@@ -1,8 +1,8 @@
-import upgradeBtnUrl from "./assets/upgrade-btn.svg";
-import { loadImage, randomInt } from "./utils";
+import { randomInt, drawCartoonText, drawCartoonPanel } from "./utils";
 import { FLOOR_W, FLOOR_H } from "./floors";
+import { formatTotalIncome } from "./totalIncome";
 
-// button placement, bottom-right corner of each floor
+// button placement, bottom-right corner of each floor (mirrors the income panel on the left)
 export const BTN_W = 360;
 export const BTN_H = 120;
 const BTN_MARGIN = 24;
@@ -23,10 +23,6 @@ interface Particle {
 const particles: Particle[] = [];
 let animationFrameId: number | null = null;
 let lastTick = 0;
-
-export function loadUpgradeButtonImage(): Promise<HTMLImageElement> {
-  return loadImage(upgradeBtnUrl);
-}
 
 function isPointOnButton(x: number, localY: number): boolean {
   return (
@@ -55,13 +51,26 @@ export function hitTestUpgradeButton(
 
 export function drawUpgradeButton(
   ctx: CanvasRenderingContext2D,
-  image: HTMLImageElement,
   offsetY: number,
   hovered: boolean,
+  cost: number,
 ): void {
+  const x = BTN_X;
+  const y = BTN_Y + offsetY;
+
   ctx.save();
-  if (hovered) ctx.filter = "brightness(0.7)";
-  ctx.drawImage(image, BTN_X, BTN_Y + offsetY, BTN_W, BTN_H);
+  if (hovered) ctx.filter = "brightness(0.85)";
+  drawCartoonPanel(ctx, x, y, BTN_W, BTN_H, 16, "#22C55E");
+
+  ctx.font = "900 48px system-ui, sans-serif";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  drawCartoonText(
+    ctx,
+    `$${formatTotalIncome(cost)}`,
+    x + BTN_W / 2,
+    y + BTN_H / 2,
+  );
   ctx.restore();
 }
 
@@ -75,46 +84,43 @@ export function drawCoins(ctx: CanvasRenderingContext2D): void {
     const radius = p.size * (1 - t * 0.3);
     ctx.globalAlpha = Math.max(0, 1 - t);
 
-    const gradient = ctx.createRadialGradient(
-      p.x - radius * 0.35,
-      p.y - radius * 0.35,
-      radius * 0.1,
-      p.x,
-      p.y,
-      radius,
-    );
-    gradient.addColorStop(0, "#FFF6D8");
-    gradient.addColorStop(0.35, "#FFDD66");
-    gradient.addColorStop(0.75, "#F0B429");
-    gradient.addColorStop(1, "#B5791A");
-
-    ctx.fillStyle = gradient;
+    // flat coin face (no directional shading, so it reads as a 2D disc, not a sphere)
+    ctx.fillStyle = "#F5C542";
     ctx.beginPath();
     ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
     ctx.fill();
-    ctx.lineWidth = Math.max(1, radius * 0.14);
+    ctx.lineWidth = Math.max(1, radius * 0.16);
     ctx.strokeStyle = "#8A5A12";
     ctx.stroke();
 
-    // glossy specular highlight
+    // embossed inner ring
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius * 0.72, 0, Math.PI * 2);
+    ctx.strokeStyle = "#D9A521";
+    ctx.lineWidth = Math.max(1, radius * 0.1);
+    ctx.stroke();
+
+    // flat gloss sheen band across the top of the disc, clipped to its circle
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+    ctx.clip();
+    const gloss = ctx.createLinearGradient(p.x, p.y - radius, p.x, p.y);
+    gloss.addColorStop(0, "rgba(255, 255, 255, 0.7)");
+    gloss.addColorStop(1, "rgba(255, 255, 255, 0)");
+    ctx.fillStyle = gloss;
     ctx.beginPath();
     ctx.ellipse(
-      p.x - radius * 0.32,
+      p.x,
       p.y - radius * 0.35,
-      radius * 0.32,
-      radius * 0.2,
-      -0.4,
+      radius * 0.95,
+      radius * 0.55,
+      0,
       0,
       Math.PI * 2,
     );
-    ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
     ctx.fill();
-
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, radius * 0.6, 0, Math.PI * 2);
-    ctx.strokeStyle = "rgba(255, 244, 200, 0.7)";
-    ctx.lineWidth = Math.max(1, radius * 0.1);
-    ctx.stroke();
+    ctx.restore();
 
     ctx.fillStyle = "#8A5A12";
     ctx.font = `bold ${Math.round(radius * 1.1)}px system-ui, sans-serif`;
