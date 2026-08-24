@@ -1,4 +1,4 @@
-import type { Floor } from "./floors";
+import type { Floor } from "../gameState";
 import { collectDueIncome } from "./incomePanel";
 
 // suffix tiers for compact large-number formatting (short scale). plain integers

@@ -4,43 +4,47 @@ import {
   FLOOR_H,
   loadFloorBackground,
   drawFloor,
-  type Floor,
-} from "./floors";
-import { loadFurnitureSprites } from "./sprites";
+} from "./uiElements/floors";
+import { loadFurnitureSprites } from "./sprites/furnitureSprites";
 import {
   createTestButtonMarkup,
   wireTestButton,
   wireResetButton,
   addFloor,
-} from "./testButton";
+} from "./uiElements/testButton";
 import {
   drawIncomePanel,
   increaseIncomeRate,
   startIncomeTicker,
-} from "./incomePanel";
-import { drawFloorNumber } from "./floorNumber";
-import { drawUpgradeStar } from "./star";
+} from "./uiElements/incomePanel";
+import { drawFloorNumber } from "./uiElements/floorNumber";
+import { drawUpgradeStar } from "./uiElements/star";
+import {
+  drawWorker,
+  hitTestWorker,
+  clickWorker,
+  getWorkerCenter,
+} from "./uiElements/worker";
 import {
   startTotalIncomeTicker,
   getTotalIncome,
   spendTotalIncome,
-} from "./totalIncome";
-import { drawHud, HUD_H } from "./hud";
-import { saveFloors, loadFloors, computeViewport } from "./gameState";
+} from "./uiElements/totalIncome";
+import { drawHud, HUD_H } from "./uiElements/hud";
+import { saveFloors, loadFloors, type Floor } from "./gameState";
+import { computeViewport } from "./computeViewport";
 import {
   drawUpgradeButton,
   hitTestUpgradeButton,
   getButtonCenter,
-  spawnCoinBurst,
-  hasActiveCoins,
-  drawCoins,
-} from "./upgradeButton";
+} from "./uiElements/upgradeButton";
+import { spawnCoinBurst, hasActiveCoins, drawCoins } from "./animations/coins";
 import {
   drawFloorLock,
   hitTestFloorLock,
   unlockFloor,
   ensureLockedFloorAbove,
-} from "./floorLock";
+} from "./uiElements/floorLock";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -112,6 +116,7 @@ async function main() {
       const floor = floors[floors.length - 1 - r];
       const offsetY = i * FLOOR_H - viewport.offsetY;
       drawFloor(ctx, bgImage, floor, offsetY);
+      drawWorker(ctx, floor, offsetY, performance.now());
       drawFloorNumber(ctx, floors.length - r, floors.length, offsetY);
       drawUpgradeStar(ctx, floor, offsetY);
       drawIncomePanel(ctx, floor, offsetY);
@@ -168,8 +173,9 @@ async function main() {
         ? row
         : null;
     const onLockPanel = hitTestFloorLock(x, y, floors) !== null;
+    const onWorker = hitTestWorker(x, y, floors) !== null;
     canvas.style.cursor =
-      activeRow !== null || onLockPanel ? "pointer" : "default";
+      activeRow !== null || onLockPanel || onWorker ? "pointer" : "default";
     if (activeRow !== hoveredRow) {
       hoveredRow = activeRow;
       redraw();
@@ -224,17 +230,31 @@ async function main() {
       return;
     }
 
+    // the upgrade button takes priority over the worker: the worker's walking path
+    // can overlap the button's area, and a click there should always mean "buy upgrade"
     const row = hitTestUpgradeButton(x, y, floors.length);
-    if (row === null) return;
-    const floor = floors[floors.length - 1 - row];
-    if (!floor.unlocked) return;
-    if (!spendTotalIncome(floor.upgradeCost)) return;
-    increaseIncomeRate(floor);
-    persist();
-    // convert the button's absolute row back to where it's actually drawn on-screen right now
-    const localOffsetY = (row - viewFirstRow) * FLOOR_H - viewOffsetY;
-    const { x: cx, y: cy } = getButtonCenter(localOffsetY);
-    spawnCoinBurst(cx, cy, redraw);
+    if (row !== null) {
+      const floor = floors[floors.length - 1 - row];
+      if (floor.unlocked && spendTotalIncome(floor.upgradeCost)) {
+        increaseIncomeRate(floor);
+        persist();
+        // convert the button's absolute row back to where it's actually drawn on-screen right now
+        const localOffsetY = (row - viewFirstRow) * FLOOR_H - viewOffsetY;
+        const { x: cx, y: cy } = getButtonCenter(localOffsetY);
+        spawnCoinBurst(cx, cy, redraw);
+      }
+      return;
+    }
+
+    const workerRow = hitTestWorker(x, y, floors);
+    if (workerRow !== null) {
+      const floor = floors[floors.length - 1 - workerRow];
+      if (clickWorker(floor, performance.now())) {
+        const localOffsetY = (workerRow - viewFirstRow) * FLOOR_H - viewOffsetY;
+        const center = getWorkerCenter(floor, localOffsetY);
+        if (center) spawnCoinBurst(center.x, center.y, redraw);
+      }
+    }
   });
 
   wireTestButton(app, () => {

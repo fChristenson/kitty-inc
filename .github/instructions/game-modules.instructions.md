@@ -12,8 +12,16 @@ distinct game element in its own dedicated file under `src/`:
   sprite selection. Nothing else should load or pick sprites directly.
 - `src/floors.ts` — floor state (`Floor`, `Placement` types), building a floor
   (`buildFloor`), and drawing a floor slab (`drawFloor`). Also owns `FLOOR_W`/`FLOOR_H`.
-- `src/upgradeButton.ts` — the upgrade button image/rendering, hover/hit-testing, and
-  the coin-burst particle animation (state + rAF loop are fully encapsulated here).
+- `src/upgradeButton.ts` — the upgrade button drawing/hover/hit-testing only. Spawning a
+  coin burst from it is done by calling `coins.ts` directly (see below).
+- `src/coins.ts` — the shared outward/gravity coin-burst particle system (`spawnCoinBurst`,
+  `hasActiveCoins`, `drawCoins`; state + rAF loop fully encapsulated here). Used by the
+  upgrade button and `worker.ts`'s click reaction.
+- `src/coinFloat.ts` — a separate, quieter coin animation: a few small coins that bubble
+  straight up from a point and fade out (`spawnFloatingCoins`, `hasActiveFloatingCoins`,
+  `drawFloatingCoins`), with its own particle array/rAF loop, independent of `coins.ts`.
+  Not currently wired to anything; available for whichever element wants this look
+  instead of the burst.
 - `src/incomePanel.ts` — the per-floor "Income" panel (title, fill bar, `$X/Ns` text)
   and `increaseIncomeRate`, the only way a floor's `incomeAmount`/`incomeIntervalSeconds`
   should be mutated. The bar's fill duration always matches `incomeIntervalSeconds`.
@@ -21,6 +29,12 @@ distinct game element in its own dedicated file under `src/`:
   (plain bold cartoon text, no panel background).
 - `src/star.ts` — the small gold star + upgrade-count number drawn just under the floor
   number label (`drawUpgradeStar`), reflecting `floor.upgradeCount`.
+- `src/worker.ts` — the small cartoon office worker (`drawWorker`) that paces back and
+  forth across the floor's walkable band (`FLOOR_X_MIN`/`FLOOR_X_MAX` from `floors.ts`);
+  per-floor position/direction state lives in its own `WeakMap<Floor, ...>`, same pattern
+  as `incomePanel.ts`'s fill-cycle clock. No-ops on locked floors. Also owns click handling:
+  `hitTestWorker`, `clickWorker` (triggers its little bounce reaction), and `getWorkerCenter`
+  (so `main.ts` can spawn `coins.ts`'s shared coin-burst particles at its position).
 - `src/totalIncome.ts` — accrual + persistence of the running total income: `formatTotalIncome`
   (6-digit cap with K/M/B/T/.../decillion suffixes), `startTotalIncomeTicker` (the only thing
   allowed to accrue floors' income into the total, skipping any floor that isn't `unlocked`),
@@ -43,7 +57,10 @@ distinct game element in its own dedicated file under `src/`:
   are visible). The canvas is a small, fixed-size "viewport window" inside a `.game__spacer`
   div sized to the full building's scroll height — it must never be resized to match
   the total floor count, or endless scrolling breaks/tanks performance. `main.ts` must
-  call `saveFloors` after any action that mutates `floors`.
+  call `saveFloors` after any action that mutates `floors`. Also the sole owner of `WorkerSlot`
+  (`{ boosted }`, whether `coinFloat.ts`'s animation should play on a floor's worker) —
+  tracked in its own `WeakMap<Floor, WorkerSlot[]>` since `Floor` itself doesn't carry it,
+  same pattern `worker.ts` uses for its own ephemeral walk-animation state.
 - `src/utils.ts` — small shared helpers (`loadImage`, `randomInt`, `roundRect`,
   `drawCartoonPanel`, `drawCartoonText`, `drawGlossHighlight`) used by multiple modules.
   Add new cross-cutting helpers here rather than duplicating them.

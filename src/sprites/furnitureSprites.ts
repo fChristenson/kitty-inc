@@ -1,4 +1,4 @@
-import { loadImage, randomInt } from "./utils";
+import { loadImage, randomInt } from "../utils";
 
 export interface FurnitureSprite {
   img: HTMLImageElement;
@@ -6,7 +6,7 @@ export interface FurnitureSprite {
 }
 
 const spriteModules = import.meta.glob<string>(
-  "./assets/sprites/sprite-*.png",
+  "../assets/sprites/sprite-*.png",
   {
     eager: true,
     import: "default",

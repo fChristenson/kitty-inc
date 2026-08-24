@@ -1,10 +1,11 @@
-import { FLOOR_H, type Floor } from "./floors";
+import { FLOOR_H } from "./floors";
+import type { Floor } from "../gameState";
 import {
   roundRect,
   drawCartoonPanel,
   drawCartoonText,
   drawGlossHighlight,
-} from "./utils";
+} from "../utils";
 
 // panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right)
 export const PANEL_W = 360;

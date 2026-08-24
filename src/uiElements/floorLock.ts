@@ -1,7 +1,8 @@
-import { FLOOR_W, FLOOR_H, buildFloor, type Floor } from "./floors";
-import { drawCartoonText } from "./utils";
+import { FLOOR_W, FLOOR_H, buildFloor } from "./floors";
+import type { Floor } from "../gameState";
+import { drawCartoonText } from "../utils";
 import { formatTotalIncome } from "./totalIncome";
-import type { FurnitureSprite } from "./sprites";
+import type { FurnitureSprite } from "../sprites/furnitureSprites";
 
 // invisible clickable region for the unlock cost, centered over the floor slab
 const PANEL_W = 280;

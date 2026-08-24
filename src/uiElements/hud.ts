@@ -1,4 +1,4 @@
-import { drawCartoonText } from "./utils";
+import { drawCartoonText } from "../utils";
 import { formatTotalIncome } from "./totalIncome";
 
 // floating text overlaid on top of the floors (no panel/bar), pinned via CSS sticky

@@ -1,4 +1,4 @@
-import { drawCartoonText } from "./utils";
+import { drawCartoonText } from "../utils";
 
 // top-left corner of each floor, no panel background
 const MARGIN = 24;

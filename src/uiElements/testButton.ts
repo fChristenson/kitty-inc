@@ -1,6 +1,7 @@
-import { buildFloor, type Floor } from "./floors";
-import type { FurnitureSprite } from "./sprites";
-import { clearFloors } from "./gameState";
+import { buildFloor } from "./floors";
+import type { Floor } from "../gameState";
+import type { FurnitureSprite } from "../sprites/furnitureSprites";
+import { clearFloors } from "../gameState";
 import { clearTotalIncome } from "./totalIncome";
 
 // the "Add Floor" / "Reset Game" dev/test controls

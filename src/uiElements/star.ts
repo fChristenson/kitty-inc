@@ -1,5 +1,5 @@
-import type { Floor } from "./floors";
-import { drawCartoonText } from "./utils";
+import type { Floor } from "../gameState";
+import { drawCartoonText } from "../utils";
 
 // sits directly under floorNumber.ts's "N / total" label, same left margin
 const MARGIN = 24;

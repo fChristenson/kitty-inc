@@ -1,36 +1,20 @@
-import bgUrl from "./assets/bg.png";
-import { loadImage, randomInt } from "./utils";
-import { pickRandomSprites, type FurnitureSprite } from "./sprites";
+import bgUrl from "../assets/bg.png";
+import { loadImage, randomInt } from "../utils";
+import {
+  pickRandomSprites,
+  type FurnitureSprite,
+} from "../sprites/furnitureSprites";
+import type { Floor, Placement } from "../gameState";
 
 // native size of bg.png
 export const FLOOR_W = 1248;
 export const FLOOR_H = 721;
 
 // the floor plane band inside each bg.png slice (rest is ceiling/walls/windows)
-const FLOOR_BOTTOM = 705;
-const FLOOR_X_MIN = 150;
-const FLOOR_X_MAX = 1100;
+export const FLOOR_BOTTOM = 705;
+export const FLOOR_X_MIN = 150;
+export const FLOOR_X_MAX = 1100;
 const FURNITURE_RISE = 60;
-
-export interface Placement {
-  img: HTMLImageElement;
-  spriteIndex: number;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-export interface Floor {
-  furniture: Placement[];
-  incomeAmount: number;
-  incomeIntervalSeconds: number;
-  upgradeCost: number; // $ needed to buy this floor's next upgrade; doubles per purchase
-  rateStep: number; // $ added to incomeAmount per upgrade click
-  upgradeCount: number; // how many upgrades have been bought on this floor
-  unlocked: boolean;
-  unlockCost: number; // 0 for floor 1 (always free); doubles starting from floor 2
-}
 
 const BASE_INCOME_AMOUNT = 1; // ground floor's starting $/interval
 // each floor above starts at 3x the previous floor's income amount, while the interval
