@@ -1,0 +1,62 @@
+[
+  {
+    "file": "sprite-01.png",
+    "width": 295,
+    "height": 335
+  },
+  {
+    "file": "sprite-02.png",
+    "width": 232,
+    "height": 365
+  },
+  {
+    "file": "sprite-03.png",
+    "width": 314,
+    "height": 224
+  },
+  {
+    "file": "sprite-04.png",
+    "width": 294,
+    "height": 275
+  },
+  {
+    "file": "sprite-05.png",
+    "width": 233,
+    "height": 256
+  },
+  {
+    "file": "sprite-06.png",
+    "width": 242,
+    "height": 358
+  },
+  {
+    "file": "sprite-07.png",
+    "width": 216,
+    "height": 354
+  },
+  {
+    "file": "sprite-08.png",
+    "width": 420,
+    "height": 236
+  },
+  {
+    "file": "sprite-09.png",
+    "width": 249,
+    "height": 406
+  },
+  {
+    "file": "sprite-10.png",
+    "width": 295,
+    "height": 398
+  },
+  {
+    "file": "sprite-11.png",
+    "width": 269,
+    "height": 388
+  },
+  {
+    "file": "sprite-12.png",
+    "width": 217,
+    "height": 346
+  }
+]
