@@ -5,6 +5,8 @@ import { randomInt } from "../utils";
 
 interface FloatingCoin {
   x: number;
+  originX: number; // fixed horizontal spawn point; x is computed from this each frame
+  startOffset: number; // how far out this coin starts, at the wide base of the cone
   y: number;
   vy: number;
   life: number;
@@ -77,9 +79,13 @@ export function drawFloatingCoins(ctx: CanvasRenderingContext2D): void {
 function updateFloatingCoins(dt: number): void {
   for (const c of coins) {
     c.y += c.vy * dt;
-    // gentle side-to-side sway instead of drifting straight up like a rocket
-    c.x += Math.sin(c.life * 0.15 + c.wobblePhase) * 0.6 * dt;
     c.life += dt;
+    // cone shape: each coin converges from its wide starting offset toward the
+    // center as it rises, with a small sway layered on top for an organic wobble
+    const t = Math.min(c.life / c.maxLife, 1);
+    const coneOffset = c.startOffset * (1 - t);
+    const wobble = Math.sin(c.life * 0.15 + c.wobblePhase) * 6;
+    c.x = c.originX + coneOffset + wobble;
   }
   for (let i = coins.length - 1; i >= 0; i--) {
     if (coins[i].life >= coins[i].maxLife) coins.splice(i, 1);
@@ -93,14 +99,19 @@ export function spawnFloatingCoins(
   y: number,
   onFrame: () => void,
 ): void {
-  const count = randomInt(4, 7);
+  const count = randomInt(2, 4);
+  const spacing = 22; // gap between each coin's starting column, i.e. the cone's base width
   for (let i = 0; i < count; i++) {
+    const startOffset =
+      (i - (count - 1) / 2) * spacing + (Math.random() - 0.5) * 15;
     coins.push({
-      x: x + (Math.random() - 0.5) * 30,
-      y: y + (Math.random() - 0.5) * 10,
+      x: x + startOffset,
+      originX: x,
+      startOffset,
+      y: y + (Math.random() - 0.5) * 20,
       vy: -(0.6 + Math.random() * 0.6),
       life: 0,
-      maxLife: 60 + Math.random() * 20,
+      maxLife: 110 + Math.random() * 40,
       size: 16 + Math.random() * 8,
       wobblePhase: Math.random() * Math.PI * 2,
     });

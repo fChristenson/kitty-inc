@@ -4,7 +4,7 @@ import {
   pickRandomSprites,
   type FurnitureSprite,
 } from "../sprites/furnitureSprites";
-import type { Floor, Placement } from "../gameState";
+import type { Floor, FurniturePosition } from "../gameState";
 
 // native size of bg.png
 export const FLOOR_W = 1248;
@@ -43,7 +43,7 @@ export function buildFloor(
   const usable = FLOOR_X_MAX - FLOOR_X_MIN;
   const slotWidth = usable / chosen.length;
 
-  const furniture: Placement[] = chosen.map((sprite, i) => {
+  const furniture: FurniturePosition[] = chosen.map((sprite, i) => {
     const { img, targetHeight } = sprite;
     const spriteIndex = sprites.indexOf(sprite);
     const scale = targetHeight / img.naturalHeight;

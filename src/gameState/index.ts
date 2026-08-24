@@ -6,7 +6,7 @@ export interface WorkerSlot {
   boosted: boolean; // whether coinFloat.ts's floating-coin animation is active on this worker
 }
 
-export interface Placement {
+export interface FurniturePosition {
   img: HTMLImageElement;
   spriteIndex: number;
   x: number;
@@ -16,7 +16,7 @@ export interface Placement {
 }
 
 export interface Floor {
-  furniture: Placement[];
+  furniture: FurniturePosition[];
   incomeAmount: number;
   incomeIntervalSeconds: number;
   upgradeCost: number; // $ needed to buy this floor's next upgrade; doubles per purchase
@@ -37,6 +37,15 @@ function getWorkerSlots(floor: Floor): WorkerSlot[] {
     workerSlots.set(floor, slots);
   }
   return slots;
+}
+
+export function isBoosted(floor: Floor): boolean {
+  return getWorkerSlots(floor)[0].boosted;
+}
+
+export function toggleBoosted(floor: Floor): void {
+  const slot = getWorkerSlots(floor)[0];
+  slot.boosted = !slot.boosted;
 }
 
 interface SavedPlacement {
@@ -106,7 +115,7 @@ export function loadFloors(sprites: FurnitureSprite[]): Floor[] {
   try {
     const saved: SavedFloor[] = JSON.parse(raw);
     return saved.map((sf) => {
-      const furniture: Placement[] = sf.furniture.map((sp) => {
+      const furniture: FurniturePosition[] = sf.furniture.map((sp) => {
         const sprite = sprites[sp.spriteIndex];
         if (!sprite) throw new Error(`missing sprite ${sp.spriteIndex}`);
         return {

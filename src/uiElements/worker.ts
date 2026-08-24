@@ -1,7 +1,8 @@
 import { FLOOR_H, FLOOR_X_MIN, FLOOR_X_MAX } from "./floors";
-import type { Floor } from "../gameState";
+import { isBoosted, type Floor } from "../gameState";
 
 const WALK_SPEED = 50; // px/sec
+const BOOSTED_WALK_SPEED = WALK_SPEED * 2;
 // feet rest well above the bottom income/upgrade panels (which start at y=577) so the
 // worker is always visible walking across the open floor instead of ducking behind them
 const WORKER_FEET_Y = 650;
@@ -92,7 +93,8 @@ export function drawWorker(
   const state = getState(floor, now);
   const dtSeconds = Math.min((now - state.lastUpdate) / 1000, 0.1);
   state.lastUpdate = now;
-  state.x += state.direction * WALK_SPEED * dtSeconds;
+  const speed = isBoosted(floor) ? BOOSTED_WALK_SPEED : WALK_SPEED;
+  state.x += state.direction * speed * dtSeconds;
   if (state.x >= FLOOR_X_MAX) {
     state.x = FLOOR_X_MAX;
     state.direction = -1;

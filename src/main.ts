@@ -31,7 +31,13 @@ import {
   spendTotalIncome,
 } from "./uiElements/totalIncome";
 import { drawHud, HUD_H } from "./uiElements/hud";
-import { saveFloors, loadFloors, type Floor } from "./gameState";
+import {
+  saveFloors,
+  loadFloors,
+  isBoosted,
+  toggleBoosted,
+  type Floor,
+} from "./gameState";
 import { computeViewport } from "./computeViewport";
 import {
   drawUpgradeButton,
@@ -39,6 +45,11 @@ import {
   getButtonCenter,
 } from "./uiElements/upgradeButton";
 import { spawnCoinBurst, hasActiveCoins, drawCoins } from "./animations/coins";
+import {
+  spawnFloatingCoins,
+  hasActiveFloatingCoins,
+  drawFloatingCoins,
+} from "./animations/coinFloat";
 import {
   drawFloorLock,
   hitTestFloorLock,
@@ -85,9 +96,23 @@ async function main() {
   // hit-testing and coin-burst placement can convert canvas-local <-> building coords
   let viewFirstRow = 0;
   let viewOffsetY = 0;
+  const lastFloatSpawn = new WeakMap<Floor, number>();
+  const FLOAT_SPAWN_INTERVAL_MS = 300;
 
   function persist() {
     saveFloors(floors);
+  }
+
+  // keeps coinFloat.ts's bubbles going for as long as the floor's worker is boosted,
+  // spawning a fresh small batch periodically instead of one that fades and stops
+  function maybeSpawnFloatingCoins(floor: Floor, offsetY: number) {
+    if (!isBoosted(floor)) return;
+    const now = performance.now();
+    const last = lastFloatSpawn.get(floor) ?? 0;
+    if (now - last < FLOAT_SPAWN_INTERVAL_MS) return;
+    lastFloatSpawn.set(floor, now);
+    const center = getWorkerCenter(floor, offsetY);
+    if (center) spawnFloatingCoins(center.x, center.y, redraw);
   }
 
   function render() {
@@ -117,6 +142,7 @@ async function main() {
       const offsetY = i * FLOOR_H - viewport.offsetY;
       drawFloor(ctx, bgImage, floor, offsetY);
       drawWorker(ctx, floor, offsetY, performance.now());
+      maybeSpawnFloatingCoins(floor, offsetY);
       drawFloorNumber(ctx, floors.length - r, floors.length, offsetY);
       drawUpgradeStar(ctx, floor, offsetY);
       drawIncomePanel(ctx, floor, offsetY);
@@ -140,6 +166,7 @@ async function main() {
     render();
     renderHud();
     if (hasActiveCoins()) drawCoins(ctx);
+    if (hasActiveFloatingCoins()) drawFloatingCoins(ctx);
     // re-pin to the ground floor if anything shifted the layout (header growing,
     // spacer settling, window resize) and the user hasn't manually scrolled away
     if (
@@ -252,7 +279,24 @@ async function main() {
       if (clickWorker(floor, performance.now())) {
         const localOffsetY = (workerRow - viewFirstRow) * FLOOR_H - viewOffsetY;
         const center = getWorkerCenter(floor, localOffsetY);
-        if (center) spawnCoinBurst(center.x, center.y, redraw);
+        if (center) {
+          spawnCoinBurst(center.x, center.y, redraw);
+          // start the float right away rather than waiting for the burst/toggle,
+          // and sync the periodic re-spawn timer so it doesn't immediately double up
+          spawnFloatingCoins(center.x, center.y, redraw);
+          lastFloatSpawn.set(floor, performance.now());
+        }
+        // flip the boosted state only once the burst has fully played out, not immediately
+        const waitForBurstToEnd = () => {
+          if (hasActiveCoins()) {
+            requestAnimationFrame(waitForBurstToEnd);
+            return;
+          }
+          toggleBoosted(floor);
+          persist();
+          redraw();
+        };
+        requestAnimationFrame(waitForBurstToEnd);
       }
     }
   });
