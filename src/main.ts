@@ -115,7 +115,13 @@ async function main() {
       drawFloorNumber(ctx, floors.length - r, floors.length, offsetY);
       drawUpgradeStar(ctx, floor, offsetY);
       drawIncomePanel(ctx, floor, offsetY);
-      drawUpgradeButton(ctx, offsetY, r === hoveredRow, floor.upgradeCost);
+      drawUpgradeButton(
+        ctx,
+        offsetY,
+        r === hoveredRow,
+        floor.upgradeCost,
+        getTotalIncome() >= floor.upgradeCost,
+      );
       drawFloorLock(ctx, floor, offsetY);
     }
   }
@@ -156,7 +162,11 @@ async function main() {
     const { x, y } = toCanvasPoint(event);
     const row = hitTestUpgradeButton(x, y, floors.length);
     const activeRow =
-      row !== null && floors[floors.length - 1 - row].unlocked ? row : null;
+      row !== null &&
+      floors[floors.length - 1 - row].unlocked &&
+      getTotalIncome() >= floors[floors.length - 1 - row].upgradeCost
+        ? row
+        : null;
     const onLockPanel = hitTestFloorLock(x, y, floors) !== null;
     canvas.style.cursor =
       activeRow !== null || onLockPanel ? "pointer" : "default";

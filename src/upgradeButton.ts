@@ -54,13 +54,15 @@ export function drawUpgradeButton(
   offsetY: number,
   hovered: boolean,
   cost: number,
+  affordable: boolean,
 ): void {
   const x = BTN_X;
   const y = BTN_Y + offsetY;
 
   ctx.save();
-  if (hovered) ctx.filter = "brightness(0.85)";
-  drawCartoonPanel(ctx, x, y, BTN_W, BTN_H, 16, "#22C55E");
+  if (!affordable) ctx.globalAlpha = 0.5;
+  else if (hovered) ctx.filter = "brightness(0.85)";
+  drawCartoonPanel(ctx, x, y, BTN_W, BTN_H, 16, affordable ? "#22C55E" : "#6B7280");
 
   ctx.font = "900 48px system-ui, sans-serif";
   ctx.textAlign = "center";
