@@ -6,7 +6,10 @@ const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
 const furnitureFile = process.argv[2] ?? "furniture.jpg";
 
 async function exists(p) {
-  return fs.access(p).then(() => true, () => false);
+  return fs.access(p).then(
+    () => true,
+    () => false,
+  );
 }
 
 // --- crop bg.jpg to remove the plain white letterbox bars on top/bottom, output bg.png ---
@@ -52,7 +55,9 @@ async function makeFurnitureTransparent() {
     out[p + 3] = alpha;
   }
 
-  await sharp(out, { raw: { width, height, channels: 4 } }).png().toFile(dest);
+  await sharp(out, { raw: { width, height, channels: 4 } })
+    .png()
+    .toFile(dest);
   console.log("furniture.png written with transparent background");
 }
 
@@ -73,7 +78,8 @@ async function extractSprites() {
   const PADDING = 4;
 
   const visited = new Uint8Array(width * height);
-  const isOpaque = (x, y) => data[(y * width + x) * channels + 3] > ALPHA_THRESHOLD;
+  const isOpaque = (x, y) =>
+    data[(y * width + x) * channels + 3] > ALPHA_THRESHOLD;
 
   const boxes = [];
   const stack = [];
@@ -82,7 +88,11 @@ async function extractSprites() {
       const idx = y * width + x;
       if (visited[idx] || !isOpaque(x, y)) continue;
 
-      let minX = x, maxX = x, minY = y, maxY = y, area = 0;
+      let minX = x,
+        maxX = x,
+        minY = y,
+        maxY = y,
+        area = 0;
       visited[idx] = 1;
       stack.push([x, y]);
       while (stack.length) {
@@ -92,8 +102,18 @@ async function extractSprites() {
         if (cx > maxX) maxX = cx;
         if (cy < minY) minY = cy;
         if (cy > maxY) maxY = cy;
-        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [1, -1], [-1, 1], [-1, -1]]) {
-          const nx = cx + dx, ny = cy + dy;
+        for (const [dx, dy] of [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+          [1, 1],
+          [1, -1],
+          [-1, 1],
+          [-1, -1],
+        ]) {
+          const nx = cx + dx,
+            ny = cy + dy;
           if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue;
           const nIdx = ny * width + nx;
           if (visited[nIdx] || !isOpaque(nx, ny)) continue;
@@ -140,7 +160,9 @@ if (await exists(path.join(assets, "bg-original.jpg"))) {
 if (await exists(path.join(assets, furnitureFile))) {
   await makeFurnitureTransparent();
 } else {
-  console.log(`skip makeFurnitureTransparent: ${furnitureFile} missing, using existing furniture.png`);
+  console.log(
+    `skip makeFurnitureTransparent: ${furnitureFile} missing, using existing furniture.png`,
+  );
 }
 
 await extractSprites();

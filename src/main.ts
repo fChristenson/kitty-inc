@@ -1,79 +1,22 @@
 import "./style.css";
-import bgUrl from "./assets/bg.png";
-
-const spriteModules = import.meta.glob<string>("./assets/sprites/sprite-*.png", {
-  eager: true,
-  import: "default",
-});
-const spriteUrls = Object.keys(spriteModules)
-  .sort()
-  .map((key) => spriteModules[key]);
-
-// native size of bg.png
-const FLOOR_W = 1248;
-const FLOOR_H = 721;
-
-// the floor plane band inside each bg.png slice (rest is ceiling/walls/windows)
-const FLOOR_BOTTOM = 705;
-const FLOOR_X_MIN = 150;
-const FLOOR_X_MAX = 1100;
-const FURNITURE_MAX_H = 195;
-const FURNITURE_RISE = 60;
-
-interface Placement {
-  img: HTMLImageElement;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-interface Floor {
-  furniture: Placement[];
-}
-
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`failed to load ${src}`));
-    img.src = src;
-  });
-}
-
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function pickRandomSprites(images: HTMLImageElement[], count: number): HTMLImageElement[] {
-  const pool = [...images];
-  const picked: HTMLImageElement[] = [];
-  for (let i = 0; i < count && pool.length > 0; i++) {
-    const idx = randomInt(0, pool.length - 1);
-    picked.push(pool.splice(idx, 1)[0]);
-  }
-  return picked;
-}
-
-function buildFloor(spriteImages: HTMLImageElement[]): Floor {
-  const count = randomInt(2, 3);
-  const chosen = pickRandomSprites(spriteImages, count);
-  const usableW = FLOOR_X_MAX - FLOOR_X_MIN;
-  const slotWidth = usableW / chosen.length;
-
-  const furniture: Placement[] = chosen.map((img, i) => {
-    const scale = Math.min(FURNITURE_MAX_H / img.naturalHeight, 1);
-    const w = img.naturalWidth * scale;
-    const h = img.naturalHeight * scale;
-    const slotCenter = FLOOR_X_MIN + slotWidth * i + slotWidth / 2;
-    const jitter = (Math.random() - 0.5) * slotWidth * 0.4;
-    const x = Math.min(Math.max(slotCenter + jitter - w / 2, FLOOR_X_MIN), FLOOR_X_MAX - w);
-    const y = FLOOR_BOTTOM - h - FURNITURE_RISE;
-    return { img, x, y, w, h };
-  });
-
-  return { furniture };
-}
+import {
+  FLOOR_W,
+  FLOOR_H,
+  loadFloorBackground,
+  drawFloor,
+  type Floor,
+} from "./floors";
+import { loadFurnitureSprites } from "./sprites";
+import { createTestButtonMarkup, wireTestButton, addFloor } from "./testButton";
+import {
+  loadUpgradeButtonImage,
+  drawUpgradeButton,
+  hitTestUpgradeButton,
+  getButtonCenter,
+  spawnCoinBurst,
+  hasActiveCoins,
+  drawCoins,
+} from "./upgradeButton";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -88,7 +31,7 @@ async function main() {
       <div class="game__scroll" id="scroll">
         <canvas id="building"></canvas>
       </div>
-      <button id="add-floor" class="game__button">Add Floor</button>
+      ${createTestButtonMarkup()}
     </div>
   `;
 
@@ -96,14 +39,15 @@ async function main() {
   const ctx = canvas.getContext("2d")!;
   const scrollEl = app.querySelector<HTMLDivElement>("#scroll")!;
   const floorCountEl = app.querySelector<HTMLSpanElement>("#floor-count")!;
-  const addFloorBtn = app.querySelector<HTMLButtonElement>("#add-floor")!;
 
-  const [bgImage, ...spriteImages] = await Promise.all([
-    loadImage(bgUrl),
-    ...spriteUrls.map(loadImage),
+  const [bgImage, upgradeBtnImage, furnitureSprites] = await Promise.all([
+    loadFloorBackground(),
+    loadUpgradeButtonImage(),
+    loadFurnitureSprites(),
   ]);
 
   const floors: Floor[] = [];
+  let hoveredRow: number | null = null;
 
   function render() {
     canvas.width = FLOOR_W;
@@ -111,23 +55,71 @@ async function main() {
     for (let r = 0; r < floors.length; r++) {
       const floor = floors[floors.length - 1 - r];
       const offsetY = r * FLOOR_H;
-      ctx.drawImage(bgImage, 0, offsetY, FLOOR_W, FLOOR_H);
-      for (const p of floor.furniture) {
-        ctx.drawImage(p.img, p.x, p.y + offsetY, p.w, p.h);
-      }
+      drawFloor(ctx, bgImage, floor, offsetY);
+      drawUpgradeButton(ctx, upgradeBtnImage, offsetY, r === hoveredRow);
     }
   }
 
-  function addFloor() {
-    floors.push(buildFloor(spriteImages));
-    floorCountEl.textContent = String(floors.length);
+  function redraw() {
     render();
-    scrollEl.scrollTop = 0; // keep the newest floor in view
+    if (hasActiveCoins()) drawCoins(ctx);
   }
 
-  addFloorBtn.addEventListener("click", addFloor);
+  // map a page-space pointer event to canvas pixel coordinates
+  function toCanvasPoint(event: MouseEvent): { x: number; y: number } {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (event.clientX - rect.left) * scaleX,
+      y: (event.clientY - rect.top) * scaleY,
+    };
+  }
 
-  addFloor(); // ground floor
+  canvas.addEventListener("mousemove", (event) => {
+    const { x, y } = toCanvasPoint(event);
+    const row = hitTestUpgradeButton(x, y, floors.length);
+    canvas.style.cursor = row !== null ? "pointer" : "default";
+    if (row !== hoveredRow) {
+      hoveredRow = row;
+      redraw();
+    }
+  });
+
+  canvas.addEventListener("mouseleave", () => {
+    if (hoveredRow !== null) {
+      hoveredRow = null;
+      redraw();
+    }
+  });
+
+  canvas.addEventListener("click", (event) => {
+    const { x, y } = toCanvasPoint(event);
+    const row = hitTestUpgradeButton(x, y, floors.length);
+    if (row === null) return;
+    const level = floors.length - row;
+    console.log(`Upgrade clicked on floor ${level}`);
+    const { x: cx, y: cy } = getButtonCenter(row * FLOOR_H);
+    spawnCoinBurst(cx, cy, redraw);
+  });
+
+  wireTestButton(app, () =>
+    addFloor({
+      floors,
+      sprites: furnitureSprites,
+      floorCountEl,
+      scrollEl,
+      onChange: redraw,
+    }),
+  );
+
+  addFloor({
+    floors,
+    sprites: furnitureSprites,
+    floorCountEl,
+    scrollEl,
+    onChange: redraw,
+  }); // ground floor
 }
 
 main();
