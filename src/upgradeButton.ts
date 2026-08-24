@@ -62,7 +62,15 @@ export function drawUpgradeButton(
   ctx.save();
   if (!affordable) ctx.globalAlpha = 0.5;
   else if (hovered) ctx.filter = "brightness(0.85)";
-  drawCartoonPanel(ctx, x, y, BTN_W, BTN_H, 16, affordable ? "#22C55E" : "#6B7280");
+  drawCartoonPanel(
+    ctx,
+    x,
+    y,
+    BTN_W,
+    BTN_H,
+    16,
+    affordable ? "#22C55E" : "#6B7280",
+  );
 
   ctx.font = "900 48px system-ui, sans-serif";
   ctx.textAlign = "center";
