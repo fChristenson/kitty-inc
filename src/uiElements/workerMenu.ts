@@ -9,7 +9,8 @@ const WORKER_BASE_PRICE_FLOOR_1 = 100;
 // the $ cost of a floor's next worker: its floor price (unlock cost, or the floor-1
 // fallback above) times how many workers it already has
 export function getWorkerCost(floor: Floor): number {
-  const floorPrice = floor.unlockCost > 0 ? floor.unlockCost : WORKER_BASE_PRICE_FLOOR_1;
+  const floorPrice =
+    floor.unlockCost > 0 ? floor.unlockCost : WORKER_BASE_PRICE_FLOOR_1;
   return floorPrice * floor.workerCount;
 }
 
@@ -52,9 +53,8 @@ export function wireWorkerMenu(
   const backdrop = container.querySelector<HTMLDivElement>(
     "#worker-menu-backdrop",
   )!;
-  const closeButton = container.querySelector<HTMLButtonElement>(
-    "#worker-menu-close",
-  )!;
+  const closeButton =
+    container.querySelector<HTMLButtonElement>("#worker-menu-close")!;
   const list = container.querySelector<HTMLDivElement>("#worker-menu-list")!;
 
   function render(): void {

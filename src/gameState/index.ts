@@ -60,7 +60,11 @@ function expireIfStale(slot: WorkerSlot, now: number): boolean {
   return slot.boosted;
 }
 
-export function isBoosted(floor: Floor, workerIndex: number, now: number): boolean {
+export function isBoosted(
+  floor: Floor,
+  workerIndex: number,
+  now: number,
+): boolean {
   return expireIfStale(ensureSlot(floor, workerIndex), now);
 }
 

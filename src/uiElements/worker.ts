@@ -210,4 +210,3 @@ export function drawWorker(
     drawFigure(ctx, walker.x, cy, walker.direction, legSwing);
   });
 }
-

@@ -57,7 +57,10 @@ import {
   ensureLockedFloorAbove,
 } from "./uiElements/floorLock";
 import { createActionBarMarkup, wireActionBar } from "./uiElements/actionBar";
-import { createWorkerMenuMarkup, wireWorkerMenu } from "./uiElements/workerMenu";
+import {
+  createWorkerMenuMarkup,
+  wireWorkerMenu,
+} from "./uiElements/workerMenu";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -90,7 +93,8 @@ async function main() {
   cloudsCanvas.height = 280;
   const scrollEl = app.querySelector<HTMLDivElement>("#scroll")!;
   const floorsEl = app.querySelector<HTMLDivElement>("#floors")!;
-  const coinOverlayCanvas = app.querySelector<HTMLCanvasElement>("#coin-overlay")!;
+  const coinOverlayCanvas =
+    app.querySelector<HTMLCanvasElement>("#coin-overlay")!;
   const coinOverlayCtx = coinOverlayCanvas.getContext("2d")!;
 
   // keeps the overlay canvas's CSS box exactly matching the scroll viewport, so
@@ -315,7 +319,10 @@ async function main() {
       }
 
       const workerIndex = hitTestWorker(x, y, floor);
-      if (workerIndex !== null && clickWorker(floor, workerIndex, performance.now())) {
+      if (
+        workerIndex !== null &&
+        clickWorker(floor, workerIndex, performance.now())
+      ) {
         const center = getWorkerCenter(floor, workerIndex);
         if (center) {
           spawnCoinBurst(floor, center.x, center.y, () => {
@@ -324,7 +331,9 @@ async function main() {
           });
           // start the float right away at just this worker, so the boost visibly
           // kicks in immediately instead of waiting for the next periodic tick
-          spawnFloatingCoins(floor, center.x, center.y, () => redrawFloor(floor));
+          spawnFloatingCoins(floor, center.x, center.y, () =>
+            redrawFloor(floor),
+          );
           lastFloatSpawn.set(floor, performance.now());
         }
         // clicking a worker only (re)activates that specific worker's boost/15s timer
@@ -362,7 +371,10 @@ async function main() {
       const now = performance.now();
       for (const floor of floors) {
         if (!floor.unlocked) continue;
-        const renderedWorkers = Math.min(floor.workerCount, MAX_RENDERED_WORKERS);
+        const renderedWorkers = Math.min(
+          floor.workerCount,
+          MAX_RENDERED_WORKERS,
+        );
         for (let i = 0; i < renderedWorkers; i++) {
           activateBoosted(floor, i, now);
         }

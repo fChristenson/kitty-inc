@@ -31,7 +31,9 @@ export function hasActiveCoins(): boolean {
 // pixel space, null if that floor isn't currently mounted/visible
 export function drawCoins(
   ctx: CanvasRenderingContext2D,
-  getFloorRect: (floor: Floor) => { left: number; top: number; width: number } | null,
+  getFloorRect: (
+    floor: Floor,
+  ) => { left: number; top: number; width: number } | null,
 ): void {
   for (const p of particles) {
     const rect = getFloorRect(p.floor);
