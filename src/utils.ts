@@ -33,6 +33,12 @@ const MAGNITUDE_SUFFIXES: { value: number; suffix: string }[] = [
 function formatCompactNumber(value: number): string {
   const safe = Math.max(0, value);
   if (safe < 1e6) return safe.toFixed(2);
+  const largestTier = MAGNITUDE_SUFFIXES[0];
+  // past the largest named tier (decillion), dividing by it forever just grows the
+  // mantissa unboundedly (e.g. "323257909.93Dc") — switch to scientific notation instead
+  if (safe >= largestTier.value * 1000) {
+    return safe.toExponential(2).replace("+", "");
+  }
   const tier =
     MAGNITUDE_SUFFIXES.find((t) => safe >= t.value) ??
     MAGNITUDE_SUFFIXES[MAGNITUDE_SUFFIXES.length - 1];

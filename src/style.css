@@ -170,24 +170,26 @@ body {
   width: 100%;
   max-width: 480px;
   display: flex;
-  justify-content: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
+  justify-content: stretch;
   background: rgba(17, 20, 23, 0.85);
   z-index: 30;
 }
 
 .action-bar__button {
-  width: 3rem;
-  height: 3rem;
+  flex: 1;
+  height: 4rem;
   border: none;
-  border-radius: 50%;
+  border-radius: 0;
   background: #3b82f6;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+.action-bar__button + .action-bar__button {
+  border-left: 1px solid rgba(0, 0, 0, 0.25);
 }
 
 .action-bar__button:active {
@@ -294,4 +296,66 @@ body {
 
 .worker-menu__price {
   font-weight: 900;
+}
+
+.popup {
+  position: fixed;
+  inset: 0;
+  z-index: 50; /* above the worker menu, since it's meant to greet the player before anything else */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.popup[hidden] {
+  display: none; /* the [hidden] attribute's UA display:none loses to the class rule above without this */
+}
+
+.popup__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.popup__panel {
+  position: relative;
+  width: min(90vw, 360px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  background: #1e293b;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.popup__panel h2 {
+  margin: 0;
+}
+
+.popup__panel p {
+  margin: 0;
+}
+
+.popup__amount {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: #34d399;
+}
+
+.popup__button {
+  margin-top: 0.5rem;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: #3b82f6;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.popup__button:active {
+  background: #2563eb;
 }

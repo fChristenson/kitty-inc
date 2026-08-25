@@ -42,6 +42,9 @@ export function hitTestFloorLock(x: number, y: number, floor: Floor): boolean {
 
 export function unlockFloor(floor: Floor): void {
   floor.unlocked = true;
+  // starts idle-income tracking fresh from the moment it's actually earning, instead of
+  // inheriting its creation time (when it was still locked and not accruing anything)
+  floor.lastCollectedAt = Date.now();
 }
 
 interface EnsureLockedFloorDeps {

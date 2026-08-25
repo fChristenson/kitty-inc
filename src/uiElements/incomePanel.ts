@@ -1,5 +1,6 @@
 import { FLOOR_H } from "./floors";
 import { countBoostedWorkers, type Floor } from "../gameState";
+import { MAX_RENDERED_WORKERS } from "./worker";
 import {
   roundRect,
   drawCartoonPanel,
@@ -22,6 +23,9 @@ let tickerRunning = false;
 
 // floor on the wait-time halving so repeated /10 upgrades can't shrink it to zero
 const MIN_INCOME_INTERVAL_SECONDS = 0.1;
+// ceiling on the wait time so a high floor's exponentially-longer base interval never
+// forces the player to wait more than this long between payouts
+const MAX_INCOME_INTERVAL_SECONDS = 3600;
 const UPGRADES_PER_INTERVAL_HALVING = 10;
 
 // below this, the fill cycle repeats too fast to read as a filling bar, so the bar is
@@ -43,14 +47,46 @@ export function increaseIncomeRate(floor: Floor): void {
   }
 }
 
-// the interval actually used for filling/paying out: halved once per individually-boosted
-// worker on the floor, on top of floor.incomeIntervalSeconds's own permanent upgrades
-function effectiveIntervalSeconds(floor: Floor, now: number): number {
-  const boostExponent = countBoostedWorkers(floor, now);
-  return Math.max(
-    MIN_INCOME_INTERVAL_SECONDS,
-    floor.incomeIntervalSeconds / 2 ** boostExponent,
-  );
+// the interval/payout actually used for filling/paying out: each boosted visual worker
+// slot (of MAX_RENDERED_WORKERS) represents that fraction of the floor's real workforce,
+// so the halving exponent scales with the actual workerCount behind it — boosting 1 of 3
+// slots only speeds up 1/3 of the workers, while boosting all 3 means every worker is
+// boosted and their doublings stack multiplicatively (cumulative), same as a global boost.
+// the interval is clamped to [MIN_INCOME_INTERVAL_SECONDS, MAX_INCOME_INTERVAL_SECONDS]
+// (ticking any faster isn't visually manageable; waiting any longer isn't playable) — any
+// speed beyond the min is folded into a payout multiplier, and any wait beyond the max is
+// folded into a payout reduction, so the player always earns the same $/sec the uncapped
+// interval implies either way
+function effectiveIncomeCycle(
+  floor: Floor,
+  now: number,
+): { intervalSeconds: number; amount: number } {
+  const boostedFraction =
+    countBoostedWorkers(floor, now) / MAX_RENDERED_WORKERS;
+  const boostExponent = boostedFraction * floor.workerCount;
+  const uncappedIntervalSeconds =
+    floor.incomeIntervalSeconds / 2 ** boostExponent;
+
+  if (uncappedIntervalSeconds > MAX_INCOME_INTERVAL_SECONDS) {
+    const underspeedMultiplier =
+      MAX_INCOME_INTERVAL_SECONDS / uncappedIntervalSeconds;
+    return {
+      intervalSeconds: MAX_INCOME_INTERVAL_SECONDS,
+      amount: floor.incomeAmount * underspeedMultiplier,
+    };
+  }
+  if (uncappedIntervalSeconds >= MIN_INCOME_INTERVAL_SECONDS) {
+    return {
+      intervalSeconds: uncappedIntervalSeconds,
+      amount: floor.incomeAmount,
+    };
+  }
+  const overspeedMultiplier =
+    MIN_INCOME_INTERVAL_SECONDS / uncappedIntervalSeconds;
+  return {
+    intervalSeconds: MIN_INCOME_INTERVAL_SECONDS,
+    amount: floor.incomeAmount * overspeedMultiplier,
+  };
 }
 
 // advances a floor's fill cycle by however many full intervals have elapsed since it was last
@@ -60,15 +96,21 @@ function effectiveIntervalSeconds(floor: Floor, now: number): number {
 export function collectDueIncome(floor: Floor, now: number): number {
   if (!cycleStart.has(floor)) cycleStart.set(floor, now);
   const start = cycleStart.get(floor)!;
-  const intervalMs = effectiveIntervalSeconds(floor, now) * 1000;
+  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
+  const intervalMs = intervalSeconds * 1000;
   const cycles = Math.floor((now - start) / intervalMs);
   if (cycles <= 0) return 0;
   cycleStart.set(floor, start + cycles * intervalMs);
-  return cycles * floor.incomeAmount;
+  // keeps gameState.ts's computeIdleIncome from re-paying this same span as idle time
+  // later: without this, time spent actively playing (but persisted via no other
+  // action) would look identical to time the tab was closed on the next reload
+  floor.lastCollectedAt = Date.now();
+  return cycles * amount;
 }
 
 function formatIncomeRate(floor: Floor, now: number): string {
-  return `${formatPrice(floor.incomeAmount)}/${formatTime(effectiveIntervalSeconds(floor, now))}`;
+  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
+  return `${formatPrice(amount)}/${formatTime(intervalSeconds)}`;
 }
 
 // walks clockwise around a rounded rect's own outline; t is a 0..1 lap fraction,
@@ -176,7 +218,8 @@ export function drawIncomePanel(
   const now = performance.now();
   if (floor.unlocked) {
     if (!cycleStart.has(floor)) cycleStart.set(floor, now);
-    const fillDurationMs = effectiveIntervalSeconds(floor, now) * 1000;
+    const fillDurationMs =
+      effectiveIncomeCycle(floor, now).intervalSeconds * 1000;
     if (fillDurationMs < FAST_CYCLE_THRESHOLD_MS) {
       isFastCycle = true;
       fillW = barW;

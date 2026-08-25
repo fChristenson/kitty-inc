@@ -75,6 +75,7 @@ export function buildFloor(
     unlocked: floorLevel === 1,
     unlockCost: floorLevel === 1 ? 0 : BASE_UNLOCK_COST * 2 ** (floorLevel - 2),
     workerCount: 1,
+    lastCollectedAt: Date.now(),
   };
 }
 

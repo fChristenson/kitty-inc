@@ -27,7 +27,6 @@ import {
   clickWorker,
   getWorkerCenter,
   getBoostedWorkerCenters,
-  MAX_RENDERED_WORKERS,
 } from "./uiElements/worker";
 import {
   startTotalIncomeTicker,
@@ -40,6 +39,7 @@ import {
   saveFloors,
   loadFloors,
   activateBoosted,
+  computeIdleIncome,
   type Floor,
 } from "./gameState";
 import {
@@ -61,6 +61,8 @@ import {
   createWorkerMenuMarkup,
   wireWorkerMenu,
 } from "./uiElements/workerMenu";
+import { createBoostMenuMarkup, wireBoostMenu } from "./uiElements/boostMenu";
+import { createPopupMarkup, showIdlePopup } from "./uiElements/popup";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -81,6 +83,8 @@ async function main() {
     <canvas class="game__coin-overlay" id="coin-overlay"></canvas>
     ${createActionBarMarkup()}
     ${createWorkerMenuMarkup()}
+    ${createBoostMenuMarkup()}
+    ${createPopupMarkup()}
   `;
 
   const hudCanvas = app.querySelector<HTMLCanvasElement>("#hud")!;
@@ -360,6 +364,14 @@ async function main() {
       redrawAll();
     },
   );
+  const boostMenu = wireBoostMenu(
+    app,
+    () => floors,
+    () => {
+      persist();
+      redrawAll();
+    },
+  );
   wireActionBar(app, {
     onScrollTop: () => {
       scrollEl.scrollTop = 0;
@@ -368,19 +380,7 @@ async function main() {
       scrollEl.scrollTop = scrollEl.scrollHeight;
     },
     onBoostAll: () => {
-      const now = performance.now();
-      for (const floor of floors) {
-        if (!floor.unlocked) continue;
-        const renderedWorkers = Math.min(
-          floor.workerCount,
-          MAX_RENDERED_WORKERS,
-        );
-        for (let i = 0; i < renderedWorkers; i++) {
-          activateBoosted(floor, i, now);
-        }
-      }
-      persist();
-      redrawAll();
+      boostMenu.open();
     },
     onOpenHireMenu: () => {
       workerMenu.open();
@@ -416,11 +416,24 @@ async function main() {
   groundEl.className = "game__ground";
   floorsEl.append(groundEl);
 
+  const idleIncome = computeIdleIncome(floors);
+  persist(); // computeIdleIncome advances each floor's lastCollectedAt in memory; save it
+  // now so a second quick reload can't re-collect the same already-paid-out idle time
+  if (idleIncome > 0) {
+    showIdlePopup(app, idleIncome, () => addTotalIncome(idleIncome));
+  }
+
   redrawAll();
   scrollEl.scrollTop = scrollEl.scrollHeight; // land on the ground floor
 
   startIncomeTicker(redrawAll);
   startTotalIncomeTicker(floors);
+
+  // collectDueIncome keeps each floor's lastCollectedAt caught up to "now" as it pays out
+  // live, but that only updates the in-memory floors[] — without this, passive play (no
+  // worker/upgrade/hire clicks to trigger persist()) would never save it, so a refresh
+  // would see a stale lastCollectedAt and re-pay the whole live session as "idle" income
+  window.addEventListener("beforeunload", persist);
 }
 
 main();

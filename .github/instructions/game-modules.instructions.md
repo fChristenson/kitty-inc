@@ -76,7 +76,7 @@ distinct game element in its own dedicated file under `src/`:
   `startIncomeTicker` already drives.
 - `src/actionBar.ts` — the fixed action bar overlaying the bottom of the viewport
   (`.action-bar`, independent of scroll/floor position): up/down arrows to jump to the
-  top/ground floor, a lightning bolt to boost every unlocked floor's worker at once, and
+  top/ground floor, a lightning bolt to open `boostMenu.ts`'s boost menu, and
   a plus to open `workerMenu.ts`'s hire menu. `createActionBarMarkup`/`wireActionBar`
   only build and wire the bar itself; `main.ts` owns what each button actually does.
 - `src/workerMenu.ts` — the "Hire Workers" full-screen menu (`createWorkerMenuMarkup`/
@@ -85,6 +85,12 @@ distinct game element in its own dedicated file under `src/`:
   floor's next worker costs its floor price (`unlockCost`, or a fallback for floor 1
   since that's permanently free) times its current `workerCount`. `incomePanel.ts` uses
   `workerCount` to scale how much a boost divides the income interval by.
+- `src/boostMenu.ts` — the "Boosts" full-screen menu (`createBoostMenuMarkup`/
+  `wireBoostMenu`, reusing `workerMenu.ts`'s `.worker-menu` styling/shape so more boost
+  options can be added to the same list later), plus `getBoostAllCost`/`buyBoostAll` —
+  the only way every unlocked floor's rendered workers should get boosted at once. Costs
+  15s of current (unboosted) income, i.e. `sum(incomeAmount / incomeIntervalSeconds)`
+  across unlocked floors, times 15, spent via `totalIncome.ts`'s `spendTotalIncome`.
 - `src/testButton.ts` — the "Add Money" / "Reset Game" dev/test controls: their markup,
   click wiring (`wireTestButton` grants a flat 100 trillion via `totalIncome.ts`'s
   `addTotalIncome`), the `addFloor` helper (build a floor, call `onAdd(floor)` — still
@@ -95,7 +101,16 @@ distinct game element in its own dedicated file under `src/`:
   `floors`. Also the sole owner of `WorkerSlot` (`{ boosted }`, whether `coinFloat.ts`'s
   animation should play on a floor's worker) — tracked in its own
   `WeakMap<Floor, WorkerSlot[]>` since `Floor` itself doesn't carry it, same pattern
-  `worker.ts` uses for its own ephemeral walk-animation state.
+  `worker.ts` uses for its own ephemeral walk-animation state. Also owns `computeIdleIncome`
+  (call once per page load): using real wall-clock time (not `performance.now()`, which
+  resets every load) against the last-visit timestamp it stamps in localStorage, it sums
+  what every unlocked floor would've earned at its own unboosted rate while the page was
+  closed, returning 0 if that gap was under a second. `popup.ts` shows the result.
+- `src/popup.ts` — the "Welcome back!" confirm dialog (`createPopupMarkup`/
+  `showIdlePopup`), shown once on load only when `gameState.ts`'s `computeIdleIncome`
+  returns more than $0. Clicking OK is the only place that idle income should be added
+  to the total (via `totalIncome.ts`'s `addTotalIncome`) — the dialog itself never
+  mutates game state, it just reports the number and fires the caller's callback.
 - `src/utils.ts` — small shared helpers (`loadImage`, `randomInt`, `roundRect`,
   `drawCartoonPanel`, `drawCartoonText`, `drawGlossHighlight`), plus `formatPrice`
   (the only way any `$` amount should be formatted, e.g. `"$1.23M"`) and `formatTime`
