@@ -1,5 +1,4 @@
-import { drawCartoonText } from "../utils";
-import { formatTotalIncome } from "./totalIncome";
+import { drawCartoonText, formatPrice } from "../utils";
 
 // floating text overlaid on top of the floors (no panel/bar), pinned via CSS sticky
 const HUD_MARGIN = 16;
@@ -18,7 +17,7 @@ export function drawHud(
   ctx.textBaseline = "middle";
   drawCartoonText(
     ctx,
-    `$${formatTotalIncome(totalIncome)}`,
+    formatPrice(totalIncome),
     x + w / 2,
     HUD_H / 2,
     "#34D399",

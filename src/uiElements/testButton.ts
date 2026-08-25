@@ -4,11 +4,11 @@ import type { FurnitureSprite } from "../sprites/furnitureSprites";
 import { clearFloors } from "../gameState";
 import { clearTotalIncome } from "./totalIncome";
 
-// the "Add Floor" / "Reset Game" dev/test controls
+// the "Add Money" / "Reset Game" dev/test controls
 export function createTestButtonMarkup(): string {
   return `
     <div class="game__test-controls">
-      <button id="add-floor" class="game__button">Add Floor</button>
+      <button id="add-money" class="game__button">Add Money</button>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
     </div>
   `;
@@ -17,24 +17,22 @@ export function createTestButtonMarkup(): string {
 interface AddFloorDeps {
   floors: Floor[];
   sprites: FurnitureSprite[];
-  scrollEl: HTMLElement;
-  onChange: () => void;
+  onAdd: (floor: Floor) => void;
 }
 
+// each floor is a real, fixed-size DOM canvas, so growing the building is just adding
+// an element — no scroll-position math needed, native scroll anchoring keeps the view put
 export function addFloor(deps: AddFloorDeps): void {
-  const scrollHeightBefore = deps.scrollEl.scrollHeight;
-  deps.floors.push(buildFloor(deps.sprites, deps.floors.length + 1));
-  deps.onChange();
-  // new floors render above existing ones, so compensate scrollTop by the added
-  // height to keep whatever the user was looking at (e.g. the ground floor) in place
-  deps.scrollEl.scrollTop += deps.scrollEl.scrollHeight - scrollHeightBefore;
+  const floor = buildFloor(deps.sprites, deps.floors.length + 1);
+  deps.floors.push(floor);
+  deps.onAdd(floor);
 }
 
 export function wireTestButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
-  const button = container.querySelector<HTMLButtonElement>("#add-floor")!;
+  const button = container.querySelector<HTMLButtonElement>("#add-money")!;
   button.addEventListener("click", onClick);
 }
 

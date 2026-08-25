@@ -5,6 +5,7 @@ import {
   loadFloorBackground,
   drawFloor,
 } from "./uiElements/floors";
+import { drawOuterWall } from "./uiElements/outerWall";
 import { loadFurnitureSprites } from "./sprites/furnitureSprites";
 import {
   createTestButtonMarkup,
@@ -19,43 +20,44 @@ import {
 } from "./uiElements/incomePanel";
 import { drawFloorNumber } from "./uiElements/floorNumber";
 import { drawUpgradeStar } from "./uiElements/star";
+import { drawWorkerCount } from "./uiElements/workerCount";
 import {
   drawWorker,
   hitTestWorker,
   clickWorker,
   getWorkerCenter,
+  getBoostedWorkerCenters,
+  MAX_RENDERED_WORKERS,
 } from "./uiElements/worker";
 import {
   startTotalIncomeTicker,
   getTotalIncome,
   spendTotalIncome,
+  addTotalIncome,
 } from "./uiElements/totalIncome";
 import { drawHud, HUD_H } from "./uiElements/hud";
 import {
   saveFloors,
   loadFloors,
-  isBoosted,
-  toggleBoosted,
+  activateBoosted,
   type Floor,
 } from "./gameState";
-import { computeViewport } from "./computeViewport";
 import {
   drawUpgradeButton,
   hitTestUpgradeButton,
   getButtonCenter,
 } from "./uiElements/upgradeButton";
-import { spawnCoinBurst, hasActiveCoins, drawCoins } from "./animations/coins";
-import {
-  spawnFloatingCoins,
-  hasActiveFloatingCoins,
-  drawFloatingCoins,
-} from "./animations/coinFloat";
+import { spawnCoinBurst, drawCoins } from "./animations/coins";
+import { spawnFloatingCoins, drawFloatingCoins } from "./animations/coinFloat";
+import { drawClouds } from "./uiElements/clouds";
 import {
   drawFloorLock,
   hitTestFloorLock,
   unlockFloor,
   ensureLockedFloorAbove,
 } from "./uiElements/floorLock";
+import { createActionBarMarkup, wireActionBar } from "./uiElements/actionBar";
+import { createWorkerMenuMarkup, wireWorkerMenu } from "./uiElements/workerMenu";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -67,23 +69,45 @@ async function main() {
         <h1>Skyscraper Clicker</h1>
       </header>
       <div class="game__scroll" id="scroll">
+        <canvas class="game__clouds" id="clouds"></canvas>
         <canvas class="game__hud" id="hud"></canvas>
-        <div class="game__spacer" id="spacer">
-          <canvas id="building"></canvas>
-        </div>
+        <div class="game__floors" id="floors"></div>
       </div>
       ${createTestButtonMarkup()}
     </div>
+    <canvas class="game__coin-overlay" id="coin-overlay"></canvas>
+    ${createActionBarMarkup()}
+    ${createWorkerMenuMarkup()}
   `;
 
-  const canvas = app.querySelector<HTMLCanvasElement>("#building")!;
-  const ctx = canvas.getContext("2d")!;
   const hudCanvas = app.querySelector<HTMLCanvasElement>("#hud")!;
   const hudCtx = hudCanvas.getContext("2d")!;
   hudCanvas.width = FLOOR_W;
   hudCanvas.height = HUD_H;
+  const cloudsCanvas = app.querySelector<HTMLCanvasElement>("#clouds")!;
+  const cloudsCtx = cloudsCanvas.getContext("2d")!;
+  cloudsCanvas.width = 960;
+  cloudsCanvas.height = 280;
   const scrollEl = app.querySelector<HTMLDivElement>("#scroll")!;
-  const spacerEl = app.querySelector<HTMLDivElement>("#spacer")!;
+  const floorsEl = app.querySelector<HTMLDivElement>("#floors")!;
+  const coinOverlayCanvas = app.querySelector<HTMLCanvasElement>("#coin-overlay")!;
+  const coinOverlayCtx = coinOverlayCanvas.getContext("2d")!;
+
+  // keeps the overlay canvas's CSS box exactly matching the scroll viewport, so
+  // floor-local coin-burst coordinates can be mapped straight into it
+  function syncCoinOverlayBounds() {
+    const rect = scrollEl.getBoundingClientRect();
+    coinOverlayCanvas.style.left = `${rect.left}px`;
+    coinOverlayCanvas.style.top = `${rect.top}px`;
+    coinOverlayCanvas.style.width = `${rect.width}px`;
+    coinOverlayCanvas.style.height = `${rect.height}px`;
+    const dpr = window.devicePixelRatio || 1;
+    coinOverlayCanvas.width = rect.width * dpr;
+    coinOverlayCanvas.height = rect.height * dpr;
+    coinOverlayCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  syncCoinOverlayBounds();
+  window.addEventListener("resize", syncCoinOverlayBounds);
 
   const [bgImage, furnitureSprites] = await Promise.all([
     loadFloorBackground(),
@@ -91,11 +115,11 @@ async function main() {
   ]);
 
   const floors: Floor[] = [];
-  let hoveredRow: number | null = null;
-  // the floor row + sub-row pixel offset the canvas is currently scrolled to, so
-  // hit-testing and coin-burst placement can convert canvas-local <-> building coords
-  let viewFirstRow = 0;
-  let viewOffsetY = 0;
+  // every floor is a real, fixed-size (FLOOR_W x FLOOR_H) DOM canvas — one draw
+  // target per floor, positioned by normal document flow. No shared canvas, no
+  // manual spacer/offset math: the browser's own scrolling does all the work.
+  const floorCanvases = new WeakMap<Floor, HTMLCanvasElement>();
+  let hoveredFloor: Floor | null = null;
   const lastFloatSpawn = new WeakMap<Floor, number>();
   const FLOAT_SPAWN_INTERVAL_MS = 300;
 
@@ -103,58 +127,59 @@ async function main() {
     saveFloors(floors);
   }
 
-  // keeps coinFloat.ts's bubbles going for as long as the floor's worker is boosted,
-  // spawning a fresh small batch periodically instead of one that fades and stops
-  function maybeSpawnFloatingCoins(floor: Floor, offsetY: number) {
-    if (!isBoosted(floor)) return;
+  // keeps coinFloat.ts's bubbles going for as long as a floor's worker is individually
+  // boosted, spawning a fresh small batch periodically instead of one that fades and
+  // stops — only at the workers actually boosted, not every worker on the floor
+  function maybeSpawnFloatingCoins(floor: Floor) {
     const now = performance.now();
+    const centers = getBoostedWorkerCenters(floor, now);
+    if (centers.length === 0) return;
     const last = lastFloatSpawn.get(floor) ?? 0;
     if (now - last < FLOAT_SPAWN_INTERVAL_MS) return;
     lastFloatSpawn.set(floor, now);
-    const center = getWorkerCenter(floor, offsetY);
-    if (center) spawnFloatingCoins(center.x, center.y, redraw);
+    for (const center of centers) {
+      spawnFloatingCoins(floor, center.x, center.y, redrawAll);
+    }
   }
 
-  function render() {
-    const spacerWidthCss =
-      spacerEl.clientWidth || canvas.getBoundingClientRect().width;
-    const viewport = computeViewport(scrollEl, spacerWidthCss, floors.length);
-    spacerEl.style.height = `${viewport.spacerHeightCss}px`;
-    viewFirstRow = viewport.firstRow;
-    viewOffsetY = viewport.offsetY;
+  // draws everything for one floor into its own canvas
+  function drawFloorCanvas(floor: Floor, canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext("2d")!;
+    ctx.clearRect(0, 0, FLOOR_W, FLOOR_H);
+    drawFloor(ctx, bgImage, floor);
+    drawOuterWall(ctx);
+    drawWorker(ctx, floor, performance.now());
+    maybeSpawnFloatingCoins(floor);
+    drawFloatingCoins(ctx, floor);
+    const floorNumber = floors.indexOf(floor) + 1;
+    drawFloorNumber(ctx, floorNumber, floors.length);
+    drawUpgradeStar(ctx, floor);
+    drawWorkerCount(ctx, floor);
+    drawIncomePanel(ctx, floor);
+    drawUpgradeButton(
+      ctx,
+      floor === hoveredFloor,
+      floor.upgradeCost,
+      getTotalIncome() >= floor.upgradeCost,
+    );
+    drawFloorLock(ctx, floor);
+  }
 
-    const targetHeight = viewport.rows * FLOOR_H;
-    // only touch canvas.width/height when the size actually changes: resetting it
-    // every frame (this runs ~60x/s from the coin and income tickers) forces a
-    // layout reflow of the scroll container each time, which reads as a jiggle.
-    // the canvas is a small fixed-size "viewport window" that never grows with the
-    // total floor count, which is what keeps redraw cost constant for endless scroll
-    if (canvas.width !== FLOOR_W || canvas.height !== targetHeight) {
-      canvas.width = FLOOR_W;
-      canvas.height = targetHeight;
-    }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  function redrawFloor(floor: Floor) {
+    const canvas = floorCanvases.get(floor);
+    if (canvas) drawFloorCanvas(floor, canvas);
+  }
 
-    for (let i = 0; i < viewport.rows; i++) {
-      const r = viewport.firstRow + i;
-      if (r < 0 || r >= floors.length) continue;
-      const floor = floors[floors.length - 1 - r];
-      const offsetY = i * FLOOR_H - viewport.offsetY;
-      drawFloor(ctx, bgImage, floor, offsetY);
-      drawWorker(ctx, floor, offsetY, performance.now());
-      maybeSpawnFloatingCoins(floor, offsetY);
-      drawFloorNumber(ctx, floors.length - r, floors.length, offsetY);
-      drawUpgradeStar(ctx, floor, offsetY);
-      drawIncomePanel(ctx, floor, offsetY);
-      drawUpgradeButton(
-        ctx,
-        offsetY,
-        r === hoveredRow,
-        floor.upgradeCost,
-        getTotalIncome() >= floor.upgradeCost,
-      );
-      drawFloorLock(ctx, floor, offsetY);
-    }
+  // a floor is only actually redrawn every frame while it's in or near the visible
+  // viewport (one viewport-height of buffer above/below) — far-off floors are skipped
+  function isNearViewport(canvas: HTMLCanvasElement): boolean {
+    const scrollRect = scrollEl.getBoundingClientRect();
+    const rect = canvas.getBoundingClientRect();
+    const buffer = scrollRect.height;
+    return (
+      rect.bottom >= scrollRect.top - buffer &&
+      rect.top <= scrollRect.bottom + buffer
+    );
   }
 
   function renderHud() {
@@ -162,180 +187,227 @@ async function main() {
     drawHud(hudCtx, hudCanvas.width, getTotalIncome());
   }
 
-  function redraw() {
-    render();
-    renderHud();
-    if (hasActiveCoins()) drawCoins(ctx);
-    if (hasActiveFloatingCoins()) drawFloatingCoins(ctx);
-    // re-pin to the ground floor if anything shifted the layout (header growing,
-    // spacer settling, window resize) and the user hasn't manually scrolled away
-    if (
-      pinnedToGroundFloor &&
-      scrollEl.scrollTop !== scrollEl.scrollHeight - scrollEl.clientHeight
-    ) {
-      scrollEl.scrollTop = scrollEl.scrollHeight;
-    }
+  function renderClouds() {
+    drawClouds(
+      cloudsCtx,
+      cloudsCanvas.width,
+      cloudsCanvas.height,
+      performance.now(),
+    );
   }
 
-  // map a page-space pointer event to a y coordinate in the full building's virtual
-  // coordinate space (canvas-local y plus however far the viewport has scrolled)
-  function toCanvasPoint(event: MouseEvent): { x: number; y: number } {
-    const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const localY = (event.clientY - rect.top) * scaleY;
+  // a floor's current on-screen rect in the coin overlay's own CSS pixel space, or
+  // null if that floor doesn't have a mounted canvas (shouldn't happen in practice)
+  function getFloorRect(floor: Floor) {
+    const canvas = floorCanvases.get(floor);
+    if (!canvas) return null;
+    const floorRect = canvas.getBoundingClientRect();
+    const overlayRect = scrollEl.getBoundingClientRect();
     return {
-      x: (event.clientX - rect.left) * scaleX,
-      y: localY + viewFirstRow * FLOOR_H + viewOffsetY,
+      left: floorRect.left - overlayRect.left,
+      top: floorRect.top - overlayRect.top,
+      width: floorRect.width,
     };
   }
 
-  canvas.addEventListener("mousemove", (event) => {
-    const { x, y } = toCanvasPoint(event);
-    const row = hitTestUpgradeButton(x, y, floors.length);
-    const activeRow =
-      row !== null &&
-      floors[floors.length - 1 - row].unlocked &&
-      getTotalIncome() >= floors[floors.length - 1 - row].upgradeCost
-        ? row
-        : null;
-    const onLockPanel = hitTestFloorLock(x, y, floors) !== null;
-    const onWorker = hitTestWorker(x, y, floors) !== null;
-    canvas.style.cursor =
-      activeRow !== null || onLockPanel || onWorker ? "pointer" : "default";
-    if (activeRow !== hoveredRow) {
-      hoveredRow = activeRow;
-      redraw();
+  function renderCoinOverlay() {
+    const dpr = window.devicePixelRatio || 1;
+    coinOverlayCtx.clearRect(
+      0,
+      0,
+      coinOverlayCanvas.width / dpr,
+      coinOverlayCanvas.height / dpr,
+    );
+    drawCoins(coinOverlayCtx, getFloorRect);
+  }
+
+  function redrawAll() {
+    renderHud();
+    renderClouds();
+    renderCoinOverlay();
+    for (const floor of floors) {
+      const canvas = floorCanvases.get(floor);
+      if (canvas && isNearViewport(canvas)) drawFloorCanvas(floor, canvas);
     }
-  });
+  }
 
-  canvas.addEventListener("mouseleave", () => {
-    if (hoveredRow !== null) {
-      hoveredRow = null;
-      redraw();
-    }
-  });
+  // converts a mouse event to floor-local canvas coordinates (0..FLOOR_W, 0..FLOOR_H)
+  function localPoint(
+    canvas: HTMLCanvasElement,
+    event: MouseEvent,
+  ): { x: number; y: number } {
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: ((event.clientX - rect.left) / rect.width) * FLOOR_W,
+      y: ((event.clientY - rect.top) / rect.height) * FLOOR_H,
+    };
+  }
 
-  // recompute which floors are visible as the user scrolls, throttled to one redraw per frame.
-  // also tracks whether the user is intentionally scrolled away from the ground floor, so
-  // layout shifts (header growing, spacer settling) don't yank their view back down
-  let pinnedToGroundFloor = true;
-  let scrollRedrawQueued = false;
-  scrollEl.addEventListener("scroll", () => {
-    pinnedToGroundFloor =
-      scrollEl.scrollTop >= scrollEl.scrollHeight - scrollEl.clientHeight - 1;
-    if (scrollRedrawQueued) return;
-    scrollRedrawQueued = true;
-    requestAnimationFrame(() => {
-      scrollRedrawQueued = false;
-      redraw();
-    });
-  });
+  // creates, wires, and inserts one floor's canvas; "prepend" for a newly-added
+  // (higher) floor so it appears above everything else, "append" for restoring
+  // floors in already-topmost-first order
+  function mountFloor(floor: Floor, position: "prepend" | "append"): void {
+    const canvas = document.createElement("canvas");
+    canvas.width = FLOOR_W;
+    canvas.height = FLOOR_H;
+    floorCanvases.set(floor, canvas);
 
-  // any size change (spacer growing with new floors, header growing as the total income
-  // counter gains digits, window resize, initial layout settling) re-pins to the ground
-  // floor as long as the user hasn't manually scrolled away from it — handled inside
-  // redraw() itself so it self-corrects every frame the app's tickers are already running
-
-  canvas.addEventListener("click", (event) => {
-    const { x, y } = toCanvasPoint(event);
-
-    const lockRow = hitTestFloorLock(x, y, floors);
-    if (lockRow !== null) {
-      const floor = floors[floors.length - 1 - lockRow];
-      if (spendTotalIncome(floor.unlockCost)) {
-        unlockFloor(floor);
-        ensureLockedFloorAbove({
-          floors,
-          sprites: furnitureSprites,
-          scrollEl,
-          onChange: redraw,
-        });
-        persist();
-        redraw();
+    canvas.addEventListener("mousemove", (event) => {
+      const { x, y } = localPoint(canvas, event);
+      const onButton =
+        hitTestUpgradeButton(x, y) &&
+        floor.unlocked &&
+        getTotalIncome() >= floor.upgradeCost;
+      const onLock = hitTestFloorLock(x, y, floor);
+      const onWorker = hitTestWorker(x, y, floor) !== null;
+      canvas.style.cursor =
+        onButton || onLock || onWorker ? "pointer" : "default";
+      const wasHovered = hoveredFloor === floor;
+      if (onButton && !wasHovered) {
+        hoveredFloor = floor;
+        redrawFloor(floor);
+      } else if (!onButton && wasHovered) {
+        hoveredFloor = null;
+        redrawFloor(floor);
       }
-      return;
-    }
+    });
 
-    // the upgrade button takes priority over the worker: the worker's walking path
-    // can overlap the button's area, and a click there should always mean "buy upgrade"
-    const row = hitTestUpgradeButton(x, y, floors.length);
-    if (row !== null) {
-      const floor = floors[floors.length - 1 - row];
-      if (floor.unlocked && spendTotalIncome(floor.upgradeCost)) {
+    canvas.addEventListener("mouseleave", () => {
+      if (hoveredFloor === floor) {
+        hoveredFloor = null;
+        redrawFloor(floor);
+      }
+    });
+
+    canvas.addEventListener("click", (event) => {
+      const { x, y } = localPoint(canvas, event);
+
+      if (hitTestFloorLock(x, y, floor)) {
+        if (spendTotalIncome(floor.unlockCost)) {
+          unlockFloor(floor);
+          ensureLockedFloorAbove({
+            floors,
+            sprites: furnitureSprites,
+            onAdd: (newFloor) => {
+              mountFloor(newFloor, "prepend");
+              redrawFloor(newFloor);
+            },
+          });
+          persist();
+          redrawFloor(floor);
+        }
+        return;
+      }
+
+      if (
+        hitTestUpgradeButton(x, y) &&
+        floor.unlocked &&
+        spendTotalIncome(floor.upgradeCost)
+      ) {
         increaseIncomeRate(floor);
         persist();
-        // convert the button's absolute row back to where it's actually drawn on-screen right now
-        const localOffsetY = (row - viewFirstRow) * FLOOR_H - viewOffsetY;
-        const { x: cx, y: cy } = getButtonCenter(localOffsetY);
-        spawnCoinBurst(cx, cy, redraw);
+        const center = getButtonCenter();
+        spawnCoinBurst(floor, center.x, center.y, () => {
+          redrawFloor(floor);
+          renderCoinOverlay();
+        });
+        return;
       }
-      return;
-    }
 
-    const workerRow = hitTestWorker(x, y, floors);
-    if (workerRow !== null) {
-      const floor = floors[floors.length - 1 - workerRow];
-      if (clickWorker(floor, performance.now())) {
-        const localOffsetY = (workerRow - viewFirstRow) * FLOOR_H - viewOffsetY;
-        const center = getWorkerCenter(floor, localOffsetY);
+      const workerIndex = hitTestWorker(x, y, floor);
+      if (workerIndex !== null && clickWorker(floor, workerIndex, performance.now())) {
+        const center = getWorkerCenter(floor, workerIndex);
         if (center) {
-          spawnCoinBurst(center.x, center.y, redraw);
-          // start the float right away rather than waiting for the burst/toggle,
-          // and sync the periodic re-spawn timer so it doesn't immediately double up
-          spawnFloatingCoins(center.x, center.y, redraw);
+          spawnCoinBurst(floor, center.x, center.y, () => {
+            redrawFloor(floor);
+            renderCoinOverlay();
+          });
+          // start the float right away at just this worker, so the boost visibly
+          // kicks in immediately instead of waiting for the next periodic tick
+          spawnFloatingCoins(floor, center.x, center.y, () => redrawFloor(floor));
           lastFloatSpawn.set(floor, performance.now());
         }
-        // flip the boosted state only once the burst has fully played out, not immediately
-        const waitForBurstToEnd = () => {
-          if (hasActiveCoins()) {
-            requestAnimationFrame(waitForBurstToEnd);
-            return;
-          }
-          toggleBoosted(floor);
-          persist();
-          redraw();
-        };
-        requestAnimationFrame(waitForBurstToEnd);
+        // clicking a worker only (re)activates that specific worker's boost/15s timer
+        activateBoosted(floor, workerIndex, performance.now());
+        persist();
+        redrawFloor(floor);
       }
-    }
-  });
+    });
+
+    if (position === "prepend") floorsEl.prepend(canvas);
+    else floorsEl.append(canvas);
+  }
 
   wireTestButton(app, () => {
-    addFloor({
-      floors,
-      sprites: furnitureSprites,
-      scrollEl,
-      onChange: redraw,
-    });
-    persist();
+    addTotalIncome(1e14);
+    redrawAll();
   });
   wireResetButton(app);
+  const workerMenu = wireWorkerMenu(
+    app,
+    () => floors,
+    () => {
+      persist();
+      redrawAll();
+    },
+  );
+  wireActionBar(app, {
+    onScrollTop: () => {
+      scrollEl.scrollTop = 0;
+    },
+    onScrollBottom: () => {
+      scrollEl.scrollTop = scrollEl.scrollHeight;
+    },
+    onBoostAll: () => {
+      const now = performance.now();
+      for (const floor of floors) {
+        if (!floor.unlocked) continue;
+        const renderedWorkers = Math.min(floor.workerCount, MAX_RENDERED_WORKERS);
+        for (let i = 0; i < renderedWorkers; i++) {
+          activateBoosted(floor, i, now);
+        }
+      }
+      persist();
+      redrawAll();
+    },
+    onOpenHireMenu: () => {
+      workerMenu.open();
+    },
+  });
 
   const restored = loadFloors(furnitureSprites);
   if (restored.length > 0) {
     floors.push(...restored);
+    // floors[] is ground-first; mount newest-first so DOM order (and thus the visual
+    // top-to-bottom stack) puts the newest/highest floor at the top, ground at the bottom
+    for (let i = floors.length - 1; i >= 0; i--) {
+      mountFloor(floors[i], "append");
+    }
   } else {
     addFloor({
       floors,
       sprites: furnitureSprites,
-      scrollEl,
-      onChange: redraw,
+      onAdd: (floor) => mountFloor(floor, "append"),
     }); // ground floor
     persist();
   }
   ensureLockedFloorAbove({
     floors,
     sprites: furnitureSprites,
-    scrollEl,
-    onChange: redraw,
+    onAdd: (floor) => mountFloor(floor, "prepend"),
   });
   persist();
 
-  redraw();
-  scrollEl.scrollTop = scrollEl.scrollHeight; // land on floor 1; ResizeObserver keeps it pinned there
+  // stays the last (bottom-most) child forever — every later floor only ever gets
+  // prepended above it, so this always remains below the ground floor
+  const groundEl = document.createElement("div");
+  groundEl.className = "game__ground";
+  floorsEl.append(groundEl);
 
-  startIncomeTicker(redraw);
+  redrawAll();
+  scrollEl.scrollTop = scrollEl.scrollHeight; // land on the ground floor
+
+  startIncomeTicker(redrawAll);
   startTotalIncomeTicker(floors);
 }
 

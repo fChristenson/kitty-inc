@@ -28,12 +28,12 @@ export function computeViewport(
   }
 
   const visibleRows = Math.ceil(scrollEl.clientHeight / floorCssHeight);
-  // never draw more rows than actually exist, or the canvas ends up taller than the
-  // building and shows blank space past the ground floor once you scroll to the bottom
-  const rows = Math.min(
-    Math.max(1, visibleRows + VIEWPORT_BUFFER_ROWS),
-    floorCount,
-  );
+  // rows depends only on the viewport's own size, never on floorCount — capping it
+  // to floorCount made the canvas (and so every floor's rendered height, since the
+  // canvas is scaled as one image) shrink/grow as floors were added, which is what
+  // made floors look inconsistently sized. A short building just leaves the extra
+  // rows undrawn (see the `r >= floors.length` skip in main.ts's render loop).
+  const rows = Math.max(1, visibleRows + VIEWPORT_BUFFER_ROWS);
 
   // clamp the continuous scroll position (in row units) BEFORE splitting it into
   // firstRow/offsetY, so offsetY always stays within a single row's fraction (0..FLOOR_H).

@@ -1,4 +1,4 @@
-import { FLOOR_H, FLOOR_X_MIN, FLOOR_X_MAX } from "./floors";
+import { FLOOR_X_MIN, FLOOR_X_MAX } from "./floors";
 import { isBoosted, type Floor } from "../gameState";
 
 const WALK_SPEED = 50; // px/sec
@@ -14,104 +14,126 @@ const CLICK_COOLDOWN_MS = 500; // ignore re-clicks faster than this so coin burs
 const HIT_HALF_WIDTH = 20 * SCALE; // generous click-target box around the figure
 const HIT_TOP = 20 * SCALE;
 const HIT_BOTTOM = 75 * SCALE;
+// floor.workerCount can grow past this, but only this many little figures are ever
+// drawn/walked — workerCount.ts still shows the real total next to its icon
+export const MAX_RENDERED_WORKERS = 3;
 
-export interface WorkerState {
+interface WalkerState {
   x: number;
   direction: 1 | -1;
   lastUpdate: number;
-  clickedAt: number; // performance.now() of the last click, -Infinity if never clicked
+  clickedAt: number; // performance.now() of this worker's own last click, -Infinity if never clicked
 }
 
-// each floor gets its own independent walker, keyed by the floor itself
-const workers = new WeakMap<Floor, WorkerState>();
+interface FloorWorkers {
+  walkers: WalkerState[];
+}
 
-function getState(floor: Floor, now: number): WorkerState {
-  let state = workers.get(floor);
+// each floor gets its own independent set of walkers, keyed by the floor itself
+const floorWorkers = new WeakMap<Floor, FloorWorkers>();
+
+function makeWalker(index: number, total: number, now: number): WalkerState {
+  // spreads walkers into evenly-spaced starting bands instead of piling them on
+  // top of each other when a floor has more than one
+  const bandWidth = (FLOOR_X_MAX - FLOOR_X_MIN) / total;
+  const bandStart = FLOOR_X_MIN + bandWidth * index;
+  return {
+    x: bandStart + Math.random() * bandWidth,
+    direction: Math.random() < 0.5 ? 1 : -1,
+    lastUpdate: now,
+    clickedAt: -Infinity,
+  };
+}
+
+function getFloorWorkers(floor: Floor, now: number): FloorWorkers {
+  let state = floorWorkers.get(floor);
   if (!state) {
-    state = {
-      x: FLOOR_X_MIN + Math.random() * (FLOOR_X_MAX - FLOOR_X_MIN),
-      direction: Math.random() < 0.5 ? 1 : -1,
-      lastUpdate: now,
-      clickedAt: -Infinity,
-    };
-    workers.set(floor, state);
+    state = { walkers: [] };
+    floorWorkers.set(floor, state);
   }
+  const targetCount = Math.min(
+    Math.max(floor.workerCount, 1),
+    MAX_RENDERED_WORKERS,
+  );
+  while (state.walkers.length < targetCount) {
+    state.walkers.push(makeWalker(state.walkers.length, targetCount, now));
+  }
+  if (state.walkers.length > targetCount) state.walkers.length = targetCount;
   return state;
 }
 
-// which floor row (top-to-bottom) a canvas point falls on the worker's click target for, if any
+// which of a floor's rendered workers a floor-local canvas point falls on, if any
 export function hitTestWorker(
   x: number,
   y: number,
-  floors: Floor[],
+  floor: Floor,
 ): number | null {
-  const row = Math.floor(y / FLOOR_H);
-  if (row < 0 || row >= floors.length) return null;
-  const floor = floors[floors.length - 1 - row];
   if (!floor.unlocked) return null;
-  const state = workers.get(floor);
+  const state = floorWorkers.get(floor);
   if (!state) return null;
 
-  const localY = y - row * FLOOR_H;
   const cyLocal = WORKER_FEET_Y - LEG_LENGTH * SCALE;
-  const withinX =
-    x >= state.x - HIT_HALF_WIDTH && x <= state.x + HIT_HALF_WIDTH;
-  const withinY = localY >= cyLocal - HIT_TOP && localY <= cyLocal + HIT_BOTTOM;
-  return withinX && withinY ? row : null;
+  const withinY = y >= cyLocal - HIT_TOP && y <= cyLocal + HIT_BOTTOM;
+  if (!withinY) return null;
+  const index = state.walkers.findIndex(
+    (w) => x >= w.x - HIT_HALF_WIDTH && x <= w.x + HIT_HALF_WIDTH,
+  );
+  return index === -1 ? null : index;
 }
 
-// starts this floor's click-bounce animation and reports whether the click should spawn
-// a coin burst; returns false while still on cooldown so rapid clicks can't pile up coins
-export function clickWorker(floor: Floor, now: number): boolean {
-  const state = getState(floor, now);
-  if (now - state.clickedAt < CLICK_COOLDOWN_MS) return false;
-  state.clickedAt = now;
+// starts the clicked worker's own click-bounce animation and reports whether the click
+// should spawn a coin burst; returns false while that specific worker is still on
+// cooldown, so rapid clicks on it can't pile up coins (clicking a different worker on
+// the same floor is unaffected)
+export function clickWorker(
+  floor: Floor,
+  workerIndex: number,
+  now: number,
+): boolean {
+  const walker = getFloorWorkers(floor, now).walkers[workerIndex];
+  if (!walker) return false;
+  if (now - walker.clickedAt < CLICK_COOLDOWN_MS) return false;
+  walker.clickedAt = now;
   return true;
 }
 
-// on-screen center of a floor's worker, for aiming a coin burst at it; null if it
-// hasn't been drawn yet (shouldn't happen in practice once a floor is unlocked)
+// on-screen (floor-local) center of one of a floor's workers, for aiming a coin burst
+// at it; null if it hasn't been drawn yet (shouldn't happen once unlocked)
 export function getWorkerCenter(
   floor: Floor,
-  offsetY: number,
+  workerIndex: number,
 ): { x: number; y: number } | null {
-  const state = workers.get(floor);
-  if (!state) return null;
-  return { x: state.x, y: WORKER_FEET_Y + offsetY - LEG_LENGTH * SCALE };
+  const walker = floorWorkers.get(floor)?.walkers[workerIndex];
+  if (!walker) return null;
+  return { x: walker.x, y: WORKER_FEET_Y - LEG_LENGTH * SCALE };
 }
 
-// a small cartoon office worker that paces back and forth across the floor's walkable
-// band; no-op on locked floors since there's nothing to animate behind the grey overlay
-export function drawWorker(
-  ctx: CanvasRenderingContext2D,
+// on-screen (floor-local) center of every currently-boosted worker on the floor, so
+// the floating-coin animation only plays at the ones actually boosted
+export function getBoostedWorkerCenters(
   floor: Floor,
-  offsetY: number,
   now: number,
+): { x: number; y: number }[] {
+  const state = floorWorkers.get(floor);
+  if (!state) return [];
+  const y = WORKER_FEET_Y - LEG_LENGTH * SCALE;
+  return state.walkers
+    .map((w, i) => ({ x: w.x, y, boosted: isBoosted(floor, i, now) }))
+    .filter((w) => w.boosted)
+    .map(({ x, y }) => ({ x, y }));
+}
+
+// draws one little cartoon office worker at (cx, cy), bounced/facing per the given state
+function drawFigure(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  direction: 1 | -1,
+  legSwing: number,
 ): void {
-  if (!floor.unlocked) return;
-
-  const state = getState(floor, now);
-  const dtSeconds = Math.min((now - state.lastUpdate) / 1000, 0.1);
-  state.lastUpdate = now;
-  const speed = isBoosted(floor) ? BOOSTED_WALK_SPEED : WALK_SPEED;
-  state.x += state.direction * speed * dtSeconds;
-  if (state.x >= FLOOR_X_MAX) {
-    state.x = FLOOR_X_MAX;
-    state.direction = -1;
-  } else if (state.x <= FLOOR_X_MIN) {
-    state.x = FLOOR_X_MIN;
-    state.direction = 1;
-  }
-
-  const cx = state.x;
-  const clickT = Math.min((now - state.clickedAt) / CLICK_BOUNCE_MS, 1);
-  const bounce = clickT < 1 ? Math.sin(clickT * Math.PI) * 14 : 0;
-  const cy = WORKER_FEET_Y + offsetY - LEG_LENGTH * SCALE - bounce;
-  const legSwing = Math.sin(now / LEG_SWING_SPEED) * 7;
-
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.scale(state.direction === -1 ? -SCALE : SCALE, SCALE); // scale + face walking direction
+  ctx.scale(direction === -1 ? -SCALE : SCALE, SCALE); // scale + face walking direction
 
   // legs
   ctx.strokeStyle = "#1E293B";
@@ -155,3 +177,37 @@ export function drawWorker(
 
   ctx.restore();
 }
+
+// small cartoon office workers (up to MAX_RENDERED_WORKERS) that pace back and forth
+// across the floor's walkable band; no-ops on locked floors since there's nothing to
+// animate behind the grey overlay
+export function drawWorker(
+  ctx: CanvasRenderingContext2D,
+  floor: Floor,
+  now: number,
+): void {
+  if (!floor.unlocked) return;
+
+  const state = getFloorWorkers(floor, now);
+  const legSwing = Math.sin(now / LEG_SWING_SPEED) * 7;
+
+  state.walkers.forEach((walker, i) => {
+    const speed = isBoosted(floor, i, now) ? BOOSTED_WALK_SPEED : WALK_SPEED;
+    const dtSeconds = Math.min((now - walker.lastUpdate) / 1000, 0.1);
+    walker.lastUpdate = now;
+    walker.x += walker.direction * speed * dtSeconds;
+    if (walker.x >= FLOOR_X_MAX) {
+      walker.x = FLOOR_X_MAX;
+      walker.direction = -1;
+    } else if (walker.x <= FLOOR_X_MIN) {
+      walker.x = FLOOR_X_MIN;
+      walker.direction = 1;
+    }
+
+    const clickT = Math.min((now - walker.clickedAt) / CLICK_BOUNCE_MS, 1);
+    const bounce = clickT < 1 ? Math.sin(clickT * Math.PI) * 14 : 0;
+    const cy = WORKER_FEET_Y - LEG_LENGTH * SCALE - bounce;
+    drawFigure(ctx, walker.x, cy, walker.direction, legSwing);
+  });
+}
+

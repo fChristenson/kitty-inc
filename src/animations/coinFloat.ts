@@ -1,13 +1,15 @@
 import { randomInt } from "../utils";
+import type { Floor } from "../gameState";
 
 // a handful of small coins that bubble straight up from a point, gently swaying,
 // and fade out — a quieter alternative to coins.ts's outward/gravity burst
 
 interface FloatingCoin {
+  floor: Floor; // which floor's canvas these coins belong to
   x: number;
   originX: number; // fixed horizontal spawn point; x is computed from this each frame
   startOffset: number; // how far out this coin starts, at the wide base of the cone
-  y: number;
+  y: number; // floor-local y
   vy: number;
   life: number;
   maxLife: number;
@@ -23,8 +25,13 @@ export function hasActiveFloatingCoins(): boolean {
   return coins.length > 0;
 }
 
-export function drawFloatingCoins(ctx: CanvasRenderingContext2D): void {
+export function drawFloatingCoins(
+  ctx: CanvasRenderingContext2D,
+  floor: Floor,
+): void {
   for (const c of coins) {
+    if (c.floor !== floor) continue;
+    const y = c.y;
     const t = c.life / c.maxLife;
     const radius = c.size * (1 - t * 0.3);
     ctx.globalAlpha = Math.max(0, 1 - t);
@@ -32,7 +39,7 @@ export function drawFloatingCoins(ctx: CanvasRenderingContext2D): void {
     // flat coin face (no directional shading, so it reads as a 2D disc, not a sphere)
     ctx.fillStyle = "#F5C542";
     ctx.beginPath();
-    ctx.arc(c.x, c.y, radius, 0, Math.PI * 2);
+    ctx.arc(c.x, y, radius, 0, Math.PI * 2);
     ctx.fill();
     ctx.lineWidth = Math.max(1, radius * 0.16);
     ctx.strokeStyle = "#8A5A12";
@@ -40,7 +47,7 @@ export function drawFloatingCoins(ctx: CanvasRenderingContext2D): void {
 
     // embossed inner ring
     ctx.beginPath();
-    ctx.arc(c.x, c.y, radius * 0.72, 0, Math.PI * 2);
+    ctx.arc(c.x, y, radius * 0.72, 0, Math.PI * 2);
     ctx.strokeStyle = "#D9A521";
     ctx.lineWidth = Math.max(1, radius * 0.1);
     ctx.stroke();
@@ -48,16 +55,16 @@ export function drawFloatingCoins(ctx: CanvasRenderingContext2D): void {
     // flat gloss sheen band across the top of the disc, clipped to its circle
     ctx.save();
     ctx.beginPath();
-    ctx.arc(c.x, c.y, radius, 0, Math.PI * 2);
+    ctx.arc(c.x, y, radius, 0, Math.PI * 2);
     ctx.clip();
-    const gloss = ctx.createLinearGradient(c.x, c.y - radius, c.x, c.y);
+    const gloss = ctx.createLinearGradient(c.x, y - radius, c.x, y);
     gloss.addColorStop(0, "rgba(255, 255, 255, 0.7)");
     gloss.addColorStop(1, "rgba(255, 255, 255, 0)");
     ctx.fillStyle = gloss;
     ctx.beginPath();
     ctx.ellipse(
       c.x,
-      c.y - radius * 0.35,
+      y - radius * 0.35,
       radius * 0.95,
       radius * 0.55,
       0,
@@ -71,7 +78,7 @@ export function drawFloatingCoins(ctx: CanvasRenderingContext2D): void {
     ctx.font = `bold ${Math.round(radius * 1.1)}px system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("$", c.x, c.y + radius * 0.05);
+    ctx.fillText("$", c.x, y + radius * 0.05);
   }
   ctx.globalAlpha = 1;
 }
@@ -92,9 +99,10 @@ function updateFloatingCoins(dt: number): void {
   }
 }
 
-// spawns a few coins that bubble up from (x, y) and disappear; drives its own rAF
-// loop, calling onFrame after each physics step
+// spawns a few coins that bubble up from (x, y) — floor-local coordinates — and
+// disappear; drives its own rAF loop, calling onFrame after each physics step
 export function spawnFloatingCoins(
+  floor: Floor,
   x: number,
   y: number,
   onFrame: () => void,
@@ -105,6 +113,7 @@ export function spawnFloatingCoins(
     const startOffset =
       (i - (count - 1) / 2) * spacing + (Math.random() - 0.5) * 15;
     coins.push({
+      floor,
       x: x + startOffset,
       originX: x,
       startOffset,

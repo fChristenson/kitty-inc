@@ -7,10 +7,9 @@ export function drawFloorNumber(
   ctx: CanvasRenderingContext2D,
   floorNumber: number,
   totalFloors: number,
-  offsetY: number,
 ): void {
   const x = MARGIN;
-  const y = MARGIN + offsetY;
+  const y = MARGIN;
 
   ctx.font = "900 34px system-ui, sans-serif";
   ctx.textAlign = "left";

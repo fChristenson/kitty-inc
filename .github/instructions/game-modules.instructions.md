@@ -5,23 +5,40 @@ applyTo: "src/**"
 
 # Module structure for this project
 
-This is a canvas-based idle/clicker game (Vite + TypeScript, no framework). Keep each
+This is a canvas-based idle/clicker game (Vite + TypeScript, no framework). Each floor
+is a real DOM element: `main.ts` creates one fixed-size (`FLOOR_W` x `FLOOR_H`) `<canvas>`
+per `Floor`, appended/prepended into `.game__floors` (a plain flex column inside the
+native-scrolling `.game__scroll`). There is no shared/virtualized canvas, no manual
+spacer-height or scroll-offset math anywhere — the browser's own scrolling and layout
+position every floor, which is what guarantees every floor renders at exactly the same
+size no matter the floor count. All `draw*(ctx, floor, ...)` functions draw at floor-local
+coordinates (0,0 origin) only; none of them take an `offsetY` parameter. Keep each
 distinct game element in its own dedicated file under `src/`:
 
 - `src/sprites.ts` — furniture sprite loading, size-tier target heights, and random
   sprite selection. Nothing else should load or pick sprites directly.
 - `src/floors.ts` — floor state (`Floor`, `Placement` types), building a floor
-  (`buildFloor`), and drawing a floor slab (`drawFloor`). Also owns `FLOOR_W`/`FLOOR_H`.
-- `src/upgradeButton.ts` — the upgrade button drawing/hover/hit-testing only. Spawning a
+  (`buildFloor`), and drawing a floor slab (`drawFloor(ctx, bgImage, floor)`, always at
+  the canvas's own origin). Also owns `FLOOR_W`/`FLOOR_H`.
+- `src/outerWall.ts` — `drawOuterWall(ctx)`, a flat exterior facade strip drawn along
+  both edges of a floor's own canvas right after `drawFloor`, masking bg.png's raw
+  left/right image edges now that the blue sky/clouds show past the canvas on each side.
+- `src/upgradeButton.ts` — the upgrade button drawing/hover/hit-testing only, all in
+  floor-local coordinates (`hitTestUpgradeButton(x, y)`, no floor/row lookup). Spawning a
   coin burst from it is done by calling `coins.ts` directly (see below).
 - `src/coins.ts` — the shared outward/gravity coin-burst particle system (`spawnCoinBurst`,
-  `hasActiveCoins`, `drawCoins`; state + rAF loop fully encapsulated here). Used by the
-  upgrade button and `worker.ts`'s click reaction.
+  `hasActiveCoins`, `drawCoins`; state + rAF loop fully encapsulated here). Particles are
+  tagged with the `Floor` they were spawned from but physics stay in that floor's local
+  (`FLOOR_W`/`FLOOR_H`) coordinate space; `drawCoins(ctx, getFloorRect)` draws them onto
+  `main.ts`'s full-viewport `#coin-overlay` canvas by mapping each particle through
+  `getFloorRect(floor)` (that floor's current on-screen rect), so a burst can never be
+  clipped by the floor's own canvas edges. Used by the upgrade button and `worker.ts`'s
+  click reaction.
 - `src/coinFloat.ts` — a separate, quieter coin animation: a few small coins that bubble
   straight up from a point and fade out (`spawnFloatingCoins`, `hasActiveFloatingCoins`,
-  `drawFloatingCoins`), with its own particle array/rAF loop, independent of `coins.ts`.
-  Not currently wired to anything; available for whichever element wants this look
-  instead of the burst.
+  `drawFloatingCoins(ctx, floor)`), tagged per-`Floor` the same way, with its own particle
+  array/rAF loop, independent of `coins.ts`. Unlike `coins.ts`'s bursts, these stay drawn
+  directly onto their own floor's canvas since they don't need to escape its bounds.
 - `src/incomePanel.ts` — the per-floor "Income" panel (title, fill bar, `$X/Ns` text)
   and `increaseIncomeRate`, the only way a floor's `incomeAmount`/`incomeIntervalSeconds`
   should be mutated. The bar's fill duration always matches `incomeIntervalSeconds`.
@@ -29,41 +46,64 @@ distinct game element in its own dedicated file under `src/`:
   (plain bold cartoon text, no panel background).
 - `src/star.ts` — the small gold star + upgrade-count number drawn just under the floor
   number label (`drawUpgradeStar`), reflecting `floor.upgradeCount`.
-- `src/worker.ts` — the small cartoon office worker (`drawWorker`) that paces back and
-  forth across the floor's walkable band (`FLOOR_X_MIN`/`FLOOR_X_MAX` from `floors.ts`);
-  per-floor position/direction state lives in its own `WeakMap<Floor, ...>`, same pattern
-  as `incomePanel.ts`'s fill-cycle clock. No-ops on locked floors. Also owns click handling:
-  `hitTestWorker`, `clickWorker` (triggers its little bounce reaction), and `getWorkerCenter`
-  (so `main.ts` can spawn `coins.ts`'s shared coin-burst particles at its position).
-- `src/totalIncome.ts` — accrual + persistence of the running total income: `formatTotalIncome`
-  (6-digit cap with K/M/B/T/.../decillion suffixes), `startTotalIncomeTicker` (the only thing
-  allowed to accrue floors' income into the total, skipping any floor that isn't `unlocked`),
-  `getTotalIncome`, and `spendTotalIncome` (the only way to deduct from the total, used to pay
-  for upgrades/unlocks). Drawing the total is `hud.ts`'s job, not this file's.
-- `src/floorLock.ts` — locked-floor state: `drawFloorLock` (grey overlay + unlock-price panel,
-  a no-op once `floor.unlocked`), `hitTestFloorLock`, and `unlockFloor` (the only way
-  `floor.unlocked` should be mutated). Every floor above floor 1 starts locked; floor 1 is
+- `src/worker.ts` — the small cartoon office worker (`drawWorker(ctx, floor, now)`) that
+  paces back and forth across the floor's walkable band (`FLOOR_X_MIN`/`FLOOR_X_MAX` from
+  `floors.ts`); per-floor position/direction state lives in its own `WeakMap<Floor, ...>`,
+  same pattern as `incomePanel.ts`'s fill-cycle clock. No-ops on locked floors. Also owns
+  click handling: `hitTestWorker(x, y, floor)`, `clickWorker` (triggers its little bounce
+  reaction), and `getWorkerCenter(floor)` (floor-local, for aiming `coins.ts`'s bursts).
+- `src/totalIncome.ts` — accrual + persistence of the running total income:
+  `startTotalIncomeTicker` (the only thing allowed to accrue floors' income into the
+  total, skipping any floor that isn't `unlocked`), `getTotalIncome`, `addTotalIncome`
+  (used by the "Add Money" dev control), and `spendTotalIncome` (the only way to deduct
+  from the total, used to pay for
+  upgrades/unlocks). Drawing the total is `hud.ts`'s job, not this file's.
+- `src/floorLock.ts` — locked-floor state: `drawFloorLock(ctx, floor)` (grey overlay +
+  unlock-price panel, a no-op once `floor.unlocked`), `hitTestFloorLock(x, y, floor)`, and
+  `unlockFloor` (the only way `floor.unlocked` should be mutated). `ensureLockedFloorAbove`
+  keeps exactly one locked floor waiting above the topmost unlocked one — it just builds
+  the `Floor` and calls `onAdd(floor)`; `main.ts`'s `onAdd` mounts a new DOM canvas for it,
+  no scroll-position math involved. Every floor above floor 1 starts locked; floor 1 is
   always free/unlocked.
 - `src/hud.ts` — the top HUD (`drawHud`): floor count + total income, drawn on its own
   dedicated `#hud` canvas that sits as the first child inside `.game__scroll` (sticky-
-  positioned, `pointer-events:none`, no panel background), so it always stays visible —
-  the building canvas is also `position: sticky` but can visually detach from the
-  viewport top near the ground floor, which would hide an in-canvas HUD.
-- `src/testButton.ts` — the "Add Floor" / "Reset Game" dev/test controls: their markup,
-  click wiring, the `addFloor` orchestration (build a floor, redraw), and `wireResetButton`
-  (clears saved floors/total income via `gameState.ts`/`totalIncome.ts` and reloads).
-- `src/gameState.ts` — `saveFloors`/`loadFloors`/`clearFloors` (localStorage persistence of the
-  `Floor[]` array) and `computeViewport` (maps scroll position to which floor rows
-  are visible). The canvas is a small, fixed-size "viewport window" inside a `.game__spacer`
-  div sized to the full building's scroll height — it must never be resized to match
-  the total floor count, or endless scrolling breaks/tanks performance. `main.ts` must
-  call `saveFloors` after any action that mutates `floors`. Also the sole owner of `WorkerSlot`
-  (`{ boosted }`, whether `coinFloat.ts`'s animation should play on a floor's worker) —
-  tracked in its own `WeakMap<Floor, WorkerSlot[]>` since `Floor` itself doesn't carry it,
-  same pattern `worker.ts` uses for its own ephemeral walk-animation state.
+  positioned, `pointer-events:none`, no panel background), so it always stays visible.
+- `src/clouds.ts` — `drawClouds`, decorative clouds slowly drifting right-to-left across
+  the `#clouds` canvas's sky band (its own `.game__clouds` sticky canvas, widened via a
+  negative margin to span the side gutters `.game__scroll`'s padding reveals, sitting
+  behind the HUD/floors in DOM order). Purely time-based off `now` — no particle array
+  or rAF loop of its own; `main.ts` redraws it every frame from the same perpetual loop
+  `startIncomeTicker` already drives.
+- `src/actionBar.ts` — the fixed action bar overlaying the bottom of the viewport
+  (`.action-bar`, independent of scroll/floor position): up/down arrows to jump to the
+  top/ground floor, a lightning bolt to boost every unlocked floor's worker at once, and
+  a plus to open `workerMenu.ts`'s hire menu. `createActionBarMarkup`/`wireActionBar`
+  only build and wire the bar itself; `main.ts` owns what each button actually does.
+- `src/workerMenu.ts` — the "Hire Workers" full-screen menu (`createWorkerMenuMarkup`/
+  `wireWorkerMenu`) listing every floor with an "Add new worker" button, plus
+  `getWorkerCost`/`buyWorker` (the only way `floor.workerCount` should be mutated). A
+  floor's next worker costs its floor price (`unlockCost`, or a fallback for floor 1
+  since that's permanently free) times its current `workerCount`. `incomePanel.ts` uses
+  `workerCount` to scale how much a boost divides the income interval by.
+- `src/testButton.ts` — the "Add Money" / "Reset Game" dev/test controls: their markup,
+  click wiring (`wireTestButton` grants a flat 100 trillion via `totalIncome.ts`'s
+  `addTotalIncome`), the `addFloor` helper (build a floor, call `onAdd(floor)` — still
+  used for the initial ground floor), and `wireResetButton` (clears saved floors/total
+  income via `gameState.ts`/`totalIncome.ts` and reloads).
+- `src/gameState.ts` — `saveFloors`/`loadFloors`/`clearFloors` (localStorage persistence of
+  the `Floor[]` array). `main.ts` must call `saveFloors` after any action that mutates
+  `floors`. Also the sole owner of `WorkerSlot` (`{ boosted }`, whether `coinFloat.ts`'s
+  animation should play on a floor's worker) — tracked in its own
+  `WeakMap<Floor, WorkerSlot[]>` since `Floor` itself doesn't carry it, same pattern
+  `worker.ts` uses for its own ephemeral walk-animation state.
 - `src/utils.ts` — small shared helpers (`loadImage`, `randomInt`, `roundRect`,
-  `drawCartoonPanel`, `drawCartoonText`, `drawGlossHighlight`) used by multiple modules.
-  Add new cross-cutting helpers here rather than duplicating them.
+  `drawCartoonPanel`, `drawCartoonText`, `drawGlossHighlight`), plus `formatPrice`
+  (the only way any `$` amount should be formatted, e.g. `"$1.23M"`) and `formatTime`
+  (the only way any duration/interval should be formatted, e.g. `"1.50h"`) — both
+  always truncate to exactly 2 decimal places and compact with the same magnitude
+  suffixes (K/M/B/T/...) once big enough, so numbers can never overflow into a raw
+  unformatted string at large values. Add new cross-cutting helpers here rather than
+  duplicating them.
 
 All canvas-drawn UI (HUD, income panel, floor number, star, upgrade button) shares one
 cartoon look: flat fill colors, a hard-edged (unblurred) offset shadow
@@ -80,10 +120,16 @@ since a white stroke on white-ish fills disappears. Match this style — includi
 
 - DOM setup (building the `#app` markup, grabbing element references).
 - Loading assets by calling into the dedicated modules above.
-- Owning top-level game state (e.g. the `floors` array, `hoveredRow`).
-- Wiring event listeners that call into the modules' exported functions.
-- Driving the render loop by calling each module's `draw*` function — it should not
-  contain drawing logic, physics, or asset-loading logic itself.
+- Owning top-level game state (e.g. the `floors` array, `hoveredFloor`, the
+  `WeakMap<Floor, HTMLCanvasElement>` of mounted floor canvases).
+- Mounting a floor: create its canvas (`width=FLOOR_W height=FLOOR_H`, never resized),
+  wire its click/mousemove/mouseleave listeners in floor-local coordinates, and
+  prepend/append it into `.game__floors` — prepend for a newly-added (higher) floor so
+  it appears above everything else, append when restoring floors in topmost-first order.
+- Driving the render loop by calling each module's `draw*(ctx, floor, ...)` function per
+  floor canvas — it should not contain drawing logic, physics, or asset-loading logic
+  itself. Only floors currently in or near the viewport (checked via
+  `getBoundingClientRect`) are actually redrawn each frame.
 
 When adding a new game element (a new UI widget, animation, or mechanic), create a new
 `src/<elementName>.ts` file for it instead of adding it directly to `main.ts`. Export

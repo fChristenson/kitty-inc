@@ -3,8 +3,8 @@ import { drawCartoonText } from "../utils";
 
 // sits directly under floorNumber.ts's "N / total" label, same left margin
 const MARGIN = 24;
-const STAR_Y = MARGIN + 90;
-const STAR_RADIUS = 26;
+export const STAR_Y = MARGIN + 90;
+export const STAR_RADIUS = 26;
 
 function starPath(
   ctx: CanvasRenderingContext2D,
@@ -30,10 +30,9 @@ function starPath(
 export function drawUpgradeStar(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
-  offsetY: number,
 ): void {
   const cx = MARGIN + STAR_RADIUS;
-  const cy = STAR_Y + offsetY;
+  const cy = STAR_Y;
 
   starPath(ctx, cx, cy, STAR_RADIUS, STAR_RADIUS * 0.45);
   ctx.fillStyle = "#FBBF24";

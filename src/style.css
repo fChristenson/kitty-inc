@@ -41,6 +41,18 @@ body {
   font-size: 1.25rem;
 }
 
+.game__clouds {
+  display: block;
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: calc(100% + 2 * var(--floor-gutter));
+  margin: 0 calc(-1 * var(--floor-gutter)); /* extends across the side gutters, behind the HUD/floors */
+  height: 140px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
 .game__hud {
   display: block;
   position: sticky;
@@ -57,8 +69,11 @@ body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overflow-anchor: none; /* our JS owns scroll position; browser scroll-anchoring fights it */
+  /* native scroll anchoring keeps the current view stable when a new floor is
+     inserted above it, so growing the building never needs manual scrollTop math */
   background: #6ec6ff;
+  --floor-gutter: 20px;
+  padding: 0 var(--floor-gutter); /* leaves the blue background visible on each side of the floors */
   display: flex;
   flex-direction: column;
   scrollbar-width: none; /* Firefox */
@@ -69,19 +84,48 @@ body {
   display: none; /* Chrome/Safari/new Edge */
 }
 
-.game__spacer {
-  position: relative;
+.game__floors {
+  position: relative; /* clouds/hud are position:sticky, which always paints above static
+    content regardless of DOM order — this puts floors in the same stacking group so
+    DOM order (floors after clouds/hud) decides it instead, keeping floors in front */
+  display: flex;
+  flex-direction: column;
   width: 100%;
   flex-shrink: 0;
-  margin-top: auto; /* bottom-anchor when the building is shorter than the viewport */
+  margin-top: auto; /* bottom-anchor (ground floor) when the building is shorter than the viewport */
 }
 
-.game__spacer canvas {
+.game__floors canvas {
   display: block;
-  position: sticky;
-  top: 0;
   width: 100%;
-  height: auto;
+  height: auto; /* every floor's canvas shares the same FLOOR_W:FLOOR_H attrs, so this is always identical */
+  flex-shrink: 0;
+}
+
+.game__ground {
+  /* stays the last (bottom-most) child of .game__floors forever — mounted once in
+     main.ts, after every new floor which only ever gets prepended above it. Gives the
+     ground floor extra room below it so it isn't obscured by/butts right up against
+     the fixed .action-bar once scrolled all the way down */
+  flex-shrink: 0;
+  height: 110px;
+  /* extends across the side gutters .game__scroll's padding reveals (same trick as
+     .game__clouds), instead of stopping at the floor canvases' own narrower width */
+  width: calc(100% + 2 * var(--floor-gutter));
+  margin: 0 calc(-1 * var(--floor-gutter));
+  background:
+    repeating-linear-gradient(90deg, #22c55e 0 14px, #16a34a 14px 28px) top /
+      100% 22px no-repeat,
+    linear-gradient(to bottom, #8a5a2b, #6b4321);
+  border-top: 4px solid #15803d;
+}
+
+.game__coin-overlay {
+  /* covers the scroll viewport exactly (sized/positioned via JS in main.ts) so a coin
+     burst can render above every floor instead of being clipped to the floor it started on */
+  position: fixed;
+  pointer-events: none;
+  z-index: 20;
 }
 
 .game__test-controls {
@@ -112,4 +156,142 @@ body {
 
 .game__button--danger:active {
   background: #b91c1c;
+}
+
+.action-bar {
+  /* floats above the game__test-controls row rather than the game__scroll's own
+     bottom, so it stays put over the viewport regardless of scroll/floor content.
+     matches .game's own width/centering so it spans the game's viewport, not the
+     full browser window either side of it */
+  position: fixed;
+  bottom: calc(4rem + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(17, 20, 23, 0.85);
+  z-index: 30;
+}
+
+.action-bar__button {
+  width: 3rem;
+  height: 3rem;
+  border: none;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.action-bar__button:active {
+  background: #2563eb;
+}
+
+.action-bar__button--boost {
+  background: #f59e0b;
+}
+
+.action-bar__button--boost:active {
+  background: #d97706;
+}
+
+.action-bar__button--hire {
+  background: #22c55e;
+}
+
+.action-bar__button--hire:active {
+  background: #16a34a;
+}
+
+.worker-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.worker-menu[hidden] {
+  display: none; /* the [hidden] attribute's UA display:none loses to the class rule above without this */
+}
+
+.worker-menu__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.worker-menu__panel {
+  position: relative;
+  width: min(90vw, 420px);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background: #1e293b;
+  border-radius: 1rem;
+  padding: 1rem;
+}
+
+.worker-menu__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.worker-menu__header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.worker-menu__close {
+  border: none;
+  background: transparent;
+  color: white;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.worker-menu__list {
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.worker-menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 0.75rem;
+  background: #22c55e;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.worker-menu__item:active {
+  background: #16a34a;
+}
+
+.worker-menu__item:disabled {
+  background: #6b7280;
+  cursor: default;
+  opacity: 0.7;
+}
+
+.worker-menu__price {
+  font-weight: 900;
 }

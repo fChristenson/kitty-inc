@@ -1,10 +1,12 @@
 import { FLOOR_H } from "./floors";
-import type { Floor } from "../gameState";
+import { countBoostedWorkers, type Floor } from "../gameState";
 import {
   roundRect,
   drawCartoonPanel,
   drawCartoonText,
   drawGlossHighlight,
+  formatPrice,
+  formatTime,
 } from "../utils";
 
 // panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right)
@@ -18,10 +20,37 @@ export const PANEL_Y = FLOOR_H - PANEL_H - PANEL_MARGIN;
 const cycleStart = new WeakMap<Floor, number>();
 let tickerRunning = false;
 
+// floor on the wait-time halving so repeated /10 upgrades can't shrink it to zero
+const MIN_INCOME_INTERVAL_SECONDS = 0.1;
+const UPGRADES_PER_INTERVAL_HALVING = 10;
+
+// below this, the fill cycle repeats too fast to read as a filling bar, so the bar is
+// just shown full and an orbiting dot (fixed speed, independent of the real interval)
+// signals "still ticking" instead
+const FAST_CYCLE_THRESHOLD_MS = 1000;
+const FAST_CYCLE_LAP_MS = 900;
+const FAST_CYCLE_TAIL_DOTS = 8;
+
 export function increaseIncomeRate(floor: Floor): void {
   floor.incomeAmount += floor.rateStep;
   floor.upgradeCost *= 2;
   floor.upgradeCount += 1;
+  if (floor.upgradeCount % UPGRADES_PER_INTERVAL_HALVING === 0) {
+    floor.incomeIntervalSeconds = Math.max(
+      MIN_INCOME_INTERVAL_SECONDS,
+      floor.incomeIntervalSeconds / 2,
+    );
+  }
+}
+
+// the interval actually used for filling/paying out: halved once per individually-boosted
+// worker on the floor, on top of floor.incomeIntervalSeconds's own permanent upgrades
+function effectiveIntervalSeconds(floor: Floor, now: number): number {
+  const boostExponent = countBoostedWorkers(floor, now);
+  return Math.max(
+    MIN_INCOME_INTERVAL_SECONDS,
+    floor.incomeIntervalSeconds / 2 ** boostExponent,
+  );
 }
 
 // advances a floor's fill cycle by however many full intervals have elapsed since it was last
@@ -31,31 +60,87 @@ export function increaseIncomeRate(floor: Floor): void {
 export function collectDueIncome(floor: Floor, now: number): number {
   if (!cycleStart.has(floor)) cycleStart.set(floor, now);
   const start = cycleStart.get(floor)!;
-  const intervalMs = floor.incomeIntervalSeconds * 1000;
+  const intervalMs = effectiveIntervalSeconds(floor, now) * 1000;
   const cycles = Math.floor((now - start) / intervalMs);
   if (cycles <= 0) return 0;
   cycleStart.set(floor, start + cycles * intervalMs);
   return cycles * floor.incomeAmount;
 }
 
-// higher floors' intervals double repeatedly and can run well past a minute,
-// so once the timer crosses a threshold we switch to the largest fitting unit
-function formatIntervalLabel(seconds: number): string {
-  if (seconds < 60) return seconds === 1 ? "s" : `${seconds}s`;
-  const [value, suffix]: [number, string] =
-    seconds < 3600
-      ? [seconds / 60, "m"]
-      : seconds < 86400
-        ? [seconds / 3600, "h"]
-        : [seconds / 86400, "d"];
-  return `${Math.round(value * 10) / 10}${suffix}`;
+function formatIncomeRate(floor: Floor, now: number): string {
+  return `${formatPrice(floor.incomeAmount)}/${formatTime(effectiveIntervalSeconds(floor, now))}`;
 }
 
-function formatIncomeRate(floor: Floor): string {
-  const amount = Number.isInteger(floor.incomeAmount)
-    ? floor.incomeAmount.toString()
-    : floor.incomeAmount.toFixed(2);
-  return `$${amount}/${formatIntervalLabel(floor.incomeIntervalSeconds)}`;
+// walks clockwise around a rounded rect's own outline; t is a 0..1 lap fraction,
+// starting at the middle of the top edge
+function roundedRectPerimeterPoint(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+  t: number,
+): { x: number; y: number } {
+  const straightW = w - 2 * r;
+  const straightH = h - 2 * r;
+  const arcLen = (Math.PI / 2) * r;
+  const total = 2 * straightW + 2 * straightH + 4 * arcLen;
+  let d = (((t % 1) + 1) % 1) * total;
+
+  if (d < straightW) return { x: x + r + d, y };
+  d -= straightW;
+  if (d < arcLen) {
+    const a = -Math.PI / 2 + (d / arcLen) * (Math.PI / 2);
+    return { x: x + w - r + r * Math.cos(a), y: y + r + r * Math.sin(a) };
+  }
+  d -= arcLen;
+  if (d < straightH) return { x: x + w, y: y + r + d };
+  d -= straightH;
+  if (d < arcLen) {
+    const a = 0 + (d / arcLen) * (Math.PI / 2);
+    return { x: x + w - r + r * Math.cos(a), y: y + h - r + r * Math.sin(a) };
+  }
+  d -= arcLen;
+  if (d < straightW) return { x: x + w - r - d, y: y + h };
+  d -= straightW;
+  if (d < arcLen) {
+    const a = Math.PI / 2 + (d / arcLen) * (Math.PI / 2);
+    return { x: x + r + r * Math.cos(a), y: y + h - r + r * Math.sin(a) };
+  }
+  d -= arcLen;
+  if (d < straightH) return { x, y: y + h - r - d };
+  d -= straightH;
+  const a = Math.PI + (d / arcLen) * (Math.PI / 2);
+  return { x: x + r + r * Math.cos(a), y: y + r + r * Math.sin(a) };
+}
+
+// a bright dot orbiting the bar's border with a fading tail, for cycles too fast to
+// show as a normal fill
+function drawFastCycleBorder(
+  ctx: CanvasRenderingContext2D,
+  barX: number,
+  barY: number,
+  barW: number,
+  barH: number,
+  now: number,
+): void {
+  const headT = (now % FAST_CYCLE_LAP_MS) / FAST_CYCLE_LAP_MS;
+  const tailStep = 1 / 60; // lap-fraction gap between trailing dots
+  for (let i = FAST_CYCLE_TAIL_DOTS; i >= 0; i--) {
+    const { x, y } = roundedRectPerimeterPoint(
+      barX,
+      barY,
+      barW,
+      barH,
+      10,
+      headT - i * tailStep,
+    );
+    const alpha = 1 - i / FAST_CYCLE_TAIL_DOTS;
+    ctx.beginPath();
+    ctx.arc(x, y, 5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+    ctx.fill();
+  }
 }
 
 // starts the persistent redraw loop that animates every floor's fill bar; safe to call more than
@@ -74,10 +159,9 @@ export function startIncomeTicker(onFrame: () => void): void {
 export function drawIncomePanel(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
-  offsetY: number,
 ): void {
   const x = PANEL_X;
-  const y = PANEL_Y + offsetY;
+  const y = PANEL_Y;
 
   const barX = x + 18;
   const barW = (PANEL_W - 36) * 1.5;
@@ -88,24 +172,32 @@ export function drawIncomePanel(
 
   // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
   let fillW = barH;
+  let isFastCycle = false;
+  const now = performance.now();
   if (floor.unlocked) {
-    if (!cycleStart.has(floor)) cycleStart.set(floor, performance.now());
-    const fillDurationMs = floor.incomeIntervalSeconds * 1000;
-    const elapsed = performance.now() - cycleStart.get(floor)!;
-    const pct = (elapsed % fillDurationMs) / fillDurationMs;
-    fillW = Math.max(barH, barW * pct);
+    if (!cycleStart.has(floor)) cycleStart.set(floor, now);
+    const fillDurationMs = effectiveIntervalSeconds(floor, now) * 1000;
+    if (fillDurationMs < FAST_CYCLE_THRESHOLD_MS) {
+      isFastCycle = true;
+      fillW = barW;
+    } else {
+      const elapsed = now - cycleStart.get(floor)!;
+      const pct = (elapsed % fillDurationMs) / fillDurationMs;
+      fillW = Math.max(barH, barW * pct);
+    }
   }
   ctx.fillStyle = "#34D399";
   roundRect(ctx, barX, barY, fillW, barH, 10);
   ctx.fill();
   drawGlossHighlight(ctx, barX, barY, fillW, barH, 10);
+  if (isFastCycle) drawFastCycleBorder(ctx, barX, barY, barW, barH, now);
 
   ctx.font = "900 36px system-ui, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   drawCartoonText(
     ctx,
-    formatIncomeRate(floor),
+    formatIncomeRate(floor, now),
     barX + barW / 2,
     barY + barH / 2 + 1,
   );

@@ -1,40 +1,6 @@
 import type { Floor } from "../gameState";
 import { collectDueIncome } from "./incomePanel";
 
-// suffix tiers for compact large-number formatting (short scale). plain integers
-// already fit the 6-digit cap below one million, so suffixes only start at "M"
-const SUFFIX_TIERS: { value: number; suffix: string }[] = [
-  { value: 1e33, suffix: "Dc" }, // decillion
-  { value: 1e30, suffix: "No" }, // nonillion
-  { value: 1e27, suffix: "Oc" }, // octillion
-  { value: 1e24, suffix: "Sp" }, // septillion
-  { value: 1e21, suffix: "Sx" }, // sextillion
-  { value: 1e18, suffix: "Qi" }, // quintillion
-  { value: 1e15, suffix: "Qa" }, // quadrillion
-  { value: 1e12, suffix: "T" }, // trillion
-  { value: 1e9, suffix: "B" }, // billion
-  { value: 1e6, suffix: "M" }, // million
-];
-
-const DIGIT_CAP = 6; // max significant digits shown, e.g. "123.457M" or "999999"
-
-export function formatTotalIncome(value: number): string {
-  const rounded = Math.max(0, Math.floor(value));
-  if (rounded < 1e6) return rounded.toString();
-
-  const tier =
-    SUFFIX_TIERS.find((t) => rounded >= t.value) ??
-    SUFFIX_TIERS[SUFFIX_TIERS.length - 1];
-  const scaled = rounded / tier.value;
-  const intDigits = Math.floor(scaled).toString().length;
-  const decimals = Math.max(0, DIGIT_CAP - intDigits);
-  const trimmed = scaled
-    .toFixed(decimals)
-    .replace(/(\.\d*?)0+$/, "$1")
-    .replace(/\.$/, "");
-  return `${trimmed}${tier.suffix}`;
-}
-
 export function getTotalIncome(): number {
   return totalIncome;
 }
@@ -44,6 +10,11 @@ export function spendTotalIncome(amount: number): boolean {
   if (totalIncome < amount) return false;
   totalIncome -= amount;
   return true;
+}
+
+// adds amount to the running total; used by the "Add Money" dev/test control
+export function addTotalIncome(amount: number): void {
+  totalIncome += amount;
 }
 
 export function clearTotalIncome(): void {

@@ -1,6 +1,5 @@
-import { drawCartoonText, drawCartoonPanel } from "../utils";
+import { drawCartoonText, drawCartoonPanel, formatPrice } from "../utils";
 import { FLOOR_W, FLOOR_H } from "./floors";
-import { formatTotalIncome } from "./totalIncome";
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left)
 export const BTN_W = 360;
@@ -18,31 +17,23 @@ function isPointOnButton(x: number, localY: number): boolean {
   );
 }
 
-export function getButtonCenter(offsetY: number): { x: number; y: number } {
-  return { x: BTN_X + BTN_W / 2, y: offsetY + BTN_Y + BTN_H / 2 };
+export function getButtonCenter(): { x: number; y: number } {
+  return { x: BTN_X + BTN_W / 2, y: BTN_Y + BTN_H / 2 };
 }
 
-// which floor row (top-to-bottom) a canvas point falls on the upgrade button for, if any
-export function hitTestUpgradeButton(
-  x: number,
-  y: number,
-  floorCount: number,
-): number | null {
-  const row = Math.floor(y / FLOOR_H);
-  if (row < 0 || row >= floorCount) return null;
-  const localY = y - row * FLOOR_H;
-  return isPointOnButton(x, localY) ? row : null;
+// whether a floor-local canvas point falls on the upgrade button
+export function hitTestUpgradeButton(x: number, y: number): boolean {
+  return isPointOnButton(x, y);
 }
 
 export function drawUpgradeButton(
   ctx: CanvasRenderingContext2D,
-  offsetY: number,
   hovered: boolean,
   cost: number,
   affordable: boolean,
 ): void {
   const x = BTN_X;
-  const y = BTN_Y + offsetY;
+  const y = BTN_Y;
 
   ctx.save();
   if (!affordable) ctx.globalAlpha = 0.5;
@@ -60,11 +51,6 @@ export function drawUpgradeButton(
   ctx.font = "900 48px system-ui, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  drawCartoonText(
-    ctx,
-    `$${formatTotalIncome(cost)}`,
-    x + BTN_W / 2,
-    y + BTN_H / 2,
-  );
+  drawCartoonText(ctx, formatPrice(cost), x + BTN_W / 2, y + BTN_H / 2);
   ctx.restore();
 }

@@ -1,7 +1,6 @@
 import { FLOOR_W, FLOOR_H, buildFloor } from "./floors";
 import type { Floor } from "../gameState";
-import { drawCartoonText } from "../utils";
-import { formatTotalIncome } from "./totalIncome";
+import { drawCartoonText, formatPrice } from "../utils";
 import type { FurnitureSprite } from "../sprites/furnitureSprites";
 
 // invisible clickable region for the unlock cost, centered over the floor slab
@@ -14,42 +13,31 @@ const PANEL_Y = FLOOR_H / 2 - PANEL_H / 2;
 export function drawFloorLock(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
-  offsetY: number,
 ): void {
   if (floor.unlocked) return;
 
-  ctx.fillStyle = "rgba(30, 30, 30, 0.7)";
-  ctx.fillRect(0, offsetY, FLOOR_W, FLOOR_H);
+  // 0.7 flattened the room's ceiling/wall/window tones into a near-uniform dark
+  // band (all within ~60-90 RGB), reading as if the room were shorter than it is
+  // since the ceiling became indistinguishable from everything below it. A lighter
+  // dim keeps enough contrast between them so the full room stays legible.
+  ctx.fillStyle = "rgba(30, 30, 30, 0.45)";
+  ctx.fillRect(0, 0, FLOOR_W, FLOOR_H);
 
   ctx.font = "900 48px system-ui, sans-serif";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  drawCartoonText(
-    ctx,
-    `$${formatTotalIncome(floor.unlockCost)}`,
-    FLOOR_W / 2,
-    offsetY + FLOOR_H / 2,
-  );
+  drawCartoonText(ctx, formatPrice(floor.unlockCost), FLOOR_W / 2, FLOOR_H / 2);
 }
 
-// which floor row (top-to-bottom) a canvas point falls on a locked floor's unlock panel for, if any
-export function hitTestFloorLock(
-  x: number,
-  y: number,
-  floors: Floor[],
-): number | null {
-  const row = Math.floor(y / FLOOR_H);
-  if (row < 0 || row >= floors.length) return null;
-  const floor = floors[floors.length - 1 - row];
-  if (floor.unlocked) return null;
-
-  const localY = y - row * FLOOR_H;
-  const onPanel =
+// whether a floor-local canvas point falls on a locked floor's unlock panel
+export function hitTestFloorLock(x: number, y: number, floor: Floor): boolean {
+  if (floor.unlocked) return false;
+  return (
     x >= PANEL_X &&
     x <= PANEL_X + PANEL_W &&
-    localY >= PANEL_Y &&
-    localY <= PANEL_Y + PANEL_H;
-  return onPanel ? row : null;
+    y >= PANEL_Y &&
+    y <= PANEL_Y + PANEL_H
+  );
 }
 
 export function unlockFloor(floor: Floor): void {
@@ -59,20 +47,18 @@ export function unlockFloor(floor: Floor): void {
 interface EnsureLockedFloorDeps {
   floors: Floor[];
   sprites: FurnitureSprite[];
-  scrollEl: HTMLElement;
-  onChange: () => void;
+  onAdd: (floor: Floor) => void;
 }
 
 // the real (non-test) way the building grows: there must always be exactly one
-// locked floor waiting above the topmost unlocked floor, ready to be bought next
+// locked floor waiting above the topmost unlocked floor, ready to be bought next.
+// each floor is a real, fixed-size DOM canvas now, so adding one is just adding an
+// element — no scroll-position math needed, native scroll anchoring keeps the view put
 export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
   const top = deps.floors[deps.floors.length - 1];
   if (top && !top.unlocked) return; // a locked floor is already waiting
 
-  const scrollHeightBefore = deps.scrollEl.scrollHeight;
-  deps.floors.push(buildFloor(deps.sprites, deps.floors.length + 1));
-  deps.onChange();
-  // new floors render above existing ones, so compensate scrollTop by the added
-  // height to keep whatever the user was looking at (e.g. the ground floor) in place
-  deps.scrollEl.scrollTop += deps.scrollEl.scrollHeight - scrollHeightBefore;
+  const floor = buildFloor(deps.sprites, deps.floors.length + 1);
+  deps.floors.push(floor);
+  deps.onAdd(floor);
 }

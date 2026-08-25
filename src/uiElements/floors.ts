@@ -74,18 +74,18 @@ export function buildFloor(
     upgradeCount: 0,
     unlocked: floorLevel === 1,
     unlockCost: floorLevel === 1 ? 0 : BASE_UNLOCK_COST * 2 ** (floorLevel - 2),
+    workerCount: 1,
   };
 }
 
-// draws one floor slab (background + its furniture) at the given vertical offset in the building canvas
+// draws one floor slab (background + its furniture) into its own canvas
 export function drawFloor(
   ctx: CanvasRenderingContext2D,
   bgImage: HTMLImageElement,
   floor: Floor,
-  offsetY: number,
 ): void {
-  ctx.drawImage(bgImage, 0, offsetY, FLOOR_W, FLOOR_H);
+  ctx.drawImage(bgImage, 0, 0, FLOOR_W, FLOOR_H);
   for (const p of floor.furniture) {
-    ctx.drawImage(p.img, p.x, p.y + offsetY, p.w, p.h);
+    ctx.drawImage(p.img, p.x, p.y, p.w, p.h);
   }
 }
