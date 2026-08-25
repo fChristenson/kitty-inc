@@ -108,9 +108,25 @@ export function collectDueIncome(floor: Floor, now: number): number {
   return cycles * amount;
 }
 
+// seconds left until the current fill cycle completes, counting down from the full
+// interval to 0 in lockstep with drawIncomePanel's own bar-fill percentage (same
+// cycleStart anchor and modulo-wrap), instead of always showing the constant interval
+function remainingCycleSeconds(floor: Floor, now: number): number {
+  if (!cycleStart.has(floor)) cycleStart.set(floor, now);
+  const intervalMs = effectiveIncomeCycle(floor, now).intervalSeconds * 1000;
+  const elapsed = now - cycleStart.get(floor)!;
+  return (intervalMs - (elapsed % intervalMs)) / 1000;
+}
+
 function formatIncomeRate(floor: Floor, now: number): string {
   const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
-  return `${formatPrice(amount)}/${formatTime(intervalSeconds)}`;
+  // matches drawIncomePanel's own fast-cycle threshold: once the bar switches to the
+  // always-full orbiting-dot animation, a countdown no longer means anything readable
+  const timeText =
+    intervalSeconds * 1000 < FAST_CYCLE_THRESHOLD_MS
+      ? "<1s"
+      : formatTime(remainingCycleSeconds(floor, now));
+  return `${formatPrice(amount)}/${timeText}`;
 }
 
 // walks clockwise around a rounded rect's own outline; t is a 0..1 lap fraction,
@@ -209,11 +225,16 @@ export function drawIncomePanel(
   const barW = (PANEL_W - 36) * 1.5;
   const barH = 60;
   const barY = y + PANEL_H / 2 - barH / 2;
+  const barRadius = 10;
+  // roundRect needs at least 2x its own corner radius to render a well-formed shape;
+  // using barH (60px) as the old minimum made the bar look paused for a noticeable
+  // slice of every short cycle before it visibly started growing
+  const barMinWidth = barRadius * 2;
 
-  drawCartoonPanel(ctx, barX, barY, barW, barH, 10, "#1E293B", false);
+  drawCartoonPanel(ctx, barX, barY, barW, barH, barRadius, "#1E293B", false);
 
   // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
-  let fillW = barH;
+  let fillW = barMinWidth;
   let isFastCycle = false;
   const now = performance.now();
   if (floor.unlocked) {
@@ -226,13 +247,13 @@ export function drawIncomePanel(
     } else {
       const elapsed = now - cycleStart.get(floor)!;
       const pct = (elapsed % fillDurationMs) / fillDurationMs;
-      fillW = Math.max(barH, barW * pct);
+      fillW = Math.max(barMinWidth, barW * pct);
     }
   }
   ctx.fillStyle = "#34D399";
-  roundRect(ctx, barX, barY, fillW, barH, 10);
+  roundRect(ctx, barX, barY, fillW, barH, barRadius);
   ctx.fill();
-  drawGlossHighlight(ctx, barX, barY, fillW, barH, 10);
+  drawGlossHighlight(ctx, barX, barY, fillW, barH, barRadius);
   if (isFastCycle) drawFastCycleBorder(ctx, barX, barY, barW, barH, now);
 
   ctx.font = "900 36px system-ui, sans-serif";

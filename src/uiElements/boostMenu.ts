@@ -96,13 +96,32 @@ export function wireBoostMenu(
     }
   });
 
+  // re-checks affordability while the menu sits open so a grayed-out "too expensive"
+  // button turns clickable again as soon as income catches up, instead of only
+  // refreshing on the next open/purchase
+  function updateAffordability(): void {
+    const button = list.querySelector<HTMLButtonElement>(
+      "#boost-menu-speed-up",
+    );
+    if (button) {
+      button.disabled = getTotalIncome() < getBoostAllCost(getFloors());
+    }
+  }
+
+  let refreshInterval: ReturnType<typeof setInterval> | null = null;
+
   function open(): void {
     render();
     menu.hidden = false;
+    refreshInterval = setInterval(updateAffordability, 250);
   }
 
   function close(): void {
     menu.hidden = true;
+    if (refreshInterval !== null) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
+    }
   }
 
   backdrop.addEventListener("click", close);

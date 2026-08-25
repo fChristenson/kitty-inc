@@ -1,6 +1,7 @@
 import type { Floor } from "../gameState";
 import { formatPrice } from "../utils";
 import { spendTotalIncome, getTotalIncome } from "./totalIncome";
+import { MAX_RENDERED_WORKERS } from "./worker";
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost
@@ -14,8 +15,10 @@ export function getWorkerCost(floor: Floor): number {
   return floorPrice * floor.workerCount;
 }
 
-// buys one more worker for the floor if affordable; returns whether it succeeded
+// buys one more worker for the floor if affordable; returns whether it succeeded. capped
+// at MAX_RENDERED_WORKERS since only that many little figures can ever be drawn per floor
 export function buyWorker(floor: Floor): boolean {
+  if (floor.workerCount >= MAX_RENDERED_WORKERS) return false;
   if (!spendTotalIncome(getWorkerCost(floor))) return false;
   floor.workerCount += 1;
   return true;
@@ -63,8 +66,9 @@ export function wireWorkerMenu(
       .map((floor, i) => ({ floor, i }))
       .filter(({ floor }) => floor.unlocked) // locked floors have no worker to add yet
       .map(({ floor, i }) => {
+        const maxed = floor.workerCount >= MAX_RENDERED_WORKERS;
         const cost = getWorkerCost(floor);
-        const affordable = getTotalIncome() >= cost;
+        const affordable = !maxed && getTotalIncome() >= cost;
         return `
           <button
             class="worker-menu__item"
@@ -72,7 +76,7 @@ export function wireWorkerMenu(
             ${affordable ? "" : "disabled"}
           >
             <span>Floor ${i + 1}: Add new worker x${floor.workerCount}</span>
-            <span class="worker-menu__price">${formatPrice(cost)}</span>
+            <span class="worker-menu__price">${maxed ? "Max" : formatPrice(cost)}</span>
           </button>
         `;
       })
@@ -91,13 +95,34 @@ export function wireWorkerMenu(
     }
   });
 
+  // re-checks affordability while the menu sits open (without rebuilding the whole
+  // list) so a button already gone gray for being too expensive turns clickable again
+  // as soon as income catches up, instead of only refreshing on the next open/purchase
+  function updateAffordability(): void {
+    list
+      .querySelectorAll<HTMLButtonElement>("button[data-floor-index]")
+      .forEach((button) => {
+        const floor = getFloors()[Number(button.dataset.floorIndex)];
+        if (!floor) return;
+        const maxed = floor.workerCount >= MAX_RENDERED_WORKERS;
+        button.disabled = maxed || getTotalIncome() < getWorkerCost(floor);
+      });
+  }
+
+  let refreshInterval: ReturnType<typeof setInterval> | null = null;
+
   function open(): void {
     render();
     menu.hidden = false;
+    refreshInterval = setInterval(updateAffordability, 250);
   }
 
   function close(): void {
     menu.hidden = true;
+    if (refreshInterval !== null) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
+    }
   }
 
   backdrop.addEventListener("click", close);

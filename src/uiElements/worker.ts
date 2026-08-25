@@ -14,8 +14,8 @@ const CLICK_COOLDOWN_MS = 500; // ignore re-clicks faster than this so coin burs
 const HIT_HALF_WIDTH = 20 * SCALE; // generous click-target box around the figure
 const HIT_TOP = 20 * SCALE;
 const HIT_BOTTOM = 75 * SCALE;
-// floor.workerCount can grow past this, but only this many little figures are ever
-// drawn/walked — workerCount.ts still shows the real total next to its icon
+// workerMenu.ts caps floor.workerCount at this too, so every worker a floor has is
+// always one of the little figures actually drawn/walked here
 export const MAX_RENDERED_WORKERS = 3;
 
 interface WalkerState {

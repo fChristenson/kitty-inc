@@ -50,24 +50,19 @@ export function formatPrice(value: number): string {
   return `$${formatCompactNumber(Math.floor(Math.max(0, value)))}`;
 }
 
-// time-unit tiers for formatTime; smallest-to-largest order matters for the lookup below
-const TIME_UNITS: { seconds: number; suffix: string }[] = [
-  { seconds: 86400, suffix: "d" },
-  { seconds: 3600, suffix: "h" },
-  { seconds: 60, suffix: "m" },
-  { seconds: 1, suffix: "s" },
-];
-
 // the only way a duration/interval should be formatted anywhere in the game, e.g.
-// "1.50h". Once past days, the leftover day count is further compacted with the
-// same magnitude suffixes formatPrice uses (e.g. "3.18Md"), so this can never
-// overflow into a giant unformatted number the way a raw day count eventually would
+// "00:01:30". Whole hours can grow past 24 rather than wrapping into days, so this
+// still never overflows into a giant unformatted number at long intervals. Sub-second
+// durations floor to "00:00:00" rather than showing a fraction (already read as "fast"
+// via incomePanel.ts's orbiting-dot bar).
 export function formatTime(seconds: number): string {
   const safe = Math.max(0, seconds);
-  const unit =
-    TIME_UNITS.find((u) => safe >= u.seconds) ??
-    TIME_UNITS[TIME_UNITS.length - 1];
-  return `${formatCompactNumber(safe / unit.seconds)}${unit.suffix}`;
+  const totalSeconds = Math.floor(safe);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const wholeSeconds = totalSeconds % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(hours)}:${pad(minutes)}:${pad(wholeSeconds)}`;
 }
 
 // draws a rounded-rect path (does not fill/stroke) for canvas HUD panels

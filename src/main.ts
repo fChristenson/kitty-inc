@@ -20,7 +20,6 @@ import {
 } from "./uiElements/incomePanel";
 import { drawFloorNumber } from "./uiElements/floorNumber";
 import { drawUpgradeStar } from "./uiElements/star";
-import { drawWorkerCount } from "./uiElements/workerCount";
 import {
   drawWorker,
   hitTestWorker,
@@ -62,6 +61,7 @@ import {
   wireWorkerMenu,
 } from "./uiElements/workerMenu";
 import { createBoostMenuMarkup, wireBoostMenu } from "./uiElements/boostMenu";
+import { createBadgesMarkup, wireBadgesMenu } from "./uiElements/badges";
 import { createPopupMarkup, showIdlePopup } from "./uiElements/popup";
 
 async function main() {
@@ -84,6 +84,7 @@ async function main() {
     ${createActionBarMarkup()}
     ${createWorkerMenuMarkup()}
     ${createBoostMenuMarkup()}
+    ${createBadgesMarkup()}
     ${createPopupMarkup()}
   `;
 
@@ -162,7 +163,6 @@ async function main() {
     const floorNumber = floors.indexOf(floor) + 1;
     drawFloorNumber(ctx, floorNumber, floors.length);
     drawUpgradeStar(ctx, floor);
-    drawWorkerCount(ctx, floor);
     drawIncomePanel(ctx, floor);
     drawUpgradeButton(
       ctx,
@@ -355,7 +355,7 @@ async function main() {
     addTotalIncome(1e14);
     redrawAll();
   });
-  wireResetButton(app);
+  wireResetButton(app, floors);
   const workerMenu = wireWorkerMenu(
     app,
     () => floors,
@@ -372,6 +372,9 @@ async function main() {
       redrawAll();
     },
   );
+  // badges have no gameplay effect and persist themselves (buyNextBadge saves its own
+  // localStorage key), so there's nothing else here that needs to persist/redraw
+  const badgesMenu = wireBadgesMenu(app, () => {});
   wireActionBar(app, {
     onScrollTop: () => {
       scrollEl.scrollTop = 0;
@@ -384,6 +387,9 @@ async function main() {
     },
     onOpenHireMenu: () => {
       workerMenu.open();
+    },
+    onOpenBadges: () => {
+      badgesMenu.open();
     },
   });
 

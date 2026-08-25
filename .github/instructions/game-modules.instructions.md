@@ -76,21 +76,32 @@ distinct game element in its own dedicated file under `src/`:
   `startIncomeTicker` already drives.
 - `src/actionBar.ts` — the fixed action bar overlaying the bottom of the viewport
   (`.action-bar`, independent of scroll/floor position): up/down arrows to jump to the
-  top/ground floor, a lightning bolt to open `boostMenu.ts`'s boost menu, and
-  a plus to open `workerMenu.ts`'s hire menu. `createActionBarMarkup`/`wireActionBar`
-  only build and wire the bar itself; `main.ts` owns what each button actually does.
+  top/ground floor, a lightning bolt to open `boostMenu.ts`'s boost menu, a plus to
+  open `workerMenu.ts`'s hire menu, and a trophy to open `badges.ts`'s badges menu.
+  `createActionBarMarkup`/`wireActionBar` only build and wire the bar itself; `main.ts`
+  owns what each button actually does.
 - `src/workerMenu.ts` — the "Hire Workers" full-screen menu (`createWorkerMenuMarkup`/
   `wireWorkerMenu`) listing every floor with an "Add new worker" button, plus
-  `getWorkerCost`/`buyWorker` (the only way `floor.workerCount` should be mutated). A
-  floor's next worker costs its floor price (`unlockCost`, or a fallback for floor 1
-  since that's permanently free) times its current `workerCount`. `incomePanel.ts` uses
-  `workerCount` to scale how much a boost divides the income interval by.
+  `getWorkerCost`/`buyWorker` (the only way `floor.workerCount` should be mutated).
+  `buyWorker` caps `workerCount` at `worker.ts`'s `MAX_RENDERED_WORKERS` (3) — every
+  floor can only ever have as many workers as can actually be drawn, so there's no
+  separate "total worker count" display anywhere. A floor's next worker costs its floor
+  price (`unlockCost`, or a fallback for floor 1 since that's permanently free) times
+  its current `workerCount`. `incomePanel.ts` uses `workerCount` to scale how much a
+  boost divides the income interval by.
 - `src/boostMenu.ts` — the "Boosts" full-screen menu (`createBoostMenuMarkup`/
   `wireBoostMenu`, reusing `workerMenu.ts`'s `.worker-menu` styling/shape so more boost
   options can be added to the same list later), plus `getBoostAllCost`/`buyBoostAll` —
   the only way every unlocked floor's rendered workers should get boosted at once. Costs
   15s of current (unboosted) income, i.e. `sum(incomeAmount / incomeIntervalSeconds)`
   across unlocked floors, times 15, spent via `totalIncome.ts`'s `spendTotalIncome`.
+- `src/badges.ts` — the "Badges" full-screen grid menu (`createBadgesMarkup`/
+  `wireBadgesMenu`, also reusing `.worker-menu`'s overlay/panel/header, with its own
+  `.badges__grid` of 20 `.badge` cells), plus `getBadgeCost`/`buyNextBadge`/`clearBadges`
+  (its own `cash-clicker:badges-bought` localStorage key, a plain bought-count since
+  badges are bought strictly in order). Badge 1 costs $1M, each next one 10x the last.
+  Purely a currency sink/collectible — no gameplay effect, so nothing else needs to
+  persist or redraw when one is bought. `testButton.ts`'s reset clears it too.
 - `src/testButton.ts` — the "Add Money" / "Reset Game" dev/test controls: their markup,
   click wiring (`wireTestButton` grants a flat 100 trillion via `totalIncome.ts`'s
   `addTotalIncome`), the `addFloor` helper (build a floor, call `onAdd(floor)` — still
