@@ -1,6 +1,6 @@
-import { FLOOR_H } from "./floors";
+import { FLOOR_H } from "../floors";
 import { countBoostedWorkers, type Floor } from "../gameState";
-import { MAX_RENDERED_WORKERS } from "./worker";
+import { MAX_RENDERED_WORKERS } from "../worker";
 import {
   roundRect,
   drawCartoonPanel,

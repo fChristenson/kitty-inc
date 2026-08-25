@@ -1,4 +1,4 @@
-import { FLOOR_X_MIN, FLOOR_X_MAX } from "./floors";
+import { FLOOR_X_MIN, FLOOR_X_MAX } from "../floors";
 import { isBoosted, type Floor } from "../gameState";
 
 const WALK_SPEED = 50; // px/sec
@@ -193,7 +193,15 @@ export function drawWorker(
 
   state.walkers.forEach((walker, i) => {
     const speed = isBoosted(floor, i, now) ? BOOSTED_WALK_SPEED : WALK_SPEED;
-    const dtSeconds = Math.min((now - walker.lastUpdate) / 1000, 0.1);
+    // exact position never needs to be preserved (it's not persisted, and nobody
+    // notices where a worker "was" after a gap) so there's no reason to cap this at
+    // 0.1s — that cap was actually the cause of the visible slowdown: any redraw gap
+    // over 100ms (common for a boosted/faster worker, or a floor cycling in and out
+    // of gameRenderer's IntersectionObserver buffer while scrolling) got truncated to
+    // a fixed 0.1s worth of movement instead of the real distance covered, making
+    // motion look like it kept stuttering to a crawl. Using the real elapsed time and
+    // letting the boundary clamp below catch any overshoot fixes that outright.
+    const dtSeconds = Math.max((now - walker.lastUpdate) / 1000, 0);
     walker.lastUpdate = now;
     walker.x += walker.direction * speed * dtSeconds;
     if (walker.x >= FLOOR_X_MAX) {

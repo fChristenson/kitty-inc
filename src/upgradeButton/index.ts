@@ -1,5 +1,5 @@
 import { drawCartoonText, drawCartoonPanel, formatPrice } from "../utils";
-import { FLOOR_W, FLOOR_H } from "./floors";
+import { FLOOR_W, FLOOR_H } from "../floors";
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left)
 export const BTN_W = 360;

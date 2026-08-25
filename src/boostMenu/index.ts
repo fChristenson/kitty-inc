@@ -1,7 +1,7 @@
 import { activateBoosted, type Floor } from "../gameState";
 import { formatPrice } from "../utils";
-import { spendTotalIncome, getTotalIncome } from "./totalIncome";
-import { MAX_RENDERED_WORKERS } from "./worker";
+import { spendTotalIncome, getTotalIncome } from "../totalIncome";
+import { MAX_RENDERED_WORKERS } from "../worker";
 
 const BOOST_ALL_SECONDS_COST = 15; // cost is 15s of current (unboosted) income
 

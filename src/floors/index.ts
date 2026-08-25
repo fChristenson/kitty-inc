@@ -1,9 +1,6 @@
 import bgUrl from "../assets/bg.png";
 import { loadImage, randomInt } from "../utils";
-import {
-  pickRandomSprites,
-  type FurnitureSprite,
-} from "../sprites/furnitureSprites";
+import { pickRandomSprites, type FurnitureSprite } from "../sprites";
 import type { Floor, FurniturePosition } from "../gameState";
 
 // native size of bg.png

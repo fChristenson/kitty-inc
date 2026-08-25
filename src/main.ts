@@ -1,68 +1,30 @@
 import "./style.css";
-import {
-  FLOOR_W,
-  FLOOR_H,
-  loadFloorBackground,
-  drawFloor,
-} from "./uiElements/floors";
-import { drawOuterWall } from "./uiElements/outerWall";
-import { loadFurnitureSprites } from "./sprites/furnitureSprites";
+import { FLOOR_W, loadFloorBackground } from "./floors";
+import { loadFurnitureSprites } from "./sprites";
 import {
   createTestButtonMarkup,
   wireTestButton,
   wireResetButton,
   addFloor,
-} from "./uiElements/testButton";
-import {
-  drawIncomePanel,
-  increaseIncomeRate,
-  startIncomeTicker,
-} from "./uiElements/incomePanel";
-import { drawFloorNumber } from "./uiElements/floorNumber";
-import { drawUpgradeStar } from "./uiElements/star";
-import {
-  drawWorker,
-  hitTestWorker,
-  clickWorker,
-  getWorkerCenter,
-  getBoostedWorkerCenters,
-} from "./uiElements/worker";
-import {
-  startTotalIncomeTicker,
-  getTotalIncome,
-  spendTotalIncome,
-  addTotalIncome,
-} from "./uiElements/totalIncome";
-import { drawHud, HUD_H } from "./uiElements/hud";
+} from "./testButton";
+import { startIncomeTicker } from "./incomePanel";
+import { startTotalIncomeTicker, addTotalIncome } from "./totalIncome";
+import { HUD_H } from "./hud";
 import {
   saveFloors,
+  schedulePersist,
   loadFloors,
-  activateBoosted,
   computeIdleIncome,
   type Floor,
 } from "./gameState";
-import {
-  drawUpgradeButton,
-  hitTestUpgradeButton,
-  getButtonCenter,
-} from "./uiElements/upgradeButton";
-import { spawnCoinBurst, drawCoins } from "./animations/coins";
-import { spawnFloatingCoins, drawFloatingCoins } from "./animations/coinFloat";
-import { drawClouds } from "./uiElements/clouds";
-import {
-  drawFloorLock,
-  hitTestFloorLock,
-  unlockFloor,
-  ensureLockedFloorAbove,
-} from "./uiElements/floorLock";
-import { createActionBarMarkup, wireActionBar } from "./uiElements/actionBar";
-import {
-  createWorkerMenuMarkup,
-  wireWorkerMenu,
-} from "./uiElements/workerMenu";
-import { createBoostMenuMarkup, wireBoostMenu } from "./uiElements/boostMenu";
-import { createBadgesMarkup, wireBadgesMenu } from "./uiElements/badges";
-import { createPopupMarkup, showIdlePopup } from "./uiElements/popup";
+import { ensureLockedFloorAbove } from "./floorLock";
+import { createActionBarMarkup, wireActionBar } from "./actionBar";
+import { createWorkerMenuMarkup, wireWorkerMenu } from "./workerMenu";
+import { createBoostMenuMarkup, wireBoostMenu } from "./boostMenu";
+import { createBadgesMarkup, wireBadgesMenu } from "./badges";
+import { createPopupMarkup, showIdlePopup } from "./popup";
+import { createGameRenderer } from "./gameRenderer";
+import { createFloorInteractions } from "./floorInteractions";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -129,231 +91,43 @@ async function main() {
   // manual spacer/offset math: the browser's own scrolling does all the work.
   const floorCanvases = new WeakMap<Floor, HTMLCanvasElement>();
   let hoveredFloor: Floor | null = null;
-  const lastFloatSpawn = new WeakMap<Floor, number>();
-  const FLOAT_SPAWN_INTERVAL_MS = 300;
 
   function persist() {
-    saveFloors(floors);
+    // debounced/idle-scheduled so a click mid-scroll doesn't synchronously serialize
+    // the whole floors array + hit localStorage on the same frame (see gameState.ts)
+    schedulePersist(floors);
   }
 
-  // keeps coinFloat.ts's bubbles going for as long as a floor's worker is individually
-  // boosted, spawning a fresh small batch periodically instead of one that fades and
-  // stops — only at the workers actually boosted, not every worker on the floor
-  function maybeSpawnFloatingCoins(floor: Floor) {
-    const now = performance.now();
-    const centers = getBoostedWorkerCenters(floor, now);
-    if (centers.length === 0) return;
-    const last = lastFloatSpawn.get(floor) ?? 0;
-    if (now - last < FLOAT_SPAWN_INTERVAL_MS) return;
-    lastFloatSpawn.set(floor, now);
-    for (const center of centers) {
-      spawnFloatingCoins(floor, center.x, center.y, redrawAll);
-    }
-  }
+  const renderer = createGameRenderer({
+    bgImage,
+    floors,
+    floorCanvases,
+    scrollEl,
+    hudCanvas,
+    hudCtx,
+    cloudsCanvas,
+    cloudsCtx,
+    coinOverlayCanvas,
+    coinOverlayCtx,
+    getHoveredFloor: () => hoveredFloor,
+  });
 
-  // draws everything for one floor into its own canvas
-  function drawFloorCanvas(floor: Floor, canvas: HTMLCanvasElement) {
-    const ctx = canvas.getContext("2d")!;
-    ctx.clearRect(0, 0, FLOOR_W, FLOOR_H);
-    drawFloor(ctx, bgImage, floor);
-    drawOuterWall(ctx);
-    drawWorker(ctx, floor, performance.now());
-    maybeSpawnFloatingCoins(floor);
-    drawFloatingCoins(ctx, floor);
-    const floorNumber = floors.indexOf(floor) + 1;
-    drawFloorNumber(ctx, floorNumber, floors.length);
-    drawUpgradeStar(ctx, floor);
-    drawIncomePanel(ctx, floor);
-    drawUpgradeButton(
-      ctx,
-      floor === hoveredFloor,
-      floor.upgradeCost,
-      getTotalIncome() >= floor.upgradeCost,
-    );
-    drawFloorLock(ctx, floor);
-  }
-
-  function redrawFloor(floor: Floor) {
-    const canvas = floorCanvases.get(floor);
-    if (canvas) drawFloorCanvas(floor, canvas);
-  }
-
-  // a floor is only actually redrawn every frame while it's in or near the visible
-  // viewport (one viewport-height of buffer above/below) — far-off floors are skipped
-  function isNearViewport(canvas: HTMLCanvasElement): boolean {
-    const scrollRect = scrollEl.getBoundingClientRect();
-    const rect = canvas.getBoundingClientRect();
-    const buffer = scrollRect.height;
-    return (
-      rect.bottom >= scrollRect.top - buffer &&
-      rect.top <= scrollRect.bottom + buffer
-    );
-  }
-
-  function renderHud() {
-    hudCtx.clearRect(0, 0, hudCanvas.width, hudCanvas.height);
-    drawHud(hudCtx, hudCanvas.width, getTotalIncome());
-  }
-
-  function renderClouds() {
-    drawClouds(
-      cloudsCtx,
-      cloudsCanvas.width,
-      cloudsCanvas.height,
-      performance.now(),
-    );
-  }
-
-  // a floor's current on-screen rect in the coin overlay's own CSS pixel space, or
-  // null if that floor doesn't have a mounted canvas (shouldn't happen in practice)
-  function getFloorRect(floor: Floor) {
-    const canvas = floorCanvases.get(floor);
-    if (!canvas) return null;
-    const floorRect = canvas.getBoundingClientRect();
-    const overlayRect = scrollEl.getBoundingClientRect();
-    return {
-      left: floorRect.left - overlayRect.left,
-      top: floorRect.top - overlayRect.top,
-      width: floorRect.width,
-    };
-  }
-
-  function renderCoinOverlay() {
-    const dpr = window.devicePixelRatio || 1;
-    coinOverlayCtx.clearRect(
-      0,
-      0,
-      coinOverlayCanvas.width / dpr,
-      coinOverlayCanvas.height / dpr,
-    );
-    drawCoins(coinOverlayCtx, getFloorRect);
-  }
-
-  function redrawAll() {
-    renderHud();
-    renderClouds();
-    renderCoinOverlay();
-    for (const floor of floors) {
-      const canvas = floorCanvases.get(floor);
-      if (canvas && isNearViewport(canvas)) drawFloorCanvas(floor, canvas);
-    }
-  }
-
-  // converts a mouse event to floor-local canvas coordinates (0..FLOOR_W, 0..FLOOR_H)
-  function localPoint(
-    canvas: HTMLCanvasElement,
-    event: MouseEvent,
-  ): { x: number; y: number } {
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: ((event.clientX - rect.left) / rect.width) * FLOOR_W,
-      y: ((event.clientY - rect.top) / rect.height) * FLOOR_H,
-    };
-  }
-
-  // creates, wires, and inserts one floor's canvas; "prepend" for a newly-added
-  // (higher) floor so it appears above everything else, "append" for restoring
-  // floors in already-topmost-first order
-  function mountFloor(floor: Floor, position: "prepend" | "append"): void {
-    const canvas = document.createElement("canvas");
-    canvas.width = FLOOR_W;
-    canvas.height = FLOOR_H;
-    floorCanvases.set(floor, canvas);
-
-    canvas.addEventListener("mousemove", (event) => {
-      const { x, y } = localPoint(canvas, event);
-      const onButton =
-        hitTestUpgradeButton(x, y) &&
-        floor.unlocked &&
-        getTotalIncome() >= floor.upgradeCost;
-      const onLock = hitTestFloorLock(x, y, floor);
-      const onWorker = hitTestWorker(x, y, floor) !== null;
-      canvas.style.cursor =
-        onButton || onLock || onWorker ? "pointer" : "default";
-      const wasHovered = hoveredFloor === floor;
-      if (onButton && !wasHovered) {
-        hoveredFloor = floor;
-        redrawFloor(floor);
-      } else if (!onButton && wasHovered) {
-        hoveredFloor = null;
-        redrawFloor(floor);
-      }
-    });
-
-    canvas.addEventListener("mouseleave", () => {
-      if (hoveredFloor === floor) {
-        hoveredFloor = null;
-        redrawFloor(floor);
-      }
-    });
-
-    canvas.addEventListener("click", (event) => {
-      const { x, y } = localPoint(canvas, event);
-
-      if (hitTestFloorLock(x, y, floor)) {
-        if (spendTotalIncome(floor.unlockCost)) {
-          unlockFloor(floor);
-          ensureLockedFloorAbove({
-            floors,
-            sprites: furnitureSprites,
-            onAdd: (newFloor) => {
-              mountFloor(newFloor, "prepend");
-              redrawFloor(newFloor);
-            },
-          });
-          persist();
-          redrawFloor(floor);
-        }
-        return;
-      }
-
-      if (
-        hitTestUpgradeButton(x, y) &&
-        floor.unlocked &&
-        spendTotalIncome(floor.upgradeCost)
-      ) {
-        increaseIncomeRate(floor);
-        persist();
-        const center = getButtonCenter();
-        spawnCoinBurst(floor, center.x, center.y, () => {
-          redrawFloor(floor);
-          renderCoinOverlay();
-        });
-        return;
-      }
-
-      const workerIndex = hitTestWorker(x, y, floor);
-      if (
-        workerIndex !== null &&
-        clickWorker(floor, workerIndex, performance.now())
-      ) {
-        const center = getWorkerCenter(floor, workerIndex);
-        if (center) {
-          spawnCoinBurst(floor, center.x, center.y, () => {
-            redrawFloor(floor);
-            renderCoinOverlay();
-          });
-          // start the float right away at just this worker, so the boost visibly
-          // kicks in immediately instead of waiting for the next periodic tick
-          spawnFloatingCoins(floor, center.x, center.y, () =>
-            redrawFloor(floor),
-          );
-          lastFloatSpawn.set(floor, performance.now());
-        }
-        // clicking a worker only (re)activates that specific worker's boost/15s timer
-        activateBoosted(floor, workerIndex, performance.now());
-        persist();
-        redrawFloor(floor);
-      }
-    });
-
-    if (position === "prepend") floorsEl.prepend(canvas);
-    else floorsEl.append(canvas);
-  }
+  const { mountFloor } = createFloorInteractions({
+    floorsEl,
+    floors,
+    floorCanvases,
+    furnitureSprites,
+    persist,
+    renderer,
+    setHoveredFloor: (floor) => {
+      hoveredFloor = floor;
+    },
+    getHoveredFloor: () => hoveredFloor,
+  });
 
   wireTestButton(app, () => {
     addTotalIncome(1e14);
-    redrawAll();
+    renderer.redrawAll();
   });
   wireResetButton(app, floors);
   const workerMenu = wireWorkerMenu(
@@ -361,7 +135,7 @@ async function main() {
     () => floors,
     () => {
       persist();
-      redrawAll();
+      renderer.redrawAll();
     },
   );
   const boostMenu = wireBoostMenu(
@@ -369,7 +143,7 @@ async function main() {
     () => floors,
     () => {
       persist();
-      redrawAll();
+      renderer.redrawAll();
     },
   );
   // badges have no gameplay effect and persist themselves (buyNextBadge saves its own
@@ -423,23 +197,27 @@ async function main() {
   floorsEl.append(groundEl);
 
   const idleIncome = computeIdleIncome(floors);
-  persist(); // computeIdleIncome advances each floor's lastCollectedAt in memory; save it
-  // now so a second quick reload can't re-collect the same already-paid-out idle time
+  // saveFloors directly (not the debounced persist()): computeIdleIncome advances each
+  // floor's lastCollectedAt in memory, and that must land before a second quick reload
+  // could otherwise re-collect the same already-paid-out idle time
+  saveFloors(floors);
   if (idleIncome > 0) {
     showIdlePopup(app, idleIncome, () => addTotalIncome(idleIncome));
   }
 
-  redrawAll();
+  renderer.redrawAll();
   scrollEl.scrollTop = scrollEl.scrollHeight; // land on the ground floor
 
-  startIncomeTicker(redrawAll);
+  startIncomeTicker(renderer.redrawAll);
   startTotalIncomeTicker(floors);
 
   // collectDueIncome keeps each floor's lastCollectedAt caught up to "now" as it pays out
   // live, but that only updates the in-memory floors[] — without this, passive play (no
   // worker/upgrade/hire clicks to trigger persist()) would never save it, so a refresh
-  // would see a stale lastCollectedAt and re-pay the whole live session as "idle" income
-  window.addEventListener("beforeunload", persist);
+  // would see a stale lastCollectedAt and re-pay the whole live session as "idle" income.
+  // uses saveFloors directly (not the debounced persist()) since a pending idle callback
+  // isn't guaranteed to fire before the page actually unloads
+  window.addEventListener("beforeunload", () => saveFloors(floors));
 }
 
 main();

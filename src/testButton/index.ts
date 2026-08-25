@@ -1,9 +1,9 @@
-import { buildFloor } from "./floors";
+import { buildFloor } from "../floors";
 import type { Floor } from "../gameState";
-import type { FurnitureSprite } from "../sprites/furnitureSprites";
+import type { FurnitureSprite } from "../sprites";
 import { clearFloors } from "../gameState";
-import { clearTotalIncome } from "./totalIncome";
-import { clearBadges } from "./badges";
+import { clearTotalIncome } from "../totalIncome";
+import { clearBadges } from "../badges";
 
 // the "Add Money" / "Reset Game" dev/test controls
 export function createTestButtonMarkup(): string {

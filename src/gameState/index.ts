@@ -1,4 +1,4 @@
-import type { FurnitureSprite } from "../sprites/furnitureSprites";
+import type { FurnitureSprite } from "../sprites";
 
 const STORAGE_KEY = "cash-clicker:floors";
 
@@ -183,6 +183,27 @@ export function saveFloors(floors: Floor[]): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {
     // storage unavailable/full: persistence is a nice-to-have, safe to ignore
+  }
+}
+
+let pendingSave: number | null = null;
+
+// schedules saveFloors to run once the browser is idle (or after a short fallback
+// delay on engines without requestIdleCallback, e.g. Safari) instead of serializing
+// the whole floors array + writing to localStorage synchronously inside a click
+// handler. Calls made while one is already pending are free — the next run always
+// reads the current floors array, so rapid clicks/purchases collapse into one write
+// instead of janking a frame the user might also be mid-scroll on.
+export function schedulePersist(floors: Floor[]): void {
+  if (pendingSave !== null) return;
+  const run = () => {
+    pendingSave = null;
+    saveFloors(floors);
+  };
+  if (typeof requestIdleCallback === "function") {
+    pendingSave = requestIdleCallback(run, { timeout: 1000 });
+  } else {
+    pendingSave = window.setTimeout(run, 200);
   }
 }
 

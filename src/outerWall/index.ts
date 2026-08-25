@@ -1,4 +1,4 @@
-import { FLOOR_H, FLOOR_W } from "./floors";
+import { FLOOR_H, FLOOR_W } from "../floors";
 
 // a thin facade strip along each side of every floor row, masking bg.png's raw
 // left/right image edges (now that the blue sky/clouds show past the canvas) so the

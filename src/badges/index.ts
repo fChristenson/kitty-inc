@@ -1,5 +1,5 @@
 import { formatPrice } from "../utils";
-import { spendTotalIncome, getTotalIncome } from "./totalIncome";
+import { spendTotalIncome, getTotalIncome } from "../totalIncome";
 
 export const BADGE_COUNT = 20;
 const BASE_BADGE_COST = 1_000_000; // first badge: $1M
@@ -92,9 +92,8 @@ export function wireBadgesMenu(
   const backdrop = container.querySelector<HTMLDivElement>(
     "#badges-menu-backdrop",
   )!;
-  const closeButton = container.querySelector<HTMLButtonElement>(
-    "#badges-menu-close",
-  )!;
+  const closeButton =
+    container.querySelector<HTMLButtonElement>("#badges-menu-close")!;
   const grid = container.querySelector<HTMLDivElement>("#badges-grid")!;
 
   function render(): void {

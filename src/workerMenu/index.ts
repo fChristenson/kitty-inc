@@ -1,7 +1,7 @@
 import type { Floor } from "../gameState";
 import { formatPrice } from "../utils";
-import { spendTotalIncome, getTotalIncome } from "./totalIncome";
-import { MAX_RENDERED_WORKERS } from "./worker";
+import { spendTotalIncome, getTotalIncome } from "../totalIncome";
+import { MAX_RENDERED_WORKERS } from "../worker";
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost
