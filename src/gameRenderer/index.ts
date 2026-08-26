@@ -1,12 +1,16 @@
-import { drawFloor } from "../floors";
-import { drawOuterWall } from "../buildings/outerWall";
-import { drawWorker, getBoostedWorkerCenters } from "../floors/worker";
-import { drawFloorNumber } from "../floors/floorNumber";
-import { drawUpgradeStar } from "../floors/star";
-import { drawIncomePanel } from "../floors/incomePanel";
-import { drawUpgradeButton } from "../floors/upgradeButton";
-import { drawFloorLock } from "../floors/floorLock";
-import { spawnFloatingCoins, drawFloatingCoins } from "../floors/coinFloat";
+import {
+  drawFloor,
+  drawWorker,
+  getBoostedWorkerCenters,
+  drawFloorNumber,
+  drawUpgradeStar,
+  drawIncomePanel,
+  drawUpgradeButton,
+  drawFloorLock,
+  spawnFloatingCoins,
+  drawFloatingCoins,
+} from "../floors";
+import { drawOuterWall } from "../buildings";
 import { getTotalIncome } from "../totalIncome";
 import type { Floor } from "../gameState";
 
@@ -38,16 +42,16 @@ function maybeSpawnFloatingCoins(floor: Floor, now: number): void {
 export function drawFloorContent(
   ctx: CanvasRenderingContext2D,
   deps: {
-    bgImage: HTMLImageElement;
+    backgrounds: HTMLImageElement[];
     floor: Floor;
     floorNumber: number;
     totalFloors: number;
     hovered: boolean;
   },
 ): void {
-  const { bgImage, floor, floorNumber, totalFloors, hovered } = deps;
+  const { backgrounds, floor, floorNumber, totalFloors, hovered } = deps;
   const now = performance.now();
-  drawFloor(ctx, bgImage, floor);
+  drawFloor(ctx, backgrounds[floor.bgIndex] ?? backgrounds[0], floor);
   drawOuterWall(ctx);
   drawWorker(ctx, floor, now);
   maybeSpawnFloatingCoins(floor, now);

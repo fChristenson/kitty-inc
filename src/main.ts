@@ -1,12 +1,9 @@
 import "./style.css";
-import { loadFloorBackground } from "./floors";
-import { loadFurnitureSprites } from "./floors/sprites";
 import {
-  createTestButtonMarkup,
-  wireTestButton,
-  wireResetButton,
-} from "./hud/testButton";
-import { startIncomeTicker } from "./floors/incomePanel";
+  loadFloorBackgrounds,
+  startIncomeTicker,
+  ensureLockedFloorAbove,
+} from "./floors";
 import { startTotalIncomeTicker, addTotalIncome } from "./totalIncome";
 import {
   saveBuildings,
@@ -15,19 +12,25 @@ import {
   computeIdleIncome,
   type Floor,
 } from "./gameState";
-import { ensureLockedFloorAbove } from "./floors/floorLock";
-import { createActionBarMarkup, wireActionBar } from "./hud/actionBar";
-import { createWorkerMenuMarkup, wireWorkerMenu } from "./hud/workerMenu";
-import { createBoostMenuMarkup, wireBoostMenu } from "./hud/boostMenu";
 import {
+  createTestButtonMarkup,
+  wireTestButton,
+  wireResetButton,
+  createActionBarMarkup,
+  wireActionBar,
+  createWorkerMenuMarkup,
+  wireWorkerMenu,
+  createBoostMenuMarkup,
+  wireBoostMenu,
   createBadgesMarkup,
   wireBadgesMenu,
   getBoughtBadgeCount,
   clearBadges,
   BADGE_COUNT,
-} from "./hud/badges";
-import { createPopupMarkup, showIdlePopup } from "./hud/popup";
-import { createGameCanvas } from "./background/gameCanvas";
+  createPopupMarkup,
+  showIdlePopup,
+} from "./hud";
+import { createGameCanvas } from "./background";
 import { createBuilding, getBuildingMultiplier } from "./buildings";
 
 async function main() {
@@ -50,10 +53,7 @@ async function main() {
   const buildingLabelEl = app.querySelector<HTMLDivElement>("#building-label")!;
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
 
-  const [bgImage, furnitureSprites] = await Promise.all([
-    loadFloorBackground(),
-    loadFurnitureSprites(),
-  ]);
+  const backgrounds = await loadFloorBackgrounds();
 
   // one Floor[] per building, laid out side by side in gameCanvas.ts's single camera
   const buildings: Floor[][] = [];
@@ -70,8 +70,7 @@ async function main() {
 
   const gameCanvas = createGameCanvas({
     canvas,
-    bgImage,
-    furnitureSprites,
+    backgrounds,
     buildings,
     getBuildingMultiplier,
     persist,
@@ -85,7 +84,7 @@ async function main() {
     gameCanvas.addBuilding();
     ensureLockedFloorAbove({
       floors: buildings[buildingIndex],
-      sprites: furnitureSprites,
+      backgroundCount: backgrounds.length,
       multiplier: getBuildingMultiplier(buildingIndex),
       onAdd: (floor) => gameCanvas.notifyFloorAdded(buildingIndex, floor),
     });
@@ -99,7 +98,7 @@ async function main() {
   function spawnBuildingIfNeeded(): void {
     if (getBoughtBadgeCount() < BADGE_COUNT) return;
     const buildingIndex = buildings.length;
-    const floors = createBuilding(furnitureSprites, buildingIndex);
+    const floors = createBuilding(buildingIndex, backgrounds.length);
     buildings.push(floors);
     setupBuilding(buildingIndex);
     clearBadges();
@@ -140,14 +139,14 @@ async function main() {
     },
   });
 
-  const restoredBuildings = loadBuildings(furnitureSprites);
+  const restoredBuildings = loadBuildings();
   if (restoredBuildings.length > 0) {
     restoredBuildings.forEach((floors, i) => {
       buildings.push(floors);
       setupBuilding(i);
     });
   } else {
-    const floors = createBuilding(furnitureSprites, 0);
+    const floors = createBuilding(0, backgrounds.length);
     buildings.push(floors);
     setupBuilding(0);
   }

@@ -1,6 +1,6 @@
 import { randomInt } from "../../utils";
 import type { Floor } from "../../gameState";
-import { FLOOR_W } from "..";
+import { FLOOR_W } from "../constants";
 
 // shared coin-burst particle system: any UI element (upgrade button, worker, ...) can
 // spawn a burst at a point and reuse the same rAF-driven physics + rendering

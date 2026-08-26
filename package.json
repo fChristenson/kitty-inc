@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "process:backgrounds": "node scripts/process-background-floors.mjs"
   },
   "devDependencies": {
     "sharp": "^0.35.3",

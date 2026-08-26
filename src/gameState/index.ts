@@ -1,5 +1,3 @@
-import type { FurnitureSprite } from "../floors/sprites";
-
 // bumped from "cash-clicker:floors" now that this holds Floor[][] (one entry per
 // building) instead of a single Floor[] — old single-building saves just start fresh
 const STORAGE_KEY = "cash-clicker:buildings";
@@ -11,17 +9,8 @@ export interface WorkerSlot {
 
 const BOOST_DURATION_MS = 15_000; // boosted state auto-resets this long after being triggered
 
-export interface FurniturePosition {
-  img: HTMLImageElement;
-  spriteIndex: number;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
 export interface Floor {
-  furniture: FurniturePosition[];
+  bgIndex: number; // which loaded shop background this floor draws (floors/index.ts)
   incomeAmount: number;
   incomeIntervalSeconds: number;
   upgradeCost: number; // $ needed to buy this floor's next upgrade; doubles per purchase
@@ -134,16 +123,7 @@ export function computeIdleIncome(buildings: Floor[][]): number {
   return idleIncome;
 }
 
-interface SavedPlacement {
-  spriteIndex: number;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
 interface SavedFloor {
-  furniture: SavedPlacement[];
   incomeAmount: number;
   incomeIntervalSeconds: number;
   upgradeCost: number;
@@ -154,6 +134,7 @@ interface SavedFloor {
   unlockCost: number;
   workerCount?: number; // added after initial release; older saves default to 1 on load
   lastCollectedAt?: number; // added after initial release; older saves default to now() on load
+  bgIndex?: number; // added after initial release; older saves default to 0 on load
 }
 
 export function clearBuildings(): void {
@@ -166,13 +147,6 @@ export function clearBuildings(): void {
 
 function toSavedFloor(floor: Floor): SavedFloor {
   return {
-    furniture: floor.furniture.map((p) => ({
-      spriteIndex: p.spriteIndex,
-      x: p.x,
-      y: p.y,
-      w: p.w,
-      h: p.h,
-    })),
     incomeAmount: floor.incomeAmount,
     incomeIntervalSeconds: floor.incomeIntervalSeconds,
     upgradeCost: floor.upgradeCost,
@@ -183,6 +157,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
     unlockCost: floor.unlockCost,
     workerCount: floor.workerCount,
     lastCollectedAt: floor.lastCollectedAt,
+    bgIndex: floor.bgIndex,
   };
 }
 
@@ -218,21 +193,9 @@ export function schedulePersist(buildings: Floor[][]): void {
   }
 }
 
-function fromSavedFloor(sf: SavedFloor, sprites: FurnitureSprite[]): Floor {
-  const furniture: FurniturePosition[] = sf.furniture.map((sp) => {
-    const sprite = sprites[sp.spriteIndex];
-    if (!sprite) throw new Error(`missing sprite ${sp.spriteIndex}`);
-    return {
-      img: sprite.img,
-      spriteIndex: sp.spriteIndex,
-      x: sp.x,
-      y: sp.y,
-      w: sp.w,
-      h: sp.h,
-    };
-  });
+function fromSavedFloor(sf: SavedFloor): Floor {
   const floor: Floor = {
-    furniture,
+    bgIndex: sf.bgIndex ?? 0,
     incomeAmount: sf.incomeAmount,
     incomeIntervalSeconds: sf.incomeIntervalSeconds,
     upgradeCost: sf.upgradeCost,
@@ -247,10 +210,9 @@ function fromSavedFloor(sf: SavedFloor, sprites: FurnitureSprite[]): Floor {
   return floor;
 }
 
-// rebuilds Floor[][] (one Floor[] per building) from localStorage, resolving each
-// placement's sprite image by index; returns [] if nothing is saved, storage is
-// unreadable, or a referenced sprite no longer exists
-export function loadBuildings(sprites: FurnitureSprite[]): Floor[][] {
+// rebuilds Floor[][] (one Floor[] per building) from localStorage; returns [] if
+// nothing is saved or storage is unreadable
+export function loadBuildings(): Floor[][] {
   let raw: string | null;
   try {
     raw = localStorage.getItem(STORAGE_KEY);
@@ -261,9 +223,7 @@ export function loadBuildings(sprites: FurnitureSprite[]): Floor[][] {
 
   try {
     const saved: SavedFloor[][] = JSON.parse(raw);
-    return saved.map((floors) =>
-      floors.map((sf) => fromSavedFloor(sf, sprites)),
-    );
+    return saved.map((floors) => floors.map((sf) => fromSavedFloor(sf)));
   } catch {
     return [];
   }

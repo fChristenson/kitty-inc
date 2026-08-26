@@ -1,4 +1,4 @@
-import { FLOOR_H } from "..";
+import { FLOOR_H } from "../constants";
 import { countBoostedWorkers, type Floor } from "../../gameState";
 import { MAX_RENDERED_WORKERS } from "../worker";
 import {

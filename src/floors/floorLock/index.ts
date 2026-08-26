@@ -1,7 +1,7 @@
-import { FLOOR_W, FLOOR_H, buildFloor } from "..";
+import { buildFloor } from "..";
+import { FLOOR_W, FLOOR_H } from "../constants";
 import type { Floor } from "../../gameState";
 import { drawCartoonText, formatPrice } from "../../utils";
-import type { FurnitureSprite } from "../sprites";
 
 // invisible clickable region for the unlock cost, centered over the floor slab
 const PANEL_W = 280;
@@ -49,7 +49,7 @@ export function unlockFloor(floor: Floor): void {
 
 interface EnsureLockedFloorDeps {
   floors: Floor[];
-  sprites: FurnitureSprite[];
+  backgroundCount: number;
   multiplier?: number; // this building's economy scale (buildings/index.ts); defaults to 1
   onAdd: (floor: Floor) => void;
 }
@@ -62,11 +62,11 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
   const top = deps.floors[deps.floors.length - 1];
   if (top && !top.unlocked) return; // a locked floor is already waiting
 
-  const floor = buildFloor(
-    deps.sprites,
-    deps.floors.length + 1,
-    deps.multiplier ?? 1,
-  );
+  const floor = buildFloor(deps.floors.length + 1, {
+    backgroundCount: deps.backgroundCount,
+    existingBgIndexes: deps.floors.map((f) => f.bgIndex),
+    multiplier: deps.multiplier ?? 1,
+  });
   deps.floors.push(floor);
   deps.onAdd(floor);
 }

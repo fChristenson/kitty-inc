@@ -1,6 +1,5 @@
 import { buildFloor } from "../floors";
 import type { Floor } from "../gameState";
-import type { FurnitureSprite } from "../floors/sprites";
 
 // each building's $ base values (income/upgrade/unlock/rate-step) are this much
 // bigger than the previous building's — a fresh, much richer economy to grow into
@@ -15,10 +14,18 @@ export function getBuildingMultiplier(buildingIndex: number): number {
 // always-free ground floor. floorLock.ts's ensureLockedFloorAbove adds the next
 // (always-locked) floor above it the same way it does for every other building.
 export function createBuilding(
-  sprites: FurnitureSprite[],
   buildingIndex: number,
+  backgroundCount: number,
 ): Floor[] {
   const multiplier = getBuildingMultiplier(buildingIndex);
-  const groundFloor = buildFloor(sprites, 1, multiplier, buildingIndex > 0);
+  const groundFloor = buildFloor(1, {
+    backgroundCount,
+    multiplier,
+    groundFloorLocked: buildingIndex > 0,
+  });
   return [groundFloor];
 }
+
+// this module's own facade: buildings/ has an outerWall sub-part for internal reuse,
+// but anything outside src/buildings must import it from here, never from a nested path
+export { drawOuterWall } from "./outerWall";

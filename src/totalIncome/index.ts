@@ -1,5 +1,5 @@
 import type { Floor } from "../gameState";
-import { collectDueIncome } from "../floors/incomePanel";
+import { collectDueIncome } from "../floors";
 
 export function getTotalIncome(): number {
   return totalIncome;

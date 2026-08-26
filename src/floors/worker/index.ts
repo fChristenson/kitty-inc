@@ -1,4 +1,4 @@
-import { FLOOR_X_MIN, FLOOR_X_MAX } from "..";
+import { FLOOR_X_MIN, FLOOR_X_MAX } from "../constants";
 import { isBoosted, type Floor } from "../../gameState";
 
 const WALK_SPEED = 50; // px/sec

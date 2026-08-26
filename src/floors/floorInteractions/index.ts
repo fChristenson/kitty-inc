@@ -10,11 +10,10 @@ import {
   ensureLockedFloorAbove,
 } from "../floorLock";
 import { activateBoosted, type Floor } from "../../gameState";
-import type { FurnitureSprite } from "../sprites";
 
 export interface FloorActionsDeps {
   floors: Floor[];
-  furnitureSprites: FurnitureSprite[];
+  backgroundCount: number;
   multiplier: number; // this building's economy scale (buildings/index.ts)
   persist: () => void;
   // gameCanvas.ts's own continuous per-frame redraw already picks up any state change
@@ -43,14 +42,14 @@ export function handleFloorClick(
   x: number,
   y: number,
 ): void {
-  const { floors, furnitureSprites, multiplier, persist, onFloorAdded } = deps;
+  const { floors, backgroundCount, multiplier, persist, onFloorAdded } = deps;
 
   if (hitTestFloorLock(x, y, floor)) {
     if (spendTotalIncome(floor.unlockCost)) {
       unlockFloor(floor);
       ensureLockedFloorAbove({
         floors,
-        sprites: furnitureSprites,
+        backgroundCount,
         multiplier,
         onAdd: onFloorAdded,
       });

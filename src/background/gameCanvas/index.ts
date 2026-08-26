@@ -1,15 +1,19 @@
-import { FLOOR_W, FLOOR_H, GROUND_H, drawGround } from "../../floors";
-import { drawFloorContent } from "../../gameRenderer";
-import { drawClouds, CLOUD_MAX_RADIUS } from "../clouds";
-import { drawHud } from "../../hud";
-import { drawCoins, hasActiveCoins } from "../../floors/coins";
-import { getTotalIncome } from "../../totalIncome";
 import {
+  FLOOR_W,
+  FLOOR_H,
+  GROUND_H,
+  drawGround,
+  drawCoins,
+  hasActiveCoins,
   hitTestFloorHover,
   handleFloorClick,
-} from "../../floors/floorInteractions";
+} from "../../floors";
+import { drawFloorContent } from "../../gameRenderer";
+import { drawClouds, CLOUD_MAX_RADIUS } from "../clouds";
+import { drawCity, CITY_MAX_HEIGHT } from "../city";
+import { drawHud } from "../../hud";
+import { getTotalIncome } from "../../totalIncome";
 import type { Floor } from "../../gameState";
-import type { FurnitureSprite } from "../../floors/sprites";
 
 // one building's on-screen slot: a GUTTER_W margin on each side of its floor room art
 // (blue sky/ground bleeds through, matching the old CSS `--floor-gutter` padding), so
@@ -42,8 +46,7 @@ const MOMENTUM_MIN_SPEED = 0.02; // world units/ms below which momentum just sto
 
 export interface GameCanvasDeps {
   canvas: HTMLCanvasElement;
-  bgImage: HTMLImageElement;
-  furnitureSprites: FurnitureSprite[];
+  backgrounds: HTMLImageElement[];
   buildings: Floor[][]; // one Floor[] per building; main.ts pushes into this in place
   getBuildingMultiplier: (buildingIndex: number) => number;
   persist: () => void;
@@ -70,8 +73,7 @@ export interface GameCanvas {
 export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   const {
     canvas,
-    bgImage,
-    furnitureSprites,
+    backgrounds,
     buildings,
     getBuildingMultiplier,
     persist,
@@ -192,6 +194,17 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return result;
   }
 
+  // a distant city skyline silhouette sitting on the ground line, behind everything
+  // else — drawn over the plain blue sky fill but under the clouds/ground/buildings
+  function drawWorldCity(): void {
+    const visibleTop = viewportTopY();
+    const visibleBottom = viewportBottomY();
+    if (0 <= visibleTop || -CITY_MAX_HEIGHT >= visibleBottom) return; // entirely out of view
+    const visibleLeft = cameraX;
+    const visibleRight = cameraX + SLOT_W;
+    drawCity(ctx, 0, visibleLeft, visibleRight);
+  }
+
   // one continuous flat ground strip across whatever's currently visible — not drawn
   // per building, so there's never a seam between one building's ground and the next
   function drawWorldGround(): void {
@@ -248,7 +261,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       ctx.save();
       ctx.translate(slotLeft, top);
       drawFloorContent(ctx, {
-        bgImage,
+        backgrounds,
         floor: floors[i],
         floorNumber: i + 1,
         totalFloors: floors.length,
@@ -292,9 +305,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.save();
     ctx.translate(-cameraX, -viewportTopY());
 
-    // strict paint order: ground, then clouds, then every visible building's floors
-    // on top of all of it — nothing from a later pass can end up underneath one
-    // still to come
+    // strict paint order: city skyline, then ground, then clouds, then every visible
+    // building's floors on top of all of it — nothing from a later pass can end up
+    // underneath one still to come
+    drawWorldCity();
     drawWorldGround();
     drawWorldClouds(performance.now());
     for (const b of visibleBuildingIndices()) drawBuildingFloors(b);
@@ -472,7 +486,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     handleFloorClick(
       {
         floors: buildings[hit.buildingIndex],
-        furnitureSprites,
+        backgroundCount: backgrounds.length,
         multiplier: getBuildingMultiplier(hit.buildingIndex),
         persist,
         onFloorAdded: (floor) => notifyFloorAdded(hit.buildingIndex, floor),
