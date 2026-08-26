@@ -107,7 +107,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // exact floor-local point the cursor is over, so the upgrade button can check
   // specifically whether it itself is hovered instead of "is anything on this floor
   // hoverable" (that coarser check is still what drives the pointer cursor below)
-  let hoveredPoint: { floor: Floor; localX: number; localY: number } | null = null;
+  let hoveredPoint: { floor: Floor; localX: number; localY: number } | null =
+    null;
 
   // which building/index a given Floor lives at, kept in sync as floors are added, so
   // a hit-test or a coin burst's on-screen rect never has to scan every building

@@ -50,7 +50,8 @@ async function processSheet(srcFile, destFile) {
   // nukes those too
   const isBackground = new Uint8Array(width * height);
   const queue = new Int32Array(width * height);
-  let qHead = 0, qTail = 0;
+  let qHead = 0,
+    qTail = 0;
   function tryEnqueue(x, y) {
     const idx = y * width + x;
     if (isBackground[idx]) return;
@@ -68,7 +69,8 @@ async function processSheet(srcFile, destFile) {
   }
   while (qHead < qTail) {
     const idx = queue[qHead++];
-    const x = idx % width, y = (idx / width) | 0;
+    const x = idx % width,
+      y = (idx / width) | 0;
     if (x > 0) tryEnqueue(x - 1, y);
     if (x < width - 1) tryEnqueue(x + 1, y);
     if (y > 0) tryEnqueue(x, y - 1);
@@ -141,7 +143,8 @@ async function processSheet(srcFile, destFile) {
 
   // tight bounding box (x from the run, y from actual content) per pose
   const boxes = runs.map(([x0, x1]) => {
-    let y0 = height, y1 = -1;
+    let y0 = height,
+      y1 = -1;
     for (let x = x0; x <= x1; x++) {
       for (let y = 0; y < height; y++) {
         if (data[(y * width + x) * channels + 3] > 10) {

@@ -1,9 +1,5 @@
 import { FLOOR_X_MIN, FLOOR_X_MAX } from "../constants";
-import {
-  isBoosted,
-  getWorkerSpriteIndexes,
-  type Floor,
-} from "../../gameState";
+import { isBoosted, getWorkerSpriteIndexes, type Floor } from "../../gameState";
 import { loadImage, randomInt } from "../../utils";
 
 // every processed worker skin (see scripts/process-cat-sprites.mjs, which writes
@@ -89,7 +85,8 @@ function pickSpriteIndex(existingIndexes: number[]): number {
   const used = new Set(existingIndexes);
   const unused: number[] = [];
   for (let i = 0; i < count; i++) if (!used.has(i)) unused.push(i);
-  const pool = unused.length > 0 ? unused : Array.from({ length: count }, (_, i) => i);
+  const pool =
+    unused.length > 0 ? unused : Array.from({ length: count }, (_, i) => i);
   return pool[randomInt(0, pool.length - 1)];
 }
 
@@ -143,7 +140,8 @@ export function hitTestWorker(
   const state = floorWorkers.get(floor);
   if (!state) return null;
 
-  const withinY = y >= WORKER_FEET_Y - HIT_TOP && y <= WORKER_FEET_Y + HIT_BOTTOM;
+  const withinY =
+    y >= WORKER_FEET_Y - HIT_TOP && y <= WORKER_FEET_Y + HIT_BOTTOM;
   if (!withinY) return null;
   const index = state.walkers.findIndex(
     (w) => x >= w.x - HIT_HALF_WIDTH && x <= w.x + HIT_HALF_WIDTH,
