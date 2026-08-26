@@ -1,7 +1,7 @@
 import "./style.css";
 import {
   loadFloorBackgrounds,
-  loadWorkerSprites,
+  loadWorkerSprite,
   startIncomeTicker,
   ensureLockedFloorAbove,
 } from "./floors";
@@ -58,7 +58,7 @@ async function main() {
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
 
   const backgrounds = await loadFloorBackgrounds();
-  await loadWorkerSprites();
+  await loadWorkerSprite();
 
   // one Floor[] per building, laid out side by side in gameCanvas.ts's single camera
   const buildings: Floor[][] = [];

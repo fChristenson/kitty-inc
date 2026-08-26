@@ -178,7 +178,7 @@ export { hitTestFloorHover, handleFloorClick } from "./floorInteractions";
 export {
   drawWorker,
   getBoostedWorkerCenters,
-  loadWorkerSprites,
+  loadWorkerSprite,
   MAX_RENDERED_WORKERS,
 } from "./worker";
 export { drawFloorNumber } from "./floorNumber";

@@ -77,17 +77,17 @@ export function countBoostedWorkers(floor: Floor, now: number): number {
     .length;
 }
 
-// which loaded worker sprite skin (floors/worker/index.ts) each of a floor's workers
-// draws with, keyed by the floor the same way workerSlots is — persisted (see
-// SavedFloor.spriteIndexes below) so a worker's skin survives a reload instead of
-// being re-randomized every time
-const workerSpriteIndexes = new WeakMap<Floor, number[]>();
+// which theme color (floors/worker/index.ts's THEME_COLORS) each of a floor's
+// workers is tinted with, keyed by the floor the same way workerSlots is —
+// persisted (see SavedFloor.tintIndexes below) so a worker's color survives a
+// reload instead of being re-randomized every time
+const workerTintIndexes = new WeakMap<Floor, number[]>();
 
-export function getWorkerSpriteIndexes(floor: Floor): number[] {
-  let indexes = workerSpriteIndexes.get(floor);
+export function getWorkerTintIndexes(floor: Floor): number[] {
+  let indexes = workerTintIndexes.get(floor);
   if (!indexes) {
     indexes = [];
-    workerSpriteIndexes.set(floor, indexes);
+    workerTintIndexes.set(floor, indexes);
   }
   return indexes;
 }
@@ -158,7 +158,8 @@ interface SavedFloor {
   workerCount?: number; // added after initial release; older saves default to 1 on load
   lastCollectedAt?: number; // added after initial release; older saves default to now() on load
   bgIndex?: number; // added after initial release; older saves default to 0 on load
-  spriteIndexes?: number[]; // added after initial release; older saves default to [] on load
+  spriteIndexes?: number[]; // renamed to tintIndexes; kept only so very old saves parse
+  tintIndexes?: number[]; // added after initial release; older saves default to [] on load
 }
 
 export function clearBuildings(): void {
@@ -182,7 +183,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
     workerCount: floor.workerCount,
     lastCollectedAt: floor.lastCollectedAt,
     bgIndex: floor.bgIndex,
-    spriteIndexes: getWorkerSpriteIndexes(floor),
+    tintIndexes: getWorkerTintIndexes(floor),
   };
 }
 
@@ -232,7 +233,7 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     lastCollectedAt: sf.lastCollectedAt ?? Date.now(),
   };
   workerSlots.set(floor, sf.workers);
-  workerSpriteIndexes.set(floor, sf.spriteIndexes ?? []);
+  workerTintIndexes.set(floor, sf.tintIndexes ?? sf.spriteIndexes ?? []);
   return floor;
 }
 
