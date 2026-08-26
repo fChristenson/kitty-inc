@@ -137,8 +137,13 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // floor 1 of a brand new building lines up exactly with floor 1 of every other one.
   // World-Y increases downward, 0 is the top of the ground strip; floors sit above
   // that at negative Y (higher floor number = higher up), identically for everyone.
+  // Shifted down by BUILDING_GROUND_OVERLAP so the ground floor's own bottom edge
+  // sits a few pixels into the street art below it (rather than exactly flush with
+  // it), so the building visually sits on top of the street instead of leaving a
+  // seam a hairline of sub-pixel canvas scaling could show through.
+  const BUILDING_GROUND_OVERLAP = 32;
   function floorWorldY(floorIndex: number): { top: number; bottom: number } {
-    const bottom = -floorIndex * FLOOR_H;
+    const bottom = -floorIndex * FLOOR_H + BUILDING_GROUND_OVERLAP;
     return { top: bottom - FLOOR_H, bottom };
   }
 
@@ -233,7 +238,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (0 >= viewportBottomY() || GROUND_H <= viewportTopY()) return;
     ctx.save();
     ctx.translate(left, 0);
-    drawGround(ctx, right - left);
+    drawGround(ctx, right - left, left);
     ctx.restore();
   }
 

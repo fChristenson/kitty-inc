@@ -85,20 +85,13 @@ body {
 }
 
 .action-bar {
-  /* floats above the game__test-controls row rather than the game__scroll's own
-     bottom, so it stays put over the viewport regardless of scroll/floor content.
-     matches .game's own width/centering so it spans the game's viewport, not the
-     full browser window either side of it */
-  position: fixed;
-  bottom: calc(4rem + env(safe-area-inset-bottom));
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 480px;
+  /* an in-flow row inside .game (below the canvas), not an overlay — the canvas's
+     own flex:1 sizing shrinks to leave real room for it, so nothing the canvas
+     draws (e.g. the ground/street art) ever ends up hidden behind it */
+  flex-shrink: 0;
   display: flex;
   justify-content: stretch;
   background: rgba(17, 20, 23, 0.85);
-  z-index: 30;
 }
 
 .action-bar__button {

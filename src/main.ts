@@ -1,6 +1,7 @@
 import "./style.css";
 import {
   loadFloorBackgrounds,
+  loadGroundImage,
   loadWorkerSprite,
   startIncomeTicker,
   ensureLockedFloorAbove,
@@ -31,7 +32,7 @@ import {
   createPopupMarkup,
   showIdlePopup,
 } from "./hud";
-import { createGameCanvas, loadCityImage } from "./background";
+import { createGameCanvas, loadCityImage, loadCloudImages } from "./background";
 import {
   createBuilding,
   getBuildingMultiplier,
@@ -46,9 +47,9 @@ async function main() {
     <div class="game">
       <div class="game__building-label" id="building-label"></div>
       <canvas class="game__canvas" id="game-canvas"></canvas>
+      ${createActionBarMarkup()}
       ${createTestButtonMarkup()}
     </div>
-    ${createActionBarMarkup()}
     ${createUpgradeMenuMarkup()}
     ${createBoostMenuMarkup()}
     ${createPopupMarkup()}
@@ -58,8 +59,10 @@ async function main() {
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
 
   const backgrounds = await loadFloorBackgrounds();
+  await loadGroundImage();
   await loadWorkerSprite();
   await loadCityImage();
+  await loadCloudImages();
 
   // one Floor[] per building, laid out side by side in gameCanvas.ts's single camera
   const buildings: Floor[][] = [];

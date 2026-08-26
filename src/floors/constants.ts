@@ -12,5 +12,9 @@ export const FLOOR_H = 721;
 export const FLOOR_X_MIN = 150;
 export const FLOOR_X_MAX = 1100;
 
-// decorative strip beneath the ground floor (grass top edge + dirt below)
-export const GROUND_H = 310;
+// decorative strip beneath the ground floor — rendered taller than the raw
+// ground/street.png art's native 1248x318 (see scripts/process-street.mjs) so it
+// reads at a scale proportionate to the multi-story buildings above it;
+// GROUND_TILE_W keeps the art's own aspect ratio instead of stretching it
+export const GROUND_H = 800;
+export const GROUND_TILE_W = Math.round(GROUND_H * (1248 / 318));

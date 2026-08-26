@@ -6,7 +6,9 @@ import {
   FLOOR_X_MIN,
   FLOOR_X_MAX,
   GROUND_H,
+  GROUND_TILE_W,
 } from "./constants";
+import groundImageUrl from "../assets/ground/street.png";
 
 export { FLOOR_W, FLOOR_H, FLOOR_X_MIN, FLOOR_X_MAX, GROUND_H };
 
@@ -141,27 +143,46 @@ export function drawFloor(
   void floor; // no per-floor furniture placement left to draw; kept for a stable draw signature
 }
 
-// decorative strip beneath the ground floor (grass top edge + dirt below); ctx must
-// already be translated to this strip's own top-left. width spans the whole building
-// slot (floor room art + both side gutters), not just the room's own FLOOR_W, so the
-// ground reads as continuous dirt/grass under the gutters' sky-blue strips too
-export function drawGround(ctx: CanvasRenderingContext2D, width: number): void {
-  const dirtGradient = ctx.createLinearGradient(0, 0, 0, GROUND_H);
-  dirtGradient.addColorStop(0, "#8a5a2b");
-  dirtGradient.addColorStop(1, "#6b4321");
-  ctx.fillStyle = dirtGradient;
-  ctx.fillRect(0, 0, width, GROUND_H);
+let groundImage: HTMLImageElement | null = null;
 
-  const stripeH = 48;
-  const stripeW = 30;
-  ctx.fillStyle = "#16a34a";
-  ctx.fillRect(0, 0, width, stripeH);
-  ctx.fillStyle = "#22c55e";
-  for (let x = 0; x < width; x += stripeW * 2) {
-    ctx.fillRect(x, 0, stripeW, stripeH);
+// loads the street/sidewalk ground art once; main.ts awaits this alongside
+// loadFloorBackgrounds before the first frame ever needs to draw it
+export async function loadGroundImage(): Promise<HTMLImageElement> {
+  groundImage = await loadImage(groundImageUrl);
+  return groundImage;
+}
+
+// decorative strip beneath the ground floor (road + sidewalks + streetlights); ctx
+// must already be translated to this strip's own top-left. width spans the whole
+// building slot (floor room art + both side gutters), not just the room's own
+// FLOOR_W, so the ground reads as continuous street under the gutters' sky strips
+// too — tiled at its own native size (GROUND_TILE_W x GROUND_H) since it isn't
+// perfectly seamless edge-to-edge but reads fine repeating at this scale/distance.
+// worldX0 is the world-x this call's local x=0 maps to, so the tile phase stays
+// locked to world coordinates instead of resetting to a fresh tile boundary (and
+// visibly "swimming") every time the visible/clipped region's own left edge shifts
+// during scrolling
+const GROUND_OVERLAP = 15; // world units drawn past both the top and bottom edge
+export function drawGround(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  worldX0: number,
+): void {
+  if (!groundImage) return;
+  const phase = ((worldX0 % GROUND_TILE_W) + GROUND_TILE_W) % GROUND_TILE_W;
+  // drawn a touch taller than its own logical [0, GROUND_H] bounds — overlapping up
+  // into the floor room's own bottom edge and down past the canvas's true bottom
+  // edge — so a hairline gap from sub-pixel canvas scaling can never show the floor
+  // background peeking through right at either seam
+  for (let x = -phase; x < width; x += GROUND_TILE_W) {
+    ctx.drawImage(
+      groundImage,
+      x,
+      -GROUND_OVERLAP,
+      GROUND_TILE_W,
+      GROUND_H + GROUND_OVERLAP * 2,
+    );
   }
-  ctx.fillStyle = "#15803d";
-  ctx.fillRect(0, stripeH - 4, width, 4);
 }
 
 // everything below is this module's own facade: floors/ has several nested sub-parts

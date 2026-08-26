@@ -1,3 +1,5 @@
+import { loadImage } from "../../utils";
+
 // decorative clouds drifting slowly left-to-right. Drawn in plain WORLD coordinates —
 // same as ground/floors in gameCanvas.ts — so the caller's existing camera transform
 // positions them correctly with zero extra math here; no per-building offset, no
@@ -14,21 +16,41 @@ const MAX_CLOUD_SIZE = 0.16 + 0.18; // matches the `size` range below
 // of the band gets sliced in half instead of rendering as a full circle
 export const CLOUD_MAX_RADIUS = MAX_CLOUD_SIZE * CELL_H;
 
+// every processed cloud shape (see scripts/process-clouds.mjs, which writes here),
+// in a stable sorted-filename order
+const cloudModules = import.meta.glob<string>("../../assets/clouds/*.png", {
+  eager: true,
+  import: "default",
+});
+const cloudUrls = Object.keys(cloudModules)
+  .sort()
+  .map((key) => cloudModules[key]);
+
+let cloudImages: HTMLImageElement[] = [];
+
+// loads every cloud shape once; main.ts awaits this alongside loadFloorBackgrounds
+// before the first frame ever needs to draw one
+export async function loadCloudImages(): Promise<HTMLImageElement[]> {
+  cloudImages = await Promise.all(cloudUrls.map(loadImage));
+  return cloudImages;
+}
+
+// draws one of the loaded cloud shapes (picked by variantIndex) centered at (x, y),
+// sized so its larger dimension matches 2r — aspect-locked to that shape's own art
+// instead of forcing every cloud into a uniform square
 function drawCloud(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   r: number,
+  variantIndex: number,
 ): void {
-  ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-  ctx.beginPath();
-  // a cluster of overlapping circles reads as a puffy cloud silhouette
-  ctx.arc(x, y, r * 0.6, 0, Math.PI * 2);
-  ctx.arc(x - r * 0.7, y + r * 0.15, r * 0.45, 0, Math.PI * 2);
-  ctx.arc(x + r * 0.7, y + r * 0.15, r * 0.5, 0, Math.PI * 2);
-  ctx.arc(x - r * 0.25, y - r * 0.3, r * 0.45, 0, Math.PI * 2);
-  ctx.arc(x + r * 0.3, y - r * 0.25, r * 0.4, 0, Math.PI * 2);
-  ctx.fill();
+  const image = cloudImages[variantIndex] ?? cloudImages[0];
+  if (!image) return;
+  const scale = (r * 2) / Math.max(image.naturalWidth, image.naturalHeight);
+  const w = image.naturalWidth * scale;
+  const h = image.naturalHeight * scale;
+  ctx.drawImage(image, x - w / 2, y - h / 2, w, h);
 }
 
 // deterministic pseudo-random in [0,1), so a given (seed, salt) always yields the
@@ -56,7 +78,7 @@ export function drawClouds(
   // no clearRect here: gameCanvas.ts already clears the whole shared canvas and
   // paints the sky-blue backdrop behind this band once per frame before calling in —
   // clearing here would just punch a transparent hole back through that fill
-  if (worldWidth <= 0) return;
+  if (worldWidth <= 0 || cloudImages.length === 0) return;
   const cellMin = Math.floor(visibleTop / CELL_H) - 1;
   const cellMax = Math.ceil(visibleBottom / CELL_H) + 1;
   const cloudsPerCell = Math.max(2, Math.round(worldWidth / CLOUD_SPACING));
@@ -71,13 +93,14 @@ export function drawClouds(
       const r = size * CELL_H;
       const speed = 0.004 + rand(seed, 3) * 0.014;
       const phase = rand(seed, 4);
+      const variantIndex = Math.floor(rand(seed, 5) * cloudImages.length);
       // this cloud's fixed home slot, spread evenly across the whole world width,
       // drifting left over time and wrapping around the world's own edges
       const baseX = i * slotWidth + phase * slotWidth;
       const x =
         (((baseX - now * speed) % worldWidth) + worldWidth) % worldWidth;
       if (x + r < visibleLeft || x - r > visibleRight) continue;
-      drawCloud(ctx, x, y, r);
+      drawCloud(ctx, x, y, r, variantIndex);
     }
   }
 }
