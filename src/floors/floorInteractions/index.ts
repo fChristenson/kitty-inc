@@ -73,7 +73,10 @@ export function handleFloorClick(
   const workerIndex = hitTestWorker(x, y, floor);
   if (
     workerIndex !== null &&
-    clickWorker(floor, workerIndex, performance.now())
+    // Date.now()-based (not performance.now()) so it matches drawWorker's
+    // Date.now()-based `now`, which is what clickedAt actually gets compared
+    // against to time the click-bounce/jump-sprite reaction
+    clickWorker(floor, workerIndex, Date.now())
   ) {
     const center = getWorkerCenter(floor, workerIndex);
     if (center) {
@@ -82,8 +85,10 @@ export function handleFloorClick(
       // kicks in immediately instead of waiting for the next periodic tick
       spawnFloatingCoins(floor, center.x, center.y, () => {});
     }
-    // clicking a worker only (re)activates that specific worker's boost/15s timer
-    activateBoosted(floor, workerIndex, performance.now());
+    // clicking a worker only (re)activates that specific worker's boost/15s timer.
+    // Date.now()-based (not performance.now()) so it matches incomePanel.ts's
+    // persisted, Date.now()-based cycle tracking that reads the same boost state
+    activateBoosted(floor, workerIndex, Date.now());
     persist();
   }
 }

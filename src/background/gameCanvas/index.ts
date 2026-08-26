@@ -6,11 +6,13 @@ import {
   drawCoins,
   hasActiveCoins,
   hitTestFloorHover,
+  hitTestUpgradeButton,
   handleFloorClick,
 } from "../../floors";
 import { drawFloorContent } from "../../gameRenderer";
 import { drawClouds, CLOUD_MAX_RADIUS } from "../clouds";
 import { drawCity, CITY_MAX_HEIGHT } from "../city";
+import { drawStars } from "../stars";
 import { drawHud } from "../../hud";
 import { getTotalIncome } from "../../totalIncome";
 import type { Floor } from "../../gameState";
@@ -29,6 +31,13 @@ const SLOT_W = FLOOR_W + GUTTER_W * 2;
 const CLOUD_START_FLOOR = 5;
 const CLOUD_START_ALTITUDE = CLOUD_START_FLOOR * FLOOR_H;
 
+// stars only appear at/above this floor's altitude, same global-threshold approach as
+// clouds above — the sky gradient below transitions from night-navy to space-black
+// across this same band, so the star field fades in exactly where the sky actually
+// turns black instead of just appearing over a still-blue sky
+const STAR_START_FLOOR = 8;
+const STAR_START_ALTITUDE = STAR_START_FLOOR * FLOOR_H;
+
 // fixed open-sky margin above the tallest building's own roof — floor rooms are
 // opaque and span nearly the whole slot width, so clouds are only ever actually
 // visible either in the thin side gutters or up here; this needs to be genuinely
@@ -36,7 +45,12 @@ const CLOUD_START_ALTITUDE = CLOUD_START_FLOOR * FLOOR_H;
 // instead of drifting across the whole visible background
 const SKY_MARGIN_H = 800;
 
-const SKY_COLOR = "#6ec6ff";
+// night sky: a dark navy horizon that deepens into near-black space across the same
+// altitude band stars start appearing in (STAR_START_ALTITUDE), recomputed as a
+// gradient every frame since which screen-y that world altitude falls at depends on
+// the current scroll position
+const SKY_COLOR_GROUND = "#0f1b3d";
+const SKY_COLOR_SPACE = "#03040d";
 
 const DRAG_THRESHOLD_PX = 6; // pointer movement below this still counts as a click/tap
 // touch/mouse momentum: velocity decays by this factor every ms once the pointer
@@ -90,7 +104,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   let cameraX = 0; // world-x currently at the viewport's left edge
   let scrollUp = 0; // world units scrolled up from the ground-anchored default (0)
   let activeBuildingIndex = 0;
-  let hoveredFloor: Floor | null = null;
+  // exact floor-local point the cursor is over, so the upgrade button can check
+  // specifically whether it itself is hovered instead of "is anything on this floor
+  // hoverable" (that coarser check is still what drives the pointer cursor below)
+  let hoveredPoint: { floor: Floor; localX: number; localY: number } | null = null;
 
   // which building/index a given Floor lives at, kept in sync as floors are added, so
   // a hit-test or a coin burst's on-screen rect never has to scan every building
@@ -218,6 +235,36 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.restore();
   }
 
+  // stars twinkle in the world above STAR_START_ALTITUDE, same global-threshold
+  // pattern as clouds — a short building simply hasn't scrolled high enough to reach
+  // them yet
+  function drawWorldStars(now: number): void {
+    const visibleTop = viewportTopY();
+    const visibleBottom = Math.min(viewportBottomY(), -STAR_START_ALTITUDE);
+    if (visibleBottom <= visibleTop) return; // nothing at/above floor 8 is on screen
+    const visibleLeft = cameraX;
+    const visibleRight = cameraX + SLOT_W;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(
+      visibleLeft,
+      visibleTop,
+      visibleRight - visibleLeft,
+      visibleBottom - visibleTop,
+    );
+    ctx.clip();
+    drawStars(
+      ctx,
+      worldWidth(),
+      now,
+      visibleLeft,
+      visibleRight,
+      visibleTop,
+      visibleBottom,
+    );
+    ctx.restore();
+  }
+
   // clouds float in the world above CLOUD_START_ALTITUDE — one global threshold, not
   // computed per building, so a short building simply hasn't reached them yet. Padded
   // downward by CLOUD_MAX_RADIUS so a cloud centered right at that altitude still
@@ -260,12 +307,16 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       if (bottom < viewportTopY() || top > viewportBottomY()) continue; // scrolled out of view
       ctx.save();
       ctx.translate(slotLeft, top);
+      const buttonHovered =
+        hoveredPoint !== null &&
+        hoveredPoint.floor === floors[i] &&
+        hitTestUpgradeButton(hoveredPoint.localX, hoveredPoint.localY);
       drawFloorContent(ctx, {
         backgrounds,
         floor: floors[i],
         floorNumber: i + 1,
         totalFloors: floors.length,
-        hovered: floors[i] === hoveredFloor,
+        buttonHovered,
       });
       ctx.restore();
     }
@@ -296,8 +347,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.scale(scale, scale);
 
     // background first, in plain screen space (fills the whole viewport regardless
-    // of camera position)
-    ctx.fillStyle = SKY_COLOR;
+    // of camera position) — a gradient, not a flat fill, since the night sky itself
+    // deepens from navy near the ground to near-black up where the stars start
+    const groundScreenY = 0 - viewportTopY();
+    const spaceScreenY = -STAR_START_ALTITUDE - viewportTopY();
+    const sky = ctx.createLinearGradient(0, groundScreenY, 0, spaceScreenY);
+    sky.addColorStop(0, SKY_COLOR_GROUND);
+    sky.addColorStop(1, SKY_COLOR_SPACE);
+    ctx.fillStyle = sky;
     ctx.fillRect(0, 0, SLOT_W, contentViewportH());
 
     // everything below is one shared camera transform — ground/clouds/floors are all
@@ -305,9 +362,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.save();
     ctx.translate(-cameraX, -viewportTopY());
 
-    // strict paint order: city skyline, then ground, then clouds, then every visible
-    // building's floors on top of all of it — nothing from a later pass can end up
-    // underneath one still to come
+    // strict paint order: stars, then city skyline, then ground, then clouds, then
+    // every visible building's floors on top of all of it — nothing from a later pass
+    // can end up underneath one still to come
+    drawWorldStars(performance.now());
     drawWorldCity();
     drawWorldGround();
     drawWorldClouds(performance.now());
@@ -436,7 +494,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         ? hitTestFloorHover(hit.localX, hit.localY, hit.floor)
         : false;
       canvas.style.cursor = hoverable ? "pointer" : "default";
-      hoveredFloor = hit && hoverable ? hit.floor : null;
+      hoveredPoint = hit
+        ? { floor: hit.floor, localX: hit.localX, localY: hit.localY }
+        : null;
       return;
     }
 

@@ -4,7 +4,7 @@ const STORAGE_KEY = "cash-clicker:buildings";
 
 export interface WorkerSlot {
   boosted: boolean; // whether coinFloat.ts's floating-coin animation is active on this worker
-  boostedAt: number; // performance.now() when boosted turned on; auto-resets BOOST_DURATION_MS later
+  boostedAt: number; // Date.now() when boosted turned on; auto-resets BOOST_DURATION_MS later
 }
 
 const BOOST_DURATION_MS = 15_000; // boosted state auto-resets this long after being triggered
@@ -77,47 +77,70 @@ export function countBoostedWorkers(floor: Floor, now: number): number {
     .length;
 }
 
-const LAST_VISIT_KEY = "cash-clicker:last-visit";
-const IDLE_INCOME_MIN_SECONDS = 1; // shorter gaps (e.g. a quick refresh) don't count as idle time — purely
-// a cheap top-level bailout, separate from each floor's own lastCollectedAt bookkeeping below
+// which loaded worker sprite skin (floors/worker/index.ts) each of a floor's workers
+// draws with, keyed by the floor the same way workerSlots is — persisted (see
+// SavedFloor.spriteIndexes below) so a worker's skin survives a reload instead of
+// being re-randomized every time
+const workerSpriteIndexes = new WeakMap<Floor, number[]>();
 
-// $ every unlocked floor across every building would have earned (at its own, unboosted
-// rate) since it last completed a whole cycle, using real wall-clock time so it still
-// counts while the tab was closed — unlike performance.now(), which resets every load.
-// A floor can't earn faster than its own interval, so a gap shorter than that earns
-// nothing *yet*: lastCollectedAt is only advanced by whole completed cycles, leaving
-// any partial progress toward the next one intact for the next call to pick up, instead
-// of a flat elapsed-time payout that ignores each floor's own rate. Must only be called
-// once per page load (also stamps "now" as the new last-visit time for the quick-refresh gate).
-export function computeIdleIncome(buildings: Floor[][]): number {
-  let lastVisit: number | null = null;
+export function getWorkerSpriteIndexes(floor: Floor): number[] {
+  let indexes = workerSpriteIndexes.get(floor);
+  if (!indexes) {
+    indexes = [];
+    workerSpriteIndexes.set(floor, indexes);
+  }
+  return indexes;
+}
+
+const LAST_CLOSE_KEY = "cash-clicker:last-close";
+const IDLE_INCOME_MIN_SECONDS = 3; // shorter gaps (a normal page reload) don't count as idle time
+
+// call this from a `beforeunload` listener (see main.ts) — the ONLY writer of this
+// timestamp, so it purely marks "when did the tab actually go away", independent of
+// whether any in-session ticker happened to run recently before that moment
+export function markAppClosed(): void {
   try {
-    const raw = localStorage.getItem(LAST_VISIT_KEY);
-    lastVisit = raw ? Number(raw) : null;
+    localStorage.setItem(LAST_CLOSE_KEY, String(Date.now()));
   } catch {
-    lastVisit = null;
+    // storage unavailable: idle income just won't be tracked next time
+  }
+}
+
+// $ every unlocked floor across every building earned, at its own current rate, over
+// the plain wall-clock gap between the last markAppClosed() timestamp and now — a
+// straight rate * elapsedSeconds calculation, not dependent on floor.lastCollectedAt
+// having been kept continuously fresh by some in-session ticker (that ticker can be
+// throttled/paused for all sorts of reasons while the tab sits open; the close
+// timestamp + current rate is the only pair of numbers actually needed here). Must
+// only be called once per page load. Below the quick-refresh gate, every floor's
+// lastCollectedAt is left completely untouched — incomePanel.ts's fill-bar progress
+// is computed straight from lastCollectedAt, so touching it on a quick refresh would
+// silently discard however far into its current cycle a floor already was.
+export function computeIdleIncome(buildings: Floor[][]): number {
+  let lastClose: number | null = null;
+  try {
+    const raw = localStorage.getItem(LAST_CLOSE_KEY);
+    lastClose = raw ? Number(raw) : null;
+  } catch {
+    lastClose = null;
   }
 
   const now = Date.now();
-  try {
-    localStorage.setItem(LAST_VISIT_KEY, String(now));
-  } catch {
-    // storage unavailable: nothing to persist, idle income just won't be tracked next time
-  }
-
-  if (lastVisit === null || !Number.isFinite(lastVisit)) return 0;
-  const elapsedSeconds = (now - lastVisit) / 1000;
+  const elapsedSeconds =
+    lastClose !== null && Number.isFinite(lastClose)
+      ? Math.max(0, (now - lastClose) / 1000)
+      : 0;
   if (elapsedSeconds <= IDLE_INCOME_MIN_SECONDS) return 0;
 
   let idleIncome = 0;
   for (const floors of buildings) {
     for (const floor of floors) {
       if (!floor.unlocked) continue;
-      const elapsedForFloor = (now - floor.lastCollectedAt) / 1000;
-      const cycles = Math.floor(elapsedForFloor / floor.incomeIntervalSeconds);
-      if (cycles <= 0) continue; // not a full cycle yet — leave lastCollectedAt untouched, timer keeps running
-      floor.lastCollectedAt += cycles * floor.incomeIntervalSeconds * 1000;
-      idleIncome += cycles * floor.incomeAmount;
+      const ratePerSecond = floor.incomeAmount / floor.incomeIntervalSeconds;
+      idleIncome += ratePerSecond * elapsedSeconds;
+      // this whole idle span was just paid out in one lump sum, so the floor's next
+      // cycle correctly starts fresh from right now
+      floor.lastCollectedAt = now;
     }
   }
   return idleIncome;
@@ -135,6 +158,7 @@ interface SavedFloor {
   workerCount?: number; // added after initial release; older saves default to 1 on load
   lastCollectedAt?: number; // added after initial release; older saves default to now() on load
   bgIndex?: number; // added after initial release; older saves default to 0 on load
+  spriteIndexes?: number[]; // added after initial release; older saves default to [] on load
 }
 
 export function clearBuildings(): void {
@@ -158,6 +182,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
     workerCount: floor.workerCount,
     lastCollectedAt: floor.lastCollectedAt,
     bgIndex: floor.bgIndex,
+    spriteIndexes: getWorkerSpriteIndexes(floor),
   };
 }
 
@@ -207,6 +232,7 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     lastCollectedAt: sf.lastCollectedAt ?? Date.now(),
   };
   workerSlots.set(floor, sf.workers);
+  workerSpriteIndexes.set(floor, sf.spriteIndexes ?? []);
   return floor;
 }
 

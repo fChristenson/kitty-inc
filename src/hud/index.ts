@@ -25,18 +25,10 @@ export function drawHud(
 }
 
 // everything below is this module's own facade: hud/ has several nested widgets
-// (actionBar, badges, boostMenu, ...) that stay together for internal reuse, but
+// (actionBar, upgradeMenu, boostMenu, ...) that stay together for internal reuse, but
 // anything outside src/hud must import them from here, never from a nested path
 export { createActionBarMarkup, wireActionBar } from "./actionBar";
 export type { ActionBarHandlers } from "./actionBar";
-export {
-  createBadgesMarkup,
-  wireBadgesMenu,
-  getBoughtBadgeCount,
-  clearBadges,
-  BADGE_COUNT,
-} from "./badges";
-export type { BadgesMenu } from "./badges";
 export { createBoostMenuMarkup, wireBoostMenu } from "./boostMenu";
 export type { BoostMenu } from "./boostMenu";
 export { createPopupMarkup, showIdlePopup } from "./popup";
@@ -45,5 +37,5 @@ export {
   wireTestButton,
   wireResetButton,
 } from "./testButton";
-export { createWorkerMenuMarkup, wireWorkerMenu } from "./workerMenu";
-export type { WorkerMenu } from "./workerMenu";
+export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
+export type { UpgradeMenu } from "./upgradeMenu";

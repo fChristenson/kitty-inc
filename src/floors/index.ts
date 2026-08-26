@@ -178,9 +178,10 @@ export { hitTestFloorHover, handleFloorClick } from "./floorInteractions";
 export {
   drawWorker,
   getBoostedWorkerCenters,
+  loadWorkerSprites,
   MAX_RENDERED_WORKERS,
 } from "./worker";
 export { drawFloorNumber } from "./floorNumber";
 export { drawUpgradeStar } from "./star";
-export { drawUpgradeButton } from "./upgradeButton";
+export { drawUpgradeButton, hitTestUpgradeButton } from "./upgradeButton";
 export { spawnFloatingCoins, drawFloatingCoins } from "./coinFloat";

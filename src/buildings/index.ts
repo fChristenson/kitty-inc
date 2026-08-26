@@ -9,6 +9,18 @@ export function getBuildingMultiplier(buildingIndex: number): number {
   return BUILDING_COST_MULTIPLIER ** buildingIndex;
 }
 
+const BUILDING_BASE_PRICE = 1_000_000_000; // $ to buy the very first purchasable building (index 1)
+
+// $ cost to buy the next building (nextBuildingIndex === buildings.length, since
+// index 0 is the always-free starting building) — scales by the same
+// BUILDING_COST_MULTIPLIER as that building's own economy, so the price always keeps
+// pace with how much richer each successive building actually is
+export function getBuildingPrice(nextBuildingIndex: number): number {
+  return (
+    BUILDING_BASE_PRICE * BUILDING_COST_MULTIPLIER ** (nextBuildingIndex - 1)
+  );
+}
+
 // builds a new building's starting floor list: just its ground floor, locked (and
 // priced) for every building except the very first one, which keeps the original
 // always-free ground floor. floorLock.ts's ensureLockedFloorAbove adds the next

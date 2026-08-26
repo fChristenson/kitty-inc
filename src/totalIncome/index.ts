@@ -52,14 +52,23 @@ let totalIncome = loadStoredTotal();
 
 // pays out each unlocked floor's income (across every building) only once its fill-bar
 // cycle actually completes, instead of accruing fractional $ continuously underneath a
-// bar that looks stepped; runs its own rAF loop, independent of canvas redraws. reads
-// the same buildings array reference every tick, so a building spawned later (badges.ts)
-// is automatically included without needing to restart the ticker. read the running
-// total via getTotalIncome()
+// bar that looks stepped. Uses setInterval (not requestAnimationFrame) so floor.
+// lastCollectedAt keeps advancing even while this tab is open but unfocused/backgrounded
+// — browsers throttle rAF to near-zero there, which let it go stale for however long the
+// tab sat in the background, so gameState.ts's computeIdleIncome wrongly treated that
+// whole span as idle time on the next load even though the tab was never closed.
+// Also catches up immediately on visibilitychange, in case the interval itself got
+// suspended for a long background/sleep stretch. reads the same buildings array
+// reference every tick, so a building bought later is automatically included without
+// needing to restart the ticker. read the running total via getTotalIncome()
+const COLLECT_INTERVAL_MS = 200;
+
 export function startTotalIncomeTicker(buildings: Floor[][]): void {
   let lastSave = performance.now();
-  const tick = () => {
-    const now = performance.now();
+  function collectAll(): void {
+    // Date.now()-based (not performance.now()) since collectDueIncome now reads/writes
+    // floor.lastCollectedAt directly, a persisted Date.now()-based timestamp
+    const now = Date.now();
     for (const floors of buildings) {
       for (const floor of floors) {
         if (!floor.unlocked) continue;
@@ -67,13 +76,17 @@ export function startTotalIncomeTicker(buildings: Floor[][]): void {
       }
     }
 
-    if (now - lastSave >= SAVE_INTERVAL_MS) {
-      lastSave = now;
+    const nowPerf = performance.now();
+    if (nowPerf - lastSave >= SAVE_INTERVAL_MS) {
+      lastSave = nowPerf;
       saveStoredTotal(totalIncome);
     }
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
+  }
+
+  setInterval(collectAll, COLLECT_INTERVAL_MS);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") collectAll();
+  });
 
   window.addEventListener("beforeunload", () => saveStoredTotal(totalIncome));
 }

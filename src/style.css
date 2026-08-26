@@ -138,14 +138,6 @@ body {
   background: #16a34a;
 }
 
-.action-bar__button--badges {
-  background: #a855f7;
-}
-
-.action-bar__button--badges:active {
-  background: #9333ea;
-}
-
 .worker-menu {
   position: fixed;
   inset: 0;
@@ -230,48 +222,6 @@ body {
 
 .worker-menu__price {
   font-weight: 900;
-}
-
-.badges__panel {
-  width: min(90vw, 480px);
-  max-height: 80vh;
-}
-
-.badges__grid {
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.75rem;
-}
-
-.badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.75rem 0.25rem;
-  border: none;
-  border-radius: 0.75rem;
-  background: #334155;
-  color: #94a3b8; /* gray while locked/unaffordable */
-  font-weight: 700;
-  font-size: 0.8rem;
-  cursor: pointer;
-}
-
-.badge:disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-
-.badge__icon {
-  width: 32px;
-  height: 32px;
-}
-
-.badge--bought {
-  color: #facc15; /* gold once bought */
-  opacity: 1;
 }
 
 .popup {

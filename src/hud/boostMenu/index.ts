@@ -23,7 +23,9 @@ export function getBoostAllCost(floors: Floor[]): number {
 // boosts every rendered worker on every unlocked floor if affordable; returns whether it succeeded
 export function buyBoostAll(floors: Floor[]): boolean {
   if (!spendTotalIncome(getBoostAllCost(floors))) return false;
-  const now = performance.now();
+  // Date.now()-based (not performance.now()) so it matches incomePanel.ts's persisted,
+  // Date.now()-based cycle tracking that reads the same boost state
+  const now = Date.now();
   for (const floor of floors) {
     if (!floor.unlocked) continue;
     const renderedWorkers = Math.min(floor.workerCount, MAX_RENDERED_WORKERS);

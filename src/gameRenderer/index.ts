@@ -46,11 +46,13 @@ export function drawFloorContent(
     floor: Floor;
     floorNumber: number;
     totalFloors: number;
-    hovered: boolean;
+    buttonHovered: boolean; // cursor is specifically over this floor's upgrade button
   },
 ): void {
-  const { backgrounds, floor, floorNumber, totalFloors, hovered } = deps;
-  const now = performance.now();
+  const { backgrounds, floor, floorNumber, totalFloors, buttonHovered } = deps;
+  // Date.now()-based (not performance.now()) so drawWorker/maybeSpawnFloatingCoins's
+  // boost checks match incomePanel.ts's persisted, Date.now()-based boost timestamps
+  const now = Date.now();
   drawFloor(ctx, backgrounds[floor.bgIndex] ?? backgrounds[0], floor);
   drawOuterWall(ctx);
   drawWorker(ctx, floor, now);
@@ -61,7 +63,7 @@ export function drawFloorContent(
   drawIncomePanel(ctx, floor);
   drawUpgradeButton(
     ctx,
-    hovered,
+    buttonHovered,
     floor.upgradeCost,
     getTotalIncome() >= floor.upgradeCost,
   );

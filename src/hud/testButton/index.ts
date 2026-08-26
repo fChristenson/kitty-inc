@@ -1,7 +1,6 @@
 import type { Floor } from "../../gameState";
 import { clearBuildings } from "../../gameState";
 import { clearTotalIncome } from "../../totalIncome";
-import { clearBadges } from "../badges";
 
 // the "Add Money" / "Reset Game" dev/test controls
 export function createTestButtonMarkup(): string {
@@ -34,7 +33,6 @@ export function wireResetButton(
     buildings.length = 0;
     clearBuildings();
     clearTotalIncome();
-    clearBadges();
     location.reload();
   });
 }

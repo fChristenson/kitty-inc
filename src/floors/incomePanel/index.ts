@@ -17,8 +17,9 @@ const PANEL_MARGIN = 24;
 export const PANEL_X = PANEL_MARGIN;
 export const PANEL_Y = FLOOR_H - PANEL_H - PANEL_MARGIN;
 
-// when each floor's current fill cycle started, keyed by the floor itself
-const cycleStart = new WeakMap<Floor, number>();
+// when each floor's current fill cycle started is floor.lastCollectedAt itself (a
+// persisted, Date.now()-based timestamp) — no separate in-memory clock, so a page
+// reload never resets/loses how far into its current cycle a floor already was
 let tickerRunning = false;
 
 // floor on the wait-time halving so repeated /10 upgrades can't shrink it to zero
@@ -91,30 +92,24 @@ function effectiveIncomeCycle(
 
 // advances a floor's fill cycle by however many full intervals have elapsed since it was last
 // checked, returning the $ earned from those completed cycles (0 if the bar hasn't filled yet).
-// shares the same clock the bar itself draws from, so a payout always lines up with the bar
-// visually completing instead of money trickling in continuously underneath a stepped bar
+// shares the same clock (and the same floor.lastCollectedAt anchor) the bar itself draws
+// from, so a payout always lines up with the bar visually completing instead of money
+// trickling in continuously underneath a stepped bar
 export function collectDueIncome(floor: Floor, now: number): number {
-  if (!cycleStart.has(floor)) cycleStart.set(floor, now);
-  const start = cycleStart.get(floor)!;
   const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
   const intervalMs = intervalSeconds * 1000;
-  const cycles = Math.floor((now - start) / intervalMs);
+  const cycles = Math.floor((now - floor.lastCollectedAt) / intervalMs);
   if (cycles <= 0) return 0;
-  cycleStart.set(floor, start + cycles * intervalMs);
-  // keeps gameState.ts's computeIdleIncome from re-paying this same span as idle time
-  // later: without this, time spent actively playing (but persisted via no other
-  // action) would look identical to time the tab was closed on the next reload
-  floor.lastCollectedAt = Date.now();
+  floor.lastCollectedAt += cycles * intervalMs;
   return cycles * amount;
 }
 
 // seconds left until the current fill cycle completes, counting down from the full
 // interval to 0 in lockstep with drawIncomePanel's own bar-fill percentage (same
-// cycleStart anchor and modulo-wrap), instead of always showing the constant interval
+// lastCollectedAt anchor and modulo-wrap), instead of always showing the constant interval
 function remainingCycleSeconds(floor: Floor, now: number): number {
-  if (!cycleStart.has(floor)) cycleStart.set(floor, now);
   const intervalMs = effectiveIncomeCycle(floor, now).intervalSeconds * 1000;
-  const elapsed = now - cycleStart.get(floor)!;
+  const elapsed = now - floor.lastCollectedAt;
   return (intervalMs - (elapsed % intervalMs)) / 1000;
 }
 
@@ -236,16 +231,15 @@ export function drawIncomePanel(
   // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
   let fillW = barMinWidth;
   let isFastCycle = false;
-  const now = performance.now();
+  const now = Date.now();
   if (floor.unlocked) {
-    if (!cycleStart.has(floor)) cycleStart.set(floor, now);
     const fillDurationMs =
       effectiveIncomeCycle(floor, now).intervalSeconds * 1000;
     if (fillDurationMs < FAST_CYCLE_THRESHOLD_MS) {
       isFastCycle = true;
       fillW = barW;
     } else {
-      const elapsed = now - cycleStart.get(floor)!;
+      const elapsed = now - floor.lastCollectedAt;
       const pct = (elapsed % fillDurationMs) / fillDurationMs;
       fillW = Math.max(barMinWidth, barW * pct);
     }

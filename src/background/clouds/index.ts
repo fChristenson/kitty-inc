@@ -6,7 +6,7 @@
 // every frame, same way worker.ts positions itself off `now`.
 
 const CELL_H = 520; // world units; the vertical tile repeats every this many units
-const CLOUD_SPACING = 360; // world units per cloud; keeps density constant as the world grows
+const CLOUD_SPACING = 1440; // world units per cloud; keeps density constant as the world grows (halved cloud count, twice)
 const MAX_CLOUD_SIZE = 0.16 + 0.18; // matches the `size` range below
 
 // the largest radius any cloud can have — callers clipping/culling a cloud-eligible
@@ -59,7 +59,7 @@ export function drawClouds(
   if (worldWidth <= 0) return;
   const cellMin = Math.floor(visibleTop / CELL_H) - 1;
   const cellMax = Math.ceil(visibleBottom / CELL_H) + 1;
-  const cloudsPerCell = Math.max(6, Math.round(worldWidth / CLOUD_SPACING));
+  const cloudsPerCell = Math.max(2, Math.round(worldWidth / CLOUD_SPACING));
   const slotWidth = worldWidth / cloudsPerCell;
   for (let cell = cellMin; cell <= cellMax; cell++) {
     const cellTop = cell * CELL_H;

@@ -1,15 +1,21 @@
 import "./style.css";
 import {
   loadFloorBackgrounds,
+  loadWorkerSprites,
   startIncomeTicker,
   ensureLockedFloorAbove,
 } from "./floors";
-import { startTotalIncomeTicker, addTotalIncome } from "./totalIncome";
+import {
+  startTotalIncomeTicker,
+  addTotalIncome,
+  spendTotalIncome,
+} from "./totalIncome";
 import {
   saveBuildings,
   schedulePersist,
   loadBuildings,
   computeIdleIncome,
+  markAppClosed,
   type Floor,
 } from "./gameState";
 import {
@@ -18,20 +24,19 @@ import {
   wireResetButton,
   createActionBarMarkup,
   wireActionBar,
-  createWorkerMenuMarkup,
-  wireWorkerMenu,
+  createUpgradeMenuMarkup,
+  wireUpgradeMenu,
   createBoostMenuMarkup,
   wireBoostMenu,
-  createBadgesMarkup,
-  wireBadgesMenu,
-  getBoughtBadgeCount,
-  clearBadges,
-  BADGE_COUNT,
   createPopupMarkup,
   showIdlePopup,
 } from "./hud";
 import { createGameCanvas } from "./background";
-import { createBuilding, getBuildingMultiplier } from "./buildings";
+import {
+  createBuilding,
+  getBuildingMultiplier,
+  getBuildingPrice,
+} from "./buildings";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -44,9 +49,8 @@ async function main() {
       ${createTestButtonMarkup()}
     </div>
     ${createActionBarMarkup()}
-    ${createWorkerMenuMarkup()}
+    ${createUpgradeMenuMarkup()}
     ${createBoostMenuMarkup()}
-    ${createBadgesMarkup()}
     ${createPopupMarkup()}
   `;
 
@@ -54,6 +58,7 @@ async function main() {
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
 
   const backgrounds = await loadFloorBackgrounds();
+  await loadWorkerSprites();
 
   // one Floor[] per building, laid out side by side in gameCanvas.ts's single camera
   const buildings: Floor[][] = [];
@@ -90,30 +95,29 @@ async function main() {
     });
   }
 
-  // buildings.ts: once every badge is bought, a new building spawns with a locked
-  // ground floor at a 1000x-richer economy than the previous one, and the badge set
-  // resets so it's a fresh (equally meaningful) goal again toward the *next* building —
-  // checked both right after startup (in case badges were already maxed from a
-  // previous session) and after every badge purchase
-  function spawnBuildingIfNeeded(): void {
-    if (getBoughtBadgeCount() < BADGE_COUNT) return;
+  // buys the next building outright if affordable (see buildings.ts's
+  // getBuildingPrice, which scales 1000x per building same as its economy); returns
+  // whether it succeeded so the upgrade menu can decide whether to re-render
+  function buyBuilding(): boolean {
     const buildingIndex = buildings.length;
+    if (!spendTotalIncome(getBuildingPrice(buildingIndex))) return false;
     const floors = createBuilding(buildingIndex, backgrounds.length);
     buildings.push(floors);
     setupBuilding(buildingIndex);
-    clearBadges();
     persist();
+    return true;
   }
 
   wireTestButton(app, () => {
-    // absurdly large: comfortably covers buying every badge in one go (the priciest,
-    // 20th, alone costs ~$1e25) plus the second building's 1000x-richer economy
+    // absurdly large: comfortably covers buying several buildings in one go
     addTotalIncome(1e30);
   });
   wireResetButton(app, buildings);
-  const workerMenu = wireWorkerMenu(
+  const upgradeMenu = wireUpgradeMenu(
     app,
     () => buildings[gameCanvas.getActiveBuildingIndex()] ?? [],
+    () => buildings.length,
+    buyBuilding,
     () => persist(),
   );
   const boostMenu = wireBoostMenu(
@@ -121,21 +125,14 @@ async function main() {
     () => buildings[gameCanvas.getActiveBuildingIndex()] ?? [],
     () => persist(),
   );
-  // badges have no gameplay effect of their own beyond potentially spawning a building
-  // (and persist themselves via their own localStorage key otherwise), so this is the
-  // only reaction needed to a purchase
-  const badgesMenu = wireBadgesMenu(app, spawnBuildingIfNeeded);
   wireActionBar(app, {
     onScrollTop: () => gameCanvas.scrollActiveToTop(),
     onScrollBottom: () => gameCanvas.scrollActiveToBottom(),
     onBoostAll: () => {
       boostMenu.open();
     },
-    onOpenHireMenu: () => {
-      workerMenu.open();
-    },
-    onOpenBadges: () => {
-      badgesMenu.open();
+    onOpenUpgradeMenu: () => {
+      upgradeMenu.open();
     },
   });
 
@@ -151,7 +148,6 @@ async function main() {
     setupBuilding(0);
   }
   persist();
-  spawnBuildingIfNeeded();
   setActiveBuilding(0);
 
   const idleIncome = computeIdleIncome(buildings);
@@ -171,14 +167,13 @@ async function main() {
   startIncomeTicker(() => gameCanvas.redraw());
   startTotalIncomeTicker(buildings);
 
-  // collectDueIncome keeps each floor's lastCollectedAt caught up to "now" as it pays out
-  // live (in every building, not just the active one), but that only updates the
-  // in-memory buildings[] — without this, passive play (no worker/upgrade/hire clicks to
-  // trigger persist()) would never save it, so a refresh would see a stale
-  // lastCollectedAt and re-pay the whole live session as "idle" income. uses
-  // saveBuildings directly (not the debounced persist()) since a pending idle callback
-  // isn't guaranteed to fire before the page actually unloads
-  window.addEventListener("beforeunload", () => saveBuildings(buildings));
+  // markAppClosed stamps "now" as the single source of truth computeIdleIncome reads
+  // next load — saveBuildings also runs here so the freshest floor state (workerCount,
+  // upgrades, etc.) is what actually gets restored
+  window.addEventListener("beforeunload", () => {
+    markAppClosed();
+    saveBuildings(buildings);
+  });
 }
 
 main();

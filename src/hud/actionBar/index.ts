@@ -36,25 +36,11 @@ export function createActionBarMarkup(): string {
       <button
         class="action-bar__button action-bar__button--hire"
         id="action-bar-hire"
-        aria-label="Hire workers"
+        aria-label="Open upgrades"
       >
         <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 5v14" />
           <path d="M5 12h14" />
-        </svg>
-      </button>
-      <button
-        class="action-bar__button action-bar__button--badges"
-        id="action-bar-badges"
-        aria-label="View badges"
-      >
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 4h8v5a4 4 0 0 1-8 0z" />
-          <path d="M8 5H5a1 1 0 0 0-1 1v1a3 3 0 0 0 3 3" />
-          <path d="M16 5h3a1 1 0 0 1 1 1v1a3 3 0 0 1-3 3" />
-          <path d="M12 13v4" />
-          <path d="M9 20h6" />
-          <path d="M10 20v-3h4v3" />
         </svg>
       </button>
     </div>
@@ -65,8 +51,7 @@ export interface ActionBarHandlers {
   onScrollTop: () => void;
   onScrollBottom: () => void;
   onBoostAll: () => void;
-  onOpenHireMenu: () => void;
-  onOpenBadges: () => void;
+  onOpenUpgradeMenu: () => void;
 }
 
 export function wireActionBar(
@@ -84,8 +69,5 @@ export function wireActionBar(
     .addEventListener("click", handlers.onBoostAll);
   container
     .querySelector<HTMLButtonElement>("#action-bar-hire")!
-    .addEventListener("click", handlers.onOpenHireMenu);
-  container
-    .querySelector<HTMLButtonElement>("#action-bar-badges")!
-    .addEventListener("click", handlers.onOpenBadges);
+    .addEventListener("click", handlers.onOpenUpgradeMenu);
 }
