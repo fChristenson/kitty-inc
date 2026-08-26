@@ -42,7 +42,12 @@ export function drawCity(
   for (let tile = tileMin; tile <= tileMax; tile++) {
     const x = tile * TILE_W;
     if (x + TILE_W < visibleLeft || x > visibleRight) continue;
-    ctx.drawImage(cityImage, x, groundY - CITY_MAX_HEIGHT, TILE_W, CITY_MAX_HEIGHT);
+    ctx.drawImage(
+      cityImage,
+      x,
+      groundY - CITY_MAX_HEIGHT,
+      TILE_W,
+      CITY_MAX_HEIGHT,
+    );
   }
 }
-
