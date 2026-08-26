@@ -23,7 +23,7 @@ export function drawFloorLock(
   ctx.fillStyle = "rgba(30, 30, 30, 0.45)";
   ctx.fillRect(0, 0, FLOOR_W, FLOOR_H);
 
-  ctx.font = "900 48px system-ui, sans-serif";
+  ctx.font = '900 96px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   drawCartoonText(ctx, formatPrice(floor.unlockCost), FLOOR_W / 2, FLOOR_H / 2);

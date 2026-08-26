@@ -1,22 +1,86 @@
+@font-face {
+  font-family: "Fredoka";
+  src: url("./assets/fonts/static/Fredoka-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fredoka";
+  src: url("./assets/fonts/static/Fredoka-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fredoka";
+  src: url("./assets/fonts/static/Fredoka-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fredoka";
+  src: url("./assets/fonts/static/Fredoka-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
+}
+
+/* buttons/inputs don't inherit the page font-family by default (browser UA
+   stylesheets give them their own system font), so every button in the game was
+   silently falling back off Fredoka without this */
+button {
+  font: inherit;
 }
 
 :root {
   color-scheme: dark;
   font-family:
+    "Fredoka",
     system-ui,
     -apple-system,
     "Segoe UI",
     sans-serif;
+
+  /* CSS mirror of src/palette.ts's COLOR object — keep both in sync by hand */
+  --color-money-green: #22c55e;
+  --color-money-green-active: #16a34a;
+  --color-money-green-shadow: #15803d;
+  --color-disabled-gray: #6b7280;
+  --color-disabled-gray-shadow: #4b5563;
+  --color-blue: #3b82f6;
+  --color-blue-active: #2563eb;
+  --color-blue-shadow: #1d4ed8;
+  --color-red: #dc2626;
+  --color-red-active: #b91c1c;
+  --color-amber: #f59e0b;
+  --color-amber-active: #d97706;
+  --color-purple: #8b5cf6;
+  --color-purple-active: #7c3aed;
+  --color-wood-fill: #f8d18e;
+  --color-wood-outline: #302721;
+  --color-wood-ring: #faf2dd;
+  --color-wood-text: #3a2a18;
+  --color-page-bg: #111417;
+  --color-page-text: #f5f5f5;
+  --color-canvas-bg: #1a2027;
+  --color-white: #ffffff;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
   min-height: 100dvh;
-  background: #111417;
-  color: #f5f5f5;
+  background: var(--color-page-bg);
+  color: var(--color-page-text);
   display: flex;
   justify-content: center;
 }
@@ -30,14 +94,6 @@ body {
   flex-direction: column;
 }
 
-.game__building-label {
-  flex-shrink: 0;
-  text-align: center;
-  padding-bottom: 0.5rem;
-  font-weight: 700;
-  color: #9ca3af;
-}
-
 .game__canvas {
   /* the entire game — HUD, sky/clouds, every building's floors/ground, coin bursts —
      is one canvas now (gameCanvas.ts owns its own 2D camera/scroll/hit-testing), so
@@ -48,8 +104,7 @@ body {
   min-height: 0;
   width: 100%;
   display: block;
-  background: #1a2027;
-  border-radius: 0.75rem;
+  background: var(--color-canvas-bg);
   touch-action: none; /* gameCanvas.ts drives drag/scroll itself via pointer events */
   cursor: default;
 }
@@ -66,22 +121,22 @@ body {
   font-weight: 600;
   border: none;
   border-radius: 0.75rem;
-  background: #3b82f6;
+  background: var(--color-blue);
   color: white;
   cursor: pointer;
   flex: 1;
 }
 
 .game__button:active {
-  background: #2563eb;
+  background: var(--color-blue-active);
 }
 
 .game__button--danger {
-  background: #dc2626;
+  background: var(--color-red);
 }
 
 .game__button--danger:active {
-  background: #b91c1c;
+  background: var(--color-red-active);
 }
 
 .action-bar {
@@ -99,7 +154,7 @@ body {
   height: 4rem;
   border: none;
   border-radius: 0;
-  background: #3b82f6;
+  background: var(--color-blue);
   color: white;
   display: flex;
   align-items: center;
@@ -112,23 +167,31 @@ body {
 }
 
 .action-bar__button:active {
-  background: #2563eb;
+  background: var(--color-blue-active);
 }
 
 .action-bar__button--boost {
-  background: #f59e0b;
+  background: var(--color-amber);
 }
 
 .action-bar__button--boost:active {
-  background: #d97706;
+  background: var(--color-amber-active);
 }
 
 .action-bar__button--hire {
-  background: #22c55e;
+  background: var(--color-money-green);
 }
 
 .action-bar__button--hire:active {
-  background: #16a34a;
+  background: var(--color-money-green-active);
+}
+
+.action-bar__button--map {
+  background: var(--color-purple);
+}
+
+.action-bar__button--map:active {
+  background: var(--color-purple-active);
 }
 
 .worker-menu {
@@ -156,8 +219,18 @@ body {
   max-height: 70vh;
   display: flex;
   flex-direction: column;
-  background: #1e293b;
-  border-radius: 1rem;
+  /* cartoon wood-board look (see src/assets/dialog.jfif): tan fill + dark outline
+     drawn as the element's own border, then a cream ring + a second dark outline
+     drawn as stacked zero-blur box-shadows so no extra wrapper markup is needed */
+  background: var(--color-wood-fill);
+  border: 4px solid var(--color-wood-outline);
+  border-radius: 1.25rem;
+  box-shadow:
+    0 0 0 10px var(--color-wood-ring),
+    0 0 0 14px var(--color-wood-outline),
+    0 22px 18px -6px rgba(0, 0, 0, 0.45);
+  color: var(--color-wood-text);
+  margin: 14px;
   padding: 1rem;
 }
 
@@ -170,23 +243,19 @@ body {
 
 .worker-menu__header h2 {
   margin: 0;
-  font-size: 1.1rem;
-}
-
-.worker-menu__close {
-  border: none;
-  background: transparent;
-  color: white;
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
+  font-size: 1.75rem;
 }
 
 .worker-menu__list {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  /* wide enough that neighboring items' cream/outline rings (7px reach) never touch */
+  gap: 1rem;
+  /* must clear the item's own 7px ring reach on every side, or this scroll
+     container's overflow:auto clips it — showing the panel's tan fill behind
+     instead of the ring's rounded corner. Extra on the right clears the scrollbar */
+  padding: 12px 18px 12px 12px;
 }
 
 .worker-menu__item {
@@ -195,20 +264,36 @@ body {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
-  border: none;
+  /* same cream-ring + dark-outline styling as the dialog panel itself, scaled down,
+     plus a chunky bottom-edge shadow (a shade darker than the fill) for a pressable
+     cartoon-button look */
+  border: 3px solid var(--color-wood-outline);
   border-radius: 0.75rem;
-  background: #22c55e;
+  background: var(--color-money-green);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 4px 0 0 var(--color-money-green-shadow);
   color: white;
   font-weight: 600;
   cursor: pointer;
 }
 
 .worker-menu__item:active {
-  background: #16a34a;
+  background: var(--color-money-green-active);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 2px 0 0 var(--color-money-green-shadow);
+  transform: translateY(2px);
 }
 
 .worker-menu__item:disabled {
-  background: #6b7280;
+  background: var(--color-disabled-gray);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 4px 0 0 var(--color-disabled-gray-shadow);
   cursor: default;
   opacity: 0.7;
 }
@@ -243,8 +328,16 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  background: #1e293b;
-  border-radius: 1rem;
+  /* same cartoon wood-board treatment as .worker-menu__panel, see comment there */
+  background: var(--color-wood-fill);
+  border: 4px solid var(--color-wood-outline);
+  border-radius: 1.25rem;
+  box-shadow:
+    0 0 0 10px var(--color-wood-ring),
+    0 0 0 14px var(--color-wood-outline),
+    0 22px 18px -6px rgba(0, 0, 0, 0.45);
+  color: var(--color-wood-text);
+  margin: 14px;
   padding: 1.5rem;
   text-align: center;
 }
@@ -258,17 +351,26 @@ body {
 }
 
 .popup__amount {
-  font-size: 1.75rem;
+  font-size: 2.25rem;
   font-weight: 900;
-  color: #34d399;
+  color: var(--color-money-green);
+  /* same green-fill + thick white outline cartoon-text look as the canvas HUD
+     total (hud/index.ts's drawCartoonText), just done with CSS text-stroke here */
+  -webkit-text-stroke: 3px var(--color-white);
+  paint-order: stroke fill;
 }
 
 .popup__button {
   margin-top: 0.5rem;
   padding: 0.75rem 2rem;
-  border: none;
+  /* same cream-ring + dark-outline treatment as .worker-menu__item, see comment there */
+  border: 3px solid var(--color-wood-outline);
   border-radius: 0.75rem;
-  background: #3b82f6;
+  background: var(--color-blue);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 4px 0 0 var(--color-blue-shadow);
   color: white;
   font-weight: 600;
   font-size: 1rem;
@@ -276,5 +378,10 @@ body {
 }
 
 .popup__button:active {
-  background: #2563eb;
+  background: var(--color-blue-active);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 2px 0 0 var(--color-blue-shadow);
+  transform: translateY(2px);
 }

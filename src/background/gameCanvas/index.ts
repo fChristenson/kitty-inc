@@ -13,8 +13,10 @@ import { drawFloorContent } from "../../gameRenderer";
 import { drawClouds, CLOUD_MAX_RADIUS } from "../clouds";
 import { drawCity, CITY_MAX_HEIGHT } from "../city";
 import { drawStars } from "../stars";
+import { drawRoof } from "../../buildings";
 import { drawHud } from "../../hud";
 import { getTotalIncome } from "../../totalIncome";
+import { COLOR } from "../../palette";
 import type { Floor } from "../../gameState";
 
 // one building's on-screen slot: a GUTTER_W margin on each side of its floor room art
@@ -50,8 +52,8 @@ const SKY_MARGIN_H = 800;
 // and deepens into near-black space across the same altitude band stars start
 // appearing in (STAR_START_ALTITUDE), recomputed as a gradient every frame since
 // which screen-y that world altitude falls at depends on the current scroll position
-const SKY_COLOR_GROUND = "#11417f";
-const SKY_COLOR_SPACE = "#03040d";
+const SKY_COLOR_GROUND = COLOR.skyGround;
+const SKY_COLOR_SPACE = COLOR.skySpace;
 
 const DRAG_THRESHOLD_PX = 6; // pointer movement below this still counts as a click/tap
 // touch/mouse momentum: velocity decays by this factor every ms once the pointer
@@ -62,74 +64,67 @@ const MOMENTUM_MIN_SPEED = 0.02; // world units/ms below which momentum just sto
 export interface GameCanvasDeps {
   canvas: HTMLCanvasElement;
   backgrounds: HTMLImageElement[];
-  buildings: Floor[][]; // one Floor[] per building; main.ts pushes into this in place
-  getBuildingMultiplier: (buildingIndex: number) => number;
+  floors: Floor[]; // the initially-active building's floors
+  getBuildingMultiplier: () => number; // the currently-active building's economy scale
   persist: () => void;
-  onActiveBuildingChange: (index: number) => void;
 }
 
 export interface GameCanvas {
   redraw: () => void;
-  // call once right after buildings.push(newFloorsArray) — registers every floor
-  // currently in the newest building for hit-testing/coin-rect lookups
-  addBuilding: () => void;
-  // call after floorLock.ts's ensureLockedFloorAbove pushes a floor directly (used by
-  // main.ts's own initial per-building setup, outside of a live unlock click)
-  notifyFloorAdded: (buildingIndex: number, floor: Floor) => void;
+  // call right after pushing a new floor onto whatever's currently the active
+  // building's own floors array (e.g. unlocking one live) — registers it for
+  // hit-testing/coin-rect lookups
+  notifyFloorAdded: (floor: Floor) => void;
+  // switches which building's floors are currently displayed — no travel animation
+  // yet, just an instant cut to the new street — and resets scroll to ground level
+  setActiveFloors: (floors: Floor[]) => void;
   scrollActiveToTop: () => void;
   scrollActiveToBottom: () => void;
-  getActiveBuildingIndex: () => number;
 }
 
 // this is the single module that owns the game's 2D world: how big it is (scaled to
-// the buildings/floors/gutters actually in it) and one shared camera that pans around
-// inside it in both x and y — every building sits on the exact same ground line, side
-// by side along the world's x-axis, never with its own independent scroll state.
+// the active building's own floors/gutters) and one shared camera that pans up/down
+// through it — only one building is ever on screen at a time (see setActiveFloors),
+// so there's no horizontal camera/panning at all.
 export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
-  const {
-    canvas,
-    backgrounds,
-    buildings,
-    getBuildingMultiplier,
-    persist,
-    onActiveBuildingChange,
-  } = deps;
+  const { canvas, backgrounds, getBuildingMultiplier, persist } = deps;
   const ctx = canvas.getContext("2d")!;
 
   let scale = 1; // world units -> CSS px
   let cssW = 0;
   let cssH = 0;
 
-  // the one shared camera: cameraX/scrollUp are world-space, identical meaning
-  // regardless of which building(s) currently happen to be on screen
-  let cameraX = 0; // world-x currently at the viewport's left edge
+  // the currently-displayed building's own floors; swapped wholesale by
+  // setActiveFloors instead of ever showing more than one building at once
+  let activeFloors: Floor[] = deps.floors;
+
+  // the one shared vertical camera; scrollUp is world-space
   let scrollUp = 0; // world units scrolled up from the ground-anchored default (0)
-  let activeBuildingIndex = 0;
   // exact floor-local point the cursor is over, so the upgrade button can check
   // specifically whether it itself is hovered instead of "is anything on this floor
   // hoverable" (that coarser check is still what drives the pointer cursor below)
   let hoveredPoint: { floor: Floor; localX: number; localY: number } | null =
     null;
 
-  // which building/index a given Floor lives at, kept in sync as floors are added, so
-  // a hit-test or a coin burst's on-screen rect never has to scan every building
-  const floorLocation = new WeakMap<
-    Floor,
-    { buildingIndex: number; floorIndex: number }
-  >();
+  // a floor's index within activeFloors, kept in sync as floors are added, so a
+  // hit-test or a coin burst's on-screen rect never has to scan the whole array
+  const floorLocation = new WeakMap<Floor, { floorIndex: number }>();
 
-  function notifyFloorAdded(buildingIndex: number, floor: Floor): void {
-    floorLocation.set(floor, {
-      buildingIndex,
-      floorIndex: buildings[buildingIndex].length - 1,
+  function registerFloors(floors: Floor[]): void {
+    floors.forEach((floor, floorIndex) => {
+      floorLocation.set(floor, { floorIndex });
     });
   }
 
-  function addBuilding(): void {
-    const buildingIndex = buildings.length - 1;
-    buildings[buildingIndex].forEach((floor, floorIndex) => {
-      floorLocation.set(floor, { buildingIndex, floorIndex });
-    });
+  function notifyFloorAdded(floor: Floor): void {
+    floorLocation.set(floor, { floorIndex: activeFloors.length - 1 });
+    clampCamera();
+  }
+
+  function setActiveFloors(floors: Floor[]): void {
+    activeFloors = floors;
+    registerFloors(floors);
+    scrollUp = 0;
     clampCamera();
   }
 
@@ -142,23 +137,21 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // it), so the building visually sits on top of the street instead of leaving a
   // seam a hairline of sub-pixel canvas scaling could show through.
   const BUILDING_GROUND_OVERLAP = 32;
+  // each floor's own row pitch is shrunk by this much so consecutive floors overlap
+  // slightly instead of only meeting exactly edge-to-edge — otherwise sub-pixel
+  // canvas scaling left a hairline gap between them
+  const FLOOR_OVERLAP = 4;
   function floorWorldY(floorIndex: number): { top: number; bottom: number } {
-    const bottom = -floorIndex * FLOOR_H + BUILDING_GROUND_OVERLAP;
+    const bottom =
+      -floorIndex * (FLOOR_H - FLOOR_OVERLAP) + BUILDING_GROUND_OVERLAP;
     return { top: bottom - FLOOR_H, bottom };
   }
 
-  function tallestFloorCount(): number {
-    return buildings.reduce((max, floors) => Math.max(max, floors.length), 1);
-  }
-
   // the world's own fixed extent — everything the camera is allowed to move around
-  // in, computed straight from the buildings given to this module: gutters + content
-  // in both directions, nothing more, nothing that grows/shrinks for any other reason
-  function worldWidth(): number {
-    return buildings.length * SLOT_W;
-  }
+  // in, computed straight from the active building's own floors: gutters + content,
+  // nothing that grows/shrinks for any other reason
   function worldTopY(): number {
-    return -(tallestFloorCount() * FLOOR_H + SKY_MARGIN_H);
+    return -(activeFloors.length * FLOOR_H + SKY_MARGIN_H);
   }
   function worldHeight(): number {
     return GROUND_H - worldTopY();
@@ -180,20 +173,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
 
   function clampCamera(): void {
-    const maxX = Math.max(0, worldWidth() - SLOT_W);
-    cameraX = Math.min(Math.max(cameraX, 0), maxX);
     scrollUp = Math.min(Math.max(scrollUp, 0), maxScrollUp());
-  }
-
-  function updateActiveBuilding(): void {
-    const index = Math.min(
-      Math.max(Math.round(cameraX / SLOT_W), 0),
-      Math.max(0, buildings.length - 1),
-    );
-    if (index !== activeBuildingIndex) {
-      activeBuildingIndex = index;
-      onActiveBuildingChange(index);
-    }
   }
 
   function resize(): void {
@@ -207,39 +187,19 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     clampCamera();
   }
 
-  // every building whose world-x slot currently overlaps the viewport, usually one,
-  // occasionally two mid-drag — everything else is skipped entirely, not just hidden
-  function visibleBuildingIndices(): number[] {
-    const result: number[] = [];
-    for (let b = 0; b < buildings.length; b++) {
-      const left = b * SLOT_W - cameraX;
-      if (left < SLOT_W && left + SLOT_W > 0) result.push(b);
-    }
-    return result;
-  }
-
   // a distant city skyline silhouette sitting on the ground line, behind everything
   // else — drawn over the plain blue sky fill but under the clouds/ground/buildings
   function drawWorldCity(): void {
     const visibleTop = viewportTopY();
     const visibleBottom = viewportBottomY();
     if (0 <= visibleTop || -CITY_MAX_HEIGHT >= visibleBottom) return; // entirely out of view
-    const visibleLeft = cameraX;
-    const visibleRight = cameraX + SLOT_W;
-    drawCity(ctx, 0, visibleLeft, visibleRight);
+    drawCity(ctx, 0, 0, SLOT_W);
   }
 
-  // one continuous flat ground strip across whatever's currently visible — not drawn
-  // per building, so there's never a seam between one building's ground and the next
+  // one continuous flat ground strip spanning the building's own slot width
   function drawWorldGround(): void {
-    const left = Math.max(0, cameraX);
-    const right = Math.min(worldWidth(), cameraX + SLOT_W);
-    if (right <= left) return;
     if (0 >= viewportBottomY() || GROUND_H <= viewportTopY()) return;
-    ctx.save();
-    ctx.translate(left, 0);
-    drawGround(ctx, right - left, left);
-    ctx.restore();
+    drawGround(ctx, SLOT_W, 0);
   }
 
   // stars twinkle in the world above STAR_START_ALTITUDE, same global-threshold
@@ -249,8 +209,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const visibleTop = viewportTopY();
     const visibleBottom = Math.min(viewportBottomY(), -STAR_START_ALTITUDE);
     if (visibleBottom <= visibleTop) return; // nothing at/above floor 8 is on screen
-    const visibleLeft = cameraX;
-    const visibleRight = cameraX + SLOT_W;
+    const visibleLeft = 0;
+    const visibleRight = SLOT_W;
     ctx.save();
     ctx.beginPath();
     ctx.rect(
@@ -262,7 +222,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.clip();
     drawStars(
       ctx,
-      worldWidth(),
+      SLOT_W,
       now,
       visibleLeft,
       visibleRight,
@@ -283,8 +243,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       -CLOUD_START_ALTITUDE + CLOUD_MAX_RADIUS,
     );
     if (visibleBottom <= visibleTop) return; // nothing at/above floor 5 is on screen
-    const visibleLeft = cameraX;
-    const visibleRight = cameraX + SLOT_W;
+    const visibleLeft = 0;
+    const visibleRight = SLOT_W;
     ctx.save();
     ctx.beginPath();
     ctx.rect(
@@ -296,7 +256,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.clip();
     drawClouds(
       ctx,
-      worldWidth(),
+      SLOT_W,
       now,
       visibleLeft,
       visibleRight,
@@ -306,41 +266,39 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.restore();
   }
 
-  function drawBuildingFloors(buildingIndex: number): void {
-    const floors = buildings[buildingIndex];
-    const slotLeft = buildingIndex * SLOT_W + GUTTER_W; // world-x; caller already applied the camera translate
-    for (let i = 0; i < floors.length; i++) {
+  function drawActiveFloors(): void {
+    for (let i = 0; i < activeFloors.length; i++) {
       const { top, bottom } = floorWorldY(i);
       if (bottom < viewportTopY() || top > viewportBottomY()) continue; // scrolled out of view
       ctx.save();
-      ctx.translate(slotLeft, top);
+      ctx.translate(GUTTER_W, top);
       const buttonHovered =
         hoveredPoint !== null &&
-        hoveredPoint.floor === floors[i] &&
+        hoveredPoint.floor === activeFloors[i] &&
         hitTestUpgradeButton(hoveredPoint.localX, hoveredPoint.localY);
       drawFloorContent(ctx, {
         backgrounds,
-        floor: floors[i],
+        floor: activeFloors[i],
         floorNumber: i + 1,
-        totalFloors: floors.length,
+        totalFloors: activeFloors.length,
         buttonHovered,
       });
+      if (i === activeFloors.length - 1) drawRoof(ctx);
       ctx.restore();
     }
   }
 
-  // a floor's current on-screen rect in the same camera-translated frame everything
-  // else draws in — coins.ts's particles are floor-local, so this is how a burst
-  // maps onto the one shared canvas
+  // a floor's current on-screen rect in the same frame everything else draws in —
+  // coins.ts's particles are floor-local, so this is how a burst maps onto the
+  // shared canvas
   function getFloorRect(
     floor: Floor,
   ): { left: number; top: number; width: number } | null {
     const loc = floorLocation.get(floor);
     if (!loc) return null;
-    const { buildingIndex, floorIndex } = loc;
-    const { top } = floorWorldY(floorIndex);
+    const { top } = floorWorldY(loc.floorIndex);
     return {
-      left: buildingIndex * SLOT_W + GUTTER_W,
+      left: GUTTER_W,
       top,
       width: FLOOR_W,
     };
@@ -372,19 +330,19 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, SLOT_W, contentViewportH());
 
-    // everything below is one shared camera transform — ground/clouds/floors are all
-    // drawn in plain world coordinates from here on, no per-building offset math
+    // everything below is the shared vertical camera transform — ground/clouds/
+    // floors are all drawn in plain world coordinates from here on
     ctx.save();
-    ctx.translate(-cameraX, -viewportTopY());
+    ctx.translate(0, -viewportTopY());
 
     // strict paint order: stars, then city skyline, then ground, then clouds, then
-    // every visible building's floors on top of all of it — nothing from a later pass
+    // the active building's floors on top of all of it — nothing from a later pass
     // can end up underneath one still to come
     drawWorldStars(performance.now());
     drawWorldCity();
     drawWorldGround();
     drawWorldClouds(performance.now());
-    for (const b of visibleBuildingIndices()) drawBuildingFloors(b);
+    drawActiveFloors();
 
     if (hasActiveCoins()) drawCoins(ctx, getFloorRect);
 
@@ -398,17 +356,15 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.restore();
   }
 
-  // --- input: one pointer drag drives both building-swipe (x) and floor-scroll (y),
-  // axis-locked from whichever direction the drag actually started moving in ---
+  // --- input: one pointer drag drives floor-scroll (vertical only — there's no
+  // horizontal camera anymore, only one building is ever on screen) ---
 
   let dragPointerId: number | null = null;
   let dragStartX = 0;
   let dragStartY = 0;
-  let lastX = 0;
   let lastY = 0;
-  let dragAxis: "x" | "y" | null = null;
+  let dragging = false;
   let didDrag = false;
-  let velocityX = 0;
   let velocityY = 0;
   let lastMoveTime = 0;
   let momentumFrame: number | null = null;
@@ -425,19 +381,13 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const step = (now: number) => {
       const dt = now - lastTime;
       lastTime = now;
-      if (
-        Math.abs(velocityX) < MOMENTUM_MIN_SPEED &&
-        Math.abs(velocityY) < MOMENTUM_MIN_SPEED
-      ) {
+      if (Math.abs(velocityY) < MOMENTUM_MIN_SPEED) {
         momentumFrame = null;
         return;
       }
-      cameraX -= velocityX * dt;
       scrollUp += velocityY * dt;
       clampCamera();
-      updateActiveBuilding();
       const decay = Math.pow(MOMENTUM_DECAY_PER_MS, dt);
-      velocityX *= decay;
       velocityY *= decay;
       momentumFrame = requestAnimationFrame(step);
     };
@@ -452,33 +402,26 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     };
   }
 
-  // finds whichever visible building/floor a canvas-local point lands on, and its
-  // floor-local coordinates within it — converts to world coordinates first (undoing
-  // the same camera transform redraw() applies), since that's the one space
-  // everything (buildings, floors, ground) is actually laid out in
+  // finds whichever floor of the active building a canvas-local point lands on, and
+  // its floor-local coordinates within it — converts to world coordinates first
+  // (undoing the same camera transform redraw() applies)
   function hitTestPoint(
     screenX: number,
     screenY: number,
   ): {
     floor: Floor;
-    buildingIndex: number;
     localX: number;
     localY: number;
   } | null {
-    const worldX = screenX + cameraX;
+    const worldX = screenX;
     const worldY = screenY + viewportTopY();
-    const buildingIndex = Math.floor(worldX / SLOT_W);
-    const floors = buildings[buildingIndex];
-    if (!floors) return null;
-    const slotLeft = buildingIndex * SLOT_W + GUTTER_W;
-    const localX = worldX - slotLeft;
+    const localX = worldX - GUTTER_W;
     if (localX < 0 || localX >= FLOOR_W) return null; // in the gutter, not the room
-    for (let i = 0; i < floors.length; i++) {
+    for (let i = 0; i < activeFloors.length; i++) {
       const { top, bottom } = floorWorldY(i);
       if (worldY >= top && worldY < bottom) {
         return {
-          floor: floors[i],
-          buildingIndex,
+          floor: activeFloors[i],
           localX,
           localY: worldY - top,
         };
@@ -491,11 +434,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     stopMomentum();
     dragPointerId = event.pointerId;
-    dragStartX = lastX = event.clientX;
+    dragStartX = event.clientX;
     dragStartY = lastY = event.clientY;
-    dragAxis = null;
+    dragging = false;
     didDrag = false;
-    velocityX = 0;
     velocityY = 0;
     lastMoveTime = performance.now();
     canvas.setPointerCapture(event.pointerId);
@@ -515,30 +457,22 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       return;
     }
 
-    const dx = event.clientX - lastX;
     const dy = event.clientY - lastY;
     const now = performance.now();
     const dt = Math.max(1, now - lastMoveTime);
     lastMoveTime = now;
 
-    if (!dragAxis) {
+    if (!dragging) {
       const totalDx = event.clientX - dragStartX;
       const totalDy = event.clientY - dragStartY;
       if (Math.hypot(totalDx, totalDy) < DRAG_THRESHOLD_PX) return;
-      dragAxis = Math.abs(totalDx) > Math.abs(totalDy) ? "x" : "y";
+      dragging = true;
       didDrag = true;
     }
 
-    if (dragAxis === "x") {
-      cameraX -= dx / scale;
-      velocityX = dx / scale / dt;
-    } else {
-      scrollUp += dy / scale;
-      velocityY = dy / scale / dt;
-    }
+    scrollUp += dy / scale;
+    velocityY = dy / scale / dt;
     clampCamera();
-    updateActiveBuilding();
-    lastX = event.clientX;
     lastY = event.clientY;
   }
 
@@ -547,10 +481,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     canvas.releasePointerCapture(event.pointerId);
     dragPointerId = null;
     if (didDrag) {
-      if (
-        Math.abs(velocityX) > MOMENTUM_MIN_SPEED ||
-        Math.abs(velocityY) > MOMENTUM_MIN_SPEED
-      ) {
+      if (Math.abs(velocityY) > MOMENTUM_MIN_SPEED) {
         runMomentum();
       }
       return;
@@ -560,11 +491,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (!hit) return;
     handleFloorClick(
       {
-        floors: buildings[hit.buildingIndex],
+        floors: activeFloors,
         backgroundCount: backgrounds.length,
-        multiplier: getBuildingMultiplier(hit.buildingIndex),
+        multiplier: getBuildingMultiplier(),
         persist,
-        onFloorAdded: (floor) => notifyFloorAdded(hit.buildingIndex, floor),
+        onFloorAdded: (floor) => notifyFloorAdded(floor),
       },
       hit.floor,
       hit.localX,
@@ -575,13 +506,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   function onWheel(event: WheelEvent): void {
     event.preventDefault();
     stopMomentum();
-    if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
-      cameraX += event.deltaX / scale;
-    } else {
-      scrollUp -= event.deltaY / scale;
-    }
+    scrollUp -= event.deltaY / scale;
     clampCamera();
-    updateActiveBuilding();
   }
 
   canvas.addEventListener("pointerdown", onPointerDown);
@@ -590,22 +516,20 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   canvas.addEventListener("pointercancel", onPointerUp);
   canvas.addEventListener("wheel", onWheel, { passive: false });
 
+  registerFloors(activeFloors);
   const resizeObserver = new ResizeObserver(() => resize());
   resizeObserver.observe(canvas);
   resize();
 
   return {
     redraw,
-    addBuilding,
     notifyFloorAdded,
+    setActiveFloors,
     scrollActiveToTop: () => {
-      const activeFloors = buildings[activeBuildingIndex]?.length ?? 0;
-      scrollUp = GROUND_H - contentViewportH() + activeFloors * FLOOR_H;
-      clampCamera();
+      scrollUp = maxScrollUp(); // all the way to worldTopY, not just the roof
     },
     scrollActiveToBottom: () => {
       scrollUp = 0;
     },
-    getActiveBuildingIndex: () => activeBuildingIndex,
   };
 }

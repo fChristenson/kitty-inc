@@ -44,7 +44,6 @@ export function createBoostMenuMarkup(): string {
       <div class="worker-menu__panel">
         <div class="worker-menu__header">
           <h2>Boosts</h2>
-          <button class="worker-menu__close" id="boost-menu-close" aria-label="Close">&times;</button>
         </div>
         <div class="worker-menu__list" id="boost-menu-list"></div>
       </div>
@@ -68,8 +67,6 @@ export function wireBoostMenu(
   const backdrop = container.querySelector<HTMLDivElement>(
     "#boost-menu-backdrop",
   )!;
-  const closeButton =
-    container.querySelector<HTMLButtonElement>("#boost-menu-close")!;
   const list = container.querySelector<HTMLDivElement>("#boost-menu-list")!;
 
   function render(): void {
@@ -127,7 +124,6 @@ export function wireBoostMenu(
   }
 
   backdrop.addEventListener("click", close);
-  closeButton.addEventListener("click", close);
 
   return { open, close };
 }

@@ -1,5 +1,6 @@
-import { drawCartoonText, drawCartoonPanel, formatPrice } from "../../utils";
+import { drawCartoonText, drawGlossyButton, formatPrice } from "../../utils";
 import { FLOOR_W, FLOOR_H } from "../constants";
+import { COLOR } from "../../palette";
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left)
 export const BTN_W = 360;
@@ -38,17 +39,17 @@ export function drawUpgradeButton(
   ctx.save();
   if (!affordable) ctx.globalAlpha = 0.5;
   else if (hovered) ctx.filter = "brightness(0.85)";
-  drawCartoonPanel(
+  drawGlossyButton(
     ctx,
     x,
     y,
     BTN_W,
     BTN_H,
     16,
-    affordable ? "#22C55E" : "#6B7280",
+    affordable ? COLOR.moneyGreen : COLOR.disabledGray,
   );
 
-  ctx.font = "900 48px system-ui, sans-serif";
+  ctx.font = '900 48px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   drawCartoonText(ctx, formatPrice(cost), x + BTN_W / 2, y + BTN_H / 2);

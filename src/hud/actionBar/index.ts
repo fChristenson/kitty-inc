@@ -43,6 +43,17 @@ export function createActionBarMarkup(): string {
           <path d="M5 12h14" />
         </svg>
       </button>
+      <button
+        class="action-bar__button action-bar__button--map"
+        id="action-bar-map"
+        aria-label="Open map"
+      >
+        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z" />
+          <path d="M9 3v15" />
+          <path d="M15 6v15" />
+        </svg>
+      </button>
     </div>
   `;
 }
@@ -52,6 +63,7 @@ export interface ActionBarHandlers {
   onScrollBottom: () => void;
   onBoostAll: () => void;
   onOpenUpgradeMenu: () => void;
+  onOpenMapMenu: () => void;
 }
 
 export function wireActionBar(
@@ -70,4 +82,7 @@ export function wireActionBar(
   container
     .querySelector<HTMLButtonElement>("#action-bar-hire")!
     .addEventListener("click", handlers.onOpenUpgradeMenu);
+  container
+    .querySelector<HTMLButtonElement>("#action-bar-map")!
+    .addEventListener("click", handlers.onOpenMapMenu);
 }

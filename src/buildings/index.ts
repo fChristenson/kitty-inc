@@ -40,4 +40,5 @@ export function createBuilding(
 
 // this module's own facade: buildings/ has an outerWall sub-part for internal reuse,
 // but anything outside src/buildings must import it from here, never from a nested path
-export { drawOuterWall } from "./outerWall";
+export { drawOuterWall, loadWallMaterial } from "./outerWall";
+export { drawRoof, loadRoofImage } from "./roof";

@@ -11,7 +11,7 @@ export function drawFloorNumber(
   const x = MARGIN;
   const y = MARGIN;
 
-  ctx.font = "900 34px system-ui, sans-serif";
+  ctx.font = '900 34px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
   drawCartoonText(ctx, `${floorNumber} / ${totalFloors}`, x, y);

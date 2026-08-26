@@ -1,5 +1,6 @@
 import type { Floor } from "../../gameState";
 import { drawCartoonText } from "../../utils";
+import { COLOR } from "../../palette";
 
 // sits directly under floorNumber.ts's "N / total" label, same left margin
 const MARGIN = 24;
@@ -35,7 +36,7 @@ export function drawUpgradeStar(
   const cy = STAR_Y;
 
   starPath(ctx, cx, cy, STAR_RADIUS, STAR_RADIUS * 0.45);
-  ctx.fillStyle = "#FBBF24";
+  ctx.fillStyle = COLOR.starYellow;
   ctx.fill();
 
   // glossy highlight, clipped to the star's own path (mirrors drawGlossHighlight in utils.ts,
@@ -62,11 +63,11 @@ export function drawUpgradeStar(
   ctx.restore();
 
   ctx.lineWidth = 4;
-  ctx.strokeStyle = "#FFFFFF";
+  ctx.strokeStyle = COLOR.white;
   starPath(ctx, cx, cy, STAR_RADIUS, STAR_RADIUS * 0.45);
   ctx.stroke();
 
-  ctx.font = "900 36px system-ui, sans-serif";
+  ctx.font = '900 36px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "left";
   ctx.textBaseline = "middle";
   drawCartoonText(ctx, `${floor.upgradeCount}`, cx + STAR_RADIUS + 14, cy + 1);

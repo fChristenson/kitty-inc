@@ -29,6 +29,8 @@ import {
   wireUpgradeMenu,
   createBoostMenuMarkup,
   wireBoostMenu,
+  createMapMenuMarkup,
+  wireMapMenu,
   createPopupMarkup,
   showIdlePopup,
 } from "./hud";
@@ -37,6 +39,8 @@ import {
   createBuilding,
   getBuildingMultiplier,
   getBuildingPrice,
+  loadWallMaterial,
+  loadRoofImage,
 } from "./buildings";
 
 async function main() {
@@ -45,27 +49,39 @@ async function main() {
 
   app.innerHTML = `
     <div class="game">
-      <div class="game__building-label" id="building-label"></div>
       <canvas class="game__canvas" id="game-canvas"></canvas>
       ${createActionBarMarkup()}
       ${createTestButtonMarkup()}
     </div>
     ${createUpgradeMenuMarkup()}
     ${createBoostMenuMarkup()}
+    ${createMapMenuMarkup()}
     ${createPopupMarkup()}
   `;
 
-  const buildingLabelEl = app.querySelector<HTMLDivElement>("#building-label")!;
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
+
+  // canvas text doesn't re-render on its own once a web font finishes loading (unlike
+  // DOM text), so every weight the canvas draws with must be loaded before the first
+  // redraw below, or the very first frame silently falls back to system-ui
+  await Promise.all([
+    document.fonts.load('700 16px "Fredoka"'),
+    document.fonts.load('900 16px "Fredoka"'),
+  ]);
 
   const backgrounds = await loadFloorBackgrounds();
   await loadGroundImage();
   await loadWorkerSprite();
   await loadCityImage();
   await loadCloudImages();
+  await loadWallMaterial();
+  await loadRoofImage();
 
-  // one Floor[] per building, laid out side by side in gameCanvas.ts's single camera
+  // one Floor[] per building; only one building is ever shown on screen at a time
+  // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
+  // happens entirely through the map menu below, not by scrolling/swiping
   const buildings: Floor[][] = [];
+  let activeBuildingIndex = 0;
 
   function persist() {
     // debounced/idle-scheduled so a click mid-scroll doesn't synchronously serialize
@@ -73,43 +89,43 @@ async function main() {
     schedulePersist(buildings);
   }
 
-  function setActiveBuilding(index: number): void {
-    buildingLabelEl.textContent = `Skyscraper ${index + 1}`;
+  const restoredBuildings = loadBuildings();
+  if (restoredBuildings.length > 0) {
+    buildings.push(...restoredBuildings);
+  } else {
+    buildings.push(createBuilding(0, backgrounds.length));
   }
 
   const gameCanvas = createGameCanvas({
     canvas,
     backgrounds,
-    buildings,
-    getBuildingMultiplier,
+    floors: buildings[activeBuildingIndex],
+    getBuildingMultiplier: () => getBuildingMultiplier(activeBuildingIndex),
     persist,
-    onActiveBuildingChange: setActiveBuilding,
   });
 
-  // registers a building's floors with gameCanvas.ts (existing ones if restored,
-  // otherwise just the fresh ground floor already in buildings[buildingIndex]), then
-  // ensures its next locked floor is waiting above it
+  // ensures a building's next locked floor is waiting above it; onAdd only forwards
+  // to gameCanvas.ts when this is the currently-active/on-screen building — an
+  // inactive building's newly-added floor gets picked up automatically the next
+  // time the player switches to it (setActiveFloors registers every floor fresh)
   function setupBuilding(buildingIndex: number): void {
-    gameCanvas.addBuilding();
     ensureLockedFloorAbove({
       floors: buildings[buildingIndex],
       backgroundCount: backgrounds.length,
       multiplier: getBuildingMultiplier(buildingIndex),
-      onAdd: (floor) => gameCanvas.notifyFloorAdded(buildingIndex, floor),
+      onAdd: (floor) => {
+        if (buildingIndex === activeBuildingIndex) {
+          gameCanvas.notifyFloorAdded(floor);
+        }
+      },
     });
   }
 
-  // buys the next building outright if affordable (see buildings.ts's
-  // getBuildingPrice, which scales 1000x per building same as its economy); returns
-  // whether it succeeded so the upgrade menu can decide whether to re-render
-  function buyBuilding(): boolean {
-    const buildingIndex = buildings.length;
-    if (!spendTotalIncome(getBuildingPrice(buildingIndex))) return false;
-    const floors = createBuilding(buildingIndex, backgrounds.length);
-    buildings.push(floors);
-    setupBuilding(buildingIndex);
-    persist();
-    return true;
+  // switches which building is currently displayed — no travel animation yet, just
+  // an instant cut to the new street
+  function goToBuilding(buildingIndex: number): void {
+    activeBuildingIndex = buildingIndex;
+    gameCanvas.setActiveFloors(buildings[buildingIndex]);
   }
 
   wireTestButton(app, () => {
@@ -119,15 +135,31 @@ async function main() {
   wireResetButton(app, buildings);
   const upgradeMenu = wireUpgradeMenu(
     app,
-    () => buildings[gameCanvas.getActiveBuildingIndex()] ?? [],
-    () => buildings.length,
-    buyBuilding,
+    () => buildings[activeBuildingIndex] ?? [],
     () => persist(),
   );
   const boostMenu = wireBoostMenu(
     app,
-    () => buildings[gameCanvas.getActiveBuildingIndex()] ?? [],
+    () => buildings[activeBuildingIndex] ?? [],
     () => persist(),
+  );
+  // buys the next building outright if affordable (see buildings.ts's
+  // getBuildingPrice, which scales 1000x per building same as its economy); returns
+  // whether it succeeded so the map menu can decide whether to re-render
+  function buyBuilding(): boolean {
+    const buildingIndex = buildings.length;
+    if (!spendTotalIncome(getBuildingPrice(buildingIndex))) return false;
+    buildings.push(createBuilding(buildingIndex, backgrounds.length));
+    setupBuilding(buildingIndex);
+    persist();
+    return true;
+  }
+  const mapMenu = wireMapMenu(
+    app,
+    () => buildings.length,
+    () => activeBuildingIndex,
+    buyBuilding,
+    goToBuilding,
   );
   wireActionBar(app, {
     onScrollTop: () => gameCanvas.scrollActiveToTop(),
@@ -138,21 +170,13 @@ async function main() {
     onOpenUpgradeMenu: () => {
       upgradeMenu.open();
     },
+    onOpenMapMenu: () => {
+      mapMenu.open();
+    },
   });
 
-  const restoredBuildings = loadBuildings();
-  if (restoredBuildings.length > 0) {
-    restoredBuildings.forEach((floors, i) => {
-      buildings.push(floors);
-      setupBuilding(i);
-    });
-  } else {
-    const floors = createBuilding(0, backgrounds.length);
-    buildings.push(floors);
-    setupBuilding(0);
-  }
+  buildings.forEach((_, i) => setupBuilding(i));
   persist();
-  setActiveBuilding(0);
 
   const idleIncome = computeIdleIncome(buildings);
   // saveBuildings directly (not the debounced persist()): computeIdleIncome advances

@@ -3,7 +3,7 @@ description: Keep game/canvas logic split into dedicated folder modules
 applyTo: "src/**"
 ---
 
-# Cash Clicker
+# Kitty Inc
 
 A canvas-based idle/clicker game (Vite + TypeScript, no framework). Click workers on
 each floor to earn money, buy upgrades/workers/boosts, unlock new floors up the

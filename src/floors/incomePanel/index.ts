@@ -9,6 +9,7 @@ import {
   formatPrice,
   formatTime,
 } from "../../utils";
+import { COLOR } from "../../palette";
 
 // panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right)
 export const PANEL_W = 360;
@@ -226,7 +227,16 @@ export function drawIncomePanel(
   // slice of every short cycle before it visibly started growing
   const barMinWidth = barRadius * 2;
 
-  drawCartoonPanel(ctx, barX, barY, barW, barH, barRadius, "#1E293B", false);
+  drawCartoonPanel(
+    ctx,
+    barX,
+    barY,
+    barW,
+    barH,
+    barRadius,
+    COLOR.incomeTrack,
+    false,
+  );
 
   // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
   let fillW = barMinWidth;
@@ -244,13 +254,13 @@ export function drawIncomePanel(
       fillW = Math.max(barMinWidth, barW * pct);
     }
   }
-  ctx.fillStyle = "#34D399";
+  ctx.fillStyle = COLOR.moneyGreen;
   roundRect(ctx, barX, barY, fillW, barH, barRadius);
   ctx.fill();
   drawGlossHighlight(ctx, barX, barY, fillW, barH, barRadius);
   if (isFastCycle) drawFastCycleBorder(ctx, barX, barY, barW, barH, now);
 
-  ctx.font = "900 36px system-ui, sans-serif";
+  ctx.font = '900 36px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   drawCartoonText(

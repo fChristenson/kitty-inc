@@ -1,5 +1,6 @@
 import { randomInt } from "../../utils";
 import type { Floor } from "../../gameState";
+import { COLOR } from "../../palette";
 
 // a handful of small coins that bubble straight up from a point, gently swaying,
 // and fade out — a quieter alternative to coins.ts's outward/gravity burst
@@ -37,18 +38,18 @@ export function drawFloatingCoins(
     ctx.globalAlpha = Math.max(0, 1 - t);
 
     // flat coin face (no directional shading, so it reads as a 2D disc, not a sphere)
-    ctx.fillStyle = "#F5C542";
+    ctx.fillStyle = COLOR.coinGold;
     ctx.beginPath();
     ctx.arc(c.x, y, radius, 0, Math.PI * 2);
     ctx.fill();
     ctx.lineWidth = Math.max(1, radius * 0.16);
-    ctx.strokeStyle = "#8A5A12";
+    ctx.strokeStyle = COLOR.coinOutline;
     ctx.stroke();
 
     // embossed inner ring
     ctx.beginPath();
     ctx.arc(c.x, y, radius * 0.72, 0, Math.PI * 2);
-    ctx.strokeStyle = "#D9A521";
+    ctx.strokeStyle = COLOR.coinHighlight;
     ctx.lineWidth = Math.max(1, radius * 0.1);
     ctx.stroke();
 
@@ -74,8 +75,8 @@ export function drawFloatingCoins(
     ctx.fill();
     ctx.restore();
 
-    ctx.fillStyle = "#8A5A12";
-    ctx.font = `bold ${Math.round(radius * 1.1)}px system-ui, sans-serif`;
+    ctx.fillStyle = COLOR.coinOutline;
+    ctx.font = `bold ${Math.round(radius * 1.1)}px "Fredoka", system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText("$", c.x, y + radius * 0.05);
