@@ -177,23 +177,22 @@ function getFloorWorkers(floor: Floor, now: number): FloorWorkers {
   return state;
 }
 
-// which of a floor's rendered workers a floor-local canvas point falls on, if any
-export function hitTestWorker(
-  x: number,
-  y: number,
-  floor: Floor,
-): number | null {
-  if (!floor.unlocked) return null;
+// every one of a floor's rendered workers whose hitbox covers a floor-local point —
+// a click on overlapping cats hits all of them at once, not just the frontmost one
+export function hitTestWorkers(x: number, y: number, floor: Floor): number[] {
+  if (!floor.unlocked) return [];
   const state = floorWorkers.get(floor);
-  if (!state) return null;
+  if (!state) return [];
 
   const withinY =
     y >= WORKER_FEET_Y - HIT_TOP && y <= WORKER_FEET_Y + HIT_BOTTOM;
-  if (!withinY) return null;
-  const index = state.walkers.findIndex(
-    (w) => x >= w.x - HIT_HALF_WIDTH && x <= w.x + HIT_HALF_WIDTH,
-  );
-  return index === -1 ? null : index;
+  if (!withinY) return [];
+
+  const indexes: number[] = [];
+  state.walkers.forEach((w, i) => {
+    if (x >= w.x - HIT_HALF_WIDTH && x <= w.x + HIT_HALF_WIDTH) indexes.push(i);
+  });
+  return indexes;
 }
 
 // starts the clicked worker's own click-bounce animation and reports whether the click

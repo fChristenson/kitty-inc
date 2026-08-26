@@ -1,4 +1,4 @@
-import { hitTestWorker, clickWorker, getWorkerCenter } from "../worker";
+import { hitTestWorkers, clickWorker, getWorkerCenter } from "../worker";
 import { hitTestUpgradeButton, getButtonCenter } from "../upgradeButton";
 import { increaseIncomeRate } from "../incomePanel";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
@@ -29,7 +29,7 @@ export function hitTestFloorHover(x: number, y: number, floor: Floor): boolean {
       floor.unlocked &&
       getTotalIncome() >= floor.upgradeCost) ||
     hitTestFloorLock(x, y, floor) ||
-    hitTestWorker(x, y, floor) !== null
+    hitTestWorkers(x, y, floor).length > 0
   );
 }
 
@@ -70,14 +70,12 @@ export function handleFloorClick(
     return;
   }
 
-  const workerIndex = hitTestWorker(x, y, floor);
-  if (
-    workerIndex !== null &&
+  // a click on overlapping cats hits every one of them, not just the frontmost
+  for (const workerIndex of hitTestWorkers(x, y, floor)) {
     // Date.now()-based (not performance.now()) so it matches drawWorker's
     // Date.now()-based `now`, which is what clickedAt actually gets compared
     // against to time the click-bounce/jump-sprite reaction
-    clickWorker(floor, workerIndex, Date.now())
-  ) {
+    if (!clickWorker(floor, workerIndex, Date.now())) continue;
     const center = getWorkerCenter(floor, workerIndex);
     if (center) {
       spawnCoinBurst(floor, center.x, center.y, () => {});
