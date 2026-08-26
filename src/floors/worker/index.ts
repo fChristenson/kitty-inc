@@ -78,6 +78,11 @@ const BOOSTED_WALK_SPEED = WALK_SPEED * 2;
 const WORKER_FEET_Y = 650;
 const CLICK_BOUNCE_MS = 300; // how long the little "boing" reaction plays after a click
 const CLICK_COOLDOWN_MS = 500; // ignore re-clicks faster than this so coin bursts don't stack up
+// how long a walker keeps walking, or keeps doing one of the idle behaviors below,
+// before randomly rolling its next behavior — see rollBehavior
+const WALK_MS_RANGE: [number, number] = [2000, 5000];
+const PAUSE_MS_RANGE: [number, number] = [500, 2000];
+const LOOK_BACK_MS_RANGE: [number, number] = [450, 900];
 // generous click-target box around the figure; the sprite's own ~0.48
 // width/height aspect ratio, so this doesn't need per-frame precision
 const HIT_HALF_WIDTH = RENDER_H * 0.48 * 0.5 + 10;
@@ -87,12 +92,20 @@ const HIT_BOTTOM = 10;
 // always one of the little figures actually drawn/walked here
 export const MAX_RENDERED_WORKERS = 3;
 
+// a walker's current idle behavior: normal pacing, paused standing still (facing the
+// camera like every pose in the sheet already does), or briefly glancing back over
+// its shoulder (rendered facing the opposite way) without actually reversing course
+type Behavior = "walking" | "paused" | "lookingBack";
+
 interface WalkerState {
   x: number;
   direction: 1 | -1;
   lastUpdate: number;
-  facingSince: number; // when direction last changed, so a turn briefly shows FACING_FRAME
+  facingSince: number; // when direction last changed, so a turn briefly plays TURN_FRAMES
   clickedAt: number; // Date.now() of this worker's own last click, -Infinity if never clicked
+  behavior: Behavior;
+  behaviorSince: number; // when the current behavior started (animates lookingBack's turn)
+  behaviorUntil: number; // when to randomly roll the next behavior
 }
 
 interface FloorWorkers {
@@ -145,6 +158,29 @@ function makeWalker(index: number, total: number, now: number): WalkerState {
     lastUpdate: now,
     facingSince: now,
     clickedAt: -Infinity,
+    behavior: "walking",
+    behaviorSince: now,
+    behaviorUntil: now + randomInt(...WALK_MS_RANGE),
+  };
+}
+
+// randomly picks the walker's next idle behavior once its current one expires:
+// mostly keeps pacing, but sometimes pauses to stand facing the camera for a bit,
+// or glances back the way it came before carrying on in the same direction
+function rollBehavior(
+  now: number,
+): Pick<WalkerState, "behavior" | "behaviorSince" | "behaviorUntil"> {
+  const roll = Math.random();
+  const [behavior, range]: [Behavior, [number, number]] =
+    roll < 0.2
+      ? ["paused", PAUSE_MS_RANGE]
+      : roll < 0.35
+        ? ["lookingBack", LOOK_BACK_MS_RANGE]
+        : ["walking", WALK_MS_RANGE];
+  return {
+    behavior,
+    behaviorSince: now,
+    behaviorUntil: now + randomInt(...range),
   };
 }
 
@@ -333,6 +369,16 @@ function walkFrameFor(walker: WalkerState, now: number): number {
   return WALK_FRAMES[step];
 }
 
+// plays TURN_FRAMES once (turning to glance back), then holds on the last one for
+// the rest of the lookingBack window
+function lookBackFrameFor(walker: WalkerState, now: number): number {
+  const step = Math.min(
+    Math.floor((now - walker.behaviorSince) / TURN_FRAME_MS),
+    TURN_FRAMES.length - 1,
+  );
+  return TURN_FRAMES[step];
+}
+
 // up to MAX_RENDERED_WORKERS little cats (walk-cycle sprite flipbook) that pace back
 // and forth across the floor's walkable band; no-ops on locked floors (nothing to
 // animate behind the grey overlay) or before the sprite sheet has finished loading
@@ -347,6 +393,8 @@ export function drawWorker(
   const tintIndexes = getWorkerTintIndexes(floor);
 
   state.walkers.forEach((walker, i) => {
+    if (now >= walker.behaviorUntil) Object.assign(walker, rollBehavior(now));
+
     const speed = isBoosted(floor, i, now) ? BOOSTED_WALK_SPEED : WALK_SPEED;
     // exact position never needs to be preserved (it's not persisted, and nobody
     // notices where a worker "was" after a gap) so there's no reason to cap this at
@@ -358,25 +406,50 @@ export function drawWorker(
     // letting the boundary clamp below catch any overshoot fixes that outright.
     const dtSeconds = Math.max((now - walker.lastUpdate) / 1000, 0);
     walker.lastUpdate = now;
-    walker.x += walker.direction * speed * dtSeconds;
-    if (walker.x >= FLOOR_X_MAX) {
-      walker.x = FLOOR_X_MAX;
-      if (walker.direction !== -1) walker.facingSince = now;
-      walker.direction = -1;
-    } else if (walker.x <= FLOOR_X_MIN) {
-      walker.x = FLOOR_X_MIN;
-      if (walker.direction !== 1) walker.facingSince = now;
-      walker.direction = 1;
+
+    // paused/lookingBack workers stand in place — only actively walking ones move
+    // or can hit a wall and reverse
+    if (walker.behavior === "walking") {
+      walker.x += walker.direction * speed * dtSeconds;
+      if (walker.x >= FLOOR_X_MAX) {
+        walker.x = FLOOR_X_MAX;
+        if (walker.direction !== -1) walker.facingSince = now;
+        walker.direction = -1;
+      } else if (walker.x <= FLOOR_X_MIN) {
+        walker.x = FLOOR_X_MIN;
+        if (walker.direction !== 1) walker.facingSince = now;
+        walker.direction = 1;
+      }
     }
 
     const clickT = Math.min((now - walker.clickedAt) / CLICK_BOUNCE_MS, 1);
     const bounce = clickT < 1 ? Math.sin(clickT * Math.PI) * 14 : 0;
-    const frame = clickT < 1 ? CLICK_FRAME : walkFrameFor(walker, now);
+
+    // the click reaction always wins; otherwise the current idle behavior picks
+    // both the frame and which way the figure actually faces on screen —
+    // lookingBack renders facing the opposite of the walker's real direction
+    // (glancing back over its shoulder) without changing where it's actually headed
+    let frame: number;
+    let renderDirection: 1 | -1;
+    if (clickT < 1) {
+      frame = CLICK_FRAME;
+      renderDirection = walker.direction;
+    } else if (walker.behavior === "paused") {
+      frame = TURN_FRAMES[0]; // neutral pose, already facing the camera
+      renderDirection = walker.direction;
+    } else if (walker.behavior === "lookingBack") {
+      frame = lookBackFrameFor(walker, now);
+      renderDirection = walker.direction === -1 ? 1 : -1;
+    } else {
+      frame = walkFrameFor(walker, now);
+      renderDirection = walker.direction;
+    }
+
     drawFigure(
       ctx,
       walker.x,
       WORKER_FEET_Y - bounce,
-      walker.direction,
+      renderDirection,
       frame,
       tintIndexes[i] ?? 0,
     );
