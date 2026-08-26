@@ -1,60 +1,48 @@
-// a distant city skyline silhouette, drawn once per frame across whatever world-x
-// range is currently visible. Deterministic per building "slot" (seeded hash, same
-// trick as ../clouds/index.ts) so the skyline never needs any stored state and always
-// redraws identically frame to frame without an rAF loop of its own.
+import { loadImage } from "../../utils";
+import cityImageUrl from "../../assets/city.png";
 
-const SLOT_W = 220; // world units per city-building slot
-const MIN_HEIGHT = 120;
-const MAX_HEIGHT = 520;
-const BUILDING_COLOR = "#7c8fb0"; // muted blue-gray silhouette, reads as atmospheric distance
-const WINDOW_COLOR = "rgba(255, 255, 255, 0.35)";
+// a rich, pre-illustrated city skyline (dusk gradient baked into the art itself),
+// tiled horizontally across whatever world-x range is currently visible. The art
+// isn't perfectly seamless edge-to-edge, but at this render size/distance and with
+// the camera constantly panning, occasional tile seams aren't noticeable — far
+// simpler than trying to chroma-key/blend the image's own smooth sky gradient.
 
-// the tallest a city building can ever be — callers clipping/culling this layer to
-// the visible viewport need this to know how far above groundY it can reach
-export const CITY_MAX_HEIGHT = MAX_HEIGHT;
+// native size of city.png
+const IMAGE_W = 1248;
+const IMAGE_H = 832;
 
-// deterministic pseudo-random in [0,1), so a given (seed, salt) always yields the
-// same building shape/window pattern across frames without keeping any array state
-function rand(seed: number, salt: number): number {
-  const x = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
-  return x - Math.floor(x);
+// how tall one tile renders, in world units — everything above this altitude is
+// the plain programmatic sky gradient (see gameCanvas's SKY_COLOR_GROUND, which is
+// matched to this image's own top-edge color so the seam between the two is as
+// close to invisible as possible)
+export const CITY_MAX_HEIGHT = 1800;
+const TILE_W = CITY_MAX_HEIGHT * (IMAGE_W / IMAGE_H);
+
+let cityImage: HTMLImageElement | null = null;
+
+// loads the skyline art once; main.ts awaits this alongside loadFloorBackgrounds
+// before the first frame ever needs to draw it
+export async function loadCityImage(): Promise<HTMLImageElement> {
+  cityImage = await loadImage(cityImageUrl);
+  return cityImage;
 }
 
-// draws every city building silhouette whose slot overlaps [visibleLeft,
-// visibleRight] (world units), each one sitting with its base at groundY and rising
-// upward (more negative world-Y) by its own random height
+// draws every tile of the skyline whose slot overlaps [visibleLeft, visibleRight]
+// (world units), each sitting with its bottom edge at groundY
 export function drawCity(
   ctx: CanvasRenderingContext2D,
   groundY: number,
   visibleLeft: number,
   visibleRight: number,
 ): void {
-  const slotMin = Math.floor(visibleLeft / SLOT_W) - 1;
-  const slotMax = Math.ceil(visibleRight / SLOT_W) + 1;
+  if (!cityImage) return;
+  const tileMin = Math.floor(visibleLeft / TILE_W) - 1;
+  const tileMax = Math.ceil(visibleRight / TILE_W) + 1;
 
-  for (let slot = slotMin; slot <= slotMax; slot++) {
-    const seed = slot * 7919; // arbitrary large prime, decorrelates neighboring slots
-    const width = SLOT_W * (0.5 + rand(seed, 1) * 0.4);
-    const height = MIN_HEIGHT + rand(seed, 2) * (MAX_HEIGHT - MIN_HEIGHT);
-    const x = slot * SLOT_W + (SLOT_W - width) / 2;
-    if (x + width < visibleLeft || x > visibleRight) continue;
-    const y = groundY - height;
-
-    ctx.fillStyle = BUILDING_COLOR;
-    ctx.fillRect(x, y, width, height);
-
-    // a handful of small lit windows, deterministic per building — most stay dark so
-    // the ones that are lit read as scattered, not a uniform grid
-    const cols = Math.max(2, Math.floor(width / 34));
-    const rows = Math.max(2, Math.floor(height / 34));
-    ctx.fillStyle = WINDOW_COLOR;
-    for (let c = 0; c < cols; c++) {
-      for (let r = 0; r < rows; r++) {
-        if (rand(seed, 10 + c * rows + r) < 0.55) continue;
-        const wx = x + 10 + c * ((width - 20) / cols);
-        const wy = y + 10 + r * ((height - 20) / rows);
-        ctx.fillRect(wx, wy, 10, 14);
-      }
-    }
+  for (let tile = tileMin; tile <= tileMax; tile++) {
+    const x = tile * TILE_W;
+    if (x + TILE_W < visibleLeft || x > visibleRight) continue;
+    ctx.drawImage(cityImage, x, groundY - CITY_MAX_HEIGHT, TILE_W, CITY_MAX_HEIGHT);
   }
 }
+

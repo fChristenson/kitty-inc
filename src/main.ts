@@ -31,7 +31,7 @@ import {
   createPopupMarkup,
   showIdlePopup,
 } from "./hud";
-import { createGameCanvas } from "./background";
+import { createGameCanvas, loadCityImage } from "./background";
 import {
   createBuilding,
   getBuildingMultiplier,
@@ -59,6 +59,7 @@ async function main() {
 
   const backgrounds = await loadFloorBackgrounds();
   await loadWorkerSprite();
+  await loadCityImage();
 
   // one Floor[] per building, laid out side by side in gameCanvas.ts's single camera
   const buildings: Floor[][] = [];
