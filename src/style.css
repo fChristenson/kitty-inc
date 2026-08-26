@@ -30,102 +30,28 @@ body {
   flex-direction: column;
 }
 
-.game__header {
-  padding: 0.75rem 1rem;
+.game__building-label {
+  flex-shrink: 0;
   text-align: center;
-  border-bottom: 1px solid #2a2f36;
+  padding-bottom: 0.5rem;
+  font-weight: 700;
+  color: #9ca3af;
 }
 
-.game__header h1 {
-  margin: 0;
-  font-size: 1.25rem;
-}
-
-.game__clouds {
-  display: block;
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: calc(100% + 2 * var(--floor-gutter));
-  margin: 0 calc(-1 * var(--floor-gutter)); /* extends across the side gutters, behind the HUD/floors */
-  height: 140px;
-  flex-shrink: 0;
-  pointer-events: none;
-}
-
-.game__hud {
-  display: block;
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: auto;
-  flex-shrink: 0;
-  z-index: 5;
-  pointer-events: none; /* let clicks/hover pass through to the building canvas beneath */
-}
-
-.game__scroll {
+.game__canvas {
+  /* the entire game — HUD, sky/clouds, every building's floors/ground, coin bursts —
+     is one canvas now (gameCanvas.ts owns its own 2D camera/scroll/hit-testing), so
+     this just needs to fill the remaining space below the building label. Its own
+     background/border make its bounds obvious against the page instead of the HUD
+     text looking like it's floating loose above an undefined canvas area */
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  /* native scroll anchoring keeps the current view stable when a new floor is
-     inserted above it, so growing the building never needs manual scrollTop math */
-  background: #6ec6ff;
-  --floor-gutter: 20px;
-  padding: 0 var(--floor-gutter); /* leaves the blue background visible on each side of the floors */
-  display: flex;
-  flex-direction: column;
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* legacy Edge/IE */
-}
-
-.game__scroll::-webkit-scrollbar {
-  display: none; /* Chrome/Safari/new Edge */
-}
-
-.game__floors {
-  position: relative; /* clouds/hud are position:sticky, which always paints above static
-    content regardless of DOM order — this puts floors in the same stacking group so
-    DOM order (floors after clouds/hud) decides it instead, keeping floors in front */
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  flex-shrink: 0;
-  margin-top: auto; /* bottom-anchor (ground floor) when the building is shorter than the viewport */
-}
-
-.game__floors canvas {
   display: block;
-  width: 100%;
-  height: auto; /* every floor's canvas shares the same FLOOR_W:FLOOR_H attrs, so this is always identical */
-  flex-shrink: 0;
-}
-
-.game__ground {
-  /* stays the last (bottom-most) child of .game__floors forever — mounted once in
-     main.ts, after every new floor which only ever gets prepended above it. Gives the
-     ground floor extra room below it so it isn't obscured by/butts right up against
-     the fixed .action-bar once scrolled all the way down */
-  flex-shrink: 0;
-  height: 110px;
-  /* extends across the side gutters .game__scroll's padding reveals (same trick as
-     .game__clouds), instead of stopping at the floor canvases' own narrower width */
-  width: calc(100% + 2 * var(--floor-gutter));
-  margin: 0 calc(-1 * var(--floor-gutter));
-  background:
-    repeating-linear-gradient(90deg, #22c55e 0 14px, #16a34a 14px 28px) top /
-      100% 22px no-repeat,
-    linear-gradient(to bottom, #8a5a2b, #6b4321);
-  border-top: 4px solid #15803d;
-}
-
-.game__coin-overlay {
-  /* covers the scroll viewport exactly (sized/positioned via JS in main.ts) so a coin
-     burst can render above every floor instead of being clipped to the floor it started on */
-  position: fixed;
-  pointer-events: none;
-  z-index: 20;
+  background: #1a2027;
+  border-radius: 0.75rem;
+  touch-action: none; /* gameCanvas.ts drives drag/scroll itself via pointer events */
+  cursor: default;
 }
 
 .game__test-controls {

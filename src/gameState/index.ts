@@ -1,6 +1,8 @@
-import type { FurnitureSprite } from "../sprites";
+import type { FurnitureSprite } from "../floors/sprites";
 
-const STORAGE_KEY = "cash-clicker:floors";
+// bumped from "cash-clicker:floors" now that this holds Floor[][] (one entry per
+// building) instead of a single Floor[] — old single-building saves just start fresh
+const STORAGE_KEY = "cash-clicker:buildings";
 
 export interface WorkerSlot {
   boosted: boolean; // whether coinFloat.ts's floating-coin animation is active on this worker
@@ -90,14 +92,15 @@ const LAST_VISIT_KEY = "cash-clicker:last-visit";
 const IDLE_INCOME_MIN_SECONDS = 1; // shorter gaps (e.g. a quick refresh) don't count as idle time — purely
 // a cheap top-level bailout, separate from each floor's own lastCollectedAt bookkeeping below
 
-// $ every unlocked floor would have earned (at its own, unboosted rate) since it last completed a
-// whole cycle, using real wall-clock time so it still counts while the tab was closed — unlike
-// performance.now(), which resets every load. A floor can't earn faster than its own interval, so
-// a gap shorter than that earns nothing *yet*: lastCollectedAt is only advanced by whole completed
-// cycles, leaving any partial progress toward the next one intact for the next call to pick up,
-// instead of a flat elapsed-time payout that ignores each floor's own rate. Must only be called
+// $ every unlocked floor across every building would have earned (at its own, unboosted
+// rate) since it last completed a whole cycle, using real wall-clock time so it still
+// counts while the tab was closed — unlike performance.now(), which resets every load.
+// A floor can't earn faster than its own interval, so a gap shorter than that earns
+// nothing *yet*: lastCollectedAt is only advanced by whole completed cycles, leaving
+// any partial progress toward the next one intact for the next call to pick up, instead
+// of a flat elapsed-time payout that ignores each floor's own rate. Must only be called
 // once per page load (also stamps "now" as the new last-visit time for the quick-refresh gate).
-export function computeIdleIncome(floors: Floor[]): number {
+export function computeIdleIncome(buildings: Floor[][]): number {
   let lastVisit: number | null = null;
   try {
     const raw = localStorage.getItem(LAST_VISIT_KEY);
@@ -118,13 +121,15 @@ export function computeIdleIncome(floors: Floor[]): number {
   if (elapsedSeconds <= IDLE_INCOME_MIN_SECONDS) return 0;
 
   let idleIncome = 0;
-  for (const floor of floors) {
-    if (!floor.unlocked) continue;
-    const elapsedForFloor = (now - floor.lastCollectedAt) / 1000;
-    const cycles = Math.floor(elapsedForFloor / floor.incomeIntervalSeconds);
-    if (cycles <= 0) continue; // not a full cycle yet — leave lastCollectedAt untouched, timer keeps running
-    floor.lastCollectedAt += cycles * floor.incomeIntervalSeconds * 1000;
-    idleIncome += cycles * floor.incomeAmount;
+  for (const floors of buildings) {
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      const elapsedForFloor = (now - floor.lastCollectedAt) / 1000;
+      const cycles = Math.floor(elapsedForFloor / floor.incomeIntervalSeconds);
+      if (cycles <= 0) continue; // not a full cycle yet — leave lastCollectedAt untouched, timer keeps running
+      floor.lastCollectedAt += cycles * floor.incomeIntervalSeconds * 1000;
+      idleIncome += cycles * floor.incomeAmount;
+    }
   }
   return idleIncome;
 }
@@ -151,7 +156,7 @@ interface SavedFloor {
   lastCollectedAt?: number; // added after initial release; older saves default to now() on load
 }
 
-export function clearFloors(): void {
+export function clearBuildings(): void {
   try {
     localStorage.removeItem(STORAGE_KEY);
   } catch {
@@ -159,8 +164,8 @@ export function clearFloors(): void {
   }
 }
 
-export function saveFloors(floors: Floor[]): void {
-  const data: SavedFloor[] = floors.map((floor) => ({
+function toSavedFloor(floor: Floor): SavedFloor {
+  return {
     furniture: floor.furniture.map((p) => ({
       spriteIndex: p.spriteIndex,
       x: p.x,
@@ -178,7 +183,13 @@ export function saveFloors(floors: Floor[]): void {
     unlockCost: floor.unlockCost,
     workerCount: floor.workerCount,
     lastCollectedAt: floor.lastCollectedAt,
-  }));
+  };
+}
+
+export function saveBuildings(buildings: Floor[][]): void {
+  const data: SavedFloor[][] = buildings.map((floors) =>
+    floors.map(toSavedFloor),
+  );
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {
@@ -188,17 +199,17 @@ export function saveFloors(floors: Floor[]): void {
 
 let pendingSave: number | null = null;
 
-// schedules saveFloors to run once the browser is idle (or after a short fallback
+// schedules saveBuildings to run once the browser is idle (or after a short fallback
 // delay on engines without requestIdleCallback, e.g. Safari) instead of serializing
-// the whole floors array + writing to localStorage synchronously inside a click
+// every building's floors + writing to localStorage synchronously inside a click
 // handler. Calls made while one is already pending are free — the next run always
-// reads the current floors array, so rapid clicks/purchases collapse into one write
+// reads the current buildings array, so rapid clicks/purchases collapse into one write
 // instead of janking a frame the user might also be mid-scroll on.
-export function schedulePersist(floors: Floor[]): void {
+export function schedulePersist(buildings: Floor[][]): void {
   if (pendingSave !== null) return;
   const run = () => {
     pendingSave = null;
-    saveFloors(floors);
+    saveBuildings(buildings);
   };
   if (typeof requestIdleCallback === "function") {
     pendingSave = requestIdleCallback(run, { timeout: 1000 });
@@ -207,9 +218,39 @@ export function schedulePersist(floors: Floor[]): void {
   }
 }
 
-// rebuilds Floor[] from localStorage, resolving each placement's sprite image by index;
-// returns [] if nothing is saved, storage is unreadable, or a referenced sprite no longer exists
-export function loadFloors(sprites: FurnitureSprite[]): Floor[] {
+function fromSavedFloor(sf: SavedFloor, sprites: FurnitureSprite[]): Floor {
+  const furniture: FurniturePosition[] = sf.furniture.map((sp) => {
+    const sprite = sprites[sp.spriteIndex];
+    if (!sprite) throw new Error(`missing sprite ${sp.spriteIndex}`);
+    return {
+      img: sprite.img,
+      spriteIndex: sp.spriteIndex,
+      x: sp.x,
+      y: sp.y,
+      w: sp.w,
+      h: sp.h,
+    };
+  });
+  const floor: Floor = {
+    furniture,
+    incomeAmount: sf.incomeAmount,
+    incomeIntervalSeconds: sf.incomeIntervalSeconds,
+    upgradeCost: sf.upgradeCost,
+    rateStep: sf.rateStep,
+    upgradeCount: sf.upgradeCount,
+    unlocked: sf.unlocked,
+    unlockCost: sf.unlockCost,
+    workerCount: sf.workerCount ?? 1,
+    lastCollectedAt: sf.lastCollectedAt ?? Date.now(),
+  };
+  workerSlots.set(floor, sf.workers);
+  return floor;
+}
+
+// rebuilds Floor[][] (one Floor[] per building) from localStorage, resolving each
+// placement's sprite image by index; returns [] if nothing is saved, storage is
+// unreadable, or a referenced sprite no longer exists
+export function loadBuildings(sprites: FurnitureSprite[]): Floor[][] {
   let raw: string | null;
   try {
     raw = localStorage.getItem(STORAGE_KEY);
@@ -219,35 +260,10 @@ export function loadFloors(sprites: FurnitureSprite[]): Floor[] {
   if (!raw) return [];
 
   try {
-    const saved: SavedFloor[] = JSON.parse(raw);
-    return saved.map((sf) => {
-      const furniture: FurniturePosition[] = sf.furniture.map((sp) => {
-        const sprite = sprites[sp.spriteIndex];
-        if (!sprite) throw new Error(`missing sprite ${sp.spriteIndex}`);
-        return {
-          img: sprite.img,
-          spriteIndex: sp.spriteIndex,
-          x: sp.x,
-          y: sp.y,
-          w: sp.w,
-          h: sp.h,
-        };
-      });
-      const floor: Floor = {
-        furniture,
-        incomeAmount: sf.incomeAmount,
-        incomeIntervalSeconds: sf.incomeIntervalSeconds,
-        upgradeCost: sf.upgradeCost,
-        rateStep: sf.rateStep,
-        upgradeCount: sf.upgradeCount,
-        unlocked: sf.unlocked,
-        unlockCost: sf.unlockCost,
-        workerCount: sf.workerCount ?? 1,
-        lastCollectedAt: sf.lastCollectedAt ?? Date.now(),
-      };
-      workerSlots.set(floor, sf.workers);
-      return floor;
-    });
+    const saved: SavedFloor[][] = JSON.parse(raw);
+    return saved.map((floors) =>
+      floors.map((sf) => fromSavedFloor(sf, sprites)),
+    );
   } catch {
     return [];
   }

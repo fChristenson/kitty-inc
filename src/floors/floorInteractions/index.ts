@@ -1,15 +1,15 @@
 import { hitTestWorker, clickWorker, getWorkerCenter } from "../worker";
-import { hitTestUpgradeButton, getButtonCenter } from "../floors/upgradeButton";
-import { increaseIncomeRate } from "../floors/incomePanel";
-import { spendTotalIncome, getTotalIncome } from "../totalIncome";
-import { spawnCoinBurst } from "../floors/coins";
-import { spawnFloatingCoins } from "../floors/coinFloat";
+import { hitTestUpgradeButton, getButtonCenter } from "../upgradeButton";
+import { increaseIncomeRate } from "../incomePanel";
+import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
+import { spawnCoinBurst } from "../coins";
+import { spawnFloatingCoins } from "../coinFloat";
 import {
   hitTestFloorLock,
   unlockFloor,
   ensureLockedFloorAbove,
 } from "../floorLock";
-import { activateBoosted, type Floor } from "../gameState";
+import { activateBoosted, type Floor } from "../../gameState";
 import type { FurnitureSprite } from "../sprites";
 
 export interface FloorActionsDeps {

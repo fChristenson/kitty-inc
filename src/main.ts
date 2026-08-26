@@ -1,30 +1,34 @@
 import "./style.css";
-import { FLOOR_W, loadFloorBackground } from "./floors";
-import { loadFurnitureSprites } from "./sprites";
+import { loadFloorBackground } from "./floors";
+import { loadFurnitureSprites } from "./floors/sprites";
 import {
   createTestButtonMarkup,
   wireTestButton,
   wireResetButton,
-  addFloor,
-} from "./testButton";
-import { startIncomeTicker } from "./incomePanel";
+} from "./hud/testButton";
+import { startIncomeTicker } from "./floors/incomePanel";
 import { startTotalIncomeTicker, addTotalIncome } from "./totalIncome";
-import { HUD_H } from "./hud";
 import {
-  saveFloors,
+  saveBuildings,
   schedulePersist,
-  loadFloors,
+  loadBuildings,
   computeIdleIncome,
   type Floor,
 } from "./gameState";
-import { ensureLockedFloorAbove } from "./floorLock";
-import { createActionBarMarkup, wireActionBar } from "./actionBar";
-import { createWorkerMenuMarkup, wireWorkerMenu } from "./workerMenu";
-import { createBoostMenuMarkup, wireBoostMenu } from "./boostMenu";
-import { createBadgesMarkup, wireBadgesMenu } from "./badges";
-import { createPopupMarkup, showIdlePopup } from "./popup";
-import { createGameRenderer } from "./gameRenderer";
-import { createFloorInteractions } from "./floorInteractions";
+import { ensureLockedFloorAbove } from "./floors/floorLock";
+import { createActionBarMarkup, wireActionBar } from "./hud/actionBar";
+import { createWorkerMenuMarkup, wireWorkerMenu } from "./hud/workerMenu";
+import { createBoostMenuMarkup, wireBoostMenu } from "./hud/boostMenu";
+import {
+  createBadgesMarkup,
+  wireBadgesMenu,
+  getBoughtBadgeCount,
+  clearBadges,
+  BADGE_COUNT,
+} from "./hud/badges";
+import { createPopupMarkup, showIdlePopup } from "./hud/popup";
+import { createGameCanvas } from "./background/gameCanvas";
+import { createBuilding, getBuildingMultiplier } from "./buildings";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -32,17 +36,10 @@ async function main() {
 
   app.innerHTML = `
     <div class="game">
-      <header class="game__header">
-        <h1>Skyscraper Clicker</h1>
-      </header>
-      <div class="game__scroll" id="scroll">
-        <canvas class="game__clouds" id="clouds"></canvas>
-        <canvas class="game__hud" id="hud"></canvas>
-        <div class="game__floors" id="floors"></div>
-      </div>
+      <div class="game__building-label" id="building-label"></div>
+      <canvas class="game__canvas" id="game-canvas"></canvas>
       ${createTestButtonMarkup()}
     </div>
-    <canvas class="game__coin-overlay" id="coin-overlay"></canvas>
     ${createActionBarMarkup()}
     ${createWorkerMenuMarkup()}
     ${createBoostMenuMarkup()}
@@ -50,112 +47,88 @@ async function main() {
     ${createPopupMarkup()}
   `;
 
-  const hudCanvas = app.querySelector<HTMLCanvasElement>("#hud")!;
-  const hudCtx = hudCanvas.getContext("2d")!;
-  hudCanvas.width = FLOOR_W;
-  hudCanvas.height = HUD_H;
-  const cloudsCanvas = app.querySelector<HTMLCanvasElement>("#clouds")!;
-  const cloudsCtx = cloudsCanvas.getContext("2d")!;
-  cloudsCanvas.width = 960;
-  cloudsCanvas.height = 280;
-  const scrollEl = app.querySelector<HTMLDivElement>("#scroll")!;
-  const floorsEl = app.querySelector<HTMLDivElement>("#floors")!;
-  const coinOverlayCanvas =
-    app.querySelector<HTMLCanvasElement>("#coin-overlay")!;
-  const coinOverlayCtx = coinOverlayCanvas.getContext("2d")!;
-
-  // keeps the overlay canvas's CSS box exactly matching the scroll viewport, so
-  // floor-local coin-burst coordinates can be mapped straight into it
-  function syncCoinOverlayBounds() {
-    const rect = scrollEl.getBoundingClientRect();
-    coinOverlayCanvas.style.left = `${rect.left}px`;
-    coinOverlayCanvas.style.top = `${rect.top}px`;
-    coinOverlayCanvas.style.width = `${rect.width}px`;
-    coinOverlayCanvas.style.height = `${rect.height}px`;
-    const dpr = window.devicePixelRatio || 1;
-    coinOverlayCanvas.width = rect.width * dpr;
-    coinOverlayCanvas.height = rect.height * dpr;
-    coinOverlayCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  syncCoinOverlayBounds();
-  window.addEventListener("resize", syncCoinOverlayBounds);
+  const buildingLabelEl = app.querySelector<HTMLDivElement>("#building-label")!;
+  const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
 
   const [bgImage, furnitureSprites] = await Promise.all([
     loadFloorBackground(),
     loadFurnitureSprites(),
   ]);
 
-  const floors: Floor[] = [];
-  // every floor is a real, fixed-size (FLOOR_W x FLOOR_H) DOM canvas — one draw
-  // target per floor, positioned by normal document flow. No shared canvas, no
-  // manual spacer/offset math: the browser's own scrolling does all the work.
-  const floorCanvases = new WeakMap<Floor, HTMLCanvasElement>();
-  let hoveredFloor: Floor | null = null;
+  // one Floor[] per building, laid out side by side in gameCanvas.ts's single camera
+  const buildings: Floor[][] = [];
 
   function persist() {
     // debounced/idle-scheduled so a click mid-scroll doesn't synchronously serialize
-    // the whole floors array + hit localStorage on the same frame (see gameState.ts)
-    schedulePersist(floors);
+    // every building's floors + hit localStorage on the same frame (see gameState.ts)
+    schedulePersist(buildings);
   }
 
-  const renderer = createGameRenderer({
+  function setActiveBuilding(index: number): void {
+    buildingLabelEl.textContent = `Skyscraper ${index + 1}`;
+  }
+
+  const gameCanvas = createGameCanvas({
+    canvas,
     bgImage,
-    floors,
-    floorCanvases,
-    scrollEl,
-    hudCanvas,
-    hudCtx,
-    cloudsCanvas,
-    cloudsCtx,
-    coinOverlayCanvas,
-    coinOverlayCtx,
-    getHoveredFloor: () => hoveredFloor,
+    furnitureSprites,
+    buildings,
+    getBuildingMultiplier,
+    persist,
+    onActiveBuildingChange: setActiveBuilding,
   });
 
-  const { mountFloor } = createFloorInteractions({
-    floorsEl,
-    floors,
-    floorCanvases,
-    furnitureSprites,
-    persist,
-    renderer,
-    setHoveredFloor: (floor) => {
-      hoveredFloor = floor;
-    },
-    getHoveredFloor: () => hoveredFloor,
-  });
+  // registers a building's floors with gameCanvas.ts (existing ones if restored,
+  // otherwise just the fresh ground floor already in buildings[buildingIndex]), then
+  // ensures its next locked floor is waiting above it
+  function setupBuilding(buildingIndex: number): void {
+    gameCanvas.addBuilding();
+    ensureLockedFloorAbove({
+      floors: buildings[buildingIndex],
+      sprites: furnitureSprites,
+      multiplier: getBuildingMultiplier(buildingIndex),
+      onAdd: (floor) => gameCanvas.notifyFloorAdded(buildingIndex, floor),
+    });
+  }
+
+  // buildings.ts: once every badge is bought, a new building spawns with a locked
+  // ground floor at a 1000x-richer economy than the previous one, and the badge set
+  // resets so it's a fresh (equally meaningful) goal again toward the *next* building —
+  // checked both right after startup (in case badges were already maxed from a
+  // previous session) and after every badge purchase
+  function spawnBuildingIfNeeded(): void {
+    if (getBoughtBadgeCount() < BADGE_COUNT) return;
+    const buildingIndex = buildings.length;
+    const floors = createBuilding(furnitureSprites, buildingIndex);
+    buildings.push(floors);
+    setupBuilding(buildingIndex);
+    clearBadges();
+    persist();
+  }
 
   wireTestButton(app, () => {
-    addTotalIncome(1e14);
-    renderer.redrawAll();
+    // absurdly large: comfortably covers buying every badge in one go (the priciest,
+    // 20th, alone costs ~$1e25) plus the second building's 1000x-richer economy
+    addTotalIncome(1e30);
   });
-  wireResetButton(app, floors);
+  wireResetButton(app, buildings);
   const workerMenu = wireWorkerMenu(
     app,
-    () => floors,
-    () => {
-      persist();
-      renderer.redrawAll();
-    },
+    () => buildings[gameCanvas.getActiveBuildingIndex()] ?? [],
+    () => persist(),
   );
   const boostMenu = wireBoostMenu(
     app,
-    () => floors,
-    () => {
-      persist();
-      renderer.redrawAll();
-    },
+    () => buildings[gameCanvas.getActiveBuildingIndex()] ?? [],
+    () => persist(),
   );
-  // badges have no gameplay effect and persist themselves (buyNextBadge saves its own
-  // localStorage key), so there's nothing else here that needs to persist/redraw
-  const badgesMenu = wireBadgesMenu(app, () => {});
+  // badges have no gameplay effect of their own beyond potentially spawning a building
+  // (and persist themselves via their own localStorage key otherwise), so this is the
+  // only reaction needed to a purchase
+  const badgesMenu = wireBadgesMenu(app, spawnBuildingIfNeeded);
   wireActionBar(app, {
-    onScrollTop: () => {
-      scrollEl.scrollTop = 0;
-    },
-    onScrollBottom: () => {
-      scrollEl.scrollTop = scrollEl.scrollHeight;
-    },
+    onScrollTop: () => gameCanvas.scrollActiveToTop(),
+    onScrollBottom: () => gameCanvas.scrollActiveToBottom(),
     onBoostAll: () => {
       boostMenu.open();
     },
@@ -167,57 +140,46 @@ async function main() {
     },
   });
 
-  const restored = loadFloors(furnitureSprites);
-  if (restored.length > 0) {
-    floors.push(...restored);
-    // floors[] is ground-first; mount newest-first so DOM order (and thus the visual
-    // top-to-bottom stack) puts the newest/highest floor at the top, ground at the bottom
-    for (let i = floors.length - 1; i >= 0; i--) {
-      mountFloor(floors[i], "append");
-    }
+  const restoredBuildings = loadBuildings(furnitureSprites);
+  if (restoredBuildings.length > 0) {
+    restoredBuildings.forEach((floors, i) => {
+      buildings.push(floors);
+      setupBuilding(i);
+    });
   } else {
-    addFloor({
-      floors,
-      sprites: furnitureSprites,
-      onAdd: (floor) => mountFloor(floor, "append"),
-    }); // ground floor
-    persist();
+    const floors = createBuilding(furnitureSprites, 0);
+    buildings.push(floors);
+    setupBuilding(0);
   }
-  ensureLockedFloorAbove({
-    floors,
-    sprites: furnitureSprites,
-    onAdd: (floor) => mountFloor(floor, "prepend"),
-  });
   persist();
+  spawnBuildingIfNeeded();
+  setActiveBuilding(0);
 
-  // stays the last (bottom-most) child forever — every later floor only ever gets
-  // prepended above it, so this always remains below the ground floor
-  const groundEl = document.createElement("div");
-  groundEl.className = "game__ground";
-  floorsEl.append(groundEl);
-
-  const idleIncome = computeIdleIncome(floors);
-  // saveFloors directly (not the debounced persist()): computeIdleIncome advances each
-  // floor's lastCollectedAt in memory, and that must land before a second quick reload
-  // could otherwise re-collect the same already-paid-out idle time
-  saveFloors(floors);
+  const idleIncome = computeIdleIncome(buildings);
+  // saveBuildings directly (not the debounced persist()): computeIdleIncome advances
+  // every floor's lastCollectedAt in memory, and that must land before a second quick
+  // reload could otherwise re-collect the same already-paid-out idle time
+  saveBuildings(buildings);
   if (idleIncome > 0) {
     showIdlePopup(app, idleIncome, () => addTotalIncome(idleIncome));
   }
 
-  renderer.redrawAll();
-  scrollEl.scrollTop = scrollEl.scrollHeight; // land on the ground floor
+  gameCanvas.redraw();
 
-  startIncomeTicker(renderer.redrawAll);
-  startTotalIncomeTicker(floors);
+  // one continuous redraw loop drives every animation (workers, clouds, income bars,
+  // coin bursts) — gameCanvas.ts itself only ever draws whichever buildings/floors are
+  // actually scrolled into view, so this stays cheap no matter how many buildings exist
+  startIncomeTicker(() => gameCanvas.redraw());
+  startTotalIncomeTicker(buildings);
 
   // collectDueIncome keeps each floor's lastCollectedAt caught up to "now" as it pays out
-  // live, but that only updates the in-memory floors[] — without this, passive play (no
-  // worker/upgrade/hire clicks to trigger persist()) would never save it, so a refresh
-  // would see a stale lastCollectedAt and re-pay the whole live session as "idle" income.
-  // uses saveFloors directly (not the debounced persist()) since a pending idle callback
+  // live (in every building, not just the active one), but that only updates the
+  // in-memory buildings[] — without this, passive play (no worker/upgrade/hire clicks to
+  // trigger persist()) would never save it, so a refresh would see a stale
+  // lastCollectedAt and re-pay the whole live session as "idle" income. uses
+  // saveBuildings directly (not the debounced persist()) since a pending idle callback
   // isn't guaranteed to fire before the page actually unloads
-  window.addEventListener("beforeunload", () => saveFloors(floors));
+  window.addEventListener("beforeunload", () => saveBuildings(buildings));
 }
 
 main();

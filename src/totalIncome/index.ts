@@ -1,5 +1,5 @@
 import type { Floor } from "../gameState";
-import { collectDueIncome } from "../incomePanel";
+import { collectDueIncome } from "../floors/incomePanel";
 
 export function getTotalIncome(): number {
   return totalIncome;
@@ -50,16 +50,21 @@ function saveStoredTotal(value: number): void {
 
 let totalIncome = loadStoredTotal();
 
-// pays out each unlocked floor's income only once its fill-bar cycle actually completes,
-// instead of accruing fractional $ continuously underneath a bar that looks stepped;
-// runs its own rAF loop, independent of canvas redraws. read the total via getTotalIncome()
-export function startTotalIncomeTicker(floors: Floor[]): void {
+// pays out each unlocked floor's income (across every building) only once its fill-bar
+// cycle actually completes, instead of accruing fractional $ continuously underneath a
+// bar that looks stepped; runs its own rAF loop, independent of canvas redraws. reads
+// the same buildings array reference every tick, so a building spawned later (badges.ts)
+// is automatically included without needing to restart the ticker. read the running
+// total via getTotalIncome()
+export function startTotalIncomeTicker(buildings: Floor[][]): void {
   let lastSave = performance.now();
   const tick = () => {
     const now = performance.now();
-    for (const floor of floors) {
-      if (!floor.unlocked) continue;
-      totalIncome += collectDueIncome(floor, now);
+    for (const floors of buildings) {
+      for (const floor of floors) {
+        if (!floor.unlocked) continue;
+        totalIncome += collectDueIncome(floor, now);
+      }
     }
 
     if (now - lastSave >= SAVE_INTERVAL_MS) {
