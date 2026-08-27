@@ -25,7 +25,7 @@ export const COLOR = {
   coinHighlight: "#D9A521",
 
   // income panel track background
-  incomeTrack: "#1E293B",
+  incomeTrack: "#3D4957",
 
   // upgrade star badge
   starYellow: "#FBBF24",

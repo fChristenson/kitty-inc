@@ -92,12 +92,17 @@ export function roundRect(
   h: number,
   r: number,
 ): void {
+  // arcTo doesn't reliably clamp a radius that's too big for the rect's own w/h on
+  // its own — asks for a bigger corner than the straight edges can fit and one
+  // side silently collapses to a flat/square corner instead of a smaller rounded
+  // one. Clamping here once guarantees every corner is always well-formed.
+  const rr = Math.max(0, Math.min(r, w / 2, h / 2));
   ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
+  ctx.moveTo(x + rr, y);
+  ctx.arcTo(x + w, y, x + w, y + h, rr);
+  ctx.arcTo(x + w, y + h, x, y + h, rr);
+  ctx.arcTo(x, y + h, x, y, rr);
+  ctx.arcTo(x, y, x + w, y, rr);
   ctx.closePath();
 }
 
@@ -149,6 +154,117 @@ export function drawCartoonPanel(
   ctx.strokeStyle = COLOR.white;
   roundRect(ctx, x, y, w, h, r);
   ctx.stroke();
+}
+
+// rounded shape (see src/assets/ref.png): from the outside in, a black outline, a
+// white ring, a thin ring shaded darker from fillColor, then either a solid fill
+// (glossy=false, e.g. the income bar's dark track) or a vertical light-to-dark
+// gradient fill (glossy=true, e.g. the bar's green fill and the upgrade button) —
+// ring widths are fractions of h (ratios sampled from ref.png's own button, whose
+// rings were ~4%/7%/6% of its height) rather than fixed pixel counts, since these
+// shapes get drawn at wildly different on-screen sizes depending on camera zoom —
+// a fixed pixel width was crisp in ref.png's own resolution but shrank to an
+// indistinguishable 1px blur once scaled down to the game's actual small on-screen
+// button/bar size. radius defaults to a full pill/stadium (matches the income bar);
+// pass a smaller fixed value for a plain rounded-rectangle look (matches the
+// upgrade button, which is NOT a full pill)
+const PILL_BLACK_OUTLINE_PCT = 0.05;
+const PILL_WHITE_RING_PCT = 0.09;
+const PILL_DARK_RING_PCT = 0.07;
+
+// draws the black/white/dark-shade ring trio as three centered strokes (not fills),
+// so it can safely be layered ON TOP of content already filled inside those bounds
+// (e.g. the income bar's track + green progress fill, drawn as separate pieces then
+// wrapped in one ring afterward) without covering it up. fillColor is only used to
+// derive the innermost dark ring's shade (see ref.png: it's a darker version of
+// whatever's inside, not plain black). Returns the total inset used, so a caller
+// drawing its own inner fill can match it exactly.
+export function drawPillBorder(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  radius: number,
+  fillColor: string,
+): number {
+  const blackW = h * PILL_BLACK_OUTLINE_PCT;
+  const whiteW = h * PILL_WHITE_RING_PCT;
+  const darkW = h * PILL_DARK_RING_PCT;
+
+  const blackInset = blackW / 2;
+  roundRect(
+    ctx,
+    x + blackInset,
+    y + blackInset,
+    w - blackInset * 2,
+    h - blackInset * 2,
+    Math.max(0, radius - blackInset),
+  );
+  ctx.lineWidth = blackW;
+  ctx.strokeStyle = COLOR.black;
+  ctx.stroke();
+
+  const whiteInset = blackW + whiteW / 2;
+  roundRect(
+    ctx,
+    x + whiteInset,
+    y + whiteInset,
+    w - whiteInset * 2,
+    h - whiteInset * 2,
+    Math.max(0, radius - whiteInset),
+  );
+  ctx.lineWidth = whiteW;
+  ctx.strokeStyle = COLOR.white;
+  ctx.stroke();
+
+  const darkInset = blackW + whiteW + darkW / 2;
+  roundRect(
+    ctx,
+    x + darkInset,
+    y + darkInset,
+    w - darkInset * 2,
+    h - darkInset * 2,
+    Math.max(0, radius - darkInset),
+  );
+  ctx.lineWidth = darkW;
+  ctx.strokeStyle = shadeColor(fillColor, -0.65);
+  ctx.stroke();
+
+  return blackW + whiteW + darkW;
+}
+
+export function drawPill(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  fillColor: string,
+  border = true,
+  glossy = false,
+  radius: number = h / 2,
+): void {
+  const r = radius;
+
+  const inset = border ? drawPillBorder(ctx, x, y, w, h, r, fillColor) : 0;
+  const fx = x + inset;
+  const fy = y + inset;
+  const fw = w - inset * 2;
+  const fh = h - inset * 2;
+  // must shrink by the same inset as the border rings so its corner arc shares
+  // their center — using the un-shrunk radius here mismatched the rings' own
+  // corners and left a visible gap
+  roundRect(ctx, fx, fy, fw, fh, Math.max(0, r - inset));
+  if (glossy) {
+    const gradient = ctx.createLinearGradient(fx, fy, fx, fy + fh);
+    gradient.addColorStop(0, shadeColor(fillColor, 0.75));
+    gradient.addColorStop(1, shadeColor(fillColor, -0.15));
+    ctx.fillStyle = gradient;
+  } else {
+    ctx.fillStyle = fillColor;
+  }
+  ctx.fill();
 }
 
 // bold cartoon text: thick stroke behind a fill color, no soft shadow/blur.

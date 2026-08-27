@@ -2,10 +2,9 @@ import { FLOOR_H, DIVIDER_H } from "../constants";
 import { countBoostedWorkers, type Floor } from "../../gameState";
 import { MAX_RENDERED_WORKERS } from "../worker";
 import {
-  roundRect,
-  drawCartoonPanel,
+  drawPill,
+  drawPillBorder,
   drawCartoonText,
-  drawGlossHighlight,
   formatPrice,
   formatTime,
 } from "../../utils";
@@ -205,6 +204,7 @@ function drawFastCycleBorder(
   barY: number,
   barW: number,
   barH: number,
+  radius: number,
   now: number,
 ): void {
   const headT = (now % FAST_CYCLE_LAP_MS) / FAST_CYCLE_LAP_MS;
@@ -216,8 +216,8 @@ function drawFastCycleBorder(
     const t1 =
       headT -
       ((i - 1) / FAST_CYCLE_TAIL_SEGMENTS) * FAST_CYCLE_TAIL_LAP_FRACTION;
-    const p0 = roundedRectPerimeterPoint(barX, barY, barW, barH, 10, t0);
-    const p1 = roundedRectPerimeterPoint(barX, barY, barW, barH, 10, t1);
+    const p0 = roundedRectPerimeterPoint(barX, barY, barW, barH, radius, t0);
+    const p1 = roundedRectPerimeterPoint(barX, barY, barW, barH, radius, t1);
     const alpha = 1 - i / FAST_CYCLE_TAIL_SEGMENTS;
     ctx.beginPath();
     ctx.moveTo(p0.x, p0.y);
@@ -259,22 +259,14 @@ export function drawIncomePanel(
   const barW = (PANEL_W - 36) * 1.5;
   const barH = 60;
   const barY = y + PANEL_H / 2 - barH / 2;
-  const barRadius = 10;
+  // rounded RECTANGLE, same as the upgrade button — NOT a full pill/stadium
+  const barRadius = barH / 3;
   // roundRect needs at least 2x its own corner radius to render a well-formed shape;
   // using barH (60px) as the old minimum made the bar look paused for a noticeable
   // slice of every short cycle before it visibly started growing
   const barMinWidth = barRadius * 2;
 
-  drawCartoonPanel(
-    ctx,
-    barX,
-    barY,
-    barW,
-    barH,
-    barRadius,
-    COLOR.incomeTrack,
-    false,
-  );
+  drawPill(ctx, barX, barY, barW, barH, COLOR.incomeTrack, false, true, barRadius);
 
   // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
   let fillW = barMinWidth;
@@ -292,11 +284,11 @@ export function drawIncomePanel(
       fillW = Math.max(barMinWidth, barW * pct);
     }
   }
-  ctx.fillStyle = COLOR.moneyGreen;
-  roundRect(ctx, barX, barY, fillW, barH, barRadius);
-  ctx.fill();
-  drawGlossHighlight(ctx, barX, barY, fillW, barH, barRadius);
-  if (isFastCycle) drawFastCycleBorder(ctx, barX, barY, barW, barH, now);
+  drawPill(ctx, barX, barY, fillW, barH, COLOR.moneyGreen, false, true, barRadius);
+  // ring stroked last, on top of both fills, so it always reads as one continuous
+  // black/white/dark-green border around the whole capsule regardless of fill width
+  drawPillBorder(ctx, barX, barY, barW, barH, barRadius, COLOR.moneyGreen);
+  if (isFastCycle) drawFastCycleBorder(ctx, barX, barY, barW, barH, barRadius, now);
 
   // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
   // time, never advanced), so the rate text uses the static full-interval formatter

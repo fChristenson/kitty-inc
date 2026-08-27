@@ -1,4 +1,4 @@
-import { drawCartoonText, drawGlossyButton, formatPrice } from "../../utils";
+import { drawCartoonText, drawPill, formatPrice } from "../../utils";
 import { FLOOR_W, FLOOR_H, DIVIDER_H } from "../constants";
 import { COLOR } from "../../palette";
 import type { Floor } from "../../gameState";
@@ -90,14 +90,21 @@ export function drawUpgradeButton(
   ctx.translate(-cx, -cy);
   if (!affordable) ctx.globalAlpha = 0.5;
   else if (hovered) ctx.filter = "brightness(0.85)";
-  drawGlossyButton(
+  // rounded RECTANGLE, not a full pill — ref.png's button corners are only modestly
+  // rounded, unlike the fully-stadium-shaped income bar. Must clear the combined
+  // black+white+dark ring inset (~21% of BTN_H) with room to spare, or the
+  // innermost green fill's own radius gets clamped to 0 and its corners go square
+  // even though the outer rings are still visibly rounded
+  drawPill(
     ctx,
     x,
     y,
     BTN_W,
     BTN_H,
-    16,
     affordable ? COLOR.moneyGreen : COLOR.disabledGray,
+    true,
+    true,
+    40,
   );
 
   ctx.font = '900 48px "Fredoka", system-ui, sans-serif';
