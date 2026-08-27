@@ -237,7 +237,11 @@ export {
 } from "./worker";
 export { drawFloorNumber } from "./floorNumber";
 export { drawUpgradeStar } from "./star";
-export { drawUpgradeButton, hitTestUpgradeButton } from "./upgradeButton";
+export {
+  drawUpgradeButton,
+  hitTestUpgradeButton,
+  triggerButtonPress,
+} from "./upgradeButton";
 export {
   spawnFloatingCoins,
   drawFloatingCoins,

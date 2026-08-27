@@ -54,6 +54,20 @@ export function formatPrice(value: number): string {
   return `$${formatCompactNumber(Math.floor(Math.max(0, value)))}`;
 }
 
+// the HUD's own total-income number specifically: shown as a full, comma-separated
+// number (not compacted) for as long as it fits within 12 digits, so the player can
+// actually watch every digit tick up in real time instead of it barely moving once
+// abbreviated. Once it'd overflow past that (1e12+), falls back to the same compact
+// magnitude-suffix format formatPrice uses everywhere else, so it never runs off the
+// edge of the HUD
+export function formatTotalIncome(value: number): string {
+  const safe = Math.floor(Math.max(0, value));
+  if (safe < 1e12) {
+    return `$${safe.toLocaleString("en-US")}`;
+  }
+  return formatPrice(safe);
+}
+
 // the only way a duration/interval should be formatted anywhere in the game, e.g.
 // "00:01:30". Whole hours can grow past 24 rather than wrapping into days, so this
 // still never overflows into a giant unformatted number at long intervals. Sub-second

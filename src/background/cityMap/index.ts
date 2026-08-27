@@ -1,4 +1,4 @@
-import { loadImage, drawCartoonText, formatPrice } from "../../utils";
+import { loadImage, drawCartoonText, formatTotalIncome } from "../../utils";
 import { COLOR } from "../../palette";
 import cityMapUrl from "../../assets/city2Bg.png";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
@@ -62,6 +62,9 @@ export function createCityMapView(
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
+  // which marker (0/1/null) the pointer is currently over — an unlocked hovered
+  // marker freezes on the jump pose instead of cycling, as a "click me" hint
+  let hoveredBuilding: number | null = null;
 
   function resize(): void {
     const rect = canvas.getBoundingClientRect();
@@ -169,15 +172,24 @@ export function createCityMapView(
         ? CAT_STAND_FRAME
         : CAT_JUMP_FRAME;
 
-    // building 0: always unlocked, plays the stand/jump cycle only while it's the
-    // active building — otherwise it's just parked there standing
-    drawCatMarker(0, activeIndex === 0 ? pose : CAT_STAND_FRAME, false);
+    // building 0: always unlocked, plays the stand/jump cycle while it's the
+    // active building or currently hovered — otherwise it's just parked there
+    // standing
+    drawCatMarker(
+      0,
+      activeIndex === 0 || hoveredBuilding === 0 ? pose : CAT_STAND_FRAME,
+      false,
+    );
 
     // building 1: grayed out with its price until bought, then behaves exactly
-    // like building 0 (stand/jump while active, otherwise standing)
+    // like building 0 (stand/jump while active or hovered, otherwise standing)
     const unlocked = deps.getBuildingCount() >= 2;
     if (unlocked) {
-      drawCatMarker(1, activeIndex === 1 ? pose : CAT_STAND_FRAME, false);
+      drawCatMarker(
+        1,
+        activeIndex === 1 || hoveredBuilding === 1 ? pose : CAT_STAND_FRAME,
+        false,
+      );
     } else {
       drawCatMarker(1, CAT_STAND_FRAME, true);
       const { cx, feetY } = markerCenter(1);
@@ -201,7 +213,7 @@ export function createCityMapView(
     ctx.textBaseline = "top";
     drawCartoonText(
       ctx,
-      formatPrice(deps.getTotalIncome()),
+      formatTotalIncome(deps.getTotalIncome()),
       cssW / 2,
       20,
       COLOR.moneyGreen,
@@ -219,8 +231,11 @@ export function createCityMapView(
 
   function onPointerMove(event: PointerEvent): void {
     const p = canvasPoint(event);
-    canvas.style.cursor =
-      hitTestAnyMarker(p.x, p.y) !== null ? "pointer" : "default";
+    const hit = hitTestAnyMarker(p.x, p.y);
+    canvas.style.cursor = hit !== null ? "pointer" : "default";
+    // a locked building-1 marker doesn't get the frozen jump-pose hover treatment
+    // — that's reserved for markers you can actually travel to right now
+    hoveredBuilding = hit === 1 && deps.getBuildingCount() < 2 ? null : hit;
   }
 
   // a locked building-1 click just buys it (staying on the map so its color/price
@@ -237,7 +252,13 @@ export function createCityMapView(
     deps.onSelectBuilding(hit);
   }
 
+  function onPointerLeave(): void {
+    hoveredBuilding = null;
+    canvas.style.cursor = "default";
+  }
+
   canvas.addEventListener("pointermove", onPointerMove);
+  canvas.addEventListener("pointerleave", onPointerLeave);
   canvas.addEventListener("click", onClick);
 
   const resizeObserver = new ResizeObserver(() => {
@@ -258,6 +279,7 @@ export function createCityMapView(
 
   function destroy(): void {
     canvas.removeEventListener("pointermove", onPointerMove);
+    canvas.removeEventListener("pointerleave", onPointerLeave);
     canvas.removeEventListener("click", onClick);
     resizeObserver.disconnect();
     if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);

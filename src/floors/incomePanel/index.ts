@@ -135,6 +135,19 @@ function formatIncomeRate(floor: Floor, now: number): string {
   return `${formatPrice(amount)}/${timeText}`;
 }
 
+// static (non-ticking) variant for locked floors: shows the full interval instead of
+// counting down, since a locked floor's cycle hasn't actually started (lastCollectedAt
+// is just its creation time) — a live countdown here would just cycle forever against
+// that fixed anchor instead of ever meaning "time until payout"
+function formatStaticIncomeRate(floor: Floor, now: number): string {
+  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
+  const timeText =
+    intervalSeconds * 1000 < FAST_CYCLE_THRESHOLD_MS
+      ? "s"
+      : formatTime(intervalSeconds);
+  return `${formatPrice(amount)}/${timeText}`;
+}
+
 // walks clockwise around a rounded rect's own outline; t is a 0..1 lap fraction,
 // starting at the middle of the top edge
 function roundedRectPerimeterPoint(
@@ -282,12 +295,17 @@ export function drawIncomePanel(
   drawGlossHighlight(ctx, barX, barY, fillW, barH, barRadius);
   if (isFastCycle) drawFastCycleBorder(ctx, barX, barY, barW, barH, now);
 
+  // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
+  // time, never advanced), so the rate text uses the static full-interval formatter
+  // instead of the live countdown — still visible, just doesn't tick
   ctx.font = '900 36px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   drawCartoonText(
     ctx,
-    formatIncomeRate(floor, now),
+    floor.unlocked
+      ? formatIncomeRate(floor, now)
+      : formatStaticIncomeRate(floor, now),
     barX + barW / 2,
     barY + barH / 2 + 1,
   );

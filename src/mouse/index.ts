@@ -37,6 +37,21 @@ const RENDER_H = Math.round(RENDER_W * (524 / 603));
 // mouse darts around fast and small, so a click landing just outside its rendered
 // fur should still count rather than requiring pixel-perfect precision
 const HIT_PADDING = 24;
+// squash/stretch + a tiny full-body wiggle while actively scurrying (skipped while
+// paused, so it isn't still jittering while standing still) — the sprite is a
+// single static pose with no walk-cycle frames of its own, so without this it just
+// slides across the floor unchanged, reading as a flat image instead of a running
+// critter
+const RUN_CYCLE_MS = 150; // quicker cadence than the cats' own walk bounce — little legs
+const RUN_SQUASH_AMOUNT = 0.07;
+const RUN_BOB_HEIGHT = 2.5;
+const RUN_WIGGLE_RAD = 0.03; // small full-body shear, alternating each half-cycle
+// on top of the continuous run wiggle above, a bigger one-off squash-then-release
+// pulse plays for this long right as a dart actually starts moving (either the very
+// first dart, or resuming after any pause) — an anticipation "push off" that reads
+// as a deliberate launch instead of just sliding from a standstill into a run
+const LAUNCH_SQUASH_MS = 150;
+const LAUNCH_SQUASH_AMOUNT = 0.14;
 // the exact same feet line worker/index.ts's WORKER_FEET_Y draws the cats on (both
 // 650 * ROOM_CONTENT_SCALE, and both bottom-anchored — see drawMouse below)
 const MOUSE_Y = 650 * ROOM_CONTENT_SCALE;
@@ -51,6 +66,7 @@ interface MouseState {
   direction: 1 | -1;
   spawnedAt: number;
   pausedUntil: number; // Date.now() timestamp; holds still until then
+  moveStartedAt: number; // Date.now() this dart's movement actually began, once any pause elapses
 }
 
 let mouseImage: HTMLImageElement | null = null;
@@ -87,6 +103,10 @@ function rollNextDart(state: MouseState, now: number): void {
     Math.random() < PAUSE_CHANCE
       ? now + randomInt(MIN_PAUSE_MS, MAX_PAUSE_MS)
       : 0;
+  // if this dart starts with a pause, movement (and its launch squish) actually
+  // begins once that pause elapses, not at this roll — drawMouse resolves which of
+  // the two actually applies
+  state.moveStartedAt = now;
 }
 
 // picks a random unlocked floor and spawns the mouse on it right now, unconditionally
@@ -103,6 +123,7 @@ function spawnOn(floors: Floor[], now: number): void {
     direction: Math.random() < 0.5 ? 1 : -1,
     spawnedAt: now,
     pausedUntil: 0,
+    moveStartedAt: now, // overwritten by rollNextDart below, just satisfying the type here
   };
   rollNextDart(active, now);
 }
@@ -155,23 +176,55 @@ export function forceSpawnMouse(floors: Floor[]): void {
 // draws the mouse into this floor's own canvas, a no-op unless it's the one floor
 // currently hosting it. Bottom-anchored at MOUSE_Y (feet/paws touch the same line
 // the cats stand on), not centered on it
-export function drawMouse(ctx: CanvasRenderingContext2D, floor: Floor): void {
+export function drawMouse(
+  ctx: CanvasRenderingContext2D,
+  floor: Floor,
+  now: number,
+): void {
   if (!active || !mouseImage || active.floor !== floor) return;
   const { x } = active;
-  ctx.save();
-  if (active.direction !== ART_FACES) {
-    ctx.translate(x, MOUSE_Y);
-    ctx.scale(-1, 1);
-    ctx.drawImage(mouseImage, -RENDER_W / 2, -RENDER_H, RENDER_W, RENDER_H);
-  } else {
-    ctx.drawImage(
-      mouseImage,
-      x - RENDER_W / 2,
-      MOUSE_Y - RENDER_H,
-      RENDER_W,
-      RENDER_H,
+
+  // only wiggle while actually running — standing still mid-pause should read as
+  // a genuine pause, not a critter vibrating in place
+  let bob = 0;
+  let stretchX = 1;
+  let stretchY = 1;
+  let shear = 0;
+  if (now >= active.pausedUntil) {
+    const phase = (now % RUN_CYCLE_MS) / RUN_CYCLE_MS;
+    const lift = Math.sin(phase * Math.PI * 2); // full cycle: down, up, down, up
+    bob = -Math.abs(lift) * RUN_BOB_HEIGHT;
+    stretchX = 1 + Math.abs(lift) * RUN_SQUASH_AMOUNT;
+    stretchY = 1 - Math.abs(lift) * RUN_SQUASH_AMOUNT;
+    shear = lift * RUN_WIGGLE_RAD;
+
+    // a bigger one-off squash pulse right as this dart's movement actually began
+    // (see moveStartedAt's own comment) — a "push off" on top of the steady
+    // per-step wiggle above, not a replacement for it
+    const launchRef =
+      active.pausedUntil > 0 ? active.pausedUntil : active.moveStartedAt;
+    const launchT = Math.min(
+      Math.max((now - launchRef) / LAUNCH_SQUASH_MS, 0),
+      1,
     );
+    if (launchT < 1) {
+      const launchSquash = Math.sin(launchT * Math.PI) * LAUNCH_SQUASH_AMOUNT;
+      stretchX += launchSquash;
+      stretchY -= launchSquash;
+    }
   }
+
+  ctx.save();
+  ctx.translate(x, MOUSE_Y + bob);
+  ctx.transform(
+    active.direction !== ART_FACES ? -stretchX : stretchX,
+    0,
+    shear,
+    stretchY,
+    0,
+    0,
+  );
+  ctx.drawImage(mouseImage, -RENDER_W / 2, -RENDER_H, RENDER_W, RENDER_H);
   ctx.restore();
 }
 

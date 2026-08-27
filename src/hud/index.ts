@@ -1,4 +1,4 @@
-import { drawCartoonText, formatPrice } from "../utils";
+import { drawCartoonText, formatTotalIncome } from "../utils";
 import { COLOR } from "../palette";
 
 // floating text overlaid on top of the floors (no panel/bar), pinned via CSS sticky
@@ -20,7 +20,7 @@ export function drawHud(
   ctx.textBaseline = "middle";
   drawCartoonText(
     ctx,
-    formatPrice(totalIncome),
+    formatTotalIncome(totalIncome),
     x + w / 2,
     HUD_TOP_MARGIN + HUD_FONT_SIZE / 2,
     COLOR.moneyGreen, // shared with the income bar/upgrade button/idle popup

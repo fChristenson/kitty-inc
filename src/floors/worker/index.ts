@@ -57,6 +57,14 @@ const WALK_FRAME_MS = 260; // how long each walk-cycle frame is held on screen
 // the new direction) right after a turn hides that seam, then the walk loop resumes
 // cleanly from its own first frame instead of wherever the shared clock lands
 const TURN_FRAME_MS = 260;
+// squash-and-stretch while walking, synced to each individual step (not the full
+// L/R stride pair) so the bounce cadence matches footfalls: neutral at each foot
+// contact, stretched taller/narrower at the mid-step peak — without this the sprite
+// just slides across the floor frame-swapping in place, reading as a cardboard
+// cutout instead of a cartoon character actually moving
+const WALK_BOUNCE_MS = WALK_FRAME_MS;
+const WALK_SQUASH_AMOUNT = 0.015;
+const WALK_BOB_HEIGHT = 1;
 
 // on-screen render size of one worker; width is aspect-locked to the sprite's own
 // cell shape (see drawFigure)
@@ -333,7 +341,9 @@ function getRecoloredFrame(
 }
 
 // draws one worker's current walk-cycle/click-reaction frame at (cx, groundY), facing
-// per direction; groundY is where its feet touch down, recolored per tintIndex
+// per direction; groundY is where its feet touch down, recolored per tintIndex.
+// stretchX/stretchY (both 1 outside an active walk bounce) scale from that same
+// feet anchor, so squashing/stretching never lifts the feet off their ground line
 function drawFigure(
   ctx: CanvasRenderingContext2D,
   cx: number,
@@ -341,6 +351,8 @@ function drawFigure(
   direction: 1 | -1,
   frame: number,
   tintIndex: number,
+  stretchX: number,
+  stretchY: number,
 ): void {
   const recolored = getRecoloredFrame(frame, tintIndex);
   if (!recolored) return;
@@ -352,7 +364,7 @@ function drawFigure(
   // frame in the sheet, so it needs the opposite mirror rule to still face the
   // walker's actual direction
   const mirrored = frame === CLICK_FRAME ? direction === 1 : direction === -1;
-  ctx.scale(mirrored ? -1 : 1, 1);
+  ctx.scale(mirrored ? -stretchX : stretchX, stretchY);
   ctx.drawImage(recolored, -renderW / 2, -RENDER_H, renderW, RENDER_H);
   ctx.restore();
 }
@@ -426,6 +438,21 @@ export function drawWorker(
     const clickT = Math.min((now - walker.clickedAt) / CLICK_BOUNCE_MS, 1);
     const bounce = clickT < 1 ? Math.sin(clickT * Math.PI) * 14 : 0;
 
+    // squash/stretch + a small vertical bob, synced to each footfall; only while
+    // actually walking (not mid click-reaction, and not standing still/looking
+    // back) so idle poses stay put instead of bobbing in place
+    let walkBob = 0;
+    let stretchX = 1;
+    let stretchY = 1;
+    if (clickT >= 1 && walker.behavior === "walking") {
+      const stepPhase =
+        ((now - walker.facingSince) % WALK_BOUNCE_MS) / WALK_BOUNCE_MS;
+      const lift = Math.sin(stepPhase * Math.PI); // 0 at each footfall, 1 mid-step
+      walkBob = -lift * WALK_BOB_HEIGHT;
+      stretchX = 1 - lift * WALK_SQUASH_AMOUNT;
+      stretchY = 1 + lift * WALK_SQUASH_AMOUNT;
+    }
+
     // the click reaction always wins; otherwise the current idle behavior picks
     // both the frame and which way the figure actually faces on screen —
     // lookingBack renders facing the opposite of the walker's real direction
@@ -449,10 +476,12 @@ export function drawWorker(
     drawFigure(
       ctx,
       walker.x,
-      WORKER_FEET_Y - bounce,
+      WORKER_FEET_Y - bounce + walkBob,
       renderDirection,
       frame,
       tintIndexes[i] ?? 0,
+      stretchX,
+      stretchY,
     );
   });
 }

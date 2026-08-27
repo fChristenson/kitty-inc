@@ -1,5 +1,9 @@
 import { hitTestWorkers, clickWorker, getWorkerCenter } from "../worker";
-import { hitTestUpgradeButton, getButtonCenter } from "../upgradeButton";
+import {
+  hitTestUpgradeButton,
+  getButtonCenter,
+  triggerButtonPress,
+} from "../upgradeButton";
 import { increaseIncomeRate } from "../incomePanel";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { spawnCoinBurst } from "../coins";
@@ -74,6 +78,7 @@ export function handleFloorClick(
   ) {
     increaseIncomeRate(floor);
     persist();
+    triggerButtonPress(floor);
     const center = getButtonCenter(isGroundFloor);
     spawnCoinBurst(floor, center.x, center.y, () => {});
     return;

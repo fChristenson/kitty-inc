@@ -58,7 +58,7 @@ export function drawFloorContent(
   drawFloor(ctx, backgrounds[floor.bgIndex] ?? backgrounds[0], floor);
   drawOuterWall(ctx);
   drawWorker(ctx, floor, now);
-  drawMouse(ctx, floor);
+  drawMouse(ctx, floor, now);
   maybeSpawnFloatingCoins(floor, now);
   drawFloatingCoins(ctx, floor);
   drawFloorNumber(ctx, floorNumber, totalFloors);
@@ -66,6 +66,7 @@ export function drawFloorContent(
   drawIncomePanel(ctx, floor, isGroundFloor);
   drawUpgradeButton(
     ctx,
+    floor,
     buttonHovered,
     floor.upgradeCost,
     getTotalIncome() >= floor.upgradeCost,
