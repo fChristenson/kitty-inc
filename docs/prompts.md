@@ -32,5 +32,5 @@ Flat 2D cartoon sprite sheet, 6 evenly spaced frames in one row, a single green 
 
 # City map tile
 
-Flat 2D cartoon overworld map tile, straight-on top-down view, muted pastel palette matching the game's building interiors. Winding dotted path lines connect round node markers (small flat circles) across stylized terrain - grass, dirt paths, small hills, trees - where buildings will sit. Seamless, tileable in every direction with no visible seam, so it repeats infinitely. Flat lighting, cel-shaded, no gradients, text, logos, or people.
+Flat 2D cartoon isometric city map tile, angled 3/4 top-down view. Rows of small chunky skyscrapers and low buildings with flat roofs and simple window details, muted pastel palette matching the game's interiors. Streets connect building lots with dotted path lines and round node markers. Seamless, tileable in every direction with no visible seam so it repeats infinitely. Flat cel-shaded lighting, no text, logos, or people.
 

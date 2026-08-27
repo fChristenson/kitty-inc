@@ -218,7 +218,14 @@ export function startIncomeTicker(onFrame: () => void): void {
   if (tickerRunning) return;
   tickerRunning = true;
   const tick = () => {
-    onFrame();
+    // an uncaught throw here would skip the requestAnimationFrame call below and
+    // permanently freeze every animation this loop drives (redraw, fill bars, ...)
+    // for the rest of the page's life — one bad frame should never end the loop
+    try {
+      onFrame();
+    } catch (err) {
+      console.error(err);
+    }
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);

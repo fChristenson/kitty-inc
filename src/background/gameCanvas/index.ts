@@ -72,6 +72,11 @@ export interface GameCanvasDeps {
 
 export interface GameCanvas {
   redraw: () => void;
+  // re-measures the canvas's own CSS size; call right after un-hiding it (e.g.
+  // switching back from the city map view), since a display:none canvas can't be
+  // measured while hidden and its ResizeObserver callback fires async — too late
+  // to save the very next redraw() from dividing by its still-stale zero size
+  resize: () => void;
   // call right after pushing a new floor onto whatever's currently the active
   // building's own floors array (e.g. unlocking one live) — registers it for
   // hit-testing/coin-rect lookups
@@ -179,6 +184,16 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
 
   function clampCamera(): void {
+    // maxScrollUp() divides by scale (derived from cssW), so while the canvas
+    // measures 0x0 (hidden, e.g. behind the city map view) that division is 0/0 —
+    // NaN — and once scrollUp becomes NaN it's stuck there forever (Math.min/max
+    // with a NaN operand always returns NaN, no future clampCamera call can undo
+    // it). Skipping entirely while there's no valid size to clamp against avoids
+    // ever poisoning it in the first place
+    if (cssW <= 0 || cssH <= 0) return;
+    // belt-and-suspenders recovery: if scrollUp somehow already went NaN before this
+    // guard existed, Math.min/max can never clear it back out on their own
+    if (Number.isNaN(scrollUp)) scrollUp = 0;
     scrollUp = Math.min(Math.max(scrollUp, 0), maxScrollUp());
   }
 
@@ -311,6 +326,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
 
   function redraw(): void {
+    // the canvas measures 0x0 while hidden (e.g. the city map view is showing
+    // instead) or for a stray frame or two around a visibility toggle before its
+    // ResizeObserver catches up — every distance below this point divides by scale
+    // (derived from cssW), so drawing anything against a zero/invalid size produces
+    // non-finite coordinates and throws (e.g. inside createLinearGradient)
+    if (cssW <= 0 || cssH <= 0) return;
     updateMouse(activeFloors, Date.now());
     const dpr = window.devicePixelRatio || 1;
     ctx.save();
@@ -547,6 +568,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
 
   return {
     redraw,
+    resize,
     notifyFloorAdded,
     setActiveFloors,
     scrollActiveToTop: () => {

@@ -12,6 +12,7 @@ import {
   startTotalIncomeTicker,
   addTotalIncome,
   spendTotalIncome,
+  getTotalIncome,
 } from "./totalIncome";
 import {
   saveBuildings,
@@ -38,7 +39,13 @@ import {
   createPopupMarkup,
   showIdlePopup,
 } from "./hud";
-import { createGameCanvas, loadCityImage, loadCloudImages } from "./background";
+import {
+  createGameCanvas,
+  loadCityImage,
+  loadCloudImages,
+  loadCityMapImage,
+  createCityMapView,
+} from "./background";
 import {
   createBuilding,
   getBuildingMultiplier,
@@ -55,6 +62,7 @@ async function main() {
   app.innerHTML = `
     <div class="game">
       <canvas class="game__canvas" id="game-canvas"></canvas>
+      <canvas class="game__canvas" id="map-canvas" hidden></canvas>
       ${createActionBarMarkup()}
       ${createTestButtonMarkup()}
     </div>
@@ -65,6 +73,7 @@ async function main() {
   `;
 
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
+  const mapCanvas = app.querySelector<HTMLCanvasElement>("#map-canvas")!;
 
   // canvas text doesn't re-render on its own once a web font finishes loading (unlike
   // DOM text), so every weight the canvas draws with must be loaded before the first
@@ -84,6 +93,7 @@ async function main() {
   await loadMouseImage();
   await loadCoinImage();
   await loadFloatingCoinImage();
+  await loadCityMapImage();
 
   // one Floor[] per building; only one building is ever shown on screen at a time
   // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
@@ -169,13 +179,43 @@ async function main() {
     persist();
     return true;
   }
-  const mapMenu = wireMapMenu(
+  // the old building-picker popup is kept wired (backdrop/list still functional)
+  // but nothing opens it anymore — it's replaced by tapping the map's own cat
+  // markers (see createCityMapView below)
+  wireMapMenu(
     app,
     () => buildings.length,
     () => activeBuildingIndex,
     buyBuilding,
     goToBuilding,
   );
+  // toggles between the building canvas and the static city map canvas
+  let mapOpen = false;
+  function closeMapView(): void {
+    mapOpen = false;
+    canvas.hidden = false;
+    mapCanvas.hidden = true;
+    // both hidden canvases' ResizeObserver callbacks fire async, too late to save
+    // the very next redraw()/tick from dividing by a stale zero size
+    gameCanvas.resize();
+    gameCanvas.redraw();
+  }
+  function openMapView(): void {
+    mapOpen = true;
+    canvas.hidden = true;
+    mapCanvas.hidden = false;
+    cityMapView.refresh();
+  }
+  const cityMapView = createCityMapView(mapCanvas, {
+    getTotalIncome,
+    getBuildingCount: () => buildings.length,
+    getActiveBuildingIndex: () => activeBuildingIndex,
+    buyBuilding,
+    onSelectBuilding: (index) => {
+      goToBuilding(index);
+      closeMapView();
+    },
+  });
   wireActionBar(app, {
     onScrollTop: () => gameCanvas.scrollActiveToTop(),
     onScrollBottom: () => gameCanvas.scrollActiveToBottom(),
@@ -186,7 +226,8 @@ async function main() {
       upgradeMenu.open();
     },
     onOpenMapMenu: () => {
-      mapMenu.open();
+      if (mapOpen) closeMapView();
+      else openMapView();
     },
   });
 
@@ -206,8 +247,12 @@ async function main() {
 
   // one continuous redraw loop drives every animation (workers, clouds, income bars,
   // coin bursts) — gameCanvas.ts itself only ever draws whichever buildings/floors are
-  // actually scrolled into view, so this stays cheap no matter how many buildings exist
-  startIncomeTicker(() => gameCanvas.redraw());
+  // actually scrolled into view, so this stays cheap no matter how many buildings exist.
+  // Skipped while the map view is open: the building canvas is hidden (0x0) then, and
+  // its own redraw() math (division by its own now-zero CSS size) would throw
+  startIncomeTicker(() => {
+    if (!mapOpen) gameCanvas.redraw();
+  });
   startTotalIncomeTicker(buildings);
 
   // markAppClosed stamps "now" as the single source of truth computeIdleIncome reads

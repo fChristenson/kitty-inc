@@ -114,6 +114,10 @@ body {
   cursor: default;
 }
 
+.game__canvas[hidden] {
+  display: none; /* the [hidden] attribute's UA display:none loses to the class rule above without this */
+}
+
 .test-actions-bar {
   display: flex;
   gap: 0.5rem;
