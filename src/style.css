@@ -80,10 +80,22 @@ button {
   --color-white: #ffffff;
 }
 
+html {
+  /* this is a fixed, full-viewport app shell — nothing on the page itself should
+     ever need to scroll (the canvas does its own internal scrolling), so the
+     outer page never gets a scrollbar to begin with. Without this, a 1px
+     rounding mismatch between 100vh/100dvh (or a modal's own transient reflow)
+     could tip the page over its own height just long enough for the browser's
+     scrollbar to flash in and back out on every click */
+  overflow: hidden;
+  height: 100%;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow: hidden;
   background: var(--color-page-bg);
   color: var(--color-page-text);
   display: flex;
