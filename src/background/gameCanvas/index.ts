@@ -153,9 +153,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // same amount (it's the translate for the WHOLE floor, divider band and room
   // content together, not a separate adjustment for either)
   const FLOOR_OVERLAP = 14;
+  // nudges the whole building (every floor, independent of the ground-overlap seam
+  // fix above) up 20px, without moving the ground/street strip itself
+  const BUILDING_Y_OFFSET = -20;
   function floorWorldY(floorIndex: number): { top: number; bottom: number } {
     const bottom =
-      -floorIndex * (FLOOR_H - FLOOR_OVERLAP) + BUILDING_GROUND_OVERLAP;
+      -floorIndex * (FLOOR_H - FLOOR_OVERLAP) +
+      BUILDING_GROUND_OVERLAP +
+      BUILDING_Y_OFFSET;
     return { top: bottom - FLOOR_H, bottom };
   }
 
