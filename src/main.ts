@@ -64,7 +64,7 @@ async function main() {
       <canvas class="game__canvas" id="game-canvas"></canvas>
       <canvas class="game__canvas" id="map-canvas" hidden></canvas>
       ${createActionBarMarkup()}
-      ${createTestButtonMarkup()}
+      ${import.meta.env.MODE !== "production" ? createTestButtonMarkup() : ""}
     </div>
     ${createUpgradeMenuMarkup()}
     ${createBoostMenuMarkup()}
@@ -146,18 +146,21 @@ async function main() {
     gameCanvas.setActiveFloors(buildings[buildingIndex]);
   }
 
-  wireTestButton(app, () => {
-    // absurdly large: comfortably covers buying several buildings in one go
-    addTotalIncome(1e30);
-  });
-  wireSpawnMouseButton(app, () => {
-    forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
-  });
-  wireIdlePopupTestButton(app, () => {
-    const testAmount = 12345;
-    showIdlePopup(app, testAmount, () => addTotalIncome(testAmount));
-  });
-  wireResetButton(app, buildings);
+  // dev/test-only controls; markup is stripped entirely in production builds
+  if (import.meta.env.MODE !== "production") {
+    wireTestButton(app, () => {
+      // absurdly large: comfortably covers buying several buildings in one go
+      addTotalIncome(1e30);
+    });
+    wireSpawnMouseButton(app, () => {
+      forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
+    });
+    wireIdlePopupTestButton(app, () => {
+      const testAmount = 12345;
+      showIdlePopup(app, testAmount, () => addTotalIncome(testAmount));
+    });
+    wireResetButton(app, buildings);
+  }
   const upgradeMenu = wireUpgradeMenu(
     app,
     () => buildings[activeBuildingIndex] ?? [],

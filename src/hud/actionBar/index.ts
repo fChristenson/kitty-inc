@@ -4,56 +4,58 @@
 export function createActionBarMarkup(): string {
   return `
     <div class="action-bar" id="action-bar">
-      <button
-        class="action-bar__button"
-        id="action-bar-scroll-top"
-        aria-label="Scroll to the top floor"
-      >
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 19V5" />
-          <path d="M5 12l7-7 7 7" />
-        </svg>
-      </button>
-      <button
-        class="action-bar__button"
-        id="action-bar-scroll-bottom"
-        aria-label="Scroll to the ground floor"
-      >
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 5v14" />
-          <path d="M5 12l7 7 7-7" />
-        </svg>
-      </button>
-      <button
-        class="action-bar__button action-bar__button--boost"
-        id="action-bar-boost-all"
-        aria-label="Boost every worker"
-      >
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
-          <path d="M13 2 3 14h7l-1 8 11-14h-7z" />
-        </svg>
-      </button>
-      <button
-        class="action-bar__button action-bar__button--hire"
-        id="action-bar-hire"
-        aria-label="Open upgrades"
-      >
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 5v14" />
-          <path d="M5 12h14" />
-        </svg>
-      </button>
-      <button
-        class="action-bar__button action-bar__button--map"
-        id="action-bar-map"
-        aria-label="Open map"
-      >
-        <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z" />
-          <path d="M9 3v15" />
-          <path d="M15 6v15" />
-        </svg>
-      </button>
+      <div class="action-bar__panel">
+        <button
+          class="action-bar__button"
+          id="action-bar-scroll-top"
+          aria-label="Scroll to the top floor"
+        >
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5" />
+            <path d="M5 12l7-7 7 7" />
+          </svg>
+        </button>
+        <button
+          class="action-bar__button"
+          id="action-bar-scroll-bottom"
+          aria-label="Scroll to the ground floor"
+        >
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14" />
+            <path d="M5 12l7 7 7-7" />
+          </svg>
+        </button>
+        <button
+          class="action-bar__button action-bar__button--boost"
+          id="action-bar-boost-all"
+          aria-label="Boost every worker"
+        >
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+            <path d="M13 2 3 14h7l-1 8 11-14h-7z" />
+          </svg>
+        </button>
+        <button
+          class="action-bar__button action-bar__button--hire"
+          id="action-bar-hire"
+          aria-label="Open upgrades"
+        >
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14" />
+            <path d="M5 12h14" />
+          </svg>
+        </button>
+        <button
+          class="action-bar__button action-bar__button--map"
+          id="action-bar-map"
+          aria-label="Open map"
+        >
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z" />
+            <path d="M9 3v15" />
+            <path d="M15 6v15" />
+          </svg>
+        </button>
+      </div>
     </div>
   `;
 }

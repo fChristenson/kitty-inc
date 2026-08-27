@@ -141,6 +141,11 @@ export function createCityMapView(
   }
 
   function redraw(): void {
+    // re-measure every call instead of trusting whatever resize() last cached —
+    // otherwise a redraw sandwiched between the canvas becoming visible and its
+    // next resize() call draws against a stale size, stretching the map image
+    // for one frame until the following resize() corrects it
+    resize();
     if (cssW <= 0 || cssH <= 0) return;
     const dpr = window.devicePixelRatio || 1;
     ctx.save();
@@ -261,10 +266,7 @@ export function createCityMapView(
   canvas.addEventListener("pointerleave", onPointerLeave);
   canvas.addEventListener("click", onClick);
 
-  const resizeObserver = new ResizeObserver(() => {
-    resize();
-    redraw();
-  });
+  const resizeObserver = new ResizeObserver(() => redraw());
   resizeObserver.observe(canvas);
 
   // keeps the current-building marker's stand/jump cycle animating even though
@@ -286,10 +288,7 @@ export function createCityMapView(
   }
 
   return {
-    refresh: () => {
-      resize();
-      redraw();
-    },
+    refresh: () => redraw(),
     destroy,
   };
 }

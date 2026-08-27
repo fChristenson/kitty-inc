@@ -6,6 +6,10 @@ Symmetrical, straight-on interior room, soft semi-realistic anime background art
 
 Flat 2D cartoon mobile-game UI dialog panel, centered, straight-on. Rounded-rectangle board, thick cream-white border, warm light-wood/parchment interior fill, soft drop shadow beneath. Chunky outlines, cel-shaded, subtle top highlight and bottom shadow for a clay-like 3D look. Muted warm pastel palette. Completely blank interior — no text, numbers, buttons, icons, or logos. Isolated on plain transparent background, edge-to-edge crop, square 1:1.
 
+# Action bar
+
+Flat 2D cartoon mobile-game UI bottom action bar, straight-on, centered. Wide rounded-rectangle board floating on a plain full-width strip, thick cream-white border ring around a warm light-wood/parchment interior fill, thin dark outline at the very edge. Chunky outlines, cel-shaded, subtle top highlight and bottom shadow for a clay-like 3D look. Muted warm pastel palette matching the popup dialog panel. Completely blank interior — no buttons, icons, text, numbers, or logos. Soft drop shadow beneath the rounded board only. Isolated on plain transparent background, edge-to-edge crop, wide 5:1 aspect ratio.
+
 # Upgrade button
 
 Flat 2D glossy cartoon mobile-game UI button, centered, straight-on. Wide rounded-rectangle shape, vibrant glossy green fill, thick bold white outline. Bright glossy highlight streak across the top third, fading out by mid-button. Solid flat hard-edged offset shadow behind/below (not blurred) for a chunky pressable 3D look. Completely blank — no text, numbers, or icons. Isolated on plain transparent background, edge-to-edge crop, wide 3:1 aspect ratio.
