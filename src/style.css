@@ -341,6 +341,22 @@ body {
   transform: translateY(2px);
 }
 
+.worker-menu__item--danger {
+  background: var(--color-red);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 4px 0 0 var(--color-red-active);
+}
+
+.worker-menu__item--danger:active {
+  background: var(--color-red-active);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 2px 0 0 var(--color-red-active);
+}
+
 /* JS-triggered press bounce (see utils.ts's triggerButtonPress) — shared by every
    worker-menu__item buyable button (upgrade menu, boost menu, ...) so a purchase
    always visibly bounces even though the button's own DOM node gets replaced by a

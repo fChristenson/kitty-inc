@@ -2,6 +2,36 @@
 // building) instead of a single Floor[] — old single-building saves just start fresh
 const STORAGE_KEY = "cash-clicker:buildings";
 
+// a random per-page-load token, written to localStorage once at startup (see
+// initSessionGuard, called from main.ts) purely so every beforeunload-driven save
+// (this module's saveBuildings, totalIncome.ts's own total save) can tell whether
+// storage was wiped out from under them since load — e.g. a player using DevTools'
+// "Clear site data" to manually reset progress, then closing the tab. Without this,
+// that close would just silently re-save the still-in-memory (pre-clear) state
+// right back into localStorage, undoing the reset the player just performed.
+const SESSION_KEY = "cash-clicker:session";
+let sessionToken = "";
+
+export function initSessionGuard(): void {
+  sessionToken = String(Math.random());
+  try {
+    localStorage.setItem(SESSION_KEY, sessionToken);
+  } catch {
+    // storage unavailable: nothing to guard, but nothing to lose either
+  }
+}
+
+// false once whatever wrote the current sessionToken (this same page load) finds it
+// missing/changed in storage — a sign something external cleared it out; every
+// beforeunload persist handler should skip saving when this returns false
+export function isStorageIntact(): boolean {
+  try {
+    return localStorage.getItem(SESSION_KEY) === sessionToken;
+  } catch {
+    return true; // storage unavailable entirely isn't the "someone cleared it" case
+  }
+}
+
 export interface WorkerSlot {
   boosted: boolean; // whether coinFloat.ts's floating-coin animation is active on this worker
   boostedAt: number; // Date.now() when boosted turned on; auto-resets BOOST_DURATION_MS later

@@ -1,4 +1,4 @@
-import type { Floor } from "../gameState";
+import { isStorageIntact, type Floor } from "../gameState";
 import { collectDueIncome } from "../floors";
 
 export function getTotalIncome(): number {
@@ -79,7 +79,10 @@ export function startTotalIncomeTicker(buildings: Floor[][]): void {
     const nowPerf = performance.now();
     if (nowPerf - lastSave >= SAVE_INTERVAL_MS) {
       lastSave = nowPerf;
-      saveStoredTotal(totalIncome);
+      // same guard as the beforeunload save below — otherwise this periodic
+      // autosave would silently undo a manual localStorage clear within ~1s of
+      // it happening, even before the player gets a chance to close the tab
+      if (isStorageIntact()) saveStoredTotal(totalIncome);
     }
   }
 
@@ -88,5 +91,8 @@ export function startTotalIncomeTicker(buildings: Floor[][]): void {
     if (document.visibilityState === "visible") collectAll();
   });
 
-  window.addEventListener("beforeunload", () => saveStoredTotal(totalIncome));
+  window.addEventListener("beforeunload", () => {
+    if (!isStorageIntact()) return;
+    saveStoredTotal(totalIncome);
+  });
 }

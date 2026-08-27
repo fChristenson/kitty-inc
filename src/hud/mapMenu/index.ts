@@ -1,4 +1,5 @@
-import { getTotalIncome } from "../../totalIncome";
+import { getTotalIncome, clearTotalIncome } from "../../totalIncome";
+import { clearBuildings, type Floor } from "../../gameState";
 import { formatPrice } from "../../utils";
 import { getBuildingPrice } from "../../buildings";
 
@@ -37,6 +38,7 @@ export function wireMapMenu(
   getActiveBuildingIndex: () => number,
   buyBuilding: () => boolean,
   onSelectBuilding: (index: number) => void,
+  buildings: Floor[][],
 ): MapMenu {
   const menu = container.querySelector<HTMLDivElement>("#map-menu")!;
   const backdrop =
@@ -71,11 +73,28 @@ export function wireMapMenu(
         <span class="worker-menu__price">${formatPrice(price)}</span>
       </button>
     `;
-    list.innerHTML = buildingButtons + buyItem;
+    const resetItem = `
+      <button class="worker-menu__item worker-menu__item--danger" id="map-menu-reset-game">
+        <span>Reset Game</span>
+      </button>
+    `;
+    list.innerHTML = buildingButtons + buyItem + resetItem;
   }
 
   list.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
+    if (target.closest("#map-menu-reset-game")) {
+      if (!confirm("Reset all progress? This can't be undone.")) return;
+      // also truncate the in-memory array: main.ts's beforeunload handler persists
+      // buildings on the way out, and without this it would just re-save the stale
+      // data right after clearBuildings() removes it, undoing the reset before the
+      // reload even happens
+      buildings.length = 0;
+      clearBuildings();
+      clearTotalIncome();
+      location.reload();
+      return;
+    }
     if (target.closest("#map-menu-buy-building")) {
       const newBuildingIndex = getBuildingCount();
       if (buyBuilding()) {

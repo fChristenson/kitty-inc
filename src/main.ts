@@ -20,6 +20,8 @@ import {
   loadBuildings,
   computeIdleIncome,
   markAppClosed,
+  initSessionGuard,
+  isStorageIntact,
   type Floor,
 } from "./gameState";
 import {
@@ -58,6 +60,7 @@ import { loadMouseImage, forceSpawnMouse } from "./mouse";
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
   if (!app) throw new Error("#app not found");
+  initSessionGuard();
 
   app.innerHTML = `
     <div class="game">
@@ -191,6 +194,7 @@ async function main() {
     () => activeBuildingIndex,
     buyBuilding,
     goToBuilding,
+    buildings,
   );
   // toggles between the building canvas and the static city map canvas
   let mapOpen = false;
@@ -260,8 +264,12 @@ async function main() {
 
   // markAppClosed stamps "now" as the single source of truth computeIdleIncome reads
   // next load — saveBuildings also runs here so the freshest floor state (workerCount,
-  // upgrades, etc.) is what actually gets restored
+  // upgrades, etc.) is what actually gets restored. Skipped entirely if storage was
+  // cleared out from under this page load (see isStorageIntact) — otherwise this would
+  // just silently undo a player manually clearing their save via DevTools before
+  // closing the tab
   window.addEventListener("beforeunload", () => {
+    if (!isStorageIntact()) return;
     markAppClosed();
     saveBuildings(buildings);
   });
