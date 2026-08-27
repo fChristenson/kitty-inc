@@ -13,6 +13,20 @@ export function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+// shared DOM click-press animation (see style.css's "worker-menu-item-press"
+// keyframes) — used by every worker-menu__item buyable list button (upgrade menu,
+// boost menu, ...) so they all bounce identically. Resolves once the animation
+// finishes, so a caller can await it before replacing/re-rendering the button
+// (otherwise the button gets torn out of the DOM before the animation ever paints)
+export function triggerButtonPress(button: HTMLButtonElement): Promise<void> {
+  button.classList.remove("worker-menu__item--pressed");
+  void button.offsetWidth; // force reflow so re-adding the class restarts the animation
+  button.classList.add("worker-menu__item--pressed");
+  return new Promise((resolve) => {
+    button.addEventListener("animationend", () => resolve(), { once: true });
+  });
+}
+
 // suffix tiers for compact large-number formatting (short scale), shared by
 // formatPrice/formatTime so every number on screen scales the same way and
 // can never overflow into a giant unformatted string at big values. Short

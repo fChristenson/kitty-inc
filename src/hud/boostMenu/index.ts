@@ -1,5 +1,5 @@
 import { activateBoosted, type Floor } from "../../gameState";
-import { formatPrice } from "../../utils";
+import { formatPrice, triggerButtonPress } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { MAX_RENDERED_WORKERS } from "../../floors";
 import mouseIconUrl from "../../assets/mouse.png";
@@ -94,12 +94,13 @@ export function wireBoostMenu(
     `;
   }
 
-  list.addEventListener("click", (event) => {
+  list.addEventListener("click", async (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
       "#boost-menu-speed-up",
     );
     if (!button) return;
     if (buyBoostAll(getFloors())) {
+      await triggerButtonPress(button);
       onPurchase();
       render();
     }

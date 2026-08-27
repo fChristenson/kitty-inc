@@ -1,5 +1,5 @@
 import type { Floor } from "../../gameState";
-import { formatPrice } from "../../utils";
+import { formatPrice, triggerButtonPress } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { MAX_RENDERED_WORKERS } from "../../floors";
 import kittyIconUrl from "../../assets/kittyIcon.png";
@@ -85,7 +85,7 @@ export function wireUpgradeMenu(
     list.innerHTML = floorItems;
   }
 
-  list.addEventListener("click", (event) => {
+  list.addEventListener("click", async (event) => {
     const target = event.target as HTMLElement;
     const button = target.closest<HTMLButtonElement>(
       "button[data-floor-index]",
@@ -93,6 +93,7 @@ export function wireUpgradeMenu(
     if (!button) return;
     const floor = getFloors()[Number(button.dataset.floorIndex)];
     if (floor && floor.unlocked && buyWorker(floor)) {
+      await triggerButtonPress(button);
       onPurchase();
       render();
     }
