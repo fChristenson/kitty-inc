@@ -256,6 +256,19 @@ export function clickWorker(
   return true;
 }
 
+// starts every unlocked floor's every worker's own click-bounce/jump animation at
+// once, ignoring each worker's individual click cooldown — used for building-wide
+// celebrations (e.g. clicking the free-boost mouse) rather than a single click on
+// one specific worker
+export function triggerJumpAll(floors: Floor[], now: number): void {
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    for (const walker of getFloorWorkers(floor, now).walkers) {
+      walker.clickedAt = now;
+    }
+  }
+}
+
 // on-screen (floor-local) center of one of a floor's workers, for aiming a coin burst
 // at it; null if it hasn't been drawn yet (shouldn't happen once unlocked)
 export function getWorkerCenter(

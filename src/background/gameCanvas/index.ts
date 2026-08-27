@@ -22,10 +22,11 @@ import type { Floor } from "../../gameState";
 
 // one building's on-screen slot: a GUTTER_W margin on each side of its floor room art
 // (blue sky/ground bleeds through, matching the old CSS `--floor-gutter` padding), so
-// buildings don't butt edge-to-edge against each other or the canvas. Wide enough that
-// the sky/clouds flanking a building read as a real, continuous background instead of
-// a thin sliver squeezed against the room art
-const GUTTER_W = 280;
+// buildings don't butt edge-to-edge against each other or the canvas. Shrunk from an
+// original 280 down to 100 so the building itself fills more of the fixed-width
+// viewport (see floors/constants.ts's GROUND_H comment for how the street's own
+// on-screen size is kept from growing along with it)
+const GUTTER_W = 100;
 const SLOT_W = FLOOR_W + GUTTER_W * 2;
 
 // clouds only appear at/above this floor's altitude — nothing but clear blue sky

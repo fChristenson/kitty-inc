@@ -4,6 +4,7 @@ import {
   ROOM_CONTENT_SCALE,
   WALK_SPEED,
   spawnCoinBurst,
+  triggerJumpAll,
 } from "../floors";
 import { loadImage, randomInt } from "../utils";
 import { applyBoostAll } from "../hud";
@@ -240,11 +241,13 @@ export function hitTestMouse(x: number, y: number, floor: Floor): boolean {
 }
 
 // if the click actually landed on the mouse, it disappears (with the same coin-burst
-// pop every other click reward gets) and every worker in the (whole) building gets a
-// free boost. This never blocks the caller's own click handling for anything else
-// under the same point (e.g. an overlapping cat) — a click hitting both the mouse
-// and a worker triggers both, same as clicking overlapping cats already hits every
-// one of them
+// pop every other click reward gets), every worker in the (whole) building gets a
+// free boost, and every one of those workers also plays its click-bounce/jump
+// animation right away (a building-wide "yay!" instead of just the boost itself).
+// This never blocks the caller's own click handling for anything else under the
+// same point (e.g. an overlapping cat) — a click hitting both the mouse and a
+// worker triggers both, same as clicking overlapping cats already hits every one of
+// them
 export function handleMouseClick(
   x: number,
   y: number,
@@ -253,7 +256,9 @@ export function handleMouseClick(
 ): void {
   if (!hitTestMouse(x, y, floor)) return;
   const burstX = active!.x;
-  despawn(Date.now());
+  const now = Date.now();
+  despawn(now);
   applyBoostAll(floors);
+  triggerJumpAll(floors, now);
   spawnCoinBurst(floor, burstX, MOUSE_Y - RENDER_H / 2, () => {});
 }

@@ -15,8 +15,12 @@ export const FLOOR_X_MAX = 1100;
 // decorative strip beneath the ground floor — rendered taller than the raw
 // ground/street.png art's native 1248x318 (see scripts/process-street.mjs) so it
 // reads at a scale proportionate to the multi-story buildings above it;
-// GROUND_TILE_W keeps the art's own aspect ratio instead of stretching it
-export const GROUND_H = 800;
+// GROUND_TILE_W keeps the art's own aspect ratio instead of stretching it. Divided
+// down from the original 800 by the same ratio gameCanvas.ts's GUTTER_W shrank
+// (280 -> 100, i.e. 1808/1448 old/new SLOT_W) so the street's own on-screen size
+// stays put even though the resulting bigger camera scale (used for everything
+// drawn in world space, ground included) makes the building itself bigger
+export const GROUND_H = 641;
 export const GROUND_TILE_W = Math.round(GROUND_H * (1248 / 318));
 
 // height of the structural floor-divider band between stories (buildings/outerWall's

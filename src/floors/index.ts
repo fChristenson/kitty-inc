@@ -232,6 +232,7 @@ export {
   drawWorker,
   getBoostedWorkerCenters,
   loadWorkerSprite,
+  triggerJumpAll,
   MAX_RENDERED_WORKERS,
   WALK_SPEED,
 } from "./worker";
