@@ -2,7 +2,6 @@ import {
   drawFloor,
   drawWorker,
   getBoostedWorkerCenters,
-  drawFloorNumber,
   drawUpgradeStar,
   drawIncomePanel,
   drawUpgradeButton,
@@ -46,11 +45,10 @@ export function drawFloorContent(
     backgrounds: HTMLImageElement[];
     floor: Floor;
     floorNumber: number;
-    totalFloors: number;
     buttonHovered: boolean; // cursor is specifically over this floor's upgrade button
   },
 ): void {
-  const { backgrounds, floor, floorNumber, totalFloors, buttonHovered } = deps;
+  const { backgrounds, floor, floorNumber, buttonHovered } = deps;
   // Date.now()-based (not performance.now()) so drawWorker/maybeSpawnFloatingCoins's
   // boost checks match incomePanel.ts's persisted, Date.now()-based boost timestamps
   const now = Date.now();
@@ -61,7 +59,6 @@ export function drawFloorContent(
   drawMouse(ctx, floor, now);
   maybeSpawnFloatingCoins(floor, now);
   drawFloatingCoins(ctx, floor);
-  drawFloorNumber(ctx, floorNumber, totalFloors);
   drawUpgradeStar(ctx, floor);
   drawIncomePanel(ctx, floor, isGroundFloor);
   drawUpgradeButton(

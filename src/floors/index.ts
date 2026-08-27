@@ -235,8 +235,7 @@ export {
   MAX_RENDERED_WORKERS,
   WALK_SPEED,
 } from "./worker";
-export { drawFloorNumber } from "./floorNumber";
-export { drawUpgradeStar } from "./star";
+export { drawUpgradeStar, getUpgradeIndicatorCenter } from "./star";
 export {
   drawUpgradeButton,
   hitTestUpgradeButton,

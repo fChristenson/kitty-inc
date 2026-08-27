@@ -35,6 +35,9 @@ const MIN_INCOME_INTERVAL_SECONDS = 0.1;
 // forces the player to wait more than this long between payouts
 const MAX_INCOME_INTERVAL_SECONDS = 3600;
 const UPGRADES_PER_INTERVAL_HALVING = 10;
+// upgradeCount hitting a multiple of this is also the "next ten levels" milestone
+// floorInteractions.ts celebrates with an extra coin burst at the upgrade indicator
+export const UPGRADE_MILESTONE_STEP = UPGRADES_PER_INTERVAL_HALVING;
 
 // below this, the fill cycle repeats too fast to read as a filling bar, so the bar is
 // just shown full and an orbiting dot (fixed speed, independent of the real interval)

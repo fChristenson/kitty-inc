@@ -1,5 +1,5 @@
 import { FLOOR_W } from "../../floors";
-import { loadImage } from "../../utils";
+import { loadImage, drawCartoonText } from "../../utils";
 import roofImageUrl from "../../assets/roof.png";
 
 // native size of the processed roof.png (see scripts/process-roof.mjs) — width
@@ -20,10 +20,26 @@ export async function loadRoofImage(): Promise<HTMLImageElement> {
   return roofImage;
 }
 
-// draws the roof cap directly above the topmost floor's own top edge; call from
-// inside the same translated block gameCanvas.ts already draws that floor's own
-// content in, so (0, 0) here is already that floor's own top-left corner
-export function drawRoof(ctx: CanvasRenderingContext2D): void {
+// draws the roof cap (+ the building's total floor count, centered on it) directly
+// above the topmost floor's own top edge; call from inside the same translated
+// block gameCanvas.ts already draws that floor's own content in, so (0, 0) here is
+// already that floor's own top-left corner
+export function drawRoof(
+  ctx: CanvasRenderingContext2D,
+  totalFloors: number,
+): void {
   if (!roofImage) return;
-  ctx.drawImage(roofImage, 0, -ROOF_H + ROOF_OVERLAP, FLOOR_W, ROOF_H);
+  const topY = -ROOF_H + ROOF_OVERLAP;
+  ctx.drawImage(roofImage, 0, topY, FLOOR_W, ROOF_H);
+
+  // sits on the thin ledge band near the bottom of the roof cap, just above the wall
+  ctx.font = '900 100px "Fredoka", system-ui, sans-serif';
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  drawCartoonText(
+    ctx,
+    `${totalFloors} floors`,
+    FLOOR_W / 2,
+    topY + ROOF_H - 465,
+  );
 }

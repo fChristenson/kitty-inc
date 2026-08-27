@@ -1,79 +1,48 @@
 import type { Floor } from "../../gameState";
 import { drawCartoonText } from "../../utils";
-import { COLOR } from "../../palette";
 
-// sits directly under floorNumber.ts's "N / total" label, same left margin, nudged
-// 20px right/down
-const MARGIN = 44;
-// horizontal-only nudge, another 40px right of MARGIN (vertical position unchanged)
-const MARGIN_X = MARGIN + 40;
-// vertical-only nudge, another 20px down from MARGIN (horizontal position unchanged)
-const MARGIN_Y = MARGIN + 20;
-export const STAR_Y = MARGIN_Y + 90;
-export const STAR_RADIUS = 26;
+// mirrors buildings/outerWall's own SIDE_WALL_WIDTH (WALL_WIDTH*2) — duplicated
+// locally instead of imported to avoid a floors<->buildings circular import
+const LEFT_WALL_WIDTH = 56;
+// inside the room, top-left corner: 40px right of the left outer wall's inner edge
+const MARGIN_X = LEFT_WALL_WIDTH + 40;
+const MARGIN_Y = 44 + 20;
+export const STAR_Y = MARGIN_Y;
+const FONT = '900 54px "Fredoka", system-ui, sans-serif';
 
-function starPath(
-  ctx: CanvasRenderingContext2D,
-  cx: number,
-  cy: number,
-  outerRadius: number,
-  innerRadius: number,
-): void {
-  const points = 5;
-  ctx.beginPath();
-  for (let i = 0; i < points * 2; i++) {
-    const radius = i % 2 === 0 ? outerRadius : innerRadius;
-    const angle = (Math.PI / points) * i - Math.PI / 2;
-    const x = cx + radius * Math.cos(angle);
-    const y = cy + radius * Math.sin(angle);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  }
-  ctx.closePath();
+function labelText(floor: Floor): string {
+  return `Lvl ${floor.upgradeCount}`;
 }
 
-// shows a star + how many upgrades this floor has bought, drawn just below the floor number
+// throwaway canvas just for measureText — floorInteractions.ts needs the label's
+// real width to aim a coin burst at its center, but has no live ctx of its own
+let measureCtx: CanvasRenderingContext2D | null = null;
+function labelWidth(floor: Floor): number {
+  measureCtx ??= document.createElement("canvas").getContext("2d")!;
+  measureCtx.font = FONT;
+  return measureCtx.measureText(labelText(floor)).width;
+}
+
+// floor-local center of the indicator (accounting for the label's own text width),
+// for aiming a coin-burst celebration at it
+export function getUpgradeIndicatorCenter(floor: Floor): {
+  x: number;
+  y: number;
+} {
+  return { x: MARGIN_X + labelWidth(floor) / 2, y: STAR_Y };
+}
+
+// shows a "Lvl N" label for how many upgrades this floor has bought, drawn at the
+// room's inside top-left corner
 export function drawUpgradeStar(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
 ): void {
-  const cx = MARGIN_X + STAR_RADIUS;
+  const cx = MARGIN_X;
   const cy = STAR_Y;
 
-  starPath(ctx, cx, cy, STAR_RADIUS, STAR_RADIUS * 0.45);
-  ctx.fillStyle = COLOR.starYellow;
-  ctx.fill();
-
-  // glossy highlight, clipped to the star's own path (mirrors drawGlossHighlight in utils.ts,
-  // which only works on rounded rects) so the icon reads shiny like every other cartoon shape
-  ctx.save();
-  starPath(ctx, cx, cy, STAR_RADIUS, STAR_RADIUS * 0.45);
-  ctx.clip();
-  const gloss = ctx.createLinearGradient(
-    cx,
-    cy - STAR_RADIUS,
-    cx,
-    cy + STAR_RADIUS,
-  );
-  gloss.addColorStop(0, "rgba(255, 255, 255, 0.65)");
-  gloss.addColorStop(0.45, "rgba(255, 255, 255, 0.15)");
-  gloss.addColorStop(1, "rgba(255, 255, 255, 0)");
-  ctx.fillStyle = gloss;
-  ctx.fillRect(
-    cx - STAR_RADIUS,
-    cy - STAR_RADIUS,
-    STAR_RADIUS * 2,
-    STAR_RADIUS * 2,
-  );
-  ctx.restore();
-
-  ctx.lineWidth = 4;
-  ctx.strokeStyle = COLOR.white;
-  starPath(ctx, cx, cy, STAR_RADIUS, STAR_RADIUS * 0.45);
-  ctx.stroke();
-
-  ctx.font = '900 36px "Fredoka", system-ui, sans-serif';
+  ctx.font = FONT;
   ctx.textAlign = "left";
-  ctx.textBaseline = "middle";
-  drawCartoonText(ctx, `${floor.upgradeCount}`, cx + STAR_RADIUS + 14, cy + 1);
+  ctx.textBaseline = "top";
+  drawCartoonText(ctx, labelText(floor), cx, cy);
 }

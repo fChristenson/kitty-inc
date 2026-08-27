@@ -4,10 +4,11 @@ import {
   getButtonCenter,
   triggerButtonPress,
 } from "../upgradeButton";
-import { increaseIncomeRate } from "../incomePanel";
+import { increaseIncomeRate, UPGRADE_MILESTONE_STEP } from "../incomePanel";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
+import { getUpgradeIndicatorCenter } from "../star";
 import {
   hitTestFloorLock,
   unlockFloor,
@@ -81,6 +82,12 @@ export function handleFloorClick(
     triggerButtonPress(floor);
     const center = getButtonCenter(isGroundFloor);
     spawnCoinBurst(floor, center.x, center.y, () => {});
+    // extra celebration burst right on the upgrade indicator every 10th upgrade,
+    // same milestone that halves this floor's income interval
+    if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
+      const indicatorCenter = getUpgradeIndicatorCenter(floor);
+      spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
+    }
     return;
   }
 

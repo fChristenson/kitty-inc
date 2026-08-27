@@ -301,10 +301,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         backgrounds,
         floor: activeFloors[i],
         floorNumber: i + 1,
-        totalFloors: activeFloors.length,
         buttonHovered,
       });
-      if (i === activeFloors.length - 1) drawRoof(ctx);
+      if (i === activeFloors.length - 1) drawRoof(ctx, activeFloors.length);
       ctx.restore();
     }
   }

@@ -1,22 +1,21 @@
 import { drawCartoonText } from "../../utils";
 
-// top-left corner of each floor, no panel background, nudged 20px right/down
-const MARGIN = 44;
-// horizontal-only nudge, another 40px right of MARGIN (vertical position unchanged)
-const MARGIN_X = MARGIN + 40;
-// vertical-only nudge, another 20px down from MARGIN (horizontal position unchanged)
-const MARGIN_Y = MARGIN + 20;
+// drawn OUTSIDE the room, in the gutter left of the building's own left outer wall
+// (wall sits at floor-local x=[0, wall width), so any negative x lands in that
+// gutter) — right-aligned so its right edge sits a fixed gap before the wall
+const GAP_BEFORE_WALL = 40;
+const MARGIN_Y = 44 + 20;
 
 export function drawFloorNumber(
   ctx: CanvasRenderingContext2D,
   floorNumber: number,
   totalFloors: number,
 ): void {
-  const x = MARGIN_X;
+  const x = -GAP_BEFORE_WALL;
   const y = MARGIN_Y;
 
-  ctx.font = '900 34px "Fredoka", system-ui, sans-serif';
-  ctx.textAlign = "left";
+  ctx.font = '900 51px "Fredoka", system-ui, sans-serif';
+  ctx.textAlign = "right";
   ctx.textBaseline = "top";
   drawCartoonText(ctx, `${floorNumber} / ${totalFloors}`, x, y);
 }
