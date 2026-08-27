@@ -266,7 +266,17 @@ export function drawIncomePanel(
   // slice of every short cycle before it visibly started growing
   const barMinWidth = barRadius * 2;
 
-  drawPill(ctx, barX, barY, barW, barH, COLOR.incomeTrack, false, true, barRadius);
+  drawPill(
+    ctx,
+    barX,
+    barY,
+    barW,
+    barH,
+    COLOR.incomeTrack,
+    false,
+    true,
+    barRadius,
+  );
 
   // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
   let fillW = barMinWidth;
@@ -284,11 +294,22 @@ export function drawIncomePanel(
       fillW = Math.max(barMinWidth, barW * pct);
     }
   }
-  drawPill(ctx, barX, barY, fillW, barH, COLOR.moneyGreen, false, true, barRadius);
+  drawPill(
+    ctx,
+    barX,
+    barY,
+    fillW,
+    barH,
+    COLOR.moneyGreen,
+    false,
+    true,
+    barRadius,
+  );
   // ring stroked last, on top of both fills, so it always reads as one continuous
   // black/white/dark-green border around the whole capsule regardless of fill width
   drawPillBorder(ctx, barX, barY, barW, barH, barRadius, COLOR.moneyGreen);
-  if (isFastCycle) drawFastCycleBorder(ctx, barX, barY, barW, barH, barRadius, now);
+  if (isFastCycle)
+    drawFastCycleBorder(ctx, barX, barY, barW, barH, barRadius, now);
 
   // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
   // time, never advanced), so the rate text uses the static full-interval formatter
