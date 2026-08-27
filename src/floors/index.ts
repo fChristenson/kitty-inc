@@ -7,10 +7,20 @@ import {
   FLOOR_X_MAX,
   GROUND_H,
   GROUND_TILE_W,
+  DIVIDER_H,
+  ROOM_CONTENT_SCALE,
 } from "./constants";
 import groundImageUrl from "../assets/ground/street.png";
 
-export { FLOOR_W, FLOOR_H, FLOOR_X_MIN, FLOOR_X_MAX, GROUND_H };
+export {
+  FLOOR_W,
+  FLOOR_H,
+  FLOOR_X_MIN,
+  FLOOR_X_MAX,
+  GROUND_H,
+  DIVIDER_H,
+  ROOM_CONTENT_SCALE,
+};
 
 const BASE_INCOME_AMOUNT = 1; // ground floor's starting $/interval
 // each floor above starts at 3x the previous floor's income amount, while the interval
@@ -133,13 +143,30 @@ export function buildFloor(
 }
 
 // draws one floor slab (just its background art now — furniture is baked into bg.png);
-// ctx must already be translated so this floor's own top-left is at (0, 0)
+// ctx must already be translated so this floor's own top-left is at (0, 0). Crops
+// ROOM_CONTENT_SHIFT_UP px off the image's own top edge and draws the rest 1:1 from
+// (0,0) — i.e. the whole room shifted up by that amount, no scaling — so the room's
+// own floor-line content isn't hidden behind the taller divider band drawn below it.
+// Leaves the bottom ROOM_CONTENT_SHIFT_UP px of this floor undrawn (no clip needed:
+// the divider band that's drawn right after this always covers exactly that gap).
 export function drawFloor(
   ctx: CanvasRenderingContext2D,
   bgImage: HTMLImageElement,
   floor: Floor,
 ): void {
-  ctx.drawImage(bgImage, 0, 0, FLOOR_W, FLOOR_H);
+  // draws the FULL image, vertically compressed to fit above the divider band, so
+  // no part of the art (including ceiling detail) is ever cropped off
+  ctx.drawImage(
+    bgImage,
+    0,
+    0,
+    FLOOR_W,
+    FLOOR_H,
+    0,
+    0,
+    FLOOR_W,
+    FLOOR_H * ROOM_CONTENT_SCALE,
+  );
   void floor; // no per-floor furniture placement left to draw; kept for a stable draw signature
 }
 
@@ -194,15 +221,25 @@ export {
   drawIncomePanel,
 } from "./incomePanel";
 export { ensureLockedFloorAbove, drawFloorLock } from "./floorLock";
-export { drawCoins, hasActiveCoins } from "./coins";
+export {
+  drawCoins,
+  hasActiveCoins,
+  spawnCoinBurst,
+  loadCoinImage,
+} from "./coins";
 export { hitTestFloorHover, handleFloorClick } from "./floorInteractions";
 export {
   drawWorker,
   getBoostedWorkerCenters,
   loadWorkerSprite,
   MAX_RENDERED_WORKERS,
+  WALK_SPEED,
 } from "./worker";
 export { drawFloorNumber } from "./floorNumber";
 export { drawUpgradeStar } from "./star";
 export { drawUpgradeButton, hitTestUpgradeButton } from "./upgradeButton";
-export { spawnFloatingCoins, drawFloatingCoins } from "./coinFloat";
+export {
+  spawnFloatingCoins,
+  drawFloatingCoins,
+  loadFloatingCoinImage,
+} from "./coinFloat";

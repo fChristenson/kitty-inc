@@ -1,9 +1,16 @@
-import { randomInt } from "../../utils";
+import { loadImage, randomInt } from "../../utils";
 import type { Floor } from "../../gameState";
-import { COLOR } from "../../palette";
+import coinImageUrl from "../../assets/coin.png";
 
 // a handful of small coins that bubble straight up from a point, gently swaying,
 // and fade out — a quieter alternative to coins.ts's outward/gravity burst
+
+let coinImage: HTMLImageElement | null = null;
+
+export async function loadFloatingCoinImage(): Promise<HTMLImageElement> {
+  coinImage = await loadImage(coinImageUrl);
+  return coinImage;
+}
 
 interface FloatingCoin {
   floor: Floor; // which floor's canvas these coins belong to
@@ -37,49 +44,10 @@ export function drawFloatingCoins(
     const radius = c.size * (1 - t * 0.3);
     ctx.globalAlpha = Math.max(0, 1 - t);
 
-    // flat coin face (no directional shading, so it reads as a 2D disc, not a sphere)
-    ctx.fillStyle = COLOR.coinGold;
-    ctx.beginPath();
-    ctx.arc(c.x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.lineWidth = Math.max(1, radius * 0.16);
-    ctx.strokeStyle = COLOR.coinOutline;
-    ctx.stroke();
-
-    // embossed inner ring
-    ctx.beginPath();
-    ctx.arc(c.x, y, radius * 0.72, 0, Math.PI * 2);
-    ctx.strokeStyle = COLOR.coinHighlight;
-    ctx.lineWidth = Math.max(1, radius * 0.1);
-    ctx.stroke();
-
-    // flat gloss sheen band across the top of the disc, clipped to its circle
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(c.x, y, radius, 0, Math.PI * 2);
-    ctx.clip();
-    const gloss = ctx.createLinearGradient(c.x, y - radius, c.x, y);
-    gloss.addColorStop(0, "rgba(255, 255, 255, 0.7)");
-    gloss.addColorStop(1, "rgba(255, 255, 255, 0)");
-    ctx.fillStyle = gloss;
-    ctx.beginPath();
-    ctx.ellipse(
-      c.x,
-      y - radius * 0.35,
-      radius * 0.95,
-      radius * 0.55,
-      0,
-      0,
-      Math.PI * 2,
-    );
-    ctx.fill();
-    ctx.restore();
-
-    ctx.fillStyle = COLOR.coinOutline;
-    ctx.font = `bold ${Math.round(radius * 1.1)}px "Fredoka", system-ui, sans-serif`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("$", c.x, y + radius * 0.05);
+    if (coinImage) {
+      const size = radius * 2;
+      ctx.drawImage(coinImage, c.x - radius, y - radius, size, size);
+    }
   }
   ctx.globalAlpha = 1;
 }

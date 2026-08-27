@@ -2,6 +2,7 @@ import type { Floor } from "../../gameState";
 import { formatPrice } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { MAX_RENDERED_WORKERS } from "../../floors";
+import kittyIconUrl from "../../assets/kittyIcon.png";
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost
@@ -72,7 +73,10 @@ export function wireUpgradeMenu(
             data-floor-index="${i}"
             ${affordable ? "" : "disabled"}
           >
-            <span>Floor ${i + 1}: Add new worker x${floor.workerCount}</span>
+            <span class="worker-menu__item-label">
+              <img src="${kittyIconUrl}" class="worker-menu__icon" alt="" />
+              Floor ${i + 1}: Add worker x${floor.workerCount}
+            </span>
             <span class="worker-menu__price">${maxed ? "Max" : formatPrice(cost)}</span>
           </button>
         `;

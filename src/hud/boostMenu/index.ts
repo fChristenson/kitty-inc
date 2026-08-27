@@ -2,6 +2,7 @@ import { activateBoosted, type Floor } from "../../gameState";
 import { formatPrice } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { MAX_RENDERED_WORKERS } from "../../floors";
+import mouseIconUrl from "../../assets/mouse.png";
 
 const BOOST_ALL_SECONDS_COST = 15; // cost is 15s of current (unboosted) income
 
@@ -20,9 +21,9 @@ export function getBoostAllCost(floors: Floor[]): number {
   return currentIncomePerSecond(floors) * BOOST_ALL_SECONDS_COST;
 }
 
-// boosts every rendered worker on every unlocked floor if affordable; returns whether it succeeded
-export function buyBoostAll(floors: Floor[]): boolean {
-  if (!spendTotalIncome(getBoostAllCost(floors))) return false;
+// boosts every rendered worker on every unlocked floor — shared by the paid
+// buyBoostAll below and mouse/index.ts's free click-triggered version
+export function applyBoostAll(floors: Floor[]): void {
   // Date.now()-based (not performance.now()) so it matches incomePanel.ts's persisted,
   // Date.now()-based cycle tracking that reads the same boost state
   const now = Date.now();
@@ -33,6 +34,12 @@ export function buyBoostAll(floors: Floor[]): boolean {
       activateBoosted(floor, i, now);
     }
   }
+}
+
+// boosts every rendered worker on every unlocked floor if affordable; returns whether it succeeded
+export function buyBoostAll(floors: Floor[]): boolean {
+  if (!spendTotalIncome(getBoostAllCost(floors))) return false;
+  applyBoostAll(floors);
   return true;
 }
 
@@ -78,7 +85,10 @@ export function wireBoostMenu(
         id="boost-menu-speed-up"
         ${affordable ? "" : "disabled"}
       >
-        <span>Speed up workers (15s)</span>
+        <span class="worker-menu__item-label">
+          <img src="${mouseIconUrl}" class="worker-menu__icon" alt="" />
+          Boost workers
+        </span>
         <span class="worker-menu__price">${formatPrice(cost)}</span>
       </button>
     `;

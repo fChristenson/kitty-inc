@@ -11,6 +11,7 @@ import {
   drawFloatingCoins,
 } from "../floors";
 import { drawOuterWall } from "../buildings";
+import { drawMouse } from "../mouse";
 import { getTotalIncome } from "../totalIncome";
 import type { Floor } from "../gameState";
 
@@ -53,19 +54,22 @@ export function drawFloorContent(
   // Date.now()-based (not performance.now()) so drawWorker/maybeSpawnFloatingCoins's
   // boost checks match incomePanel.ts's persisted, Date.now()-based boost timestamps
   const now = Date.now();
+  const isGroundFloor = floorNumber === 1;
   drawFloor(ctx, backgrounds[floor.bgIndex] ?? backgrounds[0], floor);
   drawOuterWall(ctx);
   drawWorker(ctx, floor, now);
+  drawMouse(ctx, floor);
   maybeSpawnFloatingCoins(floor, now);
   drawFloatingCoins(ctx, floor);
   drawFloorNumber(ctx, floorNumber, totalFloors);
   drawUpgradeStar(ctx, floor);
-  drawIncomePanel(ctx, floor);
+  drawIncomePanel(ctx, floor, isGroundFloor);
   drawUpgradeButton(
     ctx,
     buttonHovered,
     floor.upgradeCost,
     getTotalIncome() >= floor.upgradeCost,
+    isGroundFloor,
   );
   drawFloorLock(ctx, floor);
 }

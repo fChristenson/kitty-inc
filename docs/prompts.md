@@ -18,3 +18,19 @@ Flat 2D cartoon exterior facade texture, straight-on, no perspective. Painted co
 
 Flat 2D cartoon rooftop cap, straight-on, no perspective, viewed dead-on, not from above. Low parapet ledge, same painted concrete-panel material and muted gray as the outer wall/floor divider texture, full width. Small water tank and vent pipe on top, flat cel-shaded silhouettes, no people. Soft even lighting, subtle top highlight, gentle shadow below. Transparent background above roofline, no sky, text, or logos. Edge-to-edge, wide 3:1.
 
+# Coin
+
+Flat 2D glossy cartoon coin, centered, straight-on, viewed face-on as a flat disc, not tilted or 3D. Round gold fill, thick dark-brown outline, embossed concentric inner ring near the edge. Bright glossy highlight band across the upper third, fading out by mid-coin. Bold embossed "$" centered on the face. Cel-shaded, no soft blurred shadows. Isolated on plain transparent background, edge-to-edge crop, square 1:1.
+
+# Coin spin sprite sheet
+
+Flat 2D character sheet, 8 evenly spaced frames in one row, coin centered in each. Same glossy gold cartoon coin: gold fill, dark-brown outline, embossed ring, bold "$", glossy highlight, cel-shaded. Spinning one full rotation on its vertical axis: full circle, narrowing to a thin edge-on sliver, widening to a mirrored face, narrowing again, back to full circle. No motion blur or tilt. Isolated on transparent background, no text, edge-to-edge crop, wide aspect ratio.
+
+# Cash bill flutter sprite sheet
+
+Flat 2D cartoon sprite sheet, 6 evenly spaced frames in one row, a single green cash bill (rectangular banknote, bold "$" mark, thin darker-green border lines) fluttering and tumbling through the air, each frame a different twist/curl from nearly flat to edge-on to folded. Cel-shaded, flat lighting, no gradients or motion blur. Isolated on transparent background, no gridlines, edge-to-edge crop, wide aspect ratio.
+
+# City map tile
+
+Flat 2D cartoon overworld map tile, straight-on top-down view, muted pastel palette matching the game's building interiors. Winding dotted path lines connect round node markers (small flat circles) across stylized terrain - grass, dirt paths, small hills, trees - where buildings will sit. Seamless, tileable in every direction with no visible seam, so it repeats infinitely. Flat lighting, cel-shaded, no gradients, text, logos, or people.
+

@@ -1,4 +1,4 @@
-import { FLOOR_X_MIN, FLOOR_X_MAX } from "../constants";
+import { FLOOR_X_MIN, FLOOR_X_MAX, ROOM_CONTENT_SCALE } from "../constants";
 import { isBoosted, getWorkerTintIndexes, type Floor } from "../../gameState";
 import { loadImage, randomInt } from "../../utils";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
@@ -71,11 +71,12 @@ export async function loadWorkerSprite(): Promise<HTMLImageElement> {
   return workerSprite;
 }
 
-const WALK_SPEED = 50; // px/sec
+export const WALK_SPEED = 50; // px/sec
 const BOOSTED_WALK_SPEED = WALK_SPEED * 2;
-// feet rest well above the bottom income/upgrade panels (which start at y=577) so the
-// worker is always visible walking across the open floor instead of ducking behind them
-const WORKER_FEET_Y = 650;
+// feet rest on the room art's own floor line, scaled by the same ROOM_CONTENT_SCALE
+// drawFloor compresses its art by, so the cat keeps standing on the art's actual
+// floor instead of the area now covered by the taller divider
+const WORKER_FEET_Y = 650 * ROOM_CONTENT_SCALE;
 const CLICK_BOUNCE_MS = 300; // how long the little "boing" reaction plays after a click
 const CLICK_COOLDOWN_MS = 500; // ignore re-clicks faster than this so coin bursts don't stack up
 // how long a walker keeps walking, or keeps doing one of the idle behaviors below,

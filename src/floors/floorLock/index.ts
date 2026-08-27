@@ -40,6 +40,12 @@ export function hitTestFloorLock(x: number, y: number, floor: Floor): boolean {
   );
 }
 
+// center of the unlock panel, floor-local — where a just-unlocked floor's coin
+// burst should originate from
+export function getLockCenter(): { x: number; y: number } {
+  return { x: FLOOR_W / 2, y: FLOOR_H / 2 };
+}
+
 export function unlockFloor(floor: Floor): void {
   floor.unlocked = true;
   // starts idle-income tracking fresh from the moment it's actually earning, instead of

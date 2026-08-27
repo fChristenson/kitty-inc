@@ -3,6 +3,8 @@ import {
   loadFloorBackgrounds,
   loadGroundImage,
   loadWorkerSprite,
+  loadCoinImage,
+  loadFloatingCoinImage,
   startIncomeTicker,
   ensureLockedFloorAbove,
 } from "./floors";
@@ -22,6 +24,8 @@ import {
 import {
   createTestButtonMarkup,
   wireTestButton,
+  wireSpawnMouseButton,
+  wireIdlePopupTestButton,
   wireResetButton,
   createActionBarMarkup,
   wireActionBar,
@@ -42,6 +46,7 @@ import {
   loadWallMaterial,
   loadRoofImage,
 } from "./buildings";
+import { loadMouseImage, forceSpawnMouse } from "./mouse";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -76,6 +81,9 @@ async function main() {
   await loadCloudImages();
   await loadWallMaterial();
   await loadRoofImage();
+  await loadMouseImage();
+  await loadCoinImage();
+  await loadFloatingCoinImage();
 
   // one Floor[] per building; only one building is ever shown on screen at a time
   // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
@@ -131,6 +139,13 @@ async function main() {
   wireTestButton(app, () => {
     // absurdly large: comfortably covers buying several buildings in one go
     addTotalIncome(1e30);
+  });
+  wireSpawnMouseButton(app, () => {
+    forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
+  });
+  wireIdlePopupTestButton(app, () => {
+    const testAmount = 12345;
+    showIdlePopup(app, testAmount, () => addTotalIncome(testAmount));
   });
   wireResetButton(app, buildings);
   const upgradeMenu = wireUpgradeMenu(

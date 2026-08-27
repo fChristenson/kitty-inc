@@ -15,6 +15,7 @@ import { drawCity, CITY_MAX_HEIGHT } from "../city";
 import { drawStars } from "../stars";
 import { drawRoof } from "../../buildings";
 import { drawHud } from "../../hud";
+import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
 import { COLOR } from "../../palette";
 import type { Floor } from "../../gameState";
@@ -103,8 +104,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // exact floor-local point the cursor is over, so the upgrade button can check
   // specifically whether it itself is hovered instead of "is anything on this floor
   // hoverable" (that coarser check is still what drives the pointer cursor below)
-  let hoveredPoint: { floor: Floor; localX: number; localY: number } | null =
-    null;
+  let hoveredPoint: {
+    floor: Floor;
+    localX: number;
+    localY: number;
+    isGroundFloor: boolean;
+  } | null = null;
 
   // a floor's index within activeFloors, kept in sync as floors are added, so a
   // hit-test or a coin burst's on-screen rect never has to scan the whole array
@@ -138,9 +143,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // seam a hairline of sub-pixel canvas scaling could show through.
   const BUILDING_GROUND_OVERLAP = 32;
   // each floor's own row pitch is shrunk by this much so consecutive floors overlap
-  // slightly instead of only meeting exactly edge-to-edge — otherwise sub-pixel
-  // canvas scaling left a hairline gap between them
-  const FLOOR_OVERLAP = 4;
+  // instead of only meeting exactly edge-to-edge — floor 2 and up all shift by this
+  // same amount (it's the translate for the WHOLE floor, divider band and room
+  // content together, not a separate adjustment for either)
+  const FLOOR_OVERLAP = 14;
   function floorWorldY(floorIndex: number): { top: number; bottom: number } {
     const bottom =
       -floorIndex * (FLOOR_H - FLOOR_OVERLAP) + BUILDING_GROUND_OVERLAP;
@@ -275,7 +281,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       const buttonHovered =
         hoveredPoint !== null &&
         hoveredPoint.floor === activeFloors[i] &&
-        hitTestUpgradeButton(hoveredPoint.localX, hoveredPoint.localY);
+        hitTestUpgradeButton(hoveredPoint.localX, hoveredPoint.localY, i === 0);
       drawFloorContent(ctx, {
         backgrounds,
         floor: activeFloors[i],
@@ -305,6 +311,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
 
   function redraw(): void {
+    updateMouse(activeFloors, Date.now());
     const dpr = window.devicePixelRatio || 1;
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -412,6 +419,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     floor: Floor;
     localX: number;
     localY: number;
+    isGroundFloor: boolean;
   } | null {
     const worldX = screenX;
     const worldY = screenY + viewportTopY();
@@ -424,6 +432,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
           floor: activeFloors[i],
           localX,
           localY: worldY - top,
+          isGroundFloor: i === 0,
         };
       }
     }
@@ -448,11 +457,22 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       const p = canvasPoint(event);
       const hit = hitTestPoint(p.x, p.y);
       const hoverable = hit
-        ? hitTestFloorHover(hit.localX, hit.localY, hit.floor)
+        ? hitTestMouse(hit.localX, hit.localY, hit.floor) ||
+          hitTestFloorHover(
+            hit.localX,
+            hit.localY,
+            hit.floor,
+            hit.isGroundFloor,
+          )
         : false;
       canvas.style.cursor = hoverable ? "pointer" : "default";
       hoveredPoint = hit
-        ? { floor: hit.floor, localX: hit.localX, localY: hit.localY }
+        ? {
+            floor: hit.floor,
+            localX: hit.localX,
+            localY: hit.localY,
+            isGroundFloor: hit.isGroundFloor,
+          }
         : null;
       return;
     }
@@ -489,6 +509,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const p = canvasPoint(event);
     const hit = hitTestPoint(p.x, p.y);
     if (!hit) return;
+    // both run unconditionally on the same click — an overlapping mouse and cat(s)
+    // both register, same as clicking overlapping cats already hits every one of them
+    handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);
     handleFloorClick(
       {
         floors: activeFloors,
@@ -500,6 +523,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       hit.floor,
       hit.localX,
       hit.localY,
+      hit.isGroundFloor,
     );
   }
 

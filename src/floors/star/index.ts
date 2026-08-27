@@ -2,9 +2,14 @@ import type { Floor } from "../../gameState";
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
 
-// sits directly under floorNumber.ts's "N / total" label, same left margin
-const MARGIN = 24;
-export const STAR_Y = MARGIN + 90;
+// sits directly under floorNumber.ts's "N / total" label, same left margin, nudged
+// 20px right/down
+const MARGIN = 44;
+// horizontal-only nudge, another 40px right of MARGIN (vertical position unchanged)
+const MARGIN_X = MARGIN + 40;
+// vertical-only nudge, another 20px down from MARGIN (horizontal position unchanged)
+const MARGIN_Y = MARGIN + 20;
+export const STAR_Y = MARGIN_Y + 90;
 export const STAR_RADIUS = 26;
 
 function starPath(
@@ -32,7 +37,7 @@ export function drawUpgradeStar(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
 ): void {
-  const cx = MARGIN + STAR_RADIUS;
+  const cx = MARGIN_X + STAR_RADIUS;
   const cy = STAR_Y;
 
   starPath(ctx, cx, cy, STAR_RADIUS, STAR_RADIUS * 0.45);

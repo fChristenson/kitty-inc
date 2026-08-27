@@ -33,7 +33,6 @@ export const COLOR = {
   // generic cartoon text/button chrome
   white: "#FFFFFF",
   black: "#000000",
-  buttonOutline: "#1E2831",
   buttonRing: "#FBFBFB",
 
   // action bar / menu accent buttons
@@ -44,8 +43,15 @@ export const COLOR = {
   redActive: "#B91C1C",
   amber: "#F59E0B",
   amberActive: "#D97706",
+  amberShadow: "#B45309",
+  // less saturated amber for worker-menu/popup buttons, so their fill reads calmer
+  // than the vivid action-bar boost button, which keeps the vibrant amber above
+  amberMuted: "#CC9434",
+  amberMutedActive: "#BA7A31",
+  amberMutedShadow: "#A26333",
   purple: "#8B5CF6",
   purpleActive: "#7C3AED",
+  purpleShadow: "#6D28D9",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

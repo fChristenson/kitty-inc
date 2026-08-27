@@ -8,6 +8,7 @@ import {
   hitTestFloorLock,
   unlockFloor,
   ensureLockedFloorAbove,
+  getLockCenter,
 } from "../floorLock";
 import { activateBoosted, type Floor } from "../../gameState";
 
@@ -23,9 +24,14 @@ export interface FloorActionsDeps {
 }
 
 // whether a floor-local point lands on anything hoverable (cursor should be "pointer")
-export function hitTestFloorHover(x: number, y: number, floor: Floor): boolean {
+export function hitTestFloorHover(
+  x: number,
+  y: number,
+  floor: Floor,
+  isGroundFloor: boolean,
+): boolean {
   return (
-    (hitTestUpgradeButton(x, y) &&
+    (hitTestUpgradeButton(x, y, isGroundFloor) &&
       floor.unlocked &&
       getTotalIncome() >= floor.upgradeCost) ||
     hitTestFloorLock(x, y, floor) ||
@@ -41,6 +47,7 @@ export function handleFloorClick(
   floor: Floor,
   x: number,
   y: number,
+  isGroundFloor: boolean,
 ): void {
   const { floors, backgroundCount, multiplier, persist, onFloorAdded } = deps;
 
@@ -54,18 +61,20 @@ export function handleFloorClick(
         onAdd: onFloorAdded,
       });
       persist();
+      const center = getLockCenter();
+      spawnCoinBurst(floor, center.x, center.y, () => {});
     }
     return;
   }
 
   if (
-    hitTestUpgradeButton(x, y) &&
+    hitTestUpgradeButton(x, y, isGroundFloor) &&
     floor.unlocked &&
     spendTotalIncome(floor.upgradeCost)
   ) {
     increaseIncomeRate(floor);
     persist();
-    const center = getButtonCenter();
+    const center = getButtonCenter(isGroundFloor);
     spawnCoinBurst(floor, center.x, center.y, () => {});
     return;
   }

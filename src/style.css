@@ -63,8 +63,13 @@ button {
   --color-red-active: #b91c1c;
   --color-amber: #f59e0b;
   --color-amber-active: #d97706;
+  --color-amber-shadow: #b45309;
+  --color-amber-muted: #cc9434;
+  --color-amber-muted-active: #ba7a31;
+  --color-amber-muted-shadow: #a26333;
   --color-purple: #8b5cf6;
   --color-purple-active: #7c3aed;
+  --color-purple-shadow: #6d28d9;
   --color-wood-fill: #f8d18e;
   --color-wood-outline: #302721;
   --color-wood-ring: #faf2dd;
@@ -109,7 +114,7 @@ body {
   cursor: default;
 }
 
-.game__test-controls {
+.test-actions-bar {
   display: flex;
   gap: 0.5rem;
   margin: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
@@ -140,21 +145,35 @@ body {
 }
 
 .action-bar {
-  /* an in-flow row inside .game (below the canvas), not an overlay — the canvas's
-     own flex:1 sizing shrinks to leave real room for it, so nothing the canvas
-     draws (e.g. the ground/street art) ever ends up hidden behind it */
+  /* same cartoon wood-board panel treatment as .popup__panel/.worker-menu__panel —
+     a floating ringed panel instead of a flush dark bar, in-flow inside .game
+     (below the canvas), so the canvas's own flex:1 sizing still leaves real room
+     for it and nothing the canvas draws ever ends up hidden behind it */
   flex-shrink: 0;
   display: flex;
-  justify-content: stretch;
-  background: rgba(17, 20, 23, 0.85);
+  gap: 0.6rem;
+  background: var(--color-wood-fill);
+  border: 4px solid var(--color-wood-outline);
+  border-radius: 1.25rem;
+  box-shadow:
+    0 0 0 10px var(--color-wood-ring),
+    0 0 0 14px var(--color-wood-outline),
+    0 12px 14px -6px rgba(0, 0, 0, 0.45);
+  margin: 0.5rem 1rem 0.75rem;
+  padding: 0.6rem;
 }
 
 .action-bar__button {
   flex: 1;
-  height: 4rem;
-  border: none;
-  border-radius: 0;
+  height: 3.5rem;
+  /* same cream-ring + dark-outline pressable-button treatment as .worker-menu__item */
+  border: 3px solid var(--color-wood-outline);
+  border-radius: 0.75rem;
   background: var(--color-blue);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 4px 0 0 var(--color-blue-shadow);
   color: white;
   display: flex;
   align-items: center;
@@ -162,36 +181,61 @@ body {
   cursor: pointer;
 }
 
-.action-bar__button + .action-bar__button {
-  border-left: 1px solid rgba(0, 0, 0, 0.25);
-}
-
 .action-bar__button:active {
   background: var(--color-blue-active);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 2px 0 0 var(--color-blue-shadow);
+  transform: translateY(2px);
 }
 
 .action-bar__button--boost {
   background: var(--color-amber);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 4px 0 0 var(--color-amber-shadow);
 }
 
 .action-bar__button--boost:active {
   background: var(--color-amber-active);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 2px 0 0 var(--color-amber-shadow);
 }
 
 .action-bar__button--hire {
   background: var(--color-money-green);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 4px 0 0 var(--color-money-green-shadow);
 }
 
 .action-bar__button--hire:active {
   background: var(--color-money-green-active);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 2px 0 0 var(--color-money-green-shadow);
 }
 
 .action-bar__button--map {
   background: var(--color-purple);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 4px 0 0 var(--color-purple-shadow);
 }
 
 .action-bar__button--map:active {
   background: var(--color-purple-active);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 2px 0 0 var(--color-purple-shadow);
 }
 
 .worker-menu {
@@ -269,22 +313,22 @@ body {
      cartoon-button look */
   border: 3px solid var(--color-wood-outline);
   border-radius: 0.75rem;
-  background: var(--color-money-green);
+  background: var(--color-amber-muted);
   box-shadow:
     0 0 0 4px var(--color-wood-ring),
     0 0 0 7px var(--color-wood-outline),
-    0 4px 0 0 var(--color-money-green-shadow);
+    0 4px 0 0 var(--color-amber-muted-shadow);
   color: white;
   font-weight: 600;
   cursor: pointer;
 }
 
 .worker-menu__item:active {
-  background: var(--color-money-green-active);
+  background: var(--color-amber-muted-active);
   box-shadow:
     0 0 0 4px var(--color-wood-ring),
     0 0 0 7px var(--color-wood-outline),
-    0 2px 0 0 var(--color-money-green-shadow);
+    0 2px 0 0 var(--color-amber-muted-shadow);
   transform: translateY(2px);
 }
 
@@ -298,8 +342,25 @@ body {
   opacity: 0.7;
 }
 
+.worker-menu__item-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.worker-menu__icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+}
+
 .worker-menu__price {
   font-weight: 900;
+  color: var(--color-money-green);
+  /* same green-fill + thick white outline cartoon-text look as the canvas HUD
+     total (hud/index.ts's drawCartoonText) and the idle popup's own amount */
+  -webkit-text-stroke: 2px var(--color-white);
+  paint-order: stroke fill;
 }
 
 .popup {
@@ -366,11 +427,11 @@ body {
   /* same cream-ring + dark-outline treatment as .worker-menu__item, see comment there */
   border: 3px solid var(--color-wood-outline);
   border-radius: 0.75rem;
-  background: var(--color-blue);
+  background: var(--color-amber-muted);
   box-shadow:
     0 0 0 4px var(--color-wood-ring),
     0 0 0 7px var(--color-wood-outline),
-    0 4px 0 0 var(--color-blue-shadow);
+    0 4px 0 0 var(--color-amber-muted-shadow);
   color: white;
   font-weight: 600;
   font-size: 1rem;
@@ -378,10 +439,10 @@ body {
 }
 
 .popup__button:active {
-  background: var(--color-blue-active);
+  background: var(--color-amber-muted-active);
   box-shadow:
     0 0 0 4px var(--color-wood-ring),
     0 0 0 7px var(--color-wood-outline),
-    0 2px 0 0 var(--color-blue-shadow);
+    0 2px 0 0 var(--color-amber-muted-shadow);
   transform: translateY(2px);
 }

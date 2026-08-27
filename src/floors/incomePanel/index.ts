@@ -1,4 +1,4 @@
-import { FLOOR_H } from "../constants";
+import { FLOOR_H, DIVIDER_H } from "../constants";
 import { countBoostedWorkers, type Floor } from "../../gameState";
 import { MAX_RENDERED_WORKERS } from "../worker";
 import {
@@ -15,8 +15,14 @@ import { COLOR } from "../../palette";
 export const PANEL_W = 360;
 export const PANEL_H = 120;
 const PANEL_MARGIN = 24;
-export const PANEL_X = PANEL_MARGIN;
-export const PANEL_Y = FLOOR_H - PANEL_H - PANEL_MARGIN;
+export const PANEL_X = PANEL_MARGIN + 10;
+// centered inside the divider band below (see outerWall/index.ts's DIVIDER_H),
+// mounted on top of it since that's drawn first, nudged down 10px — except the
+// ground floor, which stays 10px higher (back at the plain centered position)
+function getPanelY(isGroundFloor: boolean): number {
+  const base = FLOOR_H - DIVIDER_H / 2 - PANEL_H / 2;
+  return isGroundFloor ? base : base + 10;
+}
 
 // when each floor's current fill cycle started is floor.lastCollectedAt itself (a
 // persisted, Date.now()-based timestamp) — no separate in-memory clock, so a page
@@ -35,7 +41,11 @@ const UPGRADES_PER_INTERVAL_HALVING = 10;
 // signals "still ticking" instead
 const FAST_CYCLE_THRESHOLD_MS = 1000;
 const FAST_CYCLE_LAP_MS = 900;
-const FAST_CYCLE_TAIL_DOTS = 8;
+// the ray covers this fraction of one full lap, broken into this many short
+// segments so its per-segment alpha fade reads as one smooth gradient trail
+const FAST_CYCLE_TAIL_LAP_FRACTION = 0.22;
+const FAST_CYCLE_TAIL_SEGMENTS = 32;
+const FAST_CYCLE_RAY_WIDTH = 8;
 
 export function increaseIncomeRate(floor: Floor): void {
   floor.incomeAmount += floor.rateStep;
@@ -120,7 +130,7 @@ function formatIncomeRate(floor: Floor, now: number): string {
   // always-full orbiting-dot animation, a countdown no longer means anything readable
   const timeText =
     intervalSeconds * 1000 < FAST_CYCLE_THRESHOLD_MS
-      ? "<1s"
+      ? "s"
       : formatTime(remainingCycleSeconds(floor, now));
   return `${formatPrice(amount)}/${timeText}`;
 }
@@ -168,8 +178,11 @@ function roundedRectPerimeterPoint(
   return { x: x + r + r * Math.cos(a), y: y + r + r * Math.sin(a) };
 }
 
-// a bright dot orbiting the bar's border with a fading tail, for cycles too fast to
-// show as a normal fill
+// a bright gradient ray sweeping around the bar's border, fading out along its own
+// trailing length, for cycles too fast to show as a normal fill. Drawn as many short
+// stroked segments (rather than one path) since canvas strokes can't fade along their
+// own length any other way — each segment's own alpha steps the fade from transparent
+// at the tail up to fully opaque at the head, reading as one continuous ray
 function drawFastCycleBorder(
   ctx: CanvasRenderingContext2D,
   barX: number,
@@ -179,21 +192,22 @@ function drawFastCycleBorder(
   now: number,
 ): void {
   const headT = (now % FAST_CYCLE_LAP_MS) / FAST_CYCLE_LAP_MS;
-  const tailStep = 1 / 60; // lap-fraction gap between trailing dots
-  for (let i = FAST_CYCLE_TAIL_DOTS; i >= 0; i--) {
-    const { x, y } = roundedRectPerimeterPoint(
-      barX,
-      barY,
-      barW,
-      barH,
-      10,
-      headT - i * tailStep,
-    );
-    const alpha = 1 - i / FAST_CYCLE_TAIL_DOTS;
+  ctx.lineWidth = FAST_CYCLE_RAY_WIDTH;
+  ctx.lineCap = "round";
+  for (let i = FAST_CYCLE_TAIL_SEGMENTS; i >= 1; i--) {
+    const t0 =
+      headT - (i / FAST_CYCLE_TAIL_SEGMENTS) * FAST_CYCLE_TAIL_LAP_FRACTION;
+    const t1 =
+      headT -
+      ((i - 1) / FAST_CYCLE_TAIL_SEGMENTS) * FAST_CYCLE_TAIL_LAP_FRACTION;
+    const p0 = roundedRectPerimeterPoint(barX, barY, barW, barH, 10, t0);
+    const p1 = roundedRectPerimeterPoint(barX, barY, barW, barH, 10, t1);
+    const alpha = 1 - i / FAST_CYCLE_TAIL_SEGMENTS;
     ctx.beginPath();
-    ctx.arc(x, y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-    ctx.fill();
+    ctx.moveTo(p0.x, p0.y);
+    ctx.lineTo(p1.x, p1.y);
+    ctx.strokeStyle = `rgba(255, 255, 255, ${alpha})`;
+    ctx.stroke();
   }
 }
 
@@ -213,9 +227,10 @@ export function startIncomeTicker(onFrame: () => void): void {
 export function drawIncomePanel(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
+  isGroundFloor: boolean,
 ): void {
   const x = PANEL_X;
-  const y = PANEL_Y;
+  const y = getPanelY(isGroundFloor);
 
   const barX = x + 18;
   const barW = (PANEL_W - 36) * 1.5;

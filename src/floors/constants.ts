@@ -18,3 +18,20 @@ export const FLOOR_X_MAX = 1100;
 // GROUND_TILE_W keeps the art's own aspect ratio instead of stretching it
 export const GROUND_H = 800;
 export const GROUND_TILE_W = Math.round(GROUND_H * (1248 / 318));
+
+// height of the structural floor-divider band between stories (buildings/outerWall's
+// bottom strip) — the tileable wall material stacked 5x (5 * the original 28px
+// wall-edge mask) instead of just a thin masking edge. Only the bottom strip uses
+// this (the top strip stays a thin 28px mask, see outerWall/index.ts): each floor's
+// own bottom band is what's actually visible at every seam (drawn last, on top,
+// thanks to FLOOR_OVERLAP). incomePanel/upgradeButton straddle this band (its own
+// z-order is drawn first, so they render mounted on top of it), and the room's own
+// bg art + worker are scaled down by ROOM_CONTENT_SCALE below so nothing the
+// original ~28px-mask art assumed (including ceiling art like bg2.png's own roof
+// beam) gets cropped off — it's compressed to fit instead. Changing this number
+// alone is enough — every dependent (ROOM_CONTENT_SCALE, the divider draw, the
+// worker's floor line) derives from it.
+export const DIVIDER_H = 140;
+// scales the room's own bg art + worker vertically so the whole image still fits
+// (compressed, not cropped) above the divider band instead of losing its top edge
+export const ROOM_CONTENT_SCALE = (FLOOR_H - (DIVIDER_H - 28)) / FLOOR_H;

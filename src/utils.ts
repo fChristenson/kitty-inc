@@ -87,10 +87,9 @@ export function roundRect(
   ctx.closePath();
 }
 
-// shared cartoon look for every HUD panel/button: flat fill, thick bold white
-// outline, and a hard-edged (unblurred) offset shadow instead of a soft drop shadow
+// shared cartoon look for every HUD panel/button: flat fill with a thick bold white
+// outline
 export const CARTOON_OUTLINE_WIDTH = 5;
-export const CARTOON_SHADOW_OFFSET = 7;
 
 // glossy plastic-button highlight: bright streak at the top fading to nothing by the
 // bottom, clipped to the given rounded-rect. shared by drawCartoonPanel and any other
@@ -125,10 +124,6 @@ export function drawCartoonPanel(
   fillColor: string,
   border = true,
 ): void {
-  ctx.fillStyle = COLOR.black;
-  roundRect(ctx, x + CARTOON_SHADOW_OFFSET, y + CARTOON_SHADOW_OFFSET, w, h, r);
-  ctx.fill();
-
   ctx.fillStyle = fillColor;
   roundRect(ctx, x, y, w, h, r);
   ctx.fill();
@@ -178,12 +173,10 @@ function shadeColor(hex: string, amount: number): string {
     .join("")}`;
 }
 
-// glossy layered-ring button (see src/assets/button.jfif): a dark outline, a white
-// ring, a darker-shade border, then a gradient fill with an upper-left glossy sheen —
-// same cream-ring language as the dialog panels (style.css), just built from one
-// accent color instead of hardcoded tan/cream. The outline is drawn twice, the second
-// copy shifted down and left showing through underneath, so the bottom edge reads
-// noticeably thicker than the top/sides for a chunky "resting on the surface" look
+// glossy layered-ring button (see src/assets/button.jfif): a white ring, a
+// darker-shade border, then a gradient fill with an upper-left glossy sheen — same
+// cream-ring language as the dialog panels (style.css), just built from one accent
+// color instead of hardcoded tan/cream
 export function drawGlossyButton(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -193,30 +186,21 @@ export function drawGlossyButton(
   r: number,
   fillColor: string,
 ): void {
-  const OUTLINE_W = 8;
   const RING_W = 10;
   const BORDER_W = 6;
-  const BOTTOM_SHADOW_EXTRA = 18;
 
-  const outlineColor = COLOR.buttonOutline;
   const ringColor = COLOR.buttonRing;
   const borderColor = shadeColor(fillColor, -0.55);
   const highlightColor = shadeColor(fillColor, 0.55);
-
-  ctx.fillStyle = outlineColor;
-  roundRect(ctx, x, y + BOTTOM_SHADOW_EXTRA, w, h, r);
-  ctx.fill();
-  roundRect(ctx, x, y, w, h, r);
-  ctx.fill();
 
   // every nested layer keeps the SAME corner radius (not shrunk by its own inset) —
   // shrinking it layer by layer runs out almost immediately for a shallow button
   // like this and leaves the border/fill layers square-cornered; same simplification
   // style.css's box-shadow ring trick already relies on for the dialog panels
-  const ringX = x + OUTLINE_W;
-  const ringY = y + OUTLINE_W;
-  const ringW = w - OUTLINE_W * 2;
-  const ringH = h - OUTLINE_W * 2;
+  const ringX = x;
+  const ringY = y;
+  const ringW = w;
+  const ringH = h;
   ctx.fillStyle = ringColor;
   roundRect(ctx, ringX, ringY, ringW, ringH, r);
   ctx.fill();

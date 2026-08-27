@@ -34,7 +34,11 @@ export function drawHud(
 // anything outside src/hud must import them from here, never from a nested path
 export { createActionBarMarkup, wireActionBar } from "./actionBar";
 export type { ActionBarHandlers } from "./actionBar";
-export { createBoostMenuMarkup, wireBoostMenu } from "./boostMenu";
+export {
+  createBoostMenuMarkup,
+  wireBoostMenu,
+  applyBoostAll,
+} from "./boostMenu";
 export type { BoostMenu } from "./boostMenu";
 export { createMapMenuMarkup, wireMapMenu } from "./mapMenu";
 export type { MapMenu } from "./mapMenu";
@@ -42,6 +46,8 @@ export { createPopupMarkup, showIdlePopup } from "./popup";
 export {
   createTestButtonMarkup,
   wireTestButton,
+  wireSpawnMouseButton,
+  wireIdlePopupTestButton,
   wireResetButton,
 } from "./testButton";
 export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
