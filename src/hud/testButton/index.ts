@@ -8,6 +8,7 @@ export function createTestButtonMarkup(): string {
     <div class="test-actions-bar">
       <button id="add-money" class="game__button">Add Money</button>
       <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
+      <button id="spawn-crit" class="game__button">Spawn Crit</button>
       <button id="trigger-idle-popup" class="game__button">Idle Popup</button>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
     </div>
@@ -27,6 +28,14 @@ export function wireSpawnMouseButton(
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>("#spawn-mouse")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>("#spawn-crit")!;
   button.addEventListener("click", onClick);
 }
 

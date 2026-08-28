@@ -3,13 +3,18 @@ import {
   hitTestUpgradeButton,
   getButtonCenter,
   triggerButtonPress,
+  isCritUpgrade,
+  consumeCritUpgrade,
+  rollCritUpgrade,
+  CRIT_UPGRADE_COUNT,
 } from "../upgradeButton";
 import { increaseIncomeRate, UPGRADE_MILESTONE_STEP } from "../incomePanel";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
 import { getUpgradeIndicatorCenter } from "../star";
-import { playSold, playBloop, playCoinDrop } from "../../sound";
+import { playSold, playBloop, playCoinDrop, playExplosion } from "../../sound";
+import { triggerScreenShake } from "../../screenShake";
 import {
   hitTestFloorLock,
   unlockFloor,
@@ -27,6 +32,10 @@ export interface FloorActionsDeps {
   // on the next tick, so these just need to register the new floor for hit-testing/
   // scroll bookkeeping — no manual "redraw this one floor now" plumbing needed anymore
   onFloorAdded: (floor: Floor) => void;
+  // converts the current visual screen center (where screenShake's "CRIT!" flash is
+  // drawn) into this floor's own local coordinate space, so a coin burst can be
+  // anchored there instead of at a fixed floor-local point
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number };
 }
 
 // whether a floor-local point lands on anything hoverable (cursor should be "pointer")
@@ -39,7 +48,7 @@ export function hitTestFloorHover(
   return (
     (hitTestUpgradeButton(x, y, isGroundFloor) &&
       floor.unlocked &&
-      getTotalIncome() >= floor.upgradeCost) ||
+      (isCritUpgrade(floor) || getTotalIncome() >= floor.upgradeCost)) ||
     hitTestFloorLock(x, y, floor) ||
     hitTestWorkers(x, y, floor).length > 0
   );
@@ -55,7 +64,14 @@ export function handleFloorClick(
   y: number,
   isGroundFloor: boolean,
 ): void {
-  const { floors, backgroundCount, multiplier, persist, onFloorAdded } = deps;
+  const {
+    floors,
+    backgroundCount,
+    multiplier,
+    persist,
+    onFloorAdded,
+    getScreenCenterLocal,
+  } = deps;
 
   if (hitTestFloorLock(x, y, floor)) {
     if (spendTotalIncome(floor.unlockCost)) {
@@ -74,25 +90,76 @@ export function handleFloorClick(
     return;
   }
 
-  if (
-    hitTestUpgradeButton(x, y, isGroundFloor) &&
-    floor.unlocked &&
-    spendTotalIncome(floor.upgradeCost)
-  ) {
-    increaseIncomeRate(floor);
-    persist();
-    triggerButtonPress(floor);
-    playCoinDrop();
-    const center = getButtonCenter(isGroundFloor);
-    spawnCoinBurst(floor, center.x, center.y, () => {});
-    // extra celebration burst right on the upgrade indicator every 10th upgrade,
-    // same milestone that halves this floor's income interval
-    if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
-      const indicatorCenter = getUpgradeIndicatorCenter(floor);
-      spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
-      playBloop();
+  if (hitTestUpgradeButton(x, y, isGroundFloor) && floor.unlocked) {
+    // the slot-machine jackpot moment: free, costs nothing, applies
+    // CRIT_UPGRADE_COUNT upgrades at once, and shakes the whole screen for weight
+    if (isCritUpgrade(floor)) {
+      consumeCritUpgrade(floor);
+      for (let i = 0; i < CRIT_UPGRADE_COUNT; i++) increaseIncomeRate(floor);
+      rollCritUpgrade(floor);
+      persist();
+      triggerButtonPress(floor);
+      triggerScreenShake();
+      playCoinDrop();
+      playExplosion();
+      const buttonCenter = getButtonCenter(isGroundFloor);
+      spawnCoinBurst(floor, buttonCenter.x, buttonCenter.y, () => {});
+      // 3 more bursts on top of the one above, so the celebration keeps erupting
+      // for as long as the crit text/shake animation is playing out. First one is
+      // dead center (matching the "CRIT!" text) at 0s; the other two are offset
+      // 40px left/right of it, staggered in after it (0.4s, 0.8s — spaced out
+      // enough to read as separate pops, not one simultaneous burst) so all three
+      // don't pop at once. Re-read fresh at each delayed spawn in case the user
+      // scrolls in between
+      const CENTER_BURST_OFFSET_PX = 200;
+      const CENTER_BURST_OFFSET_PY = 100;
+      const centerBursts: {
+        offsetX: number;
+        offsetY: number;
+        delayMs: number;
+      }[] = [
+        { offsetX: 0, offsetY: 0, delayMs: 0 },
+        {
+          offsetX: -CENTER_BURST_OFFSET_PX,
+          offsetY: -CENTER_BURST_OFFSET_PY,
+          delayMs: 100,
+        },
+        {
+          offsetX: CENTER_BURST_OFFSET_PX,
+          offsetY: CENTER_BURST_OFFSET_PY,
+          delayMs: 200,
+        },
+      ];
+      for (const { offsetX, offsetY, delayMs } of centerBursts) {
+        setTimeout(() => {
+          const p = getScreenCenterLocal(floor);
+          spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
+        }, delayMs);
+      }
+      if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
+        const indicatorCenter = getUpgradeIndicatorCenter(floor);
+        spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
+        playBloop();
+      }
+      return;
     }
-    return;
+    if (spendTotalIncome(floor.upgradeCost)) {
+      increaseIncomeRate(floor);
+      rollCritUpgrade(floor);
+      persist();
+      triggerButtonPress(floor);
+      playCoinDrop();
+      const center = getButtonCenter(isGroundFloor);
+      spawnCoinBurst(floor, center.x, center.y, () => {});
+      // extra celebration burst right on the upgrade indicator every 10th upgrade,
+      // same milestone that halves this floor's income interval
+      if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
+        const indicatorCenter = getUpgradeIndicatorCenter(floor);
+        spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
+        playBloop();
+      }
+      return;
+    }
   }
 
   // a click on overlapping cats hits every one of them, not just the frontmost

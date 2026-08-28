@@ -17,6 +17,7 @@ import { drawRoof } from "../../buildings";
 import { drawHud } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
+import { getScreenShakeOffset, drawCritFlash } from "../../screenShake";
 import { COLOR } from "../../palette";
 import type { Floor } from "../../gameState";
 
@@ -330,6 +331,17 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     };
   }
 
+  // converts the current visual screen center (where screenShake's "CRIT!" flash is
+  // drawn — dead center of the viewport) into the given floor's own local
+  // coordinate space, so a coin burst can be anchored there instead of at a fixed
+  // floor-local point (e.g. the upgrade button)
+  function screenCenterLocalFor(floor: Floor): { x: number; y: number } {
+    const loc = floorLocation.get(floor);
+    const floorTop = loc ? floorWorldY(loc.floorIndex).top : 0;
+    const worldCenterY = viewportTopY() + contentViewportH() / 2;
+    return { x: FLOOR_W / 2, y: worldCenterY - floorTop };
+  }
+
   function redraw(): void {
     // the canvas measures 0x0 while hidden (e.g. the city map view is showing
     // instead) or for a stray frame or two around a visibility toggle before its
@@ -342,6 +354,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);
+    // applied before the world scale so its magnitude stays a consistent CSS-pixel
+    // rattle regardless of zoom, and before everything else so it shakes the whole
+    // frame (world content + HUD) uniformly
+    const shake = getScreenShakeOffset(Date.now());
+    ctx.translate(shake.x, shake.y);
     ctx.scale(scale, scale);
 
     // background first, in plain screen space (fills the whole viewport regardless
@@ -385,6 +402,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // behind it, just floating text drawn last in plain screen space so nothing can
     // ever cover it and it never cuts the world off underneath it
     drawHud(ctx, SLOT_W, getTotalIncome());
+    // pops up dead center over the whole viewport for the same brief window as the
+    // shake above it (still inside the shake's own translate, so it rattles too —
+    // reinforces the "this hit hard" feeling rather than floating serenely above it)
+    drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
 
     ctx.restore();
   }
@@ -545,6 +566,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         multiplier: getBuildingMultiplier(),
         persist,
         onFloorAdded: (floor) => notifyFloorAdded(floor),
+        getScreenCenterLocal: screenCenterLocalFor,
       },
       hit.floor,
       hit.localX,

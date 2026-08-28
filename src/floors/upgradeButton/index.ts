@@ -70,6 +70,38 @@ function pressScale(floor: Floor, now: number): number {
   );
 }
 
+// "crit" upgrade: a rare, free, oversized upgrade — the slot-machine jackpot moment.
+// Rolled once per completed upgrade click (see floorInteractions/index.ts's
+// rollCritUpgrade calls); while active, this floor's button turns purple, wiggles,
+// and shows "x2" instead of its price. Clicking it costs nothing and instantly
+// applies CRIT_UPGRADE_COUNT normal upgrades at once.
+const CRIT_CHANCE = 0.05;
+export const CRIT_UPGRADE_COUNT = 5;
+const critFloors = new WeakSet<Floor>();
+
+// call once per completed upgrade click (crit or normal) to roll the next one
+export function rollCritUpgrade(floor: Floor): void {
+  if (Math.random() < CRIT_CHANCE) critFloors.add(floor);
+}
+
+export function isCritUpgrade(floor: Floor): boolean {
+  return critFloors.has(floor);
+}
+
+// call right when a crit click is handled, before rolling the next one
+export function consumeCritUpgrade(floor: Floor): void {
+  critFloors.delete(floor);
+}
+
+// dev/test-only: force this floor's button into the crit state right away,
+// bypassing CRIT_CHANCE entirely (see hud/testButton's "Spawn Crit" button)
+export function forceCritUpgrade(floor: Floor): void {
+  critFloors.add(floor);
+}
+
+const WIGGLE_PERIOD_MS = 260;
+const WIGGLE_MAX_RADIANS = 0.08;
+
 export function drawUpgradeButton(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
@@ -82,14 +114,25 @@ export function drawUpgradeButton(
   const y = getBtnY(isGroundFloor);
   const cx = x + BTN_W / 2;
   const cy = y + BTN_H / 2;
-  const scale = pressScale(floor, Date.now());
+  const now = Date.now();
+  const scale = pressScale(floor, now);
+  const crit = isCritUpgrade(floor);
 
   ctx.save();
   ctx.translate(cx, cy);
+  if (crit) {
+    ctx.rotate(
+      Math.sin((now / WIGGLE_PERIOD_MS) * Math.PI * 2) * WIGGLE_MAX_RADIANS,
+    );
+  }
   ctx.scale(scale, scale);
   ctx.translate(-cx, -cy);
-  if (!affordable) ctx.globalAlpha = 0.5;
-  else if (hovered) ctx.filter = "brightness(0.85)";
+  if (!crit) {
+    if (!affordable) ctx.globalAlpha = 0.5;
+    else if (hovered) ctx.filter = "brightness(0.85)";
+  } else if (hovered) {
+    ctx.filter = "brightness(0.85)";
+  }
   // rounded RECTANGLE, not a full pill — ref.png's button corners are only modestly
   // rounded, unlike the fully-stadium-shaped income bar. Must clear the combined
   // black+white+dark ring inset (~21% of BTN_H) with room to spare, or the
@@ -101,7 +144,7 @@ export function drawUpgradeButton(
     y,
     BTN_W,
     BTN_H,
-    affordable ? COLOR.moneyGreen : COLOR.disabledGray,
+    crit ? COLOR.purple : affordable ? COLOR.moneyGreen : COLOR.disabledGray,
     true,
     true,
     40,
@@ -110,6 +153,6 @@ export function drawUpgradeButton(
   ctx.font = '900 48px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  drawCartoonText(ctx, formatPrice(cost), cx, cy);
+  drawCartoonText(ctx, crit ? "x2" : formatPrice(cost), cx, cy);
   ctx.restore();
 }

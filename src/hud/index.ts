@@ -47,6 +47,7 @@ export {
   createTestButtonMarkup,
   wireTestButton,
   wireSpawnMouseButton,
+  wireSpawnCritButton,
   wireIdlePopupTestButton,
   wireResetButton,
 } from "./testButton";

@@ -241,6 +241,9 @@ export {
   drawUpgradeButton,
   hitTestUpgradeButton,
   triggerButtonPress,
+  rollCritUpgrade,
+  isCritUpgrade,
+  forceCritUpgrade,
 } from "./upgradeButton";
 export {
   spawnFloatingCoins,

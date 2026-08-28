@@ -7,6 +7,7 @@ import {
   loadFloatingCoinImage,
   startIncomeTicker,
   ensureLockedFloorAbove,
+  forceCritUpgrade,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -28,6 +29,7 @@ import {
   createTestButtonMarkup,
   wireTestButton,
   wireSpawnMouseButton,
+  wireSpawnCritButton,
   wireIdlePopupTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -159,6 +161,10 @@ async function main() {
     });
     wireSpawnMouseButton(app, () => {
       forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
+    });
+    wireSpawnCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceCritUpgrade(floor);
     });
     wireIdlePopupTestButton(app, () => {
       const testAmount = 12345;

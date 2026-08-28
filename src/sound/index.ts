@@ -3,6 +3,7 @@ import coinDropUrl from "../assets/sound/coinDrop.mp3";
 import swooshUrl from "../assets/sound/swoosh.mp3";
 import soldUrl from "../assets/sound/sold.mp3";
 import bloopUrl from "../assets/sound/bloop.mp3";
+import explosionUrl from "../assets/sound/explosion.mp3";
 
 const MUSIC_VOLUME = 0.4;
 const SFX_VOLUME = 0.9;
@@ -61,6 +62,17 @@ export function playSold(): void {
   const sfx = new Audio(soldUrl);
   sfx.volume = SFX_VOLUME;
   sfx.currentTime = 0.5;
+  sfx.play().catch(() => {});
+}
+
+// one-shot sound effect for the crit-upgrade "jackpot" moment (see
+// floorInteractions.ts, played alongside triggerScreenShake and the CRIT! flash).
+// explosion.mp3 has a quiet lead-in, so this skips the first 0.3s to line the
+// actual "bang" up earlier with the visual shake/flash
+export function playExplosion(): void {
+  const sfx = new Audio(explosionUrl);
+  sfx.volume = SFX_VOLUME;
+  sfx.currentTime = 0.04;
   sfx.play().catch(() => {});
 }
 
