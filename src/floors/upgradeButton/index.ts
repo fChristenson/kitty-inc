@@ -202,7 +202,7 @@ export function drawUpgradeButton(
       ? `Sale x${SALE_CRIT_MULTIPLIER}`
       : "Sale"
     : crit
-      ? "x2"
+      ? `x${CRIT_UPGRADE_COUNT}`
       : formatPrice(cost);
   drawCartoonText(ctx, label, cx, cy);
   ctx.restore();
