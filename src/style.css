@@ -130,6 +130,97 @@ body {
   display: none; /* the [hidden] attribute's UA display:none loses to the class rule above without this */
 }
 
+.city-map {
+  /* wraps #map-canvas together with its prev/next city arrows so one [hidden]
+     toggle (see main.ts's openMapView/closeMapView) shows/hides all three at once;
+     flex so the canvas's own flex:1 still fills this exactly like it used to fill
+     .game directly, position:relative so the arrows can anchor to its edges */
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+}
+
+.city-map[hidden] {
+  display: none;
+}
+
+.city-map__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: none;
+  color: var(--color-white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.city-map__arrow svg {
+  display: block;
+  /* translate/scale (not the transform shorthand) so they compose with this same
+     element's own static `rotate` below in a fixed order (translate, then rotate,
+     then scale) regardless of which rule sets which \u2014 the bounce below is authored
+     entirely in the icon's own pre-rotation "points up" space, and rotate reorients
+     that whole bounce to match each arrow's actual on-screen facing direction */
+  animation:
+    city-map-arrow-bounce-move 0.9s ease-in-out infinite,
+    city-map-arrow-bounce-warp 0.9s ease-in-out infinite;
+}
+
+/* nudges up and back in the icon's own local space \u2014 rotated per direction below,
+   this is what actually reads as "moving back and forth in the pointing direction" */
+@keyframes city-map-arrow-bounce-move {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+
+/* same squash-stretch language as worker-menu-slide-in-warp/mouse.ts's run-launch:
+   elongated along the direction of travel while moving fast, squashed flat at the
+   top of the bounce before springing back */
+@keyframes city-map-arrow-bounce-warp {
+  0%,
+  100% {
+    scale: 1 1;
+  }
+  30% {
+    scale: 0.88 1.16;
+  }
+  50% {
+    scale: 1.14 0.86;
+  }
+  70% {
+    scale: 0.88 1.16;
+  }
+}
+
+.city-map__arrow[hidden] {
+  display: none;
+}
+
+.city-map__arrow--prev {
+  left: 0.75rem;
+}
+
+.city-map__arrow--prev svg {
+  rotate: -90deg; /* up-arrow icon → points left */
+}
+
+.city-map__arrow--next {
+  right: 0.75rem;
+}
+
+.city-map__arrow--next svg {
+  rotate: 90deg; /* up-arrow icon → points right */
+}
+
 .test-actions-bar {
   display: flex;
   gap: 0.5rem;

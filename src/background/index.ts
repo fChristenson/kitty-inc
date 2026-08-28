@@ -5,5 +5,5 @@ export { createGameCanvas } from "./gameCanvas";
 export type { GameCanvas, GameCanvasDeps } from "./gameCanvas";
 export { loadCityImage } from "./city";
 export { loadCloudImages } from "./clouds";
-export { loadCityMapImage, createCityMapView } from "./cityMap";
+export { loadCityMapImage, createCityMapView, createCityMapMarkup } from "./cityMap";
 export type { CityMapView, CityMapDeps } from "./cityMap";

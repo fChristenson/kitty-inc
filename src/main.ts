@@ -49,6 +49,7 @@ import {
   loadCloudImages,
   loadCityMapImage,
   createCityMapView,
+  createCityMapMarkup,
 } from "./background";
 import {
   createBuilding,
@@ -69,7 +70,7 @@ async function main() {
   app.innerHTML = `
     <div class="game">
       <canvas class="game__canvas" id="game-canvas"></canvas>
-      <canvas class="game__canvas" id="map-canvas" hidden></canvas>
+      ${createCityMapMarkup()}
       ${createActionBarMarkup()}
       ${import.meta.env.MODE !== "production" ? createTestButtonMarkup() : ""}
     </div>
@@ -80,7 +81,7 @@ async function main() {
   `;
 
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
-  const mapCanvas = app.querySelector<HTMLCanvasElement>("#map-canvas")!;
+  const cityMapEl = app.querySelector<HTMLDivElement>("#city-map")!;
 
   // canvas text doesn't re-render on its own once a web font finishes loading (unlike
   // DOM text), so every weight the canvas draws with must be loaded before the first
@@ -210,7 +211,7 @@ async function main() {
   function closeMapView(): void {
     mapOpen = false;
     canvas.hidden = false;
-    mapCanvas.hidden = true;
+    cityMapEl.hidden = true;
     playSwoosh();
     // both hidden canvases' ResizeObserver callbacks fire async, too late to save
     // the very next redraw()/tick from dividing by a stale zero size
@@ -220,11 +221,11 @@ async function main() {
   function openMapView(): void {
     mapOpen = true;
     canvas.hidden = true;
-    mapCanvas.hidden = false;
+    cityMapEl.hidden = false;
     playSwoosh();
     cityMapView.refresh();
   }
-  const cityMapView = createCityMapView(mapCanvas, {
+  const cityMapView = createCityMapView(app, {
     getTotalIncome,
     getBuildingCount: () => buildings.length,
     getActiveBuildingIndex: () => activeBuildingIndex,

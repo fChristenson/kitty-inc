@@ -5,8 +5,9 @@ import {
   formatPrice,
 } from "../../utils";
 import { COLOR } from "../../palette";
-import { playSold } from "../../sound";
+import { playSold, playSwoosh } from "../../sound";
 import { getBuildingPrice } from "../../buildings";
+import { getCityName } from "../../cityName";
 import cityMapUrl from "../../assets/city2Bg.png";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
 import starUrl from "../../assets/star.png";
@@ -26,9 +27,13 @@ const CAT_JUMP_FRAME = 4; // the sheet's "arms-up happy pose", reused as a littl
 const CAT_POSE_SWAP_MS = 550; // how long each pose in the stand/jump cycle holds
 const MARKER_H = 100;
 const MARKER_HIT_PADDING = 16; // generous click/hover target beyond the sprite's own bounds
-// 5 buildings total on the map: building 0 is the always-free starting building,
-// buildings 1-4 unlock in order, each priced via buildings.ts's getBuildingPrice
-// (scales BUILDING_COST_MULTIPLIER per step, same as each building's own economy)
+// 5 buildings per city/map "page": within a city, building 0 unlocks first, then
+// 1-4 in order, each priced via buildings.ts's getBuildingPrice (scales
+// BUILDING_COST_MULTIPLIER per step, same as each building's own economy). Only
+// the very first building of the very first city is free — every other city's own
+// building 0 is bought the same as any other (see cityIndex/globalIndex below),
+// which naturally costs BUILDING_COST_MULTIPLIER(1000)x the previous city's last
+// (5-star) building, since building indices count up continuously across cities
 const MARKER_COUNT = 5;
 // fixed screen fractions (of the canvas's own CSS size) for each building's marker —
 // this is a flat, non-scrolling static map, so these never move/recompute per building
@@ -85,6 +90,11 @@ const STAR_STROKE_OFFSETS: [number, number][] = Array.from(
   },
 );
 
+// gap between the total-income readout and each city's own name, drawn flat right
+// below it (see drawStreetText) — the name itself comes from cityName.ts's
+// getCityName, keyed by which city (5-building page) is currently being viewed
+const STREET_TEXT_GAP_BELOW_INCOME = 12;
+
 let mapImage: HTMLImageElement | null = null;
 let catSprite: HTMLImageElement | null = null;
 let starImage: HTMLImageElement | null = null;
@@ -129,7 +139,9 @@ export interface CityMapDeps {
 
 export interface CityMapView {
   // re-measures the canvas's own CSS size and redraws; call after un-hiding it,
-  // since a display:none canvas can't be measured while hidden
+  // since a display:none canvas can't be measured while hidden. Also jumps back to
+  // whichever city the player's currently-active building lives in, so opening the
+  // map always starts on "where you are" instead of wherever it was last left
   refresh: () => void;
   destroy: () => void;
 }
@@ -141,13 +153,51 @@ interface MarkerBounds {
   bottom: number;
 }
 
+// up-arrow icon; rotated per direction via CSS (.city-map__arrow--prev/--next in
+// style.css) rather than baking rotation into the markup itself. Drawn twice — a
+// fat black pass behind, a fatter currentColor pass in front — for a bordered look,
+// since these are open stroked lines rather than a fillable shape
+const ARROW_SVG = `
+  <svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <g stroke="black" stroke-width="9">
+      <path d="M12 19V5"></path>
+      <path d="M5 12l7-7 7 7"></path>
+    </g>
+    <g stroke="currentColor" stroke-width="5">
+      <path d="M12 19V5"></path>
+      <path d="M5 12l7-7 7 7"></path>
+    </g>
+  </svg>
+`;
+
+// canvas + prev/next city arrows, wrapped together so toggling the wrapper's
+// hidden attribute hides all three at once (see main.ts's openMapView/closeMapView)
+export function createCityMapMarkup(): string {
+  return `
+    <div class="city-map" id="city-map" hidden>
+      <canvas class="game__canvas" id="map-canvas"></canvas>
+      <button class="city-map__arrow city-map__arrow--prev" id="city-map-prev" aria-label="Previous city" hidden>${ARROW_SVG}</button>
+      <button class="city-map__arrow city-map__arrow--next" id="city-map-next" aria-label="Next city" hidden>${ARROW_SVG}</button>
+    </div>
+  `;
+}
+
 export function createCityMapView(
-  canvas: HTMLCanvasElement,
+  container: HTMLElement,
   deps: CityMapDeps,
 ): CityMapView {
+  const canvas = container.querySelector<HTMLCanvasElement>("#map-canvas")!;
+  const prevButton =
+    container.querySelector<HTMLButtonElement>("#city-map-prev")!;
+  const nextButton =
+    container.querySelector<HTMLButtonElement>("#city-map-next")!;
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
+  // which city's 5-building page is currently shown; a city is "complete" (and the
+  // next one reachable) once all MARKER_COUNT of its buildings are bought — see
+  // updateArrows
+  let cityIndex = 0;
 
   function resize(): void {
     const rect = canvas.getBoundingClientRect();
@@ -344,6 +394,16 @@ export function createCityMapView(
     ctx.restore();
   }
 
+  // "Cat City", flat, centered just below the total-income text (drawn right
+  // after this in redraw(), which passes down where that text's own bottom edge
+  // landed so this doesn't have to duplicate its font/position math)
+  function drawStreetText(topY: number, name: string): void {
+    ctx.font = '900 22px "Fredoka", system-ui, sans-serif';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    drawCartoonText(ctx, name, cssW / 2, topY, COLOR.white, COLOR.black, 5);
+  }
+
   function redraw(): void {
     // re-measure every call instead of trusting whatever resize() last cached —
     // otherwise a redraw sandwiched between the canvas becoming visible and its
@@ -382,13 +442,19 @@ export function createCityMapView(
         : CAT_JUMP_FRAME;
     const buildingCount = deps.getBuildingCount();
 
-    // building 0: always unlocked, plays the stand/jump cycle while it's the
-    // active building — otherwise it just faces the camera, standing still.
-    // every building from 1 up to MARKER_COUNT-1 is grayed out with its own
-    // scaled unlock price until bought, then behaves exactly like building 0
+    // building 0 (of the very first city only) is always unlocked; whichever
+    // building is the currently-active one plays the stand/jump cycle, otherwise
+    // it just faces the camera, standing still. every building from here up to
+    // this city's own MARKER_COUNT-1 is grayed out with its own scaled unlock
+    // price until bought, then behaves exactly like any other unlocked building
     for (let i = 0; i < MARKER_COUNT; i++) {
-      if (i < buildingCount) {
-        drawCatMarker(i, activeIndex === i ? pose : CAT_STAND_FRAME, false);
+      const globalIndex = cityIndex * MARKER_COUNT + i;
+      if (globalIndex < buildingCount) {
+        drawCatMarker(
+          i,
+          activeIndex === globalIndex ? pose : CAT_STAND_FRAME,
+          false,
+        );
         drawStarRow(i, i + 1);
         continue;
       }
@@ -399,7 +465,7 @@ export function createCityMapView(
       ctx.textBaseline = "bottom";
       drawCartoonText(
         ctx,
-        formatPrice(getBuildingPrice(i)),
+        formatPrice(getBuildingPrice(globalIndex)),
         cx,
         feetY - 62,
         COLOR.white,
@@ -410,20 +476,44 @@ export function createCityMapView(
     // total income, top of the map — same green-fill/white-stroke money text look
     // used everywhere else, sized for this canvas's own CSS pixel space (unlike
     // hud/index.ts's drawHud, which is calibrated for the much larger world canvas)
-    ctx.font = '900 32px "Fredoka", system-ui, sans-serif';
+    const incomeFont = '900 32px "Fredoka", system-ui, sans-serif';
+    const incomeText = formatTotalIncome(deps.getTotalIncome());
+    const incomeTop = 20;
+    const incomeStrokeWidth = 6;
+    ctx.font = incomeFont;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     drawCartoonText(
       ctx,
-      formatTotalIncome(deps.getTotalIncome()),
+      incomeText,
       cssW / 2,
-      20,
+      incomeTop,
       COLOR.moneyGreen,
       COLOR.white,
-      6,
+      incomeStrokeWidth,
+    );
+    // measured (not a guessed constant) so the gap stays 12px even if the income
+    // font/text ever changes
+    const incomeMetrics = ctx.measureText(incomeText);
+    const incomeBottom =
+      incomeTop +
+      incomeMetrics.actualBoundingBoxAscent +
+      incomeMetrics.actualBoundingBoxDescent +
+      incomeStrokeWidth / 2;
+    drawStreetText(
+      incomeBottom + STREET_TEXT_GAP_BELOW_INCOME,
+      getCityName(cityIndex),
     );
 
+    updateArrows(buildingCount);
     ctx.restore();
+  }
+
+  // no previous city before the first one; the next city only opens up once every
+  // building in this one has been bought
+  function updateArrows(buildingCount: number): void {
+    prevButton.hidden = cityIndex === 0;
+    nextButton.hidden = buildingCount < (cityIndex + 1) * MARKER_COUNT;
   }
 
   function canvasPoint(event: MouseEvent): { x: number; y: number } {
@@ -445,15 +535,16 @@ export function createCityMapView(
     const p = canvasPoint(event);
     const hit = hitTestAnyMarker(p.x, p.y);
     if (hit === null) return;
+    const globalIndex = cityIndex * MARKER_COUNT + hit;
     const buildingCount = deps.getBuildingCount();
-    if (hit === buildingCount) {
+    if (globalIndex === buildingCount) {
       if (deps.buyBuilding()) playSold();
       redraw();
       return;
     }
     // a marker further out than the next unlock isn't reachable yet — ignore it
-    if (hit > buildingCount) return;
-    deps.onSelectBuilding(hit);
+    if (globalIndex > buildingCount) return;
+    deps.onSelectBuilding(globalIndex);
   }
 
   function onPointerLeave(): void {
@@ -463,6 +554,21 @@ export function createCityMapView(
   canvas.addEventListener("pointermove", onPointerMove);
   canvas.addEventListener("pointerleave", onPointerLeave);
   canvas.addEventListener("click", onClick);
+
+  // both arrows are only ever visible when navigating to their side is actually
+  // allowed (see updateArrows in redraw), so a click here never needs to re-check
+  function onPrevClick(): void {
+    cityIndex -= 1;
+    playSwoosh();
+    redraw();
+  }
+  function onNextClick(): void {
+    cityIndex += 1;
+    playSwoosh();
+    redraw();
+  }
+  prevButton.addEventListener("click", onPrevClick);
+  nextButton.addEventListener("click", onNextClick);
 
   const resizeObserver = new ResizeObserver(() => redraw());
   resizeObserver.observe(canvas);
@@ -491,12 +597,17 @@ export function createCityMapView(
     canvas.removeEventListener("pointermove", onPointerMove);
     canvas.removeEventListener("pointerleave", onPointerLeave);
     canvas.removeEventListener("click", onClick);
+    prevButton.removeEventListener("click", onPrevClick);
+    nextButton.removeEventListener("click", onNextClick);
     resizeObserver.disconnect();
     if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
   }
 
   return {
-    refresh: () => redraw(),
+    refresh: () => {
+      cityIndex = Math.floor(deps.getActiveBuildingIndex() / MARKER_COUNT);
+      redraw();
+    },
     destroy,
   };
 }

@@ -1,6 +1,7 @@
 import type { Floor } from "../../gameState";
 import { clearBuildings } from "../../gameState";
 import { clearTotalIncome } from "../../totalIncome";
+import { clearCityNames } from "../../cityName";
 
 // dev/test-only controls, not part of the real game UI
 export function createTestButtonMarkup(): string {
@@ -62,6 +63,7 @@ export function wireResetButton(
     buildings.length = 0;
     clearBuildings();
     clearTotalIncome();
+    clearCityNames();
     location.reload();
   });
 }

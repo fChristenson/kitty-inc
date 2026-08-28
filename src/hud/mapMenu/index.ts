@@ -1,5 +1,6 @@
 import { getTotalIncome, clearTotalIncome } from "../../totalIncome";
 import { clearBuildings, type Floor } from "../../gameState";
+import { clearCityNames } from "../../cityName";
 import { formatPrice, animateDialogClose } from "../../utils";
 import { getBuildingPrice } from "../../buildings";
 import { playSwoosh, playSold } from "../../sound";
@@ -94,6 +95,7 @@ export function wireMapMenu(
       buildings.length = 0;
       clearBuildings();
       clearTotalIncome();
+      clearCityNames();
       location.reload();
       return;
     }
