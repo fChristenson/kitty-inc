@@ -1,4 +1,4 @@
-import { FLOOR_H, FLOOR_W, DIVIDER_H } from "../../floors";
+import { FLOOR_H, FLOOR_W, DIVIDER_H, SIDE_WALL_WIDTH } from "../../floors";
 import { COLOR } from "../../palette";
 import { loadImage } from "../../utils";
 import wallMaterialUrl from "../../assets/wallMaterial.png";
@@ -14,9 +14,9 @@ import wallMaterialUrl from "../../assets/wallMaterial.png";
 // structural floor-divider band rather than just an edge mask (see DIVIDER_H's own
 // comment in floors/constants.ts for why only the bottom edge needs to be this tall)
 const WALL_WIDTH = 28;
-// side walls get one extra tile of the material stacked on (2x WALL_WIDTH) so they
-// read as noticeably thicker than the thin top edge mask, which stays a single tile
-const SIDE_WALL_WIDTH = WALL_WIDTH * 2;
+// side walls get one extra tile of the material stacked on (2x WALL_WIDTH, see
+// SIDE_WALL_WIDTH in floors/constants.ts) so they read as noticeably thicker than
+// the thin top edge mask, which stays a single tile
 const WALL_COLOR = COLOR.wall; // flat fallback used until loadWallMaterial resolves
 const WALL_SHADOW_COLOR = COLOR.wallShadow; // inner-edge shading toward the room, for a hint of depth
 

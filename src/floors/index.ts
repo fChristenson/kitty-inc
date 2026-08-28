@@ -9,6 +9,7 @@ import {
   GROUND_TILE_W,
   DIVIDER_H,
   ROOM_CONTENT_SCALE,
+  SIDE_WALL_WIDTH,
 } from "./constants";
 import groundImageUrl from "../assets/ground/street.png";
 
@@ -20,6 +21,7 @@ export {
   GROUND_H,
   DIVIDER_H,
   ROOM_CONTENT_SCALE,
+  SIDE_WALL_WIDTH,
 };
 
 const BASE_INCOME_AMOUNT = 1; // ground floor's starting $/interval

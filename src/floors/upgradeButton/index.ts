@@ -1,22 +1,23 @@
 import { drawCartoonText, drawPill, formatPrice } from "../../utils";
-import { FLOOR_W, FLOOR_H, DIVIDER_H } from "../constants";
+import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { COLOR } from "../../palette";
 import type { Floor } from "../../gameState";
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left).
-// Scaled up from the original 360 as far as the gap to the income panel allows. Nudged
-// another 20px in toward center (on top of the existing -20) to match the income panel's own shift.
-// BTN_H now exactly fills DIVIDER_H (grown +20 from 120), so it spans the divider band edge-to-edge
-export const BTN_W = 440;
+// Width cut 25% from the previous 440 (was matching the income panel 1:1); BTN_X sets its
+// right edge flush against the side wall (FLOOR_W - SIDE_WALL_WIDTH), same alignment rule
+// as the income bar's left edge. BTN_H exactly fills DIVIDER_H, spanning it edge-to-edge
+export const BTN_W = 330;
 export const BTN_H = 140;
-const BTN_MARGIN = 24;
-export const BTN_X = FLOOR_W - BTN_W - BTN_MARGIN - 40;
+export const BTN_X = FLOOR_W - SIDE_WALL_WIDTH - BTN_W;
 // centered inside the divider band below (see outerWall/index.ts's DIVIDER_H),
 // mounted on top of it since that's drawn first, nudged down 10px from dead
-// center — same for every floor. BTN_H leaves just enough divider clearance for
-// this nudge without clipping against the floor canvas edge
-function getBtnY(_isGroundFloor: boolean): number {
-  return FLOOR_H - DIVIDER_H / 2 - BTN_H / 2 + 10;
+// center — except the bottom (ground) floor, which stays at dead center. BTN_H
+// leaves just enough divider clearance for this nudge without clipping against
+// the floor canvas edge
+function getBtnY(isGroundFloor: boolean): number {
+  const base = FLOOR_H - DIVIDER_H / 2 - BTN_H / 2;
+  return isGroundFloor ? base + 2 : base + 10;
 }
 
 function isPointOnButton(

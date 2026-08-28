@@ -1,4 +1,4 @@
-import { FLOOR_H, DIVIDER_H } from "../constants";
+import { FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { countBoostedWorkers, type Floor } from "../../gameState";
 import { MAX_RENDERED_WORKERS } from "../worker";
 import {
@@ -11,17 +11,17 @@ import {
 import { COLOR } from "../../palette";
 
 // panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right).
-// Scaled up from the original 360 as far as the gap to the upgrade button allows, and nudged
-// another 20px in toward center (on top of the existing +10) to match that button's own shift
+// Scaled up from the original 360 as far as the gap to the upgrade button allows. PANEL_X is
+// set so the bar's own left edge (barX below, PANEL_X + 18) lands flush against SIDE_WALL_WIDTH
 export const PANEL_W = 440;
 export const PANEL_H = 120;
-const PANEL_MARGIN = 24;
-export const PANEL_X = PANEL_MARGIN + 10 + 20;
+export const PANEL_X = SIDE_WALL_WIDTH - 18;
 // centered inside the divider band below (see outerWall/index.ts's DIVIDER_H),
 // mounted on top of it since that's drawn first, nudged down 10px from dead
-// center — same for every floor
-function getPanelY(_isGroundFloor: boolean): number {
-  return FLOOR_H - DIVIDER_H / 2 - PANEL_H / 2 + 10;
+// center — except the bottom (ground) floor, which stays at dead center
+function getPanelY(isGroundFloor: boolean): number {
+  const base = FLOOR_H - DIVIDER_H / 2 - PANEL_H / 2;
+  return isGroundFloor ? base : base + 10;
 }
 
 // when each floor's current fill cycle started is floor.lastCollectedAt itself (a

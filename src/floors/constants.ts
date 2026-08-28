@@ -7,6 +7,11 @@
 export const FLOOR_W = 1248;
 export const FLOOR_H = 721;
 
+// width of the exterior side-wall facade strips (see buildings/outerWall/index.ts) —
+// lives here, not there, so incomePanel/upgradeButton can align their own edges flush
+// against the walls without a circular import back into buildings/
+export const SIDE_WALL_WIDTH = 56;
+
 // the floor plane band inside each bg.png slice (rest is ceiling/walls/windows) —
 // used to keep the worker walking band clear of the room's side walls
 export const FLOOR_X_MIN = 150;
