@@ -1,8 +1,15 @@
-import { loadImage, drawCartoonText, formatTotalIncome } from "../../utils";
+import {
+  loadImage,
+  drawCartoonText,
+  formatTotalIncome,
+  formatPrice,
+} from "../../utils";
 import { COLOR } from "../../palette";
 import { playSold } from "../../sound";
+import { getBuildingPrice } from "../../buildings";
 import cityMapUrl from "../../assets/city2Bg.png";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
+import starUrl from "../../assets/star.png";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -19,17 +26,56 @@ const CAT_JUMP_FRAME = 4; // the sheet's "arms-up happy pose", reused as a littl
 const CAT_POSE_SWAP_MS = 550; // how long each pose in the stand/jump cycle holds
 const MARKER_H = 100;
 const MARKER_HIT_PADDING = 16; // generous click/hover target beyond the sprite's own bounds
-// the second building's price is a placeholder — real per-building pricing (see
-// buildings/index.ts's getBuildingPrice) comes once more than 2 buildings exist here
-const NEXT_BUILDING_PRICE_TEXT = "$1B";
+// 5 buildings total on the map: building 0 is the always-free starting building,
+// buildings 1-4 unlock in order, each priced via buildings.ts's getBuildingPrice
+// (scales BUILDING_COST_MULTIPLIER per step, same as each building's own economy)
+const MARKER_COUNT = 5;
+// fixed screen fractions (of the canvas's own CSS size) for each building's marker —
+// this is a flat, non-scrolling static map, so these never move/recompute per building
+// zigzags up the map as tier/star count increases, so higher-tier buildings read
+// as literally "higher up": bottom-left, far right, middle-left, far left, far right.
+// centerShiftPx pulls a marker that many pixels toward the horizontal center
+const MARKER_POSITIONS: {
+  cxFrac: number;
+  feetYFrac: number;
+  cxFixed?: number;
+  centerShiftPx?: number;
+  cxNudgePx?: number; // extra fine-tune offset, positive = right
+  feetYNudgePx?: number; // extra fine-tune offset, positive = down
+}[] = [
+  { cxFrac: 0, feetYFrac: 1, cxFixed: 70 }, // building 0 (1 star): fixed bottom-left dock
+  { cxFrac: 0.88, feetYFrac: 0.78, centerShiftPx: 100 }, // building 1 (2 stars): far right
+  {
+    cxFrac: 0.28,
+    feetYFrac: 0.58,
+    centerShiftPx: 100,
+    cxNudgePx: 50,
+    feetYNudgePx: -50,
+  }, // building 2 (3 stars): middle left
+  { cxFrac: 0.06, feetYFrac: 0.36, centerShiftPx: 100 }, // building 3 (4 stars): far left
+  {
+    cxFrac: 0.88,
+    feetYFrac: 0.16,
+    centerShiftPx: 100,
+    cxNudgePx: 80,
+    feetYNudgePx: 50,
+  }, // building 4 (5 stars): far right
+];
+// tier star row drawn under each marker: building index 0 shows 1 filled star (of
+// 5), the last building (index MARKER_COUNT-1) shows all 5 filled
+const STAR_ROW_Y_OFFSET = 12; // below the marker's feetY
+const STAR_SIZE = 18; // rendered square size (star.png is roughly square already)
+const STAR_SPACING = 20;
 
 let mapImage: HTMLImageElement | null = null;
 let catSprite: HTMLImageElement | null = null;
+let starImage: HTMLImageElement | null = null;
 
 export async function loadCityMapImage(): Promise<HTMLImageElement> {
-  [mapImage, catSprite] = await Promise.all([
+  [mapImage, catSprite, starImage] = await Promise.all([
     loadImage(cityMapUrl),
     loadImage(catSpriteUrl),
+    loadImage(starUrl),
   ]);
   return mapImage;
 }
@@ -73,12 +119,23 @@ export function createCityMapView(
     canvas.height = Math.round(cssH * dpr);
   }
 
-  // building 0's marker always sits bottom-left; building 1's sits further up —
-  // fixed screen positions since this is a flat, non-scrolling static map
+  // building 0's marker always sits bottom-left (fixed); every other building's
+  // marker sits at its own fixed screen fraction, pulled toward center by its own
+  // centerShiftPx — see MARKER_POSITIONS above
   function markerCenter(buildingIndex: number): { cx: number; feetY: number } {
-    return buildingIndex === 0
-      ? { cx: 70, feetY: cssH - 40 }
-      : { cx: cssW * 0.62, feetY: cssH * 0.4 };
+    const pos = MARKER_POSITIONS[buildingIndex];
+    let cx = pos.cxFixed ?? cssW * pos.cxFrac;
+    if (pos.centerShiftPx) {
+      const center = cssW / 2;
+      cx += cx > center ? -pos.centerShiftPx : pos.centerShiftPx;
+    }
+    cx += pos.cxNudgePx ?? 0;
+    return {
+      cx,
+      feetY:
+        (buildingIndex === 0 ? cssH - 40 : cssH * pos.feetYFrac) +
+        (pos.feetYNudgePx ?? 0),
+    };
   }
 
   function markerBounds(buildingIndex: number): MarkerBounds {
@@ -102,10 +159,41 @@ export function createCityMapView(
     return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom;
   }
 
-  // buildings beyond index 1 don't have a marker here yet (see module comment)
+  // single star.png icon; empty (unfilled) ones get a flat gray tint via canvas
+  // filter, same technique drawCatMarker uses for a locked building's marker
+  function drawStarIcon(cx: number, cy: number, filled: boolean): void {
+    if (!starImage) return;
+    ctx.save();
+    if (!filled) {
+      ctx.filter = "grayscale(1) brightness(0.75)";
+      ctx.globalAlpha = 0.6;
+    }
+    ctx.drawImage(
+      starImage,
+      cx - STAR_SIZE / 2,
+      cy - STAR_SIZE / 2,
+      STAR_SIZE,
+      STAR_SIZE,
+    );
+    ctx.restore();
+  }
+
+  // 5 stars centered under the marker; `filledCount` (buildingIndex + 1) of them
+  // solid gold, the rest gray-tinted — shows this building's tier at a glance
+  function drawStarRow(buildingIndex: number, filledCount: number): void {
+    const { cx, feetY } = markerCenter(buildingIndex);
+    const rowY = feetY + STAR_ROW_Y_OFFSET;
+    const startX = cx - (STAR_SPACING * 4) / 2;
+    for (let i = 0; i < 5; i++) {
+      drawStarIcon(startX + i * STAR_SPACING, rowY, i < filledCount);
+    }
+  }
+
+  // any building beyond MARKER_COUNT has no marker here yet
   function hitTestAnyMarker(x: number, y: number): number | null {
-    if (hitTestMarker(0, x, y)) return 0;
-    if (hitTestMarker(1, x, y)) return 1;
+    for (let i = 0; i < MARKER_COUNT; i++) {
+      if (hitTestMarker(i, x, y)) return i;
+    }
     return null;
   }
 
@@ -174,29 +262,31 @@ export function createCityMapView(
       Math.floor(Date.now() / CAT_POSE_SWAP_MS) % 2 === 0
         ? CAT_STAND_FRAME
         : CAT_JUMP_FRAME;
+    const buildingCount = deps.getBuildingCount();
 
     // building 0: always unlocked, plays the stand/jump cycle while it's the
-    // active building — otherwise it just faces the camera, standing still
-    drawCatMarker(0, activeIndex === 0 ? pose : CAT_STAND_FRAME, false);
-
-    // building 1: grayed out with its price until bought, then behaves exactly
-    // like building 0 (stand/jump while active, otherwise just standing)
-    const unlocked = deps.getBuildingCount() >= 2;
-    if (unlocked) {
-      drawCatMarker(1, activeIndex === 1 ? pose : CAT_STAND_FRAME, false);
-    } else {
-      drawCatMarker(1, CAT_STAND_FRAME, true);
-      const { cx, feetY } = markerCenter(1);
+    // active building — otherwise it just faces the camera, standing still.
+    // every building from 1 up to MARKER_COUNT-1 is grayed out with its own
+    // scaled unlock price until bought, then behaves exactly like building 0
+    for (let i = 0; i < MARKER_COUNT; i++) {
+      if (i < buildingCount) {
+        drawCatMarker(i, activeIndex === i ? pose : CAT_STAND_FRAME, false);
+        drawStarRow(i, i + 1);
+        continue;
+      }
+      drawCatMarker(i, CAT_STAND_FRAME, true);
+      const { cx, feetY } = markerCenter(i);
       ctx.font = '900 22px "Fredoka", system-ui, sans-serif';
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
       drawCartoonText(
         ctx,
-        NEXT_BUILDING_PRICE_TEXT,
+        formatPrice(getBuildingPrice(i)),
         cx,
         feetY + 6,
         COLOR.white,
       );
+      drawStarRow(i, i + 1);
     }
 
     // total income, top of the map — same green-fill/white-stroke money text look
@@ -229,17 +319,22 @@ export function createCityMapView(
     canvas.style.cursor = hit !== null ? "pointer" : "default";
   }
 
-  // a locked building-1 click just buys it (staying on the map so its color/price
-  // change is visible); an unlocked one switches to it and leaves the map entirely
+  // clicking the next locked building (buildings unlock strictly in order) buys it
+  // (staying on the map so its color/price change is visible); clicking a further,
+  // not-yet-reachable locked marker does nothing; an unlocked one switches to it
+  // and leaves the map entirely
   function onClick(event: MouseEvent): void {
     const p = canvasPoint(event);
     const hit = hitTestAnyMarker(p.x, p.y);
     if (hit === null) return;
-    if (hit === 1 && deps.getBuildingCount() < 2) {
+    const buildingCount = deps.getBuildingCount();
+    if (hit === buildingCount) {
       if (deps.buyBuilding()) playSold();
       redraw();
       return;
     }
+    // a marker further out than the next unlock isn't reachable yet — ignore it
+    if (hit > buildingCount) return;
     deps.onSelectBuilding(hit);
   }
 
