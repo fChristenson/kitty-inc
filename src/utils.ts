@@ -27,6 +27,24 @@ export function triggerButtonPress(button: HTMLButtonElement): Promise<void> {
   });
 }
 
+// plays a dialog panel's slide-out-to-the-bottom animation (see style.css's
+// "worker-menu-slide-out" keyframes) and resolves once it finishes — every
+// worker-menu-based dialog (upgrade/boost/map menu) awaits this before actually
+// hiding itself, so closing always glides out instead of just vanishing
+export function animateDialogClose(panel: HTMLElement): Promise<void> {
+  panel.classList.add("worker-menu__panel--closing");
+  return new Promise((resolve) => {
+    panel.addEventListener(
+      "animationend",
+      () => {
+        panel.classList.remove("worker-menu__panel--closing");
+        resolve();
+      },
+      { once: true },
+    );
+  });
+}
+
 // suffix tiers for compact large-number formatting (short scale), shared by
 // formatPrice/formatTime so every number on screen scales the same way and
 // can never overflow into a giant unformatted string at big values. Short

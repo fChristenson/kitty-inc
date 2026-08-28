@@ -1,7 +1,8 @@
 import { getTotalIncome, clearTotalIncome } from "../../totalIncome";
 import { clearBuildings, type Floor } from "../../gameState";
-import { formatPrice } from "../../utils";
+import { formatPrice, animateDialogClose } from "../../utils";
 import { getBuildingPrice } from "../../buildings";
+import { playSwoosh, playSold } from "../../sound";
 
 // reuses .worker-menu's styling — same generic "dialog with a list of buyable items"
 // shape as boostMenu/upgradeMenu. Lists a button per building already owned (how you
@@ -43,6 +44,7 @@ export function wireMapMenu(
   const menu = container.querySelector<HTMLDivElement>("#map-menu")!;
   const backdrop =
     container.querySelector<HTMLDivElement>("#map-menu-backdrop")!;
+  const panel = menu.querySelector<HTMLDivElement>(".worker-menu__panel")!;
   const list = container.querySelector<HTMLDivElement>("#map-menu-list")!;
 
   function render(): void {
@@ -98,6 +100,7 @@ export function wireMapMenu(
     if (target.closest("#map-menu-buy-building")) {
       const newBuildingIndex = getBuildingCount();
       if (buyBuilding()) {
+        playSold();
         onSelectBuilding(newBuildingIndex);
         close();
       }
@@ -128,10 +131,13 @@ export function wireMapMenu(
   function open(): void {
     render();
     menu.hidden = false;
+    playSwoosh();
     refreshInterval = setInterval(updateAffordability, 250);
   }
 
-  function close(): void {
+  async function close(): Promise<void> {
+    playSwoosh();
+    await animateDialogClose(panel);
     menu.hidden = true;
     if (refreshInterval !== null) {
       clearInterval(refreshInterval);

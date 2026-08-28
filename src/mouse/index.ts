@@ -8,6 +8,7 @@ import {
 } from "../floors";
 import { loadImage, randomInt } from "../utils";
 import { applyBoostAll } from "../hud";
+import { playBloop } from "../sound";
 import type { Floor } from "../gameState";
 import mouseImageUrl from "../assets/mouse.png";
 
@@ -260,5 +261,6 @@ export function handleMouseClick(
   despawn(now);
   applyBoostAll(floors);
   triggerJumpAll(floors, now);
+  playBloop();
   spawnCoinBurst(floor, burstX, MOUSE_Y - RENDER_H / 2, () => {});
 }

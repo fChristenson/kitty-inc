@@ -37,6 +37,14 @@ const UPGRADES_PER_INTERVAL_HALVING = 10;
 // upgradeCount hitting a multiple of this is also the "next ten levels" milestone
 // floorInteractions.ts celebrates with an extra coin burst at the upgrade indicator
 export const UPGRADE_MILESTONE_STEP = UPGRADES_PER_INTERVAL_HALVING;
+// each upgrade multiplies the NEXT upgrade's cost by this, instead of a flat x2 —
+// x2 compounded against income that only grows ~linearly (+rateStep) plus a much
+// smaller periodic interval-halving kicker every UPGRADES_PER_INTERVAL_HALVING
+// upgrades diverges hard: the wait for each successive upgrade ballooned to hours,
+// then days, by only the 20th-30th upgrade on a single floor (simulated). 1.3 keeps
+// the early game snappy while still slowing into normal idle-game pacing later,
+// rather than the player hitting a wall almost immediately
+const UPGRADE_COST_GROWTH = 1.3;
 
 // below this, the fill cycle repeats too fast to read as a filling bar, so the bar is
 // just shown full and an orbiting dot (fixed speed, independent of the real interval)
@@ -51,7 +59,7 @@ const FAST_CYCLE_RAY_WIDTH = 8;
 
 export function increaseIncomeRate(floor: Floor): void {
   floor.incomeAmount += floor.rateStep;
-  floor.upgradeCost *= 2;
+  floor.upgradeCost = Math.ceil(floor.upgradeCost * UPGRADE_COST_GROWTH);
   floor.upgradeCount += 1;
   if (floor.upgradeCount % UPGRADES_PER_INTERVAL_HALVING === 0) {
     floor.incomeIntervalSeconds = Math.max(

@@ -1,10 +1,15 @@
 import { activateBoosted, type Floor } from "../../gameState";
-import { formatPrice, triggerButtonPress } from "../../utils";
+import {
+  formatPrice,
+  triggerButtonPress,
+  animateDialogClose,
+} from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
-import { MAX_RENDERED_WORKERS } from "../../floors";
+import { MAX_RENDERED_WORKERS, triggerJumpAll } from "../../floors";
+import { playSwoosh, playSold } from "../../sound";
 import mouseIconUrl from "../../assets/mouse.png";
 
-const BOOST_ALL_SECONDS_COST = 15; // cost is 15s of current (unboosted) income
+const BOOST_ALL_SECONDS_COST = 5; // cost is 5s of current (unboosted) income
 
 // $/sec every unlocked floor is currently earning at its own base rate, ignoring any
 // boost already in effect — same convention gameState.ts's computeIdleIncome uses
@@ -40,6 +45,9 @@ export function applyBoostAll(floors: Floor[]): void {
 export function buyBoostAll(floors: Floor[]): boolean {
   if (!spendTotalIncome(getBoostAllCost(floors))) return false;
   applyBoostAll(floors);
+  // same building-wide "yay!" jump-bounce mouse/index.ts's handleMouseClick triggers
+  // for its own free boost, so buying the boost from the dialog reacts identically
+  triggerJumpAll(floors, Date.now());
   return true;
 }
 
@@ -74,6 +82,7 @@ export function wireBoostMenu(
   const backdrop = container.querySelector<HTMLDivElement>(
     "#boost-menu-backdrop",
   )!;
+  const panel = menu.querySelector<HTMLDivElement>(".worker-menu__panel")!;
   const list = container.querySelector<HTMLDivElement>("#boost-menu-list")!;
 
   function render(): void {
@@ -100,6 +109,7 @@ export function wireBoostMenu(
     );
     if (!button) return;
     if (buyBoostAll(getFloors())) {
+      playSold();
       await triggerButtonPress(button);
       onPurchase();
       render();
@@ -123,10 +133,13 @@ export function wireBoostMenu(
   function open(): void {
     render();
     menu.hidden = false;
+    playSwoosh();
     refreshInterval = setInterval(updateAffordability, 250);
   }
 
-  function close(): void {
+  async function close(): Promise<void> {
+    playSwoosh();
+    await animateDialogClose(panel);
     menu.hidden = true;
     if (refreshInterval !== null) {
       clearInterval(refreshInterval);

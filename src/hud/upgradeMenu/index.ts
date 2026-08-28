@@ -1,7 +1,12 @@
 import type { Floor } from "../../gameState";
-import { formatPrice, triggerButtonPress } from "../../utils";
+import {
+  formatPrice,
+  triggerButtonPress,
+  animateDialogClose,
+} from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { MAX_RENDERED_WORKERS } from "../../floors";
+import { playSwoosh, playSold } from "../../sound";
 import kittyIconUrl from "../../assets/kittyIcon.png";
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
@@ -56,6 +61,7 @@ export function wireUpgradeMenu(
   const backdrop = container.querySelector<HTMLDivElement>(
     "#upgrade-menu-backdrop",
   )!;
+  const panel = menu.querySelector<HTMLDivElement>(".worker-menu__panel")!;
   const list = container.querySelector<HTMLDivElement>("#upgrade-menu-list")!;
 
   function render(): void {
@@ -93,6 +99,7 @@ export function wireUpgradeMenu(
     if (!button) return;
     const floor = getFloors()[Number(button.dataset.floorIndex)];
     if (floor && floor.unlocked && buyWorker(floor)) {
+      playSold();
       await triggerButtonPress(button);
       onPurchase();
       render();
@@ -118,10 +125,13 @@ export function wireUpgradeMenu(
   function open(): void {
     render();
     menu.hidden = false;
+    playSwoosh();
     refreshInterval = setInterval(updateAffordability, 250);
   }
 
-  function close(): void {
+  async function close(): Promise<void> {
+    playSwoosh();
+    await animateDialogClose(panel);
     menu.hidden = true;
     if (refreshInterval !== null) {
       clearInterval(refreshInterval);

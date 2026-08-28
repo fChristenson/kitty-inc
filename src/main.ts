@@ -56,11 +56,13 @@ import {
   loadRoofImage,
 } from "./buildings";
 import { loadMouseImage, forceSpawnMouse } from "./mouse";
+import { startBackgroundMusic, playSwoosh } from "./sound";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
   if (!app) throw new Error("#app not found");
   initSessionGuard();
+  startBackgroundMusic();
 
   app.innerHTML = `
     <div class="game">
@@ -202,6 +204,7 @@ async function main() {
     mapOpen = false;
     canvas.hidden = false;
     mapCanvas.hidden = true;
+    playSwoosh();
     // both hidden canvases' ResizeObserver callbacks fire async, too late to save
     // the very next redraw()/tick from dividing by a stale zero size
     gameCanvas.resize();
@@ -211,6 +214,7 @@ async function main() {
     mapOpen = true;
     canvas.hidden = true;
     mapCanvas.hidden = false;
+    playSwoosh();
     cityMapView.refresh();
   }
   const cityMapView = createCityMapView(mapCanvas, {
@@ -224,8 +228,14 @@ async function main() {
     },
   });
   wireActionBar(app, {
-    onScrollTop: () => gameCanvas.scrollActiveToTop(),
-    onScrollBottom: () => gameCanvas.scrollActiveToBottom(),
+    onScrollTop: () => {
+      playSwoosh();
+      gameCanvas.scrollActiveToTop();
+    },
+    onScrollBottom: () => {
+      playSwoosh();
+      gameCanvas.scrollActiveToBottom();
+    },
     onBoostAll: () => {
       boostMenu.open();
     },

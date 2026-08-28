@@ -9,6 +9,7 @@ import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
 import { getUpgradeIndicatorCenter } from "../star";
+import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
   hitTestFloorLock,
   unlockFloor,
@@ -59,6 +60,7 @@ export function handleFloorClick(
   if (hitTestFloorLock(x, y, floor)) {
     if (spendTotalIncome(floor.unlockCost)) {
       unlockFloor(floor);
+      playSold();
       ensureLockedFloorAbove({
         floors,
         backgroundCount,
@@ -80,6 +82,7 @@ export function handleFloorClick(
     increaseIncomeRate(floor);
     persist();
     triggerButtonPress(floor);
+    playCoinDrop();
     const center = getButtonCenter(isGroundFloor);
     spawnCoinBurst(floor, center.x, center.y, () => {});
     // extra celebration burst right on the upgrade indicator every 10th upgrade,
@@ -87,6 +90,7 @@ export function handleFloorClick(
     if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
       const indicatorCenter = getUpgradeIndicatorCenter(floor);
       spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
+      playBloop();
     }
     return;
   }
@@ -97,6 +101,7 @@ export function handleFloorClick(
     // Date.now()-based `now`, which is what clickedAt actually gets compared
     // against to time the click-bounce/jump-sprite reaction
     if (!clickWorker(floor, workerIndex, Date.now())) continue;
+    playBloop();
     const center = getWorkerCenter(floor, workerIndex);
     if (center) {
       spawnCoinBurst(floor, center.x, center.y, () => {});

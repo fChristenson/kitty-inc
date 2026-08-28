@@ -1,5 +1,6 @@
 import { loadImage, drawCartoonText, formatTotalIncome } from "../../utils";
 import { COLOR } from "../../palette";
+import { playSold } from "../../sound";
 import cityMapUrl from "../../assets/city2Bg.png";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
 
@@ -235,7 +236,7 @@ export function createCityMapView(
     const hit = hitTestAnyMarker(p.x, p.y);
     if (hit === null) return;
     if (hit === 1 && deps.getBuildingCount() < 2) {
-      deps.buyBuilding();
+      if (deps.buyBuilding()) playSold();
       redraw();
       return;
     }

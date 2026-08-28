@@ -295,6 +295,98 @@ body {
   color: var(--color-wood-text);
   margin: 14px;
   padding: 1rem;
+  /* stretches/squashes toward the bottom edge it slides from, so scale keyframes
+     read as "leaning into" the direction of travel instead of scaling from center */
+  transform-origin: bottom center;
+  /* glides up from off-screen every time the panel goes from [hidden] (display:none)
+     to shown — display:none resets animation state, so this replays on every open
+     with no extra JS needed. Sped up 3x total from swoosh.mp3's own 1.056s duration
+     (see sound.ts's playSwoosh, called the same moment each menu's open() sets
+     hidden=false) so the slide finishes well before the sound does. `translate` and
+     `scale` are independent CSS properties (not the `transform` shorthand), each
+     animated on its own timeline — that's what lets the warp actively ramp in/out
+     WHILE the slide is still moving instead of being a fixed stretched value that
+     only changes once the slide has already finished */
+  animation:
+    worker-menu-slide-in-move 0.352s ease-out,
+    worker-menu-slide-in-warp 0.352s ease-out;
+}
+
+.worker-menu__panel--closing {
+  /* added by utils.ts's animateDialogClose right before each menu's close()
+     actually hides itself, so closing glides back down instead of vanishing */
+  animation:
+    worker-menu-slide-out-move 0.352s ease-in forwards,
+    worker-menu-slide-out-warp 0.352s ease-in forwards;
+}
+
+@keyframes worker-menu-slide-in-move {
+  0% {
+    translate: 0 100vh;
+  }
+  /* must land on the exact same checkpoint the warp keyframes below assume is
+     "already arrived" (62%) — this animation used to only have a from/to pair,
+     so under ease-out it was still ~50px short of 0 while the warp's squash had
+     already started, reading as "warp happens before it stops" */
+  62% {
+    translate: 0 0;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+
+@keyframes worker-menu-slide-in-warp {
+  /* mirrors mouse/index.ts's run/launch squash-stretch: starts normal, ramps into
+     an elongated (tall/thin) shape right as it launches, stays stretched for the
+     bulk of the fast travel, squashes flat/wide for an instant on landing, then
+     settles back to normal */
+  0% {
+    scale: 1 1;
+  }
+  18% {
+    scale: 0.96 1.06;
+  }
+  62% {
+    scale: 0.96 1.06;
+  }
+  /* dead hold: the move animation above has already fully arrived by here (with
+     margin for its easing curve's tail), so the squash below only starts once the
+     panel has visibly stopped, not while it's still sliding */
+  72% {
+    scale: 0.96 1.06;
+  }
+  87% {
+    scale: 1.05 0.96;
+  }
+  100% {
+    scale: 1 1;
+  }
+}
+
+@keyframes worker-menu-slide-out-move {
+  0% {
+    translate: 0 0;
+  }
+  /* holds in place through the anticipation squash below before actually launching */
+  15% {
+    translate: 0 0;
+  }
+  100% {
+    translate: 0 100vh;
+  }
+}
+
+@keyframes worker-menu-slide-out-warp {
+  0% {
+    scale: 1 1;
+  }
+  15% {
+    scale: 1.05 0.96;
+  }
+  100% {
+    scale: 0.96 1.06;
+  }
 }
 
 .worker-menu__header {
