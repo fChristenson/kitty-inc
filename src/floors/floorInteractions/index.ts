@@ -7,6 +7,8 @@ import {
   consumeCritUpgrade,
   rollCritUpgrade,
   CRIT_UPGRADE_COUNT,
+  BTN_W,
+  BTN_H,
 } from "../upgradeButton";
 import { increaseIncomeRate, UPGRADE_MILESTONE_STEP } from "../incomePanel";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
@@ -150,7 +152,12 @@ export function handleFloorClick(
       triggerButtonPress(floor);
       playCoinDrop();
       const center = getButtonCenter(isGroundFloor);
-      spawnCoinBurst(floor, center.x, center.y, () => {});
+      // small random jitter so the burst doesn't spawn at the exact same pixel
+      // every single click — a random point spanning the button's own inner width
+      // on X (scaled back 25%) and half its height on Y
+      const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
+      const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
+      spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
       // extra celebration burst right on the upgrade indicator every 10th upgrade,
       // same milestone that halves this floor's income interval
       if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {

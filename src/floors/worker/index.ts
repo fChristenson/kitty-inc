@@ -1,5 +1,11 @@
 import { FLOOR_X_MIN, FLOOR_X_MAX, ROOM_CONTENT_SCALE } from "../constants";
-import { isBoosted, getWorkerTintIndexes, type Floor } from "../../gameState";
+import {
+  isBoosted,
+  getBoostRemainingMs,
+  BOOST_URGENT_THRESHOLD_MS,
+  getWorkerTintIndexes,
+  type Floor,
+} from "../../gameState";
 import { loadImage, randomInt } from "../../utils";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
 
@@ -281,18 +287,33 @@ export function getWorkerCenter(
 }
 
 // on-screen (floor-local) center of every currently-boosted worker on the floor, so
-// the floating-coin animation only plays at the ones actually boosted
+// the floating-coin animation only plays at the ones actually boosted.
+// `blinkIntensity` ramps from 0 (just entered the urgent window) to 1 (about to
+// expire) once that worker's boost has BOOST_URGENT_THRESHOLD_MS or less left, so
+// the caller's floating coins can blink harder the closer the boost is to running out
 export function getBoostedWorkerCenters(
   floor: Floor,
   now: number,
-): { x: number; y: number }[] {
+): { x: number; y: number; blinkIntensity: number }[] {
   const state = floorWorkers.get(floor);
   if (!state) return [];
   const y = WORKER_FEET_Y - RENDER_H / 2;
   return state.walkers
-    .map((w, i) => ({ x: w.x, y, boosted: isBoosted(floor, i, now) }))
+    .map((w, i) => ({
+      x: w.x,
+      y,
+      boosted: isBoosted(floor, i, now),
+      remainingMs: getBoostRemainingMs(floor, i, now),
+    }))
     .filter((w) => w.boosted)
-    .map(({ x, y }) => ({ x, y }));
+    .map(({ x, y, remainingMs }) => ({
+      x,
+      y,
+      blinkIntensity:
+        remainingMs >= BOOST_URGENT_THRESHOLD_MS
+          ? 0
+          : 1 - remainingMs / BOOST_URGENT_THRESHOLD_MS,
+    }));
 }
 
 // one recolored frame per (frame, tintIndex) pair is built once and reused forever

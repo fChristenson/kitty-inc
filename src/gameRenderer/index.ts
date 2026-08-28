@@ -32,7 +32,13 @@ function maybeSpawnFloatingCoins(floor: Floor, now: number): void {
   for (const center of centers) {
     // gameCanvas.ts redraws every frame regardless, so floating coins don't need to
     // force an extra redraw themselves the way the old per-floor-canvas version did
-    spawnFloatingCoins(floor, center.x, center.y, () => {});
+    spawnFloatingCoins(
+      floor,
+      center.x,
+      center.y,
+      () => {},
+      center.blinkIntensity,
+    );
   }
 }
 

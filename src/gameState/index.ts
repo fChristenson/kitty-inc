@@ -38,6 +38,10 @@ export interface WorkerSlot {
 }
 
 const BOOST_DURATION_MS = 15_000; // boosted state auto-resets this long after being triggered
+// floors/coinFloat.ts blinks a boosted worker's floating coins once this little
+// time is left, so letting a boost run out down to the wire visibly reads as
+// "about to lose this" instead of it just quietly expiring
+export const BOOST_URGENT_THRESHOLD_MS = 5_000;
 
 export interface Floor {
   bgIndex: number; // which loaded shop background this floor draws (floors/index.ts)
@@ -105,6 +109,18 @@ export function activateBoosted(
 export function countBoostedWorkers(floor: Floor, now: number): number {
   return getWorkerSlots(floor).filter((slot) => expireIfStale(slot, now))
     .length;
+}
+
+// ms left on a worker's boost, 0 once expired/never boosted; worker.ts's
+// getBoostedWorkerCenters uses this to flag which centers should blink as urgent
+export function getBoostRemainingMs(
+  floor: Floor,
+  workerIndex: number,
+  now: number,
+): number {
+  const slot = ensureSlot(floor, workerIndex);
+  if (!expireIfStale(slot, now)) return 0;
+  return Math.max(0, BOOST_DURATION_MS - (now - slot.boostedAt));
 }
 
 // which theme color (floors/worker/index.ts's THEME_COLORS) each of a floor's
