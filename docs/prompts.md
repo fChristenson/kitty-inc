@@ -42,3 +42,11 @@ Flat 2D cartoon sprite sheet, 6 evenly spaced frames in one row, a single green 
 
 Flat 2D cartoon isometric city map tile, angled 3/4 top-down view. Rows of small chunky skyscrapers and low buildings with flat roofs and simple window details, muted pastel palette matching the game's interiors. Streets connect building lots with dotted path lines and round node markers. Seamless, tileable in every direction with no visible seam so it repeats infinitely. Flat cel-shaded lighting, no text, logos, or people.
 
+# Empty cardboard box
+
+Flat 2D cartoon isometric cardboard box, angled 3/4 view, centered. Open top, all four flaps folded outward and down, empty interior, no contents. Warm tan cardboard fill, thick dark-brown outline, corrugated-edge texture on flap edges. Cel-shaded: flat light highlight on interior/flap faces, flat darker shade on exterior panel. No tape, labels, text, or logos. Isolated on transparent background, edge-to-edge crop, square 1:1.
+
+# Ball of yarn
+
+Flat 2D cartoon isometric ball of yarn, angled 3/4 view, centered. Rounded sphere wrapped in crisscrossing wound strand lines, one loose strand end trailing off the lower side. Solid warm coral yarn fill, thick dark-brown outline, thin darker strand-groove lines. Cel-shaded: flat light highlight on upper-facing surface, flat darker shade on lower-facing surface. No needles, tags, text, or logos. Isolated on transparent background, edge-to-edge crop, square 1:1.
+

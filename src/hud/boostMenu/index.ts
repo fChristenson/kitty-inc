@@ -142,7 +142,7 @@ export function wireBoostMenu(
       >
         <span class="worker-menu__item-label">
           <img src="${mouseIconUrl}" class="worker-menu__icon" alt="" />
-          Boost workers
+          Motivate workers
         </span>
         <span class="worker-menu__price">${formatPrice(cost)}</span>
       </button>

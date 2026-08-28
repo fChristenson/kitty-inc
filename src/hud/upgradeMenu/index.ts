@@ -8,6 +8,8 @@ import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { MAX_RENDERED_WORKERS } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import kittyIconUrl from "../../assets/kittyIcon.png";
+import officeChairsIconUrl from "../../assets/isometricBox.png";
+import officeSuppliesIconUrl from "../../assets/isometricYarn.png";
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost
@@ -30,6 +32,44 @@ export function buyWorker(floor: Floor): boolean {
   return true;
 }
 
+// a one-time, non-stacking per-floor purchase (unlike the worker button above, which
+// can be bought over and over) — priced at OFFICE_CHAIRS_COST_SECONDS worth of the
+// floor's own current income rate. Once floor.hasOfficeChairs flips true it never
+// resets, and this item just stops being listed for that floor (see render below)
+const OFFICE_CHAIRS_COST_SECONDS = 15;
+
+export function getOfficeChairsCost(floor: Floor): number {
+  return (
+    (floor.incomeAmount / floor.incomeIntervalSeconds) *
+    OFFICE_CHAIRS_COST_SECONDS
+  );
+}
+
+export function buyOfficeChairs(floor: Floor): boolean {
+  if (floor.hasOfficeChairs) return false;
+  if (!spendTotalIncome(getOfficeChairsCost(floor))) return false;
+  floor.hasOfficeChairs = true;
+  return true;
+}
+
+// a second one-time, non-stacking per-floor purchase, same shape as office chairs
+// above (own flag, own cost, never resets once bought)
+const OFFICE_SUPPLIES_COST_SECONDS = 15;
+
+export function getOfficeSuppliesCost(floor: Floor): number {
+  return (
+    (floor.incomeAmount / floor.incomeIntervalSeconds) *
+    OFFICE_SUPPLIES_COST_SECONDS
+  );
+}
+
+export function buyOfficeSupplies(floor: Floor): boolean {
+  if (floor.hasOfficeSupplies) return false;
+  if (!spendTotalIncome(getOfficeSuppliesCost(floor))) return false;
+  floor.hasOfficeSupplies = true;
+  return true;
+}
+
 export function createUpgradeMenuMarkup(): string {
   return `
     <div class="worker-menu" id="upgrade-menu" hidden>
@@ -47,6 +87,34 @@ export function createUpgradeMenuMarkup(): string {
 export interface UpgradeMenu {
   open: () => void;
   close: () => void;
+}
+
+// shared markup for a one-time, non-stacking per-floor item (office chairs,
+// office supplies, ...): shows its price while buyable, then permanently switches
+// to a disabled "Bought" state — never re-lists as buyable again
+function oneTimeItemMarkup(options: {
+  dataAttr: string;
+  floorIndex: number;
+  iconUrl: string;
+  label: string;
+  bought: boolean;
+  cost: number;
+}): string {
+  const { dataAttr, floorIndex, iconUrl, label, bought, cost } = options;
+  const affordable = !bought && getTotalIncome() >= cost;
+  return `
+    <button
+      class="worker-menu__item"
+      ${dataAttr}="${floorIndex}"
+      ${affordable ? "" : "disabled"}
+    >
+      <span class="worker-menu__item-label">
+        <img src="${iconUrl}" class="worker-menu__icon" alt="" />
+        ${label}
+      </span>
+      <span class="worker-menu__price">${bought ? "Bought" : formatPrice(cost)}</span>
+    </button>
+  `;
 }
 
 // wires the menu's open/close controls and the per-floor "Add new worker" buttons;
@@ -70,10 +138,11 @@ export function wireUpgradeMenu(
       .map((floor, i) => ({ floor, i }))
       .filter(({ floor }) => floor.unlocked) // locked floors have no worker to add yet
       .map(({ floor, i }) => {
+        const subheader = `<h3 class="worker-menu__subheader">Floor ${i + 1}</h3>`;
         const maxed = floor.workerCount >= MAX_RENDERED_WORKERS;
         const cost = getWorkerCost(floor);
         const affordable = !maxed && getTotalIncome() >= cost;
-        return `
+        const workerItem = `
           <button
             class="worker-menu__item"
             data-floor-index="${i}"
@@ -81,11 +150,28 @@ export function wireUpgradeMenu(
           >
             <span class="worker-menu__item-label">
               <img src="${kittyIconUrl}" class="worker-menu__icon" alt="" />
-              Floor ${i + 1}: Add worker x${floor.workerCount}
+              Hire worker x${floor.workerCount}
             </span>
             <span class="worker-menu__price">${maxed ? "Max" : formatPrice(cost)}</span>
           </button>
         `;
+        const officeChairsItem = oneTimeItemMarkup({
+          dataAttr: "data-office-chairs-floor-index",
+          floorIndex: i,
+          iconUrl: officeChairsIconUrl,
+          label: "Buy office chairs",
+          bought: floor.hasOfficeChairs,
+          cost: getOfficeChairsCost(floor),
+        });
+        const officeSuppliesItem = oneTimeItemMarkup({
+          dataAttr: "data-office-supplies-floor-index",
+          floorIndex: i,
+          iconUrl: officeSuppliesIconUrl,
+          label: "Buy office supplies",
+          bought: floor.hasOfficeSupplies,
+          cost: getOfficeSuppliesCost(floor),
+        });
+        return subheader + workerItem + officeChairsItem + officeSuppliesItem;
       })
       .join("");
     list.innerHTML = floorItems;
@@ -93,16 +179,45 @@ export function wireUpgradeMenu(
 
   list.addEventListener("click", async (event) => {
     const target = event.target as HTMLElement;
-    const button = target.closest<HTMLButtonElement>(
+    const workerButton = target.closest<HTMLButtonElement>(
       "button[data-floor-index]",
     );
-    if (!button) return;
-    const floor = getFloors()[Number(button.dataset.floorIndex)];
-    if (floor && floor.unlocked && buyWorker(floor)) {
-      playSold();
-      await triggerButtonPress(button);
-      onPurchase();
-      render();
+    if (workerButton) {
+      const floor = getFloors()[Number(workerButton.dataset.floorIndex)];
+      if (floor && floor.unlocked && buyWorker(floor)) {
+        playSold();
+        await triggerButtonPress(workerButton);
+        onPurchase();
+        render();
+      }
+      return;
+    }
+    const chairsButton = target.closest<HTMLButtonElement>(
+      "button[data-office-chairs-floor-index]",
+    );
+    if (chairsButton) {
+      const floor =
+        getFloors()[Number(chairsButton.dataset.officeChairsFloorIndex)];
+      if (floor && floor.unlocked && buyOfficeChairs(floor)) {
+        playSold();
+        await triggerButtonPress(chairsButton);
+        onPurchase();
+        render();
+      }
+      return;
+    }
+    const suppliesButton = target.closest<HTMLButtonElement>(
+      "button[data-office-supplies-floor-index]",
+    );
+    if (suppliesButton) {
+      const floor =
+        getFloors()[Number(suppliesButton.dataset.officeSuppliesFloorIndex)];
+      if (floor && floor.unlocked && buyOfficeSupplies(floor)) {
+        playSold();
+        await triggerButtonPress(suppliesButton);
+        onPurchase();
+        render();
+      }
     }
   });
 
@@ -117,6 +232,30 @@ export function wireUpgradeMenu(
         if (!floor) return;
         const maxed = floor.workerCount >= MAX_RENDERED_WORKERS;
         button.disabled = maxed || getTotalIncome() < getWorkerCost(floor);
+      });
+    list
+      .querySelectorAll<HTMLButtonElement>(
+        "button[data-office-chairs-floor-index]",
+      )
+      .forEach((button) => {
+        const floor =
+          getFloors()[Number(button.dataset.officeChairsFloorIndex)];
+        if (!floor) return;
+        button.disabled =
+          floor.hasOfficeChairs ||
+          getTotalIncome() < getOfficeChairsCost(floor);
+      });
+    list
+      .querySelectorAll<HTMLButtonElement>(
+        "button[data-office-supplies-floor-index]",
+      )
+      .forEach((button) => {
+        const floor =
+          getFloors()[Number(button.dataset.officeSuppliesFloorIndex)];
+        if (!floor) return;
+        button.disabled =
+          floor.hasOfficeSupplies ||
+          getTotalIncome() < getOfficeSuppliesCost(floor);
       });
   }
 

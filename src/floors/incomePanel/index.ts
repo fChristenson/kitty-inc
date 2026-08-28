@@ -46,8 +46,11 @@ export function getIncomeBarCenter(isGroundFloor: boolean): {
 // reload never resets/loses how far into its current cycle a floor already was
 let tickerRunning = false;
 
-// floor on the wait-time halving so repeated /10 upgrades can't shrink it to zero
-const MIN_INCOME_INTERVAL_SECONDS = 0.1;
+// floor on the fill cycle so it never ticks faster than once per second (any
+// speed beyond this folds into a bigger payout instead, see effectiveIncomeCycle)
+// — also keeps the bar's own fill-percentage math meaningful, since a 1s-or-longer
+// cycle is always comfortably visible as a normal filling bar
+const MIN_INCOME_INTERVAL_SECONDS = 1;
 // ceiling on the wait time so a high floor's exponentially-longer base interval never
 // forces the player to wait more than this long between payouts
 const MAX_INCOME_INTERVAL_SECONDS = 3600;
@@ -64,16 +67,15 @@ export const UPGRADE_MILESTONE_STEP = UPGRADES_PER_INTERVAL_HALVING;
 // rather than the player hitting a wall almost immediately
 const UPGRADE_COST_GROWTH = 1.3;
 
-// below this, the fill cycle repeats too fast to read as a filling bar, so the bar is
-// just shown full and an orbiting dot (fixed speed, independent of the real interval)
-// signals "still ticking" instead
-const FAST_CYCLE_THRESHOLD_MS = 1000;
-const FAST_CYCLE_LAP_MS = 900;
+// once a floor's true speed exceeds what a 1s-minimum bar can show as a normal fill
+// (see effectiveIncomeCycle's overspeed flag below), the bar is shown full instead,
+// with this ray orbiting its border at a fixed pace to signal "still ticking"
+const OVERSPEED_RAY_LAP_MS = 900;
 // the ray covers this fraction of one full lap, broken into this many short
 // segments so its per-segment alpha fade reads as one smooth gradient trail
-const FAST_CYCLE_TAIL_LAP_FRACTION = 0.22;
-const FAST_CYCLE_TAIL_SEGMENTS = 32;
-const FAST_CYCLE_RAY_WIDTH = 8;
+const OVERSPEED_RAY_TAIL_LAP_FRACTION = 0.22;
+const OVERSPEED_RAY_TAIL_SEGMENTS = 32;
+const OVERSPEED_RAY_WIDTH = 8;
 
 export function increaseIncomeRate(floor: Floor): void {
   floor.incomeAmount += floor.rateStep;
@@ -85,6 +87,25 @@ export function increaseIncomeRate(floor: Floor): void {
       floor.incomeIntervalSeconds / 2,
     );
   }
+}
+
+// permanent per-floor speed multiplier from the one-time office chairs/supplies
+// purchases (hud/upgradeMenu) — each owned upgrade doubles it, so owning both
+// stacks to a flat 4x, independent of (and layered on top of) the temporary
+// worker-boost speedup below
+function officeUpgradeSpeedMultiplier(floor: Floor): number {
+  return (floor.hasOfficeChairs ? 2 : 1) * (floor.hasOfficeSupplies ? 2 : 1);
+}
+
+// how many times faster than its own base incomeIntervalSeconds this floor is
+// currently running, from the temporary worker boost and the permanent office
+// upgrades combined — computed BEFORE the MIN_INCOME_INTERVAL_SECONDS clamp below
+// folds any further speed into a payout multiplier instead
+function currentSpeedMultiplier(floor: Floor, now: number): number {
+  const boostedFraction =
+    countBoostedWorkers(floor, now) / MAX_RENDERED_WORKERS;
+  const boostExponent = boostedFraction * floor.workerCount;
+  return 2 ** boostExponent * officeUpgradeSpeedMultiplier(floor);
 }
 
 // the interval/payout actually used for filling/paying out: each boosted visual worker
@@ -100,12 +121,9 @@ export function increaseIncomeRate(floor: Floor): void {
 function effectiveIncomeCycle(
   floor: Floor,
   now: number,
-): { intervalSeconds: number; amount: number } {
-  const boostedFraction =
-    countBoostedWorkers(floor, now) / MAX_RENDERED_WORKERS;
-  const boostExponent = boostedFraction * floor.workerCount;
+): { intervalSeconds: number; amount: number; overspeed: boolean } {
   const uncappedIntervalSeconds =
-    floor.incomeIntervalSeconds / 2 ** boostExponent;
+    floor.incomeIntervalSeconds / currentSpeedMultiplier(floor, now);
 
   if (uncappedIntervalSeconds > MAX_INCOME_INTERVAL_SECONDS) {
     const underspeedMultiplier =
@@ -113,12 +131,14 @@ function effectiveIncomeCycle(
     return {
       intervalSeconds: MAX_INCOME_INTERVAL_SECONDS,
       amount: floor.incomeAmount * underspeedMultiplier,
+      overspeed: false,
     };
   }
   if (uncappedIntervalSeconds >= MIN_INCOME_INTERVAL_SECONDS) {
     return {
       intervalSeconds: uncappedIntervalSeconds,
       amount: floor.incomeAmount,
+      overspeed: false,
     };
   }
   const overspeedMultiplier =
@@ -126,6 +146,7 @@ function effectiveIncomeCycle(
   return {
     intervalSeconds: MIN_INCOME_INTERVAL_SECONDS,
     amount: floor.incomeAmount * overspeedMultiplier,
+    overspeed: true,
   };
 }
 
@@ -153,13 +174,16 @@ function remainingCycleSeconds(floor: Floor, now: number): number {
 }
 
 function formatIncomeRate(floor: Floor, now: number): string {
-  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
-  // matches drawIncomePanel's own fast-cycle threshold: once the bar switches to the
-  // always-full orbiting-dot animation, a countdown no longer means anything readable
-  const timeText =
-    intervalSeconds * 1000 < FAST_CYCLE_THRESHOLD_MS
-      ? "s"
-      : formatTime(remainingCycleSeconds(floor, now));
+  const { amount, overspeed } = effectiveIncomeCycle(floor, now);
+  // once overspeed, the bar is pinned full and a live countdown against the
+  // artificially-clamped 1s interval wouldn't mean anything real
+  const timeText = overspeed
+    ? "s"
+    : // round, not floor/ceil: flooring a 1s-interval countdown showed "0" for
+      // virtually the whole cycle (remaining is only ever ~1 for an instant),
+      // while ceiling it showed a frozen "1" that never visibly ticked down.
+      // Rounding gives an actual "1" then "0" step partway through each cycle
+      formatTime(Math.round(remainingCycleSeconds(floor, now)));
   return `${formatPrice(amount)}/${timeText}`;
 }
 
@@ -168,11 +192,11 @@ function formatIncomeRate(floor: Floor, now: number): string {
 // is just its creation time) — a live countdown here would just cycle forever against
 // that fixed anchor instead of ever meaning "time until payout"
 function formatStaticIncomeRate(floor: Floor, now: number): string {
-  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
-  const timeText =
-    intervalSeconds * 1000 < FAST_CYCLE_THRESHOLD_MS
-      ? "s"
-      : formatTime(intervalSeconds);
+  const { intervalSeconds, amount, overspeed } = effectiveIncomeCycle(
+    floor,
+    now,
+  );
+  const timeText = overspeed ? "s" : formatTime(intervalSeconds);
   return `${formatPrice(amount)}/${timeText}`;
 }
 
@@ -219,12 +243,13 @@ function roundedRectPerimeterPoint(
   return { x: x + r + r * Math.cos(a), y: y + r + r * Math.sin(a) };
 }
 
-// a bright gradient ray sweeping around the bar's border, fading out along its own
-// trailing length, for cycles too fast to show as a normal fill. Drawn as many short
-// stroked segments (rather than one path) since canvas strokes can't fade along their
-// own length any other way — each segment's own alpha steps the fade from transparent
-// at the tail up to fully opaque at the head, reading as one continuous ray
-function drawFastCycleBorder(
+// a bright gradient ray sweeping around the bar's border at a fixed pace, fading out
+// along its own trailing length, for a floor pinned at the overspeed clamp. Drawn as
+// many short stroked segments (rather than one path) since canvas strokes can't fade
+// along their own length any other way — each segment's own alpha steps the fade
+// from transparent at the tail up to fully opaque at the head, reading as one
+// continuous ray
+function drawOverspeedRay(
   ctx: CanvasRenderingContext2D,
   barX: number,
   barY: number,
@@ -233,18 +258,19 @@ function drawFastCycleBorder(
   radius: number,
   now: number,
 ): void {
-  const headT = (now % FAST_CYCLE_LAP_MS) / FAST_CYCLE_LAP_MS;
-  ctx.lineWidth = FAST_CYCLE_RAY_WIDTH;
+  const headT = (now % OVERSPEED_RAY_LAP_MS) / OVERSPEED_RAY_LAP_MS;
+  ctx.lineWidth = OVERSPEED_RAY_WIDTH;
   ctx.lineCap = "round";
-  for (let i = FAST_CYCLE_TAIL_SEGMENTS; i >= 1; i--) {
+  for (let i = OVERSPEED_RAY_TAIL_SEGMENTS; i >= 1; i--) {
     const t0 =
-      headT - (i / FAST_CYCLE_TAIL_SEGMENTS) * FAST_CYCLE_TAIL_LAP_FRACTION;
+      headT -
+      (i / OVERSPEED_RAY_TAIL_SEGMENTS) * OVERSPEED_RAY_TAIL_LAP_FRACTION;
     const t1 =
       headT -
-      ((i - 1) / FAST_CYCLE_TAIL_SEGMENTS) * FAST_CYCLE_TAIL_LAP_FRACTION;
+      ((i - 1) / OVERSPEED_RAY_TAIL_SEGMENTS) * OVERSPEED_RAY_TAIL_LAP_FRACTION;
     const p0 = roundedRectPerimeterPoint(barX, barY, barW, barH, radius, t0);
     const p1 = roundedRectPerimeterPoint(barX, barY, barW, barH, radius, t1);
-    const alpha = 1 - i / FAST_CYCLE_TAIL_SEGMENTS;
+    const alpha = 1 - i / OVERSPEED_RAY_TAIL_SEGMENTS;
     ctx.beginPath();
     ctx.moveTo(p0.x, p0.y);
     ctx.lineTo(p1.x, p1.y);
@@ -306,15 +332,15 @@ export function drawIncomePanel(
 
   // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
   let fillW = barMinWidth;
-  let isFastCycle = false;
+  let overspeed = false;
   const now = Date.now();
   if (floor.unlocked) {
-    const fillDurationMs =
-      effectiveIncomeCycle(floor, now).intervalSeconds * 1000;
-    if (fillDurationMs < FAST_CYCLE_THRESHOLD_MS) {
-      isFastCycle = true;
+    const cycle = effectiveIncomeCycle(floor, now);
+    overspeed = cycle.overspeed;
+    if (overspeed) {
       fillW = barW;
     } else {
+      const fillDurationMs = cycle.intervalSeconds * 1000;
       const elapsed = now - floor.lastCollectedAt;
       const pct = (elapsed % fillDurationMs) / fillDurationMs;
       fillW = Math.max(barMinWidth, barW * pct);
@@ -334,8 +360,7 @@ export function drawIncomePanel(
   // ring stroked last, on top of both fills, so it always reads as one continuous
   // black/white/dark-green border around the whole capsule regardless of fill width
   drawPillBorder(ctx, barX, barY, barW, barH, barRadius, COLOR.moneyGreen);
-  if (isFastCycle)
-    drawFastCycleBorder(ctx, barX, barY, barW, barH, barRadius, now);
+  if (overspeed) drawOverspeedRay(ctx, barX, barY, barW, barH, barRadius, now);
 
   // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
   // time, never advanced), so the rate text uses the static full-interval formatter

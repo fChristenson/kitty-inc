@@ -54,6 +54,8 @@ export interface Floor {
   unlockCost: number; // 0 for floor 1 (always free); doubles starting from floor 2
   workerCount: number; // how many workers this floor has bought via workerMenu.ts; scales its boost strength
   lastCollectedAt: number; // Date.now() ms this floor last completed a whole idle-income cycle
+  hasOfficeChairs: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
+  hasOfficeSupplies: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
 }
 
 // gameState.ts is the sole owner of this per-floor data (Floor itself doesn't carry it),
@@ -206,6 +208,8 @@ interface SavedFloor {
   bgIndex?: number; // added after initial release; older saves default to 0 on load
   spriteIndexes?: number[]; // renamed to tintIndexes; kept only so very old saves parse
   tintIndexes?: number[]; // added after initial release; older saves default to [] on load
+  hasOfficeChairs?: boolean; // added after initial release; older saves default to false on load
+  hasOfficeSupplies?: boolean; // added after initial release; older saves default to false on load
 }
 
 export function clearBuildings(): void {
@@ -230,6 +234,8 @@ function toSavedFloor(floor: Floor): SavedFloor {
     lastCollectedAt: floor.lastCollectedAt,
     bgIndex: floor.bgIndex,
     tintIndexes: getWorkerTintIndexes(floor),
+    hasOfficeChairs: floor.hasOfficeChairs,
+    hasOfficeSupplies: floor.hasOfficeSupplies,
   };
 }
 
@@ -277,6 +283,8 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     unlockCost: sf.unlockCost,
     workerCount: sf.workerCount ?? 1,
     lastCollectedAt: sf.lastCollectedAt ?? Date.now(),
+    hasOfficeChairs: sf.hasOfficeChairs ?? false,
+    hasOfficeSupplies: sf.hasOfficeSupplies ?? false,
   };
   workerSlots.set(floor, sf.workers);
   workerTintIndexes.set(floor, sf.tintIndexes ?? sf.spriteIndexes ?? []);

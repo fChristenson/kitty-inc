@@ -141,6 +141,8 @@ export function buildFloor(
     unlockCost,
     workerCount: 1,
     lastCollectedAt: Date.now(),
+    hasOfficeChairs: false,
+    hasOfficeSupplies: false,
   };
 }
 
