@@ -23,6 +23,15 @@ export function getWorkerCost(floor: Floor): number {
   return floorPrice * floor.workerCount;
 }
 
+// what the floor's own 3rd worker would cost (i.e. getWorkerCost at workerCount=2),
+// independent of however many workers it actually has right now — shared pricing
+// basis for the one-time office chairs/supplies purchases below
+function getThirdWorkerCost(floor: Floor): number {
+  const floorPrice =
+    floor.unlockCost > 0 ? floor.unlockCost : WORKER_BASE_PRICE_FLOOR_1;
+  return floorPrice * 2;
+}
+
 // buys one more worker for the floor if affordable; returns whether it succeeded. capped
 // at MAX_RENDERED_WORKERS since only that many little figures can ever be drawn per floor
 export function buyWorker(floor: Floor): boolean {
@@ -33,16 +42,11 @@ export function buyWorker(floor: Floor): boolean {
 }
 
 // a one-time, non-stacking per-floor purchase (unlike the worker button above, which
-// can be bought over and over) — priced at OFFICE_CHAIRS_COST_SECONDS worth of the
-// floor's own current income rate. Once floor.hasOfficeChairs flips true it never
-// resets, and this item just stops being listed for that floor (see render below)
-const OFFICE_CHAIRS_COST_SECONDS = 15;
-
+// can be bought over and over) — priced the same as the floor's own 3rd worker.
+// Once floor.hasOfficeChairs flips true it never resets, and this item just stops
+// being listed for that floor (see render below)
 export function getOfficeChairsCost(floor: Floor): number {
-  return (
-    (floor.incomeAmount / floor.incomeIntervalSeconds) *
-    OFFICE_CHAIRS_COST_SECONDS
-  );
+  return getThirdWorkerCost(floor);
 }
 
 export function buyOfficeChairs(floor: Floor): boolean {
@@ -52,15 +56,10 @@ export function buyOfficeChairs(floor: Floor): boolean {
   return true;
 }
 
-// a second one-time, non-stacking per-floor purchase, same shape as office chairs
-// above (own flag, own cost, never resets once bought)
-const OFFICE_SUPPLIES_COST_SECONDS = 15;
-
+// a second one-time, non-stacking per-floor purchase, same shape (and same
+// third-worker pricing) as office chairs above (own flag, never resets once bought)
 export function getOfficeSuppliesCost(floor: Floor): number {
-  return (
-    (floor.incomeAmount / floor.incomeIntervalSeconds) *
-    OFFICE_SUPPLIES_COST_SECONDS
-  );
+  return getThirdWorkerCost(floor);
 }
 
 export function buyOfficeSupplies(floor: Floor): boolean {
