@@ -278,12 +278,12 @@ export function createCityMapView(
       const { cx, feetY } = markerCenter(i);
       ctx.font = '900 22px "Fredoka", system-ui, sans-serif';
       ctx.textAlign = "center";
-      ctx.textBaseline = "top";
+      ctx.textBaseline = "bottom";
       drawCartoonText(
         ctx,
         formatPrice(getBuildingPrice(i)),
         cx,
-        feetY + 6,
+        feetY - 62,
         COLOR.white,
       );
       drawStarRow(i, i + 1);

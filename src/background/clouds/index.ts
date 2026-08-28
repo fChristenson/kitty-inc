@@ -81,8 +81,16 @@ export function drawClouds(
   if (worldWidth <= 0 || cloudImages.length === 0) return;
   const cellMin = Math.floor(visibleTop / CELL_H) - 1;
   const cellMax = Math.ceil(visibleBottom / CELL_H) + 1;
-  const cloudsPerCell = Math.max(2, Math.round(worldWidth / CLOUD_SPACING));
-  const slotWidth = worldWidth / cloudsPerCell;
+  // the wrap period is padded by a cloud's own radius (worst case) on each side, so
+  // a cloud spends genuine time fully past the visible left/right edges before it
+  // wraps back around — without this padding, worldWidth alone as the wrap period
+  // made a cloud's exit-left and re-entry-at-right happen in the very same frame
+  // (the wrap point sat exactly on the clipped viewport's own edges), reading as an
+  // abrupt pop-in instead of drifting in from off-screen
+  const wrapMargin = CLOUD_MAX_RADIUS * 2;
+  const wrapWidth = worldWidth + wrapMargin * 2;
+  const cloudsPerCell = Math.max(2, Math.round(wrapWidth / CLOUD_SPACING));
+  const slotWidth = wrapWidth / cloudsPerCell;
   for (let cell = cellMin; cell <= cellMax; cell++) {
     const cellTop = cell * CELL_H;
     for (let i = 0; i < cloudsPerCell; i++) {
@@ -94,11 +102,14 @@ export function drawClouds(
       const speed = 0.004 + rand(seed, 3) * 0.014;
       const phase = rand(seed, 4);
       const variantIndex = Math.floor(rand(seed, 5) * cloudImages.length);
-      // this cloud's fixed home slot, spread evenly across the whole world width,
-      // drifting left over time and wrapping around the world's own edges
+      // this cloud's fixed home slot, spread evenly across the padded wrap width,
+      // drifting left over time and wrapping around at the padded edges (not the
+      // visible viewport's own edges) — then shifted back so the visible range
+      // [0, worldWidth) sits centered inside the padded cycle
       const baseX = i * slotWidth + phase * slotWidth;
       const x =
-        (((baseX - now * speed) % worldWidth) + worldWidth) % worldWidth;
+        ((((baseX - now * speed) % wrapWidth) + wrapWidth) % wrapWidth) -
+        wrapMargin;
       if (x + r < visibleLeft || x - r > visibleRight) continue;
       drawCloud(ctx, x, y, r, variantIndex);
     }
