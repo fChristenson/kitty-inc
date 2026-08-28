@@ -10,17 +10,18 @@ import {
 } from "../../utils";
 import { COLOR } from "../../palette";
 
-// panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right)
-export const PANEL_W = 360;
+// panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right).
+// Scaled up from the original 360 as far as the gap to the upgrade button allows, and nudged
+// another 20px in toward center (on top of the existing +10) to match that button's own shift
+export const PANEL_W = 440;
 export const PANEL_H = 120;
 const PANEL_MARGIN = 24;
-export const PANEL_X = PANEL_MARGIN + 10;
+export const PANEL_X = PANEL_MARGIN + 10 + 20;
 // centered inside the divider band below (see outerWall/index.ts's DIVIDER_H),
-// mounted on top of it since that's drawn first, nudged down 10px — except the
-// ground floor, which stays 10px higher (back at the plain centered position)
-function getPanelY(isGroundFloor: boolean): number {
-  const base = FLOOR_H - DIVIDER_H / 2 - PANEL_H / 2;
-  return isGroundFloor ? base : base + 10;
+// mounted on top of it since that's drawn first, nudged down 10px from dead
+// center — same for every floor
+function getPanelY(_isGroundFloor: boolean): number {
+  return FLOOR_H - DIVIDER_H / 2 - PANEL_H / 2 + 10;
 }
 
 // when each floor's current fill cycle started is floor.lastCollectedAt itself (a
@@ -265,7 +266,8 @@ export function drawIncomePanel(
 
   const barX = x + 18;
   const barW = (PANEL_W - 36) * 1.5;
-  const barH = 60;
+  // scaled up alongside PANEL_W; still comfortably clears the divider band's vertical bounds
+  const barH = 92;
   const barY = y + PANEL_H / 2 - barH / 2;
   // rounded RECTANGLE, same as the upgrade button — NOT a full pill/stadium
   const barRadius = barH / 3;
@@ -322,7 +324,7 @@ export function drawIncomePanel(
   // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
   // time, never advanced), so the rate text uses the static full-interval formatter
   // instead of the live countdown — still visible, just doesn't tick
-  ctx.font = '900 36px "Fredoka", system-ui, sans-serif';
+  ctx.font = '900 44px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   drawCartoonText(

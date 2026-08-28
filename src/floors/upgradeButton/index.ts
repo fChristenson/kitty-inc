@@ -3,17 +3,20 @@ import { FLOOR_W, FLOOR_H, DIVIDER_H } from "../constants";
 import { COLOR } from "../../palette";
 import type { Floor } from "../../gameState";
 
-// button placement, bottom-right corner of each floor (mirrors the income panel on the left)
-export const BTN_W = 360;
-export const BTN_H = 120;
+// button placement, bottom-right corner of each floor (mirrors the income panel on the left).
+// Scaled up from the original 360 as far as the gap to the income panel allows. Nudged
+// another 20px in toward center (on top of the existing -20) to match the income panel's own shift.
+// BTN_H now exactly fills DIVIDER_H (grown +20 from 120), so it spans the divider band edge-to-edge
+export const BTN_W = 440;
+export const BTN_H = 140;
 const BTN_MARGIN = 24;
-export const BTN_X = FLOOR_W - BTN_W - BTN_MARGIN - 20;
+export const BTN_X = FLOOR_W - BTN_W - BTN_MARGIN - 40;
 // centered inside the divider band below (see outerWall/index.ts's DIVIDER_H),
-// mounted on top of it since that's drawn first, nudged down 10px — except the
-// ground floor, which stays 10px higher (back at the plain centered position)
-function getBtnY(isGroundFloor: boolean): number {
-  const base = FLOOR_H - DIVIDER_H / 2 - BTN_H / 2;
-  return isGroundFloor ? base : base + 10;
+// mounted on top of it since that's drawn first, nudged down 10px from dead
+// center — same for every floor. BTN_H leaves just enough divider clearance for
+// this nudge without clipping against the floor canvas edge
+function getBtnY(_isGroundFloor: boolean): number {
+  return FLOOR_H - DIVIDER_H / 2 - BTN_H / 2 + 10;
 }
 
 function isPointOnButton(
@@ -150,7 +153,7 @@ export function drawUpgradeButton(
     40,
   );
 
-  ctx.font = '900 48px "Fredoka", system-ui, sans-serif';
+  ctx.font = '900 52px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   drawCartoonText(ctx, crit ? "x2" : formatPrice(cost), cx, cy);
