@@ -48,10 +48,12 @@ export function playCoinDrop(): void {
 }
 
 // one-shot sound effect for opening/closing any of the action bar's dialogs
-// (upgrade menu, boost menu, map menu) or switching to/from the static map view
+// (upgrade menu, boost menu, map menu) or switching to/from the static map view.
+// skips swoosh.mp3's own brief quiet lead-in so it reads as instant on click
 export function playSwoosh(): void {
   const sfx = new Audio(swooshUrl);
   sfx.volume = SFX_VOLUME;
+  sfx.currentTime = 0.1;
   sfx.play().catch(() => {});
 }
 

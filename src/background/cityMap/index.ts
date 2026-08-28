@@ -255,14 +255,26 @@ export function createCityMapView(
   const STAR_ROW_W = STAR_SPACING * 4 + STAR_SIZE + STAR_ROW_PAD * 2;
   const STAR_ROW_H = STAR_SIZE + STAR_ROW_PAD * 2;
   const starRowCache = new Map<number, HTMLCanvasElement>();
+  let starRowCacheDpr = 0;
   function getStarRow(filledCount: number): HTMLCanvasElement | null {
     if (!starImage) return null;
+    const dpr = window.devicePixelRatio || 1;
+    // a device-pixel-resolution cache built at one dpr would upscale (and blur)
+    // if the page later renders at a higher one — clear and rebuild instead
+    if (dpr !== starRowCacheDpr) {
+      starRowCache.clear();
+      starRowCacheDpr = dpr;
+    }
     const cached = starRowCache.get(filledCount);
     if (cached) return cached;
     const rowCanvas = document.createElement("canvas");
-    rowCanvas.width = STAR_ROW_W;
-    rowCanvas.height = STAR_ROW_H;
+    // backing store sized in device pixels (like the main canvas), not CSS pixels —
+    // otherwise this cache is drawn back into the dpr-scaled main context at less
+    // than its own resolution, upscaling (and blurring) it on any high-DPR screen
+    rowCanvas.width = Math.round(STAR_ROW_W * dpr);
+    rowCanvas.height = Math.round(STAR_ROW_H * dpr);
     const rowCtx = rowCanvas.getContext("2d")!;
+    rowCtx.scale(dpr, dpr);
     for (let i = 0; i < 5; i++) {
       drawStarIcon(
         rowCtx,
@@ -283,7 +295,16 @@ export function createCityMapView(
     const { cx, feetY } = markerCenter(buildingIndex);
     const rowY = feetY + STAR_ROW_Y_OFFSET;
     const startX = cx - (STAR_SPACING * 4) / 2 - STAR_SIZE / 2 - STAR_ROW_PAD;
-    ctx.drawImage(row, startX, rowY - STAR_SIZE / 2 - STAR_ROW_PAD);
+    // row's own backing store is device-pixel-resolution now, so its size must be
+    // given explicitly in CSS pixels here — omitting it would draw at the row
+    // canvas's raw (dpr-multiplied) pixel dimensions, dpr times too large
+    ctx.drawImage(
+      row,
+      startX,
+      rowY - STAR_SIZE / 2 - STAR_ROW_PAD,
+      STAR_ROW_W,
+      STAR_ROW_H,
+    );
   }
 
   // any building beyond MARKER_COUNT has no marker here yet
