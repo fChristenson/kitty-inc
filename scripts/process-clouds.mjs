@@ -88,6 +88,54 @@ for (let y = 0; y < height; y++) {
   }
 }
 
+// snaps every opaque non-background (cloud) pixel below FLOOD_LO to pure black —
+// this is the outline stroke's own range (near-white cloud FILL sits well above
+// FLOOD_LO and is untouched). The raw art's outline anti-aliases against the white
+// background, leaving a fringe of lighter gray pixels right at its edge that read
+// as flecks of white speckled into an otherwise-black stroke; forcing that whole
+// range to solid black makes the stroke read as one clean, uniform black line
+const OUTLINE_LO = 150; // same cutoff as FLOOD_LO, the outline's own darkness range
+for (let y = 0; y < height; y++) {
+  for (let x = 0; x < width; x++) {
+    const pixelIdx = y * width + x;
+    if (isBackground[pixelIdx]) continue;
+    if (whitenessAt(x, y) >= OUTLINE_LO) continue;
+    const i = pixelIdx * channels;
+    data[i] = 0;
+    data[i + 1] = 0;
+    data[i + 2] = 0;
+  }
+}
+
+// background pixels immediately touching the outline are the antialiased blend
+// between the white background and the black stroke — their whiteness is high
+// enough (close to WHITE_HI) that the soft chroma-key above left them partially
+// opaque near-white instead of fully transparent, which reads as a faint white
+// halo/speckle ringing the border. Any background pixel within this radius of a
+// non-background (outline/fill) pixel is forced fully transparent to erase that
+// halo; pixels farther out are genuine plain background, already alpha 0
+const HALO_RADIUS = 2;
+const forceTransparent = new Uint8Array(width * height);
+for (let y = 0; y < height; y++) {
+  for (let x = 0; x < width; x++) {
+    const idx = y * width + x;
+    if (isBackground[idx]) continue;
+    for (let dy = -HALO_RADIUS; dy <= HALO_RADIUS; dy++) {
+      const ny = y + dy;
+      if (ny < 0 || ny >= height) continue;
+      for (let dx = -HALO_RADIUS; dx <= HALO_RADIUS; dx++) {
+        const nx = x + dx;
+        if (nx < 0 || nx >= width) continue;
+        const nIdx = ny * width + nx;
+        if (isBackground[nIdx]) forceTransparent[nIdx] = 1;
+      }
+    }
+  }
+}
+for (let idx = 0; idx < forceTransparent.length; idx++) {
+  if (forceTransparent[idx]) data[idx * channels + 3] = 0;
+}
+
 // connected-component label every non-transparent pixel (8-connected, so a noise
 // speck touching only diagonally still joins whatever it's next to) and discard any
 // component smaller than a real cloud could ever be — leftover JPEG-compression
