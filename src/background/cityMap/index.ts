@@ -66,10 +66,33 @@ const MARKER_POSITIONS: {
 const STAR_ROW_Y_OFFSET = 12; // below the marker's feetY
 const STAR_SIZE = 18; // rendered square size (star.png is roughly square already)
 const STAR_SPACING = 20;
+// outline stamped behind each star icon, offset in a ring of directions — star.png is a
+// raster sprite with transparency, not a path, so there's nothing to ctx.stroke() directly.
+// Offsets are placed evenly around a circle (equal true radius) rather than by cardinal/
+// diagonal deltas, so the stamped ring dilates uniformly in every direction instead of
+// bulging out further on the diagonals (sqrt(2)x a matching cardinal delta) and reading
+// as octagonal/faceted instead of round
+const STAR_STROKE_WIDTH = 2;
+const STAR_STROKE_SAMPLE_COUNT = 16;
+const STAR_STROKE_OFFSETS: [number, number][] = Array.from(
+  { length: STAR_STROKE_SAMPLE_COUNT },
+  (_, i) => {
+    const angle = (i / STAR_STROKE_SAMPLE_COUNT) * Math.PI * 2;
+    return [
+      Math.cos(angle) * STAR_STROKE_WIDTH,
+      Math.sin(angle) * STAR_STROKE_WIDTH,
+    ];
+  },
+);
 
 let mapImage: HTMLImageElement | null = null;
 let catSprite: HTMLImageElement | null = null;
 let starImage: HTMLImageElement | null = null;
+// star.png's own silhouette with alpha hardened to fully opaque/transparent (no
+// anti-aliased fringe) — stamped at each offset above to build the outline; keeping
+// the source's own soft edges would layer up into a blurry haze instead of a sharp
+// ring once dilated. Built once since star.png/STAR_SIZE never change after load
+let starOutline: HTMLCanvasElement | null = null;
 
 export async function loadCityMapImage(): Promise<HTMLImageElement> {
   [mapImage, catSprite, starImage] = await Promise.all([
@@ -77,6 +100,22 @@ export async function loadCityMapImage(): Promise<HTMLImageElement> {
     loadImage(catSpriteUrl),
     loadImage(starUrl),
   ]);
+  const outlineCanvas = document.createElement("canvas");
+  outlineCanvas.width = STAR_SIZE;
+  outlineCanvas.height = STAR_SIZE;
+  const outlineCtx = outlineCanvas.getContext("2d")!;
+  outlineCtx.drawImage(starImage, 0, 0, STAR_SIZE, STAR_SIZE);
+  const silhouette = outlineCtx.getImageData(0, 0, STAR_SIZE, STAR_SIZE);
+  const ALPHA_THRESHOLD = 40; // out of 255 — anything past this counts as "inside" the star
+  for (let i = 0; i < silhouette.data.length; i += 4) {
+    const opaque = silhouette.data[i + 3] > ALPHA_THRESHOLD;
+    silhouette.data[i] = 255;
+    silhouette.data[i + 1] = 255;
+    silhouette.data[i + 2] = 255;
+    silhouette.data[i + 3] = opaque ? 255 : 0;
+  }
+  outlineCtx.putImageData(silhouette, 0, 0);
+  starOutline = outlineCanvas;
   return mapImage;
 }
 
@@ -164,6 +203,13 @@ export function createCityMapView(
   function drawStarIcon(cx: number, cy: number, filled: boolean): void {
     if (!starImage) return;
     ctx.save();
+    if (starOutline) {
+      const ox = cx - STAR_SIZE / 2;
+      const oy = cy - STAR_SIZE / 2;
+      for (const [dx, dy] of STAR_STROKE_OFFSETS) {
+        ctx.drawImage(starOutline, ox + dx, oy + dy, STAR_SIZE, STAR_SIZE);
+      }
+    }
     if (!filled) {
       ctx.filter = "grayscale(1) brightness(0.75)";
       ctx.globalAlpha = 0.6;
