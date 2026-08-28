@@ -170,12 +170,22 @@ const ARROW_SVG = `
   </svg>
 `;
 
-// canvas + prev/next city arrows, wrapped together so toggling the wrapper's
-// hidden attribute hides all three at once (see main.ts's openMapView/closeMapView)
+// how many speed-line rays the transition draws; their actual shape (position/
+// length) is computed fresh each time in playSpeedLines below, since it depends
+// on the canvas's current on-screen size
+const SPEED_LINE_COUNT = 12;
+const SPEED_LINE_MS = 180;
+
+// canvas + prev/next city arrows + the anime-style transition overlay (an SVG
+// JS animates real <line> rays across, in sync with a swoosh, while cityIndex
+// changes underneath — see playSpeedLines), wrapped together so toggling the
+// wrapper's hidden attribute hides all of it at once (see main.ts's
+// openMapView/closeMapView)
 export function createCityMapMarkup(): string {
   return `
     <div class="city-map" id="city-map" hidden>
       <canvas class="game__canvas" id="map-canvas"></canvas>
+      <svg class="city-map__speed-lines" id="city-map-speed-lines" aria-hidden="true"></svg>
       <button class="city-map__arrow city-map__arrow--prev" id="city-map-prev" aria-label="Previous city" hidden>${ARROW_SVG}</button>
       <button class="city-map__arrow city-map__arrow--next" id="city-map-next" aria-label="Next city" hidden>${ARROW_SVG}</button>
     </div>
@@ -187,6 +197,9 @@ export function createCityMapView(
   deps: CityMapDeps,
 ): CityMapView {
   const canvas = container.querySelector<HTMLCanvasElement>("#map-canvas")!;
+  const speedLinesSvg = container.querySelector<SVGSVGElement>(
+    "#city-map-speed-lines",
+  )!;
   const prevButton =
     container.querySelector<HTMLButtonElement>("#city-map-prev")!;
   const nextButton =
@@ -555,17 +568,88 @@ export function createCityMapView(
   canvas.addEventListener("pointerleave", onPointerLeave);
   canvas.addEventListener("click", onClick);
 
+  // real SVG <line> rays, positioned/animated frame-by-frame from JS (not CSS —
+  // a CSS gradient can't render an actual ray shape, and driving it here keeps the
+  // sweep tightly in sync with the swoosh played alongside it). Regenerated fresh
+  // each call since they depend on the canvas's current on-screen size
+  let speedLineAnimId: number | null = null;
+  function playSpeedLines(delta: -1 | 1): void {
+    if (speedLineAnimId !== null) cancelAnimationFrame(speedLineAnimId);
+    const w = cssW;
+    const h = cssH;
+    speedLinesSvg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    speedLinesSvg.innerHTML = "";
+    const lines: SVGLineElement[] = [];
+    for (let i = 0; i < SPEED_LINE_COUNT; i++) {
+      const y = (((i * 37) % 100) / 100) * h; // deterministic spread, not evenly gridded
+      const length = (0.22 + ((i * 53) % 48) / 100) * w; // varying "range": 22-70% of width
+      const line = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line",
+      );
+      line.setAttribute("x1", "0");
+      line.setAttribute("x2", String(length));
+      line.setAttribute("y1", String(y));
+      line.setAttribute("y2", String(y));
+      speedLinesSvg.appendChild(line);
+      lines.push(line);
+    }
+    // next (delta 1) = the view moving forward/right, so the rays stream the
+    // opposite way (right-to-left) past it, same parallax as scenery rushing past
+    // a car window; prev mirrors it
+    const startX = delta > 0 ? w * 1.2 : -w * 1.3;
+    const endX = delta > 0 ? -w * 1.3 : w * 1.2;
+    const start = performance.now();
+    function frame(now: number): void {
+      const t = Math.min(1, (now - start) / SPEED_LINE_MS);
+      const eased = t * t * (3 - 2 * t); // smoothstep: quick but not linear/jerky
+      const x = startX + (endX - startX) * eased;
+      const opacity =
+        t < 0.15 ? t / 0.15 : t > 0.75 ? Math.max(0, (1 - t) / 0.25) : 1;
+      for (const line of lines) {
+        line.setAttribute("transform", `translate(${x} 0)`);
+        line.style.opacity = String(opacity);
+      }
+      if (t < 1) {
+        speedLineAnimId = requestAnimationFrame(frame);
+      } else {
+        speedLinesSvg.innerHTML = "";
+        speedLineAnimId = null;
+      }
+    }
+    speedLineAnimId = requestAnimationFrame(frame);
+  }
+
+  // anime-style "cut" transition: blur the canvas and flash speed lines across it,
+  // swap cityIndex + redraw underneath while the screen is still covered by both,
+  // then clear — hides the instant content swap behind the flash instead of it
+  // just popping to the new city
+  const TRANSITION_MS = 220;
+  const SWAP_AT_MS = 90; // mid-flash, once fully covered but before it clears
+  let swapTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  let clearTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  function navigateCity(delta: -1 | 1): void {
+    playSwoosh();
+    canvas.classList.add("city-map__canvas--blurred");
+    playSpeedLines(delta);
+    if (swapTimeoutId !== null) clearTimeout(swapTimeoutId);
+    if (clearTimeoutId !== null) clearTimeout(clearTimeoutId);
+    swapTimeoutId = setTimeout(() => {
+      cityIndex += delta;
+      redraw();
+    }, SWAP_AT_MS);
+    clearTimeoutId = setTimeout(() => {
+      canvas.classList.remove("city-map__canvas--blurred");
+    }, TRANSITION_MS);
+  }
+
   // both arrows are only ever visible when navigating to their side is actually
   // allowed (see updateArrows in redraw), so a click here never needs to re-check
   function onPrevClick(): void {
-    cityIndex -= 1;
-    playSwoosh();
-    redraw();
+    navigateCity(-1);
   }
   function onNextClick(): void {
-    cityIndex += 1;
-    playSwoosh();
-    redraw();
+    navigateCity(1);
   }
   prevButton.addEventListener("click", onPrevClick);
   nextButton.addEventListener("click", onNextClick);
@@ -601,6 +685,9 @@ export function createCityMapView(
     nextButton.removeEventListener("click", onNextClick);
     resizeObserver.disconnect();
     if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+    if (swapTimeoutId !== null) clearTimeout(swapTimeoutId);
+    if (clearTimeoutId !== null) clearTimeout(clearTimeoutId);
+    if (speedLineAnimId !== null) cancelAnimationFrame(speedLineAnimId);
   }
 
   return {

@@ -145,10 +145,42 @@ body {
   display: none;
 }
 
+#map-canvas {
+  /* eased so clearing city-map__canvas--blurred (see navigateCity in
+     cityMap/index.ts) settles back to sharp instead of snapping */
+  transition: filter 0.1s ease-out;
+}
+
+.city-map__canvas--blurred {
+  /* motion-blurred "still catching up" look while the speed lines below cover the
+     actual city swap happening underneath */
+  filter: blur(9px) brightness(1.15);
+}
+
+.city-map__speed-lines {
+  /* actual <line> rays are created and animated frame-by-frame from JS (see
+     playSpeedLines in cityMap/index.ts) rather than CSS — this is just their
+     clipped, full-size stage */
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.city-map__speed-lines line {
+  stroke: white;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
 .city-map__arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  z-index: 3; /* stays above .city-map__speed-lines' flash */
   border: none;
   background: none;
   color: var(--color-white);

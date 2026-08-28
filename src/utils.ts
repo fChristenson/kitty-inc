@@ -45,23 +45,54 @@ export function animateDialogClose(panel: HTMLElement): Promise<void> {
   });
 }
 
-// suffix tiers for compact large-number formatting (short scale), shared by
-// formatPrice/formatTime so every number on screen scales the same way and
-// can never overflow into a giant unformatted string at big values. Short
-// abbreviations (not spelled-out words) so the number always fits the small
-// in-canvas upgrade button, not just the wider HUD menus
-const MAGNITUDE_SUFFIXES: { value: number; suffix: string }[] = [
-  { value: 1e33, suffix: "Dc" },
-  { value: 1e30, suffix: "No" },
-  { value: 1e27, suffix: "Oc" },
-  { value: 1e24, suffix: "Sp" },
-  { value: 1e21, suffix: "Sx" },
-  { value: 1e18, suffix: "Qi" },
-  { value: 1e15, suffix: "Qa" },
-  { value: 1e12, suffix: "T" },
-  { value: 1e9, suffix: "B" },
-  { value: 1e6, suffix: "M" },
+// short-scale "-illion" suffixes, generated algorithmically instead of from a
+// hand-maintained list — a fixed list always eventually runs out (city prices
+// climb 1000x per building, see buildings.ts, so a handful of cities in blows
+// past whatever the list's last entry was and fell back to ugly "1e36"-style
+// scientific notation). Illion tier 1 = million, 2 = billion, ... 10 = decillion
+// (these first 10 keep their familiar standalone codes below); tier 11+ is built
+// from the standard ones/tens/hundreds Latin-prefix parts (undecillion,
+// duodecillion, ... vigintillion, ... centillion, endlessly) — this covers every
+// magnitude a normal 64-bit number can hold (up to ~1e308) with no gaps
+const SMALL_ILLION_SUFFIXES = [
+  "M",
+  "B",
+  "T",
+  "Qa",
+  "Qi",
+  "Sx",
+  "Sp",
+  "Oc",
+  "No",
+  "Dc",
 ];
+const ILLION_ONES = ["", "Un", "Do", "Tr", "Qa", "Qi", "Sx", "Sp", "Oc", "No"];
+const ILLION_TENS = ["", "Dc", "Vg", "Tg", "Qd", "Qu", "Sg", "Sv", "Og", "Ng"];
+const ILLION_HUNDREDS = [
+  "",
+  "Ct",
+  "Dt",
+  "Tt",
+  "Qt",
+  "Qn",
+  "St",
+  "Sp2",
+  "Ot",
+  "Nt",
+];
+
+// builds the suffix for the nth "-illion" tier (1 = million, 10 = decillion,
+// 11 = undecillion, ...), combining the ones/tens/hundreds parts of tier itself
+// the same way "undecillion" = "un" + "decillion" or "vigintillion" = "" + "viginti"
+function illionSuffix(tier: number): string {
+  if (tier <= SMALL_ILLION_SUFFIXES.length)
+    return SMALL_ILLION_SUFFIXES[tier - 1];
+  return (
+    ILLION_ONES[tier % 10] +
+    ILLION_TENS[Math.floor(tier / 10) % 10] +
+    ILLION_HUNDREDS[Math.floor(tier / 100) % 10]
+  );
+}
 
 // compacts a non-negative number to a magnitude suffix (K/M/B/T/...) once it's
 // big enough, always a whole number (no decimals) so every number shown in the
@@ -69,16 +100,22 @@ const MAGNITUDE_SUFFIXES: { value: number; suffix: string }[] = [
 function formatCompactNumber(value: number): string {
   const safe = Math.max(0, value);
   if (safe < 1e6) return safe.toFixed(0);
-  const largestTier = MAGNITUDE_SUFFIXES[0];
-  // past the largest named tier (decillion), dividing by it forever just grows the
-  // mantissa unboundedly (e.g. "323257910Dc") — switch to scientific notation instead
-  if (safe >= largestTier.value * 1000) {
-    return safe.toExponential(0).replace("+", "");
+  if (!Number.isFinite(safe)) return "∞";
+  // reads the exponent straight out of toExponential's own normalized string
+  // instead of floor(log10(safe)) — floating-point log10 of an exact power of ten
+  // (e.g. 1e33) can land a hair under the whole number, which would silently pick
+  // the wrong (one-too-low) tier right at every tier boundary
+  const [mantissaStr, expStr] = safe.toExponential(6).split("e");
+  const exponent = Number(expStr);
+  let tier = Math.floor(exponent / 3); // 2 = million (1e6), 3 = billion (1e9), ...
+  let mantissa = Number(mantissaStr) * 10 ** (exponent - tier * 3);
+  // toFixed(0) below can round e.g. 999.6 up to "1000" — bump to the next tier
+  // instead of ever displaying a 4-digit mantissa
+  if (Math.round(mantissa) >= 1000) {
+    mantissa /= 1000;
+    tier += 1;
   }
-  const tier =
-    MAGNITUDE_SUFFIXES.find((t) => safe >= t.value) ??
-    MAGNITUDE_SUFFIXES[MAGNITUDE_SUFFIXES.length - 1];
-  return `${(safe / tier.value).toFixed(0)}${tier.suffix}`;
+  return `${mantissa.toFixed(0)}${illionSuffix(tier - 1)}`;
 }
 
 // the only way a $ amount should be formatted anywhere in the game, e.g. "$2M"

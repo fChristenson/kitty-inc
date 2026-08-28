@@ -157,8 +157,12 @@ async function main() {
   // dev/test-only controls; markup is stripped entirely in production builds
   if (import.meta.env.MODE !== "production") {
     wireTestButton(app, () => {
-      // absurdly large: comfortably covers buying several buildings in one go
-      addTotalIncome(1e30);
+      // absurdly large: comfortably covers buying dozens of buildings in one go,
+      // many cities deep (see cityName/cityMap's continuously-compounding
+      // BUILDING_COST_MULTIPLIER pricing) — formatCompactNumber's suffix (utils.ts)
+      // is generated algorithmically, not from a fixed list, so it never runs out
+      // of a name for however big this (or totalIncome) ever gets
+      addTotalIncome(1e150);
     });
     wireSpawnMouseButton(app, () => {
       forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
