@@ -181,6 +181,7 @@ async function main() {
     app,
     () => buildings[activeBuildingIndex] ?? [],
     () => persist(),
+    (floor) => gameCanvas.scrollActiveToFloor(floor),
   );
   // buys the next building outright if affordable (see buildings.ts's
   // getBuildingPrice, which scales 1000x per building same as its economy); returns

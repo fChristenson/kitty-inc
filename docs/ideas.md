@@ -75,3 +75,45 @@ Organized by the psychological lever each one pulls.
 
 Combo meter + near-miss glow + escalating milestone burst — best "addictive
 slot-machine feel per line of code" if starting somewhere concrete.
+
+## Boost variety (beyond the single "speed up workers" option)
+
+`boostMenu`'s own comment already says more items can join the list without
+changing the dialog's shape — these all reuse that same list-of-buyable-items
+pattern, and most reuse the existing `boosted`/`boostedAt` per-worker-slot
+timer (`gameState`'s `activateBoosted`/`countBoostedWorkers`) rather than
+inventing a new expiring-effect mechanism from scratch.
+
+- **Double income (not just double speed)**: current boost halves the income
+  interval; a separate boost could instead multiply `incomeAmount` directly
+  for its duration (stacks differently — good for a player who wants one big
+  payout now vs. faster smaller ones). Same `boostedAt` expiry pattern, just
+  read by `effectiveIncomeCycle` as an amount multiplier instead of an
+  interval divisor.
+- **Crit-chance boost**: a temporary buy that raises `upgradeButton`'s
+  `CRIT_CHANCE` (currently a flat 5%) for e.g. 30s — turns "jackpot" upgrades
+  from a passive rare event into something the player can actively gamble on.
+- **Upgrade discount boost**: temporarily multiplies `upgradeCost` by <1 for
+  every unlocked floor, so upgrade-spam during the window feels like a "sale" —
+  pairs naturally with a countdown-timer HUD element (same visual language as
+  the boost-expiration-urgency idea above).
+- **Unlock discount boost**: same idea but aimed at the next floor/building
+  unlock price (`getBuildingPrice`/floor unlock cost) instead of upgrades —
+  useful lever specifically for players saving up for the next big unlock.
+- **Auto-collector boost**: for its duration, every floor's fill cycle
+  auto-collects the instant it completes (no click needed) — good "borrowed
+  time" power-up that visibly changes how the game plays for a bit, not just
+  a number multiplier.
+- **Single-floor "focus" boost**: unlike `applyBoostAll` (every floor), a
+  cheaper boost that only affects one floor's workers, at a much stronger
+  multiplier — gives the boost menu a cheap/small vs. expensive/global choice
+  instead of one size fits all.
+- **Permanent (non-expiring) boosts as a rare drop**: instead of a timed
+  effect, a very rare `mouse`-click bonus or milestone reward grants a small
+  permanent bump (e.g. +1% global income) — distinguishes "boosts you buy"
+  (temporary) from "boosts you find" (permanent), and gives long-term players
+  a reason to keep clicking well after timed boosts stop feeling exciting.
+- **Combo-linked boost discount**: if the click-combo meter idea above ships,
+  let a maxed-out combo grant one free/discounted boost-menu purchase as the
+  payoff for keeping the streak alive, tying two systems together instead of
+  leaving boosts and combos independent.

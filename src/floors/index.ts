@@ -221,6 +221,7 @@ export {
   startIncomeTicker,
   collectDueIncome,
   drawIncomePanel,
+  getIncomeBarCenter,
 } from "./incomePanel";
 export { ensureLockedFloorAbove, drawFloorLock } from "./floorLock";
 export {
@@ -246,9 +247,14 @@ export {
   rollCritUpgrade,
   isCritUpgrade,
   forceCritUpgrade,
+  triggerSaleBoost,
+  isSaleActive,
+  floorIncomePerSecond,
+  SALE_ASSUMED_CLICKS,
 } from "./upgradeButton";
 export {
   spawnFloatingCoins,
   drawFloatingCoins,
   loadFloatingCoinImage,
 } from "./coinFloat";
+export { spawnIncomeFloatText, drawIncomeFloatText } from "./incomeFloatText";

@@ -8,6 +8,7 @@ import {
   drawFloorLock,
   spawnFloatingCoins,
   drawFloatingCoins,
+  drawIncomeFloatText,
 } from "../floors";
 import { drawOuterWall } from "../buildings";
 import { drawMouse } from "../mouse";
@@ -75,5 +76,6 @@ export function drawFloorContent(
     getTotalIncome() >= floor.upgradeCost,
     isGroundFloor,
   );
+  drawIncomeFloatText(ctx, floor);
   drawFloorLock(ctx, floor);
 }

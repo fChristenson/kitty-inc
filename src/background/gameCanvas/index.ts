@@ -88,6 +88,9 @@ export interface GameCanvas {
   setActiveFloors: (floors: Floor[]) => void;
   scrollActiveToTop: () => void;
   scrollActiveToBottom: () => void;
+  // centers the camera on a given floor of the currently-active building (e.g. a
+  // boost that landed on a random floor) — no-op if that floor isn't registered
+  scrollActiveToFloor: (floor: Floor) => void;
 }
 
 // this is the single module that owns the game's 2D world: how big it is (scaled to
@@ -137,6 +140,17 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     activeFloors = floors;
     registerFloors(floors);
     scrollUp = 0;
+    clampCamera();
+  }
+
+  // centers the camera vertically on whichever floor this is, if it's a currently
+  // registered floor of the active building
+  function scrollActiveToFloor(floor: Floor): void {
+    const location = floorLocation.get(floor);
+    if (!location) return;
+    const { top, bottom } = floorWorldY(location.floorIndex);
+    const floorCenterY = (top + bottom) / 2;
+    scrollUp = GROUND_H - contentViewportH() / 2 - floorCenterY;
     clampCamera();
   }
 
@@ -604,5 +618,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     scrollActiveToBottom: () => {
       scrollUp = 0;
     },
+    scrollActiveToFloor,
   };
 }

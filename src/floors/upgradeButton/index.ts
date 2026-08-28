@@ -103,6 +103,39 @@ export function forceCritUpgrade(floor: Floor): void {
   critFloors.add(floor);
 }
 
+// "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see
+// hud/boostMenu/index.ts's applySaleBoost, which picks the random floor and calls
+// triggerSaleBoost below). While active on a floor, its upgrade button wiggles like
+// a crit and clicking it is free. A crit can still roll during a sale (see
+// floorInteractions/index.ts); rather than stacking CRIT_UPGRADE_COUNT normal
+// upgrades as usual, it just multiplies that click's sale payout by
+// SALE_CRIT_MULTIPLIER
+export const SALE_DURATION_MS = 15_000;
+export const SALE_CRIT_MULTIPLIER = 5;
+// each sale click pays out floorIncomePerSecond(floor) below (1 second of that
+// floor's own income), credited straight to the player's total — hud/boostMenu's
+// own cost is priced off this same rate times this many assumed clicks, halved, so
+// a fully-clicked sale earns back at least double the cost
+export const SALE_ASSUMED_CLICKS = 10;
+const saleStartedAt = new WeakMap<Floor, number>();
+
+export function triggerSaleBoost(floor: Floor): void {
+  saleStartedAt.set(floor, Date.now());
+}
+
+export function isSaleActive(floor: Floor, now: number): boolean {
+  const startedAt = saleStartedAt.get(floor);
+  return startedAt !== undefined && now - startedAt < SALE_DURATION_MS;
+}
+
+// 1 second's worth of a floor's own current income rate — deliberately NOT added
+// back into floor.incomeAmount itself (that would compound: a bigger rate next
+// click, forever), just read fresh each click and credited straight to the
+// player's total (see floorInteractions/index.ts and hud/boostMenu/index.ts)
+export function floorIncomePerSecond(floor: Floor): number {
+  return floor.incomeAmount / floor.incomeIntervalSeconds;
+}
+
 const WIGGLE_PERIOD_MS = 260;
 const WIGGLE_MAX_RADIANS = 0.08;
 
@@ -121,17 +154,18 @@ export function drawUpgradeButton(
   const now = Date.now();
   const scale = pressScale(floor, now);
   const crit = isCritUpgrade(floor);
+  const sale = isSaleActive(floor, now);
 
   ctx.save();
   ctx.translate(cx, cy);
-  if (crit) {
+  if (crit || sale) {
     ctx.rotate(
       Math.sin((now / WIGGLE_PERIOD_MS) * Math.PI * 2) * WIGGLE_MAX_RADIANS,
     );
   }
   ctx.scale(scale, scale);
   ctx.translate(-cx, -cy);
-  if (!crit) {
+  if (!crit && !sale) {
     if (!affordable) ctx.globalAlpha = 0.5;
     else if (hovered) ctx.filter = "brightness(0.85)";
   } else if (hovered) {
@@ -148,7 +182,13 @@ export function drawUpgradeButton(
     y,
     BTN_W,
     BTN_H,
-    crit ? COLOR.purple : affordable ? COLOR.moneyGreen : COLOR.disabledGray,
+    crit
+      ? COLOR.purple
+      : sale
+        ? COLOR.amber
+        : affordable
+          ? COLOR.moneyGreen
+          : COLOR.disabledGray,
     true,
     true,
     40,
@@ -157,6 +197,13 @@ export function drawUpgradeButton(
   ctx.font = '900 52px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  drawCartoonText(ctx, crit ? "x2" : formatPrice(cost), cx, cy);
+  const label = sale
+    ? crit
+      ? `Sale x${SALE_CRIT_MULTIPLIER}`
+      : "Sale"
+    : crit
+      ? "x2"
+      : formatPrice(cost);
+  drawCartoonText(ctx, label, cx, cy);
   ctx.restore();
 }

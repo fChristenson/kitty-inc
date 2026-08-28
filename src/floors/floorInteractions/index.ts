@@ -1,4 +1,5 @@
 import { hitTestWorkers, clickWorker, getWorkerCenter } from "../worker";
+import { formatPrice } from "../../utils";
 import {
   hitTestUpgradeButton,
   getButtonCenter,
@@ -6,14 +7,22 @@ import {
   isCritUpgrade,
   consumeCritUpgrade,
   rollCritUpgrade,
+  isSaleActive,
+  SALE_CRIT_MULTIPLIER,
+  floorIncomePerSecond,
   CRIT_UPGRADE_COUNT,
   BTN_W,
   BTN_H,
 } from "../upgradeButton";
 import { increaseIncomeRate, UPGRADE_MILESTONE_STEP } from "../incomePanel";
-import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
+import {
+  spendTotalIncome,
+  getTotalIncome,
+  addTotalIncome,
+} from "../../totalIncome";
 import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
+import { spawnIncomeFloatText } from "../incomeFloatText";
 import { getUpgradeIndicatorCenter } from "../star";
 import { playSold, playBloop, playCoinDrop, playExplosion } from "../../sound";
 import { triggerScreenShake } from "../../screenShake";
@@ -50,7 +59,9 @@ export function hitTestFloorHover(
   return (
     (hitTestUpgradeButton(x, y, isGroundFloor) &&
       floor.unlocked &&
-      (isCritUpgrade(floor) || getTotalIncome() >= floor.upgradeCost)) ||
+      (isSaleActive(floor, Date.now()) ||
+        isCritUpgrade(floor) ||
+        getTotalIncome() >= floor.upgradeCost)) ||
     hitTestFloorLock(x, y, floor) ||
     hitTestWorkers(x, y, floor).length > 0
   );
@@ -93,6 +104,43 @@ export function handleFloorClick(
   }
 
   if (hitTestUpgradeButton(x, y, isGroundFloor) && floor.unlocked) {
+    // "Sale" boost: free clicks that add upgradeCount straight to incomeAmount,
+    // instead of the normal cost/rateStep math — takes priority over the crit
+    // branch below so a crit rolled during a sale just multiplies this payout
+    // (SALE_CRIT_MULTIPLIER) rather than triggering the big crit celebration
+    if (isSaleActive(floor, Date.now())) {
+      const crit = isCritUpgrade(floor);
+      if (crit) consumeCritUpgrade(floor);
+      // 1 second of the floor's own current income rate, credited straight to
+      // the player's total — never added back into floor.incomeAmount itself, or
+      // each click would permanently raise the rate the next click reads from
+      const gained =
+        floorIncomePerSecond(floor) * (crit ? SALE_CRIT_MULTIPLIER : 1);
+      addTotalIncome(gained);
+      rollCritUpgrade(floor);
+      persist();
+      triggerButtonPress(floor);
+      playCoinDrop();
+      // still gets the same shake/"CRIT!" flash weight as a normal crit, just not
+      // the extra multi-burst celebration below (this payout is already smaller,
+      // a flat multiplier rather than CRIT_UPGRADE_COUNT stacked upgrades)
+      if (crit) {
+        triggerScreenShake();
+        playExplosion();
+      }
+      const center = getButtonCenter(isGroundFloor);
+      const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
+      const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
+      spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
+      spawnIncomeFloatText(
+        floor,
+        center.x,
+        center.y,
+        `+${formatPrice(gained)}`,
+        crit,
+      );
+      return;
+    }
     // the slot-machine jackpot moment: free, costs nothing, applies
     // CRIT_UPGRADE_COUNT upgrades at once, and shakes the whole screen for weight
     if (isCritUpgrade(floor)) {

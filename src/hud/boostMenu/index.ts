@@ -5,9 +5,16 @@ import {
   animateDialogClose,
 } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
-import { MAX_RENDERED_WORKERS, triggerJumpAll } from "../../floors";
+import {
+  MAX_RENDERED_WORKERS,
+  triggerJumpAll,
+  triggerSaleBoost,
+  floorIncomePerSecond,
+  SALE_ASSUMED_CLICKS,
+} from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import mouseIconUrl from "../../assets/mouse.png";
+import coinIconUrl from "../../assets/coin.png";
 
 const BOOST_ALL_SECONDS_COST = 5; // cost is 5s of current (unboosted) income
 
@@ -24,6 +31,19 @@ function currentIncomePerSecond(floors: Floor[]): number {
 
 export function getBoostAllCost(floors: Floor[]): number {
   return currentIncomePerSecond(floors) * BOOST_ALL_SECONDS_COST;
+}
+
+// a floor's own floorIncomePerSecond (see floors/upgradeButton/index.ts — exactly
+// what one Sale click pays out), averaged across every unlocked floor since the
+// boost lands on a random one
+function averageFloorIncomePerSecond(floors: Floor[]): number {
+  const unlocked = floors.filter((floor) => floor.unlocked);
+  if (unlocked.length === 0) return 1;
+  const total = unlocked.reduce(
+    (sum, floor) => sum + Math.max(1, floorIncomePerSecond(floor)),
+    0,
+  );
+  return total / unlocked.length;
 }
 
 // boosts every rendered worker on every unlocked floor — shared by the paid
@@ -49,6 +69,27 @@ export function buyBoostAll(floors: Floor[]): boolean {
   // for its own free boost, so buying the boost from the dialog reacts identically
   triggerJumpAll(floors, Date.now());
   return true;
+}
+
+export function getSaleBoostCost(floors: Floor[]): number {
+  // half of SALE_ASSUMED_CLICKS worth of the floor's own per-second income —
+  // clicking through that many sale clicks (see floorInteractions/index.ts) pays
+  // that whole amount back, i.e. at least double the cost
+  return (averageFloorIncomePerSecond(floors) * SALE_ASSUMED_CLICKS) / 2;
+}
+
+// buys the "Sale" boost: spends the cost, then puts one random unlocked floor's
+// upgrade button on sale for its own duration (see floors/upgradeButton's
+// triggerSaleBoost/SALE_DURATION_MS). Returns the floor put on sale (so the caller
+// can e.g. scroll to it), or null (refunding nothing spent) if there's no unlocked
+// floor to put on sale yet
+export function buySaleBoost(floors: Floor[]): Floor | null {
+  const unlocked = floors.filter((floor) => floor.unlocked);
+  if (unlocked.length === 0) return null;
+  if (!spendTotalIncome(getSaleBoostCost(floors))) return null;
+  const floor = unlocked[Math.floor(Math.random() * unlocked.length)];
+  triggerSaleBoost(floor);
+  return floor;
 }
 
 // reuses .worker-menu's styling — same generic "dialog with a list of buyable items" shape
@@ -77,6 +118,9 @@ export function wireBoostMenu(
   container: HTMLElement,
   getFloors: () => Floor[],
   onPurchase: () => void,
+  // called right after a successful Sale purchase, with the floor it landed on —
+  // main.ts uses this to close the menu and scroll the camera to that floor
+  onSaleTriggered: (floor: Floor) => void,
 ): BoostMenu {
   const menu = container.querySelector<HTMLDivElement>("#boost-menu")!;
   const backdrop = container.querySelector<HTMLDivElement>(
@@ -88,6 +132,8 @@ export function wireBoostMenu(
   function render(): void {
     const cost = getBoostAllCost(getFloors());
     const affordable = getTotalIncome() >= cost;
+    const saleCost = getSaleBoostCost(getFloors());
+    const saleAffordable = getTotalIncome() >= saleCost;
     list.innerHTML = `
       <button
         class="worker-menu__item"
@@ -100,19 +146,44 @@ export function wireBoostMenu(
         </span>
         <span class="worker-menu__price">${formatPrice(cost)}</span>
       </button>
+      <button
+        class="worker-menu__item"
+        id="boost-menu-sale"
+        ${saleAffordable ? "" : "disabled"}
+      >
+        <span class="worker-menu__item-label">
+          <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+          Trigger sales event
+        </span>
+        <span class="worker-menu__price">${formatPrice(saleCost)}</span>
+      </button>
     `;
   }
 
   list.addEventListener("click", async (event) => {
-    const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
+    const target = event.target as HTMLElement;
+    const speedUpButton = target.closest<HTMLButtonElement>(
       "#boost-menu-speed-up",
     );
-    if (!button) return;
-    if (buyBoostAll(getFloors())) {
-      playSold();
-      await triggerButtonPress(button);
-      onPurchase();
-      render();
+    if (speedUpButton) {
+      if (buyBoostAll(getFloors())) {
+        playSold();
+        await triggerButtonPress(speedUpButton);
+        onPurchase();
+        render();
+      }
+      return;
+    }
+    const saleButton = target.closest<HTMLButtonElement>("#boost-menu-sale");
+    if (saleButton) {
+      const floor = buySaleBoost(getFloors());
+      if (floor) {
+        playSold();
+        await triggerButtonPress(saleButton);
+        onPurchase();
+        onSaleTriggered(floor);
+        await close();
+      }
     }
   });
 
@@ -120,11 +191,16 @@ export function wireBoostMenu(
   // button turns clickable again as soon as income catches up, instead of only
   // refreshing on the next open/purchase
   function updateAffordability(): void {
-    const button = list.querySelector<HTMLButtonElement>(
+    const speedUpButton = list.querySelector<HTMLButtonElement>(
       "#boost-menu-speed-up",
     );
-    if (button) {
-      button.disabled = getTotalIncome() < getBoostAllCost(getFloors());
+    if (speedUpButton) {
+      speedUpButton.disabled = getTotalIncome() < getBoostAllCost(getFloors());
+    }
+    const saleButton =
+      list.querySelector<HTMLButtonElement>("#boost-menu-sale");
+    if (saleButton) {
+      saleButton.disabled = getTotalIncome() < getSaleBoostCost(getFloors());
     }
   }
 

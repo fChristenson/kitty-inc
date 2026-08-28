@@ -24,6 +24,23 @@ function getPanelY(isGroundFloor: boolean): number {
   return isGroundFloor ? base : base + 10;
 }
 
+// the visible bar's own geometry, hoisted out of drawIncomePanel so
+// getIncomeBarCenter below can share it instead of duplicating these numbers
+const BAR_INSET = 18;
+const BAR_W = (PANEL_W - 36) * 1.5;
+// scaled up alongside PANEL_W; still comfortably clears the divider band's vertical bounds
+const BAR_H = 92;
+
+// center of the visible income bar, floor-local — for spawning effects (e.g. the
+// "Sale" boost's floating +income text) right on top of it
+export function getIncomeBarCenter(isGroundFloor: boolean): {
+  x: number;
+  y: number;
+} {
+  const barY = getPanelY(isGroundFloor) + PANEL_H / 2 - BAR_H / 2;
+  return { x: PANEL_X + BAR_INSET + BAR_W / 2, y: barY + BAR_H / 2 };
+}
+
 // when each floor's current fill cycle started is floor.lastCollectedAt itself (a
 // persisted, Date.now()-based timestamp) — no separate in-memory clock, so a page
 // reload never resets/loses how far into its current cycle a floor already was
@@ -264,10 +281,9 @@ export function drawIncomePanel(
   const x = PANEL_X;
   const y = getPanelY(isGroundFloor);
 
-  const barX = x + 18;
-  const barW = (PANEL_W - 36) * 1.5;
-  // scaled up alongside PANEL_W; still comfortably clears the divider band's vertical bounds
-  const barH = 92;
+  const barX = x + BAR_INSET;
+  const barW = BAR_W;
+  const barH = BAR_H;
   const barY = y + PANEL_H / 2 - barH / 2;
   // rounded RECTANGLE, same as the upgrade button — NOT a full pill/stadium
   const barRadius = barH / 3;
