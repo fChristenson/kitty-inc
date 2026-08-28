@@ -154,8 +154,17 @@ export function createCityMapView(
     cssW = rect.width;
     cssH = rect.height;
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.round(cssW * dpr);
-    canvas.height = Math.round(cssH * dpr);
+    const targetW = Math.round(cssW * dpr);
+    const targetH = Math.round(cssH * dpr);
+    // reassigning canvas.width/height reallocates+clears the whole backing store, so
+    // skip it when the size hasn't actually changed — redraw() calls resize() every
+    // single frame (tick() runs at rAF cadence for as long as the map stays open),
+    // and doing that reallocation 60x/sec was the actual source of the reported
+    // map-open freeze (each redraw() turning into a full canvas reallocation)
+    if (canvas.width !== targetW || canvas.height !== targetH) {
+      canvas.width = targetW;
+      canvas.height = targetH;
+    }
   }
 
   // building 0's marker always sits bottom-left (fixed); every other building's
@@ -199,40 +208,82 @@ export function createCityMapView(
   }
 
   // single star.png icon; empty (unfilled) ones get a flat gray tint via canvas
-  // filter, same technique drawCatMarker uses for a locked building's marker
-  function drawStarIcon(cx: number, cy: number, filled: boolean): void {
+  // filter, same technique drawCatMarker uses for a locked building's marker.
+  // targetCtx so this can render into the row cache canvas below as easily as
+  // the visible one
+  function drawStarIcon(
+    targetCtx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    filled: boolean,
+  ): void {
     if (!starImage) return;
-    ctx.save();
+    targetCtx.save();
     if (starOutline) {
       const ox = cx - STAR_SIZE / 2;
       const oy = cy - STAR_SIZE / 2;
       for (const [dx, dy] of STAR_STROKE_OFFSETS) {
-        ctx.drawImage(starOutline, ox + dx, oy + dy, STAR_SIZE, STAR_SIZE);
+        targetCtx.drawImage(
+          starOutline,
+          ox + dx,
+          oy + dy,
+          STAR_SIZE,
+          STAR_SIZE,
+        );
       }
     }
     if (!filled) {
-      ctx.filter = "grayscale(1) brightness(0.75)";
-      ctx.globalAlpha = 0.6;
+      targetCtx.filter = "grayscale(1) brightness(0.75)";
+      targetCtx.globalAlpha = 0.6;
     }
-    ctx.drawImage(
+    targetCtx.drawImage(
       starImage,
       cx - STAR_SIZE / 2,
       cy - STAR_SIZE / 2,
       STAR_SIZE,
       STAR_SIZE,
     );
-    ctx.restore();
+    targetCtx.restore();
+  }
+
+  // a star row only ever looks one of 5 ways (filledCount 1-5), so each variant is
+  // rendered once into its own offscreen canvas and reused from then on — redoing
+  // every star's 16-offset outline effect (~85 drawImage calls total across a
+  // building's row) from scratch on every single animation frame was the actual
+  // cost that made opening the map freeze the page
+  const STAR_ROW_PAD = STAR_STROKE_WIDTH; // room for the outline's offset stroke past each edge star
+  const STAR_ROW_W = STAR_SPACING * 4 + STAR_SIZE + STAR_ROW_PAD * 2;
+  const STAR_ROW_H = STAR_SIZE + STAR_ROW_PAD * 2;
+  const starRowCache = new Map<number, HTMLCanvasElement>();
+  function getStarRow(filledCount: number): HTMLCanvasElement | null {
+    if (!starImage) return null;
+    const cached = starRowCache.get(filledCount);
+    if (cached) return cached;
+    const rowCanvas = document.createElement("canvas");
+    rowCanvas.width = STAR_ROW_W;
+    rowCanvas.height = STAR_ROW_H;
+    const rowCtx = rowCanvas.getContext("2d")!;
+    for (let i = 0; i < 5; i++) {
+      drawStarIcon(
+        rowCtx,
+        STAR_ROW_PAD + i * STAR_SPACING + STAR_SIZE / 2,
+        STAR_ROW_PAD + STAR_SIZE / 2,
+        i < filledCount,
+      );
+    }
+    starRowCache.set(filledCount, rowCanvas);
+    return rowCanvas;
   }
 
   // 5 stars centered under the marker; `filledCount` (buildingIndex + 1) of them
   // solid gold, the rest gray-tinted — shows this building's tier at a glance
   function drawStarRow(buildingIndex: number, filledCount: number): void {
+    const row = getStarRow(filledCount);
+    if (!row) return;
     const { cx, feetY } = markerCenter(buildingIndex);
     const rowY = feetY + STAR_ROW_Y_OFFSET;
-    const startX = cx - (STAR_SPACING * 4) / 2;
-    for (let i = 0; i < 5; i++) {
-      drawStarIcon(startX + i * STAR_SPACING, rowY, i < filledCount);
-    }
+    const startX = cx - (STAR_SPACING * 4) / 2 - STAR_SIZE / 2 - STAR_ROW_PAD;
+    ctx.drawImage(row, startX, rowY - STAR_SIZE / 2 - STAR_ROW_PAD);
   }
 
   // any building beyond MARKER_COUNT has no marker here yet
@@ -397,10 +448,20 @@ export function createCityMapView(
 
   // keeps the current-building marker's stand/jump cycle animating even though
   // nothing else on this static map ever changes; cheap to leave running while the
-  // view is hidden too (redraw() no-ops on the then-0x0 canvas)
+  // view is hidden too (redraw() no-ops on the then-0x0 canvas). Only actually
+  // redraws a few times a second — this view has nothing that needs a full 60fps
+  // cadence (the pose swap alone is on a 550ms cycle), and each redraw's canvas
+  // repaint was expensive enough that running it every animation frame is what
+  // made opening the map freeze the whole page
+  const TICK_REDRAW_INTERVAL_MS = 100;
   let animationFrameId: number | null = null;
+  let lastTickRedraw = 0;
   function tick(): void {
-    redraw();
+    const now = performance.now();
+    if (now - lastTickRedraw >= TICK_REDRAW_INTERVAL_MS) {
+      lastTickRedraw = now;
+      redraw();
+    }
     animationFrameId = requestAnimationFrame(tick);
   }
   animationFrameId = requestAnimationFrame(tick);
