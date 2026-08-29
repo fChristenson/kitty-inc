@@ -67,6 +67,32 @@ export function hitTestFloorHover(
   );
 }
 
+// one upgrade tick's worth of logic — rate increase, next-crit reroll, the small
+// jittered coin burst at the button, and the every-10th-upgrade milestone burst
+// (same one that halves the floor's income interval, see incomePanel.ts). Shared
+// by a normal paid click and the crit branch below, which runs this exactly
+// CRIT_UPGRADE_COUNT times back to back (minus the cost) — calling this once per
+// simulated click, not just once total, is what makes a crit landing on a
+// multiple of 10 mid-run behave identically to 5 real clicks would
+function applyUpgradeTick(floor: Floor, isGroundFloor: boolean): void {
+  increaseIncomeRate(floor);
+  rollCritUpgrade(floor);
+  const center = getButtonCenter(isGroundFloor);
+  // small random jitter so the burst doesn't spawn at the exact same pixel
+  // every single click — a random point spanning the button's own inner width
+  // on X (scaled back 25%) and half its height on Y
+  const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
+  const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
+  spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
+  // extra celebration burst right on the upgrade indicator every 10th upgrade,
+  // same milestone that halves this floor's income interval
+  if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
+    const indicatorCenter = getUpgradeIndicatorCenter(floor);
+    spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
+    playBloop();
+  }
+}
+
 // handles a click at floor-local (x, y): unlocking, upgrading, or clicking a worker.
 // every hit test/mutation here is identical to the old per-canvas click listener,
 // just no longer tied to any one floor owning its own DOM canvas + event listener
@@ -145,22 +171,21 @@ export function handleFloorClick(
     // CRIT_UPGRADE_COUNT upgrades at once, and shakes the whole screen for weight
     if (isCritUpgrade(floor)) {
       consumeCritUpgrade(floor);
-      for (let i = 0; i < CRIT_UPGRADE_COUNT; i++) increaseIncomeRate(floor);
-      rollCritUpgrade(floor);
+      for (let i = 0; i < CRIT_UPGRADE_COUNT; i++) {
+        applyUpgradeTick(floor, isGroundFloor);
+      }
       persist();
       triggerButtonPress(floor);
       triggerScreenShake();
       playCoinDrop();
       playExplosion();
-      const buttonCenter = getButtonCenter(isGroundFloor);
-      spawnCoinBurst(floor, buttonCenter.x, buttonCenter.y, () => {});
-      // 3 more bursts on top of the one above, so the celebration keeps erupting
-      // for as long as the crit text/shake animation is playing out. First one is
-      // dead center (matching the "CRIT!" text) at 0s; the other two are offset
-      // 40px left/right of it, staggered in after it (0.4s, 0.8s — spaced out
-      // enough to read as separate pops, not one simultaneous burst) so all three
-      // don't pop at once. Re-read fresh at each delayed spawn in case the user
-      // scrolls in between
+      // 3 bursts on top of applyUpgradeTick's own per-click ones, so the
+      // celebration keeps erupting for as long as the crit text/shake animation
+      // is playing out. First one is dead center (matching the "CRIT!" text) at
+      // 0s; the other two are offset 40px left/right of it, staggered in after
+      // it (0.4s, 0.8s — spaced out enough to read as separate pops, not one
+      // simultaneous burst) so all three don't pop at once. Re-read fresh at
+      // each delayed spawn in case the user scrolls in between
       const CENTER_BURST_OFFSET_PX = 200;
       const CENTER_BURST_OFFSET_PY = 100;
       const centerBursts: {
@@ -186,33 +211,13 @@ export function handleFloorClick(
           spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
         }, delayMs);
       }
-      if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
-        const indicatorCenter = getUpgradeIndicatorCenter(floor);
-        spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
-        playBloop();
-      }
       return;
     }
     if (spendTotalIncome(floor.upgradeCost)) {
-      increaseIncomeRate(floor);
-      rollCritUpgrade(floor);
+      applyUpgradeTick(floor, isGroundFloor);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
-      const center = getButtonCenter(isGroundFloor);
-      // small random jitter so the burst doesn't spawn at the exact same pixel
-      // every single click — a random point spanning the button's own inner width
-      // on X (scaled back 25%) and half its height on Y
-      const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
-      const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
-      spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
-      // extra celebration burst right on the upgrade indicator every 10th upgrade,
-      // same milestone that halves this floor's income interval
-      if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
-        const indicatorCenter = getUpgradeIndicatorCenter(floor);
-        spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
-        playBloop();
-      }
       return;
     }
   }

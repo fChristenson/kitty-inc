@@ -81,11 +81,16 @@ export function increaseIncomeRate(floor: Floor): void {
   floor.incomeAmount += floor.rateStep;
   floor.upgradeCost = Math.ceil(floor.upgradeCost * UPGRADE_COST_GROWTH);
   floor.upgradeCount += 1;
+  // no MIN_INCOME_INTERVAL_SECONDS clamp here — this stores the floor's true,
+  // uncapped base interval, which effectiveIncomeCycle's own clamp below already
+  // folds into the overspeed payout multiplier the exact same way it does for a
+  // boost/office-upgrade speedup. Clamping it at the source instead pinned every
+  // sufficiently-upgraded floor's stored interval at exactly the minimum, so
+  // uncappedIntervalSeconds could only ever dip below the minimum (the actual
+  // overspeed/"filled bar" trigger) from a boost or office upgrade, never from
+  // upgrades alone
   if (floor.upgradeCount % UPGRADES_PER_INTERVAL_HALVING === 0) {
-    floor.incomeIntervalSeconds = Math.max(
-      MIN_INCOME_INTERVAL_SECONDS,
-      floor.incomeIntervalSeconds / 2,
-    );
+    floor.incomeIntervalSeconds /= 2;
   }
 }
 

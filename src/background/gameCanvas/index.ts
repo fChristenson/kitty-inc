@@ -63,6 +63,9 @@ const DRAG_THRESHOLD_PX = 6; // pointer movement below this still counts as a cl
 // lifts, so a flick keeps coasting briefly instead of stopping dead on release
 const MOMENTUM_DECAY_PER_MS = 0.994;
 const MOMENTUM_MIN_SPEED = 0.02; // world units/ms below which momentum just stops
+// press-and-hold auto-repeat: while the pointer stays down on an upgrade button,
+// its click logic re-fires this often instead of only once on release
+const UPGRADE_HOLD_INTERVAL_MS = 100;
 
 export interface GameCanvasDeps {
   canvas: HTMLCanvasElement;
@@ -435,6 +438,16 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   let didDrag = false;
   let velocityY = 0;
   let lastMoveTime = 0;
+  // press-and-hold auto-repeat on the upgrade button — see onPointerDown/onPointerUp
+  let holdIntervalId: ReturnType<typeof setInterval> | null = null;
+  let heldUpgradeButton = false;
+
+  function stopHoldRepeat(): void {
+    if (holdIntervalId !== null) {
+      clearInterval(holdIntervalId);
+      holdIntervalId = null;
+    }
+  }
   let momentumFrame: number | null = null;
 
   function stopMomentum(): void {
@@ -500,6 +513,29 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return null;
   }
 
+  // shared by the upgrade button's hold-repeat interval and a normal tap's release
+  function fireHandleFloorClick(hit: {
+    floor: Floor;
+    localX: number;
+    localY: number;
+    isGroundFloor: boolean;
+  }): void {
+    handleFloorClick(
+      {
+        floors: activeFloors,
+        backgroundCount: backgrounds.length,
+        multiplier: getBuildingMultiplier(),
+        persist,
+        onFloorAdded: (floor) => notifyFloorAdded(floor),
+        getScreenCenterLocal: screenCenterLocalFor,
+      },
+      hit.floor,
+      hit.localX,
+      hit.localY,
+      hit.isGroundFloor,
+    );
+  }
+
   function onPointerDown(event: PointerEvent): void {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     stopMomentum();
@@ -511,6 +547,25 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     velocityY = 0;
     lastMoveTime = performance.now();
     canvas.setPointerCapture(event.pointerId);
+
+    heldUpgradeButton = false;
+    const p = canvasPoint(event);
+    const hit = hitTestPoint(p.x, p.y);
+    if (
+      hit &&
+      hit.floor.unlocked &&
+      hitTestUpgradeButton(hit.localX, hit.localY, hit.isGroundFloor)
+    ) {
+      heldUpgradeButton = true;
+      // same overlapping-mouse-critter courtesy a normal tap gets, just once —
+      // repeating it every tick wouldn't mean anything for a one-time catch
+      handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);
+      fireHandleFloorClick(hit);
+      holdIntervalId = setInterval(
+        () => fireHandleFloorClick(hit),
+        UPGRADE_HOLD_INTERVAL_MS,
+      );
+    }
   }
 
   function onPointerMove(event: PointerEvent): void {
@@ -549,6 +604,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       if (Math.hypot(totalDx, totalDy) < DRAG_THRESHOLD_PX) return;
       dragging = true;
       didDrag = true;
+      // this press turned into a scroll, not a held button — stop repeating
+      stopHoldRepeat();
     }
 
     scrollUp += dy / scale;
@@ -561,32 +618,25 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (dragPointerId !== event.pointerId) return;
     canvas.releasePointerCapture(event.pointerId);
     dragPointerId = null;
+    stopHoldRepeat();
+    const wasHeldUpgradeButton = heldUpgradeButton;
+    heldUpgradeButton = false;
     if (didDrag) {
       if (Math.abs(velocityY) > MOMENTUM_MIN_SPEED) {
         runMomentum();
       }
       return;
     }
+    // already fired (at least once) via the hold-repeat interval on pointerdown —
+    // re-running it here too would double-count the release of a quick tap
+    if (wasHeldUpgradeButton) return;
     const p = canvasPoint(event);
     const hit = hitTestPoint(p.x, p.y);
     if (!hit) return;
     // both run unconditionally on the same click — an overlapping mouse and cat(s)
     // both register, same as clicking overlapping cats already hits every one of them
     handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);
-    handleFloorClick(
-      {
-        floors: activeFloors,
-        backgroundCount: backgrounds.length,
-        multiplier: getBuildingMultiplier(),
-        persist,
-        onFloorAdded: (floor) => notifyFloorAdded(floor),
-        getScreenCenterLocal: screenCenterLocalFor,
-      },
-      hit.floor,
-      hit.localX,
-      hit.localY,
-      hit.isGroundFloor,
-    );
+    fireHandleFloorClick(hit);
   }
 
   function onWheel(event: WheelEvent): void {
