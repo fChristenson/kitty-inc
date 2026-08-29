@@ -81,6 +81,58 @@ const ILLION_HUNDREDS = [
   "Nt",
 ];
 
+// full-word versions of the same tiers, for formatTotalIncomeParts below —
+// lowercase roots (without "-illion") combined then capitalized once at the end,
+// e.g. "un" + "dec" + "illion" -> "Undecillion"
+const SMALL_ILLION_NAMES = [
+  "million",
+  "billion",
+  "trillion",
+  "quadrillion",
+  "quintillion",
+  "sextillion",
+  "septillion",
+  "octillion",
+  "nonillion",
+  "decillion",
+];
+const ILLION_ONES_NAMES = [
+  "",
+  "un",
+  "duo",
+  "tre",
+  "quattuor",
+  "quin",
+  "sex",
+  "septen",
+  "octo",
+  "novem",
+];
+const ILLION_TENS_ROOTS = [
+  "",
+  "dec",
+  "vigint",
+  "trigint",
+  "quadragint",
+  "quinquagint",
+  "sexagint",
+  "septuagint",
+  "octogint",
+  "nonagint",
+];
+const ILLION_HUNDREDS_ROOTS = [
+  "",
+  "cent",
+  "ducent",
+  "trecent",
+  "quadringent",
+  "quingent",
+  "sescent",
+  "septingent",
+  "octingent",
+  "nongent",
+];
+
 // builds the suffix for the nth "-illion" tier (1 = million, 10 = decillion,
 // 11 = undecillion, ...), combining the ones/tens/hundreds parts of tier itself
 // the same way "undecillion" = "un" + "decillion" or "vigintillion" = "" + "viginti"
@@ -94,13 +146,23 @@ function illionSuffix(tier: number): string {
   );
 }
 
-// compacts a non-negative number to a magnitude suffix (K/M/B/T/...) once it's
-// big enough, always a whole number (no decimals) so every number shown in the
-// game is the same format instead of drifting per caller
-function formatCompactNumber(value: number): string {
-  const safe = Math.max(0, value);
-  if (safe < 1e6) return safe.toFixed(0);
-  if (!Number.isFinite(safe)) return "∞";
+// same tier numbering as illionSuffix, but the full spelled-out word instead of
+// the abbreviation — used by formatTotalIncomeParts
+function illionName(tier: number): string {
+  const raw =
+    tier <= SMALL_ILLION_NAMES.length
+      ? SMALL_ILLION_NAMES[tier - 1]
+      : ILLION_ONES_NAMES[tier % 10] +
+        ILLION_TENS_ROOTS[Math.floor(tier / 10) % 10] +
+        ILLION_HUNDREDS_ROOTS[Math.floor(tier / 100) % 10] +
+        "illion";
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}
+
+// shared by formatCompactNumber/formatTotalIncomeParts: how many whole "-illion"
+// tiers safe (>= 1e6) is past, and the 1-999.999 mantissa within that tier. tier
+// follows illionSuffix/illionName's numbering (1 = million, 10 = decillion, ...)
+function compactTier(safe: number): { mantissa: number; tier: number } {
   // reads the exponent straight out of toExponential's own normalized string
   // instead of floor(log10(safe)) — floating-point log10 of an exact power of ten
   // (e.g. 1e33) can land a hair under the whole number, which would silently pick
@@ -109,13 +171,45 @@ function formatCompactNumber(value: number): string {
   const exponent = Number(expStr);
   let tier = Math.floor(exponent / 3); // 2 = million (1e6), 3 = billion (1e9), ...
   let mantissa = Number(mantissaStr) * 10 ** (exponent - tier * 3);
-  // toFixed(0) below can round e.g. 999.6 up to "1000" — bump to the next tier
-  // instead of ever displaying a 4-digit mantissa
+  // rounding a mantissa like 999.6 up to "1000" below — bump to the next tier
+  // instead of ever displaying/naming a 4-digit mantissa
   if (Math.round(mantissa) >= 1000) {
     mantissa /= 1000;
     tier += 1;
   }
-  return `${mantissa.toFixed(0)}${illionSuffix(tier - 1)}`;
+  return { mantissa, tier: tier - 1 };
+}
+
+// like compactTier, but keeps the mantissa expanded to up to 12 digits instead of
+// collapsing to 1-3 — picks the smallest tier (least reduction) whose mantissa
+// still fits under 1e12, so formatTotalIncomeParts's number keeps visibly ticking
+// up at high resolution instead of instantly flattening to a 1-3 digit integer
+// the moment it crosses a tier boundary. Always at least tier 1 (million) — values
+// under that already fit in 12 digits and skip this path entirely (see
+// formatTotalIncomeParts's own <1e12 case)
+function expandedTier(safe: number): { mantissa: number; tier: number } {
+  const [mantissaStr, expStr] = safe.toExponential(11).split("e");
+  const exponent = Number(expStr);
+  let tier = Math.max(1, Math.ceil((exponent - 14) / 3));
+  let mantissa = Number(mantissaStr) * 10 ** (exponent - 3 * (tier + 1));
+  // same rounding-bump idea as compactTier, just at the 12-digit ceiling instead
+  // of the 3-digit one
+  if (Math.round(mantissa) >= 1e12) {
+    mantissa /= 1000;
+    tier += 1;
+  }
+  return { mantissa, tier };
+}
+
+// compacts a non-negative number to a magnitude suffix (K/M/B/T/...) once it's
+// big enough, always a whole number (no decimals) so every number shown in the
+// game is the same format instead of drifting per caller
+function formatCompactNumber(value: number): string {
+  const safe = Math.max(0, value);
+  if (safe < 1e6) return safe.toFixed(0);
+  if (!Number.isFinite(safe)) return "∞";
+  const { mantissa, tier } = compactTier(safe);
+  return `${mantissa.toFixed(0)}${illionSuffix(tier)}`;
 }
 
 // the only way a $ amount should be formatted anywhere in the game, e.g. "$2M"
@@ -135,6 +229,30 @@ export function formatTotalIncome(value: number): string {
     return `$${safe.toLocaleString("en-US")}`;
   }
   return formatPrice(safe);
+}
+
+// same total-income number, but split into the plain amount and the full spelled-out
+// unit name as two separate strings (e.g. { amount: "$1", unitName: "Undecillion" })
+// instead of one string with an abbreviation glued onto the end — for callers that
+// want to lay the unit out on its own line under the number. unitName is null below
+// formatTotalIncome's own 1e12 cutoff, since the full comma-separated number there
+// has no unit at all
+export function formatTotalIncomeParts(value: number): {
+  amount: string;
+  unitName: string | null;
+} {
+  const safe = Math.floor(Math.max(0, value));
+  if (safe < 1e12) {
+    return { amount: `$${safe.toLocaleString("en-US")}`, unitName: null };
+  }
+  if (!Number.isFinite(safe)) {
+    return { amount: "$∞", unitName: null };
+  }
+  const { mantissa, tier } = expandedTier(safe);
+  return {
+    amount: `$${Math.round(mantissa).toLocaleString("en-US")}`,
+    unitName: illionName(tier),
+  };
 }
 
 // the only way a duration/interval should be formatted anywhere in the game, e.g.

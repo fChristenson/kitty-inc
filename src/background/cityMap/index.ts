@@ -1,7 +1,7 @@
 import {
   loadImage,
   drawCartoonText,
-  formatTotalIncome,
+  formatTotalIncomeParts,
   formatPrice,
 } from "../../utils";
 import { COLOR } from "../../palette";
@@ -54,16 +54,16 @@ const MARKER_POSITIONS: {
     cxFrac: 0.28,
     feetYFrac: 0.58,
     centerShiftPx: 100,
-    cxNudgePx: 50,
-    feetYNudgePx: -50,
+    cxNudgePx: 20,
+    feetYNudgePx: -10,
   }, // building 2 (3 stars): middle left
-  { cxFrac: 0.06, feetYFrac: 0.36, centerShiftPx: 100 }, // building 3 (4 stars): far left
+  { cxFrac: 0.06, feetYFrac: 0.36, centerShiftPx: 100, feetYNudgePx: 40 }, // building 3 (4 stars): far left
   {
     cxFrac: 0.88,
     feetYFrac: 0.16,
     centerShiftPx: 100,
     cxNudgePx: 80,
-    feetYNudgePx: 50,
+    feetYNudgePx: 150,
   }, // building 4 (5 stars): far right
 ];
 // tier star row drawn under each marker: building index 0 shows 1 filled star (of
@@ -488,9 +488,13 @@ export function createCityMapView(
 
     // total income, top of the map — same green-fill/white-stroke money text look
     // used everywhere else, sized for this canvas's own CSS pixel space (unlike
-    // hud/index.ts's drawHud, which is calibrated for the much larger world canvas)
+    // hud/index.ts's drawHud, which is calibrated for the much larger world canvas).
+    // the unit (e.g. "Undecillion") is spelled out in full on its own line below
+    // the number instead of an abbreviation glued onto it
     const incomeFont = '900 32px "Fredoka", system-ui, sans-serif';
-    const incomeText = formatTotalIncome(deps.getTotalIncome());
+    const INCOME_FONT_SIZE = 32;
+    const { amount: incomeAmountText, unitName: incomeUnitName } =
+      formatTotalIncomeParts(deps.getTotalIncome());
     const incomeTop = 20;
     const incomeStrokeWidth = 6;
     ctx.font = incomeFont;
@@ -498,21 +502,45 @@ export function createCityMapView(
     ctx.textBaseline = "top";
     drawCartoonText(
       ctx,
-      incomeText,
+      incomeAmountText,
       cssW / 2,
       incomeTop,
       COLOR.moneyGreen,
       COLOR.white,
       incomeStrokeWidth,
     );
-    // measured (not a guessed constant) so the gap stays 12px even if the income
-    // font/text ever changes
-    const incomeMetrics = ctx.measureText(incomeText);
-    const incomeBottom =
+    // measured (not a guessed constant) so the gap stays accurate even if the
+    // income font/text ever changes
+    const incomeMetrics = ctx.measureText(incomeAmountText);
+    let incomeBottom =
       incomeTop +
       incomeMetrics.actualBoundingBoxAscent +
       incomeMetrics.actualBoundingBoxDescent +
       incomeStrokeWidth / 2;
+
+    if (incomeUnitName) {
+      const UNIT_NAME_GAP_PX = 8;
+      const UNIT_NAME_STROKE_WIDTH = 4;
+      const UNIT_NAME_FONT_SIZE = INCOME_FONT_SIZE * 0.8; // 20% smaller than the amount
+      ctx.font = `900 ${UNIT_NAME_FONT_SIZE}px "Fredoka", system-ui, sans-serif`;
+      const unitNameTop = incomeBottom + UNIT_NAME_GAP_PX;
+      drawCartoonText(
+        ctx,
+        incomeUnitName,
+        cssW / 2,
+        unitNameTop,
+        COLOR.moneyGreen,
+        COLOR.white,
+        UNIT_NAME_STROKE_WIDTH,
+      );
+      const unitNameMetrics = ctx.measureText(incomeUnitName);
+      incomeBottom =
+        unitNameTop +
+        unitNameMetrics.actualBoundingBoxAscent +
+        unitNameMetrics.actualBoundingBoxDescent +
+        UNIT_NAME_STROKE_WIDTH / 2;
+    }
+
     drawStreetText(
       incomeBottom + STREET_TEXT_GAP_BELOW_INCOME,
       getCityName(cityIndex),
