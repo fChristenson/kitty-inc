@@ -137,20 +137,18 @@ const COIN_BURST_SCALE = 0.35;
 // any point in the game's progression. Running out (spendFromAllCompanies
 // failing) ends the round the same way hitting a bound does
 const BASE_BURN_PERCENT_PER_SECOND = 0.004;
-// a green hit divides the burn rate by 5 (persists the rest of the round,
-// stacking with every other green hit); a red hit multiplies it by 5 the same
-// way — clamped so neither can run away to somewhere degenerate
-const GOOD_BURN_MULTIPLIER = 1 / 5;
-const BAD_BURN_MULTIPLIER = 5;
-const MIN_BURN_MULTIPLIER = 0.001;
-const MAX_BURN_MULTIPLIER = 1000;
-// "Market Influence %" (see hud/corporationBoostMenu's own persisted stat)
-// banked in real time as fuel burns — proportional to how much of the total
-// was just burned (as a %), plus a flat instant bump/cut on every green/red
-// hit on top of that ambient climb
-const INFLUENCE_PERCENT_PER_BURNED_PERCENT = 2;
-const GOOD_INFLUENCE_BONUS = 0.5;
-const BAD_INFLUENCE_PENALTY = 0.5;
+// a wealth-proportional burn alone would just decay toward zero forever
+// without ever actually running out, letting a deep-pocketed player camp here
+// indefinitely — so the burn % itself also compounds every DIFFICULTY_INTERVAL_MS
+// tier, the same way the other difficulty knobs do, guaranteeing the cost
+// eventually outpaces any reserve no matter how large
+const BURN_PERCENT_GROWTH_PER_TIER = 1.35;
+// "Market Influence %" (see hud/corporationBoostMenu's own persisted stat) —
+// flat rates, not tied to the burn rate or anything else about the round: this
+// much per second just for surviving, plus a flat instant bump/cut per hit
+const AMBIENT_INFLUENCE_PERCENT_PER_SECOND = 0.01;
+const GOOD_HIT_INFLUENCE_PERCENT = 0.05;
+const BAD_HIT_INFLUENCE_PERCENT = 0.05;
 
 // drawn straight onto this screen's own canvas with the exact same utils.ts
 // helpers floors/upgradeButton's real "Sale" button uses (drawPill/
@@ -201,9 +199,8 @@ interface GameState {
   gameOver: boolean;
   marketEvents: MarketEvent[];
   nextEventInMs: number; // counts down to the next spawn (see EVENT_SPAWN_INTERVAL_*)
-  fuelBurnMultiplier: number; // persists/compounds for the rest of the round on every green/red hit (see step)
-  marketInfluencePercent: number; // this session's own accrued total, for display only (the persisted stat lives in corporationBoostMenu)
   totalExpensesThisSession: number; // cumulative $ actually burned so far this round; only ever grows
+  marketInfluencePercent: number; // this session's own accrued total, for display only (the persisted stat lives in corporationBoostMenu)
 }
 
 export function createPressConferenceGameMarkup(): string {
@@ -238,6 +235,7 @@ export interface PressConferenceGame {
 
 export function wirePressConferenceGame(
   container: HTMLElement,
+  onClose?: () => void,
 ): PressConferenceGame {
   const screen = container.querySelector<HTMLDivElement>(
     "#press-conference-game",
@@ -364,9 +362,8 @@ export function wirePressConferenceGame(
       gameOver: false,
       marketEvents: [],
       nextEventInMs: randomEventDelayMs(0),
-      fuelBurnMultiplier: 1,
-      marketInfluencePercent: 0,
       totalExpensesThisSession: 0,
+      marketInfluencePercent: 0,
     };
   }
   let state = freshState();
@@ -605,6 +602,17 @@ export function wirePressConferenceGame(
     ctx.restore();
   }
 
+  // stops the round and banks this session's whole accrued
+  // state.marketInfluencePercent in one shot (see corporationBoostMenu's own
+  // persisted stat) — the only place that ever writes to it, so a round's
+  // gain/loss is never split across many small real-time persists
+  function endRound(): void {
+    state.running = false;
+    state.gameOver = true;
+    playExplosion();
+    addMarketInfluencePercent(state.marketInfluencePercent);
+  }
+
   function step(dtMs: number): void {
     if (!state.running || !state.started) return;
     const dt = dtMs / 1000;
@@ -643,35 +651,42 @@ export function wirePressConferenceGame(
 
     if (state.headY <= 0 || state.headY >= cssH) {
       state.headY = Math.max(0, Math.min(cssH, state.headY));
-      state.running = false;
-      state.gameOver = true;
-      playExplosion();
+      endRound();
     }
 
     // the combined total income across every corporation is this game's own
-    // fuel: burn a wealth-proportional slice of it every second, banking
-    // Market Influence % proportional to however much actually got burned.
-    // Running dry (spendFromAllCompanies failing) ends the round the same
-    // way hitting a bound does
+    // fuel: burn a wealth-proportional slice of it every second. Running dry
+    // ends the round the same way hitting a bound does — checked explicitly
+    // against the actual remaining total, not just left to
+    // spendFromAllCompanies: a wealth-proportional cost shrinks right along
+    // with a depleted total, so it'd otherwise keep "succeeding" against an
+    // ever-smaller sliver of money forever instead of ever actually ending
     if (state.running) {
       const totalBefore = getAllCompaniesTotalIncome();
-      const cost =
-        totalBefore *
-        BASE_BURN_PERCENT_PER_SECOND *
-        state.fuelBurnMultiplier *
-        dt;
-      if (cost > 0) {
-        if (spendFromAllCompanies(cost)) {
-          state.totalExpensesThisSession += cost;
-          const burnedPercent =
-            totalBefore > 0 ? (cost / totalBefore) * 100 : 0;
-          const gain = burnedPercent * INFLUENCE_PERCENT_PER_BURNED_PERCENT;
-          state.marketInfluencePercent += gain;
-          addMarketInfluencePercent(gain);
-        } else {
-          state.running = false;
-          state.gameOver = true;
-          playExplosion();
+      // formatPrice floors to whole dollars, so anything under $1 already
+      // reads as "$0" to the player — checking <= 0 here let a literal
+      // fractional-cent balance (displaying as $0 but not actually 0) keep
+      // the round alive forever instead of ending right when it looks empty
+      if (totalBefore < 1) {
+        endRound();
+      } else {
+        // flat rate, just for surviving — not tied to the burn cost below at
+        // all (see AMBIENT_INFLUENCE_PERCENT_PER_SECOND); only ever kept in
+        // session state here, banked for real once by endRound
+        state.marketInfluencePercent +=
+          AMBIENT_INFLUENCE_PERCENT_PER_SECOND * dt;
+
+        const cost =
+          totalBefore *
+          BASE_BURN_PERCENT_PER_SECOND *
+          BURN_PERCENT_GROWTH_PER_TIER ** getDifficultyTier() *
+          dt;
+        if (cost > 0) {
+          if (spendFromAllCompanies(cost)) {
+            state.totalExpensesThisSession += cost;
+          } else {
+            endRound();
+          }
         }
       }
     }
@@ -693,35 +708,19 @@ export function wirePressConferenceGame(
         if (event.isCrash) {
           // ends the round outright, same as hitting a bound — no burn-rate
           // penalty or shake, just the same explosion + game over
-          state.running = false;
-          state.gameOver = true;
-          playExplosion();
+          endRound();
         } else if (event.good) {
           spawnCoinBurstAt(event.x, event.y, COIN_BURST_SCALE);
           // the buy sfx, not the usual coin-drop one, just for this hit
           playSold();
-          // makes fuel last longer (persists the rest of the round) and banks
-          // an instant influence bump on top of the ambient burn-based climb
-          state.fuelBurnMultiplier = Math.max(
-            MIN_BURN_MULTIPLIER,
-            state.fuelBurnMultiplier * GOOD_BURN_MULTIPLIER,
-          );
-          state.marketInfluencePercent += GOOD_INFLUENCE_BONUS;
-          addMarketInfluencePercent(GOOD_INFLUENCE_BONUS);
+          // flat bump, on top of the flat ambient climb above — only ever
+          // kept in session state here, banked for real once by endRound
+          state.marketInfluencePercent += GOOD_HIT_INFLUENCE_PERCENT;
         } else {
           playExplosion();
           triggerScreenShake();
-          // burns fuel faster (persists the rest of the round) and knocks an
-          // instant chunk off influence
-          state.fuelBurnMultiplier = Math.min(
-            MAX_BURN_MULTIPLIER,
-            state.fuelBurnMultiplier * BAD_BURN_MULTIPLIER,
-          );
-          state.marketInfluencePercent = Math.max(
-            0,
-            state.marketInfluencePercent - BAD_INFLUENCE_PENALTY,
-          );
-          addMarketInfluencePercent(-BAD_INFLUENCE_PENALTY);
+          // flat cut, same flat magnitude as a good hit's own bump above
+          state.marketInfluencePercent -= BAD_HIT_INFLUENCE_PERCENT;
         }
         state.marketEvents.splice(i, 1);
         continue;
@@ -800,6 +799,10 @@ export function wirePressConferenceGame(
     }
     screen.hidden = true;
     playSwoosh();
+    // the boost menu sits open behind this screen the whole time (see
+    // main.ts), so it never re-renders on its own once a round changes its
+    // numbers — force it to catch up now that this screen is going away
+    onClose?.();
   }
 
   return { open, close };

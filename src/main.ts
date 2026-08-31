@@ -294,7 +294,9 @@ async function main() {
   const corporationBoostMenu = wireCorporationBoostMenu(app, () =>
     pressConferenceGame.open(),
   );
-  const pressConferenceGame = wirePressConferenceGame(app);
+  const pressConferenceGame = wirePressConferenceGame(app, () =>
+    corporationBoostMenu.refresh(),
+  );
   // buys the next building outright if affordable (see buildings.ts's
   // getBuildingPrice, which scales 1000x per building same as its economy); returns
   // whether it succeeded so the map menu can decide whether to re-render
