@@ -3,6 +3,7 @@ import { clearBuildings } from "../../gameState";
 import { clearTotalIncome } from "../../totalIncome";
 import { clearCityNames } from "../../cityName";
 import { clearCorporationNames } from "../../corporationName";
+import { clearStockPrices } from "../corporationBoostMenu";
 
 // dev/test-only controls, not part of the real game UI
 export function createTestButtonMarkup(): string {
@@ -66,6 +67,9 @@ export function wireResetButton(
     clearBuildings(getActiveCompanyIndex());
     clearTotalIncome();
     clearCityNames();
+    // clearStockPrices reads getCorporationCount, so it must run before
+    // clearCorporationNames resets that count back down to a fresh single company
+    clearStockPrices();
     clearCorporationNames();
     location.reload();
   });

@@ -51,6 +51,19 @@ function saveStockShares(companyIndex: number, value: number): void {
   }
 }
 
+// wipes every corporation's purchased shares; call alongside clearCorporationNames
+// on a full game reset, so a fresh game doesn't inherit old stock-price upgrades
+export function clearStockPrices(): void {
+  const count = getCorporationCount();
+  for (let i = 0; i < count; i++) {
+    try {
+      localStorage.removeItem(companyStorageKey(STOCK_PRICE_KEY, i));
+    } catch {
+      // storage unavailable: nothing to clear
+    }
+  }
+}
+
 // the stock price actually shown/used everywhere (menu display, boost formula):
 // raw purchased shares diluted by log10 of the company's own current value, so
 // buying cheap while a company is small doesn't just compound into a permanently
@@ -63,6 +76,13 @@ export function getStockPrice(companyIndex: number): number {
   const shares = loadStockShares(companyIndex);
   const companyValue = Math.max(10, getCompanyValue(companyIndex));
   return Math.max(STOCK_PRICE_BASE, shares / Math.log10(companyValue));
+}
+
+// how many times a company's stock has actually been raised — the menu shows
+// this ("x3") instead of the dollar stock price itself, same "xN" convention as
+// the crit-upgrade label (floors/upgradeButton)
+export function getStockTimesBought(companyIndex: number): number {
+  return loadStockShares(companyIndex) - STOCK_PRICE_BASE;
 }
 
 // $ cost to raise a company's stock price once: its own total income over a full
@@ -158,12 +178,6 @@ function formatBoostPercent(percent: number): string {
   return `+${percent.toFixed(2)}%`;
 }
 
-// $N.NN — getStockPrice is diluted (see above) and can land well under $1, so
-// formatPrice's whole-dollar rounding would just show "$0"; this keeps cents
-function formatStockPrice(price: number): string {
-  return `$${Math.max(0, price).toFixed(2)}`;
-}
-
 // reuses .worker-menu's styling — a dialog listing every corporation's own
 // "raise stock price" purchase, one item per company (see render() below)
 export function createCorporationBoostMenuMarkup(): string {
@@ -221,7 +235,7 @@ export function wireCorporationBoostMenu(
           ${affordable ? "" : "disabled"}
         >
           <span class="worker-menu__item-label">
-            ${getCorporationName(i)} (${formatStockPrice(getStockPrice(i))})
+            ${getCorporationName(i)} (x${getStockTimesBought(i)})
           </span>
           <span class="worker-menu__price">${formatPrice(cost)}</span>
         </button>
