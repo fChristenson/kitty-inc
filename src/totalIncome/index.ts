@@ -22,8 +22,7 @@ export function getTotalIncome(): number {
 export function getStoredTotalIncome(companyIndex: number): number {
   if (companyIndex === activeCompanyIndex) return totalIncome;
   return (
-    loadStoredTotal(companyIndex) +
-    getProjectedUncollectedIncome(companyIndex)
+    loadStoredTotal(companyIndex) + getProjectedUncollectedIncome(companyIndex)
   );
 }
 
