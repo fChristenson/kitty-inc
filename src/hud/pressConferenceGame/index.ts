@@ -1,6 +1,12 @@
-import { playSwoosh, playBloop, playExplosion } from "../../sound";
+import { playSwoosh, playBloop, playExplosion, playSold } from "../../sound";
 import { drawPill, drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
+import { triggerScreenShake, getScreenShakeOffset } from "../../screenShake";
+import {
+  loadCoinBurstImages,
+  spawnCoinBurstAt,
+  drawActiveCoinBursts,
+} from "../../coinBurst";
 
 // physics constants for the line's head — same "flappy bird" feel: constant
 // downward gravity, a fixed upward kick on every flap, no in-between speeds.
@@ -51,6 +57,38 @@ const TAIL_LAG_RATE = 10;
 const TAIL_MAX_ANGLE_DEG = 45;
 const TAIL_MAX_ANGLE_TAN = Math.tan((TAIL_MAX_ANGLE_DEG * Math.PI) / 180);
 
+// brief cat-themed market headlines, floating right-to-left across the
+// screen like obstacles — green/white for good ones (a coin burst + coin sfx
+// on hit), red/white for bad ones (an explosion + screen shake on hit)
+const GOOD_MARKET_EVENTS = [
+  "Purrfect Earnings!",
+  "Meow-nificent Quarter",
+  "Whisker Rally",
+  "Catnip Boom",
+  "Nine Lives Profit",
+  "Paw-sitive Outlook",
+  "Kitten IPO Hype",
+  "Feline Bull Run",
+];
+const BAD_MARKET_EVENTS = [
+  "Hairball Crash",
+  "Meow-ket Meltdown",
+  "Litter Box Losses",
+  "Copycat Selloff",
+  "Hiss-terical Panic",
+  "Claw-Back Losses",
+  "Scratched Earnings",
+  "Fur-midable Downturn",
+];
+const EVENT_FONT = '700 20px "Fredoka", system-ui, sans-serif';
+const EVENT_STROKE_WIDTH = 4;
+const EVENT_HIT_HEIGHT = 28; // vertical tolerance for a head/event collision
+const EVENT_SPAWN_INTERVAL_MIN_MS = 1400;
+const EVENT_SPAWN_INTERVAL_MAX_MS = 2600;
+// spawnCoinBurstAt's own default scale (1) is sized for a full building-width
+// canvas; this screen is much smaller, so its own bursts get shrunk down too
+const COIN_BURST_SCALE = 0.35;
+
 // drawn straight onto this screen's own canvas with the exact same utils.ts
 // helpers floors/upgradeButton's real "Sale" button uses (drawPill/
 // drawCartoonText), instead of a separate DOM element re-approximating that
@@ -77,6 +115,14 @@ const PRESS_AMPLITUDE = 0.18;
 const PRESS_DECAY = 9;
 const PRESS_FREQUENCY = 26;
 
+interface MarketEvent {
+  text: string;
+  good: boolean;
+  x: number;
+  y: number;
+  width: number; // measured once at spawn time
+}
+
 interface GameState {
   headY: number;
   velocityY: number;
@@ -89,6 +135,8 @@ interface GameState {
   started: boolean; // gravity/scroll/timer stay frozen until the first press
   running: boolean;
   gameOver: boolean;
+  marketEvents: MarketEvent[];
+  nextEventInMs: number; // counts down to the next spawn (see EVENT_SPAWN_INTERVAL_*)
 }
 
 export function createPressConferenceGameMarkup(): string {
@@ -122,6 +170,11 @@ export function wirePressConferenceGame(
   )!;
   const ctx = canvas.getContext("2d")!;
 
+  // same shared sprites/draw math floors/coins's own burst uses (see
+  // ../../coinBurst) — loaded independently here since this screen has no
+  // Floor to hang that module's own version off of
+  loadCoinBurstImages();
+
   let cssW = 0;
   let cssH = 0;
 
@@ -143,6 +196,30 @@ export function wirePressConferenceGame(
     return Math.ceil(cssW / TRAIL_SAMPLE_DX) + 2;
   }
 
+  function randomEventDelayMs(): number {
+    return (
+      EVENT_SPAWN_INTERVAL_MIN_MS +
+      Math.random() *
+        (EVENT_SPAWN_INTERVAL_MAX_MS - EVENT_SPAWN_INTERVAL_MIN_MS)
+    );
+  }
+
+  // spawns just off the right edge, drifting left like everything else in
+  // this world — a random pick from the good/bad cat-headline lists, at a
+  // random height that leaves room for the sales button anchored at the bottom
+  function spawnMarketEvent(): void {
+    const good = Math.random() < 0.5;
+    const list = good ? GOOD_MARKET_EVENTS : BAD_MARKET_EVENTS;
+    const text = list[Math.floor(Math.random() * list.length)];
+    ctx.font = EVENT_FONT;
+    const width = ctx.measureText(text).width;
+    const topMargin = 30;
+    const bottomMargin = SALES_BTN_H + SALES_BTN_BOTTOM_MARGIN + 30;
+    const y =
+      topMargin + Math.random() * Math.max(1, cssH - topMargin - bottomMargin);
+    state.marketEvents.push({ text, good, x: cssW + width / 2, y, width });
+  }
+
   function freshState(): GameState {
     const startY = cssH / 2 || 200;
     return {
@@ -157,6 +234,8 @@ export function wirePressConferenceGame(
       started: false,
       running: true,
       gameOver: false,
+      marketEvents: [],
+      nextEventInMs: randomEventDelayMs(),
     };
   }
   let state = freshState();
@@ -316,6 +395,25 @@ export function wirePressConferenceGame(
     ctx.fill();
   }
 
+  // good events read as the same green/white the HUD's own total-income text
+  // uses; bad ones swap in a mean red fill, same white stroke either way
+  function drawMarketEvents(): void {
+    ctx.font = EVENT_FONT;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (const event of state.marketEvents) {
+      drawCartoonText(
+        ctx,
+        event.text,
+        event.x,
+        event.y,
+        event.good ? COLOR.moneyGreen : COLOR.red,
+        COLOR.white,
+        EVENT_STROKE_WIDTH,
+      );
+    }
+  }
+
   // straight reuse of the exact same drawPill/drawCartoonText calls
   // floors/upgradeButton's own Sale-state button makes, at this button's own
   // size — same rotate-then-scale-around-center order that button uses while
@@ -397,15 +495,50 @@ export function wirePressConferenceGame(
       state.gameOver = true;
       playExplosion();
     }
+
+    state.nextEventInMs -= dtMs;
+    if (state.nextEventInMs <= 0) {
+      spawnMarketEvent();
+      state.nextEventInMs = randomEventDelayMs();
+    }
+    const headX = cssW * HEAD_X_FRACTION;
+    for (let i = state.marketEvents.length - 1; i >= 0; i--) {
+      const event = state.marketEvents[i];
+      event.x -= SCROLL_SPEED_PX_S * dt;
+      const withinX = Math.abs(event.x - headX) < event.width / 2 + LINE_WIDTH;
+      const withinY = Math.abs(event.y - state.headY) < EVENT_HIT_HEIGHT / 2;
+      if (withinX && withinY) {
+        if (event.good) {
+          spawnCoinBurstAt(event.x, event.y, COIN_BURST_SCALE);
+          // the buy sfx, not the usual coin-drop one, just for this hit
+          playSold();
+        } else {
+          playExplosion();
+          triggerScreenShake();
+        }
+        state.marketEvents.splice(i, 1);
+        continue;
+      }
+      if (event.x < -event.width / 2) state.marketEvents.splice(i, 1);
+    }
   }
 
   function render(now: number): void {
     ctx.clearRect(0, 0, cssW, cssH);
+    // Date.now()-based, not the rAF-supplied now above — triggerScreenShake
+    // stamps with Date.now() too (see gameCanvas.ts's own matching call),
+    // and diffing across two different clocks broke the shake entirely
+    const shake = getScreenShakeOffset(Date.now());
+    ctx.save();
+    ctx.translate(shake.x, shake.y);
     const headX = cssW * HEAD_X_FRACTION;
     drawGrid(headX);
+    drawMarketEvents();
     drawLine(headX);
     drawHead(headX);
+    drawActiveCoinBursts(ctx, now);
     drawSalesButton(now);
+    ctx.restore();
     scoreEl.textContent = formatScore(state.survivedMs);
   }
 
