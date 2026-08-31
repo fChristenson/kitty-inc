@@ -36,6 +36,8 @@ import {
   wireActionBar,
   createUpgradeMenuMarkup,
   wireUpgradeMenu,
+  createCompanySelectMenuMarkup,
+  wireCompanySelectMenu,
   createBoostMenuMarkup,
   wireBoostMenu,
   createMapMenuMarkup,
@@ -60,6 +62,7 @@ import {
 } from "./buildings";
 import { loadMouseImage, forceSpawnMouse } from "./mouse";
 import { startBackgroundMusic, playSwoosh } from "./sound";
+import { createNewCorporation } from "./corporationName";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -75,6 +78,7 @@ async function main() {
       ${import.meta.env.MODE !== "production" ? createTestButtonMarkup() : ""}
     </div>
     ${createUpgradeMenuMarkup()}
+    ${createCompanySelectMenuMarkup()}
     ${createBoostMenuMarkup()}
     ${createMapMenuMarkup()}
     ${createPopupMarkup()}
@@ -109,6 +113,27 @@ async function main() {
   const buildings: Floor[][] = [];
   let activeBuildingIndex = 0;
 
+  // so a reload lands back on whichever building the player last selected on the
+  // map, instead of always starting over at building 0
+  const ACTIVE_BUILDING_KEY = "cash-clicker:active-building-index";
+
+  function loadActiveBuildingIndex(): number {
+    try {
+      const parsed = Number(localStorage.getItem(ACTIVE_BUILDING_KEY));
+      return Number.isFinite(parsed) ? parsed : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  function saveActiveBuildingIndex(index: number): void {
+    try {
+      localStorage.setItem(ACTIVE_BUILDING_KEY, String(index));
+    } catch {
+      // storage unavailable: nothing to persist
+    }
+  }
+
   function persist() {
     // debounced/idle-scheduled so a click mid-scroll doesn't synchronously serialize
     // every building's floors + hit localStorage on the same frame (see gameState.ts)
@@ -121,6 +146,10 @@ async function main() {
   } else {
     buildings.push(createBuilding(0, backgrounds.length));
   }
+  activeBuildingIndex = Math.min(
+    Math.max(loadActiveBuildingIndex(), 0),
+    buildings.length - 1,
+  );
 
   const gameCanvas = createGameCanvas({
     canvas,
@@ -151,6 +180,7 @@ async function main() {
   // an instant cut to the new street
   function goToBuilding(buildingIndex: number): void {
     activeBuildingIndex = buildingIndex;
+    saveActiveBuildingIndex(buildingIndex);
     gameCanvas.setActiveFloors(buildings[buildingIndex]);
   }
 
@@ -182,6 +212,13 @@ async function main() {
     () => buildings[activeBuildingIndex] ?? [],
     () => persist(),
   );
+  // "Create new Corporation" adds a fresh named corporation above the current
+  // one in the map's corp-name barrel (see corporationName.ts/cityMap's
+  // drawCorporationNames) — roll up with the action bar to reach it
+  const companySelectMenu = wireCompanySelectMenu(app, () => {
+    createNewCorporation();
+    companySelectMenu.close();
+  });
   const boostMenu = wireBoostMenu(
     app,
     () => buildings[activeBuildingIndex] ?? [],
@@ -242,17 +279,20 @@ async function main() {
   wireActionBar(app, {
     onScrollTop: () => {
       playSwoosh();
-      gameCanvas.scrollActiveToTop();
+      if (mapOpen) cityMapView.flashVerticalRays(-1);
+      else gameCanvas.scrollActiveToTop();
     },
     onScrollBottom: () => {
       playSwoosh();
-      gameCanvas.scrollActiveToBottom();
+      if (mapOpen) cityMapView.flashVerticalRays(1);
+      else gameCanvas.scrollActiveToBottom();
     },
     onBoostAll: () => {
       boostMenu.open();
     },
     onOpenUpgradeMenu: () => {
-      upgradeMenu.open();
+      if (mapOpen) companySelectMenu.open();
+      else upgradeMenu.open();
     },
     onOpenMapMenu: () => {
       if (mapOpen) closeMapView();

@@ -128,3 +128,8 @@ export {
 } from "./testButton";
 export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
 export type { UpgradeMenu } from "./upgradeMenu";
+export {
+  createCompanySelectMenuMarkup,
+  wireCompanySelectMenu,
+} from "./companySelectMenu";
+export type { CompanySelectMenu } from "./companySelectMenu";

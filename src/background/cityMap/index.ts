@@ -8,6 +8,7 @@ import { COLOR } from "../../palette";
 import { playSold, playSwoosh } from "../../sound";
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
+import { getCorporationName, getCorporationCount } from "../../corporationName";
 import cityMapUrl from "../../assets/city2Bg.png";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
 import starUrl from "../../assets/star.png";
@@ -48,22 +49,22 @@ const MARKER_POSITIONS: {
   cxNudgePx?: number; // extra fine-tune offset, positive = right
   feetYNudgePx?: number; // extra fine-tune offset, positive = down
 }[] = [
-  { cxFrac: 0, feetYFrac: 1, cxFixed: 70 }, // building 0 (1 star): fixed bottom-left dock
-  { cxFrac: 0.88, feetYFrac: 0.78, centerShiftPx: 100 }, // building 1 (2 stars): far right
+  { cxFrac: 0, feetYFrac: 1, cxFixed: 70, feetYNudgePx: -80 }, // building 0 (1 star): fixed bottom-right dock (see markerCenter's own override below)
+  { cxFrac: 0.88, feetYFrac: 0.78, centerShiftPx: 300 }, // building 1 (2 stars): far right
   {
     cxFrac: 0.28,
     feetYFrac: 0.58,
     centerShiftPx: 100,
-    cxNudgePx: 20,
+    cxNudgePx: 60,
     feetYNudgePx: -10,
   }, // building 2 (3 stars): middle left
-  { cxFrac: 0.06, feetYFrac: 0.36, centerShiftPx: 100, feetYNudgePx: 40 }, // building 3 (4 stars): far left
+  { cxFrac: 0.06, feetYFrac: 0.36, centerShiftPx: 140, feetYNudgePx: 40 }, // building 3 (4 stars): far left
   {
     cxFrac: 0.88,
     feetYFrac: 0.16,
     centerShiftPx: 100,
     cxNudgePx: 80,
-    feetYNudgePx: 150,
+    feetYNudgePx: 100,
   }, // building 4 (5 stars): far right
 ];
 // tier star row drawn under each marker: building index 0 shows 1 filled star (of
@@ -143,6 +144,10 @@ export interface CityMapView {
   // whichever city the player's currently-active building lives in, so opening the
   // map always starts on "where you are" instead of wherever it was last left
   refresh: () => void;
+  // flashes the same speed-line rays the city prev/next arrows use, but running
+  // vertically — for the action bar's own scroll-to-top/scroll-to-bottom buttons
+  // while the map is open (see main.ts). -1 streams upward, 1 streams downward
+  flashVerticalRays: (direction: -1 | 1) => void;
   destroy: () => void;
 }
 
@@ -186,10 +191,45 @@ export function createCityMapMarkup(): string {
     <div class="city-map" id="city-map" hidden>
       <canvas class="game__canvas" id="map-canvas"></canvas>
       <svg class="city-map__speed-lines" id="city-map-speed-lines" aria-hidden="true"></svg>
+      <span class="city-map__corp-pointer" aria-hidden="true">${ARROW_SVG}</span>
       <button class="city-map__arrow city-map__arrow--prev" id="city-map-prev" aria-label="Previous city" hidden>${ARROW_SVG}</button>
       <button class="city-map__arrow city-map__arrow--next" id="city-map-next" aria-label="Next city" hidden>${ARROW_SVG}</button>
     </div>
   `;
+}
+
+// so a reload lands the player back on the same city page + corporation they had
+// selected, instead of always starting over at city 0 / corporation 0
+const CITY_MAP_STATE_KEY = "cash-clicker:city-map-state";
+
+interface PersistedCityMapState {
+  cityIndex: number;
+  selectedCorporationIndex: number;
+}
+
+function loadCityMapState(): PersistedCityMapState {
+  try {
+    const raw = localStorage.getItem(CITY_MAP_STATE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    return {
+      cityIndex: Number.isFinite(parsed?.cityIndex) ? parsed.cityIndex : 0,
+      selectedCorporationIndex: Number.isFinite(
+        parsed?.selectedCorporationIndex,
+      )
+        ? parsed.selectedCorporationIndex
+        : 0,
+    };
+  } catch {
+    return { cityIndex: 0, selectedCorporationIndex: 0 };
+  }
+}
+
+function saveCityMapState(state: PersistedCityMapState): void {
+  try {
+    localStorage.setItem(CITY_MAP_STATE_KEY, JSON.stringify(state));
+  } catch {
+    // storage unavailable: nothing to persist
+  }
 }
 
 export function createCityMapView(
@@ -207,10 +247,18 @@ export function createCityMapView(
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
+  const restoredState = loadCityMapState();
   // which city's 5-building page is currently shown; a city is "complete" (and the
   // next one reachable) once all MARKER_COUNT of its buildings are bought — see
-  // updateArrows
-  let cityIndex = 0;
+  // updateArrows. Restored on load (see loadCityMapState) so a reload lands back
+  // on the same page instead of always starting at city 0
+  let cityIndex = restoredState.cityIndex;
+
+  // saves cityIndex + selectedCorporationIndex together (see below) any time
+  // either one changes, so a reload can restore both
+  function persistCityMapState(): void {
+    saveCityMapState({ cityIndex, selectedCorporationIndex });
+  }
 
   function resize(): void {
     const rect = canvas.getBoundingClientRect();
@@ -230,12 +278,14 @@ export function createCityMapView(
     }
   }
 
-  // building 0's marker always sits bottom-left (fixed); every other building's
-  // marker sits at its own fixed screen fraction, pulled toward center by its own
-  // centerShiftPx — see MARKER_POSITIONS above
+  // building 0's marker always sits bottom-right (fixed) — swapped with the
+  // corporation name label, which sits bottom-left (see drawCorporationName) —
+  // every other building's marker sits at its own fixed screen fraction, pulled
+  // toward center by its own centerShiftPx, see MARKER_POSITIONS above
   function markerCenter(buildingIndex: number): { cx: number; feetY: number } {
     const pos = MARKER_POSITIONS[buildingIndex];
-    let cx = pos.cxFixed ?? cssW * pos.cxFrac;
+    let cx =
+      buildingIndex === 0 ? cssW - 70 : (pos.cxFixed ?? cssW * pos.cxFrac);
     if (pos.centerShiftPx) {
       const center = cssW / 2;
       cx += cx > center ? -pos.centerShiftPx : pos.centerShiftPx;
@@ -417,6 +467,102 @@ export function createCityMapView(
     drawCartoonText(ctx, name, cssW / 2, topY, COLOR.white, COLOR.black, 5);
   }
 
+  // the corporation that owns every city on the map (see corporationName.ts) — a
+  // small corner credit, bottom-left (swapped with building 0's marker, which now
+  // docks bottom-right), well below/away from the city's own name up top so the
+  // two are never confused for each other. The action bar's "Open upgrades"
+  // button (see main.ts) opens the corporation upgrade menu while the map is
+  // open. Rendered as a little barrel/reel: the selected corporation full-size
+  // and opaque, its neighbors (newer above, older below) smaller and faded, all
+  // scrolled by rollCorporationSelection when the action bar's up/down is
+  // pressed while the map is open (see flashVerticalTransition)
+  const CORPORATION_NAME_MARGIN_PX = 40;
+  const CORPORATION_NAME_LEFT_PX = 40; // leaves room for .city-map__corp-pointer
+  const CORP_NAME_FONT_SIZE = 22;
+  const CORP_NAME_SIDE_SCALE = 1; // side rows' font size, as a fraction of the selected one's
+  const CORP_NAME_SIDE_ALPHA = 0.35; // side rows' opacity
+  const CORP_NAME_ROW_GAP = 24; // vertical spacing between adjacent rows
+  const CORP_ROLL_MS = 260;
+  // restored on load (see loadCityMapState) so a reload lands back on the same
+  // corporation instead of always starting at 0
+  let selectedCorporationIndex = restoredState.selectedCorporationIndex;
+  // continuous "which index is centered" — equals selectedCorporationIndex at
+  // rest, animates toward the new one mid-roll (see rollCorporationSelection)
+  let corpRollFocus = selectedCorporationIndex;
+  let corpRollAnimId: number | null = null;
+
+  function drawCorporationNames(): void {
+    const count = getCorporationCount();
+    if (selectedCorporationIndex > count - 1) {
+      selectedCorporationIndex = count - 1;
+      corpRollFocus = selectedCorporationIndex;
+      persistCityMapState();
+    }
+    const bottom = cssH - CORPORATION_NAME_MARGIN_PX;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+    // a couple of rows past the nearest whole ones on each side is plenty — past
+    // 1.5 rows away a name is already fully faded (alpha 0), not worth drawing
+    const lo = Math.max(0, Math.floor(corpRollFocus) - 2);
+    const hi = Math.min(count - 1, Math.ceil(corpRollFocus) + 2);
+    for (let i = lo; i <= hi; i++) {
+      const distance = i - corpRollFocus;
+      const absDistance = Math.abs(distance);
+      if (absDistance > 1.5) continue;
+      const closeness = 1 - Math.min(1, absDistance); // 1 at the focus, 0 a row away
+      const fontSize =
+        CORP_NAME_FONT_SIZE *
+        (CORP_NAME_SIDE_SCALE + (1 - CORP_NAME_SIDE_SCALE) * closeness);
+      const alpha =
+        CORP_NAME_SIDE_ALPHA + (1 - CORP_NAME_SIDE_ALPHA) * closeness;
+      // higher index draws higher up (smaller y) — new corporations are added
+      // above the current one, so "up" should reveal a higher index
+      const y = bottom - distance * CORP_NAME_ROW_GAP;
+      const name = getCorporationName(i);
+      ctx.font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
+      ctx.globalAlpha = alpha;
+      drawCartoonText(
+        ctx,
+        name,
+        CORPORATION_NAME_LEFT_PX,
+        y,
+        COLOR.white,
+        COLOR.black,
+        5,
+      );
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  // rolls the barrel one step: direction -1 (the action bar's "up") reveals the
+  // next-higher (newer) corporation, direction 1 ("down") reveals the next-lower
+  // (older) one — a no-op past either end of the list. Drives its own redraw()
+  // calls every frame since the throttled tick loop (~10fps) alone would read as
+  // choppy for something meant to look like a smoothly spinning reel
+  function rollCorporationSelection(direction: -1 | 1): void {
+    const count = getCorporationCount();
+    const targetIndex = selectedCorporationIndex + (direction < 0 ? 1 : -1);
+    if (targetIndex < 0 || targetIndex > count - 1) return;
+    if (corpRollAnimId !== null) cancelAnimationFrame(corpRollAnimId);
+    const fromFocus = corpRollFocus;
+    const start = performance.now();
+    function frame(now: number): void {
+      const t = Math.min(1, (now - start) / CORP_ROLL_MS);
+      const eased = t * t * (3 - 2 * t); // smoothstep: quick but not linear/jerky
+      corpRollFocus = fromFocus + (targetIndex - fromFocus) * eased;
+      redraw();
+      if (t < 1) {
+        corpRollAnimId = requestAnimationFrame(frame);
+      } else {
+        corpRollFocus = targetIndex;
+        selectedCorporationIndex = targetIndex;
+        corpRollAnimId = null;
+        persistCityMapState();
+      }
+    }
+    corpRollAnimId = requestAnimationFrame(frame);
+  }
+
   function redraw(): void {
     // re-measure every call instead of trusting whatever resize() last cached —
     // otherwise a redraw sandwiched between the canvas becoming visible and its
@@ -545,6 +691,7 @@ export function createCityMapView(
       incomeBottom + STREET_TEXT_GAP_BELOW_INCOME,
       getCityName(cityIndex),
     );
+    drawCorporationNames();
 
     updateArrows(buildingCount);
     ctx.restore();
@@ -648,6 +795,74 @@ export function createCityMapView(
     speedLineAnimId = requestAnimationFrame(frame);
   }
 
+  // same ray sweep as playSpeedLines above, just rotated to run along Y instead
+  // of X — for the action bar's own scroll-to-top/scroll-to-bottom buttons while
+  // the map is open (see main.ts), not the city prev/next buttons, so it's kept
+  // entirely separate rather than folded into playSpeedLines as a shared axis flag
+  let verticalSpeedLineAnimId: number | null = null;
+  function playVerticalSpeedLines(direction: -1 | 1): void {
+    if (verticalSpeedLineAnimId !== null) {
+      cancelAnimationFrame(verticalSpeedLineAnimId);
+    }
+    const w = cssW;
+    const h = cssH;
+    speedLinesSvg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    speedLinesSvg.innerHTML = "";
+    const lines: SVGLineElement[] = [];
+    for (let i = 0; i < SPEED_LINE_COUNT; i++) {
+      const x = (((i * 37) % 100) / 100) * w; // deterministic spread, not evenly gridded
+      const length = (0.22 + ((i * 53) % 48) / 100) * h; // varying "range": 22-70% of height
+      const line = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line",
+      );
+      line.setAttribute("x1", String(x));
+      line.setAttribute("x2", String(x));
+      line.setAttribute("y1", "0");
+      line.setAttribute("y2", String(length));
+      speedLinesSvg.appendChild(line);
+      lines.push(line);
+    }
+    // direction 1 ("down", scroll-to-ground) streams downward; -1 ("up",
+    // scroll-to-top) streams upward
+    const startY = direction > 0 ? -h * 1.3 : h * 1.2;
+    const endY = direction > 0 ? h * 1.2 : -h * 1.3;
+    const start = performance.now();
+    function frame(now: number): void {
+      const t = Math.min(1, (now - start) / SPEED_LINE_MS);
+      const eased = t * t * (3 - 2 * t); // smoothstep: quick but not linear/jerky
+      const y = startY + (endY - startY) * eased;
+      const opacity =
+        t < 0.15 ? t / 0.15 : t > 0.75 ? Math.max(0, (1 - t) / 0.25) : 1;
+      for (const line of lines) {
+        line.setAttribute("transform", `translate(0 ${y})`);
+        line.style.opacity = String(opacity);
+      }
+      if (t < 1) {
+        verticalSpeedLineAnimId = requestAnimationFrame(frame);
+      } else {
+        speedLinesSvg.innerHTML = "";
+        verticalSpeedLineAnimId = null;
+      }
+    }
+    verticalSpeedLineAnimId = requestAnimationFrame(frame);
+  }
+
+  // same blur-then-clear treatment navigateCity gives the horizontal transition
+  // below, just without a city swap in the middle — this is purely the action
+  // bar's own scroll-to-top/scroll-to-bottom flourish while the map is open.
+  // Also rolls the corporation-name barrel one step in the same direction
+  let verticalClearTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  function flashVerticalTransition(direction: -1 | 1): void {
+    canvas.classList.add("city-map__canvas--blurred");
+    playVerticalSpeedLines(direction);
+    rollCorporationSelection(direction);
+    if (verticalClearTimeoutId !== null) clearTimeout(verticalClearTimeoutId);
+    verticalClearTimeoutId = setTimeout(() => {
+      canvas.classList.remove("city-map__canvas--blurred");
+    }, TRANSITION_MS);
+  }
+
   // anime-style "cut" transition: blur the canvas and flash speed lines across it,
   // swap cityIndex + redraw underneath while the screen is still covered by both,
   // then clear — hides the instant content swap behind the flash instead of it
@@ -664,6 +879,7 @@ export function createCityMapView(
     if (clearTimeoutId !== null) clearTimeout(clearTimeoutId);
     swapTimeoutId = setTimeout(() => {
       cityIndex += delta;
+      persistCityMapState();
       redraw();
     }, SWAP_AT_MS);
     clearTimeoutId = setTimeout(() => {
@@ -716,13 +932,20 @@ export function createCityMapView(
     if (swapTimeoutId !== null) clearTimeout(swapTimeoutId);
     if (clearTimeoutId !== null) clearTimeout(clearTimeoutId);
     if (speedLineAnimId !== null) cancelAnimationFrame(speedLineAnimId);
+    if (verticalSpeedLineAnimId !== null) {
+      cancelAnimationFrame(verticalSpeedLineAnimId);
+    }
+    if (verticalClearTimeoutId !== null) clearTimeout(verticalClearTimeoutId);
+    if (corpRollAnimId !== null) cancelAnimationFrame(corpRollAnimId);
   }
 
   return {
     refresh: () => {
       cityIndex = Math.floor(deps.getActiveBuildingIndex() / MARKER_COUNT);
+      persistCityMapState();
       redraw();
     },
+    flashVerticalRays: flashVerticalTransition,
     destroy,
   };
 }

@@ -1,0 +1,70 @@
+import { animateDialogClose } from "../../utils";
+import { playSwoosh } from "../../sound";
+import coinIconUrl from "../../assets/coin.png";
+
+// same worker-menu look as boostMenu/upgradeMenu — a dialog for whatever
+// corporation-wide (not per-city) upgrades the game eventually supports. Right now
+// that's just the one "Create new Corporation" placeholder item
+export function createCorporationUpgradeMenuMarkup(): string {
+  return `
+    <div class="worker-menu" id="corporation-upgrade-menu" hidden>
+      <div class="worker-menu__backdrop" id="corporation-upgrade-menu-backdrop"></div>
+      <div class="worker-menu__panel">
+        <div class="worker-menu__header">
+          <h2>Corporation Upgrades</h2>
+        </div>
+        <div class="worker-menu__list">
+          <button class="worker-menu__item" id="create-new-corporation">
+            <span class="worker-menu__item-label">
+              <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+              Create new Company
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+export interface CorporationUpgradeMenu {
+  open: () => void;
+  close: () => void;
+}
+
+// wires the menu's open/close controls and the "Create new Corporation" item;
+// onCreateNewCorporation fires on click, same pattern every other worker-menu
+// item purchase uses (see upgradeMenu/boostMenu), just with no cost of its own yet
+export function wireCorporationUpgradeMenu(
+  container: HTMLElement,
+  onCreateNewCorporation: () => void,
+): CorporationUpgradeMenu {
+  const menu = container.querySelector<HTMLDivElement>(
+    "#corporation-upgrade-menu",
+  )!;
+  const backdrop = container.querySelector<HTMLDivElement>(
+    "#corporation-upgrade-menu-backdrop",
+  )!;
+  const panel = menu.querySelector<HTMLDivElement>(".worker-menu__panel")!;
+  const createButton = container.querySelector<HTMLButtonElement>(
+    "#create-new-corporation",
+  )!;
+
+  createButton.addEventListener("click", () => {
+    onCreateNewCorporation();
+  });
+
+  function open(): void {
+    menu.hidden = false;
+    playSwoosh();
+  }
+
+  async function close(): Promise<void> {
+    playSwoosh();
+    await animateDialogClose(panel);
+    menu.hidden = true;
+  }
+
+  backdrop.addEventListener("click", close);
+
+  return { open, close };
+}

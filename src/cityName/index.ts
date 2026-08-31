@@ -79,37 +79,21 @@ const PLACE_SUFFIXES = [
   "bay",
 ];
 
-// business-y words that follow a cat word as its own separate word (e.g.
-// "Whisker" + "Holdings")
-const BUSINESS_WORDS = [
-  "Holdings",
-  "Inc.",
-  "Enterprises",
-  "Industries",
-  "Ventures",
-  "Capital",
-  "Group",
-  "& Co.",
-  "Partners",
-  "Financial",
-  "Trust",
-  "Exchange",
-  "Union",
-  "Consolidated",
-  "Global",
-  "Dynamics",
-  "Solutions",
-  "Corp.",
-  "Collective",
-  "Syndicate",
-  "Conglomerate",
-  "Cooperative",
-  "Alliance",
-  "Corporation",
-  "Investments",
-  "Associates",
-  "Brands",
-  "Networks",
+// stands alone in front of a cat word + suffix (e.g. "New" + "Whiskerville") —
+// real place names, never business words (see corporationName.ts for those)
+const PLACE_MODIFIERS = [
+  "New",
+  "North",
+  "South",
+  "East",
+  "West",
+  "Old",
+  "Upper",
+  "Lower",
+  "Fort",
+  "Port",
+  "Mount",
+  "Lake",
 ];
 
 function pick<T>(list: T[]): T {
@@ -117,12 +101,14 @@ function pick<T>(list: T[]): T {
 }
 
 // a handful of different shapes to combine the word lists into, picked at random
-// each time a brand new city needs a name — keeps names from all looking the same
+// each time a brand new city needs a name — keeps names from all looking the same.
+// always a place name (cat word + place suffix, optionally a modifier) — never a
+// business/company name, that's corporationName.ts's job
 const NAME_TEMPLATES: (() => string)[] = [
   () => `${pick(CAT_WORDS)}${pick(PLACE_SUFFIXES)}`,
-  () => `${pick(CAT_WORDS)} ${pick(BUSINESS_WORDS)}`,
-  () => `${pick(CAT_WORDS)}${pick(PLACE_SUFFIXES)} ${pick(BUSINESS_WORDS)}`,
-  () => `${pick(CAT_WORDS)} & ${pick(CAT_WORDS)} ${pick(BUSINESS_WORDS)}`,
+  () => `${pick(PLACE_MODIFIERS)} ${pick(CAT_WORDS)}${pick(PLACE_SUFFIXES)}`,
+  () =>
+    `${pick(CAT_WORDS)}${pick(PLACE_SUFFIXES)}-${pick(CAT_WORDS)}${pick(PLACE_SUFFIXES)}`,
 ];
 
 function generateCityName(): string {

@@ -194,16 +194,12 @@ body {
   display: block;
   /* translate/scale (not the transform shorthand) so they compose with this same
      element's own static `rotate` below in a fixed order (translate, then rotate,
-     then scale) regardless of which rule sets which \u2014 the bounce below is authored
-     entirely in the icon's own pre-rotation "points up" space, and rotate reorients
-     that whole bounce to match each arrow's actual on-screen facing direction */
+     then scale) regardless of which rule sets which */
   animation:
     city-map-arrow-bounce-move 0.9s ease-in-out infinite,
     city-map-arrow-bounce-warp 0.9s ease-in-out infinite;
 }
 
-/* nudges up and back in the icon's own local space \u2014 rotated per direction below,
-   this is what actually reads as "moving back and forth in the pointing direction" */
 @keyframes city-map-arrow-bounce-move {
   0%,
   100% {
@@ -251,6 +247,56 @@ body {
 
 .city-map__arrow--next svg {
   rotate: 90deg; /* up-arrow icon → points right */
+}
+
+.city-map__corp-pointer {
+  /* a shrunk-down copy of the same arrow icon/bounce as .city-map__arrow, just as
+     a static pointer at the currently-selected corporation name (see
+     drawCorporationNames in cityMap/index.ts) rather than a clickable button */
+  position: absolute;
+  left: 8px;
+  bottom: 40px;
+  z-index: 3;
+  color: var(--color-white);
+  pointer-events: none;
+}
+
+.city-map__corp-pointer svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+  rotate: 90deg; /* up-arrow icon → points right, at the company name */
+  animation:
+    city-map-corp-pointer-bounce-move 0.9s ease-in-out infinite,
+    city-map-corp-pointer-bounce-warp 0.9s ease-in-out infinite;
+}
+
+/* this one arrow's own back-and-forth (left-right) nudge, separate from the
+   map-nav arrows' up/down bounce above */
+@keyframes city-map-corp-pointer-bounce-move {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: -10px 0;
+  }
+}
+
+@keyframes city-map-corp-pointer-bounce-warp {
+  0%,
+  100% {
+    scale: 1 1;
+  }
+  30% {
+    scale: 1.16 0.88;
+  }
+  50% {
+    scale: 0.86 1.14;
+  }
+  70% {
+    scale: 1.16 0.88;
+  }
 }
 
 .test-actions-bar {
@@ -441,6 +487,15 @@ body {
   animation:
     worker-menu-slide-out-move 0.352s ease-in forwards,
     worker-menu-slide-out-warp 0.352s ease-in forwards;
+}
+
+/* sits 100px higher than every other worker-menu dialog — margin (not translate)
+   so it doesn't fight the shared open/close slide animations above, which drive
+   translate themselves; shifting top/bottom margins by the same opposite amounts
+   keeps the flex-centering math (and thus the slide distance) unchanged */
+#company-select-menu .worker-menu__panel {
+  margin-top: -86px;
+  margin-bottom: 114px;
 }
 
 @keyframes worker-menu-slide-in-move {

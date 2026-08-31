@@ -117,3 +117,20 @@ inventing a new expiring-effect mechanism from scratch.
   let a maxed-out combo grant one free/discounted boost-menu purchase as the
   payoff for keeping the streak alive, tying two systems together instead of
   leaving boosts and combos independent.
+
+
+# Muli corp
+
+- Create new corporation on map upgrade button
+- Switch corps with up and down actionbar button
+- Map boost dialog shows stock price for each owned company
+- Map boost dialog allows for "Raise stock price"
+- Company total income + value is used to get 0.01% boost to all base income for companies
+
+# Influence market boost
+
+- Minigame to raise stock value
+- Click to keep profit line up on line graph up
+- Pass through earning goals on graph to get extended duration
+- Time for minigame is based on total income, money act as fuel to keep the game going
+- Reward is % to the stock value which increases earning rate for all company floors
