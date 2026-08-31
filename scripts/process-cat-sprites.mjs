@@ -94,6 +94,21 @@ async function processSheet(srcFile, destFile) {
               );
       const i = pixelIdx * channels;
       data[i + 3] = Math.min(data[i + 3], alpha);
+      // color-decontaminate using a blend factor derived straight from
+      // whiteness (not the alpha above): whiteness <= WHITE_LO pixels are
+      // forced fully opaque by the formula above, but anti-aliasing means
+      // many of them are still a light gray blend toward the true
+      // (near-black) outline, not real foreground color — left alone,
+      // that's exactly the pale halo ring seen around a sprite once
+      // composited over anything but white
+      const blend = Math.max(0, Math.min(1, 1 - whiteness / 255));
+      if (blend > 0.02) {
+        for (let c = 0; c < 3; c++) {
+          const observed = data[i + c];
+          const decontaminated = (observed - 255 * (1 - blend)) / blend;
+          data[i + c] = Math.max(0, Math.min(255, Math.round(decontaminated)));
+        }
+      }
     }
   }
 
