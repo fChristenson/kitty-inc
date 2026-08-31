@@ -118,21 +118,26 @@ async function processSheet(srcFile, destFile) {
   if (start !== -1) rawRuns.push([start, width - 1]);
 
   // merge tiny (<=5px) stray runs — anti-aliasing remnants at a pose's
-  // fingertip/edge, not a real 6th pose — into whichever real neighboring run is
-  // closest
+  // fingertip/edge, or JPEG compression noise near an edge — into whichever real
+  // neighboring run is closest. A tiny run with no previous run yet (e.g. a stray
+  // artifact before the very first real pose) has nothing to merge backward into,
+  // so it must merge forward into the next run instead of just being kept as its
+  // own (spurious) run
   const runs = [];
-  for (const run of rawRuns) {
+  for (let idx = 0; idx < rawRuns.length; idx++) {
+    const run = rawRuns[idx];
     const runWidth = run[1] - run[0] + 1;
-    if (runWidth > 5 || runs.length === 0) {
+    if (runWidth > 5) {
       runs.push(run);
       continue;
     }
     const prev = runs[runs.length - 1];
-    const distToPrev = run[0] - prev[1];
-    const next = rawRuns[rawRuns.indexOf(run) + 1];
+    const next = rawRuns[idx + 1];
+    const distToPrev = prev ? run[0] - prev[1] : Infinity;
     const distToNext = next ? next[0] - run[1] : Infinity;
-    if (distToPrev <= distToNext) prev[1] = run[1];
-    else next[0] = run[0];
+    if (prev && distToPrev <= distToNext) prev[1] = run[1];
+    else if (next) next[0] = run[0];
+    else if (prev) prev[1] = run[1];
   }
 
   if (runs.length !== FRAME_COUNT) {

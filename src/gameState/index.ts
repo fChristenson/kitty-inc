@@ -58,6 +58,7 @@ export interface Floor {
   lastCollectedAt: number; // Date.now() ms this floor last completed a whole idle-income cycle
   hasOfficeChairs: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
   hasOfficeSupplies: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
+  hasManager: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
 }
 
 // gameState.ts is the sole owner of this per-floor data (Floor itself doesn't carry it),
@@ -199,21 +200,6 @@ export function computeIdleIncome(
   return idleIncome;
 }
 
-// $/sec every unlocked floor across every one of a company's buildings is
-// currently earning, ignoring any boost in effect — same convention this file's
-// own computeIdleIncome (and hud/boostMenu.ts's currentIncomePerSecond) use.
-// Shared so totalIncome.ts/corporationBoostMenu.ts don't each reimplement it
-export function getBuildingsIncomePerSecond(buildings: Floor[][]): number {
-  let total = 0;
-  for (const floors of buildings) {
-    for (const floor of floors) {
-      if (!floor.unlocked) continue;
-      total += floor.incomeAmount / floor.incomeIntervalSeconds;
-    }
-  }
-  return total;
-}
-
 interface SavedFloor {
   incomeAmount: number;
   incomeIntervalSeconds: number;
@@ -230,6 +216,7 @@ interface SavedFloor {
   tintIndexes?: number[]; // added after initial release; older saves default to [] on load
   hasOfficeChairs?: boolean; // added after initial release; older saves default to false on load
   hasOfficeSupplies?: boolean; // added after initial release; older saves default to false on load
+  hasManager?: boolean; // added after initial release; older saves default to false on load
 }
 
 export function clearBuildings(companyIndex = 0): void {
@@ -256,6 +243,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
     tintIndexes: getWorkerTintIndexes(floor),
     hasOfficeChairs: floor.hasOfficeChairs,
     hasOfficeSupplies: floor.hasOfficeSupplies,
+    hasManager: floor.hasManager,
   };
 }
 
@@ -308,6 +296,7 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     lastCollectedAt: sf.lastCollectedAt ?? Date.now(),
     hasOfficeChairs: sf.hasOfficeChairs ?? false,
     hasOfficeSupplies: sf.hasOfficeSupplies ?? false,
+    hasManager: sf.hasManager ?? false,
   };
   workerSlots.set(floor, sf.workers);
   workerTintIndexes.set(floor, sf.tintIndexes ?? sf.spriteIndexes ?? []);

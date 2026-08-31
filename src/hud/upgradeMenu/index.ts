@@ -10,6 +10,7 @@ import { playSwoosh, playSold } from "../../sound";
 import kittyIconUrl from "../../assets/kittyIcon.png";
 import officeChairsIconUrl from "../../assets/isometricBox.png";
 import officeSuppliesIconUrl from "../../assets/isometricYarn.png";
+import managerIconUrl from "../../assets/managerIcon.png";
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost
@@ -69,6 +70,27 @@ export function buyOfficeSupplies(floor: Floor): boolean {
   return true;
 }
 
+// a third one-time, non-stacking per-floor purchase, same shape (and same
+// third-worker pricing) as office chairs/supplies above (own flag, never resets
+// once bought) — but also gated behind the floor's own "level" (upgradeCount),
+// so a manager can only be hired once a floor's been upgraded enough to justify one
+const MANAGER_MIN_UPGRADE_COUNT = 50;
+
+export function getManagerCost(floor: Floor): number {
+  return getThirdWorkerCost(floor);
+}
+
+export function isManagerUnlocked(floor: Floor): boolean {
+  return floor.upgradeCount >= MANAGER_MIN_UPGRADE_COUNT;
+}
+
+export function buyManager(floor: Floor): boolean {
+  if (floor.hasManager || !isManagerUnlocked(floor)) return false;
+  if (!spendTotalIncome(getManagerCost(floor))) return false;
+  floor.hasManager = true;
+  return true;
+}
+
 export function createUpgradeMenuMarkup(): string {
   return `
     <div class="worker-menu" id="upgrade-menu" hidden>
@@ -90,7 +112,10 @@ export interface UpgradeMenu {
 
 // shared markup for a one-time, non-stacking per-floor item (office chairs,
 // office supplies, ...): shows its price while buyable, then permanently switches
-// to a disabled "Bought" state — never re-lists as buyable again
+// to a disabled "Bought" state — never re-lists as buyable again. lockedLabel (if
+// given and not yet bought) shows in place of the price and forces disabled,
+// regardless of affordability — for items gated behind something besides money
+// (see the manager item's floor-level requirement below)
 function oneTimeItemMarkup(options: {
   dataAttr: string;
   floorIndex: number;
@@ -98,9 +123,12 @@ function oneTimeItemMarkup(options: {
   label: string;
   bought: boolean;
   cost: number;
+  lockedLabel?: string;
 }): string {
-  const { dataAttr, floorIndex, iconUrl, label, bought, cost } = options;
-  const affordable = !bought && getTotalIncome() >= cost;
+  const { dataAttr, floorIndex, iconUrl, label, bought, cost, lockedLabel } =
+    options;
+  const affordable = !bought && !lockedLabel && getTotalIncome() >= cost;
+  const priceText = bought ? "Bought" : (lockedLabel ?? formatPrice(cost));
   return `
     <button
       class="worker-menu__item"
@@ -111,7 +139,7 @@ function oneTimeItemMarkup(options: {
         <img src="${iconUrl}" class="worker-menu__icon" alt="" />
         ${label}
       </span>
-      <span class="worker-menu__price">${bought ? "Bought" : formatPrice(cost)}</span>
+      <span class="worker-menu__price">${priceText}</span>
     </button>
   `;
 }
@@ -170,7 +198,24 @@ export function wireUpgradeMenu(
           bought: floor.hasOfficeSupplies,
           cost: getOfficeSuppliesCost(floor),
         });
-        return subheader + workerItem + officeChairsItem + officeSuppliesItem;
+        const managerItem = oneTimeItemMarkup({
+          dataAttr: "data-manager-floor-index",
+          floorIndex: i,
+          iconUrl: managerIconUrl,
+          label: "Hire manager",
+          bought: floor.hasManager,
+          cost: getManagerCost(floor),
+          lockedLabel: isManagerUnlocked(floor)
+            ? undefined
+            : `Lvl ${MANAGER_MIN_UPGRADE_COUNT}`,
+        });
+        return (
+          subheader +
+          workerItem +
+          officeChairsItem +
+          officeSuppliesItem +
+          managerItem
+        );
       })
       .join("");
     list.innerHTML = floorItems;
@@ -217,6 +262,20 @@ export function wireUpgradeMenu(
         onPurchase();
         render();
       }
+      return;
+    }
+    const managerButton = target.closest<HTMLButtonElement>(
+      "button[data-manager-floor-index]",
+    );
+    if (managerButton) {
+      const floor =
+        getFloors()[Number(managerButton.dataset.managerFloorIndex)];
+      if (floor && floor.unlocked && buyManager(floor)) {
+        playSold();
+        await triggerButtonPress(managerButton);
+        onPurchase();
+        render();
+      }
     }
   });
 
@@ -255,6 +314,16 @@ export function wireUpgradeMenu(
         button.disabled =
           floor.hasOfficeSupplies ||
           getTotalIncome() < getOfficeSuppliesCost(floor);
+      });
+    list
+      .querySelectorAll<HTMLButtonElement>("button[data-manager-floor-index]")
+      .forEach((button) => {
+        const floor = getFloors()[Number(button.dataset.managerFloorIndex)];
+        if (!floor) return;
+        button.disabled =
+          floor.hasManager ||
+          !isManagerUnlocked(floor) ||
+          getTotalIncome() < getManagerCost(floor);
       });
   }
 

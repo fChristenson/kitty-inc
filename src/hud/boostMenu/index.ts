@@ -6,7 +6,7 @@ import {
 } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import {
-  MAX_RENDERED_WORKERS,
+  getRenderedWorkerCount,
   triggerJumpAll,
   triggerSaleBoost,
   floorIncomePerSecond,
@@ -54,7 +54,7 @@ export function applyBoostAll(floors: Floor[]): void {
   const now = Date.now();
   for (const floor of floors) {
     if (!floor.unlocked) continue;
-    const renderedWorkers = Math.min(floor.workerCount, MAX_RENDERED_WORKERS);
+    const renderedWorkers = getRenderedWorkerCount(floor);
     for (let i = 0; i < renderedWorkers; i++) {
       activateBoosted(floor, i, now);
     }

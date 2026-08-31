@@ -143,6 +143,7 @@ export function buildFloor(
     lastCollectedAt: Date.now(),
     hasOfficeChairs: false,
     hasOfficeSupplies: false,
+    hasManager: false,
   };
 }
 
@@ -223,6 +224,7 @@ export {
   startIncomeTicker,
   collectDueIncome,
   peekDueIncome,
+  currentIncomeRatePerSecond,
   drawIncomePanel,
   getIncomeBarCenter,
 } from "./incomePanel";
@@ -239,6 +241,7 @@ export {
   getBoostedWorkerCenters,
   loadWorkerSprite,
   triggerJumpAll,
+  getRenderedWorkerCount,
   MAX_RENDERED_WORKERS,
   WALK_SPEED,
 } from "./worker";

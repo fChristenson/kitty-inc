@@ -1,8 +1,4 @@
-import {
-  loadBuildings,
-  getBuildingsIncomePerSecond,
-  type Floor,
-} from "../../gameState";
+import { loadBuildings, type Floor } from "../../gameState";
 import {
   formatPrice,
   formatTotalIncomeFull,
@@ -12,11 +8,13 @@ import {
   spendFromAllCompanies,
   getAllCompaniesTotalIncome,
   getStoredTotalIncome,
+  getBuildingsCurrentIncomePerSecond,
 } from "../../totalIncome";
 import { getCorporationCount, getCorporationName } from "../../corporationName";
 import { getBuildingPrice } from "../../buildings";
 import { companyStorageKey } from "../../company";
 import { playSwoosh, playSold } from "../../sound";
+import coinIconUrl from "../../assets/coin.png";
 
 // each corporation's own purchased "shares" — starts at 1 and goes up 1 per
 // purchase, separate from (and never affecting) its totalIncome/buildings. The
@@ -90,7 +88,10 @@ export function getStockTimesBought(companyIndex: number): number {
 export function getStockRaiseCost(companyIndex: number): number {
   const timesBought = loadStockShares(companyIndex) - STOCK_PRICE_BASE;
   const baseCost =
-    getBuildingsIncomePerSecond(loadBuildings(companyIndex)) * SECONDS_PER_HOUR;
+    getBuildingsCurrentIncomePerSecond(
+      loadBuildings(companyIndex),
+      Date.now(),
+    ) * SECONDS_PER_HOUR;
   return baseCost * 2 ** timesBought;
 }
 
@@ -234,6 +235,7 @@ export function wireCorporationBoostMenu(
           ${affordable ? "" : "disabled"}
         >
           <span class="worker-menu__item-label">
+            <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
             <span class="worker-menu__item-name">${getCorporationName(i)}</span>
             <span class="worker-menu__item-count">(x${getStockTimesBought(i)})</span>
           </span>

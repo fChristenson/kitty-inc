@@ -1,10 +1,9 @@
+import { isStorageIntact, loadBuildings, type Floor } from "../gameState";
 import {
-  isStorageIntact,
-  loadBuildings,
-  getBuildingsIncomePerSecond,
-  type Floor,
-} from "../gameState";
-import { collectDueIncome, peekDueIncome } from "../floors";
+  collectDueIncome,
+  peekDueIncome,
+  currentIncomeRatePerSecond,
+} from "../floors";
 import { getActiveCompanyIndex, companyStorageKey } from "../company";
 import { getCorporationCount } from "../corporationName";
 
@@ -42,7 +41,8 @@ function getProjectedUncollectedIncome(companyIndex: number): number {
       total += peekDueIncome(floor, now);
     }
   }
-  return total;
+  // same global stock-boost multiplier the active ticker applies to collectDueIncome
+  return total * incomeBoostMultiplier();
 }
 
 // combined totalIncome across every corporation — every corp boost/upgrade
@@ -79,6 +79,26 @@ function adjustStoredTotalIncome(companyIndex: number, delta: number): void {
   }
 }
 
+// $/sec every unlocked floor across every one of buildings is currently earning,
+// worker-boost/office-upgrades AND the global stock-boost multiplier (see
+// getGlobalIncomeBoostMultiplier) all included — same cycle math peekDueIncome
+// uses, just as a flat rate instead of a lump sum. Exported so
+// corporationBoostMenu.ts's getStockRaiseCost values a company's current earning
+// power the same way even while it isn't the active company
+export function getBuildingsCurrentIncomePerSecond(
+  buildings: Floor[][],
+  now: number,
+): number {
+  let total = 0;
+  for (const floors of buildings) {
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      total += currentIncomeRatePerSecond(floor, now);
+    }
+  }
+  return total * incomeBoostMultiplier();
+}
+
 // a company's own "wealth" for cost-splitting purposes: its current total plus a
 // projected hour of its own income rate, so a company that earns fast but hasn't
 // banked much yet still shoulders a fair share (not just whichever has the
@@ -90,7 +110,10 @@ function getCompanyWealth(companyIndex: number): number {
     companyIndex === activeCompanyIndex
       ? tickerBuildings
       : loadBuildings(companyIndex);
-  const ratePerSecond = getBuildingsIncomePerSecond(buildings);
+  const ratePerSecond = getBuildingsCurrentIncomePerSecond(
+    buildings,
+    Date.now(),
+  );
   return getStoredTotalIncome(companyIndex) + ratePerSecond * SECONDS_PER_HOUR;
 }
 

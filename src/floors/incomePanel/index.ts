@@ -94,12 +94,16 @@ export function increaseIncomeRate(floor: Floor): void {
   }
 }
 
-// permanent per-floor speed multiplier from the one-time office chairs/supplies
-// purchases (hud/upgradeMenu) — each owned upgrade doubles it, so owning both
-// stacks to a flat 4x, independent of (and layered on top of) the temporary
-// worker-boost speedup below
+// permanent per-floor speed multiplier from the one-time office chairs/supplies/
+// manager purchases (hud/upgradeMenu) — each owned upgrade doubles it, so owning
+// all three stacks to a flat 8x, independent of (and layered on top of) the
+// temporary worker-boost speedup below
 function officeUpgradeSpeedMultiplier(floor: Floor): number {
-  return (floor.hasOfficeChairs ? 2 : 1) * (floor.hasOfficeSupplies ? 2 : 1);
+  return (
+    (floor.hasOfficeChairs ? 2 : 1) *
+    (floor.hasOfficeSupplies ? 2 : 1) *
+    (floor.hasManager ? 2 : 1)
+  );
 }
 
 // how many times faster than its own base incomeIntervalSeconds this floor is
@@ -179,6 +183,17 @@ export function peekDueIncome(floor: Floor, now: number): number {
   const intervalMs = intervalSeconds * 1000;
   const cycles = Math.floor((now - floor.lastCollectedAt) / intervalMs);
   return cycles > 0 ? cycles * amount : 0;
+}
+
+// a floor's own $/sec at its current effective rate — same boost-aware cycle math
+// collectDueIncome/peekDueIncome use, just expressed as a flat rate instead of a
+// lump sum. Worker boost state and office-upgrade multipliers are read straight off
+// the floor itself, so this stays accurate even for a company that isn't the
+// currently active one (see totalIncome.ts's getCompanyWealth and
+// corporationBoostMenu.ts's getStockRaiseCost)
+export function currentIncomeRatePerSecond(floor: Floor, now: number): number {
+  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
+  return amount / intervalSeconds;
 }
 
 // seconds left until the current fill cycle completes, counting down from the full
