@@ -15,6 +15,7 @@ import { getBuildingPrice } from "../../buildings";
 import { companyStorageKey } from "../../company";
 import { playSwoosh, playSold } from "../../sound";
 import coinIconUrl from "../../assets/coin.png";
+import managerIconUrl from "../../assets/managerIcon.png";
 
 // each corporation's own purchased "shares" — starts at 1 and goes up 1 per
 // purchase, separate from (and never affecting) its totalIncome/buildings. The
@@ -59,6 +60,7 @@ export function clearStockPrices(): void {
       // storage unavailable: nothing to clear
     }
   }
+  clearMarketValue();
 }
 
 // the stock price actually shown/used everywhere (menu display, boost formula):
@@ -106,6 +108,80 @@ export function buyStockRaise(companyIndex: number): boolean {
     loadStockShares(companyIndex) + STOCK_PRICE_STEP,
   );
   return true;
+}
+
+// $/sec every unlocked floor of every company is currently earning combined —
+// same per-company rate getStockRaiseCost uses, just summed across every
+// corporation instead of just one
+function getAllCompaniesCurrentIncomePerSecond(now: number): number {
+  const count = getCorporationCount();
+  let total = 0;
+  for (let i = 0; i < count; i++) {
+    total += getBuildingsCurrentIncomePerSecond(loadBuildings(i), now);
+  }
+  return total;
+}
+
+const PRESS_CONFERENCE_INCOME_SECONDS = 30 * 60;
+
+// $ cost of the single, not-per-company "Hold press conference" action: every
+// company's combined income over 30 minutes at its current rate, flat (unlike
+// getStockRaiseCost, this never doubles with repeated purchases)
+export function getPressConferenceCost(): number {
+  return (
+    getAllCompaniesCurrentIncomePerSecond(Date.now()) *
+    PRESS_CONFERENCE_INCOME_SECONDS
+  );
+}
+
+// raises EVERY company's purchased shares by STOCK_PRICE_STEP at once, for one
+// combined cost (see getPressConferenceCost) instead of paying each company's
+// own escalating getStockRaiseCost individually. Returns whether it succeeded
+export function holdPressConference(): boolean {
+  if (!spendFromAllCompanies(getPressConferenceCost())) return false;
+  saveMarketValueShares(loadMarketValueShares() + MARKET_VALUE_STEP);
+  return true;
+}
+
+// how many times "Hold press conference" has been bought — not tied to any one
+// company (see MARKET_VALUE_KEY), separate from each company's own stock shares
+const MARKET_VALUE_KEY = "cash-clicker:market-value-shares";
+const MARKET_VALUE_STEP = 1;
+const MARKET_VALUE_CONTRIBUTION_RATE = 0.1;
+
+function loadMarketValueShares(): number {
+  try {
+    const raw = localStorage.getItem(MARKET_VALUE_KEY);
+    const parsed = raw !== null ? Number(raw) : 0;
+    return Number.isFinite(parsed) ? parsed : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveMarketValueShares(value: number): void {
+  try {
+    localStorage.setItem(MARKET_VALUE_KEY, String(value));
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
+// wipes press-conference purchases; folded into clearStockPrices above so a full
+// game reset doesn't inherit an old market-value modifier either
+function clearMarketValue(): void {
+  try {
+    localStorage.removeItem(MARKET_VALUE_KEY);
+  } catch {
+    // storage unavailable: nothing to clear
+  }
+}
+
+// flat percent contributed by every "Hold press conference" purchase so far —
+// no log10 dilution against any one company's value (unlike
+// getStockContributionPercent) since this isn't tied to a single company
+function getMarketValueContributionPercent(): number {
+  return loadMarketValueShares() * MARKET_VALUE_CONTRIBUTION_RATE;
 }
 
 // $ "invested" in a company's buildings — sum of what each one (after the
@@ -157,13 +233,14 @@ function getStockContributionPercent(companyIndex: number): number {
   return stockPrice * Math.log10(companyValue) * STOCK_CONTRIBUTION_RATE;
 }
 
-// summed across every corporation — the actual global income boost applied to
-// every floor of every building of every company (see totalIncome.ts's
-// startTotalIncomeTicker/gameState.ts's computeIdleIncome, both take this as an
-// injected multiplier to avoid a circular import back into this hud module)
+// summed across every corporation plus the market-value modifier — the actual
+// global income boost applied to every floor of every building of every company
+// (see totalIncome.ts's startTotalIncomeTicker/gameState.ts's computeIdleIncome,
+// both take this as an injected multiplier to avoid a circular import back into
+// this hud module)
 export function getGlobalIncomeBoostPercent(): number {
   const count = getCorporationCount();
-  let total = 0;
+  let total = getMarketValueContributionPercent();
   for (let i = 0; i < count; i++) total += getStockContributionPercent(i);
   return total;
 }
@@ -224,7 +301,17 @@ export function wireCorporationBoostMenu(
         </div>
       `;
     }).join("");
+    const marketValuePct = getMarketValueContributionPercent();
+    const marketValueRow = `
+      <div class="worker-menu__modifier-row">
+        <span>Market value</span>
+        <span>${formatBoostPercent(marketValuePct)}</span>
+      </div>
+    `;
     const totalPct = getGlobalIncomeBoostPercent();
+    const pressConferenceCost = getPressConferenceCost();
+    const pressConferenceAffordable =
+      getAllCompaniesTotalIncome() >= pressConferenceCost;
     const items = Array.from({ length: count }, (_, i) => {
       const cost = getStockRaiseCost(i);
       const affordable = getAllCompaniesTotalIncome() >= cost;
@@ -247,11 +334,24 @@ export function wireCorporationBoostMenu(
       <h3 class="worker-menu__subheader">Corporation assets</h3>
       <span class="worker-menu__total-income">${formatTotalIncomeFull(getAllCompaniesTotalIncome())}</span>
       <h3 class="worker-menu__subheader">Stock price income modifiers</h3>
+      ${marketValueRow}
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
         <span>Total</span>
         <span>${formatBoostPercent(totalPct)}</span>
       </div>
+      <h3 class="worker-menu__subheader">Raise Market Value</h3>
+      <button
+        class="worker-menu__item"
+        id="press-conference-item"
+        ${pressConferenceAffordable ? "" : "disabled"}
+      >
+        <span class="worker-menu__item-label">
+          <img src="${managerIconUrl}" class="worker-menu__icon" alt="" />
+          <span class="worker-menu__item-name">Hold press conference</span>
+        </span>
+        <span class="worker-menu__price">${formatPrice(pressConferenceCost)}</span>
+      </button>
       <h3 class="worker-menu__subheader">Raise Stock price</h3>
       ${items}
     `;
@@ -323,6 +423,17 @@ export function wireCorporationBoostMenu(
   window.addEventListener("pointerup", stopHold);
   window.addEventListener("pointercancel", stopHold);
 
+  // single-shot (not press-and-hold, unlike the per-company stock items above) —
+  // one press conference at a time makes sense given its own 30-minute-income cost
+  list.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    const button = target.closest<HTMLButtonElement>("#press-conference-item");
+    if (!button || button.disabled) return;
+    if (!holdPressConference()) return;
+    playSold();
+    render();
+  });
+
   // re-checks affordability while the menu sits open, same as boostMenu.ts's own
   // updateAffordability, so a grayed-out item turns clickable again as soon as
   // income catches up instead of only refreshing on the next open/purchase
@@ -335,6 +446,13 @@ export function wireCorporationBoostMenu(
       button.disabled =
         getAllCompaniesTotalIncome() < getStockRaiseCost(companyIndex);
     });
+    const pressConferenceButton = list.querySelector<HTMLButtonElement>(
+      "#press-conference-item",
+    );
+    if (pressConferenceButton) {
+      pressConferenceButton.disabled =
+        getAllCompaniesTotalIncome() < getPressConferenceCost();
+    }
   }
 
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
