@@ -2,7 +2,6 @@ import { FLOOR_X_MIN, FLOOR_X_MAX, ROOM_CONTENT_SCALE } from "../constants";
 import {
   isBoosted,
   activateBoosted,
-  countBoostedWorkers,
   getBoostRemainingMs,
   BOOST_URGENT_THRESHOLD_MS,
   getWorkerTintIndexes,

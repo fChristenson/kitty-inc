@@ -278,6 +278,7 @@ export interface CorporationBoostMenu {
 
 export function wireCorporationBoostMenu(
   container: HTMLElement,
+  onPressConferenceHeld?: () => void,
 ): CorporationBoostMenu {
   const menu = container.querySelector<HTMLDivElement>(
     "#corporation-boost-menu",
@@ -432,6 +433,7 @@ export function wireCorporationBoostMenu(
     if (!holdPressConference()) return;
     playSold();
     render();
+    onPressConferenceHeld?.();
   });
 
   // re-checks affordability while the menu sits open, same as boostMenu.ts's own

@@ -38,6 +38,7 @@ import {
   wireSpawnMouseButton,
   wireSpawnCritButton,
   wireIdlePopupTestButton,
+  wirePressConferenceTestButton,
   wireResetButton,
   createActionBarMarkup,
   wireActionBar,
@@ -50,6 +51,8 @@ import {
   createCorporationBoostMenuMarkup,
   wireCorporationBoostMenu,
   getGlobalIncomeBoostMultiplier,
+  createPressConferenceGameMarkup,
+  wirePressConferenceGame,
   createMapMenuMarkup,
   wireMapMenu,
   createPopupMarkup,
@@ -92,6 +95,7 @@ async function main() {
     ${createCompanySelectMenuMarkup()}
     ${createBoostMenuMarkup()}
     ${createCorporationBoostMenuMarkup()}
+    ${createPressConferenceGameMarkup()}
     ${createMapMenuMarkup()}
     ${createPopupMarkup()}
   `;
@@ -260,6 +264,7 @@ async function main() {
       const testAmount = 12345;
       showIdlePopup(app, testAmount, () => addTotalIncome(testAmount));
     });
+    wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     wireResetButton(app, buildings, () => activeCompanyIndex);
   }
   const upgradeMenu = wireUpgradeMenu(
@@ -286,7 +291,10 @@ async function main() {
     () => persist(),
     (floor) => gameCanvas.scrollActiveToFloor(floor),
   );
-  const corporationBoostMenu = wireCorporationBoostMenu(app);
+  const corporationBoostMenu = wireCorporationBoostMenu(app, () =>
+    pressConferenceGame.open(),
+  );
+  const pressConferenceGame = wirePressConferenceGame(app);
   // buys the next building outright if affordable (see buildings.ts's
   // getBuildingPrice, which scales 1000x per building same as its economy); returns
   // whether it succeeded so the map menu can decide whether to re-render

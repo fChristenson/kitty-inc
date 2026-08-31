@@ -426,6 +426,61 @@ body {
   box-shadow: 0 2px 0 0 var(--color-purple-shadow);
 }
 
+.press-conference-game {
+  /* same box .game occupies (width:100% up to 480px, centered by body's own
+     flex justify-content:center) — position:fixed can't participate in that
+     flex centering itself, so it's replicated here directly instead of just
+     spanning the full viewport like the dialogs' own dimming backdrops do */
+  position: fixed;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 50; /* above .worker-menu's own 40, since it can be opened from on top of it */
+  display: flex;
+  flex-direction: column;
+  background: var(--color-canvas-bg);
+}
+
+.press-conference-game[hidden] {
+  display: none; /* the [hidden] attribute's UA display:none loses to the flex rule above without this */
+}
+
+.press-conference-game__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  color: var(--color-white);
+}
+
+.press-conference-game__header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.press-conference-game__score {
+  position: absolute;
+  top: 3.75rem;
+  left: 1rem;
+  z-index: 1;
+  color: var(--color-white);
+  font-size: 1.5rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.press-conference-game__canvas {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: block;
+  touch-action: none; /* pressConferenceGame/index.ts drives the flap itself via pointerdown */
+}
+
 .worker-menu {
   position: fixed;
   inset: 0;

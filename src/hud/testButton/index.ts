@@ -13,6 +13,7 @@ export function createTestButtonMarkup(): string {
       <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
       <button id="spawn-crit" class="game__button">Spawn Crit</button>
       <button id="trigger-idle-popup" class="game__button">Idle Popup</button>
+      <button id="test-press-conference" class="game__button">Press Conf Game</button>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
     </div>
   `;
@@ -48,6 +49,16 @@ export function wireIdlePopupTestButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#trigger-idle-popup",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wirePressConferenceTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-press-conference",
   )!;
   button.addEventListener("click", onClick);
 }

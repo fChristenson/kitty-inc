@@ -96,6 +96,11 @@ export {
   getGlobalIncomeBoostMultiplier,
 } from "./corporationBoostMenu";
 export type { CorporationBoostMenu } from "./corporationBoostMenu";
+export {
+  createPressConferenceGameMarkup,
+  wirePressConferenceGame,
+} from "./pressConferenceGame";
+export type { PressConferenceGame } from "./pressConferenceGame";
 export { createMapMenuMarkup, wireMapMenu } from "./mapMenu";
 export type { MapMenu } from "./mapMenu";
 export { createPopupMarkup, showIdlePopup } from "./popup";
@@ -105,6 +110,7 @@ export {
   wireSpawnMouseButton,
   wireSpawnCritButton,
   wireIdlePopupTestButton,
+  wirePressConferenceTestButton,
   wireResetButton,
 } from "./testButton";
 export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
