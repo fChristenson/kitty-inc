@@ -1,5 +1,5 @@
 import { playSwoosh, playBloop, playExplosion, playSold } from "../../sound";
-import { drawPill, drawCartoonText } from "../../utils";
+import { drawPill, drawCartoonText, formatPrice } from "../../utils";
 import { COLOR } from "../../palette";
 import { triggerScreenShake, getScreenShakeOffset } from "../../screenShake";
 import {
@@ -7,6 +7,11 @@ import {
   spawnCoinBurstAt,
   drawActiveCoinBursts,
 } from "../../coinBurst";
+import {
+  spendFromAllCompanies,
+  getAllCompaniesTotalIncome,
+} from "../../totalIncome";
+import { addMarketInfluencePercent } from "../corporationBoostMenu";
 
 // physics constants for the line's head — same "flappy bird" feel: constant
 // downward gravity, a fixed upward kick on every flap, no in-between speeds.
@@ -85,6 +90,15 @@ const EVENT_STROKE_WIDTH = 4;
 const EVENT_HIT_HEIGHT = 28; // vertical tolerance for a head/event collision
 const EVENT_SPAWN_INTERVAL_MIN_MS = 1400;
 const EVENT_SPAWN_INTERVAL_MAX_MS = 2600;
+// a special bad event, substituted in for a normal one MARKET_CRASH_CHANCE of
+// the time — fatter (bigger, heavier weight, thicker stroke) and vibrates the
+// same WIGGLE_PERIOD_MS/WIGGLE_MAX_RADIANS wiggle the sales button plays.
+// Hitting it ends the round outright, same as hitting a bound, instead of the
+// usual bad-hit explosion+shake+burn-rate penalty
+const MARKET_CRASH_TEXT = "Market Crash";
+const MARKET_CRASH_CHANCE = 0.12;
+const MARKET_CRASH_FONT = '900 30px "Fredoka", system-ui, sans-serif';
+const MARKET_CRASH_STROKE_WIDTH = 6;
 // difficulty ramp: every DIFFICULTY_INTERVAL_MS survived, bad events get 25%
 // more likely (relative to good's own unchanged odds), events spawn more
 // densely (the interval between spawns shrinks), and every event moves
@@ -97,6 +111,28 @@ const MIN_SPAWN_INTERVAL_FLOOR_MS = 350; // never crowds spawns closer together 
 // spawnCoinBurstAt's own default scale (1) is sized for a full building-width
 // canvas; this screen is much smaller, so its own bursts get shrunk down too
 const COIN_BURST_SCALE = 0.35;
+
+// the combined total income across every corporation is this game's own
+// "fuel": every second it's played burns BASE_BURN_PERCENT_PER_SECOND of
+// whatever that total currently is (see step's spendFromAllCompanies call),
+// scaling by wealth instead of a fixed $ amount so this stays meaningful at
+// any point in the game's progression. Running out (spendFromAllCompanies
+// failing) ends the round the same way hitting a bound does
+const BASE_BURN_PERCENT_PER_SECOND = 0.004;
+// a green hit divides the burn rate by 5 (persists the rest of the round,
+// stacking with every other green hit); a red hit multiplies it by 5 the same
+// way — clamped so neither can run away to somewhere degenerate
+const GOOD_BURN_MULTIPLIER = 1 / 5;
+const BAD_BURN_MULTIPLIER = 5;
+const MIN_BURN_MULTIPLIER = 0.001;
+const MAX_BURN_MULTIPLIER = 1000;
+// "Market Influence %" (see hud/corporationBoostMenu's own persisted stat)
+// banked in real time as fuel burns — proportional to how much of the total
+// was just burned (as a %), plus a flat instant bump/cut on every green/red
+// hit on top of that ambient climb
+const INFLUENCE_PERCENT_PER_BURNED_PERCENT = 2;
+const GOOD_INFLUENCE_BONUS = 0.5;
+const BAD_INFLUENCE_PENALTY = 0.5;
 
 // drawn straight onto this screen's own canvas with the exact same utils.ts
 // helpers floors/upgradeButton's real "Sale" button uses (drawPill/
@@ -127,6 +163,7 @@ const PRESS_FREQUENCY = 26;
 interface MarketEvent {
   text: string;
   good: boolean;
+  isCrash: boolean; // the special "Market Crash" event (see MARKET_CRASH_CHANCE); always bad, but ends the round on hit instead of the usual bad-hit penalty
   x: number;
   y: number;
   width: number; // measured once at spawn time
@@ -146,6 +183,9 @@ interface GameState {
   gameOver: boolean;
   marketEvents: MarketEvent[];
   nextEventInMs: number; // counts down to the next spawn (see EVENT_SPAWN_INTERVAL_*)
+  fuelBurnMultiplier: number; // persists/compounds for the rest of the round on every green/red hit (see step)
+  marketInfluencePercent: number; // this session's own accrued total, for display only (the persisted stat lives in corporationBoostMenu)
+  totalExpensesThisSession: number; // cumulative $ actually burned so far this round; only ever grows
 }
 
 export function createPressConferenceGameMarkup(): string {
@@ -154,7 +194,20 @@ export function createPressConferenceGameMarkup(): string {
       <div class="press-conference-game__header">
         <h2>Press Conference</h2>
       </div>
-      <div class="press-conference-game__score" id="press-conference-game-score">0.0s</div>
+      <div class="press-conference-game__score" id="press-conference-game-score">
+        <div id="press-conference-game-timer">0.0s</div>
+      </div>
+      <div class="press-conference-game__equation" id="press-conference-game-equation">
+        <span class="press-conference-game__money press-conference-game__money--green" id="press-conference-game-total"></span>
+        <span>-</span>
+        <span class="press-conference-game__money press-conference-game__money--red" id="press-conference-game-expenses"></span>
+        <span>=</span>
+        <span class="press-conference-game__money press-conference-game__money--green" id="press-conference-game-remaining"></span>
+      </div>
+      <div class="press-conference-game__influence" id="press-conference-game-influence">
+        <span class="press-conference-game__influence-label">Market Influence</span>
+        <span id="press-conference-game-influence-value">+0.00% ▲</span>
+      </div>
       <canvas class="press-conference-game__canvas" id="press-conference-game-canvas"></canvas>
     </div>
   `;
@@ -171,8 +224,20 @@ export function wirePressConferenceGame(
   const screen = container.querySelector<HTMLDivElement>(
     "#press-conference-game",
   )!;
-  const scoreEl = container.querySelector<HTMLDivElement>(
-    "#press-conference-game-score",
+  const timerEl = container.querySelector<HTMLSpanElement>(
+    "#press-conference-game-timer",
+  )!;
+  const totalEl = container.querySelector<HTMLSpanElement>(
+    "#press-conference-game-total",
+  )!;
+  const expensesEl = container.querySelector<HTMLSpanElement>(
+    "#press-conference-game-expenses",
+  )!;
+  const remainingEl = container.querySelector<HTMLSpanElement>(
+    "#press-conference-game-remaining",
+  )!;
+  const influenceValueEl = container.querySelector<HTMLSpanElement>(
+    "#press-conference-game-influence-value",
   )!;
   const canvas = container.querySelector<HTMLCanvasElement>(
     "#press-conference-game-canvas",
@@ -234,15 +299,27 @@ export function wirePressConferenceGame(
     // difficulty tier, so it crowds out good more and more over time
     const badWeight = BAD_SPAWN_WEIGHT_GROWTH_PER_TIER ** getDifficultyTier();
     const good = Math.random() >= badWeight / (1 + badWeight);
+    // a bad spawn has its own further chance of being the special Market
+    // Crash event instead of a normal bad headline
+    const isCrash = !good && Math.random() < MARKET_CRASH_CHANCE;
     const list = good ? GOOD_MARKET_EVENTS : BAD_MARKET_EVENTS;
-    const text = list[Math.floor(Math.random() * list.length)];
-    ctx.font = EVENT_FONT;
+    const text = isCrash
+      ? MARKET_CRASH_TEXT
+      : list[Math.floor(Math.random() * list.length)];
+    ctx.font = isCrash ? MARKET_CRASH_FONT : EVENT_FONT;
     const width = ctx.measureText(text).width;
     const topMargin = 30;
     const bottomMargin = SALES_BTN_H + SALES_BTN_BOTTOM_MARGIN + 30;
     const y =
       topMargin + Math.random() * Math.max(1, cssH - topMargin - bottomMargin);
-    state.marketEvents.push({ text, good, x: cssW + width / 2, y, width });
+    state.marketEvents.push({
+      text,
+      good,
+      isCrash,
+      x: cssW + width / 2,
+      y,
+      width,
+    });
   }
 
   function freshState(): GameState {
@@ -261,6 +338,9 @@ export function wirePressConferenceGame(
       gameOver: false,
       marketEvents: [],
       nextEventInMs: randomEventDelayMs(0),
+      fuelBurnMultiplier: 1,
+      marketInfluencePercent: 0,
+      totalExpensesThisSession: 0,
     };
   }
   let state = freshState();
@@ -421,12 +501,33 @@ export function wirePressConferenceGame(
   }
 
   // good events read as the same green/white the HUD's own total-income text
-  // uses; bad ones swap in a mean red fill, same white stroke either way
-  function drawMarketEvents(): void {
-    ctx.font = EVENT_FONT;
+  // uses; bad ones swap in a mean red fill, same white stroke either way.
+  // Market Crash gets its own fatter font/stroke and the same wiggle the
+  // sales button plays continuously, to read as the one to really avoid
+  function drawMarketEvents(now: number): void {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     for (const event of state.marketEvents) {
+      if (event.isCrash) {
+        ctx.save();
+        ctx.translate(event.x, event.y);
+        ctx.rotate(
+          Math.sin((now / WIGGLE_PERIOD_MS) * Math.PI * 2) * WIGGLE_MAX_RADIANS,
+        );
+        ctx.font = MARKET_CRASH_FONT;
+        drawCartoonText(
+          ctx,
+          event.text,
+          0,
+          0,
+          COLOR.red,
+          COLOR.white,
+          MARKET_CRASH_STROKE_WIDTH,
+        );
+        ctx.restore();
+        continue;
+      }
+      ctx.font = EVENT_FONT;
       drawCartoonText(
         ctx,
         event.text,
@@ -521,6 +622,34 @@ export function wirePressConferenceGame(
       playExplosion();
     }
 
+    // the combined total income across every corporation is this game's own
+    // fuel: burn a wealth-proportional slice of it every second, banking
+    // Market Influence % proportional to however much actually got burned.
+    // Running dry (spendFromAllCompanies failing) ends the round the same
+    // way hitting a bound does
+    if (state.running) {
+      const totalBefore = getAllCompaniesTotalIncome();
+      const cost =
+        totalBefore *
+        BASE_BURN_PERCENT_PER_SECOND *
+        state.fuelBurnMultiplier *
+        dt;
+      if (cost > 0) {
+        if (spendFromAllCompanies(cost)) {
+          state.totalExpensesThisSession += cost;
+          const burnedPercent =
+            totalBefore > 0 ? (cost / totalBefore) * 100 : 0;
+          const gain = burnedPercent * INFLUENCE_PERCENT_PER_BURNED_PERCENT;
+          state.marketInfluencePercent += gain;
+          addMarketInfluencePercent(gain);
+        } else {
+          state.running = false;
+          state.gameOver = true;
+          playExplosion();
+        }
+      }
+    }
+
     state.nextEventInMs -= dtMs;
     if (state.nextEventInMs <= 0) {
       spawnMarketEvent();
@@ -535,13 +664,38 @@ export function wirePressConferenceGame(
       const withinX = Math.abs(event.x - headX) < event.width / 2 + LINE_WIDTH;
       const withinY = Math.abs(event.y - state.headY) < EVENT_HIT_HEIGHT / 2;
       if (withinX && withinY) {
-        if (event.good) {
+        if (event.isCrash) {
+          // ends the round outright, same as hitting a bound — no burn-rate
+          // penalty or shake, just the same explosion + game over
+          state.running = false;
+          state.gameOver = true;
+          playExplosion();
+        } else if (event.good) {
           spawnCoinBurstAt(event.x, event.y, COIN_BURST_SCALE);
           // the buy sfx, not the usual coin-drop one, just for this hit
           playSold();
+          // makes fuel last longer (persists the rest of the round) and banks
+          // an instant influence bump on top of the ambient burn-based climb
+          state.fuelBurnMultiplier = Math.max(
+            MIN_BURN_MULTIPLIER,
+            state.fuelBurnMultiplier * GOOD_BURN_MULTIPLIER,
+          );
+          state.marketInfluencePercent += GOOD_INFLUENCE_BONUS;
+          addMarketInfluencePercent(GOOD_INFLUENCE_BONUS);
         } else {
           playExplosion();
           triggerScreenShake();
+          // burns fuel faster (persists the rest of the round) and knocks an
+          // instant chunk off influence
+          state.fuelBurnMultiplier = Math.min(
+            MAX_BURN_MULTIPLIER,
+            state.fuelBurnMultiplier * BAD_BURN_MULTIPLIER,
+          );
+          state.marketInfluencePercent = Math.max(
+            0,
+            state.marketInfluencePercent - BAD_INFLUENCE_PENALTY,
+          );
+          addMarketInfluencePercent(-BAD_INFLUENCE_PENALTY);
         }
         state.marketEvents.splice(i, 1);
         continue;
@@ -560,13 +714,20 @@ export function wirePressConferenceGame(
     ctx.translate(shake.x, shake.y);
     const headX = cssW * HEAD_X_FRACTION;
     drawGrid(headX);
-    drawMarketEvents();
+    drawMarketEvents(now);
     drawLine(headX);
     drawHead(headX);
     drawActiveCoinBursts(ctx, now);
     drawSalesButton(now);
     ctx.restore();
-    scoreEl.textContent = formatScore(state.survivedMs);
+    timerEl.textContent = formatScore(state.survivedMs);
+    const remaining = getAllCompaniesTotalIncome();
+    totalEl.textContent = formatPrice(
+      remaining + state.totalExpensesThisSession,
+    );
+    expensesEl.textContent = formatPrice(state.totalExpensesThisSession);
+    remainingEl.textContent = formatPrice(remaining);
+    influenceValueEl.textContent = `${state.marketInfluencePercent >= 0 ? "+" : ""}${state.marketInfluencePercent.toFixed(2)}% ▲`;
   }
 
   let rafId: number | null = null;

@@ -61,6 +61,7 @@ export function clearStockPrices(): void {
     }
   }
   clearMarketValue();
+  clearMarketInfluence();
 }
 
 // the stock price actually shown/used everywhere (menu display, boost formula):
@@ -184,6 +185,44 @@ function getMarketValueContributionPercent(): number {
   return loadMarketValueShares() * MARKET_VALUE_CONTRIBUTION_RATE;
 }
 
+// "Market Influence %" — earned by playing hud/pressConferenceGame's own mini-game
+// (burning combined company income as fuel banks influence there in real time via
+// addMarketInfluencePercent), not tied to any one company either
+const MARKET_INFLUENCE_KEY = "cash-clicker:market-influence-percent";
+
+export function getMarketInfluencePercent(): number {
+  try {
+    const raw = localStorage.getItem(MARKET_INFLUENCE_KEY);
+    const parsed = raw !== null ? Number(raw) : 0;
+    return Number.isFinite(parsed) ? parsed : 0;
+  } catch {
+    return 0;
+  }
+}
+
+// banks additional influence earned just now (delta can be negative, but the
+// running total is floored at 0 — see MARKET_INFLUENCE_MIN)
+export function addMarketInfluencePercent(delta: number): void {
+  try {
+    localStorage.setItem(
+      MARKET_INFLUENCE_KEY,
+      String(Math.max(0, getMarketInfluencePercent() + delta)),
+    );
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
+// folded into clearStockPrices above so a full game reset doesn't inherit an
+// old market-influence modifier either
+function clearMarketInfluence(): void {
+  try {
+    localStorage.removeItem(MARKET_INFLUENCE_KEY);
+  } catch {
+    // storage unavailable: nothing to clear
+  }
+}
+
 // $ "invested" in a company's buildings — sum of what each one (after the
 // always-free first) cost to unlock, same buildings.ts pricing used everywhere
 // else on the map
@@ -233,14 +272,14 @@ function getStockContributionPercent(companyIndex: number): number {
   return stockPrice * Math.log10(companyValue) * STOCK_CONTRIBUTION_RATE;
 }
 
-// summed across every corporation plus the market-value modifier — the actual
-// global income boost applied to every floor of every building of every company
-// (see totalIncome.ts's startTotalIncomeTicker/gameState.ts's computeIdleIncome,
-// both take this as an injected multiplier to avoid a circular import back into
-// this hud module)
+// summed across every corporation plus the market-value/market-influence
+// modifiers — the actual global income boost applied to every floor of every
+// building of every company (see totalIncome.ts's
+// startTotalIncomeTicker/gameState.ts's computeIdleIncome, both take this as
+// an injected multiplier to avoid a circular import back into this hud module)
 export function getGlobalIncomeBoostPercent(): number {
   const count = getCorporationCount();
-  let total = getMarketValueContributionPercent();
+  let total = getMarketValueContributionPercent() + getMarketInfluencePercent();
   for (let i = 0; i < count; i++) total += getStockContributionPercent(i);
   return total;
 }
@@ -309,6 +348,13 @@ export function wireCorporationBoostMenu(
         <span>${formatBoostPercent(marketValuePct)}</span>
       </div>
     `;
+    const marketInfluencePct = getMarketInfluencePercent();
+    const marketInfluenceRow = `
+      <div class="worker-menu__modifier-row">
+        <span>Market influence</span>
+        <span>${formatBoostPercent(marketInfluencePct)}</span>
+      </div>
+    `;
     const totalPct = getGlobalIncomeBoostPercent();
     const pressConferenceCost = getPressConferenceCost();
     const pressConferenceAffordable =
@@ -336,6 +382,7 @@ export function wireCorporationBoostMenu(
       <span class="worker-menu__total-income">${formatTotalIncomeFull(getAllCompaniesTotalIncome())}</span>
       <h3 class="worker-menu__subheader">Stock price income modifiers</h3>
       ${marketValueRow}
+      ${marketInfluenceRow}
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
         <span>Total</span>
