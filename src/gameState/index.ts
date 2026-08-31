@@ -166,7 +166,10 @@ export function markAppClosed(): void {
 // lastCollectedAt is left completely untouched — incomePanel.ts's fill-bar progress
 // is computed straight from lastCollectedAt, so touching it on a quick refresh would
 // silently discard however far into its current cycle a floor already was.
-export function computeIdleIncome(buildings: Floor[][]): number {
+export function computeIdleIncome(
+  buildings: Floor[][],
+  incomeBoostMultiplier = 1,
+): number {
   let lastClose: number | null = null;
   try {
     const raw = localStorage.getItem(LAST_CLOSE_KEY);
@@ -187,13 +190,28 @@ export function computeIdleIncome(buildings: Floor[][]): number {
     for (const floor of floors) {
       if (!floor.unlocked) continue;
       const ratePerSecond = floor.incomeAmount / floor.incomeIntervalSeconds;
-      idleIncome += ratePerSecond * elapsedSeconds;
+      idleIncome += ratePerSecond * elapsedSeconds * incomeBoostMultiplier;
       // this whole idle span was just paid out in one lump sum, so the floor's next
       // cycle correctly starts fresh from right now
       floor.lastCollectedAt = now;
     }
   }
   return idleIncome;
+}
+
+// $/sec every unlocked floor across every one of a company's buildings is
+// currently earning, ignoring any boost in effect — same convention this file's
+// own computeIdleIncome (and hud/boostMenu.ts's currentIncomePerSecond) use.
+// Shared so totalIncome.ts/corporationBoostMenu.ts don't each reimplement it
+export function getBuildingsIncomePerSecond(buildings: Floor[][]): number {
+  let total = 0;
+  for (const floors of buildings) {
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      total += floor.incomeAmount / floor.incomeIntervalSeconds;
+    }
+  }
+  return total;
 }
 
 interface SavedFloor {

@@ -1,4 +1,9 @@
-import { animateDialogClose, formatPrice } from "../../utils";
+import {
+  animateDialogClose,
+  formatPrice,
+  formatTotalIncome,
+} from "../../utils";
+import { getAllCompaniesTotalIncome } from "../../totalIncome";
 import { playSwoosh } from "../../sound";
 import coinIconUrl from "../../assets/coin.png";
 
@@ -14,6 +19,8 @@ export function createCompanySelectMenuMarkup(): string {
           <h2>Corporation Upgrades</h2>
         </div>
         <div class="worker-menu__list">
+          <h3 class="worker-menu__subheader">Corporation assets</h3>
+          <span class="worker-menu__total-income" id="company-select-menu-total-income"></span>
           <button class="worker-menu__item" id="create-new-corporation">
             <span class="worker-menu__item-label">
               <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
@@ -53,9 +60,15 @@ export function wireCompanySelectMenu(
   const priceLabel = container.querySelector<HTMLSpanElement>(
     "#create-new-corporation-price",
   )!;
+  const totalIncomeLabel = container.querySelector<HTMLSpanElement>(
+    "#company-select-menu-total-income",
+  )!;
 
   function render(): void {
     priceLabel.textContent = formatPrice(getCorporationPrice());
+    totalIncomeLabel.textContent = formatTotalIncome(
+      getAllCompaniesTotalIncome(),
+    );
   }
 
   createButton.addEventListener("click", () => {

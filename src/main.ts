@@ -12,6 +12,7 @@ import {
 import {
   startTotalIncomeTicker,
   switchActiveCompany,
+  spendFromAllCompanies,
   addTotalIncome,
   spendTotalIncome,
   getTotalIncome,
@@ -46,6 +47,9 @@ import {
   wireCompanySelectMenu,
   createBoostMenuMarkup,
   wireBoostMenu,
+  createCorporationBoostMenuMarkup,
+  wireCorporationBoostMenu,
+  getGlobalIncomeBoostMultiplier,
   createMapMenuMarkup,
   wireMapMenu,
   createPopupMarkup,
@@ -86,6 +90,7 @@ async function main() {
     ${createUpgradeMenuMarkup()}
     ${createCompanySelectMenuMarkup()}
     ${createBoostMenuMarkup()}
+    ${createCorporationBoostMenuMarkup()}
     ${createMapMenuMarkup()}
     ${createPopupMarkup()}
   `;
@@ -268,7 +273,7 @@ async function main() {
     app,
     getCorporationPrice,
     () => {
-      if (!spendTotalIncome(getCorporationPrice())) return;
+      if (!spendFromAllCompanies(getCorporationPrice())) return;
       createNewCorporation();
       companySelectMenu.close();
     },
@@ -279,6 +284,7 @@ async function main() {
     () => persist(),
     (floor) => gameCanvas.scrollActiveToFloor(floor),
   );
+  const corporationBoostMenu = wireCorporationBoostMenu(app);
   // buys the next building outright if affordable (see buildings.ts's
   // getBuildingPrice, which scales 1000x per building same as its economy); returns
   // whether it succeeded so the map menu can decide whether to re-render
@@ -343,7 +349,8 @@ async function main() {
       else gameCanvas.scrollActiveToBottom();
     },
     onBoostAll: () => {
-      boostMenu.open();
+      if (mapOpen) corporationBoostMenu.open();
+      else boostMenu.open();
     },
     onOpenUpgradeMenu: () => {
       if (mapOpen) companySelectMenu.open();
@@ -358,7 +365,10 @@ async function main() {
   buildings.forEach((_, i) => setupBuilding(i));
   persist();
 
-  const idleIncome = computeIdleIncome(buildings);
+  const idleIncome = computeIdleIncome(
+    buildings,
+    getGlobalIncomeBoostMultiplier(),
+  );
   // saveBuildings directly (not the debounced persist()): computeIdleIncome advances
   // every floor's lastCollectedAt in memory, and that must land before a second quick
   // reload could otherwise re-collect the same already-paid-out idle time
@@ -377,7 +387,7 @@ async function main() {
   startIncomeTicker(() => {
     if (!mapOpen) gameCanvas.redraw();
   });
-  startTotalIncomeTicker(buildings);
+  startTotalIncomeTicker(buildings, getGlobalIncomeBoostMultiplier);
 
   // markAppClosed stamps "now" as the single source of truth computeIdleIncome reads
   // next load — saveBuildings also runs here so the freshest floor state (workerCount,

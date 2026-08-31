@@ -90,6 +90,12 @@ export {
   applyBoostAll,
 } from "./boostMenu";
 export type { BoostMenu } from "./boostMenu";
+export {
+  createCorporationBoostMenuMarkup,
+  wireCorporationBoostMenu,
+  getGlobalIncomeBoostMultiplier,
+} from "./corporationBoostMenu";
+export type { CorporationBoostMenu } from "./corporationBoostMenu";
 export { createMapMenuMarkup, wireMapMenu } from "./mapMenu";
 export type { MapMenu } from "./mapMenu";
 export { createPopupMarkup, showIdlePopup } from "./popup";
