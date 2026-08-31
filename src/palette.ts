@@ -59,6 +59,11 @@ export const COLOR = {
   woodRing: "#FAF2DD",
   woodText: "#3A2A18",
 
+  // press-conference stage floor riser — soft, close to audience.png's own
+  // cream floor/warm wood-trim tones instead of the high-contrast wood* set
+  stageFloorLight: "#EDE6D8",
+  stageFloorDark: "#D8C7A8",
+
   // page chrome
   pageBg: "#111417",
   pageText: "#F5F5F5",

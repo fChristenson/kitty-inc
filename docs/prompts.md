@@ -58,3 +58,11 @@ Flat 2D cartoon character sheet, 5 evenly spaced frames in one row, chubby cream
 
 Flat 2D cartoon audience of cats, seen from behind, seated in evenly spaced rows, varied fur colors and simple outfits, all heads turned forward facing an off-frame podium speaker. Cel-shaded flat colors, thick bold dark outlines, soft semi-realistic anime background style matching the game's muted pastel interiors. Small chunky bodies, simple round ears, tails curled at their sides, no visible faces. No text, no logos, no watermarks. Edge-to-edge crop, wide 16:9 aspect ratio
 
+# Presentation stage backdrop (sales graph)
+
+Flat 2D cartoon presentation stage backdrop, straight-on, no perspective. Wide screen mounted on a stand, displaying a simple upward-trending line graph with a few plotted points, thick bold outlines. Soft semi-realistic anime background style, muted pastel colors matching the game's interiors, warm stage curtains framing each side. Cel-shaded flat lighting, subtle shadow beneath the stand. No text, no logos, no watermarks, no people. Edge-to-edge crop, wide 16:9 aspect ratio
+
+# Stage floor riser (podium platform, 3/4 view)
+
+Flat 2D cartoon stage floor platform, angled 3/4 view, matching the presentation stage backdrop's warm wood tones and curtain-framed staging. Low rectangular riser with a flat top surface wide enough for a single standing character, front-facing panel showing simple wood-plank grain, thick dark-brown outline. Cel-shaded: flat light highlight across the top surface, flat darker shade on the front-facing panel, soft contact shadow where the top meets the front edge. No text, no logos, no watermarks, no people or animals standing on it. Isolated on plain transparent background, edge-to-edge crop, wide aspect ratio
+

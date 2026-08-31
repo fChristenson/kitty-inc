@@ -48,7 +48,11 @@ const FLAP_RAMP_DURATION_MS = 150;
 // runners use instead of actually moving the head across a finite canvas
 const SCROLL_SPEED_PX_S = 160;
 const GRID_CELL_PX = 48;
-const HEAD_X_FRACTION = 0.28;
+// the head's own fixed x, this many px left of the canvas's own horizontal center
+const HEAD_X_OFFSET_FROM_CENTER = 40;
+// how far above vertical mid-canvas the head/tail start each round (see
+// freshState/open)
+const HEAD_START_Y_LIFT_PX = 100;
 // one trail point per this many px of world scroll — independent of frame rate,
 // so the line's shape looks the same on any refresh rate
 const TRAIL_SAMPLE_DX = 6;
@@ -208,13 +212,19 @@ const PODIUM_SWITCH_MAX_MS = 900;
 // art. Drawn stretched edge-to-edge across the bottom of the canvas, behind
 // everything else, so it reads as the crowd the podium cat is speaking to
 // (see drawAudience for how its height is derived from cssW)
-const AUDIENCE_Y_OFFSET = 200;
+const AUDIENCE_Y_OFFSET = 120;
 // how far above the audience image's own top edge the podium cat and the
 // timer/score sit (see getAudienceTopY)
-const LABEL_ABOVE_AUDIENCE_OFFSET = 40;
+const LABEL_ABOVE_AUDIENCE_OFFSET = 10;
 // same 40px gap the budget label always sat above the timer/score, before
 // any of this audience-image anchoring existed (see render)
 const BUDGET_ABOVE_SCORE_OFFSET = 40;
+// extra nudge applied only to the timer/budget labels (see render), on top of
+// LABEL_ABOVE_AUDIENCE_OFFSET's shared podium alignment
+const SCORE_LABELS_EXTRA_LIFT_PX = 20;
+// height of the gradient stage-floor strip the podium cat stands on (see
+// drawFloor), sitting right at the podium's own bottom edge
+const FLOOR_H = 20;
 
 interface MarketEvent {
   text: string;
@@ -385,11 +395,11 @@ export function wirePressConferenceGame(
     const width = ctx.measureText(text).width;
     const topMargin = 30;
     const bottomMargin = SALES_BTN_H + SALES_BTN_BOTTOM_MARGIN + 30;
-    // never below the audience image's own top edge either, whichever bound
-    // is more restrictive
+    // never below the floor's own top edge either, whichever bound is more
+    // restrictive — the graph itself can no longer reach past that point
     const maxY = Math.min(
       cssH - bottomMargin,
-      getAudienceTopY() - EVENT_HIT_HEIGHT / 2,
+      getFloorTopY() - EVENT_HIT_HEIGHT / 2,
     );
     const y = topMargin + Math.random() * Math.max(1, maxY - topMargin);
     state.marketEvents.push({
@@ -403,7 +413,7 @@ export function wirePressConferenceGame(
   }
 
   function freshState(): GameState {
-    const startY = cssH / 2 || 200;
+    const startY = (cssH / 2 || 200) - HEAD_START_Y_LIFT_PX;
     return {
       headY: startY,
       velocityY: 0,
@@ -518,6 +528,29 @@ export function wirePressConferenceGame(
     return cssH - renderH + AUDIENCE_Y_OFFSET;
   }
 
+  // top edge of the floor riser (see drawFloor) — the graph's own head/line
+  // and the grid now both stop here instead of at the audience's top edge,
+  // so the floor reads as solid ground rather than something the line could
+  // pass through
+  function getFloorTopY(): number {
+    return getAudienceTopY() - FLOOR_H;
+  }
+
+  // width-spanning riser the podium cat stands on, its bottom edge pinned to
+  // the same y the podium sprite's own bottom sits (see getPodiumRect) so the
+  // cat's feet always line up with the floor regardless of canvas size. A
+  // vertical gradient (light top edge to dark front face) reads as a raised
+  // platform instead of a flat painted stripe
+  function drawFloor(): void {
+    const bottom = getAudienceTopY();
+    const top = getFloorTopY();
+    const gradient = ctx.createLinearGradient(0, top, 0, bottom);
+    gradient.addColorStop(0, COLOR.stageFloorLight);
+    gradient.addColorStop(1, COLOR.stageFloorDark);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, top, cssW, FLOOR_H);
+  }
+
   // stretched edge-to-edge across the bottom of the canvas, behind everything
   // else drawn on top of it (grid/line/head/events/podium) — width always
   // spans cssW, but height is derived from the sprite's own natural aspect
@@ -532,10 +565,11 @@ export function wirePressConferenceGame(
     ctx.drawImage(audienceSprite, 0, getAudienceTopY(), cssW, renderH);
   }
 
-  // stops at the audience image's own top edge instead of the canvas bottom,
-  // so the semi-transparent grid lines never wash out/dim the crowd art
+  // stops at the floor's own top edge instead of the audience/canvas bottom,
+  // so the semi-transparent grid lines never show through underneath the
+  // opaque floor riser drawn on top of it (see render's own draw order)
   function drawGrid(headX: number): void {
-    const gridBottom = getAudienceTopY();
+    const gridBottom = getFloorTopY();
     ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
     ctx.lineWidth = 1;
     const scrollOffset = state.worldX % GRID_CELL_PX;
@@ -797,10 +831,10 @@ export function wirePressConferenceGame(
       state.trail.splice(0, state.trail.length - maxTrailLength);
     }
 
-    // the bottom bound is the audience image's own top edge, not the canvas
-    // bottom — reaching the crowd ends the round the same way hitting the
-    // top of the screen does
-    const bottomBound = getAudienceTopY();
+    // the bottom bound is the floor riser's own top edge, not the audience or
+    // canvas bottom — reaching the floor ends the round the same way hitting
+    // the top of the screen does
+    const bottomBound = getFloorTopY();
     if (state.headY <= 0 || state.headY >= bottomBound) {
       state.headY = Math.max(0, Math.min(bottomBound, state.headY));
       endRound();
@@ -835,7 +869,7 @@ export function wirePressConferenceGame(
       spawnMarketEvent();
       state.nextEventInMs = randomEventDelayMs(getDifficultyTier());
     }
-    const headX = cssW * HEAD_X_FRACTION;
+    const headX = cssW / 2 - HEAD_X_OFFSET_FROM_CENTER;
     const eventSpeed =
       SCROLL_SPEED_PX_S * EVENT_SPEED_GROWTH_PER_TIER ** getDifficultyTier();
     for (let i = state.marketEvents.length - 1; i >= 0; i--) {
@@ -876,9 +910,10 @@ export function wirePressConferenceGame(
     const shake = getScreenShakeOffset(Date.now());
     ctx.save();
     ctx.translate(shake.x, shake.y);
-    const headX = cssW * HEAD_X_FRACTION;
+    const headX = cssW / 2 - HEAD_X_OFFSET_FROM_CENTER;
     drawAudience();
     drawGrid(headX);
+    drawFloor();
     drawMarketEvents(now);
     drawLine(headX);
     drawHead(headX);
@@ -895,7 +930,10 @@ export function wirePressConferenceGame(
     // still sits its own BUDGET_ABOVE_SCORE_OFFSET further above that, same as
     // it always sat above the timer
     const scoreBottomPx =
-      cssH - getAudienceTopY() + LABEL_ABOVE_AUDIENCE_OFFSET;
+      cssH -
+      getAudienceTopY() +
+      LABEL_ABOVE_AUDIENCE_OFFSET +
+      SCORE_LABELS_EXTRA_LIFT_PX;
     scoreEl.style.bottom = `${scoreBottomPx}px`;
     budgetEl.style.bottom = `${scoreBottomPx + BUDGET_ABOVE_SCORE_OFFSET}px`;
     budgetValueEl.textContent = formatPrice(
@@ -933,8 +971,8 @@ export function wirePressConferenceGame(
     screen.hidden = false;
     playSwoosh();
     resize();
-    state.headY = cssH / 2;
-    state.tailY = cssH / 2;
+    state.headY = cssH / 2 - HEAD_START_Y_LIFT_PX;
+    state.tailY = cssH / 2 - HEAD_START_Y_LIFT_PX;
     // a full flat line behind the head from frame one, instead of one that only
     // grows in (and so sits bunched up right under the head) over the first
     // couple seconds of play
