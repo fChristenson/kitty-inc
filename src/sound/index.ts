@@ -7,12 +7,6 @@ import explosionUrl from "../assets/sound/explosion.mp3";
 
 const MUSIC_VOLUME = 0.4;
 const SFX_VOLUME = 0.9;
-// how much quieter the background music gets while a crit explosion plays (see
-// playExplosion) — one less full-volume audio stream mixed in during the loudest
-// moment (explosion + rapid coin drops together), so the combination doesn't clip
-const MUSIC_DUCK_VOLUME = 0.12;
-const MUSIC_DUCK_MS = 900;
-let musicDuckTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 // a single click can hit several overlapping cats, or a cat and the mouse, in the
 // same synchronous call stack (see gameCanvas.ts's onPointerUp) — this window
@@ -35,6 +29,14 @@ let lastCoinDropPlayTime = 0;
 // playing, that's what actually overloaded into noise, not any one sound alone
 const EXPLOSION_DEBOUNCE_MS = 800;
 let lastExplosionPlayTime = 0;
+
+// any press-and-hold-driven purchase loop (corporationBoostMenu's stock-raise
+// hold, etc.) can call this many times a second — without a debounce, each of
+// those spawns its own Audio instance; the browser doesn't drop the excess, it
+// queues/staggers starting them, so sound kept audibly playing catch-up well
+// after the hold had already stopped instead of just being skipped
+const SOLD_DEBOUNCE_MS = 60;
+let lastSoldPlayTime = 0;
 
 let music: HTMLAudioElement | null = null;
 
@@ -86,8 +88,13 @@ export function playSwoosh(): void {
 
 // one-shot sound effect for a successful purchase — buying a worker, a boost, or
 // the next building on the map. sold.mp3 has a long quiet lead-in, so this skips
-// the first 0.5s and starts playback right where the actual "sold" sound begins
+// the first 0.5s and starts playback right where the actual "sold" sound begins.
+// Debounced (see SOLD_DEBOUNCE_MS) so a press-and-hold purchase loop drops excess
+// plays instead of queuing a backlog that keeps audibly firing after the hold ends
 export function playSold(): void {
+  const now = Date.now();
+  if (now - lastSoldPlayTime < SOLD_DEBOUNCE_MS) return;
+  lastSoldPlayTime = now;
   const sfx = new Audio(soldUrl);
   sfx.volume = SFX_VOLUME;
   sfx.currentTime = 0.5;
@@ -108,15 +115,6 @@ export function playExplosion(): void {
   sfx.volume = SFX_VOLUME;
   sfx.currentTime = 0.04;
   sfx.play().catch(() => {});
-
-  if (music) {
-    music.volume = MUSIC_DUCK_VOLUME;
-    if (musicDuckTimeoutId !== null) clearTimeout(musicDuckTimeoutId);
-    musicDuckTimeoutId = setTimeout(() => {
-      if (music) music.volume = MUSIC_VOLUME;
-      musicDuckTimeoutId = null;
-    }, MUSIC_DUCK_MS);
-  }
 }
 
 // one-shot sound effect for clicking a cat or the mouse, and for hitting the

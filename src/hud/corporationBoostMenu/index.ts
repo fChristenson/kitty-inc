@@ -6,7 +6,6 @@ import {
 import {
   formatPrice,
   formatTotalIncomeFull,
-  triggerButtonPress,
   animateDialogClose,
 } from "../../utils";
 import {
@@ -255,19 +254,71 @@ export function wireCorporationBoostMenu(
     `;
   }
 
-  list.addEventListener("click", async (event) => {
+  // press-and-hold auto-repeat (same interval/speed-up timing as gameCanvas.ts's
+  // upgrade button): pointerdown buys once immediately and starts repeating;
+  // pointerup/leave/cancel anywhere stops it. Tracks by company INDEX, not the
+  // button element itself, since every render() call replaces every button node
+  const STOCK_HOLD_INTERVAL_MS = 100;
+  const STOCK_HOLD_FAST_AFTER_MS = 5000;
+  const STOCK_HOLD_FAST_MULTIPLIER = 5;
+  let heldCompanyIndex: number | null = null;
+  let holdStartTime = 0;
+  let holdTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  function stopHold(): void {
+    heldCompanyIndex = null;
+    if (holdTimeoutId !== null) {
+      clearTimeout(holdTimeoutId);
+      holdTimeoutId = null;
+    }
+  }
+
+  // one purchase attempt; stops the hold once it's no longer affordable so it
+  // doesn't just spin uselessly against a purchase that can never succeed.
+  // Renders immediately (not gated behind awaiting the button's own press-bounce
+  // animation) — during a fast hold, back-to-back calls kept re-triggering that
+  // same animation on the same button before the previous one's "animationend"
+  // ever fired, so the awaited render() after it never actually ran, and the
+  // displayed cost/price/percentages all looked frozen for as long as the hold
+  // continued
+  function fireStockRaise(companyIndex: number): void {
+    if (!buyStockRaise(companyIndex)) {
+      stopHold();
+      return;
+    }
+    playSold();
+    render();
+  }
+
+  // self-rescheduling (not setInterval) so the delay can change mid-hold once the
+  // press crosses STOCK_HOLD_FAST_AFTER_MS
+  function scheduleHoldRepeat(companyIndex: number): void {
+    const heldMs = performance.now() - holdStartTime;
+    const delay =
+      heldMs >= STOCK_HOLD_FAST_AFTER_MS
+        ? STOCK_HOLD_INTERVAL_MS / STOCK_HOLD_FAST_MULTIPLIER
+        : STOCK_HOLD_INTERVAL_MS;
+    holdTimeoutId = setTimeout(() => {
+      if (heldCompanyIndex !== companyIndex) return; // hold already stopped
+      fireStockRaise(companyIndex);
+      scheduleHoldRepeat(companyIndex);
+    }, delay);
+  }
+
+  list.addEventListener("pointerdown", (event) => {
     const target = event.target as HTMLElement;
     const button = target.closest<HTMLButtonElement>(
       "button[data-company-index]",
     );
-    if (!button) return;
+    if (!button || button.disabled) return;
     const companyIndex = Number(button.dataset.companyIndex);
-    if (buyStockRaise(companyIndex)) {
-      playSold();
-      await triggerButtonPress(button);
-      render();
-    }
+    heldCompanyIndex = companyIndex;
+    holdStartTime = performance.now();
+    fireStockRaise(companyIndex);
+    scheduleHoldRepeat(companyIndex);
   });
+  window.addEventListener("pointerup", stopHold);
+  window.addEventListener("pointercancel", stopHold);
 
   // re-checks affordability while the menu sits open, same as boostMenu.ts's own
   // updateAffordability, so a grayed-out item turns clickable again as soon as
@@ -293,6 +344,7 @@ export function wireCorporationBoostMenu(
   }
 
   async function close(): Promise<void> {
+    stopHold();
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;

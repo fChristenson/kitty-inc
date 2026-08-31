@@ -45,6 +45,23 @@ export function animateDialogClose(panel: HTMLElement): Promise<void> {
   });
 }
 
+// keeps --worker-menu-safe-bottom (used by style.css's .worker-menu__panel) in
+// sync with the real, currently-rendered distance from the action bar's own top
+// edge down to the bottom of the viewport — not a guessed fixed height, since
+// that distance actually varies: dev builds stack an extra test-actions-bar
+// underneath the real one, production doesn't, and mobile adds its own safe-area
+// inset on top of either. Call once from main.ts with the action bar element
+export function observeActionBarHeight(actionBar: HTMLElement): void {
+  const root = document.documentElement;
+  function update(): void {
+    const reserved = window.innerHeight - actionBar.getBoundingClientRect().top;
+    root.style.setProperty("--worker-menu-safe-bottom", `${reserved}px`);
+  }
+  update();
+  new ResizeObserver(update).observe(actionBar);
+  window.addEventListener("resize", update);
+}
+
 // short-scale "-illion" suffixes, generated algorithmically instead of from a
 // hand-maintained list — a fixed list always eventually runs out (city prices
 // climb 1000x per building, see buildings.ts, so a handful of cities in blows

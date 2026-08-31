@@ -73,6 +73,7 @@ import {
 import { loadMouseImage, forceSpawnMouse } from "./mouse";
 import { startBackgroundMusic, playSwoosh } from "./sound";
 import { createNewCorporation, getCorporationPrice } from "./corporationName";
+import { observeActionBarHeight } from "./utils";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -97,6 +98,7 @@ async function main() {
 
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
   const cityMapEl = app.querySelector<HTMLDivElement>("#city-map")!;
+  observeActionBarHeight(app.querySelector<HTMLDivElement>("#action-bar")!);
 
   // canvas text doesn't re-render on its own once a web font finishes loading (unlike
   // DOM text), so every weight the canvas draws with must be loaded before the first
