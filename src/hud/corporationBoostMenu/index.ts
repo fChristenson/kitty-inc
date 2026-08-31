@@ -212,7 +212,7 @@ function getCompanyValue(companyIndex: number): number {
   return (
     getBuildingsValue(buildings.length) +
     getUpgradesValue(buildings) +
-    getStoredTotalIncome(companyIndex)
+    getStoredTotalIncome(companyIndex, buildings)
   );
 }
 

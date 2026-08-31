@@ -17,11 +17,19 @@ export function getTotalIncome(): number {
 // earned by now if it had kept ticking (see getProjectedUncollectedIncome) — so
 // every company keeps making money regardless of which one is currently
 // selected, even though only the active one's buildings are actually loaded/
-// ticked in memory at once (see company.ts)
-export function getStoredTotalIncome(companyIndex: number): number {
+// ticked in memory at once (see company.ts). `buildings`, when the caller
+// already has it loaded (see getCompanyWealth/corporationBoostMenu's
+// getCompanyValue), skips this function's own redundant loadBuildings call —
+// callers computing several per-company values in a row were each separately
+// re-reading + re-parsing the same company's localStorage entry
+export function getStoredTotalIncome(
+  companyIndex: number,
+  buildings?: Floor[][],
+): number {
   if (companyIndex === activeCompanyIndex) return totalIncome;
   return (
-    loadStoredTotal(companyIndex) + getProjectedUncollectedIncome(companyIndex)
+    loadStoredTotal(companyIndex) +
+    getProjectedUncollectedIncome(companyIndex, buildings)
   );
 }
 
@@ -31,8 +39,11 @@ export function getStoredTotalIncome(companyIndex: number): number {
 // Never persisted itself: switching to this company later runs the real
 // collectDueIncome against these same floors, crediting the identical amount for
 // real at that point, so nothing here ever gets double-counted
-function getProjectedUncollectedIncome(companyIndex: number): number {
-  const buildings = loadBuildings(companyIndex);
+function getProjectedUncollectedIncome(
+  companyIndex: number,
+  buildingsOverride?: Floor[][],
+): number {
+  const buildings = buildingsOverride ?? loadBuildings(companyIndex);
   const now = Date.now();
   let total = 0;
   for (const floors of buildings) {
@@ -105,16 +116,20 @@ export function getBuildingsCurrentIncomePerSecond(
 // biggest pile sitting still). Reads the active company's own LIVE buildings
 // (freshest) and every other company's persisted ones (see corporationBoostMenu's
 // getStockRaiseCost, same read-only-for-inactive-companies approach)
-function getCompanyWealth(companyIndex: number): number {
-  const buildings =
-    companyIndex === activeCompanyIndex
+function getCompanyWealth(companyIndex: number, buildings?: Floor[][]): number {
+  const resolvedBuildings =
+    buildings ??
+    (companyIndex === activeCompanyIndex
       ? tickerBuildings
-      : loadBuildings(companyIndex);
+      : loadBuildings(companyIndex));
   const ratePerSecond = getBuildingsCurrentIncomePerSecond(
-    buildings,
+    resolvedBuildings,
     Date.now(),
   );
-  return getStoredTotalIncome(companyIndex) + ratePerSecond * SECONDS_PER_HOUR;
+  return (
+    getStoredTotalIncome(companyIndex, resolvedBuildings) +
+    ratePerSecond * SECONDS_PER_HOUR
+  );
 }
 
 const SECONDS_PER_HOUR = 3600;
@@ -134,12 +149,22 @@ const SECONDS_PER_HOUR = 3600;
 // combined total across every company can't cover cost at all
 export function spendFromAllCompanies(cost: number): boolean {
   const count = getCorporationCount();
+  // loaded once per company and reused for both totals/weights below — each of
+  // getStoredTotalIncome/getCompanyWealth used to separately re-loadBuildings
+  // the same company, tripling the localStorage reads/JSON.parse work every
+  // purchase (stock raise, press conference, new company) once there were a
+  // few companies
+  const buildingsByCompany = Array.from({ length: count }, (_, i) =>
+    i === activeCompanyIndex ? tickerBuildings : loadBuildings(i),
+  );
   const totals = Array.from({ length: count }, (_, i) =>
-    getStoredTotalIncome(i),
+    getStoredTotalIncome(i, buildingsByCompany[i]),
   );
   if (totals.reduce((sum, total) => sum + total, 0) < cost) return false;
 
-  const weights = Array.from({ length: count }, (_, i) => getCompanyWealth(i));
+  const weights = Array.from({ length: count }, (_, i) =>
+    getCompanyWealth(i, buildingsByCompany[i]),
+  );
   const paid = new Array(count).fill(0);
   const active = new Set(Array.from({ length: count }, (_, i) => i));
   let unallocated = cost;
