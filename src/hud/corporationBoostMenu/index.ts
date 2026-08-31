@@ -19,14 +19,16 @@ import { getBuildingPrice } from "../../buildings";
 import { companyStorageKey } from "../../company";
 import { playSwoosh, playSold } from "../../sound";
 
-// each corporation's own "stock price", starting at $1 and going up $1 per
-// purchase — separate from (and never affecting) its totalIncome/buildings
+// each corporation's own purchased "shares" — starts at 1 and goes up 1 per
+// purchase, separate from (and never affecting) its totalIncome/buildings. The
+// DISPLAYED/effective stock price (see getStockPrice below) is these shares
+// diluted by how much the company has grown since, not this raw count itself
 const STOCK_PRICE_KEY = "cash-clicker:stock-price";
 const STOCK_PRICE_BASE = 1;
 const STOCK_PRICE_STEP = 1;
 const SECONDS_PER_HOUR = 3600;
 
-function loadStockPrice(companyIndex: number): number {
+function loadStockShares(companyIndex: number): number {
   try {
     const raw = localStorage.getItem(
       companyStorageKey(STOCK_PRICE_KEY, companyIndex),
@@ -38,7 +40,7 @@ function loadStockPrice(companyIndex: number): number {
   }
 }
 
-function saveStockPrice(companyIndex: number, value: number): void {
+function saveStockShares(companyIndex: number, value: number): void {
   try {
     localStorage.setItem(
       companyStorageKey(STOCK_PRICE_KEY, companyIndex),
@@ -49,27 +51,40 @@ function saveStockPrice(companyIndex: number, value: number): void {
   }
 }
 
+// the stock price actually shown/used everywhere (menu display, boost formula):
+// raw purchased shares diluted by log10 of the company's own current value, so
+// buying cheap while a company is small doesn't just compound into a permanently
+// bigger price/boost forever as that same company grows huge afterward — it
+// balances back out, the same way real share dilution works. log10 (not the raw
+// value) so this stays a gentle, gradual drop rather than crushing the price to
+// nothing the instant a company's value gets big — floored at $1 so dilution
+// alone can never push it below its own starting price
 export function getStockPrice(companyIndex: number): number {
-  return loadStockPrice(companyIndex);
+  const shares = loadStockShares(companyIndex);
+  const companyValue = Math.max(10, getCompanyValue(companyIndex));
+  return Math.max(STOCK_PRICE_BASE, shares / Math.log10(companyValue));
 }
 
 // $ cost to raise a company's stock price once: its own total income over a full
 // hour at its current rate, doubled for every time it's already been bought (so
 // the very first raise costs 1x that hourly income, the next 2x, then 4x, ...)
 export function getStockRaiseCost(companyIndex: number): number {
-  const timesBought = loadStockPrice(companyIndex) - STOCK_PRICE_BASE;
+  const timesBought = loadStockShares(companyIndex) - STOCK_PRICE_BASE;
   const baseCost =
     getBuildingsIncomePerSecond(loadBuildings(companyIndex)) * SECONDS_PER_HOUR;
   return baseCost * 2 ** timesBought;
 }
 
-// raises companyIndex's stock price by STOCK_PRICE_STEP if affordable — spent
-// proportionally from every corporation's own combined funds (see
+// raises companyIndex's purchased shares by STOCK_PRICE_STEP if affordable —
+// spent proportionally from every corporation's own combined funds (see
 // totalIncome.ts's spendFromAllCompanies), not just the currently active one.
 // Returns whether it succeeded
 export function buyStockRaise(companyIndex: number): boolean {
   if (!spendFromAllCompanies(getStockRaiseCost(companyIndex))) return false;
-  saveStockPrice(companyIndex, loadStockPrice(companyIndex) + STOCK_PRICE_STEP);
+  saveStockShares(
+    companyIndex,
+    loadStockShares(companyIndex) + STOCK_PRICE_STEP,
+  );
   return true;
 }
 
@@ -108,21 +123,18 @@ function getCompanyValue(companyIndex: number): number {
 }
 
 // how much a company's stock price contributes to the combined income boost.
-// Both stockPrice and companyValue can each individually grow huge (companyValue
-// into illion-scale territory late-game, stockPrice from repeated purchases), so
-// BOTH are log10'd before combining — turning "10 orders of magnitude bigger"
-// into "10 points bigger" for each — then scaled down by a small flat rate,
-// keeping the result comfortably in single/low-double-digit percent territory no
-// matter how astronomical the underlying numbers get (never needing scientific
-// notation to display)
-const STOCK_CONTRIBUTION_RATE = 0.01;
+// stockPrice is already dilution-tempered (see getStockPrice above), so it's
+// used directly here — logging it AGAIN on top of that flattened purchases out
+// to almost nothing (buying many more shares barely moved the modifier). Only
+// companyValue still needs its own log10: it alone can reach illion-scale late
+// game, so "10 orders of magnitude bigger" becomes "10 points bigger" instead of
+// blowing the percentage up to something needing scientific notation
+const STOCK_CONTRIBUTION_RATE = 0.1;
 
 function getStockContributionPercent(companyIndex: number): number {
-  const stockPrice = Math.max(2, getStockPrice(companyIndex));
+  const stockPrice = getStockPrice(companyIndex);
   const companyValue = Math.max(10, getCompanyValue(companyIndex));
-  return (
-    Math.log10(stockPrice) * Math.log10(companyValue) * STOCK_CONTRIBUTION_RATE
-  );
+  return stockPrice * Math.log10(companyValue) * STOCK_CONTRIBUTION_RATE;
 }
 
 // summed across every corporation — the actual global income boost applied to
@@ -144,6 +156,12 @@ export function getGlobalIncomeBoostMultiplier(): number {
 // fixed-point since getStockContributionPercent now keeps this comfortably small
 function formatBoostPercent(percent: number): string {
   return `+${percent.toFixed(2)}%`;
+}
+
+// $N.NN — getStockPrice is diluted (see above) and can land well under $1, so
+// formatPrice's whole-dollar rounding would just show "$0"; this keeps cents
+function formatStockPrice(price: number): string {
+  return `$${Math.max(0, price).toFixed(2)}`;
 }
 
 // reuses .worker-menu's styling — a dialog listing every corporation's own
@@ -203,7 +221,7 @@ export function wireCorporationBoostMenu(
           ${affordable ? "" : "disabled"}
         >
           <span class="worker-menu__item-label">
-            ${getCorporationName(i)} (${formatPrice(getStockPrice(i))})
+            ${getCorporationName(i)} (${formatStockPrice(getStockPrice(i))})
           </span>
           <span class="worker-menu__price">${formatPrice(cost)}</span>
         </button>

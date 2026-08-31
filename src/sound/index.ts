@@ -7,12 +7,34 @@ import explosionUrl from "../assets/sound/explosion.mp3";
 
 const MUSIC_VOLUME = 0.4;
 const SFX_VOLUME = 0.9;
+// how much quieter the background music gets while a crit explosion plays (see
+// playExplosion) — one less full-volume audio stream mixed in during the loudest
+// moment (explosion + rapid coin drops together), so the combination doesn't clip
+const MUSIC_DUCK_VOLUME = 0.12;
+const MUSIC_DUCK_MS = 900;
+let musicDuckTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
 // a single click can hit several overlapping cats, or a cat and the mouse, in the
 // same synchronous call stack (see gameCanvas.ts's onPointerUp) — this window
 // collapses all of those into one play instead of one per target hit
 const BLOOP_DEBOUNCE_MS = 50;
 let lastBloopPlayTime = 0;
+
+// the upgrade button's press-and-hold auto-repeat can re-fire every 20ms once
+// sped up (see gameCanvas.ts's UPGRADE_HOLD_FAST_MULTIPLIER), and every one of
+// those clicks calls playCoinDrop — without this debounce, a held Sale-boosted
+// click spammed dozens of overlapping fresh Audio instances per second, which is
+// what was actually clipping/distorting into "awful noise", not a single sound
+// itself being too loud
+const COIN_DROP_DEBOUNCE_MS = 60;
+let lastCoinDropPlayTime = 0;
+
+// crit can re-roll on every click too (rollCritUpgrade), so the same fast-held
+// Sale click could otherwise fire a fresh full explosion.mp3 before the last one
+// even finished — on top of the coin drops and background music already
+// playing, that's what actually overloaded into noise, not any one sound alone
+const EXPLOSION_DEBOUNCE_MS = 800;
+let lastExplosionPlayTime = 0;
 
 let music: HTMLAudioElement | null = null;
 
@@ -40,8 +62,13 @@ export function startBackgroundMusic(): void {
 // one-shot sound effect, played on every successful upgrade-button purchase. Creates
 // a fresh Audio instance per call instead of reusing one — reusing a single element
 // and calling .play() again just restarts it from 0, cutting off the tail of a
-// rapid previous play (e.g. clicking the upgrade button several times quickly)
+// rapid previous play (e.g. clicking the upgrade button several times quickly).
+// Debounced (see COIN_DROP_DEBOUNCE_MS) so the press-and-hold auto-repeat's fastest
+// tier doesn't stack dozens of overlapping plays into distorted noise
 export function playCoinDrop(): void {
+  const now = Date.now();
+  if (now - lastCoinDropPlayTime < COIN_DROP_DEBOUNCE_MS) return;
+  lastCoinDropPlayTime = now;
   const sfx = new Audio(coinDropUrl);
   sfx.volume = SFX_VOLUME;
   sfx.play().catch(() => {});
@@ -70,12 +97,26 @@ export function playSold(): void {
 // one-shot sound effect for the crit-upgrade "jackpot" moment (see
 // floorInteractions.ts, played alongside triggerScreenShake and the CRIT! flash).
 // explosion.mp3 has a quiet lead-in, so this skips the first 0.3s to line the
-// actual "bang" up earlier with the visual shake/flash
+// actual "bang" up earlier with the visual shake/flash. Debounced (see
+// EXPLOSION_DEBOUNCE_MS) so back-to-back crits during a fast held click can't
+// stack multiple full explosions on top of each other
 export function playExplosion(): void {
+  const now = Date.now();
+  if (now - lastExplosionPlayTime < EXPLOSION_DEBOUNCE_MS) return;
+  lastExplosionPlayTime = now;
   const sfx = new Audio(explosionUrl);
   sfx.volume = SFX_VOLUME;
   sfx.currentTime = 0.04;
   sfx.play().catch(() => {});
+
+  if (music) {
+    music.volume = MUSIC_DUCK_VOLUME;
+    if (musicDuckTimeoutId !== null) clearTimeout(musicDuckTimeoutId);
+    musicDuckTimeoutId = setTimeout(() => {
+      if (music) music.volume = MUSIC_VOLUME;
+      musicDuckTimeoutId = null;
+    }, MUSIC_DUCK_MS);
+  }
 }
 
 // one-shot sound effect for clicking a cat or the mouse, and for hitting the
