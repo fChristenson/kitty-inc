@@ -1,3 +1,5 @@
+import { companyStorageKey } from "../company";
+
 // bumped from "cash-clicker:floors" now that this holds Floor[][] (one entry per
 // building) instead of a single Floor[] — old single-building saves just start fresh
 const STORAGE_KEY = "cash-clicker:buildings";
@@ -212,9 +214,9 @@ interface SavedFloor {
   hasOfficeSupplies?: boolean; // added after initial release; older saves default to false on load
 }
 
-export function clearBuildings(): void {
+export function clearBuildings(companyIndex = 0): void {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(companyStorageKey(STORAGE_KEY, companyIndex));
   } catch {
     // storage unavailable: nothing to clear
   }
@@ -239,12 +241,15 @@ function toSavedFloor(floor: Floor): SavedFloor {
   };
 }
 
-export function saveBuildings(buildings: Floor[][]): void {
+export function saveBuildings(buildings: Floor[][], companyIndex = 0): void {
   const data: SavedFloor[][] = buildings.map((floors) =>
     floors.map(toSavedFloor),
   );
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    localStorage.setItem(
+      companyStorageKey(STORAGE_KEY, companyIndex),
+      JSON.stringify(data),
+    );
   } catch {
     // storage unavailable/full: persistence is a nice-to-have, safe to ignore
   }
@@ -258,11 +263,11 @@ let pendingSave: number | null = null;
 // handler. Calls made while one is already pending are free — the next run always
 // reads the current buildings array, so rapid clicks/purchases collapse into one write
 // instead of janking a frame the user might also be mid-scroll on.
-export function schedulePersist(buildings: Floor[][]): void {
+export function schedulePersist(buildings: Floor[][], companyIndex = 0): void {
   if (pendingSave !== null) return;
   const run = () => {
     pendingSave = null;
-    saveBuildings(buildings);
+    saveBuildings(buildings, companyIndex);
   };
   if (typeof requestIdleCallback === "function") {
     pendingSave = requestIdleCallback(run, { timeout: 1000 });
@@ -293,10 +298,10 @@ function fromSavedFloor(sf: SavedFloor): Floor {
 
 // rebuilds Floor[][] (one Floor[] per building) from localStorage; returns [] if
 // nothing is saved or storage is unreadable
-export function loadBuildings(): Floor[][] {
+export function loadBuildings(companyIndex = 0): Floor[][] {
   let raw: string | null;
   try {
-    raw = localStorage.getItem(STORAGE_KEY);
+    raw = localStorage.getItem(companyStorageKey(STORAGE_KEY, companyIndex));
   } catch {
     return [];
   }

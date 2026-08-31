@@ -1,4 +1,4 @@
-import { animateDialogClose } from "../../utils";
+import { animateDialogClose, formatPrice } from "../../utils";
 import { playSwoosh } from "../../sound";
 import coinIconUrl from "../../assets/coin.png";
 
@@ -19,6 +19,7 @@ export function createCompanySelectMenuMarkup(): string {
               <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
               Create new Company
             </span>
+            <span class="worker-menu__price" id="create-new-corporation-price"></span>
           </button>
         </div>
       </div>
@@ -32,10 +33,13 @@ export interface CompanySelectMenu {
 }
 
 // wires the menu's open/close controls and the "Create new Corporation" item;
-// onCreateNewCorporation fires on click, same pattern every other worker-menu
-// item purchase uses (see upgradeMenu/boostMenu), just with no cost of its own yet
+// getCorporationPrice renders the live cost (re-read on open and after every
+// purchase, since it scales up each time); onCreateNewCorporation fires on click
+// only — the caller (main.ts) is the one that checks affordability/spends the
+// cost before actually creating the corporation, same pattern buyBuilding uses
 export function wireCompanySelectMenu(
   container: HTMLElement,
+  getCorporationPrice: () => number,
   onCreateNewCorporation: () => void,
 ): CompanySelectMenu {
   const menu = container.querySelector<HTMLDivElement>("#company-select-menu")!;
@@ -46,12 +50,21 @@ export function wireCompanySelectMenu(
   const createButton = container.querySelector<HTMLButtonElement>(
     "#create-new-corporation",
   )!;
+  const priceLabel = container.querySelector<HTMLSpanElement>(
+    "#create-new-corporation-price",
+  )!;
+
+  function render(): void {
+    priceLabel.textContent = formatPrice(getCorporationPrice());
+  }
 
   createButton.addEventListener("click", () => {
     onCreateNewCorporation();
+    render();
   });
 
   function open(): void {
+    render();
     menu.hidden = false;
     playSwoosh();
   }

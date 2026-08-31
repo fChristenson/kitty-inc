@@ -1,5 +1,6 @@
 import { isStorageIntact, type Floor } from "../gameState";
 import { collectDueIncome } from "../floors";
+import { getActiveCompanyIndex, companyStorageKey } from "../company";
 
 export function getTotalIncome(): number {
   return totalIncome;
@@ -22,7 +23,7 @@ export function clearTotalIncome(): void {
   // and that handler re-saves whatever totalIncome currently holds
   totalIncome = 0;
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(companyStorageKey(STORAGE_KEY, activeCompanyIndex));
   } catch {
     // storage unavailable: nothing to clear
   }
@@ -31,24 +32,51 @@ export function clearTotalIncome(): void {
 const STORAGE_KEY = "cash-clicker:total-income";
 const SAVE_INTERVAL_MS = 1000;
 
-function loadStoredTotal(): number {
+function loadStoredTotal(companyIndex: number): number {
   try {
-    const value = Number(localStorage.getItem(STORAGE_KEY));
+    const value = Number(
+      localStorage.getItem(companyStorageKey(STORAGE_KEY, companyIndex)),
+    );
     return Number.isFinite(value) ? value : 0;
   } catch {
     return 0;
   }
 }
 
-function saveStoredTotal(value: number): void {
+function saveStoredTotal(companyIndex: number, value: number): void {
   try {
-    localStorage.setItem(STORAGE_KEY, String(value));
+    localStorage.setItem(
+      companyStorageKey(STORAGE_KEY, companyIndex),
+      String(value),
+    );
   } catch {
     // storage unavailable/full: persistence is a nice-to-have, safe to ignore
   }
 }
 
-let totalIncome = loadStoredTotal();
+// which company's total the module-level totalIncome/tickerBuildings below
+// currently belong to — swapped by switchActiveCompany, never shared across
+// companies (see company.ts)
+let activeCompanyIndex = getActiveCompanyIndex();
+let totalIncome = loadStoredTotal(activeCompanyIndex);
+// whichever company's buildings the ticker is currently collecting idle income
+// from; set by startTotalIncomeTicker at startup, swapped by switchActiveCompany
+let tickerBuildings: Floor[][] = [];
+
+// call when the player switches to a different company (see cityMap's barrel
+// roll / main.ts): saves the outgoing company's total immediately, then loads
+// the new one's own total and points the running ticker at its own buildings —
+// its floors' own lastCollectedAt timestamps mean the very next tick correctly
+// pays out however much idle income piled up while this company wasn't active
+export function switchActiveCompany(
+  companyIndex: number,
+  buildings: Floor[][],
+): void {
+  saveStoredTotal(activeCompanyIndex, totalIncome);
+  activeCompanyIndex = companyIndex;
+  totalIncome = loadStoredTotal(companyIndex);
+  tickerBuildings = buildings;
+}
 
 // pays out each unlocked floor's income (across every building) only once its fill-bar
 // cycle actually completes, instead of accruing fractional $ continuously underneath a
@@ -58,18 +86,20 @@ let totalIncome = loadStoredTotal();
 // tab sat in the background, so gameState.ts's computeIdleIncome wrongly treated that
 // whole span as idle time on the next load even though the tab was never closed.
 // Also catches up immediately on visibilitychange, in case the interval itself got
-// suspended for a long background/sleep stretch. reads the same buildings array
-// reference every tick, so a building bought later is automatically included without
-// needing to restart the ticker. read the running total via getTotalIncome()
+// suspended for a long background/sleep stretch. reads tickerBuildings fresh every
+// tick, so a building bought later — or a whole different company switched in via
+// switchActiveCompany — is automatically included without needing to restart this.
+// read the running total via getTotalIncome()
 const COLLECT_INTERVAL_MS = 200;
 
 export function startTotalIncomeTicker(buildings: Floor[][]): void {
+  tickerBuildings = buildings;
   let lastSave = performance.now();
   function collectAll(): void {
     // Date.now()-based (not performance.now()) since collectDueIncome now reads/writes
     // floor.lastCollectedAt directly, a persisted Date.now()-based timestamp
     const now = Date.now();
-    for (const floors of buildings) {
+    for (const floors of tickerBuildings) {
       for (const floor of floors) {
         if (!floor.unlocked) continue;
         totalIncome += collectDueIncome(floor, now);
@@ -82,7 +112,7 @@ export function startTotalIncomeTicker(buildings: Floor[][]): void {
       // same guard as the beforeunload save below — otherwise this periodic
       // autosave would silently undo a manual localStorage clear within ~1s of
       // it happening, even before the player gets a chance to close the tab
-      if (isStorageIntact()) saveStoredTotal(totalIncome);
+      if (isStorageIntact()) saveStoredTotal(activeCompanyIndex, totalIncome);
     }
   }
 
@@ -93,6 +123,6 @@ export function startTotalIncomeTicker(buildings: Floor[][]): void {
 
   window.addEventListener("beforeunload", () => {
     if (!isStorageIntact()) return;
-    saveStoredTotal(totalIncome);
+    saveStoredTotal(activeCompanyIndex, totalIncome);
   });
 }

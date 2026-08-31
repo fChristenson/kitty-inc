@@ -11,6 +11,7 @@ import {
 } from "./floors";
 import {
   startTotalIncomeTicker,
+  switchActiveCompany,
   addTotalIncome,
   spendTotalIncome,
   getTotalIncome,
@@ -25,6 +26,11 @@ import {
   isStorageIntact,
   type Floor,
 } from "./gameState";
+import {
+  getActiveCompanyIndex,
+  setActiveCompanyIndex,
+  companyStorageKey,
+} from "./company";
 import {
   createTestButtonMarkup,
   wireTestButton,
@@ -62,7 +68,7 @@ import {
 } from "./buildings";
 import { loadMouseImage, forceSpawnMouse } from "./mouse";
 import { startBackgroundMusic, playSwoosh } from "./sound";
-import { createNewCorporation } from "./corporationName";
+import { createNewCorporation, getCorporationPrice } from "./corporationName";
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -109,26 +115,38 @@ async function main() {
 
   // one Floor[] per building; only one building is ever shown on screen at a time
   // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
-  // happens entirely through the map menu below, not by scrolling/swiping
+  // happens entirely through the map menu below, not by scrolling/swiping.
+  // Belongs entirely to whichever corporation is currently active (see
+  // company.ts) — switching companies below empties this array and refills it
+  // with that other company's own buildings, never mixing the two
   const buildings: Floor[][] = [];
   let activeBuildingIndex = 0;
+  let activeCompanyIndex = getActiveCompanyIndex();
 
   // so a reload lands back on whichever building the player last selected on the
-  // map, instead of always starting over at building 0
+  // map, namespaced per company (see company.ts's companyStorageKey) since each
+  // company remembers its own last-active building independently
   const ACTIVE_BUILDING_KEY = "cash-clicker:active-building-index";
 
-  function loadActiveBuildingIndex(): number {
+  function loadActiveBuildingIndex(companyIndex: number): number {
     try {
-      const parsed = Number(localStorage.getItem(ACTIVE_BUILDING_KEY));
+      const parsed = Number(
+        localStorage.getItem(
+          companyStorageKey(ACTIVE_BUILDING_KEY, companyIndex),
+        ),
+      );
       return Number.isFinite(parsed) ? parsed : 0;
     } catch {
       return 0;
     }
   }
 
-  function saveActiveBuildingIndex(index: number): void {
+  function saveActiveBuildingIndex(companyIndex: number, index: number): void {
     try {
-      localStorage.setItem(ACTIVE_BUILDING_KEY, String(index));
+      localStorage.setItem(
+        companyStorageKey(ACTIVE_BUILDING_KEY, companyIndex),
+        String(index),
+      );
     } catch {
       // storage unavailable: nothing to persist
     }
@@ -137,17 +155,22 @@ async function main() {
   function persist() {
     // debounced/idle-scheduled so a click mid-scroll doesn't synchronously serialize
     // every building's floors + hit localStorage on the same frame (see gameState.ts)
-    schedulePersist(buildings);
+    schedulePersist(buildings, activeCompanyIndex);
   }
 
-  const restoredBuildings = loadBuildings();
-  if (restoredBuildings.length > 0) {
-    buildings.push(...restoredBuildings);
-  } else {
-    buildings.push(createBuilding(0, backgrounds.length));
+  // loads a company's saved buildings, or starts it off with a single fresh
+  // building if it's never been played before (a brand new corporation, or the
+  // very first run)
+  function loadOrCreateBuildings(companyIndex: number): Floor[][] {
+    const restored = loadBuildings(companyIndex);
+    return restored.length > 0
+      ? restored
+      : [createBuilding(0, backgrounds.length)];
   }
+
+  buildings.push(...loadOrCreateBuildings(activeCompanyIndex));
   activeBuildingIndex = Math.min(
-    Math.max(loadActiveBuildingIndex(), 0),
+    Math.max(loadActiveBuildingIndex(activeCompanyIndex), 0),
     buildings.length - 1,
   );
 
@@ -180,8 +203,33 @@ async function main() {
   // an instant cut to the new street
   function goToBuilding(buildingIndex: number): void {
     activeBuildingIndex = buildingIndex;
-    saveActiveBuildingIndex(buildingIndex);
+    saveActiveBuildingIndex(activeCompanyIndex, buildingIndex);
     gameCanvas.setActiveFloors(buildings[buildingIndex]);
+  }
+
+  // switches which corporation is active (see company.ts, cityMap's barrel-roll
+  // picker): saves the outgoing company's own buildings/active-building under its
+  // own key, then empties+refills the same buildings array reference (every
+  // closure above captured this array once, not its contents) with the new
+  // company's own separate buildings, its own last-active building, and hands
+  // totalIncome.ts its own separate running total — nothing here is shared
+  // between companies
+  function switchToCompany(companyIndex: number): void {
+    saveBuildings(buildings, activeCompanyIndex);
+    saveActiveBuildingIndex(activeCompanyIndex, activeBuildingIndex);
+
+    activeCompanyIndex = companyIndex;
+    setActiveCompanyIndex(companyIndex);
+    buildings.length = 0;
+    buildings.push(...loadOrCreateBuildings(companyIndex));
+    activeBuildingIndex = Math.min(
+      Math.max(loadActiveBuildingIndex(companyIndex), 0),
+      buildings.length - 1,
+    );
+    buildings.forEach((_, i) => setupBuilding(i));
+
+    switchActiveCompany(companyIndex, buildings);
+    gameCanvas.setActiveFloors(buildings[activeBuildingIndex]);
   }
 
   // dev/test-only controls; markup is stripped entirely in production builds
@@ -205,7 +253,7 @@ async function main() {
       const testAmount = 12345;
       showIdlePopup(app, testAmount, () => addTotalIncome(testAmount));
     });
-    wireResetButton(app, buildings);
+    wireResetButton(app, buildings, () => activeCompanyIndex);
   }
   const upgradeMenu = wireUpgradeMenu(
     app,
@@ -214,11 +262,17 @@ async function main() {
   );
   // "Create new Corporation" adds a fresh named corporation above the current
   // one in the map's corp-name barrel (see corporationName.ts/cityMap's
-  // drawCorporationNames) — roll up with the action bar to reach it
-  const companySelectMenu = wireCompanySelectMenu(app, () => {
-    createNewCorporation();
-    companySelectMenu.close();
-  });
+  // drawCorporationNames) — roll up with the action bar to reach it. Costs
+  // getCorporationPrice(), same buy-if-affordable pattern as buyBuilding below
+  const companySelectMenu = wireCompanySelectMenu(
+    app,
+    getCorporationPrice,
+    () => {
+      if (!spendTotalIncome(getCorporationPrice())) return;
+      createNewCorporation();
+      companySelectMenu.close();
+    },
+  );
   const boostMenu = wireBoostMenu(
     app,
     () => buildings[activeBuildingIndex] ?? [],
@@ -275,6 +329,7 @@ async function main() {
       goToBuilding(index);
       closeMapView();
     },
+    onSwitchCompany: switchToCompany,
   });
   wireActionBar(app, {
     onScrollTop: () => {
@@ -307,7 +362,7 @@ async function main() {
   // saveBuildings directly (not the debounced persist()): computeIdleIncome advances
   // every floor's lastCollectedAt in memory, and that must land before a second quick
   // reload could otherwise re-collect the same already-paid-out idle time
-  saveBuildings(buildings);
+  saveBuildings(buildings, activeCompanyIndex);
   if (idleIncome > 0) {
     showIdlePopup(app, idleIncome, () => addTotalIncome(idleIncome));
   }
@@ -333,7 +388,7 @@ async function main() {
   window.addEventListener("beforeunload", () => {
     if (!isStorageIntact()) return;
     markAppClosed();
-    saveBuildings(buildings);
+    saveBuildings(buildings, activeCompanyIndex);
   });
 }
 

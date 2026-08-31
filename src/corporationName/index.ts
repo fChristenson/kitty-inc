@@ -151,6 +151,20 @@ export function getCorporationCount(): number {
   return (cachedNames as string[]).length;
 }
 
+const CORPORATION_BASE_PRICE = 1_000_000; // $ to create the first new corporation
+const CORPORATION_COST_MULTIPLIER = 1000; // each one after that costs this much more
+
+// $ cost to create the next corporation — same scaling shape as buildings.ts's
+// getBuildingPrice, just keyed off getCorporationCount() instead of a building
+// index: the first-ever new corporation (index 1) costs CORPORATION_BASE_PRICE,
+// and every one after that costs CORPORATION_COST_MULTIPLIER (1000x) more
+export function getCorporationPrice(): number {
+  const nextIndex = getCorporationCount();
+  return (
+    CORPORATION_BASE_PRICE * CORPORATION_COST_MULTIPLIER ** (nextIndex - 1)
+  );
+}
+
 // generates (and persists) a brand new corporation right after the last one, same
 // naming logic as getCorporationName; returns its index. See
 // hud/companySelectMenu's "Create new Corporation" item

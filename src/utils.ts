@@ -255,6 +255,47 @@ export function formatTotalIncomeParts(value: number): {
   };
 }
 
+// count-up animation shared by every canvas that draws the running total (hud's
+// world view, cityMap's own) so they always show the exact same animated number,
+// staying in sync with each other since only one of them is ever actually visible/
+// calling this at a time (the other's canvas is hidden, its own redraw() no-ops).
+// The displayed value lags behind the real total and eases toward it every call
+// instead of snapping straight to whatever totalIncome.ts's own 200ms ticker just
+// collected, so income arriving reads as visibly counting up.
+let displayedTotalIncome: number | null = null;
+let totalIncomeLastFrameTime = performance.now();
+// fraction of the remaining gap closed per second — proportional (not a fixed
+// $/sec step), so a huge jump (e.g. the dev "Add Money" button) still visibly
+// spins up fast instead of taking forever, while a normal small tick reads as a
+// smooth climb instead of a discrete step
+const TOTAL_INCOME_CATCH_UP_RATE_PER_SECOND = 6;
+// once this close, just snap — the exponential catch-up above never mathematically
+// reaches its target, so without this the display would drift by fractions of a
+// cent forever instead of ever landing exactly on the real total
+const TOTAL_INCOME_SNAP_THRESHOLD = 0.5;
+
+export function getAnimatedTotalIncome(totalIncome: number): number {
+  const now = performance.now();
+  // clamped so a backgrounded/throttled tab doesn't resume with one giant catch-up
+  // jump from however long it was actually away
+  const dt = Math.min(1, (now - totalIncomeLastFrameTime) / 1000);
+  totalIncomeLastFrameTime = now;
+  if (displayedTotalIncome === null) displayedTotalIncome = totalIncome;
+  const remaining = totalIncome - displayedTotalIncome;
+  displayedTotalIncome =
+    // only income arriving (remaining > 0) eases in — a spend (e.g. holding the
+    // upgrade button) drops the real total instantly, and easing toward that
+    // dropped-then-refilled target too made the displayed number visibly flicker
+    // down and back up on every purchase instead of just climbing from income
+    remaining <= 0 ||
+    remaining < TOTAL_INCOME_SNAP_THRESHOLD ||
+    !Number.isFinite(remaining)
+      ? totalIncome
+      : displayedTotalIncome +
+        remaining * Math.min(1, TOTAL_INCOME_CATCH_UP_RATE_PER_SECOND * dt);
+  return displayedTotalIncome;
+}
+
 // the only way a duration/interval should be formatted anywhere in the game, e.g.
 // "00:01:30". Whole hours can grow past 24 rather than wrapping into days, so this
 // still never overflows into a giant unformatted number at long intervals. Sub-second

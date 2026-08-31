@@ -3,12 +3,18 @@ import {
   drawCartoonText,
   formatTotalIncomeParts,
   formatPrice,
+  getAnimatedTotalIncome,
 } from "../../utils";
 import { COLOR } from "../../palette";
 import { playSold, playSwoosh } from "../../sound";
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
 import { getCorporationName, getCorporationCount } from "../../corporationName";
+import {
+  getActiveCompanyIndex,
+  setActiveCompanyIndex,
+  companyStorageKey,
+} from "../../company";
 import cityMapUrl from "../../assets/city2Bg.png";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
 import starUrl from "../../assets/star.png";
@@ -136,6 +142,10 @@ export interface CityMapDeps {
   getActiveBuildingIndex: () => number; // whichever building's floors are on screen right now
   buyBuilding: () => boolean; // unlocks building 1 if affordable
   onSelectBuilding: (index: number) => void; // switch to that building and leave the map view
+  // fires once the corporation barrel roll settles on a different company (see
+  // rollCorporationSelection) so main.ts can swap in that company's own separate
+  // buildings/totalIncome/active building — see company.ts
+  onSwitchCompany: (companyIndex: number) => void;
 }
 
 export interface CityMapView {
@@ -198,35 +208,38 @@ export function createCityMapMarkup(): string {
   `;
 }
 
-// so a reload lands the player back on the same city page + corporation they had
-// selected, instead of always starting over at city 0 / corporation 0
+// so a reload lands the player back on the same city page they had selected —
+// namespaced per company (see company.ts's companyStorageKey) since each company
+// has its own separate set of cities/buildings
 const CITY_MAP_STATE_KEY = "cash-clicker:city-map-state";
 
 interface PersistedCityMapState {
   cityIndex: number;
-  selectedCorporationIndex: number;
 }
 
-function loadCityMapState(): PersistedCityMapState {
+function loadCityMapState(companyIndex: number): PersistedCityMapState {
   try {
-    const raw = localStorage.getItem(CITY_MAP_STATE_KEY);
+    const raw = localStorage.getItem(
+      companyStorageKey(CITY_MAP_STATE_KEY, companyIndex),
+    );
     const parsed = raw ? JSON.parse(raw) : null;
     return {
       cityIndex: Number.isFinite(parsed?.cityIndex) ? parsed.cityIndex : 0,
-      selectedCorporationIndex: Number.isFinite(
-        parsed?.selectedCorporationIndex,
-      )
-        ? parsed.selectedCorporationIndex
-        : 0,
     };
   } catch {
-    return { cityIndex: 0, selectedCorporationIndex: 0 };
+    return { cityIndex: 0 };
   }
 }
 
-function saveCityMapState(state: PersistedCityMapState): void {
+function saveCityMapState(
+  companyIndex: number,
+  state: PersistedCityMapState,
+): void {
   try {
-    localStorage.setItem(CITY_MAP_STATE_KEY, JSON.stringify(state));
+    localStorage.setItem(
+      companyStorageKey(CITY_MAP_STATE_KEY, companyIndex),
+      JSON.stringify(state),
+    );
   } catch {
     // storage unavailable: nothing to persist
   }
@@ -247,18 +260,29 @@ export function createCityMapView(
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
-  const restoredState = loadCityMapState();
+  // which corporation (see company.ts) owns whichever buildings/cities are
+  // currently loaded — the single source of truth for "selected company" shared
+  // with main.ts, so cityIndex below can be namespaced/restored per company
+  let selectedCorporationIndex = getActiveCompanyIndex();
+  const restoredState = loadCityMapState(selectedCorporationIndex);
   // which city's 5-building page is currently shown; a city is "complete" (and the
   // next one reachable) once all MARKER_COUNT of its buildings are bought — see
   // updateArrows. Restored on load (see loadCityMapState) so a reload lands back
   // on the same page instead of always starting at city 0
   let cityIndex = restoredState.cityIndex;
 
-  // saves cityIndex + selectedCorporationIndex together (see below) any time
-  // either one changes, so a reload can restore both
+  // saves cityIndex under the currently-selected company's own key any time it
+  // changes, so a reload can restore it
   function persistCityMapState(): void {
-    saveCityMapState({ cityIndex, selectedCorporationIndex });
+    saveCityMapState(selectedCorporationIndex, { cityIndex });
   }
+
+  // same jitter-free centering trick drawHud (hud/index.ts) uses: only remeasured
+  // when the amount's own character count changes, not every frame, since
+  // centering on the live (constantly-changing, mid-count-up) width every frame is
+  // what made the number visibly jitter left/right
+  let cachedIncomeAmountWidth = 0;
+  let cachedIncomeAmountLength = -1;
 
   function resize(): void {
     const rect = canvas.getBoundingClientRect();
@@ -483,9 +507,6 @@ export function createCityMapView(
   const CORP_NAME_SIDE_ALPHA = 0.35; // side rows' opacity
   const CORP_NAME_ROW_GAP = 24; // vertical spacing between adjacent rows
   const CORP_ROLL_MS = 260;
-  // restored on load (see loadCityMapState) so a reload lands back on the same
-  // corporation instead of always starting at 0
-  let selectedCorporationIndex = restoredState.selectedCorporationIndex;
   // continuous "which index is centered" — equals selectedCorporationIndex at
   // rest, animates toward the new one mid-roll (see rollCorporationSelection)
   let corpRollFocus = selectedCorporationIndex;
@@ -496,6 +517,9 @@ export function createCityMapView(
     if (selectedCorporationIndex > count - 1) {
       selectedCorporationIndex = count - 1;
       corpRollFocus = selectedCorporationIndex;
+      setActiveCompanyIndex(selectedCorporationIndex);
+      cityIndex = loadCityMapState(selectedCorporationIndex).cityIndex;
+      deps.onSwitchCompany(selectedCorporationIndex);
       persistCityMapState();
     }
     const bottom = cssH - CORPORATION_NAME_MARGIN_PX;
@@ -557,7 +581,10 @@ export function createCityMapView(
         corpRollFocus = targetIndex;
         selectedCorporationIndex = targetIndex;
         corpRollAnimId = null;
-        persistCityMapState();
+        setActiveCompanyIndex(selectedCorporationIndex);
+        cityIndex = loadCityMapState(selectedCorporationIndex).cityIndex;
+        deps.onSwitchCompany(selectedCorporationIndex);
+        redraw();
       }
     }
     corpRollAnimId = requestAnimationFrame(frame);
@@ -636,20 +663,29 @@ export function createCityMapView(
     // used everywhere else, sized for this canvas's own CSS pixel space (unlike
     // hud/index.ts's drawHud, which is calibrated for the much larger world canvas).
     // the unit (e.g. "Undecillion") is spelled out in full on its own line below
-    // the number instead of an abbreviation glued onto it
+    // the number instead of an abbreviation glued onto it. Same getAnimatedTotalIncome
+    // count-up animation as drawHud, so this and the building view's HUD always
+    // show the exact same (animated) number
     const incomeFont = '900 32px "Fredoka", system-ui, sans-serif';
     const INCOME_FONT_SIZE = 32;
     const { amount: incomeAmountText, unitName: incomeUnitName } =
-      formatTotalIncomeParts(deps.getTotalIncome());
+      formatTotalIncomeParts(getAnimatedTotalIncome(deps.getTotalIncome()));
     const incomeTop = 20;
     const incomeStrokeWidth = 6;
     ctx.font = incomeFont;
-    ctx.textAlign = "center";
+    // left-aligned at a position derived from the cached (not live) width below —
+    // still visually centered, but the anchor itself only moves when the number's
+    // length does, instead of re-centering (and jittering) on every frame's width
+    if (incomeAmountText.length !== cachedIncomeAmountLength) {
+      cachedIncomeAmountWidth = ctx.measureText(incomeAmountText).width;
+      cachedIncomeAmountLength = incomeAmountText.length;
+    }
+    ctx.textAlign = "left";
     ctx.textBaseline = "top";
     drawCartoonText(
       ctx,
       incomeAmountText,
-      cssW / 2,
+      cssW / 2 - cachedIncomeAmountWidth / 2,
       incomeTop,
       COLOR.moneyGreen,
       COLOR.white,
@@ -669,6 +705,7 @@ export function createCityMapView(
       const UNIT_NAME_STROKE_WIDTH = 4;
       const UNIT_NAME_FONT_SIZE = INCOME_FONT_SIZE * 0.8; // 20% smaller than the amount
       ctx.font = `900 ${UNIT_NAME_FONT_SIZE}px "Fredoka", system-ui, sans-serif`;
+      ctx.textAlign = "center"; // unlike the amount above, this one's width isn't cached/jittery
       const unitNameTop = incomeBottom + UNIT_NAME_GAP_PX;
       drawCartoonText(
         ctx,

@@ -54,6 +54,7 @@ export function wireIdlePopupTestButton(
 export function wireResetButton(
   container: HTMLElement,
   buildings: Floor[][],
+  getActiveCompanyIndex: () => number,
 ): void {
   const button = container.querySelector<HTMLButtonElement>("#reset-game")!;
   button.addEventListener("click", () => {
@@ -62,7 +63,7 @@ export function wireResetButton(
     // right after clearBuildings() removes it, undoing the reset before the reload
     // even happens
     buildings.length = 0;
-    clearBuildings();
+    clearBuildings(getActiveCompanyIndex());
     clearTotalIncome();
     clearCityNames();
     clearCorporationNames();
