@@ -547,14 +547,14 @@ body {
 .worker-menu__panel {
   position: relative;
   width: min(90vw, 420px);
-  /* fixed 100px down from the top, every time — every dialog (upgrade menu,
+  /* fixed 300px down from the top, every time — every dialog (upgrade menu,
      boost menu, map menu, corporation menus, ...) uses this exact same value, no
-     per-dialog overrides. Height capped so 100px + this can never reach the
+     per-dialog overrides. Height capped so 300px + this can never reach the
      actual, live-measured distance from the action bar's own top edge down to
      the bottom of the viewport (see utils.ts's observeActionBarHeight) — a fixed
      rem guess here previously missed the extra height dev builds stack
      underneath the real action bar (test-actions-bar) */
-  max-height: calc(100vh - 100px - var(--worker-menu-safe-bottom, 3.75rem));
+  max-height: calc(100vh - 160px - var(--worker-menu-safe-bottom, 3.75rem));
   display: flex;
   flex-direction: column;
   /* cartoon wood-board look (see src/assets/dialog.jfif): tan fill + dark outline
