@@ -570,7 +570,7 @@ body {
   color: var(--color-wood-text);
   margin-left: 14px;
   margin-right: 14px;
-  margin-top: 300px;
+  margin-top: 100px;
   margin-bottom: 14px;
   padding: 1rem;
   /* stretches/squashes toward the bottom edge it slides from, so scale keyframes
