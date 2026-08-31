@@ -5,7 +5,7 @@ import {
 } from "../../gameState";
 import {
   formatPrice,
-  formatTotalIncome,
+  formatTotalIncomeFull,
   triggerButtonPress,
   animateDialogClose,
 } from "../../utils";
@@ -107,17 +107,21 @@ function getCompanyValue(companyIndex: number): number {
   );
 }
 
-// how much a company's stock price contributes to the combined income boost —
-// $1 of stock price times $1 of company value (see getCompanyValue) is a 0.01
-// percentage-point increase, so a company's own contribution scales with both
-// how high its stock price is AND how valuable the company itself is
+// how much a company's stock price contributes to the combined income boost.
+// Both stockPrice and companyValue can each individually grow huge (companyValue
+// into illion-scale territory late-game, stockPrice from repeated purchases), so
+// BOTH are log10'd before combining — turning "10 orders of magnitude bigger"
+// into "10 points bigger" for each — then scaled down by a small flat rate,
+// keeping the result comfortably in single/low-double-digit percent territory no
+// matter how astronomical the underlying numbers get (never needing scientific
+// notation to display)
 const STOCK_CONTRIBUTION_RATE = 0.01;
 
 function getStockContributionPercent(companyIndex: number): number {
+  const stockPrice = Math.max(2, getStockPrice(companyIndex));
+  const companyValue = Math.max(10, getCompanyValue(companyIndex));
   return (
-    getStockPrice(companyIndex) *
-    getCompanyValue(companyIndex) *
-    STOCK_CONTRIBUTION_RATE
+    Math.log10(stockPrice) * Math.log10(companyValue) * STOCK_CONTRIBUTION_RATE
   );
 }
 
@@ -136,11 +140,10 @@ export function getGlobalIncomeBoostMultiplier(): number {
   return 1 + getGlobalIncomeBoostPercent() / 100;
 }
 
-// +N.NNe+M% — scientific notation (2 decimal places in the mantissa) since this
-// keeps climbing well past what a plain fixed-point percentage could read
-// sensibly; the leading + marks it as always an increase, never a penalty
+// +N.NN% — the leading + marks it as always an increase, never a penalty; plain
+// fixed-point since getStockContributionPercent now keeps this comfortably small
 function formatBoostPercent(percent: number): string {
-  return `+${percent.toExponential(2)}%`;
+  return `+${percent.toFixed(2)}%`;
 }
 
 // reuses .worker-menu's styling — a dialog listing every corporation's own
@@ -208,7 +211,7 @@ export function wireCorporationBoostMenu(
     }).join("");
     list.innerHTML = `
       <h3 class="worker-menu__subheader">Corporation assets</h3>
-      <span class="worker-menu__total-income">${formatTotalIncome(getAllCompaniesTotalIncome())}</span>
+      <span class="worker-menu__total-income">${formatTotalIncomeFull(getAllCompaniesTotalIncome())}</span>
       <h3 class="worker-menu__subheader">Stock price income modifiers</h3>
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">

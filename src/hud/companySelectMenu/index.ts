@@ -1,7 +1,7 @@
 import {
   animateDialogClose,
   formatPrice,
-  formatTotalIncome,
+  formatTotalIncomeFull,
 } from "../../utils";
 import { getAllCompaniesTotalIncome } from "../../totalIncome";
 import { playSwoosh } from "../../sound";
@@ -66,7 +66,7 @@ export function wireCompanySelectMenu(
 
   function render(): void {
     priceLabel.textContent = formatPrice(getCorporationPrice());
-    totalIncomeLabel.textContent = formatTotalIncome(
+    totalIncomeLabel.textContent = formatTotalIncomeFull(
       getAllCompaniesTotalIncome(),
     );
   }

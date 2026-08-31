@@ -255,6 +255,14 @@ export function formatTotalIncomeParts(value: number): {
   };
 }
 
+// same total-income number as formatTotalIncomeParts, but joined onto one line
+// with its full spelled-out unit name (e.g. "$1 Undecillion") instead of an
+// abbreviation — for callers with no room for a separate unit-name line
+export function formatTotalIncomeFull(value: number): string {
+  const { amount, unitName } = formatTotalIncomeParts(value);
+  return unitName ? `${amount} ${unitName}` : amount;
+}
+
 // count-up animation shared by every canvas that draws the running total (hud's
 // world view, cityMap's own) so they always show the exact same animated number,
 // staying in sync with each other since only one of them is ever actually visible/

@@ -73,14 +73,19 @@ function getCompanyWealth(companyIndex: number): number {
 
 const SECONDS_PER_HOUR = 3600;
 
-// splits cost proportionally across every corporation's own wealth (see
-// getCompanyWealth) — richer companies shoulder proportionally more of it. Any
-// company whose computed share would exceed what it actually has instead pays
-// exactly what it has and drops out, with the remaining cost re-split across the
-// rest by their own wealth (a "water-filling" pass, repeated until nothing is
-// over-capped) — so no company ever gets driven into the negative. Returns false
-// (spending nothing) if the combined total across every company can't cover cost
-// at all
+// the actual "money sink" design goal (see hud/corporationBoostMenu's stock-price
+// boosts): richer companies foot proportionally more of any corp boost/upgrade's
+// cost, draining their own excess wealth to fund something that benefits every
+// company equally (see corporationBoostMenu's getGlobalIncomeBoostMultiplier,
+// applied globally regardless of which company is currently active) — so a brand
+// new company starts out already boosted by whatever earlier ones paid into.
+// Splits cost proportionally across every corporation's own wealth (see
+// getCompanyWealth). Any company whose computed share would exceed what it
+// actually has instead pays exactly what it has and drops out, with the
+// remaining cost re-split across the rest by their own wealth (a
+// "water-filling" pass, repeated until nothing is over-capped) — so no company
+// ever gets driven into the negative. Returns false (spending nothing) if the
+// combined total across every company can't cover cost at all
 export function spendFromAllCompanies(cost: number): boolean {
   const count = getCorporationCount();
   const totals = Array.from({ length: count }, (_, i) =>
