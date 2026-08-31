@@ -54,3 +54,7 @@ Flat 2D cartoon isometric ball of yarn, angled 3/4 view, centered. Rounded spher
 
 Flat 2D cartoon character sheet, 5 evenly spaced frames in one row, chubby cream cat wearing a navy business suit, white shirt, red tie, gold button, and round black-rimmed glasses. Walking cycle across the frames, final frame both arms raised in a happy jump, eyes closed, big open-mouth smile. Bold black outline, cel-shaded flat colors, simple round eyes. Plain near-white background, no text, no logos, edge-to-edge, wide aspect ratio.
 
+# Podium audience (facing the speaker)
+
+Flat 2D cartoon audience of cats, seen from behind, seated in evenly spaced rows, varied fur colors and simple outfits, all heads turned forward facing an off-frame podium speaker. Cel-shaded flat colors, thick bold dark outlines, soft semi-realistic anime background style matching the game's muted pastel interiors. Small chunky bodies, simple round ears, tails curled at their sides, no visible faces. No text, no logos, no watermarks. Edge-to-edge crop, wide 16:9 aspect ratio
+
