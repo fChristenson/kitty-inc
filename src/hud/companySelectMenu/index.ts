@@ -69,6 +69,16 @@ export function wireCompanySelectMenu(
     totalIncomeLabel.textContent = formatTotalIncomeFull(
       getAllCompaniesTotalIncome(),
     );
+    updateAffordability();
+  }
+
+  // re-checks affordability on its own while the menu sits open, same as every
+  // other worker-menu (boostMenu/upgradeMenu/corporationBoostMenu/mapMenu), so
+  // the button grays out immediately if unaffordable and un-grays the moment
+  // income catches up instead of only refreshing on the next open/purchase
+  function updateAffordability(): void {
+    createButton.disabled =
+      getAllCompaniesTotalIncome() < getCorporationPrice();
   }
 
   createButton.addEventListener("click", () => {
@@ -76,16 +86,23 @@ export function wireCompanySelectMenu(
     render();
   });
 
+  let refreshInterval: ReturnType<typeof setInterval> | null = null;
+
   function open(): void {
     render();
     menu.hidden = false;
     playSwoosh();
+    refreshInterval = setInterval(updateAffordability, 250);
   }
 
   async function close(): Promise<void> {
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;
+    if (refreshInterval !== null) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
+    }
   }
 
   backdrop.addEventListener("click", close);

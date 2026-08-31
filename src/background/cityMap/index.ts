@@ -56,7 +56,7 @@ const MARKER_POSITIONS: {
   feetYNudgePx?: number; // extra fine-tune offset, positive = down
 }[] = [
   { cxFrac: 0, feetYFrac: 1, cxFixed: 70, feetYNudgePx: -80 }, // building 0 (1 star): fixed bottom-right dock (see markerCenter's own override below)
-  { cxFrac: 0.88, feetYFrac: 0.78, centerShiftPx: 300 }, // building 1 (2 stars): far right
+  { cxFrac: 0.88, feetYFrac: 0.78, centerShiftPx: 260 }, // building 1 (2 stars): far right
   {
     cxFrac: 0.28,
     feetYFrac: 0.58,

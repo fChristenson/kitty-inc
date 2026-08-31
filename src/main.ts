@@ -32,7 +32,7 @@ import {
   getActiveCompanyIndex,
   setActiveCompanyIndex,
   companyStorageKey,
-  saveCompanySummary,
+  saveCompanyRecord,
 } from "./company";
 import {
   createTestButtonMarkup,
@@ -229,11 +229,13 @@ async function main() {
   // totalIncome.ts its own separate running total — nothing here is shared
   // between companies
   function switchToCompany(companyIndex: number): void {
-    // snapshot the OUTGOING company's own summary (see company.ts) while
-    // `buildings`/`activeCompanyIndex` still hold its data — every other
-    // per-company read (income, value, cost-splitting) uses this instead of
-    // ever loading a dormant company's full buildings/floors again
-    saveCompanySummary(activeCompanyIndex, {
+    // snapshot the OUTGOING company's ENTIRE CompanyRecord (see company.ts) in
+    // one atomic write, while `buildings`/`activeCompanyIndex`/`totalIncome`
+    // still hold its data — bankedTotal, its rate, and the timestamp all land
+    // together, so a dormant company's derived total can never desync from a
+    // separately-written "just the total" value (there isn't one anymore)
+    saveCompanyRecord(activeCompanyIndex, {
+      bankedTotal: getTotalIncome(),
       incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
         buildings,
         Date.now(),

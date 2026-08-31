@@ -2,8 +2,9 @@ import { isStorageIntact, type Floor } from "../gameState";
 import { collectDueIncome, currentIncomeRatePerSecond } from "../floors";
 import {
   getActiveCompanyIndex,
-  companyStorageKey,
-  loadCompanySummary,
+  loadCompanyRecord,
+  saveCompanyRecord,
+  clearCompanyRecord,
 } from "../company";
 import { getCorporationCount } from "../corporationName";
 
@@ -11,38 +12,19 @@ export function getTotalIncome(): number {
   return totalIncome;
 }
 
-// reads any company's own running total (not just the currently active one) —
+// reads any company's own current total (not just the currently active one) —
 // the active company's in-memory value (freshest, may not be saved yet), every
-// other company's last-persisted total PLUS however much it would have actually
-// earned by now if it had kept ticking (see getProjectedUncollectedIncome) — so
-// every company keeps making money regardless of which one is currently
-// selected, even though only the active one's buildings are actually loaded/
-// ticked in memory at once (see company.ts)
+// other company's derived straight from its single persisted CompanyRecord (see
+// company.ts): bankedTotal as of updatedAt, plus however much its own frozen
+// rate would have earned in the elapsed time since — a pure function of that one
+// record, so it can never desync from a separate "total" write happening
+// somewhere else (there isn't one)
 export function getStoredTotalIncome(companyIndex: number): number {
   if (companyIndex === activeCompanyIndex) return totalIncome;
-  return (
-    loadStoredTotal(companyIndex) + getProjectedUncollectedIncome(companyIndex)
-  );
-}
-
-// how much a DORMANT company's floors have earned since it last stopped being
-// active, projected from its persisted CompanySummary (see company.ts) — a flat
-// rate x elapsed-seconds estimate instead of loading its full buildings/floors
-// array and replaying each floor's own quantized cycle (which is what this used
-// to do, and was the single biggest source of "more companies = more lag": every
-// read of ANY other company's total re-loaded + re-parsed that company's whole
-// buildings array). Never persisted itself: switching to this company later
-// replaces the summary with a fresh, fully-accurate one (see main.ts's
-// switchToCompany), so nothing here ever gets double-counted or drifts forever
-function getProjectedUncollectedIncome(companyIndex: number): number {
-  const summary = loadCompanySummary(companyIndex);
-  if (!summary) return 0; // never went dormant yet (e.g. brand new company) — nothing uncollected
-  const elapsedSeconds = Math.max(0, (Date.now() - summary.updatedAt) / 1000);
-  // summary.incomeRatePerSecond already had the boost multiplier baked in as of
-  // the snapshot moment — re-applying the CURRENT multiplier here would double
-  // count it, and would require calling the O(companies) boost calculation once
-  // per dormant company again anyway
-  return summary.incomeRatePerSecond * elapsedSeconds;
+  const record = loadCompanyRecord(companyIndex);
+  if (!record) return 0; // never went dormant yet (e.g. brand new company) — nothing banked
+  const elapsedSeconds = Math.max(0, (Date.now() - record.updatedAt) / 1000);
+  return record.bankedTotal + record.incomeRatePerSecond * elapsedSeconds;
 }
 
 // combined totalIncome across every corporation — every corp boost/upgrade
@@ -69,14 +51,25 @@ export function addTotalIncome(amount: number): void {
 }
 
 // applies delta (positive or negative) to a specific company's own total —
-// straight to the live value if it's the active company, otherwise read+write
-// its persisted value directly (see spendFromAllCompanies)
+// straight to the live value if it's the active company; for a dormant one,
+// re-anchors its CompanyRecord's bankedTotal AND updatedAt TOGETHER in one
+// atomic write (see spendFromAllCompanies) — bankedTotal is computed from the
+// CURRENT derived total (already including whatever it earned since it went
+// dormant) minus delta, so the next read projects forward from right now
+// instead of double-counting or drifting against a stale timestamp
 function adjustStoredTotalIncome(companyIndex: number, delta: number): void {
   if (companyIndex === activeCompanyIndex) {
     totalIncome += delta;
-  } else {
-    saveStoredTotal(companyIndex, loadStoredTotal(companyIndex) + delta);
+    return;
   }
+  const record = loadCompanyRecord(companyIndex);
+  const currentTotal = getStoredTotalIncome(companyIndex);
+  saveCompanyRecord(companyIndex, {
+    bankedTotal: currentTotal + delta,
+    incomeRatePerSecond: record?.incomeRatePerSecond ?? 0,
+    assetValue: record?.assetValue ?? 0,
+    updatedAt: Date.now(),
+  });
 }
 
 // $/sec every unlocked floor across every one of buildings is currently earning,
@@ -101,7 +94,7 @@ export function getBuildingsCurrentIncomePerSecond(
 
 // a company's own current $/sec, without ever loading a DORMANT company's full
 // buildings/floors — the active company's is computed live (freshest), every
-// other company's comes straight from its persisted CompanySummary (see
+// other company's comes straight from its persisted CompanyRecord (see
 // company.ts), already boost-adjusted as of when it went dormant. The single
 // shared way any per-company cost/weight calculation (getCompanyWealth,
 // corporationBoostMenu's getStockRaiseCost/getAllCompaniesCurrentIncomePerSecond)
@@ -110,7 +103,7 @@ export function getCompanyIncomeRatePerSecond(companyIndex: number): number {
   if (companyIndex === activeCompanyIndex) {
     return getBuildingsCurrentIncomePerSecond(tickerBuildings, Date.now());
   }
-  return loadCompanySummary(companyIndex)?.incomeRatePerSecond ?? 0;
+  return loadCompanyRecord(companyIndex)?.incomeRatePerSecond ?? 0;
 }
 
 // a company's own "wealth" for cost-splitting purposes: its current total plus a
@@ -195,59 +188,33 @@ export function clearTotalIncome(): void {
   // also zero the in-memory value: location.reload() fires beforeunload first,
   // and that handler re-saves whatever totalIncome currently holds
   totalIncome = 0;
-  try {
-    localStorage.removeItem(companyStorageKey(STORAGE_KEY, activeCompanyIndex));
-  } catch {
-    // storage unavailable: nothing to clear
-  }
+  clearCompanyRecord(activeCompanyIndex);
 }
 
-const STORAGE_KEY = "cash-clicker:total-income";
 const SAVE_INTERVAL_MS = 1000;
-
-function loadStoredTotal(companyIndex: number): number {
-  try {
-    const value = Number(
-      localStorage.getItem(companyStorageKey(STORAGE_KEY, companyIndex)),
-    );
-    return Number.isFinite(value) ? value : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function saveStoredTotal(companyIndex: number, value: number): void {
-  try {
-    localStorage.setItem(
-      companyStorageKey(STORAGE_KEY, companyIndex),
-      String(value),
-    );
-  } catch {
-    // storage unavailable/full: persistence is a nice-to-have, safe to ignore
-  }
-}
 
 // which company's total the module-level totalIncome/tickerBuildings below
 // currently belong to — swapped by switchActiveCompany, never shared across
 // companies (see company.ts)
 let activeCompanyIndex = getActiveCompanyIndex();
-let totalIncome = loadStoredTotal(activeCompanyIndex);
+let totalIncome = loadCompanyRecord(activeCompanyIndex)?.bankedTotal ?? 0;
 // whichever company's buildings the ticker is currently collecting idle income
 // from; set by startTotalIncomeTicker at startup, swapped by switchActiveCompany
 let tickerBuildings: Floor[][] = [];
 
 // call when the player switches to a different company (see cityMap's barrel
-// roll / main.ts): saves the outgoing company's total immediately, then loads
-// the new one's own total and points the running ticker at its own buildings —
-// its floors' own lastCollectedAt timestamps mean the very next tick correctly
-// pays out however much idle income piled up while this company wasn't active
+// roll / main.ts): main.ts's switchToCompany has ALREADY snapshotted the
+// outgoing company's own CompanyRecord (bankedTotal/rate/value, all together in
+// one write) before calling this, so this just flips which company's live
+// totalIncome/tickerBuildings are in memory — its floors' own lastCollectedAt
+// timestamps mean the very next tick correctly pays out however much idle
+// income piled up while this company wasn't active
 export function switchActiveCompany(
   companyIndex: number,
   buildings: Floor[][],
 ): void {
-  saveStoredTotal(activeCompanyIndex, totalIncome);
   activeCompanyIndex = companyIndex;
-  totalIncome = loadStoredTotal(companyIndex);
+  totalIncome = loadCompanyRecord(companyIndex)?.bankedTotal ?? 0;
   tickerBuildings = buildings;
 }
 
@@ -314,7 +281,7 @@ export function startTotalIncomeTicker(
       // same guard as the beforeunload save below — otherwise this periodic
       // autosave would silently undo a manual localStorage clear within ~1s of
       // it happening, even before the player gets a chance to close the tab
-      if (isStorageIntact()) saveStoredTotal(activeCompanyIndex, totalIncome);
+      if (isStorageIntact()) snapshotActiveCompanyRecord();
     }
   }
 
@@ -325,6 +292,25 @@ export function startTotalIncomeTicker(
 
   window.addEventListener("beforeunload", () => {
     if (!isStorageIntact()) return;
-    saveStoredTotal(activeCompanyIndex, totalIncome);
+    snapshotActiveCompanyRecord();
+  });
+}
+
+// refreshes the ACTIVE company's own CompanyRecord (bankedTotal + rate,
+// together) so it's never far out of date even if the session ends without an
+// explicit company switch (crash, force-quit) — assetValue is preserved as-is
+// since computing it needs hud/corporationBoostMenu's pricing logic, which this
+// module deliberately never imports (see incomeBoostMultiplier's own comment) ;
+// it's only ever fully refreshed by main.ts's switchToCompany snapshot
+function snapshotActiveCompanyRecord(): void {
+  const existing = loadCompanyRecord(activeCompanyIndex);
+  saveCompanyRecord(activeCompanyIndex, {
+    bankedTotal: totalIncome,
+    incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
+      tickerBuildings,
+      Date.now(),
+    ),
+    assetValue: existing?.assetValue ?? 0,
+    updatedAt: Date.now(),
   });
 }

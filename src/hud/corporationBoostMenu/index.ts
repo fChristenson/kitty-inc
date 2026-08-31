@@ -15,7 +15,7 @@ import { getBuildingPrice } from "../../buildings";
 import {
   companyStorageKey,
   getActiveCompanyIndex,
-  loadCompanySummary,
+  loadCompanyRecord,
 } from "../../company";
 import { playSwoosh, playSold } from "../../sound";
 import coinIconUrl from "../../assets/coin.png";
@@ -205,7 +205,7 @@ function getUpgradesValue(buildings: Floor[][]): number {
 }
 
 // buildings value + upgrades value combined — exported so main.ts can snapshot
-// a company's CompanySummary (see company.ts) at the exact moment it goes
+// a company's CompanyRecord (see company.ts) at the exact moment it goes
 // dormant, without duplicating this pricing logic there
 export function getCompanyAssetValue(buildings: Floor[][]): number {
   return getBuildingsValue(buildings.length) + getUpgradesValue(buildings);
@@ -214,7 +214,7 @@ export function getCompanyAssetValue(buildings: Floor[][]): number {
 // a company's overall value — buildings owned + upgrades bought + its own
 // current income (wealth) — the base a stock-price contribution below is
 // weighted against. The active company reads its own live buildings (freshest);
-// any dormant company reads its persisted CompanySummary's assetValue instead of
+// any dormant company reads its persisted CompanyRecord's assetValue instead of
 // ever loading its full buildings/floors array
 function getCompanyValue(companyIndex: number): number {
   if (companyIndex === getActiveCompanyIndex()) {
@@ -223,7 +223,7 @@ function getCompanyValue(companyIndex: number): number {
       getStoredTotalIncome(companyIndex)
     );
   }
-  const assetValue = loadCompanySummary(companyIndex)?.assetValue ?? 0;
+  const assetValue = loadCompanyRecord(companyIndex)?.assetValue ?? 0;
   return assetValue + getStoredTotalIncome(companyIndex);
 }
 

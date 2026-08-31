@@ -33,54 +33,81 @@ export function companyStorageKey(
   return companyIndex === 0 ? baseKey : `${baseKey}:${companyIndex}`;
 }
 
-// a tiny persisted snapshot of a DORMANT (not currently active) company —
-// everything totalIncome.ts/corporationBoostMenu.ts need to project that
-// company's income and value without ever loading its full buildings/floors
-// array (which only the one currently-active company keeps in memory/reloads
-// from storage). Written once, right when a company stops being active (see
-// main.ts's switchToCompany) — a dormant company's own buildings/upgrades never
-// change while it's dormant, so this stays valid until the player switches back
-// to it, changes something, and switches away again
-export interface CompanySummary {
-  incomeRatePerSecond: number; // already boost-multiplier-adjusted as of updatedAt
-  assetValue: number; // buildings value + upgrades value combined
-  updatedAt: number; // Date.now() at snapshot time
+// the ONLY persisted record of a DORMANT (not currently active) company's money/
+// value — everything totalIncome.ts/corporationBoostMenu.ts need to derive that
+// company's current total and value without ever loading its full buildings/
+// floors array. bankedTotal and updatedAt are always written TOGETHER, in one
+// call, by whichever single write actually changes them (main.ts's
+// switchToCompany snapshotting the outgoing company, or totalIncome.ts spending
+// from/autosaving a dormant one) — there is deliberately no separate "just the
+// total" key anywhere else that could get out of sync with this and silently
+// leave a company's total stuck (this was a real bug: the old design kept the
+// banked $ in one key and the rate/timestamp in another, and a spend against a
+// dormant company only ever updated the $ key, so the elapsed-time projection
+// kept compounding against a stale timestamp forever after)
+export interface CompanyRecord {
+  bankedTotal: number; // $ actually banked as of updatedAt
+  incomeRatePerSecond: number; // frozen as of updatedAt; only the active company's own rate can change
+  assetValue: number; // buildings value + upgrades value combined, frozen as of updatedAt
+  updatedAt: number; // Date.now() this record was last written
 }
 
-const COMPANY_SUMMARY_KEY = "cash-clicker:company-summary";
+// every company's own record lives together in ONE array under ONE key — not one
+// localStorage entry per company — so there's a single object to reason about
+// (and a single atomic read-modify-write per update, never partial/racing writes
+// split across several keys)
+const CORPORATIONS_KEY = "cash-clicker:corporations";
 
-export function saveCompanySummary(
-  companyIndex: number,
-  summary: CompanySummary,
-): void {
+function loadAllCompanyRecords(): (CompanyRecord | null)[] {
   try {
-    localStorage.setItem(
-      companyStorageKey(COMPANY_SUMMARY_KEY, companyIndex),
-      JSON.stringify(summary),
-    );
+    const raw = localStorage.getItem(CORPORATIONS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    // storage unavailable: nothing to persist
+    return [];
   }
 }
 
-export function loadCompanySummary(
-  companyIndex: number,
-): CompanySummary | null {
+function saveAllCompanyRecords(records: (CompanyRecord | null)[]): void {
   try {
-    const raw = localStorage.getItem(
-      companyStorageKey(COMPANY_SUMMARY_KEY, companyIndex),
-    );
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (
-      typeof parsed?.incomeRatePerSecond !== "number" ||
-      typeof parsed?.assetValue !== "number" ||
-      typeof parsed?.updatedAt !== "number"
-    ) {
-      return null;
-    }
-    return parsed as CompanySummary;
+    localStorage.setItem(CORPORATIONS_KEY, JSON.stringify(records));
   } catch {
+    // storage unavailable/full: persistence is a nice-to-have, safe to ignore
+  }
+}
+
+export function loadCompanyRecord(companyIndex: number): CompanyRecord | null {
+  const record = loadAllCompanyRecords()[companyIndex];
+  if (
+    !record ||
+    typeof record.bankedTotal !== "number" ||
+    typeof record.incomeRatePerSecond !== "number" ||
+    typeof record.assetValue !== "number" ||
+    typeof record.updatedAt !== "number"
+  ) {
     return null;
+  }
+  return record;
+}
+
+// the only way any code should ever persist a company's income/value snapshot —
+// always overwrites the whole record in one atomic write (read-modify-write the
+// single shared array), never just one field of it
+export function saveCompanyRecord(
+  companyIndex: number,
+  record: CompanyRecord,
+): void {
+  const all = loadAllCompanyRecords();
+  all[companyIndex] = record;
+  saveAllCompanyRecords(all);
+}
+
+// wipes a single company's record (see hud/testButton's per-active-company reset)
+export function clearCompanyRecord(companyIndex: number): void {
+  const all = loadAllCompanyRecords();
+  if (companyIndex < all.length) {
+    all[companyIndex] = null;
+    saveAllCompanyRecords(all);
   }
 }
