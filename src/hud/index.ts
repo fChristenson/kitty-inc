@@ -94,6 +94,7 @@ export {
   createCorporationBoostMenuMarkup,
   wireCorporationBoostMenu,
   getGlobalIncomeBoostMultiplier,
+  getCompanyAssetValue,
 } from "./corporationBoostMenu";
 export type { CorporationBoostMenu } from "./corporationBoostMenu";
 export {

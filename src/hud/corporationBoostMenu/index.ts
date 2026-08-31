@@ -8,11 +8,15 @@ import {
   spendFromAllCompanies,
   getAllCompaniesTotalIncome,
   getStoredTotalIncome,
-  getBuildingsCurrentIncomePerSecond,
+  getCompanyIncomeRatePerSecond,
 } from "../../totalIncome";
 import { getCorporationCount, getCorporationName } from "../../corporationName";
 import { getBuildingPrice } from "../../buildings";
-import { companyStorageKey } from "../../company";
+import {
+  companyStorageKey,
+  getActiveCompanyIndex,
+  loadCompanySummary,
+} from "../../company";
 import { playSwoosh, playSold } from "../../sound";
 import coinIconUrl from "../../assets/coin.png";
 import managerIconUrl from "../../assets/managerIcon.png";
@@ -90,10 +94,7 @@ export function getStockTimesBought(companyIndex: number): number {
 export function getStockRaiseCost(companyIndex: number): number {
   const timesBought = loadStockShares(companyIndex) - STOCK_PRICE_BASE;
   const baseCost =
-    getBuildingsCurrentIncomePerSecond(
-      loadBuildings(companyIndex),
-      Date.now(),
-    ) * SECONDS_PER_HOUR;
+    getCompanyIncomeRatePerSecond(companyIndex) * SECONDS_PER_HOUR;
   return baseCost * 2 ** timesBought;
 }
 
@@ -113,11 +114,11 @@ export function buyStockRaise(companyIndex: number): boolean {
 // $/sec every unlocked floor of every company is currently earning combined —
 // same per-company rate getStockRaiseCost uses, just summed across every
 // corporation instead of just one
-function getAllCompaniesCurrentIncomePerSecond(now: number): number {
+function getAllCompaniesCurrentIncomePerSecond(): number {
   const count = getCorporationCount();
   let total = 0;
   for (let i = 0; i < count; i++) {
-    total += getBuildingsCurrentIncomePerSecond(loadBuildings(i), now);
+    total += getCompanyIncomeRatePerSecond(i);
   }
   return total;
 }
@@ -129,8 +130,7 @@ const PRESS_CONFERENCE_INCOME_SECONDS = 30 * 60;
 // getStockRaiseCost, this never doubles with repeated purchases)
 export function getPressConferenceCost(): number {
   return (
-    getAllCompaniesCurrentIncomePerSecond(Date.now()) *
-    PRESS_CONFERENCE_INCOME_SECONDS
+    getAllCompaniesCurrentIncomePerSecond() * PRESS_CONFERENCE_INCOME_SECONDS
   );
 }
 
@@ -204,16 +204,27 @@ function getUpgradesValue(buildings: Floor[][]): number {
   return total;
 }
 
+// buildings value + upgrades value combined — exported so main.ts can snapshot
+// a company's CompanySummary (see company.ts) at the exact moment it goes
+// dormant, without duplicating this pricing logic there
+export function getCompanyAssetValue(buildings: Floor[][]): number {
+  return getBuildingsValue(buildings.length) + getUpgradesValue(buildings);
+}
+
 // a company's overall value — buildings owned + upgrades bought + its own
 // current income (wealth) — the base a stock-price contribution below is
-// weighted against
+// weighted against. The active company reads its own live buildings (freshest);
+// any dormant company reads its persisted CompanySummary's assetValue instead of
+// ever loading its full buildings/floors array
 function getCompanyValue(companyIndex: number): number {
-  const buildings = loadBuildings(companyIndex);
-  return (
-    getBuildingsValue(buildings.length) +
-    getUpgradesValue(buildings) +
-    getStoredTotalIncome(companyIndex, buildings)
-  );
+  if (companyIndex === getActiveCompanyIndex()) {
+    return (
+      getCompanyAssetValue(loadBuildings(companyIndex)) +
+      getStoredTotalIncome(companyIndex)
+    );
+  }
+  const assetValue = loadCompanySummary(companyIndex)?.assetValue ?? 0;
+  return assetValue + getStoredTotalIncome(companyIndex);
 }
 
 // how much a company's stock price contributes to the combined income boost.

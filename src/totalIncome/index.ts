@@ -1,10 +1,10 @@
-import { isStorageIntact, loadBuildings, type Floor } from "../gameState";
+import { isStorageIntact, type Floor } from "../gameState";
+import { collectDueIncome, currentIncomeRatePerSecond } from "../floors";
 import {
-  collectDueIncome,
-  peekDueIncome,
-  currentIncomeRatePerSecond,
-} from "../floors";
-import { getActiveCompanyIndex, companyStorageKey } from "../company";
+  getActiveCompanyIndex,
+  companyStorageKey,
+  loadCompanySummary,
+} from "../company";
 import { getCorporationCount } from "../corporationName";
 
 export function getTotalIncome(): number {
@@ -17,43 +17,32 @@ export function getTotalIncome(): number {
 // earned by now if it had kept ticking (see getProjectedUncollectedIncome) — so
 // every company keeps making money regardless of which one is currently
 // selected, even though only the active one's buildings are actually loaded/
-// ticked in memory at once (see company.ts). `buildings`, when the caller
-// already has it loaded (see getCompanyWealth/corporationBoostMenu's
-// getCompanyValue), skips this function's own redundant loadBuildings call —
-// callers computing several per-company values in a row were each separately
-// re-reading + re-parsing the same company's localStorage entry
-export function getStoredTotalIncome(
-  companyIndex: number,
-  buildings?: Floor[][],
-): number {
+// ticked in memory at once (see company.ts)
+export function getStoredTotalIncome(companyIndex: number): number {
   if (companyIndex === activeCompanyIndex) return totalIncome;
   return (
-    loadStoredTotal(companyIndex) +
-    getProjectedUncollectedIncome(companyIndex, buildings)
+    loadStoredTotal(companyIndex) + getProjectedUncollectedIncome(companyIndex)
   );
 }
 
-// how much a non-active company's floors have earned since they were last
-// actually collected, computed read-only (see floors.ts's peekDueIncome — same
-// cycle math collectDueIncome uses, just without advancing lastCollectedAt).
-// Never persisted itself: switching to this company later runs the real
-// collectDueIncome against these same floors, crediting the identical amount for
-// real at that point, so nothing here ever gets double-counted
-function getProjectedUncollectedIncome(
-  companyIndex: number,
-  buildingsOverride?: Floor[][],
-): number {
-  const buildings = buildingsOverride ?? loadBuildings(companyIndex);
-  const now = Date.now();
-  let total = 0;
-  for (const floors of buildings) {
-    for (const floor of floors) {
-      if (!floor.unlocked) continue;
-      total += peekDueIncome(floor, now);
-    }
-  }
-  // same global stock-boost multiplier the active ticker applies to collectDueIncome
-  return total * incomeBoostMultiplier();
+// how much a DORMANT company's floors have earned since it last stopped being
+// active, projected from its persisted CompanySummary (see company.ts) — a flat
+// rate x elapsed-seconds estimate instead of loading its full buildings/floors
+// array and replaying each floor's own quantized cycle (which is what this used
+// to do, and was the single biggest source of "more companies = more lag": every
+// read of ANY other company's total re-loaded + re-parsed that company's whole
+// buildings array). Never persisted itself: switching to this company later
+// replaces the summary with a fresh, fully-accurate one (see main.ts's
+// switchToCompany), so nothing here ever gets double-counted or drifts forever
+function getProjectedUncollectedIncome(companyIndex: number): number {
+  const summary = loadCompanySummary(companyIndex);
+  if (!summary) return 0; // never went dormant yet (e.g. brand new company) — nothing uncollected
+  const elapsedSeconds = Math.max(0, (Date.now() - summary.updatedAt) / 1000);
+  // summary.incomeRatePerSecond already had the boost multiplier baked in as of
+  // the snapshot moment — re-applying the CURRENT multiplier here would double
+  // count it, and would require calling the O(companies) boost calculation once
+  // per dormant company again anyway
+  return summary.incomeRatePerSecond * elapsedSeconds;
 }
 
 // combined totalIncome across every corporation — every corp boost/upgrade
@@ -110,26 +99,27 @@ export function getBuildingsCurrentIncomePerSecond(
   return total * incomeBoostMultiplier();
 }
 
+// a company's own current $/sec, without ever loading a DORMANT company's full
+// buildings/floors — the active company's is computed live (freshest), every
+// other company's comes straight from its persisted CompanySummary (see
+// company.ts), already boost-adjusted as of when it went dormant. The single
+// shared way any per-company cost/weight calculation (getCompanyWealth,
+// corporationBoostMenu's getStockRaiseCost/getAllCompaniesCurrentIncomePerSecond)
+// should read a company's rate — never loadBuildings(i) directly for this
+export function getCompanyIncomeRatePerSecond(companyIndex: number): number {
+  if (companyIndex === activeCompanyIndex) {
+    return getBuildingsCurrentIncomePerSecond(tickerBuildings, Date.now());
+  }
+  return loadCompanySummary(companyIndex)?.incomeRatePerSecond ?? 0;
+}
+
 // a company's own "wealth" for cost-splitting purposes: its current total plus a
 // projected hour of its own income rate, so a company that earns fast but hasn't
 // banked much yet still shoulders a fair share (not just whichever has the
-// biggest pile sitting still). Reads the active company's own LIVE buildings
-// (freshest) and every other company's persisted ones (see corporationBoostMenu's
-// getStockRaiseCost, same read-only-for-inactive-companies approach)
-function getCompanyWealth(companyIndex: number, buildings?: Floor[][]): number {
-  const resolvedBuildings =
-    buildings ??
-    (companyIndex === activeCompanyIndex
-      ? tickerBuildings
-      : loadBuildings(companyIndex));
-  const ratePerSecond = getBuildingsCurrentIncomePerSecond(
-    resolvedBuildings,
-    Date.now(),
-  );
-  return (
-    getStoredTotalIncome(companyIndex, resolvedBuildings) +
-    ratePerSecond * SECONDS_PER_HOUR
-  );
+// biggest pile sitting still)
+function getCompanyWealth(companyIndex: number): number {
+  const ratePerSecond = getCompanyIncomeRatePerSecond(companyIndex);
+  return getStoredTotalIncome(companyIndex) + ratePerSecond * SECONDS_PER_HOUR;
 }
 
 const SECONDS_PER_HOUR = 3600;
@@ -149,22 +139,12 @@ const SECONDS_PER_HOUR = 3600;
 // combined total across every company can't cover cost at all
 export function spendFromAllCompanies(cost: number): boolean {
   const count = getCorporationCount();
-  // loaded once per company and reused for both totals/weights below — each of
-  // getStoredTotalIncome/getCompanyWealth used to separately re-loadBuildings
-  // the same company, tripling the localStorage reads/JSON.parse work every
-  // purchase (stock raise, press conference, new company) once there were a
-  // few companies
-  const buildingsByCompany = Array.from({ length: count }, (_, i) =>
-    i === activeCompanyIndex ? tickerBuildings : loadBuildings(i),
-  );
   const totals = Array.from({ length: count }, (_, i) =>
-    getStoredTotalIncome(i, buildingsByCompany[i]),
+    getStoredTotalIncome(i),
   );
   if (totals.reduce((sum, total) => sum + total, 0) < cost) return false;
 
-  const weights = Array.from({ length: count }, (_, i) =>
-    getCompanyWealth(i, buildingsByCompany[i]),
-  );
+  const weights = Array.from({ length: count }, (_, i) => getCompanyWealth(i));
   const paid = new Array(count).fill(0);
   const active = new Set(Array.from({ length: count }, (_, i) => i));
   let unallocated = cost;

@@ -16,6 +16,7 @@ import {
   addTotalIncome,
   spendTotalIncome,
   getTotalIncome,
+  getBuildingsCurrentIncomePerSecond,
 } from "./totalIncome";
 import {
   saveBuildings,
@@ -31,6 +32,7 @@ import {
   getActiveCompanyIndex,
   setActiveCompanyIndex,
   companyStorageKey,
+  saveCompanySummary,
 } from "./company";
 import {
   createTestButtonMarkup,
@@ -51,6 +53,7 @@ import {
   createCorporationBoostMenuMarkup,
   wireCorporationBoostMenu,
   getGlobalIncomeBoostMultiplier,
+  getCompanyAssetValue,
   createPressConferenceGameMarkup,
   wirePressConferenceGame,
   createMapMenuMarkup,
@@ -226,6 +229,18 @@ async function main() {
   // totalIncome.ts its own separate running total — nothing here is shared
   // between companies
   function switchToCompany(companyIndex: number): void {
+    // snapshot the OUTGOING company's own summary (see company.ts) while
+    // `buildings`/`activeCompanyIndex` still hold its data — every other
+    // per-company read (income, value, cost-splitting) uses this instead of
+    // ever loading a dormant company's full buildings/floors again
+    saveCompanySummary(activeCompanyIndex, {
+      incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
+        buildings,
+        Date.now(),
+      ),
+      assetValue: getCompanyAssetValue(buildings),
+      updatedAt: Date.now(),
+    });
     saveBuildings(buildings, activeCompanyIndex);
     saveActiveBuildingIndex(activeCompanyIndex, activeBuildingIndex);
 

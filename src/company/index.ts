@@ -32,3 +32,55 @@ export function companyStorageKey(
 ): string {
   return companyIndex === 0 ? baseKey : `${baseKey}:${companyIndex}`;
 }
+
+// a tiny persisted snapshot of a DORMANT (not currently active) company —
+// everything totalIncome.ts/corporationBoostMenu.ts need to project that
+// company's income and value without ever loading its full buildings/floors
+// array (which only the one currently-active company keeps in memory/reloads
+// from storage). Written once, right when a company stops being active (see
+// main.ts's switchToCompany) — a dormant company's own buildings/upgrades never
+// change while it's dormant, so this stays valid until the player switches back
+// to it, changes something, and switches away again
+export interface CompanySummary {
+  incomeRatePerSecond: number; // already boost-multiplier-adjusted as of updatedAt
+  assetValue: number; // buildings value + upgrades value combined
+  updatedAt: number; // Date.now() at snapshot time
+}
+
+const COMPANY_SUMMARY_KEY = "cash-clicker:company-summary";
+
+export function saveCompanySummary(
+  companyIndex: number,
+  summary: CompanySummary,
+): void {
+  try {
+    localStorage.setItem(
+      companyStorageKey(COMPANY_SUMMARY_KEY, companyIndex),
+      JSON.stringify(summary),
+    );
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
+export function loadCompanySummary(
+  companyIndex: number,
+): CompanySummary | null {
+  try {
+    const raw = localStorage.getItem(
+      companyStorageKey(COMPANY_SUMMARY_KEY, companyIndex),
+    );
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (
+      typeof parsed?.incomeRatePerSecond !== "number" ||
+      typeof parsed?.assetValue !== "number" ||
+      typeof parsed?.updatedAt !== "number"
+    ) {
+      return null;
+    }
+    return parsed as CompanySummary;
+  } catch {
+    return null;
+  }
+}
