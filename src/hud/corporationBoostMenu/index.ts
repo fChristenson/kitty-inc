@@ -312,11 +312,16 @@ export function wireCorporationBoostMenu(
     `;
     const totalPct = getGlobalIncomeBoostPercent();
     const pressConferenceCost = getPressConferenceCost();
+    // computed once and reused below — getAllCompaniesTotalIncome() is itself
+    // O(companies) (a localStorage read + JSON.parse per company), so calling
+    // it again inside the per-company items loop made render() scale
+    // O(companies^2)
+    const allCompaniesTotalIncome = getAllCompaniesTotalIncome();
     const pressConferenceAffordable =
-      getAllCompaniesTotalIncome() >= pressConferenceCost;
+      allCompaniesTotalIncome >= pressConferenceCost;
     const items = Array.from({ length: count }, (_, i) => {
       const cost = getStockRaiseCost(i);
-      const affordable = getAllCompaniesTotalIncome() >= cost;
+      const affordable = allCompaniesTotalIncome >= cost;
       return `
         <button
           class="worker-menu__item"
@@ -334,7 +339,7 @@ export function wireCorporationBoostMenu(
     }).join("");
     list.innerHTML = `
       <h3 class="worker-menu__subheader">Corporation assets</h3>
-      <span class="worker-menu__total-income">${formatTotalIncomeFull(getAllCompaniesTotalIncome())}</span>
+      <span class="worker-menu__total-income">${formatTotalIncomeFull(allCompaniesTotalIncome)}</span>
       <h3 class="worker-menu__subheader">Stock price income modifiers</h3>
       ${marketInfluenceRow}
       ${modifierRows}
@@ -441,20 +446,22 @@ export function wireCorporationBoostMenu(
   // updateAffordability, so a grayed-out item turns clickable again as soon as
   // income catches up instead of only refreshing on the next open/purchase
   function updateAffordability(): void {
+    // same hoist-out-of-the-loop fix as render() above
+    const allCompaniesTotalIncome = getAllCompaniesTotalIncome();
     const buttons = list.querySelectorAll<HTMLButtonElement>(
       "button[data-company-index]",
     );
     buttons.forEach((button) => {
       const companyIndex = Number(button.dataset.companyIndex);
       button.disabled =
-        getAllCompaniesTotalIncome() < getStockRaiseCost(companyIndex);
+        allCompaniesTotalIncome < getStockRaiseCost(companyIndex);
     });
     const pressConferenceButton = list.querySelector<HTMLButtonElement>(
       "#press-conference-item",
     );
     if (pressConferenceButton) {
       pressConferenceButton.disabled =
-        getAllCompaniesTotalIncome() < getPressConferenceCost();
+        allCompaniesTotalIncome < getPressConferenceCost();
     }
   }
 

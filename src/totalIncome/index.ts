@@ -266,6 +266,13 @@ const COLLECT_INTERVAL_MS = 200;
 // hud -> floors -> totalIncome import cycle (hud already imports from both
 // totalIncome and floors)
 let incomeBoostMultiplier: () => number = () => 1;
+// incomeBoostMultiplier() itself is still O(companies) even called just once
+// per tick (see collectAll) — a company's stock/value/income doesn't
+// meaningfully change within a second, so it's only actually recomputed at
+// most this often; every other 200ms tick in between reuses the cached value
+const BOOST_MULTIPLIER_CACHE_MS = 1000;
+let cachedBoostMultiplier = 1;
+let cachedBoostMultiplierAt = 0;
 
 export function startTotalIncomeTicker(
   buildings: Floor[][],
@@ -279,10 +286,20 @@ export function startTotalIncomeTicker(
     // Date.now()-based (not performance.now()) since collectDueIncome now reads/writes
     // floor.lastCollectedAt directly, a persisted Date.now()-based timestamp
     const now = Date.now();
+    // hoisted out of the per-floor loop below — incomeBoostMultiplier() (see
+    // corporationBoostMenu's getGlobalIncomeBoostPercent) loops over every
+    // company doing a localStorage read + JSON.parse per company, so calling it
+    // once per floor instead of once per tick made this whole ticker's cost
+    // scale with floors × companies every COLLECT_INTERVAL_MS — the single
+    // biggest source of "more companies = more stutter" reported on mobile
+    if (now - cachedBoostMultiplierAt >= BOOST_MULTIPLIER_CACHE_MS) {
+      cachedBoostMultiplier = incomeBoostMultiplier();
+      cachedBoostMultiplierAt = now;
+    }
     for (const floors of tickerBuildings) {
       for (const floor of floors) {
         if (!floor.unlocked) continue;
-        totalIncome += collectDueIncome(floor, now) * incomeBoostMultiplier();
+        totalIncome += collectDueIncome(floor, now) * cachedBoostMultiplier;
       }
     }
 
