@@ -85,6 +85,15 @@ const EVENT_STROKE_WIDTH = 4;
 const EVENT_HIT_HEIGHT = 28; // vertical tolerance for a head/event collision
 const EVENT_SPAWN_INTERVAL_MIN_MS = 1400;
 const EVENT_SPAWN_INTERVAL_MAX_MS = 2600;
+// difficulty ramp: every DIFFICULTY_INTERVAL_MS survived, bad events get 25%
+// more likely (relative to good's own unchanged odds), events spawn more
+// densely (the interval between spawns shrinks), and every event moves
+// EVENT_SPEED_GROWTH_PER_TIER faster — all compounding each tier
+const DIFFICULTY_INTERVAL_MS = 10_000;
+const BAD_SPAWN_WEIGHT_GROWTH_PER_TIER = 1.25;
+const EVENT_SPEED_GROWTH_PER_TIER = 1.15;
+const SPAWN_INTERVAL_SHRINK_PER_TIER = 0.8; // <1: shrinks the gap between spawns, so more text spawns overall
+const MIN_SPAWN_INTERVAL_FLOOR_MS = 350; // never crowds spawns closer together than this regardless of tier
 // spawnCoinBurstAt's own default scale (1) is sized for a full building-width
 // canvas; this screen is much smaller, so its own bursts get shrunk down too
 const COIN_BURST_SCALE = 0.35;
@@ -196,19 +205,35 @@ export function wirePressConferenceGame(
     return Math.ceil(cssW / TRAIL_SAMPLE_DX) + 2;
   }
 
-  function randomEventDelayMs(): number {
-    return (
-      EVENT_SPAWN_INTERVAL_MIN_MS +
-      Math.random() *
-        (EVENT_SPAWN_INTERVAL_MAX_MS - EVENT_SPAWN_INTERVAL_MIN_MS)
+  // takes the tier explicitly (rather than reading state.survivedMs itself)
+  // so it's safe to call from freshState() too, before `state` exists yet —
+  // shrinks toward MIN_SPAWN_INTERVAL_FLOOR_MS each tier, so more text spawns
+  // overall as the game goes on
+  function randomEventDelayMs(tier: number): number {
+    const shrink = SPAWN_INTERVAL_SHRINK_PER_TIER ** tier;
+    const min = Math.max(
+      MIN_SPAWN_INTERVAL_FLOOR_MS,
+      EVENT_SPAWN_INTERVAL_MIN_MS * shrink,
     );
+    const max = Math.max(min + 200, EVENT_SPAWN_INTERVAL_MAX_MS * shrink);
+    return min + Math.random() * (max - min);
+  }
+
+  // how many full DIFFICULTY_INTERVAL_MS spans have been survived so far —
+  // the bad-event odds, spawn density, and every event's own drift speed all
+  // scale off this
+  function getDifficultyTier(): number {
+    return Math.floor(state.survivedMs / DIFFICULTY_INTERVAL_MS);
   }
 
   // spawns just off the right edge, drifting left like everything else in
   // this world — a random pick from the good/bad cat-headline lists, at a
   // random height that leaves room for the sales button anchored at the bottom
   function spawnMarketEvent(): void {
-    const good = Math.random() < 0.5;
+    // good keeps flat 1:1 odds; bad's own relative weight compounds each
+    // difficulty tier, so it crowds out good more and more over time
+    const badWeight = BAD_SPAWN_WEIGHT_GROWTH_PER_TIER ** getDifficultyTier();
+    const good = Math.random() >= badWeight / (1 + badWeight);
     const list = good ? GOOD_MARKET_EVENTS : BAD_MARKET_EVENTS;
     const text = list[Math.floor(Math.random() * list.length)];
     ctx.font = EVENT_FONT;
@@ -235,7 +260,7 @@ export function wirePressConferenceGame(
       running: true,
       gameOver: false,
       marketEvents: [],
-      nextEventInMs: randomEventDelayMs(),
+      nextEventInMs: randomEventDelayMs(0),
     };
   }
   let state = freshState();
@@ -499,12 +524,14 @@ export function wirePressConferenceGame(
     state.nextEventInMs -= dtMs;
     if (state.nextEventInMs <= 0) {
       spawnMarketEvent();
-      state.nextEventInMs = randomEventDelayMs();
+      state.nextEventInMs = randomEventDelayMs(getDifficultyTier());
     }
     const headX = cssW * HEAD_X_FRACTION;
+    const eventSpeed =
+      SCROLL_SPEED_PX_S * EVENT_SPEED_GROWTH_PER_TIER ** getDifficultyTier();
     for (let i = state.marketEvents.length - 1; i >= 0; i--) {
       const event = state.marketEvents[i];
-      event.x -= SCROLL_SPEED_PX_S * dt;
+      event.x -= eventSpeed * dt;
       const withinX = Math.abs(event.x - headX) < event.width / 2 + LINE_WIDTH;
       const withinY = Math.abs(event.y - state.headY) < EVENT_HIT_HEIGHT / 2;
       if (withinX && withinY) {
