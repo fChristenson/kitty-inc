@@ -169,6 +169,18 @@ export function collectDueIncome(floor: Floor, now: number): number {
   return cycles * amount;
 }
 
+// same math as collectDueIncome, but read-only — doesn't advance
+// floor.lastCollectedAt. For companies that aren't the currently active one (see
+// company.ts): their floors sit dormant instead of being ticked live, so this
+// lets totalIncome.ts estimate what they'd have actually earned by now anyway,
+// without needing every company's buildings loaded/ticking at once
+export function peekDueIncome(floor: Floor, now: number): number {
+  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
+  const intervalMs = intervalSeconds * 1000;
+  const cycles = Math.floor((now - floor.lastCollectedAt) / intervalMs);
+  return cycles > 0 ? cycles * amount : 0;
+}
+
 // seconds left until the current fill cycle completes, counting down from the full
 // interval to 0 in lockstep with drawIncomePanel's own bar-fill percentage (same
 // lastCollectedAt anchor and modulo-wrap), instead of always showing the constant interval

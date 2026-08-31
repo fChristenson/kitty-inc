@@ -222,6 +222,7 @@ export function drawGround(
 export {
   startIncomeTicker,
   collectDueIncome,
+  peekDueIncome,
   drawIncomePanel,
   getIncomeBarCenter,
 } from "./incomePanel";

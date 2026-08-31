@@ -4,7 +4,7 @@ import {
   getBuildingsIncomePerSecond,
   type Floor,
 } from "../gameState";
-import { collectDueIncome } from "../floors";
+import { collectDueIncome, peekDueIncome } from "../floors";
 import { getActiveCompanyIndex, companyStorageKey } from "../company";
 import { getCorporationCount } from "../corporationName";
 
@@ -14,12 +14,36 @@ export function getTotalIncome(): number {
 
 // reads any company's own running total (not just the currently active one) —
 // the active company's in-memory value (freshest, may not be saved yet), every
-// other company's last-persisted one (see corporationBoostMenu.ts's "Corporation
-// assets" summary, which sums this across every company)
+// other company's last-persisted total PLUS however much it would have actually
+// earned by now if it had kept ticking (see getProjectedUncollectedIncome) — so
+// every company keeps making money regardless of which one is currently
+// selected, even though only the active one's buildings are actually loaded/
+// ticked in memory at once (see company.ts)
 export function getStoredTotalIncome(companyIndex: number): number {
-  return companyIndex === activeCompanyIndex
-    ? totalIncome
-    : loadStoredTotal(companyIndex);
+  if (companyIndex === activeCompanyIndex) return totalIncome;
+  return (
+    loadStoredTotal(companyIndex) +
+    getProjectedUncollectedIncome(companyIndex)
+  );
+}
+
+// how much a non-active company's floors have earned since they were last
+// actually collected, computed read-only (see floors.ts's peekDueIncome — same
+// cycle math collectDueIncome uses, just without advancing lastCollectedAt).
+// Never persisted itself: switching to this company later runs the real
+// collectDueIncome against these same floors, crediting the identical amount for
+// real at that point, so nothing here ever gets double-counted
+function getProjectedUncollectedIncome(companyIndex: number): number {
+  const buildings = loadBuildings(companyIndex);
+  const now = Date.now();
+  let total = 0;
+  for (const floors of buildings) {
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      total += peekDueIncome(floor, now);
+    }
+  }
+  return total;
 }
 
 // combined totalIncome across every corporation — every corp boost/upgrade
