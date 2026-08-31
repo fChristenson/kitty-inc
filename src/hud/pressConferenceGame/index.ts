@@ -64,26 +64,44 @@ const TAIL_MAX_ANGLE_TAN = Math.tan((TAIL_MAX_ANGLE_DEG * Math.PI) / 180);
 
 // brief cat-themed market headlines, floating right-to-left across the
 // screen like obstacles — green/white for good ones (a coin burst + coin sfx
-// on hit), red/white for bad ones (an explosion + screen shake on hit)
-const GOOD_MARKET_EVENTS = [
-  "Purrfect Earnings!",
-  "Meow-nificent Quarter",
-  "Whisker Rally",
-  "Catnip Boom",
-  "Nine Lives Profit",
-  "Paw-sitive Outlook",
-  "Kitten IPO Hype",
-  "Feline Bull Run",
+// on hit), red/white for bad ones (an explosion + screen shake on hit).
+// Generated dynamically each spawn (see generateMarketEventText) instead of
+// picked from a fixed phrase list: one cat-themed word plus one market-mood
+// word (positive for good events, negative for bad), so the same handful of
+// small pools keeps producing fresh-feeling combinations
+const CAT_WORDS = [
+  "Purr",
+  "Whisker",
+  "Meow",
+  "Catnip",
+  "Kitten",
+  "Feline",
+  "Paw",
+  "Hairball",
+  "Fur",
+  "Tabby",
+  "Nine Lives",
+  "Litter Box",
 ];
-const BAD_MARKET_EVENTS = [
-  "Hairball Crash",
-  "Meow-ket Meltdown",
-  "Litter Box Losses",
-  "Copycat Selloff",
-  "Hiss-terical Panic",
-  "Claw-Back Losses",
-  "Scratched Earnings",
-  "Fur-midable Downturn",
+const POSITIVE_MARKET_WORDS = [
+  "Boom",
+  "Rally",
+  "Surge",
+  "Spike",
+  "Bull Run",
+  "Soar",
+  "Profit",
+  "Hype",
+];
+const NEGATIVE_MARKET_WORDS = [
+  "Crash",
+  "Meltdown",
+  "Selloff",
+  "Slump",
+  "Panic",
+  "Plunge",
+  "Losses",
+  "Downturn",
 ];
 const EVENT_FONT = '700 20px "Fredoka", system-ui, sans-serif';
 const EVENT_STROKE_WIDTH = 4;
@@ -291,9 +309,20 @@ export function wirePressConferenceGame(
     return Math.floor(state.survivedMs / DIFFICULTY_INTERVAL_MS);
   }
 
+  // one cat-themed word plus one market-mood word (see CAT_WORDS/
+  // POSITIVE_MARKET_WORDS/NEGATIVE_MARKET_WORDS above), instead of a fixed
+  // pre-written phrase — every spawn combines a fresh random pair
+  function generateMarketEventText(good: boolean): string {
+    const catWord = CAT_WORDS[Math.floor(Math.random() * CAT_WORDS.length)];
+    const moodWords = good ? POSITIVE_MARKET_WORDS : NEGATIVE_MARKET_WORDS;
+    const moodWord = moodWords[Math.floor(Math.random() * moodWords.length)];
+    return `${catWord} ${moodWord}`;
+  }
+
   // spawns just off the right edge, drifting left like everything else in
-  // this world — a random pick from the good/bad cat-headline lists, at a
-  // random height that leaves room for the sales button anchored at the bottom
+  // this world — a fresh cat-themed headline (see generateMarketEventText),
+  // at a random height that leaves room for the sales button anchored at the
+  // bottom
   function spawnMarketEvent(): void {
     // good keeps flat 1:1 odds; bad's own relative weight compounds each
     // difficulty tier, so it crowds out good more and more over time
@@ -302,10 +331,7 @@ export function wirePressConferenceGame(
     // a bad spawn has its own further chance of being the special Market
     // Crash event instead of a normal bad headline
     const isCrash = !good && Math.random() < MARKET_CRASH_CHANCE;
-    const list = good ? GOOD_MARKET_EVENTS : BAD_MARKET_EVENTS;
-    const text = isCrash
-      ? MARKET_CRASH_TEXT
-      : list[Math.floor(Math.random() * list.length)];
+    const text = isCrash ? MARKET_CRASH_TEXT : generateMarketEventText(good);
     ctx.font = isCrash ? MARKET_CRASH_FONT : EVENT_FONT;
     const width = ctx.measureText(text).width;
     const topMargin = 30;
