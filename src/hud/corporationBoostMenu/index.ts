@@ -234,7 +234,8 @@ export function wireCorporationBoostMenu(
           ${affordable ? "" : "disabled"}
         >
           <span class="worker-menu__item-label">
-            ${getCorporationName(i)} (x${getStockTimesBought(i)})
+            <span class="worker-menu__item-name">${getCorporationName(i)}</span>
+            <span class="worker-menu__item-count">(x${getStockTimesBought(i)})</span>
           </span>
           <span class="worker-menu__price">${formatPrice(cost)}</span>
         </button>

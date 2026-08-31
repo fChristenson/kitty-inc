@@ -731,7 +731,22 @@ body {
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
+}
+
+/* the actual truncating part — a plain "name (xN)" text node inside this label
+   ellipsized the WHOLE string including the "(xN)" once it overflowed, cutting
+   the counter off too; splitting it into its own span (below) keeps that part
+   always fully visible, only the name itself shrinks/truncates */
+.worker-menu__item-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.worker-menu__item-count {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .worker-menu__icon {
