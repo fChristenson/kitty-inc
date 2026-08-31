@@ -554,7 +554,7 @@ body {
      the bottom of the viewport (see utils.ts's observeActionBarHeight) — a fixed
      rem guess here previously missed the extra height dev builds stack
      underneath the real action bar (test-actions-bar) */
-  max-height: calc(100vh - 400px - var(--worker-menu-safe-bottom, 3.75rem));
+  max-height: calc(100vh - 180px - var(--worker-menu-safe-bottom, 3.75rem));
   display: flex;
   flex-direction: column;
   /* cartoon wood-board look (see src/assets/dialog.jfif): tan fill + dark outline
