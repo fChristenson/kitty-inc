@@ -17,7 +17,6 @@ import {
 } from "../../company";
 import cityMapUrl from "../../assets/city2Bg.png";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
-import starUrl from "../../assets/star.png";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -123,29 +122,6 @@ const MARKER_POSITIONS: {
     feetYNudgePx: 100,
   }, // building 4 (5 stars): far right
 ];
-// tier star row drawn under each marker: building index 0 shows 1 filled star (of
-// 5), the last building (index MARKER_COUNT-1) shows all 5 filled
-const STAR_ROW_Y_OFFSET = 12; // below the marker's feetY
-const STAR_SIZE = 13.5; // 25% smaller than the original 18 (star.png is roughly square already)
-const STAR_SPACING = 15; // 25% smaller than the original 20
-// outline stamped behind each star icon, offset in a ring of directions — star.png is a
-// raster sprite with transparency, not a path, so there's nothing to ctx.stroke() directly.
-// Offsets are placed evenly around a circle (equal true radius) rather than by cardinal/
-// diagonal deltas, so the stamped ring dilates uniformly in every direction instead of
-// bulging out further on the diagonals (sqrt(2)x a matching cardinal delta) and reading
-// as octagonal/faceted instead of round
-const STAR_STROKE_WIDTH = 1.5; // 25% smaller than the original 2, scaled alongside STAR_SIZE
-const STAR_STROKE_SAMPLE_COUNT = 16;
-const STAR_STROKE_OFFSETS: [number, number][] = Array.from(
-  { length: STAR_STROKE_SAMPLE_COUNT },
-  (_, i) => {
-    const angle = (i / STAR_STROKE_SAMPLE_COUNT) * Math.PI * 2;
-    return [
-      Math.cos(angle) * STAR_STROKE_WIDTH,
-      Math.sin(angle) * STAR_STROKE_WIDTH,
-    ];
-  },
-);
 
 // gap between the total-income readout and each city's own name, drawn flat right
 // below it (see drawStreetText) — the name itself comes from cityName.ts's
@@ -168,35 +144,12 @@ function getSortedCorporationIndices(): number[] {
 
 let mapImage: HTMLImageElement | null = null;
 let catSprite: HTMLImageElement | null = null;
-let starImage: HTMLImageElement | null = null;
-// star.png's own silhouette with alpha hardened to fully opaque/transparent (no
-// anti-aliased fringe) — stamped at each offset above to build the outline; keeping
-// the source's own soft edges would layer up into a blurry haze instead of a sharp
-// ring once dilated. Built once since star.png/STAR_SIZE never change after load
-let starOutline: HTMLCanvasElement | null = null;
 
 export async function loadCityMapImage(): Promise<HTMLImageElement> {
-  [mapImage, catSprite, starImage] = await Promise.all([
+  [mapImage, catSprite] = await Promise.all([
     loadImage(cityMapUrl),
     loadImage(catSpriteUrl),
-    loadImage(starUrl),
   ]);
-  const outlineCanvas = document.createElement("canvas");
-  outlineCanvas.width = STAR_SIZE;
-  outlineCanvas.height = STAR_SIZE;
-  const outlineCtx = outlineCanvas.getContext("2d")!;
-  outlineCtx.drawImage(starImage, 0, 0, STAR_SIZE, STAR_SIZE);
-  const silhouette = outlineCtx.getImageData(0, 0, STAR_SIZE, STAR_SIZE);
-  const ALPHA_THRESHOLD = 40; // out of 255 — anything past this counts as "inside" the star
-  for (let i = 0; i < silhouette.data.length; i += 4) {
-    const opaque = silhouette.data[i + 3] > ALPHA_THRESHOLD;
-    silhouette.data[i] = 255;
-    silhouette.data[i + 1] = 255;
-    silhouette.data[i + 2] = 255;
-    silhouette.data[i + 3] = opaque ? 255 : 0;
-  }
-  outlineCtx.putImageData(silhouette, 0, 0);
-  starOutline = outlineCanvas;
   return mapImage;
 }
 
@@ -427,106 +380,6 @@ export function createCityMapView(
   function hitTestMarker(buildingIndex: number, x: number, y: number): boolean {
     const b = markerBounds(buildingIndex);
     return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom;
-  }
-
-  // single star.png icon; empty (unfilled) ones get a flat gray tint via canvas
-  // filter, same technique drawCatMarker uses for a locked building's marker.
-  // targetCtx so this can render into the row cache canvas below as easily as
-  // the visible one
-  function drawStarIcon(
-    targetCtx: CanvasRenderingContext2D,
-    cx: number,
-    cy: number,
-    filled: boolean,
-  ): void {
-    if (!starImage) return;
-    targetCtx.save();
-    if (starOutline) {
-      const ox = cx - STAR_SIZE / 2;
-      const oy = cy - STAR_SIZE / 2;
-      for (const [dx, dy] of STAR_STROKE_OFFSETS) {
-        targetCtx.drawImage(
-          starOutline,
-          ox + dx,
-          oy + dy,
-          STAR_SIZE,
-          STAR_SIZE,
-        );
-      }
-    }
-    if (!filled) {
-      targetCtx.filter = "grayscale(1) brightness(0.75)";
-      targetCtx.globalAlpha = 0.6;
-    }
-    targetCtx.drawImage(
-      starImage,
-      cx - STAR_SIZE / 2,
-      cy - STAR_SIZE / 2,
-      STAR_SIZE,
-      STAR_SIZE,
-    );
-    targetCtx.restore();
-  }
-
-  // a star row only ever looks one of 5 ways (filledCount 1-5), so each variant is
-  // rendered once into its own offscreen canvas and reused from then on — redoing
-  // every star's 16-offset outline effect (~85 drawImage calls total across a
-  // building's row) from scratch on every single animation frame was the actual
-  // cost that made opening the map freeze the page
-  const STAR_ROW_PAD = STAR_STROKE_WIDTH; // room for the outline's offset stroke past each edge star
-  const STAR_ROW_W = STAR_SPACING * 4 + STAR_SIZE + STAR_ROW_PAD * 2;
-  const STAR_ROW_H = STAR_SIZE + STAR_ROW_PAD * 2;
-  const starRowCache = new Map<number, HTMLCanvasElement>();
-  let starRowCacheDpr = 0;
-  function getStarRow(filledCount: number): HTMLCanvasElement | null {
-    if (!starImage) return null;
-    const dpr = window.devicePixelRatio || 1;
-    // a device-pixel-resolution cache built at one dpr would upscale (and blur)
-    // if the page later renders at a higher one — clear and rebuild instead
-    if (dpr !== starRowCacheDpr) {
-      starRowCache.clear();
-      starRowCacheDpr = dpr;
-    }
-    const cached = starRowCache.get(filledCount);
-    if (cached) return cached;
-    const rowCanvas = document.createElement("canvas");
-    // backing store sized in device pixels (like the main canvas), not CSS pixels —
-    // otherwise this cache is drawn back into the dpr-scaled main context at less
-    // than its own resolution, upscaling (and blurring) it on any high-DPR screen
-    rowCanvas.width = Math.round(STAR_ROW_W * dpr);
-    rowCanvas.height = Math.round(STAR_ROW_H * dpr);
-    const rowCtx = rowCanvas.getContext("2d")!;
-    rowCtx.scale(dpr, dpr);
-    for (let i = 0; i < 5; i++) {
-      drawStarIcon(
-        rowCtx,
-        STAR_ROW_PAD + i * STAR_SPACING + STAR_SIZE / 2,
-        STAR_ROW_PAD + STAR_SIZE / 2,
-        i < filledCount,
-      );
-    }
-    starRowCache.set(filledCount, rowCanvas);
-    return rowCanvas;
-  }
-
-  // 5 stars centered under the marker; `filledCount` (buildingIndex + 1) of them
-  // solid gold, the rest gray-tinted — shows this building's tier at a glance
-  function drawStarRow(buildingIndex: number, filledCount: number): void {
-    const row = getStarRow(filledCount);
-    if (!row) return;
-    const { cx, feetY } = markerCenter(buildingIndex);
-    const rowY = feetY + STAR_ROW_Y_OFFSET;
-    const startX = cx - (STAR_SPACING * 4) / 2 - STAR_SIZE / 2 - STAR_ROW_PAD;
-    // row's own backing store is device-pixel-resolution now, so its size must be
-    // given explicitly in CSS pixels here — omitting it would draw at the row
-    // canvas's raw (dpr-multiplied) pixel dimensions, dpr times too large
-    ctx.drawImage(
-      row,
-      startX,
-      rowY - STAR_SIZE / 2 - STAR_ROW_PAD,
-      STAR_ROW_W,
-      STAR_ROW_H,
-    );
   }
 
   // any building beyond MARKER_COUNT has no marker here yet
@@ -761,7 +614,6 @@ export function createCityMapView(
           activeIndex === globalIndex ? pose : CAT_STAND_FRAME,
           false,
         );
-        drawStarRow(i, i + 1);
         continue;
       }
       drawCatMarker(i, CAT_STAND_FRAME, true);
@@ -769,7 +621,7 @@ export function createCityMapView(
       const price = getBuildingPrice(globalIndex);
       const affordable = deps.getTotalIncome() >= price;
       if (affordable) hasWigglingMarker = true;
-      // 25% smaller than the original 22px, matching the scaled-down cat/stars
+      // 25% smaller than the original 22px, matching the scaled-down cat marker
       ctx.font = '900 16.5px "Fredoka", system-ui, sans-serif';
       ctx.textAlign = "center";
       ctx.textBaseline = "bottom";
@@ -790,7 +642,6 @@ export function createCityMapView(
       } else {
         drawCartoonText(ctx, formatPrice(price), cx, priceY, COLOR.white);
       }
-      drawStarRow(i, i + 1);
     }
 
     // total income, top of the map — same green-fill/white-stroke money text look
