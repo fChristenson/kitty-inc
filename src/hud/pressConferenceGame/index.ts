@@ -8,6 +8,7 @@ import {
 } from "../../utils";
 import { COLOR } from "../../palette";
 import { triggerScreenShake, getScreenShakeOffset } from "../../screenShake";
+import { getWiggleRotation } from "../../shared/wiggle";
 import {
   loadCoinBurstImages,
   spawnCoinBurstAt,
@@ -18,6 +19,11 @@ import {
   getAllCompaniesTotalIncome,
 } from "../../totalIncome";
 import { addMarketInfluencePercent } from "../corporationBoostMenu";
+import {
+  generateMarketEventText,
+  MARKET_CRASH_TEXT,
+  MARKET_CRASH_CHANCE,
+} from "./marketEventText";
 import podiumSpriteUrl from "../../assets/sprites/podiumSpeak.png";
 import audienceUrl from "../../assets/audience.png";
 
@@ -76,57 +82,16 @@ const TAIL_MAX_ANGLE_TAN = Math.tan((TAIL_MAX_ANGLE_DEG * Math.PI) / 180);
 
 // brief cat-themed market headlines, floating right-to-left across the
 // screen like obstacles — green/white for good ones (a coin burst + coin sfx
-// on hit), red/white for bad ones (an explosion + screen shake on hit).
-// Generated dynamically each spawn (see generateMarketEventText) instead of
-// picked from a fixed phrase list: one cat-themed word plus one market-mood
-// word (positive for good events, negative for bad), so the same handful of
-// small pools keeps producing fresh-feeling combinations
-const CAT_WORDS = [
-  "Purr",
-  "Whisker",
-  "Meow",
-  "Catnip",
-  "Kitten",
-  "Feline",
-  "Paw",
-  "Hairball",
-  "Fur",
-  "Tabby",
-  "Nine Lives",
-  "Litter Box",
-];
-const POSITIVE_MARKET_WORDS = [
-  "Boom",
-  "Rally",
-  "Surge",
-  "Spike",
-  "Bull Run",
-  "Soar",
-  "Profit",
-  "Hype",
-];
-const NEGATIVE_MARKET_WORDS = [
-  "Crash",
-  "Meltdown",
-  "Selloff",
-  "Slump",
-  "Panic",
-  "Plunge",
-  "Losses",
-  "Downturn",
-];
+// on hit), red/white for bad ones (an explosion + screen shake on hit). Text
+// itself is generated dynamically each spawn (see ./marketEventText) instead
+// of picked from a fixed phrase list
 const EVENT_FONT = '700 20px "Fredoka", system-ui, sans-serif';
 const EVENT_STROKE_WIDTH = 4;
 const EVENT_HIT_HEIGHT = 28; // vertical tolerance for a head/event collision
 const EVENT_SPAWN_INTERVAL_MIN_MS = 1400;
 const EVENT_SPAWN_INTERVAL_MAX_MS = 2600;
-// a special bad event, substituted in for a normal one MARKET_CRASH_CHANCE of
-// the time — fatter (bigger, heavier weight, thicker stroke) and vibrates the
-// same WIGGLE_PERIOD_MS/WIGGLE_MAX_RADIANS wiggle the sales button plays.
-// Hitting it ends the round outright, same as hitting a bound, instead of the
-// usual bad-hit explosion+shake+burn-rate penalty
-const MARKET_CRASH_TEXT = "Market Crash";
-const MARKET_CRASH_CHANCE = 0.12;
+// MARKET_CRASH_TEXT/CHANCE live in ./marketEventText alongside the normal
+// text generator; the drawing-only constants below stay here
 const MARKET_CRASH_FONT = '900 30px "Fredoka", system-ui, sans-serif';
 const MARKET_CRASH_STROKE_WIDTH = 6;
 // difficulty ramp: every DIFFICULTY_INTERVAL_MS survived, bad events get 25%
@@ -182,11 +147,6 @@ const SALES_BTN_BOTTOM_MARGIN = 28; // fallback margin only, used before the pod
 // gap between the podium cat's own bottom edge and this button's top edge
 // (see getSalesButtonRect)
 const SALES_BTN_MARGIN_BELOW_PODIUM = 8;
-// identical to floors/upgradeButton's own WIGGLE_PERIOD_MS/WIGGLE_MAX_RADIANS —
-// this button plays that same wiggle continuously instead of only during a
-// timed sale
-const WIGGLE_PERIOD_MS = 260;
-const WIGGLE_MAX_RADIANS = 0.08;
 // identical to floors/upgradeButton's own PRESS_* press-bounce constants
 const PRESS_DURATION_MS = 450;
 const PRESS_AMPLITUDE = 0.18;
@@ -366,16 +326,6 @@ export function wirePressConferenceGame(
   // scale off this
   function getDifficultyTier(): number {
     return Math.floor(state.survivedMs / DIFFICULTY_INTERVAL_MS);
-  }
-
-  // one cat-themed word plus one market-mood word (see CAT_WORDS/
-  // POSITIVE_MARKET_WORDS/NEGATIVE_MARKET_WORDS above), instead of a fixed
-  // pre-written phrase — every spawn combines a fresh random pair
-  function generateMarketEventText(good: boolean): string {
-    const catWord = CAT_WORDS[Math.floor(Math.random() * CAT_WORDS.length)];
-    const moodWords = good ? POSITIVE_MARKET_WORDS : NEGATIVE_MARKET_WORDS;
-    const moodWord = moodWords[Math.floor(Math.random() * moodWords.length)];
-    return `${catWord} ${moodWord}`;
   }
 
   // spawns just off the right edge, drifting left like everything else in
@@ -669,9 +619,7 @@ export function wirePressConferenceGame(
       if (event.isCrash) {
         ctx.save();
         ctx.translate(event.x, event.y);
-        ctx.rotate(
-          Math.sin((now / WIGGLE_PERIOD_MS) * Math.PI * 2) * WIGGLE_MAX_RADIANS,
-        );
+        ctx.rotate(getWiggleRotation(now));
         ctx.font = MARKET_CRASH_FONT;
         drawCartoonText(
           ctx,
@@ -756,9 +704,7 @@ export function wirePressConferenceGame(
     ctx.save();
     ctx.translate(cx, cy);
     if (!state.gameOver) {
-      ctx.rotate(
-        Math.sin((now / WIGGLE_PERIOD_MS) * Math.PI * 2) * WIGGLE_MAX_RADIANS,
-      );
+      ctx.rotate(getWiggleRotation(now));
     }
     const scale = salesPressScale(now);
     ctx.scale(scale, scale);

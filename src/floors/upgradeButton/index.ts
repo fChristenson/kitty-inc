@@ -1,6 +1,7 @@
 import { drawCartoonText, drawPill, formatPrice } from "../../utils";
 import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { COLOR } from "../../palette";
+import { getWiggleRotation } from "../../shared/wiggle";
 import type { Floor } from "../../gameState";
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left).
@@ -136,9 +137,6 @@ export function floorIncomePerSecond(floor: Floor): number {
   return floor.incomeAmount / floor.incomeIntervalSeconds;
 }
 
-const WIGGLE_PERIOD_MS = 260;
-const WIGGLE_MAX_RADIANS = 0.08;
-
 export function drawUpgradeButton(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
@@ -159,9 +157,7 @@ export function drawUpgradeButton(
   ctx.save();
   ctx.translate(cx, cy);
   if (crit || sale) {
-    ctx.rotate(
-      Math.sin((now / WIGGLE_PERIOD_MS) * Math.PI * 2) * WIGGLE_MAX_RADIANS,
-    );
+    ctx.rotate(getWiggleRotation(now));
   }
   ctx.scale(scale, scale);
   ctx.translate(-cx, -cy);
