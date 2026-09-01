@@ -141,6 +141,7 @@ async function main() {
   await loadMouseImage();
   await loadCoinImage();
   await loadFloatingCoinImage();
+  await loadRoofImage(); // same roof art for every theme, loaded once
 
   // one Floor[] per building; only one building is ever shown on screen at a time
   // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
@@ -197,15 +198,15 @@ async function main() {
   }
 
   // loads every asset the given building's own theme needs (floor backgrounds,
-  // ground, wall material, roof, worker/manager sprites) and makes them the
-  // active set every draw* function reads from — call before ever showing that
-  // building on screen (initial load, goToBuilding, switchToCompany)
+  // ground, wall material, worker/manager sprites) and makes them the active set
+  // every draw* function reads from — call before ever showing that building on
+  // screen (initial load, goToBuilding, switchToCompany). Roof is NOT themed (see
+  // loadRoofImage) so it isn't part of this per-theme set.
   async function loadBuildingThemeAssets(theme: ThemeName): Promise<void> {
     await Promise.all([
       loadFloorBackgrounds(theme),
       loadGroundImage(theme),
       loadWallMaterial(theme),
-      loadRoofImage(theme),
       loadWorkerSprite(theme),
     ]);
   }

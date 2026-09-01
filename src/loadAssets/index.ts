@@ -95,7 +95,6 @@ const IMAGE_FILES = {
   city: "city.png", // distant tiled skyline behind buildings
   cityMapBackground: "mapBg.png", // city map screen's own backdrop
   wallMaterial: "wallMaterial.png", // exterior wall/floor-divider tile material
-  roof: "roof.png", // rooftop cap
   coin: "coin.png", // flat coin icon (HUD/menus)
   mouse: "mouse.png", // free-boost critter
   officeChairsIcon: "isometricBox.png", // office-chairs upgrade icon

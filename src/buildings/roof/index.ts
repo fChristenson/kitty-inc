@@ -1,9 +1,9 @@
 import { FLOOR_W } from "../../floors";
-import { drawCartoonText } from "../../utils";
-import { loadThemeImage, type ThemeName } from "../../loadAssets";
+import { drawCartoonText, loadImage } from "../../utils";
+import roofUrl from "../../assets/themes/references/dist/roof.png";
 
-// native size of the processed roof.png (see scripts/process-roof.mjs) — width
-// already matches FLOOR_W exactly, so it's drawn 1:1, never rescaled horizontally
+// native size of roof.png — width already matches FLOOR_W exactly, so it's drawn
+// 1:1, never rescaled horizontally
 const IMAGE_H = 297;
 export const ROOF_H = IMAGE_H;
 
@@ -11,24 +11,20 @@ export const ROOF_H = IMAGE_H;
 // much, same fix as gameCanvas's FLOOR_OVERLAP, so no hairline gap shows at the seam
 const ROOF_OVERLAP = 4;
 
+// roof cap is the same for every theme — no per-theme art, just the reference image
 let roofImage: HTMLImageElement | null = null;
-const roofByTheme = new Map<ThemeName, HTMLImageElement>();
+let roofPromise: Promise<HTMLImageElement> | null = null;
 
-// loads (or reuses an already-cached) theme's roof cap and makes it the active
-// one drawRoof reads from — call whenever the active building's own theme
-// changes, not just once
-export async function loadRoofImage(
-  theme: ThemeName = "references",
-): Promise<HTMLImageElement> {
-  const cached = roofByTheme.get(theme);
-  if (cached) {
-    roofImage = cached;
-    return cached;
+// loads (once, cached forever) the single shared roof cap and makes it the one
+// drawRoof reads from
+export function loadRoofImage(): Promise<HTMLImageElement> {
+  if (!roofPromise) {
+    roofPromise = loadImage(roofUrl).then((loaded) => {
+      roofImage = loaded;
+      return loaded;
+    });
   }
-  const loaded = await loadThemeImage(theme, "roof");
-  if (loaded) roofByTheme.set(theme, loaded);
-  roofImage = loaded;
-  return loaded!;
+  return roofPromise;
 }
 
 // draws the roof cap (+ the building's total floor count, centered on it) directly

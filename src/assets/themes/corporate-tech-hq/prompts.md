@@ -10,10 +10,6 @@ Symmetrical, straight-on interior room, soft semi-realistic anime background art
 
 Flat 2D cartoon exterior facade texture, straight-on, no perspective. Painted concrete-panel material, cool muted blue-gray, matching the soft semi-realistic anime style of the room interiors. Even, non-directional seam grid so it tiles correctly rotated 90° (used for both wall strips and floor dividers), soft per-seam shadow. Flat lighting, no gradient/vignette — seamless in every direction. No windows, text, logos, or people. Edge-to-edge, square 1:1.
 
-# Roof
-
-Flat 2D cartoon rooftop cap, straight-on, no perspective, viewed dead-on, not from above. Low parapet ledge, same painted concrete-panel material and cool muted blue-gray as the outer wall/floor divider texture, full width. Small water tank and vent pipe on top, flat cel-shaded silhouettes, no people. Soft even lighting, subtle top highlight, gentle shadow below. Transparent background above roofline, no sky, text, or logos. Edge-to-edge, wide 3:1.
-
 # Street / ground
 
 Flat, orthographic road/sidewalk strip, straight-on, no perspective. Cool light-gray concrete sidewalks flank a smooth dark asphalt road band, matching this theme's cool blue-gray palette instead of a warm street tone. One centered sleek modern streetlight, slim pole. Flat cel-shaded lighting, soft even shadows, no gradient. Plain white margin above/below the road band (trimmed off later). No people, vehicles, text, or logos. Edge-to-edge crop, wide aspect ratio.
