@@ -15,6 +15,12 @@ import {
 
 const MIN_SPIN_RATE = 0.04; // flipbook frames advanced per physics tick (~16.67ms)
 const MAX_SPIN_RATE = 0.12;
+// hard cap on simultaneously-active particles — a fast press-and-hold can fire a
+// full burst (40-85 particles) every ~10-50ms (see gameCanvas's
+// UPGRADE_HOLD_INTERVAL_MS), spawning particles far faster than a ~1-2s lifespan
+// lets them expire; without this cap a sustained hold grows the array (and every
+// frame's update/draw cost) without bound instead of settling at a steady state
+const MAX_PARTICLES = 500;
 
 export async function loadCoinImage(): Promise<HTMLImageElement> {
   return loadCoinBurstImages();
@@ -95,6 +101,7 @@ export function spawnCoinBurst(
 ): void {
   const count = randomInt(40, 85);
   for (let i = 0; i < count; i++) {
+    if (particles.length >= MAX_PARTICLES) break;
     // upward/outward hemisphere only (not fully random) so coins pop up and out
     // first, then arc back down under gravity instead of scattering downward too
     const angle = -Math.random() * Math.PI;
