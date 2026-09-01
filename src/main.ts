@@ -81,6 +81,14 @@ import { startBackgroundMusic, playSwoosh } from "./sound";
 import { createNewCorporation, getCorporationPrice } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
 
+// matches style.css's worker-menu-slide-out-* keyframes (0.352s) — the company
+// select menu's own close animation duration
+const DIALOG_CLOSE_MS = 352;
+// how far ahead of the dialog fully disappearing the map's own switch-company
+// animation should kick in, so the two transitions blend together instead of
+// the switch happening while the dialog hasn't even started moving yet
+const SWITCH_LEAD_MS = 100;
+
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
   if (!app) throw new Error("#app not found");
@@ -292,14 +300,25 @@ async function main() {
   // "Create new Corporation" adds a fresh named corporation above the current
   // one in the map's corp-name barrel (see corporationName.ts/cityMap's
   // drawCorporationNames) — roll up with the action bar to reach it. Costs
-  // getCorporationPrice(), same buy-if-affordable pattern as buyBuilding below
+  // getCorporationPrice(), same buy-if-affordable pattern as buyBuilding below.
+  // Auto-switches to the new company, playing the exact same swoosh +
+  // barrel-roll flourish a manual switch gets (see cityMapView's
+  // animateSwitchToCompany) — its own completion is what actually calls
+  // switchToCompany, same as a normal roll, so there's only ever one switch.
+  // Delayed to start SWITCH_LEAD_MS before the dialog's own close animation
+  // finishes, instead of firing immediately alongside it while the dialog
+  // hasn't even started sliding away yet
   const companySelectMenu = wireCompanySelectMenu(
     app,
     getCorporationPrice,
     () => {
       if (!spendFromAllCompanies(getCorporationPrice())) return;
-      createNewCorporation();
+      const newIndex = createNewCorporation();
       companySelectMenu.close();
+      setTimeout(() => {
+        playSwoosh();
+        cityMapView.animateSwitchToCompany(newIndex);
+      }, DIALOG_CLOSE_MS - SWITCH_LEAD_MS);
     },
   );
   const boostMenu = wireBoostMenu(
