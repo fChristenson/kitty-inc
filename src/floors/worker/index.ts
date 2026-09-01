@@ -101,6 +101,74 @@ export async function loadWorkerSprite(): Promise<HTMLImageElement> {
   return workerSprite!;
 }
 
+let workerIconUrl: string | null = null;
+let managerIconUrl: string | null = null;
+
+// crops sprite's TURN_FRAMES[0] pose (the plain, untinted, camera-facing neutral
+// pose already in every walk-cycle sheet) down to its own actual non-transparent
+// silhouette bounding box — the whole figure, head to feet, no forced aspect
+// ratio — instead of the raw frame's own padded cell (room for the walk cycle's
+// other poses to swing arms/legs into). object-fit: contain in the fixed square
+// icon box (see style.css's .worker-menu__icon) then scales this tighter crop up
+// to fill as much of the icon box as its own aspect ratio allows, with nothing
+// cut off — reused by both getWorkerIconUrl and getManagerIconUrl below
+function cropCameraFacingIconUrl(sprite: HTMLImageElement): string {
+  const frameW = sprite.naturalWidth / FRAME_COUNT;
+  const frameH = sprite.naturalHeight;
+  const frameX = TURN_FRAMES[0] * frameW;
+
+  // isolate just this one frame first so the bounding-box scan below only sees
+  // its own content, not the sheet's other frames
+  const frameCanvas = document.createElement("canvas");
+  frameCanvas.width = frameW;
+  frameCanvas.height = frameH;
+  const frameCtx = frameCanvas.getContext("2d")!;
+  frameCtx.drawImage(sprite, frameX, 0, frameW, frameH, 0, 0, frameW, frameH);
+
+  const { data } = frameCtx.getImageData(0, 0, frameW, frameH);
+  let minX = frameW;
+  let maxX = 0;
+  let minY = frameH;
+  let maxY = 0;
+  for (let y = 0; y < frameH; y++) {
+    for (let x = 0; x < frameW; x++) {
+      if (data[(y * frameW + x) * 4 + 3] === 0) continue;
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+  }
+  const cropW = Math.max(1, maxX - minX);
+  const cropH = Math.max(1, maxY - minY);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = cropW;
+  canvas.height = cropH;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(frameCanvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+  return canvas.toDataURL("image/png");
+}
+
+// the generic "hire worker" icon (hud/upgradeMenu) — see cropCameraFacingIconUrl.
+// Cropped once and cached; returns null until loadWorkerSprite has resolved
+export function getWorkerIconUrl(): string | null {
+  if (workerIconUrl) return workerIconUrl;
+  if (!workerSprite) return null;
+  workerIconUrl = cropCameraFacingIconUrl(workerSprite);
+  return workerIconUrl;
+}
+
+// the "hire manager"/manager-boost icons (hud/upgradeMenu, hud/corporationBoostMenu)
+// — see cropCameraFacingIconUrl. Cropped once and cached; returns null until
+// loadWorkerSprite has resolved (it loads managerSprite too)
+export function getManagerIconUrl(): string | null {
+  if (managerIconUrl) return managerIconUrl;
+  if (!managerSprite) return null;
+  managerIconUrl = cropCameraFacingIconUrl(managerSprite);
+  return managerIconUrl;
+}
+
 export const WALK_SPEED = 50; // px/sec
 const BOOSTED_WALK_SPEED = WALK_SPEED * 2;
 // feet rest on the room art's own floor line, scaled by the same ROOM_CONTENT_SCALE/

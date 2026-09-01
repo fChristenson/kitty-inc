@@ -239,6 +239,8 @@ export {
   drawWorker,
   getBoostedWorkerCenters,
   loadWorkerSprite,
+  getWorkerIconUrl,
+  getManagerIconUrl,
   triggerJumpAll,
   getRenderedWorkerCount,
   MAX_RENDERED_WORKERS,

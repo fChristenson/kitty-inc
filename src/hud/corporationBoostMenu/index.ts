@@ -12,9 +12,9 @@ import {
 } from "../../shared/pressAndHold";
 import { playSwoosh, playSold } from "../../sound";
 import { getThemeImageUrl } from "../../loadAssets";
+import { getManagerIconUrl } from "../../floors";
 
 const coinIconUrl = getThemeImageUrl("references", "coin");
-const managerIconUrl = getThemeImageUrl("references", "managerIcon");
 import {
   buyStockRaise,
   getStockRaiseCost,
@@ -83,6 +83,7 @@ export function wireCorporationBoostMenu(
   )!;
 
   function render(): void {
+    const managerIconUrl = getManagerIconUrl();
     const count = getCorporationCount();
     const modifierRows = Array.from({ length: count }, (_, i) => {
       const pct = getStockContributionPercent(i);

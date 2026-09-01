@@ -5,17 +5,19 @@ import {
   animateDialogClose,
 } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
-import { MAX_RENDERED_WORKERS } from "../../floors";
+import {
+  MAX_RENDERED_WORKERS,
+  getWorkerIconUrl,
+  getManagerIconUrl,
+} from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getThemeImageUrl } from "../../loadAssets";
 
-const kittyIconUrl = getThemeImageUrl("references", "workerIcon");
 const officeChairsIconUrl = getThemeImageUrl("references", "officeChairsIcon");
 const officeSuppliesIconUrl = getThemeImageUrl(
   "references",
   "officeSuppliesIcon",
 );
-const managerIconUrl = getThemeImageUrl("references", "managerIcon");
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost
@@ -165,6 +167,8 @@ export function wireUpgradeMenu(
   const list = container.querySelector<HTMLDivElement>("#upgrade-menu-list")!;
 
   function render(): void {
+    const kittyIconUrl = getWorkerIconUrl();
+    const managerIconUrl = getManagerIconUrl();
     const floors = getFloors();
     const floorItems = floors
       .map((floor, i) => ({ floor, i }))

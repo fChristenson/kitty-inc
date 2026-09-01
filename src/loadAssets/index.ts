@@ -58,7 +58,7 @@ function themeOf(path: string): string {
 // own dist/sprites/ folder — kept here so every theme is expected to supply the
 // exact same set instead of each caller hardcoding its own filename
 const SPRITE_FILES = {
-  worker: "kitty1Walk.png",
+  worker: "workerWalk.png",
   manager: "managerWalk.png",
   coinSpin: "coinSpin.png",
   cashBill: "cashBillFlutter.png",
@@ -70,13 +70,11 @@ export type SpriteName = keyof typeof SPRITE_FILES;
 // inside a theme's own dist/ root — same reasoning as SPRITE_FILES above
 const IMAGE_FILES = {
   city: "city.png", // distant tiled skyline behind buildings
-  cityMapBackground: "city2Bg.png", // city map screen's own backdrop
+  cityMapBackground: "mapBg.png", // city map screen's own backdrop
   wallMaterial: "wallMaterial.png", // exterior wall/floor-divider tile material
   roof: "roof.png", // rooftop cap
   coin: "coin.png", // flat coin icon (HUD/menus)
   mouse: "mouse.png", // free-boost critter
-  managerIcon: "managerIcon.png", // hire-manager button icon
-  workerIcon: "kittyIcon.png", // hire-worker button icon
   officeChairsIcon: "isometricBox.png", // office-chairs upgrade icon
   officeSuppliesIcon: "isometricYarn.png", // office-supplies upgrade icon
   audience: "audience.png", // press conference audience backdrop
