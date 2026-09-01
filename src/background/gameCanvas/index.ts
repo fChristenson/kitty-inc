@@ -64,8 +64,9 @@ const DRAG_THRESHOLD_PX = 6; // pointer movement below this still counts as a cl
 const MOMENTUM_DECAY_PER_MS = 0.994;
 const MOMENTUM_MIN_SPEED = 0.02; // world units/ms below which momentum just stops
 // press-and-hold auto-repeat: while the pointer stays down on an upgrade button,
-// its click logic re-fires this often instead of only once on release
-const UPGRADE_HOLD_INTERVAL_MS = 100;
+// its click logic re-fires this often instead of only once on release — short
+// enough to read as spamming the button by hand, not a slow metronome tick
+const UPGRADE_HOLD_INTERVAL_MS = 50;
 // held past this long, the repeat rate speeds up (see scheduleHoldRepeat below) —
 // rewards a deliberate long hold instead of the rate staying flat forever
 const UPGRADE_HOLD_FAST_AFTER_MS = 5000;
