@@ -7,10 +7,15 @@ import {
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { MAX_RENDERED_WORKERS } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
-import kittyIconUrl from "../../assets/kittyIcon.png";
-import officeChairsIconUrl from "../../assets/isometricBox.png";
-import officeSuppliesIconUrl from "../../assets/isometricYarn.png";
-import managerIconUrl from "../../assets/managerIcon.png";
+import { getThemeImageUrl } from "../../loadAssets";
+
+const kittyIconUrl = getThemeImageUrl("references", "workerIcon");
+const officeChairsIconUrl = getThemeImageUrl("references", "officeChairsIcon");
+const officeSuppliesIconUrl = getThemeImageUrl(
+  "references",
+  "officeSuppliesIcon",
+);
+const managerIconUrl = getThemeImageUrl("references", "managerIcon");
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost

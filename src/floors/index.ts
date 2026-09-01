@@ -1,5 +1,6 @@
-import { loadImage, randomInt } from "../utils";
+import { randomInt } from "../utils";
 import type { Floor } from "../gameState";
+import { loadThemeBackgrounds, loadThemeGroundImage } from "../loadAssets";
 import {
   FLOOR_W,
   FLOOR_H,
@@ -15,7 +16,6 @@ import {
   SIDE_WALL_WIDTH,
   TOP_WALL_WIDTH,
 } from "./constants";
-import groundImageUrl from "../assets/ground/street.png";
 
 export {
   FLOOR_W,
@@ -43,23 +43,13 @@ const BASE_UNLOCK_COST = 200; // floor 2's unlock price; each floor above double
 const BASE_RATE_STEP = 2;
 
 // every processed floor background (see scripts/process-background-floors.mjs, which
-// writes here), in a stable sorted-filename order
-const backgroundModules = import.meta.glob<string>(
-  "../assets/backgrounds/*.png",
-  {
-    eager: true,
-    import: "default",
-  },
-);
-const backgroundUrls = Object.keys(backgroundModules)
-  .sort()
-  .map((key) => backgroundModules[key]);
+// writes into the active theme's own dist/backgrounds/ — see ../loadAssets), in a
+// stable sorted-filename order
 
 // falls back to the original single office bg.png if no processed background art
 // exists yet
 export function loadFloorBackgrounds(): Promise<HTMLImageElement[]> {
-  const urls = backgroundUrls.length > 0 ? backgroundUrls : [];
-  return Promise.all(urls.map(loadImage));
+  return loadThemeBackgrounds("references");
 }
 
 // picks a background index in [0, count) for a floor being added on top of usedHistory
@@ -189,8 +179,8 @@ let groundImage: HTMLImageElement | null = null;
 // loads the street/sidewalk ground art once; main.ts awaits this alongside
 // loadFloorBackgrounds before the first frame ever needs to draw it
 export async function loadGroundImage(): Promise<HTMLImageElement> {
-  groundImage = await loadImage(groundImageUrl);
-  return groundImage;
+  groundImage = await loadThemeGroundImage("references");
+  return groundImage!;
 }
 
 // decorative strip beneath the ground floor (road + sidewalks + streetlights); ctx

@@ -9,7 +9,7 @@ import fs from "node:fs/promises";
 // each pose's real bounding box, then re-composites all 5 into a single uniform-cell
 // grid (same cell size, feet aligned to the same bottom row) — the actual flipbook
 // sheet floors/worker/index.ts loads. Every src/assets/<Name>Sprites.png is written
-// to src/assets/sprites/<Name>Walk.png. Safe to re-run any time a source sheet is
+// to src/assets/themes/references/dist/sprites/<Name>Walk.png. Safe to re-run any time a source sheet is
 // replaced or a new one is added; never overwrites the raw source files.
 
 const FRAME_COUNT = 5;
@@ -27,7 +27,7 @@ const WHITE_HI = 244;
 const FLOOD_LO = 150;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const outDir = path.join(assets, "sprites");
+const outDir = path.join(assets, "themes", "references", "dist", "sprites");
 
 async function processSheet(srcFile, destFile) {
   const { data, info } = await sharp(srcFile)

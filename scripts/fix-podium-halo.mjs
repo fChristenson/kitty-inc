@@ -3,13 +3,20 @@ import path from "node:path";
 
 // one-off cleanup: src/assets/podiumSprites.jfif (the raw source) has since been
 // deleted, so process-podium-sprites.mjs can no longer be re-run from scratch —
-// this instead color-decontaminates the ALREADY-GENERATED src/assets/sprites/
+// this instead color-decontaminates the ALREADY-GENERATED src/assets/themes/references/dist/sprites/
 // podiumSpeak.png in place, using the same whiteness-based un-blend-from-white
 // math added to process-podium-sprites.mjs/process-cat-sprites.mjs, to strip the
 // white/gray halo still baked into its existing edge pixels
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const file = path.join(assets, "sprites", "podiumSpeak.png");
+const file = path.join(
+  assets,
+  "themes",
+  "references",
+  "dist",
+  "sprites",
+  "podiumSpeak.png",
+);
 
 const { data, info } = await sharp(file)
   .ensureAlpha()

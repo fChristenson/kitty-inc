@@ -27,8 +27,7 @@ import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
 import { createCityTransitions } from "./transitions";
-import cityMapUrl from "../../assets/city2Bg.png";
-import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
+import { loadThemeSprite, loadThemeImage } from "../../loadAssets";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -50,10 +49,10 @@ let catSprite: HTMLImageElement | null = null;
 
 export async function loadCityMapImage(): Promise<HTMLImageElement> {
   [mapImage, catSprite] = await Promise.all([
-    loadImage(cityMapUrl),
-    loadImage(catSpriteUrl),
+    loadThemeImage("references", "cityMapBackground"),
+    loadThemeSprite("references", "worker"),
   ]);
-  return mapImage;
+  return mapImage!;
 }
 
 export interface CityMapDeps {

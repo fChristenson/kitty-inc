@@ -8,7 +8,7 @@ import fs from "node:fs/promises";
 // uniform-cell grid — same technique as process-cat-sprites.mjs, except each frame
 // is vertically centered in its cell (a spinning coin has no shared "ground line"
 // to bottom-align to, unlike the walking cats). Writes to
-// src/assets/sprites/coinSpin.png; never overwrites the raw source.
+// src/assets/themes/references/dist/sprites/coinSpin.png; never overwrites the raw source.
 
 const FRAME_COUNT = 6;
 const PADDING = 8; // px of breathing room kept around each pose inside its cell
@@ -17,7 +17,7 @@ const WHITE_HI = 244;
 const FLOOD_LO = 150;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const outDir = path.join(assets, "sprites");
+const outDir = path.join(assets, "themes", "references", "dist", "sprites");
 const srcFile = path.join(assets, "coinSprites.jfif");
 const destFile = path.join(outDir, "coinSpin.png");
 

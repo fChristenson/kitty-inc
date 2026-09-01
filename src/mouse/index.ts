@@ -7,11 +7,11 @@ import {
   spawnCoinBurst,
   triggerJumpAll,
 } from "../floors";
-import { loadImage, randomInt } from "../utils";
+import { randomInt } from "../utils";
 import { applyBoostAll } from "../hud";
 import { playBloop } from "../sound";
 import type { Floor } from "../gameState";
-import mouseImageUrl from "../assets/mouse.png";
+import { loadThemeImage } from "../loadAssets";
 
 // a free bonus critter: spawns at random on a random unlocked floor of whichever
 // building is currently active, runs back and forth for a few seconds, and — if
@@ -81,8 +81,8 @@ let nextSpawnAt = Date.now() + randomInt(MIN_SPAWN_GAP_MS, MAX_SPAWN_GAP_MS);
 // loads the mouse sprite once; main.ts awaits this alongside the other image loads
 // before the first redraw ever needs it
 export async function loadMouseImage(): Promise<HTMLImageElement> {
-  mouseImage = await loadImage(mouseImageUrl);
-  return mouseImage;
+  mouseImage = await loadThemeImage("references", "mouse");
+  return mouseImage!;
 }
 
 function despawn(now: number): void {

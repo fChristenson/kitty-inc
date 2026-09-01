@@ -7,7 +7,7 @@ import fs from "node:fs/promises";
 // every pose's podium sharing the same bottom line) gets chroma-keyed to
 // transparent and re-composited into a uniform-cell grid, feet/podium bottom
 // aligned to the same row — same technique as process-cat-sprites.mjs. Writes to
-// src/assets/sprites/podiumSpeak.png; never overwrites the raw source.
+// src/assets/themes/references/dist/sprites/podiumSpeak.png; never overwrites the raw source.
 
 const FRAME_COUNT = 5;
 const PADDING = 8; // px of breathing room kept around each pose inside its cell
@@ -16,7 +16,7 @@ const WHITE_HI = 244;
 const FLOOD_LO = 150;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const outDir = path.join(assets, "sprites");
+const outDir = path.join(assets, "themes", "references", "dist", "sprites");
 const srcFile = path.join(assets, "podiumSprites.jfif");
 const destFile = path.join(outDir, "podiumSpeak.png");
 

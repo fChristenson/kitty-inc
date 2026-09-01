@@ -5,7 +5,9 @@ import {
 } from "../../utils";
 import { getAllCompaniesTotalIncome } from "../../totalIncome";
 import { playSwoosh, playSold } from "../../sound";
-import coinIconUrl from "../../assets/coin.png";
+import { getThemeImageUrl } from "../../loadAssets";
+
+const coinIconUrl = getThemeImageUrl("references", "coin");
 
 // same worker-menu look as boostMenu/upgradeMenu — a dialog for picking/creating
 // the corporation shown on the map (see cityMap's drawCorporationNames). Right

@@ -8,7 +8,7 @@ import fs from "node:fs/promises";
 // re-composited into a uniform-cell grid — same technique as
 // process-coin-sprites.mjs, with each frame centered both horizontally and
 // vertically in its cell (a tumbling bill has no shared ground line either). Writes
-// to src/assets/sprites/cashBillFlutter.png; never overwrites the raw source.
+// to src/assets/themes/references/dist/sprites/cashBillFlutter.png; never overwrites the raw source.
 
 const FRAME_COUNT = 6;
 const PADDING = 8; // px of breathing room kept around each pose inside its cell
@@ -17,7 +17,7 @@ const WHITE_HI = 244;
 const FLOOD_LO = 150;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const outDir = path.join(assets, "sprites");
+const outDir = path.join(assets, "themes", "references", "dist", "sprites");
 const srcFile = path.join(assets, "cashBillSprite.jfif");
 const destFile = path.join(outDir, "cashBillFlutter.png");
 

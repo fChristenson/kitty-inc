@@ -1,6 +1,6 @@
-import { loadImage, randomInt } from "../../utils";
+import { randomInt } from "../../utils";
 import type { Floor } from "../../gameState";
-import coinImageUrl from "../../assets/coin.png";
+import { loadThemeImage } from "../../loadAssets";
 
 // a handful of small coins that bubble straight up from a point, gently swaying,
 // and fade out — a quieter alternative to coins.ts's outward/gravity burst
@@ -8,8 +8,8 @@ import coinImageUrl from "../../assets/coin.png";
 let coinImage: HTMLImageElement | null = null;
 
 export async function loadFloatingCoinImage(): Promise<HTMLImageElement> {
-  coinImage = await loadImage(coinImageUrl);
-  return coinImage;
+  coinImage = await loadThemeImage("references", "coin");
+  return coinImage!;
 }
 
 interface FloatingCoin {

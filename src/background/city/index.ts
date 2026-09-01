@@ -1,5 +1,4 @@
-import { loadImage } from "../../utils";
-import cityImageUrl from "../../assets/city.png";
+import { loadThemeImage } from "../../loadAssets";
 
 // a rich, pre-illustrated city skyline (dusk gradient baked into the art itself),
 // tiled horizontally across whatever world-x range is currently visible. The art
@@ -23,8 +22,8 @@ let cityImage: HTMLImageElement | null = null;
 // loads the skyline art once; main.ts awaits this alongside loadFloorBackgrounds
 // before the first frame ever needs to draw it
 export async function loadCityImage(): Promise<HTMLImageElement> {
-  cityImage = await loadImage(cityImageUrl);
-  return cityImage;
+  cityImage = await loadThemeImage("references", "city");
+  return cityImage!;
 }
 
 // draws every tile of the skyline whose slot overlaps [visibleLeft, visibleRight]

@@ -1,6 +1,6 @@
 import { FLOOR_W } from "../../floors";
-import { loadImage, drawCartoonText } from "../../utils";
-import roofImageUrl from "../../assets/roof.png";
+import { drawCartoonText } from "../../utils";
+import { loadThemeImage } from "../../loadAssets";
 
 // native size of the processed roof.png (see scripts/process-roof.mjs) — width
 // already matches FLOOR_W exactly, so it's drawn 1:1, never rescaled horizontally
@@ -16,8 +16,8 @@ let roofImage: HTMLImageElement | null = null;
 // loads the roof cap once; main.ts awaits this alongside the other image loads
 // before the first redraw ever needs it
 export async function loadRoofImage(): Promise<HTMLImageElement> {
-  roofImage = await loadImage(roofImageUrl);
-  return roofImage;
+  roofImage = await loadThemeImage("references", "roof");
+  return roofImage!;
 }
 
 // draws the roof cap (+ the building's total floor count, centered on it) directly

@@ -11,8 +11,10 @@ import {
   type PressAndHoldController,
 } from "../../shared/pressAndHold";
 import { playSwoosh, playSold } from "../../sound";
-import coinIconUrl from "../../assets/coin.png";
-import managerIconUrl from "../../assets/managerIcon.png";
+import { getThemeImageUrl } from "../../loadAssets";
+
+const coinIconUrl = getThemeImageUrl("references", "coin");
+const managerIconUrl = getThemeImageUrl("references", "managerIcon");
 import {
   buyStockRaise,
   getStockRaiseCost,

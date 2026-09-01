@@ -1,11 +1,5 @@
 import { playSwoosh, playBubble, playExplosion, playSold } from "../../sound";
-import {
-  drawPill,
-  drawCartoonText,
-  formatPrice,
-  loadImage,
-  randomInt,
-} from "../../utils";
+import { drawPill, drawCartoonText, formatPrice, randomInt } from "../../utils";
 import { COLOR } from "../../palette";
 import { triggerScreenShake, getScreenShakeOffset } from "../../screenShake";
 import { getWiggleRotation } from "../../shared/wiggle";
@@ -24,8 +18,7 @@ import {
   MARKET_CRASH_TEXT,
   MARKET_CRASH_CHANCE,
 } from "./marketEventText";
-import podiumSpriteUrl from "../../assets/sprites/podiumSpeak.png";
-import audienceUrl from "../../assets/audience.png";
+import { loadThemeSprite, loadThemeImage } from "../../loadAssets";
 
 // physics constants for the line's head — same "flappy bird" feel: constant
 // downward gravity, a fixed upward kick on every flap, no in-between speeds.
@@ -280,7 +273,7 @@ export function wirePressConferenceGame(
   loadCoinBurstImages();
 
   let podiumSprite: HTMLImageElement | null = null;
-  loadImage(podiumSpriteUrl).then((img) => {
+  loadThemeSprite("references", "podium").then((img) => {
     podiumSprite = img;
   });
   // current pose + when to next roll a new one (see drawPodium) — random
@@ -289,7 +282,7 @@ export function wirePressConferenceGame(
   let podiumNextSwitchAt = 0;
 
   let audienceSprite: HTMLImageElement | null = null;
-  loadImage(audienceUrl).then((img) => {
+  loadThemeImage("references", "audience").then((img) => {
     audienceSprite = img;
   });
 

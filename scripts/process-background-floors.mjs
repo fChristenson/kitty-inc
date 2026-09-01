@@ -7,16 +7,16 @@ import fs from "node:fs/promises";
 // with a plain-color padding border around the actual artwork and not exactly the
 // game's floor size. This trims that border and resizes/crops each one to the fixed
 // floor size (must match FLOOR_W/FLOOR_H in src/floors/constants.ts), writing the
-// result into src/assets/backgrounds/ — the folder floors/index.ts's
-// loadFloorBackgrounds() actually loads every background from. Safe to re-run any
-// time new bgN.png files are added; only ever reads the raw src/assets/bgN.* files,
-// never overwrites them.
+// result into src/assets/themes/references/dist/backgrounds/ — the "references"
+// theme's own dist folder loadAssets.ts actually loads every background from. Safe
+// to re-run any time new bgN.png files are added; only ever reads the raw
+// src/assets/bgN.* files, never overwrites them.
 
 const FLOOR_W = 1248;
 const FLOOR_H = 721;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const outDir = path.join(assets, "backgrounds");
+const outDir = path.join(assets, "themes", "references", "dist", "backgrounds");
 
 async function processBackgroundImage(file) {
   const src = path.join(assets, file);

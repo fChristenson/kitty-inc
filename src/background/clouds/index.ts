@@ -1,4 +1,4 @@
-import { loadImage } from "../../utils";
+import { loadThemeClouds } from "../../loadAssets";
 
 // decorative clouds drifting slowly left-to-right. Drawn in plain WORLD coordinates —
 // same as ground/floors in gameCanvas.ts — so the caller's existing camera transform
@@ -16,22 +16,12 @@ const MAX_CLOUD_SIZE = 0.16 + 0.18; // matches the `size` range below
 // of the band gets sliced in half instead of rendering as a full circle
 export const CLOUD_MAX_RADIUS = MAX_CLOUD_SIZE * CELL_H;
 
-// every processed cloud shape (see scripts/process-clouds.mjs, which writes here),
-// in a stable sorted-filename order
-const cloudModules = import.meta.glob<string>("../../assets/clouds/*.png", {
-  eager: true,
-  import: "default",
-});
-const cloudUrls = Object.keys(cloudModules)
-  .sort()
-  .map((key) => cloudModules[key]);
-
 let cloudImages: HTMLImageElement[] = [];
 
 // loads every cloud shape once; main.ts awaits this alongside loadFloorBackgrounds
 // before the first frame ever needs to draw one
 export async function loadCloudImages(): Promise<HTMLImageElement[]> {
-  cloudImages = await Promise.all(cloudUrls.map(loadImage));
+  cloudImages = await loadThemeClouds("references");
   return cloudImages;
 }
 

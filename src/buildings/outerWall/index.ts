@@ -6,8 +6,7 @@ import {
   TOP_WALL_WIDTH,
 } from "../../floors";
 import { COLOR } from "../../palette";
-import { loadImage } from "../../utils";
-import wallMaterialUrl from "../../assets/wallMaterial.png";
+import { loadThemeImage } from "../../loadAssets";
 
 // a thin facade strip along each side of every floor row, masking bg.png's raw
 // left/right image edges (now that the blue sky/clouds show past the canvas) so the
@@ -31,7 +30,8 @@ let wallPattern: CanvasPattern | null = null;
 // image loads before the first redraw ever needs it. A pattern isn't tied to the
 // canvas it was created from, so a throwaway offscreen context is enough here
 export async function loadWallMaterial(): Promise<void> {
-  const image = await loadImage(wallMaterialUrl);
+  const image = await loadThemeImage("references", "wallMaterial");
+  if (!image) return;
   const patternCtx = document.createElement("canvas").getContext("2d")!;
   wallPattern = patternCtx.createPattern(image, "repeat");
 }
