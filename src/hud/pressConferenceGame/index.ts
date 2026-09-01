@@ -94,6 +94,13 @@ const EVENT_SPAWN_INTERVAL_MAX_MS = 2600;
 // text generator; the drawing-only constants below stay here
 const MARKET_CRASH_FONT = '900 30px "Fredoka", system-ui, sans-serif';
 const MARKET_CRASH_STROKE_WIDTH = 6;
+// shown centered on screen, wiggling like the Market Crash text, until the
+// first flap sets state.started (see drawTapToBegin)
+const TAP_TO_BEGIN_LABEL = "Tap to begin";
+const TAP_TO_BEGIN_FONT = '900 30px "Fredoka", system-ui, sans-serif';
+const TAP_TO_BEGIN_STROKE_WIDTH = 6;
+// how far above the head's own y this sits (see drawTapToBegin)
+const TAP_TO_BEGIN_LIFT_PX = 40;
 // difficulty ramp: every DIFFICULTY_INTERVAL_MS survived, bad events get 25%
 // more likely (relative to good's own unchanged odds), events spawn more
 // densely (the interval between spawns shrinks), and every event moves
@@ -133,20 +140,20 @@ const GOOD_HIT_INFLUENCE_PERCENT = 0.05;
 // helpers floors/upgradeButton's real "Sale" button uses (drawPill/
 // drawCartoonText), instead of a separate DOM element re-approximating that
 // look in CSS — same 330:140 proportions (drawPill's own ring-width/radius
-// percentages of height do the rest, whatever this button's own size is)
-const SALES_LABEL = "Predict Sales";
+// percentages of height do the rest, whatever this button's own size is).
+// Only ever shown once state.gameOver is true — while playing, any press on
+// the canvas flaps (see the pointerdown handler) instead of needing a button
 const END_LABEL = "End";
-// the reference button's own label/width — "Project Sales" is longer than
-// "Sale", so the button widens to fit it (see getSalesButtonWidth) instead of
-// shrinking the font down to fit a same fixed width, but keeps this exact same
-// left+right margin around its own (longer) label
-const SALES_REFERENCE_LABEL = "Sale";
-const SALES_REFERENCE_BTN_W = 90;
-const SALES_BTN_H = (SALES_REFERENCE_BTN_W * 140) / 330;
-const SALES_BTN_BOTTOM_MARGIN = 28; // fallback margin only, used before the podium sprite has loaded — see getSalesButtonRect
+// the reference button's own label/width — "End" widens to fit this exact
+// same left+right margin "Sale" gets in its own reference-width button (see
+// getButtonWidth), instead of shrinking the font down to fit a fixed width
+const BTN_REFERENCE_LABEL = "Sale";
+const BTN_REFERENCE_W = 90;
+const END_BTN_H = (BTN_REFERENCE_W * 140) / 330;
+const END_BTN_BOTTOM_MARGIN = 28; // fallback margin only, used before the podium sprite has loaded — see getEndButtonRect
 // gap between the podium cat's own bottom edge and this button's top edge
-// (see getSalesButtonRect)
-const SALES_BTN_MARGIN_BELOW_PODIUM = 8;
+// (see getEndButtonRect)
+const END_BTN_MARGIN_BELOW_PODIUM = 8;
 // identical to floors/upgradeButton's own PRESS_* press-bounce constants
 const PRESS_DURATION_MS = 450;
 const PRESS_AMPLITUDE = 0.18;
@@ -330,8 +337,8 @@ export function wirePressConferenceGame(
 
   // spawns just off the right edge, drifting left like everything else in
   // this world — a fresh cat-themed headline (see generateMarketEventText),
-  // at a random height that leaves room for the sales button anchored at the
-  // bottom
+  // at a random height that leaves the same bottom clearance the End button
+  // sits in once the round's over
   function spawnMarketEvent(): void {
     // good keeps flat 1:1 odds; bad's own relative weight compounds each
     // difficulty tier, so it crowds out good more and more over time
@@ -344,7 +351,7 @@ export function wirePressConferenceGame(
     ctx.font = isCrash ? MARKET_CRASH_FONT : EVENT_FONT;
     const width = ctx.measureText(text).width;
     const topMargin = 30;
-    const bottomMargin = SALES_BTN_H + SALES_BTN_BOTTOM_MARGIN + 30;
+    const bottomMargin = END_BTN_H + END_BTN_BOTTOM_MARGIN + 30;
     // never below the floor's own top edge either, whichever bound is more
     // restrictive — the graph itself can no longer reach past that point
     const maxY = Math.min(
@@ -389,13 +396,13 @@ export function wirePressConferenceGame(
   let totalIncomeAtOpen = 0;
 
   // identical to floors/upgradeButton's own triggerButtonPress/pressScale —
-  // recorded on every press, read back every draw to drive the same
-  // squash-then-springy-overshoot bounce
-  let salesPressedAt: number | null = null;
+  // recorded whenever the End button itself is pressed, read back every draw
+  // to drive the same squash-then-springy-overshoot bounce
+  let endPressedAt: number | null = null;
 
-  function salesPressScale(now: number): number {
-    if (salesPressedAt === null) return 1;
-    const elapsedMs = now - salesPressedAt;
+  function endPressScale(now: number): number {
+    if (endPressedAt === null) return 1;
+    const elapsedMs = now - endPressedAt;
     if (elapsedMs >= PRESS_DURATION_MS) return 1;
     const t = elapsedMs / 1000;
     return (
@@ -409,48 +416,37 @@ export function wirePressConferenceGame(
   // the height-proportional font size "Sale" itself uses (52/140 of BTN_H),
   // and each label's own button width grown just enough to give it, set in
   // that same font, the exact same left+right margin "Sale" gets in its own
-  // SALES_REFERENCE_BTN_W-wide button — computed once per label and cached,
-  // since neither the font nor any label ever changes
-  const salesFontSize = Math.round((52 / 140) * SALES_BTN_H);
+  // BTN_REFERENCE_W-wide button — computed once per label and cached, since
+  // neither the font nor any label ever changes
+  const endFontSize = Math.round((52 / 140) * END_BTN_H);
   const cachedBtnWidths = new Map<string, number>();
   function getButtonWidth(label: string): number {
     const cached = cachedBtnWidths.get(label);
     if (cached !== undefined) return cached;
-    ctx.font = `900 ${salesFontSize}px "Fredoka", system-ui, sans-serif`;
+    ctx.font = `900 ${endFontSize}px "Fredoka", system-ui, sans-serif`;
     const referenceMargin =
-      SALES_REFERENCE_BTN_W - ctx.measureText(SALES_REFERENCE_LABEL).width;
+      BTN_REFERENCE_W - ctx.measureText(BTN_REFERENCE_LABEL).width;
     const width = ctx.measureText(label).width + referenceMargin;
     cachedBtnWidths.set(label, width);
     return width;
   }
 
-  function getSalesButtonLabel(): string {
-    return state.gameOver ? END_LABEL : SALES_LABEL;
-  }
-
-  function getSalesButtonRect(): {
+  // only meaningful once state.gameOver — centered under the podium cat,
+  // END_BTN_MARGIN_BELOW_PODIUM below its own bottom edge, falling back to a
+  // bottom-center canvas position if the podium sprite hasn't loaded yet
+  function getEndButtonRect(): {
     x: number;
     y: number;
     w: number;
     h: number;
   } {
-    const w = getButtonWidth(getSalesButtonLabel());
-    // "Predict Sales" keeps its original bottom-center canvas position; only
-    // the post-round "End" button moves to sit under the podium cat instead
-    if (!state.gameOver) {
-      const cx = cssW / 2;
-      const cy = cssH - SALES_BTN_H / 2 - SALES_BTN_BOTTOM_MARGIN;
-      return { x: cx - w / 2, y: cy - SALES_BTN_H / 2, w, h: SALES_BTN_H };
-    }
+    const w = getButtonWidth(END_LABEL);
     const podium = getPodiumRect();
-    // centered under the podium cat, SALES_BTN_MARGIN_BELOW_PODIUM below its
-    // own bottom edge — falls back to the old bottom-center canvas position
-    // if the podium sprite hasn't loaded yet
     const cx = podium ? podium.x + podium.w / 2 : cssW / 2;
     const cy = podium
-      ? podium.y + podium.h + SALES_BTN_MARGIN_BELOW_PODIUM + SALES_BTN_H / 2
-      : cssH - SALES_BTN_H / 2 - SALES_BTN_BOTTOM_MARGIN;
-    return { x: cx - w / 2, y: cy - SALES_BTN_H / 2, w, h: SALES_BTN_H };
+      ? podium.y + podium.h + END_BTN_MARGIN_BELOW_PODIUM + END_BTN_H / 2
+      : cssH - END_BTN_H / 2 - END_BTN_BOTTOM_MARGIN;
+    return { x: cx - w / 2, y: cy - END_BTN_H / 2, w, h: END_BTN_H };
   }
 
   function flap(): void {
@@ -608,10 +604,30 @@ export function wirePressConferenceGame(
     ctx.fill();
   }
 
+  function drawTapToBegin(now: number): void {
+    if (state.started) return;
+    ctx.save();
+    ctx.translate(cssW / 2, state.headY - TAP_TO_BEGIN_LIFT_PX);
+    ctx.rotate(getWiggleRotation(now));
+    ctx.font = TAP_TO_BEGIN_FONT;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    drawCartoonText(
+      ctx,
+      TAP_TO_BEGIN_LABEL,
+      0,
+      0,
+      COLOR.white,
+      COLOR.black,
+      TAP_TO_BEGIN_STROKE_WIDTH,
+    );
+    ctx.restore();
+  }
+
   // good events read as the same green/white the HUD's own total-income text
   // uses; bad ones swap in a mean red fill, same white stroke either way.
-  // Market Crash gets its own fatter font/stroke and the same wiggle the
-  // sales button plays continuously, to read as the one to really avoid
+  // Market Crash gets its own fatter font/stroke and its own continuous
+  // wiggle, to read as the one to really avoid
   function drawMarketEvents(now: number): void {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -648,7 +664,7 @@ export function wirePressConferenceGame(
 
   // right edge, its own bottom sitting LABEL_ABOVE_AUDIENCE_OFFSET above the
   // audience image's top edge — null until the sprite's actually loaded, so
-  // callers (drawPodium, getSalesButtonRect) can fall back gracefully
+  // callers (drawPodium, getEndButtonRect) can fall back gracefully
   function getPodiumRect(): {
     x: number;
     y: number;
@@ -692,38 +708,22 @@ export function wirePressConferenceGame(
 
   // straight reuse of the exact same drawPill/drawCartoonText calls
   // floors/upgradeButton's own Sale-state button makes, at this button's own
-  // size — same rotate-then-scale-around-center order that button uses while
-  // playing (wiggle playing continuously instead of gated behind
-  // isSaleActive); once the game's over it becomes a still "End press
-  // conference" button instead, no wiggle, just the press-bounce feedback
-  function drawSalesButton(now: number): void {
-    const label = getSalesButtonLabel();
-    const { x, y, w, h } = getSalesButtonRect();
+  // size — only ever drawn once state.gameOver, just the press-bounce
+  // feedback on tap, no wiggle
+  function drawEndButton(now: number): void {
+    const { x, y, w, h } = getEndButtonRect();
     const cx = x + w / 2;
     const cy = y + h / 2;
     ctx.save();
     ctx.translate(cx, cy);
-    if (!state.gameOver) {
-      ctx.rotate(getWiggleRotation(now));
-    }
-    const scale = salesPressScale(now);
+    const scale = endPressScale(now);
     ctx.scale(scale, scale);
     ctx.translate(-cx, -cy);
-    drawPill(
-      ctx,
-      x,
-      y,
-      w,
-      h,
-      state.gameOver ? COLOR.disabledGray : COLOR.amber,
-      true,
-      true,
-      (40 / 140) * h,
-    );
-    ctx.font = `900 ${salesFontSize}px "Fredoka", system-ui, sans-serif`;
+    drawPill(ctx, x, y, w, h, COLOR.disabledGray, true, true, (40 / 140) * h);
+    ctx.font = `900 ${endFontSize}px "Fredoka", system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    drawCartoonText(ctx, label, cx, cy);
+    drawCartoonText(ctx, END_LABEL, cx, cy);
     ctx.restore();
   }
 
@@ -864,7 +864,8 @@ export function wirePressConferenceGame(
     drawLine(headX);
     drawHead(headX);
     drawActiveCoinBursts(ctx, now);
-    drawSalesButton(now);
+    drawTapToBegin(now);
+    if (state.gameOver) drawEndButton(now);
     drawPodium(now);
     ctx.restore();
     timerEl.textContent = formatScore(state.survivedMs);
@@ -899,15 +900,19 @@ export function wirePressConferenceGame(
   }
 
   canvas.addEventListener("pointerdown", (event) => {
+    if (!state.gameOver) {
+      // no button to hit while playing — any press on the canvas flaps
+      flap();
+      return;
+    }
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
-    const btn = getSalesButtonRect();
+    const btn = getEndButtonRect();
     if (x < btn.x || x > btn.x + btn.w || y < btn.y || y > btn.y + btn.h)
       return;
-    salesPressedAt = performance.now();
-    if (state.gameOver) close();
-    else flap();
+    endPressedAt = performance.now();
+    close();
   });
 
   function open(): void {
