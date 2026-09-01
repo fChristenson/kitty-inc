@@ -31,22 +31,12 @@ export const THEME_NAMES: ThemeName[] = [
   "toy-kids-brand",
 ];
 
-// picks uniformly among every known theme, regardless of whether that theme has
-// actually generated its own dist/ assets yet — any file it hasn't generated just
-// falls back to DEFAULT_THEME's own copy (see the getThemeXUrl helpers below), so
-// this stays meaningful (and needs no further code change) as more themes get
-// their own art over time
-export function pickRandomTheme(): ThemeName {
-  return THEME_NAMES[Math.floor(Math.random() * THEME_NAMES.length)];
-}
-
-const DEFAULT_THEME: ThemeName = "references";
-
 // Vite's import.meta.glob pattern must be a static string literal, so a runtime
 // theme value can't be spliced into it — this globs every theme's dist assets up
 // front (eager) instead, and the lookup helpers below filter down to whichever
-// theme was actually asked for, falling back to DEFAULT_THEME for anything the
-// requested theme hasn't generated yet
+// theme was actually asked for. No fallback to another theme: a theme's assets
+// are always used together as one complete set, never mixed file-by-file with
+// another theme's copy (see getThemesWithFullAssets/getThemeXUrl below).
 const backgroundModules = import.meta.glob<string>(
   "../assets/themes/*/dist/backgrounds/*.png",
   { eager: true, import: "default" },
@@ -103,37 +93,44 @@ const IMAGE_FILES = {
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 
-// every processed floor background belonging to theme, in a stable sorted-filename
-// order; falls back to DEFAULT_THEME's own set if theme hasn't generated any yet
+// every processed floor background belonging to theme — NEVER falls back to
+// another theme; a company's entire set of assets (backgrounds, ground, wall
+// material, skyline, map backdrop, sprites) must always come from the SAME
+// theme, never mixed file-by-file with another theme's copy. Throws if theme
+// hasn't generated these yet — callers must only ever pass a theme returned by
+// getThemesWithFullAssets() (see company.ts's pickLeastUsedMapTheme), which
+// already guarantees this never happens in practice.
 export function getThemeBackgroundUrls(theme: ThemeName): string[] {
   const own = Object.keys(backgroundModules)
     .filter((path) => themeOf(path) === theme)
     .sort()
     .map((path) => backgroundModules[path]);
-  if (own.length > 0 || theme === DEFAULT_THEME) return own;
-  return getThemeBackgroundUrls(DEFAULT_THEME);
+  if (own.length === 0) {
+    throw new Error(`Theme "${theme}" has no floor backgrounds generated`);
+  }
+  return own;
 }
 
-// theme's own ground/street art; falls back to DEFAULT_THEME's own copy
-export function getThemeGroundUrl(theme: ThemeName): string | null {
+// theme's own ground/street art — never falls back, see getThemeBackgroundUrls
+export function getThemeGroundUrl(theme: ThemeName): string {
   const path = Object.keys(groundModules).find((p) => themeOf(p) === theme);
-  if (path) return groundModules[path];
-  if (theme === DEFAULT_THEME) return null;
-  return getThemeGroundUrl(DEFAULT_THEME);
+  if (!path) {
+    throw new Error(`Theme "${theme}" has no ground/street art generated`);
+  }
+  return groundModules[path];
 }
 
-// theme's own copy of one named sprite sheet; falls back to DEFAULT_THEME's own copy
-export function getThemeSpriteUrl(
-  theme: ThemeName,
-  name: SpriteName,
-): string | null {
+// theme's own copy of one named sprite sheet — never falls back, see
+// getThemeBackgroundUrls
+export function getThemeSpriteUrl(theme: ThemeName, name: SpriteName): string {
   const filename = SPRITE_FILES[name];
   const path = Object.keys(spriteModules).find(
     (p) => themeOf(p) === theme && p.endsWith(`/${filename}`),
   );
-  if (path) return spriteModules[path];
-  if (theme === DEFAULT_THEME) return null;
-  return getThemeSpriteUrl(DEFAULT_THEME, name);
+  if (!path) {
+    throw new Error(`Theme "${theme}" is missing sprite "${filename}"`);
+  }
+  return spriteModules[path];
 }
 
 export function loadThemeBackgrounds(
@@ -144,50 +141,93 @@ export function loadThemeBackgrounds(
 
 export function loadThemeGroundImage(
   theme: ThemeName,
-): Promise<HTMLImageElement | null> {
-  const url = getThemeGroundUrl(theme);
-  return url ? loadImage(url) : Promise.resolve(null);
+): Promise<HTMLImageElement> {
+  return loadImage(getThemeGroundUrl(theme));
 }
 
 export function loadThemeSprite(
   theme: ThemeName,
   name: SpriteName,
-): Promise<HTMLImageElement | null> {
-  const url = getThemeSpriteUrl(theme, name);
-  return url ? loadImage(url) : Promise.resolve(null);
+): Promise<HTMLImageElement> {
+  return loadImage(getThemeSpriteUrl(theme, name));
 }
 
-// theme's own copy of one named flat image; falls back to DEFAULT_THEME's own copy
-export function getThemeImageUrl(
-  theme: ThemeName,
-  name: ImageName,
-): string | null {
+// theme's own copy of one named flat image — never falls back, see
+// getThemeBackgroundUrls. Callers loading a genuinely shared/non-themed image
+// (coin/mouse/audience/isometricBox/isometricYarn — see IMAGE_FILES) always pass
+// the literal "references" theme themselves, never a variable, so this never
+// throws for those.
+export function getThemeImageUrl(theme: ThemeName, name: ImageName): string {
   const filename = IMAGE_FILES[name];
   const path = Object.keys(imageModules).find(
     (p) => themeOf(p) === theme && p.endsWith(`/${filename}`),
   );
-  if (path) return imageModules[path];
-  if (theme === DEFAULT_THEME) return null;
-  return getThemeImageUrl(DEFAULT_THEME, name);
+  if (!path) {
+    throw new Error(`Theme "${theme}" is missing image "${filename}"`);
+  }
+  return imageModules[path];
 }
 
 export function loadThemeImage(
   theme: ThemeName,
   name: ImageName,
-): Promise<HTMLImageElement | null> {
-  const url = getThemeImageUrl(theme, name);
-  return url ? loadImage(url) : Promise.resolve(null);
+): Promise<HTMLImageElement> {
+  return loadImage(getThemeImageUrl(theme, name));
 }
 
-// every processed cloud shape belonging to theme, in a stable sorted-filename
-// order; falls back to DEFAULT_THEME's own set if theme hasn't generated any yet
+// true only if theme has generated its OWN copy of EVERY asset that's supposed to
+// vary per-theme (skyline, map backdrop, floor backgrounds, ground, wall
+// material, worker + manager sprites) — this is the complete set a company's
+// buildings + map together need, so a company is never left with some pieces
+// from one theme and some from another. Anything that picks a theme for a whole
+// company (company.ts's pickLeastUsedMapTheme) must filter through
+// getThemesWithFullAssets() instead of picking from all of THEME_NAMES.
+function themeHasFullAssets(theme: ThemeName): boolean {
+  const hasOwnImage = (name: ImageName) =>
+    Object.keys(imageModules).some(
+      (p) => themeOf(p) === theme && p.endsWith(`/${IMAGE_FILES[name]}`),
+    );
+  const hasOwnSprite = (name: SpriteName) =>
+    Object.keys(spriteModules).some(
+      (p) => themeOf(p) === theme && p.endsWith(`/${SPRITE_FILES[name]}`),
+    );
+  const hasOwnBackgrounds = Object.keys(backgroundModules).some(
+    (p) => themeOf(p) === theme,
+  );
+  const hasOwnGround = Object.keys(groundModules).some(
+    (p) => themeOf(p) === theme,
+  );
+  return (
+    hasOwnImage("city") &&
+    hasOwnImage("cityMapBackground") &&
+    hasOwnImage("wallMaterial") &&
+    hasOwnSprite("worker") &&
+    hasOwnSprite("manager") &&
+    hasOwnBackgrounds &&
+    hasOwnGround
+  );
+}
+
+// every theme with its own COMPLETE set of per-theme-varying art generated so
+// far — grows on its own as more themes get processed, no code change needed
+// elsewhere. Always includes "references" (the hand-authored original, which has
+// every asset by construction).
+export function getThemesWithFullAssets(): ThemeName[] {
+  return THEME_NAMES.filter(themeHasFullAssets);
+}
+
+// every processed cloud shape belonging to theme — never falls back, see
+// getThemeBackgroundUrls. Clouds are NOT themed (every call site passes the
+// literal "references" theme itself), so this never throws in practice.
 export function getThemeCloudUrls(theme: ThemeName): string[] {
   const own = Object.keys(cloudModules)
     .filter((path) => themeOf(path) === theme)
     .sort()
     .map((path) => cloudModules[path]);
-  if (own.length > 0 || theme === DEFAULT_THEME) return own;
-  return getThemeCloudUrls(DEFAULT_THEME);
+  if (own.length === 0) {
+    throw new Error(`Theme "${theme}" has no clouds generated`);
+  }
+  return own;
 }
 
 export function loadThemeClouds(theme: ThemeName): Promise<HTMLImageElement[]> {

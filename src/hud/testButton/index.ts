@@ -1,10 +1,4 @@
 import type { Floor } from "../../gameState";
-import { clearBuildings } from "../../gameState";
-import { clearTotalIncome } from "../../totalIncome";
-import { clearCityNames } from "../../cityName";
-import { clearCorporationNames } from "../../corporationName";
-import { clearStockPrices } from "../corporationBoostMenu";
-import type { ThemeName } from "../../loadAssets";
 
 // dev/test-only controls, not part of the real game UI
 export function createTestButtonMarkup(): string {
@@ -15,7 +9,6 @@ export function createTestButtonMarkup(): string {
       <button id="spawn-crit" class="game__button">Spawn Crit</button>
       <button id="trigger-idle-popup" class="game__button">Idle Popup</button>
       <button id="test-press-conference" class="game__button">Press Conf Game</button>
-      <select id="theme-select" class="game__button" title="Active company theme"></select>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
     </div>
   `;
@@ -65,55 +58,18 @@ export function wirePressConferenceTestButton(
   button.addEventListener("click", onClick);
 }
 
-export interface ThemeTestSelect {
-  // re-reads getActiveTheme and reflects it in the dropdown — call after
-  // switching companies, since the active company's own theme may differ
-  refresh(): void;
-}
-
-// forces the active company's map + every one of its buildings onto a single
-// picked theme, bypassing the normal per-building/per-company random pick — lets
-// a dev preview a theme's full asset set without rerolling until it comes up
-export function wireThemeTestSelect(
-  container: HTMLElement,
-  themeNames: readonly ThemeName[],
-  getActiveTheme: () => ThemeName,
-  onChange: (theme: ThemeName) => void,
-): ThemeTestSelect {
-  const select = container.querySelector<HTMLSelectElement>("#theme-select")!;
-  select.innerHTML = themeNames
-    .map((name) => `<option value="${name}">${name}</option>`)
-    .join("");
-  select.value = getActiveTheme();
-  select.addEventListener("change", () => {
-    onChange(select.value as ThemeName);
-  });
-  return {
-    refresh: () => {
-      select.value = getActiveTheme();
-    },
-  };
-}
-
 export function wireResetButton(
   container: HTMLElement,
   buildings: Floor[][],
-  getActiveCompanyIndex: () => number,
 ): void {
   const button = container.querySelector<HTMLButtonElement>("#reset-game")!;
   button.addEventListener("click", () => {
     // also truncate the in-memory array: main.ts's beforeunload handler persists
-    // buildings on the way out, and without this it would just re-save the stale data
-    // right after clearBuildings() removes it, undoing the reset before the reload
-    // even happens
+    // buildings on the way out, and without this it would just re-save the stale
+    // data right after localStorage.clear() removes it, undoing the reset before
+    // the reload even happens
     buildings.length = 0;
-    clearBuildings(getActiveCompanyIndex());
-    clearTotalIncome();
-    clearCityNames();
-    // clearStockPrices reads getCorporationCount, so it must run before
-    // clearCorporationNames resets that count back down to a fresh single company
-    clearStockPrices();
-    clearCorporationNames();
+    localStorage.clear();
     location.reload();
   });
 }

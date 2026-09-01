@@ -1,4 +1,5 @@
-import type { ThemeName } from "../loadAssets";
+import { getThemesWithFullAssets, type ThemeName } from "../loadAssets";
+import { getCorporationCount } from "../corporationName";
 
 // Each corporation (see corporationName.ts's naming, cityMap.ts's barrel-roll
 // picker) runs its own completely separate game underneath — own buildings/
@@ -25,10 +26,11 @@ export function setActiveCompanyIndex(index: number): void {
   }
 }
 
-// the map screen's own art theme (skyline + map backdrop) — picked ONCE, randomly,
-// the moment a company is first created (see main.ts's loadOrCreateBuildings) and
-// never re-rolled after that, unlike buildings (which each get their own
-// independently random theme, see buildings/index.ts's createBuilding)
+// the ONE theme for a company's entire game — map skyline/backdrop AND every one
+// of its buildings' own floors/ground/wall material/worker+manager sprites all
+// come from this SAME theme, never mixed. Picked ONCE, randomly, the moment a
+// company is first created (see main.ts's loadOrCreateBuildings) and never
+// re-rolled after that.
 const MAP_THEME_KEY = "cash-clicker:map-theme";
 
 export function getMapTheme(companyIndex: number): ThemeName | null {
@@ -44,13 +46,47 @@ export function getMapTheme(companyIndex: number): ThemeName | null {
 
 export function setMapTheme(companyIndex: number, theme: ThemeName): void {
   try {
-    localStorage.setItem(
-      companyStorageKey(MAP_THEME_KEY, companyIndex),
-      theme,
-    );
+    localStorage.setItem(companyStorageKey(MAP_THEME_KEY, companyIndex), theme);
   } catch {
     // storage unavailable: nothing to persist
   }
+}
+
+// wipes a company's persisted theme — must be called alongside clearBuildings()
+// on a full reset, or the "first play"/reset experience keeps reusing whatever
+// theme this company happened to get the very first time it was ever created
+// instead of genuinely rerolling (see hud/testButton's wireResetButton)
+export function clearMapTheme(companyIndex: number): void {
+  try {
+    localStorage.removeItem(companyStorageKey(MAP_THEME_KEY, companyIndex));
+  } catch {
+    // storage unavailable: nothing to clear
+  }
+}
+
+// picks the ONE theme for a brand-new company ("Create new Corporation" button) —
+// governs everything that company ever renders (map + every building), see
+// MAP_THEME_KEY above. Prefers a theme no OTHER existing company is currently
+// using, so every company looks distinct for as long as an unused theme remains;
+// once every theme is in use by at least one company, falls back to whichever
+// theme(s) are used least, picked randomly among ties. newCompanyIndex is
+// excluded from its own tally since it doesn't have a theme assigned yet at the
+// point this is called. Only picks among getThemesWithFullAssets() (themes with
+// EVERY per-theme-varying asset generated) — picking an incomplete theme would
+// force some of that company's assets to come from a different theme, which is
+// exactly the "mixing" this whole design forbids.
+export function pickLeastUsedMapTheme(newCompanyIndex: number): ThemeName {
+  const pool = getThemesWithFullAssets();
+  const usageCount = new Map<ThemeName, number>(pool.map((name) => [name, 0]));
+  const companyCount = getCorporationCount();
+  for (let i = 0; i < companyCount; i++) {
+    if (i === newCompanyIndex) continue;
+    const theme = getMapTheme(i);
+    if (theme) usageCount.set(theme, (usageCount.get(theme) ?? 0) + 1);
+  }
+  const minCount = Math.min(...pool.map((name) => usageCount.get(name)!));
+  const leastUsed = pool.filter((name) => usageCount.get(name) === minCount);
+  return leastUsed[Math.floor(Math.random() * leastUsed.length)];
 }
 
 // company 0 keeps every pre-existing plain key (cash-clicker:buildings,

@@ -24,7 +24,6 @@ import {
   schedulePersist,
   loadBuildings,
   saveBuildingThemes,
-  loadBuildingThemes,
   computeIdleIncome,
   markAppClosed,
   initSessionGuard,
@@ -38,6 +37,7 @@ import {
   saveCompanyRecord,
   getMapTheme,
   setMapTheme,
+  pickLeastUsedMapTheme,
 } from "./company";
 import {
   createTestButtonMarkup,
@@ -46,7 +46,6 @@ import {
   wireSpawnCritButton,
   wireIdlePopupTestButton,
   wirePressConferenceTestButton,
-  wireThemeTestSelect,
   wireResetButton,
   createActionBarMarkup,
   wireActionBar,
@@ -87,11 +86,7 @@ import { loadMouseImage, forceSpawnMouse } from "./mouse";
 import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation, getCorporationPrice } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
-import {
-  pickRandomTheme,
-  getThemeBackgroundUrls,
-  THEME_NAMES,
-} from "./loadAssets";
+import { getThemeBackgroundUrls } from "./loadAssets";
 import type { ThemeName } from "./loadAssets";
 
 // matches style.css's worker-menu-slide-out-* keyframes (0.352s) — the company
@@ -157,10 +152,6 @@ async function main() {
   // buyBuilding below), unlike the map's own theme (company.ts's getMapTheme),
   // which is picked once per company instead of per building
   let buildingThemes: ThemeName[] = [];
-  // set by the dev-only theme test select below (undefined in production, where
-  // that control doesn't exist) so switchToCompany can keep it in sync with
-  // whichever company just became active
-  let refreshThemeTestSelect: (() => void) | undefined;
 
   // so a reload lands back on whichever building the player last selected on the
   // map, namespaced per company (see company.ts's companyStorageKey) since each
@@ -211,30 +202,39 @@ async function main() {
     ]);
   }
 
-  // loads a company's saved buildings + each one's own persisted theme, or starts
-  // it off with a single fresh building (its own random theme) + a fresh random
-  // map theme if it's never been played before (a brand new corporation, or the
-  // very first run)
+  // loads a company's saved buildings, forcing every one of them onto the
+  // company's own single theme (see company.ts's MAP_THEME_KEY — one theme
+  // governs the whole company, never mixed), or starts it off with a single
+  // fresh building on a freshly-picked theme if it's never been played before (a
+  // brand new corporation, or the very first run)
   async function loadOrCreateBuildings(
     companyIndex: number,
   ): Promise<Floor[][]> {
     const restored = loadBuildings(companyIndex);
     if (restored.length > 0) {
-      buildingThemes = loadBuildingThemes(companyIndex);
-      // backfill in case an older save predates this feature (fewer/no themes
-      // than buildings) — persisted immediately so it doesn't re-roll every load
-      let backfilled = false;
-      while (buildingThemes.length < restored.length) {
-        buildingThemes.push(pickRandomTheme());
-        backfilled = true;
-      }
-      if (backfilled) saveBuildingThemes(buildingThemes, companyIndex);
+      // a company always already has its own theme set by the time it has any
+      // restored buildings, EXCEPT a save from before per-company themes existed
+      // at all — falls back to plain "references" (never a random pick, see the
+      // fallback below for why) rather than leaving it unset
+      const theme = getMapTheme(companyIndex) ?? "references";
+      setMapTheme(companyIndex, theme);
+      // every building uses the SAME theme as the company itself — re-derived
+      // here (not just trusted from the persisted array) so an older save from
+      // before this rule existed (independently-random per-building themes)
+      // self-heals back to a single consistent theme the next time it loads
+      buildingThemes = restored.map(() => theme);
+      saveBuildingThemes(buildingThemes, companyIndex);
       return restored;
     }
     if (!getMapTheme(companyIndex)) {
-      setMapTheme(companyIndex, pickRandomTheme());
+      // the random least-used pick only happens when explicitly creating a NEW
+      // company (see the "Create new Corporation" handler below) — reaching this
+      // fallback means a company with no theme yet that ISN'T going through that
+      // flow (the very first company ever on a fresh install, or after Reset
+      // Game), which should always default to plain "references", not a random pick
+      setMapTheme(companyIndex, "references");
     }
-    const theme = pickRandomTheme();
+    const theme = getMapTheme(companyIndex)!;
     buildingThemes = [theme];
     saveBuildingThemes(buildingThemes, companyIndex);
     const themeBackgroundCount = getThemeBackgroundUrls(theme).length;
@@ -340,7 +340,6 @@ async function main() {
       loadCityMapImage(incomingMapTheme),
     ]);
     gameCanvas.setActiveFloors(buildings[activeBuildingIndex]);
-    refreshThemeTestSelect?.();
   }
 
   // dev/test-only controls; markup is stripped entirely in production builds
@@ -365,26 +364,7 @@ async function main() {
       showIdlePopup(app, testAmount, () => addTotalIncome(testAmount));
     });
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
-    const themeTestSelect = wireThemeTestSelect(
-      app,
-      THEME_NAMES,
-      () => getMapTheme(activeCompanyIndex) ?? "references",
-      async (theme) => {
-        setMapTheme(activeCompanyIndex, theme);
-        buildingThemes = buildings.map(() => theme);
-        saveBuildingThemes(buildingThemes, activeCompanyIndex);
-        buildings.forEach((_, i) => setupBuilding(i));
-        await Promise.all([
-          loadBuildingThemeAssets(theme),
-          loadCityImage(theme),
-          loadCityMapImage(theme),
-        ]);
-        gameCanvas.setActiveFloors(buildings[activeBuildingIndex]);
-        cityMapView.refresh();
-      },
-    );
-    refreshThemeTestSelect = () => themeTestSelect.refresh();
-    wireResetButton(app, buildings, () => activeCompanyIndex);
+    wireResetButton(app, buildings);
   }
   const upgradeMenu = wireUpgradeMenu(
     app,
@@ -408,6 +388,11 @@ async function main() {
     () => {
       if (!spendFromAllCompanies(getCorporationPrice())) return;
       const newIndex = createNewCorporation();
+      // the least-used-theme random pick only ever happens HERE, at the moment a
+      // genuinely new company is created — the very first company ever (fresh
+      // install, or after Reset Game) instead defaults to plain "references" (see
+      // loadOrCreateBuildings's own fallback)
+      setMapTheme(newIndex, pickLeastUsedMapTheme(newIndex));
       grantFreePressConference();
       companySelectMenu.close();
       setTimeout(() => {
@@ -429,13 +414,14 @@ async function main() {
     corporationBoostMenu.refresh(),
   );
   // buys the next building outright if affordable (see buildings.ts's
-  // getBuildingPrice, which scales 1000x per building same as its economy); its
-  // own theme is picked randomly, independent of every other building. Returns
-  // whether it succeeded so the map menu can decide whether to re-render
+  // getBuildingPrice, which scales 1000x per building same as its economy); uses
+  // the company's own single theme (see company.ts's MAP_THEME_KEY), same as
+  // every other building this company has — never an independently-random pick.
+  // Returns whether it succeeded so the map menu can decide whether to re-render
   function buyBuilding(): boolean {
     const buildingIndex = buildings.length;
     if (!spendTotalIncome(getBuildingPrice(buildingIndex))) return false;
-    const theme = pickRandomTheme();
+    const theme = getMapTheme(activeCompanyIndex) ?? "references";
     buildingThemes.push(theme);
     saveBuildingThemes(buildingThemes, activeCompanyIndex);
     buildings.push(
