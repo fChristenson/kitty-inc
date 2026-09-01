@@ -26,28 +26,22 @@ const POSITIVE_MARKET_WORDS = [
   "Profit",
   "Hype",
 ];
-const NEGATIVE_MARKET_WORDS = [
-  "Crash",
-  "Meltdown",
-  "Selloff",
-  "Slump",
-  "Panic",
-  "Plunge",
-  "Losses",
-  "Downturn",
-];
 
-// a special bad event, substituted in for a normal one MARKET_CRASH_CHANCE of
-// the time — always bad, but ends the round on hit instead of the usual
-// bad-hit explosion+shake+burn-rate penalty (see index.ts's spawnMarketEvent)
+// a special event, substituted in for a normal good one some of the time
+// (see index.ts's getCrashChance) — always bad, and ends the round on hit
+// instead of a normal hit's coin burst
 export const MARKET_CRASH_TEXT = "Market Crash";
-export const MARKET_CRASH_CHANCE = 0.12;
 
-// one cat-themed word plus one market-mood word, instead of a fixed
-// pre-written phrase — every spawn combines a fresh random pair
-export function generateMarketEventText(good: boolean): string {
+// one cat-themed word plus one positive market-mood word, instead of a fixed
+// pre-written phrase — every spawn combines a fresh random pair. Every event
+// that isn't the Market Crash is good now (see index.ts's spawnMarketEvent),
+// so this never needs to generate a bad headline
+export function generateMarketEventText(): string {
   const catWord = CAT_WORDS[Math.floor(Math.random() * CAT_WORDS.length)];
-  const moodWords = good ? POSITIVE_MARKET_WORDS : NEGATIVE_MARKET_WORDS;
-  const moodWord = moodWords[Math.floor(Math.random() * moodWords.length)];
+  const moodWord =
+    POSITIVE_MARKET_WORDS[
+      Math.floor(Math.random() * POSITIVE_MARKET_WORDS.length)
+    ];
   return `${catWord} ${moodWord}`;
 }
+

@@ -1,7 +1,7 @@
 import { playSwoosh, playBubble, playExplosion, playSold } from "../../sound";
 import { drawPill, drawCartoonText, formatPrice, randomInt } from "../../utils";
 import { COLOR } from "../../palette";
-import { triggerScreenShake, getScreenShakeOffset } from "../../screenShake";
+import { getScreenShakeOffset } from "../../screenShake";
 import { getWiggleRotation } from "../../shared/wiggle";
 import {
   loadCoinBurstImages,
@@ -13,11 +13,7 @@ import {
   getAllCompaniesTotalIncome,
 } from "../../totalIncome";
 import { addMarketInfluencePercent } from "../corporationBoostMenu";
-import {
-  generateMarketEventText,
-  MARKET_CRASH_TEXT,
-  MARKET_CRASH_CHANCE,
-} from "./marketEventText";
+import { generateMarketEventText, MARKET_CRASH_TEXT } from "./marketEventText";
 import { loadSprite, loadImageByName } from "../../loadAssets";
 
 // physics constants for the line's head — same "flappy bird" feel: constant
@@ -94,18 +90,30 @@ const TAP_TO_BEGIN_FONT = '900 30px "Fredoka", system-ui, sans-serif';
 const TAP_TO_BEGIN_STROKE_WIDTH = 6;
 // how far above the head's own y this sits (see drawTapToBegin)
 const TAP_TO_BEGIN_LIFT_PX = 40;
-// difficulty ramp: every DIFFICULTY_INTERVAL_MS survived, bad events get 25%
-// more likely (relative to good's own unchanged odds), events spawn more
-// densely (the interval between spawns shrinks), and every event moves
-// EVENT_SPEED_GROWTH_PER_TIER faster — all compounding each tier
+// difficulty ramp: every DIFFICULTY_INTERVAL_MS survived, the good/crash spawn
+// ratio shifts further toward crash, events spawn more densely (the interval
+// between spawns shrinks), and every event moves EVENT_SPEED_GROWTH_PER_TIER
+// faster — all compounding each tier
 const DIFFICULTY_INTERVAL_MS = 10_000;
-const BAD_SPAWN_WEIGHT_GROWTH_PER_TIER = 1.25;
 const EVENT_SPEED_GROWTH_PER_TIER = 1.15;
 const SPAWN_INTERVAL_SHRINK_PER_TIER = 0.8; // <1: shrinks the gap between spawns, so more text spawns overall
 const MIN_SPAWN_INTERVAL_FLOOR_MS = 350; // never crowds spawns closer together than this regardless of tier
 // spawnCoinBurstAt's own default scale (1) is sized for a full building-width
 // canvas; this screen is much smaller, so its own bursts get shrunk down too
 const COIN_BURST_SCALE = 0.35;
+
+// every event is either good (a coin burst on hit) or the special Market
+// Crash (ends the round on hit) — no normal "bad" event exists anymore. The
+// crash ratio starts low and climbs every difficulty tier, capping out at
+// MARKET_CRASH_CHANCE_MAX so a long-surviving round doesn't eventually become
+// unwinnable (100% crash, no good events left to hit at all)
+const MARKET_CRASH_CHANCE_START = 0.1; // 10% crash / 90% good at round start
+const MARKET_CRASH_CHANCE_GROWTH_PER_TIER = 0.08;
+const MARKET_CRASH_CHANCE_MAX = 0.9; // 90% crash / 10% good, never past this
+// once the crash ratio has capped out, spawns ALSO get denser on top of the
+// regular per-tier shrink above — a clear "everything is crashing constantly"
+// late-game crunch, not just a quiet continuation of the same gradual shrink
+const MAXED_CRASH_SPAWN_INTERVAL_SHRINK = 0.6;
 
 // the combined total income across every corporation, snapshotted once when
 // the round opens (see open's totalIncomeAtOpen), is this game's own "fuel":
@@ -189,7 +197,7 @@ const FLOOR_H = 20;
 interface MarketEvent {
   text: string;
   good: boolean;
-  isCrash: boolean; // the special "Market Crash" event (see MARKET_CRASH_CHANCE); always bad, but ends the round on hit instead of the usual bad-hit penalty
+  isCrash: boolean; // the special "Market Crash" event (see getCrashChance); always bad, but ends the round on hit instead of a normal hit's coin burst
   x: number;
   y: number;
   width: number; // measured once at spawn time
@@ -310,9 +318,14 @@ export function wirePressConferenceGame(
   // takes the tier explicitly (rather than reading state.survivedMs itself)
   // so it's safe to call from freshState() too, before `state` exists yet —
   // shrinks toward MIN_SPAWN_INTERVAL_FLOOR_MS each tier, so more text spawns
-  // overall as the game goes on
+  // overall as the game goes on. Shrinks an EXTRA MAXED_CRASH_SPAWN_INTERVAL_SHRINK
+  // on top of that once the crash ratio itself has capped out
   function randomEventDelayMs(tier: number): number {
-    const shrink = SPAWN_INTERVAL_SHRINK_PER_TIER ** tier;
+    const shrink =
+      SPAWN_INTERVAL_SHRINK_PER_TIER ** tier *
+      (getCrashChance(tier) >= MARKET_CRASH_CHANCE_MAX
+        ? MAXED_CRASH_SPAWN_INTERVAL_SHRINK
+        : 1);
     const min = Math.max(
       MIN_SPAWN_INTERVAL_FLOOR_MS,
       EVENT_SPAWN_INTERVAL_MIN_MS * shrink,
@@ -322,10 +335,20 @@ export function wirePressConferenceGame(
   }
 
   // how many full DIFFICULTY_INTERVAL_MS spans have been survived so far —
-  // the bad-event odds, spawn density, and every event's own drift speed all
+  // the crash ratio, spawn density, and every event's own drift speed all
   // scale off this
   function getDifficultyTier(): number {
     return Math.floor(state.survivedMs / DIFFICULTY_INTERVAL_MS);
+  }
+
+  // this tier's own good-vs-crash spawn ratio (see MARKET_CRASH_CHANCE_START/
+  // GROWTH/MAX above) — how much of every spawn is the Market Crash instead
+  // of a normal good event
+  function getCrashChance(tier: number): number {
+    return Math.min(
+      MARKET_CRASH_CHANCE_MAX,
+      MARKET_CRASH_CHANCE_START + MARKET_CRASH_CHANCE_GROWTH_PER_TIER * tier,
+    );
   }
 
   // spawns just off the right edge, drifting left like everything else in
@@ -333,14 +356,9 @@ export function wirePressConferenceGame(
   // at a random height that leaves the same bottom clearance the End button
   // sits in once the round's over
   function spawnMarketEvent(): void {
-    // good keeps flat 1:1 odds; bad's own relative weight compounds each
-    // difficulty tier, so it crowds out good more and more over time
-    const badWeight = BAD_SPAWN_WEIGHT_GROWTH_PER_TIER ** getDifficultyTier();
-    const good = Math.random() >= badWeight / (1 + badWeight);
-    // a bad spawn has its own further chance of being the special Market
-    // Crash event instead of a normal bad headline
-    const isCrash = !good && Math.random() < MARKET_CRASH_CHANCE;
-    const text = isCrash ? MARKET_CRASH_TEXT : generateMarketEventText(good);
+    const isCrash = Math.random() < getCrashChance(getDifficultyTier());
+    const good = !isCrash;
+    const text = isCrash ? MARKET_CRASH_TEXT : generateMarketEventText();
     ctx.font = isCrash ? MARKET_CRASH_FONT : EVENT_FONT;
     const width = ctx.measureText(text).width;
     const topMargin = 30;
@@ -821,18 +839,13 @@ export function wirePressConferenceGame(
           // ends the round outright, same as hitting a bound — no burn-rate
           // penalty or shake, just the same explosion + game over
           endRound();
-        } else if (event.good) {
+        } else {
           spawnCoinBurstAt(event.x, event.y, COIN_BURST_SCALE);
           // the buy sfx, not the usual coin-drop one, just for this hit
           playSold();
           // flat bump, on top of the flat ambient climb above — only ever
           // kept in session state here, banked for real once by endRound
           state.marketInfluencePercent += GOOD_HIT_INFLUENCE_PERCENT;
-        } else {
-          playExplosion();
-          triggerScreenShake();
-          // no influence penalty — Market Influence only ever climbs
-          // (ambient + good hits), a bad hit is just a scare, not a setback
         }
         state.marketEvents.splice(i, 1);
         continue;
