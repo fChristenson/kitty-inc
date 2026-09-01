@@ -12,7 +12,7 @@ import {
 } from "../../shared/pressAndHold";
 import { playSwoosh, playSold } from "../../sound";
 import { getThemeImageUrl } from "../../loadAssets";
-import { getManagerIconUrl } from "../../floors";
+import { getReferenceManagerIconUrl } from "../../floors";
 
 const coinIconUrl = getThemeImageUrl("references", "coin");
 import {
@@ -83,7 +83,10 @@ export function wireCorporationBoostMenu(
   )!;
 
   function render(): void {
-    const managerIconUrl = getManagerIconUrl();
+    // "Hold press conference" isn't tied to any one company/building's own
+    // theme (see getReferenceManagerIconUrl), unlike coinIconUrl above which
+    // is likewise always the references theme's own art for the same reason
+    const managerIconUrl = getReferenceManagerIconUrl();
     const count = getCorporationCount();
     const modifierRows = Array.from({ length: count }, (_, i) => {
       const pct = getStockContributionPercent(i);

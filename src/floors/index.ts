@@ -278,6 +278,8 @@ export {
   loadWorkerSprite,
   getWorkerIconUrl,
   getManagerIconUrl,
+  preloadReferenceManagerSprite,
+  getReferenceManagerIconUrl,
   triggerJumpAll,
   getRenderedWorkerCount,
   MAX_RENDERED_WORKERS,

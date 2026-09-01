@@ -28,6 +28,7 @@ const TILE_W = CITY_MAX_HEIGHT * (IMAGE_W / IMAGE_H);
 // city.png is generated.
 const THEME_SKY_GROUND_COLOR: Partial<Record<ThemeName, string>> = {
   "corporate-tech-hq": "#3A6899",
+  "bakery-cafe": "#335D90",
 };
 
 let cityImage: HTMLImageElement | null = null;

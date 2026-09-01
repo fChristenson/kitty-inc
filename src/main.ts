@@ -3,6 +3,7 @@ import {
   loadFloorBackgrounds,
   loadGroundImage,
   loadWorkerSprite,
+  preloadReferenceManagerSprite,
   loadCoinImage,
   loadFloatingCoinImage,
   startIncomeTicker,
@@ -137,6 +138,10 @@ async function main() {
   await loadCoinImage();
   await loadFloatingCoinImage();
   await loadRoofImage(); // same roof art for every theme, loaded once
+  // "Hold press conference" (hud/corporationBoostMenu) is global, not tied to
+  // any one building's theme, so its icon always needs the references sprite
+  // ready regardless of which theme the active building ends up loading
+  await preloadReferenceManagerSprite();
 
   // one Floor[] per building; only one building is ever shown on screen at a time
   // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
