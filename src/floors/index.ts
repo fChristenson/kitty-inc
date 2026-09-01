@@ -9,7 +9,11 @@ import {
   GROUND_TILE_W,
   DIVIDER_H,
   ROOM_CONTENT_SCALE,
+  ROOM_CONTENT_SCALE_X,
+  ROOM_CONTENT_Y_OFFSET,
+  ROOM_WALL_OVERLAP_PX,
   SIDE_WALL_WIDTH,
+  TOP_WALL_WIDTH,
 } from "./constants";
 import groundImageUrl from "../assets/ground/street.png";
 
@@ -22,6 +26,7 @@ export {
   DIVIDER_H,
   ROOM_CONTENT_SCALE,
   SIDE_WALL_WIDTH,
+  TOP_WALL_WIDTH,
 };
 
 const BASE_INCOME_AMOUNT = 1; // ground floor's starting $/interval
@@ -160,16 +165,20 @@ export function drawFloor(
   floor: Floor,
 ): void {
   // draws the FULL image, vertically compressed to fit above the divider band, so
-  // no part of the art (including ceiling detail) is ever cropped off
+  // no part of the art (including ceiling detail) is ever cropped off. Horizontally
+  // compressed too, so the art spans wall-to-wall with only ROOM_WALL_OVERLAP_PX
+  // reaching behind each side wall/top wall/divider band (drawOuterWall draws on top
+  // of this and hides that sliver) instead of the walls masking a big strip of
+  // full-width/full-height art
   ctx.drawImage(
     bgImage,
     0,
     0,
     FLOOR_W,
     FLOOR_H,
-    0,
-    0,
-    FLOOR_W,
+    SIDE_WALL_WIDTH - ROOM_WALL_OVERLAP_PX,
+    ROOM_CONTENT_Y_OFFSET,
+    FLOOR_W * ROOM_CONTENT_SCALE_X,
     FLOOR_H * ROOM_CONTENT_SCALE,
   );
   void floor; // no per-floor furniture placement left to draw; kept for a stable draw signature
@@ -244,6 +253,7 @@ export {
   getRenderedWorkerCount,
   MAX_RENDERED_WORKERS,
   WALK_SPEED,
+  WORKER_FEET_Y_NUDGE_PX,
 } from "./worker";
 export { drawUpgradeStar, getUpgradeIndicatorCenter } from "./star";
 export {

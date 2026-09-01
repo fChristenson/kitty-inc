@@ -1,4 +1,9 @@
-import { FLOOR_X_MIN, FLOOR_X_MAX, ROOM_CONTENT_SCALE } from "../constants";
+import {
+  FLOOR_X_MIN,
+  FLOOR_X_MAX,
+  ROOM_CONTENT_SCALE,
+  ROOM_CONTENT_Y_OFFSET,
+} from "../constants";
 import {
   isBoosted,
   activateBoosted,
@@ -99,10 +104,13 @@ export async function loadWorkerSprite(): Promise<HTMLImageElement> {
 
 export const WALK_SPEED = 50; // px/sec
 const BOOSTED_WALK_SPEED = WALK_SPEED * 2;
-// feet rest on the room art's own floor line, scaled by the same ROOM_CONTENT_SCALE
-// drawFloor compresses its art by, so the cat keeps standing on the art's actual
-// floor instead of the area now covered by the taller divider
-const WORKER_FEET_Y = 650 * ROOM_CONTENT_SCALE;
+// feet rest on the room art's own floor line, scaled by the same ROOM_CONTENT_SCALE/
+// ROOM_CONTENT_Y_OFFSET drawFloor positions its art by, so the cat keeps standing on
+// the art's actual floor instead of the area now covered by the taller divider —
+// nudged down an extra WORKER_FEET_Y_NUDGE_PX per an explicit visual tweak request
+export const WORKER_FEET_Y_NUDGE_PX = 46;
+const WORKER_FEET_Y =
+  ROOM_CONTENT_Y_OFFSET + 650 * ROOM_CONTENT_SCALE + WORKER_FEET_Y_NUDGE_PX;
 const CLICK_BOUNCE_MS = 300; // how long the little "boing" reaction plays after a click
 const CLICK_COOLDOWN_MS = 500; // ignore re-clicks faster than this so coin bursts don't stack up
 // how long a walker keeps walking, or keeps doing one of the idle behaviors below,

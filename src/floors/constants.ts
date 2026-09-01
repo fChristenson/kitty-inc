@@ -12,6 +12,11 @@ export const FLOOR_H = 721;
 // against the walls without a circular import back into buildings/
 export const SIDE_WALL_WIDTH = 56;
 
+// width of the exterior top-wall facade mask strip (see buildings/outerWall/index.ts) —
+// lives here too, same reasoning as SIDE_WALL_WIDTH, so drawFloor can size the room
+// art against it without a circular import back into buildings/
+export const TOP_WALL_WIDTH = 28;
+
 // the floor plane band inside each bg.png slice (rest is ceiling/walls/windows) —
 // used to keep the worker walking band clear of the room's side walls
 export const FLOOR_X_MIN = 150;
@@ -41,6 +46,24 @@ export const GROUND_TILE_W = Math.round(GROUND_H * (1248 / 318));
 // alone is enough — every dependent (ROOM_CONTENT_SCALE, the divider draw, the
 // worker's floor line) derives from it.
 export const DIVIDER_H = 168;
-// scales the room's own bg art + worker vertically so the whole image still fits
-// (compressed, not cropped) above the divider band instead of losing its top edge
-export const ROOM_CONTENT_SCALE = (FLOOR_H - (DIVIDER_H - 28)) / FLOOR_H;
+
+// how far the room bg art is allowed to reach behind any wall/divider band (see
+// floors/index.ts's drawFloor) — just enough to avoid a hairline gap at each seam,
+// instead of the full band width sitting hidden underneath
+export const ROOM_WALL_OVERLAP_PX = 1;
+
+// top edge the room art actually starts drawing at (see drawFloor/WORKER_FEET_Y) —
+// just ROOM_WALL_OVERLAP_PX below the top wall mask's own bottom edge, instead of
+// the art's own y=0 sitting fully hidden under the whole TOP_WALL_WIDTH mask
+export const ROOM_CONTENT_Y_OFFSET = TOP_WALL_WIDTH - ROOM_WALL_OVERLAP_PX;
+// scales the room's own bg art + worker vertically so it spans exactly from the top
+// wall's inner-overlap edge to the divider band's inner-overlap edge, instead of
+// stretching all the way from y=0 down past the divider's own top edge
+export const ROOM_CONTENT_SCALE =
+  (FLOOR_H - DIVIDER_H - TOP_WALL_WIDTH + 2 * ROOM_WALL_OVERLAP_PX) / FLOOR_H;
+
+// scales the room's own bg art horizontally so it spans exactly from one wall's
+// inner-overlap edge to the other's, instead of the walls masking a big strip of
+// full-width art on each side
+export const ROOM_CONTENT_SCALE_X =
+  (FLOOR_W - 2 * (SIDE_WALL_WIDTH - ROOM_WALL_OVERLAP_PX)) / FLOOR_W;

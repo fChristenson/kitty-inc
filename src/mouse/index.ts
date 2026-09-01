@@ -3,6 +3,7 @@ import {
   FLOOR_X_MAX,
   ROOM_CONTENT_SCALE,
   WALK_SPEED,
+  WORKER_FEET_Y_NUDGE_PX,
   spawnCoinBurst,
   triggerJumpAll,
 } from "../floors";
@@ -55,8 +56,9 @@ const RUN_WIGGLE_RAD = 0.03; // small full-body shear, alternating each half-cyc
 const LAUNCH_SQUASH_MS = 150;
 const LAUNCH_SQUASH_AMOUNT = 0.14;
 // the exact same feet line worker/index.ts's WORKER_FEET_Y draws the cats on (both
-// 650 * ROOM_CONTENT_SCALE, and both bottom-anchored — see drawMouse below)
-const MOUSE_Y = 650 * ROOM_CONTENT_SCALE;
+// 650 * ROOM_CONTENT_SCALE, and both bottom-anchored — see drawMouse below),
+// nudged down by that same WORKER_FEET_Y_NUDGE_PX so it stays in sync with the cats
+const MOUSE_Y = 676 * ROOM_CONTENT_SCALE + WORKER_FEET_Y_NUDGE_PX;
 // the source art faces left; only needs a horizontal flip when running the other way
 const ART_FACES: 1 | -1 = -1;
 
