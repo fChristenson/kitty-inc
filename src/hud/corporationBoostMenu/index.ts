@@ -123,10 +123,10 @@ function getAllCompaniesCurrentIncomePerSecond(): number {
   return total;
 }
 
-const PRESS_CONFERENCE_INCOME_SECONDS = 30 * 60;
+const PRESS_CONFERENCE_INCOME_SECONDS = 10 * 60;
 
 // $ cost of the single, not-per-company "Hold press conference" action: every
-// company's combined income over 30 minutes at its current rate, flat (unlike
+// company's combined income over 10 minutes at its current rate, flat (unlike
 // getStockRaiseCost, this never doubles with repeated purchases)
 export function getPressConferenceCost(): number {
   return (
