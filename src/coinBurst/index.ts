@@ -162,6 +162,10 @@ export function drawCoinBurstFrame(
 const activeParticles: CoinBurstParticle[] = [];
 let lastActiveUpdateAt: number | null = null;
 
+export function hasActiveCoinBursts(): boolean {
+  return activeParticles.length > 0;
+}
+
 export function spawnCoinBurstAt(x: number, y: number, scale = 1): void {
   for (const p of createCoinBurstParticles(x, y)) {
     // scales position (relative to the spawn point, so the burst still

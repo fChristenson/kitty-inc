@@ -10,11 +10,12 @@ import { playSold, playSwoosh } from "../../sound";
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
 import { getCorporationName, getCorporationCount } from "../../corporationName";
+import { getActiveCompanyIndex, setActiveCompanyIndex, companyStorageKey } from "../../company";
 import {
-  getActiveCompanyIndex,
-  setActiveCompanyIndex,
-  companyStorageKey,
-} from "../../company";
+  spawnCoinBurstAt,
+  drawActiveCoinBursts,
+  hasActiveCoinBursts,
+} from "../../coinBurst";
 import cityMapUrl from "../../assets/city2Bg.png";
 import catSpriteUrl from "../../assets/sprites/kitty1Walk.png";
 
@@ -32,6 +33,31 @@ const CAT_STAND_FRAME = 0;
 const CAT_JUMP_FRAME = 4; // the sheet's "arms-up happy pose", reused as a little hop
 const CAT_POSE_SWAP_MS = 550; // how long each pose in the stand/jump cycle holds
 const MARKER_H = 75; // 25% smaller than the original 100
+// one-shot hop played the instant a building's marker actually unlocks — same
+// shape (sin(t*pi)) and CAT_JUMP_FRAME/CLICK_FRAME swap as floors/worker's own
+// click-reaction bounce, but slower/lower (worker's 300ms/14px reads as too
+// fast/too high at this marker's much smaller MARKER_H=75 scale) — keyed by
+// globalIndex so it survives a city-page round trip; getMarkerJumpOffset
+// self-prunes expired entries so this map never grows past however many unlocks
+// are mid-animation
+const MARKER_JUMP_DURATION_MS = 500;
+const MARKER_JUMP_HEIGHT_PX = 8;
+// spawnCoinBurstAt's default scale (1) is tuned for a full building-width
+// canvas; these markers are tiny by comparison, so shrink it the same way
+// pressConferenceGame's own COIN_BURST_SCALE does for its smaller canvas
+const MARKER_COIN_BURST_SCALE = 0.3;
+const markerJumpStartedAt = new Map<number, number>();
+function getMarkerJumpOffset(globalIndex: number, now: number): number {
+  const startedAt = markerJumpStartedAt.get(globalIndex);
+  if (startedAt === undefined) return 0;
+  const elapsed = now - startedAt;
+  if (elapsed >= MARKER_JUMP_DURATION_MS) {
+    markerJumpStartedAt.delete(globalIndex);
+    return 0;
+  }
+  const t = elapsed / MARKER_JUMP_DURATION_MS;
+  return -MARKER_JUMP_HEIGHT_PX * Math.sin(Math.PI * t);
+}
 const MARKER_HIT_PADDING = 16; // generous click/hover target beyond the sprite's own bounds
 // same bounce+squash the prev/next arrows play via CSS (city-map-arrow-bounce-move/
 // -warp, style.css) — 0.9s period, 10px amplitude — replicated here since the
@@ -321,6 +347,8 @@ export function createCityMapView(
   // by the tick loop further down to temporarily run at full frame rate instead
   // of its usual throttled cadence, only while a wiggle actually needs it
   let hasWigglingMarker = false;
+  // same idea, for a marker's one-shot unlock hop (see getMarkerJumpOffset)
+  let hasActiveMarkerJump = false;
 
   function resize(): void {
     const rect = canvas.getBoundingClientRect();
@@ -394,6 +422,7 @@ export function createCityMapView(
     buildingIndex: number,
     frame: number,
     grayedOut: boolean,
+    jumpOffsetY = 0,
   ): void {
     if (!catSprite) return;
     const { cx, feetY } = markerCenter(buildingIndex);
@@ -412,7 +441,7 @@ export function createCityMapView(
       frameW,
       frameH,
       cx - renderW / 2,
-      feetY - MARKER_H,
+      feetY - MARKER_H + jumpOffsetY,
       renderW,
       MARKER_H,
     );
@@ -570,6 +599,7 @@ export function createCityMapView(
     resize();
     if (cssW <= 0 || cssH <= 0) return;
     hasWigglingMarker = false; // recomputed below; drives the tick loop's own cadence
+    hasActiveMarkerJump = false; // same, for the unlock-hop animation below
     const dpr = window.devicePixelRatio || 1;
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -609,11 +639,17 @@ export function createCityMapView(
     for (let i = 0; i < MARKER_COUNT; i++) {
       const globalIndex = cityIndex * MARKER_COUNT + i;
       if (globalIndex < buildingCount) {
-        drawCatMarker(
-          i,
-          activeIndex === globalIndex ? pose : CAT_STAND_FRAME,
-          false,
-        );
+        const jumpOffsetY = getMarkerJumpOffset(globalIndex, Date.now());
+        if (jumpOffsetY !== 0) hasActiveMarkerJump = true;
+        // the hop always wins the pose, same as a worker's click reaction always
+        // overriding its own walk/idle frame for CLICK_BOUNCE_MS
+        const frame =
+          jumpOffsetY !== 0
+            ? CAT_JUMP_FRAME
+            : activeIndex === globalIndex
+              ? pose
+              : CAT_STAND_FRAME;
+        drawCatMarker(i, frame, false, jumpOffsetY);
         continue;
       }
       drawCatMarker(i, CAT_STAND_FRAME, true);
@@ -643,6 +679,7 @@ export function createCityMapView(
         drawCartoonText(ctx, formatPrice(price), cx, priceY, COLOR.white);
       }
     }
+    drawActiveCoinBursts(ctx, Date.now());
 
     // total income, top of the map — same green-fill/white-stroke money text look
     // used everywhere else, sized for this canvas's own CSS pixel space (unlike
@@ -749,7 +786,12 @@ export function createCityMapView(
     const globalIndex = cityIndex * MARKER_COUNT + hit;
     const buildingCount = deps.getBuildingCount();
     if (globalIndex === buildingCount) {
-      if (deps.buyBuilding()) playSold();
+      if (deps.buyBuilding()) {
+        playSold();
+        markerJumpStartedAt.set(globalIndex, Date.now());
+        const { cx, feetY } = markerCenter(hit);
+        spawnCoinBurstAt(cx, feetY - MARKER_H / 2, MARKER_COIN_BURST_SCALE);
+      }
       redraw();
       return;
     }
@@ -950,14 +992,18 @@ export function createCityMapView(
   // repaint was expensive enough that running it every animation frame is what
   // made opening the map freeze the whole page. The one exception: while an
   // affordable-but-locked price is actively wiggling (see hasWigglingMarker,
-  // set by the previous redraw), that specific animation needs real frame-rate
-  // smoothness, so the throttle is skipped entirely for as long as it's showing
+  // set by the previous redraw), or a marker's unlock hop/coin burst is
+  // playing, that specific animation needs real frame-rate smoothness, so the
+  // throttle is skipped entirely for as long as either is showing
   const TICK_REDRAW_INTERVAL_MS = 100;
   let animationFrameId: number | null = null;
   let lastTickRedraw = 0;
   function tick(): void {
     const now = performance.now();
-    const interval = hasWigglingMarker ? 0 : TICK_REDRAW_INTERVAL_MS;
+    const interval =
+      hasWigglingMarker || hasActiveMarkerJump || hasActiveCoinBursts()
+        ? 0
+        : TICK_REDRAW_INTERVAL_MS;
     if (now - lastTickRedraw >= interval) {
       lastTickRedraw = now;
       redraw();
