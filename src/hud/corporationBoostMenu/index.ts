@@ -3,6 +3,7 @@ import {
   formatPrice,
   formatTotalIncomeFull,
   animateDialogClose,
+  triggerButtonPress,
 } from "../../utils";
 import {
   spendFromAllCompanies,
@@ -396,18 +397,19 @@ export function wireCorporationBoostMenu(
 
   // one purchase attempt; stops the hold once it's no longer affordable so it
   // doesn't just spin uselessly against a purchase that can never succeed.
-  // Renders immediately (not gated behind awaiting the button's own press-bounce
-  // animation) — during a fast hold, back-to-back calls kept re-triggering that
-  // same animation on the same button before the previous one's "animationend"
-  // ever fired, so the awaited render() after it never actually ran, and the
-  // displayed cost/price/percentages all looked frozen for as long as the hold
-  // continued
-  function fireStockRaise(companyIndex: number): void {
+  // Same triggerButtonPress-then-render sequencing as boostMenu.ts/upgradeMenu.ts's
+  // single-click buttons, so a held stock item bounces exactly like every other
+  // worker-menu__item instead of looking inert
+  async function fireStockRaise(companyIndex: number): Promise<void> {
     if (!buyStockRaise(companyIndex)) {
       stopHold();
       return;
     }
     playSold();
+    const button = list.querySelector<HTMLButtonElement>(
+      `button[data-company-index="${companyIndex}"]`,
+    );
+    if (button) await triggerButtonPress(button);
     render();
   }
 
@@ -421,7 +423,7 @@ export function wireCorporationBoostMenu(
         : STOCK_HOLD_INTERVAL_MS;
     holdTimeoutId = setTimeout(() => {
       if (heldCompanyIndex !== companyIndex) return; // hold already stopped
-      fireStockRaise(companyIndex);
+      void fireStockRaise(companyIndex);
       scheduleHoldRepeat(companyIndex);
     }, delay);
   }
@@ -435,7 +437,7 @@ export function wireCorporationBoostMenu(
     const companyIndex = Number(button.dataset.companyIndex);
     heldCompanyIndex = companyIndex;
     holdStartTime = performance.now();
-    fireStockRaise(companyIndex);
+    void fireStockRaise(companyIndex);
     scheduleHoldRepeat(companyIndex);
   });
   window.addEventListener("pointerup", stopHold);
