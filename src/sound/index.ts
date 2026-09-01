@@ -8,6 +8,8 @@ import bubbleUrl from "../assets/sound/bubble.wav";
 
 const MUSIC_VOLUME = 0.4;
 const SFX_VOLUME = 0.9;
+// 25% louder than the shared SFX_VOLUME per explicit request, clamped to Audio's own 1.0 max
+const COIN_DROP_VOLUME = Math.min(SFX_VOLUME * 1.25, 1);
 
 // a single click can hit several overlapping cats, or a cat and the mouse, in the
 // same synchronous call stack (see gameCanvas.ts's onPointerUp) — this window
@@ -73,7 +75,7 @@ export function playCoinDrop(): void {
   if (now - lastCoinDropPlayTime < COIN_DROP_DEBOUNCE_MS) return;
   lastCoinDropPlayTime = now;
   const sfx = new Audio(coinDropUrl);
-  sfx.volume = SFX_VOLUME;
+  sfx.volume = COIN_DROP_VOLUME;
   sfx.play().catch(() => {});
 }
 
