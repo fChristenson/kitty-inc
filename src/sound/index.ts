@@ -35,13 +35,100 @@ let lastExplosionPlayTime = 0;
 
 // any press-and-hold-driven purchase loop (corporationBoostMenu's stock-raise
 // hold, etc.) can call this many times a second — without a debounce, each of
-// those spawns its own Audio instance; the browser doesn't drop the excess, it
-// queues/staggers starting them, so sound kept audibly playing catch-up well
-// after the hold had already stopped instead of just being skipped
+// those schedules its own overlapping playback, so sound kept audibly playing
+// catch-up well after the hold had already stopped instead of just being skipped
 const SOLD_DEBOUNCE_MS = 60;
 let lastSoldPlayTime = 0;
 
 let music: HTMLAudioElement | null = null;
+
+// one shared AudioContext for every one-shot SFX below (NOT the looping background
+// music above, which stays a plain <audio> element — looping/streaming doesn't need
+// this). A brand-new `new Audio(url)` per play() call (the old approach) has to
+// fetch+decode from scratch every single time, which reads as a real ~0.3s lag
+// between an action and its sound specifically on mobile (slower CPU decode). Web
+// Audio decodes each file's bytes into an AudioBuffer ONCE (see loadSfxBuffer,
+// kicked off eagerly by preloadSounds()), so every later play just schedules an
+// already-decoded buffer — near-instant even on mobile
+const AudioContextCtor: typeof AudioContext | undefined =
+  window.AudioContext ??
+  (window as unknown as { webkitAudioContext?: typeof AudioContext })
+    .webkitAudioContext;
+let audioCtx: AudioContext | null = null;
+function getAudioContext(): AudioContext | null {
+  if (!AudioContextCtor) return null; // unsupported browser — callers no-op via optional chaining
+  if (!audioCtx) audioCtx = new AudioContextCtor();
+  return audioCtx;
+}
+
+// same autoplay-policy workaround startBackgroundMusic already needs for <audio> —
+// a fresh AudioContext starts "suspended" until the user has interacted with the
+// page at least once
+function resumeAudioContextOnGesture(ctx: AudioContext): void {
+  if (ctx.state === "running") return;
+  const retry = () => {
+    ctx.resume().catch(() => {});
+    window.removeEventListener("pointerdown", retry);
+    window.removeEventListener("keydown", retry);
+  };
+  window.addEventListener("pointerdown", retry);
+  window.addEventListener("keydown", retry);
+}
+
+const sfxUrls = {
+  coinDrop: coinDropUrl,
+  swoosh: swooshUrl,
+  sold: soldUrl,
+  explosion: explosionUrl,
+  bloop: bloopUrl,
+  bubble: bubbleUrl,
+} as const;
+type SfxName = keyof typeof sfxUrls;
+
+const sfxBufferCache = new Map<SfxName, Promise<AudioBuffer>>();
+
+function loadSfxBuffer(ctx: AudioContext, name: SfxName): Promise<AudioBuffer> {
+  const cached = sfxBufferCache.get(name);
+  if (cached) return cached;
+  const promise = fetch(sfxUrls[name])
+    .then((res) => res.arrayBuffer())
+    .then((data) => ctx.decodeAudioData(data));
+  sfxBufferCache.set(name, promise);
+  return promise;
+}
+
+// kicks off decoding every one-shot SFX up front; call once from main.ts alongside
+// its other asset preloading, well before the player can actually act on anything —
+// by the time gameplay starts, every playX() below just schedules an
+// already-decoded buffer instead of fetching/decoding for the first time on that
+// very click
+export function preloadSounds(): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  resumeAudioContextOnGesture(ctx);
+  (Object.keys(sfxUrls) as SfxName[]).forEach((name) => {
+    loadSfxBuffer(ctx, name).catch(() => {});
+  });
+}
+
+// plays a preloaded SFX buffer starting offsetSeconds into it (0 = from the very
+// start) at the given linear volume — fire-and-forget, a fresh BufferSource node
+// per call since each one can only ever be started once
+function playSfx(name: SfxName, volume: number, offsetSeconds = 0): void {
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  loadSfxBuffer(ctx, name)
+    .then((buffer) => {
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      const gain = ctx.createGain();
+      gain.gain.value = volume;
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      source.start(0, Math.min(offsetSeconds, buffer.duration));
+    })
+    .catch(() => {});
+}
 
 // starts the looping background theme; call once from main.ts. Every browser blocks
 // audio autoplay until the user has interacted with the page at least once, so if
@@ -64,29 +151,21 @@ export function startBackgroundMusic(): void {
   });
 }
 
-// one-shot sound effect, played on every successful upgrade-button purchase. Creates
-// a fresh Audio instance per call instead of reusing one — reusing a single element
-// and calling .play() again just restarts it from 0, cutting off the tail of a
-// rapid previous play (e.g. clicking the upgrade button several times quickly).
+// one-shot sound effect, played on every successful upgrade-button purchase.
 // Debounced (see COIN_DROP_DEBOUNCE_MS) so the press-and-hold auto-repeat's fastest
 // tier doesn't stack dozens of overlapping plays into distorted noise
 export function playCoinDrop(): void {
   const now = Date.now();
   if (now - lastCoinDropPlayTime < COIN_DROP_DEBOUNCE_MS) return;
   lastCoinDropPlayTime = now;
-  const sfx = new Audio(coinDropUrl);
-  sfx.volume = COIN_DROP_VOLUME;
-  sfx.play().catch(() => {});
+  playSfx("coinDrop", COIN_DROP_VOLUME);
 }
 
 // one-shot sound effect for opening/closing any of the action bar's dialogs
 // (upgrade menu, boost menu, map menu) or switching to/from the static map view.
 // skips swoosh.mp3's own brief quiet lead-in so it reads as instant on click
 export function playSwoosh(): void {
-  const sfx = new Audio(swooshUrl);
-  sfx.volume = SFX_VOLUME;
-  sfx.currentTime = 0.1;
-  sfx.play().catch(() => {});
+  playSfx("swoosh", SFX_VOLUME, 0.1);
 }
 
 // one-shot sound effect for a successful purchase — buying a worker, a boost, or
@@ -98,10 +177,7 @@ export function playSold(): void {
   const now = Date.now();
   if (now - lastSoldPlayTime < SOLD_DEBOUNCE_MS) return;
   lastSoldPlayTime = now;
-  const sfx = new Audio(soldUrl);
-  sfx.volume = SFX_VOLUME;
-  sfx.currentTime = 0.5;
-  sfx.play().catch(() => {});
+  playSfx("sold", SFX_VOLUME, 0.5);
 }
 
 // one-shot sound effect for the crit-upgrade "jackpot" moment (see
@@ -114,10 +190,7 @@ export function playExplosion(): void {
   const now = Date.now();
   if (now - lastExplosionPlayTime < EXPLOSION_DEBOUNCE_MS) return;
   lastExplosionPlayTime = now;
-  const sfx = new Audio(explosionUrl);
-  sfx.volume = SFX_VOLUME;
-  sfx.currentTime = 0.04;
-  sfx.play().catch(() => {});
+  playSfx("explosion", SFX_VOLUME, 0.04);
 }
 
 // one-shot sound effect for clicking a cat or the mouse, and for hitting the
@@ -127,16 +200,12 @@ export function playBloop(): void {
   const now = Date.now();
   if (now - lastBloopPlayTime < BLOOP_DEBOUNCE_MS) return;
   lastBloopPlayTime = now;
-  const sfx = new Audio(bloopUrl);
-  sfx.volume = SFX_VOLUME;
-  sfx.play().catch(() => {});
+  playSfx("bloop", SFX_VOLUME);
 }
 
 // one-shot sound effect for hud/pressConferenceGame's own flap — its own
 // sound, not a reuse of playBloop, so tuning/debouncing it never affects that
 // shared cat-click/milestone sfx
 export function playBubble(): void {
-  const sfx = new Audio(bubbleUrl);
-  sfx.volume = SFX_VOLUME;
-  sfx.play().catch(() => {});
+  playSfx("bubble", SFX_VOLUME);
 }

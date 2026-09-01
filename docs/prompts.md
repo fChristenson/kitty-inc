@@ -66,3 +66,50 @@ Flat 2D cartoon presentation stage backdrop, straight-on, no perspective. Wide s
 
 Flat 2D cartoon stage floor platform, angled 3/4 view, matching the presentation stage backdrop's warm wood tones and curtain-framed staging. Low rectangular riser with a flat top surface wide enough for a single standing character, front-facing panel showing simple wood-plank grain, thick dark-brown outline. Cel-shaded: flat light highlight across the top surface, flat darker shade on the front-facing panel, soft contact shadow where the top meets the front edge. No text, no logos, no watermarks, no people or animals standing on it. Isolated on plain transparent background, edge-to-edge crop, wide aspect ratio
 
+# Base interior wall shells (src/assets/base.png style, per company theme)
+
+Shared room shell every variant below must match exactly, changing ONLY the wall color/material line called out per prompt: symmetrical, straight-on, soft semi-realistic anime interior render, completely empty room (no furniture, no props, no windows, no people, no text, no logos). Suspended drop-ceiling made of large flat rectangular tiles, three long rectangular recessed panel lights evenly spaced across it, warm soft white glow. Flat, unbroken back wall filling the frame, side walls receding slightly per the room's straight-on perspective. Light warm wood baseboard trim running along the bottom of every wall. Plain light gray floor. Soft warm directional light from the upper-left casting three long soft-edged shadow bands across the floor, gentle ambient shadow, no harsh contrast. Edge-to-edge crop, wide 16:9 aspect ratio.
+
+Each themed variant is the same base shell above with its own wall color/material and baseboard-trim tone (ceiling/floor/lighting/composition unchanged), picked to stay inside the game's existing muted, warm, low-saturation palette — never neon or high-chroma, so any of them reads as belonging to the same building exterior (cool gray concrete facade) and UI (cream/wood/gold) already used everywhere else.
+
+## Corporate / tech HQ
+
+Same base room shell. Walls painted a cool, muted blue-gray (matching the building's own exterior wall color), crisp white ceiling tiles, dark charcoal-gray baseboard trim instead of wood. Clean, minimal, slightly cooler light temperature than the base template.
+
+## Bank / finance
+
+Same base room shell. Walls a deep warm walnut-brown wood panel from floor to waist height, cream-white plaster above, slim brass trim strip at the panel line, matching wood-tone baseboard. Warm, slightly formal lighting.
+
+## Law firm
+
+Same base room shell. Walls a muted sage-green upper half over the same walnut wood panel/brass trim as the bank variant, conveying a calmer, more traditional office than the bank's warmer wood-heavy version.
+
+## Bakery / café
+
+Same base room shell. Walls a warm buttery-yellow, light honey-wood baseboard and trim, slightly warmer/cozier light temperature than the base template, no cool tones at all.
+
+## Medical / wellness clinic
+
+Same base room shell. Walls a soft pale sage-mint, crisp white ceiling and baseboard trim, bright even lighting, no warm-yellow cast — reads clean and calm rather than cozy.
+
+## Fitness / gym
+
+Same base room shell. Walls a muted charcoal-gray lower half with a warm coral-red accent stripe at chair-rail height, light gray upper wall, dark rubber-look baseboard instead of wood. Slightly higher-contrast lighting than the base template.
+
+## Retail boutique
+
+Same base room shell. Walls a soft dusty blush-pink, slim warm-gold trim strip at chair-rail height in place of a plain baseboard line, soft flattering warm light.
+
+## Restaurant / hospitality
+
+Same base room shell. Walls a warm muted terracotta/rust, dark rich-brown wood baseboard and trim, warm low-contrast lighting for a cozy dining feel.
+
+## Creative / design studio
+
+Same base room shell. Walls a soft muted sky-blue (a lighter tint of the game's own sky-gradient blue), natural light-wood baseboard and trim, bright even lighting.
+
+## Toy / kids brand
+
+Same base room shell. Walls two-tone: soft mint-green lower half, pale butter-yellow upper half, separated by a simple light-wood chair rail; playful but still fully muted/pastel, no saturated primary colors.
+
+

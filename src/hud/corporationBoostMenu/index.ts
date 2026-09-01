@@ -163,13 +163,44 @@ export function wireCorporationBoostMenu(
   // pointerup/leave/cancel anywhere stops it. Tracks by company INDEX, not the
   // button element itself, since every render() call replaces every button node
   const STOCK_HOLD_INTERVAL_MS = 100;
+  // a pointerdown on a stock button waits this long, still under
+  // STOCK_DRAG_THRESHOLD_PX, before committing to "this is a real press" and
+  // buying (see the pointerdown/onStockPointerMove/onWindowPointerUp handlers
+  // below) — same swipe-vs-tap disambiguation as gameCanvas.ts's own upgrade
+  // button (UPGRADE_TAP_CONFIRM_MS), so scrolling this list never accidentally
+  // buys stock just because the scroll happened to start on a button
+  const STOCK_TAP_CONFIRM_MS = 80;
+  const STOCK_DRAG_THRESHOLD_PX = 6;
   let heldCompanyIndex: number | null = null;
   let holdController: PressAndHoldController | null = null;
+  // set on pointerdown, cleared the moment the gesture is either confirmed a
+  // drag (onStockPointerMove) or committed/consumed as a real press
+  // (commitStockPress, or a quick tap on release) — never fires directly from
+  // the pointerdown handler itself
+  let pendingCompanyIndex: number | null = null;
+  let stockConfirmTimer: ReturnType<typeof setTimeout> | null = null;
+  let stockPointerStart: { x: number; y: number } | null = null;
+
+  function clearStockPendingState(): void {
+    if (stockConfirmTimer !== null) clearTimeout(stockConfirmTimer);
+    stockConfirmTimer = null;
+    pendingCompanyIndex = null;
+    stockPointerStart = null;
+    window.removeEventListener("pointermove", onStockPointerMove);
+  }
+
+  function onStockPointerMove(event: PointerEvent): void {
+    if (!stockPointerStart) return;
+    const dx = event.clientX - stockPointerStart.x;
+    const dy = event.clientY - stockPointerStart.y;
+    if (Math.hypot(dx, dy) >= STOCK_DRAG_THRESHOLD_PX) clearStockPendingState();
+  }
 
   function stopHold(): void {
     heldCompanyIndex = null;
     holdController?.stop();
     holdController = null;
+    clearStockPendingState();
   }
 
   // one purchase attempt; stops the hold once it's no longer affordable so it
@@ -204,6 +235,16 @@ export function wireCorporationBoostMenu(
     }, STOCK_HOLD_INTERVAL_MS);
   }
 
+  // called once STOCK_TAP_CONFIRM_MS elapses with the pointer still down and no
+  // drag detected — commits to "this is a real press", buys once, and starts
+  // the press-and-hold auto-repeat for as long as the pointer stays down
+  function commitStockPress(companyIndex: number): void {
+    clearStockPendingState();
+    heldCompanyIndex = companyIndex;
+    fireStockRaise(companyIndex);
+    scheduleHoldRepeat(companyIndex);
+  }
+
   list.addEventListener("pointerdown", (event) => {
     const target = event.target as HTMLElement;
     const button = target.closest<HTMLButtonElement>(
@@ -211,11 +252,31 @@ export function wireCorporationBoostMenu(
     );
     if (!button || button.disabled) return;
     const companyIndex = Number(button.dataset.companyIndex);
-    heldCompanyIndex = companyIndex;
-    fireStockRaise(companyIndex);
-    scheduleHoldRepeat(companyIndex);
+    // don't buy yet — wait to make sure this doesn't turn into a list-scroll
+    // swipe first (see onStockPointerMove/onWindowPointerUp/commitStockPress)
+    clearStockPendingState(); // safety net against stale state from an interrupted previous gesture
+    pendingCompanyIndex = companyIndex;
+    stockPointerStart = { x: event.clientX, y: event.clientY };
+    window.addEventListener("pointermove", onStockPointerMove);
+    stockConfirmTimer = setTimeout(() => {
+      stockConfirmTimer = null;
+      if (pendingCompanyIndex !== null) commitStockPress(pendingCompanyIndex);
+    }, STOCK_TAP_CONFIRM_MS);
   });
-  window.addEventListener("pointerup", stopHold);
+
+  function onWindowPointerUp(): void {
+    // never dragged, and the confirm timer never got a chance to fire (a quick
+    // tap released before STOCK_TAP_CONFIRM_MS elapsed) — still a genuine tap,
+    // buy once now instead of just discarding it
+    if (pendingCompanyIndex !== null) {
+      const companyIndex = pendingCompanyIndex;
+      clearStockPendingState();
+      fireStockRaise(companyIndex);
+      return;
+    }
+    stopHold();
+  }
+  window.addEventListener("pointerup", onWindowPointerUp);
   window.addEventListener("pointercancel", stopHold);
 
   // single-shot (not press-and-hold, unlike the per-company stock items above) —

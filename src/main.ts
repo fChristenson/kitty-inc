@@ -78,7 +78,7 @@ import {
   loadRoofImage,
 } from "./buildings";
 import { loadMouseImage, forceSpawnMouse } from "./mouse";
-import { startBackgroundMusic, playSwoosh } from "./sound";
+import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation, getCorporationPrice } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
 
@@ -95,6 +95,7 @@ async function main() {
   if (!app) throw new Error("#app not found");
   initSessionGuard();
   startBackgroundMusic();
+  preloadSounds();
 
   app.innerHTML = `
     <div class="game">

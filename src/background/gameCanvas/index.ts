@@ -71,6 +71,13 @@ const MOMENTUM_MIN_SPEED = 0.02; // world units/ms below which momentum just sto
 // its click logic re-fires this often instead of only once on release — short
 // enough to read as spamming the button by hand, not a slow metronome tick
 const UPGRADE_HOLD_INTERVAL_MS = 50;
+// a pointerdown landing on the upgrade button waits this long, still under
+// DRAG_THRESHOLD_PX, before committing to "this is a real press" and firing (see
+// onPointerDown/onPointerMove/onPointerUp) — long enough that a swipe/scroll
+// gesture that happens to start on the button gets caught by the drag-threshold
+// check first and cancels it, short enough that a genuine tap or hold never
+// reads as delayed (a quick tap fires on release well before this even elapses)
+const UPGRADE_TAP_CONFIRM_MS = 80;
 
 export interface GameCanvasDeps {
   canvas: HTMLCanvasElement;
@@ -468,7 +475,21 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   let lastMoveTime = 0;
   // press-and-hold auto-repeat on the upgrade button — see onPointerDown/onPointerUp
   let holdController: PressAndHoldController | null = null;
-  let heldUpgradeButton = false;
+  // set on pointerdown when it lands on the upgrade button, cleared the moment the
+  // gesture is either confirmed a drag (onPointerMove) or committed/consumed as a
+  // real press (onPointerUp, or the confirm timer below) — never fired directly
+  // from onPointerDown itself, see UPGRADE_TAP_CONFIRM_MS
+  let pendingUpgradeHit: {
+    floor: Floor;
+    localX: number;
+    localY: number;
+    isGroundFloor: boolean;
+  } | null = null;
+  let upgradeConfirmTimer: ReturnType<typeof setTimeout> | null = null;
+  // true once the upgrade press has actually fired (via the confirm timer while
+  // still held) — tells onPointerUp not to also fire the generic click-elsewhere
+  // fallback or re-fire the same press a second time
+  let upgradeButtonFired = false;
 
   function stopHoldRepeat(): void {
     holdController?.stop();
@@ -574,7 +595,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     lastMoveTime = performance.now();
     canvas.setPointerCapture(event.pointerId);
 
-    heldUpgradeButton = false;
+    if (upgradeConfirmTimer !== null) clearTimeout(upgradeConfirmTimer);
+    upgradeConfirmTimer = null;
+    pendingUpgradeHit = null;
+    upgradeButtonFired = false;
     const p = canvasPoint(event);
     const hit = hitTestPoint(p.x, p.y);
     if (
@@ -582,15 +606,13 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       hit.floor.unlocked &&
       hitTestUpgradeButton(hit.localX, hit.localY, hit.isGroundFloor)
     ) {
-      heldUpgradeButton = true;
-      // same overlapping-mouse-critter courtesy a normal tap gets, just once —
-      // repeating it every tick wouldn't mean anything for a one-time catch
-      handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);
-      fireHandleFloorClick(hit);
-      holdController = startPressAndHold(
-        () => fireHandleFloorClick(hit),
-        UPGRADE_HOLD_INTERVAL_MS,
-      );
+      // don't fire yet — wait UPGRADE_TAP_CONFIRM_MS to make sure this doesn't turn
+      // into a drag first (see onPointerMove/commitUpgradePress)
+      pendingUpgradeHit = hit;
+      upgradeConfirmTimer = setTimeout(() => {
+        upgradeConfirmTimer = null;
+        if (pendingUpgradeHit) commitUpgradePress(pendingUpgradeHit);
+      }, UPGRADE_TAP_CONFIRM_MS);
     }
   }
 
@@ -630,8 +652,13 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       if (Math.hypot(totalDx, totalDy) < DRAG_THRESHOLD_PX) return;
       dragging = true;
       didDrag = true;
-      // this press turned into a scroll, not a held button — stop repeating
+      // this press turned into a scroll, not a held button — stop repeating, and
+      // cancel any not-yet-committed upgrade-button tap so a swipe that happens
+      // to start on the button never registers as a purchase
       stopHoldRepeat();
+      if (upgradeConfirmTimer !== null) clearTimeout(upgradeConfirmTimer);
+      upgradeConfirmTimer = null;
+      pendingUpgradeHit = null;
     }
 
     scrollUp += dy / scale;
@@ -640,22 +667,64 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     lastY = event.clientY;
   }
 
+  // fires the upgrade button's click logic once (same overlapping-mouse-critter
+  // courtesy a normal tap gets); shared by a confirmed hold (commitUpgradePress)
+  // and a quick tap released before the confirm timer ever got to fire
+  function fireUpgradeOnce(hit: {
+    floor: Floor;
+    localX: number;
+    localY: number;
+    isGroundFloor: boolean;
+  }): void {
+    handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);
+    fireHandleFloorClick(hit);
+  }
+
+  // called once the confirm timer elapses with the pointer still down and no drag
+  // detected — commits to "this is a real press", fires it, and starts the
+  // press-and-hold auto-repeat for as long as the pointer stays down
+  function commitUpgradePress(hit: {
+    floor: Floor;
+    localX: number;
+    localY: number;
+    isGroundFloor: boolean;
+  }): void {
+    pendingUpgradeHit = null;
+    upgradeButtonFired = true;
+    fireUpgradeOnce(hit);
+    holdController = startPressAndHold(
+      () => fireHandleFloorClick(hit),
+      UPGRADE_HOLD_INTERVAL_MS,
+    );
+  }
+
   function onPointerUp(event: PointerEvent): void {
     if (dragPointerId !== event.pointerId) return;
     canvas.releasePointerCapture(event.pointerId);
     dragPointerId = null;
     stopHoldRepeat();
-    const wasHeldUpgradeButton = heldUpgradeButton;
-    heldUpgradeButton = false;
+    if (upgradeConfirmTimer !== null) clearTimeout(upgradeConfirmTimer);
+    upgradeConfirmTimer = null;
+    const wasUpgradeButtonFired = upgradeButtonFired;
+    const releasedPendingUpgradeHit = pendingUpgradeHit;
+    upgradeButtonFired = false;
+    pendingUpgradeHit = null;
     if (didDrag) {
       if (Math.abs(velocityY) > MOMENTUM_MIN_SPEED) {
         runMomentum();
       }
       return;
     }
-    // already fired (at least once) via the hold-repeat interval on pointerdown —
-    // re-running it here too would double-count the release of a quick tap
-    if (wasHeldUpgradeButton) return;
+    // already fired via the confirm timer while still held — re-running it here
+    // too would double-count the release of a held press
+    if (wasUpgradeButtonFired) return;
+    // never dragged, and the confirm timer never got a chance to fire (a quick
+    // tap released before UPGRADE_TAP_CONFIRM_MS elapsed) — still a genuine tap,
+    // fire it now instead of waiting on a timer that would otherwise never run
+    if (releasedPendingUpgradeHit) {
+      fireUpgradeOnce(releasedPendingUpgradeHit);
+      return;
+    }
     const p = canvasPoint(event);
     const hit = hitTestPoint(p.x, p.y);
     if (!hit) return;
