@@ -17,6 +17,29 @@ export type ThemeName =
   | "creative-design-studio"
   | "toy-kids-brand";
 
+export const THEME_NAMES: ThemeName[] = [
+  "references",
+  "corporate-tech-hq",
+  "bank-finance",
+  "law-firm",
+  "bakery-cafe",
+  "medical-wellness-clinic",
+  "fitness-gym",
+  "retail-boutique",
+  "restaurant-hospitality",
+  "creative-design-studio",
+  "toy-kids-brand",
+];
+
+// picks uniformly among every known theme, regardless of whether that theme has
+// actually generated its own dist/ assets yet — any file it hasn't generated just
+// falls back to DEFAULT_THEME's own copy (see the getThemeXUrl helpers below), so
+// this stays meaningful (and needs no further code change) as more themes get
+// their own art over time
+export function pickRandomTheme(): ThemeName {
+  return THEME_NAMES[Math.floor(Math.random() * THEME_NAMES.length)];
+}
+
 const DEFAULT_THEME: ThemeName = "references";
 
 // Vite's import.meta.glob pattern must be a static string literal, so a runtime

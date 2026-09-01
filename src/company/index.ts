@@ -1,3 +1,5 @@
+import type { ThemeName } from "../loadAssets";
+
 // Each corporation (see corporationName.ts's naming, cityMap.ts's barrel-roll
 // picker) runs its own completely separate game underneath — own buildings/
 // floors, own totalIncome, own active building/map page, nothing shared between
@@ -18,6 +20,34 @@ export function getActiveCompanyIndex(): number {
 export function setActiveCompanyIndex(index: number): void {
   try {
     localStorage.setItem(ACTIVE_COMPANY_KEY, String(index));
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
+// the map screen's own art theme (skyline + map backdrop) — picked ONCE, randomly,
+// the moment a company is first created (see main.ts's loadOrCreateBuildings) and
+// never re-rolled after that, unlike buildings (which each get their own
+// independently random theme, see buildings/index.ts's createBuilding)
+const MAP_THEME_KEY = "cash-clicker:map-theme";
+
+export function getMapTheme(companyIndex: number): ThemeName | null {
+  try {
+    const value = localStorage.getItem(
+      companyStorageKey(MAP_THEME_KEY, companyIndex),
+    );
+    return (value as ThemeName) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function setMapTheme(companyIndex: number, theme: ThemeName): void {
+  try {
+    localStorage.setItem(
+      companyStorageKey(MAP_THEME_KEY, companyIndex),
+      theme,
+    );
   } catch {
     // storage unavailable: nothing to persist
   }

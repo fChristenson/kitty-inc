@@ -1,22 +1,29 @@
 import sharp from "sharp";
 import path from "node:path";
+import fs from "node:fs/promises";
+import { resolveThemeDirs } from "./lib/theme-dirs.mjs";
 
-// raw src/assets/roof.jfif (AI-generated: a rooftop parapet ledge with a water tank
-// and vent pipe on top, against a plain white sky) gets border-flood-fill
-// chroma-keyed to transparent (same technique as process-clouds.mjs — the parapet's
-// own light concrete fill stays opaque because it's enclosed by a darker outline the
-// fill can never cross), then trimmed down to its own tight bounding box so the huge
-// blank sky above the water tank doesn't get drawn as part of the roof. The parapet
-// spans the image edge-to-edge, so trimming never touches its width (already
-// FLOOR_W-sized). Writes to src/assets/roof.png; never overwrites the raw source.
+// raw roof.jfif (AI-generated: a rooftop parapet ledge with a water tank
+// and vent pipe on top, against a plain white sky), dropped into a theme's own
+// src/assets/themes/<theme>/ folder, gets border-flood-fill chroma-keyed to
+// transparent (same technique as process-clouds.mjs — the parapet's own light
+// concrete fill stays opaque because it's enclosed by a darker outline the fill
+// can never cross), then trimmed down to its own tight bounding box so the huge
+// blank sky above the water tank doesn't get drawn as part of the roof. The
+// parapet spans the image edge-to-edge, so trimming never touches its width
+// (already FLOOR_W-sized). Writes to that theme's own dist/roof.png. Pass
+// --theme=<name> to process a theme other than the default "references"; never
+// overwrites the raw source.
 
 const WHITE_LO = 200;
 const WHITE_HI = 244;
 const FLOOD_LO = 150;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const src = path.join(assets, "roof.jfif");
-const dest = path.join(assets, "roof.png");
+const { theme, themeDir, distDir } = resolveThemeDirs(assets);
+const src = path.join(themeDir, "roof.jfif");
+const dest = path.join(distDir, "roof.png");
+await fs.mkdir(distDir, { recursive: true });
 
 const { data, info } = await sharp(src)
   .ensureAlpha()
@@ -107,5 +114,5 @@ await sharp(data, { raw: { width, height, channels } })
 
 const finalMeta = await sharp(dest).metadata();
 console.log(
-  `wrote ${path.relative(assets, dest)}: ${finalMeta.width}x${finalMeta.height}`,
+  `wrote ${theme}/dist/roof.png: ${finalMeta.width}x${finalMeta.height}`,
 );

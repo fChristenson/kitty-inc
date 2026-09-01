@@ -113,8 +113,10 @@ export {
   wireSpawnCritButton,
   wireIdlePopupTestButton,
   wirePressConferenceTestButton,
+  wireThemeTestSelect,
   wireResetButton,
 } from "./testButton";
+export type { ThemeTestSelect } from "./testButton";
 export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
 export type { UpgradeMenu } from "./upgradeMenu";
 export {

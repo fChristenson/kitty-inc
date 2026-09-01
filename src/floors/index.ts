@@ -1,6 +1,10 @@
 import { randomInt } from "../utils";
 import type { Floor } from "../gameState";
-import { loadThemeBackgrounds, loadThemeGroundImage } from "../loadAssets";
+import {
+  loadThemeBackgrounds,
+  loadThemeGroundImage,
+  type ThemeName,
+} from "../loadAssets";
 import {
   FLOOR_W,
   FLOOR_H,
@@ -43,13 +47,35 @@ const BASE_UNLOCK_COST = 200; // floor 2's unlock price; each floor above double
 const BASE_RATE_STEP = 2;
 
 // every processed floor background (see scripts/process-background-floors.mjs, which
-// writes into the active theme's own dist/backgrounds/ — see ../loadAssets), in a
-// stable sorted-filename order
+// writes into a theme's own dist/backgrounds/ — see ../loadAssets), cached per theme
+// so switching the active building back and forth between two themes it's already
+// loaded is instant
+const backgroundsByTheme = new Map<ThemeName, HTMLImageElement[]>();
+// whichever theme's set was most recently loaded/switched to (see setActiveBuildingTheme
+// below) — background/gameCanvas reads this fresh every redraw via getActiveBackgrounds
+let activeBackgrounds: HTMLImageElement[] = [];
 
-// falls back to the original single office bg.png if no processed background art
-// exists yet
-export function loadFloorBackgrounds(): Promise<HTMLImageElement[]> {
-  return loadThemeBackgrounds("references");
+// loads (or reuses an already-cached) theme's floor backgrounds and makes it the
+// active set every other floors/ function (and gameCanvas, via getActiveBackgrounds)
+// reads from — call whenever the active building's own theme changes, not just once
+export async function loadFloorBackgrounds(
+  theme: ThemeName = "references",
+): Promise<HTMLImageElement[]> {
+  const cached = backgroundsByTheme.get(theme);
+  if (cached) {
+    activeBackgrounds = cached;
+    return cached;
+  }
+  const loaded = await loadThemeBackgrounds(theme);
+  backgroundsByTheme.set(theme, loaded);
+  activeBackgrounds = loaded;
+  return loaded;
+}
+
+// the currently-active building's own loaded background set — never empty once
+// loadFloorBackgrounds has resolved at least once
+export function getActiveBackgrounds(): HTMLImageElement[] {
+  return activeBackgrounds;
 }
 
 // picks a background index in [0, count) for a floor being added on top of usedHistory
@@ -175,12 +201,23 @@ export function drawFloor(
 }
 
 let groundImage: HTMLImageElement | null = null;
+const groundByTheme = new Map<ThemeName, HTMLImageElement>();
 
-// loads the street/sidewalk ground art once; main.ts awaits this alongside
-// loadFloorBackgrounds before the first frame ever needs to draw it
-export async function loadGroundImage(): Promise<HTMLImageElement> {
-  groundImage = await loadThemeGroundImage("references");
-  return groundImage!;
+// loads (or reuses an already-cached) theme's ground/street art and makes it the
+// active one drawGround reads from — call whenever the active building's own
+// theme changes, not just once
+export async function loadGroundImage(
+  theme: ThemeName = "references",
+): Promise<HTMLImageElement> {
+  const cached = groundByTheme.get(theme);
+  if (cached) {
+    groundImage = cached;
+    return cached;
+  }
+  const loaded = await loadThemeGroundImage(theme);
+  if (loaded) groundByTheme.set(theme, loaded);
+  groundImage = loaded;
+  return loaded!;
 }
 
 // decorative strip beneath the ground floor (road + sidewalks + streetlights); ctx

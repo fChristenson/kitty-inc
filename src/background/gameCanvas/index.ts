@@ -81,7 +81,10 @@ const UPGRADE_TAP_CONFIRM_MS = 80;
 
 export interface GameCanvasDeps {
   canvas: HTMLCanvasElement;
-  backgrounds: HTMLImageElement[];
+  // always reads whichever theme the currently-active building uses (see
+  // floors/index.ts's getActiveBackgrounds) — not a fixed array, since different
+  // buildings can have completely different themes
+  getBackgrounds: () => HTMLImageElement[];
   floors: Floor[]; // the initially-active building's floors
   getBuildingMultiplier: () => number; // the currently-active building's economy scale
   persist: () => void;
@@ -113,7 +116,7 @@ export interface GameCanvas {
 // through it — only one building is ever on screen at a time (see setActiveFloors),
 // so there's no horizontal camera/panning at all.
 export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
-  const { canvas, backgrounds, getBuildingMultiplier, persist } = deps;
+  const { canvas, getBackgrounds, getBuildingMultiplier, persist } = deps;
   const ctx = canvas.getContext("2d")!;
 
   let scale = 1; // world units -> CSS px
@@ -357,7 +360,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         hoveredPoint.floor === activeFloors[i] &&
         hitTestUpgradeButton(hoveredPoint.localX, hoveredPoint.localY, i === 0);
       drawFloorContent(ctx, {
-        backgrounds,
+        backgrounds: getBackgrounds(),
         floor: activeFloors[i],
         floorNumber: i + 1,
         buttonHovered,
@@ -570,7 +573,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     handleFloorClick(
       {
         floors: activeFloors,
-        backgroundCount: backgrounds.length,
+        backgroundCount: getBackgrounds().length,
         multiplier: getBuildingMultiplier(),
         persist,
         onFloorAdded: (floor) => notifyFloorAdded(floor),

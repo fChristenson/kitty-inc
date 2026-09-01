@@ -1,18 +1,19 @@
 import sharp from "sharp";
 import path from "node:path";
 import fs from "node:fs/promises";
+import { resolveThemeDirs } from "./lib/theme-dirs.mjs";
 
-// raw src/assets/themes/references/*Sprites.png files (AI-generated character
-// sheets, one per worker skin) each have a plain near-white background and 5
-// poses spaced arbitrarily across one row. This chroma-keys the white background
-// to transparent (using each pixel's whiteness for a soft/anti-aliased edge
-// instead of a hard cutoff), finds each pose's real bounding box, then
-// re-composites all 5 into a single uniform-cell grid (same cell size, feet
-// aligned to the same bottom row) — the actual flipbook sheet
-// floors/worker/index.ts loads. Every src/assets/themes/references/<Name>Sprites.png
-// is written to src/assets/themes/references/dist/sprites/<Name>Walk.png. Safe to
-// re-run any time a source sheet is replaced or a new one is added; never
-// overwrites the raw source files.
+// raw *Sprites.(png|jfif) files (AI-generated character sheets, one per worker
+// skin), dropped into a theme's own src/assets/themes/<theme>/ folder, each have a
+// plain near-white background and 5 poses spaced arbitrarily across one row. This
+// chroma-keys the white background to transparent (using each pixel's whiteness
+// for a soft/anti-aliased edge instead of a hard cutoff), finds each pose's real
+// bounding box, then re-composites all 5 into a single uniform-cell grid (same
+// cell size, feet aligned to the same bottom row) — the actual flipbook sheet
+// floors/worker/index.ts loads. Every <Name>Sprites.(png|jfif) is written to that
+// same theme's own dist/sprites/<Name>Walk.png. Pass --theme=<name> to process a
+// theme other than the default "references". Safe to re-run any time a source
+// sheet is replaced or a new one is added; never overwrites the raw source files.
 
 const FRAME_COUNT = 5;
 const PADDING = 8; // px of breathing room kept around each pose inside its cell
@@ -21,6 +22,14 @@ const PADDING = 8; // px of breathing room kept around each pose inside its cell
 // fully opaque, linear between
 const WHITE_LO = 200;
 const WHITE_HI = 244;
+// used only to decide whether a pixel counts as "pose content" for run/bounding-box
+// detection — deliberately much stricter than the >10 alpha that's still written to
+// the actual output image. A near-invisible compression/anti-aliasing fleck can land
+// just inside the soft WHITE_LO..WHITE_HI band (alpha ~10-20, practically invisible)
+// nowhere near the real pose; treating that as "content" for bounding-box purposes
+// inflates that one run's box (and therefore every pose's shared cell size, since
+// cellW/cellH take the max across all 5) even though nothing visible sits there
+const CONTENT_ALPHA_THRESHOLD = 40;
 // separate, looser threshold used only to decide flood-fill connectivity (see
 // below) — lower than WHITE_LO so the fill can bridge the faint antialiased pixels
 // right at the cat's outline (which sit in a 150-200 whiteness band) instead of
@@ -29,8 +38,8 @@ const WHITE_HI = 244;
 const FLOOD_LO = 150;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const referencesDir = path.join(assets, "themes", "references");
-const outDir = path.join(referencesDir, "dist", "sprites");
+const { theme, themeDir: referencesDir, distDir } = resolveThemeDirs(assets);
+const outDir = path.join(distDir, "sprites");
 
 async function processSheet(srcFile, destFile) {
   const { data, info } = await sharp(srcFile)
@@ -117,7 +126,7 @@ async function processSheet(srcFile, destFile) {
 
   function colHasContent(x) {
     for (let y = 0; y < height; y++) {
-      if (data[(y * width + x) * channels + 3] > 10) return true;
+      if (data[(y * width + x) * channels + 3] > CONTENT_ALPHA_THRESHOLD) return true;
     }
     return false;
   }
@@ -170,7 +179,7 @@ async function processSheet(srcFile, destFile) {
       y1 = -1;
     for (let x = x0; x <= x1; x++) {
       for (let y = 0; y < height; y++) {
-        if (data[(y * width + x) * channels + 3] > 10) {
+        if (data[(y * width + x) * channels + 3] > CONTENT_ALPHA_THRESHOLD) {
           if (y < y0) y0 = y;
           if (y > y1) y1 = y;
         }
@@ -231,16 +240,17 @@ async function processSheet(srcFile, destFile) {
   );
 }
 
-const sourceFiles = (await fs.readdir(referencesDir)).filter((f) =>
-  /Sprites\.png$/i.test(f),
-);
+const sourceFiles = (await fs.readdir(referencesDir, { withFileTypes: true }))
+  .filter((e) => e.isFile())
+  .map((e) => e.name)
+  .filter((f) => /Sprites\.(png|jpe?g|jfif)$/i.test(f));
 if (sourceFiles.length === 0) {
   console.log(
-    "no src/assets/themes/references/*Sprites.png source sheets found — nothing to do",
+    `no *Sprites.(png|jfif) source sheets found in ${path.relative(assets, referencesDir)}/ — nothing to do`,
   );
 }
 for (const file of sourceFiles) {
-  const destName = file.replace(/Sprites\.png$/i, "Walk.png");
+  const destName = file.replace(/Sprites\.(png|jpe?g|jfif)$/i, "Walk.png");
   await processSheet(
     path.join(referencesDir, file),
     path.join(outDir, destName),

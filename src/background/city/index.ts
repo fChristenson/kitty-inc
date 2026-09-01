@@ -1,4 +1,4 @@
-import { loadThemeImage } from "../../loadAssets";
+import { loadThemeImage, type ThemeName } from "../../loadAssets";
 
 // a rich, pre-illustrated city skyline (dusk gradient baked into the art itself),
 // tiled horizontally across whatever world-x range is currently visible. The art
@@ -19,10 +19,14 @@ const TILE_W = CITY_MAX_HEIGHT * (IMAGE_W / IMAGE_H);
 
 let cityImage: HTMLImageElement | null = null;
 
-// loads the skyline art once; main.ts awaits this alongside loadFloorBackgrounds
-// before the first frame ever needs to draw it
-export async function loadCityImage(): Promise<HTMLImageElement> {
-  cityImage = await loadThemeImage("references", "city");
+// loads the skyline art for the given company's own map theme (see
+// company.ts's getMapTheme/setMapTheme — picked once per company, unlike
+// buildings' own independently random themes); main.ts awaits this alongside
+// loadFloorBackgrounds before the first frame ever needs to draw it
+export async function loadCityImage(
+  theme: ThemeName = "references",
+): Promise<HTMLImageElement> {
+  cityImage = await loadThemeImage(theme, "city");
   return cityImage!;
 }
 

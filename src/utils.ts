@@ -48,9 +48,9 @@ export function animateDialogClose(panel: HTMLElement): Promise<void> {
 // keeps --worker-menu-safe-bottom (used by style.css's .worker-menu__panel) in
 // sync with the real, currently-rendered distance from the action bar's own top
 // edge down to the bottom of the viewport — not a guessed fixed height, since
-// that distance actually varies: dev builds stack an extra test-actions-bar
-// underneath the real one, production doesn't, and mobile adds its own safe-area
-// inset on top of either. Call once from main.ts with the action bar element
+// mobile adds its own safe-area inset on top of whatever that distance is
+// (the dev-only test-actions-bar floats separately via position:absolute now,
+// so it no longer affects this). Call once from main.ts with the action bar element
 export function observeActionBarHeight(actionBar: HTMLElement): void {
   const root = document.documentElement;
   function update(): void {

@@ -302,9 +302,22 @@ body {
 }
 
 .test-actions-bar {
+  /* pinned to the screen's own left edge, not the centered .game column — floats
+     free of the game layout entirely instead of stealing height from it (see
+     utils.ts's observeActionBarHeight, which no longer needs to account for it) */
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
-  margin: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  position: absolute;
+  top: calc(0.75rem + env(safe-area-inset-top));
+  left: calc(0.75rem + env(safe-area-inset-left));
+  width: 160px;
+  z-index: 100;
+}
+
+.test-actions-bar .game__button {
+  flex: none;
+  width: 100%;
 }
 
 .game__button {

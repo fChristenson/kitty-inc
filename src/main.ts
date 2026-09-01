@@ -8,6 +8,7 @@ import {
   startIncomeTicker,
   ensureLockedFloorAbove,
   forceCritUpgrade,
+  getActiveBackgrounds,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -22,6 +23,8 @@ import {
   saveBuildings,
   schedulePersist,
   loadBuildings,
+  saveBuildingThemes,
+  loadBuildingThemes,
   computeIdleIncome,
   markAppClosed,
   initSessionGuard,
@@ -33,6 +36,8 @@ import {
   setActiveCompanyIndex,
   companyStorageKey,
   saveCompanyRecord,
+  getMapTheme,
+  setMapTheme,
 } from "./company";
 import {
   createTestButtonMarkup,
@@ -41,6 +46,7 @@ import {
   wireSpawnCritButton,
   wireIdlePopupTestButton,
   wirePressConferenceTestButton,
+  wireThemeTestSelect,
   wireResetButton,
   createActionBarMarkup,
   wireActionBar,
@@ -81,6 +87,12 @@ import { loadMouseImage, forceSpawnMouse } from "./mouse";
 import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation, getCorporationPrice } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
+import {
+  pickRandomTheme,
+  getThemeBackgroundUrls,
+  THEME_NAMES,
+} from "./loadAssets";
+import type { ThemeName } from "./loadAssets";
 
 // matches style.css's worker-menu-slide-out-* keyframes (0.352s) — the company
 // select menu's own close animation duration
@@ -125,17 +137,10 @@ async function main() {
     document.fonts.load('900 16px "Fredoka"'),
   ]);
 
-  const backgrounds = await loadFloorBackgrounds();
-  await loadGroundImage();
-  await loadWorkerSprite();
-  await loadCityImage();
   await loadCloudImages();
-  await loadWallMaterial();
-  await loadRoofImage();
   await loadMouseImage();
   await loadCoinImage();
   await loadFloatingCoinImage();
-  await loadCityMapImage();
 
   // one Floor[] per building; only one building is ever shown on screen at a time
   // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
@@ -146,6 +151,15 @@ async function main() {
   const buildings: Floor[][] = [];
   let activeBuildingIndex = 0;
   let activeCompanyIndex = getActiveCompanyIndex();
+  // ThemeName per building, index-aligned with `buildings` — each building got its
+  // own independently random theme at creation (see loadOrCreateBuildings/
+  // buyBuilding below), unlike the map's own theme (company.ts's getMapTheme),
+  // which is picked once per company instead of per building
+  let buildingThemes: ThemeName[] = [];
+  // set by the dev-only theme test select below (undefined in production, where
+  // that control doesn't exist) so switchToCompany can keep it in sync with
+  // whichever company just became active
+  let refreshThemeTestSelect: (() => void) | undefined;
 
   // so a reload lands back on whichever building the player last selected on the
   // map, namespaced per company (see company.ts's companyStorageKey) since each
@@ -182,25 +196,65 @@ async function main() {
     schedulePersist(buildings, activeCompanyIndex);
   }
 
-  // loads a company's saved buildings, or starts it off with a single fresh
-  // building if it's never been played before (a brand new corporation, or the
-  // very first run)
-  function loadOrCreateBuildings(companyIndex: number): Floor[][] {
-    const restored = loadBuildings(companyIndex);
-    return restored.length > 0
-      ? restored
-      : [createBuilding(0, backgrounds.length)];
+  // loads every asset the given building's own theme needs (floor backgrounds,
+  // ground, wall material, roof, worker/manager sprites) and makes them the
+  // active set every draw* function reads from — call before ever showing that
+  // building on screen (initial load, goToBuilding, switchToCompany)
+  async function loadBuildingThemeAssets(theme: ThemeName): Promise<void> {
+    await Promise.all([
+      loadFloorBackgrounds(theme),
+      loadGroundImage(theme),
+      loadWallMaterial(theme),
+      loadRoofImage(theme),
+      loadWorkerSprite(theme),
+    ]);
   }
 
-  buildings.push(...loadOrCreateBuildings(activeCompanyIndex));
+  // loads a company's saved buildings + each one's own persisted theme, or starts
+  // it off with a single fresh building (its own random theme) + a fresh random
+  // map theme if it's never been played before (a brand new corporation, or the
+  // very first run)
+  async function loadOrCreateBuildings(
+    companyIndex: number,
+  ): Promise<Floor[][]> {
+    const restored = loadBuildings(companyIndex);
+    if (restored.length > 0) {
+      buildingThemes = loadBuildingThemes(companyIndex);
+      // backfill in case an older save predates this feature (fewer/no themes
+      // than buildings) — persisted immediately so it doesn't re-roll every load
+      let backfilled = false;
+      while (buildingThemes.length < restored.length) {
+        buildingThemes.push(pickRandomTheme());
+        backfilled = true;
+      }
+      if (backfilled) saveBuildingThemes(buildingThemes, companyIndex);
+      return restored;
+    }
+    if (!getMapTheme(companyIndex)) {
+      setMapTheme(companyIndex, pickRandomTheme());
+    }
+    const theme = pickRandomTheme();
+    buildingThemes = [theme];
+    saveBuildingThemes(buildingThemes, companyIndex);
+    const themeBackgroundCount = getThemeBackgroundUrls(theme).length;
+    return [createBuilding(0, themeBackgroundCount)];
+  }
+
+  buildings.push(...(await loadOrCreateBuildings(activeCompanyIndex)));
   activeBuildingIndex = Math.min(
     Math.max(loadActiveBuildingIndex(activeCompanyIndex), 0),
     buildings.length - 1,
   );
+  await loadBuildingThemeAssets(
+    buildingThemes[activeBuildingIndex] ?? "references",
+  );
+  const mapTheme = getMapTheme(activeCompanyIndex) ?? "references";
+  await loadCityImage(mapTheme);
+  await loadCityMapImage(mapTheme);
 
   const gameCanvas = createGameCanvas({
     canvas,
-    backgrounds,
+    getBackgrounds: getActiveBackgrounds,
     floors: buildings[activeBuildingIndex],
     getBuildingMultiplier: () => getBuildingMultiplier(activeBuildingIndex),
     persist,
@@ -209,11 +263,15 @@ async function main() {
   // ensures a building's next locked floor is waiting above it; onAdd only forwards
   // to gameCanvas.ts when this is the currently-active/on-screen building — an
   // inactive building's newly-added floor gets picked up automatically the next
-  // time the player switches to it (setActiveFloors registers every floor fresh)
+  // time the player switches to it (setActiveFloors registers every floor fresh).
+  // backgroundCount comes from that building's OWN theme (a plain URL-list lookup,
+  // not the currently-loaded active set) since an inactive building being set up
+  // here may belong to a completely different theme than whatever's on screen
   function setupBuilding(buildingIndex: number): void {
+    const theme = buildingThemes[buildingIndex] ?? "references";
     ensureLockedFloorAbove({
       floors: buildings[buildingIndex],
-      backgroundCount: backgrounds.length,
+      backgroundCount: getThemeBackgroundUrls(theme).length,
       multiplier: getBuildingMultiplier(buildingIndex),
       onAdd: (floor) => {
         if (buildingIndex === activeBuildingIndex) {
@@ -224,10 +282,13 @@ async function main() {
   }
 
   // switches which building is currently displayed — no travel animation yet, just
-  // an instant cut to the new street
-  function goToBuilding(buildingIndex: number): void {
+  // an instant cut to the new street. Loads that building's own theme's assets
+  // first (a no-op if already cached from an earlier visit) so the new building
+  // never flashes the previous one's art before the swap lands
+  async function goToBuilding(buildingIndex: number): Promise<void> {
     activeBuildingIndex = buildingIndex;
     saveActiveBuildingIndex(activeCompanyIndex, buildingIndex);
+    await loadBuildingThemeAssets(buildingThemes[buildingIndex] ?? "references");
     gameCanvas.setActiveFloors(buildings[buildingIndex]);
   }
 
@@ -238,7 +299,7 @@ async function main() {
   // company's own separate buildings, its own last-active building, and hands
   // totalIncome.ts its own separate running total — nothing here is shared
   // between companies
-  function switchToCompany(companyIndex: number): void {
+  async function switchToCompany(companyIndex: number): Promise<void> {
     // snapshot the OUTGOING company's ENTIRE CompanyRecord (see company.ts) in
     // one atomic write, while `buildings`/`activeCompanyIndex`/`totalIncome`
     // still hold its data — bankedTotal, its rate, and the timestamp all land
@@ -259,7 +320,7 @@ async function main() {
     activeCompanyIndex = companyIndex;
     setActiveCompanyIndex(companyIndex);
     buildings.length = 0;
-    buildings.push(...loadOrCreateBuildings(companyIndex));
+    buildings.push(...(await loadOrCreateBuildings(companyIndex)));
     activeBuildingIndex = Math.min(
       Math.max(loadActiveBuildingIndex(companyIndex), 0),
       buildings.length - 1,
@@ -267,7 +328,16 @@ async function main() {
     buildings.forEach((_, i) => setupBuilding(i));
 
     switchActiveCompany(companyIndex, buildings);
+    await loadBuildingThemeAssets(
+      buildingThemes[activeBuildingIndex] ?? "references",
+    );
+    const incomingMapTheme = getMapTheme(companyIndex) ?? "references";
+    await Promise.all([
+      loadCityImage(incomingMapTheme),
+      loadCityMapImage(incomingMapTheme),
+    ]);
     gameCanvas.setActiveFloors(buildings[activeBuildingIndex]);
+    refreshThemeTestSelect?.();
   }
 
   // dev/test-only controls; markup is stripped entirely in production builds
@@ -292,6 +362,25 @@ async function main() {
       showIdlePopup(app, testAmount, () => addTotalIncome(testAmount));
     });
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
+    const themeTestSelect = wireThemeTestSelect(
+      app,
+      THEME_NAMES,
+      () => getMapTheme(activeCompanyIndex) ?? "references",
+      async (theme) => {
+        setMapTheme(activeCompanyIndex, theme);
+        buildingThemes = buildings.map(() => theme);
+        saveBuildingThemes(buildingThemes, activeCompanyIndex);
+        buildings.forEach((_, i) => setupBuilding(i));
+        await Promise.all([
+          loadBuildingThemeAssets(theme),
+          loadCityImage(theme),
+          loadCityMapImage(theme),
+        ]);
+        gameCanvas.setActiveFloors(buildings[activeBuildingIndex]);
+        cityMapView.refresh();
+      },
+    );
+    refreshThemeTestSelect = () => themeTestSelect.refresh();
     wireResetButton(app, buildings, () => activeCompanyIndex);
   }
   const upgradeMenu = wireUpgradeMenu(
@@ -337,12 +426,18 @@ async function main() {
     corporationBoostMenu.refresh(),
   );
   // buys the next building outright if affordable (see buildings.ts's
-  // getBuildingPrice, which scales 1000x per building same as its economy); returns
+  // getBuildingPrice, which scales 1000x per building same as its economy); its
+  // own theme is picked randomly, independent of every other building. Returns
   // whether it succeeded so the map menu can decide whether to re-render
   function buyBuilding(): boolean {
     const buildingIndex = buildings.length;
     if (!spendTotalIncome(getBuildingPrice(buildingIndex))) return false;
-    buildings.push(createBuilding(buildingIndex, backgrounds.length));
+    const theme = pickRandomTheme();
+    buildingThemes.push(theme);
+    saveBuildingThemes(buildingThemes, activeCompanyIndex);
+    buildings.push(
+      createBuilding(buildingIndex, getThemeBackgroundUrls(theme).length),
+    );
     setupBuilding(buildingIndex);
     persist();
     return true;

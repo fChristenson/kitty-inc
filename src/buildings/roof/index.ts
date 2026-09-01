@@ -1,6 +1,6 @@
 import { FLOOR_W } from "../../floors";
 import { drawCartoonText } from "../../utils";
-import { loadThemeImage } from "../../loadAssets";
+import { loadThemeImage, type ThemeName } from "../../loadAssets";
 
 // native size of the processed roof.png (see scripts/process-roof.mjs) — width
 // already matches FLOOR_W exactly, so it's drawn 1:1, never rescaled horizontally
@@ -12,12 +12,23 @@ export const ROOF_H = IMAGE_H;
 const ROOF_OVERLAP = 4;
 
 let roofImage: HTMLImageElement | null = null;
+const roofByTheme = new Map<ThemeName, HTMLImageElement>();
 
-// loads the roof cap once; main.ts awaits this alongside the other image loads
-// before the first redraw ever needs it
-export async function loadRoofImage(): Promise<HTMLImageElement> {
-  roofImage = await loadThemeImage("references", "roof");
-  return roofImage!;
+// loads (or reuses an already-cached) theme's roof cap and makes it the active
+// one drawRoof reads from — call whenever the active building's own theme
+// changes, not just once
+export async function loadRoofImage(
+  theme: ThemeName = "references",
+): Promise<HTMLImageElement> {
+  const cached = roofByTheme.get(theme);
+  if (cached) {
+    roofImage = cached;
+    return cached;
+  }
+  const loaded = await loadThemeImage(theme, "roof");
+  if (loaded) roofByTheme.set(theme, loaded);
+  roofImage = loaded;
+  return loaded!;
 }
 
 // draws the roof cap (+ the building's total floor count, centered on it) directly
