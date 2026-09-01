@@ -315,10 +315,33 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.restore();
   }
 
+  // which floor indices actually need a full drawFloorContent this frame: the
+  // visible viewport plus one extra viewport-height of buffer on each side (so a
+  // fast scroll/fling never visibly pops a floor in), computed directly from
+  // floorWorldY's own linear formula instead of scanning every floor to find them —
+  // this is what keeps drawActiveFloors's real cost independent of total floor
+  // count (a building with hundreds of floors costs the same as one with a
+  // handful, as long as only a few are ever near the viewport at once)
+  function visibleFloorIndexRange(): { min: number; max: number } {
+    const buffer = contentViewportH();
+    const expandedTop = viewportTopY() - buffer;
+    const expandedBottom = viewportBottomY() + buffer;
+    const step = FLOOR_H - FLOOR_OVERLAP;
+    const c = BUILDING_GROUND_OVERLAP + BUILDING_Y_OFFSET;
+    // inverse of floorWorldY: bottom(i) = -i*step + c, top(i) = bottom(i) - FLOOR_H
+    const maxIndex = Math.floor((c - expandedTop) / step);
+    const minIndex = Math.ceil((c - FLOOR_H - expandedBottom) / step);
+    return {
+      min: Math.max(0, minIndex),
+      max: Math.min(activeFloors.length - 1, maxIndex),
+    };
+  }
+
   function drawActiveFloors(): void {
-    for (let i = 0; i < activeFloors.length; i++) {
-      const { top, bottom } = floorWorldY(i);
-      if (bottom < viewportTopY() || top > viewportBottomY()) continue; // scrolled out of view
+    const { min, max } = visibleFloorIndexRange();
+
+    for (let i = min; i <= max; i++) {
+      const { top } = floorWorldY(i);
       ctx.save();
       ctx.translate(GUTTER_W, top);
       const buttonHovered =

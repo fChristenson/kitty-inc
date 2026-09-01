@@ -4,7 +4,7 @@ import {
   formatTotalIncomeFull,
 } from "../../utils";
 import { getAllCompaniesTotalIncome } from "../../totalIncome";
-import { playSwoosh } from "../../sound";
+import { playSwoosh, playSold } from "../../sound";
 import coinIconUrl from "../../assets/coin.png";
 
 // same worker-menu look as boostMenu/upgradeMenu — a dialog for picking/creating
@@ -83,6 +83,7 @@ export function wireCompanySelectMenu(
 
   createButton.addEventListener("click", () => {
     onCreateNewCorporation();
+    playSold();
     render();
   });
 
