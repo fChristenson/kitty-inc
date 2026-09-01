@@ -22,6 +22,20 @@ import { resolveThemeDirs } from "./lib/theme-dirs.mjs";
 const INSET_TOP = 5;
 const INSET_BOTTOM = 3;
 
+// gameCanvas.ts tiles this whole image at GROUND_TILE_W (wider than one building's
+// own SLOT_W), so only the image's own LEFT ~58% is ever actually visible in the
+// floor view — the rest is there purely so the tile keeps repeating. If a theme's
+// raw street art happened to place its "interesting" content (car, streetlight)
+// further right than that, it never shows up on screen. Rolled cyclically (wraps
+// the pixels that fall off one edge onto the other) rather than cropped, so the
+// tile still repeats seamlessly — just starting from a different point in the
+// same art. 0 (the default) leaves an image untouched. Measured for
+// corporate-tech-hq by locating its car's bounding box (native x 759-1080 out of
+// 1248) and rolling it left so the car lands centered in the visible ~719px band.
+const THEME_ROLL_PX = {
+  "corporate-tech-hq": 560,
+};
+
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
 const { theme, themeDir, distDir } = resolveThemeDirs(assets);
 const outDir = path.join(distDir, "ground");
@@ -43,15 +57,46 @@ if (!srcFile) {
     .trim({ threshold: 20 })
     .toBuffer({ resolveWithObject: true });
   const { width, height } = trimmed.info;
-  await sharp(trimmed.data)
+  const inset = await sharp(trimmed.data)
     .extract({
       left: 0,
       top: INSET_TOP,
       width,
       height: height - INSET_TOP - INSET_BOTTOM,
     })
-    .png()
-    .toFile(dest);
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const rollPx = THEME_ROLL_PX[theme] ?? 0;
+  if (rollPx > 0) {
+    const { width: w, height: h } = inset.info;
+    const left = sharp(inset.data, {
+      raw: { width: w, height: h, channels: inset.info.channels },
+    }).extract({ left: 0, top: 0, width: rollPx, height: h });
+    const right = sharp(inset.data, {
+      raw: { width: w, height: h, channels: inset.info.channels },
+    }).extract({ left: rollPx, top: 0, width: w - rollPx, height: h });
+    await sharp({
+      create: {
+        width: w,
+        height: h,
+        channels: inset.info.channels,
+        background: { r: 0, g: 0, b: 0, alpha: 0 },
+      },
+    })
+      .composite([
+        { input: await right.png().toBuffer(), left: 0, top: 0 },
+        { input: await left.png().toBuffer(), left: w - rollPx, top: 0 },
+      ])
+      .png()
+      .toFile(dest);
+  } else {
+    await sharp(inset.data, {
+      raw: { width, height: inset.info.height, channels: inset.info.channels },
+    })
+      .png()
+      .toFile(dest);
+  }
   console.log(`${srcFile} -> ${theme}/dist/ground/street.png`);
 }
 
