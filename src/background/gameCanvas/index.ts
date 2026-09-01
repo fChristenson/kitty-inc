@@ -19,7 +19,10 @@ import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
 import { getScreenShakeOffset, drawCritFlash } from "../../screenShake";
 import { COLOR } from "../../palette";
-import { createTapHoldGesture } from "../../shared/pressAndHold";
+import {
+  startPressAndHold,
+  type PressAndHoldController,
+} from "../../shared/pressAndHold";
 import type { Floor } from "../../gameState";
 
 // a floor-room hit-test result: which floor a canvas point landed on, its own
@@ -78,13 +81,6 @@ const MOMENTUM_MIN_SPEED = 0.02; // world units/ms below which momentum just sto
 // its click logic re-fires this often instead of only once on release — short
 // enough to read as spamming the button by hand, not a slow metronome tick
 const UPGRADE_HOLD_INTERVAL_MS = 50;
-// a pointerdown landing on the upgrade button waits this long, still under
-// DRAG_THRESHOLD_PX, before committing to "this is a real press" and firing (see
-// onPointerDown/onPointerMove/onPointerUp) — long enough that a swipe/scroll
-// gesture that happens to start on the button gets caught by the drag-threshold
-// check first and cancels it, short enough that a genuine tap or hold never
-// reads as delayed (a quick tap fires on release well before this even elapses)
-const UPGRADE_TAP_CONFIRM_MS = 80;
 
 export interface GameCanvasDeps {
   canvas: HTMLCanvasElement;
@@ -560,26 +556,25 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
-  // courtesy a normal tap gets); the gesture's onFire (both a confirmed hold's
-  // first fire and a quick tap released before it ever committed)
+  // courtesy a normal tap gets); called once on pointerdown, then again every
+  // auto-repeat tick via fireHandleFloorClick alone (skipping the extra
+  // handleMouseClick, which only makes sense for the very first fire)
   function fireUpgradeOnce(hit: UpgradeHit): void {
     handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);
     fireHandleFloorClick(hit);
   }
 
-  // tap-vs-drag disambiguation + press-and-hold auto-repeat, shared with
-  // hud/corporationBoostMenu's own stock-raise buttons via createTapHoldGesture
-  // — this canvas still owns its own hit-testing (hitTestUpgradeButton below)
-  // and its own drag detection (the pan-gesture code in onPointerMove), just not
-  // the confirm-timer/commit/repeat state machine itself. onFire covers both a
-  // confirmed hold's first fire and a quick tap; onRepeat (every subsequent
-  // auto-repeat tick) skips fireUpgradeOnce's extra handleMouseClick, same as before
-  const upgradeGesture = createTapHoldGesture<UpgradeHit>({
-    confirmMs: UPGRADE_TAP_CONFIRM_MS,
-    holdIntervalMs: UPGRADE_HOLD_INTERVAL_MS,
-    onFire: fireUpgradeOnce,
-    onRepeat: fireHandleFloorClick,
-  });
+  // press-and-hold auto-repeat on the upgrade button — fires immediately on
+  // pointerdown, no tap-vs-drag delay or cancellation
+  let holdController: PressAndHoldController | null = null;
+  // true once this press has fired the upgrade button (set on pointerdown) —
+  // tells onPointerUp not to also run the generic click-elsewhere fallback
+  let upgradeFiredOnDown = false;
+
+  function stopHoldRepeat(): void {
+    holdController?.stop();
+    holdController = null;
+  }
 
   function onPointerDown(event: PointerEvent): void {
     if (event.pointerType === "mouse" && event.button !== 0) return;
@@ -593,7 +588,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     lastMoveTime = performance.now();
     canvas.setPointerCapture(event.pointerId);
 
-    upgradeGesture.cancel(); // safety net against stale state from an interrupted previous gesture
+    stopHoldRepeat(); // safety net against a stale hold from an interrupted previous gesture
+    upgradeFiredOnDown = false;
     const p = canvasPoint(event);
     const hit = hitTestPoint(p.x, p.y);
     if (
@@ -601,9 +597,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       hit.floor.unlocked &&
       hitTestUpgradeButton(hit.localX, hit.localY, hit.isGroundFloor)
     ) {
-      // don't fire yet — wait UPGRADE_TAP_CONFIRM_MS to make sure this doesn't turn
-      // into a drag first (see onPointerMove/upgradeGesture's own commit)
-      upgradeGesture.down(hit);
+      upgradeFiredOnDown = true;
+      fireUpgradeOnce(hit);
+      holdController = startPressAndHold(
+        () => fireHandleFloorClick(hit),
+        UPGRADE_HOLD_INTERVAL_MS,
+      );
     }
   }
 
@@ -643,10 +642,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       if (Math.hypot(totalDx, totalDy) < DRAG_THRESHOLD_PX) return;
       dragging = true;
       didDrag = true;
-      // this press turned into a scroll, not a held button — cancel any
-      // not-yet-committed (or already-committed) upgrade-button press so a
-      // swipe that happens to start on the button never registers as a purchase
-      upgradeGesture.cancel();
     }
 
     scrollUp += dy / scale;
@@ -659,17 +654,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (dragPointerId !== event.pointerId) return;
     canvas.releasePointerCapture(event.pointerId);
     dragPointerId = null;
-    // handled true means this gesture already fired (via a confirmed hold's
-    // repeat just stopping, or as a quick tap fired just now) — either way,
-    // don't also run the generic click-elsewhere fallback below
-    const handled = upgradeGesture.up();
+    stopHoldRepeat();
     if (didDrag) {
       if (Math.abs(velocityY) > MOMENTUM_MIN_SPEED) {
         runMomentum();
       }
       return;
     }
-    if (handled) return;
+    if (upgradeFiredOnDown) return;
     const p = canvasPoint(event);
     const hit = hitTestPoint(p.x, p.y);
     if (!hit) return;
