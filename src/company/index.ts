@@ -1,6 +1,3 @@
-import { getThemesWithFullAssets, type ThemeName } from "../loadAssets";
-import { getCorporationCount } from "../corporationName";
-
 // Each corporation (see corporationName.ts's naming, cityMap.ts's barrel-roll
 // picker) runs its own completely separate game underneath — own buildings/
 // floors, own totalIncome, own active building/map page, nothing shared between
@@ -24,69 +21,6 @@ export function setActiveCompanyIndex(index: number): void {
   } catch {
     // storage unavailable: nothing to persist
   }
-}
-
-// the ONE theme for a company's entire game — map skyline/backdrop AND every one
-// of its buildings' own floors/ground/wall material/worker+manager sprites all
-// come from this SAME theme, never mixed. Picked ONCE, randomly, the moment a
-// company is first created (see main.ts's loadOrCreateBuildings) and never
-// re-rolled after that.
-const MAP_THEME_KEY = "cash-clicker:map-theme";
-
-export function getMapTheme(companyIndex: number): ThemeName | null {
-  try {
-    const value = localStorage.getItem(
-      companyStorageKey(MAP_THEME_KEY, companyIndex),
-    );
-    return (value as ThemeName) || null;
-  } catch {
-    return null;
-  }
-}
-
-export function setMapTheme(companyIndex: number, theme: ThemeName): void {
-  try {
-    localStorage.setItem(companyStorageKey(MAP_THEME_KEY, companyIndex), theme);
-  } catch {
-    // storage unavailable: nothing to persist
-  }
-}
-
-// wipes a company's persisted theme — must be called alongside clearBuildings()
-// on a full reset, or the "first play"/reset experience keeps reusing whatever
-// theme this company happened to get the very first time it was ever created
-// instead of genuinely rerolling (see hud/testButton's wireResetButton)
-export function clearMapTheme(companyIndex: number): void {
-  try {
-    localStorage.removeItem(companyStorageKey(MAP_THEME_KEY, companyIndex));
-  } catch {
-    // storage unavailable: nothing to clear
-  }
-}
-
-// picks the ONE theme for a brand-new company ("Create new Corporation" button) —
-// governs everything that company ever renders (map + every building), see
-// MAP_THEME_KEY above. Prefers a theme no OTHER existing company is currently
-// using, so every company looks distinct for as long as an unused theme remains;
-// once every theme is in use by at least one company, falls back to whichever
-// theme(s) are used least, picked randomly among ties. newCompanyIndex is
-// excluded from its own tally since it doesn't have a theme assigned yet at the
-// point this is called. Only picks among getThemesWithFullAssets() (themes with
-// EVERY per-theme-varying asset generated) — picking an incomplete theme would
-// force some of that company's assets to come from a different theme, which is
-// exactly the "mixing" this whole design forbids.
-export function pickLeastUsedMapTheme(newCompanyIndex: number): ThemeName {
-  const pool = getThemesWithFullAssets();
-  const usageCount = new Map<ThemeName, number>(pool.map((name) => [name, 0]));
-  const companyCount = getCorporationCount();
-  for (let i = 0; i < companyCount; i++) {
-    if (i === newCompanyIndex) continue;
-    const theme = getMapTheme(i);
-    if (theme) usageCount.set(theme, (usageCount.get(theme) ?? 0) + 1);
-  }
-  const minCount = Math.min(...pool.map((name) => usageCount.get(name)!));
-  const leastUsed = pool.filter((name) => usageCount.get(name) === minCount);
-  return leastUsed[Math.floor(Math.random() * leastUsed.length)];
 }
 
 // company 0 keeps every pre-existing plain key (cash-clicker:buildings,
@@ -115,6 +49,7 @@ export interface CompanyRecord {
   bankedTotal: number; // $ actually banked as of updatedAt
   incomeRatePerSecond: number; // frozen as of updatedAt; only the active company's own rate can change
   assetValue: number; // buildings value + upgrades value combined, frozen as of updatedAt
+  upgradesValue: number; // just the upgrades portion of assetValue — corporationBoostMenu's getCompanyValue uses this alone, not the buildings-cost portion
   updatedAt: number; // Date.now() this record was last written
 }
 
@@ -154,7 +89,14 @@ export function loadCompanyRecord(companyIndex: number): CompanyRecord | null {
   ) {
     return null;
   }
-  return record;
+  // upgradesValue is newer than the rest of this record — an older save just
+  // won't have it yet, so it defaults to 0 instead of invalidating the whole
+  // record (same recovery every other one-off added field here would get)
+  return {
+    ...record,
+    upgradesValue:
+      typeof record.upgradesValue === "number" ? record.upgradesValue : 0,
+  };
 }
 
 // the only way any code should ever persist a company's income/value snapshot —

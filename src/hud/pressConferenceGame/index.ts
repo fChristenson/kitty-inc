@@ -18,7 +18,7 @@ import {
   MARKET_CRASH_TEXT,
   MARKET_CRASH_CHANCE,
 } from "./marketEventText";
-import { loadThemeSprite, loadThemeImage } from "../../loadAssets";
+import { loadSprite, loadImageByName } from "../../loadAssets";
 
 // physics constants for the line's head — same "flappy bird" feel: constant
 // downward gravity, a fixed upward kick on every flap, no in-between speeds.
@@ -126,8 +126,8 @@ const BURN_PERCENT_GROWTH_PER_TIER = 1.35;
 // flat rate, not tied to the burn rate or anything else about the round: this
 // much per second just for surviving, plus a flat instant bump on a good hit.
 // Only ever climbs — bad hits never dock it (see step)
-const AMBIENT_INFLUENCE_PERCENT_PER_SECOND = 0.01;
-const GOOD_HIT_INFLUENCE_PERCENT = 0.05;
+const AMBIENT_INFLUENCE_PERCENT_PER_SECOND = 0.05;
+const GOOD_HIT_INFLUENCE_PERCENT = 0.1;
 
 // drawn straight onto this screen's own canvas with the exact same utils.ts
 // helpers floors/upgradeButton's real "Sale" button uses (drawPill/
@@ -273,7 +273,7 @@ export function wirePressConferenceGame(
   loadCoinBurstImages();
 
   let podiumSprite: HTMLImageElement | null = null;
-  loadThemeSprite("references", "podium").then((img) => {
+  loadSprite("podium").then((img) => {
     podiumSprite = img;
   });
   // current pose + when to next roll a new one (see drawPodium) — random
@@ -282,7 +282,7 @@ export function wirePressConferenceGame(
   let podiumNextSwitchAt = 0;
 
   let audienceSprite: HTMLImageElement | null = null;
-  loadThemeImage("references", "audience").then((img) => {
+  loadImageByName("audience").then((img) => {
     audienceSprite = img;
   });
 

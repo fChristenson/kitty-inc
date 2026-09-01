@@ -11,13 +11,10 @@ import {
   getManagerIconUrl,
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
-import { getThemeImageUrl } from "../../loadAssets";
+import { getImageUrl } from "../../loadAssets";
 
-const officeChairsIconUrl = getThemeImageUrl("references", "officeChairsIcon");
-const officeSuppliesIconUrl = getThemeImageUrl(
-  "references",
-  "officeSuppliesIcon",
-);
+const officeChairsIconUrl = getImageUrl("officeChairsIcon");
+const officeSuppliesIconUrl = getImageUrl("officeSuppliesIcon");
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost

@@ -13,10 +13,10 @@ import {
   SALE_ASSUMED_CLICKS,
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
-import { getThemeImageUrl } from "../../loadAssets";
+import { getImageUrl } from "../../loadAssets";
 
-const mouseIconUrl = getThemeImageUrl("references", "mouse");
-const coinIconUrl = getThemeImageUrl("references", "coin");
+const mouseIconUrl = getImageUrl("mouse");
+const coinIconUrl = getImageUrl("coin");
 
 const BOOST_ALL_SECONDS_COST = 5; // cost is 5s of current (unboosted) income
 

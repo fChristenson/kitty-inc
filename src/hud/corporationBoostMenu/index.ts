@@ -11,15 +11,16 @@ import {
   type PressAndHoldController,
 } from "../../shared/pressAndHold";
 import { playSwoosh, playSold } from "../../sound";
-import { getThemeImageUrl } from "../../loadAssets";
-import { getReferenceManagerIconUrl } from "../../floors";
+import { getImageUrl } from "../../loadAssets";
+import { getManagerIconUrl } from "../../floors";
 
-const coinIconUrl = getThemeImageUrl("references", "coin");
+const coinIconUrl = getImageUrl("coin");
 import {
   buyStockRaise,
   getStockRaiseCost,
   getStockTimesBought,
   getStockContributionPercent,
+  getCompanyBaseModifierPercent,
   getPressConferenceCost,
   getFreePressConferenceCount,
   holdPressConference,
@@ -30,7 +31,6 @@ import {
 
 export {
   clearStockPrices,
-  getStockPrice,
   getStockTimesBought,
   getStockRaiseCost,
   buyStockRaise,
@@ -41,6 +41,7 @@ export {
   getMarketInfluencePercent,
   addMarketInfluencePercent,
   getCompanyAssetValue,
+  getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,
   getGlobalIncomeBoostMultiplier,
 } from "./economy";
@@ -83,13 +84,11 @@ export function wireCorporationBoostMenu(
   )!;
 
   function render(): void {
-    // "Hold press conference" isn't tied to any one company/building's own
-    // theme (see getReferenceManagerIconUrl), unlike coinIconUrl above which
-    // is likewise always the references theme's own art for the same reason
-    const managerIconUrl = getReferenceManagerIconUrl();
+    const managerIconUrl = getManagerIconUrl();
     const count = getCorporationCount();
     const modifierRows = Array.from({ length: count }, (_, i) => {
-      const pct = getStockContributionPercent(i);
+      const pct =
+        getStockContributionPercent(i) + getCompanyBaseModifierPercent(i);
       return `
         <div class="worker-menu__modifier-row">
           <span>${getCorporationName(i)}</span>

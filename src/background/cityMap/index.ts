@@ -27,11 +27,7 @@ import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
 import { createCityTransitions } from "./transitions";
-import {
-  loadThemeSprite,
-  loadThemeImage,
-  type ThemeName,
-} from "../../loadAssets";
+import { loadSprite, loadImageByName } from "../../loadAssets";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -51,14 +47,11 @@ const STREET_TEXT_GAP_BELOW_INCOME = 12;
 let mapImage: HTMLImageElement | null = null;
 let catSprite: HTMLImageElement | null = null;
 
-// loads the map screen's own backdrop + marker cat sprite for the given company's
-// own map theme (see company.ts's getMapTheme/setMapTheme)
-export async function loadCityMapImage(
-  theme: ThemeName = "references",
-): Promise<HTMLImageElement> {
+// loads the map screen's own backdrop + marker cat sprite
+export async function loadCityMapImage(): Promise<HTMLImageElement> {
   [mapImage, catSprite] = await Promise.all([
-    loadThemeImage(theme, "cityMapBackground"),
-    loadThemeSprite(theme, "worker"),
+    loadImageByName("cityMapBackground"),
+    loadSprite("worker"),
   ]);
   return mapImage!;
 }

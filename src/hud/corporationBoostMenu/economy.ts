@@ -18,13 +18,12 @@ import {
 // touches the DOM or canvas.
 
 // each corporation's own purchased "shares" — starts at 1 and goes up 1 per
-// purchase, separate from (and never affecting) its totalIncome/buildings. The
-// DISPLAYED/effective stock price (see getStockPrice below) is these shares
-// diluted by how much the company has grown since, not this raw count itself
+// purchase, separate from (and never affecting) its totalIncome/buildings. Each
+// purchase adds a flat +0.01% to the modifier (see getStockContributionPercent
+// below) — company value plays no part in this, only in getCompanyBaseModifierPercent
 const STOCK_PRICE_KEY = "cash-clicker:stock-price";
 const STOCK_PRICE_BASE = 1;
 const STOCK_PRICE_STEP = 1;
-const SECONDS_PER_HOUR = 3600;
 
 function loadStockShares(companyIndex: number): number {
   try {
@@ -64,20 +63,6 @@ export function clearStockPrices(): void {
   clearFreePressConferences();
 }
 
-// the stock price actually shown/used everywhere (menu display, boost formula):
-// raw purchased shares diluted by log10 of the company's own current value, so
-// buying cheap while a company is small doesn't just compound into a permanently
-// bigger price/boost forever as that same company grows huge afterward — it
-// balances back out, the same way real share dilution works. log10 (not the raw
-// value) so this stays a gentle, gradual drop rather than crushing the price to
-// nothing the instant a company's value gets big — floored at $1 so dilution
-// alone can never push it below its own starting price
-export function getStockPrice(companyIndex: number): number {
-  const shares = loadStockShares(companyIndex);
-  const companyValue = Math.max(10, getCompanyValue(companyIndex));
-  return Math.max(STOCK_PRICE_BASE, shares / Math.log10(companyValue));
-}
-
 // how many times a company's stock has actually been raised — the menu shows
 // this ("x3") instead of the dollar stock price itself, same "xN" convention as
 // the crit-upgrade label (floors/upgradeButton)
@@ -85,14 +70,14 @@ export function getStockTimesBought(companyIndex: number): number {
   return loadStockShares(companyIndex) - STOCK_PRICE_BASE;
 }
 
-// $ cost to raise a company's stock price once: its own total income over a full
-// hour at its current rate, doubled for every time it's already been bought (so
-// the very first raise costs 1x that hourly income, the next 2x, then 4x, ...)
+// $ cost to raise a company's stock price once: starts at $1 and doubles every
+// time it's already been bought (so the very first raise costs $1, the next
+// $2, then $4, ...) — flat regardless of the company's own value/size
+const STOCK_RAISE_COST_BASE = 1;
+
 export function getStockRaiseCost(companyIndex: number): number {
   const timesBought = loadStockShares(companyIndex) - STOCK_PRICE_BASE;
-  const baseCost =
-    getCompanyIncomeRatePerSecond(companyIndex) * SECONDS_PER_HOUR;
-  return baseCost * 2 ** timesBought;
+  return STOCK_RAISE_COST_BASE * 2 ** timesBought;
 }
 
 // raises companyIndex's purchased shares by STOCK_PRICE_STEP if affordable —
@@ -250,6 +235,13 @@ function getUpgradesValue(buildings: Floor[][]): number {
   return total;
 }
 
+// exported so main.ts can snapshot just the upgrades portion into a company's
+// CompanyRecord (see company.ts's upgradesValue field) when it goes dormant —
+// getCompanyValue below needs this alone, not bundled with buildings cost
+export function getCompanyUpgradesValue(buildings: Floor[][]): number {
+  return getUpgradesValue(buildings);
+}
+
 // buildings value + upgrades value combined — exported so main.ts can snapshot
 // a company's CompanyRecord (see company.ts) at the exact moment it goes
 // dormant, without duplicating this pricing logic there
@@ -257,35 +249,50 @@ export function getCompanyAssetValue(buildings: Floor[][]): number {
   return getBuildingsValue(buildings.length) + getUpgradesValue(buildings);
 }
 
-// a company's overall value — buildings owned + upgrades bought + its own
-// current income (wealth) — the base a stock-price contribution below is
-// weighted against. The active company reads its own live buildings (freshest);
-// any dormant company reads its persisted CompanyRecord's assetValue instead of
+// a company's overall value — its own current total income (bank money) plus
+// the $ sunk into its floors' upgrades — the base a stock-price contribution
+// below is weighted against, and getStockRaiseCost's own cost basis. Buildings
+// cost is deliberately NOT part of this: it was included before, and since
+// total income (the player's actual spendable cash) is already one of the two
+// terms, every stock raise's cost ended up landing right around "everything
+// you currently have", wiping a company's cash to ~0 on the very first
+// purchase. The active company reads its own live buildings (freshest); any
+// dormant company reads its persisted CompanyRecord's upgradesValue instead of
 // ever loading its full buildings/floors array
 function getCompanyValue(companyIndex: number): number {
   if (companyIndex === getActiveCompanyIndex()) {
     return (
-      getCompanyAssetValue(loadBuildings(companyIndex)) +
+      getUpgradesValue(loadBuildings(companyIndex)) +
       getStoredTotalIncome(companyIndex)
     );
   }
-  const assetValue = loadCompanyRecord(companyIndex)?.assetValue ?? 0;
-  return assetValue + getStoredTotalIncome(companyIndex);
+  const upgradesValue = loadCompanyRecord(companyIndex)?.upgradesValue ?? 0;
+  return upgradesValue + getStoredTotalIncome(companyIndex);
 }
 
-// how much a company's stock price contributes to the combined income boost.
-// stockPrice is already dilution-tempered (see getStockPrice above), so it's
-// used directly here — logging it AGAIN on top of that flattened purchases out
-// to almost nothing (buying many more shares barely moved the modifier). Only
-// companyValue still needs its own log10: it alone can reach illion-scale late
-// game, so "10 orders of magnitude bigger" becomes "10 points bigger" instead of
-// blowing the percentage up to something needing scientific notation
-const STOCK_CONTRIBUTION_RATE = 0.1;
+// how much a company's stock price contributes to the combined income boost:
+// a flat +0.01% per purchase, regardless of the company's own value/size —
+// company value only ever factors into getCompanyBaseModifierPercent below
+const STOCK_CONTRIBUTION_PER_PURCHASE = 0.01;
 
 export function getStockContributionPercent(companyIndex: number): number {
-  const stockPrice = getStockPrice(companyIndex);
+  return getStockTimesBought(companyIndex) * STOCK_CONTRIBUTION_PER_PURCHASE;
+}
+
+// a baseline % every company contributes purely from its own size, on top of
+// (never instead of) getStockContributionPercent above — so a company that's
+// never bought a single stock raise still scales up a little as it grows.
+// sqrt(log10(value)) instead of a plain log10 or sqrt(value): log10 alone
+// already compresses illion-scale late-game values down to a small number of
+// "points" (see getStockContributionPercent's own comment), and taking the
+// sqrt of THAT compresses it a second time — so a company many orders of
+// magnitude bigger than another still only ends up a few points higher, never
+// an absurd %, while still strictly increasing with value
+const BASE_MODIFIER_RATE = 0.5;
+
+export function getCompanyBaseModifierPercent(companyIndex: number): number {
   const companyValue = Math.max(10, getCompanyValue(companyIndex));
-  return stockPrice * Math.log10(companyValue) * STOCK_CONTRIBUTION_RATE;
+  return Math.sqrt(Math.log10(companyValue)) * BASE_MODIFIER_RATE;
 }
 
 // summed across every corporation plus the market-influence modifier — the
@@ -298,7 +305,9 @@ export function getStockContributionPercent(companyIndex: number): number {
 export function getGlobalIncomeBoostPercent(): number {
   const count = getCorporationCount();
   let total = getMarketInfluencePercent();
-  for (let i = 0; i < count; i++) total += getStockContributionPercent(i);
+  for (let i = 0; i < count; i++) {
+    total += getStockContributionPercent(i) + getCompanyBaseModifierPercent(i);
+  }
   return total;
 }
 

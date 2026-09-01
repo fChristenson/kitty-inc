@@ -6,7 +6,7 @@ import {
   TOP_WALL_WIDTH,
 } from "../../floors";
 import { COLOR } from "../../palette";
-import { loadThemeImage, type ThemeName } from "../../loadAssets";
+import { loadImageByName } from "../../loadAssets";
 
 // a thin facade strip along each side of every floor row, masking bg.png's raw
 // left/right image edges (now that the blue sky/clouds show past the canvas) so the
@@ -25,26 +25,16 @@ const WALL_COLOR = COLOR.wall; // flat fallback used until loadWallMaterial reso
 const WALL_SHADOW_COLOR = COLOR.wallShadow; // inner-edge shading toward the room, for a hint of depth
 
 let wallPattern: CanvasPattern | null = null;
-const wallPatternByTheme = new Map<ThemeName, CanvasPattern>();
 
-// loads (or reuses an already-cached) theme's tileable facade texture and makes
-// it the active one drawOuterWall reads from — call whenever the active
-// building's own theme changes, not just once. A pattern isn't tied to the canvas
+// loads (or reuses, once already loaded) the tileable facade texture and makes
+// it the active one drawOuterWall reads from. A pattern isn't tied to the canvas
 // it was created from, so a throwaway offscreen context is enough here
-export async function loadWallMaterial(
-  theme: ThemeName = "references",
-): Promise<void> {
-  const cached = wallPatternByTheme.get(theme);
-  if (cached) {
-    wallPattern = cached;
-    return;
-  }
-  const image = await loadThemeImage(theme, "wallMaterial");
+export async function loadWallMaterial(): Promise<void> {
+  if (wallPattern) return;
+  const image = await loadImageByName("wallMaterial");
   if (!image) return;
   const patternCtx = document.createElement("canvas").getContext("2d")!;
-  const pattern = patternCtx.createPattern(image, "repeat");
-  if (pattern) wallPatternByTheme.set(theme, pattern);
-  wallPattern = pattern;
+  wallPattern = patternCtx.createPattern(image, "repeat");
 }
 
 // draws the building's exterior walls (all four edges) for one floor's own canvas;

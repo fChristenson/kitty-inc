@@ -1,14 +1,8 @@
 import { companyStorageKey } from "../company";
-import type { ThemeName } from "../loadAssets";
 
 // bumped from "cash-clicker:floors" now that this holds Floor[][] (one entry per
 // building) instead of a single Floor[] — old single-building saves just start fresh
 const STORAGE_KEY = "cash-clicker:buildings";
-// one ThemeName per building, index-aligned with STORAGE_KEY's own Floor[][] —
-// each building gets its own independently random theme at creation time (see
-// buildings/index.ts's createBuilding), unlike the map's own theme (company.ts's
-// getMapTheme/setMapTheme), which is picked once per company instead of per building
-const BUILDING_THEMES_KEY = "cash-clicker:building-themes";
 
 // a random per-page-load token, written to localStorage once at startup (see
 // initSessionGuard, called from main.ts) purely so every beforeunload-driven save
@@ -228,9 +222,6 @@ interface SavedFloor {
 export function clearBuildings(companyIndex = 0): void {
   try {
     localStorage.removeItem(companyStorageKey(STORAGE_KEY, companyIndex));
-    localStorage.removeItem(
-      companyStorageKey(BUILDING_THEMES_KEY, companyIndex),
-    );
   } catch {
     // storage unavailable: nothing to clear
   }
@@ -326,33 +317,6 @@ export function loadBuildings(companyIndex = 0): Floor[][] {
   try {
     const saved: SavedFloor[][] = JSON.parse(raw);
     return saved.map((floors) => floors.map((sf) => fromSavedFloor(sf)));
-  } catch {
-    return [];
-  }
-}
-
-export function saveBuildingThemes(
-  themes: ThemeName[],
-  companyIndex = 0,
-): void {
-  try {
-    localStorage.setItem(
-      companyStorageKey(BUILDING_THEMES_KEY, companyIndex),
-      JSON.stringify(themes),
-    );
-  } catch {
-    // storage unavailable/full: persistence is a nice-to-have, safe to ignore
-  }
-}
-
-// index-aligned with loadBuildings' own Floor[][] — returns [] if nothing is
-// saved or storage is unreadable, same as loadBuildings itself
-export function loadBuildingThemes(companyIndex = 0): ThemeName[] {
-  try {
-    const raw = localStorage.getItem(
-      companyStorageKey(BUILDING_THEMES_KEY, companyIndex),
-    );
-    return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }

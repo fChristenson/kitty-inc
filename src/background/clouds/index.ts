@@ -21,7 +21,7 @@ let cloudImages: HTMLImageElement[] = [];
 // loads every cloud shape once; main.ts awaits this alongside loadFloorBackgrounds
 // before the first frame ever needs to draw one
 export async function loadCloudImages(): Promise<HTMLImageElement[]> {
-  cloudImages = await loadThemeClouds("references");
+  cloudImages = await loadThemeClouds();
   return cloudImages;
 }
 

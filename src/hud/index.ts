@@ -95,6 +95,7 @@ export {
   wireCorporationBoostMenu,
   getGlobalIncomeBoostMultiplier,
   getCompanyAssetValue,
+  getCompanyUpgradesValue,
   grantFreePressConference,
 } from "./corporationBoostMenu";
 export type { CorporationBoostMenu } from "./corporationBoostMenu";

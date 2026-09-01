@@ -68,6 +68,7 @@ function adjustStoredTotalIncome(companyIndex: number, delta: number): void {
     bankedTotal: currentTotal + delta,
     incomeRatePerSecond: record?.incomeRatePerSecond ?? 0,
     assetValue: record?.assetValue ?? 0,
+    upgradesValue: record?.upgradesValue ?? 0,
     updatedAt: Date.now(),
   });
 }
@@ -311,6 +312,7 @@ function snapshotActiveCompanyRecord(): void {
       Date.now(),
     ),
     assetValue: existing?.assetValue ?? 0,
+    upgradesValue: existing?.upgradesValue ?? 0,
     updatedAt: Date.now(),
   });
 }

@@ -1,5 +1,5 @@
 import { randomInt } from "../utils";
-import { loadThemeSprite } from "../loadAssets";
+import { loadSprite } from "../loadAssets";
 
 // shared coin/bill flipbook sprites + the actual particle physics/draw math —
 // floors/coins (particles glued to a specific Floor's own on-screen rect) and
@@ -19,8 +19,8 @@ let billImage: HTMLImageElement | null = null;
 
 export async function loadCoinBurstImages(): Promise<HTMLImageElement> {
   const [coin] = await Promise.all([
-    loadThemeSprite("references", "coinSpin"),
-    loadThemeSprite("references", "cashBill").then((img) => (billImage = img)),
+    loadSprite("coinSpin"),
+    loadSprite("cashBill").then((img) => (billImage = img)),
   ]);
   coinImage = coin;
   return coin!;

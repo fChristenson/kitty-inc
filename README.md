@@ -1,6 +1,6 @@
 # Kitty Inc
 
-Fun little clicker idle game.
+Fun little clicker/idle mobile game.
 
 [Play here](https://fchristenson.github.io/kitty-inc/)
 
