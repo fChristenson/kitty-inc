@@ -101,7 +101,11 @@ export function spawnCoinBurst(
 ): void {
   const count = randomInt(40, 85);
   for (let i = 0; i < count; i++) {
-    if (particles.length >= MAX_PARTICLES) break;
+    // evict the oldest particle instead of refusing to add new ones once at
+    // the cap — otherwise a sustained hold keeps the array pinned at the cap,
+    // so a later burst (e.g. the every-10th-upgrade milestone one) silently
+    // spawns nothing at all since there was never any room left for it
+    if (particles.length >= MAX_PARTICLES) particles.shift();
     // upward/outward hemisphere only (not fully random) so coins pop up and out
     // first, then arc back down under gravity instead of scattering downward too
     const angle = -Math.random() * Math.PI;

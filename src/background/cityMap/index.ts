@@ -10,7 +10,11 @@ import { playSold, playSwoosh } from "../../sound";
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
 import { getCorporationName, getCorporationCount } from "../../corporationName";
-import { getActiveCompanyIndex, setActiveCompanyIndex, companyStorageKey } from "../../company";
+import {
+  getActiveCompanyIndex,
+  setActiveCompanyIndex,
+  companyStorageKey,
+} from "../../company";
 import {
   spawnCoinBurstAt,
   drawActiveCoinBursts,

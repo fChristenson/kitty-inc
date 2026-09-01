@@ -19,6 +19,10 @@ import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
 import { getScreenShakeOffset, drawCritFlash } from "../../screenShake";
 import { COLOR } from "../../palette";
+import {
+  startPressAndHold,
+  type PressAndHoldController,
+} from "../../shared/pressAndHold";
 import type { Floor } from "../../gameState";
 
 // one building's on-screen slot: a GUTTER_W margin on each side of its floor room art
@@ -67,10 +71,6 @@ const MOMENTUM_MIN_SPEED = 0.02; // world units/ms below which momentum just sto
 // its click logic re-fires this often instead of only once on release — short
 // enough to read as spamming the button by hand, not a slow metronome tick
 const UPGRADE_HOLD_INTERVAL_MS = 50;
-// held past this long, the repeat rate speeds up (see scheduleHoldRepeat below) —
-// rewards a deliberate long hold instead of the rate staying flat forever
-const UPGRADE_HOLD_FAST_AFTER_MS = 5000;
-const UPGRADE_HOLD_FAST_MULTIPLIER = 5;
 
 export interface GameCanvasDeps {
   canvas: HTMLCanvasElement;
@@ -467,35 +467,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   let velocityY = 0;
   let lastMoveTime = 0;
   // press-and-hold auto-repeat on the upgrade button — see onPointerDown/onPointerUp
-  let holdTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  let holdController: PressAndHoldController | null = null;
   let heldUpgradeButton = false;
-  let holdStartTime = 0;
 
   function stopHoldRepeat(): void {
-    if (holdTimeoutId !== null) {
-      clearTimeout(holdTimeoutId);
-      holdTimeoutId = null;
-    }
-  }
-
-  // self-rescheduling (not setInterval) so the delay can change mid-hold once the
-  // press crosses UPGRADE_HOLD_FAST_AFTER_MS, instead of being locked in at
-  // whatever rate the hold started with
-  function scheduleHoldRepeat(hit: {
-    floor: Floor;
-    localX: number;
-    localY: number;
-    isGroundFloor: boolean;
-  }): void {
-    const heldMs = performance.now() - holdStartTime;
-    const delay =
-      heldMs >= UPGRADE_HOLD_FAST_AFTER_MS
-        ? UPGRADE_HOLD_INTERVAL_MS / UPGRADE_HOLD_FAST_MULTIPLIER
-        : UPGRADE_HOLD_INTERVAL_MS;
-    holdTimeoutId = setTimeout(() => {
-      fireHandleFloorClick(hit);
-      scheduleHoldRepeat(hit);
-    }, delay);
+    holdController?.stop();
+    holdController = null;
   }
   let momentumFrame: number | null = null;
 
@@ -610,8 +587,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       // repeating it every tick wouldn't mean anything for a one-time catch
       handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);
       fireHandleFloorClick(hit);
-      holdStartTime = performance.now();
-      scheduleHoldRepeat(hit);
+      holdController = startPressAndHold(
+        () => fireHandleFloorClick(hit),
+        UPGRADE_HOLD_INTERVAL_MS,
+      );
     }
   }
 

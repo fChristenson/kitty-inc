@@ -54,6 +54,7 @@ import {
   wireCorporationBoostMenu,
   getGlobalIncomeBoostMultiplier,
   getCompanyAssetValue,
+  grantFreePressConference,
   createPressConferenceGameMarkup,
   wirePressConferenceGame,
   createMapMenuMarkup,
@@ -314,6 +315,7 @@ async function main() {
     () => {
       if (!spendFromAllCompanies(getCorporationPrice())) return;
       const newIndex = createNewCorporation();
+      grantFreePressConference();
       companySelectMenu.close();
       setTimeout(() => {
         playSwoosh();

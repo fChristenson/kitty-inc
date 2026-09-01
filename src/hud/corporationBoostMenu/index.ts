@@ -14,6 +14,10 @@ import {
 import { getCorporationCount, getCorporationName } from "../../corporationName";
 import { getBuildingPrice } from "../../buildings";
 import {
+  startPressAndHold,
+  type PressAndHoldController,
+} from "../../shared/pressAndHold";
+import {
   companyStorageKey,
   getActiveCompanyIndex,
   loadCompanyRecord,
@@ -66,6 +70,7 @@ export function clearStockPrices(): void {
     }
   }
   clearMarketInfluence();
+  clearFreePressConferences();
 }
 
 // the stock price actually shown/used everywhere (menu display, boost formula):
@@ -140,7 +145,47 @@ export function getPressConferenceCost(): number {
 // own escalating getStockRaiseCost individually — the actual boost comes from
 // then playing hud/pressConferenceGame's own mini-game (see Market Influence
 // below), this just pays the entry fee. Returns whether it succeeded
+
+// not tied to any one company (same as the press conference action itself) —
+// banked whenever main.ts's "Create new Corporation" purchase succeeds (see
+// grantFreePressConference), spent here before ever touching real income
+const FREE_PRESS_CONFERENCES_KEY = "cash-clicker:free-press-conferences";
+
+function loadFreePressConferenceCount(): number {
+  try {
+    const raw = localStorage.getItem(FREE_PRESS_CONFERENCES_KEY);
+    const parsed = raw !== null ? Number(raw) : 0;
+    return Number.isFinite(parsed) ? parsed : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveFreePressConferenceCount(value: number): void {
+  try {
+    localStorage.setItem(FREE_PRESS_CONFERENCES_KEY, String(value));
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
+export function getFreePressConferenceCount(): number {
+  return loadFreePressConferenceCount();
+}
+
+// +1 free press conference — called once per successful "Create new
+// Corporation" purchase (see main.ts), so buying a new company always comes
+// with one conference paid for already
+export function grantFreePressConference(): void {
+  saveFreePressConferenceCount(loadFreePressConferenceCount() + 1);
+}
+
 export function holdPressConference(): boolean {
+  const freeCount = loadFreePressConferenceCount();
+  if (freeCount > 0) {
+    saveFreePressConferenceCount(freeCount - 1);
+    return true;
+  }
   return spendFromAllCompanies(getPressConferenceCost());
 }
 
@@ -178,6 +223,15 @@ export function addMarketInfluencePercent(delta: number): void {
 function clearMarketInfluence(): void {
   try {
     localStorage.removeItem(MARKET_INFLUENCE_KEY);
+  } catch {
+    // storage unavailable: nothing to clear
+  }
+}
+
+// same as clearMarketInfluence, folded into clearStockPrices
+function clearFreePressConferences(): void {
+  try {
+    localStorage.removeItem(FREE_PRESS_CONFERENCES_KEY);
   } catch {
     // storage unavailable: nothing to clear
   }
@@ -324,13 +378,19 @@ export function wireCorporationBoostMenu(
     `;
     const totalPct = getGlobalIncomeBoostPercent();
     const pressConferenceCost = getPressConferenceCost();
+    const freePressConferenceCount = getFreePressConferenceCount();
     // computed once and reused below — getAllCompaniesTotalIncome() is itself
     // O(companies) (a localStorage read + JSON.parse per company), so calling
     // it again inside the per-company items loop made render() scale
     // O(companies^2)
     const allCompaniesTotalIncome = getAllCompaniesTotalIncome();
     const pressConferenceAffordable =
+      freePressConferenceCount > 0 ||
       allCompaniesTotalIncome >= pressConferenceCost;
+    const pressConferencePriceLabel =
+      freePressConferenceCount > 0
+        ? `FREE (x${freePressConferenceCount})`
+        : formatPrice(pressConferenceCost);
     const items = Array.from({ length: count }, (_, i) => {
       const cost = getStockRaiseCost(i);
       const affordable = allCompaniesTotalIncome >= cost;
@@ -369,63 +429,57 @@ export function wireCorporationBoostMenu(
           <img src="${managerIconUrl}" class="worker-menu__icon" alt="" />
           <span class="worker-menu__item-name">Hold press conference</span>
         </span>
-        <span class="worker-menu__price">${formatPrice(pressConferenceCost)}</span>
+        <span class="worker-menu__price">${pressConferencePriceLabel}</span>
       </button>
       <h3 class="worker-menu__subheader">Raise Stock price</h3>
       ${items}
     `;
   }
 
-  // press-and-hold auto-repeat (same interval/speed-up timing as gameCanvas.ts's
-  // upgrade button): pointerdown buys once immediately and starts repeating;
+  // press-and-hold auto-repeat (same interval as gameCanvas.ts's upgrade
+  // button): pointerdown buys once immediately and starts repeating;
   // pointerup/leave/cancel anywhere stops it. Tracks by company INDEX, not the
   // button element itself, since every render() call replaces every button node
   const STOCK_HOLD_INTERVAL_MS = 100;
-  const STOCK_HOLD_FAST_AFTER_MS = 5000;
-  const STOCK_HOLD_FAST_MULTIPLIER = 5;
   let heldCompanyIndex: number | null = null;
-  let holdStartTime = 0;
-  let holdTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  let holdController: PressAndHoldController | null = null;
 
   function stopHold(): void {
     heldCompanyIndex = null;
-    if (holdTimeoutId !== null) {
-      clearTimeout(holdTimeoutId);
-      holdTimeoutId = null;
-    }
+    holdController?.stop();
+    holdController = null;
   }
 
   // one purchase attempt; stops the hold once it's no longer affordable so it
   // doesn't just spin uselessly against a purchase that can never succeed.
-  // Same triggerButtonPress-then-render sequencing as boostMenu.ts/upgradeMenu.ts's
-  // single-click buttons, so a held stock item bounces exactly like every other
-  // worker-menu__item instead of looking inert
-  async function fireStockRaise(companyIndex: number): Promise<void> {
+  // render() runs immediately (not gated behind awaiting the press-bounce
+  // animation) so price/affordability update every tick in real time — during a
+  // fast hold, each tick's triggerButtonPress cancels the previous tick's still-
+  // pending one before its "animationend" ever fires, so awaiting it here stalled
+  // render() until the very last tick's animation was finally left undisturbed
+  // (i.e. until the hold actually stopped). triggerButtonPress is still fired
+  // (fire-and-forget) on the freshly rendered button so it still bounces each
+  // tick, same look as boostMenu.ts/upgradeMenu.ts's single-click buttons
+  function fireStockRaise(companyIndex: number): void {
     if (!buyStockRaise(companyIndex)) {
       stopHold();
       return;
     }
     playSold();
+    render();
     const button = list.querySelector<HTMLButtonElement>(
       `button[data-company-index="${companyIndex}"]`,
     );
-    if (button) await triggerButtonPress(button);
-    render();
+    if (button) void triggerButtonPress(button);
   }
 
-  // self-rescheduling (not setInterval) so the delay can change mid-hold once the
-  // press crosses STOCK_HOLD_FAST_AFTER_MS
+  // self-rescheduling, same shared implementation gameCanvas.ts's own
+  // upgrade-button hold repeat uses
   function scheduleHoldRepeat(companyIndex: number): void {
-    const heldMs = performance.now() - holdStartTime;
-    const delay =
-      heldMs >= STOCK_HOLD_FAST_AFTER_MS
-        ? STOCK_HOLD_INTERVAL_MS / STOCK_HOLD_FAST_MULTIPLIER
-        : STOCK_HOLD_INTERVAL_MS;
-    holdTimeoutId = setTimeout(() => {
+    holdController = startPressAndHold(() => {
       if (heldCompanyIndex !== companyIndex) return; // hold already stopped
-      void fireStockRaise(companyIndex);
-      scheduleHoldRepeat(companyIndex);
-    }, delay);
+      fireStockRaise(companyIndex);
+    }, STOCK_HOLD_INTERVAL_MS);
   }
 
   list.addEventListener("pointerdown", (event) => {
@@ -436,8 +490,7 @@ export function wireCorporationBoostMenu(
     if (!button || button.disabled) return;
     const companyIndex = Number(button.dataset.companyIndex);
     heldCompanyIndex = companyIndex;
-    holdStartTime = performance.now();
-    void fireStockRaise(companyIndex);
+    fireStockRaise(companyIndex);
     scheduleHoldRepeat(companyIndex);
   });
   window.addEventListener("pointerup", stopHold);
@@ -474,6 +527,7 @@ export function wireCorporationBoostMenu(
     );
     if (pressConferenceButton) {
       pressConferenceButton.disabled =
+        getFreePressConferenceCount() === 0 &&
         allCompaniesTotalIncome < getPressConferenceCost();
     }
   }
