@@ -49,7 +49,7 @@ const cloudModules = import.meta.glob<string>(
 );
 
 // pulls the theme folder name back out of a glob key like
-// "../assets/themes/bakery-cafe/dist/sprites/kitty1Walk.png"
+// "../assets/themes/bakery-cafe/dist/sprites/workerWalk.png"
 function themeOf(path: string): string {
   return path.match(/\/themes\/([^/]+)\/dist\//)?.[1] ?? "";
 }

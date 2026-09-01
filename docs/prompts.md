@@ -50,7 +50,7 @@ Flat 2D cartoon isometric cardboard box, angled 3/4 view, centered. Open top, al
 
 Flat 2D cartoon isometric ball of yarn, angled 3/4 view, centered. Rounded sphere wrapped in crisscrossing wound strand lines, one loose strand end trailing off the lower side. Solid warm coral yarn fill, thick dark-brown outline, thin darker strand-groove lines. Cel-shaded: flat light highlight on upper-facing surface, flat darker shade on lower-facing surface. No needles, tags, text, or logos. Isolated on transparent background, edge-to-edge crop, square 1:1.
 
-# Manager kitty sprite sheet (src/assets/kitty1Sprites.png style)
+# Manager kitty sprite sheet (src/assets/themes/references/workerSprites.png style)
 
 Flat 2D cartoon character sheet, 5 evenly spaced frames in one row, chubby cream cat wearing a navy business suit, white shirt, red tie, gold button, and round black-rimmed glasses. Walking cycle across the frames, final frame both arms raised in a happy jump, eyes closed, big open-mouth smile. Bold black outline, cel-shaded flat colors, simple round eyes. Plain near-white background, no text, no logos, edge-to-edge, wide aspect ratio.
 

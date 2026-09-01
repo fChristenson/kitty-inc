@@ -2,15 +2,17 @@ import sharp from "sharp";
 import path from "node:path";
 import fs from "node:fs/promises";
 
-// raw src/assets/*Sprites.png files (AI-generated character sheets, one per worker
-// skin) each have a plain near-white background and 5 poses spaced arbitrarily
-// across one row. This chroma-keys the white background to transparent (using each
-// pixel's whiteness for a soft/anti-aliased edge instead of a hard cutoff), finds
-// each pose's real bounding box, then re-composites all 5 into a single uniform-cell
-// grid (same cell size, feet aligned to the same bottom row) — the actual flipbook
-// sheet floors/worker/index.ts loads. Every src/assets/<Name>Sprites.png is written
-// to src/assets/themes/references/dist/sprites/<Name>Walk.png. Safe to re-run any time a source sheet is
-// replaced or a new one is added; never overwrites the raw source files.
+// raw src/assets/themes/references/*Sprites.png files (AI-generated character
+// sheets, one per worker skin) each have a plain near-white background and 5
+// poses spaced arbitrarily across one row. This chroma-keys the white background
+// to transparent (using each pixel's whiteness for a soft/anti-aliased edge
+// instead of a hard cutoff), finds each pose's real bounding box, then
+// re-composites all 5 into a single uniform-cell grid (same cell size, feet
+// aligned to the same bottom row) — the actual flipbook sheet
+// floors/worker/index.ts loads. Every src/assets/themes/references/<Name>Sprites.png
+// is written to src/assets/themes/references/dist/sprites/<Name>Walk.png. Safe to
+// re-run any time a source sheet is replaced or a new one is added; never
+// overwrites the raw source files.
 
 const FRAME_COUNT = 5;
 const PADDING = 8; // px of breathing room kept around each pose inside its cell
@@ -27,7 +29,8 @@ const WHITE_HI = 244;
 const FLOOD_LO = 150;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const outDir = path.join(assets, "themes", "references", "dist", "sprites");
+const referencesDir = path.join(assets, "themes", "references");
+const outDir = path.join(referencesDir, "dist", "sprites");
 
 async function processSheet(srcFile, destFile) {
   const { data, info } = await sharp(srcFile)
@@ -224,17 +227,22 @@ async function processSheet(srcFile, destFile) {
     .toFile(destFile);
 
   console.log(
-    `${path.relative(assets, srcFile)} -> ${path.relative(assets, destFile)}: ${FRAME_COUNT} frames, cell ${cellW}x${cellH}`,
+    `${path.relative(referencesDir, srcFile)} -> ${path.relative(referencesDir, destFile)}: ${FRAME_COUNT} frames, cell ${cellW}x${cellH}`,
   );
 }
 
-const sourceFiles = (await fs.readdir(assets)).filter((f) =>
+const sourceFiles = (await fs.readdir(referencesDir)).filter((f) =>
   /Sprites\.png$/i.test(f),
 );
 if (sourceFiles.length === 0) {
-  console.log("no src/assets/*Sprites.png source sheets found — nothing to do");
+  console.log(
+    "no src/assets/themes/references/*Sprites.png source sheets found — nothing to do",
+  );
 }
 for (const file of sourceFiles) {
   const destName = file.replace(/Sprites\.png$/i, "Walk.png");
-  await processSheet(path.join(assets, file), path.join(outDir, destName));
+  await processSheet(
+    path.join(referencesDir, file),
+    path.join(outDir, destName),
+  );
 }

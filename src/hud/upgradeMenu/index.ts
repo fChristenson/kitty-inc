@@ -126,7 +126,7 @@ export interface UpgradeMenu {
 function oneTimeItemMarkup(options: {
   dataAttr: string;
   floorIndex: number;
-  iconUrl: string;
+  iconUrl: string | null;
   label: string;
   bought: boolean;
   cost: number;

@@ -16,7 +16,7 @@ export const CAT_FRAME_COUNT = 5;
 export const CAT_STAND_FRAME = 0;
 export const CAT_JUMP_FRAME = 4; // the sheet's "arms-up happy pose", reused as a little hop
 export const CAT_POSE_SWAP_MS = 550; // how long each pose in the stand/jump cycle holds
-// kitty1Walk.png's own frames are mostly empty transparent padding above the cat
+// workerWalk.png's own frames are mostly empty transparent padding above the cat
 // itself (measured via pixel-scanning the sheet: real content starts ~46% down
 // each frame, not at the frame's own top edge) — anything positioned relative to
 // "the cat's head" needs this, or it ends up floating far above the actual

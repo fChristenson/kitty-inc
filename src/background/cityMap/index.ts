@@ -1,4 +1,4 @@
-import { loadImage, drawCartoonText } from "../../utils";
+import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
 import { playSold } from "../../sound";
 import { getBuildingPrice } from "../../buildings";
