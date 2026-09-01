@@ -289,7 +289,9 @@ async function main() {
   async function goToBuilding(buildingIndex: number): Promise<void> {
     activeBuildingIndex = buildingIndex;
     saveActiveBuildingIndex(activeCompanyIndex, buildingIndex);
-    await loadBuildingThemeAssets(buildingThemes[buildingIndex] ?? "references");
+    await loadBuildingThemeAssets(
+      buildingThemes[buildingIndex] ?? "references",
+    );
     gameCanvas.setActiveFloors(buildings[buildingIndex]);
   }
 

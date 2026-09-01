@@ -11,7 +11,7 @@ import {
 } from "../../floors";
 import { drawFloorContent } from "../../gameRenderer";
 import { drawClouds, CLOUD_MAX_RADIUS } from "../clouds";
-import { drawCity, CITY_MAX_HEIGHT } from "../city";
+import { drawCity, CITY_MAX_HEIGHT, getCitySkyGroundColor } from "../city";
 import { drawStars } from "../stars";
 import { drawRoof } from "../../buildings";
 import { drawHud } from "../../hud";
@@ -54,12 +54,12 @@ const STAR_START_ALTITUDE = STAR_START_FLOOR * FLOOR_H;
 // instead of drifting across the whole visible background
 const SKY_MARGIN_H = 800;
 
-// night sky: starts at city.png's own top-edge color (so the seam where that image
-// ends and this programmatic gradient begins is as close to invisible as possible)
-// and deepens into near-black space across the same altitude band stars start
-// appearing in (STAR_START_ALTITUDE), recomputed as a gradient every frame since
-// which screen-y that world altitude falls at depends on the current scroll position
-const SKY_COLOR_GROUND = COLOR.skyGround;
+// night sky: starts at the active theme's own city.png top-edge color (see
+// getCitySkyGroundColor — so the seam where that image ends and this programmatic
+// gradient begins is as close to invisible as possible, per theme) and deepens
+// into near-black space across the same altitude band stars start appearing in
+// (STAR_START_ALTITUDE), recomputed as a gradient every frame since which screen-y
+// that world altitude falls at depends on the current scroll position
 const SKY_COLOR_SPACE = COLOR.skySpace;
 
 const DRAG_THRESHOLD_PX = 6; // pointer movement below this still counts as a click/tap
@@ -419,18 +419,19 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // background first, in plain screen space (fills the whole viewport regardless
     // of camera position) — a gradient, not a flat fill, since the night sky itself
     // deepens from navy near the ground to near-black up where the stars start.
-    // The ground-to-CITY_MAX_HEIGHT band is held flat at SKY_COLOR_GROUND (matching
-    // city.png's own top-edge color) instead of starting to darken immediately —
-    // that band is entirely covered by the opaque city art anyway, but without this
-    // the gradient would already be a visibly different, darker shade of blue by the
-    // time it reaches the image's top edge, showing up as a hard seam line right
-    // where the art stops and the plain gradient takes over
+    // The ground-to-CITY_MAX_HEIGHT band is held flat at getCitySkyGroundColor()
+    // (matching the active theme's own city.png top-edge color) instead of starting
+    // to darken immediately — that band is entirely covered by the opaque city art
+    // anyway, but without this the gradient would already be a visibly different,
+    // darker shade of blue by the time it reaches the image's top edge, showing up
+    // as a hard seam line right where the art stops and the plain gradient takes over
     const groundScreenY = 0 - viewportTopY();
     const spaceScreenY = -STAR_START_ALTITUDE - viewportTopY();
     const cityTopFrac = Math.min(CITY_MAX_HEIGHT / STAR_START_ALTITUDE, 1);
+    const skyColorGround = getCitySkyGroundColor();
     const sky = ctx.createLinearGradient(0, groundScreenY, 0, spaceScreenY);
-    sky.addColorStop(0, SKY_COLOR_GROUND);
-    sky.addColorStop(cityTopFrac, SKY_COLOR_GROUND);
+    sky.addColorStop(0, skyColorGround);
+    sky.addColorStop(cityTopFrac, skyColorGround);
     sky.addColorStop(1, SKY_COLOR_SPACE);
     ctx.fillStyle = sky;
     ctx.fillRect(0, 0, SLOT_W, contentViewportH());
