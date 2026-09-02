@@ -54,8 +54,8 @@ import {
   wireActionBar,
   createUpgradeMenuMarkup,
   wireUpgradeMenu,
-  createCompanySelectMenuMarkup,
-  wireCompanySelectMenu,
+  createCorporationUpgradeMenuMarkup,
+  wireCorporationUpgradeMenu,
   createBoostMenuMarkup,
   wireBoostMenu,
   createCorporationBoostMenuMarkup,
@@ -113,7 +113,7 @@ async function main() {
       ${import.meta.env.MODE !== "production" ? createTestButtonMarkup() : ""}
     </div>
     ${createUpgradeMenuMarkup()}
-    ${createCompanySelectMenuMarkup()}
+    ${createCorporationUpgradeMenuMarkup()}
     ${createBoostMenuMarkup()}
     ${createCorporationBoostMenuMarkup()}
     ${createPressConferenceGameMarkup()}
@@ -342,14 +342,28 @@ async function main() {
   // Delayed to start SWITCH_LEAD_MS before the dialog's own close animation
   // finishes, instead of firing immediately alongside it while the dialog
   // hasn't even started sliding away yet
-  const companySelectMenu = wireCompanySelectMenu(
+  const corporationUpgradeMenu = wireCorporationUpgradeMenu(
     app,
+    buildings,
+    persist,
+    // a floor bought via this dialog only needs gameCanvas hit-test registration
+    // when it lands in the exact building currently on screen — same condition
+    // setupBuilding's own onAdd already uses; every other case is picked up
+    // automatically the next time that building is switched to
+    (companyIndex, buildingIndex, floor) => {
+      if (
+        companyIndex === activeCompanyIndex &&
+        buildingIndex === activeBuildingIndex
+      ) {
+        gameCanvas.notifyFloorAdded(floor);
+      }
+    },
     getCorporationPrice,
     () => {
       if (!spendFromAllCompanies(getCorporationPrice())) return;
       const newIndex = createNewCorporation();
       grantFreePressConference();
-      companySelectMenu.close();
+      corporationUpgradeMenu.close();
       setTimeout(() => {
         playSwoosh();
         cityMapView.animateSwitchToCompany(newIndex);
@@ -436,7 +450,7 @@ async function main() {
       else boostMenu.open();
     },
     onOpenUpgradeMenu: () => {
-      if (mapOpen) companySelectMenu.open();
+      if (mapOpen) corporationUpgradeMenu.open();
       else upgradeMenu.open();
     },
     onOpenMapMenu: () => {

@@ -167,7 +167,7 @@ export function getCorporationPrice(): number {
 
 // generates (and persists) a brand new corporation right after the last one, same
 // naming logic as getCorporationName; returns its index. See
-// hud/companySelectMenu's "Create new Corporation" item
+// hud/corporationUpgradeMenu's "Create new Corporation" item
 export function createNewCorporation(): number {
   const index = getCorporationCount();
   getCorporationName(index);

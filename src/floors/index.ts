@@ -245,8 +245,9 @@ export {
   currentIncomeRatePerSecond,
   drawIncomePanel,
   getIncomeBarCenter,
+  increaseIncomeRate,
 } from "./incomePanel";
-export { ensureLockedFloorAbove, drawFloorLock } from "./floorLock";
+export { ensureLockedFloorAbove, unlockFloor, drawFloorLock } from "./floorLock";
 export {
   drawCoins,
   hasActiveCoins,
@@ -277,6 +278,7 @@ export {
   forceMegaCritUpgrade,
   forceUltraCritUpgrade,
   forceFloorBuyCrit,
+  rollFloorBuyCrit,
   triggerSaleBoost,
   isSaleActive,
   floorIncomePerSecond,

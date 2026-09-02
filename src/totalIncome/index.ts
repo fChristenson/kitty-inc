@@ -28,7 +28,7 @@ export function getStoredTotalIncome(companyIndex: number): number {
 }
 
 // combined totalIncome across every corporation — every corp boost/upgrade
-// (companySelectMenu's "Create new Company", corporationBoostMenu's stock raises)
+// (corporationUpgradeMenu's "Create new Company", corporationBoostMenu's stock raises)
 // draws from this shared pool instead of just the currently active company's own
 // wallet, so a rich company can carry a poor one
 export function getAllCompaniesTotalIncome(): number {
@@ -71,6 +71,19 @@ function adjustStoredTotalIncome(companyIndex: number, delta: number): void {
     upgradesValue: record?.upgradesValue ?? 0,
     updatedAt: Date.now(),
   });
+}
+
+// same as spendTotalIncome but for any company, not just the active one —
+// corporationUpgradeMenu's per-company Building upgrades buttons need this so
+// a purchase made for a dormant company draws from THAT company's own wallet,
+// never the currently active one's
+export function spendCompanyTotalIncome(
+  companyIndex: number,
+  amount: number,
+): boolean {
+  if (getStoredTotalIncome(companyIndex) < amount) return false;
+  adjustStoredTotalIncome(companyIndex, -amount);
+  return true;
 }
 
 // $/sec every unlocked floor across every one of buildings is currently earning,

@@ -81,7 +81,7 @@ export interface CityMapView {
   // same blur/speed-line/roll flourish as a normal barrel-roll switch, but
   // jumping straight to a given company index in one motion — for a switch
   // triggered OUTSIDE the barrel-roll gesture itself (see main.ts's
-  // companySelectMenu wiring, right after a newly-bought company becomes active)
+  // corporationUpgradeMenu wiring, right after a newly-bought company becomes active)
   animateSwitchToCompany: (companyIndex: number) => void;
   destroy: () => void;
 }

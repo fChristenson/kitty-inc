@@ -122,7 +122,7 @@ export {
 export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
 export type { UpgradeMenu } from "./upgradeMenu";
 export {
-  createCompanySelectMenuMarkup,
-  wireCompanySelectMenu,
-} from "./companySelectMenu";
-export type { CompanySelectMenu } from "./companySelectMenu";
+  createCorporationUpgradeMenuMarkup,
+  wireCorporationUpgradeMenu,
+} from "./corporationUpgradeMenu";
+export type { CorporationUpgradeMenu } from "./corporationUpgradeMenu";

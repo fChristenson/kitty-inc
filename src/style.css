@@ -726,6 +726,40 @@ body {
   color: var(--color-wood-text);
 }
 
+/* per-company name header in corporationUpgradeMenu — thinner than the
+   bold section subheaders ("Corporation assets", "Building upgrades", ...)
+   so each company name doesn't visually compete with the section labels */
+.worker-menu__subheader--company {
+  font-weight: 400;
+}
+
+/* one company's own current total income, shown right under its name so its
+   available "wallet" for the buttons below it is visible at a glance — same
+   green-fill + white-stroke cartoon-text look as .worker-menu__total-income,
+   just smaller and with amount/unit name each forced onto their own line */
+.worker-menu__company-income {
+  display: block;
+  margin: -0.25rem 0 0.25rem;
+  padding: 0 0.25rem;
+  color: var(--color-money-green);
+  -webkit-text-stroke: 1.5px var(--color-white);
+  paint-order: stroke fill;
+}
+
+.worker-menu__company-income-amount,
+.worker-menu__company-income-unit {
+  display: block;
+  font-weight: 700;
+}
+
+.worker-menu__company-income-amount {
+  font-size: 1rem;
+}
+
+.worker-menu__company-income-unit {
+  font-size: 0.85rem;
+}
+
 .worker-menu__total-income {
   display: block;
   font-size: 1.75rem;

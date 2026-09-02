@@ -1,11 +1,27 @@
 import { loadBuildings, type Floor } from "../../gameState";
 import {
   spendFromAllCompanies,
+  spendCompanyTotalIncome,
   getStoredTotalIncome,
   getCompanyIncomeRatePerSecond,
 } from "../../totalIncome";
+import {
+  increaseIncomeRate,
+  unlockFloor,
+  ensureLockedFloorAbove,
+  rollFloorBuyCrit,
+} from "../../floors";
+import {
+  getOfficeChairsCost,
+  getOfficeSuppliesCost,
+  getWorkerCost,
+  getManagerCost,
+  isManagerUnlocked,
+} from "../upgradeMenu";
+import { MAX_RENDERED_WORKERS } from "../../floors";
 import { getCorporationCount } from "../../corporationName";
-import { getBuildingPrice } from "../../buildings";
+import { getBuildingPrice, getBuildingMultiplier } from "../../buildings";
+import { getBackgroundUrls } from "../../loadAssets";
 import {
   companyStorageKey,
   getActiveCompanyIndex,
@@ -240,6 +256,219 @@ function getUpgradesValue(buildings: Floor[][]): number {
 // getCompanyValue below needs this alone, not bundled with buildings cost
 export function getCompanyUpgradesValue(buildings: Floor[][]): number {
   return getUpgradesValue(buildings);
+}
+
+// "Building upgrades" section (Corporation Upgrades dialog): lets the player
+// act on floors scattered across every one of a company's own buildings
+// without having to jump to each building on the map manually, for ANY
+// corporation (not just the active one — see corporationUpgradeMenu/index.ts,
+// which renders one of these sub-sections per company). Every item below
+// (income upgrade, worker, office chairs, office supplies, manager) shares
+// this same "whichever eligible floor is currently CHEAPEST" targeting shape,
+// and every buyCheapest* below spends from THAT company's own wallet via
+// spendCompanyTotalIncome — never assumes the active company
+export interface FloorTarget {
+  floor: Floor;
+  level: number; // 1-indexed position within its own building, for display only
+  buildingIndex: number; // which of buildings[] this floor belongs to
+}
+
+function findCheapestFloorTarget(
+  buildings: Floor[][],
+  isEligible: (floor: Floor) => boolean,
+  getCost: (floor: Floor) => number,
+): FloorTarget | null {
+  let best: FloorTarget | null = null;
+  buildings.forEach((floors, buildingIndex) => {
+    floors.forEach((floor, i) => {
+      if (!isEligible(floor)) return;
+      if (!best || getCost(floor) < getCost(best.floor)) {
+        best = { floor, level: i + 1, buildingIndex };
+      }
+    });
+  });
+  return best;
+}
+
+// targets whichever LOCKED floor (the one waiting to be bought next — see
+// floorLock.ts's ensureLockedFloorAbove, there's always exactly one per
+// building) is currently CHEAPEST to unlock across every one of a company's
+// buildings
+export function getCheapestFloorPurchaseTarget(
+  buildings: Floor[][],
+): FloorTarget | null {
+  return findCheapestFloorTarget(
+    buildings,
+    (floor) => !floor.unlocked,
+    (floor) => floor.unlockCost,
+  );
+}
+
+// spends companyIndex's own total income, unlocks the target floor, rolls the
+// same one-shot permanent crit a normal floor purchase can land (see
+// floorLock.ts's unlockFloor/upgradeButton.ts's rollFloorBuyCrit), and queues
+// that building's own next locked floor above it — same 3-step sequence
+// floorInteractions.ts's hitTestFloorLock click branch runs. notifyFloorAdded
+// is only relevant when the bought building happens to be the one currently
+// on screen (see corporationUpgradeMenu/index.ts's own caller) — every other
+// case is picked up automatically next time that building is switched to.
+// Returns whether it succeeded
+export function buyCheapestFloor(
+  companyIndex: number,
+  buildings: Floor[][],
+  notifyFloorAdded?: (buildingIndex: number, floor: Floor) => void,
+): boolean {
+  const target = getCheapestFloorPurchaseTarget(buildings);
+  if (!target) return false;
+  if (!spendCompanyTotalIncome(companyIndex, target.floor.unlockCost)) {
+    return false;
+  }
+  unlockFloor(target.floor);
+  ensureLockedFloorAbove({
+    floors: buildings[target.buildingIndex],
+    backgroundCount: getBackgroundUrls().length,
+    multiplier: getBuildingMultiplier(target.buildingIndex),
+    onAdd: (floor) => notifyFloorAdded?.(target.buildingIndex, floor),
+  });
+  const buyTier = rollFloorBuyCrit();
+  if (buyTier) target.floor.critMultiplierTier = buyTier;
+  return true;
+}
+
+// targets whichever unlocked floor is currently CHEAPEST to upgrade next (not
+// the lowest-level one — a high floor that's already been upgraded a lot can
+// easily be cheaper right now than a low, never-upgraded floor)
+export function getCheapestUpgradeTarget(
+  buildings: Floor[][],
+): FloorTarget | null {
+  return findCheapestFloorTarget(
+    buildings,
+    (floor) => floor.unlocked,
+    (floor) => floor.upgradeCost,
+  );
+}
+
+// spends companyIndex's own total income (same cost a normal upgrade-button
+// click on that floor would charge) and applies one upgrade tick via the same
+// incomePanel.ts math the canvas button uses. Returns whether it succeeded
+export function buyCheapestUpgrade(
+  companyIndex: number,
+  buildings: Floor[][],
+): boolean {
+  const target = getCheapestUpgradeTarget(buildings);
+  if (!target) return false;
+  if (!spendCompanyTotalIncome(companyIndex, target.floor.upgradeCost)) {
+    return false;
+  }
+  increaseIncomeRate(target.floor);
+  return true;
+}
+
+// targets whichever unlocked, not-yet-maxed floor is currently cheapest to
+// hire another worker for (cost scales with how many workers it already has,
+// see upgradeMenu.ts's getWorkerCost)
+export function getCheapestWorkerTarget(
+  buildings: Floor[][],
+): FloorTarget | null {
+  return findCheapestFloorTarget(
+    buildings,
+    (floor) => floor.unlocked && floor.workerCount < MAX_RENDERED_WORKERS,
+    getWorkerCost,
+  );
+}
+
+export function buyCheapestWorker(
+  companyIndex: number,
+  buildings: Floor[][],
+): boolean {
+  const target = getCheapestWorkerTarget(buildings);
+  if (!target) return false;
+  if (!spendCompanyTotalIncome(companyIndex, getWorkerCost(target.floor))) {
+    return false;
+  }
+  target.floor.workerCount += 1;
+  return true;
+}
+
+// targets whichever unlocked floor WITHOUT office chairs yet is cheapest to
+// buy them for (cost scales with floor level, see upgradeMenu.ts's
+// getOfficeChairsCost). null once every unlocked floor already has chairs,
+// which the caller uses to block the button
+export function getCheapestOfficeChairsTarget(
+  buildings: Floor[][],
+): FloorTarget | null {
+  return findCheapestFloorTarget(
+    buildings,
+    (floor) => floor.unlocked && !floor.hasOfficeChairs,
+    getOfficeChairsCost,
+  );
+}
+
+export function buyCheapestOfficeChairs(
+  companyIndex: number,
+  buildings: Floor[][],
+): boolean {
+  const target = getCheapestOfficeChairsTarget(buildings);
+  if (!target) return false;
+  if (
+    !spendCompanyTotalIncome(companyIndex, getOfficeChairsCost(target.floor))
+  ) {
+    return false;
+  }
+  target.floor.hasOfficeChairs = true;
+  return true;
+}
+
+// same shape as office chairs above, for the office-supplies one-time purchase
+export function getCheapestOfficeSuppliesTarget(
+  buildings: Floor[][],
+): FloorTarget | null {
+  return findCheapestFloorTarget(
+    buildings,
+    (floor) => floor.unlocked && !floor.hasOfficeSupplies,
+    getOfficeSuppliesCost,
+  );
+}
+
+export function buyCheapestOfficeSupplies(
+  companyIndex: number,
+  buildings: Floor[][],
+): boolean {
+  const target = getCheapestOfficeSuppliesTarget(buildings);
+  if (!target) return false;
+  if (
+    !spendCompanyTotalIncome(companyIndex, getOfficeSuppliesCost(target.floor))
+  ) {
+    return false;
+  }
+  target.floor.hasOfficeSupplies = true;
+  return true;
+}
+
+// same shape again, for the manager one-time purchase — additionally gated
+// behind isManagerUnlocked (a floor needs enough upgrades bought first), same
+// requirement upgradeMenu.ts's own per-floor manager item enforces
+export function getCheapestManagerTarget(
+  buildings: Floor[][],
+): FloorTarget | null {
+  return findCheapestFloorTarget(
+    buildings,
+    (floor) => floor.unlocked && !floor.hasManager && isManagerUnlocked(floor),
+    getManagerCost,
+  );
+}
+
+export function buyCheapestManager(
+  companyIndex: number,
+  buildings: Floor[][],
+): boolean {
+  const target = getCheapestManagerTarget(buildings);
+  if (!target) return false;
+  if (!spendCompanyTotalIncome(companyIndex, getManagerCost(target.floor))) {
+    return false;
+  }
+  target.floor.hasManager = true;
+  return true;
 }
 
 // buildings value + upgrades value combined — exported so main.ts can snapshot
