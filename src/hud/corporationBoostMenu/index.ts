@@ -93,19 +93,23 @@ export function wireCorporationBoostMenu(
     const scrollTop = list.scrollTop;
     const managerIconUrl = getManagerIconUrl();
     const count = getCorporationCount();
-    const modifierRows = Array.from({ length: count }, (_, i) => {
-      const pct =
-        getStockContributionPercent(i) + getCompanyBaseModifierPercent(i);
-      return `
+    const modifierRows = Array.from({ length: count }, (_, i) => ({
+      name: getCorporationName(i),
+      pct: getStockContributionPercent(i) + getCompanyBaseModifierPercent(i),
+    }))
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(
+        ({ name, pct }) => `
         <div class="worker-menu__modifier-row">
-          <span>${getCorporationName(i)}</span>
+          <span>${name}</span>
           <span>${formatBoostPercent(pct)}</span>
         </div>
-      `;
-    }).join("");
+      `,
+      )
+      .join("");
     const marketInfluencePct = getMarketInfluencePercent();
     const marketInfluenceRow = `
-      <div class="worker-menu__modifier-row">
+      <div class="worker-menu__modifier-row worker-menu__modifier-row--divider">
         <span>Market influence</span>
         <span>${formatBoostPercent(marketInfluencePct)}</span>
       </div>

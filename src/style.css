@@ -766,6 +766,12 @@ body {
   padding-top: 0.35rem;
 }
 
+.worker-menu__modifier-row--divider {
+  border-bottom: 2px solid var(--color-wood-outline);
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.35rem;
+}
+
 .worker-menu__item {
   display: flex;
   align-items: center;
