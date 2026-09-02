@@ -156,6 +156,7 @@ export function buildFloor(
     hasOfficeChairs: false,
     hasOfficeSupplies: false,
     hasManager: false,
+    critMultiplierTier: null,
   };
 }
 
@@ -275,6 +276,7 @@ export {
   forceCritUpgrade,
   forceMegaCritUpgrade,
   forceUltraCritUpgrade,
+  forceFloorBuyCrit,
   triggerSaleBoost,
   isSaleActive,
   floorIncomePerSecond,

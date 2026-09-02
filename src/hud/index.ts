@@ -113,6 +113,9 @@ export {
   wireSpawnCritButton,
   wireSpawnMegaCritButton,
   wireSpawnUltraCritButton,
+  wireFloorBuyCritButton,
+  wireFloorBuyMegaCritButton,
+  wireFloorBuyUltraCritButton,
   wirePressConferenceTestButton,
   wireResetButton,
 } from "./testButton";

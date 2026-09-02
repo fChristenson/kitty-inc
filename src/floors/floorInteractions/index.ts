@@ -8,6 +8,7 @@ import {
   getCritTier,
   consumeCritUpgrade,
   rollCritUpgrade,
+  rollFloorBuyCrit,
   isSaleActive,
   CRIT_TIER_CONFIG,
   floorIncomePerSecond,
@@ -122,9 +123,16 @@ export function handleFloorClick(
         multiplier,
         onAdd: onFloorAdded,
       });
+      // one-shot roll on the floor actually being bought (never re-rolled) — a hit
+      // permanently multiplies every future upgrade's rate gain on THIS floor (see
+      // incomePanel.ts's increaseIncomeRate) and recolors its bar/button to match.
+      // Rolled before persist() so a hit is captured in the same save
+      const buyTier = rollFloorBuyCrit();
+      if (buyTier) floor.critMultiplierTier = buyTier;
       persist();
       const center = getLockCenter();
       spawnCoinBurst(floor, center.x, center.y, () => {});
+      if (buyTier) triggerCritCelebration(floor, buyTier, getScreenCenterLocal);
     }
     return;
   }
@@ -145,7 +153,7 @@ export function handleFloorClick(
       // each click would permanently raise the rate the next click reads from
       const gained =
         floorIncomePerSecond(floor) *
-        (tier ? CRIT_TIER_CONFIG[tier].saleMultiplier : 1);
+        (tier ? CRIT_TIER_CONFIG[tier].multiplier : 1);
       addTotalIncome(gained);
       rollCritUpgrade(floor);
       persist();
@@ -172,7 +180,7 @@ export function handleFloorClick(
     if (isCritUpgrade(floor)) {
       const tier = getCritTier(floor)!;
       consumeCritUpgrade(floor);
-      const count = CRIT_TIER_CONFIG[tier].count;
+      const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
         applyUpgradeTick(floor, isGroundFloor);
       }

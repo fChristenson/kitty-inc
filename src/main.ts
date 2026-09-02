@@ -10,6 +10,7 @@ import {
   forceCritUpgrade,
   forceMegaCritUpgrade,
   forceUltraCritUpgrade,
+  forceFloorBuyCrit,
   getActiveBackgrounds,
 } from "./floors";
 import {
@@ -44,6 +45,9 @@ import {
   wireSpawnCritButton,
   wireSpawnMegaCritButton,
   wireSpawnUltraCritButton,
+  wireFloorBuyCritButton,
+  wireFloorBuyMegaCritButton,
+  wireFloorBuyUltraCritButton,
   wirePressConferenceTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -316,6 +320,9 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceUltraCritUpgrade(floor);
     });
+    wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
+    wireFloorBuyMegaCritButton(app, () => forceFloorBuyCrit("mega"));
+    wireFloorBuyUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     wireResetButton(app, buildings);
   }

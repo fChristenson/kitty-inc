@@ -1,6 +1,7 @@
 import { FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { countBoostedWorkers, type Floor } from "../../gameState";
 import { MAX_RENDERED_WORKERS } from "../worker";
+import { CRIT_TIER_CONFIG } from "../upgradeButton";
 import {
   drawPill,
   drawPillBorder,
@@ -81,7 +82,13 @@ const OVERSPEED_RAY_TAIL_SEGMENTS = 32;
 const OVERSPEED_RAY_WIDTH = 8;
 
 export function increaseIncomeRate(floor: Floor): void {
-  floor.incomeAmount += floor.rateStep;
+  // a permanently-crited floor (see floorInteractions.ts's rollFloorBuyCrit)
+  // multiplies every upgrade's own rate gain by that tier's multiplier, forever —
+  // distinct from the temporary crit-jackpot's free stacked upgrades
+  const rateMultiplier = floor.critMultiplierTier
+    ? CRIT_TIER_CONFIG[floor.critMultiplierTier].multiplier
+    : 1;
+  floor.incomeAmount += floor.rateStep * rateMultiplier;
   floor.upgradeCost = Math.ceil(floor.upgradeCost * UPGRADE_COST_GROWTH);
   floor.upgradeCount += 1;
   // no MIN_INCOME_INTERVAL_SECONDS clamp here — this stores the floor's true,
@@ -374,20 +381,15 @@ export function drawIncomePanel(
       fillW = Math.max(barMinWidth, barW * pct);
     }
   }
-  drawPill(
-    ctx,
-    barX,
-    barY,
-    fillW,
-    barH,
-    COLOR.moneyGreen,
-    false,
-    true,
-    barRadius,
-  );
+  // a permanently-crited floor's bar matches its own tier color instead of the
+  // usual green, mirroring the upgrade button's own color choice
+  const fillColor = floor.critMultiplierTier
+    ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
+    : COLOR.moneyGreen;
+  drawPill(ctx, barX, barY, fillW, barH, fillColor, false, true, barRadius);
   // ring stroked last, on top of both fills, so it always reads as one continuous
   // black/white/dark-green border around the whole capsule regardless of fill width
-  drawPillBorder(ctx, barX, barY, barW, barH, barRadius, COLOR.moneyGreen);
+  drawPillBorder(ctx, barX, barY, barW, barH, barRadius, fillColor);
   if (overspeed) drawOverspeedRay(ctx, barX, barY, barW, barH, barRadius, now);
 
   // a locked floor's cycle hasn't started (lastCollectedAt is just its creation

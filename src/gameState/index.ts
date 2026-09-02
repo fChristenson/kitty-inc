@@ -59,6 +59,11 @@ export interface Floor {
   hasOfficeChairs: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
   hasOfficeSupplies: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
   hasManager: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
+  // permanent per-floor rate multiplier, rolled once when the floor is bought/
+  // unlocked (see floorInteractions.ts's rollFloorBuyCrit) — never re-rolled or
+  // cleared afterward. Mirrors floors/upgradeButton's CritTier as a plain string
+  // union (not imported) to avoid a gameState<->floors circular import
+  critMultiplierTier: "crit" | "mega" | "ultra" | null;
 }
 
 // gameState.ts is the sole owner of this per-floor data (Floor itself doesn't carry it),
@@ -217,6 +222,7 @@ interface SavedFloor {
   hasOfficeChairs?: boolean; // added after initial release; older saves default to false on load
   hasOfficeSupplies?: boolean; // added after initial release; older saves default to false on load
   hasManager?: boolean; // added after initial release; older saves default to false on load
+  critMultiplierTier?: "crit" | "mega" | "ultra" | null; // added after initial release; older saves default to null on load
 }
 
 export function clearBuildings(companyIndex = 0): void {
@@ -244,6 +250,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
     hasOfficeChairs: floor.hasOfficeChairs,
     hasOfficeSupplies: floor.hasOfficeSupplies,
     hasManager: floor.hasManager,
+    critMultiplierTier: floor.critMultiplierTier,
   };
 }
 
@@ -297,6 +304,7 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     hasOfficeChairs: sf.hasOfficeChairs ?? false,
     hasOfficeSupplies: sf.hasOfficeSupplies ?? false,
     hasManager: sf.hasManager ?? false,
+    critMultiplierTier: sf.critMultiplierTier ?? null,
   };
   workerSlots.set(floor, sf.workers);
   workerTintIndexes.set(floor, sf.tintIndexes ?? sf.spriteIndexes ?? []);

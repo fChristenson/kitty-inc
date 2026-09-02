@@ -90,21 +90,22 @@ export type CritTier = "crit" | "mega" | "ultra";
 // let a stale hardcoded "Sale x5" label slip in once before (see repo memory) and
 // silently drift from the real, tier-scaled payout. Add any FUTURE per-tier value
 // here too, never as a new standalone constant a callsite has to remember to keep
-// in sync
+// in sync. `multiplier` is the one shared x5-per-tier number reused for EVERY
+// tier-scaled reward (upgrade-button free-upgrade count, Sale payout multiplier,
+// and a permanently-crited floor's rate multiplier below) since they're always
+// the same number by design — no separate count/saleMultiplier fields to drift
 export const CRIT_TIER_CONFIG: Record<
   CritTier,
   {
     chance: number; // rolled once per completed upgrade click, see rollCritUpgrade
-    count: number; // free stacked upgrades this tier applies on the upgrade button
-    saleMultiplier: number; // payout multiplier this tier applies during a Sale
+    multiplier: number;
     color: string;
     label: string; // canonical "xN" text — shared by the button AND the flash text
   }
 > = {
   crit: {
     chance: 0.05,
-    count: 5,
-    saleMultiplier: 5,
+    multiplier: 5,
     color: COLOR.purple,
     label: "x5",
   },
@@ -112,26 +113,25 @@ export const CRIT_TIER_CONFIG: Record<
     // ~1 in 100 upgrade clicks — deliberately much rarer than crit's so it reads
     // as a genuine jackpot moment, not just a bigger version of the common crit
     chance: 0.01,
-    count: 25,
-    saleMultiplier: 25,
+    multiplier: 25,
     color: COLOR.starYellow,
     label: "x25",
   },
   ultra: {
     // rarer still than mega's — the true jackpot-of-jackpots moment
     chance: 0.001,
-    count: 125,
-    saleMultiplier: 125,
+    multiplier: 125,
     color: COLOR.red,
     label: "x125",
   },
 };
 
-// back-compat convenience re-exports for callers that just want one tier's count —
-// still sourced from CRIT_TIER_CONFIG above, never a separate hardcoded number
-export const CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.crit.count;
-export const MEGA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.mega.count;
-export const ULTRA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.ultra.count;
+// back-compat convenience re-exports for callers that just want one tier's
+// multiplier — still sourced from CRIT_TIER_CONFIG above, never a separate
+// hardcoded number
+export const CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.crit.multiplier;
+export const MEGA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.mega.multiplier;
+export const ULTRA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.ultra.multiplier;
 
 const critTiers = new WeakMap<Floor, CritTier>();
 
@@ -148,6 +148,31 @@ export function rollCritUpgrade(floor: Floor): void {
   }
   if (Math.random() < CRIT_TIER_CONFIG.crit.chance)
     critTiers.set(floor, "crit");
+}
+
+// same odds/tiers as rollCritUpgrade, but a one-shot roll (not tied to any Floor's
+// "next click" telegraph) for a floor-unlock purchase — see floorInteractions.ts's
+// hitTestFloorLock branch. Returns null on a miss (the common case). A forced tier
+// (see forceFloorBuyCrit below) always wins and is consumed on the very next call
+let forcedFloorBuyCrit: CritTier | null = null;
+
+export function rollFloorBuyCrit(): CritTier | null {
+  if (forcedFloorBuyCrit) {
+    const tier = forcedFloorBuyCrit;
+    forcedFloorBuyCrit = null;
+    return tier;
+  }
+  if (Math.random() < CRIT_TIER_CONFIG.ultra.chance) return "ultra";
+  if (Math.random() < CRIT_TIER_CONFIG.mega.chance) return "mega";
+  if (Math.random() < CRIT_TIER_CONFIG.crit.chance) return "crit";
+  return null;
+}
+
+// dev/test-only: guarantees the NEXT floor bought crits at this tier, bypassing
+// chance entirely (see hud/testButton's "Floor Crit"/"Floor Mega Crit"/"Floor
+// Ultra Crit")
+export function forceFloorBuyCrit(tier: CritTier): void {
+  forcedFloorBuyCrit = tier;
 }
 
 export function getCritTier(floor: Floor): CritTier | null {
@@ -184,7 +209,7 @@ export function forceUltraCritUpgrade(floor: Floor): void {
 // a crit and clicking it is free. A crit can still roll during a sale (see
 // floorInteractions/index.ts); rather than stacking upgrades as usual, it
 // multiplies that click's sale payout by the rolled tier's own
-// CRIT_TIER_CONFIG[tier].saleMultiplier
+// CRIT_TIER_CONFIG[tier].multiplier
 export const SALE_DURATION_MS = 15_000;
 // each sale click pays out floorIncomePerSecond(floor) below (1 second of that
 // floor's own income), credited straight to the player's total — hud/boostMenu's
@@ -256,9 +281,11 @@ export function drawUpgradeButton(
       ? CRIT_TIER_CONFIG[critTier!].color
       : sale
         ? COLOR.amber
-        : affordable
-          ? COLOR.moneyGreen
-          : COLOR.disabledGray,
+        : floor.critMultiplierTier
+          ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
+          : affordable
+            ? COLOR.moneyGreen
+            : COLOR.disabledGray,
     true,
     true,
     40,
@@ -269,7 +296,7 @@ export function drawUpgradeButton(
   ctx.textBaseline = "middle";
   const label = sale
     ? crit
-      ? `Sale x${CRIT_TIER_CONFIG[critTier!].saleMultiplier}`
+      ? `Sale x${CRIT_TIER_CONFIG[critTier!].multiplier}`
       : "Sale"
     : crit
       ? CRIT_TIER_CONFIG[critTier!].label
