@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "process:backgrounds": "node scripts/process-background-floors.mjs",
     "process:favicon": "node scripts/process-favicon.mjs",
-    "process:manager-icon": "node scripts/process-manager-icon.mjs"
+    "process:manager-icon": "node scripts/process-manager-icon.mjs",
+    "process:pwa-icons": "node scripts/process-pwa-icons.mjs"
   },
   "devDependencies": {
     "sharp": "^0.35.3",
