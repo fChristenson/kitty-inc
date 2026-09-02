@@ -2,7 +2,7 @@
 // picked up immediately when online), stale-while-revalidate for everything else
 // (so already-visited assets still render instantly offline/on flaky mobile networks).
 // Bump CACHE_NAME whenever this file's own strategy changes, to drop any stale cache.
-const CACHE_NAME = "kitty-inc-v2";
+const CACHE_NAME = "kitty-inc-v3";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -42,11 +42,16 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
           return response;
         })
-        .catch(() =>
-          caches
-            .match(request)
-            .then((cached) => cached ?? caches.match(self.registration.scope)),
-        ),
+        .catch(async () => {
+          const cached =
+            (await caches.match(request)) ??
+            (await caches.match(self.registration.scope));
+          // a Response must always be returned here, even if nothing was ever
+          // cached (e.g. the very first offline load) — resolving to undefined
+          // throws "Failed to convert value to 'Response'" and breaks the whole
+          // navigation instead of just failing gracefully
+          return cached ?? Response.error();
+        }),
     );
     return;
   }
@@ -61,7 +66,7 @@ self.addEventListener("fetch", (event) => {
           }
           return response;
         })
-        .catch(() => cached);
+        .catch(() => cached ?? Response.error());
       return cached ?? network;
     }),
   );

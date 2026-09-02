@@ -269,6 +269,8 @@ export {
   rollCritUpgrade,
   isCritUpgrade,
   forceCritUpgrade,
+  forceMegaCritUpgrade,
+  forceUltraCritUpgrade,
   triggerSaleBoost,
   isSaleActive,
   floorIncomePerSecond,

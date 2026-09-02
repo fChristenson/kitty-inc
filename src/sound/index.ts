@@ -5,6 +5,8 @@ import soldUrl from "../assets/sound/sold.mp3";
 import bloopUrl from "../assets/sound/bloop.mp3";
 import explosionUrl from "../assets/sound/explosion.mp3";
 import bubbleUrl from "../assets/sound/bubble.wav";
+import winUrl from "../assets/sound/win.wav";
+import payoutUrl from "../assets/sound/payout.wav";
 
 const MUSIC_VOLUME = 0.4;
 const SFX_VOLUME = 0.9;
@@ -32,6 +34,14 @@ let lastCoinDropPlayTime = 0;
 // playing, that's what actually overloaded into noise, not any one sound alone
 const EXPLOSION_DEBOUNCE_MS = 800;
 let lastExplosionPlayTime = 0;
+
+// same idea as EXPLOSION_DEBOUNCE_MS, for the rarer mega-crit jackpot layered sfx
+const JACKPOT_DEBOUNCE_MS = 800;
+let lastJackpotPlayTime = 0;
+
+// same idea again, for the even rarer ultra-crit payout sfx
+const PAYOUT_DEBOUNCE_MS = 800;
+let lastPayoutPlayTime = 0;
 
 // any press-and-hold-driven purchase loop (corporationBoostMenu's stock-raise
 // hold, etc.) can call this many times a second — without a debounce, each of
@@ -82,6 +92,8 @@ const sfxUrls = {
   explosion: explosionUrl,
   bloop: bloopUrl,
   bubble: bubbleUrl,
+  win: winUrl,
+  payout: payoutUrl,
 } as const;
 type SfxName = keyof typeof sfxUrls;
 
@@ -112,15 +124,22 @@ export function preloadSounds(): void {
 }
 
 // plays a preloaded SFX buffer starting offsetSeconds into it (0 = from the very
-// start) at the given linear volume — fire-and-forget, a fresh BufferSource node
-// per call since each one can only ever be started once
-function playSfx(name: SfxName, volume: number, offsetSeconds = 0): void {
+// start) at the given linear volume and playbackRate (1 = unchanged pitch/speed) —
+// fire-and-forget, a fresh BufferSource node per call since each one can only ever
+// be started once
+function playSfx(
+  name: SfxName,
+  volume: number,
+  offsetSeconds = 0,
+  rate = 1,
+): void {
   const ctx = getAudioContext();
   if (!ctx) return;
   loadSfxBuffer(ctx, name)
     .then((buffer) => {
       const source = ctx.createBufferSource();
       source.buffer = buffer;
+      source.playbackRate.value = rate;
       const gain = ctx.createGain();
       gain.gain.value = volume;
       source.connect(gain);
@@ -201,6 +220,26 @@ export function playBloop(): void {
   if (now - lastBloopPlayTime < BLOOP_DEBOUNCE_MS) return;
   lastBloopPlayTime = now;
   playSfx("bloop", SFX_VOLUME);
+}
+
+// one-shot sound effect for the rare mega-crit "JACKPOT!" moment (see
+// floorInteractions.ts). Debounced (see JACKPOT_DEBOUNCE_MS) so back-to-back mega
+// crits during a fast held click can't stack overlapping plays
+export function playJackpot(): void {
+  const now = Date.now();
+  if (now - lastJackpotPlayTime < JACKPOT_DEBOUNCE_MS) return;
+  lastJackpotPlayTime = now;
+  playSfx("win", SFX_VOLUME);
+}
+
+// one-shot sound effect for the even rarer ultra-crit moment (see
+// floorInteractions.ts). Debounced (see PAYOUT_DEBOUNCE_MS) so back-to-back ultra
+// crits during a fast held click can't stack overlapping plays
+export function playPayout(): void {
+  const now = Date.now();
+  if (now - lastPayoutPlayTime < PAYOUT_DEBOUNCE_MS) return;
+  lastPayoutPlayTime = now;
+  playSfx("payout", SFX_VOLUME);
 }
 
 // one-shot sound effect for hud/pressConferenceGame's own flap — its own

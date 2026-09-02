@@ -76,32 +76,86 @@ function pressScale(floor: Floor, now: number): number {
 }
 
 // "crit" upgrade: a rare, free, oversized upgrade — the slot-machine jackpot moment.
-// Rolled once per completed upgrade click (see floorInteractions/index.ts's
-// rollCritUpgrade calls); while active, this floor's button turns purple, wiggles,
-// and shows "x2" instead of its price. Clicking it costs nothing and instantly
-// applies CRIT_UPGRADE_COUNT normal upgrades at once.
+// Three tiers (a variable-ratio reward schedule, not a flat one) roll independently
+// each completed upgrade click (see floorInteractions/index.ts's rollCritUpgrade
+// calls) — rarest ("ultra") is checked first, then "mega", then "crit", so a click
+// can never land more than one at once. While active, this floor's button recolors,
+// wiggles, and shows "xN" instead of its price; clicking it costs nothing and
+// instantly applies that tier's upgrade count at once.
+export type CritTier = "crit" | "mega" | "ultra";
+
 const CRIT_CHANCE = 0.05;
+// ~1 in 250 upgrade clicks — deliberately much rarer than CRIT_CHANCE so it reads
+// as a genuine jackpot moment, not just a bigger version of the common crit
+const MEGA_CRIT_CHANCE = 0.01;
+// rarer still than MEGA_CRIT_CHANCE — the true jackpot-of-jackpots moment
+const ULTRA_CRIT_CHANCE = 0.001;
 export const CRIT_UPGRADE_COUNT = 5;
-const critFloors = new WeakSet<Floor>();
+export const MEGA_CRIT_UPGRADE_COUNT = CRIT_UPGRADE_COUNT * 5;
+export const ULTRA_CRIT_UPGRADE_COUNT = MEGA_CRIT_UPGRADE_COUNT * 5;
+
+const CRIT_TIER_INFO: Record<
+  CritTier,
+  { count: number; color: string; label: string }
+> = {
+  crit: {
+    count: CRIT_UPGRADE_COUNT,
+    color: COLOR.purple,
+    label: `x${CRIT_UPGRADE_COUNT}`,
+  },
+  mega: {
+    count: MEGA_CRIT_UPGRADE_COUNT,
+    color: COLOR.starYellow,
+    label: `x${MEGA_CRIT_UPGRADE_COUNT}`,
+  },
+  ultra: {
+    count: ULTRA_CRIT_UPGRADE_COUNT,
+    color: COLOR.red,
+    label: `x${ULTRA_CRIT_UPGRADE_COUNT}`,
+  },
+};
+
+const critTiers = new WeakMap<Floor, CritTier>();
 
 // call once per completed upgrade click (crit or normal) to roll the next one
 export function rollCritUpgrade(floor: Floor): void {
-  if (Math.random() < CRIT_CHANCE) critFloors.add(floor);
+  if (Math.random() < ULTRA_CRIT_CHANCE) {
+    critTiers.set(floor, "ultra");
+    return;
+  }
+  if (Math.random() < MEGA_CRIT_CHANCE) {
+    critTiers.set(floor, "mega");
+    return;
+  }
+  if (Math.random() < CRIT_CHANCE) critTiers.set(floor, "crit");
+}
+
+export function getCritTier(floor: Floor): CritTier | null {
+  return critTiers.get(floor) ?? null;
 }
 
 export function isCritUpgrade(floor: Floor): boolean {
-  return critFloors.has(floor);
+  return critTiers.has(floor);
 }
 
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
-  critFloors.delete(floor);
+  critTiers.delete(floor);
 }
 
-// dev/test-only: force this floor's button into the crit state right away,
-// bypassing CRIT_CHANCE entirely (see hud/testButton's "Spawn Crit" button)
+// dev/test-only: force this floor's button into a crit state right away,
+// bypassing chance entirely (see hud/testButton's "Spawn Crit"/"Spawn Mega Crit"/
+// "Spawn Ultra Crit")
 export function forceCritUpgrade(floor: Floor): void {
-  critFloors.add(floor);
+  critTiers.set(floor, "crit");
+}
+
+export function forceMegaCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "mega");
+}
+
+export function forceUltraCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "ultra");
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see
@@ -151,7 +205,8 @@ export function drawUpgradeButton(
   const cy = y + BTN_H / 2;
   const now = Date.now();
   const scale = pressScale(floor, now);
-  const crit = isCritUpgrade(floor);
+  const critTier = getCritTier(floor);
+  const crit = critTier !== null;
   const sale = isSaleActive(floor, now);
 
   ctx.save();
@@ -179,7 +234,7 @@ export function drawUpgradeButton(
     BTN_W,
     BTN_H,
     crit
-      ? COLOR.purple
+      ? CRIT_TIER_INFO[critTier!].color
       : sale
         ? COLOR.amber
         : affordable
@@ -198,7 +253,7 @@ export function drawUpgradeButton(
       ? `Sale x${SALE_CRIT_MULTIPLIER}`
       : "Sale"
     : crit
-      ? `x${CRIT_UPGRADE_COUNT}`
+      ? CRIT_TIER_INFO[critTier!].label
       : formatPrice(cost);
   drawCartoonText(ctx, label, cx, cy);
   ctx.restore();

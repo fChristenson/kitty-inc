@@ -8,6 +8,8 @@ import {
   startIncomeTicker,
   ensureLockedFloorAbove,
   forceCritUpgrade,
+  forceMegaCritUpgrade,
+  forceUltraCritUpgrade,
   getActiveBackgrounds,
 } from "./floors";
 import {
@@ -40,6 +42,8 @@ import {
   wireTestButton,
   wireSpawnMouseButton,
   wireSpawnCritButton,
+  wireSpawnMegaCritButton,
+  wireSpawnUltraCritButton,
   wirePressConferenceTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -304,6 +308,14 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceCritUpgrade(floor);
     });
+    wireSpawnMegaCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceMegaCritUpgrade(floor);
+    });
+    wireSpawnUltraCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceUltraCritUpgrade(floor);
+    });
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     wireResetButton(app, buildings);
   }
@@ -466,11 +478,14 @@ async function main() {
 
 main();
 
-// registers the offline/installable-app shell (public/sw.js) — production-only so a
-// dev-server reload never serves a stale cached bundle; BASE_URL already carries the
-// "/kitty-inc/" GitHub Pages prefix (see vite.config.ts), so this resolves correctly
-// both in dev ("/") and once deployed
-if ("serviceWorker" in navigator && import.meta.env.MODE === "production") {
+// registers the offline/installable-app shell (public/sw.js) — gated on
+// !import.meta.hot rather than MODE, since "npm run dev:prod" (MODE=production)
+// is STILL vite's dev server with HMR, not a real build; import.meta.hot only
+// exists under any Vite dev server (regardless of --mode), so this is the one
+// check that's actually true exclusively for genuinely built/served dist output.
+// BASE_URL already carries the "/kitty-inc/" GitHub Pages prefix (see
+// vite.config.ts), so this resolves correctly once deployed
+if ("serviceWorker" in navigator && !import.meta.hot) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register(`${import.meta.env.BASE_URL}sw.js`)
