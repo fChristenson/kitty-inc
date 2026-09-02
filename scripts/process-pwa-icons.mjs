@@ -20,7 +20,10 @@ const CONTENT_FRACTION = 0.65;
 async function renderPaddedIcon(size, background) {
   const contentSize = Math.round(size * CONTENT_FRACTION);
   const content = await sharp(src)
-    .resize(contentSize, contentSize, { fit: "contain", background: TRANSPARENT })
+    .resize(contentSize, contentSize, {
+      fit: "contain",
+      background: TRANSPARENT,
+    })
     .png()
     .toBuffer();
 

@@ -2,7 +2,7 @@
 // picked up immediately when online), stale-while-revalidate for everything else
 // (so already-visited assets still render instantly offline/on flaky mobile networks).
 // Bump CACHE_NAME whenever this file's own strategy changes, to drop any stale cache.
-const CACHE_NAME = "kitty-inc-v1";
+const CACHE_NAME = "kitty-inc-v2";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
