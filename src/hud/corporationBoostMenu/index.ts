@@ -146,7 +146,7 @@ export function wireCorporationBoostMenu(
     list.innerHTML = `
       <h3 class="worker-menu__subheader">Corporation assets</h3>
       <span class="worker-menu__total-income">${formatTotalIncomeFull(allCompaniesTotalIncome)}</span>
-      <h3 class="worker-menu__subheader">I  ncome modifiers</h3>
+      <h3 class="worker-menu__subheader">Income modifiers</h3>
       ${marketInfluenceRow}
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
