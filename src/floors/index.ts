@@ -259,6 +259,7 @@ export {
   ensureLockedFloorAbove,
   unlockFloor,
   drawFloorLock,
+  MAX_FLOORS_PER_BUILDING,
 } from "./floorLock";
 export {
   drawCoins,

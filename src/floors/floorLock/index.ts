@@ -71,6 +71,10 @@ interface EnsureLockedFloorDeps {
   onAdd: (floor: Floor) => void;
 }
 
+// hard ceiling on how tall any one building can grow — shown as an "X/20"
+// indicator under each building's own map marker (see cityMap/markers.ts)
+export const MAX_FLOORS_PER_BUILDING = 20;
+
 // the real (non-test) way the building grows: there must always be exactly one
 // locked floor waiting above the topmost unlocked floor, ready to be bought next.
 // each floor is a real, fixed-size DOM canvas now, so adding one is just adding an
@@ -78,6 +82,7 @@ interface EnsureLockedFloorDeps {
 export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
   const top = deps.floors[deps.floors.length - 1];
   if (top && !top.unlocked) return; // a locked floor is already waiting
+  if (deps.floors.length >= MAX_FLOORS_PER_BUILDING) return; // building's already at its cap
 
   const floor = buildFloor(deps.floors.length + 1, {
     backgroundCount: deps.backgroundCount,

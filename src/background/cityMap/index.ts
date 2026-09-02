@@ -19,10 +19,12 @@ import {
   hitTestAnyMarker,
   drawCatMarker,
   drawLockedMarkerPrice,
+  drawMarkerFloorCount,
   triggerMarkerJump,
   getMarkerJumpOffset,
   MARKER_COIN_BURST_SCALE,
 } from "./markers";
+import { MAX_FLOORS_PER_BUILDING } from "../../floors";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
@@ -61,6 +63,7 @@ export interface CityMapDeps {
   getTotalIncome: () => BigNumber;
   getBuildingCount: () => number; // buildings unlocked so far; building 1 exists once this is >= 2
   getActiveBuildingIndex: () => number; // whichever building's floors are on screen right now
+  getBuildingFloorCount: (buildingIndex: number) => number; // for the "X/20" marker readout
   buyBuilding: () => boolean; // unlocks building 1 if affordable
   onSelectBuilding: (index: number) => void; // switch to that building and leave the map view
   // fires once the corporation barrel roll settles on a different company (see
@@ -309,6 +312,14 @@ export function createCityMapView(
               ? pose
               : CAT_STAND_FRAME;
         drawCatMarker(ctx, cssW, cssH, catSprite, i, frame, false, jumpOffsetY);
+        const { cx, feetY } = markerCenter(cssW, cssH, i);
+        drawMarkerFloorCount(
+          ctx,
+          cx,
+          feetY,
+          deps.getBuildingFloorCount(globalIndex),
+          MAX_FLOORS_PER_BUILDING,
+        );
         continue;
       }
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);

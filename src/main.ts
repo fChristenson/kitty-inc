@@ -414,6 +414,8 @@ async function main() {
     getTotalIncome,
     getBuildingCount: () => buildings.length,
     getActiveBuildingIndex: () => activeBuildingIndex,
+    getBuildingFloorCount: (buildingIndex) =>
+      buildings[buildingIndex]?.length ?? 0,
     buyBuilding,
     onSelectBuilding: (index) => {
       goToBuilding(index);

@@ -217,8 +217,9 @@ export function drawLockedMarkerPrice(
   ctx.textAlign = "center";
   ctx.textBaseline = "bottom";
   // 8px above the cat's own actual visible head (not the sprite frame's own
-  // top edge, which is mostly transparent padding — see CAT_CONTENT_TOP_FRACTION)
-  const priceY = feetY - MARKER_H * (1 - CAT_CONTENT_TOP_FRACTION) - 8;
+  // top edge, which is mostly transparent padding — see CAT_CONTENT_TOP_FRACTION),
+  // nudged another 20px further up
+  const priceY = feetY - MARKER_H * (1 - CAT_CONTENT_TOP_FRACTION) - 8 - 20;
   if (!affordable) {
     drawCartoonText(ctx, formatPrice(price), cx, priceY, COLOR.white);
     return;
@@ -230,4 +231,25 @@ export function drawLockedMarkerPrice(
   ctx.scale(scaleX, scaleY);
   drawCartoonText(ctx, formatPrice(price), 0, 0, COLOR.white);
   ctx.restore();
+}
+
+// "3/20" floor-count readout under an already-bought building's own marker —
+// how many of MAX_FLOORS_PER_BUILDING (floors/floorLock.ts) it's grown to
+export function drawMarkerFloorCount(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  feetY: number,
+  floorCount: number,
+  maxFloors: number,
+): void {
+  ctx.font = '900 14px "Fredoka", system-ui, sans-serif';
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  drawCartoonText(
+    ctx,
+    `${floorCount}/${maxFloors}`,
+    cx,
+    feetY + 4,
+    COLOR.white,
+  );
 }
