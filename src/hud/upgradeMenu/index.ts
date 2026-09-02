@@ -105,6 +105,148 @@ export function buyManager(floor: Floor): boolean {
   return true;
 }
 
+function countRemaining(
+  floors: Floor[],
+  isEligible: (floor: Floor) => boolean,
+): number {
+  return floors.filter((floor) => floor.unlocked && isEligible(floor)).length;
+}
+
+function findNextEligibleFloor(
+  floors: Floor[],
+  isEligible: (floor: Floor) => boolean,
+): Floor | null {
+  return floors.find((floor) => floor.unlocked && isEligible(floor)) ?? null;
+}
+
+// buys this one-time upgrade floor by floor from the ground up, stopping the
+// moment one is unaffordable — every floor above it costs at least as much
+// (unlockCost only ever increases with floor level), so there's no point
+// skipping ahead to check a pricier floor. Returns whether at least one bought
+function massBuyOneTime(
+  floors: Floor[],
+  isEligible: (floor: Floor) => boolean,
+  buy: (floor: Floor) => boolean,
+): boolean {
+  let boughtAny = false;
+  for (const floor of floors) {
+    if (!floor.unlocked || !isEligible(floor)) continue;
+    if (!buy(floor)) break;
+    boughtAny = true;
+  }
+  return boughtAny;
+}
+
+// same floor-order sweep as massBuyOneTime, but a single floor can take more
+// than one worker (up to MAX_RENDERED_WORKERS) before moving to the next
+function massHireWorkers(floors: Floor[]): boolean {
+  let boughtAny = false;
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    while (floor.workerCount < MAX_RENDERED_WORKERS) {
+      if (!buyWorker(floor)) return boughtAny;
+      boughtAny = true;
+    }
+  }
+  return boughtAny;
+}
+
+interface MassActionDef {
+  action: string;
+  iconUrl: string | null;
+  label: string;
+  isEligible: (floor: Floor) => boolean;
+  getCost: (floor: Floor) => BigNumber;
+  massBuy: (floors: Floor[]) => boolean;
+}
+
+// icons recomputed fresh each call (cheap cache lookups), same as the
+// per-floor render below, since they reflect whichever building's sprite
+// theme is currently loaded
+function getMassActionDefs(): MassActionDef[] {
+  return [
+    {
+      action: "workers",
+      iconUrl: getWorkerIconUrl(),
+      label: "Mass hire workers",
+      isEligible: (floor) => floor.workerCount < MAX_RENDERED_WORKERS,
+      getCost: getWorkerCost,
+      massBuy: massHireWorkers,
+    },
+    {
+      action: "chairs",
+      iconUrl: officeChairsIconUrl,
+      label: "Bulk buy office chairs",
+      isEligible: (floor) => !floor.hasOfficeChairs,
+      getCost: getOfficeChairsCost,
+      massBuy: (floors) =>
+        massBuyOneTime(
+          floors,
+          (floor) => !floor.hasOfficeChairs,
+          buyOfficeChairs,
+        ),
+    },
+    {
+      action: "supplies",
+      iconUrl: officeSuppliesIconUrl,
+      label: "Bulk buy office supplies",
+      isEligible: (floor) => !floor.hasOfficeSupplies,
+      getCost: getOfficeSuppliesCost,
+      massBuy: (floors) =>
+        massBuyOneTime(
+          floors,
+          (floor) => !floor.hasOfficeSupplies,
+          buyOfficeSupplies,
+        ),
+    },
+    {
+      action: "managers",
+      iconUrl: getManagerIconUrl(),
+      label: "Mass hire managers",
+      isEligible: (floor) => !floor.hasManager && isManagerUnlocked(floor),
+      getCost: getManagerCost,
+      massBuy: (floors) =>
+        massBuyOneTime(
+          floors,
+          (floor) => !floor.hasManager && isManagerUnlocked(floor),
+          buyManager,
+        ),
+    },
+  ];
+}
+
+// one "bulk"/"mass" row acting across every floor of the current building at
+// once, from the ground floor up (see massBuyOneTime/massHireWorkers) — shows
+// how many eligible floors still need it instead of a single $ price, since
+// no one price could represent the whole run
+function massActionItemMarkup(def: MassActionDef, floors: Floor[]): string {
+  const remaining = countRemaining(floors, def.isEligible);
+  const nextFloor = findNextEligibleFloor(floors, def.isEligible);
+  const affordable =
+    !!nextFloor && gte(getTotalIncome(), def.getCost(nextFloor));
+  const priceText = remaining > 0 ? `x${remaining} left` : "Done";
+  return `
+    <button
+      class="worker-menu__item"
+      data-mass-action="${def.action}"
+      ${remaining > 0 && affordable ? "" : "disabled"}
+    >
+      <span class="worker-menu__item-label">
+        <img src="${def.iconUrl}" class="worker-menu__icon" alt="" />
+        ${def.label}
+      </span>
+      <span class="worker-menu__price">${priceText}</span>
+    </button>
+  `;
+}
+
+function massActionsMarkup(floors: Floor[]): string {
+  const rows = getMassActionDefs()
+    .map((def) => massActionItemMarkup(def, floors))
+    .join("");
+  return `<h3 class="worker-menu__subheader">Bulk actions</h3>${rows}`;
+}
+
 export function createUpgradeMenuMarkup(): string {
   return `
     <div class="worker-menu" id="upgrade-menu" hidden>
@@ -234,11 +376,27 @@ export function wireUpgradeMenu(
         );
       })
       .join("");
-    list.innerHTML = floorItems;
+    list.innerHTML = massActionsMarkup(floors) + floorItems;
   }
 
   list.addEventListener("click", async (event) => {
     const target = event.target as HTMLElement;
+    const massButton = target.closest<HTMLButtonElement>(
+      "button[data-mass-action]",
+    );
+    if (massButton) {
+      const floors = getFloors();
+      const def = getMassActionDefs().find(
+        (d) => d.action === massButton.dataset.massAction,
+      );
+      if (def && def.massBuy(floors)) {
+        playSold();
+        await triggerButtonPress(massButton);
+        onPurchase();
+        render();
+      }
+      return;
+    }
     const workerButton = target.closest<HTMLButtonElement>(
       "button[data-floor-index]",
     );
@@ -299,6 +457,18 @@ export function wireUpgradeMenu(
   // list) so a button already gone gray for being too expensive turns clickable again
   // as soon as income catches up, instead of only refreshing on the next open/purchase
   function updateAffordability(): void {
+    const floors = getFloors();
+    list
+      .querySelectorAll<HTMLButtonElement>("button[data-mass-action]")
+      .forEach((button) => {
+        const def = getMassActionDefs().find(
+          (d) => d.action === button.dataset.massAction,
+        );
+        if (!def) return;
+        const nextFloor = findNextEligibleFloor(floors, def.isEligible);
+        button.disabled =
+          !nextFloor || lt(getTotalIncome(), def.getCost(nextFloor));
+      });
     list
       .querySelectorAll<HTMLButtonElement>("button[data-floor-index]")
       .forEach((button) => {
