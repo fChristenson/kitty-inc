@@ -2,6 +2,7 @@ import { buildFloor } from "..";
 import { FLOOR_W, FLOOR_H } from "../constants";
 import type { Floor } from "../../gameState";
 import { drawCartoonText, formatPrice } from "../../utils";
+import { getWiggleRotation } from "../../shared/wiggle";
 
 // invisible clickable region for the unlock cost, centered over the floor slab
 const PANEL_W = 280;
@@ -26,7 +27,17 @@ export function drawFloorLock(
   ctx.font = '900 96px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  drawCartoonText(ctx, formatPrice(floor.unlockCost), FLOOR_W / 2, FLOOR_H / 2);
+  // same idle wiggle every crit/sale button uses — draws attention to the price
+  // without needing a click first
+  const cx = FLOOR_W / 2;
+  const cy = FLOOR_H / 2;
+  const now = Date.now();
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(getWiggleRotation(now));
+  ctx.translate(-cx, -cy);
+  drawCartoonText(ctx, formatPrice(floor.unlockCost), cx, cy);
+  ctx.restore();
 }
 
 // whether a floor-local canvas point falls on a locked floor's unlock panel
