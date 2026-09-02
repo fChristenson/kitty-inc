@@ -9,11 +9,8 @@ import {
   consumeCritUpgrade,
   rollCritUpgrade,
   isSaleActive,
-  SALE_CRIT_MULTIPLIER,
+  CRIT_TIER_CONFIG,
   floorIncomePerSecond,
-  CRIT_UPGRADE_COUNT,
-  MEGA_CRIT_UPGRADE_COUNT,
-  ULTRA_CRIT_UPGRADE_COUNT,
   BTN_W,
   BTN_H,
 } from "../upgradeButton";
@@ -27,16 +24,7 @@ import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
 import { spawnIncomeFloatText } from "../incomeFloatText";
 import { getUpgradeIndicatorCenter } from "../star";
-import {
-  playSold,
-  playBloop,
-  playCoinDrop,
-  playExplosion,
-  playJackpot,
-  playPayout,
-} from "../../sound";
-import { triggerScreenShake } from "../../screenShake";
-import { COLOR } from "../../palette";
+import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
   hitTestFloorLock,
   unlockFloor,
@@ -44,6 +32,7 @@ import {
   getLockCenter,
 } from "../floorLock";
 import { activateBoosted, type Floor } from "../../gameState";
+import { triggerCritCelebration } from "./critCelebration";
 
 export interface FloorActionsDeps {
   floors: Floor[];
@@ -144,27 +133,25 @@ export function handleFloorClick(
     // "Sale" boost: free clicks that add upgradeCount straight to incomeAmount,
     // instead of the normal cost/rateStep math — takes priority over the crit
     // branch below so a crit rolled during a sale just multiplies this payout
-    // (SALE_CRIT_MULTIPLIER) rather than triggering the big crit celebration
+    // (see CRIT_TIER_CONFIG's saleMultiplier) rather than stacking free upgrades.
+    // Tier-aware (mega/ultra get their own bigger multiplier + celebration, not
+    // just a flat crit-sized bump) via the same triggerCritCelebration every
+    // upgrade-click crit uses
     if (isSaleActive(floor, Date.now())) {
-      const crit = isCritUpgrade(floor);
-      if (crit) consumeCritUpgrade(floor);
+      const tier = getCritTier(floor);
+      if (tier) consumeCritUpgrade(floor);
       // 1 second of the floor's own current income rate, credited straight to
       // the player's total — never added back into floor.incomeAmount itself, or
       // each click would permanently raise the rate the next click reads from
       const gained =
-        floorIncomePerSecond(floor) * (crit ? SALE_CRIT_MULTIPLIER : 1);
+        floorIncomePerSecond(floor) *
+        (tier ? CRIT_TIER_CONFIG[tier].saleMultiplier : 1);
       addTotalIncome(gained);
       rollCritUpgrade(floor);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
-      // still gets the same shake/"CRIT!" flash weight as a normal crit, just not
-      // the extra multi-burst celebration below (this payout is already smaller,
-      // a flat multiplier rather than CRIT_UPGRADE_COUNT stacked upgrades)
-      if (crit) {
-        triggerScreenShake();
-        playExplosion();
-      }
+      if (tier) triggerCritCelebration(floor, tier, getScreenCenterLocal);
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
       const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
@@ -174,152 +161,24 @@ export function handleFloorClick(
         center.x,
         center.y,
         `+${formatPrice(gained)}`,
-        crit,
+        tier !== null,
       );
       return;
     }
     // the slot-machine jackpot moment: free, costs nothing, applies that tier's
-    // upgrade count at once, and shakes the whole screen for weight — mega/ultra are
-    // the rarer, bigger-payout tiers (see upgradeButton.ts's rollCritUpgrade), each
-    // scaled up further in every dimension (shake, flash, sfx, burst count) rather
-    // than just recolored
+    // upgrade count at once, and celebrates with the same shake/flash/sfx/bursts
+    // treatment as any other crit (see triggerCritCelebration) — mega/ultra are
+    // the rarer, bigger-payout tiers (see upgradeButton.ts's rollCritUpgrade)
     if (isCritUpgrade(floor)) {
       const tier = getCritTier(floor)!;
-      const isMega = tier === "mega";
-      const isUltra = tier === "ultra";
       consumeCritUpgrade(floor);
-      const count = isUltra
-        ? ULTRA_CRIT_UPGRADE_COUNT
-        : isMega
-          ? MEGA_CRIT_UPGRADE_COUNT
-          : CRIT_UPGRADE_COUNT;
+      const count = CRIT_TIER_CONFIG[tier].count;
       for (let i = 0; i < count; i++) {
         applyUpgradeTick(floor, isGroundFloor);
       }
       persist();
       triggerButtonPress(floor);
-      if (isUltra) {
-        // blinkHz strobes the flash text on/off during its holdMs "stick" phase, on
-        // top of its regular grow/fade animation — payout.wav is ~3s long, so this
-        // sticks around for 5s (a bit longer than the sound) so it's still visibly
-        // celebrating just after the sound itself has finished.
-        // priority 2 is the highest tier, so it can never be cut off early by a
-        // mega/crit rolling moments later (see triggerScreenShake's own suppression)
-        triggerScreenShake({
-          intensity: 2.6,
-          label: `x${ULTRA_CRIT_UPGRADE_COUNT}`,
-          color: COLOR.red,
-          strokeWidth: 16,
-          blinkHz: 6,
-          holdMs: 3000,
-          priority: 2,
-        });
-        playPayout();
-      } else if (isMega) {
-        // priority 1: can interrupt a plain crit's flash, but never an in-progress
-        // ultra celebration (priority 2)
-        triggerScreenShake({
-          intensity: 1.8,
-          label: `x${MEGA_CRIT_UPGRADE_COUNT}`,
-          color: COLOR.amber,
-          strokeWidth: 14,
-          priority: 1,
-        });
-        playJackpot();
-      } else {
-        // priority 0 (the default): the only tier that can ever get suppressed by
-        // a still-playing mega/ultra flash, so those bigger moments are never
-        // stepped on by an immediately-following ordinary crit
-        triggerScreenShake({ label: `x${CRIT_UPGRADE_COUNT}` });
-        playCoinDrop();
-        playExplosion();
-      }
-      // bursts on top of applyUpgradeTick's own per-click ones, so the celebration
-      // keeps erupting for as long as the flash/shake animation plays out. First one
-      // is dead center (matching the flash text) at 0s; the rest are staggered
-      // outward so they read as separate pops, not one simultaneous burst. Each
-      // tier up gets more bursts spread wider/longer, matching its bigger
-      // shake/flash duration. Re-read fresh at each delayed spawn in case the user
-      // scrolls in between
-      const CENTER_BURST_OFFSET_PX = 200;
-      const CENTER_BURST_OFFSET_PY = 100;
-      const MEGA_BURST_OFFSET_PX = 260;
-      const MEGA_BURST_OFFSET_PY = 140;
-      const ULTRA_BURST_OFFSET_PX = 320;
-      const ULTRA_BURST_OFFSET_PY = 170;
-      const centerBursts: {
-        offsetX: number;
-        offsetY: number;
-        delayMs: number;
-      }[] = isUltra
-        ? [
-            { offsetX: 0, offsetY: 0, delayMs: 0 },
-            { offsetX: 0, offsetY: -ULTRA_BURST_OFFSET_PY, delayMs: 90 },
-            {
-              offsetX: ULTRA_BURST_OFFSET_PX,
-              offsetY: -ULTRA_BURST_OFFSET_PY / 2,
-              delayMs: 180,
-            },
-            {
-              offsetX: ULTRA_BURST_OFFSET_PX,
-              offsetY: ULTRA_BURST_OFFSET_PY / 2,
-              delayMs: 270,
-            },
-            { offsetX: 0, offsetY: ULTRA_BURST_OFFSET_PY, delayMs: 360 },
-            {
-              offsetX: -ULTRA_BURST_OFFSET_PX,
-              offsetY: ULTRA_BURST_OFFSET_PY / 2,
-              delayMs: 450,
-            },
-            {
-              offsetX: -ULTRA_BURST_OFFSET_PX,
-              offsetY: -ULTRA_BURST_OFFSET_PY / 2,
-              delayMs: 540,
-            },
-          ]
-        : isMega
-          ? [
-              { offsetX: 0, offsetY: 0, delayMs: 0 },
-              {
-                offsetX: -MEGA_BURST_OFFSET_PX,
-                offsetY: -MEGA_BURST_OFFSET_PY,
-                delayMs: 120,
-              },
-              {
-                offsetX: MEGA_BURST_OFFSET_PX,
-                offsetY: -MEGA_BURST_OFFSET_PY,
-                delayMs: 240,
-              },
-              {
-                offsetX: -MEGA_BURST_OFFSET_PX,
-                offsetY: MEGA_BURST_OFFSET_PY,
-                delayMs: 360,
-              },
-              {
-                offsetX: MEGA_BURST_OFFSET_PX,
-                offsetY: MEGA_BURST_OFFSET_PY,
-                delayMs: 480,
-              },
-            ]
-          : [
-              { offsetX: 0, offsetY: 0, delayMs: 0 },
-              {
-                offsetX: -CENTER_BURST_OFFSET_PX,
-                offsetY: -CENTER_BURST_OFFSET_PY,
-                delayMs: 100,
-              },
-              {
-                offsetX: CENTER_BURST_OFFSET_PX,
-                offsetY: CENTER_BURST_OFFSET_PY,
-                delayMs: 200,
-              },
-            ];
-      for (const { offsetX, offsetY, delayMs } of centerBursts) {
-        setTimeout(() => {
-          const p = getScreenCenterLocal(floor);
-          spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
-        }, delayMs);
-      }
+      triggerCritCelebration(floor, tier, getScreenCenterLocal);
       return;
     }
     if (spendTotalIncome(floor.upgradeCost)) {

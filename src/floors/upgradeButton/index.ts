@@ -84,50 +84,70 @@ function pressScale(floor: Floor, now: number): number {
 // instantly applies that tier's upgrade count at once.
 export type CritTier = "crit" | "mega" | "ultra";
 
-const CRIT_CHANCE = 0.05;
-// ~1 in 250 upgrade clicks — deliberately much rarer than CRIT_CHANCE so it reads
-// as a genuine jackpot moment, not just a bigger version of the common crit
-const MEGA_CRIT_CHANCE = 0.01;
-// rarer still than MEGA_CRIT_CHANCE — the true jackpot-of-jackpots moment
-const ULTRA_CRIT_CHANCE = 0.001;
-export const CRIT_UPGRADE_COUNT = 5;
-export const MEGA_CRIT_UPGRADE_COUNT = CRIT_UPGRADE_COUNT * 5;
-export const ULTRA_CRIT_UPGRADE_COUNT = MEGA_CRIT_UPGRADE_COUNT * 5;
-
-const CRIT_TIER_INFO: Record<
+// the ONE canonical source for every per-tier number/label — every caller (this
+// module's own drawUpgradeButton, floorInteractions.ts, critCelebration.ts) reads
+// from this instead of hand-building its own "xN"/multiplier, which is exactly what
+// let a stale hardcoded "Sale x5" label slip in once before (see repo memory) and
+// silently drift from the real, tier-scaled payout. Add any FUTURE per-tier value
+// here too, never as a new standalone constant a callsite has to remember to keep
+// in sync
+export const CRIT_TIER_CONFIG: Record<
   CritTier,
-  { count: number; color: string; label: string }
+  {
+    chance: number; // rolled once per completed upgrade click, see rollCritUpgrade
+    count: number; // free stacked upgrades this tier applies on the upgrade button
+    saleMultiplier: number; // payout multiplier this tier applies during a Sale
+    color: string;
+    label: string; // canonical "xN" text — shared by the button AND the flash text
+  }
 > = {
   crit: {
-    count: CRIT_UPGRADE_COUNT,
+    chance: 0.05,
+    count: 5,
+    saleMultiplier: 5,
     color: COLOR.purple,
-    label: `x${CRIT_UPGRADE_COUNT}`,
+    label: "x5",
   },
   mega: {
-    count: MEGA_CRIT_UPGRADE_COUNT,
+    // ~1 in 100 upgrade clicks — deliberately much rarer than crit's so it reads
+    // as a genuine jackpot moment, not just a bigger version of the common crit
+    chance: 0.01,
+    count: 25,
+    saleMultiplier: 25,
     color: COLOR.starYellow,
-    label: `x${MEGA_CRIT_UPGRADE_COUNT}`,
+    label: "x25",
   },
   ultra: {
-    count: ULTRA_CRIT_UPGRADE_COUNT,
+    // rarer still than mega's — the true jackpot-of-jackpots moment
+    chance: 0.001,
+    count: 125,
+    saleMultiplier: 125,
     color: COLOR.red,
-    label: `x${ULTRA_CRIT_UPGRADE_COUNT}`,
+    label: "x125",
   },
 };
 
+// back-compat convenience re-exports for callers that just want one tier's count —
+// still sourced from CRIT_TIER_CONFIG above, never a separate hardcoded number
+export const CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.crit.count;
+export const MEGA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.mega.count;
+export const ULTRA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.ultra.count;
+
 const critTiers = new WeakMap<Floor, CritTier>();
 
-// call once per completed upgrade click (crit or normal) to roll the next one
+// call once per completed upgrade click (crit or normal) to roll the next one —
+// rarest tier checked first, so a click can never land more than one tier at once
 export function rollCritUpgrade(floor: Floor): void {
-  if (Math.random() < ULTRA_CRIT_CHANCE) {
+  if (Math.random() < CRIT_TIER_CONFIG.ultra.chance) {
     critTiers.set(floor, "ultra");
     return;
   }
-  if (Math.random() < MEGA_CRIT_CHANCE) {
+  if (Math.random() < CRIT_TIER_CONFIG.mega.chance) {
     critTiers.set(floor, "mega");
     return;
   }
-  if (Math.random() < CRIT_CHANCE) critTiers.set(floor, "crit");
+  if (Math.random() < CRIT_TIER_CONFIG.crit.chance)
+    critTiers.set(floor, "crit");
 }
 
 export function getCritTier(floor: Floor): CritTier | null {
@@ -162,11 +182,10 @@ export function forceUltraCritUpgrade(floor: Floor): void {
 // hud/boostMenu/index.ts's applySaleBoost, which picks the random floor and calls
 // triggerSaleBoost below). While active on a floor, its upgrade button wiggles like
 // a crit and clicking it is free. A crit can still roll during a sale (see
-// floorInteractions/index.ts); rather than stacking CRIT_UPGRADE_COUNT normal
-// upgrades as usual, it just multiplies that click's sale payout by
-// SALE_CRIT_MULTIPLIER
+// floorInteractions/index.ts); rather than stacking upgrades as usual, it
+// multiplies that click's sale payout by the rolled tier's own
+// CRIT_TIER_CONFIG[tier].saleMultiplier
 export const SALE_DURATION_MS = 15_000;
-export const SALE_CRIT_MULTIPLIER = 5;
 // each sale click pays out floorIncomePerSecond(floor) below (1 second of that
 // floor's own income), credited straight to the player's total — hud/boostMenu's
 // own cost is priced off this same rate times this many assumed clicks, halved, so
@@ -234,7 +253,7 @@ export function drawUpgradeButton(
     BTN_W,
     BTN_H,
     crit
-      ? CRIT_TIER_INFO[critTier!].color
+      ? CRIT_TIER_CONFIG[critTier!].color
       : sale
         ? COLOR.amber
         : affordable
@@ -250,10 +269,10 @@ export function drawUpgradeButton(
   ctx.textBaseline = "middle";
   const label = sale
     ? crit
-      ? `Sale x${SALE_CRIT_MULTIPLIER}`
+      ? `Sale x${CRIT_TIER_CONFIG[critTier!].saleMultiplier}`
       : "Sale"
     : crit
-      ? CRIT_TIER_INFO[critTier!].label
+      ? CRIT_TIER_CONFIG[critTier!].label
       : formatPrice(cost);
   drawCartoonText(ctx, label, cx, cy);
   ctx.restore();
