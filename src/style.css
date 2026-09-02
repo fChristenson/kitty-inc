@@ -104,11 +104,25 @@ body {
   justify-content: center;
 }
 
+#app {
+  /* without an explicit width, this flex item (body's only child) falls back to
+     shrink-to-fit sizing, which pulls in the <canvas> descendants' default
+     replaced-element intrinsic width (300px) instead of stretching to fill the
+     viewport — collapsing the whole game to a fixed 300px on any desktop-width
+     window where there's room to shrink into (mobile viewports happened to be
+     close enough to 300px for this to go unnoticed) */
+  width: 100%;
+}
+
 .game {
   width: 100%;
   max-width: 480px;
   height: 100vh;
   height: 100dvh;
+  /* #app now fills body's full width (see #app's own comment above), so body's
+     justify-content:center no longer has anything narrower to center — .game
+     must center itself within #app's now-full-width block box */
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
 }

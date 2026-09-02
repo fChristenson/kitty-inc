@@ -44,4 +44,3 @@ export function generateMarketEventText(): string {
     ];
   return `${catWord} ${moodWord}`;
 }
-

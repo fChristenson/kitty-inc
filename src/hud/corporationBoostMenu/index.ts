@@ -84,6 +84,13 @@ export function wireCorporationBoostMenu(
   )!;
 
   function render(): void {
+    // list.innerHTML below tears down and rebuilds every node in the list —
+    // including ones whose content didn't even change (a price/count label
+    // ticking up elsewhere in the same list) — which resets scrollTop to 0
+    // like any fresh DOM replacement does. Restoring it after is simpler and
+    // far less fragile than trying to only touch the one button whose price
+    // actually changed
+    const scrollTop = list.scrollTop;
     const managerIconUrl = getManagerIconUrl();
     const count = getCorporationCount();
     const modifierRows = Array.from({ length: count }, (_, i) => {
@@ -161,6 +168,7 @@ export function wireCorporationBoostMenu(
       <h3 class="worker-menu__subheader">Raise Stock price</h3>
       ${items}
     `;
+    list.scrollTop = scrollTop;
   }
 
   // press-and-hold auto-repeat (same interval as gameCanvas.ts's upgrade

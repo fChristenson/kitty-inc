@@ -131,11 +131,19 @@ export function wireBoostMenu(
   const panel = menu.querySelector<HTMLDivElement>(".worker-menu__panel")!;
   const list = container.querySelector<HTMLDivElement>("#boost-menu-list")!;
 
+  // both costs are O(every floor in the building) to compute (see
+  // currentIncomePerSecond/averageFloorIncomePerSecond above) — cached here from
+  // render() and reused by updateAffordability's own 250ms interval below instead
+  // of recomputing them from scratch every tick, which made the dialog's upkeep
+  // cost scale with the building's total floor count for as long as it stayed open
+  let cachedBoostAllCost = 0;
+  let cachedSaleBoostCost = 0;
+
   function render(): void {
-    const cost = getBoostAllCost(getFloors());
-    const affordable = getTotalIncome() >= cost;
-    const saleCost = getSaleBoostCost(getFloors());
-    const saleAffordable = getTotalIncome() >= saleCost;
+    cachedBoostAllCost = getBoostAllCost(getFloors());
+    const affordable = getTotalIncome() >= cachedBoostAllCost;
+    cachedSaleBoostCost = getSaleBoostCost(getFloors());
+    const saleAffordable = getTotalIncome() >= cachedSaleBoostCost;
     list.innerHTML = `
       <button
         class="worker-menu__item"
@@ -146,7 +154,7 @@ export function wireBoostMenu(
           <img src="${mouseIconUrl}" class="worker-menu__icon" alt="" />
           Motivate workers
         </span>
-        <span class="worker-menu__price">${formatPrice(cost)}</span>
+        <span class="worker-menu__price">${formatPrice(cachedBoostAllCost)}</span>
       </button>
       <button
         class="worker-menu__item"
@@ -157,7 +165,7 @@ export function wireBoostMenu(
           <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
           Trigger sales event
         </span>
-        <span class="worker-menu__price">${formatPrice(saleCost)}</span>
+        <span class="worker-menu__price">${formatPrice(cachedSaleBoostCost)}</span>
       </button>
     `;
   }
@@ -191,18 +199,20 @@ export function wireBoostMenu(
 
   // re-checks affordability while the menu sits open so a grayed-out "too expensive"
   // button turns clickable again as soon as income catches up, instead of only
-  // refreshing on the next open/purchase
+  // refreshing on the next open/purchase. Reuses render()'s own cached costs
+  // instead of recomputing them (see cachedBoostAllCost/cachedSaleBoostCost above)
+  // — the only thing that actually changes every 250ms is getTotalIncome() itself
   function updateAffordability(): void {
     const speedUpButton = list.querySelector<HTMLButtonElement>(
       "#boost-menu-speed-up",
     );
     if (speedUpButton) {
-      speedUpButton.disabled = getTotalIncome() < getBoostAllCost(getFloors());
+      speedUpButton.disabled = getTotalIncome() < cachedBoostAllCost;
     }
     const saleButton =
       list.querySelector<HTMLButtonElement>("#boost-menu-sale");
     if (saleButton) {
-      saleButton.disabled = getTotalIncome() < getSaleBoostCost(getFloors());
+      saleButton.disabled = getTotalIncome() < cachedSaleBoostCost;
     }
   }
 

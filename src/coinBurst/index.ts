@@ -160,6 +160,15 @@ export function drawCoinBurstFrame(
 // drawActiveCoinBursts below
 const activeParticles: CoinBurstParticle[] = [];
 let lastActiveUpdateAt: number | null = null;
+// same cap floors/coins's own particle array uses, and for the same reason:
+// pruning only happens inside drawActiveCoinBursts, which only runs while
+// whichever screen spawned a burst (the city map, the press conference
+// minigame) is actually being redrawn — a burst spawned right as that screen
+// closes is left mid-life, un-pruned, until it's opened again. Without a cap,
+// enough of these across a long session (repeatedly opening the map, playing
+// several press conference rounds) let this array grow without bound, since
+// nothing else ever clears it between sessions
+const MAX_ACTIVE_PARTICLES = 500;
 
 export function hasActiveCoinBursts(): boolean {
   return activeParticles.length > 0;
@@ -167,6 +176,9 @@ export function hasActiveCoinBursts(): boolean {
 
 export function spawnCoinBurstAt(x: number, y: number, scale = 1): void {
   for (const p of createCoinBurstParticles(x, y)) {
+    // evict the oldest particle instead of growing unbounded — see
+    // MAX_ACTIVE_PARTICLES above
+    if (activeParticles.length >= MAX_ACTIVE_PARTICLES) activeParticles.shift();
     // scales position (relative to the spawn point, so the burst still
     // starts exactly at x,y), velocity, size, and gravity together, so a
     // smaller-scale burst is a uniformly shrunk version of the same burst,
