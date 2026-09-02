@@ -40,7 +40,6 @@ import {
   wireTestButton,
   wireSpawnMouseButton,
   wireSpawnCritButton,
-  wireIdlePopupTestButton,
   wirePressConferenceTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -61,8 +60,6 @@ import {
   wirePressConferenceGame,
   createMapMenuMarkup,
   wireMapMenu,
-  createPopupMarkup,
-  showIdlePopup,
 } from "./hud";
 import {
   createGameCanvas,
@@ -113,7 +110,6 @@ async function main() {
     ${createCorporationBoostMenuMarkup()}
     ${createPressConferenceGameMarkup()}
     ${createMapMenuMarkup()}
-    ${createPopupMarkup()}
   `;
 
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
@@ -308,10 +304,6 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceCritUpgrade(floor);
     });
-    wireIdlePopupTestButton(app, () => {
-      const testAmount = 12345;
-      showIdlePopup(app, testAmount, () => addTotalIncome(testAmount));
-    });
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     wireResetButton(app, buildings);
   }
@@ -445,9 +437,7 @@ async function main() {
   // every floor's lastCollectedAt in memory, and that must land before a second quick
   // reload could otherwise re-collect the same already-paid-out idle time
   saveBuildings(buildings, activeCompanyIndex);
-  if (idleIncome > 0) {
-    showIdlePopup(app, idleIncome, () => addTotalIncome(idleIncome));
-  }
+  if (idleIncome > 0) addTotalIncome(idleIncome);
 
   gameCanvas.redraw();
 

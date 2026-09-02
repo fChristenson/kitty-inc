@@ -732,8 +732,7 @@ body {
   font-weight: 900;
   color: var(--color-money-green);
   /* same green-fill + thick white outline cartoon-text look as the canvas HUD
-     total (hud/index.ts's drawCartoonText) / .popup__amount, just done with CSS
-     text-stroke here */
+     total (hud/index.ts's drawCartoonText), just done with CSS text-stroke here */
   -webkit-text-stroke: 3px var(--color-white);
   paint-order: stroke fill;
 }
@@ -891,86 +890,3 @@ body {
   flex-shrink: 0;
 }
 
-.popup {
-  position: fixed;
-  inset: 0;
-  z-index: 50; /* above the worker menu, since it's meant to greet the player before anything else */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.popup[hidden] {
-  display: none; /* the [hidden] attribute's UA display:none loses to the class rule above without this */
-}
-
-.popup__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-}
-
-.popup__panel {
-  position: relative;
-  width: min(90vw, 360px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  /* same cartoon wood-board treatment as .worker-menu__panel, see comment there */
-  background: var(--color-wood-fill);
-  border: 4px solid var(--color-wood-outline);
-  border-radius: 1.25rem;
-  box-shadow:
-    0 0 0 10px var(--color-wood-ring),
-    0 0 0 14px var(--color-wood-outline),
-    0 22px 18px -6px rgba(0, 0, 0, 0.45);
-  color: var(--color-wood-text);
-  margin: 14px;
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.popup__panel h2 {
-  margin: 0;
-}
-
-.popup__panel p {
-  margin: 0;
-}
-
-.popup__amount {
-  font-size: 2.25rem;
-  font-weight: 900;
-  color: var(--color-money-green);
-  /* same green-fill + thick white outline cartoon-text look as the canvas HUD
-     total (hud/index.ts's drawCartoonText), just done with CSS text-stroke here */
-  -webkit-text-stroke: 3px var(--color-white);
-  paint-order: stroke fill;
-}
-
-.popup__button {
-  margin-top: 0.5rem;
-  padding: 0.75rem 2rem;
-  /* same cream-ring + dark-outline treatment as .worker-menu__item, see comment there */
-  border: 3px solid var(--color-wood-outline);
-  border-radius: 0.75rem;
-  background: var(--color-amber-muted);
-  box-shadow:
-    0 0 0 4px var(--color-wood-ring),
-    0 0 0 7px var(--color-wood-outline),
-    0 4px 0 0 var(--color-amber-muted-shadow);
-  color: white;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.popup__button:active {
-  background: var(--color-amber-muted-active);
-  box-shadow:
-    0 0 0 4px var(--color-wood-ring),
-    0 0 0 7px var(--color-wood-outline),
-    0 2px 0 0 var(--color-amber-muted-shadow);
-  transform: translateY(2px);
-}

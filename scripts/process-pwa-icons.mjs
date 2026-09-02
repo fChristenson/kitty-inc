@@ -8,44 +8,36 @@ const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
 const publicDir = path.resolve(import.meta.dirname, "..", "public");
 const src = path.join(assets, "themes", "references", "dist", "coin.png");
 
-const MASKABLE_SIZE = 512;
-// Android's maskable-icon spec only guarantees the center ~80% (safe zone)
-// survives whatever mask shape (circle, squircle, etc.) is applied
-const MASKABLE_SAFE_ZONE = Math.round(MASKABLE_SIZE * 0.8);
-const MASKABLE_BG = "#FFFFFF";
+const TRANSPARENT = { r: 0, g: 0, b: 0, alpha: 0 };
+// how much of each icon's canvas the coin fills — the rest is breathing-room padding
+// so it never sits flush against the icon's edge (or, for the maskable icon,
+// Android's own safe-zone edge) once a mobile OS renders/masks it
+const CONTENT_FRACTION = 0.65;
 
-await sharp(src)
-  .resize(192, 192, {
-    fit: "contain",
-    background: { r: 0, g: 0, b: 0, alpha: 0 },
+// resizes the coin to fit within size*CONTENT_FRACTION, then composites it centered
+// onto a full size x size canvas of `background` — real padding, not just aspect-fit
+// slack from the coin art's own non-square (697x702) dimensions
+async function renderPaddedIcon(size, background) {
+  const contentSize = Math.round(size * CONTENT_FRACTION);
+  const content = await sharp(src)
+    .resize(contentSize, contentSize, { fit: "contain", background: TRANSPARENT })
+    .png()
+    .toBuffer();
+
+  return sharp({
+    create: { width: size, height: size, channels: 4, background },
   })
-  .png()
-  .toFile(path.join(publicDir, "icon-192.png"));
+    .composite([{ input: content, gravity: "center" }])
+    .png()
+    .toBuffer();
+}
 
-await sharp(src)
-  .resize(512, 512, {
-    fit: "contain",
-    background: { r: 0, g: 0, b: 0, alpha: 0 },
-  })
-  .png()
-  .toFile(path.join(publicDir, "icon-512.png"));
-
-const safeZoneCoin = await sharp(src)
-  .resize(MASKABLE_SAFE_ZONE, MASKABLE_SAFE_ZONE, {
-    fit: "contain",
-    background: { r: 0, g: 0, b: 0, alpha: 0 },
-  })
-  .png()
-  .toBuffer();
-
-await sharp({
-  create: {
-    width: MASKABLE_SIZE,
-    height: MASKABLE_SIZE,
-    channels: 4,
-    background: MASKABLE_BG,
-  },
-})
-  .composite([{ input: safeZoneCoin, gravity: "center" }])
-  .png()
-  .toFile(path.join(publicDir, "icon-512-maskable.png"));
+await sharp(await renderPaddedIcon(192, TRANSPARENT)).toFile(
+  path.join(publicDir, "icon-192.png"),
+);
+await sharp(await renderPaddedIcon(512, TRANSPARENT)).toFile(
+  path.join(publicDir, "icon-512.png"),
+);
+await sharp(await renderPaddedIcon(512, "#FFFFFF")).toFile(
+  path.join(publicDir, "icon-512-maskable.png"),
+);

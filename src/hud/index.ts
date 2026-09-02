@@ -106,13 +106,11 @@ export {
 export type { PressConferenceGame } from "./pressConferenceGame";
 export { createMapMenuMarkup, wireMapMenu } from "./mapMenu";
 export type { MapMenu } from "./mapMenu";
-export { createPopupMarkup, showIdlePopup } from "./popup";
 export {
   createTestButtonMarkup,
   wireTestButton,
   wireSpawnMouseButton,
   wireSpawnCritButton,
-  wireIdlePopupTestButton,
   wirePressConferenceTestButton,
   wireResetButton,
 } from "./testButton";
