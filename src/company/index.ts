@@ -4,6 +4,8 @@
 // them (see gameState.ts/totalIncome.ts's companyStorageKey usage). This module
 // just owns the single pointer to which one is currently loaded/on-screen,
 // persisted so a reload resumes the same company.
+import { type BigNumber, toBigNumber } from "../shared/bigNumber";
+
 const ACTIVE_COMPANY_KEY = "cash-clicker:active-company-index";
 
 export function getActiveCompanyIndex(): number {
@@ -46,10 +48,10 @@ export function companyStorageKey(
 // dormant company only ever updated the $ key, so the elapsed-time projection
 // kept compounding against a stale timestamp forever after)
 export interface CompanyRecord {
-  bankedTotal: number; // $ actually banked as of updatedAt
-  incomeRatePerSecond: number; // frozen as of updatedAt; only the active company's own rate can change
-  assetValue: number; // buildings value + upgrades value combined, frozen as of updatedAt
-  upgradesValue: number; // just the upgrades portion of assetValue — corporationBoostMenu's getCompanyValue uses this alone, not the buildings-cost portion
+  bankedTotal: BigNumber; // $ actually banked as of updatedAt
+  incomeRatePerSecond: BigNumber; // frozen as of updatedAt; only the active company's own rate can change
+  assetValue: BigNumber; // buildings value + upgrades value combined, frozen as of updatedAt
+  upgradesValue: BigNumber; // just the upgrades portion of assetValue — corporationBoostMenu's getCompanyValue uses this alone, not the buildings-cost portion
   updatedAt: number; // Date.now() this record was last written
 }
 
@@ -82,20 +84,27 @@ export function loadCompanyRecord(companyIndex: number): CompanyRecord | null {
   const record = loadAllCompanyRecords()[companyIndex];
   if (
     !record ||
-    typeof record.bankedTotal !== "number" ||
-    typeof record.incomeRatePerSecond !== "number" ||
-    typeof record.assetValue !== "number" ||
+    (typeof record.bankedTotal !== "number" &&
+      typeof record.bankedTotal !== "object") ||
+    (typeof record.incomeRatePerSecond !== "number" &&
+      typeof record.incomeRatePerSecond !== "object") ||
+    (typeof record.assetValue !== "number" &&
+      typeof record.assetValue !== "object") ||
     typeof record.updatedAt !== "number"
   ) {
     return null;
   }
-  // upgradesValue is newer than the rest of this record — an older save just
-  // won't have it yet, so it defaults to 0 instead of invalidating the whole
-  // record (same recovery every other one-off added field here would get)
+  // every $ field may still be a plain number here (any record saved before the
+  // BigNumber migration) — toBigNumber normalizes either shape. upgradesValue is
+  // newer than the rest of this record — an older save just won't have it yet,
+  // so it defaults to ZERO instead of invalidating the whole record (same
+  // recovery every other one-off added field here would get)
   return {
-    ...record,
-    upgradesValue:
-      typeof record.upgradesValue === "number" ? record.upgradesValue : 0,
+    bankedTotal: toBigNumber(record.bankedTotal),
+    incomeRatePerSecond: toBigNumber(record.incomeRatePerSecond),
+    assetValue: toBigNumber(record.assetValue),
+    upgradesValue: toBigNumber(record.upgradesValue),
+    updatedAt: record.updatedAt,
   };
 }
 

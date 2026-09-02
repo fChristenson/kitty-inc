@@ -7,8 +7,18 @@ import {
   clearCompanyRecord,
 } from "../company";
 import { getCorporationCount } from "../corporationName";
+import {
+  type BigNumber,
+  ZERO,
+  fromNumber,
+  toNumber,
+  add,
+  subtract,
+  multiply,
+  lt,
+} from "../shared/bigNumber";
 
-export function getTotalIncome(): number {
+export function getTotalIncome(): BigNumber {
   return totalIncome;
 }
 
@@ -19,56 +29,67 @@ export function getTotalIncome(): number {
 // rate would have earned in the elapsed time since — a pure function of that one
 // record, so it can never desync from a separate "total" write happening
 // somewhere else (there isn't one)
-export function getStoredTotalIncome(companyIndex: number): number {
+export function getStoredTotalIncome(companyIndex: number): BigNumber {
   if (companyIndex === activeCompanyIndex) return totalIncome;
   const record = loadCompanyRecord(companyIndex);
-  if (!record) return 0; // never went dormant yet (e.g. brand new company) — nothing banked
+  if (!record) return ZERO; // never went dormant yet (e.g. brand new company) — nothing banked
   const elapsedSeconds = Math.max(0, (Date.now() - record.updatedAt) / 1000);
-  return record.bankedTotal + record.incomeRatePerSecond * elapsedSeconds;
+  return add(
+    record.bankedTotal,
+    multiply(record.incomeRatePerSecond, elapsedSeconds),
+  );
 }
 
 // combined totalIncome across every corporation — every corp boost/upgrade
 // (corporationUpgradeMenu's "Create new Company", corporationBoostMenu's stock raises)
 // draws from this shared pool instead of just the currently active company's own
 // wallet, so a rich company can carry a poor one
-export function getAllCompaniesTotalIncome(): number {
+export function getAllCompaniesTotalIncome(): BigNumber {
   const count = getCorporationCount();
-  let sum = 0;
-  for (let i = 0; i < count; i++) sum += getStoredTotalIncome(i);
+  let sum = ZERO;
+  for (let i = 0; i < count; i++) sum = add(sum, getStoredTotalIncome(i));
   return sum;
 }
 
 // deducts amount from the running total if affordable; returns whether the spend succeeded
-export function spendTotalIncome(amount: number): boolean {
-  if (totalIncome < amount) return false;
-  totalIncome -= amount;
+export function spendTotalIncome(amount: BigNumber): boolean {
+  if (lt(totalIncome, amount)) return false;
+  totalIncome = subtract(totalIncome, amount);
   return true;
 }
 
 // adds amount to the running total; used by the "Add Money" dev/test control
-export function addTotalIncome(amount: number): void {
-  totalIncome += amount;
+export function addTotalIncome(amount: BigNumber): void {
+  totalIncome = add(totalIncome, amount);
 }
 
-// applies delta (positive or negative) to a specific company's own total —
+// applies delta (can be negative — a spend) to a specific company's own total —
 // straight to the live value if it's the active company; for a dormant one,
 // re-anchors its CompanyRecord's bankedTotal AND updatedAt TOGETHER in one
 // atomic write (see spendFromAllCompanies) — bankedTotal is computed from the
 // CURRENT derived total (already including whatever it earned since it went
 // dormant) minus delta, so the next read projects forward from right now
-// instead of double-counting or drifting against a stale timestamp
-function adjustStoredTotalIncome(companyIndex: number, delta: number): void {
+// instead of double-counting or drifting against a stale timestamp. delta is
+// expressed as a plain, non-negative $ amount plus a sign flag (BigNumber can't
+// represent a negative value at all — see shared/bigNumber's own convention)
+function adjustStoredTotalIncome(
+  companyIndex: number,
+  amount: BigNumber,
+  sign: 1 | -1,
+): void {
   if (companyIndex === activeCompanyIndex) {
-    totalIncome += delta;
+    totalIncome =
+      sign === 1 ? add(totalIncome, amount) : subtract(totalIncome, amount);
     return;
   }
   const record = loadCompanyRecord(companyIndex);
   const currentTotal = getStoredTotalIncome(companyIndex);
   saveCompanyRecord(companyIndex, {
-    bankedTotal: currentTotal + delta,
-    incomeRatePerSecond: record?.incomeRatePerSecond ?? 0,
-    assetValue: record?.assetValue ?? 0,
-    upgradesValue: record?.upgradesValue ?? 0,
+    bankedTotal:
+      sign === 1 ? add(currentTotal, amount) : subtract(currentTotal, amount),
+    incomeRatePerSecond: record?.incomeRatePerSecond ?? ZERO,
+    assetValue: record?.assetValue ?? ZERO,
+    upgradesValue: record?.upgradesValue ?? ZERO,
     updatedAt: Date.now(),
   });
 }
@@ -79,10 +100,10 @@ function adjustStoredTotalIncome(companyIndex: number, delta: number): void {
 // never the currently active one's
 export function spendCompanyTotalIncome(
   companyIndex: number,
-  amount: number,
+  amount: BigNumber,
 ): boolean {
-  if (getStoredTotalIncome(companyIndex) < amount) return false;
-  adjustStoredTotalIncome(companyIndex, -amount);
+  if (lt(getStoredTotalIncome(companyIndex), amount)) return false;
+  adjustStoredTotalIncome(companyIndex, amount, -1);
   return true;
 }
 
@@ -95,15 +116,15 @@ export function spendCompanyTotalIncome(
 export function getBuildingsCurrentIncomePerSecond(
   buildings: Floor[][],
   now: number,
-): number {
-  let total = 0;
+): BigNumber {
+  let total = ZERO;
   for (const floors of buildings) {
     for (const floor of floors) {
       if (!floor.unlocked) continue;
-      total += currentIncomeRatePerSecond(floor, now);
+      total = add(total, currentIncomeRatePerSecond(floor, now));
     }
   }
-  return total * incomeBoostMultiplier();
+  return multiply(total, incomeBoostMultiplier());
 }
 
 // a company's own current $/sec, without ever loading a DORMANT company's full
@@ -111,22 +132,25 @@ export function getBuildingsCurrentIncomePerSecond(
 // other company's comes straight from its persisted CompanyRecord (see
 // company.ts), already boost-adjusted as of when it went dormant. The single
 // shared way any per-company cost/weight calculation (getCompanyWealth,
-// corporationBoostMenu's getStockRaiseCost/getAllCompaniesCurrentIncomePerSecond)
+// corporationBoostMenu's getStockRaiseCost)
 // should read a company's rate — never loadBuildings(i) directly for this
-export function getCompanyIncomeRatePerSecond(companyIndex: number): number {
+export function getCompanyIncomeRatePerSecond(companyIndex: number): BigNumber {
   if (companyIndex === activeCompanyIndex) {
     return getBuildingsCurrentIncomePerSecond(tickerBuildings, Date.now());
   }
-  return loadCompanyRecord(companyIndex)?.incomeRatePerSecond ?? 0;
+  return loadCompanyRecord(companyIndex)?.incomeRatePerSecond ?? ZERO;
 }
 
 // a company's own "wealth" for cost-splitting purposes: its current total plus a
 // projected hour of its own income rate, so a company that earns fast but hasn't
 // banked much yet still shoulders a fair share (not just whichever has the
 // biggest pile sitting still)
-function getCompanyWealth(companyIndex: number): number {
+function getCompanyWealth(companyIndex: number): BigNumber {
   const ratePerSecond = getCompanyIncomeRatePerSecond(companyIndex);
-  return getStoredTotalIncome(companyIndex) + ratePerSecond * SECONDS_PER_HOUR;
+  return add(
+    getStoredTotalIncome(companyIndex),
+    multiply(ratePerSecond, SECONDS_PER_HOUR),
+  );
 }
 
 const SECONDS_PER_HOUR = 3600;
@@ -143,18 +167,26 @@ const SECONDS_PER_HOUR = 3600;
 // remaining cost re-split across the rest by their own wealth (a
 // "water-filling" pass, repeated until nothing is over-capped) — so no company
 // ever gets driven into the negative. Returns false (spending nothing) if the
-// combined total across every company can't cover cost at all
-export function spendFromAllCompanies(cost: number): boolean {
+// combined total across every company can't cover cost at all. The proportional
+// split itself (weightSum/share ratios) is done in plain lossy `number` space —
+// safe here because it's only ever comparing/dividing WEALTH RATIOS (0..1-ish
+// fractions), never raw magnitudes, so precision loss at extreme scale doesn't
+// change which companies get capped or their relative shares
+export function spendFromAllCompanies(cost: BigNumber): boolean {
   const count = getCorporationCount();
   const totals = Array.from({ length: count }, (_, i) =>
     getStoredTotalIncome(i),
   );
-  if (totals.reduce((sum, total) => sum + total, 0) < cost) return false;
+  const combinedTotal = totals.reduce((sum, total) => add(sum, total), ZERO);
+  if (lt(combinedTotal, cost)) return false;
 
-  const weights = Array.from({ length: count }, (_, i) => getCompanyWealth(i));
+  const weights = Array.from({ length: count }, (_, i) =>
+    toNumber(getCompanyWealth(i)),
+  );
+  const totalNumbers = totals.map((total) => toNumber(total));
   const paid = new Array(count).fill(0);
   const active = new Set(Array.from({ length: count }, (_, i) => i));
-  let unallocated = cost;
+  let unallocated = toNumber(cost);
 
   while (unallocated > 1e-9 && active.size > 0) {
     const weightSum = Array.from(active).reduce(
@@ -167,7 +199,7 @@ export function spendFromAllCompanies(cost: number): boolean {
         weightSum > 0
           ? (unallocated * weights[i]) / weightSum
           : unallocated / active.size;
-      const available = totals[i] - paid[i];
+      const available = totalNumbers[i] - paid[i];
       if (share >= available) {
         paid[i] += available;
         unallocated -= available;
@@ -193,7 +225,7 @@ export function spendFromAllCompanies(cost: number): boolean {
   }
 
   for (let i = 0; i < count; i++) {
-    if (paid[i] > 0) adjustStoredTotalIncome(i, -paid[i]);
+    if (paid[i] > 0) adjustStoredTotalIncome(i, fromNumber(paid[i]), -1);
   }
   return true;
 }
@@ -201,7 +233,7 @@ export function spendFromAllCompanies(cost: number): boolean {
 export function clearTotalIncome(): void {
   // also zero the in-memory value: location.reload() fires beforeunload first,
   // and that handler re-saves whatever totalIncome currently holds
-  totalIncome = 0;
+  totalIncome = ZERO;
   clearCompanyRecord(activeCompanyIndex);
 }
 
@@ -211,7 +243,8 @@ const SAVE_INTERVAL_MS = 1000;
 // currently belong to — swapped by switchActiveCompany, never shared across
 // companies (see company.ts)
 let activeCompanyIndex = getActiveCompanyIndex();
-let totalIncome = loadCompanyRecord(activeCompanyIndex)?.bankedTotal ?? 0;
+let totalIncome: BigNumber =
+  loadCompanyRecord(activeCompanyIndex)?.bankedTotal ?? ZERO;
 // whichever company's buildings the ticker is currently collecting idle income
 // from; set by startTotalIncomeTicker at startup, swapped by switchActiveCompany
 let tickerBuildings: Floor[][] = [];
@@ -228,7 +261,7 @@ export function switchActiveCompany(
   buildings: Floor[][],
 ): void {
   activeCompanyIndex = companyIndex;
-  totalIncome = loadCompanyRecord(companyIndex)?.bankedTotal ?? 0;
+  totalIncome = loadCompanyRecord(companyIndex)?.bankedTotal ?? ZERO;
   tickerBuildings = buildings;
 }
 
@@ -285,7 +318,10 @@ export function startTotalIncomeTicker(
     for (const floors of tickerBuildings) {
       for (const floor of floors) {
         if (!floor.unlocked) continue;
-        totalIncome += collectDueIncome(floor, now) * cachedBoostMultiplier;
+        totalIncome = add(
+          totalIncome,
+          multiply(collectDueIncome(floor, now), cachedBoostMultiplier),
+        );
       }
     }
 
@@ -324,8 +360,8 @@ function snapshotActiveCompanyRecord(): void {
       tickerBuildings,
       Date.now(),
     ),
-    assetValue: existing?.assetValue ?? 0,
-    upgradesValue: existing?.upgradesValue ?? 0,
+    assetValue: existing?.assetValue ?? ZERO,
+    upgradesValue: existing?.upgradesValue ?? ZERO,
     updatedAt: Date.now(),
   });
 }

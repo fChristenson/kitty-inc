@@ -1,32 +1,22 @@
 import { loadBuildings, type Floor } from "../../gameState";
-import {
-  spendFromAllCompanies,
-  spendCompanyTotalIncome,
-  getStoredTotalIncome,
-  getCompanyIncomeRatePerSecond,
-} from "../../totalIncome";
-import {
-  increaseIncomeRate,
-  unlockFloor,
-  ensureLockedFloorAbove,
-  rollFloorBuyCrit,
-} from "../../floors";
-import {
-  getOfficeChairsCost,
-  getOfficeSuppliesCost,
-  getWorkerCost,
-  getManagerCost,
-  isManagerUnlocked,
-} from "../upgradeMenu";
-import { MAX_RENDERED_WORKERS } from "../../floors";
+import { spendFromAllCompanies, getStoredTotalIncome } from "../../totalIncome";
 import { getCorporationCount } from "../../corporationName";
-import { getBuildingPrice, getBuildingMultiplier } from "../../buildings";
-import { getBackgroundUrls } from "../../loadAssets";
+import { getBuildingPrice } from "../../buildings";
 import {
   companyStorageKey,
   getActiveCompanyIndex,
   loadCompanyRecord,
 } from "../../company";
+import {
+  type BigNumber,
+  ZERO,
+  fromNumber,
+  add,
+  multiply,
+  pow,
+  max,
+  log10,
+} from "../../shared/bigNumber";
 
 // pure $ economy for the Corporation Boosts dialog (stock price / press
 // conference / company value / global boost math) — split out of index.ts,
@@ -88,12 +78,14 @@ export function getStockTimesBought(companyIndex: number): number {
 
 // $ cost to raise a company's stock price once: starts at $1 and doubles every
 // time it's already been bought (so the very first raise costs $1, the next
-// $2, then $4, ...) — flat regardless of the company's own value/size
+// $2, then $4, ...) — flat regardless of the company's own value/size. Uses
+// shared/bigNumber's pow (never a raw `**`), so this stays finite no matter
+// how many times stock has already been raised
 const STOCK_RAISE_COST_BASE = 1;
 
-export function getStockRaiseCost(companyIndex: number): number {
+export function getStockRaiseCost(companyIndex: number): BigNumber {
   const timesBought = loadStockShares(companyIndex) - STOCK_PRICE_BASE;
-  return STOCK_RAISE_COST_BASE * 2 ** timesBought;
+  return multiply(pow(2, timesBought), STOCK_RAISE_COST_BASE);
 }
 
 // raises companyIndex's purchased shares by STOCK_PRICE_STEP if affordable —
@@ -109,26 +101,34 @@ export function buyStockRaise(companyIndex: number): boolean {
   return true;
 }
 
-// $/sec every unlocked floor of every company is currently earning combined —
-// same per-company rate getStockRaiseCost uses, just summed across every
-// corporation instead of just one
-function getAllCompaniesCurrentIncomePerSecond(): number {
+// $ cost of the single, not-per-company "Hold press conference" action: 10%
+// of every company's own upgrades value summed together (never their current
+// total income — explicit request: this must stay affordable even for a
+// company that just spent itself down to $0). Same efficient per-company
+// sourcing as getCompanyValue below: the active company's upgrades value is
+// read fresh off its own live buildings, every dormant company reads its own
+// persisted CompanyRecord.upgradesValue instead of ever loading its full
+// buildings/floors array
+const PRESS_CONFERENCE_UPGRADES_VALUE_PERCENT = 0.1;
+
+function getAllCompaniesUpgradesValue(): BigNumber {
   const count = getCorporationCount();
-  let total = 0;
+  let total = ZERO;
   for (let i = 0; i < count; i++) {
-    total += getCompanyIncomeRatePerSecond(i);
+    total = add(
+      total,
+      i === getActiveCompanyIndex()
+        ? getUpgradesValue(loadBuildings(i))
+        : (loadCompanyRecord(i)?.upgradesValue ?? ZERO),
+    );
   }
   return total;
 }
 
-const PRESS_CONFERENCE_INCOME_SECONDS = 10 * 60;
-
-// $ cost of the single, not-per-company "Hold press conference" action: every
-// company's combined income over 10 minutes at its current rate, flat (unlike
-// getStockRaiseCost, this never doubles with repeated purchases)
-export function getPressConferenceCost(): number {
-  return (
-    getAllCompaniesCurrentIncomePerSecond() * PRESS_CONFERENCE_INCOME_SECONDS
+export function getPressConferenceCost(): BigNumber {
+  return multiply(
+    getAllCompaniesUpgradesValue(),
+    PRESS_CONFERENCE_UPGRADES_VALUE_PERCENT,
   );
 }
 
@@ -232,20 +232,21 @@ function clearFreePressConferences(): void {
 // $ "invested" in a company's buildings — sum of what each one (after the
 // always-free first) cost to unlock, same buildings.ts pricing used everywhere
 // else on the map
-function getBuildingsValue(buildingCount: number): number {
-  let total = 0;
-  for (let i = 1; i < buildingCount; i++) total += getBuildingPrice(i);
+function getBuildingsValue(buildingCount: number): BigNumber {
+  let total = ZERO;
+  for (let i = 1; i < buildingCount; i++)
+    total = add(total, getBuildingPrice(i));
   return total;
 }
 
 // $ "invested" in every floor's upgrades across a company's buildings — each
 // upgrade already bought raised that floor's rate by its own rateStep, so this is
 // the total $/sec worth of upgrade purchases actually paid for
-function getUpgradesValue(buildings: Floor[][]): number {
-  let total = 0;
+function getUpgradesValue(buildings: Floor[][]): BigNumber {
+  let total = ZERO;
   for (const floors of buildings) {
     for (const floor of floors) {
-      total += floor.upgradeCount * floor.rateStep;
+      total = add(total, multiply(floor.rateStep, floor.upgradeCount));
     }
   }
   return total;
@@ -254,228 +255,15 @@ function getUpgradesValue(buildings: Floor[][]): number {
 // exported so main.ts can snapshot just the upgrades portion into a company's
 // CompanyRecord (see company.ts's upgradesValue field) when it goes dormant —
 // getCompanyValue below needs this alone, not bundled with buildings cost
-export function getCompanyUpgradesValue(buildings: Floor[][]): number {
+export function getCompanyUpgradesValue(buildings: Floor[][]): BigNumber {
   return getUpgradesValue(buildings);
-}
-
-// "Building upgrades" section (Corporation Upgrades dialog): lets the player
-// act on floors scattered across every one of a company's own buildings
-// without having to jump to each building on the map manually, for ANY
-// corporation (not just the active one — see corporationUpgradeMenu/index.ts,
-// which renders one of these sub-sections per company). Every item below
-// (income upgrade, worker, office chairs, office supplies, manager) shares
-// this same "whichever eligible floor is currently CHEAPEST" targeting shape,
-// and every buyCheapest* below spends from THAT company's own wallet via
-// spendCompanyTotalIncome — never assumes the active company
-export interface FloorTarget {
-  floor: Floor;
-  level: number; // 1-indexed position within its own building, for display only
-  buildingIndex: number; // which of buildings[] this floor belongs to
-}
-
-function findCheapestFloorTarget(
-  buildings: Floor[][],
-  isEligible: (floor: Floor) => boolean,
-  getCost: (floor: Floor) => number,
-): FloorTarget | null {
-  let best: FloorTarget | null = null;
-  buildings.forEach((floors, buildingIndex) => {
-    floors.forEach((floor, i) => {
-      if (!isEligible(floor)) return;
-      if (!best || getCost(floor) < getCost(best.floor)) {
-        best = { floor, level: i + 1, buildingIndex };
-      }
-    });
-  });
-  return best;
-}
-
-// targets whichever LOCKED floor (the one waiting to be bought next — see
-// floorLock.ts's ensureLockedFloorAbove, there's always exactly one per
-// building) is currently CHEAPEST to unlock across every one of a company's
-// buildings
-export function getCheapestFloorPurchaseTarget(
-  buildings: Floor[][],
-): FloorTarget | null {
-  return findCheapestFloorTarget(
-    buildings,
-    (floor) => !floor.unlocked,
-    (floor) => floor.unlockCost,
-  );
-}
-
-// spends companyIndex's own total income, unlocks the target floor, rolls the
-// same one-shot permanent crit a normal floor purchase can land (see
-// floorLock.ts's unlockFloor/upgradeButton.ts's rollFloorBuyCrit), and queues
-// that building's own next locked floor above it — same 3-step sequence
-// floorInteractions.ts's hitTestFloorLock click branch runs. notifyFloorAdded
-// is only relevant when the bought building happens to be the one currently
-// on screen (see corporationUpgradeMenu/index.ts's own caller) — every other
-// case is picked up automatically next time that building is switched to.
-// Returns whether it succeeded
-export function buyCheapestFloor(
-  companyIndex: number,
-  buildings: Floor[][],
-  notifyFloorAdded?: (buildingIndex: number, floor: Floor) => void,
-): boolean {
-  const target = getCheapestFloorPurchaseTarget(buildings);
-  if (!target) return false;
-  if (!spendCompanyTotalIncome(companyIndex, target.floor.unlockCost)) {
-    return false;
-  }
-  unlockFloor(target.floor);
-  ensureLockedFloorAbove({
-    floors: buildings[target.buildingIndex],
-    backgroundCount: getBackgroundUrls().length,
-    multiplier: getBuildingMultiplier(target.buildingIndex),
-    onAdd: (floor) => notifyFloorAdded?.(target.buildingIndex, floor),
-  });
-  const buyTier = rollFloorBuyCrit();
-  if (buyTier) target.floor.critMultiplierTier = buyTier;
-  return true;
-}
-
-// targets whichever unlocked floor is currently CHEAPEST to upgrade next (not
-// the lowest-level one — a high floor that's already been upgraded a lot can
-// easily be cheaper right now than a low, never-upgraded floor)
-export function getCheapestUpgradeTarget(
-  buildings: Floor[][],
-): FloorTarget | null {
-  return findCheapestFloorTarget(
-    buildings,
-    (floor) => floor.unlocked,
-    (floor) => floor.upgradeCost,
-  );
-}
-
-// spends companyIndex's own total income (same cost a normal upgrade-button
-// click on that floor would charge) and applies one upgrade tick via the same
-// incomePanel.ts math the canvas button uses. Returns whether it succeeded
-export function buyCheapestUpgrade(
-  companyIndex: number,
-  buildings: Floor[][],
-): boolean {
-  const target = getCheapestUpgradeTarget(buildings);
-  if (!target) return false;
-  if (!spendCompanyTotalIncome(companyIndex, target.floor.upgradeCost)) {
-    return false;
-  }
-  increaseIncomeRate(target.floor);
-  return true;
-}
-
-// targets whichever unlocked, not-yet-maxed floor is currently cheapest to
-// hire another worker for (cost scales with how many workers it already has,
-// see upgradeMenu.ts's getWorkerCost)
-export function getCheapestWorkerTarget(
-  buildings: Floor[][],
-): FloorTarget | null {
-  return findCheapestFloorTarget(
-    buildings,
-    (floor) => floor.unlocked && floor.workerCount < MAX_RENDERED_WORKERS,
-    getWorkerCost,
-  );
-}
-
-export function buyCheapestWorker(
-  companyIndex: number,
-  buildings: Floor[][],
-): boolean {
-  const target = getCheapestWorkerTarget(buildings);
-  if (!target) return false;
-  if (!spendCompanyTotalIncome(companyIndex, getWorkerCost(target.floor))) {
-    return false;
-  }
-  target.floor.workerCount += 1;
-  return true;
-}
-
-// targets whichever unlocked floor WITHOUT office chairs yet is cheapest to
-// buy them for (cost scales with floor level, see upgradeMenu.ts's
-// getOfficeChairsCost). null once every unlocked floor already has chairs,
-// which the caller uses to block the button
-export function getCheapestOfficeChairsTarget(
-  buildings: Floor[][],
-): FloorTarget | null {
-  return findCheapestFloorTarget(
-    buildings,
-    (floor) => floor.unlocked && !floor.hasOfficeChairs,
-    getOfficeChairsCost,
-  );
-}
-
-export function buyCheapestOfficeChairs(
-  companyIndex: number,
-  buildings: Floor[][],
-): boolean {
-  const target = getCheapestOfficeChairsTarget(buildings);
-  if (!target) return false;
-  if (
-    !spendCompanyTotalIncome(companyIndex, getOfficeChairsCost(target.floor))
-  ) {
-    return false;
-  }
-  target.floor.hasOfficeChairs = true;
-  return true;
-}
-
-// same shape as office chairs above, for the office-supplies one-time purchase
-export function getCheapestOfficeSuppliesTarget(
-  buildings: Floor[][],
-): FloorTarget | null {
-  return findCheapestFloorTarget(
-    buildings,
-    (floor) => floor.unlocked && !floor.hasOfficeSupplies,
-    getOfficeSuppliesCost,
-  );
-}
-
-export function buyCheapestOfficeSupplies(
-  companyIndex: number,
-  buildings: Floor[][],
-): boolean {
-  const target = getCheapestOfficeSuppliesTarget(buildings);
-  if (!target) return false;
-  if (
-    !spendCompanyTotalIncome(companyIndex, getOfficeSuppliesCost(target.floor))
-  ) {
-    return false;
-  }
-  target.floor.hasOfficeSupplies = true;
-  return true;
-}
-
-// same shape again, for the manager one-time purchase — additionally gated
-// behind isManagerUnlocked (a floor needs enough upgrades bought first), same
-// requirement upgradeMenu.ts's own per-floor manager item enforces
-export function getCheapestManagerTarget(
-  buildings: Floor[][],
-): FloorTarget | null {
-  return findCheapestFloorTarget(
-    buildings,
-    (floor) => floor.unlocked && !floor.hasManager && isManagerUnlocked(floor),
-    getManagerCost,
-  );
-}
-
-export function buyCheapestManager(
-  companyIndex: number,
-  buildings: Floor[][],
-): boolean {
-  const target = getCheapestManagerTarget(buildings);
-  if (!target) return false;
-  if (!spendCompanyTotalIncome(companyIndex, getManagerCost(target.floor))) {
-    return false;
-  }
-  target.floor.hasManager = true;
-  return true;
 }
 
 // buildings value + upgrades value combined — exported so main.ts can snapshot
 // a company's CompanyRecord (see company.ts) at the exact moment it goes
 // dormant, without duplicating this pricing logic there
-export function getCompanyAssetValue(buildings: Floor[][]): number {
-  return getBuildingsValue(buildings.length) + getUpgradesValue(buildings);
+export function getCompanyAssetValue(buildings: Floor[][]): BigNumber {
+  return add(getBuildingsValue(buildings.length), getUpgradesValue(buildings));
 }
 
 // a company's overall value — its own current total income (bank money) plus
@@ -488,15 +276,15 @@ export function getCompanyAssetValue(buildings: Floor[][]): number {
 // purchase. The active company reads its own live buildings (freshest); any
 // dormant company reads its persisted CompanyRecord's upgradesValue instead of
 // ever loading its full buildings/floors array
-function getCompanyValue(companyIndex: number): number {
+function getCompanyValue(companyIndex: number): BigNumber {
   if (companyIndex === getActiveCompanyIndex()) {
-    return (
-      getUpgradesValue(loadBuildings(companyIndex)) +
-      getStoredTotalIncome(companyIndex)
+    return add(
+      getUpgradesValue(loadBuildings(companyIndex)),
+      getStoredTotalIncome(companyIndex),
     );
   }
-  const upgradesValue = loadCompanyRecord(companyIndex)?.upgradesValue ?? 0;
-  return upgradesValue + getStoredTotalIncome(companyIndex);
+  const upgradesValue = loadCompanyRecord(companyIndex)?.upgradesValue ?? ZERO;
+  return add(upgradesValue, getStoredTotalIncome(companyIndex));
 }
 
 // how much a company's stock price contributes to the combined income boost:
@@ -520,8 +308,8 @@ export function getStockContributionPercent(companyIndex: number): number {
 const BASE_MODIFIER_RATE = 0.5;
 
 export function getCompanyBaseModifierPercent(companyIndex: number): number {
-  const companyValue = Math.max(10, getCompanyValue(companyIndex));
-  return Math.sqrt(Math.log10(companyValue)) * BASE_MODIFIER_RATE;
+  const companyValue = max(fromNumber(10), getCompanyValue(companyIndex));
+  return Math.sqrt(log10(companyValue)) * BASE_MODIFIER_RATE;
 }
 
 // summed across every corporation plus the market-influence modifier — the

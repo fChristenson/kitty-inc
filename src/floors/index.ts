@@ -5,6 +5,7 @@ import {
   loadGroundImage as loadAssetGroundImage,
 } from "../loadAssets";
 import { MAX_INCOME_INTERVAL_SECONDS } from "./incomePanel";
+import { fromNumber, pow, multiply, ZERO } from "../shared/bigNumber";
 import {
   FLOOR_W,
   FLOOR_H,
@@ -121,11 +122,13 @@ export function buildFloor(
     groundFloorLocked = false,
   } = options;
   const isGroundFloor = floorLevel === 1;
+  // BigNumber pow/multiply never overflow to Infinity no matter how high
+  // floorLevel climbs (unlike plain `2 ** n`) — see shared/bigNumber
   const unlockCost = isGroundFloor
     ? groundFloorLocked
-      ? BASE_UNLOCK_COST * multiplier
-      : 0
-    : BASE_UNLOCK_COST * multiplier * 2 ** (floorLevel - 2);
+      ? fromNumber(BASE_UNLOCK_COST * multiplier)
+      : ZERO
+    : multiply(pow(2, floorLevel - 2), BASE_UNLOCK_COST * multiplier);
   // true once this level's own natural (uncapped) interval already exceeds the
   // 1h cap below — set once, forever, regardless of how far upgrades later
   // shrink the floor's actual incomeIntervalSeconds (see incomePanel.ts's
@@ -136,25 +139,22 @@ export function buildFloor(
 
   return {
     bgIndex: pickBackgroundIndex(backgroundCount, existingBgIndexes),
-    incomeAmount:
-      Math.round(
-        BASE_INCOME_AMOUNT *
-          multiplier *
-          INCOME_GROWTH_FACTOR ** (floorLevel - 1) *
-          100,
-      ) / 100,
+    incomeAmount: multiply(
+      pow(INCOME_GROWTH_FACTOR, floorLevel - 1),
+      BASE_INCOME_AMOUNT * multiplier,
+    ),
     incomeIntervalSeconds: Math.min(
       BASE_INCOME_INTERVAL_SECONDS * 2 ** (floorLevel - 1),
       MAX_INCOME_INTERVAL_SECONDS,
     ),
-    upgradeCost: BASE_UPGRADE_COST * multiplier * 2 ** (floorLevel - 1),
-    rateStep:
-      Math.round(
-        BASE_RATE_STEP *
-          multiplier *
-          INCOME_GROWTH_FACTOR ** (floorLevel - 1) *
-          100,
-      ) / 100,
+    upgradeCost: multiply(
+      pow(2, floorLevel - 1),
+      BASE_UPGRADE_COST * multiplier,
+    ),
+    rateStep: multiply(
+      pow(INCOME_GROWTH_FACTOR, floorLevel - 1),
+      BASE_RATE_STEP * multiplier,
+    ),
     upgradeCount: 0,
     unlocked: isGroundFloor && !groundFloorLocked,
     unlockCost,

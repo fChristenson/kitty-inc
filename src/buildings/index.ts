@@ -1,5 +1,6 @@
 import { buildFloor } from "../floors";
 import type { Floor } from "../gameState";
+import { type BigNumber, pow, multiply } from "../shared/bigNumber";
 
 // each building's $ base values (income/upgrade/unlock/rate-step) are this much
 // bigger than the previous building's — a fresh, much richer economy to grow into
@@ -14,10 +15,13 @@ const BUILDING_BASE_PRICE = 1_000_000_000; // $ to buy the very first purchasabl
 // $ cost to buy the next building (nextBuildingIndex === buildings.length, since
 // index 0 is the always-free starting building) — scales by the same
 // BUILDING_COST_MULTIPLIER as that building's own economy, so the price always keeps
-// pace with how much richer each successive building actually is
-export function getBuildingPrice(nextBuildingIndex: number): number {
-  return (
-    BUILDING_BASE_PRICE * BUILDING_COST_MULTIPLIER ** (nextBuildingIndex - 1)
+// pace with how much richer each successive building actually is. Uses
+// shared/bigNumber's pow (never a raw `**`), so this stays finite even for a
+// very high building index instead of overflowing to Infinity
+export function getBuildingPrice(nextBuildingIndex: number): BigNumber {
+  return multiply(
+    pow(BUILDING_COST_MULTIPLIER, nextBuildingIndex - 1),
+    BUILDING_BASE_PRICE,
   );
 }
 

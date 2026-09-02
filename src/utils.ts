@@ -1,4 +1,15 @@
 import { COLOR } from "./palette";
+import {
+  type BigNumber,
+  isZero,
+  toNumber,
+  fromNumber,
+  add,
+  subtract,
+  multiply,
+  lt,
+  lte,
+} from "./shared/bigNumber";
 
 export function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -178,16 +189,14 @@ function illionName(tier: number): string {
 
 // shared by formatCompactNumber/formatTotalIncomeParts: how many whole "-illion"
 // tiers safe (>= 1e6) is past, and the 1-999.999 mantissa within that tier. tier
-// follows illionSuffix/illionName's numbering (1 = million, 10 = decillion, ...)
-function compactTier(safe: number): { mantissa: number; tier: number } {
-  // reads the exponent straight out of toExponential's own normalized string
-  // instead of floor(log10(safe)) — floating-point log10 of an exact power of ten
-  // (e.g. 1e33) can land a hair under the whole number, which would silently pick
-  // the wrong (one-too-low) tier right at every tier boundary
-  const [mantissaStr, expStr] = safe.toExponential(6).split("e");
-  const exponent = Number(expStr);
+// follows illionSuffix/illionName's numbering (1 = million, 10 = decillion, ...).
+// Reads mantissa/exponent straight off the BigNumber (already normalized) instead
+// of re-deriving them via toExponential string-parsing of a plain number — and
+// since a BigNumber's exponent can never overflow, this needs no Infinity guard
+function compactTier(value: BigNumber): { mantissa: number; tier: number } {
+  const exponent = value.exponent;
   let tier = Math.floor(exponent / 3); // 2 = million (1e6), 3 = billion (1e9), ...
-  let mantissa = Number(mantissaStr) * 10 ** (exponent - tier * 3);
+  let mantissa = value.mantissa * 10 ** (exponent - tier * 3);
   // rounding a mantissa like 999.6 up to "1000" below — bump to the next tier
   // instead of ever displaying/naming a 4-digit mantissa
   if (Math.round(mantissa) >= 1000) {
@@ -204,11 +213,10 @@ function compactTier(safe: number): { mantissa: number; tier: number } {
 // the moment it crosses a tier boundary. Always at least tier 1 (million) — values
 // under that already fit in 12 digits and skip this path entirely (see
 // formatTotalIncomeParts's own <1e12 case)
-function expandedTier(safe: number): { mantissa: number; tier: number } {
-  const [mantissaStr, expStr] = safe.toExponential(11).split("e");
-  const exponent = Number(expStr);
+function expandedTier(value: BigNumber): { mantissa: number; tier: number } {
+  const exponent = value.exponent;
   let tier = Math.max(1, Math.ceil((exponent - 14) / 3));
-  let mantissa = Number(mantissaStr) * 10 ** (exponent - 3 * (tier + 1));
+  let mantissa = value.mantissa * 10 ** (exponent - 3 * (tier + 1));
   // same rounding-bump idea as compactTier, just at the 12-digit ceiling instead
   // of the 3-digit one
   if (Math.round(mantissa) >= 1e12) {
@@ -218,20 +226,20 @@ function expandedTier(safe: number): { mantissa: number; tier: number } {
   return { mantissa, tier };
 }
 
-// compacts a non-negative number to a magnitude suffix (K/M/B/T/...) once it's
+// compacts a non-negative BigNumber to a magnitude suffix (K/M/B/T/...) once it's
 // big enough, always a whole number (no decimals) so every number shown in the
 // game is the same format instead of drifting per caller
-function formatCompactNumber(value: number): string {
-  const safe = Math.max(0, value);
-  if (safe < 1e6) return safe.toFixed(0);
-  if (!Number.isFinite(safe)) return "∞";
-  const { mantissa, tier } = compactTier(safe);
+function formatCompactNumber(value: BigNumber): string {
+  if (isZero(value) || value.exponent < 6) {
+    return Math.floor(Math.max(0, toNumber(value))).toFixed(0);
+  }
+  const { mantissa, tier } = compactTier(value);
   return `${mantissa.toFixed(0)}${illionSuffix(tier)}`;
 }
 
 // the only way a $ amount should be formatted anywhere in the game, e.g. "$2M"
-export function formatPrice(value: number): string {
-  return `$${formatCompactNumber(Math.floor(Math.max(0, value)))}`;
+export function formatPrice(value: BigNumber): string {
+  return `$${formatCompactNumber(value)}`;
 }
 
 // the HUD's own total-income number specifically: shown as a full, comma-separated
@@ -240,12 +248,11 @@ export function formatPrice(value: number): string {
 // abbreviated. Once it'd overflow past that (1e12+), falls back to the same compact
 // magnitude-suffix format formatPrice uses everywhere else, so it never runs off the
 // edge of the HUD
-export function formatTotalIncome(value: number): string {
-  const safe = Math.floor(Math.max(0, value));
-  if (safe < 1e12) {
-    return `$${safe.toLocaleString("en-US")}`;
+export function formatTotalIncome(value: BigNumber): string {
+  if (value.exponent < 12) {
+    return `$${Math.floor(Math.max(0, toNumber(value))).toLocaleString("en-US")}`;
   }
-  return formatPrice(safe);
+  return formatPrice(value);
 }
 
 // same total-income number, but split into the plain amount and the full spelled-out
@@ -254,18 +261,17 @@ export function formatTotalIncome(value: number): string {
 // want to lay the unit out on its own line under the number. unitName is null below
 // formatTotalIncome's own 1e12 cutoff, since the full comma-separated number there
 // has no unit at all
-export function formatTotalIncomeParts(value: number): {
+export function formatTotalIncomeParts(value: BigNumber): {
   amount: string;
   unitName: string | null;
 } {
-  const safe = Math.floor(Math.max(0, value));
-  if (safe < 1e12) {
-    return { amount: `$${safe.toLocaleString("en-US")}`, unitName: null };
+  if (value.exponent < 12) {
+    return {
+      amount: `$${Math.floor(Math.max(0, toNumber(value))).toLocaleString("en-US")}`,
+      unitName: null,
+    };
   }
-  if (!Number.isFinite(safe)) {
-    return { amount: "$∞", unitName: null };
-  }
-  const { mantissa, tier } = expandedTier(safe);
+  const { mantissa, tier } = expandedTier(value);
   return {
     amount: `$${Math.round(mantissa).toLocaleString("en-US")}`,
     unitName: illionName(tier),
@@ -275,7 +281,7 @@ export function formatTotalIncomeParts(value: number): {
 // same total-income number as formatTotalIncomeParts, but joined onto one line
 // with its full spelled-out unit name (e.g. "$1 Undecillion") instead of an
 // abbreviation — for callers with no room for a separate unit-name line
-export function formatTotalIncomeFull(value: number): string {
+export function formatTotalIncomeFull(value: BigNumber): string {
   const { amount, unitName } = formatTotalIncomeParts(value);
   return unitName ? `${amount} ${unitName}` : amount;
 }
@@ -287,7 +293,7 @@ export function formatTotalIncomeFull(value: number): string {
 // The displayed value lags behind the real total and eases toward it every call
 // instead of snapping straight to whatever totalIncome.ts's own 200ms ticker just
 // collected, so income arriving reads as visibly counting up.
-let displayedTotalIncome: number | null = null;
+let displayedTotalIncome: BigNumber | null = null;
 let totalIncomeLastFrameTime = performance.now();
 // fraction of the remaining gap closed per second — proportional (not a fixed
 // $/sec step), so a huge jump (e.g. the dev "Add Money" button) still visibly
@@ -297,27 +303,33 @@ const TOTAL_INCOME_CATCH_UP_RATE_PER_SECOND = 6;
 // once this close, just snap — the exponential catch-up above never mathematically
 // reaches its target, so without this the display would drift by fractions of a
 // cent forever instead of ever landing exactly on the real total
-const TOTAL_INCOME_SNAP_THRESHOLD = 0.5;
+const TOTAL_INCOME_SNAP_THRESHOLD = fromNumber(0.5);
 
-export function getAnimatedTotalIncome(totalIncome: number): number {
+export function getAnimatedTotalIncome(totalIncome: BigNumber): BigNumber {
   const now = performance.now();
   // clamped so a backgrounded/throttled tab doesn't resume with one giant catch-up
   // jump from however long it was actually away
   const dt = Math.min(1, (now - totalIncomeLastFrameTime) / 1000);
   totalIncomeLastFrameTime = now;
   if (displayedTotalIncome === null) displayedTotalIncome = totalIncome;
-  const remaining = totalIncome - displayedTotalIncome;
-  displayedTotalIncome =
-    // only income arriving (remaining > 0) eases in — a spend (e.g. holding the
-    // upgrade button) drops the real total instantly, and easing toward that
-    // dropped-then-refilled target too made the displayed number visibly flicker
-    // down and back up on every purchase instead of just climbing from income
-    remaining <= 0 ||
-    remaining < TOTAL_INCOME_SNAP_THRESHOLD ||
-    !Number.isFinite(remaining)
-      ? totalIncome
-      : displayedTotalIncome +
-        remaining * Math.min(1, TOTAL_INCOME_CATCH_UP_RATE_PER_SECOND * dt);
+  // only income arriving (totalIncome > displayed) eases in — a spend (e.g. holding
+  // the upgrade button) drops the real total instantly, and easing toward that
+  // dropped-then-refilled target too made the displayed number visibly flicker
+  // down and back up on every purchase instead of just climbing from income
+  if (lte(totalIncome, displayedTotalIncome)) {
+    displayedTotalIncome = totalIncome;
+    return displayedTotalIncome;
+  }
+  const remaining = subtract(totalIncome, displayedTotalIncome);
+  displayedTotalIncome = lt(remaining, TOTAL_INCOME_SNAP_THRESHOLD)
+    ? totalIncome
+    : add(
+        displayedTotalIncome,
+        multiply(
+          remaining,
+          Math.min(1, TOTAL_INCOME_CATCH_UP_RATE_PER_SECOND * dt),
+        ),
+      );
   return displayedTotalIncome;
 }
 

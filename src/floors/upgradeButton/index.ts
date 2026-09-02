@@ -2,6 +2,7 @@ import { drawCartoonText, drawPill, formatPrice } from "../../utils";
 import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
+import { type BigNumber, divide } from "../../shared/bigNumber";
 import type { Floor } from "../../gameState";
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left).
@@ -231,15 +232,15 @@ export function isSaleActive(floor: Floor, now: number): boolean {
 // back into floor.incomeAmount itself (that would compound: a bigger rate next
 // click, forever), just read fresh each click and credited straight to the
 // player's total (see floorInteractions/index.ts and hud/boostMenu/index.ts)
-export function floorIncomePerSecond(floor: Floor): number {
-  return floor.incomeAmount / floor.incomeIntervalSeconds;
+export function floorIncomePerSecond(floor: Floor): BigNumber {
+  return divide(floor.incomeAmount, floor.incomeIntervalSeconds);
 }
 
 export function drawUpgradeButton(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
   hovered: boolean,
-  cost: number,
+  cost: BigNumber,
   affordable: boolean,
   isGroundFloor: boolean,
 ): void {

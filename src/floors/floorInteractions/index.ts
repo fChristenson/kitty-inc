@@ -33,6 +33,7 @@ import {
   getLockCenter,
 } from "../floorLock";
 import { activateBoosted, type Floor } from "../../gameState";
+import { multiply, gte } from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
 
 export interface FloorActionsDeps {
@@ -62,7 +63,7 @@ export function hitTestFloorHover(
       floor.unlocked &&
       (isSaleActive(floor, Date.now()) ||
         isCritUpgrade(floor) ||
-        getTotalIncome() >= floor.upgradeCost)) ||
+        gte(getTotalIncome(), floor.upgradeCost))) ||
     hitTestFloorLock(x, y, floor) ||
     hitTestWorkers(x, y, floor).length > 0
   );
@@ -151,9 +152,10 @@ export function handleFloorClick(
       // 1 second of the floor's own current income rate, credited straight to
       // the player's total — never added back into floor.incomeAmount itself, or
       // each click would permanently raise the rate the next click reads from
-      const gained =
-        floorIncomePerSecond(floor) *
-        (tier ? CRIT_TIER_CONFIG[tier].multiplier : 1);
+      const gained = multiply(
+        floorIncomePerSecond(floor),
+        tier ? CRIT_TIER_CONFIG[tier].multiplier : 1,
+      );
       addTotalIncome(gained);
       rollCritUpgrade(floor);
       persist();

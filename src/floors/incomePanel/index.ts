@@ -3,6 +3,13 @@ import { countBoostedWorkers, type Floor } from "../../gameState";
 import { MAX_RENDERED_WORKERS } from "../worker";
 import { CRIT_TIER_CONFIG } from "../upgradeButton";
 import {
+  type BigNumber,
+  ZERO,
+  add,
+  multiply,
+  divide,
+} from "../../shared/bigNumber";
+import {
   drawPill,
   drawPillBorder,
   drawCartoonText,
@@ -95,10 +102,13 @@ export function increaseIncomeRate(floor: Floor): void {
   const rateMultiplier = floor.critMultiplierTier
     ? CRIT_TIER_CONFIG[floor.critMultiplierTier].multiplier
     : 1;
-  floor.incomeAmount += floor.rateStep * rateMultiplier;
-  floor.upgradeCost = Math.ceil(
-    floor.upgradeCost *
-      (floor.aboveCapTier ? UPGRADE_COST_GROWTH_ABOVE_CAP : UPGRADE_COST_GROWTH),
+  floor.incomeAmount = add(
+    floor.incomeAmount,
+    multiply(floor.rateStep, rateMultiplier),
+  );
+  floor.upgradeCost = multiply(
+    floor.upgradeCost,
+    floor.aboveCapTier ? UPGRADE_COST_GROWTH_ABOVE_CAP : UPGRADE_COST_GROWTH,
   );
   floor.upgradeCount += 1;
   // no MIN_INCOME_INTERVAL_SECONDS clamp here — this stores the floor's true,
@@ -152,7 +162,7 @@ function currentSpeedMultiplier(floor: Floor, now: number): number {
 function effectiveIncomeCycle(
   floor: Floor,
   now: number,
-): { intervalSeconds: number; amount: number; overspeed: boolean } {
+): { intervalSeconds: number; amount: BigNumber; overspeed: boolean } {
   const uncappedIntervalSeconds =
     floor.incomeIntervalSeconds / currentSpeedMultiplier(floor, now);
 
@@ -167,23 +177,23 @@ function effectiveIncomeCycle(
     MIN_INCOME_INTERVAL_SECONDS / uncappedIntervalSeconds;
   return {
     intervalSeconds: MIN_INCOME_INTERVAL_SECONDS,
-    amount: floor.incomeAmount * overspeedMultiplier,
+    amount: multiply(floor.incomeAmount, overspeedMultiplier),
     overspeed: true,
   };
 }
 
 // advances a floor's fill cycle by however many full intervals have elapsed since it was last
-// checked, returning the $ earned from those completed cycles (0 if the bar hasn't filled yet).
+// checked, returning the $ earned from those completed cycles (ZERO if the bar hasn't filled yet).
 // shares the same clock (and the same floor.lastCollectedAt anchor) the bar itself draws
 // from, so a payout always lines up with the bar visually completing instead of money
 // trickling in continuously underneath a stepped bar
-export function collectDueIncome(floor: Floor, now: number): number {
+export function collectDueIncome(floor: Floor, now: number): BigNumber {
   const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
   const intervalMs = intervalSeconds * 1000;
   const cycles = Math.floor((now - floor.lastCollectedAt) / intervalMs);
-  if (cycles <= 0) return 0;
+  if (cycles <= 0) return ZERO;
   floor.lastCollectedAt += cycles * intervalMs;
-  return cycles * amount;
+  return multiply(amount, cycles);
 }
 
 // same math as collectDueIncome, but read-only — doesn't advance
@@ -191,11 +201,11 @@ export function collectDueIncome(floor: Floor, now: number): number {
 // company.ts): their floors sit dormant instead of being ticked live, so this
 // lets totalIncome.ts estimate what they'd have actually earned by now anyway,
 // without needing every company's buildings loaded/ticking at once
-export function peekDueIncome(floor: Floor, now: number): number {
+export function peekDueIncome(floor: Floor, now: number): BigNumber {
   const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
   const intervalMs = intervalSeconds * 1000;
   const cycles = Math.floor((now - floor.lastCollectedAt) / intervalMs);
-  return cycles > 0 ? cycles * amount : 0;
+  return cycles > 0 ? multiply(amount, cycles) : ZERO;
 }
 
 // a floor's own $/sec at its current effective rate — same boost-aware cycle math
@@ -204,9 +214,12 @@ export function peekDueIncome(floor: Floor, now: number): number {
 // the floor itself, so this stays accurate even for a company that isn't the
 // currently active one (see totalIncome.ts's getCompanyWealth and
 // corporationBoostMenu.ts's getStockRaiseCost)
-export function currentIncomeRatePerSecond(floor: Floor, now: number): number {
+export function currentIncomeRatePerSecond(
+  floor: Floor,
+  now: number,
+): BigNumber {
   const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
-  return amount / intervalSeconds;
+  return divide(amount, intervalSeconds);
 }
 
 // seconds left until the current fill cycle completes, counting down from the full

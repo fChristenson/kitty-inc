@@ -4,6 +4,7 @@ import {
   formatTotalIncomeParts,
   getAnimatedTotalIncome,
 } from "../../utils";
+import type { BigNumber } from "../../shared/bigNumber";
 
 // total-income readout at the top of the map — same green-fill/white-stroke
 // money text look used everywhere else, sized for this canvas's own CSS pixel
@@ -26,7 +27,7 @@ export interface IncomeReadout {
   draw(
     ctx: CanvasRenderingContext2D,
     cssW: number,
-    totalIncome: number,
+    totalIncome: BigNumber,
   ): number;
 }
 
@@ -41,7 +42,7 @@ export function createIncomeReadout(): IncomeReadout {
   function draw(
     ctx: CanvasRenderingContext2D,
     cssW: number,
-    totalIncome: number,
+    totalIncome: BigNumber,
   ): number {
     const { amount: incomeAmountText, unitName: incomeUnitName } =
       formatTotalIncomeParts(getAnimatedTotalIncome(totalIncome));

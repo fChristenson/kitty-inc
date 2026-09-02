@@ -1,5 +1,6 @@
 import { COLOR } from "../../palette";
 import { drawCartoonText, formatPrice } from "../../utils";
+import type { BigNumber } from "../../shared/bigNumber";
 import { getPriceWiggleTransform, PRICE_WIGGLE_PERIOD_MS } from "./priceWiggle";
 
 // cat marker geometry/drawing/hit-testing for the city map's per-building
@@ -208,7 +209,7 @@ export function drawLockedMarkerPrice(
   ctx: CanvasRenderingContext2D,
   cx: number,
   feetY: number,
-  price: number,
+  price: BigNumber,
   affordable: boolean,
 ): void {
   // 25% smaller than the original 22px, matching the scaled-down cat marker

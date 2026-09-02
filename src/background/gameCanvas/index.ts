@@ -62,7 +62,7 @@ const STAR_START_ALTITUDE = STAR_START_FLOOR * FLOOR_H;
 // visible either in the thin side gutters or up here; this needs to be genuinely
 // tall (not just GUTTER_W) or clouds would only ever show as thin edge slivers
 // instead of drifting across the whole visible background
-const SKY_MARGIN_H = 800;
+const SKY_MARGIN_H = 900;
 
 // night sky: starts at the active theme's own city.png top-edge color (see
 // getCitySkyGroundColor — so the seam where that image ends and this programmatic
@@ -202,9 +202,17 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
 
   // the world's own fixed extent — everything the camera is allowed to move around
   // in, computed straight from the active building's own floors: gutters + content,
-  // nothing that grows/shrinks for any other reason
+  // nothing that grows/shrinks for any other reason.
+  // Bug fix: this used to be `-(activeFloors.length * FLOOR_H + SKY_MARGIN_H)`,
+  // spacing every floor a full FLOOR_H apart — but floorWorldY (the function that
+  // actually POSITIONS floors) packs them FLOOR_OVERLAP px tighter than that. The
+  // mismatch was invisible at low floor counts but compounds by FLOOR_OVERLAP per
+  // floor, so hundreds of floors left several screens of pure empty scrollable sky
+  // above the roof. Deriving straight from floorWorldY keeps this in permanent sync
+  // with wherever floors/the roof are actually drawn, at any floor count
   function worldTopY(): number {
-    return -(activeFloors.length * FLOOR_H + SKY_MARGIN_H);
+    const topFloorIndex = Math.max(0, activeFloors.length - 1);
+    return floorWorldY(topFloorIndex).top - SKY_MARGIN_H;
   }
   function worldHeight(): number {
     return GROUND_H - worldTopY();

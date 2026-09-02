@@ -12,6 +12,14 @@ import {
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
+import {
+  type BigNumber,
+  fromNumber,
+  multiply,
+  gt,
+  gte,
+  lt,
+} from "../../shared/bigNumber";
 
 const officeChairsIconUrl = getImageUrl("officeChairsIcon");
 const officeSuppliesIconUrl = getImageUrl("officeSuppliesIcon");
@@ -20,21 +28,23 @@ const officeSuppliesIconUrl = getImageUrl("officeSuppliesIcon");
 // needs its own floor price for it instead of reading straight from unlockCost
 const WORKER_BASE_PRICE_FLOOR_1 = 100;
 
+function getFloorPrice(floor: Floor): BigNumber {
+  return gt(floor.unlockCost, fromNumber(0))
+    ? floor.unlockCost
+    : fromNumber(WORKER_BASE_PRICE_FLOOR_1);
+}
+
 // the $ cost of a floor's next worker: its floor price (unlock cost, or the floor-1
 // fallback above) times how many workers it already has
-export function getWorkerCost(floor: Floor): number {
-  const floorPrice =
-    floor.unlockCost > 0 ? floor.unlockCost : WORKER_BASE_PRICE_FLOOR_1;
-  return floorPrice * floor.workerCount;
+export function getWorkerCost(floor: Floor): BigNumber {
+  return multiply(getFloorPrice(floor), floor.workerCount);
 }
 
 // what the floor's own 3rd worker would cost (i.e. getWorkerCost at workerCount=2),
 // independent of however many workers it actually has right now — shared pricing
 // basis for the one-time office chairs/supplies purchases below
-function getThirdWorkerCost(floor: Floor): number {
-  const floorPrice =
-    floor.unlockCost > 0 ? floor.unlockCost : WORKER_BASE_PRICE_FLOOR_1;
-  return floorPrice * 2;
+function getThirdWorkerCost(floor: Floor): BigNumber {
+  return multiply(getFloorPrice(floor), 2);
 }
 
 // buys one more worker for the floor if affordable; returns whether it succeeded. capped
@@ -50,7 +60,7 @@ export function buyWorker(floor: Floor): boolean {
 // can be bought over and over) — priced the same as the floor's own 3rd worker.
 // Once floor.hasOfficeChairs flips true it never resets, and this item just stops
 // being listed for that floor (see render below)
-export function getOfficeChairsCost(floor: Floor): number {
+export function getOfficeChairsCost(floor: Floor): BigNumber {
   return getThirdWorkerCost(floor);
 }
 
@@ -63,7 +73,7 @@ export function buyOfficeChairs(floor: Floor): boolean {
 
 // a second one-time, non-stacking per-floor purchase, same shape (and same
 // third-worker pricing) as office chairs above (own flag, never resets once bought)
-export function getOfficeSuppliesCost(floor: Floor): number {
+export function getOfficeSuppliesCost(floor: Floor): BigNumber {
   return getThirdWorkerCost(floor);
 }
 
@@ -80,7 +90,7 @@ export function buyOfficeSupplies(floor: Floor): boolean {
 // so a manager can only be hired once a floor's been upgraded enough to justify one
 const MANAGER_MIN_UPGRADE_COUNT = 50;
 
-export function getManagerCost(floor: Floor): number {
+export function getManagerCost(floor: Floor): BigNumber {
   return getThirdWorkerCost(floor);
 }
 
@@ -126,12 +136,12 @@ function oneTimeItemMarkup(options: {
   iconUrl: string | null;
   label: string;
   bought: boolean;
-  cost: number;
+  cost: BigNumber;
   lockedLabel?: string;
 }): string {
   const { dataAttr, floorIndex, iconUrl, label, bought, cost, lockedLabel } =
     options;
-  const affordable = !bought && !lockedLabel && getTotalIncome() >= cost;
+  const affordable = !bought && !lockedLabel && gte(getTotalIncome(), cost);
   const priceText = bought ? "Bought" : (lockedLabel ?? formatPrice(cost));
   return `
     <button
@@ -174,7 +184,7 @@ export function wireUpgradeMenu(
         const subheader = `<h3 class="worker-menu__subheader">Floor ${i + 1}</h3>`;
         const maxed = floor.workerCount >= MAX_RENDERED_WORKERS;
         const cost = getWorkerCost(floor);
-        const affordable = !maxed && getTotalIncome() >= cost;
+        const affordable = !maxed && gte(getTotalIncome(), cost);
         const workerItem = `
           <button
             class="worker-menu__item"
@@ -295,7 +305,7 @@ export function wireUpgradeMenu(
         const floor = getFloors()[Number(button.dataset.floorIndex)];
         if (!floor) return;
         const maxed = floor.workerCount >= MAX_RENDERED_WORKERS;
-        button.disabled = maxed || getTotalIncome() < getWorkerCost(floor);
+        button.disabled = maxed || lt(getTotalIncome(), getWorkerCost(floor));
       });
     list
       .querySelectorAll<HTMLButtonElement>(
@@ -307,7 +317,7 @@ export function wireUpgradeMenu(
         if (!floor) return;
         button.disabled =
           floor.hasOfficeChairs ||
-          getTotalIncome() < getOfficeChairsCost(floor);
+          lt(getTotalIncome(), getOfficeChairsCost(floor));
       });
     list
       .querySelectorAll<HTMLButtonElement>(
@@ -319,7 +329,7 @@ export function wireUpgradeMenu(
         if (!floor) return;
         button.disabled =
           floor.hasOfficeSupplies ||
-          getTotalIncome() < getOfficeSuppliesCost(floor);
+          lt(getTotalIncome(), getOfficeSuppliesCost(floor));
       });
     list
       .querySelectorAll<HTMLButtonElement>("button[data-manager-floor-index]")
@@ -329,7 +339,7 @@ export function wireUpgradeMenu(
         button.disabled =
           floor.hasManager ||
           !isManagerUnlocked(floor) ||
-          getTotalIncome() < getManagerCost(floor);
+          lt(getTotalIncome(), getManagerCost(floor));
       });
   }
 

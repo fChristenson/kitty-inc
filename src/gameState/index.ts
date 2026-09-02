@@ -1,4 +1,13 @@
 import { companyStorageKey } from "../company";
+import {
+  type BigNumber,
+  type SerializedBigNumber,
+  ZERO,
+  toBigNumber,
+  add,
+  divide,
+  multiply,
+} from "../shared/bigNumber";
 
 // bumped from "cash-clicker:floors" now that this holds Floor[][] (one entry per
 // building) instead of a single Floor[] — old single-building saves just start fresh
@@ -47,13 +56,13 @@ export const BOOST_URGENT_THRESHOLD_MS = 5_000;
 
 export interface Floor {
   bgIndex: number; // which loaded shop background this floor draws (floors/index.ts)
-  incomeAmount: number;
+  incomeAmount: BigNumber;
   incomeIntervalSeconds: number;
-  upgradeCost: number; // $ needed to buy this floor's next upgrade; doubles per purchase
-  rateStep: number; // $ added to incomeAmount per upgrade click
+  upgradeCost: BigNumber; // $ needed to buy this floor's next upgrade; doubles per purchase
+  rateStep: BigNumber; // $ added to incomeAmount per upgrade click
   upgradeCount: number; // how many upgrades have been bought on this floor
   unlocked: boolean;
-  unlockCost: number; // 0 for floor 1 (always free); doubles starting from floor 2
+  unlockCost: BigNumber; // 0 for floor 1 (always free); doubles starting from floor 2
   workerCount: number; // how many workers this floor has bought via workerMenu.ts; scales its boost strength
   lastCollectedAt: number; // Date.now() ms this floor last completed a whole idle-income cycle
   hasOfficeChairs: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
@@ -183,7 +192,7 @@ export function markAppClosed(): void {
 export function computeIdleIncome(
   buildings: Floor[][],
   incomeBoostMultiplier = 1,
-): number {
+): BigNumber {
   let lastClose: number | null = null;
   try {
     const raw = localStorage.getItem(LAST_CLOSE_KEY);
@@ -197,14 +206,20 @@ export function computeIdleIncome(
     lastClose !== null && Number.isFinite(lastClose)
       ? Math.max(0, (now - lastClose) / 1000)
       : 0;
-  if (elapsedSeconds <= IDLE_INCOME_MIN_SECONDS) return 0;
+  if (elapsedSeconds <= IDLE_INCOME_MIN_SECONDS) return ZERO;
 
-  let idleIncome = 0;
+  let idleIncome: BigNumber = ZERO;
   for (const floors of buildings) {
     for (const floor of floors) {
       if (!floor.unlocked) continue;
-      const ratePerSecond = floor.incomeAmount / floor.incomeIntervalSeconds;
-      idleIncome += ratePerSecond * elapsedSeconds * incomeBoostMultiplier;
+      const ratePerSecond = divide(
+        floor.incomeAmount,
+        floor.incomeIntervalSeconds,
+      );
+      idleIncome = add(
+        idleIncome,
+        multiply(ratePerSecond, elapsedSeconds * incomeBoostMultiplier),
+      );
       // this whole idle span was just paid out in one lump sum, so the floor's next
       // cycle correctly starts fresh from right now
       floor.lastCollectedAt = now;
@@ -213,15 +228,18 @@ export function computeIdleIncome(
   return idleIncome;
 }
 
+// a $ field as it may appear in a saved floor: the new {mantissa, exponent}
+// BigNumber shape, or a plain number (every save written before this
+// migration) — see shared/bigNumber's toBigNumber, which normalizes either
 interface SavedFloor {
-  incomeAmount: number;
+  incomeAmount: SerializedBigNumber;
   incomeIntervalSeconds: number;
-  upgradeCost: number;
-  rateStep: number;
+  upgradeCost: SerializedBigNumber;
+  rateStep: SerializedBigNumber;
   upgradeCount: number;
   workers: WorkerSlot[];
   unlocked: boolean;
-  unlockCost: number;
+  unlockCost: SerializedBigNumber;
   workerCount?: number; // added after initial release; older saves default to 1 on load
   lastCollectedAt?: number; // added after initial release; older saves default to now() on load
   bgIndex?: number; // added after initial release; older saves default to 0 on load
@@ -302,13 +320,13 @@ export function schedulePersist(buildings: Floor[][], companyIndex = 0): void {
 function fromSavedFloor(sf: SavedFloor): Floor {
   const floor: Floor = {
     bgIndex: sf.bgIndex ?? 0,
-    incomeAmount: sf.incomeAmount,
+    incomeAmount: toBigNumber(sf.incomeAmount),
     incomeIntervalSeconds: sf.incomeIntervalSeconds,
-    upgradeCost: sf.upgradeCost,
-    rateStep: sf.rateStep,
+    upgradeCost: toBigNumber(sf.upgradeCost),
+    rateStep: toBigNumber(sf.rateStep),
     upgradeCount: sf.upgradeCount,
     unlocked: sf.unlocked,
-    unlockCost: sf.unlockCost,
+    unlockCost: toBigNumber(sf.unlockCost),
     workerCount: sf.workerCount ?? 1,
     lastCollectedAt: sf.lastCollectedAt ?? Date.now(),
     hasOfficeChairs: sf.hasOfficeChairs ?? false,

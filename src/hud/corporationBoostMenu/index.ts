@@ -29,7 +29,6 @@ import {
   formatBoostPercent,
 } from "./economy";
 
-export type { FloorTarget } from "./economy";
 export {
   clearStockPrices,
   getStockTimesBought,
@@ -45,18 +44,6 @@ export {
   getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,
   getGlobalIncomeBoostMultiplier,
-  getCheapestFloorPurchaseTarget,
-  buyCheapestFloor,
-  getCheapestUpgradeTarget,
-  buyCheapestUpgrade,
-  getCheapestWorkerTarget,
-  buyCheapestWorker,
-  getCheapestOfficeChairsTarget,
-  buyCheapestOfficeChairs,
-  getCheapestOfficeSuppliesTarget,
-  buyCheapestOfficeSupplies,
-  getCheapestManagerTarget,
-  buyCheapestManager,
 } from "./economy";
 
 // reuses .worker-menu's styling — a dialog listing every corporation's own

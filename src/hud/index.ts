@@ -3,6 +3,7 @@ import {
   formatTotalIncomeParts,
   getAnimatedTotalIncome,
 } from "../utils";
+import type { BigNumber } from "../shared/bigNumber";
 import { COLOR } from "../palette";
 
 // floating text overlaid on top of the floors (no panel/bar), pinned via CSS sticky
@@ -24,7 +25,7 @@ let cachedAmountLength = -1;
 export function drawHud(
   ctx: CanvasRenderingContext2D,
   canvasWidth: number,
-  totalIncome: number,
+  totalIncome: BigNumber,
 ): void {
   // see utils.ts's getAnimatedTotalIncome — same count-up animation cityMap's own
   // total-income readout uses, so the two always show the exact same number

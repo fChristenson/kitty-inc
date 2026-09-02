@@ -28,6 +28,7 @@ import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
 import { createCityTransitions } from "./transitions";
 import { loadSprite, loadImageByName } from "../../loadAssets";
+import { type BigNumber, gte } from "../../shared/bigNumber";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -57,7 +58,7 @@ export async function loadCityMapImage(): Promise<HTMLImageElement> {
 }
 
 export interface CityMapDeps {
-  getTotalIncome: () => number;
+  getTotalIncome: () => BigNumber;
   getBuildingCount: () => number; // buildings unlocked so far; building 1 exists once this is >= 2
   getActiveBuildingIndex: () => number; // whichever building's floors are on screen right now
   buyBuilding: () => boolean; // unlocks building 1 if affordable
@@ -313,7 +314,7 @@ export function createCityMapView(
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);
       const { cx, feetY } = markerCenter(cssW, cssH, i);
       const price = getBuildingPrice(globalIndex);
-      const affordable = deps.getTotalIncome() >= price;
+      const affordable = gte(deps.getTotalIncome(), price);
       if (affordable) hasWigglingMarker = true;
       drawLockedMarkerPrice(ctx, cx, feetY, price, affordable);
     }

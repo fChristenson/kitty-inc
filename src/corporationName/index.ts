@@ -5,6 +5,8 @@
 // but this is keyed by index the same way cityName.ts is, ready for whenever the
 // game supports more than one
 
+import { type BigNumber, pow, multiply } from "../shared/bigNumber";
+
 const CAT_WORDS = [
   "Whisker",
   "Meow",
@@ -157,11 +159,14 @@ const CORPORATION_COST_MULTIPLIER = 1000; // each one after that costs this much
 // $ cost to create the next corporation — same scaling shape as buildings.ts's
 // getBuildingPrice, just keyed off getCorporationCount() instead of a building
 // index: the first-ever new corporation (index 1) costs CORPORATION_BASE_PRICE,
-// and every one after that costs CORPORATION_COST_MULTIPLIER (1000x) more
-export function getCorporationPrice(): number {
+// and every one after that costs CORPORATION_COST_MULTIPLIER (1000x) more. Uses
+// shared/bigNumber's pow (never a raw `**`), so this stays finite no matter how
+// many corporations already exist instead of overflowing to Infinity
+export function getCorporationPrice(): BigNumber {
   const nextIndex = getCorporationCount();
-  return (
-    CORPORATION_BASE_PRICE * CORPORATION_COST_MULTIPLIER ** (nextIndex - 1)
+  return multiply(
+    pow(CORPORATION_COST_MULTIPLIER, nextIndex - 1),
+    CORPORATION_BASE_PRICE,
   );
 }
 

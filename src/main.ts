@@ -1,4 +1,5 @@
 import "./style.css";
+import { fromNumber, gt } from "./shared/bigNumber";
 import {
   loadFloorBackgrounds,
   loadGroundImage,
@@ -303,7 +304,7 @@ async function main() {
       // BUILDING_COST_MULTIPLIER pricing) — formatCompactNumber's suffix (utils.ts)
       // is generated algorithmically, not from a fixed list, so it never runs out
       // of a name for however big this (or totalIncome) ever gets
-      addTotalIncome(1e150);
+      addTotalIncome(fromNumber(1e150));
     });
     wireSpawnMouseButton(app, () => {
       forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
@@ -344,20 +345,6 @@ async function main() {
   // hasn't even started sliding away yet
   const corporationUpgradeMenu = wireCorporationUpgradeMenu(
     app,
-    buildings,
-    persist,
-    // a floor bought via this dialog only needs gameCanvas hit-test registration
-    // when it lands in the exact building currently on screen — same condition
-    // setupBuilding's own onAdd already uses; every other case is picked up
-    // automatically the next time that building is switched to
-    (companyIndex, buildingIndex, floor) => {
-      if (
-        companyIndex === activeCompanyIndex &&
-        buildingIndex === activeBuildingIndex
-      ) {
-        gameCanvas.notifyFloorAdded(floor);
-      }
-    },
     getCorporationPrice,
     () => {
       if (!spendFromAllCompanies(getCorporationPrice())) return;
@@ -470,7 +457,7 @@ async function main() {
   // every floor's lastCollectedAt in memory, and that must land before a second quick
   // reload could otherwise re-collect the same already-paid-out idle time
   saveBuildings(buildings, activeCompanyIndex);
-  if (idleIncome > 0) addTotalIncome(idleIncome);
+  if (gt(idleIncome, fromNumber(0))) addTotalIncome(idleIncome);
 
   gameCanvas.redraw();
 

@@ -14,6 +14,17 @@ import {
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
+import {
+  type BigNumber,
+  ZERO,
+  fromNumber,
+  add,
+  divide,
+  multiply,
+  max,
+  gte,
+  lt,
+} from "../../shared/bigNumber";
 
 const mouseIconUrl = getImageUrl("mouse");
 const coinIconUrl = getImageUrl("coin");
@@ -22,30 +33,31 @@ const BOOST_ALL_SECONDS_COST = 5; // cost is 5s of current (unboosted) income
 
 // $/sec every unlocked floor is currently earning at its own base rate, ignoring any
 // boost already in effect — same convention gameState.ts's computeIdleIncome uses
-function currentIncomePerSecond(floors: Floor[]): number {
+function currentIncomePerSecond(floors: Floor[]): BigNumber {
   return floors
     .filter((floor) => floor.unlocked)
     .reduce(
-      (sum, floor) => sum + floor.incomeAmount / floor.incomeIntervalSeconds,
-      0,
+      (sum, floor) =>
+        add(sum, divide(floor.incomeAmount, floor.incomeIntervalSeconds)),
+      ZERO,
     );
 }
 
-export function getBoostAllCost(floors: Floor[]): number {
-  return currentIncomePerSecond(floors) * BOOST_ALL_SECONDS_COST;
+export function getBoostAllCost(floors: Floor[]): BigNumber {
+  return multiply(currentIncomePerSecond(floors), BOOST_ALL_SECONDS_COST);
 }
 
 // a floor's own floorIncomePerSecond (see floors/upgradeButton/index.ts — exactly
 // what one Sale click pays out), averaged across every unlocked floor since the
 // boost lands on a random one
-function averageFloorIncomePerSecond(floors: Floor[]): number {
+function averageFloorIncomePerSecond(floors: Floor[]): BigNumber {
   const unlocked = floors.filter((floor) => floor.unlocked);
-  if (unlocked.length === 0) return 1;
+  if (unlocked.length === 0) return fromNumber(1);
   const total = unlocked.reduce(
-    (sum, floor) => sum + Math.max(1, floorIncomePerSecond(floor)),
-    0,
+    (sum, floor) => add(sum, max(fromNumber(1), floorIncomePerSecond(floor))),
+    ZERO,
   );
-  return total / unlocked.length;
+  return divide(total, unlocked.length);
 }
 
 // boosts every rendered worker on every unlocked floor — shared by the paid
@@ -73,11 +85,14 @@ export function buyBoostAll(floors: Floor[]): boolean {
   return true;
 }
 
-export function getSaleBoostCost(floors: Floor[]): number {
+export function getSaleBoostCost(floors: Floor[]): BigNumber {
   // half of SALE_ASSUMED_CLICKS worth of the floor's own per-second income —
   // clicking through that many sale clicks (see floorInteractions/index.ts) pays
   // that whole amount back, i.e. at least double the cost
-  return (averageFloorIncomePerSecond(floors) * SALE_ASSUMED_CLICKS) / 2;
+  return divide(
+    multiply(averageFloorIncomePerSecond(floors), SALE_ASSUMED_CLICKS),
+    2,
+  );
 }
 
 // buys the "Sale" boost: spends the cost, then puts one random unlocked floor's
@@ -136,14 +151,14 @@ export function wireBoostMenu(
   // render() and reused by updateAffordability's own 250ms interval below instead
   // of recomputing them from scratch every tick, which made the dialog's upkeep
   // cost scale with the building's total floor count for as long as it stayed open
-  let cachedBoostAllCost = 0;
-  let cachedSaleBoostCost = 0;
+  let cachedBoostAllCost: BigNumber = ZERO;
+  let cachedSaleBoostCost: BigNumber = ZERO;
 
   function render(): void {
     cachedBoostAllCost = getBoostAllCost(getFloors());
-    const affordable = getTotalIncome() >= cachedBoostAllCost;
+    const affordable = gte(getTotalIncome(), cachedBoostAllCost);
     cachedSaleBoostCost = getSaleBoostCost(getFloors());
-    const saleAffordable = getTotalIncome() >= cachedSaleBoostCost;
+    const saleAffordable = gte(getTotalIncome(), cachedSaleBoostCost);
     list.innerHTML = `
       <button
         class="worker-menu__item"
@@ -207,12 +222,12 @@ export function wireBoostMenu(
       "#boost-menu-speed-up",
     );
     if (speedUpButton) {
-      speedUpButton.disabled = getTotalIncome() < cachedBoostAllCost;
+      speedUpButton.disabled = lt(getTotalIncome(), cachedBoostAllCost);
     }
     const saleButton =
       list.querySelector<HTMLButtonElement>("#boost-menu-sale");
     if (saleButton) {
-      saleButton.disabled = getTotalIncome() < cachedSaleBoostCost;
+      saleButton.disabled = lt(getTotalIncome(), cachedSaleBoostCost);
     }
   }
 

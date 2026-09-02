@@ -12,6 +12,16 @@ import {
   spendFromAllCompanies,
   getAllCompaniesTotalIncome,
 } from "../../totalIncome";
+import {
+  type BigNumber,
+  ZERO,
+  fromNumber,
+  add,
+  subtract,
+  multiply,
+  gt,
+  lt,
+} from "../../shared/bigNumber";
 import { addMarketInfluencePercent } from "../corporationBoostMenu";
 import { generateMarketEventText, MARKET_CRASH_TEXT } from "./marketEventText";
 import { loadSprite, loadImageByName } from "../../loadAssets";
@@ -218,7 +228,7 @@ interface GameState {
   marketEvents: MarketEvent[];
   nextEventInMs: number; // counts down to the next spawn (see EVENT_SPAWN_INTERVAL_*)
   marketInfluencePercent: number; // this session's own accrued total, for display only (the persisted stat lives in corporationBoostMenu)
-  totalExpensesThisSession: number; // cumulative $ actually burned so far this round; only ever grows
+  totalExpensesThisSession: BigNumber; // cumulative $ actually burned so far this round; only ever grows
 }
 
 export function createPressConferenceGameMarkup(): string {
@@ -397,14 +407,14 @@ export function wirePressConferenceGame(
       marketEvents: [],
       nextEventInMs: randomEventDelayMs(0),
       marketInfluencePercent: 0,
-      totalExpensesThisSession: 0,
+      totalExpensesThisSession: ZERO,
     };
   }
   let state = freshState();
   // snapshotted once at open() — the round's own fuel/budget is fixed for the
   // whole round instead of tracking whatever companies are earning live, since
   // nothing is actually spent from them until endRound
-  let totalIncomeAtOpen = 0;
+  let totalIncomeAtOpen: BigNumber = ZERO;
 
   // identical to floors/upgradeButton's own triggerButtonPress/pressScale —
   // recorded whenever the End button itself is pressed, read back every draw
@@ -746,7 +756,7 @@ export function wirePressConferenceGame(
     state.running = false;
     state.gameOver = true;
     playExplosion();
-    if (state.totalExpensesThisSession > 0) {
+    if (gt(state.totalExpensesThisSession, ZERO)) {
       spendFromAllCompanies(state.totalExpensesThisSession);
     }
     addMarketInfluencePercent(state.marketInfluencePercent);
@@ -801,9 +811,12 @@ export function wirePressConferenceGame(
     // burn a wealth-proportional slice of it every second, tracked locally
     // only — running dry ends the round the same way hitting a bound does
     if (state.running) {
-      const remaining = totalIncomeAtOpen - state.totalExpensesThisSession;
+      const remaining = subtract(
+        totalIncomeAtOpen,
+        state.totalExpensesThisSession,
+      );
       // anything under $1 counts as bankrupt
-      if (remaining < 1) {
+      if (lt(remaining, fromNumber(1))) {
         endRound();
       } else {
         // flat rate, just for surviving — not tied to the burn cost below at
@@ -812,12 +825,16 @@ export function wirePressConferenceGame(
         state.marketInfluencePercent +=
           AMBIENT_INFLUENCE_PERCENT_PER_SECOND * dt;
 
-        const cost =
-          remaining *
+        const cost = multiply(
+          remaining,
           BASE_BURN_PERCENT_PER_SECOND *
-          BURN_PERCENT_GROWTH_PER_TIER ** getDifficultyTier() *
-          dt;
-        state.totalExpensesThisSession += cost;
+            BURN_PERCENT_GROWTH_PER_TIER ** getDifficultyTier() *
+            dt,
+        );
+        state.totalExpensesThisSession = add(
+          state.totalExpensesThisSession,
+          cost,
+        );
       }
     }
 
@@ -890,7 +907,7 @@ export function wirePressConferenceGame(
     scoreEl.style.bottom = `${scoreBottomPx}px`;
     budgetEl.style.bottom = `${scoreBottomPx + BUDGET_ABOVE_SCORE_OFFSET}px`;
     budgetValueEl.textContent = formatPrice(
-      totalIncomeAtOpen - state.totalExpensesThisSession,
+      subtract(totalIncomeAtOpen, state.totalExpensesThisSession),
     );
     influenceValueEl.textContent = `${state.marketInfluencePercent >= 0 ? "+" : ""}${state.marketInfluencePercent.toFixed(2)}% ▲`;
   }
