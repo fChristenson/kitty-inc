@@ -4,6 +4,7 @@ import {
   loadBackgrounds,
   loadGroundImage as loadAssetGroundImage,
 } from "../loadAssets";
+import { MAX_INCOME_INTERVAL_SECONDS } from "./incomePanel";
 import {
   FLOOR_W,
   FLOOR_H,
@@ -135,7 +136,10 @@ export function buildFloor(
           INCOME_GROWTH_FACTOR ** (floorLevel - 1) *
           100,
       ) / 100,
-    incomeIntervalSeconds: BASE_INCOME_INTERVAL_SECONDS * 2 ** (floorLevel - 1),
+    incomeIntervalSeconds: Math.min(
+      BASE_INCOME_INTERVAL_SECONDS * 2 ** (floorLevel - 1),
+      MAX_INCOME_INTERVAL_SECONDS,
+    ),
     upgradeCost: BASE_UPGRADE_COST * multiplier * 2 ** (floorLevel - 1),
     rateStep:
       Math.round(

@@ -51,9 +51,12 @@ let tickerRunning = false;
 // — also keeps the bar's own fill-percentage math meaningful, since a 1s-or-longer
 // cycle is always comfortably visible as a normal filling bar
 const MIN_INCOME_INTERVAL_SECONDS = 1;
-// ceiling on the wait time so a high floor's exponentially-longer base interval never
-// forces the player to wait more than this long between payouts
-const MAX_INCOME_INTERVAL_SECONDS = 3600;
+// ceiling on a NEW floor's own starting wait, applied once at creation time (see
+// floors/index.ts's buildFloor) — a high floor's exponentially-longer base interval
+// would otherwise start requiring days/weeks between payouts before a single
+// upgrade. Once created, a floor's interval is NOT re-clamped here on every cycle:
+// upgrades halve it below this exactly like any other floor (see increaseIncomeRate)
+export const MAX_INCOME_INTERVAL_SECONDS = 3600;
 const UPGRADES_PER_INTERVAL_HALVING = 10;
 // upgradeCount hitting a multiple of this is also the "next ten levels" milestone
 // floorInteractions.ts celebrates with an extra coin burst at the upgrade indicator
@@ -122,11 +125,13 @@ function currentSpeedMultiplier(floor: Floor, now: number): number {
 // so the halving exponent scales with the actual workerCount behind it — boosting 1 of 3
 // slots only speeds up 1/3 of the workers, while boosting all 3 means every worker is
 // boosted and their doublings stack multiplicatively (cumulative), same as a global boost.
-// the interval is clamped to [MIN_INCOME_INTERVAL_SECONDS, MAX_INCOME_INTERVAL_SECONDS]
-// (ticking any faster isn't visually manageable; waiting any longer isn't playable) — any
-// speed beyond the min is folded into a payout multiplier, and any wait beyond the max is
-// folded into a payout reduction, so the player always earns the same $/sec the uncapped
-// interval implies either way
+// the interval is clamped to a MIN_INCOME_INTERVAL_SECONDS floor (ticking any faster
+// isn't visually manageable) — any speed beyond that is folded into a payout
+// multiplier instead, so the player always earns the same $/sec the uncapped
+// interval implies either way. There is deliberately no upper clamp here anymore:
+// a floor's own incomeIntervalSeconds is only ever capped once, at creation (see
+// MAX_INCOME_INTERVAL_SECONDS/buildFloor) — from then on it halves via upgrades
+// exactly like any other floor, with no re-imposed ceiling masking that progress
 function effectiveIncomeCycle(
   floor: Floor,
   now: number,
@@ -134,15 +139,6 @@ function effectiveIncomeCycle(
   const uncappedIntervalSeconds =
     floor.incomeIntervalSeconds / currentSpeedMultiplier(floor, now);
 
-  if (uncappedIntervalSeconds > MAX_INCOME_INTERVAL_SECONDS) {
-    const underspeedMultiplier =
-      MAX_INCOME_INTERVAL_SECONDS / uncappedIntervalSeconds;
-    return {
-      intervalSeconds: MAX_INCOME_INTERVAL_SECONDS,
-      amount: floor.incomeAmount * underspeedMultiplier,
-      overspeed: false,
-    };
-  }
   if (uncappedIntervalSeconds >= MIN_INCOME_INTERVAL_SECONDS) {
     return {
       intervalSeconds: uncappedIntervalSeconds,
