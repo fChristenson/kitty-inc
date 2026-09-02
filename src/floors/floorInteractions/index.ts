@@ -207,9 +207,9 @@ export function handleFloorClick(
         // mega/crit rolling moments later (see triggerScreenShake's own suppression)
         triggerScreenShake({
           intensity: 2.6,
-          label: "ULTRA CRIT",
+          label: `x${ULTRA_CRIT_UPGRADE_COUNT}`,
           color: COLOR.red,
-          strokeWidth: 30,
+          strokeWidth: 16,
           blinkHz: 6,
           holdMs: 3000,
           priority: 2,
@@ -220,9 +220,9 @@ export function handleFloorClick(
         // ultra celebration (priority 2)
         triggerScreenShake({
           intensity: 1.8,
-          label: "MEGA CRIT",
+          label: `x${MEGA_CRIT_UPGRADE_COUNT}`,
           color: COLOR.amber,
-          strokeWidth: 26,
+          strokeWidth: 14,
           priority: 1,
         });
         playJackpot();
@@ -230,7 +230,7 @@ export function handleFloorClick(
         // priority 0 (the default): the only tier that can ever get suppressed by
         // a still-playing mega/ultra flash, so those bigger moments are never
         // stepped on by an immediately-following ordinary crit
-        triggerScreenShake();
+        triggerScreenShake({ label: `x${CRIT_UPGRADE_COUNT}` });
         playCoinDrop();
         playExplosion();
       }

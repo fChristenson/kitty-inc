@@ -4,7 +4,7 @@
 // gameCanvas.ts (under background/) reads it — going through a dedicated module
 // avoids a floors->background or background->floors module-boundary violation.
 
-import { drawCartoonText } from "../utils";
+import { drawCartoonText, shadeColor } from "../utils";
 import { COLOR } from "../palette";
 
 // extended duration so the initial punch is followed by a tail of decaying minor
@@ -27,9 +27,9 @@ let flashStartedAt: number | null = null;
 // flashHoldMs + the fade tail — lets triggerScreenShake and drawCritFlash both check
 // "is a flash still playing" without re-deriving it from elapsed-time math
 let flashEndsAt: number | null = null;
-let flashLabel = "CRIT!";
+let flashLabel = "CRIT";
 let flashColor: string = COLOR.purple;
-let flashStrokeWidth = 16;
+let flashStrokeWidth = 8;
 // how many times/sec the flash strobes on/off during its hold phase, on top of the
 // regular grow-in/fade-out animation — 0 (the default) means no strobe at all, just
 // the plain animation every tier already had
@@ -76,9 +76,9 @@ export function triggerScreenShake(options?: {
   shakeIntensity = options?.intensity ?? 1;
 
   flashStartedAt = now;
-  flashLabel = options?.label ?? "CRIT!";
+  flashLabel = options?.label ?? "x5";
   flashColor = options?.color ?? COLOR.purple;
-  flashStrokeWidth = options?.strokeWidth ?? 16;
+  flashStrokeWidth = options?.strokeWidth ?? 8;
   flashBlinkHz = options?.blinkHz ?? 0;
   flashHoldMs = options?.holdMs ?? 0;
   activeFlashPriority = priority;
@@ -196,12 +196,29 @@ export function drawCritFlash(
   ctx.font = font;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  // bloom: a soft white glow drawn (stacked twice for intensity) behind the crisp
+  // text below — canvas shadowBlur alone reads faint at this text's huge on-screen
+  // scale, so repeating the blurred fill pass compounds the glow without touching
+  // any pixel data directly. Cleared before the crisp pass so its own shadowBlur=0
+  // stroke/fill stays sharp, only the glow behind it is soft
+  ctx.shadowColor = COLOR.white;
+  ctx.shadowBlur = 45;
+  ctx.fillStyle = COLOR.white;
+  ctx.fillText(flashLabel, 0, 0);
+  ctx.fillText(flashLabel, 0, 0);
+  ctx.shadowBlur = 0;
+  ctx.shadowColor = "transparent";
+  // a light-to-tier-color vertical gradient reads as glossy/shiny rather than a
+  // flat block of color — same lightening math drawGlossyButton's own sheen uses
+  const gradient = ctx.createLinearGradient(0, -60, 0, 60);
+  gradient.addColorStop(0, shadeColor(flashColor, 0.6));
+  gradient.addColorStop(1, flashColor);
   drawCartoonText(
     ctx,
     flashLabel,
     0,
     0,
-    flashColor,
+    gradient,
     COLOR.white,
     flashStrokeWidth,
   );

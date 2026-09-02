@@ -2,7 +2,7 @@
 // picked up immediately when online), stale-while-revalidate for everything else
 // (so already-visited assets still render instantly offline/on flaky mobile networks).
 // Bump CACHE_NAME whenever this file's own strategy changes, to drop any stale cache.
-const CACHE_NAME = "kitty-inc-v3";
+const CACHE_NAME = "kitty-inc-v4";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -38,8 +38,13 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          // Cache.put throws on a 206 Partial Content response (e.g. a Range
+          // request) — this branch shouldn't ever see one for a navigation, but
+          // guard anyway rather than assume
+          if (response.status !== 206) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
           return response;
         })
         .catch(async () => {
@@ -60,7 +65,11 @@ self.addEventListener("fetch", (event) => {
     caches.match(request).then((cached) => {
       const network = fetch(request)
         .then((response) => {
-          if (response.ok) {
+          // audio/video elements issue Range requests (byte-range fetches, e.g.
+          // seeking/scrubbing our .mp3/.wav sfx) that come back as 206 Partial
+          // Content — Cache.put throws on those, so only full (200) responses
+          // are ever cached here
+          if (response.ok && response.status !== 206) {
             const copy = response.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
           }

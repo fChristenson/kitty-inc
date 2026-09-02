@@ -529,7 +529,7 @@ export function drawCartoonText(
   text: string,
   x: number,
   y: number,
-  fillColor: string = COLOR.white,
+  fillColor: string | CanvasGradient = COLOR.white,
   strokeColor: string = COLOR.black,
   strokeWidth = 5,
 ): void {
@@ -543,8 +543,9 @@ export function drawCartoonText(
 }
 
 // lightens (positive amount) or darkens (negative amount, -1..1) a "#rrggbb" color;
-// shared helper for deriving a button's ring/border/highlight tones from one fill color
-function shadeColor(hex: string, amount: number): string {
+// shared helper for deriving a button's ring/border/highlight tones from one fill
+// color, and (screenShake.ts) a flash text's own gradient stops
+export function shadeColor(hex: string, amount: number): string {
   const num = parseInt(hex.slice(1), 16);
   const channels = [(num >> 16) & 0xff, (num >> 8) & 0xff, num & 0xff];
   return `#${channels
