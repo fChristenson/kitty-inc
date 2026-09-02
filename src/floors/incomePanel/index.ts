@@ -70,6 +70,13 @@ export const UPGRADE_MILESTONE_STEP = UPGRADES_PER_INTERVAL_HALVING;
 // the early game snappy while still slowing into normal idle-game pacing later,
 // rather than the player hitting a wall almost immediately
 const UPGRADE_COST_GROWTH = 1.3;
+// floors whose natural (uncapped) interval already exceeds MAX_INCOME_INTERVAL_SECONDS
+// (see Floor.aboveCapTier, set once at creation in floors/index.ts's buildFloor)
+// earn more than their level was ever meant to once upgrades push their interval
+// well below the 1h cap they started pinned at — a steeper growth rate here is
+// what actually offsets that, since it's specifically each upgrade's cost that
+// needs to scale up faster for these floors, not their starting price
+const UPGRADE_COST_GROWTH_ABOVE_CAP = 1.6;
 
 // once a floor's true speed exceeds what a 1s-minimum bar can show as a normal fill
 // (see effectiveIncomeCycle's overspeed flag below), the bar is shown full instead,
@@ -89,7 +96,10 @@ export function increaseIncomeRate(floor: Floor): void {
     ? CRIT_TIER_CONFIG[floor.critMultiplierTier].multiplier
     : 1;
   floor.incomeAmount += floor.rateStep * rateMultiplier;
-  floor.upgradeCost = Math.ceil(floor.upgradeCost * UPGRADE_COST_GROWTH);
+  floor.upgradeCost = Math.ceil(
+    floor.upgradeCost *
+      (floor.aboveCapTier ? UPGRADE_COST_GROWTH_ABOVE_CAP : UPGRADE_COST_GROWTH),
+  );
   floor.upgradeCount += 1;
   // no MIN_INCOME_INTERVAL_SECONDS clamp here — this stores the floor's true,
   // uncapped base interval, which effectiveIncomeCycle's own clamp below already

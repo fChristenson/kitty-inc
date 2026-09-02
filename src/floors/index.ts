@@ -126,6 +126,13 @@ export function buildFloor(
       ? BASE_UNLOCK_COST * multiplier
       : 0
     : BASE_UNLOCK_COST * multiplier * 2 ** (floorLevel - 2);
+  // true once this level's own natural (uncapped) interval already exceeds the
+  // 1h cap below — set once, forever, regardless of how far upgrades later
+  // shrink the floor's actual incomeIntervalSeconds (see incomePanel.ts's
+  // increaseIncomeRate, which charges these floors a steeper per-upgrade cost)
+  const aboveCapTier =
+    BASE_INCOME_INTERVAL_SECONDS * 2 ** (floorLevel - 1) >
+    MAX_INCOME_INTERVAL_SECONDS;
 
   return {
     bgIndex: pickBackgroundIndex(backgroundCount, existingBgIndexes),
@@ -157,6 +164,7 @@ export function buildFloor(
     hasOfficeSupplies: false,
     hasManager: false,
     critMultiplierTier: null,
+    aboveCapTier,
   };
 }
 
@@ -247,7 +255,11 @@ export {
   getIncomeBarCenter,
   increaseIncomeRate,
 } from "./incomePanel";
-export { ensureLockedFloorAbove, unlockFloor, drawFloorLock } from "./floorLock";
+export {
+  ensureLockedFloorAbove,
+  unlockFloor,
+  drawFloorLock,
+} from "./floorLock";
 export {
   drawCoins,
   hasActiveCoins,

@@ -64,6 +64,14 @@ export interface Floor {
   // cleared afterward. Mirrors floors/upgradeButton's CritTier as a plain string
   // union (not imported) to avoid a gameState<->floors circular import
   critMultiplierTier: "crit" | "mega" | "ultra" | null;
+  // set once at creation (floors/index.ts's buildFloor) when this floor's
+  // natural, uncapped incomeIntervalSeconds already exceeds incomePanel.ts's
+  // MAX_INCOME_INTERVAL_SECONDS (1h) cap — never recomputed afterward, even as
+  // upgrades keep halving its actual interval well below 1h. Lets
+  // increaseIncomeRate charge a steeper per-upgrade cost growth on these
+  // floors, since every upgrade here is worth more (it wasn't "supposed" to
+  // earn this fast) than the same upgrade on a floor that was never capped
+  aboveCapTier: boolean;
 }
 
 // gameState.ts is the sole owner of this per-floor data (Floor itself doesn't carry it),
@@ -223,6 +231,7 @@ interface SavedFloor {
   hasOfficeSupplies?: boolean; // added after initial release; older saves default to false on load
   hasManager?: boolean; // added after initial release; older saves default to false on load
   critMultiplierTier?: "crit" | "mega" | "ultra" | null; // added after initial release; older saves default to null on load
+  aboveCapTier?: boolean; // added after initial release; older saves default to false on load
 }
 
 export function clearBuildings(companyIndex = 0): void {
@@ -251,6 +260,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
     hasOfficeSupplies: floor.hasOfficeSupplies,
     hasManager: floor.hasManager,
     critMultiplierTier: floor.critMultiplierTier,
+    aboveCapTier: floor.aboveCapTier,
   };
 }
 
@@ -305,6 +315,7 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     hasOfficeSupplies: sf.hasOfficeSupplies ?? false,
     hasManager: sf.hasManager ?? false,
     critMultiplierTier: sf.critMultiplierTier ?? null,
+    aboveCapTier: sf.aboveCapTier ?? false,
   };
   workerSlots.set(floor, sf.workers);
   workerTintIndexes.set(floor, sf.tintIndexes ?? sf.spriteIndexes ?? []);

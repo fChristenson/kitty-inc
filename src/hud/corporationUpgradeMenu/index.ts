@@ -83,8 +83,11 @@ function getItemKinds(
       getTarget: getCheapestFloorPurchaseTarget,
       getCost: (floor) => floor.unlockCost,
       buy: (companyIndex, companyBuildings) =>
-        buyCheapestFloor(companyIndex, companyBuildings, (buildingIndex, floor) =>
-          notifyFloorAdded(companyIndex, buildingIndex, floor),
+        buyCheapestFloor(
+          companyIndex,
+          companyBuildings,
+          (buildingIndex, floor) =>
+            notifyFloorAdded(companyIndex, buildingIndex, floor),
         ),
     },
     {
