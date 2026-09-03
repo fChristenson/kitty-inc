@@ -93,7 +93,7 @@ export function wireCorporationUpgradeMenu(
       })
       .join("");
     return `
-      <h3 class="worker-menu__subheader">Merge</h3>
+      <h3 class="worker-menu__subheader">Merge companies</h3>
       ${rows}
       <button
         class="worker-menu__item"
