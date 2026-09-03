@@ -1,6 +1,7 @@
 import { buildFloor } from "..";
 import { FLOOR_W, FLOOR_H } from "../constants";
 import type { Floor } from "../../gameState";
+import type { BigNumber } from "../../shared/bigNumber";
 import { drawCartoonText, formatPrice } from "../../utils";
 import { getWiggleRotation } from "../../shared/wiggle";
 
@@ -14,6 +15,7 @@ const PANEL_Y = FLOOR_H / 2 - PANEL_H / 2;
 export function drawFloorLock(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
+  unlockCost: BigNumber,
   affordable: boolean,
 ): void {
   if (floor.unlocked) return;
@@ -37,7 +39,7 @@ export function drawFloorLock(
   ctx.translate(cx, cy);
   if (affordable) ctx.rotate(getWiggleRotation(now));
   ctx.translate(-cx, -cy);
-  drawCartoonText(ctx, formatPrice(floor.unlockCost), cx, cy);
+  drawCartoonText(ctx, formatPrice(unlockCost), cx, cy);
   ctx.restore();
 }
 

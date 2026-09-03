@@ -14,6 +14,7 @@ import {
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
+import { applySpreeDiscount } from "../../purchaseMeter";
 import {
   type BigNumber,
   fromNumber,
@@ -39,9 +40,11 @@ function getFloorPrice(floor: Floor): BigNumber {
 }
 
 // the $ cost of a floor's next worker: its floor price (unlock cost, or the floor-1
-// fallback above) times how many workers it already has
+// fallback above) times how many workers it already has. applySpreeDiscount here
+// (not just at render time) means buyWorker's own spendTotalIncome(getWorkerCost(...))
+// call below automatically charges the discounted amount too, kept in sync for free
 export function getWorkerCost(floor: Floor): BigNumber {
-  return multiply(getFloorPrice(floor), floor.workerCount);
+  return applySpreeDiscount(multiply(getFloorPrice(floor), floor.workerCount));
 }
 
 // what the floor's own 3rd worker would cost (i.e. getWorkerCost at workerCount=2),
@@ -65,7 +68,7 @@ export function buyWorker(floor: Floor): boolean {
 // Once floor.hasOfficeChairs flips true it never resets, and this item just stops
 // being listed for that floor (see render below)
 export function getOfficeChairsCost(floor: Floor): BigNumber {
-  return getThirdWorkerCost(floor);
+  return applySpreeDiscount(getThirdWorkerCost(floor));
 }
 
 export function buyOfficeChairs(floor: Floor): boolean {
@@ -78,7 +81,7 @@ export function buyOfficeChairs(floor: Floor): boolean {
 // a second one-time, non-stacking per-floor purchase, same shape (and same
 // third-worker pricing) as office chairs above (own flag, never resets once bought)
 export function getOfficeSuppliesCost(floor: Floor): BigNumber {
-  return getThirdWorkerCost(floor);
+  return applySpreeDiscount(getThirdWorkerCost(floor));
 }
 
 export function buyOfficeSupplies(floor: Floor): boolean {
@@ -95,7 +98,7 @@ export function buyOfficeSupplies(floor: Floor): boolean {
 const MANAGER_MIN_UPGRADE_COUNT = 50;
 
 export function getManagerCost(floor: Floor): BigNumber {
-  return getThirdWorkerCost(floor);
+  return applySpreeDiscount(getThirdWorkerCost(floor));
 }
 
 export function isManagerUnlocked(floor: Floor): boolean {

@@ -1,7 +1,10 @@
 import { COLOR } from "../../palette";
 import { drawCartoonText, formatPrice } from "../../utils";
 import type { BigNumber } from "../../shared/bigNumber";
-import { getPriceWiggleTransform, PRICE_WIGGLE_PERIOD_MS } from "./priceWiggle";
+import {
+  getBounceWiggleTransform,
+  BOUNCE_WIGGLE_PERIOD_MS,
+} from "../../shared/bounceWiggle";
 
 // cat marker geometry/drawing/hit-testing for the city map's per-building
 // markers — split out of cityMap/index.ts (which owns the actual canvas +
@@ -224,8 +227,9 @@ export function drawLockedMarkerPrice(
     drawCartoonText(ctx, formatPrice(price), cx, priceY, COLOR.white);
     return;
   }
-  const phase = (Date.now() % PRICE_WIGGLE_PERIOD_MS) / PRICE_WIGGLE_PERIOD_MS;
-  const { translateY, scaleX, scaleY } = getPriceWiggleTransform(phase);
+  const phase =
+    (Date.now() % BOUNCE_WIGGLE_PERIOD_MS) / BOUNCE_WIGGLE_PERIOD_MS;
+  const { translateY, scaleX, scaleY } = getBounceWiggleTransform(phase);
   ctx.save();
   ctx.translate(cx, priceY + translateY);
   ctx.scale(scaleX, scaleY);

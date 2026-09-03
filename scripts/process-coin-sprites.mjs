@@ -141,19 +141,38 @@ const boxes = runs.map(([x0, x1]) => {
   return { x0, x1, y0, y1, w: x1 - x0 + 1, h: y1 - y0 + 1 };
 });
 
-const cellW = Math.max(...boxes.map((b) => b.w)) + PADDING * 2;
-const cellH = Math.max(...boxes.map((b) => b.h)) + PADDING * 2;
+// raw source poses spin around a VERTICAL axis (face-on frames read as a
+// circle, transitional/edge frames get squished NARROWER — width shrinks,
+// height stays ~the full diameter, so the purely edge-on pose is a tall thin
+// sliver). The game wants the coin spinning around a HORIZONTAL axis instead
+// (edge-on pose = a short wide sliver, height shrinks instead of width) — so
+// any pose whose bounding box is noticeably taller than wide (a squished/edge
+// pose) gets rotated 90° here; the roughly-circular face-on poses (h≈w) are
+// left alone, since rotating a circle 90° wouldn't change its silhouette but
+// WOULD needlessly rotate the "$" engraving on it
+const ROTATE_ASPECT_THRESHOLD = 1.15;
+const rotations = boxes.map((b) => b.h > b.w * ROTATE_ASPECT_THRESHOLD);
 
-// build each cell separately (crop pose -> pad into a transparent cellW x cellH
-// canvas, centered both horizontally and vertically — a spinning coin has no
-// shared ground line, unlike the walking cats), then lay all cells out left to
-// right into the final sheet
+const cellW =
+  Math.max(...boxes.map((b, i) => (rotations[i] ? b.h : b.w))) + PADDING * 2;
+const cellH =
+  Math.max(...boxes.map((b, i) => (rotations[i] ? b.w : b.h))) + PADDING * 2;
+
+// build each cell separately (crop pose -> rotate 90° if flagged above -> pad
+// into a transparent cellW x cellH canvas, centered both horizontally and
+// vertically — a spinning coin has no shared ground line, unlike the walking
+// cats), then lay all cells out left to right into the final sheet
 const cellBuffers = await Promise.all(
-  boxes.map(async (b) => {
-    const cropped = await sharp(data, { raw: { width, height, channels } })
-      .extract({ left: b.x0, top: b.y0, width: b.w, height: b.h })
-      .png()
-      .toBuffer();
+  boxes.map(async (b, i) => {
+    let cropped = sharp(data, { raw: { width, height, channels } }).extract({
+      left: b.x0,
+      top: b.y0,
+      width: b.w,
+      height: b.h,
+    });
+    const [poseW, poseH] = rotations[i] ? [b.h, b.w] : [b.w, b.h];
+    if (rotations[i]) cropped = cropped.rotate(90);
+    const croppedBuffer = await cropped.png().toBuffer();
     return sharp({
       create: {
         width: cellW,
@@ -164,9 +183,9 @@ const cellBuffers = await Promise.all(
     })
       .composite([
         {
-          input: cropped,
-          left: Math.round((cellW - b.w) / 2),
-          top: Math.round((cellH - b.h) / 2),
+          input: croppedBuffer,
+          left: Math.round((cellW - poseW) / 2),
+          top: Math.round((cellH - poseH) / 2),
         },
       ])
       .png()

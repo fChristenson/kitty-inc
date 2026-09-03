@@ -296,6 +296,7 @@ export {
   isSaleActive,
   floorIncomePerSecond,
   SALE_ASSUMED_CLICKS,
+  CRIT_TIER_CONFIG,
 } from "./upgradeButton";
 export {
   spawnFloatingCoins,

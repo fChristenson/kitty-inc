@@ -22,6 +22,7 @@ import {
   getTotalIncome,
   addTotalIncome,
 } from "../../totalIncome";
+import { rollShoppingSpree, applySpreeDiscount } from "../../purchaseMeter";
 import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
 import { spawnIncomeFloatText } from "../incomeFloatText";
@@ -64,7 +65,7 @@ export function hitTestFloorHover(
       floor.unlocked &&
       (isSaleActive(floor, Date.now()) ||
         isCritUpgrade(floor) ||
-        gte(getTotalIncome(), floor.upgradeCost))) ||
+        gte(getTotalIncome(), applySpreeDiscount(floor.upgradeCost)))) ||
     hitTestFloorLock(x, y, floor) ||
     hitTestWorkers(x, y, floor).length > 0
   );
@@ -116,7 +117,7 @@ export function handleFloorClick(
   } = deps;
 
   if (hitTestFloorLock(x, y, floor)) {
-    if (spendTotalIncome(floor.unlockCost)) {
+    if (spendTotalIncome(applySpreeDiscount(floor.unlockCost))) {
       unlockFloor(floor);
       playSold();
       ensureLockedFloorAbove({
@@ -163,6 +164,9 @@ export function handleFloorClick(
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
+      // a Sale click is still an "upgrade/sales click" for shopping-spree
+      // purposes — same 1% roll a plain paid click below gets
+      rollShoppingSpree();
       if (tier) triggerCritCelebration(floor, tier, getScreenCenterLocal);
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
@@ -190,14 +194,18 @@ export function handleFloorClick(
       }
       persist();
       triggerButtonPress(floor);
+      // a crit is still an upgrade click for shopping-spree purposes — same
+      // 1% roll every other qualifying click gets
+      rollShoppingSpree();
       triggerCritCelebration(floor, tier, getScreenCenterLocal);
       return;
     }
-    if (spendTotalIncome(floor.upgradeCost)) {
+    if (spendTotalIncome(applySpreeDiscount(floor.upgradeCost))) {
       applyUpgradeTick(floor, isGroundFloor);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
+      rollShoppingSpree();
       return;
     }
   }

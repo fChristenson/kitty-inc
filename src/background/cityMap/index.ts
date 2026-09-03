@@ -37,8 +37,8 @@ import { type BigNumber, gte } from "../../shared/bigNumber";
 // eventual "pick a building to unlock" map screen: whichever building is currently
 // active plays the stand/jump cycle, any other unlocked building just stands, and
 // the next building to unlock shows grayed out with its price until bought
-// (see ./markers for marker geometry/drawing, ./priceWiggle for the price
-// bounce transform, ./speedLines for the prev/next transition rays,
+// (see ./markers for marker geometry/drawing (its price bounce transform now
+// lives in shared/bounceWiggle), ./speedLines for the prev/next transition rays,
 // ./corpBarrel for the corp-name barrel, ./incomeReadout for the total-income
 // text, ./cityMapState for the persisted "which city page" state)
 

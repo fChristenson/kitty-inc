@@ -50,6 +50,8 @@ import {
   wireFloorBuyMegaCritButton,
   wireFloorBuyUltraCritButton,
   wirePressConferenceTestButton,
+  wireShoppingSpreeButton,
+  wireIdleOverlayTestButton,
   wireResetButton,
   createActionBarMarkup,
   wireActionBar,
@@ -70,6 +72,8 @@ import {
   wirePressConferenceGame,
   createMapMenuMarkup,
   wireMapMenu,
+  createTotalEarnedOverlayMarkup,
+  wireTotalEarnedOverlay,
 } from "./hud";
 import {
   createGameCanvas,
@@ -87,6 +91,7 @@ import {
   loadRoofImage,
 } from "./buildings";
 import { loadMouseImage, forceSpawnMouse } from "./mouse";
+import { forceShoppingSpree } from "./purchaseMeter";
 import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation, getCorporationPrice } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
@@ -120,6 +125,7 @@ async function main() {
     ${createCorporationBoostMenuMarkup()}
     ${createPressConferenceGameMarkup()}
     ${createMapMenuMarkup()}
+    ${createTotalEarnedOverlayMarkup()}
   `;
 
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
@@ -342,6 +348,16 @@ async function main() {
     wireFloorBuyMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireFloorBuyUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
+    // forces a shopping spree so its "Shopping spree" twirl-in + coin rain
+    // (see purchaseMeter/index.ts) can be tested without waiting on the 1%
+    // per-click roll
+    wireShoppingSpreeButton(app, () => forceShoppingSpree());
+    // shows the idle-income "You have earned" overlay (see
+    // hud/totalEarnedOverlay) on demand, without needing to actually leave and
+    // reopen the tab to earn real idle income first
+    wireIdleOverlayTestButton(app, () =>
+      totalEarnedOverlay.show(fromNumber(123456)),
+    );
     wireResetButton(app, buildings);
   }
   const upgradeMenu = wireUpgradeMenu(
@@ -406,6 +422,7 @@ async function main() {
   const pressConferenceGame = wirePressConferenceGame(app, () =>
     corporationBoostMenu.refresh(),
   );
+  const totalEarnedOverlay = wireTotalEarnedOverlay(app);
   // buys the next building outright if affordable (see buildings.ts's
   // getBuildingPrice, which scales 1000x per building same as its economy).
   // Returns whether it succeeded so the map menu can decide whether to re-render
@@ -503,7 +520,10 @@ async function main() {
   // every floor's lastCollectedAt in memory, and that must land before a second quick
   // reload could otherwise re-collect the same already-paid-out idle time
   saveBuildings(buildings, activeCompanyIndex);
-  if (gt(idleIncome, fromNumber(0))) addTotalIncome(idleIncome);
+  if (gt(idleIncome, fromNumber(0))) {
+    addTotalIncome(idleIncome);
+    totalEarnedOverlay.show(idleIncome);
+  }
 
   gameCanvas.redraw();
 

@@ -14,6 +14,7 @@ import { drawOuterWall } from "../buildings";
 import { drawMouse } from "../mouse";
 import { getTotalIncome } from "../totalIncome";
 import { gte } from "../shared/bigNumber";
+import { applySpreeDiscount } from "../purchaseMeter";
 import type { Floor } from "../gameState";
 
 // only re-spawns a floor's boosted-worker float coins this often, instead of every
@@ -69,14 +70,19 @@ export function drawFloorContent(
   drawFloatingCoins(ctx, floor);
   drawUpgradeStar(ctx, floor);
   drawIncomePanel(ctx, floor, isGroundFloor);
+  // both cost displays reflect a shopping spree's half-price discount, not
+  // just its own raw floor.upgradeCost/unlockCost — actually spending still
+  // charges the same discounted amount (see floorInteractions.ts)
+  const upgradeCost = applySpreeDiscount(floor.upgradeCost);
+  const unlockCost = applySpreeDiscount(floor.unlockCost);
   drawUpgradeButton(
     ctx,
     floor,
     buttonHovered,
-    floor.upgradeCost,
-    gte(getTotalIncome(), floor.upgradeCost),
+    upgradeCost,
+    gte(getTotalIncome(), upgradeCost),
     isGroundFloor,
   );
   drawIncomeFloatText(ctx, floor);
-  drawFloorLock(ctx, floor, gte(getTotalIncome(), floor.unlockCost));
+  drawFloorLock(ctx, floor, unlockCost, gte(getTotalIncome(), unlockCost));
 }

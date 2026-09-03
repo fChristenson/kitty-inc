@@ -14,6 +14,7 @@ import {
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
+import { applySpreeDiscount } from "../../purchaseMeter";
 import {
   type BigNumber,
   ZERO,
@@ -43,8 +44,13 @@ function currentIncomePerSecond(floors: Floor[]): BigNumber {
     );
 }
 
+// applySpreeDiscount here (not just at render time) means buyBoostAll's own
+// spendTotalIncome(getBoostAllCost(...)) call below automatically charges the
+// discounted amount too, kept in sync for free
 export function getBoostAllCost(floors: Floor[]): BigNumber {
-  return multiply(currentIncomePerSecond(floors), BOOST_ALL_SECONDS_COST);
+  return applySpreeDiscount(
+    multiply(currentIncomePerSecond(floors), BOOST_ALL_SECONDS_COST),
+  );
 }
 
 // a floor's own floorIncomePerSecond (see floors/upgradeButton/index.ts — exactly
@@ -89,9 +95,11 @@ export function getSaleBoostCost(floors: Floor[]): BigNumber {
   // half of SALE_ASSUMED_CLICKS worth of the floor's own per-second income —
   // clicking through that many sale clicks (see floorInteractions/index.ts) pays
   // that whole amount back, i.e. at least double the cost
-  return divide(
-    multiply(averageFloorIncomePerSecond(floors), SALE_ASSUMED_CLICKS),
-    2,
+  return applySpreeDiscount(
+    divide(
+      multiply(averageFloorIncomePerSecond(floors), SALE_ASSUMED_CLICKS),
+      2,
+    ),
   );
 }
 

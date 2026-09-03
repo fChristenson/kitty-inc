@@ -937,3 +937,94 @@ body {
   cursor: default;
   opacity: 0.7;
 }
+
+/* one-shot "You have earned..." splash (see hud/totalEarnedOverlay) — sits above
+   every other dialog (.worker-menu's own 40) since it can appear right at startup
+   over anything else already on screen */
+.earned-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.earned-overlay[hidden] {
+  display: none; /* the [hidden] attribute's UA display:none loses to the flex rule above without this */
+}
+
+.earned-overlay__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  animation: earned-overlay-backdrop-fade-in 0.3s ease-out;
+}
+
+.earned-overlay__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1.5rem;
+  text-align: center;
+  /* old-time cartoon newspaper-headline flourish: spins/grows in from nothing,
+     overshoots, settles — see keyframes below */
+  animation: earned-overlay-spin-in 0.7s cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.earned-overlay__label {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--color-white);
+  -webkit-text-stroke: 3px black;
+  paint-order: stroke fill;
+}
+
+.earned-overlay__amount {
+  font-size: 3rem;
+}
+
+/* spelled-out unit (e.g. "Undecillion"), its own line below the amount — same
+   80%-smaller-than-the-amount ratio as the HUD/map's own total-income readout */
+.earned-overlay__unit-name {
+  font-size: 2.4rem;
+  margin-top: -0.5rem;
+}
+
+.earned-overlay__unit-name[hidden] {
+  display: none;
+}
+
+@keyframes earned-overlay-backdrop-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes earned-overlay-spin-in {
+  0% {
+    scale: 0;
+    rotate: -540deg;
+    opacity: 0;
+  }
+  55% {
+    scale: 1.15;
+    rotate: 8deg;
+    opacity: 1;
+  }
+  80% {
+    scale: 0.94;
+    rotate: -4deg;
+  }
+  100% {
+    scale: 1;
+    rotate: 0deg;
+  }
+}
