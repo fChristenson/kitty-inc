@@ -9,6 +9,8 @@ import {
   MAX_RENDERED_WORKERS,
   getWorkerIconUrl,
   getManagerIconUrl,
+  increaseIncomeRate,
+  rollCritUpgrade,
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
@@ -16,6 +18,7 @@ import {
   type BigNumber,
   fromNumber,
   multiply,
+  subtract,
   gt,
   gte,
   lt,
@@ -23,6 +26,7 @@ import {
 
 const officeChairsIconUrl = getImageUrl("officeChairsIcon");
 const officeSuppliesIconUrl = getImageUrl("officeSuppliesIcon");
+const coinIconUrl = getImageUrl("coin");
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost
@@ -151,6 +155,59 @@ function massHireWorkers(floors: Floor[]): boolean {
   return boughtAny;
 }
 
+// the unlocked floor whose own upgradeCost is currently lowest across the whole
+// building — unlike massBuyOneTime/massHireWorkers, a floor's upgradeCost keeps
+// climbing every time it's bought (see incomePanel.ts's increaseIncomeRate), so
+// the cheapest floor can change from one purchase to the next
+function getCheapestUpgradeFloor(floors: Floor[]): Floor | null {
+  const unlocked = floors.filter((floor) => floor.unlocked);
+  if (unlocked.length === 0) return null;
+  return unlocked.reduce((cheapest, floor) =>
+    lt(floor.upgradeCost, cheapest.upgradeCost) ? floor : cheapest,
+  );
+}
+
+// "Renovate floors": repeatedly buys whichever unlocked floor's upgrade is
+// currently cheapest (re-picked after every purchase, since that same floor's
+// cost just rose), across the whole building, until the cheapest one left is no
+// longer affordable
+function massRenovateFloors(floors: Floor[]): boolean {
+  let boughtAny = false;
+  for (;;) {
+    const cheapest = getCheapestUpgradeFloor(floors);
+    if (!cheapest || !spendTotalIncome(cheapest.upgradeCost)) break;
+    increaseIncomeRate(cheapest);
+    rollCritUpgrade(cheapest);
+    boughtAny = true;
+  }
+  return boughtAny;
+}
+
+// pure preview of how many upgrades massRenovateFloors would actually buy right
+// now, for the button's own "x N" label -- runs the identical cheapest-first
+// loop against shallow clones of the unlocked floors (increaseIncomeRate only
+// ever reassigns a clone's own top-level fields, never mutates a shared nested
+// object, so cloning is enough to keep this from touching the real floors or
+// spending any real money) and a local running balance instead of spendTotalIncome
+function countAffordableRenovations(floors: Floor[]): number {
+  const clones = floors
+    .filter((floor) => floor.unlocked)
+    .map((floor) => ({ ...floor }));
+  let remaining = getTotalIncome();
+  let count = 0;
+  for (;;) {
+    if (clones.length === 0) break;
+    const cheapest = clones.reduce((min, floor) =>
+      lt(floor.upgradeCost, min.upgradeCost) ? floor : min,
+    );
+    if (lt(remaining, cheapest.upgradeCost)) break;
+    remaining = subtract(remaining, cheapest.upgradeCost);
+    increaseIncomeRate(cheapest);
+    count += 1;
+  }
+  return count;
+}
+
 interface MassActionDef {
   action: string;
   iconUrl: string | null;
@@ -224,7 +281,7 @@ function massActionItemMarkup(def: MassActionDef, floors: Floor[]): string {
   const nextFloor = findNextEligibleFloor(floors, def.isEligible);
   const affordable =
     !!nextFloor && gte(getTotalIncome(), def.getCost(nextFloor));
-  const priceText = remaining > 0 ? `x${remaining} left` : "Done";
+  const priceText = remaining > 0 ? `x${remaining}` : "Done";
   return `
     <button
       class="worker-menu__item"
@@ -244,7 +301,28 @@ function massActionsMarkup(floors: Floor[]): string {
   const rows = getMassActionDefs()
     .map((def) => massActionItemMarkup(def, floors))
     .join("");
-  return `<h3 class="worker-menu__subheader">Bulk actions</h3>${rows}`;
+  return `<h3 class="worker-menu__subheader">Bulk upgrades</h3>${renovateFloorsItemMarkup(floors)}${rows}`;
+}
+
+// top-of-the-list "Renovate floors" row (see massRenovateFloors) — shows how
+// many upgrades are affordable right now (see countAffordableRenovations)
+// instead of a single $ price, since (unlike the other bulk actions) there's
+// no fixed "x N left" count: it just keeps buying across floors until unaffordable
+function renovateFloorsItemMarkup(floors: Floor[]): string {
+  const count = countAffordableRenovations(floors);
+  return `
+    <button
+      class="worker-menu__item"
+      id="renovate-floors"
+      ${count > 0 ? "" : "disabled"}
+    >
+      <span class="worker-menu__item-label">
+        <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+        Renovate floors
+      </span>
+      <span class="worker-menu__price">x${count}</span>
+    </button>
+  `;
 }
 
 export function createUpgradeMenuMarkup(): string {
@@ -381,6 +459,18 @@ export function wireUpgradeMenu(
 
   list.addEventListener("click", async (event) => {
     const target = event.target as HTMLElement;
+    const renovateButton =
+      target.closest<HTMLButtonElement>("#renovate-floors");
+    if (renovateButton) {
+      const floors = getFloors();
+      if (massRenovateFloors(floors)) {
+        playSold();
+        await triggerButtonPress(renovateButton);
+        onPurchase();
+        render();
+      }
+      return;
+    }
     const massButton = target.closest<HTMLButtonElement>(
       "button[data-mass-action]",
     );
@@ -458,6 +548,14 @@ export function wireUpgradeMenu(
   // as soon as income catches up, instead of only refreshing on the next open/purchase
   function updateAffordability(): void {
     const floors = getFloors();
+    const renovateButton =
+      list.querySelector<HTMLButtonElement>("#renovate-floors");
+    if (renovateButton) {
+      const count = countAffordableRenovations(floors);
+      renovateButton.disabled = count === 0;
+      const priceEl = renovateButton.querySelector(".worker-menu__price");
+      if (priceEl) priceEl.textContent = `x${count}`;
+    }
     list
       .querySelectorAll<HTMLButtonElement>("button[data-mass-action]")
       .forEach((button) => {

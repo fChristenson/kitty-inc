@@ -415,7 +415,10 @@ async function main() {
     getBuildingCount: () => buildings.length,
     getActiveBuildingIndex: () => activeBuildingIndex,
     getBuildingFloorCount: (buildingIndex) =>
-      buildings[buildingIndex]?.length ?? 0,
+      // buildings[i] always includes one extra locked floor waiting above the
+      // topmost unlocked one (see ensureLockedFloorAbove) — the marker should
+      // only count floors actually unlocked, not that placeholder
+      buildings[buildingIndex]?.filter((floor) => floor.unlocked).length ?? 0,
     buyBuilding,
     onSelectBuilding: (index) => {
       goToBuilding(index);
