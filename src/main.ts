@@ -50,7 +50,6 @@ import {
   wireFloorBuyMegaCritButton,
   wireFloorBuyUltraCritButton,
   wirePressConferenceTestButton,
-  wireShoppingSpreeButton,
   wireIdleOverlayTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -91,7 +90,6 @@ import {
   loadRoofImage,
 } from "./buildings";
 import { loadMouseImage, forceSpawnMouse } from "./mouse";
-import { forceShoppingSpree } from "./purchaseMeter";
 import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation, getCorporationPrice } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
@@ -348,10 +346,6 @@ async function main() {
     wireFloorBuyMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireFloorBuyUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
-    // forces a shopping spree so its "Shopping spree" twirl-in + coin rain
-    // (see purchaseMeter/index.ts) can be tested without waiting on the 1%
-    // per-click roll
-    wireShoppingSpreeButton(app, () => forceShoppingSpree());
     // shows the idle-income "You have earned" overlay (see
     // hud/totalEarnedOverlay) on demand, without needing to actually leave and
     // reopen the tab to earn real idle income first

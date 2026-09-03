@@ -10,6 +10,7 @@ import {
   handleFloorClick,
   startButtonHoldAnim,
   stopButtonHoldAnim,
+  isUpgradeButtonEnabled,
 } from "../../floors";
 import { drawFloorContent } from "../../gameRenderer";
 import { drawClouds, CLOUD_MAX_RADIUS } from "../clouds";
@@ -20,9 +21,6 @@ import { drawHud } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
 import { getScreenShakeOffset, drawCritFlash } from "../../screenShake";
-import { isSpreeActive } from "../../purchaseMeter";
-import { drawTwirlText } from "../../shared/twirlText";
-import { drawCoinRain } from "../../shared/coinRain";
 import { COLOR } from "../../palette";
 import {
   startPressAndHold,
@@ -478,15 +476,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // shake above it (still inside the shake's own translate, so it rattles too —
     // reinforces the "this hit hard" feeling rather than floating serenely above it)
     drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
-    drawTwirlText(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
-    // rains for as long as a shopping spree is up, full viewport width
-    drawCoinRain(
-      ctx,
-      SLOT_W,
-      contentViewportH(),
-      Date.now(),
-      isSpreeActive(Date.now()),
-    );
 
     ctx.restore();
   }
@@ -626,8 +615,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       hitTestUpgradeButton(hit.localX, hit.localY, hit.isGroundFloor)
     ) {
       upgradeFiredOnDown = true;
-      heldUpgradeFloor = hit.floor;
-      startButtonHoldAnim(hit.floor);
+      // only the greyed-out/disabled state should skip the "pressure boiler"
+      // grow animation — the purchase attempt itself still fires/repeats
+      // below regardless (a still-unaffordable button just silently fails
+      // each tick, same as any other disabled-button click always has)
+      if (isUpgradeButtonEnabled(hit.floor)) {
+        heldUpgradeFloor = hit.floor;
+        startButtonHoldAnim(hit.floor);
+      }
       fireUpgradeOnce(hit);
       holdController = startPressAndHold(
         () => fireHandleFloorClick(hit),

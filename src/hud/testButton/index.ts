@@ -12,7 +12,6 @@ export function createTestButtonMarkup(): string {
       <button id="floor-buy-crit" class="game__button">Floor Crit</button>
       <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
       <button id="floor-buy-ultra-crit" class="game__button">Floor Ultra Crit</button>
-      <button id="spawn-shopping-spree" class="game__button">Shopping Spree</button>
       <button id="test-press-conference" class="game__button">Press Conf Game</button>
       <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
@@ -96,16 +95,6 @@ export function wirePressConferenceTestButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#test-press-conference",
-  )!;
-  button.addEventListener("click", onClick);
-}
-
-export function wireShoppingSpreeButton(
-  container: HTMLElement,
-  onClick: () => void,
-): void {
-  const button = container.querySelector<HTMLButtonElement>(
-    "#spawn-shopping-spree",
   )!;
   button.addEventListener("click", onClick);
 }

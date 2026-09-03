@@ -59,7 +59,6 @@ export {
   wireFloorBuyMegaCritButton,
   wireFloorBuyUltraCritButton,
   wirePressConferenceTestButton,
-  wireShoppingSpreeButton,
   wireIdleOverlayTestButton,
   wireResetButton,
 } from "./testButton";

@@ -4,7 +4,8 @@ import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { smoothstep } from "../../shared/easing";
 import { spawnCoinBurst } from "../coins";
-import { type BigNumber, divide } from "../../shared/bigNumber";
+import { type BigNumber, divide, gte } from "../../shared/bigNumber";
+import { getTotalIncome } from "../../totalIncome";
 import type { Floor } from "../../gameState";
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left).
@@ -135,7 +136,9 @@ function computeHoldScale(state: HoldAnimState, now: number): number {
   }
   if (state.phase === "pop") {
     const t = Math.min(1, elapsed / HOLD_ANIM_POP_MS);
-    return HOLD_ANIM_MAX_SCALE + (HOLD_ANIM_POP_SCALE - HOLD_ANIM_MAX_SCALE) * t;
+    return (
+      HOLD_ANIM_MAX_SCALE + (HOLD_ANIM_POP_SCALE - HOLD_ANIM_MAX_SCALE) * t
+    );
   }
   if (state.phase === "deflate") {
     const t = elapsed / 1000;
@@ -153,6 +156,13 @@ function computeHoldScale(state: HoldAnimState, now: number): number {
 export function stopButtonHoldAnim(floor: Floor): void {
   const state = holdAnimState.get(floor);
   if (!state || state.phase === "releasing") return;
+  beginReleasing(floor, state);
+}
+
+// shared by stopButtonHoldAnim above (an actual release) and stepHoldAnim
+// below (the button going grey mid-hold) — both need the exact same "start
+// deflating from whatever size it currently is" transition
+function beginReleasing(floor: Floor, state: HoldAnimState): void {
   const now = Date.now();
   holdAnimState.set(floor, {
     phase: "releasing",
@@ -165,9 +175,8 @@ export function stopButtonHoldAnim(floor: Floor): void {
 // button's current extra scale + a small random shake offset — {scale:1,
 // shakeX:0,shakeY:0} once there's no animation left to show at all. Reads AND
 // mutates holdAnimState (same "a draw call also owns firing its own one-shot
-// side effects" pattern this game's other timed animations already use, e.g.
-// the old purchaseMeter's spree trigger) — cx/cy are where a burst should
-// spawn from (the button's own center)
+// side effects" pattern this game's other timed animations already use) —
+// cx/cy are where a burst should spawn from (the button's own center)
 function stepHoldAnim(
   floor: Floor,
   now: number,
@@ -176,6 +185,18 @@ function stepHoldAnim(
 ): { scale: number; shakeX: number; shakeY: number } {
   const state = holdAnimState.get(floor);
   if (!state) return { scale: 1, shakeX: 0, shakeY: 0 };
+
+  // the button went grey mid-hold (e.g. spent down to unaffordable by
+  // something else, or a Sale/crit state just expired) — deflate immediately
+  // instead of continuing to swell on a disabled button. Only grow/pop are
+  // interrupted; deflate/releasing are already heading back to normal anyway
+  if (
+    (state.phase === "grow" || state.phase === "pop") &&
+    !isUpgradeButtonEnabled(floor)
+  ) {
+    beginReleasing(floor, state);
+    return stepHoldAnim(floor, now, cx, cy);
+  }
 
   const elapsed = now - state.phaseStartedAt;
 
@@ -204,7 +225,10 @@ function stepHoldAnim(
     // fresh grow
     state.phase = "grow";
     state.phaseStartedAt = now;
-  } else if (state.phase === "releasing" && elapsed >= HOLD_ANIM_RELEASE_DEFLATE_MS) {
+  } else if (
+    state.phase === "releasing" &&
+    elapsed >= HOLD_ANIM_RELEASE_DEFLATE_MS
+  ) {
     holdAnimState.delete(floor);
     return { scale: 1, shakeX: 0, shakeY: 0 };
   }
@@ -372,6 +396,20 @@ export function triggerSaleBoost(floor: Floor): void {
 export function isSaleActive(floor: Floor, now: number): boolean {
   const startedAt = saleStartedAt.get(floor);
   return startedAt !== undefined && now - startedAt < SALE_DURATION_MS;
+}
+
+// whether the upgrade button is currently "enabled" (colored, clickable) —
+// on Sale, mid-crit, or plainly affordable — as opposed to greyed-out. Used
+// by floorInteractions.ts's hitTestFloorHover, gameCanvas.ts's pointerdown
+// handler (must not start the hold-grow animation on a disabled button), and
+// stepHoldAnim above (must deflate immediately if a hold-in-progress button
+// goes disabled)
+export function isUpgradeButtonEnabled(floor: Floor): boolean {
+  return (
+    isSaleActive(floor, Date.now()) ||
+    isCritUpgrade(floor) ||
+    gte(getTotalIncome(), floor.upgradeCost)
+  );
 }
 
 // 1 second's worth of a floor's own current income rate — deliberately NOT added

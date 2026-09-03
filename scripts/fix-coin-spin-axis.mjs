@@ -17,8 +17,8 @@ const ROTATE_ASPECT_THRESHOLD = 1.15;
 // drawCoinBurstFrame (coinBurst/index.ts) scales the WHOLE cell (padding
 // included) onto its caller's radius-derived destW/destH box — so the cell's
 // own footprint (not just the pose inside it) is what determines the coin's
-// apparent on-screen size. Every burst/rain radius constant across the repo
-// (floors/coins, coinBurst, shared/coinRain) was tuned against the ORIGINAL
+// apparent on-screen size. Every burst radius constant across the repo
+// (floors/coins, coinBurst) was tuned against the ORIGINAL
 // sheet's 318x559 cells; keeping that same output footprint here (a first
 // run of this script recomputed a tight-content 317x317 cell instead, which
 // visibly inflated every on-screen coin — regression fixed by pinning back

@@ -10,6 +10,7 @@ import {
   rollCritUpgrade,
   rollFloorBuyCrit,
   isSaleActive,
+  isUpgradeButtonEnabled,
   CRIT_TIER_CONFIG,
   floorIncomePerSecond,
   SALE_INCOME_MULTIPLIER,
@@ -17,12 +18,7 @@ import {
   BTN_H,
 } from "../upgradeButton";
 import { increaseIncomeRate, UPGRADE_MILESTONE_STEP } from "../incomePanel";
-import {
-  spendTotalIncome,
-  getTotalIncome,
-  addTotalIncome,
-} from "../../totalIncome";
-import { rollShoppingSpree, applySpreeDiscount } from "../../purchaseMeter";
+import { spendTotalIncome, addTotalIncome } from "../../totalIncome";
 import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
 import { spawnIncomeFloatText } from "../incomeFloatText";
@@ -35,7 +31,7 @@ import {
   getLockCenter,
 } from "../floorLock";
 import { activateBoosted, type Floor } from "../../gameState";
-import { multiply, gte } from "../../shared/bigNumber";
+import { multiply } from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
 
 export interface FloorActionsDeps {
@@ -53,6 +49,11 @@ export interface FloorActionsDeps {
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number };
 }
 
+// re-exported for floors/index.ts's facade — the canonical check now lives in
+// upgradeButton.ts (needs it internally for its own hold-animation deflate),
+// this file just reuses it for hitTestFloorHover below
+export { isUpgradeButtonEnabled };
+
 // whether a floor-local point lands on anything hoverable (cursor should be "pointer")
 export function hitTestFloorHover(
   x: number,
@@ -63,9 +64,7 @@ export function hitTestFloorHover(
   return (
     (hitTestUpgradeButton(x, y, isGroundFloor) &&
       floor.unlocked &&
-      (isSaleActive(floor, Date.now()) ||
-        isCritUpgrade(floor) ||
-        gte(getTotalIncome(), applySpreeDiscount(floor.upgradeCost)))) ||
+      isUpgradeButtonEnabled(floor)) ||
     hitTestFloorLock(x, y, floor) ||
     hitTestWorkers(x, y, floor).length > 0
   );
@@ -117,7 +116,7 @@ export function handleFloorClick(
   } = deps;
 
   if (hitTestFloorLock(x, y, floor)) {
-    if (spendTotalIncome(applySpreeDiscount(floor.unlockCost))) {
+    if (spendTotalIncome(floor.unlockCost)) {
       unlockFloor(floor);
       playSold();
       ensureLockedFloorAbove({
@@ -164,9 +163,6 @@ export function handleFloorClick(
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
-      // a Sale click is still an "upgrade/sales click" for shopping-spree
-      // purposes — same 1% roll a plain paid click below gets
-      rollShoppingSpree();
       if (tier) triggerCritCelebration(floor, tier, getScreenCenterLocal);
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
@@ -194,18 +190,14 @@ export function handleFloorClick(
       }
       persist();
       triggerButtonPress(floor);
-      // a crit is still an upgrade click for shopping-spree purposes — same
-      // 1% roll every other qualifying click gets
-      rollShoppingSpree();
       triggerCritCelebration(floor, tier, getScreenCenterLocal);
       return;
     }
-    if (spendTotalIncome(applySpreeDiscount(floor.upgradeCost))) {
+    if (spendTotalIncome(floor.upgradeCost)) {
       applyUpgradeTick(floor, isGroundFloor);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
-      rollShoppingSpree();
       return;
     }
   }

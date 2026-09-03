@@ -267,7 +267,11 @@ export {
   spawnCoinBurst,
   loadCoinImage,
 } from "./coins";
-export { hitTestFloorHover, handleFloorClick } from "./floorInteractions";
+export {
+  hitTestFloorHover,
+  handleFloorClick,
+  isUpgradeButtonEnabled,
+} from "./floorInteractions";
 export {
   drawWorker,
   getBoostedWorkerCenters,
