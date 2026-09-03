@@ -895,3 +895,45 @@ body {
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+/* same wood-outline/cream-ring cartoon language as .worker-menu__item, just a
+   small square instead of a pill — amber unchecked, money-green + a white
+   check mark once checked, disabled-gray to match .worker-menu__item:disabled */
+.worker-menu__checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  flex-shrink: 0;
+  border: 3px solid var(--color-wood-outline);
+  border-radius: 0.4rem;
+  background: var(--color-amber-muted);
+  box-shadow:
+    0 0 0 3px var(--color-wood-ring),
+    0 0 0 5px var(--color-wood-outline);
+  cursor: pointer;
+}
+
+.worker-menu__checkbox:checked {
+  background: var(--color-money-green);
+}
+
+.worker-menu__checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 6px;
+  height: 12px;
+  border: solid var(--color-white);
+  border-width: 0 3px 3px 0;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.worker-menu__checkbox:disabled {
+  background: var(--color-disabled-gray);
+  cursor: default;
+  opacity: 0.7;
+}
