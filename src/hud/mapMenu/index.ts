@@ -125,7 +125,10 @@ export function wireMapMenu(
       "#map-menu-buy-building",
     );
     if (button) {
-      button.disabled = lt(getTotalIncome(), getBuildingPrice(getBuildingCount()));
+      button.disabled = lt(
+        getTotalIncome(),
+        getBuildingPrice(getBuildingCount()),
+      );
     }
   }
 

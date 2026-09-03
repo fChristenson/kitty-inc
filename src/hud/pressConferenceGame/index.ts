@@ -28,18 +28,32 @@ import { loadSprite, loadImageByName } from "../../loadAssets";
 
 // physics constants for the line's head — same "flappy bird" feel: constant
 // downward gravity, a fixed upward kick on every flap, no in-between speeds.
-// FLAP_VELOCITY_PX_S is deliberately capped at -SCROLL_SPEED_PX_S: a trail
-// sample lands every TRAIL_SAMPLE_DX/SCROLL_SPEED_PX_S seconds, so keeping
-// |velocityY| at or below SCROLL_SPEED_PX_S keeps each sample-to-sample rise
-// within a 45° angle on its own, instead of relying on the clamp below to
-// visibly correct it after the fact
+// the world (grid + trail) scrolls left under a fixed head X, giving the
+// illusion of the line constantly moving right, same convention endless
+// runners use instead of actually moving the head across a finite canvas
+const SCROLL_SPEED_PX_S = 160;
+// every point behind the head is clamped to at most this many degrees off the
+// x axis from its neighbor (see drawLine), recomputed fresh every frame from
+// the stable raw trail data — no gradient/falloff, no persisted "frozen"
+// state, just a hard cap applied uniformly along the whole tail
+const TAIL_MAX_ANGLE_DEG = 60;
+const TAIL_MAX_ANGLE_TAN = Math.tan((TAIL_MAX_ANGLE_DEG * Math.PI) / 180);
 const GRAVITY_PX_S2 = 1400;
-const FLAP_VELOCITY_PX_S = -160;
+// FLAP_VELOCITY_PX_S is deliberately capped at -SCROLL_SPEED_PX_S *
+// TAIL_MAX_ANGLE_TAN: a trail sample lands every TRAIL_SAMPLE_DX/
+// SCROLL_SPEED_PX_S seconds, so keeping |velocityY| at or below that cap keeps
+// each sample-to-sample rise within TAIL_MAX_ANGLE_DEG on its own, instead of
+// relying on the clamp below to visibly correct it after the fact. Scaled back
+// to half that cap, then up 25% twice — the full-strength kick felt too strong
+// to control
+const FLAP_STRENGTH_SCALE = 0.78125;
+const FLAP_VELOCITY_PX_S =
+  -SCROLL_SPEED_PX_S * TAIL_MAX_ANGLE_TAN * FLAP_STRENGTH_SCALE;
 // gravity accelerates the fall up to this same speed and no further (see
-// step) — the same 45°-equivalent cap as FLAP_VELOCITY_PX_S, just downward,
-// so an unbroken fall settles into a constant 45° descent instead of
-// accelerating past it
-const TERMINAL_FALL_VELOCITY_PX_S = 160;
+// step) — the same angle-equivalent cap as FLAP_VELOCITY_PX_S, just downward,
+// so an unbroken fall settles into a constant TAIL_MAX_ANGLE_DEG descent
+// instead of accelerating past it
+const TERMINAL_FALL_VELOCITY_PX_S = SCROLL_SPEED_PX_S * TAIL_MAX_ANGLE_TAN;
 // each flap eases the head's velocity toward FLAP_VELOCITY_PX_S over this
 // fixed duration instead of snapping straight to it (see step) — a fixed
 // wall-clock duration, not a threshold-based "close enough" check: gravity
@@ -48,10 +62,6 @@ const TERMINAL_FALL_VELOCITY_PX_S = 160;
 // target, leaving it permanently "stuck" easing and never handing control
 // back to gravity (the head just drifting up forever)
 const FLAP_RAMP_DURATION_MS = 150;
-// the world (grid + trail) scrolls left under a fixed head X, giving the
-// illusion of the line constantly moving right, same convention endless
-// runners use instead of actually moving the head across a finite canvas
-const SCROLL_SPEED_PX_S = 160;
 const GRID_CELL_PX = 48;
 // the head's own fixed x, this many px left of the canvas's own horizontal center
 const HEAD_X_OFFSET_FROM_CENTER = 40;
@@ -72,12 +82,6 @@ const TRAIL_SMOOTHING_RADIUS = 3;
 // giving the whole line a smoother, whip-like follow instead of tracing the
 // head's own sharp changes in direction 1:1
 const TAIL_LAG_RATE = 10;
-// every point behind the head is clamped to at most this many degrees off the
-// x axis from its neighbor (see drawLine), recomputed fresh every frame from
-// the stable raw trail data — no gradient/falloff, no persisted "frozen"
-// state, just a hard cap applied uniformly along the whole tail
-const TAIL_MAX_ANGLE_DEG = 45;
-const TAIL_MAX_ANGLE_TAN = Math.tan((TAIL_MAX_ANGLE_DEG * Math.PI) / 180);
 
 // brief cat-themed market headlines, floating right-to-left across the
 // screen like obstacles — green/white for good ones (a coin burst + coin sfx

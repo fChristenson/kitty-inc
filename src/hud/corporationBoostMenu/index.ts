@@ -255,8 +255,10 @@ export function wireCorporationBoostMenu(
     );
     buttons.forEach((button) => {
       const companyIndex = Number(button.dataset.companyIndex);
-      button.disabled =
-        lt(allCompaniesTotalIncome, getStockRaiseCost(companyIndex));
+      button.disabled = lt(
+        allCompaniesTotalIncome,
+        getStockRaiseCost(companyIndex),
+      );
     });
     const pressConferenceButton = list.querySelector<HTMLButtonElement>(
       "#press-conference-item",
