@@ -21,10 +21,14 @@ import {
   type BigNumber,
   ZERO,
   fromNumber,
+  fromLog10,
   add,
   multiply,
   pow,
   max,
+  min,
+  gt,
+  isZero,
   log10,
 } from "../../shared/bigNumber";
 
@@ -217,6 +221,101 @@ export function addMarketInfluencePercent(delta: number): void {
   } catch {
     // storage unavailable: nothing to persist
   }
+}
+
+// "Stimulate economy" — a cash sink that trades money for Market Influence %,
+// always usable regardless of current income (never blocked by a fixed cost
+// you can't afford, never a no-op once income is negligible). Each press
+// within one continuous hold costs MORE than the last, on a schedule that
+// interpolates LOGARITHMICALLY from STIMULATE_ECONOMY_BASE_COST ($10, the
+// first press) up to the hold's own starting total income (captured once at
+// hold-start — see corporationBoostMenu/index.ts's referenceTotal — by the
+// final press of STIMULATE_ECONOMY_MAX_PRESSES) — a fixed press budget
+// derived from wanting a full drain in STIMULATE_ECONOMY_DRAIN_SECONDS (15s)
+// of continuous holding at STIMULATE_ECONOMY_HOLD_INTERVAL_MS (100ms) per
+// press, REGARDLESS OF SCALE: a flat/fixed growth rate (the previous design)
+// needed roughly the same number of presses to cross each new order of
+// magnitude, so a genuinely huge total ("80+ quadrillion" and up) could take
+// far more than STIMULATE_ECONOMY_MAX_PRESSES to even approach, let alone
+// drain — interpolating directly against THIS hold's own starting total
+// instead guarantees the schedule always reaches it by the last press,
+// however large it is. Capped at whatever's actually left so a small total
+// still just fully drains to exactly 0 in one press (the literal "reset to
+// 0" cash-sink case) instead of overdrawing.
+//
+// Influence gained scales with sqrt(log10(cost)) * STIMULATE_ECONOMY_GAIN_RATE
+// (same "compress an astronomically wide $ range into a small, steadily-
+// growing number" idea getCompanyBaseModifierPercent already uses for company
+// value) rather than a flat linear rate of the $ spent — cost above can span
+// anywhere from $10 to a many-orders-of-magnitude fortune, but Market
+// Influence % must stay in a small, sane range (it feeds directly, 1:1, into
+// the global income boost), so a linear rate would either be worthless at $10
+// or wildly overpowered (tens/hundreds of percent from ONE press) once cost
+// reaches the quadrillion+ scale the schedule above is specifically designed
+// to reach. Grows without bound (slowly) as cost grows, so a genuinely huge
+// spend is still genuinely worth more, and is naturally 0 once cost drops
+// below $1 (i.e. total income is fully drained)
+const STIMULATE_ECONOMY_BASE_COST = 10;
+const STIMULATE_ECONOMY_GAIN_RATE = 0.01;
+// exported so corporationBoostMenu/index.ts's own press-and-hold timer uses
+// the exact same interval this schedule's press-budget math assumes — the
+// two must never drift out of sync
+export const STIMULATE_ECONOMY_HOLD_INTERVAL_MS = 100;
+const STIMULATE_ECONOMY_DRAIN_SECONDS = 15;
+const STIMULATE_ECONOMY_MAX_PRESSES = Math.round(
+  (STIMULATE_ECONOMY_DRAIN_SECONDS * 1000) / STIMULATE_ECONOMY_HOLD_INTERVAL_MS,
+);
+
+// streak: 1 for the first press of a fresh hold, 2 for the next consecutive
+// one, etc. (see corporationBoostMenu/index.ts's own counter). referenceTotal:
+// the combined total income captured ONCE at hold-start (NOT re-read fresh
+// every press) — the whole point is a stable schedule that still reaches the
+// full original amount by STIMULATE_ECONOMY_MAX_PRESSES regardless of how
+// much has already been drained mid-hold
+export function getStimulateEconomyCost(
+  streak: number,
+  referenceTotal: BigNumber,
+): BigNumber {
+  const currentTotal = getAllCompaniesTotalIncome();
+  const baseCost = fromNumber(STIMULATE_ECONOMY_BASE_COST);
+  // too small a reference to bother interpolating against (e.g. a fresh/
+  // near-empty economy) — just take whatever's there in one go
+  if (isZero(referenceTotal) || !gt(referenceTotal, baseCost)) {
+    return min(currentTotal, referenceTotal);
+  }
+  const progress = Math.min(
+    1,
+    Math.max(0, streak - 1) / (STIMULATE_ECONOMY_MAX_PRESSES - 1),
+  );
+  const logCost =
+    log10(baseCost) + progress * (log10(referenceTotal) - log10(baseCost));
+  return min(currentTotal, fromLog10(logCost));
+}
+
+export function getStimulateEconomyInfluenceGain(
+  streak: number,
+  referenceTotal: BigNumber,
+): number {
+  const cost = getStimulateEconomyCost(streak, referenceTotal);
+  const logCost = log10(cost);
+  if (!Number.isFinite(logCost) || logCost < 0) return 0;
+  return Math.sqrt(logCost) * STIMULATE_ECONOMY_GAIN_RATE;
+}
+
+// spends getStimulateEconomyCost(streak, referenceTotal) (proportionally
+// across every company, same as a stock raise/press conference) and banks
+// the log-scaled influence gain above. A no-op once total income is fully
+// drained (gain would be 0) — returns whether it succeeded
+export function stimulateEconomy(
+  streak: number,
+  referenceTotal: BigNumber,
+): boolean {
+  const gain = getStimulateEconomyInfluenceGain(streak, referenceTotal);
+  if (gain <= 0) return false;
+  if (!spendFromAllCompanies(getStimulateEconomyCost(streak, referenceTotal)))
+    return false;
+  addMarketInfluencePercent(gain);
+  return true;
 }
 
 // folded into clearStockPrices above so a full game reset doesn't inherit an

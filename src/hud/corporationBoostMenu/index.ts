@@ -14,7 +14,7 @@ import {
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { getManagerIconUrl } from "../../floors";
-import { gte, lt } from "../../shared/bigNumber";
+import { gte, lt, type BigNumber } from "../../shared/bigNumber";
 
 const coinIconUrl = getImageUrl("coin");
 import {
@@ -26,6 +26,10 @@ import {
   getPressConferenceCost,
   getFreePressConferenceCount,
   holdPressConference,
+  getStimulateEconomyCost,
+  getStimulateEconomyInfluenceGain,
+  stimulateEconomy,
+  STIMULATE_ECONOMY_HOLD_INTERVAL_MS,
   getMarketInfluencePercent,
   getGlobalIncomeBoostPercent,
   formatBoostPercent,
@@ -40,6 +44,8 @@ export {
   getFreePressConferenceCount,
   grantFreePressConference,
   holdPressConference,
+  getStimulateEconomyCost,
+  stimulateEconomy,
   getMarketInfluencePercent,
   addMarketInfluencePercent,
   getCompanyAssetValue,
@@ -137,6 +143,15 @@ export function wireCorporationBoostMenu(
       freePressConferenceCount > 0
         ? `FREE (x${freePressConferenceCount})`
         : formatPrice(pressConferenceCost);
+    const stimulateEconomyCost = getStimulateEconomyCost(
+      stimulateEconomyStreak,
+      currentStimulateEconomyReference(),
+    );
+    const stimulateEconomyAffordable =
+      getStimulateEconomyInfluenceGain(
+        stimulateEconomyStreak,
+        currentStimulateEconomyReference(),
+      ) > 0 && gte(allCompaniesTotalIncome, stimulateEconomyCost);
     const items = activeIndices
       .map((i) => {
         const cost = getStockRaiseCost(i);
@@ -178,6 +193,17 @@ export function wireCorporationBoostMenu(
           <span class="worker-menu__item-name">Hold press conference</span>
         </span>
         <span class="worker-menu__price">${pressConferencePriceLabel}</span>
+      </button>
+      <button
+        class="worker-menu__item"
+        id="stimulate-economy-item"
+        ${stimulateEconomyAffordable ? "" : "disabled"}
+      >
+        <span class="worker-menu__item-label">
+          <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+          <span class="worker-menu__item-name">Stimulate economy</span>
+        </span>
+        <span class="worker-menu__price">${formatPrice(stimulateEconomyCost)}</span>
       </button>
       <h3 class="worker-menu__subheader">Raise Stock price</h3>
       ${items}
@@ -241,6 +267,79 @@ export function wireCorporationBoostMenu(
   window.addEventListener("pointerup", stopHold);
   window.addEventListener("pointercancel", stopHold);
 
+  // press-and-hold auto-repeat for Stimulate economy, same interval/shape as
+  // the per-company stock-raise hold above but with its own independent hold
+  // state (this button isn't keyed by company index). stimulateEconomyStreak
+  // is the streak the NEXT press will use (1 = fresh/first press of a new
+  // hold, escalating +1 per consecutive fire); stimulateEconomyReferenceTotal
+  // is the combined total income snapshotted ONCE right when a fresh hold
+  // starts — economy.ts's own cost schedule interpolates against this FIXED
+  // value (not a freshly re-read total) so the schedule stays stable and
+  // still reaches the full original amount by its last press even as the
+  // real total shrinks mid-hold. Both reset whenever the hold actually stops.
+  // Reuses economy.ts's own STIMULATE_ECONOMY_HOLD_INTERVAL_MS (not a separate
+  // local constant) since that schedule's whole "drains within 15s" guarantee
+  // assumes this exact interval
+  let stimulateEconomyHeld = false;
+  let stimulateEconomyHoldController: PressAndHoldController | null = null;
+  let stimulateEconomyStreak = 1;
+  let stimulateEconomyReferenceTotal: BigNumber = getAllCompaniesTotalIncome();
+
+  // while idle (no hold in progress), "what would the next press cost" should
+  // preview against the LIVE current total (about to become the reference the
+  // moment a fresh hold actually starts) — only an ACTIVE hold freezes it
+  function currentStimulateEconomyReference(): BigNumber {
+    return stimulateEconomyHeld
+      ? stimulateEconomyReferenceTotal
+      : getAllCompaniesTotalIncome();
+  }
+
+  function stopStimulateEconomyHold(): void {
+    const wasHeld = stimulateEconomyHeld;
+    stimulateEconomyHeld = false;
+    stimulateEconomyHoldController?.stop();
+    stimulateEconomyHoldController = null;
+    stimulateEconomyStreak = 1;
+    // the button's price/label only otherwise updates on the next fire (or
+    // the next 250ms affordability poll, which doesn't touch the price text
+    // at all) — without this, releasing a hold left the escalated price
+    // showing until the dialog was closed and reopened
+    if (wasHeld) render();
+  }
+
+  function fireStimulateEconomy(): void {
+    if (
+      !stimulateEconomy(stimulateEconomyStreak, stimulateEconomyReferenceTotal)
+    ) {
+      stopStimulateEconomyHold();
+      return;
+    }
+    stimulateEconomyStreak += 1;
+    playSold();
+    render();
+    const button = list.querySelector<HTMLButtonElement>(
+      "#stimulate-economy-item",
+    );
+    if (button) void triggerButtonPress(button);
+  }
+
+  list.addEventListener("pointerdown", (event) => {
+    const target = event.target as HTMLElement;
+    const button = target.closest<HTMLButtonElement>("#stimulate-economy-item");
+    if (!button || button.disabled) return;
+    stopStimulateEconomyHold(); // safety net against a stale interrupted gesture
+    stimulateEconomyReferenceTotal = getAllCompaniesTotalIncome();
+    stimulateEconomyHeld = true;
+    fireStimulateEconomy();
+    stimulateEconomyHoldController = startPressAndHold(() => {
+      if (!stimulateEconomyHeld) return; // hold already stopped
+      fireStimulateEconomy();
+    }, STIMULATE_ECONOMY_HOLD_INTERVAL_MS);
+  });
+
+  window.addEventListener("pointerup", stopStimulateEconomyHold);
+  window.addEventListener("pointercancel", stopStimulateEconomyHold);
+
   // single-shot (not press-and-hold, unlike the per-company stock items above) —
   // one press conference at a time makes sense given its own 30-minute-income cost
   list.addEventListener("click", (event) => {
@@ -277,6 +376,19 @@ export function wireCorporationBoostMenu(
         getFreePressConferenceCount() === 0 &&
         lt(allCompaniesTotalIncome, getPressConferenceCost());
     }
+    const stimulateEconomyButton = list.querySelector<HTMLButtonElement>(
+      "#stimulate-economy-item",
+    );
+    if (stimulateEconomyButton) {
+      const reference = currentStimulateEconomyReference();
+      stimulateEconomyButton.disabled =
+        getStimulateEconomyInfluenceGain(stimulateEconomyStreak, reference) <=
+          0 ||
+        lt(
+          allCompaniesTotalIncome,
+          getStimulateEconomyCost(stimulateEconomyStreak, reference),
+        );
+    }
   }
 
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
@@ -290,6 +402,7 @@ export function wireCorporationBoostMenu(
 
   async function close(): Promise<void> {
     stopHold();
+    stopStimulateEconomyHold();
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;
