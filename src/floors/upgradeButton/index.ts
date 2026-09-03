@@ -236,6 +236,12 @@ export function floorIncomePerSecond(floor: Floor): BigNumber {
   return divide(floor.incomeAmount, floor.incomeIntervalSeconds);
 }
 
+// per-click payout multiplier applied only to actual sale-click earnings (see
+// floorInteractions/index.ts) — boostMenu's sale cost still prices off the plain
+// floorIncomePerSecond rate above, so a fully-clicked sale now earns back well
+// more than double its cost
+export const SALE_INCOME_MULTIPLIER = 2;
+
 export function drawUpgradeButton(
   ctx: CanvasRenderingContext2D,
   floor: Floor,

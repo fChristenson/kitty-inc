@@ -13,6 +13,7 @@ import {
 import { drawOuterWall } from "../buildings";
 import { drawMouse } from "../mouse";
 import { getTotalIncome } from "../totalIncome";
+import { gte } from "../shared/bigNumber";
 import type { Floor } from "../gameState";
 
 // only re-spawns a floor's boosted-worker float coins this often, instead of every
@@ -73,9 +74,9 @@ export function drawFloorContent(
     floor,
     buttonHovered,
     floor.upgradeCost,
-    getTotalIncome() >= floor.upgradeCost,
+    gte(getTotalIncome(), floor.upgradeCost),
     isGroundFloor,
   );
   drawIncomeFloatText(ctx, floor);
-  drawFloorLock(ctx, floor);
+  drawFloorLock(ctx, floor, gte(getTotalIncome(), floor.unlockCost));
 }

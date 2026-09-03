@@ -12,6 +12,7 @@ import {
   isSaleActive,
   CRIT_TIER_CONFIG,
   floorIncomePerSecond,
+  SALE_INCOME_MULTIPLIER,
   BTN_W,
   BTN_H,
 } from "../upgradeButton";
@@ -149,11 +150,12 @@ export function handleFloorClick(
     if (isSaleActive(floor, Date.now())) {
       const tier = getCritTier(floor);
       if (tier) consumeCritUpgrade(floor);
-      // 1 second of the floor's own current income rate, credited straight to
-      // the player's total — never added back into floor.incomeAmount itself, or
-      // each click would permanently raise the rate the next click reads from
+      // 1 second of the floor's own current income rate (times SALE_INCOME_MULTIPLIER),
+      // credited straight to the player's total — never added back into
+      // floor.incomeAmount itself, or each click would permanently raise the rate
+      // the next click reads from
       const gained = multiply(
-        floorIncomePerSecond(floor),
+        multiply(floorIncomePerSecond(floor), SALE_INCOME_MULTIPLIER),
         tier ? CRIT_TIER_CONFIG[tier].multiplier : 1,
       );
       addTotalIncome(gained);

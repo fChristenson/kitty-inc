@@ -1,5 +1,9 @@
 import { loadBuildings, type Floor } from "../../gameState";
-import { spendFromAllCompanies, getStoredTotalIncome } from "../../totalIncome";
+import {
+  spendFromAllCompanies,
+  getStoredTotalIncome,
+  getAllCompaniesTotalIncome,
+} from "../../totalIncome";
 import { getCorporationCount } from "../../corporationName";
 import { getBuildingPrice } from "../../buildings";
 import {
@@ -101,15 +105,14 @@ export function buyStockRaise(companyIndex: number): boolean {
   return true;
 }
 
-// $ cost of the single, not-per-company "Hold press conference" action: 10%
-// of every company's own upgrades value summed together (never their current
-// total income — explicit request: this must stay affordable even for a
-// company that just spent itself down to $0). Same efficient per-company
-// sourcing as getCompanyValue below: the active company's upgrades value is
-// read fresh off its own live buildings, every dormant company reads its own
-// persisted CompanyRecord.upgradesValue instead of ever loading its full
-// buildings/floors array
-const PRESS_CONFERENCE_UPGRADES_VALUE_PERCENT = 0.1;
+// $ cost of the single, not-per-company "Hold press conference" action: 15%
+// of every company's own upgrades value summed together, plus every company's
+// current total income (getAllCompaniesTotalIncome) — same efficient
+// per-company sourcing as getCompanyValue below for the upgrades half: the
+// active company's upgrades value is read fresh off its own live buildings,
+// every dormant company reads its own persisted CompanyRecord.upgradesValue
+// instead of ever loading its full buildings/floors array
+const PRESS_CONFERENCE_UPGRADES_VALUE_PERCENT = 0.15;
 
 function getAllCompaniesUpgradesValue(): BigNumber {
   const count = getCorporationCount();
@@ -127,7 +130,7 @@ function getAllCompaniesUpgradesValue(): BigNumber {
 
 export function getPressConferenceCost(): BigNumber {
   return multiply(
-    getAllCompaniesUpgradesValue(),
+    add(getAllCompaniesUpgradesValue(), getAllCompaniesTotalIncome()),
     PRESS_CONFERENCE_UPGRADES_VALUE_PERCENT,
   );
 }

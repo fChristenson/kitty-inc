@@ -14,6 +14,7 @@ const PANEL_Y = FLOOR_H / 2 - PANEL_H / 2;
 export function drawFloorLock(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
+  affordable: boolean,
 ): void {
   if (floor.unlocked) return;
 
@@ -28,13 +29,13 @@ export function drawFloorLock(
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   // same idle wiggle every crit/sale button uses — draws attention to the price
-  // without needing a click first
+  // only once the player can actually afford to unlock it; stays still otherwise
   const cx = FLOOR_W / 2;
   const cy = FLOOR_H / 2;
   const now = Date.now();
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.rotate(getWiggleRotation(now));
+  if (affordable) ctx.rotate(getWiggleRotation(now));
   ctx.translate(-cx, -cy);
   drawCartoonText(ctx, formatPrice(floor.unlockCost), cx, cy);
   ctx.restore();

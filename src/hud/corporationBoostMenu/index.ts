@@ -13,6 +13,7 @@ import {
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { getManagerIconUrl } from "../../floors";
+import { gte, lt } from "../../shared/bigNumber";
 
 const coinIconUrl = getImageUrl("coin");
 import {
@@ -124,14 +125,14 @@ export function wireCorporationBoostMenu(
     const allCompaniesTotalIncome = getAllCompaniesTotalIncome();
     const pressConferenceAffordable =
       freePressConferenceCount > 0 ||
-      allCompaniesTotalIncome >= pressConferenceCost;
+      gte(allCompaniesTotalIncome, pressConferenceCost);
     const pressConferencePriceLabel =
       freePressConferenceCount > 0
         ? `FREE (x${freePressConferenceCount})`
         : formatPrice(pressConferenceCost);
     const items = Array.from({ length: count }, (_, i) => {
       const cost = getStockRaiseCost(i);
-      const affordable = allCompaniesTotalIncome >= cost;
+      const affordable = gte(allCompaniesTotalIncome, cost);
       return `
         <button
           class="worker-menu__item"
@@ -255,7 +256,7 @@ export function wireCorporationBoostMenu(
     buttons.forEach((button) => {
       const companyIndex = Number(button.dataset.companyIndex);
       button.disabled =
-        allCompaniesTotalIncome < getStockRaiseCost(companyIndex);
+        lt(allCompaniesTotalIncome, getStockRaiseCost(companyIndex));
     });
     const pressConferenceButton = list.querySelector<HTMLButtonElement>(
       "#press-conference-item",
@@ -263,7 +264,7 @@ export function wireCorporationBoostMenu(
     if (pressConferenceButton) {
       pressConferenceButton.disabled =
         getFreePressConferenceCount() === 0 &&
-        allCompaniesTotalIncome < getPressConferenceCost();
+        lt(allCompaniesTotalIncome, getPressConferenceCost());
     }
   }
 

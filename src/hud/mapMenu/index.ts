@@ -4,6 +4,7 @@ import { clearCityNames } from "../../cityName";
 import { formatPrice, animateDialogClose } from "../../utils";
 import { getBuildingPrice } from "../../buildings";
 import { playSwoosh, playSold } from "../../sound";
+import { gte, lt } from "../../shared/bigNumber";
 
 // reuses .worker-menu's styling — same generic "dialog with a list of buyable items"
 // shape as boostMenu/upgradeMenu. Lists a button per building already owned (how you
@@ -65,7 +66,7 @@ export function wireMapMenu(
     }).join("");
 
     const price = getBuildingPrice(count);
-    const affordable = getTotalIncome() >= price;
+    const affordable = gte(getTotalIncome(), price);
     const buyItem = `
       <button
         class="worker-menu__item"
@@ -124,7 +125,7 @@ export function wireMapMenu(
       "#map-menu-buy-building",
     );
     if (button) {
-      button.disabled = getTotalIncome() < getBuildingPrice(getBuildingCount());
+      button.disabled = lt(getTotalIncome(), getBuildingPrice(getBuildingCount()));
     }
   }
 
