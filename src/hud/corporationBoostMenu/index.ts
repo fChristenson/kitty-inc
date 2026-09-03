@@ -26,10 +26,10 @@ import {
   getPressConferenceCost,
   getFreePressConferenceCount,
   holdPressConference,
-  getStimulateEconomyCost,
-  stimulateEconomy,
-  STIMULATE_ECONOMY_HOLD_INTERVAL_MS,
+  getInvestCost,
+  investInMarket,
   getMarketInfluencePercent,
+  getInvestmentPortfolioPercent,
   getGlobalIncomeBoostPercent,
   formatBoostPercent,
 } from "./economy";
@@ -43,10 +43,11 @@ export {
   getFreePressConferenceCount,
   grantFreePressConference,
   holdPressConference,
-  getStimulateEconomyCost,
-  stimulateEconomy,
+  getInvestCost,
+  investInMarket,
   getMarketInfluencePercent,
   addMarketInfluencePercent,
+  getInvestmentPortfolioPercent,
   getCompanyAssetValue,
   getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,
@@ -122,9 +123,16 @@ export function wireCorporationBoostMenu(
       .join("");
     const marketInfluencePct = getMarketInfluencePercent();
     const marketInfluenceRow = `
-      <div class="worker-menu__modifier-row worker-menu__modifier-row--divider">
+      <div class="worker-menu__modifier-row">
         <span>Market influence</span>
         <span>${formatBoostPercent(marketInfluencePct)}</span>
+      </div>
+    `;
+    const investmentPortfolioPct = getInvestmentPortfolioPercent();
+    const investmentPortfolioRow = `
+      <div class="worker-menu__modifier-row worker-menu__modifier-row--divider">
+        <span>Investment portfolio</span>
+        <span>${formatBoostPercent(investmentPortfolioPct)}</span>
       </div>
     `;
     const totalPct = getGlobalIncomeBoostPercent();
@@ -142,18 +150,12 @@ export function wireCorporationBoostMenu(
       freePressConferenceCount > 0
         ? `FREE (x${freePressConferenceCount})`
         : formatPrice(pressConferenceCost);
-    const stimulateEconomyCost = getStimulateEconomyCost(
-      stimulateEconomyStreak,
-      currentStimulateEconomyReference(),
-    );
-    // gated on cost > 0 (i.e. there's still something left to buy), NOT on
-    // influence gain > 0 — gain legitimately clamps to 0 for any sub-$1
-    // remainder (see getStimulateEconomyInfluenceGain), well before the total
-    // is actually fully drained, so gating on it instead disabled the button
-    // forever with corp assets stuck just above $0
-    const stimulateEconomyAffordable =
-      !isZero(stimulateEconomyCost) &&
-      gte(allCompaniesTotalIncome, stimulateEconomyCost);
+    const investCost = getInvestCost(currentInvestReference());
+    // gated on cost > 0 (i.e. there's still something left to invest) rather
+    // than always-enabled — once corp assets are fully drained there's
+    // genuinely nothing left for 10% of $0 to spend
+    const investAffordable =
+      !isZero(investCost) && gte(allCompaniesTotalIncome, investCost);
     const items = activeIndices
       .map((i) => {
         const cost = getStockRaiseCost(i);
@@ -179,12 +181,13 @@ export function wireCorporationBoostMenu(
       <span class="worker-menu__total-income">${formatTotalIncomeFull(allCompaniesTotalIncome)}</span>
       <h3 class="worker-menu__subheader">Income modifiers</h3>
       ${marketInfluenceRow}
+      ${investmentPortfolioRow}
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
         <span>Total</span>
         <span>${formatBoostPercent(totalPct)}</span>
       </div>
-      <h3 class="worker-menu__subheader">Raise Market Influence</h3>
+      <h3 class="worker-menu__subheader">Boost Income Modifiers</h3>
       <button
         class="worker-menu__item"
         id="press-conference-item"
@@ -198,14 +201,14 @@ export function wireCorporationBoostMenu(
       </button>
       <button
         class="worker-menu__item"
-        id="stimulate-economy-item"
-        ${stimulateEconomyAffordable ? "" : "disabled"}
+        id="invest-in-market-item"
+        ${investAffordable ? "" : "disabled"}
       >
         <span class="worker-menu__item-label">
           <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
-          <span class="worker-menu__item-name">Stimulate economy</span>
+          <span class="worker-menu__item-name">Invest in the market</span>
         </span>
-        <span class="worker-menu__price">${formatPrice(stimulateEconomyCost)}</span>
+        <span class="worker-menu__price">10%</span>
       </button>
       <h3 class="worker-menu__subheader">Raise Stock price</h3>
       ${items}
@@ -269,78 +272,61 @@ export function wireCorporationBoostMenu(
   window.addEventListener("pointerup", stopHold);
   window.addEventListener("pointercancel", stopHold);
 
-  // press-and-hold auto-repeat for Stimulate economy, same interval/shape as
-  // the per-company stock-raise hold above but with its own independent hold
-  // state (this button isn't keyed by company index). stimulateEconomyStreak
-  // is the streak the NEXT press will use (1 = fresh/first press of a new
-  // hold, escalating +1 per consecutive fire); stimulateEconomyReferenceTotal
+  // press-and-hold auto-repeat for Invest in the market, same interval/shape
+  // as the per-company stock-raise hold above but with its own independent
+  // hold state (this button isn't keyed by company index). investReferenceTotal
   // is the combined total income snapshotted ONCE right when a fresh hold
-  // starts — economy.ts's own cost schedule interpolates against this FIXED
-  // value (not a freshly re-read total) so the schedule stays stable and
-  // still reaches the full original amount by its last press even as the
-  // real total shrinks mid-hold. Both reset whenever the hold actually stops.
-  // Reuses economy.ts's own STIMULATE_ECONOMY_HOLD_INTERVAL_MS (not a separate
-  // local constant) since that schedule's whole "drains within 15s" guarantee
-  // assumes this exact interval
-  let stimulateEconomyHeld = false;
-  let stimulateEconomyHoldController: PressAndHoldController | null = null;
-  let stimulateEconomyStreak = 1;
-  let stimulateEconomyReferenceTotal: BigNumber = getAllCompaniesTotalIncome();
+  // starts — economy.ts's getInvestCost spends a flat 10% of THIS frozen
+  // value every press (not a freshly re-read total), which is what
+  // guarantees exactly 10 presses fully drains a hold regardless of scale
+  const INVEST_HOLD_INTERVAL_MS = 100;
+  let investHeld = false;
+  let investHoldController: PressAndHoldController | null = null;
+  let investReferenceTotal: BigNumber = getAllCompaniesTotalIncome();
 
-  // while idle (no hold in progress), "what would the next press cost" should
-  // preview against the LIVE current total (about to become the reference the
-  // moment a fresh hold actually starts) — only an ACTIVE hold freezes it
-  function currentStimulateEconomyReference(): BigNumber {
-    return stimulateEconomyHeld
-      ? stimulateEconomyReferenceTotal
-      : getAllCompaniesTotalIncome();
+  // while idle (no hold in progress), "what would the next press cost"
+  // should preview against the LIVE current total (about to become the
+  // reference the moment a fresh hold actually starts) — only an ACTIVE hold
+  // freezes it
+  function currentInvestReference(): BigNumber {
+    return investHeld ? investReferenceTotal : getAllCompaniesTotalIncome();
   }
 
-  function stopStimulateEconomyHold(): void {
-    const wasHeld = stimulateEconomyHeld;
-    stimulateEconomyHeld = false;
-    stimulateEconomyHoldController?.stop();
-    stimulateEconomyHoldController = null;
-    stimulateEconomyStreak = 1;
-    // the button's price/label only otherwise updates on the next fire (or
-    // the next 250ms affordability poll, which doesn't touch the price text
-    // at all) — without this, releasing a hold left the escalated price
-    // showing until the dialog was closed and reopened
-    if (wasHeld) render();
+  function stopInvestHold(): void {
+    investHeld = false;
+    investHoldController?.stop();
+    investHoldController = null;
   }
 
-  function fireStimulateEconomy(): void {
-    if (
-      !stimulateEconomy(stimulateEconomyStreak, stimulateEconomyReferenceTotal)
-    ) {
-      stopStimulateEconomyHold();
+  function fireInvest(): void {
+    if (!investInMarket(investReferenceTotal)) {
+      stopInvestHold();
       return;
     }
-    stimulateEconomyStreak += 1;
     playSold();
     render();
     const button = list.querySelector<HTMLButtonElement>(
-      "#stimulate-economy-item",
+      "#invest-in-market-item",
     );
     if (button) void triggerButtonPress(button);
   }
 
   list.addEventListener("pointerdown", (event) => {
     const target = event.target as HTMLElement;
-    const button = target.closest<HTMLButtonElement>("#stimulate-economy-item");
+    const button = target.closest<HTMLButtonElement>("#invest-in-market-item");
     if (!button || button.disabled) return;
-    stopStimulateEconomyHold(); // safety net against a stale interrupted gesture
-    stimulateEconomyReferenceTotal = getAllCompaniesTotalIncome();
-    stimulateEconomyHeld = true;
-    fireStimulateEconomy();
-    stimulateEconomyHoldController = startPressAndHold(() => {
-      if (!stimulateEconomyHeld) return; // hold already stopped
-      fireStimulateEconomy();
-    }, STIMULATE_ECONOMY_HOLD_INTERVAL_MS);
+    stopInvestHold(); // safety net against a stale interrupted gesture
+    investReferenceTotal = getAllCompaniesTotalIncome();
+    investHeld = true;
+    fireInvest();
+    investHoldController = startPressAndHold(() => {
+      if (!investHeld) return; // hold already stopped
+      fireInvest();
+    }, INVEST_HOLD_INTERVAL_MS);
   });
 
-  window.addEventListener("pointerup", stopStimulateEconomyHold);
-  window.addEventListener("pointercancel", stopStimulateEconomyHold);
+  window.addEventListener("pointerup", stopInvestHold);
+  window.addEventListener("pointercancel", stopInvestHold);
 
   // single-shot (not press-and-hold, unlike the per-company stock items above) —
   // one press conference at a time makes sense given its own 30-minute-income cost
@@ -378,14 +364,12 @@ export function wireCorporationBoostMenu(
         getFreePressConferenceCount() === 0 &&
         lt(allCompaniesTotalIncome, getPressConferenceCost());
     }
-    const stimulateEconomyButton = list.querySelector<HTMLButtonElement>(
-      "#stimulate-economy-item",
+    const investButton = list.querySelector<HTMLButtonElement>(
+      "#invest-in-market-item",
     );
-    if (stimulateEconomyButton) {
-      const reference = currentStimulateEconomyReference();
-      const cost = getStimulateEconomyCost(stimulateEconomyStreak, reference);
-      stimulateEconomyButton.disabled =
-        isZero(cost) || lt(allCompaniesTotalIncome, cost);
+    if (investButton) {
+      const cost = getInvestCost(currentInvestReference());
+      investButton.disabled = isZero(cost) || lt(allCompaniesTotalIncome, cost);
     }
   }
 
@@ -400,7 +384,7 @@ export function wireCorporationBoostMenu(
 
   async function close(): Promise<void> {
     stopHold();
-    stopStimulateEconomyHold();
+    stopInvestHold();
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;

@@ -26,7 +26,6 @@ import {
   pow,
   max,
   min,
-  gt,
   isZero,
   log10,
 } from "../../shared/bigNumber";
@@ -80,6 +79,7 @@ export function clearStockPrices(): void {
   }
   clearMarketInfluence();
   clearFreePressConferences();
+  clearInvestmentPortfolio();
 }
 
 // how many times a company's stock has actually been raised — the menu shows
@@ -222,138 +222,83 @@ export function addMarketInfluencePercent(delta: number): void {
   }
 }
 
-// "Stimulate economy" — a cash sink that trades money for Market Influence %,
-// always usable regardless of current income (never blocked by a fixed cost
-// you can't afford, never a no-op once income is negligible). Each press
-// within one continuous hold GROWS the cost from STIMULATE_ECONOMY_BASE_COST
-// ($10, the first press), reaching referenceTotal (the hold's own starting
-// total income, captured once at hold-start — see
-// corporationBoostMenu/index.ts's referenceTotal) in EXACTLY
-// STIMULATE_ECONOMY_GROWTH_PRESSES presses — a FIXED press count regardless
-// of scale (see stimulateEconomyGrowthRatio: the per-press growth RATIO
-// scales up with referenceTotal instead, so a bigger fortune gets a bigger
-// jump per press rather than needing more presses to cross it — the
-// previous fixed-ratio design needed a genuinely huge number of presses to
-// cross a genuinely huge total, which just felt like it took forever). The
-// final growth press (the peak) is where the schedule "can't grow" any
-// further without exceeding the whole economy's worth, and every press
-// after that MIRRORS back down the same ratio curve (same distance from the
-// peak on either side costs the same) over the SAME fixed press count,
-// rather than cliff-dropping straight to "spend everything left" in one
-// single press. Once the shrink side would dip below the $10 base cost it
-// just holds flat at $10 a press, and once there's less than $10 left the
-// usual min(currentTotal, cost) cap below takes over and finishes the drain
-// with one final press for whatever small amount actually remains —
-// guaranteeing the hold always ends at exactly $0, never overdrawing.
-//
-// Influence gained scales with sqrt(log10(cost)) * STIMULATE_ECONOMY_GAIN_RATE
-// (same "compress an astronomically wide $ range into a small, steadily-
-// growing number" idea getCompanyBaseModifierPercent already uses for company
-// value) rather than a flat linear rate of the $ spent — cost above can span
-// anywhere from $10 to a many-orders-of-magnitude fortune, but Market
-// Influence % must stay in a small, sane range (it feeds directly, 1:1, into
-// the global income boost), so a linear rate would either be worthless at $10
-// or wildly overpowered (tens/hundreds of percent from ONE press) once cost
-// reaches the quadrillion+ scale the schedule above is specifically designed
-// to reach. Grows without bound (slowly) as cost grows, so a genuinely huge
-// spend is still genuinely worth more, and is naturally 0 once cost drops
-// below $1 (i.e. total income is fully drained)
-const STIMULATE_ECONOMY_BASE_COST = 10;
-// fixed press count for the growth side (and, mirrored, the shrink side) —
-// a full grow-then-shrink cycle is always 2 * this - 1 presses, regardless
-// of referenceTotal's magnitude (see stimulateEconomyGrowthRatio)
-const STIMULATE_ECONOMY_GROWTH_PRESSES = 25;
-const STIMULATE_ECONOMY_GAIN_RATE = 0.01;
-// exported so corporationBoostMenu/index.ts's own press-and-hold timer fires
-// at the same cadence this schedule's press-by-press escalation assumes
-export const STIMULATE_ECONOMY_HOLD_INTERVAL_MS = 100;
+// "Investment portfolio %" — earned via "Invest in the market" below. Kept
+// as its OWN modifier, separate from Market Influence (which is earned via
+// hud/pressConferenceGame's mini-game instead), so the two income sources
+// track independently. Contributes directly, 1:1, to the global boost (see
+// getGlobalIncomeBoostPercent) — same as Market Influence, no leverage/
+// scaling/cap of any kind
+const INVESTMENT_PORTFOLIO_KEY = "cash-clicker:investment-portfolio-percent";
 
-// the per-press multiplier that takes baseCost all the way up to
-// referenceTotal in exactly STIMULATE_ECONOMY_GROWTH_PRESSES - 1 steps — a
-// bigger referenceTotal means a bigger ratio here, NOT more presses, which
-// is what keeps the full drain fast regardless of how astronomically large
-// the economy gets
-function stimulateEconomyGrowthRatio(referenceTotal: BigNumber): number {
-  const baseCost = fromNumber(STIMULATE_ECONOMY_BASE_COST);
-  if (!gt(referenceTotal, baseCost)) return 1;
-  const steps = STIMULATE_ECONOMY_GROWTH_PRESSES - 1;
-  return 10 ** ((log10(referenceTotal) - log10(baseCost)) / steps);
+export function getInvestmentPortfolioPercent(): number {
+  try {
+    const raw = localStorage.getItem(INVESTMENT_PORTFOLIO_KEY);
+    const parsed = raw !== null ? Number(raw) : 0;
+    return Number.isFinite(parsed) ? parsed : 0;
+  } catch {
+    return 0;
+  }
 }
 
-// streak: 1 for the first press of a fresh hold, 2 for the next consecutive
-// one, etc. (see corporationBoostMenu/index.ts's own counter). referenceTotal:
-// the combined total income captured ONCE at hold-start (NOT re-read fresh
-// every press) — the whole point is a stable schedule that still shapes
-// itself around the full original amount regardless of how much has already
-// been drained mid-hold
-export function getStimulateEconomyCost(
-  streak: number,
-  referenceTotal: BigNumber,
-): BigNumber {
+function addInvestmentPortfolioPercent(delta: number): void {
+  try {
+    localStorage.setItem(
+      INVESTMENT_PORTFOLIO_KEY,
+      String(Math.max(0, getInvestmentPortfolioPercent() + delta)),
+    );
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
+// "Invest in the market" — a cash sink that trades money for Investment
+// Portfolio %, always usable regardless of current income. Each click
+// spends INVEST_PERCENT (10%) of referenceTotal — the combined corp total
+// captured ONCE at hold-start (see corporationBoostMenu/index.ts's own
+// investReferenceTotal), NOT a freshly re-read total every press. That's
+// what guarantees EXACTLY 10 presses (1 / INVEST_PERCENT) fully drains any
+// hold, however large — spending 10% of the shrinking remainder each time
+// (the previous design) compounds instead of accumulating, so it only ever
+// asymptotically approaches $0 and, for a big enough total, can take far
+// more than 10 presses to even get within a dollar of it. Capped at
+// whatever's actually left (currentTotal) so the final press(es) never
+// overdraw once the reference has been fully spent
+const INVEST_PERCENT = 0.1;
+
+export function getInvestCost(referenceTotal: BigNumber): BigNumber {
   const currentTotal = getAllCompaniesTotalIncome();
-  const baseCost = fromNumber(STIMULATE_ECONOMY_BASE_COST);
-  // too small a reference to bother growing/shrinking against (e.g. a
-  // a fully-drained economy has nothing to reference at all — show the
-  // nominal $10 starting price rather than a confusing "$0" (the button
-  // stays disabled either way, since there's genuinely nothing to spend)
-  if (isZero(referenceTotal)) {
-    return baseCost;
-  }
-  // too small a reference to bother growing/shrinking against (e.g. a
-  // fresh/near-empty economy) — just take whatever's there in one go
-  if (!gt(referenceTotal, baseCost)) {
-    return min(currentTotal, referenceTotal);
-  }
-  const ratio = stimulateEconomyGrowthRatio(referenceTotal);
-  // same distance from the peak (the fixed growth press count) on either
-  // side costs the same — this is what turns one growth curve into a
-  // mirrored grow-then-shrink shape. Clamped at 0 (i.e. flat at baseCost)
-  // once a hold runs long enough to fall off the far end of the mirrored
-  // shrink side entirely
-  const distanceFromPeak = Math.abs(streak - STIMULATE_ECONOMY_GROWTH_PRESSES);
-  const exponent = Math.max(
-    0,
-    STIMULATE_ECONOMY_GROWTH_PRESSES - 1 - distanceFromPeak,
-  );
-  const cost = multiply(pow(ratio, exponent), STIMULATE_ECONOMY_BASE_COST);
-  return min(currentTotal, cost);
+  if (isZero(currentTotal)) return ZERO;
+  return min(currentTotal, multiply(referenceTotal, INVEST_PERCENT));
 }
 
-export function getStimulateEconomyInfluenceGain(
-  streak: number,
-  referenceTotal: BigNumber,
-): number {
-  const cost = getStimulateEconomyCost(streak, referenceTotal);
+// fully liquidating a company's whole worth should feel about as valuable as
+// that same worth already was AS a company (see getCompanyBaseModifierPercent
+// below, reused here — same BASE_MODIFIER_RATE, same sqrt(log10(value))
+// conversion) rather than some unrelated, much smaller rate. getInvestGain is
+// this full-drain total's SHARE for one particular press, proportional to how
+// much of referenceTotal that press actually spent — computed via log10
+// (never toNumber) so the ratio stays safe no matter how astronomically large
+// referenceTotal is
+function getInvestGain(cost: BigNumber, referenceTotal: BigNumber): number {
+  const logRef = log10(referenceTotal);
   const logCost = log10(cost);
-  if (!Number.isFinite(logCost)) return 0;
-  // sub-$1 costs (the tail end of a full drain, where whatever's left is
-  // less than the log scale's own $1 floor) still clamp to a 0 gain here —
-  // but, unlike before, that no longer means "nothing left to buy" (see
-  // stimulateEconomy below, which now checks cost > 0 for that instead), so
-  // pennies-scale remainders keep draining for free instead of getting
-  // permanently stuck just above $0
-  return Math.sqrt(Math.max(0, logCost)) * STIMULATE_ECONOMY_GAIN_RATE;
+  if (!Number.isFinite(logRef) || logRef < 0 || !Number.isFinite(logCost)) {
+    return 0;
+  }
+  const totalGain = Math.sqrt(logRef) * BASE_MODIFIER_RATE;
+  const shareOfReference = 10 ** (logCost - logRef);
+  return totalGain * shareOfReference;
 }
 
-// spends getStimulateEconomyCost(streak, referenceTotal) (proportionally
-// across every company, same as a stock raise/press conference) and banks
-// the log-scaled influence gain above. A no-op once total income is FULLY
-// drained (cost itself is exactly 0) — returns whether it succeeded. Checking
-// cost > 0 here (rather than gain > 0, which used to gate this) matters
-// because gain legitimately clamps to 0 well before cost does (any
-// sub-$1 remainder), and gating on gain instead left that last sliver of
-// income permanently unspendable — the button would go disabled forever
-// with corp assets stuck just above $0 instead of ever reaching it
-export function stimulateEconomy(
-  streak: number,
-  referenceTotal: BigNumber,
-): boolean {
-  const cost = getStimulateEconomyCost(streak, referenceTotal);
+// spends getInvestCost(referenceTotal) (proportionally across every
+// company, same as a stock raise/press conference) and banks the log-scaled
+// Investment Portfolio % gain above. A no-op once total income is fully
+// drained (cost itself is exactly 0) — returns whether it succeeded
+export function investInMarket(referenceTotal: BigNumber): boolean {
+  const cost = getInvestCost(referenceTotal);
   if (isZero(cost)) return false;
   if (!spendFromAllCompanies(cost)) return false;
-  addMarketInfluencePercent(
-    getStimulateEconomyInfluenceGain(streak, referenceTotal),
-  );
+  addInvestmentPortfolioPercent(getInvestGain(cost, referenceTotal));
   return true;
 }
 
@@ -371,6 +316,15 @@ function clearMarketInfluence(): void {
 function clearFreePressConferences(): void {
   try {
     localStorage.removeItem(FREE_PRESS_CONFERENCES_KEY);
+  } catch {
+    // storage unavailable: nothing to clear
+  }
+}
+
+// same as clearMarketInfluence, folded into clearStockPrices
+function clearInvestmentPortfolio(): void {
+  try {
+    localStorage.removeItem(INVESTMENT_PORTFOLIO_KEY);
   } catch {
     // storage unavailable: nothing to clear
   }
@@ -536,16 +490,17 @@ export function getCompanyBaseModifierPercent(companyIndex: number): number {
   return Math.sqrt(log10(companyValue)) * BASE_MODIFIER_RATE;
 }
 
-// summed across every corporation plus the market-influence modifier — the
-// actual global income boost applied to every floor of every building of every
-// company (see totalIncome.ts's startTotalIncomeTicker/gameState.ts's
-// computeIdleIncome, both take this as an injected multiplier to avoid a
-// circular import back into this hud module). Market Influence contributes its
-// own raw banked % directly, 1:1 — no leverage/scaling against anything else,
-// so whatever a mini-game round banked is exactly what shows up here
+// summed across every corporation plus the market-influence AND investment-
+// portfolio modifiers — the actual global income boost applied to every
+// floor of every building of every company (see totalIncome.ts's
+// startTotalIncomeTicker/gameState.ts's computeIdleIncome, both take this as
+// an injected multiplier to avoid a circular import back into this hud
+// module). Both contribute their own raw banked % directly, 1:1 — no
+// leverage/scaling against anything else, so whatever's banked is exactly
+// what shows up here
 export function getGlobalIncomeBoostPercent(): number {
   const count = getCorporationCount();
-  let total = getMarketInfluencePercent();
+  let total = getMarketInfluencePercent() + getInvestmentPortfolioPercent();
   for (let i = 0; i < count; i++) {
     total += getStockContributionPercent(i) + getCompanyBaseModifierPercent(i);
   }

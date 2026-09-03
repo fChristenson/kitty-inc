@@ -192,8 +192,7 @@ export function log10(value: BigNumber): number {
 // inverse of log10() above — builds a BigNumber directly from its log10
 // value without ever computing `10 ** logValue` on the whole (possibly huge)
 // number, only `10 ** fractionalPart` (always in [1, 10), always safe).
-// Used by corporationBoostMenu's getStimulateEconomyCost to interpolate a
-// cost EXPONENTIALLY between two BigNumbers (a plain BigNumber has no
+// Exponentiates a BigNumber's log10 value directly (a plain BigNumber has no
 // fractional-exponent pow of its own — shared/bigNumber's own pow() only
 // supports integer exponents)
 export function fromLog10(logValue: number): BigNumber {
