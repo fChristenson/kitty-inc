@@ -159,7 +159,12 @@ export function drawCritFlash(
   } else if (elapsed < holdEndsAt) {
     // sticks at full size/opacity (optionally strobing) — the phase a "sticky"
     // tier (ultra) uses to stay noticeable well past the initial pop-in, before
-    // the regular fade-out below ever begins
+    // the regular fade-out below ever begins. Every blink cycle here is a
+    // plain, undistorted on/off toggle — callers passing blinkHz must choose
+    // holdMs so the pattern naturally lands "on" right as holdEndsAt arrives
+    // (see critCelebration.ts's own comment on why its holdMs is exactly what
+    // it is), rather than this function warping the blink's own timing to
+    // compensate for an arbitrary holdMs
     growthScale = 1;
     rotation = 0;
     alpha = 1;

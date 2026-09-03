@@ -126,12 +126,17 @@ export function preloadSounds(): void {
 // plays a preloaded SFX buffer starting offsetSeconds into it (0 = from the very
 // start) at the given linear volume and playbackRate (1 = unchanged pitch/speed) —
 // fire-and-forget, a fresh BufferSource node per call since each one can only ever
-// be started once
+// be started once. maxDurationSeconds (if given) hard-cuts playback at that point,
+// linearly fading the gain to 0 over the last fadeOutSeconds instead of an abrupt
+// stop — used by playPayout to keep the ultra-crit sound in sync with its own
+// shortened on-screen flash text
 function playSfx(
   name: SfxName,
   volume: number,
   offsetSeconds = 0,
   rate = 1,
+  maxDurationSeconds?: number,
+  fadeOutSeconds = 0.4,
 ): void {
   const ctx = getAudioContext();
   if (!ctx) return;
@@ -144,7 +149,15 @@ function playSfx(
       gain.gain.value = volume;
       source.connect(gain);
       gain.connect(ctx.destination);
+      const startAt = ctx.currentTime;
       source.start(0, Math.min(offsetSeconds, buffer.duration));
+      if (maxDurationSeconds !== undefined) {
+        const fadeStartAt =
+          startAt + Math.max(0, maxDurationSeconds - fadeOutSeconds);
+        gain.gain.setValueAtTime(volume, fadeStartAt);
+        gain.gain.linearRampToValueAtTime(0, startAt + maxDurationSeconds);
+        source.stop(startAt + maxDurationSeconds);
+      }
     })
     .catch(() => {});
 }
@@ -234,12 +247,17 @@ export function playJackpot(): void {
 
 // one-shot sound effect for the even rarer ultra-crit moment (see
 // floorInteractions.ts). Debounced (see PAYOUT_DEBOUNCE_MS) so back-to-back ultra
-// crits during a fast held click can't stack overlapping plays
+// crits during a fast held click can't stack overlapping plays. Capped at ~1.93s
+// (matching critCelebration.ts's own total flash lifetime) and faded over its
+// last 0.576s to match the flash text's own fade-out phase duration exactly
+// (see screenShake.ts) — both end together with a smooth fade, instead of the
+// sound outlasting the (now much shorter) flash by playing the full ~3s .wav
+// past the point the screen's gone quiet
 export function playPayout(): void {
   const now = Date.now();
   if (now - lastPayoutPlayTime < PAYOUT_DEBOUNCE_MS) return;
   lastPayoutPlayTime = now;
-  playSfx("payout", SFX_VOLUME);
+  playSfx("payout", SFX_VOLUME, 0, 1, 1.926, 0.576);
 }
 
 // one-shot sound effect for hud/pressConferenceGame's own flap — its own

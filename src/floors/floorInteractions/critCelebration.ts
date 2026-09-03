@@ -28,9 +28,18 @@ export function triggerCritCelebration(
 ): void {
   if (tier === "ultra") {
     // blinkHz strobes the flash text on/off during its holdMs "stick" phase, on
-    // top of its regular grow/fade animation — payout.wav is ~3s long, so this
-    // sticks around for 5s (a bit longer than the sound) so it's still visibly
-    // celebrating just after the sound itself has finished.
+    // top of its regular grow/fade animation. holdMs is deliberately an EXACT
+    // odd multiple of the blink's own half-cycle (1000/(blinkHz*2) = 83.33ms
+    // at blinkHz=6; 15 * 83.33 = 1250) — this makes the on/off pattern always
+    // land back "on" (full alpha) exactly when the hold phase ends, so the
+    // fade-out below (which always starts from alpha=1) never has to jump or
+    // warp the blink's own timing to transition smoothly; every single blink
+    // cycle stays a plain, identical-duration on/off toggle (see
+    // screenShake.ts's own drawCritFlash). Total on-screen lifetime =
+    // GROWTH_DURATION_MS(100) + holdMs(1250) + fadeDurationMs(intensity-scaled,
+    // ~576ms at 2.6) ≈ 1.93s, matching playPayout's own fade window (see
+    // sound/index.ts) closely enough that neither the flash nor the sound
+    // outlasts the other.
     // priority 2 is the highest tier, so it can never be cut off early by a
     // mega/crit rolling moments later (see triggerScreenShake's own suppression)
     triggerScreenShake({
@@ -39,7 +48,7 @@ export function triggerCritCelebration(
       color: COLOR.red,
       strokeWidth: 16,
       blinkHz: 6,
-      holdMs: 3000,
+      holdMs: 1250,
       priority: 2,
     });
     playPayout();
