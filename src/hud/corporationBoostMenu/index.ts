@@ -14,7 +14,7 @@ import {
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { getManagerIconUrl } from "../../floors";
-import { gte, lt, type BigNumber } from "../../shared/bigNumber";
+import { gte, lt, isZero, type BigNumber } from "../../shared/bigNumber";
 
 const coinIconUrl = getImageUrl("coin");
 import {
@@ -27,7 +27,6 @@ import {
   getFreePressConferenceCount,
   holdPressConference,
   getStimulateEconomyCost,
-  getStimulateEconomyInfluenceGain,
   stimulateEconomy,
   STIMULATE_ECONOMY_HOLD_INTERVAL_MS,
   getMarketInfluencePercent,
@@ -147,11 +146,14 @@ export function wireCorporationBoostMenu(
       stimulateEconomyStreak,
       currentStimulateEconomyReference(),
     );
+    // gated on cost > 0 (i.e. there's still something left to buy), NOT on
+    // influence gain > 0 — gain legitimately clamps to 0 for any sub-$1
+    // remainder (see getStimulateEconomyInfluenceGain), well before the total
+    // is actually fully drained, so gating on it instead disabled the button
+    // forever with corp assets stuck just above $0
     const stimulateEconomyAffordable =
-      getStimulateEconomyInfluenceGain(
-        stimulateEconomyStreak,
-        currentStimulateEconomyReference(),
-      ) > 0 && gte(allCompaniesTotalIncome, stimulateEconomyCost);
+      !isZero(stimulateEconomyCost) &&
+      gte(allCompaniesTotalIncome, stimulateEconomyCost);
     const items = activeIndices
       .map((i) => {
         const cost = getStockRaiseCost(i);
@@ -381,13 +383,9 @@ export function wireCorporationBoostMenu(
     );
     if (stimulateEconomyButton) {
       const reference = currentStimulateEconomyReference();
+      const cost = getStimulateEconomyCost(stimulateEconomyStreak, reference);
       stimulateEconomyButton.disabled =
-        getStimulateEconomyInfluenceGain(stimulateEconomyStreak, reference) <=
-          0 ||
-        lt(
-          allCompaniesTotalIncome,
-          getStimulateEconomyCost(stimulateEconomyStreak, reference),
-        );
+        isZero(cost) || lt(allCompaniesTotalIncome, cost);
     }
   }
 

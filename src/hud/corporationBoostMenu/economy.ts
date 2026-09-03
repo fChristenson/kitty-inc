@@ -21,7 +21,6 @@ import {
   type BigNumber,
   ZERO,
   fromNumber,
-  fromLog10,
   add,
   multiply,
   pow,
@@ -226,22 +225,26 @@ export function addMarketInfluencePercent(delta: number): void {
 // "Stimulate economy" — a cash sink that trades money for Market Influence %,
 // always usable regardless of current income (never blocked by a fixed cost
 // you can't afford, never a no-op once income is negligible). Each press
-// within one continuous hold costs MORE than the last, on a schedule that
-// interpolates LOGARITHMICALLY from STIMULATE_ECONOMY_BASE_COST ($10, the
-// first press) up to the hold's own starting total income (captured once at
-// hold-start — see corporationBoostMenu/index.ts's referenceTotal — by the
-// final press of STIMULATE_ECONOMY_MAX_PRESSES) — a fixed press budget
-// derived from wanting a full drain in STIMULATE_ECONOMY_DRAIN_SECONDS (15s)
-// of continuous holding at STIMULATE_ECONOMY_HOLD_INTERVAL_MS (100ms) per
-// press, REGARDLESS OF SCALE: a flat/fixed growth rate (the previous design)
-// needed roughly the same number of presses to cross each new order of
-// magnitude, so a genuinely huge total ("80+ quadrillion" and up) could take
-// far more than STIMULATE_ECONOMY_MAX_PRESSES to even approach, let alone
-// drain — interpolating directly against THIS hold's own starting total
-// instead guarantees the schedule always reaches it by the last press,
-// however large it is. Capped at whatever's actually left so a small total
-// still just fully drains to exactly 0 in one press (the literal "reset to
-// 0" cash-sink case) instead of overdrawing.
+// within one continuous hold GROWS the cost from STIMULATE_ECONOMY_BASE_COST
+// ($10, the first press), reaching referenceTotal (the hold's own starting
+// total income, captured once at hold-start — see
+// corporationBoostMenu/index.ts's referenceTotal) in EXACTLY
+// STIMULATE_ECONOMY_GROWTH_PRESSES presses — a FIXED press count regardless
+// of scale (see stimulateEconomyGrowthRatio: the per-press growth RATIO
+// scales up with referenceTotal instead, so a bigger fortune gets a bigger
+// jump per press rather than needing more presses to cross it — the
+// previous fixed-ratio design needed a genuinely huge number of presses to
+// cross a genuinely huge total, which just felt like it took forever). The
+// final growth press (the peak) is where the schedule "can't grow" any
+// further without exceeding the whole economy's worth, and every press
+// after that MIRRORS back down the same ratio curve (same distance from the
+// peak on either side costs the same) over the SAME fixed press count,
+// rather than cliff-dropping straight to "spend everything left" in one
+// single press. Once the shrink side would dip below the $10 base cost it
+// just holds flat at $10 a press, and once there's less than $10 left the
+// usual min(currentTotal, cost) cap below takes over and finishes the drain
+// with one final press for whatever small amount actually remains —
+// guaranteeing the hold always ends at exactly $0, never overdrawing.
 //
 // Influence gained scales with sqrt(log10(cost)) * STIMULATE_ECONOMY_GAIN_RATE
 // (same "compress an astronomically wide $ range into a small, steadily-
@@ -256,40 +259,64 @@ export function addMarketInfluencePercent(delta: number): void {
 // spend is still genuinely worth more, and is naturally 0 once cost drops
 // below $1 (i.e. total income is fully drained)
 const STIMULATE_ECONOMY_BASE_COST = 10;
+// fixed press count for the growth side (and, mirrored, the shrink side) —
+// a full grow-then-shrink cycle is always 2 * this - 1 presses, regardless
+// of referenceTotal's magnitude (see stimulateEconomyGrowthRatio)
+const STIMULATE_ECONOMY_GROWTH_PRESSES = 25;
 const STIMULATE_ECONOMY_GAIN_RATE = 0.01;
-// exported so corporationBoostMenu/index.ts's own press-and-hold timer uses
-// the exact same interval this schedule's press-budget math assumes — the
-// two must never drift out of sync
+// exported so corporationBoostMenu/index.ts's own press-and-hold timer fires
+// at the same cadence this schedule's press-by-press escalation assumes
 export const STIMULATE_ECONOMY_HOLD_INTERVAL_MS = 100;
-const STIMULATE_ECONOMY_DRAIN_SECONDS = 15;
-const STIMULATE_ECONOMY_MAX_PRESSES = Math.round(
-  (STIMULATE_ECONOMY_DRAIN_SECONDS * 1000) / STIMULATE_ECONOMY_HOLD_INTERVAL_MS,
-);
+
+// the per-press multiplier that takes baseCost all the way up to
+// referenceTotal in exactly STIMULATE_ECONOMY_GROWTH_PRESSES - 1 steps — a
+// bigger referenceTotal means a bigger ratio here, NOT more presses, which
+// is what keeps the full drain fast regardless of how astronomically large
+// the economy gets
+function stimulateEconomyGrowthRatio(referenceTotal: BigNumber): number {
+  const baseCost = fromNumber(STIMULATE_ECONOMY_BASE_COST);
+  if (!gt(referenceTotal, baseCost)) return 1;
+  const steps = STIMULATE_ECONOMY_GROWTH_PRESSES - 1;
+  return 10 ** ((log10(referenceTotal) - log10(baseCost)) / steps);
+}
 
 // streak: 1 for the first press of a fresh hold, 2 for the next consecutive
 // one, etc. (see corporationBoostMenu/index.ts's own counter). referenceTotal:
 // the combined total income captured ONCE at hold-start (NOT re-read fresh
-// every press) — the whole point is a stable schedule that still reaches the
-// full original amount by STIMULATE_ECONOMY_MAX_PRESSES regardless of how
-// much has already been drained mid-hold
+// every press) — the whole point is a stable schedule that still shapes
+// itself around the full original amount regardless of how much has already
+// been drained mid-hold
 export function getStimulateEconomyCost(
   streak: number,
   referenceTotal: BigNumber,
 ): BigNumber {
   const currentTotal = getAllCompaniesTotalIncome();
   const baseCost = fromNumber(STIMULATE_ECONOMY_BASE_COST);
-  // too small a reference to bother interpolating against (e.g. a fresh/
-  // near-empty economy) — just take whatever's there in one go
-  if (isZero(referenceTotal) || !gt(referenceTotal, baseCost)) {
+  // too small a reference to bother growing/shrinking against (e.g. a
+  // a fully-drained economy has nothing to reference at all — show the
+  // nominal $10 starting price rather than a confusing "$0" (the button
+  // stays disabled either way, since there's genuinely nothing to spend)
+  if (isZero(referenceTotal)) {
+    return baseCost;
+  }
+  // too small a reference to bother growing/shrinking against (e.g. a
+  // fresh/near-empty economy) — just take whatever's there in one go
+  if (!gt(referenceTotal, baseCost)) {
     return min(currentTotal, referenceTotal);
   }
-  const progress = Math.min(
-    1,
-    Math.max(0, streak - 1) / (STIMULATE_ECONOMY_MAX_PRESSES - 1),
+  const ratio = stimulateEconomyGrowthRatio(referenceTotal);
+  // same distance from the peak (the fixed growth press count) on either
+  // side costs the same — this is what turns one growth curve into a
+  // mirrored grow-then-shrink shape. Clamped at 0 (i.e. flat at baseCost)
+  // once a hold runs long enough to fall off the far end of the mirrored
+  // shrink side entirely
+  const distanceFromPeak = Math.abs(streak - STIMULATE_ECONOMY_GROWTH_PRESSES);
+  const exponent = Math.max(
+    0,
+    STIMULATE_ECONOMY_GROWTH_PRESSES - 1 - distanceFromPeak,
   );
-  const logCost =
-    log10(baseCost) + progress * (log10(referenceTotal) - log10(baseCost));
-  return min(currentTotal, fromLog10(logCost));
+  const cost = multiply(pow(ratio, exponent), STIMULATE_ECONOMY_BASE_COST);
+  return min(currentTotal, cost);
 }
 
 export function getStimulateEconomyInfluenceGain(
@@ -298,23 +325,35 @@ export function getStimulateEconomyInfluenceGain(
 ): number {
   const cost = getStimulateEconomyCost(streak, referenceTotal);
   const logCost = log10(cost);
-  if (!Number.isFinite(logCost) || logCost < 0) return 0;
-  return Math.sqrt(logCost) * STIMULATE_ECONOMY_GAIN_RATE;
+  if (!Number.isFinite(logCost)) return 0;
+  // sub-$1 costs (the tail end of a full drain, where whatever's left is
+  // less than the log scale's own $1 floor) still clamp to a 0 gain here —
+  // but, unlike before, that no longer means "nothing left to buy" (see
+  // stimulateEconomy below, which now checks cost > 0 for that instead), so
+  // pennies-scale remainders keep draining for free instead of getting
+  // permanently stuck just above $0
+  return Math.sqrt(Math.max(0, logCost)) * STIMULATE_ECONOMY_GAIN_RATE;
 }
 
 // spends getStimulateEconomyCost(streak, referenceTotal) (proportionally
 // across every company, same as a stock raise/press conference) and banks
-// the log-scaled influence gain above. A no-op once total income is fully
-// drained (gain would be 0) — returns whether it succeeded
+// the log-scaled influence gain above. A no-op once total income is FULLY
+// drained (cost itself is exactly 0) — returns whether it succeeded. Checking
+// cost > 0 here (rather than gain > 0, which used to gate this) matters
+// because gain legitimately clamps to 0 well before cost does (any
+// sub-$1 remainder), and gating on gain instead left that last sliver of
+// income permanently unspendable — the button would go disabled forever
+// with corp assets stuck just above $0 instead of ever reaching it
 export function stimulateEconomy(
   streak: number,
   referenceTotal: BigNumber,
 ): boolean {
-  const gain = getStimulateEconomyInfluenceGain(streak, referenceTotal);
-  if (gain <= 0) return false;
-  if (!spendFromAllCompanies(getStimulateEconomyCost(streak, referenceTotal)))
-    return false;
-  addMarketInfluencePercent(gain);
+  const cost = getStimulateEconomyCost(streak, referenceTotal);
+  if (isZero(cost)) return false;
+  if (!spendFromAllCompanies(cost)) return false;
+  addMarketInfluencePercent(
+    getStimulateEconomyInfluenceGain(streak, referenceTotal),
+  );
   return true;
 }
 
