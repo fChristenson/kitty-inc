@@ -92,12 +92,16 @@ function updateCoins(dt: number): void {
 }
 
 // spawns a coin burst at (x, y) — floor-local coordinates — and drives its own rAF
-// loop, calling onFrame after each physics step
+// loop, calling onFrame after each physics step. scale (1 = normal) uniformly
+// scales the spawn-point offset, velocity, size, and gravity together, same
+// convention as coinBurst.ts's own spawnCoinBurstAt — a bigger scale reads as a
+// uniformly bigger burst, not just bigger sprites moving at normal speed
 export function spawnCoinBurst(
   floor: Floor,
   x: number,
   y: number,
   onFrame: () => void,
+  scale = 1,
 ): void {
   const count = randomInt(40, 85);
   for (let i = 0; i < count; i++) {
@@ -109,25 +113,24 @@ export function spawnCoinBurst(
     // upward/outward hemisphere only (not fully random) so coins pop up and out
     // first, then arc back down under gravity instead of scattering downward too
     const angle = -Math.random() * Math.PI;
-    const speed = 3 + Math.random() * 16;
+    const speed = (3 + Math.random() * 16) * scale;
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
     particles.push({
       floor,
-      x: x + (Math.random() - 0.5) * 20,
-      y: y + (Math.random() - 0.5) * 20,
+      x: x + (Math.random() - 0.5) * 20 * scale,
+      y: y + (Math.random() - 0.5) * 20 * scale,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
       life: 0,
       maxLife: 45 + Math.random() * 75,
-      size: 22 + Math.random() * 46,
+      size: (22 + Math.random() * 46) * scale,
       // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
       // full fall speed more gradually
-      gravity: Math.max(
-        0,
-        0.2 + Math.random() * 0.35 - (kind === "bill" ? 0.2 : 0),
-      ),
-      gravityRamp: kind === "bill" ? 0.05 : 0.08,
+      gravity:
+        Math.max(0, 0.2 + Math.random() * 0.35 - (kind === "bill" ? 0.2 : 0)) *
+        scale,
+      gravityRamp: (kind === "bill" ? 0.05 : 0.08) * scale,
       kind,
       spinFrame:
         Math.random() *

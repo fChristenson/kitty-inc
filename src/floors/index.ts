@@ -285,6 +285,8 @@ export {
   drawUpgradeButton,
   hitTestUpgradeButton,
   triggerButtonPress,
+  startButtonHoldAnim,
+  stopButtonHoldAnim,
   rollCritUpgrade,
   isCritUpgrade,
   forceCritUpgrade,

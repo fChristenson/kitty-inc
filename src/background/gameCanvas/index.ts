@@ -8,6 +8,8 @@ import {
   hitTestFloorHover,
   hitTestUpgradeButton,
   handleFloorClick,
+  startButtonHoldAnim,
+  stopButtonHoldAnim,
 } from "../../floors";
 import { drawFloorContent } from "../../gameRenderer";
 import { drawClouds, CLOUD_MAX_RADIUS } from "../clouds";
@@ -590,10 +592,16 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // true once this press has fired the upgrade button (set on pointerdown) —
   // tells onPointerUp not to also run the generic click-elsewhere fallback
   let upgradeFiredOnDown = false;
+  // which floor's button the "pressure boiler" grow/burst/deflate animation
+  // (see upgradeButton.ts's startButtonHoldAnim) is currently running for, so
+  // it can be stopped the instant the hold ends regardless of how it ends
+  let heldUpgradeFloor: Floor | null = null;
 
   function stopHoldRepeat(): void {
     holdController?.stop();
     holdController = null;
+    if (heldUpgradeFloor) stopButtonHoldAnim(heldUpgradeFloor);
+    heldUpgradeFloor = null;
   }
 
   function onPointerDown(event: PointerEvent): void {
@@ -618,6 +626,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       hitTestUpgradeButton(hit.localX, hit.localY, hit.isGroundFloor)
     ) {
       upgradeFiredOnDown = true;
+      heldUpgradeFloor = hit.floor;
+      startButtonHoldAnim(hit.floor);
       fireUpgradeOnce(hit);
       holdController = startPressAndHold(
         () => fireHandleFloorClick(hit),

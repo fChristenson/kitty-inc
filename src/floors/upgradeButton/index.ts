@@ -2,6 +2,8 @@ import { drawCartoonText, drawPill, formatPrice } from "../../utils";
 import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
+import { smoothstep } from "../../shared/easing";
+import { spawnCoinBurst } from "../coins";
 import { type BigNumber, divide } from "../../shared/bigNumber";
 import type { Floor } from "../../gameState";
 
@@ -74,6 +76,150 @@ function pressScale(floor: Floor, now: number): number {
     1 -
     PRESS_AMPLITUDE * Math.exp(-PRESS_DECAY * t) * Math.cos(PRESS_FREQUENCY * t)
   );
+}
+
+// press-and-hold "pressure boiler" animation, independent of pressScale's own
+// one-shot per-purchase bounce above — while the button is held down (see
+// gameCanvas.ts's onPointerDown/onPointerUp calling startButtonHoldAnim/
+// stopButtonHoldAnim), it swells and shakes harder over HOLD_ANIM_GROW_MS,
+// then "pops" (a brief overshoot past its already-swollen size, reading as a
+// distinct snap rather than just smoothly topping out), releases an
+// extra-large coin burst right as the pop starts, and springily deflates back
+// down, immediately looping into a fresh grow phase for as long as the hold
+// keeps going. Letting go at ANY point (mid-grow, mid-pop, or mid-deflate)
+// interrupts that cycle and deflates back to normal from whatever size it
+// currently was, instead of snapping back instantly
+const HOLD_ANIM_GROW_MS = 2000;
+const HOLD_ANIM_POP_MS = 120;
+const HOLD_ANIM_DEFLATE_MS = 350;
+const HOLD_ANIM_RELEASE_DEFLATE_MS = 250;
+const HOLD_ANIM_MAX_SCALE = 1.35; // biggest size reached by the end of a normal grow
+const HOLD_ANIM_POP_SCALE = 1.55; // the brief overshoot past HOLD_ANIM_MAX_SCALE at burst time
+const HOLD_ANIM_MAX_SHAKE_PX = 9;
+// "extra large" burst = this many normal-sized bursts fired together,
+// staggered slightly so they read as one bigger eruption, not a single frame
+// spike — same spawnCoinBurst every purchase already uses, just piled up
+const HOLD_ANIM_BURST_WAVES = 3;
+const HOLD_ANIM_BURST_STAGGER_MS = 50;
+const HOLD_ANIM_BURST_SCALE = 1.25; // each wave's own particles are also 25% bigger/faster
+
+type HoldAnimPhase = "grow" | "pop" | "deflate" | "releasing";
+interface HoldAnimState {
+  phase: HoldAnimPhase;
+  phaseStartedAt: number;
+  // the scale "releasing" started deflating FROM — a release can happen at
+  // any point mid-grow/mid-pop/mid-deflate, so this can't just always be
+  // HOLD_ANIM_POP_SCALE the way the normal burst-triggered deflate can
+  releaseFromScale: number;
+}
+const holdAnimState = new WeakMap<Floor, HoldAnimState>();
+
+// call once right when the button's press-and-hold begins (gameCanvas.ts's
+// onPointerDown) — starts a fresh grow phase
+export function startButtonHoldAnim(floor: Floor): void {
+  holdAnimState.set(floor, {
+    phase: "grow",
+    phaseStartedAt: Date.now(),
+    releaseFromScale: 1,
+  });
+}
+
+// pure (no mutation, no side effects) — just "how big is the button drawing
+// right now", reused by both stepHoldAnim below and stopButtonHoldAnim (which
+// needs to know where to start deflating FROM the instant a hold ends)
+function computeHoldScale(state: HoldAnimState, now: number): number {
+  const elapsed = now - state.phaseStartedAt;
+  if (state.phase === "grow") {
+    const t = smoothstep(Math.min(1, elapsed / HOLD_ANIM_GROW_MS));
+    return 1 + (HOLD_ANIM_MAX_SCALE - 1) * t;
+  }
+  if (state.phase === "pop") {
+    const t = Math.min(1, elapsed / HOLD_ANIM_POP_MS);
+    return HOLD_ANIM_MAX_SCALE + (HOLD_ANIM_POP_SCALE - HOLD_ANIM_MAX_SCALE) * t;
+  }
+  if (state.phase === "deflate") {
+    const t = elapsed / 1000;
+    const settle = 1 - Math.exp(-14 * t) * Math.cos(24 * t);
+    return HOLD_ANIM_POP_SCALE - (HOLD_ANIM_POP_SCALE - 1) * settle;
+  }
+  // releasing
+  const t = Math.min(1, elapsed / HOLD_ANIM_RELEASE_DEFLATE_MS);
+  return state.releaseFromScale - (state.releaseFromScale - 1) * smoothstep(t);
+}
+
+// call once right when the hold ends (release/cancel/drag-away — see
+// gameCanvas.ts's onPointerUp) — instead of snapping back instantly, starts a
+// deflate from whatever size the button currently was
+export function stopButtonHoldAnim(floor: Floor): void {
+  const state = holdAnimState.get(floor);
+  if (!state || state.phase === "releasing") return;
+  const now = Date.now();
+  holdAnimState.set(floor, {
+    phase: "releasing",
+    phaseStartedAt: now,
+    releaseFromScale: computeHoldScale(state, now),
+  });
+}
+
+// advances the grow/pop/deflate(/releasing) state machine and returns the
+// button's current extra scale + a small random shake offset — {scale:1,
+// shakeX:0,shakeY:0} once there's no animation left to show at all. Reads AND
+// mutates holdAnimState (same "a draw call also owns firing its own one-shot
+// side effects" pattern this game's other timed animations already use, e.g.
+// the old purchaseMeter's spree trigger) — cx/cy are where a burst should
+// spawn from (the button's own center)
+function stepHoldAnim(
+  floor: Floor,
+  now: number,
+  cx: number,
+  cy: number,
+): { scale: number; shakeX: number; shakeY: number } {
+  const state = holdAnimState.get(floor);
+  if (!state) return { scale: 1, shakeX: 0, shakeY: 0 };
+
+  const elapsed = now - state.phaseStartedAt;
+
+  if (state.phase === "grow" && elapsed >= HOLD_ANIM_GROW_MS) {
+    // the boiler bursts — an extra-large coin burst (both more waves AND each
+    // wave itself scaled up HOLD_ANIM_BURST_SCALE, not just normal-sized
+    // bursts piled up), then a brief overshoot pop before deflating
+    for (let i = 0; i < HOLD_ANIM_BURST_WAVES; i++) {
+      const delayMs = i * HOLD_ANIM_BURST_STAGGER_MS;
+      if (delayMs === 0) {
+        spawnCoinBurst(floor, cx, cy, () => {}, HOLD_ANIM_BURST_SCALE);
+      } else {
+        setTimeout(
+          () => spawnCoinBurst(floor, cx, cy, () => {}, HOLD_ANIM_BURST_SCALE),
+          delayMs,
+        );
+      }
+    }
+    state.phase = "pop";
+    state.phaseStartedAt = now;
+  } else if (state.phase === "pop" && elapsed >= HOLD_ANIM_POP_MS) {
+    state.phase = "deflate";
+    state.phaseStartedAt = now;
+  } else if (state.phase === "deflate" && elapsed >= HOLD_ANIM_DEFLATE_MS) {
+    // still held (state wasn't deleted/reassigned) — loop right back into a
+    // fresh grow
+    state.phase = "grow";
+    state.phaseStartedAt = now;
+  } else if (state.phase === "releasing" && elapsed >= HOLD_ANIM_RELEASE_DEFLATE_MS) {
+    holdAnimState.delete(floor);
+    return { scale: 1, shakeX: 0, shakeY: 0 };
+  }
+
+  const scale = computeHoldScale(state, now);
+  // only shakes while actively building pressure (grow phase) — a release or
+  // a post-burst deflate is winding down, not building tension
+  if (state.phase !== "grow") return { scale, shakeX: 0, shakeY: 0 };
+  const growT = Math.min(1, (now - state.phaseStartedAt) / HOLD_ANIM_GROW_MS);
+  const shakeMagnitude = HOLD_ANIM_MAX_SHAKE_PX * growT * growT;
+  return {
+    scale,
+    shakeX: (Math.random() - 0.5) * 2 * shakeMagnitude,
+    shakeY: (Math.random() - 0.5) * 2 * shakeMagnitude,
+  };
 }
 
 // "crit" upgrade: a rare, free, oversized upgrade — the slot-machine jackpot moment.
@@ -256,16 +402,17 @@ export function drawUpgradeButton(
   const cy = y + BTN_H / 2;
   const now = Date.now();
   const scale = pressScale(floor, now);
+  const holdAnim = stepHoldAnim(floor, now, cx, cy);
   const critTier = getCritTier(floor);
   const crit = critTier !== null;
   const sale = isSaleActive(floor, now);
 
   ctx.save();
-  ctx.translate(cx, cy);
+  ctx.translate(cx + holdAnim.shakeX, cy + holdAnim.shakeY);
   if (crit || sale) {
     ctx.rotate(getWiggleRotation(now));
   }
-  ctx.scale(scale, scale);
+  ctx.scale(scale * holdAnim.scale, scale * holdAnim.scale);
   ctx.translate(-cx, -cy);
   if (!crit && !sale) {
     if (!affordable) ctx.globalAlpha = 0.5;
