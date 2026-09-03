@@ -5,6 +5,7 @@
 // just owns the single pointer to which one is currently loaded/on-screen,
 // persisted so a reload resumes the same company.
 import { type BigNumber, toBigNumber } from "../shared/bigNumber";
+import { getCorporationCount } from "../corporationName";
 
 const ACTIVE_COMPANY_KEY = "cash-clicker:active-company-index";
 
@@ -127,4 +128,55 @@ export function clearCompanyRecord(companyIndex: number): void {
     all[companyIndex] = null;
     saveAllCompanyRecords(all);
   }
+}
+
+// a company absorbed into another via corporationUpgradeMenu's "Merge" action
+// (see hud/corporationBoostMenu/economy.ts's mergeCompanies) — its index/name/
+// records still technically exist (indices are never renumbered), it's just
+// permanently hidden from every company list from then on
+const MERGED_COMPANIES_KEY = "cash-clicker:merged-companies";
+
+function loadMergedCompanies(): number[] {
+  try {
+    const raw = localStorage.getItem(MERGED_COMPANIES_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((n): n is number => typeof n === "number")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMergedCompanies(indices: number[]): void {
+  try {
+    localStorage.setItem(MERGED_COMPANIES_KEY, JSON.stringify(indices));
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
+export function isCompanyMerged(companyIndex: number): boolean {
+  return loadMergedCompanies().includes(companyIndex);
+}
+
+export function markCompaniesMerged(companyIndices: number[]): void {
+  const merged = new Set(loadMergedCompanies());
+  for (const index of companyIndices) merged.add(index);
+  saveMergedCompanies(Array.from(merged));
+}
+
+// THE single source of truth for "which company indices still represent a
+// real, selectable corporation" (0..getCorporationCount()-1, minus anything
+// isCompanyMerged) — every list of companies shown anywhere (cityMap's
+// corp-name barrel, corporationBoostMenu's stock-raise items,
+// corporationUpgradeMenu's Merge checklist) must derive from this instead of
+// each independently re-deriving its own `Array.from({length:count})...filter`,
+// which is exactly what let a merged-away company keep showing up in the map's
+// barrel after a merge cleaned up everywhere else
+export function getActiveCorporationIndices(): number[] {
+  const count = getCorporationCount();
+  return Array.from({ length: count }, (_, i) => i).filter(
+    (i) => !isCompanyMerged(i),
+  );
 }

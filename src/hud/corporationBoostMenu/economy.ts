@@ -1,15 +1,21 @@
-import { loadBuildings, type Floor } from "../../gameState";
+import { loadBuildings, clearBuildings, type Floor } from "../../gameState";
 import {
   spendFromAllCompanies,
   getStoredTotalIncome,
   getAllCompaniesTotalIncome,
+  addCompanyTotalIncome,
 } from "../../totalIncome";
-import { getCorporationCount } from "../../corporationName";
+import {
+  getCorporationCount,
+  regenerateCorporationName,
+} from "../../corporationName";
 import { getBuildingPrice } from "../../buildings";
 import {
   companyStorageKey,
   getActiveCompanyIndex,
   loadCompanyRecord,
+  clearCompanyRecord,
+  markCompaniesMerged,
 } from "../../company";
 import {
   type BigNumber,
@@ -267,6 +273,83 @@ export function getCompanyUpgradesValue(buildings: Floor[][]): BigNumber {
 // dormant, without duplicating this pricing logic there
 export function getCompanyAssetValue(buildings: Floor[][]): BigNumber {
   return add(getBuildingsValue(buildings.length), getUpgradesValue(buildings));
+}
+
+// hud/corporationUpgradeMenu's "Merge" action: picks whichever selected company
+// has the most overall progress (total floor count across every one of its
+// buildings — the simplest holistic "how far into the game is this company"
+// signal) to survive, folds every other selected company's own total income +
+// upgrades value into the survivor's total, and adds their stock shares to the
+// survivor's own share count (see getStockContributionPercent). The merged-away
+// companies are left permanently empty (0 floors, $0, 0 shares) and hidden from
+// every company list from then on (see company.ts's isCompanyMerged). Any
+// company, including the currently ACTIVE one, can be selected — the caller
+// (main.ts) is responsible for switching to the survivor afterward, and if the
+// previously-active company was itself merged away, for not letting its own
+// stale live in-memory buildings/total get re-snapshotted over the clear this
+// function just did (see main.ts's own mergeCompanies wiring / switchToCompany's
+// skipOutgoingSnapshot option). Returns the survivor's index + freshly
+// generated name, or null if fewer than 2 companies were given
+export interface MergeCompaniesResult {
+  survivorIndex: number;
+  name: string;
+}
+
+export function mergeCompanies(
+  companyIndices: number[],
+): MergeCompaniesResult | null {
+  if (companyIndices.length < 2) return null;
+
+  const buildingsByIndex = new Map<number, Floor[][]>();
+  for (const index of companyIndices) {
+    buildingsByIndex.set(index, loadBuildings(index));
+  }
+  const progression = (index: number): number =>
+    (buildingsByIndex.get(index) ?? []).reduce(
+      (sum, floors) => sum + floors.length,
+      0,
+    );
+  const survivorIndex = companyIndices.reduce((best, index) =>
+    progression(index) > progression(best) ? index : best,
+  );
+
+  let addedTotal = ZERO;
+  let addedShares = 0;
+  for (const index of companyIndices) {
+    if (index === survivorIndex) continue;
+    addedTotal = add(
+      addedTotal,
+      add(
+        getStoredTotalIncome(index),
+        getUpgradesValue(buildingsByIndex.get(index) ?? []),
+      ),
+    );
+    addedShares += getStockTimesBought(index);
+    clearBuildings(index);
+    clearCompanyRecord(index);
+    saveStockShares(index, STOCK_PRICE_BASE);
+  }
+  // stock shares saved BEFORE folding in the merged-away companies' total
+  // income: getCompanyBaseModifierPercent/getCompanyValue read a company's
+  // CURRENT totalIncome live, so writing the new (bigger) total first and the
+  // share count second briefly left the survivor's modifier computed off a
+  // pre-merge share count against an already-inflated total — reported as
+  // "loss of stock modifiers" right after merging
+  if (addedShares > 0) {
+    saveStockShares(
+      survivorIndex,
+      loadStockShares(survivorIndex) + addedShares,
+    );
+  }
+  addCompanyTotalIncome(survivorIndex, addedTotal);
+  // same "merging/creating a corporation banks a free conference" reward
+  // main.ts's "Create new Corporation" already grants
+  grantFreePressConference();
+
+  markCompaniesMerged(
+    companyIndices.filter((index) => index !== survivorIndex),
+  );
+  return { survivorIndex, name: regenerateCorporationName(survivorIndex) };
 }
 
 // a company's overall value — its own current total income (bank money) plus

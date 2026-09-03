@@ -5,7 +5,8 @@ import {
   triggerButtonPress,
 } from "../../utils";
 import { getAllCompaniesTotalIncome } from "../../totalIncome";
-import { getCorporationCount, getCorporationName } from "../../corporationName";
+import { getCorporationName } from "../../corporationName";
+import { getActiveCorporationIndices } from "../../company";
 import {
   startPressAndHold,
   type PressAndHoldController,
@@ -45,7 +46,9 @@ export {
   getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,
   getGlobalIncomeBoostMultiplier,
+  mergeCompanies,
 } from "./economy";
+export type { MergeCompaniesResult } from "./economy";
 
 // reuses .worker-menu's styling — a dialog listing every corporation's own
 // "raise stock price" purchase, one item per company (see render() below)
@@ -93,11 +96,15 @@ export function wireCorporationBoostMenu(
     // actually changed
     const scrollTop = list.scrollTop;
     const managerIconUrl = getManagerIconUrl();
-    const count = getCorporationCount();
-    const modifierRows = Array.from({ length: count }, (_, i) => ({
-      name: getCorporationName(i),
-      pct: getStockContributionPercent(i) + getCompanyBaseModifierPercent(i),
-    }))
+    // company.ts's getActiveCorporationIndices is the single source of truth
+    // for "which companies still exist" — excludes anything merged away (see
+    // corporationUpgradeMenu's "Merge" action)
+    const activeIndices = getActiveCorporationIndices();
+    const modifierRows = activeIndices
+      .map((i) => ({
+        name: getCorporationName(i),
+        pct: getStockContributionPercent(i) + getCompanyBaseModifierPercent(i),
+      }))
       .sort((a, b) => a.name.localeCompare(b.name))
       .map(
         ({ name, pct }) => `
@@ -130,10 +137,11 @@ export function wireCorporationBoostMenu(
       freePressConferenceCount > 0
         ? `FREE (x${freePressConferenceCount})`
         : formatPrice(pressConferenceCost);
-    const items = Array.from({ length: count }, (_, i) => {
-      const cost = getStockRaiseCost(i);
-      const affordable = gte(allCompaniesTotalIncome, cost);
-      return `
+    const items = activeIndices
+      .map((i) => {
+        const cost = getStockRaiseCost(i);
+        const affordable = gte(allCompaniesTotalIncome, cost);
+        return `
         <button
           class="worker-menu__item"
           data-company-index="${i}"
@@ -147,7 +155,8 @@ export function wireCorporationBoostMenu(
           <span class="worker-menu__price">${formatPrice(cost)}</span>
         </button>
       `;
-    }).join("");
+      })
+      .join("");
     list.innerHTML = `
       <h3 class="worker-menu__subheader">Corporation assets</h3>
       <span class="worker-menu__total-income">${formatTotalIncomeFull(allCompaniesTotalIncome)}</span>

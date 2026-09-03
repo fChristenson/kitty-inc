@@ -65,6 +65,7 @@ import {
   getCompanyAssetValue,
   getCompanyUpgradesValue,
   grantFreePressConference,
+  mergeCompanies,
   createPressConferenceGameMarkup,
   wirePressConferenceGame,
   createMapMenuMarkup,
@@ -148,6 +149,12 @@ async function main() {
   const buildings: Floor[][] = [];
   let activeBuildingIndex = 0;
   let activeCompanyIndex = getActiveCompanyIndex();
+  // consumed once by the very next onSwitchCompany call (see cityMapView's own
+  // deps below) — set right before triggering a post-merge switch animation
+  // when the OUTGOING company was itself just merged away, so that switch
+  // skips re-snapshotting main.ts's own stale live buildings/total over the
+  // clear mergeCompanies already did for it
+  let skipNextOutgoingSnapshot = false;
 
   // so a reload lands back on whichever building the player last selected on the
   // map, namespaced per company (see company.ts's companyStorageKey) since each
@@ -261,24 +268,34 @@ async function main() {
   // company's own separate buildings, its own last-active building, and hands
   // totalIncome.ts its own separate running total — nothing here is shared
   // between companies
-  async function switchToCompany(companyIndex: number): Promise<void> {
-    // snapshot the OUTGOING company's ENTIRE CompanyRecord (see company.ts) in
-    // one atomic write, while `buildings`/`activeCompanyIndex`/`totalIncome`
-    // still hold its data — bankedTotal, its rate, and the timestamp all land
-    // together, so a dormant company's derived total can never desync from a
-    // separately-written "just the total" value (there isn't one anymore)
-    saveCompanyRecord(activeCompanyIndex, {
-      bankedTotal: getTotalIncome(),
-      incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
-        buildings,
-        Date.now(),
-      ),
-      assetValue: getCompanyAssetValue(buildings),
-      upgradesValue: getCompanyUpgradesValue(buildings),
-      updatedAt: Date.now(),
-    });
-    saveBuildings(buildings, activeCompanyIndex);
-    saveActiveBuildingIndex(activeCompanyIndex, activeBuildingIndex);
+  async function switchToCompany(
+    companyIndex: number,
+    // set by the corporation-merge flow below when the OUTGOING company was
+    // itself just merged away (see mergeCompanies) — its storage was already
+    // cleared there, so snapshotting main.ts's own now-stale live buildings/
+    // total over that clear would silently resurrect it. Every other caller
+    // (a normal barrel-roll switch, "Create new Corporation") leaves this off
+    skipOutgoingSnapshot = false,
+  ): Promise<void> {
+    if (!skipOutgoingSnapshot) {
+      // snapshot the OUTGOING company's ENTIRE CompanyRecord (see company.ts) in
+      // one atomic write, while `buildings`/`activeCompanyIndex`/`totalIncome`
+      // still hold its data — bankedTotal, its rate, and the timestamp all land
+      // together, so a dormant company's derived total can never desync from a
+      // separately-written "just the total" value (there isn't one anymore)
+      saveCompanyRecord(activeCompanyIndex, {
+        bankedTotal: getTotalIncome(),
+        incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
+          buildings,
+          Date.now(),
+        ),
+        assetValue: getCompanyAssetValue(buildings),
+        upgradesValue: getCompanyUpgradesValue(buildings),
+        updatedAt: Date.now(),
+      });
+      saveBuildings(buildings, activeCompanyIndex);
+      saveActiveBuildingIndex(activeCompanyIndex, activeBuildingIndex);
+    }
 
     activeCompanyIndex = companyIndex;
     setActiveCompanyIndex(companyIndex);
@@ -356,6 +373,26 @@ async function main() {
         cityMapView.animateSwitchToCompany(newIndex);
       }, DIALOG_CLOSE_MS - SWITCH_LEAD_MS);
     },
+    // "Merge" (see hud/corporationUpgradeMenu's own Merge section): folds every
+    // selected company's income/upgrades/stock into whichever one has the most
+    // map progression, then closes the dialog and barrel-rolls to it, same
+    // close+animate choreography as "Create new Corporation" above. If the
+    // company we're switching AWAY from was itself one of the merged-away
+    // ones, flag the next switch to skip re-snapshotting its now-stale live
+    // state over the clear mergeCompanies already wrote to storage for it
+    (companyIndices) => {
+      const result = mergeCompanies(companyIndices);
+      if (!result) return;
+      const mergedAway = new Set(
+        companyIndices.filter((index) => index !== result.survivorIndex),
+      );
+      skipNextOutgoingSnapshot = mergedAway.has(activeCompanyIndex);
+      corporationUpgradeMenu.close();
+      setTimeout(() => {
+        playSwoosh();
+        cityMapView.animateSwitchToCompany(result.survivorIndex);
+      }, DIALOG_CLOSE_MS - SWITCH_LEAD_MS);
+    },
   );
   const boostMenu = wireBoostMenu(
     app,
@@ -424,7 +461,11 @@ async function main() {
       goToBuilding(index);
       closeMapView();
     },
-    onSwitchCompany: switchToCompany,
+    onSwitchCompany: (companyIndex) => {
+      const skip = skipNextOutgoingSnapshot;
+      skipNextOutgoingSnapshot = false;
+      switchToCompany(companyIndex, skip);
+    },
   });
   wireActionBar(app, {
     onScrollTop: () => {

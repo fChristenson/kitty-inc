@@ -98,6 +98,7 @@ export {
   getCompanyAssetValue,
   getCompanyUpgradesValue,
   grantFreePressConference,
+  mergeCompanies,
 } from "./corporationBoostMenu";
 export type { CorporationBoostMenu } from "./corporationBoostMenu";
 export {

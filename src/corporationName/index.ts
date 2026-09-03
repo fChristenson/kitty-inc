@@ -179,6 +179,18 @@ export function createNewCorporation(): number {
   return index;
 }
 
+// overwrites companyIndex's name with a freshly generated one — used by
+// corporationUpgradeMenu's "Merge" action so the surviving company comes out
+// of a merge with a new identity instead of just keeping whichever of the
+// merged companies' names it happened to have
+export function regenerateCorporationName(companyIndex: number): string {
+  if (!cachedNames) cachedNames = loadNames();
+  const name = generateCorporationName();
+  cachedNames[companyIndex] = name;
+  saveNames(cachedNames);
+  return name;
+}
+
 // wipes every generated corporation name; call alongside clearCityNames() on a
 // full game reset, so a fresh game generates a fresh corporation name too
 export function clearCorporationNames(): void {

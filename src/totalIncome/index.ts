@@ -107,6 +107,16 @@ export function spendCompanyTotalIncome(
   return true;
 }
 
+// same as addTotalIncome but for any company, not just the active one —
+// corporationUpgradeMenu's "Merge" action uses this to fold a merged-away
+// company's own total straight into the surviving company's wallet
+export function addCompanyTotalIncome(
+  companyIndex: number,
+  amount: BigNumber,
+): void {
+  adjustStoredTotalIncome(companyIndex, amount, 1);
+}
+
 // $/sec every unlocked floor across every one of buildings is currently earning,
 // worker-boost/office-upgrades AND the global stock-boost multiplier (see
 // getGlobalIncomeBoostMultiplier) all included — same cycle math peekDueIncome

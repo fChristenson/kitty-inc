@@ -1,5 +1,8 @@
-import { getCorporationName, getCorporationCount } from "../../corporationName";
-import { getActiveCompanyIndex } from "../../company";
+import { getCorporationName } from "../../corporationName";
+import {
+  getActiveCompanyIndex,
+  getActiveCorporationIndices,
+} from "../../company";
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
 import { smoothstep } from "../../shared/easing";
@@ -22,12 +25,14 @@ const CORP_ROLL_MS = 260;
 // lists companies alphabetically, Z-to-A, by name rather than by creation
 // order — this maps a barrel POSITION (0..count-1) to the actual company
 // index everything else (setActiveCompanyIndex, onSwitchCompany, city map
-// state) is keyed by. Recomputed on demand rather than cached: cheap (a
-// handful of companies at most) and always correct even right after a new
-// one is created
+// state) is keyed by. Sourced from company.ts's getActiveCorporationIndices
+// (the single source of truth for which companies still exist — excludes any
+// merged away via corporationUpgradeMenu's "Merge" action), not a raw
+// 0..getCorporationCount()-1 range. Recomputed on demand rather than cached:
+// cheap (a handful of companies at most) and always correct even right after
+// a new one is created or a merge just happened
 function getSortedCorporationIndices(): number[] {
-  const count = getCorporationCount();
-  return Array.from({ length: count }, (_, i) => i).sort((a, b) =>
+  return getActiveCorporationIndices().sort((a, b) =>
     getCorporationName(b).localeCompare(getCorporationName(a)),
   );
 }
@@ -77,13 +82,13 @@ export function createCorpBarrel(deps: CorpBarrelDeps): CorpBarrel {
   // rendered as a little barrel/reel: the selected corporation full-size and
   // opaque, its neighbors (newer above, older below) smaller and faded
   function draw(ctx: CanvasRenderingContext2D, cssH: number): void {
-    const count = getCorporationCount();
+    const sortedIndices = getSortedCorporationIndices();
+    const count = sortedIndices.length;
     if (selectedPosition > count - 1) {
       selectedPosition = count - 1;
       corpRollFocus = selectedPosition;
       deps.onCompanySelected(companyIndexAtPosition(selectedPosition));
     }
-    const sortedIndices = getSortedCorporationIndices();
     const bottom = cssH - CORPORATION_NAME_MARGIN_PX;
     ctx.textAlign = "left";
     ctx.textBaseline = "bottom";
@@ -121,7 +126,7 @@ export function createCorpBarrel(deps: CorpBarrelDeps): CorpBarrel {
   }
 
   function rollToPosition(targetPosition: number): void {
-    const count = getCorporationCount();
+    const count = getSortedCorporationIndices().length;
     if (targetPosition < 0 || targetPosition > count - 1) return;
     if (corpRollAnimId !== null) cancelAnimationFrame(corpRollAnimId);
     const fromFocus = corpRollFocus;
