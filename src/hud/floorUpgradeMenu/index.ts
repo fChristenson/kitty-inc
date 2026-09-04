@@ -256,12 +256,21 @@ export function wireFloorUpgradeMenu(
   }
 
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
+  // this dialog (unlike the others) is opened by a tap directly on the canvas,
+  // right where the backdrop then appears — mobile browsers can synthesize a
+  // trailing compatibility "click" for that same touch shortly after, landing
+  // on the now-visible backdrop and instantly closing what was just opened.
+  // Ignoring a backdrop click this soon after open() filters that ghost click
+  // out without needing any change to gameCanvas.ts's own tap handling
+  const IGNORE_BACKDROP_CLICK_MS = 300;
+  let openedAt = 0;
 
   function open(floor: Floor, floorNumber: number): void {
     currentFloor = floor;
     title.textContent = `Floor ${floorNumber} upgrades`;
     render();
     menu.hidden = false;
+    openedAt = Date.now();
     playSwoosh();
     refreshInterval = setInterval(updateAffordability, 250);
   }
@@ -277,7 +286,10 @@ export function wireFloorUpgradeMenu(
     }
   }
 
-  backdrop.addEventListener("click", close);
+  backdrop.addEventListener("click", () => {
+    if (Date.now() - openedAt < IGNORE_BACKDROP_CLICK_MS) return;
+    close();
+  });
 
   return { open, close };
 }

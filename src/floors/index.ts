@@ -1,5 +1,6 @@
 import { randomInt } from "../utils";
 import type { Floor } from "../gameState";
+import type { CritTier } from "./upgradeButton";
 import {
   loadBackgrounds,
   loadGroundImage as loadAssetGroundImage,
@@ -109,6 +110,10 @@ export interface BuildFloorOptions {
   existingBgIndexes?: number[];
   multiplier?: number;
   groundFloorLocked?: boolean;
+  // a building-wide crit (see cityMap/index.ts) sets every floor to the same
+  // tier — a freshly created floor starts as this tier too instead of null
+  // (see floorLock.ts's ensureLockedFloorAbove, the only real caller of this)
+  defaultCritTier?: CritTier | null;
 }
 
 export function buildFloor(
@@ -120,6 +125,7 @@ export function buildFloor(
     existingBgIndexes = [],
     multiplier = 1,
     groundFloorLocked = false,
+    defaultCritTier = null,
   } = options;
   const isGroundFloor = floorLevel === 1;
   // BigNumber pow/multiply never overflow to Infinity no matter how high
@@ -163,7 +169,7 @@ export function buildFloor(
     hasOfficeChairs: false,
     hasOfficeSupplies: false,
     hasManager: false,
-    critMultiplierTier: null,
+    critMultiplierTier: defaultCritTier,
     aboveCapTier,
   };
 }
@@ -305,12 +311,15 @@ export {
   forceUltraCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,
+  pickHigherCritTier,
+  getUniformCritTier,
   triggerSaleBoost,
   isSaleActive,
   floorIncomePerSecond,
   SALE_ASSUMED_CLICKS,
   CRIT_TIER_CONFIG,
 } from "./upgradeButton";
+export type { CritTier } from "./upgradeButton";
 export {
   spawnFloatingCoins,
   drawFloatingCoins,

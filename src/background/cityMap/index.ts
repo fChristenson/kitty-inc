@@ -1,6 +1,12 @@
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
-import { playSold } from "../../sound";
+import {
+  playSold,
+  playCoinDrop,
+  playExplosion,
+  playJackpot,
+  playPayout,
+} from "../../sound";
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
 import { setActiveCompanyIndex } from "../../company";
@@ -25,14 +31,24 @@ import {
   MARKER_COIN_BURST_SCALE,
   drawBuyAllFloorsIndicator,
 } from "./markers";
-import { MAX_FLOORS_PER_BUILDING } from "../../floors";
+import {
+  MAX_FLOORS_PER_BUILDING,
+  rollFloorBuyCrit,
+  CRIT_TIER_CONFIG,
+  type CritTier,
+} from "../../floors";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
 import { createCityTransitions } from "./transitions";
 import { loadSprite, loadImageByName } from "../../loadAssets";
 import { type BigNumber, gte, isZero } from "../../shared/bigNumber";
-import { triggerScreenShake, getScreenShakeOffset } from "../../screenShake";
+import {
+  triggerScreenShake,
+  getScreenShakeOffset,
+  drawCritFlash,
+  isCritFlashActive,
+} from "../../screenShake";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -66,6 +82,10 @@ export interface CityMapDeps {
   getBuildingCount: () => number; // buildings unlocked so far; building 1 exists once this is >= 2
   getActiveBuildingIndex: () => number; // whichever building's floors are on screen right now
   getBuildingFloorCount: (buildingIndex: number) => number; // for the "X/20" marker readout
+  // the crit tier EVERY floor of this building currently shares (see
+  // setBuildingCritTier below), or null if they don't all match — colors the
+  // "X/20" marker readout so a crit-maxed building stands out on the map
+  getBuildingCritTier: (buildingIndex: number) => CritTier | null;
   // $ to unlock EVERY remaining locked floor in a building at once — ZERO once
   // there's nothing left to buy (already maxed). Drives the green buy-all-floors
   // dot (see markers.ts's drawBuyAllFloorsIndicator) and its long-press gesture
@@ -74,6 +94,13 @@ export interface CityMapDeps {
   // long-press-on-the-green-dot gesture below: unlocks every remaining floor of
   // an already-bought building in one shot. Returns whether it succeeded
   buyAllFloors: (buildingIndex: number) => boolean;
+  // sets EVERY floor this building currently has (locked or not) to the given
+  // crit tier (purple/gold/red), permanently \u2014 the reward for a crit landing
+  // on that building's own purchase (see rollFloorBuyCrit below). Does NOT
+  // unlock anything itself; a locked floor still has to be bought normally,
+  // it'll just already be that tier once it is (any brand new floor added
+  // after this also inherits it, see floorLock.ts's ensureLockedFloorAbove)
+  setBuildingCritTier: (buildingIndex: number, tier: CritTier) => void;
   onSelectBuilding: (index: number) => void; // switch to that building and leave the map view
   // fires once the corporation barrel roll settles on a different company (see
   // rollCorporationSelection) so main.ts can swap in that company's own separate
@@ -328,12 +355,14 @@ export function createCityMapView(
               : CAT_STAND_FRAME;
         drawCatMarker(ctx, cssW, cssH, catSprite, i, frame, false, jumpOffsetY);
         const { cx, feetY } = markerCenter(cssW, cssH, i);
+        const critTier = deps.getBuildingCritTier(globalIndex);
         drawMarkerFloorCount(
           ctx,
           cx,
           feetY,
           deps.getBuildingFloorCount(globalIndex),
           MAX_FLOORS_PER_BUILDING,
+          critTier ? CRIT_TIER_CONFIG[critTier].color : undefined,
         );
         const unlockAllCost = deps.getBuildingUnlockAllCost(globalIndex);
         if (
@@ -362,6 +391,12 @@ export function createCityMapView(
     drawCityPageIndicator(buildingCount);
 
     updateArrows(buildingCount);
+    // same crit flash triggerMapCatCritCelebration fires — gameCanvas.ts draws its
+    // own copy on the building canvas, but this map canvas is a totally separate
+    // <canvas> that never drew it at all, so the "x5"/"x25"/"x125" text (and
+    // "MAXED!") never appeared here. Still inside the shake's own translate above,
+    // same as gameCanvas.ts, so it rattles along with everything else
+    drawCritFlash(ctx, cssW / 2, cssH / 2, cssW, Date.now());
     ctx.restore();
   }
 
@@ -383,23 +418,64 @@ export function createCityMapView(
     canvas.style.cursor = hit !== null ? "pointer" : "default";
   }
 
+  // same tiered shake/sfx language as floors/floorInteractions/critCelebration.ts's
+  // triggerCritCelebration, adapted for this flat map canvas — no Floor to anchor a
+  // floors/coins burst on, so this reuses coinBurst's own flat-canvas
+  // spawnCoinBurstAt instead (same as pressConferenceGame does)
+  function triggerMapCatCritCelebration(
+    tier: CritTier,
+    cx: number,
+    feetY: number,
+  ): void {
+    const burstY = feetY - MARKER_H / 2;
+    const burstCount = tier === "ultra" ? 5 : tier === "mega" ? 3 : 2;
+    for (let i = 0; i < burstCount; i++) {
+      setTimeout(() => {
+        spawnCoinBurstAt(cx, burstY, MARKER_COIN_BURST_SCALE * 1.5);
+      }, i * 90);
+    }
+    if (tier === "ultra") {
+      triggerScreenShake({
+        intensity: 2.6,
+        label: CRIT_TIER_CONFIG.ultra.label,
+        color: COLOR.red,
+        strokeWidth: 16,
+        blinkHz: 6,
+        holdMs: 1250,
+        priority: 2,
+      });
+      playPayout();
+    } else if (tier === "mega") {
+      triggerScreenShake({
+        intensity: 1.8,
+        label: CRIT_TIER_CONFIG.mega.label,
+        color: COLOR.amber,
+        priority: 1,
+      });
+      playJackpot();
+    } else {
+      triggerScreenShake({ label: CRIT_TIER_CONFIG.crit.label });
+      playCoinDrop();
+      playExplosion();
+    }
+  }
+
   // clicking the next locked building (buildings unlock strictly in order) buys it
   // (staying on the map so its color/price change is visible); clicking a further,
   // not-yet-reachable locked marker does nothing; an unlocked one switches to it
   // and leaves the map entirely
   function onClick(event: MouseEvent): void {
-    // a long-press just fired below (buyAllFloorsFiredAt): suppress only a
-    // click landing within CLICK_SUPPRESS_WINDOW_MS of it, rather than
-    // permanently arming a "suppress the very next click" flag — the browser
-    // doesn't reliably send a click right after a long, held-down press
-    // (occasionally it never fires one at all), and a flag left armed forever
-    // instead ate the player's own NEXT deliberate click, forcing them to
-    // click twice to actually reach the building screen
-    if (
-      buyAllFloorsFiredAt !== null &&
-      Date.now() - buyAllFloorsFiredAt < CLICK_SUPPRESS_WINDOW_MS
-    ) {
-      buyAllFloorsFiredAt = null;
+    // a long-press just fired below (suppressNextClick): eat only the very
+    // next click, regardless of how long it takes to arrive — the browser
+    // doesn't reliably send a click right after a long, held-down press (it
+    // can land well after the timer fired, or occasionally never at all), so
+    // a fixed time window after the timer risked expiring before the real
+    // click showed up. Tying this to the gesture instead (reset on every
+    // fresh pointerdown, see below) can't leak into the player's own NEXT
+    // deliberate click either, since that click's own pointerdown already
+    // clears the flag before it fires
+    if (suppressNextClick) {
+      suppressNextClick = false;
       return;
     }
     const p = canvasPoint(event);
@@ -413,6 +489,15 @@ export function createCityMapView(
         triggerMarkerJump(globalIndex);
         const { cx, feetY } = markerCenter(cssW, cssH, hit);
         spawnCoinBurstAt(cx, feetY - MARKER_H / 2, MARKER_COIN_BURST_SCALE);
+        // rare bonus, same one-shot roll a floor-unlock purchase uses — a hit
+        // sets every floor this brand new building already has to that tier
+        // (still just the one free ground floor + the one locked floor
+        // already queued above it — nothing gets unlocked for free)
+        const buyTier = rollFloorBuyCrit();
+        if (buyTier) {
+          deps.setBuildingCritTier(globalIndex, buyTier);
+          triggerMapCatCritCelebration(buyTier, cx, feetY);
+        }
       }
       redraw();
       return;
@@ -433,9 +518,8 @@ export function createCityMapView(
   // its own small radius made the gesture nearly impossible to land in
   // practice). Suppresses a click landing shortly after (see onClick above)
   const BUY_ALL_HOLD_MS = 1000;
-  const CLICK_SUPPRESS_WINDOW_MS = 400;
   let buyAllHoldTimeout: ReturnType<typeof setTimeout> | null = null;
-  let buyAllFloorsFiredAt: number | null = null;
+  let suppressNextClick = false;
 
   function clearBuyAllHold(): void {
     if (buyAllHoldTimeout !== null) {
@@ -446,6 +530,7 @@ export function createCityMapView(
 
   function onPointerDown(event: PointerEvent): void {
     clearBuyAllHold(); // safety net against a stale interrupted previous gesture
+    suppressNextClick = false; // this is a brand new gesture, not the one that fired
     const p = canvasPoint(event);
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
     if (hit === null) return;
@@ -455,10 +540,9 @@ export function createCityMapView(
     if (isZero(cost) || !gte(deps.getTotalIncome(), cost)) return;
     buyAllHoldTimeout = setTimeout(() => {
       buyAllHoldTimeout = null;
-      triggerScreenShake({ color: COLOR.moneyGreen, label: "MAXED!" });
       if (deps.buyAllFloors(globalIndex)) {
         playSold();
-        buyAllFloorsFiredAt = Date.now();
+        suppressNextClick = true;
         // same unlock flourish a normal single-floor buy plays — a maxed-out
         // building deserves it even more than any one of them individually
         triggerMarkerJump(globalIndex);
@@ -507,7 +591,10 @@ export function createCityMapView(
   function tick(): void {
     const now = performance.now();
     const interval =
-      hasWigglingMarker || hasActiveMarkerJump || hasActiveCoinBursts()
+      hasWigglingMarker ||
+      hasActiveMarkerJump ||
+      hasActiveCoinBursts() ||
+      isCritFlashActive(Date.now())
         ? 0
         : TICK_REDRAW_INTERVAL_MS;
     if (now - lastTickRedraw >= interval) {

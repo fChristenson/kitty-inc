@@ -9,6 +9,7 @@ import {
   consumeCritUpgrade,
   rollCritUpgrade,
   rollFloorBuyCrit,
+  pickHigherCritTier,
   isSaleActive,
   isUpgradeButtonEnabled,
   CRIT_TIER_CONFIG,
@@ -130,9 +131,17 @@ export function handleFloorClick(
       // one-shot roll on the floor actually being bought (never re-rolled) — a hit
       // permanently multiplies every future upgrade's rate gain on THIS floor (see
       // incomePanel.ts's increaseIncomeRate) and recolors its bar/button to match.
-      // Rolled before persist() so a hit is captured in the same save
+      // Only ever upgrades the floor's tier, never downgrades it — a brand new
+      // floor can already start pre-set to its building's own crit tier (see
+      // ensureLockedFloorAbove), and this roll is its own separate chance to land
+      // something rarer still. Rolled before persist() so a hit is captured in
+      // the same save
       const buyTier = rollFloorBuyCrit();
-      if (buyTier) floor.critMultiplierTier = buyTier;
+      if (buyTier)
+        floor.critMultiplierTier = pickHigherCritTier(
+          floor.critMultiplierTier,
+          buyTier,
+        );
       persist();
       const center = getLockCenter();
       spawnCoinBurst(floor, center.x, center.y, () => {});

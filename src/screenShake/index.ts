@@ -121,6 +121,14 @@ const START_ROTATION_DEG = -45; // rotated in from this angle, settling to uprig
 const BACK_C1 = 1.70158;
 const BACK_C3 = BACK_C1 + 1;
 
+// read-only check for a caller whose own redraw loop is normally throttled (see
+// cityMap/index.ts's tick()) and needs to know to run at full frame rate for as
+// long as the flash is still playing, without triggering drawCritFlash's own
+// side effect of clearing the state once expired
+export function isCritFlashActive(now: number): boolean {
+  return flashEndsAt !== null && now < flashEndsAt;
+}
+
 export function drawCritFlash(
   ctx: CanvasRenderingContext2D,
   centerX: number,

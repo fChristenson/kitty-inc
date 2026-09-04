@@ -12,6 +12,9 @@ export function createTestButtonMarkup(): string {
       <button id="floor-buy-crit" class="game__button">Floor Crit</button>
       <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
       <button id="floor-buy-ultra-crit" class="game__button">Floor Ultra Crit</button>
+      <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
+      <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
+      <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
       <button id="test-press-conference" class="game__button">Press Conf Game</button>
       <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
@@ -85,6 +88,39 @@ export function wireFloorBuyUltraCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-ultra-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+// forces the SAME shared roll floors/upgradeButton's forceFloorBuyCrit arms
+// (rollFloorBuyCrit) — the map's next building purchase reads from it too (see
+// cityMap/index.ts's onClick), so these are really just clearer-labeled aliases
+// of the floor-buy-crit buttons above for testing that specific call site
+export function wireMapUnlockCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#map-unlock-crit")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockMegaCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-mega-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockUltraCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-ultra-crit",
   )!;
   button.addEventListener("click", onClick);
 }

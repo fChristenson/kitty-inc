@@ -318,20 +318,26 @@ body {
 .test-actions-bar {
   /* pinned to the screen's own left edge, not the centered .game column — floats
      free of the game layout entirely instead of stealing height from it (see
-     utils.ts's observeActionBarHeight, which no longer needs to account for it) */
+     utils.ts's observeActionBarHeight, which no longer needs to account for it).
+     Wraps into additional columns once it runs out of vertical room (this list
+     keeps growing with every new dev-only crit test button) instead of overflowing
+     the viewport in one tall single column */
   display: flex;
-  flex-direction: column;
+  flex-flow: column wrap;
+  align-content: flex-start;
   gap: 0.5rem;
   position: absolute;
   top: calc(0.75rem + env(safe-area-inset-top));
   left: calc(0.75rem + env(safe-area-inset-left));
-  width: 160px;
+  max-height: calc(
+    100dvh - 1.5rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+  );
   z-index: 100;
 }
 
 .test-actions-bar .game__button {
   flex: none;
-  width: 100%;
+  width: 160px;
 }
 
 .game__button {

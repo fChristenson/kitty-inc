@@ -15,6 +15,7 @@ import {
   forceUltraCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
+  type CritTier,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -51,6 +52,9 @@ import {
   wireFloorBuyCritButton,
   wireFloorBuyMegaCritButton,
   wireFloorBuyUltraCritButton,
+  wireMapUnlockCritButton,
+  wireMapUnlockMegaCritButton,
+  wireMapUnlockUltraCritButton,
   wirePressConferenceTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
@@ -354,6 +358,9 @@ async function main() {
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireFloorBuyUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
+    wireMapUnlockCritButton(app, () => forceFloorBuyCrit("crit"));
+    wireMapUnlockMegaCritButton(app, () => forceFloorBuyCrit("mega"));
+    wireMapUnlockUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     // shows the idle-income "You have earned" overlay (see
     // hud/totalEarnedOverlay) on demand, without needing to actually leave and
@@ -460,6 +467,18 @@ async function main() {
     persist();
     return true;
   }
+  // sets EVERY floor a building currently has (locked or not) to the given crit
+  // tier, permanently — no unlocking, no cost (see cityMap/index.ts's map-buy
+  // crit celebration). A brand new building only has its one free ground floor
+  // + the one locked floor already queued above it at this point; any floor
+  // added later inherits this same tier automatically (see floorLock.ts's
+  // ensureLockedFloorAbove)
+  function setBuildingCritTier(buildingIndex: number, tier: CritTier): void {
+    const floors = buildings[buildingIndex];
+    if (!floors) return;
+    for (const floor of floors) floor.critMultiplierTier = tier;
+    persist();
+  }
   // the old building-picker popup is kept wired (backdrop/list still functional)
   // but nothing opens it anymore — it's replaced by tapping the map's own cat
   // markers (see createCityMapView below)
@@ -499,6 +518,14 @@ async function main() {
       // topmost unlocked one (see ensureLockedFloorAbove) — the marker should
       // only count floors actually unlocked, not that placeholder
       buildings[buildingIndex]?.filter((floor) => floor.unlocked).length ?? 0,
+    getBuildingCritTier: (buildingIndex) => {
+      const floors = buildings[buildingIndex];
+      if (!floors || floors.length === 0) return null;
+      const tier = floors[0].critMultiplierTier;
+      return tier && floors.every((floor) => floor.critMultiplierTier === tier)
+        ? tier
+        : null;
+    },
     getBuildingUnlockAllCost: (buildingIndex) =>
       getBuildingUnlockAllCost(
         buildings[buildingIndex] ?? [],
@@ -506,6 +533,7 @@ async function main() {
       ),
     buyBuilding,
     buyAllFloors: buyAllFloorsForBuilding,
+    setBuildingCritTier,
     onSelectBuilding: (index) => {
       goToBuilding(index);
       closeMapView();

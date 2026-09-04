@@ -1,5 +1,5 @@
 import { COLOR } from "../../palette";
-import { drawCartoonText, formatPrice } from "../../utils";
+import { drawCartoonText, formatPrice, shadeColor } from "../../utils";
 import type { BigNumber } from "../../shared/bigNumber";
 import {
   getBounceWiggleTransform,
@@ -274,22 +274,31 @@ export function drawLockedMarkerPrice(
 }
 
 // "3/20" floor-count readout under an already-bought building's own marker —
-// how many of MAX_FLOORS_PER_BUILDING (floors/floorLock.ts) it's grown to
+// how many of MAX_FLOORS_PER_BUILDING (floors/floorLock.ts) it's grown to.
+// Plain white by default; a building whose floors all share the same crit tier
+// (see cityMap/index.ts's getBuildingCritTier) passes that tier's own color,
+// rendered with the same light-to-tier-color glossy gradient screenShake.ts's
+// own crit flash text uses (scaled down to this marker's much smaller font)
+// instead of a flat fill, so it reads as visually consistent with every other
+// crit-colored text in the game
 export function drawMarkerFloorCount(
   ctx: CanvasRenderingContext2D,
   cx: number,
   feetY: number,
   floorCount: number,
   maxFloors: number,
+  critColor?: string,
 ): void {
   ctx.font = '900 14px "Fredoka", system-ui, sans-serif';
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  drawCartoonText(
-    ctx,
-    `${floorCount}/${maxFloors}`,
-    cx,
-    feetY + 4,
-    COLOR.white,
-  );
+  const y = feetY + 4;
+  let fillStyle: string | CanvasGradient = COLOR.white;
+  if (critColor) {
+    const gradient = ctx.createLinearGradient(cx, y - 7, cx, y + 7);
+    gradient.addColorStop(0, shadeColor(critColor, 0.6));
+    gradient.addColorStop(1, critColor);
+    fillStyle = gradient;
+  }
+  drawCartoonText(ctx, `${floorCount}/${maxFloors}`, cx, y, fillStyle);
 }

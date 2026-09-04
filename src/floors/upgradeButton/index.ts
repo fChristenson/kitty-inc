@@ -304,6 +304,35 @@ export const CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.crit.multiplier;
 export const MEGA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.mega.multiplier;
 export const ULTRA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.ultra.multiplier;
 
+// rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),
+// so that's a safe, already-canonical rank to compare tiers by — null (no tier)
+// always loses to any real tier
+function critTierRank(tier: CritTier | null): number {
+  return tier ? CRIT_TIER_CONFIG[tier].multiplier : 0;
+}
+
+// whichever of a/b is rarer/bigger; used when a fresh roll should only ever
+// upgrade a floor's existing permanent tier, never downgrade it
+export function pickHigherCritTier(
+  a: CritTier | null,
+  b: CritTier | null,
+): CritTier | null {
+  return critTierRank(b) > critTierRank(a) ? b : a;
+}
+
+// the crit tier EVERY floor in this building currently shares, or null if
+// there are no floors or they don't all match — a building-wide crit (see
+// cityMap/index.ts's map-unlock crit) sets every floor to the same tier, so
+// this is how a brand new floor (ensureLockedFloorAbove) inherits that
+// building's own crit tier as its own starting default
+export function getUniformCritTier(floors: Floor[]): CritTier | null {
+  if (floors.length === 0) return null;
+  const tier = floors[0].critMultiplierTier;
+  return tier && floors.every((floor) => floor.critMultiplierTier === tier)
+    ? tier
+    : null;
+}
+
 const critTiers = new WeakMap<Floor, CritTier>();
 
 // call once per completed upgrade click (crit or normal) to roll the next one —
