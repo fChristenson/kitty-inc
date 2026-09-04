@@ -388,12 +388,18 @@ export function createCityMapView(
   // not-yet-reachable locked marker does nothing; an unlocked one switches to it
   // and leaves the map entirely
   function onClick(event: MouseEvent): void {
-    // set right before a long-press-triggered buy-all-floors fires below, so the
-    // click the browser still sends on release right after doesn't ALSO trigger
-    // onSelectBuilding and immediately boot the player off the map they just
-    // triggered that action from
-    if (suppressNextClick) {
-      suppressNextClick = false;
+    // a long-press just fired below (buyAllFloorsFiredAt): suppress only a
+    // click landing within CLICK_SUPPRESS_WINDOW_MS of it, rather than
+    // permanently arming a "suppress the very next click" flag — the browser
+    // doesn't reliably send a click right after a long, held-down press
+    // (occasionally it never fires one at all), and a flag left armed forever
+    // instead ate the player's own NEXT deliberate click, forcing them to
+    // click twice to actually reach the building screen
+    if (
+      buyAllFloorsFiredAt !== null &&
+      Date.now() - buyAllFloorsFiredAt < CLICK_SUPPRESS_WINDOW_MS
+    ) {
+      buyAllFloorsFiredAt = null;
       return;
     }
     const p = canvasPoint(event);
@@ -425,11 +431,11 @@ export function createCityMapView(
   // that building at once (see markers.ts's drawBuyAllFloorsIndicator — the
   // green dot is a visual affordability cue only, not the hit target, since
   // its own small radius made the gesture nearly impossible to land in
-  // practice). Suppresses the click the browser still fires on release (see
-  // onClick above)
+  // practice). Suppresses a click landing shortly after (see onClick above)
   const BUY_ALL_HOLD_MS = 1000;
+  const CLICK_SUPPRESS_WINDOW_MS = 400;
   let buyAllHoldTimeout: ReturnType<typeof setTimeout> | null = null;
-  let suppressNextClick = false;
+  let buyAllFloorsFiredAt: number | null = null;
 
   function clearBuyAllHold(): void {
     if (buyAllHoldTimeout !== null) {
@@ -452,7 +458,7 @@ export function createCityMapView(
       triggerScreenShake({ color: COLOR.moneyGreen, label: "MAXED!" });
       if (deps.buyAllFloors(globalIndex)) {
         playSold();
-        suppressNextClick = true;
+        buyAllFloorsFiredAt = Date.now();
         // same unlock flourish a normal single-floor buy plays — a maxed-out
         // building deserves it even more than any one of them individually
         triggerMarkerJump(globalIndex);
