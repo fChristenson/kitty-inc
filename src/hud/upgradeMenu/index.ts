@@ -222,7 +222,7 @@ function getMassActionDefs(): MassActionDef[] {
     {
       action: "workers",
       iconUrl: getWorkerIconUrl(),
-      label: "Mass hire workers",
+      label: "Hire workers",
       isEligible: (floor) => floor.workerCount < MAX_RENDERED_WORKERS,
       getCost: getWorkerCost,
       massBuy: massHireWorkers,
@@ -230,7 +230,7 @@ function getMassActionDefs(): MassActionDef[] {
     {
       action: "chairs",
       iconUrl: officeChairsIconUrl,
-      label: "Bulk buy office chairs",
+      label: "Buy office chairs",
       isEligible: (floor) => !floor.hasOfficeChairs,
       getCost: getOfficeChairsCost,
       massBuy: (floors) =>
@@ -243,7 +243,7 @@ function getMassActionDefs(): MassActionDef[] {
     {
       action: "supplies",
       iconUrl: officeSuppliesIconUrl,
-      label: "Bulk buy office supplies",
+      label: "Buy office supplies",
       isEligible: (floor) => !floor.hasOfficeSupplies,
       getCost: getOfficeSuppliesCost,
       massBuy: (floors) =>
@@ -256,7 +256,7 @@ function getMassActionDefs(): MassActionDef[] {
     {
       action: "managers",
       iconUrl: getManagerIconUrl(),
-      label: "Mass hire managers",
+      label: "Hire managers",
       isEligible: (floor) => !floor.hasManager && isManagerUnlocked(floor),
       getCost: getManagerCost,
       massBuy: (floors) =>
