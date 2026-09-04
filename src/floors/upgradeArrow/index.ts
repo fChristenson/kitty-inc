@@ -13,7 +13,7 @@ import {
 // (no button/circle behind it) as the city map's own prev/next arrows — see
 // shared/arrowIcon. Only drawn/hit-testable once a floor is unlocked, since
 // there's nothing to buy for one that isn't yet
-const GAP_AFTER_STAR = 8;
+const GAP_AFTER_STAR = 24;
 const ICON_SIZE = 52; // matches the map arrows' own on-screen size
 const HIT_RADIUS = 40; // a bit more generous than the icon itself, for tapping
 

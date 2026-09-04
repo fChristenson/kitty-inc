@@ -1,7 +1,15 @@
 import type { Floor } from "../../gameState";
-import { formatPrice, triggerButtonPress, animateDialogClose } from "../../utils";
+import {
+  formatPrice,
+  triggerButtonPress,
+  animateDialogClose,
+} from "../../utils";
 import { getTotalIncome } from "../../totalIncome";
-import { MAX_RENDERED_WORKERS, getWorkerIconUrl, getManagerIconUrl } from "../../floors";
+import {
+  MAX_RENDERED_WORKERS,
+  getWorkerIconUrl,
+  getManagerIconUrl,
+} from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { gte, lt, type BigNumber } from "../../shared/bigNumber";
@@ -98,9 +106,7 @@ export function wireFloorUpgradeMenu(
   container: HTMLElement,
   onPurchase: () => void,
 ): FloorUpgradeMenu {
-  const menu = container.querySelector<HTMLDivElement>(
-    "#floor-upgrade-menu",
-  )!;
+  const menu = container.querySelector<HTMLDivElement>("#floor-upgrade-menu")!;
   const backdrop = container.querySelector<HTMLDivElement>(
     "#floor-upgrade-menu-backdrop",
   )!;
