@@ -58,6 +58,8 @@ import {
   wireActionBar,
   createUpgradeMenuMarkup,
   wireUpgradeMenu,
+  createFloorUpgradeMenuMarkup,
+  wireFloorUpgradeMenu,
   createCorporationUpgradeMenuMarkup,
   wireCorporationUpgradeMenu,
   createBoostMenuMarkup,
@@ -120,6 +122,7 @@ async function main() {
       ${import.meta.env.MODE !== "production" ? createTestButtonMarkup() : ""}
     </div>
     ${createUpgradeMenuMarkup()}
+    ${createFloorUpgradeMenuMarkup()}
     ${createCorporationUpgradeMenuMarkup()}
     ${createBoostMenuMarkup()}
     ${createCorporationBoostMenuMarkup()}
@@ -233,12 +236,16 @@ async function main() {
   await loadCityImage();
   await loadCityMapImage();
 
+  const floorUpgradeMenu = wireFloorUpgradeMenu(app, () => persist());
+
   const gameCanvas = createGameCanvas({
     canvas,
     getBackgrounds: getActiveBackgrounds,
     floors: buildings[activeBuildingIndex],
     getBuildingMultiplier: () => getBuildingMultiplier(activeBuildingIndex),
     persist,
+    onOpenFloorUpgrades: (floor, floorNumber) =>
+      floorUpgradeMenu.open(floor, floorNumber),
   });
 
   // ensures a building's next locked floor is waiting above it; onAdd only forwards

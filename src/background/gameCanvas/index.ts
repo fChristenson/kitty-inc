@@ -7,6 +7,7 @@ import {
   hasActiveCoins,
   hitTestFloorHover,
   hitTestUpgradeButton,
+  hitTestUpgradeArrow,
   handleFloorClick,
   startButtonHoldAnim,
   stopButtonHoldAnim,
@@ -36,6 +37,7 @@ interface UpgradeHit {
   localX: number;
   localY: number;
   isGroundFloor: boolean;
+  floorNumber: number; // 1-indexed, matching floors/floorNumber.ts's own display
 }
 
 // one building's on-screen slot: a GUTTER_W margin on each side of its floor room art
@@ -94,6 +96,11 @@ export interface GameCanvasDeps {
   floors: Floor[]; // the initially-active building's floors
   getBuildingMultiplier: () => number; // the currently-active building's economy scale
   persist: () => void;
+  // fired by a plain tap on a floor's own green upgrade-arrow button (see
+  // floors/upgradeArrow) — opens that floor's own hire worker/office chairs/
+  // supplies/manager dialog (hud/floorUpgradeMenu). gameCanvas has no DOM/dialog
+  // access itself, so this is threaded in from main.ts same as persist above
+  onOpenFloorUpgrades: (floor: Floor, floorNumber: number) => void;
 }
 
 export interface GameCanvas {
@@ -122,7 +129,13 @@ export interface GameCanvas {
 // through it — only one building is ever on screen at a time (see setActiveFloors),
 // so there's no horizontal camera/panning at all.
 export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
-  const { canvas, getBackgrounds, getBuildingMultiplier, persist } = deps;
+  const {
+    canvas,
+    getBackgrounds,
+    getBuildingMultiplier,
+    persist,
+    onOpenFloorUpgrades,
+  } = deps;
   const ctx = canvas.getContext("2d")!;
 
   let scale = 1; // world units -> CSS px
@@ -542,6 +555,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
           localX,
           localY: worldY - top,
           isGroundFloor: i === 0,
+          floorNumber: i + 1,
         };
       }
     }
@@ -690,6 +704,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const p = canvasPoint(event);
     const hit = hitTestPoint(p.x, p.y);
     if (!hit) return;
+    if (hitTestUpgradeArrow(hit.localX, hit.localY, hit.floor)) {
+      onOpenFloorUpgrades(hit.floor, hit.floorNumber);
+      return;
+    }
     // both run unconditionally on the same click — an overlapping mouse and cat(s)
     // both register, same as clicking overlapping cats already hits every one of them
     handleMouseClick(hit.localX, hit.localY, hit.floor, activeFloors);

@@ -8,7 +8,10 @@ const LEFT_WALL_WIDTH = 56;
 const MARGIN_X = LEFT_WALL_WIDTH + 40;
 const MARGIN_Y = 44 + 20;
 export const STAR_Y = MARGIN_Y;
-const FONT = '900 54px "Fredoka", system-ui, sans-serif';
+export const STAR_X = MARGIN_X;
+const FONT_SIZE = 54;
+export const STAR_BOTTOM_Y = STAR_Y + FONT_SIZE;
+const FONT = `900 ${FONT_SIZE}px "Fredoka", system-ui, sans-serif`;
 
 function labelText(floor: Floor): string {
   return `Lvl ${floor.upgradeCount}`;
@@ -30,6 +33,13 @@ export function getUpgradeIndicatorCenter(floor: Floor): {
   y: number;
 } {
   return { x: MARGIN_X + labelWidth(floor) / 2, y: STAR_Y };
+}
+
+// the label's own right edge, floor-local — grows/shrinks as floor.upgradeCount
+// gains digits, so anything anchored past it (see floors/upgradeArrow) tracks
+// the text's real width instead of a fixed guess
+export function getStarRightX(floor: Floor): number {
+  return MARGIN_X + labelWidth(floor);
 }
 
 // shows a "Lvl N" label for how many upgrades this floor has bought, drawn at the

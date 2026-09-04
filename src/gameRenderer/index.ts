@@ -3,6 +3,7 @@ import {
   drawWorker,
   getBoostedWorkerCenters,
   drawUpgradeStar,
+  drawUpgradeArrow,
   drawIncomePanel,
   drawUpgradeButton,
   drawFloorLock,
@@ -13,6 +14,7 @@ import {
 import { drawOuterWall } from "../buildings";
 import { drawMouse } from "../mouse";
 import { getTotalIncome } from "../totalIncome";
+import { hasAffordableFloorUpgrade } from "../hud";
 import { gte } from "../shared/bigNumber";
 import type { Floor } from "../gameState";
 
@@ -68,6 +70,7 @@ export function drawFloorContent(
   maybeSpawnFloatingCoins(floor, now);
   drawFloatingCoins(ctx, floor);
   drawUpgradeStar(ctx, floor);
+  drawUpgradeArrow(ctx, floor, hasAffordableFloorUpgrade(floor));
   drawIncomePanel(ctx, floor, isGroundFloor);
   drawUpgradeButton(
     ctx,

@@ -23,6 +23,7 @@ import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
 import { spawnIncomeFloatText } from "../incomeFloatText";
 import { getUpgradeIndicatorCenter } from "../star";
+import { hitTestUpgradeArrow } from "../upgradeArrow";
 import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
   hitTestFloorLock,
@@ -66,6 +67,7 @@ export function hitTestFloorHover(
       floor.unlocked &&
       isUpgradeButtonEnabled(floor)) ||
     hitTestFloorLock(x, y, floor) ||
+    hitTestUpgradeArrow(x, y, floor) ||
     hitTestWorkers(x, y, floor).length > 0
   );
 }

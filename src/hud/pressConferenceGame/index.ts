@@ -926,12 +926,23 @@ export function wirePressConferenceGame(
     rafId = requestAnimationFrame(frame);
   }
 
-  canvas.addEventListener("pointerdown", (event) => {
-    if (!state.gameOver) {
-      // no button to hit while playing — any press on the canvas flaps
-      flap();
-      return;
-    }
+  canvas.addEventListener("pointerdown", () => {
+    if (state.gameOver) return; // end button is handled on click below
+    // no button to hit while playing — any press on the canvas flaps
+    flap();
+  });
+
+  // the end button is deliberately handled on "click", not "pointerdown": this
+  // screen sits on top of the boost menu dialog (see close()'s own comment),
+  // and closing it (screen.hidden = true) synchronously inside a pointerdown
+  // handler reveals that dialog's own backdrop underneath the pointer BEFORE
+  // the browser's compatibility "click" event for this same tap fires —
+  // which then landed on that now-visible backdrop instead, closing the
+  // boost menu too. Reacting on "click" instead means this tap's one and only
+  // click event is consumed right here, with nothing left over to fall
+  // through afterward
+  canvas.addEventListener("click", (event) => {
+    if (!state.gameOver) return;
     const rect = canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;

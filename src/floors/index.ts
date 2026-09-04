@@ -288,6 +288,11 @@ export {
 } from "./worker";
 export { drawUpgradeStar, getUpgradeIndicatorCenter } from "./star";
 export {
+  drawUpgradeArrow,
+  hitTestUpgradeArrow,
+  getUpgradeArrowCenter,
+} from "./upgradeArrow";
+export {
   drawUpgradeButton,
   hitTestUpgradeButton,
   triggerButtonPress,

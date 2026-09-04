@@ -116,7 +116,7 @@ export function wireCorporationBoostMenu(
         ({ name, pct }) => `
         <div class="worker-menu__modifier-row">
           <span>${name}</span>
-          <span>${formatBoostPercent(pct)}</span>
+          <span data-modifier-name="${name}">${formatBoostPercent(pct)}</span>
         </div>
       `,
       )
@@ -132,7 +132,7 @@ export function wireCorporationBoostMenu(
     const investmentPortfolioRow = `
       <div class="worker-menu__modifier-row worker-menu__modifier-row--divider">
         <span>Investment portfolio</span>
-        <span>${formatBoostPercent(investmentPortfolioPct)}</span>
+        <span data-investment-portfolio-value>${formatBoostPercent(investmentPortfolioPct)}</span>
       </div>
     `;
     const totalPct = getGlobalIncomeBoostPercent();
@@ -185,7 +185,7 @@ export function wireCorporationBoostMenu(
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
         <span>Total</span>
-        <span>${formatBoostPercent(totalPct)}</span>
+        <span data-total-boost-value>${formatBoostPercent(totalPct)}</span>
       </div>
       <h3 class="worker-menu__subheader">Boost Income Modifiers</h3>
       <button
@@ -298,13 +298,60 @@ export function wireCorporationBoostMenu(
     investHoldController = null;
   }
 
+  // patches just the specific text nodes an invest press can change (total
+  // income, investment-portfolio %, total boost %, each company's own
+  // modifier % — investing drains total income, which company value/modifier
+  // math depends on) plus every button's disabled state, WITHOUT touching
+  // list.innerHTML — a full render() rebuild here (torn down and recreated
+  // every ~100ms for as long as the hold lasts) was fighting the browser's
+  // own native touch-scroll tracking on mobile, occasionally yanking the list
+  // to a random scroll position mid-hold
+  function updateInvestDynamicValues(): void {
+    const totalIncomeEl = list.querySelector<HTMLElement>(
+      ".worker-menu__total-income",
+    );
+    if (totalIncomeEl) {
+      totalIncomeEl.textContent = formatTotalIncomeFull(
+        getAllCompaniesTotalIncome(),
+      );
+    }
+    const investmentPortfolioEl = list.querySelector<HTMLElement>(
+      "[data-investment-portfolio-value]",
+    );
+    if (investmentPortfolioEl) {
+      investmentPortfolioEl.textContent = formatBoostPercent(
+        getInvestmentPortfolioPercent(),
+      );
+    }
+    const totalBoostEl = list.querySelector<HTMLElement>(
+      "[data-total-boost-value]",
+    );
+    if (totalBoostEl) {
+      totalBoostEl.textContent = formatBoostPercent(
+        getGlobalIncomeBoostPercent(),
+      );
+    }
+    for (const i of getActiveCorporationIndices()) {
+      const name = getCorporationName(i);
+      const el = list.querySelector<HTMLElement>(
+        `[data-modifier-name="${name}"]`,
+      );
+      if (el) {
+        el.textContent = formatBoostPercent(
+          getStockContributionPercent(i) + getCompanyBaseModifierPercent(i),
+        );
+      }
+    }
+    updateAffordability();
+  }
+
   function fireInvest(): void {
     if (!investInMarket(investReferenceTotal)) {
       stopInvestHold();
       return;
     }
     playSold();
-    render();
+    updateInvestDynamicValues();
     const button = list.querySelector<HTMLButtonElement>(
       "#invest-in-market-item",
     );

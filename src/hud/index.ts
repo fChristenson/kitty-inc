@@ -65,6 +65,12 @@ export {
 export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
 export type { UpgradeMenu } from "./upgradeMenu";
 export {
+  createFloorUpgradeMenuMarkup,
+  wireFloorUpgradeMenu,
+  hasAffordableFloorUpgrade,
+} from "./floorUpgradeMenu";
+export type { FloorUpgradeMenu } from "./floorUpgradeMenu";
+export {
   createCorporationUpgradeMenuMarkup,
   wireCorporationUpgradeMenu,
 } from "./corporationUpgradeMenu";

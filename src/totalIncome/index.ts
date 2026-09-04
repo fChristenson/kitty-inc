@@ -10,12 +10,14 @@ import { getCorporationCount } from "../corporationName";
 import {
   type BigNumber,
   ZERO,
-  fromNumber,
-  toNumber,
   add,
   subtract,
   multiply,
+  divide,
   lt,
+  gte,
+  isZero,
+  log10,
 } from "../shared/bigNumber";
 
 export function getTotalIncome(): BigNumber {
@@ -177,11 +179,22 @@ const SECONDS_PER_HOUR = 3600;
 // remaining cost re-split across the rest by their own wealth (a
 // "water-filling" pass, repeated until nothing is over-capped) — so no company
 // ever gets driven into the negative. Returns false (spending nothing) if the
-// combined total across every company can't cover cost at all. The proportional
-// split itself (weightSum/share ratios) is done in plain lossy `number` space —
-// safe here because it's only ever comparing/dividing WEALTH RATIOS (0..1-ish
-// fractions), never raw magnitudes, so precision loss at extreme scale doesn't
-// change which companies get capped or their relative shares
+// combined total across every company can't cover cost at all. The
+// proportional split (weightSum/share ratios) used to run in plain `number`
+// space via toNumber(), which silently overflowed to Infinity (and further
+// arithmetic on that to NaN) once any company's own wealth/cost got
+// astronomically large — a real late-game total, and especially likely right
+// after a big corporation merge folds several already-huge totals into one —
+// which then drained every company's ENTIRE balance in a single spend instead
+// of the intended proportional share. Every $ amount below stays a BigNumber;
+// the only plain numbers are RATIOS from safeRatio (always a small, safe
+// 0..1-ish fraction, computed via log10 subtraction so it never touches
+// either operand's own raw, possibly-overflowing magnitude directly)
+function safeRatio(a: BigNumber, b: BigNumber): number {
+  if (isZero(a) || isZero(b)) return 0;
+  return 10 ** (log10(a) - log10(b));
+}
+
 export function spendFromAllCompanies(cost: BigNumber): boolean {
   const count = getCorporationCount();
   const totals = Array.from({ length: count }, (_, i) =>
@@ -191,28 +204,26 @@ export function spendFromAllCompanies(cost: BigNumber): boolean {
   if (lt(combinedTotal, cost)) return false;
 
   const weights = Array.from({ length: count }, (_, i) =>
-    toNumber(getCompanyWealth(i)),
+    getCompanyWealth(i),
   );
-  const totalNumbers = totals.map((total) => toNumber(total));
-  const paid = new Array(count).fill(0);
+  const paid: BigNumber[] = new Array(count).fill(ZERO);
   const active = new Set(Array.from({ length: count }, (_, i) => i));
-  let unallocated = toNumber(cost);
+  let unallocated = cost;
 
-  while (unallocated > 1e-9 && active.size > 0) {
+  while (!isZero(unallocated) && active.size > 0) {
     const weightSum = Array.from(active).reduce(
-      (sum, i) => sum + weights[i],
-      0,
+      (sum, i) => add(sum, weights[i]),
+      ZERO,
     );
     let anyCapped = false;
     for (const i of Array.from(active)) {
-      const share =
-        weightSum > 0
-          ? (unallocated * weights[i]) / weightSum
-          : unallocated / active.size;
-      const available = totalNumbers[i] - paid[i];
-      if (share >= available) {
-        paid[i] += available;
-        unallocated -= available;
+      const share = isZero(weightSum)
+        ? divide(unallocated, active.size)
+        : multiply(unallocated, safeRatio(weights[i], weightSum));
+      const available = subtract(totals[i], paid[i]);
+      if (gte(share, available)) {
+        paid[i] = add(paid[i], available);
+        unallocated = subtract(unallocated, available);
         active.delete(i);
         anyCapped = true;
       }
@@ -221,21 +232,21 @@ export function spendFromAllCompanies(cost: BigNumber): boolean {
       // every remaining company's share fits within its own funds — settle them
       // all at once instead of looping again
       const finalWeightSum = Array.from(active).reduce(
-        (sum, i) => sum + weights[i],
-        0,
+        (sum, i) => add(sum, weights[i]),
+        ZERO,
       );
       for (const i of active) {
-        paid[i] +=
-          finalWeightSum > 0
-            ? (unallocated * weights[i]) / finalWeightSum
-            : unallocated / active.size;
+        const share = isZero(finalWeightSum)
+          ? divide(unallocated, active.size)
+          : multiply(unallocated, safeRatio(weights[i], finalWeightSum));
+        paid[i] = add(paid[i], share);
       }
-      unallocated = 0;
+      unallocated = ZERO;
     }
   }
 
   for (let i = 0; i < count; i++) {
-    if (paid[i] > 0) adjustStoredTotalIncome(i, fromNumber(paid[i]), -1);
+    if (!isZero(paid[i])) adjustStoredTotalIncome(i, paid[i], -1);
   }
   return true;
 }
