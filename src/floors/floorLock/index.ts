@@ -5,12 +5,6 @@ import type { BigNumber } from "../../shared/bigNumber";
 import { drawCartoonText, formatPrice } from "../../utils";
 import { getWiggleRotation } from "../../shared/wiggle";
 
-// invisible clickable region for the unlock cost, centered over the floor slab
-const PANEL_W = 280;
-const PANEL_H = 140;
-const PANEL_X = FLOOR_W / 2 - PANEL_W / 2;
-const PANEL_Y = FLOOR_H / 2 - PANEL_H / 2;
-
 // dims a locked floor with a grey overlay and shows its unlock price on top; no-op once unlocked
 export function drawFloorLock(
   ctx: CanvasRenderingContext2D,
@@ -43,15 +37,13 @@ export function drawFloorLock(
   ctx.restore();
 }
 
-// whether a floor-local canvas point falls on a locked floor's unlock panel
+// whether a floor-local canvas point falls on a locked floor's clickable area —
+// the whole dark overlay (drawFloorLock's fillRect covers the entire floor),
+// not just the small price-text panel, so clicking anywhere on the dimmed
+// floor buys it, same as clicking the price text itself
 export function hitTestFloorLock(x: number, y: number, floor: Floor): boolean {
   if (floor.unlocked) return false;
-  return (
-    x >= PANEL_X &&
-    x <= PANEL_X + PANEL_W &&
-    y >= PANEL_Y &&
-    y <= PANEL_Y + PANEL_H
-  );
+  return x >= 0 && x <= FLOOR_W && y >= 0 && y <= FLOOR_H;
 }
 
 // center of the unlock panel, floor-local — where a just-unlocked floor's coin
