@@ -1,7 +1,7 @@
 import { buildFloor } from "..";
 import { FLOOR_W, FLOOR_H } from "../constants";
 import type { Floor } from "../../gameState";
-import type { BigNumber } from "../../shared/bigNumber";
+import { type BigNumber, ZERO, add } from "../../shared/bigNumber";
 import { drawCartoonText, formatPrice } from "../../utils";
 import { getWiggleRotation } from "../../shared/wiggle";
 
@@ -86,4 +86,48 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
   });
   deps.floors.push(floor);
   deps.onAdd(floor);
+}
+
+// $ to unlock every remaining locked floor in this building, all the way up to
+// MAX_FLOORS_PER_BUILDING — ZERO once there's nothing left waiting (already
+// maxed out, or a still-empty floors array). The one floor actually sitting
+// there already carries its own real unlockCost; anything further hasn't been
+// created yet, so buildFloor (the single source of truth for that formula) is
+// simulated one level at a time just to read its unlockCost, discarding
+// everything else about the result
+export function getBuildingUnlockAllCost(
+  floors: Floor[],
+  multiplier: number,
+): BigNumber {
+  const top = floors[floors.length - 1];
+  if (!top || top.unlocked) return ZERO;
+  let total = top.unlockCost;
+  for (
+    let level = floors.length + 1;
+    level <= MAX_FLOORS_PER_BUILDING;
+    level++
+  ) {
+    total = add(
+      total,
+      buildFloor(level, { backgroundCount: 1, multiplier }).unlockCost,
+    );
+  }
+  return total;
+}
+
+// unlocks every remaining floor in one go, all the way up to
+// MAX_FLOORS_PER_BUILDING — same one-at-a-time unlock+ensure-next-floor cycle
+// a normal manual unlock (floorInteractions.ts's handleFloorClick) goes
+// through, just looped straight through instead of pausing for a click each
+// time. Caller (main.ts) is expected to have already deducted
+// getBuildingUnlockAllCost's own $ cost before calling this
+export function unlockAllFloors(deps: EnsureLockedFloorDeps): void {
+  for (;;) {
+    const top = deps.floors[deps.floors.length - 1];
+    if (top && !top.unlocked) unlockFloor(top);
+    if (deps.floors.length >= MAX_FLOORS_PER_BUILDING) break;
+    const before = deps.floors.length;
+    ensureLockedFloorAbove(deps);
+    if (deps.floors.length === before) break; // safety net against an unexpected no-op
+  }
 }

@@ -260,6 +260,8 @@ export {
   unlockFloor,
   drawFloorLock,
   MAX_FLOORS_PER_BUILDING,
+  getBuildingUnlockAllCost,
+  unlockAllFloors,
 } from "./floorLock";
 export {
   drawCoins,

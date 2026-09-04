@@ -1,5 +1,5 @@
 import "./style.css";
-import { fromNumber, gt } from "./shared/bigNumber";
+import { fromNumber, gt, isZero } from "./shared/bigNumber";
 import {
   loadFloorBackgrounds,
   loadGroundImage,
@@ -8,6 +8,8 @@ import {
   loadFloatingCoinImage,
   startIncomeTicker,
   ensureLockedFloorAbove,
+  getBuildingUnlockAllCost,
+  unlockAllFloors,
   forceCritUpgrade,
   forceMegaCritUpgrade,
   forceUltraCritUpgrade,
@@ -428,6 +430,29 @@ async function main() {
     persist();
     return true;
   }
+  // unlocks every remaining floor of an ALREADY-BOUGHT building in one shot —
+  // the city map's long-press-on-the-green-dot gesture (see cityMap/index.ts,
+  // markers.ts's drawBuyAllFloorsIndicator). Returns whether it succeeded (false
+  // if there's nothing left to unlock, or it's not actually affordable)
+  function buyAllFloorsForBuilding(buildingIndex: number): boolean {
+    const floors = buildings[buildingIndex];
+    if (!floors) return false;
+    const multiplier = getBuildingMultiplier(buildingIndex);
+    const cost = getBuildingUnlockAllCost(floors, multiplier);
+    if (isZero(cost) || !spendTotalIncome(cost)) return false;
+    unlockAllFloors({
+      floors,
+      backgroundCount: getBackgroundUrls().length,
+      multiplier,
+      onAdd: (floor) => {
+        if (buildingIndex === activeBuildingIndex) {
+          gameCanvas.notifyFloorAdded(floor);
+        }
+      },
+    });
+    persist();
+    return true;
+  }
   // the old building-picker popup is kept wired (backdrop/list still functional)
   // but nothing opens it anymore — it's replaced by tapping the map's own cat
   // markers (see createCityMapView below)
@@ -467,7 +492,13 @@ async function main() {
       // topmost unlocked one (see ensureLockedFloorAbove) — the marker should
       // only count floors actually unlocked, not that placeholder
       buildings[buildingIndex]?.filter((floor) => floor.unlocked).length ?? 0,
+    getBuildingUnlockAllCost: (buildingIndex) =>
+      getBuildingUnlockAllCost(
+        buildings[buildingIndex] ?? [],
+        getBuildingMultiplier(buildingIndex),
+      ),
     buyBuilding,
+    buyAllFloors: buyAllFloorsForBuilding,
     onSelectBuilding: (index) => {
       goToBuilding(index);
       closeMapView();

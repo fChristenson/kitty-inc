@@ -23,6 +23,7 @@ import {
   triggerMarkerJump,
   getMarkerJumpOffset,
   MARKER_COIN_BURST_SCALE,
+  drawBuyAllFloorsIndicator,
 } from "./markers";
 import { MAX_FLOORS_PER_BUILDING } from "../../floors";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
@@ -30,7 +31,8 @@ import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
 import { createCityTransitions } from "./transitions";
 import { loadSprite, loadImageByName } from "../../loadAssets";
-import { type BigNumber, gte } from "../../shared/bigNumber";
+import { type BigNumber, gte, isZero } from "../../shared/bigNumber";
+import { triggerScreenShake, getScreenShakeOffset } from "../../screenShake";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -64,7 +66,14 @@ export interface CityMapDeps {
   getBuildingCount: () => number; // buildings unlocked so far; building 1 exists once this is >= 2
   getActiveBuildingIndex: () => number; // whichever building's floors are on screen right now
   getBuildingFloorCount: (buildingIndex: number) => number; // for the "X/20" marker readout
+  // $ to unlock EVERY remaining locked floor in a building at once — ZERO once
+  // there's nothing left to buy (already maxed). Drives the green buy-all-floors
+  // dot (see markers.ts's drawBuyAllFloorsIndicator) and its long-press gesture
+  getBuildingUnlockAllCost: (buildingIndex: number) => BigNumber;
   buyBuilding: () => boolean; // unlocks building 1 if affordable
+  // long-press-on-the-green-dot gesture below: unlocks every remaining floor of
+  // an already-bought building in one shot. Returns whether it succeeded
+  buyAllFloors: (buildingIndex: number) => boolean;
   onSelectBuilding: (index: number) => void; // switch to that building and leave the map view
   // fires once the corporation barrel roll settles on a different company (see
   // rollCorporationSelection) so main.ts can swap in that company's own separate
@@ -266,6 +275,12 @@ export function createCityMapView(
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);
+    // buy-all-floors long-press below plays the same shared shake every other
+    // big/free action in the game uses (see screenShake.ts) — applied once here
+    // so it nudges everything drawn on this canvas, same pattern as
+    // gameCanvas.ts/pressConferenceGame.ts's own redraw loops
+    const shake = getScreenShakeOffset(Date.now());
+    ctx.translate(shake.x, shake.y);
     if (mapImage) {
       // "cover" fit: scale up to whichever axis needs it more, so the image
       // always fills the whole canvas (cropping whatever overflows on the other
@@ -320,6 +335,13 @@ export function createCityMapView(
           deps.getBuildingFloorCount(globalIndex),
           MAX_FLOORS_PER_BUILDING,
         );
+        const unlockAllCost = deps.getBuildingUnlockAllCost(globalIndex);
+        if (
+          !isZero(unlockAllCost) &&
+          gte(deps.getTotalIncome(), unlockAllCost)
+        ) {
+          drawBuyAllFloorsIndicator(ctx, cssW, cssH, catSprite, i);
+        }
         continue;
       }
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);
@@ -366,6 +388,14 @@ export function createCityMapView(
   // not-yet-reachable locked marker does nothing; an unlocked one switches to it
   // and leaves the map entirely
   function onClick(event: MouseEvent): void {
+    // set right before a long-press-triggered buy-all-floors fires below, so the
+    // click the browser still sends on release right after doesn't ALSO trigger
+    // onSelectBuilding and immediately boot the player off the map they just
+    // triggered that action from
+    if (suppressNextClick) {
+      suppressNextClick = false;
+      return;
+    }
     const p = canvasPoint(event);
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
     if (hit === null) return;
@@ -390,9 +420,55 @@ export function createCityMapView(
     canvas.style.cursor = "default";
   }
 
+  // long-press-anywhere-on-an-eligible-marker gesture: holding it for
+  // BUY_ALL_HOLD_MS shakes the screen and unlocks every remaining floor of
+  // that building at once (see markers.ts's drawBuyAllFloorsIndicator — the
+  // green dot is a visual affordability cue only, not the hit target, since
+  // its own small radius made the gesture nearly impossible to land in
+  // practice). Suppresses the click the browser still fires on release (see
+  // onClick above)
+  const BUY_ALL_HOLD_MS = 1000;
+  let buyAllHoldTimeout: ReturnType<typeof setTimeout> | null = null;
+  let suppressNextClick = false;
+
+  function clearBuyAllHold(): void {
+    if (buyAllHoldTimeout !== null) {
+      clearTimeout(buyAllHoldTimeout);
+      buyAllHoldTimeout = null;
+    }
+  }
+
+  function onPointerDown(event: PointerEvent): void {
+    clearBuyAllHold(); // safety net against a stale interrupted previous gesture
+    const p = canvasPoint(event);
+    const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
+    if (hit === null) return;
+    const globalIndex = cityIndex * MARKER_COUNT + hit;
+    if (globalIndex >= deps.getBuildingCount()) return;
+    const cost = deps.getBuildingUnlockAllCost(globalIndex);
+    if (isZero(cost) || !gte(deps.getTotalIncome(), cost)) return;
+    buyAllHoldTimeout = setTimeout(() => {
+      buyAllHoldTimeout = null;
+      triggerScreenShake({ color: COLOR.moneyGreen, label: "MAXED!" });
+      if (deps.buyAllFloors(globalIndex)) {
+        playSold();
+        suppressNextClick = true;
+        // same unlock flourish a normal single-floor buy plays — a maxed-out
+        // building deserves it even more than any one of them individually
+        triggerMarkerJump(globalIndex);
+        const { cx, feetY } = markerCenter(cssW, cssH, hit);
+        spawnCoinBurstAt(cx, feetY - MARKER_H / 2, MARKER_COIN_BURST_SCALE);
+      }
+      redraw();
+    }, BUY_ALL_HOLD_MS);
+  }
+
   canvas.addEventListener("pointermove", onPointerMove);
   canvas.addEventListener("pointerleave", onPointerLeave);
+  canvas.addEventListener("pointerdown", onPointerDown);
   canvas.addEventListener("click", onClick);
+  window.addEventListener("pointerup", clearBuyAllHold);
+  window.addEventListener("pointercancel", clearBuyAllHold);
 
   // both arrows are only ever visible when navigating to their side is actually
   // allowed (see updateArrows in redraw), so a click here never needs to re-check
@@ -439,7 +515,11 @@ export function createCityMapView(
   function destroy(): void {
     canvas.removeEventListener("pointermove", onPointerMove);
     canvas.removeEventListener("pointerleave", onPointerLeave);
+    canvas.removeEventListener("pointerdown", onPointerDown);
     canvas.removeEventListener("click", onClick);
+    window.removeEventListener("pointerup", clearBuyAllHold);
+    window.removeEventListener("pointercancel", clearBuyAllHold);
+    clearBuyAllHold();
     prevButton.removeEventListener("click", onPrevClick);
     nextButton.removeEventListener("click", onNextClick);
     resizeObserver.disconnect();

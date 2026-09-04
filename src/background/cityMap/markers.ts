@@ -172,6 +172,42 @@ export function drawCatMarker(
   ctx.restore();
 }
 
+// small filled dot drawn just left of an unlocked building's own cat marker,
+// once the company has enough money to unlock every remaining floor in that
+// building in one shot (see cityMap/index.ts's long-press-to-buy-all-floors
+// gesture, and floors/floorLock.ts's getBuildingUnlockAllCost)
+const BUY_ALL_INDICATOR_RADIUS = 4.5;
+// gap between the circle's own right edge and the cat sprite's left edge
+const BUY_ALL_INDICATOR_GAP = -64;
+// nudges the circle down from its default vertical-center position
+const BUY_ALL_INDICATOR_Y_OFFSET = 36;
+
+export function drawBuyAllFloorsIndicator(
+  ctx: CanvasRenderingContext2D,
+  cssW: number,
+  cssH: number,
+  catSprite: HTMLImageElement | null,
+  buildingIndex: number,
+): void {
+  if (!catSprite) return;
+  const { cx, feetY } = markerCenter(cssW, cssH, buildingIndex);
+  const frameW = catSprite.naturalWidth / CAT_FRAME_COUNT;
+  const frameH = catSprite.naturalHeight;
+  const renderW = (MARKER_H * frameW) / frameH;
+  const circleX =
+    cx - renderW / 2 - BUY_ALL_INDICATOR_GAP - BUY_ALL_INDICATOR_RADIUS;
+  const circleY = feetY - MARKER_H / 2 + BUY_ALL_INDICATOR_Y_OFFSET;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(circleX, circleY, BUY_ALL_INDICATOR_RADIUS, 0, Math.PI * 2);
+  ctx.fillStyle = COLOR.moneyGreen;
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = COLOR.white;
+  ctx.stroke();
+  ctx.restore();
+}
+
 // one-shot hop played the instant a building's marker actually unlocks — same
 // shape (sin(t*pi)) and CAT_JUMP_FRAME/CLICK_FRAME swap as floors/worker's own
 // click-reaction bounce, but slower/lower (worker's 300ms/14px reads as too
