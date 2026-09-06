@@ -22,7 +22,7 @@ import {
 
 const officeChairsIconUrl = getImageUrl("officeChairsIcon");
 const officeSuppliesIconUrl = getImageUrl("officeSuppliesIcon");
-const coinIconUrl = getImageUrl("coin");
+const skyscraperIconUrl = getImageUrl("skyscraper");
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost
@@ -314,7 +314,7 @@ function renovateFloorsItemMarkup(floors: Floor[]): string {
       ${count > 0 ? "" : "disabled"}
     >
       <span class="worker-menu__item-label">
-        <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+        <img src="${skyscraperIconUrl}" class="worker-menu__icon worker-menu__icon--skyscraper" alt="" />
         Renovate floors
       </span>
       <span class="worker-menu__price">x${count}</span>

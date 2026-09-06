@@ -251,6 +251,38 @@ function addInvestmentPortfolioPercent(delta: number): void {
   }
 }
 
+// "Secured assets %" — earned by playing hud/liquidateAssetsGame's own
+// "Avoid market drop" mini-game, banked once per round via
+// addSecuredAssetsPercent; kept as its own modifier, separate from Market
+// Influence/Investment Portfolio. Contributes directly, 1:1, to the global
+// boost (see getGlobalIncomeBoostPercent) — same as those, no leverage/
+// scaling/cap of any kind
+const SECURED_ASSETS_KEY = "cash-clicker:secured-assets-percent";
+
+export function getSecuredAssetsPercent(): number {
+  try {
+    const raw = localStorage.getItem(SECURED_ASSETS_KEY);
+    const parsed = raw !== null ? Number(raw) : 0;
+    return Number.isFinite(parsed) ? parsed : 0;
+  } catch {
+    return 0;
+  }
+}
+
+// banks additional secured-assets % earned just now (delta can be negative —
+// see liquidateAssetsGame's red-line penalty — but the running total is
+// floored at 0)
+export function addSecuredAssetsPercent(delta: number): void {
+  try {
+    localStorage.setItem(
+      SECURED_ASSETS_KEY,
+      String(Math.max(0, getSecuredAssetsPercent() + delta)),
+    );
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
 // "Invest in the market" — a cash sink that trades money for Investment
 // Portfolio %, always usable regardless of current income. Each click
 // spends INVEST_PERCENT (10%) of referenceTotal — the combined corp total
@@ -500,7 +532,10 @@ export function getCompanyBaseModifierPercent(companyIndex: number): number {
 // what shows up here
 export function getGlobalIncomeBoostPercent(): number {
   const count = getCorporationCount();
-  let total = getMarketInfluencePercent() + getInvestmentPortfolioPercent();
+  let total =
+    getMarketInfluencePercent() +
+    getInvestmentPortfolioPercent() +
+    getSecuredAssetsPercent();
   for (let i = 0; i < count; i++) {
     total += getStockContributionPercent(i) + getCompanyBaseModifierPercent(i);
   }

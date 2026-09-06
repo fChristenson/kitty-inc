@@ -1,0 +1,648 @@
+import { playBubble, playSold, playExplosion } from "../../sound";
+import { COLOR } from "../../palette";
+import { formatPrice } from "../../utils";
+import { advanceTrail } from "../../shared/canvasGame";
+import {
+  wireConferenceMinigame,
+  TRAIL_SAMPLE_DX,
+  HEAD_X_OFFSET_FROM_CENTER,
+  computeMaxTrailLength,
+  type MinigameState,
+  type ConferenceMinigame,
+} from "../../shared/conferenceMinigame";
+import { LABEL_ABOVE_AUDIENCE_OFFSET } from "../../shared/pressConferenceScene";
+import {
+  type BigNumber,
+  ZERO,
+  fromNumber,
+  add,
+  subtract,
+  multiply,
+  gt,
+  lt,
+} from "../../shared/bigNumber";
+import {
+  spendFromAllCompanies,
+  getAllCompaniesTotalIncome,
+} from "../../totalIncome";
+import { addSecuredAssetsPercent } from "../corporationBoostMenu";
+import { spawnCoinBurstAt, drawActiveCoinBursts } from "../../coinBurst";
+import { triggerScreenShake } from "../../screenShake";
+import { drawMainLine } from "./mainLine";
+import { drawShortLine } from "./shortLine";
+import { renderJumpLines } from "./renderJumpLines";
+import type { LineRewardKind } from "./createLines";
+
+// "Liquidate Assets": a Geometry Dash-style endless runner built on the
+// shared shared/conferenceMinigame engine (canvas/scene/line/tap-to-begin/End
+// button/open-close all live there now) — here the head rests on whatever
+// platform is currently under it (no automatic bounce, just follows the
+// scroll) across a stream of platforms scrolling right to left, instead of
+// hud/pressConferenceGame's own flying-between-market-events graph. Only a
+// click ever moves it: the exact same fixed base jump
+// (BASE_LAUNCH_VELOCITY_PX_S) every time, sized to cover exactly one
+// platform's own gap on its own — holding just repeats that same base jump
+// over and over for as long as it's held (see step), letting the player
+// stay airborne indefinitely; releasing lets gravity resume normally.
+// Falling through a gap (missing every platform, or walking off one without
+// jumping away in time) ends the round.
+const SCROLL_SPEED_PX_S = 200;
+const GRAVITY_PX_S2 = 1400;
+// collision-only hitbox radius — the drawn head dot is the shared engine's own
+// fixed size (identical across every game built on it), not this value
+const HITBOX_RADIUS = 8;
+const TAIL_LAG_RATE = 10;
+
+// platforms scroll in from the right at SCROLL_SPEED_PX_S. Every small
+// platform sits exactly BASE_GAP_PX past whatever the actual previous
+// platform's own chain reference was, regardless of height change — every
+// step is at most PLATFORM_STEP_MAX_DELTA_PX, well within what the fixed
+// base jump (BASE_LAUNCH_VELOCITY_PX_S, no clicks) can clear. At random
+// (never twice in a row), a FORK spawns instead: two platforms ±1 base
+// jump off mainLineY, leaving mainLineY itself empty — forcing a choice of
+// jumping up or down to keep going. Long (rest-stop) platforms are flat
+// and wide, holding REST_PLATFORM_JUMP_COUNT bounces in place before the
+// next small-platform run begins, and always sit at the SAME fixed
+// mainLineY (never drifting) — their own chainFromX skips ahead by that
+// many bounce-lengths so the visible gap after one is identical to the gap
+// after any small platform. Only a click/tap ever adds MORE velocity than
+// that fixed base — there is no other "auto boost"
+export const PLATFORM_H = 2;
+// +25% over the original 40 — small platforms are a bit more forgiving to land on
+export const PLATFORM_WIDTH = 50;
+export const PLATFORM_COLOR = COLOR.white;
+
+// the height (apex above a level platform) a same-height jump reaches with
+// no extra tap/hold input — every gap is sized against this one number, so
+// tightening/loosening the base jump only ever means changing it here
+const BASE_JUMP_HEIGHT_PX = 40;
+const BASE_LAUNCH_VELOCITY_PX_S = Math.sqrt(
+  2 * GRAVITY_PX_S2 * BASE_JUMP_HEIGHT_PX,
+);
+// round-trip time for a same-height jump: up to the apex, then back down
+const BASE_FLIGHT_DURATION_S = (2 * BASE_LAUNCH_VELOCITY_PX_S) / GRAVITY_PX_S2;
+export const BASE_GAP_PX = SCROLL_SPEED_PX_S * BASE_FLIGHT_DURATION_S;
+
+// how far (either direction) a SMALL platform's height may step from the
+// previous platform's own height — exactly one base jump's apex height, the
+// most the fixed base jump can climb in one go
+export const PLATFORM_STEP_MAX_DELTA_PX = BASE_JUMP_HEIGHT_PX;
+
+// a long (rest-stop) platform is flat and holds exactly this many
+// un-boosted same-height bounces before the normal small-platform flow
+// resumes — since headX never moves, a continuously-held bounce chain on
+// one flat platform advances by exactly BASE_GAP_PX of scroll per bounce,
+// so this many bounces fit within REST_PLATFORM_WIDTH_PX below
+export const REST_PLATFORM_JUMP_COUNT = 5;
+// small margin so the head doesn't start flush against the platform's own
+// left edge, and the last bounce still has a sliver of platform left to
+// land on rather than landing exactly on its last pixel
+const REST_PLATFORM_MARGIN_PX = 20;
+export const REST_PLATFORM_WIDTH_PX =
+  REST_PLATFORM_JUMP_COUNT * BASE_GAP_PX + REST_PLATFORM_MARGIN_PX * 2;
+// how far past the right edge of the screen the platform queue is kept
+// topped up to, so the next platform is always already placed instead of
+// popping in right as it's needed
+const SPAWN_LOOKAHEAD_BUFFER_PX = 200;
+
+// this session's own accrued Secured Assets % — flat rate per second
+// survived, plus a flat bump per neutral (white) platform landed on
+const AMBIENT_INFLUENCE_PERCENT_PER_SECOND = 0.05;
+const LANDING_INFLUENCE_PERCENT = 0.08;
+// green (upgrade) and red (x125) platforms override that flat bump with
+// their own, much bigger, reward/penalty
+const GREEN_LINE_INFLUENCE_PERCENT = 1;
+const RED_LINE_INFLUENCE_PERCENT = -0.5;
+// spawnCoinBurstAt's own default scale (1) is sized for a full
+// building-width canvas; this screen is much smaller, so its own upgrade
+// bursts get shrunk down too — same convention pressConferenceGame uses
+const COIN_BURST_SCALE = 0.35;
+// same "fuel" idea as hud/pressConferenceGame's own budget: a wealth-
+// proportional slice of the total income snapshotted at open (see
+// totalIncomeAtOpen) burns away every second, tracked locally only until
+// onGameOver spends it for real in one shot — running dry ends the round
+const BASE_BURN_PERCENT_PER_SECOND = 0.05;
+// same 40px gap press conference's own budget label sits above its score
+const BUDGET_ABOVE_SCORE_OFFSET = 40;
+// mirrors shared/conferenceMinigame's own private SCORE_LABELS_EXTRA_LIFT_PX
+// so this game's own onLayout below reproduces the identical score-bottom
+// position that constant already shifted the shared score label by
+const SCORE_LABELS_EXTRA_LIFT_PX = 20;
+
+export interface Platform {
+  x: number;
+  y: number; // height at the platform's own left edge
+  // height at the platform's own right edge — equal to y unless this
+  // platform is sloped
+  endY: number;
+  width: number;
+  // where the NEXT platform's gap is measured from — always this
+  // platform's own left edge (x), same convention for every platform
+  // regardless of width, so a launch from anywhere on it always connects
+  chainFromX: number;
+  kind: "long" | "small";
+  // x125/upgrade mark from makeJumpPath — only ever set on a "small"
+  // platform (jump-segment lines), never on a main/rest-stop line
+  reward?: LineRewardKind;
+}
+
+// the platform's own surface height at a given world-x — constant for a
+// flat platform, linearly interpolated between y and endY for a ramp
+function heightAtX(platform: Platform, worldX: number): number {
+  if (platform.width <= 0 || platform.endY === platform.y) return platform.y;
+  const t = Math.min(1, Math.max(0, (worldX - platform.x) / platform.width));
+  return platform.y + (platform.endY - platform.y) * t;
+}
+
+// draws a platform's surface as a quad whose top edge follows its own
+// (x,y)-(x+width,endY) line and whose bottom edge is that same line
+// shifted straight down by PLATFORM_H — for a flat platform (endY===y)
+// this is pixel-identical to a plain fillRect, and for a sloped one it
+// joins the adjacent flat/ramp segments with no visible seam, since they
+// all share this exact same top/bottom convention at the shared edge
+export function drawPlatformSurface(
+  ctx: CanvasRenderingContext2D,
+  platform: Platform,
+): void {
+  ctx.beginPath();
+  ctx.moveTo(platform.x, platform.y);
+  ctx.lineTo(platform.x + platform.width, platform.endY);
+  ctx.lineTo(platform.x + platform.width, platform.endY + PLATFORM_H);
+  ctx.lineTo(platform.x, platform.y + PLATFORM_H);
+  ctx.closePath();
+  ctx.fill();
+}
+
+interface LiquidateAssetsState extends MinigameState {
+  platforms: Platform[];
+  platformsLanded: number;
+  // resting on whatever platform is currently under headX — stays put with
+  // no gravity, following the scroll, until either a click launches it away
+  // or the platform scrolls out from underneath (see step)
+  grounded: boolean;
+  // alternates every spawn: false means the NEXT spawn is a whole jump
+  // segment (see renderJumpLines), true means it's the following long/rest
+  // platform
+  nextIsLongPlatform: boolean;
+  // the ONE shared height every single small platform spawns on exactly —
+  // forks are the only ever deviation from it (+/-1 jump either side).
+  // Reset whenever a long/rest platform spawns, to wherever THAT lands
+  mainLineY: number;
+  // the EXACT platform object currently being rested on — a fork's two
+  // branches share the same x/width, so re-deriving "whichever platform is
+  // at headX" via a plain find() always ambiguously picks the first one in
+  // the array (the fork's top branch) even when the bottom one was what
+  // was actually landed on
+  groundedPlatform: Platform | null;
+  // false only while falling from a platform that scrolled out from under
+  // headX with NO click (pure gravity resume, launch velocity never went
+  // negative) — used to stop that passive fall from landing back on a
+  // same-height-or-higher platform it never actually jumped to reach
+  jumpedThisFlight: boolean;
+  // the height passively fallen FROM (see jumpedThisFlight) — only a
+  // platform strictly below this is a valid landing during that fall
+  passiveFallOriginY: number;
+  // cumulative $ actually burned so far this round (see
+  // BASE_BURN_PERCENT_PER_SECOND); only ever grows
+  totalExpensesThisSession: BigNumber;
+}
+
+export function createLiquidateAssetsGameMarkup(): string {
+  return `
+    <div class="press-conference-game liquidate-assets-game" id="liquidate-assets-game" hidden>
+      <div class="press-conference-game__header">
+        <h2>Secure stock price</h2>
+      </div>
+      <div class="press-conference-game__score" id="liquidate-assets-game-score">
+        <div id="liquidate-assets-game-timer">0.0s</div>
+      </div>
+      <div class="press-conference-game__budget" id="liquidate-assets-game-budget">
+        <span class="press-conference-game__budget-label">Remaining budget</span>
+        <span id="liquidate-assets-game-budget-value">$0</span>
+      </div>
+      <div class="press-conference-game__influence" id="liquidate-assets-game-influence">
+        <span class="press-conference-game__influence-label">Secured assets</span>
+        <span id="liquidate-assets-game-influence-value">+0.00% ▲</span>
+      </div>
+      <canvas class="press-conference-game__canvas" id="liquidate-assets-game-canvas"></canvas>
+    </div>
+  `;
+}
+
+export type LiquidateAssetsGame = ConferenceMinigame;
+
+export function wireLiquidateAssetsGame(
+  container: HTMLElement,
+  onClose?: () => void,
+): LiquidateAssetsGame {
+  const budgetValueEl = container.querySelector<HTMLSpanElement>(
+    "#liquidate-assets-game-budget-value",
+  )!;
+  const budgetEl = container.querySelector<HTMLDivElement>(
+    "#liquidate-assets-game-budget",
+  )!;
+  // snapshotted once at open() — the round's own fuel/budget is fixed for
+  // the whole round instead of tracking whatever companies are earning
+  // live, since nothing is actually spent from them until onGameOver
+  let totalIncomeAtOpen: BigNumber = ZERO;
+
+  function freshState(): LiquidateAssetsState {
+    return {
+      headY: 0,
+      velocityY: 0,
+      tailY: 0,
+      trail: [],
+      worldX: 0,
+      survivedMs: 0,
+      started: false,
+      running: true,
+      gameOver: false,
+      holding: false,
+      marketInfluencePercent: 0,
+      platforms: [],
+      platformsLanded: 0,
+      grounded: true,
+      nextIsLongPlatform: false,
+      mainLineY: 0,
+      groundedPlatform: null,
+      jumpedThisFlight: false,
+      passiveFallOriginY: 0,
+      totalExpensesThisSession: ZERO,
+    };
+  }
+
+  // the line's own starting height, used only to seed the very first
+  // (starter) platform — every platform after that just steps off whatever
+  // came before it, computed fresh from the current floor position so it
+  // stays correct across resizes. The extra 200 lifts the whole game
+  // (platforms + line) further above the floor
+  function getPlatformY(floorTopY: number): number {
+    return floorTopY - PLATFORM_H - 24 - 200;
+  }
+
+  // a long (rest-stop) platform — always at the SAME state.mainLineY every
+  // time (never randomized/drifting), so a cycle's ending main line always
+  // returns to wherever the segment's own starting main line was. Flat and
+  // wide enough to hold REST_PLATFORM_JUMP_COUNT bounces in place. Uses the
+  // same flat BASE_GAP_PX as every other column (not a height-solved gap)
+  // — the jump segment's drift is clamped to the same
+  // PLATFORM_STEP_MAX_DELTA_PX range any small-platform step already
+  // clears, so there's nothing special about this particular hop. Its own
+  // chainFromX skips ahead by that many BASE_GAP_PX (not its literal left
+  // edge) so the visible gap after it matches every other gap exactly
+  // instead of being eaten by its extra width
+  function spawnLongPlatform(
+    state: LiquidateAssetsState,
+    previous: Platform,
+  ): void {
+    const y = state.mainLineY;
+    const x = previous.chainFromX + BASE_GAP_PX;
+    state.platforms.push({
+      x,
+      y,
+      endY: y,
+      width: REST_PLATFORM_WIDTH_PX,
+      chainFromX: x + REST_PLATFORM_JUMP_COUNT * BASE_GAP_PX,
+      kind: "long",
+    });
+  }
+
+  // alternates a whole jump segment (renderJumpLines, anchored on
+  // state.mainLineY) with a long rest stop, over and over — see
+  // nextIsLongPlatform on the state. ctx is null outside a render pass
+  // (e.g. the initial queue fill in onOpen), which just skips drawing —
+  // the returned platforms still get added to the collision queue either way
+  function spawnNextPlatform(
+    state: LiquidateAssetsState,
+    previous: Platform,
+    ctx: CanvasRenderingContext2D | null,
+  ): void {
+    if (state.nextIsLongPlatform) {
+      spawnLongPlatform(state, previous);
+    } else {
+      state.platforms.push(
+        ...renderJumpLines(
+          ctx,
+          previous.chainFromX,
+          state.mainLineY,
+          state.survivedMs,
+        ),
+      );
+    }
+    state.nextIsLongPlatform = !state.nextIsLongPlatform;
+  }
+
+  // keeps spawning off the last queued platform until the queue extends past
+  // the right edge of the screen (plus a buffer), so the next platform is
+  // always already placed instead of appearing right as it's needed
+  function fillPlatformQueue(
+    state: LiquidateAssetsState,
+    cssW: number,
+    ctx: CanvasRenderingContext2D | null,
+  ): void {
+    let last = state.platforms.at(-1);
+    if (!last) return;
+    let guard = 0;
+    while (
+      last.x + last.width < cssW + SPAWN_LOOKAHEAD_BUFFER_PX &&
+      guard++ < 20
+    ) {
+      spawnNextPlatform(state, last, ctx);
+      last = state.platforms.at(-1)!;
+    }
+  }
+
+  return wireConferenceMinigame<LiquidateAssetsState>(container, {
+    elements: {
+      screenId: "liquidate-assets-game",
+      canvasId: "liquidate-assets-game-canvas",
+      timerId: "liquidate-assets-game-timer",
+      scoreId: "liquidate-assets-game-score",
+      influenceValueId: "liquidate-assets-game-influence-value",
+    },
+    createState: freshState,
+
+    onOpen: (state, cssW, _cssH, getFloorTopY) => {
+      totalIncomeAtOpen = getAllCompaniesTotalIncome();
+      // the line starts resting right on top of a wide starter platform
+      // (not falling onto it) — sized to hold REST_PLATFORM_JUMP_COUNT
+      // un-boosted bounces before the normal small-platform flow takes
+      // over, same chainFromX-skips-ahead convention as spawnLongPlatform
+      const headX = cssW / 2 - HEAD_X_OFFSET_FROM_CENTER;
+      const platformY = getPlatformY(getFloorTopY());
+      const starterX = headX - REST_PLATFORM_MARGIN_PX;
+      const starter: Platform = {
+        x: starterX,
+        y: platformY,
+        endY: platformY,
+        width: REST_PLATFORM_WIDTH_PX,
+        chainFromX: starterX + REST_PLATFORM_JUMP_COUNT * BASE_GAP_PX,
+        kind: "long",
+      };
+      state.platforms = [starter];
+      state.headY = platformY - HITBOX_RADIUS;
+      state.tailY = state.headY;
+      state.trail = state.trail.map(() => state.headY);
+      state.grounded = true;
+      state.groundedPlatform = starter;
+      state.mainLineY = platformY;
+      fillPlatformQueue(state, cssW, null);
+    },
+
+    step: (state, dtMs, cssW, _cssH, getFloorTopY, ctx) => {
+      const dt = dtMs / 1000;
+      const headYBefore = state.headY;
+      const headX = cssW / 2 - HEAD_X_OFFSET_FROM_CENTER;
+
+      // holding launches away from rest; gravity always applies normally
+      // once airborne (see the real-platform-landing check below for how
+      // holding then repeats the jump, rather than resting)
+      if (state.grounded) {
+        if (state.holding) {
+          state.grounded = false;
+          state.velocityY = -BASE_LAUNCH_VELOCITY_PX_S;
+          state.jumpedThisFlight = true;
+        } else {
+          // just sits at whatever platform it actually landed on, at ITS
+          // current height there (heightAtX, not a constant platform.y) —
+          // a sloped platform changes height as it scrolls by, which is
+          // exactly how the line climbs/drops without a jump. Uses the
+          // specific groundedPlatform, not a fresh lookup by x — a fork's
+          // two branches share the same x/width, so a plain lookup would
+          // always ambiguously resolve to whichever branch is first in the
+          // array regardless of which one was actually landed on
+          state.velocityY = 0;
+          if (state.groundedPlatform) {
+            state.headY =
+              heightAtX(state.groundedPlatform, headX) - HITBOX_RADIUS;
+          }
+        }
+      }
+      if (!state.grounded) {
+        // exact kinematic update (y += v*dt + 0.5*a*dt^2, v += a*dt), not
+        // Euler's "move by the already-updated velocity" shortcut — Euler
+        // systematically overshoots downward by 0.5*a*dt^2 every single
+        // frame, which drifts the real trajectory away from the exact
+        // parabola the platform gap was derived from, eventually missing
+        // after enough accumulated frames in one flight
+        state.headY += state.velocityY * dt + 0.5 * GRAVITY_PX_S2 * dt * dt;
+        state.velocityY += GRAVITY_PX_S2 * dt;
+      }
+      state.survivedMs += dtMs;
+
+      // while grounded (flat or sloped), the trail must hug the platform
+      // surface EXACTLY — the usual lag/smoothing below is tuned for a
+      // parabolic jump arc, and applying it while walking a ramp draws the
+      // recorded trail along a visibly different path than the platform
+      // itself (looks like a forked "branch" instead of one line)
+      if (state.grounded) {
+        state.tailY = state.headY;
+      } else {
+        state.tailY +=
+          (state.headY - state.tailY) * (1 - Math.exp(-TAIL_LAG_RATE * dt));
+      }
+      advanceTrail(
+        state,
+        SCROLL_SPEED_PX_S * dt,
+        state.tailY,
+        TRAIL_SAMPLE_DX,
+        computeMaxTrailLength(cssW),
+      );
+
+      const scrollDx = SCROLL_SPEED_PX_S * dt;
+      // chainFromX must scroll in lockstep with x — otherwise it goes stale
+      // between this platform's own creation and whenever the NEXT one
+      // spawns off it, inflating the live gap beyond BASE_GAP_PX by however
+      // much scrolled in between
+      for (const platform of state.platforms) {
+        platform.x -= scrollDx;
+        platform.chainFromX -= scrollDx;
+      }
+      state.platforms = state.platforms.filter(
+        (platform) => platform.x + platform.width > 0,
+      );
+
+      fillPlatformQueue(state, cssW, ctx);
+
+      // still resting only if the SAME platform it landed on still spans
+      // headX — otherwise it just scrolled out from underneath, so gravity
+      // resumes
+      const groundedSpanContainsHeadX =
+        state.groundedPlatform !== null &&
+        headX + HITBOX_RADIUS > state.groundedPlatform.x &&
+        headX - HITBOX_RADIUS <
+          state.groundedPlatform.x + state.groundedPlatform.width;
+      if (state.grounded && !groundedSpanContainsHeadX) {
+        // a passive scroll-off, never an active launch — starts this
+        // flight's headY already sitting exactly at the crossing check's
+        // own tolerance band for its OWN platform's height, so without
+        // recording where it fell from and excluding that height below,
+        // the very next same-height (or higher) platform reads as
+        // "crossed" the instant it scrolls into range, even though gravity
+        // alone can never actually climb back up to it
+        state.jumpedThisFlight = false;
+        state.passiveFallOriginY = state.groundedPlatform
+          ? heightAtX(state.groundedPlatform, headX)
+          : state.headY + HITBOX_RADIUS;
+        state.grounded = false;
+        state.groundedPlatform = null;
+      }
+
+      // landing: only while actually falling (never mid-rise, never already
+      // resting), the platform's own surface was crossed SOMEWHERE between
+      // last frame's headY and this frame's (not just "currently
+      // overlapping" it) so a big single-frame step can never tunnel clean
+      // through a thin platform, and headX falls within its horizontal span.
+      // A fork's two platforms share the same x, so a single frame's sweep
+      // can cross BOTH — picking the first array match (always the fork's
+      // TOP one, pushed first) meant dropping to the bottom line always
+      // resolved to the top one instead; picking whichever crossed
+      // platform's own height is closest to where the head actually ends
+      // up this frame lands on the one the fall really reached
+      if (!state.grounded && state.velocityY >= 0) {
+        let landedOn: Platform | undefined;
+        let landedOnTop = 0;
+        for (const platform of state.platforms) {
+          const withinX =
+            headX + HITBOX_RADIUS > platform.x &&
+            headX - HITBOX_RADIUS < platform.x + platform.width;
+          const platformTop = heightAtX(platform, headX);
+          const crossedTop =
+            headYBefore - HITBOX_RADIUS <= platformTop &&
+            state.headY + HITBOX_RADIUS >= platformTop;
+          // a passive (never-jumped) fall starts already sitting at this
+          // exact crossing tolerance for its OWN platform's height — only a
+          // platform strictly below where it fell from is a REAL drop;
+          // anything at or above that would need an actual jump to reach
+          const reachableWithoutJumping =
+            state.jumpedThisFlight || platformTop > state.passiveFallOriginY;
+          if (
+            withinX &&
+            crossedTop &&
+            reachableWithoutJumping &&
+            (!landedOn ||
+              Math.abs(platformTop - state.headY) <
+                Math.abs(landedOnTop - state.headY))
+          ) {
+            landedOn = platform;
+            landedOnTop = platformTop;
+          }
+        }
+        if (landedOn) {
+          state.headY = landedOnTop - HITBOX_RADIUS;
+          state.groundedPlatform = landedOn;
+          if (state.holding) {
+            // still held right as it lands — bounce again immediately
+            // instead of resting, repeating the jump on THIS real
+            // platform only (holding over a gap with nothing to land on
+            // never bounces; gravity just keeps pulling it down)
+            state.velocityY = -BASE_LAUNCH_VELOCITY_PX_S;
+            state.jumpedThisFlight = true;
+          } else {
+            // just rests here — no automatic bounce; only a click (see
+            // step's holding check above) ever moves it again
+            state.velocityY = 0;
+            state.grounded = true;
+          }
+          state.platformsLanded += 1;
+          // white just gets the flat per-landing bump — only upgrade (coin
+          // burst + the purchase sfx, since it's the one landing that
+          // actually reads as a reward) and x125 (explosion + shake) call
+          // out that specific reward, each with its own influence swing
+          // instead of the flat bump. Playing the purchase sfx on EVERY
+          // landing (not just this one) fired it on nearly every click while
+          // holding/bouncing continuously
+          if (landedOn.reward === "upgrade") {
+            state.marketInfluencePercent += GREEN_LINE_INFLUENCE_PERCENT;
+            playSold();
+            spawnCoinBurstAt(
+              landedOn.x + landedOn.width / 2,
+              landedOnTop,
+              COIN_BURST_SCALE,
+            );
+          } else if (landedOn.reward === "x125") {
+            state.marketInfluencePercent += RED_LINE_INFLUENCE_PERCENT;
+            triggerScreenShake();
+            playExplosion();
+          } else {
+            state.marketInfluencePercent += LANDING_INFLUENCE_PERCENT;
+          }
+        }
+      }
+
+      state.marketInfluencePercent += AMBIENT_INFLUENCE_PERCENT_PER_SECOND * dt;
+
+      // the snapshotted total (see totalIncomeAtOpen) is this game's own
+      // fuel: burn a wealth-proportional slice of it every second, tracked
+      // locally only — running dry ends the round the same way falling
+      // through a gap does (see below)
+      if (state.running) {
+        const remaining = subtract(
+          totalIncomeAtOpen,
+          state.totalExpensesThisSession,
+        );
+        // anything under $1 counts as bankrupt
+        if (lt(remaining, fromNumber(1))) {
+          state.running = false;
+          state.gameOver = true;
+        } else {
+          const cost = multiply(remaining, BASE_BURN_PERCENT_PER_SECOND * dt);
+          state.totalExpensesThisSession = add(
+            state.totalExpensesThisSession,
+            cost,
+          );
+        }
+      }
+
+      // fell clean through a gap (past every platform, nothing left to catch
+      // it) — the floor riser's own top edge is the bound, not the raw
+      // canvas bottom, so the head never visually sinks into the audience
+      if (state.headY - HITBOX_RADIUS > getFloorTopY()) {
+        state.running = false;
+        state.gameOver = true;
+      }
+      if (state.headY <= 0) {
+        state.headY = 0;
+        state.velocityY = Math.max(0, state.velocityY);
+      }
+    },
+
+    renderGraph: (ctx, state, _headX, now) => {
+      drawMainLine(ctx, state.platforms);
+      drawShortLine(ctx, state.platforms);
+      drawActiveCoinBursts(ctx, now);
+    },
+
+    onTap: (state) => {
+      // velocity itself is entirely handled by the state.holding check in
+      // step() (it fires next frame, which is imperceptible) — this only
+      // plays the tap's sound, and skips it while actually falling in the
+      // air (not resting, not rising), when a tap has no effect at all
+      if (!state.grounded && state.velocityY >= 0) return;
+      playBubble();
+    },
+
+    onGameOver: (state) => {
+      if (gt(state.totalExpensesThisSession, ZERO)) {
+        spendFromAllCompanies(state.totalExpensesThisSession);
+      }
+      addSecuredAssetsPercent(state.marketInfluencePercent);
+    },
+
+    onClose: onClose,
+
+    // budget sits its own BUDGET_ABOVE_SCORE_OFFSET further above the shared
+    // score label, same as press conference's own
+    onLayout: (state, cssH, audienceTopY) => {
+      const scoreBottomPx =
+        cssH -
+        audienceTopY +
+        LABEL_ABOVE_AUDIENCE_OFFSET +
+        SCORE_LABELS_EXTRA_LIFT_PX;
+      budgetEl.style.bottom = `${scoreBottomPx + BUDGET_ABOVE_SCORE_OFFSET}px`;
+      budgetValueEl.textContent = formatPrice(
+        subtract(totalIncomeAtOpen, state.totalExpensesThisSession),
+      );
+    },
+  });
+}

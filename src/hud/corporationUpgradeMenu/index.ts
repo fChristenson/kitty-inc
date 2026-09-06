@@ -13,7 +13,8 @@ import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { type BigNumber, gte, lt } from "../../shared/bigNumber";
 
-const coinIconUrl = getImageUrl("coin");
+const mergeIconUrl = getImageUrl("merge");
+const skyscraperIconUrl = getImageUrl("skyscraper");
 
 // company indices currently checked in the "Merge" list below — persists across
 // re-renders triggered by other actions in this same dialog (e.g. buying a new
@@ -101,7 +102,7 @@ export function wireCorporationUpgradeMenu(
         ${selectedForMerge.size >= 2 ? "" : "disabled"}
       >
         <span class="worker-menu__item-label">
-          <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+          <img src="${mergeIconUrl}" class="worker-menu__icon" alt="" />
           Merge
         </span>
         <span class="worker-menu__price">x${selectedForMerge.size} selected</span>
@@ -125,7 +126,7 @@ export function wireCorporationUpgradeMenu(
         ${corporationAffordable ? "" : "disabled"}
       >
         <span class="worker-menu__item-label">
-          <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+          <img src="${skyscraperIconUrl}" class="worker-menu__icon worker-menu__icon--skyscraper" alt="" />
           Create new Company
         </span>
         <span class="worker-menu__price">${formatPrice(corporationPrice)}</span>

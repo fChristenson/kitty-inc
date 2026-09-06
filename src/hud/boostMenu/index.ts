@@ -27,7 +27,7 @@ import {
 } from "../../shared/bigNumber";
 
 const mouseIconUrl = getImageUrl("mouse");
-const coinIconUrl = getImageUrl("coin");
+const cashRegisterIconUrl = getImageUrl("cashRegister");
 
 const BOOST_ALL_SECONDS_COST = 5; // cost is 5s of current (unboosted) income
 
@@ -177,7 +177,7 @@ export function wireBoostMenu(
         ${saleAffordable ? "" : "disabled"}
       >
         <span class="worker-menu__item-label">
-          <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+          <img src="${cashRegisterIconUrl}" class="worker-menu__icon" alt="" />
           Trigger sales event
         </span>
         <span class="worker-menu__price">${formatPrice(cachedSaleBoostCost)}</span>

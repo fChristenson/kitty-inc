@@ -893,6 +893,20 @@ body {
   flex-shrink: 0;
 }
 
+/* Invest in the market's own graph icon (~33px) over every other menu
+   icon's shared 28px box */
+.worker-menu__icon--graph {
+  width: 33px;
+  height: 33px;
+}
+
+/* Create new Company / Renovate floors' own skyscraper icon, scaled up 20%
+   (~34px) over every other menu icon's shared 28px box */
+.worker-menu__icon--skyscraper {
+  width: 34px;
+  height: 34px;
+}
+
 .worker-menu__price {
   font-weight: 900;
   color: var(--color-white);

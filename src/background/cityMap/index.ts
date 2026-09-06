@@ -380,7 +380,14 @@ export function createCityMapView(
       if (affordable) hasWigglingMarker = true;
       drawLockedMarkerPrice(ctx, cx, feetY, price, affordable);
     }
-    drawActiveCoinBursts(ctx, Date.now());
+    // performance.now(), NOT Date.now() — drawActiveCoinBursts's own
+    // lastActiveUpdateAt gate is shared across every caller (this map, every
+    // minigame), and every OTHER caller feeds it a performance.now()-based
+    // rAF timestamp. Mixing in a Date.now() epoch timestamp here made its dt
+    // swing wildly (a huge clamped-to-max jump, then stuck at 0 for a long
+    // stretch afterward) whenever this map's own redraw interleaved with a
+    // minigame's, instead of just reading a mismatched clock scale
+    drawActiveCoinBursts(ctx, performance.now());
 
     const incomeBottom = incomeReadout.draw(ctx, cssW, deps.getTotalIncome());
     drawStreetText(

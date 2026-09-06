@@ -56,6 +56,7 @@ import {
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
   wirePressConferenceTestButton,
+  wireLiquidateAssetsTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -77,6 +78,8 @@ import {
   mergeCompanies,
   createPressConferenceGameMarkup,
   wirePressConferenceGame,
+  createLiquidateAssetsGameMarkup,
+  wireLiquidateAssetsGame,
   createMapMenuMarkup,
   wireMapMenu,
   createTotalEarnedOverlayMarkup,
@@ -131,6 +134,7 @@ async function main() {
     ${createBoostMenuMarkup()}
     ${createCorporationBoostMenuMarkup()}
     ${createPressConferenceGameMarkup()}
+    ${createLiquidateAssetsGameMarkup()}
     ${createMapMenuMarkup()}
     ${createTotalEarnedOverlayMarkup()}
   `;
@@ -362,6 +366,7 @@ async function main() {
     wireMapUnlockMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireMapUnlockUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
+    wireLiquidateAssetsTestButton(app, () => liquidateAssetsGame.open());
     // shows the idle-income "You have earned" overlay (see
     // hud/totalEarnedOverlay) on demand, without needing to actually leave and
     // reopen the tab to earn real idle income first
@@ -426,10 +431,15 @@ async function main() {
     () => persist(),
     (floor) => gameCanvas.scrollActiveToFloor(floor),
   );
-  const corporationBoostMenu = wireCorporationBoostMenu(app, () =>
-    pressConferenceGame.open(),
+  const corporationBoostMenu = wireCorporationBoostMenu(
+    app,
+    () => pressConferenceGame.open(),
+    () => liquidateAssetsGame.open(),
   );
   const pressConferenceGame = wirePressConferenceGame(app, () =>
+    corporationBoostMenu.refresh(),
+  );
+  const liquidateAssetsGame = wireLiquidateAssetsGame(app, () =>
     corporationBoostMenu.refresh(),
   );
   const totalEarnedOverlay = wireTotalEarnedOverlay(app);

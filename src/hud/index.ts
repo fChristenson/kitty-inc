@@ -46,6 +46,11 @@ export {
   wirePressConferenceGame,
 } from "./pressConferenceGame";
 export type { PressConferenceGame } from "./pressConferenceGame";
+export {
+  createLiquidateAssetsGameMarkup,
+  wireLiquidateAssetsGame,
+} from "./liquidateAssetsGame";
+export type { LiquidateAssetsGame } from "./liquidateAssetsGame";
 export { createMapMenuMarkup, wireMapMenu } from "./mapMenu";
 export type { MapMenu } from "./mapMenu";
 export {
@@ -62,6 +67,7 @@ export {
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
   wirePressConferenceTestButton,
+  wireLiquidateAssetsTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
 } from "./testButton";

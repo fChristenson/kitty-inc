@@ -17,6 +17,8 @@ import { getManagerIconUrl } from "../../floors";
 import { gte, lt, isZero, type BigNumber } from "../../shared/bigNumber";
 
 const coinIconUrl = getImageUrl("coin");
+const shieldIconUrl = getImageUrl("shield");
+const graphIconUrl = getImageUrl("graph");
 import {
   buyStockRaise,
   getStockRaiseCost,
@@ -30,6 +32,7 @@ import {
   investInMarket,
   getMarketInfluencePercent,
   getInvestmentPortfolioPercent,
+  getSecuredAssetsPercent,
   getGlobalIncomeBoostPercent,
   formatBoostPercent,
 } from "./economy";
@@ -48,6 +51,8 @@ export {
   getMarketInfluencePercent,
   addMarketInfluencePercent,
   getInvestmentPortfolioPercent,
+  getSecuredAssetsPercent,
+  addSecuredAssetsPercent,
   getCompanyAssetValue,
   getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,
@@ -81,6 +86,10 @@ export interface CorporationBoostMenu {
 export function wireCorporationBoostMenu(
   container: HTMLElement,
   onPressConferenceHeld?: () => void,
+  // opens the Liquidate Assets mini game (see hud/liquidateAssetsGame) — free
+  // to play, unlike "Hold press conference" which costs $ up front; its own
+  // reward is entirely performance-based (see that module's own influence gain)
+  onOpenLiquidateAssets?: () => void,
 ): CorporationBoostMenu {
   const menu = container.querySelector<HTMLDivElement>(
     "#corporation-boost-menu",
@@ -135,6 +144,13 @@ export function wireCorporationBoostMenu(
         <span data-investment-portfolio-value>${formatBoostPercent(investmentPortfolioPct)}</span>
       </div>
     `;
+    const securedAssetsPct = getSecuredAssetsPercent();
+    const securedAssetsRow = `
+      <div class="worker-menu__modifier-row">
+        <span>Secured assets</span>
+        <span data-secured-assets-value>${formatBoostPercent(securedAssetsPct)}</span>
+      </div>
+    `;
     const totalPct = getGlobalIncomeBoostPercent();
     const pressConferenceCost = getPressConferenceCost();
     const freePressConferenceCount = getFreePressConferenceCount();
@@ -181,6 +197,7 @@ export function wireCorporationBoostMenu(
       <span class="worker-menu__total-income">${formatTotalIncomeFull(allCompaniesTotalIncome)}</span>
       <h3 class="worker-menu__subheader">Income modifiers</h3>
       ${marketInfluenceRow}
+      ${securedAssetsRow}
       ${investmentPortfolioRow}
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
@@ -199,13 +216,20 @@ export function wireCorporationBoostMenu(
         </span>
         <span class="worker-menu__price">${pressConferencePriceLabel}</span>
       </button>
+      <button class="worker-menu__item" id="liquidate-assets-item">
+        <span class="worker-menu__item-label">
+          <img src="${shieldIconUrl}" class="worker-menu__icon" alt="" />
+          <span class="worker-menu__item-name">Secure stock price</span>
+        </span>
+        <span class="worker-menu__price">${pressConferencePriceLabel}</span>
+      </button>
       <button
         class="worker-menu__item"
         id="invest-in-market-item"
         ${investAffordable ? "" : "disabled"}
       >
         <span class="worker-menu__item-label">
-          <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+          <img src="${graphIconUrl}" class="worker-menu__icon worker-menu__icon--graph" alt="" />
           <span class="worker-menu__item-name">Invest in the market</span>
         </span>
         <span class="worker-menu__price">10%</span>
@@ -385,6 +409,15 @@ export function wireCorporationBoostMenu(
     playSold();
     render();
     onPressConferenceHeld?.();
+  });
+
+  // free to open, unlike the press-conference item above — no cost/affordability
+  // check, just launches straight into the mini game
+  list.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    const button = target.closest<HTMLButtonElement>("#liquidate-assets-item");
+    if (!button) return;
+    onOpenLiquidateAssets?.();
   });
 
   // re-checks affordability while the menu sits open, same as boostMenu.ts's own
