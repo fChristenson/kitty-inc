@@ -1,9 +1,19 @@
 import { playBubble, playSold, playExplosion } from "../../sound";
 import { COLOR } from "../../palette";
-import { advanceTrail } from "../../shared/canvasGame";
+import {
+  advanceTrail,
+  computeSmoothedTrailPoints,
+  drawTrailLine,
+  drawTrailHead,
+} from "../../shared/canvasGame";
 import {
   wireConferenceMinigame,
   TRAIL_SAMPLE_DX,
+  TRAIL_SMOOTHING_RADIUS,
+  TAIL_MAX_ANGLE_TAN,
+  LINE_WIDTH,
+  LINE_COLOR,
+  HEAD_RADIUS,
   HEAD_X_OFFSET_FROM_CENTER,
   computeMaxTrailLength,
   type MinigameState,
@@ -147,6 +157,11 @@ export function drawPlatformSurface(
 }
 
 interface LiquidateAssetsState extends MinigameState {
+  // no longer part of the shared MinigameState — this game draws its own
+  // profit line (see renderGraph/onOpen below), so it owns these itself
+  velocityY: number;
+  tailY: number;
+  trail: number[];
   platforms: Platform[];
   platformsLanded: number;
   // resting on whatever platform is currently under headX — stays put with
@@ -335,7 +350,7 @@ export function wireLiquidateAssetsGame(
       state.platforms = [starter];
       state.headY = platformY - HITBOX_RADIUS;
       state.tailY = state.headY;
-      state.trail = state.trail.map(() => state.headY);
+      state.trail = new Array(computeMaxTrailLength(cssW)).fill(state.headY);
       state.grounded = true;
       state.groundedPlatform = starter;
       state.mainLineY = platformY;
@@ -538,10 +553,20 @@ export function wireLiquidateAssetsGame(
       }
     },
 
-    renderGraph: (ctx, state, _headX, now) => {
+    renderGraph: (ctx, state, headX, now) => {
       drawMainLine(ctx, state.platforms);
       drawShortLine(ctx, state.platforms);
       drawActiveCoinBursts(ctx, now);
+      const points = computeSmoothedTrailPoints(
+        state,
+        TRAIL_SAMPLE_DX,
+        TRAIL_SMOOTHING_RADIUS,
+        TAIL_MAX_ANGLE_TAN,
+        headX,
+        state.headY,
+      );
+      drawTrailLine(ctx, points, LINE_WIDTH, LINE_COLOR);
+      drawTrailHead(ctx, headX, state.headY, HEAD_RADIUS, LINE_COLOR);
     },
 
     onTap: (state) => {

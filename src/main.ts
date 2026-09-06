@@ -57,6 +57,8 @@ import {
   wireMapUnlockUltraCritButton,
   wirePressConferenceTestButton,
   wireLiquidateAssetsTestButton,
+  wirePayTaxesTestButton,
+  wireTaxHavenTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -80,6 +82,10 @@ import {
   wirePressConferenceGame,
   createLiquidateAssetsGameMarkup,
   wireLiquidateAssetsGame,
+  createPayTaxesGameMarkup,
+  wirePayTaxesGame,
+  createTaxHavenGameMarkup,
+  wireTaxHavenGame,
   createMapMenuMarkup,
   wireMapMenu,
   createTotalEarnedOverlayMarkup,
@@ -135,6 +141,8 @@ async function main() {
     ${createCorporationBoostMenuMarkup()}
     ${createPressConferenceGameMarkup()}
     ${createLiquidateAssetsGameMarkup()}
+    ${createPayTaxesGameMarkup()}
+    ${createTaxHavenGameMarkup()}
     ${createMapMenuMarkup()}
     ${createTotalEarnedOverlayMarkup()}
   `;
@@ -367,6 +375,8 @@ async function main() {
     wireMapUnlockUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     wireLiquidateAssetsTestButton(app, () => liquidateAssetsGame.open());
+    wirePayTaxesTestButton(app, () => payTaxesGame.open());
+    wireTaxHavenTestButton(app, () => taxHavenGame.open());
     // shows the idle-income "You have earned" overlay (see
     // hud/totalEarnedOverlay) on demand, without needing to actually leave and
     // reopen the tab to earn real idle income first
@@ -435,11 +445,19 @@ async function main() {
     app,
     () => pressConferenceGame.open(),
     () => liquidateAssetsGame.open(),
+    () => payTaxesGame.open(),
+    () => taxHavenGame.open(),
   );
   const pressConferenceGame = wirePressConferenceGame(app, () =>
     corporationBoostMenu.refresh(),
   );
   const liquidateAssetsGame = wireLiquidateAssetsGame(app, () =>
+    corporationBoostMenu.refresh(),
+  );
+  const payTaxesGame = wirePayTaxesGame(app, () =>
+    corporationBoostMenu.refresh(),
+  );
+  const taxHavenGame = wireTaxHavenGame(app, () =>
     corporationBoostMenu.refresh(),
   );
   const totalEarnedOverlay = wireTotalEarnedOverlay(app);

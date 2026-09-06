@@ -17,6 +17,8 @@ export function createTestButtonMarkup(): string {
       <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
       <button id="test-press-conference" class="game__button">Press Conf Game</button>
       <button id="test-liquidate-assets" class="game__button">Liquidate Assets Game</button>
+      <button id="test-pay-taxes" class="game__button">Pay Taxes Game</button>
+      <button id="test-tax-haven" class="game__button">Tax Haven Game</button>
       <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
     </div>
@@ -143,6 +145,22 @@ export function wireLiquidateAssetsTestButton(
   const button = container.querySelector<HTMLButtonElement>(
     "#test-liquidate-assets",
   )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wirePayTaxesTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>("#test-pay-taxes")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireTaxHavenTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>("#test-tax-haven")!;
   button.addEventListener("click", onClick);
 }
 

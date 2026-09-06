@@ -2,14 +2,22 @@ import { playBubble, playSold } from "../../sound";
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
-import { advanceTrail } from "../../shared/canvasGame";
+import {
+  advanceTrail,
+  computeSmoothedTrailPoints,
+  drawTrailLine,
+  drawTrailHead,
+} from "../../shared/canvasGame";
 import { spawnCoinBurstAt, drawActiveCoinBursts } from "../../coinBurst";
 import { addMarketInfluencePercent } from "../corporationBoostMenu";
 import { generateMarketEventText, MARKET_CRASH_TEXT } from "./marketEventText";
 import {
   wireConferenceMinigame,
   TRAIL_SAMPLE_DX,
+  TRAIL_SMOOTHING_RADIUS,
   LINE_WIDTH,
+  LINE_COLOR,
+  HEAD_RADIUS,
   HEAD_X_OFFSET_FROM_CENTER,
   computeMaxTrailLength,
   END_BTN_H,
@@ -116,6 +124,11 @@ interface MarketEvent {
 }
 
 interface PressConferenceState extends MinigameState {
+  // no longer part of the shared MinigameState — this game draws its own
+  // profit line (see renderGraph/onOpen below), so it owns these itself
+  velocityY: number;
+  tailY: number;
+  trail: number[];
   flapRampRemainingMs: number; // > 0 while easing toward FLAP_VELOCITY_PX_S (see FLAP_RAMP_DURATION_MS); always counts down to exactly 0
   flapRampFromVelocity: number; // velocityY at the moment the current ramp began, lerped from here toward FLAP_VELOCITY_PX_S
   marketEvents: MarketEvent[];
@@ -290,6 +303,14 @@ export function wirePressConferenceGame(
     },
     createState: freshState,
 
+    // the engine already set a default state.headY before calling this —
+    // tailY/trail are this game's own to seed now (see this file's own
+    // renderGraph)
+    onOpen: (state, cssW) => {
+      state.tailY = state.headY;
+      state.trail = new Array(computeMaxTrailLength(cssW)).fill(state.headY);
+    },
+
     step: (state, dtMs, cssW, cssH, getFloorTopY, ctx) => {
       const dt = dtMs / 1000;
       if (state.flapRampRemainingMs > 0) {
@@ -376,9 +397,19 @@ export function wirePressConferenceGame(
       }
     },
 
-    renderGraph: (ctx, state, _headX, now) => {
+    renderGraph: (ctx, state, headX, now) => {
       drawMarketEvents(ctx, state, now);
       drawActiveCoinBursts(ctx, now);
+      const points = computeSmoothedTrailPoints(
+        state,
+        TRAIL_SAMPLE_DX,
+        TRAIL_SMOOTHING_RADIUS,
+        TAIL_MAX_ANGLE_TAN,
+        headX,
+        state.headY,
+      );
+      drawTrailLine(ctx, points, LINE_WIDTH, LINE_COLOR);
+      drawTrailHead(ctx, headX, state.headY, HEAD_RADIUS, LINE_COLOR);
     },
 
     onTap: (state) => {

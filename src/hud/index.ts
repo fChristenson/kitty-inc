@@ -51,6 +51,10 @@ export {
   wireLiquidateAssetsGame,
 } from "./liquidateAssetsGame";
 export type { LiquidateAssetsGame } from "./liquidateAssetsGame";
+export { createPayTaxesGameMarkup, wirePayTaxesGame } from "./payTaxes";
+export type { PayTaxesGame } from "./payTaxes";
+export { createTaxHavenGameMarkup, wireTaxHavenGame } from "./taxHavenGame";
+export type { TaxHavenGame } from "./taxHavenGame";
 export { createMapMenuMarkup, wireMapMenu } from "./mapMenu";
 export type { MapMenu } from "./mapMenu";
 export {
@@ -68,6 +72,8 @@ export {
   wireMapUnlockUltraCritButton,
   wirePressConferenceTestButton,
   wireLiquidateAssetsTestButton,
+  wirePayTaxesTestButton,
+  wireTaxHavenTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
 } from "./testButton";

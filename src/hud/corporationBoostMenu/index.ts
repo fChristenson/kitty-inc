@@ -36,6 +36,8 @@ import {
   getMarketInfluencePercent,
   getInvestmentPortfolioPercent,
   getSecuredAssetsPercent,
+  getTaxRebatePercent,
+  getAssetsMovedPercent,
   getGlobalIncomeBoostPercent,
   formatBoostPercent,
 } from "./economy";
@@ -56,6 +58,10 @@ export {
   getInvestmentPortfolioPercent,
   getSecuredAssetsPercent,
   addSecuredAssetsPercent,
+  getTaxRebatePercent,
+  addTaxRebatePercent,
+  getAssetsMovedPercent,
+  addAssetsMovedPercent,
   getCompanyAssetValue,
   getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,
@@ -93,6 +99,12 @@ export function wireCorporationBoostMenu(
   // to play, unlike "Hold press conference" which costs $ up front; its own
   // reward is entirely performance-based (see that module's own influence gain)
   onOpenLiquidateAssets?: () => void,
+  // opens the Declare Taxes mini game (see hud/payTaxes) — same up-front entry
+  // cost/gating as the other two minigame buttons above
+  onOpenPayTaxes?: () => void,
+  // opens the Tax Haven mini game (see hud/taxHavenGame) — same up-front
+  // entry cost/gating as every other minigame button above
+  onOpenTaxHaven?: () => void,
 ): CorporationBoostMenu {
   const menu = container.querySelector<HTMLDivElement>(
     "#corporation-boost-menu",
@@ -154,6 +166,20 @@ export function wireCorporationBoostMenu(
         <span data-secured-assets-value>${formatBoostPercent(securedAssetsPct)}</span>
       </div>
     `;
+    const taxRebatePct = getTaxRebatePercent();
+    const taxRebateRow = `
+      <div class="worker-menu__modifier-row">
+        <span>Tax rebate</span>
+        <span data-tax-rebate-value>${formatBoostPercent(taxRebatePct)}</span>
+      </div>
+    `;
+    const assetsMovedPct = getAssetsMovedPercent();
+    const assetsMovedRow = `
+      <div class="worker-menu__modifier-row">
+        <span>Assets in haven</span>
+        <span data-assets-moved-value>${formatBoostPercent(assetsMovedPct)}</span>
+      </div>
+    `;
     const totalPct = getGlobalIncomeBoostPercent();
     const minigameEntryCost = getMinigameEntryCost();
     const freePressConferenceCount = getFreePressConferenceCount();
@@ -201,6 +227,8 @@ export function wireCorporationBoostMenu(
       <h3 class="worker-menu__subheader">Income modifiers</h3>
       ${marketInfluenceRow}
       ${securedAssetsRow}
+      ${taxRebateRow}
+      ${assetsMovedRow}
       ${investmentPortfolioRow}
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
@@ -227,6 +255,28 @@ export function wireCorporationBoostMenu(
         <span class="worker-menu__item-label">
           <img src="${shieldIconUrl}" class="worker-menu__icon" alt="" />
           <span class="worker-menu__item-name">Secure stock price</span>
+        </span>
+        <span class="worker-menu__price">${minigameEntryPriceLabel}</span>
+      </button>
+      <button
+        class="worker-menu__item"
+        id="declare-taxes-item"
+        ${minigameEntryAffordable ? "" : "disabled"}
+      >
+        <span class="worker-menu__item-label">
+          <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+          <span class="worker-menu__item-name">Declare taxes</span>
+        </span>
+        <span class="worker-menu__price">${minigameEntryPriceLabel}</span>
+      </button>
+      <button
+        class="worker-menu__item"
+        id="tax-haven-item"
+        ${minigameEntryAffordable ? "" : "disabled"}
+      >
+        <span class="worker-menu__item-label">
+          <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
+          <span class="worker-menu__item-name">Use tax haven</span>
         </span>
         <span class="worker-menu__price">${minigameEntryPriceLabel}</span>
       </button>
@@ -432,6 +482,26 @@ export function wireCorporationBoostMenu(
     onOpenLiquidateAssets?.();
   });
 
+  // same shared entry cost/spend pattern as liquidate-assets-item above
+  list.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    const button = target.closest<HTMLButtonElement>("#declare-taxes-item");
+    if (!button || button.disabled) return;
+    if (!spendFromAllCompanies(getMinigameEntryCost())) return;
+    playSold();
+    onOpenPayTaxes?.();
+  });
+
+  // same shared entry cost/spend pattern as declare-taxes-item above
+  list.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    const button = target.closest<HTMLButtonElement>("#tax-haven-item");
+    if (!button || button.disabled) return;
+    if (!spendFromAllCompanies(getMinigameEntryCost())) return;
+    playSold();
+    onOpenTaxHaven?.();
+  });
+
   // re-checks affordability while the menu sits open, same as boostMenu.ts's own
   // updateAffordability, so a grayed-out item turns clickable again as soon as
   // income catches up instead of only refreshing on the next open/purchase
@@ -463,6 +533,21 @@ export function wireCorporationBoostMenu(
     );
     if (liquidateAssetsButton) {
       liquidateAssetsButton.disabled =
+        getFreePressConferenceCount() === 0 &&
+        lt(allCompaniesTotalIncome, getMinigameEntryCost());
+    }
+    const declareTaxesButton = list.querySelector<HTMLButtonElement>(
+      "#declare-taxes-item",
+    );
+    if (declareTaxesButton) {
+      declareTaxesButton.disabled =
+        getFreePressConferenceCount() === 0 &&
+        lt(allCompaniesTotalIncome, getMinigameEntryCost());
+    }
+    const taxHavenButton =
+      list.querySelector<HTMLButtonElement>("#tax-haven-item");
+    if (taxHavenButton) {
+      taxHavenButton.disabled =
         getFreePressConferenceCount() === 0 &&
         lt(allCompaniesTotalIncome, getMinigameEntryCost());
     }

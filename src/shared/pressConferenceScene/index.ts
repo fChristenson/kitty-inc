@@ -32,7 +32,7 @@ export interface PressConferenceScene {
   getPodiumRect: () => { x: number; y: number; w: number; h: number } | null;
   drawAudience: () => void;
   drawFloor: () => void;
-  drawGrid: (headX: number, worldX: number) => void;
+  drawGrid: (worldX: number) => void;
   drawPodium: (now: number) => void;
 }
 
@@ -86,19 +86,23 @@ export function createPressConferenceScene(
     ctx.drawImage(audienceSprite, 0, getAudienceTopY(), cssW, renderH);
   }
 
-  function drawGrid(headX: number, worldX: number): void {
+  // anchored at a fixed screen point (not the line head's own x) so the grid
+  // only ever scrolls from worldX (time) — a game whose head is draggable
+  // (hud/payTaxes) would otherwise drag the whole grid pattern around with it
+  function drawGrid(worldX: number): void {
     const { cssW } = getSize();
     const gridBottom = getFloorTopY();
     ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
     ctx.lineWidth = 1;
     const scrollOffset = worldX % GRID_CELL_PX;
+    const anchorX = cssW / 2;
     ctx.beginPath();
-    for (let x = headX - scrollOffset; x < cssW; x += GRID_CELL_PX) {
+    for (let x = anchorX - scrollOffset; x < cssW; x += GRID_CELL_PX) {
       ctx.moveTo(x, 0);
       ctx.lineTo(x, gridBottom);
     }
     for (
-      let x = headX - scrollOffset - GRID_CELL_PX;
+      let x = anchorX - scrollOffset - GRID_CELL_PX;
       x > 0;
       x -= GRID_CELL_PX
     ) {

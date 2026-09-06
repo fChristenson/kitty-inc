@@ -8,9 +8,6 @@ import {
   createRafLoop,
   formatElapsedSeconds,
   computePressBounceScale,
-  computeSmoothedTrailPoints,
-  drawTrailLine,
-  drawTrailHead,
 } from "../canvasGame";
 import {
   createPressConferenceScene,
@@ -28,13 +25,15 @@ import {
 // conference, scrolling platforms for liquidate assets), and its own
 // tap/reward/open logic
 export const TRAIL_SAMPLE_DX = 6;
-const TRAIL_SMOOTHING_RADIUS = 3;
+export const TRAIL_SMOOTHING_RADIUS = 3;
 const TAIL_MAX_ANGLE_DEG = 60;
-const TAIL_MAX_ANGLE_TAN = Math.tan((TAIL_MAX_ANGLE_DEG * Math.PI) / 180);
+export const TAIL_MAX_ANGLE_TAN = Math.tan(
+  (TAIL_MAX_ANGLE_DEG * Math.PI) / 180,
+);
 export const LINE_WIDTH = 4;
-const LINE_COLOR = "#22c55e";
+export const LINE_COLOR = "#22c55e";
 // same head dot for every game built on this engine — never a per-game option
-const HEAD_RADIUS = LINE_WIDTH / 2;
+export const HEAD_RADIUS = LINE_WIDTH / 2;
 export const HEAD_X_OFFSET_FROM_CENTER = 40;
 const HEAD_START_Y_LIFT_PX = 100;
 
@@ -57,9 +56,6 @@ const SCORE_LABELS_EXTRA_LIFT_PX = 20;
 
 export interface MinigameState {
   headY: number;
-  velocityY: number;
-  tailY: number;
-  trail: number[];
   worldX: number;
   survivedMs: number;
   started: boolean;
@@ -67,6 +63,11 @@ export interface MinigameState {
   gameOver: boolean;
   holding: boolean;
   marketInfluencePercent: number;
+  // set (and kept up to date) by a game that wants free 2D drag control
+  // instead of the shared fixed-screen-x/physics-driven head — see the
+  // pointermove handling below. Left undefined, every other game keeps
+  // today's fixed headX exactly as before
+  headX?: number;
 }
 
 export interface ConferenceMinigameElements {
@@ -100,8 +101,10 @@ export interface ConferenceMinigameOptions<S extends MinigameState> {
     getFloorTopY: () => number,
     ctx: CanvasRenderingContext2D,
   ) => void;
-  // draws this game's own extra world content (market events / platforms),
-  // called after the shared scene backdrop and before the shared line/head
+  // draws this game's own extra world content on top of the grid — market
+  // events/platforms, its own profit line/head, anything else — called
+  // after the shared scene backdrop (audience/grid/floor) and before the
+  // shared tap-to-begin prompt/End button/podium
   renderGraph: (
     ctx: CanvasRenderingContext2D,
     state: S,
@@ -228,21 +231,11 @@ export function wireConferenceMinigame<S extends MinigameState>(
     ctx.save();
     const shake = getScreenShakeOffset(Date.now());
     ctx.translate(shake.x, shake.y);
-    const headX = cssW / 2 - HEAD_X_OFFSET_FROM_CENTER;
+    const headX = state.headX ?? cssW / 2 - HEAD_X_OFFSET_FROM_CENTER;
     scene.drawAudience();
-    scene.drawGrid(headX, state.worldX);
+    scene.drawGrid(state.worldX);
     scene.drawFloor();
     options.renderGraph(ctx, state, headX, now);
-    const points = computeSmoothedTrailPoints(
-      state,
-      TRAIL_SAMPLE_DX,
-      TRAIL_SMOOTHING_RADIUS,
-      TAIL_MAX_ANGLE_TAN,
-      headX,
-      state.headY,
-    );
-    drawTrailLine(ctx, points, LINE_WIDTH, LINE_COLOR);
-    drawTrailHead(ctx, headX, state.headY, HEAD_RADIUS, LINE_COLOR);
     drawTapToBegin(now);
     if (state.gameOver) drawEndButton(now);
     scene.drawPodium(now);
@@ -267,10 +260,17 @@ export function wireConferenceMinigame<S extends MinigameState>(
     render(now);
   });
 
-  canvas.addEventListener("pointerdown", () => {
+  // tracked in client (viewport) coordinates purely for delta math — see the
+  // pointermove drag handler below, no canvas-space conversion needed
+  let lastPointerX = 0;
+  let lastPointerY = 0;
+
+  canvas.addEventListener("pointerdown", (event) => {
     if (state.gameOver) return; // end button is handled on click below
     state.started = true;
     state.holding = true;
+    lastPointerX = event.clientX;
+    lastPointerY = event.clientY;
     options.onTap(state);
   });
   window.addEventListener("pointerup", () => {
@@ -278,6 +278,18 @@ export function wireConferenceMinigame<S extends MinigameState>(
   });
   window.addEventListener("pointercancel", () => {
     state.holding = false;
+  });
+  // only a game whose own state carries headX (see MinigameState's own
+  // comment) opts into this — moves the head by the raw pointer delta each
+  // move, giving free 2D drag control instead of the shared fixed-x/physics
+  // head every other game keeps (which never sets state.headX, so this is a
+  // no-op for them)
+  window.addEventListener("pointermove", (event) => {
+    if (!state.holding || state.headX === undefined) return;
+    state.headX += event.clientX - lastPointerX;
+    state.headY += event.clientY - lastPointerY;
+    lastPointerX = event.clientX;
+    lastPointerY = event.clientY;
   });
 
   // the end button is deliberately handled on "click", not "pointerdown":
@@ -306,10 +318,9 @@ export function wireConferenceMinigame<S extends MinigameState>(
     screen.hidden = false;
     playSwoosh();
     resize();
-    const startY = cssH / 2 - HEAD_START_Y_LIFT_PX;
-    state.headY = startY;
-    state.tailY = startY;
-    state.trail = new Array(computeMaxTrailLength(cssW)).fill(startY);
+    // a shared default only — tailY/trail are now entirely each game's own
+    // to initialize (see its own onOpen), since drawing its own line is too
+    state.headY = cssH / 2 - HEAD_START_Y_LIFT_PX;
     options.onOpen?.(state, cssW, cssH, scene.getFloorTopY);
     rafLoop.start();
   }
