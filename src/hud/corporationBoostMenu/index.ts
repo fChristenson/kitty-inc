@@ -14,6 +14,7 @@ import {
   startPressAndHold,
   type PressAndHoldController,
 } from "../../shared/pressAndHold";
+import { spawnFloatingLabel } from "../../shared/floatingLabel";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { getManagerIconUrl } from "../../floors";
@@ -40,6 +41,7 @@ import {
   getAssetsMovedPercent,
   getGlobalIncomeBoostPercent,
   formatBoostPercent,
+  STOCK_CONTRIBUTION_PER_PURCHASE,
 } from "./economy";
 
 export {
@@ -331,7 +333,14 @@ export function wireCorporationBoostMenu(
     const button = list.querySelector<HTMLButtonElement>(
       `button[data-company-index="${companyIndex}"]`,
     );
-    if (button) void triggerButtonPress(button);
+    if (button) {
+      void triggerButtonPress(button);
+      spawnFloatingLabel(
+        button,
+        panel,
+        formatBoostPercent(STOCK_CONTRIBUTION_PER_PURCHASE),
+      );
+    }
   }
 
   list.addEventListener("pointerdown", (event) => {
@@ -427,7 +436,8 @@ export function wireCorporationBoostMenu(
   }
 
   function fireInvest(): void {
-    if (!investInMarket(investReferenceTotal)) {
+    const gain = investInMarket(investReferenceTotal);
+    if (gain === null) {
       stopInvestHold();
       return;
     }
@@ -436,7 +446,10 @@ export function wireCorporationBoostMenu(
     const button = list.querySelector<HTMLButtonElement>(
       "#invest-in-market-item",
     );
-    if (button) void triggerButtonPress(button);
+    if (button) {
+      void triggerButtonPress(button);
+      spawnFloatingLabel(button, panel, formatBoostPercent(gain));
+    }
   }
 
   list.addEventListener("pointerdown", (event) => {

@@ -377,13 +377,15 @@ function getInvestGain(cost: BigNumber, referenceTotal: BigNumber): number {
 // spends getInvestCost(referenceTotal) (proportionally across every
 // company, same as a stock raise/press conference) and banks the log-scaled
 // Investment Portfolio % gain above. A no-op once total income is fully
-// drained (cost itself is exactly 0) — returns whether it succeeded
-export function investInMarket(referenceTotal: BigNumber): boolean {
+// drained (cost itself is exactly 0) — returns the % just gained, or null if
+// the press failed
+export function investInMarket(referenceTotal: BigNumber): number | null {
   const cost = getInvestCost(referenceTotal);
-  if (isZero(cost)) return false;
-  if (!spendFromAllCompanies(cost)) return false;
-  addInvestmentPortfolioPercent(getInvestGain(cost, referenceTotal));
-  return true;
+  if (isZero(cost)) return null;
+  if (!spendFromAllCompanies(cost)) return null;
+  const gain = getInvestGain(cost, referenceTotal);
+  addInvestmentPortfolioPercent(gain);
+  return gain;
 }
 
 // folded into clearStockPrices above so a full game reset doesn't inherit an
@@ -552,7 +554,7 @@ function getCompanyValue(companyIndex: number): BigNumber {
 // how much a company's stock price contributes to the combined income boost:
 // a flat +0.01% per purchase, regardless of the company's own value/size —
 // company value only ever factors into getCompanyBaseModifierPercent below
-const STOCK_CONTRIBUTION_PER_PURCHASE = 0.01;
+export const STOCK_CONTRIBUTION_PER_PURCHASE = 0.01;
 
 export function getStockContributionPercent(companyIndex: number): number {
   return getStockTimesBought(companyIndex) * STOCK_CONTRIBUTION_PER_PURCHASE;
