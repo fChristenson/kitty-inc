@@ -5,11 +5,26 @@ import { loadImageByName } from "../../loadAssets";
 // a handful of small coins that bubble straight up from a point, gently swaying,
 // and fade out — a quieter alternative to coins.ts's outward/gravity burst
 
-let coinImage: HTMLImageElement | null = null;
+// coin.png is kept at its full AI-generated resolution (~700x700) so
+// process-pwa-icons.mjs can still generate a crisp 512px PWA icon from it —
+// but these bubbles only ever render at a ~48px max diameter, so drawing the
+// full-res source every animation frame would resample it down from scratch
+// on every single frame. Downscaled once here onto an offscreen canvas sized
+// with generous headroom for high-DPI screens, then THAT small canvas is what
+// every frame actually draws
+const COIN_CANVAS_SIZE = 160;
+let coinCanvas: HTMLCanvasElement | null = null;
 
 export async function loadFloatingCoinImage(): Promise<HTMLImageElement> {
-  coinImage = await loadImageByName("coin");
-  return coinImage!;
+  const image = await loadImageByName("coin");
+  const canvas = document.createElement("canvas");
+  canvas.width = COIN_CANVAS_SIZE;
+  canvas.height = COIN_CANVAS_SIZE;
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(image, 0, 0, COIN_CANVAS_SIZE, COIN_CANVAS_SIZE);
+  coinCanvas = canvas;
+  return image;
 }
 
 interface FloatingCoin {
@@ -61,9 +76,9 @@ export function drawFloatingCoins(
         : 1;
     ctx.globalAlpha = Math.max(0, 1 - t) * blinkFactor;
 
-    if (coinImage) {
+    if (coinCanvas) {
       const size = radius * 2;
-      ctx.drawImage(coinImage, c.x - radius, y - radius, size, size);
+      ctx.drawImage(coinCanvas, c.x - radius, y - radius, size, size);
     }
   }
   ctx.globalAlpha = 1;

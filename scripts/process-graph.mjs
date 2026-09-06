@@ -126,6 +126,9 @@ await sharp(data, { raw: { width, height, channels } })
     width: maxX - minX + 1,
     height: maxY - minY + 1,
   })
+  // menu icons only ever render at ~28-34px (style.css's .worker-menu__icon) —
+  // capping here avoids shipping/decoding/resampling a needlessly huge source
+  .resize(160, 160, { fit: "inside", withoutEnlargement: true })
   .png()
   .toFile(dest);
 

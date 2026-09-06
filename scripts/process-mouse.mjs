@@ -112,6 +112,10 @@ await sharp(data, { raw: { width, height, channels } })
     width: maxX - minX + 1,
     height: maxY - minY + 1,
   })
+  // the mouse critter only ever renders at RENDER_W=110 CSS px on a
+  // DPR-scaled canvas (src/mouse/index.ts) — capping here avoids resampling a
+  // needlessly huge source on every animation frame
+  .resize(360, 360, { fit: "inside", withoutEnlargement: true })
   .png()
   .toFile(dest);
 

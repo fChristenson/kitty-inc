@@ -112,6 +112,10 @@ await sharp(data, { raw: { width, height, channels } })
     width: maxX - minX + 1,
     height: maxY - minY + 1,
   })
+  // used both as a ~28px menu icon and floors/coinFloat's own small floating
+  // bubbles (~48px max diameter, DPR-scaled) — capping here avoids resampling
+  // a needlessly huge source on every animation frame
+  .resize(220, 220, { fit: "inside", withoutEnlargement: true })
   .png()
   .toFile(dest);
 
