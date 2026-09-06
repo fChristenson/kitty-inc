@@ -115,13 +115,19 @@ export function buyStockRaise(companyIndex: number): boolean {
   return true;
 }
 
-// $ cost of opening either minigame ("Hold press conference"/"Secure stock
-// price"): a flat number of seconds of every company's own combined current
-// income rate, not tied to any one company's assets — so it stays affordable
-// (and meaningful) at any point in the game's progression the same way a
-// wealth-proportional cost would, without needing a company's own banked
-// total or upgrades to be large yet
-const MINIGAME_ENTRY_SECONDS_COST = 15;
+// $ cost of opening any minigame ("Hold press conference"/"Secure stock
+// price"/"Declare taxes"/"Use tax haven"): a flat number of seconds of every
+// company's own combined current income rate, not tied to any one company's
+// assets — so it stays affordable (and meaningful) at any point in the
+// game's progression the same way a wealth-proportional cost would, without
+// needing a company's own banked total or upgrades to be large yet. Kept
+// well under the real-world time it actually takes to re-earn it (rather
+// than an exact 1:1 "N seconds of the reported rate") — floor income arrives
+// in per-floor cycle-based lumps, not a smooth continuous drip, so the
+// derived rate is only ever an average and a player draining to $0 (e.g. via
+// "Invest in the market") can otherwise end up waiting noticeably longer
+// than the rate alone would suggest before enough lumps have actually landed
+const MINIGAME_ENTRY_SECONDS_COST = 10;
 
 export function getMinigameEntryCost(): BigNumber {
   return multiply(
