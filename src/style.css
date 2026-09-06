@@ -580,6 +580,13 @@ body {
 .worker-menu__panel {
   position: relative;
   width: min(90vw, 420px);
+  /* hints the browser to promote this panel to its own compositor layer —
+     it slides in/out via translate/scale every open/close (see the
+     worker-menu-slide-in/out keyframes below) while also carrying a heavy
+     multi-ring box-shadow; without this, some mobile browsers re-rasterize
+     that shadow every animation frame instead of just transforming a
+     cached layer, reported as dialog-open/close frame drops on mobile */
+  will-change: transform;
   /* fixed 300px down from the top, every time — every dialog (upgrade menu,
      boost menu, map menu, corporation menus, ...) uses this exact same value, no
      per-dialog overrides. Height capped so 300px + this can never reach the

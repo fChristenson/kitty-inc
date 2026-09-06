@@ -129,6 +129,52 @@ export function isCritFlashActive(now: number): boolean {
   return flashEndsAt !== null && now < flashEndsAt;
 }
 
+// caches the expensive blurred bloom glow (see drawCritFlash) per distinct
+// label — mobile browsers pay for shadowBlur as a real offscreen convolution,
+// so recomputing it every animation frame at this text's huge on-screen scale
+// was the actual source of the reported crit-celebration frame drops.
+// Rendered once at the reference 100px font size (unscaled/unrotated); the
+// caller draws the cached bitmap through its own transform, so it still
+// scales/rotates correctly every frame without redoing the blur itself
+const bloomLayerCache = new Map<
+  string,
+  { canvas: HTMLCanvasElement; width: number; height: number }
+>();
+const BLOOM_FONT = '900 100px "Fredoka", system-ui, sans-serif';
+const BLOOM_BLUR = 45;
+// generous padding so the blur's own soft falloff never gets clipped by the
+// cache canvas's own edge
+const BLOOM_PADDING = BLOOM_BLUR * 3;
+
+function getBloomLayer(
+  label: string,
+  measuredWidth: number,
+): { canvas: HTMLCanvasElement; width: number; height: number } {
+  const cached = bloomLayerCache.get(label);
+  if (cached) return cached;
+
+  const width = Math.ceil(measuredWidth + BLOOM_PADDING * 2);
+  const height = Math.ceil(100 + BLOOM_PADDING * 2);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d")!;
+  ctx.font = BLOOM_FONT;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  // stacked twice for intensity — canvas shadowBlur alone reads faint at this
+  // text's huge on-screen scale
+  ctx.shadowColor = COLOR.white;
+  ctx.shadowBlur = BLOOM_BLUR;
+  ctx.fillStyle = COLOR.white;
+  ctx.fillText(label, width / 2, height / 2);
+  ctx.fillText(label, width / 2, height / 2);
+
+  const entry = { canvas, width, height };
+  bloomLayerCache.set(label, entry);
+  return entry;
+}
+
 export function drawCritFlash(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -209,18 +255,15 @@ export function drawCritFlash(
   ctx.font = font;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  // bloom: a soft white glow drawn (stacked twice for intensity) behind the crisp
-  // text below — canvas shadowBlur alone reads faint at this text's huge on-screen
-  // scale, so repeating the blurred fill pass compounds the glow without touching
-  // any pixel data directly. Cleared before the crisp pass so its own shadowBlur=0
-  // stroke/fill stays sharp, only the glow behind it is soft
-  ctx.shadowColor = COLOR.white;
-  ctx.shadowBlur = 45;
-  ctx.fillStyle = COLOR.white;
-  ctx.fillText(flashLabel, 0, 0);
-  ctx.fillText(flashLabel, 0, 0);
-  ctx.shadowBlur = 0;
-  ctx.shadowColor = "transparent";
+  // bloom: a soft white glow behind the crisp text below. shadowBlur is
+  // expensive at this text's huge on-screen scale (it's a full offscreen
+  // blur convolution) — recomputing it via fillText every single animation
+  // frame is what caused visible frame drops on mobile during crit
+  // celebrations. getBloomLayer below renders this exact glow ONCE per
+  // distinct label (cached), so every frame after the first is just a plain
+  // drawImage of that cached bitmap instead of a fresh blur
+  const bloom = getBloomLayer(flashLabel, measuredWidth);
+  ctx.drawImage(bloom.canvas, -bloom.width / 2, -bloom.height / 2);
   // a light-to-tier-color vertical gradient reads as glossy/shiny rather than a
   // flat block of color — same lightening math drawGlossyButton's own sheen uses
   const gradient = ctx.createLinearGradient(0, -60, 0, 60);
