@@ -3,6 +3,7 @@ import {
   spendFromAllCompanies,
   getStoredTotalIncome,
   getAllCompaniesTotalIncome,
+  getAllCompaniesIncomeRatePerSecond,
   addCompanyTotalIncome,
 } from "../../totalIncome";
 import {
@@ -114,33 +115,18 @@ export function buyStockRaise(companyIndex: number): boolean {
   return true;
 }
 
-// $ cost of the single, not-per-company "Hold press conference" action: 15%
-// of every company's own upgrades value summed together, plus every company's
-// current total income (getAllCompaniesTotalIncome) — same efficient
-// per-company sourcing as getCompanyValue below for the upgrades half: the
-// active company's upgrades value is read fresh off its own live buildings,
-// every dormant company reads its own persisted CompanyRecord.upgradesValue
-// instead of ever loading its full buildings/floors array
-const PRESS_CONFERENCE_UPGRADES_VALUE_PERCENT = 0.15;
+// $ cost of opening either minigame ("Hold press conference"/"Secure stock
+// price"): a flat number of seconds of every company's own combined current
+// income rate, not tied to any one company's assets — so it stays affordable
+// (and meaningful) at any point in the game's progression the same way a
+// wealth-proportional cost would, without needing a company's own banked
+// total or upgrades to be large yet
+const MINIGAME_ENTRY_SECONDS_COST = 15;
 
-function getAllCompaniesUpgradesValue(): BigNumber {
-  const count = getCorporationCount();
-  let total = ZERO;
-  for (let i = 0; i < count; i++) {
-    total = add(
-      total,
-      i === getActiveCompanyIndex()
-        ? getUpgradesValue(loadBuildings(i))
-        : (loadCompanyRecord(i)?.upgradesValue ?? ZERO),
-    );
-  }
-  return total;
-}
-
-export function getPressConferenceCost(): BigNumber {
+export function getMinigameEntryCost(): BigNumber {
   return multiply(
-    add(getAllCompaniesUpgradesValue(), getAllCompaniesTotalIncome()),
-    PRESS_CONFERENCE_UPGRADES_VALUE_PERCENT,
+    getAllCompaniesIncomeRatePerSecond(),
+    MINIGAME_ENTRY_SECONDS_COST,
   );
 }
 
@@ -179,7 +165,7 @@ export function grantFreePressConference(): void {
 }
 
 // raises EVERY company's purchased shares by STOCK_PRICE_STEP at once, for one
-// combined cost (see getPressConferenceCost) instead of paying each company's
+// combined cost (see getMinigameEntryCost) instead of paying each company's
 // own escalating getStockRaiseCost individually — the actual boost comes from
 // then playing hud/pressConferenceGame's own mini-game (see Market Influence
 // below), this just pays the entry fee. A banked free credit (see
@@ -190,7 +176,7 @@ export function holdPressConference(): boolean {
     saveFreePressConferenceCount(freeCount - 1);
     return true;
   }
-  return spendFromAllCompanies(getPressConferenceCost());
+  return spendFromAllCompanies(getMinigameEntryCost());
 }
 
 // "Market Influence %" — earned by playing hud/pressConferenceGame's own

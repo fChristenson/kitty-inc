@@ -4,7 +4,10 @@ import {
   animateDialogClose,
   triggerButtonPress,
 } from "../../utils";
-import { getAllCompaniesTotalIncome } from "../../totalIncome";
+import {
+  getAllCompaniesTotalIncome,
+  spendFromAllCompanies,
+} from "../../totalIncome";
 import { getCorporationName } from "../../corporationName";
 import { getActiveCorporationIndices } from "../../company";
 import {
@@ -25,7 +28,7 @@ import {
   getStockTimesBought,
   getStockContributionPercent,
   getCompanyBaseModifierPercent,
-  getPressConferenceCost,
+  getMinigameEntryCost,
   getFreePressConferenceCount,
   holdPressConference,
   getInvestCost,
@@ -42,7 +45,7 @@ export {
   getStockTimesBought,
   getStockRaiseCost,
   buyStockRaise,
-  getPressConferenceCost,
+  getMinigameEntryCost,
   getFreePressConferenceCount,
   grantFreePressConference,
   holdPressConference,
@@ -152,20 +155,20 @@ export function wireCorporationBoostMenu(
       </div>
     `;
     const totalPct = getGlobalIncomeBoostPercent();
-    const pressConferenceCost = getPressConferenceCost();
+    const minigameEntryCost = getMinigameEntryCost();
     const freePressConferenceCount = getFreePressConferenceCount();
     // computed once and reused below — getAllCompaniesTotalIncome() is itself
     // O(companies) (a localStorage read + JSON.parse per company), so calling
     // it again inside the per-company items loop made render() scale
     // O(companies^2)
     const allCompaniesTotalIncome = getAllCompaniesTotalIncome();
-    const pressConferenceAffordable =
+    const minigameEntryAffordable =
       freePressConferenceCount > 0 ||
-      gte(allCompaniesTotalIncome, pressConferenceCost);
-    const pressConferencePriceLabel =
+      gte(allCompaniesTotalIncome, minigameEntryCost);
+    const minigameEntryPriceLabel =
       freePressConferenceCount > 0
         ? `FREE (x${freePressConferenceCount})`
-        : formatPrice(pressConferenceCost);
+        : formatPrice(minigameEntryCost);
     const investCost = getInvestCost(currentInvestReference());
     // gated on cost > 0 (i.e. there's still something left to invest) rather
     // than always-enabled — once corp assets are fully drained there's
@@ -208,24 +211,24 @@ export function wireCorporationBoostMenu(
       <button
         class="worker-menu__item"
         id="press-conference-item"
-        ${pressConferenceAffordable ? "" : "disabled"}
+        ${minigameEntryAffordable ? "" : "disabled"}
       >
         <span class="worker-menu__item-label">
           <img src="${managerIconUrl}" class="worker-menu__icon" alt="" />
           <span class="worker-menu__item-name">Hold press conference</span>
         </span>
-        <span class="worker-menu__price">${pressConferencePriceLabel}</span>
+        <span class="worker-menu__price">${minigameEntryPriceLabel}</span>
       </button>
       <button
         class="worker-menu__item"
         id="liquidate-assets-item"
-        ${pressConferenceAffordable ? "" : "disabled"}
+        ${minigameEntryAffordable ? "" : "disabled"}
       >
         <span class="worker-menu__item-label">
           <img src="${shieldIconUrl}" class="worker-menu__icon" alt="" />
           <span class="worker-menu__item-name">Secure stock price</span>
         </span>
-        <span class="worker-menu__price">${pressConferencePriceLabel}</span>
+        <span class="worker-menu__price">${minigameEntryPriceLabel}</span>
       </button>
       <button
         class="worker-menu__item"
@@ -415,12 +418,17 @@ export function wireCorporationBoostMenu(
     onPressConferenceHeld?.();
   });
 
-  // shows the same price as press conference (see pressConferencePriceLabel)
-  // and is gated by the same affordability check
+  // shows/costs the same as press conference (see minigameEntryPriceLabel in
+  // render()) and is gated by the same affordability check, but (unlike the
+  // free press conference) actually spends the cost itself right here —
+  // there's no separate holdX-style helper for it since it doesn't touch the
+  // free-conference credit pool
   list.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
     const button = target.closest<HTMLButtonElement>("#liquidate-assets-item");
     if (!button || button.disabled) return;
+    if (!spendFromAllCompanies(getMinigameEntryCost())) return;
+    playSold();
     onOpenLiquidateAssets?.();
   });
 
@@ -446,9 +454,9 @@ export function wireCorporationBoostMenu(
     if (pressConferenceButton) {
       pressConferenceButton.disabled =
         getFreePressConferenceCount() === 0 &&
-        lt(allCompaniesTotalIncome, getPressConferenceCost());
+        lt(allCompaniesTotalIncome, getMinigameEntryCost());
     }
-    // shows/costs the same as press conference (see pressConferencePriceLabel
+    // shows/costs the same as press conference (see minigameEntryPriceLabel
     // in render()), so it's gated by the exact same affordability check
     const liquidateAssetsButton = list.querySelector<HTMLButtonElement>(
       "#liquidate-assets-item",
@@ -456,7 +464,7 @@ export function wireCorporationBoostMenu(
     if (liquidateAssetsButton) {
       liquidateAssetsButton.disabled =
         getFreePressConferenceCount() === 0 &&
-        lt(allCompaniesTotalIncome, getPressConferenceCost());
+        lt(allCompaniesTotalIncome, getMinigameEntryCost());
     }
     const investButton = list.querySelector<HTMLButtonElement>(
       "#invest-in-market-item",

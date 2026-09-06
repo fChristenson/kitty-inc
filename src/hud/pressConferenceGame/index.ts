@@ -1,23 +1,9 @@
 import { playBubble, playSold } from "../../sound";
-import { drawCartoonText, formatPrice } from "../../utils";
+import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { advanceTrail } from "../../shared/canvasGame";
 import { spawnCoinBurstAt, drawActiveCoinBursts } from "../../coinBurst";
-import {
-  spendFromAllCompanies,
-  getAllCompaniesTotalIncome,
-} from "../../totalIncome";
-import {
-  type BigNumber,
-  ZERO,
-  fromNumber,
-  add,
-  subtract,
-  multiply,
-  gt,
-  lt,
-} from "../../shared/bigNumber";
 import { addMarketInfluencePercent } from "../corporationBoostMenu";
 import { generateMarketEventText, MARKET_CRASH_TEXT } from "./marketEventText";
 import {
@@ -31,7 +17,6 @@ import {
   type MinigameState,
   type ConferenceMinigame,
 } from "../../shared/conferenceMinigame";
-import { LABEL_ABOVE_AUDIENCE_OFFSET } from "../../shared/pressConferenceScene";
 
 // physics constants for the line's head — same "flappy bird" feel: constant
 // downward gravity, a fixed upward kick on every flap, no in-between speeds.
@@ -114,31 +99,12 @@ const MARKET_CRASH_CHANCE_MAX = 0.9; // 90% crash / 10% good, never past this
 // late-game crunch, not just a quiet continuation of the same gradual shrink
 const MAXED_CRASH_SPAWN_INTERVAL_SHRINK = 0.6;
 
-// the combined total income across every corporation, snapshotted once when
-// the round opens (see onOpen's totalIncomeAtOpen), is this game's own
-// "fuel": every second it's played burns BASE_BURN_PERCENT_PER_SECOND of
-// whatever that snapshot has left (see step), scaling by wealth instead of a
-// fixed $ amount so this stays meaningful at any point in the game's
-// progression. Nothing is actually deducted from any company in real time —
-// the round only tracks how much it WOULD have spent
-// (state.totalExpensesThisSession), and onGameOver spends that whole amount
-// for real in one shot at the very end
-const BASE_BURN_PERCENT_PER_SECOND = 0.05;
-// a wealth-proportional burn alone would just decay toward zero forever
-// without ever actually running out, letting a deep-pocketed player camp here
-// indefinitely — so the burn % itself also compounds every DIFFICULTY_INTERVAL_MS
-// tier, the same way the other difficulty knobs do, guaranteeing the cost
-// eventually outpaces any reserve no matter how large
-const BURN_PERCENT_GROWTH_PER_TIER = 1.35;
 // "Market Influence %" (see hud/corporationBoostMenu's own persisted stat) —
-// flat rate, not tied to the burn rate or anything else about the round: this
-// much per second just for surviving, plus a flat instant bump on a good hit.
-// Only ever climbs — bad hits never dock it (see step)
+// flat rate, not tied to anything else about the round: this much per second
+// just for surviving, plus a flat instant bump on a good hit. Only ever
+// climbs — bad hits never dock it (see step)
 const AMBIENT_INFLUENCE_PERCENT_PER_SECOND = 0.05;
 const GOOD_HIT_INFLUENCE_PERCENT = 0.1;
-// same 40px gap the budget label always sat above the timer/score
-const BUDGET_ABOVE_SCORE_OFFSET = 40;
-const SCORE_LABELS_EXTRA_LIFT_PX = 20;
 
 interface MarketEvent {
   text: string;
@@ -154,7 +120,6 @@ interface PressConferenceState extends MinigameState {
   flapRampFromVelocity: number; // velocityY at the moment the current ramp began, lerped from here toward FLAP_VELOCITY_PX_S
   marketEvents: MarketEvent[];
   nextEventInMs: number; // counts down to the next spawn (see EVENT_SPAWN_INTERVAL_*)
-  totalExpensesThisSession: BigNumber; // cumulative $ actually burned so far this round; only ever grows
 }
 
 export function createPressConferenceGameMarkup(): string {
@@ -165,10 +130,6 @@ export function createPressConferenceGameMarkup(): string {
       </div>
       <div class="press-conference-game__score" id="press-conference-game-score">
         <div id="press-conference-game-timer">0.0s</div>
-      </div>
-      <div class="press-conference-game__budget" id="press-conference-game-budget">
-        <span class="press-conference-game__budget-label">Remaining budget</span>
-        <span id="press-conference-game-budget-value">$0</span>
       </div>
       <div class="press-conference-game__influence" id="press-conference-game-influence">
         <span class="press-conference-game__influence-label">Market Influence</span>
@@ -185,13 +146,6 @@ export function wirePressConferenceGame(
   container: HTMLElement,
   onClose?: () => void,
 ): PressConferenceGame {
-  const budgetValueEl = container.querySelector<HTMLSpanElement>(
-    "#press-conference-game-budget-value",
-  )!;
-  const budgetEl = container.querySelector<HTMLDivElement>(
-    "#press-conference-game-budget",
-  )!;
-
   // takes the tier explicitly (rather than reading state.survivedMs itself)
   // so it's safe to call from freshState() too, before a real state exists
   // yet — shrinks toward MIN_SPAWN_INTERVAL_FLOOR_MS each tier, so more text
@@ -281,13 +235,8 @@ export function wirePressConferenceGame(
       flapRampFromVelocity: 0,
       marketEvents: [],
       nextEventInMs: randomEventDelayMs(0),
-      totalExpensesThisSession: ZERO,
     };
   }
-  // snapshotted once at open() — the round's own fuel/budget is fixed for the
-  // whole round instead of tracking whatever companies are earning live, since
-  // nothing is actually spent from them until onGameOver
-  let totalIncomeAtOpen: BigNumber = ZERO;
 
   // good events read as the same green/white the HUD's own total-income text
   // uses; bad ones swap in a mean red fill, same white stroke either way.
@@ -341,10 +290,6 @@ export function wirePressConferenceGame(
     },
     createState: freshState,
 
-    onOpen: () => {
-      totalIncomeAtOpen = getAllCompaniesTotalIncome();
-    },
-
     step: (state, dtMs, cssW, cssH, getFloorTopY, ctx) => {
       const dt = dtMs / 1000;
       if (state.flapRampRemainingMs > 0) {
@@ -389,37 +334,11 @@ export function wirePressConferenceGame(
         state.gameOver = true;
       }
 
-      // the snapshotted total (see totalIncomeAtOpen) is this game's own
-      // fuel: burn a wealth-proportional slice of it every second, tracked
-      // locally only — running dry ends the round the same way hitting a
-      // bound does
+      // flat rate, just for surviving — only ever kept in session state
+      // here, banked for real once by onGameOver
       if (state.running) {
-        const remaining = subtract(
-          totalIncomeAtOpen,
-          state.totalExpensesThisSession,
-        );
-        // anything under $1 counts as bankrupt
-        if (lt(remaining, fromNumber(1))) {
-          state.running = false;
-          state.gameOver = true;
-        } else {
-          // flat rate, just for surviving — not tied to the burn cost below
-          // at all; only ever kept in session state here, banked for real
-          // once by onGameOver
-          state.marketInfluencePercent +=
-            AMBIENT_INFLUENCE_PERCENT_PER_SECOND * dt;
-
-          const cost = multiply(
-            remaining,
-            BASE_BURN_PERCENT_PER_SECOND *
-              BURN_PERCENT_GROWTH_PER_TIER ** getDifficultyTier(state) *
-              dt,
-          );
-          state.totalExpensesThisSession = add(
-            state.totalExpensesThisSession,
-            cost,
-          );
-        }
+        state.marketInfluencePercent +=
+          AMBIENT_INFLUENCE_PERCENT_PER_SECOND * dt;
       }
 
       state.nextEventInMs -= dtMs;
@@ -471,30 +390,13 @@ export function wirePressConferenceGame(
       playBubble();
     },
 
-    // spends this session's whole accrued expenses for real in one shot (see
-    // totalIncomeAtOpen — nothing was actually deducted from any company
-    // until now), and banks the accrued state.marketInfluencePercent the same way
+    // banks the accrued state.marketInfluencePercent (nothing was actually
+    // deducted from any company for this round — that's handled separately
+    // by the entry cost paid to open this dialog)
     onGameOver: (state) => {
-      if (gt(state.totalExpensesThisSession, ZERO)) {
-        spendFromAllCompanies(state.totalExpensesThisSession);
-      }
       addMarketInfluencePercent(state.marketInfluencePercent);
     },
 
     onClose,
-
-    // budget sits its own BUDGET_ABOVE_SCORE_OFFSET further above the shared
-    // score label, same as it always did
-    onLayout: (state, cssH, audienceTopY) => {
-      const scoreBottomPx =
-        cssH -
-        audienceTopY +
-        LABEL_ABOVE_AUDIENCE_OFFSET +
-        SCORE_LABELS_EXTRA_LIFT_PX;
-      budgetEl.style.bottom = `${scoreBottomPx + BUDGET_ABOVE_SCORE_OFFSET}px`;
-      budgetValueEl.textContent = formatPrice(
-        subtract(totalIncomeAtOpen, state.totalExpensesThisSession),
-      );
-    },
   });
 }

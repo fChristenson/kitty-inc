@@ -1,6 +1,5 @@
 import { playBubble, playSold, playExplosion } from "../../sound";
 import { COLOR } from "../../palette";
-import { formatPrice } from "../../utils";
 import { advanceTrail } from "../../shared/canvasGame";
 import {
   wireConferenceMinigame,
@@ -10,21 +9,6 @@ import {
   type MinigameState,
   type ConferenceMinigame,
 } from "../../shared/conferenceMinigame";
-import { LABEL_ABOVE_AUDIENCE_OFFSET } from "../../shared/pressConferenceScene";
-import {
-  type BigNumber,
-  ZERO,
-  fromNumber,
-  add,
-  subtract,
-  multiply,
-  gt,
-  lt,
-} from "../../shared/bigNumber";
-import {
-  spendFromAllCompanies,
-  getAllCompaniesTotalIncome,
-} from "../../totalIncome";
 import { addSecuredAssetsPercent } from "../corporationBoostMenu";
 import { spawnCoinBurstAt, drawActiveCoinBursts } from "../../coinBurst";
 import { triggerScreenShake } from "../../screenShake";
@@ -117,17 +101,6 @@ const RED_LINE_INFLUENCE_PERCENT = -0.5;
 // building-width canvas; this screen is much smaller, so its own upgrade
 // bursts get shrunk down too — same convention pressConferenceGame uses
 const COIN_BURST_SCALE = 0.35;
-// same "fuel" idea as hud/pressConferenceGame's own budget: a wealth-
-// proportional slice of the total income snapshotted at open (see
-// totalIncomeAtOpen) burns away every second, tracked locally only until
-// onGameOver spends it for real in one shot — running dry ends the round
-const BASE_BURN_PERCENT_PER_SECOND = 0.05;
-// same 40px gap press conference's own budget label sits above its score
-const BUDGET_ABOVE_SCORE_OFFSET = 40;
-// mirrors shared/conferenceMinigame's own private SCORE_LABELS_EXTRA_LIFT_PX
-// so this game's own onLayout below reproduces the identical score-bottom
-// position that constant already shifted the shared score label by
-const SCORE_LABELS_EXTRA_LIFT_PX = 20;
 
 export interface Platform {
   x: number;
@@ -202,9 +175,6 @@ interface LiquidateAssetsState extends MinigameState {
   // the height passively fallen FROM (see jumpedThisFlight) — only a
   // platform strictly below this is a valid landing during that fall
   passiveFallOriginY: number;
-  // cumulative $ actually burned so far this round (see
-  // BASE_BURN_PERCENT_PER_SECOND); only ever grows
-  totalExpensesThisSession: BigNumber;
 }
 
 export function createLiquidateAssetsGameMarkup(): string {
@@ -215,10 +185,6 @@ export function createLiquidateAssetsGameMarkup(): string {
       </div>
       <div class="press-conference-game__score" id="liquidate-assets-game-score">
         <div id="liquidate-assets-game-timer">0.0s</div>
-      </div>
-      <div class="press-conference-game__budget" id="liquidate-assets-game-budget">
-        <span class="press-conference-game__budget-label">Remaining budget</span>
-        <span id="liquidate-assets-game-budget-value">$0</span>
       </div>
       <div class="press-conference-game__influence" id="liquidate-assets-game-influence">
         <span class="press-conference-game__influence-label">Secured assets</span>
@@ -235,17 +201,6 @@ export function wireLiquidateAssetsGame(
   container: HTMLElement,
   onClose?: () => void,
 ): LiquidateAssetsGame {
-  const budgetValueEl = container.querySelector<HTMLSpanElement>(
-    "#liquidate-assets-game-budget-value",
-  )!;
-  const budgetEl = container.querySelector<HTMLDivElement>(
-    "#liquidate-assets-game-budget",
-  )!;
-  // snapshotted once at open() — the round's own fuel/budget is fixed for
-  // the whole round instead of tracking whatever companies are earning
-  // live, since nothing is actually spent from them until onGameOver
-  let totalIncomeAtOpen: BigNumber = ZERO;
-
   function freshState(): LiquidateAssetsState {
     return {
       headY: 0,
@@ -267,7 +222,6 @@ export function wireLiquidateAssetsGame(
       groundedPlatform: null,
       jumpedThisFlight: false,
       passiveFallOriginY: 0,
-      totalExpensesThisSession: ZERO,
     };
   }
 
@@ -363,7 +317,6 @@ export function wireLiquidateAssetsGame(
     createState: freshState,
 
     onOpen: (state, cssW, _cssH, getFloorTopY) => {
-      totalIncomeAtOpen = getAllCompaniesTotalIncome();
       // the line starts resting right on top of a wide starter platform
       // (not falling onto it) — sized to hold REST_PLATFORM_JUMP_COUNT
       // un-boosted bounces before the normal small-platform flow takes
@@ -572,28 +525,6 @@ export function wireLiquidateAssetsGame(
 
       state.marketInfluencePercent += AMBIENT_INFLUENCE_PERCENT_PER_SECOND * dt;
 
-      // the snapshotted total (see totalIncomeAtOpen) is this game's own
-      // fuel: burn a wealth-proportional slice of it every second, tracked
-      // locally only — running dry ends the round the same way falling
-      // through a gap does (see below)
-      if (state.running) {
-        const remaining = subtract(
-          totalIncomeAtOpen,
-          state.totalExpensesThisSession,
-        );
-        // anything under $1 counts as bankrupt
-        if (lt(remaining, fromNumber(1))) {
-          state.running = false;
-          state.gameOver = true;
-        } else {
-          const cost = multiply(remaining, BASE_BURN_PERCENT_PER_SECOND * dt);
-          state.totalExpensesThisSession = add(
-            state.totalExpensesThisSession,
-            cost,
-          );
-        }
-      }
-
       // fell clean through a gap (past every platform, nothing left to catch
       // it) — the floor riser's own top edge is the bound, not the raw
       // canvas bottom, so the head never visually sinks into the audience
@@ -623,26 +554,9 @@ export function wireLiquidateAssetsGame(
     },
 
     onGameOver: (state) => {
-      if (gt(state.totalExpensesThisSession, ZERO)) {
-        spendFromAllCompanies(state.totalExpensesThisSession);
-      }
       addSecuredAssetsPercent(state.marketInfluencePercent);
     },
 
     onClose: onClose,
-
-    // budget sits its own BUDGET_ABOVE_SCORE_OFFSET further above the shared
-    // score label, same as press conference's own
-    onLayout: (state, cssH, audienceTopY) => {
-      const scoreBottomPx =
-        cssH -
-        audienceTopY +
-        LABEL_ABOVE_AUDIENCE_OFFSET +
-        SCORE_LABELS_EXTRA_LIFT_PX;
-      budgetEl.style.bottom = `${scoreBottomPx + BUDGET_ABOVE_SCORE_OFFSET}px`;
-      budgetValueEl.textContent = formatPrice(
-        subtract(totalIncomeAtOpen, state.totalExpensesThisSession),
-      );
-    },
   });
 }

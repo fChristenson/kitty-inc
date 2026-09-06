@@ -153,6 +153,18 @@ export function getCompanyIncomeRatePerSecond(companyIndex: number): BigNumber {
   return loadCompanyRecord(companyIndex)?.incomeRatePerSecond ?? ZERO;
 }
 
+// combined $/sec across every corporation — same per-company sourcing as
+// getCompanyIncomeRatePerSecond above, just summed. Used by
+// corporationBoostMenu's own getMinigameEntryCost (N seconds of this rate)
+export function getAllCompaniesIncomeRatePerSecond(): BigNumber {
+  const count = getCorporationCount();
+  let sum = ZERO;
+  for (let i = 0; i < count; i++) {
+    sum = add(sum, getCompanyIncomeRatePerSecond(i));
+  }
+  return sum;
+}
+
 // a company's own "wealth" for cost-splitting purposes: its current total plus a
 // projected hour of its own income rate, so a company that earns fast but hasn't
 // banked much yet still shoulders a fair share (not just whichever has the
@@ -203,9 +215,7 @@ export function spendFromAllCompanies(cost: BigNumber): boolean {
   const combinedTotal = totals.reduce((sum, total) => add(sum, total), ZERO);
   if (lt(combinedTotal, cost)) return false;
 
-  const weights = Array.from({ length: count }, (_, i) =>
-    getCompanyWealth(i),
-  );
+  const weights = Array.from({ length: count }, (_, i) => getCompanyWealth(i));
   const paid: BigNumber[] = new Array(count).fill(ZERO);
   const active = new Set(Array.from({ length: count }, (_, i) => i));
   let unallocated = cost;
