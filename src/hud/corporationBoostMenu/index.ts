@@ -216,7 +216,11 @@ export function wireCorporationBoostMenu(
         </span>
         <span class="worker-menu__price">${pressConferencePriceLabel}</span>
       </button>
-      <button class="worker-menu__item" id="liquidate-assets-item">
+      <button
+        class="worker-menu__item"
+        id="liquidate-assets-item"
+        ${pressConferenceAffordable ? "" : "disabled"}
+      >
         <span class="worker-menu__item-label">
           <img src="${shieldIconUrl}" class="worker-menu__icon" alt="" />
           <span class="worker-menu__item-name">Secure stock price</span>
@@ -411,12 +415,12 @@ export function wireCorporationBoostMenu(
     onPressConferenceHeld?.();
   });
 
-  // free to open, unlike the press-conference item above — no cost/affordability
-  // check, just launches straight into the mini game
+  // shows the same price as press conference (see pressConferencePriceLabel)
+  // and is gated by the same affordability check
   list.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
     const button = target.closest<HTMLButtonElement>("#liquidate-assets-item");
-    if (!button) return;
+    if (!button || button.disabled) return;
     onOpenLiquidateAssets?.();
   });
 
@@ -441,6 +445,16 @@ export function wireCorporationBoostMenu(
     );
     if (pressConferenceButton) {
       pressConferenceButton.disabled =
+        getFreePressConferenceCount() === 0 &&
+        lt(allCompaniesTotalIncome, getPressConferenceCost());
+    }
+    // shows/costs the same as press conference (see pressConferencePriceLabel
+    // in render()), so it's gated by the exact same affordability check
+    const liquidateAssetsButton = list.querySelector<HTMLButtonElement>(
+      "#liquidate-assets-item",
+    );
+    if (liquidateAssetsButton) {
+      liquidateAssetsButton.disabled =
         getFreePressConferenceCount() === 0 &&
         lt(allCompaniesTotalIncome, getPressConferenceCost());
     }
