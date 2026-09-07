@@ -160,6 +160,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
   function open(): void {
     render();
     menu.hidden = false;
+    openedAt = Date.now();
     playSwoosh();
     startPolling();
   }
@@ -171,7 +172,18 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
     stopPolling();
   }
 
-  backdrop.addEventListener("click", close);
+  // opened by a tap directly on the canvas HUD/map readout, right where the
+  // backdrop then appears — mobile browsers can synthesize a trailing
+  // compatibility "click" for that same touch shortly after, landing on the
+  // now-visible backdrop and instantly closing what was just opened (same
+  // ghost-click fix as floorUpgradeMenu, also opened from a canvas tap)
+  const IGNORE_BACKDROP_CLICK_MS = 300;
+  let openedAt = 0;
+
+  backdrop.addEventListener("click", () => {
+    if (Date.now() - openedAt < IGNORE_BACKDROP_CLICK_MS) return;
+    close();
+  });
 
   return { open, close };
 }

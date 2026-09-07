@@ -23,6 +23,7 @@ import {
   ZERO,
   fromNumber,
   add,
+  subtract,
   multiply,
   pow,
   max,
@@ -339,44 +340,63 @@ export function addAssetsMovedPercent(delta: number): void {
 // Portfolio %, always usable regardless of current income. Taking
 // INVEST_PERCENT (10%) of each company's own CURRENT total on every press
 // compounds (0.9x remaining each time) and mathematically never reaches
-// exact $0 no matter how long it's held. Instead each press takes 10% of a
-// snapshot of every company's total captured once at hold-start
-// (beginInvestHold) — a fixed dollar amount per press, so exactly 10
-// presses fully drains every company's starting balance, guaranteeing the
-// hold finishes well within a bounded time no matter how much money there is
+// exact $0 no matter how long it's held. Instead each press takes a FIXED
+// chunk (10% of that company's balance at hold-start) out of a separate
+// remaining-to-drain budget that starts at the company's FULL hold-start
+// balance and only ever shrinks — so ~10 presses fully drains it, same as
+// before, but a hold left running past that can never drain more than that
+// one original balance total, no matter how much fresh income streams in in
+// the meantime (a fixed per-press chunk recomputed fresh from the ORIGINAL
+// total every press, with no separate remaining-budget tracking at all, was
+// the previous bug: it kept matching against whatever newly-arrived income
+// was currently available forever, well past the intended one-time cut)
 const INVEST_PERCENT = 0.1;
 
-// call once when a hold gesture starts; snapshot is keyed by company index
-export function beginInvestHold(): BigNumber[] {
-  const count = getCorporationCount();
-  const snapshot: BigNumber[] = [];
-  for (let i = 0; i < count; i++) {
-    snapshot[i] = getStoredTotalIncome(i);
-  }
-  return snapshot;
+export interface InvestHoldBudget {
+  // this hold's fixed 10%-of-original chunk size per company, constant for
+  // its whole duration
+  perPressAmount: BigNumber[];
+  // how much of each company's ORIGINAL hold-start balance is still left to
+  // drain — starts at 100% of it, only ever shrinks, floors at zero
+  remaining: BigNumber[];
 }
 
-// drains INVEST_PERCENT of every company's own hold-start snapshot total
-// independently (so a poor company only ever loses its own small share,
-// never someone else's), capped to whatever that company actually still has
-// (in case something else spent from it mid-hold), then banks a log-scaled
-// Investment Portfolio % gain off however much was actually drained across
-// all of them combined this one press — same sqrt(log10(value)) conversion
-// getCompanyBaseModifierPercent uses, so a bigger single drain is worth more
-// without ever going negative/infinite. Returns the % just gained, or null
-// if every company's snapshot share had nothing left to drain
-export function investInMarket(holdStartTotals: BigNumber[]): number | null {
+// call once when a hold gesture starts
+export function beginInvestHold(): InvestHoldBudget {
+  const count = getCorporationCount();
+  const perPressAmount: BigNumber[] = [];
+  const remaining: BigNumber[] = [];
+  for (let i = 0; i < count; i++) {
+    const total = getStoredTotalIncome(i);
+    perPressAmount[i] = multiply(total, INVEST_PERCENT);
+    remaining[i] = total;
+  }
+  return { perPressAmount, remaining };
+}
+
+// drains each company's own fixed per-press chunk from its own remaining
+// hold budget (remaining is mutated in place — once a company's original
+// balance is fully used up it can't be drained again for the rest of this
+// same hold), capped to whatever that company actually still has live, then
+// banks a log-scaled Investment Portfolio % gain off however much was
+// actually drained across all of them combined this one press — same
+// sqrt(log10(value)) conversion getCompanyBaseModifierPercent uses, so a
+// bigger single drain is worth more without ever going negative/infinite.
+// Returns the % just gained, or null if every company's budget is spent
+export function investInMarket(budget: InvestHoldBudget): number | null {
+  const { perPressAmount, remaining } = budget;
   const count = getCorporationCount();
   let totalDrained: BigNumber = ZERO;
   for (let i = 0; i < count; i++) {
-    const startTotal = holdStartTotals[i];
-    if (!startTotal || isZero(startTotal)) continue;
+    const left = remaining[i];
+    if (!left || isZero(left)) continue;
     const current = getStoredTotalIncome(i);
     if (isZero(current)) continue;
-    const target = multiply(startTotal, INVEST_PERCENT);
-    const amount = min(target, current);
+    const chunk = perPressAmount[i] ?? ZERO;
+    const amount = min(min(chunk, left), current);
     if (isZero(amount)) continue;
     spendCompanyTotalIncome(i, amount);
+    remaining[i] = subtract(left, amount);
     totalDrained = add(totalDrained, amount);
   }
   if (isZero(totalDrained)) return null;

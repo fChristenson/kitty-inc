@@ -17,7 +17,7 @@ import { spawnFloatingLabel } from "../../shared/floatingLabel";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { getManagerIconUrl } from "../../floors";
-import { gte, lt, isZero, type BigNumber } from "../../shared/bigNumber";
+import { gte, lt, isZero } from "../../shared/bigNumber";
 
 const coinIconUrl = getImageUrl("coin");
 const shieldIconUrl = getImageUrl("shield");
@@ -34,6 +34,7 @@ import {
   formatBoostPercent,
   STOCK_CONTRIBUTION_PER_PURCHASE,
 } from "./economy";
+import type { InvestHoldBudget } from "./economy";
 
 export {
   clearStockPrices,
@@ -298,7 +299,7 @@ export function wireCorporationBoostMenu(
   const INVEST_HOLD_INTERVAL_MS = 100;
   let investHeld = false;
   let investHoldController: PressAndHoldController | null = null;
-  let investHoldStartTotals: BigNumber[] | null = null;
+  let investHoldStartTotals: InvestHoldBudget | null = null;
 
   function stopInvestHold(): void {
     investHeld = false;
