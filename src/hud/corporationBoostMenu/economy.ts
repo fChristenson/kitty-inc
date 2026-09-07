@@ -26,6 +26,7 @@ import {
   multiply,
   max,
   min,
+  lt,
   isZero,
   log10,
 } from "../../shared/bigNumber";
@@ -36,15 +37,17 @@ import { CONFIG } from "../../config";
 // only the dialog's DOM markup + wiring. Nothing in this file touches the
 // DOM or canvas.
 
-// converts a $ amount into a small, steadily-growing % via sqrt(log10(amount))
-// — the one shared conversion this file uses anywhere a $ amount needs to
-// become a global-boost percentage at any scale (an invested amount, a
-// company's own value below); null once the amount is too small to be worth
-// anything (log10 negative, i.e. under $1)
-function logScaledGain(amount: BigNumber): number | null {
+// compresses a $ amount spanning hundreds of orders of magnitude down to a
+// small, steadily-growing number via sqrt(log10(amount)) — null once the
+// amount is too small to be worth anything (log10 negative, i.e. under $1).
+// Every "$ amount -> global-boost %" conversion in this file builds on this
+// SAME compression, each applying its own independent rate afterward (see
+// getCompanyBaseModifierPercent/investInMarket) — never fold a
+// caller-specific rate in here
+function compressedScale(amount: BigNumber): number | null {
   const logAmount = log10(amount);
   if (!Number.isFinite(logAmount) || logAmount < 0) return null;
-  return Math.sqrt(logAmount) * BASE_MODIFIER_RATE;
+  return Math.sqrt(logAmount);
 }
 
 // $ cost of opening any minigame ("Hold press conference"/"Secure stock
@@ -266,73 +269,90 @@ export function addAssetsMovedPercent(delta: number): void {
 }
 
 // "Invest in the market" — a cash sink that trades money for Investment
-// Portfolio %, always usable regardless of current income. Taking
-// INVEST_PERCENT (10%) of each company's own CURRENT total on every press
-// compounds (0.9x remaining each time) and mathematically never reaches
-// exact $0 no matter how long it's held. Instead each press takes a FIXED
-// chunk (10% of that company's balance at hold-start) out of a separate
-// remaining-to-drain budget that starts at the company's FULL hold-start
-// balance and only ever shrinks — so ~10 presses fully drains it, same as
-// before, but a hold left running past that can never drain more than that
-// one original balance total, no matter how much fresh income streams in in
-// the meantime (a fixed per-press chunk recomputed fresh from the ORIGINAL
-// total every press, with no separate remaining-budget tracking at all, was
-// the previous bug: it kept matching against whatever newly-arrived income
-// was currently available forever, well past the intended one-time cut)
-const INVEST_PERCENT = CONFIG.corporation.investPercent;
+// Portfolio %, always usable regardless of current income. Each press takes
+// INVEST_DRAIN_PERCENT of whatever's still left in this hold's own
+// remaining-to-drain budget (started at the company's FULL hold-start
+// balance, only ever shrinks) — NOT a fixed chunk of the original total, so
+// the $ amount actually taken (and therefore the % gained, see below) is
+// deliberately smaller on every successive press, matching a real
+// "drain % of what's left" decay. A plain 0.9x-remaining-forever decay never
+// reaches exact $0 though (asymptotes toward it, mathematically forever) —
+// so once what's left decays under INVEST_DRAIN_FLOOR_FRACTION of the
+// hold's own original balance, that press takes ALL of it instead of yet
+// another shrinking slice, guaranteeing the hold actually bottoms out at
+// exactly $0 within a bounded number of presses instead of holding forever
+// without ever finishing. INVEST_GAIN_RATE is a wholly SEPARATE knob from
+// INVEST_DRAIN_PERCENT on purpose — tuning how fast money drains must never
+// silently also change (or fail to change) the % payout, which is exactly
+// the bug it used to have when one config value drove both
+const INVEST_DRAIN_PERCENT = CONFIG.corporation.investDrainPercent;
+const INVEST_DRAIN_FLOOR_FRACTION = CONFIG.corporation.investDrainFloorFraction;
+const INVEST_GAIN_RATE = CONFIG.corporation.investGainRate;
 
 export interface InvestHoldBudget {
-  // this hold's fixed 10%-of-original chunk size per company, constant for
-  // its whole duration
-  perPressAmount: BigNumber[];
+  // each company's own total at the moment this hold began — never
+  // mutated; only used to compute the drain-floor cutoff below, so a slow
+  // percentage decay still guarantees full termination
+  originalTotal: BigNumber[];
   // how much of each company's ORIGINAL hold-start balance is still left to
-  // drain — starts at 100% of it, only ever shrinks, floors at zero
+  // drain — starts at 100% of it, only ever shrinks, snaps to exactly zero
+  // once below INVEST_DRAIN_FLOOR_FRACTION of the original (see investInMarket)
   remaining: BigNumber[];
 }
 
 // call once when a hold gesture starts
 export function beginInvestHold(): InvestHoldBudget {
   const count = getCorporationCount();
-  const perPressAmount: BigNumber[] = [];
+  const originalTotal: BigNumber[] = [];
   const remaining: BigNumber[] = [];
   for (let i = 0; i < count; i++) {
     const total = getStoredTotalIncome(i);
-    perPressAmount[i] = multiply(total, INVEST_PERCENT);
+    originalTotal[i] = total;
     remaining[i] = total;
   }
-  return { perPressAmount, remaining };
+  return { originalTotal, remaining };
 }
 
-// drains each company's own fixed per-press chunk from its own remaining
-// hold budget (remaining is mutated in place — once a company's original
+// drains INVEST_DRAIN_PERCENT of each company's own CURRENT remaining hold
+// budget (remaining is mutated in place — once a company's original
 // balance is fully used up it can't be drained again for the rest of this
-// same hold), capped to whatever that company actually still has live, then
-// banks a log-scaled Investment Portfolio % gain off however much was
-// actually drained across all of them combined this one press — same
-// sqrt(log10(value)) conversion getCompanyBaseModifierPercent uses, so a
-// bigger single drain is worth more without ever going negative/infinite.
-// Returns the % just gained, or null if every company's budget is spent
+// same hold), capped to whatever that company actually still has live.
+// Each company's own gain this press is compressedScale(the ACTUAL $
+// amount drained this press) * INVEST_GAIN_RATE — since that amount itself
+// shrinks every press (see above), the gain shrinks right along with it,
+// and INVEST_GAIN_RATE stays a clean, independent, directly-felt multiplier
+// on top (see the const's own comment for why it's separate from the drain
+// rate). Returns the % just gained, or null if every company's budget is spent
 export function investInMarket(budget: InvestHoldBudget): number | null {
-  const { perPressAmount, remaining } = budget;
+  const { originalTotal, remaining } = budget;
   const count = getCorporationCount();
-  let totalDrained: BigNumber = ZERO;
+  let totalGain = 0;
+  let anyDrained = false;
   for (let i = 0; i < count; i++) {
     const left = remaining[i];
     if (!left || isZero(left)) continue;
     const current = getStoredTotalIncome(i);
     if (isZero(current)) continue;
-    const chunk = perPressAmount[i] ?? ZERO;
+    const drainFloor = multiply(
+      originalTotal[i] ?? ZERO,
+      INVEST_DRAIN_FLOOR_FRACTION,
+    );
+    // once what's left has decayed below the floor, take all of it instead
+    // of yet another (even smaller) drain-percent slice — see this const's
+    // own comment
+    const isFloorSnap = lt(left, drainFloor);
+    const chunk = isFloorSnap ? left : multiply(left, INVEST_DRAIN_PERCENT);
     const amount = min(min(chunk, left), current);
     if (isZero(amount)) continue;
     spendCompanyTotalIncome(i, amount);
     remaining[i] = subtract(left, amount);
-    totalDrained = add(totalDrained, amount);
+    anyDrained = true;
+    const scale = compressedScale(amount) ?? 0;
+    totalGain += scale * INVEST_GAIN_RATE;
   }
-  if (isZero(totalDrained)) return null;
-  const gain = logScaledGain(totalDrained);
-  if (gain === null) return null;
-  addInvestmentPortfolioPercent(gain);
-  return gain;
+  if (!anyDrained || totalGain <= 0) return null;
+  addInvestmentPortfolioPercent(totalGain);
+  return totalGain;
 }
 
 // $ "invested" in a company's buildings — sum of what each one (after the
@@ -456,7 +476,7 @@ function getCompanyValue(companyIndex: number): BigNumber {
 // company that's never done anything else still scales up a little as it
 // grows. sqrt(log10(value)) instead of a plain log10 or sqrt(value): log10
 // alone already compresses illion-scale late-game values down to a small
-// number of "points" (see logScaledGain's own comment), and taking the
+// number of "points" (see compressedScale's own comment), and taking the
 // sqrt of THAT compresses it a second time — so a company many orders of
 // magnitude bigger than another still only ends up a few points higher, never
 // an absurd %, while still strictly increasing with value
@@ -464,7 +484,7 @@ const BASE_MODIFIER_RATE = CONFIG.corporation.baseModifierRate;
 
 export function getCompanyBaseModifierPercent(companyIndex: number): number {
   const companyValue = max(fromNumber(10), getCompanyValue(companyIndex));
-  return Math.sqrt(log10(companyValue)) * BASE_MODIFIER_RATE;
+  return (compressedScale(companyValue) ?? 0) * BASE_MODIFIER_RATE;
 }
 
 // summed across every corporation plus the market-influence AND investment-

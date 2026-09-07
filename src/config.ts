@@ -80,14 +80,34 @@ export const CONFIG = {
 
   // src/hud/corporationBoostMenu/economy.ts — corporation-wide modifiers.
   corporation: {
-    // sqrt(log10(amount)) * this rate — the one shared "$ amount -> a small,
-    // steadily-growing global-boost %" conversion, reused by a company's own
-    // size-based baseline contribution and investInMarket's own gain
+    // sqrt(log10(amount)) * this rate — the shared "$ amount -> a small,
+    // steadily-growing global-boost %" conversion a company's own
+    // size-based baseline contribution uses (see getCompanyBaseModifierPercent)
     baseModifierRate: 0.5,
     // cost to open any minigame: this many seconds of combined company income/sec
     minigameEntrySecondsCost: 10,
-    // "Invest in the market": % of a company's hold-start balance drained per press
-    investPercent: 0.01,
+    // "Invest in the market" (economy.ts's investInMarket) — three
+    // DELIBERATELY SEPARATE knobs, never let one drive more than one of
+    // these again (that exact coupling caused repeated "changing this broke
+    // that instead" bugs):
+    // - investDrainPercent: % of a company's CURRENT remaining hold budget
+    //   taken per press — controls ONLY how fast the hold drains, both the
+    //   $ amount taken and (indirectly, since gain is computed off that
+    //   shrinking amount) how fast the % payout itself shrinks per press
+    investDrainPercent: 0.1,
+    // - investDrainFloorFraction: once what's left decays below this
+    //   fraction of the hold's own ORIGINAL balance, the next press takes
+    //   ALL of it instead of another shrinking slice — a plain percent-of-
+    //   remaining decay never mathematically reaches exact $0 on its own,
+    //   so this guarantees the hold actually bottoms out within a bounded
+    //   number of presses instead of holding forever without finishing
+    investDrainFloorFraction: 0.01,
+    // - investGainRate: sqrt(log10(amount drained this press)) * this rate
+    //   = the % gained that press — controls ONLY the payout's overall
+    //   size; tuning it can never change drain speed, and tuning
+    //   investDrainPercent can never fail to also shrink the payout (since
+    //   it's computed straight off the real, shrinking drained amount)
+    investGainRate: 0.05,
   },
 
   // Minigame reward rates — each banks straight into corporationBoostMenu's
