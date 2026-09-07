@@ -7,8 +7,6 @@ import {
   getAllCompaniesTotalIncome,
   spendFromAllCompanies,
 } from "../../totalIncome";
-import { getCorporationName } from "../../corporationName";
-import { getActiveCorporationIndices } from "../../company";
 import {
   startPressAndHold,
   type PressAndHoldController,
@@ -17,37 +15,28 @@ import { spawnFloatingLabel } from "../../shared/floatingLabel";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { getManagerIconUrl } from "../../floors";
-import { gte, lt, isZero } from "../../shared/bigNumber";
+import { gte, isZero } from "../../shared/bigNumber";
 
 const coinIconUrl = getImageUrl("coin");
 const shieldIconUrl = getImageUrl("shield");
 const graphIconUrl = getImageUrl("graph");
 import {
-  buyStockRaise,
-  getStockRaiseCost,
-  getStockTimesBought,
   getMinigameEntryCost,
   getFreePressConferenceCount,
   holdPressConference,
   beginInvestHold,
   investInMarket,
   formatBoostPercent,
-  STOCK_CONTRIBUTION_PER_PURCHASE,
 } from "./economy";
 import type { InvestHoldBudget } from "./economy";
 
 export {
-  clearStockPrices,
-  getStockTimesBought,
-  getStockRaiseCost,
-  buyStockRaise,
   getMinigameEntryCost,
   getFreePressConferenceCount,
   grantFreePressConference,
   holdPressConference,
   beginInvestHold,
   investInMarket,
-  getStockContributionPercent,
   getCompanyBaseModifierPercent,
   getMarketInfluencePercent,
   addMarketInfluencePercent,
@@ -67,8 +56,8 @@ export {
 } from "./economy";
 export type { MergeCompaniesResult } from "./economy";
 
-// reuses .worker-menu's styling — a dialog listing every corporation's own
-// "raise stock price" purchase, one item per company (see render() below)
+// reuses .worker-menu's styling — a dialog listing this company's various
+// income-boost purchases/minigames (see render() below)
 export function createCorporationBoostMenuMarkup(): string {
   return `
     <div class="worker-menu" id="corporation-boost-menu" hidden>
@@ -123,10 +112,6 @@ export function wireCorporationBoostMenu(
     // actually changed
     const scrollTop = list.scrollTop;
     const managerIconUrl = getManagerIconUrl();
-    // company.ts's getActiveCorporationIndices is the single source of truth
-    // for "which companies still exist" — excludes anything merged away (see
-    // corporationUpgradeMenu's "Merge" action)
-    const activeIndices = getActiveCorporationIndices();
     const minigameEntryCost = getMinigameEntryCost();
     const freePressConferenceCount = getFreePressConferenceCount();
     // computed once and reused below — getAllCompaniesTotalIncome() is itself
@@ -145,28 +130,7 @@ export function wireCorporationBoostMenu(
     // company's total is fully drained there's genuinely nothing left for
     // 10% of $0 to spend
     const investAffordable = !isZero(allCompaniesTotalIncome);
-    const items = activeIndices
-      .map((i) => {
-        const cost = getStockRaiseCost(i);
-        const affordable = gte(allCompaniesTotalIncome, cost);
-        return `
-        <button
-          class="worker-menu__item"
-          data-company-index="${i}"
-          ${affordable ? "" : "disabled"}
-        >
-          <span class="worker-menu__item-label">
-            <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
-            <span class="worker-menu__item-name">${getCorporationName(i)}</span>
-            <span class="worker-menu__item-count">(x${getStockTimesBought(i)})</span>
-          </span>
-          <span class="worker-menu__price">${formatPrice(cost)}</span>
-        </button>
-      `;
-      })
-      .join("");
     list.innerHTML = `
-      <h3 class="worker-menu__subheader">Boost Income Modifiers</h3>
       <button
         class="worker-menu__item"
         id="press-conference-item"
@@ -222,78 +186,12 @@ export function wireCorporationBoostMenu(
         </span>
         <span class="worker-menu__price">10%</span>
       </button>
-      <h3 class="worker-menu__subheader">Raise Stock price</h3>
-      ${items}
     `;
     list.scrollTop = scrollTop;
   }
 
-  // press-and-hold auto-repeat (same interval as gameCanvas.ts's upgrade
-  // button): pointerdown buys once immediately and starts repeating;
-  // pointerup/cancel anywhere stops it. Tracks by company INDEX, not the
-  // button element itself, since every render() call replaces every button node
-  const STOCK_HOLD_INTERVAL_MS = 100;
-  let heldCompanyIndex: number | null = null;
-  let holdController: PressAndHoldController | null = null;
-
-  function stopHold(): void {
-    heldCompanyIndex = null;
-    holdController?.stop();
-    holdController = null;
-  }
-
-  // one purchase attempt; stops the hold once it's no longer affordable so it
-  // doesn't just spin uselessly against a purchase that can never succeed.
-  // render() runs immediately (not gated behind awaiting the press-bounce
-  // animation) so price/affordability update every tick in real time — during a
-  // fast hold, each tick's triggerButtonPress cancels the previous tick's still-
-  // pending one before its "animationend" ever fires, so awaiting it here stalled
-  // render() until the very last tick's animation was finally left undisturbed
-  // (i.e. until the hold actually stopped). triggerButtonPress is still fired
-  // (fire-and-forget) on the freshly rendered button so it still bounces each
-  // tick, same look as boostMenu.ts/upgradeMenu.ts's single-click buttons
-  function fireStockRaise(companyIndex: number): void {
-    if (!buyStockRaise(companyIndex)) {
-      stopHold();
-      return;
-    }
-    playSold();
-    render();
-    const button = list.querySelector<HTMLButtonElement>(
-      `button[data-company-index="${companyIndex}"]`,
-    );
-    if (button) {
-      void triggerButtonPress(button);
-      spawnFloatingLabel(
-        button,
-        panel,
-        formatBoostPercent(STOCK_CONTRIBUTION_PER_PURCHASE),
-      );
-    }
-  }
-
-  list.addEventListener("pointerdown", (event) => {
-    const target = event.target as HTMLElement;
-    const button = target.closest<HTMLButtonElement>(
-      "button[data-company-index]",
-    );
-    if (!button || button.disabled) return;
-    const companyIndex = Number(button.dataset.companyIndex);
-    stopHold(); // safety net against stale state from an interrupted previous gesture
-    heldCompanyIndex = companyIndex;
-    fireStockRaise(companyIndex);
-    holdController = startPressAndHold(() => {
-      if (heldCompanyIndex !== companyIndex) return; // hold already stopped
-      fireStockRaise(companyIndex);
-    }, STOCK_HOLD_INTERVAL_MS);
-  });
-
-  window.addEventListener("pointerup", stopHold);
-  window.addEventListener("pointercancel", stopHold);
-
-  // press-and-hold auto-repeat for Invest in the market, same interval/shape
-  // as the per-company stock-raise hold above but with its own independent
-  // hold state (this button isn't keyed by company index) — a fresh
+  // press-and-hold auto-repeat for Invest in the market (this button isn't
+  // keyed by company index, unlike a per-floor purchase elsewhere) — a fresh
   // beginInvestHold() snapshot is captured every time a hold starts, so
   // exactly 10 presses fully drains it (see economy.ts's investInMarket)
   const INVEST_HOLD_INTERVAL_MS = 100;
@@ -353,7 +251,7 @@ export function wireCorporationBoostMenu(
   window.addEventListener("pointerup", stopInvestHold);
   window.addEventListener("pointercancel", stopInvestHold);
 
-  // single-shot (not press-and-hold, unlike the per-company stock items above) —
+  // single-shot (not press-and-hold, unlike the invest button above) —
   // one press conference at a time makes sense given its own 30-minute-income cost
   list.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
@@ -418,16 +316,6 @@ export function wireCorporationBoostMenu(
     const minigameEntryAffordable =
       getFreePressConferenceCount() > 0 ||
       gte(allCompaniesTotalIncome, minigameEntryCost);
-    const buttons = list.querySelectorAll<HTMLButtonElement>(
-      "button[data-company-index]",
-    );
-    buttons.forEach((button) => {
-      const companyIndex = Number(button.dataset.companyIndex);
-      button.disabled = lt(
-        allCompaniesTotalIncome,
-        getStockRaiseCost(companyIndex),
-      );
-    });
     const pressConferenceButton = list.querySelector<HTMLButtonElement>(
       "#press-conference-item",
     );
@@ -489,7 +377,6 @@ export function wireCorporationBoostMenu(
   }
 
   async function close(): Promise<void> {
-    stopHold();
     stopInvestHold();
     playSwoosh();
     await animateDialogClose(panel);

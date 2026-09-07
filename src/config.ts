@@ -72,12 +72,9 @@ export const CONFIG = {
 
   // src/hud/corporationBoostMenu/economy.ts — corporation-wide modifiers.
   corporation: {
-    stockPriceBase: 1,
-    stockPriceStep: 1,
-    stockRaiseCostBase: 1, // doubles per purchase already made (see getStockRaiseCost)
-    stockContributionPerPurchase: 0.01, // flat % added to the global boost per stock raise
-    // sqrt(log10(companyValue)) * this rate — a company's own size-based baseline
-    // contribution to the global boost; also reused by investInMarket's gain formula
+    // sqrt(log10(amount)) * this rate — the one shared "$ amount -> a small,
+    // steadily-growing global-boost %" conversion, reused by a company's own
+    // size-based baseline contribution and investInMarket's own gain
     baseModifierRate: 0.5,
     // cost to open any minigame: this many seconds of combined company income/sec
     minigameEntrySecondsCost: 10,

@@ -12,7 +12,6 @@ import {
 } from "../../corporationName";
 import { getBuildingPrice } from "../../buildings";
 import {
-  companyStorageKey,
   getActiveCompanyIndex,
   loadCompanyRecord,
   clearCompanyRecord,
@@ -25,7 +24,6 @@ import {
   add,
   subtract,
   multiply,
-  pow,
   max,
   min,
   isZero,
@@ -33,88 +31,20 @@ import {
 } from "../../shared/bigNumber";
 import { CONFIG } from "../../config";
 
-// pure $ economy for the Corporation Boosts dialog (stock price / press
-// conference / company value / global boost math) — split out of index.ts,
-// which owns only the dialog's DOM markup + wiring. Nothing in this file
-// touches the DOM or canvas.
+// pure $ economy for the Corporation Boosts dialog (press conference /
+// company value / global boost math) — split out of index.ts, which owns
+// only the dialog's DOM markup + wiring. Nothing in this file touches the
+// DOM or canvas.
 
-// each corporation's own purchased "shares" — starts at 1 and goes up 1 per
-// purchase, separate from (and never affecting) its totalIncome/buildings. Each
-// purchase adds a flat +0.01% to the modifier (see getStockContributionPercent
-// below) — company value plays no part in this, only in getCompanyBaseModifierPercent
-const STOCK_PRICE_KEY = "cash-clicker:stock-price";
-const STOCK_PRICE_BASE = CONFIG.corporation.stockPriceBase;
-const STOCK_PRICE_STEP = CONFIG.corporation.stockPriceStep;
-
-function loadStockShares(companyIndex: number): number {
-  try {
-    const raw = localStorage.getItem(
-      companyStorageKey(STOCK_PRICE_KEY, companyIndex),
-    );
-    const parsed = raw !== null ? Number(raw) : STOCK_PRICE_BASE;
-    return Number.isFinite(parsed) ? parsed : STOCK_PRICE_BASE;
-  } catch {
-    return STOCK_PRICE_BASE;
-  }
-}
-
-function saveStockShares(companyIndex: number, value: number): void {
-  try {
-    localStorage.setItem(
-      companyStorageKey(STOCK_PRICE_KEY, companyIndex),
-      String(value),
-    );
-  } catch {
-    // storage unavailable: nothing to persist
-  }
-}
-
-// wipes every corporation's purchased shares; call alongside clearCorporationNames
-// on a full game reset, so a fresh game doesn't inherit old stock-price upgrades
-export function clearStockPrices(): void {
-  const count = getCorporationCount();
-  for (let i = 0; i < count; i++) {
-    try {
-      localStorage.removeItem(companyStorageKey(STOCK_PRICE_KEY, i));
-    } catch {
-      // storage unavailable: nothing to clear
-    }
-  }
-  clearMarketInfluence();
-  clearFreePressConferences();
-  clearInvestmentPortfolio();
-}
-
-// how many times a company's stock has actually been raised — the menu shows
-// this ("x3") instead of the dollar stock price itself, same "xN" convention as
-// the crit-upgrade label (floors/upgradeButton)
-export function getStockTimesBought(companyIndex: number): number {
-  return loadStockShares(companyIndex) - STOCK_PRICE_BASE;
-}
-
-// $ cost to raise a company's stock price once: starts at $1 and doubles every
-// time it's already been bought (so the very first raise costs $1, the next
-// $2, then $4, ...) — flat regardless of the company's own value/size. Uses
-// shared/bigNumber's pow (never a raw `**`), so this stays finite no matter
-// how many times stock has already been raised
-const STOCK_RAISE_COST_BASE = CONFIG.corporation.stockRaiseCostBase;
-
-export function getStockRaiseCost(companyIndex: number): BigNumber {
-  const timesBought = loadStockShares(companyIndex) - STOCK_PRICE_BASE;
-  return multiply(pow(2, timesBought), STOCK_RAISE_COST_BASE);
-}
-
-// raises companyIndex's purchased shares by STOCK_PRICE_STEP if affordable —
-// spent proportionally from every corporation's own combined funds (see
-// totalIncome.ts's spendFromAllCompanies), not just the currently active one.
-// Returns whether it succeeded
-export function buyStockRaise(companyIndex: number): boolean {
-  if (!spendFromAllCompanies(getStockRaiseCost(companyIndex))) return false;
-  saveStockShares(
-    companyIndex,
-    loadStockShares(companyIndex) + STOCK_PRICE_STEP,
-  );
-  return true;
+// converts a $ amount into a small, steadily-growing % via sqrt(log10(amount))
+// — the one shared conversion this file uses anywhere a $ amount needs to
+// become a global-boost percentage at any scale (an invested amount, a
+// company's own value below); null once the amount is too small to be worth
+// anything (log10 negative, i.e. under $1)
+function logScaledGain(amount: BigNumber): number | null {
+  const logAmount = log10(amount);
+  if (!Number.isFinite(logAmount) || logAmount < 0) return null;
+  return Math.sqrt(logAmount) * BASE_MODIFIER_RATE;
 }
 
 // $ cost of opening any minigame ("Hold press conference"/"Secure stock
@@ -172,12 +102,10 @@ export function grantFreePressConference(): void {
   saveFreePressConferenceCount(loadFreePressConferenceCount() + 1);
 }
 
-// raises EVERY company's purchased shares by STOCK_PRICE_STEP at once, for one
-// combined cost (see getMinigameEntryCost) instead of paying each company's
-// own escalating getStockRaiseCost individually — the actual boost comes from
-// then playing hud/pressConferenceGame's own mini-game (see Market Influence
-// below), this just pays the entry fee. A banked free credit (see
-// grantFreePressConference) is always spent first. Returns whether it succeeded
+// spends a banked free credit (see grantFreePressConference) first, else
+// pays the shared getMinigameEntryCost — the actual boost comes from then
+// playing hud/pressConferenceGame's own mini-game (see Market Influence
+// below), this just pays the entry fee. Returns whether it succeeded
 export function holdPressConference(): boolean {
   const freeCount = loadFreePressConferenceCount();
   if (freeCount > 0) {
@@ -401,39 +329,10 @@ export function investInMarket(budget: InvestHoldBudget): number | null {
     totalDrained = add(totalDrained, amount);
   }
   if (isZero(totalDrained)) return null;
-  const logDrained = log10(totalDrained);
-  if (!Number.isFinite(logDrained) || logDrained < 0) return null;
-  const gain = Math.sqrt(logDrained) * BASE_MODIFIER_RATE;
+  const gain = logScaledGain(totalDrained);
+  if (gain === null) return null;
   addInvestmentPortfolioPercent(gain);
   return gain;
-}
-
-// folded into clearStockPrices above so a full game reset doesn't inherit an
-// old market-influence modifier either
-function clearMarketInfluence(): void {
-  try {
-    localStorage.removeItem(MARKET_INFLUENCE_KEY);
-  } catch {
-    // storage unavailable: nothing to clear
-  }
-}
-
-// same as clearMarketInfluence, folded into clearStockPrices
-function clearFreePressConferences(): void {
-  try {
-    localStorage.removeItem(FREE_PRESS_CONFERENCES_KEY);
-  } catch {
-    // storage unavailable: nothing to clear
-  }
-}
-
-// same as clearMarketInfluence, folded into clearStockPrices
-function clearInvestmentPortfolio(): void {
-  try {
-    localStorage.removeItem(INVESTMENT_PORTFOLIO_KEY);
-  } catch {
-    // storage unavailable: nothing to clear
-  }
 }
 
 // $ "invested" in a company's buildings — sum of what each one (after the
@@ -476,10 +375,9 @@ export function getCompanyAssetValue(buildings: Floor[][]): BigNumber {
 // hud/corporationUpgradeMenu's "Merge" action: picks whichever selected company
 // has the most overall progress (total floor count across every one of its
 // buildings — the simplest holistic "how far into the game is this company"
-// signal) to survive, folds every other selected company's own total income +
-// upgrades value into the survivor's total, and adds their stock shares to the
-// survivor's own share count (see getStockContributionPercent). The merged-away
-// companies are left permanently empty (0 floors, $0, 0 shares) and hidden from
+// signal) to survive, and folds every other selected company's own total income +
+// upgrades value into the survivor's total. The merged-away
+// companies are left permanently empty (0 floors, $0) and hidden from
 // every company list from then on (see company.ts's isCompanyMerged). Any
 // company, including the currently ACTIVE one, can be selected — the caller
 // (main.ts) is responsible for switching to the survivor afterward, and if the
@@ -512,7 +410,6 @@ export function mergeCompanies(
   );
 
   let addedTotal = ZERO;
-  let addedShares = 0;
   for (const index of companyIndices) {
     if (index === survivorIndex) continue;
     addedTotal = add(
@@ -522,22 +419,8 @@ export function mergeCompanies(
         getUpgradesValue(buildingsByIndex.get(index) ?? []),
       ),
     );
-    addedShares += getStockTimesBought(index);
     clearBuildings(index);
     clearCompanyRecord(index);
-    saveStockShares(index, STOCK_PRICE_BASE);
-  }
-  // stock shares saved BEFORE folding in the merged-away companies' total
-  // income: getCompanyBaseModifierPercent/getCompanyValue read a company's
-  // CURRENT totalIncome live, so writing the new (bigger) total first and the
-  // share count second briefly left the survivor's modifier computed off a
-  // pre-merge share count against an already-inflated total — reported as
-  // "loss of stock modifiers" right after merging
-  if (addedShares > 0) {
-    saveStockShares(
-      survivorIndex,
-      loadStockShares(survivorIndex) + addedShares,
-    );
   }
   addCompanyTotalIncome(survivorIndex, addedTotal);
   // merging multiple companies into one banks a free conference for the survivor
@@ -550,13 +433,12 @@ export function mergeCompanies(
 }
 
 // a company's overall value — its own current total income (bank money) plus
-// the $ sunk into its floors' upgrades — the base a stock-price contribution
-// below is weighted against, and getStockRaiseCost's own cost basis. Buildings
-// cost is deliberately NOT part of this: it was included before, and since
-// total income (the player's actual spendable cash) is already one of the two
-// terms, every stock raise's cost ended up landing right around "everything
-// you currently have", wiping a company's cash to ~0 on the very first
-// purchase. The active company reads its own live buildings (freshest); any
+// the $ sunk into its floors' upgrades — the base getCompanyBaseModifierPercent
+// below weighs a company's size against. Buildings cost is deliberately NOT
+// part of this — total income (the player's actual spendable cash) is already
+// one of the two terms, and buildings cost tends to track total income
+// closely enough that including it just double-counted roughly the same size
+// signal. The active company reads its own live buildings (freshest); any
 // dormant company reads its persisted CompanyRecord's upgradesValue instead of
 // ever loading its full buildings/floors array
 function getCompanyValue(companyIndex: number): BigNumber {
@@ -570,22 +452,11 @@ function getCompanyValue(companyIndex: number): BigNumber {
   return add(upgradesValue, getStoredTotalIncome(companyIndex));
 }
 
-// how much a company's stock price contributes to the combined income boost:
-// a flat +0.01% per purchase, regardless of the company's own value/size —
-// company value only ever factors into getCompanyBaseModifierPercent below
-export const STOCK_CONTRIBUTION_PER_PURCHASE =
-  CONFIG.corporation.stockContributionPerPurchase;
-
-export function getStockContributionPercent(companyIndex: number): number {
-  return getStockTimesBought(companyIndex) * STOCK_CONTRIBUTION_PER_PURCHASE;
-}
-
-// a baseline % every company contributes purely from its own size, on top of
-// (never instead of) getStockContributionPercent above — so a company that's
-// never bought a single stock raise still scales up a little as it grows.
-// sqrt(log10(value)) instead of a plain log10 or sqrt(value): log10 alone
-// already compresses illion-scale late-game values down to a small number of
-// "points" (see getStockContributionPercent's own comment), and taking the
+// a baseline % every company contributes purely from its own size — so a
+// company that's never done anything else still scales up a little as it
+// grows. sqrt(log10(value)) instead of a plain log10 or sqrt(value): log10
+// alone already compresses illion-scale late-game values down to a small
+// number of "points" (see logScaledGain's own comment), and taking the
 // sqrt of THAT compresses it a second time — so a company many orders of
 // magnitude bigger than another still only ends up a few points higher, never
 // an absurd %, while still strictly increasing with value
@@ -613,7 +484,7 @@ export function getGlobalIncomeBoostPercent(): number {
     getTaxRebatePercent() +
     getAssetsMovedPercent();
   for (let i = 0; i < count; i++) {
-    total += getStockContributionPercent(i) + getCompanyBaseModifierPercent(i);
+    total += getCompanyBaseModifierPercent(i);
   }
   return total;
 }
@@ -623,7 +494,7 @@ export function getGlobalIncomeBoostMultiplier(): number {
 }
 
 // +N.NN% — the leading + marks it as always an increase, never a penalty; plain
-// fixed-point since getStockContributionPercent now keeps this comfortably small
+// fixed-point since every banked modifier here stays comfortably small
 export function formatBoostPercent(percent: number): string {
   return `+${percent.toFixed(2)}%`;
 }

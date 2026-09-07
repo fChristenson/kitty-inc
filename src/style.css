@@ -631,7 +631,7 @@ body {
 }
 
 /* spawned by shared/floatingLabel's own spawnFloatingLabel — a "+X%"-style
-   readout rising off whatever button was just pressed (invest/stock raise) */
+   readout rising off whatever button was just pressed (invest, minigame reward) */
 .floating-label {
   position: absolute;
   translate: -50% 0;
@@ -920,11 +920,6 @@ body {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-.worker-menu__item-count {
-  flex-shrink: 0;
-  white-space: nowrap;
 }
 
 .worker-menu__icon {

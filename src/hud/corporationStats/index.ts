@@ -10,7 +10,6 @@ import { getCorporationName } from "../../corporationName";
 import { getActiveCorporationIndices } from "../../company";
 import { playSwoosh } from "../../sound";
 import {
-  getStockContributionPercent,
   getCompanyBaseModifierPercent,
   getMarketInfluencePercent,
   getInvestmentPortfolioPercent,
@@ -100,7 +99,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
     const modifierRows = activeIndices
       .map((i) => ({
         name: getCorporationName(i),
-        pct: getStockContributionPercent(i) + getCompanyBaseModifierPercent(i),
+        pct: getCompanyBaseModifierPercent(i),
       }))
       .sort((a, b) => a.name.localeCompare(b.name))
       .map(

@@ -1,6 +1,7 @@
 // the one shared "press-and-hold auto-repeat" implementation — every hold-to-
-// repeat button in this game (the floor upgrade button, the stock-raise items)
-// uses this instead of its own copy of the same self-rescheduling timeout loop.
+// repeat button in this game (the floor upgrade button, the Invest in the
+// market button) uses this instead of its own copy of the same
+// self-rescheduling timeout loop.
 // Caller fires the action once immediately on pointerdown, then calls
 // startPressAndHold to begin repeating it at a flat interval; call the returned
 // controller's stop() on pointerup/pointercancel (or as soon as the action

@@ -43,8 +43,8 @@ let lastJackpotPlayTime = 0;
 const PAYOUT_DEBOUNCE_MS = 800;
 let lastPayoutPlayTime = 0;
 
-// any press-and-hold-driven purchase loop (corporationBoostMenu's stock-raise
-// hold, etc.) can call this many times a second — without a debounce, each of
+// any press-and-hold-driven purchase loop (corporationBoostMenu's Invest in
+// the market hold, etc.) can call this many times a second — without a debounce, each of
 // those schedules its own overlapping playback, so sound kept audibly playing
 // catch-up well after the hold had already stopped instead of just being skipped
 const SOLD_DEBOUNCE_MS = 60;

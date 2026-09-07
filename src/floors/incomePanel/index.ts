@@ -218,8 +218,7 @@ export function peekDueIncome(floor: Floor, now: number): BigNumber {
 // collectDueIncome/peekDueIncome use, just expressed as a flat rate instead of a
 // lump sum. Worker boost state and office-upgrade multipliers are read straight off
 // the floor itself, so this stays accurate even for a company that isn't the
-// currently active one (see totalIncome.ts's getCompanyWealth and
-// corporationBoostMenu.ts's getStockRaiseCost)
+// currently active one (see totalIncome.ts's getCompanyWealth)
 export function currentIncomeRatePerSecond(
   floor: Floor,
   now: number,

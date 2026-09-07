@@ -43,9 +43,9 @@ export function getStoredTotalIncome(companyIndex: number): BigNumber {
 }
 
 // combined totalIncome across every corporation — every corp boost/upgrade
-// (corporationUpgradeMenu's "Create new Company", corporationBoostMenu's stock raises)
-// draws from this shared pool instead of just the currently active company's own
-// wallet, so a rich company can carry a poor one
+// (corporationUpgradeMenu's "Create new Company", corporationBoostMenu's various
+// purchases) draws from this shared pool instead of just the currently active
+// company's own wallet, so a rich company can carry a poor one
 export function getAllCompaniesTotalIncome(): BigNumber {
   const count = getCorporationCount();
   let sum = ZERO;
@@ -120,11 +120,11 @@ export function addCompanyTotalIncome(
 }
 
 // $/sec every unlocked floor across every one of buildings is currently earning,
-// worker-boost/office-upgrades AND the global stock-boost multiplier (see
+// worker-boost/office-upgrades AND the global income-boost multiplier (see
 // getGlobalIncomeBoostMultiplier) all included — same cycle math peekDueIncome
 // uses, just as a flat rate instead of a lump sum. Exported so
-// corporationBoostMenu.ts's getStockRaiseCost values a company's current earning
-// power the same way even while it isn't the active company
+// corporationBoostMenu.ts's cost/weight calculations value a company's current
+// earning power the same way even while it isn't the active company
 export function getBuildingsCurrentIncomePerSecond(
   buildings: Floor[][],
   now: number,
@@ -143,8 +143,7 @@ export function getBuildingsCurrentIncomePerSecond(
 // buildings/floors — the active company's is computed live (freshest), every
 // other company's comes straight from its persisted CompanyRecord (see
 // company.ts), already boost-adjusted as of when it went dormant. The single
-// shared way any per-company cost/weight calculation (getCompanyWealth,
-// corporationBoostMenu's getStockRaiseCost)
+// shared way any per-company cost/weight calculation (getCompanyWealth)
 // should read a company's rate — never loadBuildings(i) directly for this
 export function getCompanyIncomeRatePerSecond(companyIndex: number): BigNumber {
   if (companyIndex === activeCompanyIndex) {
@@ -179,8 +178,8 @@ function getCompanyWealth(companyIndex: number): BigNumber {
 
 const SECONDS_PER_HOUR = 3600;
 
-// the actual "money sink" design goal (see hud/corporationBoostMenu's stock-price
-// boosts): richer companies foot proportionally more of any corp boost/upgrade's
+// the actual "money sink" design goal (see hud/corporationBoostMenu's Invest
+// in the market / minigame entry costs): richer companies foot proportionally more of any corp boost/upgrade's
 // cost, draining their own excess wealth to fund something that benefits every
 // company equally (see corporationBoostMenu's getGlobalIncomeBoostMultiplier,
 // applied globally regardless of which company is currently active) — so a brand
@@ -311,13 +310,13 @@ export function switchActiveCompany(
 const COLLECT_INTERVAL_MS = 200;
 
 // multiplies every $ collected below — main.ts wires this to
-// hud/corporationBoostMenu's getGlobalIncomeBoostMultiplier (stock-price
+// hud/corporationBoostMenu's getGlobalIncomeBoostMultiplier (company-value/market
 // modifiers), passed in rather than imported directly to avoid a totalIncome ->
 // hud -> floors -> totalIncome import cycle (hud already imports from both
 // totalIncome and floors)
 let incomeBoostMultiplier: () => number = () => 1;
 // incomeBoostMultiplier() itself is still O(companies) even called just once
-// per tick (see collectAll) — a company's stock/value/income doesn't
+// per tick (see collectAll) — a company's value/income doesn't
 // meaningfully change within a second, so it's only actually recomputed at
 // most this often; every other 200ms tick in between reuses the cached value
 const BOOST_MULTIPLIER_CACHE_MS = 1000;

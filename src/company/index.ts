@@ -169,10 +169,10 @@ export function markCompaniesMerged(companyIndices: number[]): void {
 // THE single source of truth for "which company indices still represent a
 // real, selectable corporation" (0..getCorporationCount()-1, minus anything
 // isCompanyMerged) — every list of companies shown anywhere (cityMap's
-// corp-name barrel, corporationBoostMenu's stock-raise items,
-// corporationUpgradeMenu's Merge checklist) must derive from this instead of
-// each independently re-deriving its own `Array.from({length:count})...filter`,
-// which is exactly what let a merged-away company keep showing up in the map's
+// corp-name barrel, corporationUpgradeMenu's Merge checklist) must derive
+// from this instead of each independently re-deriving its own
+// `Array.from({length:count})...filter`, which is exactly what let a
+// merged-away company keep showing up in the map's
 // barrel after a merge cleaned up everywhere else
 export function getActiveCorporationIndices(): number[] {
   const count = getCorporationCount();
