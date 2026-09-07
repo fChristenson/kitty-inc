@@ -58,13 +58,17 @@ const COOLDOWN_INDICATOR_OFFSET_Y = 8;
 // text" convention
 const TAXES_FONT = '900 15px "Fredoka", system-ui, sans-serif';
 const TAXES_STROKE_WIDTH = 6;
-// aimed at wherever the ship is at the exact moment a word spawns, at
-// roughly half the line/ship's own scroll speed — fixed for that word's
-// whole life (see spawnTaxWord/step), so the ship's own later movement can
-// never speed up or redirect an already-spawned word; only a NEW word
-// spawning later, at a higher difficulty tier, is ever faster (see the
-// ramp below)
+// re-aimed at the ship's own current position every frame (a true homing
+// seek, not just drifting left), at roughly half the line/ship's own
+// scroll speed — see the difficulty ramp below for how this grows over time
 const TAXES_HOMING_SPEED_PX_S = 70;
+// how fast a word's actual velocity blends toward that fresh aim, each
+// frame (same idea/convention as hud/taxHavenGame's own TAXES_STEER_RATE_PER_S)
+// — without this, a sudden ship drag instantly redirects/snaps a word's
+// velocity, which reads as it "speeding up" toward you; blending it in over
+// a few frames keeps the word's own speed close to TAXES_HOMING_SPEED_PX_S
+// (times its difficulty tier) instead of momentarily spiking
+const TAXES_STEER_RATE_PER_S = 5;
 const TAXES_SPAWN_INTERVAL_MS = 2200;
 // approximates the rendered text's own half-size (halved along with
 // TAXES_FONT) for a circle-vs-circle touch check against the head
@@ -170,11 +174,10 @@ function drawDoubleTapCooldown(
 interface TaxWord {
   x: number;
   y: number;
-  // fixed the moment this word spawns (see spawnTaxWord) — aimed toward
-  // wherever the ship was at that exact instant, at that instant's own
-  // difficulty-tier speed. Never recomputed afterward, so the word always
-  // travels in a straight line at a genuinely constant rate for its whole
-  // life, regardless of how the ship moves later
+  // this word's own current velocity — eased toward a fresh "aim at the
+  // ship" target every frame (see step), never snapped straight to it, so
+  // a sudden ship movement blends in smoothly instead of instantly
+  // redirecting/accelerating the word
   vx: number;
   vy: number;
   // null while active (homing, harmful); counts down once a double tap
@@ -183,48 +186,22 @@ interface TaxWord {
   vanishRemainingMs: number | null;
 }
 
-// spawns just outside a random edge of the canvas, aimed toward wherever
-// the ship (shipX/shipY) is RIGHT NOW at exactly speedPxS — see the TaxWord
-// interface's own comment for why this is fixed at spawn instead of
-// re-aimed every frame in step()
-function spawnTaxWord(
-  cssW: number,
-  cssH: number,
-  shipX: number,
-  shipY: number,
-  speedPxS: number,
-): TaxWord {
+// spawns just outside a random edge of the canvas, so it always has to travel
+// inward toward wherever the ship currently is (see step's own homing update)
+function spawnTaxWord(cssW: number, cssH: number): TaxWord {
   const side = Math.floor(Math.random() * 4);
   const margin = 40;
-  let x: number;
-  let y: number;
+  const base = { vx: 0, vy: 0, vanishRemainingMs: null };
   switch (side) {
     case 0: // above
-      x = Math.random() * cssW;
-      y = -margin;
-      break;
+      return { ...base, x: Math.random() * cssW, y: -margin };
     case 1: // below
-      x = Math.random() * cssW;
-      y = cssH + margin;
-      break;
+      return { ...base, x: Math.random() * cssW, y: cssH + margin };
     case 2: // left
-      x = -margin;
-      y = Math.random() * cssH;
-      break;
+      return { ...base, x: -margin, y: Math.random() * cssH };
     default: // right
-      x = cssW + margin;
-      y = Math.random() * cssH;
+      return { ...base, x: cssW + margin, y: Math.random() * cssH };
   }
-  const dx = shipX - x;
-  const dy = shipY - y;
-  const dist = Math.hypot(dx, dy) || 1;
-  return {
-    x,
-    y,
-    vx: (dx / dist) * speedPxS,
-    vy: (dy / dist) * speedPxS,
-    vanishRemainingMs: null,
-  };
 }
 
 export function createPayTaxesGameMarkup(): string {
@@ -371,17 +348,10 @@ export function wirePayTaxesGame(
       state.nextTaxWordInMs -= dtMs;
       const taxesTier = getTaxesTier(state.survivedMs);
       if (state.nextTaxWordInMs <= 0) {
-        state.taxWords.push(
-          spawnTaxWord(
-            cssW,
-            getFloorTopY(),
-            state.shipX,
-            state.shipY,
-            getTaxesSpeedPxS(taxesTier),
-          ),
-        );
+        state.taxWords.push(spawnTaxWord(cssW, getFloorTopY()));
         state.nextTaxWordInMs = getTaxesSpawnIntervalMs(taxesTier);
       }
+      const taxesSpeed = getTaxesSpeedPxS(taxesTier);
       for (const word of state.taxWords) {
         if (word.vanishRemainingMs !== null) {
           // frozen in place and harmless while blinking out — no homing
@@ -389,9 +359,17 @@ export function wirePayTaxesGame(
           word.vanishRemainingMs = Math.max(0, word.vanishRemainingMs - dtMs);
           continue;
         }
+        const dx = state.shipX - word.x;
+        const dy = state.shipY - word.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        // eased toward the fresh aim, never snapped to it — see the
+        // TaxWord interface's own comment for why
+        const desiredVX = (dx / dist) * taxesSpeed;
+        const desiredVY = (dy / dist) * taxesSpeed;
+        word.vx += (desiredVX - word.vx) * TAXES_STEER_RATE_PER_S * dt;
+        word.vy += (desiredVY - word.vy) * TAXES_STEER_RATE_PER_S * dt;
         word.x += word.vx * dt;
         word.y += word.vy * dt;
-        const dist = Math.hypot(state.shipX - word.x, state.shipY - word.y);
         if (dist <= TAXES_COLLISION_RADIUS + HEAD_RADIUS) {
           state.running = false;
           state.gameOver = true;
