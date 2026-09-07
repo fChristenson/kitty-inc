@@ -39,16 +39,19 @@ export {
 // every literal balance number below lives in src/config.ts (CONFIG.floors) —
 // tune income/pricing there, not here
 const BASE_INCOME_AMOUNT = CONFIG.floors.baseIncomeAmount; // ground floor's starting $/interval
-// each floor above starts at 3x the previous floor's income amount, while the interval
-// only doubles (see BASE_INCOME_INTERVAL_SECONDS) — so the effective $/s rate grows 1.5x
-// per floor, rewarding climbing higher over sitting on low floors' faster-but-smaller payouts
+// each floor above starts at incomeGrowthFactor times the previous floor's income
+// amount, while the interval only doubles (see BASE_INCOME_INTERVAL_SECONDS) —
+// incomeGrowthFactor is kept equal to that doubling (see config.ts's own comment
+// on why), so a fresh, un-upgraded floor's $/s is flat across floor depth; only
+// upgrades (and other buildings) grow it from there
 const INCOME_GROWTH_FACTOR = CONFIG.floors.incomeGrowthFactor;
 const BASE_INCOME_INTERVAL_SECONDS = CONFIG.floors.baseIncomeIntervalSeconds; // ground floor's payout interval; each floor above doubles it
 const BASE_UPGRADE_COST = CONFIG.floors.baseUpgradeCost; // ground floor's starting upgrade price; each floor above doubles it
 const BASE_UNLOCK_COST = CONFIG.floors.baseUnlockCost; // floor 2's unlock price; each floor above doubles it
-// each upgrade click's payoff scales exactly like the base income (same INCOME_GROWTH_FACTOR),
-// so a floor's 1.5x-per-level rate advantage holds no matter how many upgrades it has bought —
-// a flat step here would let enough flat-rate floor-1 upgrades out-earn a higher, unupgraded floor
+// each upgrade click's payoff scales exactly like the base income (same
+// INCOME_GROWTH_FACTOR), so a higher floor's own upgrades are still worth
+// proportionately more per click than a lower floor's — a flat step here would
+// let enough flat-rate floor-1 upgrades out-earn a higher, unupgraded floor
 const BASE_RATE_STEP = CONFIG.floors.baseRateStep;
 
 // every processed floor background (see scripts/process-background-floors.mjs,

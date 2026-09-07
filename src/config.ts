@@ -10,10 +10,18 @@
 export const CONFIG = {
   // src/floors/index.ts's buildFloor — a new floor's starting stats. Each floor
   // above the ground floor multiplies its income by incomeGrowthFactor while its
-  // interval only doubles, so $/sec grows incomeGrowthFactor/2 per floor.
+  // interval only doubles. incomeGrowthFactor is deliberately equal to that
+  // doubling (2) — NOT bigger — so a fresh, un-upgraded floor's base $/s is flat
+  // across every floor level within a building; only accumulated upgrades (and
+  // switching to a whole new, 1000x-richer building) grow $/s from there.
+  // Previously this was 3 (a 1.5x-per-floor $/s runaway on floor depth ALONE),
+  // which let endlessly climbing one building's floors always out-earn buying a
+  // new building by an ever-widening margin — buildings stopped mattering once
+  // a single building got tall enough. Keep this <= 2 (the interval-doubling
+  // factor) so that snowball never comes back.
   floors: {
     baseIncomeAmount: 1,
-    incomeGrowthFactor: 3,
+    incomeGrowthFactor: 2,
     baseIncomeIntervalSeconds: 1,
     baseUpgradeCost: 1,
     baseUnlockCost: 200,
