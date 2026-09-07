@@ -9,15 +9,25 @@ export const HUD_H = HUD_TOP_MARGIN + HUD_FONT_SIZE + 16;
 
 const totalIncomeReadout = createTotalIncomeReadout();
 
+// returns the actual screen-Y just below the drawn readout (amount, plus the
+// unit-name line under it once the total is big enough to have one) — the
+// real tappable height varies with that, so callers doing hit-testing (see
+// gameCanvas's own HUD tap zone) must use this return value, not a fixed guess
 export function drawHud(
   ctx: CanvasRenderingContext2D,
   canvasWidth: number,
   totalIncome: BigNumber,
-): void {
-  totalIncomeReadout.draw(ctx, canvasWidth / 2, HUD_TOP_MARGIN, totalIncome, {
-    fontSize: HUD_FONT_SIZE,
-    unitNameGapPx: HUD_UNIT_NAME_GAP_PX,
-  });
+): number {
+  return totalIncomeReadout.draw(
+    ctx,
+    canvasWidth / 2,
+    HUD_TOP_MARGIN,
+    totalIncome,
+    {
+      fontSize: HUD_FONT_SIZE,
+      unitNameGapPx: HUD_UNIT_NAME_GAP_PX,
+    },
+  );
 }
 
 // everything below is this module's own facade: hud/ has several nested widgets
@@ -41,6 +51,11 @@ export {
   mergeCompanies,
 } from "./corporationBoostMenu";
 export type { CorporationBoostMenu } from "./corporationBoostMenu";
+export {
+  createCorporationStatsMarkup,
+  wireCorporationStats,
+} from "./corporationStats";
+export type { CorporationStats } from "./corporationStats";
 export {
   createPressConferenceGameMarkup,
   wirePressConferenceGame,

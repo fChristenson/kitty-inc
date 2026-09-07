@@ -48,6 +48,44 @@ const ASSETS_MOVED_PERCENT_PER_SECOND = 0.05;
 // text" convention
 const TAXES_FONT = '900 15px "Fredoka", system-ui, sans-serif';
 const TAXES_STROKE_WIDTH = 6;
+
+// pre-rendered once and reused every frame after — re-running strokeText +
+// fillText for every one of the swarm's words every frame is real, avoidable
+// canvas cost, especially on mobile; the text/style never changes, so a
+// small cached bitmap drawImage'd in its place is far cheaper (same idea
+// screenShake's own bloom-text caching uses)
+let taxesLabelBitmap: HTMLCanvasElement | null = null;
+
+function getTaxesLabelBitmap(ctx: CanvasRenderingContext2D): HTMLCanvasElement {
+  if (taxesLabelBitmap) return taxesLabelBitmap;
+  ctx.font = TAXES_FONT;
+  const metrics = ctx.measureText("Taxes");
+  const padding = TAXES_STROKE_WIDTH;
+  const width = Math.ceil(metrics.width + padding * 2);
+  const height = Math.ceil(
+    (metrics.actualBoundingBoxAscent || 12) +
+      (metrics.actualBoundingBoxDescent || 4) +
+      padding * 2,
+  );
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const bitmapCtx = canvas.getContext("2d")!;
+  bitmapCtx.font = TAXES_FONT;
+  bitmapCtx.textAlign = "center";
+  bitmapCtx.textBaseline = "middle";
+  drawCartoonText(
+    bitmapCtx,
+    "Taxes",
+    width / 2,
+    height / 2,
+    COLOR.red,
+    COLOR.white,
+    TAXES_STROKE_WIDTH,
+  );
+  taxesLabelBitmap = canvas;
+  return canvas;
+}
 const SWARM_SIZE = 8;
 // halved from the old flat 2x-scroll-speed baseline, then halved again
 // (slower overall), then ramps back up over time (see
@@ -491,18 +529,12 @@ export function wireTaxHavenGame(
         getSafeLineThickness(state.survivedMs),
         SAFE_LINE_COLOR,
       );
-      ctx.font = TAXES_FONT;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
+      const bitmap = getTaxesLabelBitmap(ctx);
       for (const word of state.taxWords) {
-        drawCartoonText(
-          ctx,
-          "Taxes",
-          word.x,
-          word.y,
-          COLOR.red,
-          COLOR.white,
-          TAXES_STROKE_WIDTH,
+        ctx.drawImage(
+          bitmap,
+          word.x - bitmap.width / 2,
+          word.y - bitmap.height / 2,
         );
       }
       const points = [...state.breadcrumbs, { x: state.shipX, y: state.shipY }];

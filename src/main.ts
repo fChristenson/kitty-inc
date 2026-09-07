@@ -73,10 +73,11 @@ import {
   wireBoostMenu,
   createCorporationBoostMenuMarkup,
   wireCorporationBoostMenu,
+  createCorporationStatsMarkup,
+  wireCorporationStats,
   getGlobalIncomeBoostMultiplier,
   getCompanyAssetValue,
   getCompanyUpgradesValue,
-  grantFreePressConference,
   mergeCompanies,
   createPressConferenceGameMarkup,
   wirePressConferenceGame,
@@ -139,6 +140,7 @@ async function main() {
     ${createCorporationUpgradeMenuMarkup()}
     ${createBoostMenuMarkup()}
     ${createCorporationBoostMenuMarkup()}
+    ${createCorporationStatsMarkup()}
     ${createPressConferenceGameMarkup()}
     ${createLiquidateAssetsGameMarkup()}
     ${createPayTaxesGameMarkup()}
@@ -253,6 +255,7 @@ async function main() {
   await loadCityMapImage();
 
   const floorUpgradeMenu = wireFloorUpgradeMenu(app, () => persist());
+  const corporationStats = wireCorporationStats(app);
 
   const gameCanvas = createGameCanvas({
     canvas,
@@ -262,6 +265,7 @@ async function main() {
     persist,
     onOpenFloorUpgrades: (floor, floorNumber) =>
       floorUpgradeMenu.open(floor, floorNumber),
+    onOpenCorporationStats: () => corporationStats.open(),
   });
 
   // ensures a building's next locked floor is waiting above it; onAdd only forwards
@@ -407,7 +411,6 @@ async function main() {
     () => {
       if (!spendFromAllCompanies(getCorporationPrice())) return;
       const newIndex = createNewCorporation();
-      grantFreePressConference();
       corporationUpgradeMenu.close();
       setTimeout(() => {
         playSwoosh();
@@ -571,6 +574,7 @@ async function main() {
       skipNextOutgoingSnapshot = false;
       switchToCompany(companyIndex, skip);
     },
+    onOpenCorporationStats: () => corporationStats.open(),
   });
   wireActionBar(app, {
     onScrollTop: () => {

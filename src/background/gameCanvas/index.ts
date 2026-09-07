@@ -18,7 +18,7 @@ import { drawClouds, CLOUD_MAX_RADIUS } from "../clouds";
 import { drawCity, CITY_MAX_HEIGHT, getCitySkyGroundColor } from "../city";
 import { drawStars } from "../stars";
 import { drawRoof } from "../../buildings";
-import { drawHud } from "../../hud";
+import { drawHud, HUD_H } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
 import { getScreenShakeOffset, drawCritFlash } from "../../screenShake";
@@ -101,6 +101,10 @@ export interface GameCanvasDeps {
   // supplies/manager dialog (hud/floorUpgradeMenu). gameCanvas has no DOM/dialog
   // access itself, so this is threaded in from main.ts same as persist above
   onOpenFloorUpgrades: (floor: Floor, floorNumber: number) => void;
+  // fired by a plain tap anywhere in the top-of-screen HUD total-income band
+  // (see redraw()'s own drawHud call, always the topmost layer) — opens the
+  // read-only corporation income rate/modifiers breakdown (hud/corporationStats)
+  onOpenCorporationStats: () => void;
 }
 
 export interface GameCanvas {
@@ -135,6 +139,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     getBuildingMultiplier,
     persist,
     onOpenFloorUpgrades,
+    onOpenCorporationStats,
   } = deps;
   const ctx = canvas.getContext("2d")!;
 
@@ -148,6 +153,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
 
   // the one shared vertical camera; scrollUp is world-space
   let scrollUp = 0; // world units scrolled up from the ground-anchored default (0)
+  // the HUD's own actual drawn bottom edge as of the last redraw() (see drawHud's
+  // return value) — starts at the fixed HUD_H guess before the first real draw,
+  // then tracks the real height once a unit-name line makes it taller
+  let hudBottomY = HUD_H;
   // exact floor-local point the cursor is over, so the upgrade button can check
   // specifically whether it itself is hovered instead of "is anything on this floor
   // hoverable" (that coarser check is still what drives the pointer cursor below)
@@ -483,8 +492,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
 
     // the total-income text is the absolute top layer: no reserved band, no fill
     // behind it, just floating text drawn last in plain screen space so nothing can
-    // ever cover it and it never cuts the world off underneath it
-    drawHud(ctx, SLOT_W, getTotalIncome());
+    // ever cover it and it never cuts the world off underneath it. Its real drawn
+    // height varies (a unit-name line only appears once the total is big enough),
+    // so the actual bottom edge is captured for the HUD tap-zone hit-test below
+    // instead of guessing a fixed height
+    hudBottomY = drawHud(ctx, SLOT_W, getTotalIncome());
     // pops up dead center over the whole viewport for the same brief window as the
     // shake above it (still inside the shake's own translate, so it rattles too —
     // reinforces the "this hit hard" feeling rather than floating serenely above it)
@@ -505,6 +517,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   let velocityY = 0;
   let lastMoveTime = 0;
   let momentumFrame: number | null = null;
+  // true for the whole gesture if it started inside the HUD's own screen-space
+  // tap zone (see drawHud's own "absolute top layer" comment above) — the HUD
+  // sits over whatever floor content happens to be scrolled underneath it, so
+  // that gesture must never also fire a floor tap/upgrade-button hit
+  let hudTapDown = false;
 
   function stopMomentum(): void {
     if (momentumFrame !== null) {
@@ -622,6 +639,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     stopHoldRepeat(); // safety net against a stale hold from an interrupted previous gesture
     upgradeFiredOnDown = false;
     const p = canvasPoint(event);
+    hudTapDown = p.y < hudBottomY;
+    if (hudTapDown) return; // HUD is the topmost layer — no floor hit-test underneath it
     const hit = hitTestPoint(p.x, p.y);
     if (
       hit &&
@@ -648,6 +667,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   function onPointerMove(event: PointerEvent): void {
     if (dragPointerId !== event.pointerId) {
       const p = canvasPoint(event);
+      if (p.y < hudBottomY) {
+        canvas.style.cursor = "pointer";
+        hoveredPoint = null;
+        return;
+      }
       const hit = hitTestPoint(p.x, p.y);
       const hoverable = hit
         ? hitTestMouse(hit.localX, hit.localY, hit.floor) ||
@@ -698,6 +722,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       if (Math.abs(velocityY) > MOMENTUM_MIN_SPEED) {
         runMomentum();
       }
+      return;
+    }
+    if (hudTapDown) {
+      onOpenCorporationStats();
       return;
     }
     if (upgradeFiredOnDown) return;

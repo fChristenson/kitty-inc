@@ -745,6 +745,7 @@ body {
 
 .worker-menu__list {
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   /* wide enough that neighboring items' cream/outline rings (7px reach) never touch */
@@ -765,6 +766,13 @@ body {
 
 .worker-menu__total-income {
   display: block;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  /* without this, some engines collapse the block's auto height to 0 once
+     overflow is non-visible on a nowrap/ellipsis line, hiding the text entirely */
+  min-height: 1.2em;
   font-size: 1.75rem;
   font-weight: 900;
   color: var(--color-money-green);

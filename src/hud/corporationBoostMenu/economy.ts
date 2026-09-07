@@ -1,8 +1,8 @@
 import { loadBuildings, clearBuildings, type Floor } from "../../gameState";
 import {
   spendFromAllCompanies,
+  spendCompanyTotalIncome,
   getStoredTotalIncome,
-  getAllCompaniesTotalIncome,
   getAllCompaniesIncomeRatePerSecond,
   addCompanyTotalIncome,
 } from "../../totalIncome";
@@ -336,54 +336,53 @@ export function addAssetsMovedPercent(delta: number): void {
 }
 
 // "Invest in the market" — a cash sink that trades money for Investment
-// Portfolio %, always usable regardless of current income. Each click
-// spends INVEST_PERCENT (10%) of referenceTotal — the combined corp total
-// captured ONCE at hold-start (see corporationBoostMenu/index.ts's own
-// investReferenceTotal), NOT a freshly re-read total every press. That's
-// what guarantees EXACTLY 10 presses (1 / INVEST_PERCENT) fully drains any
-// hold, however large — spending 10% of the shrinking remainder each time
-// (the previous design) compounds instead of accumulating, so it only ever
-// asymptotically approaches $0 and, for a big enough total, can take far
-// more than 10 presses to even get within a dollar of it. Capped at
-// whatever's actually left (currentTotal) so the final press(es) never
-// overdraw once the reference has been fully spent
+// Portfolio %, always usable regardless of current income. Taking
+// INVEST_PERCENT (10%) of each company's own CURRENT total on every press
+// compounds (0.9x remaining each time) and mathematically never reaches
+// exact $0 no matter how long it's held. Instead each press takes 10% of a
+// snapshot of every company's total captured once at hold-start
+// (beginInvestHold) — a fixed dollar amount per press, so exactly 10
+// presses fully drains every company's starting balance, guaranteeing the
+// hold finishes well within a bounded time no matter how much money there is
 const INVEST_PERCENT = 0.1;
 
-export function getInvestCost(referenceTotal: BigNumber): BigNumber {
-  const currentTotal = getAllCompaniesTotalIncome();
-  if (isZero(currentTotal)) return ZERO;
-  return min(currentTotal, multiply(referenceTotal, INVEST_PERCENT));
-}
-
-// fully liquidating a company's whole worth should feel about as valuable as
-// that same worth already was AS a company (see getCompanyBaseModifierPercent
-// below, reused here — same BASE_MODIFIER_RATE, same sqrt(log10(value))
-// conversion) rather than some unrelated, much smaller rate. getInvestGain is
-// this full-drain total's SHARE for one particular press, proportional to how
-// much of referenceTotal that press actually spent — computed via log10
-// (never toNumber) so the ratio stays safe no matter how astronomically large
-// referenceTotal is
-function getInvestGain(cost: BigNumber, referenceTotal: BigNumber): number {
-  const logRef = log10(referenceTotal);
-  const logCost = log10(cost);
-  if (!Number.isFinite(logRef) || logRef < 0 || !Number.isFinite(logCost)) {
-    return 0;
+// call once when a hold gesture starts; snapshot is keyed by company index
+export function beginInvestHold(): BigNumber[] {
+  const count = getCorporationCount();
+  const snapshot: BigNumber[] = [];
+  for (let i = 0; i < count; i++) {
+    snapshot[i] = getStoredTotalIncome(i);
   }
-  const totalGain = Math.sqrt(logRef) * BASE_MODIFIER_RATE;
-  const shareOfReference = 10 ** (logCost - logRef);
-  return totalGain * shareOfReference;
+  return snapshot;
 }
 
-// spends getInvestCost(referenceTotal) (proportionally across every
-// company, same as a stock raise/press conference) and banks the log-scaled
-// Investment Portfolio % gain above. A no-op once total income is fully
-// drained (cost itself is exactly 0) — returns the % just gained, or null if
-// the press failed
-export function investInMarket(referenceTotal: BigNumber): number | null {
-  const cost = getInvestCost(referenceTotal);
-  if (isZero(cost)) return null;
-  if (!spendFromAllCompanies(cost)) return null;
-  const gain = getInvestGain(cost, referenceTotal);
+// drains INVEST_PERCENT of every company's own hold-start snapshot total
+// independently (so a poor company only ever loses its own small share,
+// never someone else's), capped to whatever that company actually still has
+// (in case something else spent from it mid-hold), then banks a log-scaled
+// Investment Portfolio % gain off however much was actually drained across
+// all of them combined this one press — same sqrt(log10(value)) conversion
+// getCompanyBaseModifierPercent uses, so a bigger single drain is worth more
+// without ever going negative/infinite. Returns the % just gained, or null
+// if every company's snapshot share had nothing left to drain
+export function investInMarket(holdStartTotals: BigNumber[]): number | null {
+  const count = getCorporationCount();
+  let totalDrained: BigNumber = ZERO;
+  for (let i = 0; i < count; i++) {
+    const startTotal = holdStartTotals[i];
+    if (!startTotal || isZero(startTotal)) continue;
+    const current = getStoredTotalIncome(i);
+    if (isZero(current)) continue;
+    const target = multiply(startTotal, INVEST_PERCENT);
+    const amount = min(target, current);
+    if (isZero(amount)) continue;
+    spendCompanyTotalIncome(i, amount);
+    totalDrained = add(totalDrained, amount);
+  }
+  if (isZero(totalDrained)) return null;
+  const logDrained = log10(totalDrained);
+  if (!Number.isFinite(logDrained) || logDrained < 0) return null;
+  const gain = Math.sqrt(logDrained) * BASE_MODIFIER_RATE;
   addInvestmentPortfolioPercent(gain);
   return gain;
 }
@@ -520,8 +519,7 @@ export function mergeCompanies(
     );
   }
   addCompanyTotalIncome(survivorIndex, addedTotal);
-  // same "merging/creating a corporation banks a free conference" reward
-  // main.ts's "Create new Corporation" already grants
+  // merging multiple companies into one banks a free conference for the survivor
   grantFreePressConference();
 
   markCompaniesMerged(

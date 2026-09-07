@@ -1,6 +1,5 @@
 import {
   formatPrice,
-  formatTotalIncomeFull,
   animateDialogClose,
   triggerButtonPress,
 } from "../../utils";
@@ -27,19 +26,11 @@ import {
   buyStockRaise,
   getStockRaiseCost,
   getStockTimesBought,
-  getStockContributionPercent,
-  getCompanyBaseModifierPercent,
   getMinigameEntryCost,
   getFreePressConferenceCount,
   holdPressConference,
-  getInvestCost,
+  beginInvestHold,
   investInMarket,
-  getMarketInfluencePercent,
-  getInvestmentPortfolioPercent,
-  getSecuredAssetsPercent,
-  getTaxRebatePercent,
-  getAssetsMovedPercent,
-  getGlobalIncomeBoostPercent,
   formatBoostPercent,
   STOCK_CONTRIBUTION_PER_PURCHASE,
 } from "./economy";
@@ -53,8 +44,10 @@ export {
   getFreePressConferenceCount,
   grantFreePressConference,
   holdPressConference,
-  getInvestCost,
+  beginInvestHold,
   investInMarket,
+  getStockContributionPercent,
+  getCompanyBaseModifierPercent,
   getMarketInfluencePercent,
   addMarketInfluencePercent,
   getInvestmentPortfolioPercent,
@@ -68,6 +61,7 @@ export {
   getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,
   getGlobalIncomeBoostMultiplier,
+  formatBoostPercent,
   mergeCompanies,
 } from "./economy";
 export type { MergeCompaniesResult } from "./economy";
@@ -132,57 +126,6 @@ export function wireCorporationBoostMenu(
     // for "which companies still exist" — excludes anything merged away (see
     // corporationUpgradeMenu's "Merge" action)
     const activeIndices = getActiveCorporationIndices();
-    const modifierRows = activeIndices
-      .map((i) => ({
-        name: getCorporationName(i),
-        pct: getStockContributionPercent(i) + getCompanyBaseModifierPercent(i),
-      }))
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map(
-        ({ name, pct }) => `
-        <div class="worker-menu__modifier-row">
-          <span>${name}</span>
-          <span data-modifier-name="${name}">${formatBoostPercent(pct)}</span>
-        </div>
-      `,
-      )
-      .join("");
-    const marketInfluencePct = getMarketInfluencePercent();
-    const marketInfluenceRow = `
-      <div class="worker-menu__modifier-row">
-        <span>Market influence</span>
-        <span>${formatBoostPercent(marketInfluencePct)}</span>
-      </div>
-    `;
-    const investmentPortfolioPct = getInvestmentPortfolioPercent();
-    const investmentPortfolioRow = `
-      <div class="worker-menu__modifier-row worker-menu__modifier-row--divider">
-        <span>Investment portfolio</span>
-        <span data-investment-portfolio-value>${formatBoostPercent(investmentPortfolioPct)}</span>
-      </div>
-    `;
-    const securedAssetsPct = getSecuredAssetsPercent();
-    const securedAssetsRow = `
-      <div class="worker-menu__modifier-row">
-        <span>Secured assets</span>
-        <span data-secured-assets-value>${formatBoostPercent(securedAssetsPct)}</span>
-      </div>
-    `;
-    const taxRebatePct = getTaxRebatePercent();
-    const taxRebateRow = `
-      <div class="worker-menu__modifier-row">
-        <span>Tax rebate</span>
-        <span data-tax-rebate-value>${formatBoostPercent(taxRebatePct)}</span>
-      </div>
-    `;
-    const assetsMovedPct = getAssetsMovedPercent();
-    const assetsMovedRow = `
-      <div class="worker-menu__modifier-row">
-        <span>Assets in haven</span>
-        <span data-assets-moved-value>${formatBoostPercent(assetsMovedPct)}</span>
-      </div>
-    `;
-    const totalPct = getGlobalIncomeBoostPercent();
     const minigameEntryCost = getMinigameEntryCost();
     const freePressConferenceCount = getFreePressConferenceCount();
     // computed once and reused below — getAllCompaniesTotalIncome() is itself
@@ -197,12 +140,10 @@ export function wireCorporationBoostMenu(
       freePressConferenceCount > 0
         ? `FREE (x${freePressConferenceCount})`
         : formatPrice(minigameEntryCost);
-    const investCost = getInvestCost(currentInvestReference());
-    // gated on cost > 0 (i.e. there's still something left to invest) rather
-    // than always-enabled — once corp assets are fully drained there's
-    // genuinely nothing left for 10% of $0 to spend
-    const investAffordable =
-      !isZero(investCost) && gte(allCompaniesTotalIncome, investCost);
+    // gated on there being anything at all left to invest — once every
+    // company's total is fully drained there's genuinely nothing left for
+    // 10% of $0 to spend
+    const investAffordable = !isZero(allCompaniesTotalIncome);
     const items = activeIndices
       .map((i) => {
         const cost = getStockRaiseCost(i);
@@ -224,19 +165,6 @@ export function wireCorporationBoostMenu(
       })
       .join("");
     list.innerHTML = `
-      <h3 class="worker-menu__subheader">Corporation assets</h3>
-      <span class="worker-menu__total-income">${formatTotalIncomeFull(allCompaniesTotalIncome)}</span>
-      <h3 class="worker-menu__subheader">Income modifiers</h3>
-      ${marketInfluenceRow}
-      ${securedAssetsRow}
-      ${taxRebateRow}
-      ${assetsMovedRow}
-      ${investmentPortfolioRow}
-      ${modifierRows}
-      <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
-        <span>Total</span>
-        <span data-total-boost-value>${formatBoostPercent(totalPct)}</span>
-      </div>
       <h3 class="worker-menu__subheader">Boost Income Modifiers</h3>
       <button
         class="worker-menu__item"
@@ -364,79 +292,34 @@ export function wireCorporationBoostMenu(
 
   // press-and-hold auto-repeat for Invest in the market, same interval/shape
   // as the per-company stock-raise hold above but with its own independent
-  // hold state (this button isn't keyed by company index). investReferenceTotal
-  // is the combined total income snapshotted ONCE right when a fresh hold
-  // starts — economy.ts's getInvestCost spends a flat 10% of THIS frozen
-  // value every press (not a freshly re-read total), which is what
-  // guarantees exactly 10 presses fully drains a hold regardless of scale
+  // hold state (this button isn't keyed by company index) — a fresh
+  // beginInvestHold() snapshot is captured every time a hold starts, so
+  // exactly 10 presses fully drains it (see economy.ts's investInMarket)
   const INVEST_HOLD_INTERVAL_MS = 100;
   let investHeld = false;
   let investHoldController: PressAndHoldController | null = null;
-  let investReferenceTotal: BigNumber = getAllCompaniesTotalIncome();
-
-  // while idle (no hold in progress), "what would the next press cost"
-  // should preview against the LIVE current total (about to become the
-  // reference the moment a fresh hold actually starts) — only an ACTIVE hold
-  // freezes it
-  function currentInvestReference(): BigNumber {
-    return investHeld ? investReferenceTotal : getAllCompaniesTotalIncome();
-  }
+  let investHoldStartTotals: BigNumber[] | null = null;
 
   function stopInvestHold(): void {
     investHeld = false;
     investHoldController?.stop();
     investHoldController = null;
+    investHoldStartTotals = null;
   }
 
-  // patches just the specific text nodes an invest press can change (total
-  // income, investment-portfolio %, total boost %, each company's own
-  // modifier % — investing drains total income, which company value/modifier
-  // math depends on) plus every button's disabled state, WITHOUT touching
-  // list.innerHTML — a full render() rebuild here (torn down and recreated
-  // every ~100ms for as long as the hold lasts) was fighting the browser's
-  // own native touch-scroll tracking on mobile, occasionally yanking the list
-  // to a random scroll position mid-hold
+  // patches just the disabled/afford states an invest press can change,
+  // WITHOUT touching list.innerHTML — a full render() rebuild here (torn down
+  // and recreated every ~100ms for as long as the hold lasts) was fighting
+  // the browser's own native touch-scroll tracking on mobile, occasionally
+  // yanking the list to a random scroll position mid-hold. corporationStats'
+  // own breakdown (modifiers/per-company rates) refreshes itself while open
   function updateInvestDynamicValues(): void {
-    const totalIncomeEl = list.querySelector<HTMLElement>(
-      ".worker-menu__total-income",
-    );
-    if (totalIncomeEl) {
-      totalIncomeEl.textContent = formatTotalIncomeFull(
-        getAllCompaniesTotalIncome(),
-      );
-    }
-    const investmentPortfolioEl = list.querySelector<HTMLElement>(
-      "[data-investment-portfolio-value]",
-    );
-    if (investmentPortfolioEl) {
-      investmentPortfolioEl.textContent = formatBoostPercent(
-        getInvestmentPortfolioPercent(),
-      );
-    }
-    const totalBoostEl = list.querySelector<HTMLElement>(
-      "[data-total-boost-value]",
-    );
-    if (totalBoostEl) {
-      totalBoostEl.textContent = formatBoostPercent(
-        getGlobalIncomeBoostPercent(),
-      );
-    }
-    for (const i of getActiveCorporationIndices()) {
-      const name = getCorporationName(i);
-      const el = list.querySelector<HTMLElement>(
-        `[data-modifier-name="${name}"]`,
-      );
-      if (el) {
-        el.textContent = formatBoostPercent(
-          getStockContributionPercent(i) + getCompanyBaseModifierPercent(i),
-        );
-      }
-    }
     updateAffordability();
   }
 
   function fireInvest(): void {
-    const gain = investInMarket(investReferenceTotal);
+    if (!investHoldStartTotals) return;
+    const gain = investInMarket(investHoldStartTotals);
     if (gain === null) {
       stopInvestHold();
       return;
@@ -457,8 +340,8 @@ export function wireCorporationBoostMenu(
     const button = target.closest<HTMLButtonElement>("#invest-in-market-item");
     if (!button || button.disabled) return;
     stopInvestHold(); // safety net against a stale interrupted gesture
-    investReferenceTotal = getAllCompaniesTotalIncome();
     investHeld = true;
+    investHoldStartTotals = beginInvestHold();
     fireInvest();
     investHoldController = startPressAndHold(() => {
       if (!investHeld) return; // hold already stopped
@@ -478,6 +361,7 @@ export function wireCorporationBoostMenu(
     if (!holdPressConference()) return;
     playSold();
     render();
+    pauseAffordabilityPolling();
     onPressConferenceHeld?.();
   });
 
@@ -492,6 +376,7 @@ export function wireCorporationBoostMenu(
     if (!button || button.disabled) return;
     if (!spendFromAllCompanies(getMinigameEntryCost())) return;
     playSold();
+    pauseAffordabilityPolling();
     onOpenLiquidateAssets?.();
   });
 
@@ -502,6 +387,7 @@ export function wireCorporationBoostMenu(
     if (!button || button.disabled) return;
     if (!spendFromAllCompanies(getMinigameEntryCost())) return;
     playSold();
+    pauseAffordabilityPolling();
     onOpenPayTaxes?.();
   });
 
@@ -512,6 +398,7 @@ export function wireCorporationBoostMenu(
     if (!button || button.disabled) return;
     if (!spendFromAllCompanies(getMinigameEntryCost())) return;
     playSold();
+    pauseAffordabilityPolling();
     onOpenTaxHaven?.();
   });
 
@@ -519,8 +406,17 @@ export function wireCorporationBoostMenu(
   // updateAffordability, so a grayed-out item turns clickable again as soon as
   // income catches up instead of only refreshing on the next open/purchase
   function updateAffordability(): void {
-    // same hoist-out-of-the-loop fix as render() above
+    // same hoist-out-of-the-loop fix as render() above — getMinigameEntryCost()
+    // itself calls getAllCompaniesIncomeRatePerSecond(), which for the active
+    // company walks every one of its floors, so calling it separately for
+    // each of the 4 minigame buttons below quadrupled that cost every single
+    // tick of this interval (it keeps running even while a minigame is being
+    // played on top of this still-open menu)
     const allCompaniesTotalIncome = getAllCompaniesTotalIncome();
+    const minigameEntryCost = getMinigameEntryCost();
+    const minigameEntryAffordable =
+      getFreePressConferenceCount() > 0 ||
+      gte(allCompaniesTotalIncome, minigameEntryCost);
     const buttons = list.querySelectorAll<HTMLButtonElement>(
       "button[data-company-index]",
     );
@@ -535,9 +431,7 @@ export function wireCorporationBoostMenu(
       "#press-conference-item",
     );
     if (pressConferenceButton) {
-      pressConferenceButton.disabled =
-        getFreePressConferenceCount() === 0 &&
-        lt(allCompaniesTotalIncome, getMinigameEntryCost());
+      pressConferenceButton.disabled = !minigameEntryAffordable;
     }
     // shows/costs the same as press conference (see minigameEntryPriceLabel
     // in render()), so it's gated by the exact same affordability check
@@ -545,41 +439,52 @@ export function wireCorporationBoostMenu(
       "#liquidate-assets-item",
     );
     if (liquidateAssetsButton) {
-      liquidateAssetsButton.disabled =
-        getFreePressConferenceCount() === 0 &&
-        lt(allCompaniesTotalIncome, getMinigameEntryCost());
+      liquidateAssetsButton.disabled = !minigameEntryAffordable;
     }
     const declareTaxesButton = list.querySelector<HTMLButtonElement>(
       "#declare-taxes-item",
     );
     if (declareTaxesButton) {
-      declareTaxesButton.disabled =
-        getFreePressConferenceCount() === 0 &&
-        lt(allCompaniesTotalIncome, getMinigameEntryCost());
+      declareTaxesButton.disabled = !minigameEntryAffordable;
     }
     const taxHavenButton =
       list.querySelector<HTMLButtonElement>("#tax-haven-item");
     if (taxHavenButton) {
-      taxHavenButton.disabled =
-        getFreePressConferenceCount() === 0 &&
-        lt(allCompaniesTotalIncome, getMinigameEntryCost());
+      taxHavenButton.disabled = !minigameEntryAffordable;
     }
     const investButton = list.querySelector<HTMLButtonElement>(
       "#invest-in-market-item",
     );
     if (investButton) {
-      const cost = getInvestCost(currentInvestReference());
-      investButton.disabled = isZero(cost) || lt(allCompaniesTotalIncome, cost);
+      investButton.disabled = isZero(allCompaniesTotalIncome);
     }
   }
 
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
 
+  // stopped right as any minigame opens on top of this still-open menu —
+  // otherwise this kept polling (and, worse, kept recomputing every
+  // minigame button's own entry cost) every 250ms the whole time a game was
+  // being played, competing with that game's own render loop for no visible
+  // benefit (the menu is covered up the whole time anyway)
+  function pauseAffordabilityPolling(): void {
+    if (refreshInterval !== null) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
+    }
+  }
+
+  function resumeAffordabilityPolling(): void {
+    if (refreshInterval === null && !menu.hidden) {
+      refreshInterval = setInterval(updateAffordability, 250);
+    }
+  }
+
   function open(): void {
     render();
     menu.hidden = false;
     playSwoosh();
-    refreshInterval = setInterval(updateAffordability, 250);
+    resumeAffordabilityPolling();
   }
 
   async function close(): Promise<void> {
@@ -588,13 +493,17 @@ export function wireCorporationBoostMenu(
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-    }
+    pauseAffordabilityPolling();
   }
 
   backdrop.addEventListener("click", close);
 
-  return { open, close, refresh: render };
+  // called by main.ts once a minigame closes back to this menu — resumes the
+  // polling pauseAffordabilityPolling stopped when that minigame opened
+  function refresh(): void {
+    render();
+    resumeAffordabilityPolling();
+  }
+
+  return { open, close, refresh };
 }

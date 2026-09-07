@@ -106,6 +106,10 @@ export interface CityMapDeps {
   // rollCorporationSelection) so main.ts can swap in that company's own separate
   // buildings/totalIncome/active building — see company.ts
   onSwitchCompany: (companyIndex: number) => void;
+  // fired by a plain tap on the total-income readout at the top of the map
+  // (see incomeReadout.ts) — opens the read-only corporation income rate/
+  // modifiers breakdown (hud/corporationStats), same as gameCanvas's own HUD
+  onOpenCorporationStats: () => void;
 }
 
 export interface CityMapView {
@@ -178,6 +182,10 @@ export function createCityMapView(
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
+  // the income readout's own actual drawn bottom edge as of the last redraw()
+  // (see incomeReadout.draw's return value) — read by onClick's own HUD tap
+  // hit-test below, since its extent varies once a unit-name line appears
+  let incomeBottomY = 0;
 
   // reacts to the corp barrel settling on a (possibly new) company — sets the
   // active-company pointer, jumps this map's own city page to that company's
@@ -389,9 +397,9 @@ export function createCityMapView(
     // minigame's, instead of just reading a mismatched clock scale
     drawActiveCoinBursts(ctx, performance.now());
 
-    const incomeBottom = incomeReadout.draw(ctx, cssW, deps.getTotalIncome());
+    incomeBottomY = incomeReadout.draw(ctx, cssW, deps.getTotalIncome());
     drawStreetText(
-      incomeBottom + STREET_TEXT_GAP_BELOW_INCOME,
+      incomeBottomY + STREET_TEXT_GAP_BELOW_INCOME,
       getCityName(cityIndex),
     );
     corpBarrel.draw(ctx, cssH);
@@ -421,6 +429,10 @@ export function createCityMapView(
 
   function onPointerMove(event: PointerEvent): void {
     const p = canvasPoint(event);
+    if (p.y < incomeBottomY) {
+      canvas.style.cursor = "pointer";
+      return;
+    }
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
     canvas.style.cursor = hit !== null ? "pointer" : "default";
   }
@@ -486,6 +498,10 @@ export function createCityMapView(
       return;
     }
     const p = canvasPoint(event);
+    if (p.y < incomeBottomY) {
+      deps.onOpenCorporationStats();
+      return;
+    }
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
     if (hit === null) return;
     const globalIndex = cityIndex * MARKER_COUNT + hit;

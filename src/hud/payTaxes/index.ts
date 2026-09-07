@@ -77,6 +77,44 @@ const TAXES_MIN_SPAWN_INTERVAL_MS = 600;
 const VANISH_DURATION_MS = 600;
 const VANISH_BLINK_INTERVAL_MS = 100;
 
+// pre-rendered once and reused every frame after — re-running strokeText +
+// fillText for every single active word every frame (there can be several
+// on screen at once) is real, avoidable canvas cost, especially on mobile;
+// the text/style never changes, so a small cached bitmap drawImage'd in its
+// place is far cheaper (same idea screenShake's own bloom-text caching uses)
+let taxesLabelBitmap: HTMLCanvasElement | null = null;
+
+function getTaxesLabelBitmap(ctx: CanvasRenderingContext2D): HTMLCanvasElement {
+  if (taxesLabelBitmap) return taxesLabelBitmap;
+  ctx.font = TAXES_FONT;
+  const metrics = ctx.measureText("Taxes");
+  const padding = TAXES_STROKE_WIDTH;
+  const width = Math.ceil(metrics.width + padding * 2);
+  const height = Math.ceil(
+    (metrics.actualBoundingBoxAscent || 12) +
+      (metrics.actualBoundingBoxDescent || 4) +
+      padding * 2,
+  );
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const bitmapCtx = canvas.getContext("2d")!;
+  bitmapCtx.font = TAXES_FONT;
+  bitmapCtx.textAlign = "center";
+  bitmapCtx.textBaseline = "middle";
+  drawCartoonText(
+    bitmapCtx,
+    "Taxes",
+    width / 2,
+    height / 2,
+    COLOR.red,
+    COLOR.white,
+    TAXES_STROKE_WIDTH,
+  );
+  taxesLabelBitmap = canvas;
+  return canvas;
+}
+
 function getTaxesTier(survivedMs: number): number {
   return Math.floor(survivedMs / TAXES_DIFFICULTY_INTERVAL_MS);
 }
@@ -324,9 +362,7 @@ export function wirePayTaxesGame(
 
     renderGraph: (ctx, state, _headX, now) => {
       drawActiveCoinBursts(ctx, now);
-      ctx.font = TAXES_FONT;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
+      const bitmap = getTaxesLabelBitmap(ctx);
       for (const word of state.taxWords) {
         // blinks on/off every BLINK_INTERVAL_MS while vanishing instead of
         // just fading, then skips drawing entirely once it's about to be
@@ -337,14 +373,10 @@ export function wirePayTaxesGame(
             continue;
           }
         }
-        drawCartoonText(
-          ctx,
-          "Taxes",
-          word.x,
-          word.y,
-          COLOR.red,
-          COLOR.white,
-          TAXES_STROKE_WIDTH,
+        ctx.drawImage(
+          bitmap,
+          word.x - bitmap.width / 2,
+          word.y - bitmap.height / 2,
         );
       }
       const points = [...state.breadcrumbs, { x: state.shipX, y: state.shipY }];

@@ -1,8 +1,4 @@
-import {
-  animateDialogClose,
-  formatPrice,
-  formatTotalIncomeFull,
-} from "../../utils";
+import { animateDialogClose, formatPrice } from "../../utils";
 import { getAllCompaniesTotalIncome } from "../../totalIncome";
 import { getCorporationName } from "../../corporationName";
 import {
@@ -118,8 +114,6 @@ export function wireCorporationUpgradeMenu(
       corporationPrice,
     );
     list.innerHTML = `
-      <h3 class="worker-menu__subheader">Corporation assets</h3>
-      <span class="worker-menu__total-income">${formatTotalIncomeFull(allCompaniesTotalIncome)}</span>
       <button
         class="worker-menu__item"
         id="create-new-corporation"
