@@ -96,7 +96,6 @@ export const CONFIG = {
     // hud/liquidateAssetsGame — "Avoid market drop" (Secured Assets %)
     liquidateAssets: {
       ambientInfluencePercentPerSecond: 0.05,
-      landingInfluencePercent: 0.08,
       greenLineInfluencePercent: 0.1,
     },
     // hud/payTaxes — "Declare Taxes" (Tax Rebate %)

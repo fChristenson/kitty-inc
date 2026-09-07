@@ -151,12 +151,11 @@ export function getRestPlatformWidth(baseGapPx: number): number {
 const SPAWN_LOOKAHEAD_BUFFER_PX = 200;
 
 // this session's own accrued Secured Assets % — flat rate per second
-// survived, plus a flat bump per neutral (white) platform landed on
+// survived; landing on a neutral (white) platform itself grants nothing
+// extra, only a green (upgrade) platform does (see below)
 const AMBIENT_INFLUENCE_PERCENT_PER_SECOND =
   CONFIG.minigames.liquidateAssets.ambientInfluencePercentPerSecond;
-const LANDING_INFLUENCE_PERCENT =
-  CONFIG.minigames.liquidateAssets.landingInfluencePercent;
-// green (upgrade) platforms override that flat bump with their own, bigger, reward
+// the one reward landing itself ever grants, on top of the ambient rate above
 const GREEN_LINE_INFLUENCE_PERCENT =
   CONFIG.minigames.liquidateAssets.greenLineInfluencePercent;
 
@@ -571,11 +570,12 @@ export function wireLiquidateAssetsGame(
             state.grounded = true;
           }
           state.platformsLanded += 1;
-          // white just gets the flat per-landing bump — upgrade calls out
-          // its own bigger reward (coin burst + the purchase sfx, since
-          // it's the one landing that actually reads as a windfall).
-          // Playing the purchase sfx on EVERY landing (not just this one)
-          // fired it on nearly every click while holding/bouncing continuously
+          // only a green (upgrade) landing grants anything (coin burst + the
+          // purchase sfx, since it's the one landing that actually reads as
+          // a windfall) — a neutral (white) landing is just... landing,
+          // relying on the ambient per-second rate alone. Playing the
+          // purchase sfx on EVERY landing (not just this one) fired it on
+          // nearly every click while holding/bouncing continuously
           if (landedOn.reward === "upgrade") {
             state.marketInfluencePercent += GREEN_LINE_INFLUENCE_PERCENT;
             playSold();
@@ -584,8 +584,6 @@ export function wireLiquidateAssetsGame(
               landedOnTop,
               GREEN_LINE_INFLUENCE_PERCENT,
             );
-          } else {
-            state.marketInfluencePercent += LANDING_INFLUENCE_PERCENT;
           }
         }
       }
