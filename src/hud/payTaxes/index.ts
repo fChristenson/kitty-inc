@@ -58,9 +58,12 @@ const COOLDOWN_INDICATOR_OFFSET_Y = 8;
 // text" convention
 const TAXES_FONT = '900 15px "Fredoka", system-ui, sans-serif';
 const TAXES_STROKE_WIDTH = 6;
-// re-aimed at the head's own current position every frame (a true homing
-// seek, not just drifting left), at roughly half the line/ship's own
-// scroll speed — see the difficulty ramp below for how this grows over time
+// aimed at wherever the ship is at the exact moment a word spawns, at
+// roughly half the line/ship's own scroll speed — fixed for that word's
+// whole life (see spawnTaxWord/step), so the ship's own later movement can
+// never speed up or redirect an already-spawned word; only a NEW word
+// spawning later, at a higher difficulty tier, is ever faster (see the
+// ramp below)
 const TAXES_HOMING_SPEED_PX_S = 70;
 const TAXES_SPAWN_INTERVAL_MS = 2200;
 // approximates the rendered text's own half-size (halved along with
@@ -167,28 +170,61 @@ function drawDoubleTapCooldown(
 interface TaxWord {
   x: number;
   y: number;
+  // fixed the moment this word spawns (see spawnTaxWord) — aimed toward
+  // wherever the ship was at that exact instant, at that instant's own
+  // difficulty-tier speed. Never recomputed afterward, so the word always
+  // travels in a straight line at a genuinely constant rate for its whole
+  // life, regardless of how the ship moves later
+  vx: number;
+  vy: number;
   // null while active (homing, harmful); counts down once a double tap
   // triggers vanishBlink below — frozen and harmless the whole time, then
   // removed once it hits 0
   vanishRemainingMs: number | null;
 }
 
-// spawns just outside a random edge of the canvas, so it always has to travel
-// inward toward wherever the head currently is (see step's own homing update)
-function spawnTaxWord(cssW: number, cssH: number): TaxWord {
+// spawns just outside a random edge of the canvas, aimed toward wherever
+// the ship (shipX/shipY) is RIGHT NOW at exactly speedPxS — see the TaxWord
+// interface's own comment for why this is fixed at spawn instead of
+// re-aimed every frame in step()
+function spawnTaxWord(
+  cssW: number,
+  cssH: number,
+  shipX: number,
+  shipY: number,
+  speedPxS: number,
+): TaxWord {
   const side = Math.floor(Math.random() * 4);
   const margin = 40;
-  const base = { vanishRemainingMs: null };
+  let x: number;
+  let y: number;
   switch (side) {
     case 0: // above
-      return { ...base, x: Math.random() * cssW, y: -margin };
+      x = Math.random() * cssW;
+      y = -margin;
+      break;
     case 1: // below
-      return { ...base, x: Math.random() * cssW, y: cssH + margin };
+      x = Math.random() * cssW;
+      y = cssH + margin;
+      break;
     case 2: // left
-      return { ...base, x: -margin, y: Math.random() * cssH };
+      x = -margin;
+      y = Math.random() * cssH;
+      break;
     default: // right
-      return { ...base, x: cssW + margin, y: Math.random() * cssH };
+      x = cssW + margin;
+      y = Math.random() * cssH;
   }
+  const dx = shipX - x;
+  const dy = shipY - y;
+  const dist = Math.hypot(dx, dy) || 1;
+  return {
+    x,
+    y,
+    vx: (dx / dist) * speedPxS,
+    vy: (dy / dist) * speedPxS,
+    vanishRemainingMs: null,
+  };
 }
 
 export function createPayTaxesGameMarkup(): string {
@@ -335,10 +371,17 @@ export function wirePayTaxesGame(
       state.nextTaxWordInMs -= dtMs;
       const taxesTier = getTaxesTier(state.survivedMs);
       if (state.nextTaxWordInMs <= 0) {
-        state.taxWords.push(spawnTaxWord(cssW, getFloorTopY()));
+        state.taxWords.push(
+          spawnTaxWord(
+            cssW,
+            getFloorTopY(),
+            state.shipX,
+            state.shipY,
+            getTaxesSpeedPxS(taxesTier),
+          ),
+        );
         state.nextTaxWordInMs = getTaxesSpawnIntervalMs(taxesTier);
       }
-      const taxesSpeed = getTaxesSpeedPxS(taxesTier);
       for (const word of state.taxWords) {
         if (word.vanishRemainingMs !== null) {
           // frozen in place and harmless while blinking out — no homing
@@ -346,11 +389,9 @@ export function wirePayTaxesGame(
           word.vanishRemainingMs = Math.max(0, word.vanishRemainingMs - dtMs);
           continue;
         }
-        const dx = state.shipX - word.x;
-        const dy = state.shipY - word.y;
-        const dist = Math.hypot(dx, dy) || 1;
-        word.x += (dx / dist) * taxesSpeed * dt;
-        word.y += (dy / dist) * taxesSpeed * dt;
+        word.x += word.vx * dt;
+        word.y += word.vy * dt;
+        const dist = Math.hypot(state.shipX - word.x, state.shipY - word.y);
         if (dist <= TAXES_COLLISION_RADIUS + HEAD_RADIUS) {
           state.running = false;
           state.gameOver = true;
