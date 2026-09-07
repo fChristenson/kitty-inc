@@ -87,7 +87,7 @@ export const CONFIG = {
     // cost to open any minigame: this many seconds of combined company income/sec
     minigameEntrySecondsCost: 10,
     // "Invest in the market": % of a company's hold-start balance drained per press
-    investPercent: 0.1,
+    investPercent: 0.01,
   },
 
   // Minigame reward rates — each banks straight into corporationBoostMenu's
@@ -99,12 +99,12 @@ export const CONFIG = {
     // hud/pressConferenceGame — "Hold press conference" (Market Influence %)
     pressConference: {
       ambientInfluencePercentPerSecond: 0.05,
-      goodHitInfluencePercent: 0.1,
+      goodHitInfluencePercent: 0.01,
     },
     // hud/liquidateAssetsGame — "Avoid market drop" (Secured Assets %)
     liquidateAssets: {
       ambientInfluencePercentPerSecond: 0.05,
-      greenLineInfluencePercent: 0.1,
+      greenLineInfluencePercent: 0.01,
     },
     // hud/payTaxes — "Declare Taxes" (Tax Rebate %)
     payTaxes: {
