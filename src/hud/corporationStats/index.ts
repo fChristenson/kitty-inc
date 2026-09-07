@@ -5,6 +5,7 @@ import {
   getAllCompaniesIncomeRatePerSecond,
   getCompanyIncomeRatePerSecond,
 } from "../../totalIncome";
+import type { BigNumber } from "../../shared/bigNumber";
 import { getCorporationName } from "../../corporationName";
 import { getActiveCorporationIndices } from "../../company";
 import { playSwoosh } from "../../sound";
@@ -55,6 +56,20 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
     "#corporation-stats-menu-list",
   )!;
 
+  // debug toggle: tapping any Total row switches every $ value in this
+  // dialog between the normal K/M/B-style suffix and a raw 2-decimal
+  // scientific notation, so the actual precision behind a rounded suffix is
+  // inspectable
+  let scientificMode = false;
+
+  function formatMoney(value: BigNumber): string {
+    if (!scientificMode) return formatPrice(value);
+    const sign = value.mantissa < 0 ? "-" : "";
+    const mantissa = Math.abs(value.mantissa).toFixed(2);
+    const exponentSign = value.exponent >= 0 ? "+" : "";
+    return `$${sign}${mantissa}e${exponentSign}${value.exponent}`;
+  }
+
   function render(): void {
     const scrollTop = list.scrollTop;
     const activeIndices = getActiveCorporationIndices();
@@ -65,7 +80,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
         ({ index, name }) => `
         <div class="worker-menu__modifier-row">
           <span>${name}</span>
-          <span>${formatPrice(getStoredTotalIncome(index))}</span>
+          <span>${formatMoney(getStoredTotalIncome(index))}</span>
         </div>
       `,
       )
@@ -77,7 +92,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
         ({ index, name }) => `
         <div class="worker-menu__modifier-row">
           <span>${name}</span>
-          <span>${formatPrice(getCompanyIncomeRatePerSecond(index))}/s</span>
+          <span>${formatMoney(getCompanyIncomeRatePerSecond(index))}/s</span>
         </div>
       `,
       )
@@ -102,13 +117,13 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
       ${companyAssetRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
         <span>Total</span>
-        <span>${formatPrice(getAllCompaniesTotalIncome())}</span>
+        <span>${formatMoney(getAllCompaniesTotalIncome())}</span>
       </div>
       <h3 class="worker-menu__subheader">Corporation income rate</h3>
       ${companyIncomeRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
         <span>Total</span>
-        <span>${formatPrice(getAllCompaniesIncomeRatePerSecond())}/s</span>
+        <span>${formatMoney(getAllCompaniesIncomeRatePerSecond())}/s</span>
       </div>
       <h3 class="worker-menu__subheader">Income modifiers</h3>
       <div class="worker-menu__modifier-row">
@@ -141,6 +156,19 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
   }
 
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
+
+  // any Total row toggles scientificMode for every $ value in this dialog —
+  // pointerdown (not click) since this dialog's own 250ms poll keeps replacing
+  // list.innerHTML; a click landing right as that swap happens can land on an
+  // element the browser no longer considers "pressed", silently eating the
+  // toggle. pointerdown fires immediately on contact, before any such swap
+  // has a chance to invalidate it
+  list.addEventListener("pointerdown", (event) => {
+    const target = event.target as HTMLElement;
+    if (!target.closest(".worker-menu__modifier-row--total")) return;
+    scientificMode = !scientificMode;
+    render();
+  });
 
   // no buttons/holds to fight here (unlike corporationBoostMenu) — a full
   // render() every tick is simple and cheap enough for a read-only view

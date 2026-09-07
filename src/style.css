@@ -809,6 +809,8 @@ body {
   border-top: 2px solid var(--color-wood-outline);
   margin-top: 0.25rem;
   padding-top: 0.35rem;
+  /* corporationStats: tapping any Total row toggles $ suffix/scientific mode */
+  cursor: pointer;
 }
 
 .worker-menu__modifier-row--divider {
