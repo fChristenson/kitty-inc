@@ -36,9 +36,14 @@ const SCROLL_SPEED_PX_S = 160;
 // target (state.headX/headY, moved 1:1 by the shared engine's own
 // pointermove handling) currently is, rather than snapping straight to it —
 // SHIP_SPRING_PER_S2 pulls it in, SHIP_DAMPING_PER_S bleeds off velocity so
-// it settles instead of oscillating forever
-const SHIP_SPRING_PER_S2 = 30;
-const SHIP_DAMPING_PER_S = 5;
+// it settles instead of oscillating forever. Tuned snappier (and closer to
+// critically damped, ζ ≈ 0.97) than payTaxes' own identical-looking pair —
+// survival here reads shipX/shipY directly against a thin scrolling safe
+// line, so any lag/overshoot between the pointer and the ship is the
+// difference between staying on it and drifting off; payTaxes has no such
+// precision requirement, so its own values are untouched
+const SHIP_SPRING_PER_S2 = 60;
+const SHIP_DAMPING_PER_S = 15;
 // "Assets moved %" (see hud/corporationBoostMenu's own persisted stat) —
 // flat rate per second survived, same ambient-only convention every other
 // minigame's own modifier starts from

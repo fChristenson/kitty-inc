@@ -2,7 +2,7 @@ import { PLATFORM_COLOR, drawPlatformSurface, type Platform } from "./index";
 import { LINE_REWARD_COLOR } from "./makeJumpPath";
 
 // draws a single short (small-kind) platform segment, colored by its own
-// x125/upgrade mark (see makeJumpPath) when it has one
+// upgrade/white mark (see makeJumpPath) when it has one
 export function drawShortLineSegment(
   ctx: CanvasRenderingContext2D,
   platform: Platform,

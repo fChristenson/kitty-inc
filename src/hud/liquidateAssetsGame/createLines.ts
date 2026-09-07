@@ -1,7 +1,6 @@
-// "upgrade" (green) and "white" work interchangeably as far as reaching
-// the main line goes — both count as a "safe" continuation; only "x125"
-// (red) is the off-path, no-guarantee option
-export type LineRewardKind = "x125" | "upgrade" | "white";
+// every branch is always a genuine "safe" continuation — landable and
+// worth a reward either way, just green vs white
+export type LineRewardKind = "upgrade" | "white";
 
 // a jump segment is a genuine TREE, not a flat run — a fork's own two
 // branches each get their OWN independent continuation (which can itself

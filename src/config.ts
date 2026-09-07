@@ -97,8 +97,7 @@ export const CONFIG = {
     liquidateAssets: {
       ambientInfluencePercentPerSecond: 0.05,
       landingInfluencePercent: 0.08,
-      greenLineInfluencePercent: 1,
-      redLineInfluencePercent: -0.5,
+      greenLineInfluencePercent: 0.1,
     },
     // hud/payTaxes — "Declare Taxes" (Tax Rebate %)
     payTaxes: {

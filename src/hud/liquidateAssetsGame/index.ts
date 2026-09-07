@@ -1,4 +1,4 @@
-import { playBubble, playSold, playExplosion } from "../../sound";
+import { playBubble, playSold } from "../../sound";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
 import {
@@ -26,7 +26,6 @@ import {
   drawActiveFloatingTexts,
   shiftActiveFloatingTexts,
 } from "../../shared/floatingText";
-import { triggerScreenShake } from "../../screenShake";
 import { drawMainLine } from "./mainLine";
 import { drawShortLine } from "./shortLine";
 import { renderJumpLines } from "./renderJumpLines";
@@ -45,31 +44,61 @@ import type { LineRewardKind } from "./createLines";
 // stay airborne indefinitely; releasing lets gravity resume normally.
 // Falling through a gap (missing every platform, or walking off one without
 // jumping away in time) ends the round.
-const SCROLL_SPEED_PX_S = 200;
+
+// scroll speed ramps up the longer the round is survived (same
+// growth-over-time convention createLines.ts/makeJumpPath.ts already use
+// for their own difficulty ramps), capped so it never gets literally
+// unreactable
+const SCROLL_SPEED_BASE_PX_S = 200;
+const SCROLL_SPEED_GROWTH_PER_SEC = 4;
+const SCROLL_SPEED_MAX_PX_S = 420;
+
+export function getScrollSpeed(survivedMs: number): number {
+  return Math.min(
+    SCROLL_SPEED_MAX_PX_S,
+    SCROLL_SPEED_BASE_PX_S + (survivedMs / 1000) * SCROLL_SPEED_GROWTH_PER_SEC,
+  );
+}
+
 const GRAVITY_PX_S2 = 1400;
 // collision-only hitbox radius — the drawn head dot is the shared engine's own
 // fixed size (identical across every game built on it), not this value
 const HITBOX_RADIUS = 8;
 const TAIL_LAG_RATE = 10;
 
-// platforms scroll in from the right at SCROLL_SPEED_PX_S. Every small
-// platform sits exactly BASE_GAP_PX past whatever the actual previous
-// platform's own chain reference was, regardless of height change — every
-// step is at most PLATFORM_STEP_MAX_DELTA_PX, well within what the fixed
-// base jump (BASE_LAUNCH_VELOCITY_PX_S, no clicks) can clear. At random
-// (never twice in a row), a FORK spawns instead: two platforms ±1 base
-// jump off mainLineY, leaving mainLineY itself empty — forcing a choice of
-// jumping up or down to keep going. Long (rest-stop) platforms are flat
-// and wide, holding REST_PLATFORM_JUMP_COUNT bounces in place before the
-// next small-platform run begins, and always sit at the SAME fixed
-// mainLineY (never drifting) — their own chainFromX skips ahead by that
-// many bounce-lengths so the visible gap after one is identical to the gap
+// platforms scroll in from the right at getScrollSpeed(survivedMs). Every
+// small platform sits exactly one current base gap (see getBaseGapPx) past
+// whatever the actual previous platform's own chain reference was,
+// regardless of height change — every step is at most
+// PLATFORM_STEP_MAX_DELTA_PX, well within what the fixed base jump
+// (BASE_LAUNCH_VELOCITY_PX_S, no clicks) can clear. At random (never twice
+// in a row), a FORK spawns instead: two platforms ±1 base jump off
+// mainLineY, leaving mainLineY itself empty — forcing a choice of jumping
+// up or down to keep going. Long (rest-stop) platforms are flat and wide,
+// holding REST_PLATFORM_JUMP_COUNT bounces in place before the next
+// small-platform run begins, and always sit at the SAME fixed mainLineY
+// (never drifting) — their own chainFromX skips ahead by that many
+// bounce-lengths so the visible gap after one is identical to the gap
 // after any small platform. Only a click/tap ever adds MORE velocity than
 // that fixed base — there is no other "auto boost"
 export const PLATFORM_H = 2;
-// +25% over the original 40 — small platforms are a bit more forgiving to land on
-export const PLATFORM_WIDTH = 50;
 export const PLATFORM_COLOR = COLOR.white;
+
+// a small (jump-segment) platform's own width shrinks the longer the round
+// is survived — on top of the scroll speeding up, a narrower landing target
+// is the other half of "harder over time", floored so it never becomes
+// literally unlandable
+const PLATFORM_WIDTH_BASE_PX = 50; // +25% over the original 40 — a bit more forgiving to start
+const PLATFORM_WIDTH_MIN_PX = 26;
+const PLATFORM_WIDTH_SHRINK_PX_PER_SEC = 0.6;
+
+export function getPlatformWidth(survivedMs: number): number {
+  return Math.max(
+    PLATFORM_WIDTH_MIN_PX,
+    PLATFORM_WIDTH_BASE_PX -
+      (survivedMs / 1000) * PLATFORM_WIDTH_SHRINK_PX_PER_SEC,
+  );
+}
 
 // the height (apex above a level platform) a same-height jump reaches with
 // no extra tap/hold input — every gap is sized against this one number, so
@@ -78,9 +107,19 @@ const BASE_JUMP_HEIGHT_PX = 40;
 const BASE_LAUNCH_VELOCITY_PX_S = Math.sqrt(
   2 * GRAVITY_PX_S2 * BASE_JUMP_HEIGHT_PX,
 );
-// round-trip time for a same-height jump: up to the apex, then back down
+// round-trip time for a same-height jump: up to the apex, then back down —
+// purely vertical physics, so this stays constant regardless of how fast
+// the world is currently scrolling
 const BASE_FLIGHT_DURATION_S = (2 * BASE_LAUNCH_VELOCITY_PX_S) / GRAVITY_PX_S2;
-export const BASE_GAP_PX = SCROLL_SPEED_PX_S * BASE_FLIGHT_DURATION_S;
+
+// the horizontal distance one fixed-height/fixed-duration jump covers AT a
+// given scroll speed — this is what makes every jump math result scale
+// correctly as getScrollSpeed(survivedMs) ramps up: recompute this fresh
+// (from the CURRENT speed) everywhere a gap is measured, never reuse a
+// value computed at a different speed/time
+export function getBaseGapPx(scrollSpeed: number): number {
+  return scrollSpeed * BASE_FLIGHT_DURATION_S;
+}
 
 // how far (either direction) a SMALL platform's height may step from the
 // previous platform's own height — exactly one base jump's apex height, the
@@ -90,15 +129,22 @@ export const PLATFORM_STEP_MAX_DELTA_PX = BASE_JUMP_HEIGHT_PX;
 // a long (rest-stop) platform is flat and holds exactly this many
 // un-boosted same-height bounces before the normal small-platform flow
 // resumes — since headX never moves, a continuously-held bounce chain on
-// one flat platform advances by exactly BASE_GAP_PX of scroll per bounce,
-// so this many bounces fit within REST_PLATFORM_WIDTH_PX below
+// one flat platform advances by exactly one current base gap of scroll per
+// bounce, so this many bounces fit within getRestPlatformWidth below
 export const REST_PLATFORM_JUMP_COUNT = 5;
 // small margin so the head doesn't start flush against the platform's own
 // left edge, and the last bounce still has a sliver of platform left to
 // land on rather than landing exactly on its last pixel
 const REST_PLATFORM_MARGIN_PX = 20;
-export const REST_PLATFORM_WIDTH_PX =
-  REST_PLATFORM_JUMP_COUNT * BASE_GAP_PX + REST_PLATFORM_MARGIN_PX * 2;
+
+// a rest platform must physically fit REST_PLATFORM_JUMP_COUNT bounces at
+// whatever the CURRENT base gap is — unlike the small jump-segment
+// platforms, this one is never deliberately shrunk for difficulty (doing so
+// would make its own guaranteed bounce chain literally impossible), it just
+// tracks the gap math above
+export function getRestPlatformWidth(baseGapPx: number): number {
+  return REST_PLATFORM_JUMP_COUNT * baseGapPx + REST_PLATFORM_MARGIN_PX * 2;
+}
 // how far past the right edge of the screen the platform queue is kept
 // topped up to, so the next platform is always already placed instead of
 // popping in right as it's needed
@@ -110,12 +156,9 @@ const AMBIENT_INFLUENCE_PERCENT_PER_SECOND =
   CONFIG.minigames.liquidateAssets.ambientInfluencePercentPerSecond;
 const LANDING_INFLUENCE_PERCENT =
   CONFIG.minigames.liquidateAssets.landingInfluencePercent;
-// green (upgrade) and red (x125) platforms override that flat bump with
-// their own, much bigger, reward/penalty
+// green (upgrade) platforms override that flat bump with their own, bigger, reward
 const GREEN_LINE_INFLUENCE_PERCENT =
   CONFIG.minigames.liquidateAssets.greenLineInfluencePercent;
-const RED_LINE_INFLUENCE_PERCENT =
-  CONFIG.minigames.liquidateAssets.redLineInfluencePercent;
 
 export interface Platform {
   x: number;
@@ -129,7 +172,7 @@ export interface Platform {
   // regardless of width, so a launch from anywhere on it always connects
   chainFromX: number;
   kind: "long" | "small";
-  // x125/upgrade mark from makeJumpPath — only ever set on a "small"
+  // upgrade/white mark from makeJumpPath — only ever set on a "small"
   // platform (jump-segment lines), never on a main/rest-stop line
   reward?: LineRewardKind;
 }
@@ -257,26 +300,27 @@ export function wireLiquidateAssetsGame(
   // a long (rest-stop) platform — always at the SAME state.mainLineY every
   // time (never randomized/drifting), so a cycle's ending main line always
   // returns to wherever the segment's own starting main line was. Flat and
-  // wide enough to hold REST_PLATFORM_JUMP_COUNT bounces in place. Uses the
-  // same flat BASE_GAP_PX as every other column (not a height-solved gap)
-  // — the jump segment's drift is clamped to the same
-  // PLATFORM_STEP_MAX_DELTA_PX range any small-platform step already
+  // wide enough to hold REST_PLATFORM_JUMP_COUNT bounces in place, sized
+  // fresh off the CURRENT base gap (see getBaseGapPx) so it stays correct
+  // as scroll speed ramps up — the jump segment's drift is clamped to the
+  // same PLATFORM_STEP_MAX_DELTA_PX range any small-platform step already
   // clears, so there's nothing special about this particular hop. Its own
-  // chainFromX skips ahead by that many BASE_GAP_PX (not its literal left
+  // chainFromX skips ahead by that many base gaps (not its literal left
   // edge) so the visible gap after it matches every other gap exactly
   // instead of being eaten by its extra width
   function spawnLongPlatform(
     state: LiquidateAssetsState,
     previous: Platform,
   ): void {
+    const baseGapPx = getBaseGapPx(getScrollSpeed(state.survivedMs));
     const y = state.mainLineY;
-    const x = previous.chainFromX + BASE_GAP_PX;
+    const x = previous.chainFromX + baseGapPx;
     state.platforms.push({
       x,
       y,
       endY: y,
-      width: REST_PLATFORM_WIDTH_PX,
-      chainFromX: x + REST_PLATFORM_JUMP_COUNT * BASE_GAP_PX,
+      width: getRestPlatformWidth(baseGapPx),
+      chainFromX: x + REST_PLATFORM_JUMP_COUNT * baseGapPx,
       kind: "long",
     });
   }
@@ -340,16 +384,19 @@ export function wireLiquidateAssetsGame(
       // the line starts resting right on top of a wide starter platform
       // (not falling onto it) — sized to hold REST_PLATFORM_JUMP_COUNT
       // un-boosted bounces before the normal small-platform flow takes
-      // over, same chainFromX-skips-ahead convention as spawnLongPlatform
+      // over, same chainFromX-skips-ahead convention as spawnLongPlatform.
+      // survivedMs is always 0 here (a fresh round), so this uses the
+      // round's own starting speed/gap
       const headX = cssW / 2 - HEAD_X_OFFSET_FROM_CENTER;
       const platformY = getPlatformY(getFloorTopY());
       const starterX = headX - REST_PLATFORM_MARGIN_PX;
+      const baseGapPx = getBaseGapPx(getScrollSpeed(state.survivedMs));
       const starter: Platform = {
         x: starterX,
         y: platformY,
         endY: platformY,
-        width: REST_PLATFORM_WIDTH_PX,
-        chainFromX: starterX + REST_PLATFORM_JUMP_COUNT * BASE_GAP_PX,
+        width: getRestPlatformWidth(baseGapPx),
+        chainFromX: starterX + REST_PLATFORM_JUMP_COUNT * baseGapPx,
         kind: "long",
       };
       state.platforms = [starter];
@@ -414,20 +461,25 @@ export function wireLiquidateAssetsGame(
         state.tailY +=
           (state.headY - state.tailY) * (1 - Math.exp(-TAIL_LAG_RATE * dt));
       }
+      // read once per frame (survivedMs was just updated above) and reused
+      // for both the trail's own advance rate and the platform scroll below
+      // — they must always move at the exact same speed, or the trail
+      // visibly desyncs from the platforms it's supposed to be following
+      const scrollSpeed = getScrollSpeed(state.survivedMs);
       advanceTrail(
         state,
-        SCROLL_SPEED_PX_S * dt,
+        scrollSpeed * dt,
         state.tailY,
         TRAIL_SAMPLE_DX,
         computeMaxTrailLength(cssW),
       );
 
-      const scrollDx = SCROLL_SPEED_PX_S * dt;
+      const scrollDx = scrollSpeed * dt;
       shiftActiveFloatingTexts(scrollDx);
       // chainFromX must scroll in lockstep with x — otherwise it goes stale
       // between this platform's own creation and whenever the NEXT one
-      // spawns off it, inflating the live gap beyond BASE_GAP_PX by however
-      // much scrolled in between
+      // spawns off it, inflating the live gap beyond the current base gap
+      // (see getBaseGapPx) by however much scrolled in between
       for (const platform of state.platforms) {
         platform.x -= scrollDx;
         platform.chainFromX -= scrollDx;
@@ -519,13 +571,11 @@ export function wireLiquidateAssetsGame(
             state.grounded = true;
           }
           state.platformsLanded += 1;
-          // white just gets the flat per-landing bump — only upgrade (coin
-          // burst + the purchase sfx, since it's the one landing that
-          // actually reads as a reward) and x125 (explosion + shake) call
-          // out that specific reward, each with its own influence swing
-          // instead of the flat bump. Playing the purchase sfx on EVERY
-          // landing (not just this one) fired it on nearly every click while
-          // holding/bouncing continuously
+          // white just gets the flat per-landing bump — upgrade calls out
+          // its own bigger reward (coin burst + the purchase sfx, since
+          // it's the one landing that actually reads as a windfall).
+          // Playing the purchase sfx on EVERY landing (not just this one)
+          // fired it on nearly every click while holding/bouncing continuously
           if (landedOn.reward === "upgrade") {
             state.marketInfluencePercent += GREEN_LINE_INFLUENCE_PERCENT;
             playSold();
@@ -534,10 +584,6 @@ export function wireLiquidateAssetsGame(
               landedOnTop,
               GREEN_LINE_INFLUENCE_PERCENT,
             );
-          } else if (landedOn.reward === "x125") {
-            state.marketInfluencePercent += RED_LINE_INFLUENCE_PERCENT;
-            triggerScreenShake();
-            playExplosion();
           } else {
             state.marketInfluencePercent += LANDING_INFLUENCE_PERCENT;
           }
