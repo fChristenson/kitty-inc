@@ -10,6 +10,7 @@ import {
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
+import { CONFIG } from "../../config";
 import {
   type BigNumber,
   fromNumber,
@@ -26,7 +27,7 @@ const skyscraperIconUrl = getImageUrl("skyscraper");
 
 // floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
 // needs its own floor price for it instead of reading straight from unlockCost
-const WORKER_BASE_PRICE_FLOOR_1 = 100;
+const WORKER_BASE_PRICE_FLOOR_1 = CONFIG.upgradeMenu.workerBasePriceFloor1;
 
 function getFloorPrice(floor: Floor): BigNumber {
   return gt(floor.unlockCost, fromNumber(0))
@@ -89,7 +90,8 @@ export function buyOfficeSupplies(floor: Floor): boolean {
 // once bought) — but also gated behind the floor's own "level" (upgradeCount),
 // so a manager can only be hired once a floor's been upgraded enough to justify one
 // (also read by hud/floorUpgradeMenu, the per-floor dialog, for its own locked label)
-export const MANAGER_MIN_UPGRADE_COUNT = 50;
+export const MANAGER_MIN_UPGRADE_COUNT =
+  CONFIG.upgradeMenu.managerMinUpgradeCount;
 
 export function getManagerCost(floor: Floor): BigNumber {
   return getThirdWorkerCost(floor);

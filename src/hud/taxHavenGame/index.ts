@@ -1,11 +1,11 @@
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
+import { CONFIG } from "../../config";
 import {
   drawTrailLine,
   drawTrailHead,
   type TrailPoint,
 } from "../../shared/canvasGame";
-import { drawActiveCoinBursts } from "../../coinBurst";
 import {
   wireConferenceMinigame,
   TRAIL_SAMPLE_DX,
@@ -42,7 +42,8 @@ const SHIP_DAMPING_PER_S = 5;
 // "Assets moved %" (see hud/corporationBoostMenu's own persisted stat) —
 // flat rate per second survived, same ambient-only convention every other
 // minigame's own modifier starts from
-const ASSETS_MOVED_PERCENT_PER_SECOND = 0.05;
+const ASSETS_MOVED_PERCENT_PER_SECOND =
+  CONFIG.minigames.taxHaven.assetsMovedPercentPerSecond;
 // "Taxes" obstacles: same big bold red/white cartoon-text style
 // pressConferenceGame's own MARKET_CRASH_TEXT uses — the shared "danger red
 // text" convention
@@ -519,8 +520,7 @@ export function wireTaxHavenGame(
       }
     },
 
-    renderGraph: (ctx, state, _headX, now) => {
-      drawActiveCoinBursts(ctx, now);
+    renderGraph: (ctx, state, _headX, _now) => {
       // same through-point quadratic smoothing the profit line's own trail
       // uses — plain lineTo segments between samples read as visibly jagged
       drawTrailLine(

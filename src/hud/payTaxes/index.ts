@@ -1,12 +1,12 @@
 import { playExplosion } from "../../sound";
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
+import { CONFIG } from "../../config";
 import {
   drawTrailLine,
   drawTrailHead,
   type TrailPoint,
 } from "../../shared/canvasGame";
-import { drawActiveCoinBursts } from "../../coinBurst";
 import { triggerScreenShake } from "../../screenShake";
 import {
   wireConferenceMinigame,
@@ -40,7 +40,8 @@ const SHIP_DAMPING_PER_S = 5;
 // "Tax rebate %" (see hud/corporationBoostMenu's own persisted stat) — flat
 // rate per second survived, same ambient-only convention the other two
 // games' own modifiers start from
-const TAX_REBATE_PERCENT_PER_SECOND = 0.05;
+const TAX_REBATE_PERCENT_PER_SECOND =
+  CONFIG.minigames.payTaxes.taxRebatePercentPerSecond;
 // a second tap landing within this window of the first counts as a double
 // tap (see onTap below) instead of two separate single taps
 const DOUBLE_TAP_WINDOW_MS = 300;
@@ -360,8 +361,7 @@ export function wirePayTaxesGame(
       );
     },
 
-    renderGraph: (ctx, state, _headX, now) => {
-      drawActiveCoinBursts(ctx, now);
+    renderGraph: (ctx, state, _headX, _now) => {
       const bitmap = getTaxesLabelBitmap(ctx);
       for (const word of state.taxWords) {
         // blinks on/off every BLINK_INTERVAL_MS while vanishing instead of

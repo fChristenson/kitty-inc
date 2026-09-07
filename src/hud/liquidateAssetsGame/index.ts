@@ -1,5 +1,6 @@
 import { playBubble, playSold, playExplosion } from "../../sound";
 import { COLOR } from "../../palette";
+import { CONFIG } from "../../config";
 import {
   advanceTrail,
   computeSmoothedTrailPoints,
@@ -20,7 +21,11 @@ import {
   type ConferenceMinigame,
 } from "../../shared/conferenceMinigame";
 import { addSecuredAssetsPercent } from "../corporationBoostMenu";
-import { spawnCoinBurstAt, drawActiveCoinBursts } from "../../coinBurst";
+import {
+  spawnFloatingText,
+  drawActiveFloatingTexts,
+  shiftActiveFloatingTexts,
+} from "../../shared/floatingText";
 import { triggerScreenShake } from "../../screenShake";
 import { drawMainLine } from "./mainLine";
 import { drawShortLine } from "./shortLine";
@@ -101,16 +106,16 @@ const SPAWN_LOOKAHEAD_BUFFER_PX = 200;
 
 // this session's own accrued Secured Assets % — flat rate per second
 // survived, plus a flat bump per neutral (white) platform landed on
-const AMBIENT_INFLUENCE_PERCENT_PER_SECOND = 0.05;
-const LANDING_INFLUENCE_PERCENT = 0.08;
+const AMBIENT_INFLUENCE_PERCENT_PER_SECOND =
+  CONFIG.minigames.liquidateAssets.ambientInfluencePercentPerSecond;
+const LANDING_INFLUENCE_PERCENT =
+  CONFIG.minigames.liquidateAssets.landingInfluencePercent;
 // green (upgrade) and red (x125) platforms override that flat bump with
 // their own, much bigger, reward/penalty
-const GREEN_LINE_INFLUENCE_PERCENT = 1;
-const RED_LINE_INFLUENCE_PERCENT = -0.5;
-// spawnCoinBurstAt's own default scale (1) is sized for a full
-// building-width canvas; this screen is much smaller, so its own upgrade
-// bursts get shrunk down too — same convention pressConferenceGame uses
-const COIN_BURST_SCALE = 0.35;
+const GREEN_LINE_INFLUENCE_PERCENT =
+  CONFIG.minigames.liquidateAssets.greenLineInfluencePercent;
+const RED_LINE_INFLUENCE_PERCENT =
+  CONFIG.minigames.liquidateAssets.redLineInfluencePercent;
 
 export interface Platform {
   x: number;
@@ -418,6 +423,7 @@ export function wireLiquidateAssetsGame(
       );
 
       const scrollDx = SCROLL_SPEED_PX_S * dt;
+      shiftActiveFloatingTexts(scrollDx);
       // chainFromX must scroll in lockstep with x — otherwise it goes stale
       // between this platform's own creation and whenever the NEXT one
       // spawns off it, inflating the live gap beyond BASE_GAP_PX by however
@@ -523,10 +529,10 @@ export function wireLiquidateAssetsGame(
           if (landedOn.reward === "upgrade") {
             state.marketInfluencePercent += GREEN_LINE_INFLUENCE_PERCENT;
             playSold();
-            spawnCoinBurstAt(
+            spawnFloatingText(
               landedOn.x + landedOn.width / 2,
               landedOnTop,
-              COIN_BURST_SCALE,
+              GREEN_LINE_INFLUENCE_PERCENT,
             );
           } else if (landedOn.reward === "x125") {
             state.marketInfluencePercent += RED_LINE_INFLUENCE_PERCENT;
@@ -556,7 +562,7 @@ export function wireLiquidateAssetsGame(
     renderGraph: (ctx, state, headX, now) => {
       drawMainLine(ctx, state.platforms);
       drawShortLine(ctx, state.platforms);
-      drawActiveCoinBursts(ctx, now);
+      drawActiveFloatingTexts(ctx, now);
       const points = computeSmoothedTrailPoints(
         state,
         TRAIL_SAMPLE_DX,

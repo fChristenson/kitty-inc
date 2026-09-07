@@ -17,6 +17,7 @@ import {
   formatTime,
 } from "../../utils";
 import { COLOR } from "../../palette";
+import { CONFIG } from "../../config";
 
 // panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right).
 // Scaled up from the original 360 as far as the gap to the upgrade button allows. PANEL_X is
@@ -58,14 +59,17 @@ let tickerRunning = false;
 // speed beyond this folds into a bigger payout instead, see effectiveIncomeCycle)
 // — also keeps the bar's own fill-percentage math meaningful, since a 1s-or-longer
 // cycle is always comfortably visible as a normal filling bar
-const MIN_INCOME_INTERVAL_SECONDS = 1;
+// every literal balance number below lives in src/config.ts (CONFIG.incomePanel)
+const MIN_INCOME_INTERVAL_SECONDS = CONFIG.incomePanel.minIncomeIntervalSeconds;
 // ceiling on a NEW floor's own starting wait, applied once at creation time (see
 // floors/index.ts's buildFloor) — a high floor's exponentially-longer base interval
 // would otherwise start requiring days/weeks between payouts before a single
 // upgrade. Once created, a floor's interval is NOT re-clamped here on every cycle:
 // upgrades halve it below this exactly like any other floor (see increaseIncomeRate)
-export const MAX_INCOME_INTERVAL_SECONDS = 3600;
-const UPGRADES_PER_INTERVAL_HALVING = 10;
+export const MAX_INCOME_INTERVAL_SECONDS =
+  CONFIG.incomePanel.maxIncomeIntervalSeconds;
+const UPGRADES_PER_INTERVAL_HALVING =
+  CONFIG.incomePanel.upgradesPerIntervalHalving;
 // upgradeCount hitting a multiple of this is also the "next ten levels" milestone
 // floorInteractions.ts celebrates with an extra coin burst at the upgrade indicator
 export const UPGRADE_MILESTONE_STEP = UPGRADES_PER_INTERVAL_HALVING;
@@ -76,14 +80,15 @@ export const UPGRADE_MILESTONE_STEP = UPGRADES_PER_INTERVAL_HALVING;
 // then days, by only the 20th-30th upgrade on a single floor (simulated). 1.3 keeps
 // the early game snappy while still slowing into normal idle-game pacing later,
 // rather than the player hitting a wall almost immediately
-const UPGRADE_COST_GROWTH = 1.3;
+const UPGRADE_COST_GROWTH = CONFIG.incomePanel.upgradeCostGrowth;
 // floors whose natural (uncapped) interval already exceeds MAX_INCOME_INTERVAL_SECONDS
 // (see Floor.aboveCapTier, set once at creation in floors/index.ts's buildFloor)
 // earn more than their level was ever meant to once upgrades push their interval
 // well below the 1h cap they started pinned at — a steeper growth rate here is
 // what actually offsets that, since it's specifically each upgrade's cost that
 // needs to scale up faster for these floors, not their starting price
-const UPGRADE_COST_GROWTH_ABOVE_CAP = 1.6;
+const UPGRADE_COST_GROWTH_ABOVE_CAP =
+  CONFIG.incomePanel.upgradeCostGrowthAboveCap;
 
 // once a floor's true speed exceeds what a 1s-minimum bar can show as a normal fill
 // (see effectiveIncomeCycle's overspeed flag below), the bar is shown full instead,
@@ -129,10 +134,11 @@ export function increaseIncomeRate(floor: Floor): void {
 // all three stacks to a flat 8x, independent of (and layered on top of) the
 // temporary worker-boost speedup below
 function officeUpgradeSpeedMultiplier(floor: Floor): number {
+  const perUpgrade = CONFIG.officeUpgrades.speedMultiplierPerUpgrade;
   return (
-    (floor.hasOfficeChairs ? 2 : 1) *
-    (floor.hasOfficeSupplies ? 2 : 1) *
-    (floor.hasManager ? 2 : 1)
+    (floor.hasOfficeChairs ? perUpgrade : 1) *
+    (floor.hasOfficeSupplies ? perUpgrade : 1) *
+    (floor.hasManager ? perUpgrade : 1)
   );
 }
 

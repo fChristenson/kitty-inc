@@ -31,6 +31,7 @@ import {
   isZero,
   log10,
 } from "../../shared/bigNumber";
+import { CONFIG } from "../../config";
 
 // pure $ economy for the Corporation Boosts dialog (stock price / press
 // conference / company value / global boost math) — split out of index.ts,
@@ -42,8 +43,8 @@ import {
 // purchase adds a flat +0.01% to the modifier (see getStockContributionPercent
 // below) — company value plays no part in this, only in getCompanyBaseModifierPercent
 const STOCK_PRICE_KEY = "cash-clicker:stock-price";
-const STOCK_PRICE_BASE = 1;
-const STOCK_PRICE_STEP = 1;
+const STOCK_PRICE_BASE = CONFIG.corporation.stockPriceBase;
+const STOCK_PRICE_STEP = CONFIG.corporation.stockPriceStep;
 
 function loadStockShares(companyIndex: number): number {
   try {
@@ -96,7 +97,7 @@ export function getStockTimesBought(companyIndex: number): number {
 // $2, then $4, ...) — flat regardless of the company's own value/size. Uses
 // shared/bigNumber's pow (never a raw `**`), so this stays finite no matter
 // how many times stock has already been raised
-const STOCK_RAISE_COST_BASE = 1;
+const STOCK_RAISE_COST_BASE = CONFIG.corporation.stockRaiseCostBase;
 
 export function getStockRaiseCost(companyIndex: number): BigNumber {
   const timesBought = loadStockShares(companyIndex) - STOCK_PRICE_BASE;
@@ -128,7 +129,7 @@ export function buyStockRaise(companyIndex: number): boolean {
 // derived rate is only ever an average and a player draining to $0 (e.g. via
 // "Invest in the market") can otherwise end up waiting noticeably longer
 // than the rate alone would suggest before enough lumps have actually landed
-const MINIGAME_ENTRY_SECONDS_COST = 10;
+const MINIGAME_ENTRY_SECONDS_COST = CONFIG.corporation.minigameEntrySecondsCost;
 
 export function getMinigameEntryCost(): BigNumber {
   return multiply(
@@ -350,7 +351,7 @@ export function addAssetsMovedPercent(delta: number): void {
 // total every press, with no separate remaining-budget tracking at all, was
 // the previous bug: it kept matching against whatever newly-arrived income
 // was currently available forever, well past the intended one-time cut)
-const INVEST_PERCENT = 0.1;
+const INVEST_PERCENT = CONFIG.corporation.investPercent;
 
 export interface InvestHoldBudget {
   // this hold's fixed 10%-of-original chunk size per company, constant for
@@ -572,7 +573,8 @@ function getCompanyValue(companyIndex: number): BigNumber {
 // how much a company's stock price contributes to the combined income boost:
 // a flat +0.01% per purchase, regardless of the company's own value/size —
 // company value only ever factors into getCompanyBaseModifierPercent below
-export const STOCK_CONTRIBUTION_PER_PURCHASE = 0.01;
+export const STOCK_CONTRIBUTION_PER_PURCHASE =
+  CONFIG.corporation.stockContributionPerPurchase;
 
 export function getStockContributionPercent(companyIndex: number): number {
   return getStockTimesBought(companyIndex) * STOCK_CONTRIBUTION_PER_PURCHASE;
@@ -587,7 +589,7 @@ export function getStockContributionPercent(companyIndex: number): number {
 // sqrt of THAT compresses it a second time — so a company many orders of
 // magnitude bigger than another still only ends up a few points higher, never
 // an absurd %, while still strictly increasing with value
-const BASE_MODIFIER_RATE = 0.5;
+const BASE_MODIFIER_RATE = CONFIG.corporation.baseModifierRate;
 
 export function getCompanyBaseModifierPercent(companyIndex: number): number {
   const companyValue = max(fromNumber(10), getCompanyValue(companyIndex));

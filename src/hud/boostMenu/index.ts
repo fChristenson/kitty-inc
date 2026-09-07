@@ -14,6 +14,7 @@ import {
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
+import { CONFIG } from "../../config";
 import {
   type BigNumber,
   ZERO,
@@ -29,7 +30,7 @@ import {
 const mouseIconUrl = getImageUrl("mouse");
 const cashRegisterIconUrl = getImageUrl("cashRegister");
 
-const BOOST_ALL_SECONDS_COST = 5; // cost is 5s of current (unboosted) income
+const BOOST_ALL_SECONDS_COST = CONFIG.boostMenu.boostAllSecondsCost; // cost is 5s of current (unboosted) income
 
 // $/sec every unlocked floor is currently earning at its own base rate, ignoring any
 // boost already in effect — same convention gameState.ts's computeIdleIncome uses

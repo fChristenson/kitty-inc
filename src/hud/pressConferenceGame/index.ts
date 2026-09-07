@@ -8,8 +8,13 @@ import {
   drawTrailLine,
   drawTrailHead,
 } from "../../shared/canvasGame";
-import { spawnCoinBurstAt, drawActiveCoinBursts } from "../../coinBurst";
+import {
+  spawnFloatingText,
+  drawActiveFloatingTexts,
+  shiftActiveFloatingTexts,
+} from "../../shared/floatingText";
 import { addMarketInfluencePercent } from "../corporationBoostMenu";
+import { CONFIG } from "../../config";
 import { generateMarketEventText, MARKET_CRASH_TEXT } from "./marketEventText";
 import {
   wireConferenceMinigame,
@@ -90,13 +95,10 @@ const DIFFICULTY_INTERVAL_MS = 10_000;
 const EVENT_SPEED_GROWTH_PER_TIER = 1.15;
 const SPAWN_INTERVAL_SHRINK_PER_TIER = 0.8; // <1: shrinks the gap between spawns, so more text spawns overall
 const MIN_SPAWN_INTERVAL_FLOOR_MS = 350; // never crowds spawns closer together than this regardless of tier
-// spawnCoinBurstAt's own default scale (1) is sized for a full building-width
-// canvas; this screen is much smaller, so its own bursts get shrunk down too
-const COIN_BURST_SCALE = 0.35;
 
-// every event is either good (a coin burst on hit) or the special Market
-// Crash (ends the round on hit) — no normal "bad" event exists anymore. The
-// crash ratio starts low and climbs every difficulty tier, capping out at
+// every event is either good (a floating +% label on hit) or the special
+// Market Crash (ends the round on hit) — no normal "bad" event exists
+// anymore. The crash ratio starts low and climbs every difficulty tier, capping out at
 // MARKET_CRASH_CHANCE_MAX so a long-surviving round doesn't eventually become
 // unwinnable (100% crash, no good events left to hit at all)
 const MARKET_CRASH_CHANCE_START = 0.1; // 10% crash / 90% good at round start
@@ -111,8 +113,10 @@ const MAXED_CRASH_SPAWN_INTERVAL_SHRINK = 0.6;
 // flat rate, not tied to anything else about the round: this much per second
 // just for surviving, plus a flat instant bump on a good hit. Only ever
 // climbs — bad hits never dock it (see step)
-const AMBIENT_INFLUENCE_PERCENT_PER_SECOND = 0.05;
-const GOOD_HIT_INFLUENCE_PERCENT = 0.1;
+const AMBIENT_INFLUENCE_PERCENT_PER_SECOND =
+  CONFIG.minigames.pressConference.ambientInfluencePercentPerSecond;
+const GOOD_HIT_INFLUENCE_PERCENT =
+  CONFIG.minigames.pressConference.goodHitInfluencePercent;
 
 interface MarketEvent {
   text: string;
@@ -371,6 +375,7 @@ export function wirePressConferenceGame(
       const eventSpeed =
         SCROLL_SPEED_PX_S *
         EVENT_SPEED_GROWTH_PER_TIER ** getDifficultyTier(state);
+      shiftActiveFloatingTexts(eventSpeed * dt);
       for (let i = state.marketEvents.length - 1; i >= 0; i--) {
         const event = state.marketEvents[i];
         event.x -= eventSpeed * dt;
@@ -383,7 +388,7 @@ export function wirePressConferenceGame(
             state.running = false;
             state.gameOver = true;
           } else {
-            spawnCoinBurstAt(event.x, event.y, COIN_BURST_SCALE);
+            spawnFloatingText(event.x, event.y, GOOD_HIT_INFLUENCE_PERCENT);
             // the buy sfx, not the usual coin-drop one, just for this hit
             playSold();
             // flat bump, on top of the flat ambient climb above — only ever
@@ -399,7 +404,7 @@ export function wirePressConferenceGame(
 
     renderGraph: (ctx, state, headX, now) => {
       drawMarketEvents(ctx, state, now);
-      drawActiveCoinBursts(ctx, now);
+      drawActiveFloatingTexts(ctx, now);
       const points = computeSmoothedTrailPoints(
         state,
         TRAIL_SAMPLE_DX,

@@ -7,6 +7,7 @@ import { spawnCoinBurst } from "../coins";
 import { type BigNumber, divide, gte } from "../../shared/bigNumber";
 import { getTotalIncome } from "../../totalIncome";
 import type { Floor } from "../../gameState";
+import { CONFIG } from "../../config";
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left).
 // Width cut 25% from the previous 440 (was matching the income panel 1:1); BTN_X sets its
@@ -274,24 +275,23 @@ export const CRIT_TIER_CONFIG: Record<
     label: string; // canonical "xN" text — shared by the button AND the flash text
   }
 > = {
+  // chance/multiplier per tier live in src/config.ts (CONFIG.crit) — only the
+  // cosmetic color/label stay here
   crit: {
-    chance: 0.05,
-    multiplier: 5,
+    ...CONFIG.crit.crit,
     color: COLOR.purple,
     label: "x5",
   },
   mega: {
     // ~1 in 100 upgrade clicks — deliberately much rarer than crit's so it reads
     // as a genuine jackpot moment, not just a bigger version of the common crit
-    chance: 0.01,
-    multiplier: 25,
+    ...CONFIG.crit.mega,
     color: COLOR.starYellow,
     label: "x25",
   },
   ultra: {
     // rarer still than mega's — the true jackpot-of-jackpots moment
-    chance: 0.001,
-    multiplier: 125,
+    ...CONFIG.crit.ultra,
     color: COLOR.red,
     label: "x125",
   },
@@ -410,12 +410,12 @@ export function forceUltraCritUpgrade(floor: Floor): void {
 // floorInteractions/index.ts); rather than stacking upgrades as usual, it
 // multiplies that click's sale payout by the rolled tier's own
 // CRIT_TIER_CONFIG[tier].multiplier
-export const SALE_DURATION_MS = 15_000;
+export const SALE_DURATION_MS = CONFIG.sale.durationMs;
 // each sale click pays out floorIncomePerSecond(floor) below (1 second of that
 // floor's own income), credited straight to the player's total — hud/boostMenu's
 // own cost is priced off this same rate times this many assumed clicks, halved, so
 // a fully-clicked sale earns back at least double the cost
-export const SALE_ASSUMED_CLICKS = 10;
+export const SALE_ASSUMED_CLICKS = CONFIG.sale.assumedClicks;
 const saleStartedAt = new WeakMap<Floor, number>();
 
 export function triggerSaleBoost(floor: Floor): void {
@@ -453,7 +453,7 @@ export function floorIncomePerSecond(floor: Floor): BigNumber {
 // floorInteractions/index.ts) — boostMenu's sale cost still prices off the plain
 // floorIncomePerSecond rate above, so a fully-clicked sale now earns back well
 // more than double its cost
-export const SALE_INCOME_MULTIPLIER = 2;
+export const SALE_INCOME_MULTIPLIER = CONFIG.sale.incomeMultiplier;
 
 export function drawUpgradeButton(
   ctx: CanvasRenderingContext2D,
