@@ -14,7 +14,7 @@ const SFX_VOLUME = 0.9;
 const COIN_DROP_VOLUME = Math.min(SFX_VOLUME * 1.25, 1);
 // 25% quieter than the shared SFX_VOLUME per explicit request — the mega-crit
 // (25x) jackpot sfx
-const JACKPOT_VOLUME = SFX_VOLUME * 0.75;
+const JACKPOT_VOLUME = SFX_VOLUME * 0.65;
 
 // a single click can hit several overlapping cats, or a cat and the mouse, in the
 // same synchronous call stack (see gameCanvas.ts's onPointerUp) — this window
