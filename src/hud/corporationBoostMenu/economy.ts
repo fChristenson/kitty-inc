@@ -344,7 +344,10 @@ export function getCompanyBaseModifierPercent(companyIndex: number): number {
 // whatever's banked is exactly what shows up here
 export function getGlobalIncomeBoostPercent(): number {
   const count = getCorporationCount();
-  let total = getMarketInfluencePercent() + getSecuredAssetsPercent() + getTaxRebatePercent();
+  let total =
+    getMarketInfluencePercent() +
+    getSecuredAssetsPercent() +
+    getTaxRebatePercent();
   for (let i = 0; i < count; i++) {
     total += getCompanyBaseModifierPercent(i);
   }
