@@ -106,8 +106,10 @@ export const CONFIG = {
     //   = the % gained that press — controls ONLY the payout's overall
     //   size; tuning it can never change drain speed, and tuning
     //   investDrainPercent can never fail to also shrink the payout (since
-    //   it's computed straight off the real, shrinking drained amount)
-    investGainRate: 0.05,
+    //   it's computed straight off the real, shrinking drained amount).
+    //   log10($1) = 0, so a ~$1 drain still yields ~0% — meaningful gain
+    //   only kicks in once the amount drained is genuinely large
+    investGainRate: 0.005,
   },
 
   // Minigame reward rates — each banks straight into corporationBoostMenu's

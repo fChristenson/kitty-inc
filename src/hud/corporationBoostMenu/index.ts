@@ -26,7 +26,7 @@ import {
   holdPressConference,
   beginInvestHold,
   investInMarket,
-  formatBoostPercent,
+  formatInvestGainPercent,
 } from "./economy";
 import type { InvestHoldBudget } from "./economy";
 
@@ -214,7 +214,7 @@ export function wireCorporationBoostMenu(
     );
     if (button) {
       void triggerButtonPress(button);
-      spawnFloatingLabel(button, panel, formatBoostPercent(gain));
+      spawnFloatingLabel(button, panel, formatInvestGainPercent(gain));
     }
   }
 

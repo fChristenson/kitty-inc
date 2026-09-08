@@ -487,3 +487,13 @@ export function getGlobalIncomeBoostMultiplier(): number {
 export function formatBoostPercent(percent: number): string {
   return `+${percent.toFixed(2)}%`;
 }
+
+// same as formatBoostPercent, but for a single invest press's own gain —
+// investGainRate can produce a genuinely nonzero gain that still rounds to
+// "0.00" at 2 decimals (see config.ts's own comment on why $1 amounts drained
+// yield ~0%), which reads as "that press did nothing" even though it did;
+// ">0.00%" instead makes clear something (just not much) was actually gained
+export function formatInvestGainPercent(percent: number): string {
+  if (percent > 0 && percent < 0.01) return "< 0.01%";
+  return formatBoostPercent(percent);
+}
