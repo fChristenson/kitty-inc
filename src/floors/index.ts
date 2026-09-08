@@ -129,8 +129,8 @@ export interface BuildFloorOptions {
 }
 
 // the level-0 (freshly-built, un-upgraded) income/cost/interval stats for a given
-// floorLevel/multiplier — the one shared formula buildFloor and resetFloorToBaseStats
-// below both derive from, so they can never drift out of sync with each other
+// floorLevel/multiplier — buildFloor's own formula, factored out so a future
+// caller needing the same level-0 baseline can reuse it instead of redriving it
 function computeBaseFloorStats(
   floorLevel: number,
   multiplier: number,
@@ -204,30 +204,6 @@ export function buildFloor(
     overtimeStartedAt: null,
     overtimeCost: ZERO,
   };
-}
-
-// resets a floor's own upgrade progression (income/interval/upgradeCost/rateStep/
-// upgradeCount) back to its level-0 stats, recomputed via the exact same formula
-// buildFloor uses for this floorLevel/multiplier — the "Work overtime" gauge's
-// tier-up reward (see floorInteractions.ts) calls this right alongside promoting
-// a floor's permanent critMultiplierTier, so the floor re-climbs from lvl 0 with
-// the new tier's rate multiplier applied to every future upgrade from here on.
-// Deliberately leaves unlock state/workers/office upgrades/the crit tier itself
-// untouched — only the level-0-derived stats reset. lastCollectedAt is reset to
-// now so the fill-cycle timer restarts cleanly against the new interval instead
-// of computing stale cycles against the old one
-export function resetFloorToBaseStats(
-  floor: Floor,
-  floorLevel: number,
-  multiplier = 1,
-): void {
-  const base = computeBaseFloorStats(floorLevel, multiplier);
-  floor.incomeAmount = base.incomeAmount;
-  floor.incomeIntervalSeconds = base.incomeIntervalSeconds;
-  floor.upgradeCost = base.upgradeCost;
-  floor.rateStep = base.rateStep;
-  floor.upgradeCount = 0;
-  floor.lastCollectedAt = Date.now();
 }
 
 // draws one floor slab (just its background art now — furniture is baked into bg.png);

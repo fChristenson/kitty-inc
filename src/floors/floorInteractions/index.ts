@@ -1,6 +1,5 @@
 import { hitTestWorkers, clickWorker, getWorkerCenter } from "../worker";
 import { formatPrice } from "../../utils";
-import { resetFloorToBaseStats } from "..";
 import {
   hitTestUpgradeButton,
   getButtonCenter,
@@ -267,10 +266,6 @@ export function handleFloorClick(
         // bar starts at 0 again for the new (bigger) tier's own goal, instead of
         // draining down from the just-maxed value against it
         resetOvertimeTicks(floor);
-        // the new tier's rate multiplier applies to every future upgrade from
-        // here on, so the floor re-climbs from lvl 0 instead of keeping its
-        // already-upgraded income/cost/interval on top of the new multiplier
-        resetFloorToBaseStats(floor, floors.indexOf(floor) + 1, multiplier);
       }
       persist();
       triggerButtonPress(floor);
