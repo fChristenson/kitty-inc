@@ -9,6 +9,7 @@ import {
   getRenderedWorkerCount,
   triggerJumpAll,
   triggerSaleBoost,
+  triggerOvertimeBoost,
   floorIncomePerSecond,
   SALE_ASSUMED_CLICKS,
 } from "../../floors";
@@ -29,6 +30,7 @@ import {
 
 const mouseIconUrl = getImageUrl("mouse");
 const cashRegisterIconUrl = getImageUrl("cashRegister");
+const overtimeIconUrl = getImageUrl("clock");
 
 const BOOST_ALL_SECONDS_COST = CONFIG.boostMenu.boostAllSecondsCost; // cost is 5s of current (unboosted) income
 
@@ -110,6 +112,39 @@ export function buySaleBoost(floors: Floor[]): Floor | null {
   return floor;
 }
 
+// same pricing as the Sale boost — both are "pick a random unlocked floor and put
+// it in a temporary 15s spotlight state" purchases (see floors/upgradeButton's
+// triggerOvertimeBoost/OVERTIME_DURATION_MS)
+export function getOvertimeBoostCost(floors: Floor[]): BigNumber {
+  return getSaleBoostCost(floors);
+}
+
+// unlocked floors the event can actually land on — an already-ultra (125x) floor
+// has no next crit tier left to promote it to (see floors/upgradeButton's
+// nextCritTier), so it's excluded from the random pick entirely. Shared by
+// buyOvertimeBoost below and the menu's own render/affordability so the button
+// is fully blocked (not just "too expensive") once every floor is maxed
+function getOvertimeEligibleFloors(floors: Floor[]): Floor[] {
+  return floors.filter(
+    (floor) => floor.unlocked && floor.critMultiplierTier !== "ultra",
+  );
+}
+
+// buys the "Work overtime" boost: spends the cost, then puts one random ELIGIBLE
+// floor's upgrade button into its own 15s overtime event (see
+// floors/upgradeButton's triggerOvertimeBoost). Returns the floor the event
+// landed on (so the caller can e.g. scroll to it), or null (refunding nothing
+// spent) if there's no eligible floor to target yet
+export function buyOvertimeBoost(floors: Floor[]): Floor | null {
+  const eligible = getOvertimeEligibleFloors(floors);
+  if (eligible.length === 0) return null;
+  const cost = getOvertimeBoostCost(floors);
+  if (!spendTotalIncome(cost)) return null;
+  const floor = eligible[Math.floor(Math.random() * eligible.length)];
+  triggerOvertimeBoost(floor, cost);
+  return floor;
+}
+
 // reuses .worker-menu's styling — same generic "dialog with a list of buyable items" shape
 export function createBoostMenuMarkup(): string {
   return `
@@ -139,6 +174,8 @@ export function wireBoostMenu(
   // called right after a successful Sale purchase, with the floor it landed on —
   // main.ts uses this to close the menu and scroll the camera to that floor
   onSaleTriggered: (floor: Floor) => void,
+  // same, for a successful Work overtime purchase
+  onOvertimeTriggered: (floor: Floor) => void,
 ): BoostMenu {
   const menu = container.querySelector<HTMLDivElement>("#boost-menu")!;
   const backdrop = container.querySelector<HTMLDivElement>(
@@ -154,12 +191,17 @@ export function wireBoostMenu(
   // cost scale with the building's total floor count for as long as it stayed open
   let cachedBoostAllCost: BigNumber = ZERO;
   let cachedSaleBoostCost: BigNumber = ZERO;
+  let cachedOvertimeBoostCost: BigNumber = ZERO;
 
   function render(): void {
     cachedBoostAllCost = getBoostAllCost(getFloors());
     const affordable = gte(getTotalIncome(), cachedBoostAllCost);
     cachedSaleBoostCost = getSaleBoostCost(getFloors());
     const saleAffordable = gte(getTotalIncome(), cachedSaleBoostCost);
+    cachedOvertimeBoostCost = getOvertimeBoostCost(getFloors());
+    const overtimeEligible = getOvertimeEligibleFloors(getFloors()).length > 0;
+    const overtimeAffordable =
+      overtimeEligible && gte(getTotalIncome(), cachedOvertimeBoostCost);
     list.innerHTML = `
       <button
         class="worker-menu__item"
@@ -179,9 +221,20 @@ export function wireBoostMenu(
       >
         <span class="worker-menu__item-label">
           <img src="${cashRegisterIconUrl}" class="worker-menu__icon" alt="" />
-          Trigger sales event
+          Host sales event
         </span>
         <span class="worker-menu__price">${formatPrice(cachedSaleBoostCost)}</span>
+      </button>
+      <button
+        class="worker-menu__item"
+        id="boost-menu-overtime"
+        ${overtimeAffordable ? "" : "disabled"}
+      >
+        <span class="worker-menu__item-label">
+          <img src="${overtimeIconUrl}" class="worker-menu__icon" alt="" />
+          Work overtime
+        </span>
+        <span class="worker-menu__price">${overtimeEligible ? formatPrice(cachedOvertimeBoostCost) : "-"}</span>
       </button>
     `;
   }
@@ -210,6 +263,20 @@ export function wireBoostMenu(
         onSaleTriggered(floor);
         await close();
       }
+      return;
+    }
+    const overtimeButton = target.closest<HTMLButtonElement>(
+      "#boost-menu-overtime",
+    );
+    if (overtimeButton) {
+      const floor = buyOvertimeBoost(getFloors());
+      if (floor) {
+        playSold();
+        await triggerButtonPress(overtimeButton);
+        onPurchase();
+        onOvertimeTriggered(floor);
+        await close();
+      }
     }
   });
 
@@ -229,6 +296,15 @@ export function wireBoostMenu(
       list.querySelector<HTMLButtonElement>("#boost-menu-sale");
     if (saleButton) {
       saleButton.disabled = lt(getTotalIncome(), cachedSaleBoostCost);
+    }
+    const overtimeButton = list.querySelector<HTMLButtonElement>(
+      "#boost-menu-overtime",
+    );
+    if (overtimeButton) {
+      const overtimeEligible =
+        getOvertimeEligibleFloors(getFloors()).length > 0;
+      overtimeButton.disabled =
+        !overtimeEligible || lt(getTotalIncome(), cachedOvertimeBoostCost);
     }
   }
 

@@ -60,6 +60,26 @@ export const CONFIG = {
     incomeMultiplier: 2,
   },
 
+  // src/floors/upgradeButton/index.ts — the purchasable "Work overtime" boost.
+  // Each free click during the event adds a tick (crit-scaled, see
+  // CRIT_TIER_CONFIG) to the floor's own overtime gauge (incomePanel.ts).
+  overtime: {
+    durationMs: 15_000,
+    tickGoal: 1000, // base goal for a floor with no permanent crit tier yet
+    // a floor's CURRENT permanent crit tier raises its own gauge's goal further
+    // (multiplies the base tickGoal above) — a higher tier already earns more
+    // per tick, so its own gauge should take proportionally longer to fill
+    tickGoalMultiplierByTier: {
+      crit: 2,
+      mega: 3,
+      ultra: 4,
+    },
+    // once the 15s window ends, the gauge doesn't snap back to normal right
+    // away — it ticks back down from wherever it ended toward 0 first, at this
+    // fixed rate (1 tick per this many ms)
+    drainMsPerTick: 500,
+  },
+
   // src/hud/boostMenu/index.ts — one-time paid boosts.
   boostMenu: {
     boostAllSecondsCost: 5, // "Boost all" costs this many seconds of current income

@@ -81,6 +81,14 @@ export interface Floor {
   // floors, since every upgrade here is worth more (it wasn't "supposed" to
   // earn this fast) than the same upgrade on a floor that was never capped
   aboveCapTier: boolean;
+  // "Work overtime" boost's own persisted gauge state (see floors/upgradeButton) —
+  // stored directly on the floor (not a WeakMap) so it survives a reload and
+  // follows the floor across building switches; the drain tail is derived purely
+  // from (overtimeTicks, overtimeStartedAt, now) so it correctly keeps draining
+  // across however long the app was actually closed, same as idle income above
+  overtimeTicks: number;
+  overtimeStartedAt: number | null; // Date.now() ms the CURRENT run's window started; null = no run yet
+  overtimeCost: BigNumber; // $ paid for the CURRENT run; ZERO if never triggered
 }
 
 // gameState.ts is the sole owner of this per-floor data (Floor itself doesn't carry it),
@@ -250,6 +258,9 @@ interface SavedFloor {
   hasManager?: boolean; // added after initial release; older saves default to false on load
   critMultiplierTier?: "crit" | "mega" | "ultra" | null; // added after initial release; older saves default to null on load
   aboveCapTier?: boolean; // added after initial release; older saves default to false on load
+  overtimeTicks?: number; // added after initial release; older saves default to 0 on load
+  overtimeStartedAt?: number | null; // added after initial release; older saves default to null on load
+  overtimeCost?: SerializedBigNumber; // added after initial release; older saves default to ZERO on load
 }
 
 export function clearBuildings(companyIndex = 0): void {
@@ -279,6 +290,9 @@ function toSavedFloor(floor: Floor): SavedFloor {
     hasManager: floor.hasManager,
     critMultiplierTier: floor.critMultiplierTier,
     aboveCapTier: floor.aboveCapTier,
+    overtimeTicks: floor.overtimeTicks,
+    overtimeStartedAt: floor.overtimeStartedAt,
+    overtimeCost: floor.overtimeCost,
   };
 }
 
@@ -334,6 +348,10 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     hasManager: sf.hasManager ?? false,
     critMultiplierTier: sf.critMultiplierTier ?? null,
     aboveCapTier: sf.aboveCapTier ?? false,
+    overtimeTicks: sf.overtimeTicks ?? 0,
+    overtimeStartedAt: sf.overtimeStartedAt ?? null,
+    overtimeCost:
+      sf.overtimeCost !== undefined ? toBigNumber(sf.overtimeCost) : ZERO,
   };
   workerSlots.set(floor, sf.workers);
   workerTintIndexes.set(floor, sf.tintIndexes ?? sf.spriteIndexes ?? []);

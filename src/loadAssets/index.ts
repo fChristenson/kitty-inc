@@ -53,6 +53,7 @@ const IMAGE_FILES = {
   merge: "merge.png", // Merge companies' own menu icon
   skyscraper: "skyscraper.png", // Create new Company / Renovate floors icon
   cashRegister: "cashRegister.png", // Trigger sales event's own menu icon
+  clock: "clock.png", // Work overtime's own menu icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

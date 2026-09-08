@@ -1,13 +1,24 @@
 import { FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { countBoostedWorkers, type Floor } from "../../gameState";
 import { MAX_RENDERED_WORKERS } from "../worker";
-import { CRIT_TIER_CONFIG } from "../upgradeButton";
+import {
+  CRIT_TIER_CONFIG,
+  isOvertimeGaugeVisible,
+  isOvertimeDraining,
+  getOvertimeFillFraction,
+  getOvertimeDisplayTicks,
+  getOvertimeTickGoal,
+  getOvertimeCost,
+} from "../upgradeButton";
+import { getWiggleRotation } from "../../shared/wiggle";
+import { getTotalIncome } from "../../totalIncome";
 import {
   type BigNumber,
   ZERO,
   add,
   multiply,
   divide,
+  gte,
 } from "../../shared/bigNumber";
 import {
   drawPill,
@@ -15,6 +26,7 @@ import {
   drawCartoonText,
   formatPrice,
   formatTime,
+  roundRect,
 } from "../../utils";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
@@ -48,6 +60,48 @@ export function getIncomeBarCenter(isGroundFloor: boolean): {
 } {
   const barY = getPanelY(isGroundFloor) + PANEL_H / 2 - BAR_H / 2;
   return { x: PANEL_X + BAR_INSET + BAR_W / 2, y: barY + BAR_H / 2 };
+}
+
+// whether a floor-local point lands on the income bar itself — only meaningful
+// while the "Work overtime" gauge's drain tail is showing it as clickable (see
+// floorInteractions.ts's isOvertimeDraining-gated click handling)
+export function hitTestIncomeBar(
+  x: number,
+  y: number,
+  isGroundFloor: boolean,
+): boolean {
+  const barY = getPanelY(isGroundFloor) + PANEL_H / 2 - BAR_H / 2;
+  const barX = PANEL_X + BAR_INSET;
+  return x >= barX && x <= barX + BAR_W && y >= barY && y <= barY + BAR_H;
+}
+
+// the bar's own "juicy" press bounce for the drain-tail re-trigger click (see
+// floorInteractions.ts) — same squash-then-overshoot feel/constants as the
+// upgrade button's own press animation (floors/upgradeButton's pressScale), but
+// independent per-floor state so pressing the BAR doesn't also visibly bounce
+// the (unrelated, already-reverted-to-normal) upgrade button next to it
+const barPressedAt = new WeakMap<Floor, number>();
+const BAR_PRESS_DURATION_MS = 450;
+const BAR_PRESS_AMPLITUDE = 0.18;
+const BAR_PRESS_DECAY = 9;
+const BAR_PRESS_FREQUENCY = 26;
+
+export function triggerIncomeBarPress(floor: Floor): void {
+  barPressedAt.set(floor, Date.now());
+}
+
+function incomeBarPressScale(floor: Floor, now: number): number {
+  const startedAt = barPressedAt.get(floor);
+  if (startedAt === undefined) return 1;
+  const elapsedMs = now - startedAt;
+  if (elapsedMs >= BAR_PRESS_DURATION_MS) return 1;
+  const t = elapsedMs / 1000;
+  return (
+    1 -
+    BAR_PRESS_AMPLITUDE *
+      Math.exp(-BAR_PRESS_DECAY * t) *
+      Math.cos(BAR_PRESS_FREQUENCY * t)
+  );
 }
 
 // when each floor's current fill cycle started is floor.lastCollectedAt itself (a
@@ -263,6 +317,54 @@ function formatStaticIncomeRate(floor: Floor, now: number): string {
   return `${formatPrice(amount)}/${timeText}`;
 }
 
+// "Work overtime" boost's own progress readout — a plain tick count, not a $/time
+// rate, since the gauge isn't paying out anything itself (see floors/upgradeButton).
+// Reads the same drain-aware value/goal the bar's own fill fraction uses, so the
+// number (and its own max) tick down/scale in lockstep with the bar itself
+function formatOvertimeProgress(floor: Floor, now: number): string {
+  return `${Math.floor(getOvertimeDisplayTicks(floor, now))}/${getOvertimeTickGoal(floor)}`;
+}
+
+// the overtime gauge's own fill look: a two-color gradient spanning the WHOLE
+// bar's width, from the floor's CURRENT permanent crit tier color to the NEXT
+// tier's color (null/base -> green to purple, crit -> purple to gold, mega ->
+// gold to red) — same colors CRIT_TIER_CONFIG already uses everywhere else, so
+// filling the bar visibly previews the tier-up reward a full gauge grants (see
+// floorInteractions.ts's overtime-goal-reached branch). An already-ultra floor
+// has no next tier to preview, so it's just a solid red fill instead
+function getGaugeGradientColors(floor: Floor): [string, string] {
+  switch (floor.critMultiplierTier) {
+    case null:
+      return [COLOR.moneyGreen, CRIT_TIER_CONFIG.crit.color];
+    case "crit":
+      return [CRIT_TIER_CONFIG.crit.color, CRIT_TIER_CONFIG.mega.color];
+    case "mega":
+      return [CRIT_TIER_CONFIG.mega.color, CRIT_TIER_CONFIG.ultra.color];
+    case "ultra":
+      return [CRIT_TIER_CONFIG.ultra.color, CRIT_TIER_CONFIG.ultra.color];
+  }
+}
+
+function drawGaugeFill(
+  ctx: CanvasRenderingContext2D,
+  floor: Floor,
+  barX: number,
+  barY: number,
+  barW: number,
+  barH: number,
+  radius: number,
+  fillW: number,
+): void {
+  if (fillW <= 0) return;
+  const [fromColor, toColor] = getGaugeGradientColors(floor);
+  const gradient = ctx.createLinearGradient(barX, barY, barX + barW, barY);
+  gradient.addColorStop(0, fromColor);
+  gradient.addColorStop(1, toColor);
+  roundRect(ctx, barX, barY, fillW, barH, radius);
+  ctx.fillStyle = gradient;
+  ctx.fill();
+}
+
 // walks clockwise around a rounded rect's own outline; t is a 0..1 lap fraction,
 // starting at the middle of the top edge
 function roundedRectPerimeterPoint(
@@ -381,6 +483,33 @@ export function drawIncomePanel(
   // slice of every short cycle before it visibly started growing
   const barMinWidth = barRadius * 2;
 
+  const now = Date.now();
+  // "Work overtime" boost (see floors/upgradeButton) takes over this floor's whole
+  // bar — a filling gauge instead of the normal payout-cycle fill — for its own
+  // 15s duration, then keeps showing the gauge a little longer while it ticks
+  // back down to 0, before this floor's bar finally reverts to normal
+  const overtimeGaugeVisible =
+    floor.unlocked && isOvertimeGaugeVisible(floor, now);
+  // during that drain tail specifically (not the initial 15s window), the bar
+  // wiggles like the overtime button itself and becomes clickable (see
+  // floorInteractions.ts) to re-trigger another event on this same floor for the
+  // same cost, letting several chained events fill the gauge all the way — only
+  // wiggles while the player could actually act on it (affordable, and this
+  // floor isn't already maxed at ultra with no further tier to reach)
+  const draining =
+    floor.unlocked &&
+    floor.critMultiplierTier !== "ultra" &&
+    isOvertimeDraining(floor, now) &&
+    gte(getTotalIncome(), getOvertimeCost(floor));
+
+  ctx.save();
+  const barCenter = getIncomeBarCenter(isGroundFloor);
+  ctx.translate(barCenter.x, barCenter.y);
+  if (draining) ctx.rotate(getWiggleRotation(now));
+  const pressScale = incomeBarPressScale(floor, now);
+  ctx.scale(pressScale, pressScale);
+  ctx.translate(-barCenter.x, -barCenter.y);
+
   drawPill(
     ctx,
     barX,
@@ -396,8 +525,9 @@ export function drawIncomePanel(
   // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
   let fillW = barMinWidth;
   let overspeed = false;
-  const now = Date.now();
-  if (floor.unlocked) {
+  if (overtimeGaugeVisible) {
+    fillW = Math.max(barMinWidth, barW * getOvertimeFillFraction(floor, now));
+  } else if (floor.unlocked) {
     const cycle = effectiveIncomeCycle(floor, now);
     overspeed = cycle.overspeed;
     if (overspeed) {
@@ -414,10 +544,22 @@ export function drawIncomePanel(
   const fillColor = floor.critMultiplierTier
     ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
     : COLOR.moneyGreen;
-  drawPill(ctx, barX, barY, fillW, barH, fillColor, false, true, barRadius);
+  if (overtimeGaugeVisible) {
+    drawGaugeFill(ctx, floor, barX, barY, barW, barH, barRadius, fillW);
+  } else {
+    drawPill(ctx, barX, barY, fillW, barH, fillColor, false, true, barRadius);
+  }
   // ring stroked last, on top of both fills, so it always reads as one continuous
   // black/white/dark-green border around the whole capsule regardless of fill width
-  drawPillBorder(ctx, barX, barY, barW, barH, barRadius, fillColor);
+  drawPillBorder(
+    ctx,
+    barX,
+    barY,
+    barW,
+    barH,
+    barRadius,
+    overtimeGaugeVisible ? COLOR.amber : fillColor,
+  );
   if (overspeed) drawOverspeedRay(ctx, barX, barY, barW, barH, barRadius, now);
 
   // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
@@ -428,10 +570,13 @@ export function drawIncomePanel(
   ctx.textBaseline = "middle";
   drawCartoonText(
     ctx,
-    floor.unlocked
-      ? formatIncomeRate(floor, now)
-      : formatStaticIncomeRate(floor, now),
+    overtimeGaugeVisible
+      ? formatOvertimeProgress(floor, now)
+      : floor.unlocked
+        ? formatIncomeRate(floor, now)
+        : formatStaticIncomeRate(floor, now),
     barX + barW / 2,
     barY + barH / 2 + 1,
   );
+  ctx.restore();
 }

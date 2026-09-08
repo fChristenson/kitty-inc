@@ -438,6 +438,7 @@ async function main() {
     () => buildings[activeBuildingIndex] ?? [],
     () => persist(),
     (floor) => gameCanvas.scrollActiveToFloor(floor),
+    (floor) => gameCanvas.scrollActiveToFloor(floor),
   );
   const corporationBoostMenu = wireCorporationBoostMenu(
     app,

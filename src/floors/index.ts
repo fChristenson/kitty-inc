@@ -6,7 +6,13 @@ import {
   loadGroundImage as loadAssetGroundImage,
 } from "../loadAssets";
 import { MAX_INCOME_INTERVAL_SECONDS } from "./incomePanel";
-import { fromNumber, pow, multiply, ZERO } from "../shared/bigNumber";
+import {
+  type BigNumber,
+  fromNumber,
+  pow,
+  multiply,
+  ZERO,
+} from "../shared/bigNumber";
 import { CONFIG } from "../config";
 import {
   FLOOR_W,
@@ -122,6 +128,38 @@ export interface BuildFloorOptions {
   defaultCritTier?: CritTier | null;
 }
 
+// the level-0 (freshly-built, un-upgraded) income/cost/interval stats for a given
+// floorLevel/multiplier — the one shared formula buildFloor and resetFloorToBaseStats
+// below both derive from, so they can never drift out of sync with each other
+function computeBaseFloorStats(
+  floorLevel: number,
+  multiplier: number,
+): {
+  incomeAmount: BigNumber;
+  incomeIntervalSeconds: number;
+  upgradeCost: BigNumber;
+  rateStep: BigNumber;
+} {
+  return {
+    incomeAmount: multiply(
+      pow(INCOME_GROWTH_FACTOR, floorLevel - 1),
+      BASE_INCOME_AMOUNT * multiplier,
+    ),
+    incomeIntervalSeconds: Math.min(
+      BASE_INCOME_INTERVAL_SECONDS * 2 ** (floorLevel - 1),
+      MAX_INCOME_INTERVAL_SECONDS,
+    ),
+    upgradeCost: multiply(
+      pow(2, floorLevel - 1),
+      BASE_UPGRADE_COST * multiplier,
+    ),
+    rateStep: multiply(
+      pow(INCOME_GROWTH_FACTOR, floorLevel - 1),
+      BASE_RATE_STEP * multiplier,
+    ),
+  };
+}
+
 export function buildFloor(
   floorLevel: number,
   options: BuildFloorOptions,
@@ -151,22 +189,7 @@ export function buildFloor(
 
   return {
     bgIndex: pickBackgroundIndex(backgroundCount, existingBgIndexes),
-    incomeAmount: multiply(
-      pow(INCOME_GROWTH_FACTOR, floorLevel - 1),
-      BASE_INCOME_AMOUNT * multiplier,
-    ),
-    incomeIntervalSeconds: Math.min(
-      BASE_INCOME_INTERVAL_SECONDS * 2 ** (floorLevel - 1),
-      MAX_INCOME_INTERVAL_SECONDS,
-    ),
-    upgradeCost: multiply(
-      pow(2, floorLevel - 1),
-      BASE_UPGRADE_COST * multiplier,
-    ),
-    rateStep: multiply(
-      pow(INCOME_GROWTH_FACTOR, floorLevel - 1),
-      BASE_RATE_STEP * multiplier,
-    ),
+    ...computeBaseFloorStats(floorLevel, multiplier),
     upgradeCount: 0,
     unlocked: isGroundFloor && !groundFloorLocked,
     unlockCost,
@@ -177,7 +200,34 @@ export function buildFloor(
     hasManager: false,
     critMultiplierTier: defaultCritTier,
     aboveCapTier,
+    overtimeTicks: 0,
+    overtimeStartedAt: null,
+    overtimeCost: ZERO,
   };
+}
+
+// resets a floor's own upgrade progression (income/interval/upgradeCost/rateStep/
+// upgradeCount) back to its level-0 stats, recomputed via the exact same formula
+// buildFloor uses for this floorLevel/multiplier — the "Work overtime" gauge's
+// tier-up reward (see floorInteractions.ts) calls this right alongside promoting
+// a floor's permanent critMultiplierTier, so the floor re-climbs from lvl 0 with
+// the new tier's rate multiplier applied to every future upgrade from here on.
+// Deliberately leaves unlock state/workers/office upgrades/the crit tier itself
+// untouched — only the level-0-derived stats reset. lastCollectedAt is reset to
+// now so the fill-cycle timer restarts cleanly against the new interval instead
+// of computing stale cycles against the old one
+export function resetFloorToBaseStats(
+  floor: Floor,
+  floorLevel: number,
+  multiplier = 1,
+): void {
+  const base = computeBaseFloorStats(floorLevel, multiplier);
+  floor.incomeAmount = base.incomeAmount;
+  floor.incomeIntervalSeconds = base.incomeIntervalSeconds;
+  floor.upgradeCost = base.upgradeCost;
+  floor.rateStep = base.rateStep;
+  floor.upgradeCount = 0;
+  floor.lastCollectedAt = Date.now();
 }
 
 // draws one floor slab (just its background art now — furniture is baked into bg.png);
@@ -323,6 +373,8 @@ export {
   isSaleActive,
   floorIncomePerSecond,
   SALE_ASSUMED_CLICKS,
+  triggerOvertimeBoost,
+  isOvertimeActive,
   CRIT_TIER_CONFIG,
 } from "./upgradeButton";
 export type { CritTier } from "./upgradeButton";

@@ -1,5 +1,6 @@
 import { hitTestWorkers, clickWorker, getWorkerCenter } from "../worker";
 import { formatPrice } from "../../utils";
+import { resetFloorToBaseStats } from "..";
 import {
   hitTestUpgradeButton,
   getButtonCenter,
@@ -10,7 +11,17 @@ import {
   rollCritUpgrade,
   rollFloorBuyCrit,
   pickHigherCritTier,
+  nextCritTier,
   isSaleActive,
+  isOvertimeActive,
+  endOvertimeActiveWindow,
+  isOvertimeDraining,
+  getOvertimeCost,
+  retriggerOvertimeBoost,
+  addOvertimeTicks,
+  getOvertimeTicks,
+  getOvertimeTickGoal,
+  resetOvertimeTicks,
   isUpgradeButtonEnabled,
   CRIT_TIER_CONFIG,
   floorIncomePerSecond,
@@ -18,7 +29,13 @@ import {
   BTN_W,
   BTN_H,
 } from "../upgradeButton";
-import { increaseIncomeRate, UPGRADE_MILESTONE_STEP } from "../incomePanel";
+import {
+  increaseIncomeRate,
+  UPGRADE_MILESTONE_STEP,
+  hitTestIncomeBar,
+  getIncomeBarCenter,
+  triggerIncomeBarPress,
+} from "../incomePanel";
 import { spendTotalIncome, addTotalIncome } from "../../totalIncome";
 import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
@@ -56,6 +73,19 @@ export interface FloorActionsDeps {
 // this file just reuses it for hitTestFloorHover below
 export { isUpgradeButtonEnabled };
 
+// whether the drain-tail bar (see hitTestIncomeBar) can be clicked to re-trigger
+// another event on this floor right now — an already-ultra (125x) floor has no
+// next crit tier left to promote it to, so the event can't spawn/re-spawn there
+// at all once it's reached that cap (shared by hitTestFloorHover and the actual
+// click handling below, so the cursor and the click agree)
+function canRetriggerOvertime(floor: Floor, now: number): boolean {
+  return (
+    floor.unlocked &&
+    floor.critMultiplierTier !== "ultra" &&
+    isOvertimeDraining(floor, now)
+  );
+}
+
 // whether a floor-local point lands on anything hoverable (cursor should be "pointer")
 export function hitTestFloorHover(
   x: number,
@@ -67,6 +97,8 @@ export function hitTestFloorHover(
     (hitTestUpgradeButton(x, y, isGroundFloor) &&
       floor.unlocked &&
       isUpgradeButtonEnabled(floor)) ||
+    (canRetriggerOvertime(floor, Date.now()) &&
+      hitTestIncomeBar(x, y, isGroundFloor)) ||
     hitTestFloorLock(x, y, floor) ||
     hitTestUpgradeArrow(x, y, floor) ||
     hitTestWorkers(x, y, floor).length > 0
@@ -117,6 +149,27 @@ export function handleFloorClick(
     onFloorAdded,
     getScreenCenterLocal,
   } = deps;
+
+  // "Work overtime" boost's drain tail (see floors/upgradeButton): while the
+  // gauge is ticking back down, the bar itself wiggles and becomes clickable —
+  // paying the SAME cost the original purchase did re-triggers another event on
+  // this SAME floor, letting several chained events fill the gauge all the way
+  // (blocked once this floor's already ultra — see canRetriggerOvertime above)
+  if (
+    canRetriggerOvertime(floor, Date.now()) &&
+    hitTestIncomeBar(x, y, isGroundFloor)
+  ) {
+    const cost = getOvertimeCost(floor);
+    if (spendTotalIncome(cost)) {
+      retriggerOvertimeBoost(floor, Date.now());
+      persist();
+      playSold();
+      triggerIncomeBarPress(floor);
+      const center = getIncomeBarCenter(isGroundFloor);
+      spawnCoinBurst(floor, center.x, center.y, () => {});
+    }
+    return;
+  }
 
   if (hitTestFloorLock(x, y, floor)) {
     if (spendTotalIncome(floor.unlockCost)) {
@@ -184,6 +237,62 @@ export function handleFloorClick(
         center.x,
         center.y,
         `+${formatPrice(gained)}`,
+        tier !== null,
+      );
+      return;
+    }
+    // "Work overtime" boost (see hud/boostMenu.ts's buyOvertimeBoost): free clicks
+    // that add ticks to this floor's own overtime gauge (drawn by incomePanel.ts
+    // in place of its normal fill-cycle bar) instead of paying out anything. A
+    // crit rolled during the event scales the ticks a click adds by that tier's
+    // own multiplier (5/25/125), same tier-aware celebration treatment as Sale
+    if (isOvertimeActive(floor, Date.now())) {
+      const tier = getCritTier(floor);
+      if (tier) consumeCritUpgrade(floor);
+      const ticks = tier ? CRIT_TIER_CONFIG[tier].multiplier : 1;
+      const ticksBefore = getOvertimeTicks(floor);
+      addOvertimeTicks(floor, ticks);
+      rollCritUpgrade(floor);
+      // filling the gauge all the way promotes this floor's own PERMANENT crit
+      // tier one step (null -> crit -> mega -> ultra, capped at ultra) and ends
+      // the event early instead of waiting out the rest of its own 15s — only
+      // fires the instant it crosses the goal, not on every click while already
+      // maxed, so a long drain-tail re-trigger chain can't over-promote past ultra
+      let goalReached = false;
+      const goal = getOvertimeTickGoal(floor);
+      if (ticksBefore < goal && getOvertimeTicks(floor) >= goal) {
+        goalReached = true;
+        floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+        endOvertimeActiveWindow(floor, Date.now());
+        // bar starts at 0 again for the new (bigger) tier's own goal, instead of
+        // draining down from the just-maxed value against it
+        resetOvertimeTicks(floor);
+        // the new tier's rate multiplier applies to every future upgrade from
+        // here on, so the floor re-climbs from lvl 0 instead of keeping its
+        // already-upgraded income/cost/interval on top of the new multiplier
+        resetFloorToBaseStats(floor, floors.indexOf(floor) + 1, multiplier);
+      }
+      persist();
+      triggerButtonPress(floor);
+      playCoinDrop();
+      if (goalReached) {
+        triggerCritCelebration(
+          floor,
+          floor.critMultiplierTier!,
+          getScreenCenterLocal,
+        );
+      } else if (tier) {
+        triggerCritCelebration(floor, tier, getScreenCenterLocal);
+      }
+      const center = getButtonCenter(isGroundFloor);
+      const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
+      const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
+      spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
+      spawnIncomeFloatText(
+        floor,
+        center.x,
+        center.y,
+        `+${ticks}`,
         tier !== null,
       );
       return;
