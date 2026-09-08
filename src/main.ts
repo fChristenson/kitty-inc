@@ -632,6 +632,22 @@ async function main() {
     markAppClosed();
     saveBuildings(buildings, activeCompanyIndex);
   });
+
+  // beforeunload alone is unreliable for catching "the player actually left" —
+  // especially on mobile, where backgrounding/swiping away/OS-killing a tab
+  // very often never fires it at all — which is exactly why the idle-income
+  // popup was reported as inconsistent (last-close simply never got stamped
+  // for however long that session ran). visibilitychange's "hidden" state
+  // fires far more reliably across platforms (backgrounding, locking the
+  // screen, switching apps, and a normal close all trigger it), so stamp the
+  // same close-timestamp there too. Harmless if the player comes right back —
+  // the timestamp just gets refreshed again the next time they actually leave
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "hidden") return;
+    if (!isStorageIntact()) return;
+    markAppClosed();
+    saveBuildings(buildings, activeCompanyIndex);
+  });
 }
 
 main();
