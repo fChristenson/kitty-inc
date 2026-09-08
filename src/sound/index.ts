@@ -12,6 +12,9 @@ const MUSIC_VOLUME = 0.4;
 const SFX_VOLUME = 0.9;
 // 25% louder than the shared SFX_VOLUME per explicit request, clamped to Audio's own 1.0 max
 const COIN_DROP_VOLUME = Math.min(SFX_VOLUME * 1.25, 1);
+// 25% quieter than the shared SFX_VOLUME per explicit request — the mega-crit
+// (25x) jackpot sfx
+const JACKPOT_VOLUME = SFX_VOLUME * 0.75;
 
 // a single click can hit several overlapping cats, or a cat and the mouse, in the
 // same synchronous call stack (see gameCanvas.ts's onPointerUp) — this window
@@ -242,7 +245,7 @@ export function playJackpot(): void {
   const now = Date.now();
   if (now - lastJackpotPlayTime < JACKPOT_DEBOUNCE_MS) return;
   lastJackpotPlayTime = now;
-  playSfx("win", SFX_VOLUME);
+  playSfx("win", JACKPOT_VOLUME);
 }
 
 // one-shot sound effect for the even rarer ultra-crit moment (see

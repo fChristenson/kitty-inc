@@ -238,36 +238,6 @@ export function addTaxRebatePercent(delta: number): void {
   }
 }
 
-// "Assets moved %" — earned by playing hud/taxHavenGame's own "Tax Haven"
-// mini-game, banked once per round via addAssetsMovedPercent; kept as its
-// own modifier, separate from every other one above. Contributes directly,
-// 1:1, to the global boost (see getGlobalIncomeBoostPercent), same as those,
-// no leverage/scaling/cap of any kind
-const ASSETS_MOVED_KEY = "cash-clicker:assets-moved-percent";
-
-export function getAssetsMovedPercent(): number {
-  try {
-    const raw = localStorage.getItem(ASSETS_MOVED_KEY);
-    const parsed = raw !== null ? Number(raw) : 0;
-    return Number.isFinite(parsed) ? parsed : 0;
-  } catch {
-    return 0;
-  }
-}
-
-// banks additional assets-moved % earned just now (delta can be negative,
-// but the running total is floored at 0)
-export function addAssetsMovedPercent(delta: number): void {
-  try {
-    localStorage.setItem(
-      ASSETS_MOVED_KEY,
-      String(Math.max(0, getAssetsMovedPercent() + delta)),
-    );
-  } catch {
-    // storage unavailable: nothing to persist
-  }
-}
-
 // "Invest in the market" — a cash sink that trades money for Investment
 // Portfolio %, always usable regardless of current income. Each press takes
 // INVEST_DRAIN_PERCENT of whatever's still left in this hold's own
@@ -501,8 +471,7 @@ export function getGlobalIncomeBoostPercent(): number {
     getMarketInfluencePercent() +
     getInvestmentPortfolioPercent() +
     getSecuredAssetsPercent() +
-    getTaxRebatePercent() +
-    getAssetsMovedPercent();
+    getTaxRebatePercent();
   for (let i = 0; i < count; i++) {
     total += getCompanyBaseModifierPercent(i);
   }

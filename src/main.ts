@@ -58,7 +58,6 @@ import {
   wirePressConferenceTestButton,
   wireLiquidateAssetsTestButton,
   wirePayTaxesTestButton,
-  wireTaxHavenTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -85,8 +84,6 @@ import {
   wireLiquidateAssetsGame,
   createPayTaxesGameMarkup,
   wirePayTaxesGame,
-  createTaxHavenGameMarkup,
-  wireTaxHavenGame,
   createMapMenuMarkup,
   wireMapMenu,
   createTotalEarnedOverlayMarkup,
@@ -144,7 +141,6 @@ async function main() {
     ${createPressConferenceGameMarkup()}
     ${createLiquidateAssetsGameMarkup()}
     ${createPayTaxesGameMarkup()}
-    ${createTaxHavenGameMarkup()}
     ${createMapMenuMarkup()}
     ${createTotalEarnedOverlayMarkup()}
   `;
@@ -380,7 +376,6 @@ async function main() {
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     wireLiquidateAssetsTestButton(app, () => liquidateAssetsGame.open());
     wirePayTaxesTestButton(app, () => payTaxesGame.open());
-    wireTaxHavenTestButton(app, () => taxHavenGame.open());
     // shows the idle-income "You have earned" overlay (see
     // hud/totalEarnedOverlay) on demand, without needing to actually leave and
     // reopen the tab to earn real idle income first
@@ -449,7 +444,6 @@ async function main() {
     () => pressConferenceGame.open(),
     () => liquidateAssetsGame.open(),
     () => payTaxesGame.open(),
-    () => taxHavenGame.open(),
   );
   const pressConferenceGame = wirePressConferenceGame(app, () =>
     corporationBoostMenu.refresh(),
@@ -458,9 +452,6 @@ async function main() {
     corporationBoostMenu.refresh(),
   );
   const payTaxesGame = wirePayTaxesGame(app, () =>
-    corporationBoostMenu.refresh(),
-  );
-  const taxHavenGame = wireTaxHavenGame(app, () =>
     corporationBoostMenu.refresh(),
   );
   const totalEarnedOverlay = wireTotalEarnedOverlay(app);

@@ -15,7 +15,6 @@ import {
   getInvestmentPortfolioPercent,
   getSecuredAssetsPercent,
   getTaxRebatePercent,
-  getAssetsMovedPercent,
   getGlobalIncomeBoostPercent,
   formatBoostPercent,
 } from "../corporationBoostMenu";
@@ -136,10 +135,6 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
       <div class="worker-menu__modifier-row">
         <span>Tax rebate</span>
         <span>${formatBoostPercent(getTaxRebatePercent())}</span>
-      </div>
-      <div class="worker-menu__modifier-row">
-        <span>Assets in haven</span>
-        <span>${formatBoostPercent(getAssetsMovedPercent())}</span>
       </div>
       <div class="worker-menu__modifier-row worker-menu__modifier-row--divider">
         <span>Investment portfolio</span>

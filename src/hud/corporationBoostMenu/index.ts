@@ -45,8 +45,6 @@ export {
   addSecuredAssetsPercent,
   getTaxRebatePercent,
   addTaxRebatePercent,
-  getAssetsMovedPercent,
-  addAssetsMovedPercent,
   getCompanyAssetValue,
   getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,
@@ -88,9 +86,6 @@ export function wireCorporationBoostMenu(
   // opens the Declare Taxes mini game (see hud/payTaxes) — same up-front entry
   // cost/gating as the other two minigame buttons above
   onOpenPayTaxes?: () => void,
-  // opens the Tax Haven mini game (see hud/taxHavenGame) — same up-front
-  // entry cost/gating as every other minigame button above
-  onOpenTaxHaven?: () => void,
 ): CorporationBoostMenu {
   const menu = container.querySelector<HTMLDivElement>(
     "#corporation-boost-menu",
@@ -161,17 +156,6 @@ export function wireCorporationBoostMenu(
         <span class="worker-menu__item-label">
           <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
           <span class="worker-menu__item-name">Declare taxes</span>
-        </span>
-        <span class="worker-menu__price">${minigameEntryPriceLabel}</span>
-      </button>
-      <button
-        class="worker-menu__item"
-        id="tax-haven-item"
-        ${minigameEntryAffordable ? "" : "disabled"}
-      >
-        <span class="worker-menu__item-label">
-          <img src="${coinIconUrl}" class="worker-menu__icon" alt="" />
-          <span class="worker-menu__item-name">Use tax haven</span>
         </span>
         <span class="worker-menu__price">${minigameEntryPriceLabel}</span>
       </button>
@@ -290,17 +274,6 @@ export function wireCorporationBoostMenu(
     onOpenPayTaxes?.();
   });
 
-  // same shared entry cost/spend pattern as declare-taxes-item above
-  list.addEventListener("click", (event) => {
-    const target = event.target as HTMLElement;
-    const button = target.closest<HTMLButtonElement>("#tax-haven-item");
-    if (!button || button.disabled) return;
-    if (!spendFromAllCompanies(getMinigameEntryCost())) return;
-    playSold();
-    pauseAffordabilityPolling();
-    onOpenTaxHaven?.();
-  });
-
   // re-checks affordability while the menu sits open, same as boostMenu.ts's own
   // updateAffordability, so a grayed-out item turns clickable again as soon as
   // income catches up instead of only refreshing on the next open/purchase
@@ -335,11 +308,6 @@ export function wireCorporationBoostMenu(
     );
     if (declareTaxesButton) {
       declareTaxesButton.disabled = !minigameEntryAffordable;
-    }
-    const taxHavenButton =
-      list.querySelector<HTMLButtonElement>("#tax-haven-item");
-    if (taxHavenButton) {
-      taxHavenButton.disabled = !minigameEntryAffordable;
     }
     const investButton = list.querySelector<HTMLButtonElement>(
       "#invest-in-market-item",

@@ -63,8 +63,7 @@ const TAXES_STROKE_WIDTH = 6;
 // scroll speed — see the difficulty ramp below for how this grows over time
 const TAXES_HOMING_SPEED_PX_S = 70;
 // how fast a word's actual velocity blends toward that fresh aim, each
-// frame (same idea/convention as hud/taxHavenGame's own TAXES_STEER_RATE_PER_S)
-// — without this, a sudden ship drag instantly redirects/snaps a word's
+// frame — without this, a sudden ship drag instantly redirects/snaps a word's
 // velocity, which reads as it "speeding up" toward you; blending it in over
 // a few frames keeps the word's own speed close to TAXES_HOMING_SPEED_PX_S
 // (times its difficulty tier) instead of momentarily spiking

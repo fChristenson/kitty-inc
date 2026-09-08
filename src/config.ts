@@ -112,7 +112,7 @@ export const CONFIG = {
 
   // Minigame reward rates — each banks straight into corporationBoostMenu's
   // matching modifier % (see economy.ts's addMarketInfluencePercent/
-  // addSecuredAssetsPercent/addTaxRebatePercent/addAssetsMovedPercent), 1:1,
+  // addSecuredAssetsPercent/addTaxRebatePercent), 1:1,
   // no leverage/cap. Keep these roughly proportionate to each other so no one
   // minigame is a strictly better use of the same entry cost than another.
   minigames: {
@@ -129,10 +129,6 @@ export const CONFIG = {
     // hud/payTaxes — "Declare Taxes" (Tax Rebate %)
     payTaxes: {
       taxRebatePercentPerSecond: 0.05,
-    },
-    // hud/taxHavenGame — "Tax Haven" (Assets Moved %)
-    taxHaven: {
-      assetsMovedPercentPerSecond: 0.05,
     },
   },
 } as const;
