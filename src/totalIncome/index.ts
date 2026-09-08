@@ -178,8 +178,8 @@ function getCompanyWealth(companyIndex: number): BigNumber {
 
 const SECONDS_PER_HOUR = 3600;
 
-// the actual "money sink" design goal (see hud/corporationBoostMenu's Invest
-// in the market / minigame entry costs): richer companies foot proportionally more of any corp boost/upgrade's
+// the actual "money sink" design goal (see hud/corporationBoostMenu's minigame
+// entry costs and main.ts's "Create new Corporation" purchase): richer companies foot proportionally more of any corp boost/upgrade's
 // cost, draining their own excess wealth to fund something that benefits every
 // company equally (see corporationBoostMenu's getGlobalIncomeBoostMultiplier,
 // applied globally regardless of which company is currently active) — so a brand

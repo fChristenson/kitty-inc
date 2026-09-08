@@ -630,38 +630,6 @@ body {
     worker-menu-slide-out-warp 0.352s ease-in forwards;
 }
 
-/* spawned by shared/floatingLabel's own spawnFloatingLabel — a "+X%"-style
-   readout rising off whatever button was just pressed (invest, minigame reward) */
-.floating-label {
-  position: absolute;
-  translate: -50% 0;
-  font-weight: 900;
-  color: var(--color-white);
-  -webkit-text-stroke: 1px black;
-  paint-order: stroke fill;
-  pointer-events: none;
-  white-space: nowrap;
-  z-index: 5;
-  animation: floating-label-rise 900ms ease-out forwards;
-}
-
-@keyframes floating-label-rise {
-  0% {
-    opacity: 0;
-    translate: -50% 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    translate: -50% -40px;
-  }
-}
-
 @keyframes worker-menu-slide-in-move {
   0% {
     translate: 0 100vh;
@@ -927,13 +895,6 @@ body {
   height: 28px;
   object-fit: contain;
   flex-shrink: 0;
-}
-
-/* Invest in the market's own graph icon (~33px) over every other menu
-   icon's shared 28px box */
-.worker-menu__icon--graph {
-  width: 33px;
-  height: 33px;
 }
 
 /* Create new Company / Renovate floors' own skyscraper icon, scaled up 20%

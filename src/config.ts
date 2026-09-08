@@ -86,30 +86,6 @@ export const CONFIG = {
     baseModifierRate: 0.5,
     // cost to open any minigame: this many seconds of combined company income/sec
     minigameEntrySecondsCost: 10,
-    // "Invest in the market" (economy.ts's investInMarket) — three
-    // DELIBERATELY SEPARATE knobs, never let one drive more than one of
-    // these again (that exact coupling caused repeated "changing this broke
-    // that instead" bugs):
-    // - investDrainPercent: % of a company's CURRENT remaining hold budget
-    //   taken per press — controls ONLY how fast the hold drains, both the
-    //   $ amount taken and (indirectly, since gain is computed off that
-    //   shrinking amount) how fast the % payout itself shrinks per press
-    investDrainPercent: 0.1,
-    // - investDrainFloorFraction: once what's left decays below this
-    //   fraction of the hold's own ORIGINAL balance, the next press takes
-    //   ALL of it instead of another shrinking slice — a plain percent-of-
-    //   remaining decay never mathematically reaches exact $0 on its own,
-    //   so this guarantees the hold actually bottoms out within a bounded
-    //   number of presses instead of holding forever without finishing
-    investDrainFloorFraction: 0.01,
-    // - investGainRate: sqrt(log10(amount drained this press)) * this rate
-    //   = the % gained that press — controls ONLY the payout's overall
-    //   size; tuning it can never change drain speed, and tuning
-    //   investDrainPercent can never fail to also shrink the payout (since
-    //   it's computed straight off the real, shrinking drained amount).
-    //   log10($1) = 0, so a ~$1 drain still yields ~0% — meaningful gain
-    //   only kicks in once the amount drained is genuinely large
-    investGainRate: 0.005,
   },
 
   // Minigame reward rates — each banks straight into corporationBoostMenu's

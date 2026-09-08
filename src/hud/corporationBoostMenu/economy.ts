@@ -1,7 +1,6 @@
 import { loadBuildings, clearBuildings, type Floor } from "../../gameState";
 import {
   spendFromAllCompanies,
-  spendCompanyTotalIncome,
   getStoredTotalIncome,
   getAllCompaniesIncomeRatePerSecond,
   addCompanyTotalIncome,
@@ -22,12 +21,8 @@ import {
   ZERO,
   fromNumber,
   add,
-  subtract,
   multiply,
   max,
-  min,
-  lt,
-  isZero,
   log10,
 } from "../../shared/bigNumber";
 import { CONFIG } from "../../config";
@@ -42,8 +37,7 @@ import { CONFIG } from "../../config";
 // amount is too small to be worth anything (log10 negative, i.e. under $1).
 // Every "$ amount -> global-boost %" conversion in this file builds on this
 // SAME compression, each applying its own independent rate afterward (see
-// getCompanyBaseModifierPercent/investInMarket) — never fold a
-// caller-specific rate in here
+// getCompanyBaseModifierPercent) — never fold a caller-specific rate in here
 function compressedScale(amount: BigNumber): number | null {
   const logAmount = log10(amount);
   if (!Number.isFinite(logAmount) || logAmount < 0) return null;
@@ -51,7 +45,7 @@ function compressedScale(amount: BigNumber): number | null {
 }
 
 // $ cost of opening any minigame ("Hold press conference"/"Secure stock
-// price"/"Declare taxes"/"Use tax haven"): a flat number of seconds of every
+// price"/"Declare taxes"): a flat number of seconds of every
 // company's own combined current income rate, not tied to any one company's
 // assets — so it stays affordable (and meaningful) at any point in the
 // game's progression the same way a wealth-proportional cost would, without
@@ -59,9 +53,9 @@ function compressedScale(amount: BigNumber): number | null {
 // well under the real-world time it actually takes to re-earn it (rather
 // than an exact 1:1 "N seconds of the reported rate") — floor income arrives
 // in per-floor cycle-based lumps, not a smooth continuous drip, so the
-// derived rate is only ever an average and a player draining to $0 (e.g. via
-// "Invest in the market") can otherwise end up waiting noticeably longer
-// than the rate alone would suggest before enough lumps have actually landed
+// derived rate is only ever an average and a player draining to $0 can
+// otherwise end up waiting noticeably longer than the rate alone would
+// suggest before enough lumps have actually landed
 const MINIGAME_ENTRY_SECONDS_COST = CONFIG.corporation.minigameEntrySecondsCost;
 
 export function getMinigameEntryCost(): BigNumber {
@@ -147,39 +141,10 @@ export function addMarketInfluencePercent(delta: number): void {
   }
 }
 
-// "Investment portfolio %" — earned via "Invest in the market" below. Kept
-// as its OWN modifier, separate from Market Influence (which is earned via
-// hud/pressConferenceGame's mini-game instead), so the two income sources
-// track independently. Contributes directly, 1:1, to the global boost (see
-// getGlobalIncomeBoostPercent) — same as Market Influence, no leverage/
-// scaling/cap of any kind
-const INVESTMENT_PORTFOLIO_KEY = "cash-clicker:investment-portfolio-percent";
-
-export function getInvestmentPortfolioPercent(): number {
-  try {
-    const raw = localStorage.getItem(INVESTMENT_PORTFOLIO_KEY);
-    const parsed = raw !== null ? Number(raw) : 0;
-    return Number.isFinite(parsed) ? parsed : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function addInvestmentPortfolioPercent(delta: number): void {
-  try {
-    localStorage.setItem(
-      INVESTMENT_PORTFOLIO_KEY,
-      String(Math.max(0, getInvestmentPortfolioPercent() + delta)),
-    );
-  } catch {
-    // storage unavailable: nothing to persist
-  }
-}
-
 // "Secured assets %" — earned by playing hud/liquidateAssetsGame's own
 // "Avoid market drop" mini-game, banked once per round via
 // addSecuredAssetsPercent; kept as its own modifier, separate from Market
-// Influence/Investment Portfolio. Contributes directly, 1:1, to the global
+// Influence. Contributes directly, 1:1, to the global
 // boost (see getGlobalIncomeBoostPercent) — same as those, no leverage/
 // scaling/cap of any kind
 const SECURED_ASSETS_KEY = "cash-clicker:secured-assets-percent";
@@ -236,93 +201,6 @@ export function addTaxRebatePercent(delta: number): void {
   } catch {
     // storage unavailable: nothing to persist
   }
-}
-
-// "Invest in the market" — a cash sink that trades money for Investment
-// Portfolio %, always usable regardless of current income. Each press takes
-// INVEST_DRAIN_PERCENT of whatever's still left in this hold's own
-// remaining-to-drain budget (started at the company's FULL hold-start
-// balance, only ever shrinks) — NOT a fixed chunk of the original total, so
-// the $ amount actually taken (and therefore the % gained, see below) is
-// deliberately smaller on every successive press, matching a real
-// "drain % of what's left" decay. A plain 0.9x-remaining-forever decay never
-// reaches exact $0 though (asymptotes toward it, mathematically forever) —
-// so once what's left decays under INVEST_DRAIN_FLOOR_FRACTION of the
-// hold's own original balance, that press takes ALL of it instead of yet
-// another shrinking slice, guaranteeing the hold actually bottoms out at
-// exactly $0 within a bounded number of presses instead of holding forever
-// without ever finishing. INVEST_GAIN_RATE is a wholly SEPARATE knob from
-// INVEST_DRAIN_PERCENT on purpose — tuning how fast money drains must never
-// silently also change (or fail to change) the % payout, which is exactly
-// the bug it used to have when one config value drove both
-const INVEST_DRAIN_PERCENT = CONFIG.corporation.investDrainPercent;
-const INVEST_DRAIN_FLOOR_FRACTION = CONFIG.corporation.investDrainFloorFraction;
-const INVEST_GAIN_RATE = CONFIG.corporation.investGainRate;
-
-export interface InvestHoldBudget {
-  // each company's own total at the moment this hold began — never
-  // mutated; only used to compute the drain-floor cutoff below, so a slow
-  // percentage decay still guarantees full termination
-  originalTotal: BigNumber[];
-  // how much of each company's ORIGINAL hold-start balance is still left to
-  // drain — starts at 100% of it, only ever shrinks, snaps to exactly zero
-  // once below INVEST_DRAIN_FLOOR_FRACTION of the original (see investInMarket)
-  remaining: BigNumber[];
-}
-
-// call once when a hold gesture starts
-export function beginInvestHold(): InvestHoldBudget {
-  const count = getCorporationCount();
-  const originalTotal: BigNumber[] = [];
-  const remaining: BigNumber[] = [];
-  for (let i = 0; i < count; i++) {
-    const total = getStoredTotalIncome(i);
-    originalTotal[i] = total;
-    remaining[i] = total;
-  }
-  return { originalTotal, remaining };
-}
-
-// drains INVEST_DRAIN_PERCENT of each company's own CURRENT remaining hold
-// budget (remaining is mutated in place — once a company's original
-// balance is fully used up it can't be drained again for the rest of this
-// same hold), capped to whatever that company actually still has live.
-// Each company's own gain this press is compressedScale(the ACTUAL $
-// amount drained this press) * INVEST_GAIN_RATE — since that amount itself
-// shrinks every press (see above), the gain shrinks right along with it,
-// and INVEST_GAIN_RATE stays a clean, independent, directly-felt multiplier
-// on top (see the const's own comment for why it's separate from the drain
-// rate). Returns the % just gained, or null if every company's budget is spent
-export function investInMarket(budget: InvestHoldBudget): number | null {
-  const { originalTotal, remaining } = budget;
-  const count = getCorporationCount();
-  let totalGain = 0;
-  let anyDrained = false;
-  for (let i = 0; i < count; i++) {
-    const left = remaining[i];
-    if (!left || isZero(left)) continue;
-    const current = getStoredTotalIncome(i);
-    if (isZero(current)) continue;
-    const drainFloor = multiply(
-      originalTotal[i] ?? ZERO,
-      INVEST_DRAIN_FLOOR_FRACTION,
-    );
-    // once what's left has decayed below the floor, take all of it instead
-    // of yet another (even smaller) drain-percent slice — see this const's
-    // own comment
-    const isFloorSnap = lt(left, drainFloor);
-    const chunk = isFloorSnap ? left : multiply(left, INVEST_DRAIN_PERCENT);
-    const amount = min(min(chunk, left), current);
-    if (isZero(amount)) continue;
-    spendCompanyTotalIncome(i, amount);
-    remaining[i] = subtract(left, amount);
-    anyDrained = true;
-    const scale = compressedScale(amount) ?? 0;
-    totalGain += scale * INVEST_GAIN_RATE;
-  }
-  if (!anyDrained || totalGain <= 0) return null;
-  addInvestmentPortfolioPercent(totalGain);
-  return totalGain;
 }
 
 // $ "invested" in a company's buildings — sum of what each one (after the
@@ -457,21 +335,16 @@ export function getCompanyBaseModifierPercent(companyIndex: number): number {
   return (compressedScale(companyValue) ?? 0) * BASE_MODIFIER_RATE;
 }
 
-// summed across every corporation plus the market-influence AND investment-
-// portfolio modifiers — the actual global income boost applied to every
-// floor of every building of every company (see totalIncome.ts's
-// startTotalIncomeTicker/gameState.ts's computeIdleIncome, both take this as
-// an injected multiplier to avoid a circular import back into this hud
-// module). Both contribute their own raw banked % directly, 1:1 — no
-// leverage/scaling against anything else, so whatever's banked is exactly
-// what shows up here
+// summed across every corporation plus the market-influence modifier — the
+// actual global income boost applied to every floor of every building of
+// every company (see totalIncome.ts's startTotalIncomeTicker/gameState.ts's
+// computeIdleIncome, both take this as an injected multiplier to avoid a
+// circular import back into this hud module). Contributes its own raw
+// banked % directly, 1:1 — no leverage/scaling against anything else, so
+// whatever's banked is exactly what shows up here
 export function getGlobalIncomeBoostPercent(): number {
   const count = getCorporationCount();
-  let total =
-    getMarketInfluencePercent() +
-    getInvestmentPortfolioPercent() +
-    getSecuredAssetsPercent() +
-    getTaxRebatePercent();
+  let total = getMarketInfluencePercent() + getSecuredAssetsPercent() + getTaxRebatePercent();
   for (let i = 0; i < count; i++) {
     total += getCompanyBaseModifierPercent(i);
   }
@@ -486,14 +359,4 @@ export function getGlobalIncomeBoostMultiplier(): number {
 // fixed-point since every banked modifier here stays comfortably small
 export function formatBoostPercent(percent: number): string {
   return `+${percent.toFixed(2)}%`;
-}
-
-// same as formatBoostPercent, but for a single invest press's own gain —
-// investGainRate can produce a genuinely nonzero gain that still rounds to
-// "0.00" at 2 decimals (see config.ts's own comment on why $1 amounts drained
-// yield ~0%), which reads as "that press did nothing" even though it did;
-// ">0.00%" instead makes clear something (just not much) was actually gained
-export function formatInvestGainPercent(percent: number): string {
-  if (percent > 0 && percent < 0.01) return "< 0.01%";
-  return formatBoostPercent(percent);
 }

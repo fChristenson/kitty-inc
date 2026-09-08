@@ -12,7 +12,6 @@ import { playSwoosh } from "../../sound";
 import {
   getCompanyBaseModifierPercent,
   getMarketInfluencePercent,
-  getInvestmentPortfolioPercent,
   getSecuredAssetsPercent,
   getTaxRebatePercent,
   getGlobalIncomeBoostPercent,
@@ -132,13 +131,9 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
         <span>Secured assets</span>
         <span>${formatBoostPercent(getSecuredAssetsPercent())}</span>
       </div>
-      <div class="worker-menu__modifier-row">
+      <div class="worker-menu__modifier-row worker-menu__modifier-row--divider">
         <span>Tax rebate</span>
         <span>${formatBoostPercent(getTaxRebatePercent())}</span>
-      </div>
-      <div class="worker-menu__modifier-row worker-menu__modifier-row--divider">
-        <span>Investment portfolio</span>
-        <span>${formatBoostPercent(getInvestmentPortfolioPercent())}</span>
       </div>
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">

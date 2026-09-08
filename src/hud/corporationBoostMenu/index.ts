@@ -1,46 +1,29 @@
-import {
-  formatPrice,
-  animateDialogClose,
-  triggerButtonPress,
-} from "../../utils";
+import { formatPrice, animateDialogClose } from "../../utils";
 import {
   getAllCompaniesTotalIncome,
   spendFromAllCompanies,
 } from "../../totalIncome";
-import {
-  startPressAndHold,
-  type PressAndHoldController,
-} from "../../shared/pressAndHold";
-import { spawnFloatingLabel } from "../../shared/floatingLabel";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { getManagerIconUrl } from "../../floors";
-import { gte, isZero } from "../../shared/bigNumber";
+import { gte } from "../../shared/bigNumber";
 
 const coinIconUrl = getImageUrl("coin");
 const shieldIconUrl = getImageUrl("shield");
-const graphIconUrl = getImageUrl("graph");
 import {
   getMinigameEntryCost,
   getFreePressConferenceCount,
   holdPressConference,
-  beginInvestHold,
-  investInMarket,
-  formatInvestGainPercent,
 } from "./economy";
-import type { InvestHoldBudget } from "./economy";
 
 export {
   getMinigameEntryCost,
   getFreePressConferenceCount,
   grantFreePressConference,
   holdPressConference,
-  beginInvestHold,
-  investInMarket,
   getCompanyBaseModifierPercent,
   getMarketInfluencePercent,
   addMarketInfluencePercent,
-  getInvestmentPortfolioPercent,
   getSecuredAssetsPercent,
   addSecuredAssetsPercent,
   getTaxRebatePercent,
@@ -121,10 +104,6 @@ export function wireCorporationBoostMenu(
       freePressConferenceCount > 0
         ? `FREE (x${freePressConferenceCount})`
         : formatPrice(minigameEntryCost);
-    // gated on there being anything at all left to invest — once every
-    // company's total is fully drained there's genuinely nothing left for
-    // 10% of $0 to spend
-    const investAffordable = !isZero(allCompaniesTotalIncome);
     list.innerHTML = `
       <button
         class="worker-menu__item"
@@ -159,83 +138,11 @@ export function wireCorporationBoostMenu(
         </span>
         <span class="worker-menu__price">${minigameEntryPriceLabel}</span>
       </button>
-      <button
-        class="worker-menu__item"
-        id="invest-in-market-item"
-        ${investAffordable ? "" : "disabled"}
-      >
-        <span class="worker-menu__item-label">
-          <img src="${graphIconUrl}" class="worker-menu__icon worker-menu__icon--graph" alt="" />
-          <span class="worker-menu__item-name">Invest in the market</span>
-        </span>
-        <span class="worker-menu__price">10%</span>
-      </button>
     `;
     list.scrollTop = scrollTop;
   }
 
-  // press-and-hold auto-repeat for Invest in the market (this button isn't
-  // keyed by company index, unlike a per-floor purchase elsewhere) — a fresh
-  // beginInvestHold() snapshot is captured every time a hold starts, so
-  // exactly 10 presses fully drains it (see economy.ts's investInMarket)
-  const INVEST_HOLD_INTERVAL_MS = 100;
-  let investHeld = false;
-  let investHoldController: PressAndHoldController | null = null;
-  let investHoldStartTotals: InvestHoldBudget | null = null;
-
-  function stopInvestHold(): void {
-    investHeld = false;
-    investHoldController?.stop();
-    investHoldController = null;
-    investHoldStartTotals = null;
-  }
-
-  // patches just the disabled/afford states an invest press can change,
-  // WITHOUT touching list.innerHTML — a full render() rebuild here (torn down
-  // and recreated every ~100ms for as long as the hold lasts) was fighting
-  // the browser's own native touch-scroll tracking on mobile, occasionally
-  // yanking the list to a random scroll position mid-hold. corporationStats'
-  // own breakdown (modifiers/per-company rates) refreshes itself while open
-  function updateInvestDynamicValues(): void {
-    updateAffordability();
-  }
-
-  function fireInvest(): void {
-    if (!investHoldStartTotals) return;
-    const gain = investInMarket(investHoldStartTotals);
-    if (gain === null) {
-      stopInvestHold();
-      return;
-    }
-    playSold();
-    updateInvestDynamicValues();
-    const button = list.querySelector<HTMLButtonElement>(
-      "#invest-in-market-item",
-    );
-    if (button) {
-      void triggerButtonPress(button);
-      spawnFloatingLabel(button, panel, formatInvestGainPercent(gain));
-    }
-  }
-
-  list.addEventListener("pointerdown", (event) => {
-    const target = event.target as HTMLElement;
-    const button = target.closest<HTMLButtonElement>("#invest-in-market-item");
-    if (!button || button.disabled) return;
-    stopInvestHold(); // safety net against a stale interrupted gesture
-    investHeld = true;
-    investHoldStartTotals = beginInvestHold();
-    fireInvest();
-    investHoldController = startPressAndHold(() => {
-      if (!investHeld) return; // hold already stopped
-      fireInvest();
-    }, INVEST_HOLD_INTERVAL_MS);
-  });
-
-  window.addEventListener("pointerup", stopInvestHold);
-  window.addEventListener("pointercancel", stopInvestHold);
-
-  // single-shot (not press-and-hold, unlike the invest button above) —
+  // single-shot (not press-and-hold, unlike a per-floor purchase elsewhere) —
   // one press conference at a time makes sense given its own 30-minute-income cost
   list.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
@@ -309,12 +216,6 @@ export function wireCorporationBoostMenu(
     if (declareTaxesButton) {
       declareTaxesButton.disabled = !minigameEntryAffordable;
     }
-    const investButton = list.querySelector<HTMLButtonElement>(
-      "#invest-in-market-item",
-    );
-    if (investButton) {
-      investButton.disabled = isZero(allCompaniesTotalIncome);
-    }
   }
 
   let refreshInterval: ReturnType<typeof setInterval> | null = null;
@@ -345,7 +246,6 @@ export function wireCorporationBoostMenu(
   }
 
   async function close(): Promise<void> {
-    stopInvestHold();
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;
