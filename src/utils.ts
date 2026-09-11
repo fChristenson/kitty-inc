@@ -444,7 +444,22 @@ const PILL_DARK_RING_PCT = 0.07;
 // derive the innermost dark ring's shade (see ref.png: it's a darker version of
 // whatever's inside, not plain black). Returns the total inset used, so a caller
 // drawing its own inner fill can match it exactly.
-export function drawPillBorder(
+//
+// The actual 3-stroke render is cached per (w, h, radius, fillColor) — every real
+// caller (the upgrade button, an income bar's track) always passes a FIXED size for
+// a given button/bar, from a small fixed color palette, so this cache stays small
+// and never sees the kind of continuously-varying width a progress-bar FILL would
+// (that's drawn via drawPill's own separate, uncached, border=false gradient fill
+// below — never through this function). Re-rendering 3 anti-aliased stroke rings
+// every single frame for every visible floor's button/bar was measured as a real,
+// avoidable cost — same "pre-render once, blit every frame" fix already applied to
+// buildings/outerWall's own pattern fills.
+const pillBorderCache = new Map<
+  string,
+  { canvas: HTMLCanvasElement; inset: number }
+>();
+
+function renderPillBorderRings(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -497,6 +512,30 @@ export function drawPillBorder(
   ctx.stroke();
 
   return blackW + whiteW + darkW;
+}
+
+export function drawPillBorder(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  radius: number,
+  fillColor: string,
+): number {
+  const key = `${w}:${h}:${radius}:${fillColor}`;
+  let entry = pillBorderCache.get(key);
+  if (!entry) {
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(w);
+    canvas.height = Math.ceil(h);
+    const cacheCtx = canvas.getContext("2d")!;
+    const inset = renderPillBorderRings(cacheCtx, 0, 0, w, h, radius, fillColor);
+    entry = { canvas, inset };
+    pillBorderCache.set(key, entry);
+  }
+  ctx.drawImage(entry.canvas, x, y);
+  return entry.inset;
 }
 
 export function drawPill(
