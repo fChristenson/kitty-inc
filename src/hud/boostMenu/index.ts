@@ -5,6 +5,7 @@ import {
   animateDialogClose,
 } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
+import { createPollingLoop } from "../../shared/pollingLoop";
 import {
   applyBoostAll,
   triggerJumpAll,
@@ -297,23 +298,20 @@ export function wireBoostMenu(
     }
   }
 
-  let refreshInterval: ReturnType<typeof setInterval> | null = null;
+  const affordabilityPolling = createPollingLoop(updateAffordability, 250);
 
   function open(): void {
     render();
     menu.hidden = false;
     playSwoosh();
-    refreshInterval = setInterval(updateAffordability, 250);
+    affordabilityPolling.start();
   }
 
   async function close(): Promise<void> {
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-    }
+    affordabilityPolling.stop();
   }
 
   backdrop.addEventListener("click", close);

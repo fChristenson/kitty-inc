@@ -11,6 +11,7 @@ import {
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { CONFIG } from "../../config";
+import { createPollingLoop } from "../../shared/pollingLoop";
 import {
   type BigNumber,
   fromNumber,
@@ -433,23 +434,20 @@ export function wireUpgradeMenu(
       });
   }
 
-  let refreshInterval: ReturnType<typeof setInterval> | null = null;
+  const affordabilityPolling = createPollingLoop(updateAffordability, 250);
 
   function open(): void {
     render();
     menu.hidden = false;
     playSwoosh();
-    refreshInterval = setInterval(updateAffordability, 250);
+    affordabilityPolling.start();
   }
 
   async function close(): Promise<void> {
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-    }
+    affordabilityPolling.stop();
   }
 
   backdrop.addEventListener("click", close);

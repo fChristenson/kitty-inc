@@ -9,6 +9,7 @@ import type { BigNumber } from "../../shared/bigNumber";
 import { getCorporationName } from "../../corporationName";
 import { getActiveCorporationIndices } from "../../company";
 import { playSwoosh } from "../../sound";
+import { createPollingLoop } from "../../shared/pollingLoop";
 import {
   getCompanyBaseModifierPercent,
   getMarketInfluencePercent,
@@ -144,8 +145,6 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
     list.scrollTop = scrollTop;
   }
 
-  let refreshInterval: ReturnType<typeof setInterval> | null = null;
-
   // any Total row toggles scientificMode for every $ value in this dialog —
   // pointerdown (not click) since this dialog's own 250ms poll keeps replacing
   // list.innerHTML; a click landing right as that swap happens can land on an
@@ -161,17 +160,14 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
 
   // no buttons/holds to fight here (unlike corporationBoostMenu) — a full
   // render() every tick is simple and cheap enough for a read-only view
+  const polling = createPollingLoop(render, 250);
+
   function startPolling(): void {
-    if (refreshInterval === null && !menu.hidden) {
-      refreshInterval = setInterval(render, 250);
-    }
+    if (!menu.hidden) polling.start();
   }
 
   function stopPolling(): void {
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-    }
+    polling.stop();
   }
 
   function open(): void {

@@ -7,6 +7,7 @@ import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { getManagerIconUrl } from "../../floors";
 import { gte } from "../../shared/bigNumber";
+import { createPollingLoop } from "../../shared/pollingLoop";
 
 const coinIconUrl = getImageUrl("coin");
 const shieldIconUrl = getImageUrl("shield");
@@ -218,7 +219,7 @@ export function wireCorporationBoostMenu(
     }
   }
 
-  let refreshInterval: ReturnType<typeof setInterval> | null = null;
+  const affordabilityPolling = createPollingLoop(updateAffordability, 250);
 
   // stopped right as any minigame opens on top of this still-open menu —
   // otherwise this kept polling (and, worse, kept recomputing every
@@ -226,16 +227,11 @@ export function wireCorporationBoostMenu(
   // being played, competing with that game's own render loop for no visible
   // benefit (the menu is covered up the whole time anyway)
   function pauseAffordabilityPolling(): void {
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-    }
+    affordabilityPolling.stop();
   }
 
   function resumeAffordabilityPolling(): void {
-    if (refreshInterval === null && !menu.hidden) {
-      refreshInterval = setInterval(updateAffordability, 250);
-    }
+    if (!menu.hidden) affordabilityPolling.start();
   }
 
   function open(): void {

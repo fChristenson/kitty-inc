@@ -8,6 +8,7 @@ import {
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { type BigNumber, gte, lt } from "../../shared/bigNumber";
+import { createPollingLoop } from "../../shared/pollingLoop";
 
 const mergeIconUrl = getImageUrl("merge");
 const skyscraperIconUrl = getImageUrl("skyscraper");
@@ -185,24 +186,21 @@ export function wireCorporationUpgradeMenu(
     }
   }
 
-  let refreshInterval: ReturnType<typeof setInterval> | null = null;
+  const affordabilityPolling = createPollingLoop(updateAffordability, 250);
 
   function open(): void {
     selectedForMerge.clear();
     render();
     menu.hidden = false;
     playSwoosh();
-    refreshInterval = setInterval(updateAffordability, 250);
+    affordabilityPolling.start();
   }
 
   async function close(): Promise<void> {
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-    }
+    affordabilityPolling.stop();
   }
 
   backdrop.addEventListener("click", close);

@@ -13,6 +13,7 @@ import {
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { gte, lt, type BigNumber } from "../../shared/bigNumber";
+import { createPollingLoop } from "../../shared/pollingLoop";
 import {
   getWorkerCost,
   buyWorker,
@@ -255,7 +256,7 @@ export function wireFloorUpgradeMenu(
     }
   }
 
-  let refreshInterval: ReturnType<typeof setInterval> | null = null;
+  const affordabilityPolling = createPollingLoop(updateAffordability, 250);
   // this dialog (unlike the others) is opened by a tap directly on the canvas,
   // right where the backdrop then appears — mobile browsers can synthesize a
   // trailing compatibility "click" for that same touch shortly after, landing
@@ -272,7 +273,7 @@ export function wireFloorUpgradeMenu(
     menu.hidden = false;
     openedAt = Date.now();
     playSwoosh();
-    refreshInterval = setInterval(updateAffordability, 250);
+    affordabilityPolling.start();
   }
 
   async function close(): Promise<void> {
@@ -280,10 +281,7 @@ export function wireFloorUpgradeMenu(
     await animateDialogClose(panel);
     menu.hidden = true;
     currentFloor = null;
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-    }
+    affordabilityPolling.stop();
   }
 
   backdrop.addEventListener("click", () => {

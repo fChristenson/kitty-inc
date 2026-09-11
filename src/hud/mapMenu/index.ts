@@ -5,6 +5,7 @@ import { formatPrice, animateDialogClose } from "../../utils";
 import { getBuildingPrice } from "../../buildings";
 import { playSwoosh, playSold } from "../../sound";
 import { gte, lt } from "../../shared/bigNumber";
+import { createPollingLoop } from "../../shared/pollingLoop";
 
 // reuses .worker-menu's styling — same generic "dialog with a list of buyable items"
 // shape as boostMenu/upgradeMenu. Lists a button per building already owned (how you
@@ -132,23 +133,20 @@ export function wireMapMenu(
     }
   }
 
-  let refreshInterval: ReturnType<typeof setInterval> | null = null;
+  const affordabilityPolling = createPollingLoop(updateAffordability, 250);
 
   function open(): void {
     render();
     menu.hidden = false;
     playSwoosh();
-    refreshInterval = setInterval(updateAffordability, 250);
+    affordabilityPolling.start();
   }
 
   async function close(): Promise<void> {
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;
-    if (refreshInterval !== null) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-    }
+    affordabilityPolling.stop();
   }
 
   backdrop.addEventListener("click", close);
