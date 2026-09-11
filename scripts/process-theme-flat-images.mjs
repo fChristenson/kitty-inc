@@ -21,7 +21,13 @@ const FLAT_IMAGES = [
     cropFillerBase: true,
   },
   { rawPrefix: "wallMaterial", destName: "wallMaterial.png" },
-  { rawPrefix: "mapBg", destName: "mapBg.png" },
+  // this is only ever drawn "cover"-fit behind the map screen (see
+  // cityMap/index.ts) — never at native resolution — so a huge source is
+  // pure waste: bigger download, slower decode, and (before that view's own
+  // pre-scaled-canvas cache existed) a more expensive per-frame resample.
+  // Capped at a width that's still comfortably sharp on any real display
+  // this canvas actually renders at
+  { rawPrefix: "mapBg", destName: "mapBg.png", maxWidth: 1000 },
 ];
 
 // city skyline art (every theme sampled so far) bakes in a flat, solid-color
@@ -86,11 +92,18 @@ for (const {
   rawFallback,
   destName,
   cropFillerBase,
+  maxWidth,
 } of FLAT_IMAGES) {
   const srcFile = findRaw(rawPrefix) ?? (rawFallback && findRaw(rawFallback));
   if (!srcFile) continue;
   let out = await sharp(path.join(themeDir, srcFile)).png().toBuffer();
   if (cropFillerBase) out = await cropFillerBaseIfPresent(out);
+  if (maxWidth) {
+    out = await sharp(out)
+      .resize(maxWidth, null, { withoutEnlargement: true })
+      .png({ compressionLevel: 9 })
+      .toBuffer();
+  }
   await sharp(out).toFile(path.join(distDir, destName));
   console.log(`${srcFile} -> ${theme}/dist/${destName}`);
   processed++;

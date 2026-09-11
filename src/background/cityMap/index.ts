@@ -189,6 +189,56 @@ export function createCityMapView(
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
+  // pre-scaled copy of mapImage (a large native-resolution source), cached so
+  // redraw() never has to ask the browser to resample the huge original down
+  // to display size on every single frame — that repeated resampling is what
+  // made crit celebrations here visibly lag, since a crit flash forces the
+  // tick loop to full frame rate for its whole duration (see isCritFlashActive
+  // below). Rebuilt only when the source image or the display size changes
+  let scaledMapCanvas: HTMLCanvasElement | null = null;
+  let scaledMapForImage: HTMLImageElement | null = null;
+  let scaledMapW = 0;
+  let scaledMapH = 0;
+  function getScaledMapCanvas(): HTMLCanvasElement | null {
+    if (!mapImage) return null;
+    const dpr = window.devicePixelRatio || 1;
+    const targetW = Math.round(cssW * dpr);
+    const targetH = Math.round(cssH * dpr);
+    if (
+      scaledMapCanvas &&
+      scaledMapForImage === mapImage &&
+      scaledMapW === targetW &&
+      scaledMapH === targetH
+    ) {
+      return scaledMapCanvas;
+    }
+    const offscreen = document.createElement("canvas");
+    offscreen.width = targetW;
+    offscreen.height = targetH;
+    const offCtx = offscreen.getContext("2d")!;
+    offCtx.imageSmoothingEnabled = true;
+    offCtx.imageSmoothingQuality = "high";
+    // same "cover" fit math the old direct-draw used, just done once here
+    // instead of every frame
+    const fitScale = Math.max(
+      targetW / mapImage.naturalWidth,
+      targetH / mapImage.naturalHeight,
+    );
+    const drawW = mapImage.naturalWidth * fitScale;
+    const drawH = mapImage.naturalHeight * fitScale;
+    offCtx.drawImage(
+      mapImage,
+      (targetW - drawW) / 2,
+      (targetH - drawH) / 2,
+      drawW,
+      drawH,
+    );
+    scaledMapCanvas = offscreen;
+    scaledMapForImage = mapImage;
+    scaledMapW = targetW;
+    scaledMapH = targetH;
+    return scaledMapCanvas;
+  }
   // the income readout's own actual drawn bottom edge as of the last redraw()
   // (see incomeReadout.draw's return value) — read by onClick's own HUD tap
   // hit-test below, since its extent varies once a unit-name line appears
@@ -324,24 +374,12 @@ export function createCityMapView(
     // gameCanvas.ts/pressConferenceGame.ts's own redraw loops
     const shake = getScreenShakeOffset(Date.now());
     ctx.translate(shake.x, shake.y);
-    if (mapImage) {
-      // "cover" fit: scale up to whichever axis needs it more, so the image
-      // always fills the whole canvas (cropping whatever overflows on the other
-      // axis, clipped automatically by the canvas's own bounds) instead of
-      // leaving empty space around it
-      const fitScale = Math.max(
-        cssW / mapImage.naturalWidth,
-        cssH / mapImage.naturalHeight,
-      );
-      const drawW = mapImage.naturalWidth * fitScale;
-      const drawH = mapImage.naturalHeight * fitScale;
-      ctx.drawImage(
-        mapImage,
-        (cssW - drawW) / 2,
-        (cssH - drawH) / 2,
-        drawW,
-        drawH,
-      );
+    // pre-scaled once per size/image change (see getScaledMapCanvas above) —
+    // this is a cheap blit of an already-cover-fit bitmap, not a fresh resample
+    // of the huge original source every frame
+    const scaledMap = getScaledMapCanvas();
+    if (scaledMap) {
+      ctx.drawImage(scaledMap, 0, 0, cssW, cssH);
     }
 
     const activeIndex = deps.getActiveBuildingIndex();
