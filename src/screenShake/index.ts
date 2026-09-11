@@ -38,6 +38,11 @@ let shakeStartedAt: number | null = null;
 // OWN separate lifetime (flashStartedAt/flashEndsAt), since a "sticky" tier (ultra)
 // holds its flash on screen far longer than the short physical shake rattle
 let shakeIntensity = 1;
+// randomized per trigger (see startFlash) so repeated crits don't all rattle
+// along the exact same fixed waveform/strength — a subtle bit of organic variance
+let shakeMagnitudeScale = 1;
+let shakePhaseX = 0;
+let shakePhaseY = 0;
 
 let flashStartedAt: number | null = null;
 // absolute end timestamp, computed once at trigger time from GROWTH_DURATION_MS +
@@ -78,10 +83,22 @@ interface FlashRequest {
 const GROWTH_DURATION_MS = 100;
 const FLASH_DURATION_MS = 260;
 
+// randomized once per trigger (see startFlash) instead of always entering from
+// the exact same fixed angle — varies both the tilt amount and which way it
+// leans, so consecutive crits don't all pop in identically
+let flashEntryRotationDeg = -45;
+// random phase offset for the settled-in wobble/breathing motion below (see
+// drawCritFlash) — without this, two crits landing back to back would wobble
+// in perfect lockstep with each other instead of reading as independent
+let flashWobbleSeed = 0;
+
 function startFlash(req: FlashRequest): void {
   const now = Date.now();
   shakeStartedAt = now;
   shakeIntensity = req.intensity;
+  shakeMagnitudeScale = 0.85 + Math.random() * 0.3;
+  shakePhaseX = Math.random() * Math.PI * 2;
+  shakePhaseY = Math.random() * Math.PI * 2;
 
   flashStartedAt = now;
   flashLabel = req.label;
@@ -90,6 +107,8 @@ function startFlash(req: FlashRequest): void {
   flashBlinkHz = req.blinkHz;
   flashHoldMs = req.holdMs;
   activeFlashPriority = req.priority;
+  flashEntryRotationDeg = (Math.random() < 0.5 ? -1 : 1) * (35 + Math.random() * 20);
+  flashWobbleSeed = Math.random() * Math.PI * 2;
   const fadeDurationMs = FLASH_DURATION_MS * req.intensity - GROWTH_DURATION_MS;
   flashEndsAt = now + GROWTH_DURATION_MS + req.holdMs + fadeDurationMs;
 }
@@ -143,12 +162,16 @@ export function getScreenShakeOffset(now: number): { x: number; y: number } {
   }
   const t = elapsed / 1000;
   const magnitude =
-    SHAKE_MAGNITUDE_PX * shakeIntensity * Math.exp(-SHAKE_DECAY_RATE * t);
-  // two different frequencies so x/y don't move in lockstep (reads as a rattle,
-  // not a single diagonal bounce)
+    SHAKE_MAGNITUDE_PX *
+    shakeIntensity *
+    shakeMagnitudeScale *
+    Math.exp(-SHAKE_DECAY_RATE * t);
+  // two different frequencies (plus each trigger's own random phase offset) so
+  // x/y don't move in lockstep and consecutive crits don't rattle identically —
+  // reads as a rattle, not a single diagonal bounce
   return {
-    x: Math.sin(t * 70) * magnitude,
-    y: Math.cos(t * 53) * magnitude,
+    x: Math.sin(t * 70 + shakePhaseX) * magnitude,
+    y: Math.cos(t * 53 + shakePhaseY) * magnitude,
   };
 }
 
@@ -159,11 +182,16 @@ export function getScreenShakeOffset(now: number): { x: number; y: number } {
 // several seconds. Call from gameCanvas.ts's redraw() in plain screen space, after
 // the shake translate has been undone, so the text itself doesn't rattle along with
 // the world
-const START_ROTATION_DEG = -45; // rotated in from this angle, settling to upright
 // standard "ease out back" overshoot constants: grows past full size then settles
 // to it, instead of just stopping dead at 1 — reads as a springy pop, not a static fade-in
 const BACK_C1 = 1.70158;
 const BACK_C3 = BACK_C1 + 1;
+// once settled, a small continuous rotation/scale wobble (see flashWobbleSeed
+// above) keeps the text feeling "alive" instead of a static held frame —
+// subtle enough not to fight the deliberate blink/fade phases
+const WOBBLE_ROTATION_DEG = 2.5;
+const WOBBLE_SCALE_AMOUNT = 0.025;
+const WOBBLE_HZ = 1.8;
 
 // read-only check for a caller whose own redraw loop is normally throttled (see
 // cityMap/index.ts's tick()) and needs to know to run at full frame rate for as
@@ -243,16 +271,16 @@ export function drawCritFlash(
   let alpha: number;
   if (elapsed < GROWTH_DURATION_MS) {
     // grows in from nothing (overshooting past full size before settling to it)
-    // while rotating in from START_ROTATION_DEG down to upright. Rotation uses
-    // its own ease-out curve (decelerating into upright) instead of a constant
-    // angular speed — a linear rotation moving at a fixed rate and then
-    // instantly halting at 0 the moment growth ends read as an abrupt "flip"
-    // rather than a smooth settle
+    // while rotating in from flashEntryRotationDeg (randomized per trigger, see
+    // startFlash) down to upright. Rotation uses its own ease-out curve
+    // (decelerating into upright) instead of a constant angular speed — a
+    // linear rotation moving at a fixed rate and then instantly halting at 0
+    // the moment growth ends read as an abrupt "flip" rather than a smooth settle
     const g = elapsed / GROWTH_DURATION_MS;
     growthScale =
       1 + BACK_C3 * Math.pow(g - 1, 3) + BACK_C1 * Math.pow(g - 1, 2);
     const rotProgress = 1 - Math.pow(1 - g, 3);
-    rotation = START_ROTATION_DEG * (Math.PI / 180) * (1 - rotProgress);
+    rotation = flashEntryRotationDeg * (Math.PI / 180) * (1 - rotProgress);
     alpha = 1;
   } else if (elapsed < holdEndsAt) {
     // sticks at full size/opacity (optionally strobing) — the phase a "sticky"
@@ -262,9 +290,13 @@ export function drawCritFlash(
     // holdMs so the pattern naturally lands "on" right as holdEndsAt arrives
     // (see critCelebration.ts's own comment on why its holdMs is exactly what
     // it is), rather than this function warping the blink's own timing to
-    // compensate for an arbitrary holdMs
-    growthScale = 1;
-    rotation = 0;
+    // compensate for an arbitrary holdMs. A small wobble rides on top of the
+    // held size/rotation the whole time (see WOBBLE_* above) so it never reads
+    // as a flat, static frame even while blinking
+    const wobbleT = (elapsed - GROWTH_DURATION_MS) / 1000;
+    const wobble = Math.sin(wobbleT * WOBBLE_HZ * Math.PI * 2 + flashWobbleSeed);
+    growthScale = 1 + wobble * WOBBLE_SCALE_AMOUNT;
+    rotation = wobble * WOBBLE_ROTATION_DEG * (Math.PI / 180);
     alpha = 1;
     if (flashBlinkHz > 0) {
       const tHold = (elapsed - GROWTH_DURATION_MS) / 1000;
@@ -272,9 +304,13 @@ export function drawCritFlash(
       if (!isOn) alpha = 0.15;
     }
   } else {
-    // holds at full size, upright, while fading out over the remainder of the lifetime
-    growthScale = 1;
-    rotation = 0;
+    // holds at full size, upright, while fading out over the remainder of the
+    // lifetime — the same settle wobble keeps riding along, fading out with it
+    // rather than snapping to a dead-still pose the instant the hold ends
+    const wobbleT = (elapsed - GROWTH_DURATION_MS) / 1000;
+    const wobble = Math.sin(wobbleT * WOBBLE_HZ * Math.PI * 2 + flashWobbleSeed);
+    growthScale = 1 + wobble * WOBBLE_SCALE_AMOUNT;
+    rotation = wobble * WOBBLE_ROTATION_DEG * (Math.PI / 180);
     alpha = 1 - (elapsed - holdEndsAt) / (totalLifetimeMs - holdEndsAt);
   }
 

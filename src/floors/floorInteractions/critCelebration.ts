@@ -171,10 +171,16 @@ function spawnTierBursts(
             },
           ];
   for (const { offsetX, offsetY, delayMs } of centerBursts) {
+    // a little random scatter/timing jitter on top of each burst's own base
+    // spot — keeps repeated crits from erupting in the exact same
+    // choreographed pattern every single time
+    const jitterX = offsetX + (Math.random() - 0.5) * 40;
+    const jitterY = offsetY + (Math.random() - 0.5) * 40;
+    const jitteredDelayMs = Math.max(0, delayMs + (Math.random() - 0.5) * 40);
     setTimeout(() => {
       const p = getScreenCenterLocal(floor);
-      spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
-    }, delayMs);
+      spawnCoinBurst(floor, p.x + jitterX, p.y + jitterY, () => {});
+    }, jitteredDelayMs);
   }
 }
 
