@@ -71,13 +71,6 @@ interface FlashRequest {
   priority: number;
 }
 
-// a same-tick chain/boost proc riding on the crit that just triggered a flash
-// used to just get silently dropped (their own priority never beats the
-// crit/mega/ultra flash already playing) — queued requests instead get their
-// own full turn once the current flash ends (see drawCritFlash below), so
-// nothing simultaneous ever goes unseen
-let flashQueue: FlashRequest[] = [];
-
 // how long the grow-in (scale + rotate) phase takes, and the fade-out tail's base
 // duration before any per-tier `intensity` scaling — declared up here (moved out of
 // their original spot further down) since triggerScreenShake needs them to compute
@@ -125,16 +118,17 @@ export function triggerScreenShake(options?: {
     startFlash(req);
     return;
   }
-  // a strictly bigger celebration still preempts whatever's currently
-  // playing immediately (an ultra shouldn't wait behind a plain crit) —
-  // anything else (same/lower priority, e.g. a piggyback boost/chain proc
-  // riding the very crit that's already flashing) queues up to get its own
-  // full turn right after, instead of being dropped on the floor
+  // a strictly bigger celebration still preempts whatever's currently playing
+  // immediately (an ultra shouldn't wait behind a plain crit); anything else
+  // (same/lower priority) is simply dropped instead of queued — a chain/boost
+  // proc riding the very crit that's already flashing is folded into that same
+  // flash by the caller instead of firing a second request (see
+  // critCelebration.ts's triggerCritCelebration), so nothing here should ever
+  // need a second turn; a genuinely separate, unrelated crit arriving mid-flash
+  // is just skipped rather than making the player sit through a backlog
   if (req.priority > activeFlashPriority) {
     startFlash(req);
-    return;
   }
-  flashQueue.push(req);
 }
 
 
@@ -235,14 +229,9 @@ export function drawCritFlash(
 ): void {
   if (flashStartedAt === null || flashEndsAt === null) return;
   if (now >= flashEndsAt) {
-    const next = flashQueue.shift();
-    if (next) {
-      startFlash(next);
-    } else {
-      flashStartedAt = null;
-      flashEndsAt = null;
-      activeFlashPriority = -1;
-    }
+    flashStartedAt = null;
+    flashEndsAt = null;
+    activeFlashPriority = -1;
     return;
   }
 

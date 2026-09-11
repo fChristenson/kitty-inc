@@ -59,10 +59,7 @@ import {
 } from "../floorLock";
 import { activateBoosted, type Floor } from "../../gameState";
 import { multiply } from "../../shared/bigNumber";
-import {
-  triggerCritCelebration,
-  triggerBoostCritCelebration,
-} from "./critCelebration";
+import { triggerCritCelebration } from "./critCelebration";
 
 export interface FloorActionsDeps {
   floors: Floor[];
@@ -285,9 +282,8 @@ export function handleFloorClick(
           buyTier.tier,
           getScreenCenterLocal,
           buyTier.chain,
+          buyTier.boost,
         );
-      if (buyTier?.boost)
-        triggerBoostCritCelebration(floor, getScreenCenterLocal);
     }
     return;
   }
@@ -411,8 +407,7 @@ export function handleFloorClick(
       if (boost) applyFloorBoost(floors);
       persist();
       triggerButtonPress(floor);
-      triggerCritCelebration(floor, tier, getScreenCenterLocal, chain);
-      if (boost) triggerBoostCritCelebration(floor, getScreenCenterLocal);
+      triggerCritCelebration(floor, tier, getScreenCenterLocal, chain, boost);
       return;
     }
     if (spendTotalIncome(floor.upgradeCost)) {

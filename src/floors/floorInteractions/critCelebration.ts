@@ -31,13 +31,25 @@ export function triggerCritCelebration(
   tier: CritTier,
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
   chain = false,
+  boost = false,
 ): void {
   // chain crit (see upgradeButton.ts's isChainCrit/rollFloorBuyCrit's own chain
   // flag): the flash shows the word "Chain" instead of the tier's usual "x5"/
   // "x25"/"x125" number the instant the crit actually happens — this is a
   // celebration-moment-only swap, the upgrade button's own idle/armed label is
-  // untouched and still always shows the plain tier label
-  const label = (tierLabel: string) => (chain ? "Chain" : tierLabel);
+  // untouched and still always shows the plain tier label. A boost proc (see
+  // isBoostCrit) rides the SAME crit moment the exact same way and wins over
+  // chain if both land on this same click (rare, ~0.5%) — both used to also
+  // fire their own second triggerScreenShake call, which either got silently
+  // dropped or (worse, a later "fix") queued to play right after this one, so
+  // the player had to sit through the plain tier flash first. Folding it into
+  // this single flash instead means whichever proc landed IS the one flash we
+  // show, immediately, in place of the plain tier appearance
+  const label = (tierLabel: string) =>
+    boost ? BOOST_CRIT_LABEL : chain ? "Chain" : tierLabel;
+  // same swap for color — boost's own blue takes over the tier's usual color
+  // (chain keeps the tier's own color; it has no dedicated color of its own)
+  const color = (tierColor: string) => (boost ? BOOST_CRIT_COLOR : tierColor);
   if (tier === "ultra") {
     // blinkHz strobes the flash text on/off during its holdMs "stick" phase, on
     // top of its regular grow/fade animation. holdMs is deliberately an EXACT
@@ -57,7 +69,7 @@ export function triggerCritCelebration(
     triggerScreenShake({
       intensity: 2.6,
       label: label(CRIT_TIER_CONFIG.ultra.label),
-      color: COLOR.red,
+      color: color(COLOR.red),
       strokeWidth: 16,
       blinkHz: 6,
       holdMs: 1250,
@@ -70,7 +82,7 @@ export function triggerCritCelebration(
     triggerScreenShake({
       intensity: 1.8,
       label: label(CRIT_TIER_CONFIG.mega.label),
-      color: COLOR.amber,
+      color: color(COLOR.amber),
       strokeWidth: 14,
       priority: 1,
     });
@@ -79,9 +91,21 @@ export function triggerCritCelebration(
     // priority 0 (the default): the only tier that can ever get suppressed by
     // a still-playing mega/ultra flash, so those bigger moments are never
     // stepped on by an immediately-following ordinary crit
-    triggerScreenShake({ label: label(CRIT_TIER_CONFIG.crit.label) });
+    triggerScreenShake({
+      label: label(CRIT_TIER_CONFIG.crit.label),
+      color: color(COLOR.purple),
+    });
     playCoinDrop();
     playExplosion();
+  }
+
+  // boost's own extra punch (the free-worker payout) on top of whatever the
+  // tier already celebrates — previously its own separate flash, now folded
+  // into the single flash above instead
+  if (boost) {
+    playCoinDrop();
+    const p = getScreenCenterLocal(floor);
+    spawnCoinBurst(floor, p.x, p.y, () => {});
   }
 
   // bursts on top of whatever the caller's own reward already spawned, so the
@@ -167,23 +191,4 @@ export function triggerCritCelebration(
       spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
     }, delayMs);
   }
-}
-
-// "boost crit" (see upgradeButton.ts's isBoostCrit): a proc riding on an
-// already-landed tier, same as chain — grants a free worker boost instead of
-// extra upgrades. Its own flash (screenShake.ts draws the same free-boost
-// critter icon behind it that hud/boostMenu.ts/mouse/index.ts already use)
-export function triggerBoostCritCelebration(
-  floor: Floor,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
-  triggerScreenShake({
-    intensity: 1.4,
-    label: BOOST_CRIT_LABEL,
-    color: BOOST_CRIT_COLOR,
-    strokeWidth: 12,
-  });
-  playCoinDrop();
-  const p = getScreenCenterLocal(floor);
-  spawnCoinBurst(floor, p.x, p.y, () => {});
 }
