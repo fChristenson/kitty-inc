@@ -131,7 +131,6 @@ export function triggerScreenShake(options?: {
   }
 }
 
-
 // call once per frame from gameCanvas.ts's redraw(), before its own dpr/scale
 // transforms are applied, so the magnitude is a consistent CSS-pixel amount
 // regardless of the world's current zoom/scale

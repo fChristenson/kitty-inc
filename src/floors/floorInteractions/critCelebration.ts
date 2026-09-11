@@ -12,44 +12,20 @@ import {
   playJackpot,
   playPayout,
 } from "../../sound";
-import { triggerScreenShake } from "../../screenShake";
+import { triggerScreenShake, isCritFlashActive } from "../../screenShake";
 import { COLOR } from "../../palette";
 
-// the one shared "how does a crit tier celebrate" trigger — shake/flash/sfx/coin
-// bursts, tier-scaled. Extracted out of the upgrade-button click branch so any
-// OTHER click that can roll a crit tier (the Sale-boost click below, later a
-// floor-unlock purchase) gets the exact same weighted celebration instead of each
-// call site hand-rolling (and inevitably drifting from) its own copy. Deliberately
-// does NOT decide what a crit actually REWARDS (extra upgrades vs a bigger sale
-// payout vs whatever a future caller wants) — that stays the caller's own concern.
-// Labels always come from CRIT_TIER_CONFIG (the one canonical source); the flash's
-// own color intentionally does NOT always match CRIT_TIER_CONFIG[tier].color (that
-// one's the upgrade BUTTON's color) — mega's button is gold but its flash text is
-// amber/orange per an explicit earlier request, so the flash keeps its own colors
-export function triggerCritCelebration(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-  chain = false,
-  boost = false,
-): void {
-  // chain crit (see upgradeButton.ts's isChainCrit/rollFloorBuyCrit's own chain
-  // flag): the flash shows the word "Chain" instead of the tier's usual "x5"/
-  // "x25"/"x125" number the instant the crit actually happens — this is a
-  // celebration-moment-only swap, the upgrade button's own idle/armed label is
-  // untouched and still always shows the plain tier label. A boost proc (see
-  // isBoostCrit) rides the SAME crit moment the exact same way and wins over
-  // chain if both land on this same click (rare, ~0.5%) — both used to also
-  // fire their own second triggerScreenShake call, which either got silently
-  // dropped or (worse, a later "fix") queued to play right after this one, so
-  // the player had to sit through the plain tier flash first. Folding it into
-  // this single flash instead means whichever proc landed IS the one flash we
-  // show, immediately, in place of the plain tier appearance
-  const label = (tierLabel: string) =>
-    boost ? BOOST_CRIT_LABEL : chain ? "Chain" : tierLabel;
-  // same swap for color — boost's own blue takes over the tier's usual color
-  // (chain keeps the tier's own color; it has no dedicated color of its own)
-  const color = (tierColor: string) => (boost ? BOOST_CRIT_COLOR : tierColor);
+function tierColor(tier: CritTier): string {
+  if (tier === "ultra") return COLOR.red;
+  if (tier === "mega") return COLOR.amber;
+  return COLOR.purple;
+}
+
+// the shake/flash/sfx treatment for a landed tier, tier-scaled — `label`/
+// `color` let a piggyback proc (see celebrateChain/celebrateBoost below) show
+// its own text/color in place of the tier's default "x5"/"x25"/"x125" purple/
+// amber/red, while keeping that tier's own intensity/duration/priority
+function playTierFlash(tier: CritTier, label: string, color: string): void {
   if (tier === "ultra") {
     // blinkHz strobes the flash text on/off during its holdMs "stick" phase, on
     // top of its regular grow/fade animation. holdMs is deliberately an EXACT
@@ -68,8 +44,8 @@ export function triggerCritCelebration(
     // mega/crit rolling moments later (see triggerScreenShake's own suppression)
     triggerScreenShake({
       intensity: 2.6,
-      label: label(CRIT_TIER_CONFIG.ultra.label),
-      color: color(COLOR.red),
+      label,
+      color,
       strokeWidth: 16,
       blinkHz: 6,
       holdMs: 1250,
@@ -81,8 +57,8 @@ export function triggerCritCelebration(
     // ultra celebration (priority 2)
     triggerScreenShake({
       intensity: 1.8,
-      label: label(CRIT_TIER_CONFIG.mega.label),
-      color: color(COLOR.amber),
+      label,
+      color,
       strokeWidth: 14,
       priority: 1,
     });
@@ -91,30 +67,24 @@ export function triggerCritCelebration(
     // priority 0 (the default): the only tier that can ever get suppressed by
     // a still-playing mega/ultra flash, so those bigger moments are never
     // stepped on by an immediately-following ordinary crit
-    triggerScreenShake({
-      label: label(CRIT_TIER_CONFIG.crit.label),
-      color: color(COLOR.purple),
-    });
+    triggerScreenShake({ label, color });
     playCoinDrop();
     playExplosion();
   }
+}
 
-  // boost's own extra punch (the free-worker payout) on top of whatever the
-  // tier already celebrates — previously its own separate flash, now folded
-  // into the single flash above instead
-  if (boost) {
-    playCoinDrop();
-    const p = getScreenCenterLocal(floor);
-    spawnCoinBurst(floor, p.x, p.y, () => {});
-  }
-
-  // bursts on top of whatever the caller's own reward already spawned, so the
-  // celebration keeps erupting for as long as the flash/shake animation plays
-  // out. First one is dead center (matching the flash text) at 0s; the rest are
-  // staggered outward so they read as separate pops, not one simultaneous burst.
-  // Each tier up gets more bursts spread wider/longer, matching its bigger
-  // shake/flash duration. Re-read fresh at each delayed spawn in case the user
-  // scrolls in between
+// bursts on top of whatever the caller's own reward already spawned, so the
+// celebration keeps erupting for as long as the flash/shake animation plays
+// out. First one is dead center (matching the flash text) at 0s; the rest are
+// staggered outward so they read as separate pops, not one simultaneous burst.
+// Each tier up gets more bursts spread wider/longer, matching its bigger
+// shake/flash duration. Re-read fresh at each delayed spawn in case the user
+// scrolls in between
+function spawnTierBursts(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
   const CENTER_BURST_OFFSET_PX = 200;
   const CENTER_BURST_OFFSET_PY = 100;
   const MEGA_BURST_OFFSET_PX = 260;
@@ -191,4 +161,112 @@ export function triggerCritCelebration(
       spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
     }, delayMs);
   }
+}
+
+function celebrateTier(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playTierFlash(tier, CRIT_TIER_CONFIG[tier].label, tierColor(tier));
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// chain crit (see upgradeButton.ts's isChainCrit/rollFloorBuyCrit's own chain
+// flag): the flash shows the word "Chain" instead of the tier's usual "x5"/
+// "x25"/"x125" number — a celebration-moment-only swap, the upgrade button's
+// own idle/armed label is untouched and still always shows the plain tier
+// label. Keeps the tier's own color (chain has no dedicated color of its own)
+function celebrateChain(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playTierFlash(tier, "Chain", tierColor(tier));
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// boost crit (see upgradeButton.ts's isBoostCrit): same swap as chain above,
+// but with its own dedicated blue and an extra punch (its free-worker payout)
+// on top of the tier's own flash/sound/bursts
+function celebrateBoost(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playTierFlash(tier, BOOST_CRIT_LABEL, BOOST_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
+// chain and boost are both "special" procs riding the SAME landed tier (see
+// isChainCrit/isBoostCrit) — when only one lands it plays immediately same as
+// any plain crit, but when BOTH land on the same click they each get their own
+// full turn, one after another, instead of one replacing (or silently
+// dropping) the other. Regular (non-special) crits never join this queue —
+// they're simply skipped while a special celebration is still due, rather
+// than piling up behind it (see triggerCritCelebration below)
+const specialCelebrationQueue: (() => void)[] = [];
+let drainingSpecialQueue = false;
+
+function drainSpecialCelebrationQueue(): void {
+  if (drainingSpecialQueue) return;
+  drainingSpecialQueue = true;
+  const step = () => {
+    if (isCritFlashActive(Date.now())) {
+      setTimeout(step, 100);
+      return;
+    }
+    const next = specialCelebrationQueue.shift();
+    if (!next) {
+      drainingSpecialQueue = false;
+      return;
+    }
+    next();
+    setTimeout(step, 100);
+  };
+  step();
+}
+
+// the one shared "how does a crit tier celebrate" trigger — shake/flash/sfx/coin
+// bursts, tier-scaled. Extracted out of the upgrade-button click branch so any
+// OTHER click that can roll a crit tier (the Sale-boost click below, later a
+// floor-unlock purchase) gets the exact same weighted celebration instead of each
+// call site hand-rolling (and inevitably drifting from) its own copy. Deliberately
+// does NOT decide what a crit actually REWARDS (extra upgrades vs a bigger sale
+// payout vs whatever a future caller wants) — that stays the caller's own concern.
+// Labels always come from CRIT_TIER_CONFIG (the one canonical source); the flash's
+// own color intentionally does NOT always match CRIT_TIER_CONFIG[tier].color (that
+// one's the upgrade BUTTON's color) — mega's button is gold but its flash text is
+// amber/orange per an explicit earlier request, so the flash keeps its own colors
+export function triggerCritCelebration(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+  chain = false,
+  boost = false,
+): void {
+  if (chain || boost) {
+    if (chain) {
+      specialCelebrationQueue.push(() =>
+        celebrateChain(floor, tier, getScreenCenterLocal),
+      );
+    }
+    if (boost) {
+      specialCelebrationQueue.push(() =>
+        celebrateBoost(floor, tier, getScreenCenterLocal),
+      );
+    }
+    drainSpecialCelebrationQueue();
+    return;
+  }
+  // a plain tier crit with no special proc: only worth celebrating if nothing
+  // special is still queued/playing — omitted entirely rather than cutting in
+  // front of (or piling up behind) whatever special celebration is still due
+  if (specialCelebrationQueue.length > 0 || isCritFlashActive(Date.now())) {
+    return;
+  }
+  celebrateTier(floor, tier, getScreenCenterLocal);
 }
