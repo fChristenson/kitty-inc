@@ -6,6 +6,7 @@ import {
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
 import { smoothstep } from "../../shared/easing";
+import { startTween, type TweenHandle } from "../../shared/tween";
 
 // the scrolling "barrel" of corporation names in the map's bottom-left
 // corner, plus the barrel-roll switch-company animation behind it — split
@@ -77,7 +78,7 @@ export function createCorpBarrel(deps: CorpBarrelDeps): CorpBarrel {
   // continuous "which position is centered" — equals selectedPosition at
   // rest, animates toward the new one mid-roll (see rollToPosition)
   let corpRollFocus = selectedPosition;
-  let corpRollAnimId: number | null = null;
+  let corpRollTween: TweenHandle | null = null;
 
   function companyIndexAtPosition(position: number): number {
     return getSortedCorporationIndices()[position] ?? 0;
@@ -132,24 +133,22 @@ export function createCorpBarrel(deps: CorpBarrelDeps): CorpBarrel {
   function rollToPosition(targetPosition: number): void {
     const count = getSortedCorporationIndices().length;
     if (targetPosition < 0 || targetPosition > count - 1) return;
-    if (corpRollAnimId !== null) cancelAnimationFrame(corpRollAnimId);
+    corpRollTween?.cancel();
     const fromFocus = corpRollFocus;
-    const start = performance.now();
-    function frame(now: number): void {
-      const t = Math.min(1, (now - start) / CORP_ROLL_MS);
-      corpRollFocus = fromFocus + (targetPosition - fromFocus) * smoothstep(t);
-      deps.redraw();
-      if (t < 1) {
-        corpRollAnimId = requestAnimationFrame(frame);
-      } else {
+    corpRollTween = startTween(
+      CORP_ROLL_MS,
+      (t) => {
+        corpRollFocus =
+          fromFocus + (targetPosition - fromFocus) * smoothstep(t);
+        deps.redraw();
+      },
+      () => {
         corpRollFocus = targetPosition;
         selectedPosition = targetPosition;
-        corpRollAnimId = null;
         deps.onCompanySelected(companyIndexAtPosition(selectedPosition));
         deps.redraw();
-      }
-    }
-    corpRollAnimId = requestAnimationFrame(frame);
+      },
+    );
   }
 
   function rollOneStep(direction: -1 | 1): void {
@@ -166,7 +165,7 @@ export function createCorpBarrel(deps: CorpBarrelDeps): CorpBarrel {
   }
 
   function destroy(): void {
-    if (corpRollAnimId !== null) cancelAnimationFrame(corpRollAnimId);
+    corpRollTween?.cancel();
   }
 
   return {

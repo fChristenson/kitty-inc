@@ -10,6 +10,7 @@ import { getCorporationName } from "../../corporationName";
 import { getActiveCorporationIndices } from "../../company";
 import { playSwoosh } from "../../sound";
 import { createPollingLoop } from "../../shared/pollingLoop";
+import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import {
   getCompanyBaseModifierPercent,
   getMarketInfluencePercent,
@@ -173,7 +174,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
   function open(): void {
     render();
     menu.hidden = false;
-    openedAt = Date.now();
+    ghostClickGuard.markOpened();
     playSwoosh();
     startPolling();
   }
@@ -186,15 +187,11 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
   }
 
   // opened by a tap directly on the canvas HUD/map readout, right where the
-  // backdrop then appears — mobile browsers can synthesize a trailing
-  // compatibility "click" for that same touch shortly after, landing on the
-  // now-visible backdrop and instantly closing what was just opened (same
-  // ghost-click fix as floorUpgradeMenu, also opened from a canvas tap)
-  const IGNORE_BACKDROP_CLICK_MS = 300;
-  let openedAt = 0;
+  // backdrop then appears
+  const ghostClickGuard = createGhostClickGuard();
 
   backdrop.addEventListener("click", () => {
-    if (Date.now() - openedAt < IGNORE_BACKDROP_CLICK_MS) return;
+    if (ghostClickGuard.shouldIgnore()) return;
     close();
   });
 

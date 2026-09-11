@@ -1,4 +1,5 @@
 import { smoothstep } from "../../shared/easing";
+import { startTween, type TweenHandle } from "../../shared/tween";
 
 // real SVG <line> rays, positioned/animated frame-by-frame from JS (not CSS —
 // a CSS gradient can't render an actual ray shape, and driving it here keeps
@@ -45,7 +46,7 @@ function opacityForPhase(t: number): number {
   return t < 0.15 ? t / 0.15 : t > 0.75 ? Math.max(0, (1 - t) / 0.25) : 1;
 }
 
-let speedLineAnimId: number | null = null;
+let speedLineTween: TweenHandle | null = null;
 
 // next (delta 1) = the view moving forward/right, so the rays stream the
 // opposite way (right-to-left) past it, same parallax as scenery rushing past
@@ -56,38 +57,32 @@ export function playSpeedLines(
   h: number,
   delta: -1 | 1,
 ): void {
-  if (speedLineAnimId !== null) cancelAnimationFrame(speedLineAnimId);
+  speedLineTween?.cancel();
   const lines = buildRays(svg, w, h, "horizontal");
   const startX = delta > 0 ? w * 1.2 : -w * 1.3;
   const endX = delta > 0 ? -w * 1.3 : w * 1.2;
-  const start = performance.now();
-  function frame(now: number): void {
-    const t = Math.min(1, (now - start) / SPEED_LINE_MS);
-    const x = startX + (endX - startX) * smoothstep(t);
-    const opacity = opacityForPhase(t);
-    for (const line of lines) {
-      line.setAttribute("transform", `translate(${x} 0)`);
-      line.style.opacity = String(opacity);
-    }
-    if (t < 1) {
-      speedLineAnimId = requestAnimationFrame(frame);
-    } else {
+  speedLineTween = startTween(
+    SPEED_LINE_MS,
+    (t) => {
+      const x = startX + (endX - startX) * smoothstep(t);
+      const opacity = opacityForPhase(t);
+      for (const line of lines) {
+        line.setAttribute("transform", `translate(${x} 0)`);
+        line.style.opacity = String(opacity);
+      }
+    },
+    () => {
       svg.innerHTML = "";
-      speedLineAnimId = null;
-    }
-  }
-  speedLineAnimId = requestAnimationFrame(frame);
+    },
+  );
 }
 
 // for a view's own cleanup/destroy — cancels an in-flight horizontal sweep, if any
 export function cancelSpeedLines(): void {
-  if (speedLineAnimId !== null) {
-    cancelAnimationFrame(speedLineAnimId);
-    speedLineAnimId = null;
-  }
+  speedLineTween?.cancel();
 }
 
-let verticalSpeedLineAnimId: number | null = null;
+let verticalSpeedLineTween: TweenHandle | null = null;
 
 // same ray sweep as playSpeedLines above, just rotated to run along Y instead
 // of X — direction 1 ("down") streams downward; -1 ("up") streams upward
@@ -97,35 +92,27 @@ export function playVerticalSpeedLines(
   h: number,
   direction: -1 | 1,
 ): void {
-  if (verticalSpeedLineAnimId !== null) {
-    cancelAnimationFrame(verticalSpeedLineAnimId);
-  }
+  verticalSpeedLineTween?.cancel();
   const lines = buildRays(svg, w, h, "vertical");
   const startY = direction > 0 ? -h * 1.3 : h * 1.2;
   const endY = direction > 0 ? h * 1.2 : -h * 1.3;
-  const start = performance.now();
-  function frame(now: number): void {
-    const t = Math.min(1, (now - start) / SPEED_LINE_MS);
-    const y = startY + (endY - startY) * smoothstep(t);
-    const opacity = opacityForPhase(t);
-    for (const line of lines) {
-      line.setAttribute("transform", `translate(0 ${y})`);
-      line.style.opacity = String(opacity);
-    }
-    if (t < 1) {
-      verticalSpeedLineAnimId = requestAnimationFrame(frame);
-    } else {
+  verticalSpeedLineTween = startTween(
+    SPEED_LINE_MS,
+    (t) => {
+      const y = startY + (endY - startY) * smoothstep(t);
+      const opacity = opacityForPhase(t);
+      for (const line of lines) {
+        line.setAttribute("transform", `translate(0 ${y})`);
+        line.style.opacity = String(opacity);
+      }
+    },
+    () => {
       svg.innerHTML = "";
-      verticalSpeedLineAnimId = null;
-    }
-  }
-  verticalSpeedLineAnimId = requestAnimationFrame(frame);
+    },
+  );
 }
 
 // for a view's own cleanup/destroy — cancels an in-flight vertical sweep, if any
 export function cancelVerticalSpeedLines(): void {
-  if (verticalSpeedLineAnimId !== null) {
-    cancelAnimationFrame(verticalSpeedLineAnimId);
-    verticalSpeedLineAnimId = null;
-  }
+  verticalSpeedLineTween?.cancel();
 }

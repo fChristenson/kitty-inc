@@ -14,6 +14,7 @@ import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { gte, lt, type BigNumber } from "../../shared/bigNumber";
 import { createPollingLoop } from "../../shared/pollingLoop";
+import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import {
   getWorkerCost,
   buyWorker,
@@ -258,20 +259,15 @@ export function wireFloorUpgradeMenu(
 
   const affordabilityPolling = createPollingLoop(updateAffordability, 250);
   // this dialog (unlike the others) is opened by a tap directly on the canvas,
-  // right where the backdrop then appears — mobile browsers can synthesize a
-  // trailing compatibility "click" for that same touch shortly after, landing
-  // on the now-visible backdrop and instantly closing what was just opened.
-  // Ignoring a backdrop click this soon after open() filters that ghost click
-  // out without needing any change to gameCanvas.ts's own tap handling
-  const IGNORE_BACKDROP_CLICK_MS = 300;
-  let openedAt = 0;
+  // right where the backdrop then appears
+  const ghostClickGuard = createGhostClickGuard();
 
   function open(floor: Floor, floorNumber: number): void {
     currentFloor = floor;
     title.textContent = `Floor ${floorNumber} upgrades`;
     render();
     menu.hidden = false;
-    openedAt = Date.now();
+    ghostClickGuard.markOpened();
     playSwoosh();
     affordabilityPolling.start();
   }
@@ -285,7 +281,7 @@ export function wireFloorUpgradeMenu(
   }
 
   backdrop.addEventListener("click", () => {
-    if (Date.now() - openedAt < IGNORE_BACKDROP_CLICK_MS) return;
+    if (ghostClickGuard.shouldIgnore()) return;
     close();
   });
 
