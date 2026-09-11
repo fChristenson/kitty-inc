@@ -328,13 +328,10 @@ body {
 .test-actions-bar {
   /* pinned to the screen's own left edge, not the centered .game column — floats
      free of the game layout entirely instead of stealing height from it (see
-     utils.ts's observeActionBarHeight, which no longer needs to account for it).
-     Wraps into additional columns once it runs out of vertical room (this list
-     keeps growing with every new dev-only crit test button) instead of overflowing
-     the viewport in one tall single column */
+     utils.ts's observeActionBarHeight, which no longer needs to account for it) */
   display: flex;
-  flex-flow: column wrap;
-  align-content: flex-start;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 0.5rem;
   position: absolute;
   top: calc(0.75rem + env(safe-area-inset-top));
@@ -348,6 +345,40 @@ body {
 .test-actions-bar .game__button {
   flex: none;
   width: 160px;
+}
+
+.test-actions-dropdown__toggle {
+  width: 160px;
+  padding: 0.9rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  background: var(--color-blue);
+  color: white;
+  cursor: pointer;
+  list-style: none;
+}
+
+.test-actions-dropdown__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.test-actions-dropdown__toggle:active {
+  background: var(--color-blue-active);
+}
+
+.test-actions-dropdown__menu {
+  /* single column, scrolls vertically once it runs out of viewport room (this
+     list keeps growing with every new dev-only crit test button) instead of
+     spilling into extra columns or overflowing the page */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  max-height: calc(
+    100dvh - 22rem - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+  );
+  overflow-y: auto;
 }
 
 .game__button {

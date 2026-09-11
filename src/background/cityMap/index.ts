@@ -31,12 +31,8 @@ import {
   MARKER_COIN_BURST_SCALE,
   drawBuyAllFloorsIndicator,
 } from "./markers";
-import {
-  MAX_FLOORS_PER_BUILDING,
-  rollFloorBuyCrit,
-  CRIT_TIER_CONFIG,
-  type CritTier,
-} from "../../floors";
+import { MAX_FLOORS_PER_BUILDING, rollFloorBuyCrit } from "../../floors";
+import { CRIT_TIER_CONFIG, type CritTier } from "../../shared/critTypes";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";

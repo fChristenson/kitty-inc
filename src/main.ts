@@ -1,5 +1,6 @@
 import "./style.css";
 import { fromNumber, gt, isZero } from "./shared/bigNumber";
+import { CHAIN_CRIT_CONTINUE_CHANCE, type CritTier } from "./shared/critTypes";
 import {
   loadFloorBackgrounds,
   loadGroundImage,
@@ -14,11 +15,10 @@ import {
   forceMegaCritUpgrade,
   forceUltraCritUpgrade,
   forceChainCritUpgrade,
+  forceBoostCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
-  CHAIN_CRIT_CONTINUE_CHANCE,
-  type CritTier,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -55,7 +55,9 @@ import {
   wireSpawnChainCritButton,
   wireSpawnChainMegaCritButton,
   wireSpawnChainUltraCritButton,
+  wireSpawnBoostCritButton,
   wireFloorBuyCritButton,
+  wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
   wireFloorBuyUltraCritButton,
   wireFloorBuyChainCritButton,
@@ -391,7 +393,14 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceChainCritUpgrade(floor, "ultra");
     });
+    wireSpawnBoostCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceBoostCritUpgrade(floor, "crit");
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
+    wireFloorBuyBoostCritButton(app, () =>
+      forceFloorBuyCrit("crit", false, true),
+    );
     wireFloorBuyMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireFloorBuyUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
     wireFloorBuyChainCritButton(app, () => forceFloorBuyCrit("crit", true));

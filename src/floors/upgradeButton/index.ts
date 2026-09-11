@@ -248,138 +248,66 @@ function stepHoldAnim(
 }
 
 // "crit" upgrade: a rare, free, oversized upgrade — the slot-machine jackpot moment.
-// Three tiers (a variable-ratio reward schedule, not a flat one) roll independently
+// Tiers (a variable-ratio reward schedule, not a flat one) roll independently
 // each completed upgrade click (see floorInteractions/index.ts's rollCritUpgrade
-// calls) — rarest ("ultra") is checked first, then "mega", then "crit", so a click
-// can never land more than one at once. While active, this floor's button recolors,
-// wiggles, and shows "xN" instead of its price; clicking it costs nothing and
-// instantly applies that tier's upgrade count at once.
-export type CritTier = "crit" | "mega" | "ultra";
-
-// the ONE canonical source for every per-tier number/label — every caller (this
-// module's own drawUpgradeButton, floorInteractions.ts, critCelebration.ts) reads
-// from this instead of hand-building its own "xN"/multiplier, which is exactly what
-// let a stale hardcoded "Sale x5" label slip in once before (see repo memory) and
-// silently drift from the real, tier-scaled payout. Add any FUTURE per-tier value
-// here too, never as a new standalone constant a callsite has to remember to keep
-// in sync. `multiplier` is the one shared x5-per-tier number reused for EVERY
-// tier-scaled reward (upgrade-button free-upgrade count, Sale payout multiplier,
-// and a permanently-crited floor's rate multiplier below) since they're always
-// the same number by design — no separate count/saleMultiplier fields to drift
-export const CRIT_TIER_CONFIG: Record<
-  CritTier,
-  {
-    chance: number; // rolled once per completed upgrade click, see rollCritUpgrade
-    multiplier: number;
-    color: string;
-    label: string; // canonical "xN" text — shared by the button AND the flash text
-  }
-> = {
-  // chance/multiplier per tier live in src/config.ts (CONFIG.crit) — only the
-  // cosmetic color/label stay here
-  crit: {
-    ...CONFIG.crit.crit,
-    color: COLOR.purple,
-    label: "x5",
-  },
-  mega: {
-    // ~1 in 100 upgrade clicks — deliberately much rarer than crit's so it reads
-    // as a genuine jackpot moment, not just a bigger version of the common crit
-    ...CONFIG.crit.mega,
-    color: COLOR.starYellow,
-    label: "x25",
-  },
-  ultra: {
-    // rarer still than mega's — the true jackpot-of-jackpots moment
-    ...CONFIG.crit.ultra,
-    color: COLOR.red,
-    label: "x125",
-  },
-};
-
-// back-compat convenience re-exports for callers that just want one tier's
-// multiplier — still sourced from CRIT_TIER_CONFIG above, never a separate
-// hardcoded number
-export const CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.crit.multiplier;
-export const MEGA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.mega.multiplier;
-export const ULTRA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.ultra.multiplier;
-
-// rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),
-// so that's a safe, already-canonical rank to compare tiers by — null (no tier)
-// always loses to any real tier
-function critTierRank(tier: CritTier | null): number {
-  return tier ? CRIT_TIER_CONFIG[tier].multiplier : 0;
-}
-
-// whichever of a/b is rarer/bigger; used when a fresh roll should only ever
-// upgrade a floor's existing permanent tier, never downgrade it
-export function pickHigherCritTier(
-  a: CritTier | null,
-  b: CritTier | null,
-): CritTier | null {
-  return critTierRank(b) > critTierRank(a) ? b : a;
-}
-
-// the tier one step up from `tier` (null -> crit -> mega -> ultra), capped at
-// ultra — see floorInteractions.ts's overtime-gauge-filled reward, which promotes
-// a floor's permanent critMultiplierTier by exactly one step this way
-export function nextCritTier(tier: CritTier | null): CritTier {
-  if (tier === null) return "crit";
-  if (tier === "crit") return "mega";
-  return "ultra";
-}
-
-// the building's own baseline crit tier — the LOWEST tier any current floor
-// has, not "every floor must match exactly". A building-wide crit (see
-// cityMap/index.ts's map-unlock crit) sets every floor to the same tier, but
-// individual floors can then be promoted further above that (overtime-gauge
-// promotion, a floor-buy crit roll) without ever demoting one below it — so
-// requiring an EXACT match here used to make this flip back to null the
-// moment just one floor got promoted past the rest, which made every floor
-// unlocked afterward start back at "no crit" instead of the building's real
-// baseline. Taking the lowest tier present is what a brand new floor
-// (ensureLockedFloorAbove) should inherit as its own starting default.
-export function getUniformCritTier(floors: Floor[]): CritTier | null {
-  if (floors.length === 0) return null;
-  return floors.reduce<CritTier | null>(
-    (lowest, floor) =>
-      critTierRank(floor.critMultiplierTier) < critTierRank(lowest)
-        ? floor.critMultiplierTier
-        : lowest,
-    floors[0].critMultiplierTier,
-  );
-}
+// calls), rarest first (see CRIT_TIER_ORDER), so a click can never land more than
+// one at once. While active, this floor's button recolors, wiggles, and shows
+// "xN" instead of its price; clicking it costs nothing and instantly applies
+// that tier's upgrade count at once.
+//
+// CritTier/CRIT_TIER_CONFIG/CRIT_TIER_ORDER and every pure tier-comparison
+// helper now live in shared/critTypes (so other modules — gameState's Floor
+// type, background/cityMap, main.ts — can read the same canonical data
+// without going through this module or duplicating a plain string union) —
+// re-exported here so every existing sibling import (incomePanel.ts,
+// floorLock.ts, critCelebration.ts, floorInteractions.ts) keeps working
+// unchanged
+export {
+  type CritTier,
+  type CritTierDef,
+  CRIT_TIER_CONFIG,
+  CRIT_TIER_ORDER,
+  CRIT_UPGRADE_COUNT,
+  MEGA_CRIT_UPGRADE_COUNT,
+  ULTRA_CRIT_UPGRADE_COUNT,
+  CHAIN_CRIT_CHANCE,
+  CHAIN_CRIT_CONTINUE_CHANCE,
+  BOOST_CRIT_CHANCE,
+  BOOST_CRIT_COLOR,
+  BOOST_CRIT_LABEL,
+  isChainCrit,
+  isBoostCrit,
+  pickHigherCritTier,
+  nextCritTier,
+  getUniformCritTier,
+} from "../../shared/critTypes";
+import {
+  type CritTier,
+  CRIT_TIER_CONFIG,
+  CRIT_TIER_ORDER,
+  CHAIN_CRIT_CHANCE,
+  BOOST_CRIT_CHANCE,
+  rollCritProcs,
+  consumeCritProcs,
+  forceChainCritProc,
+  forceBoostCritProc,
+} from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
-// an extra flag layered on top of an armed critTiers entry (never set without
-// one) — see rollCritUpgrade below. A chain crit is not its own CritTier/color;
-// it reuses whichever of crit/mega/ultra actually landed, just extends that
-// SAME upgrade to neighboring floors too (see floorInteractions.ts)
-const chainCrits = new WeakSet<Floor>();
-const CHAIN_CRIT_CHANCE = CONFIG.crit.chainChance;
-// odds a chain crit keeps climbing to the NEXT floor after each one it already
-// applied to — see floorInteractions.ts's applyChainCrit
-export const CHAIN_CRIT_CONTINUE_CHANCE = CONFIG.crit.chainContinueChance;
 
 // call once per completed upgrade click (crit or normal) to roll the next one —
-// rarest tier checked first, so a click can never land more than one tier at once.
-// Whenever a tier actually lands, this also rolls an ADDITIONAL, independent
-// chance for it to become a "chain crit" (see CONFIG.crit.chainChance) — chain
-// can only ever ride along with a real tier hit, never occur on its own
+// walks CRIT_TIER_ORDER rarest-first, so a click can never land more than one
+// tier at once, and adding a new tier to that shared order is the only change
+// needed here. Whenever a tier actually lands, also rolls its two piggyback
+// procs (chain/boost — see rollCritProcs) — neither ever occurs without a
+// tier landing first, and neither changes the button's own appearance
 export function rollCritUpgrade(floor: Floor): void {
-  if (Math.random() < CRIT_TIER_CONFIG.ultra.chance) {
-    critTiers.set(floor, "ultra");
-    if (Math.random() < CHAIN_CRIT_CHANCE) chainCrits.add(floor);
-    return;
-  }
-  if (Math.random() < CRIT_TIER_CONFIG.mega.chance) {
-    critTiers.set(floor, "mega");
-    if (Math.random() < CHAIN_CRIT_CHANCE) chainCrits.add(floor);
-    return;
-  }
-  if (Math.random() < CRIT_TIER_CONFIG.crit.chance) {
-    critTiers.set(floor, "crit");
-    if (Math.random() < CHAIN_CRIT_CHANCE) chainCrits.add(floor);
+  for (const tier of CRIT_TIER_ORDER) {
+    if (Math.random() < CRIT_TIER_CONFIG[tier].chance) {
+      critTiers.set(floor, tier);
+      rollCritProcs(floor);
+      return;
+    }
   }
 }
 
@@ -392,6 +320,7 @@ export function rollCritUpgrade(floor: Floor): void {
 export interface FloorBuyCritResult {
   tier: CritTier;
   chain: boolean;
+  boost: boolean;
 }
 
 let forcedFloorBuyCrit: FloorBuyCritResult | null = null;
@@ -402,20 +331,28 @@ export function rollFloorBuyCrit(): FloorBuyCritResult | null {
     forcedFloorBuyCrit = null;
     return result;
   }
-  let tier: CritTier | null = null;
-  if (Math.random() < CRIT_TIER_CONFIG.ultra.chance) tier = "ultra";
-  else if (Math.random() < CRIT_TIER_CONFIG.mega.chance) tier = "mega";
-  else if (Math.random() < CRIT_TIER_CONFIG.crit.chance) tier = "crit";
-  if (!tier) return null;
-  return { tier, chain: Math.random() < CHAIN_CRIT_CHANCE };
+  for (const tier of CRIT_TIER_ORDER) {
+    if (Math.random() < CRIT_TIER_CONFIG[tier].chance) {
+      return {
+        tier,
+        chain: Math.random() < CHAIN_CRIT_CHANCE,
+        boost: Math.random() < BOOST_CRIT_CHANCE,
+      };
+    }
+  }
+  return null;
 }
 
 // dev/test-only: guarantees the NEXT floor bought (or building bought — both
 // share this same roll) crits at this tier, bypassing chance entirely (see
 // hud/testButton's "Floor Crit"/"Floor Mega Crit"/"Floor Ultra Crit"/"Map
-// Unlock Crit"/etc. and their own "Chain" siblings)
-export function forceFloorBuyCrit(tier: CritTier, chain = false): void {
-  forcedFloorBuyCrit = { tier, chain };
+// Unlock Crit"/etc. and their own "Chain"/"Boost" siblings)
+export function forceFloorBuyCrit(
+  tier: CritTier,
+  chain = false,
+  boost = false,
+): void {
+  forcedFloorBuyCrit = { tier, chain, boost };
 }
 
 export function getCritTier(floor: Floor): CritTier | null {
@@ -426,16 +363,10 @@ export function isCritUpgrade(floor: Floor): boolean {
   return critTiers.has(floor);
 }
 
-// whether the CURRENTLY ARMED crit (if any) is also a chain crit — see
-// rollCritUpgrade/floorInteractions.ts's plain-click crit branch
-export function isChainCrit(floor: Floor): boolean {
-  return chainCrits.has(floor);
-}
-
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
-  chainCrits.delete(floor);
+  consumeCritProcs(floor);
 }
 
 // dev/test-only: force this floor's button into a crit state right away,
@@ -453,6 +384,16 @@ export function forceUltraCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "ultra");
 }
 
+// dev/test-only: force this floor's already-armed tier to also carry a boost
+// proc, bypassing chance entirely (see hud/testButton's "Spawn Boost Crit")
+export function forceBoostCritUpgrade(
+  floor: Floor,
+  tier: CritTier = "crit",
+): void {
+  critTiers.set(floor, tier);
+  forceBoostCritProc(floor);
+}
+
 // dev/test-only: force this floor into a chain crit at the given tier
 // (default "crit"), bypassing both the crit chance AND the 0.01% chain chance
 // (see hud/testButton's "Spawn Chain Crit"/"Spawn Chain Mega Crit"/"Spawn Chain
@@ -463,7 +404,7 @@ export function forceChainCritUpgrade(
   tier: CritTier = "crit",
 ): void {
   critTiers.set(floor, tier);
-  chainCrits.add(floor);
+  forceChainCritProc(floor);
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see

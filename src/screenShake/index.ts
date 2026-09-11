@@ -16,6 +16,14 @@ loadImageByName("chain").then((image) => {
   chainIcon = image;
 });
 
+// same idea as chainIcon above, but drawn behind the "Boost" flash text (see
+// upgradeButton.ts's isBoostCrit) — reuses the same free-boost critter icon
+// hud/boostMenu.ts and mouse/index.ts already use for this exact mechanic
+let boostIcon: HTMLImageElement | null = null;
+loadImageByName("mouse").then((image) => {
+  boostIcon = image;
+});
+
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -53,12 +61,45 @@ let flashHoldMs = 0;
 // currently still-playing flash's own priority
 let activeFlashPriority = -1;
 
+interface FlashRequest {
+  intensity: number;
+  label: string;
+  color: string;
+  strokeWidth: number;
+  blinkHz: number;
+  holdMs: number;
+  priority: number;
+}
+
+// a same-tick chain/boost proc riding on the crit that just triggered a flash
+// used to just get silently dropped (their own priority never beats the
+// crit/mega/ultra flash already playing) — queued requests instead get their
+// own full turn once the current flash ends (see drawCritFlash below), so
+// nothing simultaneous ever goes unseen
+let flashQueue: FlashRequest[] = [];
+
 // how long the grow-in (scale + rotate) phase takes, and the fade-out tail's base
 // duration before any per-tier `intensity` scaling — declared up here (moved out of
 // their original spot further down) since triggerScreenShake needs them to compute
 // flashEndsAt
 const GROWTH_DURATION_MS = 100;
 const FLASH_DURATION_MS = 260;
+
+function startFlash(req: FlashRequest): void {
+  const now = Date.now();
+  shakeStartedAt = now;
+  shakeIntensity = req.intensity;
+
+  flashStartedAt = now;
+  flashLabel = req.label;
+  flashColor = req.color;
+  flashStrokeWidth = req.strokeWidth;
+  flashBlinkHz = req.blinkHz;
+  flashHoldMs = req.holdMs;
+  activeFlashPriority = req.priority;
+  const fadeDurationMs = FLASH_DURATION_MS * req.intensity - GROWTH_DURATION_MS;
+  flashEndsAt = now + GROWTH_DURATION_MS + req.holdMs + fadeDurationMs;
+}
 
 export function triggerScreenShake(options?: {
   intensity?: number;
@@ -69,32 +110,33 @@ export function triggerScreenShake(options?: {
   holdMs?: number;
   priority?: number;
 }): void {
-  const priority = options?.priority ?? 0;
+  const req: FlashRequest = {
+    intensity: options?.intensity ?? 1,
+    label: options?.label ?? "x5",
+    color: options?.color ?? COLOR.purple,
+    strokeWidth: options?.strokeWidth ?? 8,
+    blinkHz: options?.blinkHz ?? 0,
+    holdMs: options?.holdMs ?? 0,
+    priority: options?.priority ?? 0,
+  };
   const now = Date.now();
-  // a bigger celebration is still playing out — don't let a lower-tier one
-  // interrupt/overwrite it early
-  if (
-    flashEndsAt !== null &&
-    now < flashEndsAt &&
-    priority < activeFlashPriority
-  ) {
+  const idle = flashEndsAt === null || now >= flashEndsAt;
+  if (idle) {
+    startFlash(req);
     return;
   }
-
-  shakeStartedAt = now;
-  shakeIntensity = options?.intensity ?? 1;
-
-  flashStartedAt = now;
-  flashLabel = options?.label ?? "x5";
-  flashColor = options?.color ?? COLOR.purple;
-  flashStrokeWidth = options?.strokeWidth ?? 8;
-  flashBlinkHz = options?.blinkHz ?? 0;
-  flashHoldMs = options?.holdMs ?? 0;
-  activeFlashPriority = priority;
-  const fadeDurationMs =
-    FLASH_DURATION_MS * shakeIntensity - GROWTH_DURATION_MS;
-  flashEndsAt = now + GROWTH_DURATION_MS + flashHoldMs + fadeDurationMs;
+  // a strictly bigger celebration still preempts whatever's currently
+  // playing immediately (an ultra shouldn't wait behind a plain crit) —
+  // anything else (same/lower priority, e.g. a piggyback boost/chain proc
+  // riding the very crit that's already flashing) queues up to get its own
+  // full turn right after, instead of being dropped on the floor
+  if (req.priority > activeFlashPriority) {
+    startFlash(req);
+    return;
+  }
+  flashQueue.push(req);
 }
+
 
 // call once per frame from gameCanvas.ts's redraw(), before its own dpr/scale
 // transforms are applied, so the magnitude is a consistent CSS-pixel amount
@@ -193,9 +235,14 @@ export function drawCritFlash(
 ): void {
   if (flashStartedAt === null || flashEndsAt === null) return;
   if (now >= flashEndsAt) {
-    flashStartedAt = null;
-    flashEndsAt = null;
-    activeFlashPriority = -1;
+    const next = flashQueue.shift();
+    if (next) {
+      startFlash(next);
+    } else {
+      flashStartedAt = null;
+      flashEndsAt = null;
+      activeFlashPriority = -1;
+    }
     return;
   }
 
@@ -276,6 +323,14 @@ export function drawCritFlash(
     ctx.rotate(Math.PI / 4);
     ctx.drawImage(chainIcon, -iconW / 2, -iconH / 2, iconW, iconH);
     ctx.restore();
+  }
+  if (flashLabel === "Boost" && boostIcon) {
+    // no extra rotation (unlike chainIcon above) — mouse.png is a directional
+    // side-view sprite, not a symmetric icon, so spinning it 45deg makes it
+    // read as facing the wrong way instead of its normal running pose
+    const iconW = measuredWidth * 1.4 * 0.75;
+    const iconH = iconW * (boostIcon.height / boostIcon.width);
+    ctx.drawImage(boostIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

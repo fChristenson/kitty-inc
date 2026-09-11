@@ -1,4 +1,10 @@
-import { hitTestWorkers, clickWorker, getWorkerCenter } from "../worker";
+import {
+  hitTestWorkers,
+  clickWorker,
+  getWorkerCenter,
+  applyBoostAll,
+  triggerJumpAll,
+} from "../worker";
 import { formatPrice } from "../../utils";
 import {
   hitTestUpgradeButton,
@@ -7,6 +13,7 @@ import {
   isCritUpgrade,
   getCritTier,
   isChainCrit,
+  isBoostCrit,
   consumeCritUpgrade,
   rollCritUpgrade,
   rollFloorBuyCrit,
@@ -52,7 +59,10 @@ import {
 } from "../floorLock";
 import { activateBoosted, type Floor } from "../../gameState";
 import { multiply } from "../../shared/bigNumber";
-import { triggerCritCelebration } from "./critCelebration";
+import {
+  triggerCritCelebration,
+  triggerBoostCritCelebration,
+} from "./critCelebration";
 
 export interface FloorActionsDeps {
   floors: Floor[];
@@ -132,6 +142,15 @@ function applyUpgradeTick(floor: Floor, isGroundFloor: boolean): void {
   }
 }
 
+// "boost crit" reward (see upgradeButton.ts's isBoostCrit): the SAME building-
+// wide free-boost-everyone reward + cat-jump celebration hud/boostMenu.ts's
+// buyBoostAll and mouse/index.ts's free click trigger already use — never a
+// separate single-floor copy of that loop
+function applyFloorBoost(floors: Floor[]): void {
+  applyBoostAll(floors);
+  triggerJumpAll(floors, Date.now());
+}
+
 // minimal deps a chain crit needs to grow a building while walking upward —
 // a subset of FloorActionsDeps so non-floors callers (cityMap.ts's own
 // building-unlock crit, via main.ts) don't need that type's unrelated fields
@@ -181,7 +200,7 @@ export function applyChainCrit(
 
 // handles a click at floor-local (x, y): unlocking, upgrading, or clicking a worker.
 // every hit test/mutation here is identical to the old per-canvas click listener,
-// just no longer tied to any one floor owning its own DOM canvas + event listener
+// just no longer tied to any one floor owning its own DOM canvas + event listener.
 export function handleFloorClick(
   deps: FloorActionsDeps,
   floor: Floor,
@@ -253,6 +272,9 @@ export function handleFloorClick(
             );
           });
         }
+        // boost crit (see rollFloorBuyCrit): same building-wide free-boost
+        // reward a per-click boost crit grants (see applyFloorBoost above)
+        if (buyTier.boost) applyFloorBoost(floors);
       }
       persist();
       const center = getLockCenter();
@@ -264,6 +286,8 @@ export function handleFloorClick(
           getScreenCenterLocal,
           buyTier.chain,
         );
+      if (buyTier?.boost)
+        triggerBoostCritCelebration(floor, getScreenCenterLocal);
     }
     return;
   }
@@ -363,10 +387,14 @@ export function handleFloorClick(
     // treatment as any other crit (see triggerCritCelebration) — mega/ultra are
     // the rarer, bigger-payout tiers (see upgradeButton.ts's rollCritUpgrade).
     // A "chain crit" (see isChainCrit) additionally extends this same tier's
-    // upgrade count up through the building — read the flag before consuming it
+    // upgrade count up through the building, and a "boost crit" (see
+    // isBoostCrit) additionally free-activates this floor's own workers —
+    // neither ever changes the button's own pre-click appearance, both only
+    // read the flag right here, at the moment the already-armed tier is spent
     if (isCritUpgrade(floor)) {
       const tier = getCritTier(floor)!;
       const chain = isChainCrit(floor);
+      const boost = isBoostCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -380,9 +408,11 @@ export function handleFloorClick(
           }
         });
       }
+      if (boost) applyFloorBoost(floors);
       persist();
       triggerButtonPress(floor);
       triggerCritCelebration(floor, tier, getScreenCenterLocal, chain);
+      if (boost) triggerBoostCritCelebration(floor, getScreenCenterLocal);
       return;
     }
     if (spendTotalIncome(floor.upgradeCost)) {

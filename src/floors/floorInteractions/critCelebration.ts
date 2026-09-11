@@ -1,5 +1,10 @@
 import type { Floor } from "../../gameState";
-import { type CritTier, CRIT_TIER_CONFIG } from "../upgradeButton";
+import {
+  type CritTier,
+  CRIT_TIER_CONFIG,
+  BOOST_CRIT_COLOR,
+  BOOST_CRIT_LABEL,
+} from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
   playCoinDrop,
@@ -162,4 +167,23 @@ export function triggerCritCelebration(
       spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
     }, delayMs);
   }
+}
+
+// "boost crit" (see upgradeButton.ts's isBoostCrit): a proc riding on an
+// already-landed tier, same as chain — grants a free worker boost instead of
+// extra upgrades. Its own flash (screenShake.ts draws the same free-boost
+// critter icon behind it that hud/boostMenu.ts/mouse/index.ts already use)
+export function triggerBoostCritCelebration(
+  floor: Floor,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  triggerScreenShake({
+    intensity: 1.4,
+    label: BOOST_CRIT_LABEL,
+    color: BOOST_CRIT_COLOR,
+    strokeWidth: 12,
+  });
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
 }

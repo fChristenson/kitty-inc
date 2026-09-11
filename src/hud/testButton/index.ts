@@ -4,30 +4,37 @@ import type { Floor } from "../../gameState";
 export function createTestButtonMarkup(): string {
   return `
     <div class="test-actions-bar">
-      <button id="add-money" class="game__button">Add Money</button>
-      <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
-      <button id="spawn-crit" class="game__button">Spawn Crit</button>
-      <button id="spawn-mega-crit" class="game__button">Spawn Mega Crit</button>
-      <button id="spawn-ultra-crit" class="game__button">Spawn Ultra Crit</button>
-      <button id="spawn-chain-crit" class="game__button">Spawn Chain Crit</button>
-      <button id="spawn-chain-mega-crit" class="game__button">Spawn Chain Mega Crit</button>
-      <button id="spawn-chain-ultra-crit" class="game__button">Spawn Chain Ultra Crit</button>
-      <button id="floor-buy-crit" class="game__button">Floor Crit</button>
-      <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
-      <button id="floor-buy-ultra-crit" class="game__button">Floor Ultra Crit</button>
-      <button id="floor-buy-chain-crit" class="game__button">Floor Chain Crit</button>
-      <button id="floor-buy-chain-mega-crit" class="game__button">Floor Chain Mega Crit</button>
-      <button id="floor-buy-chain-ultra-crit" class="game__button">Floor Chain Ultra Crit</button>
-      <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
-      <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
-      <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
-      <button id="map-unlock-chain-crit" class="game__button">Map Unlock Chain Crit</button>
-      <button id="map-unlock-chain-mega-crit" class="game__button">Map Unlock Chain Mega Crit</button>
-      <button id="map-unlock-chain-ultra-crit" class="game__button">Map Unlock Chain Ultra Crit</button>
-      <button id="test-press-conference" class="game__button">Press Conf Game</button>
-      <button id="test-liquidate-assets" class="game__button">Liquidate Assets Game</button>
-      <button id="test-pay-taxes" class="game__button">Pay Taxes Game</button>
-      <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Test Actions</summary>
+        <div class="test-actions-dropdown__menu">
+          <button id="add-money" class="game__button">Add Money</button>
+          <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
+          <button id="spawn-crit" class="game__button">Spawn Crit</button>
+          <button id="spawn-mega-crit" class="game__button">Spawn Mega Crit</button>
+          <button id="spawn-ultra-crit" class="game__button">Spawn Ultra Crit</button>
+          <button id="spawn-chain-crit" class="game__button">Spawn Chain Crit</button>
+          <button id="spawn-chain-mega-crit" class="game__button">Spawn Chain Mega Crit</button>
+          <button id="spawn-chain-ultra-crit" class="game__button">Spawn Chain Ultra Crit</button>
+          <button id="spawn-boost-crit" class="game__button">Spawn Boost Crit</button>
+          <button id="floor-buy-crit" class="game__button">Floor Crit</button>
+          <button id="floor-buy-boost-crit" class="game__button">Floor Boost Crit</button>
+          <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
+          <button id="floor-buy-ultra-crit" class="game__button">Floor Ultra Crit</button>
+          <button id="floor-buy-chain-crit" class="game__button">Floor Chain Crit</button>
+          <button id="floor-buy-chain-mega-crit" class="game__button">Floor Chain Mega Crit</button>
+          <button id="floor-buy-chain-ultra-crit" class="game__button">Floor Chain Ultra Crit</button>
+          <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
+          <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
+          <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
+          <button id="map-unlock-chain-crit" class="game__button">Map Unlock Chain Crit</button>
+          <button id="map-unlock-chain-mega-crit" class="game__button">Map Unlock Chain Mega Crit</button>
+          <button id="map-unlock-chain-ultra-crit" class="game__button">Map Unlock Chain Ultra Crit</button>
+          <button id="test-press-conference" class="game__button">Press Conf Game</button>
+          <button id="test-liquidate-assets" class="game__button">Liquidate Assets Game</button>
+          <button id="test-pay-taxes" class="game__button">Pay Taxes Game</button>
+          <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
+        </div>
+      </details>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
     </div>
   `;
@@ -104,11 +111,30 @@ export function wireSpawnChainUltraCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnBoostCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#spawn-boost-crit")!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireFloorBuyCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>("#floor-buy-crit")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyBoostCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-boost-crit",
+  )!;
   button.addEventListener("click", onClick);
 }
 

@@ -11,6 +11,7 @@ import {
   officeUpgradeSpeedMultiplier,
   currentIncomeRatePerSecond,
 } from "../shared/income";
+import type { CritTier } from "../shared/critTypes";
 
 // bumped from "cash-clicker:floors" now that this holds Floor[][] (one entry per
 // building) instead of a single Floor[] — old single-building saves just start fresh
@@ -73,9 +74,10 @@ export interface Floor {
   hasManager: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
   // permanent per-floor rate multiplier, rolled once when the floor is bought/
   // unlocked (see floorInteractions.ts's rollFloorBuyCrit) — never re-rolled or
-  // cleared afterward. Mirrors floors/upgradeButton's CritTier as a plain string
-  // union (not imported) to avoid a gameState<->floors circular import
-  critMultiplierTier: "crit" | "mega" | "ultra" | null;
+  // cleared afterward. Real CritTier type from shared/critTypes (a type-only
+  // import, erased at build time, so importing it here creates no runtime
+  // cycle even though shared/critTypes itself type-imports Floor from here)
+  critMultiplierTier: CritTier | null;
   // set once at creation (floors/index.ts's buildFloor) when this floor's
   // natural, uncapped incomeIntervalSeconds already exceeds incomePanel.ts's
   // MAX_INCOME_INTERVAL_SECONDS (1h) cap — never recomputed afterward, even as
@@ -263,7 +265,7 @@ interface SavedFloor {
   hasOfficeChairs?: boolean; // added after initial release; older saves default to false on load
   hasOfficeSupplies?: boolean; // added after initial release; older saves default to false on load
   hasManager?: boolean; // added after initial release; older saves default to false on load
-  critMultiplierTier?: "crit" | "mega" | "ultra" | null; // added after initial release; older saves default to null on load
+  critMultiplierTier?: CritTier | null; // added after initial release; older saves default to null on load
   aboveCapTier?: boolean; // added after initial release; older saves default to false on load
   overtimeTicks?: number; // added after initial release; older saves default to 0 on load
   overtimeStartedAt?: number | null; // added after initial release; older saves default to null on load

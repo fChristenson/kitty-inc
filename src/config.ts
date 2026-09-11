@@ -54,6 +54,10 @@ export const CONFIG = {
     // at a time
     chainChance: 0.05,
     chainContinueChance: 0.5,
+    // "boost crit" — a separate, independent roll (not a tier: no free-upgrade
+    // multiplier, its reward is a free worker boost instead) checked only if
+    // no crit/mega/ultra tier landed on this same click
+    boostChance: 0.05,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

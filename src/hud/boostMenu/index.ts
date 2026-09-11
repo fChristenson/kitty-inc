@@ -1,4 +1,4 @@
-import { activateBoosted, type Floor } from "../../gameState";
+import { type Floor } from "../../gameState";
 import {
   formatPrice,
   triggerButtonPress,
@@ -6,13 +6,17 @@ import {
 } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import {
-  getRenderedWorkerCount,
+  applyBoostAll,
   triggerJumpAll,
   triggerSaleBoost,
   triggerOvertimeBoost,
   floorIncomePerSecond,
   SALE_ASSUMED_CLICKS,
 } from "../../floors";
+// re-exported for hud/index.ts's own facade — applyBoostAll's canonical home
+// is floors/worker.ts (floorInteractions.ts's boost crit proc uses it too),
+// this module just re-shares it rather than keeping its own duplicate copy
+export { applyBoostAll } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { CONFIG } from "../../config";
@@ -61,21 +65,6 @@ function averageFloorIncomePerSecond(floors: Floor[]): BigNumber {
     ZERO,
   );
   return divide(total, unlocked.length);
-}
-
-// boosts every rendered worker on every unlocked floor — shared by the paid
-// buyBoostAll below and mouse/index.ts's free click-triggered version
-export function applyBoostAll(floors: Floor[]): void {
-  // Date.now()-based (not performance.now()) so it matches incomePanel.ts's persisted,
-  // Date.now()-based cycle tracking that reads the same boost state
-  const now = Date.now();
-  for (const floor of floors) {
-    if (!floor.unlocked) continue;
-    const renderedWorkers = getRenderedWorkerCount(floor);
-    for (let i = 0; i < renderedWorkers; i++) {
-      activateBoosted(floor, i, now);
-    }
-  }
 }
 
 // boosts every rendered worker on every unlocked floor if affordable; returns whether it succeeded

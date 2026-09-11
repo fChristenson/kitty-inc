@@ -340,6 +340,23 @@ export function getRenderedWorkerCount(floor: Floor): number {
   );
 }
 
+// boosts every rendered worker on every unlocked floor — the ONE canonical
+// "boost everything" reward, shared by hud/boostMenu.ts's paid buyBoostAll,
+// mouse/index.ts's free click-triggered version, AND floorInteractions.ts's
+// boost crit proc, so none of them ever hand-roll their own copy of this loop
+export function applyBoostAll(floors: Floor[]): void {
+  // Date.now()-based (not performance.now()) so it matches incomePanel.ts's
+  // persisted, Date.now()-based cycle tracking that reads the same boost state
+  const now = Date.now();
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    const renderedWorkers = getRenderedWorkerCount(floor);
+    for (let i = 0; i < renderedWorkers; i++) {
+      activateBoosted(floor, i, now);
+    }
+  }
+}
+
 // how often a hired manager re-triggers the boost on its own floor, no player
 // action needed
 const MANAGER_AUTO_BOOST_INTERVAL_MS = 20_000;

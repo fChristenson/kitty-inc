@@ -620,7 +620,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   function stopHoldRepeat(): void {
     holdController?.stop();
     holdController = null;
-    if (heldUpgradeFloor) stopButtonHoldAnim(heldUpgradeFloor);
+    if (heldUpgradeFloor) {
+      stopButtonHoldAnim(heldUpgradeFloor);
+    }
     heldUpgradeFloor = null;
   }
 
