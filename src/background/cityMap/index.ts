@@ -10,6 +10,7 @@ import {
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
 import { setActiveCompanyIndex } from "../../company";
+import { getEffectiveDpr } from "../../shared/devicePixelRatio";
 import {
   spawnCoinBurstAt,
   drawActiveCoinBursts,
@@ -197,7 +198,7 @@ export function createCityMapView(
   let scaledMapH = 0;
   function getScaledMapCanvas(): HTMLCanvasElement | null {
     if (!mapImage) return null;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = getEffectiveDpr();
     const targetW = Math.round(cssW * dpr);
     const targetH = Math.round(cssH * dpr);
     if (
@@ -304,7 +305,7 @@ export function createCityMapView(
     const rect = canvas.getBoundingClientRect();
     cssW = rect.width;
     cssH = rect.height;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = getEffectiveDpr();
     const targetW = Math.round(cssW * dpr);
     const targetH = Math.round(cssH * dpr);
     // reassigning canvas.width/height reallocates+clears the whole backing store, so
@@ -360,7 +361,7 @@ export function createCityMapView(
     if (cssW <= 0 || cssH <= 0) return;
     hasWigglingMarker = false; // recomputed below; drives the tick loop's own cadence
     hasActiveMarkerJump = false; // same, for the unlock-hop animation below
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);

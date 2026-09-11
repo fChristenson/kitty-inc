@@ -3,6 +3,7 @@
 // every such game needs (DPR-aware canvas sizing, a clamped-delta rAF loop,
 // elapsed-time formatting, a button press-bounce curve) extracted out once a
 // second game needed the exact same code pressConferenceGame already had
+import { getEffectiveDpr } from "../devicePixelRatio";
 
 // DPR-aware canvas sizing: keeps canvas.width/height in sync with its own CSS
 // box (via ResizeObserver) and returns the CSS-space size every draw call
@@ -21,7 +22,7 @@ export function setupResizableCanvas(canvas: HTMLCanvasElement): {
     const rect = canvas.getBoundingClientRect();
     cssW = rect.width;
     cssH = rect.height;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = getEffectiveDpr();
     canvas.width = Math.round(cssW * dpr);
     canvas.height = Math.round(cssH * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

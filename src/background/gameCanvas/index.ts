@@ -27,6 +27,7 @@ import {
   startPressAndHold,
   type PressAndHoldController,
 } from "../../shared/pressAndHold";
+import { getEffectiveDpr } from "../../shared/devicePixelRatio";
 import type { Floor } from "../../gameState";
 
 // a floor-room hit-test result: which floor a canvas point landed on, its own
@@ -277,7 +278,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     cssW = rect.width;
     cssH = rect.height;
     scale = cssW / SLOT_W;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = getEffectiveDpr();
     canvas.width = Math.round(cssW * dpr);
     canvas.height = Math.round(cssH * dpr);
     clampCamera();
@@ -441,7 +442,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // non-finite coordinates and throws (e.g. inside createLinearGradient)
     if (cssW <= 0 || cssH <= 0) return;
     updateMouse(activeFloors, Date.now());
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);
