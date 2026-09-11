@@ -13,13 +13,13 @@ import {
 import { getWiggleRotation } from "../../shared/wiggle";
 import { getTotalIncome } from "../../totalIncome";
 import {
-  type BigNumber,
-  ZERO,
-  add,
-  multiply,
-  divide,
-  gte,
-} from "../../shared/bigNumber";
+  officeUpgradeSpeedMultiplier,
+  effectiveIncomeCycle as sharedEffectiveIncomeCycle,
+  collectDueIncome as sharedCollectDueIncome,
+  peekDueIncome as sharedPeekDueIncome,
+  currentIncomeRatePerSecond as sharedCurrentIncomeRatePerSecond,
+} from "../../shared/income";
+import { type BigNumber, add, multiply, gte } from "../../shared/bigNumber";
 import {
   drawPill,
   drawPillBorder,
@@ -109,12 +109,6 @@ function incomeBarPressScale(floor: Floor, now: number): number {
 // reload never resets/loses how far into its current cycle a floor already was
 let tickerRunning = false;
 
-// floor on the fill cycle so it never ticks faster than once per second (any
-// speed beyond this folds into a bigger payout instead, see effectiveIncomeCycle)
-// — also keeps the bar's own fill-percentage math meaningful, since a 1s-or-longer
-// cycle is always comfortably visible as a normal filling bar
-// every literal balance number below lives in src/config.ts (CONFIG.incomePanel)
-const MIN_INCOME_INTERVAL_SECONDS = CONFIG.incomePanel.minIncomeIntervalSeconds;
 // ceiling on a NEW floor's own starting wait, applied once at creation time (see
 // floors/index.ts's buildFloor) — a high floor's exponentially-longer base interval
 // would otherwise start requiring days/weeks between payouts before a single
@@ -183,19 +177,6 @@ export function increaseIncomeRate(floor: Floor): void {
   }
 }
 
-// permanent per-floor speed multiplier from the one-time office chairs/supplies/
-// manager purchases (hud/upgradeMenu) — each owned upgrade doubles it, so owning
-// all three stacks to a flat 8x, independent of (and layered on top of) the
-// temporary worker-boost speedup below
-function officeUpgradeSpeedMultiplier(floor: Floor): number {
-  const perUpgrade = CONFIG.officeUpgrades.speedMultiplierPerUpgrade;
-  return (
-    (floor.hasOfficeChairs ? perUpgrade : 1) *
-    (floor.hasOfficeSupplies ? perUpgrade : 1) *
-    (floor.hasManager ? perUpgrade : 1)
-  );
-}
-
 // how many times faster than its own base incomeIntervalSeconds this floor is
 // currently running, from the temporary worker boost and the permanent office
 // upgrades combined — computed BEFORE the MIN_INCOME_INTERVAL_SECONDS clamp below
@@ -218,28 +199,15 @@ function currentSpeedMultiplier(floor: Floor, now: number): number {
 // interval implies either way. There is deliberately no upper clamp here anymore:
 // a floor's own incomeIntervalSeconds is only ever capped once, at creation (see
 // MAX_INCOME_INTERVAL_SECONDS/buildFloor) — from then on it halves via upgrades
-// exactly like any other floor, with no re-imposed ceiling masking that progress
+// exactly like any other floor, with no re-imposed ceiling masking that progress.
+// Thin wrapper over shared/income's pure formula — this is the ONE place that
+// folds the worker-boost-aware speed multiplier in; gameState's idle catch-up
+// calls the shared formula directly with just officeUpgradeSpeedMultiplier
 function effectiveIncomeCycle(
   floor: Floor,
   now: number,
 ): { intervalSeconds: number; amount: BigNumber; overspeed: boolean } {
-  const uncappedIntervalSeconds =
-    floor.incomeIntervalSeconds / currentSpeedMultiplier(floor, now);
-
-  if (uncappedIntervalSeconds >= MIN_INCOME_INTERVAL_SECONDS) {
-    return {
-      intervalSeconds: uncappedIntervalSeconds,
-      amount: floor.incomeAmount,
-      overspeed: false,
-    };
-  }
-  const overspeedMultiplier =
-    MIN_INCOME_INTERVAL_SECONDS / uncappedIntervalSeconds;
-  return {
-    intervalSeconds: MIN_INCOME_INTERVAL_SECONDS,
-    amount: multiply(floor.incomeAmount, overspeedMultiplier),
-    overspeed: true,
-  };
+  return sharedEffectiveIncomeCycle(floor, currentSpeedMultiplier(floor, now));
 }
 
 // advances a floor's fill cycle by however many full intervals have elapsed since it was last
@@ -248,12 +216,7 @@ function effectiveIncomeCycle(
 // from, so a payout always lines up with the bar visually completing instead of money
 // trickling in continuously underneath a stepped bar
 export function collectDueIncome(floor: Floor, now: number): BigNumber {
-  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
-  const intervalMs = intervalSeconds * 1000;
-  const cycles = Math.floor((now - floor.lastCollectedAt) / intervalMs);
-  if (cycles <= 0) return ZERO;
-  floor.lastCollectedAt += cycles * intervalMs;
-  return multiply(amount, cycles);
+  return sharedCollectDueIncome(floor, now, currentSpeedMultiplier(floor, now));
 }
 
 // same math as collectDueIncome, but read-only — doesn't advance
@@ -262,10 +225,7 @@ export function collectDueIncome(floor: Floor, now: number): BigNumber {
 // lets totalIncome.ts estimate what they'd have actually earned by now anyway,
 // without needing every company's buildings loaded/ticking at once
 export function peekDueIncome(floor: Floor, now: number): BigNumber {
-  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
-  const intervalMs = intervalSeconds * 1000;
-  const cycles = Math.floor((now - floor.lastCollectedAt) / intervalMs);
-  return cycles > 0 ? multiply(amount, cycles) : ZERO;
+  return sharedPeekDueIncome(floor, now, currentSpeedMultiplier(floor, now));
 }
 
 // a floor's own $/sec at its current effective rate — same boost-aware cycle math
@@ -277,8 +237,10 @@ export function currentIncomeRatePerSecond(
   floor: Floor,
   now: number,
 ): BigNumber {
-  const { intervalSeconds, amount } = effectiveIncomeCycle(floor, now);
-  return divide(amount, intervalSeconds);
+  return sharedCurrentIncomeRatePerSecond(
+    floor,
+    currentSpeedMultiplier(floor, now),
+  );
 }
 
 // seconds left until the current fill cycle completes, counting down from the full
