@@ -1,6 +1,7 @@
 import { randomInt } from "../../utils";
 import type { Floor } from "../../gameState";
 import { loadImageByName } from "../../loadAssets";
+import { createParticlePool } from "../../shared/particlePool";
 
 // a handful of small coins that bubble straight up from a point, gently swaying,
 // and fade out — a quieter alternative to coins.ts's outward/gravity burst

@@ -85,7 +85,7 @@ function playSpecialFlash(label: string, color: string): void {
     strokeWidth: 14,
     priority: 1,
   });
-  playJackpot();
+  playExplosion();
 }
 
 // bursts on top of whatever the caller's own reward already spawned, so the
