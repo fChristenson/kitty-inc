@@ -119,5 +119,11 @@ export function createCityTransitions(
     cancelVerticalSpeedLines();
   }
 
-  return { flashVertical, jumpToEnd, animateSwitchToCompany, navigateCity, destroy };
+  return {
+    flashVertical,
+    jumpToEnd,
+    animateSwitchToCompany,
+    navigateCity,
+    destroy,
+  };
 }

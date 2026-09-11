@@ -1,4 +1,5 @@
 import { companyStorageKey } from "../company";
+import { CONFIG } from "../config";
 import {
   type BigNumber,
   type SerializedBigNumber,
@@ -187,6 +188,22 @@ export function markAppClosed(): void {
   }
 }
 
+// mirrors floors/incomePanel/index.ts's officeUpgradeSpeedMultiplier (the
+// permanent part only — the temporary worker-boost speedup it also applies
+// doesn't belong here, since any boost active when the tab closed would have
+// long expired by the time this runs). Duplicated rather than imported: that
+// module already imports FROM gameState, and Floor's own hasOfficeChairs/
+// hasOfficeSupplies/hasManager fields plus CONFIG are all this needs, so a
+// keep-in-sync comment beats introducing a cycle for 3 lines of math
+function officeUpgradeSpeedMultiplier(floor: Floor): number {
+  const perUpgrade = CONFIG.officeUpgrades.speedMultiplierPerUpgrade;
+  return (
+    (floor.hasOfficeChairs ? perUpgrade : 1) *
+    (floor.hasOfficeSupplies ? perUpgrade : 1) *
+    (floor.hasManager ? perUpgrade : 1)
+  );
+}
+
 // $ every unlocked floor across every building earned, at its own current rate, over
 // the plain wall-clock gap between the last markAppClosed() timestamp and now — a
 // straight rate * elapsedSeconds calculation, not dependent on floor.lastCollectedAt
@@ -220,9 +237,9 @@ export function computeIdleIncome(
   for (const floors of buildings) {
     for (const floor of floors) {
       if (!floor.unlocked) continue;
-      const ratePerSecond = divide(
-        floor.incomeAmount,
-        floor.incomeIntervalSeconds,
+      const ratePerSecond = multiply(
+        divide(floor.incomeAmount, floor.incomeIntervalSeconds),
+        officeUpgradeSpeedMultiplier(floor),
       );
       idleIncome = add(
         idleIncome,
