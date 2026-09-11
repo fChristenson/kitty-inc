@@ -11,6 +11,12 @@ import {
 } from "../../corporationName";
 import { getBuildingPrice } from "../../buildings";
 import {
+  getOfficeChairsCost,
+  getOfficeSuppliesCost,
+  getManagerCost,
+  getWorkersInvestedValue,
+} from "../upgradeMenu";
+import {
   getActiveCompanyIndex,
   loadCompanyRecord,
   clearCompanyRecord,
@@ -233,11 +239,48 @@ export function getCompanyUpgradesValue(buildings: Floor[][]): BigNumber {
   return getUpgradesValue(buildings);
 }
 
-// buildings value + upgrades value combined — exported so main.ts can snapshot
-// a company's CompanyRecord (see company.ts) at the exact moment it goes
-// dormant, without duplicating this pricing logic there
+// $ actually PAID to unlock every floor a company owns — a floor's own
+// unlockCost is never rewritten after being unlocked, so reading it back is
+// the real spend, not a proxy (locked floors haven't been paid for yet, so
+// they're excluded)
+function getFloorUnlockValue(buildings: Floor[][]): BigNumber {
+  let total = ZERO;
+  for (const floors of buildings) {
+    for (const floor of floors) {
+      if (floor.unlocked) total = add(total, floor.unlockCost);
+    }
+  }
+  return total;
+}
+
+// $ actually paid hiring workers + the one-time office chairs/supplies/manager
+// purchases across every floor — all deterministic from a floor's own current
+// state (workerCount, the hasOfficeX flags), so no separate historical spend
+// tracking is needed to read back the real amount invested
+function getStaffInvestmentValue(buildings: Floor[][]): BigNumber {
+  let total = ZERO;
+  for (const floors of buildings) {
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      total = add(total, getWorkersInvestedValue(floor));
+      if (floor.hasOfficeChairs) total = add(total, getOfficeChairsCost(floor));
+      if (floor.hasOfficeSupplies)
+        total = add(total, getOfficeSuppliesCost(floor));
+      if (floor.hasManager) total = add(total, getManagerCost(floor));
+    }
+  }
+  return total;
+}
+
+// buildings value + every other real $ sunk into a company (floor unlocks,
+// workers, office purchases, upgrades combined) — exported so main.ts can
+// snapshot a company's CompanyRecord (see company.ts) at the exact moment it
+// goes dormant, without duplicating this pricing logic there
 export function getCompanyAssetValue(buildings: Floor[][]): BigNumber {
-  return add(getBuildingsValue(buildings.length), getUpgradesValue(buildings));
+  return add(
+    add(getBuildingsValue(buildings.length), getUpgradesValue(buildings)),
+    add(getFloorUnlockValue(buildings), getStaffInvestmentValue(buildings)),
+  );
 }
 
 // hud/corporationUpgradeMenu's "Merge" action: picks whichever selected company
@@ -300,24 +343,20 @@ export function mergeCompanies(
   return { survivorIndex, name: regenerateCorporationName(survivorIndex) };
 }
 
-// a company's overall value — its own current total income (bank money) plus
-// the $ sunk into its floors' upgrades — the base getCompanyBaseModifierPercent
-// below weighs a company's size against. Buildings cost is deliberately NOT
-// part of this — total income (the player's actual spendable cash) is already
-// one of the two terms, and buildings cost tends to track total income
-// closely enough that including it just double-counted roughly the same size
-// signal. The active company reads its own live buildings (freshest); any
-// dormant company reads its persisted CompanyRecord's upgradesValue instead of
-// ever loading its full buildings/floors array
+// a company's overall value — the $ actually invested into it, i.e. buildings
+// bought + upgrades bought (see getCompanyAssetValue) — the base
+// getCompanyBaseModifierPercent below weighs a company's size against.
+// Deliberately NOT the company's current banked total income: that's
+// unspent/liquid cash, not money put INTO the company, and would let a player
+// who just hoards cash without ever spending it inflate this for free. The
+// active company reads its own live buildings (freshest); any dormant
+// company reads its persisted CompanyRecord's own frozen assetValue instead
+// of ever loading its full buildings/floors array
 function getCompanyValue(companyIndex: number): BigNumber {
   if (companyIndex === getActiveCompanyIndex()) {
-    return add(
-      getUpgradesValue(loadBuildings(companyIndex)),
-      getStoredTotalIncome(companyIndex),
-    );
+    return getCompanyAssetValue(loadBuildings(companyIndex));
   }
-  const upgradesValue = loadCompanyRecord(companyIndex)?.upgradesValue ?? ZERO;
-  return add(upgradesValue, getStoredTotalIncome(companyIndex));
+  return loadCompanyRecord(companyIndex)?.assetValue ?? ZERO;
 }
 
 // a baseline % every company contributes purely from its own size — so a

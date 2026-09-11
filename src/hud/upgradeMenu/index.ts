@@ -41,6 +41,17 @@ export function getWorkerCost(floor: Floor): BigNumber {
   return multiply(getFloorPrice(floor), floor.workerCount);
 }
 
+// $ actually PAID to reach this floor's current workerCount (not the cost of the
+// NEXT one, see getWorkerCost above) — buying the Nth worker cost
+// floorPrice*(N-1) at the time, so cumulative spend is that arithmetic series'
+// sum. Every floor starts with 1 free worker, so only workerCount-1 were ever
+// bought. Used by corporationBoostMenu's company-value calc, which needs real
+// money invested rather than the price of a purchase that hasn't happened yet
+export function getWorkersInvestedValue(floor: Floor): BigNumber {
+  const bought = Math.max(0, floor.workerCount - 1);
+  return multiply(getFloorPrice(floor), (bought * (bought + 1)) / 2);
+}
+
 // what the floor's own 3rd worker would cost (i.e. getWorkerCost at workerCount=2),
 // independent of however many workers it actually has right now — shared pricing
 // basis for the one-time office chairs/supplies purchases below
