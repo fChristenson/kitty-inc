@@ -59,6 +59,10 @@ export interface CorpBarrel {
   // distance, not just an adjacent step) — for jumping straight to a
   // freshly-created company instead of a one-step nudge
   rollToPosition(targetPosition: number): void;
+  // jumps straight to the first (direction 1) or last (direction -1) position
+  // in one motion — same end the matching rollOneStep direction would
+  // eventually reach, just without stepping through every company in between
+  rollToEnd(direction: -1 | 1): void;
   destroy(): void;
 }
 
@@ -152,6 +156,11 @@ export function createCorpBarrel(deps: CorpBarrelDeps): CorpBarrel {
     rollToPosition(selectedPosition + (direction < 0 ? 1 : -1));
   }
 
+  function rollToEnd(direction: -1 | 1): void {
+    const count = getSortedCorporationIndices().length;
+    rollToPosition(direction < 0 ? count - 1 : 0);
+  }
+
   function resolveTargetPosition(companyIndex: number): number {
     return getSortedCorporationIndices().indexOf(companyIndex);
   }
@@ -167,6 +176,7 @@ export function createCorpBarrel(deps: CorpBarrelDeps): CorpBarrel {
     resolveTargetPosition,
     rollOneStep,
     rollToPosition,
+    rollToEnd,
     destroy,
   };
 }

@@ -121,8 +121,9 @@ export interface CityMapView {
   // flashes the same speed-line rays the city prev/next arrows use, but running
   // vertically — for the action bar's own scroll-to-top/scroll-to-bottom buttons
   // while the map is open (see main.ts). -1 streams upward, 1 streams downward
-  flashVerticalRays: (direction: -1 | 1) => void;
-  // same blur/speed-line/roll flourish as a normal barrel-roll switch, but
+  flashVerticalRays: (direction: -1 | 1) => void;  // same, but jumps the barrel straight to the top/bottommost company instead
+  // of one step — for a HELD scroll button (see main.ts's action-bar wiring)
+  jumpToEnd: (direction: -1 | 1) => void;  // same blur/speed-line/roll flourish as a normal barrel-roll switch, but
   // jumping straight to a given company index in one motion — for a switch
   // triggered OUTSIDE the barrel-roll gesture itself (see main.ts's
   // corporationUpgradeMenu wiring, right after a newly-bought company becomes active)
@@ -208,6 +209,7 @@ export function createCityMapView(
     speedLinesSvg,
     getCssSize: () => ({ cssW, cssH }),
     rollOneStep: (direction) => corpBarrel.rollOneStep(direction),
+    rollToEnd: (direction) => corpBarrel.rollToEnd(direction),
     resolveCompanyTargetPosition: (companyIndex) =>
       corpBarrel.resolveTargetPosition(companyIndex),
     rollToPosition: (targetPosition) =>
@@ -651,6 +653,7 @@ export function createCityMapView(
       redraw();
     },
     flashVerticalRays: (direction) => transitions.flashVertical(direction),
+    jumpToEnd: (direction) => transitions.jumpToEnd(direction),
     animateSwitchToCompany: (companyIndex) =>
       transitions.animateSwitchToCompany(companyIndex),
     destroy,

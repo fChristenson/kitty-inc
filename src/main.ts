@@ -579,6 +579,16 @@ async function main() {
       if (mapOpen) cityMapView.flashVerticalRays(1);
       else gameCanvas.scrollActiveToBottom();
     },
+    onHoldScrollTop: () => {
+      if (!mapOpen) return;
+      playSwoosh();
+      cityMapView.jumpToEnd(-1);
+    },
+    onHoldScrollBottom: () => {
+      if (!mapOpen) return;
+      playSwoosh();
+      cityMapView.jumpToEnd(1);
+    },
     onBoostAll: () => {
       if (mapOpen) corporationBoostMenu.open();
       else boostMenu.open();

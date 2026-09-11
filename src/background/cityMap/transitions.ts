@@ -21,6 +21,7 @@ export interface CityTransitionsDeps {
   speedLinesSvg: SVGSVGElement;
   getCssSize: () => { cssW: number; cssH: number };
   rollOneStep: (direction: -1 | 1) => void;
+  rollToEnd: (direction: -1 | 1) => void;
   resolveCompanyTargetPosition: (companyIndex: number) => number;
   rollToPosition: (targetPosition: number) => void;
   getSelectedPosition: () => number;
@@ -35,6 +36,10 @@ export interface CityTransitions {
   // own scroll-to-top/scroll-to-bottom flourish while the map is open, also
   // rolling the corp barrel one step in the same direction
   flashVertical(direction: -1 | 1): void;
+  // same vertical flourish as flashVertical, but jumps the barrel straight to
+  // the top/bottommost company in one motion — for a HELD (not tapped) scroll
+  // button, so the player doesn't have to roll through every company in between
+  jumpToEnd(direction: -1 | 1): void;
   // same blur + speed-line flourish as a normal barrel roll, but jumping
   // straight to companyIndex's own barrel position in one motion instead of
   // one adjacent step — for a switch that didn't come from the player
@@ -80,6 +85,17 @@ export function createCityTransitions(
     }, TRANSITION_MS);
   }
 
+  function jumpToEnd(direction: -1 | 1): void {
+    const { cssW, cssH } = deps.getCssSize();
+    canvas.classList.add("city-map__canvas--blurred");
+    playVerticalSpeedLines(speedLinesSvg, cssW, cssH, direction);
+    deps.rollToEnd(direction);
+    if (verticalClearTimeoutId !== null) clearTimeout(verticalClearTimeoutId);
+    verticalClearTimeoutId = setTimeout(() => {
+      canvas.classList.remove("city-map__canvas--blurred");
+    }, TRANSITION_MS);
+  }
+
   function navigateCity(delta: -1 | 1): void {
     playSwoosh();
     const { cssW, cssH } = deps.getCssSize();
@@ -103,5 +119,5 @@ export function createCityTransitions(
     cancelVerticalSpeedLines();
   }
 
-  return { flashVertical, animateSwitchToCompany, navigateCity, destroy };
+  return { flashVertical, jumpToEnd, animateSwitchToCompany, navigateCity, destroy };
 }

@@ -63,21 +63,71 @@ export function createActionBarMarkup(): string {
 export interface ActionBarHandlers {
   onScrollTop: () => void;
   onScrollBottom: () => void;
+  // held (not tapped) scroll-top/bottom \u2014 while the map is open this jumps
+  // straight to the top/bottommost company instead of rolling one at a time;
+  // a no-op while the map is closed (a tap already scrolls floors instantly)
+  onHoldScrollTop: () => void;
+  onHoldScrollBottom: () => void;
   onBoostAll: () => void;
   onOpenUpgradeMenu: () => void;
   onOpenMapMenu: () => void;
+}
+
+// long enough that a normal tap never triggers the hold action, short enough
+// that deliberately holding the button still feels immediate
+const SCROLL_HOLD_MS = 400;
+
+// wires a scroll button to fire onClick on a normal tap, or onHold once the
+// press is held past SCROLL_HOLD_MS \u2014 the browser still sends a trailing
+// click when the button is finally released after a hold, so that click is
+// swallowed (holdFired) instead of also firing onClick on top of the hold
+function wireHoldableScrollButton(
+  button: HTMLButtonElement,
+  onClick: () => void,
+  onHold: () => void,
+): void {
+  let holdTimeout: ReturnType<typeof setTimeout> | null = null;
+  let holdFired = false;
+  function clearHold(): void {
+    if (holdTimeout !== null) {
+      clearTimeout(holdTimeout);
+      holdTimeout = null;
+    }
+  }
+  button.addEventListener("pointerdown", () => {
+    holdFired = false;
+    clearHold();
+    holdTimeout = setTimeout(() => {
+      holdTimeout = null;
+      holdFired = true;
+      onHold();
+    }, SCROLL_HOLD_MS);
+  });
+  button.addEventListener("pointerup", clearHold);
+  button.addEventListener("pointercancel", clearHold);
+  button.addEventListener("click", () => {
+    if (holdFired) {
+      holdFired = false;
+      return;
+    }
+    onClick();
+  });
 }
 
 export function wireActionBar(
   container: HTMLElement,
   handlers: ActionBarHandlers,
 ): void {
-  container
-    .querySelector<HTMLButtonElement>("#action-bar-scroll-top")!
-    .addEventListener("click", handlers.onScrollTop);
-  container
-    .querySelector<HTMLButtonElement>("#action-bar-scroll-bottom")!
-    .addEventListener("click", handlers.onScrollBottom);
+  wireHoldableScrollButton(
+    container.querySelector<HTMLButtonElement>("#action-bar-scroll-top")!,
+    handlers.onScrollTop,
+    handlers.onHoldScrollTop,
+  );
+  wireHoldableScrollButton(
+    container.querySelector<HTMLButtonElement>("#action-bar-scroll-bottom")!,
+    handlers.onScrollBottom,
+    handlers.onHoldScrollBottom,
+  );
   container
     .querySelector<HTMLButtonElement>("#action-bar-boost-all")!
     .addEventListener("click", handlers.onBoostAll);

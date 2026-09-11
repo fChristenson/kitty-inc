@@ -329,17 +329,25 @@ export function nextCritTier(tier: CritTier | null): CritTier {
   return "ultra";
 }
 
-// the crit tier EVERY floor in this building currently shares, or null if
-// there are no floors or they don't all match — a building-wide crit (see
-// cityMap/index.ts's map-unlock crit) sets every floor to the same tier, so
-// this is how a brand new floor (ensureLockedFloorAbove) inherits that
-// building's own crit tier as its own starting default
+// the building's own baseline crit tier — the LOWEST tier any current floor
+// has, not "every floor must match exactly". A building-wide crit (see
+// cityMap/index.ts's map-unlock crit) sets every floor to the same tier, but
+// individual floors can then be promoted further above that (overtime-gauge
+// promotion, a floor-buy crit roll) without ever demoting one below it — so
+// requiring an EXACT match here used to make this flip back to null the
+// moment just one floor got promoted past the rest, which made every floor
+// unlocked afterward start back at "no crit" instead of the building's real
+// baseline. Taking the lowest tier present is what a brand new floor
+// (ensureLockedFloorAbove) should inherit as its own starting default.
 export function getUniformCritTier(floors: Floor[]): CritTier | null {
   if (floors.length === 0) return null;
-  const tier = floors[0].critMultiplierTier;
-  return tier && floors.every((floor) => floor.critMultiplierTier === tier)
-    ? tier
-    : null;
+  return floors.reduce<CritTier | null>(
+    (lowest, floor) =>
+      critTierRank(floor.critMultiplierTier) < critTierRank(lowest)
+        ? floor.critMultiplierTier
+        : lowest,
+    floors[0].critMultiplierTier,
+  );
 }
 
 const critTiers = new WeakMap<Floor, CritTier>();
