@@ -107,7 +107,8 @@ function startFlash(req: FlashRequest): void {
   flashBlinkHz = req.blinkHz;
   flashHoldMs = req.holdMs;
   activeFlashPriority = req.priority;
-  flashEntryRotationDeg = (Math.random() < 0.5 ? -1 : 1) * (35 + Math.random() * 20);
+  flashEntryRotationDeg =
+    (Math.random() < 0.5 ? -1 : 1) * (35 + Math.random() * 20);
   flashWobbleSeed = Math.random() * Math.PI * 2;
   const fadeDurationMs = FLASH_DURATION_MS * req.intensity - GROWTH_DURATION_MS;
   flashEndsAt = now + GROWTH_DURATION_MS + req.holdMs + fadeDurationMs;
@@ -294,7 +295,9 @@ export function drawCritFlash(
     // held size/rotation the whole time (see WOBBLE_* above) so it never reads
     // as a flat, static frame even while blinking
     const wobbleT = (elapsed - GROWTH_DURATION_MS) / 1000;
-    const wobble = Math.sin(wobbleT * WOBBLE_HZ * Math.PI * 2 + flashWobbleSeed);
+    const wobble = Math.sin(
+      wobbleT * WOBBLE_HZ * Math.PI * 2 + flashWobbleSeed,
+    );
     growthScale = 1 + wobble * WOBBLE_SCALE_AMOUNT;
     rotation = wobble * WOBBLE_ROTATION_DEG * (Math.PI / 180);
     alpha = 1;
@@ -308,7 +311,9 @@ export function drawCritFlash(
     // lifetime — the same settle wobble keeps riding along, fading out with it
     // rather than snapping to a dead-still pose the instant the hold ends
     const wobbleT = (elapsed - GROWTH_DURATION_MS) / 1000;
-    const wobble = Math.sin(wobbleT * WOBBLE_HZ * Math.PI * 2 + flashWobbleSeed);
+    const wobble = Math.sin(
+      wobbleT * WOBBLE_HZ * Math.PI * 2 + flashWobbleSeed,
+    );
     growthScale = 1 + wobble * WOBBLE_SCALE_AMOUNT;
     rotation = wobble * WOBBLE_ROTATION_DEG * (Math.PI / 180);
     alpha = 1 - (elapsed - holdEndsAt) / (totalLifetimeMs - holdEndsAt);
