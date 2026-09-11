@@ -15,16 +15,57 @@ export const COIN_BILL_CHANCE = 0.3;
 const MIN_SPIN_RATE = 0.04; // flipbook frames advanced per physics tick (~16.67ms)
 const MAX_SPIN_RATE = 0.12;
 
-let coinImage: HTMLImageElement | null = null;
-let billImage: HTMLImageElement | null = null;
+// each flipbook frame pre-scaled ONCE onto its own small offscreen canvas, so
+// drawCoinBurstFrame's own per-particle drawImage() call resamples from an
+// already-small source every frame instead of the full-resolution spritesheet
+// (coinSpin.png/cashBill.png are ~460px tall native) — the same "pre-downscale
+// once at load time" fix already used for coinFloat's single bubble icon,
+// generalized to every frame of a flipbook. This is what actually cut the
+// per-frame draw cost; the particle COUNT/cap is untouched on purpose — see
+// cash-clicker-rendering.md's own notes on why lowering the cap instead was
+// the wrong fix (kills the "money rain" look without fixing the real cost).
+const PRESCALE_CELL_H = 200; // comfortably above any real on-screen particle size
+let coinFrameCanvases: HTMLCanvasElement[] | null = null;
+let billFrameCanvases: HTMLCanvasElement[] | null = null;
+
+function buildFrameCanvases(
+  image: HTMLImageElement,
+  frameCount: number,
+): HTMLCanvasElement[] {
+  const frameW = image.naturalWidth / frameCount;
+  const frameH = image.naturalHeight;
+  const cellW = Math.round(PRESCALE_CELL_H * (frameW / frameH));
+  const canvases: HTMLCanvasElement[] = [];
+  for (let i = 0; i < frameCount; i++) {
+    const canvas = document.createElement("canvas");
+    canvas.width = cellW;
+    canvas.height = PRESCALE_CELL_H;
+    const ctx = canvas.getContext("2d")!;
+    ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(
+      image,
+      i * frameW,
+      0,
+      frameW,
+      frameH,
+      0,
+      0,
+      cellW,
+      PRESCALE_CELL_H,
+    );
+    canvases.push(canvas);
+  }
+  return canvases;
+}
 
 export async function loadCoinBurstImages(): Promise<HTMLImageElement> {
-  const [coin] = await Promise.all([
+  const [coin, bill] = await Promise.all([
     loadSprite("coinSpin"),
-    loadSprite("cashBill").then((img) => (billImage = img)),
+    loadSprite("cashBill"),
   ]);
-  coinImage = coin;
-  return coin!;
+  coinFrameCanvases = buildFrameCanvases(coin, COIN_SPIN_FRAME_COUNT);
+  billFrameCanvases = buildFrameCanvases(bill, BILL_SPIN_FRAME_COUNT);
+  return coin;
 }
 
 export interface CoinBurstSprite {
@@ -117,33 +158,23 @@ export function drawCoinBurstFrame(
   y: number,
   radius: number,
 ): void {
-  const image = sprite.kind === "bill" ? billImage : coinImage;
-  if (!image) return;
+  const frameCanvases =
+    sprite.kind === "bill" ? billFrameCanvases : coinFrameCanvases;
+  if (!frameCanvases) return;
   const frameCount =
     sprite.kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT;
-  const frameW = image.naturalWidth / frameCount;
-  const frameH = image.naturalHeight;
   const frame =
     ((Math.floor(sprite.spinFrame) % frameCount) + frameCount) % frameCount;
+  const frameCanvas = frameCanvases[frame];
   // frames share one cell size, so the coin's diameter maps to height and width
   // follows the cell's own aspect ratio — that's what makes thinner edge-on
   // frames actually read as the coin thinning, not just shrinking
   const destH = radius * 2;
-  const destW = destH * (frameW / frameH);
+  const destW = destH * (frameCanvas.width / frameCanvas.height);
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(sprite.axisAngle);
-  ctx.drawImage(
-    image,
-    frame * frameW,
-    0,
-    frameW,
-    frameH,
-    -destW / 2,
-    -destH / 2,
-    destW,
-    destH,
-  );
+  ctx.drawImage(frameCanvas, -destW / 2, -destH / 2, destW, destH);
   ctx.restore();
 }
 
