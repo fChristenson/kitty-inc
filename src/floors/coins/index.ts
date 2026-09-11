@@ -48,10 +48,6 @@ export function hasActiveCoins(): boolean {
   return pool.hasActive();
 }
 
-export function getActiveCoinsCount(): number {
-  return pool.count();
-}
-
 // draws every particle onto a full-viewport overlay canvas (so a burst can never be
 // clipped by the floor it started on), mapping each particle's floor-local x/y through
 // getFloorRect(floor) — the floor's current on-screen rect in the overlay's own CSS

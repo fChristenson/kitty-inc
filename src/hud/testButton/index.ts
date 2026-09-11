@@ -33,7 +33,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-liquidate-assets" class="game__button">Liquidate Assets Game</button>
           <button id="test-pay-taxes" class="game__button">Pay Taxes Game</button>
           <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
-          <button id="toggle-perf-overlay" class="game__button">Perf Overlay</button>
         </div>
       </details>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
@@ -46,16 +45,6 @@ export function wireTestButton(
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>("#add-money")!;
-  button.addEventListener("click", onClick);
-}
-
-export function wireTogglePerfOverlayButton(
-  container: HTMLElement,
-  onClick: () => void,
-): void {
-  const button = container.querySelector<HTMLButtonElement>(
-    "#toggle-perf-overlay",
-  )!;
   button.addEventListener("click", onClick);
 }
 

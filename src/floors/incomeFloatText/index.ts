@@ -42,10 +42,6 @@ export function drawIncomeFloatText(
   }
 }
 
-export function getActiveIncomeFloatTextCount(): number {
-  return pool.count();
-}
-
 // spawns "+text" rising from (x, y) — floor-local coordinates — and drives its own
 // rAF loop until every active label has fully faded, same self-contained pattern
 // coinFloat/index.ts's spawnFloatingCoins uses. `emphasized` renders it

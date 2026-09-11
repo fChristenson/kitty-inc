@@ -193,10 +193,6 @@ export function hasActiveCoinBursts(): boolean {
   return pool.hasActive();
 }
 
-export function getActiveCoinBurstsCount(): number {
-  return pool.count();
-}
-
 export function spawnCoinBurstAt(x: number, y: number, scale = 1): void {
   for (const p of createCoinBurstParticles(x, y)) {
     // scales position (relative to the spawn point, so the burst still

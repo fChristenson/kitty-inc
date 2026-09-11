@@ -245,11 +245,6 @@ let drainingSpecialQueue = false;
 // pile of identical "Chain" procs never replays the same celebration on repeat
 const CELEBRATION_QUEUE_MAX_AGE_MS = 2000;
 
-// for a debug/perf overlay to show a live number (see hud/perfOverlay)
-export function getSpecialCelebrationQueueLength(): number {
-  return specialCelebrationQueue.length;
-}
-
 function drainSpecialCelebrationQueue(): void {
   if (drainingSpecialQueue) return;
   drainingSpecialQueue = true;
