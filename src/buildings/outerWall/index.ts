@@ -25,6 +25,38 @@ const WALL_COLOR = COLOR.wall; // flat fallback used until loadWallMaterial reso
 const WALL_SHADOW_COLOR = COLOR.wallShadow; // inner-edge shading toward the room, for a hint of depth
 
 let wallPattern: CanvasPattern | null = null;
+// the 4 wall/divider regions pre-rendered ONCE from wallPattern, drawn every
+// frame via a cheap drawImage() instead of re-tiling a CanvasPattern fill —
+// measured via the perf overlay + a direct drawFloorContent timing harness:
+// each pattern-filled fillRect averaged ~1.46ms (vs ~0ms for an identically-
+// sized flat-color fillRect) — 4 of these EVERY floor EVERY frame was the
+// actual dominant cost behind a reported "lags even with zero particles"
+// mobile bug, not anything particle-related
+let leftWallCanvas: HTMLCanvasElement | null = null;
+let rightWallCanvas: HTMLCanvasElement | null = null;
+let topWallCanvas: HTMLCanvasElement | null = null;
+let dividerCanvas: HTMLCanvasElement | null = null;
+
+// renders pattern tiled exactly as `ctx.fillRect(offsetX, offsetY, w, h)` would
+// have (translating first so the pattern's own tiling phase anchors to that
+// same logical offset) onto a small w x h canvas of its own, so the one-time
+// render lands identically to the original per-frame fill but only ever runs once
+function renderPatternTile(
+  pattern: CanvasPattern,
+  offsetX: number,
+  offsetY: number,
+  w: number,
+  h: number,
+): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.translate(-offsetX, -offsetY);
+  ctx.fillStyle = pattern;
+  ctx.fillRect(offsetX, offsetY, w, h);
+  return canvas;
+}
 
 // loads (or reuses, once already loaded) the tileable facade texture and makes
 // it the active one drawOuterWall reads from. A pattern isn't tied to the canvas
@@ -35,6 +67,29 @@ export async function loadWallMaterial(): Promise<void> {
   if (!image) return;
   const patternCtx = document.createElement("canvas").getContext("2d")!;
   wallPattern = patternCtx.createPattern(image, "repeat");
+  if (!wallPattern) return;
+  leftWallCanvas = renderPatternTile(
+    wallPattern,
+    0,
+    0,
+    SIDE_WALL_WIDTH,
+    FLOOR_H,
+  );
+  rightWallCanvas = renderPatternTile(
+    wallPattern,
+    FLOOR_W - SIDE_WALL_WIDTH,
+    0,
+    SIDE_WALL_WIDTH,
+    FLOOR_H,
+  );
+  topWallCanvas = renderPatternTile(wallPattern, 0, 0, FLOOR_W, TOP_WALL_WIDTH);
+  dividerCanvas = renderPatternTile(
+    wallPattern,
+    0,
+    FLOOR_H - DIVIDER_H,
+    FLOOR_W,
+    DIVIDER_H,
+  );
 }
 
 // draws the building's exterior walls (all four edges) for one floor's own canvas;
@@ -42,11 +97,20 @@ export async function loadWallMaterial(): Promise<void> {
 // sized to fit within DIVIDER_H) render mounted on top of the divider band, not
 // hidden underneath it
 export function drawOuterWall(ctx: CanvasRenderingContext2D): void {
-  ctx.fillStyle = wallPattern ?? WALL_COLOR;
-  ctx.fillRect(0, 0, SIDE_WALL_WIDTH, FLOOR_H);
-  ctx.fillRect(FLOOR_W - SIDE_WALL_WIDTH, 0, SIDE_WALL_WIDTH, FLOOR_H);
-  ctx.fillRect(0, 0, FLOOR_W, TOP_WALL_WIDTH);
-  ctx.fillRect(0, FLOOR_H - DIVIDER_H, FLOOR_W, DIVIDER_H);
+  if (leftWallCanvas && rightWallCanvas && topWallCanvas && dividerCanvas) {
+    ctx.drawImage(leftWallCanvas, 0, 0);
+    ctx.drawImage(rightWallCanvas, FLOOR_W - SIDE_WALL_WIDTH, 0);
+    ctx.drawImage(topWallCanvas, 0, 0);
+    ctx.drawImage(dividerCanvas, 0, FLOOR_H - DIVIDER_H);
+  } else {
+    // flat fallback before the material image (and its pre-rendered tiles above)
+    // has finished loading — cheap regardless, no pattern involved yet
+    ctx.fillStyle = WALL_COLOR;
+    ctx.fillRect(0, 0, SIDE_WALL_WIDTH, FLOOR_H);
+    ctx.fillRect(FLOOR_W - SIDE_WALL_WIDTH, 0, SIDE_WALL_WIDTH, FLOOR_H);
+    ctx.fillRect(0, 0, FLOOR_W, TOP_WALL_WIDTH);
+    ctx.fillRect(0, FLOOR_H - DIVIDER_H, FLOOR_W, DIVIDER_H);
+  }
 
   const shadowWidth = 5;
   ctx.fillStyle = WALL_SHADOW_COLOR;
