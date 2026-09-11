@@ -45,6 +45,12 @@ interface FloatingCoin {
 }
 
 const coins: FloatingCoin[] = [];
+// same hard cap floors/coins uses, for the same reason: on a slow/lagging device
+// the dt clamp below (max 3 ticks/frame) makes each coin's real-world lifetime
+// stretch out, so spawn rate can outpace decay rate for as long as any floor has
+// a boosted worker — without this, that grows the array (and every frame's
+// update/draw cost) without bound instead of settling at a steady state
+const MAX_COINS = 200;
 let animationFrameId: number | null = null;
 let lastTick = 0;
 
@@ -116,6 +122,8 @@ export function spawnFloatingCoins(
   for (let i = 0; i < count; i++) {
     const startOffset =
       (i - (count - 1) / 2) * spacing + (Math.random() - 0.5) * 15;
+    // evict the oldest coin instead of refusing new ones once at the cap
+    if (coins.length >= MAX_COINS) coins.shift();
     coins.push({
       floor,
       x: x + startOffset,

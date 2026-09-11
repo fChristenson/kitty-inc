@@ -21,6 +21,11 @@ interface FloatingIncomeText extends FloatingTextParticle {
 }
 
 const texts: FloatingIncomeText[] = [];
+// same hard cap floors/coinFloat and floors/coins use — without it, a slow
+// device's dt clamp (below) can make each label's real-world lifetime stretch
+// out enough for spawn rate to outpace decay over a long session, growing this
+// array (and its per-frame draw cost) without bound
+const MAX_TEXTS = 100;
 let animationFrameId: number | null = null;
 let lastTick = 0;
 
@@ -58,6 +63,8 @@ export function spawnIncomeFloatText(
   text: string,
   emphasized = false,
 ): void {
+  // evict the oldest label instead of refusing new ones once at the cap
+  if (texts.length >= MAX_TEXTS) texts.shift();
   texts.push({
     ...createFloatingTextParticle(x, y - SPAWN_Y_OFFSET, text, emphasized),
     floor,

@@ -229,8 +229,21 @@ function celebrateBoost(
 // dropping) the other. Regular (non-special) crits never join this queue —
 // they're simply skipped while a special celebration is still due, rather
 // than piling up behind it (see triggerCritCelebration below)
-const specialCelebrationQueue: (() => void)[] = [];
+interface QueuedCelebration {
+  kind: "chain" | "boost";
+  queuedAt: number;
+  run: () => void;
+}
+const specialCelebrationQueue: QueuedCelebration[] = [];
 let drainingSpecialQueue = false;
+
+// a bulk-buy hold (x250 multiplier) can land many chain/boost procs far
+// faster than they can each get their own on-screen turn — anything still
+// waiting once it's this stale is long past the moment it actually happened,
+// so it's dropped rather than played back late; and only one of each kind is
+// ever queued at once (see the dedupe in triggerCritCelebration below), so a
+// pile of identical "Chain" procs never replays the same celebration on repeat
+const CELEBRATION_QUEUE_MAX_AGE_MS = 2000;
 
 function drainSpecialCelebrationQueue(): void {
   if (drainingSpecialQueue) return;
@@ -245,7 +258,11 @@ function drainSpecialCelebrationQueue(): void {
       drainingSpecialQueue = false;
       return;
     }
-    next();
+    if (Date.now() - next.queuedAt > CELEBRATION_QUEUE_MAX_AGE_MS) {
+      step();
+      return;
+    }
+    next.run();
     setTimeout(step, 100);
   };
   step();
@@ -270,15 +287,23 @@ export function triggerCritCelebration(
   boost = false,
 ): void {
   if (chain || boost) {
-    if (chain) {
-      specialCelebrationQueue.push(() =>
-        celebrateChain(floor, tier, getScreenCenterLocal),
-      );
+    const now = Date.now();
+    // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
+    // bulk-buy hold repeatedly rolling "chain") shouldn't queue up N replays
+    // of the identical celebration, just the first still-fresh one
+    if (chain && !specialCelebrationQueue.some((q) => q.kind === "chain")) {
+      specialCelebrationQueue.push({
+        kind: "chain",
+        queuedAt: now,
+        run: () => celebrateChain(floor, tier, getScreenCenterLocal),
+      });
     }
-    if (boost) {
-      specialCelebrationQueue.push(() =>
-        celebrateBoost(floor, tier, getScreenCenterLocal),
-      );
+    if (boost && !specialCelebrationQueue.some((q) => q.kind === "boost")) {
+      specialCelebrationQueue.push({
+        kind: "boost",
+        queuedAt: now,
+        run: () => celebrateBoost(floor, tier, getScreenCenterLocal),
+      });
     }
     drainSpecialCelebrationQueue();
     return;
