@@ -38,6 +38,9 @@ export function createParticlePool<T extends PoolParticle>(
   maxCount: number,
 ): ParticlePool<T> {
   const list: T[] = [];
+  // ring-buffer eviction cursor — see spawn() below for why this exists
+  // instead of Array.shift()
+  let nextEvictIndex = 0;
   let animationFrameId: number | null = null;
   let lastTick = 0;
 
@@ -52,14 +55,34 @@ export function createParticlePool<T extends PoolParticle>(
       return list.length;
     },
     spawn(item) {
-      if (list.length >= maxCount) list.shift();
-      list.push(item);
+      if (list.length < maxCount) {
+        list.push(item);
+        return;
+      }
+      // O(1) ring-buffer eviction: overwrite the oldest slot directly.
+      // Array.shift() is O(n) (re-indexes every remaining element) — once a
+      // sustained hold pins the pool at its cap (confirmed via the perf
+      // overlay: "coin bursts (floor): 500" stuck at max with FPS at 7), a
+      // single burst of 40-85 new particles was doing up to ~85 * 500
+      // element shifts EVERY spawn call, dozens of times a second. This was
+      // the actual mobile lag, not a leak — the array was correctly bounded,
+      // just extremely expensive to maintain at that bound.
+      list[nextEvictIndex] = item;
+      nextEvictIndex = (nextEvictIndex + 1) % maxCount;
     },
     update(dt, advance) {
       for (const p of list) advance(p, dt);
-      for (let i = list.length - 1; i >= 0; i--) {
-        if (list[i].life >= list[i].maxLife) list.splice(i, 1);
+      // single-pass in-place compaction instead of a reverse loop of
+      // list.splice(i, 1) calls — splice is the same O(n)-per-removal cost
+      // as shift(), just as bad here as it was in spawn() above
+      let writeIndex = 0;
+      for (let i = 0; i < list.length; i++) {
+        if (list[i].life < list[i].maxLife) list[writeIndex++] = list[i];
       }
+      list.length = writeIndex;
+      // ring-buffer position only matters between compactions; harmless (and
+      // necessary) to restart it clean right after one
+      nextEvictIndex = 0;
     },
     ensureTicking(step) {
       if (animationFrameId !== null) return;

@@ -20,8 +20,14 @@ const MAX_SPIN_RATE = 0.12;
 // full burst (40-85 particles) every ~10-50ms (see gameCanvas's
 // UPGRADE_HOLD_INTERVAL_MS), spawning particles far faster than a ~1-2s lifespan
 // lets them expire; without this cap a sustained hold grows the array (and every
-// frame's update/draw cost) without bound instead of settling at a steady state
-const MAX_PARTICLES = 500;
+// frame's update/draw cost) without bound instead of settling at a steady state.
+// Was 500 — confirmed via the perf overlay (real device: FPS 7, this pool
+// permanently pinned at 500 during a held Sale-boosted upgrade click) that even
+// with O(1) pool eviction, actually DRAWING 500 rotated/alpha-blended sprites
+// every single frame is too expensive for a weaker mobile GPU to sustain 60fps.
+// Lowered to a steady-state count that still reads as a dense money-rain effect
+// without being the frame's own bottleneck.
+const MAX_PARTICLES = 150;
 
 export async function loadCoinImage(): Promise<HTMLImageElement> {
   return loadCoinBurstImages();
