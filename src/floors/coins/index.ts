@@ -9,6 +9,7 @@ import {
   COIN_BILL_CHANCE,
   type CoinBurstSprite,
 } from "../../coinBurst";
+import { createParticlePool } from "../../shared/particlePool";
 
 // shared coin-burst particle system: any UI element (upgrade button, worker, ...) can
 // spawn a burst at a point and reuse the same rAF-driven physics + rendering
@@ -41,12 +42,10 @@ interface Particle extends CoinBurstSprite {
   spinDir: 1 | -1; // picked once per coin so a burst doesn't spin in lockstep
 }
 
-const particles: Particle[] = [];
-let animationFrameId: number | null = null;
-let lastTick = 0;
+const pool = createParticlePool<Particle>(MAX_PARTICLES);
 
 export function hasActiveCoins(): boolean {
-  return particles.length > 0;
+  return pool.hasActive();
 }
 
 // draws every particle onto a full-viewport overlay canvas (so a burst can never be
@@ -59,7 +58,7 @@ export function drawCoins(
     floor: Floor,
   ) => { left: number; top: number; width: number } | null,
 ): void {
-  for (const p of particles) {
+  for (const p of pool.list) {
     const rect = getFloorRect(p.floor);
     if (!rect) continue;
     const scale = rect.width / FLOOR_W;
@@ -74,21 +73,16 @@ export function drawCoins(
   ctx.globalAlpha = 1;
 }
 
-function updateCoins(dt: number): void {
-  for (const p of particles) {
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    // gravity ramps up with age so coins pop up, then drop heavily rather than
-    // floating — bills use a much gentler ramp (see gravityRamp's own comment)
-    // since paper flutters down instead of dropping like metal
-    p.vy += (p.gravity + p.life * p.gravityRamp) * dt;
-    p.vx *= Math.pow(0.96, dt);
-    p.life += dt;
-    p.spinFrame += p.spinDir * p.spinRate * dt;
-  }
-  for (let i = particles.length - 1; i >= 0; i--) {
-    if (particles[i].life >= particles[i].maxLife) particles.splice(i, 1);
-  }
+function advanceCoin(p: Particle, dt: number): void {
+  p.x += p.vx * dt;
+  p.y += p.vy * dt;
+  // gravity ramps up with age so coins pop up, then drop heavily rather than
+  // floating — bills use a much gentler ramp (see gravityRamp's own comment)
+  // since paper flutters down instead of dropping like metal
+  p.vy += (p.gravity + p.life * p.gravityRamp) * dt;
+  p.vx *= Math.pow(0.96, dt);
+  p.life += dt;
+  p.spinFrame += p.spinDir * p.spinRate * dt;
 }
 
 // spawns a coin burst at (x, y) — floor-local coordinates — and drives its own rAF
@@ -105,18 +99,13 @@ export function spawnCoinBurst(
 ): void {
   const count = randomInt(40, 85);
   for (let i = 0; i < count; i++) {
-    // evict the oldest particle instead of refusing to add new ones once at
-    // the cap — otherwise a sustained hold keeps the array pinned at the cap,
-    // so a later burst (e.g. the every-10th-upgrade milestone one) silently
-    // spawns nothing at all since there was never any room left for it
-    if (particles.length >= MAX_PARTICLES) particles.shift();
     // upward/outward hemisphere only (not fully random) so coins pop up and out
     // first, then arc back down under gravity instead of scattering downward too
     const angle = -Math.random() * Math.PI;
     const speed = (3 + Math.random() * 16) * scale;
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
-    particles.push({
+    pool.spawn({
       floor,
       x: x + (Math.random() - 0.5) * 20 * scale,
       y: y + (Math.random() - 0.5) * 20 * scale,
@@ -141,19 +130,8 @@ export function spawnCoinBurst(
     });
   }
 
-  startTickerIfNeeded(onFrame);
-}
-
-function startTickerIfNeeded(onFrame: () => void): void {
-  if (animationFrameId !== null) return;
-  lastTick = performance.now();
-  const tick = (now: number) => {
-    const dt = Math.max(0, Math.min((now - lastTick) / 16.67, 3));
-    lastTick = now;
-    updateCoins(dt);
+  pool.ensureTicking((dt) => {
+    pool.update(dt, advanceCoin);
     onFrame();
-    animationFrameId =
-      particles.length > 0 ? requestAnimationFrame(tick) : null;
-  };
-  animationFrameId = requestAnimationFrame(tick);
+  });
 }

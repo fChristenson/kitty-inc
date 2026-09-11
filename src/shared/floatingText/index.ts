@@ -1,4 +1,5 @@
 import { drawCartoonText } from "../../utils";
+import { createParticlePool, clampedDtSince } from "../particlePool";
 
 // a "+X"-style label that fades in, floats up, then fades back out — the one
 // shared implementation for BOTH floors/incomeFloatText's per-Floor "+$X"
@@ -85,17 +86,17 @@ export function drawFloatingTextParticle(
 }
 
 // the flat, no-Floor consumer for minigame rewards — every active label
-// lives in this one module-level list, ticked/drawn by drawActiveFloatingTexts
-// below (same shape as coinBurst.ts's own spawnCoinBurstAt/drawActiveCoinBursts)
+// lives in this one pool, ticked/drawn by drawActiveFloatingTexts below (same
+// shape as coinBurst.ts's own spawnCoinBurstAt/drawActiveCoinBursts)
 const FONT_PX = 16;
 const TOTAL_RISE_PX = 80;
 const RISE_PER_TICK = TOTAL_RISE_PX / FLOATING_TEXT_MAX_LIFE_TICKS;
 
-const activeTexts: FloatingTextParticle[] = [];
+const pool = createParticlePool<FloatingTextParticle>(100);
 let lastActiveUpdateAt: number | null = null;
 
 export function hasActiveFloatingTexts(): boolean {
-  return activeTexts.length > 0;
+  return pool.hasActive();
 }
 
 // shifts every currently-active label by dx — for a minigame whose own world
@@ -104,14 +105,14 @@ export function hasActiveFloatingTexts(): boolean {
 // (market events/platforms), so a spawned label scrolls off exactly like
 // everything else instead of hovering in place while the world moves past it
 export function shiftActiveFloatingTexts(dx: number): void {
-  for (const t of activeTexts) t.x -= dx;
+  for (const t of pool.list) t.x -= dx;
 }
 
 // spawns a "+X%" label (always leading with a +, since every caller today is
 // a positive reward) rising from (x, y) — whatever coordinate space the
 // caller's own canvas already draws in
 export function spawnFloatingText(x: number, y: number, percent: number): void {
-  activeTexts.push(createFloatingTextParticle(x, y, `+${percent.toFixed(2)}%`));
+  pool.spawn(createFloatingTextParticle(x, y, `+${percent.toFixed(2)}%`));
 }
 
 // call once per frame from the caller's own render loop, same convention as
@@ -121,15 +122,12 @@ export function drawActiveFloatingTexts(
   ctx: CanvasRenderingContext2D,
   now: number,
 ): void {
-  if (activeTexts.length === 0) {
+  if (!pool.hasActive()) {
     lastActiveUpdateAt = null;
     return;
   }
-  const dt = Math.max(
-    0,
-    Math.min((now - (lastActiveUpdateAt ?? now)) / 16.67, 3),
-  );
+  const dt = clampedDtSince(lastActiveUpdateAt, now);
   lastActiveUpdateAt = now;
-  updateFloatingTextParticles(activeTexts, dt, RISE_PER_TICK);
-  for (const t of activeTexts) drawFloatingTextParticle(ctx, t, FONT_PX);
+  updateFloatingTextParticles(pool.list, dt, RISE_PER_TICK);
+  for (const t of pool.list) drawFloatingTextParticle(ctx, t, FONT_PX);
 }

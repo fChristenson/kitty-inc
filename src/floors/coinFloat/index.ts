@@ -45,18 +45,10 @@ interface FloatingCoin {
   blinkIntensity: number;
 }
 
-const coins: FloatingCoin[] = [];
-// same hard cap floors/coins uses, for the same reason: on a slow/lagging device
-// the dt clamp below (max 3 ticks/frame) makes each coin's real-world lifetime
-// stretch out, so spawn rate can outpace decay rate for as long as any floor has
-// a boosted worker — without this, that grows the array (and every frame's
-// update/draw cost) without bound instead of settling at a steady state
-const MAX_COINS = 200;
-let animationFrameId: number | null = null;
-let lastTick = 0;
+const pool = createParticlePool<FloatingCoin>(200);
 
 export function hasActiveFloatingCoins(): boolean {
-  return coins.length > 0;
+  return pool.hasActive();
 }
 
 // how fast an urgent coin blinks (radians/tick, matching the life-based phase
@@ -67,7 +59,7 @@ export function drawFloatingCoins(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
 ): void {
-  for (const c of coins) {
+  for (const c of pool.list) {
     if (c.floor !== floor) continue;
     const y = c.y;
     const t = c.life / c.maxLife;
@@ -91,20 +83,15 @@ export function drawFloatingCoins(
   ctx.globalAlpha = 1;
 }
 
-function updateFloatingCoins(dt: number): void {
-  for (const c of coins) {
-    c.y += c.vy * dt;
-    c.life += dt;
-    // cone shape: each coin converges from its wide starting offset toward the
-    // center as it rises, with a small sway layered on top for an organic wobble
-    const t = Math.min(c.life / c.maxLife, 1);
-    const coneOffset = c.startOffset * (1 - t);
-    const wobble = Math.sin(c.life * 0.15 + c.wobblePhase) * 6;
-    c.x = c.originX + coneOffset + wobble;
-  }
-  for (let i = coins.length - 1; i >= 0; i--) {
-    if (coins[i].life >= coins[i].maxLife) coins.splice(i, 1);
-  }
+function advanceFloatingCoin(c: FloatingCoin, dt: number): void {
+  c.y += c.vy * dt;
+  c.life += dt;
+  // cone shape: each coin converges from its wide starting offset toward the
+  // center as it rises, with a small sway layered on top for an organic wobble
+  const t = Math.min(c.life / c.maxLife, 1);
+  const coneOffset = c.startOffset * (1 - t);
+  const wobble = Math.sin(c.life * 0.15 + c.wobblePhase) * 6;
+  c.x = c.originX + coneOffset + wobble;
 }
 
 // spawns a few coins that bubble up from (x, y) — floor-local coordinates — and
@@ -123,9 +110,7 @@ export function spawnFloatingCoins(
   for (let i = 0; i < count; i++) {
     const startOffset =
       (i - (count - 1) / 2) * spacing + (Math.random() - 0.5) * 15;
-    // evict the oldest coin instead of refusing new ones once at the cap
-    if (coins.length >= MAX_COINS) coins.shift();
-    coins.push({
+    pool.spawn({
       floor,
       x: x + startOffset,
       originX: x,
@@ -140,14 +125,8 @@ export function spawnFloatingCoins(
     });
   }
 
-  if (animationFrameId !== null) return;
-  lastTick = performance.now();
-  const tick = (now: number) => {
-    const dt = Math.max(0, Math.min((now - lastTick) / 16.67, 3));
-    lastTick = now;
-    updateFloatingCoins(dt);
+  pool.ensureTicking((dt) => {
+    pool.update(dt, advanceFloatingCoin);
     onFrame();
-    animationFrameId = coins.length > 0 ? requestAnimationFrame(tick) : null;
-  };
-  animationFrameId = requestAnimationFrame(tick);
+  });
 }

@@ -6,6 +6,7 @@ import {
   updateFloatingTextParticles,
   drawFloatingTextParticle,
 } from "../../shared/floatingText";
+import { createParticlePool } from "../../shared/particlePool";
 
 // a single "+$X"-style label that fades in, floats straight up, then fades back
 // out — spawned on the income bar for a "Sale" boost click (see
@@ -20,14 +21,7 @@ interface FloatingIncomeText extends FloatingTextParticle {
   floor: Floor;
 }
 
-const texts: FloatingIncomeText[] = [];
-// same hard cap floors/coinFloat and floors/coins use — without it, a slow
-// device's dt clamp (below) can make each label's real-world lifetime stretch
-// out enough for spawn rate to outpace decay over a long session, growing this
-// array (and its per-frame draw cost) without bound
-const MAX_TEXTS = 100;
-let animationFrameId: number | null = null;
-let lastTick = 0;
+const pool = createParticlePool<FloatingIncomeText>(100);
 
 // total distance it rises over its whole lifetime, spread evenly per tick
 const TOTAL_RISE_PX = 100;
@@ -42,14 +36,10 @@ export function drawIncomeFloatText(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
 ): void {
-  for (const t of texts) {
+  for (const t of pool.list) {
     if (t.floor !== floor) continue;
     drawFloatingTextParticle(ctx, t, BASE_FONT_PX, EMPHASIZED_SCALE);
   }
-}
-
-function updateIncomeFloatText(dt: number): void {
-  updateFloatingTextParticles(texts, dt, RISE_PER_TICK);
 }
 
 // spawns "+text" rising from (x, y) — floor-local coordinates — and drives its own
@@ -63,20 +53,12 @@ export function spawnIncomeFloatText(
   text: string,
   emphasized = false,
 ): void {
-  // evict the oldest label instead of refusing new ones once at the cap
-  if (texts.length >= MAX_TEXTS) texts.shift();
-  texts.push({
+  pool.spawn({
     ...createFloatingTextParticle(x, y - SPAWN_Y_OFFSET, text, emphasized),
     floor,
   });
 
-  if (animationFrameId !== null) return;
-  lastTick = performance.now();
-  const tick = (now: number) => {
-    const dt = Math.max(0, Math.min((now - lastTick) / 16.67, 3));
-    lastTick = now;
-    updateIncomeFloatText(dt);
-    animationFrameId = texts.length > 0 ? requestAnimationFrame(tick) : null;
-  };
-  animationFrameId = requestAnimationFrame(tick);
+  pool.ensureTicking((dt) => {
+    updateFloatingTextParticles(pool.list, dt, RISE_PER_TICK);
+  });
 }

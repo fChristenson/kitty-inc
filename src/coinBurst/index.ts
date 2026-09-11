@@ -1,5 +1,6 @@
 import { randomInt } from "../utils";
 import { loadSprite } from "../loadAssets";
+import { createParticlePool, clampedDtSince } from "../shared/particlePool";
 
 // shared coin/bill flipbook sprites + the actual particle physics/draw math —
 // floors/coins (particles glued to a specific Floor's own on-screen rect) and
@@ -89,27 +90,20 @@ export function createCoinBurstParticles(
   return out;
 }
 
-// advances every particle by dt (in ~16.67ms "ticks", not seconds — same unit
-// spawnCoinBurst's own random ranges above are tuned against) and prunes any
-// that have died; mutates particles in place (including removing dead ones)
-export function updateCoinBurstParticles(
-  particles: CoinBurstParticle[],
-  dt: number,
-): void {
-  for (const p of particles) {
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    // gravity ramps up with age so coins pop up, then drop heavily rather than
-    // floating — bills use a much gentler ramp (see gravityRamp's own comment)
-    // since paper flutters down instead of dropping like metal
-    p.vy += (p.gravity + p.life * p.gravityRamp) * dt;
-    p.vx *= Math.pow(0.96, dt);
-    p.life += dt;
-    p.spinFrame += p.spinDir * p.spinRate * dt;
-  }
-  for (let i = particles.length - 1; i >= 0; i--) {
-    if (particles[i].life >= particles[i].maxLife) particles.splice(i, 1);
-  }
+// per-particle physics for one dt (in ~16.67ms "ticks", not seconds — same
+// unit spawnCoinBurst's own random ranges above are tuned against); pruning
+// expired particles is the pool's own job (see shared/particlePool), not this
+// function's
+function advanceCoinBurstParticle(p: CoinBurstParticle, dt: number): void {
+  p.x += p.vx * dt;
+  p.y += p.vy * dt;
+  // gravity ramps up with age so coins pop up, then drop heavily rather than
+  // floating — bills use a much gentler ramp (see gravityRamp's own comment)
+  // since paper flutters down instead of dropping like metal
+  p.vy += (p.gravity + p.life * p.gravityRamp) * dt;
+  p.vx *= Math.pow(0.96, dt);
+  p.life += dt;
+  p.spinFrame += p.spinDir * p.spinRate * dt;
 }
 
 // draws one coin/bill particle centered at (x, y) with the given on-screen
@@ -156,29 +150,20 @@ export function drawCoinBurstFrame(
 // the actually-simple API: no Floor, no ctx, no page dependency — a position
 // (and, optionally, a scale — 1 is tuned for a full building-width canvas;
 // pass smaller for a smaller one) is all spawning needs. Every active burst
-// everywhere lives in this one module-level list, ticked/drawn by
-// drawActiveCoinBursts below
-const activeParticles: CoinBurstParticle[] = [];
+// everywhere lives in this one pool, ticked/drawn by drawActiveCoinBursts
+// below — pruning only happens there, which only runs while whichever screen
+// spawned a burst (the city map, the press conference minigame) is actually
+// being redrawn, so the pool's own cap (not just per-particle expiry) is what
+// keeps a burst spawned right as that screen closes from accumulating forever
+const pool = createParticlePool<CoinBurstParticle>(500);
 let lastActiveUpdateAt: number | null = null;
-// same cap floors/coins's own particle array uses, and for the same reason:
-// pruning only happens inside drawActiveCoinBursts, which only runs while
-// whichever screen spawned a burst (the city map, the press conference
-// minigame) is actually being redrawn — a burst spawned right as that screen
-// closes is left mid-life, un-pruned, until it's opened again. Without a cap,
-// enough of these across a long session (repeatedly opening the map, playing
-// several press conference rounds) let this array grow without bound, since
-// nothing else ever clears it between sessions
-const MAX_ACTIVE_PARTICLES = 500;
 
 export function hasActiveCoinBursts(): boolean {
-  return activeParticles.length > 0;
+  return pool.hasActive();
 }
 
 export function spawnCoinBurstAt(x: number, y: number, scale = 1): void {
   for (const p of createCoinBurstParticles(x, y)) {
-    // evict the oldest particle instead of growing unbounded — see
-    // MAX_ACTIVE_PARTICLES above
-    if (activeParticles.length >= MAX_ACTIVE_PARTICLES) activeParticles.shift();
     // scales position (relative to the spawn point, so the burst still
     // starts exactly at x,y), velocity, size, and gravity together, so a
     // smaller-scale burst is a uniformly shrunk version of the same burst,
@@ -190,7 +175,7 @@ export function spawnCoinBurstAt(x: number, y: number, scale = 1): void {
     p.size *= scale;
     p.gravity *= scale;
     p.gravityRamp *= scale;
-    activeParticles.push(p);
+    pool.spawn(p);
   }
 }
 
@@ -202,17 +187,14 @@ export function drawActiveCoinBursts(
   ctx: CanvasRenderingContext2D,
   now: number,
 ): void {
-  if (activeParticles.length === 0) {
+  if (!pool.hasActive()) {
     lastActiveUpdateAt = null;
     return;
   }
-  const dt = Math.max(
-    0,
-    Math.min((now - (lastActiveUpdateAt ?? now)) / 16.67, 3),
-  );
+  const dt = clampedDtSince(lastActiveUpdateAt, now);
   lastActiveUpdateAt = now;
-  updateCoinBurstParticles(activeParticles, dt);
-  for (const p of activeParticles) {
+  pool.update(dt, advanceCoinBurstParticle);
+  for (const p of pool.list) {
     const t = p.life / p.maxLife;
     const radius = p.size * (1 - t * 0.3);
     ctx.globalAlpha = Math.max(0, 1 - t);
