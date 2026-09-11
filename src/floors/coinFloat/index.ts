@@ -51,6 +51,10 @@ export function hasActiveFloatingCoins(): boolean {
   return pool.hasActive();
 }
 
+export function getActiveFloatingCoinsCount(): number {
+  return pool.count();
+}
+
 // how fast an urgent coin blinks (radians/tick, matching the life-based phase
 // other per-particle wobble/spin uses elsewhere in this file)
 const BLINK_RATE = 0.525;

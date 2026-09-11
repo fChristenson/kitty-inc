@@ -60,6 +60,7 @@ import {
 import { activateBoosted, type Floor } from "../../gameState";
 import { multiply } from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
+export { getSpecialCelebrationQueueLength } from "./critCelebration";
 
 export interface FloorActionsDeps {
   floors: Floor[];

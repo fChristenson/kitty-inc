@@ -99,6 +99,10 @@ export function hasActiveFloatingTexts(): boolean {
   return pool.hasActive();
 }
 
+export function getActiveFloatingTextsCount(): number {
+  return pool.count();
+}
+
 // shifts every currently-active label by dx — for a minigame whose own world
 // scrolls left under a fixed head/camera, call this every step with the same
 // per-frame scroll delta already applied to that game's own world elements

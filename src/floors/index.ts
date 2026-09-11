@@ -304,6 +304,7 @@ export {
 export {
   drawCoins,
   hasActiveCoins,
+  getActiveCoinsCount,
   spawnCoinBurst,
   loadCoinImage,
 } from "./coins";
@@ -312,6 +313,7 @@ export {
   handleFloorClick,
   isUpgradeButtonEnabled,
   applyChainCrit,
+  getSpecialCelebrationQueueLength,
 } from "./floorInteractions";
 export type { ChainCritDeps } from "./floorInteractions";
 export {
@@ -364,5 +366,10 @@ export {
   spawnFloatingCoins,
   drawFloatingCoins,
   loadFloatingCoinImage,
+  getActiveFloatingCoinsCount,
 } from "./coinFloat";
-export { spawnIncomeFloatText, drawIncomeFloatText } from "./incomeFloatText";
+export {
+  spawnIncomeFloatText,
+  drawIncomeFloatText,
+  getActiveIncomeFloatTextCount,
+} from "./incomeFloatText";

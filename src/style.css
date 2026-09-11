@@ -381,6 +381,27 @@ body {
   overflow-y: auto;
 }
 
+/* dev-only diagnostic HUD (see hud/perfOverlay) — bottom-left, clear of the
+   action bar/dialogs above and the test-actions-bar (top-left) */
+.perf-overlay {
+  position: absolute;
+  bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  left: calc(0.75rem + env(safe-area-inset-left));
+  z-index: 100;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.75);
+  color: var(--color-money-green);
+  font-family: monospace;
+  font-size: 0.75rem;
+  white-space: pre;
+  border-radius: 0.5rem;
+  pointer-events: none;
+}
+
+.perf-overlay[hidden] {
+  display: none;
+}
+
 .game__button {
   padding: 0.9rem;
   font-size: 1rem;

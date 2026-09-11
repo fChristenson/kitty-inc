@@ -74,6 +74,9 @@ import {
   wirePayTaxesTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
+  wireTogglePerfOverlayButton,
+  createPerfOverlayMarkup,
+  wirePerfOverlay,
   createActionBarMarkup,
   wireActionBar,
   createUpgradeMenuMarkup,
@@ -145,6 +148,7 @@ async function main() {
       ${createCityMapMarkup()}
       ${createActionBarMarkup()}
       ${import.meta.env.MODE !== "production" ? createTestButtonMarkup() : ""}
+      ${createPerfOverlayMarkup()}
     </div>
     ${createUpgradeMenuMarkup()}
     ${createFloorUpgradeMenuMarkup()}
@@ -428,6 +432,16 @@ async function main() {
       totalEarnedOverlay.show(fromNumber(123456)),
     );
     wireResetButton(app, buildings);
+    const perfOverlay = wirePerfOverlay(app);
+    perfOverlay.setVisible(true);
+    wireTogglePerfOverlayButton(app, () => perfOverlay.toggle());
+  } else {
+    // a PWA launches from a fixed manifest start_url, not whatever URL the
+    // player happens to type — a query param can't be relied on to toggle
+    // this, so it just defaults on until the reported prod-only bug is
+    // actually diagnosed
+    const perfOverlay = wirePerfOverlay(app);
+    perfOverlay.setVisible(true);
   }
   const upgradeMenu = wireUpgradeMenu(
     app,

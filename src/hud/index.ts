@@ -99,7 +99,10 @@ export {
   wirePayTaxesTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
+  wireTogglePerfOverlayButton,
 } from "./testButton";
+export { createPerfOverlayMarkup, wirePerfOverlay } from "./perfOverlay";
+export type { PerfOverlay } from "./perfOverlay";
 export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
 export type { UpgradeMenu } from "./upgradeMenu";
 export {

@@ -18,6 +18,9 @@ export interface PoolParticle {
 export interface ParticlePool<T extends PoolParticle> {
   readonly list: T[];
   hasActive(): boolean;
+  // current particle count — for debug/perf overlays that want to show a
+  // live number, not just a boolean
+  count(): number;
   // adds `item`, evicting the OLDEST particle first if already at `maxCount` —
   // this is the actual leak fix; refusing new particles instead would let a
   // high-frequency spawner (e.g. a held button) starve a rarer one out entirely
@@ -45,6 +48,9 @@ export function createParticlePool<T extends PoolParticle>(
   return {
     list,
     hasActive,
+    count() {
+      return list.length;
+    },
     spawn(item) {
       if (list.length >= maxCount) list.shift();
       list.push(item);
