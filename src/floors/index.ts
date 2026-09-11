@@ -311,7 +311,9 @@ export {
   hitTestFloorHover,
   handleFloorClick,
   isUpgradeButtonEnabled,
+  applyChainCrit,
 } from "./floorInteractions";
+export type { ChainCritDeps } from "./floorInteractions";
 export {
   drawWorker,
   getBoostedWorkerCenters,
@@ -341,6 +343,7 @@ export {
   forceCritUpgrade,
   forceMegaCritUpgrade,
   forceUltraCritUpgrade,
+  forceChainCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,
   pickHigherCritTier,
@@ -352,6 +355,7 @@ export {
   triggerOvertimeBoost,
   isOvertimeActive,
   CRIT_TIER_CONFIG,
+  CHAIN_CRIT_CONTINUE_CHANCE,
 } from "./upgradeButton";
 export type { CritTier } from "./upgradeButton";
 export {

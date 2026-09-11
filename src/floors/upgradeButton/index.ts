@@ -351,45 +351,71 @@ export function getUniformCritTier(floors: Floor[]): CritTier | null {
 }
 
 const critTiers = new WeakMap<Floor, CritTier>();
+// an extra flag layered on top of an armed critTiers entry (never set without
+// one) — see rollCritUpgrade below. A chain crit is not its own CritTier/color;
+// it reuses whichever of crit/mega/ultra actually landed, just extends that
+// SAME upgrade to neighboring floors too (see floorInteractions.ts)
+const chainCrits = new WeakSet<Floor>();
+const CHAIN_CRIT_CHANCE = CONFIG.crit.chainChance;
+// odds a chain crit keeps climbing to the NEXT floor after each one it already
+// applied to — see floorInteractions.ts's applyChainCrit
+export const CHAIN_CRIT_CONTINUE_CHANCE = CONFIG.crit.chainContinueChance;
 
 // call once per completed upgrade click (crit or normal) to roll the next one —
-// rarest tier checked first, so a click can never land more than one tier at once
+// rarest tier checked first, so a click can never land more than one tier at once.
+// Whenever a tier actually lands, this also rolls an ADDITIONAL, independent
+// chance for it to become a "chain crit" (see CONFIG.crit.chainChance) — chain
+// can only ever ride along with a real tier hit, never occur on its own
 export function rollCritUpgrade(floor: Floor): void {
   if (Math.random() < CRIT_TIER_CONFIG.ultra.chance) {
     critTiers.set(floor, "ultra");
+    if (Math.random() < CHAIN_CRIT_CHANCE) chainCrits.add(floor);
     return;
   }
   if (Math.random() < CRIT_TIER_CONFIG.mega.chance) {
     critTiers.set(floor, "mega");
+    if (Math.random() < CHAIN_CRIT_CHANCE) chainCrits.add(floor);
     return;
   }
-  if (Math.random() < CRIT_TIER_CONFIG.crit.chance)
+  if (Math.random() < CRIT_TIER_CONFIG.crit.chance) {
     critTiers.set(floor, "crit");
+    if (Math.random() < CHAIN_CRIT_CHANCE) chainCrits.add(floor);
+  }
 }
 
 // same odds/tiers as rollCritUpgrade, but a one-shot roll (not tied to any Floor's
 // "next click" telegraph) for a floor-unlock purchase — see floorInteractions.ts's
-// hitTestFloorLock branch. Returns null on a miss (the common case). A forced tier
-// (see forceFloorBuyCrit below) always wins and is consumed on the very next call
-let forcedFloorBuyCrit: CritTier | null = null;
-
-export function rollFloorBuyCrit(): CritTier | null {
-  if (forcedFloorBuyCrit) {
-    const tier = forcedFloorBuyCrit;
-    forcedFloorBuyCrit = null;
-    return tier;
-  }
-  if (Math.random() < CRIT_TIER_CONFIG.ultra.chance) return "ultra";
-  if (Math.random() < CRIT_TIER_CONFIG.mega.chance) return "mega";
-  if (Math.random() < CRIT_TIER_CONFIG.crit.chance) return "crit";
-  return null;
+// hitTestFloorLock branch, and cityMap.ts's own new-building purchase, which
+// shares this exact same roll. Returns null on a miss (the common case); a hit
+// also rolls the same CHAIN_CRIT_CHANCE as rollCritUpgrade. A forced tier (see
+// forceFloorBuyCrit below) always wins and is consumed on the very next call
+export interface FloorBuyCritResult {
+  tier: CritTier;
+  chain: boolean;
 }
 
-// dev/test-only: guarantees the NEXT floor bought crits at this tier, bypassing
-// chance entirely (see hud/testButton's "Floor Crit"/"Floor Mega Crit"/"Floor
-// Ultra Crit")
-export function forceFloorBuyCrit(tier: CritTier): void {
-  forcedFloorBuyCrit = tier;
+let forcedFloorBuyCrit: FloorBuyCritResult | null = null;
+
+export function rollFloorBuyCrit(): FloorBuyCritResult | null {
+  if (forcedFloorBuyCrit) {
+    const result = forcedFloorBuyCrit;
+    forcedFloorBuyCrit = null;
+    return result;
+  }
+  let tier: CritTier | null = null;
+  if (Math.random() < CRIT_TIER_CONFIG.ultra.chance) tier = "ultra";
+  else if (Math.random() < CRIT_TIER_CONFIG.mega.chance) tier = "mega";
+  else if (Math.random() < CRIT_TIER_CONFIG.crit.chance) tier = "crit";
+  if (!tier) return null;
+  return { tier, chain: Math.random() < CHAIN_CRIT_CHANCE };
+}
+
+// dev/test-only: guarantees the NEXT floor bought (or building bought — both
+// share this same roll) crits at this tier, bypassing chance entirely (see
+// hud/testButton's "Floor Crit"/"Floor Mega Crit"/"Floor Ultra Crit"/"Map
+// Unlock Crit"/etc. and their own "Chain" siblings)
+export function forceFloorBuyCrit(tier: CritTier, chain = false): void {
+  forcedFloorBuyCrit = { tier, chain };
 }
 
 export function getCritTier(floor: Floor): CritTier | null {
@@ -400,9 +426,16 @@ export function isCritUpgrade(floor: Floor): boolean {
   return critTiers.has(floor);
 }
 
+// whether the CURRENTLY ARMED crit (if any) is also a chain crit — see
+// rollCritUpgrade/floorInteractions.ts's plain-click crit branch
+export function isChainCrit(floor: Floor): boolean {
+  return chainCrits.has(floor);
+}
+
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
+  chainCrits.delete(floor);
 }
 
 // dev/test-only: force this floor's button into a crit state right away,
@@ -418,6 +451,19 @@ export function forceMegaCritUpgrade(floor: Floor): void {
 
 export function forceUltraCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "ultra");
+}
+
+// dev/test-only: force this floor into a chain crit at the given tier
+// (default "crit"), bypassing both the crit chance AND the 0.01% chain chance
+// (see hud/testButton's "Spawn Chain Crit"/"Spawn Chain Mega Crit"/"Spawn Chain
+// Ultra Crit") — the chain behavior itself doesn't depend on which tier chains,
+// tier only changes how many free upgrades each chained floor gets
+export function forceChainCritUpgrade(
+  floor: Floor,
+  tier: CritTier = "crit",
+): void {
+  critTiers.set(floor, tier);
+  chainCrits.add(floor);
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see

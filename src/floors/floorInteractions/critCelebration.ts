@@ -25,7 +25,14 @@ export function triggerCritCelebration(
   floor: Floor,
   tier: CritTier,
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+  chain = false,
 ): void {
+  // chain crit (see upgradeButton.ts's isChainCrit/rollFloorBuyCrit's own chain
+  // flag): the flash shows the word "Chain" instead of the tier's usual "x5"/
+  // "x25"/"x125" number the instant the crit actually happens — this is a
+  // celebration-moment-only swap, the upgrade button's own idle/armed label is
+  // untouched and still always shows the plain tier label
+  const label = (tierLabel: string) => (chain ? "Chain" : tierLabel);
   if (tier === "ultra") {
     // blinkHz strobes the flash text on/off during its holdMs "stick" phase, on
     // top of its regular grow/fade animation. holdMs is deliberately an EXACT
@@ -44,7 +51,7 @@ export function triggerCritCelebration(
     // mega/crit rolling moments later (see triggerScreenShake's own suppression)
     triggerScreenShake({
       intensity: 2.6,
-      label: CRIT_TIER_CONFIG.ultra.label,
+      label: label(CRIT_TIER_CONFIG.ultra.label),
       color: COLOR.red,
       strokeWidth: 16,
       blinkHz: 6,
@@ -57,7 +64,7 @@ export function triggerCritCelebration(
     // ultra celebration (priority 2)
     triggerScreenShake({
       intensity: 1.8,
-      label: CRIT_TIER_CONFIG.mega.label,
+      label: label(CRIT_TIER_CONFIG.mega.label),
       color: COLOR.amber,
       strokeWidth: 14,
       priority: 1,
@@ -67,7 +74,7 @@ export function triggerCritCelebration(
     // priority 0 (the default): the only tier that can ever get suppressed by
     // a still-playing mega/ultra flash, so those bigger moments are never
     // stepped on by an immediately-following ordinary crit
-    triggerScreenShake({ label: CRIT_TIER_CONFIG.crit.label });
+    triggerScreenShake({ label: label(CRIT_TIER_CONFIG.crit.label) });
     playCoinDrop();
     playExplosion();
   }

@@ -48,6 +48,12 @@ export const CONFIG = {
     crit: { chance: 0.05, multiplier: 5 },
     mega: { chance: 0.01, multiplier: 25 },
     ultra: { chance: 0.001, multiplier: 125 },
+    // "chain crit" — an extra roll on top of an already-landed crit/mega/ultra
+    // (see rollCritUpgrade): applies that same tier's upgrade to the next floor
+    // too, then has chainContinueChance to keep going up the building one floor
+    // at a time
+    chainChance: 0.05,
+    chainContinueChance: 0.5,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

@@ -99,8 +99,14 @@ export interface CityMapDeps {
   // on that building's own purchase (see rollFloorBuyCrit below). Does NOT
   // unlock anything itself; a locked floor still has to be bought normally,
   // it'll just already be that tier once it is (any brand new floor added
-  // after this also inherits it, see floorLock.ts's ensureLockedFloorAbove)
-  setBuildingCritTier: (buildingIndex: number, tier: CritTier) => void;
+  // after this also inherits it, see floorLock.ts's ensureLockedFloorAbove).
+  // `chain` (see rollFloorBuyCrit's own chain flag) additionally keeps
+  // promoting/auto-unlocking floors ABOVE this building's current floor list
+  setBuildingCritTier: (
+    buildingIndex: number,
+    tier: CritTier,
+    chain: boolean,
+  ) => void;
   onSelectBuilding: (index: number) => void; // switch to that building and leave the map view
   // fires once the corporation barrel roll settles on a different company (see
   // rollCorporationSelection) so main.ts can swap in that company's own separate
@@ -447,6 +453,7 @@ export function createCityMapView(
     tier: CritTier,
     cx: number,
     feetY: number,
+    chain: boolean,
   ): void {
     const burstY = feetY - MARKER_H / 2;
     const burstCount = tier === "ultra" ? 5 : tier === "mega" ? 3 : 2;
@@ -455,10 +462,14 @@ export function createCityMapView(
         spawnCoinBurstAt(cx, burstY, MARKER_COIN_BURST_SCALE * 1.5);
       }, i * 90);
     }
+    // chain crit: the flash shows "Chain" instead of the tier's usual "x5"/
+    // "x25"/"x125" number, same swap floorInteractions.ts's own
+    // triggerCritCelebration does for the other 2 crit events
+    const label = (tierLabel: string) => (chain ? "Chain" : tierLabel);
     if (tier === "ultra") {
       triggerScreenShake({
         intensity: 2.6,
-        label: CRIT_TIER_CONFIG.ultra.label,
+        label: label(CRIT_TIER_CONFIG.ultra.label),
         color: COLOR.red,
         strokeWidth: 16,
         blinkHz: 6,
@@ -469,13 +480,13 @@ export function createCityMapView(
     } else if (tier === "mega") {
       triggerScreenShake({
         intensity: 1.8,
-        label: CRIT_TIER_CONFIG.mega.label,
+        label: label(CRIT_TIER_CONFIG.mega.label),
         color: COLOR.amber,
         priority: 1,
       });
       playJackpot();
     } else {
-      triggerScreenShake({ label: CRIT_TIER_CONFIG.crit.label });
+      triggerScreenShake({ label: label(CRIT_TIER_CONFIG.crit.label) });
       playCoinDrop();
       playExplosion();
     }
@@ -517,11 +528,12 @@ export function createCityMapView(
         // rare bonus, same one-shot roll a floor-unlock purchase uses — a hit
         // sets every floor this brand new building already has to that tier
         // (still just the one free ground floor + the one locked floor
-        // already queued above it — nothing gets unlocked for free)
+        // already queued above it — nothing gets unlocked for free, except
+        // whatever a chain crit additionally climbs into above that)
         const buyTier = rollFloorBuyCrit();
         if (buyTier) {
-          deps.setBuildingCritTier(globalIndex, buyTier);
-          triggerMapCatCritCelebration(buyTier, cx, feetY);
+          deps.setBuildingCritTier(globalIndex, buyTier.tier, buyTier.chain);
+          triggerMapCatCritCelebration(buyTier.tier, cx, feetY, buyTier.chain);
         }
       }
       redraw();

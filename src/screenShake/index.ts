@@ -6,6 +6,15 @@
 
 import { drawCartoonText, shadeColor } from "../utils";
 import { COLOR } from "../palette";
+import { loadImageByName } from "../loadAssets";
+
+// preloaded once at module load (well before a player can ever land a chain
+// crit) — drawCritFlash below draws this behind the "Chain" flash text; null
+// until the fetch/decode resolves, in which case that draw is just skipped
+let chainIcon: HTMLImageElement | null = null;
+loadImageByName("chain").then((image) => {
+  chainIcon = image;
+});
 
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
@@ -255,6 +264,19 @@ export function drawCritFlash(
   ctx.font = font;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
+  // chain crit's own backdrop icon, drawn behind everything else — same
+  // translate/scale/alpha as the text itself (so it pops in/fades together
+  // with it), but rotated an extra fixed 45deg of its own on top of the
+  // text's animated entrance rotation, scoped to its own save/restore so
+  // that extra spin doesn't also rotate the bloom/text drawn after it
+  if (flashLabel === "Chain" && chainIcon) {
+    const iconW = measuredWidth * 1.4 * 0.75;
+    const iconH = iconW * (chainIcon.height / chainIcon.width);
+    ctx.save();
+    ctx.rotate(Math.PI / 4);
+    ctx.drawImage(chainIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+    ctx.restore();
+  }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen
   // blur convolution) — recomputing it via fillText every single animation

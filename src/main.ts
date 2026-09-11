@@ -13,8 +13,11 @@ import {
   forceCritUpgrade,
   forceMegaCritUpgrade,
   forceUltraCritUpgrade,
+  forceChainCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
+  applyChainCrit,
+  CHAIN_CRIT_CONTINUE_CHANCE,
   type CritTier,
 } from "./floors";
 import {
@@ -49,12 +52,21 @@ import {
   wireSpawnCritButton,
   wireSpawnMegaCritButton,
   wireSpawnUltraCritButton,
+  wireSpawnChainCritButton,
+  wireSpawnChainMegaCritButton,
+  wireSpawnChainUltraCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyMegaCritButton,
   wireFloorBuyUltraCritButton,
+  wireFloorBuyChainCritButton,
+  wireFloorBuyChainMegaCritButton,
+  wireFloorBuyChainUltraCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
+  wireMapUnlockChainCritButton,
+  wireMapUnlockChainMegaCritButton,
+  wireMapUnlockChainUltraCritButton,
   wirePressConferenceTestButton,
   wireLiquidateAssetsTestButton,
   wirePayTaxesTestButton,
@@ -367,12 +379,36 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceUltraCritUpgrade(floor);
     });
+    wireSpawnChainCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceChainCritUpgrade(floor, "crit");
+    });
+    wireSpawnChainMegaCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceChainCritUpgrade(floor, "mega");
+    });
+    wireSpawnChainUltraCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceChainCritUpgrade(floor, "ultra");
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireFloorBuyUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
+    wireFloorBuyChainCritButton(app, () => forceFloorBuyCrit("crit", true));
+    wireFloorBuyChainMegaCritButton(app, () => forceFloorBuyCrit("mega", true));
+    wireFloorBuyChainUltraCritButton(app, () =>
+      forceFloorBuyCrit("ultra", true),
+    );
     wireMapUnlockCritButton(app, () => forceFloorBuyCrit("crit"));
     wireMapUnlockMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireMapUnlockUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
+    wireMapUnlockChainCritButton(app, () => forceFloorBuyCrit("crit", true));
+    wireMapUnlockChainMegaCritButton(app, () =>
+      forceFloorBuyCrit("mega", true),
+    );
+    wireMapUnlockChainUltraCritButton(app, () =>
+      forceFloorBuyCrit("ultra", true),
+    );
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     wireLiquidateAssetsTestButton(app, () => liquidateAssetsGame.open());
     wirePayTaxesTestButton(app, () => payTaxesGame.open());
@@ -495,11 +531,64 @@ async function main() {
   // crit celebration). A brand new building only has its one free ground floor
   // + the one locked floor already queued above it at this point; any floor
   // added later inherits this same tier automatically (see floorLock.ts's
-  // ensureLockedFloorAbove)
-  function setBuildingCritTier(buildingIndex: number, tier: CritTier): void {
+  // ensureLockedFloorAbove). `chain` (see rollFloorBuyCrit's own chain flag)
+  // additionally UNLOCKS that already-queued locked floor (it already got the
+  // tier from the loop below, but was still sitting locked) and keeps climbing
+  // further above it — same "chain crit" behavior the other 2 crit events
+  // share. Chain must start from index 0 (the ground floor), NOT
+  // floors.length-1 — the walker's first step lands on startIndex+1, and the
+  // queued locked floor is always index 1 at this point (a brand new building
+  // is always exactly [ground, one queued locked floor] here), so starting
+  // any later just skips over it and the chain never actually unlocks anything
+  function applyBuildingCritTier(
+    buildingIndex: number,
+    tier: CritTier,
+    chain: boolean,
+  ): void {
     const floors = buildings[buildingIndex];
     if (!floors) return;
     for (const floor of floors) floor.critMultiplierTier = tier;
+    if (!chain) return;
+    applyChainCrit(
+      {
+        floors,
+        backgroundCount: getBackgroundUrls().length,
+        multiplier: getBuildingMultiplier(buildingIndex),
+        onFloorAdded: (floor) => {
+          if (buildingIndex === activeBuildingIndex) {
+            gameCanvas.notifyFloorAdded(floor);
+          }
+        },
+      },
+      0,
+      (floor) => {
+        floor.critMultiplierTier = tier;
+      },
+    );
+  }
+  // a chain crit ALWAYS has at least +1 impact area — same guarantee
+  // applyChainCrit's own floor walker already gives (its first extra floor is
+  // unconditional, only whether it keeps going past that is a coin flip).
+  // "The building" being unlocked for THIS event is a whole building, not a
+  // floor, so a chain here must always unlock at least one MORE building
+  // (free, same tier, its own floor-chain too) — only whether it climbs PAST
+  // that first extra building is CHAIN_CRIT_CONTINUE_CHANCE
+  function setBuildingCritTier(
+    buildingIndex: number,
+    tier: CritTier,
+    chain: boolean,
+  ): void {
+    applyBuildingCritTier(buildingIndex, tier, chain);
+    if (chain) {
+      let continueChain = true;
+      while (continueChain) {
+        const nextIndex = buildings.length;
+        buildings.push(createBuilding(nextIndex, getBackgroundUrls().length));
+        setupBuilding(nextIndex);
+        applyBuildingCritTier(nextIndex, tier, chain);
+        continueChain = Math.random() < CHAIN_CRIT_CONTINUE_CHANCE;
+      }
+    }
     persist();
   }
   // the old building-picker popup is kept wired (backdrop/list still functional)

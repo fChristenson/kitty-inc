@@ -6,6 +6,7 @@ import {
   triggerButtonPress,
   isCritUpgrade,
   getCritTier,
+  isChainCrit,
   consumeCritUpgrade,
   rollCritUpgrade,
   rollFloorBuyCrit,
@@ -23,6 +24,7 @@ import {
   resetOvertimeTicks,
   isUpgradeButtonEnabled,
   CRIT_TIER_CONFIG,
+  CHAIN_CRIT_CONTINUE_CHANCE,
   floorIncomePerSecond,
   SALE_INCOME_MULTIPLIER,
   BTN_W,
@@ -130,6 +132,53 @@ function applyUpgradeTick(floor: Floor, isGroundFloor: boolean): void {
   }
 }
 
+// minimal deps a chain crit needs to grow a building while walking upward —
+// a subset of FloorActionsDeps so non-floors callers (cityMap.ts's own
+// building-unlock crit, via main.ts) don't need that type's unrelated fields
+export interface ChainCritDeps {
+  floors: Floor[];
+  backgroundCount: number;
+  multiplier: number;
+  onFloorAdded: (floor: Floor) => void;
+}
+
+// "chain crit" (see upgradeButton.ts's rollCritUpgrade/isChainCrit/
+// rollFloorBuyCrit's own chain flag): extends whatever reward `applyToFloor`
+// represents onto the floor directly above the one that crit, unconditionally,
+// then keeps climbing one floor at a time as long as CHAIN_CRIT_CONTINUE_CHANCE
+// keeps rolling true. A locked floor in its path is auto-unlocked for free (no
+// cost charged, no separate floor-buy crit roll of its own) before getting the
+// reward applied. Stops the instant it runs past the building's own floor cap
+// (no next floor left to queue, see ensureLockedFloorAbove's own
+// MAX_FLOORS_PER_BUILDING guard) — shared by all 3 crit-rolling events (a plain
+// upgrade click, unlocking a floor, and cityMap.ts's own unlocking a building),
+// each supplying its own `applyToFloor` reward (free upgrade ticks vs a
+// permanent critMultiplierTier promotion)
+export function applyChainCrit(
+  deps: ChainCritDeps,
+  startIndex: number,
+  applyToFloor: (floor: Floor, isGroundFloor: boolean) => void,
+): void {
+  const { floors, backgroundCount, multiplier, onFloorAdded } = deps;
+  let index = startIndex + 1;
+  for (;;) {
+    if (index >= floors.length) return;
+    const target = floors[index];
+    if (!target.unlocked) {
+      unlockFloor(target);
+      ensureLockedFloorAbove({
+        floors,
+        backgroundCount,
+        multiplier,
+        onAdd: onFloorAdded,
+      });
+    }
+    applyToFloor(target, index === 0);
+    index += 1;
+    if (Math.random() >= CHAIN_CRIT_CONTINUE_CHANCE) return;
+  }
+}
+
 // handles a click at floor-local (x, y): unlocking, upgrading, or clicking a worker.
 // every hit test/mutation here is identical to the old per-canvas click listener,
 // just no longer tied to any one floor owning its own DOM canvas + event listener
@@ -189,15 +238,32 @@ export function handleFloorClick(
       // something rarer still. Rolled before persist() so a hit is captured in
       // the same save
       const buyTier = rollFloorBuyCrit();
-      if (buyTier)
+      if (buyTier) {
         floor.critMultiplierTier = pickHigherCritTier(
           floor.critMultiplierTier,
-          buyTier,
+          buyTier.tier,
         );
+        // chain crit (see rollFloorBuyCrit): promotes the SAME tier onto the
+        // floor(s) above too, instead of just the one just unlocked
+        if (buyTier.chain) {
+          applyChainCrit(deps, floors.indexOf(floor), (target) => {
+            target.critMultiplierTier = pickHigherCritTier(
+              target.critMultiplierTier,
+              buyTier.tier,
+            );
+          });
+        }
+      }
       persist();
       const center = getLockCenter();
       spawnCoinBurst(floor, center.x, center.y, () => {});
-      if (buyTier) triggerCritCelebration(floor, buyTier, getScreenCenterLocal);
+      if (buyTier)
+        triggerCritCelebration(
+          floor,
+          buyTier.tier,
+          getScreenCenterLocal,
+          buyTier.chain,
+        );
     }
     return;
   }
@@ -295,17 +361,28 @@ export function handleFloorClick(
     // the slot-machine jackpot moment: free, costs nothing, applies that tier's
     // upgrade count at once, and celebrates with the same shake/flash/sfx/bursts
     // treatment as any other crit (see triggerCritCelebration) — mega/ultra are
-    // the rarer, bigger-payout tiers (see upgradeButton.ts's rollCritUpgrade)
+    // the rarer, bigger-payout tiers (see upgradeButton.ts's rollCritUpgrade).
+    // A "chain crit" (see isChainCrit) additionally extends this same tier's
+    // upgrade count up through the building — read the flag before consuming it
     if (isCritUpgrade(floor)) {
       const tier = getCritTier(floor)!;
+      const chain = isChainCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
         applyUpgradeTick(floor, isGroundFloor);
       }
+      if (chain) {
+        const target = floors.indexOf(floor);
+        applyChainCrit(deps, target, (chainFloor, chainIsGroundFloor) => {
+          for (let i = 0; i < count; i++) {
+            applyUpgradeTick(chainFloor, chainIsGroundFloor);
+          }
+        });
+      }
       persist();
       triggerButtonPress(floor);
-      triggerCritCelebration(floor, tier, getScreenCenterLocal);
+      triggerCritCelebration(floor, tier, getScreenCenterLocal, chain);
       return;
     }
     if (spendTotalIncome(floor.upgradeCost)) {
