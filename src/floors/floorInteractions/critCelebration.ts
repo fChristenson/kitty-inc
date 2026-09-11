@@ -73,6 +73,21 @@ function playTierFlash(tier: CritTier, label: string, color: string): void {
   }
 }
 
+// chain/boost celebrations (see celebrateChain/celebrateBoost below) never
+// scale with the actual landed tier — always this same punchy "25x" flash
+// (no ultra-style blink/hold to sit through) and its own sfx, regardless of
+// whether a crit/mega/ultra was what actually procced them
+function playSpecialFlash(label: string, color: string): void {
+  triggerScreenShake({
+    intensity: 1.8,
+    label,
+    color,
+    strokeWidth: 14,
+    priority: 1,
+  });
+  playJackpot();
+}
+
 // bursts on top of whatever the caller's own reward already spawned, so the
 // celebration keeps erupting for as long as the flash/shake animation plays
 // out. First one is dead center (matching the flash text) at 0s; the rest are
@@ -182,7 +197,7 @@ function celebrateChain(
   tier: CritTier,
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
 ): void {
-  playTierFlash(tier, "Chain", tierColor(tier));
+  playSpecialFlash("Chain", tierColor(tier));
   spawnTierBursts(floor, tier, getScreenCenterLocal);
 }
 
@@ -194,7 +209,7 @@ function celebrateBoost(
   tier: CritTier,
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
 ): void {
-  playTierFlash(tier, BOOST_CRIT_LABEL, BOOST_CRIT_COLOR);
+  playSpecialFlash(BOOST_CRIT_LABEL, BOOST_CRIT_COLOR);
   spawnTierBursts(floor, tier, getScreenCenterLocal);
   playCoinDrop();
   const p = getScreenCenterLocal(floor);
