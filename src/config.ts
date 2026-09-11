@@ -54,9 +54,10 @@ export const CONFIG = {
     // at a time
     chainChance: 0.05,
     chainContinueChance: 0.5,
-    // "boost crit" — a separate, independent roll (not a tier: no free-upgrade
-    // multiplier, its reward is a free worker boost instead) checked only if
-    // no crit/mega/ultra tier landed on this same click
+    // "boost crit" — a separate, independent roll from chain, but only ever
+    // checked once a crit/mega/ultra tier has already landed on this same
+    // click: it piggybacks on that tier's own free-upgrade payout instead of
+    // replacing it, adding a free worker boost on top
     boostChance: 0.1,
   },
 
