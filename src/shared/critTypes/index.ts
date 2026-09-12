@@ -109,14 +109,35 @@ const explosionCrits = new WeakSet<Floor>();
 const bootyCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see upgradeButton.ts's rollCritUpgrade) to
-// roll all three piggyback procs — any combination (including none/all) can
-// land alongside that same tier hit
+// roll all five piggyback procs — each is rolled independently, but at most
+// MAX_SPECIAL_CRIT_PROCS of the ones that actually land get applied (picked
+// randomly among them) so a single crit can never stack every proc at once
+export const MAX_SPECIAL_CRIT_PROCS = 2;
+
+// Fisher-Yates shuffle then keep only the first `max` — the generic mechanic
+// behind capping how many piggyback procs land on the same crit at once;
+// exported so rollFloorBuyCrit (upgradeButton.ts, a separate one-shot roll
+// for floor/building purchases) can apply the identical cap without
+// duplicating the shuffle logic
+export function pickAtMost<T>(items: T[], max: number): T[] {
+  const shuffled = [...items];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, max);
+}
+
 export function rollCritProcs(floor: Floor): void {
-  if (Math.random() < CHAIN_CRIT_CHANCE) chainCrits.add(floor);
-  if (Math.random() < BOOST_CRIT_CHANCE) boostCrits.add(floor);
-  if (Math.random() < ELEVATOR_CRIT_CHANCE) elevatorCrits.add(floor);
-  if (Math.random() < EXPLOSION_CRIT_CHANCE) explosionCrits.add(floor);
-  if (Math.random() < BOOTY_CRIT_CHANCE) bootyCrits.add(floor);
+  const landed: Array<() => void> = [];
+  if (Math.random() < CHAIN_CRIT_CHANCE) landed.push(() => chainCrits.add(floor));
+  if (Math.random() < BOOST_CRIT_CHANCE) landed.push(() => boostCrits.add(floor));
+  if (Math.random() < ELEVATOR_CRIT_CHANCE)
+    landed.push(() => elevatorCrits.add(floor));
+  if (Math.random() < EXPLOSION_CRIT_CHANCE)
+    landed.push(() => explosionCrits.add(floor));
+  if (Math.random() < BOOTY_CRIT_CHANCE) landed.push(() => bootyCrits.add(floor));
+  for (const apply of pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS)) apply();
 }
 
 // whether the CURRENTLY ARMED crit (if any) is also a chain/boost/elevator

@@ -302,6 +302,8 @@ import {
   ELEVATOR_CRIT_CHANCE,
   EXPLOSION_CRIT_CHANCE,
   BOOTY_CRIT_CHANCE,
+  MAX_SPECIAL_CRIT_PROCS,
+  pickAtMost,
   rollCritProcs,
   consumeCritProcs,
   forceChainCritProc,
@@ -354,13 +356,24 @@ export function rollFloorBuyCrit(): FloorBuyCritResult | null {
   }
   for (const tier of CRIT_TIER_ORDER) {
     if (Math.random() < CRIT_TIER_CONFIG[tier].chance) {
+      // same independent-roll-then-cap shape as rollCritProcs (shared/
+      // critTypes) — a floor/building purchase crit can't stack every proc
+      // at once either
+      type ProcKind = "chain" | "boost" | "elevator" | "explosion" | "booty";
+      const landed: ProcKind[] = [];
+      if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
+      if (Math.random() < BOOST_CRIT_CHANCE) landed.push("boost");
+      if (Math.random() < ELEVATOR_CRIT_CHANCE) landed.push("elevator");
+      if (Math.random() < EXPLOSION_CRIT_CHANCE) landed.push("explosion");
+      if (Math.random() < BOOTY_CRIT_CHANCE) landed.push("booty");
+      const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       return {
         tier,
-        chain: Math.random() < CHAIN_CRIT_CHANCE,
-        boost: Math.random() < BOOST_CRIT_CHANCE,
-        elevator: Math.random() < ELEVATOR_CRIT_CHANCE,
-        explosion: Math.random() < EXPLOSION_CRIT_CHANCE,
-        booty: Math.random() < BOOTY_CRIT_CHANCE,
+        chain: kept.has("chain"),
+        boost: kept.has("boost"),
+        elevator: kept.has("elevator"),
+        explosion: kept.has("explosion"),
+        booty: kept.has("booty"),
       };
     }
   }
