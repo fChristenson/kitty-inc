@@ -1,5 +1,6 @@
 // the fixed action bar overlaying the bottom of the viewport, independent of any
 // floor/scroll position — its own DOM controls, styled via .action-bar in style.css
+import { onTapOrClick } from "../../shared/tapEvents";
 
 export function createActionBarMarkup(): string {
   return `
@@ -63,7 +64,7 @@ export function createActionBarMarkup(): string {
 export interface ActionBarHandlers {
   onScrollTop: () => void;
   onScrollBottom: () => void;
-  // held (not tapped) scroll-top/bottom \u2014 while the map is open this jumps
+  // held (not tapped) scroll-top/bottom — while the map is open this jumps
   // straight to the top/bottommost company instead of rolling one at a time;
   // a no-op while the map is closed (a tap already scrolls floors instantly)
   onHoldScrollTop: () => void;
@@ -77,39 +78,16 @@ export interface ActionBarHandlers {
 // that deliberately holding the button still feels immediate
 const SCROLL_HOLD_MS = 400;
 
-// fires onTap on whichever comes first, pointerup or the browser's own
-// synthesized "click" \u2014 mobile browsers can silently swallow the click that
-// would normally follow a tap right after a drag/swipe elsewhere on the page
-// (confirmed via an on-screen debug log: pointerdown/pointerup always fired,
-// "click" sometimes just never did), so pointerup alone can't be trusted;
-// but relying on preventDefault to fully suppress the OTHER one turned out
-// not to be reliable either. Listening for both and just ignoring whichever
-// one shows up second (reset on the next pointerdown) is simpler and covers
-// both failure modes at once, regardless of which one a given browser/
-// gesture actually fires
+// wires a plain tap button using the shared onTapOrClick dedupe (see
+// shared/tapEvents) instead of a raw "click" listener
 function wireTapButton(button: HTMLButtonElement, onTap: () => void): void {
-  let fired = false;
-  function fireOnce(): void {
-    if (fired) return;
-    fired = true;
-    onTap();
-  }
-  button.addEventListener("pointerdown", () => {
-    fired = false;
-  });
-  button.addEventListener("pointerup", fireOnce);
-  button.addEventListener("click", fireOnce);
-  // an aborted gesture shouldn't fire at all \u2014 marking it "already fired"
-  // blocks a click that might still trail a cancelled pointer
-  button.addEventListener("pointercancel", () => {
-    fired = true;
-  });
+  onTapOrClick(button, onTap);
 }
 
 // wires a scroll button to fire onClick on a normal tap, or onHold once the
-// press is held past SCROLL_HOLD_MS \u2014 the tap side reuses wireTapButton's
-// own "whichever of pointerup/click comes first" dedupe, gated by whether
-// the hold already fired
+// press is held past SCROLL_HOLD_MS — the hold timer is tracked directly off
+// pointerdown/pointerup, and the tap itself reuses the shared onTapOrClick
+// dedupe, gated by whether the hold already fired
 function wireHoldableScrollButton(
   button: HTMLButtonElement,
   onClick: () => void,
@@ -117,21 +95,14 @@ function wireHoldableScrollButton(
 ): void {
   let holdTimeout: ReturnType<typeof setTimeout> | null = null;
   let holdFired = false;
-  let tapFired = false;
   function clearHold(): void {
     if (holdTimeout !== null) {
       clearTimeout(holdTimeout);
       holdTimeout = null;
     }
   }
-  function fireTapOnce(): void {
-    if (tapFired || holdFired) return;
-    tapFired = true;
-    onClick();
-  }
   button.addEventListener("pointerdown", () => {
     holdFired = false;
-    tapFired = false;
     clearHold();
     holdTimeout = setTimeout(() => {
       holdTimeout = null;
@@ -139,14 +110,10 @@ function wireHoldableScrollButton(
       onHold();
     }, SCROLL_HOLD_MS);
   });
-  button.addEventListener("pointerup", () => {
-    clearHold();
-    fireTapOnce();
-  });
-  button.addEventListener("click", fireTapOnce);
-  button.addEventListener("pointercancel", () => {
-    clearHold();
-    tapFired = true;
+  button.addEventListener("pointerup", clearHold);
+  button.addEventListener("pointercancel", clearHold);
+  onTapOrClick(button, () => {
+    if (!holdFired) onClick();
   });
 }
 

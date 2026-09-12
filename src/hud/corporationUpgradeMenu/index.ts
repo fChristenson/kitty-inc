@@ -9,6 +9,8 @@ import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { type BigNumber, gte, lt } from "../../shared/bigNumber";
 import { createPollingLoop } from "../../shared/pollingLoop";
+import { createGhostClickGuard } from "../../shared/ghostClickGuard";
+import { onTapOrClick } from "../../shared/tapEvents";
 
 const mergeIconUrl = getImageUrl("merge");
 const skyscraperIconUrl = getImageUrl("skyscraper");
@@ -154,7 +156,7 @@ export function wireCorporationUpgradeMenu(
     updateMergeButton();
   });
 
-  list.addEventListener("click", (event) => {
+  onTapOrClick(list, (event) => {
     const target = event.target as HTMLElement;
     const mergeButton = target.closest<HTMLButtonElement>("#merge-companies");
     if (mergeButton) {
@@ -188,10 +190,15 @@ export function wireCorporationUpgradeMenu(
 
   const affordabilityPolling = createPollingLoop(updateAffordability, 250);
 
+  // opened by a tap on the action bar's own Hire button — same trailing-
+  // click-hits-the-new-backdrop risk any button-opened dialog has
+  const ghostClickGuard = createGhostClickGuard();
+
   function open(): void {
     selectedForMerge.clear();
     render();
     menu.hidden = false;
+    ghostClickGuard.markOpened();
     playSwoosh();
     affordabilityPolling.start();
   }
@@ -203,7 +210,10 @@ export function wireCorporationUpgradeMenu(
     affordabilityPolling.stop();
   }
 
-  backdrop.addEventListener("click", close);
+  onTapOrClick(backdrop, () => {
+    if (ghostClickGuard.shouldIgnore()) return;
+    close();
+  });
 
   return { open, close };
 }

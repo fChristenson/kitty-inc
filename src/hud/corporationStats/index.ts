@@ -11,6 +11,7 @@ import { getActiveCorporationIndices } from "../../company";
 import { playSwoosh } from "../../sound";
 import { createPollingLoop } from "../../shared/pollingLoop";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
+import { onTapOrClick } from "../../shared/tapEvents";
 import {
   getCompanyBaseModifierPercent,
   formatBoostPercent,
@@ -184,7 +185,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
   // backdrop then appears
   const ghostClickGuard = createGhostClickGuard();
 
-  backdrop.addEventListener("click", () => {
+  onTapOrClick(backdrop, () => {
     if (ghostClickGuard.shouldIgnore()) return;
     close();
   });

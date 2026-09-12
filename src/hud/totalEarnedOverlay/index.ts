@@ -1,5 +1,6 @@
 import { formatTotalIncomeParts } from "../../utils";
 import type { BigNumber } from "../../shared/bigNumber";
+import { onTapOrClick } from "../../shared/tapEvents";
 
 // one-shot "You have earned..." splash — a pure celebratory reveal of the idle
 // income collected while the tab was closed/away. main.ts only calls show()
@@ -34,7 +35,7 @@ export function wireTotalEarnedOverlay(
     ".earned-overlay__unit-name",
   )!;
 
-  overlay.addEventListener("click", () => {
+  onTapOrClick(overlay, () => {
     overlay.hidden = true;
   });
 

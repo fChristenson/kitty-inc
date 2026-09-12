@@ -6,6 +6,8 @@ import {
 } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { createPollingLoop } from "../../shared/pollingLoop";
+import { createGhostClickGuard } from "../../shared/ghostClickGuard";
+import { onTapOrClick } from "../../shared/tapEvents";
 import {
   applyBoostAll,
   triggerJumpAll,
@@ -229,7 +231,7 @@ export function wireBoostMenu(
     `;
   }
 
-  list.addEventListener("click", async (event) => {
+  onTapOrClick(list, async (event) => {
     const target = event.target as HTMLElement;
     const speedUpButton = target.closest<HTMLButtonElement>(
       "#boost-menu-speed-up",
@@ -300,9 +302,14 @@ export function wireBoostMenu(
 
   const affordabilityPolling = createPollingLoop(updateAffordability, 250);
 
+  // opened by a tap on the action bar's own Boost button — same trailing-
+  // click-hits-the-new-backdrop risk any button-opened dialog has
+  const ghostClickGuard = createGhostClickGuard();
+
   function open(): void {
     render();
     menu.hidden = false;
+    ghostClickGuard.markOpened();
     playSwoosh();
     affordabilityPolling.start();
   }
@@ -314,7 +321,10 @@ export function wireBoostMenu(
     affordabilityPolling.stop();
   }
 
-  backdrop.addEventListener("click", close);
+  onTapOrClick(backdrop, () => {
+    if (ghostClickGuard.shouldIgnore()) return;
+    close();
+  });
 
   return { open, close };
 }

@@ -6,6 +6,8 @@ import { getBuildingPrice } from "../../buildings";
 import { playSwoosh, playSold } from "../../sound";
 import { gte, lt } from "../../shared/bigNumber";
 import { createPollingLoop } from "../../shared/pollingLoop";
+import { createGhostClickGuard } from "../../shared/ghostClickGuard";
+import { onTapOrClick } from "../../shared/tapEvents";
 
 // reuses .worker-menu's styling — same generic "dialog with a list of buyable items"
 // shape as boostMenu/upgradeMenu. Lists a button per building already owned (how you
@@ -86,7 +88,7 @@ export function wireMapMenu(
     list.innerHTML = buildingButtons + buyItem + resetItem;
   }
 
-  list.addEventListener("click", (event) => {
+  onTapOrClick(list, (event) => {
     const target = event.target as HTMLElement;
     if (target.closest("#map-menu-reset-game")) {
       if (!confirm("Reset all progress? This can't be undone.")) return;
@@ -135,9 +137,14 @@ export function wireMapMenu(
 
   const affordabilityPolling = createPollingLoop(updateAffordability, 250);
 
+  // opened by a tap on the action bar's own Map button — same trailing-
+  // click-hits-the-new-backdrop risk any button-opened dialog has
+  const ghostClickGuard = createGhostClickGuard();
+
   function open(): void {
     render();
     menu.hidden = false;
+    ghostClickGuard.markOpened();
     playSwoosh();
     affordabilityPolling.start();
   }
@@ -149,7 +156,10 @@ export function wireMapMenu(
     affordabilityPolling.stop();
   }
 
-  backdrop.addEventListener("click", close);
+  onTapOrClick(backdrop, () => {
+    if (ghostClickGuard.shouldIgnore()) return;
+    close();
+  });
 
   return { open, close };
 }

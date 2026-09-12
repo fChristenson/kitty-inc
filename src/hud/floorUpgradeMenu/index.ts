@@ -15,6 +15,7 @@ import { getImageUrl } from "../../loadAssets";
 import { gte, lt, type BigNumber } from "../../shared/bigNumber";
 import { createPollingLoop } from "../../shared/pollingLoop";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
+import { onTapOrClick } from "../../shared/tapEvents";
 import {
   getWorkerCost,
   buyWorker,
@@ -170,7 +171,7 @@ export function wireFloorUpgradeMenu(
     list.innerHTML = workerItem + chairsItem + suppliesItem + managerItem;
   }
 
-  list.addEventListener("click", async (event) => {
+  onTapOrClick(list, async (event) => {
     const target = event.target as HTMLElement;
     const floor = currentFloor;
     if (!floor) return;
@@ -280,7 +281,7 @@ export function wireFloorUpgradeMenu(
     affordabilityPolling.stop();
   }
 
-  backdrop.addEventListener("click", () => {
+  onTapOrClick(backdrop, () => {
     if (ghostClickGuard.shouldIgnore()) return;
     close();
   });

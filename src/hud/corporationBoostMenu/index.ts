@@ -3,6 +3,8 @@ import { playSwoosh } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { arrowIconMarkup } from "../../shared/arrowIcon";
 import { CRIT_PROC_KINDS, CRIT_PROC_INFO } from "../../shared/critTypes";
+import { createGhostClickGuard } from "../../shared/ghostClickGuard";
+import { onTapOrClick } from "../../shared/tapEvents";
 
 export {
   getMinigameEntryCost,
@@ -103,9 +105,14 @@ export function wireCorporationBoostMenu(
     ).join("");
   }
 
+  // opened by a tap on the action bar's own Boost button — same trailing-
+  // click-hits-the-new-backdrop risk any button-opened dialog has
+  const ghostClickGuard = createGhostClickGuard();
+
   function open(): void {
     render();
     menu.hidden = false;
+    ghostClickGuard.markOpened();
     playSwoosh();
   }
 
@@ -115,7 +122,10 @@ export function wireCorporationBoostMenu(
     menu.hidden = true;
   }
 
-  backdrop.addEventListener("click", close);
+  onTapOrClick(backdrop, () => {
+    if (ghostClickGuard.shouldIgnore()) return;
+    close();
+  });
 
   function refresh(): void {
     render();

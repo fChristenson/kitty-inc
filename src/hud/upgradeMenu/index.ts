@@ -12,6 +12,8 @@ import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { CONFIG } from "../../config";
 import { createPollingLoop } from "../../shared/pollingLoop";
+import { createGhostClickGuard } from "../../shared/ghostClickGuard";
+import { onTapOrClick } from "../../shared/tapEvents";
 import {
   type BigNumber,
   fromNumber,
@@ -377,7 +379,7 @@ export function wireUpgradeMenu(
     list.innerHTML = massActionsMarkup(getFloors());
   }
 
-  list.addEventListener("click", async (event) => {
+  onTapOrClick(list, async (event) => {
     const target = event.target as HTMLElement;
     const renovateButton =
       target.closest<HTMLButtonElement>("#renovate-floors");
@@ -436,9 +438,14 @@ export function wireUpgradeMenu(
 
   const affordabilityPolling = createPollingLoop(updateAffordability, 250);
 
+  // opened by a tap on the action bar's own Hire button — same trailing-
+  // click-hits-the-new-backdrop risk any button-opened dialog has
+  const ghostClickGuard = createGhostClickGuard();
+
   function open(): void {
     render();
     menu.hidden = false;
+    ghostClickGuard.markOpened();
     playSwoosh();
     affordabilityPolling.start();
   }
@@ -450,7 +457,10 @@ export function wireUpgradeMenu(
     affordabilityPolling.stop();
   }
 
-  backdrop.addEventListener("click", close);
+  onTapOrClick(backdrop, () => {
+    if (ghostClickGuard.shouldIgnore()) return;
+    close();
+  });
 
   return { open, close };
 }
