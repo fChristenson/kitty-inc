@@ -64,6 +64,11 @@ export function installDebugOverlay(): void {
     (e) => log(`pointerup -> ${describe(e)}`),
     true,
   );
+  window.addEventListener(
+    "pointercancel",
+    (e) => log(`pointercancel -> ${describe(e)}`),
+    true,
+  );
   window.addEventListener("click", (e) => log(`click -> ${describe(e)}`), true);
 
   window.addEventListener("error", (e) => {

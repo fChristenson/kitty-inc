@@ -49,6 +49,13 @@
    silently falling back off Fredoka without this */
 button {
   font: inherit;
+  /* confirmed via the on-screen debug overlay: after some taps, pointerdown/
+     pointerup fire but no click follows at all (a separate later tap's click
+     then fires normally) — the classic signature of a mobile browser holding
+     a tap's click back while it waits to see if a second tap completes a
+     double-tap-to-zoom gesture. manipulation disables that zoom/double-tap
+     disambiguation on every button, so a tap's click always fires immediately */
+  touch-action: manipulation;
 }
 
 :root {
