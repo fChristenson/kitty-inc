@@ -45,7 +45,14 @@ interface FloatingCoin {
   blinkIntensity: number;
 }
 
-const pool = createParticlePool<FloatingCoin>(200);
+// generously high: gameCanvas only ever spawns these for boosted workers on
+// floors actually scrolled into view (viewport-bounded, at most a few dozen
+// workers even in the most crowded realistic case), so this cap is never meant
+// to actually bind — it's just a backstop against a runaway leak, not a real
+// steady-state limit. A cap low enough to actually get hit made coins vanish
+// mid-animation (the ring-buffer eviction is instant, not a fade), which read
+// as a bug when several workers were boosted on screen at once
+const pool = createParticlePool<FloatingCoin>(1000);
 
 export function hasActiveFloatingCoins(): boolean {
   return pool.hasActive();

@@ -10,8 +10,10 @@ import payoutUrl from "../assets/sound/payout.wav";
 
 const MUSIC_VOLUME = 0.4;
 const SFX_VOLUME = 0.9;
-// 25% louder than the shared SFX_VOLUME per explicit request, clamped to Audio's own 1.0 max
-const COIN_DROP_VOLUME = Math.min(SFX_VOLUME * 1.25, 1);
+// 50% louder than the shared SFX_VOLUME per explicit request — playSfx uses a
+// GainNode (not <audio>.volume), so this actually plays louder instead of
+// silently clamping flat at 1.0 the way the old Math.min(..., 1) version did
+const COIN_DROP_VOLUME = SFX_VOLUME * 1.5;
 // 25% quieter than the shared SFX_VOLUME per explicit request — the mega-crit
 // (25x) jackpot sfx
 const JACKPOT_VOLUME = SFX_VOLUME * 0.6;
