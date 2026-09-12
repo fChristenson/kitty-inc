@@ -158,11 +158,6 @@ import { loadMouseImage, forceSpawnMouse } from "./mouse";
 import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation, getCorporationPrice } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
-import {
-  installDebugOverlay,
-  logActionBarWired,
-  logHandlerFired,
-} from "./shared/debugOverlay";
 import { getBackgroundUrls } from "./loadAssets";
 
 // matches style.css's worker-menu-slide-out-* keyframes (0.352s) — the company
@@ -174,7 +169,6 @@ const DIALOG_CLOSE_MS = 352;
 const SWITCH_LEAD_MS = 100;
 
 async function main() {
-  installDebugOverlay();
   const app = document.querySelector<HTMLDivElement>("#app");
   if (!app) throw new Error("#app not found");
   initSessionGuard();
@@ -846,13 +840,11 @@ async function main() {
   });
   wireActionBar(app, {
     onScrollTop: () => {
-      logHandlerFired("onScrollTop");
       playSwoosh();
       if (mapOpen) cityMapView.flashVerticalRays(-1);
       else gameCanvas.scrollActiveToTop();
     },
     onScrollBottom: () => {
-      logHandlerFired("onScrollBottom");
       playSwoosh();
       if (mapOpen) cityMapView.flashVerticalRays(1);
       else gameCanvas.scrollActiveToBottom();
@@ -868,28 +860,18 @@ async function main() {
       cityMapView.jumpToEnd(1);
     },
     onBoostAll: () => {
-      logHandlerFired("onBoostAll");
       if (mapOpen) corporationBoostMenu.open();
       else boostMenu.open();
     },
     onOpenUpgradeMenu: () => {
-      logHandlerFired("onOpenUpgradeMenu");
       if (mapOpen) corporationUpgradeMenu.open();
       else upgradeMenu.open();
     },
     onOpenMapMenu: () => {
-      logHandlerFired("onOpenMapMenu");
       if (mapOpen) closeMapView();
       else openMapView();
     },
   });
-  logActionBarWired([
-    "action-bar-scroll-top",
-    "action-bar-scroll-bottom",
-    "action-bar-boost-all",
-    "action-bar-hire",
-    "action-bar-map",
-  ]);
 
   buildings.forEach((_, i) => setupBuilding(i));
   persist();
