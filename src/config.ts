@@ -59,6 +59,20 @@ export const CONFIG = {
     // click: it piggybacks on that tier's own free-upgrade payout instead of
     // replacing it, adding a free worker boost on top
     boostChance: 0.1,
+    // "elevator crit" — same shape as chain (extends the landed tier's
+    // free-upgrade payout floor by floor), but starts from the BOTTOM of the
+    // building (floor 0) and climbs up, instead of starting at the floor that
+    // actually crit
+    elevatorChance: 0.05,
+    elevatorContinueChance: 0.5,
+    // "explosion crit" — same shape as chain again, but spreads BOTH
+    // directions (up AND down) from the floor that actually crit, instead of
+    // only upward
+    explosionChance: 0.05,
+    explosionContinueChance: 0.5,
+    // "booty crit" — a flat one-time effect (not tier-scaled, same as boost):
+    // doubles the CURRENTLY ACTIVE company's total income once
+    bootyChance: 0.05,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

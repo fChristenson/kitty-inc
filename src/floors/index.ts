@@ -312,6 +312,7 @@ export {
   handleFloorClick,
   isUpgradeButtonEnabled,
   applyChainCrit,
+  applyExplosionCrit,
 } from "./floorInteractions";
 export type { ChainCritDeps } from "./floorInteractions";
 export {
@@ -346,6 +347,9 @@ export {
   forceUltraCritUpgrade,
   forceChainCritUpgrade,
   forceBoostCritUpgrade,
+  forceElevatorCritUpgrade,
+  forceExplosionCritUpgrade,
+  forceBootyCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,
   pickHigherCritTier,
@@ -365,7 +369,4 @@ export {
   drawFloatingCoins,
   loadFloatingCoinImage,
 } from "./coinFloat";
-export {
-  spawnIncomeFloatText,
-  drawIncomeFloatText,
-} from "./incomeFloatText";
+export { spawnIncomeFloatText, drawIncomeFloatText } from "./incomeFloatText";

@@ -76,21 +76,51 @@ export const BOOST_CRIT_CHANCE = CONFIG.crit.boostChance;
 export const BOOST_CRIT_COLOR = COLOR.blue;
 export const BOOST_CRIT_LABEL = "Boost";
 
-// state for both piggyback procs lives here too (not upgradeButton.ts) so the
-// whole "what can ride along with a landed crit" system stays in one place
+// "elevator crit" — a third piggyback proc, same shape as chain (extends the
+// landed tier's free-upgrade payout floor by floor) but the walk starts from
+// the BOTTOM of the building (floor 0) and climbs up, instead of starting at
+// the floor that actually crit — see floorInteractions.ts's applyChainCrit
+// call with startIndex -1
+export const ELEVATOR_CRIT_CHANCE = CONFIG.crit.elevatorChance;
+export const ELEVATOR_CRIT_CONTINUE_CHANCE = CONFIG.crit.elevatorContinueChance;
+export const ELEVATOR_CRIT_LABEL = "Elevator";
+
+// "explosion crit" — a fourth piggyback proc, same shape as chain again, but
+// spreads BOTH directions (up AND down) from the floor that actually crit,
+// instead of only upward — see floorInteractions.ts's applyExplosionCrit
+export const EXPLOSION_CRIT_CHANCE = CONFIG.crit.explosionChance;
+export const EXPLOSION_CRIT_CONTINUE_CHANCE =
+  CONFIG.crit.explosionContinueChance;
+export const EXPLOSION_CRIT_LABEL = "Boom";
+
+// "booty crit" — a fifth piggyback proc, a flat one-time effect (not
+// tier-scaled) like boost: doubles the CURRENTLY ACTIVE company's total
+// income once, applied by floorInteractions.ts
+export const BOOTY_CRIT_CHANCE = CONFIG.crit.bootyChance;
+export const BOOTY_CRIT_COLOR = COLOR.gold;
+export const BOOTY_CRIT_LABEL = "Booty";
+
+// state for all three piggyback procs lives here too (not upgradeButton.ts) so
+// the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
 const boostCrits = new WeakSet<Floor>();
+const elevatorCrits = new WeakSet<Floor>();
+const explosionCrits = new WeakSet<Floor>();
+const bootyCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see upgradeButton.ts's rollCritUpgrade) to
-// roll both piggyback procs — either, neither, or both can land alongside
-// that same tier hit
+// roll all three piggyback procs — any combination (including none/all) can
+// land alongside that same tier hit
 export function rollCritProcs(floor: Floor): void {
   if (Math.random() < CHAIN_CRIT_CHANCE) chainCrits.add(floor);
   if (Math.random() < BOOST_CRIT_CHANCE) boostCrits.add(floor);
+  if (Math.random() < ELEVATOR_CRIT_CHANCE) elevatorCrits.add(floor);
+  if (Math.random() < EXPLOSION_CRIT_CHANCE) explosionCrits.add(floor);
+  if (Math.random() < BOOTY_CRIT_CHANCE) bootyCrits.add(floor);
 }
 
-// whether the CURRENTLY ARMED crit (if any) is also a chain/boost crit — see
-// rollCritProcs/floorInteractions.ts's plain-click crit branch
+// whether the CURRENTLY ARMED crit (if any) is also a chain/boost/elevator
+// crit — see rollCritProcs/floorInteractions.ts's plain-click crit branch
 export function isChainCrit(floor: Floor): boolean {
   return chainCrits.has(floor);
 }
@@ -99,21 +129,48 @@ export function isBoostCrit(floor: Floor): boolean {
   return boostCrits.has(floor);
 }
 
+export function isElevatorCrit(floor: Floor): boolean {
+  return elevatorCrits.has(floor);
+}
+
+export function isExplosionCrit(floor: Floor): boolean {
+  return explosionCrits.has(floor);
+}
+
+export function isBootyCrit(floor: Floor): boolean {
+  return bootyCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
   boostCrits.delete(floor);
+  elevatorCrits.delete(floor);
+  explosionCrits.delete(floor);
+  bootyCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
-// (see upgradeButton.ts's forceChainCritUpgrade/forceBoostCritUpgrade),
-// bypassing chance entirely
+// (see upgradeButton.ts's forceChainCritUpgrade/forceBoostCritUpgrade/
+// forceElevatorCritUpgrade), bypassing chance entirely
 export function forceChainCritProc(floor: Floor): void {
   chainCrits.add(floor);
 }
 
 export function forceBoostCritProc(floor: Floor): void {
   boostCrits.add(floor);
+}
+
+export function forceElevatorCritProc(floor: Floor): void {
+  elevatorCrits.add(floor);
+}
+
+export function forceExplosionCritProc(floor: Floor): void {
+  explosionCrits.add(floor);
+}
+
+export function forceBootyCritProc(floor: Floor): void {
+  bootyCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

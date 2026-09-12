@@ -24,6 +24,25 @@ loadImageByName("mouse").then((image) => {
   boostIcon = image;
 });
 
+// same idea again, drawn behind the "Elevator" flash text (see
+// upgradeButton.ts's isElevatorCrit)
+let elevatorIcon: HTMLImageElement | null = null;
+loadImageByName("elevator").then((image) => {
+  elevatorIcon = image;
+});
+
+// same idea again, drawn behind the "Explosion" flash text (see
+// upgradeButton.ts's isExplosionCrit)
+let explosionIcon: HTMLImageElement | null = null;
+loadImageByName("explosion").then((image) => {
+  explosionIcon = image;
+});
+// same idea again, drawn behind the "Booty" flash text (see
+// upgradeButton.ts's isBootyCrit)
+let bootyIcon: HTMLImageElement | null = null;
+loadImageByName("booty").then((image) => {
+  bootyIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -248,6 +267,20 @@ function getBloomLayer(
   return entry;
 }
 
+// fits an icon's own bounding box to a common on-screen "footprint", matched
+// by AREA (targetSize = the side of an equal-area square) rather than by one
+// dimension — chain.png (short/wide), mouse.png (a tall running sprite), and
+// elevator.png (near-square) all have very different aspect ratios, so fixing
+// just their width (the original approach) left the short/wide one reading
+// much smaller than the taller ones at the identical width
+function fitIconSize(
+  icon: HTMLImageElement,
+  targetSize: number,
+): { w: number; h: number } {
+  const scale = targetSize / Math.sqrt(icon.width * icon.height);
+  return { w: icon.width * scale, h: icon.height * scale };
+}
+
 export function drawCritFlash(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -346,8 +379,7 @@ export function drawCritFlash(
   // text's animated entrance rotation, scoped to its own save/restore so
   // that extra spin doesn't also rotate the bloom/text drawn after it
   if (flashLabel === "Chain" && chainIcon) {
-    const iconW = measuredWidth * 1.4 * 0.75;
-    const iconH = iconW * (chainIcon.height / chainIcon.width);
+    const { w: iconW, h: iconH } = fitIconSize(chainIcon, measuredWidth * 0.85);
     ctx.save();
     ctx.rotate(Math.PI / 4);
     ctx.drawImage(chainIcon, -iconW / 2, -iconH / 2, iconW, iconH);
@@ -357,9 +389,32 @@ export function drawCritFlash(
     // no extra rotation (unlike chainIcon above) — mouse.png is a directional
     // side-view sprite, not a symmetric icon, so spinning it 45deg makes it
     // read as facing the wrong way instead of its normal running pose
-    const iconW = measuredWidth * 1.4 * 0.75;
-    const iconH = iconW * (boostIcon.height / boostIcon.width);
+    const { w: iconW, h: iconH } = fitIconSize(boostIcon, measuredWidth * 0.85);
     ctx.drawImage(boostIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Elevator" && elevatorIcon) {
+    // no extra rotation — elevator.png is a real upright scene (doors/wall),
+    // rotating it would read as broken rather than stylized
+    const { w: iconW, h: iconH } = fitIconSize(
+      elevatorIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(elevatorIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Boom" && explosionIcon) {
+    // no extra rotation — explosion.png is already a radial starburst shape,
+    // spinning it wouldn't read as differently "exploded"
+    const { w: iconW, h: iconH } = fitIconSize(
+      explosionIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(explosionIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Booty" && bootyIcon) {
+    // no extra rotation — booty.png is an upright treasure chest, spinning it
+    // would just look broken
+    const { w: iconW, h: iconH } = fitIconSize(bootyIcon, measuredWidth * 0.85);
+    ctx.drawImage(bootyIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

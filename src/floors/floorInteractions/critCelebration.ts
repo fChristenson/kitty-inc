@@ -4,6 +4,10 @@ import {
   CRIT_TIER_CONFIG,
   BOOST_CRIT_COLOR,
   BOOST_CRIT_LABEL,
+  ELEVATOR_CRIT_LABEL,
+  EXPLOSION_CRIT_LABEL,
+  BOOTY_CRIT_COLOR,
+  BOOTY_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -222,6 +226,47 @@ function celebrateBoost(
   spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
+// elevator crit (see upgradeButton.ts's isElevatorCrit): same swap as chain
+// above, keeping the landed tier's own color (climbing the building from the
+// bottom up is applied by floorInteractions.ts, this only covers the
+// celebration moment)
+function celebrateElevator(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(ELEVATOR_CRIT_LABEL, tierColor(tier));
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// explosion crit (see upgradeButton.ts's isExplosionCrit): same swap again,
+// keeping the landed tier's own color (spreading both up and down is applied
+// by floorInteractions.ts, this only covers the celebration moment)
+function celebrateExplosion(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(EXPLOSION_CRIT_LABEL, tierColor(tier));
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// booty crit (see upgradeButton.ts's isBootyCrit): same swap as boost above,
+// its own dedicated gold — the reward itself (doubling the active company's
+// total income) is applied by floorInteractions.ts, this only covers the
+// celebration moment
+function celebrateBooty(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(BOOTY_CRIT_LABEL, BOOTY_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
 // chain and boost are both "special" procs riding the SAME landed tier (see
 // isChainCrit/isBoostCrit) — when only one lands it plays immediately same as
 // any plain crit, but when BOTH land on the same click they each get their own
@@ -230,7 +275,7 @@ function celebrateBoost(
 // they're simply skipped while a special celebration is still due, rather
 // than piling up behind it (see triggerCritCelebration below)
 interface QueuedCelebration {
-  kind: "chain" | "boost";
+  kind: "chain" | "boost" | "elevator" | "explosion" | "booty";
   queuedAt: number;
   run: () => void;
 }
@@ -285,8 +330,11 @@ export function triggerCritCelebration(
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
   chain = false,
   boost = false,
+  elevator = false,
+  explosion = false,
+  booty = false,
 ): void {
-  if (chain || boost) {
+  if (chain || boost || elevator || explosion || booty) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
     // bulk-buy hold repeatedly rolling "chain") shouldn't queue up N replays
@@ -303,6 +351,33 @@ export function triggerCritCelebration(
         kind: "boost",
         queuedAt: now,
         run: () => celebrateBoost(floor, tier, getScreenCenterLocal),
+      });
+    }
+    if (
+      elevator &&
+      !specialCelebrationQueue.some((q) => q.kind === "elevator")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "elevator",
+        queuedAt: now,
+        run: () => celebrateElevator(floor, tier, getScreenCenterLocal),
+      });
+    }
+    if (
+      explosion &&
+      !specialCelebrationQueue.some((q) => q.kind === "explosion")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "explosion",
+        queuedAt: now,
+        run: () => celebrateExplosion(floor, tier, getScreenCenterLocal),
+      });
+    }
+    if (booty && !specialCelebrationQueue.some((q) => q.kind === "booty")) {
+      specialCelebrationQueue.push({
+        kind: "booty",
+        queuedAt: now,
+        run: () => celebrateBooty(floor, tier, getScreenCenterLocal),
       });
     }
     drainSpecialCelebrationQueue();

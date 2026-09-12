@@ -275,8 +275,20 @@ export {
   BOOST_CRIT_CHANCE,
   BOOST_CRIT_COLOR,
   BOOST_CRIT_LABEL,
+  ELEVATOR_CRIT_CHANCE,
+  ELEVATOR_CRIT_CONTINUE_CHANCE,
+  ELEVATOR_CRIT_LABEL,
+  EXPLOSION_CRIT_CHANCE,
+  EXPLOSION_CRIT_CONTINUE_CHANCE,
+  EXPLOSION_CRIT_LABEL,
+  BOOTY_CRIT_CHANCE,
+  BOOTY_CRIT_COLOR,
+  BOOTY_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
+  isElevatorCrit,
+  isExplosionCrit,
+  isBootyCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -287,10 +299,16 @@ import {
   CRIT_TIER_ORDER,
   CHAIN_CRIT_CHANCE,
   BOOST_CRIT_CHANCE,
+  ELEVATOR_CRIT_CHANCE,
+  EXPLOSION_CRIT_CHANCE,
+  BOOTY_CRIT_CHANCE,
   rollCritProcs,
   consumeCritProcs,
   forceChainCritProc,
   forceBoostCritProc,
+  forceElevatorCritProc,
+  forceExplosionCritProc,
+  forceBootyCritProc,
 } from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
@@ -321,6 +339,9 @@ export interface FloorBuyCritResult {
   tier: CritTier;
   chain: boolean;
   boost: boolean;
+  elevator: boolean;
+  explosion: boolean;
+  booty: boolean;
 }
 
 let forcedFloorBuyCrit: FloorBuyCritResult | null = null;
@@ -337,6 +358,9 @@ export function rollFloorBuyCrit(): FloorBuyCritResult | null {
         tier,
         chain: Math.random() < CHAIN_CRIT_CHANCE,
         boost: Math.random() < BOOST_CRIT_CHANCE,
+        elevator: Math.random() < ELEVATOR_CRIT_CHANCE,
+        explosion: Math.random() < EXPLOSION_CRIT_CHANCE,
+        booty: Math.random() < BOOTY_CRIT_CHANCE,
       };
     }
   }
@@ -346,13 +370,17 @@ export function rollFloorBuyCrit(): FloorBuyCritResult | null {
 // dev/test-only: guarantees the NEXT floor bought (or building bought — both
 // share this same roll) crits at this tier, bypassing chance entirely (see
 // hud/testButton's "Floor Crit"/"Floor Mega Crit"/"Floor Ultra Crit"/"Map
-// Unlock Crit"/etc. and their own "Chain"/"Boost" siblings)
+// Unlock Crit"/etc. and their own "Chain"/"Boost"/"Elevator"/"Explosion"/
+// "Booty" siblings)
 export function forceFloorBuyCrit(
   tier: CritTier,
   chain = false,
   boost = false,
+  elevator = false,
+  explosion = false,
+  booty = false,
 ): void {
-  forcedFloorBuyCrit = { tier, chain, boost };
+  forcedFloorBuyCrit = { tier, chain, boost, elevator, explosion, booty };
 }
 
 export function getCritTier(floor: Floor): CritTier | null {
@@ -405,6 +433,37 @@ export function forceChainCritUpgrade(
 ): void {
   critTiers.set(floor, tier);
   forceChainCritProc(floor);
+}
+
+// dev/test-only: force this floor into an elevator crit at the given tier
+// (default "crit"), bypassing chance entirely (see hud/testButton's "Spawn
+// Elevator Crit") — same shape as forceChainCritUpgrade above, just arming
+// the elevator proc instead of the chain one
+export function forceElevatorCritUpgrade(
+  floor: Floor,
+  tier: CritTier = "crit",
+): void {
+  critTiers.set(floor, tier);
+  forceElevatorCritProc(floor);
+}
+
+// dev/test-only: force this floor into an explosion crit at the given tier
+// (default "crit"), bypassing chance entirely (see hud/testButton's "Spawn
+// Explosion Crit") — same shape again, arming the explosion proc instead
+export function forceExplosionCritUpgrade(
+  floor: Floor,
+  tier: CritTier = "crit",
+): void {
+  critTiers.set(floor, tier);
+  forceExplosionCritProc(floor);
+}
+
+// dev/test-only: force this floor into a booty crit, bypassing chance
+// entirely (see hud/testButton's "Spawn Booty Crit") — not tier-scaled
+// (see isBootyCrit's own doc comment), so no tier param needed
+export function forceBootyCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceBootyCritProc(floor);
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see

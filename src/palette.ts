@@ -52,6 +52,13 @@ export const COLOR = {
   purple: "#8B5CF6",
   purpleActive: "#7C3AED",
   purpleShadow: "#6D28D9",
+  // Elevator crit's own dedicated color (Boost's blue/Chain's tier-color are
+  // both already taken)
+  teal: "#14B8A6",
+  // Explosion crit's own dedicated color
+  orange: "#F97316",
+  // Booty crit's own dedicated color
+  gold: "#D4AF37",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

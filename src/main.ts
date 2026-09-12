@@ -16,6 +16,9 @@ import {
   forceUltraCritUpgrade,
   forceChainCritUpgrade,
   forceBoostCritUpgrade,
+  forceElevatorCritUpgrade,
+  forceExplosionCritUpgrade,
+  forceBootyCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -56,6 +59,13 @@ import {
   wireSpawnChainMegaCritButton,
   wireSpawnChainUltraCritButton,
   wireSpawnBoostCritButton,
+  wireSpawnElevatorCritButton,
+  wireSpawnElevatorMegaCritButton,
+  wireSpawnElevatorUltraCritButton,
+  wireSpawnExplosionCritButton,
+  wireSpawnExplosionMegaCritButton,
+  wireSpawnExplosionUltraCritButton,
+  wireSpawnBootyCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
@@ -63,6 +73,13 @@ import {
   wireFloorBuyChainCritButton,
   wireFloorBuyChainMegaCritButton,
   wireFloorBuyChainUltraCritButton,
+  wireFloorBuyElevatorCritButton,
+  wireFloorBuyElevatorMegaCritButton,
+  wireFloorBuyElevatorUltraCritButton,
+  wireFloorBuyExplosionCritButton,
+  wireFloorBuyExplosionMegaCritButton,
+  wireFloorBuyExplosionUltraCritButton,
+  wireFloorBuyBootyCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -397,6 +414,34 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceBoostCritUpgrade(floor, "crit");
     });
+    wireSpawnElevatorCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceElevatorCritUpgrade(floor, "crit");
+    });
+    wireSpawnElevatorMegaCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceElevatorCritUpgrade(floor, "mega");
+    });
+    wireSpawnElevatorUltraCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceElevatorCritUpgrade(floor, "ultra");
+    });
+    wireSpawnExplosionCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceExplosionCritUpgrade(floor, "crit");
+    });
+    wireSpawnExplosionMegaCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceExplosionCritUpgrade(floor, "mega");
+    });
+    wireSpawnExplosionUltraCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceExplosionCritUpgrade(floor, "ultra");
+    });
+    wireSpawnBootyCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceBootyCritUpgrade(floor);
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyBoostCritButton(app, () =>
       forceFloorBuyCrit("crit", false, true),
@@ -407,6 +452,27 @@ async function main() {
     wireFloorBuyChainMegaCritButton(app, () => forceFloorBuyCrit("mega", true));
     wireFloorBuyChainUltraCritButton(app, () =>
       forceFloorBuyCrit("ultra", true),
+    );
+    wireFloorBuyElevatorCritButton(app, () =>
+      forceFloorBuyCrit("crit", false, false, true),
+    );
+    wireFloorBuyElevatorMegaCritButton(app, () =>
+      forceFloorBuyCrit("mega", false, false, true),
+    );
+    wireFloorBuyElevatorUltraCritButton(app, () =>
+      forceFloorBuyCrit("ultra", false, false, true),
+    );
+    wireFloorBuyExplosionCritButton(app, () =>
+      forceFloorBuyCrit("crit", false, false, false, true),
+    );
+    wireFloorBuyExplosionMegaCritButton(app, () =>
+      forceFloorBuyCrit("mega", false, false, false, true),
+    );
+    wireFloorBuyExplosionUltraCritButton(app, () =>
+      forceFloorBuyCrit("ultra", false, false, false, true),
+    );
+    wireFloorBuyBootyCritButton(app, () =>
+      forceFloorBuyCrit("crit", false, false, false, false, true),
     );
     wireMapUnlockCritButton(app, () => forceFloorBuyCrit("crit"));
     wireMapUnlockMegaCritButton(app, () => forceFloorBuyCrit("mega"));

@@ -55,6 +55,9 @@ const IMAGE_FILES = {
   cashRegister: "cashRegister.png", // Trigger sales event's own menu icon
   clock: "clock.png", // Work overtime's own menu icon
   chain: "chain.png", // Chain crit flash's own backdrop icon
+  elevator: "elevator.png", // Elevator crit flash's own backdrop icon
+  explosion: "explosion.png", // Explosion crit flash's own backdrop icon
+  booty: "booty.png", // Booty crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 
