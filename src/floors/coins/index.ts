@@ -113,7 +113,7 @@ export function spawnCoinBurst(
       vy: Math.sin(angle) * speed,
       life: 0,
       maxLife: 45 + Math.random() * 75,
-      size: (22 + Math.random() * 46) * scale * 1.15,
+      size: (22 + Math.random() * 46) * scale * 1.15 * 1.25,
       // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
       // full fall speed more gradually
       gravity:
