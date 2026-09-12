@@ -452,7 +452,10 @@ export function drawCritFlash(
   if (flashLabel === "Heavenly" && heavenIcon) {
     // no extra rotation — heaven.png is an upright gate, spinning it would
     // just look broken
-    const { w: iconW, h: iconH } = fitIconSize(heavenIcon, measuredWidth * 0.85);
+    const { w: iconW, h: iconH } = fitIconSize(
+      heavenIcon,
+      measuredWidth * 0.85,
+    );
     ctx.drawImage(heavenIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
