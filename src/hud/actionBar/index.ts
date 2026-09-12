@@ -83,10 +83,17 @@ const SCROLL_HOLD_MS = 400;
 // (confirmed via an on-screen debug log: pointerdown/pointerup always fired,
 // "click" sometimes just never did, right after swiping the canvas to
 // scroll). pointerup itself is never suppressed this way, so driving the
-// action directly from it sidesteps the whole class of bug
+// action directly from it sidesteps the whole class of bug. preventDefault
+// on pointerdown additionally stops the browser from ever synthesizing that
+// trailing click at all — without it, the click still arrives ~50-100ms
+// later and, once onTap already opened a full-screen dialog on pointerup,
+// lands on that dialog's own backdrop (now covering the same screen point)
+// and immediately closes it right back — the exact "opens then instantly
+// closes" regression seen after switching this off "click" in the first place
 function wireTapButton(button: HTMLButtonElement, onTap: () => void): void {
   let armedPointerId: number | null = null;
   button.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
     armedPointerId = event.pointerId;
   });
   button.addEventListener("pointerup", (event) => {
@@ -116,7 +123,8 @@ function wireHoldableScrollButton(
       holdTimeout = null;
     }
   }
-  button.addEventListener("pointerdown", () => {
+  button.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
     holdFired = false;
     clearHold();
     holdTimeout = setTimeout(() => {
