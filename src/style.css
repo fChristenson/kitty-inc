@@ -49,6 +49,14 @@
    silently falling back off Fredoka without this */
 button {
   font: inherit;
+  /* without this, mobile browsers can treat two taps landing close together in
+     time (e.g. a frustrated re-tap on a button that felt unresponsive) as a
+     double-tap-to-zoom gesture and silently swallow the click entirely instead
+     of firing it — reported as "the action bar's onclick sometimes stops
+     working, clicking several times makes it work again". manipulation disables
+     that double-tap/zoom disambiguation on every button so a tap always fires
+     its click immediately, no delay or drop */
+  touch-action: manipulation;
 }
 
 :root {
