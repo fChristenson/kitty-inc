@@ -24,6 +24,8 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-explosion-ultra-crit" class="game__button">Spawn Explosion Ultra Crit</button>
           <button id="spawn-booty-crit" class="game__button">Spawn Booty Crit</button>
           <button id="spawn-upgrade-crit" class="game__button">Spawn Upgrade Crit</button>
+          <button id="spawn-peppermint-crit" class="game__button">Spawn Peppermint Crit</button>
+          <button id="spawn-heavenly-crit" class="game__button">Spawn Heavenly Crit</button>
           <button id="floor-buy-crit" class="game__button">Floor Crit</button>
           <button id="floor-buy-boost-crit" class="game__button">Floor Boost Crit</button>
           <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
@@ -39,6 +41,8 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-explosion-ultra-crit" class="game__button">Floor Explosion Ultra Crit</button>
           <button id="floor-buy-booty-crit" class="game__button">Floor Booty Crit</button>
           <button id="floor-buy-upgrade-crit" class="game__button">Floor Upgrade Crit</button>
+          <button id="floor-buy-peppermint-crit" class="game__button">Floor Peppermint Crit</button>
+          <button id="floor-buy-heavenly-crit" class="game__button">Floor Heavenly Crit</button>
           <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
           <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
           <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
@@ -46,6 +50,7 @@ export function createTestButtonMarkup(): string {
           <button id="map-unlock-chain-mega-crit" class="game__button">Map Unlock Chain Mega Crit</button>
           <button id="map-unlock-chain-ultra-crit" class="game__button">Map Unlock Chain Ultra Crit</button>
           <button id="map-unlock-upgrade-crit" class="game__button">Map Unlock Upgrade Crit</button>
+          <button id="map-unlock-heavenly-crit" class="game__button">Map Unlock Heavenly Crit</button>
           <button id="test-press-conference" class="game__button">Press Conf Game</button>
           <button id="test-liquidate-assets" class="game__button">Liquidate Assets Game</button>
           <button id="test-pay-taxes" class="game__button">Pay Taxes Game</button>
@@ -141,9 +146,8 @@ export function wireSpawnBounceCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
-  const button = container.querySelector<HTMLButtonElement>(
-    "#spawn-bounce-crit",
-  )!;
+  const button =
+    container.querySelector<HTMLButtonElement>("#spawn-bounce-crit")!;
   button.addEventListener("click", onClick);
 }
 
@@ -210,8 +214,29 @@ export function wireSpawnUpgradeCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
-  const button =
-    container.querySelector<HTMLButtonElement>("#spawn-upgrade-crit")!;
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-upgrade-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnPeppermintCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-peppermint-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnHeavenlyCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-heavenly-crit",
+  )!;
   button.addEventListener("click", onClick);
 }
 
@@ -363,6 +388,26 @@ export function wireFloorBuyUpgradeCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireFloorBuyPeppermintCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-peppermint-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyHeavenlyCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-heavenly-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 // forces the SAME shared roll floors/upgradeButton's forceFloorBuyCrit arms
 // (rollFloorBuyCrit) — the map's next building purchase reads from it too (see
 // cityMap/index.ts's onClick), so these are really just clearer-labeled aliases
@@ -432,6 +477,16 @@ export function wireMapUnlockUpgradeCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#map-unlock-upgrade-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockHeavenlyCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-heavenly-crit",
   )!;
   button.addEventListener("click", onClick);
 }

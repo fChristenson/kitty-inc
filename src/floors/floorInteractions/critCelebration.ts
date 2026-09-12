@@ -10,6 +10,10 @@ import {
   BOOTY_CRIT_LABEL,
   UPGRADE_CRIT_COLOR,
   UPGRADE_CRIT_LABEL,
+  PEPPERMINT_CRIT_COLOR,
+  PEPPERMINT_CRIT_LABEL,
+  HEAVENLY_CRIT_COLOR,
+  HEAVENLY_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -286,6 +290,45 @@ function celebrateUpgrade(
   spawnTierBursts(floor, tier, getScreenCenterLocal);
 }
 
+// peppermint crit (see upgradeButton.ts's isPeppermintCrit): same swap as
+// boost/booty/upgrade above, its own dedicated pink — the reward itself
+// (promoting every other unlocked floor in the building) is applied by
+// floorInteractions.ts, this only covers the celebration moment
+function celebratePeppermint(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(PEPPERMINT_CRIT_LABEL, PEPPERMINT_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// heavenly crit (see upgradeButton.ts's isHeavenlyCrit): the single biggest
+// reward in the game, so it gets the same "ultra-strength" flash treatment
+// ultra tiers themselves use (long strobing hold, top priority) regardless of
+// which tier actually landed alongside it — the reward itself (unlock all/
+// max every tier/grant every floor a max-tier upgrade batch) is applied by
+// floorInteractions.ts, this only covers the celebration moment
+function celebrateHeavenly(
+  floor: Floor,
+  _tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  triggerScreenShake({
+    intensity: 2.6,
+    label: HEAVENLY_CRIT_LABEL,
+    color: HEAVENLY_CRIT_COLOR,
+    strokeWidth: 16,
+    blinkHz: 6,
+    holdMs: 1250,
+    priority: 2,
+  });
+  playPayout();
+  // always the biggest (ultra-shaped) burst pattern, since this moment is the
+  // biggest regardless of which base tier happened to land with it
+  spawnTierBursts(floor, "ultra", getScreenCenterLocal);
+}
+
 // chain and boost are both "special" procs riding the SAME landed tier (see
 // isChainCrit/isBoostCrit) — when only one lands it plays immediately same as
 // any plain crit, but when BOTH land on the same click they each get their own
@@ -294,7 +337,15 @@ function celebrateUpgrade(
 // they're simply skipped while a special celebration is still due, rather
 // than piling up behind it (see triggerCritCelebration below)
 interface QueuedCelebration {
-  kind: "chain" | "boost" | "bounce" | "explosion" | "booty" | "upgrade";
+  kind:
+    | "chain"
+    | "boost"
+    | "bounce"
+    | "explosion"
+    | "booty"
+    | "upgrade"
+    | "peppermint"
+    | "heavenly";
   queuedAt: number;
   run: () => void;
 }
@@ -353,8 +404,19 @@ export function triggerCritCelebration(
   explosion = false,
   booty = false,
   upgrade = false,
+  peppermint = false,
+  heavenly = false,
 ): void {
-  if (chain || boost || bounce || explosion || booty || upgrade) {
+  if (
+    chain ||
+    boost ||
+    bounce ||
+    explosion ||
+    booty ||
+    upgrade ||
+    peppermint ||
+    heavenly
+  ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
     // bulk-buy hold repeatedly rolling "chain") shouldn't queue up N replays
@@ -373,10 +435,7 @@ export function triggerCritCelebration(
         run: () => celebrateBoost(floor, tier, getScreenCenterLocal),
       });
     }
-    if (
-      bounce &&
-      !specialCelebrationQueue.some((q) => q.kind === "bounce")
-    ) {
+    if (bounce && !specialCelebrationQueue.some((q) => q.kind === "bounce")) {
       specialCelebrationQueue.push({
         kind: "bounce",
         queuedAt: now,
@@ -405,6 +464,26 @@ export function triggerCritCelebration(
         kind: "upgrade",
         queuedAt: now,
         run: () => celebrateUpgrade(floor, tier, getScreenCenterLocal),
+      });
+    }
+    if (
+      peppermint &&
+      !specialCelebrationQueue.some((q) => q.kind === "peppermint")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "peppermint",
+        queuedAt: now,
+        run: () => celebratePeppermint(floor, tier, getScreenCenterLocal),
+      });
+    }
+    if (
+      heavenly &&
+      !specialCelebrationQueue.some((q) => q.kind === "heavenly")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "heavenly",
+        queuedAt: now,
+        run: () => celebrateHeavenly(floor, tier, getScreenCenterLocal),
       });
     }
     drainSpecialCelebrationQueue();

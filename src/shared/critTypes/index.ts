@@ -109,7 +109,25 @@ export const UPGRADE_CRIT_CHANCE = CONFIG.crit.upgradeChance;
 export const UPGRADE_CRIT_COLOR = COLOR.cyan;
 export const UPGRADE_CRIT_LABEL = "Upgrade";
 
-// state for all three piggyback procs lives here too (not upgradeButton.ts) so
+// "peppermint crit" — a seventh piggyback proc, a flat one-time effect (not
+// tier-scaled) like booty/upgrade: promotes every OTHER unlocked floor in the
+// building one tier step at once (same nextCritTier promotion upgrade crit
+// uses, just applied to alternating floors building-wide) — applied by
+// floorInteractions.ts
+export const PEPPERMINT_CRIT_CHANCE = CONFIG.crit.peppermintChance;
+export const PEPPERMINT_CRIT_COLOR = COLOR.peppermintPink;
+export const PEPPERMINT_CRIT_LABEL = "Peppermint";
+
+// "heavenly crit" — an eighth piggyback proc, the single biggest reward in the
+// game: unlocks every remaining floor in the building for free, promotes
+// every floor (including newly-unlocked ones) straight to the strongest tier,
+// then grants that tier's own free-upgrade batch to every floor — applied by
+// floorInteractions.ts
+export const HEAVENLY_CRIT_CHANCE = CONFIG.crit.heavenlyChance;
+export const HEAVENLY_CRIT_COLOR = COLOR.heavenlyGold;
+export const HEAVENLY_CRIT_LABEL = "Heavenly";
+
+// state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
 const boostCrits = new WeakSet<Floor>();
@@ -117,6 +135,8 @@ const bounceCrits = new WeakSet<Floor>();
 const explosionCrits = new WeakSet<Floor>();
 const bootyCrits = new WeakSet<Floor>();
 const upgradeCrits = new WeakSet<Floor>();
+const peppermintCrits = new WeakSet<Floor>();
+const heavenlyCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll all five
 // piggyback procs — each is rolled independently, but at most
@@ -153,6 +173,8 @@ export interface CritRollResult {
   explosion: boolean;
   booty: boolean;
   upgrade: boolean;
+  peppermint: boolean;
+  heavenly: boolean;
 }
 
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
@@ -174,7 +196,9 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         | "bounce"
         | "explosion"
         | "booty"
-        | "upgrade";
+        | "upgrade"
+        | "peppermint"
+        | "heavenly";
       const landed: ProcKind[] = [];
       if (Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE) {
         if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
@@ -183,6 +207,8 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         if (Math.random() < EXPLOSION_CRIT_CHANCE) landed.push("explosion");
         if (Math.random() < BOOTY_CRIT_CHANCE) landed.push("booty");
         if (Math.random() < UPGRADE_CRIT_CHANCE) landed.push("upgrade");
+        if (Math.random() < PEPPERMINT_CRIT_CHANCE) landed.push("peppermint");
+        if (Math.random() < HEAVENLY_CRIT_CHANCE) landed.push("heavenly");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       onLanded({
@@ -193,6 +219,8 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         explosion: kept.has("explosion"),
         booty: kept.has("booty"),
         upgrade: kept.has("upgrade"),
+        peppermint: kept.has("peppermint"),
+        heavenly: kept.has("heavenly"),
       });
       return;
     }
@@ -225,6 +253,14 @@ export function isUpgradeCrit(floor: Floor): boolean {
   return upgradeCrits.has(floor);
 }
 
+export function isPeppermintCrit(floor: Floor): boolean {
+  return peppermintCrits.has(floor);
+}
+
+export function isHeavenlyCrit(floor: Floor): boolean {
+  return heavenlyCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -233,6 +269,8 @@ export function consumeCritProcs(floor: Floor): void {
   explosionCrits.delete(floor);
   bootyCrits.delete(floor);
   upgradeCrits.delete(floor);
+  peppermintCrits.delete(floor);
+  heavenlyCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -260,6 +298,14 @@ export function forceBootyCritProc(floor: Floor): void {
 
 export function forceUpgradeCritProc(floor: Floor): void {
   upgradeCrits.add(floor);
+}
+
+export function forcePeppermintCritProc(floor: Floor): void {
+  peppermintCrits.add(floor);
+}
+
+export function forceHeavenlyCritProc(floor: Floor): void {
+  heavenlyCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

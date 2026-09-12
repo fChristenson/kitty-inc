@@ -86,6 +86,19 @@ export const CONFIG = {
     // building-unlock crit, EVERY floor in that building's) own
     // critMultiplierTier one step further (see shared/critTypes' nextCritTier)
     upgradeChance: 0.001,
+    // "peppermint crit" — a flat one-time effect, not tier-scaled, but a much
+    // bigger swing than a single upgrade crit: promotes every OTHER unlocked
+    // floor in the building one tier step at once (see shared/critTypes'
+    // nextCritTier). Rarer than upgradeChance since it's a guaranteed
+    // building-wide effect instead of a single floor
+    peppermintChance: 0.0005,
+    // "heavenly crit" — the single biggest reward in the game: unlocks every
+    // remaining floor in the building for free, promotes every floor (new
+    // ones included) straight to the max tier, then grants that tier's own
+    // free-upgrade batch to every floor. Rarer than peppermintChance since a
+    // fully-unlocked, fully-maxed building is a far bigger swing than
+    // promoting alternating floors one step
+    heavenlyChance: 0.0001,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

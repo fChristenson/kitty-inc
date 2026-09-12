@@ -944,6 +944,87 @@ body {
   flex-shrink: 0;
 }
 
+/* corporationBoostMenu's special-crits info list — a <details> per crit (native
+   expand/collapse, no JS needed) instead of a plain .worker-menu__item button,
+   since these rows aren't purchasable/pressable, just informational */
+.crit-info-item {
+  border: 3px solid var(--color-wood-outline);
+  border-radius: 0.75rem;
+  background: var(--color-amber-muted);
+  box-shadow:
+    0 0 0 4px var(--color-wood-ring),
+    0 0 0 7px var(--color-wood-outline),
+    0 4px 0 0 var(--color-amber-muted-shadow);
+  color: var(--color-white);
+  overflow: hidden;
+  /* a flex item inside .worker-menu__list (flex column) otherwise gets
+     compressed below its own content's height once an expanded <details>
+     pushes the list's total content past its scrollable container's height —
+     flex-shrink kicks in BEFORE overflow-y:auto would ever scroll to reveal
+     it, clipping the description text instead of just scrolling to it */
+  flex-shrink: 0;
+}
+
+.crit-info-item__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  -webkit-text-stroke: 1px black;
+  paint-order: stroke fill;
+  cursor: pointer;
+  list-style: none;
+}
+
+.crit-info-item__summary::-webkit-details-marker {
+  display: none;
+}
+
+.crit-info-item__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.crit-info-item__name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.crit-info-item__chevron {
+  flex-shrink: 0;
+  display: flex;
+  /* the shared arrow icon's native geometry points UP; rotated 180° by default
+     so it reads as a "collapsed, tap to expand" down-arrow, then rotated back
+     to upright once opened (see the [open] rule below) */
+  transform: rotate(180deg);
+  transition: transform 150ms ease;
+}
+
+.crit-info-item__chevron svg {
+  display: block;
+}
+
+/* rotates to point up once its own <details> is expanded */
+.crit-info-item[open] .crit-info-item__chevron {
+  transform: rotate(0deg);
+}
+
+.crit-info-item__description {
+  margin: 0;
+  padding: 0 1rem 0.85rem 1rem;
+  font-weight: 400;
+  -webkit-text-stroke: 0.5px black;
+  paint-order: stroke fill;
+}
+
 /* same wood-outline/cream-ring cartoon language as .worker-menu__item, just a
    small square instead of a pill — amber unchecked, money-green + a white
    check mark once checked, disabled-gray to match .worker-menu__item:disabled */

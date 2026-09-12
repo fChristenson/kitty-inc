@@ -13,10 +13,6 @@ import { createPollingLoop } from "../../shared/pollingLoop";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import {
   getCompanyBaseModifierPercent,
-  getMarketInfluencePercent,
-  getSecuredAssetsPercent,
-  getTaxRebatePercent,
-  getGlobalIncomeBoostPercent,
   formatBoostPercent,
 } from "../corporationBoostMenu";
 
@@ -111,6 +107,16 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
       `,
       )
       .join("");
+    // only the per-company modifiers are shown/totaled here now — market
+    // influence/secured assets/tax rebate (the global, non-company mods) were
+    // removed from this dialog per explicit request, so this total must sum
+    // just the rows actually visible above it, not the full
+    // getGlobalIncomeBoostPercent() (which still folds those 3 in for the
+    // REAL income multiplier elsewhere — unrelated, unaffected by this)
+    const companyModifierTotal = activeIndices.reduce(
+      (sum, i) => sum + getCompanyBaseModifierPercent(i),
+      0,
+    );
     list.innerHTML = `
       <h3 class="worker-menu__subheader">Corporation assets</h3>
       ${companyAssetRows}
@@ -125,22 +131,10 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
         <span>${formatMoney(getAllCompaniesIncomeRatePerSecond())}/s</span>
       </div>
       <h3 class="worker-menu__subheader">Income modifiers</h3>
-      <div class="worker-menu__modifier-row">
-        <span>Market influence</span>
-        <span>${formatBoostPercent(getMarketInfluencePercent())}</span>
-      </div>
-      <div class="worker-menu__modifier-row">
-        <span>Secured assets</span>
-        <span>${formatBoostPercent(getSecuredAssetsPercent())}</span>
-      </div>
-      <div class="worker-menu__modifier-row worker-menu__modifier-row--divider">
-        <span>Tax rebate</span>
-        <span>${formatBoostPercent(getTaxRebatePercent())}</span>
-      </div>
       ${modifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
         <span>Total</span>
-        <span>${formatBoostPercent(getGlobalIncomeBoostPercent())}</span>
+        <span>${formatBoostPercent(companyModifierTotal)}</span>
       </div>
     `;
     list.scrollTop = scrollTop;

@@ -49,6 +49,18 @@ let upgradeIcon: HTMLImageElement | null = null;
 loadImageByName("upgrade").then((image) => {
   upgradeIcon = image;
 });
+// same idea again, drawn behind the "Peppermint" flash text (see
+// upgradeButton.ts's isPeppermintCrit)
+let peppermintIcon: HTMLImageElement | null = null;
+loadImageByName("peppermint").then((image) => {
+  peppermintIcon = image;
+});
+// same idea again, drawn behind the "Heavenly" flash text (see
+// upgradeButton.ts's isHeavenlyCrit)
+let heavenIcon: HTMLImageElement | null = null;
+loadImageByName("heaven").then((image) => {
+  heavenIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -427,6 +439,21 @@ export function drawCritFlash(
       measuredWidth * 0.85,
     );
     ctx.drawImage(upgradeIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Peppermint" && peppermintIcon) {
+    // no extra rotation — peppermint.png is an upright candy cane, spinning it
+    // would just look broken
+    const { w: iconW, h: iconH } = fitIconSize(
+      peppermintIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(peppermintIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Heavenly" && heavenIcon) {
+    // no extra rotation — heaven.png is an upright gate, spinning it would
+    // just look broken
+    const { w: iconW, h: iconH } = fitIconSize(heavenIcon, measuredWidth * 0.85);
+    ctx.drawImage(heavenIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

@@ -351,6 +351,8 @@ export {
   forceExplosionCritUpgrade,
   forceBootyCritUpgrade,
   forceUpgradeCritUpgrade,
+  forcePeppermintCritUpgrade,
+  forceHeavenlyCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,
   pickHigherCritTier,

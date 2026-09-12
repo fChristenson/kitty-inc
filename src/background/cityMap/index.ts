@@ -11,6 +11,7 @@ import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
 import { setActiveCompanyIndex } from "../../company";
 import { getEffectiveDpr } from "../../shared/devicePixelRatio";
+import { arrowIconMarkup } from "../../shared/arrowIcon";
 import {
   spawnCoinBurstAt,
   drawActiveCoinBursts,
@@ -37,6 +38,8 @@ import {
   CRIT_TIER_CONFIG,
   UPGRADE_CRIT_LABEL,
   UPGRADE_CRIT_COLOR,
+  HEAVENLY_CRIT_LABEL,
+  HEAVENLY_CRIT_COLOR,
   type CritTier,
 } from "../../shared/critTypes";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
@@ -107,11 +110,17 @@ export interface CityMapDeps {
   // `upgrade` (see rollFloorBuyCrit's own upgrade flag) instead promotes
   // EVERY floor this building has one further step past whatever tier they
   // were just set to
+  // `heavenly` (see rollFloorBuyCrit's own heavenly flag) unlocks every
+  // remaining floor of this building for free, maxes every floor's tier, and
+  // grants each one a full max-tier free-upgrade batch — the same reward a
+  // heavenly crit landing on a normal upgrade click grants, just applied to
+  // this whole newly-bought building
   setBuildingCritTier: (
     buildingIndex: number,
     tier: CritTier,
     chain: boolean,
     upgrade: boolean,
+    heavenly: boolean,
   ) => void;
   onSelectBuilding: (index: number) => void; // switch to that building and leave the map view
   // fires once the corporation barrel roll settles on a different company (see
@@ -147,18 +156,7 @@ export interface CityMapView {
 // style.css) rather than baking rotation into the markup itself. Drawn twice — a
 // fat black pass behind, a fatter currentColor pass in front — for a bordered look,
 // since these are open stroked lines rather than a fillable shape
-const ARROW_SVG = `
-  <svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <g stroke="black" stroke-width="9">
-      <path d="M12 19V5"></path>
-      <path d="M5 12l7-7 7 7"></path>
-    </g>
-    <g stroke="currentColor" stroke-width="5">
-      <path d="M12 19V5"></path>
-      <path d="M5 12l7-7 7 7"></path>
-    </g>
-  </svg>
-`;
+const ARROW_SVG = arrowIconMarkup(52);
 
 // canvas + prev/next city arrows + the anime-style transition overlay (an SVG
 // JS animates real <line> rays across, in sync with a swoosh, while cityIndex
@@ -499,6 +497,7 @@ export function createCityMapView(
     feetY: number,
     chain: boolean,
     upgrade: boolean,
+    heavenly: boolean,
   ): void {
     const burstY = feetY - MARKER_H / 2;
     const burstCount = tier === "ultra" ? 5 : tier === "mega" ? 3 : 2;
@@ -506,6 +505,23 @@ export function createCityMapView(
       setTimeout(() => {
         spawnCoinBurstAt(cx, burstY, MARKER_COIN_BURST_SCALE * 1.5);
       }, i * 90);
+    }
+    // heavenly crit: the single biggest reward, so it always gets the same
+    // "ultra-strength" flash floorInteractions/critCelebration.ts's own
+    // celebrateHeavenly uses — checked before upgrade's own flat flash below
+    // since heavenly is the bigger moment if both happen to land together
+    if (heavenly) {
+      triggerScreenShake({
+        intensity: 2.6,
+        label: HEAVENLY_CRIT_LABEL,
+        color: HEAVENLY_CRIT_COLOR,
+        strokeWidth: 16,
+        blinkHz: 6,
+        holdMs: 1250,
+        priority: 2,
+      });
+      playPayout();
+      return;
     }
     // upgrade crit: a flat, non-tier-scaled flash (same shape as
     // floorInteractions/critCelebration.ts's own playSpecialFlash) instead of
@@ -597,6 +613,7 @@ export function createCityMapView(
             buyTier.tier,
             buyTier.chain,
             buyTier.upgrade,
+            buyTier.heavenly,
           );
           triggerMapCatCritCelebration(
             buyTier.tier,
@@ -604,6 +621,7 @@ export function createCityMapView(
             feetY,
             buyTier.chain,
             buyTier.upgrade,
+            buyTier.heavenly,
           );
         }
       }

@@ -281,12 +281,18 @@ export {
   BOOTY_CRIT_LABEL,
   UPGRADE_CRIT_COLOR,
   UPGRADE_CRIT_LABEL,
+  PEPPERMINT_CRIT_COLOR,
+  PEPPERMINT_CRIT_LABEL,
+  HEAVENLY_CRIT_COLOR,
+  HEAVENLY_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
   isExplosionCrit,
   isBootyCrit,
   isUpgradeCrit,
+  isPeppermintCrit,
+  isHeavenlyCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -303,6 +309,8 @@ import {
   forceExplosionCritProc,
   forceBootyCritProc,
   forceUpgradeCritProc,
+  forcePeppermintCritProc,
+  forceHeavenlyCritProc,
 } from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
@@ -322,6 +330,8 @@ export function rollCritUpgrade(floor: Floor): void {
     if (result.explosion) forceExplosionCritProc(floor);
     if (result.booty) forceBootyCritProc(floor);
     if (result.upgrade) forceUpgradeCritProc(floor);
+    if (result.peppermint) forcePeppermintCritProc(floor);
+    if (result.heavenly) forceHeavenlyCritProc(floor);
   });
 }
 
@@ -362,8 +372,20 @@ export function forceFloorBuyCrit(
   explosion = false,
   booty = false,
   upgrade = false,
+  peppermint = false,
+  heavenly = false,
 ): void {
-  forcedFloorBuyCrit = { tier, chain, boost, bounce, explosion, booty, upgrade };
+  forcedFloorBuyCrit = {
+    tier,
+    chain,
+    boost,
+    bounce,
+    explosion,
+    booty,
+    upgrade,
+    peppermint,
+    heavenly,
+  };
 }
 
 export function getCritTier(floor: Floor): CritTier | null {
@@ -455,6 +477,22 @@ export function forceBootyCritUpgrade(floor: Floor): void {
 export function forceUpgradeCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceUpgradeCritProc(floor);
+}
+
+// dev/test-only: force this floor into a peppermint crit, bypassing chance
+// entirely (see hud/testButton's "Spawn Peppermint Crit") — not tier-scaled,
+// so no tier param needed (same shape as booty/upgrade above)
+export function forcePeppermintCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forcePeppermintCritProc(floor);
+}
+
+// dev/test-only: force this floor into a heavenly crit, bypassing chance
+// entirely (see hud/testButton's "Spawn Heavenly Crit") — not tier-scaled,
+// so no tier param needed (same shape as booty/upgrade/peppermint above)
+export function forceHeavenlyCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceHeavenlyCritProc(floor);
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see

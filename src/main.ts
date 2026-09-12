@@ -3,6 +3,8 @@ import { fromNumber, gt, isZero } from "./shared/bigNumber";
 import {
   CHAIN_CRIT_CONTINUE_CHANCE,
   nextCritTier,
+  CRIT_TIER_ORDER,
+  CRIT_TIER_CONFIG,
   type CritTier,
 } from "./shared/critTypes";
 import {
@@ -24,9 +26,12 @@ import {
   forceExplosionCritUpgrade,
   forceBootyCritUpgrade,
   forceUpgradeCritUpgrade,
+  forcePeppermintCritUpgrade,
+  forceHeavenlyCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
+  increaseIncomeRate,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -72,6 +77,8 @@ import {
   wireSpawnExplosionUltraCritButton,
   wireSpawnBootyCritButton,
   wireSpawnUpgradeCritButton,
+  wireSpawnPeppermintCritButton,
+  wireSpawnHeavenlyCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
@@ -87,6 +94,8 @@ import {
   wireFloorBuyExplosionUltraCritButton,
   wireFloorBuyBootyCritButton,
   wireFloorBuyUpgradeCritButton,
+  wireFloorBuyPeppermintCritButton,
+  wireFloorBuyHeavenlyCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -94,6 +103,7 @@ import {
   wireMapUnlockChainMegaCritButton,
   wireMapUnlockChainUltraCritButton,
   wireMapUnlockUpgradeCritButton,
+  wireMapUnlockHeavenlyCritButton,
   wirePressConferenceTestButton,
   wireLiquidateAssetsTestButton,
   wirePayTaxesTestButton,
@@ -454,6 +464,14 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceUpgradeCritUpgrade(floor);
     });
+    wireSpawnPeppermintCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forcePeppermintCritUpgrade(floor);
+    });
+    wireSpawnHeavenlyCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceHeavenlyCritUpgrade(floor);
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyBoostCritButton(app, () =>
       forceFloorBuyCrit("crit", false, true),
@@ -489,6 +507,22 @@ async function main() {
     wireFloorBuyUpgradeCritButton(app, () =>
       forceFloorBuyCrit("crit", false, false, false, false, false, true),
     );
+    wireFloorBuyPeppermintCritButton(app, () =>
+      forceFloorBuyCrit("crit", false, false, false, false, false, false, true),
+    );
+    wireFloorBuyHeavenlyCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
     wireMapUnlockCritButton(app, () => forceFloorBuyCrit("crit"));
     wireMapUnlockMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireMapUnlockUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
@@ -501,6 +535,19 @@ async function main() {
     );
     wireMapUnlockUpgradeCritButton(app, () =>
       forceFloorBuyCrit("crit", false, false, false, false, false, true),
+    );
+    wireMapUnlockHeavenlyCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
     );
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     wireLiquidateAssetsTestButton(app, () => liquidateAssetsGame.open());
@@ -569,12 +616,7 @@ async function main() {
     (floor) => gameCanvas.scrollActiveToFloor(floor),
     (floor) => gameCanvas.scrollActiveToFloor(floor),
   );
-  const corporationBoostMenu = wireCorporationBoostMenu(
-    app,
-    () => pressConferenceGame.open(),
-    () => liquidateAssetsGame.open(),
-    () => payTaxesGame.open(),
-  );
+  const corporationBoostMenu = wireCorporationBoostMenu(app);
   const pressConferenceGame = wirePressConferenceGame(app, () =>
     corporationBoostMenu.refresh(),
   );
@@ -638,6 +680,7 @@ async function main() {
     tier: CritTier,
     chain: boolean,
     upgrade: boolean,
+    heavenly: boolean,
   ): void {
     const floors = buildings[buildingIndex];
     if (!floors) return;
@@ -649,6 +692,33 @@ async function main() {
     if (upgrade) {
       for (const floor of floors) {
         floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+      }
+    }
+    // heavenly crit: the biggest reward of all, applied building-wide —
+    // unlocks every remaining floor for free, maxes every floor's tier, then
+    // grants each one a full max-tier free-upgrade batch. Uses
+    // increaseIncomeRate directly (not floorInteractions.ts's applyUpgradeTick,
+    // which also spawns a coin burst/re-rolls a crit at a specific ON-SCREEN
+    // floor button position) since this building may not even be the one
+    // currently displayed
+    if (heavenly) {
+      unlockAllFloors({
+        floors,
+        backgroundCount: getBackgroundUrls().length,
+        multiplier: getBuildingMultiplier(buildingIndex),
+        onAdd: (floor) => {
+          if (buildingIndex === activeBuildingIndex) {
+            gameCanvas.notifyFloorAdded(floor);
+          }
+        },
+      });
+      const maxTier = CRIT_TIER_ORDER[0];
+      const count = CRIT_TIER_CONFIG[maxTier].multiplier;
+      for (const floor of floors) {
+        floor.critMultiplierTier = maxTier;
+        for (let i = 0; i < count; i++) {
+          increaseIncomeRate(floor);
+        }
       }
     }
     if (!chain) return;
@@ -681,15 +751,16 @@ async function main() {
     tier: CritTier,
     chain: boolean,
     upgrade: boolean,
+    heavenly: boolean,
   ): void {
-    applyBuildingCritTier(buildingIndex, tier, chain, upgrade);
+    applyBuildingCritTier(buildingIndex, tier, chain, upgrade, heavenly);
     if (chain) {
       let continueChain = true;
       while (continueChain) {
         const nextIndex = buildings.length;
         buildings.push(createBuilding(nextIndex, getBackgroundUrls().length));
         setupBuilding(nextIndex);
-        applyBuildingCritTier(nextIndex, tier, chain, upgrade);
+        applyBuildingCritTier(nextIndex, tier, chain, upgrade, heavenly);
         continueChain = Math.random() < CHAIN_CRIT_CONTINUE_CHANCE;
       }
     }

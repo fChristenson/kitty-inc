@@ -18,6 +18,8 @@ import {
   isExplosionCrit,
   isBootyCrit,
   isUpgradeCrit,
+  isPeppermintCrit,
+  isHeavenlyCrit,
   consumeCritUpgrade,
   rollCritUpgrade,
   rollFloorBuyCrit,
@@ -35,6 +37,7 @@ import {
   resetOvertimeTicks,
   isUpgradeButtonEnabled,
   CRIT_TIER_CONFIG,
+  CRIT_TIER_ORDER,
   CHAIN_CRIT_CONTINUE_CHANCE,
   BOUNCE_CRIT_CONTINUE_CHANCE,
   EXPLOSION_CRIT_CONTINUE_CHANCE,
@@ -64,12 +67,54 @@ import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
   hitTestFloorLock,
   unlockFloor,
+  unlockAllFloors,
   ensureLockedFloorAbove,
   getLockCenter,
 } from "../floorLock";
 import { activateBoosted, type Floor } from "../../gameState";
 import { multiply } from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
+
+// "peppermint crit" (see shared/critTypes' isPeppermintCrit): promotes every
+// OTHER unlocked floor in the building one tier step at once (same
+// nextCritTier promotion upgrade crit uses on a single floor, just applied
+// building-wide to alternating floors) — unlocked floors always form a
+// contiguous prefix of `floors`, so striding by 2 over the whole array and
+// skipping any not-yet-unlocked entries is equivalent to "every other of all
+// unlocked floors"
+function applyPeppermintCrit(floors: Floor[]): void {
+  for (let i = 0; i < floors.length; i += 2) {
+    const floor = floors[i];
+    if (floor.unlocked) {
+      floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+    }
+  }
+}
+
+// "heavenly crit" (see shared/critTypes' isHeavenlyCrit): the single biggest
+// reward in the game — unlocks every remaining floor in the building for
+// free (reusing the exact same unlockAllFloors loop a paid "unlock all"
+// purchase uses), promotes EVERY floor (including the ones just unlocked)
+// straight to the strongest tier (CRIT_TIER_ORDER[0], rarest-first so index 0
+// is always the top), then grants that tier's own free-upgrade count to every
+// floor once — the same reward shape a real crit of that tier landing on a
+// floor already grants, just applied building-wide instead of to one floor
+function applyHeavenlyCrit(deps: FloorActionsDeps): void {
+  unlockAllFloors({
+    floors: deps.floors,
+    backgroundCount: deps.backgroundCount,
+    multiplier: deps.multiplier,
+    onAdd: deps.onFloorAdded,
+  });
+  const maxTier = CRIT_TIER_ORDER[0];
+  const count = CRIT_TIER_CONFIG[maxTier].multiplier;
+  deps.floors.forEach((floor, index) => {
+    floor.critMultiplierTier = maxTier;
+    for (let i = 0; i < count; i++) {
+      applyUpgradeTick(floor, index === 0);
+    }
+  });
+}
 
 export interface FloorActionsDeps {
   floors: Floor[];
@@ -366,6 +411,13 @@ export function handleFloorClick(
         if (buyTier.upgrade) {
           floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
         }
+        // peppermint crit: same flat one-time effect again, but promotes every
+        // OTHER unlocked floor across the whole building at once
+        if (buyTier.peppermint) applyPeppermintCrit(floors);
+        // heavenly crit: the biggest reward of all — unlocks every remaining
+        // floor, maxes every floor's tier, and grants each one a full
+        // max-tier free-upgrade batch
+        if (buyTier.heavenly) applyHeavenlyCrit(deps);
       }
       persist();
       const center = getLockCenter();
@@ -381,6 +433,8 @@ export function handleFloorClick(
           buyTier.explosion,
           buyTier.booty,
           buyTier.upgrade,
+          buyTier.peppermint,
+          buyTier.heavenly,
         );
     }
     return;
@@ -493,6 +547,8 @@ export function handleFloorClick(
       const explosion = isExplosionCrit(floor);
       const booty = isBootyCrit(floor);
       const upgrade = isUpgradeCrit(floor);
+      const peppermint = isPeppermintCrit(floor);
+      const heavenly = isHeavenlyCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -542,7 +598,15 @@ export function handleFloorClick(
       if (booty) addTotalIncome(getTotalIncome());
       // upgrade crit: promotes this floor's own permanent tier one further
       // step, same flat one-time effect as booty/boost
-      if (upgrade) floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+      if (upgrade)
+        floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+      // peppermint crit: same flat one-time effect again, but promotes every
+      // OTHER unlocked floor across the whole building at once
+      if (peppermint) applyPeppermintCrit(floors);
+      // heavenly crit: the biggest reward of all — unlocks every remaining
+      // floor, maxes every floor's tier, and grants each one a full
+      // max-tier free-upgrade batch
+      if (heavenly) applyHeavenlyCrit(deps);
       persist();
       triggerButtonPress(floor);
       triggerCritCelebration(
@@ -555,6 +619,8 @@ export function handleFloorClick(
         explosion,
         booty,
         upgrade,
+        peppermint,
+        heavenly,
       );
       return;
     }

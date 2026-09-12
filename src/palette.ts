@@ -61,6 +61,10 @@ export const COLOR = {
   gold: "#D4AF37",
   // Upgrade crit's own dedicated color
   cyan: "#06B6D4",
+  // Peppermint crit's own dedicated color
+  peppermintPink: "#EC4899",
+  // Heavenly crit's own dedicated color
+  heavenlyGold: "#FFD700",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",
