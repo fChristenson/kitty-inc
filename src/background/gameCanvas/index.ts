@@ -85,8 +85,9 @@ const MOMENTUM_DECAY_PER_MS = 0.994;
 const MOMENTUM_MIN_SPEED = 0.02; // world units/ms below which momentum just stops
 // press-and-hold auto-repeat: while the pointer stays down on an upgrade button,
 // its click logic re-fires this often instead of only once on release — short
-// enough to read as spamming the button by hand, not a slow metronome tick
-const UPGRADE_HOLD_INTERVAL_MS = 50;
+// enough to read as spamming the button by hand, not a slow metronome tick.
+// 50% faster repeat rate than the original 50ms per explicit request
+const UPGRADE_HOLD_INTERVAL_MS = 33;
 
 export interface GameCanvasDeps {
   canvas: HTMLCanvasElement;
