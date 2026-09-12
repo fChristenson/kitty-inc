@@ -77,39 +77,39 @@ export interface ActionBarHandlers {
 // that deliberately holding the button still feels immediate
 const SCROLL_HOLD_MS = 400;
 
-// fires onTap on pointerup, NOT the browser's synthesized "click" \u2014 mobile
-// browsers can silently swallow the click that would normally follow a tap
-// when it lands shortly after a drag/swipe gesture elsewhere on the page
+// fires onTap on whichever comes first, pointerup or the browser's own
+// synthesized "click" \u2014 mobile browsers can silently swallow the click that
+// would normally follow a tap right after a drag/swipe elsewhere on the page
 // (confirmed via an on-screen debug log: pointerdown/pointerup always fired,
-// "click" sometimes just never did, right after swiping the canvas to
-// scroll). pointerup itself is never suppressed this way, so driving the
-// action directly from it sidesteps the whole class of bug. preventDefault
-// on pointerdown additionally stops the browser from ever synthesizing that
-// trailing click at all — without it, the click still arrives ~50-100ms
-// later and, once onTap already opened a full-screen dialog on pointerup,
-// lands on that dialog's own backdrop (now covering the same screen point)
-// and immediately closes it right back — the exact "opens then instantly
-// closes" regression seen after switching this off "click" in the first place
+// "click" sometimes just never did), so pointerup alone can't be trusted;
+// but relying on preventDefault to fully suppress the OTHER one turned out
+// not to be reliable either. Listening for both and just ignoring whichever
+// one shows up second (reset on the next pointerdown) is simpler and covers
+// both failure modes at once, regardless of which one a given browser/
+// gesture actually fires
 function wireTapButton(button: HTMLButtonElement, onTap: () => void): void {
-  let armedPointerId: number | null = null;
-  button.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
-    armedPointerId = event.pointerId;
+  let fired = false;
+  function fireOnce(): void {
+    if (fired) return;
+    fired = true;
+    onTap();
+  }
+  button.addEventListener("pointerdown", () => {
+    fired = false;
   });
-  button.addEventListener("pointerup", (event) => {
-    if (armedPointerId === event.pointerId) onTap();
-    armedPointerId = null;
-  });
+  button.addEventListener("pointerup", fireOnce);
+  button.addEventListener("click", fireOnce);
+  // an aborted gesture shouldn't fire at all \u2014 marking it "already fired"
+  // blocks a click that might still trail a cancelled pointer
   button.addEventListener("pointercancel", () => {
-    armedPointerId = null;
+    fired = true;
   });
 }
 
 // wires a scroll button to fire onClick on a normal tap, or onHold once the
-// press is held past SCROLL_HOLD_MS \u2014 both decided directly off
-// pointerdown/pointerup (see wireTapButton's own comment on why: relying on
-// the browser's synthesized "click" here had the exact same swallowed-after-
-// a-swipe bug)
+// press is held past SCROLL_HOLD_MS \u2014 the tap side reuses wireTapButton's
+// own "whichever of pointerup/click comes first" dedupe, gated by whether
+// the hold already fired
 function wireHoldableScrollButton(
   button: HTMLButtonElement,
   onClick: () => void,
@@ -117,15 +117,21 @@ function wireHoldableScrollButton(
 ): void {
   let holdTimeout: ReturnType<typeof setTimeout> | null = null;
   let holdFired = false;
+  let tapFired = false;
   function clearHold(): void {
     if (holdTimeout !== null) {
       clearTimeout(holdTimeout);
       holdTimeout = null;
     }
   }
-  button.addEventListener("pointerdown", (event) => {
-    event.preventDefault();
+  function fireTapOnce(): void {
+    if (tapFired || holdFired) return;
+    tapFired = true;
+    onClick();
+  }
+  button.addEventListener("pointerdown", () => {
     holdFired = false;
+    tapFired = false;
     clearHold();
     holdTimeout = setTimeout(() => {
       holdTimeout = null;
@@ -135,9 +141,13 @@ function wireHoldableScrollButton(
   });
   button.addEventListener("pointerup", () => {
     clearHold();
-    if (!holdFired) onClick();
+    fireTapOnce();
   });
-  button.addEventListener("pointercancel", clearHold);
+  button.addEventListener("click", fireTapOnce);
+  button.addEventListener("pointercancel", () => {
+    clearHold();
+    tapFired = true;
+  });
 }
 
 export function wireActionBar(
