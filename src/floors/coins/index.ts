@@ -21,7 +21,7 @@ const MAX_SPIN_RATE = 0.12;
 // UPGRADE_HOLD_INTERVAL_MS), spawning particles far faster than a ~1-2s lifespan
 // lets them expire; without this cap a sustained hold grows the array (and every
 // frame's update/draw cost) without bound instead of settling at a steady state
-const MAX_PARTICLES = 500;
+const MAX_PARTICLES = 750;
 
 export async function loadCoinImage(): Promise<HTMLImageElement> {
   return loadCoinBurstImages();
@@ -113,7 +113,7 @@ export function spawnCoinBurst(
       vy: Math.sin(angle) * speed,
       life: 0,
       maxLife: 45 + Math.random() * 75,
-      size: (22 + Math.random() * 46) * scale,
+      size: (22 + Math.random() * 46) * scale * 1.15,
       // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
       // full fall speed more gradually
       gravity:

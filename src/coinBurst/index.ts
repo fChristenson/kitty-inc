@@ -111,7 +111,7 @@ export function createCoinBurstParticles(
       vy: Math.sin(angle) * speed,
       life: 0,
       maxLife: 45 + Math.random() * 75,
-      size: 22 + Math.random() * 46,
+      size: (22 + Math.random() * 46) * 1.15,
       // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
       // full fall speed more gradually
       gravity: Math.max(
@@ -186,7 +186,7 @@ export function drawCoinBurstFrame(
 // spawned a burst (the city map, the press conference minigame) is actually
 // being redrawn, so the pool's own cap (not just per-particle expiry) is what
 // keeps a burst spawned right as that screen closes from accumulating forever
-const pool = createParticlePool<CoinBurstParticle>(500);
+const pool = createParticlePool<CoinBurstParticle>(750);
 let lastActiveUpdateAt: number | null = null;
 
 export function hasActiveCoinBursts(): boolean {
