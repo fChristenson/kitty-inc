@@ -16,13 +16,14 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-chain-mega-crit" class="game__button">Spawn Chain Mega Crit</button>
           <button id="spawn-chain-ultra-crit" class="game__button">Spawn Chain Ultra Crit</button>
           <button id="spawn-boost-crit" class="game__button">Spawn Boost Crit</button>
-          <button id="spawn-elevator-crit" class="game__button">Spawn Elevator Crit</button>
-          <button id="spawn-elevator-mega-crit" class="game__button">Spawn Elevator Mega Crit</button>
-          <button id="spawn-elevator-ultra-crit" class="game__button">Spawn Elevator Ultra Crit</button>
+          <button id="spawn-bounce-crit" class="game__button">Spawn Bounce Crit</button>
+          <button id="spawn-bounce-mega-crit" class="game__button">Spawn Bounce Mega Crit</button>
+          <button id="spawn-bounce-ultra-crit" class="game__button">Spawn Bounce Ultra Crit</button>
           <button id="spawn-explosion-crit" class="game__button">Spawn Explosion Crit</button>
           <button id="spawn-explosion-mega-crit" class="game__button">Spawn Explosion Mega Crit</button>
           <button id="spawn-explosion-ultra-crit" class="game__button">Spawn Explosion Ultra Crit</button>
           <button id="spawn-booty-crit" class="game__button">Spawn Booty Crit</button>
+          <button id="spawn-upgrade-crit" class="game__button">Spawn Upgrade Crit</button>
           <button id="floor-buy-crit" class="game__button">Floor Crit</button>
           <button id="floor-buy-boost-crit" class="game__button">Floor Boost Crit</button>
           <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
@@ -30,19 +31,21 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-chain-crit" class="game__button">Floor Chain Crit</button>
           <button id="floor-buy-chain-mega-crit" class="game__button">Floor Chain Mega Crit</button>
           <button id="floor-buy-chain-ultra-crit" class="game__button">Floor Chain Ultra Crit</button>
-          <button id="floor-buy-elevator-crit" class="game__button">Floor Elevator Crit</button>
-          <button id="floor-buy-elevator-mega-crit" class="game__button">Floor Elevator Mega Crit</button>
-          <button id="floor-buy-elevator-ultra-crit" class="game__button">Floor Elevator Ultra Crit</button>
+          <button id="floor-buy-bounce-crit" class="game__button">Floor Bounce Crit</button>
+          <button id="floor-buy-bounce-mega-crit" class="game__button">Floor Bounce Mega Crit</button>
+          <button id="floor-buy-bounce-ultra-crit" class="game__button">Floor Bounce Ultra Crit</button>
           <button id="floor-buy-explosion-crit" class="game__button">Floor Explosion Crit</button>
           <button id="floor-buy-explosion-mega-crit" class="game__button">Floor Explosion Mega Crit</button>
           <button id="floor-buy-explosion-ultra-crit" class="game__button">Floor Explosion Ultra Crit</button>
           <button id="floor-buy-booty-crit" class="game__button">Floor Booty Crit</button>
+          <button id="floor-buy-upgrade-crit" class="game__button">Floor Upgrade Crit</button>
           <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
           <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
           <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
           <button id="map-unlock-chain-crit" class="game__button">Map Unlock Chain Crit</button>
           <button id="map-unlock-chain-mega-crit" class="game__button">Map Unlock Chain Mega Crit</button>
           <button id="map-unlock-chain-ultra-crit" class="game__button">Map Unlock Chain Ultra Crit</button>
+          <button id="map-unlock-upgrade-crit" class="game__button">Map Unlock Upgrade Crit</button>
           <button id="test-press-conference" class="game__button">Press Conf Game</button>
           <button id="test-liquidate-assets" class="game__button">Liquidate Assets Game</button>
           <button id="test-pay-taxes" class="game__button">Pay Taxes Game</button>
@@ -134,32 +137,32 @@ export function wireSpawnBoostCritButton(
   button.addEventListener("click", onClick);
 }
 
-export function wireSpawnElevatorCritButton(
+export function wireSpawnBounceCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#spawn-elevator-crit",
+    "#spawn-bounce-crit",
   )!;
   button.addEventListener("click", onClick);
 }
 
-export function wireSpawnElevatorMegaCritButton(
+export function wireSpawnBounceMegaCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#spawn-elevator-mega-crit",
+    "#spawn-bounce-mega-crit",
   )!;
   button.addEventListener("click", onClick);
 }
 
-export function wireSpawnElevatorUltraCritButton(
+export function wireSpawnBounceUltraCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#spawn-elevator-ultra-crit",
+    "#spawn-bounce-ultra-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -200,6 +203,15 @@ export function wireSpawnBootyCritButton(
 ): void {
   const button =
     container.querySelector<HTMLButtonElement>("#spawn-booty-crit")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnUpgradeCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#spawn-upgrade-crit")!;
   button.addEventListener("click", onClick);
 }
 
@@ -271,32 +283,32 @@ export function wireFloorBuyChainUltraCritButton(
   button.addEventListener("click", onClick);
 }
 
-export function wireFloorBuyElevatorCritButton(
+export function wireFloorBuyBounceCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#floor-buy-elevator-crit",
+    "#floor-buy-bounce-crit",
   )!;
   button.addEventListener("click", onClick);
 }
 
-export function wireFloorBuyElevatorMegaCritButton(
+export function wireFloorBuyBounceMegaCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#floor-buy-elevator-mega-crit",
+    "#floor-buy-bounce-mega-crit",
   )!;
   button.addEventListener("click", onClick);
 }
 
-export function wireFloorBuyElevatorUltraCritButton(
+export function wireFloorBuyBounceUltraCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#floor-buy-elevator-ultra-crit",
+    "#floor-buy-bounce-ultra-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -337,6 +349,16 @@ export function wireFloorBuyBootyCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-booty-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyUpgradeCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-upgrade-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -400,6 +422,16 @@ export function wireMapUnlockChainUltraCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#map-unlock-chain-ultra-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockUpgradeCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-upgrade-crit",
   )!;
   button.addEventListener("click", onClick);
 }

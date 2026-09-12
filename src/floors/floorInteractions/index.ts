@@ -14,9 +14,10 @@ import {
   getCritTier,
   isChainCrit,
   isBoostCrit,
-  isElevatorCrit,
+  isBounceCrit,
   isExplosionCrit,
   isBootyCrit,
+  isUpgradeCrit,
   consumeCritUpgrade,
   rollCritUpgrade,
   rollFloorBuyCrit,
@@ -35,7 +36,7 @@ import {
   isUpgradeButtonEnabled,
   CRIT_TIER_CONFIG,
   CHAIN_CRIT_CONTINUE_CHANCE,
-  ELEVATOR_CRIT_CONTINUE_CHANCE,
+  BOUNCE_CRIT_CONTINUE_CHANCE,
   EXPLOSION_CRIT_CONTINUE_CHANCE,
   floorIncomePerSecond,
   SALE_INCOME_MULTIPLIER,
@@ -172,7 +173,7 @@ export interface ChainCritDeps {
 // represents onto the floor directly above the one that crit, unconditionally,
 // then keeps climbing one floor at a time as long as `continueChance` keeps
 // rolling true (defaults to chain's own CHAIN_CRIT_CONTINUE_CHANCE; the
-// elevator/explosion procs pass their own dedicated chance instead, see their
+// bounce/explosion procs pass their own dedicated chance instead, see their
 // own call sites below). A locked floor in its path is auto-unlocked for free
 // (no cost charged, no separate floor-buy crit roll of its own) before getting
 // the reward applied. Stops the instant it runs past the building's own floor
@@ -221,6 +222,28 @@ export function applyExplosionCrit(
   continueChance: number = EXPLOSION_CRIT_CONTINUE_CHANCE,
 ): void {
   applyChainCrit(deps, centerIndex, applyToFloor, continueChance);
+  const { floors } = deps;
+  let index = centerIndex - 1;
+  for (;;) {
+    if (index < 0) return;
+    applyToFloor(floors[index], index === 0);
+    index -= 1;
+    if (Math.random() >= continueChance) return;
+  }
+}
+
+// "bounce crit" (see shared/critTypes's isBounceCrit): unlike chain/explosion,
+// ONLY ever cascades downward from the floor that actually crit — like a ball
+// bouncing down a staircase, never up. Same downward-walk shape as
+// applyExplosionCrit's own downward half; no auto-unlock handling needed
+// since a building's floors are always unlocked contiguously from the ground
+// up, so anything below an already-unlocked floor is already unlocked too
+export function applyBounceCrit(
+  deps: ChainCritDeps,
+  centerIndex: number,
+  applyToFloor: (floor: Floor, isGroundFloor: boolean) => void,
+  continueChance: number = BOUNCE_CRIT_CONTINUE_CHANCE,
+): void {
   const { floors } = deps;
   let index = centerIndex - 1;
   for (;;) {
@@ -305,20 +328,21 @@ export function handleFloorClick(
             );
           });
         }
-        // elevator crit: the same tier-promotion reward as chain above, just
-        // climbing from the building's own ground floor (index -1) up, with
-        // its own ELEVATOR_CRIT_CONTINUE_CHANCE odds
-        if (buyTier.elevator) {
-          applyChainCrit(
+        // bounce crit: the same tier-promotion reward as chain above, but
+        // cascading downward from the floor just bought/unlocked instead of
+        // up — like a ball bouncing down the stairs, never up — with its own
+        // BOUNCE_CRIT_CONTINUE_CHANCE odds
+        if (buyTier.bounce) {
+          applyBounceCrit(
             deps,
-            -1,
+            floors.indexOf(floor),
             (target) => {
               target.critMultiplierTier = pickHigherCritTier(
                 target.critMultiplierTier,
                 buyTier.tier,
               );
             },
-            ELEVATOR_CRIT_CONTINUE_CHANCE,
+            BOUNCE_CRIT_CONTINUE_CHANCE,
           );
         }
         // explosion crit: same tier-promotion reward again, spreading both up
@@ -337,6 +361,11 @@ export function handleFloorClick(
         // booty crit: same flat one-time double-income effect a per-click
         // booty crit grants
         if (buyTier.booty) addTotalIncome(getTotalIncome());
+        // upgrade crit: promotes THIS floor's own permanent tier one further
+        // step beyond whatever it was just set to above
+        if (buyTier.upgrade) {
+          floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+        }
       }
       persist();
       const center = getLockCenter();
@@ -348,9 +377,10 @@ export function handleFloorClick(
           getScreenCenterLocal,
           buyTier.chain,
           buyTier.boost,
-          buyTier.elevator,
+          buyTier.bounce,
           buyTier.explosion,
           buyTier.booty,
+          buyTier.upgrade,
         );
     }
     return;
@@ -459,9 +489,10 @@ export function handleFloorClick(
       const tier = getCritTier(floor)!;
       const chain = isChainCrit(floor);
       const boost = isBoostCrit(floor);
-      const elevator = isElevatorCrit(floor);
+      const bounce = isBounceCrit(floor);
       const explosion = isExplosionCrit(floor);
       const booty = isBootyCrit(floor);
+      const upgrade = isUpgradeCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -475,21 +506,20 @@ export function handleFloorClick(
           }
         });
       }
-      // elevator crit: the exact same walk-and-reward logic as chain above,
-      // just started at index -1 so the FIRST floor it reaches is the
-      // building's own ground floor (index 0) instead of the clicked floor's
-      // own neighbor — it then keeps climbing upward from there with its own
-      // ELEVATOR_CRIT_CONTINUE_CHANCE odds
-      if (elevator) {
-        applyChainCrit(
+      // bounce crit: cascades downward from the floor that actually crit,
+      // like a ball bouncing down the stairs — never up — with its own
+      // BOUNCE_CRIT_CONTINUE_CHANCE odds
+      if (bounce) {
+        const target = floors.indexOf(floor);
+        applyBounceCrit(
           deps,
-          -1,
-          (elevatorFloor, elevatorIsGroundFloor) => {
+          target,
+          (bounceFloor, bounceIsGroundFloor) => {
             for (let i = 0; i < count; i++) {
-              applyUpgradeTick(elevatorFloor, elevatorIsGroundFloor);
+              applyUpgradeTick(bounceFloor, bounceIsGroundFloor);
             }
           },
-          ELEVATOR_CRIT_CONTINUE_CHANCE,
+          BOUNCE_CRIT_CONTINUE_CHANCE,
         );
       }
       // explosion crit: same reward walk again, spreading both up AND down
@@ -510,6 +540,9 @@ export function handleFloorClick(
       // booty crit: doubles the currently active company's total income once —
       // a flat effect, not tied to the tier/count that landed
       if (booty) addTotalIncome(getTotalIncome());
+      // upgrade crit: promotes this floor's own permanent tier one further
+      // step, same flat one-time effect as booty/boost
+      if (upgrade) floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
       persist();
       triggerButtonPress(floor);
       triggerCritCelebration(
@@ -518,9 +551,10 @@ export function handleFloorClick(
         getScreenCenterLocal,
         chain,
         boost,
-        elevator,
+        bounce,
         explosion,
         booty,
+        upgrade,
       );
       return;
     }

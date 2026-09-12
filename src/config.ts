@@ -48,6 +48,14 @@ export const CONFIG = {
     crit: { chance: 0.05, multiplier: 5 },
     mega: { chance: 0.01, multiplier: 25 },
     ultra: { chance: 0.001, multiplier: 125 },
+    // gateway roll for the whole "special crit" (chain/boost/bounce/
+    // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
+    // ultra, before any of the 6 individual proc chances below are even
+    // rolled — a miss here means NONE of them get a chance to land at all
+    // this time, silently (see rollCrit in shared/critTypes). A hit just
+    // opens the door to the existing independent-roll-then-cap-at-2 logic,
+    // it doesn't guarantee a proc actually lands
+    specialCritGatewayChance: 0.25,
     // "chain crit" — an extra roll on top of an already-landed crit/mega/ultra
     // (see rollCritUpgrade): applies that same tier's upgrade to the next floor
     // too, then has chainContinueChance to keep going up the building one floor
@@ -59,12 +67,12 @@ export const CONFIG = {
     // click: it piggybacks on that tier's own free-upgrade payout instead of
     // replacing it, adding a free worker boost on top
     boostChance: 0.1,
-    // "elevator crit" — same shape as chain (extends the landed tier's
+    // "bounce crit" — same shape as chain (extends the landed tier's
     // free-upgrade payout floor by floor), but starts from the BOTTOM of the
     // building (floor 0) and climbs up, instead of starting at the floor that
     // actually crit
-    elevatorChance: 0.05,
-    elevatorContinueChance: 0.5,
+    bounceChance: 0.05,
+    bounceContinueChance: 0.5,
     // "explosion crit" — same shape as chain again, but spreads BOTH
     // directions (up AND down) from the floor that actually crit, instead of
     // only upward
@@ -73,6 +81,11 @@ export const CONFIG = {
     // "booty crit" — a flat one-time effect (not tier-scaled, same as boost):
     // doubles the CURRENTLY ACTIVE company's total income once
     bootyChance: 0.05,
+    // "upgrade crit" — a flat one-time effect (not tier-scaled, same as
+    // boost/booty): permanently promotes the affected floor's (or, for a
+    // building-unlock crit, EVERY floor in that building's) own
+    // critMultiplierTier one step further (see shared/critTypes' nextCritTier)
+    upgradeChance: 0.001,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

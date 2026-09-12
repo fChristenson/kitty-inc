@@ -24,11 +24,11 @@ loadImageByName("mouse").then((image) => {
   boostIcon = image;
 });
 
-// same idea again, drawn behind the "Elevator" flash text (see
-// upgradeButton.ts's isElevatorCrit)
-let elevatorIcon: HTMLImageElement | null = null;
-loadImageByName("elevator").then((image) => {
-  elevatorIcon = image;
+// same idea again, drawn behind the "Bounce" flash text (see
+// upgradeButton.ts's isBounceCrit)
+let ballIcon: HTMLImageElement | null = null;
+loadImageByName("ball").then((image) => {
+  ballIcon = image;
 });
 
 // same idea again, drawn behind the "Explosion" flash text (see
@@ -42,6 +42,12 @@ loadImageByName("explosion").then((image) => {
 let bootyIcon: HTMLImageElement | null = null;
 loadImageByName("booty").then((image) => {
   bootyIcon = image;
+});
+// same idea again, drawn behind the "Upgrade" flash text (see
+// upgradeButton.ts's isUpgradeCrit)
+let upgradeIcon: HTMLImageElement | null = null;
+loadImageByName("upgrade").then((image) => {
+  upgradeIcon = image;
 });
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
@@ -270,7 +276,7 @@ function getBloomLayer(
 // fits an icon's own bounding box to a common on-screen "footprint", matched
 // by AREA (targetSize = the side of an equal-area square) rather than by one
 // dimension — chain.png (short/wide), mouse.png (a tall running sprite), and
-// elevator.png (near-square) all have very different aspect ratios, so fixing
+// ball.png (near-square) all have very different aspect ratios, so fixing
 // just their width (the original approach) left the short/wide one reading
 // much smaller than the taller ones at the identical width
 function fitIconSize(
@@ -392,14 +398,11 @@ export function drawCritFlash(
     const { w: iconW, h: iconH } = fitIconSize(boostIcon, measuredWidth * 0.85);
     ctx.drawImage(boostIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Elevator" && elevatorIcon) {
-    // no extra rotation — elevator.png is a real upright scene (doors/wall),
-    // rotating it would read as broken rather than stylized
-    const { w: iconW, h: iconH } = fitIconSize(
-      elevatorIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(elevatorIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  if (flashLabel === "Bounce" && ballIcon) {
+    // no extra rotation — ball.png already reads as bouncy on its own,
+    // rotating it would just look like it's rolling away instead
+    const { w: iconW, h: iconH } = fitIconSize(ballIcon, measuredWidth * 0.85);
+    ctx.drawImage(ballIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   if (flashLabel === "Boom" && explosionIcon) {
     // no extra rotation — explosion.png is already a radial starburst shape,
@@ -415,6 +418,15 @@ export function drawCritFlash(
     // would just look broken
     const { w: iconW, h: iconH } = fitIconSize(bootyIcon, measuredWidth * 0.85);
     ctx.drawImage(bootyIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Upgrade" && upgradeIcon) {
+    // no extra rotation — upgrade.png is an upright arrow, spinning it would
+    // read as pointing somewhere else instead of "up"
+    const { w: iconW, h: iconH } = fitIconSize(
+      upgradeIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(upgradeIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

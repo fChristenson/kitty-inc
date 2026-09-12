@@ -33,7 +33,12 @@ import {
   drawBuyAllFloorsIndicator,
 } from "./markers";
 import { MAX_FLOORS_PER_BUILDING, rollFloorBuyCrit } from "../../floors";
-import { CRIT_TIER_CONFIG, type CritTier } from "../../shared/critTypes";
+import {
+  CRIT_TIER_CONFIG,
+  UPGRADE_CRIT_LABEL,
+  UPGRADE_CRIT_COLOR,
+  type CritTier,
+} from "../../shared/critTypes";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
@@ -98,11 +103,15 @@ export interface CityMapDeps {
   // it'll just already be that tier once it is (any brand new floor added
   // after this also inherits it, see floorLock.ts's ensureLockedFloorAbove).
   // `chain` (see rollFloorBuyCrit's own chain flag) additionally keeps
-  // promoting/auto-unlocking floors ABOVE this building's current floor list
+  // promoting/auto-unlocking floors ABOVE this building's current floor list.
+  // `upgrade` (see rollFloorBuyCrit's own upgrade flag) instead promotes
+  // EVERY floor this building has one further step past whatever tier they
+  // were just set to
   setBuildingCritTier: (
     buildingIndex: number,
     tier: CritTier,
     chain: boolean,
+    upgrade: boolean,
   ) => void;
   onSelectBuilding: (index: number) => void; // switch to that building and leave the map view
   // fires once the corporation barrel roll settles on a different company (see
@@ -489,6 +498,7 @@ export function createCityMapView(
     cx: number,
     feetY: number,
     chain: boolean,
+    upgrade: boolean,
   ): void {
     const burstY = feetY - MARKER_H / 2;
     const burstCount = tier === "ultra" ? 5 : tier === "mega" ? 3 : 2;
@@ -496,6 +506,21 @@ export function createCityMapView(
       setTimeout(() => {
         spawnCoinBurstAt(cx, burstY, MARKER_COIN_BURST_SCALE * 1.5);
       }, i * 90);
+    }
+    // upgrade crit: a flat, non-tier-scaled flash (same shape as
+    // floorInteractions/critCelebration.ts's own playSpecialFlash) instead of
+    // the tier-scaled branches below — the reward itself (promoting every
+    // floor's tier one step) is applied by main.ts's setBuildingCritTier
+    if (upgrade) {
+      triggerScreenShake({
+        intensity: 1.8,
+        label: UPGRADE_CRIT_LABEL,
+        color: UPGRADE_CRIT_COLOR,
+        strokeWidth: 14,
+        priority: 1,
+      });
+      playExplosion();
+      return;
     }
     // chain crit: the flash shows "Chain" instead of the tier's usual "x5"/
     // "x25"/"x125" number, same swap floorInteractions.ts's own
@@ -567,8 +592,19 @@ export function createCityMapView(
         // whatever a chain crit additionally climbs into above that)
         const buyTier = rollFloorBuyCrit();
         if (buyTier) {
-          deps.setBuildingCritTier(globalIndex, buyTier.tier, buyTier.chain);
-          triggerMapCatCritCelebration(buyTier.tier, cx, feetY, buyTier.chain);
+          deps.setBuildingCritTier(
+            globalIndex,
+            buyTier.tier,
+            buyTier.chain,
+            buyTier.upgrade,
+          );
+          triggerMapCatCritCelebration(
+            buyTier.tier,
+            cx,
+            feetY,
+            buyTier.chain,
+            buyTier.upgrade,
+          );
         }
       }
       redraw();

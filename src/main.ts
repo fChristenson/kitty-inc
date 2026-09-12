@@ -1,6 +1,10 @@
 import "./style.css";
 import { fromNumber, gt, isZero } from "./shared/bigNumber";
-import { CHAIN_CRIT_CONTINUE_CHANCE, type CritTier } from "./shared/critTypes";
+import {
+  CHAIN_CRIT_CONTINUE_CHANCE,
+  nextCritTier,
+  type CritTier,
+} from "./shared/critTypes";
 import {
   loadFloorBackgrounds,
   loadGroundImage,
@@ -16,9 +20,10 @@ import {
   forceUltraCritUpgrade,
   forceChainCritUpgrade,
   forceBoostCritUpgrade,
-  forceElevatorCritUpgrade,
+  forceBounceCritUpgrade,
   forceExplosionCritUpgrade,
   forceBootyCritUpgrade,
+  forceUpgradeCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -59,13 +64,14 @@ import {
   wireSpawnChainMegaCritButton,
   wireSpawnChainUltraCritButton,
   wireSpawnBoostCritButton,
-  wireSpawnElevatorCritButton,
-  wireSpawnElevatorMegaCritButton,
-  wireSpawnElevatorUltraCritButton,
+  wireSpawnBounceCritButton,
+  wireSpawnBounceMegaCritButton,
+  wireSpawnBounceUltraCritButton,
   wireSpawnExplosionCritButton,
   wireSpawnExplosionMegaCritButton,
   wireSpawnExplosionUltraCritButton,
   wireSpawnBootyCritButton,
+  wireSpawnUpgradeCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
@@ -73,19 +79,21 @@ import {
   wireFloorBuyChainCritButton,
   wireFloorBuyChainMegaCritButton,
   wireFloorBuyChainUltraCritButton,
-  wireFloorBuyElevatorCritButton,
-  wireFloorBuyElevatorMegaCritButton,
-  wireFloorBuyElevatorUltraCritButton,
+  wireFloorBuyBounceCritButton,
+  wireFloorBuyBounceMegaCritButton,
+  wireFloorBuyBounceUltraCritButton,
   wireFloorBuyExplosionCritButton,
   wireFloorBuyExplosionMegaCritButton,
   wireFloorBuyExplosionUltraCritButton,
   wireFloorBuyBootyCritButton,
+  wireFloorBuyUpgradeCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
   wireMapUnlockChainCritButton,
   wireMapUnlockChainMegaCritButton,
   wireMapUnlockChainUltraCritButton,
+  wireMapUnlockUpgradeCritButton,
   wirePressConferenceTestButton,
   wireLiquidateAssetsTestButton,
   wirePayTaxesTestButton,
@@ -414,17 +422,17 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceBoostCritUpgrade(floor, "crit");
     });
-    wireSpawnElevatorCritButton(app, () => {
+    wireSpawnBounceCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
-      if (floor) forceElevatorCritUpgrade(floor, "crit");
+      if (floor) forceBounceCritUpgrade(floor, "crit");
     });
-    wireSpawnElevatorMegaCritButton(app, () => {
+    wireSpawnBounceMegaCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
-      if (floor) forceElevatorCritUpgrade(floor, "mega");
+      if (floor) forceBounceCritUpgrade(floor, "mega");
     });
-    wireSpawnElevatorUltraCritButton(app, () => {
+    wireSpawnBounceUltraCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
-      if (floor) forceElevatorCritUpgrade(floor, "ultra");
+      if (floor) forceBounceCritUpgrade(floor, "ultra");
     });
     wireSpawnExplosionCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -442,6 +450,10 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceBootyCritUpgrade(floor);
     });
+    wireSpawnUpgradeCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceUpgradeCritUpgrade(floor);
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyBoostCritButton(app, () =>
       forceFloorBuyCrit("crit", false, true),
@@ -453,13 +465,13 @@ async function main() {
     wireFloorBuyChainUltraCritButton(app, () =>
       forceFloorBuyCrit("ultra", true),
     );
-    wireFloorBuyElevatorCritButton(app, () =>
+    wireFloorBuyBounceCritButton(app, () =>
       forceFloorBuyCrit("crit", false, false, true),
     );
-    wireFloorBuyElevatorMegaCritButton(app, () =>
+    wireFloorBuyBounceMegaCritButton(app, () =>
       forceFloorBuyCrit("mega", false, false, true),
     );
-    wireFloorBuyElevatorUltraCritButton(app, () =>
+    wireFloorBuyBounceUltraCritButton(app, () =>
       forceFloorBuyCrit("ultra", false, false, true),
     );
     wireFloorBuyExplosionCritButton(app, () =>
@@ -474,6 +486,9 @@ async function main() {
     wireFloorBuyBootyCritButton(app, () =>
       forceFloorBuyCrit("crit", false, false, false, false, true),
     );
+    wireFloorBuyUpgradeCritButton(app, () =>
+      forceFloorBuyCrit("crit", false, false, false, false, false, true),
+    );
     wireMapUnlockCritButton(app, () => forceFloorBuyCrit("crit"));
     wireMapUnlockMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireMapUnlockUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
@@ -483,6 +498,9 @@ async function main() {
     );
     wireMapUnlockChainUltraCritButton(app, () =>
       forceFloorBuyCrit("ultra", true),
+    );
+    wireMapUnlockUpgradeCritButton(app, () =>
+      forceFloorBuyCrit("crit", false, false, false, false, false, true),
     );
     wirePressConferenceTestButton(app, () => pressConferenceGame.open());
     wireLiquidateAssetsTestButton(app, () => liquidateAssetsGame.open());
@@ -619,10 +637,20 @@ async function main() {
     buildingIndex: number,
     tier: CritTier,
     chain: boolean,
+    upgrade: boolean,
   ): void {
     const floors = buildings[buildingIndex];
     if (!floors) return;
     for (const floor of floors) floor.critMultiplierTier = tier;
+    // upgrade crit: promotes every floor this building has one further step
+    // past the tier they were just set to above (see rollFloorBuyCrit's own
+    // upgrade flag, applied here instead of floorInteractions.ts since this
+    // is a whole-building event, not a single Floor)
+    if (upgrade) {
+      for (const floor of floors) {
+        floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+      }
+    }
     if (!chain) return;
     applyChainCrit(
       {
@@ -652,15 +680,16 @@ async function main() {
     buildingIndex: number,
     tier: CritTier,
     chain: boolean,
+    upgrade: boolean,
   ): void {
-    applyBuildingCritTier(buildingIndex, tier, chain);
+    applyBuildingCritTier(buildingIndex, tier, chain, upgrade);
     if (chain) {
       let continueChain = true;
       while (continueChain) {
         const nextIndex = buildings.length;
         buildings.push(createBuilding(nextIndex, getBackgroundUrls().length));
         setupBuilding(nextIndex);
-        applyBuildingCritTier(nextIndex, tier, chain);
+        applyBuildingCritTier(nextIndex, tier, chain, upgrade);
         continueChain = Math.random() < CHAIN_CRIT_CONTINUE_CHANCE;
       }
     }

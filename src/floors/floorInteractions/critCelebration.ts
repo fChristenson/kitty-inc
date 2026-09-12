@@ -4,10 +4,12 @@ import {
   CRIT_TIER_CONFIG,
   BOOST_CRIT_COLOR,
   BOOST_CRIT_LABEL,
-  ELEVATOR_CRIT_LABEL,
+  BOUNCE_CRIT_LABEL,
   EXPLOSION_CRIT_LABEL,
   BOOTY_CRIT_COLOR,
   BOOTY_CRIT_LABEL,
+  UPGRADE_CRIT_COLOR,
+  UPGRADE_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -88,6 +90,10 @@ function playSpecialFlash(label: string, color: string): void {
     color,
     strokeWidth: 14,
     priority: 1,
+    // sticks at full size/opacity this much longer before the regular
+    // fade-out begins, so the icon+text stay on screen a beat longer once
+    // fully shown
+    holdMs: 300,
   });
   playExplosion();
 }
@@ -226,16 +232,16 @@ function celebrateBoost(
   spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
-// elevator crit (see upgradeButton.ts's isElevatorCrit): same swap as chain
+// bounce crit (see upgradeButton.ts's isBounceCrit): same swap as chain
 // above, keeping the landed tier's own color (climbing the building from the
 // bottom up is applied by floorInteractions.ts, this only covers the
 // celebration moment)
-function celebrateElevator(
+function celebrateBounce(
   floor: Floor,
   tier: CritTier,
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
 ): void {
-  playSpecialFlash(ELEVATOR_CRIT_LABEL, tierColor(tier));
+  playSpecialFlash(BOUNCE_CRIT_LABEL, tierColor(tier));
   spawnTierBursts(floor, tier, getScreenCenterLocal);
 }
 
@@ -267,6 +273,19 @@ function celebrateBooty(
   spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
+// upgrade crit (see upgradeButton.ts's isUpgradeCrit): same swap as boost/
+// booty above, its own dedicated cyan — the reward itself (promoting the
+// floor's/building's own permanent tier) is applied by floorInteractions.ts/
+// main.ts, this only covers the celebration moment
+function celebrateUpgrade(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(UPGRADE_CRIT_LABEL, UPGRADE_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
 // chain and boost are both "special" procs riding the SAME landed tier (see
 // isChainCrit/isBoostCrit) — when only one lands it plays immediately same as
 // any plain crit, but when BOTH land on the same click they each get their own
@@ -275,7 +294,7 @@ function celebrateBooty(
 // they're simply skipped while a special celebration is still due, rather
 // than piling up behind it (see triggerCritCelebration below)
 interface QueuedCelebration {
-  kind: "chain" | "boost" | "elevator" | "explosion" | "booty";
+  kind: "chain" | "boost" | "bounce" | "explosion" | "booty" | "upgrade";
   queuedAt: number;
   run: () => void;
 }
@@ -330,11 +349,12 @@ export function triggerCritCelebration(
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
   chain = false,
   boost = false,
-  elevator = false,
+  bounce = false,
   explosion = false,
   booty = false,
+  upgrade = false,
 ): void {
-  if (chain || boost || elevator || explosion || booty) {
+  if (chain || boost || bounce || explosion || booty || upgrade) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
     // bulk-buy hold repeatedly rolling "chain") shouldn't queue up N replays
@@ -354,13 +374,13 @@ export function triggerCritCelebration(
       });
     }
     if (
-      elevator &&
-      !specialCelebrationQueue.some((q) => q.kind === "elevator")
+      bounce &&
+      !specialCelebrationQueue.some((q) => q.kind === "bounce")
     ) {
       specialCelebrationQueue.push({
-        kind: "elevator",
+        kind: "bounce",
         queuedAt: now,
-        run: () => celebrateElevator(floor, tier, getScreenCenterLocal),
+        run: () => celebrateBounce(floor, tier, getScreenCenterLocal),
       });
     }
     if (
@@ -378,6 +398,13 @@ export function triggerCritCelebration(
         kind: "booty",
         queuedAt: now,
         run: () => celebrateBooty(floor, tier, getScreenCenterLocal),
+      });
+    }
+    if (upgrade && !specialCelebrationQueue.some((q) => q.kind === "upgrade")) {
+      specialCelebrationQueue.push({
+        kind: "upgrade",
+        queuedAt: now,
+        run: () => celebrateUpgrade(floor, tier, getScreenCenterLocal),
       });
     }
     drainSpecialCelebrationQueue();

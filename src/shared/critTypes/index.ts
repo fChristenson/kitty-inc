@@ -68,7 +68,7 @@ export const CHAIN_CRIT_CHANCE = CONFIG.crit.chainChance;
 export const CHAIN_CRIT_CONTINUE_CHANCE = CONFIG.crit.chainContinueChance;
 
 // "boost crit" — another proc riding on an already-landed crit/mega/ultra (see
-// rollCritProcs below), same as chain: instead of extra upgrades it grants a
+// rollCrit below), same as chain: instead of extra upgrades it grants a
 // free worker boost. Neither proc's button EVER changes appearance on its
 // own — both are invisible until the already-armed tier is actually clicked,
 // only then do they reveal themselves via their own celebration flash
@@ -76,14 +76,14 @@ export const BOOST_CRIT_CHANCE = CONFIG.crit.boostChance;
 export const BOOST_CRIT_COLOR = COLOR.blue;
 export const BOOST_CRIT_LABEL = "Boost";
 
-// "elevator crit" — a third piggyback proc, same shape as chain (extends the
+// "bounce crit" — a third piggyback proc, same shape as chain (extends the
 // landed tier's free-upgrade payout floor by floor) but the walk starts from
 // the BOTTOM of the building (floor 0) and climbs up, instead of starting at
 // the floor that actually crit — see floorInteractions.ts's applyChainCrit
 // call with startIndex -1
-export const ELEVATOR_CRIT_CHANCE = CONFIG.crit.elevatorChance;
-export const ELEVATOR_CRIT_CONTINUE_CHANCE = CONFIG.crit.elevatorContinueChance;
-export const ELEVATOR_CRIT_LABEL = "Elevator";
+export const BOUNCE_CRIT_CHANCE = CONFIG.crit.bounceChance;
+export const BOUNCE_CRIT_CONTINUE_CHANCE = CONFIG.crit.bounceContinueChance;
+export const BOUNCE_CRIT_LABEL = "Bounce";
 
 // "explosion crit" — a fourth piggyback proc, same shape as chain again, but
 // spreads BOTH directions (up AND down) from the floor that actually crit,
@@ -100,25 +100,38 @@ export const BOOTY_CRIT_CHANCE = CONFIG.crit.bootyChance;
 export const BOOTY_CRIT_COLOR = COLOR.gold;
 export const BOOTY_CRIT_LABEL = "Booty";
 
+// "upgrade crit" — a sixth piggyback proc, a flat one-time effect (not
+// tier-scaled) like boost/booty: permanently promotes the affected floor's
+// (or, for a building-unlock crit, every floor in that building's) own
+// critMultiplierTier one step further — applied by floorInteractions.ts/
+// main.ts using nextCritTier (defined further down this file)
+export const UPGRADE_CRIT_CHANCE = CONFIG.crit.upgradeChance;
+export const UPGRADE_CRIT_COLOR = COLOR.cyan;
+export const UPGRADE_CRIT_LABEL = "Upgrade";
+
 // state for all three piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
 const boostCrits = new WeakSet<Floor>();
-const elevatorCrits = new WeakSet<Floor>();
+const bounceCrits = new WeakSet<Floor>();
 const explosionCrits = new WeakSet<Floor>();
 const bootyCrits = new WeakSet<Floor>();
+const upgradeCrits = new WeakSet<Floor>();
 
-// call once a tier has just landed (see upgradeButton.ts's rollCritUpgrade) to
-// roll all five piggyback procs — each is rolled independently, but at most
+// call once a tier has just landed (see rollCrit below) to roll all five
+// piggyback procs — each is rolled independently, but at most
 // MAX_SPECIAL_CRIT_PROCS of the ones that actually land get applied (picked
 // randomly among them) so a single crit can never stack every proc at once
 export const MAX_SPECIAL_CRIT_PROCS = 2;
 
+// gateway roll checked ONCE before any individual proc chance is even rolled
+// (see CONFIG.crit's own comment) — a miss here skips the whole system
+// silently for this crit, no procs possible at all this time
+export const SPECIAL_CRIT_GATEWAY_CHANCE = CONFIG.crit.specialCritGatewayChance;
+
 // Fisher-Yates shuffle then keep only the first `max` — the generic mechanic
-// behind capping how many piggyback procs land on the same crit at once;
-// exported so rollFloorBuyCrit (upgradeButton.ts, a separate one-shot roll
-// for floor/building purchases) can apply the identical cap without
-// duplicating the shuffle logic
+// behind capping how many piggyback procs land on the same crit at once,
+// used by rollCrit below
 export function pickAtMost<T>(items: T[], max: number): T[] {
   const shuffled = [...items];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -128,20 +141,66 @@ export function pickAtMost<T>(items: T[], max: number): T[] {
   return shuffled.slice(0, max);
 }
 
-export function rollCritProcs(floor: Floor): void {
-  const landed: Array<() => void> = [];
-  if (Math.random() < CHAIN_CRIT_CHANCE) landed.push(() => chainCrits.add(floor));
-  if (Math.random() < BOOST_CRIT_CHANCE) landed.push(() => boostCrits.add(floor));
-  if (Math.random() < ELEVATOR_CRIT_CHANCE)
-    landed.push(() => elevatorCrits.add(floor));
-  if (Math.random() < EXPLOSION_CRIT_CHANCE)
-    landed.push(() => explosionCrits.add(floor));
-  if (Math.random() < BOOTY_CRIT_CHANCE) landed.push(() => bootyCrits.add(floor));
-  for (const apply of pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS)) apply();
+// full result of one rollCrit() call once a tier has actually landed — the
+// one shape both rollCritUpgrade (per-click, upgradeButton.ts) and
+// rollFloorBuyCrit (one-shot floor/building purchase, also upgradeButton.ts)
+// now get back from the exact same shared roll
+export interface CritRollResult {
+  tier: CritTier;
+  chain: boolean;
+  boost: boolean;
+  bounce: boolean;
+  explosion: boolean;
+  booty: boolean;
+  upgrade: boolean;
 }
 
-// whether the CURRENTLY ARMED crit (if any) is also a chain/boost/elevator
-// crit — see rollCritProcs/floorInteractions.ts's plain-click crit branch
+// the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
+// for the tier (previously duplicated separately by rollCritUpgrade and
+// rollFloorBuyCrit), then — only if a tier actually landed — rolls the
+// special-proc gateway, all 6 independent proc chances, and caps the result to
+// MAX_SPECIAL_CRIT_PROCS. `onLanded` is called exactly once, with the full
+// result, if and only if a tier landed — a miss is silent, onLanded is never
+// invoked. Callers decide what "landing" means for their own case: mutating a
+// Floor's armed state (rollCritUpgrade) vs. just capturing the result to
+// return (rollFloorBuyCrit) — this function itself has no Floor/state
+// dependency at all
+export function rollCrit(onLanded: (result: CritRollResult) => void): void {
+  for (const tier of CRIT_TIER_ORDER) {
+    if (Math.random() < CRIT_TIER_CONFIG[tier].chance) {
+      type ProcKind =
+        | "chain"
+        | "boost"
+        | "bounce"
+        | "explosion"
+        | "booty"
+        | "upgrade";
+      const landed: ProcKind[] = [];
+      if (Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE) {
+        if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
+        if (Math.random() < BOOST_CRIT_CHANCE) landed.push("boost");
+        if (Math.random() < BOUNCE_CRIT_CHANCE) landed.push("bounce");
+        if (Math.random() < EXPLOSION_CRIT_CHANCE) landed.push("explosion");
+        if (Math.random() < BOOTY_CRIT_CHANCE) landed.push("booty");
+        if (Math.random() < UPGRADE_CRIT_CHANCE) landed.push("upgrade");
+      }
+      const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
+      onLanded({
+        tier,
+        chain: kept.has("chain"),
+        boost: kept.has("boost"),
+        bounce: kept.has("bounce"),
+        explosion: kept.has("explosion"),
+        booty: kept.has("booty"),
+        upgrade: kept.has("upgrade"),
+      });
+      return;
+    }
+  }
+}
+
+// whether the CURRENTLY ARMED crit (if any) is also a chain/boost/bounce
+// crit — see rollCrit/floorInteractions.ts's plain-click crit branch
 export function isChainCrit(floor: Floor): boolean {
   return chainCrits.has(floor);
 }
@@ -150,8 +209,8 @@ export function isBoostCrit(floor: Floor): boolean {
   return boostCrits.has(floor);
 }
 
-export function isElevatorCrit(floor: Floor): boolean {
-  return elevatorCrits.has(floor);
+export function isBounceCrit(floor: Floor): boolean {
+  return bounceCrits.has(floor);
 }
 
 export function isExplosionCrit(floor: Floor): boolean {
@@ -162,18 +221,23 @@ export function isBootyCrit(floor: Floor): boolean {
   return bootyCrits.has(floor);
 }
 
+export function isUpgradeCrit(floor: Floor): boolean {
+  return upgradeCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
   boostCrits.delete(floor);
-  elevatorCrits.delete(floor);
+  bounceCrits.delete(floor);
   explosionCrits.delete(floor);
   bootyCrits.delete(floor);
+  upgradeCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
 // (see upgradeButton.ts's forceChainCritUpgrade/forceBoostCritUpgrade/
-// forceElevatorCritUpgrade), bypassing chance entirely
+// forceBounceCritUpgrade), bypassing chance entirely
 export function forceChainCritProc(floor: Floor): void {
   chainCrits.add(floor);
 }
@@ -182,8 +246,8 @@ export function forceBoostCritProc(floor: Floor): void {
   boostCrits.add(floor);
 }
 
-export function forceElevatorCritProc(floor: Floor): void {
-  elevatorCrits.add(floor);
+export function forceBounceCritProc(floor: Floor): void {
+  bounceCrits.add(floor);
 }
 
 export function forceExplosionCritProc(floor: Floor): void {
@@ -192,6 +256,10 @@ export function forceExplosionCritProc(floor: Floor): void {
 
 export function forceBootyCritProc(floor: Floor): void {
   bootyCrits.add(floor);
+}
+
+export function forceUpgradeCritProc(floor: Floor): void {
+  upgradeCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

@@ -270,81 +270,69 @@ export {
   CRIT_UPGRADE_COUNT,
   MEGA_CRIT_UPGRADE_COUNT,
   ULTRA_CRIT_UPGRADE_COUNT,
-  CHAIN_CRIT_CHANCE,
   CHAIN_CRIT_CONTINUE_CHANCE,
-  BOOST_CRIT_CHANCE,
   BOOST_CRIT_COLOR,
   BOOST_CRIT_LABEL,
-  ELEVATOR_CRIT_CHANCE,
-  ELEVATOR_CRIT_CONTINUE_CHANCE,
-  ELEVATOR_CRIT_LABEL,
-  EXPLOSION_CRIT_CHANCE,
+  BOUNCE_CRIT_CONTINUE_CHANCE,
+  BOUNCE_CRIT_LABEL,
   EXPLOSION_CRIT_CONTINUE_CHANCE,
   EXPLOSION_CRIT_LABEL,
-  BOOTY_CRIT_CHANCE,
   BOOTY_CRIT_COLOR,
   BOOTY_CRIT_LABEL,
+  UPGRADE_CRIT_COLOR,
+  UPGRADE_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
-  isElevatorCrit,
+  isBounceCrit,
   isExplosionCrit,
   isBootyCrit,
+  isUpgradeCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
 } from "../../shared/critTypes";
 import {
   type CritTier,
+  type CritRollResult,
   CRIT_TIER_CONFIG,
-  CRIT_TIER_ORDER,
-  CHAIN_CRIT_CHANCE,
-  BOOST_CRIT_CHANCE,
-  ELEVATOR_CRIT_CHANCE,
-  EXPLOSION_CRIT_CHANCE,
-  BOOTY_CRIT_CHANCE,
-  MAX_SPECIAL_CRIT_PROCS,
-  pickAtMost,
-  rollCritProcs,
+  rollCrit,
   consumeCritProcs,
   forceChainCritProc,
   forceBoostCritProc,
-  forceElevatorCritProc,
+  forceBounceCritProc,
   forceExplosionCritProc,
   forceBootyCritProc,
+  forceUpgradeCritProc,
 } from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
 
-// call once per completed upgrade click (crit or normal) to roll the next one —
-// walks CRIT_TIER_ORDER rarest-first, so a click can never land more than one
-// tier at once, and adding a new tier to that shared order is the only change
-// needed here. Whenever a tier actually lands, also rolls its two piggyback
-// procs (chain/boost — see rollCritProcs) — neither ever occurs without a
-// tier landing first, and neither changes the button's own appearance
+// call once per completed upgrade click (crit or normal) to roll the next
+// one — delegates the entire roll (tier + gateway + procs + cap) to
+// shared/critTypes's rollCrit, only reacting to the result: arms this
+// floor's tier, then marks it with whichever piggyback procs landed (reusing
+// the same forceXCritProc setters the dev-test "force" helpers below use —
+// landing "for real" and being forced are the same underlying WeakSet add)
 export function rollCritUpgrade(floor: Floor): void {
-  for (const tier of CRIT_TIER_ORDER) {
-    if (Math.random() < CRIT_TIER_CONFIG[tier].chance) {
-      critTiers.set(floor, tier);
-      rollCritProcs(floor);
-      return;
-    }
-  }
+  rollCrit((result) => {
+    critTiers.set(floor, result.tier);
+    if (result.chain) forceChainCritProc(floor);
+    if (result.boost) forceBoostCritProc(floor);
+    if (result.bounce) forceBounceCritProc(floor);
+    if (result.explosion) forceExplosionCritProc(floor);
+    if (result.booty) forceBootyCritProc(floor);
+    if (result.upgrade) forceUpgradeCritProc(floor);
+  });
 }
 
-// same odds/tiers as rollCritUpgrade, but a one-shot roll (not tied to any Floor's
-// "next click" telegraph) for a floor-unlock purchase — see floorInteractions.ts's
-// hitTestFloorLock branch, and cityMap.ts's own new-building purchase, which
-// shares this exact same roll. Returns null on a miss (the common case); a hit
-// also rolls the same CHAIN_CRIT_CHANCE as rollCritUpgrade. A forced tier (see
-// forceFloorBuyCrit below) always wins and is consumed on the very next call
-export interface FloorBuyCritResult {
-  tier: CritTier;
-  chain: boolean;
-  boost: boolean;
-  elevator: boolean;
-  explosion: boolean;
-  booty: boolean;
-}
+// same shared rollCrit as rollCritUpgrade, but a one-shot roll (not tied to
+// any Floor's "next click" telegraph) for a floor-unlock purchase — see
+// floorInteractions.ts's hitTestFloorLock branch, and cityMap.ts's own
+// new-building purchase, which shares this exact same roll. Returns null on
+// a miss (the common case, rollCrit's onLanded simply never fires). A forced
+// tier (see forceFloorBuyCrit below) always wins and is consumed on the very
+// next call
+export type FloorBuyCritResult = CritRollResult;
 
 let forcedFloorBuyCrit: FloorBuyCritResult | null = null;
 
@@ -354,46 +342,28 @@ export function rollFloorBuyCrit(): FloorBuyCritResult | null {
     forcedFloorBuyCrit = null;
     return result;
   }
-  for (const tier of CRIT_TIER_ORDER) {
-    if (Math.random() < CRIT_TIER_CONFIG[tier].chance) {
-      // same independent-roll-then-cap shape as rollCritProcs (shared/
-      // critTypes) — a floor/building purchase crit can't stack every proc
-      // at once either
-      type ProcKind = "chain" | "boost" | "elevator" | "explosion" | "booty";
-      const landed: ProcKind[] = [];
-      if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
-      if (Math.random() < BOOST_CRIT_CHANCE) landed.push("boost");
-      if (Math.random() < ELEVATOR_CRIT_CHANCE) landed.push("elevator");
-      if (Math.random() < EXPLOSION_CRIT_CHANCE) landed.push("explosion");
-      if (Math.random() < BOOTY_CRIT_CHANCE) landed.push("booty");
-      const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
-      return {
-        tier,
-        chain: kept.has("chain"),
-        boost: kept.has("boost"),
-        elevator: kept.has("elevator"),
-        explosion: kept.has("explosion"),
-        booty: kept.has("booty"),
-      };
-    }
-  }
-  return null;
+  let rolled: FloorBuyCritResult | null = null;
+  rollCrit((result) => {
+    rolled = result;
+  });
+  return rolled;
 }
 
 // dev/test-only: guarantees the NEXT floor bought (or building bought — both
 // share this same roll) crits at this tier, bypassing chance entirely (see
 // hud/testButton's "Floor Crit"/"Floor Mega Crit"/"Floor Ultra Crit"/"Map
-// Unlock Crit"/etc. and their own "Chain"/"Boost"/"Elevator"/"Explosion"/
+// Unlock Crit"/etc. and their own "Chain"/"Boost"/"Bounce"/"Explosion"/
 // "Booty" siblings)
 export function forceFloorBuyCrit(
   tier: CritTier,
   chain = false,
   boost = false,
-  elevator = false,
+  bounce = false,
   explosion = false,
   booty = false,
+  upgrade = false,
 ): void {
-  forcedFloorBuyCrit = { tier, chain, boost, elevator, explosion, booty };
+  forcedFloorBuyCrit = { tier, chain, boost, bounce, explosion, booty, upgrade };
 }
 
 export function getCritTier(floor: Floor): CritTier | null {
@@ -448,16 +418,16 @@ export function forceChainCritUpgrade(
   forceChainCritProc(floor);
 }
 
-// dev/test-only: force this floor into an elevator crit at the given tier
+// dev/test-only: force this floor into a bounce crit at the given tier
 // (default "crit"), bypassing chance entirely (see hud/testButton's "Spawn
-// Elevator Crit") — same shape as forceChainCritUpgrade above, just arming
-// the elevator proc instead of the chain one
-export function forceElevatorCritUpgrade(
+// Bounce Crit") — same shape as forceChainCritUpgrade above, just arming
+// the bounce proc instead of the chain one
+export function forceBounceCritUpgrade(
   floor: Floor,
   tier: CritTier = "crit",
 ): void {
   critTiers.set(floor, tier);
-  forceElevatorCritProc(floor);
+  forceBounceCritProc(floor);
 }
 
 // dev/test-only: force this floor into an explosion crit at the given tier
@@ -477,6 +447,14 @@ export function forceExplosionCritUpgrade(
 export function forceBootyCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceBootyCritProc(floor);
+}
+
+// dev/test-only: force this floor into an upgrade crit, bypassing chance
+// entirely (see hud/testButton's "Spawn Upgrade Crit") — not tier-scaled,
+// so no tier param needed
+export function forceUpgradeCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceUpgradeCritProc(floor);
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see
