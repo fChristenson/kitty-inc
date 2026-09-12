@@ -189,8 +189,13 @@ await sharp(data, { raw: { width, height, channels } })
     width: maxX - minX + 1,
     height: maxY - minY + 1,
   })
-  .resize(400, 400, { fit: "inside", withoutEnlargement: true })
-  .png({ compressionLevel: 9 })
+  // only ever drawn as a small flash-text backdrop, and this source's soft
+  // AI-art gradients compress far worse than a flat icon at the same size
+  // (e.g. chain.png) — both a smaller cap AND palette quantization (adaptive
+  // indexed color, still keeps the alpha channel) cut the shipped file size
+  // drastically with no visible quality loss at actual on-screen size
+  .resize(250, 250, { fit: "inside", withoutEnlargement: true })
+  .png({ compressionLevel: 9, palette: true })
   .toFile(dest);
 
 const finalMeta = await sharp(dest).metadata();

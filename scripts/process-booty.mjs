@@ -83,10 +83,12 @@ await sharp(data, { raw: { width, height, channels } })
     width: maxX - minX + 1,
     height: maxY - minY + 1,
   })
-  // only ever drawn as a small flash-text backdrop — capping here avoids
-  // shipping/decoding/resampling a needlessly huge source
-  .resize(400, 400, { fit: "inside", withoutEnlargement: true })
-  .png({ compressionLevel: 9 })
+  // only ever drawn as a small flash-text backdrop — both a smaller cap AND
+  // palette quantization (adaptive indexed color, alpha channel kept) cut the
+  // shipped file size drastically with no visible quality loss at actual
+  // on-screen size
+  .resize(250, 250, { fit: "inside", withoutEnlargement: true })
+  .png({ compressionLevel: 9, palette: true })
   .toFile(dest);
 
 const finalMeta = await sharp(dest).metadata();
