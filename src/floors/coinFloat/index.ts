@@ -46,13 +46,16 @@ interface FloatingCoin {
 }
 
 // generously high: gameCanvas only ever spawns these for boosted workers on
-// floors actually scrolled into view (viewport-bounded, at most a few dozen
-// workers even in the most crowded realistic case), so this cap is never meant
-// to actually bind — it's just a backstop against a runaway leak, not a real
-// steady-state limit. A cap low enough to actually get hit made coins vanish
-// mid-animation (the ring-buffer eviction is instant, not a fade), which read
-// as a bug when several workers were boosted on screen at once
-const pool = createParticlePool<FloatingCoin>(1000);
+// floors actually scrolled into view, but the pre-render buffer (see
+// gameCanvas.ts's visibleFloorIndexRange) can keep several screens' worth of
+// floors actively spawning at once, and every one of THOSE floors can have up
+// to MAX_RENDERED_WORKERS boosted simultaneously — 1000 turned out to still be
+// low enough to hit (and evict mid-animation) on a screen packed with fully
+// boosted floors, so this is sized well past that observed real case rather
+// than a back-of-envelope guess. Each active coin is one small drawImage
+// call, cheap enough that a much higher cap costs nothing even if it's never
+// actually reached
+const pool = createParticlePool<FloatingCoin>(6000);
 
 export function hasActiveFloatingCoins(): boolean {
   return pool.hasActive();

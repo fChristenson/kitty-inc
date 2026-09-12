@@ -8,7 +8,7 @@ import bubbleUrl from "../assets/sound/bubble.wav";
 import winUrl from "../assets/sound/win.wav";
 import payoutUrl from "../assets/sound/payout.wav";
 
-const MUSIC_VOLUME = 0.4;
+const MUSIC_VOLUME = 0.3; // 25% quieter than the original 0.4 per explicit request
 const SFX_VOLUME = 0.9;
 // 50% louder than the shared SFX_VOLUME per explicit request — playSfx uses a
 // GainNode (not <audio>.volume), so this actually plays louder instead of
