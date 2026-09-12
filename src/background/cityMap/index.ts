@@ -40,7 +40,9 @@ import {
   UPGRADE_CRIT_COLOR,
   HEAVENLY_CRIT_LABEL,
   HEAVENLY_CRIT_COLOR,
+  runFirstCritProc,
   type CritTier,
+  type CritRollResult,
 } from "../../shared/critTypes";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
@@ -99,29 +101,24 @@ export interface CityMapDeps {
   // long-press-on-the-green-dot gesture below: unlocks every remaining floor of
   // an already-bought building in one shot. Returns whether it succeeded
   buyAllFloors: (buildingIndex: number) => boolean;
-  // sets EVERY floor this building currently has (locked or not) to the given
-  // crit tier (purple/gold/red), permanently \u2014 the reward for a crit landing
-  // on that building's own purchase (see rollFloorBuyCrit below). Does NOT
-  // unlock anything itself; a locked floor still has to be bought normally,
-  // it'll just already be that tier once it is (any brand new floor added
-  // after this also inherits it, see floorLock.ts's ensureLockedFloorAbove).
-  // `chain` (see rollFloorBuyCrit's own chain flag) additionally keeps
-  // promoting/auto-unlocking floors ABOVE this building's current floor list.
-  // `upgrade` (see rollFloorBuyCrit's own upgrade flag) instead promotes
-  // EVERY floor this building has one further step past whatever tier they
-  // were just set to
-  // `heavenly` (see rollFloorBuyCrit's own heavenly flag) unlocks every
-  // remaining floor of this building for free, maxes every floor's tier, and
-  // grants each one a full max-tier free-upgrade batch — the same reward a
-  // heavenly crit landing on a normal upgrade click grants, just applied to
-  // this whole newly-bought building
-  setBuildingCritTier: (
-    buildingIndex: number,
-    tier: CritTier,
-    chain: boolean,
-    upgrade: boolean,
-    heavenly: boolean,
-  ) => void;
+  // sets EVERY floor this building currently has (locked or not) to
+  // result.tier, permanently — the reward for a crit landing on that
+  // building's own purchase (see rollFloorBuyCrit below). Does NOT unlock
+  // anything itself; a locked floor still has to be bought normally, it'll
+  // just already be that tier once it is (any brand new floor added after
+  // this also inherits it, see floorLock.ts's ensureLockedFloorAbove).
+  // result.chain (see rollFloorBuyCrit's own chain flag) additionally keeps
+  // promoting/auto-unlocking floors ABOVE this building's current floor
+  // list. result.upgrade instead promotes EVERY floor this building has one
+  // further step past whatever tier they were just set to. result.heavenly
+  // unlocks every remaining floor of this building for free, maxes every
+  // floor's tier, and grants each one a full max-tier free-upgrade batch —
+  // the same reward a heavenly crit landing on a normal upgrade click
+  // grants, just applied to this whole newly-bought building. The other
+  // procs (boost/bounce/explosion/booty/peppermint) don't apply at building
+  // scope at all — main.ts's own applyBuildingCritTier simply has no
+  // handler for them
+  setBuildingCritTier: (buildingIndex: number, result: CritRollResult) => void;
   onSelectBuilding: (index: number) => void; // switch to that building and leave the map view
   // fires once the corporation barrel roll settles on a different company (see
   // rollCorporationSelection) so main.ts can swap in that company's own separate
@@ -492,13 +489,11 @@ export function createCityMapView(
   // floors/coins burst on, so this reuses coinBurst's own flat-canvas
   // spawnCoinBurstAt instead (same as pressConferenceGame does)
   function triggerMapCatCritCelebration(
-    tier: CritTier,
+    result: CritRollResult,
     cx: number,
     feetY: number,
-    chain: boolean,
-    upgrade: boolean,
-    heavenly: boolean,
   ): void {
+    const { tier, chain } = result;
     const burstY = feetY - MARKER_H / 2;
     const burstCount = tier === "ultra" ? 5 : tier === "mega" ? 3 : 2;
     for (let i = 0; i < burstCount; i++) {
@@ -506,38 +501,50 @@ export function createCityMapView(
         spawnCoinBurstAt(cx, burstY, MARKER_COIN_BURST_SCALE * 1.5);
       }, i * 90);
     }
-    // heavenly crit: the single biggest reward, so it always gets the same
-    // "ultra-strength" flash floorInteractions/critCelebration.ts's own
-    // celebrateHeavenly uses — checked before upgrade's own flat flash below
-    // since heavenly is the bigger moment if both happen to land together
-    if (heavenly) {
-      triggerScreenShake({
-        intensity: 2.6,
-        label: HEAVENLY_CRIT_LABEL,
-        color: HEAVENLY_CRIT_COLOR,
-        strokeWidth: 16,
-        blinkHz: 6,
-        holdMs: 1250,
-        priority: 2,
-      });
-      playPayout();
-      return;
-    }
-    // upgrade crit: a flat, non-tier-scaled flash (same shape as
-    // floorInteractions/critCelebration.ts's own playSpecialFlash) instead of
-    // the tier-scaled branches below — the reward itself (promoting every
-    // floor's tier one step) is applied by main.ts's setBuildingCritTier
-    if (upgrade) {
-      triggerScreenShake({
-        intensity: 1.8,
-        label: UPGRADE_CRIT_LABEL,
-        color: UPGRADE_CRIT_COLOR,
-        strokeWidth: 14,
-        priority: 1,
-      });
-      playExplosion();
-      return;
-    }
+    // only ONE flash can ever show at once, so heavenly/upgrade — the only 2
+    // procs this whole-building event supports (see setBuildingCritTier) —
+    // are mutually exclusive with each other and with the plain tier flash
+    // below, in priority order (heavenly first: it's the bigger moment if
+    // both happen to land together). A landed proc with no entry here (the
+    // other 5 don't apply at building scope) just falls through to the plain
+    // tier flash, same as before this existed
+    const playedSpecial = runFirstCritProc(
+      result,
+      undefined,
+      {
+        // heavenly crit: the single biggest reward, so it always gets the
+        // same "ultra-strength" flash floorInteractions/critCelebration.ts's
+        // own celebrateHeavenly uses
+        heavenly: () => {
+          triggerScreenShake({
+            intensity: 2.6,
+            label: HEAVENLY_CRIT_LABEL,
+            color: HEAVENLY_CRIT_COLOR,
+            strokeWidth: 16,
+            blinkHz: 6,
+            holdMs: 1250,
+            priority: 2,
+          });
+          playPayout();
+        },
+        // upgrade crit: a flat, non-tier-scaled flash (same shape as
+        // floorInteractions/critCelebration.ts's own playSpecialFlash) —
+        // the reward itself (promoting every floor's tier one step) is
+        // applied by main.ts's setBuildingCritTier
+        upgrade: () => {
+          triggerScreenShake({
+            intensity: 1.8,
+            label: UPGRADE_CRIT_LABEL,
+            color: UPGRADE_CRIT_COLOR,
+            strokeWidth: 14,
+            priority: 1,
+          });
+          playExplosion();
+        },
+      },
+      ["heavenly", "upgrade"],
+    );
+    if (playedSpecial) return;
     // chain crit: the flash shows "Chain" instead of the tier's usual "x5"/
     // "x25"/"x125" number, same swap floorInteractions.ts's own
     // triggerCritCelebration does for the other 2 crit events
@@ -608,21 +615,8 @@ export function createCityMapView(
         // whatever a chain crit additionally climbs into above that)
         const buyTier = rollFloorBuyCrit();
         if (buyTier) {
-          deps.setBuildingCritTier(
-            globalIndex,
-            buyTier.tier,
-            buyTier.chain,
-            buyTier.upgrade,
-            buyTier.heavenly,
-          );
-          triggerMapCatCritCelebration(
-            buyTier.tier,
-            cx,
-            feetY,
-            buyTier.chain,
-            buyTier.upgrade,
-            buyTier.heavenly,
-          );
+          deps.setBuildingCritTier(globalIndex, buyTier);
+          triggerMapCatCritCelebration(buyTier, cx, feetY);
         }
       }
       redraw();

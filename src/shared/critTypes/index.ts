@@ -12,6 +12,7 @@
 // nextCritTier's promotion chain) already reads that ordering generically
 // instead of a hardcoded if/else per tier.
 import type { Floor } from "../../gameState";
+import type { ImageName } from "../../loadAssets";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 
@@ -66,6 +67,10 @@ export const ULTRA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.ultra.multiplier;
 // one floor at a time
 export const CHAIN_CRIT_CHANCE = CONFIG.crit.chainChance;
 export const CHAIN_CRIT_CONTINUE_CHANCE = CONFIG.crit.chainContinueChance;
+// chain has no dedicated color (its celebration always uses the landed
+// tier's own color instead, see critCelebration.ts's tierColor) — only a
+// label, kept here for symmetry with every other proc's own exported label
+export const CHAIN_CRIT_LABEL = "Chain";
 
 // "boost crit" — another proc riding on an already-landed crit/mega/ultra (see
 // rollCrit below), same as chain: instead of extra upgrades it grants a
@@ -177,6 +182,125 @@ export interface CritRollResult {
   heavenly: boolean;
 }
 
+// every piggyback proc's own field name on CritRollResult — the single
+// canonical list every "for each landed proc" loop below (and rollCrit
+// itself) iterates, so adding a brand new proc is a two-line change here
+// (this array + CritRollResult's own field) instead of touching every
+// dispatch site by hand
+export type CritProcKind = Exclude<keyof CritRollResult, "tier">;
+
+export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
+  "chain",
+  "boost",
+  "bounce",
+  "explosion",
+  "booty",
+  "upgrade",
+  "peppermint",
+  "heavenly",
+];
+
+// a caller-supplied "what does this proc actually DO here" function per proc
+// kind, keyed the same way as CritRollResult's own boolean fields — a proc
+// with no entry is simply skipped by the dispatchers below, so a caller that
+// only supports a subset of procs (e.g. the building-unlock event, which
+// only ever wires up "upgrade"/"heavenly") never has to list the rest
+export type CritProcHandlers<TContext> = Partial<
+  Record<CritProcKind, (ctx: TContext) => void>
+>;
+
+// runs EVERY landed proc's own handler once, in CRIT_PROC_KINDS order — the
+// shared "reward application" dispatcher: a caller (a per-floor upgrade
+// click, a floor-unlock purchase, a whole building bought off the map) never
+// re-checks `result.chain`/`result.boost`/... itself, it just supplies a
+// small handlers map of "what this proc means for ME" and this loop does the
+// rest. Multiple landed procs (MAX_SPECIAL_CRIT_PROCS allows up to 2) each
+// still get their own independent call, same as before this existed
+export function applyCritProcs<TContext>(
+  result: Pick<CritRollResult, CritProcKind>,
+  ctx: TContext,
+  handlers: CritProcHandlers<TContext>,
+): void {
+  for (const kind of CRIT_PROC_KINDS) {
+    if (result[kind]) handlers[kind]?.(ctx);
+  }
+}
+
+// same idea, but for a mutually-exclusive "only the FIRST matching landed
+// proc's handler ever runs" dispatch — used by celebration/flash code, where
+// only one visual can ever be shown at once (unlike reward application,
+// where every landed proc's effect is independent and additive). Returns
+// whether a handler actually ran, so the caller can fall back to its own
+// default celebration (the plain landed tier's own flash) if not
+export function runFirstCritProc<TContext>(
+  result: Pick<CritRollResult, CritProcKind>,
+  ctx: TContext,
+  handlers: CritProcHandlers<TContext>,
+  order: readonly CritProcKind[] = CRIT_PROC_KINDS,
+): boolean {
+  for (const kind of order) {
+    if (result[kind] && handlers[kind]) {
+      handlers[kind]!(ctx);
+      return true;
+    }
+  }
+  return false;
+}
+
+// display metadata for the player-facing "Special Crits" info menu (see
+// hud/corporationBoostMenu's CRIT_INFO) — one canonical table instead of that
+// menu hand-duplicating every label string a second time. `icon` is a
+// loadAssets ImageName key; `description` is short display-only prose, never
+// read by any game logic
+export interface CritProcDisplayInfo {
+  label: string;
+  icon: ImageName;
+  description: string;
+}
+
+export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
+  chain: {
+    label: CHAIN_CRIT_LABEL,
+    icon: "chain",
+    description: "Repeats the crit on the floor above",
+  },
+  boost: {
+    label: BOOST_CRIT_LABEL,
+    icon: "mouse",
+    description: "Boosts every worker for free",
+  },
+  bounce: {
+    label: BOUNCE_CRIT_LABEL,
+    icon: "ball",
+    description: "Repeats the crit on the floor below",
+  },
+  explosion: {
+    label: EXPLOSION_CRIT_LABEL,
+    icon: "explosion",
+    description: "Repeats the crit up and down at once",
+  },
+  booty: {
+    label: BOOTY_CRIT_LABEL,
+    icon: "booty",
+    description: "Doubles your total income",
+  },
+  upgrade: {
+    label: UPGRADE_CRIT_LABEL,
+    icon: "upgrade",
+    description: "Upgrades the floor's crit tier",
+  },
+  peppermint: {
+    label: PEPPERMINT_CRIT_LABEL,
+    icon: "peppermint",
+    description: "Upgrades every other floor's tier",
+  },
+  heavenly: {
+    label: HEAVENLY_CRIT_LABEL,
+    icon: "heaven",
+    description: "Unlocks, maxes, and upgrades every floor",
+  },
+};
+
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
 // for the tier (previously duplicated separately by rollCritUpgrade and
 // rollFloorBuyCrit), then — only if a tier actually landed — rolls the
@@ -190,16 +314,7 @@ export interface CritRollResult {
 export function rollCrit(onLanded: (result: CritRollResult) => void): void {
   for (const tier of CRIT_TIER_ORDER) {
     if (Math.random() < CRIT_TIER_CONFIG[tier].chance) {
-      type ProcKind =
-        | "chain"
-        | "boost"
-        | "bounce"
-        | "explosion"
-        | "booty"
-        | "upgrade"
-        | "peppermint"
-        | "heavenly";
-      const landed: ProcKind[] = [];
+      const landed: CritProcKind[] = [];
       if (Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE) {
         if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
         if (Math.random() < BOOST_CRIT_CHANCE) landed.push("boost");

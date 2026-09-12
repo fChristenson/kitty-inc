@@ -2,6 +2,7 @@ import { animateDialogClose } from "../../utils";
 import { playSwoosh } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { arrowIconMarkup } from "../../shared/arrowIcon";
+import { CRIT_PROC_KINDS, CRIT_PROC_INFO } from "../../shared/critTypes";
 
 export {
   getMinigameEntryCost,
@@ -25,51 +26,20 @@ export {
 export type { MergeCompaniesResult } from "./economy";
 
 // every "special crit" piggyback proc (see .github/instructions/special-crits.
-// instructions.md), for the info list below — icon/label match each proc's own
-// celebration flash exactly (screenShake.ts/critCelebration.ts), description
-// is display-only prose, not read by any game logic
-const CRIT_INFO: { icon: string; label: string; description: string }[] = [
-  {
-    icon: getImageUrl("chain"),
-    label: "Chain",
-    description: "Repeats the crit on the floor above",
-  },
-  {
-    icon: getImageUrl("mouse"),
-    label: "Boost",
-    description: "Boosts every worker for free",
-  },
-  {
-    icon: getImageUrl("ball"),
-    label: "Bounce",
-    description: "Repeats the crit on the floor below",
-  },
-  {
-    icon: getImageUrl("explosion"),
-    label: "Boom",
-    description: "Repeats the crit up and down at once",
-  },
-  {
-    icon: getImageUrl("booty"),
-    label: "Booty",
-    description: "Doubles your total income",
-  },
-  {
-    icon: getImageUrl("upgrade"),
-    label: "Upgrade",
-    description: "Upgrades the floor's crit tier",
-  },
-  {
-    icon: getImageUrl("peppermint"),
-    label: "Peppermint",
-    description: "Upgrades every other floor's tier",
-  },
-  {
-    icon: getImageUrl("heaven"),
-    label: "Heavenly",
-    description: "Unlocks, maxes, and upgrades every floor",
-  },
-];
+// instructions.md), for the info list below — derived straight from
+// shared/critTypes's own canonical CRIT_PROC_INFO table (icon/label match each
+// proc's own celebration flash exactly, screenShake.ts/critCelebration.ts)
+// instead of this menu hand-duplicating every label/icon/description a
+// second time
+const CRIT_INFO: { icon: string; label: string; description: string }[] =
+  CRIT_PROC_KINDS.map((kind) => {
+    const info = CRIT_PROC_INFO[kind];
+    return {
+      icon: getImageUrl(info.icon),
+      label: info.label,
+      description: info.description,
+    };
+  });
 
 // the map view's own prev/next/pointer arrow icon (shared/arrowIcon), reused
 // here as the expand/collapse chevron — rotated via CSS (.crit-info-item[open])

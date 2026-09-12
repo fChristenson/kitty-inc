@@ -5,7 +5,8 @@ import {
   nextCritTier,
   CRIT_TIER_ORDER,
   CRIT_TIER_CONFIG,
-  type CritTier,
+  applyCritProcs,
+  type CritRollResult,
 } from "./shared/critTypes";
 import {
   loadFloorBackgrounds,
@@ -677,50 +678,57 @@ async function main() {
   // any later just skips over it and the chain never actually unlocks anything
   function applyBuildingCritTier(
     buildingIndex: number,
-    tier: CritTier,
-    chain: boolean,
-    upgrade: boolean,
-    heavenly: boolean,
+    result: CritRollResult,
   ): void {
     const floors = buildings[buildingIndex];
     if (!floors) return;
+    const { tier, chain } = result;
     for (const floor of floors) floor.critMultiplierTier = tier;
-    // upgrade crit: promotes every floor this building has one further step
-    // past the tier they were just set to above (see rollFloorBuyCrit's own
-    // upgrade flag, applied here instead of floorInteractions.ts since this
-    // is a whole-building event, not a single Floor)
-    if (upgrade) {
-      for (const floor of floors) {
-        floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
-      }
-    }
-    // heavenly crit: the biggest reward of all, applied building-wide —
-    // unlocks every remaining floor for free, maxes every floor's tier, then
-    // grants each one a full max-tier free-upgrade batch. Uses
-    // increaseIncomeRate directly (not floorInteractions.ts's applyUpgradeTick,
-    // which also spawns a coin burst/re-rolls a crit at a specific ON-SCREEN
-    // floor button position) since this building may not even be the one
-    // currently displayed
-    if (heavenly) {
-      unlockAllFloors({
-        floors,
-        backgroundCount: getBackgroundUrls().length,
-        multiplier: getBuildingMultiplier(buildingIndex),
-        onAdd: (floor) => {
-          if (buildingIndex === activeBuildingIndex) {
-            gameCanvas.notifyFloorAdded(floor);
-          }
-        },
-      });
-      const maxTier = CRIT_TIER_ORDER[0];
-      const count = CRIT_TIER_CONFIG[maxTier].multiplier;
-      for (const floor of floors) {
-        floor.critMultiplierTier = maxTier;
-        for (let i = 0; i < count; i++) {
-          increaseIncomeRate(floor);
+    // reward side of every proc this building-buy event actually supports —
+    // one handler per proc kind (see shared/critTypes's applyCritProcs), so
+    // this is the ONE place that has to say what "upgrade"/"heavenly" mean
+    // for a whole building; a proc with no entry here (boost/bounce/
+    // explosion/booty/peppermint don't apply at building scope) is simply
+    // skipped
+    applyCritProcs(result, floors, {
+      // upgrade crit: promotes every floor this building has one further
+      // step past the tier they were just set to above (see
+      // rollFloorBuyCrit's own upgrade flag, applied here instead of
+      // floorInteractions.ts since this is a whole-building event, not a
+      // single Floor)
+      upgrade: (floors) => {
+        for (const floor of floors) {
+          floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
         }
-      }
-    }
+      },
+      // heavenly crit: the biggest reward of all, applied building-wide —
+      // unlocks every remaining floor for free, maxes every floor's tier,
+      // then grants each one a full max-tier free-upgrade batch. Uses
+      // increaseIncomeRate directly (not floorInteractions.ts's
+      // applyUpgradeTick, which also spawns a coin burst/re-rolls a crit at
+      // a specific ON-SCREEN floor button position) since this building may
+      // not even be the one currently displayed
+      heavenly: (floors) => {
+        unlockAllFloors({
+          floors,
+          backgroundCount: getBackgroundUrls().length,
+          multiplier: getBuildingMultiplier(buildingIndex),
+          onAdd: (floor) => {
+            if (buildingIndex === activeBuildingIndex) {
+              gameCanvas.notifyFloorAdded(floor);
+            }
+          },
+        });
+        const maxTier = CRIT_TIER_ORDER[0];
+        const count = CRIT_TIER_CONFIG[maxTier].multiplier;
+        for (const floor of floors) {
+          floor.critMultiplierTier = maxTier;
+          for (let i = 0; i < count; i++) {
+            increaseIncomeRate(floor);
+          }
+        }
+      },
+    });
     if (!chain) return;
     applyChainCrit(
       {
@@ -748,24 +756,22 @@ async function main() {
   // that first extra building is CHAIN_CRIT_CONTINUE_CHANCE
   function setBuildingCritTier(
     buildingIndex: number,
-    tier: CritTier,
-    chain: boolean,
-    upgrade: boolean,
-    heavenly: boolean,
+    result: CritRollResult,
   ): void {
-    applyBuildingCritTier(buildingIndex, tier, chain, upgrade, heavenly);
-    if (chain) {
+    applyBuildingCritTier(buildingIndex, result);
+    if (result.chain) {
       let continueChain = true;
       while (continueChain) {
         const nextIndex = buildings.length;
         buildings.push(createBuilding(nextIndex, getBackgroundUrls().length));
         setupBuilding(nextIndex);
-        applyBuildingCritTier(nextIndex, tier, chain, upgrade, heavenly);
+        applyBuildingCritTier(nextIndex, result);
         continueChain = Math.random() < CHAIN_CRIT_CONTINUE_CHANCE;
       }
     }
     persist();
   }
+
   // the old building-picker popup is kept wired (backdrop/list still functional)
   // but nothing opens it anymore — it's replaced by tapping the map's own cat
   // markers (see createCityMapView below)
