@@ -77,10 +77,32 @@ export interface ActionBarHandlers {
 // that deliberately holding the button still feels immediate
 const SCROLL_HOLD_MS = 400;
 
+// fires onTap on pointerup, NOT the browser's synthesized "click" \u2014 mobile
+// browsers can silently swallow the click that would normally follow a tap
+// when it lands shortly after a drag/swipe gesture elsewhere on the page
+// (confirmed via an on-screen debug log: pointerdown/pointerup always fired,
+// "click" sometimes just never did, right after swiping the canvas to
+// scroll). pointerup itself is never suppressed this way, so driving the
+// action directly from it sidesteps the whole class of bug
+function wireTapButton(button: HTMLButtonElement, onTap: () => void): void {
+  let armedPointerId: number | null = null;
+  button.addEventListener("pointerdown", (event) => {
+    armedPointerId = event.pointerId;
+  });
+  button.addEventListener("pointerup", (event) => {
+    if (armedPointerId === event.pointerId) onTap();
+    armedPointerId = null;
+  });
+  button.addEventListener("pointercancel", () => {
+    armedPointerId = null;
+  });
+}
+
 // wires a scroll button to fire onClick on a normal tap, or onHold once the
-// press is held past SCROLL_HOLD_MS \u2014 the browser still sends a trailing
-// click when the button is finally released after a hold, so that click is
-// swallowed (holdFired) instead of also firing onClick on top of the hold
+// press is held past SCROLL_HOLD_MS \u2014 both decided directly off
+// pointerdown/pointerup (see wireTapButton's own comment on why: relying on
+// the browser's synthesized "click" here had the exact same swallowed-after-
+// a-swipe bug)
 function wireHoldableScrollButton(
   button: HTMLButtonElement,
   onClick: () => void,
@@ -103,15 +125,11 @@ function wireHoldableScrollButton(
       onHold();
     }, SCROLL_HOLD_MS);
   });
-  button.addEventListener("pointerup", clearHold);
-  button.addEventListener("pointercancel", clearHold);
-  button.addEventListener("click", () => {
-    if (holdFired) {
-      holdFired = false;
-      return;
-    }
-    onClick();
+  button.addEventListener("pointerup", () => {
+    clearHold();
+    if (!holdFired) onClick();
   });
+  button.addEventListener("pointercancel", clearHold);
 }
 
 export function wireActionBar(
@@ -128,13 +146,16 @@ export function wireActionBar(
     handlers.onScrollBottom,
     handlers.onHoldScrollBottom,
   );
-  container
-    .querySelector<HTMLButtonElement>("#action-bar-boost-all")!
-    .addEventListener("click", handlers.onBoostAll);
-  container
-    .querySelector<HTMLButtonElement>("#action-bar-hire")!
-    .addEventListener("click", handlers.onOpenUpgradeMenu);
-  container
-    .querySelector<HTMLButtonElement>("#action-bar-map")!
-    .addEventListener("click", handlers.onOpenMapMenu);
+  wireTapButton(
+    container.querySelector<HTMLButtonElement>("#action-bar-boost-all")!,
+    handlers.onBoostAll,
+  );
+  wireTapButton(
+    container.querySelector<HTMLButtonElement>("#action-bar-hire")!,
+    handlers.onOpenUpgradeMenu,
+  );
+  wireTapButton(
+    container.querySelector<HTMLButtonElement>("#action-bar-map")!,
+    handlers.onOpenMapMenu,
+  );
 }
