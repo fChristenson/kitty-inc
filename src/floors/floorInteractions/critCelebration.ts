@@ -14,6 +14,14 @@ import {
   PEPPERMINT_CRIT_LABEL,
   HEAVENLY_CRIT_COLOR,
   HEAVENLY_CRIT_LABEL,
+  PAIR_CRIT_COLOR,
+  PAIR_CRIT_LABEL,
+  THREE_OF_A_KIND_CRIT_COLOR,
+  THREE_OF_A_KIND_CRIT_LABEL,
+  FOUR_OF_A_KIND_CRIT_COLOR,
+  FOUR_OF_A_KIND_CRIT_LABEL,
+  FULL_HOUSE_CRIT_COLOR,
+  FULL_HOUSE_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -329,6 +337,24 @@ function celebrateHeavenly(
   spawnTierBursts(floor, "ultra", getScreenCenterLocal);
 }
 
+// pair/three of a kind/four of a kind/full house crits (see
+// upgradeButton.ts's isPairCrit etc.): same flat "own label + own color"
+// flash shape as boost/booty/upgrade/peppermint above — the reward itself
+// (promoting a fixed number of floors'/buildings' own tier) is applied by
+// floorInteractions.ts/main.ts, this only covers the celebration moment. One
+// shared helper instead of 4 near-identical functions, since only the
+// label/color ever differ between them
+function celebratePokerHand(
+  label: string,
+  color: string,
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(label, color);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
 // chain and boost are both "special" procs riding the SAME landed tier (see
 // isChainCrit/isBoostCrit) — when only one lands it plays immediately same as
 // any plain crit, but when BOTH land on the same click they each get their own
@@ -345,7 +371,11 @@ interface QueuedCelebration {
     | "booty"
     | "upgrade"
     | "peppermint"
-    | "heavenly";
+    | "heavenly"
+    | "pair"
+    | "threeOfAKind"
+    | "fourOfAKind"
+    | "fullHouse";
   queuedAt: number;
   run: () => void;
 }
@@ -406,6 +436,10 @@ export function triggerCritCelebration(
   upgrade = false,
   peppermint = false,
   heavenly = false,
+  pair = false,
+  threeOfAKind = false,
+  fourOfAKind = false,
+  fullHouse = false,
 ): void {
   if (
     chain ||
@@ -415,7 +449,11 @@ export function triggerCritCelebration(
     booty ||
     upgrade ||
     peppermint ||
-    heavenly
+    heavenly ||
+    pair ||
+    threeOfAKind ||
+    fourOfAKind ||
+    fullHouse
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -484,6 +522,71 @@ export function triggerCritCelebration(
         kind: "heavenly",
         queuedAt: now,
         run: () => celebrateHeavenly(floor, tier, getScreenCenterLocal),
+      });
+    }
+    if (pair && !specialCelebrationQueue.some((q) => q.kind === "pair")) {
+      specialCelebrationQueue.push({
+        kind: "pair",
+        queuedAt: now,
+        run: () =>
+          celebratePokerHand(
+            PAIR_CRIT_LABEL,
+            PAIR_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      threeOfAKind &&
+      !specialCelebrationQueue.some((q) => q.kind === "threeOfAKind")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "threeOfAKind",
+        queuedAt: now,
+        run: () =>
+          celebratePokerHand(
+            THREE_OF_A_KIND_CRIT_LABEL,
+            THREE_OF_A_KIND_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      fourOfAKind &&
+      !specialCelebrationQueue.some((q) => q.kind === "fourOfAKind")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "fourOfAKind",
+        queuedAt: now,
+        run: () =>
+          celebratePokerHand(
+            FOUR_OF_A_KIND_CRIT_LABEL,
+            FOUR_OF_A_KIND_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      fullHouse &&
+      !specialCelebrationQueue.some((q) => q.kind === "fullHouse")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "fullHouse",
+        queuedAt: now,
+        run: () =>
+          celebratePokerHand(
+            FULL_HOUSE_CRIT_LABEL,
+            FULL_HOUSE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
       });
     }
     drainSpecialCelebrationQueue();

@@ -99,6 +99,16 @@ export const CONFIG = {
     // fully-unlocked, fully-maxed building is a far bigger swing than
     // promoting alternating floors one step
     heavenlyChance: 0.0001,
+    // "pair"/"three of a kind"/"four of a kind"/"full house" crits — four more
+    // flat, not-tier-scaled procs (see shared/critTypes' POKER_HAND_CRIT_COUNTS):
+    // each promotes a FIXED number of floors' own permanent crit tier one step
+    // (2/3/4/5 respectively), auto-unlocking locked floors along the way if the
+    // building doesn't have enough unlocked ones yet. Rarer as the count grows,
+    // same "bigger guaranteed swing costs more" logic as peppermint/heavenly
+    pairChance: 0.002,
+    threeOfAKindChance: 0.001,
+    fourOfAKindChance: 0.0005,
+    fullHouseChance: 0.0002,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

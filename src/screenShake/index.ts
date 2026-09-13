@@ -61,6 +61,30 @@ let heavenIcon: HTMLImageElement | null = null;
 loadImageByName("heaven").then((image) => {
   heavenIcon = image;
 });
+// same idea again, drawn behind the "Pair" flash text (see
+// upgradeButton.ts's isPairCrit)
+let pairIcon: HTMLImageElement | null = null;
+loadImageByName("pair").then((image) => {
+  pairIcon = image;
+});
+// same idea again, drawn behind the "Three of a Kind" flash text (see
+// upgradeButton.ts's isThreeOfAKindCrit)
+let threeOfAKindIcon: HTMLImageElement | null = null;
+loadImageByName("threeOfAKind").then((image) => {
+  threeOfAKindIcon = image;
+});
+// same idea again, drawn behind the "Four of a Kind" flash text (see
+// upgradeButton.ts's isFourOfAKindCrit)
+let fourOfAKindIcon: HTMLImageElement | null = null;
+loadImageByName("fourOfAKind").then((image) => {
+  fourOfAKindIcon = image;
+});
+// same idea again, drawn behind the "Full House" flash text (see
+// upgradeButton.ts's isFullHouseCrit)
+let fullHouseIcon: HTMLImageElement | null = null;
+loadImageByName("fullHouse").then((image) => {
+  fullHouseIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -457,6 +481,33 @@ export function drawCritFlash(
       measuredWidth * 0.85,
     );
     ctx.drawImage(heavenIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Pair" && pairIcon) {
+    // no extra rotation — pair.png is already an upright fanned pair of
+    // cards, spinning it would just look broken
+    const { w: iconW, h: iconH } = fitIconSize(pairIcon, measuredWidth * 0.85);
+    ctx.drawImage(pairIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Three of a Kind" && threeOfAKindIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      threeOfAKindIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(threeOfAKindIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Four of a Kind" && fourOfAKindIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      fourOfAKindIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(fourOfAKindIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Full House" && fullHouseIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      fullHouseIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(fullHouseIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

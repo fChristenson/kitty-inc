@@ -20,6 +20,11 @@ import {
   isUpgradeCrit,
   isPeppermintCrit,
   isHeavenlyCrit,
+  isPairCrit,
+  isThreeOfAKindCrit,
+  isFourOfAKindCrit,
+  isFullHouseCrit,
+  POKER_HAND_CRIT_COUNTS,
   consumeCritUpgrade,
   rollCritUpgrade,
   rollFloorBuyCrit,
@@ -114,6 +119,39 @@ function applyHeavenlyCrit(deps: FloorActionsDeps): void {
       applyUpgradeTick(floor, index === 0);
     }
   });
+}
+
+// "pair"/"three of a kind"/"four of a kind"/"full house" crits (see
+// shared/critTypes's isPairCrit etc.): promotes `count` floors' own
+// permanent crit tier one step, starting AT the floor that actually landed
+// the proc and walking upward \u2014 same auto-unlock-as-it-goes behavior
+// applyChainCrit's walk uses (a locked floor in the path is unlocked for
+// free instead of blocking the walk), just a fixed count instead of a
+// probabilistic continue-chance. `count` always comes from shared/critTypes'
+// POKER_HAND_CRIT_COUNTS \u2014 the one place that number is ever named
+function applyPokerHandCrit(
+  deps: ChainCritDeps,
+  startIndex: number,
+  count: number,
+): void {
+  const { floors, backgroundCount, multiplier, onFloorAdded } = deps;
+  for (
+    let promoted = 0, index = startIndex;
+    promoted < count && index < floors.length;
+    promoted++, index++
+  ) {
+    const target = floors[index];
+    if (!target.unlocked) {
+      unlockFloor(target);
+      ensureLockedFloorAbove({
+        floors,
+        backgroundCount,
+        multiplier,
+        onAdd: onFloorAdded,
+      });
+    }
+    target.critMultiplierTier = nextCritTier(target.critMultiplierTier);
+  }
 }
 
 export interface FloorActionsDeps {
@@ -418,6 +456,37 @@ export function handleFloorClick(
         // floor, maxes every floor's tier, and grants each one a full
         // max-tier free-upgrade batch
         if (buyTier.heavenly) applyHeavenlyCrit(deps);
+        // pair/three of a kind/four of a kind/full house crits: promote a
+        // fixed number of floors' own permanent tier one step, starting at
+        // the floor just bought/unlocked (see POKER_HAND_CRIT_COUNTS)
+        if (buyTier.pair) {
+          applyPokerHandCrit(
+            deps,
+            floors.indexOf(floor),
+            POKER_HAND_CRIT_COUNTS.pair,
+          );
+        }
+        if (buyTier.threeOfAKind) {
+          applyPokerHandCrit(
+            deps,
+            floors.indexOf(floor),
+            POKER_HAND_CRIT_COUNTS.threeOfAKind,
+          );
+        }
+        if (buyTier.fourOfAKind) {
+          applyPokerHandCrit(
+            deps,
+            floors.indexOf(floor),
+            POKER_HAND_CRIT_COUNTS.fourOfAKind,
+          );
+        }
+        if (buyTier.fullHouse) {
+          applyPokerHandCrit(
+            deps,
+            floors.indexOf(floor),
+            POKER_HAND_CRIT_COUNTS.fullHouse,
+          );
+        }
       }
       persist();
       const center = getLockCenter();
@@ -435,6 +504,10 @@ export function handleFloorClick(
           buyTier.upgrade,
           buyTier.peppermint,
           buyTier.heavenly,
+          buyTier.pair,
+          buyTier.threeOfAKind,
+          buyTier.fourOfAKind,
+          buyTier.fullHouse,
         );
     }
     return;
@@ -549,6 +622,10 @@ export function handleFloorClick(
       const upgrade = isUpgradeCrit(floor);
       const peppermint = isPeppermintCrit(floor);
       const heavenly = isHeavenlyCrit(floor);
+      const pair = isPairCrit(floor);
+      const threeOfAKind = isThreeOfAKindCrit(floor);
+      const fourOfAKind = isFourOfAKindCrit(floor);
+      const fullHouse = isFullHouseCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -607,6 +684,37 @@ export function handleFloorClick(
       // floor, maxes every floor's tier, and grants each one a full
       // max-tier free-upgrade batch
       if (heavenly) applyHeavenlyCrit(deps);
+      // pair/three of a kind/four of a kind/full house crits: promote a
+      // fixed number of floors' own permanent tier one step, starting at
+      // the floor that actually crit (see POKER_HAND_CRIT_COUNTS)
+      if (pair) {
+        applyPokerHandCrit(
+          deps,
+          floors.indexOf(floor),
+          POKER_HAND_CRIT_COUNTS.pair,
+        );
+      }
+      if (threeOfAKind) {
+        applyPokerHandCrit(
+          deps,
+          floors.indexOf(floor),
+          POKER_HAND_CRIT_COUNTS.threeOfAKind,
+        );
+      }
+      if (fourOfAKind) {
+        applyPokerHandCrit(
+          deps,
+          floors.indexOf(floor),
+          POKER_HAND_CRIT_COUNTS.fourOfAKind,
+        );
+      }
+      if (fullHouse) {
+        applyPokerHandCrit(
+          deps,
+          floors.indexOf(floor),
+          POKER_HAND_CRIT_COUNTS.fullHouse,
+        );
+      }
       persist();
       triggerButtonPress(floor);
       triggerCritCelebration(
@@ -621,6 +729,10 @@ export function handleFloorClick(
         upgrade,
         peppermint,
         heavenly,
+        pair,
+        threeOfAKind,
+        fourOfAKind,
+        fullHouse,
       );
       return;
     }

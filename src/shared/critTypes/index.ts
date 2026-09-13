@@ -132,6 +132,41 @@ export const HEAVENLY_CRIT_CHANCE = CONFIG.crit.heavenlyChance;
 export const HEAVENLY_CRIT_COLOR = COLOR.heavenlyGold;
 export const HEAVENLY_CRIT_LABEL = "Heavenly";
 
+// "pair"/"three of a kind"/"four of a kind"/"full house" crits — four more
+// flat, not-tier-scaled piggyback procs (same shape as booty/upgrade/
+// peppermint/heavenly): each promotes a FIXED number of floors' (or, at
+// building-unlock scope, buildings') own permanent crit tier one step,
+// starting at whatever just landed the proc and walking upward — auto-
+// unlocking any locked floor/building in its path for free instead of
+// stopping early if there aren't enough already-unlocked ones yet (same as
+// applyChainCrit's own walk, just a fixed count instead of a probabilistic
+// continue-chance). POKER_HAND_CRIT_COUNTS is the ONE place that "how many"
+// number for each is ever named — every consumer (floorInteractions.ts's
+// per-click/floor-unlock reward, main.ts's building-unlock reward) reads it
+// from here instead of re-hardcoding it
+export const POKER_HAND_CRIT_COUNTS = {
+  pair: 2,
+  threeOfAKind: 3,
+  fourOfAKind: 4,
+  fullHouse: 5,
+} as const;
+
+export const PAIR_CRIT_CHANCE = CONFIG.crit.pairChance;
+export const PAIR_CRIT_COLOR = COLOR.pairBlue;
+export const PAIR_CRIT_LABEL = "Pair";
+
+export const THREE_OF_A_KIND_CRIT_CHANCE = CONFIG.crit.threeOfAKindChance;
+export const THREE_OF_A_KIND_CRIT_COLOR = COLOR.threeOfAKindGreen;
+export const THREE_OF_A_KIND_CRIT_LABEL = "Three of a Kind";
+
+export const FOUR_OF_A_KIND_CRIT_CHANCE = CONFIG.crit.fourOfAKindChance;
+export const FOUR_OF_A_KIND_CRIT_COLOR = COLOR.fourOfAKindIndigo;
+export const FOUR_OF_A_KIND_CRIT_LABEL = "Four of a Kind";
+
+export const FULL_HOUSE_CRIT_CHANCE = CONFIG.crit.fullHouseChance;
+export const FULL_HOUSE_CRIT_COLOR = COLOR.fullHouseCrimson;
+export const FULL_HOUSE_CRIT_LABEL = "Full House";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -142,6 +177,10 @@ const bootyCrits = new WeakSet<Floor>();
 const upgradeCrits = new WeakSet<Floor>();
 const peppermintCrits = new WeakSet<Floor>();
 const heavenlyCrits = new WeakSet<Floor>();
+const pairCrits = new WeakSet<Floor>();
+const threeOfAKindCrits = new WeakSet<Floor>();
+const fourOfAKindCrits = new WeakSet<Floor>();
+const fullHouseCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll all five
 // piggyback procs — each is rolled independently, but at most
@@ -180,6 +219,10 @@ export interface CritRollResult {
   upgrade: boolean;
   peppermint: boolean;
   heavenly: boolean;
+  pair: boolean;
+  threeOfAKind: boolean;
+  fourOfAKind: boolean;
+  fullHouse: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -198,6 +241,10 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "upgrade",
   "peppermint",
   "heavenly",
+  "pair",
+  "threeOfAKind",
+  "fourOfAKind",
+  "fullHouse",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -299,6 +346,26 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "heaven",
     description: "Unlocks, maxes, and upgrades every floor",
   },
+  pair: {
+    label: PAIR_CRIT_LABEL,
+    icon: "pair",
+    description: "Upgrades 2 floors' crit tier",
+  },
+  threeOfAKind: {
+    label: THREE_OF_A_KIND_CRIT_LABEL,
+    icon: "threeOfAKind",
+    description: "Upgrades 3 floors' crit tier",
+  },
+  fourOfAKind: {
+    label: FOUR_OF_A_KIND_CRIT_LABEL,
+    icon: "fourOfAKind",
+    description: "Upgrades 4 floors' crit tier",
+  },
+  fullHouse: {
+    label: FULL_HOUSE_CRIT_LABEL,
+    icon: "fullHouse",
+    description: "Upgrades 5 floors' crit tier",
+  },
 };
 
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
@@ -324,6 +391,12 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         if (Math.random() < UPGRADE_CRIT_CHANCE) landed.push("upgrade");
         if (Math.random() < PEPPERMINT_CRIT_CHANCE) landed.push("peppermint");
         if (Math.random() < HEAVENLY_CRIT_CHANCE) landed.push("heavenly");
+        if (Math.random() < PAIR_CRIT_CHANCE) landed.push("pair");
+        if (Math.random() < THREE_OF_A_KIND_CRIT_CHANCE)
+          landed.push("threeOfAKind");
+        if (Math.random() < FOUR_OF_A_KIND_CRIT_CHANCE)
+          landed.push("fourOfAKind");
+        if (Math.random() < FULL_HOUSE_CRIT_CHANCE) landed.push("fullHouse");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       onLanded({
@@ -336,6 +409,10 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         upgrade: kept.has("upgrade"),
         peppermint: kept.has("peppermint"),
         heavenly: kept.has("heavenly"),
+        pair: kept.has("pair"),
+        threeOfAKind: kept.has("threeOfAKind"),
+        fourOfAKind: kept.has("fourOfAKind"),
+        fullHouse: kept.has("fullHouse"),
       });
       return;
     }
@@ -376,6 +453,22 @@ export function isHeavenlyCrit(floor: Floor): boolean {
   return heavenlyCrits.has(floor);
 }
 
+export function isPairCrit(floor: Floor): boolean {
+  return pairCrits.has(floor);
+}
+
+export function isThreeOfAKindCrit(floor: Floor): boolean {
+  return threeOfAKindCrits.has(floor);
+}
+
+export function isFourOfAKindCrit(floor: Floor): boolean {
+  return fourOfAKindCrits.has(floor);
+}
+
+export function isFullHouseCrit(floor: Floor): boolean {
+  return fullHouseCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -386,6 +479,10 @@ export function consumeCritProcs(floor: Floor): void {
   upgradeCrits.delete(floor);
   peppermintCrits.delete(floor);
   heavenlyCrits.delete(floor);
+  pairCrits.delete(floor);
+  threeOfAKindCrits.delete(floor);
+  fourOfAKindCrits.delete(floor);
+  fullHouseCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -421,6 +518,22 @@ export function forcePeppermintCritProc(floor: Floor): void {
 
 export function forceHeavenlyCritProc(floor: Floor): void {
   heavenlyCrits.add(floor);
+}
+
+export function forcePairCritProc(floor: Floor): void {
+  pairCrits.add(floor);
+}
+
+export function forceThreeOfAKindCritProc(floor: Floor): void {
+  threeOfAKindCrits.add(floor);
+}
+
+export function forceFourOfAKindCritProc(floor: Floor): void {
+  fourOfAKindCrits.add(floor);
+}
+
+export function forceFullHouseCritProc(floor: Floor): void {
+  fullHouseCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

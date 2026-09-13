@@ -26,6 +26,10 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-upgrade-crit" class="game__button">Spawn Upgrade Crit</button>
           <button id="spawn-peppermint-crit" class="game__button">Spawn Peppermint Crit</button>
           <button id="spawn-heavenly-crit" class="game__button">Spawn Heavenly Crit</button>
+          <button id="spawn-pair-crit" class="game__button">Spawn Pair Crit</button>
+          <button id="spawn-three-of-a-kind-crit" class="game__button">Spawn Three of a Kind Crit</button>
+          <button id="spawn-four-of-a-kind-crit" class="game__button">Spawn Four of a Kind Crit</button>
+          <button id="spawn-full-house-crit" class="game__button">Spawn Full House Crit</button>
           <button id="floor-buy-crit" class="game__button">Floor Crit</button>
           <button id="floor-buy-boost-crit" class="game__button">Floor Boost Crit</button>
           <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
@@ -43,6 +47,10 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-upgrade-crit" class="game__button">Floor Upgrade Crit</button>
           <button id="floor-buy-peppermint-crit" class="game__button">Floor Peppermint Crit</button>
           <button id="floor-buy-heavenly-crit" class="game__button">Floor Heavenly Crit</button>
+          <button id="floor-buy-pair-crit" class="game__button">Floor Pair Crit</button>
+          <button id="floor-buy-three-of-a-kind-crit" class="game__button">Floor Three of a Kind Crit</button>
+          <button id="floor-buy-four-of-a-kind-crit" class="game__button">Floor Four of a Kind Crit</button>
+          <button id="floor-buy-full-house-crit" class="game__button">Floor Full House Crit</button>
           <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
           <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
           <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
@@ -51,6 +59,10 @@ export function createTestButtonMarkup(): string {
           <button id="map-unlock-chain-ultra-crit" class="game__button">Map Unlock Chain Ultra Crit</button>
           <button id="map-unlock-upgrade-crit" class="game__button">Map Unlock Upgrade Crit</button>
           <button id="map-unlock-heavenly-crit" class="game__button">Map Unlock Heavenly Crit</button>
+          <button id="map-unlock-pair-crit" class="game__button">Map Unlock Pair Crit</button>
+          <button id="map-unlock-three-of-a-kind-crit" class="game__button">Map Unlock Three of a Kind Crit</button>
+          <button id="map-unlock-four-of-a-kind-crit" class="game__button">Map Unlock Four of a Kind Crit</button>
+          <button id="map-unlock-full-house-crit" class="game__button">Map Unlock Full House Crit</button>
           <button id="test-press-conference" class="game__button">Press Conf Game</button>
           <button id="test-liquidate-assets" class="game__button">Liquidate Assets Game</button>
           <button id="test-pay-taxes" class="game__button">Pay Taxes Game</button>
@@ -240,6 +252,45 @@ export function wireSpawnHeavenlyCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnPairCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#spawn-pair-crit")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnThreeOfAKindCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-three-of-a-kind-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnFourOfAKindCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-four-of-a-kind-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnFullHouseCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-full-house-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireFloorBuyCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -408,6 +459,46 @@ export function wireFloorBuyHeavenlyCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireFloorBuyPairCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-pair-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyThreeOfAKindCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-three-of-a-kind-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyFourOfAKindCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-four-of-a-kind-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyFullHouseCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-full-house-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 // forces the SAME shared roll floors/upgradeButton's forceFloorBuyCrit arms
 // (rollFloorBuyCrit) — the map's next building purchase reads from it too (see
 // cityMap/index.ts's onClick), so these are really just clearer-labeled aliases
@@ -487,6 +578,46 @@ export function wireMapUnlockHeavenlyCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#map-unlock-heavenly-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockPairCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-pair-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockThreeOfAKindCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-three-of-a-kind-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockFourOfAKindCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-four-of-a-kind-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockFullHouseCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-full-house-crit",
   )!;
   button.addEventListener("click", onClick);
 }

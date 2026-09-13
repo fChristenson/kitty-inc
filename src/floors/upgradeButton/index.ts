@@ -285,6 +285,15 @@ export {
   PEPPERMINT_CRIT_LABEL,
   HEAVENLY_CRIT_COLOR,
   HEAVENLY_CRIT_LABEL,
+  POKER_HAND_CRIT_COUNTS,
+  PAIR_CRIT_COLOR,
+  PAIR_CRIT_LABEL,
+  THREE_OF_A_KIND_CRIT_COLOR,
+  THREE_OF_A_KIND_CRIT_LABEL,
+  FOUR_OF_A_KIND_CRIT_COLOR,
+  FOUR_OF_A_KIND_CRIT_LABEL,
+  FULL_HOUSE_CRIT_COLOR,
+  FULL_HOUSE_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -293,6 +302,10 @@ export {
   isUpgradeCrit,
   isPeppermintCrit,
   isHeavenlyCrit,
+  isPairCrit,
+  isThreeOfAKindCrit,
+  isFourOfAKindCrit,
+  isFullHouseCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -311,6 +324,10 @@ import {
   forceUpgradeCritProc,
   forcePeppermintCritProc,
   forceHeavenlyCritProc,
+  forcePairCritProc,
+  forceThreeOfAKindCritProc,
+  forceFourOfAKindCritProc,
+  forceFullHouseCritProc,
 } from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
@@ -332,6 +349,10 @@ export function rollCritUpgrade(floor: Floor): void {
     if (result.upgrade) forceUpgradeCritProc(floor);
     if (result.peppermint) forcePeppermintCritProc(floor);
     if (result.heavenly) forceHeavenlyCritProc(floor);
+    if (result.pair) forcePairCritProc(floor);
+    if (result.threeOfAKind) forceThreeOfAKindCritProc(floor);
+    if (result.fourOfAKind) forceFourOfAKindCritProc(floor);
+    if (result.fullHouse) forceFullHouseCritProc(floor);
   });
 }
 
@@ -374,6 +395,10 @@ export function forceFloorBuyCrit(
   upgrade = false,
   peppermint = false,
   heavenly = false,
+  pair = false,
+  threeOfAKind = false,
+  fourOfAKind = false,
+  fullHouse = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -385,6 +410,10 @@ export function forceFloorBuyCrit(
     upgrade,
     peppermint,
     heavenly,
+    pair,
+    threeOfAKind,
+    fourOfAKind,
+    fullHouse,
   };
 }
 
@@ -493,6 +522,30 @@ export function forcePeppermintCritUpgrade(floor: Floor): void {
 export function forceHeavenlyCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceHeavenlyCritProc(floor);
+}
+
+// dev/test-only: force this floor into a pair/three-of-a-kind/four-of-a-kind/
+// full-house crit, bypassing chance entirely (see hud/testButton's "Spawn
+// Pair Crit"/etc.) — not tier-scaled, so no tier param needed (same shape as
+// booty/upgrade/peppermint/heavenly above)
+export function forcePairCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forcePairCritProc(floor);
+}
+
+export function forceThreeOfAKindCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceThreeOfAKindCritProc(floor);
+}
+
+export function forceFourOfAKindCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFourOfAKindCritProc(floor);
+}
+
+export function forceFullHouseCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFullHouseCritProc(floor);
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see

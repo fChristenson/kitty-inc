@@ -6,6 +6,7 @@ import {
   CRIT_TIER_ORDER,
   CRIT_TIER_CONFIG,
   applyCritProcs,
+  POKER_HAND_CRIT_COUNTS,
   type CritRollResult,
 } from "./shared/critTypes";
 import {
@@ -29,6 +30,10 @@ import {
   forceUpgradeCritUpgrade,
   forcePeppermintCritUpgrade,
   forceHeavenlyCritUpgrade,
+  forcePairCritUpgrade,
+  forceThreeOfAKindCritUpgrade,
+  forceFourOfAKindCritUpgrade,
+  forceFullHouseCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -80,6 +85,10 @@ import {
   wireSpawnUpgradeCritButton,
   wireSpawnPeppermintCritButton,
   wireSpawnHeavenlyCritButton,
+  wireSpawnPairCritButton,
+  wireSpawnThreeOfAKindCritButton,
+  wireSpawnFourOfAKindCritButton,
+  wireSpawnFullHouseCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
@@ -97,6 +106,10 @@ import {
   wireFloorBuyUpgradeCritButton,
   wireFloorBuyPeppermintCritButton,
   wireFloorBuyHeavenlyCritButton,
+  wireFloorBuyPairCritButton,
+  wireFloorBuyThreeOfAKindCritButton,
+  wireFloorBuyFourOfAKindCritButton,
+  wireFloorBuyFullHouseCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -105,6 +118,10 @@ import {
   wireMapUnlockChainUltraCritButton,
   wireMapUnlockUpgradeCritButton,
   wireMapUnlockHeavenlyCritButton,
+  wireMapUnlockPairCritButton,
+  wireMapUnlockThreeOfAKindCritButton,
+  wireMapUnlockFourOfAKindCritButton,
+  wireMapUnlockFullHouseCritButton,
   wirePressConferenceTestButton,
   wireLiquidateAssetsTestButton,
   wirePayTaxesTestButton,
@@ -473,6 +490,22 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceHeavenlyCritUpgrade(floor);
     });
+    wireSpawnPairCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forcePairCritUpgrade(floor);
+    });
+    wireSpawnThreeOfAKindCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceThreeOfAKindCritUpgrade(floor);
+    });
+    wireSpawnFourOfAKindCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceFourOfAKindCritUpgrade(floor);
+    });
+    wireSpawnFullHouseCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceFullHouseCritUpgrade(floor);
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyBoostCritButton(app, () =>
       forceFloorBuyCrit("crit", false, true),
@@ -524,6 +557,68 @@ async function main() {
         true,
       ),
     );
+    wireFloorBuyPairCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyThreeOfAKindCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyFourOfAKindCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyFullHouseCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
     wireMapUnlockCritButton(app, () => forceFloorBuyCrit("crit"));
     wireMapUnlockMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireMapUnlockUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
@@ -540,6 +635,68 @@ async function main() {
     wireMapUnlockHeavenlyCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireMapUnlockPairCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireMapUnlockThreeOfAKindCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireMapUnlockFourOfAKindCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireMapUnlockFullHouseCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
         false,
         false,
         false,
@@ -767,6 +924,28 @@ async function main() {
         setupBuilding(nextIndex);
         applyBuildingCritTier(nextIndex, result);
         continueChain = Math.random() < CHAIN_CRIT_CONTINUE_CHANCE;
+      }
+    }
+    // pair/three of a kind/four of a kind/full house crits (see
+    // shared/critTypes' POKER_HAND_CRIT_COUNTS): at floor scope these
+    // promote a fixed number of floors; at this whole-building scope they
+    // unlock/create that many buildings instead (the building this event is
+    // already for counts as the first of them, so only count-1 MORE get
+    // created here), each set to the same landed tier. Applied independently
+    // per landed kind (MAX_SPECIAL_CRIT_PROCS allows up to 2 to land
+    // together), same as every other proc's reward
+    for (const count of [
+      result.pair && POKER_HAND_CRIT_COUNTS.pair,
+      result.threeOfAKind && POKER_HAND_CRIT_COUNTS.threeOfAKind,
+      result.fourOfAKind && POKER_HAND_CRIT_COUNTS.fourOfAKind,
+      result.fullHouse && POKER_HAND_CRIT_COUNTS.fullHouse,
+    ]) {
+      if (!count) continue;
+      for (let i = 1; i < count; i++) {
+        const nextIndex = buildings.length;
+        buildings.push(createBuilding(nextIndex, getBackgroundUrls().length));
+        setupBuilding(nextIndex);
+        applyBuildingCritTier(nextIndex, result);
       }
     }
     persist();

@@ -61,6 +61,10 @@ const IMAGE_FILES = {
   upgrade: "upgrade.png", // Upgrade crit flash's own backdrop icon
   peppermint: "peppermint.png", // Peppermint crit flash's own backdrop icon
   heaven: "heaven.png", // Heavenly crit flash's own backdrop icon
+  pair: "pair.png", // Pair crit flash's own backdrop icon
+  threeOfAKind: "threeOfAKind.png", // Three of a Kind crit flash's own backdrop icon
+  fourOfAKind: "fourOfAKind.png", // Four of a Kind crit flash's own backdrop icon
+  fullHouse: "fullHouse.png", // Full House crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

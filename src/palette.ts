@@ -65,6 +65,14 @@ export const COLOR = {
   peppermintPink: "#EC4899",
   // Heavenly crit's own dedicated color
   heavenlyGold: "#FFD700",
+  // Pair crit's own dedicated color
+  pairBlue: "#38BDF8",
+  // Three of a Kind crit's own dedicated color
+  threeOfAKindGreen: "#10B981",
+  // Four of a Kind crit's own dedicated color
+  fourOfAKindIndigo: "#6366F1",
+  // Full House crit's own dedicated color
+  fullHouseCrimson: "#E11D48",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",
