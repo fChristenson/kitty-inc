@@ -124,9 +124,16 @@ function applyHeavenlyCrit(deps: FloorActionsDeps): void {
   const count = CRIT_TIER_CONFIG[maxTier].multiplier;
   deps.floors.forEach((floor, index) => {
     floor.critMultiplierTier = maxTier;
+    // cheap direct rate bump instead of replaying the full applyUpgradeTick
+    // (coin burst + milestone check) up to `count` times per floor — with up
+    // to ~20 floors this would otherwise be thousands of bursts/rerolls for
+    // one proc; still rolls this floor's own next crit exactly once
     for (let i = 0; i < count; i++) {
-      applyUpgradeTick(floor, index === 0);
+      increaseIncomeRate(floor);
     }
+    rollCritUpgrade(floor);
+    const center = getButtonCenter(index === 0);
+    spawnCoinBurst(floor, center.x, center.y, () => {});
   });
 }
 
@@ -215,16 +222,19 @@ export function hitTestFloorHover(
   );
 }
 
-// one upgrade tick's worth of logic — rate increase, next-crit reroll, the small
-// jittered coin burst at the button, and the every-10th-upgrade milestone burst
-// (same one that halves the floor's income interval, see incomePanel.ts). Shared
-// by a normal paid click and the crit branch below, which runs this exactly
-// CRIT_UPGRADE_COUNT times back to back (minus the cost) — calling this once per
-// simulated click, not just once total, is what makes a crit landing on a
-// multiple of 10 mid-run behave identically to 5 real clicks would
+// one upgrade tick's worth of logic — rate increase, the small jittered coin
+// burst at the button, and the every-10th-upgrade milestone burst (same one
+// that halves the floor's income interval, see incomePanel.ts). Shared by a
+// normal paid click and the crit branch below, which runs this exactly
+// CRIT_UPGRADE_COUNT times back to back (minus the cost) — calling this once
+// per simulated click, not just once total, is what makes a crit landing on a
+// multiple of 10 mid-run behave identically to 5 real clicks would.
+// Deliberately does NOT reroll the next crit itself — a landed tier's own
+// multiplier (e.g. x125) would otherwise reroll the special-crit gateway once
+// per free tick instead of once for the whole crit; every call site rolls the
+// next crit exactly once on its own, after this has run its full count
 function applyUpgradeTick(floor: Floor, isGroundFloor: boolean): void {
   increaseIncomeRate(floor);
-  rollCritUpgrade(floor);
   const center = getButtonCenter(isGroundFloor);
   // small random jitter so the burst doesn't spawn at the exact same pixel
   // every single click — a random point spanning the button's own inner width
@@ -375,20 +385,30 @@ function applySuppliesGiveawayCrit(floor: Floor): void {
 
 // "winter sale"/"spring sale"/"summer sale"/"autumn sale" crits (see
 // shared/critTypes's isWinterSaleCrit etc.) — all four share this exact
-// reward, only their icon/label/color differ: permanently cuts EVERY
-// unlocked floor's own upgrade cost (a stored, directly-mutable value) and
-// worker/office chairs/supplies/manager costs (via Floor.priceDiscountMultiplier,
-// folded into hud/upgradeMenu's getFloorPrice) by
-// SEASONAL_SALE_DISCOUNT_MULTIPLIER, for every floor in the WHOLE building
-// this roll happened in
+// reward, only their icon/label/color differ: permanently cuts EVERY floor's
+// own upgrade cost, worker/office chairs/supplies/manager costs (via
+// Floor.priceDiscountMultiplier, folded into hud/upgradeMenu's getFloorPrice),
+// AND the cost to unlock the next floor, by SEASONAL_SALE_DISCOUNT_MULTIPLIER,
+// for every floor in the WHOLE building this roll happened in — including the
+// one still-locked floor waiting at the top (its own unlockCost is a real,
+// not-yet-paid price too, and floors/index.ts's ensureLockedFloorAbove reads
+// priceDiscountMultiplier back off the ground floor to keep every FUTURE
+// queued floor discounted the same way, so repeated procs really do stack
+// building-wide forever, not just for floors that already existed)
 function applySeasonalSaleCrit(floors: Floor[]): void {
   for (const floor of floors) {
-    if (!floor.unlocked) continue;
-    floor.upgradeCost = multiply(
-      floor.upgradeCost,
-      SEASONAL_SALE_DISCOUNT_MULTIPLIER,
-    );
     floor.priceDiscountMultiplier *= SEASONAL_SALE_DISCOUNT_MULTIPLIER;
+    if (floor.unlocked) {
+      floor.upgradeCost = multiply(
+        floor.upgradeCost,
+        SEASONAL_SALE_DISCOUNT_MULTIPLIER,
+      );
+    } else {
+      floor.unlockCost = multiply(
+        floor.unlockCost,
+        SEASONAL_SALE_DISCOUNT_MULTIPLIER,
+      );
+    }
   }
 }
 
@@ -717,12 +737,17 @@ export function handleFloorClick(
       for (let i = 0; i < count; i++) {
         applyUpgradeTick(floor, isGroundFloor);
       }
+      // reroll THIS floor's next crit exactly once for the whole landed crit —
+      // never once per free tick above, or a big multiplier (x125 ultra) would
+      // roll the special-crit gateway up to 125 times instead of once
+      rollCritUpgrade(floor);
       if (chain) {
         const target = floors.indexOf(floor);
         applyChainCrit(deps, target, (chainFloor, chainIsGroundFloor) => {
           for (let i = 0; i < count; i++) {
             applyUpgradeTick(chainFloor, chainIsGroundFloor);
           }
+          rollCritUpgrade(chainFloor);
         });
       }
       // bounce crit: cascades downward from the floor that actually crit,
@@ -737,6 +762,7 @@ export function handleFloorClick(
             for (let i = 0; i < count; i++) {
               applyUpgradeTick(bounceFloor, bounceIsGroundFloor);
             }
+            rollCritUpgrade(bounceFloor);
           },
           BOUNCE_CRIT_CONTINUE_CHANCE,
         );
@@ -752,6 +778,7 @@ export function handleFloorClick(
             for (let i = 0; i < count; i++) {
               applyUpgradeTick(explosionFloor, explosionIsGroundFloor);
             }
+            rollCritUpgrade(explosionFloor);
           },
         );
       }
@@ -843,6 +870,7 @@ export function handleFloorClick(
     }
     if (spendTotalIncome(floor.upgradeCost)) {
       applyUpgradeTick(floor, isGroundFloor);
+      rollCritUpgrade(floor);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();

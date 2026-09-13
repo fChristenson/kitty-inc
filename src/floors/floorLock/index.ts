@@ -89,6 +89,13 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
     // reset back to null, so "the default floor is the crit version" holds for
     // every floor the building ever grows, not just the ones that existed yet
     defaultCritTier: getUniformCritTier(deps.floors),
+    // same idea for a seasonal-sale discount (see shared/critTypes'
+    // SEASONAL_SALE_DISCOUNT_MULTIPLIER) — every floor in a building is kept
+    // in sync on this value (applySeasonalSaleCrit applies it to all of them
+    // at once), so the ground floor's own copy is always this building's
+    // current accumulated discount, and a freshly queued floor should start
+    // already discounted by that same amount instead of resetting to 1
+    priceDiscountMultiplier: deps.floors[0]?.priceDiscountMultiplier ?? 1,
   });
   deps.floors.push(floor);
   deps.onAdd(floor);
@@ -107,6 +114,7 @@ export function getBuildingUnlockAllCost(
 ): BigNumber {
   const top = floors[floors.length - 1];
   if (!top || top.unlocked) return ZERO;
+  const priceDiscountMultiplier = floors[0]?.priceDiscountMultiplier ?? 1;
   let total = top.unlockCost;
   for (
     let level = floors.length + 1;
@@ -115,7 +123,8 @@ export function getBuildingUnlockAllCost(
   ) {
     total = add(
       total,
-      buildFloor(level, { backgroundCount: 1, multiplier }).unlockCost,
+      buildFloor(level, { backgroundCount: 1, multiplier, priceDiscountMultiplier })
+        .unlockCost,
     );
   }
   return total;

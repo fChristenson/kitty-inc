@@ -126,6 +126,12 @@ export interface BuildFloorOptions {
   // tier — a freshly created floor starts as this tier too instead of null
   // (see floorLock.ts's ensureLockedFloorAbove, the only real caller of this)
   defaultCritTier?: CritTier | null;
+  // this building's own accumulated seasonal-sale discount (see shared/critTypes'
+  // SEASONAL_SALE_DISCOUNT_MULTIPLIER) — a freshly created floor starts already
+  // discounted by this same amount instead of resetting to 1, so a locked floor
+  // queued AFTER a seasonal sale already procced still gets it (see
+  // floorLock.ts's ensureLockedFloorAbove, the only real caller of this)
+  priceDiscountMultiplier?: number;
 }
 
 // the level-0 (freshly-built, un-upgraded) income/cost/interval stats for a given
@@ -170,15 +176,17 @@ export function buildFloor(
     multiplier = 1,
     groundFloorLocked = false,
     defaultCritTier = null,
+    priceDiscountMultiplier = 1,
   } = options;
   const isGroundFloor = floorLevel === 1;
   // BigNumber pow/multiply never overflow to Infinity no matter how high
   // floorLevel climbs (unlike plain `2 ** n`) — see shared/bigNumber
-  const unlockCost = isGroundFloor
+  const baseUnlockCost = isGroundFloor
     ? groundFloorLocked
       ? fromNumber(BASE_UNLOCK_COST * multiplier)
       : ZERO
     : multiply(pow(2, floorLevel - 2), BASE_UNLOCK_COST * multiplier);
+  const unlockCost = multiply(baseUnlockCost, priceDiscountMultiplier);
   // true once this level's own natural (uncapped) interval already exceeds the
   // 1h cap below — set once, forever, regardless of how far upgrades later
   // shrink the floor's actual incomeIntervalSeconds (see incomePanel.ts's
@@ -203,7 +211,7 @@ export function buildFloor(
     overtimeTicks: 0,
     overtimeStartedAt: null,
     overtimeCost: ZERO,
-    priceDiscountMultiplier: 1,
+    priceDiscountMultiplier,
   };
 }
 
