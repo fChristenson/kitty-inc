@@ -117,10 +117,11 @@ await sharp(data, { raw: { width, height, channels } })
     width: maxX - minX + 1,
     height: maxY - minY + 1,
   })
-  // menu icons only ever render at ~28-34px (style.css's .worker-menu__icon) —
-  // capping here avoids shipping/decoding/resampling a needlessly huge source
-  .resize(160, 160, { fit: "inside", withoutEnlargement: true })
-  .png()
+  // also drawn as a special-crit flash backdrop (screenShake.ts) alongside
+  // chain/upgrade/heaven/etc. — match their same 250px cap + palette
+  // quantization so this icon isn't noticeably smaller/heavier than the rest
+  .resize(250, 250, { fit: "inside", withoutEnlargement: true })
+  .png({ compressionLevel: 9, palette: true })
   .toFile(dest);
 
 const finalMeta = await sharp(dest).metadata();
