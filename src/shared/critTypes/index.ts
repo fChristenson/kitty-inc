@@ -190,6 +190,33 @@ export const SUPPLIES_SALE_CRIT_CHANCE = CONFIG.crit.suppliesSaleChance;
 export const SUPPLIES_SALE_CRIT_COLOR = COLOR.suppliesSaleLime;
 export const SUPPLIES_SALE_CRIT_LABEL = "Supplies Sale";
 
+// "winter sale"/"spring sale"/"summer sale"/"autumn sale" crits — four more
+// flat, not-tier-scaled procs, all sharing the exact same reward (only the
+// season/icon/label/color differ): permanently cuts every unlocked floor's
+// own upgrade AND worker/office chairs/supplies/manager costs by 25%, for
+// the WHOLE building the roll happened in (see floorInteractions.ts's
+// applySeasonalSaleCrit and hud/upgradeMenu's getFloorPrice, which folds
+// Floor.priceDiscountMultiplier into every worker-derived cost).
+// SEASONAL_SALE_DISCOUNT_MULTIPLIER is the ONE place "25% off" is ever named
+export const SEASONAL_SALE_DISCOUNT_MULTIPLIER =
+  1 - CONFIG.crit.seasonalSaleDiscount;
+
+export const WINTER_SALE_CRIT_CHANCE = CONFIG.crit.winterSaleChance;
+export const WINTER_SALE_CRIT_COLOR = COLOR.winterSaleIceBlue;
+export const WINTER_SALE_CRIT_LABEL = "Winter Sale";
+
+export const SPRING_SALE_CRIT_CHANCE = CONFIG.crit.springSaleChance;
+export const SPRING_SALE_CRIT_COLOR = COLOR.springSalePink;
+export const SPRING_SALE_CRIT_LABEL = "Spring Sale";
+
+export const SUMMER_SALE_CRIT_CHANCE = CONFIG.crit.summerSaleChance;
+export const SUMMER_SALE_CRIT_COLOR = COLOR.summerSaleOrange;
+export const SUMMER_SALE_CRIT_LABEL = "Summer Sale";
+
+export const AUTUMN_SALE_CRIT_CHANCE = CONFIG.crit.autumnSaleChance;
+export const AUTUMN_SALE_CRIT_COLOR = COLOR.autumnSaleAmber;
+export const AUTUMN_SALE_CRIT_LABEL = "Autumn Sale";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -207,6 +234,10 @@ const fullHouseCrits = new WeakSet<Floor>();
 const tickTockCrits = new WeakSet<Floor>();
 const chairSaleCrits = new WeakSet<Floor>();
 const suppliesSaleCrits = new WeakSet<Floor>();
+const winterSaleCrits = new WeakSet<Floor>();
+const springSaleCrits = new WeakSet<Floor>();
+const summerSaleCrits = new WeakSet<Floor>();
+const autumnSaleCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
@@ -253,6 +284,10 @@ export interface CritRollResult {
   tickTock: boolean;
   chairSale: boolean;
   suppliesSale: boolean;
+  winterSale: boolean;
+  springSale: boolean;
+  summerSale: boolean;
+  autumnSale: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -278,6 +313,10 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "tickTock",
   "chairSale",
   "suppliesSale",
+  "winterSale",
+  "springSale",
+  "summerSale",
+  "autumnSale",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -414,6 +453,26 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "officeSuppliesIcon",
     description: "Free office supplies for the floor",
   },
+  winterSale: {
+    label: WINTER_SALE_CRIT_LABEL,
+    icon: "winter",
+    description: "Cuts upgrade/worker costs 25% building-wide",
+  },
+  springSale: {
+    label: SPRING_SALE_CRIT_LABEL,
+    icon: "spring",
+    description: "Cuts upgrade/worker costs 25% building-wide",
+  },
+  summerSale: {
+    label: SUMMER_SALE_CRIT_LABEL,
+    icon: "summer",
+    description: "Cuts upgrade/worker costs 25% building-wide",
+  },
+  autumnSale: {
+    label: AUTUMN_SALE_CRIT_LABEL,
+    icon: "autumn",
+    description: "Cuts upgrade/worker costs 25% building-wide",
+  },
 };
 
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
@@ -449,6 +508,10 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         if (Math.random() < CHAIR_SALE_CRIT_CHANCE) landed.push("chairSale");
         if (Math.random() < SUPPLIES_SALE_CRIT_CHANCE)
           landed.push("suppliesSale");
+        if (Math.random() < WINTER_SALE_CRIT_CHANCE) landed.push("winterSale");
+        if (Math.random() < SPRING_SALE_CRIT_CHANCE) landed.push("springSale");
+        if (Math.random() < SUMMER_SALE_CRIT_CHANCE) landed.push("summerSale");
+        if (Math.random() < AUTUMN_SALE_CRIT_CHANCE) landed.push("autumnSale");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       onLanded({
@@ -468,6 +531,10 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         tickTock: kept.has("tickTock"),
         chairSale: kept.has("chairSale"),
         suppliesSale: kept.has("suppliesSale"),
+        winterSale: kept.has("winterSale"),
+        springSale: kept.has("springSale"),
+        summerSale: kept.has("summerSale"),
+        autumnSale: kept.has("autumnSale"),
       });
       return;
     }
@@ -536,6 +603,22 @@ export function isSuppliesSaleCrit(floor: Floor): boolean {
   return suppliesSaleCrits.has(floor);
 }
 
+export function isWinterSaleCrit(floor: Floor): boolean {
+  return winterSaleCrits.has(floor);
+}
+
+export function isSpringSaleCrit(floor: Floor): boolean {
+  return springSaleCrits.has(floor);
+}
+
+export function isSummerSaleCrit(floor: Floor): boolean {
+  return summerSaleCrits.has(floor);
+}
+
+export function isAutumnSaleCrit(floor: Floor): boolean {
+  return autumnSaleCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -553,6 +636,10 @@ export function consumeCritProcs(floor: Floor): void {
   tickTockCrits.delete(floor);
   chairSaleCrits.delete(floor);
   suppliesSaleCrits.delete(floor);
+  winterSaleCrits.delete(floor);
+  springSaleCrits.delete(floor);
+  summerSaleCrits.delete(floor);
+  autumnSaleCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -616,6 +703,22 @@ export function forceChairSaleCritProc(floor: Floor): void {
 
 export function forceSuppliesSaleCritProc(floor: Floor): void {
   suppliesSaleCrits.add(floor);
+}
+
+export function forceWinterSaleCritProc(floor: Floor): void {
+  winterSaleCrits.add(floor);
+}
+
+export function forceSpringSaleCritProc(floor: Floor): void {
+  springSaleCrits.add(floor);
+}
+
+export function forceSummerSaleCritProc(floor: Floor): void {
+  summerSaleCrits.add(floor);
+}
+
+export function forceAutumnSaleCritProc(floor: Floor): void {
+  autumnSaleCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

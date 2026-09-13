@@ -27,6 +27,11 @@ import {
   isTickTockCrit,
   isChairSaleCrit,
   isSuppliesSaleCrit,
+  isWinterSaleCrit,
+  isSpringSaleCrit,
+  isSummerSaleCrit,
+  isAutumnSaleCrit,
+  SEASONAL_SALE_DISCOUNT_MULTIPLIER,
   POKER_HAND_CRIT_COUNTS,
   consumeCritUpgrade,
   rollCritUpgrade,
@@ -368,6 +373,25 @@ function applySuppliesSaleCrit(floor: Floor): void {
   floor.hasOfficeSupplies = true;
 }
 
+// "winter sale"/"spring sale"/"summer sale"/"autumn sale" crits (see
+// shared/critTypes's isWinterSaleCrit etc.) — all four share this exact
+// reward, only their icon/label/color differ: permanently cuts EVERY
+// unlocked floor's own upgrade cost (a stored, directly-mutable value) and
+// worker/office chairs/supplies/manager costs (via Floor.priceDiscountMultiplier,
+// folded into hud/upgradeMenu's getFloorPrice) by
+// SEASONAL_SALE_DISCOUNT_MULTIPLIER, for every floor in the WHOLE building
+// this roll happened in
+function applySeasonalSaleCrit(floors: Floor[]): void {
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    floor.upgradeCost = multiply(
+      floor.upgradeCost,
+      SEASONAL_SALE_DISCOUNT_MULTIPLIER,
+    );
+    floor.priceDiscountMultiplier *= SEASONAL_SALE_DISCOUNT_MULTIPLIER;
+  }
+}
+
 // handles a click at floor-local (x, y): unlocking, upgrading, or clicking a worker.
 // every hit test/mutation here is identical to the old per-canvas click listener,
 // just no longer tied to any one floor owning its own DOM canvas + event listener.
@@ -525,6 +549,16 @@ export function handleFloorClick(
         // supplies purchase for the floor just bought/unlocked
         if (buyTier.chairSale) applyChairSaleCrit(floor);
         if (buyTier.suppliesSale) applySuppliesSaleCrit(floor);
+        // winter/spring/summer/autumn sale crits: permanently cut every
+        // unlocked floor's own upgrade/worker costs 25%, building-wide
+        if (
+          buyTier.winterSale ||
+          buyTier.springSale ||
+          buyTier.summerSale ||
+          buyTier.autumnSale
+        ) {
+          applySeasonalSaleCrit(floors);
+        }
       }
       persist();
       const center = getLockCenter();
@@ -549,6 +583,10 @@ export function handleFloorClick(
           buyTier.tickTock,
           buyTier.chairSale,
           buyTier.suppliesSale,
+          buyTier.winterSale,
+          buyTier.springSale,
+          buyTier.summerSale,
+          buyTier.autumnSale,
         );
     }
     return;
@@ -670,6 +708,10 @@ export function handleFloorClick(
       const tickTock = isTickTockCrit(floor);
       const chairSale = isChairSaleCrit(floor);
       const suppliesSale = isSuppliesSaleCrit(floor);
+      const winterSale = isWinterSaleCrit(floor);
+      const springSale = isSpringSaleCrit(floor);
+      const summerSale = isSummerSaleCrit(floor);
+      const autumnSale = isAutumnSaleCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -766,6 +808,11 @@ export function handleFloorClick(
       // supplies purchase for the floor that actually crit
       if (chairSale) applyChairSaleCrit(floor);
       if (suppliesSale) applySuppliesSaleCrit(floor);
+      // winter/spring/summer/autumn sale crits: permanently cut every
+      // unlocked floor's own upgrade/worker costs 25%, building-wide
+      if (winterSale || springSale || summerSale || autumnSale) {
+        applySeasonalSaleCrit(floors);
+      }
       persist();
       triggerButtonPress(floor);
       triggerCritCelebration(
@@ -787,6 +834,10 @@ export function handleFloorClick(
         tickTock,
         chairSale,
         suppliesSale,
+        winterSale,
+        springSale,
+        summerSale,
+        autumnSale,
       );
       return;
     }

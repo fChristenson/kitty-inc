@@ -65,6 +65,10 @@ const IMAGE_FILES = {
   threeOfAKind: "threeOfAKind.png", // Three of a Kind crit flash's own backdrop icon
   fourOfAKind: "fourOfAKind.png", // Four of a Kind crit flash's own backdrop icon
   fullHouse: "fullHouse.png", // Full House crit flash's own backdrop icon
+  winter: "christmasTree.png", // Winter Sale crit flash's own backdrop icon
+  spring: "spring.png", // Spring Sale crit flash's own backdrop icon
+  summer: "summer.png", // Summer Sale crit flash's own backdrop icon
+  autumn: "fall.png", // Autumn Sale crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

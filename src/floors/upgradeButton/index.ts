@@ -300,6 +300,15 @@ export {
   CHAIR_SALE_CRIT_LABEL,
   SUPPLIES_SALE_CRIT_COLOR,
   SUPPLIES_SALE_CRIT_LABEL,
+  SEASONAL_SALE_DISCOUNT_MULTIPLIER,
+  WINTER_SALE_CRIT_COLOR,
+  WINTER_SALE_CRIT_LABEL,
+  SPRING_SALE_CRIT_COLOR,
+  SPRING_SALE_CRIT_LABEL,
+  SUMMER_SALE_CRIT_COLOR,
+  SUMMER_SALE_CRIT_LABEL,
+  AUTUMN_SALE_CRIT_COLOR,
+  AUTUMN_SALE_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -315,6 +324,10 @@ export {
   isTickTockCrit,
   isChairSaleCrit,
   isSuppliesSaleCrit,
+  isWinterSaleCrit,
+  isSpringSaleCrit,
+  isSummerSaleCrit,
+  isAutumnSaleCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -340,6 +353,10 @@ import {
   forceTickTockCritProc,
   forceChairSaleCritProc,
   forceSuppliesSaleCritProc,
+  forceWinterSaleCritProc,
+  forceSpringSaleCritProc,
+  forceSummerSaleCritProc,
+  forceAutumnSaleCritProc,
 } from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
@@ -368,6 +385,10 @@ export function rollCritUpgrade(floor: Floor): void {
     if (result.tickTock) forceTickTockCritProc(floor);
     if (result.chairSale) forceChairSaleCritProc(floor);
     if (result.suppliesSale) forceSuppliesSaleCritProc(floor);
+    if (result.winterSale) forceWinterSaleCritProc(floor);
+    if (result.springSale) forceSpringSaleCritProc(floor);
+    if (result.summerSale) forceSummerSaleCritProc(floor);
+    if (result.autumnSale) forceAutumnSaleCritProc(floor);
   });
 }
 
@@ -417,6 +438,10 @@ export function forceFloorBuyCrit(
   tickTock = false,
   chairSale = false,
   suppliesSale = false,
+  winterSale = false,
+  springSale = false,
+  summerSale = false,
+  autumnSale = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -435,6 +460,10 @@ export function forceFloorBuyCrit(
     tickTock,
     chairSale,
     suppliesSale,
+    winterSale,
+    springSale,
+    summerSale,
+    autumnSale,
   };
 }
 
@@ -582,6 +611,26 @@ export function forceChairSaleCritUpgrade(floor: Floor): void {
 export function forceSuppliesSaleCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceSuppliesSaleCritProc(floor);
+}
+
+export function forceWinterSaleCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceWinterSaleCritProc(floor);
+}
+
+export function forceSpringSaleCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSpringSaleCritProc(floor);
+}
+
+export function forceSummerSaleCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSummerSaleCritProc(floor);
+}
+
+export function forceAutumnSaleCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceAutumnSaleCritProc(floor);
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see

@@ -106,6 +106,25 @@ let suppliesSaleIcon: HTMLImageElement | null = null;
 loadImageByName("officeSuppliesIcon").then((image) => {
   suppliesSaleIcon = image;
 });
+// same idea again, drawn behind the "Winter Sale"/"Spring Sale"/"Summer
+// Sale"/"Autumn Sale" flash text (see upgradeButton.ts's isWinterSaleCrit
+// etc.)
+let winterSaleIcon: HTMLImageElement | null = null;
+loadImageByName("winter").then((image) => {
+  winterSaleIcon = image;
+});
+let springSaleIcon: HTMLImageElement | null = null;
+loadImageByName("spring").then((image) => {
+  springSaleIcon = image;
+});
+let summerSaleIcon: HTMLImageElement | null = null;
+loadImageByName("summer").then((image) => {
+  summerSaleIcon = image;
+});
+let autumnSaleIcon: HTMLImageElement | null = null;
+loadImageByName("autumn").then((image) => {
+  autumnSaleIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -552,6 +571,34 @@ export function drawCritFlash(
       measuredWidth * 0.85,
     );
     ctx.drawImage(suppliesSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Winter Sale" && winterSaleIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      winterSaleIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(winterSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Spring Sale" && springSaleIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      springSaleIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(springSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Summer Sale" && summerSaleIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      summerSaleIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(summerSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Autumn Sale" && autumnSaleIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      autumnSaleIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(autumnSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

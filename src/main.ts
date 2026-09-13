@@ -37,6 +37,10 @@ import {
   forceTickTockCritUpgrade,
   forceChairSaleCritUpgrade,
   forceSuppliesSaleCritUpgrade,
+  forceWinterSaleCritUpgrade,
+  forceSpringSaleCritUpgrade,
+  forceSummerSaleCritUpgrade,
+  forceAutumnSaleCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -95,6 +99,10 @@ import {
   wireSpawnTickTockCritButton,
   wireSpawnChairSaleCritButton,
   wireSpawnSuppliesSaleCritButton,
+  wireSpawnWinterSaleCritButton,
+  wireSpawnSpringSaleCritButton,
+  wireSpawnSummerSaleCritButton,
+  wireSpawnAutumnSaleCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
@@ -119,6 +127,10 @@ import {
   wireFloorBuyTickTockCritButton,
   wireFloorBuyChairSaleCritButton,
   wireFloorBuySuppliesSaleCritButton,
+  wireFloorBuyWinterSaleCritButton,
+  wireFloorBuySpringSaleCritButton,
+  wireFloorBuySummerSaleCritButton,
+  wireFloorBuyAutumnSaleCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -527,6 +539,22 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceSuppliesSaleCritUpgrade(floor);
     });
+    wireSpawnWinterSaleCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceWinterSaleCritUpgrade(floor);
+    });
+    wireSpawnSpringSaleCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceSpringSaleCritUpgrade(floor);
+    });
+    wireSpawnSummerSaleCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceSummerSaleCritUpgrade(floor);
+    });
+    wireSpawnAutumnSaleCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceAutumnSaleCritUpgrade(floor);
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyBoostCritButton(app, () =>
       forceFloorBuyCrit("crit", false, true),
@@ -680,6 +708,96 @@ async function main() {
     wireFloorBuySuppliesSaleCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyWinterSaleCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuySpringSaleCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuySummerSaleCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyAutumnSaleCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
         false,
         false,
         false,

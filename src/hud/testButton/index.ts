@@ -33,6 +33,10 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-tick-tock-crit" class="game__button">Spawn Tick Tock Crit</button>
           <button id="spawn-chair-sale-crit" class="game__button">Spawn Chair Sale Crit</button>
           <button id="spawn-supplies-sale-crit" class="game__button">Spawn Supplies Sale Crit</button>
+          <button id="spawn-winter-sale-crit" class="game__button">Spawn Winter Sale Crit</button>
+          <button id="spawn-spring-sale-crit" class="game__button">Spawn Spring Sale Crit</button>
+          <button id="spawn-summer-sale-crit" class="game__button">Spawn Summer Sale Crit</button>
+          <button id="spawn-autumn-sale-crit" class="game__button">Spawn Autumn Sale Crit</button>
           <button id="floor-buy-crit" class="game__button">Floor Crit</button>
           <button id="floor-buy-boost-crit" class="game__button">Floor Boost Crit</button>
           <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
@@ -57,6 +61,10 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-tick-tock-crit" class="game__button">Floor Tick Tock Crit</button>
           <button id="floor-buy-chair-sale-crit" class="game__button">Floor Chair Sale Crit</button>
           <button id="floor-buy-supplies-sale-crit" class="game__button">Floor Supplies Sale Crit</button>
+          <button id="floor-buy-winter-sale-crit" class="game__button">Floor Winter Sale Crit</button>
+          <button id="floor-buy-spring-sale-crit" class="game__button">Floor Spring Sale Crit</button>
+          <button id="floor-buy-summer-sale-crit" class="game__button">Floor Summer Sale Crit</button>
+          <button id="floor-buy-autumn-sale-crit" class="game__button">Floor Autumn Sale Crit</button>
           <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
           <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
           <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
@@ -327,6 +335,46 @@ export function wireSpawnSuppliesSaleCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnWinterSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-winter-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnSpringSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-spring-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnSummerSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-summer-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnAutumnSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-autumn-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireFloorBuyCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -561,6 +609,46 @@ export function wireFloorBuySuppliesSaleCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-supplies-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyWinterSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-winter-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuySpringSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-spring-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuySummerSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-summer-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyAutumnSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-autumn-sale-crit",
   )!;
   button.addEventListener("click", onClick);
 }

@@ -203,6 +203,7 @@ export function buildFloor(
     overtimeTicks: 0,
     overtimeStartedAt: null,
     overtimeCost: ZERO,
+    priceDiscountMultiplier: 1,
   };
 }
 
@@ -361,6 +362,10 @@ export {
   forceTickTockCritUpgrade,
   forceChairSaleCritUpgrade,
   forceSuppliesSaleCritUpgrade,
+  forceWinterSaleCritUpgrade,
+  forceSpringSaleCritUpgrade,
+  forceSummerSaleCritUpgrade,
+  forceAutumnSaleCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,
   pickHigherCritTier,

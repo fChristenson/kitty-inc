@@ -28,6 +28,14 @@ import {
   CHAIR_SALE_CRIT_LABEL,
   SUPPLIES_SALE_CRIT_COLOR,
   SUPPLIES_SALE_CRIT_LABEL,
+  WINTER_SALE_CRIT_COLOR,
+  WINTER_SALE_CRIT_LABEL,
+  SPRING_SALE_CRIT_COLOR,
+  SPRING_SALE_CRIT_LABEL,
+  SUMMER_SALE_CRIT_COLOR,
+  SUMMER_SALE_CRIT_LABEL,
+  AUTUMN_SALE_CRIT_COLOR,
+  AUTUMN_SALE_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -384,7 +392,11 @@ interface QueuedCelebration {
     | "fullHouse"
     | "tickTock"
     | "chairSale"
-    | "suppliesSale";
+    | "suppliesSale"
+    | "winterSale"
+    | "springSale"
+    | "summerSale"
+    | "autumnSale";
   queuedAt: number;
   run: () => void;
 }
@@ -452,6 +464,10 @@ export function triggerCritCelebration(
   tickTock = false,
   chairSale = false,
   suppliesSale = false,
+  winterSale = false,
+  springSale = false,
+  summerSale = false,
+  autumnSale = false,
 ): void {
   if (
     chain ||
@@ -468,7 +484,11 @@ export function triggerCritCelebration(
     fullHouse ||
     tickTock ||
     chairSale ||
-    suppliesSale
+    suppliesSale ||
+    winterSale ||
+    springSale ||
+    summerSale ||
+    autumnSale
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -649,6 +669,74 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             SUPPLIES_SALE_CRIT_LABEL,
             SUPPLIES_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      winterSale &&
+      !specialCelebrationQueue.some((q) => q.kind === "winterSale")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "winterSale",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            WINTER_SALE_CRIT_LABEL,
+            WINTER_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      springSale &&
+      !specialCelebrationQueue.some((q) => q.kind === "springSale")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "springSale",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            SPRING_SALE_CRIT_LABEL,
+            SPRING_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      summerSale &&
+      !specialCelebrationQueue.some((q) => q.kind === "summerSale")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "summerSale",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            SUMMER_SALE_CRIT_LABEL,
+            SUMMER_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      autumnSale &&
+      !specialCelebrationQueue.some((q) => q.kind === "autumnSale")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "autumnSale",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            AUTUMN_SALE_CRIT_LABEL,
+            AUTUMN_SALE_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

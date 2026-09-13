@@ -120,6 +120,17 @@ export const CONFIG = {
     // if it doesn't already have it
     chairSaleChance: 0.1,
     suppliesSaleChance: 0.1,
+    // "winter sale"/"spring sale"/"summer sale"/"autumn sale" crits — four
+    // more flat, not-tier-scaled procs, all sharing one effect (see
+    // shared/critTypes' SEASONAL_SALE_DISCOUNT_MULTIPLIER): permanently cut
+    // every unlocked floor's own upgrade AND worker/office chairs/supplies/
+    // manager costs by 25%, for the WHOLE building the roll happened in
+    winterSaleChance: 0.0008,
+    springSaleChance: 0.0008,
+    summerSaleChance: 0.0008,
+    autumnSaleChance: 0.0008,
+    // 0.25 = 25% off; procs multiply the affected cost by 1 - this
+    seasonalSaleDiscount: 0.25,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

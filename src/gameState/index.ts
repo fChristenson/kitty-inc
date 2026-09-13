@@ -94,6 +94,14 @@ export interface Floor {
   overtimeTicks: number;
   overtimeStartedAt: number | null; // Date.now() ms the CURRENT run's window started; null = no run yet
   overtimeCost: BigNumber; // $ paid for the CURRENT run; ZERO if never triggered
+  // permanent per-floor price multiplier (default 1), permanently multiplied
+  // by 0.75 each time a "seasonal sale" crit lands on this floor (see
+  // shared/critTypes' SEASONAL_SALE_DISCOUNT_MULTIPLIER) — folded into
+  // hud/upgradeMenu's getFloorPrice, so it discounts every worker/office
+  // chairs/supplies/manager cost derived from it. floor.upgradeCost itself is
+  // discounted directly (a stored, already-mutable value), this multiplier is
+  // only needed for the derived-from-getFloorPrice costs
+  priceDiscountMultiplier: number;
 }
 
 // gameState.ts is the sole owner of this per-floor data (Floor itself doesn't carry it),
@@ -270,6 +278,7 @@ interface SavedFloor {
   overtimeTicks?: number; // added after initial release; older saves default to 0 on load
   overtimeStartedAt?: number | null; // added after initial release; older saves default to null on load
   overtimeCost?: SerializedBigNumber; // added after initial release; older saves default to ZERO on load
+  priceDiscountMultiplier?: number; // added after initial release; older saves default to 1 on load
 }
 
 export function clearBuildings(companyIndex = 0): void {
@@ -302,6 +311,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
     overtimeTicks: floor.overtimeTicks,
     overtimeStartedAt: floor.overtimeStartedAt,
     overtimeCost: floor.overtimeCost,
+    priceDiscountMultiplier: floor.priceDiscountMultiplier,
   };
 }
 
@@ -361,6 +371,7 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     overtimeStartedAt: sf.overtimeStartedAt ?? null,
     overtimeCost:
       sf.overtimeCost !== undefined ? toBigNumber(sf.overtimeCost) : ZERO,
+    priceDiscountMultiplier: sf.priceDiscountMultiplier ?? 1,
   };
   workerSlots.set(floor, sf.workers);
   workerTintIndexes.set(floor, sf.tintIndexes ?? sf.spriteIndexes ?? []);

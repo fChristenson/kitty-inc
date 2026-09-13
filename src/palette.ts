@@ -77,6 +77,14 @@ export const COLOR = {
   chairSaleBrown: "#92400E",
   // Supplies Sale crit's own dedicated color
   suppliesSaleLime: "#84CC16",
+  // Winter Sale crit's own dedicated color
+  winterSaleIceBlue: "#7DD3FC",
+  // Spring Sale crit's own dedicated color
+  springSalePink: "#F472B6",
+  // Summer Sale crit's own dedicated color
+  summerSaleOrange: "#FB923C",
+  // Autumn Sale crit's own dedicated color
+  autumnSaleAmber: "#D97706",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

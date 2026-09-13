@@ -33,9 +33,13 @@ const skyscraperIconUrl = getImageUrl("skyscraper");
 const WORKER_BASE_PRICE_FLOOR_1 = CONFIG.upgradeMenu.workerBasePriceFloor1;
 
 function getFloorPrice(floor: Floor): BigNumber {
-  return gt(floor.unlockCost, fromNumber(0))
+  const base = gt(floor.unlockCost, fromNumber(0))
     ? floor.unlockCost
     : fromNumber(WORKER_BASE_PRICE_FLOOR_1);
+  // "seasonal sale" crits (see shared/critTypes' SEASONAL_SALE_DISCOUNT_
+  // MULTIPLIER) permanently discount this floor's own worker/office chairs/
+  // supplies/manager costs, all of which derive from this one price
+  return multiply(base, floor.priceDiscountMultiplier);
 }
 
 // the $ cost of a floor's next worker: its floor price (unlock cost, or the floor-1
