@@ -177,6 +177,19 @@ export const TICK_TOCK_CRIT_CHANCE = CONFIG.crit.tickTockChance;
 export const TICK_TOCK_CRIT_COLOR = COLOR.teal;
 export const TICK_TOCK_CRIT_LABEL = "Tick Tock";
 
+// "chair sale"/"supplies sale" crits — two more flat, not-tier-scaled procs:
+// grant the floor being upgraded its one-time office chairs/supplies
+// purchase (see hud/upgradeMenu's buyOfficeChairs/buyOfficeSupplies) for
+// free, if it doesn't already have it. Reuse the icons already shipped for
+// those exact menu entries
+export const CHAIR_SALE_CRIT_CHANCE = CONFIG.crit.chairSaleChance;
+export const CHAIR_SALE_CRIT_COLOR = COLOR.chairSaleBrown;
+export const CHAIR_SALE_CRIT_LABEL = "Chair Sale";
+
+export const SUPPLIES_SALE_CRIT_CHANCE = CONFIG.crit.suppliesSaleChance;
+export const SUPPLIES_SALE_CRIT_COLOR = COLOR.suppliesSaleLime;
+export const SUPPLIES_SALE_CRIT_LABEL = "Supplies Sale";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -192,6 +205,8 @@ const threeOfAKindCrits = new WeakSet<Floor>();
 const fourOfAKindCrits = new WeakSet<Floor>();
 const fullHouseCrits = new WeakSet<Floor>();
 const tickTockCrits = new WeakSet<Floor>();
+const chairSaleCrits = new WeakSet<Floor>();
+const suppliesSaleCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll all five
 // piggyback procs — each is rolled independently, but at most
@@ -235,6 +250,8 @@ export interface CritRollResult {
   fourOfAKind: boolean;
   fullHouse: boolean;
   tickTock: boolean;
+  chairSale: boolean;
+  suppliesSale: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -258,6 +275,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "fourOfAKind",
   "fullHouse",
   "tickTock",
+  "chairSale",
+  "suppliesSale",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -384,6 +403,16 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "clock",
     description: "Pays every floor twice, instantly",
   },
+  chairSale: {
+    label: CHAIR_SALE_CRIT_LABEL,
+    icon: "officeChairsIcon",
+    description: "Free office chairs for the floor",
+  },
+  suppliesSale: {
+    label: SUPPLIES_SALE_CRIT_LABEL,
+    icon: "officeSuppliesIcon",
+    description: "Free office supplies for the floor",
+  },
 };
 
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
@@ -416,6 +445,9 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
           landed.push("fourOfAKind");
         if (Math.random() < FULL_HOUSE_CRIT_CHANCE) landed.push("fullHouse");
         if (Math.random() < TICK_TOCK_CRIT_CHANCE) landed.push("tickTock");
+        if (Math.random() < CHAIR_SALE_CRIT_CHANCE) landed.push("chairSale");
+        if (Math.random() < SUPPLIES_SALE_CRIT_CHANCE)
+          landed.push("suppliesSale");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       onLanded({
@@ -433,6 +465,8 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         fourOfAKind: kept.has("fourOfAKind"),
         fullHouse: kept.has("fullHouse"),
         tickTock: kept.has("tickTock"),
+        chairSale: kept.has("chairSale"),
+        suppliesSale: kept.has("suppliesSale"),
       });
       return;
     }
@@ -493,6 +527,14 @@ export function isTickTockCrit(floor: Floor): boolean {
   return tickTockCrits.has(floor);
 }
 
+export function isChairSaleCrit(floor: Floor): boolean {
+  return chairSaleCrits.has(floor);
+}
+
+export function isSuppliesSaleCrit(floor: Floor): boolean {
+  return suppliesSaleCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -508,6 +550,8 @@ export function consumeCritProcs(floor: Floor): void {
   fourOfAKindCrits.delete(floor);
   fullHouseCrits.delete(floor);
   tickTockCrits.delete(floor);
+  chairSaleCrits.delete(floor);
+  suppliesSaleCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -563,6 +607,14 @@ export function forceFullHouseCritProc(floor: Floor): void {
 
 export function forceTickTockCritProc(floor: Floor): void {
   tickTockCrits.add(floor);
+}
+
+export function forceChairSaleCritProc(floor: Floor): void {
+  chairSaleCrits.add(floor);
+}
+
+export function forceSuppliesSaleCritProc(floor: Floor): void {
+  suppliesSaleCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

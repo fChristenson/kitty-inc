@@ -114,6 +114,12 @@ export const CONFIG = {
     // without touching its fill-cycle progress (see shared/income's
     // floor.lastCollectedAt) — the bar keeps ticking from exactly where it was
     tickTockChance: 0.0008,
+    // "chair sale"/"supplies sale" crits — flat, not-tier-scaled procs: grant
+    // the floor being upgraded its one-time office chairs/supplies purchase
+    // (see hud/upgradeMenu's buyOfficeChairs/buyOfficeSupplies) for free,
+    // if it doesn't already have it
+    chairSaleChance: 0.001,
+    suppliesSaleChance: 0.001,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

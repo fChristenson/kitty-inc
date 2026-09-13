@@ -73,6 +73,10 @@ export const COLOR = {
   fourOfAKindIndigo: "#6366F1",
   // Full House crit's own dedicated color
   fullHouseCrimson: "#E11D48",
+  // Chair Sale crit's own dedicated color
+  chairSaleBrown: "#92400E",
+  // Supplies Sale crit's own dedicated color
+  suppliesSaleLime: "#84CC16",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

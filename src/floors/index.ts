@@ -359,6 +359,8 @@ export {
   forceFourOfAKindCritUpgrade,
   forceFullHouseCritUpgrade,
   forceTickTockCritUpgrade,
+  forceChairSaleCritUpgrade,
+  forceSuppliesSaleCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,
   pickHigherCritTier,

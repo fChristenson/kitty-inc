@@ -24,6 +24,10 @@ import {
   FULL_HOUSE_CRIT_LABEL,
   TICK_TOCK_CRIT_COLOR,
   TICK_TOCK_CRIT_LABEL,
+  CHAIR_SALE_CRIT_COLOR,
+  CHAIR_SALE_CRIT_LABEL,
+  SUPPLIES_SALE_CRIT_COLOR,
+  SUPPLIES_SALE_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -378,7 +382,9 @@ interface QueuedCelebration {
     | "threeOfAKind"
     | "fourOfAKind"
     | "fullHouse"
-    | "tickTock";
+    | "tickTock"
+    | "chairSale"
+    | "suppliesSale";
   queuedAt: number;
   run: () => void;
 }
@@ -444,6 +450,8 @@ export function triggerCritCelebration(
   fourOfAKind = false,
   fullHouse = false,
   tickTock = false,
+  chairSale = false,
+  suppliesSale = false,
 ): void {
   if (
     chain ||
@@ -458,7 +466,9 @@ export function triggerCritCelebration(
     threeOfAKind ||
     fourOfAKind ||
     fullHouse ||
-    tickTock
+    tickTock ||
+    chairSale ||
+    suppliesSale
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -605,6 +615,40 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             TICK_TOCK_CRIT_LABEL,
             TICK_TOCK_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      chairSale &&
+      !specialCelebrationQueue.some((q) => q.kind === "chairSale")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "chairSale",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            CHAIR_SALE_CRIT_LABEL,
+            CHAIR_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      suppliesSale &&
+      !specialCelebrationQueue.some((q) => q.kind === "suppliesSale")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "suppliesSale",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            SUPPLIES_SALE_CRIT_LABEL,
+            SUPPLIES_SALE_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

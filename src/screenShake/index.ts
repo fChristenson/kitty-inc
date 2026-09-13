@@ -92,6 +92,20 @@ let tickTockIcon: HTMLImageElement | null = null;
 loadImageByName("clock").then((image) => {
   tickTockIcon = image;
 });
+// same idea again, drawn behind the "Chair Sale" flash text (see
+// upgradeButton.ts's isChairSaleCrit) — reuses the icon already shipped for
+// hud/upgradeMenu's office chairs purchase
+let chairSaleIcon: HTMLImageElement | null = null;
+loadImageByName("officeChairsIcon").then((image) => {
+  chairSaleIcon = image;
+});
+// same idea again, drawn behind the "Supplies Sale" flash text (see
+// upgradeButton.ts's isSuppliesSaleCrit) — reuses the icon already shipped
+// for hud/upgradeMenu's office supplies purchase
+let suppliesSaleIcon: HTMLImageElement | null = null;
+loadImageByName("officeSuppliesIcon").then((image) => {
+  suppliesSaleIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -524,6 +538,20 @@ export function drawCritFlash(
       measuredWidth * 0.85,
     );
     ctx.drawImage(tickTockIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Chair Sale" && chairSaleIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      chairSaleIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(chairSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Supplies Sale" && suppliesSaleIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      suppliesSaleIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(suppliesSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

@@ -296,6 +296,10 @@ export {
   FULL_HOUSE_CRIT_LABEL,
   TICK_TOCK_CRIT_COLOR,
   TICK_TOCK_CRIT_LABEL,
+  CHAIR_SALE_CRIT_COLOR,
+  CHAIR_SALE_CRIT_LABEL,
+  SUPPLIES_SALE_CRIT_COLOR,
+  SUPPLIES_SALE_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -309,6 +313,8 @@ export {
   isFourOfAKindCrit,
   isFullHouseCrit,
   isTickTockCrit,
+  isChairSaleCrit,
+  isSuppliesSaleCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -332,6 +338,8 @@ import {
   forceFourOfAKindCritProc,
   forceFullHouseCritProc,
   forceTickTockCritProc,
+  forceChairSaleCritProc,
+  forceSuppliesSaleCritProc,
 } from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
@@ -358,6 +366,8 @@ export function rollCritUpgrade(floor: Floor): void {
     if (result.fourOfAKind) forceFourOfAKindCritProc(floor);
     if (result.fullHouse) forceFullHouseCritProc(floor);
     if (result.tickTock) forceTickTockCritProc(floor);
+    if (result.chairSale) forceChairSaleCritProc(floor);
+    if (result.suppliesSale) forceSuppliesSaleCritProc(floor);
   });
 }
 
@@ -405,6 +415,8 @@ export function forceFloorBuyCrit(
   fourOfAKind = false,
   fullHouse = false,
   tickTock = false,
+  chairSale = false,
+  suppliesSale = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -421,6 +433,8 @@ export function forceFloorBuyCrit(
     fourOfAKind,
     fullHouse,
     tickTock,
+    chairSale,
+    suppliesSale,
   };
 }
 
@@ -558,6 +572,16 @@ export function forceFullHouseCritUpgrade(floor: Floor): void {
 export function forceTickTockCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceTickTockCritProc(floor);
+}
+
+export function forceChairSaleCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceChairSaleCritProc(floor);
+}
+
+export function forceSuppliesSaleCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSuppliesSaleCritProc(floor);
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see

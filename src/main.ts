@@ -35,6 +35,8 @@ import {
   forceFourOfAKindCritUpgrade,
   forceFullHouseCritUpgrade,
   forceTickTockCritUpgrade,
+  forceChairSaleCritUpgrade,
+  forceSuppliesSaleCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -91,6 +93,8 @@ import {
   wireSpawnFourOfAKindCritButton,
   wireSpawnFullHouseCritButton,
   wireSpawnTickTockCritButton,
+  wireSpawnChairSaleCritButton,
+  wireSpawnSuppliesSaleCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
@@ -113,6 +117,8 @@ import {
   wireFloorBuyFourOfAKindCritButton,
   wireFloorBuyFullHouseCritButton,
   wireFloorBuyTickTockCritButton,
+  wireFloorBuyChairSaleCritButton,
+  wireFloorBuySuppliesSaleCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -513,6 +519,14 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceTickTockCritUpgrade(floor);
     });
+    wireSpawnChairSaleCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceChairSaleCritUpgrade(floor);
+    });
+    wireSpawnSuppliesSaleCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceSuppliesSaleCritUpgrade(floor);
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyBoostCritButton(app, () =>
       forceFloorBuyCrit("crit", false, true),
@@ -629,6 +643,45 @@ async function main() {
     wireFloorBuyTickTockCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyChairSaleCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuySuppliesSaleCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
         false,
         false,
         false,

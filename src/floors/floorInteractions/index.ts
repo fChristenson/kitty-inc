@@ -25,6 +25,8 @@ import {
   isFourOfAKindCrit,
   isFullHouseCrit,
   isTickTockCrit,
+  isChairSaleCrit,
+  isSuppliesSaleCrit,
   POKER_HAND_CRIT_COUNTS,
   consumeCritUpgrade,
   rollCritUpgrade,
@@ -354,6 +356,18 @@ function applyTickTockCrit(floors: Floor[]): void {
   addTotalIncome(total);
 }
 
+// "chair sale"/"supplies sale" crits (see shared/critTypes's isChairSaleCrit/
+// isSuppliesSaleCrit): grant the floor being upgraded its one-time office
+// chairs/supplies purchase for free (same flags hud/upgradeMenu's own paid
+// buyOfficeChairs/buyOfficeSupplies set) — a no-op if the floor already has it
+function applyChairSaleCrit(floor: Floor): void {
+  floor.hasOfficeChairs = true;
+}
+
+function applySuppliesSaleCrit(floor: Floor): void {
+  floor.hasOfficeSupplies = true;
+}
+
 // handles a click at floor-local (x, y): unlocking, upgrading, or clicking a worker.
 // every hit test/mutation here is identical to the old per-canvas click listener,
 // just no longer tied to any one floor owning its own DOM canvas + event listener.
@@ -507,6 +521,10 @@ export function handleFloorClick(
         // tick tock crit: instantly pays every unlocked floor twice at its
         // own current rate, without disturbing any floor's own bar progress
         if (buyTier.tickTock) applyTickTockCrit(floors);
+        // chair sale/supplies sale crits: free one-time office chairs/
+        // supplies purchase for the floor just bought/unlocked
+        if (buyTier.chairSale) applyChairSaleCrit(floor);
+        if (buyTier.suppliesSale) applySuppliesSaleCrit(floor);
       }
       persist();
       const center = getLockCenter();
@@ -529,6 +547,8 @@ export function handleFloorClick(
           buyTier.fourOfAKind,
           buyTier.fullHouse,
           buyTier.tickTock,
+          buyTier.chairSale,
+          buyTier.suppliesSale,
         );
     }
     return;
@@ -648,6 +668,8 @@ export function handleFloorClick(
       const fourOfAKind = isFourOfAKindCrit(floor);
       const fullHouse = isFullHouseCrit(floor);
       const tickTock = isTickTockCrit(floor);
+      const chairSale = isChairSaleCrit(floor);
+      const suppliesSale = isSuppliesSaleCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -740,6 +762,10 @@ export function handleFloorClick(
       // tick tock crit: instantly pays every unlocked floor twice at its own
       // current rate, without disturbing any floor's own bar progress
       if (tickTock) applyTickTockCrit(floors);
+      // chair sale/supplies sale crits: free one-time office chairs/
+      // supplies purchase for the floor that actually crit
+      if (chairSale) applyChairSaleCrit(floor);
+      if (suppliesSale) applySuppliesSaleCrit(floor);
       persist();
       triggerButtonPress(floor);
       triggerCritCelebration(
@@ -759,6 +785,8 @@ export function handleFloorClick(
         fourOfAKind,
         fullHouse,
         tickTock,
+        chairSale,
+        suppliesSale,
       );
       return;
     }
