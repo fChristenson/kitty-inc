@@ -123,8 +123,11 @@ export function getBuildingUnlockAllCost(
   ) {
     total = add(
       total,
-      buildFloor(level, { backgroundCount: 1, multiplier, priceDiscountMultiplier })
-        .unlockCost,
+      buildFloor(level, {
+        backgroundCount: 1,
+        multiplier,
+        priceDiscountMultiplier,
+      }).unlockCost,
     );
   }
   return total;
