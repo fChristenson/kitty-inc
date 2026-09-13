@@ -109,6 +109,11 @@ export const CONFIG = {
     threeOfAKindChance: 0.001,
     fourOfAKindChance: 0.0005,
     fullHouseChance: 0.0002,
+    // "tick tock crit" — a flat, not-tier-scaled proc: instantly credits every
+    // unlocked floor 2 extra payouts' worth of income at its own current rate,
+    // without touching its fill-cycle progress (see shared/income's
+    // floor.lastCollectedAt) — the bar keeps ticking from exactly where it was
+    tickTockChance: 0.0008,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

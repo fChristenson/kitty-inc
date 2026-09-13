@@ -24,6 +24,7 @@ import {
   isThreeOfAKindCrit,
   isFourOfAKindCrit,
   isFullHouseCrit,
+  isTickTockCrit,
   POKER_HAND_CRIT_COUNTS,
   consumeCritUpgrade,
   rollCritUpgrade,
@@ -57,6 +58,7 @@ import {
   hitTestIncomeBar,
   getIncomeBarCenter,
   triggerIncomeBarPress,
+  currentPayoutAmount,
 } from "../incomePanel";
 import {
   spendTotalIncome,
@@ -77,7 +79,7 @@ import {
   getLockCenter,
 } from "../floorLock";
 import { activateBoosted, type Floor } from "../../gameState";
-import { multiply } from "../../shared/bigNumber";
+import { type BigNumber, ZERO, add, multiply } from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
 
 // "peppermint crit" (see shared/critTypes' isPeppermintCrit): promotes every
@@ -337,6 +339,21 @@ export function applyBounceCrit(
   }
 }
 
+// "tick tock crit" (see shared/critTypes's isTickTockCrit): instantly credits
+// every unlocked floor 2 extra payouts' worth of income at its own current
+// rate, WITHOUT touching floor.lastCollectedAt (see incomePanel.ts's
+// currentPayoutAmount) — each floor's own bar keeps ticking from exactly the
+// same progress it was already at, it just also gets paid twice right now
+function applyTickTockCrit(floors: Floor[]): void {
+  const now = Date.now();
+  let total: BigNumber = ZERO;
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    total = add(total, multiply(currentPayoutAmount(floor, now), 2));
+  }
+  addTotalIncome(total);
+}
+
 // handles a click at floor-local (x, y): unlocking, upgrading, or clicking a worker.
 // every hit test/mutation here is identical to the old per-canvas click listener,
 // just no longer tied to any one floor owning its own DOM canvas + event listener.
@@ -487,6 +504,9 @@ export function handleFloorClick(
             POKER_HAND_CRIT_COUNTS.fullHouse,
           );
         }
+        // tick tock crit: instantly pays every unlocked floor twice at its
+        // own current rate, without disturbing any floor's own bar progress
+        if (buyTier.tickTock) applyTickTockCrit(floors);
       }
       persist();
       const center = getLockCenter();
@@ -508,6 +528,7 @@ export function handleFloorClick(
           buyTier.threeOfAKind,
           buyTier.fourOfAKind,
           buyTier.fullHouse,
+          buyTier.tickTock,
         );
     }
     return;
@@ -626,6 +647,7 @@ export function handleFloorClick(
       const threeOfAKind = isThreeOfAKindCrit(floor);
       const fourOfAKind = isFourOfAKindCrit(floor);
       const fullHouse = isFullHouseCrit(floor);
+      const tickTock = isTickTockCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -715,6 +737,9 @@ export function handleFloorClick(
           POKER_HAND_CRIT_COUNTS.fullHouse,
         );
       }
+      // tick tock crit: instantly pays every unlocked floor twice at its own
+      // current rate, without disturbing any floor's own bar progress
+      if (tickTock) applyTickTockCrit(floors);
       persist();
       triggerButtonPress(floor);
       triggerCritCelebration(
@@ -733,6 +758,7 @@ export function handleFloorClick(
         threeOfAKind,
         fourOfAKind,
         fullHouse,
+        tickTock,
       );
       return;
     }

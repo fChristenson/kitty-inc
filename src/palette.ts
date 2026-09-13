@@ -52,8 +52,8 @@ export const COLOR = {
   purple: "#8B5CF6",
   purpleActive: "#7C3AED",
   purpleShadow: "#6D28D9",
-  // unused: bounce/explosion crits both use the landed tier's own color
-  // instead of a dedicated one (see critCelebration.ts's tierColor)
+  // Tick Tock crit's own dedicated color (previously unused — bounce/
+  // explosion crits both use the landed tier's own color instead)
   teal: "#14B8A6",
   // Explosion crit's own dedicated color
   orange: "#F97316",

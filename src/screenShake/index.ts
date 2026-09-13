@@ -85,6 +85,13 @@ let fullHouseIcon: HTMLImageElement | null = null;
 loadImageByName("fullHouse").then((image) => {
   fullHouseIcon = image;
 });
+// same idea again, drawn behind the "Tick Tock" flash text (see
+// upgradeButton.ts's isTickTockCrit) — reuses the clock icon already shipped
+// for hud/boostMenu's "Work overtime" menu entry
+let tickTockIcon: HTMLImageElement | null = null;
+loadImageByName("clock").then((image) => {
+  tickTockIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -508,6 +515,15 @@ export function drawCritFlash(
       measuredWidth * 0.85,
     );
     ctx.drawImage(fullHouseIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Tick Tock" && tickTockIcon) {
+    // no extra rotation — clock.png is already an upright clock face,
+    // spinning it would just look broken
+    const { w: iconW, h: iconH } = fitIconSize(
+      tickTockIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(tickTockIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

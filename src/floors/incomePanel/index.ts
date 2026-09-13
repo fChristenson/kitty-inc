@@ -228,6 +228,15 @@ export function peekDueIncome(floor: Floor, now: number): BigNumber {
   return sharedPeekDueIncome(floor, now, currentSpeedMultiplier(floor, now));
 }
 
+// a floor's own $ amount for exactly ONE completed payout cycle at its
+// current effective rate (same cycle math collectDueIncome uses), without
+// advancing floor.lastCollectedAt at all — used by the "Tick Tock" crit
+// (floorInteractions.ts's applyTickTockCrit), which grants floors extra
+// payouts while leaving their own visible fill-cycle progress untouched
+export function currentPayoutAmount(floor: Floor, now: number): BigNumber {
+  return effectiveIncomeCycle(floor, now).amount;
+}
+
 // a floor's own $/sec at its current effective rate — same boost-aware cycle math
 // collectDueIncome/peekDueIncome use, just expressed as a flat rate instead of a
 // lump sum. Worker boost state and office-upgrade multipliers are read straight off

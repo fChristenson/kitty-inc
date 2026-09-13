@@ -167,6 +167,16 @@ export const FULL_HOUSE_CRIT_CHANCE = CONFIG.crit.fullHouseChance;
 export const FULL_HOUSE_CRIT_COLOR = COLOR.fullHouseCrimson;
 export const FULL_HOUSE_CRIT_LABEL = "Full House";
 
+// "tick tock crit" — a flat, not-tier-scaled proc: instantly grants every
+// unlocked floor 2 extra payouts' worth of income at its own current rate,
+// without touching its fill-cycle progress (floor.lastCollectedAt is never
+// changed) — the bar keeps ticking from exactly where it was, it just also
+// gets 2 payouts credited on top right now. Reuses the clock icon already
+// shipped for hud/boostMenu's "Work overtime" menu entry
+export const TICK_TOCK_CRIT_CHANCE = CONFIG.crit.tickTockChance;
+export const TICK_TOCK_CRIT_COLOR = COLOR.teal;
+export const TICK_TOCK_CRIT_LABEL = "Tick Tock";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -181,6 +191,7 @@ const pairCrits = new WeakSet<Floor>();
 const threeOfAKindCrits = new WeakSet<Floor>();
 const fourOfAKindCrits = new WeakSet<Floor>();
 const fullHouseCrits = new WeakSet<Floor>();
+const tickTockCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll all five
 // piggyback procs — each is rolled independently, but at most
@@ -223,6 +234,7 @@ export interface CritRollResult {
   threeOfAKind: boolean;
   fourOfAKind: boolean;
   fullHouse: boolean;
+  tickTock: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -245,6 +257,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "threeOfAKind",
   "fourOfAKind",
   "fullHouse",
+  "tickTock",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -366,6 +379,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "fullHouse",
     description: "Upgrades 5 floors' crit tier",
   },
+  tickTock: {
+    label: TICK_TOCK_CRIT_LABEL,
+    icon: "clock",
+    description: "Pays every floor twice, instantly",
+  },
 };
 
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
@@ -397,6 +415,7 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         if (Math.random() < FOUR_OF_A_KIND_CRIT_CHANCE)
           landed.push("fourOfAKind");
         if (Math.random() < FULL_HOUSE_CRIT_CHANCE) landed.push("fullHouse");
+        if (Math.random() < TICK_TOCK_CRIT_CHANCE) landed.push("tickTock");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       onLanded({
@@ -413,6 +432,7 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         threeOfAKind: kept.has("threeOfAKind"),
         fourOfAKind: kept.has("fourOfAKind"),
         fullHouse: kept.has("fullHouse"),
+        tickTock: kept.has("tickTock"),
       });
       return;
     }
@@ -469,6 +489,10 @@ export function isFullHouseCrit(floor: Floor): boolean {
   return fullHouseCrits.has(floor);
 }
 
+export function isTickTockCrit(floor: Floor): boolean {
+  return tickTockCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -483,6 +507,7 @@ export function consumeCritProcs(floor: Floor): void {
   threeOfAKindCrits.delete(floor);
   fourOfAKindCrits.delete(floor);
   fullHouseCrits.delete(floor);
+  tickTockCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -534,6 +559,10 @@ export function forceFourOfAKindCritProc(floor: Floor): void {
 
 export function forceFullHouseCritProc(floor: Floor): void {
   fullHouseCrits.add(floor);
+}
+
+export function forceTickTockCritProc(floor: Floor): void {
+  tickTockCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

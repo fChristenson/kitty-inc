@@ -34,6 +34,7 @@ import {
   forceThreeOfAKindCritUpgrade,
   forceFourOfAKindCritUpgrade,
   forceFullHouseCritUpgrade,
+  forceTickTockCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -89,6 +90,7 @@ import {
   wireSpawnThreeOfAKindCritButton,
   wireSpawnFourOfAKindCritButton,
   wireSpawnFullHouseCritButton,
+  wireSpawnTickTockCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
@@ -110,6 +112,7 @@ import {
   wireFloorBuyThreeOfAKindCritButton,
   wireFloorBuyFourOfAKindCritButton,
   wireFloorBuyFullHouseCritButton,
+  wireFloorBuyTickTockCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -506,6 +509,10 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceFullHouseCritUpgrade(floor);
     });
+    wireSpawnTickTockCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceTickTockCritUpgrade(floor);
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyBoostCritButton(app, () =>
       forceFloorBuyCrit("crit", false, true),
@@ -605,6 +612,24 @@ async function main() {
     wireFloorBuyFullHouseCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyTickTockCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
         false,
         false,
         false,

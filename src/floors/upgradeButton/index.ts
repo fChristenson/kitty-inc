@@ -294,6 +294,8 @@ export {
   FOUR_OF_A_KIND_CRIT_LABEL,
   FULL_HOUSE_CRIT_COLOR,
   FULL_HOUSE_CRIT_LABEL,
+  TICK_TOCK_CRIT_COLOR,
+  TICK_TOCK_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -306,6 +308,7 @@ export {
   isThreeOfAKindCrit,
   isFourOfAKindCrit,
   isFullHouseCrit,
+  isTickTockCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -328,6 +331,7 @@ import {
   forceThreeOfAKindCritProc,
   forceFourOfAKindCritProc,
   forceFullHouseCritProc,
+  forceTickTockCritProc,
 } from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
@@ -353,6 +357,7 @@ export function rollCritUpgrade(floor: Floor): void {
     if (result.threeOfAKind) forceThreeOfAKindCritProc(floor);
     if (result.fourOfAKind) forceFourOfAKindCritProc(floor);
     if (result.fullHouse) forceFullHouseCritProc(floor);
+    if (result.tickTock) forceTickTockCritProc(floor);
   });
 }
 
@@ -399,6 +404,7 @@ export function forceFloorBuyCrit(
   threeOfAKind = false,
   fourOfAKind = false,
   fullHouse = false,
+  tickTock = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -414,6 +420,7 @@ export function forceFloorBuyCrit(
     threeOfAKind,
     fourOfAKind,
     fullHouse,
+    tickTock,
   };
 }
 
@@ -546,6 +553,11 @@ export function forceFourOfAKindCritUpgrade(floor: Floor): void {
 export function forceFullHouseCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceFullHouseCritProc(floor);
+}
+
+export function forceTickTockCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceTickTockCritProc(floor);
 }
 
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see

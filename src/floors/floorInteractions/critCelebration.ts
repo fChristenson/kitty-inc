@@ -22,6 +22,8 @@ import {
   FOUR_OF_A_KIND_CRIT_LABEL,
   FULL_HOUSE_CRIT_COLOR,
   FULL_HOUSE_CRIT_LABEL,
+  TICK_TOCK_CRIT_COLOR,
+  TICK_TOCK_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -337,14 +339,14 @@ function celebrateHeavenly(
   spawnTierBursts(floor, "ultra", getScreenCenterLocal);
 }
 
-// pair/three of a kind/four of a kind/full house crits (see
+// pair/three of a kind/four of a kind/full house/tick tock crits (see
 // upgradeButton.ts's isPairCrit etc.): same flat "own label + own color"
 // flash shape as boost/booty/upgrade/peppermint above — the reward itself
-// (promoting a fixed number of floors'/buildings' own tier) is applied by
-// floorInteractions.ts/main.ts, this only covers the celebration moment. One
-// shared helper instead of 4 near-identical functions, since only the
-// label/color ever differ between them
-function celebratePokerHand(
+// (promoting a fixed number of floors'/buildings' own tier, or paying every
+// floor twice) is applied by floorInteractions.ts/main.ts, this only covers
+// the celebration moment. One shared helper instead of 5 near-identical
+// functions, since only the label/color ever differ between them
+function celebrateFlatProc(
   label: string,
   color: string,
   floor: Floor,
@@ -375,7 +377,8 @@ interface QueuedCelebration {
     | "pair"
     | "threeOfAKind"
     | "fourOfAKind"
-    | "fullHouse";
+    | "fullHouse"
+    | "tickTock";
   queuedAt: number;
   run: () => void;
 }
@@ -440,6 +443,7 @@ export function triggerCritCelebration(
   threeOfAKind = false,
   fourOfAKind = false,
   fullHouse = false,
+  tickTock = false,
 ): void {
   if (
     chain ||
@@ -453,7 +457,8 @@ export function triggerCritCelebration(
     pair ||
     threeOfAKind ||
     fourOfAKind ||
-    fullHouse
+    fullHouse ||
+    tickTock
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -529,7 +534,7 @@ export function triggerCritCelebration(
         kind: "pair",
         queuedAt: now,
         run: () =>
-          celebratePokerHand(
+          celebrateFlatProc(
             PAIR_CRIT_LABEL,
             PAIR_CRIT_COLOR,
             floor,
@@ -546,7 +551,7 @@ export function triggerCritCelebration(
         kind: "threeOfAKind",
         queuedAt: now,
         run: () =>
-          celebratePokerHand(
+          celebrateFlatProc(
             THREE_OF_A_KIND_CRIT_LABEL,
             THREE_OF_A_KIND_CRIT_COLOR,
             floor,
@@ -563,7 +568,7 @@ export function triggerCritCelebration(
         kind: "fourOfAKind",
         queuedAt: now,
         run: () =>
-          celebratePokerHand(
+          celebrateFlatProc(
             FOUR_OF_A_KIND_CRIT_LABEL,
             FOUR_OF_A_KIND_CRIT_COLOR,
             floor,
@@ -580,9 +585,26 @@ export function triggerCritCelebration(
         kind: "fullHouse",
         queuedAt: now,
         run: () =>
-          celebratePokerHand(
+          celebrateFlatProc(
             FULL_HOUSE_CRIT_LABEL,
             FULL_HOUSE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      tickTock &&
+      !specialCelebrationQueue.some((q) => q.kind === "tickTock")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "tickTock",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            TICK_TOCK_CRIT_LABEL,
+            TICK_TOCK_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,
