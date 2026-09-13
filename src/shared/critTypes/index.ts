@@ -210,11 +210,10 @@ const suppliesSaleCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
-// or more actually landed, randomly pick exactly ONE of them (via
-// pickAtMost's Fisher-Yates shuffle) to actually apply, so a single crit can
-// never stack more than one proc at once even when several would have
-// landed on the same roll
-export const MAX_SPECIAL_CRIT_PROCS = 1;
+// or more actually landed, randomly pick up to MAX_SPECIAL_CRIT_PROCS of
+// them (via pickAtMost's Fisher-Yates shuffle) to actually apply, so a
+// single crit can never stack every proc at once even when several land
+export const MAX_SPECIAL_CRIT_PROCS = 2;
 
 // gateway roll checked ONCE before any individual proc chance is even rolled
 // (see CONFIG.crit's own comment) — a miss here skips the whole system
@@ -295,9 +294,8 @@ export type CritProcHandlers<TContext> = Partial<
 // click, a floor-unlock purchase, a whole building bought off the map) never
 // re-checks `result.chain`/`result.boost`/... itself, it just supplies a
 // small handlers map of "what this proc means for ME" and this loop does the
-// rest. Only ONE landed proc (MAX_SPECIAL_CRIT_PROCS = 1) is ever kept per
-// roll, but this loop still stays a loop (not a plain if/else) so a future
-// bump of that cap needs no change here
+// rest. Up to MAX_SPECIAL_CRIT_PROCS landed procs each still get their own
+// independent call, same as before this existed
 export function applyCritProcs<TContext>(
   result: Pick<CritRollResult, CritProcKind>,
   ctx: TContext,

@@ -1009,10 +1009,9 @@ async function main() {
     // promote a fixed number of floors; at this whole-building scope they
     // unlock/create that many buildings instead (the building this event is
     // already for counts as the first of them, so only count-1 MORE get
-    // created here), each set to the same landed tier. This loop only ever
-    // runs for at most one of the four kinds at once (MAX_SPECIAL_CRIT_PROCS
-    // caps a roll to a single landed proc), but stays written as a loop over
-    // all four so it needs no change if that cap is ever raised again
+    // created here), each set to the same landed tier. Applied independently
+    // per landed kind (MAX_SPECIAL_CRIT_PROCS allows up to 2 to land
+    // together), same as every other proc's reward
     for (const count of [
       result.pair && POKER_HAND_CRIT_COUNTS.pair,
       result.threeOfAKind && POKER_HAND_CRIT_COUNTS.threeOfAKind,
