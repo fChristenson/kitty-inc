@@ -32,7 +32,8 @@ export type { MergeCompaniesResult } from "./economy";
 // shared/critTypes's own canonical CRIT_PROC_INFO table (icon/label match each
 // proc's own celebration flash exactly, screenShake.ts/critCelebration.ts)
 // instead of this menu hand-duplicating every label/icon/description a
-// second time
+// second time. Sorted alphabetically by label — CRIT_PROC_KINDS' own order is
+// roll-rarity-driven, not a sensible reading order for a lookup list
 const CRIT_INFO: { icon: string; label: string; description: string }[] =
   CRIT_PROC_KINDS.map((kind) => {
     const info = CRIT_PROC_INFO[kind];
@@ -41,7 +42,7 @@ const CRIT_INFO: { icon: string; label: string; description: string }[] =
       label: info.label,
       description: info.description,
     };
-  });
+  }).sort((a, b) => a.label.localeCompare(b.label));
 
 // the map view's own prev/next/pointer arrow icon (shared/arrowIcon), reused
 // here as the expand/collapse chevron — rotated via CSS (.crit-info-item[open])
