@@ -208,11 +208,13 @@ const tickTockCrits = new WeakSet<Floor>();
 const chairSaleCrits = new WeakSet<Floor>();
 const suppliesSaleCrits = new WeakSet<Floor>();
 
-// call once a tier has just landed (see rollCrit below) to roll all five
-// piggyback procs — each is rolled independently, but at most
-// MAX_SPECIAL_CRIT_PROCS of the ones that actually land get applied (picked
-// randomly among them) so a single crit can never stack every proc at once
-export const MAX_SPECIAL_CRIT_PROCS = 2;
+// call once a tier has just landed (see rollCrit below) to roll every
+// piggyback proc independently, each against its own chance — then, if one
+// or more actually landed, randomly pick exactly ONE of them (via
+// pickAtMost's Fisher-Yates shuffle) to actually apply, so a single crit can
+// never stack more than one proc at once even when several would have
+// landed on the same roll
+export const MAX_SPECIAL_CRIT_PROCS = 1;
 
 // gateway roll checked ONCE before any individual proc chance is even rolled
 // (see CONFIG.crit's own comment) — a miss here skips the whole system
@@ -293,8 +295,9 @@ export type CritProcHandlers<TContext> = Partial<
 // click, a floor-unlock purchase, a whole building bought off the map) never
 // re-checks `result.chain`/`result.boost`/... itself, it just supplies a
 // small handlers map of "what this proc means for ME" and this loop does the
-// rest. Multiple landed procs (MAX_SPECIAL_CRIT_PROCS allows up to 2) each
-// still get their own independent call, same as before this existed
+// rest. Only ONE landed proc (MAX_SPECIAL_CRIT_PROCS = 1) is ever kept per
+// roll, but this loop still stays a loop (not a plain if/else) so a future
+// bump of that cap needs no change here
 export function applyCritProcs<TContext>(
   result: Pick<CritRollResult, CritProcKind>,
   ctx: TContext,
@@ -418,8 +421,8 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
 // for the tier (previously duplicated separately by rollCritUpgrade and
 // rollFloorBuyCrit), then — only if a tier actually landed — rolls the
-// special-proc gateway, all 6 independent proc chances, and caps the result to
-// MAX_SPECIAL_CRIT_PROCS. `onLanded` is called exactly once, with the full
+// special-proc gateway, every proc's own independent chance, and caps the
+// result to MAX_SPECIAL_CRIT_PROCS. `onLanded` is called exactly once, with the full
 // result, if and only if a tier landed — a miss is silent, onLanded is never
 // invoked. Callers decide what "landing" means for their own case: mutating a
 // Floor's armed state (rollCritUpgrade) vs. just capturing the result to

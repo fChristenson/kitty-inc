@@ -62,8 +62,10 @@ Roll order:
    `BOOST_CRIT_CHANCE`, `BOUNCE_CRIT_CHANCE`, `EXPLOSION_CRIT_CHANCE`,
    `BOOTY_CRIT_CHANCE`, `UPGRADE_CRIT_CHANCE`, `PEPPERMINT_CRIT_CHANCE`,
    `HEAVENLY_CRIT_CHANCE`).
-4. Cap whichever landed to at most `MAX_SPECIAL_CRIT_PROCS` (2) via `pickAtMost`
-   (Fisher-Yates shuffle + slice) — a lucky roll can never stack more than 2 procs.
+4. Cap whichever landed to at most `MAX_SPECIAL_CRIT_PROCS` (1) via `pickAtMost`
+   (Fisher-Yates shuffle + slice) — even if several procs' own chances all hit
+   on the same roll, exactly one of them is picked at random to actually apply;
+   a lucky roll can never stack more than one proc at once.
 
 Per-floor proc state (`chainCrits`/`boostCrits`/`bounceCrits`/`explosionCrits`/
 `bootyCrits`/`upgradeCrits`/`peppermintCrits`/`heavenlyCrits`, all

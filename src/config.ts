@@ -91,7 +91,7 @@ export const CONFIG = {
     // floor in the building one tier step at once (see shared/critTypes'
     // nextCritTier). Rarer than upgradeChance since it's a guaranteed
     // building-wide effect instead of a single floor
-    peppermintChance: 0.0005,
+    peppermintChance: 0.0001,
     // "heavenly crit" — the single biggest reward in the game: unlocks every
     // remaining floor in the building for free, promotes every floor (new
     // ones included) straight to the max tier, then grants that tier's own
@@ -107,19 +107,19 @@ export const CONFIG = {
     // same "bigger guaranteed swing costs more" logic as peppermint/heavenly
     pairChance: 0.002,
     threeOfAKindChance: 0.001,
-    fourOfAKindChance: 0.0005,
-    fullHouseChance: 0.0002,
+    fourOfAKindChance: 0.005,
+    fullHouseChance: 0.0005,
     // "tick tock crit" — a flat, not-tier-scaled proc: instantly credits every
     // unlocked floor 2 extra payouts' worth of income at its own current rate,
     // without touching its fill-cycle progress (see shared/income's
     // floor.lastCollectedAt) — the bar keeps ticking from exactly where it was
-    tickTockChance: 0.0008,
+    tickTockChance: 0.05,
     // "chair sale"/"supplies sale" crits — flat, not-tier-scaled procs: grant
     // the floor being upgraded its one-time office chairs/supplies purchase
     // (see hud/upgradeMenu's buyOfficeChairs/buyOfficeSupplies) for free,
     // if it doesn't already have it
-    chairSaleChance: 0.001,
-    suppliesSaleChance: 0.001,
+    chairSaleChance: 0.1,
+    suppliesSaleChance: 0.1,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.
