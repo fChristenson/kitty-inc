@@ -114,12 +114,12 @@ export const CONFIG = {
     // without touching its fill-cycle progress (see shared/income's
     // floor.lastCollectedAt) — the bar keeps ticking from exactly where it was
     tickTockChance: 0.05,
-    // "chair sale"/"supplies sale" crits — flat, not-tier-scaled procs: grant
+    // "Chair Giveaway"/"Supplies Giveaway" crits — flat, not-tier-scaled procs: grant
     // the floor being upgraded its one-time office chairs/supplies purchase
     // (see hud/upgradeMenu's buyOfficeChairs/buyOfficeSupplies) for free,
     // if it doesn't already have it
-    chairSaleChance: 0.1,
-    suppliesSaleChance: 0.1,
+    chairGiveawayChance: 0.1,
+    suppliesGiveawayChance: 0.1,
     // "winter sale"/"spring sale"/"summer sale"/"autumn sale" crits — four
     // more flat, not-tier-scaled procs, all sharing one effect (see
     // shared/critTypes' SEASONAL_SALE_DISCOUNT_MULTIPLIER): permanently cut

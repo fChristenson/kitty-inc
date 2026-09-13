@@ -16,6 +16,12 @@ import { dropSmallOpaqueComponents } from "./lib/drop-small-components.mjs";
 const WHITE_LO = 150;
 const WHITE_HI = 195;
 const FLOOD_LO = 150;
+// background here is a near-perfectly neutral gray (channel spread <=3); the
+// umbrella's cream stripes and the sand patch are still clearly tinted (warm
+// R>G>B) even where bright — requiring near-neutrality keeps the flood fill
+// from ever crossing into that real content just because it's bright enough
+// to pass the whiteness check alone
+const SAT_MAX = 20;
 const MIN_KEEP_AREA = 200;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
@@ -33,6 +39,15 @@ function whitenessAt(x, y) {
   return Math.min(data[i], data[i + 1], data[i + 2]);
 }
 
+function isNeutralAt(x, y) {
+  const i = (y * width + x) * channels;
+  return (
+    Math.max(data[i], data[i + 1], data[i + 2]) -
+      Math.min(data[i], data[i + 1], data[i + 2]) <=
+    SAT_MAX
+  );
+}
+
 const isBackground = new Uint8Array(width * height);
 const queue = new Int32Array(width * height);
 let qHead = 0;
@@ -41,6 +56,7 @@ function tryEnqueue(x, y) {
   const idx = y * width + x;
   if (isBackground[idx]) return;
   if (whitenessAt(x, y) <= FLOOD_LO) return;
+  if (!isNeutralAt(x, y)) return;
   isBackground[idx] = 1;
   queue[qTail++] = idx;
 }
@@ -62,10 +78,30 @@ while (qHead < qTail) {
   if (y < height - 1) tryEnqueue(x, y + 1);
 }
 
+// a confirmed-background pixel only needs the soft whiteness blend right at
+// its true edge against real content — deep inside an enclosed pocket
+// (never touching a non-background neighbor), ambient-occlusion shading can
+// dip its own whiteness into the blend range and leave it wrongly near-opaque
+// even though the flood fill already proved it's background; force those
+// straight to fully transparent instead
+function touchesContent(x, y, idx) {
+  return (
+    (x > 0 && !isBackground[idx - 1]) ||
+    (x < width - 1 && !isBackground[idx + 1]) ||
+    (y > 0 && !isBackground[idx - width]) ||
+    (y < height - 1 && !isBackground[idx + width])
+  );
+}
+
 for (let y = 0; y < height; y++) {
   for (let x = 0; x < width; x++) {
     const pixelIdx = y * width + x;
     if (!isBackground[pixelIdx]) continue;
+    const i = pixelIdx * channels;
+    if (!touchesContent(x, y, pixelIdx)) {
+      data[i + 3] = 0;
+      continue;
+    }
     const whiteness = whitenessAt(x, y);
     const alpha =
       whiteness >= WHITE_HI
@@ -75,7 +111,6 @@ for (let y = 0; y < height; y++) {
           : Math.round(
               255 * (1 - (whiteness - WHITE_LO) / (WHITE_HI - WHITE_LO)),
             );
-    const i = pixelIdx * channels;
     data[i + 3] = Math.min(data[i + 3], alpha);
   }
 }

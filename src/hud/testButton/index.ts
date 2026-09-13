@@ -31,8 +31,8 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-four-of-a-kind-crit" class="game__button">Spawn Four of a Kind Crit</button>
           <button id="spawn-full-house-crit" class="game__button">Spawn Full House Crit</button>
           <button id="spawn-tick-tock-crit" class="game__button">Spawn Tick Tock Crit</button>
-          <button id="spawn-chair-sale-crit" class="game__button">Spawn Chair Sale Crit</button>
-          <button id="spawn-supplies-sale-crit" class="game__button">Spawn Supplies Sale Crit</button>
+          <button id="spawn-chair-giveaway-crit" class="game__button">Spawn Chair Giveaway Crit</button>
+          <button id="spawn-supplies-giveaway-crit" class="game__button">Spawn Supplies Giveaway Crit</button>
           <button id="spawn-winter-sale-crit" class="game__button">Spawn Winter Sale Crit</button>
           <button id="spawn-spring-sale-crit" class="game__button">Spawn Spring Sale Crit</button>
           <button id="spawn-summer-sale-crit" class="game__button">Spawn Summer Sale Crit</button>
@@ -59,8 +59,8 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-four-of-a-kind-crit" class="game__button">Floor Four of a Kind Crit</button>
           <button id="floor-buy-full-house-crit" class="game__button">Floor Full House Crit</button>
           <button id="floor-buy-tick-tock-crit" class="game__button">Floor Tick Tock Crit</button>
-          <button id="floor-buy-chair-sale-crit" class="game__button">Floor Chair Sale Crit</button>
-          <button id="floor-buy-supplies-sale-crit" class="game__button">Floor Supplies Sale Crit</button>
+          <button id="floor-buy-chair-giveaway-crit" class="game__button">Floor Chair Giveaway Crit</button>
+          <button id="floor-buy-supplies-giveaway-crit" class="game__button">Floor Supplies Giveaway Crit</button>
           <button id="floor-buy-winter-sale-crit" class="game__button">Floor Winter Sale Crit</button>
           <button id="floor-buy-spring-sale-crit" class="game__button">Floor Spring Sale Crit</button>
           <button id="floor-buy-summer-sale-crit" class="game__button">Floor Summer Sale Crit</button>
@@ -315,22 +315,22 @@ export function wireSpawnTickTockCritButton(
   button.addEventListener("click", onClick);
 }
 
-export function wireSpawnChairSaleCritButton(
+export function wireSpawnChairGiveawayCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#spawn-chair-sale-crit",
+    "#spawn-chair-giveaway-crit",
   )!;
   button.addEventListener("click", onClick);
 }
 
-export function wireSpawnSuppliesSaleCritButton(
+export function wireSpawnSuppliesGiveawayCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#spawn-supplies-sale-crit",
+    "#spawn-supplies-giveaway-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -593,22 +593,22 @@ export function wireFloorBuyTickTockCritButton(
   button.addEventListener("click", onClick);
 }
 
-export function wireFloorBuyChairSaleCritButton(
+export function wireFloorBuyChairGiveawayCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#floor-buy-chair-sale-crit",
+    "#floor-buy-chair-giveaway-crit",
   )!;
   button.addEventListener("click", onClick);
 }
 
-export function wireFloorBuySuppliesSaleCritButton(
+export function wireFloorBuySuppliesGiveawayCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
-    "#floor-buy-supplies-sale-crit",
+    "#floor-buy-supplies-giveaway-crit",
   )!;
   button.addEventListener("click", onClick);
 }

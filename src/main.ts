@@ -35,8 +35,8 @@ import {
   forceFourOfAKindCritUpgrade,
   forceFullHouseCritUpgrade,
   forceTickTockCritUpgrade,
-  forceChairSaleCritUpgrade,
-  forceSuppliesSaleCritUpgrade,
+  forceChairGiveawayCritUpgrade,
+  forceSuppliesGiveawayCritUpgrade,
   forceWinterSaleCritUpgrade,
   forceSpringSaleCritUpgrade,
   forceSummerSaleCritUpgrade,
@@ -97,8 +97,8 @@ import {
   wireSpawnFourOfAKindCritButton,
   wireSpawnFullHouseCritButton,
   wireSpawnTickTockCritButton,
-  wireSpawnChairSaleCritButton,
-  wireSpawnSuppliesSaleCritButton,
+  wireSpawnChairGiveawayCritButton,
+  wireSpawnSuppliesGiveawayCritButton,
   wireSpawnWinterSaleCritButton,
   wireSpawnSpringSaleCritButton,
   wireSpawnSummerSaleCritButton,
@@ -125,8 +125,8 @@ import {
   wireFloorBuyFourOfAKindCritButton,
   wireFloorBuyFullHouseCritButton,
   wireFloorBuyTickTockCritButton,
-  wireFloorBuyChairSaleCritButton,
-  wireFloorBuySuppliesSaleCritButton,
+  wireFloorBuyChairGiveawayCritButton,
+  wireFloorBuySuppliesGiveawayCritButton,
   wireFloorBuyWinterSaleCritButton,
   wireFloorBuySpringSaleCritButton,
   wireFloorBuySummerSaleCritButton,
@@ -531,13 +531,13 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceTickTockCritUpgrade(floor);
     });
-    wireSpawnChairSaleCritButton(app, () => {
+    wireSpawnChairGiveawayCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
-      if (floor) forceChairSaleCritUpgrade(floor);
+      if (floor) forceChairGiveawayCritUpgrade(floor);
     });
-    wireSpawnSuppliesSaleCritButton(app, () => {
+    wireSpawnSuppliesGiveawayCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
-      if (floor) forceSuppliesSaleCritUpgrade(floor);
+      if (floor) forceSuppliesGiveawayCritUpgrade(floor);
     });
     wireSpawnWinterSaleCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -686,7 +686,7 @@ async function main() {
         true,
       ),
     );
-    wireFloorBuyChairSaleCritButton(app, () =>
+    wireFloorBuyChairGiveawayCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
         false,
@@ -705,7 +705,7 @@ async function main() {
         true,
       ),
     );
-    wireFloorBuySuppliesSaleCritButton(app, () =>
+    wireFloorBuySuppliesGiveawayCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
         false,

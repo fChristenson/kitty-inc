@@ -296,10 +296,10 @@ export {
   FULL_HOUSE_CRIT_LABEL,
   TICK_TOCK_CRIT_COLOR,
   TICK_TOCK_CRIT_LABEL,
-  CHAIR_SALE_CRIT_COLOR,
-  CHAIR_SALE_CRIT_LABEL,
-  SUPPLIES_SALE_CRIT_COLOR,
-  SUPPLIES_SALE_CRIT_LABEL,
+  CHAIR_GIVEAWAY_CRIT_COLOR,
+  CHAIR_GIVEAWAY_CRIT_LABEL,
+  SUPPLIES_GIVEAWAY_CRIT_COLOR,
+  SUPPLIES_GIVEAWAY_CRIT_LABEL,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
   WINTER_SALE_CRIT_COLOR,
   WINTER_SALE_CRIT_LABEL,
@@ -322,8 +322,8 @@ export {
   isFourOfAKindCrit,
   isFullHouseCrit,
   isTickTockCrit,
-  isChairSaleCrit,
-  isSuppliesSaleCrit,
+  isChairGiveawayCrit,
+  isSuppliesGiveawayCrit,
   isWinterSaleCrit,
   isSpringSaleCrit,
   isSummerSaleCrit,
@@ -351,8 +351,8 @@ import {
   forceFourOfAKindCritProc,
   forceFullHouseCritProc,
   forceTickTockCritProc,
-  forceChairSaleCritProc,
-  forceSuppliesSaleCritProc,
+  forceChairGiveawayCritProc,
+  forceSuppliesGiveawayCritProc,
   forceWinterSaleCritProc,
   forceSpringSaleCritProc,
   forceSummerSaleCritProc,
@@ -383,8 +383,8 @@ export function rollCritUpgrade(floor: Floor): void {
     if (result.fourOfAKind) forceFourOfAKindCritProc(floor);
     if (result.fullHouse) forceFullHouseCritProc(floor);
     if (result.tickTock) forceTickTockCritProc(floor);
-    if (result.chairSale) forceChairSaleCritProc(floor);
-    if (result.suppliesSale) forceSuppliesSaleCritProc(floor);
+    if (result.chairGiveaway) forceChairGiveawayCritProc(floor);
+    if (result.suppliesGiveaway) forceSuppliesGiveawayCritProc(floor);
     if (result.winterSale) forceWinterSaleCritProc(floor);
     if (result.springSale) forceSpringSaleCritProc(floor);
     if (result.summerSale) forceSummerSaleCritProc(floor);
@@ -436,8 +436,8 @@ export function forceFloorBuyCrit(
   fourOfAKind = false,
   fullHouse = false,
   tickTock = false,
-  chairSale = false,
-  suppliesSale = false,
+  chairGiveaway = false,
+  suppliesGiveaway = false,
   winterSale = false,
   springSale = false,
   summerSale = false,
@@ -458,8 +458,8 @@ export function forceFloorBuyCrit(
     fourOfAKind,
     fullHouse,
     tickTock,
-    chairSale,
-    suppliesSale,
+    chairGiveaway,
+    suppliesGiveaway,
     winterSale,
     springSale,
     summerSale,
@@ -603,14 +603,14 @@ export function forceTickTockCritUpgrade(floor: Floor): void {
   forceTickTockCritProc(floor);
 }
 
-export function forceChairSaleCritUpgrade(floor: Floor): void {
+export function forceChairGiveawayCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
-  forceChairSaleCritProc(floor);
+  forceChairGiveawayCritProc(floor);
 }
 
-export function forceSuppliesSaleCritUpgrade(floor: Floor): void {
+export function forceSuppliesGiveawayCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
-  forceSuppliesSaleCritProc(floor);
+  forceSuppliesGiveawayCritProc(floor);
 }
 
 export function forceWinterSaleCritUpgrade(floor: Floor): void {

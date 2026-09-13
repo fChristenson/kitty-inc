@@ -25,8 +25,8 @@ import {
   isFourOfAKindCrit,
   isFullHouseCrit,
   isTickTockCrit,
-  isChairSaleCrit,
-  isSuppliesSaleCrit,
+  isChairGiveawayCrit,
+  isSuppliesGiveawayCrit,
   isWinterSaleCrit,
   isSpringSaleCrit,
   isSummerSaleCrit,
@@ -361,15 +361,15 @@ function applyTickTockCrit(floors: Floor[]): void {
   addTotalIncome(total);
 }
 
-// "chair sale"/"supplies sale" crits (see shared/critTypes's isChairSaleCrit/
-// isSuppliesSaleCrit): grant the floor being upgraded its one-time office
+// "Chair Giveaway"/"Supplies Giveaway" crits (see shared/critTypes's isChairGiveawayCrit/
+// isSuppliesGiveawayCrit): grant the floor being upgraded its one-time office
 // chairs/supplies purchase for free (same flags hud/upgradeMenu's own paid
 // buyOfficeChairs/buyOfficeSupplies set) — a no-op if the floor already has it
-function applyChairSaleCrit(floor: Floor): void {
+function applyChairGiveawayCrit(floor: Floor): void {
   floor.hasOfficeChairs = true;
 }
 
-function applySuppliesSaleCrit(floor: Floor): void {
+function applySuppliesGiveawayCrit(floor: Floor): void {
   floor.hasOfficeSupplies = true;
 }
 
@@ -545,10 +545,10 @@ export function handleFloorClick(
         // tick tock crit: instantly pays every unlocked floor twice at its
         // own current rate, without disturbing any floor's own bar progress
         if (buyTier.tickTock) applyTickTockCrit(floors);
-        // chair sale/supplies sale crits: free one-time office chairs/
+        // Chair Giveaway/Supplies Giveaway crits: free one-time office chairs/
         // supplies purchase for the floor just bought/unlocked
-        if (buyTier.chairSale) applyChairSaleCrit(floor);
-        if (buyTier.suppliesSale) applySuppliesSaleCrit(floor);
+        if (buyTier.chairGiveaway) applyChairGiveawayCrit(floor);
+        if (buyTier.suppliesGiveaway) applySuppliesGiveawayCrit(floor);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -581,8 +581,8 @@ export function handleFloorClick(
           buyTier.fourOfAKind,
           buyTier.fullHouse,
           buyTier.tickTock,
-          buyTier.chairSale,
-          buyTier.suppliesSale,
+          buyTier.chairGiveaway,
+          buyTier.suppliesGiveaway,
           buyTier.winterSale,
           buyTier.springSale,
           buyTier.summerSale,
@@ -706,8 +706,8 @@ export function handleFloorClick(
       const fourOfAKind = isFourOfAKindCrit(floor);
       const fullHouse = isFullHouseCrit(floor);
       const tickTock = isTickTockCrit(floor);
-      const chairSale = isChairSaleCrit(floor);
-      const suppliesSale = isSuppliesSaleCrit(floor);
+      const chairGiveaway = isChairGiveawayCrit(floor);
+      const suppliesGiveaway = isSuppliesGiveawayCrit(floor);
       const winterSale = isWinterSaleCrit(floor);
       const springSale = isSpringSaleCrit(floor);
       const summerSale = isSummerSaleCrit(floor);
@@ -804,10 +804,10 @@ export function handleFloorClick(
       // tick tock crit: instantly pays every unlocked floor twice at its own
       // current rate, without disturbing any floor's own bar progress
       if (tickTock) applyTickTockCrit(floors);
-      // chair sale/supplies sale crits: free one-time office chairs/
+      // Chair Giveaway/Supplies Giveaway crits: free one-time office chairs/
       // supplies purchase for the floor that actually crit
-      if (chairSale) applyChairSaleCrit(floor);
-      if (suppliesSale) applySuppliesSaleCrit(floor);
+      if (chairGiveaway) applyChairGiveawayCrit(floor);
+      if (suppliesGiveaway) applySuppliesGiveawayCrit(floor);
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
@@ -832,8 +832,8 @@ export function handleFloorClick(
         fourOfAKind,
         fullHouse,
         tickTock,
-        chairSale,
-        suppliesSale,
+        chairGiveaway,
+        suppliesGiveaway,
         winterSale,
         springSale,
         summerSale,

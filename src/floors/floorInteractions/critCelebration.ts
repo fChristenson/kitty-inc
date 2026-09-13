@@ -24,10 +24,10 @@ import {
   FULL_HOUSE_CRIT_LABEL,
   TICK_TOCK_CRIT_COLOR,
   TICK_TOCK_CRIT_LABEL,
-  CHAIR_SALE_CRIT_COLOR,
-  CHAIR_SALE_CRIT_LABEL,
-  SUPPLIES_SALE_CRIT_COLOR,
-  SUPPLIES_SALE_CRIT_LABEL,
+  CHAIR_GIVEAWAY_CRIT_COLOR,
+  CHAIR_GIVEAWAY_CRIT_LABEL,
+  SUPPLIES_GIVEAWAY_CRIT_COLOR,
+  SUPPLIES_GIVEAWAY_CRIT_LABEL,
   WINTER_SALE_CRIT_COLOR,
   WINTER_SALE_CRIT_LABEL,
   SPRING_SALE_CRIT_COLOR,
@@ -391,8 +391,8 @@ interface QueuedCelebration {
     | "fourOfAKind"
     | "fullHouse"
     | "tickTock"
-    | "chairSale"
-    | "suppliesSale"
+    | "chairGiveaway"
+    | "suppliesGiveaway"
     | "winterSale"
     | "springSale"
     | "summerSale"
@@ -462,8 +462,8 @@ export function triggerCritCelebration(
   fourOfAKind = false,
   fullHouse = false,
   tickTock = false,
-  chairSale = false,
-  suppliesSale = false,
+  chairGiveaway = false,
+  suppliesGiveaway = false,
   winterSale = false,
   springSale = false,
   summerSale = false,
@@ -483,8 +483,8 @@ export function triggerCritCelebration(
     fourOfAKind ||
     fullHouse ||
     tickTock ||
-    chairSale ||
-    suppliesSale ||
+    chairGiveaway ||
+    suppliesGiveaway ||
     winterSale ||
     springSale ||
     summerSale ||
@@ -642,16 +642,16 @@ export function triggerCritCelebration(
       });
     }
     if (
-      chairSale &&
-      !specialCelebrationQueue.some((q) => q.kind === "chairSale")
+      chairGiveaway &&
+      !specialCelebrationQueue.some((q) => q.kind === "chairGiveaway")
     ) {
       specialCelebrationQueue.push({
-        kind: "chairSale",
+        kind: "chairGiveaway",
         queuedAt: now,
         run: () =>
           celebrateFlatProc(
-            CHAIR_SALE_CRIT_LABEL,
-            CHAIR_SALE_CRIT_COLOR,
+            CHAIR_GIVEAWAY_CRIT_LABEL,
+            CHAIR_GIVEAWAY_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,
@@ -659,16 +659,16 @@ export function triggerCritCelebration(
       });
     }
     if (
-      suppliesSale &&
-      !specialCelebrationQueue.some((q) => q.kind === "suppliesSale")
+      suppliesGiveaway &&
+      !specialCelebrationQueue.some((q) => q.kind === "suppliesGiveaway")
     ) {
       specialCelebrationQueue.push({
-        kind: "suppliesSale",
+        kind: "suppliesGiveaway",
         queuedAt: now,
         run: () =>
           celebrateFlatProc(
-            SUPPLIES_SALE_CRIT_LABEL,
-            SUPPLIES_SALE_CRIT_COLOR,
+            SUPPLIES_GIVEAWAY_CRIT_LABEL,
+            SUPPLIES_GIVEAWAY_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

@@ -177,18 +177,18 @@ export const TICK_TOCK_CRIT_CHANCE = CONFIG.crit.tickTockChance;
 export const TICK_TOCK_CRIT_COLOR = COLOR.teal;
 export const TICK_TOCK_CRIT_LABEL = "Tick Tock";
 
-// "chair sale"/"supplies sale" crits — two more flat, not-tier-scaled procs:
+// "Chair Giveaway"/"Supplies Giveaway" crits — two more flat, not-tier-scaled procs:
 // grant the floor being upgraded its one-time office chairs/supplies
 // purchase (see hud/upgradeMenu's buyOfficeChairs/buyOfficeSupplies) for
 // free, if it doesn't already have it. Reuse the icons already shipped for
 // those exact menu entries
-export const CHAIR_SALE_CRIT_CHANCE = CONFIG.crit.chairSaleChance;
-export const CHAIR_SALE_CRIT_COLOR = COLOR.chairSaleBrown;
-export const CHAIR_SALE_CRIT_LABEL = "Chair Sale";
+export const CHAIR_GIVEAWAY_CRIT_CHANCE = CONFIG.crit.chairGiveawayChance;
+export const CHAIR_GIVEAWAY_CRIT_COLOR = COLOR.chairGiveawayBrown;
+export const CHAIR_GIVEAWAY_CRIT_LABEL = "Chair Giveaway";
 
-export const SUPPLIES_SALE_CRIT_CHANCE = CONFIG.crit.suppliesSaleChance;
-export const SUPPLIES_SALE_CRIT_COLOR = COLOR.suppliesSaleLime;
-export const SUPPLIES_SALE_CRIT_LABEL = "Supplies Sale";
+export const SUPPLIES_GIVEAWAY_CRIT_CHANCE = CONFIG.crit.suppliesGiveawayChance;
+export const SUPPLIES_GIVEAWAY_CRIT_COLOR = COLOR.suppliesGiveawayLime;
+export const SUPPLIES_GIVEAWAY_CRIT_LABEL = "Supplies Giveaway";
 
 // "winter sale"/"spring sale"/"summer sale"/"autumn sale" crits — four more
 // flat, not-tier-scaled procs, all sharing the exact same reward (only the
@@ -232,8 +232,8 @@ const threeOfAKindCrits = new WeakSet<Floor>();
 const fourOfAKindCrits = new WeakSet<Floor>();
 const fullHouseCrits = new WeakSet<Floor>();
 const tickTockCrits = new WeakSet<Floor>();
-const chairSaleCrits = new WeakSet<Floor>();
-const suppliesSaleCrits = new WeakSet<Floor>();
+const chairGiveawayCrits = new WeakSet<Floor>();
+const suppliesGiveawayCrits = new WeakSet<Floor>();
 const winterSaleCrits = new WeakSet<Floor>();
 const springSaleCrits = new WeakSet<Floor>();
 const summerSaleCrits = new WeakSet<Floor>();
@@ -282,8 +282,8 @@ export interface CritRollResult {
   fourOfAKind: boolean;
   fullHouse: boolean;
   tickTock: boolean;
-  chairSale: boolean;
-  suppliesSale: boolean;
+  chairGiveaway: boolean;
+  suppliesGiveaway: boolean;
   winterSale: boolean;
   springSale: boolean;
   summerSale: boolean;
@@ -311,8 +311,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "fourOfAKind",
   "fullHouse",
   "tickTock",
-  "chairSale",
-  "suppliesSale",
+  "chairGiveaway",
+  "suppliesGiveaway",
   "winterSale",
   "springSale",
   "summerSale",
@@ -443,13 +443,13 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "clock",
     description: "Pays every floor twice, instantly",
   },
-  chairSale: {
-    label: CHAIR_SALE_CRIT_LABEL,
+  chairGiveaway: {
+    label: CHAIR_GIVEAWAY_CRIT_LABEL,
     icon: "officeChairsIcon",
     description: "Free office chairs for the floor",
   },
-  suppliesSale: {
-    label: SUPPLIES_SALE_CRIT_LABEL,
+  suppliesGiveaway: {
+    label: SUPPLIES_GIVEAWAY_CRIT_LABEL,
     icon: "officeSuppliesIcon",
     description: "Free office supplies for the floor",
   },
@@ -505,9 +505,9 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
           landed.push("fourOfAKind");
         if (Math.random() < FULL_HOUSE_CRIT_CHANCE) landed.push("fullHouse");
         if (Math.random() < TICK_TOCK_CRIT_CHANCE) landed.push("tickTock");
-        if (Math.random() < CHAIR_SALE_CRIT_CHANCE) landed.push("chairSale");
-        if (Math.random() < SUPPLIES_SALE_CRIT_CHANCE)
-          landed.push("suppliesSale");
+        if (Math.random() < CHAIR_GIVEAWAY_CRIT_CHANCE) landed.push("chairGiveaway");
+        if (Math.random() < SUPPLIES_GIVEAWAY_CRIT_CHANCE)
+          landed.push("suppliesGiveaway");
         if (Math.random() < WINTER_SALE_CRIT_CHANCE) landed.push("winterSale");
         if (Math.random() < SPRING_SALE_CRIT_CHANCE) landed.push("springSale");
         if (Math.random() < SUMMER_SALE_CRIT_CHANCE) landed.push("summerSale");
@@ -529,8 +529,8 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         fourOfAKind: kept.has("fourOfAKind"),
         fullHouse: kept.has("fullHouse"),
         tickTock: kept.has("tickTock"),
-        chairSale: kept.has("chairSale"),
-        suppliesSale: kept.has("suppliesSale"),
+        chairGiveaway: kept.has("chairGiveaway"),
+        suppliesGiveaway: kept.has("suppliesGiveaway"),
         winterSale: kept.has("winterSale"),
         springSale: kept.has("springSale"),
         summerSale: kept.has("summerSale"),
@@ -595,12 +595,12 @@ export function isTickTockCrit(floor: Floor): boolean {
   return tickTockCrits.has(floor);
 }
 
-export function isChairSaleCrit(floor: Floor): boolean {
-  return chairSaleCrits.has(floor);
+export function isChairGiveawayCrit(floor: Floor): boolean {
+  return chairGiveawayCrits.has(floor);
 }
 
-export function isSuppliesSaleCrit(floor: Floor): boolean {
-  return suppliesSaleCrits.has(floor);
+export function isSuppliesGiveawayCrit(floor: Floor): boolean {
+  return suppliesGiveawayCrits.has(floor);
 }
 
 export function isWinterSaleCrit(floor: Floor): boolean {
@@ -634,8 +634,8 @@ export function consumeCritProcs(floor: Floor): void {
   fourOfAKindCrits.delete(floor);
   fullHouseCrits.delete(floor);
   tickTockCrits.delete(floor);
-  chairSaleCrits.delete(floor);
-  suppliesSaleCrits.delete(floor);
+  chairGiveawayCrits.delete(floor);
+  suppliesGiveawayCrits.delete(floor);
   winterSaleCrits.delete(floor);
   springSaleCrits.delete(floor);
   summerSaleCrits.delete(floor);
@@ -697,12 +697,12 @@ export function forceTickTockCritProc(floor: Floor): void {
   tickTockCrits.add(floor);
 }
 
-export function forceChairSaleCritProc(floor: Floor): void {
-  chairSaleCrits.add(floor);
+export function forceChairGiveawayCritProc(floor: Floor): void {
+  chairGiveawayCrits.add(floor);
 }
 
-export function forceSuppliesSaleCritProc(floor: Floor): void {
-  suppliesSaleCrits.add(floor);
+export function forceSuppliesGiveawayCritProc(floor: Floor): void {
+  suppliesGiveawayCrits.add(floor);
 }
 
 export function forceWinterSaleCritProc(floor: Floor): void {

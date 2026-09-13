@@ -92,19 +92,19 @@ let tickTockIcon: HTMLImageElement | null = null;
 loadImageByName("clock").then((image) => {
   tickTockIcon = image;
 });
-// same idea again, drawn behind the "Chair Sale" flash text (see
-// upgradeButton.ts's isChairSaleCrit) — reuses the icon already shipped for
+// same idea again, drawn behind the "Chair Giveaway" flash text (see
+// upgradeButton.ts's isChairGiveawayCrit) — reuses the icon already shipped for
 // hud/upgradeMenu's office chairs purchase
-let chairSaleIcon: HTMLImageElement | null = null;
+let chairGiveawayIcon: HTMLImageElement | null = null;
 loadImageByName("officeChairsIcon").then((image) => {
-  chairSaleIcon = image;
+  chairGiveawayIcon = image;
 });
-// same idea again, drawn behind the "Supplies Sale" flash text (see
-// upgradeButton.ts's isSuppliesSaleCrit) — reuses the icon already shipped
+// same idea again, drawn behind the "Supplies Giveaway" flash text (see
+// upgradeButton.ts's isSuppliesGiveawayCrit) — reuses the icon already shipped
 // for hud/upgradeMenu's office supplies purchase
-let suppliesSaleIcon: HTMLImageElement | null = null;
+let suppliesGiveawayIcon: HTMLImageElement | null = null;
 loadImageByName("officeSuppliesIcon").then((image) => {
-  suppliesSaleIcon = image;
+  suppliesGiveawayIcon = image;
 });
 // same idea again, drawn behind the "Winter Sale"/"Spring Sale"/"Summer
 // Sale"/"Autumn Sale" flash text (see upgradeButton.ts's isWinterSaleCrit
@@ -558,19 +558,19 @@ export function drawCritFlash(
     );
     ctx.drawImage(tickTockIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Chair Sale" && chairSaleIcon) {
+  if (flashLabel === "Chair Giveaway" && chairGiveawayIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
-      chairSaleIcon,
+      chairGiveawayIcon,
       measuredWidth * 0.85,
     );
-    ctx.drawImage(chairSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+    ctx.drawImage(chairGiveawayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Supplies Sale" && suppliesSaleIcon) {
+  if (flashLabel === "Supplies Giveaway" && suppliesGiveawayIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
-      suppliesSaleIcon,
+      suppliesGiveawayIcon,
       measuredWidth * 0.85,
     );
-    ctx.drawImage(suppliesSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+    ctx.drawImage(suppliesGiveawayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   if (flashLabel === "Winter Sale" && winterSaleIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
