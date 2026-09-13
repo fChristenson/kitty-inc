@@ -55,7 +55,7 @@ export const CONFIG = {
     // this time, silently (see rollCrit in shared/critTypes). A hit just
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
-    specialCritGatewayChance: 0.25,
+    specialCritGatewayChance: 0.15,
     // "chain crit" — an extra roll on top of an already-landed crit/mega/ultra
     // (see rollCritUpgrade): applies that same tier's upgrade to the next floor
     // too, then has chainContinueChance to keep going up the building one floor
@@ -125,10 +125,10 @@ export const CONFIG = {
     // shared/critTypes' SEASONAL_SALE_DISCOUNT_MULTIPLIER): permanently cut
     // every unlocked floor's own upgrade AND worker/office chairs/supplies/
     // manager costs by 25%, for the WHOLE building the roll happened in
-    winterSaleChance: 0.0008,
-    springSaleChance: 0.0008,
-    summerSaleChance: 0.0008,
-    autumnSaleChance: 0.0008,
+    winterSaleChance: 0.05,
+    springSaleChance: 0.05,
+    summerSaleChance: 0.05,
+    autumnSaleChance: 0.05,
     // 0.25 = 25% off; procs multiply the affected cost by 1 - this
     seasonalSaleDiscount: 0.25,
   },
