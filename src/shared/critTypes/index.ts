@@ -265,10 +265,11 @@ export const FROZEN_CRIT_LABEL = "Frozen";
 // "snowball crit" — also no instant reward: arming this proc just marks the
 // floor so that, once the crit is actually clicked, upgradeButton.ts's
 // triggerSnowballCrit starts a Sale-like free-click event for
-// CONFIG.crit.snowballDurationMs of real time, during which each click adds
-// n^2 * rateStep (n = that click's own count) to the floor's own income
-// rate instead of paying out cash (see floorInteractions.ts's own Snowball
-// click branch)
+// CONFIG.crit.snowballDurationMs of real time, during which each click
+// credits n^2 * floorIncomePerSecond (n = that click's own count) straight
+// to the player's total income — same lump-sum-payout shape as Sale, just
+// growing per click instead of a flat multiplier (see floorInteractions.ts's
+// own Snowball click branch)
 export const SNOWBALL_CRIT_CHANCE = CONFIG.crit.snowballChance;
 export const SNOWBALL_CRIT_COLOR = COLOR.snowballBlue;
 export const SNOWBALL_CRIT_LABEL = "Snowball";
@@ -575,7 +576,7 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
   snowball: {
     label: SNOWBALL_CRIT_LABEL,
     icon: "snowball",
-    description: "Free clicks snowball the floor's own income rate",
+    description: "Free clicks earn a growing lump sum of cash",
   },
 };
 

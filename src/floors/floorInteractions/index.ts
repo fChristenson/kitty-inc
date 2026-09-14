@@ -421,8 +421,8 @@ function applyFrozenCrit(floor: Floor): void {
 // "snowball crit" (see shared/critTypes's isSnowballCrit): also no instant
 // payout — just starts upgradeButton.ts's own Sale-like free-click event on
 // this ONE floor (see triggerSnowballCrit/isSnowballActive); the actual
-// per-click n^2 * rateStep income-rate reward is applied in the Snowball
-// click branch below, not here
+// per-click n^2 * floorIncomePerSecond cash reward is applied in the
+// Snowball click branch below, not here
 function applySnowballCrit(floor: Floor): void {
   triggerSnowballCrit(floor);
 }
@@ -782,22 +782,25 @@ export function handleFloorClick(
       return;
     }
     // "Snowball" event (see shared/critTypes' isSnowballCrit): free clicks,
-    // same as Sale/Overtime above, but each one permanently adds n^2 *
-    // rateStep to this floor's OWN income rate (n = that click's own
-    // 1-indexed count within the event, via nextSnowballClickCount) instead
-    // of paying out cash or filling a gauge — the growth visibly snowballs
-    // the longer the event is milked. A crit rolled mid-event multiplies
-    // that click's own gain by the landed tier's multiplier, same tier-aware
-    // treatment as Sale/Overtime
+    // same as Sale above — each click credits a lump sum straight to the
+    // player's total, based on that floor's own current
+    // floorIncomePerSecond "tick" (never touching floor.incomeAmount itself,
+    // so the floor's own rate is left completely untouched) — but instead of
+    // Sale's flat SALE_INCOME_MULTIPLIER, the payout grows by n^2 (n = that
+    // click's own 1-indexed count within the event, via
+    // nextSnowballClickCount), so the payout visibly snowballs the longer the
+    // event is milked. A crit rolled mid-event multiplies that click's own
+    // gain by the landed tier's multiplier, same tier-aware treatment as
+    // Sale/Overtime
     if (isSnowballActive(floor, Date.now())) {
       const tier = getCritTier(floor);
       if (tier) consumeCritUpgrade(floor);
       const n = nextSnowballClickCount(floor);
       const gained = multiply(
-        multiply(floor.rateStep, n * n),
+        multiply(floorIncomePerSecond(floor), n * n),
         tier ? CRIT_TIER_CONFIG[tier].multiplier : 1,
       );
-      floor.incomeAmount = add(floor.incomeAmount, gained);
+      addTotalIncome(gained);
       rollCritUpgrade(floor);
       persist();
       triggerButtonPress(floor);
@@ -811,7 +814,7 @@ export function handleFloorClick(
         floor,
         center.x,
         center.y,
-        `+${formatPrice(gained)}/s`,
+        `+${formatPrice(gained)}`,
         tier !== null,
       );
       return;

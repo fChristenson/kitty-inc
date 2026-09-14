@@ -152,9 +152,10 @@ export const CONFIG = {
     frozenChance: 0.1,
     frozenDurationMs: 15000,
     // "snowball crit" — starts a Sale-like free-click event (see
-    // upgradeButton.ts's isSnowballActive/triggerSnowballCrit), but each click
-    // permanently adds n^2 * rateStep to the floor's own income rate (n = that
-    // click's own 1-indexed count within the event) instead of paying out cash
+    // upgradeButton.ts's isSnowballActive/triggerSnowballCrit): each click
+    // credits a lump sum straight to the player's total, growing by n^2 (n =
+    // that click's own 1-indexed count within the event) instead of Sale's
+    // own flat multiplier
     snowballChance: 0.1,
     snowballDurationMs: 15000,
   },
