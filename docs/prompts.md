@@ -1,10 +1,1 @@
-# Asset generation prompts
-
-Raw AI-generated art drops into `src/assets/` (or `src/assets/themes/<name>/`
-for a per-theme variant), then a matching `scripts/process-*.mjs` chroma-keys
-it from a plain white background to a transparent `.png` (same flood-fill
-technique as `process-star.mjs`/`process-coin.mjs`) and crops to its own tight
-bounding box. Generate every prompt below on a plain solid white background,
-no shadow, no drop shadow, no surrounding scenery — just the subject centered
-in frame — so that pipeline can cleanly cut it out.
-
+"Flat vector cartoon of [SUBJECT], bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."

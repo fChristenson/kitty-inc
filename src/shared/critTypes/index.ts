@@ -237,6 +237,17 @@ export const HALLOWEEN_SALE_CRIT_CHANCE = CONFIG.crit.halloweenSaleChance;
 export const HALLOWEEN_SALE_CRIT_COLOR = COLOR.halloweenSalePurple;
 export const HALLOWEEN_SALE_CRIT_LABEL = "Halloween Sale";
 
+// "easter sale" crit — same shape/same steeper discount again as halloween
+// sale above (its own multiplier, never reuses SEASONAL_SALE_DISCOUNT_
+// MULTIPLIER or HALLOWEEN_SALE_DISCOUNT_MULTIPLIER), just its own icon/
+// label/color
+export const EASTER_SALE_DISCOUNT_MULTIPLIER =
+  1 - CONFIG.crit.easterSaleDiscount;
+
+export const EASTER_SALE_CRIT_CHANCE = CONFIG.crit.easterSaleChance;
+export const EASTER_SALE_CRIT_COLOR = COLOR.easterSalePink;
+export const EASTER_SALE_CRIT_LABEL = "Easter Sale";
+
 // "sunshine crit" — same reward as boost above (a free worker boost on
 // every unlocked floor), just lasting twice as long — see floorInteractions.ts's
 // applyFloorBoost, which takes the boost's own duration as a param so this
@@ -367,6 +378,7 @@ const springSaleCrits = new WeakSet<Floor>();
 const summerSaleCrits = new WeakSet<Floor>();
 const autumnSaleCrits = new WeakSet<Floor>();
 const halloweenSaleCrits = new WeakSet<Floor>();
+const easterSaleCrits = new WeakSet<Floor>();
 const sunshineCrits = new WeakSet<Floor>();
 const snowdayCrits = new WeakSet<Floor>();
 const fastForwardCrits = new WeakSet<Floor>();
@@ -440,6 +452,7 @@ export interface CritRollResult {
   summerSale: boolean;
   autumnSale: boolean;
   halloweenSale: boolean;
+  easterSale: boolean;
   sunshine: boolean;
   snowday: boolean;
   fastForward: boolean;
@@ -484,6 +497,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "summerSale",
   "autumnSale",
   "halloweenSale",
+  "easterSale",
   "sunshine",
   "snowday",
   "fastForward",
@@ -662,6 +676,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "halloween",
     description: "Cuts upgrade/worker costs 50% building-wide",
   },
+  easterSale: {
+    label: EASTER_SALE_CRIT_LABEL,
+    icon: "easterBunny",
+    description: "Cuts upgrade/worker costs 50% building-wide",
+  },
   sunshine: {
     label: SUNSHINE_CRIT_LABEL,
     icon: "sunny",
@@ -785,6 +804,7 @@ export function rollCrit(
     if (Math.random() < AUTUMN_SALE_CRIT_CHANCE) landed.push("autumnSale");
     if (Math.random() < HALLOWEEN_SALE_CRIT_CHANCE)
       landed.push("halloweenSale");
+    if (Math.random() < EASTER_SALE_CRIT_CHANCE) landed.push("easterSale");
     if (Math.random() < SUNSHINE_CRIT_CHANCE) landed.push("sunshine");
     if (Math.random() < SNOWDAY_CRIT_CHANCE) landed.push("snowday");
     if (Math.random() < FAST_FORWARD_CRIT_CHANCE) landed.push("fastForward");
@@ -835,6 +855,7 @@ export function rollCrit(
     summerSale: kept.has("summerSale"),
     autumnSale: kept.has("autumnSale"),
     halloweenSale: kept.has("halloweenSale"),
+    easterSale: kept.has("easterSale"),
     sunshine: kept.has("sunshine"),
     snowday: kept.has("snowday"),
     fastForward: kept.has("fastForward"),
@@ -936,6 +957,10 @@ export function isHalloweenSaleCrit(floor: Floor): boolean {
   return halloweenSaleCrits.has(floor);
 }
 
+export function isEasterSaleCrit(floor: Floor): boolean {
+  return easterSaleCrits.has(floor);
+}
+
 export function isSunshineCrit(floor: Floor): boolean {
   return sunshineCrits.has(floor);
 }
@@ -1021,6 +1046,7 @@ export function consumeCritProcs(floor: Floor): void {
   summerSaleCrits.delete(floor);
   autumnSaleCrits.delete(floor);
   halloweenSaleCrits.delete(floor);
+  easterSaleCrits.delete(floor);
   sunshineCrits.delete(floor);
   snowdayCrits.delete(floor);
   fastForwardCrits.delete(floor);
@@ -1121,6 +1147,10 @@ export function forceAutumnSaleCritProc(floor: Floor): void {
 
 export function forceHalloweenSaleCritProc(floor: Floor): void {
   halloweenSaleCrits.add(floor);
+}
+
+export function forceEasterSaleCritProc(floor: Floor): void {
+  easterSaleCrits.add(floor);
 }
 
 export function forceSunshineCritProc(floor: Floor): void {

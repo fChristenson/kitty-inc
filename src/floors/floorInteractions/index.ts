@@ -35,6 +35,7 @@ import {
   isSummerSaleCrit,
   isAutumnSaleCrit,
   isHalloweenSaleCrit,
+  isEasterSaleCrit,
   isSunshineCrit,
   isSnowdayCrit,
   isFastForwardCrit,
@@ -50,6 +51,7 @@ import {
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
   HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
+  EASTER_SALE_DISCOUNT_MULTIPLIER,
   POKER_HAND_CRIT_COUNTS,
   consumeCritUpgrade,
   rollCritUpgrade,
@@ -758,6 +760,10 @@ export function handleFloorClick(
         if (buyTier.halloweenSale) {
           applySeasonalSaleCrit(floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER);
         }
+        // easter sale crit: same reward/steeper cut again, just its own icon
+        if (buyTier.easterSale) {
+          applySeasonalSaleCrit(floors, EASTER_SALE_DISCOUNT_MULTIPLIER);
+        }
         // sunshine crit: same building-wide free-boost reward as boost, just
         // twice the duration
         if (buyTier.sunshine) applySunshineCrit(floors);
@@ -827,6 +833,7 @@ export function handleFloorClick(
           buyTier.bonusTier,
           buyTier.intern,
           buyTier.unionBoss,
+          buyTier.easterSale,
         );
     }
     return;
@@ -1043,6 +1050,7 @@ export function handleFloorClick(
       const summerSale = isSummerSaleCrit(floor);
       const autumnSale = isAutumnSaleCrit(floor);
       const halloweenSale = isHalloweenSaleCrit(floor);
+      const easterSale = isEasterSaleCrit(floor);
       const sunshine = isSunshineCrit(floor);
       const snowday = isSnowdayCrit(floor);
       const fastForward = isFastForwardCrit(floor);
@@ -1208,6 +1216,10 @@ export function handleFloorClick(
       if (halloweenSale) {
         applySeasonalSaleCrit(floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER);
       }
+      // easter sale crit: same reward/steeper cut again, just its own icon
+      if (easterSale) {
+        applySeasonalSaleCrit(floors, EASTER_SALE_DISCOUNT_MULTIPLIER);
+      }
       persist();
       triggerButtonPress(floor);
       triggerCritCelebration(
@@ -1247,6 +1259,7 @@ export function handleFloorClick(
         bonusTier,
         intern,
         unionBoss,
+        easterSale,
       );
       return;
     }

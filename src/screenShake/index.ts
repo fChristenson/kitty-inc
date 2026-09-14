@@ -131,6 +131,12 @@ let halloweenSaleIcon: HTMLImageElement | null = null;
 loadImageByName("halloween").then((image) => {
   halloweenSaleIcon = image;
 });
+// same idea again, drawn behind the "Easter Sale" flash text (see
+// upgradeButton.ts's isEasterSaleCrit)
+let easterSaleIcon: HTMLImageElement | null = null;
+loadImageByName("easterBunny").then((image) => {
+  easterSaleIcon = image;
+});
 // same idea again, drawn behind the "Sunshine" flash text (see
 // upgradeButton.ts's isSunshineCrit)
 let sunshineIcon: HTMLImageElement | null = null;
@@ -776,6 +782,13 @@ function drawFlashLayer(
       measuredWidth * 0.85,
     );
     ctx.drawImage(halloweenSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (label === "Easter Sale" && easterSaleIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      easterSaleIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(easterSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   if (label === "Sunshine" && sunshineIcon) {
     const { w: iconW, h: iconH } = fitIconSize(

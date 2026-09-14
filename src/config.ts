@@ -141,6 +141,11 @@ export const CONFIG = {
     halloweenSaleChance: 0.05,
     // 0.5 = 50% off — double the seasonal sales' own 25%
     halloweenSaleDiscount: 0.5,
+    // "easter sale" crit — same shape/steeper discount again as halloween
+    // sale above, just its own icon/label/color (see shared/critTypes'
+    // EASTER_SALE_DISCOUNT_MULTIPLIER)
+    easterSaleChance: 0.05,
+    easterSaleDiscount: 0.5,
     // "sunshine crit" — same free-worker-boost reward as boost above, just
     // its own longer duration (see shared/critTypes' SUNSHINE_BOOST_DURATION_MS)
     sunshineChance: 0.1,

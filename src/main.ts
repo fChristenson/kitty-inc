@@ -43,6 +43,7 @@ import {
   forceSummerSaleCritUpgrade,
   forceAutumnSaleCritUpgrade,
   forceHalloweenSaleCritUpgrade,
+  forceEasterSaleCritUpgrade,
   forceSunshineCritUpgrade,
   forceSnowdayCritUpgrade,
   forceFastForwardCritUpgrade,
@@ -121,6 +122,7 @@ import {
   wireSpawnSummerSaleCritButton,
   wireSpawnAutumnSaleCritButton,
   wireSpawnHalloweenSaleCritButton,
+  wireSpawnEasterSaleCritButton,
   wireSpawnSunshineCritButton,
   wireSpawnSnowdayCritButton,
   wireSpawnFastForwardCritButton,
@@ -165,6 +167,7 @@ import {
   wireFloorBuySummerSaleCritButton,
   wireFloorBuyAutumnSaleCritButton,
   wireFloorBuyHalloweenSaleCritButton,
+  wireFloorBuyEasterSaleCritButton,
   wireFloorBuySunshineCritButton,
   wireFloorBuySnowdayCritButton,
   wireFloorBuyFastForwardCritButton,
@@ -606,6 +609,10 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceHalloweenSaleCritUpgrade(floor);
     });
+    wireSpawnEasterSaleCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceEasterSaleCritUpgrade(floor);
+    });
     wireSpawnSunshineCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceSunshineCritUpgrade(floor);
@@ -977,6 +984,46 @@ async function main() {
         false,
         false,
         false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyEasterSaleCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
         false,
         false,
         true,

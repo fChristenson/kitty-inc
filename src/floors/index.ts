@@ -376,6 +376,7 @@ export {
   forceSummerSaleCritUpgrade,
   forceAutumnSaleCritUpgrade,
   forceHalloweenSaleCritUpgrade,
+  forceEasterSaleCritUpgrade,
   forceSunshineCritUpgrade,
   forceSnowdayCritUpgrade,
   forceFastForwardCritUpgrade,

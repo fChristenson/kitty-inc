@@ -90,6 +90,8 @@ export const COLOR = {
   autumnSaleAmber: "#D97706",
   // Halloween Sale crit's own dedicated color
   halloweenSalePurple: "#7C3AED",
+  // Easter Sale crit's own dedicated color — a soft pastel pink
+  easterSalePink: "#F9A8D4",
   // Sunshine crit's own dedicated color
   sunshineGold: "#FACC15",
   // Snowday crit's own dedicated color

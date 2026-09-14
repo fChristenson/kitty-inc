@@ -70,6 +70,9 @@ export {
   HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
   HALLOWEEN_SALE_CRIT_COLOR,
   HALLOWEEN_SALE_CRIT_LABEL,
+  EASTER_SALE_DISCOUNT_MULTIPLIER,
+  EASTER_SALE_CRIT_COLOR,
+  EASTER_SALE_CRIT_LABEL,
   SUNSHINE_CRIT_COLOR,
   SUNSHINE_CRIT_LABEL,
   SNOWDAY_CRIT_COLOR,
@@ -115,6 +118,7 @@ export {
   isSummerSaleCrit,
   isAutumnSaleCrit,
   isHalloweenSaleCrit,
+  isEasterSaleCrit,
   isSunshineCrit,
   isSnowdayCrit,
   isFastForwardCrit,
@@ -159,6 +163,7 @@ import {
   forceSummerSaleCritProc,
   forceAutumnSaleCritProc,
   forceHalloweenSaleCritProc,
+  forceEasterSaleCritProc,
   forceSunshineCritProc,
   forceSnowdayCritProc,
   forceFastForwardCritProc,
@@ -211,6 +216,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.summerSale) forceSummerSaleCritProc(floor);
     if (result.autumnSale) forceAutumnSaleCritProc(floor);
     if (result.halloweenSale) forceHalloweenSaleCritProc(floor);
+    if (result.easterSale) forceEasterSaleCritProc(floor);
     if (result.sunshine) forceSunshineCritProc(floor);
     if (result.snowday) forceSnowdayCritProc(floor);
     if (result.fastForward) forceFastForwardCritProc(floor);
@@ -292,6 +298,7 @@ export function forceFloorBuyCrit(
   bonusTier: CritTier | null = null,
   intern = false,
   unionBoss = false,
+  easterSale = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -316,6 +323,7 @@ export function forceFloorBuyCrit(
     summerSale,
     autumnSale,
     halloweenSale,
+    easterSale,
     sunshine,
     snowday,
     fastForward,
@@ -506,6 +514,11 @@ export function forceAutumnSaleCritUpgrade(floor: Floor): void {
 export function forceHalloweenSaleCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceHalloweenSaleCritProc(floor);
+}
+
+export function forceEasterSaleCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceEasterSaleCritProc(floor);
 }
 
 export function forceSunshineCritUpgrade(floor: Floor): void {

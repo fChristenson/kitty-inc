@@ -38,6 +38,8 @@ import {
   AUTUMN_SALE_CRIT_LABEL,
   HALLOWEEN_SALE_CRIT_COLOR,
   HALLOWEEN_SALE_CRIT_LABEL,
+  EASTER_SALE_CRIT_COLOR,
+  EASTER_SALE_CRIT_LABEL,
   SUNSHINE_CRIT_COLOR,
   SUNSHINE_CRIT_LABEL,
   SNOWDAY_CRIT_COLOR,
@@ -530,6 +532,7 @@ interface QueuedCelebration {
     | "summerSale"
     | "autumnSale"
     | "halloweenSale"
+    | "easterSale"
     | "sunshine"
     | "snowday"
     | "fastForward"
@@ -649,6 +652,7 @@ export function triggerCritCelebration(
   bonusTier: CritTier | null = null,
   intern = false,
   unionBoss = false,
+  easterSale = false,
 ): void {
   if (
     chain ||
@@ -682,7 +686,8 @@ export function triggerCritCelebration(
     royalFlush ||
     nightShift ||
     intern ||
-    unionBoss
+    unionBoss ||
+    easterSale
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -979,6 +984,23 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             HALLOWEEN_SALE_CRIT_LABEL,
             HALLOWEEN_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      easterSale &&
+      !specialCelebrationQueue.some((q) => q.kind === "easterSale")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "easterSale",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            EASTER_SALE_CRIT_LABEL,
+            EASTER_SALE_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

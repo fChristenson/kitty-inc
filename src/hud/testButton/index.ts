@@ -48,6 +48,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-summer-sale-crit" class="game__button">Spawn Summer Sale Crit</button>
           <button id="spawn-autumn-sale-crit" class="game__button">Spawn Autumn Sale Crit</button>
           <button id="spawn-halloween-sale-crit" class="game__button">Spawn Halloween Sale Crit</button>
+          <button id="spawn-easter-sale-crit" class="game__button">Spawn Easter Sale Crit</button>
           <button id="spawn-sunshine-crit" class="game__button">Spawn Sunshine Crit</button>
           <button id="spawn-snowday-crit" class="game__button">Spawn Snowday Crit</button>
           <button id="spawn-fastforward-crit" class="game__button">Spawn Fast Forward Crit</button>
@@ -94,6 +95,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-summer-sale-crit" class="game__button">Floor Summer Sale Crit</button>
           <button id="floor-buy-autumn-sale-crit" class="game__button">Floor Autumn Sale Crit</button>
           <button id="floor-buy-halloween-sale-crit" class="game__button">Floor Halloween Sale Crit</button>
+          <button id="floor-buy-easter-sale-crit" class="game__button">Floor Easter Sale Crit</button>
           <button id="floor-buy-sunshine-crit" class="game__button">Floor Sunshine Crit</button>
           <button id="floor-buy-snowday-crit" class="game__button">Floor Snowday Crit</button>
           <button id="floor-buy-fastforward-crit" class="game__button">Floor Fast Forward Crit</button>
@@ -433,6 +435,16 @@ export function wireSpawnHalloweenSaleCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-halloween-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnEasterSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-easter-sale-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -868,6 +880,16 @@ export function wireFloorBuyHalloweenSaleCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-halloween-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyEasterSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-easter-sale-crit",
   )!;
   button.addEventListener("click", onClick);
 }
