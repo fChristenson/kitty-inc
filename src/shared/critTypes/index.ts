@@ -946,6 +946,14 @@ export function getBonusTierCrit(floor: Floor): CritTier | null {
   return bonusTierCrits.get(floor) ?? null;
 }
 
+// call once a landed floor-buy/unlock crit (see rollFloorBuyCrit) has picked
+// up an armed bonus tier — unlike consumeCritProcs below, this leaves every
+// OTHER per-floor armed test proc untouched, since a floor-buy roll never
+// consults those
+export function consumeBonusTierCrit(floor: Floor): void {
+  bonusTierCrits.delete(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);

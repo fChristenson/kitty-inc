@@ -122,6 +122,7 @@ export {
   isGoldStandardCrit,
   isNightShiftCrit,
   getBonusTierCrit,
+  consumeBonusTierCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,

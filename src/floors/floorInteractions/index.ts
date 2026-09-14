@@ -44,6 +44,7 @@ import {
   isGoldStandardCrit,
   isNightShiftCrit,
   getBonusTierCrit,
+  consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
   HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
   POKER_HAND_CRIT_COUNTS,
@@ -602,6 +603,15 @@ export function handleFloorClick(
       // the same save
       const buyTier = rollFloorBuyCrit();
       if (buyTier) {
+        // an armed "force bonus tier" test button (see forceBonusTierCritProc)
+        // only ever set this floor's own bonusTierCrits entry, which the plain
+        // upgrade-click roll already reads — floor-buy/unlock rolls its own
+        // separate one-shot result above, so it needs its own merge here too
+        const forcedBonusTier = getBonusTierCrit(floor);
+        if (forcedBonusTier) {
+          buyTier.bonusTier = forcedBonusTier;
+          consumeBonusTierCrit(floor);
+        }
         floor.critMultiplierTier = pickHigherCritTier(
           floor.critMultiplierTier,
           buyTier.tier,

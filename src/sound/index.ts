@@ -18,7 +18,10 @@ const COIN_DROP_VOLUME = SFX_VOLUME * 1.5;
 // (25x) jackpot sfx
 const JACKPOT_VOLUME = SFX_VOLUME * 0.6;
 // 50% quieter than the shared SFX_VOLUME per explicit request
-const ARCADE_SLOT_WIN_VOLUME = SFX_VOLUME * 0.5;
+const ARCADE_SLOT_WIN_VOLUME = SFX_VOLUME * 0.25;
+// 25% louder than the shared SFX_VOLUME per explicit request — the "cash
+// register" purchase sfx
+const SOLD_VOLUME = SFX_VOLUME * 1.50;
 
 // a single click can hit several overlapping cats, or a cat and the mouse, in the
 // same synchronous call stack (see gameCanvas.ts's onPointerUp) — this window
@@ -220,7 +223,7 @@ export function playSold(): void {
   const now = Date.now();
   if (now - lastSoldPlayTime < SOLD_DEBOUNCE_MS) return;
   lastSoldPlayTime = now;
-  playSfx("sold", SFX_VOLUME, 0.5);
+  playSfx("sold", SOLD_VOLUME, 0.5);
 }
 
 // one-shot sound effect for the crit-upgrade "jackpot" moment (see
