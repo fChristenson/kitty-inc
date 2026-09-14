@@ -743,8 +743,7 @@ export function rollCrit(
         if (Math.random() < PAYDAY_CRIT_CHANCE) landed.push("payday");
         if (Math.random() < GOLD_STANDARD_CRIT_CHANCE)
           landed.push("goldStandard");
-        if (Math.random() < NIGHT_SHIFT_CRIT_CHANCE)
-          landed.push("nightShift");
+        if (Math.random() < NIGHT_SHIFT_CRIT_CHANCE) landed.push("nightShift");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       // real-roll-only tally for the "Special Crits" info menu's collectible
