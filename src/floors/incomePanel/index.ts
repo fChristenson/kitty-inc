@@ -9,7 +9,6 @@ import {
   getOvertimeDisplayTicks,
   getOvertimeTickGoal,
   getOvertimeCost,
-  isFrozenActive,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { getTotalIncome } from "../../totalIncome";
@@ -160,15 +159,10 @@ export function increaseIncomeRate(floor: Floor): void {
     floor.incomeAmount,
     multiply(floor.rateStep, rateMultiplier),
   );
-  // a "frozen crit" (see upgradeButton.ts's isFrozenActive) locks this floor's
-  // price at whatever it already is — every other part of the tick below
-  // (income rate above, upgradeCount, interval halving) still proceeds as normal
-  if (!isFrozenActive(floor, Date.now())) {
-    floor.upgradeCost = multiply(
-      floor.upgradeCost,
-      floor.aboveCapTier ? UPGRADE_COST_GROWTH_ABOVE_CAP : UPGRADE_COST_GROWTH,
-    );
-  }
+  floor.upgradeCost = multiply(
+    floor.upgradeCost,
+    floor.aboveCapTier ? UPGRADE_COST_GROWTH_ABOVE_CAP : UPGRADE_COST_GROWTH,
+  );
   floor.upgradeCount += 1;
   // no MIN_INCOME_INTERVAL_SECONDS clamp here — this stores the floor's true,
   // uncapped base interval, which effectiveIncomeCycle's own clamp below already

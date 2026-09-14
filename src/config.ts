@@ -146,9 +146,11 @@ export const CONFIG = {
     // "fast forward crit" — same instant-income reward as tick tock above,
     // just a steeper multiplier (see shared/critTypes' FAST_FORWARD_PAYOUT_MULTIPLIER)
     fastForwardChance: 0.05,
-    // "frozen crit" — locks the floor's own upgrade price at whatever it
-    // currently is for this many ms of real time (see upgradeButton.ts's
-    // isFrozenActive/triggerFrozenCrit), instead of granting an instant reward
+    // "frozen crit" — starts a Sale-like free-click event (see
+    // upgradeButton.ts's isFrozenActive/triggerFrozenCrit/FROZEN_PAYOUT_MULTIPLIER):
+    // each click pays a flat floorIncomePerSecond * ultra-crit multiplier
+    // straight to the player's total instead of performing the normal paid
+    // upgrade at all
     frozenChance: 0.1,
     frozenDurationMs: 15000,
     // "snowball crit" — starts a Sale-like free-click event (see

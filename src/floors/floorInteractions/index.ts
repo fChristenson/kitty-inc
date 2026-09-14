@@ -48,6 +48,8 @@ import {
   isSaleActive,
   isOvertimeActive,
   triggerFrozenCrit,
+  isFrozenActive,
+  FROZEN_PAYOUT_MULTIPLIER,
   isSnowballActive,
   triggerSnowballCrit,
   nextSnowballClickCount,
@@ -411,9 +413,11 @@ function applyFastForwardCrit(floors: Floor[]): void {
   applyTickTockCrit(floors, FAST_FORWARD_PAYOUT_MULTIPLIER);
 }
 
-// "frozen crit" (see shared/critTypes's isFrozenCrit): unlike every proc
-// above, no instant payout — just starts upgradeButton.ts's own 15s price-lock
-// window on this ONE floor (see triggerFrozenCrit/isFrozenActive)
+// "frozen crit" (see shared/critTypes's isFrozenCrit): no instant payout —
+// just starts upgradeButton.ts's own Sale-like free-click window on this
+// ONE floor (see triggerFrozenCrit/isFrozenActive); the actual per-click
+// ultra-crit-equivalent cash reward is applied in the Frozen click branch
+// below, not here
 function applyFrozenCrit(floor: Floor): void {
   triggerFrozenCrit(floor);
 }
@@ -798,6 +802,42 @@ export function handleFloorClick(
       const n = nextSnowballClickCount(floor);
       const gained = multiply(
         multiply(floorIncomePerSecond(floor), n * n),
+        tier ? CRIT_TIER_CONFIG[tier].multiplier : 1,
+      );
+      addTotalIncome(gained);
+      rollCritUpgrade(floor);
+      persist();
+      triggerButtonPress(floor);
+      playCoinDrop();
+      if (tier) triggerCritCelebration(floor, tier, getScreenCenterLocal);
+      const center = getButtonCenter(isGroundFloor);
+      const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
+      const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
+      spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
+      spawnIncomeFloatText(
+        floor,
+        center.x,
+        center.y,
+        `+${formatPrice(gained)}`,
+        tier !== null,
+      );
+      return;
+    }
+    // "Frozen" event (see shared/critTypes' isFrozenCrit): free clicks, same
+    // shape as Sale/Snowball above — instead of the normal paid upgrade, each
+    // click just credits a flat floorIncomePerSecond * FROZEN_PAYOUT_MULTIPLIER
+    // (an ultra/125x crit's own multiplier) straight to the player's total,
+    // as if every click were its own free ultra crit's worth of cash.
+    // applyUpgradeTick is never called while this is active, so the floor's
+    // own rate/upgradeCost genuinely stay frozen — nothing about its
+    // progression changes. A crit rolled mid-event multiplies that click's
+    // own gain by the landed tier's multiplier on top, same tier-aware
+    // treatment as Sale/Overtime/Snowball
+    if (isFrozenActive(floor, Date.now())) {
+      const tier = getCritTier(floor);
+      if (tier) consumeCritUpgrade(floor);
+      const gained = multiply(
+        multiply(floorIncomePerSecond(floor), FROZEN_PAYOUT_MULTIPLIER),
         tier ? CRIT_TIER_CONFIG[tier].multiplier : 1,
       );
       addTotalIncome(gained);

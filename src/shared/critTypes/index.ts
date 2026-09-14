@@ -252,12 +252,14 @@ export const FAST_FORWARD_CRIT_CHANCE = CONFIG.crit.fastForwardChance;
 export const FAST_FORWARD_CRIT_COLOR = COLOR.fastForwardBlue;
 export const FAST_FORWARD_CRIT_LABEL = "Fast Forward";
 
-// "frozen crit" — unlike every proc above, no instant reward: arming this
-// proc just marks the floor so that, once the crit is actually clicked,
-// upgradeButton.ts's triggerFrozenCrit locks its upgrade price at whatever
-// it currently is for CONFIG.crit.frozenDurationMs of real time (see
-// upgradeButton.ts's isFrozenActive, checked by incomePanel.ts's
-// increaseIncomeRate)
+// "frozen crit" — also no instant reward: arming this proc just marks the
+// floor so that, once the crit is actually clicked, upgradeButton.ts's
+// triggerFrozenCrit starts a Sale-like free-click event for
+// CONFIG.crit.frozenDurationMs of real time, during which each click
+// credits floorIncomePerSecond * an ultra crit's own multiplier straight to
+// the player's total INSTEAD of performing the normal paid upgrade — as if
+// every click were its own free ultra crit's worth of cash (see
+// floorInteractions.ts's own Frozen click branch)
 export const FROZEN_CRIT_CHANCE = CONFIG.crit.frozenChance;
 export const FROZEN_CRIT_COLOR = COLOR.frozenIceBlue;
 export const FROZEN_CRIT_LABEL = "Frozen";
@@ -571,7 +573,7 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
   frozen: {
     label: FROZEN_CRIT_LABEL,
     icon: "icecube",
-    description: "Locks the floor's upgrade price for 15s",
+    description: "Free clicks each pay out like an ultra crit",
   },
   snowball: {
     label: SNOWBALL_CRIT_LABEL,

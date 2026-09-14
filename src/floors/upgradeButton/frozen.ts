@@ -1,21 +1,23 @@
-// "frozen crit" (see shared/critTypes' isFrozenCrit): unlike every other
-// piggyback proc, its reward isn't instant — it just locks this floor's
-// upgradeCost at whatever it currently is for FROZEN_DURATION_MS of real
-// time. incomePanel.ts's increaseIncomeRate checks isFrozenActive and skips
-// its own cost-growth multiplication while true; every other part of that
-// tick (income rate, upgradeCount, interval halving) proceeds completely
-// normally, and the button still costs real money to click — it just isn't
-// getting any more expensive for the duration. The button itself still
-// wiggles and shows its own "Frozen" label/color while active (see
-// drawUpgradeButton), same visual treatment as Sale/Overtime, but
-// affordability dimming still applies normally (freeClick: false below —
-// this is not a free click)
+// "frozen crit" (see shared/critTypes' isFrozenCrit): a Sale-like free-click
+// event — while active, this floor's button wiggles/costs nothing to click,
+// same as Sale/Overtime/Snowball — but instead of performing the normal
+// paid upgrade at all, each click just credits a flat lump sum straight to
+// the player's total: floorIncomePerSecond(floor) * an ULTRA (125x) crit's
+// own multiplier, as if every click were its own free ultra crit's worth of
+// cash (see floorInteractions.ts's own Frozen click branch, which never
+// calls applyUpgradeTick while this is active — the floor's own rate/price
+// genuinely stay frozen since nothing about its progression changes)
 import type { Floor } from "../../gameState";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
 import { createTimedFloorEvent, registerEventButton } from "./shared";
+import { CRIT_TIER_CONFIG } from "./crit";
 
 export const FROZEN_DURATION_MS = CONFIG.crit.frozenDurationMs;
+// the flat "how many ultra-crits' worth of cash" multiplier every Frozen
+// click pays out — reuses the same ultra-tier config the base crit-tier
+// system already defines, rather than a second hardcoded 125
+export const FROZEN_PAYOUT_MULTIPLIER = CRIT_TIER_CONFIG.ultra.multiplier;
 
 const frozenEvent = createTimedFloorEvent(FROZEN_DURATION_MS);
 
@@ -30,9 +32,9 @@ export function isFrozenActive(floor: Floor, now: number): boolean {
 registerEventButton({
   key: "frozen",
   color: COLOR.frozenIceBlue,
-  freeClick: false,
+  freeClick: true,
   isActive: isFrozenActive,
-  // never scales with a simultaneously-armed crit tier — the reward is a
-  // flat price lock, not a per-click payout, so there's no multiplier to show
-  label: () => "Frozen",
+  label: (critMultiplier) =>
+    critMultiplier !== null ? `Frozen x${critMultiplier}` : "Frozen",
 });
+
