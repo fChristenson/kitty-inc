@@ -56,6 +56,7 @@ import {
   getActiveBackgrounds,
   applyChainCrit,
   increaseIncomeRate,
+  currentIncomeRatePerSecond,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -71,6 +72,7 @@ import {
   schedulePersist,
   loadBuildings,
   computeIdleIncome,
+  reconcileBoostedAwayIncome,
   markAppClosed,
   initSessionGuard,
   isStorageIntact,
@@ -447,6 +449,15 @@ async function main() {
     buildings.forEach((_, i) => setupBuilding(i));
 
     switchActiveCompany(companyIndex, buildings);
+    // tops up whatever collectDueIncome is about to pay any floor whose own
+    // worker boost decayed partway through however long this company just sat
+    // dormant (see gameState.ts's own doc comment) — must run AFTER
+    // switchActiveCompany so the credit lands in the now-active company's total
+    const awayBoostIncome = reconcileBoostedAwayIncome(
+      buildings,
+      currentIncomeRatePerSecond,
+    );
+    if (gt(awayBoostIncome, fromNumber(0))) addTotalIncome(awayBoostIncome);
     await loadBuildingThemeAssets();
     await Promise.all([loadCityImage(), loadCityMapImage()]);
     gameCanvas.setActiveFloors(buildings[activeBuildingIndex]);
@@ -1681,6 +1692,7 @@ async function main() {
 
   const idleIncome = computeIdleIncome(
     buildings,
+    currentIncomeRatePerSecond,
     getGlobalIncomeBoostMultiplier(),
   );
   // saveBuildings directly (not the debounced persist()): computeIdleIncome advances

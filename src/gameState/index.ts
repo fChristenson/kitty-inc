@@ -6,11 +6,9 @@ import {
   toBigNumber,
   add,
   multiply,
+  subtract,
+  gte,
 } from "../shared/bigNumber";
-import {
-  officeUpgradeSpeedMultiplier,
-  currentIncomeRatePerSecond,
-} from "../shared/income";
 import type { CritTier } from "../shared/critTypes";
 
 // bumped from "cash-clicker:floors" now that this holds Floor[][] (one entry per
@@ -187,6 +185,26 @@ export function getBoostRemainingMs(
   );
 }
 
+// the latest moment (ms) any of this floor's own worker-boost slots is still
+// scheduled to run until, or -Infinity if none are currently boosted — a pure
+// read of the raw (boostedAt, durationMs) pair, NOT `slot.boosted` itself
+// (which only gets lazily cleared the next time expireIfStale actually runs
+// against it, so it can't be trusted as "still boosted" on its own after a
+// long away/idle gap). Used only by the away/idle income catch-up below,
+// which needs to know WHEN a boost that was active while unobserved actually
+// ran out, not just whether it's active right now
+export function getFloorBoostEndsAt(floor: Floor): number {
+  let latest = -Infinity;
+  for (const slot of getWorkerSlots(floor)) {
+    if (!slot.boosted) continue;
+    latest = Math.max(
+      latest,
+      slot.boostedAt + (slot.durationMs ?? BOOST_DURATION_MS),
+    );
+  }
+  return latest;
+}
+
 // which theme color (floors/worker/index.ts's THEME_COLORS) each of a floor's
 // workers is tinted with, keyed by the floor the same way workerSlots is —
 // persisted (see SavedFloor.tintIndexes below) so a worker's color survives a
@@ -226,8 +244,20 @@ export function markAppClosed(): void {
 // lastCollectedAt is left completely untouched — incomePanel.ts's fill-bar progress
 // is computed straight from lastCollectedAt, so touching it on a quick refresh would
 // silently discard however far into its current cycle a floor already was.
+//
+// getIncomeRatePerSecond is injected (rather than imported from floors/incomePanel)
+// so this file doesn't need a real, cycle-risking import from floors/ — main.ts
+// passes in the floors facade's own boost-aware currentIncomeRatePerSecond(floor,
+// now), which is exactly what makes the worker-boost segment below correct: a
+// boost that was still ticking down when the app closed now earns its own
+// elevated rate for exactly however much of the idle span it genuinely had left
+// (see getFloorBoostEndsAt), falling back to the normal rate for the remainder,
+// instead of the whole idle span being priced at whichever rate happens to apply
+// once this finally runs (previously always the un-boosted rate, since boost
+// state used to be treated as if it never survived a reload).
 export function computeIdleIncome(
   buildings: Floor[][],
+  getIncomeRatePerSecond: (floor: Floor, now: number) => BigNumber,
   incomeBoostMultiplier = 1,
 ): BigNumber {
   let lastClose: number | null = null;
@@ -243,23 +273,19 @@ export function computeIdleIncome(
     lastClose !== null && Number.isFinite(lastClose)
       ? Math.max(0, (now - lastClose) / 1000)
       : 0;
-  if (elapsedSeconds <= IDLE_INCOME_MIN_SECONDS) return ZERO;
+  if (elapsedSeconds <= IDLE_INCOME_MIN_SECONDS || lastClose === null)
+    return ZERO;
 
   let idleIncome: BigNumber = ZERO;
   for (const floors of buildings) {
     for (const floor of floors) {
       if (!floor.unlocked) continue;
-      // same formula floors/incomePanel's live ticker pays out per cycle, just
-      // read as a flat rate and multiplied by the whole away-time span at once —
-      // no worker-boost multiplier here since none survives a reload, so
-      // officeUpgradeSpeedMultiplier alone is the correct speed for this floor
-      const ratePerSecond = currentIncomeRatePerSecond(
-        floor,
-        officeUpgradeSpeedMultiplier(floor),
-      );
       idleIncome = add(
         idleIncome,
-        multiply(ratePerSecond, elapsedSeconds * incomeBoostMultiplier),
+        multiply(
+          integrateAwayIncome(floor, lastClose, now, getIncomeRatePerSecond),
+          incomeBoostMultiplier,
+        ),
       );
       // this whole idle span was just paid out in one lump sum, so the floor's next
       // cycle correctly starts fresh from right now
@@ -267,6 +293,83 @@ export function computeIdleIncome(
     }
   }
   return idleIncome;
+}
+
+// a floor's own $ earned across [fromMs, toMs), split into (at most) two
+// segments right at its own worker-boost expiry (getFloorBoostEndsAt) if that
+// falls strictly inside the window — the boosted segment prices at the rate
+// AT fromMs (still boosted, by construction: nothing can arm/clear a boost on
+// a floor while it isn't the active company's, so whatever was true right as
+// it went idle/dormant holds for its own whole remaining duration), the rest
+// at the rate AT toMs. Collapses to a single flat-rate segment (identical to
+// the old plain rate*elapsedSeconds formula) whenever no boost decayed mid-span
+function integrateAwayIncome(
+  floor: Floor,
+  fromMs: number,
+  toMs: number,
+  getIncomeRatePerSecond: (floor: Floor, now: number) => BigNumber,
+): BigNumber {
+  if (toMs <= fromMs) return ZERO;
+  const boostEndsAt = getFloorBoostEndsAt(floor);
+  if (boostEndsAt > fromMs && boostEndsAt < toMs) {
+    const boostedSeconds = (boostEndsAt - fromMs) / 1000;
+    const normalSeconds = (toMs - boostEndsAt) / 1000;
+    return add(
+      multiply(getIncomeRatePerSecond(floor, fromMs), boostedSeconds),
+      multiply(getIncomeRatePerSecond(floor, toMs), normalSeconds),
+    );
+  }
+  return multiply(getIncomeRatePerSecond(floor, toMs), (toMs - fromMs) / 1000);
+}
+
+// tops up whatever the NORMAL per-floor cycle catch-up (collectDueIncome, run by
+// the ticker the instant it resumes ticking these floors again) is about to pay
+// for a floor whose own worker boost decayed at some point WHILE its building/
+// company sat dormant (switched away from, not a full app close — see
+// main.ts's switchToCompany) — collectDueIncome only ever prices an elapsed gap
+// at ONE rate (whatever applies the moment it's finally called), so a boost
+// that had, say, 10s left when the player switched away and a 60s gap before
+// they switched back would otherwise be paid entirely at the post-expiry rate,
+// silently losing the extra the boosted portion should have earned. Left
+// completely alone (zero credit, zero side effects) for every floor whose own
+// boost was already over before it went dormant, still running past `now`, or
+// never armed at all — those are already priced exactly right by the normal
+// catch-up on its own, nothing to correct. Deliberately does NOT touch
+// floor.lastCollectedAt — that stays owned by collectDueIncome, so this is a
+// pure top-up layered on top of its own normal catch-up, never a replacement
+// for it
+export function reconcileBoostedAwayIncome(
+  buildings: Floor[][],
+  getIncomeRatePerSecond: (floor: Floor, now: number) => BigNumber,
+  now = Date.now(),
+): BigNumber {
+  let extra: BigNumber = ZERO;
+  for (const floors of buildings) {
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      const boostEndsAt = getFloorBoostEndsAt(floor);
+      if (boostEndsAt <= floor.lastCollectedAt || boostEndsAt >= now) continue;
+      const boostedSeconds = (boostEndsAt - floor.lastCollectedAt) / 1000;
+      const normalSeconds = (now - boostEndsAt) / 1000;
+      const trueOwed = add(
+        multiply(
+          getIncomeRatePerSecond(floor, floor.lastCollectedAt),
+          boostedSeconds,
+        ),
+        multiply(getIncomeRatePerSecond(floor, now), normalSeconds),
+      );
+      // what collectDueIncome will price this exact same span at once it
+      // resumes: a single (post-expiry, un-boosted) rate for the whole gap
+      const baseline = multiply(
+        getIncomeRatePerSecond(floor, now),
+        boostedSeconds + normalSeconds,
+      );
+      if (gte(trueOwed, baseline)) {
+        extra = add(extra, subtract(trueOwed, baseline));
+      }
+    }
+  }
+  return extra;
 }
 
 // a $ field as it may appear in a saved floor: the new {mantissa, exponent}

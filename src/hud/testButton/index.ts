@@ -9,6 +9,12 @@ export function createTestButtonMarkup(): string {
         <div class="test-actions-dropdown__menu">
           <button id="add-money" class="game__button">Add Money</button>
           <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
+          <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Upgrade Crits</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="spawn-crit" class="game__button">Spawn Crit</button>
           <button id="spawn-mega-crit" class="game__button">Spawn Mega Crit</button>
           <button id="spawn-ultra-crit" class="game__button">Spawn Ultra Crit</button>
@@ -48,6 +54,11 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-payday-crit" class="game__button">Spawn Payday Crit</button>
           <button id="spawn-gold-standard-crit" class="game__button">Spawn Gold Standard Crit</button>
           <button id="spawn-night-shift-crit" class="game__button">Spawn Night Shift Crit</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Floor Unlock Crits</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="floor-buy-crit" class="game__button">Floor Crit</button>
           <button id="floor-buy-boost-crit" class="game__button">Floor Boost Crit</button>
           <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
@@ -87,6 +98,11 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-payday-crit" class="game__button">Floor Payday Crit</button>
           <button id="floor-buy-gold-standard-crit" class="game__button">Floor Gold Standard Crit</button>
           <button id="floor-buy-night-shift-crit" class="game__button">Floor Night Shift Crit</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Map Unlock Crits</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
           <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
           <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
@@ -100,7 +116,6 @@ export function createTestButtonMarkup(): string {
           <button id="map-unlock-four-of-a-kind-crit" class="game__button">Map Unlock Four of a Kind Crit</button>
           <button id="map-unlock-full-house-crit" class="game__button">Map Unlock Full House Crit</button>
           <button id="map-unlock-royal-flush-crit" class="game__button">Map Unlock Royal Flush Crit</button>
-          <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
         </div>
       </details>
       <button id="reset-game" class="game__button game__button--danger">Reset Game</button>
