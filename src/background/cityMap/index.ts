@@ -372,7 +372,7 @@ export function createCityMapView(
     // buy-all-floors long-press below plays the same shared shake every other
     // big/free action in the game uses (see screenShake.ts) — applied once here
     // so it nudges everything drawn on this canvas, same pattern as
-    // gameCanvas.ts/pressConferenceGame.ts's own redraw loops
+    // gameCanvas.ts's own redraw loop
     const shake = getScreenShakeOffset(Date.now());
     ctx.translate(shake.x, shake.y);
     // pre-scaled once per size/image change (see getScaledMapCanvas above) —
@@ -436,12 +436,12 @@ export function createCityMapView(
       drawLockedMarkerPrice(ctx, cx, feetY, price, affordable);
     }
     // performance.now(), NOT Date.now() — drawActiveCoinBursts's own
-    // lastActiveUpdateAt gate is shared across every caller (this map, every
-    // minigame), and every OTHER caller feeds it a performance.now()-based
+    // lastActiveUpdateAt gate is shared across every caller of this flat-canvas
+    // burst API, and every OTHER caller feeds it a performance.now()-based
     // rAF timestamp. Mixing in a Date.now() epoch timestamp here made its dt
     // swing wildly (a huge clamped-to-max jump, then stuck at 0 for a long
-    // stretch afterward) whenever this map's own redraw interleaved with a
-    // minigame's, instead of just reading a mismatched clock scale
+    // stretch afterward) whenever this map's own redraw interleaved with
+    // another caller's, instead of just reading a mismatched clock scale
     drawActiveCoinBursts(ctx, performance.now());
 
     incomeBottomY = incomeReadout.draw(ctx, cssW, deps.getTotalIncome());
@@ -487,7 +487,7 @@ export function createCityMapView(
   // same tiered shake/sfx language as floors/floorInteractions/critCelebration.ts's
   // triggerCritCelebration, adapted for this flat map canvas — no Floor to anchor a
   // floors/coins burst on, so this reuses coinBurst's own flat-canvas
-  // spawnCoinBurstAt instead (same as pressConferenceGame does)
+  // spawnCoinBurstAt instead
   function triggerMapCatCritCelebration(
     result: CritRollResult,
     cx: number,

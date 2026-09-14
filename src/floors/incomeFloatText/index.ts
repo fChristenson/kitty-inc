@@ -13,9 +13,9 @@ import { createParticlePool } from "../../shared/particlePool";
 // floorInteractions/index.ts), a readable alternative to coins/coinFloat's
 // particles for a number that actually needs to be read, not just felt.
 // Per-Floor filtering + this module's own rAF loop are the only things NOT
-// shared with shared/floatingText's own flat minigame-reward consumer — the
-// actual rise/fade math lives there once, reused here (see repo notes on
-// coinBurst.ts's Floor-anchored/flat split for why this shape)
+// shared with shared/floatingText — the actual rise/fade math lives there
+// once, reused here (see repo notes on coinBurst.ts's Floor-anchored/flat
+// split for why this shape)
 
 interface FloatingIncomeText extends FloatingTextParticle {
   floor: Floor;

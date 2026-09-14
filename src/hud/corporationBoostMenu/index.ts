@@ -12,17 +12,7 @@ import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import { onTapOrClick } from "../../shared/tapEvents";
 
 export {
-  getMinigameEntryCost,
-  getFreePressConferenceCount,
-  grantFreePressConference,
-  holdPressConference,
   getCompanyBaseModifierPercent,
-  getMarketInfluencePercent,
-  addMarketInfluencePercent,
-  getSecuredAssetsPercent,
-  addSecuredAssetsPercent,
-  getTaxRebatePercent,
-  addTaxRebatePercent,
   getCompanyAssetValue,
   getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,

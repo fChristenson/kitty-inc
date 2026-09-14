@@ -91,9 +91,6 @@ export function createTestButtonMarkup(): string {
           <button id="map-unlock-three-of-a-kind-crit" class="game__button">Map Unlock Three of a Kind Crit</button>
           <button id="map-unlock-four-of-a-kind-crit" class="game__button">Map Unlock Four of a Kind Crit</button>
           <button id="map-unlock-full-house-crit" class="game__button">Map Unlock Full House Crit</button>
-          <button id="test-press-conference" class="game__button">Press Conf Game</button>
-          <button id="test-liquidate-assets" class="game__button">Liquidate Assets Game</button>
-          <button id="test-pay-taxes" class="game__button">Pay Taxes Game</button>
           <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
         </div>
       </details>
@@ -926,34 +923,6 @@ export function wireMapUnlockFullHouseCritButton(
   const button = container.querySelector<HTMLButtonElement>(
     "#map-unlock-full-house-crit",
   )!;
-  button.addEventListener("click", onClick);
-}
-
-export function wirePressConferenceTestButton(
-  container: HTMLElement,
-  onClick: () => void,
-): void {
-  const button = container.querySelector<HTMLButtonElement>(
-    "#test-press-conference",
-  )!;
-  button.addEventListener("click", onClick);
-}
-
-export function wireLiquidateAssetsTestButton(
-  container: HTMLElement,
-  onClick: () => void,
-): void {
-  const button = container.querySelector<HTMLButtonElement>(
-    "#test-liquidate-assets",
-  )!;
-  button.addEventListener("click", onClick);
-}
-
-export function wirePayTaxesTestButton(
-  container: HTMLElement,
-  onClick: () => void,
-): void {
-  const button = container.querySelector<HTMLButtonElement>("#test-pay-taxes")!;
   button.addEventListener("click", onClick);
 }
 

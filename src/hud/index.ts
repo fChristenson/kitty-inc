@@ -47,7 +47,6 @@ export {
   getGlobalIncomeBoostMultiplier,
   getCompanyAssetValue,
   getCompanyUpgradesValue,
-  grantFreePressConference,
   mergeCompanies,
 } from "./corporationBoostMenu";
 export type { CorporationBoostMenu } from "./corporationBoostMenu";
@@ -56,18 +55,6 @@ export {
   wireCorporationStats,
 } from "./corporationStats";
 export type { CorporationStats } from "./corporationStats";
-export {
-  createPressConferenceGameMarkup,
-  wirePressConferenceGame,
-} from "./pressConferenceGame";
-export type { PressConferenceGame } from "./pressConferenceGame";
-export {
-  createLiquidateAssetsGameMarkup,
-  wireLiquidateAssetsGame,
-} from "./liquidateAssetsGame";
-export type { LiquidateAssetsGame } from "./liquidateAssetsGame";
-export { createPayTaxesGameMarkup, wirePayTaxesGame } from "./payTaxes";
-export type { PayTaxesGame } from "./payTaxes";
 export { createMapMenuMarkup, wireMapMenu } from "./mapMenu";
 export type { MapMenu } from "./mapMenu";
 export {
@@ -156,9 +143,6 @@ export {
   wireMapUnlockThreeOfAKindCritButton,
   wireMapUnlockFourOfAKindCritButton,
   wireMapUnlockFullHouseCritButton,
-  wirePressConferenceTestButton,
-  wireLiquidateAssetsTestButton,
-  wirePayTaxesTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
 } from "./testButton";

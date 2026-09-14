@@ -236,8 +236,7 @@ export function getMarkerJumpOffset(globalIndex: number, now: number): number {
 }
 
 // spawnCoinBurstAt's default scale (1) is tuned for a full building-width
-// canvas; these markers are tiny by comparison, so shrink it the same way
-// pressConferenceGame's own COIN_BURST_SCALE does for its smaller canvas
+// canvas; these markers are tiny by comparison, so shrink it accordingly
 export const MARKER_COIN_BURST_SCALE = 0.3;
 
 // draws a still-locked marker's grayed-out cat + its unlock price (wiggling

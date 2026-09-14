@@ -153,8 +153,8 @@ export function getCompanyIncomeRatePerSecond(companyIndex: number): BigNumber {
 }
 
 // combined $/sec across every corporation — same per-company sourcing as
-// getCompanyIncomeRatePerSecond above, just summed. Used by
-// corporationBoostMenu's own getMinigameEntryCost (N seconds of this rate)
+// getCompanyIncomeRatePerSecond above, just summed (see
+// hud/corporationStats's own combined-rate readout)
 export function getAllCompaniesIncomeRatePerSecond(): BigNumber {
   const count = getCorporationCount();
   let sum = ZERO;
@@ -178,8 +178,8 @@ function getCompanyWealth(companyIndex: number): BigNumber {
 
 const SECONDS_PER_HOUR = 3600;
 
-// the actual "money sink" design goal (see hud/corporationBoostMenu's minigame
-// entry costs and main.ts's "Create new Corporation" purchase): richer companies foot proportionally more of any corp boost/upgrade's
+// the actual "money sink" design goal (see main.ts's "Create new Corporation"
+// purchase): richer companies foot proportionally more of any corp boost/upgrade's
 // cost, draining their own excess wealth to fund something that benefits every
 // company equally (see corporationBoostMenu's getGlobalIncomeBoostMultiplier,
 // applied globally regardless of which company is currently active) — so a brand

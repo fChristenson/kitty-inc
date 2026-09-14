@@ -4,7 +4,6 @@ import swooshUrl from "../assets/sound/swoosh.mp3";
 import soldUrl from "../assets/sound/sold.mp3";
 import bloopUrl from "../assets/sound/bloop.mp3";
 import explosionUrl from "../assets/sound/explosion.mp3";
-import bubbleUrl from "../assets/sound/bubble.wav";
 import winUrl from "../assets/sound/win.wav";
 import payoutUrl from "../assets/sound/payout.wav";
 
@@ -96,7 +95,6 @@ const sfxUrls = {
   sold: soldUrl,
   explosion: explosionUrl,
   bloop: bloopUrl,
-  bubble: bubbleUrl,
   win: winUrl,
   payout: payoutUrl,
 } as const;
@@ -263,11 +261,4 @@ export function playPayout(): void {
   if (now - lastPayoutPlayTime < PAYOUT_DEBOUNCE_MS) return;
   lastPayoutPlayTime = now;
   playSfx("payout", SFX_VOLUME, 0, 1, 1.926, 0.576);
-}
-
-// one-shot sound effect for hud/pressConferenceGame's own flap — its own
-// sound, not a reuse of playBloop, so tuning/debouncing it never affects that
-// shared cat-click/milestone sfx
-export function playBubble(): void {
-  playSfx("bubble", SFX_VOLUME);
 }

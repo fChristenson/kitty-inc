@@ -37,7 +37,6 @@ async function resizeInPlace(file, resize) {
 
 const FLAT_ICONS = [
   // menu icons only ever render at ~28-34px (style.css's .worker-menu__icon)
-  "shield.png",
   "graph.png",
   "merge.png",
   "skyscraper.png",

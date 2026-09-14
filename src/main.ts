@@ -164,9 +164,6 @@ import {
   wireMapUnlockThreeOfAKindCritButton,
   wireMapUnlockFourOfAKindCritButton,
   wireMapUnlockFullHouseCritButton,
-  wirePressConferenceTestButton,
-  wireLiquidateAssetsTestButton,
-  wirePayTaxesTestButton,
   wireIdleOverlayTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -187,12 +184,6 @@ import {
   getCompanyAssetValue,
   getCompanyUpgradesValue,
   mergeCompanies,
-  createPressConferenceGameMarkup,
-  wirePressConferenceGame,
-  createLiquidateAssetsGameMarkup,
-  wireLiquidateAssetsGame,
-  createPayTaxesGameMarkup,
-  wirePayTaxesGame,
   createMapMenuMarkup,
   wireMapMenu,
   createTotalEarnedOverlayMarkup,
@@ -247,9 +238,6 @@ async function main() {
     ${createBoostMenuMarkup()}
     ${createCorporationBoostMenuMarkup()}
     ${createCorporationStatsMarkup()}
-    ${createPressConferenceGameMarkup()}
-    ${createLiquidateAssetsGameMarkup()}
-    ${createPayTaxesGameMarkup()}
     ${createMapMenuMarkup()}
     ${createTotalEarnedOverlayMarkup()}
   `;
@@ -1148,9 +1136,6 @@ async function main() {
         true,
       ),
     );
-    wirePressConferenceTestButton(app, () => pressConferenceGame.open());
-    wireLiquidateAssetsTestButton(app, () => liquidateAssetsGame.open());
-    wirePayTaxesTestButton(app, () => payTaxesGame.open());
     // shows the idle-income "You have earned" overlay (see
     // hud/totalEarnedOverlay) on demand, without needing to actually leave and
     // reopen the tab to earn real idle income first
@@ -1216,15 +1201,6 @@ async function main() {
     (floor) => gameCanvas.scrollActiveToFloor(floor),
   );
   const corporationBoostMenu = wireCorporationBoostMenu(app);
-  const pressConferenceGame = wirePressConferenceGame(app, () =>
-    corporationBoostMenu.refresh(),
-  );
-  const liquidateAssetsGame = wireLiquidateAssetsGame(app, () =>
-    corporationBoostMenu.refresh(),
-  );
-  const payTaxesGame = wirePayTaxesGame(app, () =>
-    corporationBoostMenu.refresh(),
-  );
   const totalEarnedOverlay = wireTotalEarnedOverlay(app);
   // buys the next building outright if affordable (see buildings.ts's
   // getBuildingPrice, which scales 1000x per building same as its economy).

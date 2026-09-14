@@ -4,7 +4,7 @@ import { createParticlePool, clampedDtSince } from "../shared/particlePool";
 
 // shared coin/bill flipbook sprites + the actual particle physics/draw math —
 // floors/coins (particles glued to a specific Floor's own on-screen rect) and
-// hud/pressConferenceGame (its own flat canvas, no Floor at all) each own
+// background/cityMap (its own flat canvas, no Floor at all) each own
 // their own particle array (and, for floors/coins, its own extra `floor`
 // field per particle), but both spawn/update/draw through the functions
 // below, so the actual animation itself only exists in one place
@@ -90,7 +90,7 @@ export interface CoinBurstParticle extends CoinBurstSprite {
 
 // one burst's worth of particles at (x, y) — same random ranges regardless of
 // caller, so a burst looks identical whether it's floors/coins's own
-// Floor-anchored version or hud/pressConferenceGame's flat-canvas one
+// Floor-anchored version or background/cityMap's flat-canvas one
 export function createCoinBurstParticles(
   x: number,
   y: number,
@@ -183,7 +183,7 @@ export function drawCoinBurstFrame(
 // pass smaller for a smaller one) is all spawning needs. Every active burst
 // everywhere lives in this one pool, ticked/drawn by drawActiveCoinBursts
 // below — pruning only happens there, which only runs while whichever screen
-// spawned a burst (the city map, the press conference minigame) is actually
+// spawned a burst (the city map, a Floor-anchored one) is actually
 // being redrawn, so the pool's own cap (not just per-particle expiry) is what
 // keeps a burst spawned right as that screen closes from accumulating forever
 const pool = createParticlePool<CoinBurstParticle>(750);

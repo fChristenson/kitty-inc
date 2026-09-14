@@ -1,13 +1,10 @@
 import { drawCartoonText } from "../../utils";
-import { createParticlePool, clampedDtSince } from "../particlePool";
 
-// a "+X"-style label that fades in, floats up, then fades back out — the one
-// shared implementation for BOTH floors/incomeFloatText's per-Floor "+$X"
-// Sale payout AND this module's own flat, no-Floor "+X%" minigame reward
-// (same "generic particle math lives here once, each consumer keeps its own
-// list/loop" split as coinBurst.ts's createCoinBurstParticles/
-// updateCoinBurstParticles/drawCoinBurstFrame, reused by both floors/coins
-// and coinBurst's own flat spawnCoinBurstAt)
+// a "+X"-style label that fades in, floats up, then fades back out — shared
+// rise/fade math for floors/incomeFloatText's per-Floor "+$X" Sale payout
+// labels (same "generic particle math lives here once, each consumer keeps
+// its own list/loop" split as coinBurst.ts's createCoinBurstParticles/
+// updateCoinBurstParticles/drawCoinBurstFrame)
 
 export interface FloatingTextParticle {
   x: number;
@@ -58,8 +55,7 @@ export function updateFloatingTextParticles(
 }
 
 // draws one label at its own current (x, y) — basePx/emphasizedScale let each
-// consumer pick its own size (floors/incomeFloatText's Sale payout reads much
-// bigger than a minigame's own reward label)
+// consumer pick its own size
 export function drawFloatingTextParticle(
   ctx: CanvasRenderingContext2D,
   t: FloatingTextParticle,
@@ -83,51 +79,4 @@ export function drawFloatingTextParticle(
   ctx.globalAlpha = alpha;
   drawCartoonText(ctx, t.text, t.x, t.y);
   ctx.restore();
-}
-
-// the flat, no-Floor consumer for minigame rewards — every active label
-// lives in this one pool, ticked/drawn by drawActiveFloatingTexts below (same
-// shape as coinBurst.ts's own spawnCoinBurstAt/drawActiveCoinBursts)
-const FONT_PX = 16;
-const TOTAL_RISE_PX = 80;
-const RISE_PER_TICK = TOTAL_RISE_PX / FLOATING_TEXT_MAX_LIFE_TICKS;
-
-const pool = createParticlePool<FloatingTextParticle>(100);
-let lastActiveUpdateAt: number | null = null;
-
-export function hasActiveFloatingTexts(): boolean {
-  return pool.hasActive();
-}
-
-// shifts every currently-active label by dx — for a minigame whose own world
-// scrolls left under a fixed head/camera, call this every step with the same
-// per-frame scroll delta already applied to that game's own world elements
-// (market events/platforms), so a spawned label scrolls off exactly like
-// everything else instead of hovering in place while the world moves past it
-export function shiftActiveFloatingTexts(dx: number): void {
-  for (const t of pool.list) t.x -= dx;
-}
-
-// spawns a "+X%" label (always leading with a +, since every caller today is
-// a positive reward) rising from (x, y) — whatever coordinate space the
-// caller's own canvas already draws in
-export function spawnFloatingText(x: number, y: number, percent: number): void {
-  pool.spawn(createFloatingTextParticle(x, y, `+${percent.toFixed(2)}%`));
-}
-
-// call once per frame from the caller's own render loop, same convention as
-// drawActiveCoinBursts — advances every active label by however long it's
-// been since the last call, then draws them all straight onto ctx
-export function drawActiveFloatingTexts(
-  ctx: CanvasRenderingContext2D,
-  now: number,
-): void {
-  if (!pool.hasActive()) {
-    lastActiveUpdateAt = null;
-    return;
-  }
-  const dt = clampedDtSince(lastActiveUpdateAt, now);
-  lastActiveUpdateAt = now;
-  updateFloatingTextParticles(pool.list, dt, RISE_PER_TICK);
-  for (const t of pool.list) drawFloatingTextParticle(ctx, t, FONT_PX);
 }

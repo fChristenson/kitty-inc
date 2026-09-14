@@ -1,10 +1,5 @@
 import { loadBuildings, clearBuildings, type Floor } from "../../gameState";
-import {
-  spendFromAllCompanies,
-  getStoredTotalIncome,
-  getAllCompaniesIncomeRatePerSecond,
-  addCompanyTotalIncome,
-} from "../../totalIncome";
+import { getStoredTotalIncome, addCompanyTotalIncome } from "../../totalIncome";
 import {
   getCorporationCount,
   regenerateCorporationName,
@@ -48,165 +43,6 @@ function compressedScale(amount: BigNumber): number | null {
   const logAmount = log10(amount);
   if (!Number.isFinite(logAmount) || logAmount < 0) return null;
   return Math.sqrt(logAmount);
-}
-
-// $ cost of opening any minigame ("Hold press conference"/"Secure stock
-// price"/"Declare taxes"): a flat number of seconds of every
-// company's own combined current income rate, not tied to any one company's
-// assets — so it stays affordable (and meaningful) at any point in the
-// game's progression the same way a wealth-proportional cost would, without
-// needing a company's own banked total or upgrades to be large yet. Kept
-// well under the real-world time it actually takes to re-earn it (rather
-// than an exact 1:1 "N seconds of the reported rate") — floor income arrives
-// in per-floor cycle-based lumps, not a smooth continuous drip, so the
-// derived rate is only ever an average and a player draining to $0 can
-// otherwise end up waiting noticeably longer than the rate alone would
-// suggest before enough lumps have actually landed
-const MINIGAME_ENTRY_SECONDS_COST = CONFIG.corporation.minigameEntrySecondsCost;
-
-export function getMinigameEntryCost(): BigNumber {
-  return multiply(
-    getAllCompaniesIncomeRatePerSecond(),
-    MINIGAME_ENTRY_SECONDS_COST,
-  );
-}
-
-// not tied to any one company (same as the press conference action itself) —
-// banked whenever main.ts's "Create new Corporation" purchase succeeds (see
-// grantFreePressConference), spent here before ever touching real income
-const FREE_PRESS_CONFERENCES_KEY = "cash-clicker:free-press-conferences";
-
-function loadFreePressConferenceCount(): number {
-  try {
-    const raw = localStorage.getItem(FREE_PRESS_CONFERENCES_KEY);
-    const parsed = raw !== null ? Number(raw) : 0;
-    return Number.isFinite(parsed) ? parsed : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function saveFreePressConferenceCount(value: number): void {
-  try {
-    localStorage.setItem(FREE_PRESS_CONFERENCES_KEY, String(value));
-  } catch {
-    // storage unavailable: nothing to persist
-  }
-}
-
-export function getFreePressConferenceCount(): number {
-  return loadFreePressConferenceCount();
-}
-
-// +1 free press conference — called once per successful "Create new
-// Corporation" purchase (see main.ts), so buying a new company always comes
-// with one conference paid for already
-export function grantFreePressConference(): void {
-  saveFreePressConferenceCount(loadFreePressConferenceCount() + 1);
-}
-
-// spends a banked free credit (see grantFreePressConference) first, else
-// pays the shared getMinigameEntryCost — the actual boost comes from then
-// playing hud/pressConferenceGame's own mini-game (see Market Influence
-// below), this just pays the entry fee. Returns whether it succeeded
-export function holdPressConference(): boolean {
-  const freeCount = loadFreePressConferenceCount();
-  if (freeCount > 0) {
-    saveFreePressConferenceCount(freeCount - 1);
-    return true;
-  }
-  return spendFromAllCompanies(getMinigameEntryCost());
-}
-
-// "Market Influence %" — earned by playing hud/pressConferenceGame's own
-// mini-game, banked once per round via addMarketInfluencePercent; not tied to
-// any one company either. Contributes directly, 1:1, to the global boost (see
-// getGlobalIncomeBoostPercent) — no leverage/scaling/cap of any kind
-const MARKET_INFLUENCE_KEY = "cash-clicker:market-influence-percent";
-
-export function getMarketInfluencePercent(): number {
-  try {
-    const raw = localStorage.getItem(MARKET_INFLUENCE_KEY);
-    const parsed = raw !== null ? Number(raw) : 0;
-    return Number.isFinite(parsed) ? parsed : 0;
-  } catch {
-    return 0;
-  }
-}
-
-// banks additional influence earned just now (delta can be negative, but the
-// running total is floored at 0)
-export function addMarketInfluencePercent(delta: number): void {
-  try {
-    localStorage.setItem(
-      MARKET_INFLUENCE_KEY,
-      String(Math.max(0, getMarketInfluencePercent() + delta)),
-    );
-  } catch {
-    // storage unavailable: nothing to persist
-  }
-}
-
-// "Secured assets %" — earned by playing hud/liquidateAssetsGame's own
-// "Avoid market drop" mini-game, banked once per round via
-// addSecuredAssetsPercent; kept as its own modifier, separate from Market
-// Influence. Contributes directly, 1:1, to the global
-// boost (see getGlobalIncomeBoostPercent) — same as those, no leverage/
-// scaling/cap of any kind
-const SECURED_ASSETS_KEY = "cash-clicker:secured-assets-percent";
-
-export function getSecuredAssetsPercent(): number {
-  try {
-    const raw = localStorage.getItem(SECURED_ASSETS_KEY);
-    const parsed = raw !== null ? Number(raw) : 0;
-    return Number.isFinite(parsed) ? parsed : 0;
-  } catch {
-    return 0;
-  }
-}
-
-// banks additional secured-assets % earned just now (delta can be negative —
-// see liquidateAssetsGame's red-line penalty — but the running total is
-// floored at 0)
-export function addSecuredAssetsPercent(delta: number): void {
-  try {
-    localStorage.setItem(
-      SECURED_ASSETS_KEY,
-      String(Math.max(0, getSecuredAssetsPercent() + delta)),
-    );
-  } catch {
-    // storage unavailable: nothing to persist
-  }
-}
-
-// "Tax rebate %" — earned by playing hud/payTaxes's own "Declare Taxes"
-// mini-game, banked once per round via addTaxRebatePercent; kept as its own
-// modifier, separate from every other one above. Contributes directly, 1:1,
-// to the global boost (see getGlobalIncomeBoostPercent), same as those, no
-// leverage/scaling/cap of any kind
-const TAX_REBATE_KEY = "cash-clicker:tax-rebate-percent";
-
-export function getTaxRebatePercent(): number {
-  try {
-    const raw = localStorage.getItem(TAX_REBATE_KEY);
-    const parsed = raw !== null ? Number(raw) : 0;
-    return Number.isFinite(parsed) ? parsed : 0;
-  } catch {
-    return 0;
-  }
-}
-
-// banks additional tax-rebate % earned just now (delta can be negative, but
-// the running total is floored at 0)
-export function addTaxRebatePercent(delta: number): void {
-  try {
-    localStorage.setItem(
-      TAX_REBATE_KEY,
-      String(Math.max(0, getTaxRebatePercent() + delta)),
-    );
-  } catch {
-    // storage unavailable: nothing to persist
-  }
 }
 
 // $ "invested" in a company's buildings — sum of what each one (after the
@@ -334,8 +170,6 @@ export function mergeCompanies(
     clearCompanyRecord(index);
   }
   addCompanyTotalIncome(survivorIndex, addedTotal);
-  // merging multiple companies into one banks a free conference for the survivor
-  grantFreePressConference();
 
   markCompaniesMerged(
     companyIndices.filter((index) => index !== survivorIndex),
@@ -374,19 +208,14 @@ export function getCompanyBaseModifierPercent(companyIndex: number): number {
   return (compressedScale(companyValue) ?? 0) * BASE_MODIFIER_RATE;
 }
 
-// summed across every corporation plus the market-influence modifier — the
-// actual global income boost applied to every floor of every building of
-// every company (see totalIncome.ts's startTotalIncomeTicker/gameState.ts's
+// summed across every corporation's own base size modifier — the actual
+// global income boost applied to every floor of every building of every
+// company (see totalIncome.ts's startTotalIncomeTicker/gameState.ts's
 // computeIdleIncome, both take this as an injected multiplier to avoid a
-// circular import back into this hud module). Contributes its own raw
-// banked % directly, 1:1 — no leverage/scaling against anything else, so
-// whatever's banked is exactly what shows up here
+// circular import back into this hud module)
 export function getGlobalIncomeBoostPercent(): number {
   const count = getCorporationCount();
-  let total =
-    getMarketInfluencePercent() +
-    getSecuredAssetsPercent() +
-    getTaxRebatePercent();
+  let total = 0;
   for (let i = 0; i < count; i++) {
     total += getCompanyBaseModifierPercent(i);
   }

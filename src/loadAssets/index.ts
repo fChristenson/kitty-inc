@@ -34,7 +34,6 @@ const SPRITE_FILES = {
   manager: "managerWalk.png",
   coinSpin: "coinSpin.png",
   cashBill: "cashBillFlutter.png",
-  podium: "podiumSpeak.png",
 } as const;
 export type SpriteName = keyof typeof SPRITE_FILES;
 
@@ -48,8 +47,6 @@ const IMAGE_FILES = {
   mouse: "mouse.png", // free-boost critter
   officeChairsIcon: "isometricBox.png", // office-chairs upgrade icon
   officeSuppliesIcon: "isometricYarn.png", // office-supplies upgrade icon
-  audience: "audience.png", // press conference audience backdrop
-  shield: "shield.png", // Avoid Market Drop minigame's own menu icon
   merge: "merge.png", // Merge companies' own menu icon
   skyscraper: "skyscraper.png", // Create new Company / Renovate floors icon
   cashRegister: "cashRegister.png", // Trigger sales event's own menu icon

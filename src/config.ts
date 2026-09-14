@@ -1,6 +1,6 @@
 // Central balance sheet for every number that feeds into "how much money is being
 // made" — per-floor income growth, upgrade pricing, crit-tier odds/payouts, sale
-// boosts, corporation-wide modifiers, and every minigame's own reward rate. This is
+// boosts, and corporation-wide modifiers. This is
 // the one place to tune when rebalancing income across methods so they stay
 // proportionate to each other — nothing else in the codebase should hardcode a
 // balance number already owned here; add new tunable values as new fields instead
@@ -226,29 +226,5 @@ export const CONFIG = {
     // steadily-growing global-boost %" conversion a company's own
     // size-based baseline contribution uses (see getCompanyBaseModifierPercent)
     baseModifierRate: 0.5,
-    // cost to open any minigame: this many seconds of combined company income/sec
-    minigameEntrySecondsCost: 10,
-  },
-
-  // Minigame reward rates — each banks straight into corporationBoostMenu's
-  // matching modifier % (see economy.ts's addMarketInfluencePercent/
-  // addSecuredAssetsPercent/addTaxRebatePercent), 1:1,
-  // no leverage/cap. Keep these roughly proportionate to each other so no one
-  // minigame is a strictly better use of the same entry cost than another.
-  minigames: {
-    // hud/pressConferenceGame — "Hold press conference" (Market Influence %)
-    pressConference: {
-      ambientInfluencePercentPerSecond: 0.05,
-      goodHitInfluencePercent: 0.01,
-    },
-    // hud/liquidateAssetsGame — "Avoid market drop" (Secured Assets %)
-    liquidateAssets: {
-      ambientInfluencePercentPerSecond: 0.05,
-      greenLineInfluencePercent: 0.01,
-    },
-    // hud/payTaxes — "Declare Taxes" (Tax Rebate %)
-    payTaxes: {
-      taxRebatePercentPerSecond: 0.05,
-    },
   },
 } as const;

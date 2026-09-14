@@ -20,7 +20,7 @@ import {
 // read-only "Corporation income rate"/"Income modifiers" breakdown — split
 // out of corporationBoostMenu so that dialog only has to hold its own
 // buy/spend buttons. Opened by tapping corporationBoostMenu's own "Total
-// income" summary row, on top of it (same layering as the 4 minigames)
+// income" summary row, on top of it
 export function createCorporationStatsMarkup(): string {
   return `
     <div class="worker-menu" id="corporation-stats-menu" hidden>
