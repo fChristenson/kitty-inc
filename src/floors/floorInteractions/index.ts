@@ -620,13 +620,17 @@ export function handleFloorClick(
       const buyTier = rollFloorBuyCrit();
       if (buyTier) {
         // an armed "force bonus tier" test button (see forceBonusTierCritProc)
-        // only ever set this floor's own bonusTierCrits entry, which the plain
-        // upgrade-click roll already reads — floor-buy/unlock rolls its own
-        // separate one-shot result above, so it needs its own merge here too
-        const forcedBonusTier = getBonusTierCrit(floor);
-        if (forcedBonusTier) {
-          buyTier.bonusTier = forcedBonusTier;
-          consumeBonusTierCrit(floor);
+        // always arms buildings[activeBuildingIndex][0] (main.ts's own test
+        // wiring — the only floor a test button can address), which is never
+        // the actual locked `floor` being unlocked here (floor 0 always
+        // starts unlocked already) — so this searches the WHOLE building
+        // instead of just this one floor, unlike the plain-click branch
+        // below (where the armed floor and the clicked floor are always the
+        // same, so a direct getBonusTierCrit(floor) there is correct)
+        const forcedBonusTierFloor = floors.find((f) => getBonusTierCrit(f));
+        if (forcedBonusTierFloor) {
+          buyTier.bonusTier = getBonusTierCrit(forcedBonusTierFloor)!;
+          consumeBonusTierCrit(forcedBonusTierFloor);
         }
         floor.critMultiplierTier = pickHigherCritTier(
           floor.critMultiplierTier,

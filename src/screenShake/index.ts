@@ -848,7 +848,10 @@ function drawFlashLayer(
     ctx.drawImage(nightShiftIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   if (label === "Intern" && internIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(internIcon, measuredWidth * 0.85);
+    const { w: iconW, h: iconH } = fitIconSize(
+      internIcon,
+      measuredWidth * 0.85,
+    );
     ctx.drawImage(internIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   if (label === "Union Boss" && unionBossIcon) {

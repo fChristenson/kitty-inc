@@ -153,8 +153,10 @@ export function drawBonusTierCoins(
 let hudFlashStartedAt: number | null = null;
 // sold.mp3 is ~3.19s total and playSold() skips its first 0.5s lead-in (see
 // sound/index.ts), so this must last at least that ~2.69s remainder — otherwise
-// the wiggle/flash visibly ends while the cash register sound is still playing
-const HUD_FLASH_DURATION_MS = 2700;
+// the wiggle/flash visibly ends while the cash register sound is still playing.
+// Cut 0.2s short of that per explicit request, so the wiggle settles a beat
+// before the sound's own very last, already-quiet tail
+const HUD_FLASH_DURATION_MS = 2300;
 
 // call once the flying coins above have fully arrived
 export function triggerHudTotalFlash(): void {

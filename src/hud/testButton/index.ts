@@ -529,9 +529,8 @@ export function wireSpawnInternCritButton(
   container: HTMLElement,
   onClick: () => void,
 ): void {
-  const button = container.querySelector<HTMLButtonElement>(
-    "#spawn-intern-crit",
-  )!;
+  const button =
+    container.querySelector<HTMLButtonElement>("#spawn-intern-crit")!;
   button.addEventListener("click", onClick);
 }
 
