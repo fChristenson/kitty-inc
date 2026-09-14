@@ -998,6 +998,38 @@ body {
   white-space: nowrap;
 }
 
+/* wraps the icon so the count badge below can be positioned relative to it,
+   pinned to its top-right corner. The extra top/right margin reserves real
+   layout space for the badge's own outward overflow (matching its negative
+   offsets below) so .crit-info-item's overflow:hidden never clips it —
+   relying on the badge's absolute offset alone left it clipped at the top */
+.crit-info-item__icon-wrap {
+  position: relative;
+  flex-shrink: 0;
+  margin: 5px 6px 0 0;
+}
+
+/* pill-shaped "how many times has this crit landed" collectible counter —
+   see shared/critTypes/critProcCounts.ts. Only rendered for a count of 1+
+   (see corporationBoostMenu/index.ts's render()) */
+.crit-info-item__count-badge {
+  position: absolute;
+  top: -5px;
+  right: -6px;
+  min-width: 0.9rem;
+  height: 0.9rem;
+  padding: 0 0.2rem;
+  border-radius: 999px;
+  background: var(--color-white);
+  border: 1.5px solid black;
+  color: black;
+  font-size: 0.55rem;
+  font-weight: 900;
+  line-height: calc(0.9rem - 3px);
+  text-align: center;
+  -webkit-text-stroke: 0;
+}
+
 .crit-info-item__name {
   min-width: 0;
   overflow: hidden;

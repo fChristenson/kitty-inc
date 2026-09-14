@@ -15,6 +15,9 @@ import type { Floor } from "../../gameState";
 import type { ImageName } from "../../loadAssets";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
+import { recordCritProcLanded } from "./critProcCounts";
+
+export { getCritProcCount } from "./critProcCounts";
 
 export type CritTier = "crit" | "mega" | "ultra";
 
@@ -673,8 +676,12 @@ export function rollCrit(
         if (Math.random() < FROZEN_CRIT_CHANCE) landed.push("frozen");
         if (Math.random() < SNOWBALL_CRIT_CHANCE) landed.push("snowball");
         if (Math.random() < FREE_SALE_CRIT_CHANCE) landed.push("freeSale");
+        if (Math.random() < BULL_MARKET_CRIT_CHANCE) landed.push("bullMarket");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
+      // real-roll-only tally for the "Special Crits" info menu's collectible
+      // count badges — see shared/critTypes/critProcCounts.ts
+      for (const kind of kept) recordCritProcLanded(kind);
       onLanded({
         tier,
         chain: kept.has("chain"),
@@ -703,6 +710,7 @@ export function rollCrit(
         frozen: kept.has("frozen"),
         snowball: kept.has("snowball"),
         freeSale: kept.has("freeSale"),
+        bullMarket: kept.has("bullMarket"),
       });
       return;
     }
@@ -815,6 +823,10 @@ export function isFreeSaleCrit(floor: Floor): boolean {
   return freeSaleCrits.has(floor);
 }
 
+export function isBullMarketCrit(floor: Floor): boolean {
+  return bullMarketCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -843,6 +855,7 @@ export function consumeCritProcs(floor: Floor): void {
   frozenCrits.delete(floor);
   snowballCrits.delete(floor);
   freeSaleCrits.delete(floor);
+  bullMarketCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -950,6 +963,10 @@ export function forceSnowballCritProc(floor: Floor): void {
 
 export function forceFreeSaleCritProc(floor: Floor): void {
   freeSaleCrits.add(floor);
+}
+
+export function forceBullMarketCritProc(floor: Floor): void {
+  bullMarketCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

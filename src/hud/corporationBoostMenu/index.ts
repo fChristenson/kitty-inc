@@ -2,7 +2,12 @@ import { animateDialogClose } from "../../utils";
 import { playSwoosh } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { arrowIconMarkup } from "../../shared/arrowIcon";
-import { CRIT_PROC_KINDS, CRIT_PROC_INFO } from "../../shared/critTypes";
+import {
+  CRIT_PROC_KINDS,
+  CRIT_PROC_INFO,
+  getCritProcCount,
+} from "../../shared/critTypes";
+import type { CritProcKind } from "../../shared/critTypes";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import { onTapOrClick } from "../../shared/tapEvents";
 
@@ -34,15 +39,20 @@ export type { MergeCompaniesResult } from "./economy";
 // instead of this menu hand-duplicating every label/icon/description a
 // second time. Sorted alphabetically by label — CRIT_PROC_KINDS' own order is
 // roll-rarity-driven, not a sensible reading order for a lookup list
-const CRIT_INFO: { icon: string; label: string; description: string }[] =
-  CRIT_PROC_KINDS.map((kind) => {
-    const info = CRIT_PROC_INFO[kind];
-    return {
-      icon: getImageUrl(info.icon),
-      label: info.label,
-      description: info.description,
-    };
-  }).sort((a, b) => a.label.localeCompare(b.label));
+const CRIT_INFO: {
+  kind: CritProcKind;
+  icon: string;
+  label: string;
+  description: string;
+}[] = CRIT_PROC_KINDS.map((kind) => {
+  const info = CRIT_PROC_INFO[kind];
+  return {
+    kind,
+    icon: getImageUrl(info.icon),
+    label: info.label,
+    description: info.description,
+  };
+}).sort((a, b) => a.label.localeCompare(b.label));
 
 // the map view's own prev/next/pointer arrow icon (shared/arrowIcon), reused
 // here as the expand/collapse chevron — rotated via CSS (.crit-info-item[open])
@@ -86,24 +96,32 @@ export function wireCorporationBoostMenu(
     "#corporation-boost-menu-list",
   )!;
 
-  // static content (nothing here depends on game state), so this only ever
-  // needs to run once — still exposed as render()/refresh() to match every
-  // other worker-menu-style dialog's own open()/refresh() shape
+  // icon/label/description are static, but each row's own landed-count badge
+  // is live game state — re-read via getCritProcCount() on every render()/
+  // refresh() call instead of baking it into the static CRIT_INFO array
   function render(): void {
-    list.innerHTML = CRIT_INFO.map(
-      ({ icon, label, description }) => `
+    list.innerHTML = CRIT_INFO.map(({ kind, icon, label, description }) => {
+      const count = getCritProcCount(kind);
+      const badge =
+        count > 0
+          ? `<span class="crit-info-item__count-badge">${count}</span>`
+          : "";
+      return `
         <details class="crit-info-item">
           <summary class="crit-info-item__summary">
             <span class="crit-info-item__label">
-              <img src="${icon}" class="worker-menu__icon" alt="" />
+              <span class="crit-info-item__icon-wrap">
+                <img src="${icon}" class="worker-menu__icon" alt="" />
+                ${badge}
+              </span>
               <span class="crit-info-item__name">${label}</span>
             </span>
             <span class="crit-info-item__chevron" aria-hidden="true">${CHEVRON_SVG}</span>
           </summary>
           <p class="crit-info-item__description">${description}</p>
         </details>
-      `,
-    ).join("");
+      `;
+    }).join("");
   }
 
   // opened by a tap on the action bar's own Boost button — same trailing-

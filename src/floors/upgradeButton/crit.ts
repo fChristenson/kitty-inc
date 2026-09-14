@@ -80,6 +80,8 @@ export {
   SNOWBALL_CRIT_LABEL,
   FREE_SALE_CRIT_COLOR,
   FREE_SALE_CRIT_LABEL,
+  BULL_MARKET_CRIT_COLOR,
+  BULL_MARKET_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -106,6 +108,7 @@ export {
   isFrozenCrit,
   isSnowballCrit,
   isFreeSaleCrit,
+  isBullMarketCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -141,6 +144,7 @@ import {
   forceFrozenCritProc,
   forceSnowballCritProc,
   forceFreeSaleCritProc,
+  forceBullMarketCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
 
@@ -185,6 +189,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.frozen) forceFrozenCritProc(floor);
     if (result.snowball) forceSnowballCritProc(floor);
     if (result.freeSale) forceFreeSaleCritProc(floor);
+    if (result.bullMarket) forceBullMarketCritProc(floor);
   }, allowSpecialProcs);
 }
 
@@ -245,6 +250,7 @@ export function forceFloorBuyCrit(
   frozen = false,
   snowball = false,
   freeSale = false,
+  bullMarket = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -274,6 +280,7 @@ export function forceFloorBuyCrit(
     frozen,
     snowball,
     freeSale,
+    bullMarket,
   };
 }
 
@@ -476,4 +483,9 @@ export function forceSnowballCritUpgrade(floor: Floor): void {
 export function forceFreeSaleCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceFreeSaleCritProc(floor);
+}
+
+export function forceBullMarketCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceBullMarketCritProc(floor);
 }
