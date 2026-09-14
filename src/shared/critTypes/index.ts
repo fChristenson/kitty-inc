@@ -361,6 +361,10 @@ const bullMarketCrits = new WeakSet<Floor>();
 const paydayCrits = new WeakSet<Floor>();
 const goldStandardCrits = new WeakSet<Floor>();
 const nightShiftCrits = new WeakSet<Floor>();
+// "special crit crit" bonus tier riding on an already-landed proc (see
+// rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
+// unlike every other proc this one carries actual tier data, not just a flag
+const bonusTierCrits = new WeakMap<Floor, CritTier>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
@@ -392,6 +396,11 @@ export function pickAtMost<T>(items: T[], max: number): T[] {
 // now get back from the exact same shared roll
 export interface CritRollResult {
   tier: CritTier;
+  // "special crit crit": set only when at least one piggyback proc below also
+  // landed (see rollCrit) — an independent bonus x5/x25/x125 tier on top of
+  // whichever proc(s) fired, never itself eligible to roll a further nested
+  // bonus
+  bonusTier: CritTier | null;
   chain: boolean;
   boost: boolean;
   bounce: boolean;
@@ -429,8 +438,9 @@ export interface CritRollResult {
 // canonical list every "for each landed proc" loop below (and rollCrit
 // itself) iterates, so adding a brand new proc is a two-line change here
 // (this array + CritRollResult's own field) instead of touching every
-// dispatch site by hand
-export type CritProcKind = Exclude<keyof CritRollResult, "tier">;
+// dispatch site by hand. bonusTier is excluded — it's a CritTier | null
+// modifier riding on an already-landed proc, not itself a boolean proc kind
+export type CritProcKind = Exclude<keyof CritRollResult, "tier" | "bonusTier">;
 
 export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "chain",
@@ -682,6 +692,18 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
   },
 };
 
+// walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
+// chance hits (or null on a full miss) — the single roll cascade shared by
+// both the base tier roll in rollCrit below AND the "special crit crit"
+// bonus roll (rollCrit's own bonusTier line), so both always use IDENTICAL
+// odds, per-tier, with zero duplicated logic
+function rollTier(): CritTier | null {
+  for (const tier of CRIT_TIER_ORDER) {
+    if (Math.random() < CRIT_TIER_CONFIG[tier].chance) return tier;
+  }
+  return null;
+}
+
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
 // for the tier (previously duplicated separately by rollCritUpgrade and
 // rollFloorBuyCrit), then — only if a tier actually landed — rolls the
@@ -702,90 +724,94 @@ export function rollCrit(
   onLanded: (result: CritRollResult) => void,
   allowSpecialProcs = true,
 ): void {
-  for (const tier of CRIT_TIER_ORDER) {
-    if (Math.random() < CRIT_TIER_CONFIG[tier].chance) {
-      const landed: CritProcKind[] = [];
-      if (allowSpecialProcs && Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE) {
-        if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
-        if (Math.random() < BOOST_CRIT_CHANCE) landed.push("boost");
-        if (Math.random() < BOUNCE_CRIT_CHANCE) landed.push("bounce");
-        if (Math.random() < EXPLOSION_CRIT_CHANCE) landed.push("explosion");
-        if (Math.random() < BOOTY_CRIT_CHANCE) landed.push("booty");
-        if (Math.random() < UPGRADE_CRIT_CHANCE) landed.push("upgrade");
-        if (Math.random() < PEPPERMINT_CRIT_CHANCE) landed.push("peppermint");
-        if (Math.random() < HEAVENLY_CRIT_CHANCE) landed.push("heavenly");
-        if (Math.random() < PAIR_CRIT_CHANCE) landed.push("pair");
-        if (Math.random() < THREE_OF_A_KIND_CRIT_CHANCE)
-          landed.push("threeOfAKind");
-        if (Math.random() < FOUR_OF_A_KIND_CRIT_CHANCE)
-          landed.push("fourOfAKind");
-        if (Math.random() < FULL_HOUSE_CRIT_CHANCE) landed.push("fullHouse");
-        if (Math.random() < ROYAL_FLUSH_CRIT_CHANCE) landed.push("royalFlush");
-        if (Math.random() < TICK_TOCK_CRIT_CHANCE) landed.push("tickTock");
-        if (Math.random() < CHAIR_GIVEAWAY_CRIT_CHANCE)
-          landed.push("chairGiveaway");
-        if (Math.random() < SUPPLIES_GIVEAWAY_CRIT_CHANCE)
-          landed.push("suppliesGiveaway");
-        if (Math.random() < WINTER_SALE_CRIT_CHANCE) landed.push("winterSale");
-        if (Math.random() < SPRING_SALE_CRIT_CHANCE) landed.push("springSale");
-        if (Math.random() < SUMMER_SALE_CRIT_CHANCE) landed.push("summerSale");
-        if (Math.random() < AUTUMN_SALE_CRIT_CHANCE) landed.push("autumnSale");
-        if (Math.random() < HALLOWEEN_SALE_CRIT_CHANCE)
-          landed.push("halloweenSale");
-        if (Math.random() < SUNSHINE_CRIT_CHANCE) landed.push("sunshine");
-        if (Math.random() < SNOWDAY_CRIT_CHANCE) landed.push("snowday");
-        if (Math.random() < FAST_FORWARD_CRIT_CHANCE)
-          landed.push("fastForward");
-        if (Math.random() < FROZEN_CRIT_CHANCE) landed.push("frozen");
-        if (Math.random() < SNOWBALL_CRIT_CHANCE) landed.push("snowball");
-        if (Math.random() < FREE_SALE_CRIT_CHANCE) landed.push("freeSale");
-        if (Math.random() < BULL_MARKET_CRIT_CHANCE) landed.push("bullMarket");
-        if (Math.random() < PAYDAY_CRIT_CHANCE) landed.push("payday");
-        if (Math.random() < GOLD_STANDARD_CRIT_CHANCE)
-          landed.push("goldStandard");
-        if (Math.random() < NIGHT_SHIFT_CRIT_CHANCE) landed.push("nightShift");
-      }
-      const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
-      // real-roll-only tally for the "Special Crits" info menu's collectible
-      // count badges — see shared/critTypes/critProcCounts.ts
-      for (const kind of kept) recordCritProcLanded(kind);
-      onLanded({
-        tier,
-        chain: kept.has("chain"),
-        boost: kept.has("boost"),
-        bounce: kept.has("bounce"),
-        explosion: kept.has("explosion"),
-        booty: kept.has("booty"),
-        upgrade: kept.has("upgrade"),
-        peppermint: kept.has("peppermint"),
-        heavenly: kept.has("heavenly"),
-        pair: kept.has("pair"),
-        threeOfAKind: kept.has("threeOfAKind"),
-        fourOfAKind: kept.has("fourOfAKind"),
-        fullHouse: kept.has("fullHouse"),
-        royalFlush: kept.has("royalFlush"),
-        tickTock: kept.has("tickTock"),
-        chairGiveaway: kept.has("chairGiveaway"),
-        suppliesGiveaway: kept.has("suppliesGiveaway"),
-        winterSale: kept.has("winterSale"),
-        springSale: kept.has("springSale"),
-        summerSale: kept.has("summerSale"),
-        autumnSale: kept.has("autumnSale"),
-        halloweenSale: kept.has("halloweenSale"),
-        sunshine: kept.has("sunshine"),
-        snowday: kept.has("snowday"),
-        fastForward: kept.has("fastForward"),
-        frozen: kept.has("frozen"),
-        snowball: kept.has("snowball"),
-        freeSale: kept.has("freeSale"),
-        bullMarket: kept.has("bullMarket"),
-        payday: kept.has("payday"),
-        goldStandard: kept.has("goldStandard"),
-        nightShift: kept.has("nightShift"),
-      });
-      return;
-    }
+  const tier = rollTier();
+  if (tier === null) return;
+  const landed: CritProcKind[] = [];
+  if (allowSpecialProcs && Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE) {
+    if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
+    if (Math.random() < BOOST_CRIT_CHANCE) landed.push("boost");
+    if (Math.random() < BOUNCE_CRIT_CHANCE) landed.push("bounce");
+    if (Math.random() < EXPLOSION_CRIT_CHANCE) landed.push("explosion");
+    if (Math.random() < BOOTY_CRIT_CHANCE) landed.push("booty");
+    if (Math.random() < UPGRADE_CRIT_CHANCE) landed.push("upgrade");
+    if (Math.random() < PEPPERMINT_CRIT_CHANCE) landed.push("peppermint");
+    if (Math.random() < HEAVENLY_CRIT_CHANCE) landed.push("heavenly");
+    if (Math.random() < PAIR_CRIT_CHANCE) landed.push("pair");
+    if (Math.random() < THREE_OF_A_KIND_CRIT_CHANCE)
+      landed.push("threeOfAKind");
+    if (Math.random() < FOUR_OF_A_KIND_CRIT_CHANCE) landed.push("fourOfAKind");
+    if (Math.random() < FULL_HOUSE_CRIT_CHANCE) landed.push("fullHouse");
+    if (Math.random() < ROYAL_FLUSH_CRIT_CHANCE) landed.push("royalFlush");
+    if (Math.random() < TICK_TOCK_CRIT_CHANCE) landed.push("tickTock");
+    if (Math.random() < CHAIR_GIVEAWAY_CRIT_CHANCE)
+      landed.push("chairGiveaway");
+    if (Math.random() < SUPPLIES_GIVEAWAY_CRIT_CHANCE)
+      landed.push("suppliesGiveaway");
+    if (Math.random() < WINTER_SALE_CRIT_CHANCE) landed.push("winterSale");
+    if (Math.random() < SPRING_SALE_CRIT_CHANCE) landed.push("springSale");
+    if (Math.random() < SUMMER_SALE_CRIT_CHANCE) landed.push("summerSale");
+    if (Math.random() < AUTUMN_SALE_CRIT_CHANCE) landed.push("autumnSale");
+    if (Math.random() < HALLOWEEN_SALE_CRIT_CHANCE)
+      landed.push("halloweenSale");
+    if (Math.random() < SUNSHINE_CRIT_CHANCE) landed.push("sunshine");
+    if (Math.random() < SNOWDAY_CRIT_CHANCE) landed.push("snowday");
+    if (Math.random() < FAST_FORWARD_CRIT_CHANCE) landed.push("fastForward");
+    if (Math.random() < FROZEN_CRIT_CHANCE) landed.push("frozen");
+    if (Math.random() < SNOWBALL_CRIT_CHANCE) landed.push("snowball");
+    if (Math.random() < FREE_SALE_CRIT_CHANCE) landed.push("freeSale");
+    if (Math.random() < BULL_MARKET_CRIT_CHANCE) landed.push("bullMarket");
+    if (Math.random() < PAYDAY_CRIT_CHANCE) landed.push("payday");
+    if (Math.random() < GOLD_STANDARD_CRIT_CHANCE) landed.push("goldStandard");
+    if (Math.random() < NIGHT_SHIFT_CRIT_CHANCE) landed.push("nightShift");
   }
+  const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
+  // real-roll-only tally for the "Special Crits" info menu's collectible
+  // count badges — see shared/critTypes/critProcCounts.ts
+  for (const kind of kept) recordCritProcLanded(kind);
+  // "special crit crit": once at least one piggyback proc has actually
+  // landed, it gets its own independent shot at a bonus x5/x25/x125 tier,
+  // reusing the EXACT same rarest-first cascade/odds as the base tier roll
+  // above (rollTier) — never rolled at all when no proc landed, and never
+  // itself eligible to roll a further nested bonus (one level only). See
+  // getBonusTierCrit/floorInteractions.ts's applyBonusTierCrit for the
+  // reward (multiplies total income by the bonus tier's own multiplier) and
+  // critCelebration.ts for the stacked celebration this triggers
+  const bonusTier = kept.size > 0 ? rollTier() : null;
+  onLanded({
+    tier,
+    bonusTier,
+    chain: kept.has("chain"),
+    boost: kept.has("boost"),
+    bounce: kept.has("bounce"),
+    explosion: kept.has("explosion"),
+    booty: kept.has("booty"),
+    upgrade: kept.has("upgrade"),
+    peppermint: kept.has("peppermint"),
+    heavenly: kept.has("heavenly"),
+    pair: kept.has("pair"),
+    threeOfAKind: kept.has("threeOfAKind"),
+    fourOfAKind: kept.has("fourOfAKind"),
+    fullHouse: kept.has("fullHouse"),
+    royalFlush: kept.has("royalFlush"),
+    tickTock: kept.has("tickTock"),
+    chairGiveaway: kept.has("chairGiveaway"),
+    suppliesGiveaway: kept.has("suppliesGiveaway"),
+    winterSale: kept.has("winterSale"),
+    springSale: kept.has("springSale"),
+    summerSale: kept.has("summerSale"),
+    autumnSale: kept.has("autumnSale"),
+    halloweenSale: kept.has("halloweenSale"),
+    sunshine: kept.has("sunshine"),
+    snowday: kept.has("snowday"),
+    fastForward: kept.has("fastForward"),
+    frozen: kept.has("frozen"),
+    snowball: kept.has("snowball"),
+    freeSale: kept.has("freeSale"),
+    bullMarket: kept.has("bullMarket"),
+    payday: kept.has("payday"),
+    goldStandard: kept.has("goldStandard"),
+    nightShift: kept.has("nightShift"),
+  });
 }
 
 // whether the CURRENTLY ARMED crit (if any) is also a chain/boost/bounce
@@ -914,6 +940,12 @@ export function isNightShiftCrit(floor: Floor): boolean {
   return nightShiftCrits.has(floor);
 }
 
+// the armed "special crit crit" bonus tier riding on this floor's already-
+// landed proc(s), if any (see rollCrit's own bonusTier)
+export function getBonusTierCrit(floor: Floor): CritTier | null {
+  return bonusTierCrits.get(floor) ?? null;
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -947,6 +979,7 @@ export function consumeCritProcs(floor: Floor): void {
   paydayCrits.delete(floor);
   goldStandardCrits.delete(floor);
   nightShiftCrits.delete(floor);
+  bonusTierCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -1074,6 +1107,12 @@ export function forceGoldStandardCritProc(floor: Floor): void {
 
 export function forceNightShiftCritProc(floor: Floor): void {
   nightShiftCrits.add(floor);
+}
+
+// dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)
+// the caller already armed on this floor, bypassing chance entirely
+export function forceBonusTierCritProc(floor: Floor, tier: CritTier): void {
+  bonusTierCrits.set(floor, tier);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

@@ -3,8 +3,11 @@ import {
   drawCartoonText,
   formatTotalIncomeParts,
   getAnimatedTotalIncome,
+  shadeColor,
 } from "../../utils";
 import type { BigNumber } from "../bigNumber";
+import { getHudTotalFlashStrength } from "../../bonusTierFx";
+import { getWiggleRotation } from "../wiggle";
 
 // shared "amount + spelled-out unit name below it" total-income drawing, used by
 // both hud/index.ts's top-of-screen HUD and background/cityMap's map readout —
@@ -57,6 +60,26 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     );
     const strokeWidth = fontSize * AMOUNT_STROKE_TO_FONT_RATIO;
 
+    // "special crit crit" bonus-tier coins merging into the total (see
+    // bonusTierFx) flash this whole readout white and wiggle it briefly —
+    // strength fades 1 -> 0, so both the color blend and the wiggle's own
+    // amplitude fade back to normal together instead of snapping off
+    const now = Date.now();
+    const flashStrength = getHudTotalFlashStrength(now);
+    const textColor =
+      flashStrength > 0
+        ? shadeColor(COLOR.moneyGreen, flashStrength)
+        : COLOR.moneyGreen;
+    const wiggleRotation =
+      flashStrength > 0 ? getWiggleRotation(now) * flashStrength : 0;
+
+    ctx.save();
+    if (wiggleRotation !== 0) {
+      ctx.translate(centerX, top);
+      ctx.rotate(wiggleRotation);
+      ctx.translate(-centerX, -top);
+    }
+
     ctx.font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
     if (amount.length !== cachedAmountLength) {
       cachedAmountWidth = ctx.measureText(amount).width;
@@ -69,7 +92,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       amount,
       centerX - cachedAmountWidth / 2,
       top,
-      COLOR.moneyGreen,
+      textColor,
       COLOR.white,
       strokeWidth,
     );
@@ -92,7 +115,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         unitName,
         centerX,
         unitTop,
-        COLOR.moneyGreen,
+        textColor,
         COLOR.white,
         unitStrokeWidth,
       );
@@ -104,6 +127,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         unitStrokeWidth / 2;
     }
 
+    ctx.restore();
     return bottom;
   }
 

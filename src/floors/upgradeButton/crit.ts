@@ -121,6 +121,7 @@ export {
   isPaydayCrit,
   isGoldStandardCrit,
   isNightShiftCrit,
+  getBonusTierCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -161,6 +162,7 @@ import {
   forcePaydayCritProc,
   forceGoldStandardCritProc,
   forceNightShiftCritProc,
+  forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
 
@@ -210,6 +212,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.payday) forcePaydayCritProc(floor);
     if (result.goldStandard) forceGoldStandardCritProc(floor);
     if (result.nightShift) forceNightShiftCritProc(floor);
+    if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
 
@@ -275,9 +278,11 @@ export function forceFloorBuyCrit(
   goldStandard = false,
   royalFlush = false,
   nightShift = false,
+  bonusTier: CritTier | null = null,
 ): void {
   forcedFloorBuyCrit = {
     tier,
+    bonusTier,
     chain,
     boost,
     bounce,
@@ -539,4 +544,14 @@ export function forceGoldStandardCritUpgrade(floor: Floor): void {
 export function forceNightShiftCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceNightShiftCritProc(floor);
+}
+
+// dev/test-only: force the NEXT "special crit crit" bonus tier a floor's
+// already-armed (or yet to be armed) proc rides in on, bypassing chance
+// entirely and WITHOUT forcing any particular proc itself — combine with any
+// of the existing "Spawn X Crit" buttons (see hud/testButton's "Spawn Bonus
+// Tier Crit"/"Mega Crit"/"Ultra Crit") to test a chosen proc + a chosen
+// bonus tier together
+export function forceBonusTierCritUpgrade(floor: Floor, tier: CritTier): void {
+  forceBonusTierCritProc(floor, tier);
 }

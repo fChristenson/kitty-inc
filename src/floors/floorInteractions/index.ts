@@ -43,6 +43,7 @@ import {
   isPaydayCrit,
   isGoldStandardCrit,
   isNightShiftCrit,
+  getBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
   HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
   POKER_HAND_CRIT_COUNTS,
@@ -69,6 +70,7 @@ import {
   getOvertimeTickGoal,
   resetOvertimeTicks,
   isUpgradeButtonEnabled,
+  type CritTier,
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
   CHAIN_CRIT_CONTINUE_CHANCE,
@@ -486,6 +488,18 @@ function applyGoldStandardCrit(): void {
   addTotalIncome(multiply(getTotalIncome(), 3));
 }
 
+// "special crit crit" bonus tier (see shared/critTypes's getBonusTierCrit):
+// once ANY piggyback proc lands, it gets its own independent shot at this
+// bonus tier — when it hits, multiplies the currently active company's total
+// income by that tier's own multiplier (5x/25x/125x), same "add
+// (multiplier-1)x more" shape payday/gold standard already use, on top of
+// whatever the proc(s) it rode in on already granted
+function applyBonusTierCrit(bonusTier: CritTier): void {
+  addTotalIncome(
+    multiply(getTotalIncome(), CRIT_TIER_CONFIG[bonusTier].multiplier - 1),
+  );
+}
+
 // "Chair Giveaway"/"Supplies Giveaway" crits (see shared/critTypes's isChairGiveawayCrit/
 // isSuppliesGiveawayCrit): grant the floor being upgraded its one-time office
 // chairs/supplies purchase for free (same flags hud/upgradeMenu's own paid
@@ -729,6 +743,14 @@ export function handleFloorClick(
         if (buyTier.payday) applyPaydayCrit();
         // gold standard crit: same flat one-time effect, a steeper 4x
         if (buyTier.goldStandard) applyGoldStandardCrit();
+        // night shift crit: same building-wide free-boost reward as boost/
+        // sunshine/snowday, just shorter and with a temporary +1-worker
+        // boost-strength bonus (previously missed on this floor-buy branch,
+        // only the plain-click branch applied it)
+        if (buyTier.nightShift) applyNightShiftCrit(floors);
+        // "special crit crit": once any proc above landed, a bonus tier may
+        // have also landed on top of it (see rollCrit's own bonusTier)
+        if (buyTier.bonusTier) applyBonusTierCrit(buyTier.bonusTier);
       }
       persist();
       const center = getLockCenter();
@@ -768,6 +790,7 @@ export function handleFloorClick(
           buyTier.goldStandard,
           buyTier.royalFlush,
           buyTier.nightShift,
+          buyTier.bonusTier,
         );
     }
     return;
@@ -993,6 +1016,7 @@ export function handleFloorClick(
       const payday = isPaydayCrit(floor);
       const goldStandard = isGoldStandardCrit(floor);
       const nightShift = isNightShiftCrit(floor);
+      const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -1126,6 +1150,9 @@ export function handleFloorClick(
       // sunshine/snowday, just shorter and with a temporary +1-worker
       // boost-strength bonus
       if (nightShift) applyNightShiftCrit(floors);
+      // "special crit crit": once any proc above landed, a bonus tier may
+      // have also landed on top of it (see rollCrit's own bonusTier)
+      if (bonusTier) applyBonusTierCrit(bonusTier);
       // Chair Giveaway/Supplies Giveaway crits: free one-time office chairs/
       // supplies purchase for the floor that actually crit
       if (chairGiveaway) applyChairGiveawayCrit(floor);
@@ -1175,6 +1202,7 @@ export function handleFloorClick(
         goldStandard,
         royalFlush,
         nightShift,
+        bonusTier,
       );
       return;
     }

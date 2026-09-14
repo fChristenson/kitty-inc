@@ -22,6 +22,7 @@ import { drawHud, HUD_H } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
 import { getScreenShakeOffset, drawCritFlash } from "../../screenShake";
+import { drawBonusTierCoins } from "../../bonusTierFx";
 import { COLOR } from "../../palette";
 import {
   startPressAndHold,
@@ -503,6 +504,17 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // shake above it (still inside the shake's own translate, so it rattles too —
     // reinforces the "this hit hard" feeling rather than floating serenely above it)
     drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
+    // "special crit crit" bonus-tier coins (see bonusTierFx), flying from that
+    // same flash-text spot up to roughly where the total-income readout sits
+    drawBonusTierCoins(
+      ctx,
+      SLOT_W / 2,
+      contentViewportH() / 2,
+      SLOT_W / 2,
+      HUD_H / 2,
+      SLOT_W,
+      Date.now(),
+    );
 
     ctx.restore();
   }

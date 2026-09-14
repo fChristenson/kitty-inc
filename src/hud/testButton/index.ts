@@ -10,6 +10,9 @@ export function createTestButtonMarkup(): string {
           <button id="add-money" class="game__button">Add Money</button>
           <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
           <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
+          <button id="force-bonus-tier-crit" class="game__button">Force Bonus Tier x5</button>
+          <button id="force-bonus-tier-mega-crit" class="game__button">Force Bonus Tier x25</button>
+          <button id="force-bonus-tier-ultra-crit" class="game__button">Force Bonus Tier x125</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -514,6 +517,36 @@ export function wireSpawnNightShiftCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-night-shift-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireForceBonusTierCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#force-bonus-tier-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireForceBonusTierMegaCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#force-bonus-tier-mega-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireForceBonusTierUltraCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#force-bonus-tier-ultra-crit",
   )!;
   button.addEventListener("click", onClick);
 }

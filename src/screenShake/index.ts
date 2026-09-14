@@ -234,6 +234,16 @@ let flashHoldMs = 0;
 // currently still-playing flash's own priority
 let activeFlashPriority = -1;
 
+// a second, fully STATIC flash layer drawn BEHIND the normal animated one —
+// null means nothing frozen. Set only by freezeCritFlashAsBackground below
+// (see critCelebration.ts's "special crit crit" stacking): once the foreground
+// proc's own flash finishes its hold phase, it's captured here (frozen at full
+// size/opacity, no further growth/wobble/fade) so the bonus tier's own flash
+// can animate on top of it, and both are cleared together once THAT flash ends
+let bgFlashLabel: string | null = null;
+let bgFlashColor: string = COLOR.purple;
+let bgFlashStrokeWidth = 8;
+
 interface FlashRequest {
   intensity: number;
   label: string;
@@ -370,6 +380,34 @@ export function isCritFlashActive(now: number): boolean {
   return flashEndsAt !== null && now < flashEndsAt;
 }
 
+// absolute timestamp the CURRENT foreground flash's hold phase ends (right
+// before its fade would normally begin), or null if nothing is playing — see
+// critCelebration.ts's "special crit crit" stacking, which needs to know
+// exactly when to freeze a proc's own celebration as a background layer
+// without hardcoding/duplicating whatever holdMs it happened to be triggered
+// with
+export function getFlashHoldEndsAt(): number | null {
+  return flashStartedAt !== null
+    ? flashStartedAt + GROWTH_DURATION_MS + flashHoldMs
+    : null;
+}
+
+// captures whatever's CURRENTLY playing as the foreground flash (label/color/
+// stroke width) into the separate static background layer above, then clears
+// the foreground's own timing so it stops animating/fading — the very next
+// triggerScreenShake call (see critCelebration.ts's stacked bonus-tier
+// celebration, called right after this) becomes the new foreground flash,
+// drawn on top of this now-frozen backdrop
+export function freezeCritFlashAsBackground(): void {
+  if (flashStartedAt === null) return;
+  bgFlashLabel = flashLabel;
+  bgFlashColor = flashColor;
+  bgFlashStrokeWidth = flashStrokeWidth;
+  flashStartedAt = null;
+  flashEndsAt = null;
+  activeFlashPriority = -1;
+}
+
 // caches the expensive blurred bloom glow (see drawCritFlash) per distinct
 // label — mobile browsers pay for shadowBlur as a real offscreen convolution,
 // so recomputing it every animation frame at this text's huge on-screen scale
@@ -437,11 +475,31 @@ export function drawCritFlash(
   viewportWidth: number,
   now: number,
 ): void {
-  if (flashStartedAt === null || flashEndsAt === null) return;
+  if (bgFlashLabel !== null) {
+    drawFlashLayer(
+      ctx,
+      centerX,
+      centerY,
+      viewportWidth,
+      bgFlashLabel,
+      bgFlashColor,
+      bgFlashStrokeWidth,
+      1,
+      1,
+      0,
+    );
+  }
+  if (flashStartedAt === null || flashEndsAt === null) {
+    // no foreground flash left to eventually clear it — never leave an
+    // orphaned frozen background on screen forever
+    bgFlashLabel = null;
+    return;
+  }
   if (now >= flashEndsAt) {
     flashStartedAt = null;
     flashEndsAt = null;
     activeFlashPriority = -1;
+    bgFlashLabel = null;
     return;
   }
 
@@ -501,6 +559,37 @@ export function drawCritFlash(
     alpha = 1 - (elapsed - holdEndsAt) / (totalLifetimeMs - holdEndsAt);
   }
 
+  drawFlashLayer(
+    ctx,
+    centerX,
+    centerY,
+    viewportWidth,
+    flashLabel,
+    flashColor,
+    flashStrokeWidth,
+    alpha,
+    growthScale,
+    rotation,
+  );
+}
+
+// draws one flash "layer" — icon + bloom + glossy gradient text + outline —
+// at a given alpha/scale/rotation. Shared by drawCritFlash's own animated
+// foreground flash AND its static, frozen background layer (see
+// freezeCritFlashAsBackground) so neither has to duplicate this whole
+// per-proc icon lookup + bloom + text-drawing block
+function drawFlashLayer(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  viewportWidth: number,
+  label: string,
+  color: string,
+  strokeWidth: number,
+  alpha: number,
+  growthScale: number,
+  rotation: number,
+): void {
   // extra-bold weight + a thick outline is what reads as "fat"/chunky at this
   // size, more than font-size alone (900 is already the heaviest weight
   // Fredoka ships)
@@ -510,7 +599,7 @@ export function drawCritFlash(
   // viewport's width, not a fixed font-size — measure once at the reference
   // 100px size and scale up/down from there so this holds regardless of
   // screen size
-  const measuredWidth = ctx.measureText(flashLabel).width;
+  const measuredWidth = ctx.measureText(label).width;
   const targetScale = (viewportWidth * 0.8) / measuredWidth;
   const scale = growthScale * targetScale;
 
@@ -527,27 +616,27 @@ export function drawCritFlash(
   // with it), but rotated an extra fixed 45deg of its own on top of the
   // text's animated entrance rotation, scoped to its own save/restore so
   // that extra spin doesn't also rotate the bloom/text drawn after it
-  if (flashLabel === "Chain" && chainIcon) {
+  if (label === "Chain" && chainIcon) {
     const { w: iconW, h: iconH } = fitIconSize(chainIcon, measuredWidth * 0.85);
     ctx.save();
     ctx.rotate(Math.PI / 4);
     ctx.drawImage(chainIcon, -iconW / 2, -iconH / 2, iconW, iconH);
     ctx.restore();
   }
-  if (flashLabel === "Boost" && boostIcon) {
+  if (label === "Boost" && boostIcon) {
     // no extra rotation (unlike chainIcon above) — mouse.png is a directional
     // side-view sprite, not a symmetric icon, so spinning it 45deg makes it
     // read as facing the wrong way instead of its normal running pose
     const { w: iconW, h: iconH } = fitIconSize(boostIcon, measuredWidth * 0.85);
     ctx.drawImage(boostIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Bounce" && ballIcon) {
+  if (label === "Bounce" && ballIcon) {
     // no extra rotation — ball.png already reads as bouncy on its own,
     // rotating it would just look like it's rolling away instead
     const { w: iconW, h: iconH } = fitIconSize(ballIcon, measuredWidth * 0.85);
     ctx.drawImage(ballIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Boom" && explosionIcon) {
+  if (label === "Boom" && explosionIcon) {
     // no extra rotation — explosion.png is already a radial starburst shape,
     // spinning it wouldn't read as differently "exploded"
     const { w: iconW, h: iconH } = fitIconSize(
@@ -556,13 +645,13 @@ export function drawCritFlash(
     );
     ctx.drawImage(explosionIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Booty" && bootyIcon) {
+  if (label === "Booty" && bootyIcon) {
     // no extra rotation — booty.png is an upright treasure chest, spinning it
     // would just look broken
     const { w: iconW, h: iconH } = fitIconSize(bootyIcon, measuredWidth * 0.85);
     ctx.drawImage(bootyIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Upgrade" && upgradeIcon) {
+  if (label === "Upgrade" && upgradeIcon) {
     // no extra rotation — upgrade.png is an upright arrow, spinning it would
     // read as pointing somewhere else instead of "up"
     const { w: iconW, h: iconH } = fitIconSize(
@@ -571,7 +660,7 @@ export function drawCritFlash(
     );
     ctx.drawImage(upgradeIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Peppermint" && peppermintIcon) {
+  if (label === "Peppermint" && peppermintIcon) {
     // no extra rotation — peppermint.png is an upright candy cane, spinning it
     // would just look broken
     const { w: iconW, h: iconH } = fitIconSize(
@@ -580,7 +669,7 @@ export function drawCritFlash(
     );
     ctx.drawImage(peppermintIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Heavenly" && heavenIcon) {
+  if (label === "Heavenly" && heavenIcon) {
     // no extra rotation — heaven.png is an upright gate, spinning it would
     // just look broken
     const { w: iconW, h: iconH } = fitIconSize(
@@ -589,34 +678,34 @@ export function drawCritFlash(
     );
     ctx.drawImage(heavenIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Pair" && pairIcon) {
+  if (label === "Pair" && pairIcon) {
     // no extra rotation — pair.png is already an upright fanned pair of
     // cards, spinning it would just look broken
     const { w: iconW, h: iconH } = fitIconSize(pairIcon, measuredWidth * 0.85);
     ctx.drawImage(pairIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Three of a Kind" && threeOfAKindIcon) {
+  if (label === "Three of a Kind" && threeOfAKindIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       threeOfAKindIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(threeOfAKindIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Four of a Kind" && fourOfAKindIcon) {
+  if (label === "Four of a Kind" && fourOfAKindIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       fourOfAKindIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(fourOfAKindIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Full House" && fullHouseIcon) {
+  if (label === "Full House" && fullHouseIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       fullHouseIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(fullHouseIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Tick Tock" && tickTockIcon) {
+  if (label === "Tick Tock" && tickTockIcon) {
     // no extra rotation — clock.png is already an upright clock face,
     // spinning it would just look broken
     const { w: iconW, h: iconH } = fitIconSize(
@@ -625,119 +714,119 @@ export function drawCritFlash(
     );
     ctx.drawImage(tickTockIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Chair Giveaway" && chairGiveawayIcon) {
+  if (label === "Chair Giveaway" && chairGiveawayIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       chairGiveawayIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(chairGiveawayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Supplies Giveaway" && suppliesGiveawayIcon) {
+  if (label === "Supplies Giveaway" && suppliesGiveawayIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       suppliesGiveawayIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(suppliesGiveawayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Winter Sale" && winterSaleIcon) {
+  if (label === "Winter Sale" && winterSaleIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       winterSaleIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(winterSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Spring Sale" && springSaleIcon) {
+  if (label === "Spring Sale" && springSaleIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       springSaleIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(springSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Summer Sale" && summerSaleIcon) {
+  if (label === "Summer Sale" && summerSaleIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       summerSaleIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(summerSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Autumn Sale" && autumnSaleIcon) {
+  if (label === "Autumn Sale" && autumnSaleIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       autumnSaleIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(autumnSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Halloween Sale" && halloweenSaleIcon) {
+  if (label === "Halloween Sale" && halloweenSaleIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       halloweenSaleIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(halloweenSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Sunshine" && sunshineIcon) {
+  if (label === "Sunshine" && sunshineIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       sunshineIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(sunshineIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Snowday" && snowdayIcon) {
+  if (label === "Snowday" && snowdayIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       snowdayIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(snowdayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Fast Forward" && fastForwardIcon) {
+  if (label === "Fast Forward" && fastForwardIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       fastForwardIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(fastForwardIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Frozen" && icecubeIcon) {
+  if (label === "Frozen" && icecubeIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       icecubeIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(icecubeIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Snowball" && snowballIcon) {
+  if (label === "Snowball" && snowballIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       snowballIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(snowballIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Sale" && cashRegisterIcon) {
+  if (label === "Sale" && cashRegisterIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       cashRegisterIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(cashRegisterIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Payday" && paydayIcon) {
+  if (label === "Payday" && paydayIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       paydayIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(paydayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Gold Standard" && goldStandardIcon) {
+  if (label === "Gold Standard" && goldStandardIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       goldStandardIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(goldStandardIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Royal Flush" && royalFlushIcon) {
+  if (label === "Royal Flush" && royalFlushIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       royalFlushIcon,
       measuredWidth * 0.85,
     );
     ctx.drawImage(royalFlushIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (flashLabel === "Night Shift" && nightShiftIcon) {
+  if (label === "Night Shift" && nightShiftIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       nightShiftIcon,
       measuredWidth * 0.85,
@@ -751,21 +840,13 @@ export function drawCritFlash(
   // celebrations. getBloomLayer below renders this exact glow ONCE per
   // distinct label (cached), so every frame after the first is just a plain
   // drawImage of that cached bitmap instead of a fresh blur
-  const bloom = getBloomLayer(flashLabel, measuredWidth);
+  const bloom = getBloomLayer(label, measuredWidth);
   ctx.drawImage(bloom.canvas, -bloom.width / 2, -bloom.height / 2);
   // a light-to-tier-color vertical gradient reads as glossy/shiny rather than a
   // flat block of color — same lightening math drawGlossyButton's own sheen uses
   const gradient = ctx.createLinearGradient(0, -60, 0, 60);
-  gradient.addColorStop(0, shadeColor(flashColor, 0.6));
-  gradient.addColorStop(1, flashColor);
-  drawCartoonText(
-    ctx,
-    flashLabel,
-    0,
-    0,
-    gradient,
-    COLOR.white,
-    flashStrokeWidth,
-  );
+  gradient.addColorStop(0, shadeColor(color, 0.6));
+  gradient.addColorStop(1, color);
+  drawCartoonText(ctx, label, 0, 0, gradient, COLOR.white, strokeWidth);
   ctx.restore();
 }

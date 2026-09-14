@@ -65,8 +65,16 @@ import {
   playExplosion,
   playJackpot,
   playPayout,
+  playArcadeSlotWin,
+  playSold,
 } from "../../sound";
-import { triggerScreenShake, isCritFlashActive } from "../../screenShake";
+import { spawnBonusTierCoins, triggerHudTotalFlash } from "../../bonusTierFx";
+import {
+  triggerScreenShake,
+  isCritFlashActive,
+  getFlashHoldEndsAt,
+  freezeCritFlashAsBackground,
+} from "../../screenShake";
 import { COLOR } from "../../palette";
 
 function tierColor(tier: CritTier): string {
@@ -249,6 +257,57 @@ function celebrateTier(
 ): void {
   playTierFlash(tier, CRIT_TIER_CONFIG[tier].label, tierColor(tier));
   spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// per-tier flash tuning for the "special crit crit" bonus tier's own
+// celebration below — unlike a plain landed tier (celebrateTier above, whose
+// only tier with a strobing hold is ultra), EVERY bonus tier blinks, scaled
+// up per tier so a bigger multiplier sticks around proportionally longer.
+// Each holdMs is an exact odd multiple of blinkHz's own half-cycle
+// (1000/(6*2) ≈ 83.33ms), so the strobe always lands back "on" right as the
+// hold ends and the fade-out can begin smoothly (same reasoning
+// playTierFlash's own ultra branch already documents) — ultra's own value
+// (1250) is unchanged from that existing tier
+const BONUS_TIER_FLASH: Record<
+  CritTier,
+  { intensity: number; strokeWidth: number; holdMs: number; priority: number }
+> = {
+  crit: { intensity: 1.4, strokeWidth: 10, holdMs: 417, priority: 0 },
+  mega: { intensity: 2, strokeWidth: 14, holdMs: 750, priority: 1 },
+  ultra: { intensity: 2.6, strokeWidth: 16, holdMs: 1250, priority: 2 },
+};
+
+// "special crit crit" bonus tier (see shared/critTypes' getBonusTierCrit):
+// always blinks/strobes regardless of which tier (5x/25x/125x) actually
+// landed — the same treatment ultra's own plain-crit flash gets — and always
+// plays arcadeSlotWin.wav instead of that tier's usual sfx, since this is
+// always its own distinct "slot machine hit", not a graduated
+// crit/jackpot/payout escalation
+function celebrateBonusTier(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  const { intensity, strokeWidth, holdMs, priority } = BONUS_TIER_FLASH[tier];
+  triggerScreenShake({
+    intensity,
+    label: CRIT_TIER_CONFIG[tier].label,
+    color: tierColor(tier),
+    strokeWidth,
+    blinkHz: 6,
+    holdMs,
+    priority,
+  });
+  playArcadeSlotWin();
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  // 3 coins fly from this very flash text up to the total-income readout,
+  // shrinking as they go (see bonusTierFx's own doc comment) — once they all
+  // arrive, the total itself flashes white + wiggles while the purchase sound
+  // plays, so the moment reads as this reward physically merging into the total
+  spawnBonusTierCoins(() => {
+    triggerHudTotalFlash();
+    playSold();
+  });
 }
 
 // chain crit (see upgradeButton.ts's isChainCrit/rollFloorBuyCrit's own chain
@@ -476,7 +535,8 @@ interface QueuedCelebration {
     | "payday"
     | "goldStandard"
     | "royalFlush"
-    | "nightShift";
+    | "nightShift"
+    | "bonusTier";
   queuedAt: number;
   run: () => void;
 }
@@ -495,20 +555,41 @@ function drainSpecialCelebrationQueue(): void {
   if (drainingSpecialQueue) return;
   drainingSpecialQueue = true;
   const step = () => {
+    // a queued "special crit crit" bonus tier never waits for the flash ahead
+    // of it to run its full course (grow -> hold -> fade) like every other
+    // queued kind does below — it freezes that flash as a static backdrop
+    // the INSTANT its own hold phase ends (before any fade begins), then
+    // takes over as the still-animating foreground flash drawn on top of it,
+    // so the proc's own celebration reads as "holds, freezes, and the bonus
+    // tier flash stacks over it" instead of "fully fades out, then a
+    // separate flash starts fresh"
+    const next = specialCelebrationQueue[0];
+    if (next?.kind === "bonusTier") {
+      const holdEndsAt = getFlashHoldEndsAt();
+      if (holdEndsAt !== null && Date.now() < holdEndsAt) {
+        setTimeout(step, 50);
+        return;
+      }
+      freezeCritFlashAsBackground();
+      specialCelebrationQueue.shift();
+      next.run();
+      setTimeout(step, 100);
+      return;
+    }
     if (isCritFlashActive(Date.now())) {
       setTimeout(step, 100);
       return;
     }
-    const next = specialCelebrationQueue.shift();
-    if (!next) {
+    const popped = specialCelebrationQueue.shift();
+    if (!popped) {
       drainingSpecialQueue = false;
       return;
     }
-    if (Date.now() - next.queuedAt > CELEBRATION_QUEUE_MAX_AGE_MS) {
+    if (Date.now() - popped.queuedAt > CELEBRATION_QUEUE_MAX_AGE_MS) {
       step();
       return;
     }
-    next.run();
+    popped.run();
     setTimeout(step, 100);
   };
   step();
@@ -559,6 +640,7 @@ export function triggerCritCelebration(
   goldStandard = false,
   royalFlush = false,
   nightShift = false,
+  bonusTier: CritTier | null = null,
 ): void {
   if (
     chain ||
@@ -1000,6 +1082,21 @@ export function triggerCritCelebration(
         kind: "nightShift",
         queuedAt: now,
         run: () => celebrateNightShift(floor, tier, getScreenCenterLocal),
+      });
+    }
+    // "special crit crit": queued AFTER every proc's own celebration above,
+    // so it plays right after theirs holds/fades — the queue's own
+    // one-at-a-time draining (drainSpecialCelebrationQueue) is what makes
+    // this read as "show the special crit, then stack a plain x5/x25/x125
+    // tier flash on top of it" instead of both flashing simultaneously
+    if (
+      bonusTier &&
+      !specialCelebrationQueue.some((q) => q.kind === "bonusTier")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "bonusTier",
+        queuedAt: now,
+        run: () => celebrateBonusTier(floor, bonusTier, getScreenCenterLocal),
       });
     }
     drainSpecialCelebrationQueue();

@@ -6,6 +6,7 @@ import bloopUrl from "../assets/sound/bloop.mp3";
 import explosionUrl from "../assets/sound/explosion.mp3";
 import winUrl from "../assets/sound/win.wav";
 import payoutUrl from "../assets/sound/payout.wav";
+import arcadeSlotWinUrl from "../assets/sound/arcadeSlotWin.wav";
 
 const MUSIC_VOLUME = 0.3; // 25% quieter than the original 0.4 per explicit request
 const SFX_VOLUME = 0.9;
@@ -16,6 +17,8 @@ const COIN_DROP_VOLUME = SFX_VOLUME * 1.5;
 // 25% quieter than the shared SFX_VOLUME per explicit request — the mega-crit
 // (25x) jackpot sfx
 const JACKPOT_VOLUME = SFX_VOLUME * 0.6;
+// 50% quieter than the shared SFX_VOLUME per explicit request
+const ARCADE_SLOT_WIN_VOLUME = SFX_VOLUME * 0.5;
 
 // a single click can hit several overlapping cats, or a cat and the mouse, in the
 // same synchronous call stack (see gameCanvas.ts's onPointerUp) — this window
@@ -46,6 +49,10 @@ let lastJackpotPlayTime = 0;
 // same idea again, for the even rarer ultra-crit payout sfx
 const PAYOUT_DEBOUNCE_MS = 800;
 let lastPayoutPlayTime = 0;
+
+// same idea again, for the "special crit crit" bonus-tier moment
+const ARCADE_SLOT_WIN_DEBOUNCE_MS = 800;
+let lastArcadeSlotWinPlayTime = 0;
 
 // any press-and-hold-driven purchase loop (corporationUpgradeMenu's building-
 // upgrade holds, etc.) can call this many times a second — without a debounce, each of
@@ -97,6 +104,7 @@ const sfxUrls = {
   bloop: bloopUrl,
   win: winUrl,
   payout: payoutUrl,
+  arcadeSlotWin: arcadeSlotWinUrl,
 } as const;
 type SfxName = keyof typeof sfxUrls;
 
@@ -261,4 +269,17 @@ export function playPayout(): void {
   if (now - lastPayoutPlayTime < PAYOUT_DEBOUNCE_MS) return;
   lastPayoutPlayTime = now;
   playSfx("payout", SFX_VOLUME, 0, 1, 1.926, 0.576);
+}
+
+// one-shot sound effect for the "special crit crit" bonus-tier moment (see
+// critCelebration.ts's celebrateBonusTier) — always this same sfx regardless
+// of which bonus tier (5x/25x/125x) actually landed, since this moment is its
+// own distinct "slot machine hit", not a graduated crit/jackpot/payout escalation.
+// Debounced (see ARCADE_SLOT_WIN_DEBOUNCE_MS) so back-to-back bonus tiers during
+// a fast held click can't stack overlapping plays
+export function playArcadeSlotWin(): void {
+  const now = Date.now();
+  if (now - lastArcadeSlotWinPlayTime < ARCADE_SLOT_WIN_DEBOUNCE_MS) return;
+  lastArcadeSlotWinPlayTime = now;
+  playSfx("arcadeSlotWin", ARCADE_SLOT_WIN_VOLUME);
 }
