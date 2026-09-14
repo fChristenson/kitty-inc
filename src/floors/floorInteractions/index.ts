@@ -4,6 +4,7 @@ import {
   getWorkerCenter,
   applyBoostAll,
   triggerJumpAll,
+  getRenderedWorkerCount,
 } from "../worker";
 import { formatPrice } from "../../utils";
 import {
@@ -41,6 +42,7 @@ import {
   isFreeSaleCrit,
   isPaydayCrit,
   isGoldStandardCrit,
+  isNightShiftCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
   HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
   POKER_HAND_CRIT_COUNTS,
@@ -297,6 +299,31 @@ function applySunshineCrit(floors: Floor[]): void {
 const SNOWDAY_BOOST_DURATION_MS = BOOST_DURATION_MS * 3;
 function applySnowdayCrit(floors: Floor[]): void {
   applyFloorBoost(floors, SNOWDAY_BOOST_DURATION_MS);
+}
+
+// "night shift crit" (see shared/critTypes' isNightShiftCrit): same
+// building-wide free-boost reward as boost/sunshine/snowday above, but its
+// own SHORTER duration — half the normal boost length. Also, for the same
+// shorter window, activates a "virtual" boosted worker slot one past each
+// unlocked floor's own last rendered worker index: countBoostedWorkers
+// (gameState.ts) counts every slot regardless of rendered-worker cap, so
+// this bumps incomePanel.ts's boost-speed exponent by 1/MAX_RENDERED_WORKERS
+// extra — the same effect a genuine +1 boosted worker would have — while
+// getRenderedWorkerCount-bounded drawing never renders it, since real
+// workers only ever occupy indices below that count
+const NIGHT_SHIFT_BOOST_DURATION_MS = Math.round(BOOST_DURATION_MS / 2);
+function applyNightShiftCrit(floors: Floor[]): void {
+  applyFloorBoost(floors, NIGHT_SHIFT_BOOST_DURATION_MS);
+  const now = Date.now();
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    activateBoosted(
+      floor,
+      getRenderedWorkerCount(floor),
+      now,
+      NIGHT_SHIFT_BOOST_DURATION_MS,
+    );
+  }
 }
 
 // minimal deps a chain crit needs to grow a building while walking upward —
@@ -740,6 +767,7 @@ export function handleFloorClick(
           buyTier.payday,
           buyTier.goldStandard,
           buyTier.royalFlush,
+          buyTier.nightShift,
         );
     }
     return;
@@ -964,6 +992,7 @@ export function handleFloorClick(
       const freeSale = isFreeSaleCrit(floor);
       const payday = isPaydayCrit(floor);
       const goldStandard = isGoldStandardCrit(floor);
+      const nightShift = isNightShiftCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -1093,6 +1122,10 @@ export function handleFloorClick(
       if (payday) applyPaydayCrit();
       // gold standard crit: same flat one-time effect, a steeper 4x
       if (goldStandard) applyGoldStandardCrit();
+      // night shift crit: same building-wide free-boost reward as boost/
+      // sunshine/snowday, just shorter and with a temporary +1-worker
+      // boost-strength bonus
+      if (nightShift) applyNightShiftCrit(floors);
       // Chair Giveaway/Supplies Giveaway crits: free one-time office chairs/
       // supplies purchase for the floor that actually crit
       if (chairGiveaway) applyChairGiveawayCrit(floor);
@@ -1141,6 +1174,7 @@ export function handleFloorClick(
         payday,
         goldStandard,
         royalFlush,
+        nightShift,
       );
       return;
     }

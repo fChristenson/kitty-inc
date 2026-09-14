@@ -47,6 +47,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-free-sale-crit" class="game__button">Spawn Free Sale Crit</button>
           <button id="spawn-payday-crit" class="game__button">Spawn Payday Crit</button>
           <button id="spawn-gold-standard-crit" class="game__button">Spawn Gold Standard Crit</button>
+          <button id="spawn-night-shift-crit" class="game__button">Spawn Night Shift Crit</button>
           <button id="floor-buy-crit" class="game__button">Floor Crit</button>
           <button id="floor-buy-boost-crit" class="game__button">Floor Boost Crit</button>
           <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
@@ -85,6 +86,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-free-sale-crit" class="game__button">Floor Free Sale Crit</button>
           <button id="floor-buy-payday-crit" class="game__button">Floor Payday Crit</button>
           <button id="floor-buy-gold-standard-crit" class="game__button">Floor Gold Standard Crit</button>
+          <button id="floor-buy-night-shift-crit" class="game__button">Floor Night Shift Crit</button>
           <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
           <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
           <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
@@ -491,6 +493,16 @@ export function wireSpawnGoldStandardCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnNightShiftCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-night-shift-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireFloorBuyCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -865,6 +877,16 @@ export function wireFloorBuyGoldStandardCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-gold-standard-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyNightShiftCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-night-shift-crit",
   )!;
   button.addEventListener("click", onClick);
 }

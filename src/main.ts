@@ -51,6 +51,7 @@ import {
   forceFreeSaleCritUpgrade,
   forcePaydayCritUpgrade,
   forceGoldStandardCritUpgrade,
+  forceNightShiftCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -123,6 +124,7 @@ import {
   wireSpawnFreeSaleCritButton,
   wireSpawnPaydayCritButton,
   wireSpawnGoldStandardCritButton,
+  wireSpawnNightShiftCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
@@ -161,6 +163,7 @@ import {
   wireFloorBuyFreeSaleCritButton,
   wireFloorBuyPaydayCritButton,
   wireFloorBuyGoldStandardCritButton,
+  wireFloorBuyNightShiftCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -613,6 +616,10 @@ async function main() {
     wireSpawnGoldStandardCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceGoldStandardCritUpgrade(floor);
+    });
+    wireSpawnNightShiftCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceNightShiftCritUpgrade(floor);
     });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyBoostCritButton(app, () =>
@@ -1142,6 +1149,41 @@ async function main() {
     wireFloorBuyGoldStandardCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyNightShiftCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
         false,
         false,
         false,

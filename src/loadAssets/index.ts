@@ -76,6 +76,7 @@ const IMAGE_FILES = {
   bull: "bull.png", // Bull Market crit flash's own backdrop icon
   payday: "payday.png", // Payday crit flash's own backdrop icon
   goldStandard: "goldStandard.png", // Gold Standard crit flash's own backdrop icon
+  sleepyMoon: "sleepyMoon.png", // Night Shift crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

@@ -385,6 +385,7 @@ export {
   forceBullMarketCritUpgrade,
   forcePaydayCritUpgrade,
   forceGoldStandardCritUpgrade,
+  forceNightShiftCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,
   pickHigherCritTier,

@@ -316,6 +316,18 @@ export const GOLD_STANDARD_CRIT_CHANCE = CONFIG.crit.goldStandardChance;
 export const GOLD_STANDARD_CRIT_COLOR = COLOR.goldStandardAmber;
 export const GOLD_STANDARD_CRIT_LABEL = "Gold Standard";
 
+// "night shift crit" — same building-wide free-worker-boost reward as
+// boost/sunshine/snowday above, but its own SHORTER duration, and while
+// active also temporarily counts as +1 worker for boost-strength purposes
+// (see floorInteractions.ts's applyNightShiftCrit, which activates a
+// "virtual" boosted worker slot one past each floor's own last rendered
+// worker index — countBoostedWorkers counts it toward incomePanel's own
+// boost-speed exponent, but rendering never draws it since it's past
+// getRenderedWorkerCount)
+export const NIGHT_SHIFT_CRIT_CHANCE = CONFIG.crit.nightShiftChance;
+export const NIGHT_SHIFT_CRIT_COLOR = COLOR.nightShiftIndigo;
+export const NIGHT_SHIFT_CRIT_LABEL = "Night Shift";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -348,6 +360,7 @@ const freeSaleCrits = new WeakSet<Floor>();
 const bullMarketCrits = new WeakSet<Floor>();
 const paydayCrits = new WeakSet<Floor>();
 const goldStandardCrits = new WeakSet<Floor>();
+const nightShiftCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
@@ -409,6 +422,7 @@ export interface CritRollResult {
   bullMarket: boolean;
   payday: boolean;
   goldStandard: boolean;
+  nightShift: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -449,6 +463,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "bullMarket",
   "payday",
   "goldStandard",
+  "nightShift",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -660,6 +675,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "goldStandard",
     description: "Quadruples your total income",
   },
+  nightShift: {
+    label: NIGHT_SHIFT_CRIT_LABEL,
+    icon: "sleepyMoon",
+    description: "Short worker boost, counts as +1 worker",
+  },
 };
 
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
@@ -723,6 +743,8 @@ export function rollCrit(
         if (Math.random() < PAYDAY_CRIT_CHANCE) landed.push("payday");
         if (Math.random() < GOLD_STANDARD_CRIT_CHANCE)
           landed.push("goldStandard");
+        if (Math.random() < NIGHT_SHIFT_CRIT_CHANCE)
+          landed.push("nightShift");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -760,6 +782,7 @@ export function rollCrit(
         bullMarket: kept.has("bullMarket"),
         payday: kept.has("payday"),
         goldStandard: kept.has("goldStandard"),
+        nightShift: kept.has("nightShift"),
       });
       return;
     }
@@ -888,6 +911,10 @@ export function isGoldStandardCrit(floor: Floor): boolean {
   return goldStandardCrits.has(floor);
 }
 
+export function isNightShiftCrit(floor: Floor): boolean {
+  return nightShiftCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -920,6 +947,7 @@ export function consumeCritProcs(floor: Floor): void {
   bullMarketCrits.delete(floor);
   paydayCrits.delete(floor);
   goldStandardCrits.delete(floor);
+  nightShiftCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -1043,6 +1071,10 @@ export function forcePaydayCritProc(floor: Floor): void {
 
 export function forceGoldStandardCritProc(floor: Floor): void {
   goldStandardCrits.add(floor);
+}
+
+export function forceNightShiftCritProc(floor: Floor): void {
+  nightShiftCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

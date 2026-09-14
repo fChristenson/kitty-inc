@@ -186,6 +186,12 @@ let royalFlushIcon: HTMLImageElement | null = null;
 loadImageByName("royalFlush").then((image) => {
   royalFlushIcon = image;
 });
+// same idea again, drawn behind the "Night Shift" flash text (see
+// shared/critTypes's isNightShiftCrit)
+let nightShiftIcon: HTMLImageElement | null = null;
+loadImageByName("sleepyMoon").then((image) => {
+  nightShiftIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -730,6 +736,13 @@ export function drawCritFlash(
       measuredWidth * 0.85,
     );
     ctx.drawImage(royalFlushIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Night Shift" && nightShiftIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      nightShiftIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(nightShiftIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

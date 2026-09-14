@@ -54,6 +54,8 @@ import {
   PAYDAY_CRIT_LABEL,
   GOLD_STANDARD_CRIT_COLOR,
   GOLD_STANDARD_CRIT_LABEL,
+  NIGHT_SHIFT_CRIT_COLOR,
+  NIGHT_SHIFT_CRIT_LABEL,
   ROYAL_FLUSH_CRIT_COLOR,
   ROYAL_FLUSH_CRIT_LABEL,
 } from "../upgradeButton";
@@ -309,6 +311,22 @@ function celebrateSnowday(
   spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
+// night shift crit (see upgradeButton.ts's isNightShiftCrit): same
+// celebration shape as boost/sunshine/snowday above (the reward itself — a
+// shorter free worker boost plus a temporary +1-worker boost-strength bonus
+// — is applied by floorInteractions.ts), its own dedicated midnight indigo
+function celebrateNightShift(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(NIGHT_SHIFT_CRIT_LABEL, NIGHT_SHIFT_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
 // bounce crit (see upgradeButton.ts's isBounceCrit): same swap as chain
 // above, keeping the landed tier's own color (climbing the building from the
 // bottom up is applied by floorInteractions.ts, this only covers the
@@ -457,7 +475,8 @@ interface QueuedCelebration {
     | "freeSale"
     | "payday"
     | "goldStandard"
-    | "royalFlush";
+    | "royalFlush"
+    | "nightShift";
   queuedAt: number;
   run: () => void;
 }
@@ -539,6 +558,7 @@ export function triggerCritCelebration(
   payday = false,
   goldStandard = false,
   royalFlush = false,
+  nightShift = false,
 ): void {
   if (
     chain ||
@@ -569,7 +589,8 @@ export function triggerCritCelebration(
     freeSale ||
     payday ||
     goldStandard ||
-    royalFlush
+    royalFlush ||
+    nightShift
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -969,6 +990,16 @@ export function triggerCritCelebration(
             tier,
             getScreenCenterLocal,
           ),
+      });
+    }
+    if (
+      nightShift &&
+      !specialCelebrationQueue.some((q) => q.kind === "nightShift")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "nightShift",
+        queuedAt: now,
+        run: () => celebrateNightShift(floor, tier, getScreenCenterLocal),
       });
     }
     drainSpecialCelebrationQueue();

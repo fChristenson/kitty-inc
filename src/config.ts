@@ -179,6 +179,11 @@ export const CONFIG = {
     // "gold standard crit" — same flat one-time effect as payday, just a
     // steeper multiplier
     goldStandardChance: 0.01,
+    // "night shift crit" — same building-wide free-worker-boost reward as
+    // boost/sunshine/snowday above, but SHORTER than plain boost's own
+    // duration, and temporarily counts as +1 worker for boost-strength
+    // purposes (see shared/critTypes' NIGHT_SHIFT_BOOST_DURATION_MS)
+    nightShiftChance: 0.1,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

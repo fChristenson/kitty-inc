@@ -88,6 +88,8 @@ export {
   PAYDAY_CRIT_LABEL,
   GOLD_STANDARD_CRIT_COLOR,
   GOLD_STANDARD_CRIT_LABEL,
+  NIGHT_SHIFT_CRIT_COLOR,
+  NIGHT_SHIFT_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -118,6 +120,7 @@ export {
   isBullMarketCrit,
   isPaydayCrit,
   isGoldStandardCrit,
+  isNightShiftCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -157,6 +160,7 @@ import {
   forceBullMarketCritProc,
   forcePaydayCritProc,
   forceGoldStandardCritProc,
+  forceNightShiftCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
 
@@ -205,6 +209,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.bullMarket) forceBullMarketCritProc(floor);
     if (result.payday) forcePaydayCritProc(floor);
     if (result.goldStandard) forceGoldStandardCritProc(floor);
+    if (result.nightShift) forceNightShiftCritProc(floor);
   }, allowSpecialProcs);
 }
 
@@ -269,6 +274,7 @@ export function forceFloorBuyCrit(
   payday = false,
   goldStandard = false,
   royalFlush = false,
+  nightShift = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -302,6 +308,7 @@ export function forceFloorBuyCrit(
     payday,
     goldStandard,
     royalFlush,
+    nightShift,
   };
 }
 
@@ -524,4 +531,12 @@ export function forcePaydayCritUpgrade(floor: Floor): void {
 export function forceGoldStandardCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceGoldStandardCritProc(floor);
+}
+
+// dev/test-only: force this floor into a night shift crit, bypassing chance
+// entirely (see hud/testButton's "Spawn Night Shift Crit") — not tier-scaled,
+// so no tier param needed
+export function forceNightShiftCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceNightShiftCritProc(floor);
 }

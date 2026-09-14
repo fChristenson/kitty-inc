@@ -108,6 +108,9 @@ export const COLOR = {
   // Gold Standard crit's own dedicated color — a deep vault-gold, distinct
   // from booty's/heavenly's/mega's own golds
   goldStandardAmber: "#B8860B",
+  // Night Shift crit's own dedicated color — a deep midnight indigo,
+  // distinct from fourOfAKindIndigo's own brighter shade
+  nightShiftIndigo: "#312E81",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",
