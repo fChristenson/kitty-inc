@@ -24,6 +24,7 @@ import {
   isThreeOfAKindCrit,
   isFourOfAKindCrit,
   isFullHouseCrit,
+  isRoyalFlushCrit,
   isTickTockCrit,
   isChairGiveawayCrit,
   isSuppliesGiveawayCrit,
@@ -101,6 +102,7 @@ import {
   unlockAllFloors,
   ensureLockedFloorAbove,
   getLockCenter,
+  MAX_FLOORS_PER_BUILDING,
 } from "../floorLock";
 import {
   activateBoosted,
@@ -649,6 +651,17 @@ export function handleFloorClick(
             POKER_HAND_CRIT_COUNTS.fullHouse,
           );
         }
+        // royal flush crit: unlike the other poker-hand crits' fixed count,
+        // this promotes EVERY floor from the one just bought/unlocked all
+        // the way up to the building's own cap (MAX_FLOORS_PER_BUILDING is
+        // always a big enough count to reach it) — auto-unlocking as it goes
+        if (buyTier.royalFlush) {
+          applyPokerHandCrit(
+            deps,
+            floors.indexOf(floor),
+            MAX_FLOORS_PER_BUILDING,
+          );
+        }
         // tick tock crit: instantly pays every unlocked floor twice at its
         // own current rate, without disturbing any floor's own bar progress
         if (buyTier.tickTock) applyTickTockCrit(floors);
@@ -726,6 +739,7 @@ export function handleFloorClick(
           buyTier.freeSale,
           buyTier.payday,
           buyTier.goldStandard,
+          buyTier.royalFlush,
         );
     }
     return;
@@ -933,6 +947,7 @@ export function handleFloorClick(
       const threeOfAKind = isThreeOfAKindCrit(floor);
       const fourOfAKind = isFourOfAKindCrit(floor);
       const fullHouse = isFullHouseCrit(floor);
+      const royalFlush = isRoyalFlushCrit(floor);
       const tickTock = isTickTockCrit(floor);
       const chairGiveaway = isChairGiveawayCrit(floor);
       const suppliesGiveaway = isSuppliesGiveawayCrit(floor);
@@ -1050,6 +1065,17 @@ export function handleFloorClick(
           POKER_HAND_CRIT_COUNTS.fullHouse,
         );
       }
+      // royal flush crit: unlike the other poker-hand crits' fixed count,
+      // this promotes EVERY floor from the one that actually crit all the
+      // way up to the building's own cap (MAX_FLOORS_PER_BUILDING is always
+      // a big enough count to reach it) — auto-unlocking as it goes
+      if (royalFlush) {
+        applyPokerHandCrit(
+          deps,
+          floors.indexOf(floor),
+          MAX_FLOORS_PER_BUILDING,
+        );
+      }
       // tick tock crit: instantly pays every unlocked floor twice at its own
       // current rate, without disturbing any floor's own bar progress
       if (tickTock) applyTickTockCrit(floors);
@@ -1114,6 +1140,7 @@ export function handleFloorClick(
         freeSale,
         payday,
         goldStandard,
+        royalFlush,
       );
       return;
     }

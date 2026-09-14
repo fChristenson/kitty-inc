@@ -152,6 +152,7 @@ export const POKER_HAND_CRIT_COUNTS = {
   threeOfAKind: 3,
   fourOfAKind: 4,
   fullHouse: 5,
+  royalFlush: 6,
 } as const;
 
 export const PAIR_CRIT_CHANCE = CONFIG.crit.pairChance;
@@ -169,6 +170,10 @@ export const FOUR_OF_A_KIND_CRIT_LABEL = "Four of a Kind";
 export const FULL_HOUSE_CRIT_CHANCE = CONFIG.crit.fullHouseChance;
 export const FULL_HOUSE_CRIT_COLOR = COLOR.fullHouseCrimson;
 export const FULL_HOUSE_CRIT_LABEL = "Full House";
+
+export const ROYAL_FLUSH_CRIT_CHANCE = CONFIG.crit.royalFlushChance;
+export const ROYAL_FLUSH_CRIT_COLOR = COLOR.royalFlushPurple;
+export const ROYAL_FLUSH_CRIT_LABEL = "Royal Flush";
 
 // "tick tock crit" — a flat, not-tier-scaled proc: instantly grants every
 // unlocked floor 2 extra payouts' worth of income at its own current rate,
@@ -325,6 +330,7 @@ const pairCrits = new WeakSet<Floor>();
 const threeOfAKindCrits = new WeakSet<Floor>();
 const fourOfAKindCrits = new WeakSet<Floor>();
 const fullHouseCrits = new WeakSet<Floor>();
+const royalFlushCrits = new WeakSet<Floor>();
 const tickTockCrits = new WeakSet<Floor>();
 const chairGiveawayCrits = new WeakSet<Floor>();
 const suppliesGiveawayCrits = new WeakSet<Floor>();
@@ -385,6 +391,7 @@ export interface CritRollResult {
   threeOfAKind: boolean;
   fourOfAKind: boolean;
   fullHouse: boolean;
+  royalFlush: boolean;
   tickTock: boolean;
   chairGiveaway: boolean;
   suppliesGiveaway: boolean;
@@ -424,6 +431,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "threeOfAKind",
   "fourOfAKind",
   "fullHouse",
+  "royalFlush",
   "tickTock",
   "chairGiveaway",
   "suppliesGiveaway",
@@ -562,6 +570,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "fullHouse",
     description: "Upgrades 5 floors' crit tier",
   },
+  royalFlush: {
+    label: ROYAL_FLUSH_CRIT_LABEL,
+    icon: "royalFlush",
+    description: "Upgrades 6 floors' crit tier",
+  },
   tickTock: {
     label: TICK_TOCK_CRIT_LABEL,
     icon: "clock",
@@ -687,6 +700,7 @@ export function rollCrit(
         if (Math.random() < FOUR_OF_A_KIND_CRIT_CHANCE)
           landed.push("fourOfAKind");
         if (Math.random() < FULL_HOUSE_CRIT_CHANCE) landed.push("fullHouse");
+        if (Math.random() < ROYAL_FLUSH_CRIT_CHANCE) landed.push("royalFlush");
         if (Math.random() < TICK_TOCK_CRIT_CHANCE) landed.push("tickTock");
         if (Math.random() < CHAIR_GIVEAWAY_CRIT_CHANCE)
           landed.push("chairGiveaway");
@@ -728,6 +742,7 @@ export function rollCrit(
         threeOfAKind: kept.has("threeOfAKind"),
         fourOfAKind: kept.has("fourOfAKind"),
         fullHouse: kept.has("fullHouse"),
+        royalFlush: kept.has("royalFlush"),
         tickTock: kept.has("tickTock"),
         chairGiveaway: kept.has("chairGiveaway"),
         suppliesGiveaway: kept.has("suppliesGiveaway"),
@@ -799,6 +814,10 @@ export function isFourOfAKindCrit(floor: Floor): boolean {
 
 export function isFullHouseCrit(floor: Floor): boolean {
   return fullHouseCrits.has(floor);
+}
+
+export function isRoyalFlushCrit(floor: Floor): boolean {
+  return royalFlushCrits.has(floor);
 }
 
 export function isTickTockCrit(floor: Floor): boolean {
@@ -883,6 +902,7 @@ export function consumeCritProcs(floor: Floor): void {
   threeOfAKindCrits.delete(floor);
   fourOfAKindCrits.delete(floor);
   fullHouseCrits.delete(floor);
+  royalFlushCrits.delete(floor);
   tickTockCrits.delete(floor);
   chairGiveawayCrits.delete(floor);
   suppliesGiveawayCrits.delete(floor);
@@ -951,6 +971,10 @@ export function forceFourOfAKindCritProc(floor: Floor): void {
 
 export function forceFullHouseCritProc(floor: Floor): void {
   fullHouseCrits.add(floor);
+}
+
+export function forceRoyalFlushCritProc(floor: Floor): void {
+  royalFlushCrits.add(floor);
 }
 
 export function forceTickTockCritProc(floor: Floor): void {

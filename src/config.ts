@@ -109,6 +109,10 @@ export const CONFIG = {
     threeOfAKindChance: 0.001,
     fourOfAKindChance: 0.005,
     fullHouseChance: 0.0005,
+    // "royal flush crit" — same shape again, the natural next step past full
+    // house's 5: promotes 6 floors. Rarer still, same "bigger guaranteed
+    // swing costs more" logic
+    royalFlushChance: 0.0002,
     // "tick tock crit" — a flat, not-tier-scaled proc: instantly credits every
     // unlocked floor 2 extra payouts' worth of income at its own current rate,
     // without touching its fill-cycle progress (see shared/income's

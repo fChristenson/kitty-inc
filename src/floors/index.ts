@@ -367,6 +367,7 @@ export {
   forceThreeOfAKindCritUpgrade,
   forceFourOfAKindCritUpgrade,
   forceFullHouseCritUpgrade,
+  forceRoyalFlushCritUpgrade,
   forceTickTockCritUpgrade,
   forceChairGiveawayCritUpgrade,
   forceSuppliesGiveawayCritUpgrade,

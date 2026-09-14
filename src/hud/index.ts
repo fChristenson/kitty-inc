@@ -82,6 +82,7 @@ export {
   wireSpawnThreeOfAKindCritButton,
   wireSpawnFourOfAKindCritButton,
   wireSpawnFullHouseCritButton,
+  wireSpawnRoyalFlushCritButton,
   wireSpawnTickTockCritButton,
   wireSpawnChairGiveawayCritButton,
   wireSpawnSuppliesGiveawayCritButton,
@@ -119,6 +120,7 @@ export {
   wireFloorBuyThreeOfAKindCritButton,
   wireFloorBuyFourOfAKindCritButton,
   wireFloorBuyFullHouseCritButton,
+  wireFloorBuyRoyalFlushCritButton,
   wireFloorBuyTickTockCritButton,
   wireFloorBuyChairGiveawayCritButton,
   wireFloorBuySuppliesGiveawayCritButton,
@@ -147,6 +149,7 @@ export {
   wireMapUnlockThreeOfAKindCritButton,
   wireMapUnlockFourOfAKindCritButton,
   wireMapUnlockFullHouseCritButton,
+  wireMapUnlockRoyalFlushCritButton,
   wireIdleOverlayTestButton,
   wireResetButton,
 } from "./testButton";

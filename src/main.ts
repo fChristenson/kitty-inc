@@ -34,6 +34,7 @@ import {
   forceThreeOfAKindCritUpgrade,
   forceFourOfAKindCritUpgrade,
   forceFullHouseCritUpgrade,
+  forceRoyalFlushCritUpgrade,
   forceTickTockCritUpgrade,
   forceChairGiveawayCritUpgrade,
   forceSuppliesGiveawayCritUpgrade,
@@ -105,6 +106,7 @@ import {
   wireSpawnThreeOfAKindCritButton,
   wireSpawnFourOfAKindCritButton,
   wireSpawnFullHouseCritButton,
+  wireSpawnRoyalFlushCritButton,
   wireSpawnTickTockCritButton,
   wireSpawnChairGiveawayCritButton,
   wireSpawnSuppliesGiveawayCritButton,
@@ -142,6 +144,7 @@ import {
   wireFloorBuyThreeOfAKindCritButton,
   wireFloorBuyFourOfAKindCritButton,
   wireFloorBuyFullHouseCritButton,
+  wireFloorBuyRoyalFlushCritButton,
   wireFloorBuyTickTockCritButton,
   wireFloorBuyChairGiveawayCritButton,
   wireFloorBuySuppliesGiveawayCritButton,
@@ -170,6 +173,7 @@ import {
   wireMapUnlockThreeOfAKindCritButton,
   wireMapUnlockFourOfAKindCritButton,
   wireMapUnlockFullHouseCritButton,
+  wireMapUnlockRoyalFlushCritButton,
   wireIdleOverlayTestButton,
   wireResetButton,
   createActionBarMarkup,
@@ -542,6 +546,10 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceFullHouseCritUpgrade(floor);
     });
+    wireSpawnRoyalFlushCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceRoyalFlushCritUpgrade(floor);
+    });
     wireSpawnTickTockCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceTickTockCritUpgrade(floor);
@@ -705,6 +713,41 @@ async function main() {
     wireFloorBuyFullHouseCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyRoyalFlushCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
         false,
         false,
         false,
@@ -1218,6 +1261,41 @@ async function main() {
         true,
       ),
     );
+    wireMapUnlockRoyalFlushCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
     // shows the idle-income "You have earned" overlay (see
     // hud/totalEarnedOverlay) on demand, without needing to actually leave and
     // reopen the tab to earn real idle income first
@@ -1432,12 +1510,17 @@ async function main() {
     // already for counts as the first of them, so only count-1 MORE get
     // created here), each set to the same landed tier. Applied independently
     // per landed kind (MAX_SPECIAL_CRIT_PROCS allows up to 2 to land
-    // together), same as every other proc's reward
+    // together), same as every other proc's reward. Royal Flush is the ONE
+    // exception at floor scope (unlocks/upgrades every floor above it
+    // instead of a fixed 6 — see floorInteractions.ts's applyPokerHandCrit
+    // call), but at this map/building scope it still just unlocks 6
+    // buildings, same as every other poker-hand crit here
     for (const count of [
       result.pair && POKER_HAND_CRIT_COUNTS.pair,
       result.threeOfAKind && POKER_HAND_CRIT_COUNTS.threeOfAKind,
       result.fourOfAKind && POKER_HAND_CRIT_COUNTS.fourOfAKind,
       result.fullHouse && POKER_HAND_CRIT_COUNTS.fullHouse,
+      result.royalFlush && POKER_HAND_CRIT_COUNTS.royalFlush,
     ]) {
       if (!count) continue;
       for (let i = 1; i < count; i++) {

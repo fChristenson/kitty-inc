@@ -54,6 +54,8 @@ import {
   PAYDAY_CRIT_LABEL,
   GOLD_STANDARD_CRIT_COLOR,
   GOLD_STANDARD_CRIT_LABEL,
+  ROYAL_FLUSH_CRIT_COLOR,
+  ROYAL_FLUSH_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -454,7 +456,8 @@ interface QueuedCelebration {
     | "snowball"
     | "freeSale"
     | "payday"
-    | "goldStandard";
+    | "goldStandard"
+    | "royalFlush";
   queuedAt: number;
   run: () => void;
 }
@@ -535,6 +538,7 @@ export function triggerCritCelebration(
   freeSale = false,
   payday = false,
   goldStandard = false,
+  royalFlush = false,
 ): void {
   if (
     chain ||
@@ -564,7 +568,8 @@ export function triggerCritCelebration(
     snowball ||
     freeSale ||
     payday ||
-    goldStandard
+    goldStandard ||
+    royalFlush
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -943,6 +948,23 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             GOLD_STANDARD_CRIT_LABEL,
             GOLD_STANDARD_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      royalFlush &&
+      !specialCelebrationQueue.some((q) => q.kind === "royalFlush")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "royalFlush",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            ROYAL_FLUSH_CRIT_LABEL,
+            ROYAL_FLUSH_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

@@ -30,6 +30,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-three-of-a-kind-crit" class="game__button">Spawn Three of a Kind Crit</button>
           <button id="spawn-four-of-a-kind-crit" class="game__button">Spawn Four of a Kind Crit</button>
           <button id="spawn-full-house-crit" class="game__button">Spawn Full House Crit</button>
+          <button id="spawn-royal-flush-crit" class="game__button">Spawn Royal Flush Crit</button>
           <button id="spawn-tick-tock-crit" class="game__button">Spawn Tick Tock Crit</button>
           <button id="spawn-chair-giveaway-crit" class="game__button">Spawn Chair Giveaway Crit</button>
           <button id="spawn-supplies-giveaway-crit" class="game__button">Spawn Supplies Giveaway Crit</button>
@@ -67,6 +68,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-three-of-a-kind-crit" class="game__button">Floor Three of a Kind Crit</button>
           <button id="floor-buy-four-of-a-kind-crit" class="game__button">Floor Four of a Kind Crit</button>
           <button id="floor-buy-full-house-crit" class="game__button">Floor Full House Crit</button>
+          <button id="floor-buy-royal-flush-crit" class="game__button">Floor Royal Flush Crit</button>
           <button id="floor-buy-tick-tock-crit" class="game__button">Floor Tick Tock Crit</button>
           <button id="floor-buy-chair-giveaway-crit" class="game__button">Floor Chair Giveaway Crit</button>
           <button id="floor-buy-supplies-giveaway-crit" class="game__button">Floor Supplies Giveaway Crit</button>
@@ -95,6 +97,7 @@ export function createTestButtonMarkup(): string {
           <button id="map-unlock-three-of-a-kind-crit" class="game__button">Map Unlock Three of a Kind Crit</button>
           <button id="map-unlock-four-of-a-kind-crit" class="game__button">Map Unlock Four of a Kind Crit</button>
           <button id="map-unlock-full-house-crit" class="game__button">Map Unlock Full House Crit</button>
+          <button id="map-unlock-royal-flush-crit" class="game__button">Map Unlock Royal Flush Crit</button>
           <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
         </div>
       </details>
@@ -316,6 +319,16 @@ export function wireSpawnFullHouseCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-full-house-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnRoyalFlushCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-royal-flush-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -686,6 +699,16 @@ export function wireFloorBuyFullHouseCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireFloorBuyRoyalFlushCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-royal-flush-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireFloorBuyTickTockCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -965,6 +988,16 @@ export function wireMapUnlockFullHouseCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#map-unlock-full-house-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockRoyalFlushCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-royal-flush-crit",
   )!;
   button.addEventListener("click", onClick);
 }

@@ -50,6 +50,8 @@ export {
   FOUR_OF_A_KIND_CRIT_LABEL,
   FULL_HOUSE_CRIT_COLOR,
   FULL_HOUSE_CRIT_LABEL,
+  ROYAL_FLUSH_CRIT_COLOR,
+  ROYAL_FLUSH_CRIT_LABEL,
   TICK_TOCK_CRIT_COLOR,
   TICK_TOCK_CRIT_LABEL,
   CHAIR_GIVEAWAY_CRIT_COLOR,
@@ -98,6 +100,7 @@ export {
   isThreeOfAKindCrit,
   isFourOfAKindCrit,
   isFullHouseCrit,
+  isRoyalFlushCrit,
   isTickTockCrit,
   isChairGiveawayCrit,
   isSuppliesGiveawayCrit,
@@ -136,6 +139,7 @@ import {
   forceThreeOfAKindCritProc,
   forceFourOfAKindCritProc,
   forceFullHouseCritProc,
+  forceRoyalFlushCritProc,
   forceTickTockCritProc,
   forceChairGiveawayCritProc,
   forceSuppliesGiveawayCritProc,
@@ -183,6 +187,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.threeOfAKind) forceThreeOfAKindCritProc(floor);
     if (result.fourOfAKind) forceFourOfAKindCritProc(floor);
     if (result.fullHouse) forceFullHouseCritProc(floor);
+    if (result.royalFlush) forceRoyalFlushCritProc(floor);
     if (result.tickTock) forceTickTockCritProc(floor);
     if (result.chairGiveaway) forceChairGiveawayCritProc(floor);
     if (result.suppliesGiveaway) forceSuppliesGiveawayCritProc(floor);
@@ -263,6 +268,7 @@ export function forceFloorBuyCrit(
   bullMarket = false,
   payday = false,
   goldStandard = false,
+  royalFlush = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -295,6 +301,7 @@ export function forceFloorBuyCrit(
     bullMarket,
     payday,
     goldStandard,
+    royalFlush,
   };
 }
 
@@ -427,6 +434,11 @@ export function forceFourOfAKindCritUpgrade(floor: Floor): void {
 export function forceFullHouseCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceFullHouseCritProc(floor);
+}
+
+export function forceRoyalFlushCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceRoyalFlushCritProc(floor);
 }
 
 export function forceTickTockCritUpgrade(floor: Floor): void {

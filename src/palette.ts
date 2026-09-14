@@ -73,6 +73,9 @@ export const COLOR = {
   fourOfAKindIndigo: "#6366F1",
   // Full House crit's own dedicated color
   fullHouseCrimson: "#E11D48",
+  // Royal Flush crit's own dedicated color — a regal purple, distinct from
+  // the crit-tier purple and every other poker-hand color above
+  royalFlushPurple: "#9333EA",
   // Chair Giveaway crit's own dedicated color
   chairGiveawayBrown: "#92400E",
   // Supplies Giveaway crit's own dedicated color
