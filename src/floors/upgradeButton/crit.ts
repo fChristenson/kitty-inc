@@ -90,6 +90,10 @@ export {
   GOLD_STANDARD_CRIT_LABEL,
   NIGHT_SHIFT_CRIT_COLOR,
   NIGHT_SHIFT_CRIT_LABEL,
+  INTERN_CRIT_COLOR,
+  INTERN_CRIT_LABEL,
+  UNION_BOSS_CRIT_COLOR,
+  UNION_BOSS_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -121,6 +125,8 @@ export {
   isPaydayCrit,
   isGoldStandardCrit,
   isNightShiftCrit,
+  isInternCrit,
+  isUnionBossCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -163,6 +169,8 @@ import {
   forcePaydayCritProc,
   forceGoldStandardCritProc,
   forceNightShiftCritProc,
+  forceInternCritProc,
+  forceUnionBossCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -213,6 +221,8 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.payday) forcePaydayCritProc(floor);
     if (result.goldStandard) forceGoldStandardCritProc(floor);
     if (result.nightShift) forceNightShiftCritProc(floor);
+    if (result.intern) forceInternCritProc(floor);
+    if (result.unionBoss) forceUnionBossCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -280,6 +290,8 @@ export function forceFloorBuyCrit(
   royalFlush = false,
   nightShift = false,
   bonusTier: CritTier | null = null,
+  intern = false,
+  unionBoss = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -315,6 +327,8 @@ export function forceFloorBuyCrit(
     goldStandard,
     royalFlush,
     nightShift,
+    intern,
+    unionBoss,
   };
 }
 
@@ -545,6 +559,20 @@ export function forceGoldStandardCritUpgrade(floor: Floor): void {
 export function forceNightShiftCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceNightShiftCritProc(floor);
+}
+
+// dev/test-only: force this floor into an intern/union boss crit, bypassing
+// chance entirely (see hud/testButton's "Spawn Intern Crit"/"Spawn Union
+// Boss Crit") — not tier-scaled, so no tier param needed (same shape as
+// chair giveaway/supplies giveaway above)
+export function forceInternCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceInternCritProc(floor);
+}
+
+export function forceUnionBossCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceUnionBossCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

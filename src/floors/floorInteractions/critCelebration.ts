@@ -58,6 +58,10 @@ import {
   NIGHT_SHIFT_CRIT_LABEL,
   ROYAL_FLUSH_CRIT_COLOR,
   ROYAL_FLUSH_CRIT_LABEL,
+  INTERN_CRIT_COLOR,
+  INTERN_CRIT_LABEL,
+  UNION_BOSS_CRIT_COLOR,
+  UNION_BOSS_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -536,6 +540,8 @@ interface QueuedCelebration {
     | "goldStandard"
     | "royalFlush"
     | "nightShift"
+    | "intern"
+    | "unionBoss"
     | "bonusTier";
   queuedAt: number;
   run: () => void;
@@ -641,6 +647,8 @@ export function triggerCritCelebration(
   royalFlush = false,
   nightShift = false,
   bonusTier: CritTier | null = null,
+  intern = false,
+  unionBoss = false,
 ): void {
   if (
     chain ||
@@ -672,7 +680,9 @@ export function triggerCritCelebration(
     payday ||
     goldStandard ||
     royalFlush ||
-    nightShift
+    nightShift ||
+    intern ||
+    unionBoss
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -853,6 +863,37 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             SUPPLIES_GIVEAWAY_CRIT_LABEL,
             SUPPLIES_GIVEAWAY_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (intern && !specialCelebrationQueue.some((q) => q.kind === "intern")) {
+      specialCelebrationQueue.push({
+        kind: "intern",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            INTERN_CRIT_LABEL,
+            INTERN_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      unionBoss &&
+      !specialCelebrationQueue.some((q) => q.kind === "unionBoss")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "unionBoss",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            UNION_BOSS_CRIT_LABEL,
+            UNION_BOSS_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

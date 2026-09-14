@@ -184,6 +184,11 @@ export const CONFIG = {
     // duration, and temporarily counts as +1 worker for boost-strength
     // purposes (see shared/critTypes' NIGHT_SHIFT_BOOST_DURATION_MS)
     nightShiftChance: 0.1,
+    // "Intern"/"Union Boss" crits — flat, not-tier-scaled procs: grant the
+    // floor being upgraded one free worker/manager (see hud/upgradeMenu's
+    // buyWorker/buyManager), free of charge
+    internChance: 0.1,
+    unionBossChance: 0.1,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

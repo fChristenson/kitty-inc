@@ -328,6 +328,22 @@ export const NIGHT_SHIFT_CRIT_CHANCE = CONFIG.crit.nightShiftChance;
 export const NIGHT_SHIFT_CRIT_COLOR = COLOR.nightShiftIndigo;
 export const NIGHT_SHIFT_CRIT_LABEL = "Night Shift";
 
+// "Intern"/"Union Boss" crits — two more flat, not-tier-scaled procs: grant
+// the floor being upgraded one free worker/manager (see hud/upgradeMenu's
+// buyWorker/buyManager), for free — same shape as Chair Giveaway/Supplies
+// Giveaway above, just a counted resource (workerCount) instead of a
+// one-time flag for Intern. Their own backdrop icons reuse the SAME
+// camera-facing worker/manager crop hud/upgradeMenu's own "hire worker"/
+// "hire manager" icons use (see scripts/process-intern.mjs/process-union-
+// boss.mjs, which crop that same frame at build time instead of runtime)
+export const INTERN_CRIT_CHANCE = CONFIG.crit.internChance;
+export const INTERN_CRIT_COLOR = COLOR.internSkyBlue;
+export const INTERN_CRIT_LABEL = "Intern";
+
+export const UNION_BOSS_CRIT_CHANCE = CONFIG.crit.unionBossChance;
+export const UNION_BOSS_CRIT_COLOR = COLOR.unionBossSlate;
+export const UNION_BOSS_CRIT_LABEL = "Union Boss";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -361,6 +377,8 @@ const bullMarketCrits = new WeakSet<Floor>();
 const paydayCrits = new WeakSet<Floor>();
 const goldStandardCrits = new WeakSet<Floor>();
 const nightShiftCrits = new WeakSet<Floor>();
+const internCrits = new WeakSet<Floor>();
+const unionBossCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -432,6 +450,8 @@ export interface CritRollResult {
   payday: boolean;
   goldStandard: boolean;
   nightShift: boolean;
+  intern: boolean;
+  unionBoss: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -474,6 +494,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "payday",
   "goldStandard",
   "nightShift",
+  "intern",
+  "unionBoss",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -690,6 +712,16 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "sleepyMoon",
     description: "Short worker boost, counts as +1 worker",
   },
+  intern: {
+    label: INTERN_CRIT_LABEL,
+    icon: "intern",
+    description: "Grants the floor a free worker",
+  },
+  unionBoss: {
+    label: UNION_BOSS_CRIT_LABEL,
+    icon: "unionBoss",
+    description: "Grants the floor a free manager",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -763,6 +795,8 @@ export function rollCrit(
     if (Math.random() < PAYDAY_CRIT_CHANCE) landed.push("payday");
     if (Math.random() < GOLD_STANDARD_CRIT_CHANCE) landed.push("goldStandard");
     if (Math.random() < NIGHT_SHIFT_CRIT_CHANCE) landed.push("nightShift");
+    if (Math.random() < INTERN_CRIT_CHANCE) landed.push("intern");
+    if (Math.random() < UNION_BOSS_CRIT_CHANCE) landed.push("unionBoss");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -811,6 +845,8 @@ export function rollCrit(
     payday: kept.has("payday"),
     goldStandard: kept.has("goldStandard"),
     nightShift: kept.has("nightShift"),
+    intern: kept.has("intern"),
+    unionBoss: kept.has("unionBoss"),
   });
 }
 
@@ -940,6 +976,14 @@ export function isNightShiftCrit(floor: Floor): boolean {
   return nightShiftCrits.has(floor);
 }
 
+export function isInternCrit(floor: Floor): boolean {
+  return internCrits.has(floor);
+}
+
+export function isUnionBossCrit(floor: Floor): boolean {
+  return unionBossCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -987,6 +1031,8 @@ export function consumeCritProcs(floor: Floor): void {
   paydayCrits.delete(floor);
   goldStandardCrits.delete(floor);
   nightShiftCrits.delete(floor);
+  internCrits.delete(floor);
+  unionBossCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1115,6 +1161,14 @@ export function forceGoldStandardCritProc(floor: Floor): void {
 
 export function forceNightShiftCritProc(floor: Floor): void {
   nightShiftCrits.add(floor);
+}
+
+export function forceInternCritProc(floor: Floor): void {
+  internCrits.add(floor);
+}
+
+export function forceUnionBossCritProc(floor: Floor): void {
+  unionBossCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

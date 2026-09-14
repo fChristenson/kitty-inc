@@ -192,6 +192,20 @@ let nightShiftIcon: HTMLImageElement | null = null;
 loadImageByName("sleepyMoon").then((image) => {
   nightShiftIcon = image;
 });
+// same idea again, drawn behind the "Intern"/"Union Boss" flash text (see
+// shared/critTypes's isInternCrit/isUnionBossCrit) — reuses the worker/manager
+// walk-cycle sprite's own camera-facing frame, cropped ahead of time at build
+// time (see scripts/process-intern.mjs/process-union-boss.mjs) rather than
+// hud/upgradeMenu's own runtime crop, so this stays a plain static asset like
+// every other crit icon
+let internIcon: HTMLImageElement | null = null;
+loadImageByName("intern").then((image) => {
+  internIcon = image;
+});
+let unionBossIcon: HTMLImageElement | null = null;
+loadImageByName("unionBoss").then((image) => {
+  unionBossIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -832,6 +846,17 @@ function drawFlashLayer(
       measuredWidth * 0.85,
     );
     ctx.drawImage(nightShiftIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (label === "Intern" && internIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(internIcon, measuredWidth * 0.85);
+    ctx.drawImage(internIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (label === "Union Boss" && unionBossIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      unionBossIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(unionBossIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

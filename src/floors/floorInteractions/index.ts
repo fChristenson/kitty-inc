@@ -5,6 +5,7 @@ import {
   applyBoostAll,
   triggerJumpAll,
   getRenderedWorkerCount,
+  MAX_RENDERED_WORKERS,
 } from "../worker";
 import { formatPrice } from "../../utils";
 import {
@@ -43,6 +44,8 @@ import {
   isPaydayCrit,
   isGoldStandardCrit,
   isNightShiftCrit,
+  isInternCrit,
+  isUnionBossCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -513,6 +516,19 @@ function applySuppliesGiveawayCrit(floor: Floor): void {
   floor.hasOfficeSupplies = true;
 }
 
+// "Intern"/"Union Boss" crits (see shared/critTypes's isInternCrit/
+// isUnionBossCrit): grant the floor being upgraded one free worker/manager
+// (same fields hud/upgradeMenu's own paid buyWorker/buyManager set), for
+// free — Intern is capped at MAX_RENDERED_WORKERS (same cap buyWorker
+// itself enforces), Union Boss is a no-op if the floor already has a manager
+function applyInternCrit(floor: Floor): void {
+  if (floor.workerCount < MAX_RENDERED_WORKERS) floor.workerCount += 1;
+}
+
+function applyUnionBossCrit(floor: Floor): void {
+  floor.hasManager = true;
+}
+
 // "winter sale"/"spring sale"/"summer sale"/"autumn sale"/"halloween sale"
 // crits (see shared/critTypes's isWinterSaleCrit etc.) — all five share this
 // exact reward shape, only their icon/label/color AND discount size differ
@@ -720,6 +736,10 @@ export function handleFloorClick(
         // supplies purchase for the floor just bought/unlocked
         if (buyTier.chairGiveaway) applyChairGiveawayCrit(floor);
         if (buyTier.suppliesGiveaway) applySuppliesGiveawayCrit(floor);
+        // Intern/Union Boss crits: free one-time worker/manager for the
+        // floor just bought/unlocked
+        if (buyTier.intern) applyInternCrit(floor);
+        if (buyTier.unionBoss) applyUnionBossCrit(floor);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -801,6 +821,8 @@ export function handleFloorClick(
           buyTier.royalFlush,
           buyTier.nightShift,
           buyTier.bonusTier,
+          buyTier.intern,
+          buyTier.unionBoss,
         );
     }
     return;
@@ -1026,6 +1048,8 @@ export function handleFloorClick(
       const payday = isPaydayCrit(floor);
       const goldStandard = isGoldStandardCrit(floor);
       const nightShift = isNightShiftCrit(floor);
+      const intern = isInternCrit(floor);
+      const unionBoss = isUnionBossCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1167,6 +1191,10 @@ export function handleFloorClick(
       // supplies purchase for the floor that actually crit
       if (chairGiveaway) applyChairGiveawayCrit(floor);
       if (suppliesGiveaway) applySuppliesGiveawayCrit(floor);
+      // Intern/Union Boss crits: free one-time worker/manager for the floor
+      // that actually crit
+      if (intern) applyInternCrit(floor);
+      if (unionBoss) applyUnionBossCrit(floor);
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
@@ -1213,6 +1241,8 @@ export function handleFloorClick(
         royalFlush,
         nightShift,
         bonusTier,
+        intern,
+        unionBoss,
       );
       return;
     }

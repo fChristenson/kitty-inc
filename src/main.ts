@@ -52,6 +52,8 @@ import {
   forcePaydayCritUpgrade,
   forceGoldStandardCritUpgrade,
   forceNightShiftCritUpgrade,
+  forceInternCritUpgrade,
+  forceUnionBossCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
@@ -128,6 +130,8 @@ import {
   wireSpawnPaydayCritButton,
   wireSpawnGoldStandardCritButton,
   wireSpawnNightShiftCritButton,
+  wireSpawnInternCritButton,
+  wireSpawnUnionBossCritButton,
   wireForceBonusTierCritButton,
   wireForceBonusTierMegaCritButton,
   wireForceBonusTierUltraCritButton,
@@ -170,6 +174,8 @@ import {
   wireFloorBuyPaydayCritButton,
   wireFloorBuyGoldStandardCritButton,
   wireFloorBuyNightShiftCritButton,
+  wireFloorBuyInternCritButton,
+  wireFloorBuyUnionBossCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -635,6 +641,14 @@ async function main() {
     wireSpawnNightShiftCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceNightShiftCritUpgrade(floor);
+    });
+    wireSpawnInternCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceInternCritUpgrade(floor);
+    });
+    wireSpawnUnionBossCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceUnionBossCritUpgrade(floor);
     });
     wireForceBonusTierCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1238,6 +1252,83 @@ async function main() {
         false,
         false,
         false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyInternCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
+        true,
+      ),
+    );
+    wireFloorBuyUnionBossCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
         false,
         true,
       ),

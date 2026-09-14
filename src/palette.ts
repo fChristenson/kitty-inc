@@ -111,6 +111,10 @@ export const COLOR = {
   // Night Shift crit's own dedicated color — a deep midnight indigo,
   // distinct from fourOfAKindIndigo's own brighter shade
   nightShiftIndigo: "#312E81",
+  // Intern crit's own dedicated color — a fresh, junior-level sky blue
+  internSkyBlue: "#0EA5E9",
+  // Union Boss crit's own dedicated color — a stern, authoritative slate
+  unionBossSlate: "#475569",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",
