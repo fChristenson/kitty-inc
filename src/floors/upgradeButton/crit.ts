@@ -78,6 +78,8 @@ export {
   FROZEN_CRIT_LABEL,
   SNOWBALL_CRIT_COLOR,
   SNOWBALL_CRIT_LABEL,
+  FREE_SALE_CRIT_COLOR,
+  FREE_SALE_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -103,6 +105,7 @@ export {
   isFastForwardCrit,
   isFrozenCrit,
   isSnowballCrit,
+  isFreeSaleCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -137,6 +140,7 @@ import {
   forceFastForwardCritProc,
   forceFrozenCritProc,
   forceSnowballCritProc,
+  forceFreeSaleCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
 
@@ -147,8 +151,12 @@ const critTiers = new WeakMap<Floor, CritTier>();
 // shared/critTypes's rollCrit, only reacting to the result: arms this
 // floor's tier, then marks it with whichever piggyback procs landed (reusing
 // the same forceXCritProc setters the dev-test "force" helpers below use —
-// landing "for real" and being forced are the same underlying WeakSet add)
-export function rollCritUpgrade(floor: Floor): void {
+// landing "for real" and being forced are the same underlying WeakSet add).
+// `allowSpecialProcs = false` (see floorInteractions.ts's Sale/Overtime/
+// Frozen/Snowball click branches, re-arming the next crit while one of
+// those is already active) forwards straight through to rollCrit — still
+// arms a plain tier crit normally, just never a piggyback proc alongside it
+export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
   rollCrit((result) => {
     critTiers.set(floor, result.tier);
     if (result.chain) forceChainCritProc(floor);
@@ -176,7 +184,8 @@ export function rollCritUpgrade(floor: Floor): void {
     if (result.fastForward) forceFastForwardCritProc(floor);
     if (result.frozen) forceFrozenCritProc(floor);
     if (result.snowball) forceSnowballCritProc(floor);
-  });
+    if (result.freeSale) forceFreeSaleCritProc(floor);
+  }, allowSpecialProcs);
 }
 
 // same shared rollCrit as rollCritUpgrade, but a one-shot roll (not tied to
@@ -235,6 +244,7 @@ export function forceFloorBuyCrit(
   fastForward = false,
   frozen = false,
   snowball = false,
+  freeSale = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -263,6 +273,7 @@ export function forceFloorBuyCrit(
     fastForward,
     frozen,
     snowball,
+    freeSale,
   };
 }
 
@@ -460,4 +471,9 @@ export function forceFrozenCritUpgrade(floor: Floor): void {
 export function forceSnowballCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceSnowballCritProc(floor);
+}
+
+export function forceFreeSaleCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFreeSaleCritProc(floor);
 }

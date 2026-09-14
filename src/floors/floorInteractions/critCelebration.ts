@@ -48,6 +48,8 @@ import {
   FROZEN_CRIT_LABEL,
   SNOWBALL_CRIT_COLOR,
   SNOWBALL_CRIT_LABEL,
+  FREE_SALE_CRIT_COLOR,
+  FREE_SALE_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -445,7 +447,8 @@ interface QueuedCelebration {
     | "snowday"
     | "fastForward"
     | "frozen"
-    | "snowball";
+    | "snowball"
+    | "freeSale";
   queuedAt: number;
   run: () => void;
 }
@@ -523,6 +526,7 @@ export function triggerCritCelebration(
   fastForward = false,
   frozen = false,
   snowball = false,
+  freeSale = false,
 ): void {
   if (
     chain ||
@@ -549,7 +553,8 @@ export function triggerCritCelebration(
     snowday ||
     fastForward ||
     frozen ||
-    snowball
+    snowball ||
+    freeSale
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -880,6 +885,23 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             SNOWBALL_CRIT_LABEL,
             SNOWBALL_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      freeSale &&
+      !specialCelebrationQueue.some((q) => q.kind === "freeSale")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "freeSale",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            FREE_SALE_CRIT_LABEL,
+            FREE_SALE_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

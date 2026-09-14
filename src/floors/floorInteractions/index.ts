@@ -37,6 +37,7 @@ import {
   isFastForwardCrit,
   isFrozenCrit,
   isSnowballCrit,
+  isFreeSaleCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
   HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
   POKER_HAND_CRIT_COUNTS,
@@ -46,6 +47,7 @@ import {
   pickHigherCritTier,
   nextCritTier,
   isSaleActive,
+  triggerSaleBoost,
   isOvertimeActive,
   triggerFrozenCrit,
   isFrozenActive,
@@ -431,6 +433,14 @@ function applySnowballCrit(floor: Floor): void {
   triggerSnowballCrit(floor);
 }
 
+// "free sale crit" (see shared/critTypes's isFreeSaleCrit): no reward of its
+// own — just calls the SAME triggerSaleBoost hud/boostMenu.ts's paid
+// purchase already uses, starting an ordinary "Sale" event on this ONE
+// floor for free (own window/button state/payout math all reused as-is)
+function applyFreeSaleCrit(floor: Floor): void {
+  triggerSaleBoost(floor);
+}
+
 // "Chair Giveaway"/"Supplies Giveaway" crits (see shared/critTypes's isChairGiveawayCrit/
 // isSuppliesGiveawayCrit): grant the floor being upgraded its one-time office
 // chairs/supplies purchase for free (same flags hud/upgradeMenu's own paid
@@ -656,6 +666,8 @@ export function handleFloorClick(
         if (buyTier.frozen) applyFrozenCrit(floor);
         // snowball crit: starts just this floor's own snowball click event
         if (buyTier.snowball) applySnowballCrit(floor);
+        // free sale crit: starts just this floor's own free Sale event
+        if (buyTier.freeSale) applyFreeSaleCrit(floor);
       }
       persist();
       const center = getLockCenter();
@@ -690,6 +702,7 @@ export function handleFloorClick(
           buyTier.fastForward,
           buyTier.frozen,
           buyTier.snowball,
+          buyTier.freeSale,
         );
     }
     return;
@@ -715,7 +728,10 @@ export function handleFloorClick(
         tier ? CRIT_TIER_CONFIG[tier].multiplier : 1,
       );
       addTotalIncome(gained);
-      rollCritUpgrade(floor);
+      // re-arm the next crit for AFTER this sale ends without letting it also
+      // roll a piggyback proc while a special event is already active (see
+      // shared/critTypes' rollCrit's own allowSpecialProcs param)
+      rollCritUpgrade(floor, false);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
@@ -744,7 +760,11 @@ export function handleFloorClick(
       const ticks = tier ? CRIT_TIER_CONFIG[tier].multiplier : 1;
       const ticksBefore = getOvertimeTicks(floor);
       addOvertimeTicks(floor, ticks);
-      rollCritUpgrade(floor);
+      // re-arm the next crit for AFTER this overtime run ends without
+      // letting it also roll a piggyback proc while a special event is
+      // already active (see shared/critTypes' rollCrit's own
+      // allowSpecialProcs param)
+      rollCritUpgrade(floor, false);
       // filling the gauge all the way promotes this floor's own PERMANENT crit
       // tier one step (null -> crit -> mega -> ultra, capped at ultra) and ends
       // the event early instead of waiting out the rest of its own 15s — only
@@ -805,7 +825,11 @@ export function handleFloorClick(
         tier ? CRIT_TIER_CONFIG[tier].multiplier : 1,
       );
       addTotalIncome(gained);
-      rollCritUpgrade(floor);
+      // re-arm the next crit for AFTER this snowball event ends without
+      // letting it also roll a piggyback proc while a special event is
+      // already active (see shared/critTypes' rollCrit's own
+      // allowSpecialProcs param)
+      rollCritUpgrade(floor, false);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
@@ -841,7 +865,11 @@ export function handleFloorClick(
         tier ? CRIT_TIER_CONFIG[tier].multiplier : 1,
       );
       addTotalIncome(gained);
-      rollCritUpgrade(floor);
+      // re-arm the next crit for AFTER this frozen event ends without
+      // letting it also roll a piggyback proc while a special event is
+      // already active (see shared/critTypes' rollCrit's own
+      // allowSpecialProcs param)
+      rollCritUpgrade(floor, false);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
@@ -895,6 +923,7 @@ export function handleFloorClick(
       const fastForward = isFastForwardCrit(floor);
       const frozen = isFrozenCrit(floor);
       const snowball = isSnowballCrit(floor);
+      const freeSale = isFreeSaleCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -1006,6 +1035,8 @@ export function handleFloorClick(
       if (frozen) applyFrozenCrit(floor);
       // snowball crit: starts just this floor's own snowball click event
       if (snowball) applySnowballCrit(floor);
+      // free sale crit: starts just this floor's own free Sale event
+      if (freeSale) applyFreeSaleCrit(floor);
       // Chair Giveaway/Supplies Giveaway crits: free one-time office chairs/
       // supplies purchase for the floor that actually crit
       if (chairGiveaway) applyChairGiveawayCrit(floor);
@@ -1050,6 +1081,7 @@ export function handleFloorClick(
         fastForward,
         frozen,
         snowball,
+        freeSale,
       );
       return;
     }

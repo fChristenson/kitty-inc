@@ -160,6 +160,11 @@ export const CONFIG = {
     // own flat multiplier
     snowballChance: 0.1,
     snowballDurationMs: 15000,
+    // "free sale crit" — no reward of its own: just triggers the SAME "Sale"
+    // event hud/boostMenu's paid purchase starts (see
+    // floorInteractions.ts's applyFreeSaleCrit/upgradeButton.ts's
+    // triggerSaleBoost), for free
+    freeSaleChance: 0.1,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.
@@ -168,8 +173,9 @@ export const CONFIG = {
     // hud/boostMenu's own cost is priced off floorIncomePerSecond times this
     // many assumed clicks, halved (see getSaleBoostCost)
     assumedClicks: 10,
-    // per-click payout multiplier applied only while a sale is active
-    incomeMultiplier: 2,
+    // per-click payout multiplier applied only while a sale is active —
+    // doubled from 2 to 4 per explicit request
+    incomeMultiplier: 4,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Work overtime" boost.

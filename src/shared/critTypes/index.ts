@@ -276,6 +276,16 @@ export const SNOWBALL_CRIT_CHANCE = CONFIG.crit.snowballChance;
 export const SNOWBALL_CRIT_COLOR = COLOR.snowballBlue;
 export const SNOWBALL_CRIT_LABEL = "Snowball";
 
+// "free sale crit" — also no instant reward: arming this proc just marks
+// the floor so that, once the crit is actually clicked, floorInteractions.ts's
+// applyFreeSaleCrit calls the SAME triggerSaleBoost hud/boostMenu.ts's paid
+// purchase already uses — a free ride on the existing "Sale" event (own
+// window/button state/payout math all reused as-is, see upgradeButton.ts's
+// sale.ts), just armed by a crit roll instead of spent cash
+export const FREE_SALE_CRIT_CHANCE = CONFIG.crit.freeSaleChance;
+export const FREE_SALE_CRIT_COLOR = COLOR.amber;
+export const FREE_SALE_CRIT_LABEL = "Sale";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -303,6 +313,7 @@ const snowdayCrits = new WeakSet<Floor>();
 const fastForwardCrits = new WeakSet<Floor>();
 const frozenCrits = new WeakSet<Floor>();
 const snowballCrits = new WeakSet<Floor>();
+const freeSaleCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
@@ -359,6 +370,7 @@ export interface CritRollResult {
   fastForward: boolean;
   frozen: boolean;
   snowball: boolean;
+  freeSale: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -394,6 +406,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "fastForward",
   "frozen",
   "snowball",
+  "freeSale",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -580,6 +593,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "snowball",
     description: "Free clicks earn a growing lump sum of cash",
   },
+  freeSale: {
+    label: FREE_SALE_CRIT_LABEL,
+    icon: "cashRegister",
+    description: "Starts a free Sale event on this floor",
+  },
 };
 
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
@@ -591,12 +609,21 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
 // invoked. Callers decide what "landing" means for their own case: mutating a
 // Floor's armed state (rollCritUpgrade) vs. just capturing the result to
 // return (rollFloorBuyCrit) — this function itself has no Floor/state
-// dependency at all
-export function rollCrit(onLanded: (result: CritRollResult) => void): void {
+// dependency at all.
+// `allowSpecialProcs = false` (see floorInteractions.ts's Sale/Overtime/
+// Frozen/Snowball click branches) skips the entire gateway+proc roll —
+// still rolls a plain tier crit normally, just never a piggyback proc on top,
+// so re-arming the next crit while already inside one of those special
+// events can only ever land a "regular" x5/x25/x125, never stack another
+// special event (or any other proc) on top of the one already running
+export function rollCrit(
+  onLanded: (result: CritRollResult) => void,
+  allowSpecialProcs = true,
+): void {
   for (const tier of CRIT_TIER_ORDER) {
     if (Math.random() < CRIT_TIER_CONFIG[tier].chance) {
       const landed: CritProcKind[] = [];
-      if (Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE) {
+      if (allowSpecialProcs && Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE) {
         if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
         if (Math.random() < BOOST_CRIT_CHANCE) landed.push("boost");
         if (Math.random() < BOUNCE_CRIT_CHANCE) landed.push("bounce");
@@ -628,6 +655,7 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
           landed.push("fastForward");
         if (Math.random() < FROZEN_CRIT_CHANCE) landed.push("frozen");
         if (Math.random() < SNOWBALL_CRIT_CHANCE) landed.push("snowball");
+        if (Math.random() < FREE_SALE_CRIT_CHANCE) landed.push("freeSale");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       onLanded({
@@ -657,6 +685,7 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         fastForward: kept.has("fastForward"),
         frozen: kept.has("frozen"),
         snowball: kept.has("snowball"),
+        freeSale: kept.has("freeSale"),
       });
       return;
     }
@@ -765,6 +794,10 @@ export function isSnowballCrit(floor: Floor): boolean {
   return snowballCrits.has(floor);
 }
 
+export function isFreeSaleCrit(floor: Floor): boolean {
+  return freeSaleCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -792,6 +825,7 @@ export function consumeCritProcs(floor: Floor): void {
   fastForwardCrits.delete(floor);
   frozenCrits.delete(floor);
   snowballCrits.delete(floor);
+  freeSaleCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -895,6 +929,10 @@ export function forceFrozenCritProc(floor: Floor): void {
 
 export function forceSnowballCritProc(floor: Floor): void {
   snowballCrits.add(floor);
+}
+
+export function forceFreeSaleCritProc(floor: Floor): void {
+  freeSaleCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

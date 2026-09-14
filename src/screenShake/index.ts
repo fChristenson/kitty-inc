@@ -161,6 +161,13 @@ let snowballIcon: HTMLImageElement | null = null;
 loadImageByName("snowball").then((image) => {
   snowballIcon = image;
 });
+// same idea again, drawn behind the "Sale" flash text (see
+// upgradeButton.ts's isFreeSaleCrit) — reuses the cash register icon already
+// shipped for hud/boostMenu's own "Trigger sales event" menu entry
+let cashRegisterIcon: HTMLImageElement | null = null;
+loadImageByName("cashRegister").then((image) => {
+  cashRegisterIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -677,6 +684,13 @@ export function drawCritFlash(
       measuredWidth * 0.85,
     );
     ctx.drawImage(snowballIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Sale" && cashRegisterIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      cashRegisterIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(cashRegisterIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

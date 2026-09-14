@@ -380,6 +380,7 @@ export {
   forceFastForwardCritUpgrade,
   forceFrozenCritUpgrade,
   forceSnowballCritUpgrade,
+  forceFreeSaleCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,
   pickHigherCritTier,

@@ -43,6 +43,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-fastforward-crit" class="game__button">Spawn Fast Forward Crit</button>
           <button id="spawn-frozen-crit" class="game__button">Spawn Frozen Crit</button>
           <button id="spawn-snowball-crit" class="game__button">Spawn Snowball Crit</button>
+          <button id="spawn-free-sale-crit" class="game__button">Spawn Free Sale Crit</button>
           <button id="floor-buy-crit" class="game__button">Floor Crit</button>
           <button id="floor-buy-boost-crit" class="game__button">Floor Boost Crit</button>
           <button id="floor-buy-mega-crit" class="game__button">Floor Mega Crit</button>
@@ -77,6 +78,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-fastforward-crit" class="game__button">Floor Fast Forward Crit</button>
           <button id="floor-buy-frozen-crit" class="game__button">Floor Frozen Crit</button>
           <button id="floor-buy-snowball-crit" class="game__button">Floor Snowball Crit</button>
+          <button id="floor-buy-free-sale-crit" class="game__button">Floor Free Sale Crit</button>
           <button id="map-unlock-crit" class="game__button">Map Unlock Crit</button>
           <button id="map-unlock-mega-crit" class="game__button">Map Unlock Mega Crit</button>
           <button id="map-unlock-ultra-crit" class="game__button">Map Unlock Ultra Crit</button>
@@ -446,6 +448,16 @@ export function wireSpawnSnowballCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnFreeSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-free-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireFloorBuyCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -780,6 +792,16 @@ export function wireFloorBuySnowballCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-snowball-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyFreeSaleCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-free-sale-crit",
   )!;
   button.addEventListener("click", onClick);
 }
