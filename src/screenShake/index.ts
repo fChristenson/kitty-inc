@@ -125,6 +125,42 @@ let autumnSaleIcon: HTMLImageElement | null = null;
 loadImageByName("autumn").then((image) => {
   autumnSaleIcon = image;
 });
+// same idea again, drawn behind the "Halloween Sale" flash text (see
+// upgradeButton.ts's isHalloweenSaleCrit)
+let halloweenSaleIcon: HTMLImageElement | null = null;
+loadImageByName("halloween").then((image) => {
+  halloweenSaleIcon = image;
+});
+// same idea again, drawn behind the "Sunshine" flash text (see
+// upgradeButton.ts's isSunshineCrit)
+let sunshineIcon: HTMLImageElement | null = null;
+loadImageByName("sunny").then((image) => {
+  sunshineIcon = image;
+});
+// same idea again, drawn behind the "Snowday" flash text (see
+// upgradeButton.ts's isSnowdayCrit)
+let snowdayIcon: HTMLImageElement | null = null;
+loadImageByName("snowman").then((image) => {
+  snowdayIcon = image;
+});
+// same idea again, drawn behind the "Fast Forward" flash text (see
+// upgradeButton.ts's isFastForwardCrit)
+let fastForwardIcon: HTMLImageElement | null = null;
+loadImageByName("fastforward").then((image) => {
+  fastForwardIcon = image;
+});
+// same idea again, drawn behind the "Frozen" flash text (see
+// upgradeButton.ts's isFrozenCrit)
+let icecubeIcon: HTMLImageElement | null = null;
+loadImageByName("icecube").then((image) => {
+  icecubeIcon = image;
+});
+// same idea again, drawn behind the "Snowball" flash text (see
+// upgradeButton.ts's isSnowballCrit)
+let snowballIcon: HTMLImageElement | null = null;
+loadImageByName("snowball").then((image) => {
+  snowballIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -599,6 +635,48 @@ export function drawCritFlash(
       measuredWidth * 0.85,
     );
     ctx.drawImage(autumnSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Halloween Sale" && halloweenSaleIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      halloweenSaleIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(halloweenSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Sunshine" && sunshineIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      sunshineIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(sunshineIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Snowday" && snowdayIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      snowdayIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(snowdayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Fast Forward" && fastForwardIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      fastForwardIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(fastForwardIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Frozen" && icecubeIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      icecubeIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(icecubeIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Snowball" && snowballIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      snowballIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(snowballIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

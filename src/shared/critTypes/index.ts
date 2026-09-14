@@ -217,6 +217,62 @@ export const AUTUMN_SALE_CRIT_CHANCE = CONFIG.crit.autumnSaleChance;
 export const AUTUMN_SALE_CRIT_COLOR = COLOR.autumnSaleAmber;
 export const AUTUMN_SALE_CRIT_LABEL = "Autumn Sale";
 
+// "halloween sale" crit — same shape as the 4 seasonal sales above, but its
+// own steeper discount (its own multiplier, never reuses
+// SEASONAL_SALE_DISCOUNT_MULTIPLIER) — see floorInteractions.ts's
+// applySeasonalSaleCrit, which takes the discount multiplier as a param so
+// this and the 4 seasonal sales can share the one reward function
+export const HALLOWEEN_SALE_DISCOUNT_MULTIPLIER =
+  1 - CONFIG.crit.halloweenSaleDiscount;
+
+export const HALLOWEEN_SALE_CRIT_CHANCE = CONFIG.crit.halloweenSaleChance;
+export const HALLOWEEN_SALE_CRIT_COLOR = COLOR.halloweenSalePurple;
+export const HALLOWEEN_SALE_CRIT_LABEL = "Halloween Sale";
+
+// "sunshine crit" — same reward as boost above (a free worker boost on
+// every unlocked floor), just lasting twice as long — see floorInteractions.ts's
+// applyFloorBoost, which takes the boost's own duration as a param so this
+// and plain boost can share the one reward function
+export const SUNSHINE_CRIT_CHANCE = CONFIG.crit.sunshineChance;
+export const SUNSHINE_CRIT_COLOR = COLOR.sunshineGold;
+export const SUNSHINE_CRIT_LABEL = "Sunshine";
+
+// "snowday crit" — same reward as sunshine above (a free worker boost on
+// every unlocked floor), just its own even longer duration — see
+// floorInteractions.ts's applySnowdayCrit
+export const SNOWDAY_CRIT_CHANCE = CONFIG.crit.snowdayChance;
+export const SNOWDAY_CRIT_COLOR = COLOR.snowdayFrost;
+export const SNOWDAY_CRIT_LABEL = "Snowday";
+
+// "fast forward crit" — same reward as tick tock above (instantly credits
+// every unlocked floor extra payouts' worth of income at its own current
+// rate, without touching its fill-cycle progress), just a steeper multiplier
+// — see floorInteractions.ts's applyFastForwardCrit
+export const FAST_FORWARD_CRIT_CHANCE = CONFIG.crit.fastForwardChance;
+export const FAST_FORWARD_CRIT_COLOR = COLOR.fastForwardBlue;
+export const FAST_FORWARD_CRIT_LABEL = "Fast Forward";
+
+// "frozen crit" — unlike every proc above, no instant reward: arming this
+// proc just marks the floor so that, once the crit is actually clicked,
+// upgradeButton.ts's triggerFrozenCrit locks its upgrade price at whatever
+// it currently is for CONFIG.crit.frozenDurationMs of real time (see
+// upgradeButton.ts's isFrozenActive, checked by incomePanel.ts's
+// increaseIncomeRate)
+export const FROZEN_CRIT_CHANCE = CONFIG.crit.frozenChance;
+export const FROZEN_CRIT_COLOR = COLOR.frozenIceBlue;
+export const FROZEN_CRIT_LABEL = "Frozen";
+
+// "snowball crit" — also no instant reward: arming this proc just marks the
+// floor so that, once the crit is actually clicked, upgradeButton.ts's
+// triggerSnowballCrit starts a Sale-like free-click event for
+// CONFIG.crit.snowballDurationMs of real time, during which each click adds
+// n^2 * rateStep (n = that click's own count) to the floor's own income
+// rate instead of paying out cash (see floorInteractions.ts's own Snowball
+// click branch)
+export const SNOWBALL_CRIT_CHANCE = CONFIG.crit.snowballChance;
+export const SNOWBALL_CRIT_COLOR = COLOR.snowballBlue;
+export const SNOWBALL_CRIT_LABEL = "Snowball";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -238,6 +294,12 @@ const winterSaleCrits = new WeakSet<Floor>();
 const springSaleCrits = new WeakSet<Floor>();
 const summerSaleCrits = new WeakSet<Floor>();
 const autumnSaleCrits = new WeakSet<Floor>();
+const halloweenSaleCrits = new WeakSet<Floor>();
+const sunshineCrits = new WeakSet<Floor>();
+const snowdayCrits = new WeakSet<Floor>();
+const fastForwardCrits = new WeakSet<Floor>();
+const frozenCrits = new WeakSet<Floor>();
+const snowballCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
@@ -288,6 +350,12 @@ export interface CritRollResult {
   springSale: boolean;
   summerSale: boolean;
   autumnSale: boolean;
+  halloweenSale: boolean;
+  sunshine: boolean;
+  snowday: boolean;
+  fastForward: boolean;
+  frozen: boolean;
+  snowball: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -317,6 +385,12 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "springSale",
   "summerSale",
   "autumnSale",
+  "halloweenSale",
+  "sunshine",
+  "snowday",
+  "fastForward",
+  "frozen",
+  "snowball",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -473,6 +547,36 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "autumn",
     description: "Cuts upgrade/worker costs 25% building-wide",
   },
+  halloweenSale: {
+    label: HALLOWEEN_SALE_CRIT_LABEL,
+    icon: "halloween",
+    description: "Cuts upgrade/worker costs 50% building-wide",
+  },
+  sunshine: {
+    label: SUNSHINE_CRIT_LABEL,
+    icon: "sunny",
+    description: "Boosts every worker, twice as long",
+  },
+  snowday: {
+    label: SNOWDAY_CRIT_LABEL,
+    icon: "snowman",
+    description: "Boosts every worker, three times as long",
+  },
+  fastForward: {
+    label: FAST_FORWARD_CRIT_LABEL,
+    icon: "fastforward",
+    description: "Instantly credits 4 payouts' worth of income",
+  },
+  frozen: {
+    label: FROZEN_CRIT_LABEL,
+    icon: "icecube",
+    description: "Locks the floor's upgrade price for 15s",
+  },
+  snowball: {
+    label: SNOWBALL_CRIT_LABEL,
+    icon: "snowball",
+    description: "Free clicks snowball the floor's own income rate",
+  },
 };
 
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
@@ -505,13 +609,22 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
           landed.push("fourOfAKind");
         if (Math.random() < FULL_HOUSE_CRIT_CHANCE) landed.push("fullHouse");
         if (Math.random() < TICK_TOCK_CRIT_CHANCE) landed.push("tickTock");
-        if (Math.random() < CHAIR_GIVEAWAY_CRIT_CHANCE) landed.push("chairGiveaway");
+        if (Math.random() < CHAIR_GIVEAWAY_CRIT_CHANCE)
+          landed.push("chairGiveaway");
         if (Math.random() < SUPPLIES_GIVEAWAY_CRIT_CHANCE)
           landed.push("suppliesGiveaway");
         if (Math.random() < WINTER_SALE_CRIT_CHANCE) landed.push("winterSale");
         if (Math.random() < SPRING_SALE_CRIT_CHANCE) landed.push("springSale");
         if (Math.random() < SUMMER_SALE_CRIT_CHANCE) landed.push("summerSale");
         if (Math.random() < AUTUMN_SALE_CRIT_CHANCE) landed.push("autumnSale");
+        if (Math.random() < HALLOWEEN_SALE_CRIT_CHANCE)
+          landed.push("halloweenSale");
+        if (Math.random() < SUNSHINE_CRIT_CHANCE) landed.push("sunshine");
+        if (Math.random() < SNOWDAY_CRIT_CHANCE) landed.push("snowday");
+        if (Math.random() < FAST_FORWARD_CRIT_CHANCE)
+          landed.push("fastForward");
+        if (Math.random() < FROZEN_CRIT_CHANCE) landed.push("frozen");
+        if (Math.random() < SNOWBALL_CRIT_CHANCE) landed.push("snowball");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       onLanded({
@@ -535,6 +648,12 @@ export function rollCrit(onLanded: (result: CritRollResult) => void): void {
         springSale: kept.has("springSale"),
         summerSale: kept.has("summerSale"),
         autumnSale: kept.has("autumnSale"),
+        halloweenSale: kept.has("halloweenSale"),
+        sunshine: kept.has("sunshine"),
+        snowday: kept.has("snowday"),
+        fastForward: kept.has("fastForward"),
+        frozen: kept.has("frozen"),
+        snowball: kept.has("snowball"),
       });
       return;
     }
@@ -619,6 +738,30 @@ export function isAutumnSaleCrit(floor: Floor): boolean {
   return autumnSaleCrits.has(floor);
 }
 
+export function isHalloweenSaleCrit(floor: Floor): boolean {
+  return halloweenSaleCrits.has(floor);
+}
+
+export function isSunshineCrit(floor: Floor): boolean {
+  return sunshineCrits.has(floor);
+}
+
+export function isSnowdayCrit(floor: Floor): boolean {
+  return snowdayCrits.has(floor);
+}
+
+export function isFastForwardCrit(floor: Floor): boolean {
+  return fastForwardCrits.has(floor);
+}
+
+export function isFrozenCrit(floor: Floor): boolean {
+  return frozenCrits.has(floor);
+}
+
+export function isSnowballCrit(floor: Floor): boolean {
+  return snowballCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -640,6 +783,12 @@ export function consumeCritProcs(floor: Floor): void {
   springSaleCrits.delete(floor);
   summerSaleCrits.delete(floor);
   autumnSaleCrits.delete(floor);
+  halloweenSaleCrits.delete(floor);
+  sunshineCrits.delete(floor);
+  snowdayCrits.delete(floor);
+  fastForwardCrits.delete(floor);
+  frozenCrits.delete(floor);
+  snowballCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -719,6 +868,30 @@ export function forceSummerSaleCritProc(floor: Floor): void {
 
 export function forceAutumnSaleCritProc(floor: Floor): void {
   autumnSaleCrits.add(floor);
+}
+
+export function forceHalloweenSaleCritProc(floor: Floor): void {
+  halloweenSaleCrits.add(floor);
+}
+
+export function forceSunshineCritProc(floor: Floor): void {
+  sunshineCrits.add(floor);
+}
+
+export function forceSnowdayCritProc(floor: Floor): void {
+  snowdayCrits.add(floor);
+}
+
+export function forceFastForwardCritProc(floor: Floor): void {
+  fastForwardCrits.add(floor);
+}
+
+export function forceFrozenCritProc(floor: Floor): void {
+  frozenCrits.add(floor);
+}
+
+export function forceSnowballCritProc(floor: Floor): void {
+  snowballCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

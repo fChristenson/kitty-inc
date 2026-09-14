@@ -49,10 +49,15 @@ export function isStorageIntact(): boolean {
 
 export interface WorkerSlot {
   boosted: boolean; // whether coinFloat.ts's floating-coin animation is active on this worker
-  boostedAt: number; // Date.now() when boosted turned on; auto-resets BOOST_DURATION_MS later
+  boostedAt: number; // Date.now() when boosted turned on; auto-resets durationMs later
+  // how long THIS activation lasts — defaults to BOOST_DURATION_MS when unset
+  // (every slot created before this field existed, or a fresh never-boosted
+  // slot) so a longer-lasting boost (see shared/critTypes' Sunshine crit) can
+  // override it per-activation without a separate parallel mechanism
+  durationMs?: number;
 }
 
-const BOOST_DURATION_MS = 15_000; // boosted state auto-resets this long after being triggered
+export const BOOST_DURATION_MS = 15_000; // boosted state auto-resets this long after being triggered
 // floors/coinFloat.ts blinks a boosted worker's floating coins once this little
 // time is left, so letting a boost run out down to the wire visibly reads as
 // "about to lose this" instead of it just quietly expiring
@@ -128,7 +133,10 @@ function ensureSlot(floor: Floor, workerIndex: number): WorkerSlot {
 }
 
 function expireIfStale(slot: WorkerSlot, now: number): boolean {
-  if (slot.boosted && now - slot.boostedAt >= BOOST_DURATION_MS) {
+  if (
+    slot.boosted &&
+    now - slot.boostedAt >= (slot.durationMs ?? BOOST_DURATION_MS)
+  ) {
     slot.boosted = false;
   }
   return slot.boosted;
@@ -142,14 +150,19 @@ export function isBoosted(
   return expireIfStale(ensureSlot(floor, workerIndex), now);
 }
 
+// durationMs (default BOOST_DURATION_MS) lets a caller grant a longer-lasting
+// boost than the normal one (see shared/critTypes' Sunshine crit) without
+// touching any other activation's own duration
 export function activateBoosted(
   floor: Floor,
   workerIndex: number,
   now: number,
+  durationMs: number = BOOST_DURATION_MS,
 ): void {
   const slot = ensureSlot(floor, workerIndex);
   slot.boosted = true;
   slot.boostedAt = now;
+  slot.durationMs = durationMs;
 }
 
 // how many of a floor's workers are currently boosted; incomePanel.ts uses this to
@@ -168,7 +181,10 @@ export function getBoostRemainingMs(
 ): number {
   const slot = ensureSlot(floor, workerIndex);
   if (!expireIfStale(slot, now)) return 0;
-  return Math.max(0, BOOST_DURATION_MS - (now - slot.boostedAt));
+  return Math.max(
+    0,
+    (slot.durationMs ?? BOOST_DURATION_MS) - (now - slot.boostedAt),
+  );
 }
 
 // which theme color (floors/worker/index.ts's THEME_COLORS) each of a floor's

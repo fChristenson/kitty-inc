@@ -131,6 +131,32 @@ export const CONFIG = {
     autumnSaleChance: 0.05,
     // 0.25 = 25% off; procs multiply the affected cost by 1 - this
     seasonalSaleDiscount: 0.25,
+    // "halloween sale" crit — same shape as the 4 seasonal sales above (same
+    // floor/upgrade/worker cost cut, same building-wide scope), but its own
+    // steeper discount (see shared/critTypes' HALLOWEEN_SALE_DISCOUNT_MULTIPLIER)
+    halloweenSaleChance: 0.05,
+    // 0.5 = 50% off — double the seasonal sales' own 25%
+    halloweenSaleDiscount: 0.5,
+    // "sunshine crit" — same free-worker-boost reward as boost above, just
+    // its own longer duration (see shared/critTypes' SUNSHINE_BOOST_DURATION_MS)
+    sunshineChance: 0.1,
+    // "snowday crit" — same free-worker-boost reward as sunshine above, just
+    // its own longer duration still (see shared/critTypes' SNOWDAY_BOOST_DURATION_MS)
+    snowdayChance: 0.1,
+    // "fast forward crit" — same instant-income reward as tick tock above,
+    // just a steeper multiplier (see shared/critTypes' FAST_FORWARD_PAYOUT_MULTIPLIER)
+    fastForwardChance: 0.05,
+    // "frozen crit" — locks the floor's own upgrade price at whatever it
+    // currently is for this many ms of real time (see upgradeButton.ts's
+    // isFrozenActive/triggerFrozenCrit), instead of granting an instant reward
+    frozenChance: 0.1,
+    frozenDurationMs: 15000,
+    // "snowball crit" — starts a Sale-like free-click event (see
+    // upgradeButton.ts's isSnowballActive/triggerSnowballCrit), but each click
+    // permanently adds n^2 * rateStep to the floor's own income rate (n = that
+    // click's own 1-indexed count within the event) instead of paying out cash
+    snowballChance: 0.1,
+    snowballDurationMs: 15000,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

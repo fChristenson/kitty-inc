@@ -36,6 +36,18 @@ import {
   SUMMER_SALE_CRIT_LABEL,
   AUTUMN_SALE_CRIT_COLOR,
   AUTUMN_SALE_CRIT_LABEL,
+  HALLOWEEN_SALE_CRIT_COLOR,
+  HALLOWEEN_SALE_CRIT_LABEL,
+  SUNSHINE_CRIT_COLOR,
+  SUNSHINE_CRIT_LABEL,
+  SNOWDAY_CRIT_COLOR,
+  SNOWDAY_CRIT_LABEL,
+  FAST_FORWARD_CRIT_COLOR,
+  FAST_FORWARD_CRIT_LABEL,
+  FROZEN_CRIT_COLOR,
+  FROZEN_CRIT_LABEL,
+  SNOWBALL_CRIT_COLOR,
+  SNOWBALL_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -258,6 +270,37 @@ function celebrateBoost(
   spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
+// sunshine crit (see upgradeButton.ts's isSunshineCrit): same celebration
+// shape as boost above (the reward itself — a longer-lasting free worker
+// boost — is applied by floorInteractions.ts), just its own dedicated gold
+function celebrateSunshine(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(SUNSHINE_CRIT_LABEL, SUNSHINE_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
+// snowday crit (see upgradeButton.ts's isSnowdayCrit): same celebration
+// shape as boost/sunshine above (the reward itself — an even longer-lasting
+// free worker boost — is applied by floorInteractions.ts), its own dedicated
+// frost color
+function celebrateSnowday(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(SNOWDAY_CRIT_LABEL, SNOWDAY_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
 // bounce crit (see upgradeButton.ts's isBounceCrit): same swap as chain
 // above, keeping the landed tier's own color (climbing the building from the
 // bottom up is applied by floorInteractions.ts, this only covers the
@@ -396,7 +439,13 @@ interface QueuedCelebration {
     | "winterSale"
     | "springSale"
     | "summerSale"
-    | "autumnSale";
+    | "autumnSale"
+    | "halloweenSale"
+    | "sunshine"
+    | "snowday"
+    | "fastForward"
+    | "frozen"
+    | "snowball";
   queuedAt: number;
   run: () => void;
 }
@@ -468,6 +517,12 @@ export function triggerCritCelebration(
   springSale = false,
   summerSale = false,
   autumnSale = false,
+  halloweenSale = false,
+  sunshine = false,
+  snowday = false,
+  fastForward = false,
+  frozen = false,
+  snowball = false,
 ): void {
   if (
     chain ||
@@ -488,7 +543,13 @@ export function triggerCritCelebration(
     winterSale ||
     springSale ||
     summerSale ||
-    autumnSale
+    autumnSale ||
+    halloweenSale ||
+    sunshine ||
+    snowday ||
+    fastForward ||
+    frozen ||
+    snowball
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -737,6 +798,88 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             AUTUMN_SALE_CRIT_LABEL,
             AUTUMN_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      halloweenSale &&
+      !specialCelebrationQueue.some((q) => q.kind === "halloweenSale")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "halloweenSale",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            HALLOWEEN_SALE_CRIT_LABEL,
+            HALLOWEEN_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      sunshine &&
+      !specialCelebrationQueue.some((q) => q.kind === "sunshine")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "sunshine",
+        queuedAt: now,
+        run: () => celebrateSunshine(floor, tier, getScreenCenterLocal),
+      });
+    }
+    if (snowday && !specialCelebrationQueue.some((q) => q.kind === "snowday")) {
+      specialCelebrationQueue.push({
+        kind: "snowday",
+        queuedAt: now,
+        run: () => celebrateSnowday(floor, tier, getScreenCenterLocal),
+      });
+    }
+    if (
+      fastForward &&
+      !specialCelebrationQueue.some((q) => q.kind === "fastForward")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "fastForward",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            FAST_FORWARD_CRIT_LABEL,
+            FAST_FORWARD_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (frozen && !specialCelebrationQueue.some((q) => q.kind === "frozen")) {
+      specialCelebrationQueue.push({
+        kind: "frozen",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            FROZEN_CRIT_LABEL,
+            FROZEN_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      snowball &&
+      !specialCelebrationQueue.some((q) => q.kind === "snowball")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "snowball",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            SNOWBALL_CRIT_LABEL,
+            SNOWBALL_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

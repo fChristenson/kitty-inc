@@ -69,6 +69,12 @@ const IMAGE_FILES = {
   spring: "spring.png", // Spring Sale crit flash's own backdrop icon
   summer: "summer.png", // Summer Sale crit flash's own backdrop icon
   autumn: "fall.png", // Autumn Sale crit flash's own backdrop icon
+  halloween: "halloween.png", // Halloween Sale crit flash's own backdrop icon
+  sunny: "sunny.png", // Sunshine crit flash's own backdrop icon
+  snowman: "snowman.png", // Snowday crit flash's own backdrop icon
+  fastforward: "fastforward.png", // Fast Forward crit flash's own backdrop icon
+  icecube: "icecube.png", // Frozen crit flash's own backdrop icon
+  snowball: "snowball.png", // Snowball crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

@@ -31,7 +31,14 @@ import {
   isSpringSaleCrit,
   isSummerSaleCrit,
   isAutumnSaleCrit,
+  isHalloweenSaleCrit,
+  isSunshineCrit,
+  isSnowdayCrit,
+  isFastForwardCrit,
+  isFrozenCrit,
+  isSnowballCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
+  HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
   POKER_HAND_CRIT_COUNTS,
   consumeCritUpgrade,
   rollCritUpgrade,
@@ -40,6 +47,10 @@ import {
   nextCritTier,
   isSaleActive,
   isOvertimeActive,
+  triggerFrozenCrit,
+  isSnowballActive,
+  triggerSnowballCrit,
+  nextSnowballClickCount,
   endOvertimeActiveWindow,
   isOvertimeDraining,
   getOvertimeCost,
@@ -85,7 +96,11 @@ import {
   ensureLockedFloorAbove,
   getLockCenter,
 } from "../floorLock";
-import { activateBoosted, type Floor } from "../../gameState";
+import {
+  activateBoosted,
+  BOOST_DURATION_MS,
+  type Floor,
+} from "../../gameState";
 import { type BigNumber, ZERO, add, multiply } from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
 
@@ -254,10 +269,26 @@ function applyUpgradeTick(floor: Floor, isGroundFloor: boolean): void {
 // "boost crit" reward (see upgradeButton.ts's isBoostCrit): the SAME building-
 // wide free-boost-everyone reward + cat-jump celebration hud/boostMenu.ts's
 // buyBoostAll and mouse/index.ts's free click trigger already use — never a
-// separate single-floor copy of that loop
-function applyFloorBoost(floors: Floor[]): void {
-  applyBoostAll(floors);
+// separate single-floor copy of that loop. durationMs (default the normal
+// boost length) lets the Sunshine crit below grant a longer-lasting boost
+// through this exact same reward function
+function applyFloorBoost(floors: Floor[], durationMs?: number): void {
+  applyBoostAll(floors, durationMs);
   triggerJumpAll(floors, Date.now());
+}
+
+// "sunshine crit" (see shared/critTypes' isSunshineCrit): identical reward to
+// boost above, just twice the normal boost duration
+const SUNSHINE_BOOST_DURATION_MS = BOOST_DURATION_MS * 2;
+function applySunshineCrit(floors: Floor[]): void {
+  applyFloorBoost(floors, SUNSHINE_BOOST_DURATION_MS);
+}
+
+// "snowday crit" (see shared/critTypes' isSnowdayCrit): identical reward to
+// sunshine above, just three times the normal boost duration
+const SNOWDAY_BOOST_DURATION_MS = BOOST_DURATION_MS * 3;
+function applySnowdayCrit(floors: Floor[]): void {
+  applyFloorBoost(floors, SNOWDAY_BOOST_DURATION_MS);
 }
 
 // minimal deps a chain crit needs to grow a building while walking upward —
@@ -357,18 +388,43 @@ export function applyBounceCrit(
 }
 
 // "tick tock crit" (see shared/critTypes's isTickTockCrit): instantly credits
-// every unlocked floor 2 extra payouts' worth of income at its own current
+// every unlocked floor extra payouts' worth of income at its own current
 // rate, WITHOUT touching floor.lastCollectedAt (see incomePanel.ts's
 // currentPayoutAmount) — each floor's own bar keeps ticking from exactly the
-// same progress it was already at, it just also gets paid twice right now
-function applyTickTockCrit(floors: Floor[]): void {
+// same progress it was already at, it just also gets paid `multiplier`
+// payouts right now. `multiplier` defaults to tick tock's own 2x; "fast
+// forward" below reuses this exact function with a steeper 4x
+function applyTickTockCrit(floors: Floor[], multiplier = 2): void {
   const now = Date.now();
   let total: BigNumber = ZERO;
   for (const floor of floors) {
     if (!floor.unlocked) continue;
-    total = add(total, multiply(currentPayoutAmount(floor, now), 2));
+    total = add(total, multiply(currentPayoutAmount(floor, now), multiplier));
   }
   addTotalIncome(total);
+}
+
+// "fast forward crit" (see shared/critTypes's isFastForwardCrit): same
+// instant-income reward as tick tock above, just a steeper multiplier
+const FAST_FORWARD_PAYOUT_MULTIPLIER = 4;
+function applyFastForwardCrit(floors: Floor[]): void {
+  applyTickTockCrit(floors, FAST_FORWARD_PAYOUT_MULTIPLIER);
+}
+
+// "frozen crit" (see shared/critTypes's isFrozenCrit): unlike every proc
+// above, no instant payout — just starts upgradeButton.ts's own 15s price-lock
+// window on this ONE floor (see triggerFrozenCrit/isFrozenActive)
+function applyFrozenCrit(floor: Floor): void {
+  triggerFrozenCrit(floor);
+}
+
+// "snowball crit" (see shared/critTypes's isSnowballCrit): also no instant
+// payout — just starts upgradeButton.ts's own Sale-like free-click event on
+// this ONE floor (see triggerSnowballCrit/isSnowballActive); the actual
+// per-click n^2 * rateStep income-rate reward is applied in the Snowball
+// click branch below, not here
+function applySnowballCrit(floor: Floor): void {
+  triggerSnowballCrit(floor);
 }
 
 // "Chair Giveaway"/"Supplies Giveaway" crits (see shared/critTypes's isChairGiveawayCrit/
@@ -383,31 +439,32 @@ function applySuppliesGiveawayCrit(floor: Floor): void {
   floor.hasOfficeSupplies = true;
 }
 
-// "winter sale"/"spring sale"/"summer sale"/"autumn sale" crits (see
-// shared/critTypes's isWinterSaleCrit etc.) — all four share this exact
-// reward, only their icon/label/color differ: permanently cuts EVERY floor's
-// own upgrade cost, worker/office chairs/supplies/manager costs (via
-// Floor.priceDiscountMultiplier, folded into hud/upgradeMenu's getFloorPrice),
-// AND the cost to unlock the next floor, by SEASONAL_SALE_DISCOUNT_MULTIPLIER,
-// for every floor in the WHOLE building this roll happened in — including the
-// one still-locked floor waiting at the top (its own unlockCost is a real,
-// not-yet-paid price too, and floors/index.ts's ensureLockedFloorAbove reads
-// priceDiscountMultiplier back off the ground floor to keep every FUTURE
-// queued floor discounted the same way, so repeated procs really do stack
-// building-wide forever, not just for floors that already existed)
-function applySeasonalSaleCrit(floors: Floor[]): void {
+// "winter sale"/"spring sale"/"summer sale"/"autumn sale"/"halloween sale"
+// crits (see shared/critTypes's isWinterSaleCrit etc.) — all five share this
+// exact reward shape, only their icon/label/color AND discount size differ
+// (halloween's own HALLOWEEN_SALE_DISCOUNT_MULTIPLIER is steeper than the 4
+// seasonal ones' shared SEASONAL_SALE_DISCOUNT_MULTIPLIER, so this takes the
+// discount as a param instead of hardcoding one constant): permanently cuts
+// EVERY floor's own upgrade cost, worker/office chairs/supplies/manager
+// costs (via Floor.priceDiscountMultiplier, folded into hud/upgradeMenu's
+// getFloorPrice), AND the cost to unlock the next floor, by
+// `discountMultiplier`, for every floor in the WHOLE building this roll
+// happened in — including the one still-locked floor waiting at the top (its
+// own unlockCost is a real, not-yet-paid price too, and floors/index.ts's
+// ensureLockedFloorAbove reads priceDiscountMultiplier back off the ground
+// floor to keep every FUTURE queued floor discounted the same way, so
+// repeated procs really do stack building-wide forever, not just for floors
+// that already existed)
+function applySeasonalSaleCrit(
+  floors: Floor[],
+  discountMultiplier: number,
+): void {
   for (const floor of floors) {
-    floor.priceDiscountMultiplier *= SEASONAL_SALE_DISCOUNT_MULTIPLIER;
+    floor.priceDiscountMultiplier *= discountMultiplier;
     if (floor.unlocked) {
-      floor.upgradeCost = multiply(
-        floor.upgradeCost,
-        SEASONAL_SALE_DISCOUNT_MULTIPLIER,
-      );
+      floor.upgradeCost = multiply(floor.upgradeCost, discountMultiplier);
     } else {
-      floor.unlockCost = multiply(
-        floor.unlockCost,
-        SEASONAL_SALE_DISCOUNT_MULTIPLIER,
-      );
+      floor.unlockCost = multiply(floor.unlockCost, discountMultiplier);
     }
   }
 }
@@ -577,8 +634,24 @@ export function handleFloorClick(
           buyTier.summerSale ||
           buyTier.autumnSale
         ) {
-          applySeasonalSaleCrit(floors);
+          applySeasonalSaleCrit(floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER);
         }
+        // halloween sale crit: same reward, but its own steeper 50% cut
+        if (buyTier.halloweenSale) {
+          applySeasonalSaleCrit(floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER);
+        }
+        // sunshine crit: same building-wide free-boost reward as boost, just
+        // twice the duration
+        if (buyTier.sunshine) applySunshineCrit(floors);
+        // snowday crit: same reward again, three times the duration
+        if (buyTier.snowday) applySnowdayCrit(floors);
+        // fast forward crit: same instant-income reward as tick tock, just
+        // a steeper multiplier
+        if (buyTier.fastForward) applyFastForwardCrit(floors);
+        // frozen crit: locks just this floor's own upgrade price for 15s
+        if (buyTier.frozen) applyFrozenCrit(floor);
+        // snowball crit: starts just this floor's own snowball click event
+        if (buyTier.snowball) applySnowballCrit(floor);
       }
       persist();
       const center = getLockCenter();
@@ -607,6 +680,12 @@ export function handleFloorClick(
           buyTier.springSale,
           buyTier.summerSale,
           buyTier.autumnSale,
+          buyTier.halloweenSale,
+          buyTier.sunshine,
+          buyTier.snowday,
+          buyTier.fastForward,
+          buyTier.frozen,
+          buyTier.snowball,
         );
     }
     return;
@@ -702,6 +781,41 @@ export function handleFloorClick(
       );
       return;
     }
+    // "Snowball" event (see shared/critTypes' isSnowballCrit): free clicks,
+    // same as Sale/Overtime above, but each one permanently adds n^2 *
+    // rateStep to this floor's OWN income rate (n = that click's own
+    // 1-indexed count within the event, via nextSnowballClickCount) instead
+    // of paying out cash or filling a gauge — the growth visibly snowballs
+    // the longer the event is milked. A crit rolled mid-event multiplies
+    // that click's own gain by the landed tier's multiplier, same tier-aware
+    // treatment as Sale/Overtime
+    if (isSnowballActive(floor, Date.now())) {
+      const tier = getCritTier(floor);
+      if (tier) consumeCritUpgrade(floor);
+      const n = nextSnowballClickCount(floor);
+      const gained = multiply(
+        multiply(floor.rateStep, n * n),
+        tier ? CRIT_TIER_CONFIG[tier].multiplier : 1,
+      );
+      floor.incomeAmount = add(floor.incomeAmount, gained);
+      rollCritUpgrade(floor);
+      persist();
+      triggerButtonPress(floor);
+      playCoinDrop();
+      if (tier) triggerCritCelebration(floor, tier, getScreenCenterLocal);
+      const center = getButtonCenter(isGroundFloor);
+      const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
+      const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
+      spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
+      spawnIncomeFloatText(
+        floor,
+        center.x,
+        center.y,
+        `+${formatPrice(gained)}/s`,
+        tier !== null,
+      );
+      return;
+    }
     // the slot-machine jackpot moment: free, costs nothing, applies that tier's
     // upgrade count at once, and celebrates with the same shake/flash/sfx/bursts
     // treatment as any other crit (see triggerCritCelebration) — mega/ultra are
@@ -732,6 +846,12 @@ export function handleFloorClick(
       const springSale = isSpringSaleCrit(floor);
       const summerSale = isSummerSaleCrit(floor);
       const autumnSale = isAutumnSaleCrit(floor);
+      const halloweenSale = isHalloweenSaleCrit(floor);
+      const sunshine = isSunshineCrit(floor);
+      const snowday = isSnowdayCrit(floor);
+      const fastForward = isFastForwardCrit(floor);
+      const frozen = isFrozenCrit(floor);
+      const snowball = isSnowballCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -783,6 +903,11 @@ export function handleFloorClick(
         );
       }
       if (boost) applyFloorBoost(floors);
+      // sunshine crit: same building-wide free-boost reward as boost, just
+      // twice the duration
+      if (sunshine) applySunshineCrit(floors);
+      // snowday crit: same reward again, three times the duration
+      if (snowday) applySnowdayCrit(floors);
       // booty crit: doubles the currently active company's total income once —
       // a flat effect, not tied to the tier/count that landed
       if (booty) addTotalIncome(getTotalIncome());
@@ -831,6 +956,13 @@ export function handleFloorClick(
       // tick tock crit: instantly pays every unlocked floor twice at its own
       // current rate, without disturbing any floor's own bar progress
       if (tickTock) applyTickTockCrit(floors);
+      // fast forward crit: same instant-income reward as tick tock, just a
+      // steeper multiplier
+      if (fastForward) applyFastForwardCrit(floors);
+      // frozen crit: locks just this floor's own upgrade price for 15s
+      if (frozen) applyFrozenCrit(floor);
+      // snowball crit: starts just this floor's own snowball click event
+      if (snowball) applySnowballCrit(floor);
       // Chair Giveaway/Supplies Giveaway crits: free one-time office chairs/
       // supplies purchase for the floor that actually crit
       if (chairGiveaway) applyChairGiveawayCrit(floor);
@@ -838,7 +970,11 @@ export function handleFloorClick(
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
-        applySeasonalSaleCrit(floors);
+        applySeasonalSaleCrit(floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER);
+      }
+      // halloween sale crit: same reward, but its own steeper 50% cut
+      if (halloweenSale) {
+        applySeasonalSaleCrit(floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER);
       }
       persist();
       triggerButtonPress(floor);
@@ -865,6 +1001,12 @@ export function handleFloorClick(
         springSale,
         summerSale,
         autumnSale,
+        halloweenSale,
+        sunshine,
+        snowday,
+        fastForward,
+        frozen,
+        snowball,
       );
       return;
     }

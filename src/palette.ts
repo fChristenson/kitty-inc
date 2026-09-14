@@ -85,6 +85,18 @@ export const COLOR = {
   summerSaleOrange: "#FB923C",
   // Autumn Sale crit's own dedicated color
   autumnSaleAmber: "#D97706",
+  // Halloween Sale crit's own dedicated color
+  halloweenSalePurple: "#7C3AED",
+  // Sunshine crit's own dedicated color
+  sunshineGold: "#FACC15",
+  // Snowday crit's own dedicated color
+  snowdayFrost: "#A5F3FC",
+  // Fast Forward crit's own dedicated color
+  fastForwardBlue: "#2563EB",
+  // Frozen crit's own dedicated color, matching the icecube icon
+  frozenIceBlue: "#7DD3E8",
+  // Snowball crit's own dedicated color, matching the snowball icon
+  snowballBlue: "#93C5FD",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

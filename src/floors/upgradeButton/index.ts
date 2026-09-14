@@ -309,6 +309,19 @@ export {
   SUMMER_SALE_CRIT_LABEL,
   AUTUMN_SALE_CRIT_COLOR,
   AUTUMN_SALE_CRIT_LABEL,
+  HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
+  HALLOWEEN_SALE_CRIT_COLOR,
+  HALLOWEEN_SALE_CRIT_LABEL,
+  SUNSHINE_CRIT_COLOR,
+  SUNSHINE_CRIT_LABEL,
+  SNOWDAY_CRIT_COLOR,
+  SNOWDAY_CRIT_LABEL,
+  FAST_FORWARD_CRIT_COLOR,
+  FAST_FORWARD_CRIT_LABEL,
+  FROZEN_CRIT_COLOR,
+  FROZEN_CRIT_LABEL,
+  SNOWBALL_CRIT_COLOR,
+  SNOWBALL_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -328,6 +341,12 @@ export {
   isSpringSaleCrit,
   isSummerSaleCrit,
   isAutumnSaleCrit,
+  isHalloweenSaleCrit,
+  isSunshineCrit,
+  isSnowdayCrit,
+  isFastForwardCrit,
+  isFrozenCrit,
+  isSnowballCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -357,6 +376,12 @@ import {
   forceSpringSaleCritProc,
   forceSummerSaleCritProc,
   forceAutumnSaleCritProc,
+  forceHalloweenSaleCritProc,
+  forceSunshineCritProc,
+  forceSnowdayCritProc,
+  forceFastForwardCritProc,
+  forceFrozenCritProc,
+  forceSnowballCritProc,
 } from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
@@ -389,6 +414,12 @@ export function rollCritUpgrade(floor: Floor): void {
     if (result.springSale) forceSpringSaleCritProc(floor);
     if (result.summerSale) forceSummerSaleCritProc(floor);
     if (result.autumnSale) forceAutumnSaleCritProc(floor);
+    if (result.halloweenSale) forceHalloweenSaleCritProc(floor);
+    if (result.sunshine) forceSunshineCritProc(floor);
+    if (result.snowday) forceSnowdayCritProc(floor);
+    if (result.fastForward) forceFastForwardCritProc(floor);
+    if (result.frozen) forceFrozenCritProc(floor);
+    if (result.snowball) forceSnowballCritProc(floor);
   });
 }
 
@@ -442,6 +473,12 @@ export function forceFloorBuyCrit(
   springSale = false,
   summerSale = false,
   autumnSale = false,
+  halloweenSale = false,
+  sunshine = false,
+  snowday = false,
+  fastForward = false,
+  frozen = false,
+  snowball = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -464,6 +501,12 @@ export function forceFloorBuyCrit(
     springSale,
     summerSale,
     autumnSale,
+    halloweenSale,
+    sunshine,
+    snowday,
+    fastForward,
+    frozen,
+    snowball,
   };
 }
 
@@ -633,6 +676,36 @@ export function forceAutumnSaleCritUpgrade(floor: Floor): void {
   forceAutumnSaleCritProc(floor);
 }
 
+export function forceHalloweenSaleCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceHalloweenSaleCritProc(floor);
+}
+
+export function forceSunshineCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSunshineCritProc(floor);
+}
+
+export function forceSnowdayCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSnowdayCritProc(floor);
+}
+
+export function forceFastForwardCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFastForwardCritProc(floor);
+}
+
+export function forceFrozenCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFrozenCritProc(floor);
+}
+
+export function forceSnowballCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSnowballCritProc(floor);
+}
+
 // "Sale" boost: a purchasable, targeted alternative to boostMenu's boost-all (see
 // hud/boostMenu/index.ts's applySaleBoost, which picks the random floor and calls
 // triggerSaleBoost below). While active on a floor, its upgrade button wiggles like
@@ -657,6 +730,59 @@ export function isSaleActive(floor: Floor, now: number): boolean {
   return startedAt !== undefined && now - startedAt < SALE_DURATION_MS;
 }
 
+// "frozen crit" (see shared/critTypes' isFrozenCrit): unlike every other
+// piggyback proc, its reward isn't instant — it just locks this floor's
+// upgradeCost at whatever it currently is for FROZEN_DURATION_MS of real
+// time. incomePanel.ts's increaseIncomeRate checks isFrozenActive and skips
+// its own cost-growth multiplication while true; every other part of that
+// tick (income rate, upgradeCount, interval halving) proceeds completely
+// normally, and the button still costs real money to click — it just isn't
+// getting any more expensive for the duration. The button itself still
+// wiggles and shows its own "Frozen" label/color while active (see
+// drawUpgradeButton below), same visual treatment as Sale/Overtime, but
+// affordability dimming still applies normally (this is not a free click)
+export const FROZEN_DURATION_MS = CONFIG.crit.frozenDurationMs;
+const frozenStartedAt = new WeakMap<Floor, number>();
+
+export function triggerFrozenCrit(floor: Floor): void {
+  frozenStartedAt.set(floor, Date.now());
+}
+
+export function isFrozenActive(floor: Floor, now: number): boolean {
+  const startedAt = frozenStartedAt.get(floor);
+  return startedAt !== undefined && now - startedAt < FROZEN_DURATION_MS;
+}
+
+// "snowball crit" (see shared/critTypes' isSnowballCrit): a Sale-like free-
+// click event — while active, this floor's button wiggles/costs nothing to
+// click, same as Sale/Overtime — but instead of paying out cash or filling a
+// gauge, each click permanently adds n^2 * rateStep to the floor's OWN income
+// rate (n = that click's own 1-indexed count within this event; see
+// floorInteractions.ts's Snowball click branch, which calls addSnowballClick
+// below to get each click's own n), so income visibly snowballs the longer
+// the event is milked. The click counter resets every time the event (re)starts
+export const SNOWBALL_DURATION_MS = CONFIG.crit.snowballDurationMs;
+const snowballStartedAt = new WeakMap<Floor, number>();
+const snowballClickCount = new WeakMap<Floor, number>();
+
+export function triggerSnowballCrit(floor: Floor): void {
+  snowballStartedAt.set(floor, Date.now());
+  snowballClickCount.set(floor, 0);
+}
+
+export function isSnowballActive(floor: Floor, now: number): boolean {
+  const startedAt = snowballStartedAt.get(floor);
+  return startedAt !== undefined && now - startedAt < SNOWBALL_DURATION_MS;
+}
+
+// call once per free snowball click — bumps this event's own click counter
+// and returns that click's own n (1-indexed), for the caller to square
+export function nextSnowballClickCount(floor: Floor): number {
+  const n = (snowballClickCount.get(floor) ?? 0) + 1;
+  snowballClickCount.set(floor, n);
+  return n;
+}
+
 // whether the upgrade button is currently "enabled" (colored, clickable) —
 // on Sale, mid-crit, or plainly affordable — as opposed to greyed-out. Used
 // by floorInteractions.ts's hitTestFloorHover, gameCanvas.ts's pointerdown
@@ -667,6 +793,7 @@ export function isUpgradeButtonEnabled(floor: Floor): boolean {
   return (
     isSaleActive(floor, Date.now()) ||
     isOvertimeActive(floor, Date.now()) ||
+    isSnowballActive(floor, Date.now()) ||
     isCritUpgrade(floor) ||
     gte(getTotalIncome(), floor.upgradeCost)
   );
@@ -860,15 +987,17 @@ export function drawUpgradeButton(
   const crit = critTier !== null;
   const sale = isSaleActive(floor, now);
   const overtime = isOvertimeActive(floor, now);
+  const frozen = isFrozenActive(floor, now);
+  const snowball = isSnowballActive(floor, now);
 
   ctx.save();
   ctx.translate(cx + holdAnim.shakeX, cy + holdAnim.shakeY);
-  if (crit || sale || overtime) {
+  if (crit || sale || overtime || frozen || snowball) {
     ctx.rotate(getWiggleRotation(now));
   }
   ctx.scale(scale * holdAnim.scale, scale * holdAnim.scale);
   ctx.translate(-cx, -cy);
-  if (!crit && !sale && !overtime) {
+  if (!crit && !sale && !overtime && !snowball) {
     if (!affordable) ctx.globalAlpha = 0.5;
     else if (hovered) ctx.filter = "brightness(0.85)";
   } else if (hovered) {
@@ -891,11 +1020,15 @@ export function drawUpgradeButton(
         ? COLOR.amber
         : overtime
           ? COLOR.amber
-          : floor.critMultiplierTier
-            ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
-            : affordable
-              ? COLOR.moneyGreen
-              : COLOR.disabledGray,
+          : snowball
+            ? COLOR.snowballBlue
+            : frozen
+              ? COLOR.frozenIceBlue
+              : floor.critMultiplierTier
+                ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
+                : affordable
+                  ? COLOR.moneyGreen
+                  : COLOR.disabledGray,
     true,
     true,
     40,
@@ -912,9 +1045,15 @@ export function drawUpgradeButton(
       ? crit
         ? `Overtime x${CRIT_TIER_CONFIG[critTier!].multiplier}`
         : "Overtime"
-      : crit
-        ? CRIT_TIER_CONFIG[critTier!].label
-        : formatPrice(cost);
+      : snowball
+        ? crit
+          ? `Snowball x${CRIT_TIER_CONFIG[critTier!].multiplier}`
+          : "Snowball"
+        : frozen
+          ? "Frozen"
+          : crit
+            ? CRIT_TIER_CONFIG[critTier!].label
+            : formatPrice(cost);
   drawCartoonText(ctx, label, cx, cy);
   ctx.restore();
 }
