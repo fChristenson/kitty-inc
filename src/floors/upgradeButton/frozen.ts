@@ -37,4 +37,3 @@ registerEventButton({
   label: (critMultiplier) =>
     critMultiplier !== null ? `Frozen x${critMultiplier}` : "Frozen",
 });
-
