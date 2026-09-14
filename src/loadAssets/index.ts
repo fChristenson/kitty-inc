@@ -75,6 +75,7 @@ const IMAGE_FILES = {
   fastforward: "fastforward.png", // Fast Forward crit flash's own backdrop icon
   icecube: "icecube.png", // Frozen crit flash's own backdrop icon
   snowball: "snowball.png", // Snowball crit flash's own backdrop icon
+  bull: "bull.png", // Bull Market crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

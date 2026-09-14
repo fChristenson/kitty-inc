@@ -286,6 +286,15 @@ export const FREE_SALE_CRIT_CHANCE = CONFIG.crit.freeSaleChance;
 export const FREE_SALE_CRIT_COLOR = COLOR.amber;
 export const FREE_SALE_CRIT_LABEL = "Sale";
 
+// "bull market crit" — an instant, flat, building-wide reward: doubles
+// every unlocked floor's own upgradeCount at once (see
+// floorInteractions.ts's applyBullMarketCrit, which reads each floor's
+// current count once then replays that many more direct increaseIncomeRate
+// bumps, same perf-conscious approach applyHeavenlyCrit already uses)
+export const BULL_MARKET_CRIT_CHANCE = CONFIG.crit.bullMarketChance;
+export const BULL_MARKET_CRIT_COLOR = COLOR.bullMarketGreen;
+export const BULL_MARKET_CRIT_LABEL = "Bull Market";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -314,6 +323,7 @@ const fastForwardCrits = new WeakSet<Floor>();
 const frozenCrits = new WeakSet<Floor>();
 const snowballCrits = new WeakSet<Floor>();
 const freeSaleCrits = new WeakSet<Floor>();
+const bullMarketCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
@@ -371,6 +381,7 @@ export interface CritRollResult {
   frozen: boolean;
   snowball: boolean;
   freeSale: boolean;
+  bullMarket: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -407,6 +418,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "frozen",
   "snowball",
   "freeSale",
+  "bullMarket",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -597,6 +609,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     label: FREE_SALE_CRIT_LABEL,
     icon: "cashRegister",
     description: "Starts a free Sale event on this floor",
+  },
+  bullMarket: {
+    label: BULL_MARKET_CRIT_LABEL,
+    icon: "bull",
+    description: "Doubles every unlocked floor's own upgrade count",
   },
 };
 

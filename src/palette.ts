@@ -97,6 +97,8 @@ export const COLOR = {
   frozenIceBlue: "#7DD3E8",
   // Snowball crit's own dedicated color, matching the snowball icon
   snowballBlue: "#93C5FD",
+  // Bull Market crit's own dedicated color — a bullish stock-market green
+  bullMarketGreen: "#16A34A",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

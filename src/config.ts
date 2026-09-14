@@ -165,6 +165,10 @@ export const CONFIG = {
     // floorInteractions.ts's applyFreeSaleCrit/upgradeButton.ts's
     // triggerSaleBoost), for free
     freeSaleChance: 0.05,
+    // "bull market crit" — doubles every unlocked floor's own upgradeCount
+    // building-wide (see floorInteractions.ts's applyBullMarketCrit), same
+    // recompute-from-increaseIncomeRate approach applyHeavenlyCrit uses
+    bullMarketChance: 0.01,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.
