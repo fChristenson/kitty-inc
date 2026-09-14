@@ -99,6 +99,12 @@ export const COLOR = {
   snowballBlue: "#93C5FD",
   // Bull Market crit's own dedicated color — a bullish stock-market green
   bullMarketGreen: "#16A34A",
+  // Payday crit's own dedicated color — a rich emerald, distinct from every
+  // other green already in use
+  paydayEmerald: "#059669",
+  // Gold Standard crit's own dedicated color — a deep vault-gold, distinct
+  // from booty's/heavenly's/mega's own golds
+  goldStandardAmber: "#B8860B",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

@@ -73,6 +73,8 @@ const IMAGE_FILES = {
   icecube: "icecube.png", // Frozen crit flash's own backdrop icon
   snowball: "snowball.png", // Snowball crit flash's own backdrop icon
   bull: "bull.png", // Bull Market crit flash's own backdrop icon
+  payday: "payday.png", // Payday crit flash's own backdrop icon
+  goldStandard: "goldStandard.png", // Gold Standard crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

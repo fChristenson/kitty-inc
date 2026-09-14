@@ -169,6 +169,12 @@ export const CONFIG = {
     // building-wide (see floorInteractions.ts's applyBullMarketCrit), same
     // recompute-from-increaseIncomeRate approach applyHeavenlyCrit uses
     bullMarketChance: 0.01,
+    // "payday crit" — a flat one-time effect (not tier-scaled, same shape as
+    // booty): triples the CURRENTLY ACTIVE company's total income once
+    paydayChance: 0.05,
+    // "gold standard crit" — same flat one-time effect as payday, just a
+    // steeper multiplier
+    goldStandardChance: 0.01,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

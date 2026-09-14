@@ -82,6 +82,10 @@ export {
   FREE_SALE_CRIT_LABEL,
   BULL_MARKET_CRIT_COLOR,
   BULL_MARKET_CRIT_LABEL,
+  PAYDAY_CRIT_COLOR,
+  PAYDAY_CRIT_LABEL,
+  GOLD_STANDARD_CRIT_COLOR,
+  GOLD_STANDARD_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -109,6 +113,8 @@ export {
   isSnowballCrit,
   isFreeSaleCrit,
   isBullMarketCrit,
+  isPaydayCrit,
+  isGoldStandardCrit,
   pickHigherCritTier,
   nextCritTier,
   getUniformCritTier,
@@ -145,6 +151,8 @@ import {
   forceSnowballCritProc,
   forceFreeSaleCritProc,
   forceBullMarketCritProc,
+  forcePaydayCritProc,
+  forceGoldStandardCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
 
@@ -190,6 +198,8 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.snowball) forceSnowballCritProc(floor);
     if (result.freeSale) forceFreeSaleCritProc(floor);
     if (result.bullMarket) forceBullMarketCritProc(floor);
+    if (result.payday) forcePaydayCritProc(floor);
+    if (result.goldStandard) forceGoldStandardCritProc(floor);
   }, allowSpecialProcs);
 }
 
@@ -251,6 +261,8 @@ export function forceFloorBuyCrit(
   snowball = false,
   freeSale = false,
   bullMarket = false,
+  payday = false,
+  goldStandard = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -281,6 +293,8 @@ export function forceFloorBuyCrit(
     snowball,
     freeSale,
     bullMarket,
+    payday,
+    goldStandard,
   };
 }
 
@@ -488,4 +502,14 @@ export function forceFreeSaleCritUpgrade(floor: Floor): void {
 export function forceBullMarketCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceBullMarketCritProc(floor);
+}
+
+export function forcePaydayCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forcePaydayCritProc(floor);
+}
+
+export function forceGoldStandardCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceGoldStandardCritProc(floor);
 }

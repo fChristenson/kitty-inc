@@ -298,6 +298,19 @@ export const BULL_MARKET_CRIT_CHANCE = CONFIG.crit.bullMarketChance;
 export const BULL_MARKET_CRIT_COLOR = COLOR.bullMarketGreen;
 export const BULL_MARKET_CRIT_LABEL = "Bull Market";
 
+// "payday crit" — a flat, not-tier-scaled proc like booty: triples the
+// CURRENTLY ACTIVE company's total income once (see
+// floorInteractions.ts's applyPaydayCrit)
+export const PAYDAY_CRIT_CHANCE = CONFIG.crit.paydayChance;
+export const PAYDAY_CRIT_COLOR = COLOR.paydayEmerald;
+export const PAYDAY_CRIT_LABEL = "Payday";
+
+// "gold standard crit" — same flat one-time effect as payday, just a
+// steeper multiplier (see floorInteractions.ts's applyGoldStandardCrit)
+export const GOLD_STANDARD_CRIT_CHANCE = CONFIG.crit.goldStandardChance;
+export const GOLD_STANDARD_CRIT_COLOR = COLOR.goldStandardAmber;
+export const GOLD_STANDARD_CRIT_LABEL = "Gold Standard";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -327,6 +340,8 @@ const frozenCrits = new WeakSet<Floor>();
 const snowballCrits = new WeakSet<Floor>();
 const freeSaleCrits = new WeakSet<Floor>();
 const bullMarketCrits = new WeakSet<Floor>();
+const paydayCrits = new WeakSet<Floor>();
+const goldStandardCrits = new WeakSet<Floor>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
@@ -385,6 +400,8 @@ export interface CritRollResult {
   snowball: boolean;
   freeSale: boolean;
   bullMarket: boolean;
+  payday: boolean;
+  goldStandard: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -422,6 +439,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "snowball",
   "freeSale",
   "bullMarket",
+  "payday",
+  "goldStandard",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -618,6 +637,16 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "bull",
     description: "Doubles every unlocked floor's own upgrade count",
   },
+  payday: {
+    label: PAYDAY_CRIT_LABEL,
+    icon: "payday",
+    description: "Triples your total income",
+  },
+  goldStandard: {
+    label: GOLD_STANDARD_CRIT_LABEL,
+    icon: "goldStandard",
+    description: "Quadruples your total income",
+  },
 };
 
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
@@ -677,6 +706,9 @@ export function rollCrit(
         if (Math.random() < SNOWBALL_CRIT_CHANCE) landed.push("snowball");
         if (Math.random() < FREE_SALE_CRIT_CHANCE) landed.push("freeSale");
         if (Math.random() < BULL_MARKET_CRIT_CHANCE) landed.push("bullMarket");
+        if (Math.random() < PAYDAY_CRIT_CHANCE) landed.push("payday");
+        if (Math.random() < GOLD_STANDARD_CRIT_CHANCE)
+          landed.push("goldStandard");
       }
       const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
       // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -711,6 +743,8 @@ export function rollCrit(
         snowball: kept.has("snowball"),
         freeSale: kept.has("freeSale"),
         bullMarket: kept.has("bullMarket"),
+        payday: kept.has("payday"),
+        goldStandard: kept.has("goldStandard"),
       });
       return;
     }
@@ -827,6 +861,14 @@ export function isBullMarketCrit(floor: Floor): boolean {
   return bullMarketCrits.has(floor);
 }
 
+export function isPaydayCrit(floor: Floor): boolean {
+  return paydayCrits.has(floor);
+}
+
+export function isGoldStandardCrit(floor: Floor): boolean {
+  return goldStandardCrits.has(floor);
+}
+
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   chainCrits.delete(floor);
@@ -856,6 +898,8 @@ export function consumeCritProcs(floor: Floor): void {
   snowballCrits.delete(floor);
   freeSaleCrits.delete(floor);
   bullMarketCrits.delete(floor);
+  paydayCrits.delete(floor);
+  goldStandardCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -967,6 +1011,14 @@ export function forceFreeSaleCritProc(floor: Floor): void {
 
 export function forceBullMarketCritProc(floor: Floor): void {
   bullMarketCrits.add(floor);
+}
+
+export function forcePaydayCritProc(floor: Floor): void {
+  paydayCrits.add(floor);
+}
+
+export function forceGoldStandardCritProc(floor: Floor): void {
+  goldStandardCrits.add(floor);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

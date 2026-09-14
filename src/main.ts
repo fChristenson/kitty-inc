@@ -48,6 +48,8 @@ import {
   forceFrozenCritUpgrade,
   forceSnowballCritUpgrade,
   forceFreeSaleCritUpgrade,
+  forcePaydayCritUpgrade,
+  forceGoldStandardCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -117,6 +119,8 @@ import {
   wireSpawnFrozenCritButton,
   wireSpawnSnowballCritButton,
   wireSpawnFreeSaleCritButton,
+  wireSpawnPaydayCritButton,
+  wireSpawnGoldStandardCritButton,
   wireFloorBuyCritButton,
   wireFloorBuyBoostCritButton,
   wireFloorBuyMegaCritButton,
@@ -152,6 +156,8 @@ import {
   wireFloorBuyFrozenCritButton,
   wireFloorBuySnowballCritButton,
   wireFloorBuyFreeSaleCritButton,
+  wireFloorBuyPaydayCritButton,
+  wireFloorBuyGoldStandardCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -592,6 +598,14 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceFreeSaleCritUpgrade(floor);
     });
+    wireSpawnPaydayCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forcePaydayCritUpgrade(floor);
+    });
+    wireSpawnGoldStandardCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceGoldStandardCritUpgrade(floor);
+    });
     wireFloorBuyCritButton(app, () => forceFloorBuyCrit("crit"));
     wireFloorBuyBoostCritButton(app, () =>
       forceFloorBuyCrit("crit", false, true),
@@ -1020,6 +1034,74 @@ async function main() {
     wireFloorBuyFreeSaleCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyPaydayCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+      ),
+    );
+    wireFloorBuyGoldStandardCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
         false,
         false,
         false,

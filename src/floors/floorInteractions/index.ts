@@ -38,6 +38,8 @@ import {
   isFrozenCrit,
   isSnowballCrit,
   isFreeSaleCrit,
+  isPaydayCrit,
+  isGoldStandardCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
   HALLOWEEN_SALE_DISCOUNT_MULTIPLIER,
   POKER_HAND_CRIT_COUNTS,
@@ -441,6 +443,20 @@ function applyFreeSaleCrit(floor: Floor): void {
   triggerSaleBoost(floor);
 }
 
+// "payday crit" (see shared/critTypes's isPaydayCrit): a flat one-time
+// effect, same shape as booty — triples the currently active company's
+// total income once
+function applyPaydayCrit(): void {
+  addTotalIncome(multiply(getTotalIncome(), 2));
+}
+
+// "gold standard crit" (see shared/critTypes's isGoldStandardCrit): same
+// flat one-time effect as payday, just a steeper multiplier — quadruples
+// the currently active company's total income once
+function applyGoldStandardCrit(): void {
+  addTotalIncome(multiply(getTotalIncome(), 3));
+}
+
 // "Chair Giveaway"/"Supplies Giveaway" crits (see shared/critTypes's isChairGiveawayCrit/
 // isSuppliesGiveawayCrit): grant the floor being upgraded its one-time office
 // chairs/supplies purchase for free (same flags hud/upgradeMenu's own paid
@@ -668,6 +684,11 @@ export function handleFloorClick(
         if (buyTier.snowball) applySnowballCrit(floor);
         // free sale crit: starts just this floor's own free Sale event
         if (buyTier.freeSale) applyFreeSaleCrit(floor);
+        // payday crit: same flat one-time triple-income effect a per-click
+        // payday crit grants
+        if (buyTier.payday) applyPaydayCrit();
+        // gold standard crit: same flat one-time effect, a steeper 4x
+        if (buyTier.goldStandard) applyGoldStandardCrit();
       }
       persist();
       const center = getLockCenter();
@@ -703,6 +724,8 @@ export function handleFloorClick(
           buyTier.frozen,
           buyTier.snowball,
           buyTier.freeSale,
+          buyTier.payday,
+          buyTier.goldStandard,
         );
     }
     return;
@@ -924,6 +947,8 @@ export function handleFloorClick(
       const frozen = isFrozenCrit(floor);
       const snowball = isSnowballCrit(floor);
       const freeSale = isFreeSaleCrit(floor);
+      const payday = isPaydayCrit(floor);
+      const goldStandard = isGoldStandardCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
@@ -1037,6 +1062,11 @@ export function handleFloorClick(
       if (snowball) applySnowballCrit(floor);
       // free sale crit: starts just this floor's own free Sale event
       if (freeSale) applyFreeSaleCrit(floor);
+      // payday crit: triples the currently active company's total income
+      // once, same flat one-time effect as booty
+      if (payday) applyPaydayCrit();
+      // gold standard crit: same flat one-time effect, a steeper 4x
+      if (goldStandard) applyGoldStandardCrit();
       // Chair Giveaway/Supplies Giveaway crits: free one-time office chairs/
       // supplies purchase for the floor that actually crit
       if (chairGiveaway) applyChairGiveawayCrit(floor);
@@ -1082,6 +1112,8 @@ export function handleFloorClick(
         frozen,
         snowball,
         freeSale,
+        payday,
+        goldStandard,
       );
       return;
     }

@@ -168,6 +168,18 @@ let cashRegisterIcon: HTMLImageElement | null = null;
 loadImageByName("cashRegister").then((image) => {
   cashRegisterIcon = image;
 });
+// same idea again, drawn behind the "Payday" flash text (see
+// shared/critTypes's isPaydayCrit)
+let paydayIcon: HTMLImageElement | null = null;
+loadImageByName("payday").then((image) => {
+  paydayIcon = image;
+});
+// same idea again, drawn behind the "Gold Standard" flash text (see
+// shared/critTypes's isGoldStandardCrit)
+let goldStandardIcon: HTMLImageElement | null = null;
+loadImageByName("goldStandard").then((image) => {
+  goldStandardIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -691,6 +703,20 @@ export function drawCritFlash(
       measuredWidth * 0.85,
     );
     ctx.drawImage(cashRegisterIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Payday" && paydayIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      paydayIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(paydayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (flashLabel === "Gold Standard" && goldStandardIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      goldStandardIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(goldStandardIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

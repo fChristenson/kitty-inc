@@ -50,6 +50,10 @@ import {
   SNOWBALL_CRIT_LABEL,
   FREE_SALE_CRIT_COLOR,
   FREE_SALE_CRIT_LABEL,
+  PAYDAY_CRIT_COLOR,
+  PAYDAY_CRIT_LABEL,
+  GOLD_STANDARD_CRIT_COLOR,
+  GOLD_STANDARD_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -448,7 +452,9 @@ interface QueuedCelebration {
     | "fastForward"
     | "frozen"
     | "snowball"
-    | "freeSale";
+    | "freeSale"
+    | "payday"
+    | "goldStandard";
   queuedAt: number;
   run: () => void;
 }
@@ -527,6 +533,8 @@ export function triggerCritCelebration(
   frozen = false,
   snowball = false,
   freeSale = false,
+  payday = false,
+  goldStandard = false,
 ): void {
   if (
     chain ||
@@ -554,7 +562,9 @@ export function triggerCritCelebration(
     fastForward ||
     frozen ||
     snowball ||
-    freeSale
+    freeSale ||
+    payday ||
+    goldStandard
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -902,6 +912,37 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             FREE_SALE_CRIT_LABEL,
             FREE_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (payday && !specialCelebrationQueue.some((q) => q.kind === "payday")) {
+      specialCelebrationQueue.push({
+        kind: "payday",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            PAYDAY_CRIT_LABEL,
+            PAYDAY_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      goldStandard &&
+      !specialCelebrationQueue.some((q) => q.kind === "goldStandard")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "goldStandard",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            GOLD_STANDARD_CRIT_LABEL,
+            GOLD_STANDARD_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,
