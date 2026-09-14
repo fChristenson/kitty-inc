@@ -151,20 +151,20 @@ export const CONFIG = {
     // each click pays a flat floorIncomePerSecond * ultra-crit multiplier
     // straight to the player's total instead of performing the normal paid
     // upgrade at all
-    frozenChance: 0.1,
+    frozenChance: 0.01,
     frozenDurationMs: 15000,
     // "snowball crit" — starts a Sale-like free-click event (see
     // upgradeButton.ts's isSnowballActive/triggerSnowballCrit): each click
     // credits a lump sum straight to the player's total, growing by n^2 (n =
     // that click's own 1-indexed count within the event) instead of Sale's
     // own flat multiplier
-    snowballChance: 0.1,
+    snowballChance: 0.01,
     snowballDurationMs: 15000,
     // "free sale crit" — no reward of its own: just triggers the SAME "Sale"
     // event hud/boostMenu's paid purchase starts (see
     // floorInteractions.ts's applyFreeSaleCrit/upgradeButton.ts's
     // triggerSaleBoost), for free
-    freeSaleChance: 0.1,
+    freeSaleChance: 0.05,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.
