@@ -120,4 +120,3 @@ export function drawUpgradeButton(
   drawCartoonText(ctx, label, cx, cy);
   ctx.restore();
 }
-
