@@ -104,6 +104,7 @@ const IMAGE_FILES = {
   teamBuilding: "teamBuilding.png", // Team Building crit flash's own backdrop icon
   springCleaning: "springCleaning.png", // Spring Cleaning crit flash's own backdrop icon
   nightOwl: "nightOwl.png", // Night Owl crit flash's own backdrop icon
+  headhunter: "headhunter.png", // Headhunter crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

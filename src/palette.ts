@@ -168,6 +168,8 @@ export const COLOR = {
   springCleaningMint: "#14919B",
   // Night Owl crit's own dedicated color
   nightOwlIndigo: "#3730A3",
+  // Headhunter crit's own dedicated color
+  headhunterRust: "#C2410C",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

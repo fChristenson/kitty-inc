@@ -158,6 +158,8 @@ export {
   SPRING_CLEANING_CRIT_LABEL,
   NIGHT_OWL_CRIT_COLOR,
   NIGHT_OWL_CRIT_LABEL,
+  HEADHUNTER_CRIT_COLOR,
+  HEADHUNTER_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -216,6 +218,7 @@ export {
   isTeamBuildingCrit,
   isSpringCleaningCrit,
   isNightOwlCrit,
+  isHeadhunterCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -285,6 +288,7 @@ import {
   forceTeamBuildingCritProc,
   forceSpringCleaningCritProc,
   forceNightOwlCritProc,
+  forceHeadhunterCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -390,6 +394,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.teamBuilding) forceTeamBuildingCritProc(floor);
     if (result.springCleaning) forceSpringCleaningCritProc(floor);
     if (result.nightOwl) forceNightOwlCritProc(floor);
+    if (result.headhunter) forceHeadhunterCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -532,6 +537,7 @@ export function forceFloorBuyCrit(
     teamBuilding: false,
     springCleaning: false,
     nightOwl: false,
+    headhunter: false,
   };
 }
 
@@ -638,6 +644,11 @@ export function forceSpringCleaningFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceNightOwlFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.nightOwl = true;
+}
+
+export function forceHeadhunterFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.headhunter = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -1037,6 +1048,11 @@ export function forceSpringCleaningCritUpgrade(floor: Floor): void {
 export function forceNightOwlCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceNightOwlCritProc(floor);
+}
+
+export function forceHeadhunterCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceHeadhunterCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

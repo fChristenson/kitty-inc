@@ -274,6 +274,10 @@ export const CONFIG = {
     // "Night Owl" crit — Night Shift's reward with twice the virtual-worker
     // bump (+2 instead of +1), so a touch rarer than it
     nightOwlChance: 0.05,
+    // "Headhunter" crit — matches the floor that crit to the building's
+    // best-staffed floor; a no-op if it's already the best, so priced like
+    // the other single-floor staffing procs
+    headhunterChance: 0.06,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

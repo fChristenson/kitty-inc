@@ -71,6 +71,7 @@ import {
   isTeamBuildingCrit,
   isSpringCleaningCrit,
   isNightOwlCrit,
+  isHeadhunterCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -419,6 +420,21 @@ function applyNightShiftCrit(floors: Floor[]): void {
 // twice the virtual-worker bump
 function applyNightOwlCrit(floors: Floor[]): void {
   applyNightShiftBoost(floors, 2);
+}
+
+// "Headhunter" crit (see shared/critTypes's isHeadhunterCrit): poaches the
+// building's best headcount onto just the floor that crit — Clone Army's
+// levelling-up, narrowed to one floor. Nothing happens when that floor is
+// already the best-staffed one (or the only one)
+function applyHeadhunterCrit(floor: Floor, floors: Floor[]): void {
+  let best = 0;
+  for (const other of floors) {
+    if (other.unlocked) best = Math.max(best, other.workerCount);
+  }
+  floor.workerCount = Math.max(
+    floor.workerCount,
+    Math.min(best, MAX_RENDERED_WORKERS),
+  );
 }
 
 // minimal deps a chain crit needs to grow a building while walking upward —
@@ -1085,6 +1101,7 @@ export function handleFloorClick(
         if (buyTier.teamBuilding) applyTeamBuildingCrit(floors);
         if (buyTier.springCleaning) applySpringCleaningCrit(floors, multiplier);
         if (buyTier.nightOwl) applyNightOwlCrit(floors);
+        if (buyTier.headhunter) applyHeadhunterCrit(floor, floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -1198,6 +1215,7 @@ export function handleFloorClick(
           buyTier.teamBuilding,
           buyTier.springCleaning,
           buyTier.nightOwl,
+          buyTier.headhunter,
         );
     }
     return;
@@ -1377,6 +1395,7 @@ export function handleFloorClick(
       const teamBuilding = isTeamBuildingCrit(floor);
       const springCleaning = isSpringCleaningCrit(floor);
       const nightOwl = isNightOwlCrit(floor);
+      const headhunter = isHeadhunterCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1399,6 +1418,7 @@ export function handleFloorClick(
       if (teamBuilding) applyTeamBuildingCrit(floors);
       if (springCleaning) applySpringCleaningCrit(floors, multiplier);
       if (nightOwl) applyNightOwlCrit(floors);
+      if (headhunter) applyHeadhunterCrit(floor, floors);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
       // never once per free tick above, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
@@ -1638,6 +1658,7 @@ export function handleFloorClick(
         teamBuilding,
         springCleaning,
         nightOwl,
+        headhunter,
       );
       return;
     }

@@ -45,9 +45,6 @@
   seconds (Frozen, but not just the one floor).
 - Shredder — wipes the floor's upgrade cost entirely for its next ten
   upgrades, then snaps back to normal.
-
-## To consider
-
 - Coffee Run — every floor's income timer runs at half interval until the
   player's next crit lands, however long that takes.
 - Open Plan — merges the two lowest-earning unlocked floors' rates into
@@ -78,3 +75,36 @@
   the building's highest tier.
 - Golden Stapler — Golden Ticket with a bigger moment: a jackpot flash that
   also guarantees an ultra on the very next click.
+
+## To consider
+
+- Expense Report — refunds the cost of the last ten upgrades bought on the
+  floor that crit, at the price they were actually paid.
+- Standing Desk — permanently halves one random unlocked floor's income
+  interval, no cap, so repeats keep compounding on different floors.
+- Headhunter — steals the highest worker count in the company and applies it
+  to the floor that crit, leaving the source floor untouched.
+- Dress Code — every floor without a manager instantly gets one, and every
+  floor that already has one gains a worker instead.
+- Sabbatical — the floor that crit stops earning for 30 seconds, then pays
+  out triple everything it would have made, plus a bonus.
+- Mailroom — the next crit that lands anywhere also fires on the ground
+  floor, whatever floor actually triggered it.
+- Photocopier — duplicates the floor that crit's entire upgrade count onto
+  the floor directly above it.
+- Recruitment Drive — every unlocked floor below the one that crit gains a
+  worker; every floor above gains a manager.
+- Buyout — instantly unlocks every floor in the building but resets each to
+  zero upgrades. Trade breadth for depth.
+- Overtime Pay — every upgrade bought in the next 15 seconds also credits
+  its own cost straight back as income.
+- Tea Break — pauses every floor's timer for 10 seconds, then releases them
+  all at once so every bar completes simultaneously.
+- Company Car — one random unlocked floor permanently earns at the rate of
+  the best floor in the building.
+- Audit — reveals and instantly banks the exact income the building would
+  make over the next full minute.
+- Intern Army — fills the floor that crit to its worker cap, then spills the
+  leftover hires onto the floors above it.
+- Merger — averages every unlocked floor's rate, then raises them all to
+  that average. Lifts the weak without touching the strong.

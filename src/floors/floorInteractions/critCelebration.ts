@@ -114,6 +114,8 @@ import {
   SPRING_CLEANING_CRIT_LABEL,
   NIGHT_OWL_CRIT_COLOR,
   NIGHT_OWL_CRIT_LABEL,
+  HEADHUNTER_CRIT_COLOR,
+  HEADHUNTER_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -619,6 +621,7 @@ interface QueuedCelebration {
     | "teamBuilding"
     | "springCleaning"
     | "nightOwl"
+    | "headhunter"
     | "bonusTier";
   queuedAt: number;
   maxAgeMs?: number;
@@ -758,6 +761,7 @@ export function triggerCritCelebration(
   teamBuilding = false,
   springCleaning = false,
   nightOwl = false,
+  headhunter = false,
 ): void {
   const procFlags: Partial<Record<CritProcKind, boolean>> = {
     chain,
@@ -817,6 +821,7 @@ export function triggerCritCelebration(
     teamBuilding,
     springCleaning,
     nightOwl,
+    headhunter,
   };
   if (
     chain ||
@@ -875,7 +880,8 @@ export function triggerCritCelebration(
     coffeeRun ||
     teamBuilding ||
     springCleaning ||
-    nightOwl
+    nightOwl ||
+    headhunter
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1620,6 +1626,23 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             NIGHT_OWL_CRIT_LABEL,
             NIGHT_OWL_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      headhunter &&
+      !specialCelebrationQueue.some((q) => q.kind === "headhunter")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "headhunter",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            HEADHUNTER_CRIT_LABEL,
+            HEADHUNTER_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

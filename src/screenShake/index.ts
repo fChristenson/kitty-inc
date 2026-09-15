@@ -74,6 +74,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Team Building": { name: "teamBuilding" },
   "Spring Cleaning": { name: "springCleaning" },
   "Night Owl": { name: "nightOwl" },
+  Headhunter: { name: "headhunter" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();
