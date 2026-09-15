@@ -96,6 +96,7 @@ const IMAGE_FILES = {
   roundUp: "roundUp.png", // Round Up crit flash's own backdrop icon
   goldenHandshake: "goldenHandshake.png", // Golden Handshake crit flash's own backdrop icon
   supplyRun: "supplyRun.png", // Supply Run crit flash's own backdrop icon
+  casualFriday: "casualFriday.png", // Casual Friday crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

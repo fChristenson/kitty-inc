@@ -63,6 +63,7 @@ import {
   isRoundUpCrit,
   isGoldenHandshakeCrit,
   isSupplyRunCrit,
+  isCasualFridayCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -84,6 +85,7 @@ import {
   LUCKY_CLOVER_CRIT_COUNT,
   LUCKY_CLOVER_CRIT_TIER,
   ROUND_UP_CRIT_STEP,
+  CASUAL_FRIDAY_CRIT_UPGRADES,
   endOvertimeActiveWindow,
   isOvertimeDraining,
   getOvertimeCost,
@@ -177,6 +179,18 @@ function applyRoundUpCrit(floors: Floor[]): void {
     const ticks =
       ROUND_UP_CRIT_STEP - (floor.upgradeCount % ROUND_UP_CRIT_STEP);
     for (let i = 0; i < ticks; i++) applyUpgradeTick(floor, index === 0);
+  }
+}
+
+// "Casual Friday" crit (see shared/critTypes's isCasualFridayCrit): a flat
+// batch of free upgrades on every unlocked floor, not scaled by the landed
+// tier
+function applyCasualFridayCrit(floors: Floor[]): void {
+  for (const [index, floor] of floors.entries()) {
+    if (!floor.unlocked) continue;
+    for (let i = 0; i < CASUAL_FRIDAY_CRIT_UPGRADES; i++) {
+      applyUpgradeTick(floor, index === 0);
+    }
   }
 }
 
@@ -965,6 +979,7 @@ export function handleFloorClick(
         if (buyTier.roundUp) applyRoundUpCrit(floors);
         if (buyTier.goldenHandshake) applyGoldenHandshakeCrit(floors);
         if (buyTier.supplyRun) applySupplyRunCrit(floor);
+        if (buyTier.casualFriday) applyCasualFridayCrit(floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -1070,6 +1085,7 @@ export function handleFloorClick(
           buyTier.roundUp,
           buyTier.goldenHandshake,
           buyTier.supplyRun,
+          buyTier.casualFriday,
         );
     }
     return;
@@ -1241,6 +1257,7 @@ export function handleFloorClick(
       const roundUp = isRoundUpCrit(floor);
       const goldenHandshake = isGoldenHandshakeCrit(floor);
       const supplyRun = isSupplyRunCrit(floor);
+      const casualFriday = isCasualFridayCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1253,6 +1270,7 @@ export function handleFloorClick(
       if (roundUp) applyRoundUpCrit(floors);
       if (goldenHandshake) applyGoldenHandshakeCrit(floors);
       if (supplyRun) applySupplyRunCrit(floor);
+      if (casualFriday) applyCasualFridayCrit(floors);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
       // never once per free tick above, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
@@ -1484,6 +1502,7 @@ export function handleFloorClick(
         roundUp,
         goldenHandshake,
         supplyRun,
+        casualFriday,
       );
       return;
     }

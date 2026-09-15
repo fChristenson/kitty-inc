@@ -152,6 +152,8 @@ export const COLOR = {
   goldenHandshakeGold: "#CA8A04",
   // Supply Run crit's own dedicated color
   supplyRunTan: "#B45309",
+  // Casual Friday crit's own dedicated color
+  casualFridayTeal: "#0D9488",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

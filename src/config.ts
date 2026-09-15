@@ -244,6 +244,9 @@ export const CONFIG = {
     // "Supply Run" crit — free office chairs AND supplies for the floor that
     // crit, in one go
     supplyRunChance: 0.0005,
+    // "Casual Friday" crit — a flat batch of free upgrades for every unlocked
+    // floor in the building
+    casualFridayChance: 0.0005,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

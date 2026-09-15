@@ -483,6 +483,13 @@ export const SUPPLY_RUN_CRIT_CHANCE = CONFIG.crit.supplyRunChance;
 export const SUPPLY_RUN_CRIT_COLOR = COLOR.supplyRunTan;
 export const SUPPLY_RUN_CRIT_LABEL = "Supply Run";
 
+// "Casual Friday" crit — a flat CASUAL_FRIDAY_CRIT_UPGRADES free upgrades on
+// every unlocked floor at once, no tier scaling
+export const CASUAL_FRIDAY_CRIT_CHANCE = CONFIG.crit.casualFridayChance;
+export const CASUAL_FRIDAY_CRIT_COLOR = COLOR.casualFridayTeal;
+export const CASUAL_FRIDAY_CRIT_LABEL = "Casual Friday";
+export const CASUAL_FRIDAY_CRIT_UPGRADES = 5;
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -552,6 +559,7 @@ const executiveOrderCrits = new WeakSet<Floor>();
 const roundUpCrits = new WeakSet<Floor>();
 const goldenHandshakeCrits = new WeakSet<Floor>();
 const supplyRunCrits = new WeakSet<Floor>();
+const casualFridayCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -642,6 +650,7 @@ export interface CritRollResult {
   roundUp: boolean;
   goldenHandshake: boolean;
   supplyRun: boolean;
+  casualFriday: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -703,6 +712,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "roundUp",
   "goldenHandshake",
   "supplyRun",
+  "casualFriday",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -1014,6 +1024,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "supplyRun",
     description: "Free office chairs and supplies for the floor",
   },
+  casualFriday: {
+    label: CASUAL_FRIDAY_CRIT_LABEL,
+    icon: "casualFriday",
+    description: "Five free upgrades on every unlocked floor",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -1109,6 +1124,7 @@ export function rollCrit(
     if (Math.random() < GOLDEN_HANDSHAKE_CRIT_CHANCE)
       landed.push("goldenHandshake");
     if (Math.random() < SUPPLY_RUN_CRIT_CHANCE) landed.push("supplyRun");
+    if (Math.random() < CASUAL_FRIDAY_CRIT_CHANCE) landed.push("casualFriday");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -1176,6 +1192,7 @@ export function rollCrit(
     roundUp: kept.has("roundUp"),
     goldenHandshake: kept.has("goldenHandshake"),
     supplyRun: kept.has("supplyRun"),
+    casualFriday: kept.has("casualFriday"),
   });
 }
 
@@ -1381,6 +1398,10 @@ export function isSupplyRunCrit(floor: Floor): boolean {
   return supplyRunCrits.has(floor);
 }
 
+export function isCasualFridayCrit(floor: Floor): boolean {
+  return casualFridayCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1447,6 +1468,7 @@ export function consumeCritProcs(floor: Floor): void {
   roundUpCrits.delete(floor);
   goldenHandshakeCrits.delete(floor);
   supplyRunCrits.delete(floor);
+  casualFridayCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1651,6 +1673,10 @@ export function forceGoldenHandshakeCritProc(floor: Floor): void {
 
 export function forceSupplyRunCritProc(floor: Floor): void {
   supplyRunCrits.add(floor);
+}
+
+export function forceCasualFridayCritProc(floor: Floor): void {
+  casualFridayCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)
