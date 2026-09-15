@@ -60,11 +60,15 @@ for (let y = shadowFilterYStart; y < height; y++) {
 // drops any disconnected fleck the shadow-patch removal left behind
 keepLargestOpaqueComponent(data, width, height, channels);
 
-// tight bounding box of the frame's own opaque silhouette, requiring a real
-// run of opaque pixels (not a stray low-alpha noise speck) — same fix every
-// other special-crit icon script needed
+// tight bounding box of the frame's own opaque silhouette. By this point the
+// shadow patch is already gone (color-filtered above) and any leftover fleck
+// was dropped by keepLargestOpaqueComponent, so every remaining opaque pixel
+// genuinely belongs to the character — MIN_OPAQUE_RUN=1 (any opaque pixel at
+// all) is enough; requiring a wider run here (as every other special-crit
+// icon script does, where noise ISN'T already fully cleaned up first) chopped
+// the paws' own rounded tips off flat instead of capturing their true extent.
 const ALPHA_CUTOFF = 20;
-const MIN_OPAQUE_RUN = 10;
+const MIN_OPAQUE_RUN = 1;
 
 function firstOpaqueRow(rows, cols, get) {
   for (let a = 0; a < rows; a++) {
