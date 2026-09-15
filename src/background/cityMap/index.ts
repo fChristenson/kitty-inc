@@ -52,6 +52,8 @@ import {
   type CritTier,
   type CritRollResult,
 } from "../../shared/critTypes";
+import { CRIT_PROC_INFO, CRIT_PROC_KINDS } from "../../shared/critTypes";
+import { notifyCrit } from "../../critNotifications";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
@@ -502,6 +504,12 @@ export function createCityMapView(
     feetY: number,
   ): void {
     const { tier, chain } = result;
+    notifyCrit(CRIT_TIER_CONFIG[tier].label, CRIT_TIER_CONFIG[tier].color);
+    for (const kind of CRIT_PROC_KINDS) {
+      if (!result[kind]) continue;
+      const info = CRIT_PROC_INFO[kind];
+      notifyCrit(info.label, CRIT_TIER_CONFIG[tier].color, info.icon);
+    }
     const burstY = feetY - MARKER_H / 2;
     const burstCount = tier === "ultra" ? 5 : tier === "mega" ? 3 : 2;
     for (let i = 0; i < burstCount; i++) {

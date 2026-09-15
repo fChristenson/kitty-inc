@@ -515,9 +515,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       SLOT_W,
       Date.now(),
     );
-
     ctx.restore();
   }
+
 
   // --- input: one pointer drag drives floor-scroll (vertical only — there's no
   // horizontal camera anymore, only one building is ever on screen) ---

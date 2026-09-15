@@ -9,6 +9,7 @@ export function createTestButtonMarkup(): string {
         <div class="test-actions-dropdown__menu">
           <button id="add-money" class="game__button">Add Money</button>
           <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
+          <button id="spawn-random-crit-floats" class="game__button">Random Crit Floats</button>
           <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
           <button id="force-bonus-tier-crit" class="game__button">Force Bonus Tier x5</button>
           <button id="force-bonus-tier-mega-crit" class="game__button">Force Bonus Tier x25</button>
@@ -167,6 +168,16 @@ export function wireSpawnMouseButton(
   onClick: () => void,
 ): void {
   const button = container.querySelector<HTMLButtonElement>("#spawn-mouse")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnRandomCritFloatsButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-random-crit-floats",
+  )!;
   button.addEventListener("click", onClick);
 }
 

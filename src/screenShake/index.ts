@@ -4,9 +4,9 @@
 // gameCanvas.ts (under background/) reads it — going through a dedicated module
 // avoids a floors->background or background->floors module-boundary violation.
 
-import { drawCartoonText, shadeColor } from "../utils";
 import { COLOR } from "../palette";
 import { loadImageByName, type ImageName } from "../loadAssets";
+import { drawCritText } from "../shared/critText";
 
 // every crit-type's own backdrop icon, drawn behind drawFlashLayer's flash
 // text below, keyed by that flash's own label. rotateDeg is only set for the
@@ -482,7 +482,8 @@ function drawFlashLayer(
   // extra-bold weight + a thick outline is what reads as "fat"/chunky at this
   // size, more than font-size alone (900 is already the heaviest weight
   // Fredoka ships)
-  const font = '900 100px "Fredoka", system-ui, sans-serif';
+  const fontSize = 100;
+  const font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
   ctx.font = font;
   // "full size" (growthScale === 1) is defined as covering 80% of the
   // viewport's width, not a fixed font-size — measure once at the reference
@@ -528,11 +529,6 @@ function drawFlashLayer(
   // drawImage of that cached bitmap instead of a fresh blur
   const bloom = getBloomLayer(label, measuredWidth);
   ctx.drawImage(bloom.canvas, -bloom.width / 2, -bloom.height / 2);
-  // a light-to-tier-color vertical gradient reads as glossy/shiny rather than a
-  // flat block of color — same lightening math drawGlossyButton's own sheen uses
-  const gradient = ctx.createLinearGradient(0, -60, 0, 60);
-  gradient.addColorStop(0, shadeColor(color, 0.6));
-  gradient.addColorStop(1, color);
-  drawCartoonText(ctx, label, 0, 0, gradient, COLOR.white, strokeWidth);
+  drawCritText(ctx, label, 0, 0, color, { fontSize, strokeWidth });
   ctx.restore();
 }

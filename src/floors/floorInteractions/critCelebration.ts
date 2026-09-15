@@ -1,5 +1,11 @@
 import type { Floor } from "../../gameState";
 import {
+  CRIT_PROC_INFO,
+  CRIT_PROC_KINDS,
+  type CritProcKind,
+} from "../../shared/critTypes";
+import { notifyCrit } from "../../critNotifications";
+import {
   type CritTier,
   CRIT_TIER_CONFIG,
   BOOST_CRIT_COLOR,
@@ -690,6 +696,56 @@ export function triggerCritCelebration(
   espressoShot = false,
   dejaVu = false,
 ): void {
+  notifyCrit(CRIT_TIER_CONFIG[tier].label, tierColor(tier));
+  const procFlags: Partial<Record<CritProcKind, boolean>> = {
+    chain,
+    boost,
+    bounce,
+    explosion,
+    booty,
+    upgrade,
+    peppermint,
+    heavenly,
+    pair,
+    threeOfAKind,
+    fourOfAKind,
+    fullHouse,
+    tickTock,
+    chairGiveaway,
+    suppliesGiveaway,
+    winterSale,
+    springSale,
+    summerSale,
+    autumnSale,
+    halloweenSale,
+    easterSale,
+    sunshine,
+    snowday,
+    fastForward,
+    frozen,
+    snowball,
+    freeSale,
+    bullMarket: false,
+    payday,
+    goldStandard,
+    nightShift,
+    intern,
+    unionBoss,
+    rushHour,
+    goldenTicket,
+    silverTicket,
+    goldenParachute,
+    payout,
+    grandOpening,
+    fullyStaffed,
+    espressoShot,
+    dejaVu,
+  };
+  for (const kind of CRIT_PROC_KINDS) {
+    if (!procFlags[kind]) continue;
+    const info = CRIT_PROC_INFO[kind];
+    notifyCrit(info.label, tierColor(tier), info.icon);
+  }
   if (
     chain ||
     boost ||
