@@ -88,9 +88,15 @@ function firstOpaqueRow(rows, cols, get) {
 }
 const alphaAt = (y, x) => data[(y * width + x) * channels + 3];
 const minY = firstOpaqueRow(height, width, (y, x) => alphaAt(y, x));
-const maxY = height - 1 - firstOpaqueRow(height, width, (y, x) => alphaAt(height - 1 - y, x));
+const maxY =
+  height -
+  1 -
+  firstOpaqueRow(height, width, (y, x) => alphaAt(height - 1 - y, x));
 const minX = firstOpaqueRow(width, height, (x, y) => alphaAt(y, x));
-const maxX = width - 1 - firstOpaqueRow(width, height, (x, y) => alphaAt(y, width - 1 - x));
+const maxX =
+  width -
+  1 -
+  firstOpaqueRow(width, height, (x, y) => alphaAt(y, width - 1 - x));
 const croppedW = maxX - minX + 1;
 const croppedH = maxY - minY + 1;
 const cropped = await sharp(data, { raw: { width, height, channels } })
@@ -106,4 +112,6 @@ await sharp(shadowed.data, {
   .png({ compressionLevel: 9, palette: true })
   .toFile(dest);
 const finalMeta = await sharp(dest).metadata();
-console.log(`wrote ${path.relative(assets, dest)}: ${finalMeta.width}x${finalMeta.height}`);
+console.log(
+  `wrote ${path.relative(assets, dest)}: ${finalMeta.width}x${finalMeta.height}`,
+);

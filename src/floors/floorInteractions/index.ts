@@ -531,10 +531,7 @@ function randomDejaVuTier(): CritTier {
   return CRIT_TIER_ORDER[Math.floor(Math.random() * CRIT_TIER_ORDER.length)];
 }
 
-function applyDejaVuCrit(
-  floor: Floor,
-  isGroundFloor: boolean,
-): void {
+function applyDejaVuCrit(floor: Floor, isGroundFloor: boolean): void {
   const count = CRIT_TIER_CONFIG[randomDejaVuTier()].multiplier;
   for (let repetition = 0; repetition < 2; repetition++) {
     for (let i = 0; i < count; i++) {
