@@ -98,7 +98,9 @@ const HOLD_ANIM_DEFLATE_MS = 350;
 const HOLD_ANIM_RELEASE_DEFLATE_MS = 250;
 const HOLD_ANIM_MAX_SCALE = 1.35; // biggest size reached by the end of a normal grow
 const HOLD_ANIM_POP_SCALE = 1.55; // the brief overshoot past HOLD_ANIM_MAX_SCALE at burst time
-const HOLD_ANIM_MAX_SHAKE_PX = 9;
+const HOLD_ANIM_MAX_SHAKE_PX = 14;
+const HOLD_ANIM_MAX_WOBBLE_RAD = Math.PI / 12; // 15 degrees to either side
+const HOLD_ANIM_WOBBLE_FREQUENCY = 72;
 // "extra large" burst = this many normal-sized bursts fired together,
 // staggered slightly so they read as one bigger eruption, not a single frame
 // spike — same spawnCoinBurst every purchase already uses, just piled up
@@ -174,8 +176,9 @@ function beginReleasing(floor: Floor, state: HoldAnimState): void {
 }
 
 // advances the grow/pop/deflate(/releasing) state machine and returns the
-// button's current extra scale + a small random shake offset — {scale:1,
-// shakeX:0,shakeY:0} once there's no animation left to show at all. Reads AND
+// button's current extra scale + wobble + a small random shake offset —
+// {scale:1,rotation:0,shakeX:0,shakeY:0} once there's no animation left to show
+// at all. Reads AND
 // mutates holdAnimState (same "a draw call also owns firing its own one-shot
 // side effects" pattern this game's other timed animations already use) —
 // cx/cy are where a burst should spawn from (the button's own center)
@@ -184,22 +187,9 @@ export function stepHoldAnim(
   now: number,
   cx: number,
   cy: number,
-): { scale: number; shakeX: number; shakeY: number } {
+): { scale: number; rotation: number; shakeX: number; shakeY: number } {
   const state = holdAnimState.get(floor);
-  if (!state) return { scale: 1, shakeX: 0, shakeY: 0 };
-
-  // the button went grey mid-hold (e.g. spent down to unaffordable by
-  // something else, or an event/crit state just expired) — deflate
-  // immediately instead of continuing to swell on a disabled button. Only
-  // grow/pop are interrupted; deflate/releasing are already heading back to
-  // normal anyway
-  if (
-    (state.phase === "grow" || state.phase === "pop") &&
-    !isUpgradeButtonEnabled(floor)
-  ) {
-    beginReleasing(floor, state);
-    return stepHoldAnim(floor, now, cx, cy);
-  }
+  if (!state) return { scale: 1, rotation: 0, shakeX: 0, shakeY: 0 };
 
   const elapsed = now - state.phaseStartedAt;
 
@@ -233,17 +223,25 @@ export function stepHoldAnim(
     elapsed >= HOLD_ANIM_RELEASE_DEFLATE_MS
   ) {
     holdAnimState.delete(floor);
-    return { scale: 1, shakeX: 0, shakeY: 0 };
+    return { scale: 1, rotation: 0, shakeX: 0, shakeY: 0 };
   }
 
   const scale = computeHoldScale(state, now);
-  // only shakes while actively building pressure (grow phase) — a release or
-  // a post-burst deflate is winding down, not building tension
-  if (state.phase !== "grow") return { scale, shakeX: 0, shakeY: 0 };
+  // Only vibrate and wobble while actively building pressure. A release or a
+  // post-burst deflate is winding down, not building tension.
+  if (state.phase !== "grow") {
+    return { scale, rotation: 0, shakeX: 0, shakeY: 0 };
+  }
   const growT = Math.min(1, (now - state.phaseStartedAt) / HOLD_ANIM_GROW_MS);
   const shakeMagnitude = HOLD_ANIM_MAX_SHAKE_PX * growT * growT;
   return {
     scale,
+    rotation:
+      Math.sin(
+        ((now - state.phaseStartedAt) / 1000) * HOLD_ANIM_WOBBLE_FREQUENCY,
+      ) *
+      HOLD_ANIM_MAX_WOBBLE_RAD *
+      growT,
     shakeX: (Math.random() - 0.5) * 2 * shakeMagnitude,
     shakeY: (Math.random() - 0.5) * 2 * shakeMagnitude,
   };

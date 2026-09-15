@@ -76,6 +76,7 @@ export function drawUpgradeButton(
   if (crit || activeEvent) {
     ctx.rotate(getWiggleRotation(now));
   }
+  ctx.rotate(holdAnim.rotation);
   ctx.scale(scale * holdAnim.scale, scale * holdAnim.scale);
   ctx.translate(-cx, -cy);
   if (!crit && !activeEvent?.freeClick) {
