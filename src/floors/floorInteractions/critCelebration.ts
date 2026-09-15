@@ -94,6 +94,8 @@ import {
   EXECUTIVE_ORDER_CRIT_LABEL,
   ROUND_UP_CRIT_COLOR,
   ROUND_UP_CRIT_LABEL,
+  GOLDEN_HANDSHAKE_CRIT_COLOR,
+  GOLDEN_HANDSHAKE_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -589,6 +591,7 @@ interface QueuedCelebration {
     | "secondWind"
     | "executiveOrder"
     | "roundUp"
+    | "goldenHandshake"
     | "bonusTier";
   queuedAt: number;
   maxAgeMs?: number;
@@ -718,6 +721,7 @@ export function triggerCritCelebration(
   secondWind = false,
   executiveOrder = false,
   roundUp = false,
+  goldenHandshake = false,
 ): void {
   const procFlags: Partial<Record<CritProcKind, boolean>> = {
     chain,
@@ -767,6 +771,7 @@ export function triggerCritCelebration(
     secondWind,
     executiveOrder,
     roundUp,
+    goldenHandshake,
   };
   if (
     chain ||
@@ -815,7 +820,8 @@ export function triggerCritCelebration(
     luckyClover ||
     secondWind ||
     executiveOrder ||
-    roundUp
+    roundUp ||
+    goldenHandshake
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1390,6 +1396,23 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             ROUND_UP_CRIT_LABEL,
             ROUND_UP_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      goldenHandshake &&
+      !specialCelebrationQueue.some((q) => q.kind === "goldenHandshake")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "goldenHandshake",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            GOLDEN_HANDSHAKE_CRIT_LABEL,
+            GOLDEN_HANDSHAKE_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

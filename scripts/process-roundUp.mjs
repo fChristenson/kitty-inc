@@ -6,10 +6,11 @@ import { keepLargestOpaqueComponent } from "./lib/keep-largest-component.mjs";
 
 // the sign the cat holds up is itself page-white, so a plain whiteness
 // threshold would erase it — the fill is seeded from the border instead and
-// can never cross the sign's own dark outline to reach it
-const WHITE_LO = 246;
-const WHITE_HI = 251;
-const FLOOD_LO = 246;
+// can never cross the sign's own dark outline to reach it. The thresholds sit
+// low enough to also eat the ragged pale sketch rim drawn around the cat
+const WHITE_LO = 195;
+const WHITE_HI = 235;
+const FLOOD_LO = 195;
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
 const src = path.join(assets, "roundUp.jfif");
 const dest = path.join(assets, "roundUp.png");

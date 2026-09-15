@@ -238,6 +238,9 @@ export const CONFIG = {
     // "Round Up" crit — tops every unlocked floor's upgradeCount up to the
     // next multiple of 10, for free
     roundUpChance: 0.0005,
+    // "Golden Handshake" crit — hands every unlocked floor a free manager at
+    // once (Union Boss's building-wide sibling)
+    goldenHandshakeChance: 0.0005,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

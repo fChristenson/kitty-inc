@@ -148,6 +148,8 @@ export const COLOR = {
   executiveOrderTeal: "#0F766E",
   // Round Up crit's own dedicated color
   roundUpOrange: "#EA580C",
+  // Golden Handshake crit's own dedicated color
+  goldenHandshakeGold: "#CA8A04",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

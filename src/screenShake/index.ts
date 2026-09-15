@@ -64,6 +64,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Second Wind": { name: "secondWind" },
   "Executive Order": { name: "executiveOrder" },
   "Round Up": { name: "roundUp" },
+  "Golden Handshake": { name: "goldenHandshake" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

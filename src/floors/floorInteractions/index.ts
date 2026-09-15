@@ -61,6 +61,7 @@ import {
   isSecondWindCrit,
   isExecutiveOrderCrit,
   isRoundUpCrit,
+  isGoldenHandshakeCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -637,6 +638,14 @@ function applyUnionBossCrit(floor: Floor): void {
   floor.hasManager = true;
 }
 
+// "Golden Handshake" crit (see shared/critTypes's isGoldenHandshakeCrit):
+// Union Boss applied to every unlocked floor at once
+function applyGoldenHandshakeCrit(floors: Floor[]): void {
+  for (const floor of floors) {
+    if (floor.unlocked) applyUnionBossCrit(floor);
+  }
+}
+
 // "Rush Hour" crit (see shared/critTypes's isRushHourCrit): no instant
 // payout — just starts the building-wide timed window (see
 // triggerRushHourCrit/isRushHourActive) during which every unlocked floor's
@@ -944,6 +953,7 @@ export function handleFloorClick(
         if (buyTier.secondWind) applySecondWindCrit();
         if (buyTier.executiveOrder) applyExecutiveOrderCrit(floors);
         if (buyTier.roundUp) applyRoundUpCrit(floors);
+        if (buyTier.goldenHandshake) applyGoldenHandshakeCrit(floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -1047,6 +1057,7 @@ export function handleFloorClick(
           buyTier.secondWind,
           buyTier.executiveOrder,
           buyTier.roundUp,
+          buyTier.goldenHandshake,
         );
     }
     return;
@@ -1216,6 +1227,7 @@ export function handleFloorClick(
       const secondWind = isSecondWindCrit(floor);
       const executiveOrder = isExecutiveOrderCrit(floor);
       const roundUp = isRoundUpCrit(floor);
+      const goldenHandshake = isGoldenHandshakeCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1226,6 +1238,7 @@ export function handleFloorClick(
       if (secondWind) applySecondWindCrit();
       if (executiveOrder) applyExecutiveOrderCrit(floors);
       if (roundUp) applyRoundUpCrit(floors);
+      if (goldenHandshake) applyGoldenHandshakeCrit(floors);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
       // never once per free tick above, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
@@ -1455,6 +1468,7 @@ export function handleFloorClick(
         secondWind,
         executiveOrder,
         roundUp,
+        goldenHandshake,
       );
       return;
     }

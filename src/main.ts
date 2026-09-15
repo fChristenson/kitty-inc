@@ -71,6 +71,7 @@ import {
   forceSecondWindCritUpgrade,
   forceExecutiveOrderCritUpgrade,
   forceRoundUpCritUpgrade,
+  forceGoldenHandshakeCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   forceGrandOpeningFloorBuyCrit,
@@ -82,6 +83,7 @@ import {
   forceSecondWindFloorBuyCrit,
   forceExecutiveOrderFloorBuyCrit,
   forceRoundUpFloorBuyCrit,
+  forceGoldenHandshakeFloorBuyCrit,
   forcePayoutFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -172,6 +174,7 @@ import {
   wireSpawnSecondWindCritButton,
   wireSpawnExecutiveOrderCritButton,
   wireSpawnRoundUpCritButton,
+  wireSpawnGoldenHandshakeCritButton,
   wireSpawnGoldenParachuteCritButton,
   wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
@@ -231,6 +234,7 @@ import {
   wireFloorBuySecondWindCritButton,
   wireFloorBuyExecutiveOrderCritButton,
   wireFloorBuyRoundUpCritButton,
+  wireFloorBuyGoldenHandshakeCritButton,
   wireFloorBuyGoldenParachuteCritButton,
   wireFloorBuyPayoutCritButton,
   wireMapUnlockCritButton,
@@ -758,6 +762,10 @@ async function main() {
     wireSpawnRoundUpCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceRoundUpCritUpgrade(floor);
+    });
+    wireSpawnGoldenHandshakeCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceGoldenHandshakeCritUpgrade(floor);
     });
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1639,6 +1647,9 @@ async function main() {
       forceExecutiveOrderFloorBuyCrit("crit"),
     );
     wireFloorBuyRoundUpCritButton(app, () => forceRoundUpFloorBuyCrit("crit"));
+    wireFloorBuyGoldenHandshakeCritButton(app, () =>
+      forceGoldenHandshakeFloorBuyCrit("crit"),
+    );
     wireFloorBuyGoldenParachuteCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",

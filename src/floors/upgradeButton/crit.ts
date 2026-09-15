@@ -135,6 +135,8 @@ export {
   ROUND_UP_CRIT_COLOR,
   ROUND_UP_CRIT_LABEL,
   ROUND_UP_CRIT_STEP,
+  GOLDEN_HANDSHAKE_CRIT_COLOR,
+  GOLDEN_HANDSHAKE_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -183,6 +185,7 @@ export {
   isSecondWindCrit,
   isExecutiveOrderCrit,
   isRoundUpCrit,
+  isGoldenHandshakeCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -242,6 +245,7 @@ import {
   forceSecondWindCritProc,
   forceExecutiveOrderCritProc,
   forceRoundUpCritProc,
+  forceGoldenHandshakeCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -337,6 +341,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.secondWind) forceSecondWindCritProc(floor);
     if (result.executiveOrder) forceExecutiveOrderCritProc(floor);
     if (result.roundUp) forceRoundUpCritProc(floor);
+    if (result.goldenHandshake) forceGoldenHandshakeCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -469,6 +474,7 @@ export function forceFloorBuyCrit(
     secondWind: false,
     executiveOrder: false,
     roundUp: false,
+    goldenHandshake: false,
   };
 }
 
@@ -523,6 +529,13 @@ export function forceExecutiveOrderFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceRoundUpFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.roundUp = true;
+}
+
+export function forceGoldenHandshakeFloorBuyCrit(
+  tier: CritTier = "crit",
+): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.goldenHandshake = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -872,6 +885,11 @@ export function forceExecutiveOrderCritUpgrade(floor: Floor): void {
 export function forceRoundUpCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceRoundUpCritProc(floor);
+}
+
+export function forceGoldenHandshakeCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceGoldenHandshakeCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

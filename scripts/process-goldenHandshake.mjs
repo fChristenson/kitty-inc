@@ -4,23 +4,22 @@ import fs from "node:fs/promises";
 import { addDropShadow } from "./lib/synthetic-drop-shadow.mjs";
 import { keepLargestOpaqueComponent } from "./lib/keep-largest-component.mjs";
 
-// the cat's shirt/collar/eyes are themselves page-white, so a plain whiteness
-// threshold would punch holes straight through them — the fill is seeded from
-// the border instead and can never reach them past the art's heavy dark outline.
-// The thresholds sit low enough to also eat the ragged pale sketch rim
+// the art draws a ragged pale sketch rim just outside the cats' black outline
+// (whiteness ~210-245); the thresholds sit well below it so the fill eats the
+// rim too, while the gold/collar shading (all under ~180) stays untouched
 const WHITE_LO = 195;
 const WHITE_HI = 235;
 const FLOOD_LO = 195;
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const src = path.join(assets, "executiveOrder.jfif");
-const dest = path.join(assets, "executiveOrder.png");
+const src = path.join(assets, "goldenHandshake.jfif");
+const dest = path.join(assets, "goldenHandshake.png");
 // loadAssets' IMAGE_FILES glob only sees the theme's own dist/ root
 const themeDest = path.join(
   assets,
   "themes",
   "references",
   "dist",
-  "executiveOrder.png",
+  "goldenHandshake.png",
 );
 
 const { data, info } = await sharp(src)
@@ -78,8 +77,7 @@ for (let y = 0; y < height; y++) {
     );
   }
 }
-// the cat and its podium overlap into one outlined silhouette, so anything else
-// left opaque is chroma-key noise
+// the two cats are joined at the handshake, so they're one opaque blob
 keepLargestOpaqueComponent(data, width, height, channels);
 const alphaAt = (y, x) => data[(y * width + x) * channels + 3];
 const cutoff = 20;
