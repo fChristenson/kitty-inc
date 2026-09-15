@@ -55,6 +55,7 @@ import {
   isGrandOpeningCrit,
   isFullyStaffedCrit,
   isEspressoShotCrit,
+  isDejaVuCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -523,6 +524,25 @@ function applyEspressoShotCrit(floors: Floor[]): void {
   applyFloorBoost(floors);
 }
 
+// "Deja Vu" crit (see shared/critTypes's isDejaVuCrit): picks one of the
+// existing crit tiers uniformly, then applies that tier's free-upgrade batch
+// twice without rolling another crit or piggyback proc.
+function randomDejaVuTier(): CritTier {
+  return CRIT_TIER_ORDER[Math.floor(Math.random() * CRIT_TIER_ORDER.length)];
+}
+
+function applyDejaVuCrit(
+  floor: Floor,
+  isGroundFloor: boolean,
+): void {
+  const count = CRIT_TIER_CONFIG[randomDejaVuTier()].multiplier;
+  for (let repetition = 0; repetition < 2; repetition++) {
+    for (let i = 0; i < count; i++) {
+      applyUpgradeTick(floor, isGroundFloor);
+    }
+  }
+}
+
 // "payday crit" (see shared/critTypes's isPaydayCrit): a flat one-time
 // effect, same shape as booty — triples the currently active company's
 // total income once
@@ -857,6 +877,7 @@ export function handleFloorClick(
         if (buyTier.grandOpening) applyGrandOpeningCrit(deps);
         if (buyTier.fullyStaffed) applyFullyStaffedCrit(floors);
         if (buyTier.espressoShot) applyEspressoShotCrit(floors);
+        if (buyTier.dejaVu) applyDejaVuCrit(floor, floors.indexOf(floor) === 0);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -954,6 +975,7 @@ export function handleFloorClick(
           buyTier.grandOpening,
           buyTier.fullyStaffed,
           buyTier.espressoShot,
+          buyTier.dejaVu,
         );
     }
     return;
@@ -1117,6 +1139,7 @@ export function handleFloorClick(
       const grandOpening = isGrandOpeningCrit(floor);
       const fullyStaffed = isFullyStaffedCrit(floor);
       const espressoShot = isEspressoShotCrit(floor);
+      const dejaVu = isDejaVuCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1283,6 +1306,7 @@ export function handleFloorClick(
       if (grandOpening) applyGrandOpeningCrit(deps);
       if (fullyStaffed) applyFullyStaffedCrit(floors);
       if (espressoShot) applyEspressoShotCrit(floors);
+      if (dejaVu) applyDejaVuCrit(floor, isGroundFloor);
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
@@ -1344,6 +1368,7 @@ export function handleFloorClick(
         grandOpening,
         fullyStaffed,
         espressoShot,
+        dejaVu,
       );
       return;
     }

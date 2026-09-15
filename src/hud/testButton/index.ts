@@ -66,6 +66,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-grand-opening-crit" class="game__button">Spawn Grand Opening Crit</button>
           <button id="spawn-fully-staffed-crit" class="game__button">Spawn Fully Staffed Crit</button>
           <button id="spawn-espresso-shot-crit" class="game__button">Spawn Espresso Shot Crit</button>
+          <button id="spawn-deja-vu-crit" class="game__button">Spawn Deja Vu Crit</button>
           <button id="spawn-golden-parachute-crit" class="game__button">Spawn Golden Parachute Crit</button>
           <button id="spawn-payout-crit" class="game__button">Spawn Payout Crit</button>
         </div>
@@ -121,6 +122,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-grand-opening-crit" class="game__button">Floor Grand Opening Crit</button>
           <button id="floor-buy-fully-staffed-crit" class="game__button">Floor Fully Staffed Crit</button>
           <button id="floor-buy-espresso-shot-crit" class="game__button">Floor Espresso Shot Crit</button>
+          <button id="floor-buy-deja-vu-crit" class="game__button">Floor Deja Vu Crit</button>
           <button id="floor-buy-golden-parachute-crit" class="game__button">Floor Golden Parachute Crit</button>
           <button id="floor-buy-payout-crit" class="game__button">Floor Payout Crit</button>
         </div>
@@ -138,6 +140,7 @@ export function createTestButtonMarkup(): string {
           <button id="map-unlock-grand-opening-crit" class="game__button">Map Unlock Grand Opening Crit</button>
           <button id="map-unlock-fully-staffed-crit" class="game__button">Map Unlock Fully Staffed Crit</button>
           <button id="map-unlock-espresso-shot-crit" class="game__button">Map Unlock Espresso Shot Crit</button>
+          <button id="map-unlock-deja-vu-crit" class="game__button">Map Unlock Deja Vu Crit</button>
           <button id="map-unlock-heavenly-crit" class="game__button">Map Unlock Heavenly Crit</button>
           <button id="map-unlock-pair-crit" class="game__button">Map Unlock Pair Crit</button>
           <button id="map-unlock-three-of-a-kind-crit" class="game__button">Map Unlock Three of a Kind Crit</button>
@@ -631,6 +634,16 @@ export function wireSpawnEspressoShotCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-espresso-shot-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnDejaVuCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-deja-vu-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -1162,6 +1175,16 @@ export function wireFloorBuyEspressoShotCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireFloorBuyDejaVuCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-deja-vu-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireFloorBuyGoldenParachuteCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -1281,6 +1304,16 @@ export function wireMapUnlockEspressoShotCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#map-unlock-espresso-shot-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockDejaVuCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-deja-vu-crit",
   )!;
   button.addEventListener("click", onClick);
 }

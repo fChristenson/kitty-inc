@@ -137,6 +137,8 @@ export const COLOR = {
   fullyStaffedGreen: "#22C55E",
   // Espresso Shot crit's own dedicated color
   espressoShotBrown: "#92400E",
+  // Deja Vu crit's own dedicated color
+  dejaVuBlue: "#0EA5E9",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

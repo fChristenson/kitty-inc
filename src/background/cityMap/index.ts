@@ -46,6 +46,8 @@ import {
   FULLY_STAFFED_CRIT_COLOR,
   ESPRESSO_SHOT_CRIT_LABEL,
   ESPRESSO_SHOT_CRIT_COLOR,
+  DEJA_VU_CRIT_LABEL,
+  DEJA_VU_CRIT_COLOR,
   runFirstCritProc,
   type CritTier,
   type CritRollResult,
@@ -578,8 +580,25 @@ export function createCityMapView(
           });
           playSold();
         },
+        dejaVu: () => {
+          triggerScreenShake({
+            intensity: 1.8,
+            label: DEJA_VU_CRIT_LABEL,
+            color: DEJA_VU_CRIT_COLOR,
+            strokeWidth: 14,
+            priority: 1,
+          });
+          playExplosion();
+        },
       },
-      ["heavenly", "fullyStaffed", "espressoShot", "grandOpening", "upgrade"],
+      [
+        "heavenly",
+        "fullyStaffed",
+        "espressoShot",
+        "dejaVu",
+        "grandOpening",
+        "upgrade",
+      ],
     );
     if (playedSpecial) return;
     // chain crit: the flash shows "Chain" instead of the tier's usual "x5"/

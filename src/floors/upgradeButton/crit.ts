@@ -120,6 +120,8 @@ export {
   FULLY_STAFFED_CRIT_LABEL,
   ESPRESSO_SHOT_CRIT_COLOR,
   ESPRESSO_SHOT_CRIT_LABEL,
+  DEJA_VU_CRIT_COLOR,
+  DEJA_VU_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -162,6 +164,7 @@ export {
   isGrandOpeningCrit,
   isFullyStaffedCrit,
   isEspressoShotCrit,
+  isDejaVuCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -215,6 +218,7 @@ import {
   forceGrandOpeningCritProc,
   forceFullyStaffedCritProc,
   forceEspressoShotCritProc,
+  forceDejaVuCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -305,6 +309,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.grandOpening) forceGrandOpeningCritProc(floor);
     if (result.fullyStaffed) forceFullyStaffedCritProc(floor);
     if (result.espressoShot) forceEspressoShotCritProc(floor);
+    if (result.dejaVu) forceDejaVuCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -383,6 +388,7 @@ export function forceFloorBuyCrit(
   grandOpening = false,
   fullyStaffed = false,
   espressoShot = false,
+  dejaVu = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -429,6 +435,7 @@ export function forceFloorBuyCrit(
     grandOpening,
     fullyStaffed,
     espressoShot,
+    dejaVu,
   };
 }
 
@@ -451,6 +458,13 @@ export function forceFullyStaffedFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceEspressoShotFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.espressoShot = true;
+}
+
+// dev/test-only: guarantees the next floor/building purchase crit carries a
+// Deja Vu proc on top of the chosen tier
+export function forceDejaVuFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.dejaVu = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -768,6 +782,13 @@ export function forceFullyStaffedCritUpgrade(floor: Floor): void {
 export function forceEspressoShotCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceEspressoShotCritProc(floor);
+}
+
+// dev/test-only: force this floor's already-armed tier to also carry a Deja Vu
+// proc, bypassing chance entirely
+export function forceDejaVuCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceDejaVuCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

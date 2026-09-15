@@ -88,6 +88,7 @@ const IMAGE_FILES = {
   grandOpening: "grandOpening.png", // Grand Opening crit flash's own backdrop icon
   fullyStaffed: "fullyStaffed.png", // Fully Staffed crit flash's own backdrop icon
   espressoShot: "espressoShot.png", // Espresso Shot crit flash's own backdrop icon
+  dejaVu: "dejaVu.png", // Deja Vu crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

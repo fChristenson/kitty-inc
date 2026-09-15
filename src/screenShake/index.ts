@@ -58,6 +58,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Grand Opening": { name: "grandOpening" },
   "Fully Staffed": { name: "fullyStaffed" },
   "Espresso Shot": { name: "espressoShot" },
+  "Deja Vu": { name: "dejaVu" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

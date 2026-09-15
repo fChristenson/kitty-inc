@@ -222,6 +222,9 @@ export const CONFIG = {
     // "Espresso Shot" crit — boosts every unlocked floor's workers for the
     // regular boost duration, with the same canonical worker-speed behavior
     espressoShotChance: 0.0005,
+    // "Deja Vu" crit — chooses a random crit tier at consumption time and
+    // applies that tier's free-upgrade batch twice
+    dejaVuChance: 0.0005,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

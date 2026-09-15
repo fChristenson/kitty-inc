@@ -80,6 +80,8 @@ import {
   FULLY_STAFFED_CRIT_LABEL,
   ESPRESSO_SHOT_CRIT_COLOR,
   ESPRESSO_SHOT_CRIT_LABEL,
+  DEJA_VU_CRIT_COLOR,
+  DEJA_VU_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -569,6 +571,7 @@ interface QueuedCelebration {
     | "grandOpening"
     | "fullyStaffed"
     | "espressoShot"
+    | "dejaVu"
     | "bonusTier";
   queuedAt: number;
   run: () => void;
@@ -685,6 +688,7 @@ export function triggerCritCelebration(
   grandOpening = false,
   fullyStaffed = false,
   espressoShot = false,
+  dejaVu = false,
 ): void {
   if (
     chain ||
@@ -727,7 +731,8 @@ export function triggerCritCelebration(
     payout ||
     grandOpening ||
     fullyStaffed ||
-    espressoShot
+    espressoShot ||
+    dejaVu
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1174,6 +1179,20 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             ESPRESSO_SHOT_CRIT_LABEL,
             ESPRESSO_SHOT_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (dejaVu && !specialCelebrationQueue.some((q) => q.kind === "dejaVu")) {
+      specialCelebrationQueue.push({
+        kind: "dejaVu",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            DEJA_VU_CRIT_LABEL,
+            DEJA_VU_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,
