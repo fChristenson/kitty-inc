@@ -126,6 +126,12 @@ export const COLOR = {
   // Golden Parachute crit's own dedicated color — a burnt marigold-orange,
   // checked for distinctness against every other gold/amber above
   goldenParachuteMarigold: "#C97A1A",
+  // Payout crit's own dedicated color — a deep olive green, checked for
+  // distinctness against every other green already in use
+  payoutOlive: "#4D7C0F",
+  // Grand Opening crit's own dedicated color — bright ceremonial rose-red,
+  // distinct from the base ultra red and every other event color
+  grandOpeningRose: "#F43F5E",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

@@ -54,6 +54,8 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Golden Ticket": { name: "goldenTicket" },
   "Silver Ticket": { name: "silverTicket", rotateDeg: 45 },
   "Golden Parachute": { name: "goldenParachute" },
+  Payout: { name: "payout" },
+  "Grand Opening": { name: "grandOpening" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

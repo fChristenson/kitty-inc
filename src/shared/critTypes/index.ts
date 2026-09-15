@@ -413,6 +413,13 @@ export const SILVER_TICKET_CRIT_CHANCE = CONFIG.crit.silverTicketChance;
 export const SILVER_TICKET_CRIT_COLOR = COLOR.silverTicketGray;
 export const SILVER_TICKET_CRIT_LABEL = "Silver Ticket";
 
+// "Grand Opening" crit — dual-scope unlock proc: on a map building purchase,
+// buys the next building for free; on an upgrade/floor unlock, unlocks every
+// remaining floor in that same building for free
+export const GRAND_OPENING_CRIT_CHANCE = CONFIG.crit.grandOpeningChance;
+export const GRAND_OPENING_CRIT_COLOR = COLOR.grandOpeningRose;
+export const GRAND_OPENING_CRIT_LABEL = "Grand Opening";
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -421,6 +428,14 @@ export const SILVER_TICKET_CRIT_LABEL = "Silver Ticket";
 export const GOLDEN_PARACHUTE_CRIT_CHANCE = CONFIG.crit.goldenParachuteChance;
 export const GOLDEN_PARACHUTE_CRIT_COLOR = COLOR.goldenParachuteMarigold;
 export const GOLDEN_PARACHUTE_CRIT_LABEL = "Golden Parachute";
+
+// "Payout" crit — the biggest flat one-time jackpot (see
+// floorInteractions.ts's applyPayoutCrit): instantly adds the combined total
+// income + upgrades value across EVERY corporation, not just the active
+// one, to the currently active company's own total
+export const PAYOUT_CRIT_CHANCE = CONFIG.crit.payoutChance;
+export const PAYOUT_CRIT_COLOR = COLOR.payoutOlive;
+export const PAYOUT_CRIT_LABEL = "Payout";
 
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
@@ -462,6 +477,8 @@ const rushHourCrits = new WeakSet<Floor>();
 const goldenTicketCrits = new WeakSet<Floor>();
 const silverTicketCrits = new WeakSet<Floor>();
 const goldenParachuteCrits = new WeakSet<Floor>();
+const payoutCrits = new WeakSet<Floor>();
+const grandOpeningCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -540,6 +557,8 @@ export interface CritRollResult {
   goldenTicket: boolean;
   silverTicket: boolean;
   goldenParachute: boolean;
+  payout: boolean;
+  grandOpening: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -589,6 +608,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "goldenTicket",
   "silverTicket",
   "goldenParachute",
+  "payout",
+  "grandOpening",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -840,6 +861,16 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "goldenParachute",
     description: "Instantly adds 15s of your company's income",
   },
+  payout: {
+    label: PAYOUT_CRIT_LABEL,
+    icon: "payout",
+    description: "Instantly adds every company's income + upgrades",
+  },
+  grandOpening: {
+    label: GRAND_OPENING_CRIT_LABEL,
+    icon: "grandOpening",
+    description: "Buys the next building free, or unlocks all floors",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -919,8 +950,10 @@ export function rollCrit(
     if (Math.random() < RUSH_HOUR_CRIT_CHANCE) landed.push("rushHour");
     if (Math.random() < GOLDEN_TICKET_CRIT_CHANCE) landed.push("goldenTicket");
     if (Math.random() < SILVER_TICKET_CRIT_CHANCE) landed.push("silverTicket");
+    if (Math.random() < GRAND_OPENING_CRIT_CHANCE) landed.push("grandOpening");
     if (Math.random() < GOLDEN_PARACHUTE_CRIT_CHANCE)
       landed.push("goldenParachute");
+    if (Math.random() < PAYOUT_CRIT_CHANCE) landed.push("payout");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -976,6 +1009,8 @@ export function rollCrit(
     goldenTicket: kept.has("goldenTicket"),
     silverTicket: kept.has("silverTicket"),
     goldenParachute: kept.has("goldenParachute"),
+    payout: kept.has("payout"),
+    grandOpening: kept.has("grandOpening"),
   });
 }
 
@@ -1133,6 +1168,14 @@ export function isGoldenParachuteCrit(floor: Floor): boolean {
   return goldenParachuteCrits.has(floor);
 }
 
+export function isPayoutCrit(floor: Floor): boolean {
+  return payoutCrits.has(floor);
+}
+
+export function isGrandOpeningCrit(floor: Floor): boolean {
+  return grandOpeningCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1187,6 +1230,8 @@ export function consumeCritProcs(floor: Floor): void {
   goldenTicketCrits.delete(floor);
   silverTicketCrits.delete(floor);
   goldenParachuteCrits.delete(floor);
+  payoutCrits.delete(floor);
+  grandOpeningCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1343,6 +1388,14 @@ export function forceSilverTicketCritProc(floor: Floor): void {
 
 export function forceGoldenParachuteCritProc(floor: Floor): void {
   goldenParachuteCrits.add(floor);
+}
+
+export function forcePayoutCritProc(floor: Floor): void {
+  payoutCrits.add(floor);
+}
+
+export function forceGrandOpeningCritProc(floor: Floor): void {
+  grandOpeningCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

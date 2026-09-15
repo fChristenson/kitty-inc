@@ -72,6 +72,10 @@ import {
   SILVER_TICKET_CRIT_LABEL,
   GOLDEN_PARACHUTE_CRIT_COLOR,
   GOLDEN_PARACHUTE_CRIT_LABEL,
+  PAYOUT_CRIT_COLOR,
+  PAYOUT_CRIT_LABEL,
+  GRAND_OPENING_CRIT_COLOR,
+  GRAND_OPENING_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -557,6 +561,8 @@ interface QueuedCelebration {
     | "goldenTicket"
     | "silverTicket"
     | "goldenParachute"
+    | "payout"
+    | "grandOpening"
     | "bonusTier";
   queuedAt: number;
   run: () => void;
@@ -669,6 +675,8 @@ export function triggerCritCelebration(
   goldenTicket = false,
   silverTicket = false,
   goldenParachute = false,
+  payout = false,
+  grandOpening = false,
 ): void {
   if (
     chain ||
@@ -707,7 +715,9 @@ export function triggerCritCelebration(
     rushHour ||
     goldenTicket ||
     silverTicket ||
-    goldenParachute
+    goldenParachute ||
+    payout ||
+    grandOpening
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1089,6 +1099,37 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             GOLDEN_PARACHUTE_CRIT_LABEL,
             GOLDEN_PARACHUTE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (payout && !specialCelebrationQueue.some((q) => q.kind === "payout")) {
+      specialCelebrationQueue.push({
+        kind: "payout",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            PAYOUT_CRIT_LABEL,
+            PAYOUT_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      grandOpening &&
+      !specialCelebrationQueue.some((q) => q.kind === "grandOpening")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "grandOpening",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            GRAND_OPENING_CRIT_LABEL,
+            GRAND_OPENING_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

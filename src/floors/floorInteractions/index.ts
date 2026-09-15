@@ -51,6 +51,8 @@ import {
   isGoldenTicketCrit,
   isSilverTicketCrit,
   isGoldenParachuteCrit,
+  isPayoutCrit,
+  isGrandOpeningCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -100,6 +102,8 @@ import {
   addTotalIncome,
   getTotalIncome,
   getCompanyIncomeRatePerSecond,
+  getAllCompaniesTotalIncome,
+  getAllCompaniesUpgradesValue,
 } from "../../totalIncome";
 import { getActiveCompanyIndex } from "../../company";
 import { spawnCoinBurst } from "../coins";
@@ -485,6 +489,19 @@ function applyFreeSaleCrit(floor: Floor): void {
   triggerSaleBoost(floor);
 }
 
+// "Grand Opening" crit (see shared/critTypes's isGrandOpeningCrit): unlocks
+// every currently-locked floor in this building for free, preserving each
+// floor's own existing tier/rate/upgrade state (unlike heavenly, which also
+// maxes tiers and grants upgrades)
+function applyGrandOpeningCrit(deps: FloorActionsDeps): void {
+  unlockAllFloors({
+    floors: deps.floors,
+    backgroundCount: deps.backgroundCount,
+    multiplier: deps.multiplier,
+    onAdd: deps.onFloorAdded,
+  });
+}
+
 // "payday crit" (see shared/critTypes's isPaydayCrit): a flat one-time
 // effect, same shape as booty — triples the currently active company's
 // total income once
@@ -571,6 +588,17 @@ const GOLDEN_PARACHUTE_SECONDS = 15;
 function applyGoldenParachuteCrit(): void {
   const rate = getCompanyIncomeRatePerSecond(getActiveCompanyIndex());
   addTotalIncome(multiply(rate, GOLDEN_PARACHUTE_SECONDS));
+}
+
+// "Payout" crit (see shared/critTypes's isPayoutCrit): the biggest flat
+// one-time jackpot — instantly adds the combined total income + upgrades
+// value across EVERY corporation (not just the active one) to the
+// currently active company's own total (see totalIncome.ts's
+// getAllCompaniesTotalIncome/getAllCompaniesUpgradesValue)
+function applyPayoutCrit(): void {
+  addTotalIncome(
+    add(getAllCompaniesTotalIncome(), getAllCompaniesUpgradesValue()),
+  );
 }
 
 // "winter sale"/"spring sale"/"summer sale"/"autumn sale"/"halloween sale"
@@ -800,6 +828,12 @@ export function handleFloorClick(
         // golden parachute crit: instantly pays 15s of the active company's
         // own combined income rate, no matter how much it's already banked
         if (buyTier.goldenParachute) applyGoldenParachuteCrit();
+        // payout crit: instantly adds every corporation's own combined
+        // income + upgrades value, the biggest flat one-time jackpot
+        if (buyTier.payout) applyPayoutCrit();
+        // grand opening crit: unlocks every remaining locked floor in this
+        // building for free
+        if (buyTier.grandOpening) applyGrandOpeningCrit(deps);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -893,6 +927,8 @@ export function handleFloorClick(
           buyTier.goldenTicket,
           buyTier.silverTicket,
           buyTier.goldenParachute,
+          buyTier.payout,
+          buyTier.grandOpening,
         );
     }
     return;
@@ -1052,6 +1088,8 @@ export function handleFloorClick(
       const goldenTicket = isGoldenTicketCrit(floor);
       const silverTicket = isSilverTicketCrit(floor);
       const goldenParachute = isGoldenParachuteCrit(floor);
+      const payout = isPayoutCrit(floor);
+      const grandOpening = isGrandOpeningCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1210,6 +1248,12 @@ export function handleFloorClick(
       // golden parachute crit: instantly pays 15s of the active company's
       // own combined income rate, no matter how much it's already banked
       if (goldenParachute) applyGoldenParachuteCrit();
+      // payout crit: instantly adds every corporation's own combined income
+      // + upgrades value, the biggest flat one-time jackpot
+      if (payout) applyPayoutCrit();
+      // grand opening crit: unlocks every remaining locked floor in this
+      // building for free
+      if (grandOpening) applyGrandOpeningCrit(deps);
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
@@ -1267,6 +1311,8 @@ export function handleFloorClick(
         goldenTicket,
         silverTicket,
         goldenParachute,
+        payout,
+        grandOpening,
       );
       return;
     }

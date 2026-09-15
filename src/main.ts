@@ -59,8 +59,12 @@ import {
   forceGoldenTicketCritUpgrade,
   forceSilverTicketCritUpgrade,
   forceGoldenParachuteCritUpgrade,
+  forcePayoutCritUpgrade,
+  forceGrandOpeningCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
+  forceGrandOpeningFloorBuyCrit,
+  forcePayoutFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
   increaseIncomeRate,
@@ -141,7 +145,9 @@ import {
   wireSpawnRushHourCritButton,
   wireSpawnGoldenTicketCritButton,
   wireSpawnSilverTicketCritButton,
+  wireSpawnGrandOpeningCritButton,
   wireSpawnGoldenParachuteCritButton,
+  wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
   wireForceBonusTierMegaCritButton,
   wireForceBonusTierUltraCritButton,
@@ -190,7 +196,9 @@ import {
   wireFloorBuyRushHourCritButton,
   wireFloorBuyGoldenTicketCritButton,
   wireFloorBuySilverTicketCritButton,
+  wireFloorBuyGrandOpeningCritButton,
   wireFloorBuyGoldenParachuteCritButton,
+  wireFloorBuyPayoutCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -198,6 +206,7 @@ import {
   wireMapUnlockChainMegaCritButton,
   wireMapUnlockChainUltraCritButton,
   wireMapUnlockUpgradeCritButton,
+  wireMapUnlockGrandOpeningCritButton,
   wireMapUnlockHeavenlyCritButton,
   wireMapUnlockPairCritButton,
   wireMapUnlockThreeOfAKindCritButton,
@@ -681,9 +690,17 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceSilverTicketCritUpgrade(floor);
     });
+    wireSpawnGrandOpeningCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceGrandOpeningCritUpgrade(floor);
+    });
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceGoldenParachuteCritUpgrade(floor);
+    });
+    wireSpawnPayoutCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forcePayoutCritUpgrade(floor);
     });
     wireForceBonusTierCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1534,6 +1551,9 @@ async function main() {
         true,
       ),
     );
+    wireFloorBuyGrandOpeningCritButton(app, () =>
+      forceGrandOpeningFloorBuyCrit("crit"),
+    );
     wireFloorBuyGoldenParachuteCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
@@ -1578,6 +1598,7 @@ async function main() {
         true,
       ),
     );
+    wireFloorBuyPayoutCritButton(app, () => forcePayoutFloorBuyCrit("crit"));
     wireMapUnlockCritButton(app, () => forceFloorBuyCrit("crit"));
     wireMapUnlockMegaCritButton(app, () => forceFloorBuyCrit("mega"));
     wireMapUnlockUltraCritButton(app, () => forceFloorBuyCrit("ultra"));
@@ -1590,6 +1611,9 @@ async function main() {
     );
     wireMapUnlockUpgradeCritButton(app, () =>
       forceFloorBuyCrit("crit", false, false, false, false, false, true),
+    );
+    wireMapUnlockGrandOpeningCritButton(app, () =>
+      forceGrandOpeningFloorBuyCrit("crit"),
     );
     wireMapUnlockHeavenlyCritButton(app, () =>
       forceFloorBuyCrit(
@@ -1778,6 +1802,13 @@ async function main() {
     persist();
     return true;
   }
+
+  // same as buyBuilding above, but as a crit reward (no cost check/spend)
+  function buyBuildingForFree(): void {
+    const buildingIndex = buildings.length;
+    buildings.push(createBuilding(buildingIndex, getBackgroundUrls().length));
+    setupBuilding(buildingIndex);
+  }
   // unlocks every remaining floor of an ALREADY-BOUGHT building in one shot —
   // the city map's long-press-on-the-green-dot gesture (see cityMap/index.ts,
   // markers.ts's drawBuyAllFloorsIndicator). Returns whether it succeeded (false
@@ -1934,6 +1965,9 @@ async function main() {
         setupBuilding(nextIndex);
         applyBuildingCritTier(nextIndex, result);
       }
+    }
+    if (result.grandOpening) {
+      buyBuildingForFree();
     }
     persist();
   }

@@ -53,6 +53,40 @@ export function getAllCompaniesTotalIncome(): BigNumber {
   return sum;
 }
 
+// $ actually spent on upgrades across a company's buildings — same simple
+// sum hud/corporationBoostMenu's own getCompanyUpgradesValue(buildings)
+// exposes for the active company; duplicated here (not imported) since hud/
+// sits above totalIncome/ in the dependency graph and must never be
+// imported from here
+function sumUpgradesValue(buildings: Floor[][]): BigNumber {
+  let total = ZERO;
+  for (const floors of buildings) {
+    for (const floor of floors) {
+      total = add(total, multiply(floor.rateStep, floor.upgradeCount));
+    }
+  }
+  return total;
+}
+
+// a company's own current upgrades-only value (see company.ts's CompanyRecord
+// upgradesValue field) — same active/dormant split as getStoredTotalIncome
+// above: the active company reads its own live buildings (freshest), any
+// dormant company reads its persisted record's own frozen upgradesValue
+export function getStoredUpgradesValue(companyIndex: number): BigNumber {
+  if (companyIndex === activeCompanyIndex)
+    return sumUpgradesValue(tickerBuildings);
+  return loadCompanyRecord(companyIndex)?.upgradesValue ?? ZERO;
+}
+
+// combined upgrades value across every corporation — see "Payout" crit's own
+// applyPayoutCrit (floorInteractions.ts), the only current consumer
+export function getAllCompaniesUpgradesValue(): BigNumber {
+  const count = getCorporationCount();
+  let sum = ZERO;
+  for (let i = 0; i < count; i++) sum = add(sum, getStoredUpgradesValue(i));
+  return sum;
+}
+
 // deducts amount from the running total if affordable; returns whether the spend succeeded
 export function spendTotalIncome(amount: BigNumber): boolean {
   if (lt(totalIncome, amount)) return false;

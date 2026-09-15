@@ -211,11 +211,23 @@ export const CONFIG = {
     // only mega instead of ultra (see upgradeButton's armGuaranteedMegaCrit)
     // — a smaller guaranteed swing, so less rare than Golden Ticket
     silverTicketChance: 0.005,
+    // "Grand Opening" crit — if it lands on a map building purchase, buys
+    // the next building for free; if it lands on an upgrade/floor unlock,
+    // unlocks every remaining floor in that building for free. Big swing,
+    // so keep rarer than most flat one-time procs
+    grandOpeningChance: 0.0005,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income
     // rate (across every one of its buildings), straight to its total
     goldenParachuteChance: 0.03,
+    // "Payout" crit — the biggest flat one-time jackpot: instantly adds the
+    // combined total income + upgrades value across EVERY corporation (not
+    // just the active one) to the currently active company's own total (see
+    // floorInteractions.ts's applyPayoutCrit/totalIncome.ts's
+    // getAllCompaniesUpgradesValue) — rare, since a multi-company save could
+    // make this enormous
+    payoutChance: 0.005,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

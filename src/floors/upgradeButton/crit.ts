@@ -112,6 +112,10 @@ export {
   SILVER_TICKET_CRIT_LABEL,
   GOLDEN_PARACHUTE_CRIT_COLOR,
   GOLDEN_PARACHUTE_CRIT_LABEL,
+  PAYOUT_CRIT_COLOR,
+  PAYOUT_CRIT_LABEL,
+  GRAND_OPENING_CRIT_COLOR,
+  GRAND_OPENING_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -150,6 +154,8 @@ export {
   isGoldenTicketCrit,
   isSilverTicketCrit,
   isGoldenParachuteCrit,
+  isPayoutCrit,
+  isGrandOpeningCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -199,6 +205,8 @@ import {
   forceGoldenTicketCritProc,
   forceSilverTicketCritProc,
   forceGoldenParachuteCritProc,
+  forcePayoutCritProc,
+  forceGrandOpeningCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -285,6 +293,8 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.goldenTicket) forceGoldenTicketCritProc(floor);
     if (result.silverTicket) forceSilverTicketCritProc(floor);
     if (result.goldenParachute) forceGoldenParachuteCritProc(floor);
+    if (result.payout) forcePayoutCritProc(floor);
+    if (result.grandOpening) forceGrandOpeningCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -359,6 +369,8 @@ export function forceFloorBuyCrit(
   goldenTicket = false,
   silverTicket = false,
   goldenParachute = false,
+  payout = false,
+  grandOpening = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -401,7 +413,23 @@ export function forceFloorBuyCrit(
     goldenTicket,
     silverTicket,
     goldenParachute,
+    payout,
+    grandOpening,
   };
+}
+
+// dev/test-only: guarantees the next floor/building purchase crit carries a
+// Grand Opening proc on top of the chosen tier (default "crit")
+export function forceGrandOpeningFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.grandOpening = true;
+}
+
+// dev/test-only: guarantees the next floor/building purchase crit carries a
+// Payout proc on top of the chosen tier (default "crit")
+export function forcePayoutFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.payout = true;
 }
 
 export function getCritTier(floor: Floor): CritTier | null {
@@ -682,6 +710,22 @@ export function forceSilverTicketCritUpgrade(floor: Floor): void {
 export function forceGoldenParachuteCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceGoldenParachuteCritProc(floor);
+}
+
+// dev/test-only: force this floor's already-armed tier to also carry a
+// Payout proc, bypassing chance entirely (see hud/testButton's "Spawn
+// Payout Crit") — not tier-scaled, so no tier param needed
+export function forcePayoutCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forcePayoutCritProc(floor);
+}
+
+// dev/test-only: force this floor's already-armed tier to also carry a
+// Grand Opening proc, bypassing chance entirely (see hud/testButton's
+// "Spawn Grand Opening Crit") — not tier-scaled, so no tier param needed
+export function forceGrandOpeningCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceGrandOpeningCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's
