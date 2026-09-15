@@ -71,6 +71,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Fire Drill": { name: "fireDrill" },
   "Double Down": { name: "doubleDown" },
   "Coffee Run": { name: "coffeeRun" },
+  "Team Building": { name: "teamBuilding" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

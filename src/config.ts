@@ -263,6 +263,9 @@ export const CONFIG = {
     // boost/sunshine/snowday, but the longest duration of the family (a full
     // minute), so rarer than any of them
     coffeeRunChance: 0.03,
+    // "Team Building" crit — one free worker on every unlocked floor at once
+    // (Intern's building-wide sibling, priced like Golden Handshake)
+    teamBuildingChance: 0.03,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

@@ -152,6 +152,8 @@ export {
   DOUBLE_DOWN_CRIT_REPEATS,
   COFFEE_RUN_CRIT_COLOR,
   COFFEE_RUN_CRIT_LABEL,
+  TEAM_BUILDING_CRIT_COLOR,
+  TEAM_BUILDING_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -207,6 +209,7 @@ export {
   isFireDrillCrit,
   isDoubleDownCrit,
   isCoffeeRunCrit,
+  isTeamBuildingCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -273,6 +276,7 @@ import {
   forceFireDrillCritProc,
   forceDoubleDownCritProc,
   forceCoffeeRunCritProc,
+  forceTeamBuildingCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -375,6 +379,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.fireDrill) forceFireDrillCritProc(floor);
     if (result.doubleDown) forceDoubleDownCritProc(floor);
     if (result.coffeeRun) forceCoffeeRunCritProc(floor);
+    if (result.teamBuilding) forceTeamBuildingCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -514,6 +519,7 @@ export function forceFloorBuyCrit(
     fireDrill: false,
     doubleDown: false,
     coffeeRun: false,
+    teamBuilding: false,
   };
 }
 
@@ -605,6 +611,11 @@ export function forceDoubleDownFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceCoffeeRunFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.coffeeRun = true;
+}
+
+export function forceTeamBuildingFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.teamBuilding = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -989,6 +1000,11 @@ export function forceDoubleDownCritUpgrade(floor: Floor): void {
 export function forceCoffeeRunCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceCoffeeRunCritProc(floor);
+}
+
+export function forceTeamBuildingCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceTeamBuildingCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

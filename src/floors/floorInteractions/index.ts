@@ -68,6 +68,7 @@ import {
   isFireDrillCrit,
   isDoubleDownCrit,
   isCoffeeRunCrit,
+  isTeamBuildingCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -714,6 +715,14 @@ function applyGoldenHandshakeCrit(floors: Floor[]): void {
   }
 }
 
+// "Team Building" crit (see shared/critTypes's isTeamBuildingCrit): the same
+// idea for Intern — one free worker on every unlocked floor at once
+function applyTeamBuildingCrit(floors: Floor[]): void {
+  for (const floor of floors) {
+    if (floor.unlocked) applyInternCrit(floor);
+  }
+}
+
 // "Rush Hour" crit (see shared/critTypes's isRushHourCrit): no instant
 // payout — just starts the building-wide timed window (see
 // triggerRushHourCrit/isRushHourActive) during which every unlocked floor's
@@ -1031,6 +1040,7 @@ export function handleFloorClick(
         if (buyTier.doubleDown)
           applyDoubleDownCrit(floor, floors.indexOf(floor) === 0, buyTier.tier);
         if (buyTier.coffeeRun) applyCoffeeRunCrit(floors);
+        if (buyTier.teamBuilding) applyTeamBuildingCrit(floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -1141,6 +1151,7 @@ export function handleFloorClick(
           buyTier.fireDrill,
           buyTier.doubleDown,
           buyTier.coffeeRun,
+          buyTier.teamBuilding,
         );
     }
     return;
@@ -1317,6 +1328,7 @@ export function handleFloorClick(
       const fireDrill = isFireDrillCrit(floor);
       const doubleDown = isDoubleDownCrit(floor);
       const coffeeRun = isCoffeeRunCrit(floor);
+      const teamBuilding = isTeamBuildingCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1336,6 +1348,7 @@ export function handleFloorClick(
       if (fireDrill) applyFireDrillCrit(floors);
       if (doubleDown) applyDoubleDownCrit(floor, isGroundFloor, tier);
       if (coffeeRun) applyCoffeeRunCrit(floors);
+      if (teamBuilding) applyTeamBuildingCrit(floors);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
       // never once per free tick above, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
@@ -1572,6 +1585,7 @@ export function handleFloorClick(
         fireDrill,
         doubleDown,
         coffeeRun,
+        teamBuilding,
       );
       return;
     }

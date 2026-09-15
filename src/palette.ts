@@ -162,6 +162,8 @@ export const COLOR = {
   doubleDownCrimson: "#9F1239",
   // Coffee Run crit's own dedicated color
   coffeeRunTeal: "#0E7490",
+  // Team Building crit's own dedicated color
+  teamBuildingCoral: "#F97056",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

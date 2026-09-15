@@ -78,6 +78,7 @@ import {
   forceFireDrillCritUpgrade,
   forceDoubleDownCritUpgrade,
   forceCoffeeRunCritUpgrade,
+  forceTeamBuildingCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   forceGrandOpeningFloorBuyCrit,
@@ -96,6 +97,7 @@ import {
   forceFireDrillFloorBuyCrit,
   forceDoubleDownFloorBuyCrit,
   forceCoffeeRunFloorBuyCrit,
+  forceTeamBuildingFloorBuyCrit,
   forcePayoutFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -193,6 +195,7 @@ import {
   wireSpawnFireDrillCritButton,
   wireSpawnDoubleDownCritButton,
   wireSpawnCoffeeRunCritButton,
+  wireSpawnTeamBuildingCritButton,
   wireSpawnGoldenParachuteCritButton,
   wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
@@ -259,6 +262,7 @@ import {
   wireFloorBuyFireDrillCritButton,
   wireFloorBuyDoubleDownCritButton,
   wireFloorBuyCoffeeRunCritButton,
+  wireFloorBuyTeamBuildingCritButton,
   wireFloorBuyGoldenParachuteCritButton,
   wireFloorBuyPayoutCritButton,
   wireMapUnlockCritButton,
@@ -814,6 +818,10 @@ async function main() {
     wireSpawnCoffeeRunCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceCoffeeRunCritUpgrade(floor);
+    });
+    wireSpawnTeamBuildingCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceTeamBuildingCritUpgrade(floor);
     });
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1715,6 +1723,9 @@ async function main() {
     );
     wireFloorBuyCoffeeRunCritButton(app, () =>
       forceCoffeeRunFloorBuyCrit("crit"),
+    );
+    wireFloorBuyTeamBuildingCritButton(app, () =>
+      forceTeamBuildingFloorBuyCrit("crit"),
     );
     wireFloorBuyGoldenParachuteCritButton(app, () =>
       forceFloorBuyCrit(
