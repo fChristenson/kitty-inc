@@ -825,7 +825,7 @@ function drawFlashLayer(
     );
     ctx.drawImage(snowballIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
-  if (label === "Sale" && cashRegisterIcon) {
+  if (label === "Sales event" && cashRegisterIcon) {
     const { w: iconW, h: iconH } = fitIconSize(
       cashRegisterIcon,
       measuredWidth * 0.85,

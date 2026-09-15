@@ -1,7 +1,7 @@
 // Everything the button's own geometry/press-and-hold animation AND every
-// "event crit" module (sale.ts/overtime.ts/frozen.ts/snowball.ts/...) needs
-// in common lives here — button-specific state that isn't itself a new event
-// type stays in this one file instead of being duplicated per event.
+// "event crit" module (sale.ts/overtime.ts/...) needs in common
+// lives here — button-specific state that isn't itself a new event type
+// stays in this one file instead of being duplicated per event.
 import { smoothstep } from "../../shared/easing";
 import { spawnCoinBurst } from "../coins";
 import { type BigNumber, divide, gte } from "../../shared/bigNumber";
@@ -250,25 +250,25 @@ export function stepHoldAnim(
 }
 
 // ---------------------------------------------------------------------------
-// "event crit" framework — the shared shape behind Sale/Overtime/Frozen/
-// Snowball (and any future one): a temporary, per-floor window that takes
-// over the upgrade button's color/label/wiggle while active. Adding a brand
-// new one is meant to be:
+// "event crit" framework — the shared shape behind Sale/Overtime (and
+// any future one): a temporary, per-floor window that takes over the upgrade
+// button's color/label/wiggle while active. Adding a brand new one is meant
+// to be:
 //   1. a new file (e.g. upgradeButton/thing.ts) that owns that event's own
 //      trigger/isActive state — createTimedFloorEvent below covers the
 //      common "just runs for N ms once triggered" shape; an event with extra
-//      per-run state (like Snowball's own click counter) or persisted-across-
-//      reload state (like Overtime's own gauge) still just wraps its own
-//      isActive/trigger with the same signatures.
+//      per-run state or persisted-across-reload state (like Overtime's own
+//      gauge) still just wraps its own isActive/trigger with the same
+//      signatures.
 //   2. that file calling registerEventButton once (at module-eval time) with
 //      its own color/label/freeClick — nothing in drawUpgradeButton (index.ts)
 //      or isUpgradeButtonEnabled below needs to change
 // ---------------------------------------------------------------------------
 
-// factory for the common "starts now, runs for a fixed duration" shape (Sale/
-// Frozen/Snowball's own window) — an event with extra state of its own (e.g.
-// Snowball's per-run click counter) just wraps this instead of hand-rolling
-// its own WeakMap<Floor, number> + now-startedAt<duration check again
+// factory for the common "starts now, runs for a fixed duration" shape
+// (Sale/Frozen's own window) — an event with extra state of its own just
+// wraps this instead of hand-rolling its own WeakMap<Floor, number> +
+// now-startedAt<duration check again
 export interface TimedFloorEvent {
   trigger(floor: Floor): void;
   isActive(floor: Floor, now: number): boolean;
@@ -293,25 +293,25 @@ export interface EventButtonDef {
   key: string;
   // the button's fill color while this event is the active one
   color: string;
-  // free clicks (Sale/Overtime/Snowball) never dim for unaffordability and
-  // always count as "clickable" for isUpgradeButtonEnabled below; an event
-  // that still charges real money while active (Frozen) is false here, so
-  // the button keeps its normal afford ability-based dimming
+  // free clicks (Sale/Overtime) never dim for unaffordability and always
+  // count as "clickable" for isUpgradeButtonEnabled below; an event that
+  // still charges real money while active (Frozen) is false here, so the
+  // button keeps its normal affordability-based dimming
   freeClick: boolean;
   isActive(floor: Floor, now: number): boolean;
   // `critMultiplier` is the landed tier's own multiplier (5/25/125) if a
   // plain crit is ALSO currently armed on this same floor, else null — lets
-  // an event append its own "x5" the same way Sale/Overtime/Snowball do;
-  // an event whose reward never scales with tier (Frozen) can just ignore it
+  // an event append its own "x5" the same way Sale/Overtime do; an event
+  // whose reward never scales with tier (Frozen) can just ignore it
   label(critMultiplier: number | null): string;
 }
 
 const eventButtons: EventButtonDef[] = [];
 
 // call once per event module, at module-eval time (see sale.ts/overtime.ts/
-// frozen.ts/snowball.ts's own bottom-of-file call) — registration order is
-// the tie-break priority when (rarely) more than one event is active on the
-// same floor at once, first-registered wins
+// frozen.ts's own bottom-of-file call) — registration order is the
+// tie-break priority when (rarely) more than one event is active on the same
+// floor at once, first-registered wins
 export function registerEventButton(def: EventButtonDef): void {
   eventButtons.push(def);
 }

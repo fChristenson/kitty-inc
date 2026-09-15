@@ -11,16 +11,6 @@ import { CONFIG } from "../../config";
 import { createTimedFloorEvent, registerEventButton } from "./shared";
 
 export const SALE_DURATION_MS = CONFIG.sale.durationMs;
-// each sale click pays out floorIncomePerSecond(floor) (1 second of that
-// floor's own income), credited straight to the player's total — hud/boostMenu's
-// own cost is priced off this same rate times this many assumed clicks, halved, so
-// a fully-clicked sale earns back at least double the cost
-export const SALE_ASSUMED_CLICKS = CONFIG.sale.assumedClicks;
-// per-click payout multiplier applied only to actual sale-click earnings (see
-// floorInteractions/index.ts) — boostMenu's sale cost still prices off the plain
-// floorIncomePerSecond rate, so a fully-clicked sale now earns back well more
-// than double its cost
-export const SALE_INCOME_MULTIPLIER = CONFIG.sale.incomeMultiplier;
 
 const saleEvent = createTimedFloorEvent(SALE_DURATION_MS);
 
@@ -38,5 +28,5 @@ registerEventButton({
   freeClick: true,
   isActive: isSaleActive,
   label: (critMultiplier) =>
-    critMultiplier !== null ? `Sale x${critMultiplier}` : "Sale",
+    critMultiplier !== null ? `Sales event x${critMultiplier}` : "Sales event",
 });

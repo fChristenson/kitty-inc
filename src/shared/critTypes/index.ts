@@ -272,25 +272,36 @@ export const FAST_FORWARD_CRIT_COLOR = COLOR.fastForwardBlue;
 export const FAST_FORWARD_CRIT_LABEL = "Fast Forward";
 
 // "frozen crit" — also no instant reward: arming this proc just marks the
-// floor so that, once the crit is actually clicked, upgradeButton.ts's
-// triggerFrozenCrit starts a Sale-like free-click event for
-// CONFIG.crit.frozenDurationMs of real time, during which each click
-// credits floorIncomePerSecond * an ultra crit's own multiplier straight to
-// the player's total INSTEAD of performing the normal paid upgrade — as if
-// every click were its own free ultra crit's worth of cash (see
-// floorInteractions.ts's own Frozen click branch)
+// floor so that, once the crit is actually clicked, triggerFrozenCrit below
+// starts a CONFIG.crit.frozenDurationMs window during which this floor's
+// own upgradeCost stops growing entirely (see incomePanel.ts's
+// increaseIncomeRate) — upgrades still cost real money and behave
+// completely normally otherwise, just at whatever price was already locked
+// in when the window started
 export const FROZEN_CRIT_CHANCE = CONFIG.crit.frozenChance;
 export const FROZEN_CRIT_COLOR = COLOR.frozenIceBlue;
 export const FROZEN_CRIT_LABEL = "Frozen";
+export const FROZEN_DURATION_MS = CONFIG.crit.frozenDurationMs;
+// a per-floor start timestamp, not a plain WeakSet flag like every other
+// proc — the price-freeze needs to know WHEN its window ends, not just
+// whether it landed
+const frozenStartedAt = new WeakMap<Floor, number>();
 
-// "snowball crit" — also no instant reward: arming this proc just marks the
-// floor so that, once the crit is actually clicked, upgradeButton.ts's
-// triggerSnowballCrit starts a Sale-like free-click event for
-// CONFIG.crit.snowballDurationMs of real time, during which each click
-// credits n^2 * floorIncomePerSecond (n = that click's own count) straight
-// to the player's total income — same lump-sum-payout shape as Sale, just
-// growing per click instead of a flat multiplier (see floorInteractions.ts's
-// own Snowball click branch)
+export function triggerFrozenCrit(floor: Floor): void {
+  frozenStartedAt.set(floor, Date.now());
+}
+
+export function isFrozenActive(floor: Floor, now: number): boolean {
+  const startedAt = frozenStartedAt.get(floor);
+  return startedAt !== undefined && now - startedAt < FROZEN_DURATION_MS;
+}
+
+// "snowball crit" — a flat, not-tier-scaled proc (same shape as tick tock/
+// fast forward): instantly credits every unlocked floor 1 extra payout's
+// worth of income at its own current rate, multiplied by however many
+// floors are currently unlocked (the more floors owned, the bigger the
+// snowball) — see floorInteractions.ts's applySnowballCrit, which reuses
+// applyTickTockCrit with that count as its own multiplier
 export const SNOWBALL_CRIT_CHANCE = CONFIG.crit.snowballChance;
 export const SNOWBALL_CRIT_COLOR = COLOR.snowballBlue;
 export const SNOWBALL_CRIT_LABEL = "Snowball";
@@ -303,7 +314,7 @@ export const SNOWBALL_CRIT_LABEL = "Snowball";
 // sale.ts), just armed by a crit roll instead of spent cash
 export const FREE_SALE_CRIT_CHANCE = CONFIG.crit.freeSaleChance;
 export const FREE_SALE_CRIT_COLOR = COLOR.amber;
-export const FREE_SALE_CRIT_LABEL = "Sale";
+export const FREE_SALE_CRIT_LABEL = "Sales event";
 
 // "bull market crit" — an instant, flat, building-wide reward: doubles
 // every unlocked floor's own upgradeCount at once (see
@@ -699,17 +710,17 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
   frozen: {
     label: FROZEN_CRIT_LABEL,
     icon: "icecube",
-    description: "Free clicks each pay out like an ultra crit",
+    description: "Locks this floor's upgrade price for 15s",
   },
   snowball: {
     label: SNOWBALL_CRIT_LABEL,
     icon: "snowball",
-    description: "Free clicks earn a growing lump sum of cash",
+    description: "Pays every floor once, times floors unlocked",
   },
   freeSale: {
     label: FREE_SALE_CRIT_LABEL,
     icon: "cashRegister",
-    description: "Starts a free Sale event on this floor",
+    description: "Starts a free Sales event on this floor",
   },
   bullMarket: {
     label: BULL_MARKET_CRIT_LABEL,
@@ -766,7 +777,7 @@ function rollTier(): CritTier | null {
 // return (rollFloorBuyCrit) — this function itself has no Floor/state
 // dependency at all.
 // `allowSpecialProcs = false` (see floorInteractions.ts's Sale/Overtime/
-// Frozen/Snowball click branches) skips the entire gateway+proc roll —
+// Frozen click branches) skips the entire gateway+proc roll —
 // still rolls a plain tier crit normally, just never a piggyback proc on top,
 // so re-arming the next crit while already inside one of those special
 // events can only ever land a "regular" x5/x25/x125, never stack another

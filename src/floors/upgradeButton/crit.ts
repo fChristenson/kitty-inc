@@ -1,7 +1,7 @@
 // The base crit-TIER system (x5/x25/x125 jackpot rolls) — distinct from the
-// "event crit" framework in shared.ts (Sale/Overtime/Frozen/Snowball and any
-// future ones): a tier is what's rolled per click and what makes an event's
-// own piggyback proc possible in the first place, not itself a timed window.
+// "event crit" framework in shared.ts (Sale/Overtime and any future ones): a
+// tier is what's rolled per click and what makes an event's own piggyback
+// proc possible in the first place, not itself a timed window.
 //
 // "crit" upgrade: a rare, free, oversized upgrade — the slot-machine jackpot moment.
 // Tiers (a variable-ratio reward schedule, not a flat one) roll independently
@@ -81,6 +81,9 @@ export {
   FAST_FORWARD_CRIT_LABEL,
   FROZEN_CRIT_COLOR,
   FROZEN_CRIT_LABEL,
+  FROZEN_DURATION_MS,
+  triggerFrozenCrit,
+  isFrozenActive,
   SNOWBALL_CRIT_COLOR,
   SNOWBALL_CRIT_LABEL,
   FREE_SALE_CRIT_COLOR,
@@ -189,9 +192,9 @@ const critTiers = new WeakMap<Floor, CritTier>();
 // the same forceXCritProc setters the dev-test "force" helpers below use —
 // landing "for real" and being forced are the same underlying WeakSet add).
 // `allowSpecialProcs = false` (see floorInteractions.ts's Sale/Overtime/
-// Frozen/Snowball click branches, re-arming the next crit while one of
-// those is already active) forwards straight through to rollCrit — still
-// arms a plain tier crit normally, just never a piggyback proc alongside it
+// Frozen click branches, re-arming the next crit while one of those is
+// already active) forwards straight through to rollCrit — still arms a
+// plain tier crit normally, just never a piggyback proc alongside it
 export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
   rollCrit((result) => {
     critTiers.set(floor, result.tier);

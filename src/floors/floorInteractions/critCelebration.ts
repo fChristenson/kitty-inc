@@ -154,8 +154,8 @@ function playSpecialFlash(label: string, color: string): void {
     priority: 1,
     // sticks at full size/opacity this much longer before the regular
     // fade-out begins, so the icon+text stay on screen a beat longer once
-    // fully shown
-    holdMs: 300,
+    // fully shown — bumped +300ms per explicit request
+    holdMs: 600,
   });
   playExplosion();
 }

@@ -155,20 +155,19 @@ export const CONFIG = {
     // "fast forward crit" — same instant-income reward as tick tock above,
     // just a steeper multiplier (see shared/critTypes' FAST_FORWARD_PAYOUT_MULTIPLIER)
     fastForwardChance: 0.05,
-    // "frozen crit" — starts a Sale-like free-click event (see
-    // upgradeButton.ts's isFrozenActive/triggerFrozenCrit/FROZEN_PAYOUT_MULTIPLIER):
-    // each click pays a flat floorIncomePerSecond * ultra-crit multiplier
-    // straight to the player's total instead of performing the normal paid
-    // upgrade at all
+    // "frozen crit" — starts a window (see
+    // upgradeButton.ts's isFrozenActive/triggerFrozenCrit) during which this
+    // floor's own upgradeCost stops growing entirely (see incomePanel.ts's
+    // increaseIncomeRate) — upgrades still cost real money as normal, just
+    // at whatever price was already locked in when the window started
     frozenChance: 0.01,
     frozenDurationMs: 15000,
-    // "snowball crit" — starts a Sale-like free-click event (see
-    // upgradeButton.ts's isSnowballActive/triggerSnowballCrit): each click
-    // credits a lump sum straight to the player's total, growing by n^2 (n =
-    // that click's own 1-indexed count within the event) instead of Sale's
-    // own flat multiplier
+    // "snowball crit" — a flat, not-tier-scaled proc (see shared/critTypes'
+    // applySnowballCrit): instantly credits every unlocked floor 1 extra
+    // payout's worth of income at its own current rate, multiplied by how
+    // many floors are currently unlocked — the more floors owned, the bigger
+    // the snowball
     snowballChance: 0.01,
-    snowballDurationMs: 15000,
     // "free sale crit" — no reward of its own: just triggers the SAME "Sale"
     // event hud/boostMenu's paid purchase starts (see
     // floorInteractions.ts's applyFreeSaleCrit/upgradeButton.ts's
@@ -199,12 +198,6 @@ export const CONFIG = {
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.
   sale: {
     durationMs: 15_000,
-    // hud/boostMenu's own cost is priced off floorIncomePerSecond times this
-    // many assumed clicks, halved (see getSaleBoostCost)
-    assumedClicks: 10,
-    // per-click payout multiplier applied only while a sale is active —
-    // doubled from 2 to 4 per explicit request
-    incomeMultiplier: 4,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Work overtime" boost.

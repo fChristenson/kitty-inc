@@ -1,5 +1,6 @@
 import sharp from "sharp";
 import path from "node:path";
+import { keepLargestOpaqueComponent } from "./lib/keep-largest-component.mjs";
 
 // "Intern" crit's own backdrop icon: crops the ALREADY-processed worker walk
 // sprite sheet's frame 0 (its plain, untinted, camera-facing neutral pose —
@@ -12,10 +13,16 @@ const TURN_FRAME_INDEX = 0;
 // the walk-cycle sheet bakes a small, noisy/jaggy reddish ground patch in
 // right under the character's feet (visible in-game against the floor art,
 // but reads as pixelation/a strange-colored blob once isolated as a large
-// standalone icon) — this cutoff keeps the feet themselves (still cream-
-// colored through row 300) while dropping the patch, which only starts
-// bleeding in at row 300+
-const CONTENT_HEIGHT_FRACTION = 300 / 323;
+// standalone icon), and it sits close enough under the feet that a simple
+// row cutoff either chops the feet off with it or lets it bleed through —
+// so instead it's chroma-keyed out by color: every sample of the patch has
+// a near-zero blue channel while real fur/suit/outline pixels never do.
+// Restricting this to the sheet's lower fraction (where legs/feet are, well
+// below the face/ears/tie) keeps it from eating legitimate dark colors
+// higher up the frame (eyes, tie).
+const SHADOW_FILTER_Y_FRACTION = 260 / 323;
+const SHADOW_BLUE_CUTOFF = 15;
+const SHADOW_BLACK_RG_CUTOFF = 15;
 
 const distSprites = path.resolve(
   import.meta.dirname,
@@ -35,14 +42,31 @@ const sheet = sharp(src);
 const { width: sheetW, height: sheetH } = await sheet.metadata();
 const frameW = Math.floor(sheetW / FRAME_COUNT);
 const frameX = TURN_FRAME_INDEX * frameW;
-const contentH = Math.floor(sheetH * CONTENT_HEIGHT_FRACTION);
 
 const { data, info } = await sheet
-  .extract({ left: frameX, top: 0, width: frameW, height: contentH })
+  .extract({ left: frameX, top: 0, width: frameW, height: sheetH })
   .ensureAlpha()
   .raw()
   .toBuffer({ resolveWithObject: true });
 const { width, height, channels } = info;
+
+const shadowFilterYStart = Math.floor(sheetH * SHADOW_FILTER_Y_FRACTION);
+for (let y = shadowFilterYStart; y < height; y++) {
+  for (let x = 0; x < width; x++) {
+    const i = (y * width + x) * channels;
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
+    if (
+      b < SHADOW_BLUE_CUTOFF &&
+      !(r < SHADOW_BLACK_RG_CUTOFF && g < SHADOW_BLACK_RG_CUTOFF)
+    ) {
+      data[i + 3] = 0;
+    }
+  }
+}
+// drops any disconnected fleck the shadow-patch removal left behind
+keepLargestOpaqueComponent(data, width, height, channels);
 
 // tight bounding box of the frame's own opaque silhouette, requiring a real
 // run of opaque pixels (not a stray low-alpha noise speck) — same fix every

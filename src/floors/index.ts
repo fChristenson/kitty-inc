@@ -397,7 +397,6 @@ export {
   triggerSaleBoost,
   isSaleActive,
   floorIncomePerSecond,
-  SALE_ASSUMED_CLICKS,
   triggerOvertimeBoost,
   isOvertimeActive,
   CRIT_TIER_CONFIG,

@@ -13,8 +13,7 @@ import {
   triggerJumpAll,
   triggerSaleBoost,
   triggerOvertimeBoost,
-  floorIncomePerSecond,
-  SALE_ASSUMED_CLICKS,
+  currentPayoutAmount,
 } from "../../floors";
 // re-exported for hud/index.ts's own facade — applyBoostAll's canonical home
 // is floors/worker.ts (floorInteractions.ts's boost crit proc uses it too),
@@ -57,14 +56,16 @@ export function getBoostAllCost(floors: Floor[]): BigNumber {
   return multiply(currentIncomePerSecond(floors), BOOST_ALL_SECONDS_COST);
 }
 
-// a floor's own floorIncomePerSecond (see floors/upgradeButton/index.ts — exactly
-// what one Sale click pays out), averaged across every unlocked floor since the
-// boost lands on a random one
-function averageFloorIncomePerSecond(floors: Floor[]): BigNumber {
+// a floor's own currentPayoutAmount (see floors/incomePanel/index.ts — exactly
+// what one Sale click now pays out, 1 full bar's worth), averaged across every
+// unlocked floor since the boost lands on a random one
+function averageFloorPayoutAmount(floors: Floor[]): BigNumber {
   const unlocked = floors.filter((floor) => floor.unlocked);
   if (unlocked.length === 0) return fromNumber(1);
+  const now = Date.now();
   const total = unlocked.reduce(
-    (sum, floor) => add(sum, max(fromNumber(1), floorIncomePerSecond(floor))),
+    (sum, floor) =>
+      add(sum, max(fromNumber(1), currentPayoutAmount(floor, now))),
     ZERO,
   );
   return divide(total, unlocked.length);
@@ -81,13 +82,9 @@ export function buyBoostAll(floors: Floor[]): boolean {
 }
 
 export function getSaleBoostCost(floors: Floor[]): BigNumber {
-  // half of SALE_ASSUMED_CLICKS worth of the floor's own per-second income —
-  // clicking through that many sale clicks (see floorInteractions/index.ts) pays
-  // that whole amount back, i.e. at least double the cost
-  return divide(
-    multiply(averageFloorIncomePerSecond(floors), SALE_ASSUMED_CLICKS),
-    2,
-  );
+  // half of the floor's own current bar payout — a single sale click now
+  // pays that whole amount back, i.e. at least double the cost
+  return divide(averageFloorPayoutAmount(floors), 2);
 }
 
 // buys the "Sale" boost: spends the cost, then puts one random unlocked floor's
@@ -177,7 +174,7 @@ export function wireBoostMenu(
   const list = container.querySelector<HTMLDivElement>("#boost-menu-list")!;
 
   // both costs are O(every floor in the building) to compute (see
-  // currentIncomePerSecond/averageFloorIncomePerSecond above) — cached here from
+  // currentIncomePerSecond/averageFloorPayoutAmount above) — cached here from
   // render() and reused by updateAffordability's own 250ms interval below instead
   // of recomputing them from scratch every tick, which made the dialog's upkeep
   // cost scale with the building's total floor count for as long as it stayed open

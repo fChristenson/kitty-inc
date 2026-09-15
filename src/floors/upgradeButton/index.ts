@@ -10,16 +10,20 @@
 //                 below plugs into.
 //   crit.ts     — the base crit-TIER system (x5/x25/x125 rolls + every
 //                 piggyback proc's dev-test force helper).
-//   sale.ts / overtime.ts / frozen.ts / snowball.ts — one file per "event
-//                 crit" (a temporary window that takes over the button's
-//                 color/label/wiggle while active). Adding a new one is just
-//                 a new file in this same shape — see shared.ts's own
-//                 "event crit framework" comment for the exact recipe.
+//   sale.ts / overtime.ts — one file per "event crit" (a temporary window
+//                 that takes over the button's own color/label/wiggle while
+//                 active). Adding a new one is just a new file in this same
+//                 shape — see shared.ts's own "event crit framework" comment
+//                 for the exact recipe. Every OTHER piggyback proc (including
+//                 Snowball/Frozen, both formerly event crits here) is a flat,
+//                 not-button-appearance-changing proc with no file of its
+//                 own in this folder — its state (if any beyond a plain
+//                 landed/not-landed flag) lives in shared/critTypes instead.
 //
 // Import order below is also the event-button PRIORITY order (see shared.ts's
 // registerEventButton) for the rare case more than one is active on the same
-// floor at once — keep sale/overtime/snowball/frozen in this order unless
-// deliberately reprioritizing.
+// floor at once — keep sale/overtime in this order unless deliberately
+// reprioritizing.
 import { drawCartoonText, drawPill, formatPrice } from "../../utils";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
@@ -37,15 +41,11 @@ import {
 import { getCritTier, CRIT_TIER_CONFIG, type CritTier } from "./crit";
 import "./sale";
 import "./overtime";
-import "./snowball";
-import "./frozen";
 
 export * from "./shared";
 export * from "./crit";
 export * from "./sale";
 export * from "./overtime";
-export * from "./frozen";
-export * from "./snowball";
 
 export function drawUpgradeButton(
   ctx: CanvasRenderingContext2D,
