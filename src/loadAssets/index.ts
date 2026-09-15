@@ -86,6 +86,8 @@ const IMAGE_FILES = {
   goldenParachute: "goldenParachute.png", // Golden Parachute crit flash's own backdrop icon
   payout: "payout.png", // Payout crit flash's own backdrop icon
   grandOpening: "grandOpening.png", // Grand Opening crit flash's own backdrop icon
+  fullyStaffed: "fullyStaffed.png", // Fully Staffed crit flash's own backdrop icon
+  espressoShot: "espressoShot.png", // Espresso Shot crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

@@ -56,6 +56,8 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Golden Parachute": { name: "goldenParachute" },
   Payout: { name: "payout" },
   "Grand Opening": { name: "grandOpening" },
+  "Fully Staffed": { name: "fullyStaffed" },
+  "Espresso Shot": { name: "espressoShot" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

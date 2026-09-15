@@ -53,6 +53,8 @@ import {
   isGoldenParachuteCrit,
   isPayoutCrit,
   isGrandOpeningCrit,
+  isFullyStaffedCrit,
+  isEspressoShotCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -502,6 +504,25 @@ function applyGrandOpeningCrit(deps: FloorActionsDeps): void {
   });
 }
 
+// "Fully Staffed" crit (see shared/critTypes's isFullyStaffedCrit): fills
+// every unlocked floor to the existing rendered-worker cap and grants every
+// unlocked floor a manager.
+// This changes the same state fields as the paid menu actions, but skips all
+// spending because the reward is free.
+function applyFullyStaffedCrit(floors: Floor[]): void {
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    floor.workerCount = MAX_RENDERED_WORKERS;
+    floor.hasManager = true;
+  }
+}
+
+// "Espresso Shot" crit (see shared/critTypes's isEspressoShotCrit): applies
+// the normal all-worker boost for its regular 15-second duration
+function applyEspressoShotCrit(floors: Floor[]): void {
+  applyFloorBoost(floors);
+}
+
 // "payday crit" (see shared/critTypes's isPaydayCrit): a flat one-time
 // effect, same shape as booty — triples the currently active company's
 // total income once
@@ -834,6 +855,8 @@ export function handleFloorClick(
         // grand opening crit: unlocks every remaining locked floor in this
         // building for free
         if (buyTier.grandOpening) applyGrandOpeningCrit(deps);
+        if (buyTier.fullyStaffed) applyFullyStaffedCrit(floors);
+        if (buyTier.espressoShot) applyEspressoShotCrit(floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -929,6 +952,8 @@ export function handleFloorClick(
           buyTier.goldenParachute,
           buyTier.payout,
           buyTier.grandOpening,
+          buyTier.fullyStaffed,
+          buyTier.espressoShot,
         );
     }
     return;
@@ -1090,6 +1115,8 @@ export function handleFloorClick(
       const goldenParachute = isGoldenParachuteCrit(floor);
       const payout = isPayoutCrit(floor);
       const grandOpening = isGrandOpeningCrit(floor);
+      const fullyStaffed = isFullyStaffedCrit(floor);
+      const espressoShot = isEspressoShotCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1254,6 +1281,8 @@ export function handleFloorClick(
       // grand opening crit: unlocks every remaining locked floor in this
       // building for free
       if (grandOpening) applyGrandOpeningCrit(deps);
+      if (fullyStaffed) applyFullyStaffedCrit(floors);
+      if (espressoShot) applyEspressoShotCrit(floors);
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
@@ -1313,6 +1342,8 @@ export function handleFloorClick(
         goldenParachute,
         payout,
         grandOpening,
+        fullyStaffed,
+        espressoShot,
       );
       return;
     }

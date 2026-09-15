@@ -420,6 +420,18 @@ export const GRAND_OPENING_CRIT_CHANCE = CONFIG.crit.grandOpeningChance;
 export const GRAND_OPENING_CRIT_COLOR = COLOR.grandOpeningRose;
 export const GRAND_OPENING_CRIT_LABEL = "Grand Opening";
 
+// "Fully Staffed" crit — fills every unlocked floor to its worker cap and
+// grants every manager-eligible unlocked floor a manager for free
+export const FULLY_STAFFED_CRIT_CHANCE = CONFIG.crit.fullyStaffedChance;
+export const FULLY_STAFFED_CRIT_COLOR = COLOR.fullyStaffedGreen;
+export const FULLY_STAFFED_CRIT_LABEL = "Fully Staffed";
+
+// "Espresso Shot" crit — boosts every unlocked floor's workers using the
+// canonical worker-boost behavior for the regular 15-second duration
+export const ESPRESSO_SHOT_CRIT_CHANCE = CONFIG.crit.espressoShotChance;
+export const ESPRESSO_SHOT_CRIT_COLOR = COLOR.espressoShotBrown;
+export const ESPRESSO_SHOT_CRIT_LABEL = "Espresso Shot";
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -479,6 +491,8 @@ const silverTicketCrits = new WeakSet<Floor>();
 const goldenParachuteCrits = new WeakSet<Floor>();
 const payoutCrits = new WeakSet<Floor>();
 const grandOpeningCrits = new WeakSet<Floor>();
+const fullyStaffedCrits = new WeakSet<Floor>();
+const espressoShotCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -559,6 +573,8 @@ export interface CritRollResult {
   goldenParachute: boolean;
   payout: boolean;
   grandOpening: boolean;
+  fullyStaffed: boolean;
+  espressoShot: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -610,6 +626,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "goldenParachute",
   "payout",
   "grandOpening",
+  "fullyStaffed",
+  "espressoShot",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -871,6 +889,16 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "grandOpening",
     description: "Buys the next building free, or unlocks all floors",
   },
+  fullyStaffed: {
+    label: FULLY_STAFFED_CRIT_LABEL,
+    icon: "fullyStaffed",
+    description: "Hires workers and managers on every unlocked floor",
+  },
+  espressoShot: {
+    label: ESPRESSO_SHOT_CRIT_LABEL,
+    icon: "espressoShot",
+    description: "Boosts every worker for 15 seconds",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -951,6 +979,8 @@ export function rollCrit(
     if (Math.random() < GOLDEN_TICKET_CRIT_CHANCE) landed.push("goldenTicket");
     if (Math.random() < SILVER_TICKET_CRIT_CHANCE) landed.push("silverTicket");
     if (Math.random() < GRAND_OPENING_CRIT_CHANCE) landed.push("grandOpening");
+    if (Math.random() < FULLY_STAFFED_CRIT_CHANCE) landed.push("fullyStaffed");
+    if (Math.random() < ESPRESSO_SHOT_CRIT_CHANCE) landed.push("espressoShot");
     if (Math.random() < GOLDEN_PARACHUTE_CRIT_CHANCE)
       landed.push("goldenParachute");
     if (Math.random() < PAYOUT_CRIT_CHANCE) landed.push("payout");
@@ -1011,6 +1041,8 @@ export function rollCrit(
     goldenParachute: kept.has("goldenParachute"),
     payout: kept.has("payout"),
     grandOpening: kept.has("grandOpening"),
+    fullyStaffed: kept.has("fullyStaffed"),
+    espressoShot: kept.has("espressoShot"),
   });
 }
 
@@ -1176,6 +1208,14 @@ export function isGrandOpeningCrit(floor: Floor): boolean {
   return grandOpeningCrits.has(floor);
 }
 
+export function isFullyStaffedCrit(floor: Floor): boolean {
+  return fullyStaffedCrits.has(floor);
+}
+
+export function isEspressoShotCrit(floor: Floor): boolean {
+  return espressoShotCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1232,6 +1272,8 @@ export function consumeCritProcs(floor: Floor): void {
   goldenParachuteCrits.delete(floor);
   payoutCrits.delete(floor);
   grandOpeningCrits.delete(floor);
+  fullyStaffedCrits.delete(floor);
+  espressoShotCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1396,6 +1438,14 @@ export function forcePayoutCritProc(floor: Floor): void {
 
 export function forceGrandOpeningCritProc(floor: Floor): void {
   grandOpeningCrits.add(floor);
+}
+
+export function forceFullyStaffedCritProc(floor: Floor): void {
+  fullyStaffedCrits.add(floor);
+}
+
+export function forceEspressoShotCritProc(floor: Floor): void {
+  espressoShotCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

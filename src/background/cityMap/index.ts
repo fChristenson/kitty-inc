@@ -42,6 +42,10 @@ import {
   HEAVENLY_CRIT_COLOR,
   GRAND_OPENING_CRIT_LABEL,
   GRAND_OPENING_CRIT_COLOR,
+  FULLY_STAFFED_CRIT_LABEL,
+  FULLY_STAFFED_CRIT_COLOR,
+  ESPRESSO_SHOT_CRIT_LABEL,
+  ESPRESSO_SHOT_CRIT_COLOR,
   runFirstCritProc,
   type CritTier,
   type CritRollResult,
@@ -503,8 +507,8 @@ export function createCityMapView(
         spawnCoinBurstAt(cx, burstY, MARKER_COIN_BURST_SCALE * 1.5);
       }, i * 90);
     }
-    // only ONE flash can ever show at once, so heavenly/upgrade/grand opening
-    // — the only 3 procs this whole-building event supports (see
+    // only ONE flash can ever show at once, so heavenly/upgrade/grand opening/
+    // fully staffed/espresso shot — the only 5 procs this whole-building event supports (see
     // setBuildingCritTier) —
     // are mutually exclusive with each other and with the plain tier flash
     // below, in priority order (heavenly first: it's the bigger moment if
@@ -554,8 +558,28 @@ export function createCityMapView(
           });
           playSold();
         },
+        fullyStaffed: () => {
+          triggerScreenShake({
+            intensity: 1.8,
+            label: FULLY_STAFFED_CRIT_LABEL,
+            color: FULLY_STAFFED_CRIT_COLOR,
+            strokeWidth: 14,
+            priority: 1,
+          });
+          playSold();
+        },
+        espressoShot: () => {
+          triggerScreenShake({
+            intensity: 1.8,
+            label: ESPRESSO_SHOT_CRIT_LABEL,
+            color: ESPRESSO_SHOT_CRIT_COLOR,
+            strokeWidth: 14,
+            priority: 1,
+          });
+          playSold();
+        },
       },
-      ["heavenly", "grandOpening", "upgrade"],
+      ["heavenly", "fullyStaffed", "espressoShot", "grandOpening", "upgrade"],
     );
     if (playedSpecial) return;
     // chain crit: the flash shows "Chain" instead of the tier's usual "x5"/

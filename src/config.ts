@@ -216,6 +216,12 @@ export const CONFIG = {
     // unlocks every remaining floor in that building for free. Big swing,
     // so keep rarer than most flat one-time procs
     grandOpeningChance: 0.0005,
+    // "Fully Staffed" crit — fills every unlocked floor to its worker cap and
+    // grants every manager-eligible unlocked floor a manager for free
+    fullyStaffedChance: 0.0005,
+    // "Espresso Shot" crit — boosts every unlocked floor's workers for the
+    // regular boost duration, with the same canonical worker-speed behavior
+    espressoShotChance: 0.0005,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

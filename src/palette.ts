@@ -132,6 +132,11 @@ export const COLOR = {
   // Grand Opening crit's own dedicated color — bright ceremonial rose-red,
   // distinct from the base ultra red and every other event color
   grandOpeningRose: "#F43F5E",
+  // Fully Staffed crit's own dedicated color — a practical workforce green
+  // distinct from the money button and existing worker-related proc colors
+  fullyStaffedGreen: "#22C55E",
+  // Espresso Shot crit's own dedicated color
+  espressoShotBrown: "#92400E",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

@@ -116,6 +116,10 @@ export {
   PAYOUT_CRIT_LABEL,
   GRAND_OPENING_CRIT_COLOR,
   GRAND_OPENING_CRIT_LABEL,
+  FULLY_STAFFED_CRIT_COLOR,
+  FULLY_STAFFED_CRIT_LABEL,
+  ESPRESSO_SHOT_CRIT_COLOR,
+  ESPRESSO_SHOT_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -156,6 +160,8 @@ export {
   isGoldenParachuteCrit,
   isPayoutCrit,
   isGrandOpeningCrit,
+  isFullyStaffedCrit,
+  isEspressoShotCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -207,6 +213,8 @@ import {
   forceGoldenParachuteCritProc,
   forcePayoutCritProc,
   forceGrandOpeningCritProc,
+  forceFullyStaffedCritProc,
+  forceEspressoShotCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -295,6 +303,8 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.goldenParachute) forceGoldenParachuteCritProc(floor);
     if (result.payout) forcePayoutCritProc(floor);
     if (result.grandOpening) forceGrandOpeningCritProc(floor);
+    if (result.fullyStaffed) forceFullyStaffedCritProc(floor);
+    if (result.espressoShot) forceEspressoShotCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -371,6 +381,8 @@ export function forceFloorBuyCrit(
   goldenParachute = false,
   payout = false,
   grandOpening = false,
+  fullyStaffed = false,
+  espressoShot = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -415,6 +427,8 @@ export function forceFloorBuyCrit(
     goldenParachute,
     payout,
     grandOpening,
+    fullyStaffed,
+    espressoShot,
   };
 }
 
@@ -423,6 +437,20 @@ export function forceFloorBuyCrit(
 export function forceGrandOpeningFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.grandOpening = true;
+}
+
+// dev/test-only: guarantees the next floor/building purchase crit carries a
+// Fully Staffed proc on top of the chosen tier
+export function forceFullyStaffedFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.fullyStaffed = true;
+}
+
+// dev/test-only: guarantees the next floor/building purchase crit carries an
+// Espresso Shot proc on top of the chosen tier
+export function forceEspressoShotFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.espressoShot = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -726,6 +754,20 @@ export function forcePayoutCritUpgrade(floor: Floor): void {
 export function forceGrandOpeningCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceGrandOpeningCritProc(floor);
+}
+
+// dev/test-only: force this floor's already-armed tier to also carry a Fully
+// Staffed proc, bypassing chance entirely
+export function forceFullyStaffedCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFullyStaffedCritProc(floor);
+}
+
+// dev/test-only: force this floor's already-armed tier to also carry an
+// Espresso Shot proc, bypassing chance entirely
+export function forceEspressoShotCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceEspressoShotCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

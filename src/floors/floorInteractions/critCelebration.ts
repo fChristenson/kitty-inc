@@ -76,6 +76,10 @@ import {
   PAYOUT_CRIT_LABEL,
   GRAND_OPENING_CRIT_COLOR,
   GRAND_OPENING_CRIT_LABEL,
+  FULLY_STAFFED_CRIT_COLOR,
+  FULLY_STAFFED_CRIT_LABEL,
+  ESPRESSO_SHOT_CRIT_COLOR,
+  ESPRESSO_SHOT_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -563,6 +567,8 @@ interface QueuedCelebration {
     | "goldenParachute"
     | "payout"
     | "grandOpening"
+    | "fullyStaffed"
+    | "espressoShot"
     | "bonusTier";
   queuedAt: number;
   run: () => void;
@@ -677,6 +683,8 @@ export function triggerCritCelebration(
   goldenParachute = false,
   payout = false,
   grandOpening = false,
+  fullyStaffed = false,
+  espressoShot = false,
 ): void {
   if (
     chain ||
@@ -717,7 +725,9 @@ export function triggerCritCelebration(
     silverTicket ||
     goldenParachute ||
     payout ||
-    grandOpening
+    grandOpening ||
+    fullyStaffed ||
+    espressoShot
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1130,6 +1140,40 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             GRAND_OPENING_CRIT_LABEL,
             GRAND_OPENING_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      fullyStaffed &&
+      !specialCelebrationQueue.some((q) => q.kind === "fullyStaffed")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "fullyStaffed",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            FULLY_STAFFED_CRIT_LABEL,
+            FULLY_STAFFED_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      espressoShot &&
+      !specialCelebrationQueue.some((q) => q.kind === "espressoShot")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "espressoShot",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            ESPRESSO_SHOT_CRIT_LABEL,
+            ESPRESSO_SHOT_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

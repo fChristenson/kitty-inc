@@ -1,15 +1,17 @@
 import sharp from "sharp";
 import path from "node:path";
-import { keepLargestOpaqueComponent } from "./lib/keep-largest-component.mjs";
 import { addDropShadow } from "./lib/synthetic-drop-shadow.mjs";
+import { keepLargestOpaqueComponent } from "./lib/keep-largest-component.mjs";
 
-const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const src = path.join(assets, "unionBoss.jfif");
-const dest = path.join(assets, "unionBoss.png");
-
+// Process the raw Fully Staffed crit artwork into a transparent, tightly-cropped
+// and palette-quantized backdrop icon. The source uses a near-white background.
 const WHITE_LO = 220;
 const WHITE_HI = 245;
 const FLOOD_LO = 220;
+
+const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
+const src = path.join(assets, "fullyStaffed.jfif");
+const dest = path.join(assets, "fullyStaffed.png");
 
 const { data, info } = await sharp(src)
   .ensureAlpha()
@@ -49,6 +51,7 @@ while (qHead < qTail) {
   if (y > 0) tryEnqueue(x, y - 1);
   if (y < height - 1) tryEnqueue(x, y + 1);
 }
+
 for (let y = 0; y < height; y++) {
   for (let x = 0; x < width; x++) {
     const pixelIdx = y * width + x;
@@ -68,11 +71,11 @@ for (let y = 0; y < height; y++) {
     );
   }
 }
+
 keepLargestOpaqueComponent(data, width, height, channels);
 
 const ALPHA_CUTOFF = 20;
 const MIN_OPAQUE_RUN = 20;
-
 function firstOpaqueRow(rows, cols, get) {
   for (let a = 0; a < rows; a++) {
     let run = 0;
@@ -80,14 +83,11 @@ function firstOpaqueRow(rows, cols, get) {
       if (get(a, b) > ALPHA_CUTOFF) {
         run++;
         if (run >= MIN_OPAQUE_RUN) return a;
-      } else {
-        run = 0;
-      }
+      } else run = 0;
     }
   }
   return rows;
 }
-
 const alphaAt = (y, x) => data[(y * width + x) * channels + 3];
 const minY = firstOpaqueRow(height, width, (y, x) => alphaAt(y, x));
 const maxY =
@@ -99,10 +99,8 @@ const maxX =
   width -
   1 -
   firstOpaqueRow(width, height, (x, y) => alphaAt(y, width - 1 - x));
-
 const croppedW = maxX - minX + 1;
 const croppedH = maxY - minY + 1;
-
 const cropped = await sharp(data, { raw: { width, height, channels } })
   .extract({ left: minX, top: minY, width: croppedW, height: croppedH })
   .ensureAlpha()
@@ -115,7 +113,6 @@ await sharp(shadowed.data, {
   .resize(250, 250, { fit: "inside", withoutEnlargement: true })
   .png({ compressionLevel: 9, palette: true })
   .toFile(dest);
-
 const finalMeta = await sharp(dest).metadata();
 console.log(
   `wrote ${path.relative(assets, dest)}: ${finalMeta.width}x${finalMeta.height}`,

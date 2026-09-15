@@ -1,97 +1,77 @@
 import sharp from "sharp";
 import path from "node:path";
 import { keepLargestOpaqueComponent } from "./lib/keep-largest-component.mjs";
+import { addDropShadow } from "./lib/synthetic-drop-shadow.mjs";
 
-// "Intern" crit's own backdrop icon: crops the ALREADY-processed worker walk
-// sprite sheet's frame 0 (its plain, untinted, camera-facing neutral pose —
-// the exact same frame floors/worker.ts's own getWorkerIconUrl crops at
-// runtime for hud/upgradeMenu's "hire worker" icon) down to its tight
-// bounding box. No chroma-keying needed here (unlike every other process-*
-// script) since the sprite sheet is already clean transparent-background art.
-const FRAME_COUNT = 5;
-const TURN_FRAME_INDEX = 0;
-// the walk-cycle sheet bakes a small, noisy/jaggy reddish ground patch in
-// right under the character's feet (visible in-game against the floor art,
-// but reads as pixelation/a strange-colored blob once isolated as a large
-// standalone icon), and it sits close enough under the feet that a simple
-// row cutoff either chops the feet off with it or lets it bleed through —
-// so instead it's chroma-keyed out by color: every sample of the patch has
-// a near-zero blue channel while real fur/suit/outline pixels never do.
-// Restricting this to the sheet's lower fraction (where legs/feet are, well
-// below the face/ears/tie) keeps it from eating legitimate dark colors
-// higher up the frame (eyes, tie).
-const SHADOW_FILTER_Y_FRACTION = 260 / 323;
-const SHADOW_BLUE_CUTOFF = 15;
-const SHADOW_BLACK_RG_CUTOFF = 15;
-
-const distSprites = path.resolve(
-  import.meta.dirname,
-  "..",
-  "src",
-  "assets",
-  "themes",
-  "references",
-  "dist",
-  "sprites",
-);
-const src = path.join(distSprites, "workerWalk.png");
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
+const src = path.join(assets, "intern.jfif");
 const dest = path.join(assets, "intern.png");
 
-const sheet = sharp(src);
-const { width: sheetW, height: sheetH } = await sheet.metadata();
-const frameW = Math.floor(sheetW / FRAME_COUNT);
-const frameX = TURN_FRAME_INDEX * frameW;
+const WHITE_LO = 220;
+const WHITE_HI = 245;
+const FLOOD_LO = 220;
 
-const { data, info } = await sheet
-  .extract({ left: frameX, top: 0, width: frameW, height: sheetH })
+const { data, info } = await sharp(src)
   .ensureAlpha()
   .raw()
   .toBuffer({ resolveWithObject: true });
 const { width, height, channels } = info;
 
-const shadowFilterYStart = Math.floor(sheetH * SHADOW_FILTER_Y_FRACTION);
-for (let y = shadowFilterYStart; y < height; y++) {
+function whitenessAt(x, y) {
+  const i = (y * width + x) * channels;
+  return Math.min(data[i], data[i + 1], data[i + 2]);
+}
+
+const isBackground = new Uint8Array(width * height);
+const queue = new Int32Array(width * height);
+let qHead = 0;
+let qTail = 0;
+function tryEnqueue(x, y) {
+  const idx = y * width + x;
+  if (isBackground[idx] || whitenessAt(x, y) <= FLOOD_LO) return;
+  isBackground[idx] = 1;
+  queue[qTail++] = idx;
+}
+for (let x = 0; x < width; x++) {
+  tryEnqueue(x, 0);
+  tryEnqueue(x, height - 1);
+}
+for (let y = 0; y < height; y++) {
+  tryEnqueue(0, y);
+  tryEnqueue(width - 1, y);
+}
+while (qHead < qTail) {
+  const idx = queue[qHead++];
+  const x = idx % width;
+  const y = (idx / width) | 0;
+  if (x > 0) tryEnqueue(x - 1, y);
+  if (x < width - 1) tryEnqueue(x + 1, y);
+  if (y > 0) tryEnqueue(x, y - 1);
+  if (y < height - 1) tryEnqueue(x, y + 1);
+}
+for (let y = 0; y < height; y++) {
   for (let x = 0; x < width; x++) {
-    const i = (y * width + x) * channels;
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
-    if (
-      b < SHADOW_BLUE_CUTOFF &&
-      !(r < SHADOW_BLACK_RG_CUTOFF && g < SHADOW_BLACK_RG_CUTOFF)
-    ) {
-      data[i + 3] = 0;
-    }
+    const pixelIdx = y * width + x;
+    if (!isBackground[pixelIdx]) continue;
+    const whiteness = whitenessAt(x, y);
+    const alpha =
+      whiteness >= WHITE_HI
+        ? 0
+        : whiteness <= WHITE_LO
+          ? 255
+          : Math.round(
+              255 * (1 - (whiteness - WHITE_LO) / (WHITE_HI - WHITE_LO)),
+            );
+    data[pixelIdx * channels + 3] = Math.min(
+      data[pixelIdx * channels + 3],
+      alpha,
+    );
   }
 }
-// drops any disconnected fleck the shadow-patch removal left behind. A high
-// alphaCutoff here (not the function's default 20) matters: leftover ground-
-// shadow noise right under the paws stays weakly attached to the real paw
-// only through a handful of partial-alpha (anti-aliased-looking) pixels, so a
-// low cutoff still treats it as "connected" and keeps the whole speckled tail.
-// Raising the cutoff means only strongly-opaque pixels can link up the main
-// silhouette, severing that weak bridge so the noise tail forms its own much
-// smaller component and gets dropped, while real fully-opaque paw pixels are
-// unaffected.
-const COMPONENT_ALPHA_CUTOFF = 200;
-keepLargestOpaqueComponent(
-  data,
-  width,
-  height,
-  channels,
-  COMPONENT_ALPHA_CUTOFF,
-);
+keepLargestOpaqueComponent(data, width, height, channels);
 
-// tight bounding box of the frame's own opaque silhouette. By this point the
-// shadow patch is already gone (color-filtered above) and any leftover fleck
-// was dropped by keepLargestOpaqueComponent, so every remaining opaque pixel
-// genuinely belongs to the character — MIN_OPAQUE_RUN=1 (any opaque pixel at
-// all) is enough; requiring a wider run here (as every other special-crit
-// icon script does, where noise ISN'T already fully cleaned up first) chopped
-// the paws' own rounded tips off flat instead of capturing their true extent.
 const ALPHA_CUTOFF = 20;
-const MIN_OPAQUE_RUN = 1;
+const MIN_OPAQUE_RUN = 20;
 
 function firstOpaqueRow(rows, cols, get) {
   for (let a = 0; a < rows; a++) {
@@ -123,10 +103,15 @@ const maxX =
 const croppedW = maxX - minX + 1;
 const croppedH = maxY - minY + 1;
 
-await sharp(data, { raw: { width, height, channels } })
+const cropped = await sharp(data, { raw: { width, height, channels } })
   .extract({ left: minX, top: minY, width: croppedW, height: croppedH })
-  // only ever drawn as a small flash-text backdrop — small cap + palette
-  // quantization keeps this in line with the other special-crit icons
+  .ensureAlpha()
+  .raw()
+  .toBuffer();
+const shadowed = await addDropShadow(cropped, croppedW, croppedH);
+await sharp(shadowed.data, {
+  raw: { width: shadowed.width, height: shadowed.height, channels: 4 },
+})
   .resize(250, 250, { fit: "inside", withoutEnlargement: true })
   .png({ compressionLevel: 9, palette: true })
   .toFile(dest);
