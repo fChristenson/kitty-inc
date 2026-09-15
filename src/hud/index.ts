@@ -98,6 +98,8 @@ export {
   wireSpawnFrozenCritButton,
   wireSpawnSnowballCritButton,
   wireSpawnFreeSaleCritButton,
+  wireSpawnBullMarketCritButton,
+  wireTestActionsFilter,
   wireSpawnPaydayCritButton,
   wireSpawnGoldStandardCritButton,
   wireSpawnNightShiftCritButton,

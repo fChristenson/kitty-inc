@@ -52,6 +52,7 @@ import {
   forceFrozenCritUpgrade,
   forceSnowballCritUpgrade,
   forceFreeSaleCritUpgrade,
+  forceBullMarketCritUpgrade,
   forcePaydayCritUpgrade,
   forceGoldStandardCritUpgrade,
   forceNightShiftCritUpgrade,
@@ -177,6 +178,8 @@ import {
   wireSpawnFrozenCritButton,
   wireSpawnSnowballCritButton,
   wireSpawnFreeSaleCritButton,
+  wireSpawnBullMarketCritButton,
+  wireTestActionsFilter,
   wireSpawnPaydayCritButton,
   wireSpawnGoldStandardCritButton,
   wireSpawnNightShiftCritButton,
@@ -734,6 +737,10 @@ async function main() {
     wireSpawnFreeSaleCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceFreeSaleCritUpgrade(floor);
+    });
+    wireSpawnBullMarketCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceBullMarketCritUpgrade(floor);
     });
     wireSpawnPaydayCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1938,6 +1945,8 @@ async function main() {
       totalEarnedOverlay.show(fromNumber(123456)),
     );
     wireResetButton(app, buildings);
+    // wired last, so it sees every dropdown/button the block above created
+    wireTestActionsFilter(app);
   }
   const upgradeMenu = wireUpgradeMenu(
     app,

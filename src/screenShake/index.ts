@@ -6,76 +6,42 @@
 
 import { COLOR } from "../palette";
 import { loadImageByName, type ImageName } from "../loadAssets";
+import {
+  CRIT_PROC_INFO,
+  CRIT_PROC_KINDS,
+  type CritProcKind,
+} from "../shared/critTypes";
 import { drawCritText } from "../shared/critText";
 
+// a handful of icons are explicitly designed to spin an extra fixed amount on
+// top of the flash text's own animated entrance rotation (see drawFlashLayer).
+// Every other icon is either already-upright/symmetric or a directional sprite
+// (e.g. mouse.png's running pose) that would read as broken if spun
+const CRIT_ICON_EXTRA_ROTATION: Partial<Record<CritProcKind, number>> = {
+  chain: 45,
+  silverTicket: 45,
+};
+
 // every crit-type's own backdrop icon, drawn behind drawFlashLayer's flash
-// text below, keyed by that flash's own label. rotateDeg is only set for the
-// couple of icons explicitly designed to spin an extra fixed amount on top of
-// the text's animated entrance rotation (see drawFlashLayer) — every other
-// icon here is either already-upright/symmetric or a directional sprite
-// (e.g. mouse.png's running pose) that would read as broken if spun.
+// text below, keyed by that flash's own label. Derived from critTypes'
+// canonical CRIT_PROC_INFO rather than hand-listed here — a third copy of the
+// label -> icon mapping is exactly how Bull Market ended up flashing with no
+// icon at all
 const CRIT_ICON_BY_LABEL: Partial<
   Record<string, { name: ImageName; rotateDeg?: number }>
-> = {
-  Chain: { name: "chain", rotateDeg: 45 },
-  Boost: { name: "mouse" },
-  Bounce: { name: "ball" },
-  Boom: { name: "explosion" },
-  Booty: { name: "booty" },
-  Upgrade: { name: "upgrade" },
-  Peppermint: { name: "peppermint" },
-  Heavenly: { name: "heaven" },
-  Pair: { name: "pair" },
-  "Three of a Kind": { name: "threeOfAKind" },
-  "Four of a Kind": { name: "fourOfAKind" },
-  "Full House": { name: "fullHouse" },
-  "Tick Tock": { name: "clock" },
-  "Chair Giveaway": { name: "officeChairsIcon" },
-  "Supplies Giveaway": { name: "officeSuppliesIcon" },
-  "Winter Sale": { name: "winter" },
-  "Spring Sale": { name: "spring" },
-  "Summer Sale": { name: "summer" },
-  "Autumn Sale": { name: "autumn" },
-  "Halloween Sale": { name: "halloween" },
-  "Easter Sale": { name: "easterBunny" },
-  Sunshine: { name: "sunny" },
-  Snowday: { name: "snowman" },
-  "Fast Forward": { name: "fastforward" },
-  Frozen: { name: "icecube" },
-  Snowball: { name: "snowball" },
-  "Sales event": { name: "cashRegister" },
-  Payday: { name: "payday" },
-  "Gold Standard": { name: "goldStandard" },
-  "Royal Flush": { name: "royalFlush" },
-  "Night Shift": { name: "sleepyMoon" },
-  Intern: { name: "intern" },
-  "Union Boss": { name: "unionBoss" },
-  "Rush Hour": { name: "sportscar" },
-  "Golden Ticket": { name: "goldenTicket" },
-  "Silver Ticket": { name: "silverTicket", rotateDeg: 45 },
-  "Golden Parachute": { name: "goldenParachute" },
-  Payout: { name: "payout" },
-  "Grand Opening": { name: "grandOpening" },
-  "Fully Staffed": { name: "fullyStaffed" },
-  "Espresso Shot": { name: "espressoShot" },
-  "Deja Vu": { name: "dejaVu" },
-  "Clone Army": { name: "cloneArmy" },
-  "Lucky Clover": { name: "luckyClover" },
-  "Second Wind": { name: "secondWind" },
-  "Executive Order": { name: "executiveOrder" },
-  "Round Up": { name: "roundUp" },
-  "Golden Handshake": { name: "goldenHandshake" },
-  "Supply Run": { name: "supplyRun" },
-  "Casual Friday": { name: "casualFriday" },
-  "Fancy Friday": { name: "fancyFriday" },
-  "Fire Drill": { name: "fireDrill" },
-  "Double Down": { name: "doubleDown" },
-  "Coffee Run": { name: "coffeeRun" },
-  "Team Building": { name: "teamBuilding" },
-  "Spring Cleaning": { name: "springCleaning" },
-  "Night Owl": { name: "nightOwl" },
-  Headhunter: { name: "headhunter" },
-};
+> = Object.fromEntries(
+  CRIT_PROC_KINDS.map((kind) => [
+    CRIT_PROC_INFO[kind].label,
+    {
+      name: CRIT_PROC_INFO[kind].icon,
+      rotateDeg: CRIT_ICON_EXTRA_ROTATION[kind],
+    },
+  ]),
+);
+
+// the Sale boost's own flash isn't a piggyback proc, so it isn't in
+// CRIT_PROC_INFO and still needs its own entry
+CRIT_ICON_BY_LABEL["Sales event"] = { name: "cashRegister" };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();
 const requestedCritIcons = new Set<ImageName>();

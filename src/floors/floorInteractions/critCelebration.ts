@@ -633,13 +633,11 @@ function queueProcCelebration(
 }
 
 // Deja Vu's own bonus procs: only kinds that did NOT land on this roll, so it
-// always reads as "and these too" rather than replaying what already showed.
-// bullMarket is excluded — it has no per-floor reward to grant
+// always reads as "and these too" rather than replaying what already showed
 function pickDejaVuFollowUps(procs: Partial<CritProcFlags>): CritProcKind[] {
   const available = CRIT_PROC_KINDS.filter(
     (kind) =>
       kind !== "dejaVu" &&
-      kind !== "bullMarket" &&
       !procs[kind] &&
       !specialCelebrationQueue.some((q) => q.kind === kind),
   );

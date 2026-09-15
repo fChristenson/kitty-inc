@@ -4,6 +4,14 @@ import type { Floor } from "../../gameState";
 export function createTestButtonMarkup(): string {
   return `
     <div class="test-actions-bar">
+      <input
+        type="search"
+        id="test-actions-filter"
+        class="test-actions-filter"
+        placeholder="Filter actions…"
+        autocomplete="off"
+      />
+      <p class="test-actions-empty" id="test-actions-empty" hidden>No matches</p>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Test Actions</summary>
         <div class="test-actions-dropdown__menu">
@@ -55,6 +63,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-frozen-crit" class="game__button">Spawn Frozen Crit</button>
           <button id="spawn-snowball-crit" class="game__button">Spawn Snowball Crit</button>
           <button id="spawn-free-sale-crit" class="game__button">Spawn Free Sale Crit</button>
+          <button id="spawn-bull-market-crit" class="game__button">Spawn Bull Market Crit</button>
           <button id="spawn-payday-crit" class="game__button">Spawn Payday Crit</button>
           <button id="spawn-gold-standard-crit" class="game__button">Spawn Gold Standard Crit</button>
           <button id="spawn-night-shift-crit" class="game__button">Spawn Night Shift Crit</button>
@@ -555,6 +564,16 @@ export function wireSpawnFreeSaleCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-free-sale-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnBullMarketCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-bull-market-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -1720,4 +1739,60 @@ export function wireResetButton(
     localStorage.clear();
     location.reload();
   });
+}
+
+// live text filter over every dev button in the bar. Matching buttons stay
+// visible and their section is forced open; a section with no matches is
+// hidden entirely. Whatever the player had open by hand is remembered and
+// restored once the filter is cleared
+export function wireTestActionsFilter(container: HTMLElement): void {
+  const input = container.querySelector<HTMLInputElement>(
+    "#test-actions-filter",
+  );
+  if (!input) return;
+  const empty = container.querySelector<HTMLParagraphElement>(
+    "#test-actions-empty",
+  );
+  const dropdowns = Array.from(
+    container.querySelectorAll<HTMLDetailsElement>(".test-actions-dropdown"),
+  );
+  let manualOpenState: boolean[] | null = null;
+
+  function apply(): void {
+    const query = input!.value.trim().toLowerCase();
+    const filtering = query.length > 0;
+    if (filtering && manualOpenState === null) {
+      manualOpenState = dropdowns.map((d) => d.open);
+    }
+    let totalMatches = 0;
+    dropdowns.forEach((dropdown, index) => {
+      const toggle = dropdown.querySelector<HTMLElement>(
+        ".test-actions-dropdown__toggle",
+      );
+      let matches = 0;
+      for (const button of dropdown.querySelectorAll<HTMLButtonElement>(
+        ".game__button",
+      )) {
+        const hit =
+          !filtering ||
+          (button.textContent ?? "").toLowerCase().includes(query);
+        button.hidden = !hit;
+        if (hit) matches++;
+      }
+      totalMatches += matches;
+      dropdown.hidden = filtering && matches === 0;
+      dropdown.classList.toggle(
+        "test-actions-dropdown--filtered",
+        filtering && matches > 0,
+      );
+      if (filtering) dropdown.open = matches > 0;
+      else if (manualOpenState) dropdown.open = manualOpenState[index];
+      if (toggle) toggle.dataset.matches = filtering ? String(matches) : "";
+    });
+    if (!filtering) manualOpenState = null;
+    if (empty) empty.hidden = !filtering || totalMatches > 0;
+  }
+
+  input.addEventListener("input", apply);
+  apply();
 }

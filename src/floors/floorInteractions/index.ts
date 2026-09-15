@@ -387,6 +387,18 @@ function applyHeadhunterCrit(floor: Floor, floors: Floor[]): void {
   );
 }
 
+// "bull market crit" (see shared/critTypes's isBullMarketCrit): doubles every
+// unlocked floor's own upgradeCount building-wide. Uses increaseIncomeRate
+// directly rather than applyUpgradeTick for the same reason applyHeavenlyCrit
+// does — a well-upgraded building would otherwise spawn thousands of bursts
+function applyBullMarketCrit(floors: Floor[]): void {
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    const existing = floor.upgradeCount;
+    for (let i = 0; i < existing; i++) increaseIncomeRate(floor);
+  }
+}
+
 // minimal deps a chain crit needs to grow a building while walking upward —
 // a subset of FloorActionsDeps so non-floors callers (cityMap.ts's own
 // building-unlock crit, via main.ts) don't need that type's unrelated fields
@@ -849,6 +861,7 @@ export interface CritRewardContext {
 const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   boost: (c) => applyFloorBoost(c.floors),
   booty: () => addTotalIncome(getTotalIncome()),
+  bullMarket: (c) => applyBullMarketCrit(c.floors),
   upgrade: (c) => {
     c.floor.critMultiplierTier = nextCritTier(c.floor.critMultiplierTier);
   },
