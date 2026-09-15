@@ -33,7 +33,7 @@ function animateFloatingCrit(item: HTMLDivElement, delayMs: number): void {
       const popProgress = Math.min(1, progress / 0.2);
       const scale = 0.78 + Math.sin((popProgress * Math.PI) / 2) * 0.22;
       const x = Math.sin(wave) * FLOATING_WAVE_AMPLITUDE_PX;
-      const y = 92 - progress * 224;
+      const y = 92 - progress * 204;
       const rotation = Math.cos(wave) * 7;
 
       item.style.opacity = `${opacity}`;
