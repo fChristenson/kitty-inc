@@ -14,64 +14,6 @@ import {
   triggerButtonPress,
   isCritUpgrade,
   getCritTier,
-  isChainCrit,
-  isBoostCrit,
-  isBounceCrit,
-  isExplosionCrit,
-  isBootyCrit,
-  isUpgradeCrit,
-  isPeppermintCrit,
-  isHeavenlyCrit,
-  isPairCrit,
-  isThreeOfAKindCrit,
-  isFourOfAKindCrit,
-  isFullHouseCrit,
-  isRoyalFlushCrit,
-  isTickTockCrit,
-  isChairGiveawayCrit,
-  isSuppliesGiveawayCrit,
-  isWinterSaleCrit,
-  isSpringSaleCrit,
-  isSummerSaleCrit,
-  isAutumnSaleCrit,
-  isHalloweenSaleCrit,
-  isEasterSaleCrit,
-  isSunshineCrit,
-  isSnowdayCrit,
-  isFastForwardCrit,
-  isFrozenCrit,
-  isSnowballCrit,
-  isFreeSaleCrit,
-  isPaydayCrit,
-  isGoldStandardCrit,
-  isNightShiftCrit,
-  isInternCrit,
-  isUnionBossCrit,
-  isRushHourCrit,
-  isGoldenTicketCrit,
-  isSilverTicketCrit,
-  isGoldenParachuteCrit,
-  isPayoutCrit,
-  isGrandOpeningCrit,
-  isFullyStaffedCrit,
-  isEspressoShotCrit,
-  isDejaVuCrit,
-  isCloneArmyCrit,
-  isLuckyCloverCrit,
-  isSecondWindCrit,
-  isExecutiveOrderCrit,
-  isRoundUpCrit,
-  isGoldenHandshakeCrit,
-  isSupplyRunCrit,
-  isCasualFridayCrit,
-  isFancyFridayCrit,
-  isFireDrillCrit,
-  isDoubleDownCrit,
-  isCoffeeRunCrit,
-  isTeamBuildingCrit,
-  isSpringCleaningCrit,
-  isNightOwlCrit,
-  isHeadhunterCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -138,6 +80,14 @@ import { spawnIncomeFloatText } from "../incomeFloatText";
 import { getUpgradeIndicatorCenter } from "../star";
 import { hitTestUpgradeArrow } from "../upgradeArrow";
 import { computeBaseFloorStats } from "..";
+import {
+  type CritProcKind,
+  type CritProcHandlers,
+  readCritProcs,
+  applyCritProcs,
+  onlyCritProc,
+  recordCritProcLanded,
+} from "../../shared/critTypes";
 import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
   hitTestFloorLock,
@@ -876,6 +826,195 @@ function applySeasonalSaleCrit(
   }
 }
 
+// everything a proc's reward handler could need, so the one shared table
+// below can serve every consumption site (a per-click crit, a floor-unlock
+// crit, and Deja Vu's own spawned follow-ups) instead of each re-listing all
+// 59 procs in its own if-chain
+export interface CritRewardContext {
+  deps: FloorActionsDeps;
+  floors: Floor[];
+  floor: Floor;
+  isGroundFloor: boolean;
+  tier: CritTier;
+  // how many free upgrade ticks the landed tier is worth
+  count: number;
+  // this building's own economy scale (see buildings/getBuildingMultiplier)
+  multiplier: number;
+}
+
+// the reward every proc grants regardless of WHICH event consumed it. The
+// three "walk the reward across floors" procs (chain/bounce/explosion) are
+// the only ones that genuinely differ per event, so they're layered on top
+// per-site below rather than living here
+const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
+  boost: (c) => applyFloorBoost(c.floors),
+  booty: () => addTotalIncome(getTotalIncome()),
+  upgrade: (c) => {
+    c.floor.critMultiplierTier = nextCritTier(c.floor.critMultiplierTier);
+  },
+  peppermint: (c) => applyPeppermintCrit(c.floors),
+  heavenly: (c) => applyHeavenlyCrit(c.deps),
+  pair: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      POKER_HAND_CRIT_COUNTS.pair,
+    ),
+  threeOfAKind: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      POKER_HAND_CRIT_COUNTS.threeOfAKind,
+    ),
+  fourOfAKind: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      POKER_HAND_CRIT_COUNTS.fourOfAKind,
+    ),
+  fullHouse: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      POKER_HAND_CRIT_COUNTS.fullHouse,
+    ),
+  // unlike the fixed-count hands above, this one climbs all the way to the
+  // building's own cap, auto-unlocking as it goes
+  royalFlush: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      MAX_FLOORS_PER_BUILDING,
+    ),
+  tickTock: (c) => applyTickTockCrit(c.floors),
+  chairGiveaway: (c) => applyChairGiveawayCrit(c.floor),
+  suppliesGiveaway: (c) => applySuppliesGiveawayCrit(c.floor),
+  winterSale: (c) =>
+    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+  springSale: (c) =>
+    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+  summerSale: (c) =>
+    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+  autumnSale: (c) =>
+    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+  halloweenSale: (c) =>
+    applySeasonalSaleCrit(c.floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER),
+  easterSale: (c) =>
+    applySeasonalSaleCrit(c.floors, EASTER_SALE_DISCOUNT_MULTIPLIER),
+  sunshine: (c) => applySunshineCrit(c.floors),
+  snowday: (c) => applySnowdayCrit(c.floors),
+  fastForward: (c) => applyFastForwardCrit(c.floors),
+  frozen: (c) => applyFrozenCrit(c.floor),
+  snowball: (c) => applySnowballCrit(c.floors),
+  freeSale: (c) => applyFreeSaleCrit(c.floor),
+  payday: () => applyPaydayCrit(),
+  goldStandard: () => applyGoldStandardCrit(),
+  nightShift: (c) => applyNightShiftCrit(c.floors),
+  intern: (c) => applyInternCrit(c.floor),
+  unionBoss: (c) => applyUnionBossCrit(c.floor),
+  rushHour: (c) => applyRushHourCrit(c.floors),
+  goldenTicket: (c) => applyGoldenTicketCrit(c.floor),
+  silverTicket: (c) => applySilverTicketCrit(c.floor),
+  goldenParachute: () => applyGoldenParachuteCrit(),
+  payout: () => applyPayoutCrit(),
+  grandOpening: (c) => applyGrandOpeningCrit(c.deps),
+  fullyStaffed: (c) => applyFullyStaffedCrit(c.floors),
+  espressoShot: (c) => applyEspressoShotCrit(c.floors),
+  dejaVu: (c) => applyDejaVuCrit(c.floor, c.isGroundFloor),
+  cloneArmy: (c) => applyCloneArmyCrit(c.floors),
+  luckyClover: (c) => applyLuckyCloverCrit(c.floor, c.isGroundFloor),
+  secondWind: () => applySecondWindCrit(),
+  executiveOrder: (c) => applyExecutiveOrderCrit(c.floors),
+  roundUp: (c) => applyRoundUpCrit(c.floors),
+  goldenHandshake: (c) => applyGoldenHandshakeCrit(c.floors),
+  supplyRun: (c) => applySupplyRunCrit(c.floor),
+  casualFriday: (c) =>
+    applyFlatUpgradeBatch(c.floors, CASUAL_FRIDAY_CRIT_UPGRADES),
+  fancyFriday: (c) =>
+    applyFlatUpgradeBatch(c.floors, FANCY_FRIDAY_CRIT_UPGRADES),
+  fireDrill: (c) => applyFireDrillCrit(c.floors),
+  doubleDown: (c) => applyDoubleDownCrit(c.floor, c.isGroundFloor, c.tier),
+  coffeeRun: (c) => applyCoffeeRunCrit(c.floors),
+  teamBuilding: (c) => applyTeamBuildingCrit(c.floors),
+  springCleaning: (c) => applySpringCleaningCrit(c.floors, c.multiplier),
+  nightOwl: (c) => applyNightOwlCrit(c.floors),
+  headhunter: (c) => applyHeadhunterCrit(c.floor, c.floors),
+};
+
+// an upgrade-click crit walks its landed tier's own free-upgrade batch across
+// the floors it reaches, re-arming each one's next crit as it goes
+const CLICK_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
+  ...SHARED_CRIT_REWARDS,
+  chain: (c) =>
+    applyChainCrit(c.deps, c.floors.indexOf(c.floor), (reached, isGround) => {
+      for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
+      rollCritUpgrade(reached);
+    }),
+  bounce: (c) =>
+    applyBounceCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      (reached, isGround) => {
+        for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
+        rollCritUpgrade(reached);
+      },
+      BOUNCE_CRIT_CONTINUE_CHANCE,
+    ),
+  explosion: (c) =>
+    applyExplosionCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      (reached, isGround) => {
+        for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
+        rollCritUpgrade(reached);
+      },
+    ),
+};
+
+// a floor-unlock crit has no free-upgrade batch to spread, so its walkers
+// promote each reached floor's permanent tier instead
+const FLOOR_BUY_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
+  ...SHARED_CRIT_REWARDS,
+  chain: (c) =>
+    applyChainCrit(c.deps, c.floors.indexOf(c.floor), (reached) => {
+      reached.critMultiplierTier = pickHigherCritTier(
+        reached.critMultiplierTier,
+        c.tier,
+      );
+    }),
+  bounce: (c) =>
+    applyBounceCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      (reached) => {
+        reached.critMultiplierTier = pickHigherCritTier(
+          reached.critMultiplierTier,
+          c.tier,
+        );
+      },
+      BOUNCE_CRIT_CONTINUE_CHANCE,
+    ),
+  explosion: (c) =>
+    applyExplosionCrit(c.deps, c.floors.indexOf(c.floor), (reached) => {
+      reached.critMultiplierTier = pickHigherCritTier(
+        reached.critMultiplierTier,
+        c.tier,
+      );
+    }),
+};
+
+// Deja Vu's spawned follow-ups go through the exact same reward dispatcher
+// and collectible tally a genuinely rolled proc does — they used to be
+// celebration-only, so a follow-up Heavenly flashed without ever unlocking a
+// single floor or counting toward its badge
+function grantFollowUpProc(
+  kind: CritProcKind,
+  context: CritRewardContext,
+): void {
+  applyCritProcs(onlyCritProc(kind), context, CLICK_CRIT_REWARDS);
+  recordCritProcLanded(kind);
+}
+
 // handles a click at floor-local (x, y): unlocking, upgrading, or clicking a worker.
 // every hit test/mutation here is identical to the old per-canvas click listener,
 // just no longer tied to any one floor owning its own DOM canvas + event listener.
@@ -935,6 +1074,17 @@ export function handleFloorClick(
       // something rarer still. Rolled before persist() so a hit is captured in
       // the same save
       const buyTier = rollFloorBuyCrit();
+      const buyRewardContext: CritRewardContext | null = buyTier
+        ? {
+            deps,
+            floors,
+            floor,
+            isGroundFloor: floors.indexOf(floor) === 0,
+            tier: buyTier.tier,
+            count: CRIT_TIER_CONFIG[buyTier.tier].multiplier,
+            multiplier,
+          }
+        : null;
       if (buyTier) {
         // an armed "force bonus tier" test button (see forceBonusTierCritProc)
         // always arms buildings[activeBuildingIndex][0] (main.ts's own test
@@ -953,203 +1103,11 @@ export function handleFloorClick(
           floor.critMultiplierTier,
           buyTier.tier,
         );
-        // chain crit (see rollFloorBuyCrit): promotes the SAME tier onto the
-        // floor(s) above too, instead of just the one just unlocked
-        if (buyTier.chain) {
-          applyChainCrit(deps, floors.indexOf(floor), (target) => {
-            target.critMultiplierTier = pickHigherCritTier(
-              target.critMultiplierTier,
-              buyTier.tier,
-            );
-          });
-        }
-        // bounce crit: the same tier-promotion reward as chain above, but
-        // cascading downward from the floor just bought/unlocked instead of
-        // up — like a ball bouncing down the stairs, never up — with its own
-        // BOUNCE_CRIT_CONTINUE_CHANCE odds
-        if (buyTier.bounce) {
-          applyBounceCrit(
-            deps,
-            floors.indexOf(floor),
-            (target) => {
-              target.critMultiplierTier = pickHigherCritTier(
-                target.critMultiplierTier,
-                buyTier.tier,
-              );
-            },
-            BOUNCE_CRIT_CONTINUE_CHANCE,
-          );
-        }
-        // explosion crit: same tier-promotion reward again, spreading both up
-        // and down from the floor that actually bought/unlocked
-        if (buyTier.explosion) {
-          applyExplosionCrit(deps, floors.indexOf(floor), (target) => {
-            target.critMultiplierTier = pickHigherCritTier(
-              target.critMultiplierTier,
-              buyTier.tier,
-            );
-          });
-        }
-        // boost crit (see rollFloorBuyCrit): same building-wide free-boost
-        // reward a per-click boost crit grants (see applyFloorBoost above)
-        if (buyTier.boost) applyFloorBoost(floors);
-        // booty crit: same flat one-time double-income effect a per-click
-        // booty crit grants
-        if (buyTier.booty) addTotalIncome(getTotalIncome());
-        // upgrade crit: promotes THIS floor's own permanent tier one further
-        // step beyond whatever it was just set to above
-        if (buyTier.upgrade) {
-          floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
-        }
-        // peppermint crit: same flat one-time effect again, but promotes every
-        // OTHER unlocked floor across the whole building at once
-        if (buyTier.peppermint) applyPeppermintCrit(floors);
-        // heavenly crit: the biggest reward of all — unlocks every remaining
-        // floor, maxes every floor's tier, and grants each one a full
-        // max-tier free-upgrade batch
-        if (buyTier.heavenly) applyHeavenlyCrit(deps);
-        // pair/three of a kind/four of a kind/full house crits: promote a
-        // fixed number of floors' own permanent tier one step, starting at
-        // the floor just bought/unlocked (see POKER_HAND_CRIT_COUNTS)
-        if (buyTier.pair) {
-          applyPokerHandCrit(
-            deps,
-            floors.indexOf(floor),
-            POKER_HAND_CRIT_COUNTS.pair,
-          );
-        }
-        if (buyTier.threeOfAKind) {
-          applyPokerHandCrit(
-            deps,
-            floors.indexOf(floor),
-            POKER_HAND_CRIT_COUNTS.threeOfAKind,
-          );
-        }
-        if (buyTier.fourOfAKind) {
-          applyPokerHandCrit(
-            deps,
-            floors.indexOf(floor),
-            POKER_HAND_CRIT_COUNTS.fourOfAKind,
-          );
-        }
-        if (buyTier.fullHouse) {
-          applyPokerHandCrit(
-            deps,
-            floors.indexOf(floor),
-            POKER_HAND_CRIT_COUNTS.fullHouse,
-          );
-        }
-        // royal flush crit: unlike the other poker-hand crits' fixed count,
-        // this promotes EVERY floor from the one just bought/unlocked all
-        // the way up to the building's own cap (MAX_FLOORS_PER_BUILDING is
-        // always a big enough count to reach it) — auto-unlocking as it goes
-        if (buyTier.royalFlush) {
-          applyPokerHandCrit(
-            deps,
-            floors.indexOf(floor),
-            MAX_FLOORS_PER_BUILDING,
-          );
-        }
-        // tick tock crit: instantly pays every unlocked floor twice at its
-        // own current rate, without disturbing any floor's own bar progress
-        if (buyTier.tickTock) applyTickTockCrit(floors);
-        // Chair Giveaway/Supplies Giveaway crits: free one-time office chairs/
-        // supplies purchase for the floor just bought/unlocked
-        if (buyTier.chairGiveaway) applyChairGiveawayCrit(floor);
-        if (buyTier.suppliesGiveaway) applySuppliesGiveawayCrit(floor);
-        // Intern/Union Boss crits: free one-time worker/manager for the
-        // floor just bought/unlocked
-        if (buyTier.intern) applyInternCrit(floor);
-        if (buyTier.unionBoss) applyUnionBossCrit(floor);
-        // rush hour crit: caps every unlocked floor's own income timer at
-        // RUSH_HOUR_INTERVAL_SECONDS, building-wide, for its own duration
-        if (buyTier.rushHour) applyRushHourCrit(floors);
-        // golden ticket crit: guarantees this floor's very next crit lands
-        // ultra, no reward of its own
-        if (buyTier.goldenTicket) applyGoldenTicketCrit(floor);
-        // silver ticket crit: guarantees this floor's very next crit lands
-        // mega, no reward of its own
-        if (buyTier.silverTicket) applySilverTicketCrit(floor);
-        // golden parachute crit: instantly pays 15s of the active company's
-        // own combined income rate, no matter how much it's already banked
-        if (buyTier.goldenParachute) applyGoldenParachuteCrit();
-        // payout crit: instantly adds every corporation's own combined
-        // income + upgrades value, the biggest flat one-time jackpot
-        if (buyTier.payout) applyPayoutCrit();
-        // grand opening crit: unlocks every remaining locked floor in this
-        // building for free
-        if (buyTier.grandOpening) applyGrandOpeningCrit(deps);
-        if (buyTier.fullyStaffed) applyFullyStaffedCrit(floors);
-        if (buyTier.espressoShot) applyEspressoShotCrit(floors);
-        if (buyTier.dejaVu) applyDejaVuCrit(floor, floors.indexOf(floor) === 0);
-        if (buyTier.cloneArmy) applyCloneArmyCrit(floors);
-        if (buyTier.luckyClover)
-          applyLuckyCloverCrit(floor, floors.indexOf(floor) === 0);
-        if (buyTier.secondWind) applySecondWindCrit();
-        if (buyTier.executiveOrder) applyExecutiveOrderCrit(floors);
-        if (buyTier.roundUp) applyRoundUpCrit(floors);
-        if (buyTier.goldenHandshake) applyGoldenHandshakeCrit(floors);
-        if (buyTier.supplyRun) applySupplyRunCrit(floor);
-        if (buyTier.casualFriday)
-          applyFlatUpgradeBatch(floors, CASUAL_FRIDAY_CRIT_UPGRADES);
-        if (buyTier.fancyFriday)
-          applyFlatUpgradeBatch(floors, FANCY_FRIDAY_CRIT_UPGRADES);
-        if (buyTier.fireDrill) applyFireDrillCrit(floors);
-        if (buyTier.doubleDown)
-          applyDoubleDownCrit(floor, floors.indexOf(floor) === 0, buyTier.tier);
-        if (buyTier.coffeeRun) applyCoffeeRunCrit(floors);
-        if (buyTier.teamBuilding) applyTeamBuildingCrit(floors);
-        if (buyTier.springCleaning) applySpringCleaningCrit(floors, multiplier);
-        if (buyTier.nightOwl) applyNightOwlCrit(floors);
-        if (buyTier.headhunter) applyHeadhunterCrit(floor, floors);
-        // winter/spring/summer/autumn sale crits: permanently cut every
-        // unlocked floor's own upgrade/worker costs 25%, building-wide
-        if (
-          buyTier.winterSale ||
-          buyTier.springSale ||
-          buyTier.summerSale ||
-          buyTier.autumnSale
-        ) {
-          applySeasonalSaleCrit(floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER);
-        }
-        // halloween sale crit: same reward, but its own steeper 50% cut
-        if (buyTier.halloweenSale) {
-          applySeasonalSaleCrit(floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER);
-        }
-        // easter sale crit: same reward/steeper cut again, just its own icon
-        if (buyTier.easterSale) {
-          applySeasonalSaleCrit(floors, EASTER_SALE_DISCOUNT_MULTIPLIER);
-        }
-        // sunshine crit: same building-wide free-boost reward as boost, just
-        // twice the duration
-        if (buyTier.sunshine) applySunshineCrit(floors);
-        // snowday crit: same reward again, three times the duration
-        if (buyTier.snowday) applySnowdayCrit(floors);
-        // fast forward crit: same instant-income reward as tick tock, just
-        // a steeper multiplier
-        if (buyTier.fastForward) applyFastForwardCrit(floors);
-        // frozen crit: locks just this floor's own upgrade price for 15s
-        if (buyTier.frozen) applyFrozenCrit(floor);
-        // snowball crit: pays every unlocked floor once, scaled by how many
-        // floors are currently unlocked
-        if (buyTier.snowball) applySnowballCrit(floors);
-        // free sale crit: starts just this floor's own free Sale event
-        if (buyTier.freeSale) applyFreeSaleCrit(floor);
-        // payday crit: same flat one-time triple-income effect a per-click
-        // payday crit grants
-        if (buyTier.payday) applyPaydayCrit();
-        // gold standard crit: same flat one-time effect, a steeper 4x
-        if (buyTier.goldStandard) applyGoldStandardCrit();
-        // night shift crit: same building-wide free-boost reward as boost/
-        // sunshine/snowday, just shorter and with a temporary +1-worker
-        // boost-strength bonus (previously missed on this floor-buy branch,
-        // only the plain-click branch applied it)
-        if (buyTier.nightShift) applyNightShiftCrit(floors);
+        applyCritProcs(buyTier, buyRewardContext!, FLOOR_BUY_CRIT_REWARDS);
         // "special crit crit": once any proc above landed, a bonus tier may
         // have also landed on top of it (see rollCrit's own bonusTier)
         if (buyTier.bonusTier) applyBonusTierCrit(buyTier.bonusTier);
       }
-      persist();
       const center = getLockCenter();
       spawnCoinBurst(floor, center.x, center.y, () => {});
       if (buyTier)
@@ -1157,66 +1115,13 @@ export function handleFloorClick(
           floor,
           buyTier.tier,
           getScreenCenterLocal,
-          buyTier.chain,
-          buyTier.boost,
-          buyTier.bounce,
-          buyTier.explosion,
-          buyTier.booty,
-          buyTier.upgrade,
-          buyTier.peppermint,
-          buyTier.heavenly,
-          buyTier.pair,
-          buyTier.threeOfAKind,
-          buyTier.fourOfAKind,
-          buyTier.fullHouse,
-          buyTier.tickTock,
-          buyTier.chairGiveaway,
-          buyTier.suppliesGiveaway,
-          buyTier.winterSale,
-          buyTier.springSale,
-          buyTier.summerSale,
-          buyTier.autumnSale,
-          buyTier.halloweenSale,
-          buyTier.sunshine,
-          buyTier.snowday,
-          buyTier.fastForward,
-          buyTier.frozen,
-          buyTier.snowball,
-          buyTier.freeSale,
-          buyTier.payday,
-          buyTier.goldStandard,
-          buyTier.royalFlush,
-          buyTier.nightShift,
+          buyTier,
           buyTier.bonusTier,
-          buyTier.intern,
-          buyTier.unionBoss,
-          buyTier.easterSale,
-          buyTier.rushHour,
-          buyTier.goldenTicket,
-          buyTier.silverTicket,
-          buyTier.goldenParachute,
-          buyTier.payout,
-          buyTier.grandOpening,
-          buyTier.fullyStaffed,
-          buyTier.espressoShot,
-          buyTier.dejaVu,
-          buyTier.cloneArmy,
-          buyTier.luckyClover,
-          buyTier.secondWind,
-          buyTier.executiveOrder,
-          buyTier.roundUp,
-          buyTier.goldenHandshake,
-          buyTier.supplyRun,
-          buyTier.casualFriday,
-          buyTier.fancyFriday,
-          buyTier.fireDrill,
-          buyTier.doubleDown,
-          buyTier.coffeeRun,
-          buyTier.teamBuilding,
-          buyTier.springCleaning,
-          buyTier.nightOwl,
-          buyTier.headhunter,
+          (kind) => grantFollowUpProc(kind, buyRewardContext!),
         );
+      // after the celebration, not before: Deja Vu grants its follow-up procs'
+      // rewards synchronously from in there, and they'd otherwise miss this save
+      persist();
     }
     return;
   }
@@ -1338,328 +1243,42 @@ export function handleFloorClick(
     // read the flag right here, at the moment the already-armed tier is spent
     if (isCritUpgrade(floor)) {
       const tier = getCritTier(floor)!;
-      const chain = isChainCrit(floor);
-      const boost = isBoostCrit(floor);
-      const bounce = isBounceCrit(floor);
-      const explosion = isExplosionCrit(floor);
-      const booty = isBootyCrit(floor);
-      const upgrade = isUpgradeCrit(floor);
-      const peppermint = isPeppermintCrit(floor);
-      const heavenly = isHeavenlyCrit(floor);
-      const pair = isPairCrit(floor);
-      const threeOfAKind = isThreeOfAKindCrit(floor);
-      const fourOfAKind = isFourOfAKindCrit(floor);
-      const fullHouse = isFullHouseCrit(floor);
-      const royalFlush = isRoyalFlushCrit(floor);
-      const tickTock = isTickTockCrit(floor);
-      const chairGiveaway = isChairGiveawayCrit(floor);
-      const suppliesGiveaway = isSuppliesGiveawayCrit(floor);
-      const winterSale = isWinterSaleCrit(floor);
-      const springSale = isSpringSaleCrit(floor);
-      const summerSale = isSummerSaleCrit(floor);
-      const autumnSale = isAutumnSaleCrit(floor);
-      const halloweenSale = isHalloweenSaleCrit(floor);
-      const easterSale = isEasterSaleCrit(floor);
-      const sunshine = isSunshineCrit(floor);
-      const snowday = isSnowdayCrit(floor);
-      const fastForward = isFastForwardCrit(floor);
-      const frozen = isFrozenCrit(floor);
-      const snowball = isSnowballCrit(floor);
-      const freeSale = isFreeSaleCrit(floor);
-      const payday = isPaydayCrit(floor);
-      const goldStandard = isGoldStandardCrit(floor);
-      const nightShift = isNightShiftCrit(floor);
-      const intern = isInternCrit(floor);
-      const unionBoss = isUnionBossCrit(floor);
-      const rushHour = isRushHourCrit(floor);
-      const goldenTicket = isGoldenTicketCrit(floor);
-      const silverTicket = isSilverTicketCrit(floor);
-      const goldenParachute = isGoldenParachuteCrit(floor);
-      const payout = isPayoutCrit(floor);
-      const grandOpening = isGrandOpeningCrit(floor);
-      const fullyStaffed = isFullyStaffedCrit(floor);
-      const espressoShot = isEspressoShotCrit(floor);
-      const dejaVu = isDejaVuCrit(floor);
-      const cloneArmy = isCloneArmyCrit(floor);
-      const luckyClover = isLuckyCloverCrit(floor);
-      const secondWind = isSecondWindCrit(floor);
-      const executiveOrder = isExecutiveOrderCrit(floor);
-      const roundUp = isRoundUpCrit(floor);
-      const goldenHandshake = isGoldenHandshakeCrit(floor);
-      const supplyRun = isSupplyRunCrit(floor);
-      const casualFriday = isCasualFridayCrit(floor);
-      const fancyFriday = isFancyFridayCrit(floor);
-      const fireDrill = isFireDrillCrit(floor);
-      const doubleDown = isDoubleDownCrit(floor);
-      const coffeeRun = isCoffeeRunCrit(floor);
-      const teamBuilding = isTeamBuildingCrit(floor);
-      const springCleaning = isSpringCleaningCrit(floor);
-      const nightOwl = isNightOwlCrit(floor);
-      const headhunter = isHeadhunterCrit(floor);
+      const procs = readCritProcs(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
         applyUpgradeTick(floor, isGroundFloor);
       }
-      if (luckyClover) applyLuckyCloverCrit(floor, isGroundFloor);
-      if (secondWind) applySecondWindCrit();
-      if (executiveOrder) applyExecutiveOrderCrit(floors);
-      if (roundUp) applyRoundUpCrit(floors);
-      if (goldenHandshake) applyGoldenHandshakeCrit(floors);
-      if (supplyRun) applySupplyRunCrit(floor);
-      if (casualFriday)
-        applyFlatUpgradeBatch(floors, CASUAL_FRIDAY_CRIT_UPGRADES);
-      if (fancyFriday)
-        applyFlatUpgradeBatch(floors, FANCY_FRIDAY_CRIT_UPGRADES);
-      if (fireDrill) applyFireDrillCrit(floors);
-      if (doubleDown) applyDoubleDownCrit(floor, isGroundFloor, tier);
-      if (coffeeRun) applyCoffeeRunCrit(floors);
-      if (teamBuilding) applyTeamBuildingCrit(floors);
-      if (springCleaning) applySpringCleaningCrit(floors, multiplier);
-      if (nightOwl) applyNightOwlCrit(floors);
-      if (headhunter) applyHeadhunterCrit(floor, floors);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
-      // never once per free tick above, or a big multiplier (x125 ultra) would
+      // never once per free tick below, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
       rollCritUpgrade(floor);
-      if (chain) {
-        const target = floors.indexOf(floor);
-        applyChainCrit(deps, target, (chainFloor, chainIsGroundFloor) => {
-          for (let i = 0; i < count; i++) {
-            applyUpgradeTick(chainFloor, chainIsGroundFloor);
-          }
-          rollCritUpgrade(chainFloor);
-        });
-      }
-      // bounce crit: cascades downward from the floor that actually crit,
-      // like a ball bouncing down the stairs — never up — with its own
-      // BOUNCE_CRIT_CONTINUE_CHANCE odds
-      if (bounce) {
-        const target = floors.indexOf(floor);
-        applyBounceCrit(
-          deps,
-          target,
-          (bounceFloor, bounceIsGroundFloor) => {
-            for (let i = 0; i < count; i++) {
-              applyUpgradeTick(bounceFloor, bounceIsGroundFloor);
-            }
-            rollCritUpgrade(bounceFloor);
-          },
-          BOUNCE_CRIT_CONTINUE_CHANCE,
-        );
-      }
-      // explosion crit: same reward walk again, spreading both up AND down
-      // from the clicked floor itself
-      if (explosion) {
-        const target = floors.indexOf(floor);
-        applyExplosionCrit(
-          deps,
-          target,
-          (explosionFloor, explosionIsGroundFloor) => {
-            for (let i = 0; i < count; i++) {
-              applyUpgradeTick(explosionFloor, explosionIsGroundFloor);
-            }
-            rollCritUpgrade(explosionFloor);
-          },
-        );
-      }
-      if (boost) applyFloorBoost(floors);
-      // sunshine crit: same building-wide free-boost reward as boost, just
-      // twice the duration
-      if (sunshine) applySunshineCrit(floors);
-      // snowday crit: same reward again, three times the duration
-      if (snowday) applySnowdayCrit(floors);
-      // booty crit: doubles the currently active company's total income once —
-      // a flat effect, not tied to the tier/count that landed
-      if (booty) addTotalIncome(getTotalIncome());
-      // upgrade crit: promotes this floor's own permanent tier one further
-      // step, same flat one-time effect as booty/boost
-      if (upgrade)
-        floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
-      // peppermint crit: same flat one-time effect again, but promotes every
-      // OTHER unlocked floor across the whole building at once
-      if (peppermint) applyPeppermintCrit(floors);
-      // heavenly crit: the biggest reward of all — unlocks every remaining
-      // floor, maxes every floor's tier, and grants each one a full
-      // max-tier free-upgrade batch
-      if (heavenly) applyHeavenlyCrit(deps);
-      // pair/three of a kind/four of a kind/full house crits: promote a
-      // fixed number of floors' own permanent tier one step, starting at
-      // the floor that actually crit (see POKER_HAND_CRIT_COUNTS)
-      if (pair) {
-        applyPokerHandCrit(
-          deps,
-          floors.indexOf(floor),
-          POKER_HAND_CRIT_COUNTS.pair,
-        );
-      }
-      if (threeOfAKind) {
-        applyPokerHandCrit(
-          deps,
-          floors.indexOf(floor),
-          POKER_HAND_CRIT_COUNTS.threeOfAKind,
-        );
-      }
-      if (fourOfAKind) {
-        applyPokerHandCrit(
-          deps,
-          floors.indexOf(floor),
-          POKER_HAND_CRIT_COUNTS.fourOfAKind,
-        );
-      }
-      if (fullHouse) {
-        applyPokerHandCrit(
-          deps,
-          floors.indexOf(floor),
-          POKER_HAND_CRIT_COUNTS.fullHouse,
-        );
-      }
-      // royal flush crit: unlike the other poker-hand crits' fixed count,
-      // this promotes EVERY floor from the one that actually crit all the
-      // way up to the building's own cap (MAX_FLOORS_PER_BUILDING is always
-      // a big enough count to reach it) — auto-unlocking as it goes
-      if (royalFlush) {
-        applyPokerHandCrit(
-          deps,
-          floors.indexOf(floor),
-          MAX_FLOORS_PER_BUILDING,
-        );
-      }
-      // tick tock crit: instantly pays every unlocked floor twice at its own
-      // current rate, without disturbing any floor's own bar progress
-      if (tickTock) applyTickTockCrit(floors);
-      // fast forward crit: same instant-income reward as tick tock, just a
-      // steeper multiplier
-      if (fastForward) applyFastForwardCrit(floors);
-      // frozen crit: locks just this floor's own upgrade price for 15s
-      if (frozen) applyFrozenCrit(floor);
-      // snowball crit: pays every unlocked floor once, scaled by how many
-      // floors are currently unlocked
-      if (snowball) applySnowballCrit(floors);
-      // free sale crit: starts just this floor's own free Sale event
-      if (freeSale) applyFreeSaleCrit(floor);
-      // payday crit: triples the currently active company's total income
-      // once, same flat one-time effect as booty
-      if (payday) applyPaydayCrit();
-      // gold standard crit: same flat one-time effect, a steeper 4x
-      if (goldStandard) applyGoldStandardCrit();
-      // night shift crit: same building-wide free-boost reward as boost/
-      // sunshine/snowday, just shorter and with a temporary +1-worker
-      // boost-strength bonus
-      if (nightShift) applyNightShiftCrit(floors);
+      const rewardContext: CritRewardContext = {
+        deps,
+        floors,
+        floor,
+        isGroundFloor,
+        tier,
+        count,
+        multiplier,
+      };
+      applyCritProcs(procs, rewardContext, CLICK_CRIT_REWARDS);
       // "special crit crit": once any proc above landed, a bonus tier may
       // have also landed on top of it (see rollCrit's own bonusTier)
       if (bonusTier) applyBonusTierCrit(bonusTier);
-      // Chair Giveaway/Supplies Giveaway crits: free one-time office chairs/
-      // supplies purchase for the floor that actually crit
-      if (chairGiveaway) applyChairGiveawayCrit(floor);
-      if (suppliesGiveaway) applySuppliesGiveawayCrit(floor);
-      // Intern/Union Boss crits: free one-time worker/manager for the floor
-      // that actually crit
-      if (intern) applyInternCrit(floor);
-      if (unionBoss) applyUnionBossCrit(floor);
-      // rush hour crit: caps every unlocked floor's own income timer at
-      // RUSH_HOUR_INTERVAL_SECONDS, building-wide, for its own duration
-      if (rushHour) applyRushHourCrit(floors);
-      // golden ticket crit: guarantees this floor's very next crit lands
-      // ultra, no reward of its own
-      if (goldenTicket) applyGoldenTicketCrit(floor);
-      // silver ticket crit: guarantees this floor's very next crit lands
-      // mega, no reward of its own
-      if (silverTicket) applySilverTicketCrit(floor);
-      // golden parachute crit: instantly pays 15s of the active company's
-      // own combined income rate, no matter how much it's already banked
-      if (goldenParachute) applyGoldenParachuteCrit();
-      // payout crit: instantly adds every corporation's own combined income
-      // + upgrades value, the biggest flat one-time jackpot
-      if (payout) applyPayoutCrit();
-      // grand opening crit: unlocks every remaining locked floor in this
-      // building for free
-      if (grandOpening) applyGrandOpeningCrit(deps);
-      if (fullyStaffed) applyFullyStaffedCrit(floors);
-      if (espressoShot) applyEspressoShotCrit(floors);
-      if (dejaVu) applyDejaVuCrit(floor, isGroundFloor);
-      if (cloneArmy) applyCloneArmyCrit(floors);
-      // winter/spring/summer/autumn sale crits: permanently cut every
-      // unlocked floor's own upgrade/worker costs 25%, building-wide
-      if (winterSale || springSale || summerSale || autumnSale) {
-        applySeasonalSaleCrit(floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER);
-      }
-      // halloween sale crit: same reward, but its own steeper 50% cut
-      if (halloweenSale) {
-        applySeasonalSaleCrit(floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER);
-      }
-      // easter sale crit: same reward/steeper cut again, just its own icon
-      if (easterSale) {
-        applySeasonalSaleCrit(floors, EASTER_SALE_DISCOUNT_MULTIPLIER);
-      }
-      persist();
       triggerButtonPress(floor);
       triggerCritCelebration(
         floor,
         tier,
         getScreenCenterLocal,
-        chain,
-        boost,
-        bounce,
-        explosion,
-        booty,
-        upgrade,
-        peppermint,
-        heavenly,
-        pair,
-        threeOfAKind,
-        fourOfAKind,
-        fullHouse,
-        tickTock,
-        chairGiveaway,
-        suppliesGiveaway,
-        winterSale,
-        springSale,
-        summerSale,
-        autumnSale,
-        halloweenSale,
-        sunshine,
-        snowday,
-        fastForward,
-        frozen,
-        snowball,
-        freeSale,
-        payday,
-        goldStandard,
-        royalFlush,
-        nightShift,
+        procs,
         bonusTier,
-        intern,
-        unionBoss,
-        easterSale,
-        rushHour,
-        goldenTicket,
-        silverTicket,
-        goldenParachute,
-        payout,
-        grandOpening,
-        fullyStaffed,
-        espressoShot,
-        dejaVu,
-        cloneArmy,
-        luckyClover,
-        secondWind,
-        executiveOrder,
-        roundUp,
-        goldenHandshake,
-        supplyRun,
-        casualFriday,
-        fancyFriday,
-        fireDrill,
-        doubleDown,
-        coffeeRun,
-        teamBuilding,
-        springCleaning,
-        nightOwl,
-        headhunter,
+        (kind) => grantFollowUpProc(kind, rewardContext),
       );
+      // after the celebration, not before: Deja Vu grants its follow-up procs'
+      // rewards synchronously from in there, and they'd otherwise miss this save
+      persist();
       return;
     }
     if (spendTotalIncome(floor.upgradeCost)) {

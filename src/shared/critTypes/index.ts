@@ -17,7 +17,7 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { recordCritProcLanded } from "./critProcCounts";
 
-export { getCritProcCount } from "./critProcCounts";
+export { getCritProcCount, recordCritProcLanded } from "./critProcCounts";
 
 export type CritTier = "crit" | "mega" | "ultra";
 
@@ -70,9 +70,10 @@ export const ULTRA_CRIT_UPGRADE_COUNT = CRIT_TIER_CONFIG.ultra.multiplier;
 // one floor at a time
 export const CHAIN_CRIT_CHANCE = CONFIG.crit.chainChance;
 export const CHAIN_CRIT_CONTINUE_CHANCE = CONFIG.crit.chainContinueChance;
-// chain has no dedicated color (its celebration always uses the landed
-// tier's own color instead, see critCelebration.ts's tierColor) — only a
-// label, kept here for symmetry with every other proc's own exported label
+// chain has no dedicated celebration color (its flash always uses the landed
+// tier's own color instead, see critCelebration.ts's tierColor) — this one is
+// only CRIT_PROC_INFO's display color, same for bounce/explosion below
+export const CHAIN_CRIT_COLOR = COLOR.blue;
 export const CHAIN_CRIT_LABEL = "Chain";
 
 // "boost crit" — another proc riding on an already-landed crit/mega/ultra (see
@@ -91,6 +92,7 @@ export const BOOST_CRIT_LABEL = "Boost";
 // call with startIndex -1
 export const BOUNCE_CRIT_CHANCE = CONFIG.crit.bounceChance;
 export const BOUNCE_CRIT_CONTINUE_CHANCE = CONFIG.crit.bounceContinueChance;
+export const BOUNCE_CRIT_COLOR = COLOR.blue;
 export const BOUNCE_CRIT_LABEL = "Bounce";
 
 // "explosion crit" — a fourth piggyback proc, same shape as chain again, but
@@ -99,6 +101,7 @@ export const BOUNCE_CRIT_LABEL = "Bounce";
 export const EXPLOSION_CRIT_CHANCE = CONFIG.crit.explosionChance;
 export const EXPLOSION_CRIT_CONTINUE_CHANCE =
   CONFIG.crit.explosionContinueChance;
+export const EXPLOSION_CRIT_COLOR = COLOR.blue;
 export const EXPLOSION_CRIT_LABEL = "Boom";
 
 // "booty crit" — a fifth piggyback proc, a flat one-time effect (not
@@ -790,6 +793,99 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "headhunter",
 ];
 
+// the one kind -> "is this proc armed on this floor" registry. Every per-proc
+// WeakSet above is reachable from here, so anything that needs to act on procs
+// generically (consumeCritProcs, readCritProcs, forceCritProc) walks
+// CRIT_PROC_KINDS instead of hand-listing all 59 of them again
+const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
+  chain: chainCrits,
+  boost: boostCrits,
+  bounce: bounceCrits,
+  explosion: explosionCrits,
+  booty: bootyCrits,
+  upgrade: upgradeCrits,
+  peppermint: peppermintCrits,
+  heavenly: heavenlyCrits,
+  pair: pairCrits,
+  threeOfAKind: threeOfAKindCrits,
+  fourOfAKind: fourOfAKindCrits,
+  fullHouse: fullHouseCrits,
+  royalFlush: royalFlushCrits,
+  tickTock: tickTockCrits,
+  chairGiveaway: chairGiveawayCrits,
+  suppliesGiveaway: suppliesGiveawayCrits,
+  winterSale: winterSaleCrits,
+  springSale: springSaleCrits,
+  summerSale: summerSaleCrits,
+  autumnSale: autumnSaleCrits,
+  halloweenSale: halloweenSaleCrits,
+  easterSale: easterSaleCrits,
+  sunshine: sunshineCrits,
+  snowday: snowdayCrits,
+  fastForward: fastForwardCrits,
+  frozen: frozenCrits,
+  snowball: snowballCrits,
+  freeSale: freeSaleCrits,
+  bullMarket: bullMarketCrits,
+  payday: paydayCrits,
+  goldStandard: goldStandardCrits,
+  nightShift: nightShiftCrits,
+  intern: internCrits,
+  unionBoss: unionBossCrits,
+  rushHour: rushHourCrits,
+  goldenTicket: goldenTicketCrits,
+  silverTicket: silverTicketCrits,
+  goldenParachute: goldenParachuteCrits,
+  payout: payoutCrits,
+  grandOpening: grandOpeningCrits,
+  fullyStaffed: fullyStaffedCrits,
+  espressoShot: espressoShotCrits,
+  dejaVu: dejaVuCrits,
+  cloneArmy: cloneArmyCrits,
+  luckyClover: luckyCloverCrits,
+  secondWind: secondWindCrits,
+  executiveOrder: executiveOrderCrits,
+  roundUp: roundUpCrits,
+  goldenHandshake: goldenHandshakeCrits,
+  supplyRun: supplyRunCrits,
+  casualFriday: casualFridayCrits,
+  fancyFriday: fancyFridayCrits,
+  fireDrill: fireDrillCrits,
+  doubleDown: doubleDownCrits,
+  coffeeRun: coffeeRunCrits,
+  teamBuilding: teamBuildingCrits,
+  springCleaning: springCleaningCrits,
+  nightOwl: nightOwlCrits,
+  headhunter: headhunterCrits,
+};
+
+// every proc currently armed on this floor, as the same boolean-per-kind shape
+// CritRollResult uses — so a consumption site can hand the whole set straight
+// to applyCritProcs/triggerCritCelebration instead of reading 59 isXCrit()
+// calls into 59 local consts
+export type CritProcFlags = Record<CritProcKind, boolean>;
+
+export function readCritProcs(floor: Floor): CritProcFlags {
+  const flags = {} as CritProcFlags;
+  for (const kind of CRIT_PROC_KINDS) {
+    flags[kind] = CRIT_PROC_SETS[kind].has(floor);
+  }
+  return flags;
+}
+
+// a flags record with exactly one proc set — lets a single proc be pushed
+// through the same applyCritProcs dispatcher everything else uses (see
+// critCelebration's Deja Vu follow-ups)
+export function onlyCritProc(kind: CritProcKind): CritProcFlags {
+  const flags = {} as CritProcFlags;
+  for (const other of CRIT_PROC_KINDS) flags[other] = other === kind;
+  return flags;
+}
+
+export function forceCritProc(kind: CritProcKind, floor: Floor): void {
+  CRIT_PROC_SETS[kind].add(floor);
+}
+
 // a caller-supplied "what does this proc actually DO here" function per proc
 // kind, keyed the same way as CritRollResult's own boolean fields — a proc
 // with no entry is simply skipped by the dispatchers below, so a caller that
@@ -838,12 +934,14 @@ export function runFirstCritProc<TContext>(
 }
 
 // display metadata for the player-facing "Special Crits" info menu (see
-// hud/corporationBoostMenu's CRIT_INFO) — one canonical table instead of that
-// menu hand-duplicating every label string a second time. `icon` is a
+// hud/corporationBoostMenu's CRIT_INFO) AND the celebration flash each proc
+// triggers (floorInteractions/critCelebration) — one canonical table instead
+// of those hand-duplicating every label/color a second time. `icon` is a
 // loadAssets ImageName key; `description` is short display-only prose, never
 // read by any game logic
 export interface CritProcDisplayInfo {
   label: string;
+  color: string;
   icon: ImageName;
   description: string;
 }
@@ -851,296 +949,414 @@ export interface CritProcDisplayInfo {
 export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
   chain: {
     label: CHAIN_CRIT_LABEL,
+
+    color: CHAIN_CRIT_COLOR,
     icon: "chain",
     description: "Repeats the crit on the floor above",
   },
   boost: {
     label: BOOST_CRIT_LABEL,
+
+    color: BOOST_CRIT_COLOR,
     icon: "mouse",
     description: "Boosts every worker for free",
   },
   bounce: {
     label: BOUNCE_CRIT_LABEL,
+
+    color: BOUNCE_CRIT_COLOR,
     icon: "ball",
     description: "Repeats the crit on the floor below",
   },
   explosion: {
     label: EXPLOSION_CRIT_LABEL,
+
+    color: EXPLOSION_CRIT_COLOR,
     icon: "explosion",
     description: "Repeats the crit up and down at once",
   },
   booty: {
     label: BOOTY_CRIT_LABEL,
+
+    color: BOOTY_CRIT_COLOR,
     icon: "booty",
     description: "Doubles your total income",
   },
   upgrade: {
     label: UPGRADE_CRIT_LABEL,
+
+    color: UPGRADE_CRIT_COLOR,
     icon: "upgrade",
     description: "Upgrades the floor's crit tier",
   },
   peppermint: {
     label: PEPPERMINT_CRIT_LABEL,
+
+    color: PEPPERMINT_CRIT_COLOR,
     icon: "peppermint",
     description: "Upgrades every other floor's tier",
   },
   heavenly: {
     label: HEAVENLY_CRIT_LABEL,
+
+    color: HEAVENLY_CRIT_COLOR,
     icon: "heaven",
     description: "Unlocks, maxes, and upgrades every floor",
   },
   pair: {
     label: PAIR_CRIT_LABEL,
+
+    color: PAIR_CRIT_COLOR,
     icon: "pair",
     description: "Upgrades 2 floors' crit tier",
   },
   threeOfAKind: {
     label: THREE_OF_A_KIND_CRIT_LABEL,
+
+    color: THREE_OF_A_KIND_CRIT_COLOR,
     icon: "threeOfAKind",
     description: "Upgrades 3 floors' crit tier",
   },
   fourOfAKind: {
     label: FOUR_OF_A_KIND_CRIT_LABEL,
+
+    color: FOUR_OF_A_KIND_CRIT_COLOR,
     icon: "fourOfAKind",
     description: "Upgrades 4 floors' crit tier",
   },
   fullHouse: {
     label: FULL_HOUSE_CRIT_LABEL,
+
+    color: FULL_HOUSE_CRIT_COLOR,
     icon: "fullHouse",
     description: "Upgrades 5 floors' crit tier",
   },
   royalFlush: {
     label: ROYAL_FLUSH_CRIT_LABEL,
+
+    color: ROYAL_FLUSH_CRIT_COLOR,
     icon: "royalFlush",
     description: "Upgrades 6 floors' crit tier",
   },
   tickTock: {
     label: TICK_TOCK_CRIT_LABEL,
+
+    color: TICK_TOCK_CRIT_COLOR,
     icon: "clock",
     description: "Pays every floor twice, instantly",
   },
   chairGiveaway: {
     label: CHAIR_GIVEAWAY_CRIT_LABEL,
+
+    color: CHAIR_GIVEAWAY_CRIT_COLOR,
     icon: "officeChairsIcon",
     description: "Free office chairs for the floor",
   },
   suppliesGiveaway: {
     label: SUPPLIES_GIVEAWAY_CRIT_LABEL,
+
+    color: SUPPLIES_GIVEAWAY_CRIT_COLOR,
     icon: "officeSuppliesIcon",
     description: "Free office supplies for the floor",
   },
   winterSale: {
     label: WINTER_SALE_CRIT_LABEL,
+
+    color: WINTER_SALE_CRIT_COLOR,
     icon: "winter",
     description: "Cuts upgrade/worker costs 25% building-wide",
   },
   springSale: {
     label: SPRING_SALE_CRIT_LABEL,
+
+    color: SPRING_SALE_CRIT_COLOR,
     icon: "spring",
     description: "Cuts upgrade/worker costs 25% building-wide",
   },
   summerSale: {
     label: SUMMER_SALE_CRIT_LABEL,
+
+    color: SUMMER_SALE_CRIT_COLOR,
     icon: "summer",
     description: "Cuts upgrade/worker costs 25% building-wide",
   },
   autumnSale: {
     label: AUTUMN_SALE_CRIT_LABEL,
+
+    color: AUTUMN_SALE_CRIT_COLOR,
     icon: "autumn",
     description: "Cuts upgrade/worker costs 25% building-wide",
   },
   halloweenSale: {
     label: HALLOWEEN_SALE_CRIT_LABEL,
+
+    color: HALLOWEEN_SALE_CRIT_COLOR,
     icon: "halloween",
     description: "Cuts upgrade/worker costs 50% building-wide",
   },
   easterSale: {
     label: EASTER_SALE_CRIT_LABEL,
+
+    color: EASTER_SALE_CRIT_COLOR,
     icon: "easterBunny",
     description: "Cuts upgrade/worker costs 50% building-wide",
   },
   sunshine: {
     label: SUNSHINE_CRIT_LABEL,
+
+    color: SUNSHINE_CRIT_COLOR,
     icon: "sunny",
     description: "Boosts every worker, twice as long",
   },
   snowday: {
     label: SNOWDAY_CRIT_LABEL,
+
+    color: SNOWDAY_CRIT_COLOR,
     icon: "snowman",
     description: "Boosts every worker, three times as long",
   },
   fastForward: {
     label: FAST_FORWARD_CRIT_LABEL,
+
+    color: FAST_FORWARD_CRIT_COLOR,
     icon: "fastforward",
     description: "Instantly credits 4 payouts' worth of income",
   },
   frozen: {
     label: FROZEN_CRIT_LABEL,
+
+    color: FROZEN_CRIT_COLOR,
     icon: "icecube",
     description: "Locks this floor's upgrade price for 15s",
   },
   snowball: {
     label: SNOWBALL_CRIT_LABEL,
+
+    color: SNOWBALL_CRIT_COLOR,
     icon: "snowball",
     description: "Pays every floor once, times floors unlocked",
   },
   freeSale: {
     label: FREE_SALE_CRIT_LABEL,
+
+    color: FREE_SALE_CRIT_COLOR,
     icon: "cashRegister",
     description: "Starts a free Sales event on this floor",
   },
   bullMarket: {
     label: BULL_MARKET_CRIT_LABEL,
+
+    color: BULL_MARKET_CRIT_COLOR,
     icon: "bull",
     description: "Doubles every unlocked floor's own upgrade count",
   },
   payday: {
     label: PAYDAY_CRIT_LABEL,
+
+    color: PAYDAY_CRIT_COLOR,
     icon: "payday",
     description: "Triples your total income",
   },
   goldStandard: {
     label: GOLD_STANDARD_CRIT_LABEL,
+
+    color: GOLD_STANDARD_CRIT_COLOR,
     icon: "goldStandard",
     description: "Quadruples your total income",
   },
   nightShift: {
     label: NIGHT_SHIFT_CRIT_LABEL,
+
+    color: NIGHT_SHIFT_CRIT_COLOR,
     icon: "sleepyMoon",
     description: "Short worker boost, counts as +1 worker",
   },
   intern: {
     label: INTERN_CRIT_LABEL,
+
+    color: INTERN_CRIT_COLOR,
     icon: "intern",
     description: "Grants the floor a free worker",
   },
   unionBoss: {
     label: UNION_BOSS_CRIT_LABEL,
+
+    color: UNION_BOSS_CRIT_COLOR,
     icon: "unionBoss",
     description: "Grants the floor a free manager",
   },
   rushHour: {
     label: RUSH_HOUR_CRIT_LABEL,
+
+    color: RUSH_HOUR_CRIT_COLOR,
     icon: "sportscar",
     description: "Caps every floor's income timer at 0.5s for 15s",
   },
   goldenTicket: {
     label: GOLDEN_TICKET_CRIT_LABEL,
+
+    color: GOLDEN_TICKET_CRIT_COLOR,
     icon: "goldenTicket",
     description: "Guarantees this floor's next crit is ultra",
   },
   silverTicket: {
     label: SILVER_TICKET_CRIT_LABEL,
+
+    color: SILVER_TICKET_CRIT_COLOR,
     icon: "silverTicket",
     description: "Guarantees this floor's next crit is mega",
   },
   goldenParachute: {
     label: GOLDEN_PARACHUTE_CRIT_LABEL,
+
+    color: GOLDEN_PARACHUTE_CRIT_COLOR,
     icon: "goldenParachute",
     description: "Instantly adds 15s of your company's income",
   },
   payout: {
     label: PAYOUT_CRIT_LABEL,
+
+    color: PAYOUT_CRIT_COLOR,
     icon: "payout",
     description: "Instantly adds every company's income + upgrades",
   },
   grandOpening: {
     label: GRAND_OPENING_CRIT_LABEL,
+
+    color: GRAND_OPENING_CRIT_COLOR,
     icon: "grandOpening",
     description: "Buys the next building free, or unlocks all floors",
   },
   fullyStaffed: {
     label: FULLY_STAFFED_CRIT_LABEL,
+
+    color: FULLY_STAFFED_CRIT_COLOR,
     icon: "fullyStaffed",
     description: "Hires workers and managers on every unlocked floor",
   },
   espressoShot: {
     label: ESPRESSO_SHOT_CRIT_LABEL,
+
+    color: ESPRESSO_SHOT_CRIT_COLOR,
     icon: "espressoShot",
     description: "Boosts every worker for 15 seconds",
   },
   dejaVu: {
     label: DEJA_VU_CRIT_LABEL,
+
+    color: DEJA_VU_CRIT_COLOR,
     icon: "dejaVu",
     description: "Repeats a random crit twice",
   },
   cloneArmy: {
     label: CLONE_ARMY_CRIT_LABEL,
+
+    color: CLONE_ARMY_CRIT_COLOR,
     icon: "cloneArmy",
     description: "Copies the strongest workforce to every floor",
   },
   luckyClover: {
     label: LUCKY_CLOVER_CRIT_LABEL,
+
+    color: LUCKY_CLOVER_CRIT_COLOR,
     icon: "luckyClover",
     description: "Triggers 4 x125 crits in succession",
   },
   secondWind: {
     label: SECOND_WIND_CRIT_LABEL,
+
+    color: SECOND_WIND_CRIT_COLOR,
     icon: "secondWind",
     description: "Refunds every upgrade, floor and building bought",
   },
   executiveOrder: {
     label: EXECUTIVE_ORDER_CRIT_LABEL,
+
+    color: EXECUTIVE_ORDER_CRIT_COLOR,
     icon: "executiveOrder",
     description: "Promotes every floor one crit tier",
   },
   roundUp: {
     label: ROUND_UP_CRIT_LABEL,
+
+    color: ROUND_UP_CRIT_COLOR,
     icon: "roundUp",
     description: "Tops every floor up to the next 10 upgrades",
   },
   goldenHandshake: {
     label: GOLDEN_HANDSHAKE_CRIT_LABEL,
+
+    color: GOLDEN_HANDSHAKE_CRIT_COLOR,
     icon: "goldenHandshake",
     description: "Gives every unlocked floor a free manager",
   },
   supplyRun: {
     label: SUPPLY_RUN_CRIT_LABEL,
+
+    color: SUPPLY_RUN_CRIT_COLOR,
     icon: "supplyRun",
     description: "Free office chairs and supplies for the floor",
   },
   casualFriday: {
     label: CASUAL_FRIDAY_CRIT_LABEL,
+
+    color: CASUAL_FRIDAY_CRIT_COLOR,
     icon: "casualFriday",
     description: "Five free upgrades on every unlocked floor",
   },
   fancyFriday: {
     label: FANCY_FRIDAY_CRIT_LABEL,
+
+    color: FANCY_FRIDAY_CRIT_COLOR,
     icon: "fancyFriday",
     description: "Ten free upgrades on every unlocked floor",
   },
   fireDrill: {
     label: FIRE_DRILL_CRIT_LABEL,
+
+    color: FIRE_DRILL_CRIT_COLOR,
     icon: "fireDrill",
     description: "Completes every floor's income timer at once",
   },
   doubleDown: {
     label: DOUBLE_DOWN_CRIT_LABEL,
+
+    color: DOUBLE_DOWN_CRIT_COLOR,
     icon: "doubleDown",
     description: "Replays the crit that spawned it twice more",
   },
   coffeeRun: {
     label: COFFEE_RUN_CRIT_LABEL,
+
+    color: COFFEE_RUN_CRIT_COLOR,
     icon: "coffeeRun",
     description: "Boosts every worker for a full minute",
   },
   teamBuilding: {
     label: TEAM_BUILDING_CRIT_LABEL,
+
+    color: TEAM_BUILDING_CRIT_COLOR,
     icon: "teamBuilding",
     description: "Hires a free worker on every unlocked floor",
   },
   springCleaning: {
     label: SPRING_CLEANING_CRIT_LABEL,
+
+    color: SPRING_CLEANING_CRIT_COLOR,
     icon: "springCleaning",
     description: "Rebuilds every floor fresh, one tier higher",
   },
   nightOwl: {
     label: NIGHT_OWL_CRIT_LABEL,
+
+    color: NIGHT_OWL_CRIT_COLOR,
     icon: "nightOwl",
     description: "Night Shift's boost, worth two extra workers",
   },
   headhunter: {
     label: HEADHUNTER_CRIT_LABEL,
+
+    color: HEADHUNTER_CRIT_COLOR,
     icon: "headhunter",
     description: "Matches this floor to the best-staffed one",
   },
@@ -1582,65 +1798,7 @@ export function consumeBonusTierCrit(floor: Floor): void {
 
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
-  chainCrits.delete(floor);
-  boostCrits.delete(floor);
-  bounceCrits.delete(floor);
-  explosionCrits.delete(floor);
-  bootyCrits.delete(floor);
-  upgradeCrits.delete(floor);
-  peppermintCrits.delete(floor);
-  heavenlyCrits.delete(floor);
-  pairCrits.delete(floor);
-  threeOfAKindCrits.delete(floor);
-  fourOfAKindCrits.delete(floor);
-  fullHouseCrits.delete(floor);
-  royalFlushCrits.delete(floor);
-  tickTockCrits.delete(floor);
-  chairGiveawayCrits.delete(floor);
-  suppliesGiveawayCrits.delete(floor);
-  winterSaleCrits.delete(floor);
-  springSaleCrits.delete(floor);
-  summerSaleCrits.delete(floor);
-  autumnSaleCrits.delete(floor);
-  halloweenSaleCrits.delete(floor);
-  easterSaleCrits.delete(floor);
-  sunshineCrits.delete(floor);
-  snowdayCrits.delete(floor);
-  fastForwardCrits.delete(floor);
-  frozenCrits.delete(floor);
-  snowballCrits.delete(floor);
-  freeSaleCrits.delete(floor);
-  bullMarketCrits.delete(floor);
-  paydayCrits.delete(floor);
-  goldStandardCrits.delete(floor);
-  nightShiftCrits.delete(floor);
-  internCrits.delete(floor);
-  unionBossCrits.delete(floor);
-  rushHourCrits.delete(floor);
-  goldenTicketCrits.delete(floor);
-  silverTicketCrits.delete(floor);
-  goldenParachuteCrits.delete(floor);
-  payoutCrits.delete(floor);
-  grandOpeningCrits.delete(floor);
-  fullyStaffedCrits.delete(floor);
-  espressoShotCrits.delete(floor);
-  dejaVuCrits.delete(floor);
-  cloneArmyCrits.delete(floor);
-  luckyCloverCrits.delete(floor);
-  secondWindCrits.delete(floor);
-  executiveOrderCrits.delete(floor);
-  roundUpCrits.delete(floor);
-  goldenHandshakeCrits.delete(floor);
-  supplyRunCrits.delete(floor);
-  casualFridayCrits.delete(floor);
-  fancyFridayCrits.delete(floor);
-  fireDrillCrits.delete(floor);
-  doubleDownCrits.delete(floor);
-  coffeeRunCrits.delete(floor);
-  teamBuildingCrits.delete(floor);
-  springCleaningCrits.delete(floor);
-  nightOwlCrits.delete(floor);
-  headhunterCrits.delete(floor);
+  for (const kind of CRIT_PROC_KINDS) CRIT_PROC_SETS[kind].delete(floor);
   bonusTierCrits.delete(floor);
 }
 

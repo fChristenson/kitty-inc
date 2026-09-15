@@ -1,5 +1,5 @@
 import type { Floor } from "../../gameState";
-import { type CritProcKind } from "../../shared/critTypes";
+import { type CritProcKind, type CritProcFlags } from "../../shared/critTypes";
 import { CRIT_PROC_INFO, CRIT_PROC_KINDS } from "../../shared/critTypes";
 import {
   type CritTier,
@@ -10,112 +10,14 @@ import {
   EXPLOSION_CRIT_LABEL,
   BOOTY_CRIT_COLOR,
   BOOTY_CRIT_LABEL,
-  UPGRADE_CRIT_COLOR,
-  UPGRADE_CRIT_LABEL,
-  PEPPERMINT_CRIT_COLOR,
-  PEPPERMINT_CRIT_LABEL,
   HEAVENLY_CRIT_COLOR,
   HEAVENLY_CRIT_LABEL,
-  PAIR_CRIT_COLOR,
-  PAIR_CRIT_LABEL,
-  THREE_OF_A_KIND_CRIT_COLOR,
-  THREE_OF_A_KIND_CRIT_LABEL,
-  FOUR_OF_A_KIND_CRIT_COLOR,
-  FOUR_OF_A_KIND_CRIT_LABEL,
-  FULL_HOUSE_CRIT_COLOR,
-  FULL_HOUSE_CRIT_LABEL,
-  TICK_TOCK_CRIT_COLOR,
-  TICK_TOCK_CRIT_LABEL,
-  CHAIR_GIVEAWAY_CRIT_COLOR,
-  CHAIR_GIVEAWAY_CRIT_LABEL,
-  SUPPLIES_GIVEAWAY_CRIT_COLOR,
-  SUPPLIES_GIVEAWAY_CRIT_LABEL,
-  WINTER_SALE_CRIT_COLOR,
-  WINTER_SALE_CRIT_LABEL,
-  SPRING_SALE_CRIT_COLOR,
-  SPRING_SALE_CRIT_LABEL,
-  SUMMER_SALE_CRIT_COLOR,
-  SUMMER_SALE_CRIT_LABEL,
-  AUTUMN_SALE_CRIT_COLOR,
-  AUTUMN_SALE_CRIT_LABEL,
-  HALLOWEEN_SALE_CRIT_COLOR,
-  HALLOWEEN_SALE_CRIT_LABEL,
-  EASTER_SALE_CRIT_COLOR,
-  EASTER_SALE_CRIT_LABEL,
   SUNSHINE_CRIT_COLOR,
   SUNSHINE_CRIT_LABEL,
   SNOWDAY_CRIT_COLOR,
   SNOWDAY_CRIT_LABEL,
-  FAST_FORWARD_CRIT_COLOR,
-  FAST_FORWARD_CRIT_LABEL,
-  FROZEN_CRIT_COLOR,
-  FROZEN_CRIT_LABEL,
-  SNOWBALL_CRIT_COLOR,
-  SNOWBALL_CRIT_LABEL,
-  FREE_SALE_CRIT_COLOR,
-  FREE_SALE_CRIT_LABEL,
-  PAYDAY_CRIT_COLOR,
-  PAYDAY_CRIT_LABEL,
-  GOLD_STANDARD_CRIT_COLOR,
-  GOLD_STANDARD_CRIT_LABEL,
   NIGHT_SHIFT_CRIT_COLOR,
   NIGHT_SHIFT_CRIT_LABEL,
-  ROYAL_FLUSH_CRIT_COLOR,
-  ROYAL_FLUSH_CRIT_LABEL,
-  INTERN_CRIT_COLOR,
-  INTERN_CRIT_LABEL,
-  UNION_BOSS_CRIT_COLOR,
-  UNION_BOSS_CRIT_LABEL,
-  RUSH_HOUR_CRIT_COLOR,
-  RUSH_HOUR_CRIT_LABEL,
-  GOLDEN_TICKET_CRIT_COLOR,
-  GOLDEN_TICKET_CRIT_LABEL,
-  SILVER_TICKET_CRIT_COLOR,
-  SILVER_TICKET_CRIT_LABEL,
-  GOLDEN_PARACHUTE_CRIT_COLOR,
-  GOLDEN_PARACHUTE_CRIT_LABEL,
-  PAYOUT_CRIT_COLOR,
-  PAYOUT_CRIT_LABEL,
-  GRAND_OPENING_CRIT_COLOR,
-  GRAND_OPENING_CRIT_LABEL,
-  FULLY_STAFFED_CRIT_COLOR,
-  FULLY_STAFFED_CRIT_LABEL,
-  ESPRESSO_SHOT_CRIT_COLOR,
-  ESPRESSO_SHOT_CRIT_LABEL,
-  DEJA_VU_CRIT_COLOR,
-  DEJA_VU_CRIT_LABEL,
-  CLONE_ARMY_CRIT_COLOR,
-  CLONE_ARMY_CRIT_LABEL,
-  LUCKY_CLOVER_CRIT_COLOR,
-  LUCKY_CLOVER_CRIT_LABEL,
-  SECOND_WIND_CRIT_COLOR,
-  SECOND_WIND_CRIT_LABEL,
-  EXECUTIVE_ORDER_CRIT_COLOR,
-  EXECUTIVE_ORDER_CRIT_LABEL,
-  ROUND_UP_CRIT_COLOR,
-  ROUND_UP_CRIT_LABEL,
-  GOLDEN_HANDSHAKE_CRIT_COLOR,
-  GOLDEN_HANDSHAKE_CRIT_LABEL,
-  SUPPLY_RUN_CRIT_COLOR,
-  SUPPLY_RUN_CRIT_LABEL,
-  CASUAL_FRIDAY_CRIT_COLOR,
-  CASUAL_FRIDAY_CRIT_LABEL,
-  FANCY_FRIDAY_CRIT_COLOR,
-  FANCY_FRIDAY_CRIT_LABEL,
-  FIRE_DRILL_CRIT_COLOR,
-  FIRE_DRILL_CRIT_LABEL,
-  DOUBLE_DOWN_CRIT_COLOR,
-  DOUBLE_DOWN_CRIT_LABEL,
-  COFFEE_RUN_CRIT_COLOR,
-  COFFEE_RUN_CRIT_LABEL,
-  TEAM_BUILDING_CRIT_COLOR,
-  TEAM_BUILDING_CRIT_LABEL,
-  SPRING_CLEANING_CRIT_COLOR,
-  SPRING_CLEANING_CRIT_LABEL,
-  NIGHT_OWL_CRIT_COLOR,
-  NIGHT_OWL_CRIT_LABEL,
-  HEADHUNTER_CRIT_COLOR,
-  HEADHUNTER_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -457,60 +359,6 @@ function celebrateBounce(
   spawnTierBursts(floor, tier, getScreenCenterLocal);
 }
 
-// explosion crit (see upgradeButton.ts's isExplosionCrit): same swap again,
-// keeping the landed tier's own color (spreading both up and down is applied
-// by floorInteractions.ts, this only covers the celebration moment)
-function celebrateExplosion(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
-  playSpecialFlash(EXPLOSION_CRIT_LABEL, tierColor(tier));
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
-}
-
-// booty crit (see upgradeButton.ts's isBootyCrit): same swap as boost above,
-// its own dedicated gold — the reward itself (doubling the active company's
-// total income) is applied by floorInteractions.ts, this only covers the
-// celebration moment
-function celebrateBooty(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
-  playSpecialFlash(BOOTY_CRIT_LABEL, BOOTY_CRIT_COLOR);
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
-  playCoinDrop();
-  const p = getScreenCenterLocal(floor);
-  spawnCoinBurst(floor, p.x, p.y, () => {});
-}
-
-// upgrade crit (see upgradeButton.ts's isUpgradeCrit): same swap as boost/
-// booty above, its own dedicated cyan — the reward itself (promoting the
-// floor's/building's own permanent tier) is applied by floorInteractions.ts/
-// main.ts, this only covers the celebration moment
-function celebrateUpgrade(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
-  playSpecialFlash(UPGRADE_CRIT_LABEL, UPGRADE_CRIT_COLOR);
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
-}
-
-// peppermint crit (see upgradeButton.ts's isPeppermintCrit): same swap as
-// boost/booty/upgrade above, its own dedicated pink — the reward itself
-// (promoting every other unlocked floor in the building) is applied by
-// floorInteractions.ts, this only covers the celebration moment
-function celebratePeppermint(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
-  playSpecialFlash(PEPPERMINT_CRIT_LABEL, PEPPERMINT_CRIT_COLOR);
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
-}
-
 // heavenly crit (see upgradeButton.ts's isHeavenlyCrit): the single biggest
 // reward in the game, so it gets the same "ultra-strength" flash treatment
 // ultra tiers themselves use (long strobing hold, top priority) regardless of
@@ -555,6 +403,40 @@ function celebrateFlatProc(
   spawnTierBursts(floor, tier, getScreenCenterLocal);
 }
 
+// explosion is the one proc whose flash takes the LANDED TIER's color rather
+// than a dedicated one of its own
+function celebrateExplosion(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  celebrateFlatProc(
+    EXPLOSION_CRIT_LABEL,
+    tierColor(tier),
+    floor,
+    tier,
+    getScreenCenterLocal,
+  );
+}
+
+// booty adds a coin drop + burst on top of the standard flash
+function celebrateBooty(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  celebrateFlatProc(
+    BOOTY_CRIT_LABEL,
+    BOOTY_CRIT_COLOR,
+    floor,
+    tier,
+    getScreenCenterLocal,
+  );
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
 // chain and boost are both "special" procs riding the SAME landed tier (see
 // isChainCrit/isBoostCrit) — when only one lands it plays immediately same as
 // any plain crit, but when BOTH land on the same click they each get their own
@@ -563,73 +445,13 @@ function celebrateFlatProc(
 // they're simply skipped while a special celebration is still due, rather
 // than piling up behind it (see triggerCritCelebration below)
 interface QueuedCelebration {
-  kind:
-    | "chain"
-    | "boost"
-    | "bounce"
-    | "explosion"
-    | "booty"
-    | "upgrade"
-    | "peppermint"
-    | "heavenly"
-    | "pair"
-    | "threeOfAKind"
-    | "fourOfAKind"
-    | "fullHouse"
-    | "tickTock"
-    | "chairGiveaway"
-    | "suppliesGiveaway"
-    | "winterSale"
-    | "springSale"
-    | "summerSale"
-    | "autumnSale"
-    | "halloweenSale"
-    | "easterSale"
-    | "sunshine"
-    | "snowday"
-    | "fastForward"
-    | "frozen"
-    | "snowball"
-    | "freeSale"
-    | "payday"
-    | "goldStandard"
-    | "royalFlush"
-    | "nightShift"
-    | "intern"
-    | "unionBoss"
-    | "rushHour"
-    | "goldenTicket"
-    | "silverTicket"
-    | "goldenParachute"
-    | "payout"
-    | "grandOpening"
-    | "fullyStaffed"
-    | "espressoShot"
-    | "dejaVu"
-    | "cloneArmy"
-    | "luckyClover"
-    | "secondWind"
-    | "executiveOrder"
-    | "roundUp"
-    | "goldenHandshake"
-    | "supplyRun"
-    | "casualFriday"
-    | "fancyFriday"
-    | "fireDrill"
-    | "doubleDown"
-    | "coffeeRun"
-    | "teamBuilding"
-    | "springCleaning"
-    | "nightOwl"
-    | "headhunter"
-    | "bonusTier";
+  kind: CritProcKind | "bonusTier";
   queuedAt: number;
   maxAgeMs?: number;
   run: () => void;
 }
 const specialCelebrationQueue: QueuedCelebration[] = [];
 let drainingSpecialQueue = false;
-type RandomFollowUpKind = Exclude<CritProcKind, "bullMarket" | "dejaVu">;
 const DEJA_VU_RANDOM_FOLLOW_UP_COUNT = 2;
 const DEJA_VU_FOLLOW_UP_MAX_AGE_MS = 5000;
 
@@ -703,1091 +525,31 @@ export function triggerCritCelebration(
   floor: Floor,
   tier: CritTier,
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-  chain = false,
-  boost = false,
-  bounce = false,
-  explosion = false,
-  booty = false,
-  upgrade = false,
-  peppermint = false,
-  heavenly = false,
-  pair = false,
-  threeOfAKind = false,
-  fourOfAKind = false,
-  fullHouse = false,
-  tickTock = false,
-  chairGiveaway = false,
-  suppliesGiveaway = false,
-  winterSale = false,
-  springSale = false,
-  summerSale = false,
-  autumnSale = false,
-  halloweenSale = false,
-  sunshine = false,
-  snowday = false,
-  fastForward = false,
-  frozen = false,
-  snowball = false,
-  freeSale = false,
-  payday = false,
-  goldStandard = false,
-  royalFlush = false,
-  nightShift = false,
+  procs?: Partial<CritProcFlags>,
   bonusTier: CritTier | null = null,
-  intern = false,
-  unionBoss = false,
-  easterSale = false,
-  rushHour = false,
-  goldenTicket = false,
-  silverTicket = false,
-  goldenParachute = false,
-  payout = false,
-  grandOpening = false,
-  fullyStaffed = false,
-  espressoShot = false,
-  dejaVu = false,
-  cloneArmy = false,
-  luckyClover = false,
-  secondWind = false,
-  executiveOrder = false,
-  roundUp = false,
-  goldenHandshake = false,
-  supplyRun = false,
-  casualFriday = false,
-  fancyFriday = false,
-  fireDrill = false,
-  doubleDown = false,
-  coffeeRun = false,
-  teamBuilding = false,
-  springCleaning = false,
-  nightOwl = false,
-  headhunter = false,
+  onFollowUpProc?: (kind: CritProcKind) => void,
 ): void {
-  const procFlags: Partial<Record<CritProcKind, boolean>> = {
-    chain,
-    boost,
-    bounce,
-    explosion,
-    booty,
-    upgrade,
-    peppermint,
-    heavenly,
-    pair,
-    threeOfAKind,
-    fourOfAKind,
-    fullHouse,
-    tickTock,
-    chairGiveaway,
-    suppliesGiveaway,
-    winterSale,
-    springSale,
-    summerSale,
-    autumnSale,
-    halloweenSale,
-    easterSale,
-    sunshine,
-    snowday,
-    fastForward,
-    frozen,
-    snowball,
-    freeSale,
-    bullMarket: false,
-    payday,
-    goldStandard,
-    nightShift,
-    intern,
-    unionBoss,
-    rushHour,
-    goldenTicket,
-    silverTicket,
-    goldenParachute,
-    payout,
-    grandOpening,
-    fullyStaffed,
-    espressoShot,
-    dejaVu,
-    cloneArmy,
-    luckyClover,
-    secondWind,
-    executiveOrder,
-    roundUp,
-    goldenHandshake,
-    supplyRun,
-    casualFriday,
-    fancyFriday,
-    fireDrill,
-    doubleDown,
-    coffeeRun,
-    teamBuilding,
-    springCleaning,
-    nightOwl,
-    headhunter,
-  };
-  if (
-    chain ||
-    boost ||
-    bounce ||
-    explosion ||
-    booty ||
-    upgrade ||
-    peppermint ||
-    heavenly ||
-    pair ||
-    threeOfAKind ||
-    fourOfAKind ||
-    fullHouse ||
-    tickTock ||
-    chairGiveaway ||
-    suppliesGiveaway ||
-    winterSale ||
-    springSale ||
-    summerSale ||
-    autumnSale ||
-    halloweenSale ||
-    sunshine ||
-    snowday ||
-    fastForward ||
-    frozen ||
-    snowball ||
-    freeSale ||
-    payday ||
-    goldStandard ||
-    royalFlush ||
-    nightShift ||
-    intern ||
-    unionBoss ||
-    easterSale ||
-    rushHour ||
-    goldenTicket ||
-    silverTicket ||
-    goldenParachute ||
-    payout ||
-    grandOpening ||
-    fullyStaffed ||
-    espressoShot ||
-    dejaVu ||
-    cloneArmy ||
-    luckyClover ||
-    secondWind ||
-    executiveOrder ||
-    roundUp ||
-    goldenHandshake ||
-    supplyRun ||
-    casualFriday ||
-    fancyFriday ||
-    fireDrill ||
-    doubleDown ||
-    coffeeRun ||
-    teamBuilding ||
-    springCleaning ||
-    nightOwl ||
-    headhunter
-  ) {
+  const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
+  if (landed.length > 0) {
     const now = Date.now();
-    // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
-    // bulk-buy hold repeatedly rolling "chain") shouldn't queue up N replays
-    // of the identical celebration, just the first still-fresh one
-    if (chain && !specialCelebrationQueue.some((q) => q.kind === "chain")) {
-      specialCelebrationQueue.push({
-        kind: "chain",
-        queuedAt: now,
-        run: () => celebrateChain(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (boost && !specialCelebrationQueue.some((q) => q.kind === "boost")) {
-      specialCelebrationQueue.push({
-        kind: "boost",
-        queuedAt: now,
-        run: () => celebrateBoost(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (bounce && !specialCelebrationQueue.some((q) => q.kind === "bounce")) {
-      specialCelebrationQueue.push({
-        kind: "bounce",
-        queuedAt: now,
-        run: () => celebrateBounce(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (
-      explosion &&
-      !specialCelebrationQueue.some((q) => q.kind === "explosion")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "explosion",
-        queuedAt: now,
-        run: () => celebrateExplosion(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (booty && !specialCelebrationQueue.some((q) => q.kind === "booty")) {
-      specialCelebrationQueue.push({
-        kind: "booty",
-        queuedAt: now,
-        run: () => celebrateBooty(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (upgrade && !specialCelebrationQueue.some((q) => q.kind === "upgrade")) {
-      specialCelebrationQueue.push({
-        kind: "upgrade",
-        queuedAt: now,
-        run: () => celebrateUpgrade(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (
-      peppermint &&
-      !specialCelebrationQueue.some((q) => q.kind === "peppermint")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "peppermint",
-        queuedAt: now,
-        run: () => celebratePeppermint(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (
-      heavenly &&
-      !specialCelebrationQueue.some((q) => q.kind === "heavenly")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "heavenly",
-        queuedAt: now,
-        run: () => celebrateHeavenly(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (pair && !specialCelebrationQueue.some((q) => q.kind === "pair")) {
-      specialCelebrationQueue.push({
-        kind: "pair",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            PAIR_CRIT_LABEL,
-            PAIR_CRIT_COLOR,
+    for (const kind of landed) {
+      queueProcCelebration(kind, floor, tier, getScreenCenterLocal, now);
+      // Deja Vu doesn't just FLASH extra procs, it grants them: each follow-up
+      // is applied and tallied through the same path a real roll uses (see
+      // floorInteractions' onFollowUpProc)
+      if (kind === "dejaVu") {
+        for (const followUp of pickDejaVuFollowUps(procs!)) {
+          onFollowUpProc?.(followUp);
+          queueProcCelebration(
+            followUp,
             floor,
             tier,
             getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      threeOfAKind &&
-      !specialCelebrationQueue.some((q) => q.kind === "threeOfAKind")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "threeOfAKind",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            THREE_OF_A_KIND_CRIT_LABEL,
-            THREE_OF_A_KIND_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      fourOfAKind &&
-      !specialCelebrationQueue.some((q) => q.kind === "fourOfAKind")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "fourOfAKind",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            FOUR_OF_A_KIND_CRIT_LABEL,
-            FOUR_OF_A_KIND_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      fullHouse &&
-      !specialCelebrationQueue.some((q) => q.kind === "fullHouse")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "fullHouse",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            FULL_HOUSE_CRIT_LABEL,
-            FULL_HOUSE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      tickTock &&
-      !specialCelebrationQueue.some((q) => q.kind === "tickTock")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "tickTock",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            TICK_TOCK_CRIT_LABEL,
-            TICK_TOCK_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      chairGiveaway &&
-      !specialCelebrationQueue.some((q) => q.kind === "chairGiveaway")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "chairGiveaway",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            CHAIR_GIVEAWAY_CRIT_LABEL,
-            CHAIR_GIVEAWAY_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      suppliesGiveaway &&
-      !specialCelebrationQueue.some((q) => q.kind === "suppliesGiveaway")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "suppliesGiveaway",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            SUPPLIES_GIVEAWAY_CRIT_LABEL,
-            SUPPLIES_GIVEAWAY_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (intern && !specialCelebrationQueue.some((q) => q.kind === "intern")) {
-      specialCelebrationQueue.push({
-        kind: "intern",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            INTERN_CRIT_LABEL,
-            INTERN_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      unionBoss &&
-      !specialCelebrationQueue.some((q) => q.kind === "unionBoss")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "unionBoss",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            UNION_BOSS_CRIT_LABEL,
-            UNION_BOSS_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      winterSale &&
-      !specialCelebrationQueue.some((q) => q.kind === "winterSale")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "winterSale",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            WINTER_SALE_CRIT_LABEL,
-            WINTER_SALE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      springSale &&
-      !specialCelebrationQueue.some((q) => q.kind === "springSale")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "springSale",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            SPRING_SALE_CRIT_LABEL,
-            SPRING_SALE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      summerSale &&
-      !specialCelebrationQueue.some((q) => q.kind === "summerSale")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "summerSale",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            SUMMER_SALE_CRIT_LABEL,
-            SUMMER_SALE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      autumnSale &&
-      !specialCelebrationQueue.some((q) => q.kind === "autumnSale")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "autumnSale",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            AUTUMN_SALE_CRIT_LABEL,
-            AUTUMN_SALE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      halloweenSale &&
-      !specialCelebrationQueue.some((q) => q.kind === "halloweenSale")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "halloweenSale",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            HALLOWEEN_SALE_CRIT_LABEL,
-            HALLOWEEN_SALE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      easterSale &&
-      !specialCelebrationQueue.some((q) => q.kind === "easterSale")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "easterSale",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            EASTER_SALE_CRIT_LABEL,
-            EASTER_SALE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      rushHour &&
-      !specialCelebrationQueue.some((q) => q.kind === "rushHour")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "rushHour",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            RUSH_HOUR_CRIT_LABEL,
-            RUSH_HOUR_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      goldenTicket &&
-      !specialCelebrationQueue.some((q) => q.kind === "goldenTicket")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "goldenTicket",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            GOLDEN_TICKET_CRIT_LABEL,
-            GOLDEN_TICKET_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      silverTicket &&
-      !specialCelebrationQueue.some((q) => q.kind === "silverTicket")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "silverTicket",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            SILVER_TICKET_CRIT_LABEL,
-            SILVER_TICKET_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      goldenParachute &&
-      !specialCelebrationQueue.some((q) => q.kind === "goldenParachute")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "goldenParachute",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            GOLDEN_PARACHUTE_CRIT_LABEL,
-            GOLDEN_PARACHUTE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (payout && !specialCelebrationQueue.some((q) => q.kind === "payout")) {
-      specialCelebrationQueue.push({
-        kind: "payout",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            PAYOUT_CRIT_LABEL,
-            PAYOUT_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      grandOpening &&
-      !specialCelebrationQueue.some((q) => q.kind === "grandOpening")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "grandOpening",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            GRAND_OPENING_CRIT_LABEL,
-            GRAND_OPENING_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      fullyStaffed &&
-      !specialCelebrationQueue.some((q) => q.kind === "fullyStaffed")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "fullyStaffed",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            FULLY_STAFFED_CRIT_LABEL,
-            FULLY_STAFFED_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      espressoShot &&
-      !specialCelebrationQueue.some((q) => q.kind === "espressoShot")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "espressoShot",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            ESPRESSO_SHOT_CRIT_LABEL,
-            ESPRESSO_SHOT_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (dejaVu && !specialCelebrationQueue.some((q) => q.kind === "dejaVu")) {
-      specialCelebrationQueue.push({
-        kind: "dejaVu",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            DEJA_VU_CRIT_LABEL,
-            DEJA_VU_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-
-      const availableFollowUps = CRIT_PROC_KINDS.filter(
-        (kind) =>
-          kind !== "dejaVu" &&
-          kind !== "bullMarket" &&
-          !procFlags[kind] &&
-          !specialCelebrationQueue.some((q) => q.kind === kind),
-      ) as RandomFollowUpKind[];
-      for (
-        let i = 0;
-        i < DEJA_VU_RANDOM_FOLLOW_UP_COUNT && availableFollowUps.length > 0;
-        i++
-      ) {
-        const randomIndex = Math.floor(
-          Math.random() * availableFollowUps.length,
-        );
-        const followUpKind = availableFollowUps.splice(randomIndex, 1)[0];
-        const followUpInfo = CRIT_PROC_INFO[followUpKind];
-        specialCelebrationQueue.push({
-          kind: followUpKind,
-          queuedAt: now,
-          maxAgeMs: DEJA_VU_FOLLOW_UP_MAX_AGE_MS,
-          run: () =>
-            celebrateFlatProc(
-              followUpInfo.label,
-              tierColor(tier),
-              floor,
-              tier,
-              getScreenCenterLocal,
-            ),
-        });
+            now,
+            DEJA_VU_FOLLOW_UP_MAX_AGE_MS,
+          );
+        }
       }
-    }
-    if (
-      cloneArmy &&
-      !specialCelebrationQueue.some((q) => q.kind === "cloneArmy")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "cloneArmy",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            CLONE_ARMY_CRIT_LABEL,
-            CLONE_ARMY_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      luckyClover &&
-      !specialCelebrationQueue.some((q) => q.kind === "luckyClover")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "luckyClover",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            LUCKY_CLOVER_CRIT_LABEL,
-            LUCKY_CLOVER_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      secondWind &&
-      !specialCelebrationQueue.some((q) => q.kind === "secondWind")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "secondWind",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            SECOND_WIND_CRIT_LABEL,
-            SECOND_WIND_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      executiveOrder &&
-      !specialCelebrationQueue.some((q) => q.kind === "executiveOrder")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "executiveOrder",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            EXECUTIVE_ORDER_CRIT_LABEL,
-            EXECUTIVE_ORDER_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (roundUp && !specialCelebrationQueue.some((q) => q.kind === "roundUp")) {
-      specialCelebrationQueue.push({
-        kind: "roundUp",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            ROUND_UP_CRIT_LABEL,
-            ROUND_UP_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      goldenHandshake &&
-      !specialCelebrationQueue.some((q) => q.kind === "goldenHandshake")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "goldenHandshake",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            GOLDEN_HANDSHAKE_CRIT_LABEL,
-            GOLDEN_HANDSHAKE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      supplyRun &&
-      !specialCelebrationQueue.some((q) => q.kind === "supplyRun")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "supplyRun",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            SUPPLY_RUN_CRIT_LABEL,
-            SUPPLY_RUN_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      casualFriday &&
-      !specialCelebrationQueue.some((q) => q.kind === "casualFriday")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "casualFriday",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            CASUAL_FRIDAY_CRIT_LABEL,
-            CASUAL_FRIDAY_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      fancyFriday &&
-      !specialCelebrationQueue.some((q) => q.kind === "fancyFriday")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "fancyFriday",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            FANCY_FRIDAY_CRIT_LABEL,
-            FANCY_FRIDAY_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      fireDrill &&
-      !specialCelebrationQueue.some((q) => q.kind === "fireDrill")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "fireDrill",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            FIRE_DRILL_CRIT_LABEL,
-            FIRE_DRILL_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      doubleDown &&
-      !specialCelebrationQueue.some((q) => q.kind === "doubleDown")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "doubleDown",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            DOUBLE_DOWN_CRIT_LABEL,
-            DOUBLE_DOWN_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      coffeeRun &&
-      !specialCelebrationQueue.some((q) => q.kind === "coffeeRun")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "coffeeRun",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            COFFEE_RUN_CRIT_LABEL,
-            COFFEE_RUN_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      teamBuilding &&
-      !specialCelebrationQueue.some((q) => q.kind === "teamBuilding")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "teamBuilding",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            TEAM_BUILDING_CRIT_LABEL,
-            TEAM_BUILDING_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      springCleaning &&
-      !specialCelebrationQueue.some((q) => q.kind === "springCleaning")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "springCleaning",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            SPRING_CLEANING_CRIT_LABEL,
-            SPRING_CLEANING_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      nightOwl &&
-      !specialCelebrationQueue.some((q) => q.kind === "nightOwl")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "nightOwl",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            NIGHT_OWL_CRIT_LABEL,
-            NIGHT_OWL_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      headhunter &&
-      !specialCelebrationQueue.some((q) => q.kind === "headhunter")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "headhunter",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            HEADHUNTER_CRIT_LABEL,
-            HEADHUNTER_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      sunshine &&
-      !specialCelebrationQueue.some((q) => q.kind === "sunshine")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "sunshine",
-        queuedAt: now,
-        run: () => celebrateSunshine(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (snowday && !specialCelebrationQueue.some((q) => q.kind === "snowday")) {
-      specialCelebrationQueue.push({
-        kind: "snowday",
-        queuedAt: now,
-        run: () => celebrateSnowday(floor, tier, getScreenCenterLocal),
-      });
-    }
-    if (
-      fastForward &&
-      !specialCelebrationQueue.some((q) => q.kind === "fastForward")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "fastForward",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            FAST_FORWARD_CRIT_LABEL,
-            FAST_FORWARD_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (frozen && !specialCelebrationQueue.some((q) => q.kind === "frozen")) {
-      specialCelebrationQueue.push({
-        kind: "frozen",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            FROZEN_CRIT_LABEL,
-            FROZEN_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      snowball &&
-      !specialCelebrationQueue.some((q) => q.kind === "snowball")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "snowball",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            SNOWBALL_CRIT_LABEL,
-            SNOWBALL_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      freeSale &&
-      !specialCelebrationQueue.some((q) => q.kind === "freeSale")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "freeSale",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            FREE_SALE_CRIT_LABEL,
-            FREE_SALE_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (payday && !specialCelebrationQueue.some((q) => q.kind === "payday")) {
-      specialCelebrationQueue.push({
-        kind: "payday",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            PAYDAY_CRIT_LABEL,
-            PAYDAY_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      goldStandard &&
-      !specialCelebrationQueue.some((q) => q.kind === "goldStandard")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "goldStandard",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            GOLD_STANDARD_CRIT_LABEL,
-            GOLD_STANDARD_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      royalFlush &&
-      !specialCelebrationQueue.some((q) => q.kind === "royalFlush")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "royalFlush",
-        queuedAt: now,
-        run: () =>
-          celebrateFlatProc(
-            ROYAL_FLUSH_CRIT_LABEL,
-            ROYAL_FLUSH_CRIT_COLOR,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
-      });
-    }
-    if (
-      nightShift &&
-      !specialCelebrationQueue.some((q) => q.kind === "nightShift")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "nightShift",
-        queuedAt: now,
-        run: () => celebrateNightShift(floor, tier, getScreenCenterLocal),
-      });
     }
     // "special crit crit": queued AFTER every proc's own celebration above,
     // so it plays right after theirs holds/fades — the queue's own
@@ -1814,4 +576,81 @@ export function triggerCritCelebration(
     return;
   }
   celebrateTier(floor, tier, getScreenCenterLocal);
+}
+
+// the handful of procs whose flash is more than the standard label+color
+// treatment celebrateFlatProc gives every other one
+const CUSTOM_PROC_CELEBRATIONS: Partial<
+  Record<
+    CritProcKind,
+    (
+      floor: Floor,
+      tier: CritTier,
+      getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+    ) => void
+  >
+> = {
+  chain: celebrateChain,
+  boost: celebrateBoost,
+  bounce: celebrateBounce,
+  explosion: celebrateExplosion,
+  booty: celebrateBooty,
+  heavenly: celebrateHeavenly,
+  sunshine: celebrateSunshine,
+  snowday: celebrateSnowday,
+  nightShift: celebrateNightShift,
+};
+
+// one of each kind at a time — a rapid pile-up of the same proc (e.g. a
+// bulk-buy hold repeatedly rolling "chain") shouldn't queue up N replays of
+// the identical celebration, just the first still-fresh one
+function queueProcCelebration(
+  kind: CritProcKind,
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+  now: number,
+  maxAgeMs?: number,
+): void {
+  if (specialCelebrationQueue.some((q) => q.kind === kind)) return;
+  const custom = CUSTOM_PROC_CELEBRATIONS[kind];
+  const info = CRIT_PROC_INFO[kind];
+  specialCelebrationQueue.push({
+    kind,
+    queuedAt: now,
+    maxAgeMs,
+    run: () =>
+      custom
+        ? custom(floor, tier, getScreenCenterLocal)
+        : celebrateFlatProc(
+            info.label,
+            info.color,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+  });
+}
+
+// Deja Vu's own bonus procs: only kinds that did NOT land on this roll, so it
+// always reads as "and these too" rather than replaying what already showed.
+// bullMarket is excluded — it has no per-floor reward to grant
+function pickDejaVuFollowUps(procs: Partial<CritProcFlags>): CritProcKind[] {
+  const available = CRIT_PROC_KINDS.filter(
+    (kind) =>
+      kind !== "dejaVu" &&
+      kind !== "bullMarket" &&
+      !procs[kind] &&
+      !specialCelebrationQueue.some((q) => q.kind === kind),
+  );
+  const picked: CritProcKind[] = [];
+  for (
+    let i = 0;
+    i < DEJA_VU_RANDOM_FOLLOW_UP_COUNT && available.length > 0;
+    i++
+  ) {
+    const index = Math.floor(Math.random() * available.length);
+    picked.push(available.splice(index, 1)[0]);
+  }
+  return picked;
 }
