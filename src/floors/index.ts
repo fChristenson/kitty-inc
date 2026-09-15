@@ -389,6 +389,7 @@ export {
   forceNightShiftCritUpgrade,
   forceInternCritUpgrade,
   forceUnionBossCritUpgrade,
+  forceRushHourCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,

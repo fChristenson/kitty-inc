@@ -100,6 +100,12 @@ export {
   INTERN_CRIT_LABEL,
   UNION_BOSS_CRIT_COLOR,
   UNION_BOSS_CRIT_LABEL,
+  RUSH_HOUR_CRIT_COLOR,
+  RUSH_HOUR_CRIT_LABEL,
+  RUSH_HOUR_DURATION_MS,
+  RUSH_HOUR_INTERVAL_SECONDS,
+  triggerRushHourCrit,
+  isRushHourActive,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -134,6 +140,7 @@ export {
   isNightShiftCrit,
   isInternCrit,
   isUnionBossCrit,
+  isRushHourCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -179,6 +186,7 @@ import {
   forceNightShiftCritProc,
   forceInternCritProc,
   forceUnionBossCritProc,
+  forceRushHourCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -232,6 +240,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.nightShift) forceNightShiftCritProc(floor);
     if (result.intern) forceInternCritProc(floor);
     if (result.unionBoss) forceUnionBossCritProc(floor);
+    if (result.rushHour) forceRushHourCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -302,6 +311,7 @@ export function forceFloorBuyCrit(
   intern = false,
   unionBoss = false,
   easterSale = false,
+  rushHour = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -340,6 +350,7 @@ export function forceFloorBuyCrit(
     nightShift,
     intern,
     unionBoss,
+    rushHour,
   };
 }
 
@@ -589,6 +600,14 @@ export function forceInternCritUpgrade(floor: Floor): void {
 export function forceUnionBossCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceUnionBossCritProc(floor);
+}
+
+// dev/test-only: force this floor's already-armed tier to also carry a Rush
+// Hour proc, bypassing chance entirely (see hud/testButton's "Spawn Rush
+// Hour Crit") — not tier-scaled, so no tier param needed
+export function forceRushHourCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceRushHourCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

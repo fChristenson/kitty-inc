@@ -60,6 +60,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-night-shift-crit" class="game__button">Spawn Night Shift Crit</button>
           <button id="spawn-intern-crit" class="game__button">Spawn Intern Crit</button>
           <button id="spawn-union-boss-crit" class="game__button">Spawn Union Boss Crit</button>
+          <button id="spawn-rush-hour-crit" class="game__button">Spawn Rush Hour Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -107,6 +108,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-night-shift-crit" class="game__button">Floor Night Shift Crit</button>
           <button id="floor-buy-intern-crit" class="game__button">Floor Intern Crit</button>
           <button id="floor-buy-union-boss-crit" class="game__button">Floor Union Boss Crit</button>
+          <button id="floor-buy-rush-hour-crit" class="game__button">Floor Rush Hour Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -556,6 +558,16 @@ export function wireSpawnUnionBossCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnRushHourCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-rush-hour-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireForceBonusTierCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -1000,6 +1012,16 @@ export function wireFloorBuyUnionBossCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-union-boss-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyRushHourCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-rush-hour-crit",
   )!;
   button.addEventListener("click", onClick);
 }

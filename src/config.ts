@@ -193,6 +193,14 @@ export const CONFIG = {
     // buyWorker/buyManager), free of charge
     internChance: 0.1,
     unionBossChance: 0.1,
+    // "Rush Hour" crit — for rushHourDurationMs, every unlocked floor's own
+    // income timer is capped at rushHourIntervalSeconds (never slowed down —
+    // see shared/critTypes' isRushHourActive), stacking with whatever worker
+    // boost/office-upgrade speedup already applies; a floor already faster
+    // than the cap is left completely untouched
+    rushHourChance: 0.1,
+    rushHourIntervalSeconds: 0.5,
+    rushHourDurationMs: 15000,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

@@ -10,6 +10,8 @@ import {
   getOvertimeTickGoal,
   getOvertimeCost,
   isFrozenActive,
+  isRushHourActive,
+  RUSH_HOUR_INTERVAL_SECONDS,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { getTotalIncome } from "../../totalIncome";
@@ -191,7 +193,17 @@ function currentSpeedMultiplier(floor: Floor, now: number): number {
   const boostedFraction =
     countBoostedWorkers(floor, now) / MAX_RENDERED_WORKERS;
   const boostExponent = boostedFraction * floor.workerCount;
-  return 2 ** boostExponent * officeUpgradeSpeedMultiplier(floor);
+  const speedMultiplier = 2 ** boostExponent * officeUpgradeSpeedMultiplier(floor);
+  if (!isRushHourActive(floor, now)) return speedMultiplier;
+  // "Rush Hour" crit (see shared/critTypes' isRushHourActive): the floor's
+  // own income timer is capped at RUSH_HOUR_INTERVAL_SECONDS while active —
+  // Math.max picks whichever multiplier yields the SMALLER (faster) interval,
+  // so this stacks with (never undoes) whatever worker/office speed already
+  // applies, and a floor already faster than the cap is left untouched
+  return Math.max(
+    speedMultiplier,
+    floor.incomeIntervalSeconds / RUSH_HOUR_INTERVAL_SECONDS,
+  );
 }
 
 // the interval/payout actually used for filling/paying out: each boosted visual worker

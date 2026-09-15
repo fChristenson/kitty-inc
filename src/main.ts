@@ -55,6 +55,7 @@ import {
   forceNightShiftCritUpgrade,
   forceInternCritUpgrade,
   forceUnionBossCritUpgrade,
+  forceRushHourCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
@@ -134,6 +135,7 @@ import {
   wireSpawnNightShiftCritButton,
   wireSpawnInternCritButton,
   wireSpawnUnionBossCritButton,
+  wireSpawnRushHourCritButton,
   wireForceBonusTierCritButton,
   wireForceBonusTierMegaCritButton,
   wireForceBonusTierUltraCritButton,
@@ -179,6 +181,7 @@ import {
   wireFloorBuyNightShiftCritButton,
   wireFloorBuyInternCritButton,
   wireFloorBuyUnionBossCritButton,
+  wireFloorBuyRushHourCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -656,6 +659,10 @@ async function main() {
     wireSpawnUnionBossCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceUnionBossCritUpgrade(floor);
+    });
+    wireSpawnRushHourCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceRushHourCritUpgrade(floor);
     });
     wireForceBonusTierCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1376,6 +1383,47 @@ async function main() {
         false,
         false,
         null,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyRushHourCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
+        false,
+        false,
         false,
         true,
       ),

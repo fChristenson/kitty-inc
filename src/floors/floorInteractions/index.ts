@@ -47,6 +47,7 @@ import {
   isNightShiftCrit,
   isInternCrit,
   isUnionBossCrit,
+  isRushHourCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -62,6 +63,7 @@ import {
   triggerSaleBoost,
   isOvertimeActive,
   triggerFrozenCrit,
+  triggerRushHourCrit,
   endOvertimeActiveWindow,
   isOvertimeDraining,
   getOvertimeCost,
@@ -527,6 +529,15 @@ function applyUnionBossCrit(floor: Floor): void {
   floor.hasManager = true;
 }
 
+// "Rush Hour" crit (see shared/critTypes's isRushHourCrit): no instant
+// payout — just starts the building-wide timed window (see
+// triggerRushHourCrit/isRushHourActive) during which every unlocked floor's
+// own income timer is capped at RUSH_HOUR_INTERVAL_SECONDS (see
+// incomePanel.ts's currentSpeedMultiplier)
+function applyRushHourCrit(floors: Floor[]): void {
+  triggerRushHourCrit(floors);
+}
+
 // "winter sale"/"spring sale"/"summer sale"/"autumn sale"/"halloween sale"
 // crits (see shared/critTypes's isWinterSaleCrit etc.) — all five share this
 // exact reward shape, only their icon/label/color AND discount size differ
@@ -742,6 +753,9 @@ export function handleFloorClick(
         // floor just bought/unlocked
         if (buyTier.intern) applyInternCrit(floor);
         if (buyTier.unionBoss) applyUnionBossCrit(floor);
+        // rush hour crit: caps every unlocked floor's own income timer at
+        // RUSH_HOUR_INTERVAL_SECONDS, building-wide, for its own duration
+        if (buyTier.rushHour) applyRushHourCrit(floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -831,6 +845,7 @@ export function handleFloorClick(
           buyTier.intern,
           buyTier.unionBoss,
           buyTier.easterSale,
+          buyTier.rushHour,
         );
     }
     return;
@@ -986,6 +1001,7 @@ export function handleFloorClick(
       const nightShift = isNightShiftCrit(floor);
       const intern = isInternCrit(floor);
       const unionBoss = isUnionBossCrit(floor);
+      const rushHour = isRushHourCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1132,6 +1148,9 @@ export function handleFloorClick(
       // that actually crit
       if (intern) applyInternCrit(floor);
       if (unionBoss) applyUnionBossCrit(floor);
+      // rush hour crit: caps every unlocked floor's own income timer at
+      // RUSH_HOUR_INTERVAL_SECONDS, building-wide, for its own duration
+      if (rushHour) applyRushHourCrit(floors);
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
@@ -1185,6 +1204,7 @@ export function handleFloorClick(
         intern,
         unionBoss,
         easterSale,
+        rushHour,
       );
       return;
     }

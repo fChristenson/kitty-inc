@@ -64,6 +64,8 @@ import {
   INTERN_CRIT_LABEL,
   UNION_BOSS_CRIT_COLOR,
   UNION_BOSS_CRIT_LABEL,
+  RUSH_HOUR_CRIT_COLOR,
+  RUSH_HOUR_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -545,6 +547,7 @@ interface QueuedCelebration {
     | "nightShift"
     | "intern"
     | "unionBoss"
+    | "rushHour"
     | "bonusTier";
   queuedAt: number;
   run: () => void;
@@ -653,6 +656,7 @@ export function triggerCritCelebration(
   intern = false,
   unionBoss = false,
   easterSale = false,
+  rushHour = false,
 ): void {
   if (
     chain ||
@@ -687,7 +691,8 @@ export function triggerCritCelebration(
     nightShift ||
     intern ||
     unionBoss ||
-    easterSale
+    easterSale ||
+    rushHour
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1001,6 +1006,23 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             EASTER_SALE_CRIT_LABEL,
             EASTER_SALE_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      rushHour &&
+      !specialCelebrationQueue.some((q) => q.kind === "rushHour")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "rushHour",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            RUSH_HOUR_CRIT_LABEL,
+            RUSH_HOUR_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

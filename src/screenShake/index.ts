@@ -212,6 +212,12 @@ let unionBossIcon: HTMLImageElement | null = null;
 loadImageByName("unionBoss").then((image) => {
   unionBossIcon = image;
 });
+// same idea again, drawn behind the "Rush Hour" flash text (see
+// shared/critTypes's isRushHourCrit)
+let sportscarIcon: HTMLImageElement | null = null;
+loadImageByName("sportscar").then((image) => {
+  sportscarIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -873,6 +879,13 @@ function drawFlashLayer(
       measuredWidth * 0.85,
     );
     ctx.drawImage(unionBossIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (label === "Rush Hour" && sportscarIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      sportscarIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(sportscarIcon, -iconW / 2, -iconH / 2, iconW, iconH);
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

@@ -366,6 +366,36 @@ export const UNION_BOSS_CRIT_CHANCE = CONFIG.crit.unionBossChance;
 export const UNION_BOSS_CRIT_COLOR = COLOR.unionBossSlate;
 export const UNION_BOSS_CRIT_LABEL = "Union Boss";
 
+// "Rush Hour" crit — also no instant reward: arming this proc just marks the
+// floor so that, once the crit is actually clicked, triggerRushHourCrit below
+// starts a CONFIG.crit.rushHourDurationMs window across the WHOLE building
+// during which every unlocked floor's own income timer is capped at
+// RUSH_HOUR_INTERVAL_SECONDS (see incomePanel.ts's currentSpeedMultiplier) —
+// this stacks with (never undoes) whatever worker-boost/office-upgrade speedup
+// already applies, and a floor already faster than the cap is left untouched
+export const RUSH_HOUR_CRIT_CHANCE = CONFIG.crit.rushHourChance;
+export const RUSH_HOUR_CRIT_COLOR = COLOR.orange;
+export const RUSH_HOUR_CRIT_LABEL = "Rush Hour";
+export const RUSH_HOUR_DURATION_MS = CONFIG.crit.rushHourDurationMs;
+export const RUSH_HOUR_INTERVAL_SECONDS = CONFIG.crit.rushHourIntervalSeconds;
+// a per-floor start timestamp, not a plain WeakSet flag — same shape as
+// Frozen's own frozenStartedAt, since this needs to know WHEN its window ends
+const rushHourStartedAt = new WeakMap<Floor, number>();
+
+// building-wide: arms every currently-unlocked floor at once (see
+// floorInteractions.ts's applyRushHourCrit)
+export function triggerRushHourCrit(floors: Floor[]): void {
+  const now = Date.now();
+  for (const floor of floors) {
+    if (floor.unlocked) rushHourStartedAt.set(floor, now);
+  }
+}
+
+export function isRushHourActive(floor: Floor, now: number): boolean {
+  const startedAt = rushHourStartedAt.get(floor);
+  return startedAt !== undefined && now - startedAt < RUSH_HOUR_DURATION_MS;
+}
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -402,6 +432,7 @@ const goldStandardCrits = new WeakSet<Floor>();
 const nightShiftCrits = new WeakSet<Floor>();
 const internCrits = new WeakSet<Floor>();
 const unionBossCrits = new WeakSet<Floor>();
+const rushHourCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -476,6 +507,7 @@ export interface CritRollResult {
   nightShift: boolean;
   intern: boolean;
   unionBoss: boolean;
+  rushHour: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -521,6 +553,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "nightShift",
   "intern",
   "unionBoss",
+  "rushHour",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -752,6 +785,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "unionBoss",
     description: "Grants the floor a free manager",
   },
+  rushHour: {
+    label: RUSH_HOUR_CRIT_LABEL,
+    icon: "sportscar",
+    description: "Caps every floor's income timer at 0.5s for 15s",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -828,6 +866,7 @@ export function rollCrit(
     if (Math.random() < NIGHT_SHIFT_CRIT_CHANCE) landed.push("nightShift");
     if (Math.random() < INTERN_CRIT_CHANCE) landed.push("intern");
     if (Math.random() < UNION_BOSS_CRIT_CHANCE) landed.push("unionBoss");
+    if (Math.random() < RUSH_HOUR_CRIT_CHANCE) landed.push("rushHour");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -879,6 +918,7 @@ export function rollCrit(
     nightShift: kept.has("nightShift"),
     intern: kept.has("intern"),
     unionBoss: kept.has("unionBoss"),
+    rushHour: kept.has("rushHour"),
   });
 }
 
@@ -1020,6 +1060,10 @@ export function isUnionBossCrit(floor: Floor): boolean {
   return unionBossCrits.has(floor);
 }
 
+export function isRushHourCrit(floor: Floor): boolean {
+  return rushHourCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1070,6 +1114,7 @@ export function consumeCritProcs(floor: Floor): void {
   nightShiftCrits.delete(floor);
   internCrits.delete(floor);
   unionBossCrits.delete(floor);
+  rushHourCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1210,6 +1255,10 @@ export function forceInternCritProc(floor: Floor): void {
 
 export function forceUnionBossCritProc(floor: Floor): void {
   unionBossCrits.add(floor);
+}
+
+export function forceRushHourCritProc(floor: Floor): void {
+  rushHourCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)
