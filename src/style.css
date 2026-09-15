@@ -871,10 +871,73 @@ body {
   flex-shrink: 0;
 }
 
-/* corporationBoostMenu's special-crits info list — a <details> per crit (native
-   expand/collapse, no JS needed) instead of a plain .worker-menu__item button,
-   since these rows aren't purchasable/pressable, just informational */
-.crit-info-item {
+/* this dialog's header holds a back arrow before the title, so it reads
+   left-to-right instead of pushing the two apart like every other menu's
+   title/close pairing does */
+#corporation-boost-menu .worker-menu__header {
+  justify-content: flex-start;
+}
+
+/* pinned to exactly the height .worker-menu__panel's shared max-height already
+   caps it at (same expression on purpose). A merely capped, content-driven
+   height is indefinite as far as percentage resolution goes, so the slider's
+   panes below could never size themselves against it and scrolled the whole
+   track instead of themselves */
+#corporation-boost-menu .worker-menu__panel {
+  height: calc(100vh - 180px - var(--worker-menu-safe-bottom, 3.75rem));
+}
+
+/* corporationBoostMenu's special-crits browser — two panes (a 3-column icon
+   grid and a single crit's detail card) sitting side by side on a track twice
+   the viewport's width, slid between by translating the track (see
+   corporationBoostMenu/index.ts's showDetail/showGrid). Each pane scrolls
+   itself, so both keep their own scroll position across a slide with no
+   save/restore needed */
+.crit-info-slider {
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+.crit-info-slider__track {
+  display: flex;
+  width: 200%;
+  height: 100%;
+  transition: transform 260ms ease;
+}
+
+.crit-info-slider--detail .crit-info-slider__track {
+  transform: translateX(-50%);
+}
+
+/* each pane is exactly half the double-width track, i.e. one slider width */
+.crit-info-slider__pane {
+  width: 50%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* must clear each tile's own 7px ring reach plus its count badge's 10px
+     outward offset, or this scroll container's overflow clips them */
+  padding: 14px 20px 14px 14px;
+}
+
+.crit-info-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* wide enough that a tile's count badge (pinned 10px outside its top-right
+     corner) never reaches the neighbouring tile's own 7px ring */
+  gap: 1.35rem;
+}
+
+/* one crit's icon in the grid — same wood-outline/cream-ring cartoon language
+   as .worker-menu__item, just a square tile */
+.crit-info-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 0.5rem;
   border: 3px solid var(--color-wood-outline);
   border-radius: 0.75rem;
   background: var(--color-amber-muted);
@@ -882,106 +945,112 @@ body {
     0 0 0 4px var(--color-wood-ring),
     0 0 0 7px var(--color-wood-outline),
     0 4px 0 0 var(--color-amber-muted-shadow);
-  color: var(--color-white);
-  overflow: hidden;
-  /* a flex item inside .worker-menu__list (flex column) otherwise gets
-     compressed below its own content's height once an expanded <details>
-     pushes the list's total content past its scrollable container's height —
-     flex-shrink kicks in BEFORE overflow-y:auto would ever scroll to reveal
-     it, clipping the description text instead of just scrolling to it */
-  flex-shrink: 0;
-}
-
-.crit-info-item__summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  font-weight: 600;
-  -webkit-text-stroke: 1px black;
-  paint-order: stroke fill;
   cursor: pointer;
-  list-style: none;
+  transition: transform 100ms ease;
 }
 
-.crit-info-item__summary::-webkit-details-marker {
-  display: none;
+.crit-info-tile:active {
+  transform: translateY(2px);
 }
 
-.crit-info-item__label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-/* wraps the icon so the count badge below can be positioned relative to it,
-   pinned to its top-right corner. The extra top/right margin reserves real
-   layout space for the badge's own outward overflow (matching its negative
-   offsets below) so .crit-info-item's overflow:hidden never clips it —
-   relying on the badge's absolute offset alone left it clipped at the top */
-.crit-info-item__icon-wrap {
-  position: relative;
-  flex-shrink: 0;
-  margin: 5px 6px 0 0;
+.crit-info-tile__icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* pill-shaped "how many times has this crit landed" collectible counter —
    see shared/critTypes/critProcCounts.ts. Only rendered for a count of 1+
-   (see corporationBoostMenu/index.ts's render()) */
-.crit-info-item__count-badge {
+   (see corporationBoostMenu/index.ts's renderGrid()). Pinned far enough out
+   to sit ON the tile's own cream/outline ring rather than inside the artwork,
+   and sized for the tile — the old list rows' badge was scaled for a 28px
+   icon and read as a smudge at this size */
+.crit-info-tile__count-badge {
   position: absolute;
-  top: -5px;
-  right: -6px;
-  min-width: 0.9rem;
-  height: 0.9rem;
-  padding: 0 0.2rem;
+  top: -10px;
+  right: -10px;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.3rem;
   border-radius: 999px;
   background: var(--color-white);
-  border: 1.5px solid black;
+  border: 3px solid var(--color-wood-outline);
   color: black;
-  font-size: 0.55rem;
+  font-size: 0.8rem;
   font-weight: 900;
-  line-height: calc(0.9rem - 3px);
+  line-height: calc(1.5rem - 6px);
   text-align: center;
   -webkit-text-stroke: 0;
 }
 
-.crit-info-item__name {
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.crit-info-item__chevron {
-  flex-shrink: 0;
+/* the second pane: one crit blown up, with its name/description underneath */
+.crit-info-detail {
   display: flex;
-  /* the shared arrow icon's native geometry points UP; rotated 180° by default
-     so it reads as a "collapsed, tap to expand" down-arrow, then rotated back
-     to upright once opened (see the [open] rule below) */
-  transform: rotate(180deg);
-  transition: transform 150ms ease;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.5rem 1rem;
 }
 
-.crit-info-item__chevron svg {
-  display: block;
+.crit-info-detail__icon {
+  width: min(60%, 180px);
+  aspect-ratio: 1;
+  object-fit: contain;
 }
 
-/* rotates to point up once its own <details> is expanded */
-.crit-info-item[open] .crit-info-item__chevron {
-  transform: rotate(0deg);
-}
-
-.crit-info-item__description {
+.crit-info-detail__name {
   margin: 0;
-  padding: 0 1rem 0.85rem 1rem;
-  font-weight: 400;
-  -webkit-text-stroke: 0.5px black;
+  font-size: 1.4rem;
+  color: var(--color-white);
+  -webkit-text-stroke: 2.5px black;
   paint-order: stroke fill;
+}
+
+.crit-info-detail__description {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-white);
+  -webkit-text-stroke: 1.5px black;
+  paint-order: stroke fill;
+}
+
+.crit-info-detail__count {
+  margin: 0;
+  font-weight: 800;
+  color: var(--color-wood-text);
+}
+
+.crit-info-detail__count--none {
+  opacity: 0.7;
+}
+
+/* header back arrow, only shown while the detail pane is open. The shared
+   arrow icon's native geometry points UP, so it's rotated a quarter turn
+   counter-clockwise to read as "back" */
+.crit-info-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin-right: 0.5rem;
+  border: 3px solid var(--color-wood-outline);
+  border-radius: 999px;
+  background: var(--color-amber-muted);
+  color: var(--color-white);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.crit-info-back[hidden] {
+  display: none;
+}
+
+.crit-info-back svg {
+  display: block;
+  transform: rotate(-90deg);
 }
 
 /* same wood-outline/cream-ring cartoon language as .worker-menu__item, just a
