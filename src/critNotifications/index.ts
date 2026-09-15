@@ -14,7 +14,7 @@ import {
 const NOTIFICATION_LIFE_MS = 1800;
 const FLOATING_X_RANGE_PX = 32;
 const FLOATING_DELAY_MS = 300;
-const FLOATING_WAVE_AMPLITUDE_PX = 30;
+const FLOATING_WAVE_AMPLITUDE_PX = 10;
 let overlay: HTMLDivElement | null = null;
 let unsubscribeCritEvents: (() => void) | null = null;
 
