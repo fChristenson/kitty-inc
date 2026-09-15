@@ -137,6 +137,8 @@ export {
   ROUND_UP_CRIT_STEP,
   GOLDEN_HANDSHAKE_CRIT_COLOR,
   GOLDEN_HANDSHAKE_CRIT_LABEL,
+  SUPPLY_RUN_CRIT_COLOR,
+  SUPPLY_RUN_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -186,6 +188,7 @@ export {
   isExecutiveOrderCrit,
   isRoundUpCrit,
   isGoldenHandshakeCrit,
+  isSupplyRunCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -246,6 +249,7 @@ import {
   forceExecutiveOrderCritProc,
   forceRoundUpCritProc,
   forceGoldenHandshakeCritProc,
+  forceSupplyRunCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -342,6 +346,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.executiveOrder) forceExecutiveOrderCritProc(floor);
     if (result.roundUp) forceRoundUpCritProc(floor);
     if (result.goldenHandshake) forceGoldenHandshakeCritProc(floor);
+    if (result.supplyRun) forceSupplyRunCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -475,6 +480,7 @@ export function forceFloorBuyCrit(
     executiveOrder: false,
     roundUp: false,
     goldenHandshake: false,
+    supplyRun: false,
   };
 }
 
@@ -536,6 +542,11 @@ export function forceGoldenHandshakeFloorBuyCrit(
 ): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.goldenHandshake = true;
+}
+
+export function forceSupplyRunFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.supplyRun = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -890,6 +901,11 @@ export function forceRoundUpCritUpgrade(floor: Floor): void {
 export function forceGoldenHandshakeCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceGoldenHandshakeCritProc(floor);
+}
+
+export function forceSupplyRunCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSupplyRunCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

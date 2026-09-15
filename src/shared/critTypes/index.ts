@@ -477,6 +477,12 @@ export const GOLDEN_HANDSHAKE_CRIT_CHANCE = CONFIG.crit.goldenHandshakeChance;
 export const GOLDEN_HANDSHAKE_CRIT_COLOR = COLOR.goldenHandshakeGold;
 export const GOLDEN_HANDSHAKE_CRIT_LABEL = "Golden Handshake";
 
+// "Supply Run" crit — Chair Giveaway and Supplies Giveaway at once, on the
+// floor that actually crit
+export const SUPPLY_RUN_CRIT_CHANCE = CONFIG.crit.supplyRunChance;
+export const SUPPLY_RUN_CRIT_COLOR = COLOR.supplyRunTan;
+export const SUPPLY_RUN_CRIT_LABEL = "Supply Run";
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -545,6 +551,7 @@ const secondWindCrits = new WeakSet<Floor>();
 const executiveOrderCrits = new WeakSet<Floor>();
 const roundUpCrits = new WeakSet<Floor>();
 const goldenHandshakeCrits = new WeakSet<Floor>();
+const supplyRunCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -634,6 +641,7 @@ export interface CritRollResult {
   executiveOrder: boolean;
   roundUp: boolean;
   goldenHandshake: boolean;
+  supplyRun: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -694,6 +702,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "executiveOrder",
   "roundUp",
   "goldenHandshake",
+  "supplyRun",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -1000,6 +1009,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "goldenHandshake",
     description: "Gives every unlocked floor a free manager",
   },
+  supplyRun: {
+    label: SUPPLY_RUN_CRIT_LABEL,
+    icon: "supplyRun",
+    description: "Free office chairs and supplies for the floor",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -1094,6 +1108,7 @@ export function rollCrit(
     if (Math.random() < ROUND_UP_CRIT_CHANCE) landed.push("roundUp");
     if (Math.random() < GOLDEN_HANDSHAKE_CRIT_CHANCE)
       landed.push("goldenHandshake");
+    if (Math.random() < SUPPLY_RUN_CRIT_CHANCE) landed.push("supplyRun");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -1160,6 +1175,7 @@ export function rollCrit(
     executiveOrder: kept.has("executiveOrder"),
     roundUp: kept.has("roundUp"),
     goldenHandshake: kept.has("goldenHandshake"),
+    supplyRun: kept.has("supplyRun"),
   });
 }
 
@@ -1361,6 +1377,10 @@ export function isGoldenHandshakeCrit(floor: Floor): boolean {
   return goldenHandshakeCrits.has(floor);
 }
 
+export function isSupplyRunCrit(floor: Floor): boolean {
+  return supplyRunCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1426,6 +1446,7 @@ export function consumeCritProcs(floor: Floor): void {
   executiveOrderCrits.delete(floor);
   roundUpCrits.delete(floor);
   goldenHandshakeCrits.delete(floor);
+  supplyRunCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1626,6 +1647,10 @@ export function forceRoundUpCritProc(floor: Floor): void {
 
 export function forceGoldenHandshakeCritProc(floor: Floor): void {
   goldenHandshakeCrits.add(floor);
+}
+
+export function forceSupplyRunCritProc(floor: Floor): void {
+  supplyRunCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

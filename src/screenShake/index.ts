@@ -65,6 +65,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Executive Order": { name: "executiveOrder" },
   "Round Up": { name: "roundUp" },
   "Golden Handshake": { name: "goldenHandshake" },
+  "Supply Run": { name: "supplyRun" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

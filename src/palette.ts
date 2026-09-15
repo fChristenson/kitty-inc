@@ -150,6 +150,8 @@ export const COLOR = {
   roundUpOrange: "#EA580C",
   // Golden Handshake crit's own dedicated color
   goldenHandshakeGold: "#CA8A04",
+  // Supply Run crit's own dedicated color
+  supplyRunTan: "#B45309",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

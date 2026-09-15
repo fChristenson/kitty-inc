@@ -73,6 +73,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-executive-order-crit" class="game__button">Spawn Executive Order Crit</button>
           <button id="spawn-round-up-crit" class="game__button">Spawn Round Up Crit</button>
           <button id="spawn-golden-handshake-crit" class="game__button">Spawn Golden Handshake Crit</button>
+          <button id="spawn-supply-run-crit" class="game__button">Spawn Supply Run Crit</button>
           <button id="spawn-golden-parachute-crit" class="game__button">Spawn Golden Parachute Crit</button>
           <button id="spawn-payout-crit" class="game__button">Spawn Payout Crit</button>
         </div>
@@ -137,6 +138,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-executive-order-crit" class="game__button">Floor Executive Order Crit</button>
           <button id="floor-buy-round-up-crit" class="game__button">Floor Round Up Crit</button>
           <button id="floor-buy-golden-handshake-crit" class="game__button">Floor Golden Handshake Crit</button>
+          <button id="floor-buy-supply-run-crit" class="game__button">Floor Supply Run Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -713,6 +715,16 @@ export function wireSpawnGoldenHandshakeCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-golden-handshake-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnSupplyRunCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-supply-run-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -1330,6 +1342,16 @@ export function wireFloorBuyGoldenHandshakeCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-golden-handshake-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuySupplyRunCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-supply-run-crit",
   )!;
   button.addEventListener("click", onClick);
 }

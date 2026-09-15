@@ -95,6 +95,7 @@ const IMAGE_FILES = {
   executiveOrder: "executiveOrder.png", // Executive Order crit flash's own backdrop icon
   roundUp: "roundUp.png", // Round Up crit flash's own backdrop icon
   goldenHandshake: "goldenHandshake.png", // Golden Handshake crit flash's own backdrop icon
+  supplyRun: "supplyRun.png", // Supply Run crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 
