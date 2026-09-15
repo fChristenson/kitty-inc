@@ -436,20 +436,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return { x: FLOOR_W / 2, y: worldCenterY - floorTop };
   }
 
-  function screenPointFromFloorLocal(
-    floor: Floor,
-    localX: number,
-    localY: number,
-  ): { x: number; y: number } {
-    const loc = floorLocation.get(floor);
-    const floorTop = loc ? floorWorldY(loc.floorIndex).top : 0;
-    const rect = canvas.getBoundingClientRect();
-    return {
-      x: rect.left + scale * (GUTTER_W + localX),
-      y: rect.top + scale * (floorTop + localY - viewportTopY()),
-    };
-  }
-
   function redraw(): void {
     // the canvas measures 0x0 while hidden (e.g. the city map view is showing
     // instead) or for a stray frame or two around a visibility toggle before its
@@ -514,12 +500,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // so the actual bottom edge is captured for the HUD tap-zone hit-test below
     // instead of guessing a fixed height
     hudBottomY = drawHud(ctx, SLOT_W, getTotalIncome());
-    // pops up dead center over the whole viewport for the same brief window as the
-    // shake above it (still inside the shake's own translate, so it rattles too —
-    // reinforces the "this hit hard" feeling rather than floating serenely above it)
     drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
-    // "special crit crit" bonus-tier coins (see bonusTierFx), flying from that
-    // same flash-text spot up to roughly where the total-income readout sits
     drawBonusTierCoins(
       ctx,
       SLOT_W / 2,
@@ -531,7 +512,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     );
     ctx.restore();
   }
-
 
   // --- input: one pointer drag drives floor-scroll (vertical only — there's no
   // horizontal camera anymore, only one building is ever on screen) ---
@@ -617,7 +597,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         persist,
         onFloorAdded: (floor) => notifyFloorAdded(floor),
         getScreenCenterLocal: screenCenterLocalFor,
-        getScreenPointFromFloorLocal: screenPointFromFloorLocal,
       },
       hit.floor,
       hit.localX,

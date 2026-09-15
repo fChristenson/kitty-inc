@@ -61,7 +61,6 @@ export {
   createTestButtonMarkup,
   wireTestButton,
   wireSpawnMouseButton,
-  wireSpawnRandomCritFloatsButton,
   wireSpawnCritButton,
   wireSpawnMegaCritButton,
   wireSpawnUltraCritButton,

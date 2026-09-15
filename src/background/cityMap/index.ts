@@ -52,8 +52,6 @@ import {
   type CritTier,
   type CritRollResult,
 } from "../../shared/critTypes";
-import { CRIT_PROC_INFO, CRIT_PROC_KINDS } from "../../shared/critTypes";
-import { enqueueCritDisplayEvents } from "../../shared/critEvents";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
@@ -463,11 +461,6 @@ export function createCityMapView(
     drawCityPageIndicator(buildingCount);
 
     updateArrows(buildingCount);
-    // same crit flash triggerMapCatCritCelebration fires — gameCanvas.ts draws its
-    // own copy on the building canvas, but this map canvas is a totally separate
-    // <canvas> that never drew it at all, so the "x5"/"x25"/"x125" text (and
-    // "MAXED!") never appeared here. Still inside the shake's own translate above,
-    // same as gameCanvas.ts, so it rattles along with everything else
     drawCritFlash(ctx, cssW / 2, cssH / 2, cssW, Date.now());
     ctx.restore();
   }
@@ -504,25 +497,6 @@ export function createCityMapView(
     feetY: number,
   ): void {
     const { tier, chain } = result;
-    enqueueCritDisplayEvents([
-      {
-        label: CRIT_TIER_CONFIG[tier].label,
-        color: CRIT_TIER_CONFIG[tier].color,
-        anchor: { x: cx, y: feetY },
-      },
-    ]);
-    for (const kind of CRIT_PROC_KINDS) {
-      if (!result[kind]) continue;
-      const info = CRIT_PROC_INFO[kind];
-      enqueueCritDisplayEvents([
-        {
-          label: info.label,
-          color: CRIT_TIER_CONFIG[tier].color,
-          icon: info.icon,
-          anchor: { x: cx, y: feetY },
-        },
-      ]);
-    }
     const burstY = feetY - MARKER_H / 2;
     const burstCount = tier === "ultra" ? 5 : tier === "mega" ? 3 : 2;
     for (let i = 0; i < burstCount; i++) {

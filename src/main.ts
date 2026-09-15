@@ -110,7 +110,6 @@ import {
   createTestButtonMarkup,
   wireTestButton,
   wireSpawnMouseButton,
-  wireSpawnRandomCritFloatsButton,
   wireSpawnCritButton,
   wireSpawnMegaCritButton,
   wireSpawnUltraCritButton,
@@ -280,8 +279,6 @@ import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation, getCorporationPrice } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
 import { getBackgroundUrls } from "./loadAssets";
-import { spawnRandomCritNotificationBurst } from "./critNotifications";
-import { initCritNotifications } from "./critNotifications";
 
 // matches style.css's worker-menu-slide-out-* keyframes (0.352s) — the company
 // select menu's own close animation duration
@@ -302,7 +299,6 @@ async function main() {
     <div class="game">
       <canvas class="game__canvas" id="game-canvas"></canvas>
       ${createCityMapMarkup()}
-      <div class="crit-notifications" id="crit-notifications" aria-hidden="true"></div>
       ${createActionBarMarkup()}
       ${import.meta.env.MODE !== "production" ? createTestButtonMarkup() : ""}
     </div>
@@ -315,8 +311,6 @@ async function main() {
     ${createMapMenuMarkup()}
     ${createTotalEarnedOverlayMarkup()}
   `;
-  initCritNotifications(app.querySelector<HTMLDivElement>("#crit-notifications")!);
-
   const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
   const cityMapEl = app.querySelector<HTMLDivElement>("#city-map")!;
   observeActionBarHeight(app.querySelector<HTMLDivElement>("#action-bar")!);
@@ -535,10 +529,6 @@ async function main() {
     });
     wireSpawnMouseButton(app, () => {
       forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
-    });
-    wireSpawnRandomCritFloatsButton(app, () => {
-      spawnRandomCritNotificationBurst();
-      gameCanvas.redraw();
     });
     wireSpawnCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1607,7 +1597,9 @@ async function main() {
       forceEspressoShotFloorBuyCrit("crit"),
     );
     wireFloorBuyDejaVuCritButton(app, () => forceDejaVuFloorBuyCrit("crit"));
-    wireFloorBuyCloneArmyCritButton(app, () => forceCloneArmyFloorBuyCrit("crit"));
+    wireFloorBuyCloneArmyCritButton(app, () =>
+      forceCloneArmyFloorBuyCrit("crit"),
+    );
     wireFloorBuyGoldenParachuteCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",

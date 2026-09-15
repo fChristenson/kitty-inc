@@ -1,11 +1,6 @@
 import type { Floor } from "../../gameState";
-import type { ImageName } from "../../loadAssets";
-import {
-  CRIT_PROC_INFO,
-  CRIT_PROC_KINDS,
-  type CritProcKind,
-} from "../../shared/critTypes";
-import { enqueueCritDisplayEvents } from "../../shared/critEvents";
+import { type CritProcKind } from "../../shared/critTypes";
+import { CRIT_PROC_INFO, CRIT_PROC_KINDS } from "../../shared/critTypes";
 import {
   type CritTier,
   CRIT_TIER_CONFIG,
@@ -584,11 +579,14 @@ interface QueuedCelebration {
     | "cloneArmy"
     | "bonusTier";
   queuedAt: number;
+  maxAgeMs?: number;
   run: () => void;
 }
 const specialCelebrationQueue: QueuedCelebration[] = [];
 let drainingSpecialQueue = false;
 type RandomFollowUpKind = Exclude<CritProcKind, "bullMarket" | "dejaVu">;
+const DEJA_VU_RANDOM_FOLLOW_UP_COUNT = 2;
+const DEJA_VU_FOLLOW_UP_MAX_AGE_MS = 5000;
 
 // a bulk-buy hold (x250 multiplier) can land many chain/boost procs far
 // faster than they can each get their own on-screen turn — anything still
@@ -632,7 +630,10 @@ function drainSpecialCelebrationQueue(): void {
       drainingSpecialQueue = false;
       return;
     }
-    if (Date.now() - popped.queuedAt > CELEBRATION_QUEUE_MAX_AGE_MS) {
+    if (
+      Date.now() - popped.queuedAt >
+      (popped.maxAgeMs ?? CELEBRATION_QUEUE_MAX_AGE_MS)
+    ) {
       step();
       return;
     }
@@ -657,7 +658,7 @@ export function triggerCritCelebration(
   floor: Floor,
   tier: CritTier,
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-  chainOption: boolean | { x: number; y: number } = false,
+  chain = false,
   boost = false,
   bounce = false,
   explosion = false,
@@ -701,26 +702,7 @@ export function triggerCritCelebration(
   espressoShot = false,
   dejaVu = false,
   cloneArmy = false,
-  displayAnchor?: { x: number; y: number },
 ): void {
-  const chain = typeof chainOption === "boolean" ? chainOption : false;
-  const resolvedDisplayAnchor =
-    typeof chainOption === "boolean" ? displayAnchor : chainOption;
-  const enqueueDisplayEvents = (
-    events: { label: string; color: string; icon?: ImageName }[],
-  ): void =>
-    enqueueCritDisplayEvents(
-      events.map((event) => ({ ...event, anchor: resolvedDisplayAnchor })),
-    );
-
-  enqueueDisplayEvents([
-    { label: CRIT_TIER_CONFIG[tier].label, color: tierColor(tier) },
-  ]);
-  if (dejaVu) {
-    enqueueDisplayEvents([
-      { label: CRIT_TIER_CONFIG[tier].label, color: tierColor(tier) },
-    ]);
-  }
   const procFlags: Partial<Record<CritProcKind, boolean>> = {
     chain,
     boost,
@@ -766,19 +748,6 @@ export function triggerCritCelebration(
     dejaVu,
     cloneArmy,
   };
-  for (const kind of CRIT_PROC_KINDS) {
-    if (!procFlags[kind]) continue;
-    const info = CRIT_PROC_INFO[kind];
-    if (kind === "dejaVu") {
-      enqueueDisplayEvents([
-        { label: info.label, color: tierColor(tier), icon: info.icon },
-      ]);
-    } else {
-      enqueueDisplayEvents([
-        { label: info.label, color: tierColor(tier), icon: info.icon },
-      ]);
-    }
-  }
   if (
     chain ||
     boost ||
@@ -821,8 +790,8 @@ export function triggerCritCelebration(
     grandOpening ||
     fullyStaffed ||
     espressoShot ||
-    dejaVu
-    || cloneArmy
+    dejaVu ||
+    cloneArmy
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1296,22 +1265,20 @@ export function triggerCritCelebration(
           !procFlags[kind] &&
           !specialCelebrationQueue.some((q) => q.kind === kind),
       ) as RandomFollowUpKind[];
-      for (let i = 0; i < 2 && availableFollowUps.length > 0; i++) {
+      for (
+        let i = 0;
+        i < DEJA_VU_RANDOM_FOLLOW_UP_COUNT && availableFollowUps.length > 0;
+        i++
+      ) {
         const randomIndex = Math.floor(
           Math.random() * availableFollowUps.length,
         );
         const followUpKind = availableFollowUps.splice(randomIndex, 1)[0];
         const followUpInfo = CRIT_PROC_INFO[followUpKind];
-        enqueueDisplayEvents([
-          {
-            label: followUpInfo.label,
-            color: tierColor(tier),
-            icon: followUpInfo.icon,
-          },
-        ]);
         specialCelebrationQueue.push({
           kind: followUpKind,
           queuedAt: now,
+          maxAgeMs: DEJA_VU_FOLLOW_UP_MAX_AGE_MS,
           run: () =>
             celebrateFlatProc(
               followUpInfo.label,

@@ -226,11 +226,6 @@ export interface FloorActionsDeps {
   // drawn) into this floor's own local coordinate space, so a coin burst can be
   // anchored there instead of at a fixed floor-local point
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number };
-  getScreenPointFromFloorLocal: (
-    floor: Floor,
-    x: number,
-    y: number,
-  ) => { x: number; y: number };
 }
 
 // re-exported for floors/index.ts's facade — the canonical check now lives in
@@ -707,9 +702,7 @@ export function handleFloorClick(
     persist,
     onFloorAdded,
     getScreenCenterLocal,
-    getScreenPointFromFloorLocal,
   } = deps;
-  const displayAnchor = getScreenPointFromFloorLocal(floor, x, y);
 
   // "Work overtime" boost's drain tail (see floors/upgradeButton): while the
   // gauge is ticking back down, the bar itself wiggles and becomes clickable —
@@ -998,7 +991,6 @@ export function handleFloorClick(
           buyTier.espressoShot,
           buyTier.dejaVu,
           buyTier.cloneArmy,
-          displayAnchor,
         );
     }
     return;
@@ -1031,13 +1023,7 @@ export function handleFloorClick(
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
-      if (tier)
-        triggerCritCelebration(
-          floor,
-          tier,
-          getScreenCenterLocal,
-          displayAnchor,
-        );
+      if (tier) triggerCritCelebration(floor, tier, getScreenCenterLocal);
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
       const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
@@ -1092,12 +1078,7 @@ export function handleFloorClick(
           getScreenCenterLocal,
         );
       } else if (tier) {
-        triggerCritCelebration(
-          floor,
-          tier,
-          getScreenCenterLocal,
-          displayAnchor,
-        );
+        triggerCritCelebration(floor, tier, getScreenCenterLocal);
       }
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
@@ -1406,7 +1387,6 @@ export function handleFloorClick(
         espressoShot,
         dejaVu,
         cloneArmy,
-        displayAnchor,
       );
       return;
     }
