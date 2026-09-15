@@ -145,6 +145,8 @@ export {
   FANCY_FRIDAY_CRIT_COLOR,
   FANCY_FRIDAY_CRIT_LABEL,
   FANCY_FRIDAY_CRIT_UPGRADES,
+  FIRE_DRILL_CRIT_COLOR,
+  FIRE_DRILL_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -197,6 +199,7 @@ export {
   isSupplyRunCrit,
   isCasualFridayCrit,
   isFancyFridayCrit,
+  isFireDrillCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -260,6 +263,7 @@ import {
   forceSupplyRunCritProc,
   forceCasualFridayCritProc,
   forceFancyFridayCritProc,
+  forceFireDrillCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -359,6 +363,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.supplyRun) forceSupplyRunCritProc(floor);
     if (result.casualFriday) forceCasualFridayCritProc(floor);
     if (result.fancyFriday) forceFancyFridayCritProc(floor);
+    if (result.fireDrill) forceFireDrillCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -495,6 +500,7 @@ export function forceFloorBuyCrit(
     supplyRun: false,
     casualFriday: false,
     fancyFriday: false,
+    fireDrill: false,
   };
 }
 
@@ -571,6 +577,11 @@ export function forceCasualFridayFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceFancyFridayFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.fancyFriday = true;
+}
+
+export function forceFireDrillFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.fireDrill = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -940,6 +951,11 @@ export function forceCasualFridayCritUpgrade(floor: Floor): void {
 export function forceFancyFridayCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceFancyFridayCritProc(floor);
+}
+
+export function forceFireDrillCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFireDrillCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

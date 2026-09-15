@@ -102,6 +102,8 @@ import {
   CASUAL_FRIDAY_CRIT_LABEL,
   FANCY_FRIDAY_CRIT_COLOR,
   FANCY_FRIDAY_CRIT_LABEL,
+  FIRE_DRILL_CRIT_COLOR,
+  FIRE_DRILL_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -601,6 +603,7 @@ interface QueuedCelebration {
     | "supplyRun"
     | "casualFriday"
     | "fancyFriday"
+    | "fireDrill"
     | "bonusTier";
   queuedAt: number;
   maxAgeMs?: number;
@@ -734,6 +737,7 @@ export function triggerCritCelebration(
   supplyRun = false,
   casualFriday = false,
   fancyFriday = false,
+  fireDrill = false,
 ): void {
   const procFlags: Partial<Record<CritProcKind, boolean>> = {
     chain,
@@ -787,6 +791,7 @@ export function triggerCritCelebration(
     supplyRun,
     casualFriday,
     fancyFriday,
+    fireDrill,
   };
   if (
     chain ||
@@ -839,7 +844,8 @@ export function triggerCritCelebration(
     goldenHandshake ||
     supplyRun ||
     casualFriday ||
-    fancyFriday
+    fancyFriday ||
+    fireDrill
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1482,6 +1488,23 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             FANCY_FRIDAY_CRIT_LABEL,
             FANCY_FRIDAY_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      fireDrill &&
+      !specialCelebrationQueue.some((q) => q.kind === "fireDrill")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "fireDrill",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            FIRE_DRILL_CRIT_LABEL,
+            FIRE_DRILL_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

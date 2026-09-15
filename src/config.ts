@@ -250,6 +250,9 @@ export const CONFIG = {
     // "Fancy Friday" crit — Casual Friday's bigger sibling: twice the free
     // upgrades on every unlocked floor
     fancyFridayChance: 0.0005,
+    // "Fire Drill" crit — instantly completes every unlocked floor's income
+    // timer once, paying it out and restarting the bar
+    fireDrillChance: 0.0005,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

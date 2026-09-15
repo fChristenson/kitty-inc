@@ -496,6 +496,13 @@ export const FANCY_FRIDAY_CRIT_COLOR = COLOR.fancyFridayIndigo;
 export const FANCY_FRIDAY_CRIT_LABEL = "Fancy Friday";
 export const FANCY_FRIDAY_CRIT_UPGRADES = 10;
 
+// "Fire Drill" crit — unlike tick tock (which pays out without disturbing
+// any bar), this actually COMPLETES every unlocked floor's income timer:
+// full payout, then the bar restarts from empty
+export const FIRE_DRILL_CRIT_CHANCE = CONFIG.crit.fireDrillChance;
+export const FIRE_DRILL_CRIT_COLOR = COLOR.fireDrillRed;
+export const FIRE_DRILL_CRIT_LABEL = "Fire Drill";
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -567,6 +574,7 @@ const goldenHandshakeCrits = new WeakSet<Floor>();
 const supplyRunCrits = new WeakSet<Floor>();
 const casualFridayCrits = new WeakSet<Floor>();
 const fancyFridayCrits = new WeakSet<Floor>();
+const fireDrillCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -659,6 +667,7 @@ export interface CritRollResult {
   supplyRun: boolean;
   casualFriday: boolean;
   fancyFriday: boolean;
+  fireDrill: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -722,6 +731,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "supplyRun",
   "casualFriday",
   "fancyFriday",
+  "fireDrill",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -1043,6 +1053,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "fancyFriday",
     description: "Ten free upgrades on every unlocked floor",
   },
+  fireDrill: {
+    label: FIRE_DRILL_CRIT_LABEL,
+    icon: "fireDrill",
+    description: "Completes every floor's income timer at once",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -1140,6 +1155,7 @@ export function rollCrit(
     if (Math.random() < SUPPLY_RUN_CRIT_CHANCE) landed.push("supplyRun");
     if (Math.random() < CASUAL_FRIDAY_CRIT_CHANCE) landed.push("casualFriday");
     if (Math.random() < FANCY_FRIDAY_CRIT_CHANCE) landed.push("fancyFriday");
+    if (Math.random() < FIRE_DRILL_CRIT_CHANCE) landed.push("fireDrill");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -1209,6 +1225,7 @@ export function rollCrit(
     supplyRun: kept.has("supplyRun"),
     casualFriday: kept.has("casualFriday"),
     fancyFriday: kept.has("fancyFriday"),
+    fireDrill: kept.has("fireDrill"),
   });
 }
 
@@ -1422,6 +1439,10 @@ export function isFancyFridayCrit(floor: Floor): boolean {
   return fancyFridayCrits.has(floor);
 }
 
+export function isFireDrillCrit(floor: Floor): boolean {
+  return fireDrillCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1490,6 +1511,7 @@ export function consumeCritProcs(floor: Floor): void {
   supplyRunCrits.delete(floor);
   casualFridayCrits.delete(floor);
   fancyFridayCrits.delete(floor);
+  fireDrillCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1702,6 +1724,10 @@ export function forceCasualFridayCritProc(floor: Floor): void {
 
 export function forceFancyFridayCritProc(floor: Floor): void {
   fancyFridayCrits.add(floor);
+}
+
+export function forceFireDrillCritProc(floor: Floor): void {
+  fireDrillCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

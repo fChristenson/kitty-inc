@@ -156,6 +156,8 @@ export const COLOR = {
   casualFridayTeal: "#0D9488",
   // Fancy Friday crit's own dedicated color
   fancyFridayIndigo: "#4338CA",
+  // Fire Drill crit's own dedicated color
+  fireDrillRed: "#DC2626",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

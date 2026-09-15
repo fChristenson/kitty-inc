@@ -68,6 +68,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Supply Run": { name: "supplyRun" },
   "Casual Friday": { name: "casualFriday" },
   "Fancy Friday": { name: "fancyFriday" },
+  "Fire Drill": { name: "fireDrill" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();
