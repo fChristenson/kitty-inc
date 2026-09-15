@@ -9,7 +9,10 @@ const FLOOD_LO = 220;
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
 const src = path.join(assets, "cloneArmy.jfif");
 const dest = path.join(assets, "cloneArmy.png");
-const { data, info } = await sharp(src).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+const { data, info } = await sharp(src)
+  .ensureAlpha()
+  .raw()
+  .toBuffer({ resolveWithObject: true });
 const { width, height, channels } = info;
 const whitenessAt = (x, y) => {
   const i = (y * width + x) * channels;
@@ -25,8 +28,14 @@ function tryEnqueue(x, y) {
   isBackground[idx] = 1;
   queue[qTail++] = idx;
 }
-for (let x = 0; x < width; x++) { tryEnqueue(x, 0); tryEnqueue(x, height - 1); }
-for (let y = 0; y < height; y++) { tryEnqueue(0, y); tryEnqueue(width - 1, y); }
+for (let x = 0; x < width; x++) {
+  tryEnqueue(x, 0);
+  tryEnqueue(x, height - 1);
+}
+for (let y = 0; y < height; y++) {
+  tryEnqueue(0, y);
+  tryEnqueue(width - 1, y);
+}
 while (qHead < qTail) {
   const idx = queue[qHead++];
   const x = idx % width;
@@ -36,33 +45,56 @@ while (qHead < qTail) {
   if (y > 0) tryEnqueue(x, y - 1);
   if (y < height - 1) tryEnqueue(x, y + 1);
 }
-for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
-  const pixelIdx = y * width + x;
-  if (!isBackground[pixelIdx]) continue;
-  const whiteness = whitenessAt(x, y);
-  const alpha = whiteness >= WHITE_HI ? 0 : whiteness <= WHITE_LO ? 255 : Math.round(255 * (1 - (whiteness - WHITE_LO) / (WHITE_HI - WHITE_LO)));
-  data[pixelIdx * channels + 3] = Math.min(data[pixelIdx * channels + 3], alpha);
-}
+for (let y = 0; y < height; y++)
+  for (let x = 0; x < width; x++) {
+    const pixelIdx = y * width + x;
+    if (!isBackground[pixelIdx]) continue;
+    const whiteness = whitenessAt(x, y);
+    const alpha =
+      whiteness >= WHITE_HI
+        ? 0
+        : whiteness <= WHITE_LO
+          ? 255
+          : Math.round(
+              255 * (1 - (whiteness - WHITE_LO) / (WHITE_HI - WHITE_LO)),
+            );
+    data[pixelIdx * channels + 3] = Math.min(
+      data[pixelIdx * channels + 3],
+      alpha,
+    );
+  }
 keepLargestOpaqueComponent(data, width, height, channels);
 const alphaAt = (y, x) => data[(y * width + x) * channels + 3];
 const cutoff = 20;
 function firstOpaque(limit, span, get) {
   for (let a = 0; a < limit; a++) {
     let count = 0;
-    for (let b = 0; b < span; b++) { if (get(a, b) > cutoff) { if (++count >= 20) return a; } else count = 0; }
+    for (let b = 0; b < span; b++) {
+      if (get(a, b) > cutoff) {
+        if (++count >= 20) return a;
+      } else count = 0;
+    }
   }
   return limit;
 }
 const minY = firstOpaque(height, width, (y, x) => alphaAt(y, x));
-const maxY = height - 1 - firstOpaque(height, width, (y, x) => alphaAt(height - 1 - y, x));
+const maxY =
+  height - 1 - firstOpaque(height, width, (y, x) => alphaAt(height - 1 - y, x));
 const minX = firstOpaque(width, height, (x, y) => alphaAt(y, x));
-const maxX = width - 1 - firstOpaque(width, height, (x, y) => alphaAt(y, width - 1 - x));
+const maxX =
+  width - 1 - firstOpaque(width, height, (x, y) => alphaAt(y, width - 1 - x));
 const croppedW = maxX - minX + 1;
 const croppedH = maxY - minY + 1;
-const cropped = await sharp(data, { raw: { width, height, channels } }).extract({ left: minX, top: minY, width: croppedW, height: croppedH }).ensureAlpha().raw().toBuffer();
+const cropped = await sharp(data, { raw: { width, height, channels } })
+  .extract({ left: minX, top: minY, width: croppedW, height: croppedH })
+  .ensureAlpha()
+  .raw()
+  .toBuffer();
 const shadowed = await addDropShadow(cropped, croppedW, croppedH);
 const outputWidth = Math.min(250, shadowed.width);
-const outputHeight = Math.round(shadowed.height * (outputWidth / shadowed.width));
+const outputHeight = Math.round(
+  shadowed.height * (outputWidth / shadowed.width),
+);
 const resized = await sharp(shadowed.data, {
   raw: { width: shadowed.width, height: shadowed.height, channels: 4 },
 })
@@ -71,8 +103,7 @@ const resized = await sharp(shadowed.data, {
   .raw()
   .toBuffer({ resolveWithObject: true });
 const removeHeadArcs = (x, y) =>
-  y <= 27 &&
-  ((x >= 18 && x <= 88) || (x >= 140 && x <= 212));
+  y <= 27 && ((x >= 18 && x <= 88) || (x >= 140 && x <= 212));
 const removeWhiteEarGaps = (x, y) =>
   y <= 50 &&
   ((x >= 0 && x <= 92) || (x >= 80 && x <= 170) || (x >= 158 && x <= 249));
@@ -80,8 +111,15 @@ for (let y = 0; y < resized.info.height; y++) {
   for (let x = 0; x < resized.info.width; x++) {
     const i = (y * resized.info.width + x) * resized.info.channels;
     if (removeHeadArcs(x, y)) {
-      resized.data[i + 3] = 0;
-      continue;
+      const maximum = Math.max(
+        resized.data[i],
+        resized.data[i + 1],
+        resized.data[i + 2],
+      );
+      if (maximum < 150) {
+        resized.data[i + 3] = 0;
+        continue;
+      }
     }
     if (removeWhiteEarGaps(x, y)) {
       const red = resized.data[i];
