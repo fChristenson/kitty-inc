@@ -67,6 +67,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Golden Handshake": { name: "goldenHandshake" },
   "Supply Run": { name: "supplyRun" },
   "Casual Friday": { name: "casualFriday" },
+  "Fancy Friday": { name: "fancyFriday" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

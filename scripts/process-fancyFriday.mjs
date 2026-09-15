@@ -4,23 +4,26 @@ import fs from "node:fs/promises";
 import { addDropShadow } from "./lib/synthetic-drop-shadow.mjs";
 import { keepLargestOpaqueComponent } from "./lib/keep-largest-component.mjs";
 
-// the cat's white paws/muzzle and cream scarf are pale enough to fall inside
-// these thresholds, so the fill is seeded from the border rather than applied
-// per-pixel — it can't cross the heavy outline to reach them. Kept low enough
-// to also eat the ragged pale sketch rim drawn around the whole scene
+// the monocle lens and shirt collar are pale enough to fall inside these
+// thresholds, so the fill is seeded from the border rather than applied
+// per-pixel — it can't cross their outlines to reach them. Kept low enough to
+// also eat the ragged pale sketch rim drawn around the whole scene
 const WHITE_LO = 195;
 const WHITE_HI = 235;
 const FLOOD_LO = 195;
+// the curled tail closes off a sliver of background against the jacket sleeve
+// that the border-seeded fill can never reach, so it gets its own seed point
+const EXTRA_FLOOD_SEEDS = [[368, 690]];
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const src = path.join(assets, "casualFriday.jfif");
-const dest = path.join(assets, "casualFriday.png");
+const src = path.join(assets, "fancyFriday.jfif");
+const dest = path.join(assets, "fancyFriday.png");
 // loadAssets' IMAGE_FILES glob only sees the theme's own dist/ root
 const themeDest = path.join(
   assets,
   "themes",
   "references",
   "dist",
-  "casualFriday.png",
+  "fancyFriday.png",
 );
 
 const { data, info } = await sharp(src)
@@ -50,6 +53,7 @@ for (let y = 0; y < height; y++) {
   tryEnqueue(0, y);
   tryEnqueue(width - 1, y);
 }
+for (const [x, y] of EXTRA_FLOOD_SEEDS) tryEnqueue(x, y);
 while (qHead < qTail) {
   const idx = queue[qHead++];
   const x = idx % width;

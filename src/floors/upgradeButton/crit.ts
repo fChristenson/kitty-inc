@@ -142,6 +142,9 @@ export {
   CASUAL_FRIDAY_CRIT_COLOR,
   CASUAL_FRIDAY_CRIT_LABEL,
   CASUAL_FRIDAY_CRIT_UPGRADES,
+  FANCY_FRIDAY_CRIT_COLOR,
+  FANCY_FRIDAY_CRIT_LABEL,
+  FANCY_FRIDAY_CRIT_UPGRADES,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -193,6 +196,7 @@ export {
   isGoldenHandshakeCrit,
   isSupplyRunCrit,
   isCasualFridayCrit,
+  isFancyFridayCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -255,6 +259,7 @@ import {
   forceGoldenHandshakeCritProc,
   forceSupplyRunCritProc,
   forceCasualFridayCritProc,
+  forceFancyFridayCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -353,6 +358,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.goldenHandshake) forceGoldenHandshakeCritProc(floor);
     if (result.supplyRun) forceSupplyRunCritProc(floor);
     if (result.casualFriday) forceCasualFridayCritProc(floor);
+    if (result.fancyFriday) forceFancyFridayCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -488,6 +494,7 @@ export function forceFloorBuyCrit(
     goldenHandshake: false,
     supplyRun: false,
     casualFriday: false,
+    fancyFriday: false,
   };
 }
 
@@ -559,6 +566,11 @@ export function forceSupplyRunFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceCasualFridayFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.casualFriday = true;
+}
+
+export function forceFancyFridayFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.fancyFriday = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -923,6 +935,11 @@ export function forceSupplyRunCritUpgrade(floor: Floor): void {
 export function forceCasualFridayCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceCasualFridayCritProc(floor);
+}
+
+export function forceFancyFridayCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFancyFridayCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

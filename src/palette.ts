@@ -154,6 +154,8 @@ export const COLOR = {
   supplyRunTan: "#B45309",
   // Casual Friday crit's own dedicated color
   casualFridayTeal: "#0D9488",
+  // Fancy Friday crit's own dedicated color
+  fancyFridayIndigo: "#4338CA",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

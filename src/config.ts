@@ -247,6 +247,9 @@ export const CONFIG = {
     // "Casual Friday" crit — a flat batch of free upgrades for every unlocked
     // floor in the building
     casualFridayChance: 0.0005,
+    // "Fancy Friday" crit — Casual Friday's bigger sibling: twice the free
+    // upgrades on every unlocked floor
+    fancyFridayChance: 0.0005,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income
