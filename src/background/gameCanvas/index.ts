@@ -436,6 +436,20 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return { x: FLOOR_W / 2, y: worldCenterY - floorTop };
   }
 
+  function screenPointFromFloorLocal(
+    floor: Floor,
+    localX: number,
+    localY: number,
+  ): { x: number; y: number } {
+    const loc = floorLocation.get(floor);
+    const floorTop = loc ? floorWorldY(loc.floorIndex).top : 0;
+    const rect = canvas.getBoundingClientRect();
+    return {
+      x: rect.left + scale * (GUTTER_W + localX),
+      y: rect.top + scale * (floorTop + localY - viewportTopY()),
+    };
+  }
+
   function redraw(): void {
     // the canvas measures 0x0 while hidden (e.g. the city map view is showing
     // instead) or for a stray frame or two around a visibility toggle before its
@@ -603,6 +617,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         persist,
         onFloorAdded: (floor) => notifyFloorAdded(floor),
         getScreenCenterLocal: screenCenterLocalFor,
+        getScreenPointFromFloorLocal: screenPointFromFloorLocal,
       },
       hit.floor,
       hit.localX,

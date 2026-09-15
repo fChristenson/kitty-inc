@@ -122,6 +122,8 @@ export {
   ESPRESSO_SHOT_CRIT_LABEL,
   DEJA_VU_CRIT_COLOR,
   DEJA_VU_CRIT_LABEL,
+  CLONE_ARMY_CRIT_COLOR,
+  CLONE_ARMY_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -165,6 +167,7 @@ export {
   isFullyStaffedCrit,
   isEspressoShotCrit,
   isDejaVuCrit,
+  isCloneArmyCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -219,6 +222,7 @@ import {
   forceFullyStaffedCritProc,
   forceEspressoShotCritProc,
   forceDejaVuCritProc,
+  forceCloneArmyCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -310,6 +314,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.fullyStaffed) forceFullyStaffedCritProc(floor);
     if (result.espressoShot) forceEspressoShotCritProc(floor);
     if (result.dejaVu) forceDejaVuCritProc(floor);
+    if (result.cloneArmy) forceCloneArmyCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -389,6 +394,7 @@ export function forceFloorBuyCrit(
   fullyStaffed = false,
   espressoShot = false,
   dejaVu = false,
+  cloneArmy = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -436,6 +442,7 @@ export function forceFloorBuyCrit(
     fullyStaffed,
     espressoShot,
     dejaVu,
+    cloneArmy,
   };
 }
 
@@ -465,6 +472,11 @@ export function forceEspressoShotFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceDejaVuFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.dejaVu = true;
+}
+
+export function forceCloneArmyFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.cloneArmy = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -789,6 +801,11 @@ export function forceEspressoShotCritUpgrade(floor: Floor): void {
 export function forceDejaVuCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceDejaVuCritProc(floor);
+}
+
+export function forceCloneArmyCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceCloneArmyCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

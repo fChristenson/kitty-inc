@@ -225,6 +225,9 @@ export const CONFIG = {
     // "Deja Vu" crit — chooses a random crit tier at consumption time and
     // applies that tier's free-upgrade batch twice
     dejaVuChance: 0.0005,
+    // "Clone Army" crit - copies the largest unlocked floor workforce to all
+    // other unlocked floors for free
+    cloneArmyChance: 0.0005,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

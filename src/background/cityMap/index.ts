@@ -508,6 +508,7 @@ export function createCityMapView(
       {
         label: CRIT_TIER_CONFIG[tier].label,
         color: CRIT_TIER_CONFIG[tier].color,
+        anchor: { x: cx, y: feetY },
       },
     ]);
     for (const kind of CRIT_PROC_KINDS) {
@@ -518,6 +519,7 @@ export function createCityMapView(
           label: info.label,
           color: CRIT_TIER_CONFIG[tier].color,
           icon: info.icon,
+          anchor: { x: cx, y: feetY },
         },
       ]);
     }

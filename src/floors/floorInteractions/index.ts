@@ -56,6 +56,7 @@ import {
   isFullyStaffedCrit,
   isEspressoShotCrit,
   isDejaVuCrit,
+  isCloneArmyCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -225,6 +226,11 @@ export interface FloorActionsDeps {
   // drawn) into this floor's own local coordinate space, so a coin burst can be
   // anchored there instead of at a fixed floor-local point
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number };
+  getScreenPointFromFloorLocal: (
+    floor: Floor,
+    x: number,
+    y: number,
+  ) => { x: number; y: number };
 }
 
 // re-exported for floors/index.ts's facade — the canonical check now lives in
@@ -518,6 +524,21 @@ function applyFullyStaffedCrit(floors: Floor[]): void {
   }
 }
 
+// "Clone Army" copies the strongest unlocked floor workforce to every other
+// unlocked floor without charging for workers.
+function applyCloneArmyCrit(floors: Floor[]): void {
+  const largestWorkerCount = floors.reduce(
+    (largest, floor) =>
+      floor.unlocked ? Math.max(largest, floor.workerCount) : largest,
+    1,
+  );
+  for (const floor of floors) {
+    if (floor.unlocked) {
+      floor.workerCount = Math.min(largestWorkerCount, MAX_RENDERED_WORKERS);
+    }
+  }
+}
+
 // "Espresso Shot" crit (see shared/critTypes's isEspressoShotCrit): applies
 // the normal all-worker boost for its regular 15-second duration
 function applyEspressoShotCrit(floors: Floor[]): void {
@@ -686,7 +707,9 @@ export function handleFloorClick(
     persist,
     onFloorAdded,
     getScreenCenterLocal,
+    getScreenPointFromFloorLocal,
   } = deps;
+  const displayAnchor = getScreenPointFromFloorLocal(floor, x, y);
 
   // "Work overtime" boost's drain tail (see floors/upgradeButton): while the
   // gauge is ticking back down, the bar itself wiggles and becomes clickable —
@@ -875,6 +898,7 @@ export function handleFloorClick(
         if (buyTier.fullyStaffed) applyFullyStaffedCrit(floors);
         if (buyTier.espressoShot) applyEspressoShotCrit(floors);
         if (buyTier.dejaVu) applyDejaVuCrit(floor, floors.indexOf(floor) === 0);
+        if (buyTier.cloneArmy) applyCloneArmyCrit(floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -973,6 +997,8 @@ export function handleFloorClick(
           buyTier.fullyStaffed,
           buyTier.espressoShot,
           buyTier.dejaVu,
+          buyTier.cloneArmy,
+          displayAnchor,
         );
     }
     return;
@@ -1005,7 +1031,13 @@ export function handleFloorClick(
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
-      if (tier) triggerCritCelebration(floor, tier, getScreenCenterLocal);
+      if (tier)
+        triggerCritCelebration(
+          floor,
+          tier,
+          getScreenCenterLocal,
+          displayAnchor,
+        );
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
       const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
@@ -1060,7 +1092,12 @@ export function handleFloorClick(
           getScreenCenterLocal,
         );
       } else if (tier) {
-        triggerCritCelebration(floor, tier, getScreenCenterLocal);
+        triggerCritCelebration(
+          floor,
+          tier,
+          getScreenCenterLocal,
+          displayAnchor,
+        );
       }
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
@@ -1137,6 +1174,7 @@ export function handleFloorClick(
       const fullyStaffed = isFullyStaffedCrit(floor);
       const espressoShot = isEspressoShotCrit(floor);
       const dejaVu = isDejaVuCrit(floor);
+      const cloneArmy = isCloneArmyCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1304,6 +1342,7 @@ export function handleFloorClick(
       if (fullyStaffed) applyFullyStaffedCrit(floors);
       if (espressoShot) applyEspressoShotCrit(floors);
       if (dejaVu) applyDejaVuCrit(floor, isGroundFloor);
+      if (cloneArmy) applyCloneArmyCrit(floors);
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
@@ -1366,6 +1405,8 @@ export function handleFloorClick(
         fullyStaffed,
         espressoShot,
         dejaVu,
+        cloneArmy,
+        displayAnchor,
       );
       return;
     }

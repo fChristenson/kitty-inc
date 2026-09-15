@@ -1,4 +1,5 @@
 import type { Floor } from "../../gameState";
+import type { ImageName } from "../../loadAssets";
 import {
   CRIT_PROC_INFO,
   CRIT_PROC_KINDS,
@@ -88,6 +89,8 @@ import {
   ESPRESSO_SHOT_CRIT_LABEL,
   DEJA_VU_CRIT_COLOR,
   DEJA_VU_CRIT_LABEL,
+  CLONE_ARMY_CRIT_COLOR,
+  CLONE_ARMY_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -578,6 +581,7 @@ interface QueuedCelebration {
     | "fullyStaffed"
     | "espressoShot"
     | "dejaVu"
+    | "cloneArmy"
     | "bonusTier";
   queuedAt: number;
   run: () => void;
@@ -653,7 +657,7 @@ export function triggerCritCelebration(
   floor: Floor,
   tier: CritTier,
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-  chain = false,
+  chainOption: boolean | { x: number; y: number } = false,
   boost = false,
   bounce = false,
   explosion = false,
@@ -696,12 +700,24 @@ export function triggerCritCelebration(
   fullyStaffed = false,
   espressoShot = false,
   dejaVu = false,
+  cloneArmy = false,
+  displayAnchor?: { x: number; y: number },
 ): void {
-  enqueueCritDisplayEvents([
+  const chain = typeof chainOption === "boolean" ? chainOption : false;
+  const resolvedDisplayAnchor =
+    typeof chainOption === "boolean" ? displayAnchor : chainOption;
+  const enqueueDisplayEvents = (
+    events: { label: string; color: string; icon?: ImageName }[],
+  ): void =>
+    enqueueCritDisplayEvents(
+      events.map((event) => ({ ...event, anchor: resolvedDisplayAnchor })),
+    );
+
+  enqueueDisplayEvents([
     { label: CRIT_TIER_CONFIG[tier].label, color: tierColor(tier) },
   ]);
   if (dejaVu) {
-    enqueueCritDisplayEvents([
+    enqueueDisplayEvents([
       { label: CRIT_TIER_CONFIG[tier].label, color: tierColor(tier) },
     ]);
   }
@@ -748,16 +764,17 @@ export function triggerCritCelebration(
     fullyStaffed,
     espressoShot,
     dejaVu,
+    cloneArmy,
   };
   for (const kind of CRIT_PROC_KINDS) {
     if (!procFlags[kind]) continue;
     const info = CRIT_PROC_INFO[kind];
     if (kind === "dejaVu") {
-      enqueueCritDisplayEvents([
+      enqueueDisplayEvents([
         { label: info.label, color: tierColor(tier), icon: info.icon },
       ]);
     } else {
-      enqueueCritDisplayEvents([
+      enqueueDisplayEvents([
         { label: info.label, color: tierColor(tier), icon: info.icon },
       ]);
     }
@@ -805,6 +822,7 @@ export function triggerCritCelebration(
     fullyStaffed ||
     espressoShot ||
     dejaVu
+    || cloneArmy
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1284,7 +1302,7 @@ export function triggerCritCelebration(
         );
         const followUpKind = availableFollowUps.splice(randomIndex, 1)[0];
         const followUpInfo = CRIT_PROC_INFO[followUpKind];
-        enqueueCritDisplayEvents([
+        enqueueDisplayEvents([
           {
             label: followUpInfo.label,
             color: tierColor(tier),
@@ -1304,6 +1322,23 @@ export function triggerCritCelebration(
             ),
         });
       }
+    }
+    if (
+      cloneArmy &&
+      !specialCelebrationQueue.some((q) => q.kind === "cloneArmy")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "cloneArmy",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            CLONE_ARMY_CRIT_LABEL,
+            CLONE_ARMY_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
     }
     if (
       sunshine &&

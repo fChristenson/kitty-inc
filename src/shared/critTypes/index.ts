@@ -438,6 +438,12 @@ export const DEJA_VU_CRIT_CHANCE = CONFIG.crit.dejaVuChance;
 export const DEJA_VU_CRIT_COLOR = COLOR.dejaVuBlue;
 export const DEJA_VU_CRIT_LABEL = "Deja Vu";
 
+// "Clone Army" crit - copies the largest unlocked floor workforce to every
+// other unlocked floor for free
+export const CLONE_ARMY_CRIT_CHANCE = CONFIG.crit.cloneArmyChance;
+export const CLONE_ARMY_CRIT_COLOR = COLOR.cloneArmyViolet;
+export const CLONE_ARMY_CRIT_LABEL = "Clone Army";
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -500,6 +506,7 @@ const grandOpeningCrits = new WeakSet<Floor>();
 const fullyStaffedCrits = new WeakSet<Floor>();
 const espressoShotCrits = new WeakSet<Floor>();
 const dejaVuCrits = new WeakSet<Floor>();
+const cloneArmyCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -583,6 +590,7 @@ export interface CritRollResult {
   fullyStaffed: boolean;
   espressoShot: boolean;
   dejaVu: boolean;
+  cloneArmy: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -637,6 +645,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "fullyStaffed",
   "espressoShot",
   "dejaVu",
+  "cloneArmy",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -913,6 +922,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "dejaVu",
     description: "Repeats a random crit twice",
   },
+  cloneArmy: {
+    label: CLONE_ARMY_CRIT_LABEL,
+    icon: "cloneArmy",
+    description: "Copies the strongest workforce to every floor",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -996,6 +1010,7 @@ export function rollCrit(
     if (Math.random() < FULLY_STAFFED_CRIT_CHANCE) landed.push("fullyStaffed");
     if (Math.random() < ESPRESSO_SHOT_CRIT_CHANCE) landed.push("espressoShot");
     if (Math.random() < DEJA_VU_CRIT_CHANCE) landed.push("dejaVu");
+    if (Math.random() < CLONE_ARMY_CRIT_CHANCE) landed.push("cloneArmy");
     if (Math.random() < GOLDEN_PARACHUTE_CRIT_CHANCE)
       landed.push("goldenParachute");
     if (Math.random() < PAYOUT_CRIT_CHANCE) landed.push("payout");
@@ -1059,6 +1074,7 @@ export function rollCrit(
     fullyStaffed: kept.has("fullyStaffed"),
     espressoShot: kept.has("espressoShot"),
     dejaVu: kept.has("dejaVu"),
+    cloneArmy: kept.has("cloneArmy"),
   });
 }
 
@@ -1236,6 +1252,10 @@ export function isDejaVuCrit(floor: Floor): boolean {
   return dejaVuCrits.has(floor);
 }
 
+export function isCloneArmyCrit(floor: Floor): boolean {
+  return cloneArmyCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1295,6 +1315,7 @@ export function consumeCritProcs(floor: Floor): void {
   fullyStaffedCrits.delete(floor);
   espressoShotCrits.delete(floor);
   dejaVuCrits.delete(floor);
+  cloneArmyCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1471,6 +1492,10 @@ export function forceEspressoShotCritProc(floor: Floor): void {
 
 export function forceDejaVuCritProc(floor: Floor): void {
   dejaVuCrits.add(floor);
+}
+
+export function forceCloneArmyCritProc(floor: Floor): void {
+  cloneArmyCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

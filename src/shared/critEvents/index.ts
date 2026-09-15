@@ -4,6 +4,7 @@ export interface CritDisplayEvent {
   label: string;
   color: string;
   icon?: ImageName;
+  anchor?: { x: number; y: number };
 }
 
 type CritDisplayListener = (event: CritDisplayEvent) => void;

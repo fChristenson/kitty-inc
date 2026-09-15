@@ -59,6 +59,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Fully Staffed": { name: "fullyStaffed" },
   "Espresso Shot": { name: "espressoShot" },
   "Deja Vu": { name: "dejaVu" },
+  "Clone Army": { name: "cloneArmy" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

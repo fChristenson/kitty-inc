@@ -27,11 +27,11 @@ function animateFloatingCrit(item: HTMLDivElement, delayMs: number): void {
       if (!item.isConnected) return;
       const progress = Math.min(1, (now - startedAt) / NOTIFICATION_LIFE_MS);
       const wave = progress * Math.PI * 2;
-      const fadeIn = Math.min(1, progress / 0.12);
+      const fadeIn = Math.min(1, progress / 0.2);
       const fadeOut = Math.min(1, (1 - progress) / 0.18);
       const opacity = Math.min(fadeIn, fadeOut);
       const popProgress = Math.min(1, progress / 0.2);
-      const scale = 0.78 + Math.sin((popProgress * Math.PI) / 2) * 0.22;
+      const scale = 0.58 + Math.sin((popProgress * Math.PI) / 2) * 0.42;
       const x = Math.sin(wave) * FLOATING_WAVE_AMPLITUDE_PX;
       const y = 92 - progress * 180;
       const rotation = Math.cos(wave) * 7;
@@ -56,7 +56,7 @@ export function initCritNotifications(container: HTMLDivElement): void {
   unsubscribeCritEvents?.();
   unsubscribeCritEvents = subscribeCritDisplayEvents(
     (event: CritDisplayEvent) => {
-      notifyCrit(event.label, event.color, event.icon);
+      notifyCrit(event.label, event.color, event.icon, event.anchor);
     },
   );
 }
@@ -65,12 +65,20 @@ export function notifyCrit(
   label: string,
   color: string,
   iconName?: ImageName,
+  anchor?: { x: number; y: number },
 ): void {
   if (!overlay) return;
   const item = document.createElement("div");
   item.className = "crit-float";
   item.style.color = color;
-  item.style.left = `${Math.random() * FLOATING_X_RANGE_PX}px`;
+  if (anchor) {
+    const overlayRect = overlay.getBoundingClientRect();
+    item.style.left = `${anchor.x - overlayRect.left - 32}px`;
+    item.style.top = `${anchor.y - overlayRect.top - 124}px`;
+    item.style.bottom = "auto";
+  } else {
+    item.style.left = `${Math.random() * FLOATING_X_RANGE_PX}px`;
+  }
   item.style.visibility = "hidden";
   item.style.transform = "translate3d(0, 140px, 0) scale(0.78)";
   const delayMs = overlay.children.length * FLOATING_DELAY_MS;
