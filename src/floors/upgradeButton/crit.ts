@@ -128,6 +128,10 @@ export {
   LUCKY_CLOVER_CRIT_LABEL,
   LUCKY_CLOVER_CRIT_COUNT,
   LUCKY_CLOVER_CRIT_TIER,
+  SECOND_WIND_CRIT_COLOR,
+  SECOND_WIND_CRIT_LABEL,
+  EXECUTIVE_ORDER_CRIT_COLOR,
+  EXECUTIVE_ORDER_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -173,6 +177,8 @@ export {
   isDejaVuCrit,
   isCloneArmyCrit,
   isLuckyCloverCrit,
+  isSecondWindCrit,
+  isExecutiveOrderCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -229,6 +235,8 @@ import {
   forceDejaVuCritProc,
   forceCloneArmyCritProc,
   forceLuckyCloverCritProc,
+  forceSecondWindCritProc,
+  forceExecutiveOrderCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -321,6 +329,8 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.espressoShot) forceEspressoShotCritProc(floor);
     if (result.dejaVu) forceDejaVuCritProc(floor);
     if (result.cloneArmy) forceCloneArmyCritProc(floor);
+    if (result.secondWind) forceSecondWindCritProc(floor);
+    if (result.executiveOrder) forceExecutiveOrderCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -450,6 +460,8 @@ export function forceFloorBuyCrit(
     dejaVu,
     cloneArmy,
     luckyClover: false,
+    secondWind: false,
+    executiveOrder: false,
   };
 }
 
@@ -489,6 +501,16 @@ export function forceCloneArmyFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceLuckyCloverFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.luckyClover = true;
+}
+
+export function forceSecondWindFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.secondWind = true;
+}
+
+export function forceExecutiveOrderFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.executiveOrder = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -823,6 +845,16 @@ export function forceCloneArmyCritUpgrade(floor: Floor): void {
 export function forceLuckyCloverCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceLuckyCloverCritProc(floor);
+}
+
+export function forceSecondWindCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSecondWindCritProc(floor);
+}
+
+export function forceExecutiveOrderCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceExecutiveOrderCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

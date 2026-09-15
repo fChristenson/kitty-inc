@@ -68,6 +68,8 @@ import {
   forceDejaVuCritUpgrade,
   forceCloneArmyCritUpgrade,
   forceLuckyCloverCritUpgrade,
+  forceSecondWindCritUpgrade,
+  forceExecutiveOrderCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   forceGrandOpeningFloorBuyCrit,
@@ -76,6 +78,8 @@ import {
   forceDejaVuFloorBuyCrit,
   forceCloneArmyFloorBuyCrit,
   forceLuckyCloverFloorBuyCrit,
+  forceSecondWindFloorBuyCrit,
+  forceExecutiveOrderFloorBuyCrit,
   forcePayoutFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -163,6 +167,8 @@ import {
   wireSpawnDejaVuCritButton,
   wireSpawnCloneArmyCritButton,
   wireSpawnLuckyCloverCritButton,
+  wireSpawnSecondWindCritButton,
+  wireSpawnExecutiveOrderCritButton,
   wireSpawnGoldenParachuteCritButton,
   wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
@@ -219,6 +225,8 @@ import {
   wireFloorBuyDejaVuCritButton,
   wireFloorBuyCloneArmyCritButton,
   wireFloorBuyLuckyCloverCritButton,
+  wireFloorBuySecondWindCritButton,
+  wireFloorBuyExecutiveOrderCritButton,
   wireFloorBuyGoldenParachuteCritButton,
   wireFloorBuyPayoutCritButton,
   wireMapUnlockCritButton,
@@ -229,9 +237,6 @@ import {
   wireMapUnlockChainUltraCritButton,
   wireMapUnlockUpgradeCritButton,
   wireMapUnlockGrandOpeningCritButton,
-  wireMapUnlockFullyStaffedCritButton,
-  wireMapUnlockEspressoShotCritButton,
-  wireMapUnlockDejaVuCritButton,
   wireMapUnlockHeavenlyCritButton,
   wireMapUnlockPairCritButton,
   wireMapUnlockThreeOfAKindCritButton,
@@ -737,6 +742,14 @@ async function main() {
     wireSpawnLuckyCloverCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceLuckyCloverCritUpgrade(floor);
+    });
+    wireSpawnSecondWindCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceSecondWindCritUpgrade(floor);
+    });
+    wireSpawnExecutiveOrderCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceExecutiveOrderCritUpgrade(floor);
     });
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1611,6 +1624,12 @@ async function main() {
     wireFloorBuyLuckyCloverCritButton(app, () =>
       forceLuckyCloverFloorBuyCrit("crit"),
     );
+    wireFloorBuySecondWindCritButton(app, () =>
+      forceSecondWindFloorBuyCrit("crit"),
+    );
+    wireFloorBuyExecutiveOrderCritButton(app, () =>
+      forceExecutiveOrderFloorBuyCrit("crit"),
+    );
     wireFloorBuyGoldenParachuteCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
@@ -1672,13 +1691,6 @@ async function main() {
     wireMapUnlockGrandOpeningCritButton(app, () =>
       forceGrandOpeningFloorBuyCrit("crit"),
     );
-    wireMapUnlockFullyStaffedCritButton(app, () =>
-      forceFullyStaffedFloorBuyCrit("crit"),
-    );
-    wireMapUnlockEspressoShotCritButton(app, () =>
-      forceEspressoShotFloorBuyCrit("crit"),
-    );
-    wireMapUnlockDejaVuCritButton(app, () => forceDejaVuFloorBuyCrit("crit"));
     wireMapUnlockHeavenlyCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",

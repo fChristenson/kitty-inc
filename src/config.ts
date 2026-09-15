@@ -229,6 +229,12 @@ export const CONFIG = {
     // other unlocked floors for free
     cloneArmyChance: 0.0005,
     luckyCloverChance: 0.01,
+    // "Second Wind" crit — refunds everything the active company has ever
+    // spent on upgrades, floor unlocks and building purchases
+    secondWindChance: 0.0005,
+    // "Executive Order" crit — promotes every floor in the building one
+    // permanent crit tier step at once
+    executiveOrderChance: 0.0005,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

@@ -58,6 +58,8 @@ import {
   isDejaVuCrit,
   isCloneArmyCrit,
   isLuckyCloverCrit,
+  isSecondWindCrit,
+  isExecutiveOrderCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -111,6 +113,7 @@ import {
   getCompanyIncomeRatePerSecond,
   getAllCompaniesTotalIncome,
   getAllCompaniesUpgradesValue,
+  getActiveCompanyInvestedValue,
 } from "../../totalIncome";
 import { getActiveCompanyIndex } from "../../company";
 import { spawnCoinBurst } from "../coins";
@@ -148,6 +151,15 @@ function applyPeppermintCrit(floors: Floor[]): void {
     if (floor.unlocked) {
       floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
     }
+  }
+}
+
+// "Executive Order" crit (see shared/critTypes's isExecutiveOrderCrit): the
+// same tier promotion, but on EVERY unlocked floor instead of every other one
+function applyExecutiveOrderCrit(floors: Floor[]): void {
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
   }
 }
 
@@ -644,6 +656,13 @@ function applyLuckyCloverCrit(floor: Floor, isGroundFloor: boolean): void {
   }
 }
 
+// "Second Wind" crit (see shared/critTypes's isSecondWindCrit): hands back
+// every dollar the active company has spent on upgrades, floor unlocks and
+// building purchases — nothing bought is lost, the money just comes back
+function applySecondWindCrit(): void {
+  addTotalIncome(getActiveCompanyInvestedValue());
+}
+
 // "Golden Parachute" crit (see shared/critTypes's isGoldenParachuteCrit): a
 // flat, not-tier-scaled instant payout — unlike payday/gold standard (which
 // multiply the ALREADY-BANKED total), this pays out GOLDEN_PARACHUTE_SECONDS
@@ -907,6 +926,8 @@ export function handleFloorClick(
         if (buyTier.cloneArmy) applyCloneArmyCrit(floors);
         if (buyTier.luckyClover)
           applyLuckyCloverCrit(floor, floors.indexOf(floor) === 0);
+        if (buyTier.secondWind) applySecondWindCrit();
+        if (buyTier.executiveOrder) applyExecutiveOrderCrit(floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -1007,6 +1028,8 @@ export function handleFloorClick(
           buyTier.dejaVu,
           buyTier.cloneArmy,
           buyTier.luckyClover,
+          buyTier.secondWind,
+          buyTier.executiveOrder,
         );
     }
     return;
@@ -1173,6 +1196,8 @@ export function handleFloorClick(
       const dejaVu = isDejaVuCrit(floor);
       const cloneArmy = isCloneArmyCrit(floor);
       const luckyClover = isLuckyCloverCrit(floor);
+      const secondWind = isSecondWindCrit(floor);
+      const executiveOrder = isExecutiveOrderCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1180,6 +1205,8 @@ export function handleFloorClick(
         applyUpgradeTick(floor, isGroundFloor);
       }
       if (luckyClover) applyLuckyCloverCrit(floor, isGroundFloor);
+      if (secondWind) applySecondWindCrit();
+      if (executiveOrder) applyExecutiveOrderCrit(floors);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
       // never once per free tick above, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
@@ -1406,6 +1433,8 @@ export function handleFloorClick(
         dejaVu,
         cloneArmy,
         luckyClover,
+        secondWind,
+        executiveOrder,
       );
       return;
     }

@@ -1,5 +1,6 @@
 import { isStorageIntact, type Floor } from "../gameState";
 import { collectDueIncome, currentIncomeRatePerSecond } from "../floors";
+import { getBuildingPrice } from "../buildings";
 import {
   getActiveCompanyIndex,
   loadCompanyRecord,
@@ -85,6 +86,22 @@ export function getAllCompaniesUpgradesValue(): BigNumber {
   let sum = ZERO;
   for (let i = 0; i < count; i++) sum = add(sum, getStoredUpgradesValue(i));
   return sum;
+}
+
+// everything the ACTIVE company has ever sunk into its buildings: upgrades,
+// every unlocked floor's own unlock price, and each building past the free
+// first one — see "Second Wind" crit's applySecondWindCrit, which refunds it
+export function getActiveCompanyInvestedValue(): BigNumber {
+  let total = sumUpgradesValue(tickerBuildings);
+  for (const floors of tickerBuildings) {
+    for (const floor of floors) {
+      if (floor.unlocked) total = add(total, floor.unlockCost);
+    }
+  }
+  for (let i = 1; i < tickerBuildings.length; i++) {
+    total = add(total, getBuildingPrice(i));
+  }
+  return total;
 }
 
 // deducts amount from the running total if affordable; returns whether the spend succeeded

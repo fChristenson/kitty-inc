@@ -61,6 +61,8 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Deja Vu": { name: "dejaVu" },
   "Clone Army": { name: "cloneArmy" },
   "Lucky Clover": { name: "luckyClover" },
+  "Second Wind": { name: "secondWind" },
+  "Executive Order": { name: "executiveOrder" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

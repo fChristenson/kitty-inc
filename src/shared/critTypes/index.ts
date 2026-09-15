@@ -451,6 +451,19 @@ export const LUCKY_CLOVER_CRIT_LABEL = "Lucky Clover";
 export const LUCKY_CLOVER_CRIT_COUNT = 4;
 export const LUCKY_CLOVER_CRIT_TIER: CritTier = "ultra";
 
+// "Second Wind" crit — refunds every dollar the active company has sunk into
+// upgrades, floor unlocks and building purchases
+export const SECOND_WIND_CRIT_CHANCE = CONFIG.crit.secondWindChance;
+export const SECOND_WIND_CRIT_COLOR = COLOR.secondWindSky;
+export const SECOND_WIND_CRIT_LABEL = "Second Wind";
+
+// "Executive Order" crit — promotes EVERY floor in the building one permanent
+// crit tier step at once (Peppermint's reward without the every-other-floor
+// stride)
+export const EXECUTIVE_ORDER_CRIT_CHANCE = CONFIG.crit.executiveOrderChance;
+export const EXECUTIVE_ORDER_CRIT_COLOR = COLOR.executiveOrderTeal;
+export const EXECUTIVE_ORDER_CRIT_LABEL = "Executive Order";
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -515,6 +528,8 @@ const espressoShotCrits = new WeakSet<Floor>();
 const dejaVuCrits = new WeakSet<Floor>();
 const cloneArmyCrits = new WeakSet<Floor>();
 const luckyCloverCrits = new WeakSet<Floor>();
+const secondWindCrits = new WeakSet<Floor>();
+const executiveOrderCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -600,6 +615,8 @@ export interface CritRollResult {
   dejaVu: boolean;
   cloneArmy: boolean;
   luckyClover: boolean;
+  secondWind: boolean;
+  executiveOrder: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -656,6 +673,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "dejaVu",
   "cloneArmy",
   "luckyClover",
+  "secondWind",
+  "executiveOrder",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -942,6 +961,16 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "luckyClover",
     description: "Triggers 4 x125 crits in succession",
   },
+  secondWind: {
+    label: SECOND_WIND_CRIT_LABEL,
+    icon: "secondWind",
+    description: "Refunds every upgrade, floor and building bought",
+  },
+  executiveOrder: {
+    label: EXECUTIVE_ORDER_CRIT_LABEL,
+    icon: "executiveOrder",
+    description: "Promotes every floor one crit tier",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -1030,6 +1059,9 @@ export function rollCrit(
       landed.push("goldenParachute");
     if (Math.random() < PAYOUT_CRIT_CHANCE) landed.push("payout");
     if (Math.random() < LUCKY_CLOVER_CRIT_CHANCE) landed.push("luckyClover");
+    if (Math.random() < SECOND_WIND_CRIT_CHANCE) landed.push("secondWind");
+    if (Math.random() < EXECUTIVE_ORDER_CRIT_CHANCE)
+      landed.push("executiveOrder");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -1092,6 +1124,8 @@ export function rollCrit(
     dejaVu: kept.has("dejaVu"),
     cloneArmy: kept.has("cloneArmy"),
     luckyClover: kept.has("luckyClover"),
+    secondWind: kept.has("secondWind"),
+    executiveOrder: kept.has("executiveOrder"),
   });
 }
 
@@ -1277,6 +1311,14 @@ export function isLuckyCloverCrit(floor: Floor): boolean {
   return luckyCloverCrits.has(floor);
 }
 
+export function isSecondWindCrit(floor: Floor): boolean {
+  return secondWindCrits.has(floor);
+}
+
+export function isExecutiveOrderCrit(floor: Floor): boolean {
+  return executiveOrderCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1338,6 +1380,8 @@ export function consumeCritProcs(floor: Floor): void {
   dejaVuCrits.delete(floor);
   cloneArmyCrits.delete(floor);
   luckyCloverCrits.delete(floor);
+  secondWindCrits.delete(floor);
+  executiveOrderCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1522,6 +1566,14 @@ export function forceCloneArmyCritProc(floor: Floor): void {
 
 export function forceLuckyCloverCritProc(floor: Floor): void {
   luckyCloverCrits.add(floor);
+}
+
+export function forceSecondWindCritProc(floor: Floor): void {
+  secondWindCrits.add(floor);
+}
+
+export function forceExecutiveOrderCritProc(floor: Floor): void {
+  executiveOrderCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

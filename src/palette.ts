@@ -142,6 +142,10 @@ export const COLOR = {
   // Clone Army crit's own dedicated color
   cloneArmyViolet: "#8B5CF6",
   luckyCloverGreen: "#65A30D",
+  // Second Wind crit's own dedicated color
+  secondWindSky: "#7DA7C9",
+  // Executive Order crit's own dedicated color
+  executiveOrderTeal: "#0F766E",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

@@ -88,6 +88,10 @@ import {
   CLONE_ARMY_CRIT_LABEL,
   LUCKY_CLOVER_CRIT_COLOR,
   LUCKY_CLOVER_CRIT_LABEL,
+  SECOND_WIND_CRIT_COLOR,
+  SECOND_WIND_CRIT_LABEL,
+  EXECUTIVE_ORDER_CRIT_COLOR,
+  EXECUTIVE_ORDER_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -580,6 +584,8 @@ interface QueuedCelebration {
     | "dejaVu"
     | "cloneArmy"
     | "luckyClover"
+    | "secondWind"
+    | "executiveOrder"
     | "bonusTier";
   queuedAt: number;
   maxAgeMs?: number;
@@ -706,6 +712,8 @@ export function triggerCritCelebration(
   dejaVu = false,
   cloneArmy = false,
   luckyClover = false,
+  secondWind = false,
+  executiveOrder = false,
 ): void {
   const procFlags: Partial<Record<CritProcKind, boolean>> = {
     chain,
@@ -752,6 +760,8 @@ export function triggerCritCelebration(
     dejaVu,
     cloneArmy,
     luckyClover,
+    secondWind,
+    executiveOrder,
   };
   if (
     chain ||
@@ -797,7 +807,9 @@ export function triggerCritCelebration(
     espressoShot ||
     dejaVu ||
     cloneArmy ||
-    luckyClover
+    luckyClover ||
+    secondWind ||
+    executiveOrder
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1324,6 +1336,40 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             LUCKY_CLOVER_CRIT_LABEL,
             LUCKY_CLOVER_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      secondWind &&
+      !specialCelebrationQueue.some((q) => q.kind === "secondWind")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "secondWind",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            SECOND_WIND_CRIT_LABEL,
+            SECOND_WIND_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      executiveOrder &&
+      !specialCelebrationQueue.some((q) => q.kind === "executiveOrder")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "executiveOrder",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            EXECUTIVE_ORDER_CRIT_LABEL,
+            EXECUTIVE_ORDER_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,
