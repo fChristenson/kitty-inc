@@ -161,7 +161,7 @@ export const CONFIG = {
     // increaseIncomeRate) — upgrades still cost real money as normal, just
     // at whatever price was already locked in when the window started
     frozenChance: 0.01,
-    frozenDurationMs: 15000,
+    frozenDurationMs: 3000,
     // "snowball crit" — a flat, not-tier-scaled proc (see shared/critTypes'
     // applySnowballCrit): instantly credits every unlocked floor 1 extra
     // payout's worth of income at its own current rate, multiplied by how
@@ -201,6 +201,16 @@ export const CONFIG = {
     rushHourChance: 0.1,
     rushHourIntervalSeconds: 0.5,
     rushHourDurationMs: 15000,
+    // "Golden Ticket" crit — no instant reward: guarantees the very NEXT
+    // crit roll on this floor lands ultra, bypassing every tier chance (and
+    // every other piggyback proc's own chance) entirely for that one roll
+    // (see shared/critTypes' isGoldenTicketCrit / upgradeButton's
+    // armGuaranteedUltraCrit). Rare, since it's a guaranteed jackpot
+    goldenTicketChance: 0.001,
+    // "Silver Ticket" crit — same shape as Golden Ticket, but guarantees
+    // only mega instead of ultra (see upgradeButton's armGuaranteedMegaCrit)
+    // — a smaller guaranteed swing, so less rare than Golden Ticket
+    silverTicketChance: 0.005,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

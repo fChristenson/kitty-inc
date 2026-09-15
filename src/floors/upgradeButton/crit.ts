@@ -106,6 +106,10 @@ export {
   RUSH_HOUR_INTERVAL_SECONDS,
   triggerRushHourCrit,
   isRushHourActive,
+  GOLDEN_TICKET_CRIT_COLOR,
+  GOLDEN_TICKET_CRIT_LABEL,
+  SILVER_TICKET_CRIT_COLOR,
+  SILVER_TICKET_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -141,6 +145,8 @@ export {
   isInternCrit,
   isUnionBossCrit,
   isRushHourCrit,
+  isGoldenTicketCrit,
+  isSilverTicketCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -187,11 +193,32 @@ import {
   forceInternCritProc,
   forceUnionBossCritProc,
   forceRushHourCritProc,
+  forceGoldenTicketCritProc,
+  forceSilverTicketCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
 
 const critTiers = new WeakMap<Floor, CritTier>();
+
+// "Golden Ticket" crit's own reward (see floorInteractions.ts's
+// applyGoldenTicketCrit): a one-shot flag consumed by the very next
+// rollCritUpgrade call on this floor, forcing a guaranteed "ultra" tier and
+// skipping rollCrit's own tier/proc chances entirely for that one roll
+const guaranteedUltraCrits = new WeakSet<Floor>();
+
+export function armGuaranteedUltraCrit(floor: Floor): void {
+  guaranteedUltraCrits.add(floor);
+}
+
+// "Silver Ticket" crit's own reward (see floorInteractions.ts's
+// applySilverTicketCrit): same one-shot shape as Golden Ticket above, but
+// forces a guaranteed "mega" tier instead
+const guaranteedMegaCrits = new WeakSet<Floor>();
+
+export function armGuaranteedMegaCrit(floor: Floor): void {
+  guaranteedMegaCrits.add(floor);
+}
 
 // call once per completed upgrade click (crit or normal) to roll the next
 // one — delegates the entire roll (tier + gateway + procs + cap) to
@@ -204,6 +231,16 @@ const critTiers = new WeakMap<Floor, CritTier>();
 // already active) forwards straight through to rollCrit — still arms a
 // plain tier crit normally, just never a piggyback proc alongside it
 export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
+  if (guaranteedUltraCrits.has(floor)) {
+    guaranteedUltraCrits.delete(floor);
+    critTiers.set(floor, "ultra");
+    return;
+  }
+  if (guaranteedMegaCrits.has(floor)) {
+    guaranteedMegaCrits.delete(floor);
+    critTiers.set(floor, "mega");
+    return;
+  }
   rollCrit((result) => {
     critTiers.set(floor, result.tier);
     if (result.chain) forceChainCritProc(floor);
@@ -241,6 +278,8 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.intern) forceInternCritProc(floor);
     if (result.unionBoss) forceUnionBossCritProc(floor);
     if (result.rushHour) forceRushHourCritProc(floor);
+    if (result.goldenTicket) forceGoldenTicketCritProc(floor);
+    if (result.silverTicket) forceSilverTicketCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -312,6 +351,8 @@ export function forceFloorBuyCrit(
   unionBoss = false,
   easterSale = false,
   rushHour = false,
+  goldenTicket = false,
+  silverTicket = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -351,6 +392,8 @@ export function forceFloorBuyCrit(
     intern,
     unionBoss,
     rushHour,
+    goldenTicket,
+    silverTicket,
   };
 }
 
@@ -608,6 +651,22 @@ export function forceUnionBossCritUpgrade(floor: Floor): void {
 export function forceRushHourCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceRushHourCritProc(floor);
+}
+
+// dev/test-only: force this floor's already-armed tier to also carry a
+// Golden Ticket proc, bypassing chance entirely (see hud/testButton's "Spawn
+// Golden Ticket Crit") — not tier-scaled, so no tier param needed
+export function forceGoldenTicketCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceGoldenTicketCritProc(floor);
+}
+
+// dev/test-only: force this floor's already-armed tier to also carry a
+// Silver Ticket proc, bypassing chance entirely (see hud/testButton's "Spawn
+// Silver Ticket Crit") — not tier-scaled, so no tier param needed
+export function forceSilverTicketCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSilverTicketCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

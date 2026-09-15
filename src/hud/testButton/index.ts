@@ -61,6 +61,8 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-intern-crit" class="game__button">Spawn Intern Crit</button>
           <button id="spawn-union-boss-crit" class="game__button">Spawn Union Boss Crit</button>
           <button id="spawn-rush-hour-crit" class="game__button">Spawn Rush Hour Crit</button>
+          <button id="spawn-golden-ticket-crit" class="game__button">Spawn Golden Ticket Crit</button>
+          <button id="spawn-silver-ticket-crit" class="game__button">Spawn Silver Ticket Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -109,6 +111,8 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-intern-crit" class="game__button">Floor Intern Crit</button>
           <button id="floor-buy-union-boss-crit" class="game__button">Floor Union Boss Crit</button>
           <button id="floor-buy-rush-hour-crit" class="game__button">Floor Rush Hour Crit</button>
+          <button id="floor-buy-golden-ticket-crit" class="game__button">Floor Golden Ticket Crit</button>
+          <button id="floor-buy-silver-ticket-crit" class="game__button">Floor Silver Ticket Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -568,6 +572,26 @@ export function wireSpawnRushHourCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnGoldenTicketCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-golden-ticket-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnSilverTicketCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-silver-ticket-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireForceBonusTierCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -1022,6 +1046,26 @@ export function wireFloorBuyRushHourCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-rush-hour-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyGoldenTicketCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-golden-ticket-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuySilverTicketCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-silver-ticket-crit",
   )!;
   button.addEventListener("click", onClick);
 }

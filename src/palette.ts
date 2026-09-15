@@ -117,6 +117,12 @@ export const COLOR = {
   internSkyBlue: "#0EA5E9",
   // Union Boss crit's own dedicated color — a stern, authoritative slate
   unionBossSlate: "#475569",
+  // Golden Ticket crit's own dedicated color — a bright pale yellow,
+  // distinct from every other gold/amber already in use
+  goldenTicketYellow: "#FDE047",
+  // Silver Ticket crit's own dedicated color — a cool silvery slate,
+  // distinct from unionBossSlate's own darker shade
+  silverTicketGray: "#CBD5E1",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

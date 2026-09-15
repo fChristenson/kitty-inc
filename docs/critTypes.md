@@ -1,7 +1,52 @@
 # Crit ideas
 
-- Intern - get 1 free worker
-- Union boss - get 1 free manager
-- Rush Hour — free clicks temporarily halve the floor's incomeIntervalSeconds per click
-  (reverting once the window ends) instead of paying cash — speed-themed, distinct from
-  Snowball's floor-count-scaled payout and Frozen's flat-ultra-cash shapes.
+- Compound Interest — permanently adds a tiny (~0.1%) rate bump to every
+  unlocked floor, scaled by the floor's own current upgradeCount — small
+  alone, but stacks forever every time it lands again.
+- Golden Parachute — an instant lump-sum payout worth several seconds of
+  total income, but knocks 10% off the current active company's total income
+  rate for a short window afterward (a real risk/reward proc, unlike every
+  other flat-upside one).
+- IPO — one-time payout scaled to the CURRENT active company's own total
+  asset value (buildings + upgrades), not its income rate — rewards a big,
+  built-out company far more than a fresh one.
+- Networking Event — every OTHER company (not just the active one) gets a
+  small flat income injection too, the only proc that reaches across
+  companies instead of staying scoped to the one currently open.
+- Grand Opening — instantly buys the next building for free, skipping its
+  cost entirely (a free ride on the existing "buy building" flow).
+- Full Staff — every unlocked floor in the building is instantly topped up
+  to its own max rendered worker count for free, building-wide (Intern's
+  bigger, all-floors-at-once sibling).
+- Espresso Shot — every unlocked floor's workers run at double speed for a
+  short 5s burst — shorter than Boost/Sunshine/Snowday, but the strongest
+  multiplier of the three.
+- Déjà Vu — instantly repeats whichever piggyback proc landed on this same
+  floor's PREVIOUS crit (falls through to a plain flat cash bonus if there
+  wasn't one), a proc whose effect is different every time it lands.
+- Overtime Pay — instantly fills every unlocked floor's own "Work overtime"
+  gauge to full at once, building-wide, without needing a single click.
+- Lucky Clover — for the next crit only, MAX_SPECIAL_CRIT_PROCS is
+  temporarily raised so more than 2 piggyback procs can stack together.
+- Clone Army — copies the building's single BEST floor's own worker count
+  onto every other unlocked floor at once (great for a lopsided building).
+- Second Wind — refunds the player's most recent real purchase (upgrade,
+  worker, floor unlock, whichever was last) in full, as if it never happened
+  — but keeps whatever it bought.
+- Time Capsule — banks a slice of the current payout to be paid out again,
+  with interest, once a short delay elapses (a "reward now AND later" proc).
+- Executive Order — promotes every OTHER owned building's own permanent crit
+  tier one step at once (Peppermint's effect, but at map scale instead of
+  floor scale).
+- Round Up — rounds every unlocked floor's own upgradeCount up to the next
+  multiple of 10 for free, instantly triggering however many milestone
+  bonuses that crosses.
+- Golden Handshake — instantly grants every eligible unlocked floor a free
+  manager at once, building-wide (Union Boss's bigger, all-floors sibling).
+- Silent Partner — every company gains a small permanent passive income
+  modifier (stacking with itself if it lands again), instead of one big
+  one-time payout.
+- Insider Tip — reveals (and instantly banks) whichever of the two currently
+  eligible piggyback proc rolls WOULD have landed next, letting the player
+  effectively double-dip on the very next crit's own extra roll.
+

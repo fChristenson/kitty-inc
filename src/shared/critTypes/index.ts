@@ -396,6 +396,23 @@ export function isRushHourActive(floor: Floor, now: number): boolean {
   return startedAt !== undefined && now - startedAt < RUSH_HOUR_DURATION_MS;
 }
 
+// "Golden Ticket" crit — also no instant reward: arming this proc just marks
+// the floor so that, once the crit is actually clicked, floorInteractions.ts's
+// applyGoldenTicketCrit arms upgradeButton.ts's own armGuaranteedUltraCrit —
+// the very next rollCritUpgrade call on that floor skips the tier/proc
+// chances entirely and forces a plain ultra tier, guaranteed
+export const GOLDEN_TICKET_CRIT_CHANCE = CONFIG.crit.goldenTicketChance;
+export const GOLDEN_TICKET_CRIT_COLOR = COLOR.goldenTicketYellow;
+export const GOLDEN_TICKET_CRIT_LABEL = "Golden Ticket";
+
+// "Silver Ticket" crit — same shape as Golden Ticket, but arms
+// upgradeButton.ts's own armGuaranteedMegaCrit instead — the very next
+// rollCritUpgrade call on that floor is forced to a plain mega tier
+// (a smaller guaranteed swing than Golden Ticket's ultra)
+export const SILVER_TICKET_CRIT_CHANCE = CONFIG.crit.silverTicketChance;
+export const SILVER_TICKET_CRIT_COLOR = COLOR.silverTicketGray;
+export const SILVER_TICKET_CRIT_LABEL = "Silver Ticket";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -433,6 +450,8 @@ const nightShiftCrits = new WeakSet<Floor>();
 const internCrits = new WeakSet<Floor>();
 const unionBossCrits = new WeakSet<Floor>();
 const rushHourCrits = new WeakSet<Floor>();
+const goldenTicketCrits = new WeakSet<Floor>();
+const silverTicketCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -508,6 +527,8 @@ export interface CritRollResult {
   intern: boolean;
   unionBoss: boolean;
   rushHour: boolean;
+  goldenTicket: boolean;
+  silverTicket: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -554,6 +575,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "intern",
   "unionBoss",
   "rushHour",
+  "goldenTicket",
+  "silverTicket",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -790,6 +813,16 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "sportscar",
     description: "Caps every floor's income timer at 0.5s for 15s",
   },
+  goldenTicket: {
+    label: GOLDEN_TICKET_CRIT_LABEL,
+    icon: "goldenTicket",
+    description: "Guarantees this floor's next crit is ultra",
+  },
+  silverTicket: {
+    label: SILVER_TICKET_CRIT_LABEL,
+    icon: "silverTicket",
+    description: "Guarantees this floor's next crit is mega",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -867,6 +900,8 @@ export function rollCrit(
     if (Math.random() < INTERN_CRIT_CHANCE) landed.push("intern");
     if (Math.random() < UNION_BOSS_CRIT_CHANCE) landed.push("unionBoss");
     if (Math.random() < RUSH_HOUR_CRIT_CHANCE) landed.push("rushHour");
+    if (Math.random() < GOLDEN_TICKET_CRIT_CHANCE) landed.push("goldenTicket");
+    if (Math.random() < SILVER_TICKET_CRIT_CHANCE) landed.push("silverTicket");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -919,6 +954,8 @@ export function rollCrit(
     intern: kept.has("intern"),
     unionBoss: kept.has("unionBoss"),
     rushHour: kept.has("rushHour"),
+    goldenTicket: kept.has("goldenTicket"),
+    silverTicket: kept.has("silverTicket"),
   });
 }
 
@@ -1064,6 +1101,14 @@ export function isRushHourCrit(floor: Floor): boolean {
   return rushHourCrits.has(floor);
 }
 
+export function isGoldenTicketCrit(floor: Floor): boolean {
+  return goldenTicketCrits.has(floor);
+}
+
+export function isSilverTicketCrit(floor: Floor): boolean {
+  return silverTicketCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1115,6 +1160,8 @@ export function consumeCritProcs(floor: Floor): void {
   internCrits.delete(floor);
   unionBossCrits.delete(floor);
   rushHourCrits.delete(floor);
+  goldenTicketCrits.delete(floor);
+  silverTicketCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1259,6 +1306,14 @@ export function forceUnionBossCritProc(floor: Floor): void {
 
 export function forceRushHourCritProc(floor: Floor): void {
   rushHourCrits.add(floor);
+}
+
+export function forceGoldenTicketCritProc(floor: Floor): void {
+  goldenTicketCrits.add(floor);
+}
+
+export function forceSilverTicketCritProc(floor: Floor): void {
+  silverTicketCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

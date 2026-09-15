@@ -48,6 +48,8 @@ import {
   isInternCrit,
   isUnionBossCrit,
   isRushHourCrit,
+  isGoldenTicketCrit,
+  isSilverTicketCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -64,6 +66,8 @@ import {
   isOvertimeActive,
   triggerFrozenCrit,
   triggerRushHourCrit,
+  armGuaranteedUltraCrit,
+  armGuaranteedMegaCrit,
   endOvertimeActiveWindow,
   isOvertimeDraining,
   getOvertimeCost,
@@ -538,6 +542,21 @@ function applyRushHourCrit(floors: Floor[]): void {
   triggerRushHourCrit(floors);
 }
 
+// "Golden Ticket" crit (see shared/critTypes's isGoldenTicketCrit): no
+// instant payout — just arms upgradeButton.ts's own armGuaranteedUltraCrit
+// so the very next rollCritUpgrade call on this floor is forced straight to
+// ultra, bypassing every tier/proc chance entirely for that one roll
+function applyGoldenTicketCrit(floor: Floor): void {
+  armGuaranteedUltraCrit(floor);
+}
+
+// "Silver Ticket" crit (see shared/critTypes's isSilverTicketCrit): same
+// shape as Golden Ticket above, but forces the very next rollCritUpgrade
+// call on this floor to mega instead
+function applySilverTicketCrit(floor: Floor): void {
+  armGuaranteedMegaCrit(floor);
+}
+
 // "winter sale"/"spring sale"/"summer sale"/"autumn sale"/"halloween sale"
 // crits (see shared/critTypes's isWinterSaleCrit etc.) — all five share this
 // exact reward shape, only their icon/label/color AND discount size differ
@@ -756,6 +775,12 @@ export function handleFloorClick(
         // rush hour crit: caps every unlocked floor's own income timer at
         // RUSH_HOUR_INTERVAL_SECONDS, building-wide, for its own duration
         if (buyTier.rushHour) applyRushHourCrit(floors);
+        // golden ticket crit: guarantees this floor's very next crit lands
+        // ultra, no reward of its own
+        if (buyTier.goldenTicket) applyGoldenTicketCrit(floor);
+        // silver ticket crit: guarantees this floor's very next crit lands
+        // mega, no reward of its own
+        if (buyTier.silverTicket) applySilverTicketCrit(floor);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -846,6 +871,8 @@ export function handleFloorClick(
           buyTier.unionBoss,
           buyTier.easterSale,
           buyTier.rushHour,
+          buyTier.goldenTicket,
+          buyTier.silverTicket,
         );
     }
     return;
@@ -1002,6 +1029,8 @@ export function handleFloorClick(
       const intern = isInternCrit(floor);
       const unionBoss = isUnionBossCrit(floor);
       const rushHour = isRushHourCrit(floor);
+      const goldenTicket = isGoldenTicketCrit(floor);
+      const silverTicket = isSilverTicketCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1151,6 +1180,12 @@ export function handleFloorClick(
       // rush hour crit: caps every unlocked floor's own income timer at
       // RUSH_HOUR_INTERVAL_SECONDS, building-wide, for its own duration
       if (rushHour) applyRushHourCrit(floors);
+      // golden ticket crit: guarantees this floor's very next crit lands
+      // ultra, no reward of its own
+      if (goldenTicket) applyGoldenTicketCrit(floor);
+      // silver ticket crit: guarantees this floor's very next crit lands
+      // mega, no reward of its own
+      if (silverTicket) applySilverTicketCrit(floor);
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
@@ -1205,6 +1240,8 @@ export function handleFloorClick(
         unionBoss,
         easterSale,
         rushHour,
+        goldenTicket,
+        silverTicket,
       );
       return;
     }

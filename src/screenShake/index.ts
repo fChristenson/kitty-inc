@@ -218,6 +218,18 @@ let sportscarIcon: HTMLImageElement | null = null;
 loadImageByName("sportscar").then((image) => {
   sportscarIcon = image;
 });
+// same idea again, drawn behind the "Golden Ticket" flash text (see
+// shared/critTypes's isGoldenTicketCrit)
+let goldenTicketIcon: HTMLImageElement | null = null;
+loadImageByName("goldenTicket").then((image) => {
+  goldenTicketIcon = image;
+});
+// same idea again, drawn behind the "Silver Ticket" flash text (see
+// shared/critTypes's isSilverTicketCrit)
+let silverTicketIcon: HTMLImageElement | null = null;
+loadImageByName("silverTicket").then((image) => {
+  silverTicketIcon = image;
+});
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -886,6 +898,27 @@ function drawFlashLayer(
       measuredWidth * 0.85,
     );
     ctx.drawImage(sportscarIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  if (label === "Golden Ticket" && goldenTicketIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      goldenTicketIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.drawImage(goldenTicketIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+  }
+  // rotated a fixed 45deg on top of the text's own animated entrance
+  // rotation (per explicit request), scoped to its own save/restore so that
+  // extra spin doesn't also rotate the bloom/text drawn after it — same
+  // pattern chainIcon above uses
+  if (label === "Silver Ticket" && silverTicketIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(
+      silverTicketIcon,
+      measuredWidth * 0.85,
+    );
+    ctx.save();
+    ctx.rotate(Math.PI / 4);
+    ctx.drawImage(silverTicketIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+    ctx.restore();
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

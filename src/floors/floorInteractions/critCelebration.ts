@@ -66,6 +66,10 @@ import {
   UNION_BOSS_CRIT_LABEL,
   RUSH_HOUR_CRIT_COLOR,
   RUSH_HOUR_CRIT_LABEL,
+  GOLDEN_TICKET_CRIT_COLOR,
+  GOLDEN_TICKET_CRIT_LABEL,
+  SILVER_TICKET_CRIT_COLOR,
+  SILVER_TICKET_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -548,6 +552,8 @@ interface QueuedCelebration {
     | "intern"
     | "unionBoss"
     | "rushHour"
+    | "goldenTicket"
+    | "silverTicket"
     | "bonusTier";
   queuedAt: number;
   run: () => void;
@@ -657,6 +663,8 @@ export function triggerCritCelebration(
   unionBoss = false,
   easterSale = false,
   rushHour = false,
+  goldenTicket = false,
+  silverTicket = false,
 ): void {
   if (
     chain ||
@@ -692,7 +700,9 @@ export function triggerCritCelebration(
     intern ||
     unionBoss ||
     easterSale ||
-    rushHour
+    rushHour ||
+    goldenTicket ||
+    silverTicket
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1023,6 +1033,40 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             RUSH_HOUR_CRIT_LABEL,
             RUSH_HOUR_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      goldenTicket &&
+      !specialCelebrationQueue.some((q) => q.kind === "goldenTicket")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "goldenTicket",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            GOLDEN_TICKET_CRIT_LABEL,
+            GOLDEN_TICKET_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      silverTicket &&
+      !specialCelebrationQueue.some((q) => q.kind === "silverTicket")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "silverTicket",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            SILVER_TICKET_CRIT_LABEL,
+            SILVER_TICKET_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,
