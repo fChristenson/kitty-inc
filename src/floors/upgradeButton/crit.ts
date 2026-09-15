@@ -147,6 +147,9 @@ export {
   FANCY_FRIDAY_CRIT_UPGRADES,
   FIRE_DRILL_CRIT_COLOR,
   FIRE_DRILL_CRIT_LABEL,
+  DOUBLE_DOWN_CRIT_COLOR,
+  DOUBLE_DOWN_CRIT_LABEL,
+  DOUBLE_DOWN_CRIT_REPEATS,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -200,6 +203,7 @@ export {
   isCasualFridayCrit,
   isFancyFridayCrit,
   isFireDrillCrit,
+  isDoubleDownCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -264,6 +268,7 @@ import {
   forceCasualFridayCritProc,
   forceFancyFridayCritProc,
   forceFireDrillCritProc,
+  forceDoubleDownCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -364,6 +369,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.casualFriday) forceCasualFridayCritProc(floor);
     if (result.fancyFriday) forceFancyFridayCritProc(floor);
     if (result.fireDrill) forceFireDrillCritProc(floor);
+    if (result.doubleDown) forceDoubleDownCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -501,6 +507,7 @@ export function forceFloorBuyCrit(
     casualFriday: false,
     fancyFriday: false,
     fireDrill: false,
+    doubleDown: false,
   };
 }
 
@@ -582,6 +589,11 @@ export function forceFancyFridayFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceFireDrillFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.fireDrill = true;
+}
+
+export function forceDoubleDownFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.doubleDown = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -956,6 +968,11 @@ export function forceFancyFridayCritUpgrade(floor: Floor): void {
 export function forceFireDrillCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceFireDrillCritProc(floor);
+}
+
+export function forceDoubleDownCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceDoubleDownCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

@@ -66,6 +66,7 @@ import {
   isCasualFridayCrit,
   isFancyFridayCrit,
   isFireDrillCrit,
+  isDoubleDownCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -89,6 +90,7 @@ import {
   ROUND_UP_CRIT_STEP,
   CASUAL_FRIDAY_CRIT_UPGRADES,
   FANCY_FRIDAY_CRIT_UPGRADES,
+  DOUBLE_DOWN_CRIT_REPEATS,
   endOvertimeActiveWindow,
   isOvertimeDraining,
   getOvertimeCost,
@@ -620,6 +622,24 @@ function applyDejaVuCrit(floor: Floor, isGroundFloor: boolean): void {
   }
 }
 
+// "Double Down" crit (see shared/critTypes's isDoubleDownCrit): same shape as
+// Deja Vu above, but replays the tier that ACTUALLY landed rather than a
+// random one — so its value rides on whatever crit spawned it
+function applyDoubleDownCrit(
+  floor: Floor,
+  isGroundFloor: boolean,
+  tier: CritTier,
+): void {
+  const count = CRIT_TIER_CONFIG[tier].multiplier;
+  for (
+    let repetition = 0;
+    repetition < DOUBLE_DOWN_CRIT_REPEATS;
+    repetition++
+  ) {
+    for (let i = 0; i < count; i++) applyUpgradeTick(floor, isGroundFloor);
+  }
+}
+
 // "payday crit" (see shared/critTypes's isPaydayCrit): a flat one-time
 // effect, same shape as booty — triples the currently active company's
 // total income once
@@ -1000,6 +1020,8 @@ export function handleFloorClick(
         if (buyTier.fancyFriday)
           applyFlatUpgradeBatch(floors, FANCY_FRIDAY_CRIT_UPGRADES);
         if (buyTier.fireDrill) applyFireDrillCrit(floors);
+        if (buyTier.doubleDown)
+          applyDoubleDownCrit(floor, floors.indexOf(floor) === 0, buyTier.tier);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -1108,6 +1130,7 @@ export function handleFloorClick(
           buyTier.casualFriday,
           buyTier.fancyFriday,
           buyTier.fireDrill,
+          buyTier.doubleDown,
         );
     }
     return;
@@ -1282,6 +1305,7 @@ export function handleFloorClick(
       const casualFriday = isCasualFridayCrit(floor);
       const fancyFriday = isFancyFridayCrit(floor);
       const fireDrill = isFireDrillCrit(floor);
+      const doubleDown = isDoubleDownCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1299,6 +1323,7 @@ export function handleFloorClick(
       if (fancyFriday)
         applyFlatUpgradeBatch(floors, FANCY_FRIDAY_CRIT_UPGRADES);
       if (fireDrill) applyFireDrillCrit(floors);
+      if (doubleDown) applyDoubleDownCrit(floor, isGroundFloor, tier);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
       // never once per free tick above, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
@@ -1533,6 +1558,7 @@ export function handleFloorClick(
         casualFriday,
         fancyFriday,
         fireDrill,
+        doubleDown,
       );
       return;
     }

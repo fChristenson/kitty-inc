@@ -16,8 +16,9 @@ and they must not be confused:
    top of an already-landed tier. A proc never fires standalone and never changes
    the upgrade button's idle appearance; it's invisible until the armed crit is
    actually clicked, at which point it reveals itself only via the celebration
-   flash (label swap + backdrop icon). Current procs: **Chain**, **Boost**,
-   **Bounce**, **Explosion**, **Booty**, **Upgrade**, **Peppermint**, **Heavenly**.
+   flash (label swap + backdrop icon). The full, canonical list lives in
+   `shared/critTypes`'s `CRIT_PROC_KINDS`/`CRIT_PROC_INFO` — read it there
+   rather than trusting any list written down elsewhere.
 
 All odds/multipliers live in `src/config.ts`'s `CONFIG.crit` — never hardcode a
 chance or multiplier anywhere else.
@@ -57,11 +58,9 @@ Roll order:
 1. Walk `CRIT_TIER_ORDER` (rarest-first). First tier whose `chance` hits wins; a
    full miss calls `onLanded` zero times (silent, no null-check needed by callers).
 2. Only once a tier lands: roll `SPECIAL_CRIT_GATEWAY_CHANCE` once. A miss here
-   means **none** of the 8 procs get a chance to land, silently.
-3. On a gateway hit, roll all 8 procs independently (`CHAIN_CRIT_CHANCE`,
-   `BOOST_CRIT_CHANCE`, `BOUNCE_CRIT_CHANCE`, `EXPLOSION_CRIT_CHANCE`,
-   `BOOTY_CRIT_CHANCE`, `UPGRADE_CRIT_CHANCE`, `PEPPERMINT_CRIT_CHANCE`,
-   `HEAVENLY_CRIT_CHANCE`).
+   means **none** of the procs get a chance to land, silently.
+3. On a gateway hit, roll every proc in `CRIT_PROC_KINDS` independently against
+   its own `X_CRIT_CHANCE`.
 4. Cap whichever landed to at most `MAX_SPECIAL_CRIT_PROCS` (2) via `pickAtMost`
    (Fisher-Yates shuffle + slice) — a lucky roll can never stack more than 2 procs.
 
@@ -126,6 +125,8 @@ chest, starburst).
 
 1. `config.ts`: add its `xChance` (and `xContinueChance` if it's a "walk a tier
    reward across floors" shape like chain/bounce/explosion) under `CONFIG.crit`.
+   **Pick that chance from the rarity bands below — never default a new proc to
+   whatever the last one used.**
 2. `shared/critTypes/index.ts`: add `X_CRIT_CHANCE`/`X_CRIT_COLOR`/`X_CRIT_LABEL`
    exports, a `xCrits` WeakSet, `isXCrit`/`forceXCritProc`, add it to
    `consumeCritProcs`, add its field to `CritRollResult`, and add its roll line
@@ -142,21 +143,59 @@ tier?)` dev helper, thread the flag through `rollCritUpgrade`/
    `screenShake.ts` on the new label string.
 6. `hud/testButton`: add a "Spawn X Crit" dev button calling `forceXCritUpgrade`
    (+ re-export the new wiring function through `hud/index.ts`'s facade).
-7. **`hud/corporationBoostMenu/index.ts`'s `CRIT_INFO` array**: add `{ icon:
-getImageUrl("<name>"), label: "<Label>", description: "<brief phrase>" }` —
-   this is what makes the new proc show up (icon + name + expandable
-   description) in the player-facing "Special Crits" info dialog. Keep the
-   description short (2 lines max, phrase-style — "Boosts every worker for
-   free", not a full sentence); see the existing 8 entries for tone.
+7. **`shared/critTypes/index.ts`'s `CRIT_PROC_INFO` table**: add `{ label:
+X_CRIT_LABEL, icon: "<name>", description: "<brief phrase>" }`. This is the
+   canonical icon/label/description table — `hud/corporationBoostMenu`'s
+   `CRIT_INFO` is derived from it, so this one entry is what makes the proc
+   show up (icon + name + expandable description) in the player-facing
+   "Special Crits" dialog. Keep the description short (2 lines max,
+   phrase-style — "Boosts every worker for free", not a full sentence); a proc
+   missing from this table is undiscoverable even though it still lands
+   in-game.
 
 Never let `MAX_SPECIAL_CRIT_PROCS`'s cap-then-random-pick logic be bypassed for
 a new proc — it must go through the same `landed` array + `pickAtMost` path.
+
+## Odds must be proportional to the reward
+
+`CONFIG.crit`'s chances are a single deliberate ladder, not per-proc guesses:
+the bigger the swing a proc grants, the rarer it must be. Before adding or
+touching a chance, place the proc in one of these bands and use a value from
+it; if it doesn't fit cleanly, compare it against the existing procs in the
+neighbouring bands rather than inventing a new magnitude.
+
+| Band     | Chance                           | Reward shape                                                                                       | Examples                                                                                                        |
+| -------- | -------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Minor    | `0.06`–`0.10` (**hard cap 10%**) | one trinket, one floor, or one tick of income; a short timed boost                                 | chair/supplies giveaway, intern, boost, frozen, tick tock, fire drill, supply run, espresso shot, chain, bounce |
+| Moderate | `0.02`–`0.05`                    | building-wide but bounded — a fixed batch of free upgrades, a cost cut, a one-time income multiple | casual/fancy friday, round up, seasonal sales, clone army, golden handshake, payday, golden parachute, pair     |
+| Strong   | `0.005`–`0.015`                  | permanent tier promotion, a guaranteed future jackpot, or a large refund/payout                    | upgrade, three/four of a kind, gold standard, golden ticket, second wind, executive order, payout, lucky clover |
+| Huge     | `0.001`–`0.003`                  | reshapes the whole building at once                                                                | full house, peppermint, royal flush, grand opening                                                              |
+| Rarest   | `0.0001`                         | **heavenly only** — nothing may be rarer                                                           | heavenly                                                                                                        |
+
+Two rules that fall out of this and have both been violated before:
+
+- **A family of procs must decrease monotonically with its own reward size.**
+  The poker hands (pair → three → four → full house → royal flush) promote 2,
+  3, 4, 5 and 6 floors, so their chances must strictly decrease in that order;
+  they were inverted for a long time (four of a kind was 5× likelier than
+  three of a kind) without anything catching it.
+- **Don't copy the previous proc's chance.** Several procs were shipped at
+  `0.0005` purely because that's what the one above them used, leaving a
+  one-tick-of-income proc as rare as a whole-building unlock.
+
+Remember the odds compound: a proc only rolls at all once a tier has landed
+(`CRIT_TIER_CONFIG`) **and** `SPECIAL_CRIT_GATEWAY_CHANCE` has hit, so a `0.10`
+band value is nowhere near a 10% chance per click.
 
 ## Processing a new crit's icon (raw art → shipped PNG)
 
 Every special-crit backdrop icon is a raw `src/assets/<name>.jfif` processed by
 a dedicated `scripts/process-<name>.mjs` into `src/assets/<name>.png` — never
-hand-edit a PNG directly, and never overwrite the raw `.jfif` source.
+hand-edit a PNG directly, and never overwrite the raw `.jfif` source. The
+script must ALSO copy the finished PNG into
+`src/assets/themes/references/dist/<name>.png`: `loadAssets`'s `IMAGE_FILES`
+glob only reads that folder, so an icon written solely to `src/assets/` builds
+fine and silently never ships.
 
 **1. Pick a chroma-key technique based on the raw art's own background**, in
 this order of preference:

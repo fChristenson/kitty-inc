@@ -69,6 +69,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Casual Friday": { name: "casualFriday" },
   "Fancy Friday": { name: "fancyFriday" },
   "Fire Drill": { name: "fireDrill" },
+  "Double Down": { name: "doubleDown" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

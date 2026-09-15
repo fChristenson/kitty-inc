@@ -158,6 +158,8 @@ export const COLOR = {
   fancyFridayIndigo: "#4338CA",
   // Fire Drill crit's own dedicated color
   fireDrillRed: "#DC2626",
+  // Double Down crit's own dedicated color
+  doubleDownCrimson: "#9F1239",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",
