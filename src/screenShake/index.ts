@@ -70,6 +70,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Fancy Friday": { name: "fancyFriday" },
   "Fire Drill": { name: "fireDrill" },
   "Double Down": { name: "doubleDown" },
+  "Coffee Run": { name: "coffeeRun" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

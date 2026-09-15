@@ -100,6 +100,7 @@ const IMAGE_FILES = {
   fancyFriday: "fancyFriday.png", // Fancy Friday crit flash's own backdrop icon
   fireDrill: "fireDrill.png", // Fire Drill crit flash's own backdrop icon
   doubleDown: "doubleDown.png", // Double Down crit flash's own backdrop icon
+  coffeeRun: "coffeeRun.png", // Coffee Run crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

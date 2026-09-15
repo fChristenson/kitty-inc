@@ -160,6 +160,8 @@ export const COLOR = {
   fireDrillRed: "#DC2626",
   // Double Down crit's own dedicated color
   doubleDownCrimson: "#9F1239",
+  // Coffee Run crit's own dedicated color
+  coffeeRunTeal: "#0E7490",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

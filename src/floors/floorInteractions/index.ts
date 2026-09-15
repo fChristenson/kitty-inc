@@ -67,6 +67,7 @@ import {
   isFancyFridayCrit,
   isFireDrillCrit,
   isDoubleDownCrit,
+  isCoffeeRunCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -367,6 +368,13 @@ function applySunshineCrit(floors: Floor[]): void {
 const SNOWDAY_BOOST_DURATION_MS = BOOST_DURATION_MS * 3;
 function applySnowdayCrit(floors: Floor[]): void {
   applyFloorBoost(floors, SNOWDAY_BOOST_DURATION_MS);
+}
+
+// "Coffee Run" crit (see shared/critTypes' isCoffeeRunCrit): the same reward
+// again, at the family's longest duration — a full minute
+const COFFEE_RUN_BOOST_DURATION_MS = BOOST_DURATION_MS * 4;
+function applyCoffeeRunCrit(floors: Floor[]): void {
+  applyFloorBoost(floors, COFFEE_RUN_BOOST_DURATION_MS);
 }
 
 // "night shift crit" (see shared/critTypes' isNightShiftCrit): same
@@ -1022,6 +1030,7 @@ export function handleFloorClick(
         if (buyTier.fireDrill) applyFireDrillCrit(floors);
         if (buyTier.doubleDown)
           applyDoubleDownCrit(floor, floors.indexOf(floor) === 0, buyTier.tier);
+        if (buyTier.coffeeRun) applyCoffeeRunCrit(floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -1131,6 +1140,7 @@ export function handleFloorClick(
           buyTier.fancyFriday,
           buyTier.fireDrill,
           buyTier.doubleDown,
+          buyTier.coffeeRun,
         );
     }
     return;
@@ -1306,6 +1316,7 @@ export function handleFloorClick(
       const fancyFriday = isFancyFridayCrit(floor);
       const fireDrill = isFireDrillCrit(floor);
       const doubleDown = isDoubleDownCrit(floor);
+      const coffeeRun = isCoffeeRunCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1324,6 +1335,7 @@ export function handleFloorClick(
         applyFlatUpgradeBatch(floors, FANCY_FRIDAY_CRIT_UPGRADES);
       if (fireDrill) applyFireDrillCrit(floors);
       if (doubleDown) applyDoubleDownCrit(floor, isGroundFloor, tier);
+      if (coffeeRun) applyCoffeeRunCrit(floors);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
       // never once per free tick above, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
@@ -1559,6 +1571,7 @@ export function handleFloorClick(
         fancyFriday,
         fireDrill,
         doubleDown,
+        coffeeRun,
       );
       return;
     }

@@ -259,6 +259,10 @@ export const CONFIG = {
     // same floor, so it scales with whatever landed (up to 250 extra free
     // upgrades off an ultra); priced like the other tier-scaled repeats
     doubleDownChance: 0.015,
+    // "Coffee Run" crit — same building-wide free-worker-boost reward as
+    // boost/sunshine/snowday, but the longest duration of the family (a full
+    // minute), so rarer than any of them
+    coffeeRunChance: 0.03,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

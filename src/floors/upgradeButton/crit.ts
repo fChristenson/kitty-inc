@@ -150,6 +150,8 @@ export {
   DOUBLE_DOWN_CRIT_COLOR,
   DOUBLE_DOWN_CRIT_LABEL,
   DOUBLE_DOWN_CRIT_REPEATS,
+  COFFEE_RUN_CRIT_COLOR,
+  COFFEE_RUN_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -204,6 +206,7 @@ export {
   isFancyFridayCrit,
   isFireDrillCrit,
   isDoubleDownCrit,
+  isCoffeeRunCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -269,6 +272,7 @@ import {
   forceFancyFridayCritProc,
   forceFireDrillCritProc,
   forceDoubleDownCritProc,
+  forceCoffeeRunCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -370,6 +374,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.fancyFriday) forceFancyFridayCritProc(floor);
     if (result.fireDrill) forceFireDrillCritProc(floor);
     if (result.doubleDown) forceDoubleDownCritProc(floor);
+    if (result.coffeeRun) forceCoffeeRunCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -508,6 +513,7 @@ export function forceFloorBuyCrit(
     fancyFriday: false,
     fireDrill: false,
     doubleDown: false,
+    coffeeRun: false,
   };
 }
 
@@ -594,6 +600,11 @@ export function forceFireDrillFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceDoubleDownFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.doubleDown = true;
+}
+
+export function forceCoffeeRunFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.coffeeRun = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -973,6 +984,11 @@ export function forceFireDrillCritUpgrade(floor: Floor): void {
 export function forceDoubleDownCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceDoubleDownCritProc(floor);
+}
+
+export function forceCoffeeRunCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceCoffeeRunCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

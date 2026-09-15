@@ -510,6 +510,12 @@ export const DOUBLE_DOWN_CRIT_COLOR = COLOR.doubleDownCrimson;
 export const DOUBLE_DOWN_CRIT_LABEL = "Double Down";
 export const DOUBLE_DOWN_CRIT_REPEATS = 2;
 
+// "Coffee Run" crit — the boost/sunshine/snowday family's longest window: a
+// full minute of boosted workers building-wide
+export const COFFEE_RUN_CRIT_CHANCE = CONFIG.crit.coffeeRunChance;
+export const COFFEE_RUN_CRIT_COLOR = COLOR.coffeeRunTeal;
+export const COFFEE_RUN_CRIT_LABEL = "Coffee Run";
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -583,6 +589,7 @@ const casualFridayCrits = new WeakSet<Floor>();
 const fancyFridayCrits = new WeakSet<Floor>();
 const fireDrillCrits = new WeakSet<Floor>();
 const doubleDownCrits = new WeakSet<Floor>();
+const coffeeRunCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -677,6 +684,7 @@ export interface CritRollResult {
   fancyFriday: boolean;
   fireDrill: boolean;
   doubleDown: boolean;
+  coffeeRun: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -742,6 +750,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "fancyFriday",
   "fireDrill",
   "doubleDown",
+  "coffeeRun",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -1073,6 +1082,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "doubleDown",
     description: "Replays the crit that spawned it twice more",
   },
+  coffeeRun: {
+    label: COFFEE_RUN_CRIT_LABEL,
+    icon: "coffeeRun",
+    description: "Boosts every worker for a full minute",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -1172,6 +1186,7 @@ export function rollCrit(
     if (Math.random() < FANCY_FRIDAY_CRIT_CHANCE) landed.push("fancyFriday");
     if (Math.random() < FIRE_DRILL_CRIT_CHANCE) landed.push("fireDrill");
     if (Math.random() < DOUBLE_DOWN_CRIT_CHANCE) landed.push("doubleDown");
+    if (Math.random() < COFFEE_RUN_CRIT_CHANCE) landed.push("coffeeRun");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -1243,6 +1258,7 @@ export function rollCrit(
     fancyFriday: kept.has("fancyFriday"),
     fireDrill: kept.has("fireDrill"),
     doubleDown: kept.has("doubleDown"),
+    coffeeRun: kept.has("coffeeRun"),
   });
 }
 
@@ -1464,6 +1480,10 @@ export function isDoubleDownCrit(floor: Floor): boolean {
   return doubleDownCrits.has(floor);
 }
 
+export function isCoffeeRunCrit(floor: Floor): boolean {
+  return coffeeRunCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1534,6 +1554,7 @@ export function consumeCritProcs(floor: Floor): void {
   fancyFridayCrits.delete(floor);
   fireDrillCrits.delete(floor);
   doubleDownCrits.delete(floor);
+  coffeeRunCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1754,6 +1775,10 @@ export function forceFireDrillCritProc(floor: Floor): void {
 
 export function forceDoubleDownCritProc(floor: Floor): void {
   doubleDownCrits.add(floor);
+}
+
+export function forceCoffeeRunCritProc(floor: Floor): void {
+  coffeeRunCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

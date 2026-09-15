@@ -1,6 +1,6 @@
 # Crit ideas
 
-## Instant payouts
+## Reviewed
 
 - Petty Cash — pays out one second of every OTHER corporation's income rate
   straight into the active one (Golden Parachute's cross-company cousin).
@@ -11,9 +11,6 @@
   tall empty tower.
 - Compound Interest — pays out the active company's own total again, but
   only the digits after the leading one (a scaling-friendly partial double).
-
-## Free stuff
-
 - Hot Desking — fills every unlocked floor to the same worker count as the
   single most-staffed floor (Clone Army, but only levelling up, never down).
 - Supply Run — grants office chairs AND supplies to every unlocked floor at
@@ -22,9 +19,6 @@
   starts them already at the building's current crit tier.
 - Corner Office — picks the single highest-earning floor and permanently
   doubles its rate step, nothing else.
-
-## Tier / multiplier plays
-
 - Promotion Ladder — promotes floors one tier each, starting from the top of
   the building and walking down until it runs out of floors.
 - Hostile Takeover — copies the single best crit tier anywhere in the
@@ -33,9 +27,6 @@
   is better, so it can only ever improve the crit that spawned it.
 - Casual Friday — every floor drops one tier, but the whole building's
   income interval is permanently cut in half. A real trade-off crit.
-
-## Timed events
-
 - Fire Drill — every floor's income bar instantly completes and restarts,
   over and over, for a few seconds.
 - All Hands — every worker on every floor is boosted at once for double the
@@ -44,9 +35,6 @@
   guaranteed at least mega tier.
 - Ghost Shift — the building keeps earning at double rate while the tab is
   backgrounded, for one full idle stretch.
-
-## Weird / chaotic
-
 - Butterfly Effect — applies a random OTHER special crit's reward, picked
   fresh at consumption time (Deja Vu, but across procs instead of tiers).
 - Rubber Duck — the next five clicks on ANY floor each count as crits at the
@@ -57,3 +45,36 @@
   seconds (Frozen, but not just the one floor).
 - Shredder — wipes the floor's upgrade cost entirely for its next ten
   upgrades, then snaps back to normal.
+
+## To consider
+
+- Coffee Run — every floor's income timer runs at half interval until the
+  player's next crit lands, however long that takes.
+- Open Plan — merges the two lowest-earning unlocked floors' rates into
+  both, so each ends up at their combined rate.
+- Severance — instantly pays out ten seconds of the single highest-earning
+  floor's rate, then resets that floor's boost timers.
+- Pension Plan — banks a small percentage of every click's payout into a pot
+  that a later crit cashes out all at once.
+- Whiteboard — the next upgrade bought on any floor also applies to every
+  other unlocked floor, at the same price.
+- Team Building — every unlocked floor gains one worker, capped at the
+  render limit (Intern, building-wide).
+- Key Card — unlocks the single cheapest locked floor across ALL buildings,
+  not just the current one.
+- Spring Cleaning — clears every floor's accumulated price growth, resetting
+  upgrade costs to the base for that floor's current level.
+- Night Owl — doubles idle income for the next offline stretch only, then
+  expires unused if the player stays on the page.
+- Stock Split — halves every floor's rate step but doubles its upgrade
+  count, netting the same income with far cheaper future upgrades.
+- Water Cooler — each unlocked floor gets its own independent chance to
+  spawn a small crit flash, chained off this one.
+- Corner Cut — permanently removes one floor's manager but doubles that
+  floor's rate. Another genuine trade-off.
+- Fire Sale — for 15 seconds every purchase across the whole company is
+  free, capped at a handful of buys.
+- Annual Review — promotes the LOWEST-tier floor in the building straight to
+  the building's highest tier.
+- Golden Stapler — Golden Ticket with a bigger moment: a jackpot flash that
+  also guarantees an ultra on the very next click.
