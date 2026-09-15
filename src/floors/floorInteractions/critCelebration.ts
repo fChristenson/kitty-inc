@@ -4,7 +4,7 @@ import {
   CRIT_PROC_KINDS,
   type CritProcKind,
 } from "../../shared/critTypes";
-import { notifyCrit } from "../../critNotifications";
+import { enqueueCritDisplayEvents } from "../../shared/critEvents";
 import {
   type CritTier,
   CRIT_TIER_CONFIG,
@@ -584,6 +584,7 @@ interface QueuedCelebration {
 }
 const specialCelebrationQueue: QueuedCelebration[] = [];
 let drainingSpecialQueue = false;
+type RandomFollowUpKind = Exclude<CritProcKind, "bullMarket" | "dejaVu">;
 
 // a bulk-buy hold (x250 multiplier) can land many chain/boost procs far
 // faster than they can each get their own on-screen turn — anything still
@@ -696,7 +697,14 @@ export function triggerCritCelebration(
   espressoShot = false,
   dejaVu = false,
 ): void {
-  notifyCrit(CRIT_TIER_CONFIG[tier].label, tierColor(tier));
+  enqueueCritDisplayEvents([
+    { label: CRIT_TIER_CONFIG[tier].label, color: tierColor(tier) },
+  ]);
+  if (dejaVu) {
+    enqueueCritDisplayEvents([
+      { label: CRIT_TIER_CONFIG[tier].label, color: tierColor(tier) },
+    ]);
+  }
   const procFlags: Partial<Record<CritProcKind, boolean>> = {
     chain,
     boost,
@@ -744,7 +752,15 @@ export function triggerCritCelebration(
   for (const kind of CRIT_PROC_KINDS) {
     if (!procFlags[kind]) continue;
     const info = CRIT_PROC_INFO[kind];
-    notifyCrit(info.label, tierColor(tier), info.icon);
+    if (kind === "dejaVu") {
+      enqueueCritDisplayEvents([
+        { label: info.label, color: tierColor(tier), icon: info.icon },
+      ]);
+    } else {
+      enqueueCritDisplayEvents([
+        { label: info.label, color: tierColor(tier), icon: info.icon },
+      ]);
+    }
   }
   if (
     chain ||
@@ -1254,6 +1270,40 @@ export function triggerCritCelebration(
             getScreenCenterLocal,
           ),
       });
+
+      const availableFollowUps = CRIT_PROC_KINDS.filter(
+        (kind) =>
+          kind !== "dejaVu" &&
+          kind !== "bullMarket" &&
+          !procFlags[kind] &&
+          !specialCelebrationQueue.some((q) => q.kind === kind),
+      ) as RandomFollowUpKind[];
+      for (let i = 0; i < 2 && availableFollowUps.length > 0; i++) {
+        const randomIndex = Math.floor(
+          Math.random() * availableFollowUps.length,
+        );
+        const followUpKind = availableFollowUps.splice(randomIndex, 1)[0];
+        const followUpInfo = CRIT_PROC_INFO[followUpKind];
+        enqueueCritDisplayEvents([
+          {
+            label: followUpInfo.label,
+            color: tierColor(tier),
+            icon: followUpInfo.icon,
+          },
+        ]);
+        specialCelebrationQueue.push({
+          kind: followUpKind,
+          queuedAt: now,
+          run: () =>
+            celebrateFlatProc(
+              followUpInfo.label,
+              tierColor(tier),
+              floor,
+              tier,
+              getScreenCenterLocal,
+            ),
+        });
+      }
     }
     if (
       sunshine &&

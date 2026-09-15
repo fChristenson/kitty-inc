@@ -1,6 +1,10 @@
 import { getImageUrl, type ImageName } from "../loadAssets";
 import { drawCritText } from "../shared/critText";
 import {
+  subscribeCritDisplayEvents,
+  type CritDisplayEvent,
+} from "../shared/critEvents";
+import {
   CRIT_PROC_INFO,
   CRIT_PROC_KINDS,
   CRIT_TIER_CONFIG,
@@ -12,6 +16,7 @@ const FLOATING_X_RANGE_PX = 32;
 const FLOATING_DELAY_MS = 300;
 const FLOATING_WAVE_AMPLITUDE_PX = 30;
 let overlay: HTMLDivElement | null = null;
+let unsubscribeCritEvents: (() => void) | null = null;
 
 function animateFloatingCrit(item: HTMLDivElement, delayMs: number): void {
   window.setTimeout(() => {
@@ -48,6 +53,10 @@ function animateFloatingCrit(item: HTMLDivElement, delayMs: number): void {
 
 export function initCritNotifications(container: HTMLDivElement): void {
   overlay = container;
+  unsubscribeCritEvents?.();
+  unsubscribeCritEvents = subscribeCritDisplayEvents((event: CritDisplayEvent) => {
+    notifyCrit(event.label, event.color, event.icon);
+  });
 }
 
 export function notifyCrit(
