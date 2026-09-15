@@ -551,16 +551,18 @@ function applyFullyStaffedCrit(floors: Floor[]): void {
 }
 
 // "Clone Army" copies the strongest unlocked floor workforce to every other
-// unlocked floor without charging for workers.
+// unlocked floor without charging for workers — only ever levelling floors
+// up, never taking workers away from one that's somehow already above the cap
 function applyCloneArmyCrit(floors: Floor[]): void {
   const largestWorkerCount = floors.reduce(
     (largest, floor) =>
       floor.unlocked ? Math.max(largest, floor.workerCount) : largest,
     1,
   );
+  const target = Math.min(largestWorkerCount, MAX_RENDERED_WORKERS);
   for (const floor of floors) {
     if (floor.unlocked) {
-      floor.workerCount = Math.min(largestWorkerCount, MAX_RENDERED_WORKERS);
+      floor.workerCount = Math.max(floor.workerCount, target);
     }
   }
 }
