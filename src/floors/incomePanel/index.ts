@@ -193,7 +193,8 @@ function currentSpeedMultiplier(floor: Floor, now: number): number {
   const boostedFraction =
     countBoostedWorkers(floor, now) / MAX_RENDERED_WORKERS;
   const boostExponent = boostedFraction * floor.workerCount;
-  const speedMultiplier = 2 ** boostExponent * officeUpgradeSpeedMultiplier(floor);
+  const speedMultiplier =
+    2 ** boostExponent * officeUpgradeSpeedMultiplier(floor);
   if (!isRushHourActive(floor, now)) return speedMultiplier;
   // "Rush Hour" crit (see shared/critTypes' isRushHourActive): the floor's
   // own income timer is capped at RUSH_HOUR_INTERVAL_SECONDS while active —
