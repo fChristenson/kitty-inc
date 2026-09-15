@@ -54,9 +54,11 @@ function animateFloatingCrit(item: HTMLDivElement, delayMs: number): void {
 export function initCritNotifications(container: HTMLDivElement): void {
   overlay = container;
   unsubscribeCritEvents?.();
-  unsubscribeCritEvents = subscribeCritDisplayEvents((event: CritDisplayEvent) => {
-    notifyCrit(event.label, event.color, event.icon);
-  });
+  unsubscribeCritEvents = subscribeCritDisplayEvents(
+    (event: CritDisplayEvent) => {
+      notifyCrit(event.label, event.color, event.icon);
+    },
+  );
 }
 
 export function notifyCrit(

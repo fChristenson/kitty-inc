@@ -505,7 +505,10 @@ export function createCityMapView(
   ): void {
     const { tier, chain } = result;
     enqueueCritDisplayEvents([
-      { label: CRIT_TIER_CONFIG[tier].label, color: CRIT_TIER_CONFIG[tier].color },
+      {
+        label: CRIT_TIER_CONFIG[tier].label,
+        color: CRIT_TIER_CONFIG[tier].color,
+      },
     ]);
     for (const kind of CRIT_PROC_KINDS) {
       if (!result[kind]) continue;
