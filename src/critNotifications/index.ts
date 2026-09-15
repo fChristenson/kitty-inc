@@ -7,10 +7,44 @@ import {
   CRIT_TIER_ORDER,
 } from "../shared/critTypes";
 
-const NOTIFICATION_LIFE_MS = 1500;
+const NOTIFICATION_LIFE_MS = 1800;
 const FLOATING_X_RANGE_PX = 32;
 const FLOATING_DELAY_MS = 300;
+const FLOATING_WAVE_AMPLITUDE_PX = 30;
 let overlay: HTMLDivElement | null = null;
+
+function animateFloatingCrit(item: HTMLDivElement, delayMs: number): void {
+  window.setTimeout(() => {
+    item.style.visibility = "visible";
+    const startedAt = performance.now();
+
+    const frame = (now: number): void => {
+      if (!item.isConnected) return;
+      const progress = Math.min(1, (now - startedAt) / NOTIFICATION_LIFE_MS);
+      const wave = progress * Math.PI * 2;
+      const fadeIn = Math.min(1, progress / 0.12);
+      const fadeOut = Math.min(1, (1 - progress) / 0.18);
+      const opacity = Math.min(fadeIn, fadeOut);
+      const popProgress = Math.min(1, progress / 0.2);
+      const scale = 0.78 + Math.sin((popProgress * Math.PI) / 2) * 0.22;
+      const x = Math.sin(wave) * FLOATING_WAVE_AMPLITUDE_PX;
+      const y = 92 - progress * 224;
+      const rotation = Math.cos(wave) * 7;
+
+      item.style.opacity = `${opacity}`;
+      item.style.filter = `saturate(${0.9 + opacity * 0.3}) brightness(${0.92 + opacity * 0.1})`;
+      item.style.transform = `translate3d(${x}px, ${y}px, 0) rotate(${rotation}deg) scale(${scale})`;
+
+      if (progress < 1) {
+        window.requestAnimationFrame(frame);
+      } else {
+        item.remove();
+      }
+    };
+
+    window.requestAnimationFrame(frame);
+  }, delayMs);
+}
 
 export function initCritNotifications(container: HTMLDivElement): void {
   overlay = container;
@@ -26,6 +60,8 @@ export function notifyCrit(
   item.className = "crit-float";
   item.style.color = color;
   item.style.left = `${Math.random() * FLOATING_X_RANGE_PX}px`;
+  item.style.visibility = "hidden";
+  item.style.transform = "translate3d(0, 140px, 0) scale(0.78)";
   const delayMs = overlay.children.length * FLOATING_DELAY_MS;
   item.style.animationDelay = `${delayMs}ms`;
   if (iconName) {
@@ -61,7 +97,7 @@ export function notifyCrit(
     item.append(textCanvas);
   }
   overlay.append(item);
-  window.setTimeout(() => item.remove(), delayMs + NOTIFICATION_LIFE_MS);
+  animateFloatingCrit(item, delayMs);
 }
 
 // dev/test-only: creates a deliberately dense mixed burst so the float

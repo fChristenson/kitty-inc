@@ -1121,6 +1121,7 @@ body {
 .crit-notifications {
   position: fixed;
   left: calc(50% - 240px + 32px);
+  transform: translateX(-40px);
   bottom: 32px;
   z-index: 1000;
   pointer-events: none;
@@ -1143,8 +1144,10 @@ body {
   height: 64px;
   display: grid;
   place-items: center;
-  color: #8B5CF6;
-  font: 900 42px/1 "Fredoka", sans-serif;
+  color: #8b5cf6;
+  font:
+    900 42px/1 "Fredoka",
+    sans-serif;
   -webkit-text-stroke: 4px #ffffff;
   paint-order: stroke fill;
   text-shadow:
@@ -1152,23 +1155,24 @@ body {
     -2px -2px 0 #000000,
     2px -2px 0 #000000,
     -2px 2px 0 #000000;
-  animation: crit-float-rise 1.5s linear both;
-  will-change: transform, opacity;
+  transform-origin: center bottom;
+  visibility: hidden;
+  will-change: transform, opacity, filter;
 }
 
 .crit-float--crit {
-  color: #8B5CF6;
+  color: #8b5cf6;
   font-size: 42px;
 }
 
 .crit-float--mega {
-  color: #F59E0B;
+  color: #f59e0b;
   font-size: 52px;
   -webkit-text-stroke-width: 5px;
 }
 
 .crit-float--ultra {
-  color: #DC2626;
+  color: #dc2626;
   font-size: 64px;
   -webkit-text-stroke-width: 6px;
 }
@@ -1186,43 +1190,4 @@ body {
   height: 64px;
   object-fit: contain;
   filter: drop-shadow(3px 4px 2px rgba(0, 0, 0, 0.55));
-}
-
-@keyframes crit-float-rise {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 100px, 0) rotate(-8deg);
-  }
-  12.5% {
-    opacity: 1;
-    transform: translate3d(21px, 75px, 0) rotate(5deg);
-  }
-  25% {
-    opacity: 1;
-    transform: translate3d(30px, 50px, 0) rotate(7deg);
-  }
-  37.5% {
-    opacity: 1;
-    transform: translate3d(21px, 25px, 0) rotate(5deg);
-  }
-  50% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(0deg);
-  }
-  62.5% {
-    opacity: 1;
-    transform: translate3d(-21px, -25px, 0) rotate(-5deg);
-  }
-  75% {
-    opacity: 1;
-    transform: translate3d(-30px, -50px, 0) rotate(-7deg);
-  }
-  87.5% {
-    opacity: 1;
-    transform: translate3d(-21px, -85px, 0) rotate(-5deg);
-  }
-  to {
-    opacity: 0;
-    transform: translate3d(0, -120px, 0) rotate(0deg);
-  }
 }
