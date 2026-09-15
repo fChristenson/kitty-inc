@@ -392,6 +392,7 @@ export {
   forceRushHourCritUpgrade,
   forceGoldenTicketCritUpgrade,
   forceSilverTicketCritUpgrade,
+  forceGoldenParachuteCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   rollFloorBuyCrit,

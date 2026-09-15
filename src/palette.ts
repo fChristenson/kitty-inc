@@ -123,6 +123,9 @@ export const COLOR = {
   // Silver Ticket crit's own dedicated color — a cool silvery slate,
   // distinct from unionBossSlate's own darker shade
   silverTicketGray: "#CBD5E1",
+  // Golden Parachute crit's own dedicated color — a burnt marigold-orange,
+  // checked for distinctness against every other gold/amber above
+  goldenParachuteMarigold: "#C97A1A",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

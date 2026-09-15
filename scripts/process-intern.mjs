@@ -65,8 +65,23 @@ for (let y = shadowFilterYStart; y < height; y++) {
     }
   }
 }
-// drops any disconnected fleck the shadow-patch removal left behind
-keepLargestOpaqueComponent(data, width, height, channels);
+// drops any disconnected fleck the shadow-patch removal left behind. A high
+// alphaCutoff here (not the function's default 20) matters: leftover ground-
+// shadow noise right under the paws stays weakly attached to the real paw
+// only through a handful of partial-alpha (anti-aliased-looking) pixels, so a
+// low cutoff still treats it as "connected" and keeps the whole speckled tail.
+// Raising the cutoff means only strongly-opaque pixels can link up the main
+// silhouette, severing that weak bridge so the noise tail forms its own much
+// smaller component and gets dropped, while real fully-opaque paw pixels are
+// unaffected.
+const COMPONENT_ALPHA_CUTOFF = 200;
+keepLargestOpaqueComponent(
+  data,
+  width,
+  height,
+  channels,
+  COMPONENT_ALPHA_CUTOFF,
+);
 
 // tight bounding box of the frame's own opaque silhouette. By this point the
 // shadow patch is already gone (color-filtered above) and any leftover fleck

@@ -211,6 +211,11 @@ export const CONFIG = {
     // only mega instead of ultra (see upgradeButton's armGuaranteedMegaCrit)
     // — a smaller guaranteed swing, so less rare than Golden Ticket
     silverTicketChance: 0.005,
+    // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
+    // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
+    // seconds' worth of the currently active company's own combined income
+    // rate (across every one of its buildings), straight to its total
+    goldenParachuteChance: 0.03,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

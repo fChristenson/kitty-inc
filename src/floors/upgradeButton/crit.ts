@@ -110,6 +110,8 @@ export {
   GOLDEN_TICKET_CRIT_LABEL,
   SILVER_TICKET_CRIT_COLOR,
   SILVER_TICKET_CRIT_LABEL,
+  GOLDEN_PARACHUTE_CRIT_COLOR,
+  GOLDEN_PARACHUTE_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -147,6 +149,7 @@ export {
   isRushHourCrit,
   isGoldenTicketCrit,
   isSilverTicketCrit,
+  isGoldenParachuteCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -195,6 +198,7 @@ import {
   forceRushHourCritProc,
   forceGoldenTicketCritProc,
   forceSilverTicketCritProc,
+  forceGoldenParachuteCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -280,6 +284,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.rushHour) forceRushHourCritProc(floor);
     if (result.goldenTicket) forceGoldenTicketCritProc(floor);
     if (result.silverTicket) forceSilverTicketCritProc(floor);
+    if (result.goldenParachute) forceGoldenParachuteCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -353,6 +358,7 @@ export function forceFloorBuyCrit(
   rushHour = false,
   goldenTicket = false,
   silverTicket = false,
+  goldenParachute = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -394,6 +400,7 @@ export function forceFloorBuyCrit(
     rushHour,
     goldenTicket,
     silverTicket,
+    goldenParachute,
   };
 }
 
@@ -667,6 +674,14 @@ export function forceGoldenTicketCritUpgrade(floor: Floor): void {
 export function forceSilverTicketCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceSilverTicketCritProc(floor);
+}
+
+// dev/test-only: force this floor's already-armed tier to also carry a
+// Golden Parachute proc, bypassing chance entirely (see hud/testButton's
+// "Spawn Golden Parachute Crit") — not tier-scaled, so no tier param needed
+export function forceGoldenParachuteCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceGoldenParachuteCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

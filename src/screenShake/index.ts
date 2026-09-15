@@ -6,230 +6,76 @@
 
 import { drawCartoonText, shadeColor } from "../utils";
 import { COLOR } from "../palette";
-import { loadImageByName } from "../loadAssets";
+import { loadImageByName, type ImageName } from "../loadAssets";
 
-// preloaded once at module load (well before a player can ever land a chain
-// crit) — drawCritFlash below draws this behind the "Chain" flash text; null
-// until the fetch/decode resolves, in which case that draw is just skipped
-let chainIcon: HTMLImageElement | null = null;
-loadImageByName("chain").then((image) => {
-  chainIcon = image;
-});
+// every crit-type's own backdrop icon, drawn behind drawFlashLayer's flash
+// text below, keyed by that flash's own label. rotateDeg is only set for the
+// couple of icons explicitly designed to spin an extra fixed amount on top of
+// the text's animated entrance rotation (see drawFlashLayer) — every other
+// icon here is either already-upright/symmetric or a directional sprite
+// (e.g. mouse.png's running pose) that would read as broken if spun.
+const CRIT_ICON_BY_LABEL: Partial<
+  Record<string, { name: ImageName; rotateDeg?: number }>
+> = {
+  Chain: { name: "chain", rotateDeg: 45 },
+  Boost: { name: "mouse" },
+  Bounce: { name: "ball" },
+  Boom: { name: "explosion" },
+  Booty: { name: "booty" },
+  Upgrade: { name: "upgrade" },
+  Peppermint: { name: "peppermint" },
+  Heavenly: { name: "heaven" },
+  Pair: { name: "pair" },
+  "Three of a Kind": { name: "threeOfAKind" },
+  "Four of a Kind": { name: "fourOfAKind" },
+  "Full House": { name: "fullHouse" },
+  "Tick Tock": { name: "clock" },
+  "Chair Giveaway": { name: "officeChairsIcon" },
+  "Supplies Giveaway": { name: "officeSuppliesIcon" },
+  "Winter Sale": { name: "winter" },
+  "Spring Sale": { name: "spring" },
+  "Summer Sale": { name: "summer" },
+  "Autumn Sale": { name: "autumn" },
+  "Halloween Sale": { name: "halloween" },
+  "Easter Sale": { name: "easterBunny" },
+  Sunshine: { name: "sunny" },
+  Snowday: { name: "snowman" },
+  "Fast Forward": { name: "fastforward" },
+  Frozen: { name: "icecube" },
+  Snowball: { name: "snowball" },
+  "Sales event": { name: "cashRegister" },
+  Payday: { name: "payday" },
+  "Gold Standard": { name: "goldStandard" },
+  "Royal Flush": { name: "royalFlush" },
+  "Night Shift": { name: "sleepyMoon" },
+  Intern: { name: "intern" },
+  "Union Boss": { name: "unionBoss" },
+  "Rush Hour": { name: "sportscar" },
+  "Golden Ticket": { name: "goldenTicket" },
+  "Silver Ticket": { name: "silverTicket", rotateDeg: 45 },
+  "Golden Parachute": { name: "goldenParachute" },
+};
 
-// same idea as chainIcon above, but drawn behind the "Boost" flash text (see
-// upgradeButton.ts's isBoostCrit) — reuses the same free-boost critter icon
-// hud/boostMenu.ts and mouse/index.ts already use for this exact mechanic
-let boostIcon: HTMLImageElement | null = null;
-loadImageByName("mouse").then((image) => {
-  boostIcon = image;
-});
+const loadedCritIcons = new Map<ImageName, HTMLImageElement>();
+const requestedCritIcons = new Set<ImageName>();
 
-// same idea again, drawn behind the "Bounce" flash text (see
-// upgradeButton.ts's isBounceCrit)
-let ballIcon: HTMLImageElement | null = null;
-loadImageByName("ball").then((image) => {
-  ballIcon = image;
-});
-
-// same idea again, drawn behind the "Explosion" flash text (see
-// upgradeButton.ts's isExplosionCrit)
-let explosionIcon: HTMLImageElement | null = null;
-loadImageByName("explosion").then((image) => {
-  explosionIcon = image;
-});
-// same idea again, drawn behind the "Booty" flash text (see
-// upgradeButton.ts's isBootyCrit)
-let bootyIcon: HTMLImageElement | null = null;
-loadImageByName("booty").then((image) => {
-  bootyIcon = image;
-});
-// same idea again, drawn behind the "Upgrade" flash text (see
-// upgradeButton.ts's isUpgradeCrit)
-let upgradeIcon: HTMLImageElement | null = null;
-loadImageByName("upgrade").then((image) => {
-  upgradeIcon = image;
-});
-// same idea again, drawn behind the "Peppermint" flash text (see
-// upgradeButton.ts's isPeppermintCrit)
-let peppermintIcon: HTMLImageElement | null = null;
-loadImageByName("peppermint").then((image) => {
-  peppermintIcon = image;
-});
-// same idea again, drawn behind the "Heavenly" flash text (see
-// upgradeButton.ts's isHeavenlyCrit)
-let heavenIcon: HTMLImageElement | null = null;
-loadImageByName("heaven").then((image) => {
-  heavenIcon = image;
-});
-// same idea again, drawn behind the "Pair" flash text (see
-// upgradeButton.ts's isPairCrit)
-let pairIcon: HTMLImageElement | null = null;
-loadImageByName("pair").then((image) => {
-  pairIcon = image;
-});
-// same idea again, drawn behind the "Three of a Kind" flash text (see
-// upgradeButton.ts's isThreeOfAKindCrit)
-let threeOfAKindIcon: HTMLImageElement | null = null;
-loadImageByName("threeOfAKind").then((image) => {
-  threeOfAKindIcon = image;
-});
-// same idea again, drawn behind the "Four of a Kind" flash text (see
-// upgradeButton.ts's isFourOfAKindCrit)
-let fourOfAKindIcon: HTMLImageElement | null = null;
-loadImageByName("fourOfAKind").then((image) => {
-  fourOfAKindIcon = image;
-});
-// same idea again, drawn behind the "Full House" flash text (see
-// upgradeButton.ts's isFullHouseCrit)
-let fullHouseIcon: HTMLImageElement | null = null;
-loadImageByName("fullHouse").then((image) => {
-  fullHouseIcon = image;
-});
-// same idea again, drawn behind the "Tick Tock" flash text (see
-// upgradeButton.ts's isTickTockCrit) — reuses the clock icon already shipped
-// for hud/boostMenu's "Work overtime" menu entry
-let tickTockIcon: HTMLImageElement | null = null;
-loadImageByName("clock").then((image) => {
-  tickTockIcon = image;
-});
-// same idea again, drawn behind the "Chair Giveaway" flash text (see
-// upgradeButton.ts's isChairGiveawayCrit) — reuses the icon already shipped for
-// hud/upgradeMenu's office chairs purchase
-let chairGiveawayIcon: HTMLImageElement | null = null;
-loadImageByName("officeChairsIcon").then((image) => {
-  chairGiveawayIcon = image;
-});
-// same idea again, drawn behind the "Supplies Giveaway" flash text (see
-// upgradeButton.ts's isSuppliesGiveawayCrit) — reuses the icon already shipped
-// for hud/upgradeMenu's office supplies purchase
-let suppliesGiveawayIcon: HTMLImageElement | null = null;
-loadImageByName("officeSuppliesIcon").then((image) => {
-  suppliesGiveawayIcon = image;
-});
-// same idea again, drawn behind the "Winter Sale"/"Spring Sale"/"Summer
-// Sale"/"Autumn Sale" flash text (see upgradeButton.ts's isWinterSaleCrit
-// etc.)
-let winterSaleIcon: HTMLImageElement | null = null;
-loadImageByName("winter").then((image) => {
-  winterSaleIcon = image;
-});
-let springSaleIcon: HTMLImageElement | null = null;
-loadImageByName("spring").then((image) => {
-  springSaleIcon = image;
-});
-let summerSaleIcon: HTMLImageElement | null = null;
-loadImageByName("summer").then((image) => {
-  summerSaleIcon = image;
-});
-let autumnSaleIcon: HTMLImageElement | null = null;
-loadImageByName("autumn").then((image) => {
-  autumnSaleIcon = image;
-});
-// same idea again, drawn behind the "Halloween Sale" flash text (see
-// upgradeButton.ts's isHalloweenSaleCrit)
-let halloweenSaleIcon: HTMLImageElement | null = null;
-loadImageByName("halloween").then((image) => {
-  halloweenSaleIcon = image;
-});
-// same idea again, drawn behind the "Easter Sale" flash text (see
-// upgradeButton.ts's isEasterSaleCrit)
-let easterSaleIcon: HTMLImageElement | null = null;
-loadImageByName("easterBunny").then((image) => {
-  easterSaleIcon = image;
-});
-// same idea again, drawn behind the "Sunshine" flash text (see
-// upgradeButton.ts's isSunshineCrit)
-let sunshineIcon: HTMLImageElement | null = null;
-loadImageByName("sunny").then((image) => {
-  sunshineIcon = image;
-});
-// same idea again, drawn behind the "Snowday" flash text (see
-// upgradeButton.ts's isSnowdayCrit)
-let snowdayIcon: HTMLImageElement | null = null;
-loadImageByName("snowman").then((image) => {
-  snowdayIcon = image;
-});
-// same idea again, drawn behind the "Fast Forward" flash text (see
-// upgradeButton.ts's isFastForwardCrit)
-let fastForwardIcon: HTMLImageElement | null = null;
-loadImageByName("fastforward").then((image) => {
-  fastForwardIcon = image;
-});
-// same idea again, drawn behind the "Frozen" flash text (see
-// upgradeButton.ts's isFrozenCrit)
-let icecubeIcon: HTMLImageElement | null = null;
-loadImageByName("icecube").then((image) => {
-  icecubeIcon = image;
-});
-// same idea again, drawn behind the "Snowball" flash text (see
-// upgradeButton.ts's isSnowballCrit)
-let snowballIcon: HTMLImageElement | null = null;
-loadImageByName("snowball").then((image) => {
-  snowballIcon = image;
-});
-// same idea again, drawn behind the "Sale" flash text (see
-// upgradeButton.ts's isFreeSaleCrit) — reuses the cash register icon already
-// shipped for hud/boostMenu's own "Trigger sales event" menu entry
-let cashRegisterIcon: HTMLImageElement | null = null;
-loadImageByName("cashRegister").then((image) => {
-  cashRegisterIcon = image;
-});
-// same idea again, drawn behind the "Payday" flash text (see
-// shared/critTypes's isPaydayCrit)
-let paydayIcon: HTMLImageElement | null = null;
-loadImageByName("payday").then((image) => {
-  paydayIcon = image;
-});
-// same idea again, drawn behind the "Gold Standard" flash text (see
-// shared/critTypes's isGoldStandardCrit)
-let goldStandardIcon: HTMLImageElement | null = null;
-loadImageByName("goldStandard").then((image) => {
-  goldStandardIcon = image;
-});
-// same idea again, drawn behind the "Royal Flush" flash text (see
-// shared/critTypes's isRoyalFlushCrit)
-let royalFlushIcon: HTMLImageElement | null = null;
-loadImageByName("royalFlush").then((image) => {
-  royalFlushIcon = image;
-});
-// same idea again, drawn behind the "Night Shift" flash text (see
-// shared/critTypes's isNightShiftCrit)
-let nightShiftIcon: HTMLImageElement | null = null;
-loadImageByName("sleepyMoon").then((image) => {
-  nightShiftIcon = image;
-});
-// same idea again, drawn behind the "Intern"/"Union Boss" flash text (see
-// shared/critTypes's isInternCrit/isUnionBossCrit) — reuses the worker/manager
-// walk-cycle sprite's own camera-facing frame, cropped ahead of time at build
-// time (see scripts/process-intern.mjs/process-union-boss.mjs) rather than
-// hud/upgradeMenu's own runtime crop, so this stays a plain static asset like
-// every other crit icon
-let internIcon: HTMLImageElement | null = null;
-loadImageByName("intern").then((image) => {
-  internIcon = image;
-});
-let unionBossIcon: HTMLImageElement | null = null;
-loadImageByName("unionBoss").then((image) => {
-  unionBossIcon = image;
-});
-// same idea again, drawn behind the "Rush Hour" flash text (see
-// shared/critTypes's isRushHourCrit)
-let sportscarIcon: HTMLImageElement | null = null;
-loadImageByName("sportscar").then((image) => {
-  sportscarIcon = image;
-});
-// same idea again, drawn behind the "Golden Ticket" flash text (see
-// shared/critTypes's isGoldenTicketCrit)
-let goldenTicketIcon: HTMLImageElement | null = null;
-loadImageByName("goldenTicket").then((image) => {
-  goldenTicketIcon = image;
-});
-// same idea again, drawn behind the "Silver Ticket" flash text (see
-// shared/critTypes's isSilverTicketCrit)
-let silverTicketIcon: HTMLImageElement | null = null;
-loadImageByName("silverTicket").then((image) => {
-  silverTicketIcon = image;
-});
+// on-demand loader: a given crit icon's fetch/decode only kicks off the
+// first time that crit type actually flashes on screen, instead of every
+// single one being preloaded upfront at module load — most sessions only
+// ever land a handful of these crit types, so eagerly fetching all ~35 icons
+// at startup just to have them "ready" would needlessly bloat initial load.
+// Returns null (draw is skipped for that frame) until the image resolves.
+function getCritIcon(name: ImageName): HTMLImageElement | null {
+  const cached = loadedCritIcons.get(name);
+  if (cached) return cached;
+  if (!requestedCritIcons.has(name)) {
+    requestedCritIcons.add(name);
+    loadImageByName(name).then((image) => {
+      loadedCritIcons.set(name, image);
+    });
+  }
+  return null;
+}
 // extended duration so the initial punch is followed by a tail of decaying minor
 // shakes settling to rest, rather than stopping dead right after the punch
 const SHAKE_DURATION_MS = 650;
@@ -649,276 +495,24 @@ function drawFlashLayer(
   ctx.font = font;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  // chain crit's own backdrop icon, drawn behind everything else — same
+  // per-crit backdrop icon, drawn behind everything else — same
   // translate/scale/alpha as the text itself (so it pops in/fades together
-  // with it), but rotated an extra fixed 45deg of its own on top of the
-  // text's animated entrance rotation, scoped to its own save/restore so
-  // that extra spin doesn't also rotate the bloom/text drawn after it
-  if (label === "Chain" && chainIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(chainIcon, measuredWidth * 0.85);
-    ctx.save();
-    ctx.rotate(Math.PI / 4);
-    ctx.drawImage(chainIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-    ctx.restore();
-  }
-  if (label === "Boost" && boostIcon) {
-    // no extra rotation (unlike chainIcon above) — mouse.png is a directional
-    // side-view sprite, not a symmetric icon, so spinning it 45deg makes it
-    // read as facing the wrong way instead of its normal running pose
-    const { w: iconW, h: iconH } = fitIconSize(boostIcon, measuredWidth * 0.85);
-    ctx.drawImage(boostIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Bounce" && ballIcon) {
-    // no extra rotation — ball.png already reads as bouncy on its own,
-    // rotating it would just look like it's rolling away instead
-    const { w: iconW, h: iconH } = fitIconSize(ballIcon, measuredWidth * 0.85);
-    ctx.drawImage(ballIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Boom" && explosionIcon) {
-    // no extra rotation — explosion.png is already a radial starburst shape,
-    // spinning it wouldn't read as differently "exploded"
-    const { w: iconW, h: iconH } = fitIconSize(
-      explosionIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(explosionIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Booty" && bootyIcon) {
-    // no extra rotation — booty.png is an upright treasure chest, spinning it
-    // would just look broken
-    const { w: iconW, h: iconH } = fitIconSize(bootyIcon, measuredWidth * 0.85);
-    ctx.drawImage(bootyIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Upgrade" && upgradeIcon) {
-    // no extra rotation — upgrade.png is an upright arrow, spinning it would
-    // read as pointing somewhere else instead of "up"
-    const { w: iconW, h: iconH } = fitIconSize(
-      upgradeIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(upgradeIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Peppermint" && peppermintIcon) {
-    // no extra rotation — peppermint.png is an upright candy cane, spinning it
-    // would just look broken
-    const { w: iconW, h: iconH } = fitIconSize(
-      peppermintIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(peppermintIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Heavenly" && heavenIcon) {
-    // no extra rotation — heaven.png is an upright gate, spinning it would
-    // just look broken
-    const { w: iconW, h: iconH } = fitIconSize(
-      heavenIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(heavenIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Pair" && pairIcon) {
-    // no extra rotation — pair.png is already an upright fanned pair of
-    // cards, spinning it would just look broken
-    const { w: iconW, h: iconH } = fitIconSize(pairIcon, measuredWidth * 0.85);
-    ctx.drawImage(pairIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Three of a Kind" && threeOfAKindIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      threeOfAKindIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(threeOfAKindIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Four of a Kind" && fourOfAKindIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      fourOfAKindIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(fourOfAKindIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Full House" && fullHouseIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      fullHouseIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(fullHouseIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Tick Tock" && tickTockIcon) {
-    // no extra rotation — clock.png is already an upright clock face,
-    // spinning it would just look broken
-    const { w: iconW, h: iconH } = fitIconSize(
-      tickTockIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(tickTockIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Chair Giveaway" && chairGiveawayIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      chairGiveawayIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(chairGiveawayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Supplies Giveaway" && suppliesGiveawayIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      suppliesGiveawayIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(suppliesGiveawayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Winter Sale" && winterSaleIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      winterSaleIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(winterSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Spring Sale" && springSaleIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      springSaleIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(springSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Summer Sale" && summerSaleIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      summerSaleIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(summerSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Autumn Sale" && autumnSaleIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      autumnSaleIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(autumnSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Halloween Sale" && halloweenSaleIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      halloweenSaleIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(halloweenSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Easter Sale" && easterSaleIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      easterSaleIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(easterSaleIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Sunshine" && sunshineIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      sunshineIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(sunshineIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Snowday" && snowdayIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      snowdayIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(snowdayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Fast Forward" && fastForwardIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      fastForwardIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(fastForwardIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Frozen" && icecubeIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      icecubeIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(icecubeIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Snowball" && snowballIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      snowballIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(snowballIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Sales event" && cashRegisterIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      cashRegisterIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(cashRegisterIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Payday" && paydayIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      paydayIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(paydayIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Gold Standard" && goldStandardIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      goldStandardIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(goldStandardIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Royal Flush" && royalFlushIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      royalFlushIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(royalFlushIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Night Shift" && nightShiftIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      nightShiftIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(nightShiftIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Intern" && internIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      internIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(internIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Union Boss" && unionBossIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      unionBossIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(unionBossIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Rush Hour" && sportscarIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      sportscarIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(sportscarIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  if (label === "Golden Ticket" && goldenTicketIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      goldenTicketIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.drawImage(goldenTicketIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-  }
-  // rotated a fixed 45deg on top of the text's own animated entrance
-  // rotation (per explicit request), scoped to its own save/restore so that
-  // extra spin doesn't also rotate the bloom/text drawn after it — same
-  // pattern chainIcon above uses
-  if (label === "Silver Ticket" && silverTicketIcon) {
-    const { w: iconW, h: iconH } = fitIconSize(
-      silverTicketIcon,
-      measuredWidth * 0.85,
-    );
-    ctx.save();
-    ctx.rotate(Math.PI / 4);
-    ctx.drawImage(silverTicketIcon, -iconW / 2, -iconH / 2, iconW, iconH);
-    ctx.restore();
+  // with it). A couple of icons (see CRIT_ICON_BY_LABEL's rotateDeg) also
+  // spin an extra fixed amount of their own on top of the text's animated
+  // entrance rotation, scoped to their own save/restore so that extra spin
+  // doesn't also rotate the bloom/text drawn after it.
+  const critIconConfig = CRIT_ICON_BY_LABEL[label];
+  const critIcon = critIconConfig ? getCritIcon(critIconConfig.name) : null;
+  if (critIcon) {
+    const { w: iconW, h: iconH } = fitIconSize(critIcon, measuredWidth * 0.85);
+    if (critIconConfig?.rotateDeg) {
+      ctx.save();
+      ctx.rotate((critIconConfig.rotateDeg * Math.PI) / 180);
+      ctx.drawImage(critIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+      ctx.restore();
+    } else {
+      ctx.drawImage(critIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+    }
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is
   // expensive at this text's huge on-screen scale (it's a full offscreen

@@ -58,6 +58,7 @@ import {
   forceRushHourCritUpgrade,
   forceGoldenTicketCritUpgrade,
   forceSilverTicketCritUpgrade,
+  forceGoldenParachuteCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   getActiveBackgrounds,
@@ -140,6 +141,7 @@ import {
   wireSpawnRushHourCritButton,
   wireSpawnGoldenTicketCritButton,
   wireSpawnSilverTicketCritButton,
+  wireSpawnGoldenParachuteCritButton,
   wireForceBonusTierCritButton,
   wireForceBonusTierMegaCritButton,
   wireForceBonusTierUltraCritButton,
@@ -188,6 +190,7 @@ import {
   wireFloorBuyRushHourCritButton,
   wireFloorBuyGoldenTicketCritButton,
   wireFloorBuySilverTicketCritButton,
+  wireFloorBuyGoldenParachuteCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
   wireMapUnlockUltraCritButton,
@@ -677,6 +680,10 @@ async function main() {
     wireSpawnSilverTicketCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceSilverTicketCritUpgrade(floor);
+    });
+    wireSpawnGoldenParachuteCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceGoldenParachuteCritUpgrade(floor);
     });
     wireForceBonusTierCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1519,6 +1526,50 @@ async function main() {
         false,
         false,
         null,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+      ),
+    );
+    wireFloorBuyGoldenParachuteCritButton(app, () =>
+      forceFloorBuyCrit(
+        "crit",
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
+        false,
         false,
         false,
         false,

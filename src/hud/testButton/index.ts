@@ -63,6 +63,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-rush-hour-crit" class="game__button">Spawn Rush Hour Crit</button>
           <button id="spawn-golden-ticket-crit" class="game__button">Spawn Golden Ticket Crit</button>
           <button id="spawn-silver-ticket-crit" class="game__button">Spawn Silver Ticket Crit</button>
+          <button id="spawn-golden-parachute-crit" class="game__button">Spawn Golden Parachute Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -113,6 +114,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-rush-hour-crit" class="game__button">Floor Rush Hour Crit</button>
           <button id="floor-buy-golden-ticket-crit" class="game__button">Floor Golden Ticket Crit</button>
           <button id="floor-buy-silver-ticket-crit" class="game__button">Floor Silver Ticket Crit</button>
+          <button id="floor-buy-golden-parachute-crit" class="game__button">Floor Golden Parachute Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -592,6 +594,16 @@ export function wireSpawnSilverTicketCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnGoldenParachuteCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-golden-parachute-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireForceBonusTierCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -1066,6 +1078,16 @@ export function wireFloorBuySilverTicketCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-silver-ticket-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyGoldenParachuteCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-golden-parachute-crit",
   )!;
   button.addEventListener("click", onClick);
 }

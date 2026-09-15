@@ -70,6 +70,8 @@ import {
   GOLDEN_TICKET_CRIT_LABEL,
   SILVER_TICKET_CRIT_COLOR,
   SILVER_TICKET_CRIT_LABEL,
+  GOLDEN_PARACHUTE_CRIT_COLOR,
+  GOLDEN_PARACHUTE_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -554,6 +556,7 @@ interface QueuedCelebration {
     | "rushHour"
     | "goldenTicket"
     | "silverTicket"
+    | "goldenParachute"
     | "bonusTier";
   queuedAt: number;
   run: () => void;
@@ -665,6 +668,7 @@ export function triggerCritCelebration(
   rushHour = false,
   goldenTicket = false,
   silverTicket = false,
+  goldenParachute = false,
 ): void {
   if (
     chain ||
@@ -702,7 +706,8 @@ export function triggerCritCelebration(
     easterSale ||
     rushHour ||
     goldenTicket ||
-    silverTicket
+    silverTicket ||
+    goldenParachute
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1067,6 +1072,23 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             SILVER_TICKET_CRIT_LABEL,
             SILVER_TICKET_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      goldenParachute &&
+      !specialCelebrationQueue.some((q) => q.kind === "goldenParachute")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "goldenParachute",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            GOLDEN_PARACHUTE_CRIT_LABEL,
+            GOLDEN_PARACHUTE_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

@@ -50,6 +50,7 @@ import {
   isRushHourCrit,
   isGoldenTicketCrit,
   isSilverTicketCrit,
+  isGoldenParachuteCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -98,7 +99,9 @@ import {
   spendTotalIncome,
   addTotalIncome,
   getTotalIncome,
+  getCompanyIncomeRatePerSecond,
 } from "../../totalIncome";
+import { getActiveCompanyIndex } from "../../company";
 import { spawnCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
 import { spawnIncomeFloatText } from "../incomeFloatText";
@@ -557,6 +560,19 @@ function applySilverTicketCrit(floor: Floor): void {
   armGuaranteedMegaCrit(floor);
 }
 
+// "Golden Parachute" crit (see shared/critTypes's isGoldenParachuteCrit): a
+// flat, not-tier-scaled instant payout — unlike payday/gold standard (which
+// multiply the ALREADY-BANKED total), this pays out GOLDEN_PARACHUTE_SECONDS
+// worth of the currently active company's own combined income rate across
+// EVERY one of its buildings (see totalIncome.ts's
+// getCompanyIncomeRatePerSecond), so it's worth the same regardless of how
+// much the company has banked up so far
+const GOLDEN_PARACHUTE_SECONDS = 15;
+function applyGoldenParachuteCrit(): void {
+  const rate = getCompanyIncomeRatePerSecond(getActiveCompanyIndex());
+  addTotalIncome(multiply(rate, GOLDEN_PARACHUTE_SECONDS));
+}
+
 // "winter sale"/"spring sale"/"summer sale"/"autumn sale"/"halloween sale"
 // crits (see shared/critTypes's isWinterSaleCrit etc.) — all five share this
 // exact reward shape, only their icon/label/color AND discount size differ
@@ -781,6 +797,9 @@ export function handleFloorClick(
         // silver ticket crit: guarantees this floor's very next crit lands
         // mega, no reward of its own
         if (buyTier.silverTicket) applySilverTicketCrit(floor);
+        // golden parachute crit: instantly pays 15s of the active company's
+        // own combined income rate, no matter how much it's already banked
+        if (buyTier.goldenParachute) applyGoldenParachuteCrit();
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -873,6 +892,7 @@ export function handleFloorClick(
           buyTier.rushHour,
           buyTier.goldenTicket,
           buyTier.silverTicket,
+          buyTier.goldenParachute,
         );
     }
     return;
@@ -1031,6 +1051,7 @@ export function handleFloorClick(
       const rushHour = isRushHourCrit(floor);
       const goldenTicket = isGoldenTicketCrit(floor);
       const silverTicket = isSilverTicketCrit(floor);
+      const goldenParachute = isGoldenParachuteCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1186,6 +1207,9 @@ export function handleFloorClick(
       // silver ticket crit: guarantees this floor's very next crit lands
       // mega, no reward of its own
       if (silverTicket) applySilverTicketCrit(floor);
+      // golden parachute crit: instantly pays 15s of the active company's
+      // own combined income rate, no matter how much it's already banked
+      if (goldenParachute) applyGoldenParachuteCrit();
       // winter/spring/summer/autumn sale crits: permanently cut every
       // unlocked floor's own upgrade/worker costs 25%, building-wide
       if (winterSale || springSale || summerSale || autumnSale) {
@@ -1242,6 +1266,7 @@ export function handleFloorClick(
         rushHour,
         goldenTicket,
         silverTicket,
+        goldenParachute,
       );
       return;
     }

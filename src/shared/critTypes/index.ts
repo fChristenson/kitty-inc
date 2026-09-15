@@ -413,6 +413,15 @@ export const SILVER_TICKET_CRIT_CHANCE = CONFIG.crit.silverTicketChance;
 export const SILVER_TICKET_CRIT_COLOR = COLOR.silverTicketGray;
 export const SILVER_TICKET_CRIT_LABEL = "Silver Ticket";
 
+// "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
+// floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
+// seconds' worth of the currently active company's own combined income rate
+// (every building, not just this one) straight to its total, same one-shot
+// shape as booty/payday/gold standard
+export const GOLDEN_PARACHUTE_CRIT_CHANCE = CONFIG.crit.goldenParachuteChance;
+export const GOLDEN_PARACHUTE_CRIT_COLOR = COLOR.goldenParachuteMarigold;
+export const GOLDEN_PARACHUTE_CRIT_LABEL = "Golden Parachute";
+
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
@@ -452,6 +461,7 @@ const unionBossCrits = new WeakSet<Floor>();
 const rushHourCrits = new WeakSet<Floor>();
 const goldenTicketCrits = new WeakSet<Floor>();
 const silverTicketCrits = new WeakSet<Floor>();
+const goldenParachuteCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -529,6 +539,7 @@ export interface CritRollResult {
   rushHour: boolean;
   goldenTicket: boolean;
   silverTicket: boolean;
+  goldenParachute: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -577,6 +588,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "rushHour",
   "goldenTicket",
   "silverTicket",
+  "goldenParachute",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -823,6 +835,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "silverTicket",
     description: "Guarantees this floor's next crit is mega",
   },
+  goldenParachute: {
+    label: GOLDEN_PARACHUTE_CRIT_LABEL,
+    icon: "goldenParachute",
+    description: "Instantly adds 15s of your company's income",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -902,6 +919,8 @@ export function rollCrit(
     if (Math.random() < RUSH_HOUR_CRIT_CHANCE) landed.push("rushHour");
     if (Math.random() < GOLDEN_TICKET_CRIT_CHANCE) landed.push("goldenTicket");
     if (Math.random() < SILVER_TICKET_CRIT_CHANCE) landed.push("silverTicket");
+    if (Math.random() < GOLDEN_PARACHUTE_CRIT_CHANCE)
+      landed.push("goldenParachute");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -956,6 +975,7 @@ export function rollCrit(
     rushHour: kept.has("rushHour"),
     goldenTicket: kept.has("goldenTicket"),
     silverTicket: kept.has("silverTicket"),
+    goldenParachute: kept.has("goldenParachute"),
   });
 }
 
@@ -1109,6 +1129,10 @@ export function isSilverTicketCrit(floor: Floor): boolean {
   return silverTicketCrits.has(floor);
 }
 
+export function isGoldenParachuteCrit(floor: Floor): boolean {
+  return goldenParachuteCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1162,6 +1186,7 @@ export function consumeCritProcs(floor: Floor): void {
   rushHourCrits.delete(floor);
   goldenTicketCrits.delete(floor);
   silverTicketCrits.delete(floor);
+  goldenParachuteCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1314,6 +1339,10 @@ export function forceGoldenTicketCritProc(floor: Floor): void {
 
 export function forceSilverTicketCritProc(floor: Floor): void {
   silverTicketCrits.add(floor);
+}
+
+export function forceGoldenParachuteCritProc(floor: Floor): void {
+  goldenParachuteCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

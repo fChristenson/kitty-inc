@@ -1,18 +1,8 @@
 # Crit ideas
 
-- Compound Interest — permanently adds a tiny (~0.1%) rate bump to every
-  unlocked floor, scaled by the floor's own current upgradeCount — small
-  alone, but stacks forever every time it lands again.
-- Golden Parachute — an instant lump-sum payout worth several seconds of
-  total income, but knocks 10% off the current active company's total income
-  rate for a short window afterward (a real risk/reward proc, unlike every
-  other flat-upside one).
 - IPO — one-time payout scaled to the CURRENT active company's own total
   asset value (buildings + upgrades), not its income rate — rewards a big,
   built-out company far more than a fresh one.
-- Networking Event — every OTHER company (not just the active one) gets a
-  small flat income injection too, the only proc that reaches across
-  companies instead of staying scoped to the one currently open.
 - Grand Opening — instantly buys the next building for free, skipping its
   cost entirely (a free ride on the existing "buy building" flow).
 - Full Staff — every unlocked floor in the building is instantly topped up
@@ -33,8 +23,6 @@
 - Second Wind — refunds the player's most recent real purchase (upgrade,
   worker, floor unlock, whichever was last) in full, as if it never happened
   — but keeps whatever it bought.
-- Time Capsule — banks a slice of the current payout to be paid out again,
-  with interest, once a short delay elapses (a "reward now AND later" proc).
 - Executive Order — promotes every OTHER owned building's own permanent crit
   tier one step at once (Peppermint's effect, but at map scale instead of
   floor scale).
@@ -43,9 +31,6 @@
   bonuses that crosses.
 - Golden Handshake — instantly grants every eligible unlocked floor a free
   manager at once, building-wide (Union Boss's bigger, all-floors sibling).
-- Silent Partner — every company gains a small permanent passive income
-  modifier (stacking with itself if it lands again), instead of one big
-  one-time payout.
 - Insider Tip — reveals (and instantly banks) whichever of the two currently
   eligible piggyback proc rolls WOULD have landed next, letting the player
   effectively double-dip on the very next crit's own extra roll.
