@@ -228,6 +228,7 @@ export const CONFIG = {
     // "Clone Army" crit - copies the largest unlocked floor workforce to all
     // other unlocked floors for free
     cloneArmyChance: 0.0005,
+    luckyCloverChance: 0.01,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

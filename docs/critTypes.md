@@ -1,9 +1,5 @@
 # Crit ideas
 
-- Lucky Clover — for the next crit only, MAX_SPECIAL_CRIT_PROCS is
-  temporarily raised so more than 2 piggyback procs can stack together.
-- Clone Army — copies the building's single BEST floor's own worker count
-  onto every other unlocked floor at once (great for a lopsided building).
 - Second Wind — refunds the player's most recent real purchase (upgrade,
   worker, floor unlock, whichever was last) in full, as if it never happened
   — but keeps whatever it bought.

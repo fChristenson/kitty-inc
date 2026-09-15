@@ -124,6 +124,10 @@ export {
   DEJA_VU_CRIT_LABEL,
   CLONE_ARMY_CRIT_COLOR,
   CLONE_ARMY_CRIT_LABEL,
+  LUCKY_CLOVER_CRIT_COLOR,
+  LUCKY_CLOVER_CRIT_LABEL,
+  LUCKY_CLOVER_CRIT_COUNT,
+  LUCKY_CLOVER_CRIT_TIER,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -168,6 +172,7 @@ export {
   isEspressoShotCrit,
   isDejaVuCrit,
   isCloneArmyCrit,
+  isLuckyCloverCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -223,6 +228,7 @@ import {
   forceEspressoShotCritProc,
   forceDejaVuCritProc,
   forceCloneArmyCritProc,
+  forceLuckyCloverCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -443,6 +449,7 @@ export function forceFloorBuyCrit(
     espressoShot,
     dejaVu,
     cloneArmy,
+    luckyClover: false,
   };
 }
 
@@ -477,6 +484,11 @@ export function forceDejaVuFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceCloneArmyFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.cloneArmy = true;
+}
+
+export function forceLuckyCloverFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.luckyClover = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -806,6 +818,11 @@ export function forceDejaVuCritUpgrade(floor: Floor): void {
 export function forceCloneArmyCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceCloneArmyCritProc(floor);
+}
+
+export function forceLuckyCloverCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceLuckyCloverCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

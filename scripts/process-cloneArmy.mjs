@@ -61,5 +61,47 @@ const croppedW = maxX - minX + 1;
 const croppedH = maxY - minY + 1;
 const cropped = await sharp(data, { raw: { width, height, channels } }).extract({ left: minX, top: minY, width: croppedW, height: croppedH }).ensureAlpha().raw().toBuffer();
 const shadowed = await addDropShadow(cropped, croppedW, croppedH);
-await sharp(shadowed.data, { raw: { width: shadowed.width, height: shadowed.height, channels: 4 } }).resize(250, 250, { fit: "inside", withoutEnlargement: true }).png({ compressionLevel: 9, palette: true }).toFile(dest);
+const outputWidth = Math.min(250, shadowed.width);
+const outputHeight = Math.round(shadowed.height * (outputWidth / shadowed.width));
+const resized = await sharp(shadowed.data, {
+  raw: { width: shadowed.width, height: shadowed.height, channels: 4 },
+})
+  .resize(250, 250, { fit: "inside", withoutEnlargement: true })
+  .ensureAlpha()
+  .raw()
+  .toBuffer({ resolveWithObject: true });
+const removeHeadArcs = (x, y) =>
+  y <= 27 &&
+  ((x >= 18 && x <= 88) || (x >= 140 && x <= 212));
+const removeWhiteEarGaps = (x, y) =>
+  y <= 50 &&
+  ((x >= 0 && x <= 92) || (x >= 80 && x <= 170) || (x >= 158 && x <= 249));
+for (let y = 0; y < resized.info.height; y++) {
+  for (let x = 0; x < resized.info.width; x++) {
+    const i = (y * resized.info.width + x) * resized.info.channels;
+    if (removeHeadArcs(x, y)) {
+      resized.data[i + 3] = 0;
+      continue;
+    }
+    if (removeWhiteEarGaps(x, y)) {
+      const red = resized.data[i];
+      const green = resized.data[i + 1];
+      const blue = resized.data[i + 2];
+      const minimum = Math.min(red, green, blue);
+      const maximum = Math.max(red, green, blue);
+      if (minimum > 145 && maximum - minimum <= 55) {
+        resized.data[i + 3] = 0;
+      }
+    }
+  }
+}
+await sharp(resized.data, {
+  raw: {
+    width: resized.info.width,
+    height: resized.info.height,
+    channels: resized.info.channels,
+  },
+})
+  .png({ compressionLevel: 9, palette: true })
+  .toFile(dest);
 console.log(`wrote ${path.relative(assets, dest)}`);

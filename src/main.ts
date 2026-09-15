@@ -7,6 +7,8 @@ import {
   CRIT_TIER_CONFIG,
   applyCritProcs,
   POKER_HAND_CRIT_COUNTS,
+  LUCKY_CLOVER_CRIT_COUNT,
+  LUCKY_CLOVER_CRIT_TIER,
   type CritRollResult,
 } from "./shared/critTypes";
 import {
@@ -65,6 +67,7 @@ import {
   forceEspressoShotCritUpgrade,
   forceDejaVuCritUpgrade,
   forceCloneArmyCritUpgrade,
+  forceLuckyCloverCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   forceGrandOpeningFloorBuyCrit,
@@ -72,10 +75,9 @@ import {
   forceEspressoShotFloorBuyCrit,
   forceDejaVuFloorBuyCrit,
   forceCloneArmyFloorBuyCrit,
-  MAX_RENDERED_WORKERS,
+  forceLuckyCloverFloorBuyCrit,
   forcePayoutFloorBuyCrit,
   getActiveBackgrounds,
-  applyBoostAll,
   applyChainCrit,
   increaseIncomeRate,
   currentIncomeRatePerSecond,
@@ -160,6 +162,7 @@ import {
   wireSpawnEspressoShotCritButton,
   wireSpawnDejaVuCritButton,
   wireSpawnCloneArmyCritButton,
+  wireSpawnLuckyCloverCritButton,
   wireSpawnGoldenParachuteCritButton,
   wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
@@ -215,6 +218,7 @@ import {
   wireFloorBuyEspressoShotCritButton,
   wireFloorBuyDejaVuCritButton,
   wireFloorBuyCloneArmyCritButton,
+  wireFloorBuyLuckyCloverCritButton,
   wireFloorBuyGoldenParachuteCritButton,
   wireFloorBuyPayoutCritButton,
   wireMapUnlockCritButton,
@@ -729,6 +733,10 @@ async function main() {
     wireSpawnCloneArmyCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceCloneArmyCritUpgrade(floor);
+    });
+    wireSpawnLuckyCloverCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceLuckyCloverCritUpgrade(floor);
     });
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1600,6 +1608,9 @@ async function main() {
     wireFloorBuyCloneArmyCritButton(app, () =>
       forceCloneArmyFloorBuyCrit("crit"),
     );
+    wireFloorBuyLuckyCloverCritButton(app, () =>
+      forceLuckyCloverFloorBuyCrit("crit"),
+    );
     wireFloorBuyGoldenParachuteCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
@@ -1856,12 +1867,6 @@ async function main() {
     return true;
   }
 
-  // same as buyBuilding above, but as a crit reward (no cost check/spend)
-  function buyBuildingForFree(): void {
-    const buildingIndex = buildings.length;
-    buildings.push(createBuilding(buildingIndex, getBackgroundUrls().length));
-    setupBuilding(buildingIndex);
-  }
   // unlocks every remaining floor of an ALREADY-BOUGHT building in one shot —
   // the city map's long-press-on-the-green-dot gesture (see cityMap/index.ts,
   // markers.ts's drawBuyAllFloorsIndicator). Returns whether it succeeded (false
@@ -1951,21 +1956,25 @@ async function main() {
           }
         }
       },
-      fullyStaffed: (floors) => {
-        for (const floor of floors) {
-          if (!floor.unlocked) continue;
-          floor.workerCount = MAX_RENDERED_WORKERS;
-          floor.hasManager = true;
-        }
+      // grand opening crit: same reward as at floor scope — unlocks every
+      // remaining locked floor of this building for free
+      grandOpening: (floors) => {
+        unlockAllFloors({
+          floors,
+          backgroundCount: getBackgroundUrls().length,
+          multiplier: getBuildingMultiplier(buildingIndex),
+          onAdd: (floor) => {
+            if (buildingIndex === activeBuildingIndex) {
+              gameCanvas.notifyFloorAdded(floor);
+            }
+          },
+        });
       },
-      espressoShot: (floors) => applyBoostAll(floors),
-      dejaVu: (floors) => {
-        const randomTier =
-          CRIT_TIER_ORDER[Math.floor(Math.random() * CRIT_TIER_ORDER.length)];
-        const count = CRIT_TIER_CONFIG[randomTier].multiplier;
+      luckyClover: (floors) => {
+        const count = CRIT_TIER_CONFIG[LUCKY_CLOVER_CRIT_TIER].multiplier;
         for (const floor of floors) {
           if (!floor.unlocked) continue;
-          for (let repetition = 0; repetition < 2; repetition++) {
+          for (let run = 0; run < LUCKY_CLOVER_CRIT_COUNT; run++) {
             for (let i = 0; i < count; i++) increaseIncomeRate(floor);
           }
         }
@@ -2037,9 +2046,6 @@ async function main() {
         setupBuilding(nextIndex);
         applyBuildingCritTier(nextIndex, result);
       }
-    }
-    if (result.grandOpening) {
-      buyBuildingForFree();
     }
     persist();
   }

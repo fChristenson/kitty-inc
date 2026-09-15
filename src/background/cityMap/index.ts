@@ -42,12 +42,6 @@ import {
   HEAVENLY_CRIT_COLOR,
   GRAND_OPENING_CRIT_LABEL,
   GRAND_OPENING_CRIT_COLOR,
-  FULLY_STAFFED_CRIT_LABEL,
-  FULLY_STAFFED_CRIT_COLOR,
-  ESPRESSO_SHOT_CRIT_LABEL,
-  ESPRESSO_SHOT_CRIT_COLOR,
-  DEJA_VU_CRIT_LABEL,
-  DEJA_VU_CRIT_COLOR,
   runFirstCritProc,
   type CritTier,
   type CritRollResult,
@@ -123,9 +117,9 @@ export interface CityMapDeps {
   // floor's tier, and grants each one a full max-tier free-upgrade batch —
   // the same reward a heavenly crit landing on a normal upgrade click
   // grants, just applied to this whole newly-bought building. result.
-  // grandOpening buys the next building for free. The other procs (boost/
-  // bounce/explosion/booty/peppermint) don't apply at building scope at all
-  // — main.ts's own applyBuildingCritTier simply has no handler for them
+  // grandOpening unlocks every remaining floor of this building for free.
+  // The other procs don't apply at building scope at all — main.ts's own
+  // applyBuildingCritTier simply has no handler for them
   setBuildingCritTier: (buildingIndex: number, result: CritRollResult) => void;
   onSelectBuilding: (index: number) => void; // switch to that building and leave the map view
   // fires once the corporation barrel roll settles on a different company (see
@@ -504,14 +498,12 @@ export function createCityMapView(
         spawnCoinBurstAt(cx, burstY, MARKER_COIN_BURST_SCALE * 1.5);
       }, i * 90);
     }
-    // only ONE flash can ever show at once, so heavenly/upgrade/grand opening/
-    // fully staffed/espresso shot — the only 5 procs this whole-building event supports (see
-    // setBuildingCritTier) —
-    // are mutually exclusive with each other and with the plain tier flash
-    // below, in priority order (heavenly first: it's the bigger moment if
-    // both happen to land together). A landed proc with no entry here (the
-    // other 5 don't apply at building scope) just falls through to the plain
-    // tier flash, same as before this existed
+    // only ONE flash can ever show at once, so heavenly/upgrade/grand opening
+    // — the only 3 procs this whole-building event supports (see
+    // setBuildingCritTier) — are mutually exclusive with each other and with
+    // the plain tier flash below, in priority order (heavenly first: it's the
+    // bigger moment if both happen to land together). A landed proc with no
+    // entry here just falls through to the plain tier flash
     const playedSpecial = runFirstCritProc(
       result,
       undefined,
@@ -555,45 +547,8 @@ export function createCityMapView(
           });
           playSold();
         },
-        fullyStaffed: () => {
-          triggerScreenShake({
-            intensity: 1.8,
-            label: FULLY_STAFFED_CRIT_LABEL,
-            color: FULLY_STAFFED_CRIT_COLOR,
-            strokeWidth: 14,
-            priority: 1,
-          });
-          playSold();
-        },
-        espressoShot: () => {
-          triggerScreenShake({
-            intensity: 1.8,
-            label: ESPRESSO_SHOT_CRIT_LABEL,
-            color: ESPRESSO_SHOT_CRIT_COLOR,
-            strokeWidth: 14,
-            priority: 1,
-          });
-          playSold();
-        },
-        dejaVu: () => {
-          triggerScreenShake({
-            intensity: 1.8,
-            label: DEJA_VU_CRIT_LABEL,
-            color: DEJA_VU_CRIT_COLOR,
-            strokeWidth: 14,
-            priority: 1,
-          });
-          playExplosion();
-        },
       },
-      [
-        "heavenly",
-        "fullyStaffed",
-        "espressoShot",
-        "dejaVu",
-        "grandOpening",
-        "upgrade",
-      ],
+      ["heavenly", "grandOpening", "upgrade"],
     );
     if (playedSpecial) return;
     // chain crit: the flash shows "Chain" instead of the tier's usual "x5"/

@@ -86,6 +86,8 @@ import {
   DEJA_VU_CRIT_LABEL,
   CLONE_ARMY_CRIT_COLOR,
   CLONE_ARMY_CRIT_LABEL,
+  LUCKY_CLOVER_CRIT_COLOR,
+  LUCKY_CLOVER_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -577,6 +579,7 @@ interface QueuedCelebration {
     | "espressoShot"
     | "dejaVu"
     | "cloneArmy"
+    | "luckyClover"
     | "bonusTier";
   queuedAt: number;
   maxAgeMs?: number;
@@ -702,6 +705,7 @@ export function triggerCritCelebration(
   espressoShot = false,
   dejaVu = false,
   cloneArmy = false,
+  luckyClover = false,
 ): void {
   const procFlags: Partial<Record<CritProcKind, boolean>> = {
     chain,
@@ -747,6 +751,7 @@ export function triggerCritCelebration(
     espressoShot,
     dejaVu,
     cloneArmy,
+    luckyClover,
   };
   if (
     chain ||
@@ -791,7 +796,8 @@ export function triggerCritCelebration(
     fullyStaffed ||
     espressoShot ||
     dejaVu ||
-    cloneArmy
+    cloneArmy ||
+    luckyClover
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1301,6 +1307,23 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             CLONE_ARMY_CRIT_LABEL,
             CLONE_ARMY_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      luckyClover &&
+      !specialCelebrationQueue.some((q) => q.kind === "luckyClover")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "luckyClover",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            LUCKY_CLOVER_CRIT_LABEL,
+            LUCKY_CLOVER_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

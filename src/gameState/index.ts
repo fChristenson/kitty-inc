@@ -400,6 +400,10 @@ interface SavedFloor {
   priceDiscountMultiplier?: number; // added after initial release; older saves default to 1 on load
 }
 
+interface SavedBuildings {
+  buildings: SavedFloor[][];
+}
+
 export function clearBuildings(companyIndex = 0): void {
   try {
     localStorage.removeItem(companyStorageKey(STORAGE_KEY, companyIndex));
@@ -438,10 +442,13 @@ export function saveBuildings(buildings: Floor[][], companyIndex = 0): void {
   const data: SavedFloor[][] = buildings.map((floors) =>
     floors.map(toSavedFloor),
   );
+  const saved: SavedBuildings = {
+    buildings: data,
+  };
   try {
     localStorage.setItem(
       companyStorageKey(STORAGE_KEY, companyIndex),
-      JSON.stringify(data),
+      JSON.stringify(saved),
     );
   } catch {
     // storage unavailable/full: persistence is a nice-to-have, safe to ignore
@@ -509,8 +516,11 @@ export function loadBuildings(companyIndex = 0): Floor[][] {
   if (!raw) return [];
 
   try {
-    const saved: SavedFloor[][] = JSON.parse(raw);
-    return saved.map((floors) => floors.map((sf) => fromSavedFloor(sf)));
+    const parsed: SavedFloor[][] | SavedBuildings = JSON.parse(raw);
+    const saved = Array.isArray(parsed) ? { buildings: parsed } : parsed;
+    return saved.buildings.map((floors) =>
+      floors.map((sf) => fromSavedFloor(sf)),
+    );
   } catch {
     return [];
   }

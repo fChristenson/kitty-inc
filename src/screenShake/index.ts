@@ -60,6 +60,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Espresso Shot": { name: "espressoShot" },
   "Deja Vu": { name: "dejaVu" },
   "Clone Army": { name: "cloneArmy" },
+  "Lucky Clover": { name: "luckyClover" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

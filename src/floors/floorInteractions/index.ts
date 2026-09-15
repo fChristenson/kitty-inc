@@ -57,6 +57,7 @@ import {
   isEspressoShotCrit,
   isDejaVuCrit,
   isCloneArmyCrit,
+  isLuckyCloverCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -75,6 +76,8 @@ import {
   triggerRushHourCrit,
   armGuaranteedUltraCrit,
   armGuaranteedMegaCrit,
+  LUCKY_CLOVER_CRIT_COUNT,
+  LUCKY_CLOVER_CRIT_TIER,
   endOvertimeActiveWindow,
   isOvertimeDraining,
   getOvertimeCost,
@@ -631,6 +634,16 @@ function applySilverTicketCrit(floor: Floor): void {
   armGuaranteedMegaCrit(floor);
 }
 
+// "Lucky Clover" crit (see shared/critTypes's isLuckyCloverCrit): instantly
+// pays out LUCKY_CLOVER_CRIT_COUNT back-to-back ultra-tier crits on this
+// floor, all at once
+function applyLuckyCloverCrit(floor: Floor, isGroundFloor: boolean): void {
+  const count = CRIT_TIER_CONFIG[LUCKY_CLOVER_CRIT_TIER].multiplier;
+  for (let run = 0; run < LUCKY_CLOVER_CRIT_COUNT; run++) {
+    for (let i = 0; i < count; i++) applyUpgradeTick(floor, isGroundFloor);
+  }
+}
+
 // "Golden Parachute" crit (see shared/critTypes's isGoldenParachuteCrit): a
 // flat, not-tier-scaled instant payout — unlike payday/gold standard (which
 // multiply the ALREADY-BANKED total), this pays out GOLDEN_PARACHUTE_SECONDS
@@ -892,6 +905,8 @@ export function handleFloorClick(
         if (buyTier.espressoShot) applyEspressoShotCrit(floors);
         if (buyTier.dejaVu) applyDejaVuCrit(floor, floors.indexOf(floor) === 0);
         if (buyTier.cloneArmy) applyCloneArmyCrit(floors);
+        if (buyTier.luckyClover)
+          applyLuckyCloverCrit(floor, floors.indexOf(floor) === 0);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -991,6 +1006,7 @@ export function handleFloorClick(
           buyTier.espressoShot,
           buyTier.dejaVu,
           buyTier.cloneArmy,
+          buyTier.luckyClover,
         );
     }
     return;
@@ -1156,12 +1172,14 @@ export function handleFloorClick(
       const espressoShot = isEspressoShotCrit(floor);
       const dejaVu = isDejaVuCrit(floor);
       const cloneArmy = isCloneArmyCrit(floor);
+      const luckyClover = isLuckyCloverCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
       for (let i = 0; i < count; i++) {
         applyUpgradeTick(floor, isGroundFloor);
       }
+      if (luckyClover) applyLuckyCloverCrit(floor, isGroundFloor);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
       // never once per free tick above, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
@@ -1387,6 +1405,7 @@ export function handleFloorClick(
         espressoShot,
         dejaVu,
         cloneArmy,
+        luckyClover,
       );
       return;
     }
