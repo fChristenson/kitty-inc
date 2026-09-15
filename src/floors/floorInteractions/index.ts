@@ -69,6 +69,8 @@ import {
   isDoubleDownCrit,
   isCoffeeRunCrit,
   isTeamBuildingCrit,
+  isSpringCleaningCrit,
+  isNightOwlCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   SEASONAL_SALE_DISCOUNT_MULTIPLIER,
@@ -134,6 +136,7 @@ import { spawnFloatingCoins } from "../coinFloat";
 import { spawnIncomeFloatText } from "../incomeFloatText";
 import { getUpgradeIndicatorCenter } from "../star";
 import { hitTestUpgradeArrow } from "../upgradeArrow";
+import { computeBaseFloorStats } from "..";
 import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
   hitTestFloorLock,
@@ -381,26 +384,41 @@ function applyCoffeeRunCrit(floors: Floor[]): void {
 // "night shift crit" (see shared/critTypes' isNightShiftCrit): same
 // building-wide free-boost reward as boost/sunshine/snowday above, but its
 // own SHORTER duration — half the normal boost length. Also, for the same
-// shorter window, activates a "virtual" boosted worker slot one past each
-// unlocked floor's own last rendered worker index: countBoostedWorkers
-// (gameState.ts) counts every slot regardless of rendered-worker cap, so
-// this bumps incomePanel.ts's boost-speed exponent by 1/MAX_RENDERED_WORKERS
-// extra — the same effect a genuine +1 boosted worker would have — while
-// getRenderedWorkerCount-bounded drawing never renders it, since real
-// workers only ever occupy indices below that count
+// shorter window, activates `extraWorkers` "virtual" boosted worker slots
+// just past each unlocked floor's own last rendered worker index:
+// countBoostedWorkers (gameState.ts) counts every slot regardless of
+// rendered-worker cap, so this bumps incomePanel.ts's boost-speed exponent by
+// extraWorkers/MAX_RENDERED_WORKERS — the same effect that many genuine extra
+// boosted workers would have — while getRenderedWorkerCount-bounded drawing
+// never renders them, since real workers only ever occupy indices below that
+// count. "Night Owl" below is the same reward with two virtual workers
+// instead of one
 const NIGHT_SHIFT_BOOST_DURATION_MS = Math.round(BOOST_DURATION_MS / 2);
-function applyNightShiftCrit(floors: Floor[]): void {
+function applyNightShiftBoost(floors: Floor[], extraWorkers: number): void {
   applyFloorBoost(floors, NIGHT_SHIFT_BOOST_DURATION_MS);
   const now = Date.now();
   for (const floor of floors) {
     if (!floor.unlocked) continue;
-    activateBoosted(
-      floor,
-      getRenderedWorkerCount(floor),
-      now,
-      NIGHT_SHIFT_BOOST_DURATION_MS,
-    );
+    const firstVirtualIndex = getRenderedWorkerCount(floor);
+    for (let i = 0; i < extraWorkers; i++) {
+      activateBoosted(
+        floor,
+        firstVirtualIndex + i,
+        now,
+        NIGHT_SHIFT_BOOST_DURATION_MS,
+      );
+    }
   }
+}
+
+function applyNightShiftCrit(floors: Floor[]): void {
+  applyNightShiftBoost(floors, 1);
+}
+
+// "Night Owl" crit (see shared/critTypes' isNightOwlCrit): Night Shift with
+// twice the virtual-worker bump
+function applyNightOwlCrit(floors: Floor[]): void {
+  applyNightShiftBoost(floors, 2);
 }
 
 // minimal deps a chain crit needs to grow a building while walking upward —
@@ -723,6 +741,30 @@ function applyTeamBuildingCrit(floors: Floor[]): void {
   }
 }
 
+// "Spring Cleaning" crit (see shared/critTypes's isSpringCleaningCrit): wipes
+// each unlocked floor back to its own level-0 economy (rate/interval/cost, no
+// banked upgrades) but one permanent tier higher — a fresh floor that earns
+// more per upgrade from here on. A floor already at the top tier has nothing
+// to trade its upgrades for, so it's skipped entirely. Workers/manager/office
+// upgrades and the building's accumulated price discount all survive
+function applySpringCleaningCrit(floors: Floor[], multiplier: number): void {
+  for (const [index, floor] of floors.entries()) {
+    if (!floor.unlocked) continue;
+    const promoted = nextCritTier(floor.critMultiplierTier);
+    if (promoted === floor.critMultiplierTier) continue;
+    const base = computeBaseFloorStats(index + 1, multiplier);
+    floor.incomeAmount = base.incomeAmount;
+    floor.incomeIntervalSeconds = base.incomeIntervalSeconds;
+    floor.rateStep = base.rateStep;
+    floor.upgradeCost = multiply(
+      base.upgradeCost,
+      floor.priceDiscountMultiplier,
+    );
+    floor.upgradeCount = 0;
+    floor.critMultiplierTier = promoted;
+  }
+}
+
 // "Rush Hour" crit (see shared/critTypes's isRushHourCrit): no instant
 // payout — just starts the building-wide timed window (see
 // triggerRushHourCrit/isRushHourActive) during which every unlocked floor's
@@ -1041,6 +1083,8 @@ export function handleFloorClick(
           applyDoubleDownCrit(floor, floors.indexOf(floor) === 0, buyTier.tier);
         if (buyTier.coffeeRun) applyCoffeeRunCrit(floors);
         if (buyTier.teamBuilding) applyTeamBuildingCrit(floors);
+        if (buyTier.springCleaning) applySpringCleaningCrit(floors, multiplier);
+        if (buyTier.nightOwl) applyNightOwlCrit(floors);
         // winter/spring/summer/autumn sale crits: permanently cut every
         // unlocked floor's own upgrade/worker costs 25%, building-wide
         if (
@@ -1152,6 +1196,8 @@ export function handleFloorClick(
           buyTier.doubleDown,
           buyTier.coffeeRun,
           buyTier.teamBuilding,
+          buyTier.springCleaning,
+          buyTier.nightOwl,
         );
     }
     return;
@@ -1329,6 +1375,8 @@ export function handleFloorClick(
       const doubleDown = isDoubleDownCrit(floor);
       const coffeeRun = isCoffeeRunCrit(floor);
       const teamBuilding = isTeamBuildingCrit(floor);
+      const springCleaning = isSpringCleaningCrit(floor);
+      const nightOwl = isNightOwlCrit(floor);
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       const count = CRIT_TIER_CONFIG[tier].multiplier;
@@ -1349,6 +1397,8 @@ export function handleFloorClick(
       if (doubleDown) applyDoubleDownCrit(floor, isGroundFloor, tier);
       if (coffeeRun) applyCoffeeRunCrit(floors);
       if (teamBuilding) applyTeamBuildingCrit(floors);
+      if (springCleaning) applySpringCleaningCrit(floors, multiplier);
+      if (nightOwl) applyNightOwlCrit(floors);
       // reroll THIS floor's next crit exactly once for the whole landed crit —
       // never once per free tick above, or a big multiplier (x125 ultra) would
       // roll the special-crit gateway up to 125 times instead of once
@@ -1586,6 +1636,8 @@ export function handleFloorClick(
         doubleDown,
         coffeeRun,
         teamBuilding,
+        springCleaning,
+        nightOwl,
       );
       return;
     }

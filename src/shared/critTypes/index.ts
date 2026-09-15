@@ -522,6 +522,19 @@ export const TEAM_BUILDING_CRIT_CHANCE = CONFIG.crit.teamBuildingChance;
 export const TEAM_BUILDING_CRIT_COLOR = COLOR.teamBuildingCoral;
 export const TEAM_BUILDING_CRIT_LABEL = "Team Building";
 
+// "Spring Cleaning" crit — promotes every unlocked floor one tier and wipes it
+// back to a brand new floor at that tier; a floor already at the top tier is
+// skipped entirely, since there's nothing left to trade the upgrades for
+export const SPRING_CLEANING_CRIT_CHANCE = CONFIG.crit.springCleaningChance;
+export const SPRING_CLEANING_CRIT_COLOR = COLOR.springCleaningMint;
+export const SPRING_CLEANING_CRIT_LABEL = "Spring Cleaning";
+
+// "Night Owl" crit — Night Shift's exact reward, but worth +2 virtual boosted
+// workers instead of +1
+export const NIGHT_OWL_CRIT_CHANCE = CONFIG.crit.nightOwlChance;
+export const NIGHT_OWL_CRIT_COLOR = COLOR.nightOwlIndigo;
+export const NIGHT_OWL_CRIT_LABEL = "Night Owl";
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -597,6 +610,8 @@ const fireDrillCrits = new WeakSet<Floor>();
 const doubleDownCrits = new WeakSet<Floor>();
 const coffeeRunCrits = new WeakSet<Floor>();
 const teamBuildingCrits = new WeakSet<Floor>();
+const springCleaningCrits = new WeakSet<Floor>();
+const nightOwlCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -693,6 +708,8 @@ export interface CritRollResult {
   doubleDown: boolean;
   coffeeRun: boolean;
   teamBuilding: boolean;
+  springCleaning: boolean;
+  nightOwl: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -760,6 +777,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "doubleDown",
   "coffeeRun",
   "teamBuilding",
+  "springCleaning",
+  "nightOwl",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -1101,6 +1120,16 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "teamBuilding",
     description: "Hires a free worker on every unlocked floor",
   },
+  springCleaning: {
+    label: SPRING_CLEANING_CRIT_LABEL,
+    icon: "springCleaning",
+    description: "Rebuilds every floor fresh, one tier higher",
+  },
+  nightOwl: {
+    label: NIGHT_OWL_CRIT_LABEL,
+    icon: "nightOwl",
+    description: "Night Shift's boost, worth two extra workers",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -1202,6 +1231,9 @@ export function rollCrit(
     if (Math.random() < DOUBLE_DOWN_CRIT_CHANCE) landed.push("doubleDown");
     if (Math.random() < COFFEE_RUN_CRIT_CHANCE) landed.push("coffeeRun");
     if (Math.random() < TEAM_BUILDING_CRIT_CHANCE) landed.push("teamBuilding");
+    if (Math.random() < SPRING_CLEANING_CRIT_CHANCE)
+      landed.push("springCleaning");
+    if (Math.random() < NIGHT_OWL_CRIT_CHANCE) landed.push("nightOwl");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -1275,6 +1307,8 @@ export function rollCrit(
     doubleDown: kept.has("doubleDown"),
     coffeeRun: kept.has("coffeeRun"),
     teamBuilding: kept.has("teamBuilding"),
+    springCleaning: kept.has("springCleaning"),
+    nightOwl: kept.has("nightOwl"),
   });
 }
 
@@ -1504,6 +1538,14 @@ export function isTeamBuildingCrit(floor: Floor): boolean {
   return teamBuildingCrits.has(floor);
 }
 
+export function isSpringCleaningCrit(floor: Floor): boolean {
+  return springCleaningCrits.has(floor);
+}
+
+export function isNightOwlCrit(floor: Floor): boolean {
+  return nightOwlCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1576,6 +1618,8 @@ export function consumeCritProcs(floor: Floor): void {
   doubleDownCrits.delete(floor);
   coffeeRunCrits.delete(floor);
   teamBuildingCrits.delete(floor);
+  springCleaningCrits.delete(floor);
+  nightOwlCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1804,6 +1848,14 @@ export function forceCoffeeRunCritProc(floor: Floor): void {
 
 export function forceTeamBuildingCritProc(floor: Floor): void {
   teamBuildingCrits.add(floor);
+}
+
+export function forceSpringCleaningCritProc(floor: Floor): void {
+  springCleaningCrits.add(floor);
+}
+
+export function forceNightOwlCritProc(floor: Floor): void {
+  nightOwlCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

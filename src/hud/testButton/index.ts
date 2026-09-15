@@ -80,6 +80,8 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-double-down-crit" class="game__button">Spawn Double Down Crit</button>
           <button id="spawn-coffee-run-crit" class="game__button">Spawn Coffee Run Crit</button>
           <button id="spawn-team-building-crit" class="game__button">Spawn Team Building Crit</button>
+          <button id="spawn-spring-cleaning-crit" class="game__button">Spawn Spring Cleaning Crit</button>
+          <button id="spawn-night-owl-crit" class="game__button">Spawn Night Owl Crit</button>
           <button id="spawn-golden-parachute-crit" class="game__button">Spawn Golden Parachute Crit</button>
           <button id="spawn-payout-crit" class="game__button">Spawn Payout Crit</button>
         </div>
@@ -151,6 +153,8 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-double-down-crit" class="game__button">Floor Double Down Crit</button>
           <button id="floor-buy-coffee-run-crit" class="game__button">Floor Coffee Run Crit</button>
           <button id="floor-buy-team-building-crit" class="game__button">Floor Team Building Crit</button>
+          <button id="floor-buy-spring-cleaning-crit" class="game__button">Floor Spring Cleaning Crit</button>
+          <button id="floor-buy-night-owl-crit" class="game__button">Floor Night Owl Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -797,6 +801,26 @@ export function wireSpawnTeamBuildingCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-team-building-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnSpringCleaningCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-spring-cleaning-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnNightOwlCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-night-owl-crit",
   )!;
   button.addEventListener("click", onClick);
 }
@@ -1484,6 +1508,26 @@ export function wireFloorBuyTeamBuildingCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-team-building-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuySpringCleaningCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-spring-cleaning-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyNightOwlCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-night-owl-crit",
   )!;
   button.addEventListener("click", onClick);
 }

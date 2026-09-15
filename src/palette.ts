@@ -164,6 +164,10 @@ export const COLOR = {
   coffeeRunTeal: "#0E7490",
   // Team Building crit's own dedicated color
   teamBuildingCoral: "#F97056",
+  // Spring Cleaning crit's own dedicated color
+  springCleaningMint: "#14919B",
+  // Night Owl crit's own dedicated color
+  nightOwlIndigo: "#3730A3",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

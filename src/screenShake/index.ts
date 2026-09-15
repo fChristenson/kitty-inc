@@ -72,6 +72,8 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Double Down": { name: "doubleDown" },
   "Coffee Run": { name: "coffeeRun" },
   "Team Building": { name: "teamBuilding" },
+  "Spring Cleaning": { name: "springCleaning" },
+  "Night Owl": { name: "nightOwl" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

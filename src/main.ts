@@ -79,6 +79,8 @@ import {
   forceDoubleDownCritUpgrade,
   forceCoffeeRunCritUpgrade,
   forceTeamBuildingCritUpgrade,
+  forceSpringCleaningCritUpgrade,
+  forceNightOwlCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   forceGrandOpeningFloorBuyCrit,
@@ -98,6 +100,8 @@ import {
   forceDoubleDownFloorBuyCrit,
   forceCoffeeRunFloorBuyCrit,
   forceTeamBuildingFloorBuyCrit,
+  forceSpringCleaningFloorBuyCrit,
+  forceNightOwlFloorBuyCrit,
   forcePayoutFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -196,6 +200,8 @@ import {
   wireSpawnDoubleDownCritButton,
   wireSpawnCoffeeRunCritButton,
   wireSpawnTeamBuildingCritButton,
+  wireSpawnSpringCleaningCritButton,
+  wireSpawnNightOwlCritButton,
   wireSpawnGoldenParachuteCritButton,
   wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
@@ -263,6 +269,8 @@ import {
   wireFloorBuyDoubleDownCritButton,
   wireFloorBuyCoffeeRunCritButton,
   wireFloorBuyTeamBuildingCritButton,
+  wireFloorBuySpringCleaningCritButton,
+  wireFloorBuyNightOwlCritButton,
   wireFloorBuyGoldenParachuteCritButton,
   wireFloorBuyPayoutCritButton,
   wireMapUnlockCritButton,
@@ -822,6 +830,14 @@ async function main() {
     wireSpawnTeamBuildingCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceTeamBuildingCritUpgrade(floor);
+    });
+    wireSpawnSpringCleaningCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceSpringCleaningCritUpgrade(floor);
+    });
+    wireSpawnNightOwlCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceNightOwlCritUpgrade(floor);
     });
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1726,6 +1742,12 @@ async function main() {
     );
     wireFloorBuyTeamBuildingCritButton(app, () =>
       forceTeamBuildingFloorBuyCrit("crit"),
+    );
+    wireFloorBuySpringCleaningCritButton(app, () =>
+      forceSpringCleaningFloorBuyCrit("crit"),
+    );
+    wireFloorBuyNightOwlCritButton(app, () =>
+      forceNightOwlFloorBuyCrit("crit"),
     );
     wireFloorBuyGoldenParachuteCritButton(app, () =>
       forceFloorBuyCrit(

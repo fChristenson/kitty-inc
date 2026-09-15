@@ -266,6 +266,14 @@ export const CONFIG = {
     // "Team Building" crit — one free worker on every unlocked floor at once
     // (Intern's building-wide sibling, priced like Golden Handshake)
     teamBuildingChance: 0.03,
+    // "Spring Cleaning" crit — promotes every unlocked floor one permanent tier
+    // AND resets it to a fresh, un-upgraded floor at that higher tier; a floor
+    // already at the top tier is left alone. Trades banked upgrades for a
+    // permanently better multiplier, so priced with the other tier promotions
+    springCleaningChance: 0.006,
+    // "Night Owl" crit — Night Shift's reward with twice the virtual-worker
+    // bump (+2 instead of +1), so a touch rarer than it
+    nightOwlChance: 0.05,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

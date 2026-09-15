@@ -110,6 +110,10 @@ import {
   COFFEE_RUN_CRIT_LABEL,
   TEAM_BUILDING_CRIT_COLOR,
   TEAM_BUILDING_CRIT_LABEL,
+  SPRING_CLEANING_CRIT_COLOR,
+  SPRING_CLEANING_CRIT_LABEL,
+  NIGHT_OWL_CRIT_COLOR,
+  NIGHT_OWL_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -613,6 +617,8 @@ interface QueuedCelebration {
     | "doubleDown"
     | "coffeeRun"
     | "teamBuilding"
+    | "springCleaning"
+    | "nightOwl"
     | "bonusTier";
   queuedAt: number;
   maxAgeMs?: number;
@@ -750,6 +756,8 @@ export function triggerCritCelebration(
   doubleDown = false,
   coffeeRun = false,
   teamBuilding = false,
+  springCleaning = false,
+  nightOwl = false,
 ): void {
   const procFlags: Partial<Record<CritProcKind, boolean>> = {
     chain,
@@ -807,6 +815,8 @@ export function triggerCritCelebration(
     doubleDown,
     coffeeRun,
     teamBuilding,
+    springCleaning,
+    nightOwl,
   };
   if (
     chain ||
@@ -863,7 +873,9 @@ export function triggerCritCelebration(
     fireDrill ||
     doubleDown ||
     coffeeRun ||
-    teamBuilding
+    teamBuilding ||
+    springCleaning ||
+    nightOwl
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1574,6 +1586,40 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             TEAM_BUILDING_CRIT_LABEL,
             TEAM_BUILDING_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      springCleaning &&
+      !specialCelebrationQueue.some((q) => q.kind === "springCleaning")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "springCleaning",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            SPRING_CLEANING_CRIT_LABEL,
+            SPRING_CLEANING_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (
+      nightOwl &&
+      !specialCelebrationQueue.some((q) => q.kind === "nightOwl")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "nightOwl",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            NIGHT_OWL_CRIT_LABEL,
+            NIGHT_OWL_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

@@ -137,7 +137,8 @@ export interface BuildFloorOptions {
 // the level-0 (freshly-built, un-upgraded) income/cost/interval stats for a given
 // floorLevel/multiplier — buildFloor's own formula, factored out so a future
 // caller needing the same level-0 baseline can reuse it instead of redriving it
-function computeBaseFloorStats(
+// (see floorInteractions.ts's Spring Cleaning crit, which resets a floor to it)
+export function computeBaseFloorStats(
   floorLevel: number,
   multiplier: number,
 ): {
@@ -411,6 +412,8 @@ export {
   forceDoubleDownCritUpgrade,
   forceCoffeeRunCritUpgrade,
   forceTeamBuildingCritUpgrade,
+  forceSpringCleaningCritUpgrade,
+  forceNightOwlCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   forceGrandOpeningFloorBuyCrit,
@@ -430,6 +433,8 @@ export {
   forceDoubleDownFloorBuyCrit,
   forceCoffeeRunFloorBuyCrit,
   forceTeamBuildingFloorBuyCrit,
+  forceSpringCleaningFloorBuyCrit,
+  forceNightOwlFloorBuyCrit,
   forcePayoutFloorBuyCrit,
   rollFloorBuyCrit,
   pickHigherCritTier,

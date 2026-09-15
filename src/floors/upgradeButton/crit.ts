@@ -154,6 +154,10 @@ export {
   COFFEE_RUN_CRIT_LABEL,
   TEAM_BUILDING_CRIT_COLOR,
   TEAM_BUILDING_CRIT_LABEL,
+  SPRING_CLEANING_CRIT_COLOR,
+  SPRING_CLEANING_CRIT_LABEL,
+  NIGHT_OWL_CRIT_COLOR,
+  NIGHT_OWL_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -210,6 +214,8 @@ export {
   isDoubleDownCrit,
   isCoffeeRunCrit,
   isTeamBuildingCrit,
+  isSpringCleaningCrit,
+  isNightOwlCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -277,6 +283,8 @@ import {
   forceDoubleDownCritProc,
   forceCoffeeRunCritProc,
   forceTeamBuildingCritProc,
+  forceSpringCleaningCritProc,
+  forceNightOwlCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -380,6 +388,8 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.doubleDown) forceDoubleDownCritProc(floor);
     if (result.coffeeRun) forceCoffeeRunCritProc(floor);
     if (result.teamBuilding) forceTeamBuildingCritProc(floor);
+    if (result.springCleaning) forceSpringCleaningCritProc(floor);
+    if (result.nightOwl) forceNightOwlCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -520,6 +530,8 @@ export function forceFloorBuyCrit(
     doubleDown: false,
     coffeeRun: false,
     teamBuilding: false,
+    springCleaning: false,
+    nightOwl: false,
   };
 }
 
@@ -616,6 +628,16 @@ export function forceCoffeeRunFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceTeamBuildingFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.teamBuilding = true;
+}
+
+export function forceSpringCleaningFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.springCleaning = true;
+}
+
+export function forceNightOwlFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.nightOwl = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -1005,6 +1027,16 @@ export function forceCoffeeRunCritUpgrade(floor: Floor): void {
 export function forceTeamBuildingCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceTeamBuildingCritProc(floor);
+}
+
+export function forceSpringCleaningCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSpringCleaningCritProc(floor);
+}
+
+export function forceNightOwlCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceNightOwlCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's
