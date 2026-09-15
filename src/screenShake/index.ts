@@ -63,6 +63,7 @@ const CRIT_ICON_BY_LABEL: Partial<
   "Lucky Clover": { name: "luckyClover" },
   "Second Wind": { name: "secondWind" },
   "Executive Order": { name: "executiveOrder" },
+  "Round Up": { name: "roundUp" },
 };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();

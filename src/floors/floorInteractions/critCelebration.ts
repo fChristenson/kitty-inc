@@ -92,6 +92,8 @@ import {
   SECOND_WIND_CRIT_LABEL,
   EXECUTIVE_ORDER_CRIT_COLOR,
   EXECUTIVE_ORDER_CRIT_LABEL,
+  ROUND_UP_CRIT_COLOR,
+  ROUND_UP_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnCoinBurst } from "../coins";
 import {
@@ -586,6 +588,7 @@ interface QueuedCelebration {
     | "luckyClover"
     | "secondWind"
     | "executiveOrder"
+    | "roundUp"
     | "bonusTier";
   queuedAt: number;
   maxAgeMs?: number;
@@ -714,6 +717,7 @@ export function triggerCritCelebration(
   luckyClover = false,
   secondWind = false,
   executiveOrder = false,
+  roundUp = false,
 ): void {
   const procFlags: Partial<Record<CritProcKind, boolean>> = {
     chain,
@@ -762,6 +766,7 @@ export function triggerCritCelebration(
     luckyClover,
     secondWind,
     executiveOrder,
+    roundUp,
   };
   if (
     chain ||
@@ -809,7 +814,8 @@ export function triggerCritCelebration(
     cloneArmy ||
     luckyClover ||
     secondWind ||
-    executiveOrder
+    executiveOrder ||
+    roundUp
   ) {
     const now = Date.now();
     // one of each kind at a time — a rapid pile-up of the same proc (e.g. a
@@ -1370,6 +1376,20 @@ export function triggerCritCelebration(
           celebrateFlatProc(
             EXECUTIVE_ORDER_CRIT_LABEL,
             EXECUTIVE_ORDER_CRIT_COLOR,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+      });
+    }
+    if (roundUp && !specialCelebrationQueue.some((q) => q.kind === "roundUp")) {
+      specialCelebrationQueue.push({
+        kind: "roundUp",
+        queuedAt: now,
+        run: () =>
+          celebrateFlatProc(
+            ROUND_UP_CRIT_LABEL,
+            ROUND_UP_CRIT_COLOR,
             floor,
             tier,
             getScreenCenterLocal,

@@ -464,6 +464,13 @@ export const EXECUTIVE_ORDER_CRIT_CHANCE = CONFIG.crit.executiveOrderChance;
 export const EXECUTIVE_ORDER_CRIT_COLOR = COLOR.executiveOrderTeal;
 export const EXECUTIVE_ORDER_CRIT_LABEL = "Executive Order";
 
+// "Round Up" crit — tops every unlocked floor's own upgradeCount up to the
+// next multiple of ROUND_UP_CRIT_STEP, for free
+export const ROUND_UP_CRIT_CHANCE = CONFIG.crit.roundUpChance;
+export const ROUND_UP_CRIT_COLOR = COLOR.roundUpOrange;
+export const ROUND_UP_CRIT_LABEL = "Round Up";
+export const ROUND_UP_CRIT_STEP = 10;
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -530,6 +537,7 @@ const cloneArmyCrits = new WeakSet<Floor>();
 const luckyCloverCrits = new WeakSet<Floor>();
 const secondWindCrits = new WeakSet<Floor>();
 const executiveOrderCrits = new WeakSet<Floor>();
+const roundUpCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -617,6 +625,7 @@ export interface CritRollResult {
   luckyClover: boolean;
   secondWind: boolean;
   executiveOrder: boolean;
+  roundUp: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -675,6 +684,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "luckyClover",
   "secondWind",
   "executiveOrder",
+  "roundUp",
 ];
 
 // a caller-supplied "what does this proc actually DO here" function per proc
@@ -971,6 +981,11 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "executiveOrder",
     description: "Promotes every floor one crit tier",
   },
+  roundUp: {
+    label: ROUND_UP_CRIT_LABEL,
+    icon: "roundUp",
+    description: "Tops every floor up to the next 10 upgrades",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -1062,6 +1077,7 @@ export function rollCrit(
     if (Math.random() < SECOND_WIND_CRIT_CHANCE) landed.push("secondWind");
     if (Math.random() < EXECUTIVE_ORDER_CRIT_CHANCE)
       landed.push("executiveOrder");
+    if (Math.random() < ROUND_UP_CRIT_CHANCE) landed.push("roundUp");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -1126,6 +1142,7 @@ export function rollCrit(
     luckyClover: kept.has("luckyClover"),
     secondWind: kept.has("secondWind"),
     executiveOrder: kept.has("executiveOrder"),
+    roundUp: kept.has("roundUp"),
   });
 }
 
@@ -1319,6 +1336,10 @@ export function isExecutiveOrderCrit(floor: Floor): boolean {
   return executiveOrderCrits.has(floor);
 }
 
+export function isRoundUpCrit(floor: Floor): boolean {
+  return roundUpCrits.has(floor);
+}
+
 // the armed "special crit crit" bonus tier riding on this floor's already-
 // landed proc(s), if any (see rollCrit's own bonusTier)
 export function getBonusTierCrit(floor: Floor): CritTier | null {
@@ -1382,6 +1403,7 @@ export function consumeCritProcs(floor: Floor): void {
   luckyCloverCrits.delete(floor);
   secondWindCrits.delete(floor);
   executiveOrderCrits.delete(floor);
+  roundUpCrits.delete(floor);
   bonusTierCrits.delete(floor);
 }
 
@@ -1574,6 +1596,10 @@ export function forceSecondWindCritProc(floor: Floor): void {
 
 export function forceExecutiveOrderCritProc(floor: Floor): void {
   executiveOrderCrits.add(floor);
+}
+
+export function forceRoundUpCritProc(floor: Floor): void {
+  roundUpCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

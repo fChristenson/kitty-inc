@@ -93,6 +93,7 @@ const IMAGE_FILES = {
   luckyClover: "luckyClover.png", // Lucky Clover crit flash's own backdrop icon
   secondWind: "secondWind.png", // Second Wind crit flash's own backdrop icon
   executiveOrder: "executiveOrder.png", // Executive Order crit flash's own backdrop icon
+  roundUp: "roundUp.png", // Round Up crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

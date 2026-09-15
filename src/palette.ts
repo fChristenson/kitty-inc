@@ -146,6 +146,8 @@ export const COLOR = {
   secondWindSky: "#7DA7C9",
   // Executive Order crit's own dedicated color
   executiveOrderTeal: "#0F766E",
+  // Round Up crit's own dedicated color
+  roundUpOrange: "#EA580C",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

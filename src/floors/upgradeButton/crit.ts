@@ -132,6 +132,9 @@ export {
   SECOND_WIND_CRIT_LABEL,
   EXECUTIVE_ORDER_CRIT_COLOR,
   EXECUTIVE_ORDER_CRIT_LABEL,
+  ROUND_UP_CRIT_COLOR,
+  ROUND_UP_CRIT_LABEL,
+  ROUND_UP_CRIT_STEP,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -179,6 +182,7 @@ export {
   isLuckyCloverCrit,
   isSecondWindCrit,
   isExecutiveOrderCrit,
+  isRoundUpCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -237,6 +241,7 @@ import {
   forceLuckyCloverCritProc,
   forceSecondWindCritProc,
   forceExecutiveOrderCritProc,
+  forceRoundUpCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -331,6 +336,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.cloneArmy) forceCloneArmyCritProc(floor);
     if (result.secondWind) forceSecondWindCritProc(floor);
     if (result.executiveOrder) forceExecutiveOrderCritProc(floor);
+    if (result.roundUp) forceRoundUpCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -462,6 +468,7 @@ export function forceFloorBuyCrit(
     luckyClover: false,
     secondWind: false,
     executiveOrder: false,
+    roundUp: false,
   };
 }
 
@@ -511,6 +518,11 @@ export function forceSecondWindFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceExecutiveOrderFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.executiveOrder = true;
+}
+
+export function forceRoundUpFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.roundUp = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -855,6 +867,11 @@ export function forceSecondWindCritUpgrade(floor: Floor): void {
 export function forceExecutiveOrderCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceExecutiveOrderCritProc(floor);
+}
+
+export function forceRoundUpCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceRoundUpCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's
