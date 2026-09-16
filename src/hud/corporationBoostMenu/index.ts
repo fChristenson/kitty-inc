@@ -138,7 +138,7 @@ export function wireCorporationBoostMenu(
     const count = getCritProcCount(info.kind);
     const landed =
       count > 0
-        ? `<p class="crit-info-detail__count">Landed ${count}&times;</p>`
+        ? `<p class="crit-info-detail__count">Seen ${count}&times;</p>`
         : `<p class="crit-info-detail__count crit-info-detail__count--none">Not yet discovered</p>`;
     detail.innerHTML = `
       <img src="${info.icon}" class="crit-info-detail__icon" alt="" />
