@@ -400,6 +400,8 @@ export {
   forceGoldenTicketCritUpgrade,
   forceSilverTicketCritUpgrade,
   forceGoldenParachuteCritUpgrade,
+  forceExecutiveBonusCritUpgrade,
+  forcePowerSurgeCritUpgrade,
   forceCashFlowCritUpgrade,
   forcePayoutCritUpgrade,
   forceGrandOpeningCritUpgrade,

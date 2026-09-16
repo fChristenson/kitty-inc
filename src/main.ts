@@ -133,6 +133,7 @@ import {
   applyChainCrit,
   increaseIncomeRate,
   currentIncomeRatePerSecond,
+  applyBoostAll,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -530,6 +531,12 @@ async function main() {
     getBackgrounds: getActiveBackgrounds,
     floors: buildings[activeBuildingIndex],
     getBuildingMultiplier: () => getBuildingMultiplier(activeBuildingIndex),
+    getCompanyValue: () => getCompanyAssetValue(buildings),
+    applyCompanyWideBoost: () => {
+      for (const floors of buildings) {
+        applyBoostAll(floors);
+      }
+    },
     persist,
     onOpenFloorUpgrades: (floor, floorNumber) =>
       floorUpgradeMenu.open(floor, floorNumber),

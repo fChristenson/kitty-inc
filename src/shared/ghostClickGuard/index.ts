@@ -21,7 +21,11 @@ export function createGhostClickGuard(delayMs = 500): GhostClickGuard {
       openedAt = Date.now();
     },
     shouldIgnore() {
-      return Date.now() - openedAt < delayMs;
+      if (Date.now() - openedAt >= delayMs) return false;
+      // Consume only the stale opening gesture. A real user interaction after
+      // the dialog transition must never be blocked by the debounce window.
+      openedAt = 0;
+      return true;
     },
   };
 }

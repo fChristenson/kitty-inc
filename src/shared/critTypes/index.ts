@@ -694,6 +694,13 @@ export const GOLDEN_PARACHUTE_CRIT_CHANCE = CONFIG.crit.goldenParachuteChance;
 export const GOLDEN_PARACHUTE_CRIT_COLOR = COLOR.goldenParachuteMarigold;
 export const GOLDEN_PARACHUTE_CRIT_LABEL = "Golden Parachute";
 
+export const EXECUTIVE_BONUS_CRIT_CHANCE = CONFIG.crit.executiveBonusChance;
+export const EXECUTIVE_BONUS_CRIT_COLOR = COLOR.gold;
+export const EXECUTIVE_BONUS_CRIT_LABEL = "Executive Bonus";
+export const POWER_SURGE_CRIT_CHANCE = CONFIG.crit.powerSurgeChance;
+export const POWER_SURGE_CRIT_COLOR = COLOR.starYellow;
+export const POWER_SURGE_CRIT_LABEL = "Power Surge";
+
 // "Payout" crit — the biggest flat one-time jackpot (see
 // floorInteractions.ts's applyPayoutCrit): instantly adds the combined total
 // income + upgrades value across EVERY corporation, not just the active
@@ -748,6 +755,8 @@ const rateLockCrits = new WeakSet<Floor>();
 const goldenTicketCrits = new WeakSet<Floor>();
 const silverTicketCrits = new WeakSet<Floor>();
 const goldenParachuteCrits = new WeakSet<Floor>();
+const executiveBonusCrits = new WeakSet<Floor>();
+const powerSurgeCrits = new WeakSet<Floor>();
 const payoutCrits = new WeakSet<Floor>();
 const grandOpeningCrits = new WeakSet<Floor>();
 const fullyStaffedCrits = new WeakSet<Floor>();
@@ -867,6 +876,8 @@ export interface CritRollResult {
   goldenTicket: boolean;
   silverTicket: boolean;
   goldenParachute: boolean;
+  executiveBonus: boolean;
+  powerSurge: boolean;
   payout: boolean;
   grandOpening: boolean;
   fullyStaffed: boolean;
@@ -956,6 +967,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "goldenTicket",
   "silverTicket",
   "goldenParachute",
+  "executiveBonus",
+  "powerSurge",
   "payout",
   "grandOpening",
   "fullyStaffed",
@@ -1041,6 +1054,8 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   goldenTicket: goldenTicketCrits,
   silverTicket: silverTicketCrits,
   goldenParachute: goldenParachuteCrits,
+  executiveBonus: executiveBonusCrits,
+  powerSurge: powerSurgeCrits,
   payout: payoutCrits,
   grandOpening: grandOpeningCrits,
   fullyStaffed: fullyStaffedCrits,
@@ -1472,6 +1487,18 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "goldenParachute",
     description: "Instantly adds 15s of your company's income",
   },
+  executiveBonus: {
+    label: EXECUTIVE_BONUS_CRIT_LABEL,
+    color: EXECUTIVE_BONUS_CRIT_COLOR,
+    icon: "executiveBonus",
+    description: "Pays 25% of company value",
+  },
+  powerSurge: {
+    label: POWER_SURGE_CRIT_LABEL,
+    color: POWER_SURGE_CRIT_COLOR,
+    icon: "powerSurge",
+    description: "Boosts workers across every company building",
+  },
   payout: {
     label: PAYOUT_CRIT_LABEL,
 
@@ -1785,6 +1812,9 @@ export function rollCrit(
     if (Math.random() < CLONE_ARMY_CRIT_CHANCE) landed.push("cloneArmy");
     if (Math.random() < GOLDEN_PARACHUTE_CRIT_CHANCE)
       landed.push("goldenParachute");
+    if (Math.random() < EXECUTIVE_BONUS_CRIT_CHANCE)
+      landed.push("executiveBonus");
+    if (Math.random() < POWER_SURGE_CRIT_CHANCE) landed.push("powerSurge");
     if (Math.random() < PAYOUT_CRIT_CHANCE) landed.push("payout");
     if (Math.random() < LUCKY_CLOVER_CRIT_CHANCE) landed.push("luckyClover");
     if (Math.random() < SECOND_WIND_CRIT_CHANCE) landed.push("secondWind");
@@ -1879,6 +1909,8 @@ export function rollCrit(
     goldenTicket: kept.has("goldenTicket"),
     silverTicket: kept.has("silverTicket"),
     goldenParachute: kept.has("goldenParachute"),
+    executiveBonus: kept.has("executiveBonus"),
+    powerSurge: kept.has("powerSurge"),
     payout: kept.has("payout"),
     grandOpening: kept.has("grandOpening"),
     fullyStaffed: kept.has("fullyStaffed"),
@@ -2092,6 +2124,14 @@ export function isSilverTicketCrit(floor: Floor): boolean {
 
 export function isGoldenParachuteCrit(floor: Floor): boolean {
   return goldenParachuteCrits.has(floor);
+}
+
+export function isExecutiveBonusCrit(floor: Floor): boolean {
+  return executiveBonusCrits.has(floor);
+}
+
+export function isPowerSurgeCrit(floor: Floor): boolean {
+  return powerSurgeCrits.has(floor);
 }
 
 export function isPayoutCrit(floor: Floor): boolean {
@@ -2423,6 +2463,14 @@ export function forceSilverTicketCritProc(floor: Floor): void {
 
 export function forceGoldenParachuteCritProc(floor: Floor): void {
   goldenParachuteCrits.add(floor);
+}
+
+export function forceExecutiveBonusCritProc(floor: Floor): void {
+  executiveBonusCrits.add(floor);
+}
+
+export function forcePowerSurgeCritProc(floor: Floor): void {
+  powerSurgeCrits.add(floor);
 }
 
 export function forcePayoutCritProc(floor: Floor): void {

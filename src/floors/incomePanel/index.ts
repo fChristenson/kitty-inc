@@ -198,7 +198,8 @@ export function increaseIncomeRate(floor: Floor): void {
 function currentSpeedMultiplier(floor: Floor, now: number): number {
   const boostedFraction =
     countBoostedWorkers(floor, now) / MAX_RENDERED_WORKERS;
-  const boostExponent = boostedFraction * floor.workerCount;
+  const boostExponent =
+    boostedFraction * (floor.workerCount + (floor.hasManager ? 1 : 0));
   const speedMultiplier =
     2 ** boostExponent * officeUpgradeSpeedMultiplier(floor);
   let effectiveSpeedMultiplier = speedMultiplier;

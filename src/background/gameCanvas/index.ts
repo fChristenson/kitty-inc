@@ -24,6 +24,7 @@ import { getTotalIncome } from "../../totalIncome";
 import { getScreenShakeOffset, drawCritFlash } from "../../screenShake";
 import { drawBonusTierCoins } from "../../bonusTierFx";
 import { COLOR } from "../../palette";
+import type { BigNumber } from "../../shared/bigNumber";
 import {
   startPressAndHold,
   type PressAndHoldController,
@@ -98,6 +99,8 @@ export interface GameCanvasDeps {
   getBackgrounds: () => HTMLImageElement[];
   floors: Floor[]; // the initially-active building's floors
   getBuildingMultiplier: () => number; // the currently-active building's economy scale
+  getCompanyValue: () => BigNumber;
+  applyCompanyWideBoost: () => void;
   persist: () => void;
   // fired by a plain tap on a floor's own green upgrade-arrow button (see
   // floors/upgradeArrow) — opens that floor's own hire worker/office chairs/
@@ -595,6 +598,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         backgroundCount: getBackgrounds().length,
         multiplier: getBuildingMultiplier(),
         persist,
+        getCompanyValue: deps.getCompanyValue,
+        applyCompanyWideBoost: deps.applyCompanyWideBoost,
         onFloorAdded: (floor) => notifyFloorAdded(floor),
         getScreenCenterLocal: screenCenterLocalFor,
       },

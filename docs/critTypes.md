@@ -164,8 +164,6 @@
 - **Rainy Day Fund** — converts a percentage of the building's current income
   rate into a protected reserve that pays out if the player cannot afford an
   upgrade.
-- **Power Surge** — instantly completes every income bar that is at least 80%
-  full, leaving less-progressed bars untouched.
 - **Talent Pipeline** — the next worker hired on each unlocked floor arrives
   already boosted and extends the boost duration of the worker below it.
 - **Price Match** — temporarily gives every unlocked floor the upgrade price

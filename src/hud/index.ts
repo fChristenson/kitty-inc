@@ -46,6 +46,7 @@ export {
   wireCorporationBoostMenu,
   getGlobalIncomeBoostMultiplier,
   getCompanyAssetValue,
+  getActiveCompanyAssetValue,
   getCompanyUpgradesValue,
   mergeCompanies,
 } from "./corporationBoostMenu";

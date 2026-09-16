@@ -340,6 +340,9 @@ export const CONFIG = {
     // seconds' worth of the currently active company's own combined income
     // rate (across every one of its buildings), straight to its total
     goldenParachuteChance: 0.03,
+    // "Executive Bonus" crit — pays 25% of the active company's asset value
+    executiveBonusChance: 0.04,
+    powerSurgeChance: 0.05,
     // "Payout" crit — the biggest flat one-time jackpot: instantly adds the
     // combined total income + upgrades value across EVERY corporation (not
     // just the active one) to the currently active company's own total (see

@@ -119,6 +119,10 @@ export function getCompanyAssetValue(buildings: Floor[][]): BigNumber {
   );
 }
 
+export function getActiveCompanyAssetValue(buildings: Floor[][]): BigNumber {
+  return getCompanyAssetValue(buildings);
+}
+
 // hud/corporationUpgradeMenu's "Merge" action: picks whichever selected company
 // has the most overall progress (total floor count across every one of its
 // buildings — the simplest holistic "how far into the game is this company"

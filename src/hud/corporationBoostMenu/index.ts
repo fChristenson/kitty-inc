@@ -14,6 +14,7 @@ import { onTapOrClick } from "../../shared/tapEvents";
 export {
   getCompanyBaseModifierPercent,
   getCompanyAssetValue,
+  getActiveCompanyAssetValue,
   getCompanyUpgradesValue,
   getGlobalIncomeBoostPercent,
   getGlobalIncomeBoostMultiplier,

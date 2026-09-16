@@ -240,6 +240,8 @@ export {
   isGoldenTicketCrit,
   isSilverTicketCrit,
   isGoldenParachuteCrit,
+  isExecutiveBonusCrit,
+  isPowerSurgeCrit,
   isPayoutCrit,
   isGrandOpeningCrit,
   isFullyStaffedCrit,
@@ -327,6 +329,8 @@ import {
   forceGoldenTicketCritProc,
   forceSilverTicketCritProc,
   forceGoldenParachuteCritProc,
+  forceExecutiveBonusCritProc,
+  forcePowerSurgeCritProc,
   forcePayoutCritProc,
   forceGrandOpeningCritProc,
   forceFullyStaffedCritProc,
@@ -452,6 +456,8 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.goldenTicket) forceGoldenTicketCritProc(floor);
     if (result.silverTicket) forceSilverTicketCritProc(floor);
     if (result.goldenParachute) forceGoldenParachuteCritProc(floor);
+    if (result.executiveBonus) forceExecutiveBonusCritProc(floor);
+    if (result.powerSurge) forcePowerSurgeCritProc(floor);
     if (result.payout) forcePayoutCritProc(floor);
     if (result.grandOpening) forceGrandOpeningCritProc(floor);
     if (result.fullyStaffed) forceFullyStaffedCritProc(floor);
@@ -560,6 +566,7 @@ export function forceFloorBuyCrit(
   goldenTicket = false,
   silverTicket = false,
   goldenParachute = false,
+  executiveBonus = false,
   payout = false,
   grandOpening = false,
   fullyStaffed = false,
@@ -618,6 +625,8 @@ export function forceFloorBuyCrit(
     goldenTicket,
     silverTicket,
     goldenParachute,
+    executiveBonus,
+    powerSurge: false,
     payout,
     grandOpening,
     fullyStaffed,
@@ -1131,6 +1140,16 @@ export function forceSilverTicketCritUpgrade(floor: Floor): void {
 export function forceGoldenParachuteCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceGoldenParachuteCritProc(floor);
+}
+
+export function forceExecutiveBonusCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceExecutiveBonusCritProc(floor);
+}
+
+export function forcePowerSurgeCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forcePowerSurgeCritProc(floor);
 }
 
 export function forceCashFlowCritUpgrade(floor: Floor): void {

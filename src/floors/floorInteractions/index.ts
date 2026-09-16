@@ -283,6 +283,8 @@ export interface FloorActionsDeps {
   // on the next tick, so these just need to register the new floor for hit-testing/
   // scroll bookkeeping — no manual "redraw this one floor now" plumbing needed anymore
   onFloorAdded: (floor: Floor) => void;
+  getCompanyValue: () => BigNumber;
+  applyCompanyWideBoost: () => void;
   // converts the current visual screen center (where screenShake's "CRIT!" flash is
   // drawn) into this floor's own local coordinate space, so a coin burst can be
   // anchored there instead of at a fixed floor-local point
@@ -1105,6 +1107,9 @@ export interface CritRewardContext {
 // the only ones that genuinely differ per event, so they're layered on top
 // per-site below rather than living here
 const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
+  powerSurge: (c) => c.deps.applyCompanyWideBoost(),
+  executiveBonus: (c) =>
+    addTotalIncome(multiply(c.deps.getCompanyValue(), 0.25)),
   boost: (c) => applyFloorBoost(c.floors),
   booty: () => addTotalIncome(getTotalIncome()),
   bullMarket: (c) => applyBullMarketCrit(c.floors),
