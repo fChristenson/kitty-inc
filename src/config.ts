@@ -345,6 +345,7 @@ export const CONFIG = {
     powerSurgeChance: 0.05,
     priceMatchChance: 0.05,
     priceMatchDurationMs: 5000,
+    firstClassChance: 0.05,
     // "Payout" crit — the biggest flat one-time jackpot: instantly adds the
     // combined total income + upgrades value across EVERY corporation (not
     // just the active one) to the currently active company's own total (see

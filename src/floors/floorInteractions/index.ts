@@ -750,6 +750,23 @@ function applyPriceMatchCrit(floors: Floor[], floor: Floor): void {
   if (cheapest) triggerPriceMatchCrit(floor, cheapest);
 }
 
+function applyFirstClassCrit(deps: FloorActionsDeps, source: Floor): void {
+  const sourceIndex = deps.floors.indexOf(source);
+  const next = deps.floors.find(
+    (candidate, index) => index > sourceIndex && !candidate.unlocked,
+  );
+  if (!next || next.unlocked) return;
+  const firstFloorCost = computeBaseFloorStats(1, deps.multiplier).upgradeCost;
+  unlockFloor(next);
+  next.upgradeCost = firstFloorCost;
+  ensureLockedFloorAbove({
+    floors: deps.floors,
+    backgroundCount: deps.backgroundCount,
+    multiplier: deps.multiplier,
+    onAdd: deps.onFloorAdded,
+  });
+}
+
 // "frozen crit" (see shared/critTypes's isFrozenCrit): no instant payout —
 // just starts upgradeButton.ts's own timed window on this ONE floor (see
 // triggerFrozenCrit/isFrozenActive), during which incomePanel.ts's
@@ -1123,6 +1140,7 @@ export interface CritRewardContext {
 // the only ones that genuinely differ per event, so they're layered on top
 // per-site below rather than living here
 const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
+  firstClass: (c) => applyFirstClassCrit(c.deps, c.floor),
   powerSurge: (c) => c.deps.applyCompanyWideBoost(),
   priceMatch: (c) => applyPriceMatchCrit(c.floors, c.floor),
   executiveBonus: (c) =>

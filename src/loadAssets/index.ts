@@ -57,6 +57,7 @@ const IMAGE_FILES = {
   executiveBonus: "executiveBonus.png", // Executive Bonus crit flash's own backdrop icon
   powerSurge: "powerSurge.png", // Power Surge crit flash's own backdrop icon
   priceMatch: "priceMatch.png", // Price Match crit flash's own backdrop icon
+  firstClass: "firstClass.png", // First Class crit flash's own backdrop icon
   ball: "ball.png", // Bounce crit flash's own backdrop icon
   explosion: "explosion.png", // Explosion crit flash's own backdrop icon
   booty: "booty.png", // Booty crit flash's own backdrop icon

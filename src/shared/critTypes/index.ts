@@ -705,6 +705,9 @@ export const PRICE_MATCH_CRIT_CHANCE = CONFIG.crit.priceMatchChance;
 export const PRICE_MATCH_CRIT_COLOR = COLOR.cyan;
 export const PRICE_MATCH_CRIT_LABEL = "Price Match";
 export const PRICE_MATCH_DURATION_MS = CONFIG.crit.priceMatchDurationMs;
+export const FIRST_CLASS_CRIT_CHANCE = CONFIG.crit.firstClassChance;
+export const FIRST_CLASS_CRIT_COLOR = COLOR.blue;
+export const FIRST_CLASS_CRIT_LABEL = "First Class";
 const priceMatchCosts = new WeakMap<
   Floor,
   { cost: BigNumber; originalCost: BigNumber; startedAt: number }
@@ -792,6 +795,7 @@ const goldenParachuteCrits = new WeakSet<Floor>();
 const executiveBonusCrits = new WeakSet<Floor>();
 const powerSurgeCrits = new WeakSet<Floor>();
 const priceMatchCrits = new WeakSet<Floor>();
+const firstClassCrits = new WeakSet<Floor>();
 const payoutCrits = new WeakSet<Floor>();
 const grandOpeningCrits = new WeakSet<Floor>();
 const fullyStaffedCrits = new WeakSet<Floor>();
@@ -914,6 +918,7 @@ export interface CritRollResult {
   executiveBonus: boolean;
   powerSurge: boolean;
   priceMatch: boolean;
+  firstClass: boolean;
   payout: boolean;
   grandOpening: boolean;
   fullyStaffed: boolean;
@@ -1006,6 +1011,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "executiveBonus",
   "powerSurge",
   "priceMatch",
+  "firstClass",
   "payout",
   "grandOpening",
   "fullyStaffed",
@@ -1094,6 +1100,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   executiveBonus: executiveBonusCrits,
   powerSurge: powerSurgeCrits,
   priceMatch: priceMatchCrits,
+  firstClass: firstClassCrits,
   payout: payoutCrits,
   grandOpening: grandOpeningCrits,
   fullyStaffed: fullyStaffedCrits,
@@ -1543,6 +1550,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "priceMatch",
     description: "Matches this floor to the cheapest upgrade price for 5s",
   },
+  firstClass: {
+    label: FIRST_CLASS_CRIT_LABEL,
+    color: FIRST_CLASS_CRIT_COLOR,
+    icon: "firstClass",
+    description: "Unlocks the next floor at the cheapest starting price",
+  },
   payout: {
     label: PAYOUT_CRIT_LABEL,
 
@@ -1860,6 +1873,7 @@ export function rollCrit(
       landed.push("executiveBonus");
     if (Math.random() < POWER_SURGE_CRIT_CHANCE) landed.push("powerSurge");
     if (Math.random() < PRICE_MATCH_CRIT_CHANCE) landed.push("priceMatch");
+    if (Math.random() < FIRST_CLASS_CRIT_CHANCE) landed.push("firstClass");
     if (Math.random() < PAYOUT_CRIT_CHANCE) landed.push("payout");
     if (Math.random() < LUCKY_CLOVER_CRIT_CHANCE) landed.push("luckyClover");
     if (Math.random() < SECOND_WIND_CRIT_CHANCE) landed.push("secondWind");
@@ -1957,6 +1971,7 @@ export function rollCrit(
     executiveBonus: kept.has("executiveBonus"),
     powerSurge: kept.has("powerSurge"),
     priceMatch: kept.has("priceMatch"),
+    firstClass: kept.has("firstClass"),
     payout: kept.has("payout"),
     grandOpening: kept.has("grandOpening"),
     fullyStaffed: kept.has("fullyStaffed"),
@@ -2182,6 +2197,10 @@ export function isPowerSurgeCrit(floor: Floor): boolean {
 
 export function isPriceMatchCrit(floor: Floor): boolean {
   return priceMatchCrits.has(floor);
+}
+
+export function isFirstClassCrit(floor: Floor): boolean {
+  return firstClassCrits.has(floor);
 }
 
 export function isPayoutCrit(floor: Floor): boolean {
@@ -2525,6 +2544,10 @@ export function forcePowerSurgeCritProc(floor: Floor): void {
 
 export function forcePriceMatchCritProc(floor: Floor): void {
   priceMatchCrits.add(floor);
+}
+
+export function forceFirstClassCritProc(floor: Floor): void {
+  firstClassCrits.add(floor);
 }
 
 export function forcePayoutCritProc(floor: Floor): void {

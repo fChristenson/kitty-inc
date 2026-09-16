@@ -72,6 +72,13 @@ import {
   forceExecutiveBonusCritUpgrade,
   forcePowerSurgeCritUpgrade,
   forcePriceMatchCritUpgrade,
+  forceBlueprintFloorBuyCrit,
+  forceFirstClassFloorBuyCrit,
+  forceExecutiveBonusFloorBuyCrit,
+  forcePowerSurgeFloorBuyCrit,
+  forcePriceMatchFloorBuyCrit,
+  forceDominoEffectFloorBuyCrit,
+  forceFirstClassCritUpgrade,
   forceGrandOpeningCritUpgrade,
   forceFullyStaffedCritUpgrade,
   forceShiftChangeCritUpgrade,
@@ -259,6 +266,7 @@ import {
   wireSpawnExecutiveBonusCritButton,
   wireSpawnPowerSurgeCritButton,
   wireSpawnPriceMatchCritButton,
+  wireSpawnFirstClassCritButton,
   wireForceBonusTierCritButton,
   wireForceBonusTierMegaCritButton,
   wireForceBonusTierUltraCritButton,
@@ -331,6 +339,12 @@ import {
   wireFloorBuyNightOwlCritButton,
   wireFloorBuyHeadhunterCritButton,
   wireFloorBuyRecruitmentDriveCritButton,
+  wireFloorBuyBlueprintCritButton,
+  wireFloorBuyDominoEffectCritButton,
+  wireFloorBuyFirstClassCritButton,
+  wireFloorBuyExecutiveBonusCritButton,
+  wireFloorBuyPowerSurgeCritButton,
+  wireFloorBuyPriceMatchCritButton,
   wireFloorBuyGoldenParachuteCritButton,
   wireFloorBuyPayoutCritButton,
   wireMapUnlockCritButton,
@@ -1010,6 +1024,10 @@ async function main() {
     wireSpawnPriceMatchCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forcePriceMatchCritUpgrade(floor);
+    });
+    wireSpawnFirstClassCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceFirstClassCritUpgrade(floor);
     });
     wireForceBonusTierCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1927,6 +1945,24 @@ async function main() {
     );
     wireFloorBuyRecruitmentDriveCritButton(app, () =>
       forceRecruitmentDriveFloorBuyCrit("crit"),
+    );
+    wireFloorBuyBlueprintCritButton(app, () =>
+      forceBlueprintFloorBuyCrit("crit"),
+    );
+    wireFloorBuyDominoEffectCritButton(app, () =>
+      forceDominoEffectFloorBuyCrit("crit"),
+    );
+    wireFloorBuyFirstClassCritButton(app, () =>
+      forceFirstClassFloorBuyCrit("crit"),
+    );
+    wireFloorBuyExecutiveBonusCritButton(app, () =>
+      forceExecutiveBonusFloorBuyCrit("crit"),
+    );
+    wireFloorBuyPowerSurgeCritButton(app, () =>
+      forcePowerSurgeFloorBuyCrit("crit"),
+    );
+    wireFloorBuyPriceMatchCritButton(app, () =>
+      forcePriceMatchFloorBuyCrit("crit"),
     );
     wireFloorBuyGoldenParachuteCritButton(app, () =>
       forceFloorBuyCrit(

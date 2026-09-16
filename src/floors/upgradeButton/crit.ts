@@ -244,6 +244,7 @@ export {
   isExecutiveBonusCrit,
   isPowerSurgeCrit,
   isPriceMatchCrit,
+  isFirstClassCrit,
   isPayoutCrit,
   isGrandOpeningCrit,
   isFullyStaffedCrit,
@@ -334,6 +335,7 @@ import {
   forceExecutiveBonusCritProc,
   forcePowerSurgeCritProc,
   forcePriceMatchCritProc,
+  forceFirstClassCritProc,
   forcePayoutCritProc,
   forceGrandOpeningCritProc,
   forceFullyStaffedCritProc,
@@ -462,6 +464,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.executiveBonus) forceExecutiveBonusCritProc(floor);
     if (result.powerSurge) forcePowerSurgeCritProc(floor);
     if (result.priceMatch) forcePriceMatchCritProc(floor);
+    if (result.firstClass) forceFirstClassCritProc(floor);
     if (result.payout) forcePayoutCritProc(floor);
     if (result.grandOpening) forceGrandOpeningCritProc(floor);
     if (result.fullyStaffed) forceFullyStaffedCritProc(floor);
@@ -632,6 +635,7 @@ export function forceFloorBuyCrit(
     executiveBonus,
     powerSurge: false,
     priceMatch: false,
+    firstClass: false,
     payout,
     grandOpening,
     fullyStaffed,
@@ -840,6 +844,11 @@ export function forceDominoEffectFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceBlueprintFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.blueprint = true;
+}
+
+export function forceFirstClassFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.firstClass = true;
 }
 
 export function forceExecutiveBonusFloorBuyCrit(tier: CritTier = "crit"): void {
@@ -1180,6 +1189,11 @@ export function forcePowerSurgeCritUpgrade(floor: Floor): void {
 export function forcePriceMatchCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forcePriceMatchCritProc(floor);
+}
+
+export function forceFirstClassCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFirstClassCritProc(floor);
 }
 
 export function forceCashFlowCritUpgrade(floor: Floor): void {

@@ -65,6 +65,7 @@ interface EnsureLockedFloorDeps {
   backgroundCount: number;
   multiplier?: number; // this building's economy scale (buildings/index.ts); defaults to 1
   onAdd: (floor: Floor) => void;
+  startingUpgradeCost?: import("../../shared/bigNumber").BigNumber;
 }
 
 // hard ceiling on how tall any one building can grow — shown as an "X/20"
@@ -96,6 +97,7 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
     // current accumulated discount, and a freshly queued floor should start
     // already discounted by that same amount instead of resetting to 1
     priceDiscountMultiplier: deps.floors[0]?.priceDiscountMultiplier ?? 1,
+    startingUpgradeCost: deps.startingUpgradeCost,
   });
   deps.floors.push(floor);
   deps.onAdd(floor);

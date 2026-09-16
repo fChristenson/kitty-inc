@@ -116,6 +116,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-executive-bonus-crit" class="game__button">Spawn Executive Bonus Crit</button>
           <button id="spawn-power-surge-crit" class="game__button">Spawn Power Surge Crit</button>
           <button id="spawn-price-match-crit" class="game__button">Spawn Price Match Crit</button>
+          <button id="spawn-first-class-crit" class="game__button">Spawn First Class Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -197,6 +198,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-executive-bonus-crit" class="game__button">Floor Executive Bonus Crit</button>
           <button id="floor-buy-power-surge-crit" class="game__button">Floor Power Surge Crit</button>
           <button id="floor-buy-price-match-crit" class="game__button">Floor Price Match Crit</button>
+          <button id="floor-buy-first-class-crit" class="game__button">Floor First Class Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1112,6 +1114,15 @@ export function wireSpawnPriceMatchCritButton(
     .addEventListener("click", onClick);
 }
 
+export function wireSpawnFirstClassCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#spawn-first-class-crit")!
+    .addEventListener("click", onClick);
+}
+
 export function wireSpawnCashFlowCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -1852,6 +1863,15 @@ export function wireFloorBuyPriceMatchCritButton(
 ): void {
   container
     .querySelector<HTMLButtonElement>("#floor-buy-price-match-crit")!
+    .addEventListener("click", onClick);
+}
+
+export function wireFloorBuyFirstClassCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#floor-buy-first-class-crit")!
     .addEventListener("click", onClick);
 }
 

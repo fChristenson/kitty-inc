@@ -157,8 +157,6 @@
 - Overflow — the critted floor immediately pays five current income timer payouts,
   then its timer restarts.
 
-## To consider
-
 - **Time Deposit** — stores the critted floor's next five payouts and releases
   them together with a bonus when the deposit matures.
 - **Rainy Day Fund** — converts a percentage of the building's current income
@@ -183,3 +181,35 @@
 - **Executive Bonus** — grants a building-wide payout based on the highest
   permanent crit tier currently represented in the building.
 
+## New suggestions
+
+- **Flash Sale** — the next three upgrades on the critted floor cost only one
+  percent of their current price, without changing their normal progression.
+- **Lucky Ledger** — records the next five upgrade costs and refunds their
+  average value as a single payout when the fifth upgrade is bought.
+- **Relay Team** — each boosted worker on the critted floor briefly passes its
+  boost to the next unlocked floor, creating a short upward chain of boosts.
+- **Dividend Day** — pays a small dividend from every building based on that
+  building's own upgrade value, rewarding broad development across the company.
+- **Milestone Marker** — instantly grants enough free upgrades on the critted
+  floor to reach its next five-upgrade milestone.
+- **Reserve Staff** — stores one free worker for each unlocked floor and adds
+  those workers to newly unlocked floors for the next 30 seconds.
+- **Fast Lane** — the next naturally completed income cycle on every unlocked
+  floor completes twice as quickly, without altering stored intervals.
+- **Open Book** — pays a bonus based on the number of different floor upgrade
+  features already purchased in the current building.
+- **Lucky Number** — the next upgrade whose count ends in seven grants a
+  second free upgrade immediately afterward.
+- **Shared Services** — temporarily treats every unlocked floor as owning
+  office chairs and supplies for pricing and boost calculations.
+- **Growth Fund** — converts a portion of the next building unlock cost into
+  free upgrade progress on the floor that triggered the crit.
+- **Secondment** — temporarily lends the best worker count in the company to
+  the critted floor without changing any permanent worker totals.
+- **Clean Slate** — removes all pending temporary price overrides and replaces
+  them with the current cheapest-floor price for one short window.
+- **Quartermaster** — grants every unlocked floor one free office upgrade,
+  choosing chairs or supplies wherever that feature is still missing.
+
+## To consider

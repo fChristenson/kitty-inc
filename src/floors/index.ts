@@ -132,6 +132,7 @@ export interface BuildFloorOptions {
   // queued AFTER a seasonal sale already procced still gets it (see
   // floorLock.ts's ensureLockedFloorAbove, the only real caller of this)
   priceDiscountMultiplier?: number;
+  startingUpgradeCost?: BigNumber;
 }
 
 // the level-0 (freshly-built, un-upgraded) income/cost/interval stats for a given
@@ -178,6 +179,7 @@ export function buildFloor(
     groundFloorLocked = false,
     defaultCritTier = null,
     priceDiscountMultiplier = 1,
+    startingUpgradeCost,
   } = options;
   const isGroundFloor = floorLevel === 1;
   // BigNumber pow/multiply never overflow to Infinity no matter how high
@@ -196,9 +198,11 @@ export function buildFloor(
     BASE_INCOME_INTERVAL_SECONDS * 2 ** (floorLevel - 1) >
     MAX_INCOME_INTERVAL_SECONDS;
 
+  const baseStats = computeBaseFloorStats(floorLevel, multiplier);
   return {
     bgIndex: pickBackgroundIndex(backgroundCount, existingBgIndexes),
-    ...computeBaseFloorStats(floorLevel, multiplier),
+    ...baseStats,
+    upgradeCost: startingUpgradeCost ?? baseStats.upgradeCost,
     upgradeCount: 0,
     unlocked: isGroundFloor && !groundFloorLocked,
     unlockCost,
@@ -361,6 +365,7 @@ export {
   forceBlueprintCritUpgrade,
   forceDominoEffectFloorBuyCrit,
   forceBlueprintFloorBuyCrit,
+  forceFirstClassFloorBuyCrit,
   forceExecutiveBonusFloorBuyCrit,
   forcePowerSurgeFloorBuyCrit,
   forcePriceMatchFloorBuyCrit,
@@ -407,6 +412,7 @@ export {
   forceExecutiveBonusCritUpgrade,
   forcePowerSurgeCritUpgrade,
   forcePriceMatchCritUpgrade,
+  forceFirstClassCritUpgrade,
   forceCashFlowCritUpgrade,
   forcePayoutCritUpgrade,
   forceGrandOpeningCritUpgrade,
