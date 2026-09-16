@@ -137,8 +137,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
       .join("");
     const critModifierTotal = CRIT_PROC_KINDS.reduce(
       (sum, kind) =>
-        sum +
-        getCritProcIncomeModifierPercent(kind, getCritProcCount(kind)),
+        sum + getCritProcIncomeModifierPercent(kind, getCritProcCount(kind)),
       0,
     );
     const totalModifier = companyModifierTotal + critModifierTotal;
@@ -157,7 +156,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
       </div>
       <h3 class="worker-menu__subheader">Income modifiers</h3>
       ${modifierRows}
-      ${critModifierRows ? '<div class="worker-menu__modifier-row worker-menu__modifier-row--divider"></div>' : ''}
+      ${critModifierRows ? '<div class="worker-menu__modifier-row worker-menu__modifier-row--divider"></div>' : ""}
       ${critModifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
         <span>Total</span>
