@@ -22,7 +22,13 @@ import {
   peekDueIncome as sharedPeekDueIncome,
   currentIncomeRatePerSecond as sharedCurrentIncomeRatePerSecond,
 } from "../../shared/income";
-import { type BigNumber, ZERO, add, multiply, gte } from "../../shared/bigNumber";
+import {
+  type BigNumber,
+  ZERO,
+  add,
+  multiply,
+  gte,
+} from "../../shared/bigNumber";
 import {
   drawPill,
   drawPillBorder,
@@ -33,10 +39,7 @@ import {
 } from "../../utils";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
-import {
-  getTeaBreakPausedAt,
-  isTeaBreakPaused,
-} from "../../shared/critTypes";
+import { getTeaBreakPausedAt, isTeaBreakPaused } from "../../shared/critTypes";
 
 // panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right).
 // Scaled up from the original 360 as far as the gap to the upgrade button allows. PANEL_X is
