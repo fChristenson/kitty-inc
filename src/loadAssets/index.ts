@@ -66,6 +66,7 @@ const IMAGE_FILES = {
   peppermint: "peppermint.png", // Peppermint crit flash's own backdrop icon
   heaven: "heaven.png", // Heavenly crit flash's own backdrop icon
   mystic: "mystic.png", // Mystic crit flash's own backdrop icon
+  keynote: "keynote.png", // Keynote crit flash's own backdrop icon
   pair: "pair.png", // Pair crit flash's own backdrop icon
   threeOfAKind: "threeOfAKind.png", // Three of a Kind crit flash's own backdrop icon
   fourOfAKind: "fourOfAKind.png", // Four of a Kind crit flash's own backdrop icon

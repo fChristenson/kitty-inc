@@ -166,6 +166,13 @@ export const MYSTIC_CRIT_COLOR = COLOR.mysticTeal;
 export const MYSTIC_CRIT_LABEL = "Mystic";
 export const MYSTIC_UPGRADE_COUNT = 10;
 
+// "keynote crit" — grants 10 free upgrades to the floor that landed the
+// proc, without changing the normal tier-scaled crit reward.
+export const KEYNOTE_CRIT_CHANCE = CONFIG.crit.keynoteChance;
+export const KEYNOTE_CRIT_COLOR = COLOR.gold;
+export const KEYNOTE_CRIT_LABEL = "Keynote";
+export const KEYNOTE_UPGRADE_COUNT = 10;
+
 // "pair"/"three of a kind"/"four of a kind"/"full house" crits — four more
 // flat, not-tier-scaled piggyback procs (same shape as booty/upgrade/
 // peppermint/heavenly): each promotes a FIXED number of floors' (or, at
@@ -777,6 +784,7 @@ const upgradeCrits = new WeakSet<Floor>();
 const peppermintCrits = new WeakSet<Floor>();
 const heavenlyCrits = new WeakSet<Floor>();
 const mysticCrits = new WeakSet<Floor>();
+const keynoteCrits = new WeakSet<Floor>();
 const pairCrits = new WeakSet<Floor>();
 const threeOfAKindCrits = new WeakSet<Floor>();
 const fourOfAKindCrits = new WeakSet<Floor>();
@@ -903,6 +911,7 @@ export interface CritRollResult {
   peppermint: boolean;
   heavenly: boolean;
   mystic: boolean;
+  keynote: boolean;
   pair: boolean;
   threeOfAKind: boolean;
   fourOfAKind: boolean;
@@ -999,6 +1008,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "peppermint",
   "heavenly",
   "mystic",
+  "keynote",
   "pair",
   "threeOfAKind",
   "fourOfAKind",
@@ -1091,6 +1101,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   peppermint: peppermintCrits,
   heavenly: heavenlyCrits,
   mystic: mysticCrits,
+  keynote: keynoteCrits,
   pair: pairCrits,
   threeOfAKind: threeOfAKindCrits,
   fourOfAKind: fourOfAKindCrits,
@@ -1332,6 +1343,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     color: MYSTIC_CRIT_COLOR,
     icon: "mystic",
     description: "Builds one free building with 10 upgrades",
+  },
+  keynote: {
+    label: KEYNOTE_CRIT_LABEL,
+    color: KEYNOTE_CRIT_COLOR,
+    icon: "keynote",
+    description: "Adds 10 free upgrades to the crit floor",
   },
   shiftChange: {
     label: SHIFT_CHANGE_CRIT_LABEL,
@@ -1872,6 +1889,7 @@ export function rollCrit(
     if (Math.random() < PEPPERMINT_CRIT_CHANCE) landed.push("peppermint");
     if (Math.random() < HEAVENLY_CRIT_CHANCE) landed.push("heavenly");
     if (Math.random() < MYSTIC_CRIT_CHANCE) landed.push("mystic");
+    if (Math.random() < KEYNOTE_CRIT_CHANCE) landed.push("keynote");
     if (Math.random() < PAIR_CRIT_CHANCE) landed.push("pair");
     if (Math.random() < THREE_OF_A_KIND_CRIT_CHANCE)
       landed.push("threeOfAKind");
@@ -1986,6 +2004,7 @@ export function rollCrit(
     peppermint: kept.has("peppermint"),
     heavenly: kept.has("heavenly"),
     mystic: kept.has("mystic"),
+    keynote: kept.has("keynote"),
     pair: kept.has("pair"),
     threeOfAKind: kept.has("threeOfAKind"),
     fourOfAKind: kept.has("fourOfAKind"),
@@ -2110,6 +2129,10 @@ export function isHeavenlyCrit(floor: Floor): boolean {
 
 export function isMysticCrit(floor: Floor): boolean {
   return mysticCrits.has(floor);
+}
+
+export function isKeynoteCrit(floor: Floor): boolean {
+  return keynoteCrits.has(floor);
 }
 
 export function isPairCrit(floor: Floor): boolean {
@@ -2469,6 +2492,10 @@ export function forceHeavenlyCritProc(floor: Floor): void {
 
 export function forceMysticCritProc(floor: Floor): void {
   mysticCrits.add(floor);
+}
+
+export function forceKeynoteCritProc(floor: Floor): void {
+  keynoteCrits.add(floor);
 }
 
 export function forcePairCritProc(floor: Floor): void {

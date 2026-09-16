@@ -80,6 +80,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-silver-ticket-crit" class="game__button">Spawn Silver Ticket Crit</button>
           <button id="spawn-grand-opening-crit" class="game__button">Spawn Grand Opening Crit</button>
           <button id="spawn-mystic-crit" class="game__button">Spawn Mystic Crit</button>
+          <button id="spawn-keynote-crit" class="game__button">Spawn Keynote Crit</button>
           <button id="spawn-fully-staffed-crit" class="game__button">Spawn Fully Staffed Crit</button>
           <button id="spawn-shift-change-crit" class="game__button">Spawn Shift Change Crit</button>
           <button id="spawn-espresso-shot-crit" class="game__button">Spawn Espresso Shot Crit</button>
@@ -172,6 +173,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-silver-ticket-crit" class="game__button">Floor Silver Ticket Crit</button>
           <button id="floor-buy-grand-opening-crit" class="game__button">Floor Grand Opening Crit</button>
           <button id="floor-buy-mystic-crit" class="game__button">Floor Mystic Crit</button>
+          <button id="floor-buy-keynote-crit" class="game__button">Floor Keynote Crit</button>
           <button id="floor-buy-fully-staffed-crit" class="game__button">Floor Fully Staffed Crit</button>
           <button id="floor-buy-espresso-shot-crit" class="game__button">Floor Espresso Shot Crit</button>
           <button id="floor-buy-deja-vu-crit" class="game__button">Floor Deja Vu Crit</button>
@@ -762,6 +764,16 @@ export function wireSpawnMysticCritButton(
 ): void {
   const button =
     container.querySelector<HTMLButtonElement>("#spawn-mystic-crit")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnKeynoteCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-keynote-crit",
+  )!;
   button.addEventListener("click", onClick);
 }
 
@@ -1661,6 +1673,16 @@ export function wireFloorBuyMysticCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-mystic-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyKeynoteCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-keynote-crit",
   )!;
   button.addEventListener("click", onClick);
 }

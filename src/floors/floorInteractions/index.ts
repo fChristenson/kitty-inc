@@ -54,6 +54,7 @@ import {
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
   MYSTIC_UPGRADE_COUNT,
+  KEYNOTE_UPGRADE_COUNT,
   CHAIN_CRIT_CONTINUE_CHANCE,
   DOMINO_EFFECT_CONTINUE_CHANCE,
   BOUNCE_CRIT_CONTINUE_CHANCE,
@@ -886,6 +887,12 @@ function applyMysticCrit(deps: FloorActionsDeps, floor: Floor): void {
   }
 }
 
+function applyKeynoteCrit(floor: Floor, isGroundFloor: boolean): void {
+  for (let i = 0; i < KEYNOTE_UPGRADE_COUNT; i++) {
+    applyUpgradeTick(floor, isGroundFloor);
+  }
+}
+
 // "Fully Staffed" crit (see shared/critTypes's isFullyStaffedCrit): fills
 // every unlocked floor to the existing rendered-worker cap and grants every
 // unlocked floor a manager.
@@ -1331,6 +1338,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   nightOwl: (c) => applyNightOwlCrit(c.floors),
   headhunter: (c) => applyHeadhunterCrit(c.floor, c.floors),
   blueprint: (c) => applyBlueprintCrit(c.deps, c.floors.indexOf(c.floor)),
+  keynote: (c) => applyKeynoteCrit(c.floor, c.isGroundFloor),
 };
 
 // an upgrade-click crit walks its landed tier's own free-upgrade batch across

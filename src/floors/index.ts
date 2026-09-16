@@ -331,6 +331,10 @@ export {
 } from "./floorInteractions";
 export type { ChainCritDeps } from "./floorInteractions";
 export {
+  forceKeynoteCritUpgrade,
+  forceKeynoteFloorBuyCrit,
+} from "./upgradeButton";
+export {
   drawWorker,
   getBoostedWorkerCenters,
   loadWorkerSprite,

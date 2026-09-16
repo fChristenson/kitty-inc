@@ -37,6 +37,8 @@ import {
   forceHeavenlyCritUpgrade,
   forceMysticCritUpgrade,
   forceMysticFloorBuyCrit,
+  forceKeynoteCritUpgrade,
+  forceKeynoteFloorBuyCrit,
   forcePairCritUpgrade,
   forceThreeOfAKindCritUpgrade,
   forceFourOfAKindCritUpgrade,
@@ -236,6 +238,7 @@ import {
   wireSpawnSilverTicketCritButton,
   wireSpawnGrandOpeningCritButton,
   wireSpawnMysticCritButton,
+  wireSpawnKeynoteCritButton,
   wireSpawnFullyStaffedCritButton,
   wireSpawnShiftChangeCritButton,
   wireSpawnEspressoShotCritButton,
@@ -327,6 +330,7 @@ import {
   wireFloorBuySilverTicketCritButton,
   wireFloorBuyGrandOpeningCritButton,
   wireFloorBuyMysticCritButton,
+  wireFloorBuyKeynoteCritButton,
   wireFloorBuyFullyStaffedCritButton,
   wireFloorBuyEspressoShotCritButton,
   wireFloorBuyDejaVuCritButton,
@@ -903,6 +907,10 @@ async function main() {
     wireSpawnMysticCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceMysticCritUpgrade(floor);
+    });
+    wireSpawnKeynoteCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceKeynoteCritUpgrade(floor);
     });
     wireSpawnFullyStaffedCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1923,6 +1931,7 @@ async function main() {
       forceGrandOpeningFloorBuyCrit("crit"),
     );
     wireFloorBuyMysticCritButton(app, () => forceMysticFloorBuyCrit("crit"));
+    wireFloorBuyKeynoteCritButton(app, () => forceKeynoteFloorBuyCrit("crit"));
     wireFloorBuyFullyStaffedCritButton(app, () =>
       forceFullyStaffedFloorBuyCrit("crit"),
     );

@@ -52,6 +52,9 @@ export {
   MYSTIC_CRIT_COLOR,
   MYSTIC_CRIT_LABEL,
   MYSTIC_UPGRADE_COUNT,
+  KEYNOTE_CRIT_COLOR,
+  KEYNOTE_CRIT_LABEL,
+  KEYNOTE_UPGRADE_COUNT,
   POKER_HAND_CRIT_COUNTS,
   PAIR_CRIT_COLOR,
   PAIR_CRIT_LABEL,
@@ -215,6 +218,7 @@ export {
   isPeppermintCrit,
   isHeavenlyCrit,
   isMysticCrit,
+  isKeynoteCrit,
   isPairCrit,
   isThreeOfAKindCrit,
   isFourOfAKindCrit,
@@ -306,6 +310,7 @@ import {
   forcePeppermintCritProc,
   forceHeavenlyCritProc,
   forceMysticCritProc,
+  forceKeynoteCritProc,
   forcePairCritProc,
   forceThreeOfAKindCritProc,
   forceFourOfAKindCritProc,
@@ -595,6 +600,7 @@ export function forceFloorBuyCrit(
   teamLunch = false,
   dominoEffect = false,
   mystic = false,
+  keynote = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -611,6 +617,7 @@ export function forceFloorBuyCrit(
     peppermint,
     heavenly,
     mystic,
+    keynote,
     pair,
     threeOfAKind,
     fourOfAKind,
@@ -1017,11 +1024,24 @@ export function forceMysticCritUpgrade(floor: Floor): void {
   forceMysticCritProc(floor);
 }
 
+// dev/test-only: force this floor into a Keynote crit, bypassing chance
+export function forceKeynoteCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceKeynoteCritProc(floor);
+}
+
 // dev/test-only: guarantees the next floor/building purchase carries a Mystic
 // proc.
 export function forceMysticFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.mystic = true;
+}
+
+// dev/test-only: guarantees the next floor/building purchase carries a Keynote
+// proc on top of the chosen tier
+export function forceKeynoteFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.keynote = true;
 }
 
 // dev/test-only: force this floor into a pair/three-of-a-kind/four-of-a-kind/

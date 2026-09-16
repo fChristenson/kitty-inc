@@ -213,3 +213,70 @@
   choosing chairs or supplies wherever that feature is still missing.
 
 ## To consider
+
+- **Carryover** — preserves the critted floor's current income-bar progress and
+  copies that same progress to every other unlocked floor.
+- **Rain Check** — stores the current floor's next payout and automatically
+  adds it to the total when that floor's timer completes again.
+- **Blueprint Copy** — creates a temporary blueprint of the critted floor's
+  income rate and applies it to the next floor unlocked for 30 seconds.
+- **Prime Time** — the next ten seconds of income from the critted floor are
+  paid at its current rate plus one extra payout per active worker.
+- **Level Skip** — grants enough free upgrades to reach the next interval
+  halving milestone, without changing the floor's permanent crit tier.
+- **Budget Buffer** — reserves the current upgrade price and automatically
+  covers that price once if the next click would otherwise be unaffordable.
+- **Open Schedule** — reveals the next three income-cycle completion times and
+  shortens each of those cycles by 25 percent.
+- **Floor Dividend** — every other unlocked floor pays the critted floor's
+  current one-cycle payout into the company's total income.
+- **Staff Rotation** — moves one worker from the most-staffed unlocked floor
+  to the least-staffed one, then boosts both workers briefly.
+- **Rate Relay** — copies half of the critted floor's current rate step to the
+  floor immediately above it for its next five upgrades.
+- **Milestone Grant** — the next upgrade milestone on the critted floor pays
+  a bonus equal to five current income cycles.
+- **Fresh Start** — resets only the critted floor's upgrade cost growth to its
+  current level's base cost, preserving income and upgrade progress.
+- **Floor Pass** — the next floor unlock in the current building costs nothing
+  and begins with the current floor's worker count.
+- **Shared Momentum** — each of the next five upgrades on the critted floor
+  grants one free upgrade to the floor directly above it.
+- **Reserve Payout** — banks the building's current one-cycle income and pays
+  it out after the next floor unlock.
+- **Quiet Boost** — grants every unlocked floor a short worker boost without
+  changing worker counts or triggering a map-wide celebration.
+- **Top Floor Bonus** — pays the highest unlocked floor three of its current
+  payouts and gives it one free manager if eligible.
+- **Bottom Line** — grants the ground floor a permanent rate-step increase
+  based on the number of unlocked floors.
+- **Double Entry** — the next paid upgrade records both its normal income gain
+  and its full price as income, then returns to normal.
+- **Staff Ladder** — grants one worker to each unlocked floor in order from
+  the ground floor upward until the worker cap is reached.
+- **Price Discovery** — permanently lowers the critted floor's next upgrade
+  cost by the exact amount of its most recent cost increase.
+- **Cycle Share** — when the critted floor completes its next income cycle,
+  every unlocked floor receives a quarter-cycle payout.
+- **First Mover** — the next floor unlocked in this building receives five free
+  upgrades and starts with the current building-wide crit tier.
+- **Bridge Loan** — immediately pays enough income to cover the critted floor's
+  next upgrade, capped at one upgrade's cost.
+- **Lucky Breakpoint** — advances the critted floor to the next interval
+  halving threshold and pays one extra current cycle.
+- **Company Match** — grants a payout matching the total income rate of the
+  company's second-highest-earning building.
+- **Workshare** — temporarily pools all unlocked floors' worker counts when
+  calculating boost strength, without changing their saved staffing.
+- **Level Playing Field** — raises every unlocked floor below the critted
+  floor to at least half of the critted floor's upgrade count.
+- **Early Access** — unlocks the next floor's room immediately, but leaves its
+  normal upgrade cost and worker requirements unchanged.
+- **Golden Hour** — for the next five income cycles, every completed cycle
+  grants a second payout at half value.
+- **Progress Report** — pays a bonus based on the building's total upgrade
+  count and reveals the current highest-tier floor.
+- **Floor Upgrade Grant** — refunds the exact cost of the next upgrade while
+  keeping that upgrade's income and level progress.
+- **Balanced Portfolio** — pays a larger dividend when the company's building
+  levels are close together, rewarding broad development.
