@@ -906,6 +906,24 @@ function applyFullyStaffedCrit(floors: Floor[]): void {
   }
 }
 
+// "Skip" buys every floor and its one-time building upgrades for free, without
+// changing floor tiers or upgrade levels.
+function applySkipCrit(deps: FloorActionsDeps): void {
+  unlockAllFloors({
+    floors: deps.floors,
+    backgroundCount: deps.backgroundCount,
+    multiplier: deps.multiplier,
+    onAdd: deps.onFloorAdded,
+  });
+  for (const floor of deps.floors) {
+    if (!floor.unlocked) continue;
+    floor.hasOfficeChairs = true;
+    floor.hasOfficeSupplies = true;
+    floor.hasManager = true;
+  }
+  applyFullyStaffedCrit(deps.floors);
+}
+
 // "Shift Change" fills only the landing floor and its immediately lower
 // unlocked neighbor; floor arrays are stored ground-to-top.
 function applyShiftChangeCrit(floors: Floor[], floor: Floor): void {
@@ -1304,6 +1322,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   payout: () => applyPayoutCrit(),
   grandOpening: (c) => applyGrandOpeningCrit(c.deps),
   fullyStaffed: (c) => applyFullyStaffedCrit(c.floors),
+  skip: (c) => applySkipCrit(c.deps),
   shiftChange: (c) => applyShiftChangeCrit(c.floors, c.floor),
   espressoShot: (c) => applyEspressoShotCrit(c.floors),
   dejaVu: (c) => applyDejaVuCrit(c.floor, c.isGroundFloor),
@@ -1504,10 +1523,12 @@ export function handleFloorClick(
           buyTier.bonusTier = getBonusTierCrit(forcedBonusTierFloor)!;
           consumeBonusTierCrit(forcedBonusTierFloor);
         }
-        floor.critMultiplierTier = pickHigherCritTier(
-          floor.critMultiplierTier,
-          buyTier.tier,
-        );
+        if (!buyTier.skip) {
+          floor.critMultiplierTier = pickHigherCritTier(
+            floor.critMultiplierTier,
+            buyTier.tier,
+          );
+        }
         applyCritProcs(buyTier, buyRewardContext!, FLOOR_BUY_CRIT_REWARDS);
         if (buyTier.mystic) applyMysticCrit(deps, floor);
         // "special crit crit": once any proc above landed, a bonus tier may

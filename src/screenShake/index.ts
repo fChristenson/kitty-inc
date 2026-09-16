@@ -473,6 +473,8 @@ function drawFlashLayer(
   // screen size
   const measuredWidth = ctx.measureText(label).width;
   const targetScale = (viewportWidth * 0.8) / measuredWidth;
+  const textScale =
+    label === "Skip" ? measuredWidth / ctx.measureText("Heavenly").width : 1;
   const scale = growthScale * targetScale;
 
   ctx.save();
@@ -509,8 +511,11 @@ function drawFlashLayer(
   // celebrations. getBloomLayer below renders this exact glow ONCE per
   // distinct label (cached), so every frame after the first is just a plain
   // drawImage of that cached bitmap instead of a fresh blur
+  ctx.save();
+  ctx.scale(textScale, textScale);
   const bloom = getBloomLayer(label, measuredWidth);
   ctx.drawImage(bloom.canvas, -bloom.width / 2, -bloom.height / 2);
   drawCritText(ctx, label, 0, 0, color, { fontSize, strokeWidth });
+  ctx.restore();
   ctx.restore();
 }

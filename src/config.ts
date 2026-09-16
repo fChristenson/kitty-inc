@@ -110,6 +110,9 @@ export const CONFIG = {
     // fully-unlocked, fully-maxed building is a far bigger swing than
     // promoting alternating floors one step
     heavenlyChance: 0.0001,
+    // "skip crit" — unlocks every floor and buys its upgrade items for free,
+    // without changing floor tiers or upgrade levels
+    skipChance: 0.0001,
     // "mystic crit" — map-only: buys one extra building for free and gives
     // its ground floor exactly 10 normal upgrade-rate increases
     mysticChance: 0.001,

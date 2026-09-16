@@ -158,6 +158,12 @@ export const HEAVENLY_CRIT_CHANCE = CONFIG.crit.heavenlyChance;
 export const HEAVENLY_CRIT_COLOR = COLOR.heavenlyGold;
 export const HEAVENLY_CRIT_LABEL = "Heavenly";
 
+// "skip crit" — unlocks every floor and buys its upgrade items for free,
+// without changing floor tiers or upgrade levels
+export const SKIP_CRIT_CHANCE = CONFIG.crit.skipChance;
+export const SKIP_CRIT_COLOR = COLOR.cyan;
+export const SKIP_CRIT_LABEL = "Skip";
+
 // "mystic crit" — buys one additional building for free at map scope, or
 // applies exactly 10 normal upgrade-rate increases to the triggering floor at
 // upgrade/floor-unlock scope.
@@ -827,6 +833,7 @@ const firstClassCrits = new WeakSet<Floor>();
 const payoutCrits = new WeakSet<Floor>();
 const grandOpeningCrits = new WeakSet<Floor>();
 const fullyStaffedCrits = new WeakSet<Floor>();
+const skipCrits = new WeakSet<Floor>();
 const shiftChangeCrits = new WeakSet<Floor>();
 const espressoShotCrits = new WeakSet<Floor>();
 const dejaVuCrits = new WeakSet<Floor>();
@@ -954,6 +961,7 @@ export interface CritRollResult {
   payout: boolean;
   grandOpening: boolean;
   fullyStaffed: boolean;
+  skip: boolean;
   shiftChange: boolean;
   espressoShot: boolean;
   dejaVu: boolean;
@@ -1051,6 +1059,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "payout",
   "grandOpening",
   "fullyStaffed",
+  "skip",
   "shiftChange",
   "espressoShot",
   "dejaVu",
@@ -1144,6 +1153,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   payout: payoutCrits,
   grandOpening: grandOpeningCrits,
   fullyStaffed: fullyStaffedCrits,
+  skip: skipCrits,
   shiftChange: shiftChangeCrits,
   espressoShot: espressoShotCrits,
   dejaVu: dejaVuCrits,
@@ -1659,6 +1669,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "fullyStaffed",
     description: "Hires workers and managers on every unlocked floor",
   },
+  skip: {
+    label: SKIP_CRIT_LABEL,
+    color: SKIP_CRIT_COLOR,
+    icon: "skip",
+    description: "Unlocks every floor and buys its upgrade items for free",
+  },
   espressoShot: {
     label: ESPRESSO_SHOT_CRIT_LABEL,
 
@@ -1949,6 +1965,7 @@ export function rollCrit(
     if (Math.random() < SILVER_TICKET_CRIT_CHANCE) landed.push("silverTicket");
     if (Math.random() < GRAND_OPENING_CRIT_CHANCE) landed.push("grandOpening");
     if (Math.random() < FULLY_STAFFED_CRIT_CHANCE) landed.push("fullyStaffed");
+    if (Math.random() < SKIP_CRIT_CHANCE) landed.push("skip");
     if (Math.random() < SHIFT_CHANGE_CRIT_CHANCE) landed.push("shiftChange");
     if (Math.random() < ESPRESSO_SHOT_CRIT_CHANCE) landed.push("espressoShot");
     if (Math.random() < DEJA_VU_CRIT_CHANCE) landed.push("dejaVu");
@@ -2065,6 +2082,7 @@ export function rollCrit(
     payout: kept.has("payout"),
     grandOpening: kept.has("grandOpening"),
     fullyStaffed: kept.has("fullyStaffed"),
+    skip: kept.has("skip"),
     shiftChange: kept.has("shiftChange"),
     espressoShot: kept.has("espressoShot"),
     dejaVu: kept.has("dejaVu"),
@@ -2319,6 +2337,10 @@ export function isGrandOpeningCrit(floor: Floor): boolean {
 
 export function isFullyStaffedCrit(floor: Floor): boolean {
   return fullyStaffedCrits.has(floor);
+}
+
+export function isSkipCrit(floor: Floor): boolean {
+  return skipCrits.has(floor);
 }
 
 export function isShiftChangeCrit(floor: Floor): boolean {
@@ -2682,6 +2704,10 @@ export function forceGrandOpeningCritProc(floor: Floor): void {
 
 export function forceFullyStaffedCritProc(floor: Floor): void {
   fullyStaffedCrits.add(floor);
+}
+
+export function forceSkipCritProc(floor: Floor): void {
+  skipCrits.add(floor);
 }
 
 export function forceShiftChangeCritProc(floor: Floor): void {

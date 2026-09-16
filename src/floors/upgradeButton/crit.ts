@@ -147,6 +147,8 @@ export {
   GRAND_OPENING_CRIT_LABEL,
   FULLY_STAFFED_CRIT_COLOR,
   FULLY_STAFFED_CRIT_LABEL,
+  SKIP_CRIT_COLOR,
+  SKIP_CRIT_LABEL,
   SHIFT_CHANGE_CRIT_COLOR,
   SHIFT_CHANGE_CRIT_LABEL,
   ESPRESSO_SHOT_CRIT_COLOR,
@@ -258,6 +260,7 @@ export {
   isPayoutCrit,
   isGrandOpeningCrit,
   isFullyStaffedCrit,
+  isSkipCrit,
   isShiftChangeCrit,
   isEspressoShotCrit,
   isDejaVuCrit,
@@ -353,6 +356,7 @@ import {
   forcePayoutCritProc,
   forceGrandOpeningCritProc,
   forceFullyStaffedCritProc,
+  forceSkipCritProc,
   forceShiftChangeCritProc,
   forceEspressoShotCritProc,
   forceDejaVuCritProc,
@@ -601,6 +605,7 @@ export function forceFloorBuyCrit(
   dominoEffect = false,
   mystic = false,
   keynote = false,
+  skip = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -618,6 +623,7 @@ export function forceFloorBuyCrit(
     heavenly,
     mystic,
     keynote,
+    skip,
     pair,
     threeOfAKind,
     fourOfAKind,
@@ -1030,6 +1036,11 @@ export function forceKeynoteCritUpgrade(floor: Floor): void {
   forceKeynoteCritProc(floor);
 }
 
+export function forceSkipCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSkipCritProc(floor);
+}
+
 // dev/test-only: guarantees the next floor/building purchase carries a Mystic
 // proc.
 export function forceMysticFloorBuyCrit(tier: CritTier = "crit"): void {
@@ -1042,6 +1053,11 @@ export function forceMysticFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceKeynoteFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.keynote = true;
+}
+
+export function forceSkipFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.skip = true;
 }
 
 // dev/test-only: force this floor into a pair/three-of-a-kind/four-of-a-kind/

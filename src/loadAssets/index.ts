@@ -65,6 +65,7 @@ const IMAGE_FILES = {
   upgrade: "upgrade.png", // Upgrade crit flash's own backdrop icon
   peppermint: "peppermint.png", // Peppermint crit flash's own backdrop icon
   heaven: "heaven.png", // Heavenly crit flash's own backdrop icon
+  skip: "skip.png", // Skip crit flash's own backdrop icon
   mystic: "mystic.png", // Mystic crit flash's own backdrop icon
   keynote: "keynote.png", // Keynote crit flash's own backdrop icon
   pair: "pair.png", // Pair crit flash's own backdrop icon

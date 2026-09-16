@@ -90,6 +90,7 @@ import {
   forceOpenBookCritUpgrade,
   forceGrandOpeningCritUpgrade,
   forceFullyStaffedCritUpgrade,
+  forceSkipCritUpgrade,
   forceShiftChangeCritUpgrade,
   forceEspressoShotCritUpgrade,
   forceDejaVuCritUpgrade,
@@ -125,6 +126,7 @@ import {
   forceFloorBuyCrit,
   forceGrandOpeningFloorBuyCrit,
   forceFullyStaffedFloorBuyCrit,
+  forceSkipFloorBuyCrit,
   forceEspressoShotFloorBuyCrit,
   forceDejaVuFloorBuyCrit,
   forceCloneArmyFloorBuyCrit,
@@ -153,6 +155,7 @@ import {
   increaseIncomeRate,
   currentIncomeRatePerSecond,
   applyBoostAll,
+  MAX_RENDERED_WORKERS,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -240,6 +243,7 @@ import {
   wireSpawnMysticCritButton,
   wireSpawnKeynoteCritButton,
   wireSpawnFullyStaffedCritButton,
+  wireSpawnSkipCritButton,
   wireSpawnShiftChangeCritButton,
   wireSpawnEspressoShotCritButton,
   wireSpawnDejaVuCritButton,
@@ -332,6 +336,7 @@ import {
   wireFloorBuyMysticCritButton,
   wireFloorBuyKeynoteCritButton,
   wireFloorBuyFullyStaffedCritButton,
+  wireFloorBuySkipCritButton,
   wireFloorBuyEspressoShotCritButton,
   wireFloorBuyDejaVuCritButton,
   wireFloorBuyCloneArmyCritButton,
@@ -373,6 +378,7 @@ import {
   wireMapUnlockUpgradeCritButton,
   wireMapUnlockGrandOpeningCritButton,
   wireMapUnlockHeavenlyCritButton,
+  wireMapUnlockSkipCritButton,
   wireMapUnlockMysticCritButton,
   wireMapUnlockPairCritButton,
   wireMapUnlockThreeOfAKindCritButton,
@@ -915,6 +921,10 @@ async function main() {
     wireSpawnFullyStaffedCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceFullyStaffedCritUpgrade(floor);
+    });
+    wireSpawnSkipCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceSkipCritUpgrade(floor);
     });
     wireSpawnShiftChangeCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1935,6 +1945,7 @@ async function main() {
     wireFloorBuyFullyStaffedCritButton(app, () =>
       forceFullyStaffedFloorBuyCrit("crit"),
     );
+    wireFloorBuySkipCritButton(app, () => forceSkipFloorBuyCrit("crit"));
     wireFloorBuyEspressoShotCritButton(app, () =>
       forceEspressoShotFloorBuyCrit("crit"),
     );
@@ -2095,6 +2106,7 @@ async function main() {
         true,
       ),
     );
+    wireMapUnlockSkipCritButton(app, () => forceSkipFloorBuyCrit("crit"));
     wireMapUnlockMysticCritButton(app, () => forceMysticFloorBuyCrit("crit"));
     wireMapUnlockPairCritButton(app, () =>
       forceFloorBuyCrit(
@@ -2317,7 +2329,9 @@ async function main() {
     const floors = buildings[buildingIndex];
     if (!floors) return;
     const { tier, chain } = result;
-    for (const floor of floors) floor.critMultiplierTier = tier;
+    for (const floor of floors) {
+      if (!result.skip) floor.critMultiplierTier = tier;
+    }
     if (result.mystic) createMysticBuilding();
     // reward side of every proc this building-buy event actually supports —
     // one handler per proc kind (see shared/critTypes's applyCritProcs), so
@@ -2361,6 +2375,27 @@ async function main() {
           for (let i = 0; i < count; i++) {
             increaseIncomeRate(floor);
           }
+        }
+      },
+      // skip crit: unlocks every floor and grants its free workers, manager,
+      // office chairs, and supplies without changing tiers or levels
+      skip: (floors) => {
+        unlockAllFloors({
+          floors,
+          backgroundCount: getBackgroundUrls().length,
+          multiplier: getBuildingMultiplier(buildingIndex),
+          onAdd: (floor) => {
+            if (buildingIndex === activeBuildingIndex) {
+              gameCanvas.notifyFloorAdded(floor);
+            }
+          },
+        });
+        for (const floor of floors) {
+          if (!floor.unlocked) continue;
+          floor.workerCount = MAX_RENDERED_WORKERS;
+          floor.hasManager = true;
+          floor.hasOfficeChairs = true;
+          floor.hasOfficeSupplies = true;
         }
       },
       // grand opening crit: same reward as at floor scope — unlocks every

@@ -333,6 +333,8 @@ export type { ChainCritDeps } from "./floorInteractions";
 export {
   forceKeynoteCritUpgrade,
   forceKeynoteFloorBuyCrit,
+  forceSkipCritUpgrade,
+  forceSkipFloorBuyCrit,
 } from "./upgradeButton";
 export {
   drawWorker,
