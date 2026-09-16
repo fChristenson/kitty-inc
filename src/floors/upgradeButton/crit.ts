@@ -304,6 +304,7 @@ import {
   forceFourOfAKindCritProc,
   forceFullHouseCritProc,
   forceRoyalFlushCritProc,
+  forceLuckyNumberCritProc,
   forceTickTockCritProc,
   forceChairGiveawayCritProc,
   forceSuppliesGiveawayCritProc,
@@ -603,6 +604,7 @@ export function forceFloorBuyCrit(
     threeOfAKind,
     fourOfAKind,
     fullHouse,
+    luckyNumber: false,
     tickTock,
     chairGiveaway,
     suppliesGiveaway,
@@ -849,6 +851,11 @@ export function forceBlueprintFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceFirstClassFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.firstClass = true;
+}
+
+export function forceLuckyNumberFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.luckyNumber = true;
 }
 
 export function forceExecutiveBonusFloorBuyCrit(tier: CritTier = "crit"): void {
@@ -1194,6 +1201,14 @@ export function forcePriceMatchCritUpgrade(floor: Floor): void {
 export function forceFirstClassCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceFirstClassCritProc(floor);
+}
+
+export function forceLuckyNumberCritUpgrade(
+  floor: Floor,
+  tier: CritTier = "crit",
+): void {
+  critTiers.set(floor, tier);
+  forceLuckyNumberCritProc(floor);
 }
 
 export function forceCashFlowCritUpgrade(floor: Floor): void {

@@ -180,6 +180,8 @@
   while increasing the odds that the next special proc is a new type.
 - **Executive Bonus** — grants a building-wide payout based on the highest
   permanent crit tier currently represented in the building.
+- **Lucky Number** — unlocks a random 2-12 floors above the critted floor for
+  free, extending the current building as needed up to its floor cap.
 
 ## New suggestions
 
@@ -199,8 +201,6 @@
   floor completes twice as quickly, without altering stored intervals.
 - **Open Book** — pays a bonus based on the number of different floor upgrade
   features already purchased in the current building.
-- **Lucky Number** — the next upgrade whose count ends in seven grants a
-  second free upgrade immediately afterward.
 - **Shared Services** — temporarily treats every unlocked floor as owning
   office chairs and supplies for pricing and boost calculations.
 - **Growth Fund** — converts a portion of the next building unlock cost into

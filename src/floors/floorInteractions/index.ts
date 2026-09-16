@@ -94,6 +94,8 @@ import {
   onlyCritProc,
   recordCritProcLanded,
   triggerPriceMatchCrit,
+  LUCKY_NUMBER_MIN_FLOORS,
+  LUCKY_NUMBER_MAX_FLOORS,
 } from "../../shared/critTypes";
 import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
@@ -767,6 +769,44 @@ function applyFirstClassCrit(deps: FloorActionsDeps, source: Floor): void {
   });
 }
 
+function applyLuckyNumberCrit(deps: FloorActionsDeps, source: Floor): void {
+  const targetCount =
+    LUCKY_NUMBER_MIN_FLOORS +
+    Math.floor(
+      Math.random() * (LUCKY_NUMBER_MAX_FLOORS - LUCKY_NUMBER_MIN_FLOORS + 1),
+    );
+  const sourceIndex = deps.floors.indexOf(source);
+  let nextIndex = sourceIndex + 1;
+  let unlockedCount = 0;
+
+  while (unlockedCount < targetCount) {
+    if (nextIndex >= deps.floors.length) {
+      const before = deps.floors.length;
+      ensureLockedFloorAbove({
+        floors: deps.floors,
+        backgroundCount: deps.backgroundCount,
+        multiplier: deps.multiplier,
+        onAdd: deps.onFloorAdded,
+      });
+      if (deps.floors.length === before) break;
+    }
+
+    const next = deps.floors[nextIndex];
+    if (!next) break;
+    if (!next.unlocked) {
+      unlockFloor(next);
+      unlockedCount++;
+      ensureLockedFloorAbove({
+        floors: deps.floors,
+        backgroundCount: deps.backgroundCount,
+        multiplier: deps.multiplier,
+        onAdd: deps.onFloorAdded,
+      });
+    }
+    nextIndex++;
+  }
+}
+
 // "frozen crit" (see shared/critTypes's isFrozenCrit): no instant payout —
 // just starts upgradeButton.ts's own timed window on this ONE floor (see
 // triggerFrozenCrit/isFrozenActive), during which incomePanel.ts's
@@ -1141,6 +1181,7 @@ export interface CritRewardContext {
 // per-site below rather than living here
 const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   firstClass: (c) => applyFirstClassCrit(c.deps, c.floor),
+  luckyNumber: (c) => applyLuckyNumberCrit(c.deps, c.floor),
   powerSurge: (c) => c.deps.applyCompanyWideBoost(),
   priceMatch: (c) => applyPriceMatchCrit(c.floors, c.floor),
   executiveBonus: (c) =>
