@@ -13,6 +13,7 @@
 // instead of a hardcoded if/else per tier.
 import type { Floor } from "../../gameState";
 import type { ImageName } from "../../loadAssets";
+import type { BigNumber } from "../../shared/bigNumber";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { recordCritProcLanded } from "./critProcCounts";
@@ -700,6 +701,27 @@ export const EXECUTIVE_BONUS_CRIT_LABEL = "Executive Bonus";
 export const POWER_SURGE_CRIT_CHANCE = CONFIG.crit.powerSurgeChance;
 export const POWER_SURGE_CRIT_COLOR = COLOR.starYellow;
 export const POWER_SURGE_CRIT_LABEL = "Power Surge";
+export const PRICE_MATCH_CRIT_CHANCE = CONFIG.crit.priceMatchChance;
+export const PRICE_MATCH_CRIT_COLOR = COLOR.cyan;
+export const PRICE_MATCH_CRIT_LABEL = "Price Match";
+export const PRICE_MATCH_DURATION_MS = CONFIG.crit.priceMatchDurationMs;
+const priceMatchCosts = new WeakMap<
+  Floor,
+  { cost: BigNumber; startedAt: number }
+>();
+
+export function triggerPriceMatchCrit(floor: Floor, cost: BigNumber): void {
+  priceMatchCosts.set(floor, { cost, startedAt: Date.now() });
+}
+
+export function getPriceMatchCost(floor: Floor, now: number): BigNumber | null {
+  const match = priceMatchCosts.get(floor);
+  if (!match || now - match.startedAt >= PRICE_MATCH_DURATION_MS) {
+    priceMatchCosts.delete(floor);
+    return null;
+  }
+  return match.cost;
+}
 
 // "Payout" crit — the biggest flat one-time jackpot (see
 // floorInteractions.ts's applyPayoutCrit): instantly adds the combined total
@@ -757,6 +779,7 @@ const silverTicketCrits = new WeakSet<Floor>();
 const goldenParachuteCrits = new WeakSet<Floor>();
 const executiveBonusCrits = new WeakSet<Floor>();
 const powerSurgeCrits = new WeakSet<Floor>();
+const priceMatchCrits = new WeakSet<Floor>();
 const payoutCrits = new WeakSet<Floor>();
 const grandOpeningCrits = new WeakSet<Floor>();
 const fullyStaffedCrits = new WeakSet<Floor>();
@@ -878,6 +901,7 @@ export interface CritRollResult {
   goldenParachute: boolean;
   executiveBonus: boolean;
   powerSurge: boolean;
+  priceMatch: boolean;
   payout: boolean;
   grandOpening: boolean;
   fullyStaffed: boolean;
@@ -969,6 +993,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "goldenParachute",
   "executiveBonus",
   "powerSurge",
+  "priceMatch",
   "payout",
   "grandOpening",
   "fullyStaffed",
@@ -1056,6 +1081,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   goldenParachute: goldenParachuteCrits,
   executiveBonus: executiveBonusCrits,
   powerSurge: powerSurgeCrits,
+  priceMatch: priceMatchCrits,
   payout: payoutCrits,
   grandOpening: grandOpeningCrits,
   fullyStaffed: fullyStaffedCrits,
@@ -1499,6 +1525,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "powerSurge",
     description: "Boosts workers across every company building",
   },
+  priceMatch: {
+    label: PRICE_MATCH_CRIT_LABEL,
+    color: PRICE_MATCH_CRIT_COLOR,
+    icon: "priceMatch",
+    description: "Matches this floor to the cheapest upgrade price for 5s",
+  },
   payout: {
     label: PAYOUT_CRIT_LABEL,
 
@@ -1815,6 +1847,7 @@ export function rollCrit(
     if (Math.random() < EXECUTIVE_BONUS_CRIT_CHANCE)
       landed.push("executiveBonus");
     if (Math.random() < POWER_SURGE_CRIT_CHANCE) landed.push("powerSurge");
+    if (Math.random() < PRICE_MATCH_CRIT_CHANCE) landed.push("priceMatch");
     if (Math.random() < PAYOUT_CRIT_CHANCE) landed.push("payout");
     if (Math.random() < LUCKY_CLOVER_CRIT_CHANCE) landed.push("luckyClover");
     if (Math.random() < SECOND_WIND_CRIT_CHANCE) landed.push("secondWind");
@@ -1911,6 +1944,7 @@ export function rollCrit(
     goldenParachute: kept.has("goldenParachute"),
     executiveBonus: kept.has("executiveBonus"),
     powerSurge: kept.has("powerSurge"),
+    priceMatch: kept.has("priceMatch"),
     payout: kept.has("payout"),
     grandOpening: kept.has("grandOpening"),
     fullyStaffed: kept.has("fullyStaffed"),
@@ -2132,6 +2166,10 @@ export function isExecutiveBonusCrit(floor: Floor): boolean {
 
 export function isPowerSurgeCrit(floor: Floor): boolean {
   return powerSurgeCrits.has(floor);
+}
+
+export function isPriceMatchCrit(floor: Floor): boolean {
+  return priceMatchCrits.has(floor);
 }
 
 export function isPayoutCrit(floor: Floor): boolean {
@@ -2471,6 +2509,10 @@ export function forceExecutiveBonusCritProc(floor: Floor): void {
 
 export function forcePowerSurgeCritProc(floor: Floor): void {
   powerSurgeCrits.add(floor);
+}
+
+export function forcePriceMatchCritProc(floor: Floor): void {
+  priceMatchCrits.add(floor);
 }
 
 export function forcePayoutCritProc(floor: Floor): void {

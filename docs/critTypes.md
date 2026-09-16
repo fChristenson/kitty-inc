@@ -166,8 +166,6 @@
   upgrade.
 - **Talent Pipeline** — the next worker hired on each unlocked floor arrives
   already boosted and extends the boost duration of the worker below it.
-- **Price Match** — temporarily gives every unlocked floor the upgrade price
-  of the cheapest floor, while preserving each floor's own income progression.
 - **Forecast** — displays the exact next crit tier and applies a small payout
   whenever the player follows the forecasted upgrade path.
 - **Vacancy Bonus** — pays extra for every worker slot that is still empty,

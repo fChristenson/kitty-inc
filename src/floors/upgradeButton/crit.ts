@@ -242,6 +242,7 @@ export {
   isGoldenParachuteCrit,
   isExecutiveBonusCrit,
   isPowerSurgeCrit,
+  isPriceMatchCrit,
   isPayoutCrit,
   isGrandOpeningCrit,
   isFullyStaffedCrit,
@@ -331,6 +332,7 @@ import {
   forceGoldenParachuteCritProc,
   forceExecutiveBonusCritProc,
   forcePowerSurgeCritProc,
+  forcePriceMatchCritProc,
   forcePayoutCritProc,
   forceGrandOpeningCritProc,
   forceFullyStaffedCritProc,
@@ -458,6 +460,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.goldenParachute) forceGoldenParachuteCritProc(floor);
     if (result.executiveBonus) forceExecutiveBonusCritProc(floor);
     if (result.powerSurge) forcePowerSurgeCritProc(floor);
+    if (result.priceMatch) forcePriceMatchCritProc(floor);
     if (result.payout) forcePayoutCritProc(floor);
     if (result.grandOpening) forceGrandOpeningCritProc(floor);
     if (result.fullyStaffed) forceFullyStaffedCritProc(floor);
@@ -627,6 +630,7 @@ export function forceFloorBuyCrit(
     goldenParachute,
     executiveBonus,
     powerSurge: false,
+    priceMatch: false,
     payout,
     grandOpening,
     fullyStaffed,
@@ -1150,6 +1154,11 @@ export function forceExecutiveBonusCritUpgrade(floor: Floor): void {
 export function forcePowerSurgeCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forcePowerSurgeCritProc(floor);
+}
+
+export function forcePriceMatchCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forcePriceMatchCritProc(floor);
 }
 
 export function forceCashFlowCritUpgrade(floor: Floor): void {

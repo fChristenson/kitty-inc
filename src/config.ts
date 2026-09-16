@@ -343,6 +343,8 @@ export const CONFIG = {
     // "Executive Bonus" crit — pays 25% of the active company's asset value
     executiveBonusChance: 0.04,
     powerSurgeChance: 0.05,
+    priceMatchChance: 0.05,
+    priceMatchDurationMs: 5000,
     // "Payout" crit — the biggest flat one-time jackpot: instantly adds the
     // combined total income + upgrades value across EVERY corporation (not
     // just the active one) to the currently active company's own total (see

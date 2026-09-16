@@ -59,6 +59,7 @@ import {
   EXPLOSION_CRIT_CONTINUE_CHANCE,
   BTN_W,
   BTN_H,
+  getUpgradeCost,
 } from "../upgradeButton";
 import {
   increaseIncomeRate,
@@ -92,6 +93,7 @@ import {
   applyCritProcs,
   onlyCritProc,
   recordCritProcLanded,
+  triggerPriceMatchCrit,
 } from "../../shared/critTypes";
 import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
@@ -112,6 +114,7 @@ import {
   ZERO,
   add,
   gt,
+  lt,
   multiply,
 } from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
@@ -734,6 +737,19 @@ function applyTeaBreakCrit(floor: Floor, isGroundFloor: boolean): void {
   applyUpgradeTick(floor, isGroundFloor);
 }
 
+function applyPriceMatchCrit(floors: Floor[], floor: Floor): void {
+  const cheapest = floors
+    .filter((candidate) => candidate.unlocked)
+    .reduce(
+      (cost, candidate) =>
+        cost === null || lt(candidate.upgradeCost, cost)
+          ? candidate.upgradeCost
+          : cost,
+      null as BigNumber | null,
+    );
+  if (cheapest) triggerPriceMatchCrit(floor, cheapest);
+}
+
 // "frozen crit" (see shared/critTypes's isFrozenCrit): no instant payout —
 // just starts upgradeButton.ts's own timed window on this ONE floor (see
 // triggerFrozenCrit/isFrozenActive), during which incomePanel.ts's
@@ -1108,6 +1124,7 @@ export interface CritRewardContext {
 // per-site below rather than living here
 const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   powerSurge: (c) => c.deps.applyCompanyWideBoost(),
+  priceMatch: (c) => applyPriceMatchCrit(c.floors, c.floor),
   executiveBonus: (c) =>
     addTotalIncome(multiply(c.deps.getCompanyValue(), 0.25)),
   boost: (c) => applyFloorBoost(c.floors),
@@ -1568,7 +1585,7 @@ export function handleFloorClick(
       persist();
       return;
     }
-    if (spendTotalIncome(floor.upgradeCost)) {
+    if (spendTotalIncome(getUpgradeCost(floor))) {
       applyUpgradeTick(floor, isGroundFloor);
       rollCritUpgrade(floor);
       persist();

@@ -9,6 +9,11 @@ import { getTotalIncome } from "../../totalIncome";
 import type { Floor } from "../../gameState";
 import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { isCritUpgrade } from "./crit";
+import { getPriceMatchCost } from "../../shared/critTypes";
+
+export function getUpgradeCost(floor: Floor, now = Date.now()): BigNumber {
+  return getPriceMatchCost(floor, now) ?? floor.upgradeCost;
+}
 
 // button placement, bottom-right corner of each floor (mirrors the income panel on the left).
 // Width cut 25% from the previous 440 (was matching the income panel 1:1); BTN_X sets its
@@ -347,7 +352,7 @@ export function isUpgradeButtonEnabled(floor: Floor): boolean {
   return (
     eventButtons.some((def) => def.freeClick && def.isActive(floor, now)) ||
     isCritUpgrade(floor) ||
-    gte(getTotalIncome(), floor.upgradeCost)
+    gte(getTotalIncome(), getUpgradeCost(floor))
   );
 }
 

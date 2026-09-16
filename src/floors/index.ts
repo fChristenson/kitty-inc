@@ -402,6 +402,7 @@ export {
   forceGoldenParachuteCritUpgrade,
   forceExecutiveBonusCritUpgrade,
   forcePowerSurgeCritUpgrade,
+  forcePriceMatchCritUpgrade,
   forceCashFlowCritUpgrade,
   forcePayoutCritUpgrade,
   forceGrandOpeningCritUpgrade,
