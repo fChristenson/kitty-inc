@@ -396,6 +396,7 @@ export {
   forceGoldenTicketCritUpgrade,
   forceSilverTicketCritUpgrade,
   forceGoldenParachuteCritUpgrade,
+  forceCashFlowCritUpgrade,
   forcePayoutCritUpgrade,
   forceGrandOpeningCritUpgrade,
   forceFullyStaffedCritUpgrade,

@@ -55,6 +55,7 @@ const IMAGE_FILES = {
   ball: "ball.png", // Bounce crit flash's own backdrop icon
   explosion: "explosion.png", // Explosion crit flash's own backdrop icon
   booty: "booty.png", // Booty crit flash's own backdrop icon
+  cashFlow: "cashFlow.png", // Cash Flow crit flash's own backdrop icon
   upgrade: "upgrade.png", // Upgrade crit flash's own backdrop icon
   peppermint: "peppermint.png", // Peppermint crit flash's own backdrop icon
   heaven: "heaven.png", // Heavenly crit flash's own backdrop icon

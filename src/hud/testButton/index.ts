@@ -40,6 +40,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-explosion-mega-crit" class="game__button">Spawn Explosion Mega Crit</button>
           <button id="spawn-explosion-ultra-crit" class="game__button">Spawn Explosion Ultra Crit</button>
           <button id="spawn-booty-crit" class="game__button">Spawn Booty Crit</button>
+          <button id="spawn-cash-flow-crit" class="game__button">Spawn Cash Flow Crit</button>
           <button id="spawn-upgrade-crit" class="game__button">Spawn Upgrade Crit</button>
           <button id="spawn-peppermint-crit" class="game__button">Spawn Peppermint Crit</button>
           <button id="spawn-heavenly-crit" class="game__button">Spawn Heavenly Crit</button>
@@ -974,6 +975,16 @@ export function wireSpawnPayoutCritButton(
 ): void {
   const button =
     container.querySelector<HTMLButtonElement>("#spawn-payout-crit")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnCashFlowCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-cash-flow-crit",
+  )!;
   button.addEventListener("click", onClick);
 }
 

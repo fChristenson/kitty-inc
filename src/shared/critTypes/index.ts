@@ -111,6 +111,12 @@ export const BOOTY_CRIT_CHANCE = CONFIG.crit.bootyChance;
 export const BOOTY_CRIT_COLOR = COLOR.gold;
 export const BOOTY_CRIT_LABEL = "Booty";
 
+// "cash flow crit" — a flat one-time effect that pays one combined income
+// cycle across every corporation (see floorInteractions.ts)
+export const CASH_FLOW_CRIT_CHANCE = CONFIG.crit.cashFlowChance;
+export const CASH_FLOW_CRIT_COLOR = COLOR.moneyGreen;
+export const CASH_FLOW_CRIT_LABEL = "Cash Flow";
+
 // "upgrade crit" — a sixth piggyback proc, a flat one-time effect (not
 // tier-scaled) like boost/booty: permanently promotes the affected floor's
 // (or, for a building-unlock crit, every floor in that building's) own
@@ -658,6 +664,7 @@ const boostCrits = new WeakSet<Floor>();
 const bounceCrits = new WeakSet<Floor>();
 const explosionCrits = new WeakSet<Floor>();
 const bootyCrits = new WeakSet<Floor>();
+const cashFlowCrits = new WeakSet<Floor>();
 const upgradeCrits = new WeakSet<Floor>();
 const peppermintCrits = new WeakSet<Floor>();
 const heavenlyCrits = new WeakSet<Floor>();
@@ -766,6 +773,7 @@ export interface CritRollResult {
   bounce: boolean;
   explosion: boolean;
   booty: boolean;
+  cashFlow: boolean;
   upgrade: boolean;
   peppermint: boolean;
   heavenly: boolean;
@@ -845,6 +853,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "bounce",
   "explosion",
   "booty",
+  "cashFlow",
   "upgrade",
   "peppermint",
   "heavenly",
@@ -920,6 +929,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   bounce: bounceCrits,
   explosion: explosionCrits,
   booty: bootyCrits,
+  cashFlow: cashFlowCrits,
   upgrade: upgradeCrits,
   peppermint: peppermintCrits,
   heavenly: heavenlyCrits,
@@ -1107,6 +1117,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     color: BOOTY_CRIT_COLOR,
     icon: "booty",
     description: "Doubles your total income",
+  },
+  cashFlow: {
+    label: CASH_FLOW_CRIT_LABEL,
+    color: CASH_FLOW_CRIT_COLOR,
+    icon: "cashFlow",
+    description: "Pays one combined income cycle",
   },
   upgrade: {
     label: UPGRADE_CRIT_LABEL,
@@ -1583,6 +1599,7 @@ export function rollCrit(
     if (Math.random() < BOUNCE_CRIT_CHANCE) landed.push("bounce");
     if (Math.random() < EXPLOSION_CRIT_CHANCE) landed.push("explosion");
     if (Math.random() < BOOTY_CRIT_CHANCE) landed.push("booty");
+    if (Math.random() < CASH_FLOW_CRIT_CHANCE) landed.push("cashFlow");
     if (Math.random() < UPGRADE_CRIT_CHANCE) landed.push("upgrade");
     if (Math.random() < PEPPERMINT_CRIT_CHANCE) landed.push("peppermint");
     if (Math.random() < HEAVENLY_CRIT_CHANCE) landed.push("heavenly");
@@ -1679,6 +1696,7 @@ export function rollCrit(
     bounce: kept.has("bounce"),
     explosion: kept.has("explosion"),
     booty: kept.has("booty"),
+    cashFlow: kept.has("cashFlow"),
     upgrade: kept.has("upgrade"),
     peppermint: kept.has("peppermint"),
     heavenly: kept.has("heavenly"),
@@ -1765,6 +1783,10 @@ export function isExplosionCrit(floor: Floor): boolean {
 
 export function isBootyCrit(floor: Floor): boolean {
   return bootyCrits.has(floor);
+}
+
+export function isCashFlowCrit(floor: Floor): boolean {
+  return cashFlowCrits.has(floor);
 }
 
 export function isUpgradeCrit(floor: Floor): boolean {
@@ -2056,6 +2078,10 @@ export function forceExplosionCritProc(floor: Floor): void {
 
 export function forceBootyCritProc(floor: Floor): void {
   bootyCrits.add(floor);
+}
+
+export function forceCashFlowCritProc(floor: Floor): void {
+  cashFlowCrits.add(floor);
 }
 
 export function forceUpgradeCritProc(floor: Floor): void {

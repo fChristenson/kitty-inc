@@ -35,6 +35,8 @@ export {
   EXPLOSION_CRIT_LABEL,
   BOOTY_CRIT_COLOR,
   BOOTY_CRIT_LABEL,
+  CASH_FLOW_CRIT_COLOR,
+  CASH_FLOW_CRIT_LABEL,
   UPGRADE_CRIT_COLOR,
   UPGRADE_CRIT_LABEL,
   PEPPERMINT_CRIT_COLOR,
@@ -182,6 +184,7 @@ export {
   isBounceCrit,
   isExplosionCrit,
   isBootyCrit,
+  isCashFlowCrit,
   isUpgradeCrit,
   isPeppermintCrit,
   isHeavenlyCrit,
@@ -259,6 +262,7 @@ import {
   forceBounceCritProc,
   forceExplosionCritProc,
   forceBootyCritProc,
+  forceCashFlowCritProc,
   forceUpgradeCritProc,
   forcePeppermintCritProc,
   forceHeavenlyCritProc,
@@ -375,6 +379,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.bounce) forceBounceCritProc(floor);
     if (result.explosion) forceExplosionCritProc(floor);
     if (result.booty) forceBootyCritProc(floor);
+    if (result.cashFlow) forceCashFlowCritProc(floor);
     if (result.upgrade) forceUpgradeCritProc(floor);
     if (result.peppermint) forcePeppermintCritProc(floor);
     if (result.heavenly) forceHeavenlyCritProc(floor);
@@ -528,6 +533,7 @@ export function forceFloorBuyCrit(
     bounce,
     explosion,
     booty,
+    cashFlow: false,
     upgrade,
     peppermint,
     heavenly,
@@ -1028,6 +1034,11 @@ export function forceSilverTicketCritUpgrade(floor: Floor): void {
 export function forceGoldenParachuteCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceGoldenParachuteCritProc(floor);
+}
+
+export function forceCashFlowCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceCashFlowCritProc(floor);
 }
 
 // dev/test-only: force this floor's already-armed tier to also carry a

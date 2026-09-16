@@ -138,6 +138,7 @@ export {
   wireSpawnMergerCritButton,
   wireSpawnShareholdersCritButton,
   wireSpawnGoldenParachuteCritButton,
+  wireSpawnCashFlowCritButton,
   wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
   wireForceBonusTierMegaCritButton,

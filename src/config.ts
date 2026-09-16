@@ -81,6 +81,9 @@ export const CONFIG = {
     // "booty crit" — a flat one-time effect (not tier-scaled, same as boost):
     // doubles the CURRENTLY ACTIVE company's total income once
     bootyChance: 0.03,
+    // "cash flow" — a flat one-time effect: pays one second of the combined
+    // income rate across every corporation, without loading dormant buildings
+    cashFlowChance: 0.03,
     // "upgrade crit" — a flat one-time effect (not tier-scaled, same as
     // boost/booty): permanently promotes the affected floor's (or, for a
     // building-unlock crit, EVERY floor in that building's) own

@@ -64,6 +64,7 @@ import {
   forceGoldenTicketCritUpgrade,
   forceSilverTicketCritUpgrade,
   forceGoldenParachuteCritUpgrade,
+  forceCashFlowCritUpgrade,
   forcePayoutCritUpgrade,
   forceGrandOpeningCritUpgrade,
   forceFullyStaffedCritUpgrade,
@@ -231,6 +232,7 @@ import {
   wireSpawnMergerCritButton,
   wireSpawnShareholdersCritButton,
   wireSpawnGoldenParachuteCritButton,
+  wireSpawnCashFlowCritButton,
   wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
   wireForceBonusTierMegaCritButton,
@@ -921,6 +923,10 @@ async function main() {
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceGoldenParachuteCritUpgrade(floor);
+    });
+    wireSpawnCashFlowCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceCashFlowCritUpgrade(floor);
     });
     wireSpawnPayoutCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];

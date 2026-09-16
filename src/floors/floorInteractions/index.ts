@@ -70,6 +70,7 @@ import {
   addTotalIncome,
   getTotalIncome,
   getCompanyIncomeRatePerSecond,
+  getAllCompaniesIncomeRatePerSecond,
   getAllCompaniesTotalIncome,
   getAllCompaniesUpgradesValue,
   getActiveCompanyInvestedValue,
@@ -914,6 +915,13 @@ function applyGoldenParachuteCrit(): void {
   addTotalIncome(multiply(rate, GOLDEN_PARACHUTE_SECONDS));
 }
 
+// Cash Flow pays one income cycle for every building in every corporation.
+// The combined-rate helper uses live active buildings and persisted dormant
+// company rates, so this never loads dormant floors.
+function applyCashFlowCrit(): void {
+  addTotalIncome(getAllCompaniesIncomeRatePerSecond());
+}
+
 // "Payout" crit (see shared/critTypes's isPayoutCrit): the biggest flat
 // one-time jackpot — instantly adds the combined total income + upgrades
 // value across EVERY corporation (not just the active one) to the
@@ -1048,6 +1056,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   goldenTicket: (c) => applyGoldenTicketCrit(c.floor),
   silverTicket: (c) => applySilverTicketCrit(c.floor),
   goldenParachute: () => applyGoldenParachuteCrit(),
+  cashFlow: () => applyCashFlowCrit(),
   payout: () => applyPayoutCrit(),
   grandOpening: (c) => applyGrandOpeningCrit(c.deps),
   fullyStaffed: (c) => applyFullyStaffedCrit(c.floors),
