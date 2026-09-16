@@ -39,8 +39,8 @@ first one or two:
    celebration flash/icon, dev test button (see "Adding a brand new piggyback
    proc" below).
 3. **Add it to the canonical `CRIT_PROC_INFO` metadata** (directly or through
-  the batch catalog described below). The Special Crits menu derives its
-  `CRIT_INFO` array from this registry. Supply an icon + label + a brief, one-line
+   the batch catalog described below). The Special Crits menu derives its
+   `CRIT_INFO` array from this registry. Supply an icon + label + a brief, one-line
    description (2 lines max, phrase-style like "Boosts every worker for
    free", not a full sentence) so players can look up what it does. A proc
    with no `CRIT_INFO` entry is invisible/undiscoverable to the player even
@@ -63,8 +63,8 @@ Roll order:
 3. On a gateway hit, roll every proc in `CRIT_PROC_KINDS` independently against
    its own `X_CRIT_CHANCE`.
 4. Cap whichever landed to `MAX_SPECIAL_CRIT_PROCS` via `pickAtMost`
-  (Fisher-Yates shuffle + slice). Read the current cap from code; never change
-  it or bypass it when adding a batch.
+   (Fisher-Yates shuffle + slice). Read the current cap from code; never change
+   it or bypass it when adding a batch.
 
 Per-floor proc state (`chainCrits`/`boostCrits`/`bounceCrits`/`explosionCrits`/
 `bootyCrits`/`upgradeCrits`/`peppermintCrits`/`heavenlyCrits`, all
@@ -79,7 +79,7 @@ Each proc's actual reward is applied where the crit is _consumed_ (the click
 handler), not inside `rollCrit` itself:
 
 - Upgrade clicks and floor unlocks both call `applyFloorCrit(deps, floor,
-  result)`. It owns the base tier's free upgrades, one reroll, proc dispatch
+result)`. It owns the base tier's free upgrades, one reroll, proc dispatch
   through the exhaustive `CRIT_REWARDS` table, bonus tier, and celebration.
   Keep purchase costs and unlocking outside this function. Never restore
   separate click/unlock reward tables, substitute permanent promotions for
@@ -130,32 +130,32 @@ Legacy `X_CRIT_*` constants and per-proc force helpers remain for existing
 callers; do not multiply that boilerplate for a new batch.
 
 1. Add `<kind>Chance` and all reward counts/multipliers/durations to
-  `CONFIG.crit`. `getCritProcChance(kind)` expects the `<kind>Chance` naming
-  convention. Pick odds from the bands below and compare neighboring rewards.
+   `CONFIG.crit`. `getCritProcChance(kind)` expects the `<kind>Chance` naming
+   convention. Pick odds from the bands below and compare neighboring rewards.
 2. Add `{ label, color, icon, description }` to `FEATURED_CRIT_INFO` in
-  `src/shared/critTypes/featuredProcs.ts`, using an existing palette color
-  where appropriate. `FeaturedCritKind` and `FEATURED_CRIT_KINDS` derive from
-  this catalog. The existing integration merges it into `CritRollResult`,
-  `CRIT_PROC_KINDS`, `CRIT_PROC_INFO`, `CRIT_PROC_SETS`, roll results, and
-  upgrade arming. Check those connections; do not create a parallel registry.
+   `src/shared/critTypes/featuredProcs.ts`, using an existing palette color
+   where appropriate. `FeaturedCritKind` and `FEATURED_CRIT_KINDS` derive from
+   this catalog. The existing integration merges it into `CritRollResult`,
+   `CRIT_PROC_KINDS`, `CRIT_PROC_INFO`, `CRIT_PROC_SETS`, roll results, and
+   upgrade arming. Check those connections; do not create a parallel registry.
 3. Implement the effect in `createFeaturedCritRewards` in
-  `src/floors/floorInteractions/featuredCritRewards.ts`, reusing the injected
-  upgrade/payout/rate helpers. This table feeds `CRIT_REWARDS`, consumed by
-  the same `applyFloorCrit` for upgrade clicks and floor unlocks. Extend the
-  helper interface only for a genuinely new operation, not one callback per
-  crit. Use cheap numerical loops for bulk upgrades, not repeated particles
-  or crit rerolls inside those loops.
+   `src/floors/floorInteractions/featuredCritRewards.ts`, reusing the injected
+   upgrade/payout/rate helpers. This table feeds `CRIT_REWARDS`, consumed by
+   the same `applyFloorCrit` for upgrade clicks and floor unlocks. Extend the
+   helper interface only for a genuinely new operation, not one callback per
+   crit. Use cheap numerical loops for bulk upgrades, not repeated particles
+   or crit rerolls inside those loops.
 4. Process the icon and register its shipped PNG in `loadAssets/IMAGE_FILES`.
-  Metadata supplies the generic flash, collection menu, and test button.
+   Metadata supplies the generic flash, collection menu, and test button.
 5. Preserve one test button per proc plus Regular Crit in
-  `hud/testButton/critTestActions.ts`, using the existing `forceTestCrit` and
-  shared Event/Tier/Bonus tier controls. Never reintroduce separate Spawn,
-  Floor, Map, Mega, or Ultra buttons for every proc.
+   `hud/testButton/critTestActions.ts`, using the existing `forceTestCrit` and
+   shared Event/Tier/Bonus tier controls. Never reintroduce separate Spawn,
+   Floor, Map, Mega, or Ultra buttons for every proc.
 6. Map testing must show only procs with actual map rewards. If adding map
-  support, implement and verify the building-level effect, then update
-  `MAP_CRIT_TEST_KINDS`. Text search must respect this event filter; switching
-  events must restore eligible buttons. Keep the map bonus-tier selector
-  disabled until map bonus-tier rewards actually exist.
+   support, implement and verify the building-level effect, then update
+   `MAP_CRIT_TEST_KINDS`. Text search must respect this event filter; switching
+   events must restore eligible buttons. Keep the map bonus-tier selector
+   disabled until map bonus-tier rewards actually exist.
 7. Extend the existing regression script and write the batch report below.
 
 Never let `MAX_SPECIAL_CRIT_PROCS`'s cap-then-random-pick logic be bypassed for
@@ -207,9 +207,9 @@ before the shared cap; they are not per-click odds.
 
 Use these exact table columns, one row per implemented crit:
 
-| Image | Crit | Immediate reward | Proc chance | Comparison |
-| --- | --- | --- | --- | --- |
-| dinnerTime | Dinner Time | 5 payouts on every unlocked floor | 4% | Above Fast Forward's 4 payouts at 5% |
+| Image      | Crit        | Immediate reward                  | Proc chance | Comparison                           |
+| ---------- | ----------- | --------------------------------- | ----------- | ------------------------------------ |
+| dinnerTime | Dinner Time | 5 payouts on every unlocked floor | 4%          | Above Fast Forward's 4 payouts at 5% |
 
 - **Image**: asset basename; distinguish it from the display name.
 - **Crit**: exact current canonical label, including later renames.
