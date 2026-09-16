@@ -170,6 +170,14 @@ export const COLOR = {
   nightOwlIndigo: "#3730A3",
   // Headhunter crit's own dedicated color
   headhunterRust: "#C2410C",
+  // Dress Code crit's own dedicated color
+  dressCodeGreen: "#15803D",
+  // Tea Break crit's own dedicated color
+  teaBreakBrown: "#A16207",
+  // Recruitment Drive crit's own dedicated color
+  recruitmentDriveBlue: "#2563EB",
+  // Merger crit's own dedicated color
+  mergerGold: "#A16207",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

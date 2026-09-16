@@ -544,6 +544,52 @@ export const HEADHUNTER_CRIT_CHANCE = CONFIG.crit.headhunterChance;
 export const HEADHUNTER_CRIT_COLOR = COLOR.headhunterRust;
 export const HEADHUNTER_CRIT_LABEL = "Headhunter";
 
+// "Dress Code" crit — adds a manager to each unlocked floor without one,
+// otherwise adds one worker
+export const DRESS_CODE_CRIT_CHANCE = CONFIG.crit.dressCodeChance;
+export const DRESS_CODE_CRIT_COLOR = COLOR.dressCodeGreen;
+export const DRESS_CODE_CRIT_LABEL = "Dress Code";
+
+// "Tea Break" crit — pauses every unlocked floor's income timer for a short
+// break, then releases one payout from every floor together
+export const TEA_BREAK_CRIT_CHANCE = CONFIG.crit.teaBreakChance;
+export const TEA_BREAK_CRIT_COLOR = COLOR.teaBreakBrown;
+export const TEA_BREAK_CRIT_LABEL = "Tea Break";
+export const TEA_BREAK_DURATION_MS = CONFIG.crit.teaBreakDurationMs;
+const teaBreakPausedAt = new WeakMap<Floor, number>();
+
+export function isTeaBreakCrit(floor: Floor): boolean {
+  return teaBreakCrits.has(floor);
+}
+
+export function startTeaBreakPause(floor: Floor, startedAt: number): void {
+  teaBreakPausedAt.set(floor, startedAt);
+}
+
+export function isTeaBreakPaused(floor: Floor): boolean {
+  return teaBreakPausedAt.has(floor);
+}
+
+export function getTeaBreakPausedAt(floor: Floor): number | null {
+  return teaBreakPausedAt.get(floor) ?? null;
+}
+
+export function endTeaBreakPause(floor: Floor): void {
+  teaBreakPausedAt.delete(floor);
+}
+
+// "Recruitment Drive" crit — fills this floor and contiguous unlocked floors
+// above it to the rendered worker cap, stopping before the first maxed/locked
+// floor
+export const RECRUITMENT_DRIVE_CRIT_CHANCE = CONFIG.crit.recruitmentDriveChance;
+export const RECRUITMENT_DRIVE_CRIT_COLOR = COLOR.recruitmentDriveBlue;
+export const RECRUITMENT_DRIVE_CRIT_LABEL = "Recruitment Drive";
+// "Merger" crit - synchronizes every unlocked lower floor to the landing
+// floor's current upgrade level, without changing the landing floor itself
+export const MERGER_CRIT_CHANCE = CONFIG.crit.mergerChance;
+export const MERGER_CRIT_COLOR = COLOR.mergerGold;
+export const MERGER_CRIT_LABEL = "Merger";
+
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
 // seconds' worth of the currently active company's own combined income rate
@@ -616,12 +662,16 @@ const supplyRunCrits = new WeakSet<Floor>();
 const casualFridayCrits = new WeakSet<Floor>();
 const fancyFridayCrits = new WeakSet<Floor>();
 const fireDrillCrits = new WeakSet<Floor>();
+const teaBreakCrits = new WeakSet<Floor>();
 const doubleDownCrits = new WeakSet<Floor>();
 const coffeeRunCrits = new WeakSet<Floor>();
 const teamBuildingCrits = new WeakSet<Floor>();
 const springCleaningCrits = new WeakSet<Floor>();
 const nightOwlCrits = new WeakSet<Floor>();
 const headhunterCrits = new WeakSet<Floor>();
+const dressCodeCrits = new WeakSet<Floor>();
+const recruitmentDriveCrits = new WeakSet<Floor>();
+const mergerCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -715,12 +765,16 @@ export interface CritRollResult {
   casualFriday: boolean;
   fancyFriday: boolean;
   fireDrill: boolean;
+  teaBreak: boolean;
   doubleDown: boolean;
   coffeeRun: boolean;
   teamBuilding: boolean;
   springCleaning: boolean;
   nightOwl: boolean;
   headhunter: boolean;
+  dressCode: boolean;
+  recruitmentDrive: boolean;
+  merger: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -785,12 +839,16 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "casualFriday",
   "fancyFriday",
   "fireDrill",
+  "teaBreak",
   "doubleDown",
   "coffeeRun",
   "teamBuilding",
   "springCleaning",
   "nightOwl",
   "headhunter",
+  "dressCode",
+  "recruitmentDrive",
+  "merger",
 ];
 
 // the one kind -> "is this proc armed on this floor" registry. Every per-proc
@@ -851,12 +909,16 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   casualFriday: casualFridayCrits,
   fancyFriday: fancyFridayCrits,
   fireDrill: fireDrillCrits,
+  teaBreak: teaBreakCrits,
   doubleDown: doubleDownCrits,
   coffeeRun: coffeeRunCrits,
   teamBuilding: teamBuildingCrits,
   springCleaning: springCleaningCrits,
   nightOwl: nightOwlCrits,
   headhunter: headhunterCrits,
+  dressCode: dressCodeCrits,
+  recruitmentDrive: recruitmentDriveCrits,
+  merger: mergerCrits,
 };
 
 // every proc currently armed on this floor, as the same boolean-per-kind shape
@@ -1360,6 +1422,30 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "headhunter",
     description: "Matches this floor to the best-staffed one",
   },
+  dressCode: {
+    label: DRESS_CODE_CRIT_LABEL,
+    color: DRESS_CODE_CRIT_COLOR,
+    icon: "dressCode",
+    description: "Adds managers, then workers, building-wide",
+  },
+  teaBreak: {
+    label: TEA_BREAK_CRIT_LABEL,
+    color: TEA_BREAK_CRIT_COLOR,
+    icon: "teaBreak",
+    description: "Pauses every floor, then pays them together",
+  },
+  recruitmentDrive: {
+    label: RECRUITMENT_DRIVE_CRIT_LABEL,
+    color: RECRUITMENT_DRIVE_CRIT_COLOR,
+    icon: "recruitmentDrive",
+    description: "Fills this floor and unlocked floors above",
+  },
+  merger: {
+    label: MERGER_CRIT_LABEL,
+    color: MERGER_CRIT_COLOR,
+    icon: "merger",
+    description: "Raises lower unlocked floors to this level",
+  },
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
@@ -1465,6 +1551,11 @@ export function rollCrit(
       landed.push("springCleaning");
     if (Math.random() < NIGHT_OWL_CRIT_CHANCE) landed.push("nightOwl");
     if (Math.random() < HEADHUNTER_CRIT_CHANCE) landed.push("headhunter");
+    if (Math.random() < DRESS_CODE_CRIT_CHANCE) landed.push("dressCode");
+    if (Math.random() < TEA_BREAK_CRIT_CHANCE) landed.push("teaBreak");
+    if (Math.random() < RECRUITMENT_DRIVE_CRIT_CHANCE)
+      landed.push("recruitmentDrive");
+    if (Math.random() < MERGER_CRIT_CHANCE) landed.push("merger");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -1541,6 +1632,10 @@ export function rollCrit(
     springCleaning: kept.has("springCleaning"),
     nightOwl: kept.has("nightOwl"),
     headhunter: kept.has("headhunter"),
+    dressCode: kept.has("dressCode"),
+    teaBreak: kept.has("teaBreak"),
+    recruitmentDrive: kept.has("recruitmentDrive"),
+    merger: kept.has("merger"),
   });
 }
 
@@ -1780,6 +1875,18 @@ export function isNightOwlCrit(floor: Floor): boolean {
 
 export function isHeadhunterCrit(floor: Floor): boolean {
   return headhunterCrits.has(floor);
+}
+
+export function isDressCodeCrit(floor: Floor): boolean {
+  return dressCodeCrits.has(floor);
+}
+
+export function isRecruitmentDriveCrit(floor: Floor): boolean {
+  return recruitmentDriveCrits.has(floor);
+}
+
+export function isMergerCrit(floor: Floor): boolean {
+  return mergerCrits.has(floor);
 }
 
 // the armed "special crit crit" bonus tier riding on this floor's already-
@@ -2039,6 +2146,22 @@ export function forceNightOwlCritProc(floor: Floor): void {
 
 export function forceHeadhunterCritProc(floor: Floor): void {
   headhunterCrits.add(floor);
+}
+
+export function forceDressCodeCritProc(floor: Floor): void {
+  dressCodeCrits.add(floor);
+}
+
+export function forceTeaBreakCritProc(floor: Floor): void {
+  teaBreakCrits.add(floor);
+}
+
+export function forceRecruitmentDriveCritProc(floor: Floor): void {
+  recruitmentDriveCrits.add(floor);
+}
+
+export function forceMergerCritProc(floor: Floor): void {
+  mergerCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

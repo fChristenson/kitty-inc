@@ -22,7 +22,7 @@ import {
   peekDueIncome as sharedPeekDueIncome,
   currentIncomeRatePerSecond as sharedCurrentIncomeRatePerSecond,
 } from "../../shared/income";
-import { type BigNumber, add, multiply, gte } from "../../shared/bigNumber";
+import { type BigNumber, ZERO, add, multiply, gte } from "../../shared/bigNumber";
 import {
   drawPill,
   drawPillBorder,
@@ -33,6 +33,10 @@ import {
 } from "../../utils";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
+import {
+  getTeaBreakPausedAt,
+  isTeaBreakPaused,
+} from "../../shared/critTypes";
 
 // panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right).
 // Scaled up from the original 360 as far as the gap to the upgrade button allows. PANEL_X is
@@ -235,6 +239,7 @@ function effectiveIncomeCycle(
 // from, so a payout always lines up with the bar visually completing instead of money
 // trickling in continuously underneath a stepped bar
 export function collectDueIncome(floor: Floor, now: number): BigNumber {
+  if (isTeaBreakPaused(floor)) return ZERO;
   return sharedCollectDueIncome(floor, now, currentSpeedMultiplier(floor, now));
 }
 
@@ -474,6 +479,7 @@ export function drawIncomePanel(
   const barMinWidth = barRadius * 2;
 
   const now = Date.now();
+  const timerNow = getTeaBreakPausedAt(floor) ?? now;
   // "Work overtime" boost (see floors/upgradeButton) takes over this floor's whole
   // bar — a filling gauge instead of the normal payout-cycle fill — for its own
   // 15s duration, then keeps showing the gauge a little longer while it ticks
@@ -518,13 +524,13 @@ export function drawIncomePanel(
   if (overtimeGaugeVisible) {
     fillW = Math.max(barMinWidth, barW * getOvertimeFillFraction(floor, now));
   } else if (floor.unlocked) {
-    const cycle = effectiveIncomeCycle(floor, now);
+    const cycle = effectiveIncomeCycle(floor, timerNow);
     overspeed = cycle.overspeed;
     if (overspeed) {
       fillW = barW;
     } else {
       const fillDurationMs = cycle.intervalSeconds * 1000;
-      const elapsed = now - floor.lastCollectedAt;
+      const elapsed = timerNow - floor.lastCollectedAt;
       const pct = (elapsed % fillDurationMs) / fillDurationMs;
       fillW = Math.max(barMinWidth, barW * pct);
     }

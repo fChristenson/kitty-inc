@@ -278,6 +278,18 @@ export const CONFIG = {
     // best-staffed floor; a no-op if it's already the best, so priced like
     // the other single-floor staffing procs
     headhunterChance: 0.06,
+    // "Dress Code" crit — adds a manager or worker on every unlocked floor
+    dressCodeChance: 0.08,
+    // "Tea Break" crit — pauses every unlocked floor's income timer, then
+    // releases one payout from each floor together after the break
+    teaBreakChance: 0.08,
+    teaBreakDurationMs: 10000,
+    // "Recruitment Drive" crit — fills this floor and contiguous unlocked
+    // floors above it, stopping at the first maxed or locked floor
+    recruitmentDriveChance: 0.06,
+    // "Merger" crit - synchronizes lower unlocked floors to the landing
+    // floor's upgrade level, bounded by the levels already earned there
+    mergerChance: 0.03,
     // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
     // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
     // seconds' worth of the currently active company's own combined income

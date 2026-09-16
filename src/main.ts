@@ -79,10 +79,14 @@ import {
   forceFireDrillCritUpgrade,
   forceDoubleDownCritUpgrade,
   forceCoffeeRunCritUpgrade,
+  forceDressCodeCritUpgrade,
+  forceTeaBreakCritUpgrade,
   forceTeamBuildingCritUpgrade,
   forceSpringCleaningCritUpgrade,
   forceNightOwlCritUpgrade,
   forceHeadhunterCritUpgrade,
+  forceRecruitmentDriveCritUpgrade,
+  forceMergerCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   forceGrandOpeningFloorBuyCrit,
@@ -101,10 +105,13 @@ import {
   forceFireDrillFloorBuyCrit,
   forceDoubleDownFloorBuyCrit,
   forceCoffeeRunFloorBuyCrit,
+  forceDressCodeFloorBuyCrit,
+  forceTeaBreakFloorBuyCrit,
   forceTeamBuildingFloorBuyCrit,
   forceSpringCleaningFloorBuyCrit,
   forceNightOwlFloorBuyCrit,
   forceHeadhunterFloorBuyCrit,
+  forceRecruitmentDriveFloorBuyCrit,
   forcePayoutFloorBuyCrit,
   getActiveBackgrounds,
   applyChainCrit,
@@ -204,10 +211,14 @@ import {
   wireSpawnFireDrillCritButton,
   wireSpawnDoubleDownCritButton,
   wireSpawnCoffeeRunCritButton,
+  wireSpawnDressCodeCritButton,
+  wireSpawnTeaBreakCritButton,
   wireSpawnTeamBuildingCritButton,
   wireSpawnSpringCleaningCritButton,
   wireSpawnNightOwlCritButton,
   wireSpawnHeadhunterCritButton,
+  wireSpawnRecruitmentDriveCritButton,
+  wireSpawnMergerCritButton,
   wireSpawnGoldenParachuteCritButton,
   wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
@@ -274,10 +285,13 @@ import {
   wireFloorBuyFireDrillCritButton,
   wireFloorBuyDoubleDownCritButton,
   wireFloorBuyCoffeeRunCritButton,
+  wireFloorBuyDressCodeCritButton,
+  wireFloorBuyTeaBreakCritButton,
   wireFloorBuyTeamBuildingCritButton,
   wireFloorBuySpringCleaningCritButton,
   wireFloorBuyNightOwlCritButton,
   wireFloorBuyHeadhunterCritButton,
+  wireFloorBuyRecruitmentDriveCritButton,
   wireFloorBuyGoldenParachuteCritButton,
   wireFloorBuyPayoutCritButton,
   wireMapUnlockCritButton,
@@ -838,6 +852,14 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceCoffeeRunCritUpgrade(floor);
     });
+    wireSpawnDressCodeCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceDressCodeCritUpgrade(floor);
+    });
+    wireSpawnTeaBreakCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceTeaBreakCritUpgrade(floor);
+    });
     wireSpawnTeamBuildingCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceTeamBuildingCritUpgrade(floor);
@@ -853,6 +875,16 @@ async function main() {
     wireSpawnHeadhunterCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceHeadhunterCritUpgrade(floor);
+    });
+    wireSpawnRecruitmentDriveCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceRecruitmentDriveCritUpgrade(floor);
+    });
+    wireSpawnMergerCritButton(app, () => {
+      const floor = [...(buildings[activeBuildingIndex] ?? [])]
+        .reverse()
+        .find((candidate) => candidate.unlocked);
+      if (floor) forceMergerCritUpgrade(floor);
     });
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1755,6 +1787,12 @@ async function main() {
     wireFloorBuyCoffeeRunCritButton(app, () =>
       forceCoffeeRunFloorBuyCrit("crit"),
     );
+    wireFloorBuyDressCodeCritButton(app, () =>
+      forceDressCodeFloorBuyCrit("crit"),
+    );
+    wireFloorBuyTeaBreakCritButton(app, () =>
+      forceTeaBreakFloorBuyCrit("crit"),
+    );
     wireFloorBuyTeamBuildingCritButton(app, () =>
       forceTeamBuildingFloorBuyCrit("crit"),
     );
@@ -1766,6 +1804,9 @@ async function main() {
     );
     wireFloorBuyHeadhunterCritButton(app, () =>
       forceHeadhunterFloorBuyCrit("crit"),
+    );
+    wireFloorBuyRecruitmentDriveCritButton(app, () =>
+      forceRecruitmentDriveFloorBuyCrit("crit"),
     );
     wireFloorBuyGoldenParachuteCritButton(app, () =>
       forceFloorBuyCrit(

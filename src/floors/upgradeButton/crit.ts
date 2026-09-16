@@ -160,6 +160,12 @@ export {
   NIGHT_OWL_CRIT_LABEL,
   HEADHUNTER_CRIT_COLOR,
   HEADHUNTER_CRIT_LABEL,
+  DRESS_CODE_CRIT_COLOR,
+  DRESS_CODE_CRIT_LABEL,
+  RECRUITMENT_DRIVE_CRIT_COLOR,
+  RECRUITMENT_DRIVE_CRIT_LABEL,
+  MERGER_CRIT_COLOR,
+  MERGER_CRIT_LABEL,
   isChainCrit,
   isBoostCrit,
   isBounceCrit,
@@ -219,6 +225,9 @@ export {
   isSpringCleaningCrit,
   isNightOwlCrit,
   isHeadhunterCrit,
+  isDressCodeCrit,
+  isRecruitmentDriveCrit,
+  isMergerCrit,
   getBonusTierCrit,
   consumeBonusTierCrit,
   pickHigherCritTier,
@@ -289,6 +298,10 @@ import {
   forceSpringCleaningCritProc,
   forceNightOwlCritProc,
   forceHeadhunterCritProc,
+  forceDressCodeCritProc,
+  forceTeaBreakCritProc,
+  forceRecruitmentDriveCritProc,
+  forceMergerCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -395,6 +408,10 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.springCleaning) forceSpringCleaningCritProc(floor);
     if (result.nightOwl) forceNightOwlCritProc(floor);
     if (result.headhunter) forceHeadhunterCritProc(floor);
+    if (result.dressCode) forceDressCodeCritProc(floor);
+    if (result.teaBreak) forceTeaBreakCritProc(floor);
+    if (result.recruitmentDrive) forceRecruitmentDriveCritProc(floor);
+    if (result.merger) forceMergerCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -475,6 +492,7 @@ export function forceFloorBuyCrit(
   espressoShot = false,
   dejaVu = false,
   cloneArmy = false,
+  merger = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -538,6 +556,10 @@ export function forceFloorBuyCrit(
     springCleaning: false,
     nightOwl: false,
     headhunter: false,
+    dressCode: false,
+    teaBreak: false,
+    recruitmentDrive: false,
+    merger,
   };
 }
 
@@ -649,6 +671,23 @@ export function forceNightOwlFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceHeadhunterFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.headhunter = true;
+}
+
+export function forceDressCodeFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.dressCode = true;
+}
+
+export function forceTeaBreakFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.teaBreak = true;
+}
+
+export function forceRecruitmentDriveFloorBuyCrit(
+  tier: CritTier = "crit",
+): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.recruitmentDrive = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries a
@@ -1053,6 +1092,29 @@ export function forceNightOwlCritUpgrade(floor: Floor): void {
 export function forceHeadhunterCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceHeadhunterCritProc(floor);
+}
+
+export function forceDressCodeCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceDressCodeCritProc(floor);
+}
+
+export function forceTeaBreakCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceTeaBreakCritProc(floor);
+}
+
+export function forceRecruitmentDriveCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceRecruitmentDriveCritProc(floor);
+}
+
+export function forceMergerCritUpgrade(
+  floor: Floor,
+  tier: CritTier = "crit",
+): void {
+  critTiers.set(floor, tier);
+  forceMergerCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

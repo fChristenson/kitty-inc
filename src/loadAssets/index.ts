@@ -105,6 +105,10 @@ const IMAGE_FILES = {
   springCleaning: "springCleaning.png", // Spring Cleaning crit flash's own backdrop icon
   nightOwl: "nightOwl.png", // Night Owl crit flash's own backdrop icon
   headhunter: "headhunter.png", // Headhunter crit flash's own backdrop icon
+  dressCode: "dressCode.png", // Dress Code crit flash's own backdrop icon
+  teaBreak: "teaBreak.png", // Tea Break crit flash's own backdrop icon
+  recruitmentDrive: "recruitmentDrive.png", // Recruitment Drive crit flash's own backdrop icon
+  merger: "merger.png", // Merger crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

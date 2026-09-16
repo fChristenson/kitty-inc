@@ -87,6 +87,9 @@ import {
   applyCritProcs,
   onlyCritProc,
   recordCritProcLanded,
+  TEA_BREAK_DURATION_MS,
+  startTeaBreakPause,
+  endTeaBreakPause,
 } from "../../shared/critTypes";
 import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
@@ -332,6 +335,49 @@ function applyCoffeeRunCrit(floors: Floor[]): void {
   applyFloorBoost(floors, COFFEE_RUN_BOOST_DURATION_MS);
 }
 
+function applyDressCodeCrit(floors: Floor[]): void {
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    if (!floor.hasManager) {
+      floor.hasManager = true;
+    } else {
+      applyInternCrit(floor);
+    }
+  }
+}
+
+// "Recruitment Drive" crit: fill the floor that crit and then each contiguous
+// unlocked floor above it, stopping before the first maxed or locked floor.
+function applyRecruitmentDriveCrit(floors: Floor[], floor: Floor): void {
+  let index = floors.indexOf(floor);
+  if (index < 0 || !floor.unlocked) return;
+  if (floor.workerCount < MAX_RENDERED_WORKERS) {
+    floor.workerCount = MAX_RENDERED_WORKERS;
+  }
+  index += 1;
+  while (index < floors.length) {
+    const target = floors[index];
+    if (!target.unlocked || target.workerCount >= MAX_RENDERED_WORKERS) return;
+    target.workerCount = MAX_RENDERED_WORKERS;
+    index += 1;
+  }
+}
+
+// "Merger" crit: replay free upgrade ticks on every unlocked floor below the
+// landing floor until each reaches the landing floor's level. Floor order is
+// ground-to-top, so lower floors are the preceding array entries.
+function applyMergerCrit(floors: Floor[], floor: Floor): void {
+  const landingIndex = floors.indexOf(floor);
+  const targetLevel = floor.upgradeCount;
+  for (let index = landingIndex - 1; index >= 0; index--) {
+    const lowerFloor = floors[index];
+    if (!lowerFloor.unlocked) continue;
+    while (lowerFloor.upgradeCount < targetLevel) {
+      applyUpgradeTick(lowerFloor, index === 0);
+    }
+  }
+}
+
 // "night shift crit" (see shared/critTypes' isNightShiftCrit): same
 // building-wide free-boost reward as boost/sunshine/snowday above, but its
 // own SHORTER duration — half the normal boost length. Also, for the same
@@ -531,6 +577,23 @@ function applyFireDrillCrit(floors: Floor[]): void {
     floor.lastCollectedAt = now;
   }
   addTotalIncome(total);
+}
+
+function applyTeaBreakCrit(floors: Floor[], persist: () => void): void {
+  const startedAt = Date.now();
+  const unlockedFloors = floors.filter((floor) => floor.unlocked);
+  for (const floor of unlockedFloors) startTeaBreakPause(floor, startedAt);
+  setTimeout(() => {
+    const releasedAt = Date.now();
+    let total: BigNumber = ZERO;
+    for (const floor of unlockedFloors) {
+      total = add(total, currentPayoutAmount(floor, releasedAt));
+      floor.lastCollectedAt = releasedAt;
+      endTeaBreakPause(floor);
+    }
+    addTotalIncome(total);
+    persist();
+  }, TEA_BREAK_DURATION_MS);
 }
 
 // "frozen crit" (see shared/critTypes's isFrozenCrit): no instant payout —
@@ -946,8 +1009,12 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   fancyFriday: (c) =>
     applyFlatUpgradeBatch(c.floors, FANCY_FRIDAY_CRIT_UPGRADES),
   fireDrill: (c) => applyFireDrillCrit(c.floors),
+  teaBreak: (c) => applyTeaBreakCrit(c.floors, c.deps.persist),
   doubleDown: (c) => applyDoubleDownCrit(c.floor, c.isGroundFloor, c.tier),
   coffeeRun: (c) => applyCoffeeRunCrit(c.floors),
+  dressCode: (c) => applyDressCodeCrit(c.floors),
+  recruitmentDrive: (c) => applyRecruitmentDriveCrit(c.floors, c.floor),
+  merger: (c) => applyMergerCrit(c.floors, c.floor),
   teamBuilding: (c) => applyTeamBuildingCrit(c.floors),
   springCleaning: (c) => applySpringCleaningCrit(c.floors, c.multiplier),
   nightOwl: (c) => applyNightOwlCrit(c.floors),
@@ -988,6 +1055,9 @@ const CLICK_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
 // promote each reached floor's permanent tier instead
 const FLOOR_BUY_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   ...SHARED_CRIT_REWARDS,
+  // A newly unlocked floor always starts at level 0, so Merger has no useful
+  // target level to synchronize into floors below it on this path.
+  merger: () => {},
   chain: (c) =>
     applyChainCrit(c.deps, c.floors.indexOf(c.floor), (reached) => {
       reached.critMultiplierTier = pickHigherCritTier(

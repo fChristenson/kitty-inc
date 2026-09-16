@@ -92,6 +92,10 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-spring-cleaning-crit" class="game__button">Spawn Spring Cleaning Crit</button>
           <button id="spawn-night-owl-crit" class="game__button">Spawn Night Owl Crit</button>
           <button id="spawn-headhunter-crit" class="game__button">Spawn Headhunter Crit</button>
+          <button id="spawn-dress-code-crit" class="game__button">Spawn Dress Code Crit</button>
+          <button id="spawn-tea-break-crit" class="game__button">Spawn Tea Break Crit</button>
+          <button id="spawn-recruitment-drive-crit" class="game__button">Spawn Recruitment Drive Crit</button>
+          <button id="spawn-merger-crit" class="game__button">Spawn Merger Crit</button>
           <button id="spawn-golden-parachute-crit" class="game__button">Spawn Golden Parachute Crit</button>
           <button id="spawn-payout-crit" class="game__button">Spawn Payout Crit</button>
         </div>
@@ -166,6 +170,9 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-spring-cleaning-crit" class="game__button">Floor Spring Cleaning Crit</button>
           <button id="floor-buy-night-owl-crit" class="game__button">Floor Night Owl Crit</button>
           <button id="floor-buy-headhunter-crit" class="game__button">Floor Headhunter Crit</button>
+          <button id="floor-buy-dress-code-crit" class="game__button">Floor Dress Code Crit</button>
+          <button id="floor-buy-tea-break-crit" class="game__button">Floor Tea Break Crit</button>
+          <button id="floor-buy-recruitment-drive-crit" class="game__button">Floor Recruitment Drive Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -816,6 +823,26 @@ export function wireSpawnCoffeeRunCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnDressCodeCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-dress-code-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnTeaBreakCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-tea-break-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireSpawnTeamBuildingCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -853,6 +880,25 @@ export function wireSpawnHeadhunterCritButton(
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-headhunter-crit",
   )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnRecruitmentDriveCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-recruitment-drive-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnMergerCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#spawn-merger-crit")!;
   button.addEventListener("click", onClick);
 }
 
@@ -1533,6 +1579,26 @@ export function wireFloorBuyCoffeeRunCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireFloorBuyDressCodeCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-dress-code-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyTeaBreakCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-tea-break-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireFloorBuyTeamBuildingCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -1569,6 +1635,16 @@ export function wireFloorBuyHeadhunterCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-headhunter-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyRecruitmentDriveCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-recruitment-drive-crit",
   )!;
   button.addEventListener("click", onClick);
 }
