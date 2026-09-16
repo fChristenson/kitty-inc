@@ -388,6 +388,12 @@ export const INTERN_CRIT_CHANCE = CONFIG.crit.internChance;
 export const INTERN_CRIT_COLOR = COLOR.internSkyBlue;
 export const INTERN_CRIT_LABEL = "Intern";
 
+// "Talent Scout" crit — adds one capped worker, then boosts every actual
+// worker on the critted floor for the normal boost duration
+export const TALENT_SCOUT_CRIT_CHANCE = CONFIG.crit.talentScoutChance;
+export const TALENT_SCOUT_CRIT_COLOR = COLOR.talentScoutOrange;
+export const TALENT_SCOUT_CRIT_LABEL = "Talent Scout";
+
 export const UNION_BOSS_CRIT_CHANCE = CONFIG.crit.unionBossChance;
 export const UNION_BOSS_CRIT_COLOR = COLOR.unionBossSlate;
 export const UNION_BOSS_CRIT_LABEL = "Union Boss";
@@ -681,6 +687,7 @@ const paydayCrits = new WeakSet<Floor>();
 const goldStandardCrits = new WeakSet<Floor>();
 const nightShiftCrits = new WeakSet<Floor>();
 const internCrits = new WeakSet<Floor>();
+const talentScoutCrits = new WeakSet<Floor>();
 const unionBossCrits = new WeakSet<Floor>();
 const rushHourCrits = new WeakSet<Floor>();
 const goldenTicketCrits = new WeakSet<Floor>();
@@ -788,6 +795,7 @@ export interface CritRollResult {
   goldStandard: boolean;
   nightShift: boolean;
   intern: boolean;
+  talentScout: boolean;
   unionBoss: boolean;
   rushHour: boolean;
   goldenTicket: boolean;
@@ -866,6 +874,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "goldStandard",
   "nightShift",
   "intern",
+  "talentScout",
   "unionBoss",
   "rushHour",
   "goldenTicket",
@@ -940,6 +949,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   goldStandard: goldStandardCrits,
   nightShift: nightShiftCrits,
   intern: internCrits,
+  talentScout: talentScoutCrits,
   unionBoss: unionBossCrits,
   rushHour: rushHourCrits,
   goldenTicket: goldenTicketCrits,
@@ -1300,6 +1310,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "intern",
     description: "Grants the floor a free worker",
   },
+  talentScout: {
+    label: TALENT_SCOUT_CRIT_LABEL,
+    color: TALENT_SCOUT_CRIT_COLOR,
+    icon: "talentScout",
+    description: "Adds and boosts a worker on this floor",
+  },
   unionBoss: {
     label: UNION_BOSS_CRIT_LABEL,
 
@@ -1601,6 +1617,7 @@ export function rollCrit(
     if (Math.random() < GOLD_STANDARD_CRIT_CHANCE) landed.push("goldStandard");
     if (Math.random() < NIGHT_SHIFT_CRIT_CHANCE) landed.push("nightShift");
     if (Math.random() < INTERN_CRIT_CHANCE) landed.push("intern");
+    if (Math.random() < TALENT_SCOUT_CRIT_CHANCE) landed.push("talentScout");
     if (Math.random() < UNION_BOSS_CRIT_CHANCE) landed.push("unionBoss");
     if (Math.random() < RUSH_HOUR_CRIT_CHANCE) landed.push("rushHour");
     if (Math.random() < GOLDEN_TICKET_CRIT_CHANCE) landed.push("goldenTicket");
@@ -1691,6 +1708,7 @@ export function rollCrit(
     goldStandard: kept.has("goldStandard"),
     nightShift: kept.has("nightShift"),
     intern: kept.has("intern"),
+    talentScout: kept.has("talentScout"),
     unionBoss: kept.has("unionBoss"),
     rushHour: kept.has("rushHour"),
     goldenTicket: kept.has("goldenTicket"),
@@ -1863,6 +1881,10 @@ export function isNightShiftCrit(floor: Floor): boolean {
 
 export function isInternCrit(floor: Floor): boolean {
   return internCrits.has(floor);
+}
+
+export function isTalentScoutCrit(floor: Floor): boolean {
+  return talentScoutCrits.has(floor);
 }
 
 export function isUnionBossCrit(floor: Floor): boolean {
@@ -2150,6 +2172,10 @@ export function forceNightShiftCritProc(floor: Floor): void {
 
 export function forceInternCritProc(floor: Floor): void {
   internCrits.add(floor);
+}
+
+export function forceTalentScoutCritProc(floor: Floor): void {
+  talentScoutCrits.add(floor);
 }
 
 export function forceUnionBossCritProc(floor: Floor): void {

@@ -103,6 +103,8 @@ export {
   NIGHT_SHIFT_CRIT_LABEL,
   INTERN_CRIT_COLOR,
   INTERN_CRIT_LABEL,
+  TALENT_SCOUT_CRIT_COLOR,
+  TALENT_SCOUT_CRIT_LABEL,
   UNION_BOSS_CRIT_COLOR,
   UNION_BOSS_CRIT_LABEL,
   RUSH_HOUR_CRIT_COLOR,
@@ -209,6 +211,7 @@ export {
   isGoldStandardCrit,
   isNightShiftCrit,
   isInternCrit,
+  isTalentScoutCrit,
   isUnionBossCrit,
   isRushHourCrit,
   isGoldenTicketCrit,
@@ -285,6 +288,7 @@ import {
   forceGoldStandardCritProc,
   forceNightShiftCritProc,
   forceInternCritProc,
+  forceTalentScoutCritProc,
   forceUnionBossCritProc,
   forceRushHourCritProc,
   forceGoldenTicketCritProc,
@@ -500,6 +504,7 @@ export function forceFloorBuyCrit(
   nightShift = false,
   bonusTier: CritTier | null = null,
   intern = false,
+  talentScout = false,
   unionBoss = false,
   easterSale = false,
   rushHour = false,
@@ -552,6 +557,7 @@ export function forceFloorBuyCrit(
     royalFlush,
     nightShift,
     intern,
+    talentScout,
     unionBoss,
     rushHour,
     goldenTicket,
@@ -980,6 +986,11 @@ export function forceNightShiftCritUpgrade(floor: Floor): void {
 export function forceInternCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceInternCritProc(floor);
+}
+
+export function forceTalentScoutCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceTalentScoutCritProc(floor);
 }
 
 export function forceUnionBossCritUpgrade(floor: Floor): void {

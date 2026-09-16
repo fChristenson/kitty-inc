@@ -69,6 +69,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-gold-standard-crit" class="game__button">Spawn Gold Standard Crit</button>
           <button id="spawn-night-shift-crit" class="game__button">Spawn Night Shift Crit</button>
           <button id="spawn-intern-crit" class="game__button">Spawn Intern Crit</button>
+          <button id="spawn-talent-scout-crit" class="game__button">Spawn Talent Scout Crit</button>
           <button id="spawn-union-boss-crit" class="game__button">Spawn Union Boss Crit</button>
           <button id="spawn-rush-hour-crit" class="game__button">Spawn Rush Hour Crit</button>
           <button id="spawn-golden-ticket-crit" class="game__button">Spawn Golden Ticket Crit</button>
@@ -635,6 +636,16 @@ export function wireSpawnInternCritButton(
 ): void {
   const button =
     container.querySelector<HTMLButtonElement>("#spawn-intern-crit")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnTalentScoutCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-talent-scout-crit",
+  )!;
   button.addEventListener("click", onClick);
 }
 

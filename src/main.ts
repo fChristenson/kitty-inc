@@ -58,6 +58,7 @@ import {
   forceGoldStandardCritUpgrade,
   forceNightShiftCritUpgrade,
   forceInternCritUpgrade,
+  forceTalentScoutCritUpgrade,
   forceUnionBossCritUpgrade,
   forceRushHourCritUpgrade,
   forceGoldenTicketCritUpgrade,
@@ -197,6 +198,7 @@ import {
   wireSpawnGoldStandardCritButton,
   wireSpawnNightShiftCritButton,
   wireSpawnInternCritButton,
+  wireSpawnTalentScoutCritButton,
   wireSpawnUnionBossCritButton,
   wireSpawnRushHourCritButton,
   wireSpawnGoldenTicketCritButton,
@@ -785,6 +787,10 @@ async function main() {
     wireSpawnInternCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceInternCritUpgrade(floor);
+    });
+    wireSpawnTalentScoutCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceTalentScoutCritUpgrade(floor);
     });
     wireSpawnUnionBossCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];

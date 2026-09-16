@@ -117,6 +117,8 @@ export const COLOR = {
   nightShiftIndigo: "#312E81",
   // Intern crit's own dedicated color — a fresh, junior-level sky blue
   internSkyBlue: "#0EA5E9",
+  // Talent Scout crit's own dedicated color — a warm recruiting orange
+  talentScoutOrange: "#F97316",
   // Union Boss crit's own dedicated color — a stern, authoritative slate
   unionBossSlate: "#475569",
   // Golden Ticket crit's own dedicated color — a bright pale yellow,

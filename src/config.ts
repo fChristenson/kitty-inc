@@ -55,7 +55,7 @@ export const CONFIG = {
     // this time, silently (see rollCrit in shared/critTypes). A hit just
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
-    specialCritGatewayChance: 0.25,
+    specialCritGatewayChance: 0.15,
     // "chain crit" — an extra roll on top of an already-landed crit/mega/ultra
     // (see rollCritUpgrade): applies that same tier's upgrade to the next floor
     // too, then has chainContinueChance to keep going up the building one floor
@@ -196,6 +196,9 @@ export const CONFIG = {
     // floor being upgraded one free worker/manager (see hud/upgradeMenu's
     // buyWorker/buyManager), free of charge
     internChance: 0.1,
+    // "Talent Scout" crit — adds one capped worker, then briefly boosts every
+    // actual worker on the critted floor
+    talentScoutChance: 0.08,
     unionBossChance: 0.08,
     // "Rush Hour" crit — for rushHourDurationMs, every unlocked floor's own
     // income timer is capped at rushHourIntervalSeconds (never slowed down —

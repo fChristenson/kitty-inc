@@ -794,6 +794,17 @@ function applyInternCrit(floor: Floor): void {
   if (floor.workerCount < MAX_RENDERED_WORKERS) floor.workerCount += 1;
 }
 
+// "Talent Scout" crit: hire one capped real worker first, then boost every
+// actual worker slot now present on the critted floor. No virtual slots or
+// manager state are involved.
+function applyTalentScoutCrit(floor: Floor): void {
+  applyInternCrit(floor);
+  const now = Date.now();
+  for (let workerIndex = 0; workerIndex < floor.workerCount; workerIndex++) {
+    activateBoosted(floor, workerIndex, now, BOOST_DURATION_MS);
+  }
+}
+
 function applyUnionBossCrit(floor: Floor): void {
   floor.hasManager = true;
 }
@@ -1031,6 +1042,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   goldStandard: () => applyGoldStandardCrit(),
   nightShift: (c) => applyNightShiftCrit(c.floors),
   intern: (c) => applyInternCrit(c.floor),
+  talentScout: (c) => applyTalentScoutCrit(c.floor),
   unionBoss: (c) => applyUnionBossCrit(c.floor),
   rushHour: (c) => applyRushHourCrit(c.floors),
   goldenTicket: (c) => applyGoldenTicketCrit(c.floor),

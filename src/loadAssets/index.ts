@@ -79,6 +79,7 @@ const IMAGE_FILES = {
   goldStandard: "goldStandard.png", // Gold Standard crit flash's own backdrop icon
   sleepyMoon: "sleepyMoon.png", // Night Shift crit flash's own backdrop icon
   intern: "intern.png", // Intern crit flash's own backdrop icon
+  talentScout: "talentScout.png", // Talent Scout crit flash's own backdrop icon
   unionBoss: "unionBoss.png", // Union Boss crit flash's own backdrop icon
   easterBunny: "easterBunny.png", // Easter Sale crit flash's own backdrop icon
   sportscar: "sportscar.png", // Rush Hour crit flash's own backdrop icon
