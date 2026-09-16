@@ -395,8 +395,62 @@ import {
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
+import {
+  FEATURED_CRIT_KINDS,
+  featuredCritFlags,
+  forceCritProc,
+  readCritProcs,
+  type CritProcKind,
+  type FeaturedCritKind,
+} from "../../shared/critTypes";
 
 const critTiers = new WeakMap<Floor, CritTier>();
+
+let testCritFloor: Floor | null = null;
+
+export function forceTestCrit(
+  floor: Floor,
+  kind: CritProcKind | null,
+  tier: CritTier,
+  bonusTier: CritTier | null,
+  event: "upgrade" | "unlock" | "map",
+): void {
+  if (testCritFloor) consumeCritUpgrade(testCritFloor);
+  testCritFloor = floor;
+  consumeCritUpgrade(floor);
+  forcedFloorBuyCrit = null;
+  const result: CritRollResult = {
+    ...readCritProcs(floor),
+    tier,
+    bonusTier: kind ? bonusTier : null,
+  };
+  if (kind) result[kind] = true;
+  if (event !== "upgrade") {
+    forcedFloorBuyCrit = result;
+    return;
+  }
+  critTiers.set(floor, tier);
+  if (kind) forceCritProc(kind, floor);
+  if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
+}
+
+export function forceFeaturedCritUpgrade(
+  floor: Floor,
+  kind: FeaturedCritKind,
+  tier: CritTier = "crit",
+): void {
+  consumeCritProcs(floor);
+  critTiers.set(floor, tier);
+  forceCritProc(kind, floor);
+}
+
+export function forceFeaturedFloorBuyCrit(
+  kind: FeaturedCritKind,
+  tier: CritTier = "crit",
+): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit[kind] = true;
+}
 
 // "Golden Ticket" crit's own reward (see floorInteractions.ts's
 // applyGoldenTicketCrit): a one-shot flag consumed by the very next
@@ -440,6 +494,9 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
   }
   rollCrit((result) => {
     critTiers.set(floor, result.tier);
+    for (const kind of FEATURED_CRIT_KINDS) {
+      if (result[kind]) forceCritProc(kind, floor);
+    }
     if (result.chain) forceChainCritProc(floor);
     if (result.dominoEffect) forceDominoEffectCritProc(floor);
     if (result.blueprint) forceBlueprintCritProc(floor);
@@ -614,6 +671,7 @@ export function forceFloorBuyCrit(
   rainCheck = false,
 ): void {
   forcedFloorBuyCrit = {
+    ...featuredCritFlags(),
     tier,
     bonusTier,
     chain,

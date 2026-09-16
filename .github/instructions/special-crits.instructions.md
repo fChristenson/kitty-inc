@@ -1,6 +1,6 @@
 ---
-description: How the crit-tier + piggyback-proc ("special crit") system works, and how to process/optimize a new crit's backdrop icon and register it in the Special Crits info menu
-applyTo: "src/shared/critTypes/**,src/floors/upgradeButton/**,src/floors/floorInteractions/**,src/screenShake/**,src/loadAssets/**,src/hud/corporationBoostMenu/**,scripts/process-*.mjs,src/config.ts"
+description: "Create special crits individually or in batches: reward balance, shared registration, icon processing, event-specific test controls, and batch reports in docs/critTypes.md"
+applyTo: "src/shared/critTypes/**,src/floors/upgradeButton/**,src/floors/floorInteractions/**,src/screenShake/**,src/loadAssets/**,src/hud/corporationBoostMenu/**,src/hud/testButton/**,scripts/process-*.mjs,scripts/lib/process-crit-icon.mjs,scripts/test-featured-crits.mjs,src/config.ts,docs/critTypes.md"
 ---
 
 # Special crits
@@ -38,8 +38,9 @@ first one or two:
 2. **Wire it into the actual game** — roll chance, reward application,
    celebration flash/icon, dev test button (see "Adding a brand new piggyback
    proc" below).
-3. **Add it to the "Special Crits" info menu** (`hud/corporationBoostMenu/
-index.ts`'s `CRIT_INFO` array) — an icon + label + a brief, one-line
+3. **Add it to the canonical `CRIT_PROC_INFO` metadata** (directly or through
+  the batch catalog described below). The Special Crits menu derives its
+  `CRIT_INFO` array from this registry. Supply an icon + label + a brief, one-line
    description (2 lines max, phrase-style like "Boosts every worker for
    free", not a full sentence) so players can look up what it does. A proc
    with no `CRIT_INFO` entry is invisible/undiscoverable to the player even
@@ -61,8 +62,9 @@ Roll order:
    means **none** of the procs get a chance to land, silently.
 3. On a gateway hit, roll every proc in `CRIT_PROC_KINDS` independently against
    its own `X_CRIT_CHANCE`.
-4. Cap whichever landed to at most `MAX_SPECIAL_CRIT_PROCS` (2) via `pickAtMost`
-   (Fisher-Yates shuffle + slice) — a lucky roll can never stack more than 2 procs.
+4. Cap whichever landed to `MAX_SPECIAL_CRIT_PROCS` via `pickAtMost`
+  (Fisher-Yates shuffle + slice). Read the current cap from code; never change
+  it or bypass it when adding a batch.
 
 Per-floor proc state (`chainCrits`/`boostCrits`/`bounceCrits`/`explosionCrits`/
 `bootyCrits`/`upgradeCrits`/`peppermintCrits`/`heavenlyCrits`, all
@@ -76,11 +78,21 @@ piggyback-proc state stays in one place instead of scattered across
 Each proc's actual reward is applied where the crit is _consumed_ (the click
 handler), not inside `rollCrit` itself:
 
+- Upgrade clicks and floor unlocks both call `applyFloorCrit(deps, floor,
+  result)`. It owns the base tier's free upgrades, one reroll, proc dispatch
+  through the exhaustive `CRIT_REWARDS` table, bonus tier, and celebration.
+  Keep purchase costs and unlocking outside this function. Never restore
+  separate click/unlock reward tables, substitute permanent promotions for
+  free upgrades on unlock, or suppress a proc only on the unlock path.
+- Map/building unlocks retain their own building-level effects in `main.ts`.
+  Do not remove map support while consolidating floor behavior, and do not
+  claim a floor-only proc works on the map without implementing its effect.
 - **Chain**: `applyChainCrit(deps, startIndex, applyToFloor)` — walks upward
   floor-by-floor from `startIndex + 1`, unconditional first step, then rolls
-  `CHAIN_CRIT_CONTINUE_CHANCE` per further step. Reused by Bounce (same walker,
-  started at `-1` so its first step lands on the ground floor) and building-unlock
+  `CHAIN_CRIT_CONTINUE_CHANCE` per further step. Also used for building-unlock
   chaining in `main.ts`.
+- **Bounce**: `applyBounceCrit` walks downward from the triggering floor,
+  with its own continuation chance; it does not start from the ground floor.
 - **Explosion**: `applyExplosionCrit` — reuses `applyChainCrit` for the upward
   half, adds its own simple downward walk (no unlock-handling needed downward,
   since floors below an unlocked one are always already unlocked).
@@ -96,65 +108,151 @@ handler), not inside `rollCrit` itself:
 - **Heavenly**: the biggest reward of all — unlocks every remaining floor in
   the building for free (`unlockAllFloors`), promotes EVERY floor to the
   strongest tier (`CRIT_TIER_ORDER[0]`), then grants each floor that tier's
-  own free-upgrade count via `applyUpgradeTick`, same as a real crit of that
-  tier landing on each floor individually.
+  own free-upgrade count via the cheap `increaseIncomeRate` loop, with effects
+  and rerolls once per floor, not once per simulated upgrade.
 
 ## Celebration + icon backdrop (`floorInteractions/critCelebration.ts`, `screenShake/index.ts`)
 
-`triggerCritCelebration(floor, tier, ..., chain, boost, bounce, explosion, booty,
-upgrade, peppermint, heavenly)` swaps the flash's label from the tier's plain
-`"x5"/"x25"/"x125"` to the proc's own label (`CHAIN_CRIT_LABEL` etc.) and calls
-`triggerScreenShake`.
+`triggerCritCelebration` accepts a proc-flags object, not a growing list of
+positional booleans. Generic proc celebrations use the label/color from
+`CRIT_PROC_INFO`. `screenShake/index.ts` derives `CRIT_ICON_BY_LABEL` from the
+same metadata and lazy-loads icons through `getCritIcon` when needed.
 
-`screenShake.ts`'s `drawCritFlash` draws each proc's backdrop icon behind the
-flash text, gated purely on `flashLabel === "<ProcLabel>"` (e.g. `"Chain"`,
-`"Boost"`, `"Bounce"`, `"Boom"`, `"Booty"`, `"Upgrade"`, `"Peppermint"`,
-`"Heavenly"`) — this string match is the one and only signal used, don't add
-a separate boolean option for it. Every icon is preloaded once at module-eval
-time via `loadImageByName("<name>")` into a `loadImageByName("<name>")` into a
-module-level `let xIcon: HTMLImageElement | null` (fire-and-forget; the draw just
-no-ops if still null) and sized with `fitIconSize(icon, measuredWidth * 0.85)`
-— **always match by bounding-box AREA** (`targetSize / sqrt(w*h)`), never by a
-single fixed dimension, or icons with different aspect ratios read as
-different sizes on screen. Only rotate an icon an extra fixed amount if it's a
-symmetric, non-directional shape (chain's infinity-link icon is rotated 45°) —
-never rotate a directional sprite (mouse) or an already-upright icon (arrow,
-chest, starburst).
+Do not add a new preload variable, per-label draw block, or duplicated menu
+entry for each crit. Register metadata once. Preserve area-based icon sizing
+(`targetSize / sqrt(w*h)`) and existing explicit rotation exceptions; do not
+rotate new upright/directional artwork by default.
 
 ## Adding a brand new piggyback proc
 
-1. `config.ts`: add its `xChance` (and `xContinueChance` if it's a "walk a tier
-   reward across floors" shape like chain/bounce/explosion) under `CONFIG.crit`.
-   **Pick that chance from the rarity bands below — never default a new proc to
-   whatever the last one used.**
-2. `shared/critTypes/index.ts`: add `X_CRIT_CHANCE`/`X_CRIT_COLOR`/`X_CRIT_LABEL`
-   exports, a `xCrits` WeakSet, `isXCrit`/`forceXCritProc`, add it to
-   `consumeCritProcs`, add its field to `CritRollResult`, and add its roll line
-   to `rollCrit`'s gateway block.
-3. `upgradeButton.ts`: re-export the new pieces, add `forceXCritUpgrade(floor,
-tier?)` dev helper, thread the flag through `rollCritUpgrade`/
-   `rollFloorBuyCrit`/`forceFloorBuyCrit` same as the existing ones — and add
-   its export to `floors/index.ts`'s facade re-export list (easy to miss; a
-   missing facade export won't show up in `get_errors`/tsserver, only a real
-   `npm run build` catches it).
-4. `floorInteractions/index.ts` (+ `critCelebration.ts`): apply the actual reward
-   at consumption time, add the `x` param to `triggerCritCelebration`.
-5. Process + register a backdrop icon (see below) and gate its draw in
-   `screenShake.ts` on the new label string.
-6. `hud/testButton`: add a "Spawn X Crit" dev button calling `forceXCritUpgrade`
-   (+ re-export the new wiring function through `hud/index.ts`'s facade).
-7. **`shared/critTypes/index.ts`'s `CRIT_PROC_INFO` table**: add `{ label:
-X_CRIT_LABEL, icon: "<name>", description: "<brief phrase>" }`. This is the
-   canonical icon/label/description table — `hud/corporationBoostMenu`'s
-   `CRIT_INFO` is derived from it, so this one entry is what makes the proc
-   show up (icon + name + expandable description) in the player-facing
-   "Special Crits" dialog. Keep the description short (2 lines max,
-   phrase-style — "Boosts every worker for free", not a full sentence); a proc
-   missing from this table is undiscoverable even though it still lands
-   in-game.
+Use the batch catalog pattern for new entries, even when adding just one.
+Legacy `X_CRIT_*` constants and per-proc force helpers remain for existing
+callers; do not multiply that boilerplate for a new batch.
+
+1. Add `<kind>Chance` and all reward counts/multipliers/durations to
+  `CONFIG.crit`. `getCritProcChance(kind)` expects the `<kind>Chance` naming
+  convention. Pick odds from the bands below and compare neighboring rewards.
+2. Add `{ label, color, icon, description }` to `FEATURED_CRIT_INFO` in
+  `src/shared/critTypes/featuredProcs.ts`, using an existing palette color
+  where appropriate. `FeaturedCritKind` and `FEATURED_CRIT_KINDS` derive from
+  this catalog. The existing integration merges it into `CritRollResult`,
+  `CRIT_PROC_KINDS`, `CRIT_PROC_INFO`, `CRIT_PROC_SETS`, roll results, and
+  upgrade arming. Check those connections; do not create a parallel registry.
+3. Implement the effect in `createFeaturedCritRewards` in
+  `src/floors/floorInteractions/featuredCritRewards.ts`, reusing the injected
+  upgrade/payout/rate helpers. This table feeds `CRIT_REWARDS`, consumed by
+  the same `applyFloorCrit` for upgrade clicks and floor unlocks. Extend the
+  helper interface only for a genuinely new operation, not one callback per
+  crit. Use cheap numerical loops for bulk upgrades, not repeated particles
+  or crit rerolls inside those loops.
+4. Process the icon and register its shipped PNG in `loadAssets/IMAGE_FILES`.
+  Metadata supplies the generic flash, collection menu, and test button.
+5. Preserve one test button per proc plus Regular Crit in
+  `hud/testButton/critTestActions.ts`, using the existing `forceTestCrit` and
+  shared Event/Tier/Bonus tier controls. Never reintroduce separate Spawn,
+  Floor, Map, Mega, or Ultra buttons for every proc.
+6. Map testing must show only procs with actual map rewards. If adding map
+  support, implement and verify the building-level effect, then update
+  `MAP_CRIT_TEST_KINDS`. Text search must respect this event filter; switching
+  events must restore eligible buttons. Keep the map bonus-tier selector
+  disabled until map bonus-tier rewards actually exist.
+7. Extend the existing regression script and write the batch report below.
 
 Never let `MAX_SPECIAL_CRIT_PROCS`'s cap-then-random-pick logic be bypassed for
 a new proc — it must go through the same `landed` array + `pickAtMost` path.
+
+## Processing a batch
+
+Use `docs/critTypes.md`'s implemented batch as the report example and the
+files above as the implementation example. Read their current contents;
+names, balance, and the batch size can change after a rename or removal.
+
+1. Inventory the supplied raw assets against the current registry and
+   processing scripts. Do not assume every unprocessed image is new crit
+   art, or add a second crit for an already-registered image. Account for
+   every requested asset, including any explicitly excluded ones.
+2. Compare proposed rewards against `CRIT_PROC_INFO`, their actual handlers,
+   and the documentation. Assign unique names and distinct reward values or
+   targets. A brainstorm entry is not proof of current game behavior.
+3. Sample actual background pixels and make a labeled/ordered contact sheet
+   of the raw batch. Group only images that genuinely suit the same removal
+   technique. Use dedicated `process-<image>.mjs` wrappers around
+   `scripts/lib/process-crit-icon.mjs` for compatible near-white-background
+   artwork. Keep each wrapper reproducible; do not copy the entire processor
+   into every file. Use a tailored processor for incompatible art rather than
+   changing shared thresholds blindly and damaging other icons.
+4. Run the wrappers. The shared processor removes border-connected background,
+   drops tiny components, tight-crops, caps at 250x250, writes a quantized PNG,
+   and automatically copies it to `themes/references/dist`. Preserve raw
+   sources unless removal was explicitly requested.
+5. Inspect every processed icon on a contrasting background, not just white.
+   Verify enclosed light details, disconnected real pieces, outlines, feet,
+   and crop bounds. Assert dimensions, alpha, indexed palette, and identical
+   root/shipped copies. Record any image-specific treatment or limitation.
+6. Integrate and validate in small slices. Complete metadata, actual rewards,
+   shipped icons, and generated test controls for every entry before calling
+   the batch done. Do not change unrelated existing crit balance.
+
+## Batch report format
+
+Maintain a section near the top of `docs/critTypes.md`, before brainstorm
+ideas, titled `Implemented asset batch` (add a date/name when distinguishing
+multiple batches). Reuse this document instead of scattering one report per
+crit. Update existing rows after renames, reward changes, or removals.
+
+Start with a short scope paragraph: which events are supported, whether
+rewards are immediate, and whether existing crit balance changed. Explain
+that proc chances are conditional on a tier and the special gateway landing,
+before the shared cap; they are not per-click odds.
+
+Use these exact table columns, one row per implemented crit:
+
+| Image | Crit | Immediate reward | Proc chance | Comparison |
+| --- | --- | --- | --- | --- |
+| dinnerTime | Dinner Time | 5 payouts on every unlocked floor | 4% | Above Fast Forward's 4 payouts at 5% |
+
+- **Image**: asset basename; distinguish it from the display name.
+- **Crit**: exact current canonical label, including later renames.
+- **Immediate reward**: concrete count/multiplier, target, and timing; distinguish
+  an income cycle from seconds of income or a percentage of banked cash.
+- **Proc chance**: current configured probability displayed as a percentage.
+- **Comparison**: name the closest existing crit and state the useful difference
+  in amount, target, or scope, with odds where relevant. Verify against code.
+
+After the table, state scope and edge cases: current building vs company,
+locked-floor exclusions, timer preservation/resets, maximum-tier behavior,
+single-floor behavior, repeated-target stacking, and exact milestone boundaries.
+Separate map-specific behavior explicitly; do not imply every crit is map-capable.
+
+Finish with processing and verification notes: regeneration command, output
+locations and optimization checks, test controls, commands run and their
+results, browser checks performed, and any unverified requirements. The final
+chat response should summarize the batch and link to this report rather than
+repeat the whole table.
+
+## Batch verification
+
+- Extend `scripts/test-featured-crits.mjs`; run
+  `node scripts/test-featured-crits.mjs` and `npm run build`. Reuse its Vite
+  `ssrLoadModule` harness rather than adding a new test dependency per batch.
+  Keep expected batch counts and reward assertions current.
+- Cover concrete reward amounts/targets, single-floor cases, tier caps,
+  milestone boundaries, unchanged timers where promised, proc arming/consuming,
+  tier/gateway misses, the shared cap, rarity ordering, and asset properties.
+- Control random sequences for deterministic roll tests. Mutating `CONFIG`
+  after module loading does not update legacy cached chance constants.
+- `BigNumber.subtract` clamps negative results to zero. For signed test deltas
+  on deliberately small balances, compare `toNumber(after) - toNumber(before)`;
+  do not convert real late-game huge balances this way.
+- In a disposable browser session or isolated fixtures, exercise both real
+  upgrade-click and floor-unlock handlers with matching starting state and
+  randomness. Include walker continuation, not only the first-step/failure
+  case. Verify identical rewards apart from the purchase/unlock itself.
+- Verify one generated button per proc, event and text filters together,
+  supported map choices, selected tiers, and clearing stale forced selections.
+  Check icon loads, menu/celebration rendering, and desktop/mobile text fit.
+  State explicitly when browser behavior was not verified; a build alone does
+  not prove that an asset or reward is reachable in-game.
 
 ## Crit suggestion quality rules
 
@@ -259,10 +357,10 @@ the icon should keep a shadow, use `scripts/lib/synthetic-drop-shadow.mjs`'s
 icon — it blurs the icon's own alpha silhouette, offsets it down-right, tints
 it black/translucent, and composites it underneath on a padded canvas.
 
-**4. Tight-crop to the bounding box.** Use a real-run-of-opaque-pixels scan
-(`MIN_OPAQUE_RUN`, e.g. 20px), not "first pixel above the alpha cutoff" — a
-single stray noise pixel otherwise silently inflates the crop box (this exact
-bug previously inflated a whole sprite sheet's cell height, see repo memory).
+**4. Tight-crop to the bounding box.** Remove stray components before scanning
+alpha bounds. A real-run-of-opaque-pixels guard can help when noise remains,
+but do not blindly require a wide run after component cleanup: it can cut off
+legitimate tapered feet, tails, or tips. Verify the resulting silhouette.
 
 **5. Size-optimize before writing the final PNG** — every special-crit icon is
 only ever drawn as a small flash-text backdrop, never full-screen, so:
@@ -278,13 +376,12 @@ only ever drawn as a small flash-text backdrop, never full-screen, so:
   `compressionLevel: 9` alone is nowhere near enough for full-color/AI-rendered
   source art (as opposed to a simple flat vector-style icon).
 
-**6. Register and double-copy.** Add `<name>: "<name>.png"` to `loadAssets/
-index.ts`'s `IMAGE_FILES` (with a one-line comment saying which crit flash it
-backs), then manually copy the output into `src/assets/themes/references/dist/
-<name>.png` too — `getImageUrl` reads from that `dist/` copy, NOT from
-`src/assets/<name>.png` directly, and nothing auto-copies between the two.
-Re-copy by hand any time the script is re-run.
+**6. Register and verify both copies.** Add `<name>: "<name>.png"` to
+`loadAssets/index.ts`'s `IMAGE_FILES`. `getImageUrl` reads from
+`src/assets/themes/references/dist/<name>.png`, not the root asset copy.
+The batch helper copies automatically; older standalone processors may still
+require a manual copy after each run. Always verify the two outputs match.
 
-**7. Wire the draw call.** In `screenShake.ts`: preload via `loadImageByName`
-into a new module-level icon variable, add a `flashLabel === "<Label>" &&
-xIcon` block using `fitIconSize`, matching the pattern of the existing 8 icons.
+**7. Register metadata, not another draw call.** The canonical proc entry's
+`icon` and `label` feed `screenShake`'s lazy icon lookup and the Special Crits
+menu automatically. Verify the rendered result; do not duplicate the renderer.

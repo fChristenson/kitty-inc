@@ -17,6 +17,18 @@ import type { BigNumber } from "../../shared/bigNumber";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { recordCritProcLanded } from "./critProcCounts";
+import {
+  FEATURED_CRIT_INFO,
+  FEATURED_CRIT_KINDS,
+  featuredCritFlags,
+  type FeaturedCritKind,
+} from "./featuredProcs";
+
+export {
+  FEATURED_CRIT_KINDS,
+  featuredCritFlags,
+  type FeaturedCritKind,
+} from "./featuredProcs";
 
 export { getCritProcCount, recordCritProcLanded } from "./critProcCounts";
 
@@ -907,7 +919,7 @@ export function pickAtMost<T>(items: T[], max: number): T[] {
 // one shape both rollCritUpgrade (per-click, upgradeButton.ts) and
 // rollFloorBuyCrit (one-shot floor/building purchase, also upgradeButton.ts)
 // now get back from the exact same shared roll
-export interface CritRollResult {
+export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   tier: CritTier;
   // "special crit crit": set only when at least one piggyback proc below also
   // landed (see rollCrit) — an independent bonus x5/x25/x125 tier on top of
@@ -1101,6 +1113,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "recruitmentDrive",
   "merger",
   "shareholders",
+  ...FEATURED_CRIT_KINDS,
 ];
 
 // the one kind -> "is this proc armed on this floor" registry. Every per-proc
@@ -1108,6 +1121,9 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
 // generically (consumeCritProcs, readCritProcs, forceCritProc) walks
 // CRIT_PROC_KINDS instead of hand-listing all 59 of them again
 const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
+  ...(Object.fromEntries(
+    FEATURED_CRIT_KINDS.map((kind) => [kind, new WeakSet<Floor>()]),
+  ) as Record<FeaturedCritKind, WeakSet<Floor>>),
   chain: chainCrits,
   dominoEffect: dominoEffectCrits,
   blueprint: blueprintCrits,
@@ -1303,6 +1319,7 @@ export function getCritProcIncomeModifierPercent(
 }
 
 export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
+  ...FEATURED_CRIT_INFO,
   chain: {
     label: CHAIN_CRIT_LABEL,
 
@@ -2028,6 +2045,9 @@ export function rollCrit(
       landed.push("recruitmentDrive");
     if (Math.random() < MERGER_CRIT_CHANCE) landed.push("merger");
     if (Math.random() < SHAREHOLDERS_CRIT_CHANCE) landed.push("shareholders");
+    for (const kind of FEATURED_CRIT_KINDS) {
+      if (Math.random() < getCritProcChance(kind)) landed.push(kind);
+    }
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -2043,6 +2063,7 @@ export function rollCrit(
   // critCelebration.ts for the stacked celebration this triggers
   const bonusTier = kept.size > 0 ? rollTier() : null;
   onLanded({
+    ...featuredCritFlags(kept),
     tier,
     bonusTier,
     chain: kept.has("chain"),

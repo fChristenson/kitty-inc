@@ -1,5 +1,43 @@
 # Crit ideas
 
+## Implemented asset batch
+
+These rewards apply instantly on upgrade-click and floor-unlock crits. Odds
+below are per-proc rolls after a tier and the special gateway have landed,
+before the shared proc cap, not odds per click. Existing crits are unchanged.
+Payouts use each target floor's current income cycle without resetting timers;
+upgrades follow normal level, income, cost, and interval progression for free.
+
+| Image        | Crit          | Immediate reward                                        | Proc chance | Comparison                                                 |
+| ------------ | ------------- | ------------------------------------------------------- | ----------- | ---------------------------------------------------------- |
+| ballerina    | Pirouette     | 3 upgrades, then 3 payouts on this floor                | 6%          | Small upgrade/payout combination                           |
+| cowboy       | Roundup Rodeo | 8 upgrades on the lowest-level unlocked floor           | 3.5%        | Safety Net targets highest cost instead                    |
+| dinnerTime   | Dinner Time   | 5 payouts on every unlocked floor                       | 4%          | Above Fast Forward's 4 payouts at 5%                       |
+| fingerGuns   | Finger Guns   | 2 upgrades here and 2 on the highest unlocked floor     | 7%          | Both batches stack if this is the highest floor            |
+| flamenco     | Flamenco      | 7 upgrades on every unlocked floor                      | 3.5%        | Between Casual Friday's 5 and Fancy Friday's 10            |
+| milestone    | Milestone     | Raise this floor to the next multiple of 25 upgrades    | 2.5%        | Round Up targets multiples of 10 building-wide             |
+| moonwalker   | Moonwalk      | 6 upgrades on this floor and every unlocked floor below | 4%          | Fixed downward batch, unlike Bounce's random walk          |
+| ninja        | Ninja Bonus   | 12 upgrades on this floor                               | 2.5%        | Above Keynote's 10 at 3%                                   |
+| obelisk      | Obelisk       | Promote this floor twice, then grant 2 upgrades         | 0.8%        | Upgrade's two-step sibling; upgrades still pay at max tier |
+| sharpShooter | Sharpshooter  | 10 payouts from the highest-income-rate unlocked floor  | 4%          | Overflow pays 5 on the triggering floor                    |
+| space        | Space Race    | 20 upgrades on the highest unlocked floor               | 2%          | Larger, top-floor-targeted upgrade batch                   |
+| yesChef      | Yes Chef      | 8 payouts on every unlocked floor                       | 2.5%        | Above Dinner Time's 5 payouts at 4%                        |
+
+All floor targets are within the current building. Tier promotions cap at
+ultra and never remove progress. Milestone grants a full 25 upgrades when
+already on a multiple of 25. Each entry has one shared dev control and
+appears in the Special Crits collection with its own optimized icon.
+
+Upgrade clicks and floor unlocks use the same `applyFloorCrit` reward and
+celebration path, including the base tier's free upgrades. Floor unlocks no
+longer substitute permanent promotions or suppress Merger. Dev actions have
+one registry-generated button per special crit, plus Regular Crit; select
+the event, tier, and optional special bonus tier using the shared controls.
+
+Verification: `node scripts/test-featured-crits.mjs`, then `npm run build`.
+Regenerate an icon with `node scripts/process-<image>.mjs`; each script also
+copies its output into the shipped asset directory.
+
 ## Reviewed
 
 - Petty Cash — pays out one second of every OTHER corporation's income rate

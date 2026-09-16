@@ -333,6 +333,9 @@ export type { ChainCritDeps } from "./floorInteractions";
 export {
   forceKeynoteCritUpgrade,
   forceKeynoteFloorBuyCrit,
+  forceFeaturedCritUpgrade,
+  forceFeaturedFloorBuyCrit,
+  forceTestCrit,
   forceSkipCritUpgrade,
   forceSkipFloorBuyCrit,
   forceRainCheckFloorBuyCrit,

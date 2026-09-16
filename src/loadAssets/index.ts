@@ -134,6 +134,18 @@ const IMAGE_FILES = {
   shareholders: "sharedholders.png", // Shareholders crit flash's own backdrop icon
   luckyNumber: "luckyNumber.png", // Lucky Number crit flash's own backdrop icon
   openBook: "openBook.png", // Open Book crit flash's own backdrop icon
+  ballerina: "ballerina.png",
+  cowboy: "cowboy.png",
+  dinnerTime: "dinnerTime.png",
+  fingerGuns: "fingerGuns.png",
+  flamenco: "flamenco.png",
+  milestone: "milestone.png",
+  moonwalker: "moonwalker.png",
+  ninja: "ninja.png",
+  obelisk: "obelisk.png",
+  sharpShooter: "sharpShooter.png",
+  space: "space.png",
+  yesChef: "yesChef.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 
