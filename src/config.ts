@@ -234,6 +234,9 @@ export const CONFIG = {
     // "Fully Staffed" crit — fills every unlocked floor to its worker cap and
     // grants every manager-eligible unlocked floor a manager for free
     fullyStaffedChance: 0.02,
+    // "Shift Change" crit — fills the critted floor and the immediately lower
+    // unlocked floor to the rendered worker cap
+    shiftChangeChance: 0.08,
     // "Espresso Shot" crit — boosts every unlocked floor's workers for the
     // regular boost duration, with the same canonical worker-speed behavior
     espressoShotChance: 0.08,
@@ -255,6 +258,15 @@ export const CONFIG = {
     // "Round Up" crit — tops every unlocked floor's upgradeCount up to the
     // next multiple of 10, for free
     roundUpChance: 0.04,
+    // "Safety Net" crit — gives 5 free upgrades to the most expensive
+    // unlocked floor in the building
+    safetyNetChance: 0.04,
+    // "Floor Share" crit - gives the critted floor one temporary upgrade
+    // reward scaled by its own level plus every unlocked floor below it
+    floorShareChance: 0.04,
+    // "Same Boat" crit - gives the critted floor twice the Floor Share
+    // temporary reward
+    sameBoatChance: 0.02,
     // "Golden Handshake" crit — hands every unlocked floor a free manager at
     // once (Union Boss's building-wide sibling)
     goldenHandshakeChance: 0.03,

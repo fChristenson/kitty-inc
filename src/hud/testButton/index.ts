@@ -78,6 +78,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-silver-ticket-crit" class="game__button">Spawn Silver Ticket Crit</button>
           <button id="spawn-grand-opening-crit" class="game__button">Spawn Grand Opening Crit</button>
           <button id="spawn-fully-staffed-crit" class="game__button">Spawn Fully Staffed Crit</button>
+          <button id="spawn-shift-change-crit" class="game__button">Spawn Shift Change Crit</button>
           <button id="spawn-espresso-shot-crit" class="game__button">Spawn Espresso Shot Crit</button>
           <button id="spawn-deja-vu-crit" class="game__button">Spawn Deja Vu Crit</button>
           <button id="spawn-clone-army-crit" class="game__button">Spawn Reinforcements Crit</button>
@@ -85,6 +86,9 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-second-wind-crit" class="game__button">Spawn Second Wind Crit</button>
           <button id="spawn-executive-order-crit" class="game__button">Spawn Executive Order Crit</button>
           <button id="spawn-round-up-crit" class="game__button">Spawn Round Up Crit</button>
+          <button id="spawn-safety-net-crit" class="game__button">Spawn Safety Net Crit</button>
+          <button id="spawn-floor-share-crit" class="game__button">Spawn Floor Share Crit</button>
+          <button id="spawn-same-boat-crit" class="game__button">Spawn Same Boat Crit</button>
           <button id="spawn-golden-handshake-crit" class="game__button">Spawn Golden Handshake Crit</button>
           <button id="spawn-supply-run-crit" class="game__button">Spawn Supply Run Crit</button>
           <button id="spawn-casual-friday-crit" class="game__button">Spawn Casual Friday Crit</button>
@@ -721,6 +725,16 @@ export function wireSpawnFullyStaffedCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnShiftChangeCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-shift-change-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireSpawnEspressoShotCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -787,6 +801,36 @@ export function wireSpawnRoundUpCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-round-up-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnSafetyNetCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-safety-net-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnFloorShareCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-floor-share-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnSameBoatCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-same-boat-crit",
   )!;
   button.addEventListener("click", onClick);
 }

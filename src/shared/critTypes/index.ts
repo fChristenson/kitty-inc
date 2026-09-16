@@ -480,6 +480,12 @@ export const FULLY_STAFFED_CRIT_CHANCE = CONFIG.crit.fullyStaffedChance;
 export const FULLY_STAFFED_CRIT_COLOR = COLOR.fullyStaffedGreen;
 export const FULLY_STAFFED_CRIT_LABEL = "Fully Staffed";
 
+// "Shift Change" crit — fills the critted floor and the immediately lower
+// unlocked floor to their rendered worker cap
+export const SHIFT_CHANGE_CRIT_CHANCE = CONFIG.crit.shiftChangeChance;
+export const SHIFT_CHANGE_CRIT_COLOR = COLOR.teamBuildingCoral;
+export const SHIFT_CHANGE_CRIT_LABEL = "Shift Change";
+
 // "Espresso Shot" crit — boosts every unlocked floor's workers using the
 // canonical worker-boost behavior for the regular 15-second duration
 export const ESPRESSO_SHOT_CRIT_CHANCE = CONFIG.crit.espressoShotChance;
@@ -524,6 +530,24 @@ export const ROUND_UP_CRIT_CHANCE = CONFIG.crit.roundUpChance;
 export const ROUND_UP_CRIT_COLOR = COLOR.roundUpOrange;
 export const ROUND_UP_CRIT_LABEL = "Round Up";
 export const ROUND_UP_CRIT_STEP = 10;
+
+// "Safety Net" crit — gives five normal free upgrades to the most expensive
+// unlocked floor in the current building
+export const SAFETY_NET_CRIT_CHANCE = CONFIG.crit.safetyNetChance;
+export const SAFETY_NET_CRIT_COLOR = COLOR.safetyNetOrange;
+export const SAFETY_NET_CRIT_LABEL = "Safety Net";
+export const SAFETY_NET_CRIT_UPGRADES = 5;
+
+// "Floor Share" crit - gives the critted floor one temporary upgrade reward
+// scaled by its own level plus every unlocked floor below it
+export const FLOOR_SHARE_CRIT_CHANCE = CONFIG.crit.floorShareChance;
+export const FLOOR_SHARE_CRIT_COLOR = COLOR.floorShareBlue;
+export const FLOOR_SHARE_CRIT_LABEL = "Floor Share";
+
+// "Same Boat" crit — Floor Share's temporary reward at twice the level
+export const SAME_BOAT_CRIT_CHANCE = CONFIG.crit.sameBoatChance;
+export const SAME_BOAT_CRIT_COLOR = COLOR.sameBoatCoral;
+export const SAME_BOAT_CRIT_LABEL = "Same Boat";
 
 // "Golden Handshake" crit — Union Boss's building-wide sibling: a free
 // manager on every unlocked floor at once
@@ -720,6 +744,7 @@ const goldenParachuteCrits = new WeakSet<Floor>();
 const payoutCrits = new WeakSet<Floor>();
 const grandOpeningCrits = new WeakSet<Floor>();
 const fullyStaffedCrits = new WeakSet<Floor>();
+const shiftChangeCrits = new WeakSet<Floor>();
 const espressoShotCrits = new WeakSet<Floor>();
 const dejaVuCrits = new WeakSet<Floor>();
 const cloneArmyCrits = new WeakSet<Floor>();
@@ -727,6 +752,9 @@ const luckyCloverCrits = new WeakSet<Floor>();
 const secondWindCrits = new WeakSet<Floor>();
 const executiveOrderCrits = new WeakSet<Floor>();
 const roundUpCrits = new WeakSet<Floor>();
+const safetyNetCrits = new WeakSet<Floor>();
+const floorShareCrits = new WeakSet<Floor>();
+const sameBoatCrits = new WeakSet<Floor>();
 const goldenHandshakeCrits = new WeakSet<Floor>();
 const supplyRunCrits = new WeakSet<Floor>();
 const casualFridayCrits = new WeakSet<Floor>();
@@ -830,6 +858,7 @@ export interface CritRollResult {
   payout: boolean;
   grandOpening: boolean;
   fullyStaffed: boolean;
+  shiftChange: boolean;
   espressoShot: boolean;
   dejaVu: boolean;
   cloneArmy: boolean;
@@ -837,6 +866,9 @@ export interface CritRollResult {
   secondWind: boolean;
   executiveOrder: boolean;
   roundUp: boolean;
+  safetyNet: boolean;
+  floorShare: boolean;
+  sameBoat: boolean;
   goldenHandshake: boolean;
   supplyRun: boolean;
   casualFriday: boolean;
@@ -911,6 +943,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "payout",
   "grandOpening",
   "fullyStaffed",
+  "shiftChange",
   "espressoShot",
   "dejaVu",
   "cloneArmy",
@@ -918,6 +951,9 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "secondWind",
   "executiveOrder",
   "roundUp",
+  "safetyNet",
+  "floorShare",
+  "sameBoat",
   "goldenHandshake",
   "supplyRun",
   "casualFriday",
@@ -988,6 +1024,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   payout: payoutCrits,
   grandOpening: grandOpeningCrits,
   fullyStaffed: fullyStaffedCrits,
+  shiftChange: shiftChangeCrits,
   espressoShot: espressoShotCrits,
   dejaVu: dejaVuCrits,
   cloneArmy: cloneArmyCrits,
@@ -995,6 +1032,9 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   secondWind: secondWindCrits,
   executiveOrder: executiveOrderCrits,
   roundUp: roundUpCrits,
+  safetyNet: safetyNetCrits,
+  floorShare: floorShareCrits,
+  sameBoat: sameBoatCrits,
   goldenHandshake: goldenHandshakeCrits,
   supplyRun: supplyRunCrits,
   casualFriday: casualFridayCrits,
@@ -1164,6 +1204,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     color: HEAVENLY_CRIT_COLOR,
     icon: "heaven",
     description: "Unlocks, maxes, and upgrades every floor",
+  },
+  shiftChange: {
+    label: SHIFT_CHANGE_CRIT_LABEL,
+    color: SHIFT_CHANGE_CRIT_COLOR,
+    icon: "shiftChange",
+    description: "Fills this floor and the one below",
   },
   pair: {
     label: PAIR_CRIT_LABEL,
@@ -1463,6 +1509,24 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "roundUp",
     description: "Tops every floor up to the next 10 upgrades",
   },
+  safetyNet: {
+    label: SAFETY_NET_CRIT_LABEL,
+    color: SAFETY_NET_CRIT_COLOR,
+    icon: "safetyNet",
+    description: "Adds 5 upgrades to the priciest floor",
+  },
+  floorShare: {
+    label: FLOOR_SHARE_CRIT_LABEL,
+    color: FLOOR_SHARE_CRIT_COLOR,
+    icon: "floorShare",
+    description: "Shares lower floors' levels for one reward",
+  },
+  sameBoat: {
+    label: SAME_BOAT_CRIT_LABEL,
+    color: SAME_BOAT_CRIT_COLOR,
+    icon: "sameBoat",
+    description: "Doubles the shared lower-floor level for one reward",
+  },
   goldenHandshake: {
     label: GOLDEN_HANDSHAKE_CRIT_LABEL,
 
@@ -1668,6 +1732,7 @@ export function rollCrit(
     if (Math.random() < SILVER_TICKET_CRIT_CHANCE) landed.push("silverTicket");
     if (Math.random() < GRAND_OPENING_CRIT_CHANCE) landed.push("grandOpening");
     if (Math.random() < FULLY_STAFFED_CRIT_CHANCE) landed.push("fullyStaffed");
+    if (Math.random() < SHIFT_CHANGE_CRIT_CHANCE) landed.push("shiftChange");
     if (Math.random() < ESPRESSO_SHOT_CRIT_CHANCE) landed.push("espressoShot");
     if (Math.random() < DEJA_VU_CRIT_CHANCE) landed.push("dejaVu");
     if (Math.random() < CLONE_ARMY_CRIT_CHANCE) landed.push("cloneArmy");
@@ -1679,6 +1744,9 @@ export function rollCrit(
     if (Math.random() < EXECUTIVE_ORDER_CRIT_CHANCE)
       landed.push("executiveOrder");
     if (Math.random() < ROUND_UP_CRIT_CHANCE) landed.push("roundUp");
+    if (Math.random() < SAFETY_NET_CRIT_CHANCE) landed.push("safetyNet");
+    if (Math.random() < FLOOR_SHARE_CRIT_CHANCE) landed.push("floorShare");
+    if (Math.random() < SAME_BOAT_CRIT_CHANCE) landed.push("sameBoat");
     if (Math.random() < GOLDEN_HANDSHAKE_CRIT_CHANCE)
       landed.push("goldenHandshake");
     if (Math.random() < SUPPLY_RUN_CRIT_CHANCE) landed.push("supplyRun");
@@ -1763,6 +1831,7 @@ export function rollCrit(
     payout: kept.has("payout"),
     grandOpening: kept.has("grandOpening"),
     fullyStaffed: kept.has("fullyStaffed"),
+    shiftChange: kept.has("shiftChange"),
     espressoShot: kept.has("espressoShot"),
     dejaVu: kept.has("dejaVu"),
     cloneArmy: kept.has("cloneArmy"),
@@ -1770,6 +1839,9 @@ export function rollCrit(
     secondWind: kept.has("secondWind"),
     executiveOrder: kept.has("executiveOrder"),
     roundUp: kept.has("roundUp"),
+    safetyNet: kept.has("safetyNet"),
+    floorShare: kept.has("floorShare"),
+    sameBoat: kept.has("sameBoat"),
     goldenHandshake: kept.has("goldenHandshake"),
     supplyRun: kept.has("supplyRun"),
     casualFriday: kept.has("casualFriday"),
@@ -1973,6 +2045,10 @@ export function isFullyStaffedCrit(floor: Floor): boolean {
   return fullyStaffedCrits.has(floor);
 }
 
+export function isShiftChangeCrit(floor: Floor): boolean {
+  return shiftChangeCrits.has(floor);
+}
+
 export function isEspressoShotCrit(floor: Floor): boolean {
   return espressoShotCrits.has(floor);
 }
@@ -1999,6 +2075,18 @@ export function isExecutiveOrderCrit(floor: Floor): boolean {
 
 export function isRoundUpCrit(floor: Floor): boolean {
   return roundUpCrits.has(floor);
+}
+
+export function isSafetyNetCrit(floor: Floor): boolean {
+  return safetyNetCrits.has(floor);
+}
+
+export function isFloorShareCrit(floor: Floor): boolean {
+  return floorShareCrits.has(floor);
+}
+
+export function isSameBoatCrit(floor: Floor): boolean {
+  return sameBoatCrits.has(floor);
 }
 
 export function isGoldenHandshakeCrit(floor: Floor): boolean {
@@ -2272,6 +2360,10 @@ export function forceFullyStaffedCritProc(floor: Floor): void {
   fullyStaffedCrits.add(floor);
 }
 
+export function forceShiftChangeCritProc(floor: Floor): void {
+  shiftChangeCrits.add(floor);
+}
+
 export function forceEspressoShotCritProc(floor: Floor): void {
   espressoShotCrits.add(floor);
 }
@@ -2298,6 +2390,18 @@ export function forceExecutiveOrderCritProc(floor: Floor): void {
 
 export function forceRoundUpCritProc(floor: Floor): void {
   roundUpCrits.add(floor);
+}
+
+export function forceSafetyNetCritProc(floor: Floor): void {
+  safetyNetCrits.add(floor);
+}
+
+export function forceFloorShareCritProc(floor: Floor): void {
+  floorShareCrits.add(floor);
+}
+
+export function forceSameBoatCritProc(floor: Floor): void {
+  sameBoatCrits.add(floor);
 }
 
 export function forceGoldenHandshakeCritProc(floor: Floor): void {

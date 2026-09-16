@@ -69,6 +69,7 @@ import {
   forcePayoutCritUpgrade,
   forceGrandOpeningCritUpgrade,
   forceFullyStaffedCritUpgrade,
+  forceShiftChangeCritUpgrade,
   forceEspressoShotCritUpgrade,
   forceDejaVuCritUpgrade,
   forceCloneArmyCritUpgrade,
@@ -76,6 +77,9 @@ import {
   forceSecondWindCritUpgrade,
   forceExecutiveOrderCritUpgrade,
   forceRoundUpCritUpgrade,
+  forceSafetyNetCritUpgrade,
+  forceFloorShareCritUpgrade,
+  forceSameBoatCritUpgrade,
   forceGoldenHandshakeCritUpgrade,
   forceSupplyRunCritUpgrade,
   forceCasualFridayCritUpgrade,
@@ -208,6 +212,7 @@ import {
   wireSpawnSilverTicketCritButton,
   wireSpawnGrandOpeningCritButton,
   wireSpawnFullyStaffedCritButton,
+  wireSpawnShiftChangeCritButton,
   wireSpawnEspressoShotCritButton,
   wireSpawnDejaVuCritButton,
   wireSpawnCloneArmyCritButton,
@@ -215,6 +220,9 @@ import {
   wireSpawnSecondWindCritButton,
   wireSpawnExecutiveOrderCritButton,
   wireSpawnRoundUpCritButton,
+  wireSpawnSafetyNetCritButton,
+  wireSpawnFloorShareCritButton,
+  wireSpawnSameBoatCritButton,
   wireSpawnGoldenHandshakeCritButton,
   wireSpawnSupplyRunCritButton,
   wireSpawnCasualFridayCritButton,
@@ -824,6 +832,10 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceFullyStaffedCritUpgrade(floor);
     });
+    wireSpawnShiftChangeCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceShiftChangeCritUpgrade(floor);
+    });
     wireSpawnEspressoShotCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceEspressoShotCritUpgrade(floor);
@@ -851,6 +863,18 @@ async function main() {
     wireSpawnRoundUpCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceRoundUpCritUpgrade(floor);
+    });
+    wireSpawnSafetyNetCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceSafetyNetCritUpgrade(floor);
+    });
+    wireSpawnFloorShareCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceFloorShareCritUpgrade(floor);
+    });
+    wireSpawnSameBoatCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceSameBoatCritUpgrade(floor);
     });
     wireSpawnGoldenHandshakeCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];

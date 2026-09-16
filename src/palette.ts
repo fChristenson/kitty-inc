@@ -152,6 +152,12 @@ export const COLOR = {
   executiveOrderTeal: "#0F766E",
   // Round Up crit's own dedicated color
   roundUpOrange: "#EA580C",
+  // Safety Net crit's own dedicated color
+  safetyNetOrange: "#F97316",
+  // Floor Share crit's own dedicated color
+  floorShareBlue: "#2563EB",
+  // Same Boat crit's own dedicated color
+  sameBoatCoral: "#E76F51",
   // Golden Handshake crit's own dedicated color
   goldenHandshakeGold: "#CA8A04",
   // Supply Run crit's own dedicated color

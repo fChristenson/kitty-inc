@@ -91,6 +91,7 @@ const IMAGE_FILES = {
   payout: "payout.png", // Payout crit flash's own backdrop icon
   grandOpening: "grandOpening.png", // Grand Opening crit flash's own backdrop icon
   fullyStaffed: "fullyStaffed.png", // Fully Staffed crit flash's own backdrop icon
+  shiftChange: "shiftChange.png", // Shift Change crit flash's own backdrop icon
   espressoShot: "espressoShot.png", // Espresso Shot crit flash's own backdrop icon
   dejaVu: "dejaVu.png", // Deja Vu crit flash's own backdrop icon
   cloneArmy: "cloneArmy.png", // Reinforcements crit flash's own backdrop icon
@@ -98,6 +99,9 @@ const IMAGE_FILES = {
   secondWind: "secondWind.png", // Second Wind crit flash's own backdrop icon
   executiveOrder: "executiveOrder.png", // Executive Order crit flash's own backdrop icon
   roundUp: "roundUp.png", // Round Up crit flash's own backdrop icon
+  safetyNet: "safetyNet.png", // Safety Net crit flash's own backdrop icon
+  floorShare: "floorShare.png", // Floor Share crit flash's own backdrop icon
+  sameBoat: "sameBoat.png", // Same Boat crit flash's own backdrop icon
   goldenHandshake: "goldenHandshake.png", // Golden Handshake crit flash's own backdrop icon
   supplyRun: "supplyRun.png", // Supply Run crit flash's own backdrop icon
   casualFriday: "casualFriday.png", // Casual Friday crit flash's own backdrop icon

@@ -37,6 +37,7 @@ import {
   LUCKY_CLOVER_CRIT_COUNT,
   LUCKY_CLOVER_CRIT_TIER,
   ROUND_UP_CRIT_STEP,
+  SAFETY_NET_CRIT_UPGRADES,
   CASUAL_FRIDAY_CRIT_UPGRADES,
   FANCY_FRIDAY_CRIT_UPGRADES,
   DOUBLE_DOWN_CRIT_REPEATS,
@@ -108,7 +109,13 @@ import {
   BOOST_DURATION_MS,
   type Floor,
 } from "../../gameState";
-import { type BigNumber, ZERO, add, multiply } from "../../shared/bigNumber";
+import {
+  type BigNumber,
+  ZERO,
+  add,
+  gt,
+  multiply,
+} from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
 
 // "peppermint crit" (see shared/critTypes' isPeppermintCrit): promotes every
@@ -147,6 +154,50 @@ function applyRoundUpCrit(floors: Floor[]): void {
       ROUND_UP_CRIT_STEP - (floor.upgradeCount % ROUND_UP_CRIT_STEP);
     for (let i = 0; i < ticks; i++) applyUpgradeTick(floor, index === 0);
   }
+}
+
+function applySafetyNetCrit(floors: Floor[]): void {
+  let target: Floor | null = null;
+  for (const floor of floors) {
+    if (
+      !floor.unlocked ||
+      (target && !gt(floor.upgradeCost, target.upgradeCost))
+    ) {
+      continue;
+    }
+    target = floor;
+  }
+  if (!target) return;
+  const targetIndex = floors.indexOf(target);
+  for (let i = 0; i < SAFETY_NET_CRIT_UPGRADES; i++) {
+    applyUpgradeTick(target, targetIndex === 0);
+  }
+}
+
+function applyFloorShareCrit(
+  floors: Floor[],
+  target: Floor,
+  isGroundFloor: boolean,
+  levelMultiplier = 1,
+): void {
+  const targetIndex = floors.indexOf(target);
+  if (targetIndex < 0 || !target.unlocked) return;
+
+  let sharedLevel = target.upgradeCount;
+  for (let index = 0; index < targetIndex; index++) {
+    const floor = floors[index];
+    if (floor.unlocked) sharedLevel += floor.upgradeCount;
+  }
+
+  const rateMultiplier = target.critMultiplierTier
+    ? CRIT_TIER_CONFIG[target.critMultiplierTier].multiplier
+    : 1;
+  target.incomeAmount = add(
+    target.incomeAmount,
+    multiply(target.rateStep, sharedLevel * levelMultiplier * rateMultiplier),
+  );
+  const center = getButtonCenter(isGroundFloor);
+  spawnCoinBurst(target, center.x, center.y, () => {});
 }
 
 // "Casual Friday"/"Fancy Friday" crits (see shared/critTypes's
@@ -685,6 +736,16 @@ function applyFullyStaffedCrit(floors: Floor[]): void {
   }
 }
 
+// "Shift Change" fills only the landing floor and its immediately lower
+// unlocked neighbor; floor arrays are stored ground-to-top.
+function applyShiftChangeCrit(floors: Floor[], floor: Floor): void {
+  const floorIndex = floors.indexOf(floor);
+  const targets = [floor, floors[floorIndex - 1]];
+  for (const target of targets) {
+    if (target?.unlocked) target.workerCount = MAX_RENDERED_WORKERS;
+  }
+}
+
 // "Reinforcements" copies the strongest unlocked floor workforce to every other
 // unlocked floor without charging for workers — only ever levelling floors
 // up, never taking workers away from one that's somehow already above the cap
@@ -1066,6 +1127,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   payout: () => applyPayoutCrit(),
   grandOpening: (c) => applyGrandOpeningCrit(c.deps),
   fullyStaffed: (c) => applyFullyStaffedCrit(c.floors),
+  shiftChange: (c) => applyShiftChangeCrit(c.floors, c.floor),
   espressoShot: (c) => applyEspressoShotCrit(c.floors),
   dejaVu: (c) => applyDejaVuCrit(c.floor, c.isGroundFloor),
   cloneArmy: (c) => applyCloneArmyCrit(c.floors),
@@ -1073,6 +1135,9 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   secondWind: () => applySecondWindCrit(),
   executiveOrder: (c) => applyExecutiveOrderCrit(c.floors),
   roundUp: (c) => applyRoundUpCrit(c.floors),
+  safetyNet: (c) => applySafetyNetCrit(c.floors),
+  floorShare: (c) => applyFloorShareCrit(c.floors, c.floor, c.isGroundFloor),
+  sameBoat: (c) => applyFloorShareCrit(c.floors, c.floor, c.isGroundFloor, 2),
   goldenHandshake: (c) => applyGoldenHandshakeCrit(c.floors),
   supplyRun: (c) => applySupplyRunCrit(c.floor),
   casualFriday: (c) =>

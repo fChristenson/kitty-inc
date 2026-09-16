@@ -133,6 +133,8 @@ export {
   GRAND_OPENING_CRIT_LABEL,
   FULLY_STAFFED_CRIT_COLOR,
   FULLY_STAFFED_CRIT_LABEL,
+  SHIFT_CHANGE_CRIT_COLOR,
+  SHIFT_CHANGE_CRIT_LABEL,
   ESPRESSO_SHOT_CRIT_COLOR,
   ESPRESSO_SHOT_CRIT_LABEL,
   DEJA_VU_CRIT_COLOR,
@@ -150,6 +152,11 @@ export {
   ROUND_UP_CRIT_COLOR,
   ROUND_UP_CRIT_LABEL,
   ROUND_UP_CRIT_STEP,
+  SAFETY_NET_CRIT_COLOR,
+  SAFETY_NET_CRIT_LABEL,
+  SAFETY_NET_CRIT_UPGRADES,
+  SAME_BOAT_CRIT_COLOR,
+  SAME_BOAT_CRIT_LABEL,
   GOLDEN_HANDSHAKE_CRIT_COLOR,
   GOLDEN_HANDSHAKE_CRIT_LABEL,
   SUPPLY_RUN_CRIT_COLOR,
@@ -229,6 +236,7 @@ export {
   isPayoutCrit,
   isGrandOpeningCrit,
   isFullyStaffedCrit,
+  isShiftChangeCrit,
   isEspressoShotCrit,
   isDejaVuCrit,
   isCloneArmyCrit,
@@ -236,6 +244,9 @@ export {
   isSecondWindCrit,
   isExecutiveOrderCrit,
   isRoundUpCrit,
+  isSafetyNetCrit,
+  isFloorShareCrit,
+  isSameBoatCrit,
   isGoldenHandshakeCrit,
   isSupplyRunCrit,
   isCasualFridayCrit,
@@ -308,6 +319,7 @@ import {
   forcePayoutCritProc,
   forceGrandOpeningCritProc,
   forceFullyStaffedCritProc,
+  forceShiftChangeCritProc,
   forceEspressoShotCritProc,
   forceDejaVuCritProc,
   forceCloneArmyCritProc,
@@ -315,6 +327,9 @@ import {
   forceSecondWindCritProc,
   forceExecutiveOrderCritProc,
   forceRoundUpCritProc,
+  forceSafetyNetCritProc,
+  forceFloorShareCritProc,
+  forceSameBoatCritProc,
   forceGoldenHandshakeCritProc,
   forceSupplyRunCritProc,
   forceCasualFridayCritProc,
@@ -425,12 +440,16 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.payout) forcePayoutCritProc(floor);
     if (result.grandOpening) forceGrandOpeningCritProc(floor);
     if (result.fullyStaffed) forceFullyStaffedCritProc(floor);
+    if (result.shiftChange) forceShiftChangeCritProc(floor);
     if (result.espressoShot) forceEspressoShotCritProc(floor);
     if (result.dejaVu) forceDejaVuCritProc(floor);
     if (result.cloneArmy) forceCloneArmyCritProc(floor);
     if (result.secondWind) forceSecondWindCritProc(floor);
     if (result.executiveOrder) forceExecutiveOrderCritProc(floor);
     if (result.roundUp) forceRoundUpCritProc(floor);
+    if (result.safetyNet) forceSafetyNetCritProc(floor);
+    if (result.floorShare) forceFloorShareCritProc(floor);
+    if (result.sameBoat) forceSameBoatCritProc(floor);
     if (result.goldenHandshake) forceGoldenHandshakeCritProc(floor);
     if (result.supplyRun) forceSupplyRunCritProc(floor);
     if (result.casualFriday) forceCasualFridayCritProc(floor);
@@ -527,6 +546,7 @@ export function forceFloorBuyCrit(
   payout = false,
   grandOpening = false,
   fullyStaffed = false,
+  shiftChange = false,
   espressoShot = false,
   dejaVu = false,
   cloneArmy = false,
@@ -581,6 +601,7 @@ export function forceFloorBuyCrit(
     payout,
     grandOpening,
     fullyStaffed,
+    shiftChange,
     espressoShot,
     dejaVu,
     cloneArmy,
@@ -588,6 +609,9 @@ export function forceFloorBuyCrit(
     secondWind: false,
     executiveOrder: false,
     roundUp: false,
+    safetyNet: false,
+    floorShare: false,
+    sameBoat: false,
     goldenHandshake: false,
     supplyRun: false,
     casualFriday: false,
@@ -621,6 +645,11 @@ export function forceGrandOpeningFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceFullyStaffedFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.fullyStaffed = true;
+}
+
+export function forceShiftChangeFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.shiftChange = true;
 }
 
 // dev/test-only: guarantees the next floor/building purchase crit carries an
@@ -1078,6 +1107,11 @@ export function forceFullyStaffedCritUpgrade(floor: Floor): void {
   forceFullyStaffedCritProc(floor);
 }
 
+export function forceShiftChangeCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceShiftChangeCritProc(floor);
+}
+
 // dev/test-only: force this floor's already-armed tier to also carry an
 // Espresso Shot proc, bypassing chance entirely
 export function forceEspressoShotCritUpgrade(floor: Floor): void {
@@ -1115,6 +1149,21 @@ export function forceExecutiveOrderCritUpgrade(floor: Floor): void {
 export function forceRoundUpCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceRoundUpCritProc(floor);
+}
+
+export function forceSafetyNetCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSafetyNetCritProc(floor);
+}
+
+export function forceFloorShareCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceFloorShareCritProc(floor);
+}
+
+export function forceSameBoatCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSameBoatCritProc(floor);
 }
 
 export function forceGoldenHandshakeCritUpgrade(floor: Floor): void {
