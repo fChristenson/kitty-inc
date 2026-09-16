@@ -6,6 +6,7 @@ import {
   CRIT_PROC_KINDS,
   CRIT_PROC_INFO,
   getCritProcCount,
+  getCritProcIncomeModifierPercent,
 } from "../../shared/critTypes";
 import type { CritProcKind } from "../../shared/critTypes";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
@@ -136,15 +137,23 @@ export function wireCorporationBoostMenu(
     const info = CRIT_INFO.find(({ kind }) => kind === openKind);
     if (!info) return;
     const count = getCritProcCount(info.kind);
+    const incomeModifier = getCritProcIncomeModifierPercent(info.kind, count);
+    const modifierStep = getCritProcIncomeModifierPercent(info.kind, 1);
+    const nextThreshold = count === 0 ? 1 : Math.floor(count / 10) * 10 + 10;
+    const nextBoost = modifierStep;
     const landed =
       count > 0
-        ? `<p class="crit-info-detail__count">Seen ${count}&times;</p>`
+        ? `<p class="crit-info-detail__count">Collected ${count}&times;</p>`
         : `<p class="crit-info-detail__count crit-info-detail__count--none">Not yet discovered</p>`;
+      const modifier = `<p class="crit-info-detail__modifier">Income modifier <strong>+${incomeModifier.toFixed(2)}%</strong></p>`;
+      const next = `<p class="crit-info-detail__next">Next boost: ${nextThreshold} collected (<strong>+${nextBoost.toFixed(2)}%</strong>)</p>`;
     detail.innerHTML = `
       <img src="${info.icon}" class="crit-info-detail__icon" alt="" />
       <h3 class="crit-info-detail__name">${info.label}</h3>
       <p class="crit-info-detail__description">${info.description}</p>
       ${landed}
+      ${modifier}
+      ${next}
     `;
   }
 

@@ -1115,6 +1115,32 @@ body {
   opacity: 0.7;
 }
 
+.crit-info-detail__modifier {
+  margin: 0;
+  color: var(--color-white);
+  font-weight: 900;
+  -webkit-text-stroke: 1px black;
+  paint-order: stroke fill;
+}
+
+.crit-info-detail__modifier strong {
+  color: var(--color-money-green);
+  font-size: 1.15em;
+}
+
+.crit-info-detail__next {
+  margin: -0.2rem 0 0;
+  color: var(--color-white);
+  font-size: 0.9rem;
+  font-weight: 700;
+  -webkit-text-stroke: 1px black;
+  paint-order: stroke fill;
+}
+
+.crit-info-detail__next strong {
+  color: var(--color-money-green);
+}
+
 /* header back arrow, only shown while the detail pane is open. The shared
    arrow icon's native geometry points UP, so it's rotated a quarter turn
    counter-clockwise to read as "back" */

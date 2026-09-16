@@ -1263,6 +1263,24 @@ export interface CritProcDisplayInfo {
   description: string;
 }
 
+// A proc's collection modifier is inverse to its configured roll chance:
+// rarer crits grant a larger income bonus per collection milestone.
+export function getCritProcChance(kind: CritProcKind): number {
+  const chanceKey = `${kind}Chance` as keyof typeof CONFIG.crit;
+  const chance = CONFIG.crit[chanceKey];
+  return typeof chance === "number" ? chance : 0;
+}
+
+export function getCritProcIncomeModifierPercent(
+  kind: CritProcKind,
+  count: number,
+): number {
+  const chance = getCritProcChance(kind);
+  if (chance <= 0 || count <= 0) return 0;
+  const milestone = Math.floor((count - 1) / 10) + 1;
+  return milestone * (0.01 / chance);
+}
+
 export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
   chain: {
     label: CHAIN_CRIT_LABEL,

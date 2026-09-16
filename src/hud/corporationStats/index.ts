@@ -16,6 +16,12 @@ import {
   getCompanyBaseModifierPercent,
   formatBoostPercent,
 } from "../corporationBoostMenu";
+import {
+  CRIT_PROC_INFO,
+  CRIT_PROC_KINDS,
+  getCritProcCount,
+  getCritProcIncomeModifierPercent,
+} from "../../shared/critTypes";
 
 // read-only "Corporation income rate"/"Income modifiers" breakdown — split
 // out of corporationBoostMenu so that dialog only has to hold its own
@@ -108,16 +114,34 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
       `,
       )
       .join("");
-    // only the per-company modifiers are shown/totaled here now — market
-    // influence/secured assets/tax rebate (the global, non-company mods) were
-    // removed from this dialog per explicit request, so this total must sum
-    // just the rows actually visible above it, not the full
-    // getGlobalIncomeBoostPercent() (which still folds those 3 in for the
-    // REAL income multiplier elsewhere — unrelated, unaffected by this)
+    // The total is limited to the company and collected-crit rows visible in
+    // this dialog; other global modifiers are intentionally not represented.
     const companyModifierTotal = activeIndices.reduce(
       (sum, i) => sum + getCompanyBaseModifierPercent(i),
       0,
     );
+    const critModifierRows = CRIT_PROC_KINDS.map((kind) => ({
+      label: CRIT_PROC_INFO[kind].label,
+      pct: getCritProcIncomeModifierPercent(kind, getCritProcCount(kind)),
+    }))
+      .filter(({ pct }) => pct > 0)
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .map(
+        ({ label, pct }) => `
+        <div class="worker-menu__modifier-row">
+          <span>${label}</span>
+          <span>${formatBoostPercent(pct)}</span>
+        </div>
+      `,
+      )
+      .join("");
+    const critModifierTotal = CRIT_PROC_KINDS.reduce(
+      (sum, kind) =>
+        sum +
+        getCritProcIncomeModifierPercent(kind, getCritProcCount(kind)),
+      0,
+    );
+    const totalModifier = companyModifierTotal + critModifierTotal;
     list.innerHTML = `
       <h3 class="worker-menu__subheader">Corporation assets</h3>
       ${companyAssetRows}
@@ -133,9 +157,11 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
       </div>
       <h3 class="worker-menu__subheader">Income modifiers</h3>
       ${modifierRows}
+      ${critModifierRows ? '<div class="worker-menu__modifier-row worker-menu__modifier-row--divider"></div>' : ''}
+      ${critModifierRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
         <span>Total</span>
-        <span>${formatBoostPercent(companyModifierTotal)}</span>
+        <span>${formatBoostPercent(totalModifier)}</span>
       </div>
     `;
     list.scrollTop = scrollTop;
