@@ -190,6 +190,8 @@ export function wireCorporationBoostMenu(
   const ghostClickGuard = createGhostClickGuard();
 
   function open(): void {
+    panel.classList.remove("worker-menu__panel--closing");
+    void panel.offsetWidth;
     showGrid();
     renderGrid();
     grid.parentElement?.scrollTo({ top: 0 });
