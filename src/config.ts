@@ -161,7 +161,11 @@ export const CONFIG = {
     // increaseIncomeRate) — upgrades still cost real money as normal, just
     // at whatever price was already locked in when the window started
     frozenChance: 0.1,
-    frozenDurationMs: 3000,
+    frozenDurationMs: 5000,
+    // "spending freeze crit" — locks every unlocked floor's current upgrade
+    // price for the whole building for a short window
+    spendingFreezeChance: 0.05,
+    spendingFreezeDurationMs: 5000,
     // "snowball crit" — a flat, not-tier-scaled proc (see shared/critTypes'
     // applySnowballCrit): instantly credits every unlocked floor 1 extra
     // payout's worth of income at its own current rate, multiplied by how
@@ -255,6 +259,9 @@ export const CONFIG = {
     // "Fire Drill" crit — instantly completes every unlocked floor's income
     // timer once, paying it out and restarting the bar
     fireDrillChance: 0.08,
+    // "Performance Bonus" crit — completes one income timer per worker and
+    // manager on every unlocked floor
+    performanceBonusChance: 0.06,
     // "Double Down" crit — replays the tier that spawned it twice more on the
     // same floor, so it scales with whatever landed (up to 250 extra free
     // upgrades off an ultra); priced like the other tier-scaled repeats
@@ -302,6 +309,7 @@ export const CONFIG = {
     // getAllCompaniesUpgradesValue) — rare, since a multi-company save could
     // make this enormous
     payoutChance: 0.005,
+    shareholdersChance: 0.02,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

@@ -84,6 +84,11 @@ export {
   FROZEN_DURATION_MS,
   triggerFrozenCrit,
   isFrozenActive,
+  SPENDING_FREEZE_CRIT_COLOR,
+  SPENDING_FREEZE_CRIT_LABEL,
+  SPENDING_FREEZE_DURATION_MS,
+  triggerSpendingFreeze,
+  isSpendingFreezeActive,
   SNOWBALL_CRIT_COLOR,
   SNOWBALL_CRIT_LABEL,
   FREE_SALE_CRIT_COLOR,
@@ -147,6 +152,8 @@ export {
   FANCY_FRIDAY_CRIT_UPGRADES,
   FIRE_DRILL_CRIT_COLOR,
   FIRE_DRILL_CRIT_LABEL,
+  PERFORMANCE_BONUS_CRIT_COLOR,
+  PERFORMANCE_BONUS_CRIT_LABEL,
   DOUBLE_DOWN_CRIT_COLOR,
   DOUBLE_DOWN_CRIT_LABEL,
   DOUBLE_DOWN_CRIT_REPEATS,
@@ -192,6 +199,7 @@ export {
   isSnowdayCrit,
   isFastForwardCrit,
   isFrozenCrit,
+  isSpendingFreezeCrit,
   isSnowballCrit,
   isFreeSaleCrit,
   isBullMarketCrit,
@@ -219,6 +227,7 @@ export {
   isCasualFridayCrit,
   isFancyFridayCrit,
   isFireDrillCrit,
+  isPerformanceBonusCrit,
   isDoubleDownCrit,
   isCoffeeRunCrit,
   isTeamBuildingCrit,
@@ -265,6 +274,7 @@ import {
   forceSnowdayCritProc,
   forceFastForwardCritProc,
   forceFrozenCritProc,
+  forceSpendingFreezeCritProc,
   forceSnowballCritProc,
   forceFreeSaleCritProc,
   forceBullMarketCritProc,
@@ -292,6 +302,7 @@ import {
   forceCasualFridayCritProc,
   forceFancyFridayCritProc,
   forceFireDrillCritProc,
+  forcePerformanceBonusCritProc,
   forceDoubleDownCritProc,
   forceCoffeeRunCritProc,
   forceTeamBuildingCritProc,
@@ -302,6 +313,7 @@ import {
   forceTeaBreakCritProc,
   forceRecruitmentDriveCritProc,
   forceMergerCritProc,
+  forceShareholdersCritProc,
   forceBonusTierCritProc,
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
@@ -376,6 +388,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.snowday) forceSnowdayCritProc(floor);
     if (result.fastForward) forceFastForwardCritProc(floor);
     if (result.frozen) forceFrozenCritProc(floor);
+    if (result.spendingFreeze) forceSpendingFreezeCritProc(floor);
     if (result.snowball) forceSnowballCritProc(floor);
     if (result.freeSale) forceFreeSaleCritProc(floor);
     if (result.bullMarket) forceBullMarketCritProc(floor);
@@ -402,6 +415,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.casualFriday) forceCasualFridayCritProc(floor);
     if (result.fancyFriday) forceFancyFridayCritProc(floor);
     if (result.fireDrill) forceFireDrillCritProc(floor);
+    if (result.performanceBonus) forcePerformanceBonusCritProc(floor);
     if (result.doubleDown) forceDoubleDownCritProc(floor);
     if (result.coffeeRun) forceCoffeeRunCritProc(floor);
     if (result.teamBuilding) forceTeamBuildingCritProc(floor);
@@ -412,6 +426,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.teaBreak) forceTeaBreakCritProc(floor);
     if (result.recruitmentDrive) forceRecruitmentDriveCritProc(floor);
     if (result.merger) forceMergerCritProc(floor);
+    if (result.shareholders) forceShareholdersCritProc(floor);
     if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
   }, allowSpecialProcs);
 }
@@ -522,6 +537,7 @@ export function forceFloorBuyCrit(
     snowday,
     fastForward,
     frozen,
+    spendingFreeze: false,
     snowball,
     freeSale,
     bullMarket,
@@ -550,6 +566,7 @@ export function forceFloorBuyCrit(
     casualFriday: false,
     fancyFriday: false,
     fireDrill: false,
+    performanceBonus: false,
     doubleDown: false,
     coffeeRun: false,
     teamBuilding: false,
@@ -560,6 +577,7 @@ export function forceFloorBuyCrit(
     teaBreak: false,
     recruitmentDrive: false,
     merger,
+    shareholders: false,
   };
 }
 
@@ -641,6 +659,13 @@ export function forceFancyFridayFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceFireDrillFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.fireDrill = true;
+}
+
+export function forcePerformanceBonusFloorBuyCrit(
+  tier: CritTier = "crit",
+): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.performanceBonus = true;
 }
 
 export function forceDoubleDownFloorBuyCrit(tier: CritTier = "crit"): void {
@@ -898,6 +923,11 @@ export function forceFrozenCritUpgrade(floor: Floor): void {
   forceFrozenCritProc(floor);
 }
 
+export function forceSpendingFreezeCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceSpendingFreezeCritProc(floor);
+}
+
 export function forceSnowballCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceSnowballCritProc(floor);
@@ -1064,6 +1094,11 @@ export function forceFireDrillCritUpgrade(floor: Floor): void {
   forceFireDrillCritProc(floor);
 }
 
+export function forcePerformanceBonusCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forcePerformanceBonusCritProc(floor);
+}
+
 export function forceDoubleDownCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceDoubleDownCritProc(floor);
@@ -1115,6 +1150,11 @@ export function forceMergerCritUpgrade(
 ): void {
   critTiers.set(floor, tier);
   forceMergerCritProc(floor);
+}
+
+export function forceShareholdersCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceShareholdersCritProc(floor);
 }
 
 // dev/test-only: force the NEXT "special crit crit" bonus tier a floor's

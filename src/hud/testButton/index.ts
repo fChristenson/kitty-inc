@@ -61,6 +61,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-snowday-crit" class="game__button">Spawn Snowday Crit</button>
           <button id="spawn-fastforward-crit" class="game__button">Spawn Fast Forward Crit</button>
           <button id="spawn-frozen-crit" class="game__button">Spawn Frozen Crit</button>
+          <button id="spawn-spending-freeze-crit" class="game__button">Spawn Spending Freeze Crit</button>
           <button id="spawn-snowball-crit" class="game__button">Spawn Snowball Crit</button>
           <button id="spawn-free-sale-crit" class="game__button">Spawn Free Sale Crit</button>
           <button id="spawn-bull-market-crit" class="game__button">Spawn Bull Market Crit</button>
@@ -86,6 +87,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-casual-friday-crit" class="game__button">Spawn Casual Friday Crit</button>
           <button id="spawn-fancy-friday-crit" class="game__button">Spawn Fancy Friday Crit</button>
           <button id="spawn-fire-drill-crit" class="game__button">Spawn Fire Drill Crit</button>
+          <button id="spawn-performance-bonus-crit" class="game__button">Spawn Performance Bonus Crit</button>
           <button id="spawn-double-down-crit" class="game__button">Spawn Double Down Crit</button>
           <button id="spawn-coffee-run-crit" class="game__button">Spawn Coffee Run Crit</button>
           <button id="spawn-team-building-crit" class="game__button">Spawn Team Building Crit</button>
@@ -96,6 +98,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-tea-break-crit" class="game__button">Spawn Tea Break Crit</button>
           <button id="spawn-recruitment-drive-crit" class="game__button">Spawn Recruitment Drive Crit</button>
           <button id="spawn-merger-crit" class="game__button">Spawn Merger Crit</button>
+          <button id="spawn-shareholders-crit" class="game__button">Spawn Shareholders Crit</button>
           <button id="spawn-golden-parachute-crit" class="game__button">Spawn Golden Parachute Crit</button>
           <button id="spawn-payout-crit" class="game__button">Spawn Payout Crit</button>
         </div>
@@ -164,6 +167,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-casual-friday-crit" class="game__button">Floor Casual Friday Crit</button>
           <button id="floor-buy-fancy-friday-crit" class="game__button">Floor Fancy Friday Crit</button>
           <button id="floor-buy-fire-drill-crit" class="game__button">Floor Fire Drill Crit</button>
+          <button id="floor-buy-performance-bonus-crit" class="game__button">Floor Performance Bonus Crit</button>
           <button id="floor-buy-double-down-crit" class="game__button">Floor Double Down Crit</button>
           <button id="floor-buy-coffee-run-crit" class="game__button">Floor Coffee Run Crit</button>
           <button id="floor-buy-team-building-crit" class="game__button">Floor Team Building Crit</button>
@@ -555,6 +559,16 @@ export function wireSpawnFrozenCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnSpendingFreezeCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-spending-freeze-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireSpawnSnowballCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -803,6 +817,16 @@ export function wireSpawnFireDrillCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnPerformanceBonusCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-performance-bonus-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireSpawnDoubleDownCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -899,6 +923,16 @@ export function wireSpawnMergerCritButton(
 ): void {
   const button =
     container.querySelector<HTMLButtonElement>("#spawn-merger-crit")!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnShareholdersCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-shareholders-crit",
+  )!;
   button.addEventListener("click", onClick);
 }
 
@@ -1555,6 +1589,16 @@ export function wireFloorBuyFireDrillCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-fire-drill-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyPerformanceBonusCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-performance-bonus-crit",
   )!;
   button.addEventListener("click", onClick);
 }

@@ -72,6 +72,7 @@ const IMAGE_FILES = {
   snowman: "snowman.png", // Snowday crit flash's own backdrop icon
   fastforward: "fastforward.png", // Fast Forward crit flash's own backdrop icon
   icecube: "icecube.png", // Frozen crit flash's own backdrop icon
+  spendingFreeze: "spendingFreeze.png", // Spending Freeze crit flash's own backdrop icon
   snowball: "snowball.png", // Snowball crit flash's own backdrop icon
   bull: "bull.png", // Bull Market crit flash's own backdrop icon
   payday: "payday.png", // Payday crit flash's own backdrop icon
@@ -99,6 +100,7 @@ const IMAGE_FILES = {
   casualFriday: "casualFriday.png", // Casual Friday crit flash's own backdrop icon
   fancyFriday: "fancyFriday.png", // Fancy Friday crit flash's own backdrop icon
   fireDrill: "fireDrill.png", // Fire Drill crit flash's own backdrop icon
+  performanceBonus: "performanceBonus.png", // Performance Bonus crit flash's own backdrop icon
   doubleDown: "doubleDown.png", // Double Down crit flash's own backdrop icon
   coffeeRun: "coffeeRun.png", // Coffee Run crit flash's own backdrop icon
   teamBuilding: "teamBuilding.png", // Team Building crit flash's own backdrop icon
@@ -109,6 +111,7 @@ const IMAGE_FILES = {
   teaBreak: "teaBreak.png", // Tea Break crit flash's own backdrop icon
   recruitmentDrive: "recruitmentDrive.png", // Recruitment Drive crit flash's own backdrop icon
   merger: "merger.png", // Merger crit flash's own backdrop icon
+  shareholders: "sharedholders.png", // Shareholders crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

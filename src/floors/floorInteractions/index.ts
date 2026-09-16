@@ -29,6 +29,7 @@ import {
   triggerSaleBoost,
   isOvertimeActive,
   triggerFrozenCrit,
+  triggerSpendingFreeze,
   triggerRushHourCrit,
   armGuaranteedUltraCrit,
   armGuaranteedMegaCrit,
@@ -579,6 +580,33 @@ function applyFireDrillCrit(floors: Floor[]): void {
   addTotalIncome(total);
 }
 
+// "Performance Bonus" crit: completes one current income timer per actual
+// worker and manager on every unlocked floor, then restarts each bar.
+function applyPerformanceBonusCrit(floors: Floor[]): void {
+  const now = Date.now();
+  let total: BigNumber = ZERO;
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    const staffingUnits = floor.workerCount + (floor.hasManager ? 1 : 0);
+    total = add(
+      total,
+      multiply(currentPayoutAmount(floor, now), staffingUnits),
+    );
+    floor.lastCollectedAt = now;
+  }
+  addTotalIncome(total);
+}
+
+function applyShareholdersCrit(floors: Floor[]): void {
+  let staffingUnits = 0;
+  for (const floor of floors) {
+    if (!floor.unlocked) continue;
+    staffingUnits += floor.workerCount + (floor.hasManager ? 1 : 0);
+  }
+  const payoutPercent = Math.min(100, staffingUnits) / 100;
+  addTotalIncome(multiply(getTotalIncome(), payoutPercent));
+}
+
 function applyTeaBreakCrit(floors: Floor[], persist: () => void): void {
   const startedAt = Date.now();
   const unlockedFloors = floors.filter((floor) => floor.unlocked);
@@ -604,6 +632,10 @@ function applyTeaBreakCrit(floors: Floor[], persist: () => void): void {
 // started, for FROZEN_DURATION_MS
 function applyFrozenCrit(floor: Floor): void {
   triggerFrozenCrit(floor);
+}
+
+function applySpendingFreezeCrit(floors: Floor[]): void {
+  triggerSpendingFreeze(floors);
 }
 
 // "snowball crit" (see shared/critTypes's isSnowballCrit): a flat,
@@ -981,6 +1013,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   snowday: (c) => applySnowdayCrit(c.floors),
   fastForward: (c) => applyFastForwardCrit(c.floors),
   frozen: (c) => applyFrozenCrit(c.floor),
+  spendingFreeze: (c) => applySpendingFreezeCrit(c.floors),
   snowball: (c) => applySnowballCrit(c.floors),
   freeSale: (c) => applyFreeSaleCrit(c.floor),
   payday: () => applyPaydayCrit(),
@@ -1009,12 +1042,14 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   fancyFriday: (c) =>
     applyFlatUpgradeBatch(c.floors, FANCY_FRIDAY_CRIT_UPGRADES),
   fireDrill: (c) => applyFireDrillCrit(c.floors),
+  performanceBonus: (c) => applyPerformanceBonusCrit(c.floors),
   teaBreak: (c) => applyTeaBreakCrit(c.floors, c.deps.persist),
   doubleDown: (c) => applyDoubleDownCrit(c.floor, c.isGroundFloor, c.tier),
   coffeeRun: (c) => applyCoffeeRunCrit(c.floors),
   dressCode: (c) => applyDressCodeCrit(c.floors),
   recruitmentDrive: (c) => applyRecruitmentDriveCrit(c.floors, c.floor),
   merger: (c) => applyMergerCrit(c.floors, c.floor),
+  shareholders: (c) => applyShareholdersCrit(c.floors),
   teamBuilding: (c) => applyTeamBuildingCrit(c.floors),
   springCleaning: (c) => applySpringCleaningCrit(c.floors, c.multiplier),
   nightOwl: (c) => applyNightOwlCrit(c.floors),

@@ -76,8 +76,6 @@
 - Golden Stapler — Golden Ticket with a bigger moment: a jackpot flash that
   also guarantees an ultra on the very next click.
 
-## To consider
-
 - Expense Report — refunds the cost of the last ten upgrades bought on the
   floor that crit, at the price they were actually paid.
 - Standing Desk — permanently halves one random unlocked floor's income
@@ -108,3 +106,21 @@
   leftover hires onto the floors above it.
 - Merger — averages every unlocked floor's rate, then raises them all to
   that average. Lifts the weak without touching the strong.
+
+## To consider
+
+- Payroll — pays every unlocked floor one second of its current income rate.
+- Market Research — reveals the next crit tier before the next upgrade is bought.
+- Elevator Pitch — instantly moves the camera to the highest unlocked floor and gives it one free upgrade.
+- Team Lunch — boosts every worker on the critted floor for twice the normal boost duration.
+- Expense Freeze — locks the current upgrade price on every unlocked floor for 30 seconds.
+- Open House — unlocks the next floor at no cost and gives it one free worker.
+- Performance Bonus — doubles the critted floor's rate step for its next ten upgrades.
+- Staff Meeting — pauses all worker animations while granting every unlocked floor one worker.
+- Budget Review — refunds the next five upgrade costs on the critted floor.
+- Head Start — raises the next unlocked floor to the current floor's worker count.
+- Overtime Roster — adds a temporary manager to every unlocked floor for 20 seconds.
+- Cost Cutting — permanently reduces the critted floor's upgrade cost growth by 10 percent.
+- Floor Plan — copies the critted floor's office chairs and supplies to every unlocked floor.
+- Hiring Freeze — prevents worker purchases for 30 seconds while doubling income from existing workers.
+- Shareholders — pays out one percent of the active company's total earned income.

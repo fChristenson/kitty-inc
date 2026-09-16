@@ -50,6 +50,7 @@ import {
   forceSnowdayCritUpgrade,
   forceFastForwardCritUpgrade,
   forceFrozenCritUpgrade,
+  forceSpendingFreezeCritUpgrade,
   forceSnowballCritUpgrade,
   forceFreeSaleCritUpgrade,
   forceBullMarketCritUpgrade,
@@ -77,6 +78,7 @@ import {
   forceCasualFridayCritUpgrade,
   forceFancyFridayCritUpgrade,
   forceFireDrillCritUpgrade,
+  forcePerformanceBonusCritUpgrade,
   forceDoubleDownCritUpgrade,
   forceCoffeeRunCritUpgrade,
   forceDressCodeCritUpgrade,
@@ -87,6 +89,7 @@ import {
   forceHeadhunterCritUpgrade,
   forceRecruitmentDriveCritUpgrade,
   forceMergerCritUpgrade,
+  forceShareholdersCritUpgrade,
   forceBonusTierCritUpgrade,
   forceFloorBuyCrit,
   forceGrandOpeningFloorBuyCrit,
@@ -103,6 +106,7 @@ import {
   forceCasualFridayFloorBuyCrit,
   forceFancyFridayFloorBuyCrit,
   forceFireDrillFloorBuyCrit,
+  forcePerformanceBonusFloorBuyCrit,
   forceDoubleDownFloorBuyCrit,
   forceCoffeeRunFloorBuyCrit,
   forceDressCodeFloorBuyCrit,
@@ -183,6 +187,7 @@ import {
   wireSpawnSnowdayCritButton,
   wireSpawnFastForwardCritButton,
   wireSpawnFrozenCritButton,
+  wireSpawnSpendingFreezeCritButton,
   wireSpawnSnowballCritButton,
   wireSpawnFreeSaleCritButton,
   wireSpawnBullMarketCritButton,
@@ -209,6 +214,7 @@ import {
   wireSpawnCasualFridayCritButton,
   wireSpawnFancyFridayCritButton,
   wireSpawnFireDrillCritButton,
+  wireSpawnPerformanceBonusCritButton,
   wireSpawnDoubleDownCritButton,
   wireSpawnCoffeeRunCritButton,
   wireSpawnDressCodeCritButton,
@@ -219,6 +225,7 @@ import {
   wireSpawnHeadhunterCritButton,
   wireSpawnRecruitmentDriveCritButton,
   wireSpawnMergerCritButton,
+  wireSpawnShareholdersCritButton,
   wireSpawnGoldenParachuteCritButton,
   wireSpawnPayoutCritButton,
   wireForceBonusTierCritButton,
@@ -283,6 +290,7 @@ import {
   wireFloorBuyCasualFridayCritButton,
   wireFloorBuyFancyFridayCritButton,
   wireFloorBuyFireDrillCritButton,
+  wireFloorBuyPerformanceBonusCritButton,
   wireFloorBuyDoubleDownCritButton,
   wireFloorBuyCoffeeRunCritButton,
   wireFloorBuyDressCodeCritButton,
@@ -744,6 +752,10 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceFrozenCritUpgrade(floor);
     });
+    wireSpawnSpendingFreezeCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceSpendingFreezeCritUpgrade(floor);
+    });
     wireSpawnSnowballCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceSnowballCritUpgrade(floor);
@@ -844,6 +856,10 @@ async function main() {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceFireDrillCritUpgrade(floor);
     });
+    wireSpawnPerformanceBonusCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forcePerformanceBonusCritUpgrade(floor);
+    });
     wireSpawnDoubleDownCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceDoubleDownCritUpgrade(floor);
@@ -885,6 +901,10 @@ async function main() {
         .reverse()
         .find((candidate) => candidate.unlocked);
       if (floor) forceMergerCritUpgrade(floor);
+    });
+    wireSpawnShareholdersCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceShareholdersCritUpgrade(floor);
     });
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1780,6 +1800,9 @@ async function main() {
     );
     wireFloorBuyFireDrillCritButton(app, () =>
       forceFireDrillFloorBuyCrit("crit"),
+    );
+    wireFloorBuyPerformanceBonusCritButton(app, () =>
+      forcePerformanceBonusFloorBuyCrit("crit"),
     );
     wireFloorBuyDoubleDownCritButton(app, () =>
       forceDoubleDownFloorBuyCrit("crit"),

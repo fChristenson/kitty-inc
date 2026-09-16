@@ -100,6 +100,8 @@ export const COLOR = {
   fastForwardBlue: "#2563EB",
   // Frozen crit's own dedicated color, matching the icecube icon
   frozenIceBlue: "#7DD3E8",
+  // Spending Freeze crit's dedicated color
+  spendingFreezeTeal: "#14B8A6",
   // Snowball crit's own dedicated color, matching the snowball icon
   snowballBlue: "#93C5FD",
   // Bull Market crit's own dedicated color — a bullish stock-market green
@@ -158,6 +160,8 @@ export const COLOR = {
   fancyFridayIndigo: "#4338CA",
   // Fire Drill crit's own dedicated color
   fireDrillRed: "#DC2626",
+  // Performance Bonus crit's own dedicated color
+  performanceBonusBlue: "#0284C7",
   // Double Down crit's own dedicated color
   doubleDownCrimson: "#9F1239",
   // Coffee Run crit's own dedicated color
@@ -178,6 +182,7 @@ export const COLOR = {
   recruitmentDriveBlue: "#2563EB",
   // Merger crit's own dedicated color
   mergerGold: "#A16207",
+  shareholdersGreen: "#166534",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

@@ -299,6 +299,29 @@ export function isFrozenActive(floor: Floor, now: number): boolean {
   return startedAt !== undefined && now - startedAt < FROZEN_DURATION_MS;
 }
 
+// "spending freeze crit" — building-wide counterpart to Frozen: every
+// currently unlocked floor shares one start timestamp, so all prices expire
+// together while each floor retains the price it had when the window began.
+export const SPENDING_FREEZE_CRIT_CHANCE = CONFIG.crit.spendingFreezeChance;
+export const SPENDING_FREEZE_CRIT_COLOR = COLOR.spendingFreezeTeal;
+export const SPENDING_FREEZE_CRIT_LABEL = "Spending Freeze";
+export const SPENDING_FREEZE_DURATION_MS = CONFIG.crit.spendingFreezeDurationMs;
+const spendingFreezeStartedAt = new WeakMap<Floor, number>();
+
+export function triggerSpendingFreeze(floors: Floor[]): void {
+  const now = Date.now();
+  for (const floor of floors) {
+    if (floor.unlocked) spendingFreezeStartedAt.set(floor, now);
+  }
+}
+
+export function isSpendingFreezeActive(floor: Floor, now: number): boolean {
+  const startedAt = spendingFreezeStartedAt.get(floor);
+  return (
+    startedAt !== undefined && now - startedAt < SPENDING_FREEZE_DURATION_MS
+  );
+}
+
 // "snowball crit" — a flat, not-tier-scaled proc (same shape as tick tock/
 // fast forward): instantly credits every unlocked floor 1 extra payout's
 // worth of income at its own current rate, multiplied by however many
@@ -506,6 +529,12 @@ export const FIRE_DRILL_CRIT_CHANCE = CONFIG.crit.fireDrillChance;
 export const FIRE_DRILL_CRIT_COLOR = COLOR.fireDrillRed;
 export const FIRE_DRILL_CRIT_LABEL = "Fire Drill";
 
+// "Performance Bonus" crit — completes one current income timer for every
+// actual worker and manager on every unlocked floor
+export const PERFORMANCE_BONUS_CRIT_CHANCE = CONFIG.crit.performanceBonusChance;
+export const PERFORMANCE_BONUS_CRIT_COLOR = COLOR.performanceBonusBlue;
+export const PERFORMANCE_BONUS_CRIT_LABEL = "Performance Bonus";
+
 // "Double Down" crit — unlike Deja Vu (which picks a RANDOM tier), this
 // replays whatever tier actually landed, DOUBLE_DOWN_CRIT_REPEATS more times
 export const DOUBLE_DOWN_CRIT_CHANCE = CONFIG.crit.doubleDownChance;
@@ -589,6 +618,9 @@ export const RECRUITMENT_DRIVE_CRIT_LABEL = "Recruitment Drive";
 export const MERGER_CRIT_CHANCE = CONFIG.crit.mergerChance;
 export const MERGER_CRIT_COLOR = COLOR.mergerGold;
 export const MERGER_CRIT_LABEL = "Merger";
+export const SHAREHOLDERS_CRIT_CHANCE = CONFIG.crit.shareholdersChance;
+export const SHAREHOLDERS_CRIT_COLOR = COLOR.shareholdersGreen;
+export const SHAREHOLDERS_CRIT_LABEL = "Shareholders";
 
 // "Golden Parachute" crit — a flat, not-tier-scaled instant payout (see
 // floorInteractions.ts's applyGoldenParachuteCrit): instantly adds 15
@@ -635,6 +667,7 @@ const sunshineCrits = new WeakSet<Floor>();
 const snowdayCrits = new WeakSet<Floor>();
 const fastForwardCrits = new WeakSet<Floor>();
 const frozenCrits = new WeakSet<Floor>();
+const spendingFreezeCrits = new WeakSet<Floor>();
 const snowballCrits = new WeakSet<Floor>();
 const freeSaleCrits = new WeakSet<Floor>();
 const bullMarketCrits = new WeakSet<Floor>();
@@ -662,6 +695,7 @@ const supplyRunCrits = new WeakSet<Floor>();
 const casualFridayCrits = new WeakSet<Floor>();
 const fancyFridayCrits = new WeakSet<Floor>();
 const fireDrillCrits = new WeakSet<Floor>();
+const performanceBonusCrits = new WeakSet<Floor>();
 const teaBreakCrits = new WeakSet<Floor>();
 const doubleDownCrits = new WeakSet<Floor>();
 const coffeeRunCrits = new WeakSet<Floor>();
@@ -672,6 +706,7 @@ const headhunterCrits = new WeakSet<Floor>();
 const dressCodeCrits = new WeakSet<Floor>();
 const recruitmentDriveCrits = new WeakSet<Floor>();
 const mergerCrits = new WeakSet<Floor>();
+const shareholdersCrits = new WeakSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
@@ -738,6 +773,7 @@ export interface CritRollResult {
   snowday: boolean;
   fastForward: boolean;
   frozen: boolean;
+  spendingFreeze: boolean;
   snowball: boolean;
   freeSale: boolean;
   bullMarket: boolean;
@@ -765,6 +801,7 @@ export interface CritRollResult {
   casualFriday: boolean;
   fancyFriday: boolean;
   fireDrill: boolean;
+  performanceBonus: boolean;
   teaBreak: boolean;
   doubleDown: boolean;
   coffeeRun: boolean;
@@ -775,6 +812,7 @@ export interface CritRollResult {
   dressCode: boolean;
   recruitmentDrive: boolean;
   merger: boolean;
+  shareholders: boolean;
 }
 
 // every piggyback proc's own field name on CritRollResult — the single
@@ -812,6 +850,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "snowday",
   "fastForward",
   "frozen",
+  "spendingFreeze",
   "snowball",
   "freeSale",
   "bullMarket",
@@ -839,6 +878,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "casualFriday",
   "fancyFriday",
   "fireDrill",
+  "performanceBonus",
   "teaBreak",
   "doubleDown",
   "coffeeRun",
@@ -849,6 +889,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "dressCode",
   "recruitmentDrive",
   "merger",
+  "shareholders",
 ];
 
 // the one kind -> "is this proc armed on this floor" registry. Every per-proc
@@ -882,6 +923,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   snowday: snowdayCrits,
   fastForward: fastForwardCrits,
   frozen: frozenCrits,
+  spendingFreeze: spendingFreezeCrits,
   snowball: snowballCrits,
   freeSale: freeSaleCrits,
   bullMarket: bullMarketCrits,
@@ -909,6 +951,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   casualFriday: casualFridayCrits,
   fancyFriday: fancyFridayCrits,
   fireDrill: fireDrillCrits,
+  performanceBonus: performanceBonusCrits,
   teaBreak: teaBreakCrits,
   doubleDown: doubleDownCrits,
   coffeeRun: coffeeRunCrits,
@@ -919,6 +962,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   dressCode: dressCodeCrits,
   recruitmentDrive: recruitmentDriveCrits,
   merger: mergerCrits,
+  shareholders: shareholdersCrits,
 };
 
 // every proc currently armed on this floor, as the same boolean-per-kind shape
@@ -1191,6 +1235,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "icecube",
     description: "Locks this floor's upgrade price for 15s",
   },
+  spendingFreeze: {
+    label: SPENDING_FREEZE_CRIT_LABEL,
+    color: SPENDING_FREEZE_CRIT_COLOR,
+    icon: "spendingFreeze",
+    description: "Locks every unlocked floor's upgrade price for 5s",
+  },
   snowball: {
     label: SNOWBALL_CRIT_LABEL,
 
@@ -1380,6 +1430,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "fireDrill",
     description: "Completes every floor's income timer at once",
   },
+  performanceBonus: {
+    label: PERFORMANCE_BONUS_CRIT_LABEL,
+    color: PERFORMANCE_BONUS_CRIT_COLOR,
+    icon: "performanceBonus",
+    description: "Completes one timer per worker and manager",
+  },
   doubleDown: {
     label: DOUBLE_DOWN_CRIT_LABEL,
 
@@ -1445,6 +1501,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     color: MERGER_CRIT_COLOR,
     icon: "merger",
     description: "Raises lower unlocked floors to this level",
+  },
+  shareholders: {
+    label: SHAREHOLDERS_CRIT_LABEL,
+    color: SHAREHOLDERS_CRIT_COLOR,
+    icon: "shareholders",
+    description: "Pays 1% of income per staffing unit",
   },
 };
 
@@ -1514,6 +1576,8 @@ export function rollCrit(
     if (Math.random() < SNOWDAY_CRIT_CHANCE) landed.push("snowday");
     if (Math.random() < FAST_FORWARD_CRIT_CHANCE) landed.push("fastForward");
     if (Math.random() < FROZEN_CRIT_CHANCE) landed.push("frozen");
+    if (Math.random() < SPENDING_FREEZE_CRIT_CHANCE)
+      landed.push("spendingFreeze");
     if (Math.random() < SNOWBALL_CRIT_CHANCE) landed.push("snowball");
     if (Math.random() < FREE_SALE_CRIT_CHANCE) landed.push("freeSale");
     if (Math.random() < BULL_MARKET_CRIT_CHANCE) landed.push("bullMarket");
@@ -1544,6 +1608,8 @@ export function rollCrit(
     if (Math.random() < CASUAL_FRIDAY_CRIT_CHANCE) landed.push("casualFriday");
     if (Math.random() < FANCY_FRIDAY_CRIT_CHANCE) landed.push("fancyFriday");
     if (Math.random() < FIRE_DRILL_CRIT_CHANCE) landed.push("fireDrill");
+    if (Math.random() < PERFORMANCE_BONUS_CRIT_CHANCE)
+      landed.push("performanceBonus");
     if (Math.random() < DOUBLE_DOWN_CRIT_CHANCE) landed.push("doubleDown");
     if (Math.random() < COFFEE_RUN_CRIT_CHANCE) landed.push("coffeeRun");
     if (Math.random() < TEAM_BUILDING_CRIT_CHANCE) landed.push("teamBuilding");
@@ -1556,6 +1622,7 @@ export function rollCrit(
     if (Math.random() < RECRUITMENT_DRIVE_CRIT_CHANCE)
       landed.push("recruitmentDrive");
     if (Math.random() < MERGER_CRIT_CHANCE) landed.push("merger");
+    if (Math.random() < SHAREHOLDERS_CRIT_CHANCE) landed.push("shareholders");
   }
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
   // real-roll-only tally for the "Special Crits" info menu's collectible
@@ -1599,6 +1666,7 @@ export function rollCrit(
     snowday: kept.has("snowday"),
     fastForward: kept.has("fastForward"),
     frozen: kept.has("frozen"),
+    spendingFreeze: kept.has("spendingFreeze"),
     snowball: kept.has("snowball"),
     freeSale: kept.has("freeSale"),
     bullMarket: kept.has("bullMarket"),
@@ -1626,6 +1694,7 @@ export function rollCrit(
     casualFriday: kept.has("casualFriday"),
     fancyFriday: kept.has("fancyFriday"),
     fireDrill: kept.has("fireDrill"),
+    performanceBonus: kept.has("performanceBonus"),
     doubleDown: kept.has("doubleDown"),
     coffeeRun: kept.has("coffeeRun"),
     teamBuilding: kept.has("teamBuilding"),
@@ -1636,6 +1705,7 @@ export function rollCrit(
     teaBreak: kept.has("teaBreak"),
     recruitmentDrive: kept.has("recruitmentDrive"),
     merger: kept.has("merger"),
+    shareholders: kept.has("shareholders"),
   });
 }
 
@@ -1743,6 +1813,10 @@ export function isFastForwardCrit(floor: Floor): boolean {
 
 export function isFrozenCrit(floor: Floor): boolean {
   return frozenCrits.has(floor);
+}
+
+export function isSpendingFreezeCrit(floor: Floor): boolean {
+  return spendingFreezeCrits.has(floor);
 }
 
 export function isSnowballCrit(floor: Floor): boolean {
@@ -1853,6 +1927,10 @@ export function isFireDrillCrit(floor: Floor): boolean {
   return fireDrillCrits.has(floor);
 }
 
+export function isPerformanceBonusCrit(floor: Floor): boolean {
+  return performanceBonusCrits.has(floor);
+}
+
 export function isDoubleDownCrit(floor: Floor): boolean {
   return doubleDownCrits.has(floor);
 }
@@ -1887,6 +1965,10 @@ export function isRecruitmentDriveCrit(floor: Floor): boolean {
 
 export function isMergerCrit(floor: Floor): boolean {
   return mergerCrits.has(floor);
+}
+
+export function isShareholdersCrit(floor: Floor): boolean {
+  return shareholdersCrits.has(floor);
 }
 
 // the armed "special crit crit" bonus tier riding on this floor's already-
@@ -2016,6 +2098,10 @@ export function forceFrozenCritProc(floor: Floor): void {
   frozenCrits.add(floor);
 }
 
+export function forceSpendingFreezeCritProc(floor: Floor): void {
+  spendingFreezeCrits.add(floor);
+}
+
 export function forceSnowballCritProc(floor: Floor): void {
   snowballCrits.add(floor);
 }
@@ -2124,6 +2210,10 @@ export function forceFireDrillCritProc(floor: Floor): void {
   fireDrillCrits.add(floor);
 }
 
+export function forcePerformanceBonusCritProc(floor: Floor): void {
+  performanceBonusCrits.add(floor);
+}
+
 export function forceDoubleDownCritProc(floor: Floor): void {
   doubleDownCrits.add(floor);
 }
@@ -2162,6 +2252,10 @@ export function forceRecruitmentDriveCritProc(floor: Floor): void {
 
 export function forceMergerCritProc(floor: Floor): void {
   mergerCrits.add(floor);
+}
+
+export function forceShareholdersCritProc(floor: Floor): void {
+  shareholdersCrits.add(floor);
 }
 
 // dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)

@@ -10,6 +10,7 @@ import {
   getOvertimeTickGoal,
   getOvertimeCost,
   isFrozenActive,
+  isSpendingFreezeActive,
   isRushHourActive,
   RUSH_HOUR_INTERVAL_SECONDS,
 } from "../upgradeButton";
@@ -172,7 +173,10 @@ export function increaseIncomeRate(floor: Floor): void {
   // "frozen crit" (see upgradeButton/frozen.ts's isFrozenActive): while
   // active, this floor's upgradeCost is locked — every other part of the
   // tick (rate gain, upgradeCount, interval-halving) proceeds as normal
-  if (!isFrozenActive(floor, Date.now())) {
+  if (
+    !isFrozenActive(floor, Date.now()) &&
+    !isSpendingFreezeActive(floor, Date.now())
+  ) {
     floor.upgradeCost = multiply(
       floor.upgradeCost,
       floor.aboveCapTier ? UPGRADE_COST_GROWTH_ABOVE_CAP : UPGRADE_COST_GROWTH,
