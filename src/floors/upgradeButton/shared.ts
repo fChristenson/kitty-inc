@@ -191,6 +191,17 @@ export function stepHoldAnim(
   const state = holdAnimState.get(floor);
   if (!state) return { scale: 1, rotation: 0, shakeX: 0, shakeY: 0 };
 
+  // Stop building pressure as soon as the button becomes unaffordable. The
+  // purchase repeat may keep trying, but a visibly gray button must not keep
+  // wobbling or growing as though it were still actionable.
+  if (
+    (state.phase === "grow" || state.phase === "pop") &&
+    !isUpgradeButtonEnabled(floor)
+  ) {
+    beginReleasing(floor, state);
+    return stepHoldAnim(floor, now, cx, cy);
+  }
+
   const elapsed = now - state.phaseStartedAt;
 
   if (state.phase === "grow" && elapsed >= HOLD_ANIM_GROW_MS) {

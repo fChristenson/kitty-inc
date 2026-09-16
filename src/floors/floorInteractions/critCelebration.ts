@@ -452,7 +452,7 @@ interface QueuedCelebration {
 }
 const specialCelebrationQueue: QueuedCelebration[] = [];
 let drainingSpecialQueue = false;
-const DEJA_VU_RANDOM_FOLLOW_UP_COUNT = 2;
+const DEJA_VU_REPEAT_COUNT = 2;
 const DEJA_VU_FOLLOW_UP_MAX_AGE_MS = 5000;
 
 // a bulk-buy hold (x250 multiplier) can land many chain/boost procs far
@@ -547,6 +547,7 @@ export function triggerCritCelebration(
             getScreenCenterLocal,
             now,
             DEJA_VU_FOLLOW_UP_MAX_AGE_MS,
+            true,
           );
         }
       }
@@ -611,8 +612,10 @@ function queueProcCelebration(
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
   now: number,
   maxAgeMs?: number,
+  allowDuplicate = false,
 ): void {
-  if (specialCelebrationQueue.some((q) => q.kind === kind)) return;
+  if (!allowDuplicate && specialCelebrationQueue.some((q) => q.kind === kind))
+    return;
   const custom = CUSTOM_PROC_CELEBRATIONS[kind];
   const info = CRIT_PROC_INFO[kind];
   specialCelebrationQueue.push({
@@ -632,8 +635,9 @@ function queueProcCelebration(
   });
 }
 
-// Deja Vu's own bonus procs: only kinds that did NOT land on this roll, so it
-// always reads as "and these too" rather than replaying what already showed
+// Deja Vu picks one random proc other than itself and repeats that same proc
+// twice. Avoid procs already shown on this roll so the replay reads as a new
+// bonus rather than a duplicate of the original flash.
 function pickDejaVuFollowUps(procs: Partial<CritProcFlags>): CritProcKind[] {
   const available = CRIT_PROC_KINDS.filter(
     (kind) =>
@@ -641,14 +645,7 @@ function pickDejaVuFollowUps(procs: Partial<CritProcFlags>): CritProcKind[] {
       !procs[kind] &&
       !specialCelebrationQueue.some((q) => q.kind === kind),
   );
-  const picked: CritProcKind[] = [];
-  for (
-    let i = 0;
-    i < DEJA_VU_RANDOM_FOLLOW_UP_COUNT && available.length > 0;
-    i++
-  ) {
-    const index = Math.floor(Math.random() * available.length);
-    picked.push(available.splice(index, 1)[0]);
-  }
-  return picked;
+  if (available.length === 0) return [];
+  const repeated = available[Math.floor(Math.random() * available.length)];
+  return Array.from({ length: DEJA_VU_REPEAT_COUNT }, () => repeated);
 }

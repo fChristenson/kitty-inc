@@ -107,8 +107,6 @@
 - Merger — averages every unlocked floor's rate, then raises them all to
   that average. Lifts the weak without touching the strong.
 
-## To consider
-
 - Payroll — pays every unlocked floor one second of its current income rate.
 - Market Research — reveals the next crit tier before the next upgrade is bought.
 - Elevator Pitch — instantly moves the camera to the highest unlocked floor and gives it one free upgrade.
@@ -124,3 +122,22 @@
 - Floor Plan — copies the critted floor's office chairs and supplies to every unlocked floor.
 - Hiring Freeze — prevents worker purchases for 30 seconds while doubling income from existing workers.
 - Shareholders — pays out one percent of the active company's total earned income.
+
+## To consider
+
+- Time Clock — instantly completes the critted floor's current income timer twice.
+- Talent Scout — adds one worker to the critted floor and boosts that worker briefly.
+- Cost Center — refunds the difference between the current upgrade cost and its previous cost.
+- Floor Share — copies one percent of the critted floor's income rate to every other unlocked floor.
+- Break Room — doubles the active floor's worker boost effect for 10 seconds.
+- Cash Flow — pays out the current income rate of every unlocked floor once.
+- Promotion Cycle — gives the critted floor one manager and one worker if both are available.
+- Safety Net — prevents the next unaffordable upgrade from increasing its cost.
+- Board Meeting — guarantees the next crit on every unlocked floor is at least mega tier.
+- Open Ledger — reveals the total amount spent on upgrades in the current building.
+- Shift Change — moves every active worker boost from the critted floor to the floor above it.
+- Hiring Spree — fills one random unlocked floor to its worker cap.
+- Rate Lock — freezes the critted floor's income interval for 20 seconds.
+- Dividend Reinvestment — converts the next payout into free upgrade progress on the critted floor.
+- Floor Bonus — grants one free upgrade to every unlocked floor below the critted floor.
+
