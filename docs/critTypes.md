@@ -160,3 +160,34 @@
 
 ## To consider
 
+- **Time Deposit** — stores the critted floor's next five payouts and releases
+  them together with a bonus when the deposit matures.
+- **Rainy Day Fund** — converts a percentage of the building's current income
+  rate into a protected reserve that pays out if the player cannot afford an
+  upgrade.
+- **Power Surge** — instantly completes every income bar that is at least 80%
+  full, leaving less-progressed bars untouched.
+- **Talent Pipeline** — the next worker hired on each unlocked floor arrives
+  already boosted and extends the boost duration of the worker below it.
+- **Price Match** — temporarily gives every unlocked floor the upgrade price
+  of the cheapest floor, while preserving each floor's own income progression.
+- **Forecast** — displays the exact next crit tier and applies a small payout
+  whenever the player follows the forecasted upgrade path.
+- **Vacancy Bonus** — pays extra for every worker slot that is still empty,
+  turning an under-staffed building into a short-term source of cash.
+- **Safety Inspection** — removes one random negative or limiting floor state
+  and grants that floor a free manager if it is eligible.
+- **Bidding War** — freezes the current floor's upgrade price, then increases
+  its income rate each time another floor is upgraded during the window.
+- **Lucky Breakroom** — every worker currently boosted has a chance to produce
+  a small independent payout before their boost expires.
+- **Blueprint Transfer** — copies one unlocked floor's permanent upgrades to
+  the next locked floor before unlocking it, without changing its starting
+  level.
+- **Compound Bonus** — pays a percentage based on the number of different
+  special crit types collected by the player so far.
+- **Quiet Quarter** — suppresses all special-crit flashes for a short period
+  while increasing the odds that the next special proc is a new type.
+- **Executive Bonus** — grants a building-wide payout based on the highest
+  permanent crit tier currently represented in the building.
+

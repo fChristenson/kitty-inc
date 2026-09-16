@@ -76,6 +76,15 @@ export const CHAIN_CRIT_CONTINUE_CHANCE = CONFIG.crit.chainContinueChance;
 export const CHAIN_CRIT_COLOR = COLOR.blue;
 export const CHAIN_CRIT_LABEL = "Chain";
 
+// "domino effect" — starts with one free upgrade on the floor that crit,
+// then has a 50% chance to reach each floor above it with double the previous
+// floor's upgrade count. Its reward is applied by floorInteractions.ts.
+export const DOMINO_EFFECT_CRIT_CHANCE = CONFIG.crit.dominoEffectChance;
+export const DOMINO_EFFECT_CONTINUE_CHANCE =
+  CONFIG.crit.dominoEffectContinueChance;
+export const DOMINO_EFFECT_CRIT_COLOR = COLOR.blue;
+export const DOMINO_EFFECT_CRIT_LABEL = "Domino Effect";
+
 // "boost crit" — another proc riding on an already-landed crit/mega/ultra (see
 // rollCrit below), same as chain: instead of extra upgrades it grants a
 // free worker boost. Neither proc's button EVER changes appearance on its
@@ -648,32 +657,13 @@ export const DRESS_CODE_CRIT_CHANCE = CONFIG.crit.dressCodeChance;
 export const DRESS_CODE_CRIT_COLOR = COLOR.dressCodeGreen;
 export const DRESS_CODE_CRIT_LABEL = "Dress Code";
 
-// "Tea Break" crit — pauses every unlocked floor's income timer for a short
-// break, then releases one payout from every floor together
+// "Tea Break" crit — grants one free upgrade to the floor that landed it
 export const TEA_BREAK_CRIT_CHANCE = CONFIG.crit.teaBreakChance;
 export const TEA_BREAK_CRIT_COLOR = COLOR.teaBreakBrown;
 export const TEA_BREAK_CRIT_LABEL = "Tea Break";
-export const TEA_BREAK_DURATION_MS = CONFIG.crit.teaBreakDurationMs;
-const teaBreakPausedAt = new WeakMap<Floor, number>();
 
 export function isTeaBreakCrit(floor: Floor): boolean {
   return teaBreakCrits.has(floor);
-}
-
-export function startTeaBreakPause(floor: Floor, startedAt: number): void {
-  teaBreakPausedAt.set(floor, startedAt);
-}
-
-export function isTeaBreakPaused(floor: Floor): boolean {
-  return teaBreakPausedAt.has(floor);
-}
-
-export function getTeaBreakPausedAt(floor: Floor): number | null {
-  return teaBreakPausedAt.get(floor) ?? null;
-}
-
-export function endTeaBreakPause(floor: Floor): void {
-  teaBreakPausedAt.delete(floor);
 }
 
 // "Recruitment Drive" crit — fills this floor and contiguous unlocked floors
@@ -711,6 +701,7 @@ export const PAYOUT_CRIT_LABEL = "Payout";
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
+const dominoEffectCrits = new WeakSet<Floor>();
 const boostCrits = new WeakSet<Floor>();
 const bounceCrits = new WeakSet<Floor>();
 const explosionCrits = new WeakSet<Floor>();
@@ -794,9 +785,10 @@ const bonusTierCrits = new WeakMap<Floor, CritTier>();
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
 // or more actually landed, randomly pick up to MAX_SPECIAL_CRIT_PROCS of
-// them (via pickAtMost's Fisher-Yates shuffle) to actually apply, so a
-// single crit can never stack every proc at once even when several land
-export const MAX_SPECIAL_CRIT_PROCS = 2;
+// them (via pickAtMost's Fisher-Yates shuffle) to actually apply. Only one
+// proc can land on a base crit; Deja Vu's two follow-ups are spawned later by
+// its dedicated follow-up path and are intentionally unaffected by this cap.
+export const MAX_SPECIAL_CRIT_PROCS = 1;
 
 // gateway roll checked ONCE before any individual proc chance is even rolled
 // (see CONFIG.crit's own comment) — a miss here skips the whole system
@@ -827,6 +819,7 @@ export interface CritRollResult {
   // bonus
   bonusTier: CritTier | null;
   chain: boolean;
+  dominoEffect: boolean;
   boost: boolean;
   bounce: boolean;
   explosion: boolean;
@@ -914,6 +907,7 @@ export type CritProcKind = Exclude<keyof CritRollResult, "tier" | "bonusTier">;
 
 export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "chain",
+  "dominoEffect",
   "boost",
   "bounce",
   "explosion",
@@ -997,6 +991,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
 // CRIT_PROC_KINDS instead of hand-listing all 59 of them again
 const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   chain: chainCrits,
+  dominoEffect: dominoEffectCrits,
   boost: boostCrits,
   bounce: bounceCrits,
   explosion: explosionCrits,
@@ -1115,8 +1110,7 @@ export type CritProcHandlers<TContext> = Partial<
 // click, a floor-unlock purchase, a whole building bought off the map) never
 // re-checks `result.chain`/`result.boost`/... itself, it just supplies a
 // small handlers map of "what this proc means for ME" and this loop does the
-// rest. Up to MAX_SPECIAL_CRIT_PROCS landed procs each still get their own
-// independent call, same as before this existed
+// rest. The single selected landed proc gets its own independent call.
 export function applyCritProcs<TContext>(
   result: Pick<CritRollResult, CritProcKind>,
   ctx: TContext,
@@ -1168,6 +1162,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     color: CHAIN_CRIT_COLOR,
     icon: "chain",
     description: "Repeats the crit on the floor above",
+  },
+  dominoEffect: {
+    label: DOMINO_EFFECT_CRIT_LABEL,
+    color: DOMINO_EFFECT_CRIT_COLOR,
+    icon: "dominoEffect",
+    description: "Doubles upgrades across a lucky floor run",
   },
   boost: {
     label: BOOST_CRIT_LABEL,
@@ -1716,6 +1716,7 @@ export function rollCrit(
   const landed: CritProcKind[] = [];
   if (allowSpecialProcs && Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE) {
     if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
+    if (Math.random() < DOMINO_EFFECT_CRIT_CHANCE) landed.push("dominoEffect");
     if (Math.random() < BOOST_CRIT_CHANCE) landed.push("boost");
     if (Math.random() < BOUNCE_CRIT_CHANCE) landed.push("bounce");
     if (Math.random() < EXPLOSION_CRIT_CHANCE) landed.push("explosion");
@@ -1820,6 +1821,7 @@ export function rollCrit(
     tier,
     bonusTier,
     chain: kept.has("chain"),
+    dominoEffect: kept.has("dominoEffect"),
     boost: kept.has("boost"),
     bounce: kept.has("bounce"),
     explosion: kept.has("explosion"),
@@ -1902,6 +1904,10 @@ export function rollCrit(
 // crit — see rollCrit/floorInteractions.ts's plain-click crit branch
 export function isChainCrit(floor: Floor): boolean {
   return chainCrits.has(floor);
+}
+
+export function isDominoEffectCrit(floor: Floor): boolean {
+  return dominoEffectCrits.has(floor);
 }
 
 export function isBoostCrit(floor: Floor): boolean {
@@ -2225,6 +2231,10 @@ export function consumeCritProcs(floor: Floor): void {
 // forceBounceCritUpgrade), bypassing chance entirely
 export function forceChainCritProc(floor: Floor): void {
   chainCrits.add(floor);
+}
+
+export function forceDominoEffectCritProc(floor: Floor): void {
+  dominoEffectCrits.add(floor);
 }
 
 export function forceBoostCritProc(floor: Floor): void {

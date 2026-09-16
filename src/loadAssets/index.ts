@@ -52,6 +52,7 @@ const IMAGE_FILES = {
   cashRegister: "cashRegister.png", // Trigger sales event's own menu icon
   clock: "clock.png", // Work overtime's own menu icon
   chain: "chain.png", // Chain crit flash's own backdrop icon
+  dominoEffect: "dominoEffect.png", // Domino Effect crit flash's own backdrop icon
   ball: "ball.png", // Bounce crit flash's own backdrop icon
   explosion: "explosion.png", // Explosion crit flash's own backdrop icon
   booty: "booty.png", // Booty crit flash's own backdrop icon

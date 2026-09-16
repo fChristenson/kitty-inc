@@ -55,13 +55,18 @@ export const CONFIG = {
     // this time, silently (see rollCrit in shared/critTypes). A hit just
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
-    specialCritGatewayChance: 0.15,
+    specialCritGatewayChance: 0.05,
     // "chain crit" — an extra roll on top of an already-landed crit/mega/ultra
     // (see rollCritUpgrade): applies that same tier's upgrade to the next floor
     // too, then has chainContinueChance to keep going up the building one floor
     // at a time
     chainChance: 0.08,
     chainContinueChance: 0.5,
+    // "domino effect" — starts with one free upgrade on the critted floor,
+    // then has a 50% chance to reach each floor above it with double the
+    // previous floor's upgrade count
+    dominoEffectChance: 0.04,
+    dominoEffectContinueChance: 0.5,
     // "boost crit" — a separate, independent roll from chain, but only ever
     // checked once a crit/mega/ultra tier has already landed on this same
     // click: it piggybacks on that tier's own free-upgrade payout instead of
@@ -319,10 +324,8 @@ export const CONFIG = {
     headhunterChance: 0.06,
     // "Dress Code" crit — adds a manager or worker on every unlocked floor
     dressCodeChance: 0.08,
-    // "Tea Break" crit — pauses every unlocked floor's income timer, then
-    // releases one payout from each floor together after the break
+    // "Tea Break" crit — grants one free upgrade to the floor that landed it
     teaBreakChance: 0.08,
-    teaBreakDurationMs: 10000,
     // "Recruitment Drive" crit — fills this floor and contiguous unlocked
     // floors above it, stopping at the first maxed or locked floor
     recruitmentDriveChance: 0.06,

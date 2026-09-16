@@ -54,6 +54,7 @@ import {
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
   CHAIN_CRIT_CONTINUE_CHANCE,
+  DOMINO_EFFECT_CONTINUE_CHANCE,
   BOUNCE_CRIT_CONTINUE_CHANCE,
   EXPLOSION_CRIT_CONTINUE_CHANCE,
   BTN_W,
@@ -91,9 +92,6 @@ import {
   applyCritProcs,
   onlyCritProc,
   recordCritProcLanded,
-  TEA_BREAK_DURATION_MS,
-  startTeaBreakPause,
-  endTeaBreakPause,
 } from "../../shared/critTypes";
 import { playSold, playBloop, playCoinDrop } from "../../sound";
 import {
@@ -499,6 +497,33 @@ function applyBullMarketCrit(floors: Floor[]): void {
   }
 }
 
+// "Domino Effect" starts with one free upgrade on the landing floor, then
+// has a 50% chance to reach each floor above it with double the prior batch.
+// Batch upgrades use the cheap rate-only path so a late-building domino run
+// cannot freeze the main thread by spawning one particle per simulated click.
+function applyDominoEffectCrit(deps: ChainCritDeps, startIndex: number): void {
+  const { floors, backgroundCount, multiplier, onFloorAdded } = deps;
+  let index = startIndex;
+  let count = 1;
+  while (index < floors.length) {
+    const target = floors[index];
+    if (!target.unlocked) {
+      unlockFloor(target);
+      ensureLockedFloorAbove({
+        floors,
+        backgroundCount,
+        multiplier,
+        onAdd: onFloorAdded,
+      });
+    }
+    for (let i = 0; i < count; i++) increaseIncomeRate(target);
+    if (index !== startIndex) rollCritUpgrade(target);
+    index += 1;
+    if (Math.random() >= DOMINO_EFFECT_CONTINUE_CHANCE) return;
+    count *= 2;
+  }
+}
+
 // minimal deps a chain crit needs to grow a building while walking upward —
 // a subset of FloorActionsDeps so non-floors callers (cityMap.ts's own
 // building-unlock crit, via main.ts) don't need that type's unrelated fields
@@ -678,21 +703,8 @@ function applyShareholdersCrit(floors: Floor[]): void {
   addTotalIncome(multiply(getTotalIncome(), payoutPercent));
 }
 
-function applyTeaBreakCrit(floors: Floor[], persist: () => void): void {
-  const startedAt = Date.now();
-  const unlockedFloors = floors.filter((floor) => floor.unlocked);
-  for (const floor of unlockedFloors) startTeaBreakPause(floor, startedAt);
-  setTimeout(() => {
-    const releasedAt = Date.now();
-    let total: BigNumber = ZERO;
-    for (const floor of unlockedFloors) {
-      total = add(total, currentPayoutAmount(floor, releasedAt));
-      floor.lastCollectedAt = releasedAt;
-      endTeaBreakPause(floor);
-    }
-    addTotalIncome(total);
-    persist();
-  }, TEA_BREAK_DURATION_MS);
+function applyTeaBreakCrit(floor: Floor, isGroundFloor: boolean): void {
+  applyUpgradeTick(floor, isGroundFloor);
 }
 
 // "frozen crit" (see shared/critTypes's isFrozenCrit): no instant payout —
@@ -1166,7 +1178,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   bonusRound: (c) => applyBonusRoundCrit(c.floor),
   overflow: (c) => applyOverflowCrit(c.floor),
   performanceBonus: (c) => applyPerformanceBonusCrit(c.floors),
-  teaBreak: (c) => applyTeaBreakCrit(c.floors, c.deps.persist),
+  teaBreak: (c) => applyTeaBreakCrit(c.floor, c.isGroundFloor),
   doubleDown: (c) => applyDoubleDownCrit(c.floor, c.isGroundFloor, c.tier),
   coffeeRun: (c) => applyCoffeeRunCrit(c.floors),
   dressCode: (c) => applyDressCodeCrit(c.floors),
@@ -1184,6 +1196,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
 // the floors it reaches, re-arming each one's next crit as it goes
 const CLICK_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   ...SHARED_CRIT_REWARDS,
+  dominoEffect: (c) => applyDominoEffectCrit(c.deps, c.floors.indexOf(c.floor)),
   chain: (c) =>
     applyChainCrit(c.deps, c.floors.indexOf(c.floor), (reached, isGround) => {
       for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
@@ -1214,6 +1227,7 @@ const CLICK_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
 // promote each reached floor's permanent tier instead
 const FLOOR_BUY_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   ...SHARED_CRIT_REWARDS,
+  dominoEffect: (c) => applyDominoEffectCrit(c.deps, c.floors.indexOf(c.floor)),
   // A newly unlocked floor always starts at level 0, so Merger has no useful
   // target level to synchronize into floors below it on this path.
   merger: () => {},

@@ -25,6 +25,7 @@ import {
   forceMegaCritUpgrade,
   forceUltraCritUpgrade,
   forceChainCritUpgrade,
+  forceDominoEffectCritUpgrade,
   forceBoostCritUpgrade,
   forceBounceCritUpgrade,
   forceExplosionCritUpgrade,
@@ -166,6 +167,7 @@ import {
   wireSpawnMegaCritButton,
   wireSpawnUltraCritButton,
   wireSpawnChainCritButton,
+  wireSpawnDominoEffectCritButton,
   wireSpawnChainMegaCritButton,
   wireSpawnChainUltraCritButton,
   wireSpawnBoostCritButton,
@@ -647,6 +649,10 @@ async function main() {
     wireSpawnChainCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceChainCritUpgrade(floor, "crit");
+    });
+    wireSpawnDominoEffectCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceDominoEffectCritUpgrade(floor, "crit");
     });
     wireSpawnChainMegaCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];

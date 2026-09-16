@@ -27,6 +27,9 @@ export {
   MEGA_CRIT_UPGRADE_COUNT,
   ULTRA_CRIT_UPGRADE_COUNT,
   CHAIN_CRIT_CONTINUE_CHANCE,
+  DOMINO_EFFECT_CONTINUE_CHANCE,
+  DOMINO_EFFECT_CRIT_COLOR,
+  DOMINO_EFFECT_CRIT_LABEL,
   BOOST_CRIT_COLOR,
   BOOST_CRIT_LABEL,
   BOUNCE_CRIT_CONTINUE_CHANCE,
@@ -193,6 +196,7 @@ export {
   MERGER_CRIT_COLOR,
   MERGER_CRIT_LABEL,
   isChainCrit,
+  isDominoEffectCrit,
   isBoostCrit,
   isBounceCrit,
   isExplosionCrit,
@@ -277,6 +281,7 @@ import {
   rollCrit,
   consumeCritProcs,
   forceChainCritProc,
+  forceDominoEffectCritProc,
   forceBoostCritProc,
   forceBounceCritProc,
   forceExplosionCritProc,
@@ -401,6 +406,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
   rollCrit((result) => {
     critTiers.set(floor, result.tier);
     if (result.chain) forceChainCritProc(floor);
+    if (result.dominoEffect) forceDominoEffectCritProc(floor);
     if (result.boost) forceBoostCritProc(floor);
     if (result.bounce) forceBounceCritProc(floor);
     if (result.explosion) forceExplosionCritProc(floor);
@@ -558,11 +564,13 @@ export function forceFloorBuyCrit(
   cloneArmy = false,
   merger = false,
   teamLunch = false,
+  dominoEffect = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
     bonusTier,
     chain,
+    dominoEffect,
     boost,
     bounce,
     explosion,
@@ -802,6 +810,13 @@ export function forcePayoutFloorBuyCrit(tier: CritTier = "crit"): void {
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.payout = true;
 }
 
+// dev/test-only: guarantees the next floor/building purchase crit carries a
+// Domino Effect proc on top of the chosen tier
+export function forceDominoEffectFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.dominoEffect = true;
+}
+
 export function getCritTier(floor: Floor): CritTier | null {
   return critTiers.get(floor) ?? null;
 }
@@ -852,6 +867,16 @@ export function forceChainCritUpgrade(
 ): void {
   critTiers.set(floor, tier);
   forceChainCritProc(floor);
+}
+
+// dev/test-only: force this floor into a Domino Effect crit at the given tier
+// (default "crit"), bypassing both the tier chance and proc chance
+export function forceDominoEffectCritUpgrade(
+  floor: Floor,
+  tier: CritTier = "crit",
+): void {
+  critTiers.set(floor, tier);
+  forceDominoEffectCritProc(floor);
 }
 
 // dev/test-only: force this floor into a bounce crit at the given tier
