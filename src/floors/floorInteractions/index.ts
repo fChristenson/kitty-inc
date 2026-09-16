@@ -524,6 +524,31 @@ function applyDominoEffectCrit(deps: ChainCritDeps, startIndex: number): void {
   }
 }
 
+// Blueprint unlocks the next floor and copies the triggering floor's
+// progression and staffing to it for free. The target starts at level 0, so
+// replaying the source's upgrade count through the normal rate math preserves
+// the target floor's own base economics while matching its upgrade level.
+function applyBlueprintCrit(deps: ChainCritDeps, sourceIndex: number): void {
+  const { floors, backgroundCount, multiplier, onFloorAdded } = deps;
+  const source = floors[sourceIndex];
+  const target = floors[sourceIndex + 1];
+  if (!source || !target) return;
+  if (!target.unlocked) {
+    unlockFloor(target);
+    ensureLockedFloorAbove({
+      floors,
+      backgroundCount,
+      multiplier,
+      onAdd: onFloorAdded,
+    });
+  }
+  for (let i = 0; i < source.upgradeCount; i++) {
+    increaseIncomeRate(target);
+  }
+  target.workerCount = source.workerCount;
+  target.hasManager = source.hasManager;
+}
+
 // minimal deps a chain crit needs to grow a building while walking upward —
 // a subset of FloorActionsDeps so non-floors callers (cityMap.ts's own
 // building-unlock crit, via main.ts) don't need that type's unrelated fields
@@ -1190,6 +1215,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   springCleaning: (c) => applySpringCleaningCrit(c.floors, c.multiplier),
   nightOwl: (c) => applyNightOwlCrit(c.floors),
   headhunter: (c) => applyHeadhunterCrit(c.floor, c.floors),
+  blueprint: (c) => applyBlueprintCrit(c.deps, c.floors.indexOf(c.floor)),
 };
 
 // an upgrade-click crit walks its landed tier's own free-upgrade batch across

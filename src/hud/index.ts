@@ -65,6 +65,7 @@ export {
   wireSpawnMegaCritButton,
   wireSpawnUltraCritButton,
   wireSpawnChainCritButton,
+  wireSpawnBlueprintCritButton,
   wireSpawnDominoEffectCritButton,
   wireSpawnChainMegaCritButton,
   wireSpawnChainUltraCritButton,

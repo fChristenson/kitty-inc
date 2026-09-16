@@ -146,7 +146,6 @@
 - Mentor — permanently increases the boost duration of one random worker.
 - Tower Share — grants every unlocked floor a payout based on its own worker count.
 - Lucky Break — instantly completes the next income timer that would finish naturally.
-- Blueprint — copies the critted floor's current office-upgrade bonuses to the floor above it.
 - Fast Track — halves the critted floor's next five income intervals.
 - Full Shift — boosts every worker and manager on the critted floor for one normal duration.
 - Rainmaker — pays one additional current income cycle from the company's highest-rate building.
@@ -181,9 +180,6 @@
   its income rate each time another floor is upgraded during the window.
 - **Lucky Breakroom** — every worker currently boosted has a chance to produce
   a small independent payout before their boost expires.
-- **Blueprint Transfer** — copies one unlocked floor's permanent upgrades to
-  the next locked floor before unlocking it, without changing its starting
-  level.
 - **Compound Bonus** — pays a percentage based on the number of different
   special crit types collected by the player so far.
 - **Quiet Quarter** — suppresses all special-crit flashes for a short period

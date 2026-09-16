@@ -30,6 +30,8 @@ export {
   DOMINO_EFFECT_CONTINUE_CHANCE,
   DOMINO_EFFECT_CRIT_COLOR,
   DOMINO_EFFECT_CRIT_LABEL,
+  BLUEPRINT_CRIT_COLOR,
+  BLUEPRINT_CRIT_LABEL,
   BOOST_CRIT_COLOR,
   BOOST_CRIT_LABEL,
   BOUNCE_CRIT_CONTINUE_CHANCE,
@@ -197,6 +199,7 @@ export {
   MERGER_CRIT_LABEL,
   isChainCrit,
   isDominoEffectCrit,
+  isBlueprintCrit,
   isBoostCrit,
   isBounceCrit,
   isExplosionCrit,
@@ -282,6 +285,7 @@ import {
   consumeCritProcs,
   forceChainCritProc,
   forceDominoEffectCritProc,
+  forceBlueprintCritProc,
   forceBoostCritProc,
   forceBounceCritProc,
   forceExplosionCritProc,
@@ -407,6 +411,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     critTiers.set(floor, result.tier);
     if (result.chain) forceChainCritProc(floor);
     if (result.dominoEffect) forceDominoEffectCritProc(floor);
+    if (result.blueprint) forceBlueprintCritProc(floor);
     if (result.boost) forceBoostCritProc(floor);
     if (result.bounce) forceBounceCritProc(floor);
     if (result.explosion) forceExplosionCritProc(floor);
@@ -571,6 +576,7 @@ export function forceFloorBuyCrit(
     bonusTier,
     chain,
     dominoEffect,
+    blueprint: false,
     boost,
     bounce,
     explosion,
@@ -877,6 +883,11 @@ export function forceDominoEffectCritUpgrade(
 ): void {
   critTiers.set(floor, tier);
   forceDominoEffectCritProc(floor);
+}
+
+export function forceBlueprintCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceBlueprintCritProc(floor);
 }
 
 // dev/test-only: force this floor into a bounce crit at the given tier

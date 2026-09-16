@@ -67,6 +67,9 @@ export const CONFIG = {
     // previous floor's upgrade count
     dominoEffectChance: 0.04,
     dominoEffectContinueChance: 0.5,
+    // "blueprint" crit — unlocks the next floor and copies the triggering
+    // floor's upgrades, workers, and manager to it for free
+    blueprintChance: 0.04,
     // "boost crit" — a separate, independent roll from chain, but only ever
     // checked once a crit/mega/ultra tier has already landed on this same
     // click: it piggybacks on that tier's own free-upgrade payout instead of

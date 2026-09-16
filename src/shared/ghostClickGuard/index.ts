@@ -14,7 +14,7 @@ export interface GhostClickGuard {
   shouldIgnore(): boolean;
 }
 
-export function createGhostClickGuard(delayMs = 300): GhostClickGuard {
+export function createGhostClickGuard(delayMs = 500): GhostClickGuard {
   let openedAt = 0;
   return {
     markOpened() {

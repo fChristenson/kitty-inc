@@ -53,6 +53,7 @@ const IMAGE_FILES = {
   clock: "clock.png", // Work overtime's own menu icon
   chain: "chain.png", // Chain crit flash's own backdrop icon
   dominoEffect: "dominoEffect.png", // Domino Effect crit flash's own backdrop icon
+  blueprint: "blueprint.png", // Blueprint crit flash's own backdrop icon
   ball: "ball.png", // Bounce crit flash's own backdrop icon
   explosion: "explosion.png", // Explosion crit flash's own backdrop icon
   booty: "booty.png", // Booty crit flash's own backdrop icon

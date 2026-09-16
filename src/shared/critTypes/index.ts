@@ -85,6 +85,10 @@ export const DOMINO_EFFECT_CONTINUE_CHANCE =
 export const DOMINO_EFFECT_CRIT_COLOR = COLOR.blue;
 export const DOMINO_EFFECT_CRIT_LABEL = "Domino Effect";
 
+export const BLUEPRINT_CRIT_CHANCE = CONFIG.crit.blueprintChance;
+export const BLUEPRINT_CRIT_COLOR = COLOR.blue;
+export const BLUEPRINT_CRIT_LABEL = "Blueprint";
+
 // "boost crit" — another proc riding on an already-landed crit/mega/ultra (see
 // rollCrit below), same as chain: instead of extra upgrades it grants a
 // free worker boost. Neither proc's button EVER changes appearance on its
@@ -702,6 +706,7 @@ export const PAYOUT_CRIT_LABEL = "Payout";
 // the whole "what can ride along with a landed crit" system stays in one place
 const chainCrits = new WeakSet<Floor>();
 const dominoEffectCrits = new WeakSet<Floor>();
+const blueprintCrits = new WeakSet<Floor>();
 const boostCrits = new WeakSet<Floor>();
 const bounceCrits = new WeakSet<Floor>();
 const explosionCrits = new WeakSet<Floor>();
@@ -820,6 +825,7 @@ export interface CritRollResult {
   bonusTier: CritTier | null;
   chain: boolean;
   dominoEffect: boolean;
+  blueprint: boolean;
   boost: boolean;
   bounce: boolean;
   explosion: boolean;
@@ -908,6 +914,7 @@ export type CritProcKind = Exclude<keyof CritRollResult, "tier" | "bonusTier">;
 export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "chain",
   "dominoEffect",
+  "blueprint",
   "boost",
   "bounce",
   "explosion",
@@ -992,6 +999,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
 const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   chain: chainCrits,
   dominoEffect: dominoEffectCrits,
+  blueprint: blueprintCrits,
   boost: boostCrits,
   bounce: bounceCrits,
   explosion: explosionCrits,
@@ -1168,6 +1176,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     color: DOMINO_EFFECT_CRIT_COLOR,
     icon: "dominoEffect",
     description: "Doubles upgrades across a lucky floor run",
+  },
+  blueprint: {
+    label: BLUEPRINT_CRIT_LABEL,
+    color: BLUEPRINT_CRIT_COLOR,
+    icon: "blueprint",
+    description: "Unlocks and copies the crit floor's upgrades and staff",
   },
   boost: {
     label: BOOST_CRIT_LABEL,
@@ -1717,6 +1731,7 @@ export function rollCrit(
   if (allowSpecialProcs && Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE) {
     if (Math.random() < CHAIN_CRIT_CHANCE) landed.push("chain");
     if (Math.random() < DOMINO_EFFECT_CRIT_CHANCE) landed.push("dominoEffect");
+    if (Math.random() < BLUEPRINT_CRIT_CHANCE) landed.push("blueprint");
     if (Math.random() < BOOST_CRIT_CHANCE) landed.push("boost");
     if (Math.random() < BOUNCE_CRIT_CHANCE) landed.push("bounce");
     if (Math.random() < EXPLOSION_CRIT_CHANCE) landed.push("explosion");
@@ -1822,6 +1837,7 @@ export function rollCrit(
     bonusTier,
     chain: kept.has("chain"),
     dominoEffect: kept.has("dominoEffect"),
+    blueprint: kept.has("blueprint"),
     boost: kept.has("boost"),
     bounce: kept.has("bounce"),
     explosion: kept.has("explosion"),
@@ -1908,6 +1924,10 @@ export function isChainCrit(floor: Floor): boolean {
 
 export function isDominoEffectCrit(floor: Floor): boolean {
   return dominoEffectCrits.has(floor);
+}
+
+export function isBlueprintCrit(floor: Floor): boolean {
+  return blueprintCrits.has(floor);
 }
 
 export function isBoostCrit(floor: Floor): boolean {
@@ -2235,6 +2255,10 @@ export function forceChainCritProc(floor: Floor): void {
 
 export function forceDominoEffectCritProc(floor: Floor): void {
   dominoEffectCrits.add(floor);
+}
+
+export function forceBlueprintCritProc(floor: Floor): void {
+  blueprintCrits.add(floor);
 }
 
 export function forceBoostCritProc(floor: Floor): void {

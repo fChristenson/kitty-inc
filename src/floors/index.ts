@@ -358,6 +358,7 @@ export {
   forceUltraCritUpgrade,
   forceChainCritUpgrade,
   forceDominoEffectCritUpgrade,
+  forceBlueprintCritUpgrade,
   forceDominoEffectFloorBuyCrit,
   forceBoostCritUpgrade,
   forceBounceCritUpgrade,
