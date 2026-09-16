@@ -185,6 +185,7 @@ export const COLOR = {
   // Merger crit's own dedicated color
   mergerGold: "#A16207",
   shareholdersGreen: "#166534",
+  rateLockBlue: "#0EA5E9",
 
   // wood/dialog chrome (worker menu, idle popup panels)
   woodFill: "#F8D18E",

@@ -31,6 +31,7 @@ import {
   triggerFrozenCrit,
   triggerSpendingFreeze,
   triggerRushHourCrit,
+  triggerRateLockCrit,
   armGuaranteedUltraCrit,
   armGuaranteedMegaCrit,
   LUCKY_CLOVER_CRIT_COUNT,
@@ -870,6 +871,10 @@ function applyRushHourCrit(floors: Floor[]): void {
   triggerRushHourCrit(floors);
 }
 
+function applyRateLockCrit(floor: Floor): void {
+  triggerRateLockCrit(floor);
+}
+
 // "Golden Ticket" crit (see shared/critTypes's isGoldenTicketCrit): no
 // instant payout — just arms upgradeButton.ts's own armGuaranteedUltraCrit
 // so the very next rollCritUpgrade call on this floor is forced straight to
@@ -1053,6 +1058,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   talentScout: (c) => applyTalentScoutCrit(c.floor),
   unionBoss: (c) => applyUnionBossCrit(c.floor),
   rushHour: (c) => applyRushHourCrit(c.floors),
+  rateLock: (c) => applyRateLockCrit(c.floor),
   goldenTicket: (c) => applyGoldenTicketCrit(c.floor),
   silverTicket: (c) => applySilverTicketCrit(c.floor),
   goldenParachute: () => applyGoldenParachuteCrit(),

@@ -211,6 +211,11 @@ export const CONFIG = {
     rushHourChance: 0.08,
     rushHourIntervalSeconds: 0.5,
     rushHourDurationMs: 15000,
+    // "Rate Lock" crit — for one floor, guarantees a half-length income interval
+    // multiplier for a short window without changing its stored interval
+    rateLockChance: 0.08,
+    rateLockSpeedMultiplier: 0.5,
+    rateLockDurationMs: 10000,
     // "Golden Ticket" crit — no instant reward: guarantees the very NEXT
     // crit roll on this floor lands ultra, bypassing every tier chance (and
     // every other piggyback proc's own chance) entirely for that one roll

@@ -108,6 +108,7 @@ export {
   wireSpawnTalentScoutCritButton,
   wireSpawnUnionBossCritButton,
   wireSpawnRushHourCritButton,
+  wireSpawnRateLockCritButton,
   wireSpawnGoldenTicketCritButton,
   wireSpawnSilverTicketCritButton,
   wireSpawnGrandOpeningCritButton,

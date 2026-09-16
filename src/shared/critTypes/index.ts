@@ -434,6 +434,22 @@ export function isRushHourActive(floor: Floor, now: number): boolean {
   return startedAt !== undefined && now - startedAt < RUSH_HOUR_DURATION_MS;
 }
 
+export const RATE_LOCK_CRIT_CHANCE = CONFIG.crit.rateLockChance;
+export const RATE_LOCK_CRIT_COLOR = COLOR.rateLockBlue;
+export const RATE_LOCK_CRIT_LABEL = "Rate Lock";
+export const RATE_LOCK_DURATION_MS = CONFIG.crit.rateLockDurationMs;
+export const RATE_LOCK_SPEED_MULTIPLIER = CONFIG.crit.rateLockSpeedMultiplier;
+const rateLockStartedAt = new WeakMap<Floor, number>();
+
+export function triggerRateLockCrit(floor: Floor): void {
+  rateLockStartedAt.set(floor, Date.now());
+}
+
+export function isRateLockActive(floor: Floor, now: number): boolean {
+  const startedAt = rateLockStartedAt.get(floor);
+  return startedAt !== undefined && now - startedAt < RATE_LOCK_DURATION_MS;
+}
+
 // "Golden Ticket" crit — also no instant reward: arming this proc just marks
 // the floor so that, once the crit is actually clicked, floorInteractions.ts's
 // applyGoldenTicketCrit arms upgradeButton.ts's own armGuaranteedUltraCrit —
@@ -697,6 +713,7 @@ const internCrits = new WeakSet<Floor>();
 const talentScoutCrits = new WeakSet<Floor>();
 const unionBossCrits = new WeakSet<Floor>();
 const rushHourCrits = new WeakSet<Floor>();
+const rateLockCrits = new WeakSet<Floor>();
 const goldenTicketCrits = new WeakSet<Floor>();
 const silverTicketCrits = new WeakSet<Floor>();
 const goldenParachuteCrits = new WeakSet<Floor>();
@@ -806,6 +823,7 @@ export interface CritRollResult {
   talentScout: boolean;
   unionBoss: boolean;
   rushHour: boolean;
+  rateLock: boolean;
   goldenTicket: boolean;
   silverTicket: boolean;
   goldenParachute: boolean;
@@ -886,6 +904,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "talentScout",
   "unionBoss",
   "rushHour",
+  "rateLock",
   "goldenTicket",
   "silverTicket",
   "goldenParachute",
@@ -962,6 +981,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   talentScout: talentScoutCrits,
   unionBoss: unionBossCrits,
   rushHour: rushHourCrits,
+  rateLock: rateLockCrits,
   goldenTicket: goldenTicketCrits,
   silverTicket: silverTicketCrits,
   goldenParachute: goldenParachuteCrits,
@@ -1346,6 +1366,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "sportscar",
     description: "Caps every floor's income timer at 0.5s for 15s",
   },
+  rateLock: {
+    label: RATE_LOCK_CRIT_LABEL,
+    color: RATE_LOCK_CRIT_COLOR,
+    icon: "rateLock",
+    description: "Locks this floor to at least 0.5x speed for 10s",
+  },
   goldenTicket: {
     label: GOLDEN_TICKET_CRIT_LABEL,
 
@@ -1637,6 +1663,7 @@ export function rollCrit(
     if (Math.random() < TALENT_SCOUT_CRIT_CHANCE) landed.push("talentScout");
     if (Math.random() < UNION_BOSS_CRIT_CHANCE) landed.push("unionBoss");
     if (Math.random() < RUSH_HOUR_CRIT_CHANCE) landed.push("rushHour");
+    if (Math.random() < RATE_LOCK_CRIT_CHANCE) landed.push("rateLock");
     if (Math.random() < GOLDEN_TICKET_CRIT_CHANCE) landed.push("goldenTicket");
     if (Math.random() < SILVER_TICKET_CRIT_CHANCE) landed.push("silverTicket");
     if (Math.random() < GRAND_OPENING_CRIT_CHANCE) landed.push("grandOpening");
@@ -1729,6 +1756,7 @@ export function rollCrit(
     talentScout: kept.has("talentScout"),
     unionBoss: kept.has("unionBoss"),
     rushHour: kept.has("rushHour"),
+    rateLock: kept.has("rateLock"),
     goldenTicket: kept.has("goldenTicket"),
     silverTicket: kept.has("silverTicket"),
     goldenParachute: kept.has("goldenParachute"),
@@ -1915,6 +1943,10 @@ export function isUnionBossCrit(floor: Floor): boolean {
 
 export function isRushHourCrit(floor: Floor): boolean {
   return rushHourCrits.has(floor);
+}
+
+export function isRateLockCrit(floor: Floor): boolean {
+  return rateLockCrits.has(floor);
 }
 
 export function isGoldenTicketCrit(floor: Floor): boolean {
@@ -2210,6 +2242,10 @@ export function forceUnionBossCritProc(floor: Floor): void {
 
 export function forceRushHourCritProc(floor: Floor): void {
   rushHourCrits.add(floor);
+}
+
+export function forceRateLockCritProc(floor: Floor): void {
+  rateLockCrits.add(floor);
 }
 
 export function forceGoldenTicketCritProc(floor: Floor): void {

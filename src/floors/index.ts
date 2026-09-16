@@ -393,6 +393,7 @@ export {
   forceTalentScoutCritUpgrade,
   forceUnionBossCritUpgrade,
   forceRushHourCritUpgrade,
+  forceRateLockCritUpgrade,
   forceGoldenTicketCritUpgrade,
   forceSilverTicketCritUpgrade,
   forceGoldenParachuteCritUpgrade,

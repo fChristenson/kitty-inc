@@ -115,6 +115,12 @@ export {
   RUSH_HOUR_INTERVAL_SECONDS,
   triggerRushHourCrit,
   isRushHourActive,
+  RATE_LOCK_CRIT_COLOR,
+  RATE_LOCK_CRIT_LABEL,
+  RATE_LOCK_DURATION_MS,
+  RATE_LOCK_SPEED_MULTIPLIER,
+  triggerRateLockCrit,
+  isRateLockActive,
   GOLDEN_TICKET_CRIT_COLOR,
   GOLDEN_TICKET_CRIT_LABEL,
   SILVER_TICKET_CRIT_COLOR,
@@ -295,6 +301,7 @@ import {
   forceTalentScoutCritProc,
   forceUnionBossCritProc,
   forceRushHourCritProc,
+  forceRateLockCritProc,
   forceGoldenTicketCritProc,
   forceSilverTicketCritProc,
   forceGoldenParachuteCritProc,
@@ -411,6 +418,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.intern) forceInternCritProc(floor);
     if (result.unionBoss) forceUnionBossCritProc(floor);
     if (result.rushHour) forceRushHourCritProc(floor);
+    if (result.rateLock) forceRateLockCritProc(floor);
     if (result.goldenTicket) forceGoldenTicketCritProc(floor);
     if (result.silverTicket) forceSilverTicketCritProc(floor);
     if (result.goldenParachute) forceGoldenParachuteCritProc(floor);
@@ -566,6 +574,7 @@ export function forceFloorBuyCrit(
     talentScout,
     unionBoss,
     rushHour,
+    rateLock: false,
     goldenTicket,
     silverTicket,
     goldenParachute,
@@ -1010,6 +1019,11 @@ export function forceUnionBossCritUpgrade(floor: Floor): void {
 export function forceRushHourCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceRushHourCritProc(floor);
+}
+
+export function forceRateLockCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceRateLockCritProc(floor);
 }
 
 // dev/test-only: force this floor's already-armed tier to also carry a

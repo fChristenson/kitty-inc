@@ -13,6 +13,8 @@ import {
   isSpendingFreezeActive,
   isRushHourActive,
   RUSH_HOUR_INTERVAL_SECONDS,
+  isRateLockActive,
+  RATE_LOCK_SPEED_MULTIPLIER,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { getTotalIncome } from "../../totalIncome";
@@ -206,14 +208,21 @@ function currentSpeedMultiplier(floor: Floor, now: number): number {
   const boostExponent = boostedFraction * floor.workerCount;
   const speedMultiplier =
     2 ** boostExponent * officeUpgradeSpeedMultiplier(floor);
-  if (!isRushHourActive(floor, now)) return speedMultiplier;
+  let effectiveSpeedMultiplier = speedMultiplier;
+  if (isRateLockActive(floor, now)) {
+    effectiveSpeedMultiplier = Math.max(
+      effectiveSpeedMultiplier,
+      1 / RATE_LOCK_SPEED_MULTIPLIER,
+    );
+  }
+  if (!isRushHourActive(floor, now)) return effectiveSpeedMultiplier;
   // "Rush Hour" crit (see shared/critTypes' isRushHourActive): the floor's
   // own income timer is capped at RUSH_HOUR_INTERVAL_SECONDS while active —
   // Math.max picks whichever multiplier yields the SMALLER (faster) interval,
   // so this stacks with (never undoes) whatever worker/office speed already
   // applies, and a floor already faster than the cap is left untouched
   return Math.max(
-    speedMultiplier,
+    effectiveSpeedMultiplier,
     floor.incomeIntervalSeconds / RUSH_HOUR_INTERVAL_SECONDS,
   );
 }
