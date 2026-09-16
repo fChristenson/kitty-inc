@@ -1,4 +1,5 @@
 import { buildFloor } from "../floors";
+import { increaseIncomeRate } from "../floors/incomePanel";
 import type { Floor } from "../gameState";
 import { type BigNumber, pow, multiply } from "../shared/bigNumber";
 
@@ -32,13 +33,21 @@ export function getBuildingPrice(nextBuildingIndex: number): BigNumber {
 export function createBuilding(
   buildingIndex: number,
   backgroundCount: number,
+  options: {
+    groundFloorLocked?: boolean;
+    initialUpgradeCount?: number;
+  } = {},
 ): Floor[] {
   const multiplier = getBuildingMultiplier(buildingIndex);
+  const groundFloorLocked = options.groundFloorLocked ?? buildingIndex > 0;
   const groundFloor = buildFloor(1, {
     backgroundCount,
     multiplier,
-    groundFloorLocked: buildingIndex > 0,
+    groundFloorLocked,
   });
+  for (let i = 0; i < (options.initialUpgradeCount ?? 0); i++) {
+    increaseIncomeRate(groundFloor);
+  }
   return [groundFloor];
 }
 

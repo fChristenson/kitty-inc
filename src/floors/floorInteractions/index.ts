@@ -53,6 +53,7 @@ import {
   type CritTier,
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
+  MYSTIC_UPGRADE_COUNT,
   CHAIN_CRIT_CONTINUE_CHANCE,
   DOMINO_EFFECT_CONTINUE_CHANCE,
   BOUNCE_CRIT_CONTINUE_CHANCE,
@@ -288,6 +289,7 @@ export interface FloorActionsDeps {
   // on the next tick, so these just need to register the new floor for hit-testing/
   // scroll bookkeeping — no manual "redraw this one floor now" plumbing needed anymore
   onFloorAdded: (floor: Floor) => void;
+  createMysticBuilding: () => void;
   getCompanyValue: () => BigNumber;
   applyCompanyWideBoost: () => void;
   // converts the current visual screen center (where screenShake's "CRIT!" flash is
@@ -855,6 +857,33 @@ function applyGrandOpeningCrit(deps: FloorActionsDeps): void {
     multiplier: deps.multiplier,
     onAdd: deps.onFloorAdded,
   });
+}
+
+function applyMysticCrit(deps: FloorActionsDeps, floor: Floor): void {
+  deps.createMysticBuilding();
+  const floorIndex = deps.floors.indexOf(floor);
+  let nextFloor = deps.floors[floorIndex + 1];
+  if (!nextFloor) {
+    ensureLockedFloorAbove({
+      floors: deps.floors,
+      backgroundCount: deps.backgroundCount,
+      multiplier: deps.multiplier,
+      onAdd: deps.onFloorAdded,
+    });
+    nextFloor = deps.floors[floorIndex + 1];
+  }
+  if (!nextFloor) return;
+
+  if (!nextFloor.unlocked) unlockFloor(nextFloor);
+  ensureLockedFloorAbove({
+    floors: deps.floors,
+    backgroundCount: deps.backgroundCount,
+    multiplier: deps.multiplier,
+    onAdd: deps.onFloorAdded,
+  });
+  for (let i = 0; i < MYSTIC_UPGRADE_COUNT; i++) {
+    increaseIncomeRate(floor);
+  }
 }
 
 // "Fully Staffed" crit (see shared/critTypes's isFullyStaffedCrit): fills
@@ -1472,6 +1501,7 @@ export function handleFloorClick(
           buyTier.tier,
         );
         applyCritProcs(buyTier, buyRewardContext!, FLOOR_BUY_CRIT_REWARDS);
+        if (buyTier.mystic) applyMysticCrit(deps, floor);
         // "special crit crit": once any proc above landed, a bonus tier may
         // have also landed on top of it (see rollCrit's own bonusTier)
         if (buyTier.bonusTier) applyBonusTierCrit(buyTier.bonusTier);
@@ -1632,6 +1662,7 @@ export function handleFloorClick(
         multiplier,
       };
       applyCritProcs(procs, rewardContext, CLICK_CRIT_REWARDS);
+      if (procs.mystic) applyMysticCrit(deps, floor);
       // "special crit crit": once any proc above landed, a bonus tier may
       // have also landed on top of it (see rollCrit's own bonusTier)
       if (bonusTier) applyBonusTierCrit(bonusTier);

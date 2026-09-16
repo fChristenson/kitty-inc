@@ -65,6 +65,8 @@ export const COLOR = {
   peppermintPink: "#EC4899",
   // Heavenly crit's own dedicated color
   heavenlyGold: "#FFD700",
+  // Mystic crit's own dedicated color
+  mysticTeal: "#0F766E",
   // Pair crit's own dedicated color
   pairBlue: "#38BDF8",
   // Three of a Kind crit's own dedicated color

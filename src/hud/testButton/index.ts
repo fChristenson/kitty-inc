@@ -79,6 +79,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-golden-ticket-crit" class="game__button">Spawn Golden Ticket Crit</button>
           <button id="spawn-silver-ticket-crit" class="game__button">Spawn Silver Ticket Crit</button>
           <button id="spawn-grand-opening-crit" class="game__button">Spawn Grand Opening Crit</button>
+          <button id="spawn-mystic-crit" class="game__button">Spawn Mystic Crit</button>
           <button id="spawn-fully-staffed-crit" class="game__button">Spawn Fully Staffed Crit</button>
           <button id="spawn-shift-change-crit" class="game__button">Spawn Shift Change Crit</button>
           <button id="spawn-espresso-shot-crit" class="game__button">Spawn Espresso Shot Crit</button>
@@ -170,6 +171,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-golden-ticket-crit" class="game__button">Floor Golden Ticket Crit</button>
           <button id="floor-buy-silver-ticket-crit" class="game__button">Floor Silver Ticket Crit</button>
           <button id="floor-buy-grand-opening-crit" class="game__button">Floor Grand Opening Crit</button>
+          <button id="floor-buy-mystic-crit" class="game__button">Floor Mystic Crit</button>
           <button id="floor-buy-fully-staffed-crit" class="game__button">Floor Fully Staffed Crit</button>
           <button id="floor-buy-espresso-shot-crit" class="game__button">Floor Espresso Shot Crit</button>
           <button id="floor-buy-deja-vu-crit" class="game__button">Floor Deja Vu Crit</button>
@@ -217,6 +219,7 @@ export function createTestButtonMarkup(): string {
           <button id="map-unlock-upgrade-crit" class="game__button">Map Unlock Upgrade Crit</button>
           <button id="map-unlock-grand-opening-crit" class="game__button">Map Unlock Grand Opening Crit</button>
           <button id="map-unlock-heavenly-crit" class="game__button">Map Unlock Heavenly Crit</button>
+          <button id="map-unlock-mystic-crit" class="game__button">Map Unlock Mystic Crit</button>
           <button id="map-unlock-pair-crit" class="game__button">Map Unlock Pair Crit</button>
           <button id="map-unlock-three-of-a-kind-crit" class="game__button">Map Unlock Three of a Kind Crit</button>
           <button id="map-unlock-four-of-a-kind-crit" class="game__button">Map Unlock Four of a Kind Crit</button>
@@ -750,6 +753,15 @@ export function wireSpawnGrandOpeningCritButton(
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-grand-opening-crit",
   )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnMysticCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#spawn-mystic-crit")!;
   button.addEventListener("click", onClick);
 }
 
@@ -1643,6 +1655,16 @@ export function wireFloorBuyGrandOpeningCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireFloorBuyMysticCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-mystic-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireFloorBuyFullyStaffedCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -2054,6 +2076,16 @@ export function wireMapUnlockHeavenlyCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#map-unlock-heavenly-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireMapUnlockMysticCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#map-unlock-mystic-crit",
   )!;
   button.addEventListener("click", onClick);
 }

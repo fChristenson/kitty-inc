@@ -9,6 +9,7 @@ import {
   POKER_HAND_CRIT_COUNTS,
   LUCKY_CLOVER_CRIT_COUNT,
   LUCKY_CLOVER_CRIT_TIER,
+  MYSTIC_UPGRADE_COUNT,
   type CritRollResult,
 } from "./shared/critTypes";
 import {
@@ -34,6 +35,8 @@ import {
   forceUpgradeCritUpgrade,
   forcePeppermintCritUpgrade,
   forceHeavenlyCritUpgrade,
+  forceMysticCritUpgrade,
+  forceMysticFloorBuyCrit,
   forcePairCritUpgrade,
   forceThreeOfAKindCritUpgrade,
   forceFourOfAKindCritUpgrade,
@@ -232,6 +235,7 @@ import {
   wireSpawnGoldenTicketCritButton,
   wireSpawnSilverTicketCritButton,
   wireSpawnGrandOpeningCritButton,
+  wireSpawnMysticCritButton,
   wireSpawnFullyStaffedCritButton,
   wireSpawnShiftChangeCritButton,
   wireSpawnEspressoShotCritButton,
@@ -322,6 +326,7 @@ import {
   wireFloorBuyGoldenTicketCritButton,
   wireFloorBuySilverTicketCritButton,
   wireFloorBuyGrandOpeningCritButton,
+  wireFloorBuyMysticCritButton,
   wireFloorBuyFullyStaffedCritButton,
   wireFloorBuyEspressoShotCritButton,
   wireFloorBuyDejaVuCritButton,
@@ -364,6 +369,7 @@ import {
   wireMapUnlockUpgradeCritButton,
   wireMapUnlockGrandOpeningCritButton,
   wireMapUnlockHeavenlyCritButton,
+  wireMapUnlockMysticCritButton,
   wireMapUnlockPairCritButton,
   wireMapUnlockThreeOfAKindCritButton,
   wireMapUnlockFourOfAKindCritButton,
@@ -565,6 +571,7 @@ async function main() {
         applyBoostAll(floors);
       }
     },
+    createMysticBuilding: () => createMysticBuilding(),
     persist,
     onOpenFloorUpgrades: (floor, floorNumber) =>
       floorUpgradeMenu.open(floor, floorNumber),
@@ -586,6 +593,20 @@ async function main() {
         }
       },
     });
+  }
+
+  function createMysticBuilding(): void {
+    const mysticBuildingIndex = buildings.length;
+    buildings.push(
+      createBuilding(mysticBuildingIndex, getBackgroundUrls().length, {
+        groundFloorLocked: false,
+        initialUpgradeCount: MYSTIC_UPGRADE_COUNT,
+      }),
+    );
+    const groundFloor = buildings[mysticBuildingIndex]?.[0];
+    if (groundFloor) {
+      setupBuilding(mysticBuildingIndex);
+    }
   }
 
   // switches which building is currently displayed — no travel animation yet, just
@@ -878,6 +899,10 @@ async function main() {
     wireSpawnGrandOpeningCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceGrandOpeningCritUpgrade(floor);
+    });
+    wireSpawnMysticCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceMysticCritUpgrade(floor);
     });
     wireSpawnFullyStaffedCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1897,6 +1922,7 @@ async function main() {
     wireFloorBuyGrandOpeningCritButton(app, () =>
       forceGrandOpeningFloorBuyCrit("crit"),
     );
+    wireFloorBuyMysticCritButton(app, () => forceMysticFloorBuyCrit("crit"));
     wireFloorBuyFullyStaffedCritButton(app, () =>
       forceFullyStaffedFloorBuyCrit("crit"),
     );
@@ -2060,6 +2086,7 @@ async function main() {
         true,
       ),
     );
+    wireMapUnlockMysticCritButton(app, () => forceMysticFloorBuyCrit("crit"));
     wireMapUnlockPairCritButton(app, () =>
       forceFloorBuyCrit(
         "crit",
@@ -2282,6 +2309,7 @@ async function main() {
     if (!floors) return;
     const { tier, chain } = result;
     for (const floor of floors) floor.critMultiplierTier = tier;
+    if (result.mystic) createMysticBuilding();
     // reward side of every proc this building-buy event actually supports —
     // one handler per proc kind (see shared/critTypes's applyCritProcs), so
     // this is the ONE place that has to say what "upgrade"/"heavenly" mean

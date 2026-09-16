@@ -101,6 +101,7 @@ export interface GameCanvasDeps {
   getBuildingMultiplier: () => number; // the currently-active building's economy scale
   getCompanyValue: () => BigNumber;
   applyCompanyWideBoost: () => void;
+  createMysticBuilding: () => void;
   persist: () => void;
   // fired by a plain tap on a floor's own green upgrade-arrow button (see
   // floors/upgradeArrow) — opens that floor's own hire worker/office chairs/
@@ -600,6 +601,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         persist,
         getCompanyValue: deps.getCompanyValue,
         applyCompanyWideBoost: deps.applyCompanyWideBoost,
+        createMysticBuilding: deps.createMysticBuilding,
         onFloorAdded: (floor) => notifyFloorAdded(floor),
         getScreenCenterLocal: screenCenterLocalFor,
       },

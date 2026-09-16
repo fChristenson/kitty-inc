@@ -40,6 +40,8 @@ import {
   UPGRADE_CRIT_COLOR,
   HEAVENLY_CRIT_LABEL,
   HEAVENLY_CRIT_COLOR,
+  MYSTIC_CRIT_LABEL,
+  MYSTIC_CRIT_COLOR,
   GRAND_OPENING_CRIT_LABEL,
   GRAND_OPENING_CRIT_COLOR,
   runFirstCritProc,
@@ -498,7 +500,7 @@ export function createCityMapView(
         spawnCoinBurstAt(cx, burstY, MARKER_COIN_BURST_SCALE * 1.5);
       }, i * 90);
     }
-    // only ONE flash can ever show at once, so heavenly/upgrade/grand opening
+    // only ONE flash can ever show at once, so Mystic/heavenly/upgrade/grand opening
     // — the only 3 procs this whole-building event supports (see
     // setBuildingCritTier) — are mutually exclusive with each other and with
     // the plain tier flash below, in priority order (heavenly first: it's the
@@ -508,6 +510,18 @@ export function createCityMapView(
       result,
       undefined,
       {
+        mystic: () => {
+          triggerScreenShake({
+            intensity: 2.2,
+            label: MYSTIC_CRIT_LABEL,
+            color: MYSTIC_CRIT_COLOR,
+            strokeWidth: 15,
+            blinkHz: 6,
+            holdMs: 900,
+            priority: 2,
+          });
+          playPayout();
+        },
         // heavenly crit: the single biggest reward, so it always gets the
         // same "ultra-strength" flash floorInteractions/critCelebration.ts's
         // own celebrateHeavenly uses
@@ -548,7 +562,7 @@ export function createCityMapView(
           playSold();
         },
       },
-      ["heavenly", "grandOpening", "upgrade"],
+      ["mystic", "heavenly", "grandOpening", "upgrade"],
     );
     if (playedSpecial) return;
     // chain crit: the flash shows "Chain" instead of the tier's usual "x5"/

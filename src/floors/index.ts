@@ -378,6 +378,8 @@ export {
   forceUpgradeCritUpgrade,
   forcePeppermintCritUpgrade,
   forceHeavenlyCritUpgrade,
+  forceMysticCritUpgrade,
+  forceMysticFloorBuyCrit,
   forcePairCritUpgrade,
   forceThreeOfAKindCritUpgrade,
   forceFourOfAKindCritUpgrade,

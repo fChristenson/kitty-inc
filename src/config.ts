@@ -110,6 +110,9 @@ export const CONFIG = {
     // fully-unlocked, fully-maxed building is a far bigger swing than
     // promoting alternating floors one step
     heavenlyChance: 0.0001,
+    // "mystic crit" — map-only: buys one extra building for free and gives
+    // its ground floor exactly 10 normal upgrade-rate increases
+    mysticChance: 0.001,
     // "pair"/"three of a kind"/"four of a kind"/"full house" crits — four more
     // flat, not-tier-scaled procs (see shared/critTypes' POKER_HAND_CRIT_COUNTS):
     // each promotes a FIXED number of floors' own permanent crit tier one step

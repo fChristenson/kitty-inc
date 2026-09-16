@@ -49,6 +49,9 @@ export {
   PEPPERMINT_CRIT_LABEL,
   HEAVENLY_CRIT_COLOR,
   HEAVENLY_CRIT_LABEL,
+  MYSTIC_CRIT_COLOR,
+  MYSTIC_CRIT_LABEL,
+  MYSTIC_UPGRADE_COUNT,
   POKER_HAND_CRIT_COUNTS,
   PAIR_CRIT_COLOR,
   PAIR_CRIT_LABEL,
@@ -211,6 +214,7 @@ export {
   isUpgradeCrit,
   isPeppermintCrit,
   isHeavenlyCrit,
+  isMysticCrit,
   isPairCrit,
   isThreeOfAKindCrit,
   isFourOfAKindCrit,
@@ -301,6 +305,7 @@ import {
   forceUpgradeCritProc,
   forcePeppermintCritProc,
   forceHeavenlyCritProc,
+  forceMysticCritProc,
   forcePairCritProc,
   forceThreeOfAKindCritProc,
   forceFourOfAKindCritProc,
@@ -433,6 +438,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.upgrade) forceUpgradeCritProc(floor);
     if (result.peppermint) forcePeppermintCritProc(floor);
     if (result.heavenly) forceHeavenlyCritProc(floor);
+    if (result.mystic) forceMysticCritProc(floor);
     if (result.pair) forcePairCritProc(floor);
     if (result.threeOfAKind) forceThreeOfAKindCritProc(floor);
     if (result.fourOfAKind) forceFourOfAKindCritProc(floor);
@@ -588,6 +594,7 @@ export function forceFloorBuyCrit(
   merger = false,
   teamLunch = false,
   dominoEffect = false,
+  mystic = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -603,6 +610,7 @@ export function forceFloorBuyCrit(
     upgrade,
     peppermint,
     heavenly,
+    mystic,
     pair,
     threeOfAKind,
     fourOfAKind,
@@ -1002,6 +1010,18 @@ export function forcePeppermintCritUpgrade(floor: Floor): void {
 export function forceHeavenlyCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceHeavenlyCritProc(floor);
+}
+
+export function forceMysticCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceMysticCritProc(floor);
+}
+
+// dev/test-only: guarantees the next floor/building purchase carries a Mystic
+// proc.
+export function forceMysticFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.mystic = true;
 }
 
 // dev/test-only: force this floor into a pair/three-of-a-kind/four-of-a-kind/
