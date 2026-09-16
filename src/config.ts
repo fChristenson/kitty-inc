@@ -352,6 +352,10 @@ export const CONFIG = {
     // seconds' worth of the currently active company's own combined income
     // rate (across every one of its buildings), straight to its total
     goldenParachuteChance: 0.03,
+    // "Rain Check" crit — pays 5 seconds of the landed building's combined
+    // current income rate
+    rainCheckChance: 0.03,
+    rainCheckSeconds: 5,
     // "Executive Bonus" crit — pays 25% of the active company's asset value
     executiveBonusChance: 0.04,
     powerSurgeChance: 0.05,

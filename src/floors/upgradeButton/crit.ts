@@ -141,6 +141,9 @@ export {
   SILVER_TICKET_CRIT_LABEL,
   GOLDEN_PARACHUTE_CRIT_COLOR,
   GOLDEN_PARACHUTE_CRIT_LABEL,
+  RAIN_CHECK_CRIT_COLOR,
+  RAIN_CHECK_CRIT_LABEL,
+  RAIN_CHECK_CRIT_SECONDS,
   PAYOUT_CRIT_COLOR,
   PAYOUT_CRIT_LABEL,
   GRAND_OPENING_CRIT_COLOR,
@@ -349,6 +352,7 @@ import {
   forceGoldenTicketCritProc,
   forceSilverTicketCritProc,
   forceGoldenParachuteCritProc,
+  forceRainCheckCritProc,
   forceExecutiveBonusCritProc,
   forcePowerSurgeCritProc,
   forcePriceMatchCritProc,
@@ -480,6 +484,7 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.goldenTicket) forceGoldenTicketCritProc(floor);
     if (result.silverTicket) forceSilverTicketCritProc(floor);
     if (result.goldenParachute) forceGoldenParachuteCritProc(floor);
+    if (result.rainCheck) forceRainCheckCritProc(floor);
     if (result.executiveBonus) forceExecutiveBonusCritProc(floor);
     if (result.powerSurge) forcePowerSurgeCritProc(floor);
     if (result.priceMatch) forcePriceMatchCritProc(floor);
@@ -606,6 +611,7 @@ export function forceFloorBuyCrit(
   mystic = false,
   keynote = false,
   skip = false,
+  rainCheck = false,
 ): void {
   forcedFloorBuyCrit = {
     tier,
@@ -624,6 +630,7 @@ export function forceFloorBuyCrit(
     mystic,
     keynote,
     skip,
+    rainCheck,
     pair,
     threeOfAKind,
     fourOfAKind,
@@ -1060,6 +1067,11 @@ export function forceSkipFloorBuyCrit(tier: CritTier = "crit"): void {
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.skip = true;
 }
 
+export function forceRainCheckFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.rainCheck = true;
+}
+
 // dev/test-only: force this floor into a pair/three-of-a-kind/four-of-a-kind/
 // full-house crit, bypassing chance entirely (see hud/testButton's "Spawn
 // Pair Crit"/etc.) — not tier-scaled, so no tier param needed (same shape as
@@ -1246,6 +1258,11 @@ export function forceSilverTicketCritUpgrade(floor: Floor): void {
 export function forceGoldenParachuteCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceGoldenParachuteCritProc(floor);
+}
+
+export function forceRainCheckCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceRainCheckCritProc(floor);
 }
 
 export function forceExecutiveBonusCritUpgrade(floor: Floor): void {

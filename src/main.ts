@@ -72,6 +72,8 @@ import {
   forceGoldenTicketCritUpgrade,
   forceSilverTicketCritUpgrade,
   forceGoldenParachuteCritUpgrade,
+  forceRainCheckCritUpgrade,
+  forceRainCheckFloorBuyCrit,
   forceCashFlowCritUpgrade,
   forcePayoutCritUpgrade,
   forceExecutiveBonusCritUpgrade,
@@ -276,6 +278,7 @@ import {
   wireSpawnMergerCritButton,
   wireSpawnShareholdersCritButton,
   wireSpawnGoldenParachuteCritButton,
+  wireSpawnRainCheckCritButton,
   wireSpawnCashFlowCritButton,
   wireSpawnPayoutCritButton,
   wireSpawnExecutiveBonusCritButton,
@@ -368,6 +371,7 @@ import {
   wireFloorBuyPowerSurgeCritButton,
   wireFloorBuyPriceMatchCritButton,
   wireFloorBuyGoldenParachuteCritButton,
+  wireFloorBuyRainCheckCritButton,
   wireFloorBuyPayoutCritButton,
   wireMapUnlockCritButton,
   wireMapUnlockMegaCritButton,
@@ -1055,6 +1059,10 @@ async function main() {
     wireSpawnGoldenParachuteCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceGoldenParachuteCritUpgrade(floor);
+    });
+    wireSpawnRainCheckCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceRainCheckCritUpgrade(floor);
     });
     wireSpawnCashFlowCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -2075,6 +2083,9 @@ async function main() {
         false,
         true,
       ),
+    );
+    wireFloorBuyRainCheckCritButton(app, () =>
+      forceRainCheckFloorBuyCrit("crit"),
     );
     wireFloorBuyPayoutCritButton(app, () => forcePayoutFloorBuyCrit("crit"));
     wireMapUnlockCritButton(app, () => forceFloorBuyCrit("crit"));

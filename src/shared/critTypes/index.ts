@@ -725,6 +725,13 @@ export const GOLDEN_PARACHUTE_CRIT_CHANCE = CONFIG.crit.goldenParachuteChance;
 export const GOLDEN_PARACHUTE_CRIT_COLOR = COLOR.goldenParachuteMarigold;
 export const GOLDEN_PARACHUTE_CRIT_LABEL = "Golden Parachute";
 
+// "Rain Check" crit — a flat, not-tier-scaled payout equal to five seconds
+// of the landed building's combined current income rate
+export const RAIN_CHECK_CRIT_CHANCE = CONFIG.crit.rainCheckChance;
+export const RAIN_CHECK_CRIT_SECONDS = CONFIG.crit.rainCheckSeconds;
+export const RAIN_CHECK_CRIT_COLOR = COLOR.rainCheckBlue;
+export const RAIN_CHECK_CRIT_LABEL = "Rain Check";
+
 export const EXECUTIVE_BONUS_CRIT_CHANCE = CONFIG.crit.executiveBonusChance;
 export const EXECUTIVE_BONUS_CRIT_COLOR = COLOR.gold;
 export const EXECUTIVE_BONUS_CRIT_LABEL = "Executive Bonus";
@@ -826,6 +833,7 @@ const rateLockCrits = new WeakSet<Floor>();
 const goldenTicketCrits = new WeakSet<Floor>();
 const silverTicketCrits = new WeakSet<Floor>();
 const goldenParachuteCrits = new WeakSet<Floor>();
+const rainCheckCrits = new WeakSet<Floor>();
 const executiveBonusCrits = new WeakSet<Floor>();
 const powerSurgeCrits = new WeakSet<Floor>();
 const priceMatchCrits = new WeakSet<Floor>();
@@ -954,6 +962,7 @@ export interface CritRollResult {
   goldenTicket: boolean;
   silverTicket: boolean;
   goldenParachute: boolean;
+  rainCheck: boolean;
   executiveBonus: boolean;
   powerSurge: boolean;
   priceMatch: boolean;
@@ -1052,6 +1061,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "goldenTicket",
   "silverTicket",
   "goldenParachute",
+  "rainCheck",
   "executiveBonus",
   "powerSurge",
   "priceMatch",
@@ -1146,6 +1156,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   goldenTicket: goldenTicketCrits,
   silverTicket: silverTicketCrits,
   goldenParachute: goldenParachuteCrits,
+  rainCheck: rainCheckCrits,
   executiveBonus: executiveBonusCrits,
   powerSurge: powerSurgeCrits,
   priceMatch: priceMatchCrits,
@@ -1624,6 +1635,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "goldenParachute",
     description: "Instantly adds 15s of your company's income",
   },
+  rainCheck: {
+    label: RAIN_CHECK_CRIT_LABEL,
+    color: RAIN_CHECK_CRIT_COLOR,
+    icon: "rainCheck",
+    description: "Adds 5s of this building's income",
+  },
   executiveBonus: {
     label: EXECUTIVE_BONUS_CRIT_LABEL,
     color: EXECUTIVE_BONUS_CRIT_COLOR,
@@ -1972,6 +1989,7 @@ export function rollCrit(
     if (Math.random() < CLONE_ARMY_CRIT_CHANCE) landed.push("cloneArmy");
     if (Math.random() < GOLDEN_PARACHUTE_CRIT_CHANCE)
       landed.push("goldenParachute");
+    if (Math.random() < RAIN_CHECK_CRIT_CHANCE) landed.push("rainCheck");
     if (Math.random() < EXECUTIVE_BONUS_CRIT_CHANCE)
       landed.push("executiveBonus");
     if (Math.random() < POWER_SURGE_CRIT_CHANCE) landed.push("powerSurge");
@@ -2075,6 +2093,7 @@ export function rollCrit(
     goldenTicket: kept.has("goldenTicket"),
     silverTicket: kept.has("silverTicket"),
     goldenParachute: kept.has("goldenParachute"),
+    rainCheck: kept.has("rainCheck"),
     executiveBonus: kept.has("executiveBonus"),
     powerSurge: kept.has("powerSurge"),
     priceMatch: kept.has("priceMatch"),
@@ -2309,6 +2328,10 @@ export function isSilverTicketCrit(floor: Floor): boolean {
 
 export function isGoldenParachuteCrit(floor: Floor): boolean {
   return goldenParachuteCrits.has(floor);
+}
+
+export function isRainCheckCrit(floor: Floor): boolean {
+  return rainCheckCrits.has(floor);
 }
 
 export function isExecutiveBonusCrit(floor: Floor): boolean {
@@ -2676,6 +2699,10 @@ export function forceSilverTicketCritProc(floor: Floor): void {
 
 export function forceGoldenParachuteCritProc(floor: Floor): void {
   goldenParachuteCrits.add(floor);
+}
+
+export function forceRainCheckCritProc(floor: Floor): void {
+  rainCheckCrits.add(floor);
 }
 
 export function forceExecutiveBonusCritProc(floor: Floor): void {

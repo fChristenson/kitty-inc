@@ -335,6 +335,7 @@ export {
   forceKeynoteFloorBuyCrit,
   forceSkipCritUpgrade,
   forceSkipFloorBuyCrit,
+  forceRainCheckFloorBuyCrit,
 } from "./upgradeButton";
 export {
   drawWorker,
@@ -419,6 +420,7 @@ export {
   forceGoldenTicketCritUpgrade,
   forceSilverTicketCritUpgrade,
   forceGoldenParachuteCritUpgrade,
+  forceRainCheckCritUpgrade,
   forceExecutiveBonusCritUpgrade,
   forcePowerSurgeCritUpgrade,
   forcePriceMatchCritUpgrade,

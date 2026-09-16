@@ -132,6 +132,8 @@ export const COLOR = {
   // Golden Parachute crit's own dedicated color — a burnt marigold-orange,
   // checked for distinctness against every other gold/amber above
   goldenParachuteMarigold: "#C97A1A",
+  // Rain Check crit's own dedicated color — a clear umbrella blue
+  rainCheckBlue: "#0284C7",
   // Payout crit's own dedicated color — a deep olive green, checked for
   // distinctness against every other green already in use
   payoutOlive: "#4D7C0F",

@@ -53,6 +53,7 @@ import {
   type CritTier,
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
+  RAIN_CHECK_CRIT_SECONDS,
   MYSTIC_UPGRADE_COUNT,
   KEYNOTE_UPGRADE_COUNT,
   CHAIN_CRIT_CONTINUE_CHANCE,
@@ -70,6 +71,7 @@ import {
   getIncomeBarCenter,
   triggerIncomeBarPress,
   currentPayoutAmount,
+  currentIncomeRatePerSecond,
 } from "../incomePanel";
 import {
   spendTotalIncome,
@@ -1169,6 +1171,20 @@ function applyGoldenParachuteCrit(): void {
   addTotalIncome(multiply(rate, GOLDEN_PARACHUTE_SECONDS));
 }
 
+// "Rain Check" pays five seconds of the building that produced the crit,
+// summing the current rate of each unlocked floor in that building only.
+function applyRainCheckCrit(floors: Floor[]): void {
+  const now = Date.now();
+  const buildingRate = floors.reduce(
+    (total, floor) =>
+      floor.unlocked
+        ? add(total, currentIncomeRatePerSecond(floor, now))
+        : total,
+    ZERO,
+  );
+  addTotalIncome(multiply(buildingRate, RAIN_CHECK_CRIT_SECONDS));
+}
+
 // Cash Flow pays one income cycle for every building in every corporation.
 // The combined-rate helper uses live active buildings and persisted dormant
 // company rates, so this never loads dormant floors.
@@ -1318,6 +1334,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   goldenTicket: (c) => applyGoldenTicketCrit(c.floor),
   silverTicket: (c) => applySilverTicketCrit(c.floor),
   goldenParachute: () => applyGoldenParachuteCrit(),
+  rainCheck: (c) => applyRainCheckCrit(c.floors),
   cashFlow: () => applyCashFlowCrit(),
   payout: () => applyPayoutCrit(),
   grandOpening: (c) => applyGrandOpeningCrit(c.deps),

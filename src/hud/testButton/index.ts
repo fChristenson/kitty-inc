@@ -115,6 +115,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-merger-crit" class="game__button">Spawn Merger Crit</button>
           <button id="spawn-shareholders-crit" class="game__button">Spawn Shareholders Crit</button>
           <button id="spawn-golden-parachute-crit" class="game__button">Spawn Golden Parachute Crit</button>
+          <button id="spawn-rain-check-crit" class="game__button">Spawn Rain Check Crit</button>
           <button id="spawn-payout-crit" class="game__button">Spawn Payout Crit</button>
           <button id="spawn-executive-bonus-crit" class="game__button">Spawn Executive Bonus Crit</button>
           <button id="spawn-power-surge-crit" class="game__button">Spawn Power Surge Crit</button>
@@ -181,6 +182,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-deja-vu-crit" class="game__button">Floor Deja Vu Crit</button>
           <button id="floor-buy-clone-army-crit" class="game__button">Floor Reinforcements Crit</button>
           <button id="floor-buy-golden-parachute-crit" class="game__button">Floor Golden Parachute Crit</button>
+          <button id="floor-buy-rain-check-crit" class="game__button">Floor Rain Check Crit</button>
           <button id="floor-buy-payout-crit" class="game__button">Floor Payout Crit</button>
           <button id="floor-buy-lucky-clover-crit" class="game__button">Floor Lucky Clover Crit</button>
           <button id="floor-buy-second-wind-crit" class="game__button">Floor Second Wind Crit</button>
@@ -1118,6 +1120,16 @@ export function wireSpawnGoldenParachuteCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnRainCheckCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-rain-check-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireSpawnPayoutCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -1755,6 +1767,16 @@ export function wireFloorBuyGoldenParachuteCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#floor-buy-golden-parachute-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyRainCheckCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#floor-buy-rain-check-crit",
   )!;
   button.addEventListener("click", onClick);
 }
