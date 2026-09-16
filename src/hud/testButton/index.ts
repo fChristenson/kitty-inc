@@ -94,6 +94,8 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-casual-friday-crit" class="game__button">Spawn Casual Friday Crit</button>
           <button id="spawn-fancy-friday-crit" class="game__button">Spawn Fancy Friday Crit</button>
           <button id="spawn-fire-drill-crit" class="game__button">Spawn Fire Drill Crit</button>
+          <button id="spawn-bonus-round-crit" class="game__button">Spawn Bonus Round Crit</button>
+          <button id="spawn-overflow-crit" class="game__button">Spawn Overflow Crit</button>
           <button id="spawn-performance-bonus-crit" class="game__button">Spawn Performance Bonus Crit</button>
           <button id="spawn-double-down-crit" class="game__button">Spawn Double Down Crit</button>
           <button id="spawn-coffee-run-crit" class="game__button">Spawn Coffee Run Crit</button>
@@ -881,6 +883,26 @@ export function wireSpawnFireDrillCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-fire-drill-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnBonusRoundCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-bonus-round-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnOverflowCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-overflow-crit",
   )!;
   button.addEventListener("click", onClick);
 }

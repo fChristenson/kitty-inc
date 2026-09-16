@@ -581,6 +581,17 @@ export const FIRE_DRILL_CRIT_CHANCE = CONFIG.crit.fireDrillChance;
 export const FIRE_DRILL_CRIT_COLOR = COLOR.fireDrillRed;
 export const FIRE_DRILL_CRIT_LABEL = "Fire Drill";
 
+// "Bonus Round" crit — completes only the critted floor's income timer twice
+export const BONUS_ROUND_CRIT_CHANCE = CONFIG.crit.bonusRoundChance;
+export const BONUS_ROUND_CRIT_COLOR = COLOR.bonusRoundGold;
+export const BONUS_ROUND_CRIT_LABEL = "Bonus Round";
+
+// "Overflow" crit — pays five current income timer payouts on only the floor
+// where the crit landed, then restarts that floor's timer
+export const OVERFLOW_CRIT_CHANCE = CONFIG.crit.overflowChance;
+export const OVERFLOW_CRIT_COLOR = COLOR.overflowBlue;
+export const OVERFLOW_CRIT_LABEL = "Overflow";
+
 // "Performance Bonus" crit — completes one current income timer for every
 // actual worker and manager on every unlocked floor
 export const PERFORMANCE_BONUS_CRIT_CHANCE = CONFIG.crit.performanceBonusChance;
@@ -760,6 +771,8 @@ const supplyRunCrits = new WeakSet<Floor>();
 const casualFridayCrits = new WeakSet<Floor>();
 const fancyFridayCrits = new WeakSet<Floor>();
 const fireDrillCrits = new WeakSet<Floor>();
+const bonusRoundCrits = new WeakSet<Floor>();
+const overflowCrits = new WeakSet<Floor>();
 const performanceBonusCrits = new WeakSet<Floor>();
 const teaBreakCrits = new WeakSet<Floor>();
 const doubleDownCrits = new WeakSet<Floor>();
@@ -874,6 +887,8 @@ export interface CritRollResult {
   casualFriday: boolean;
   fancyFriday: boolean;
   fireDrill: boolean;
+  bonusRound: boolean;
+  overflow: boolean;
   performanceBonus: boolean;
   teaBreak: boolean;
   doubleDown: boolean;
@@ -959,6 +974,8 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "casualFriday",
   "fancyFriday",
   "fireDrill",
+  "bonusRound",
+  "overflow",
   "performanceBonus",
   "teaBreak",
   "doubleDown",
@@ -1040,6 +1057,8 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   casualFriday: casualFridayCrits,
   fancyFriday: fancyFridayCrits,
   fireDrill: fireDrillCrits,
+  bonusRound: bonusRoundCrits,
+  overflow: overflowCrits,
   performanceBonus: performanceBonusCrits,
   teaBreak: teaBreakCrits,
   doubleDown: doubleDownCrits,
@@ -1562,6 +1581,18 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "fireDrill",
     description: "Completes every floor's income timer at once",
   },
+  bonusRound: {
+    label: BONUS_ROUND_CRIT_LABEL,
+    color: BONUS_ROUND_CRIT_COLOR,
+    icon: "bonusRound",
+    description: "Completes this floor's income timer twice",
+  },
+  overflow: {
+    label: OVERFLOW_CRIT_LABEL,
+    color: OVERFLOW_CRIT_COLOR,
+    icon: "overflow",
+    description: "Pays five timer payouts on this floor",
+  },
   performanceBonus: {
     label: PERFORMANCE_BONUS_CRIT_LABEL,
     color: PERFORMANCE_BONUS_CRIT_COLOR,
@@ -1753,6 +1784,8 @@ export function rollCrit(
     if (Math.random() < CASUAL_FRIDAY_CRIT_CHANCE) landed.push("casualFriday");
     if (Math.random() < FANCY_FRIDAY_CRIT_CHANCE) landed.push("fancyFriday");
     if (Math.random() < FIRE_DRILL_CRIT_CHANCE) landed.push("fireDrill");
+    if (Math.random() < BONUS_ROUND_CRIT_CHANCE) landed.push("bonusRound");
+    if (Math.random() < OVERFLOW_CRIT_CHANCE) landed.push("overflow");
     if (Math.random() < PERFORMANCE_BONUS_CRIT_CHANCE)
       landed.push("performanceBonus");
     if (Math.random() < DOUBLE_DOWN_CRIT_CHANCE) landed.push("doubleDown");
@@ -1847,6 +1880,8 @@ export function rollCrit(
     casualFriday: kept.has("casualFriday"),
     fancyFriday: kept.has("fancyFriday"),
     fireDrill: kept.has("fireDrill"),
+    bonusRound: kept.has("bonusRound"),
+    overflow: kept.has("overflow"),
     performanceBonus: kept.has("performanceBonus"),
     doubleDown: kept.has("doubleDown"),
     coffeeRun: kept.has("coffeeRun"),
@@ -2107,6 +2142,14 @@ export function isFancyFridayCrit(floor: Floor): boolean {
 
 export function isFireDrillCrit(floor: Floor): boolean {
   return fireDrillCrits.has(floor);
+}
+
+export function isBonusRoundCrit(floor: Floor): boolean {
+  return bonusRoundCrits.has(floor);
+}
+
+export function isOverflowCrit(floor: Floor): boolean {
+  return overflowCrits.has(floor);
 }
 
 export function isPerformanceBonusCrit(floor: Floor): boolean {
@@ -2422,6 +2465,14 @@ export function forceFancyFridayCritProc(floor: Floor): void {
 
 export function forceFireDrillCritProc(floor: Floor): void {
   fireDrillCrits.add(floor);
+}
+
+export function forceBonusRoundCritProc(floor: Floor): void {
+  bonusRoundCrits.add(floor);
+}
+
+export function forceOverflowCritProc(floor: Floor): void {
+  overflowCrits.add(floor);
 }
 
 export function forcePerformanceBonusCritProc(floor: Floor): void {

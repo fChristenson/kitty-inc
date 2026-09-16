@@ -129,6 +129,8 @@ export {
   wireSpawnCasualFridayCritButton,
   wireSpawnFancyFridayCritButton,
   wireSpawnFireDrillCritButton,
+  wireSpawnBonusRoundCritButton,
+  wireSpawnOverflowCritButton,
   wireSpawnPerformanceBonusCritButton,
   wireSpawnDoubleDownCritButton,
   wireSpawnCoffeeRunCritButton,

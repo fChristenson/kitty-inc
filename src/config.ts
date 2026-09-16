@@ -282,6 +282,12 @@ export const CONFIG = {
     // "Fire Drill" crit — instantly completes every unlocked floor's income
     // timer once, paying it out and restarting the bar
     fireDrillChance: 0.08,
+    // "Bonus Round" crit — completes the critted floor's income timer twice,
+    // paying two current payouts and restarting that floor's bar
+    bonusRoundChance: 0.08,
+    // "Overflow" crit — pays five current income timer payouts on the critted
+    // floor, then restarts that floor's bar
+    overflowChance: 0.06,
     // "Performance Bonus" crit — completes one income timer per worker and
     // manager on every unlocked floor
     performanceBonusChance: 0.06,

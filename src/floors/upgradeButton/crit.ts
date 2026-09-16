@@ -252,6 +252,8 @@ export {
   isCasualFridayCrit,
   isFancyFridayCrit,
   isFireDrillCrit,
+  isBonusRoundCrit,
+  isOverflowCrit,
   isPerformanceBonusCrit,
   isDoubleDownCrit,
   isCoffeeRunCrit,
@@ -335,6 +337,8 @@ import {
   forceCasualFridayCritProc,
   forceFancyFridayCritProc,
   forceFireDrillCritProc,
+  forceBonusRoundCritProc,
+  forceOverflowCritProc,
   forcePerformanceBonusCritProc,
   forceDoubleDownCritProc,
   forceCoffeeRunCritProc,
@@ -455,6 +459,8 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     if (result.casualFriday) forceCasualFridayCritProc(floor);
     if (result.fancyFriday) forceFancyFridayCritProc(floor);
     if (result.fireDrill) forceFireDrillCritProc(floor);
+    if (result.bonusRound) forceBonusRoundCritProc(floor);
+    if (result.overflow) forceOverflowCritProc(floor);
     if (result.performanceBonus) forcePerformanceBonusCritProc(floor);
     if (result.doubleDown) forceDoubleDownCritProc(floor);
     if (result.coffeeRun) forceCoffeeRunCritProc(floor);
@@ -617,6 +623,8 @@ export function forceFloorBuyCrit(
     casualFriday: false,
     fancyFriday: false,
     fireDrill: false,
+    bonusRound: false,
+    overflow: false,
     performanceBonus: false,
     doubleDown: false,
     coffeeRun: false,
@@ -716,6 +724,16 @@ export function forceFancyFridayFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceFireDrillFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.fireDrill = true;
+}
+
+export function forceBonusRoundFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.bonusRound = true;
+}
+
+export function forceOverflowFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.overflow = true;
 }
 
 export function forcePerformanceBonusFloorBuyCrit(
@@ -1189,6 +1207,16 @@ export function forceFancyFridayCritUpgrade(floor: Floor): void {
 export function forceFireDrillCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceFireDrillCritProc(floor);
+}
+
+export function forceBonusRoundCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceBonusRoundCritProc(floor);
+}
+
+export function forceOverflowCritUpgrade(floor: Floor): void {
+  critTiers.set(floor, "crit");
+  forceOverflowCritProc(floor);
 }
 
 export function forcePerformanceBonusCritUpgrade(floor: Floor): void {

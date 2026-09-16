@@ -633,6 +633,24 @@ function applyFireDrillCrit(floors: Floor[]): void {
   addTotalIncome(total);
 }
 
+// "Bonus Round" crit: completes only the floor that landed the crit twice,
+// then restarts that floor's timer once so other floors and worker state stay
+// untouched.
+function applyBonusRoundCrit(floor: Floor): void {
+  const now = Date.now();
+  addTotalIncome(multiply(currentPayoutAmount(floor, now), 2));
+  floor.lastCollectedAt = now;
+}
+
+// "Overflow" crit: completes only the floor that landed the crit five times,
+// then restarts that floor's timer so other floors and worker state stay
+// untouched.
+function applyOverflowCrit(floor: Floor): void {
+  const now = Date.now();
+  addTotalIncome(multiply(currentPayoutAmount(floor, now), 5));
+  floor.lastCollectedAt = now;
+}
+
 // "Performance Bonus" crit: completes one current income timer per actual
 // worker and manager on every unlocked floor, then restarts each bar.
 function applyPerformanceBonusCrit(floors: Floor[]): void {
@@ -1145,6 +1163,8 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   fancyFriday: (c) =>
     applyFlatUpgradeBatch(c.floors, FANCY_FRIDAY_CRIT_UPGRADES),
   fireDrill: (c) => applyFireDrillCrit(c.floors),
+  bonusRound: (c) => applyBonusRoundCrit(c.floor),
+  overflow: (c) => applyOverflowCrit(c.floor),
   performanceBonus: (c) => applyPerformanceBonusCrit(c.floors),
   teaBreak: (c) => applyTeaBreakCrit(c.floors, c.deps.persist),
   doubleDown: (c) => applyDoubleDownCrit(c.floor, c.isGroundFloor, c.tier),

@@ -123,8 +123,6 @@
 - Hiring Freeze — prevents worker purchases for 30 seconds while doubling income from existing workers.
 - Shareholders — pays out one percent of the active company's total earned income.
 
-## To consider
-
 - Time Clock — instantly completes the critted floor's current income timer twice.
 - Talent Scout — adds one worker to the critted floor and boosts that worker briefly.
 - Cost Center — refunds the difference between the current upgrade cost and its previous cost.
@@ -140,4 +138,25 @@
 - Rate Lock — freezes the critted floor's income interval for 20 seconds.
 - Dividend Reinvestment — converts the next payout into free upgrade progress on the critted floor.
 - Floor Bonus — grants one free upgrade to every unlocked floor below the critted floor.
+
+- Bonus Round — the next completed income timer on the critted floor pays twice.
+- Overflow — the critted floor immediately pays five current income timer payouts,
+  then its timer restarts.
+- Greenlight — removes the next upgrade cost on the critted floor only.
+- Mentor — permanently increases the boost duration of one random worker.
+- Tower Share — grants every unlocked floor a payout based on its own worker count.
+- Lucky Break — instantly completes the next income timer that would finish naturally.
+- Blueprint — copies the critted floor's current office-upgrade bonuses to the floor above it.
+- Fast Track — halves the critted floor's next five income intervals.
+- Full Shift — boosts every worker and manager on the critted floor for one normal duration.
+- Rainmaker — pays one additional current income cycle from the company's highest-rate building.
+- Open Door — makes the next three floor purchases free without changing upgrade costs.
+- Staff Credit — grants every unlocked floor one free worker, with no manager changes.
+- Momentum — each of the next three upgrades on the critted floor also triggers a small payout.
+- Capital Gain — pays a bonus based on the critted floor's current upgrade level.
+- Priority Lane — moves the critted floor's next upgrade milestone forward by five levels.
+- Overflow — the critted floor immediately pays five current income timer payouts,
+  then its timer restarts.
+
+## To consider
 

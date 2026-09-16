@@ -85,6 +85,8 @@ import {
   forceCasualFridayCritUpgrade,
   forceFancyFridayCritUpgrade,
   forceFireDrillCritUpgrade,
+  forceBonusRoundCritUpgrade,
+  forceOverflowCritUpgrade,
   forcePerformanceBonusCritUpgrade,
   forceDoubleDownCritUpgrade,
   forceCoffeeRunCritUpgrade,
@@ -228,6 +230,8 @@ import {
   wireSpawnCasualFridayCritButton,
   wireSpawnFancyFridayCritButton,
   wireSpawnFireDrillCritButton,
+  wireSpawnBonusRoundCritButton,
+  wireSpawnOverflowCritButton,
   wireSpawnPerformanceBonusCritButton,
   wireSpawnDoubleDownCritButton,
   wireSpawnCoffeeRunCritButton,
@@ -895,6 +899,14 @@ async function main() {
     wireSpawnFireDrillCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceFireDrillCritUpgrade(floor);
+    });
+    wireSpawnBonusRoundCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceBonusRoundCritUpgrade(floor);
+    });
+    wireSpawnOverflowCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceOverflowCritUpgrade(floor);
     });
     wireSpawnPerformanceBonusCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];

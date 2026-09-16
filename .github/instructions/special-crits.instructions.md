@@ -156,6 +156,27 @@ X_CRIT_LABEL, icon: "<name>", description: "<brief phrase>" }`. This is the
 Never let `MAX_SPECIAL_CRIT_PROCS`'s cap-then-random-pick logic be bypassed for
 a new proc — it must go through the same `landed` array + `pickAtMost` path.
 
+## Crit suggestion quality rules
+
+Every crit name suggestion must have a fun unique name.
+
+Every new crit suggestion must have a clearly positive effect for the player.
+Do not propose effects that remove progress, reduce income, impose a penalty,
+or otherwise make the player's position worse unless the user explicitly asks
+for a trade-off or downside.
+
+Every suggestion must also be meaningfully distinct from existing crits. It
+may be in the same family or resemble an existing reward, but it must differ
+enough in target, timing, scope, scaling, trigger, or resource affected that
+players can identify it as a unique effect. Do not rename an existing crit,
+combine the same reward with cosmetic wording, or make a trivial numeric
+variation of an existing proc and present it as a new idea.
+
+Before accepting a suggestion, compare it against the canonical
+`CRIT_PROC_INFO` table and the current crit documentation. If it overlaps an
+existing proc, revise the target or effect until the distinction is explicit
+and useful.
+
 ## Odds must be proportional to the reward
 
 `CONFIG.crit`'s chances are a single deliberate ladder, not per-proc guesses:

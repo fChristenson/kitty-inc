@@ -168,6 +168,10 @@ export const COLOR = {
   fancyFridayIndigo: "#4338CA",
   // Fire Drill crit's own dedicated color
   fireDrillRed: "#DC2626",
+  // Bonus Round crit's own dedicated color
+  bonusRoundGold: "#D97706",
+  // Overflow crit's own dedicated color
+  overflowBlue: "#0369A1",
   // Performance Bonus crit's own dedicated color
   performanceBonusBlue: "#0284C7",
   // Double Down crit's own dedicated color
