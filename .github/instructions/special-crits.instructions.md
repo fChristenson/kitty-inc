@@ -159,18 +159,11 @@ a new proc — it must go through the same `landed` array + `pickAtMost` path.
 ## Crit suggestion quality rules
 
 Every crit name suggestion must have a fun unique name.
+Crit rewards must always be positive and provide instant gratification.
+Crits can have the same reward effect as long as the name is distinct and the values are different.
+For example, a crit can upgrade a floor and another crit can do so but they both must have distinct values for the upgrade effect such as one with +1 and another with +2.
 
-Every new crit suggestion must have a clearly positive effect for the player.
-Do not propose effects that remove progress, reduce income, impose a penalty,
-or otherwise make the player's position worse unless the user explicitly asks
-for a trade-off or downside.
-
-Every suggestion must also be meaningfully distinct from existing crits. It
-may be in the same family or resemble an existing reward, but it must differ
-enough in target, timing, scope, scaling, trigger, or resource affected that
-players can identify it as a unique effect. Do not rename an existing crit,
-combine the same reward with cosmetic wording, or make a trivial numeric
-variation of an existing proc and present it as a new idea.
+Crit rewards should not be delayed rewards or require any special actions to be realized; they must provide immediate benefit without prior knowledge of how they work for the user.
 
 Before accepting a suggestion, compare it against the canonical
 `CRIT_PROC_INFO` table and the current crit documentation. If it overlaps an
