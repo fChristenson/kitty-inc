@@ -75,12 +75,14 @@ import {
   forceBlueprintFloorBuyCrit,
   forceFirstClassFloorBuyCrit,
   forceLuckyNumberFloorBuyCrit,
+  forceOpenBookFloorBuyCrit,
   forceExecutiveBonusFloorBuyCrit,
   forcePowerSurgeFloorBuyCrit,
   forcePriceMatchFloorBuyCrit,
   forceDominoEffectFloorBuyCrit,
   forceFirstClassCritUpgrade,
   forceLuckyNumberCritUpgrade,
+  forceOpenBookCritUpgrade,
   forceGrandOpeningCritUpgrade,
   forceFullyStaffedCritUpgrade,
   forceShiftChangeCritUpgrade,
@@ -270,6 +272,7 @@ import {
   wireSpawnPriceMatchCritButton,
   wireSpawnFirstClassCritButton,
   wireSpawnLuckyNumberCritButton,
+  wireSpawnOpenBookCritButton,
   wireForceBonusTierCritButton,
   wireForceBonusTierMegaCritButton,
   wireForceBonusTierUltraCritButton,
@@ -346,6 +349,7 @@ import {
   wireFloorBuyDominoEffectCritButton,
   wireFloorBuyFirstClassCritButton,
   wireFloorBuyLuckyNumberCritButton,
+  wireFloorBuyOpenBookCritButton,
   wireFloorBuyExecutiveBonusCritButton,
   wireFloorBuyPowerSurgeCritButton,
   wireFloorBuyPriceMatchCritButton,
@@ -1036,6 +1040,10 @@ async function main() {
     wireSpawnLuckyNumberCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceLuckyNumberCritUpgrade(floor);
+    });
+    wireSpawnOpenBookCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceOpenBookCritUpgrade(floor);
     });
     wireForceBonusTierCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
@@ -1965,6 +1973,9 @@ async function main() {
     );
     wireFloorBuyLuckyNumberCritButton(app, () =>
       forceLuckyNumberFloorBuyCrit("crit"),
+    );
+    wireFloorBuyOpenBookCritButton(app, () =>
+      forceOpenBookFloorBuyCrit("crit"),
     );
     wireFloorBuyExecutiveBonusCritButton(app, () =>
       forceExecutiveBonusFloorBuyCrit("crit"),

@@ -60,6 +60,8 @@ export {
   FULL_HOUSE_CRIT_LABEL,
   ROYAL_FLUSH_CRIT_COLOR,
   ROYAL_FLUSH_CRIT_LABEL,
+  OPEN_BOOK_CRIT_COLOR,
+  OPEN_BOOK_CRIT_LABEL,
   TICK_TOCK_CRIT_COLOR,
   TICK_TOCK_CRIT_LABEL,
   CHAIR_GIVEAWAY_CRIT_COLOR,
@@ -304,6 +306,7 @@ import {
   forceFourOfAKindCritProc,
   forceFullHouseCritProc,
   forceRoyalFlushCritProc,
+  forceOpenBookCritProc,
   forceLuckyNumberCritProc,
   forceTickTockCritProc,
   forceChairGiveawayCritProc,
@@ -605,6 +608,7 @@ export function forceFloorBuyCrit(
     fourOfAKind,
     fullHouse,
     luckyNumber: false,
+    openBook: false,
     tickTock,
     chairGiveaway,
     suppliesGiveaway,
@@ -856,6 +860,11 @@ export function forceFirstClassFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceLuckyNumberFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.luckyNumber = true;
+}
+
+export function forceOpenBookFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.openBook = true;
 }
 
 export function forceExecutiveBonusFloorBuyCrit(tier: CritTier = "crit"): void {
@@ -1209,6 +1218,14 @@ export function forceLuckyNumberCritUpgrade(
 ): void {
   critTiers.set(floor, tier);
   forceLuckyNumberCritProc(floor);
+}
+
+export function forceOpenBookCritUpgrade(
+  floor: Floor,
+  tier: CritTier = "crit",
+): void {
+  critTiers.set(floor, tier);
+  forceOpenBookCritProc(floor);
 }
 
 export function forceCashFlowCritUpgrade(floor: Floor): void {

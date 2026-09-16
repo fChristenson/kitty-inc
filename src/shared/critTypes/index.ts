@@ -203,6 +203,9 @@ export const LUCKY_NUMBER_CRIT_COLOR = COLOR.gold;
 export const LUCKY_NUMBER_CRIT_LABEL = "Lucky Number";
 export const LUCKY_NUMBER_MIN_FLOORS = 2;
 export const LUCKY_NUMBER_MAX_FLOORS = 12;
+export const OPEN_BOOK_CRIT_CHANCE = CONFIG.crit.openBookChance;
+export const OPEN_BOOK_CRIT_COLOR = COLOR.cyan;
+export const OPEN_BOOK_CRIT_LABEL = "Open Book";
 
 // "tick tock crit" — a flat, not-tier-scaled proc: instantly grants every
 // unlocked floor 2 extra payouts' worth of income at its own current rate,
@@ -771,6 +774,7 @@ const fourOfAKindCrits = new WeakSet<Floor>();
 const fullHouseCrits = new WeakSet<Floor>();
 const royalFlushCrits = new WeakSet<Floor>();
 const luckyNumberCrits = new WeakSet<Floor>();
+const openBookCrits = new WeakSet<Floor>();
 const tickTockCrits = new WeakSet<Floor>();
 const chairGiveawayCrits = new WeakSet<Floor>();
 const suppliesGiveawayCrits = new WeakSet<Floor>();
@@ -895,6 +899,7 @@ export interface CritRollResult {
   fullHouse: boolean;
   royalFlush: boolean;
   luckyNumber: boolean;
+  openBook: boolean;
   tickTock: boolean;
   chairGiveaway: boolean;
   suppliesGiveaway: boolean;
@@ -989,6 +994,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "fullHouse",
   "royalFlush",
   "luckyNumber",
+  "openBook",
   "tickTock",
   "chairGiveaway",
   "suppliesGiveaway",
@@ -1079,6 +1085,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   fullHouse: fullHouseCrits,
   royalFlush: royalFlushCrits,
   luckyNumber: luckyNumberCrits,
+  openBook: openBookCrits,
   tickTock: tickTockCrits,
   chairGiveaway: chairGiveawayCrits,
   suppliesGiveaway: suppliesGiveawayCrits,
@@ -1354,6 +1361,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     color: LUCKY_NUMBER_CRIT_COLOR,
     icon: "luckyNumber",
     description: "Unlocks 2-12 floors for free",
+  },
+  openBook: {
+    label: OPEN_BOOK_CRIT_LABEL,
+    color: OPEN_BOOK_CRIT_COLOR,
+    icon: "openBook",
+    description: "Pays the value of all bought upgrades",
   },
   tickTock: {
     label: TICK_TOCK_CRIT_LABEL,
@@ -1847,6 +1860,7 @@ export function rollCrit(
     if (Math.random() < FULL_HOUSE_CRIT_CHANCE) landed.push("fullHouse");
     if (Math.random() < ROYAL_FLUSH_CRIT_CHANCE) landed.push("royalFlush");
     if (Math.random() < LUCKY_NUMBER_CRIT_CHANCE) landed.push("luckyNumber");
+    if (Math.random() < OPEN_BOOK_CRIT_CHANCE) landed.push("openBook");
     if (Math.random() < TICK_TOCK_CRIT_CHANCE) landed.push("tickTock");
     if (Math.random() < CHAIR_GIVEAWAY_CRIT_CHANCE)
       landed.push("chairGiveaway");
@@ -1958,6 +1972,7 @@ export function rollCrit(
     fullHouse: kept.has("fullHouse"),
     royalFlush: kept.has("royalFlush"),
     luckyNumber: kept.has("luckyNumber"),
+    openBook: kept.has("openBook"),
     tickTock: kept.has("tickTock"),
     chairGiveaway: kept.has("chairGiveaway"),
     suppliesGiveaway: kept.has("suppliesGiveaway"),
@@ -2095,6 +2110,10 @@ export function isRoyalFlushCrit(floor: Floor): boolean {
 
 export function isLuckyNumberCrit(floor: Floor): boolean {
   return luckyNumberCrits.has(floor);
+}
+
+export function isOpenBookCrit(floor: Floor): boolean {
+  return openBookCrits.has(floor);
 }
 
 export function isTickTockCrit(floor: Floor): boolean {
@@ -2446,6 +2465,10 @@ export function forceRoyalFlushCritProc(floor: Floor): void {
 
 export function forceLuckyNumberCritProc(floor: Floor): void {
   luckyNumberCrits.add(floor);
+}
+
+export function forceOpenBookCritProc(floor: Floor): void {
+  openBookCrits.add(floor);
 }
 
 export function forceTickTockCritProc(floor: Floor): void {

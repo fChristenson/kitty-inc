@@ -129,6 +129,7 @@ const IMAGE_FILES = {
   merger: "merger.png", // Merger crit flash's own backdrop icon
   shareholders: "sharedholders.png", // Shareholders crit flash's own backdrop icon
   luckyNumber: "luckyNumber.png", // Lucky Number crit flash's own backdrop icon
+  openBook: "openBook.png", // Open Book crit flash's own backdrop icon
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

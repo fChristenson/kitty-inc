@@ -126,6 +126,8 @@ export const CONFIG = {
     royalFlushChance: 0.0015,
     // "lucky number" — unlocks a random 2-12 floors in this building for free
     luckyNumberChance: 0.001,
+    // "open book" — pays the current value of upgrades bought across every building
+    openBookChance: 0.02,
     // "tick tock crit" — a flat, not-tier-scaled proc: instantly credits every
     // unlocked floor 2 extra payouts' worth of income at its own current rate,
     // without touching its fill-cycle progress (see shared/income's

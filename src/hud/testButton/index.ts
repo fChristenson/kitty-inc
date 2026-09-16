@@ -118,6 +118,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-price-match-crit" class="game__button">Spawn Price Match Crit</button>
           <button id="spawn-first-class-crit" class="game__button">Spawn First Class Crit</button>
           <button id="spawn-lucky-number-crit" class="game__button">Spawn Lucky Number Crit</button>
+          <button id="spawn-open-book-crit" class="game__button">Spawn Open Book Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -201,6 +202,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-price-match-crit" class="game__button">Floor Price Match Crit</button>
           <button id="floor-buy-first-class-crit" class="game__button">Floor First Class Crit</button>
           <button id="floor-buy-lucky-number-crit" class="game__button">Floor Lucky Number Crit</button>
+          <button id="floor-buy-open-book-crit" class="game__button">Floor Open Book Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1134,6 +1136,15 @@ export function wireSpawnLuckyNumberCritButton(
     .addEventListener("click", onClick);
 }
 
+export function wireSpawnOpenBookCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#spawn-open-book-crit")!
+    .addEventListener("click", onClick);
+}
+
 export function wireSpawnCashFlowCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -1892,6 +1903,15 @@ export function wireFloorBuyLuckyNumberCritButton(
 ): void {
   container
     .querySelector<HTMLButtonElement>("#floor-buy-lucky-number-crit")!
+    .addEventListener("click", onClick);
+}
+
+export function wireFloorBuyOpenBookCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#floor-buy-open-book-crit")!
     .addEventListener("click", onClick);
 }
 

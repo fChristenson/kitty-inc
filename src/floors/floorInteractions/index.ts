@@ -735,6 +735,10 @@ function applyShareholdersCrit(floors: Floor[]): void {
   addTotalIncome(multiply(getTotalIncome(), payoutPercent));
 }
 
+function applyOpenBookCrit(): void {
+  addTotalIncome(getAllCompaniesUpgradesValue());
+}
+
 function applyTeaBreakCrit(floor: Floor, isGroundFloor: boolean): void {
   applyUpgradeTick(floor, isGroundFloor);
 }
@@ -1180,6 +1184,7 @@ export interface CritRewardContext {
 // the only ones that genuinely differ per event, so they're layered on top
 // per-site below rather than living here
 const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
+  openBook: () => applyOpenBookCrit(),
   firstClass: (c) => applyFirstClassCrit(c.deps, c.floor),
   luckyNumber: (c) => applyLuckyNumberCrit(c.deps, c.floor),
   powerSurge: (c) => c.deps.applyCompanyWideBoost(),

@@ -180,6 +180,8 @@
   while increasing the odds that the next special proc is a new type.
 - **Executive Bonus** — grants a building-wide payout based on the highest
   permanent crit tier currently represented in the building.
+- **Open Book** — pays a one-time payout equal to the current value of all
+  upgrades bought across every building.
 - **Lucky Number** — unlocks a random 2-12 floors above the critted floor for
   free, extending the current building as needed up to its floor cap.
 
@@ -199,8 +201,6 @@
   those workers to newly unlocked floors for the next 30 seconds.
 - **Fast Lane** — the next naturally completed income cycle on every unlocked
   floor completes twice as quickly, without altering stored intervals.
-- **Open Book** — pays a bonus based on the number of different floor upgrade
-  features already purchased in the current building.
 - **Shared Services** — temporarily treats every unlocked floor as owning
   office chairs and supplies for pricing and boost calculations.
 - **Growth Fund** — converts a portion of the next building unlock cost into
