@@ -91,6 +91,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-double-down-crit" class="game__button">Spawn Double Down Crit</button>
           <button id="spawn-coffee-run-crit" class="game__button">Spawn Coffee Run Crit</button>
           <button id="spawn-team-building-crit" class="game__button">Spawn Team Building Crit</button>
+          <button id="spawn-team-lunch-crit" class="game__button">Spawn Team Lunch Crit</button>
           <button id="spawn-spring-cleaning-crit" class="game__button">Spawn Spring Cleaning Crit</button>
           <button id="spawn-night-owl-crit" class="game__button">Spawn Night Owl Crit</button>
           <button id="spawn-headhunter-crit" class="game__button">Spawn Headhunter Crit</button>
@@ -873,6 +874,16 @@ export function wireSpawnTeamBuildingCritButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#spawn-team-building-crit",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireSpawnTeamLunchCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#spawn-team-lunch-crit",
   )!;
   button.addEventListener("click", onClick);
 }

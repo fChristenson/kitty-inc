@@ -814,6 +814,17 @@ function applyTeamBuildingCrit(floors: Floor[]): void {
   }
 }
 
+// "Team Lunch" crit: boost only the real worker slots on the floor that
+// landed the crit, with exactly twice the normal boost duration. Managers and
+// virtual worker slots are intentionally excluded.
+const TEAM_LUNCH_BOOST_DURATION_MS = BOOST_DURATION_MS * 2;
+function applyTeamLunchCrit(floor: Floor): void {
+  const now = Date.now();
+  for (let workerIndex = 0; workerIndex < floor.workerCount; workerIndex++) {
+    activateBoosted(floor, workerIndex, now, TEAM_LUNCH_BOOST_DURATION_MS);
+  }
+}
+
 // "Spring Cleaning" crit (see shared/critTypes's isSpringCleaningCrit): wipes
 // each unlocked floor back to its own level-0 economy (rate/interval/cost, no
 // banked upgrades) but one permanent tier higher — a fresh floor that earns
@@ -1051,6 +1062,7 @@ const SHARED_CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
   merger: (c) => applyMergerCrit(c.floors, c.floor),
   shareholders: (c) => applyShareholdersCrit(c.floors),
   teamBuilding: (c) => applyTeamBuildingCrit(c.floors),
+  teamLunch: (c) => applyTeamLunchCrit(c.floor),
   springCleaning: (c) => applySpringCleaningCrit(c.floors, c.multiplier),
   nightOwl: (c) => applyNightOwlCrit(c.floors),
   headhunter: (c) => applyHeadhunterCrit(c.floor, c.floors),

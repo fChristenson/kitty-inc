@@ -273,6 +273,9 @@ export const CONFIG = {
     // "Team Building" crit — one free worker on every unlocked floor at once
     // (Intern's building-wide sibling, priced like Golden Handshake)
     teamBuildingChance: 0.03,
+    // "Team Lunch" crit — doubles the normal boost duration for every actual
+    // worker on only the floor where the crit landed
+    teamLunchChance: 0.08,
     // "Spring Cleaning" crit — promotes every unlocked floor one permanent tier
     // AND resets it to a fresh, un-upgraded floor at that higher tier; a floor
     // already at the top tier is left alone. Trades banked upgrades for a

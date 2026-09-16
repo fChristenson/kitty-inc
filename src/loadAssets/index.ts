@@ -104,6 +104,7 @@ const IMAGE_FILES = {
   doubleDown: "doubleDown.png", // Double Down crit flash's own backdrop icon
   coffeeRun: "coffeeRun.png", // Coffee Run crit flash's own backdrop icon
   teamBuilding: "teamBuilding.png", // Team Building crit flash's own backdrop icon
+  teamLunch: "teamLunch.png", // Team Lunch crit flash's own backdrop icon
   springCleaning: "springCleaning.png", // Spring Cleaning crit flash's own backdrop icon
   nightOwl: "nightOwl.png", // Night Owl crit flash's own backdrop icon
   headhunter: "headhunter.png", // Headhunter crit flash's own backdrop icon

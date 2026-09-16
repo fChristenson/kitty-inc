@@ -554,6 +554,12 @@ export const TEAM_BUILDING_CRIT_CHANCE = CONFIG.crit.teamBuildingChance;
 export const TEAM_BUILDING_CRIT_COLOR = COLOR.teamBuildingCoral;
 export const TEAM_BUILDING_CRIT_LABEL = "Team Building";
 
+// "Team Lunch" crit — doubles the normal boost duration for every actual
+// worker on only the floor where the crit landed
+export const TEAM_LUNCH_CRIT_CHANCE = CONFIG.crit.teamLunchChance;
+export const TEAM_LUNCH_CRIT_COLOR = COLOR.teamBuildingCoral;
+export const TEAM_LUNCH_CRIT_LABEL = "Team Lunch";
+
 // "Spring Cleaning" crit — promotes every unlocked floor one tier and wipes it
 // back to a brand new floor at that tier; a floor already at the top tier is
 // skipped entirely, since there's nothing left to trade the upgrades for
@@ -700,6 +706,7 @@ const teaBreakCrits = new WeakSet<Floor>();
 const doubleDownCrits = new WeakSet<Floor>();
 const coffeeRunCrits = new WeakSet<Floor>();
 const teamBuildingCrits = new WeakSet<Floor>();
+const teamLunchCrits = new WeakSet<Floor>();
 const springCleaningCrits = new WeakSet<Floor>();
 const nightOwlCrits = new WeakSet<Floor>();
 const headhunterCrits = new WeakSet<Floor>();
@@ -806,6 +813,7 @@ export interface CritRollResult {
   doubleDown: boolean;
   coffeeRun: boolean;
   teamBuilding: boolean;
+  teamLunch: boolean;
   springCleaning: boolean;
   nightOwl: boolean;
   headhunter: boolean;
@@ -883,6 +891,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "doubleDown",
   "coffeeRun",
   "teamBuilding",
+  "teamLunch",
   "springCleaning",
   "nightOwl",
   "headhunter",
@@ -956,6 +965,7 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   doubleDown: doubleDownCrits,
   coffeeRun: coffeeRunCrits,
   teamBuilding: teamBuildingCrits,
+  teamLunch: teamLunchCrits,
   springCleaning: springCleaningCrits,
   nightOwl: nightOwlCrits,
   headhunter: headhunterCrits,
@@ -1457,6 +1467,12 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     icon: "teamBuilding",
     description: "Hires a free worker on every unlocked floor",
   },
+  teamLunch: {
+    label: TEAM_LUNCH_CRIT_LABEL,
+    color: TEAM_LUNCH_CRIT_COLOR,
+    icon: "teamLunch",
+    description: "Doubles every worker's boost duration",
+  },
   springCleaning: {
     label: SPRING_CLEANING_CRIT_LABEL,
 
@@ -1613,6 +1629,7 @@ export function rollCrit(
     if (Math.random() < DOUBLE_DOWN_CRIT_CHANCE) landed.push("doubleDown");
     if (Math.random() < COFFEE_RUN_CRIT_CHANCE) landed.push("coffeeRun");
     if (Math.random() < TEAM_BUILDING_CRIT_CHANCE) landed.push("teamBuilding");
+    if (Math.random() < TEAM_LUNCH_CRIT_CHANCE) landed.push("teamLunch");
     if (Math.random() < SPRING_CLEANING_CRIT_CHANCE)
       landed.push("springCleaning");
     if (Math.random() < NIGHT_OWL_CRIT_CHANCE) landed.push("nightOwl");
@@ -1698,6 +1715,7 @@ export function rollCrit(
     doubleDown: kept.has("doubleDown"),
     coffeeRun: kept.has("coffeeRun"),
     teamBuilding: kept.has("teamBuilding"),
+    teamLunch: kept.has("teamLunch"),
     springCleaning: kept.has("springCleaning"),
     nightOwl: kept.has("nightOwl"),
     headhunter: kept.has("headhunter"),
@@ -1941,6 +1959,10 @@ export function isCoffeeRunCrit(floor: Floor): boolean {
 
 export function isTeamBuildingCrit(floor: Floor): boolean {
   return teamBuildingCrits.has(floor);
+}
+
+export function isTeamLunchCrit(floor: Floor): boolean {
+  return teamLunchCrits.has(floor);
 }
 
 export function isSpringCleaningCrit(floor: Floor): boolean {
@@ -2224,6 +2246,10 @@ export function forceCoffeeRunCritProc(floor: Floor): void {
 
 export function forceTeamBuildingCritProc(floor: Floor): void {
   teamBuildingCrits.add(floor);
+}
+
+export function forceTeamLunchCritProc(floor: Floor): void {
+  teamLunchCrits.add(floor);
 }
 
 export function forceSpringCleaningCritProc(floor: Floor): void {

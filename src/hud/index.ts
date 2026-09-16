@@ -129,6 +129,7 @@ export {
   wireSpawnDressCodeCritButton,
   wireSpawnTeaBreakCritButton,
   wireSpawnTeamBuildingCritButton,
+  wireSpawnTeamLunchCritButton,
   wireSpawnSpringCleaningCritButton,
   wireSpawnNightOwlCritButton,
   wireSpawnHeadhunterCritButton,

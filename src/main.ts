@@ -84,6 +84,7 @@ import {
   forceDressCodeCritUpgrade,
   forceTeaBreakCritUpgrade,
   forceTeamBuildingCritUpgrade,
+  forceTeamLunchCritUpgrade,
   forceSpringCleaningCritUpgrade,
   forceNightOwlCritUpgrade,
   forceHeadhunterCritUpgrade,
@@ -220,6 +221,7 @@ import {
   wireSpawnDressCodeCritButton,
   wireSpawnTeaBreakCritButton,
   wireSpawnTeamBuildingCritButton,
+  wireSpawnTeamLunchCritButton,
   wireSpawnSpringCleaningCritButton,
   wireSpawnNightOwlCritButton,
   wireSpawnHeadhunterCritButton,
@@ -879,6 +881,10 @@ async function main() {
     wireSpawnTeamBuildingCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
       if (floor) forceTeamBuildingCritUpgrade(floor);
+    });
+    wireSpawnTeamLunchCritButton(app, () => {
+      const floor = (buildings[activeBuildingIndex] ?? [])[0];
+      if (floor) forceTeamLunchCritUpgrade(floor);
     });
     wireSpawnSpringCleaningCritButton(app, () => {
       const floor = (buildings[activeBuildingIndex] ?? [])[0];
