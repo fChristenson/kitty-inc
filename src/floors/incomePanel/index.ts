@@ -15,6 +15,7 @@ import {
   RUSH_HOUR_INTERVAL_SECONDS,
   isRateLockActive,
   RATE_LOCK_SPEED_MULTIPLIER,
+  getPriceMatchCost,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { getTotalIncome } from "../../totalIncome";
@@ -170,7 +171,8 @@ export function increaseIncomeRate(floor: Floor): void {
   // tick (rate gain, upgradeCount, interval-halving) proceeds as normal
   if (
     !isFrozenActive(floor, Date.now()) &&
-    !isSpendingFreezeActive(floor, Date.now())
+    !isSpendingFreezeActive(floor, Date.now()) &&
+    getPriceMatchCost(floor, Date.now()) === null
   ) {
     floor.upgradeCost = multiply(
       floor.upgradeCost,

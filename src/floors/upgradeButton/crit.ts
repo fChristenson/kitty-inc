@@ -18,6 +18,7 @@
 // re-exported here so every existing sibling import (incomePanel.ts,
 // floorLock.ts, critCelebration.ts, floorInteractions.ts) keeps working
 // unchanged
+export { getPriceMatchCost } from "../../shared/critTypes";
 export {
   type CritTier,
   type CritTierDef,
@@ -834,6 +835,26 @@ export function forcePayoutFloorBuyCrit(tier: CritTier = "crit"): void {
 export function forceDominoEffectFloorBuyCrit(tier: CritTier = "crit"): void {
   forceFloorBuyCrit(tier);
   if (forcedFloorBuyCrit) forcedFloorBuyCrit.dominoEffect = true;
+}
+
+export function forceBlueprintFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.blueprint = true;
+}
+
+export function forceExecutiveBonusFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.executiveBonus = true;
+}
+
+export function forcePowerSurgeFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.powerSurge = true;
+}
+
+export function forcePriceMatchFloorBuyCrit(tier: CritTier = "crit"): void {
+  forceFloorBuyCrit(tier);
+  if (forcedFloorBuyCrit) forcedFloorBuyCrit.priceMatch = true;
 }
 
 export function getCritTier(floor: Floor): CritTier | null {

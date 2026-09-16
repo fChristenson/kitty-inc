@@ -707,16 +707,28 @@ export const PRICE_MATCH_CRIT_LABEL = "Price Match";
 export const PRICE_MATCH_DURATION_MS = CONFIG.crit.priceMatchDurationMs;
 const priceMatchCosts = new WeakMap<
   Floor,
-  { cost: BigNumber; startedAt: number }
+  { cost: BigNumber; originalCost: BigNumber; startedAt: number }
 >();
 
 export function triggerPriceMatchCrit(floor: Floor, cost: BigNumber): void {
-  priceMatchCosts.set(floor, { cost, startedAt: Date.now() });
+  const originalCost =
+    priceMatchCosts.get(floor)?.originalCost ?? floor.upgradeCost;
+  const startedAt = Date.now();
+  floor.upgradeCost = cost;
+  priceMatchCosts.set(floor, { cost, originalCost, startedAt });
+  setTimeout(() => {
+    const active = priceMatchCosts.get(floor);
+    if (active?.startedAt === startedAt) {
+      floor.upgradeCost = active.originalCost;
+      priceMatchCosts.delete(floor);
+    }
+  }, PRICE_MATCH_DURATION_MS);
 }
 
 export function getPriceMatchCost(floor: Floor, now: number): BigNumber | null {
   const match = priceMatchCosts.get(floor);
   if (!match || now - match.startedAt >= PRICE_MATCH_DURATION_MS) {
+    if (match) floor.upgradeCost = match.originalCost;
     priceMatchCosts.delete(floor);
     return null;
   }

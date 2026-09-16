@@ -113,6 +113,9 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-shareholders-crit" class="game__button">Spawn Shareholders Crit</button>
           <button id="spawn-golden-parachute-crit" class="game__button">Spawn Golden Parachute Crit</button>
           <button id="spawn-payout-crit" class="game__button">Spawn Payout Crit</button>
+          <button id="spawn-executive-bonus-crit" class="game__button">Spawn Executive Bonus Crit</button>
+          <button id="spawn-power-surge-crit" class="game__button">Spawn Power Surge Crit</button>
+          <button id="spawn-price-match-crit" class="game__button">Spawn Price Match Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -189,6 +192,11 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-dress-code-crit" class="game__button">Floor Dress Code Crit</button>
           <button id="floor-buy-tea-break-crit" class="game__button">Floor Tea Break Crit</button>
           <button id="floor-buy-recruitment-drive-crit" class="game__button">Floor Recruitment Drive Crit</button>
+          <button id="floor-buy-blueprint-crit" class="game__button">Floor Blueprint Crit</button>
+          <button id="floor-buy-domino-effect-crit" class="game__button">Floor Domino Effect Crit</button>
+          <button id="floor-buy-executive-bonus-crit" class="game__button">Floor Executive Bonus Crit</button>
+          <button id="floor-buy-power-surge-crit" class="game__button">Floor Power Surge Crit</button>
+          <button id="floor-buy-price-match-crit" class="game__button">Floor Price Match Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1077,6 +1085,33 @@ export function wireSpawnPayoutCritButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSpawnExecutiveBonusCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#spawn-executive-bonus-crit")!
+    .addEventListener("click", onClick);
+}
+
+export function wireSpawnPowerSurgeCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#spawn-power-surge-crit")!
+    .addEventListener("click", onClick);
+}
+
+export function wireSpawnPriceMatchCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#spawn-price-match-crit")!
+    .addEventListener("click", onClick);
+}
+
 export function wireSpawnCashFlowCritButton(
   container: HTMLElement,
   onClick: () => void,
@@ -1773,6 +1808,51 @@ export function wireFloorBuyTeaBreakCritButton(
     "#floor-buy-tea-break-crit",
   )!;
   button.addEventListener("click", onClick);
+}
+
+export function wireFloorBuyBlueprintCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#floor-buy-blueprint-crit")!
+    .addEventListener("click", onClick);
+}
+
+export function wireFloorBuyDominoEffectCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#floor-buy-domino-effect-crit")!
+    .addEventListener("click", onClick);
+}
+
+export function wireFloorBuyExecutiveBonusCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#floor-buy-executive-bonus-crit")!
+    .addEventListener("click", onClick);
+}
+
+export function wireFloorBuyPowerSurgeCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#floor-buy-power-surge-crit")!
+    .addEventListener("click", onClick);
+}
+
+export function wireFloorBuyPriceMatchCritButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#floor-buy-price-match-crit")!
+    .addEventListener("click", onClick);
 }
 
 export function wireFloorBuyTeamBuildingCritButton(
