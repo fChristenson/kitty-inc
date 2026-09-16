@@ -76,7 +76,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-fully-staffed-crit" class="game__button">Spawn Fully Staffed Crit</button>
           <button id="spawn-espresso-shot-crit" class="game__button">Spawn Espresso Shot Crit</button>
           <button id="spawn-deja-vu-crit" class="game__button">Spawn Deja Vu Crit</button>
-          <button id="spawn-clone-army-crit" class="game__button">Spawn Clone Army Crit</button>
+          <button id="spawn-clone-army-crit" class="game__button">Spawn Reinforcements Crit</button>
           <button id="spawn-lucky-clover-crit" class="game__button">Spawn Lucky Clover Crit</button>
           <button id="spawn-second-wind-crit" class="game__button">Spawn Second Wind Crit</button>
           <button id="spawn-executive-order-crit" class="game__button">Spawn Executive Order Crit</button>
@@ -148,7 +148,7 @@ export function createTestButtonMarkup(): string {
           <button id="floor-buy-fully-staffed-crit" class="game__button">Floor Fully Staffed Crit</button>
           <button id="floor-buy-espresso-shot-crit" class="game__button">Floor Espresso Shot Crit</button>
           <button id="floor-buy-deja-vu-crit" class="game__button">Floor Deja Vu Crit</button>
-          <button id="floor-buy-clone-army-crit" class="game__button">Floor Clone Army Crit</button>
+          <button id="floor-buy-clone-army-crit" class="game__button">Floor Reinforcements Crit</button>
           <button id="floor-buy-golden-parachute-crit" class="game__button">Floor Golden Parachute Crit</button>
           <button id="floor-buy-payout-crit" class="game__button">Floor Payout Crit</button>
           <button id="floor-buy-lucky-clover-crit" class="game__button">Floor Lucky Clover Crit</button>

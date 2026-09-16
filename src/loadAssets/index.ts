@@ -89,7 +89,7 @@ const IMAGE_FILES = {
   fullyStaffed: "fullyStaffed.png", // Fully Staffed crit flash's own backdrop icon
   espressoShot: "espressoShot.png", // Espresso Shot crit flash's own backdrop icon
   dejaVu: "dejaVu.png", // Deja Vu crit flash's own backdrop icon
-  cloneArmy: "cloneArmy.png", // Clone Army crit flash's own backdrop icon
+  cloneArmy: "cloneArmy.png", // Reinforcements crit flash's own backdrop icon
   luckyClover: "luckyClover.png", // Lucky Clover crit flash's own backdrop icon
   secondWind: "secondWind.png", // Second Wind crit flash's own backdrop icon
   executiveOrder: "executiveOrder.png", // Executive Order crit flash's own backdrop icon

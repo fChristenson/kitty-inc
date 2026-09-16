@@ -12,7 +12,7 @@
 - Compound Interest — pays out the active company's own total again, but
   only the digits after the leading one (a scaling-friendly partial double).
 - Hot Desking — fills every unlocked floor to the same worker count as the
-  single most-staffed floor (Clone Army, but only levelling up, never down).
+  single most-staffed floor (Reinforcements, but only levelling up, never down).
 - Supply Run — grants office chairs AND supplies to every unlocked floor at
   once (Chair Giveaway + Supplies Giveaway, building-wide).
 - Ribbon Cutting — unlocks the next TWO floors for free instead of one, and

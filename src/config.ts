@@ -225,7 +225,7 @@ export const CONFIG = {
     // "Deja Vu" crit — chooses a random crit tier at consumption time and
     // applies that tier's free-upgrade batch twice
     dejaVuChance: 0.02,
-    // "Clone Army" crit - copies the largest unlocked floor workforce to all
+    // "Reinforcements" crit - copies the largest unlocked floor workforce to all
     // other unlocked floors for free
     cloneArmyChance: 0.03,
     // "Lucky Clover" crit — instantly pays out 4 back-to-back ultra-tier

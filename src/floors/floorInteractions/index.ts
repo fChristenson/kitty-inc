@@ -373,7 +373,7 @@ function applyNightOwlCrit(floors: Floor[]): void {
 }
 
 // "Headhunter" crit (see shared/critTypes's isHeadhunterCrit): poaches the
-// building's best headcount onto just the floor that crit — Clone Army's
+// building's best headcount onto just the floor that crit — Reinforcements'
 // levelling-up, narrowed to one floor. Nothing happens when that floor is
 // already the best-staffed one (or the only one)
 function applyHeadhunterCrit(floor: Floor, floors: Floor[]): void {
@@ -588,7 +588,7 @@ function applyFullyStaffedCrit(floors: Floor[]): void {
   }
 }
 
-// "Clone Army" copies the strongest unlocked floor workforce to every other
+// "Reinforcements" copies the strongest unlocked floor workforce to every other
 // unlocked floor without charging for workers — only ever levelling floors
 // up, never taking workers away from one that's somehow already above the cap
 function applyCloneArmyCrit(floors: Floor[]): void {

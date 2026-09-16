@@ -441,11 +441,11 @@ export const DEJA_VU_CRIT_CHANCE = CONFIG.crit.dejaVuChance;
 export const DEJA_VU_CRIT_COLOR = COLOR.dejaVuBlue;
 export const DEJA_VU_CRIT_LABEL = "Deja Vu";
 
-// "Clone Army" crit - copies the largest unlocked floor workforce to every
+// "Reinforcements" crit - copies the largest unlocked floor workforce to every
 // other unlocked floor for free
 export const CLONE_ARMY_CRIT_CHANCE = CONFIG.crit.cloneArmyChance;
 export const CLONE_ARMY_CRIT_COLOR = COLOR.cloneArmyViolet;
-export const CLONE_ARMY_CRIT_LABEL = "Clone Army";
+export const CLONE_ARMY_CRIT_LABEL = "Reinforcements";
 
 export const LUCKY_CLOVER_CRIT_CHANCE = CONFIG.crit.luckyCloverChance;
 export const LUCKY_CLOVER_CRIT_COLOR = COLOR.luckyCloverGreen;
