@@ -227,6 +227,15 @@ export const IMAGE_FILES = {
   strongReturn: "strongReturn.png",
   theBigCheese: "theBigCheese.png",
   queenOfQueens: "queenOfQueens.png",
+  bubbleEconomy: "bubbleEconomy.png",
+  cloudNineToFive: "cloudNineToFive.png",
+  luckyLaundromat: "luckyLaundromat.png",
+  moneyMagnet: "moneyMagnet.png",
+  overTheRainbow: "overTheRainbow.png",
+  pocketDimension: "pocketDimension.png",
+  shootingStarEmployee: "shootingStarEmployee.png",
+  treasureMeasure: "treasureMeasure.png",
+  wishfulBanking: "wishfulBanking.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

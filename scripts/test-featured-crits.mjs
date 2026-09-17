@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 93);
+  assert.equal(kinds.length, 102);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -111,6 +111,7 @@ try {
     [
       "goldNugget",
       "amethyst",
+      "bubbleEconomy",
       "emerald",
       "iHatePortals",
       "ruby",
@@ -126,6 +127,7 @@ try {
       "dinnerTime",
       "silverRush",
       "yesChef",
+      "cloudNineToFive",
       "goldRush",
       "yesWarchief",
       "wouldYouKindly",
@@ -165,9 +167,15 @@ try {
       "iDidntAskForThis",
       "wizard",
       "youAreNotPrepared",
+      "wishfulBanking",
       "theBigCheese",
     ],
-    ["moonwalker", "mimeYourBusiness", "spaceAndTime"],
+    [
+      "moonwalker",
+      "mimeYourBusiness",
+      "spaceAndTime",
+      "pocketDimension",
+    ],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(
@@ -272,6 +280,15 @@ try {
     strongReturn: [[20, 30, 36, 0], 0],
     theBigCheese: [[20, 60, 10, 0], 0],
     queenOfQueens: [[48, 58, 38, 0], 0],
+    bubbleEconomy: [[20, 30, 10, 0], 21],
+    cloudNineToFive: [[20, 30, 10, 0], 54],
+    luckyLaundromat: [[25, 35, 15, 0], 30],
+    moneyMagnet: [[20, 30, 10, 0], 42],
+    overTheRainbow: [[20, 30, 10, 0], 45],
+    pocketDimension: [[38, 48, 10, 0], 0],
+    shootingStarEmployee: [[20, 30, 33, 0], 0],
+    treasureMeasure: [[20, 30, 20, 0], 0],
+    wishfulBanking: [[20, 42, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -335,6 +352,8 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "theBigCheese")
       assert.equal(test.context.floor.critMultiplierTier, "mega");
+    if (kind === "wishfulBanking")
+      assert.equal(test.context.floor.critMultiplierTier, "mega");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const test = fixture();
@@ -391,6 +410,7 @@ try {
     "theLawWon",
     "littleSister",
     "thinkWithYourHead",
+    "treasureMeasure",
   ]) {
     const test = fixture();
     for (const floor of test.floors) {

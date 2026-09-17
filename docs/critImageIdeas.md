@@ -27,18 +27,6 @@ Each name is a working crit title, followed by the image to generate.
 - **Pop the Question** - A velvet ring box opening to reveal a ludicrously large golden question mark.
 - **Party Crasher** - A grinning cat bursting through a wrapped gift box in a crooked party hat.
 
-## Impossible good luck
-
-- **Pocket Dimension** - A jacket pocket opening into a tiny glowing galaxy, with a large coin halfway out.
-- **Money Magnet** - A chunky red horseshoe magnet pulling a tightly packed arc of coins toward its poles.
-- **Lucky Laundromat** - A round-front washing machine tumbling bright gold coins instead of clothes.
-- **Shooting Star Employee** - A smiling employee cat riding a chunky golden star, briefcase tucked under one paw.
-- **Cloud Nine to Five** - A business cat lounging on a small cloud with its laptop balanced on its knees.
-- **Treasure Measure** - A tape measure unrolling into a broad golden ribbon with coins along its curve.
-- **Wishful Banking** - A polished magic lamp pouring a thick curling stream of gold into a piggy bank.
-- **Over the Rainbow** - A compact rainbow arch ending in an overflowing office inbox of coins.
-- **Bubble Economy** - A cat blowing one enormous soap bubble with a shiny gold coin suspended inside it.
-
 ## Movie references
 
 - **Back to the Fiscal** (*Back to the Future*) - A wide-eyed cat in a puffy vest riding a calculator-shaped hoverboard, with two short golden light trails.
