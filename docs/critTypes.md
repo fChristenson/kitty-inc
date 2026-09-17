@@ -2,7 +2,7 @@
 
 ## Implemented asset batch: 2026-09-17 (character art)
 
-46 new crits from the character art drops, with instant rewards on upgrade
+57 new crits from the character art drops, with instant rewards on upgrade
 clicks and floor unlocks through the same `applyFloorCrit` function. Previous
 crits remain available and their balance is unchanged. Proc chances below apply
 after a tier and the special gateway land, before the shared proc cap. They are
@@ -73,33 +73,55 @@ Nine more from the "impossible good luck" drop, also renamed to camelCase first:
 | treasureMeasure      | Treasure Measure   | 10 upgrades on the lowest-level floor              | 3.2%        | Between Roundup Rodeo's 8 at 3.5% and Cake Day's 12 at 3%          |
 | wishfulBanking       | Wishful Banking    | 2 tier promotions, then 12 upgrades on this floor  | 0.45%       | Between Not Prepared's 2 plus 9 at 0.5% and Big Cheese's 2 plus 30 |
 
+Eleven more from the "movie references" drop, also renamed to camelCase first.
+The film titles are reference notes only; the artwork and labels are original
+parodies with no logos or poster layouts:
+
+| Image                   | Crit                      | Immediate reward                                   | Proc chance | Comparison                                                          |
+| ----------------------- | ------------------------- | -------------------------------------------------- | ----------- | ------------------------------------------------------------------- |
+| backToTheFiscal         | Back to the Fiscal        | 11 upgrades on this floor                          | 2.6%        | Between Keynote's 10 at 3% and Ninja Bonus's 12 at 2.5%             |
+| despicableFees          | Despicable Fees           | 30 payouts on this floor                           | 1.6%        | Above Abra-Cash-Dabra's 25 at 1.8%; largest single-floor payout     |
+| howToTrainYourManager   | Train Your Manager        | 4 upgrades, then 6 payouts on this floor           | 4%          | Donut Disturb pays 5 with 5 upgrades at 5%; more cash, fewer levels |
+| jurassicPerk            | Jurassic Perk             | 13 payouts on this floor                           | 2.9%        | Between Ruby's 12 at 3% and Chonk's 16 at 2.8%                      |
+| raidersOfTheLostReceipt | Lost Receipt              | 9 upgrades on the lowest-level floor               | 3.4%        | Between Roundup Rodeo's 8 at 3.5% and Treasure Measure's 10         |
+| theDevilWearsPawda      | The Devil Wears Pawda     | 14 upgrades on the cheapest-to-upgrade floor       | 2.8%        | The Law Won gives 6 upgrades plus 2 payouts to the same target      |
+| theExpenseMatrix        | The Expense Matrix        | 18 payouts on every unlocked floor                 | 1.2%        | Above Now I'm Suspicious's 17 at 1.3%; largest building-wide payout |
+| theFastAndTheFurriest   | The Fast and the Furriest | 12 upgrades on alternating floors, from the ground | 1.5%        | Above Magic Is a Tool's 8 on the same pattern at 1.8%               |
+| theFellowshipOfTheBling | Fellowship of the Bling   | 6 upgrades, then 6 payouts on every unlocked floor | 1.6%        | Above Lucky Laundromat's 5 upgrades plus 5 payouts at 2%            |
+| theGreatCatsby          | The Great Catsby          | 1 tier promotion, then 30 upgrades on this floor   | 0.65%       | Above I Didn't Ask For This's 1 promotion plus 20 at 0.7%           |
+| theLordOfTheRingBinders | The Ring Binders          | 35 upgrades on this floor                          | 1.3%        | Between Samurai's 30 at 1.5% and Epic Loot's 40 at 1.2%             |
+
 All targets are within the current building and exclude locked floors. The base
 tier's free upgrades occur before the special reward and its target selection.
 Payouts mean current income cycles, not seconds or banked cash, and leave timer
 progress unchanged. Upgrade/payout combinations pay at the post-upgrade rate.
 Dual Wield and Dodge This resolve their target before upgrading or paying, so on
 a tie the triggering floor wins; Little Sister, Think With Your Head, White
-Rabbit and Red or Blue break lowest-level and top-earner ties the same way.
+Rabbit, Red or Blue, Treasure Measure, Lost Receipt and The Devil Wears Pawda
+break lowest-level, cheapest and top-earner ties the same way.
 White Rabbit grants its upgrades once when the triggering floor is already the
 lowest-level floor, not twice. Red or Blue resolves its two targets
 independently and can land both on the same floor.
-Magic Is a Tool, Princess Cut, Disco Dividend and Over the Rainbow always select
-indices 0, 2, 4 and so on. Space and Time, Mime Your Business and Pocket
-Dimension cover indices 0 through the triggering floor inclusive.
+Magic Is a Tool, Princess Cut, Disco Dividend, Over the Rainbow and The Fast and
+the Furriest always select indices 0, 2, 4 and so on. Space and Time, Mime Your
+Business and Pocket Dimension cover indices 0 through the triggering floor
+inclusive.
 
 Promotions cap at ultra; Arcane Surge, I Didn't Ask For This, Not Prepared,
-The Big Cheese and Wishful Banking still grant their free upgrades on an
-already-ultra floor. On a one-floor building every target resolves to that
-floor. Repeated procs stay additive and no new timed state exists.
+The Big Cheese, Wishful Banking and The Great Catsby still grant their free
+upgrades on an already-ultra floor. On a one-floor building every target
+resolves to that floor. Repeated procs stay additive and no new timed state
+exists.
 
-All 46 are floor-only, not map-specific: their generated test buttons appear for
+All 57 are floor-only, not map-specific: their generated test buttons appear for
 Upgrade click and Floor unlock and stay hidden for Map unlock.
 
 ### Processing and verification (character art)
 
-All 46 raw JFIF sources are preserved. The "big personalities" and "impossible
-good luck" files arrived with spaces or dashes in their names and were renamed
-to camelCase to match the `IMAGE_FILES` key convention before processing.
+All 57 raw JFIF sources are preserved. The "big personalities", "impossible
+good luck" and "movie references" files arrived with spaces or dashes in their
+names and were renamed to camelCase to match the `IMAGE_FILES` key convention
+before processing.
 Sampled border whiteness ran 240-255 on most images; `whiteRabbit`, `megaChonk`,
 `nowIAmSuspicious`, `bubbleEconomy`, `cloudNineToFive` and `overTheRainbow` dip
 lower because their artwork touches the frame edge, but since the shared border
@@ -107,8 +129,9 @@ fill only seeds bright border pixels, those needed no special handling either.
 Every enclosed light detail (armour highlights, muzzles, bone charms, a
 blindfold, white faces and bellies, visor glass, shirt collars, red/blue pills,
 the mime's glass safe, a translucent soap bubble, a white cloud, the washing
-machine drum, the magnet poles) is closed by a dark outline, so all 46 used the
-existing near-white border-fill processor with no seeds or threshold changes.
+machine drum, the magnet poles, a cracked eggshell, coffee mugs, receipts and a
+white dinner jacket) is closed by a dark outline, so all 57 used the existing
+near-white border-fill processor with no seeds or threshold changes.
 
 Regenerate with `node scripts/process-<image>.mjs`; the wrappers call
 `scripts/lib/process-crit-icon.mjs` and write both `src/assets/<image>.png` and
@@ -120,8 +143,8 @@ pistols, warglaive blades, in-flight bullets and juggled coins, feet, tails and
 crop bounds. Outputs all fit within 250x250 as indexed-palette PNGs with alpha
 at 13.7-32.1 KB, and every root/shipped pair is byte-identical.
 
-Validation: `node scripts/test-featured-crits.mjs` passed all 102 featured
-rewards (including these 46) and `npm run build` passed. Browser behaviour for
+Validation: `node scripts/test-featured-crits.mjs` passed all 113 featured
+rewards (including these 57) and `npm run build` passed. Browser behaviour for
 this batch was not verified in-game.
 
 ## Implemented asset batch: 2026-09-17

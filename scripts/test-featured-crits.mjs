@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 102);
+  assert.equal(kinds.length, 113);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -115,12 +115,14 @@ try {
       "emerald",
       "iHatePortals",
       "ruby",
+      "jurassicPerk",
       "chonk",
       "saphire",
       "nothingToSee",
       "megaChonk",
       "diamond",
       "abraCashDabra",
+      "despicableFees",
     ],
     [
       "fastForward",
@@ -132,6 +134,7 @@ try {
       "yesWarchief",
       "wouldYouKindly",
       "nowIAmSuspicious",
+      "theExpenseMatrix",
     ],
     [
       "casualFriday",
@@ -149,12 +152,14 @@ try {
     [
       "hammerTime",
       "keynote",
+      "backToTheFiscal",
       "ninja",
       "cyberPunk",
       "bulletDodger",
       "rockTheStock",
       "space",
       "samurai",
+      "theLordOfTheRingBinders",
       "epic",
       "bigDaddy",
       "centurion",
@@ -165,6 +170,7 @@ try {
       "arcana",
       "obelisk",
       "iDidntAskForThis",
+      "theGreatCatsby",
       "wizard",
       "youAreNotPrepared",
       "wishfulBanking",
@@ -284,6 +290,17 @@ try {
     shootingStarEmployee: [[20, 30, 33, 0], 0],
     treasureMeasure: [[20, 30, 20, 0], 0],
     wishfulBanking: [[20, 42, 10, 0], 0],
+    backToTheFiscal: [[20, 41, 10, 0], 0],
+    despicableFees: [[20, 30, 10, 0], 90],
+    howToTrainYourManager: [[20, 34, 10, 0], 18],
+    jurassicPerk: [[20, 30, 10, 0], 39],
+    raidersOfTheLostReceipt: [[20, 30, 19, 0], 0],
+    theDevilWearsPawda: [[34, 30, 10, 0], 0],
+    theExpenseMatrix: [[20, 30, 10, 0], 108],
+    theFastAndTheFurriest: [[32, 30, 22, 0], 0],
+    theFellowshipOfTheBling: [[26, 36, 16, 0], 36],
+    theGreatCatsby: [[20, 60, 10, 0], 0],
+    theLordOfTheRingBinders: [[20, 65, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -349,6 +366,8 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "mega");
     if (kind === "wishfulBanking")
       assert.equal(test.context.floor.critMultiplierTier, "mega");
+    if (kind === "theGreatCatsby")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const test = fixture();
@@ -406,6 +425,8 @@ try {
     "littleSister",
     "thinkWithYourHead",
     "treasureMeasure",
+    "raidersOfTheLostReceipt",
+    "theDevilWearsPawda",
   ]) {
     const test = fixture();
     for (const floor of test.floors) {

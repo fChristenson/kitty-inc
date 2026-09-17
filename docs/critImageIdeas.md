@@ -3,57 +3,6 @@
 Visual concepts only; rewards and rarity can be designed when a batch is selected.
 Each name is a working crit title, followed by the image to generate.
 
-## Office nonsense
-
-- **Executive Spin** - A delighted office cat spinning in a swivel chair, tie flying sideways.
-- **Rubber Stampede** - An enormous rubber stamp flattening a tiny mountain of paperwork, with gold coins popping out.
-- **Reply All** - An overwhelmed cat peeking out of an overstuffed envelope, clutching a second envelope.
-- **Staple of Success** - A chrome stapler snapping shut on a thick bundle of banknotes like a prize-winning sandwich.
-- **Fax of Fortune** - An old fax machine feeding out one impossibly long ribbon of money.
-- **Casual Monday** - A serious executive cat wearing a blazer above the waist and enormous fluffy slippers below.
-- **Desk Jockey** - A helmeted cat riding an office chair like a racing motorcycle, gripping the armrests.
-- **Inbox Zero Gravity** - A floating in-tray with a neat stack of envelopes orbiting it like Saturn's rings.
-- **Bean Counter** - A bespectacled accountant cat solemnly counting three giant jelly beans on an abacus.
-
-## Snacks and celebrations
-
-- **Dough Division** - A business cat stretching pizza dough into a giant coin, with flour on its nose.
-- **Profit Popcorn** - A striped popcorn tub overflowing with chunky gold coin kernels.
-- **Donut Disturb** - A napping cat curled through the hole of an enormous iced donut, still wearing its tie.
-- **Cake Day** - A tiny employee triumphantly holding a towering cake with one oversized candle.
-- **Champagne Problems** - A bottle launching a gold cork, with a thick splash of sparkling coins.
-- **Bonus Burrito** - An open foil-wrapped burrito stuffed with rolled banknotes and gold coins.
-- **Sundae Best** - A cat in a bow tie presenting an ice-cream sundae with a gold coin cherry.
-- **Pop the Question** - A velvet ring box opening to reveal a ludicrously large golden question mark.
-- **Party Crasher** - A grinning cat bursting through a wrapped gift box in a crooked party hat.
-
-## Movie references
-
-- **Back to the Fiscal** (*Back to the Future*) - A wide-eyed cat in a puffy vest riding a calculator-shaped hoverboard, with two short golden light trails.
-- **The Expense Matrix** (*The Matrix*) - A sunglasses-wearing cat leaning impossibly backward as three oversized expense receipts sail overhead.
-- **Raiders of the Lost Receipt** (*Raiders of the Lost Ark*) - A fedora-wearing explorer cat carefully swapping a golden receipt for a small bag of coins on a pedestal.
-- **Jurassic Perk** (*Jurassic Park*) - A huge dinosaur egg cracking open to reveal a delighted baby dinosaur clutching an employee coffee mug.
-- **The Lord of the Ring Binders** (*The Lord of the Rings*) - A tiny cloaked office cat holding one glowing gold binder ring above an enormous open folder.
-- **The Fellowship of the Bling** (*The Fellowship of the Ring*) - Three miniature adventurer cats struggling together to carry one enormous jeweled coin.
-- **The Great Catsby** (*The Great Gatsby*) - A suave cat in a white dinner jacket raising a sparkling glass, with one oversized gold art-deco fan behind it.
-- **The Devil Wears Pawda** (*The Devil Wears Prada*) - A severe fashion-editor cat in enormous sunglasses inspecting a tiny handbag shaped like a briefcase.
-- **The Grand Budget Hotel** (*The Grand Budapest Hotel*) - A perfectly groomed concierge cat in a plum uniform presenting a towering stack of pastel accounting boxes.
-- **The Breakfast Bonus** (*The Breakfast Club*) - A business cat triumphantly raising one paw while sitting beside an oversized cereal bowl full of coins.
-- **Ferris Bueller's Paid Day Off** (*Ferris Bueller's Day Off*) - A smug cat reclining in an office chair with its feet on a closed laptop and a tiny tropical drink in paw.
-- **Honey, I Shrunk the Budget** (*Honey, I Shrunk the Kids*) - A tiny accountant cat standing on a giant calculator, using a pencil as a climbing pole.
-- **Despicable Fees** (*Despicable Me*) - A gleeful cat in a long striped scarf hugging a miniature moon made entirely of gold.
-- **How to Train Your Manager** (*How to Train Your Dragon*) - A junior employee cat offering a coffee cup to a small dragon wearing a manager's tie.
-- **Finding Bonus** (*Finding Nemo*) - A scuba-diver cat peering into a tiny anemone where a bright orange coin purse is hiding.
-- **The Purrsuit of Happyness** (*The Pursuit of Happyness*) - A beaming cat in an oversized business suit hugging a shiny new briefcase with both paws.
-- **Everything Everywhere All at Lunch** (*Everything Everywhere All at Once*) - A frazzled office cat balancing an enormous bagel like a halo, with a googly eye stuck to its forehead.
-- **A Fistful of Dollars and Donuts** (*A Fistful of Dollars*) - A squinting poncho-wearing cat holding a fan of banknotes in one paw and a giant pink donut in the other.
-- **The Fast and the Furriest** (*The Fast and the Furious*) - A racing-driver cat squeezed into a tiny sports car built from a gold credit card, with oversized wheels.
-- **2001: A Space Office** (*2001: A Space Odyssey*) - An astronaut cat floating beside a mysterious upright black filing cabinet, reaching toward its single glowing red drawer handle.
-
-Keep these as original cartoon interpretations of recognizable movie motifs.
-Use the film titles here as reference notes, not text embedded in the images;
-avoid studio logos, copied poster layouts, and actor likenesses.
-
 ## Dance floor profits
 
 - **Break Even** - A tracksuit-wearing cat holding a one-paw breakdance freeze on a flattened cardboard box, sneakers pointing skyward.

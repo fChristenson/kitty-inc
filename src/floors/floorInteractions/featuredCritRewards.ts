@@ -37,6 +37,14 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
   };
   const alternating = (context: CritRewardContext) =>
     context.floors.filter((floor, index) => floor.unlocked && index % 2 === 0);
+  const cheapest = (context: CritRewardContext) =>
+    context.floors
+      .filter((floor) => floor.unlocked)
+      .reduce(
+        (best, floor) =>
+          lt(floor.upgradeCost, best.upgradeCost) ? floor : best,
+        context.floor,
+      );
   const promoteAndUpgrade = (floor: Floor, steps: number, upgrades: number) => {
     for (let step = 0; step < steps; step++) {
       floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
@@ -139,15 +147,9 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
     spy: (context) =>
       actions.upgrade([selectByRate(context, false)], balance.spyUpgrades),
     theLawWon: (context) => {
-      const cheapest = context.floors
-        .filter((floor) => floor.unlocked)
-        .reduce(
-          (best, floor) =>
-            lt(floor.upgradeCost, best.upgradeCost) ? floor : best,
-          context.floor,
-        );
-      actions.upgrade([cheapest], balance.theLawWonUpgrades);
-      actions.payCycles([cheapest], balance.theLawWonPayouts);
+      const floor = cheapest(context);
+      actions.upgrade([floor], balance.theLawWonUpgrades);
+      actions.payCycles([floor], balance.theLawWonPayouts);
     },
     victorian: (context) =>
       actions.payCycles(
@@ -390,6 +392,51 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         context.floor,
         balance.wishfulBankingTierSteps,
         balance.wishfulBankingUpgrades,
+      ),
+    backToTheFiscal: (context) =>
+      actions.upgrade([context.floor], balance.backToTheFiscalUpgrades),
+    despicableFees: (context) =>
+      actions.payCycles([context.floor], balance.despicableFeesPayouts),
+    howToTrainYourManager: (context) => {
+      actions.upgrade([context.floor], balance.howToTrainYourManagerUpgrades);
+      actions.payCycles([context.floor], balance.howToTrainYourManagerPayouts);
+    },
+    jurassicPerk: (context) =>
+      actions.payCycles([context.floor], balance.jurassicPerkPayouts),
+    raidersOfTheLostReceipt: (context) =>
+      actions.upgrade(
+        [lowestLevel(context)],
+        balance.raidersOfTheLostReceiptUpgrades,
+      ),
+    theDevilWearsPawda: (context) =>
+      actions.upgrade([cheapest(context)], balance.theDevilWearsPawdaUpgrades),
+    theExpenseMatrix: (context) =>
+      actions.payCycles(context.floors, balance.theExpenseMatrixPayouts),
+    theFastAndTheFurriest: (context) =>
+      actions.upgrade(
+        alternating(context),
+        balance.theFastAndTheFurriestUpgrades,
+      ),
+    theFellowshipOfTheBling: (context) => {
+      actions.upgrade(
+        context.floors,
+        balance.theFellowshipOfTheBlingUpgrades,
+      );
+      actions.payCycles(
+        context.floors,
+        balance.theFellowshipOfTheBlingPayouts,
+      );
+    },
+    theGreatCatsby: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.theGreatCatsbyTierSteps,
+        balance.theGreatCatsbyUpgrades,
+      ),
+    theLordOfTheRingBinders: (context) =>
+      actions.upgrade(
+        [context.floor],
+        balance.theLordOfTheRingBindersUpgrades,
       ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
