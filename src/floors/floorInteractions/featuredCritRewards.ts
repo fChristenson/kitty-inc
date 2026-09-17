@@ -502,8 +502,7 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.upgrade([highestFloor(context)], balance.wokAndRollUpgrades),
     iAmTheNight: (context) =>
       actions.upgrade(context.floors, balance.iAmTheNightUpgrades),
-    tubs: (context) =>
-      actions.payCycles([context.floor], balance.tubsPayouts),
+    tubs: (context) => actions.payCycles([context.floor], balance.tubsPayouts),
     whySoSerious: (context) =>
       promoteAndUpgrade(
         context.floor,
