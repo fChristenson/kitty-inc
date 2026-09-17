@@ -752,6 +752,78 @@ export const FEATURED_CRIT_INFO = {
     icon: "prehistoric",
     description: "One tier promotion and forty upgrades here",
   },
+  breadyOrNot: {
+    label: "Bready or Not",
+    color: COLOR.goldenHandshakeGold,
+    icon: "breadyOrNot",
+    description: "Eleven upgrades on this floor and every floor below",
+  },
+  eggcellentWork: {
+    label: "Egg-cellent Work",
+    color: COLOR.sunshineGold,
+    icon: "eggcellentWork",
+    description: "One tier promotion and eight upgrades here",
+  },
+  holyGuacamole: {
+    label: "Holy Guacamole",
+    color: COLOR.dressCodeGreen,
+    icon: "holyGuacamole",
+    description: "Nineteen instant payouts on every unlocked floor",
+  },
+  loafActually: {
+    label: "Loaf Actually",
+    color: COLOR.espressoShotBrown,
+    icon: "loafActually",
+    description: "Twelve free upgrades on every unlocked floor",
+  },
+  pastaLaVista: {
+    label: "Pasta La Vista",
+    color: COLOR.orange,
+    icon: "pastaLaVista",
+    description: "Sixteen payouts on alternating floors, from the ground",
+  },
+  souperStar: {
+    label: "Souper Star",
+    color: COLOR.amberMuted,
+    icon: "souperStar",
+    description: "Sixteen payouts from the highest-earning floor",
+  },
+  tacoBoutIt: {
+    label: "Taco 'Bout It",
+    color: COLOR.autumnSaleAmber,
+    icon: "tacoBoutIt",
+    description: "Four upgrades here and four on the lowest-level floor",
+  },
+  theGreatPancakeStack: {
+    label: "The Great Pancake Stack",
+    color: COLOR.supplyRunTan,
+    icon: "theGreatPancakeStack",
+    description: "Twenty-one upgrades here and every floor below",
+  },
+  wokAndRoll: {
+    label: "Wok and Roll",
+    color: COLOR.summerSaleOrange,
+    icon: "wokAndRoll",
+    description: "Twenty-four free upgrades on the highest floor",
+  },
+  iAmTheNight: {
+    label: "I Am the Night",
+    color: COLOR.fourOfAKindIndigo,
+    icon: "iAmTheNight",
+    description: "Twenty-seven free upgrades on every unlocked floor",
+  },
+  tubs: {
+    label: "Tubs",
+    color: COLOR.rainCheckBlue,
+    icon: "tubs",
+    description: "Twenty-six instant payouts on this floor",
+  },
+  whySoSerious: {
+    label: "Why So Serious",
+    color: COLOR.halloweenSalePurple,
+    icon: "whySoSerious",
+    description: "Two tier promotions and twenty upgrades here",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

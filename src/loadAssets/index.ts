@@ -259,6 +259,18 @@ export const IMAGE_FILES = {
   tapThatAsset: "tapThatAsset.png",
   waltzStreet: "waltzStreet.png",
   prehistoric: "prehistoric.png",
+  breadyOrNot: "breadyOrNot.png",
+  eggcellentWork: "eggcellentWork.png",
+  holyGuacamole: "holyGuacamole.png",
+  loafActually: "loafActually.png",
+  pastaLaVista: "pastaLaVista.png",
+  souperStar: "souperStar.png",
+  tacoBoutIt: "tacoBoutIt.png",
+  theGreatPancakeStack: "theGreatPancakeStack.png",
+  wokAndRoll: "wokAndRoll.png",
+  iAmTheNight: "iAmTheNight.png",
+  tubs: "tubs.png",
+  whySoSerious: "whySoSerious.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

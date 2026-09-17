@@ -2,7 +2,7 @@
 
 ## Implemented asset batch: 2026-09-17 (character art)
 
-69 new crits from the character art drops, with instant rewards on upgrade
+81 new crits from the character art drops, with instant rewards on upgrade
 clicks and floor unlocks through the same `applyFloorCrit` function. Previous
 crits remain available and their balance is unchanged. Proc chances below apply
 after a tier and the special gateway land, before the shared proc cap. They are
@@ -109,6 +109,24 @@ Twelve more from the "dance floor profits" drop plus one standalone
 | waltzStreet      | Waltz Street      | 17 upgrades on every unlocked floor                | 1.8%        | Between For the King's 15 at 2% and Yes, Your Highness's 19              |
 | prehistoric      | Prehistoric       | 1 tier promotion, then 40 upgrades on this floor   | 0.55%       | Above The Great Catsby's 1 promotion plus 30 at 0.65%                    |
 
+Twelve more from the "comfort food" drop plus three standalone hero sources,
+also renamed to camelCase first:
+
+| Image                | Crit                    | Immediate reward                                  | Proc chance | Comparison                                                          |
+| -------------------- | ----------------------- | ------------------------------------------------- | ----------- | ------------------------------------------------------------------- |
+| breadyOrNot          | Bready or Not           | 11 upgrades here and every floor below            | 2.8%        | Between Space and Time's 9 at 3% and Shuffle the Funds' 14 at 2.5%  |
+| eggcellentWork       | Egg-cellent Work        | 1 tier promotion, then 8 upgrades on this floor   | 0.95%       | Above Bean Counter's 1 promotion plus 6 upgrades at 1%              |
+| holyGuacamole        | Holy Guacamole          | 19 payouts on every unlocked floor                | 1.1%        | Above The Expense Matrix's 18 at 1.2%; largest building-wide payout |
+| loafActually         | Loaf Actually           | 12 upgrades on every unlocked floor               | 2.6%        | Between Work Work's 11 at 2.8% and Gladiator's 13 at 2.2%           |
+| pastaLaVista         | Pasta La Vista          | 16 payouts on alternating floors, from the ground | 1.7%        | Between Over the Rainbow's 15 at 1.8% and Tap That Asset's 17       |
+| souperStar           | Souper Star             | 16 payouts from the highest-earning floor         | 1.9%        | Above Champagne Problems' 15 at 2% on the same target               |
+| tacoBoutIt           | Taco 'Bout It           | 4 upgrades here and 4 on the lowest-level floor   | 4%          | A smaller, likelier White Rabbit, which gives 5 and 5 at 3.5%       |
+| theGreatPancakeStack | The Great Pancake Stack | 21 upgrades here and every floor below            | 1.8%        | Above Pocket Dimension's 18 on the same downward span at 2%         |
+| wokAndRoll           | Wok and Roll            | 24 upgrades on the highest unlocked floor         | 1.8%        | Between Shooting Star's 23 at 1.9% and Strong Return's 26 at 1.7%   |
+| iAmTheNight          | I Am the Night          | 27 upgrades on every unlocked floor               | 1.4%        | Between For the Emperor's 25 at 1.5% and Queen of Queens' 28        |
+| tubs                 | Tubs                    | 26 payouts on this floor                          | 1.7%        | Between Abra-Cash-Dabra's 25 at 1.8% and Despicable Fees' 30        |
+| whySoSerious         | Why So Serious          | 2 tier promotions, then 20 upgrades on this floor | 0.35%       | The rarest promotion proc; The Big Cheese gives 2 plus 30 at 0.4%   |
+
 All targets are within the current building and exclude locked floors. The base
 tier's free upgrades occur before the special reward and its target selection.
 Payouts mean current income cycles, not seconds or banked cash, and leave timer
@@ -119,50 +137,61 @@ Rabbit, Red or Blue, Treasure Measure, Lost Receipt, The Devil Wears Pawda and
 Charleston Charge break lowest-level, cheapest and top-earner ties the same way.
 White Rabbit grants its upgrades once when the triggering floor is already the
 lowest-level floor, not twice. Red or Blue resolves its two targets
-independently and can land both on the same floor. Tango Tender upgrades twice
-over when the triggering floor is already the highest one, exactly like Party
-Crasher and Finger Guns.
+independently and can land both on the same floor. Tango Tender and Taco 'Bout
+It upgrade twice over when the triggering floor is already their second target,
+exactly like Party Crasher and Finger Guns.
 Magic Is a Tool, Princess Cut, Disco Dividend, Over the Rainbow, The Fast and
-the Furriest and Tap That Asset always select indices 0, 2, 4 and so on. Space
-and Time, Mime Your Business, Pocket Dimension and Shuffle the Funds cover
-indices 0 through the triggering floor inclusive.
+the Furriest, Tap That Asset and Pasta La Vista always select indices 0, 2, 4
+and so on. Space and Time, Mime Your Business, Pocket Dimension, Shuffle the
+Funds, Bready or Not and The Great Pancake Stack cover indices 0 through the
+triggering floor inclusive.
 
 Promotions cap at ultra; Arcane Surge, I Didn't Ask For This, Not Prepared,
-The Big Cheese, Wishful Banking, The Great Catsby and Prehistoric still grant
-their free upgrades on an already-ultra floor. On a one-floor building every
-target resolves to that floor. Repeated procs stay additive and no new timed
-state exists.
+The Big Cheese, Wishful Banking, The Great Catsby, Prehistoric, Egg-cellent Work
+and Why So Serious still grant their free upgrades on an already-ultra floor. On
+a one-floor building every target resolves to that floor. Repeated procs stay
+additive and no new timed state exists.
 
-All 69 are floor-only, not map-specific: their generated test buttons appear for
+All 81 are floor-only, not map-specific: their generated test buttons appear for
 Upgrade click and Floor unlock and stay hidden for Map unlock.
 
 ### Processing and verification (character art)
 
-All 69 raw JFIF sources are preserved. The "big personalities", "impossible
-good luck", "movie references" and "dance floor profits" files arrived with
-spaces or dashes in their names and were renamed to camelCase to match the
-`IMAGE_FILES` key convention before processing.
+All 81 raw JFIF sources are preserved. The "big personalities", "impossible
+good luck", "movie references", "dance floor profits" and "comfort food" files
+arrived with spaces or dashes in their names and were renamed to camelCase to
+match the `IMAGE_FILES` key convention before processing.
 Sampled border whiteness ran 240-255 on most images; `whiteRabbit`, `megaChonk`,
-`nowIAmSuspicious`, `bubbleEconomy`, `cloudNineToFive` and `overTheRainbow` dip
-lower because their artwork touches the frame edge, but since the shared border
-fill only seeds bright border pixels, those needed no special handling either.
+`nowIAmSuspicious`, `bubbleEconomy`, `cloudNineToFive`, `overTheRainbow`,
+`breadyOrNot`, `holyGuacamole`, `tacoBoutIt` and `wokAndRoll` dip lower because
+their artwork touches the frame edge, but since the shared border fill only
+seeds bright border pixels, those needed no special handling either.
 Every enclosed light detail (armour highlights, muzzles, bone charms, a
 blindfold, white faces and bellies, visor glass, shirt collars, red/blue pills,
 the mime's glass safe, a translucent soap bubble, a white cloud, the washing
 machine drum, the magnet poles, a cracked eggshell, coffee mugs, receipts, a
-white dinner jacket and a cardboard robot suit) is closed by a dark outline, so
-68 of the 69 used the existing near-white border-fill processor with no seeds or
-threshold changes.
+white dinner jacket, a cardboard robot suit, a chef's hat and coat) is closed by
+a dark outline, so 78 of the 81 used the existing near-white border-fill
+processor with no seeds or threshold changes.
 
-`tangoTender` is the one exception and has its own tailored
-`scripts/process-tangoTender.mjs`. That source ships as a "sticker": a thick
-white ring around the dancers, fenced off from the real background by its own
-thin mid-gray stroke (sampled at whiteness ~109-163), which the shared
-border-seeded fill cannot cross — so the shared processor left a visible white
-halo. The tailored version adds one seed inside the ring (which clears the whole
-connected band), erodes the leftover stroke, and keeps only the largest opaque
-component so the stroke loop cannot survive as a floating outline. Shared
-thresholds were not touched, so no other icon is affected.
+`tangoTender`, `pastaLaVista` and `whySoSerious` are the exceptions and go
+through `scripts/lib/process-sticker-crit-icon.mjs` instead. Those sources ship
+as "stickers": a thick white ring or badge disc around the subject, fenced off
+from the real background by the sticker's own thin mid-gray stroke (sampled at
+whiteness ~109-163), which the shared border-seeded fill cannot cross — so the
+shared processor left a visible white halo. The sticker processor takes a seed
+inside the ring (which clears the whole connected band), erodes the leftover
+stroke, and keeps only the largest opaque component so the stroke cannot survive
+as a floating outline. `pastaLaVista` needs a second seed because its raised
+fork splits the badge ring into two arcs, and its seeds are deliberately placed
+away from the chef's white hat and coat so those survive; its dark badge circle
+is connected to the cat and is kept as part of the artwork. Shared thresholds
+were not touched, so no other icon is affected.
+
+Only reach for the sticker processor when a magenta-composite check actually
+shows a halo: it ends in `keepLargestOpaqueComponent`, which would discard
+genuinely detached artwork such as Dodge This's pistol or Clowning Around's
+juggled coins.
 
 Regenerate with `node scripts/process-<image>.mjs`; the wrappers call
 `scripts/lib/process-crit-icon.mjs` and write both `src/assets/<image>.png` and
@@ -175,8 +204,8 @@ crop bounds, and that `tangoTender` no longer carries its sticker halo. Outputs
 all fit within 250x250 as indexed-palette PNGs with alpha at 13.7-31.9 KB, and
 every root/shipped pair is byte-identical.
 
-Validation: `node scripts/test-featured-crits.mjs` passed all 125 featured
-rewards (including these 69) and `npm run build` passed. Browser behaviour for
+Validation: `node scripts/test-featured-crits.mjs` passed all 137 featured
+rewards (including these 81) and `npm run build` passed. Browser behaviour for
 this batch was not verified in-game.
 
 ## Implemented asset batch: 2026-09-17

@@ -3,6 +3,56 @@
 Visual concepts only; rewards and rarity can be designed when a batch is selected.
 Each name is a working crit title, followed by the image to generate.
 
+## Comfort food
+
+- **Taco 'Bout It** - Two cats leaning in over a giant taco held between them, deep in serious conversation.
+- **Cheese Pull Champion** - A cat stretching a heroic cheese pull from one pizza slice, arms fully extended.
+- **Noodle Nap** - A sleepy cat curled inside an oversized ramen bowl, using a fishcake slice as a pillow.
+- **Grill Sergeant** - A stern cat in an apron and tiny cap saluting beside a smoking barbecue.
+- **Avocardio** - A cat jogging on a treadmill built from a halved avocado, the pit turning as the roller.
+- **Butter Believe It** - A cat shoving a giant pat of butter across a warm pancake like a boulder.
+- **Pickle Predicament** - A dismayed cat holding one enormous gherkin at arm's length, burger gaping open below.
+- **Hot Potato** - A cat juggling one glowing baked potato between its paws, ears flat and eyes watering.
+- **Brunch Boss** - A cat in sunglasses at a tiny cafe table behind a precarious stack of avocado toast.
+- **Curry Favour** - A cat bowing deeply while presenting a steaming curry pot on a velvet cushion.
+- **Dim Sum Dynasty** - A cat lifting the lid off the top basket of a towering bamboo steamer, steam billowing.
+- **Soup Dumpling Surgeon** - A cat in tiny goggles carefully lifting one plump soup dumpling with chopsticks.
+
+Keep one hero dish per image and let the cat's expression carry the joke. Food
+should read as chunky, stylized shapes rather than photographic detail, and
+steam or sauce should be a few bold curves, not fine wisps. These do not need
+coins in frame at all.
+
+## Sweet tooth
+
+- **Gummy Bear Market** - A giant translucent gummy bear standing proudly while a tiny cat shakes its paw.
+- **Lollipop Guild** - Three solemn cats holding oversized swirl lollipops upright like ceremonial staffs.
+- **Sugar High** - A vibrating wide-eyed cat with fur on end, ringed by a halo of scattered candy wrappers.
+- **Jawbreaker** - A determined cat straining to bite into an enormous striped jawbreaker, cheeks bulging.
+- **Marshmallow Mountain** - A tiny mountaineering cat planting a flag on the summit of a heaped marshmallow peak.
+- **Chocolate Fountain of Youth** - A rejuvenated kitten leaping out of the lower tier of a chocolate fountain.
+- **Licorice Laces** - A cat crouched tying its enormous sneakers with long red licorice laces.
+- **Toffee Trap** - A cat with one paw comically stretched into a long strand of molten toffee.
+- **Bubblegum Balloon** - A cat lifted clean off the ground by the enormous pink bubble it just blew.
+- **Candy Cane Climber** - A cat in a woolly hat scaling a giant candy cane with one tiny pickaxe.
+- **Sherbet Sherpa** - A bundled-up cat hauling a sled piled with a mound of rainbow sherbet.
+- **Truffle Shuffle** - A dapper cat presenting one glossy chocolate truffle on a small velvet cushion.
+- **Minty Fresh Start** - A beaming cat holding a giant striped humbug, one sparkle popping off its tooth.
+- **Sour Power** - A cat with a fiercely puckered face and electrified fur clutching one tiny sour candy.
+- **Caramel Cascade** - A cat catching a thick ribbon of caramel in a cup, tongue out in anticipation.
+- **Nougat Nap** - A cat sleeping soundly inside a split candy bar as though the nougat were a mattress.
+- **Jelly Bean Jamboree** - A cat diving head first into an enormous jar of jelly beans, tail still sticking out.
+- **Rock Candy Quarry** - A hard-hatted cat chipping chunky crystals off a rock-candy boulder.
+- **Fudge It** - A cat slicing a thick slab of fudge with an oversized knife, one square already missing.
+- **Cotton Candy Cloud** - A cat lounging on a pink cotton-candy cloud, tugging off one tuft to eat.
+- **Sprinkle Storm** - A delighted cat sheltering under a tiny umbrella in a downpour of rainbow sprinkles.
+- **Gobstopper Getaway** - A cat sprinting ahead of a giant gobstopper rolling downhill behind it.
+
+Candy reads best as simple glossy shapes with one or two bold highlights, so
+keep wrappers, stripes, and swirls chunky enough to survive at icon size. Sugar
+sparkles should be a few large stars rather than fine glitter. Money is
+optional here; the sweet itself is the prize.
+
 ## Nerd culture
 
 - **Roll for Revenue** (*tabletop RPGs*) - A tiny accountant cat struggling to roll an enormous translucent twenty-sided die with a gold coin suspended inside.

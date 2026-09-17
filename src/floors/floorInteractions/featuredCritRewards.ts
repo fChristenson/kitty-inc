@@ -467,5 +467,48 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.prehistoricTierSteps,
         balance.prehistoricUpgrades,
       ),
+    breadyOrNot: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.breadyOrNotUpgrades,
+      ),
+    eggcellentWork: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.eggcellentWorkTierSteps,
+        balance.eggcellentWorkUpgrades,
+      ),
+    holyGuacamole: (context) =>
+      actions.payCycles(context.floors, balance.holyGuacamolePayouts),
+    loafActually: (context) =>
+      actions.upgrade(context.floors, balance.loafActuallyUpgrades),
+    pastaLaVista: (context) =>
+      actions.payCycles(alternating(context), balance.pastaLaVistaPayouts),
+    souperStar: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.souperStarPayouts,
+      ),
+    tacoBoutIt: (context) => {
+      actions.upgrade([context.floor], balance.tacoBoutItUpgrades);
+      actions.upgrade([lowestLevel(context)], balance.tacoBoutItUpgrades);
+    },
+    theGreatPancakeStack: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.theGreatPancakeStackUpgrades,
+      ),
+    wokAndRoll: (context) =>
+      actions.upgrade([highestFloor(context)], balance.wokAndRollUpgrades),
+    iAmTheNight: (context) =>
+      actions.upgrade(context.floors, balance.iAmTheNightUpgrades),
+    tubs: (context) =>
+      actions.payCycles([context.floor], balance.tubsPayouts),
+    whySoSerious: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.whySoSeriousTierSteps,
+        balance.whySoSeriousUpgrades,
+      ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

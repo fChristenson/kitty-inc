@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 125);
+  assert.equal(kinds.length, 137);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -124,6 +124,7 @@ try {
       "megaChonk",
       "diamond",
       "abraCashDabra",
+      "tubs",
       "despicableFees",
     ],
     [
@@ -137,12 +138,14 @@ try {
       "wouldYouKindly",
       "nowIAmSuspicious",
       "theExpenseMatrix",
+      "holyGuacamole",
     ],
     [
       "casualFriday",
       "flamenco",
       "roman",
       "workWork",
+      "loafActually",
       "fancyFriday",
       "gladiator",
       "forTheKing",
@@ -150,6 +153,7 @@ try {
       "yesYourHighness",
       "captainOfIndustry",
       "forTheEmperor",
+      "iAmTheNight",
       "queenOfQueens",
     ],
     [
@@ -171,6 +175,7 @@ try {
     ],
     [
       "blessed",
+      "eggcellentWork",
       "arcana",
       "obelisk",
       "iDidntAskForThis",
@@ -180,6 +185,7 @@ try {
       "youAreNotPrepared",
       "wishfulBanking",
       "theBigCheese",
+      "whySoSerious",
     ],
     ["moonwalker", "mimeYourBusiness", "spaceAndTime", "pocketDimension"],
   ]) {
@@ -318,6 +324,18 @@ try {
     tapThatAsset: [[20, 30, 10, 0], 51],
     waltzStreet: [[37, 47, 27, 0], 0],
     prehistoric: [[20, 70, 10, 0], 0],
+    breadyOrNot: [[31, 41, 10, 0], 0],
+    eggcellentWork: [[20, 38, 10, 0], 0],
+    holyGuacamole: [[20, 30, 10, 0], 114],
+    loafActually: [[32, 42, 22, 0], 0],
+    pastaLaVista: [[20, 30, 10, 0], 48],
+    souperStar: [[20, 30, 10, 0], 48],
+    tacoBoutIt: [[20, 34, 14, 0], 0],
+    theGreatPancakeStack: [[41, 51, 10, 0], 0],
+    wokAndRoll: [[20, 30, 34, 0], 0],
+    iAmTheNight: [[47, 57, 37, 0], 0],
+    tubs: [[20, 30, 10, 0], 78],
+    whySoSerious: [[20, 50, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -387,6 +405,10 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "prehistoric")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "eggcellentWork")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "whySoSerious")
+      assert.equal(test.context.floor.critMultiplierTier, "mega");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const test = fixture();
