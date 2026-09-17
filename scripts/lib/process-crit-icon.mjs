@@ -3,7 +3,7 @@ import path from "node:path";
 import { copyFile } from "node:fs/promises";
 import { dropSmallOpaqueComponents } from "./drop-small-components.mjs";
 
-export async function processCritIcon(name) {
+export async function processCritIcon(name, { backgroundSeeds = [] } = {}) {
   const assets = path.resolve(import.meta.dirname, "../../src/assets");
   const { data, info } = await sharp(path.join(assets, `${name}.jfif`))
     .ensureAlpha()
@@ -28,6 +28,12 @@ export async function processCritIcon(name) {
   for (let row = 0; row < height; row++) {
     enqueue(row * width);
     enqueue(row * width + width - 1);
+  }
+  for (const [column, row] of backgroundSeeds) {
+    if (column < 0 || column >= width || row < 0 || row >= height) {
+      throw new Error(`Invalid background seed for ${name}: ${column},${row}`);
+    }
+    enqueue(row * width + column);
   }
   while (head < tail) {
     const pixel = queue[head++];

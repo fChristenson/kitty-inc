@@ -1,42 +1,85 @@
 # Crit ideas
 
-## Implemented asset batch
+## Implemented asset batch: 2026-09-17
 
-These rewards apply instantly on upgrade-click and floor-unlock crits. Odds
-below are per-proc rolls after a tier and the special gateway have landed,
-before the shared proc cap, not odds per click. Existing crits are unchanged.
-Payouts use each target floor's current income cycle without resetting timers;
-upgrades follow normal level, income, cost, and interval progression for free.
+22 new crits, with instant rewards on upgrade clicks and floor unlocks through
+the same `applyFloorCrit` function. Previous crits remain available and their
+balance is unchanged; this report replaces the previous batch report only.
+Proc chances below apply after a tier and the special gateway land, before
+the shared proc cap. They are not per-click odds.
 
-| Image        | Crit          | Immediate reward                                        | Proc chance | Comparison                                                 |
-| ------------ | ------------- | ------------------------------------------------------- | ----------- | ---------------------------------------------------------- |
-| ballerina    | Pirouette     | 3 upgrades, then 3 payouts on this floor                | 6%          | Small upgrade/payout combination                           |
-| cowboy       | Roundup Rodeo | 8 upgrades on the lowest-level unlocked floor           | 3.5%        | Safety Net targets highest cost instead                    |
-| dinnerTime   | Dinner Time   | 5 payouts on every unlocked floor                       | 4%          | Above Fast Forward's 4 payouts at 5%                       |
-| fingerGuns   | Finger Guns   | 2 upgrades here and 2 on the highest unlocked floor     | 7%          | Both batches stack if this is the highest floor            |
-| flamenco     | Flamenco      | 7 upgrades on every unlocked floor                      | 3.5%        | Between Casual Friday's 5 and Fancy Friday's 10            |
-| milestone    | Milestone     | Raise this floor to the next multiple of 25 upgrades    | 2.5%        | Round Up targets multiples of 10 building-wide             |
-| moonwalker   | Moonwalk      | 6 upgrades on this floor and every unlocked floor below | 4%          | Fixed downward batch, unlike Bounce's random walk          |
-| ninja        | Ninja Bonus   | 12 upgrades on this floor                               | 2.5%        | Above Keynote's 10 at 3%                                   |
-| obelisk      | Obelisk       | Promote this floor twice, then grant 2 upgrades         | 0.8%        | Upgrade's two-step sibling; upgrades still pay at max tier |
-| sharpShooter | Sharpshooter  | 10 payouts from the highest-income-rate unlocked floor  | 4%          | Overflow pays 5 on the triggering floor                    |
-| space        | Space Race    | 20 upgrades on the highest unlocked floor               | 2%          | Larger, top-floor-targeted upgrade batch                   |
-| yesChef      | Yes Chef      | 8 payouts on every unlocked floor                       | 2.5%        | Above Dinner Time's 5 payouts at 4%                        |
+| Image         | Crit            | Immediate reward                                                | Proc chance | Comparison                                                                      |
+| ------------- | --------------- | --------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------- |
+| amethyst      | Amethyst        | 6 payouts on this floor                                         | 5%          | Above Overflow's 5 at 6%; does not restart the timer                            |
+| blessed       | Blessed         | 1 tier promotion, then 3 upgrades here                          | 1%          | Upgrade plus immediate upgrades; smaller promotion than Obelisk at 0.8%         |
+| centurion     | Centurion       | 100 upgrades on this floor                                      | 1%          | Above Samurai's 30 at 1.5%; below Lucky Clover's 500 at 0.4%                    |
+| checkUp       | Check Up        | 4 upgrades, then 2 payouts on the lowest-level floor            | 5%          | Roundup Rodeo's target, but 4 upgrades plus cash instead of 8 upgrades          |
+| diamond       | Diamond         | 24 payouts on this floor                                        | 2%          | Above Sapphire's 18 at 2.5%                                                     |
+| emerald       | Emerald         | 9 payouts on this floor                                         | 4%          | Above Amethyst's 6 at 5%                                                        |
+| fireman       | First Responder | 3 upgrades, then 1 payout on every unlocked floor               | 4%          | Fire Drill's building-wide payout plus upgrades, without timer resets           |
+| forTheEmperor | For the Emperor | 25 upgrades on every unlocked floor                             | 1.5%        | Above For the King's 15 at 2%; up to 500 free upgrades                          |
+| forTheKing    | For the King    | 15 upgrades on every unlocked floor                             | 2%          | Above Fancy Friday's 10 at 2.5%                                                 |
+| goldNugget    | Gold Nugget     | 4 payouts on this floor                                         | 7%          | Below Overflow's 5 at 6%; preserves the timer                                   |
+| goldRush      | Gold Rush       | 10 payouts on every unlocked floor                              | 2%          | Above Yes Chef's 8 at 2.5%                                                      |
+| hammerTime    | Hammer Time     | 9 upgrades on this floor                                        | 4%          | Below Keynote's 10 at 3%                                                        |
+| robinHood     | Robin Hood      | 7 top-earner payouts, then 3 upgrades on the lowest-level floor | 3%          | Sharpshooter pays 10 without the targeted upgrades; no income is taken away     |
+| roman         | Roman Holiday   | 9 upgrades on every unlocked floor                              | 3%          | Between Flamenco's 7 at 3.5% and Fancy Friday's 10 at 2.5%                      |
+| ruby          | Ruby            | 12 payouts on this floor                                        | 3%          | Above Emerald's 9 at 4%                                                         |
+| samurai       | Samurai         | 30 upgrades on this floor                                       | 1.5%        | Above Ninja Bonus's 12 at 2.5% and Space Race's top-floor 20 at 2%              |
+| saphire       | Sapphire        | 18 payouts on this floor                                        | 2.5%        | Above Ruby's 12 at 3%; raw asset spelling retained                              |
+| silverRush    | Silver Rush     | 6 payouts on every unlocked floor                               | 3.5%        | Between Dinner Time's 5 at 4% and Yes Chef's 8 at 2.5%                          |
+| spy           | Undercover      | 17 upgrades on the lowest-income-rate floor                     | 2.2%        | Roundup Rodeo gives 8 to the lowest-level floor, a different target             |
+| theLawWon     | The Law Won     | 6 upgrades, then 2 payouts on the cheapest-upgrade floor        | 4.5%        | Safety Net gives 5 upgrades to the most expensive floor instead                 |
+| victorian     | High Society    | 9 payouts on alternating unlocked floors, starting at ground    | 3%          | Yes Chef pays 8 everywhere at 2.5%; this pays more per target but fewer targets |
+| wizard        | Wizard          | 2 tier promotions, then 5 upgrades here                         | 0.6%        | Above Obelisk's 2 promotions plus 2 upgrades at 0.8%                            |
 
-All floor targets are within the current building. Tier promotions cap at
-ultra and never remove progress. Milestone grants a full 25 upgrades when
-already on a multiple of 25. Each entry has one shared dev control and
-appears in the Special Crits collection with its own optimized icon.
+All targets are within the current building and exclude locked floors. The
+base tier's free upgrades occur before the special reward and its target
+selection. Payouts mean current income cycles, not seconds or banked cash;
+they leave timer progress unchanged. Upgrade/payout combinations pay at the
+post-upgrade rate, except Robin Hood, which pays before upgrading its other
+target. No proc takes income or progress away.
 
-Upgrade clicks and floor unlocks use the same `applyFloorCrit` reward and
-celebration path, including the base tier's free upgrades. Floor unlocks no
-longer substitute permanent promotions or suppress Merger. Dev actions have
-one registry-generated button per special crit, plus Regular Crit; select
-the event, tier, and optional special bonus tier using the shared controls.
+Promotions cap at ultra; Blessed and Wizard still grant their free upgrades
+on an already-ultra floor. Bulk upgrades use the normal numerical progression
+without replaying particles or crit rolls per tick. On a one-floor building,
+every target resolves to that floor; Robin Hood grants both rewards there.
+For equal best scores, the triggering floor wins if tied; otherwise the first
+matching floor from the ground wins. High Society always selects indices
+0, 2, 4, and so on. Repeated procs remain additive; no new timed state exists.
 
-Verification: `node scripts/test-featured-crits.mjs`, then `npm run build`.
-Regenerate an icon with `node scripts/process-<image>.mjs`; each script also
-copies its output into the shipped asset directory.
+These additions are floor-only, not map-specific. Their generated test buttons
+appear for Upgrade click and Floor unlock, and stay hidden for Map unlock.
+Shared Tier and Bonus tier controls remain available for floor tests.
+
+### Processing and verification
+
+All 22 raw JFIF sources are preserved. Sampled corner channels ranged from
+244 to 255; every icon used the existing near-white border-fill processor.
+Contrasting-background inspection preserved enclosed light details and full
+silhouettes. Outputs fit within 250x250, contain alpha and indexed palettes,
+and have identical root/shipped copies (approximately 15-34 KB each).
+Robin Hood adds three sampled background seeds for enclosed bow/quiver gaps;
+the optional seeds do not change processing for any other image.
+
+Regenerate with `node scripts/process-<image>.mjs`; wrappers use
+`scripts/lib/process-crit-icon.mjs` and write both `src/assets/<image>.png`
+and `src/assets/themes/references/dist/<image>.png` automatically.
+
+Validation: `node scripts/test-featured-crits.mjs` passed all 34 featured
+rewards, including the previous 12; `npm run build` passed. Tests cover
+single-floor rewards, target ties, locked-floor exclusions, promotion caps,
+rarity ladders, roll gates/cap, proc consumption, unique controls, and icons.
+
+Browser verification passed 44 real-handler cases (22 crits on each of upgrade
+click and floor unlock), checking cash and floor progression against expected
+results. All 22 icons loaded; 44 desktop/mobile flash renders drew the correct
+icon with nonblank pixel output. The collection grid, mobile detail layout,
+two-line descriptions, map filtering, and selected tier/bonus controls passed.
+The dev panel has 123 unique buttons: 122 special crits and Regular Crit.
+Tests used isolated floors and restored the test balance. A fresh Vite server
+was needed after stale hot-reload module instances invalidated the first
+browser check; no gameplay change was needed for that tooling issue.
 
 ## Reviewed
 

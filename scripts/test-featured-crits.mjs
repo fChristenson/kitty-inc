@@ -58,8 +58,12 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 12);
+  assert.equal(kinds.length, 34);
   assert.equal(new Set(allKinds).size, allKinds.length);
+  assert.equal(
+    new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
+    allKinds.length,
+  );
   const oldLabels = new Set(
     allKinds
       .filter((kind) => !kinds.includes(kind))
@@ -98,6 +102,36 @@ try {
   assert(CONFIG.crit.flamencoChance > CONFIG.crit.fancyFridayChance);
   assert(CONFIG.crit.keynoteChance > CONFIG.crit.ninjaChance);
   assert(CONFIG.crit.ninjaChance > CONFIG.crit.spaceChance);
+  for (const family of [
+    ["goldNugget", "amethyst", "emerald", "ruby", "saphire", "diamond"],
+    ["fastForward", "dinnerTime", "silverRush", "yesChef", "goldRush"],
+    [
+      "casualFriday",
+      "flamenco",
+      "roman",
+      "fancyFriday",
+      "forTheKing",
+      "forTheEmperor",
+    ],
+    [
+      "hammerTime",
+      "keynote",
+      "ninja",
+      "space",
+      "samurai",
+      "centurion",
+      "luckyClover",
+    ],
+    ["blessed", "obelisk", "wizard"],
+  ]) {
+    for (let index = 1; index < family.length; index++) {
+      assert(
+        crit.getCritProcChance(family[index - 1]) >
+          crit.getCritProcChance(family[index]),
+        family.join(" > "),
+      );
+    }
+  }
 
   const expected = {
     ballerina: [[20, 33, 10, 0], 9],
@@ -112,6 +146,28 @@ try {
     sharpShooter: [[20, 30, 10, 0], 30],
     space: [[20, 30, 30, 0], 0],
     yesChef: [[20, 30, 10, 0], 48],
+    amethyst: [[20, 30, 10, 0], 18],
+    blessed: [[20, 33, 10, 0], 0],
+    centurion: [[20, 130, 10, 0], 0],
+    checkUp: [[20, 30, 14, 0], 4],
+    diamond: [[20, 30, 10, 0], 72],
+    emerald: [[20, 30, 10, 0], 27],
+    fireman: [[23, 33, 13, 0], 6],
+    forTheEmperor: [[45, 55, 35, 0], 0],
+    forTheKing: [[35, 45, 25, 0], 0],
+    goldNugget: [[20, 30, 10, 0], 12],
+    goldRush: [[20, 30, 10, 0], 60],
+    hammerTime: [[20, 39, 10, 0], 0],
+    robinHood: [[20, 30, 13, 0], 21],
+    roman: [[29, 39, 19, 0], 0],
+    ruby: [[20, 30, 10, 0], 36],
+    samurai: [[20, 60, 10, 0], 0],
+    saphire: [[20, 30, 10, 0], 54],
+    silverRush: [[20, 30, 10, 0], 36],
+    spy: [[37, 30, 10, 0], 0],
+    theLawWon: [[26, 30, 10, 0], 2],
+    victorian: [[20, 30, 10, 0], 27],
+    wizard: [[20, 35, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -120,6 +176,7 @@ try {
       critMultiplierTier: null,
       rate: [1, 9, 4, 100][index],
       payout: [1, 3, 2, 100][index],
+      upgradeCost: fromNumber([10, 100, 50, 0][index]),
       lastCollectedAt: 123,
     }));
     let income = 0;
@@ -160,6 +217,10 @@ try {
     );
     if (kind === "obelisk")
       assert.equal(test.context.floor.critMultiplierTier, "mega");
+    if (kind === "blessed")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "wizard")
+      assert.equal(test.context.floor.critMultiplierTier, "mega");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const test = fixture();
@@ -185,6 +246,47 @@ try {
     assert(
       test.income() > 0 || test.context.floor.upgradeCount > 20,
       `${kind}: no single-floor reward`,
+    );
+  }
+  for (const kind of ["blessed", "wizard"]) {
+    for (const tier of [null, "crit", "mega", "ultra"]) {
+      const test = fixture();
+      test.context.floor.critMultiplierTier = tier;
+      test.rewards[kind](test.context);
+      const expectedTier =
+        kind === "wizard"
+          ? tier === null
+            ? "mega"
+            : "ultra"
+          : tier === null
+            ? "crit"
+            : tier === "crit"
+              ? "mega"
+              : "ultra";
+      assert.equal(test.context.floor.critMultiplierTier, expectedTier);
+      assert.equal(
+        test.context.floor.upgradeCount,
+        30 + CONFIG.crit[`${kind}Upgrades`],
+      );
+    }
+  }
+  for (const kind of ["checkUp", "robinHood", "spy", "theLawWon"]) {
+    const test = fixture();
+    for (const floor of test.floors) {
+      floor.upgradeCount = 30;
+      floor.rate = 1;
+      floor.upgradeCost = fromNumber(10);
+    }
+    test.rewards[kind](test.context);
+    assert.equal(
+      test.context.floor.upgradeCount,
+      30 + CONFIG.crit[`${kind}Upgrades`],
+      `${kind}: tie favors triggering floor`,
+    );
+    assert.equal(
+      test.floors[3].upgradeCount,
+      30,
+      `${kind}: locked floor touched`,
     );
   }
   const oldProcCount = allKinds.length - kinds.length;
@@ -233,7 +335,7 @@ try {
     "Gateway miss must suppress procs",
   );
   console.log(
-    "PASS: 12 rewards, single-floor fallbacks, milestones, tier caps, registry state, roll gates/cap, odds, and icons",
+    "PASS: 34 rewards, single-floor fallbacks, targeting ties, milestones, tier caps, registry state, roll gates/cap, odds, and icons",
   );
 } finally {
   Math.random = originalRandom;
