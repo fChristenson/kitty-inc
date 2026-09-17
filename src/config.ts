@@ -467,6 +467,12 @@ export const CONFIG = {
     beanCounterUpgrades: 6,
     kingOfTheWorldChance: 0.015,
     kingOfTheWorldUpgrades: 30,
+    officeClownChance: 0.04,
+    officeClownUpgrades: 5,
+    fridayTieDayChance: 0.03,
+    fridayTieDayPayouts: 10,
+    soReadyChance: 0.02,
+    soReadyUpgrades: 15,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

@@ -260,6 +260,24 @@ export const FEATURED_CRIT_INFO = {
     icon: "kingOfTheWorld",
     description: "Thirty free upgrades on the highest floor",
   },
+  officeClown: {
+    label: "Office Clown",
+    color: COLOR.red,
+    icon: "officeClown",
+    description: "Five free upgrades on the lowest-level floor",
+  },
+  fridayTieDay: {
+    label: "Friday Tie Day",
+    color: COLOR.blue,
+    icon: "fridayTieDay",
+    description: "Ten payouts on alternating floors, from the ground",
+  },
+  soReady: {
+    label: "So Ready",
+    color: COLOR.cyan,
+    icon: "soReady",
+    description: "Fifteen free upgrades on this floor",
+  },
   wizard: {
     label: "Wizard",
     color: COLOR.purple,

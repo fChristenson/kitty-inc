@@ -178,6 +178,9 @@ export const IMAGE_FILES = {
   inboxZeroGravity: "inboxZeroGravity.png",
   beanCounter: "beanCounter.png",
   kingOfTheWorld: "kingOfTheWorld.png",
+  officeClown: "officeClown.png",
+  fridayTieDay: "fridayTieDay.png",
+  soReady: "soReady.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

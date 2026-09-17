@@ -2,7 +2,7 @@
 
 ## Implemented asset batch: 2026-09-17
 
-32 new crits, with instant rewards on upgrade clicks and floor unlocks through
+35 new crits, with instant rewards on upgrade clicks and floor unlocks through
 the same `applyFloorCrit` function. Previous crits remain available and their
 balance is unchanged; this report replaces the previous batch report only.
 Proc chances below apply after a tier and the special gateway land, before
@@ -42,6 +42,9 @@ the shared proc cap. They are not per-click odds.
 | inboxZeroGravity | Inbox Zero Gravity | 12 payouts on every unlocked floor                              | 3%          | Above Gold Rush's 10 at 2%; broad payout scope                                  |
 | beanCounter      | Bean Counter       | 1 tier promotion and 6 upgrades on this floor                   | 1%          | Adds upgrades to Blessed's 1 promotion and 3 upgrades at the same 1%            |
 | kingOfTheWorld   | King of the World  | 30 upgrades on the highest unlocked floor                       | 1.5%        | Matches Samurai's 30 upgrades, but targets the top floor at the same rarity     |
+| officeClown      | Office Clown       | 5 upgrades on the lowest-level floor                            | 4%          | Smaller than Roundup Rodeo's 8 at 3.5%, with the same level-based target        |
+| fridayTieDay     | Friday Tie Day     | 10 payouts on alternating unlocked floors, starting at ground   | 3%          | More per selected floor than High Society's 9 at 3%, with the same pattern      |
+| soReady          | So Ready           | 15 upgrades on this floor                                       | 2%          | Same count as For the King, but focused on one floor instead of the building    |
 
 All targets are within the current building and exclude locked floors. The
 base tier's free upgrades occur before the special reward and its target
@@ -64,7 +67,7 @@ Shared Tier and Bonus tier controls remain available for floor tests.
 
 ### Processing and verification
 
-All 10 new raw JFIF sources are preserved. Sampled corner channels ranged from
+All 13 new raw JFIF sources are preserved. Sampled corner channels ranged from
 244 to 255; every icon used the existing near-white border-fill processor.
 Contrasting-background inspection preserved enclosed light details and full
 silhouettes. Outputs fit within 250x250, contain alpha and indexed palettes,
@@ -76,7 +79,7 @@ Regenerate with `node scripts/process-<image>.mjs`; wrappers use
 `scripts/lib/process-crit-icon.mjs` and write both `src/assets/<image>.png`
 and `src/assets/themes/references/dist/<image>.png` automatically.
 
-Validation: `node scripts/test-featured-crits.mjs` passed all 44 featured
+Validation: `node scripts/test-featured-crits.mjs` passed all 47 featured
 rewards, including the previous 12; `npm run build` passed. Tests cover
 single-floor rewards, target ties, locked-floor exclusions, promotion caps,
 rarity ladders, roll gates/cap, proc consumption, unique controls, and icons.

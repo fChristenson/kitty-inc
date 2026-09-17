@@ -185,6 +185,17 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       ),
     kingOfTheWorld: (context) =>
       actions.upgrade([highestFloor(context)], balance.kingOfTheWorldUpgrades),
+    officeClown: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.officeClownUpgrades),
+    fridayTieDay: (context) =>
+      actions.payCycles(
+        context.floors.filter(
+          (floor, index) => floor.unlocked && index % 2 === 0,
+        ),
+        balance.fridayTieDayPayouts,
+      ),
+    soReady: (context) =>
+      actions.upgrade([context.floor], balance.soReadyUpgrades),
     wizard: (context) =>
       promoteAndUpgrade(
         context.floor,

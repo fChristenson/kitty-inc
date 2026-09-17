@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 44);
+  assert.equal(kinds.length, 47);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -183,6 +183,9 @@ try {
     inboxZeroGravity: [[20, 30, 10, 0], 72],
     beanCounter: [[20, 36, 10, 0], 0],
     kingOfTheWorld: [[20, 30, 40, 0], 0],
+    officeClown: [[20, 30, 15, 0], 0],
+    fridayTieDay: [[20, 30, 10, 0], 30],
+    soReady: [[20, 45, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -352,7 +355,7 @@ try {
     "Gateway miss must suppress procs",
   );
   console.log(
-    "PASS: 44 rewards, single-floor fallbacks, targeting ties, milestones, tier caps, registry state, roll gates/cap, odds, and icons",
+    "PASS: 47 rewards, single-floor fallbacks, targeting ties, milestones, tier caps, registry state, roll gates/cap, odds, and icons",
   );
 } finally {
   Math.random = originalRandom;
