@@ -21,7 +21,7 @@ const JACKPOT_VOLUME = SFX_VOLUME * 0.6;
 const ARCADE_SLOT_WIN_VOLUME = SFX_VOLUME * 0.25;
 // 25% louder than the shared SFX_VOLUME per explicit request — the "cash
 // register" purchase sfx
-const SOLD_VOLUME = SFX_VOLUME * 1.50;
+const SOLD_VOLUME = SFX_VOLUME * 1.5;
 
 // a single click can hit several overlapping cats, or a cat and the mouse, in the
 // same synchronous call stack (see gameCanvas.ts's onPointerUp) — this window
@@ -81,7 +81,12 @@ const AudioContextCtor: typeof AudioContext | undefined =
 let audioCtx: AudioContext | null = null;
 function getAudioContext(): AudioContext | null {
   if (!AudioContextCtor) return null; // unsupported browser — callers no-op via optional chaining
-  if (!audioCtx) audioCtx = new AudioContextCtor();
+  // "interactive" asks for the smallest output buffer the device supports, so a
+  // scheduled sound reaches the speakers as soon as possible — the default
+  // ("balanced") trades latency for power on some platforms, which reads as the
+  // sfx lagging behind the click that caused it
+  if (!audioCtx)
+    audioCtx = new AudioContextCtor({ latencyHint: "interactive" });
   return audioCtx;
 }
 
@@ -112,13 +117,20 @@ const sfxUrls = {
 type SfxName = keyof typeof sfxUrls;
 
 const sfxBufferCache = new Map<SfxName, Promise<AudioBuffer>>();
+// the RESOLVED buffers, kept alongside the promise cache above purely so playSfx
+// can start an already-decoded sound synchronously — see startBuffer's call sites
+const decodedSfxBuffers = new Map<SfxName, AudioBuffer>();
 
 function loadSfxBuffer(ctx: AudioContext, name: SfxName): Promise<AudioBuffer> {
   const cached = sfxBufferCache.get(name);
   if (cached) return cached;
   const promise = fetch(sfxUrls[name])
     .then((res) => res.arrayBuffer())
-    .then((data) => ctx.decodeAudioData(data));
+    .then((data) => ctx.decodeAudioData(data))
+    .then((buffer) => {
+      decodedSfxBuffers.set(name, buffer);
+      return buffer;
+    });
   sfxBufferCache.set(name, promise);
   return promise;
 }
@@ -154,25 +166,37 @@ function playSfx(
 ): void {
   const ctx = getAudioContext();
   if (!ctx) return;
+  const startBuffer = (buffer: AudioBuffer) => {
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.playbackRate.value = rate;
+    const gain = ctx.createGain();
+    gain.gain.value = volume;
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    const startAt = ctx.currentTime;
+    source.start(0, Math.min(offsetSeconds, buffer.duration));
+    if (maxDurationSeconds !== undefined) {
+      const fadeStartAt =
+        startAt + Math.max(0, maxDurationSeconds - fadeOutSeconds);
+      gain.gain.setValueAtTime(volume, fadeStartAt);
+      gain.gain.linearRampToValueAtTime(0, startAt + maxDurationSeconds);
+      source.stop(startAt + maxDurationSeconds);
+    }
+  };
+  // the whole point of preloadSounds: once a buffer is decoded, start it RIGHT
+  // HERE, in the same synchronous call the click handler made. Going through the
+  // cached promise's .then() instead would push source.start() into a microtask,
+  // which can't run until the entire click handler (crit rewards, coin bursts,
+  // celebrations, persist) has finished — so the sound trailed the click by
+  // however long all of that took
+  const decoded = decodedSfxBuffers.get(name);
+  if (decoded) {
+    startBuffer(decoded);
+    return;
+  }
   loadSfxBuffer(ctx, name)
-    .then((buffer) => {
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.playbackRate.value = rate;
-      const gain = ctx.createGain();
-      gain.gain.value = volume;
-      source.connect(gain);
-      gain.connect(ctx.destination);
-      const startAt = ctx.currentTime;
-      source.start(0, Math.min(offsetSeconds, buffer.duration));
-      if (maxDurationSeconds !== undefined) {
-        const fadeStartAt =
-          startAt + Math.max(0, maxDurationSeconds - fadeOutSeconds);
-        gain.gain.setValueAtTime(volume, fadeStartAt);
-        gain.gain.linearRampToValueAtTime(0, startAt + maxDurationSeconds);
-        source.stop(startAt + maxDurationSeconds);
-      }
-    })
+    .then(startBuffer)
     .catch(() => {});
 }
 
