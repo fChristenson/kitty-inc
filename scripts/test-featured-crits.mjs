@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 83);
+  assert.equal(kinds.length, 93);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -119,6 +119,7 @@ try {
       "nothingToSee",
       "megaChonk",
       "diamond",
+      "abraCashDabra",
     ],
     [
       "fastForward",
@@ -139,7 +140,9 @@ try {
       "gladiator",
       "forTheKing",
       "yesYourHighness",
+      "captainOfIndustry",
       "forTheEmperor",
+      "queenOfQueens",
     ],
     [
       "hammerTime",
@@ -147,6 +150,7 @@ try {
       "ninja",
       "cyberPunk",
       "bulletDodger",
+      "rockTheStock",
       "space",
       "samurai",
       "epic",
@@ -161,7 +165,9 @@ try {
       "iDidntAskForThis",
       "wizard",
       "youAreNotPrepared",
+      "theBigCheese",
     ],
+    ["moonwalker", "mimeYourBusiness", "spaceAndTime"],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(
@@ -256,6 +262,16 @@ try {
     nothingToSee: [[20, 30, 10, 0], 60],
     nowIAmSuspicious: [[20, 30, 10, 0], 102],
     redOrBlue: [[20, 30, 16, 0], 18],
+    abraCashDabra: [[20, 30, 10, 0], 75],
+    captainOfIndustry: [[41, 51, 31, 0], 0],
+    clowningAround: [[23, 33, 13, 0], 18],
+    discoDividend: [[20, 30, 10, 0], 33],
+    mimeYourBusiness: [[28, 38, 10, 0], 0],
+    redCarpetTreatment: [[20, 30, 10, 0], 36],
+    rockTheStock: [[20, 46, 10, 0], 0],
+    strongReturn: [[20, 30, 36, 0], 0],
+    theBigCheese: [[20, 60, 10, 0], 0],
+    queenOfQueens: [[48, 58, 38, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -317,6 +333,8 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "mega");
     if (kind === "arcana" || kind === "iDidntAskForThis")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "theBigCheese")
+      assert.equal(test.context.floor.critMultiplierTier, "mega");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const test = fixture();

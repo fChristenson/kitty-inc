@@ -217,6 +217,16 @@ export const IMAGE_FILES = {
   nothingToSee: "nothingToSee.png",
   nowIAmSuspicious: "nowIAmSuspicious.png",
   redOrBlue: "redOrBlue.png",
+  abraCashDabra: "abraCashDabra.png",
+  captainOfIndustry: "captainOfIndustry.png",
+  clowningAround: "clowningAround.png",
+  discoDividend: "discoDividend.png",
+  mimeYourBusiness: "mimeYourBusiness.png",
+  redCarpetTreatment: "redCarpetTreatment.png",
+  rockTheStock: "rockTheStock.png",
+  strongReturn: "strongReturn.png",
+  theBigCheese: "theBigCheese.png",
+  queenOfQueens: "queenOfQueens.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

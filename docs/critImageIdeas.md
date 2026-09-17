@@ -27,18 +27,6 @@ Each name is a working crit title, followed by the image to generate.
 - **Pop the Question** - A velvet ring box opening to reveal a ludicrously large golden question mark.
 - **Party Crasher** - A grinning cat bursting through a wrapped gift box in a crooked party hat.
 
-## Big personalities
-
-- **Disco Dividend** - A cat in a white disco suit pointing upward beneath a small mirrored disco ball.
-- **Abra-Cash-Dabra** - A stage-magician cat pulling a long chain of banknotes out of a top hat.
-- **Clowning Around** - A cheerful clown cat balancing on a striped ball while juggling three chunky coins.
-- **Strong Return** - A circus strongman cat lifting a barbell with money bags instead of weight plates.
-- **Mime Your Business** - A striped-shirt mime cat pressing its paws against a clearly outlined glass safe.
-- **Rock the Stock** - A glam-rock cat in star-shaped glasses playing a gold coin-shaped electric guitar.
-- **Red Carpet Treatment** - A glamorous cat posing on a short rolled-out red carpet with an absurdly long feather boa.
-- **Captain of Industry** - A nautical captain cat proudly steering a ship's wheel mounted on an office desk.
-- **The Big Cheese** - A smug executive cat seated on a giant wedge of Swiss cheese like a throne.
-
 ## Impossible good luck
 
 - **Pocket Dimension** - A jacket pocket opening into a tiny glowing galaxy, with a large coin halfway out.

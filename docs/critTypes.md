@@ -2,7 +2,7 @@
 
 ## Implemented asset batch: 2026-09-17 (character art)
 
-27 new crits from the character art drops, with instant rewards on upgrade
+37 new crits from the character art drops, with instant rewards on upgrade
 clicks and floor unlocks through the same `applyFloorCrit` function. Previous
 crits remain available and their balance is unchanged. Proc chances below apply
 after a tier and the special gateway land, before the shared proc cap. They are
@@ -43,6 +43,22 @@ Four more from the follow-up Matrix-themed drop, wired the same way:
 | nowIAmSuspicious | Now I'm Suspicious | 17 payouts on every unlocked floor                                  | 1.3%        | Above Would You Kindly's 16 at 1.5%; largest building-wide payout |
 | redOrBlue        | Red or Blue        | 6 upgrades on the lowest-level floor; 6 payouts from the top earner | 3%          | Robin Hood pays 7 and upgrades 3 across the same pair at 3%       |
 
+Ten more from the "big personalities" drop, wired the same way. Their raw files
+arrived with spaces and dashes in the names and were renamed to camelCase first:
+
+| Image              | Crit                 | Immediate reward                                   | Proc chance | Comparison                                                        |
+| ------------------ | -------------------- | -------------------------------------------------- | ----------- | ----------------------------------------------------------------- |
+| abraCashDabra      | Abra-Cash-Dabra      | 25 payouts on this floor                           | 1.8%        | Above Diamond's 24 at 2%; the largest single-floor payout         |
+| captainOfIndustry  | Captain of Industry  | 21 upgrades on every unlocked floor                | 1.6%        | Between Yes, Your Highness's 19 at 1.7% and For the Emperor's 25  |
+| clowningAround     | Clowning Around      | 3 upgrades, then 3 payouts on every unlocked floor | 3%          | First Responder pays 1 per floor with the same 3 upgrades at 4%   |
+| discoDividend      | Disco Dividend       | 11 payouts on alternating floors, from the ground  | 2.4%        | Between Sundae Best's 10 at 2.5% and Princess Cut's 13 at 2.1%    |
+| mimeYourBusiness   | Mime Your Business   | 8 upgrades on this floor and every floor below     | 3.5%        | Between Moonwalk's 6 at 4% and Space and Time's 9 at 3%           |
+| redCarpetTreatment | Red Carpet Treatment | 12 payouts from the highest-earning floor          | 3%          | Above Sharpshooter's 10 at 4%; below Champagne Problems' 15 at 2% |
+| rockTheStock       | Rock the Stock       | 16 upgrades on this floor                          | 2.1%        | Between Bullet Dodger's 14 at 2.2% and Space Race's 20 at 2%      |
+| strongReturn       | Strong Return        | 26 upgrades on the highest unlocked floor          | 1.7%        | Between Space Race's 20 at 2% and King of the World's 30 at 1.5%  |
+| theBigCheese       | The Big Cheese       | 2 tier promotions, then 30 upgrades on this floor  | 0.4%        | Above Not Prepared's 2 promotions plus 9 upgrades at 0.5%         |
+| queenOfQueens      | Queen of Queens      | 28 upgrades on every unlocked floor                | 1.3%        | Above For the Emperor's 25 at 1.5%; largest building-wide batch   |
+
 All targets are within the current building and exclude locked floors. The base
 tier's free upgrades occur before the special reward and its target selection.
 Payouts mean current income cycles, not seconds or banked cash, and leave timer
@@ -53,27 +69,30 @@ Rabbit and Red or Blue break lowest-level and top-earner ties the same way.
 White Rabbit grants its upgrades once when the triggering floor is already the
 lowest-level floor, not twice. Red or Blue resolves its two targets
 independently and can land both on the same floor.
-Magic Is a Tool and Princess Cut always select indices 0, 2, 4 and so on. Space
-and Time covers indices 0 through the triggering floor inclusive.
+Magic Is a Tool, Princess Cut and Disco Dividend always select indices 0, 2, 4
+and so on. Space and Time and Mime Your Business cover indices 0 through the
+triggering floor inclusive.
 
-Promotions cap at ultra; Arcane Surge, I Didn't Ask For This and Not Prepared
-still grant their free upgrades on an already-ultra floor. On a one-floor
-building every target resolves to that floor. Repeated procs stay additive and
-no new timed state exists.
+Promotions cap at ultra; Arcane Surge, I Didn't Ask For This, Not Prepared and
+The Big Cheese still grant their free upgrades on an already-ultra floor. On a
+one-floor building every target resolves to that floor. Repeated procs stay
+additive and no new timed state exists.
 
-All 27 are floor-only, not map-specific: their generated test buttons appear for
+All 37 are floor-only, not map-specific: their generated test buttons appear for
 Upgrade click and Floor unlock and stay hidden for Map unlock.
 
 ### Processing and verification (character art)
 
-All 27 raw JFIF sources are preserved. Sampled border whiteness ran 240-255 on
-every image except `whiteRabbit`, `megaChonk` and `nowIAmSuspicious`, whose
-artwork touches the frame edge; since the shared border fill only seeds bright
-border pixels, those needed no special handling either. Every enclosed light
-detail (armour highlights, muzzles, bone charms, a blindfold, white faces and
-bellies, visor glass, shirt collars, red/blue pills) is closed by a dark
-outline, so all 27 used the existing near-white border-fill processor with no
-seeds or threshold changes.
+All 37 raw JFIF sources are preserved. Nine of the "big personalities" files
+arrived with spaces or dashes in their names and were renamed to camelCase to
+match the `IMAGE_FILES` key convention before processing. Sampled border
+whiteness ran 240-255 on every image except `whiteRabbit`, `megaChonk` and
+`nowIAmSuspicious`, whose artwork touches the frame edge; since the shared
+border fill only seeds bright border pixels, those needed no special handling
+either. Every enclosed light detail (armour highlights, muzzles, bone charms, a
+blindfold, white faces and bellies, visor glass, shirt collars, red/blue pills,
+the mime's glass safe interior) is closed by a dark outline, so all 37 used the
+existing near-white border-fill processor with no seeds or threshold changes.
 
 Regenerate with `node scripts/process-<image>.mjs`; the wrappers call
 `scripts/lib/process-crit-icon.mjs` and write both `src/assets/<image>.png` and
@@ -81,12 +100,12 @@ Regenerate with `node scripts/process-<image>.mjs`; the wrappers call
 from `whiteRabbit.jfif`, renamed from `followTheWhiteRabbit.jfif`.
 
 Magenta-background inspection confirmed intact enclosed highlights, detached
-pistols, warglaive blades and in-flight bullets, feet, tails and crop bounds.
-Outputs all fit within 250x250 as indexed-palette PNGs with alpha at 20.8-32.1
-KB, and every root/shipped pair is byte-identical.
+pistols, warglaive blades, in-flight bullets and juggled coins, feet, tails and
+crop bounds. Outputs all fit within 250x250 as indexed-palette PNGs with alpha
+at 15.0-32.1 KB, and every root/shipped pair is byte-identical.
 
-Validation: `node scripts/test-featured-crits.mjs` passed all 83 featured
-rewards (including these 27) and `npm run build` passed. Browser behaviour for
+Validation: `node scripts/test-featured-crits.mjs` passed all 93 featured
+rewards (including these 37) and `npm run build` passed. Browser behaviour for
 this batch was not verified in-game.
 
 ## Implemented asset batch: 2026-09-17
