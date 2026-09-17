@@ -2,7 +2,7 @@
 
 ## Implemented asset batch: 2026-09-17
 
-22 new crits, with instant rewards on upgrade clicks and floor unlocks through
+32 new crits, with instant rewards on upgrade clicks and floor unlocks through
 the same `applyFloorCrit` function. Previous crits remain available and their
 balance is unchanged; this report replaces the previous batch report only.
 Proc chances below apply after a tier and the special gateway land, before
@@ -32,6 +32,16 @@ the shared proc cap. They are not per-click odds.
 | theLawWon     | The Law Won     | 6 upgrades, then 2 payouts on the cheapest-upgrade floor        | 4.5%        | Safety Net gives 5 upgrades to the most expensive floor instead                 |
 | victorian     | High Society    | 9 payouts on alternating unlocked floors, starting at ground    | 3%          | Yes Chef pays 8 everywhere at 2.5%; this pays more per target but fewer targets |
 | wizard        | Wizard          | 2 tier promotions, then 5 upgrades here                         | 0.6%        | Above Obelisk's 2 promotions plus 2 upgrades at 0.8%                            |
+| executiveSpin | Executive Spin  | 4 upgrades on the highest unlocked floor                       | 5%          | Above Space Race's 20 on the top floor at 2% only when the target is topmost   |
+| rubberStampede | Rubber Stampede | 7 payouts on every unlocked floor                              | 2.5%        | Above Silver Rush's 6 at 3.5%; broad building-wide cash effect                |
+| replyAll      | Reply All       | 3 payouts on this floor and the lowest-level floor              | 6%          | More targeted than Dinner Time's 5 everywhere at 4%                            |
+| stapleOfSuccess | Staple of Success | 7 upgrades on this floor                                      | 4%          | Between Hammer Time's 9 at 4% and Tea Break's 1 at 8%                          |
+| faxOfFortune  | Fax of Fortune   | 8 payouts from the highest-earning floor                       | 3.5%        | Sharpshooter pays 10 at 4%; this keeps the same target with a lower payout     |
+| casualMonday  | Casual Monday    | 20 upgrades on this floor                                      | 2.5%        | Below Samurai's 30 at 1.5%; twice Keynote's 10 at 3%                          |
+| deskJockey    | Desk Jockey     | 6 upgrades on the lowest-level floor                            | 5%          | Targets like Roundup Rodeo's 8 at 3.5%, but with a smaller reward             |
+| inboxZeroGravity | Inbox Zero Gravity | 12 payouts on every unlocked floor                          | 3%          | Above Gold Rush's 10 at 2%; broad payout scope                                |
+| beanCounter  | Bean Counter    | 1 tier promotion and 6 upgrades on this floor                   | 1%          | Adds upgrades to Blessed's 1 promotion and 3 upgrades at the same 1%           |
+| kingOfTheWorld | King of the World | 30 upgrades on the highest unlocked floor                    | 1.5%        | Matches Samurai's 30 upgrades, but targets the top floor at the same rarity    |
 
 All targets are within the current building and exclude locked floors. The
 base tier's free upgrades occur before the special reward and its target
@@ -54,7 +64,7 @@ Shared Tier and Bonus tier controls remain available for floor tests.
 
 ### Processing and verification
 
-All 22 raw JFIF sources are preserved. Sampled corner channels ranged from
+All 10 new raw JFIF sources are preserved. Sampled corner channels ranged from
 244 to 255; every icon used the existing near-white border-fill processor.
 Contrasting-background inspection preserved enclosed light details and full
 silhouettes. Outputs fit within 250x250, contain alpha and indexed palettes,
@@ -66,7 +76,7 @@ Regenerate with `node scripts/process-<image>.mjs`; wrappers use
 `scripts/lib/process-crit-icon.mjs` and write both `src/assets/<image>.png`
 and `src/assets/themes/references/dist/<image>.png` automatically.
 
-Validation: `node scripts/test-featured-crits.mjs` passed all 34 featured
+Validation: `node scripts/test-featured-crits.mjs` passed all 44 featured
 rewards, including the previous 12; `npm run build` passed. Tests cover
 single-floor rewards, target ties, locked-floor exclusions, promotion caps,
 rarity ladders, roll gates/cap, proc consumption, unique controls, and icons.

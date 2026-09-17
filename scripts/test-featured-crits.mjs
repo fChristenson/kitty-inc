@@ -11,6 +11,7 @@ const originalRandom = Math.random;
 try {
   const crit = await server.ssrLoadModule("/src/shared/critTypes/index.ts");
   const { CONFIG } = await server.ssrLoadModule("/src/config.ts");
+  const { IMAGE_FILES } = await server.ssrLoadModule("/src/loadAssets/index.ts");
   const { createFeaturedCritRewards } = await server.ssrLoadModule(
     "/src/floors/floorInteractions/featuredCritRewards.ts",
   );
@@ -58,7 +59,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 34);
+  assert.equal(kinds.length, 44);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -83,10 +84,12 @@ try {
     );
     crit.consumeCritProcs(floor);
     assert.equal(crit.readCritProcs(floor)[kind], false);
-    const source = await readFile(`src/assets/${info.icon}.png`);
+    const source = await readFile(`src/assets/${IMAGE_FILES[info.icon]}`);
     assert.deepEqual(
       source,
-      await readFile(`src/assets/themes/references/dist/${info.icon}.png`),
+      await readFile(
+        `src/assets/themes/references/dist/${IMAGE_FILES[info.icon]}`,
+      ),
     );
     const metadata = await sharp(source).metadata();
     assert(
@@ -168,6 +171,16 @@ try {
     theLawWon: [[26, 30, 10, 0], 2],
     victorian: [[20, 30, 10, 0], 27],
     wizard: [[20, 35, 10, 0], 0],
+    executiveSpin: [[20, 30, 14, 0], 0],
+    rubberStampede: [[20, 30, 10, 0], 42],
+    replyAll: [[20, 30, 10, 0], 15],
+    stapleOfSuccess: [[20, 37, 10, 0], 0],
+    faxOfFortune: [[20, 30, 10, 0], 24],
+    casualMonday: [[20, 50, 10, 0], 0],
+    deskJockey: [[20, 30, 16, 0], 0],
+    inboxZeroGravity: [[20, 30, 10, 0], 72],
+    beanCounter: [[20, 36, 10, 0], 0],
+    kingOfTheWorld: [[20, 30, 40, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -221,6 +234,8 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "wizard")
       assert.equal(test.context.floor.critMultiplierTier, "mega");
+    if (kind === "beanCounter")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const test = fixture();
@@ -335,7 +350,7 @@ try {
     "Gateway miss must suppress procs",
   );
   console.log(
-    "PASS: 34 rewards, single-floor fallbacks, targeting ties, milestones, tier caps, registry state, roll gates/cap, odds, and icons",
+    "PASS: 44 rewards, single-floor fallbacks, targeting ties, milestones, tier caps, registry state, roll gates/cap, odds, and icons",
   );
 } finally {
   Math.random = originalRandom;

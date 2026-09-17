@@ -39,7 +39,7 @@ export type SpriteName = keyof typeof SPRITE_FILES;
 
 // every flat single-file image this game loads, by logical name -> its filename
 // inside dist/ root — same reasoning as SPRITE_FILES above
-const IMAGE_FILES = {
+export const IMAGE_FILES = {
   city: "city.png", // distant tiled skyline behind buildings
   cityMapBackground: "mapBg.png", // city map screen's own backdrop
   wallMaterial: "wallMaterial.png", // exterior wall/floor-divider tile material
@@ -168,6 +168,16 @@ const IMAGE_FILES = {
   theLawWon: "theLawWon.png",
   victorian: "victorian.png",
   wizard: "wizard.png",
+  executiveSpin: "executiveSpin.png",
+  rubberStampede: "rubberStampede.png",
+  replyAll: "replyAll.png",
+  stapleOfSuccess: "stapleOfSuccess.png",
+  faxOfFortune: "faxOfFortune.png",
+  casualMonday: "casualMonday.png",
+  deskJockey: "deskJockey.png",
+  inboxZeroGravity: "inboxZeroGravity.png",
+  beanCounter: "beanCounter.png",
+  kingOfTheWorld: "kingOfTheWorld.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 
