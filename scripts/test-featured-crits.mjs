@@ -170,12 +170,7 @@ try {
       "wishfulBanking",
       "theBigCheese",
     ],
-    [
-      "moonwalker",
-      "mimeYourBusiness",
-      "spaceAndTime",
-      "pocketDimension",
-    ],
+    ["moonwalker", "mimeYourBusiness", "spaceAndTime", "pocketDimension"],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(
