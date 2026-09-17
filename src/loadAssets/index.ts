@@ -181,6 +181,15 @@ export const IMAGE_FILES = {
   officeClown: "officeClown.png",
   fridayTieDay: "fridayTieDay.png",
   soReady: "soReady.png",
+  doughDivision: "doughDivision.png",
+  profitPopcorn: "profitPopcorn.png",
+  donutDisturb: "donutDisturb.png",
+  cakeDay: "cakeDay.png",
+  champagneProblems: "champagneProblems.png",
+  bonusBurrito: "bonusBurrito.png",
+  sundaeBest: "sundaeBest.png",
+  popTheQuestion: "popTheQuestion.png",
+  partyCrasher: "partyCrasher.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

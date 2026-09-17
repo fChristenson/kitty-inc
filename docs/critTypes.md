@@ -2,7 +2,7 @@
 
 ## Implemented asset batch: 2026-09-17
 
-35 new crits, with instant rewards on upgrade clicks and floor unlocks through
+44 new crits, with instant rewards on upgrade clicks and floor unlocks through
 the same `applyFloorCrit` function. Previous crits remain available and their
 balance is unchanged; this report replaces the previous batch report only.
 Proc chances below apply after a tier and the special gateway land, before
@@ -45,6 +45,15 @@ the shared proc cap. They are not per-click odds.
 | officeClown      | Office Clown       | 5 upgrades on the lowest-level floor                            | 4%          | Smaller than Roundup Rodeo's 8 at 3.5%, with the same level-based target        |
 | fridayTieDay     | Friday Tie Day     | 10 payouts on alternating unlocked floors, starting at ground   | 3%          | More per selected floor than High Society's 9 at 3%, with the same pattern      |
 | soReady          | So Ready           | 15 upgrades on this floor                                       | 2%          | Same count as For the King, but focused on one floor instead of the building    |
+| doughDivision    | Dough Division     | 6 upgrades on this floor                                        | 6%          | Smaller than So Ready's 15 at 2%; a common single-floor upgrade                 |
+| profitPopcorn    | Profit Popcorn     | 4 payouts on every unlocked floor                              | 4%          | Building-wide payout below Gold Rush's 10 at 2%                                |
+| donutDisturb     | Donut Disturb      | 5 upgrades and 5 payouts on this floor                         | 5%          | Combines a smaller upgrade batch with cash versus Check Up's targeted mix      |
+| cakeDay          | Cake Day           | 12 upgrades on the lowest-level floor                          | 3%          | Same target as Office Clown, with more upgrades at a lower rarity               |
+| champagneProblems | Champagne Problems | 15 payouts from the highest-earning floor                    | 2%          | Higher than Sharpshooter's 10 at 4%, with a rarer jackpot                       |
+| bonusBurrito     | Bonus Burrito      | 8 upgrades and 3 payouts on this floor                         | 4%          | Adds cash to Staple of Success's 7 upgrades at the same rarity                  |
+| sundaeBest       | Sundae Best        | 10 payouts on alternating unlocked floors, starting at ground  | 2.5%        | Matches High Society's pattern with one more payout per selected floor          |
+| popTheQuestion   | Pop the Question   | 1 tier promotion and 4 upgrades on this floor                   | 1%          | Similar to Blessed, with one extra upgrade and no second promotion              |
+| partyCrasher     | Party Crasher      | 3 upgrades here and 3 on the highest unlocked floor            | 5%          | A smaller two-target version of Finger Guns' 2-upgrade pair at 7%               |
 
 All targets are within the current building and exclude locked floors. The
 base tier's free upgrades occur before the special reward and its target
@@ -79,7 +88,7 @@ Regenerate with `node scripts/process-<image>.mjs`; wrappers use
 `scripts/lib/process-crit-icon.mjs` and write both `src/assets/<image>.png`
 and `src/assets/themes/references/dist/<image>.png` automatically.
 
-Validation: `node scripts/test-featured-crits.mjs` passed all 47 featured
+Validation: `node scripts/test-featured-crits.mjs` passed all 56 featured
 rewards, including the previous 12; `npm run build` passed. Tests cover
 single-floor rewards, target ties, locked-floor exclusions, promotion caps,
 rarity ladders, roll gates/cap, proc consumption, unique controls, and icons.
