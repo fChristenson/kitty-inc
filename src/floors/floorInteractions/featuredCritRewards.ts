@@ -418,14 +418,8 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.theFastAndTheFurriestUpgrades,
       ),
     theFellowshipOfTheBling: (context) => {
-      actions.upgrade(
-        context.floors,
-        balance.theFellowshipOfTheBlingUpgrades,
-      );
-      actions.payCycles(
-        context.floors,
-        balance.theFellowshipOfTheBlingPayouts,
-      );
+      actions.upgrade(context.floors, balance.theFellowshipOfTheBlingUpgrades);
+      actions.payCycles(context.floors, balance.theFellowshipOfTheBlingPayouts);
     },
     theGreatCatsby: (context) =>
       promoteAndUpgrade(
@@ -434,9 +428,6 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.theGreatCatsbyUpgrades,
       ),
     theLordOfTheRingBinders: (context) =>
-      actions.upgrade(
-        [context.floor],
-        balance.theLordOfTheRingBindersUpgrades,
-      ),
+      actions.upgrade([context.floor], balance.theLordOfTheRingBindersUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
