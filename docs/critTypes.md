@@ -1,5 +1,94 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-17 (character art)
+
+27 new crits from the character art drops, with instant rewards on upgrade
+clicks and floor unlocks through the same `applyFloorCrit` function. Previous
+crits remain available and their balance is unchanged. Proc chances below apply
+after a tier and the special gateway land, before the shared proc cap. They are
+not per-click odds.
+
+| Image             | Crit                  | Immediate reward                                              | Proc chance | Comparison                                                                 |
+| ----------------- | --------------------- | ------------------------------------------------------------- | ----------- | -------------------------------------------------------------------------- |
+| epic              | Epic Loot             | 40 upgrades on this floor                                     | 1.2%        | Above Samurai's 30 at 1.5%; below Centurion's 100 at 1%                    |
+| ready             | Dual Wield            | 4 upgrades, then 4 payouts on the highest-earning floor       | 3%          | Sharpshooter pays 10 on the same target at 4% but grants no upgrades       |
+| workWork          | Work Work             | 11 upgrades on every unlocked floor                           | 2.8%        | Between Roman Holiday's 9 at 3% and For the King's 15 at 2%                |
+| yesWarchief       | Yes, Warchief         | 14 payouts on every unlocked floor                            | 1.8%        | Above Inbox Zero Gravity's 12 at 3% and Gold Rush's 10 at 2%               |
+| youAreNotPrepared | Not Prepared          | 2 tier promotions, then 9 upgrades on this floor              | 0.5%        | Above Wizard's 2 promotions plus 5 upgrades at 0.6%; rarest of that family |
+| arcana            | Arcane Surge          | 1 tier promotion, then 12 upgrades on this floor              | 0.9%        | Above Bean Counter's 1 promotion plus 6 upgrades at 1%                     |
+| bigDaddy          | Big Daddy             | 45 upgrades on this floor                                     | 1.1%        | Between Epic Loot's 40 at 1.2% and Centurion's 100 at 1%                   |
+| chonk             | Chonk                 | 16 payouts on this floor                                      | 2.8%        | Between Ruby's 12 at 3% and Sapphire's 18 at 2.5%                          |
+| cyberPunk         | Cyberpunk             | 13 upgrades on this floor                                     | 2.4%        | Between Ninja Bonus's 12 at 2.5% and Space Race's 20 at 2%                 |
+| dodgeThis         | Dodge This            | 6 payouts from the highest-earning floor                      | 4.5%        | Below Sharpshooter's 10 on the same target at 4%                           |
+| whiteRabbit       | White Rabbit          | 5 upgrades here and 5 on the lowest-level floor               | 3.5%        | Reply All hits the same pair with 3 payouts instead of upgrades at 6%      |
+| gladiator         | Gladiator             | 13 upgrades on every unlocked floor                           | 2.2%        | Between Fancy Friday's 10 at 2.5% and For the King's 15 at 2%              |
+| iDidntAskForThis  | I Didn't Ask For This | 1 tier promotion, then 20 upgrades on this floor              | 0.7%        | Above Arcane Surge's 1 promotion plus 12 upgrades at 0.9%                  |
+| iHatePortals      | I Hate Portals        | 11 payouts on this floor                                      | 3.5%        | Between Emerald's 9 at 4% and Ruby's 12 at 3%                              |
+| littleSister      | Little Sister         | 7 upgrades on the lowest-level floor                          | 3.8%        | Between Office Clown's 5 at 4% and Roundup Rodeo's 8 at 3.5%               |
+| magicIsATool      | Magic Is a Tool       | 8 upgrades on alternating unlocked floors, starting at ground | 1.8%        | High Society's pattern with upgrades instead of its 9 payouts at 3%        |
+| megaChonk         | Mega Chonk            | 22 payouts on this floor                                      | 2.2%        | Between Sapphire's 18 at 2.5% and Diamond's 24 at 2%                       |
+| metal             | Heavy Metal           | 17 upgrades on the highest unlocked floor                     | 2.4%        | Below Space Race's 20 on the same target at 2%                             |
+| princess          | Princess Cut          | 13 payouts on alternating unlocked floors, starting at ground | 2.1%        | Above Sundae Best's 10 on the same pattern at 2.5%                         |
+| spaceAndTime      | Space and Time        | 9 upgrades on this floor and every floor below                | 3%          | Above Moonwalk's 6 on the same downward span at 4%                         |
+| thinkWithYourHead | Think With Your Head  | 5 upgrades, then 5 payouts on the lowest-level floor          | 4%          | Above Check Up's 4 upgrades plus 2 payouts on the same target at 5%        |
+| wouldYouKindly    | Would You Kindly      | 16 payouts on every unlocked floor                            | 1.5%        | Above Yes, Warchief's 14 at 1.8%; the largest building-wide payout         |
+| yesYourHighness   | Yes, Your Highness    | 19 upgrades on every unlocked floor                           | 1.7%        | Between For the King's 15 at 2% and For the Emperor's 25 at 1.5%           |
+
+Four more from the follow-up Matrix-themed drop, wired the same way:
+
+| Image            | Crit               | Immediate reward                                                    | Proc chance | Comparison                                                        |
+| ---------------- | ------------------ | ------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------- |
+| bulletDodger     | Bullet Dodger      | 14 upgrades on this floor                                           | 2.2%        | Between Cyberpunk's 13 at 2.4% and Space Race's 20 at 2%          |
+| nothingToSee     | Nothing to See     | 20 payouts on this floor                                            | 2.4%        | Between Sapphire's 18 at 2.5% and Mega Chonk's 22 at 2.2%         |
+| nowIAmSuspicious | Now I'm Suspicious | 17 payouts on every unlocked floor                                  | 1.3%        | Above Would You Kindly's 16 at 1.5%; largest building-wide payout |
+| redOrBlue        | Red or Blue        | 6 upgrades on the lowest-level floor; 6 payouts from the top earner | 3%          | Robin Hood pays 7 and upgrades 3 across the same pair at 3%       |
+
+All targets are within the current building and exclude locked floors. The base
+tier's free upgrades occur before the special reward and its target selection.
+Payouts mean current income cycles, not seconds or banked cash, and leave timer
+progress unchanged. Upgrade/payout combinations pay at the post-upgrade rate.
+Dual Wield and Dodge This resolve their target before upgrading or paying, so on
+a tie the triggering floor wins; Little Sister, Think With Your Head, White
+Rabbit and Red or Blue break lowest-level and top-earner ties the same way.
+White Rabbit grants its upgrades once when the triggering floor is already the
+lowest-level floor, not twice. Red or Blue resolves its two targets
+independently and can land both on the same floor.
+Magic Is a Tool and Princess Cut always select indices 0, 2, 4 and so on. Space
+and Time covers indices 0 through the triggering floor inclusive.
+
+Promotions cap at ultra; Arcane Surge, I Didn't Ask For This and Not Prepared
+still grant their free upgrades on an already-ultra floor. On a one-floor
+building every target resolves to that floor. Repeated procs stay additive and
+no new timed state exists.
+
+All 27 are floor-only, not map-specific: their generated test buttons appear for
+Upgrade click and Floor unlock and stay hidden for Map unlock.
+
+### Processing and verification (character art)
+
+All 27 raw JFIF sources are preserved. Sampled border whiteness ran 240-255 on
+every image except `whiteRabbit`, `megaChonk` and `nowIAmSuspicious`, whose
+artwork touches the frame edge; since the shared border fill only seeds bright
+border pixels, those needed no special handling either. Every enclosed light
+detail (armour highlights, muzzles, bone charms, a blindfold, white faces and
+bellies, visor glass, shirt collars, red/blue pills) is closed by a dark
+outline, so all 27 used the existing near-white border-fill processor with no
+seeds or threshold changes.
+
+Regenerate with `node scripts/process-<image>.mjs`; the wrappers call
+`scripts/lib/process-crit-icon.mjs` and write both `src/assets/<image>.png` and
+`src/assets/themes/references/dist/<image>.png`. Note `whiteRabbit.png` comes
+from `whiteRabbit.jfif`, renamed from `followTheWhiteRabbit.jfif`.
+
+Magenta-background inspection confirmed intact enclosed highlights, detached
+pistols, warglaive blades and in-flight bullets, feet, tails and crop bounds.
+Outputs all fit within 250x250 as indexed-palette PNGs with alpha at 20.8-32.1
+KB, and every root/shipped pair is byte-identical.
+
+Validation: `node scripts/test-featured-crits.mjs` passed all 83 featured
+rewards (including these 27) and `npm run build` passed. Browser behaviour for
+this batch was not verified in-game.
+
 ## Implemented asset batch: 2026-09-17
 
 44 new crits, with instant rewards on upgrade clicks and floor unlocks through

@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 56);
+  assert.equal(kinds.length, 83);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -108,26 +108,60 @@ try {
   assert(CONFIG.crit.keynoteChance > CONFIG.crit.ninjaChance);
   assert(CONFIG.crit.ninjaChance > CONFIG.crit.spaceChance);
   for (const family of [
-    ["goldNugget", "amethyst", "emerald", "ruby", "saphire", "diamond"],
-    ["fastForward", "dinnerTime", "silverRush", "yesChef", "goldRush"],
+    [
+      "goldNugget",
+      "amethyst",
+      "emerald",
+      "iHatePortals",
+      "ruby",
+      "chonk",
+      "saphire",
+      "nothingToSee",
+      "megaChonk",
+      "diamond",
+    ],
+    [
+      "fastForward",
+      "dinnerTime",
+      "silverRush",
+      "yesChef",
+      "goldRush",
+      "yesWarchief",
+      "wouldYouKindly",
+      "nowIAmSuspicious",
+    ],
     [
       "casualFriday",
       "flamenco",
       "roman",
+      "workWork",
       "fancyFriday",
+      "gladiator",
       "forTheKing",
+      "yesYourHighness",
       "forTheEmperor",
     ],
     [
       "hammerTime",
       "keynote",
       "ninja",
+      "cyberPunk",
+      "bulletDodger",
       "space",
       "samurai",
+      "epic",
+      "bigDaddy",
       "centurion",
       "luckyClover",
     ],
-    ["blessed", "obelisk", "wizard"],
+    [
+      "blessed",
+      "arcana",
+      "obelisk",
+      "iDidntAskForThis",
+      "wizard",
+      "youAreNotPrepared",
+    ],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(
@@ -195,6 +229,33 @@ try {
     sundaeBest: [[20, 30, 10, 0], 30],
     popTheQuestion: [[20, 34, 10, 0], 0],
     partyCrasher: [[20, 33, 13, 0], 0],
+    epic: [[20, 70, 10, 0], 0],
+    ready: [[20, 34, 10, 0], 12],
+    workWork: [[31, 41, 21, 0], 0],
+    yesWarchief: [[20, 30, 10, 0], 84],
+    youAreNotPrepared: [[20, 39, 10, 0], 0],
+    arcana: [[20, 42, 10, 0], 0],
+    bigDaddy: [[20, 75, 10, 0], 0],
+    chonk: [[20, 30, 10, 0], 48],
+    cyberPunk: [[20, 43, 10, 0], 0],
+    dodgeThis: [[20, 30, 10, 0], 18],
+    whiteRabbit: [[20, 35, 15, 0], 0],
+    gladiator: [[33, 43, 23, 0], 0],
+    iDidntAskForThis: [[20, 50, 10, 0], 0],
+    iHatePortals: [[20, 30, 10, 0], 33],
+    littleSister: [[20, 30, 17, 0], 0],
+    magicIsATool: [[28, 30, 18, 0], 0],
+    megaChonk: [[20, 30, 10, 0], 66],
+    metal: [[20, 30, 27, 0], 0],
+    princess: [[20, 30, 10, 0], 39],
+    spaceAndTime: [[29, 39, 10, 0], 0],
+    thinkWithYourHead: [[20, 30, 15, 0], 10],
+    wouldYouKindly: [[20, 30, 10, 0], 96],
+    yesYourHighness: [[39, 49, 29, 0], 0],
+    bulletDodger: [[20, 44, 10, 0], 0],
+    nothingToSee: [[20, 30, 10, 0], 60],
+    nowIAmSuspicious: [[20, 30, 10, 0], 102],
+    redOrBlue: [[20, 30, 16, 0], 18],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -252,6 +313,10 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "popTheQuestion")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "youAreNotPrepared")
+      assert.equal(test.context.floor.critMultiplierTier, "mega");
+    if (kind === "arcana" || kind === "iDidntAskForThis")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const test = fixture();
@@ -301,7 +366,14 @@ try {
       );
     }
   }
-  for (const kind of ["checkUp", "robinHood", "spy", "theLawWon"]) {
+  for (const kind of [
+    "checkUp",
+    "robinHood",
+    "spy",
+    "theLawWon",
+    "littleSister",
+    "thinkWithYourHead",
+  ]) {
     const test = fixture();
     for (const floor of test.floors) {
       floor.upgradeCount = 30;
@@ -366,7 +438,7 @@ try {
     "Gateway miss must suppress procs",
   );
   console.log(
-    "PASS: 56 rewards, single-floor fallbacks, targeting ties, milestones, tier caps, registry state, roll gates/cap, odds, and icons",
+    `PASS: ${kinds.length} rewards, single-floor fallbacks, targeting ties, milestones, tier caps, registry state, roll gates/cap, odds, and icons`,
   );
 } finally {
   Math.random = originalRandom;
