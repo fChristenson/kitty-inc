@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 113);
+  assert.equal(kinds.length, 125);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -112,6 +112,7 @@ try {
       "goldNugget",
       "amethyst",
       "bubbleEconomy",
+      "chaChaChing",
       "emerald",
       "iHatePortals",
       "ruby",
@@ -119,6 +120,7 @@ try {
       "chonk",
       "saphire",
       "nothingToSee",
+      "rumbaReturns",
       "megaChonk",
       "diamond",
       "abraCashDabra",
@@ -144,12 +146,14 @@ try {
       "fancyFriday",
       "gladiator",
       "forTheKing",
+      "waltzStreet",
       "yesYourHighness",
       "captainOfIndustry",
       "forTheEmperor",
       "queenOfQueens",
     ],
     [
+      "breakEven",
       "hammerTime",
       "keynote",
       "backToTheFiscal",
@@ -172,6 +176,7 @@ try {
       "iDidntAskForThis",
       "theGreatCatsby",
       "wizard",
+      "prehistoric",
       "youAreNotPrepared",
       "wishfulBanking",
       "theBigCheese",
@@ -301,6 +306,18 @@ try {
     theFellowshipOfTheBling: [[26, 36, 16, 0], 36],
     theGreatCatsby: [[20, 60, 10, 0], 0],
     theLordOfTheRingBinders: [[20, 65, 10, 0], 0],
+    breakEven: [[20, 38, 10, 0], 0],
+    chaChaChing: [[20, 30, 10, 0], 24],
+    charlestonCharge: [[20, 30, 21, 0], 0],
+    congaCompounding: [[24, 34, 14, 0], 24],
+    robotResources: [[20, 30, 29, 0], 0],
+    rumbaReturns: [[20, 30, 10, 0], 63],
+    salsaSalary: [[20, 30, 10, 0], 39],
+    shuffleTheFunds: [[34, 44, 10, 0], 0],
+    tangoTender: [[20, 37, 17, 0], 0],
+    tapThatAsset: [[20, 30, 10, 0], 51],
+    waltzStreet: [[37, 47, 27, 0], 0],
+    prehistoric: [[20, 70, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -368,6 +385,8 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "mega");
     if (kind === "theGreatCatsby")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "prehistoric")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const test = fixture();
@@ -427,6 +446,7 @@ try {
     "treasureMeasure",
     "raidersOfTheLostReceipt",
     "theDevilWearsPawda",
+    "charlestonCharge",
   ]) {
     const test = fixture();
     for (const floor of test.floors) {

@@ -247,6 +247,18 @@ export const IMAGE_FILES = {
   theFellowshipOfTheBling: "theFellowshipOfTheBling.png",
   theGreatCatsby: "theGreatCatsby.png",
   theLordOfTheRingBinders: "theLordOfTheRingBinders.png",
+  breakEven: "breakEven.png",
+  chaChaChing: "chaChaChing.png",
+  charlestonCharge: "charlestonCharge.png",
+  congaCompounding: "congaCompounding.png",
+  robotResources: "robotResources.png",
+  rumbaReturns: "rumbaReturns.png",
+  salsaSalary: "salsaSalary.png",
+  shuffleTheFunds: "shuffleTheFunds.png",
+  tangoTender: "tangoTender.png",
+  tapThatAsset: "tapThatAsset.png",
+  waltzStreet: "waltzStreet.png",
+  prehistoric: "prehistoric.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

@@ -3,34 +3,6 @@
 Visual concepts only; rewards and rarity can be designed when a batch is selected.
 Each name is a working crit title, followed by the image to generate.
 
-## Dance floor profits
-
-- **Break Even** - A tracksuit-wearing cat holding a one-paw breakdance freeze on a flattened cardboard box, sneakers pointing skyward.
-- **Tap That Asset** - A cat in a waistcoat and oversized tap shoes clicking its heels together above two chunky gold coins.
-- **Tango Tender** - Two business cats in a dramatic tango dip, a single red rose tucked into the lead dancer's lapel.
-- **Waltz Street** - A ballroom pair turning in a compact waltz pose, one cat's flowing skirt shaped like a broad fan of banknotes.
-- **Salsa Salary** - A cat in bright flared trousers caught mid-salsa turn, holding a tiny payslip-shaped clutch.
-- **Swing Shift** - Two cats in suspenders and rolled-up sleeves leaning apart in a springy swing-dance pose, joined by one paw.
-- **Cha-Cha-Ching** - A beaming cat taking an exaggerated cha-cha side step, with a gold coin on each shiny shoe buckle.
-- **Rumba Returns** - A bow-tied cat striking a graceful rumba line, one paw extended and its long tie curling in the opposite direction.
-- **Shuffle the Funds** - A hoodie-wearing cat doing a sharp heel-toe shuffle in huge neon sneakers, beside a chunky coin-shaped boombox.
-- **Pop and Profit** - A street-dancer cat frozen in an angular popping pose, elbows squared and tie sticking straight out.
-- **Locking in Gains** - A cat in striped socks and a bright cap holding a locking pose, one paw pointing outward and the other planted on its hip.
-- **Robot Resources** - An office cat wearing a homemade cardboard robot suit, dancing with rigid right-angle elbows and knees.
-- **Charleston Charge** - A cat in a straw boater and bow tie performing a crossed-knee Charleston step, with a cane tucked under one arm.
-- **Can-Can Capital** - Two cheerful stage cats kicking one leg high in matching boots, their colorful ruffled skirts forming bold semicircles.
-- **Kickline Credit** - Three tiny cats shoulder-to-shoulder in matching jackets, performing one perfectly synchronized high kick.
-- **Conga Compounding** - Three party-hat cats in a short conga line, each holding the shoulders of the one ahead, with the leader carrying a giant coin.
-- **Limbo Liabilities** - A determined cat leaning backward beneath a low bar made from an oversized pencil, briefcase balanced on its belly.
-- **Twist and Earn** - A cat in a polka-dot shirt twisting with bent knees and opposite-facing paws, its tie corkscrewing upward.
-- **Polka Dot Payday** - Two cats in matching polka-dot waistcoats doing a buoyant polka hop, both pairs of boots briefly off the ground.
-- **Bunny Hop Bonus** - A cat in floppy costume ears caught at the peak of a two-footed hop, hugging a carrot-shaped gold trophy.
-
-Favor a distinctive frozen dance pose over motion blur. For pairs and groups,
-keep the figures close together with clean gaps between limbs so the dance
-remains recognizable at icon size. Use costumes as accents, not as a substitute
-for a clear pose; these should feel like a joyful office talent show.
-
 ## Nerd culture
 
 - **Roll for Revenue** (*tabletop RPGs*) - A tiny accountant cat struggling to roll an enormous translucent twenty-sided die with a gold coin suspended inside.

@@ -2,7 +2,7 @@
 
 ## Implemented asset batch: 2026-09-17 (character art)
 
-57 new crits from the character art drops, with instant rewards on upgrade
+69 new crits from the character art drops, with instant rewards on upgrade
 clicks and floor unlocks through the same `applyFloorCrit` function. Previous
 crits remain available and their balance is unchanged. Proc chances below apply
 after a tier and the special gateway land, before the shared proc cap. They are
@@ -36,12 +36,12 @@ not per-click odds.
 
 Four more from the follow-up Matrix-themed drop, wired the same way:
 
-| Image            | Crit               | Immediate reward                                                    | Proc chance | Comparison                                                        |
-| ---------------- | ------------------ | ------------------------------------------------------------------- | ----------- | ----------------------------------------------------------------- |
-| bulletDodger     | Bullet Dodger      | 14 upgrades on this floor                                           | 2.2%        | Between Cyberpunk's 13 at 2.4% and Space Race's 20 at 2%          |
-| nothingToSee     | Nothing to See     | 20 payouts on this floor                                            | 2.4%        | Between Sapphire's 18 at 2.5% and Mega Chonk's 22 at 2.2%         |
-| nowIAmSuspicious | Now I'm Suspicious | 17 payouts on every unlocked floor                                  | 1.3%        | Above Would You Kindly's 16 at 1.5%; largest building-wide payout |
-| redOrBlue        | Red or Blue        | 6 upgrades on the lowest-level floor; 6 payouts from the top earner | 3%          | Robin Hood pays 7 and upgrades 3 across the same pair at 3%       |
+| Image            | Crit               | Immediate reward                                                    | Proc chance | Comparison                                                           |
+| ---------------- | ------------------ | ------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------- |
+| bulletDodger     | Bullet Dodger      | 14 upgrades on this floor                                           | 2.2%        | Between Cyberpunk's 13 at 2.4% and Space Race's 20 at 2%             |
+| nothingToSee     | Nothing to See     | 20 payouts on this floor                                            | 2.4%        | Between Sapphire's 18 at 2.5% and Mega Chonk's 22 at 2.2%            |
+| nowIAmSuspicious | Now I'm Suspicious | 17 payouts on every unlocked floor                                  | 1.3%        | Above Would You Kindly's 16 at 1.5%; largest building-wide payout    |
+| redOrBlue        | Red or Blue        | 6 upgrades on the lowest-level floor; 6 payouts from the top earner | 3%          | Honor among thieves pays 7 and upgrades 3 across the same pair at 3% |
 
 Ten more from the "big personalities" drop, wired the same way. Their raw files
 arrived with spaces and dashes in the names and were renamed to camelCase first:
@@ -91,37 +91,57 @@ parodies with no logos or poster layouts:
 | theGreatCatsby          | The Great Catsby          | 1 tier promotion, then 30 upgrades on this floor   | 0.65%       | Above I Didn't Ask For This's 1 promotion plus 20 at 0.7%           |
 | theLordOfTheRingBinders | The Ring Binders          | 35 upgrades on this floor                          | 1.3%        | Between Samurai's 30 at 1.5% and Epic Loot's 40 at 1.2%             |
 
+Twelve more from the "dance floor profits" drop plus one standalone
+`prehistoric` source, also renamed to camelCase first:
+
+| Image            | Crit              | Immediate reward                                   | Proc chance | Comparison                                                               |
+| ---------------- | ----------------- | -------------------------------------------------- | ----------- | ------------------------------------------------------------------------ |
+| breakEven        | Break Even        | 8 upgrades on this floor                           | 4.5%        | Below Hammer Time's 9 at 4%; the cheapest single-floor batch             |
+| chaChaChing      | Cha-Cha-Ching     | 8 payouts on this floor                            | 4.2%        | Between Bubble Economy's 7 at 4.5% and Emerald's 9 at 4%                 |
+| charlestonCharge | Charleston Charge | 11 upgrades on the lowest-level floor              | 3.1%        | Between Treasure Measure's 10 at 3.2% and Cake Day's 12 at 3%            |
+| congaCompounding | Conga Compounding | 4 upgrades, then 4 payouts on every unlocked floor | 2.5%        | Between Clowning Around's 3 plus 3 at 3% and Lucky Laundromat's 5 plus 5 |
+| robotResources   | Robot Resources   | 19 upgrades on the highest unlocked floor          | 2.2%        | Between Heavy Metal's 17 at 2.4% and Space Race's 20 at 2%               |
+| rumbaReturns     | Rumba Returns     | 21 payouts on this floor                           | 2.3%        | Between Nothing to See's 20 at 2.4% and Mega Chonk's 22 at 2.2%          |
+| salsaSalary      | Salsa Salary      | 13 payouts from the highest-earning floor          | 2.7%        | Between Red Carpet Treatment's 12 at 3% and Money Magnet's 14            |
+| shuffleTheFunds  | Shuffle the Funds | 14 upgrades on this floor and every floor below    | 2.5%        | Between Space and Time's 9 at 3% and Pocket Dimension's 18 at 2%         |
+| tangoTender      | Tango Tender      | 7 upgrades here and 7 on the highest floor         | 2.8%        | The largest of the paired batches; Party Crasher gives 3 and 3 at 5%     |
+| tapThatAsset     | Tap That Asset    | 17 payouts on alternating floors, from the ground  | 1.6%        | Above Over the Rainbow's 15 on the same pattern at 1.8%                  |
+| waltzStreet      | Waltz Street      | 17 upgrades on every unlocked floor                | 1.8%        | Between For the King's 15 at 2% and Yes, Your Highness's 19              |
+| prehistoric      | Prehistoric       | 1 tier promotion, then 40 upgrades on this floor   | 0.55%       | Above The Great Catsby's 1 promotion plus 30 at 0.65%                    |
+
 All targets are within the current building and exclude locked floors. The base
 tier's free upgrades occur before the special reward and its target selection.
 Payouts mean current income cycles, not seconds or banked cash, and leave timer
 progress unchanged. Upgrade/payout combinations pay at the post-upgrade rate.
 Dual Wield and Dodge This resolve their target before upgrading or paying, so on
 a tie the triggering floor wins; Little Sister, Think With Your Head, White
-Rabbit, Red or Blue, Treasure Measure, Lost Receipt and The Devil Wears Pawda
-break lowest-level, cheapest and top-earner ties the same way.
+Rabbit, Red or Blue, Treasure Measure, Lost Receipt, The Devil Wears Pawda and
+Charleston Charge break lowest-level, cheapest and top-earner ties the same way.
 White Rabbit grants its upgrades once when the triggering floor is already the
 lowest-level floor, not twice. Red or Blue resolves its two targets
-independently and can land both on the same floor.
-Magic Is a Tool, Princess Cut, Disco Dividend, Over the Rainbow and The Fast and
-the Furriest always select indices 0, 2, 4 and so on. Space and Time, Mime Your
-Business and Pocket Dimension cover indices 0 through the triggering floor
-inclusive.
+independently and can land both on the same floor. Tango Tender upgrades twice
+over when the triggering floor is already the highest one, exactly like Party
+Crasher and Finger Guns.
+Magic Is a Tool, Princess Cut, Disco Dividend, Over the Rainbow, The Fast and
+the Furriest and Tap That Asset always select indices 0, 2, 4 and so on. Space
+and Time, Mime Your Business, Pocket Dimension and Shuffle the Funds cover
+indices 0 through the triggering floor inclusive.
 
 Promotions cap at ultra; Arcane Surge, I Didn't Ask For This, Not Prepared,
-The Big Cheese, Wishful Banking and The Great Catsby still grant their free
-upgrades on an already-ultra floor. On a one-floor building every target
-resolves to that floor. Repeated procs stay additive and no new timed state
-exists.
+The Big Cheese, Wishful Banking, The Great Catsby and Prehistoric still grant
+their free upgrades on an already-ultra floor. On a one-floor building every
+target resolves to that floor. Repeated procs stay additive and no new timed
+state exists.
 
-All 57 are floor-only, not map-specific: their generated test buttons appear for
+All 69 are floor-only, not map-specific: their generated test buttons appear for
 Upgrade click and Floor unlock and stay hidden for Map unlock.
 
 ### Processing and verification (character art)
 
-All 57 raw JFIF sources are preserved. The "big personalities", "impossible
-good luck" and "movie references" files arrived with spaces or dashes in their
-names and were renamed to camelCase to match the `IMAGE_FILES` key convention
-before processing.
+All 69 raw JFIF sources are preserved. The "big personalities", "impossible
+good luck", "movie references" and "dance floor profits" files arrived with
+spaces or dashes in their names and were renamed to camelCase to match the
+`IMAGE_FILES` key convention before processing.
 Sampled border whiteness ran 240-255 on most images; `whiteRabbit`, `megaChonk`,
 `nowIAmSuspicious`, `bubbleEconomy`, `cloudNineToFive` and `overTheRainbow` dip
 lower because their artwork touches the frame edge, but since the shared border
@@ -129,9 +149,20 @@ fill only seeds bright border pixels, those needed no special handling either.
 Every enclosed light detail (armour highlights, muzzles, bone charms, a
 blindfold, white faces and bellies, visor glass, shirt collars, red/blue pills,
 the mime's glass safe, a translucent soap bubble, a white cloud, the washing
-machine drum, the magnet poles, a cracked eggshell, coffee mugs, receipts and a
-white dinner jacket) is closed by a dark outline, so all 57 used the existing
-near-white border-fill processor with no seeds or threshold changes.
+machine drum, the magnet poles, a cracked eggshell, coffee mugs, receipts, a
+white dinner jacket and a cardboard robot suit) is closed by a dark outline, so
+68 of the 69 used the existing near-white border-fill processor with no seeds or
+threshold changes.
+
+`tangoTender` is the one exception and has its own tailored
+`scripts/process-tangoTender.mjs`. That source ships as a "sticker": a thick
+white ring around the dancers, fenced off from the real background by its own
+thin mid-gray stroke (sampled at whiteness ~109-163), which the shared
+border-seeded fill cannot cross — so the shared processor left a visible white
+halo. The tailored version adds one seed inside the ring (which clears the whole
+connected band), erodes the leftover stroke, and keeps only the largest opaque
+component so the stroke loop cannot survive as a floating outline. Shared
+thresholds were not touched, so no other icon is affected.
 
 Regenerate with `node scripts/process-<image>.mjs`; the wrappers call
 `scripts/lib/process-crit-icon.mjs` and write both `src/assets/<image>.png` and
@@ -140,11 +171,12 @@ from `whiteRabbit.jfif`, renamed from `followTheWhiteRabbit.jfif`.
 
 Magenta-background inspection confirmed intact enclosed highlights, detached
 pistols, warglaive blades, in-flight bullets and juggled coins, feet, tails and
-crop bounds. Outputs all fit within 250x250 as indexed-palette PNGs with alpha
-at 13.7-32.1 KB, and every root/shipped pair is byte-identical.
+crop bounds, and that `tangoTender` no longer carries its sticker halo. Outputs
+all fit within 250x250 as indexed-palette PNGs with alpha at 13.7-31.9 KB, and
+every root/shipped pair is byte-identical.
 
-Validation: `node scripts/test-featured-crits.mjs` passed all 113 featured
-rewards (including these 57) and `npm run build` passed. Browser behaviour for
+Validation: `node scripts/test-featured-crits.mjs` passed all 125 featured
+rewards (including these 69) and `npm run build` passed. Browser behaviour for
 this batch was not verified in-game.
 
 ## Implemented asset batch: 2026-09-17
@@ -155,64 +187,65 @@ balance is unchanged; this report replaces the previous batch report only.
 Proc chances below apply after a tier and the special gateway land, before
 the shared proc cap. They are not per-click odds.
 
-| Image             | Crit               | Immediate reward                                                | Proc chance | Comparison                                                                      |
-| ----------------- | ------------------ | --------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------- |
-| amethyst          | Amethyst           | 6 payouts on this floor                                         | 5%          | Above Overflow's 5 at 6%; does not restart the timer                            |
-| blessed           | Blessed            | 1 tier promotion, then 3 upgrades here                          | 1%          | Upgrade plus immediate upgrades; smaller promotion than Obelisk at 0.8%         |
-| centurion         | Centurion          | 100 upgrades on this floor                                      | 1%          | Above Samurai's 30 at 1.5%; below Lucky Clover's 500 at 0.4%                    |
-| checkUp           | Check Up           | 4 upgrades, then 2 payouts on the lowest-level floor            | 5%          | Roundup Rodeo's target, but 4 upgrades plus cash instead of 8 upgrades          |
-| diamond           | Diamond            | 24 payouts on this floor                                        | 2%          | Above Sapphire's 18 at 2.5%                                                     |
-| emerald           | Emerald            | 9 payouts on this floor                                         | 4%          | Above Amethyst's 6 at 5%                                                        |
-| fireman           | First Responder    | 3 upgrades, then 1 payout on every unlocked floor               | 4%          | Fire Drill's building-wide payout plus upgrades, without timer resets           |
-| forTheEmperor     | For the Emperor    | 25 upgrades on every unlocked floor                             | 1.5%        | Above For the King's 15 at 2%; up to 500 free upgrades                          |
-| forTheKing        | For the King       | 15 upgrades on every unlocked floor                             | 2%          | Above Fancy Friday's 10 at 2.5%                                                 |
-| goldNugget        | Gold Nugget        | 4 payouts on this floor                                         | 7%          | Below Overflow's 5 at 6%; preserves the timer                                   |
-| goldRush          | Gold Rush          | 10 payouts on every unlocked floor                              | 2%          | Above Yes Chef's 8 at 2.5%                                                      |
-| hammerTime        | Hammer Time        | 9 upgrades on this floor                                        | 4%          | Below Keynote's 10 at 3%                                                        |
-| robinHood         | Robin Hood         | 7 top-earner payouts, then 3 upgrades on the lowest-level floor | 3%          | Sharpshooter pays 10 without the targeted upgrades; no income is taken away     |
-| roman             | Roman Holiday      | 9 upgrades on every unlocked floor                              | 3%          | Between Flamenco's 7 at 3.5% and Fancy Friday's 10 at 2.5%                      |
-| ruby              | Ruby               | 12 payouts on this floor                                        | 3%          | Above Emerald's 9 at 4%                                                         |
-| samurai           | Samurai            | 30 upgrades on this floor                                       | 1.5%        | Above Ninja Bonus's 12 at 2.5% and Space Race's top-floor 20 at 2%              |
-| saphire           | Sapphire           | 18 payouts on this floor                                        | 2.5%        | Above Ruby's 12 at 3%; raw asset spelling retained                              |
-| silverRush        | Silver Rush        | 6 payouts on every unlocked floor                               | 3.5%        | Between Dinner Time's 5 at 4% and Yes Chef's 8 at 2.5%                          |
-| spy               | Undercover         | 17 upgrades on the lowest-income-rate floor                     | 2.2%        | Roundup Rodeo gives 8 to the lowest-level floor, a different target             |
-| theLawWon         | The Law Won        | 6 upgrades, then 2 payouts on the cheapest-upgrade floor        | 4.5%        | Safety Net gives 5 upgrades to the most expensive floor instead                 |
-| victorian         | High Society       | 9 payouts on alternating unlocked floors, starting at ground    | 3%          | Yes Chef pays 8 everywhere at 2.5%; this pays more per target but fewer targets |
-| wizard            | Wizard             | 2 tier promotions, then 5 upgrades here                         | 0.6%        | Above Obelisk's 2 promotions plus 2 upgrades at 0.8%                            |
-| executiveSpin     | Executive Spin     | 4 upgrades on the highest unlocked floor                        | 5%          | Above Space Race's 20 on the top floor at 2% only when the target is topmost    |
-| rubberStampede    | Rubber Stampede    | 7 payouts on every unlocked floor                               | 2.5%        | Above Silver Rush's 6 at 3.5%; broad building-wide cash effect                  |
-| replyAll          | Reply All          | 3 payouts on this floor and the lowest-level floor              | 6%          | More targeted than Dinner Time's 5 everywhere at 4%                             |
-| stapleOfSuccess   | Staple of Success  | 7 upgrades on this floor                                        | 4%          | Between Hammer Time's 9 at 4% and Tea Break's 1 at 8%                           |
-| faxOfFortune      | Fax of Fortune     | 8 payouts from the highest-earning floor                        | 3.5%        | Sharpshooter pays 10 at 4%; this keeps the same target with a lower payout      |
-| casualMonday      | Casual Monday      | 20 upgrades on this floor                                       | 2.5%        | Below Samurai's 30 at 1.5%; twice Keynote's 10 at 3%                            |
-| deskJockey        | Desk Jockey        | 6 upgrades on the lowest-level floor                            | 5%          | Targets like Roundup Rodeo's 8 at 3.5%, but with a smaller reward               |
-| inboxZeroGravity  | Inbox Zero Gravity | 12 payouts on every unlocked floor                              | 3%          | Above Gold Rush's 10 at 2%; broad payout scope                                  |
-| beanCounter       | Bean Counter       | 1 tier promotion and 6 upgrades on this floor                   | 1%          | Adds upgrades to Blessed's 1 promotion and 3 upgrades at the same 1%            |
-| kingOfTheWorld    | King of the World  | 30 upgrades on the highest unlocked floor                       | 1.5%        | Matches Samurai's 30 upgrades, but targets the top floor at the same rarity     |
-| officeClown       | Office Clown       | 5 upgrades on the lowest-level floor                            | 4%          | Smaller than Roundup Rodeo's 8 at 3.5%, with the same level-based target        |
-| fridayTieDay      | Friday Tie Day     | 10 payouts on alternating unlocked floors, starting at ground   | 3%          | More per selected floor than High Society's 9 at 3%, with the same pattern      |
-| soReady           | So Ready           | 15 upgrades on this floor                                       | 2%          | Same count as For the King, but focused on one floor instead of the building    |
-| doughDivision     | Dough Division     | 6 upgrades on this floor                                        | 6%          | Smaller than So Ready's 15 at 2%; a common single-floor upgrade                 |
-| profitPopcorn     | Profit Popcorn     | 4 payouts on every unlocked floor                               | 4%          | Building-wide payout below Gold Rush's 10 at 2%                                 |
-| donutDisturb      | Donut Disturb      | 5 upgrades and 5 payouts on this floor                          | 5%          | Combines a smaller upgrade batch with cash versus Check Up's targeted mix       |
-| cakeDay           | Cake Day           | 12 upgrades on the lowest-level floor                           | 3%          | Same target as Office Clown, with more upgrades at a lower rarity               |
-| champagneProblems | Champagne Problems | 15 payouts from the highest-earning floor                       | 2%          | Higher than Sharpshooter's 10 at 4%, with a rarer jackpot                       |
-| bonusBurrito      | Bonus Burrito      | 8 upgrades and 3 payouts on this floor                          | 4%          | Adds cash to Staple of Success's 7 upgrades at the same rarity                  |
-| sundaeBest        | Sundae Best        | 10 payouts on alternating unlocked floors, starting at ground   | 2.5%        | Matches High Society's pattern with one more payout per selected floor          |
-| popTheQuestion    | Pop the Question   | 1 tier promotion and 4 upgrades on this floor                   | 1%          | Similar to Blessed, with one extra upgrade and no second promotion              |
-| partyCrasher      | Party Crasher      | 3 upgrades here and 3 on the highest unlocked floor             | 5%          | A smaller two-target version of Finger Guns' 2-upgrade pair at 7%               |
+| Image             | Crit                | Immediate reward                                                | Proc chance | Comparison                                                                      |
+| ----------------- | ------------------- | --------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------- |
+| amethyst          | Amethyst            | 6 payouts on this floor                                         | 5%          | Above Overflow's 5 at 6%; does not restart the timer                            |
+| blessed           | Blessed             | 1 tier promotion, then 3 upgrades here                          | 1%          | Upgrade plus immediate upgrades; smaller promotion than Obelisk at 0.8%         |
+| centurion         | Centurion           | 100 upgrades on this floor                                      | 1%          | Above Samurai's 30 at 1.5%; below Lucky Clover's 500 at 0.4%                    |
+| checkUp           | Check Up            | 4 upgrades, then 2 payouts on the lowest-level floor            | 5%          | Roundup Rodeo's target, but 4 upgrades plus cash instead of 8 upgrades          |
+| diamond           | Diamond             | 24 payouts on this floor                                        | 2%          | Above Sapphire's 18 at 2.5%                                                     |
+| emerald           | Emerald             | 9 payouts on this floor                                         | 4%          | Above Amethyst's 6 at 5%                                                        |
+| fireman           | First Responder     | 3 upgrades, then 1 payout on every unlocked floor               | 4%          | Fire Drill's building-wide payout plus upgrades, without timer resets           |
+| forTheEmperor     | For the Emperor     | 25 upgrades on every unlocked floor                             | 1.5%        | Above For the King's 15 at 2%; up to 500 free upgrades                          |
+| forTheKing        | For the King        | 15 upgrades on every unlocked floor                             | 2%          | Above Fancy Friday's 10 at 2.5%                                                 |
+| goldNugget        | Gold Nugget         | 4 payouts on this floor                                         | 7%          | Below Overflow's 5 at 6%; preserves the timer                                   |
+| goldRush          | Gold Rush           | 10 payouts on every unlocked floor                              | 2%          | Above Yes Chef's 8 at 2.5%                                                      |
+| hammerTime        | Hammer Time         | 9 upgrades on this floor                                        | 4%          | Below Keynote's 10 at 3%                                                        |
+| robinHood         | Honor among thieves | 7 top-earner payouts, then 3 upgrades on the lowest-level floor | 3%          | Sharpshooter pays 10 without the targeted upgrades; no income is taken away     |
+| roman             | Roman Holiday       | 9 upgrades on every unlocked floor                              | 3%          | Between Flamenco's 7 at 3.5% and Fancy Friday's 10 at 2.5%                      |
+| ruby              | Ruby                | 12 payouts on this floor                                        | 3%          | Above Emerald's 9 at 4%                                                         |
+| samurai           | Samurai             | 30 upgrades on this floor                                       | 1.5%        | Above Ninja Bonus's 12 at 2.5% and Space Race's top-floor 20 at 2%              |
+| saphire           | Sapphire            | 18 payouts on this floor                                        | 2.5%        | Above Ruby's 12 at 3%; raw asset spelling retained                              |
+| silverRush        | Silver Rush         | 6 payouts on every unlocked floor                               | 3.5%        | Between Dinner Time's 5 at 4% and Yes Chef's 8 at 2.5%                          |
+| spy               | Undercover          | 17 upgrades on the lowest-income-rate floor                     | 2.2%        | Roundup Rodeo gives 8 to the lowest-level floor, a different target             |
+| theLawWon         | The Law Won         | 6 upgrades, then 2 payouts on the cheapest-upgrade floor        | 4.5%        | Safety Net gives 5 upgrades to the most expensive floor instead                 |
+| victorian         | High Society        | 9 payouts on alternating unlocked floors, starting at ground    | 3%          | Yes Chef pays 8 everywhere at 2.5%; this pays more per target but fewer targets |
+| wizard            | Wizard              | 2 tier promotions, then 5 upgrades here                         | 0.6%        | Above Obelisk's 2 promotions plus 2 upgrades at 0.8%                            |
+| executiveSpin     | Executive Spin      | 4 upgrades on the highest unlocked floor                        | 5%          | Above Space Race's 20 on the top floor at 2% only when the target is topmost    |
+| rubberStampede    | Rubber Stampede     | 7 payouts on every unlocked floor                               | 2.5%        | Above Silver Rush's 6 at 3.5%; broad building-wide cash effect                  |
+| replyAll          | Reply All           | 3 payouts on this floor and the lowest-level floor              | 6%          | More targeted than Dinner Time's 5 everywhere at 4%                             |
+| stapleOfSuccess   | Staple of Success   | 7 upgrades on this floor                                        | 4%          | Between Hammer Time's 9 at 4% and Tea Break's 1 at 8%                           |
+| faxOfFortune      | Fax of Fortune      | 8 payouts from the highest-earning floor                        | 3.5%        | Sharpshooter pays 10 at 4%; this keeps the same target with a lower payout      |
+| casualMonday      | Casual Monday       | 20 upgrades on this floor                                       | 2.5%        | Below Samurai's 30 at 1.5%; twice Keynote's 10 at 3%                            |
+| deskJockey        | Desk Jockey         | 6 upgrades on the lowest-level floor                            | 5%          | Targets like Roundup Rodeo's 8 at 3.5%, but with a smaller reward               |
+| inboxZeroGravity  | Inbox Zero Gravity  | 12 payouts on every unlocked floor                              | 3%          | Above Gold Rush's 10 at 2%; broad payout scope                                  |
+| beanCounter       | Bean Counter        | 1 tier promotion and 6 upgrades on this floor                   | 1%          | Adds upgrades to Blessed's 1 promotion and 3 upgrades at the same 1%            |
+| kingOfTheWorld    | King of the World   | 30 upgrades on the highest unlocked floor                       | 1.5%        | Matches Samurai's 30 upgrades, but targets the top floor at the same rarity     |
+| officeClown       | Office Clown        | 5 upgrades on the lowest-level floor                            | 4%          | Smaller than Roundup Rodeo's 8 at 3.5%, with the same level-based target        |
+| fridayTieDay      | Friday Tie Day      | 10 payouts on alternating unlocked floors, starting at ground   | 3%          | More per selected floor than High Society's 9 at 3%, with the same pattern      |
+| soReady           | So Ready            | 15 upgrades on this floor                                       | 2%          | Same count as For the King, but focused on one floor instead of the building    |
+| doughDivision     | Dough Division      | 6 upgrades on this floor                                        | 6%          | Smaller than So Ready's 15 at 2%; a common single-floor upgrade                 |
+| profitPopcorn     | Profit Popcorn      | 4 payouts on every unlocked floor                               | 4%          | Building-wide payout below Gold Rush's 10 at 2%                                 |
+| donutDisturb      | Donut Disturb       | 5 upgrades and 5 payouts on this floor                          | 5%          | Combines a smaller upgrade batch with cash versus Check Up's targeted mix       |
+| cakeDay           | Cake Day            | 12 upgrades on the lowest-level floor                           | 3%          | Same target as Office Clown, with more upgrades at a lower rarity               |
+| champagneProblems | Champagne Problems  | 15 payouts from the highest-earning floor                       | 2%          | Higher than Sharpshooter's 10 at 4%, with a rarer jackpot                       |
+| bonusBurrito      | Bonus Burrito       | 8 upgrades and 3 payouts on this floor                          | 4%          | Adds cash to Staple of Success's 7 upgrades at the same rarity                  |
+| sundaeBest        | Sundae Best         | 10 payouts on alternating unlocked floors, starting at ground   | 2.5%        | Matches High Society's pattern with one more payout per selected floor          |
+| popTheQuestion    | Pop the Question    | 1 tier promotion and 4 upgrades on this floor                   | 1%          | Similar to Blessed, with one extra upgrade and no second promotion              |
+| partyCrasher      | Party Crasher       | 3 upgrades here and 3 on the highest unlocked floor             | 5%          | A smaller two-target version of Finger Guns' 2-upgrade pair at 7%               |
 
 All targets are within the current building and exclude locked floors. The
 base tier's free upgrades occur before the special reward and its target
 selection. Payouts mean current income cycles, not seconds or banked cash;
 they leave timer progress unchanged. Upgrade/payout combinations pay at the
-post-upgrade rate, except Robin Hood, which pays before upgrading its other
+post-upgrade rate, except Honor among thieves, which pays before upgrading its
+other
 target. No proc takes income or progress away.
 
 Promotions cap at ultra; Blessed and Wizard still grant their free upgrades
 on an already-ultra floor. Bulk upgrades use the normal numerical progression
 without replaying particles or crit rolls per tick. On a one-floor building,
-every target resolves to that floor; Robin Hood grants both rewards there.
+every target resolves to that floor; Honor among thieves grants both rewards there.
 For equal best scores, the triggering floor wins if tied; otherwise the first
 matching floor from the ground wins. High Society always selects indices
 0, 2, 4, and so on. Repeated procs remain additive; no new timed state exists.
@@ -228,7 +261,8 @@ All 13 new raw JFIF sources are preserved. Sampled corner channels ranged from
 Contrasting-background inspection preserved enclosed light details and full
 silhouettes. Outputs fit within 250x250, contain alpha and indexed palettes,
 and have identical root/shipped copies (approximately 15-34 KB each).
-Robin Hood adds three sampled background seeds for enclosed bow/quiver gaps;
+Honor among thieves adds three sampled background seeds for enclosed bow/quiver
+gaps;
 the optional seeds do not change processing for any other image.
 
 Regenerate with `node scripts/process-<image>.mjs`; wrappers use
