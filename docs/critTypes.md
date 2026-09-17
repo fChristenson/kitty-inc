@@ -8,40 +8,40 @@ balance is unchanged; this report replaces the previous batch report only.
 Proc chances below apply after a tier and the special gateway land, before
 the shared proc cap. They are not per-click odds.
 
-| Image         | Crit            | Immediate reward                                                | Proc chance | Comparison                                                                      |
-| ------------- | --------------- | --------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------- |
-| amethyst      | Amethyst        | 6 payouts on this floor                                         | 5%          | Above Overflow's 5 at 6%; does not restart the timer                            |
-| blessed       | Blessed         | 1 tier promotion, then 3 upgrades here                          | 1%          | Upgrade plus immediate upgrades; smaller promotion than Obelisk at 0.8%         |
-| centurion     | Centurion       | 100 upgrades on this floor                                      | 1%          | Above Samurai's 30 at 1.5%; below Lucky Clover's 500 at 0.4%                    |
-| checkUp       | Check Up        | 4 upgrades, then 2 payouts on the lowest-level floor            | 5%          | Roundup Rodeo's target, but 4 upgrades plus cash instead of 8 upgrades          |
-| diamond       | Diamond         | 24 payouts on this floor                                        | 2%          | Above Sapphire's 18 at 2.5%                                                     |
-| emerald       | Emerald         | 9 payouts on this floor                                         | 4%          | Above Amethyst's 6 at 5%                                                        |
-| fireman       | First Responder | 3 upgrades, then 1 payout on every unlocked floor               | 4%          | Fire Drill's building-wide payout plus upgrades, without timer resets           |
-| forTheEmperor | For the Emperor | 25 upgrades on every unlocked floor                             | 1.5%        | Above For the King's 15 at 2%; up to 500 free upgrades                          |
-| forTheKing    | For the King    | 15 upgrades on every unlocked floor                             | 2%          | Above Fancy Friday's 10 at 2.5%                                                 |
-| goldNugget    | Gold Nugget     | 4 payouts on this floor                                         | 7%          | Below Overflow's 5 at 6%; preserves the timer                                   |
-| goldRush      | Gold Rush       | 10 payouts on every unlocked floor                              | 2%          | Above Yes Chef's 8 at 2.5%                                                      |
-| hammerTime    | Hammer Time     | 9 upgrades on this floor                                        | 4%          | Below Keynote's 10 at 3%                                                        |
-| robinHood     | Robin Hood      | 7 top-earner payouts, then 3 upgrades on the lowest-level floor | 3%          | Sharpshooter pays 10 without the targeted upgrades; no income is taken away     |
-| roman         | Roman Holiday   | 9 upgrades on every unlocked floor                              | 3%          | Between Flamenco's 7 at 3.5% and Fancy Friday's 10 at 2.5%                      |
-| ruby          | Ruby            | 12 payouts on this floor                                        | 3%          | Above Emerald's 9 at 4%                                                         |
-| samurai       | Samurai         | 30 upgrades on this floor                                       | 1.5%        | Above Ninja Bonus's 12 at 2.5% and Space Race's top-floor 20 at 2%              |
-| saphire       | Sapphire        | 18 payouts on this floor                                        | 2.5%        | Above Ruby's 12 at 3%; raw asset spelling retained                              |
-| silverRush    | Silver Rush     | 6 payouts on every unlocked floor                               | 3.5%        | Between Dinner Time's 5 at 4% and Yes Chef's 8 at 2.5%                          |
-| spy           | Undercover      | 17 upgrades on the lowest-income-rate floor                     | 2.2%        | Roundup Rodeo gives 8 to the lowest-level floor, a different target             |
-| theLawWon     | The Law Won     | 6 upgrades, then 2 payouts on the cheapest-upgrade floor        | 4.5%        | Safety Net gives 5 upgrades to the most expensive floor instead                 |
-| victorian     | High Society    | 9 payouts on alternating unlocked floors, starting at ground    | 3%          | Yes Chef pays 8 everywhere at 2.5%; this pays more per target but fewer targets |
-| wizard        | Wizard          | 2 tier promotions, then 5 upgrades here                         | 0.6%        | Above Obelisk's 2 promotions plus 2 upgrades at 0.8%                            |
-| executiveSpin | Executive Spin  | 4 upgrades on the highest unlocked floor                       | 5%          | Above Space Race's 20 on the top floor at 2% only when the target is topmost   |
-| rubberStampede | Rubber Stampede | 7 payouts on every unlocked floor                              | 2.5%        | Above Silver Rush's 6 at 3.5%; broad building-wide cash effect                |
-| replyAll      | Reply All       | 3 payouts on this floor and the lowest-level floor              | 6%          | More targeted than Dinner Time's 5 everywhere at 4%                            |
-| stapleOfSuccess | Staple of Success | 7 upgrades on this floor                                      | 4%          | Between Hammer Time's 9 at 4% and Tea Break's 1 at 8%                          |
-| faxOfFortune  | Fax of Fortune   | 8 payouts from the highest-earning floor                       | 3.5%        | Sharpshooter pays 10 at 4%; this keeps the same target with a lower payout     |
-| casualMonday  | Casual Monday    | 20 upgrades on this floor                                      | 2.5%        | Below Samurai's 30 at 1.5%; twice Keynote's 10 at 3%                          |
-| deskJockey    | Desk Jockey     | 6 upgrades on the lowest-level floor                            | 5%          | Targets like Roundup Rodeo's 8 at 3.5%, but with a smaller reward             |
-| inboxZeroGravity | Inbox Zero Gravity | 12 payouts on every unlocked floor                          | 3%          | Above Gold Rush's 10 at 2%; broad payout scope                                |
-| beanCounter  | Bean Counter    | 1 tier promotion and 6 upgrades on this floor                   | 1%          | Adds upgrades to Blessed's 1 promotion and 3 upgrades at the same 1%           |
-| kingOfTheWorld | King of the World | 30 upgrades on the highest unlocked floor                    | 1.5%        | Matches Samurai's 30 upgrades, but targets the top floor at the same rarity    |
+| Image            | Crit               | Immediate reward                                                | Proc chance | Comparison                                                                      |
+| ---------------- | ------------------ | --------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------- |
+| amethyst         | Amethyst           | 6 payouts on this floor                                         | 5%          | Above Overflow's 5 at 6%; does not restart the timer                            |
+| blessed          | Blessed            | 1 tier promotion, then 3 upgrades here                          | 1%          | Upgrade plus immediate upgrades; smaller promotion than Obelisk at 0.8%         |
+| centurion        | Centurion          | 100 upgrades on this floor                                      | 1%          | Above Samurai's 30 at 1.5%; below Lucky Clover's 500 at 0.4%                    |
+| checkUp          | Check Up           | 4 upgrades, then 2 payouts on the lowest-level floor            | 5%          | Roundup Rodeo's target, but 4 upgrades plus cash instead of 8 upgrades          |
+| diamond          | Diamond            | 24 payouts on this floor                                        | 2%          | Above Sapphire's 18 at 2.5%                                                     |
+| emerald          | Emerald            | 9 payouts on this floor                                         | 4%          | Above Amethyst's 6 at 5%                                                        |
+| fireman          | First Responder    | 3 upgrades, then 1 payout on every unlocked floor               | 4%          | Fire Drill's building-wide payout plus upgrades, without timer resets           |
+| forTheEmperor    | For the Emperor    | 25 upgrades on every unlocked floor                             | 1.5%        | Above For the King's 15 at 2%; up to 500 free upgrades                          |
+| forTheKing       | For the King       | 15 upgrades on every unlocked floor                             | 2%          | Above Fancy Friday's 10 at 2.5%                                                 |
+| goldNugget       | Gold Nugget        | 4 payouts on this floor                                         | 7%          | Below Overflow's 5 at 6%; preserves the timer                                   |
+| goldRush         | Gold Rush          | 10 payouts on every unlocked floor                              | 2%          | Above Yes Chef's 8 at 2.5%                                                      |
+| hammerTime       | Hammer Time        | 9 upgrades on this floor                                        | 4%          | Below Keynote's 10 at 3%                                                        |
+| robinHood        | Robin Hood         | 7 top-earner payouts, then 3 upgrades on the lowest-level floor | 3%          | Sharpshooter pays 10 without the targeted upgrades; no income is taken away     |
+| roman            | Roman Holiday      | 9 upgrades on every unlocked floor                              | 3%          | Between Flamenco's 7 at 3.5% and Fancy Friday's 10 at 2.5%                      |
+| ruby             | Ruby               | 12 payouts on this floor                                        | 3%          | Above Emerald's 9 at 4%                                                         |
+| samurai          | Samurai            | 30 upgrades on this floor                                       | 1.5%        | Above Ninja Bonus's 12 at 2.5% and Space Race's top-floor 20 at 2%              |
+| saphire          | Sapphire           | 18 payouts on this floor                                        | 2.5%        | Above Ruby's 12 at 3%; raw asset spelling retained                              |
+| silverRush       | Silver Rush        | 6 payouts on every unlocked floor                               | 3.5%        | Between Dinner Time's 5 at 4% and Yes Chef's 8 at 2.5%                          |
+| spy              | Undercover         | 17 upgrades on the lowest-income-rate floor                     | 2.2%        | Roundup Rodeo gives 8 to the lowest-level floor, a different target             |
+| theLawWon        | The Law Won        | 6 upgrades, then 2 payouts on the cheapest-upgrade floor        | 4.5%        | Safety Net gives 5 upgrades to the most expensive floor instead                 |
+| victorian        | High Society       | 9 payouts on alternating unlocked floors, starting at ground    | 3%          | Yes Chef pays 8 everywhere at 2.5%; this pays more per target but fewer targets |
+| wizard           | Wizard             | 2 tier promotions, then 5 upgrades here                         | 0.6%        | Above Obelisk's 2 promotions plus 2 upgrades at 0.8%                            |
+| executiveSpin    | Executive Spin     | 4 upgrades on the highest unlocked floor                        | 5%          | Above Space Race's 20 on the top floor at 2% only when the target is topmost    |
+| rubberStampede   | Rubber Stampede    | 7 payouts on every unlocked floor                               | 2.5%        | Above Silver Rush's 6 at 3.5%; broad building-wide cash effect                  |
+| replyAll         | Reply All          | 3 payouts on this floor and the lowest-level floor              | 6%          | More targeted than Dinner Time's 5 everywhere at 4%                             |
+| stapleOfSuccess  | Staple of Success  | 7 upgrades on this floor                                        | 4%          | Between Hammer Time's 9 at 4% and Tea Break's 1 at 8%                           |
+| faxOfFortune     | Fax of Fortune     | 8 payouts from the highest-earning floor                        | 3.5%        | Sharpshooter pays 10 at 4%; this keeps the same target with a lower payout      |
+| casualMonday     | Casual Monday      | 20 upgrades on this floor                                       | 2.5%        | Below Samurai's 30 at 1.5%; twice Keynote's 10 at 3%                            |
+| deskJockey       | Desk Jockey        | 6 upgrades on the lowest-level floor                            | 5%          | Targets like Roundup Rodeo's 8 at 3.5%, but with a smaller reward               |
+| inboxZeroGravity | Inbox Zero Gravity | 12 payouts on every unlocked floor                              | 3%          | Above Gold Rush's 10 at 2%; broad payout scope                                  |
+| beanCounter      | Bean Counter       | 1 tier promotion and 6 upgrades on this floor                   | 1%          | Adds upgrades to Blessed's 1 promotion and 3 upgrades at the same 1%            |
+| kingOfTheWorld   | King of the World  | 30 upgrades on the highest unlocked floor                       | 1.5%        | Matches Samurai's 30 upgrades, but targets the top floor at the same rarity     |
 
 All targets are within the current building and exclude locked floors. The
 base tier's free upgrades occur before the special reward and its target

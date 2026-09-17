@@ -11,7 +11,9 @@ const originalRandom = Math.random;
 try {
   const crit = await server.ssrLoadModule("/src/shared/critTypes/index.ts");
   const { CONFIG } = await server.ssrLoadModule("/src/config.ts");
-  const { IMAGE_FILES } = await server.ssrLoadModule("/src/loadAssets/index.ts");
+  const { IMAGE_FILES } = await server.ssrLoadModule(
+    "/src/loadAssets/index.ts",
+  );
   const { createFeaturedCritRewards } = await server.ssrLoadModule(
     "/src/floors/floorInteractions/featuredCritRewards.ts",
   );

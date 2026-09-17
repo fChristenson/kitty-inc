@@ -184,10 +184,7 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.beanCounterUpgrades,
       ),
     kingOfTheWorld: (context) =>
-      actions.upgrade(
-        [highestFloor(context)],
-        balance.kingOfTheWorldUpgrades,
-      ),
+      actions.upgrade([highestFloor(context)], balance.kingOfTheWorldUpgrades),
     wizard: (context) =>
       promoteAndUpgrade(
         context.floor,
