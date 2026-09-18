@@ -11,14 +11,19 @@ export async function processCritIcon(
     protectedRects = [],
     sourceExtension = ".jfif",
     sourcePath = null,
+    // {left, top, width, height} of the real artwork when the source arrives
+    // letterboxed — the border-seeded fill can't start inside a non-white bar
+    sourceRect = null,
   } = {},
 ) {
   const assets = path.resolve(import.meta.dirname, "../../src/assets");
   const critAssets = path.resolve(import.meta.dirname, "../../public");
-  const { data, info } = await sharp(
+  const pipeline = sharp(
     sourcePath ?? path.join(assets, `${name}${sourceExtension}`),
+  ).ensureAlpha();
+  const { data, info } = await (
+    sourceRect ? pipeline.extract(sourceRect) : pipeline
   )
-    .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
   const { width, height, channels } = info;

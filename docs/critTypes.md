@@ -1,5 +1,74 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-18 (gold, money and cyber-agents)
+
+Twenty-five crits — nineteen gold/money props, one meme mount, and five
+character portraits — support upgrade clicks and floor unlocks through the
+shared `applyFloorCrit` path. Rewards are immediate, existing crit balance is
+unchanged, and proc chances apply only after a tier and the special gateway
+land, before the shared proc cap; they are not per-click odds.
+
+| Image               | Crit                    | Immediate reward                              | Proc chance | Comparison                                                |
+| ------------------- | ----------------------- | --------------------------------------------- | ----------- | --------------------------------------------------------- |
+| adamWhiskersen      | Adam Whiskersen         | 2 tier promotions, then 8 upgrades here       | 0.7%        | One upgrade above Golden Chalice's double promotion       |
+| bankroll            | Bankroll                | 25 free upgrades on this floor                | 0.6%        | Above Bullion Brigade's 24, below JC Dentclaw's 26        |
+| billBlizzard        | Bill Blizzard           | 23 payouts on every unlocked floor            | 0.5%        | The largest building-wide payout, above Money Tree's 22   |
+| bobPawge            | Bob Pawge               | 24 free upgrades on every unlocked floor      | 0.5%        | The largest building-wide batch, above Money Printer's 23 |
+| bullionStack        | Bullion Brigade         | 24 free upgrades on this floor                | 0.7%        | Above Astralclaw Skyblade's 23 at 0.7%                    |
+| cashCannon          | Cash Cannon             | 10 upgrades on alternating floors             | 1.3%        | Above Drizzt Do'Purrden's 9 at 1.3%                       |
+| fairExchange        | Fair Exchange           | 18 payouts on alternating floors              | 1.1%        | Above Tap That Asset's 17                                 |
+| gemMine             | Gem Mine                | 10 upgrades on this floor and every one below | 1.3%        | Between Mime Your Business's 8 and Bready or Not's 11     |
+| goldMine            | Gold Mine               | 15 payouts on the highest unlocked floor      | 1.2%        | Larger than The Griffin Contract's 9 at 1.8%              |
+| goldenChalice       | Golden Chalice          | 2 tier promotions, then 7 upgrades here       | 0.8%        | Between Elmiaowster's 6 and Adam Whiskersen's 8           |
+| goldenGoose         | Golden Goose            | 21 payouts on every unlocked floor            | 0.7%        | Above Elven Songblade's 20 at 0.7%                        |
+| goldenStag          | Golden Stag             | 22 payouts from the highest-earning floor     | 0.8%        | Above Liquid Assets's 21, and rarer for it                |
+| handsomeJake        | Handsome Jake           | 18 upgrades on the highest unlocked floor     | 1.2%        | Between Strike It Rich's 16 and Robot Resources's 19      |
+| jcDentclaw          | JC Dentclaw             | 26 free upgrades on this floor                | 0.5%        | The largest single-floor batch below Samurai's 30         |
+| liquidAssets        | Liquid Assets           | 21 payouts from the highest-earning floor     | 0.9%        | Above Hearthpaw Shadowagent's 20 at 1%                    |
+| midasTouch          | Midas Touch             | 1 tier promotion, then 13 upgrades here       | 0.9%        | Above Arcana's single promotion plus 12                   |
+| moneyPrinter        | Money Printer           | 23 free upgrades on every unlocked floor      | 0.6%        | Above Vault Door's 22, below Bob Pawge's 24               |
+| moneyTree           | Money Tree              | 22 payouts on every unlocked floor            | 0.6%        | Above Golden Goose's 21, below Bill Blizzard's 23         |
+| nuggetAvalanche     | Nugget Avalanche        | 17 instant payouts on this floor              | 1.2%        | Between Chonk's 16 and Saphire's 18                       |
+| pennyJar            | Penny Jar               | 15 free upgrades on the lowest-level floor    | 2%          | Above Wink Wink's 14 at 2.2%                              |
+| purrDenton          | Purr Denton             | 17 free upgrades on the lowest-level floor    | 1.9%        | Above Penny Jar's 15, and rarer for it                    |
+| strikeItRich        | Strike It Rich          | 16 upgrades on the highest unlocked floor     | 1.4%        | Between Sarevmeowk's 15 and Metal's 17                    |
+| vaultDoor           | Vault Door              | 22 free upgrades on every unlocked floor      | 0.6%        | Above Captain of Industry's 21 at 1.1%                    |
+| wishingWell         | Wishing Well            | 23 instant payouts on this floor              | 0.9%        | Between Megachonk's 22 and Diamond's 24                   |
+| youKnowWhatStallion | You Know What, Stallion | 11 upgrades on alternating floors             | 1.2%        | Above Cash Cannon's 10, and rarer for it                  |
+
+All twenty-five are single-shot and current-building only, with no map-specific
+behavior. Building-wide entries skip locked floors; alternating entries (Cash
+Cannon, Fair Exchange, You Know What Stallion) walk the building stride-by-2
+from the ground floor, and Gem Mine takes the triggering floor plus everything
+below it. Penny Jar and Purr Denton resolve the lowest-level unlocked floor,
+Gold Mine / Handsome Jake / Strike It Rich the highest unlocked floor, and
+Golden Stag / Liquid Assets the current top earner by income rate — on a
+one-floor building all of those collapse onto the triggering floor. Midas
+Touch, Golden Chalice and Adam Whiskersen promote the triggering floor's
+permanent crit tier and stop at the strongest tier. No payout crit in this
+batch touches floor collection timers.
+
+### Processing and verification (gold, money and cyber-agents)
+
+All twenty-five raw sources already arrived camelCased, and were processed with
+`node scripts/process-<name>.mjs` around `scripts/lib/process-crit-icon.mjs`. A
+raw contact sheet plus a border-pixel scan across the batch showed twenty-four
+on a plain near-white background; only `jcDentclaw` shipped as a portrait canvas
+letterboxed by mid-grey bars, which blocks the border-seeded flood fill from
+ever starting. That case added a small `sourceRect` option to the shared
+processor rather than a bespoke copy of it — the wrapper crops to the white
+canvas (`left: 279, width: 690`) and the normal key then works, taking the
+output from a full-frame 250x167 down to a tight 151x250. A magenta contact
+sheet of the batch confirmed no halos, including Golden Goose's white goose,
+which survives because the flood fill stops at its black outline.
+
+Each icon ships as both `public/<name>.png` and `public/stickers/<name>.png`
+via `scripts/lib/sticker-border.mjs`.
+
+`node scripts/test-featured-crits.mjs` passes at 318 entries and
+`npm run build` is clean. In-game celebration rendering and the Special Crits
+menu were not exercised in a browser for this batch.
+
 ## Implemented asset batch: 2026-09-18 (Baldur's Gate cats)
 
 Nineteen Baldur's-Gate-inspired cat crits support upgrade clicks and floor

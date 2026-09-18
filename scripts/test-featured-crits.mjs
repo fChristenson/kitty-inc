@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 293);
+  assert.equal(kinds.length, 318);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -491,6 +491,31 @@ try {
     thisIsTheEnd: [[20, 52, 10, 0], 0],
     whiskerWyll: [[20, 30, 10, 0], 57],
     winkWink: [[20, 30, 24, 0], 0],
+    adamWhiskersen: [[20, 38, 10, 0], 0],
+    bankroll: [[20, 55, 10, 0], 0],
+    billBlizzard: [[20, 30, 10, 0], 138],
+    bobPawge: [[44, 54, 34, 0], 0],
+    bullionStack: [[20, 54, 10, 0], 0],
+    cashCannon: [[30, 30, 20, 0], 0],
+    fairExchange: [[20, 30, 10, 0], 54],
+    gemMine: [[30, 40, 10, 0], 0],
+    goldMine: [[20, 30, 10, 0], 30],
+    goldenChalice: [[20, 37, 10, 0], 0],
+    goldenGoose: [[20, 30, 10, 0], 126],
+    goldenStag: [[20, 30, 10, 0], 66],
+    handsomeJake: [[20, 30, 28, 0], 0],
+    jcDentclaw: [[20, 56, 10, 0], 0],
+    liquidAssets: [[20, 30, 10, 0], 63],
+    midasTouch: [[20, 43, 10, 0], 0],
+    moneyPrinter: [[43, 53, 33, 0], 0],
+    moneyTree: [[20, 30, 10, 0], 132],
+    nuggetAvalanche: [[20, 30, 10, 0], 51],
+    pennyJar: [[20, 30, 25, 0], 0],
+    purrDenton: [[20, 30, 27, 0], 0],
+    strikeItRich: [[20, 30, 26, 0], 0],
+    vaultDoor: [[42, 52, 32, 0], 0],
+    wishingWell: [[20, 30, 10, 0], 69],
+    youKnowWhatStallion: [[31, 30, 21, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
