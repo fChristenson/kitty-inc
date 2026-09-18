@@ -1,5 +1,36 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-18 (mythic creatures)
+
+Eighteen mythic-creature featured crits support upgrade clicks and floor
+unlocks through the shared `applyFloorCrit` path. Rewards are immediate,
+existing crit balance is unchanged, and proc chances apply only after a tier
+and the special gateway land, before the shared proc cap; they are not per-click
+odds.
+
+| Image             | Crit               | Immediate reward                                  | Proc chance | Comparison                                                           |
+| ----------------- | ------------------ | ------------------------------------------------- | ----------- | -------------------------------------------------------------------- |
+| emberwingDragon   | Emberwing Dragon   | 18 upgrades on this floor                         | 1.5%        | Same single-floor scale as Victory Pose at 1.6%                      |
+| moonlitKirin      | Moonlit Kirin      | 10 payouts from the highest-earning floor         | 1.3%        | Targeted payout rarer than Diamond Compass at 1.8%                   |
+| pocketPhoenix     | Pocket Phoenix     | 7 upgrades on this floor                          | 2%          | Smaller single-floor reward than Emberwing Dragon                    |
+| crystalGriffin    | Crystal Griffin    | 8 payouts on every unlocked floor                 | 1.7%        | Building-wide payout below Cosmic Catapult's 9 at 1.4%               |
+| velvetManticore   | Velvet Manticore   | 1 tier promotion, then 9 upgrades on this floor   | 1.2%        | Promotion shape like Emerald Crown, with a larger batch              |
+| frostfangYeti     | Frostfang Yeti     | 11 upgrades on every unlocked floor               | 2.2%        | Building-wide upgrade reward below Thunder Paws's 8 at 1.8%          |
+| lanternKitsune    | Lantern Kitsune    | 6 instant payouts on this floor                   | 1.9%        | Smaller than Claw and Order's 6 at 2.4% only by equal count          |
+| coralSeaSerpent   | Coral Sea Serpent  | 12 payouts on this floor                          | 1.6%        | Same single-floor count as Queue Royalty at 2.3%                     |
+| clockworkMinotaur | Clockwork Minotaur | 13 free upgrades on this floor                    | 1.8%        | Similar to Imperial Scepter, but stays on the current floor          |
+| starryCerberus    | Starry Cerberus    | 8 upgrades on alternating floors, from the ground | 1.4%        | Alternating upgrade pattern like Sidekick Shuffle at 2.1%            |
+| goldenSphinx      | Golden Sphinx      | 10 upgrades on the highest unlocked floor         | 1.1%        | Targeted top-floor reward below Hard Carry's 14 at 1.9%              |
+| mossbackTreant    | Mossback Treant    | 5 upgrades on every unlocked floor                | 2.1%        | Smaller building-wide reward than Ready Check's 6 at 1.3%            |
+| rainbowAlicorn    | Rainbow Alicorn    | 9 payouts from the highest-earning floor          | 1.3%        | Same target as Moonlit Kirin, with one fewer payout                  |
+| bogWitchFamiliar  | Bog Witch Familiar | 6 free upgrades on this floor                     | 2.5%        | Smaller single-floor reward than Pocket Phoenix                      |
+| pearlHippocampus  | Pearl Hippocampus  | 7 instant payouts on this floor                   | 1.8%        | Between Claw and Order's 6 at 2.4% and Ruby Heart Relic's 12 at 2.4% |
+| thunderbirdChick  | Thunderbird Chick  | 9 free upgrades on this floor                     | 1.6%        | Smaller single-floor reward than Emberwing Dragon                    |
+| obsidianBasilisk  | Obsidian Basilisk  | 20 free upgrades on this floor                    | 1%          | Larger and rarer than Feline Fury's 16 at 1.5%                       |
+| cloudNymph        | Cloud Nymph        | 5 payouts on every unlocked floor                 | 2.3%        | Smaller building-wide payout than Golden Fleece's 7 at 2%            |
+
+The full featured-crit regression now covers 237 entries.
+
 ## Implemented asset batch: 2026-09-18 (valuables)
 
 Nine new valuables-themed featured crits support upgrade clicks and floor

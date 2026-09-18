@@ -6,6 +6,7 @@ export async function processCritIcon(
   name,
   {
     backgroundSeeds = [],
+    darkBackgroundThreshold = null,
     protectedRects = [],
     sourceExtension = ".jfif",
     sourcePath = null,
@@ -26,6 +27,10 @@ export async function processCritIcon(
   let tail = 0;
   const whiteness = (pixel) =>
     Math.min(...data.subarray(pixel * channels, pixel * channels + 3));
+  const isBackgroundColor = (pixel) =>
+    darkBackgroundThreshold === null
+      ? whiteness(pixel) >= 195
+      : whiteness(pixel) <= darkBackgroundThreshold;
   const isProtected = (pixel) => {
     const column = pixel % width;
     const row = Math.floor(pixel / width);
@@ -35,7 +40,7 @@ export async function processCritIcon(
     );
   };
   const enqueue = (pixel) => {
-    if (background[pixel] || isProtected(pixel) || whiteness(pixel) < 195)
+    if (background[pixel] || isProtected(pixel) || !isBackgroundColor(pixel))
       return;
     background[pixel] = 1;
     queue[tail++] = pixel;
@@ -70,11 +75,14 @@ export async function processCritIcon(
       (column + 1 < width && !background[pixel + 1]) ||
       (pixel >= width && !background[pixel - width]) ||
       (pixel + width < background.length && !background[pixel + width]);
-    data[pixel * channels + 3] = touchesContent
-      ? Math.round(
-          255 * Math.max(0, Math.min(1, (235 - whiteness(pixel)) / 40)),
-        )
-      : 0;
+    data[pixel * channels + 3] =
+      darkBackgroundThreshold !== null
+        ? 0
+        : touchesContent
+          ? Math.round(
+              255 * Math.max(0, Math.min(1, (235 - whiteness(pixel)) / 40)),
+            )
+          : 0;
   }
   dropSmallOpaqueComponents(data, width, height, channels, 120);
   let left = width;

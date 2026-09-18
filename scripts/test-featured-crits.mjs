@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 219);
+  assert.equal(kinds.length, 237);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -416,6 +416,24 @@ try {
     sapphireHourglass: [[20, 30, 10, 0], 27],
     vaultOfJewels: [[26, 36, 16, 0], 0],
     goldenIdol: [[20, 45, 10, 0], 0],
+    emberwingDragon: [[20, 48, 10, 0], 0],
+    moonlitKirin: [[20, 30, 10, 0], 30],
+    pocketPhoenix: [[20, 37, 10, 0], 0],
+    crystalGriffin: [[20, 30, 10, 0], 48],
+    velvetManticore: [[20, 39, 10, 0], 0],
+    frostfangYeti: [[31, 41, 21, 0], 0],
+    lanternKitsune: [[20, 30, 10, 0], 18],
+    coralSeaSerpent: [[20, 30, 10, 0], 36],
+    clockworkMinotaur: [[20, 43, 10, 0], 0],
+    starryCerberus: [[28, 30, 18, 0], 0],
+    goldenSphinx: [[20, 30, 20, 0], 0],
+    mossbackTreant: [[25, 35, 15, 0], 0],
+    rainbowAlicorn: [[20, 30, 10, 0], 27],
+    bogWitchFamiliar: [[20, 36, 10, 0], 0],
+    pearlHippocampus: [[20, 30, 10, 0], 21],
+    thunderbirdChick: [[20, 39, 10, 0], 0],
+    obsidianBasilisk: [[20, 50, 10, 0], 0],
+    cloudNymph: [[20, 30, 10, 0], 30],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -496,6 +514,8 @@ try {
     if (kind === "theMoonstoneKey")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "emeraldCrown")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "velvetManticore")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {

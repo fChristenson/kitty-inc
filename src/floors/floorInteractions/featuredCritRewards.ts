@@ -756,5 +756,51 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.upgrade(context.floors, balance.vaultOfJewelsUpgrades),
     goldenIdol: (context) =>
       actions.upgrade([context.floor], balance.goldenIdolUpgrades),
+    emberwingDragon: (context) =>
+      actions.upgrade([context.floor], balance.emberwingDragonUpgrades),
+    moonlitKirin: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.moonlitKirinPayouts,
+      ),
+    pocketPhoenix: (context) =>
+      actions.upgrade([context.floor], balance.pocketPhoenixUpgrades),
+    crystalGriffin: (context) =>
+      actions.payCycles(context.floors, balance.crystalGriffinPayouts),
+    velvetManticore: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.velvetManticoreTierSteps,
+        balance.velvetManticoreUpgrades,
+      ),
+    frostfangYeti: (context) =>
+      actions.upgrade(context.floors, balance.frostfangYetiUpgrades),
+    lanternKitsune: (context) =>
+      actions.payCycles([context.floor], balance.lanternKitsunePayouts),
+    coralSeaSerpent: (context) =>
+      actions.payCycles([context.floor], balance.coralSeaSerpentPayouts),
+    clockworkMinotaur: (context) =>
+      actions.upgrade([context.floor], balance.clockworkMinotaurUpgrades),
+    starryCerberus: (context) =>
+      actions.upgrade(alternating(context), balance.starryCerberusUpgrades),
+    goldenSphinx: (context) =>
+      actions.upgrade([highestFloor(context)], balance.goldenSphinxUpgrades),
+    mossbackTreant: (context) =>
+      actions.upgrade(context.floors, balance.mossbackTreantUpgrades),
+    rainbowAlicorn: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.rainbowAlicornPayouts,
+      ),
+    bogWitchFamiliar: (context) =>
+      actions.upgrade([context.floor], balance.bogWitchFamiliarUpgrades),
+    pearlHippocampus: (context) =>
+      actions.payCycles([context.floor], balance.pearlHippocampusPayouts),
+    thunderbirdChick: (context) =>
+      actions.upgrade([context.floor], balance.thunderbirdChickUpgrades),
+    obsidianBasilisk: (context) =>
+      actions.upgrade([context.floor], balance.obsidianBasiliskUpgrades),
+    cloudNymph: (context) =>
+      actions.payCycles(context.floors, balance.cloudNymphPayouts),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

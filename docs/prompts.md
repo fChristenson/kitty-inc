@@ -4,105 +4,100 @@
 
 "Flat vector cartoon of [SUBJECT], bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
 
-## Mythic creatures
+## Witcher-inspired cat hunters
 
-### Emberwing Dragon
+### The White Whisker
 ```text
-Flat vector cartoon of a small red dragon with broad ember-colored wings, curled golden horns, glowing orange scales, and a tiny flame puff between its claws, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a stoic white-haired cat monster hunter wearing layered dark leather armor, carrying two sheathed swords and standing in a windswept mountain pass, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Moonlit Kirin
+### Silverclaw Sentinel
 ```text
-Flat vector cartoon of an elegant kirin with a luminous silver mane, branching antlers, midnight-blue scales, and tiny stars glowing along its hooves, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a focused cat hunter drawing a shining silver sword against a shadowy winged beast, with a weathered cloak, sharp eyes, and a protective stance, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Thunder Roc
+### Wolfmark Wanderer
 ```text
-Flat vector cartoon of a majestic roc with enormous cobalt wings, golden talons, bright lightning feathers, and a storm cloud curled behind its head, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a lone cat monster hunter in a wolf-emblem medallion and travel-worn armor, walking through a misty pine forest with two swords across its back, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Pocket Phoenix
+### Elixir Under Moonlight
 ```text
-Flat vector cartoon of a tiny phoenix rising from a swirl of ruby and amber flames, with bright feather tips, a glowing tail, and wings spread wide in rebirth, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a cat alchemist hunter holding a glowing red potion beneath a full moon, with belts of glass vials, dark leather armor, and pale magical smoke curling around its paws, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Crystal Griffin
+### The Griffin Contract
 ```text
-Flat vector cartoon of a proud griffin with a lion's body, eagle wings, layered blue feathers, a hooked beak, and one talon raised in a powerful guardian pose, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a cat monster hunter studying a parchment contract beside a proud griffin, with a silver sword planted in the ground and a rugged forest trail behind them, no readable text, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Velvet Manticore
+### Bard of the Broken Lyre
 ```text
-Flat vector cartoon of a dramatic manticore with a deep purple lion body, barbed scorpion tail, small bat wings, and a velvet-red mane rippling in the wind, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a flamboyant cat bard in a colorful travel coat playing a small broken lyre beside a heavily armed cat monster hunter, with playful musical notes and a campfire glow, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Frostfang Yeti
+### Swamp Hexbreaker
 ```text
-Flat vector cartoon of a friendly yeti with thick icy-blue fur, oversized snow-covered feet, frosted horns, and both hands raised as snow swirls around its body, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a determined cat witch hunter standing knee-deep in a stylized swamp, holding a silver blade in one paw and a glowing blue ward sign in the other, with reeds and ghostly mist behind it, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Lantern Kitsune
+### Midnight Monster Contract
 ```text
-Flat vector cartoon of a nine-tailed kitsune with warm orange fur, flowing cream tails, a small magical lantern floating above its paws, and colorful foxfire flames around its ears, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a black-cloaked cat hunter pinning a monster contract to a crooked wooden sign under a moonlit sky, with a silver sword, leather satchel, and distant glowing eyes in the forest, no readable text, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Coral Sea Serpent
+### Cat School Acrobat
 ```text
-Flat vector cartoon of a playful sea serpent coiling through translucent turquoise waves, with teal scales, sweeping fins, a curling tail, and tiny bubbles sparkling around its head, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of an agile cat monster hunter leaping sideways between two ancient stone pillars, dual swords flashing, light armor flowing, and a small magical sign glowing beneath its paws, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Clockwork Minotaur
+### Frostbite Tracker
 ```text
-Flat vector cartoon of a powerful clockwork minotaur with bronze armor plates, glowing ruby eyes, curled brass horns, and a giant gear-shaped hammer resting on one shoulder, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a fur-lined cat hunter tracking enormous claw marks across fresh snow, carrying a lantern and silver sword while icy breath and drifting snow surround its focused face, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Starry Cerberus
+### Cursed Crown Hunt
 ```text
-Flat vector cartoon of a three-headed cerberus with midnight fur, glowing constellation markings, three expressive faces, and three playful tongues sticking out, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a cat monster hunter confronting a floating cursed crown surrounded by violet flames, with a silver sword raised defensively and a ruined castle silhouette behind it, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Golden Sphinx
+### Alchemy at Dusk
 ```text
-Flat vector cartoon of a regal golden sphinx with bright blue eyes, striped wings, tall alert ears, and one paw raised in a mysterious riddle pose, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a cat hunter brewing a glowing potion over a small campfire, surrounded by herbs, mushrooms, glass vials, and two swords resting against a travel pack, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Mossback Treant
+### The Antlerwood Stalker
 ```text
-Flat vector cartoon of a gentle treant with a broad wooden body, mossy antlers, glowing mushrooms on its shoulders, and tiny vines wrapped around its branch-like arms, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a cat monster hunter facing a towering antlered forest spirit made of bark, roots, and glowing leaves, with a silver sword and a magical protective sign between them, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Rainbow Alicorn
+### Moonlit Wyvern Hunt
 ```text
-Flat vector cartoon of a graceful alicorn with soft white fur, rainbow mane, iridescent wings, a spiraled horn, and colorful magical ribbons curling around its hooves, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a cat hunter crouched on a rocky ledge beneath a huge crescent moon, watching a winged wyvern circle overhead, with a crossbow, silver bolts, and a flowing dark cloak, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Bog Witch Familiar
+### Tavern Tactician
 ```text
-Flat vector cartoon of a tiny swamp spirit with a round mossy body, bright yellow eyes, a crooked twig crest, glowing mushrooms growing from its back, and webbed feet planted in a puddle, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a clever cat monster hunter planning a hunt at a rustic tavern table, surrounded by a map, monster tracks, potion bottles, and a sheathed silver sword, with a tiny bard cat listening nearby, no readable text, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Pearl Hippocampus
+### The Meadow Wraith Bell
 ```text
-Flat vector cartoon of a graceful hippocampus with a sea-horse head, curled fish tail, flowing blue mane, turquoise fins, and a proud rearing pose above a curling wave, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a cat hunter ringing an old bronze bell as a translucent ghostly spirit rises from a meadow, with a silver sword, protective blue runes, and tall grass bending in magical wind, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Thunderbird Chick
+### Sea Monster Slayer
 ```text
-Flat vector cartoon of a fluffy young thunderbird with oversized electric-blue wings, bright yellow talons, a tiny storm cloud above its head, and harmless sparks around its feathers, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a cat monster hunter standing on a small wooden boat with a silver harpoon and sword, facing a curling tentacled sea beast rising from stylized teal waves, with sea mist and glowing eyes, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Obsidian Basilisk
+### The Runic Parry
 ```text
-Flat vector cartoon of a sleek obsidian basilisk with dark iridescent scales, a flared hood, glowing violet eyes, and a polished black crest, posed in a dramatic coil without frightening gore, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a cat hunter deflecting a magical blast with a silver sword, creating a bright circular rune shield, while a horned monster recoils behind a burst of colorful sparks, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Cloud Nymph
+### Wolfpack Farewell
 ```text
-Flat vector cartoon of a tiny cloud nymph with a soft white cloud body, pastel rainbow hair, miniature silver wings, and a gentle rain shower curling around its hands, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
-```
-
-### Marble Chimera
-```text
-Flat vector cartoon of a friendly chimera with a lion body, goat horns, a dragon tail, colorful patterned scales, and three different playful expressions, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of three cat monster hunters in different armor styles standing back to back at sunset, with crossed swords, travel cloaks, and a distant trail leading into a wild forest, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
