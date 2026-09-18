@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 210);
+  assert.equal(kinds.length, 219);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -407,6 +407,15 @@ try {
     treasureTruffle: [[20, 35, 10, 0], 15],
     wizardsWaffle: [[30, 40, 20, 0], 0],
     goldenFortuneCookie: [[20, 30, 19, 0], 0],
+    crystalDragonEgg: [[20, 42, 10, 0], 0],
+    diamondCompass: [[20, 30, 10, 0], 30],
+    emeraldCrown: [[20, 38, 10, 0], 0],
+    goldenFleece: [[20, 30, 10, 0], 42],
+    imperialScepter: [[20, 30, 23, 0], 0],
+    rubyHeartRelic: [[20, 30, 10, 0], 36],
+    sapphireHourglass: [[20, 30, 10, 0], 27],
+    vaultOfJewels: [[26, 36, 16, 0], 0],
+    goldenIdol: [[20, 45, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -485,6 +494,8 @@ try {
     if (kind === "magicalPayrollGirl")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "theMoonstoneKey")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "emeraldCrown")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {

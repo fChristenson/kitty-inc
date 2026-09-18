@@ -731,5 +731,30 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         [lowestLevel(context)],
         balance.goldenFortuneCookieUpgrades,
       ),
+    crystalDragonEgg: (context) =>
+      actions.upgrade([context.floor], balance.crystalDragonEggUpgrades),
+    diamondCompass: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.diamondCompassPayouts,
+      ),
+    emeraldCrown: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.emeraldCrownTierSteps,
+        balance.emeraldCrownUpgrades,
+      ),
+    goldenFleece: (context) =>
+      actions.payCycles(context.floors, balance.goldenFleecePayouts),
+    imperialScepter: (context) =>
+      actions.upgrade([highestFloor(context)], balance.imperialScepterUpgrades),
+    rubyHeartRelic: (context) =>
+      actions.payCycles([context.floor], balance.rubyHeartRelicPayouts),
+    sapphireHourglass: (context) =>
+      actions.payCycles(alternating(context), balance.sapphireHourglassPayouts),
+    vaultOfJewels: (context) =>
+      actions.upgrade(context.floors, balance.vaultOfJewelsUpgrades),
+    goldenIdol: (context) =>
+      actions.upgrade([context.floor], balance.goldenIdolUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

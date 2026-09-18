@@ -4,104 +4,105 @@
 
 "Flat vector cartoon of [SUBJECT], bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
 
-## Candy collection
+## Mythic creatures
 
-### Rainbow Rock Candy
+### Emberwing Dragon
 ```text
-Flat vector cartoon of a cluster of translucent rainbow rock candy crystals on wooden sticks, with sparkling sugar facets and bright jewel-like colors, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a small red dragon with broad ember-colored wings, curled golden horns, glowing orange scales, and a tiny flame puff between its claws, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Gummy Bear Parade
+### Moonlit Kirin
 ```text
-Flat vector cartoon of a cheerful pile of glossy gummy bears in red, orange, yellow, green, blue, and purple, arranged in a playful parade formation, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of an elegant kirin with a luminous silver mane, branching antlers, midnight-blue scales, and tiny stars glowing along its hooves, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Lollipop Lighthouse
+### Thunder Roc
 ```text
-Flat vector cartoon of a tall spiral rainbow lollipop designed like a tiny lighthouse, with a glowing candy beacon and a peppermint-striped base, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a majestic roc with enormous cobalt wings, golden talons, bright lightning feathers, and a storm cloud curled behind its head, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Chocolate Comet
+### Pocket Phoenix
 ```text
-Flat vector cartoon of a shiny chocolate truffle shaped like a comet, with a caramel center peeking through and a sparkling trail of cocoa dust and sugar stars, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a tiny phoenix rising from a swirl of ruby and amber flames, with bright feather tips, a glowing tail, and wings spread wide in rebirth, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Taffy Tornado
+### Crystal Griffin
 ```text
-Flat vector cartoon of colorful twisted taffy ribbons spiraling into a small candy tornado, with glossy highlights, stretched curls, and tiny sugar sprinkles caught in the swirl, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a proud griffin with a lion's body, eagle wings, layered blue feathers, a hooked beak, and one talon raised in a powerful guardian pose, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Jawbreaker Planet
+### Velvet Manticore
 ```text
-Flat vector cartoon of a giant multicolored jawbreaker candy sliced to reveal concentric rainbow layers, with a glossy shell and tiny candy moons orbiting around it, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a dramatic manticore with a deep purple lion body, barbed scorpion tail, small bat wings, and a velvet-red mane rippling in the wind, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Peppermint Pinwheel
+### Frostfang Yeti
 ```text
-Flat vector cartoon of a large red-and-white peppermint pinwheel candy with four crisp spiral arms, a shiny candy center, and a striped stick, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a friendly yeti with thick icy-blue fur, oversized snow-covered feet, frosted horns, and both hands raised as snow swirls around its body, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Candy Button Box
+### Lantern Kitsune
 ```text
-Flat vector cartoon of a colorful box overflowing with round candy buttons in bright rainbow colors, with a glossy paper wrapper, playful dots, and several candies bouncing out, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a nine-tailed kitsune with warm orange fur, flowing cream tails, a small magical lantern floating above its paws, and colorful foxfire flames around its ears, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Licorice Labyrinth
+### Coral Sea Serpent
 ```text
-Flat vector cartoon of glossy red, black, and purple licorice ropes woven into a neat maze, with candy twists at the corners and shiny sugar highlights, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a playful sea serpent coiling through translucent turquoise waves, with teal scales, sweeping fins, a curling tail, and tiny bubbles sparkling around its head, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Marshmallow Mountain
+### Clockwork Minotaur
 ```text
-Flat vector cartoon of a towering mountain of fluffy pastel marshmallows stacked like snowy peaks, with toasted golden tops, tiny candy flags, and sparkling sugar dust, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a powerful clockwork minotaur with bronze armor plates, glowing ruby eyes, curled brass horns, and a giant gear-shaped hammer resting on one shoulder, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Caramel Cascade
+### Starry Cerberus
 ```text
-Flat vector cartoon of a glossy caramel waterfall pouring over stacked chocolate squares, with golden ribbons, crunchy nut pieces, and shiny candy droplets frozen midair, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a three-headed cerberus with midnight fur, glowing constellation markings, three expressive faces, and three playful tongues sticking out, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Candy Corn Castle
+### Golden Sphinx
 ```text
-Flat vector cartoon of a tiny castle built from yellow, orange, and white candy corn pieces, with gumdrop turrets, sugar windows, and a peppermint flag, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a regal golden sphinx with bright blue eyes, striped wings, tall alert ears, and one paw raised in a mysterious riddle pose, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Sour Spray
+### Mossback Treant
 ```text
-Flat vector cartoon of a bright sour candy spray bottle with a translucent green nozzle, citrus-shaped candies bursting from the spray, and colorful fizzy bubbles, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a gentle treant with a broad wooden body, mossy antlers, glowing mushrooms on its shoulders, and tiny vines wrapped around its branch-like arms, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Bonbon Bouquet
+### Rainbow Alicorn
 ```text
-Flat vector cartoon of a bouquet made from jewel-toned bonbons wrapped like flowers, with candy wrappers as petals, twisted foil stems, and sparkling sugar centers, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a graceful alicorn with soft white fur, rainbow mane, iridescent wings, a spiraled horn, and colorful magical ribbons curling around its hooves, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Fudge Fortress
+### Bog Witch Familiar
 ```text
-Flat vector cartoon of a chunky chocolate fudge fortress with caramel drawbridges, wafer walls, colorful candy windows, and a glossy chocolate moat, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a tiny swamp spirit with a round mossy body, bright yellow eyes, a crooked twig crest, glowing mushrooms growing from its back, and webbed feet planted in a puddle, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Bubblegum Balloon
+### Pearl Hippocampus
 ```text
-Flat vector cartoon of a huge translucent bubblegum bubble tied with a candy wrapper ribbon, reflecting rainbow highlights and containing tiny floating sugar stars, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a graceful hippocampus with a sea-horse head, curled fish tail, flowing blue mane, turquoise fins, and a proud rearing pose above a curling wave, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Honeycomb Hard Candy
+### Thunderbird Chick
 ```text
-Flat vector cartoon of golden honeycomb-shaped hard candies stacked into a sparkling geometric cluster, with amber transparency, tiny sugar crystals, and glossy highlights, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a fluffy young thunderbird with oversized electric-blue wings, bright yellow talons, a tiny storm cloud above its head, and harmless sparks around its feathers, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Candy Cane Carousel
+### Obsidian Basilisk
 ```text
-Flat vector cartoon of a tiny carousel made from red-and-white candy canes, with peppermint horses, striped poles, a frosting roof, and colorful gumdrop decorations, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a sleek obsidian basilisk with dark iridescent scales, a flared hood, glowing violet eyes, and a polished black crest, posed in a dramatic coil without frightening gore, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### Sprinkle Volcano
+### Cloud Nymph
 ```text
-Flat vector cartoon of a cupcake volcano erupting with rainbow sprinkles, glossy frosting lava, candy rocks, and colorful sugar smoke puffs, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a tiny cloud nymph with a soft white cloud body, pastel rainbow hair, miniature silver wings, and a gentle rain shower curling around its hands, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
 
-### The Candy Shop Sign
+### Marble Chimera
 ```text
-Flat vector cartoon of an ornate candy shop sign shaped like a giant wrapped sweet, surrounded by lollipops, gumdrops, peppermint stars, and sparkling sugar lights, with no readable text, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+Flat vector cartoon of a friendly chimera with a lion body, goat horns, a dragon tail, colorful patterned scales, and three different playful expressions, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 ```
+

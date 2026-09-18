@@ -1262,6 +1262,60 @@ export const FEATURED_CRIT_INFO = {
     icon: "goldenFortuneCookie",
     description: "Nine free upgrades on the lowest-level floor",
   },
+  crystalDragonEgg: {
+    label: "Crystal Dragon Egg",
+    color: COLOR.cyan,
+    icon: "crystalDragonEgg",
+    description: "Twelve free upgrades on this floor",
+  },
+  diamondCompass: {
+    label: "Diamond Compass",
+    color: COLOR.blue,
+    icon: "diamondCompass",
+    description: "Ten payouts from the highest-earning floor",
+  },
+  emeraldCrown: {
+    label: "Emerald Crown",
+    color: COLOR.moneyGreen,
+    icon: "emeraldCrown",
+    description: "One tier promotion and eight upgrades here",
+  },
+  goldenFleece: {
+    label: "Golden Fleece",
+    color: COLOR.gold,
+    icon: "goldenFleece",
+    description: "Seven payouts on every unlocked floor",
+  },
+  imperialScepter: {
+    label: "Imperial Scepter",
+    color: COLOR.heavenlyGold,
+    icon: "imperialScepter",
+    description: "Thirteen free upgrades on the highest floor",
+  },
+  rubyHeartRelic: {
+    label: "Ruby Heart Relic",
+    color: COLOR.fullHouseCrimson,
+    icon: "rubyHeartRelic",
+    description: "Twelve instant payouts on this floor",
+  },
+  sapphireHourglass: {
+    label: "Sapphire Hourglass",
+    color: COLOR.silverTicketGray,
+    icon: "sapphireHourglass",
+    description: "Nine payouts on alternating floors, from the ground",
+  },
+  vaultOfJewels: {
+    label: "Vault of Jewels",
+    color: COLOR.goldenHandshakeGold,
+    icon: "vaultOfJewels",
+    description: "Six free upgrades on every unlocked floor",
+  },
+  goldenIdol: {
+    label: "Golden Idol",
+    color: COLOR.goldenParachuteMarigold,
+    icon: "goldenIdol",
+    description: "Fifteen free upgrades on this floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

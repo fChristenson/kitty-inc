@@ -1,5 +1,27 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-18 (valuables)
+
+Nine new valuables-themed featured crits support upgrade clicks and floor
+unlocks through the shared `applyFloorCrit` path. Rewards are immediate,
+existing crit balance is unchanged, and proc chances apply only after a tier
+and the special gateway land, before the shared proc cap; they are not per-click
+odds.
+
+| Image              | Crit                 | Immediate reward                                      | Proc chance | Comparison                                                   |
+| ------------------ | -------------------- | ----------------------------------------------------- | ----------- | ------------------------------------------------------------ |
+| crystalDragonEgg   | Crystal Dragon Egg   | 12 upgrades on this floor                             | 1.4%        | Same single-floor shape as Inventory Full, with rarer odds  |
+| diamondCompass     | Diamond Compass     | 10 payouts from the highest-earning floor              | 1.8%        | Same target as Sharpshooter, with equal count at lower odds |
+| emeraldCrown       | Emerald Crown       | 1 tier promotion, then 8 upgrades on this floor        | 1.2%        | Similar promotion shape to Save Point Savings, with larger upgrades |
+| goldenFleece       | Golden Fleece       | 7 payouts on every unlocked floor                      | 2%          | Building-wide payout below Cosmic Catapult's 9 at 1.4%    |
+| imperialScepter    | Imperial Scepter    | 13 upgrades on the highest unlocked floor              | 1.5%        | Below Hard Carry's 14 at 1.9% on the same target           |
+| rubyHeartRelic     | Ruby Heart Relic    | 12 instant payouts on this floor                       | 2.4%        | Same count as Queue Royalty at 2.3%, with a narrower target |
+| sapphireHourglass  | Sapphire Hourglass  | 9 payouts on alternating floors, from the ground       | 1.7%        | Alternating-floor payout pattern like Critical Knit        |
+| vaultOfJewels      | Vault of Jewels     | 6 free upgrades on every unlocked floor                | 1.6%        | Building-wide upgrade reward below Thunder Paws's 8 at 1.8% |
+| goldenIdol         | Golden Idol         | 15 free upgrades on this floor                         | 1.1%        | Similar single-floor reward to Feline Fury, with rarer odds |
+
+The full featured-crit regression now covers 219 entries.
+
 ## Implemented asset batch: 2026-09-18 (superhero and magical sweets)
 
 Fourteen new themed featured crits support upgrade clicks and floor unlocks

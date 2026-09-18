@@ -341,6 +341,15 @@ export const IMAGE_FILES = {
   treasureTruffle: "treasureTruffle.png",
   wizardsWaffle: "wizardsWaffle.png",
   goldenFortuneCookie: "goldenFortuneCookie.png",
+  crystalDragonEgg: "crystalDragonEgg.png",
+  diamondCompass: "diamondCompass.png",
+  emeraldCrown: "emeraldCrown.png",
+  goldenFleece: "goldenFleece.png",
+  imperialScepter: "imperialScepter.png",
+  rubyHeartRelic: "rubyHeartRelic.png",
+  sapphireHourglass: "sapphireHourglass.png",
+  vaultOfJewels: "vaultOfJewels.png",
+  goldenIdol: "goldenIdol.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 
