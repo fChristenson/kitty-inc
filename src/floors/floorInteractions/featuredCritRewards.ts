@@ -509,5 +509,24 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.whySoSeriousTierSteps,
         balance.whySoSeriousUpgrades,
       ),
+    avocardio: (context) =>
+      actions.upgrade([context.floor], balance.avocardioUpgrades),
+    butterBelieveIt: (context) =>
+      actions.payCycles([context.floor], balance.butterBelieveItPayouts),
+    cheesePullChampion: (context) => {
+      actions.upgrade([context.floor], balance.cheesePullChampionUpgrades);
+      actions.payCycles([context.floor], balance.cheesePullChampionPayouts);
+    },
+    grillSergeant: (context) =>
+      actions.upgrade(context.floors, balance.grillSergeantUpgrades),
+    noodleNap: (context) =>
+      actions.payCycles(alternating(context), balance.noodleNapPayouts),
+    picklePredicament: (context) =>
+      actions.upgrade(
+        [lowestLevel(context)],
+        balance.picklePredicamentUpgrades,
+      ),
+    golem: (context) =>
+      actions.upgrade([highestFloor(context)], balance.golemUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 137);
+  assert.equal(kinds.length, 144);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -86,12 +86,10 @@ try {
     );
     crit.consumeCritProcs(floor);
     assert.equal(crit.readCritProcs(floor)[kind], false);
-    const source = await readFile(`src/assets/${IMAGE_FILES[info.icon]}`);
+    const source = await readFile(`public/${IMAGE_FILES[info.icon]}`);
     assert.deepEqual(
       source,
-      await readFile(
-        `src/assets/themes/references/dist/${IMAGE_FILES[info.icon]}`,
-      ),
+      await readFile(`public/${IMAGE_FILES[info.icon]}`),
     );
     const metadata = await sharp(source).metadata();
     assert(
@@ -336,6 +334,13 @@ try {
     iAmTheNight: [[47, 57, 37, 0], 0],
     tubs: [[20, 30, 10, 0], 78],
     whySoSerious: [[20, 50, 10, 0], 0],
+    avocardio: [[20, 45, 10, 0], 0],
+    butterBelieveIt: [[20, 30, 10, 0], 54],
+    cheesePullChampion: [[20, 36, 10, 0], 18],
+    grillSergeant: [[40, 50, 30, 0], 0],
+    noodleNap: [[20, 30, 10, 0], 66],
+    picklePredicament: [[20, 30, 18, 0], 0],
+    golem: [[20, 30, 45, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

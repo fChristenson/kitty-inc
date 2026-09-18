@@ -1,11 +1,16 @@
 import sharp from "sharp";
 import path from "node:path";
-import { copyFile } from "node:fs/promises";
 import { dropSmallOpaqueComponents } from "./drop-small-components.mjs";
 
-export async function processCritIcon(name, { backgroundSeeds = [] } = {}) {
+export async function processCritIcon(
+  name,
+  { backgroundSeeds = [], sourceExtension = ".jfif", sourcePath = null } = {},
+) {
   const assets = path.resolve(import.meta.dirname, "../../src/assets");
-  const { data, info } = await sharp(path.join(assets, `${name}.jfif`))
+  const critAssets = path.resolve(import.meta.dirname, "../../public");
+  const { data, info } = await sharp(
+    sourcePath ?? path.join(assets, `${name}${sourceExtension}`),
+  )
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
@@ -72,15 +77,11 @@ export async function processCritIcon(name, { backgroundSeeds = [] } = {}) {
     bottom = Math.max(bottom, row);
   }
   if (right < left || bottom < top) throw new Error(`Empty crit icon: ${name}`);
-  const destination = path.join(assets, `${name}.png`);
+  const destination = path.join(critAssets, `${name}.png`);
   await sharp(data, { raw: { width, height, channels } })
     .extract({ left, top, width: right - left + 1, height: bottom - top + 1 })
     .resize(250, 250, { fit: "inside", withoutEnlargement: true })
     .png({ compressionLevel: 9, palette: true })
     .toFile(destination);
-  await copyFile(
-    destination,
-    path.join(assets, "themes/references/dist", `${name}.png`),
-  );
   console.log(`Processed and copied ${name}.png`);
 }

@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import { resolveThemeDirs } from "./lib/theme-dirs.mjs";
 
 // raw *Sprites.(png|jfif) files (AI-generated character sheets, one per worker
-// skin), dropped into a theme's own src/assets/themes/<theme>/ folder, each have a
+// skin), dropped into a theme's own src/assets/<theme>/ folder, each have a
 // plain near-white background and 5 poses spaced arbitrarily across one row. This
 // chroma-keys the white background to transparent (using each pixel's whiteness
 // for a soft/anti-aliased edge instead of a hard cutoff), finds each pose's real
@@ -39,7 +39,7 @@ const FLOOD_LO = 150;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
 const { theme, themeDir: referencesDir, distDir } = resolveThemeDirs(assets);
-const outDir = path.join(distDir, "sprites");
+const outDir = distDir;
 
 async function processSheet(srcFile, destFile) {
   const { data, info } = await sharp(srcFile)
@@ -126,7 +126,8 @@ async function processSheet(srcFile, destFile) {
 
   function colHasContent(x) {
     for (let y = 0; y < height; y++) {
-      if (data[(y * width + x) * channels + 3] > CONTENT_ALPHA_THRESHOLD) return true;
+      if (data[(y * width + x) * channels + 3] > CONTENT_ALPHA_THRESHOLD)
+        return true;
     }
     return false;
   }

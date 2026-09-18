@@ -1,34 +1,31 @@
 import { loadImage } from "../utils";
 
-// every generated asset lives under this one folder (see docs/prompts.md for how
-// the raw art was authored, and scripts/process-*.mjs for how it's built). This
-// used to glob across multiple theme folders and pick one at runtime; that whole
-// multi-theme system was removed, so these just always point at "references".
-const backgroundModules = import.meta.glob<string>(
-  "../assets/themes/references/dist/backgrounds/*.png",
-  { eager: true, import: "default" },
-);
-const groundModules = import.meta.glob<string>(
-  "../assets/themes/references/dist/ground/street.png",
-  { eager: true, import: "default" },
-);
-const spriteModules = import.meta.glob<string>(
-  "../assets/themes/references/dist/sprites/*.png",
-  { eager: true, import: "default" },
-);
-// flat single-file images living directly in dist/ root (icons, backdrops,
-// textures — anything that isn't a multi-file set like backgrounds/sprites/
-// clouds above)
-const imageModules = import.meta.glob<string>(
-  "../assets/themes/references/dist/*.png",
-  { eager: true, import: "default" },
-);
-const cloudModules = import.meta.glob<string>(
-  "../assets/themes/references/dist/clouds/*.png",
-  { eager: true, import: "default" },
-);
+const PUBLIC_ASSET_BASE = import.meta.env.BASE_URL;
+const themeAssetUrl = (filename: string) => `${PUBLIC_ASSET_BASE}${filename}`;
+const critAssetUrl = (filename: string) => `${PUBLIC_ASSET_BASE}${filename}`;
+const sharedThemeImages = new Set([
+  "city.png",
+  "mapBg.png",
+  "wallMaterial.png",
+  "coin.png",
+  "mouse.png",
+  "isometricBox.png",
+  "isometricYarn.png",
+  "merge.png",
+  "skyscraper.png",
+  "cashRegister.png",
+  "clock.png",
+]);
+const backgroundFiles = ["bg2.png", "bg4.png", "bg6.png"];
+const cloudFiles = [
+  "cloud0.png",
+  "cloud1.png",
+  "cloud2.png",
+  "cloud3.png",
+  "cloud4.png",
+];
 
-// every sprite this game loads, by logical name -> its filename inside dist/sprites/
+// Every sprite this game loads, by logical name -> its filename in public/assets/.
 const SPRITE_FILES = {
   worker: "workerWalk.png",
   manager: "managerWalk.png",
@@ -271,36 +268,26 @@ export const IMAGE_FILES = {
   iAmTheNight: "iAmTheNight.png",
   tubs: "tubs.png",
   whySoSerious: "whySoSerious.png",
+  avocardio: "avocardio.png",
+  butterBelieveIt: "butterBelieveIt.png",
+  cheesePullChampion: "cheesePullChampion.png",
+  grillSergeant: "grillSergeant.png",
+  noodleNap: "noodleNap.png",
+  picklePredicament: "picklePredicament.png",
+  golem: "golem.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 
 export function getBackgroundUrls(): string[] {
-  const urls = Object.keys(backgroundModules)
-    .sort()
-    .map((path) => backgroundModules[path]);
-  if (urls.length === 0) {
-    throw new Error("No floor backgrounds generated");
-  }
-  return urls;
+  return backgroundFiles.map(themeAssetUrl);
 }
 
 export function getGroundUrl(): string {
-  const path = Object.keys(groundModules)[0];
-  if (!path) {
-    throw new Error("No ground/street art generated");
-  }
-  return groundModules[path];
+  return themeAssetUrl("street.png");
 }
 
 export function getSpriteUrl(name: SpriteName): string {
-  const filename = SPRITE_FILES[name];
-  const path = Object.keys(spriteModules).find((p) =>
-    p.endsWith(`/${filename}`),
-  );
-  if (!path) {
-    throw new Error(`Missing sprite "${filename}"`);
-  }
-  return spriteModules[path];
+  return themeAssetUrl(SPRITE_FILES[name]);
 }
 
 export function loadBackgrounds(): Promise<HTMLImageElement[]> {
@@ -317,13 +304,9 @@ export function loadSprite(name: SpriteName): Promise<HTMLImageElement> {
 
 export function getImageUrl(name: ImageName): string {
   const filename = IMAGE_FILES[name];
-  const path = Object.keys(imageModules).find((p) =>
-    p.endsWith(`/${filename}`),
-  );
-  if (!path) {
-    throw new Error(`Missing image "${filename}"`);
-  }
-  return imageModules[path];
+  return sharedThemeImages.has(filename)
+    ? themeAssetUrl(filename)
+    : critAssetUrl(filename);
 }
 
 export function loadImageByName(name: ImageName): Promise<HTMLImageElement> {
@@ -331,13 +314,7 @@ export function loadImageByName(name: ImageName): Promise<HTMLImageElement> {
 }
 
 export function getCloudUrls(): string[] {
-  const urls = Object.keys(cloudModules)
-    .sort()
-    .map((path) => cloudModules[path]);
-  if (urls.length === 0) {
-    throw new Error("No clouds generated");
-  }
-  return urls;
+  return cloudFiles.map(themeAssetUrl);
 }
 
 export function loadThemeClouds(): Promise<HTMLImageElement[]> {

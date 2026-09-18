@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import { resolveThemeDirs } from "./lib/theme-dirs.mjs";
 
 // raw floor background art (e.g. bg.png, bg2.jfif, bg3.jfif, ...) dropped straight
-// into a theme's own src/assets/themes/<theme>/ folder — usually straight out of
+// into a theme's own src/assets/<theme>/ folder — usually straight out of
 // an AI image generator, often with a plain-color padding border around the
 // actual artwork and not exactly the game's floor size. This trims that border
 // and resizes/crops each one to the fixed floor size (must match FLOOR_W/FLOOR_H
@@ -19,7 +19,7 @@ const FLOOR_H = 721;
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
 const { theme, themeDir, distDir } = resolveThemeDirs(assets);
-const outDir = path.join(distDir, "backgrounds");
+const outDir = distDir;
 
 async function processBackgroundImage(file) {
   const src = path.join(themeDir, file);
@@ -66,4 +66,3 @@ if (files.length === 0) {
   await fs.mkdir(outDir, { recursive: true });
   for (const file of files) await processBackgroundImage(file);
 }
-

@@ -6,8 +6,8 @@ import fs from "node:fs/promises";
 // room shell per themed variant in docs/prompts.md's "Base interior wall shells"
 // section, in the exact same order those variants are listed there). Converts each
 // to png and MOVES it (not a copy — the raw .jfif is deleted once its png lands) into
-// its own src/assets/themes/<theme-name>/base.png, mirroring the existing
-// src/assets/themes/references/ tidy-up. Safe to re-run: any baseN.jfif already
+// its own src/assets/<theme-name>/base.png, mirroring the existing
+// src/assets/references/ tidy-up. Safe to re-run: any baseN.jfif already
 // moved is simply skipped.
 const NUMBER_TO_THEME = {
   2: "corporate-tech-hq",
@@ -23,12 +23,16 @@ const NUMBER_TO_THEME = {
 };
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
-const themesDir = path.join(assets, "themes");
+const publicAssetsDir = path.resolve(
+  import.meta.dirname,
+  "..",
+  "public",
+  "assets",
+);
 
 for (const [num, theme] of Object.entries(NUMBER_TO_THEME)) {
   const src = path.join(assets, `base${num}.jfif`);
-  const destDir = path.join(themesDir, theme);
-  const dest = path.join(destDir, "base.png");
+  const dest = path.join(publicAssetsDir, `base-${theme}.png`);
 
   try {
     await fs.access(src);
@@ -37,8 +41,8 @@ for (const [num, theme] of Object.entries(NUMBER_TO_THEME)) {
     continue;
   }
 
-  await fs.mkdir(destDir, { recursive: true });
+  await fs.mkdir(publicAssetsDir, { recursive: true });
   await sharp(src).png().toFile(dest);
   await fs.unlink(src);
-  console.log(`base${num}.jfif -> themes/${theme}/base.png`);
+  console.log(`base${num}.jfif -> assets/base-${theme}.png`);
 }

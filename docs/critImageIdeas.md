@@ -6,12 +6,6 @@ Each name is a working crit title, followed by the image to generate.
 ## Comfort food
 
 - **Taco 'Bout It** - Two cats leaning in over a giant taco held between them, deep in serious conversation.
-- **Cheese Pull Champion** - A cat stretching a heroic cheese pull from one pizza slice, arms fully extended.
-- **Noodle Nap** - A sleepy cat curled inside an oversized ramen bowl, using a fishcake slice as a pillow.
-- **Grill Sergeant** - A stern cat in an apron and tiny cap saluting beside a smoking barbecue.
-- **Avocardio** - A cat jogging on a treadmill built from a halved avocado, the pit turning as the roller.
-- **Butter Believe It** - A cat shoving a giant pat of butter across a warm pancake like a boulder.
-- **Pickle Predicament** - A dismayed cat holding one enormous gherkin at arm's length, burger gaping open below.
 - **Hot Potato** - A cat juggling one glowing baked potato between its paws, ears flat and eyes watering.
 - **Brunch Boss** - A cat in sunglasses at a tiny cafe table behind a precarious stack of avocado toast.
 - **Curry Favour** - A cat bowing deeply while presenting a steaming curry pot on a velvet cushion.

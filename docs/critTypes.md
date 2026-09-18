@@ -2,7 +2,7 @@
 
 ## Implemented asset batch: 2026-09-17 (character art)
 
-81 new crits from the character art drops, with instant rewards on upgrade
+88 new crits from the character art drops, with instant rewards on upgrade
 clicks and floor unlocks through the same `applyFloorCrit` function. Previous
 crits remain available and their balance is unchanged. Proc chances below apply
 after a tier and the special gateway land, before the shared proc cap. They are
@@ -127,6 +127,19 @@ also renamed to camelCase first:
 | tubs                 | Tubs                    | 26 payouts on this floor                          | 1.7%        | Between Abra-Cash-Dabra's 25 at 1.8% and Despicable Fees' 30        |
 | whySoSerious         | Why So Serious          | 2 tier promotions, then 20 upgrades on this floor | 0.35%       | The rarest promotion proc; The Big Cheese gives 2 plus 30 at 0.4%   |
 
+Seven more from the remaining comfort-food sources plus one standalone golem,
+with every source name normalized to lower camelCase before processing:
+
+| Image              | Crit                 | Immediate reward                                  | Proc chance | Comparison                                                          |
+| ------------------ | -------------------- | ------------------------------------------------- | ----------- | ------------------------------------------------------------------- |
+| avocardio          | Avocardio            | 15 upgrades on this floor                         | 3.5%        | Between Epic Loot's 40 at 1.2% and Hammer Time's 9 at 4%            |
+| butterBelieveIt    | Butter Believe It    | 18 instant payouts on this floor                  | 2.4%        | Between Sapphire's 18 at 2.5% and Mega Chonk's 22 at 2.2%           |
+| cheesePullChampion | Cheese Pull Champion | 6 upgrades and 6 payouts on this floor            | 2.2%        | Smaller than Donut Disturb's 5 and 5 at 5%, but slightly rarer      |
+| grillSergeant      | Grill Sergeant       | 20 free upgrades on every unlocked floor          | 1.3%        | Between I Am the Night's 27 at 1.4% and Queen of Queens' 28         |
+| noodleNap          | Noodle Nap           | 22 payouts on alternating floors, from the ground | 1.5%        | Between Pasta La Vista's 16 at 1.7% and Tap That Asset's 17 at 1.6% |
+| picklePredicament  | Pickle Predicament   | 8 upgrades on the lowest-level floor              | 3.2%        | Between Treasure Measure's 10 at 3.2% and Little Sister's 7 at 3.8% |
+| golem              | Golem                | 35 free upgrades on the highest floor             | 1.15%       | Between Big Daddy's 45 at 1.1% and Epic Loot's 40 at 1.2%           |
+
 All targets are within the current building and exclude locked floors. The base
 tier's free upgrades occur before the special reward and its target selection.
 Payouts mean current income cycles, not seconds or banked cash, and leave timer
@@ -146,21 +159,24 @@ and so on. Space and Time, Mime Your Business, Pocket Dimension, Shuffle the
 Funds, Bready or Not and The Great Pancake Stack cover indices 0 through the
 triggering floor inclusive.
 
+Noodle Nap uses the same alternating-floor selection, while Grill Sergeant
+upgrades every unlocked floor and Golem targets the highest unlocked floor.
+
 Promotions cap at ultra; Arcane Surge, I Didn't Ask For This, Not Prepared,
 The Big Cheese, Wishful Banking, The Great Catsby, Prehistoric, Egg-cellent Work
 and Why So Serious still grant their free upgrades on an already-ultra floor. On
 a one-floor building every target resolves to that floor. Repeated procs stay
 additive and no new timed state exists.
 
-All 81 are floor-only, not map-specific: their generated test buttons appear for
+All 88 are floor-only, not map-specific: their generated test buttons appear for
 Upgrade click and Floor unlock and stay hidden for Map unlock.
 
 ### Processing and verification (character art)
 
-All 81 raw JFIF sources are preserved. The "big personalities", "impossible
-good luck", "movie references", "dance floor profits" and "comfort food" files
-arrived with spaces or dashes in their names and were renamed to camelCase to
-match the `IMAGE_FILES` key convention before processing.
+The earlier 81 raw JFIF sources are preserved. The seven new PNG/JPG sources
+arrived with spaces or title-case names and were renamed to lower camelCase to
+match the `IMAGE_FILES` key convention before processing. Their wrappers use an
+explicit source path so generated icons do not overwrite raw inputs.
 Sampled border whiteness ran 240-255 on most images; `whiteRabbit`, `megaChonk`,
 `nowIAmSuspicious`, `bubbleEconomy`, `cloudNineToFive`, `overTheRainbow`,
 `breadyOrNot`, `holyGuacamole`, `tacoBoutIt` and `wokAndRoll` dip lower because
@@ -171,7 +187,7 @@ blindfold, white faces and bellies, visor glass, shirt collars, red/blue pills,
 the mime's glass safe, a translucent soap bubble, a white cloud, the washing
 machine drum, the magnet poles, a cracked eggshell, coffee mugs, receipts, a
 white dinner jacket, a cardboard robot suit, a chef's hat and coat) is closed by
-a dark outline, so 78 of the 81 used the existing near-white border-fill
+a dark outline, so 78 of the 81 earlier sources used the existing near-white border-fill
 processor with no seeds or threshold changes.
 
 `tangoTender`, `pastaLaVista` and `whySoSerious` are the exceptions and go
@@ -204,8 +220,8 @@ crop bounds, and that `tangoTender` no longer carries its sticker halo. Outputs
 all fit within 250x250 as indexed-palette PNGs with alpha at 13.7-31.9 KB, and
 every root/shipped pair is byte-identical.
 
-Validation: `node scripts/test-featured-crits.mjs` passed all 137 featured
-rewards (including these 81) and `npm run build` passed. Browser behaviour for
+Validation: `node scripts/test-featured-crits.mjs` passed all 144 featured
+rewards (including these 88) and `npm run build` passed. Browser behaviour for
 this batch was not verified in-game.
 
 ## Implemented asset batch: 2026-09-17

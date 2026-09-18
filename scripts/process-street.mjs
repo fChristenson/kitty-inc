@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import { resolveThemeDirs } from "./lib/theme-dirs.mjs";
 
 // raw street art (e.g. street2.png, street.jfif, ...) dropped into a theme's own
-// src/assets/themes/<theme>/ folder (AI-generated) is a flat, orthographic
+// src/assets/<theme>/ folder (AI-generated) is a flat, orthographic
 // (no-perspective) road/sidewalk strip with one centered streetlight, on a plain
 // white margin above and below. This just needs its white margins trimmed off —
 // no chroma-keying, the road band itself is meant to be fully opaque. sharp's
@@ -38,7 +38,7 @@ const THEME_ROLL_PX = {
 
 const assets = path.resolve(import.meta.dirname, "..", "src", "assets");
 const { theme, themeDir, distDir } = resolveThemeDirs(assets);
-const outDir = path.join(distDir, "ground");
+const outDir = distDir;
 const dest = path.join(outDir, "street.png");
 
 const srcFile = (await fs.readdir(themeDir, { withFileTypes: true }))

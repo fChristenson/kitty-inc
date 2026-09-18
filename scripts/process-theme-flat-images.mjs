@@ -6,7 +6,7 @@ import { resolveThemeDirs } from "./lib/theme-dirs.mjs";
 // some raw theme art needs no chroma-key/trim/crop at all — it's already meant to
 // be a full-bleed, edge-to-edge backdrop (city skyline, wall material tile, city
 // map background, ...). This just converts whichever of those raw files exist in
-// a theme's own src/assets/themes/<theme>/ folder straight to PNG in that same
+// a theme's own src/assets/<theme>/ folder straight to PNG in that same
 // theme's own dist/ root, under the standardized name loadAssets.ts's IMAGE_FILES
 // map expects. Pass --theme=<name> to process a theme other than the default
 // "references"; never overwrites the raw source files. Safe to re-run any time.

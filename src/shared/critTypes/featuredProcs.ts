@@ -824,6 +824,48 @@ export const FEATURED_CRIT_INFO = {
     icon: "whySoSerious",
     description: "Two tier promotions and twenty upgrades here",
   },
+  avocardio: {
+    label: "Avocardio",
+    color: COLOR.bullMarketGreen,
+    icon: "avocardio",
+    description: "Fifteen free upgrades on this floor",
+  },
+  butterBelieveIt: {
+    label: "Butter Believe It",
+    color: COLOR.sunshineGold,
+    icon: "butterBelieveIt",
+    description: "Eighteen instant payouts on this floor",
+  },
+  cheesePullChampion: {
+    label: "Cheese Pull Champion",
+    color: COLOR.goldenHandshakeGold,
+    icon: "cheesePullChampion",
+    description: "Six upgrades and six payouts on this floor",
+  },
+  grillSergeant: {
+    label: "Grill Sergeant",
+    color: COLOR.red,
+    icon: "grillSergeant",
+    description: "Twenty free upgrades on every unlocked floor",
+  },
+  noodleNap: {
+    label: "Noodle Nap",
+    color: COLOR.autumnSaleAmber,
+    icon: "noodleNap",
+    description: "Twenty-two payouts on alternating floors, from the ground",
+  },
+  picklePredicament: {
+    label: "Pickle Predicament",
+    color: COLOR.dressCodeGreen,
+    icon: "picklePredicament",
+    description: "Eight free upgrades on the lowest-level floor",
+  },
+  golem: {
+    label: "Golem",
+    color: COLOR.unionBossSlate,
+    icon: "golem",
+    description: "Thirty-five free upgrades on the highest floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

@@ -1,6 +1,6 @@
 import { FLOOR_W } from "../../floors";
 import { drawCartoonText, loadImage } from "../../utils";
-import roofUrl from "../../assets/themes/references/dist/roof.png";
+const roofUrl = `${import.meta.env.BASE_URL}roof.png`;
 
 // native size of roof.png — width already matches FLOOR_W exactly, so it's drawn
 // 1:1, never rescaled horizontally

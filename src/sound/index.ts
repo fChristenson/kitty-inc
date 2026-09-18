@@ -1,12 +1,13 @@
-import themeUrl from "../assets/sound/theme.mp3";
-import coinDropUrl from "../assets/sound/coinDrop.mp3";
-import swooshUrl from "../assets/sound/swoosh.mp3";
-import soldUrl from "../assets/sound/sold.mp3";
-import bloopUrl from "../assets/sound/bloop.mp3";
-import explosionUrl from "../assets/sound/explosion.mp3";
-import winUrl from "../assets/sound/win.wav";
-import payoutUrl from "../assets/sound/payout.wav";
-import arcadeSlotWinUrl from "../assets/sound/arcadeSlotWin.wav";
+const soundUrl = (filename: string) => `${import.meta.env.BASE_URL}${filename}`;
+const themeUrl = soundUrl("theme.mp3");
+const coinDropUrl = soundUrl("coinDrop.mp3");
+const swooshUrl = soundUrl("swoosh.mp3");
+const soldUrl = soundUrl("sold.mp3");
+const bloopUrl = soundUrl("bloop.mp3");
+const explosionUrl = soundUrl("explosion.mp3");
+const winUrl = soundUrl("win.wav");
+const payoutUrl = soundUrl("payout.wav");
+const arcadeSlotWinUrl = soundUrl("arcadeSlotWin.wav");
 
 const MUSIC_VOLUME = 0.3; // 25% quieter than the original 0.4 per explicit request
 const SFX_VOLUME = 0.9;

@@ -1,13 +1,13 @@
 @font-face {
   font-family: "Fredoka";
-  src: url("./assets/fonts/static/Fredoka-Regular.ttf") format("truetype");
+  src: url("/Fredoka-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Fredoka";
-  src: url("./assets/fonts/static/Fredoka-Medium.ttf") format("truetype");
+  src: url("/Fredoka-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -15,7 +15,7 @@
 
 @font-face {
   font-family: "Fredoka";
-  src: url("./assets/fonts/static/Fredoka-SemiBold.ttf") format("truetype");
+  src: url("/Fredoka-SemiBold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -23,7 +23,7 @@
 
 @font-face {
   font-family: "Fredoka";
-  src: url("./assets/fonts/static/Fredoka-Bold.ttf") format("truetype");
+  src: url("/Fredoka-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
