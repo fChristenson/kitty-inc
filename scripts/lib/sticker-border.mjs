@@ -159,7 +159,9 @@ export async function addStickerBorder(
     const alpha = data[source + 3] / 255;
     const target = pixel * 4;
     for (let c = 0; c < 3; c++) {
-      out[target + c] = Math.round(data[source + c] * alpha + 255 * (1 - alpha));
+      out[target + c] = Math.round(
+        data[source + c] * alpha + 255 * (1 - alpha),
+      );
     }
     out[target + 3] = 255;
   }
