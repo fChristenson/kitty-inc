@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 196);
+  assert.equal(kinds.length, 210);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -393,6 +393,20 @@ try {
     emoteEconomy: [[20, 30, 10, 0], 48],
     checkpointChampion: [[20, 30, 20, 0], 0],
     fishingForFunds: [[20, 30, 10, 0], 39],
+    purrfectOrigin: [[20, 37, 10, 0], 0],
+    capeEscape: [[20, 30, 10, 0], 30],
+    thunderPaws: [[28, 38, 18, 0], 0],
+    clawAndOrder: [[20, 30, 10, 0], 18],
+    felineFury: [[20, 46, 10, 0], 0],
+    sidekickShuffle: [[27, 30, 17, 0], 0],
+    cosmicCatapult: [[20, 30, 10, 0], 54],
+    theMoonstoneKey: [[20, 36, 10, 0], 0],
+    spellbookSupreme: [[20, 42, 10, 0], 0],
+    prismPotion: [[20, 30, 10, 0], 42],
+    galaxyGumball: [[20, 30, 10, 0], 33],
+    treasureTruffle: [[20, 35, 10, 0], 15],
+    wizardsWaffle: [[30, 40, 20, 0], 0],
+    goldenFortuneCookie: [[20, 30, 19, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -469,6 +483,8 @@ try {
     if (kind === "savePointSavings" || kind === "achievementUnlocked")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "magicalPayrollGirl")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "theMoonstoneKey")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {

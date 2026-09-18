@@ -327,6 +327,20 @@ export const IMAGE_FILES = {
   emoteEconomy: "emoteEconomy.png",
   checkpointChampion: "checkpointChampion.png",
   fishingForFunds: "fishingForFunds.png",
+  purrfectOrigin: "purrfectOrigin.png",
+  capeEscape: "capeEscape.png",
+  thunderPaws: "thunderPaws.png",
+  clawAndOrder: "clawAndOrder.png",
+  felineFury: "felineFury.png",
+  sidekickShuffle: "sidekickShuffle.png",
+  cosmicCatapult: "cosmicCatapult.png",
+  theMoonstoneKey: "theMoonstoneKey.png",
+  spellbookSupreme: "spellbookSupreme.png",
+  prismPotion: "prismPotion.png",
+  galaxyGumball: "galaxyGumball.png",
+  treasureTruffle: "treasureTruffle.png",
+  wizardsWaffle: "wizardsWaffle.png",
+  goldenFortuneCookie: "goldenFortuneCookie.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

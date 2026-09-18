@@ -1178,6 +1178,90 @@ export const FEATURED_CRIT_INFO = {
     icon: "fishingForFunds",
     description: "Thirteen instant payouts on this floor",
   },
+  purrfectOrigin: {
+    label: "Purrfect Origin",
+    color: COLOR.sunshineGold,
+    icon: "purrfectOrigin",
+    description: "Seven free upgrades on this floor",
+  },
+  capeEscape: {
+    label: "Cape Escape",
+    color: COLOR.red,
+    icon: "capeEscape",
+    description: "Ten payouts from the highest-earning floor",
+  },
+  thunderPaws: {
+    label: "Thunder Paws",
+    color: COLOR.blue,
+    icon: "thunderPaws",
+    description: "Eight free upgrades on every unlocked floor",
+  },
+  clawAndOrder: {
+    label: "Claw and Order",
+    color: COLOR.cyan,
+    icon: "clawAndOrder",
+    description: "Six instant payouts on this floor",
+  },
+  felineFury: {
+    label: "Feline Fury",
+    color: COLOR.fullHouseCrimson,
+    icon: "felineFury",
+    description: "Sixteen free upgrades on this floor",
+  },
+  sidekickShuffle: {
+    label: "Sidekick Shuffle",
+    color: COLOR.peppermintPink,
+    icon: "sidekickShuffle",
+    description: "Seven upgrades on alternating floors, from the ground",
+  },
+  cosmicCatapult: {
+    label: "Cosmic Catapult",
+    color: COLOR.nightShiftIndigo,
+    icon: "cosmicCatapult",
+    description: "Nine payouts on every unlocked floor",
+  },
+  theMoonstoneKey: {
+    label: "The Moonstone Key",
+    color: COLOR.silverTicketGray,
+    icon: "theMoonstoneKey",
+    description: "One tier promotion and six upgrades here",
+  },
+  spellbookSupreme: {
+    label: "Spellbook Supreme",
+    color: COLOR.purple,
+    icon: "spellbookSupreme",
+    description: "Twelve free upgrades on this floor",
+  },
+  prismPotion: {
+    label: "Prism Potion",
+    color: COLOR.cyan,
+    icon: "prismPotion",
+    description: "Fourteen payouts from the highest-earning floor",
+  },
+  galaxyGumball: {
+    label: "Galaxy Gumball",
+    color: COLOR.springSalePink,
+    icon: "galaxyGumball",
+    description: "Eleven instant payouts on this floor",
+  },
+  treasureTruffle: {
+    label: "Treasure Truffle",
+    color: COLOR.goldenHandshakeGold,
+    icon: "treasureTruffle",
+    description: "Five upgrades and five payouts on this floor",
+  },
+  wizardsWaffle: {
+    label: "Wizard's Waffle",
+    color: COLOR.autumnSaleAmber,
+    icon: "wizardsWaffle",
+    description: "Ten free upgrades on every unlocked floor",
+  },
+  goldenFortuneCookie: {
+    label: "Golden Fortune Cookie",
+    color: COLOR.heavenlyGold,
+    icon: "goldenFortuneCookie",
+    description: "Nine free upgrades on the lowest-level floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

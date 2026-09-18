@@ -688,5 +688,45 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       ),
     fishingForFunds: (context) =>
       actions.payCycles([context.floor], balance.fishingForFundsPayouts),
+    purrfectOrigin: (context) =>
+      actions.upgrade([context.floor], balance.purrfectOriginUpgrades),
+    capeEscape: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.capeEscapePayouts,
+      ),
+    thunderPaws: (context) =>
+      actions.upgrade(context.floors, balance.thunderPawsUpgrades),
+    clawAndOrder: (context) =>
+      actions.payCycles([context.floor], balance.clawAndOrderPayouts),
+    felineFury: (context) =>
+      actions.upgrade([context.floor], balance.felineFuryUpgrades),
+    sidekickShuffle: (context) =>
+      actions.upgrade(alternating(context), balance.sidekickShuffleUpgrades),
+    cosmicCatapult: (context) =>
+      actions.payCycles(context.floors, balance.cosmicCatapultPayouts),
+    theMoonstoneKey: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.theMoonstoneKeyTierSteps,
+        balance.theMoonstoneKeyUpgrades,
+      ),
+    spellbookSupreme: (context) =>
+      actions.upgrade([context.floor], balance.spellbookSupremeUpgrades),
+    prismPotion: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.prismPotionPayouts,
+      ),
+    galaxyGumball: (context) =>
+      actions.payCycles([context.floor], balance.galaxyGumballPayouts),
+    treasureTruffle: (context) => {
+      actions.upgrade([context.floor], balance.treasureTruffleUpgrades);
+      actions.payCycles([context.floor], balance.treasureTrufflePayouts);
+    },
+    wizardsWaffle: (context) =>
+      actions.upgrade(context.floors, balance.wizardsWaffleUpgrades),
+    goldenFortuneCookie: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.goldenFortuneCookieUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
