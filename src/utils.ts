@@ -544,7 +544,15 @@ export function drawPillBorder(
     canvas.width = Math.ceil(w);
     canvas.height = Math.ceil(h);
     const cacheCtx = canvas.getContext("2d")!;
-    const inset = renderPillBorderRings(cacheCtx, 0, 0, w, h, radius, fillColor);
+    const inset = renderPillBorderRings(
+      cacheCtx,
+      0,
+      0,
+      w,
+      h,
+      radius,
+      fillColor,
+    );
     entry = { canvas, inset };
     pillBorderCache.set(key, entry);
   }
