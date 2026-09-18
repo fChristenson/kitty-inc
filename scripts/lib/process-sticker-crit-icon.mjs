@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import path from "node:path";
 import { keepLargestOpaqueComponent } from "./keep-largest-component.mjs";
+import { writeCritSticker } from "./sticker-border.mjs";
 
 // Variant of process-crit-icon.mjs for "sticker" sources: art that ships with a
 // thick white ring around the subject, fenced off from the real background by
@@ -114,5 +115,6 @@ export async function processStickerCritIcon(
     .resize(250, 250, { fit: "inside", withoutEnlargement: true })
     .png({ compressionLevel: 9, palette: true })
     .toFile(destination);
+  await writeCritSticker(name);
   console.log(`Processed and copied ${name}.png`);
 }

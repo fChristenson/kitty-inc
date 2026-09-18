@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import path from "node:path";
 import { dropSmallOpaqueComponents } from "./drop-small-components.mjs";
+import { writeCritSticker } from "./sticker-border.mjs";
 
 export async function processCritIcon(
   name,
@@ -105,5 +106,6 @@ export async function processCritIcon(
     .resize(250, 250, { fit: "inside", withoutEnlargement: true })
     .png({ compressionLevel: 9, palette: true })
     .toFile(destination);
+  await writeCritSticker(name);
   console.log(`Processed and copied ${name}.png`);
 }

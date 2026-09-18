@@ -2,7 +2,10 @@ import { loadImage } from "../utils";
 
 const PUBLIC_ASSET_BASE = import.meta.env.BASE_URL;
 const themeAssetUrl = (filename: string) => `${PUBLIC_ASSET_BASE}${filename}`;
-const critAssetUrl = (filename: string) => `${PUBLIC_ASSET_BASE}${filename}`;
+// crit backdrop icons ship as the white-bordered "sticker" cut of the same
+// artwork, generated into public/stickers/ by scripts/add-sticker-borders.mjs
+const critAssetUrl = (filename: string) =>
+  `${PUBLIC_ASSET_BASE}stickers/${filename}`;
 const sharedThemeImages = new Set([
   "city.png",
   "mapBg.png",
