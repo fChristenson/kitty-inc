@@ -1124,6 +1124,60 @@ export const FEATURED_CRIT_INFO = {
     icon: "oneMoreRound",
     description: "Eight upgrades and eight payouts on this floor",
   },
+  couchCoOpCapital: {
+    label: "Couch Co-Op Capital",
+    color: COLOR.blue,
+    icon: "couchCoOpCapital",
+    description: "Nine free upgrades on every unlocked floor",
+  },
+  hardCarry: {
+    label: "Hard Carry",
+    color: COLOR.orange,
+    icon: "hardCarry",
+    description: "Fourteen free upgrades on the highest floor",
+  },
+  readyCheck: {
+    label: "Ready Check",
+    color: COLOR.moneyGreen,
+    icon: "readyCheck",
+    description: "Six free upgrades on every unlocked floor",
+  },
+  queueRoyalty: {
+    label: "Queue Royalty",
+    color: COLOR.heavenlyGold,
+    icon: "queueRoyalty",
+    description: "Twelve instant payouts on this floor",
+  },
+  rankedAndBanked: {
+    label: "Ranked and Banked",
+    color: COLOR.gold,
+    icon: "rankedAndBanked",
+    description: "Eleven free upgrades on this floor",
+  },
+  victoryPose: {
+    label: "Victory Pose",
+    color: COLOR.starYellow,
+    icon: "victoryPose",
+    description: "Eighteen free upgrades on this floor",
+  },
+  emoteEconomy: {
+    label: "Emote Economy",
+    color: COLOR.peppermintPink,
+    icon: "emoteEconomy",
+    description: "Eight payouts on every unlocked floor",
+  },
+  checkpointChampion: {
+    label: "Checkpoint Champion",
+    color: COLOR.cyan,
+    icon: "checkpointChampion",
+    description: "Ten free upgrades on the highest floor",
+  },
+  fishingForFunds: {
+    label: "Fishing for Funds",
+    color: COLOR.moneyGreen,
+    icon: "fishingForFunds",
+    description: "Thirteen instant payouts on this floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

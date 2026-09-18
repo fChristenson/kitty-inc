@@ -667,5 +667,23 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.upgrade([context.floor], balance.oneMoreRoundUpgrades);
       actions.payCycles([context.floor], balance.oneMoreRoundPayouts);
     },
+    couchCoOpCapital: (context) =>
+      actions.upgrade(context.floors, balance.couchCoOpCapitalUpgrades),
+    hardCarry: (context) =>
+      actions.upgrade([highestFloor(context)], balance.hardCarryUpgrades),
+    readyCheck: (context) =>
+      actions.upgrade(context.floors, balance.readyCheckUpgrades),
+    queueRoyalty: (context) =>
+      actions.payCycles([context.floor], balance.queueRoyaltyPayouts),
+    rankedAndBanked: (context) =>
+      actions.upgrade([context.floor], balance.rankedAndBankedUpgrades),
+    victoryPose: (context) =>
+      actions.upgrade([context.floor], balance.victoryPoseUpgrades),
+    emoteEconomy: (context) =>
+      actions.payCycles(context.floors, balance.emoteEconomyPayouts),
+    checkpointChampion: (context) =>
+      actions.upgrade([highestFloor(context)], balance.checkpointChampionUpgrades),
+    fishingForFunds: (context) =>
+      actions.payCycles([context.floor], balance.fishingForFundsPayouts),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

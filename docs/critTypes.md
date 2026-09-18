@@ -1,5 +1,26 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-18 (gaming culture)
+
+Nine new gaming-culture featured crits support upgrade clicks and floor unlocks
+through the shared `applyFloorCrit` path. Rewards are immediate, existing crit
+balance is unchanged, and proc chances apply only after a tier and the special
+gateway land, before the shared proc cap; they are not per-click odds.
+
+| Image              | Crit                 | Immediate reward                                      | Proc chance | Comparison                                                  |
+| ------------------ | -------------------- | ----------------------------------------------------- | ----------- | ----------------------------------------------------------- |
+| couchCoOpCapital   | Couch Co-Op Capital  | 9 upgrades on every unlocked floor                    | 1.7%        | Building-wide reward below Mecha Middle Management's 12 at 1.6% |
+| hardCarry          | Hard Carry           | 14 upgrades on the highest unlocked floor             | 1.9%        | Below Space Race's 20 at 2%; targets the top floor          |
+| readyCheck         | Ready Check          | 6 upgrades on every unlocked floor                    | 1.3%        | Smaller building-wide reward than Gummy Bear Market's 10 at 1.5% |
+| queueRoyalty       | Queue Royalty        | 12 payouts on this floor                              | 2.3%        | Same single-floor count as Ruby at 3%, with a rarer proc    |
+| rankedAndBanked    | Ranked and Banked    | 11 upgrades on this floor                             | 2%          | Smaller than It Compiles!'s 15 at 2.4%                      |
+| victoryPose        | Victory Pose         | 18 upgrades on this floor                             | 1.6%        | Same count as Jawbreaker at 2.8%, with rarer odds           |
+| emoteEconomy       | Emote Economy        | 8 payouts on every unlocked floor                     | 2.7%        | Building-wide payout below Speedrun Payroll's 15 at 1.4%  |
+| checkpointChampion | Checkpoint Champion  | 10 upgrades on the highest unlocked floor             | 1.5%        | Below Patch Notes Payday's 11 at 2.1% on the same target   |
+| fishingForFunds    | Fishing for Funds    | 13 instant payouts on this floor                      | 2.5%        | Between Lag Compensation's 9 at 2.6% and Loot Goblin's 16 at 2.2% |
+
+The full featured-crit regression now covers 196 entries.
+
 ## Implemented asset batch: 2026-09-18 (nerd culture, continued)
 
 Eight more nerd-culture featured crits support upgrade clicks and floor unlocks

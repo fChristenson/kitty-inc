@@ -318,6 +318,15 @@ export const IMAGE_FILES = {
   mintCondition: "mintCondition.png",
   stackOverflowing: "stackOverflowing.png",
   oneMoreRound: "oneMoreRound.png",
+  couchCoOpCapital: "couchCoOpCapital.png",
+  hardCarry: "hardCarry.png",
+  readyCheck: "readyCheck.png",
+  queueRoyalty: "queueRoyalty.png",
+  rankedAndBanked: "rankedAndBanked.png",
+  victoryPose: "victoryPose.png",
+  emoteEconomy: "emoteEconomy.png",
+  checkpointChampion: "checkpointChampion.png",
+  fishingForFunds: "fishingForFunds.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

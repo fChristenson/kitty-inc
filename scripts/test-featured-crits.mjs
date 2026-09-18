@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 187);
+  assert.equal(kinds.length, 196);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -384,6 +384,15 @@ try {
     mintCondition: [[20, 30, 10, 0], 54],
     stackOverflowing: [[20, 30, 19, 0], 0],
     oneMoreRound: [[20, 38, 10, 0], 24],
+    couchCoOpCapital: [[29, 39, 19, 0], 0],
+    hardCarry: [[20, 30, 24, 0], 0],
+    readyCheck: [[26, 36, 16, 0], 0],
+    queueRoyalty: [[20, 30, 10, 0], 36],
+    rankedAndBanked: [[20, 41, 10, 0], 0],
+    victoryPose: [[20, 48, 10, 0], 0],
+    emoteEconomy: [[20, 30, 10, 0], 48],
+    checkpointChampion: [[20, 30, 20, 0], 0],
+    fishingForFunds: [[20, 30, 10, 0], 39],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
