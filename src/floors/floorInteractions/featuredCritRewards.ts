@@ -659,7 +659,10 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.mintConditionPayouts,
       ),
     stackOverflowing: (context) =>
-      actions.upgrade([highestFloor(context)], balance.stackOverflowingUpgrades),
+      actions.upgrade(
+        [highestFloor(context)],
+        balance.stackOverflowingUpgrades,
+      ),
     oneMoreRound: (context) => {
       actions.upgrade([context.floor], balance.oneMoreRoundUpgrades);
       actions.payCycles([context.floor], balance.oneMoreRoundPayouts);
