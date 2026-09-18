@@ -578,5 +578,24 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.payCycles(context.floors, balance.sherbetSherpaPayouts),
     toffeeTrap: (context) =>
       actions.upgrade([context.floor], balance.toffeeTrapUpgrades),
+    cottonCandyCloud: (context) =>
+      actions.payCycles([context.floor], balance.cottonCandyCloudPayouts),
+    fudgeIt: (context) =>
+      actions.upgrade([context.floor], balance.fudgeItUpgrades),
+    gobstopperGetaway: (context) =>
+      actions.upgrade(
+        [highestFloor(context)],
+        balance.gobstopperGetawayUpgrades,
+      ),
+    jellyBeanJamboree: (context) =>
+      actions.payCycles(alternating(context), balance.jellyBeanJamboreePayouts),
+    rockCandyQuarry: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.rockCandyQuarryTierSteps,
+        balance.rockCandyQuarryUpgrades,
+      ),
+    sprinkleStorm: (context) =>
+      actions.upgrade(context.floors, balance.sprinkleStormUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

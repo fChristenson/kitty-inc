@@ -2,29 +2,35 @@
 
 ## Implemented asset batch: 2026-09-18 (sweet tooth)
 
-Eleven new sweet-themed featured crits support upgrade clicks and floor unlocks
+Seventeen sweet-themed featured crits support upgrade clicks and floor unlocks
 through the shared `applyFloorCrit` path. Rewards are immediate, existing crit
 balance is unchanged, and these proc chances apply only after a tier and the
 special gateway land, before the shared proc cap; they are not per-click odds.
 
-| Image                    | Crit                        | Immediate reward                                  | Proc chance | Comparison                                                    |
-| ------------------------ | --------------------------- | ------------------------------------------------- | ----------- | ------------------------------------------------------------- |
-| chocolateFountainOfYouth | Chocolate Fountain of Youth | 20 payouts on this floor                          | 2%          | Below Diamond's 24 payouts at 2%; targets the current floor   |
-| gummyBearMarket          | Gummy Bear Market           | 10 upgrades on every unlocked floor               | 1.5%        | Below Dim Sum Dynasty's 15 at 1.6%; same building-wide scope  |
-| jawbreaker               | Jawbreaker                  | 18 upgrades on this floor                         | 2.8%        | Between Ninja Bonus's 12 at 2.5% and Space Race's 20 at 2%    |
-| licoriceLaces            | Licorice Laces              | 9 upgrades on the lowest-level floor              | 2.4%        | Above Roundup Rodeo's 8 at 3.5%; targets the weakest floor    |
-| lollipopGuild            | Lollipop Guild              | 12 payouts on alternating floors, from the ground | 1.8%        | Above Sundae Best's 10 at 2.5%; narrower alternating scope    |
-| marshmallowMountain      | Marshmallow Mountain        | 8 upgrades on the highest unlocked floor          | 2.6%        | Below Space Race's 20 at 2%; targets the top floor            |
-| sugarHigh                | Sugar High                  | 5 upgrades and 5 payouts on every unlocked floor  | 1.2%        | Smaller mixed building-wide reward than Clowning Around at 3% |
-| bubblegumBalloon         | Bubblegum Balloon           | 15 payouts on this floor                          | 3%          | Between Diamond's 24 at 2% and Emerald's 9 at 4%              |
-| candyCaneClimber         | Candy Cane Climber          | 12 upgrades on the highest unlocked floor         | 2.2%        | Below Space Race's 20; above Marshmallow Mountain's 8         |
-| sherbetSherpa            | Sherbet Sherpa              | 8 payouts on every unlocked floor                 | 1.6%        | Below Yes Chef's 8 at 2.5% with a rarer matching payout       |
-| toffeeTrap               | Toffee Trap                 | 7 upgrades on this floor                          | 2.7%        | Below Ninja Bonus's 12 at 2.5%; smaller single-floor reward   |
+| Image                    | Crit                        | Immediate reward                                  | Proc chance | Comparison                                                      |
+| ------------------------ | --------------------------- | ------------------------------------------------- | ----------- | --------------------------------------------------------------- |
+| chocolateFountainOfYouth | Chocolate Fountain of Youth | 20 payouts on this floor                          | 2%          | Below Diamond's 24 payouts at 2%; targets the current floor     |
+| gummyBearMarket          | Gummy Bear Market           | 10 upgrades on every unlocked floor               | 1.5%        | Below Dim Sum Dynasty's 15 at 1.6%; same building-wide scope    |
+| jawbreaker               | Jawbreaker                  | 18 upgrades on this floor                         | 2.8%        | Between Ninja Bonus's 12 at 2.5% and Space Race's 20 at 2%      |
+| licoriceLaces            | Licorice Laces              | 9 upgrades on the lowest-level floor              | 2.4%        | Above Roundup Rodeo's 8 at 3.5%; targets the weakest floor      |
+| lollipopGuild            | Lollipop Guild              | 12 payouts on alternating floors, from the ground | 1.8%        | Above Sundae Best's 10 at 2.5%; narrower alternating scope      |
+| marshmallowMountain      | Marshmallow Mountain        | 8 upgrades on the highest unlocked floor          | 2.6%        | Below Space Race's 20 at 2%; targets the top floor              |
+| sugarHigh                | Sugar High                  | 5 upgrades and 5 payouts on every unlocked floor  | 1.2%        | Smaller mixed building-wide reward than Clowning Around at 3%   |
+| bubblegumBalloon         | Bubblegum Balloon           | 15 payouts on this floor                          | 3%          | Between Diamond's 24 at 2% and Emerald's 9 at 4%                |
+| candyCaneClimber         | Candy Cane Climber          | 12 upgrades on the highest unlocked floor         | 2.2%        | Below Space Race's 20; above Marshmallow Mountain's 8           |
+| sherbetSherpa            | Sherbet Sherpa              | 8 payouts on every unlocked floor                 | 1.6%        | Below Yes Chef's 8 at 2.5% with a rarer matching payout         |
+| toffeeTrap               | Toffee Trap                 | 7 upgrades on this floor                          | 2.7%        | Below Ninja Bonus's 12 at 2.5%; smaller single-floor reward     |
+| cottonCandyCloud         | Cotton Candy Cloud          | 11 payouts on this floor                          | 2.4%        | Narrower single-floor payout than Diamond's 24 at 2%            |
+| fudgeIt                  | Fudge It                    | 14 upgrades on this floor                         | 2.1%        | Same count as Bullet Dodger at 2.2%, but targets this floor     |
+| gobstopperGetaway        | Gobstopper Getaway          | 13 upgrades on the highest unlocked floor         | 1.8%        | Below Space Race's 20 at 2%; targets the top floor              |
+| jellyBeanJamboree        | Jelly Bean Jamboree         | 10 payouts on alternating floors, from the ground | 2.6%        | Same pattern as Lollipop Guild's 12 at 1.8%, with fewer payouts |
+| rockCandyQuarry          | Rock Candy Quarry           | 1 tier promotion and 7 upgrades on this floor     | 1.4%        | Same promotion shape as Blessed, with a larger upgrade batch    |
+| sprinkleStorm            | Sprinkle Storm              | 6 upgrades on every unlocked floor                | 3%          | Building-wide, smaller than Gummy Bear Market's 10 at 1.5%      |
 
 Processing: raw PNG and JFIF files were renamed to camelCase, processed with the shared
 near-white-background icon processor, capped at 250x250, palette-quantized,
 and written to `public/`. Verified with `node scripts/test-featured-crits.mjs`
-and `npm run build`; the suite now covers 160 featured crits.
+and `npm run build`; the suite now covers 166 featured crits.
 
 ## Implemented asset batch: 2026-09-17 (character art)
 

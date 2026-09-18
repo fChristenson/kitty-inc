@@ -962,6 +962,42 @@ export const FEATURED_CRIT_INFO = {
     icon: "toffeeTrap",
     description: "Seven free upgrades on this floor",
   },
+  cottonCandyCloud: {
+    label: "Cotton Candy Cloud",
+    color: COLOR.peppermintPink,
+    icon: "cottonCandyCloud",
+    description: "Eleven instant payouts on this floor",
+  },
+  fudgeIt: {
+    label: "Fudge It",
+    color: COLOR.autumnSaleAmber,
+    icon: "fudgeIt",
+    description: "Fourteen free upgrades on this floor",
+  },
+  gobstopperGetaway: {
+    label: "Gobstopper Getaway",
+    color: COLOR.orange,
+    icon: "gobstopperGetaway",
+    description: "Thirteen free upgrades on the highest floor",
+  },
+  jellyBeanJamboree: {
+    label: "Jelly Bean Jamboree",
+    color: COLOR.springSalePink,
+    icon: "jellyBeanJamboree",
+    description: "Ten payouts on alternating floors, from the ground",
+  },
+  rockCandyQuarry: {
+    label: "Rock Candy Quarry",
+    color: COLOR.cyan,
+    icon: "rockCandyQuarry",
+    description: "One tier promotion and seven upgrades here",
+  },
+  sprinkleStorm: {
+    label: "Sprinkle Storm",
+    color: COLOR.blue,
+    icon: "sprinkleStorm",
+    description: "Six free upgrades on every unlocked floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

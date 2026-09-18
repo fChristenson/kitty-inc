@@ -4,43 +4,6 @@
 
 "Flat vector cartoon of [SUBJECT], bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
 
-## Sweet tooth
-
-### Nougat Nap
-```text
-Flat vector cartoon of a cat sleeping soundly inside a split candy bar as though the nougat were a mattress, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
-```
-
-### Jelly Bean Jamboree
-```text
-Flat vector cartoon of a cat diving head first into an enormous jar of jelly beans, tail still sticking out, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
-```
-
-### Rock Candy Quarry
-```text
-Flat vector cartoon of a hard-hatted cat chipping chunky crystals off a rock-candy boulder, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
-```
-
-### Fudge It
-```text
-Flat vector cartoon of a cat slicing a thick slab of fudge with an oversized knife, one square already missing, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
-```
-
-### Cotton Candy Cloud
-```text
-Flat vector cartoon of a cat lounging on a pink cotton-candy cloud, tugging off one tuft to eat, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
-```
-
-### Sprinkle Storm
-```text
-Flat vector cartoon of a delighted cat sheltering under a tiny umbrella in a downpour of rainbow sprinkles, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
-```
-
-### Gobstopper Getaway
-```text
-Flat vector cartoon of a cat sprinting ahead of a giant gobstopper rolling downhill behind it, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
-```
-
 ## Nerd culture
 
 ### Roll for Revenue

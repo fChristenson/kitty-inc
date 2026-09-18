@@ -291,6 +291,12 @@ export const IMAGE_FILES = {
   candyCaneClimber: "candyCaneClimber.png",
   sherbetSherpa: "sherbetSherpa.png",
   toffeeTrap: "toffeeTrap.png",
+  cottonCandyCloud: "cottonCandyCloud.png",
+  fudgeIt: "fudgeIt.png",
+  gobstopperGetaway: "gobstopperGetaway.png",
+  jellyBeanJamboree: "jellyBeanJamboree.png",
+  rockCandyQuarry: "rockCandyQuarry.png",
+  sprinkleStorm: "sprinkleStorm.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 
