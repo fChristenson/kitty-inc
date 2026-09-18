@@ -297,6 +297,18 @@ export const IMAGE_FILES = {
   jellyBeanJamboree: "jellyBeanJamboree.png",
   rockCandyQuarry: "rockCandyQuarry.png",
   sprinkleStorm: "sprinkleStorm.png",
+  dungeonAccountant: "dungeonAccountant.png",
+  lootGoblin: "lootGoblin.png",
+  inventoryFull: "inventoryFull.png",
+  sideQuestSalary: "sideQuestSalary.png",
+  minMaxManager: "minMaxManager.png",
+  criticalKnit: "criticalKnit.png",
+  savePointSavings: "savePointSavings.png",
+  achievementUnlocked: "achievementUnlocked.png",
+  newGamePlus: "newGamePlus.png",
+  speedrunPayroll: "speedrunPayroll.png",
+  lagCompensation: "lagCompensation.png",
+  patchNotesPayday: "patchNotesPayday.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

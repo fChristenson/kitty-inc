@@ -998,6 +998,78 @@ export const FEATURED_CRIT_INFO = {
     icon: "sprinkleStorm",
     description: "Six free upgrades on every unlocked floor",
   },
+  dungeonAccountant: {
+    label: "Dungeon Accountant",
+    color: COLOR.nightShiftIndigo,
+    icon: "dungeonAccountant",
+    description: "Nine free upgrades on this floor",
+  },
+  lootGoblin: {
+    label: "Loot Goblin",
+    color: COLOR.bullMarketGreen,
+    icon: "lootGoblin",
+    description: "Sixteen instant payouts on this floor",
+  },
+  inventoryFull: {
+    label: "Inventory Full",
+    color: COLOR.gold,
+    icon: "inventoryFull",
+    description: "Twelve free upgrades on this floor",
+  },
+  sideQuestSalary: {
+    label: "Side Quest Salary",
+    color: COLOR.heavenlyGold,
+    icon: "sideQuestSalary",
+    description: "Seven payouts from the highest-earning floor",
+  },
+  minMaxManager: {
+    label: "Min-Max Manager",
+    color: COLOR.cyan,
+    icon: "minMaxManager",
+    description: "Ten free upgrades on the lowest-level floor",
+  },
+  criticalKnit: {
+    label: "Critical Knit",
+    color: COLOR.peppermintPink,
+    icon: "criticalKnit",
+    description: "Six payouts on alternating floors, from the ground",
+  },
+  savePointSavings: {
+    label: "Save Point Savings",
+    color: COLOR.blue,
+    icon: "savePointSavings",
+    description: "One tier promotion and five upgrades here",
+  },
+  achievementUnlocked: {
+    label: "Achievement Unlocked",
+    color: COLOR.starYellow,
+    icon: "achievementUnlocked",
+    description: "One tier promotion and eight upgrades here",
+  },
+  newGamePlus: {
+    label: "New Game Plus",
+    color: COLOR.orange,
+    icon: "newGamePlus",
+    description: "Twenty free upgrades on this floor",
+  },
+  speedrunPayroll: {
+    label: "Speedrun Payroll",
+    color: COLOR.red,
+    icon: "speedrunPayroll",
+    description: "Fifteen instant payouts on every unlocked floor",
+  },
+  lagCompensation: {
+    label: "Lag Compensation",
+    color: COLOR.silverTicketGray,
+    icon: "lagCompensation",
+    description: "Nine instant payouts on this floor",
+  },
+  patchNotesPayday: {
+    label: "Patch Notes Payday",
+    color: COLOR.moneyGreen,
+    icon: "patchNotesPayday",
+    description: "Eleven free upgrades on the highest floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

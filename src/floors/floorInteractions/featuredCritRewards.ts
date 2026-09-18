@@ -597,5 +597,43 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       ),
     sprinkleStorm: (context) =>
       actions.upgrade(context.floors, balance.sprinkleStormUpgrades),
+    dungeonAccountant: (context) =>
+      actions.upgrade([context.floor], balance.dungeonAccountantUpgrades),
+    lootGoblin: (context) =>
+      actions.payCycles([context.floor], balance.lootGoblinPayouts),
+    inventoryFull: (context) =>
+      actions.upgrade([context.floor], balance.inventoryFullUpgrades),
+    sideQuestSalary: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.sideQuestSalaryPayouts,
+      ),
+    minMaxManager: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.minMaxManagerUpgrades),
+    criticalKnit: (context) =>
+      actions.payCycles(alternating(context), balance.criticalKnitPayouts),
+    savePointSavings: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.savePointSavingsTierSteps,
+        balance.savePointSavingsUpgrades,
+      ),
+    achievementUnlocked: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.achievementUnlockedTierSteps,
+        balance.achievementUnlockedUpgrades,
+      ),
+    newGamePlus: (context) =>
+      actions.upgrade([context.floor], balance.newGamePlusUpgrades),
+    speedrunPayroll: (context) =>
+      actions.payCycles(context.floors, balance.speedrunPayrollPayouts),
+    lagCompensation: (context) =>
+      actions.payCycles([context.floor], balance.lagCompensationPayouts),
+    patchNotesPayday: (context) =>
+      actions.upgrade(
+        [highestFloor(context)],
+        balance.patchNotesPaydayUpgrades,
+      ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

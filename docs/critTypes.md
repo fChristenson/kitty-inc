@@ -1,5 +1,31 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-18 (nerd culture)
+
+Twelve new nerd-culture featured crits support upgrade clicks and floor unlocks
+through the shared `applyFloorCrit` path. Rewards are immediate, existing crit
+balance is unchanged, and proc chances apply only after a tier and the special
+gateway land, before the shared proc cap; they are not per-click odds.
+
+| Image               | Crit                 | Immediate reward                                      | Proc chance | Comparison                                                   |
+| ------------------- | -------------------- | ----------------------------------------------------- | ----------- | ------------------------------------------------------------ |
+| dungeonAccountant   | Dungeon Accountant   | 9 upgrades on this floor                              | 2.8%        | Below Jawbreaker's 18 at 2.8%; a smaller single-floor reward |
+| lootGoblin          | Loot Goblin          | 16 payouts on this floor                              | 2.2%        | Between Mega Chonk's 22 at 2.2% and Ruby's 12 at 3%          |
+| inventoryFull       | Inventory Full       | 12 upgrades on this floor                             | 2%          | Same count as Ninja Bonus at 2.5%; a common single-floor hit |
+| sideQuestSalary     | Side Quest Salary    | 7 payouts from the highest-earning floor               | 3%          | Smaller than Sharpshooter's 10 at 4%; targets the top earner |
+| minMaxManager       | Min-Max Manager      | 10 upgrades on the lowest-level floor                 | 2.5%        | Between Roundup Rodeo's 8 at 3.5% and Ninja Bonus's 12 at 2.5% |
+| criticalKnit        | Critical Knit        | 6 payouts on alternating floors, from the ground      | 2.4%        | Narrower than Lollipop Guild's 12 at 1.8%; same target pattern |
+| savePointSavings    | Save Point Savings   | 1 tier promotion, then 5 upgrades on this floor       | 1.2%        | Same promotion shape as Blessed, with a smaller upgrade batch |
+| achievementUnlocked | Achievement Unlocked | 1 tier promotion, then 8 upgrades on this floor       | 0.9%        | Rarer and larger than Save Point Savings                     |
+| newGamePlus         | New Game Plus        | 20 upgrades on this floor                              | 1.8%        | Same count as Space Race at 2%, but stays on the landed floor |
+| speedrunPayroll     | Speedrun Payroll     | 15 payouts on every unlocked floor                     | 1.4%        | Building-wide payout, below Would You Kindly's 16 at 1.5%   |
+| lagCompensation     | Lag Compensation     | 9 payouts on this floor                                | 2.6%        | Smaller than Chonk's 16 at 2.8%; common single-floor reward |
+| patchNotesPayday    | Patch Notes Payday   | 11 upgrades on the highest unlocked floor              | 2.1%        | Below Space Race's 20 at 2%; targets the top floor           |
+
+Processing: raw JFIF files were renamed to camelCase, processed with the shared
+near-white-background icon processor, capped at 250x250, palette-quantized,
+and written to `public/`. The focused suite now covers 178 featured crits.
+
 ## Implemented asset batch: 2026-09-18 (sweet tooth)
 
 Seventeen sweet-themed featured crits support upgrade clicks and floor unlocks
