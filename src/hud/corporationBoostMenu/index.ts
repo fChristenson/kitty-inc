@@ -116,90 +116,207 @@ export function wireCorporationBoostMenu(
   // which crit the detail pane is currently showing, so refresh() can re-render
   // its live landed count without kicking the player back to the grid
   let openKind: CritProcKind | null = null;
-  let gridImageObserver: IntersectionObserver | null = null;
+  // the grid is built once and then only patched — with a few hundred crits,
+  // re-running innerHTML on every refresh() both stutters and throws away every
+  // already-decoded icon
+  const tiles = new Map<CritProcKind, HTMLElement>();
+  let renderedCount = 0;
+  let iconObserver: IntersectionObserver | null = null;
+  let pageObserver: IntersectionObserver | null = null;
+  const sentinel = document.createElement("div");
+  sentinel.className = "crit-info-grid__sentinel";
+  sentinel.setAttribute("aria-hidden", "true");
 
-  function renderGrid(): void {
-    gridImageObserver?.disconnect();
-    grid.innerHTML = CRIT_INFO.map(({ kind, icon, label }) => {
-      const count = getCritProcCount(kind);
-      const badge =
-        count > 0
-          ? `<span class="crit-info-tile__count-badge">${count}</span>`
-          : "";
-      return `
-        <button type="button" class="crit-info-tile" data-kind="${kind}" aria-label="${label}">
-          <img data-src="${icon}" class="crit-info-tile__icon" alt="" />
-          ${badge}
-        </button>
-      `;
-    }).join("");
-
-    const images = grid.querySelectorAll<HTMLImageElement>(
-      ".crit-info-tile__icon",
+  function badgeFor(tile: HTMLElement, count: number): void {
+    const existing = tile.querySelector<HTMLElement>(
+      ".crit-info-tile__count-badge",
     );
-    const scrollRoot = grid.parentElement;
-    if (!scrollRoot || !("IntersectionObserver" in window)) {
-      images.forEach((image) => {
-        image.src = image.dataset.src ?? "";
-      });
+    if (count <= 0) {
+      existing?.remove();
       return;
     }
-    gridImageObserver = new IntersectionObserver(
-      (entries, observer) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          const image = entry.target as HTMLImageElement;
-          image.src = image.dataset.src ?? "";
-          observer.unobserve(image);
-        });
-      },
-      { root: scrollRoot, rootMargin: "160px" },
-    );
-    images.forEach((image) => gridImageObserver?.observe(image));
+    const text = String(count);
+    if (existing) {
+      if (existing.textContent !== text) existing.textContent = text;
+      return;
+    }
+    const badge = document.createElement("span");
+    badge.className = "crit-info-tile__count-badge";
+    badge.textContent = text;
+    tile.append(badge);
+  }
+
+  // one screenful at a time; the sentinel below the last tile pulls in the next
+  // page as it scrolls into reach
+  const PAGE_SIZE = 60;
+
+  function appendPage(): void {
+    const page = CRIT_INFO.slice(renderedCount, renderedCount + PAGE_SIZE);
+    if (page.length === 0) {
+      pageObserver?.unobserve(sentinel);
+      return;
+    }
+    const fragment = document.createDocumentFragment();
+    for (const { kind, icon, label } of page) {
+      const tile = document.createElement("button");
+      tile.type = "button";
+      tile.className = "crit-info-tile";
+      tile.dataset.kind = kind;
+      tile.setAttribute("aria-label", label);
+      const image = document.createElement("img");
+      image.className = "crit-info-tile__icon";
+      image.alt = "";
+      image.dataset.src = icon;
+      tile.append(image);
+      badgeFor(tile, getCritProcCount(kind));
+      tiles.set(kind, tile);
+      fragment.append(tile);
+      if (iconObserver) iconObserver.observe(image);
+      else image.src = icon;
+    }
+    renderedCount += page.length;
+    grid.insertBefore(fragment, sentinel);
+    if (renderedCount >= CRIT_INFO.length) {
+      pageObserver?.unobserve(sentinel);
+      sentinel.remove();
+      return;
+    }
+    // re-arm: if the page that just landed still doesn't fill the scroller the
+    // sentinel stays intersecting, which on its own fires no second callback
+    pageObserver?.unobserve(sentinel);
+    pageObserver?.observe(sentinel);
+  }
+
+  function buildGrid(): void {
+    if (renderedCount > 0) return;
+    grid.append(sentinel);
+    const scrollRoot = grid.parentElement;
+    if (scrollRoot && "IntersectionObserver" in window) {
+      iconObserver = new IntersectionObserver(
+        (entries, observer) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const image = entry.target as HTMLImageElement;
+            image.src = image.dataset.src ?? "";
+            observer.unobserve(image);
+          }
+        },
+        { root: scrollRoot, rootMargin: "160px" },
+      );
+      pageObserver = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((entry) => entry.isIntersecting)) appendPage();
+        },
+        { root: scrollRoot, rootMargin: "400px" },
+      );
+      appendPage();
+      pageObserver.observe(sentinel);
+      return;
+    }
+    while (renderedCount < CRIT_INFO.length) appendPage();
+  }
+
+  function syncBadges(): void {
+    for (const [kind, tile] of tiles) badgeFor(tile, getCritProcCount(kind));
+  }
+
+  function detailStats(kind: CritProcKind): {
+    landed: string;
+    landedNone: boolean;
+    modifier: string;
+    nextLabel: string;
+    nextBoost: string;
+  } {
+    const count = getCritProcCount(kind);
+    const incomeModifier = getCritProcIncomeModifierPercent(kind, count);
+    const modifierStep = getCritProcIncomeModifierPercent(kind, 1);
+    const nextThreshold = count === 0 ? 1 : Math.floor(count / 10) * 10 + 10;
+    return {
+      landed: count > 0 ? `Collected ${count}\u00d7` : "Not yet discovered",
+      landedNone: count === 0,
+      modifier: `+${incomeModifier.toFixed(2)}%`,
+      nextLabel: `Next boost: ${nextThreshold} collected (`,
+      nextBoost: `+${modifierStep.toFixed(2)}%`,
+    };
   }
 
   function renderDetail(): void {
     const info = CRIT_INFO.find(({ kind }) => kind === openKind);
     if (!info) return;
-    const count = getCritProcCount(info.kind);
-    const incomeModifier = getCritProcIncomeModifierPercent(info.kind, count);
-    const modifierStep = getCritProcIncomeModifierPercent(info.kind, 1);
-    const nextThreshold = count === 0 ? 1 : Math.floor(count / 10) * 10 + 10;
-    const nextBoost = modifierStep;
-    const landed =
-      count > 0
-        ? `<p class="crit-info-detail__count">Collected ${count}&times;</p>`
-        : `<p class="crit-info-detail__count crit-info-detail__count--none">Not yet discovered</p>`;
-    const modifier = `<p class="crit-info-detail__modifier">Income modifier <strong>+${incomeModifier.toFixed(2)}%</strong></p>`;
-    const next = `<p class="crit-info-detail__next">Next boost: ${nextThreshold} collected (<strong>+${nextBoost.toFixed(2)}%</strong>)</p>`;
     detail.innerHTML = `
       <img src="${info.icon}" class="crit-info-detail__icon" alt="" />
       <h3 class="crit-info-detail__name">${info.label}</h3>
       <p class="crit-info-detail__description">${info.description}</p>
-      ${landed}
-      ${modifier}
-      ${next}
+      <p class="crit-info-detail__count"></p>
+      <p class="crit-info-detail__modifier">Income modifier <strong></strong></p>
+      <p class="crit-info-detail__next"><span></span><strong></strong>)</p>
     `;
+    syncDetail();
+  }
+
+  // only the live-state numbers change between refreshes — rewriting the whole
+  // card would swap out its (large) icon element and re-decode it
+  function syncDetail(): void {
+    if (!openKind) return;
+    const stats = detailStats(openKind);
+    const landed = detail.querySelector<HTMLElement>(
+      ".crit-info-detail__count",
+    );
+    if (landed) {
+      landed.textContent = stats.landed;
+      landed.classList.toggle(
+        "crit-info-detail__count--none",
+        stats.landedNone,
+      );
+    }
+    const modifier = detail.querySelector<HTMLElement>(
+      ".crit-info-detail__modifier strong",
+    );
+    if (modifier) modifier.textContent = stats.modifier;
+    const nextLabel = detail.querySelector<HTMLElement>(
+      ".crit-info-detail__next span",
+    );
+    if (nextLabel) nextLabel.textContent = stats.nextLabel;
+    const nextBoost = detail.querySelector<HTMLElement>(
+      ".crit-info-detail__next strong",
+    );
+    if (nextBoost) nextBoost.textContent = stats.nextBoost;
+  }
+
+  // the track carries the whole grid, so hint the compositor for the duration
+  // of the slide only — leaving will-change on permanently keeps a layer of
+  // several hundred tiles alive for nothing
+  let slideTimer: number | null = null;
+
+  function slide(toDetail: boolean): void {
+    slider.classList.add("crit-info-slider--sliding");
+    slider.classList.toggle("crit-info-slider--detail", toDetail);
+    if (slideTimer !== null) clearTimeout(slideTimer);
+    slideTimer = window.setTimeout(() => {
+      slider.classList.remove("crit-info-slider--sliding");
+      slideTimer = null;
+    }, 320);
   }
 
   function showDetail(kind: CritProcKind): void {
     openKind = kind;
     renderDetail();
     detail.parentElement?.scrollTo({ top: 0 });
-    slider.classList.add("crit-info-slider--detail");
+    slide(true);
     backButton.hidden = false;
     playSwoosh();
   }
 
   function showGrid(): void {
     openKind = null;
-    slider.classList.remove("crit-info-slider--detail");
+    syncBadges();
+    slide(false);
     backButton.hidden = true;
     playSwoosh();
   }
 
-  // one delegated handler instead of one per tile, so renderGrid() can replace
-  // the whole grid on every refresh without rewiring anything
+  // one delegated handler instead of one per tile, so pages can be appended to
+  // the grid without rewiring anything
   onTapOrClick(grid, (event) => {
     const tile = (event.target as HTMLElement | null)?.closest<HTMLElement>(
       ".crit-info-tile",
@@ -219,7 +336,7 @@ export function wireCorporationBoostMenu(
     panel.classList.remove("worker-menu__panel--closing");
     void panel.offsetWidth;
     showGrid();
-    renderGrid();
+    buildGrid();
     grid.parentElement?.scrollTo({ top: 0 });
     menu.hidden = false;
     ghostClickGuard.markOpened();
@@ -238,10 +355,12 @@ export function wireCorporationBoostMenu(
   });
 
   // icon/label/description are static, but each crit's own landed-count badge
-  // is live game state — re-read via getCritProcCount() on every render
+  // is live game state — re-read via getCritProcCount() on every render. Only
+  // the visible pane is worth touching, and only its numbers ever change.
   function refresh(): void {
-    renderGrid();
-    if (openKind) renderDetail();
+    if (menu.hidden) return;
+    if (openKind) syncDetail();
+    else syncBadges();
   }
 
   return { open, close, refresh };

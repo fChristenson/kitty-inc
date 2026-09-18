@@ -996,6 +996,12 @@ body {
   transition: transform 260ms ease;
 }
 
+/* only while a slide is actually running (see showDetail/showGrid) — the grid
+   pane holds hundreds of tiles, so a permanent layer promotion is expensive */
+.crit-info-slider--sliding .crit-info-slider__track {
+  will-change: transform;
+}
+
 .crit-info-slider--detail .crit-info-slider__track {
   transform: translateX(-50%);
 }
@@ -1017,6 +1023,13 @@ body {
   /* wide enough that a tile's count badge (pinned 10px outside its top-right
      corner) never reaches the neighbouring tile's own 7px ring */
   gap: 1.35rem;
+}
+
+/* pulls in the next page of tiles as it scrolls into reach (corporationBoost
+   Menu/index.ts's appendPage); spans the row so it can't take a tile's cell */
+.crit-info-grid__sentinel {
+  grid-column: 1 / -1;
+  height: 1px;
 }
 
 /* one crit's icon in the grid — same wood-outline/cream-ring cartoon language
