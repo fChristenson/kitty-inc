@@ -727,6 +727,9 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
     wizardsWaffle: (context) =>
       actions.upgrade(context.floors, balance.wizardsWaffleUpgrades),
     goldenFortuneCookie: (context) =>
-      actions.upgrade([lowestLevel(context)], balance.goldenFortuneCookieUpgrades),
+      actions.upgrade(
+        [lowestLevel(context)],
+        balance.goldenFortuneCookieUpgrades,
+      ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

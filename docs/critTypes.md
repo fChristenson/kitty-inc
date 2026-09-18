@@ -7,22 +7,22 @@ through the shared `applyFloorCrit` path. Rewards are immediate, existing crit
 balance is unchanged, and proc chances apply only after a tier and the special
 gateway land, before the shared proc cap; they are not per-click odds.
 
-| Image                | Crit                  | Immediate reward                                      | Proc chance | Comparison                                                   |
-| -------------------- | --------------------- | ----------------------------------------------------- | ----------- | ------------------------------------------------------------ |
-| purrfectOrigin       | Purrfect Origin       | 7 upgrades on this floor                              | 2.8%        | Smaller single-floor reward than Feline Fury's 16 at 1.5%  |
-| capeEscape           | Cape Escape           | 10 payouts from the highest-earning floor              | 2%          | Same target as Sharpshooter, with equal count at lower odds |
-| thunderPaws          | Thunder Paws          | 8 upgrades on every unlocked floor                    | 1.8%        | Building-wide upgrade reward below Mecha Middle Management's 12 at 1.6% |
-| clawAndOrder         | Claw and Order        | 6 instant payouts on this floor                       | 2.4%        | Smaller than Queue Royalty's 12 at 2.3%                    |
-| felineFury           | Feline Fury           | 16 free upgrades on this floor                        | 1.5%        | Same count as It Compiles! at 2.4%, but rarer              |
-| sidekickShuffle      | Sidekick Shuffle      | 7 upgrades on alternating floors, from the ground     | 2.1%        | Alternating-floor scope like Critical Knit's payouts      |
-| cosmicCatapult       | Cosmic Catapult       | 9 payouts on every unlocked floor                     | 1.4%        | Building-wide payout below Speedrun Payroll's 15 at 1.4%  |
-| theMoonstoneKey      | The Moonstone Key     | 1 tier promotion, then 6 upgrades on this floor       | 1.2%        | Similar promotion shape to Save Point Savings at 1.2%      |
-| spellbookSupreme     | Spellbook Supreme     | 12 free upgrades on this floor                        | 1.9%        | Same count as Inventory Full at 2%, with slightly rarer odds |
-| prismPotion          | Prism Potion          | 14 payouts from the highest-earning floor              | 1.7%        | Targeted payout below Mint Condition's 18 at 1.5%          |
-| galaxyGumball        | Galaxy Gumball        | 11 instant payouts on this floor                      | 2.3%        | Between Lag Compensation's 9 at 2.6% and Loot Goblin's 16 at 2.2% |
-| treasureTruffle      | Treasure Truffle      | 5 upgrades and 5 payouts on this floor                | 2.6%        | Smaller mixed reward than One More Round's 8+8 at 2%       |
-| wizardsWaffle        | Wizard's Waffle       | 10 free upgrades on every unlocked floor              | 1.6%        | Building-wide upgrade reward below Thunder Paws' 8 at 1.8% only by scope |
-| goldenFortuneCookie  | Golden Fortune Cookie | 9 upgrades on the lowest-level floor                  | 2%          | Similar low-floor target to Cache Me Outside's 8 at 2.6%  |
+| Image               | Crit                  | Immediate reward                                  | Proc chance | Comparison                                                               |
+| ------------------- | --------------------- | ------------------------------------------------- | ----------- | ------------------------------------------------------------------------ |
+| purrfectOrigin      | Purrfect Origin       | 7 upgrades on this floor                          | 2.8%        | Smaller single-floor reward than Feline Fury's 16 at 1.5%                |
+| capeEscape          | Cape Escape           | 10 payouts from the highest-earning floor         | 2%          | Same target as Sharpshooter, with equal count at lower odds              |
+| thunderPaws         | Thunder Paws          | 8 upgrades on every unlocked floor                | 1.8%        | Building-wide upgrade reward below Mecha Middle Management's 12 at 1.6%  |
+| clawAndOrder        | Claw and Order        | 6 instant payouts on this floor                   | 2.4%        | Smaller than Queue Royalty's 12 at 2.3%                                  |
+| felineFury          | Feline Fury           | 16 free upgrades on this floor                    | 1.5%        | Same count as It Compiles! at 2.4%, but rarer                            |
+| sidekickShuffle     | Sidekick Shuffle      | 7 upgrades on alternating floors, from the ground | 2.1%        | Alternating-floor scope like Critical Knit's payouts                     |
+| cosmicCatapult      | Cosmic Catapult       | 9 payouts on every unlocked floor                 | 1.4%        | Building-wide payout below Speedrun Payroll's 15 at 1.4%                 |
+| theMoonstoneKey     | The Moonstone Key     | 1 tier promotion, then 6 upgrades on this floor   | 1.2%        | Similar promotion shape to Save Point Savings at 1.2%                    |
+| spellbookSupreme    | Spellbook Supreme     | 12 free upgrades on this floor                    | 1.9%        | Same count as Inventory Full at 2%, with slightly rarer odds             |
+| prismPotion         | Prism Potion          | 14 payouts from the highest-earning floor         | 1.7%        | Targeted payout below Mint Condition's 18 at 1.5%                        |
+| galaxyGumball       | Galaxy Gumball        | 11 instant payouts on this floor                  | 2.3%        | Between Lag Compensation's 9 at 2.6% and Loot Goblin's 16 at 2.2%        |
+| treasureTruffle     | Treasure Truffle      | 5 upgrades and 5 payouts on this floor            | 2.6%        | Smaller mixed reward than One More Round's 8+8 at 2%                     |
+| wizardsWaffle       | Wizard's Waffle       | 10 free upgrades on every unlocked floor          | 1.6%        | Building-wide upgrade reward below Thunder Paws' 8 at 1.8% only by scope |
+| goldenFortuneCookie | Golden Fortune Cookie | 9 upgrades on the lowest-level floor              | 2%          | Similar low-floor target to Cache Me Outside's 8 at 2.6%                 |
 
 The full featured-crit regression now covers 210 entries.
 
