@@ -1,5 +1,26 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-18 (nerd culture, continued)
+
+Eight more nerd-culture featured crits support upgrade clicks and floor unlocks
+through the shared `applyFloorCrit` path. Rewards are immediate, existing crit
+balance is unchanged, and proc chances apply only after a tier and the special
+gateway land, before the shared proc cap; they are not per-click odds.
+
+| Image                  | Crit                    | Immediate reward                                      | Proc chance | Comparison                                                   |
+| ---------------------- | ----------------------- | ----------------------------------------------------- | ----------- | ------------------------------------------------------------ |
+| biggerOnTheInside      | Bigger on the Inside    | 10 payouts on every unlocked floor                    | 1.8%        | Building-wide payout below Speedrun Payroll's 15 at 1.4%    |
+| cacheMeOutside         | Cache Me Outside       | 8 upgrades on the lowest-level floor                  | 2.6%        | Between Min-Max Manager's 10 at 2.5% and Roundup Rodeo's 8 at 3.5% |
+| itCompiles              | It Compiles!            | 15 upgrades on this floor                             | 2.4%        | Same count as For the King's building-wide reward, but single-floor |
+| magicalPayrollGirl      | Magical Payroll Girl    | 1 tier promotion, then 10 upgrades on this floor      | 1.1%        | Larger than Save Point Savings's 5 upgrades at 1.2%         |
+| mechaMiddleManagement   | Mecha Middle Management | 12 upgrades on every unlocked floor                   | 1.6%        | Building-wide upgrade reward below Gummy Bear Market's 10 at 1.5% |
+| mergeConflict            | Merge Conflict           | 7 upgrades and 7 payouts on this floor                | 2%          | Mixed single-floor reward, smaller than Clowning Around's building-wide effect |
+| mintCondition            | Mint Condition           | 18 payouts from the highest-earning floor              | 1.5%        | Below Sharpshooter's 10 payouts at 4% only because this is a rarer targeted hit |
+| stackOverflowing         | Stack Overflowing        | 9 upgrades on the highest unlocked floor              | 2.2%        | Below Patch Notes Payday's 11 on the same target at 2.1%   |
+| oneMoreRound              | One More Round            | 8 upgrades and 8 payouts on this floor                 | 2%          | Mixed single-floor reward, smaller than Merge Conflict's 7+7 at 2% |
+
+The full featured-crit regression now covers 186 entries.
+
 ## Implemented asset batch: 2026-09-18 (nerd culture)
 
 Twelve new nerd-culture featured crits support upgrade clicks and floor unlocks

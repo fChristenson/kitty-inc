@@ -635,5 +635,34 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         [highestFloor(context)],
         balance.patchNotesPaydayUpgrades,
       ),
+    biggerOnTheInside: (context) =>
+      actions.payCycles(context.floors, balance.biggerOnTheInsidePayouts),
+    cacheMeOutside: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.cacheMeOutsideUpgrades),
+    itCompiles: (context) =>
+      actions.upgrade([context.floor], balance.itCompilesUpgrades),
+    magicalPayrollGirl: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.magicalPayrollGirlTierSteps,
+        balance.magicalPayrollGirlUpgrades,
+      ),
+    mechaMiddleManagement: (context) =>
+      actions.upgrade(context.floors, balance.mechaMiddleManagementUpgrades),
+    mergeConflict: (context) => {
+      actions.upgrade([context.floor], balance.mergeConflictUpgrades);
+      actions.payCycles([context.floor], balance.mergeConflictPayouts);
+    },
+    mintCondition: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.mintConditionPayouts,
+      ),
+    stackOverflowing: (context) =>
+      actions.upgrade([highestFloor(context)], balance.stackOverflowingUpgrades),
+    oneMoreRound: (context) => {
+      actions.upgrade([context.floor], balance.oneMoreRoundUpgrades);
+      actions.payCycles([context.floor], balance.oneMoreRoundPayouts);
+    },
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

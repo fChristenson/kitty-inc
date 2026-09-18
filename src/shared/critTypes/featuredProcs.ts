@@ -1070,6 +1070,60 @@ export const FEATURED_CRIT_INFO = {
     icon: "patchNotesPayday",
     description: "Eleven free upgrades on the highest floor",
   },
+  biggerOnTheInside: {
+    label: "Bigger on the Inside",
+    color: COLOR.blue,
+    icon: "biggerOnTheInside",
+    description: "Ten instant payouts on every unlocked floor",
+  },
+  cacheMeOutside: {
+    label: "Cache Me Outside",
+    color: COLOR.orange,
+    icon: "cacheMeOutside",
+    description: "Eight free upgrades on the lowest-level floor",
+  },
+  itCompiles: {
+    label: "It Compiles!",
+    color: COLOR.moneyGreen,
+    icon: "itCompiles",
+    description: "Fifteen free upgrades on this floor",
+  },
+  magicalPayrollGirl: {
+    label: "Magical Payroll Girl",
+    color: COLOR.peppermintPink,
+    icon: "magicalPayrollGirl",
+    description: "One tier promotion and ten upgrades here",
+  },
+  mechaMiddleManagement: {
+    label: "Mecha Middle Management",
+    color: COLOR.red,
+    icon: "mechaMiddleManagement",
+    description: "Twelve free upgrades on every unlocked floor",
+  },
+  mergeConflict: {
+    label: "Merge Conflict",
+    color: COLOR.fullHouseCrimson,
+    icon: "mergeConflict",
+    description: "Seven upgrades and seven payouts on this floor",
+  },
+  mintCondition: {
+    label: "Mint Condition",
+    color: COLOR.cyan,
+    icon: "mintCondition",
+    description: "Eighteen payouts from the highest-earning floor",
+  },
+  stackOverflowing: {
+    label: "Stack Overflowing",
+    color: COLOR.gold,
+    icon: "stackOverflowing",
+    description: "Nine free upgrades on the highest floor",
+  },
+  oneMoreRound: {
+    label: "One More Round",
+    color: COLOR.sunshineGold,
+    icon: "oneMoreRound",
+    description: "Eight upgrades and eight payouts on this floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

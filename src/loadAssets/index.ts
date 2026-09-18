@@ -309,6 +309,15 @@ export const IMAGE_FILES = {
   speedrunPayroll: "speedrunPayroll.png",
   lagCompensation: "lagCompensation.png",
   patchNotesPayday: "patchNotesPayday.png",
+  biggerOnTheInside: "biggerOnTheInside.png",
+  cacheMeOutside: "cacheMeOutside.png",
+  itCompiles: "itCompiles.png",
+  magicalPayrollGirl: "magicalPayrollGirl.png",
+  mechaMiddleManagement: "mechaMiddleManagement.png",
+  mergeConflict: "mergeConflict.png",
+  mintCondition: "mintCondition.png",
+  stackOverflowing: "stackOverflowing.png",
+  oneMoreRound: "oneMoreRound.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

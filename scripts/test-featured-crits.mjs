@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 178);
+  assert.equal(kinds.length, 187);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -375,6 +375,15 @@ try {
     speedrunPayroll: [[20, 30, 10, 0], 90],
     lagCompensation: [[20, 30, 10, 0], 27],
     patchNotesPayday: [[20, 30, 21, 0], 0],
+    biggerOnTheInside: [[20, 30, 10, 0], 60],
+    cacheMeOutside: [[20, 30, 18, 0], 0],
+    itCompiles: [[20, 45, 10, 0], 0],
+    magicalPayrollGirl: [[20, 40, 10, 0], 0],
+    mechaMiddleManagement: [[32, 42, 22, 0], 0],
+    mergeConflict: [[20, 37, 10, 0], 21],
+    mintCondition: [[20, 30, 10, 0], 54],
+    stackOverflowing: [[20, 30, 19, 0], 0],
+    oneMoreRound: [[20, 38, 10, 0], 24],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -449,6 +458,8 @@ try {
     if (kind === "whySoSerious")
       assert.equal(test.context.floor.critMultiplierTier, "mega");
     if (kind === "savePointSavings" || kind === "achievementUnlocked")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "magicalPayrollGirl")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {

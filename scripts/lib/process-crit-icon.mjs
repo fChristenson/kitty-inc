@@ -4,7 +4,12 @@ import { dropSmallOpaqueComponents } from "./drop-small-components.mjs";
 
 export async function processCritIcon(
   name,
-  { backgroundSeeds = [], sourceExtension = ".jfif", sourcePath = null } = {},
+  {
+    backgroundSeeds = [],
+    protectedRects = [],
+    sourceExtension = ".jfif",
+    sourcePath = null,
+  } = {},
 ) {
   const assets = path.resolve(import.meta.dirname, "../../src/assets");
   const critAssets = path.resolve(import.meta.dirname, "../../public");
@@ -21,8 +26,17 @@ export async function processCritIcon(
   let tail = 0;
   const whiteness = (pixel) =>
     Math.min(...data.subarray(pixel * channels, pixel * channels + 3));
+  const isProtected = (pixel) => {
+    const column = pixel % width;
+    const row = Math.floor(pixel / width);
+    return protectedRects.some(
+      ({ left, top, right, bottom }) =>
+        column >= left && column <= right && row >= top && row <= bottom,
+    );
+  };
   const enqueue = (pixel) => {
-    if (background[pixel] || whiteness(pixel) < 195) return;
+    if (background[pixel] || isProtected(pixel) || whiteness(pixel) < 195)
+      return;
     background[pixel] = 1;
     queue[tail++] = pixel;
   };
