@@ -1,5 +1,68 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-18 (Baldur's Gate cats)
+
+Nineteen Baldur's-Gate-inspired cat crits support upgrade clicks and floor
+unlocks through the shared `applyFloorCrit` path. Rewards are immediate,
+existing crit balance is unchanged, and proc chances apply only after a tier
+and the special gateway land, before the shared proc cap; they are not
+per-click odds.
+
+| Image                | Crit                  | Immediate reward                              | Proc chance | Comparison                                                       |
+| -------------------- | --------------------- | --------------------------------------------- | ----------- | ---------------------------------------------------------------- |
+| astapurrion          | Astapurrion           | 19 instant payouts on this floor              | 1%          | Above Nothing to See's 20 at 2%, rarer for the near-equal payout |
+| astralclawSkyblade   | Astralclaw Skyblade   | 23 free upgrades on this floor                | 0.7%        | Larger and rarer than This Is The End's 22                      |
+| drizztDoPurrden      | Drizzt Do'Purrden     | 9 upgrades on alternating floors              | 1.3%        | Above Magic Is A Tool's 8 at 1.7%                               |
+| elmiaowster          | Elmiaowster           | 2 tier promotions, then 6 upgrades here       | 0.9%        | Same double promotion as Wizard, with a larger batch            |
+| elvenSongblade       | Elven Songblade       | 20 payouts on every unlocked floor            | 0.7%        | Above Holy Guacamole's 19 at 1.2%                               |
+| galepaw              | Galepaw               | 11 payouts on every unlocked floor            | 1.6%        | Between Cosmic Catapult's 9 and Inbox Zero Gravity's 12         |
+| halsinpaw            | Halsinpaw             | 16 free upgrades on every unlocked floor      | 1%          | Above For The King's 15, below Waltz Street's 17                |
+| hearthpawShadowagent | Hearthpaw Shadowagent | 20 payouts from the highest-earning floor     | 1%          | One more payout than Whisker Wyll, one tick rarer               |
+| imeown               | Imeown                | 13 free upgrades on the lowest-level floor    | 2.4%        | Above Cake Day's 12 at 2.8%                                     |
+| jaheirball           | Jaheirball            | 14 payouts on alternating floors              | 1.2%        | Between Princess's 13 and Over The Rainbow's 15                 |
+| karlachonk           | Karlachonk            | 21 free upgrades on this floor                | 0.9%        | Above Obsidian Basilisk's 20 at 1%                              |
+| laezclaw             | Lae'zclaw             | 19 free upgrades on this floor                | 1%          | Between The Siege Scratcher's 18 and Obsidian Basilisk's 20     |
+| minscAndMeow         | Minsc and Meow        | 18 free upgrades on every unlocked floor      | 0.8%        | Above Halsinpaw's 16, and rarer for it                          |
+| sarevmeowk           | Sarevmeowk            | 15 upgrades on the highest unlocked floor     | 1.5%        | Between Imperial Scepter's 13 and Metal's 17                    |
+| shadowpurr           | Shadowpurr            | 1 tier promotion, then 11 upgrades here       | 1.1%        | Promotion shape like Arcana's 12, one upgrade smaller           |
+| theEmpurror          | The Empurror          | 13 payouts on every unlocked floor            | 1.1%        | Between Inbox Zero Gravity's 12 and Yes Warchief's 14           |
+| thisIsTheEnd         | This Is The End       | 22 free upgrades on this floor                | 0.8%        | Above Karlachonk's 21, and rarer for it                         |
+| whiskerWyll          | Whisker Wyll          | 19 payouts from the highest-earning floor     | 1.1%        | Above Mint Condition's 18 at 1.5%                               |
+| winkWink             | Wink Wink             | 14 free upgrades on the lowest-level floor    | 2.2%        | One more upgrade than Imeown, one tick rarer                    |
+
+All nineteen are single-shot and current-building only, with no map-specific
+behavior. Building-wide entries (Halsinpaw, Minsc and Meow, Galepaw, The
+Empurror, Elven Songblade) skip locked floors; alternating entries (Drizzt
+Do'Purrden, Jaheirball) walk the building's floors stride-by-2 from the ground
+floor. Imeown and Wink Wink both resolve the lowest-level unlocked floor, so on
+a one-floor building they land on the triggering floor; Whisker Wyll and
+Hearthpaw Shadowagent do the same via current income rate. Sarevmeowk targets
+the highest unlocked floor. Shadowpurr and Elmiaowster promote the triggering
+floor's permanent crit tier and stop at the strongest tier. No payout crit in
+this batch touches floor collection timers.
+
+### Processing and verification (Baldur's Gate cats)
+
+Raw sources were renamed to camelCase (`src/assets/<name>.jfif`) — three
+arrived with spaces (`Astralclaw Skyblade`, `Hearthpaw Shadowagent`,
+`Elven Songblade`) — and processed with `node scripts/process-<name>.mjs`, each
+a thin wrapper around `scripts/lib/process-crit-icon.mjs`. A contact sheet of
+the raw batch confirmed all nineteen sit on a plain near-white background, so
+the shared border-seeded flood fill handled every one; a magenta contact sheet
+of the outputs confirmed no halos, with Shadowpurr's detached crescent moon and
+Halsinpaw's deliberate brown backdrop panel both surviving intact. That
+processor also emits the white-bordered sticker cut through
+`scripts/lib/sticker-border.mjs`, so each icon ships as both
+`public/<name>.png` and `public/stickers/<name>.png` (the latter is what
+`loadAssets`' `critAssetUrl` loads).
+
+Imeown and Wink Wink are two distinct pink-haired rogue illustrations from the
+same source prompt, kept as separate crits with distinct labels and values.
+
+`node scripts/test-featured-crits.mjs` passes at 293 entries and
+`npm run build` is clean. In-game celebration rendering and the Special Crits
+menu were not exercised in a browser for this batch.
+
 ## Implemented asset batch: 2026-09-18 (adventuring cats)
 
 Four adventuring-cat crits support upgrade clicks and floor unlocks through the

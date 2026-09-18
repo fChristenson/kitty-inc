@@ -2,10 +2,7 @@ import { loadImage } from "../utils";
 
 const PUBLIC_ASSET_BASE = import.meta.env.BASE_URL;
 const themeAssetUrl = (filename: string) => `${PUBLIC_ASSET_BASE}${filename}`;
-// crit backdrop icons ship as the white-bordered "sticker" cut of the same
-// artwork, generated into public/stickers/ by scripts/add-sticker-borders.mjs
-const critAssetUrl = (filename: string) =>
-  `${PUBLIC_ASSET_BASE}stickers/${filename}`;
+const critAssetUrl = (filename: string) => `${PUBLIC_ASSET_BASE}${filename}`;
 const sharedThemeImages = new Set([
   "city.png",
   "mapBg.png",
@@ -408,6 +405,25 @@ export const IMAGE_FILES = {
   candleclawCatacomb: "candleclawCatacomb.png",
   emberPawPatrol: "emberPawPatrol.png",
   whiskerCoastSurvivor: "whiskerCoastSurvivor.png",
+  astapurrion: "astapurrion.png",
+  astralclawSkyblade: "astralclawSkyblade.png",
+  drizztDoPurrden: "drizztDoPurrden.png",
+  elmiaowster: "elmiaowster.png",
+  elvenSongblade: "elvenSongblade.png",
+  galepaw: "galepaw.png",
+  halsinpaw: "halsinpaw.png",
+  hearthpawShadowagent: "hearthpawShadowagent.png",
+  imeown: "imeown.png",
+  jaheirball: "jaheirball.png",
+  karlachonk: "karlachonk.png",
+  laezclaw: "laezclaw.png",
+  minscAndMeow: "minscAndMeow.png",
+  sarevmeowk: "sarevmeowk.png",
+  shadowpurr: "shadowpurr.png",
+  theEmpurror: "theEmpurror.png",
+  thisIsTheEnd: "thisIsTheEnd.png",
+  whiskerWyll: "whiskerWyll.png",
+  winkWink: "winkWink.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 
@@ -440,6 +456,13 @@ export function getImageUrl(name: ImageName): string {
   return sharedThemeImages.has(filename)
     ? themeAssetUrl(filename)
     : critAssetUrl(filename);
+}
+
+// the white-bordered "sticker" cut of the same artwork, generated into
+// public/stickers/ by scripts/add-sticker-borders.mjs — used by the Special
+// Crits dialog, while the celebration flash draws the plain cut-out
+export function getStickerUrl(name: ImageName): string {
+  return `${PUBLIC_ASSET_BASE}stickers/${IMAGE_FILES[name]}`;
 }
 
 export function loadImageByName(name: ImageName): Promise<HTMLImageElement> {

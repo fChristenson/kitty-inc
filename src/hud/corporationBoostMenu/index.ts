@@ -1,6 +1,6 @@
 import { animateDialogClose, cancelDialogClose } from "../../utils";
 import { playSwoosh } from "../../sound";
-import { getImageUrl } from "../../loadAssets";
+import { getStickerUrl } from "../../loadAssets";
 import { arrowIconMarkup } from "../../shared/arrowIcon";
 import {
   CRIT_PROC_KINDS,
@@ -40,7 +40,7 @@ const CRIT_INFO: {
   const info = CRIT_PROC_INFO[kind];
   return {
     kind,
-    icon: getImageUrl(info.icon),
+    icon: getStickerUrl(info.icon),
     label: info.label,
     description: info.description,
   };

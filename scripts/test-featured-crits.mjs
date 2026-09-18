@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 274);
+  assert.equal(kinds.length, 293);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -472,6 +472,25 @@ try {
     candleclawCatacomb: [[20, 30, 10, 0], 42],
     emberPawPatrol: [[34, 44, 24, 0], 0],
     whiskerCoastSurvivor: [[20, 30, 10, 0], 51],
+    astapurrion: [[20, 30, 10, 0], 57],
+    astralclawSkyblade: [[20, 53, 10, 0], 0],
+    drizztDoPurrden: [[29, 30, 19, 0], 0],
+    elmiaowster: [[20, 36, 10, 0], 0],
+    elvenSongblade: [[20, 30, 10, 0], 120],
+    galepaw: [[20, 30, 10, 0], 66],
+    halsinpaw: [[36, 46, 26, 0], 0],
+    hearthpawShadowagent: [[20, 30, 10, 0], 60],
+    imeown: [[20, 30, 23, 0], 0],
+    jaheirball: [[20, 30, 10, 0], 42],
+    karlachonk: [[20, 51, 10, 0], 0],
+    laezclaw: [[20, 49, 10, 0], 0],
+    minscAndMeow: [[38, 48, 28, 0], 0],
+    sarevmeowk: [[20, 30, 25, 0], 0],
+    shadowpurr: [[20, 41, 10, 0], 0],
+    theEmpurror: [[20, 30, 10, 0], 78],
+    thisIsTheEnd: [[20, 52, 10, 0], 0],
+    whiskerWyll: [[20, 30, 10, 0], 57],
+    winkWink: [[20, 30, 24, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
