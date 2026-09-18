@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { addStickerBorder, DEFAULT_BORDER } from "./lib/sticker-border.mjs";
 
 // Regenerates the white-bordered sticker cut of every crit icon into
-// public/stickers/, which is where loadAssets' critAssetUrl reads them from.
+// public/stickers/, which is where the Special Crits dialog reads them from.
 //
 //   node scripts/add-sticker-borders.mjs                # every crit icon
 //   node scripts/add-sticker-borders.mjs ninja cowboy   # just these
@@ -15,26 +15,41 @@ const loadAssetsFile = path.resolve(
   import.meta.dirname,
   "../src/loadAssets/index.ts",
 );
+const critTypesDir = path.resolve(
+  import.meta.dirname,
+  "../src/shared/critTypes",
+);
 
-// The crit icons are exactly IMAGE_FILES minus the shared theme images, so read
-// that split off loadAssets rather than keeping a second list in sync here.
+// Driven by the canonical CRIT_PROC_INFO icons rather than by "everything in
+// IMAGE_FILES that isn't a theme image" — a few procs (Tick Tock, the boost
+// menu's own crits) point at icons the theme also uses, and those still need a
+// sticker cut for the dialog.
 async function critIconFiles() {
   const source = await fs.readFile(loadAssetsFile, "utf8");
-  const themeBlock = source.match(
-    /const sharedThemeImages = new Set\(\[([\s\S]*?)\]\)/,
-  );
   const imageBlock = source.match(
     /export const IMAGE_FILES = \{([\s\S]*?)\n\} as const;/,
   );
-  if (!themeBlock || !imageBlock) {
+  if (!imageBlock) {
     throw new Error("Could not parse IMAGE_FILES from src/loadAssets/index.ts");
   }
-  const shared = new Set(
-    [...themeBlock[1].matchAll(/"([^"]+)"/g)].map((match) => match[1]),
+  const filenameByName = new Map(
+    [...imageBlock[1].matchAll(/(\w+):\s*"([^"]+\.png)"/g)].map((match) => [
+      match[1],
+      match[2],
+    ]),
   );
   const files = new Set();
-  for (const match of imageBlock[1].matchAll(/:\s*"([^"]+\.png)"/g)) {
-    if (!shared.has(match[1])) files.add(match[1]);
+  for (const entry of await fs.readdir(critTypesDir)) {
+    if (!entry.endsWith(".ts")) continue;
+    const critSource = await fs.readFile(
+      path.join(critTypesDir, entry),
+      "utf8",
+    );
+    for (const match of critSource.matchAll(/\bicon:\s*"(\w+)"/g)) {
+      const filename = filenameByName.get(match[1]);
+      if (!filename) throw new Error(`Unregistered crit icon: ${match[1]}`);
+      files.add(filename);
+    }
   }
   return [...files].sort();
 }
