@@ -2,7 +2,7 @@
 
 ## Implemented asset batch: 2026-09-17 (character art)
 
-88 new crits from the character art drops, with instant rewards on upgrade
+93 new crits from the character art drops, with instant rewards on upgrade
 clicks and floor unlocks through the same `applyFloorCrit` function. Previous
 crits remain available and their balance is unchanged. Proc chances below apply
 after a tier and the special gateway land, before the shared proc cap. They are
@@ -140,6 +140,17 @@ with every source name normalized to lower camelCase before processing:
 | picklePredicament  | Pickle Predicament   | 8 upgrades on the lowest-level floor              | 3.2%        | Between Treasure Measure's 10 at 3.2% and Little Sister's 7 at 3.8% |
 | golem              | Golem                | 35 free upgrades on the highest floor             | 1.15%       | Between Big Daddy's 45 at 1.1% and Epic Loot's 40 at 1.2%           |
 
+Five more from the remaining comfort-food drop, renamed to lower camelCase
+before processing:
+
+| Image               | Crit                  | Immediate reward                          | Proc chance | Comparison                                                       |
+| ------------------- | --------------------- | ----------------------------------------- | ----------- | ---------------------------------------------------------------- |
+| hotPotato           | Hot Potato            | 18 instant payouts on this floor          | 3.4%        | Between Bubble Economy's 7 at 4.5% and Mega Chonk's 22 at 2.2%   |
+| brunchBoss          | Brunch Boss           | 7 upgrades and 7 payouts on this floor    | 2.1%        | Between Cheese Pull Champion's 6 and 6 at 2.2% and Donut Disturb |
+| curryFavour         | Curry Favour          | 14 payouts from the highest-earning floor | 1.8%        | Between Souper Star's 16 at 1.9% and Money Magnet's 14 at 2.5%   |
+| dimSumDynasty       | Dim Sum Dynasty       | 15 free upgrades on every unlocked floor  | 1.6%        | Between Grill Sergeant's 20 at 1.3% and Work Work's 11 at 2.8%   |
+| soupDumplingSurgeon | Soup Dumpling Surgeon | 5 upgrades and 10 payouts on this floor   | 1.2%        | Between Donut Disturb's 5 and 5 at 5% and Ballerina's 3 and 3    |
+
 All targets are within the current building and exclude locked floors. The base
 tier's free upgrades occur before the special reward and its target selection.
 Payouts mean current income cycles, not seconds or banked cash, and leave timer
@@ -168,7 +179,7 @@ and Why So Serious still grant their free upgrades on an already-ultra floor. On
 a one-floor building every target resolves to that floor. Repeated procs stay
 additive and no new timed state exists.
 
-All 88 are floor-only, not map-specific: their generated test buttons appear for
+All 93 are floor-only, not map-specific: their generated test buttons appear for
 Upgrade click and Floor unlock and stay hidden for Map unlock.
 
 ### Processing and verification (character art)
@@ -220,8 +231,8 @@ crop bounds, and that `tangoTender` no longer carries its sticker halo. Outputs
 all fit within 250x250 as indexed-palette PNGs with alpha at 13.7-31.9 KB, and
 every root/shipped pair is byte-identical.
 
-Validation: `node scripts/test-featured-crits.mjs` passed all 144 featured
-rewards (including these 88) and `npm run build` passed. Browser behaviour for
+Validation: `node scripts/test-featured-crits.mjs` passed all 149 featured
+rewards (including these 93) and `npm run build` passed. Browser behaviour for
 this batch was not verified in-game.
 
 ## Implemented asset batch: 2026-09-17

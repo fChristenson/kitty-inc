@@ -866,6 +866,36 @@ export const FEATURED_CRIT_INFO = {
     icon: "golem",
     description: "Thirty-five free upgrades on the highest floor",
   },
+  hotPotato: {
+    label: "Hot Potato",
+    color: COLOR.roundUpOrange,
+    icon: "hotPotato",
+    description: "Eighteen instant payouts on this floor",
+  },
+  brunchBoss: {
+    label: "Brunch Boss",
+    color: COLOR.supplyRunTan,
+    icon: "brunchBoss",
+    description: "Seven upgrades and seven payouts on this floor",
+  },
+  curryFavour: {
+    label: "Curry Favour",
+    color: COLOR.halloweenSalePurple,
+    icon: "curryFavour",
+    description: "Fourteen payouts from the highest-earning floor",
+  },
+  dimSumDynasty: {
+    label: "Dim Sum Dynasty",
+    color: COLOR.goldenHandshakeGold,
+    icon: "dimSumDynasty",
+    description: "Fifteen free upgrades on every unlocked floor",
+  },
+  soupDumplingSurgeon: {
+    label: "Soup Dumpling Surgeon",
+    color: COLOR.teaBreakBrown,
+    icon: "soupDumplingSurgeon",
+    description: "Five upgrades and ten payouts on this floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

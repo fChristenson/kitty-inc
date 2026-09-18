@@ -688,6 +688,18 @@ export const CONFIG = {
     picklePredicamentUpgrades: 8,
     golemChance: 0.0115,
     golemUpgrades: 35,
+    hotPotatoChance: 0.034,
+    hotPotatoPayouts: 18,
+    brunchBossChance: 0.021,
+    brunchBossUpgrades: 7,
+    brunchBossPayouts: 7,
+    curryFavourChance: 0.018,
+    curryFavourPayouts: 14,
+    dimSumDynastyChance: 0.016,
+    dimSumDynastyUpgrades: 15,
+    soupDumplingSurgeonChance: 0.012,
+    soupDumplingSurgeonUpgrades: 5,
+    soupDumplingSurgeonPayouts: 10,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

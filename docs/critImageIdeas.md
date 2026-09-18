@@ -6,11 +6,6 @@ Each name is a working crit title, followed by the image to generate.
 ## Comfort food
 
 - **Taco 'Bout It** - Two cats leaning in over a giant taco held between them, deep in serious conversation.
-- **Hot Potato** - A cat juggling one glowing baked potato between its paws, ears flat and eyes watering.
-- **Brunch Boss** - A cat in sunglasses at a tiny cafe table behind a precarious stack of avocado toast.
-- **Curry Favour** - A cat bowing deeply while presenting a steaming curry pot on a velvet cushion.
-- **Dim Sum Dynasty** - A cat lifting the lid off the top basket of a towering bamboo steamer, steam billowing.
-- **Soup Dumpling Surgeon** - A cat in tiny goggles carefully lifting one plump soup dumpling with chopsticks.
 
 Keep one hero dish per image and let the cat's expression carry the joke. Food
 should read as chunky, stylized shapes rather than photographic detail, and

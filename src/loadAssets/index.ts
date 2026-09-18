@@ -275,6 +275,11 @@ export const IMAGE_FILES = {
   noodleNap: "noodleNap.png",
   picklePredicament: "picklePredicament.png",
   golem: "golem.png",
+  hotPotato: "hotPotato.png",
+  brunchBoss: "brunchBoss.png",
+  curryFavour: "curryFavour.png",
+  dimSumDynasty: "dimSumDynasty.png",
+  soupDumplingSurgeon: "soupDumplingSurgeon.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

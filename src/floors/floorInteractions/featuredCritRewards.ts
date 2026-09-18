@@ -528,5 +528,22 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       ),
     golem: (context) =>
       actions.upgrade([highestFloor(context)], balance.golemUpgrades),
+    hotPotato: (context) =>
+      actions.payCycles([context.floor], balance.hotPotatoPayouts),
+    brunchBoss: (context) => {
+      actions.upgrade([context.floor], balance.brunchBossUpgrades);
+      actions.payCycles([context.floor], balance.brunchBossPayouts);
+    },
+    curryFavour: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.curryFavourPayouts,
+      ),
+    dimSumDynasty: (context) =>
+      actions.upgrade(context.floors, balance.dimSumDynastyUpgrades),
+    soupDumplingSurgeon: (context) => {
+      actions.upgrade([context.floor], balance.soupDumplingSurgeonUpgrades);
+      actions.payCycles([context.floor], balance.soupDumplingSurgeonPayouts);
+    },
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
