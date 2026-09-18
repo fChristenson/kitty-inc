@@ -1,5 +1,43 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-18 (adventuring cats)
+
+Four adventuring-cat crits support upgrade clicks and floor unlocks through the
+shared `applyFloorCrit` path. Rewards are immediate, existing crit balance is
+unchanged, and proc chances apply only after a tier and the special gateway
+land, before the shared proc cap; they are not per-click odds.
+
+| Image                | Crit                   | Immediate reward                          | Proc chance | Comparison                                                                 |
+| -------------------- | ---------------------- | ----------------------------------------- | ----------- | -------------------------------------------------------------------------- |
+| bloodlineOmen        | Bloodline Omen         | 17 free upgrades on this floor            | 1.2%        | Between Relicblade Ronin's 16 at 1.1% and The Siege Scratcher's 18 at 1.4% |
+| candleclawCatacomb   | Candleclaw Catacomb    | 14 instant payouts on this floor          | 1.3%        | One more payout than Moonlit Wyvern Hunt's 13 at 1.4%                      |
+| emberPawPatrol       | Ember Paw Patrol       | 14 free upgrades on every unlocked floor  | 1.1%        | Building-wide batch above Ironpaw Vanguard's 11 at 1.8%                    |
+| whiskerCoastSurvivor | Whisker Coast Survivor | 17 payouts from the highest-earning floor | 1.2%        | Larger and rarer than Wolfmark Wanderer's 11 at 2.1%                       |
+
+All four are single-shot and current-building only, with no map-specific
+behavior: Ember Paw Patrol's building-wide batch skips locked floors, and both
+payout crits leave floor collection timers untouched. Bloodline Omen and
+Candleclaw Catacomb act on the triggering floor, so on a one-floor building they
+simply apply to that floor. Whisker Coast Survivor resolves its target by
+current income rate among unlocked floors, which can be the triggering floor.
+
+### Processing and verification (adventuring cats)
+
+Raw sources were renamed to camelCase (`src/assets/<name>.jfif`) and processed
+with `node scripts/process-<name>.mjs`, each a thin wrapper around
+`scripts/lib/process-crit-icon.mjs`; all four had a near-white background that
+the shared border-seeded flood fill removed cleanly, verified by compositing
+each output over magenta. That processor now also emits the white-bordered
+sticker cut through `scripts/lib/sticker-border.mjs`, so every icon ships as
+both `public/<name>.png` and `public/stickers/<name>.png` (the latter is what
+`loadAssets`' `critAssetUrl` loads). Regenerate every sticker with
+`node scripts/add-sticker-borders.mjs`.
+
+`node scripts/test-featured-crits.mjs` passes at 274 entries — it now asserts
+the ≤250px indexed-alpha constraints on the sticker copy as well — and
+`npm run build` is clean. In-game celebration rendering and the Special Crits
+menu were not exercised in a browser for this batch.
+
 ## Implemented asset batch: 2026-09-18 (grimdark space cats)
 
 Thirty-two original grimdark space-marine-inspired cat crits support upgrade

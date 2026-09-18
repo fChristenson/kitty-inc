@@ -955,6 +955,14 @@ export const CONFIG = {
     wolfmarkWandererPayouts: 11,
     wolfpackFarewellChance: 0.017,
     wolfpackFarewellUpgrades: 6,
+    bloodlineOmenChance: 0.012,
+    bloodlineOmenUpgrades: 17,
+    candleclawCatacombChance: 0.013,
+    candleclawCatacombPayouts: 14,
+    emberPawPatrolChance: 0.011,
+    emberPawPatrolUpgrades: 14,
+    whiskerCoastSurvivorChance: 0.012,
+    whiskerCoastSurvivorPayouts: 17,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

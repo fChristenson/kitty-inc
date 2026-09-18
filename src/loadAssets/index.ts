@@ -404,6 +404,10 @@ export const IMAGE_FILES = {
   voidshieldTemplar: "voidshieldTemplar.png",
   wolfmarkWanderer: "wolfmarkWanderer.png",
   wolfpackFarewell: "wolfpackFarewell.png",
+  bloodlineOmen: "bloodlineOmen.png",
+  candleclawCatacomb: "candleclawCatacomb.png",
+  emberPawPatrol: "emberPawPatrol.png",
+  whiskerCoastSurvivor: "whiskerCoastSurvivor.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

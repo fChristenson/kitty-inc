@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 270);
+  assert.equal(kinds.length, 274);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -87,17 +87,18 @@ try {
     crit.consumeCritProcs(floor);
     assert.equal(crit.readCritProcs(floor)[kind], false);
     const source = await readFile(`public/${IMAGE_FILES[info.icon]}`);
-    assert.deepEqual(
-      source,
-      await readFile(`public/${IMAGE_FILES[info.icon]}`),
-    );
-    const metadata = await sharp(source).metadata();
-    assert(
-      metadata.width <= 250 &&
-        metadata.height <= 250 &&
-        metadata.isPalette &&
-        metadata.hasAlpha,
-    );
+    // the game loads the white-bordered sticker cut, so check that copy too
+    const shipped = await readFile(`public/stickers/${IMAGE_FILES[info.icon]}`);
+    for (const buffer of [source, shipped]) {
+      const metadata = await sharp(buffer).metadata();
+      assert(
+        metadata.width <= 250 &&
+          metadata.height <= 250 &&
+          metadata.isPalette &&
+          metadata.hasAlpha,
+        `${kind}: unoptimized icon`,
+      );
+    }
   }
   assert(CONFIG.crit.fastForwardChance > CONFIG.crit.dinnerTimeChance);
   assert(CONFIG.crit.dinnerTimeChance > CONFIG.crit.yesChefChance);
@@ -467,6 +468,10 @@ try {
     voidshieldTemplar: [[28, 38, 18, 0], 0],
     wolfmarkWanderer: [[20, 30, 10, 0], 33],
     wolfpackFarewell: [[26, 36, 16, 0], 0],
+    bloodlineOmen: [[20, 47, 10, 0], 0],
+    candleclawCatacomb: [[20, 30, 10, 0], 42],
+    emberPawPatrol: [[34, 44, 24, 0], 0],
+    whiskerCoastSurvivor: [[20, 30, 10, 0], 51],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

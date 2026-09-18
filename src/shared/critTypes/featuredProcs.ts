@@ -1622,6 +1622,30 @@ export const FEATURED_CRIT_INFO = {
     icon: "wolfpackFarewell",
     description: "Six free upgrades on every unlocked floor",
   },
+  bloodlineOmen: {
+    label: "Bloodline Omen",
+    color: COLOR.fullHouseCrimson,
+    icon: "bloodlineOmen",
+    description: "Seventeen free upgrades on this floor",
+  },
+  candleclawCatacomb: {
+    label: "Candleclaw Catacomb",
+    color: COLOR.nightShiftIndigo,
+    icon: "candleclawCatacomb",
+    description: "Fourteen instant payouts on this floor",
+  },
+  emberPawPatrol: {
+    label: "Ember Paw Patrol",
+    color: COLOR.orange,
+    icon: "emberPawPatrol",
+    description: "Fourteen free upgrades on every unlocked floor",
+  },
+  whiskerCoastSurvivor: {
+    label: "Whisker Coast Survivor",
+    color: COLOR.cyan,
+    icon: "whiskerCoastSurvivor",
+    description: "Seventeen payouts from the highest-earning floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

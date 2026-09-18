@@ -891,5 +891,16 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       ),
     wolfpackFarewell: (context) =>
       actions.upgrade(context.floors, balance.wolfpackFarewellUpgrades),
+    bloodlineOmen: (context) =>
+      actions.upgrade([context.floor], balance.bloodlineOmenUpgrades),
+    candleclawCatacomb: (context) =>
+      actions.payCycles([context.floor], balance.candleclawCatacombPayouts),
+    emberPawPatrol: (context) =>
+      actions.upgrade(context.floors, balance.emberPawPatrolUpgrades),
+    whiskerCoastSurvivor: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.whiskerCoastSurvivorPayouts,
+      ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
