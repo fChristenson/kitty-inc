@@ -682,7 +682,10 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
     emoteEconomy: (context) =>
       actions.payCycles(context.floors, balance.emoteEconomyPayouts),
     checkpointChampion: (context) =>
-      actions.upgrade([highestFloor(context)], balance.checkpointChampionUpgrades),
+      actions.upgrade(
+        [highestFloor(context)],
+        balance.checkpointChampionUpgrades,
+      ),
     fishingForFunds: (context) =>
       actions.payCycles([context.floor], balance.fishingForFundsPayouts),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
