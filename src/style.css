@@ -1047,6 +1047,11 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  /* drop-shadow follows the PNG's alpha, so the stacked 0-offset pass traces
+     the sticker's own white silhouette instead of boxing the image */
+  filter: drop-shadow(0 0 1px var(--color-wood-outline))
+    drop-shadow(0 0 1px var(--color-wood-outline))
+    drop-shadow(0 2px 3px rgb(0 0 0 / 0.35));
 }
 
 /* pill-shaped "how many times has this crit landed" collectible counter —
@@ -1087,6 +1092,9 @@ body {
   width: min(60%, 180px);
   aspect-ratio: 1;
   object-fit: contain;
+  filter: drop-shadow(0 0 2px var(--color-wood-outline))
+    drop-shadow(0 0 2px var(--color-wood-outline))
+    drop-shadow(0 5px 7px rgb(0 0 0 / 0.4));
 }
 
 .crit-info-detail__name {
