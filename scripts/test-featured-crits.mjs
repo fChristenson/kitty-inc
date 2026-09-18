@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 237);
+  assert.equal(kinds.length, 270);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -434,6 +434,39 @@ try {
     thunderbirdChick: [[20, 39, 10, 0], 0],
     obsidianBasilisk: [[20, 50, 10, 0], 0],
     cloudNymph: [[20, 30, 10, 0], 30],
+    alchemyAtDusk: [[20, 36, 10, 0], 0],
+    astropathAlleycat: [[20, 30, 10, 0], 48],
+    bardOfTheBrokenLyre: [[20, 30, 10, 0], 21],
+    battleStandardBobcat: [[20, 40, 10, 0], 0],
+    cathedralStarship: [[20, 30, 10, 0], 72],
+    cursedCrownHunt: [[20, 45, 10, 0], 0],
+    dreadnoughtWhisker: [[20, 50, 10, 0], 0],
+    elixirUnderMoonlight: [[20, 37, 10, 0], 0],
+    frostbiteTracker: [[20, 30, 10, 0], 27],
+    ironpawVanguard: [[31, 41, 21, 0], 0],
+    lastStandLionheart: [[20, 44, 10, 0], 0],
+    meowchineBerserker: [[20, 38, 10, 0], 0],
+    meowtallicanGunner: [[20, 30, 10, 0], 30],
+    midnightMonsterContract: [[20, 30, 16, 0], 0],
+    moonlitWyvernHunt: [[20, 30, 10, 0], 39],
+    orbitalPounce: [[25, 35, 15, 0], 0],
+    plasmaPurrgeon: [[20, 39, 10, 0], 0],
+    relicbladeRonin: [[20, 46, 10, 0], 0],
+    seaMonsterSlayer: [[20, 30, 10, 0], 30],
+    silverclawSentinel: [[20, 37, 10, 0], 0],
+    starBastionCaptain: [[20, 42, 10, 0], 0],
+    tavernTactician: [[20, 30, 10, 0], 48],
+    theAntlerwoodStalker: [[20, 35, 10, 0], 0],
+    theCataclysmicChaplain: [[20, 45, 10, 0], 0],
+    theGriffinContract: [[20, 30, 10, 0], 18],
+    theSiegeScratcher: [[20, 48, 10, 0], 0],
+    theWarpwayWatcher: [[20, 30, 10, 0], 36],
+    theWhiteWhisker: [[20, 30, 20, 0], 0],
+    toxinclawInfiltrator: [[20, 30, 10, 0], 21],
+    voidclawVeteran: [[20, 43, 10, 0], 0],
+    voidshieldTemplar: [[28, 38, 18, 0], 0],
+    wolfmarkWanderer: [[20, 30, 10, 0], 33],
+    wolfpackFarewell: [[26, 36, 16, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -516,6 +549,8 @@ try {
     if (kind === "emeraldCrown")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "velvetManticore")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "elixirUnderMoonlight" || kind === "theAntlerwoodStalker")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {

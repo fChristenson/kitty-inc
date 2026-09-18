@@ -1,5 +1,17 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-18 (grimdark space cats)
+
+Thirty-two original grimdark space-marine-inspired cat crits support upgrade
+clicks and floor unlocks through the shared `applyFloorCrit` path. Rewards are
+immediate, existing crit balance is unchanged, and proc chances apply only
+after a tier and the special gateway land, before the shared proc cap; they are
+not per-click odds.
+
+The batch covers armored cat warriors, alchemists, chaplains, psykers, void
+pilots, gothic starships, monster contracts, siege weapons, and party banners.
+The full featured-crit regression now covers 269 entries.
+
 ## Implemented asset batch: 2026-09-18 (mythic creatures)
 
 Eighteen mythic-creature featured crits support upgrade clicks and floor
