@@ -896,6 +896,72 @@ export const FEATURED_CRIT_INFO = {
     icon: "soupDumplingSurgeon",
     description: "Five upgrades and ten payouts on this floor",
   },
+  chocolateFountainOfYouth: {
+    label: "Chocolate Fountain of Youth",
+    color: COLOR.autumnSaleAmber,
+    icon: "chocolateFountainOfYouth",
+    description: "Twenty instant payouts on this floor",
+  },
+  gummyBearMarket: {
+    label: "Gummy Bear Market",
+    color: COLOR.red,
+    icon: "gummyBearMarket",
+    description: "Ten free upgrades on every unlocked floor",
+  },
+  jawbreaker: {
+    label: "Jawbreaker",
+    color: COLOR.purple,
+    icon: "jawbreaker",
+    description: "Eighteen free upgrades on this floor",
+  },
+  licoriceLaces: {
+    label: "Licorice Laces",
+    color: COLOR.fullHouseCrimson,
+    icon: "licoriceLaces",
+    description: "Nine free upgrades on the lowest-level floor",
+  },
+  lollipopGuild: {
+    label: "Lollipop Guild",
+    color: COLOR.peppermintPink,
+    icon: "lollipopGuild",
+    description: "Twelve payouts on alternating floors, from the ground",
+  },
+  marshmallowMountain: {
+    label: "Marshmallow Mountain",
+    color: COLOR.white,
+    icon: "marshmallowMountain",
+    description: "Eight free upgrades on the highest unlocked floor",
+  },
+  sugarHigh: {
+    label: "Sugar High",
+    color: COLOR.starYellow,
+    icon: "sugarHigh",
+    description: "Five upgrades and five payouts on every unlocked floor",
+  },
+  bubblegumBalloon: {
+    label: "Bubblegum Balloon",
+    color: COLOR.springSalePink,
+    icon: "bubblegumBalloon",
+    description: "Fifteen instant payouts on this floor",
+  },
+  candyCaneClimber: {
+    label: "Candy Cane Climber",
+    color: COLOR.red,
+    icon: "candyCaneClimber",
+    description: "Twelve free upgrades on the highest unlocked floor",
+  },
+  sherbetSherpa: {
+    label: "Sherbet Sherpa",
+    color: COLOR.easterSalePink,
+    icon: "sherbetSherpa",
+    description: "Eight instant payouts on every unlocked floor",
+  },
+  toffeeTrap: {
+    label: "Toffee Trap",
+    color: COLOR.autumnSaleAmber,
+    icon: "toffeeTrap",
+    description: "Seven free upgrades on this floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

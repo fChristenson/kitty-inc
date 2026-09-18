@@ -14,17 +14,6 @@ coins in frame at all.
 
 ## Sweet tooth
 
-- **Gummy Bear Market** - A giant translucent gummy bear standing proudly while a tiny cat shakes its paw.
-- **Lollipop Guild** - Three solemn cats holding oversized swirl lollipops upright like ceremonial staffs.
-- **Sugar High** - A vibrating wide-eyed cat with fur on end, ringed by a halo of scattered candy wrappers.
-- **Jawbreaker** - A determined cat straining to bite into an enormous striped jawbreaker, cheeks bulging.
-- **Marshmallow Mountain** - A tiny mountaineering cat planting a flag on the summit of a heaped marshmallow peak.
-- **Chocolate Fountain of Youth** - A rejuvenated kitten leaping out of the lower tier of a chocolate fountain.
-- **Licorice Laces** - A cat crouched tying its enormous sneakers with long red licorice laces.
-- **Toffee Trap** - A cat with one paw comically stretched into a long strand of molten toffee.
-- **Bubblegum Balloon** - A cat lifted clean off the ground by the enormous pink bubble it just blew.
-- **Candy Cane Climber** - A cat in a woolly hat scaling a giant candy cane with one tiny pickaxe.
-- **Sherbet Sherpa** - A bundled-up cat hauling a sled piled with a mound of rainbow sherbet.
 - **Truffle Shuffle** - A dapper cat presenting one glossy chocolate truffle on a small velvet cushion.
 - **Minty Fresh Start** - A beaming cat holding a giant striped humbug, one sparkle popping off its tooth.
 - **Sour Power** - A cat with a fiercely puckered face and electrified fur clutching one tiny sour candy.

@@ -545,5 +545,38 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.upgrade([context.floor], balance.soupDumplingSurgeonUpgrades);
       actions.payCycles([context.floor], balance.soupDumplingSurgeonPayouts);
     },
+    chocolateFountainOfYouth: (context) =>
+      actions.payCycles(
+        [context.floor],
+        balance.chocolateFountainOfYouthPayouts,
+      ),
+    gummyBearMarket: (context) =>
+      actions.upgrade(context.floors, balance.gummyBearMarketUpgrades),
+    jawbreaker: (context) =>
+      actions.upgrade([context.floor], balance.jawbreakerUpgrades),
+    licoriceLaces: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.licoriceLacesUpgrades),
+    lollipopGuild: (context) =>
+      actions.payCycles(alternating(context), balance.lollipopGuildPayouts),
+    marshmallowMountain: (context) =>
+      actions.upgrade(
+        [highestFloor(context)],
+        balance.marshmallowMountainUpgrades,
+      ),
+    sugarHigh: (context) => {
+      actions.upgrade(context.floors, balance.sugarHighUpgrades);
+      actions.payCycles(context.floors, balance.sugarHighPayouts);
+    },
+    bubblegumBalloon: (context) =>
+      actions.payCycles([context.floor], balance.bubblegumBalloonPayouts),
+    candyCaneClimber: (context) =>
+      actions.upgrade(
+        [highestFloor(context)],
+        balance.candyCaneClimberUpgrades,
+      ),
+    sherbetSherpa: (context) =>
+      actions.payCycles(context.floors, balance.sherbetSherpaPayouts),
+    toffeeTrap: (context) =>
+      actions.upgrade([context.floor], balance.toffeeTrapUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

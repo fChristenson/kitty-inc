@@ -280,6 +280,17 @@ export const IMAGE_FILES = {
   curryFavour: "curryFavour.png",
   dimSumDynasty: "dimSumDynasty.png",
   soupDumplingSurgeon: "soupDumplingSurgeon.png",
+  chocolateFountainOfYouth: "chocolateFountainOfYouth.png",
+  gummyBearMarket: "gummyBearMarket.png",
+  jawbreaker: "jawbreaker.png",
+  licoriceLaces: "licoriceLaces.png",
+  lollipopGuild: "lollipopGuild.png",
+  marshmallowMountain: "marshmallowMountain.png",
+  sugarHigh: "sugarHigh.png",
+  bubblegumBalloon: "bubblegumBalloon.png",
+  candyCaneClimber: "candyCaneClimber.png",
+  sherbetSherpa: "sherbetSherpa.png",
+  toffeeTrap: "toffeeTrap.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

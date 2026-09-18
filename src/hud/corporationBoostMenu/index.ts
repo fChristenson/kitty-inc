@@ -116,8 +116,10 @@ export function wireCorporationBoostMenu(
   // which crit the detail pane is currently showing, so refresh() can re-render
   // its live landed count without kicking the player back to the grid
   let openKind: CritProcKind | null = null;
+  let gridImageObserver: IntersectionObserver | null = null;
 
   function renderGrid(): void {
+    gridImageObserver?.disconnect();
     grid.innerHTML = CRIT_INFO.map(({ kind, icon, label }) => {
       const count = getCritProcCount(kind);
       const badge =
@@ -126,11 +128,34 @@ export function wireCorporationBoostMenu(
           : "";
       return `
         <button type="button" class="crit-info-tile" data-kind="${kind}" aria-label="${label}">
-          <img src="${icon}" class="crit-info-tile__icon" alt="" />
+          <img data-src="${icon}" class="crit-info-tile__icon" alt="" />
           ${badge}
         </button>
       `;
     }).join("");
+
+    const images = grid.querySelectorAll<HTMLImageElement>(
+      ".crit-info-tile__icon",
+    );
+    const scrollRoot = grid.parentElement;
+    if (!scrollRoot || !("IntersectionObserver" in window)) {
+      images.forEach((image) => {
+        image.src = image.dataset.src ?? "";
+      });
+      return;
+    }
+    gridImageObserver = new IntersectionObserver(
+      (entries, observer) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          const image = entry.target as HTMLImageElement;
+          image.src = image.dataset.src ?? "";
+          observer.unobserve(image);
+        });
+      },
+      { root: scrollRoot, rootMargin: "160px" },
+    );
+    images.forEach((image) => gridImageObserver?.observe(image));
   }
 
   function renderDetail(): void {
