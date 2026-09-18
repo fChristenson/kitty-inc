@@ -1,4 +1,4 @@
-import { animateDialogClose } from "../../utils";
+import { animateDialogClose, cancelDialogClose } from "../../utils";
 import { playSwoosh } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import { arrowIconMarkup } from "../../shared/arrowIcon";
@@ -215,6 +215,7 @@ export function wireCorporationBoostMenu(
   const ghostClickGuard = createGhostClickGuard();
 
   function open(): void {
+    cancelDialogClose(panel);
     panel.classList.remove("worker-menu__panel--closing");
     void panel.offsetWidth;
     showGrid();

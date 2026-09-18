@@ -1,4 +1,8 @@
-import { formatPrice, animateDialogClose } from "../../utils";
+import {
+  formatPrice,
+  animateDialogClose,
+  cancelDialogClose,
+} from "../../utils";
 import {
   getAllCompaniesTotalIncome,
   getStoredTotalIncome,
@@ -192,6 +196,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
   }
 
   function open(): void {
+    cancelDialogClose(panel);
     render();
     menu.hidden = false;
     ghostClickGuard.markOpened();

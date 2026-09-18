@@ -1,7 +1,11 @@
 import { getTotalIncome, clearTotalIncome } from "../../totalIncome";
 import { clearBuildings, type Floor } from "../../gameState";
 import { clearCityNames } from "../../cityName";
-import { formatPrice, animateDialogClose } from "../../utils";
+import {
+  formatPrice,
+  animateDialogClose,
+  cancelDialogClose,
+} from "../../utils";
 import { getBuildingPrice } from "../../buildings";
 import { playSwoosh, playSold } from "../../sound";
 import { gte, lt } from "../../shared/bigNumber";
@@ -142,6 +146,7 @@ export function wireMapMenu(
   const ghostClickGuard = createGhostClickGuard();
 
   function open(): void {
+    cancelDialogClose(panel);
     render();
     menu.hidden = false;
     ghostClickGuard.markOpened();

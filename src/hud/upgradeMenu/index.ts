@@ -1,5 +1,9 @@
 import type { Floor } from "../../gameState";
-import { triggerButtonPress, animateDialogClose } from "../../utils";
+import {
+  triggerButtonPress,
+  animateDialogClose,
+  cancelDialogClose,
+} from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import {
   MAX_RENDERED_WORKERS,
@@ -447,6 +451,7 @@ export function wireUpgradeMenu(
   const ghostClickGuard = createGhostClickGuard();
 
   function open(): void {
+    cancelDialogClose(panel);
     render();
     menu.hidden = false;
     ghostClickGuard.markOpened();

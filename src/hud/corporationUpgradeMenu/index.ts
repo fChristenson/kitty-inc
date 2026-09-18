@@ -1,4 +1,8 @@
-import { animateDialogClose, formatPrice } from "../../utils";
+import {
+  animateDialogClose,
+  cancelDialogClose,
+  formatPrice,
+} from "../../utils";
 import { getAllCompaniesTotalIncome } from "../../totalIncome";
 import { getCorporationName } from "../../corporationName";
 import {
@@ -195,6 +199,7 @@ export function wireCorporationUpgradeMenu(
   const ghostClickGuard = createGhostClickGuard();
 
   function open(): void {
+    cancelDialogClose(panel);
     selectedForMerge.clear();
     render();
     menu.hidden = false;

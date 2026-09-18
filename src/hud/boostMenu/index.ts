@@ -3,6 +3,7 @@ import {
   formatPrice,
   triggerButtonPress,
   animateDialogClose,
+  cancelDialogClose,
 } from "../../utils";
 import { spendTotalIncome, getTotalIncome } from "../../totalIncome";
 import { createPollingLoop } from "../../shared/pollingLoop";
@@ -304,6 +305,7 @@ export function wireBoostMenu(
   const ghostClickGuard = createGhostClickGuard();
 
   function open(): void {
+    cancelDialogClose(panel);
     render();
     menu.hidden = false;
     ghostClickGuard.markOpened();

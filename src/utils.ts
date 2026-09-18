@@ -42,17 +42,31 @@ export function triggerButtonPress(button: HTMLButtonElement): Promise<void> {
 // "worker-menu-slide-out" keyframes) and resolves once it finishes — every
 // worker-menu-based dialog (upgrade/boost/map menu) awaits this before actually
 // hiding itself, so closing always glides out instead of just vanishing
+const pendingDialogCloses = new WeakMap<HTMLElement, () => void>();
+
+export function cancelDialogClose(panel: HTMLElement): void {
+  pendingDialogCloses.get(panel)?.();
+}
+
 export function animateDialogClose(panel: HTMLElement): Promise<void> {
+  cancelDialogClose(panel);
   panel.classList.add("worker-menu__panel--closing");
   return new Promise((resolve) => {
-    panel.addEventListener(
-      "animationend",
-      () => {
-        panel.classList.remove("worker-menu__panel--closing");
-        resolve();
-      },
-      { once: true },
-    );
+    const finish = () => {
+      if (pendingDialogCloses.get(panel) !== cancel) return;
+      pendingDialogCloses.delete(panel);
+      panel.classList.remove("worker-menu__panel--closing");
+      panel.removeEventListener("animationend", onAnimationEnd);
+      resolve();
+    };
+    const onAnimationEnd = () => finish();
+    const cancel = () => {
+      pendingDialogCloses.delete(panel);
+      panel.classList.remove("worker-menu__panel--closing");
+      panel.removeEventListener("animationend", onAnimationEnd);
+    };
+    pendingDialogCloses.set(panel, cancel);
+    panel.addEventListener("animationend", onAnimationEnd);
   });
 }
 

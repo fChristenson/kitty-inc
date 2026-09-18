@@ -3,6 +3,7 @@ import {
   formatPrice,
   triggerButtonPress,
   animateDialogClose,
+  cancelDialogClose,
 } from "../../utils";
 import { getTotalIncome } from "../../totalIncome";
 import {
@@ -264,6 +265,7 @@ export function wireFloorUpgradeMenu(
   const ghostClickGuard = createGhostClickGuard();
 
   function open(floor: Floor, floorNumber: number): void {
+    cancelDialogClose(panel);
     currentFloor = floor;
     title.textContent = `Floor ${floorNumber} upgrades`;
     render();
