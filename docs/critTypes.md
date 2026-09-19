@@ -11,17 +11,17 @@ This is the first batch named under the one-name rule: each source file is the
 crit's display name in camelCase, so `fullSteam.png` becomes "Full Steam" and
 the same string is the registry key and the icon, with nothing to keep in sync.
 
-| Image         | Crit           | Immediate reward                              | Proc chance | Comparison                                              |
-| ------------- | -------------- | --------------------------------------------- | ----------- | ------------------------------------------------------- |
-| aetherLantern | Aether Lantern | 19 upgrades on this floor and every one below | 0.8%        | Above Twenty-One's 17 at 0.9%                           |
-| boilerRoom    | Boiler Room    | 22 free upgrades on the lowest-level floor    | 1.4%        | Above Bullseye's 21 at 1.5%                             |
+| Image         | Crit           | Immediate reward                              | Proc chance | Comparison                                               |
+| ------------- | -------------- | --------------------------------------------- | ----------- | -------------------------------------------------------- |
+| aetherLantern | Aether Lantern | 19 upgrades on this floor and every one below | 0.8%        | Above Twenty-One's 17 at 0.9%                            |
+| boilerRoom    | Boiler Room    | 22 free upgrades on the lowest-level floor    | 1.4%        | Above Bullseye's 21 at 1.5%                              |
 | brassDiver    | Brass Diver    | 33 instant payouts on this floor              | 0.5%        | The largest single-floor payout, above Scratch Card's 32 |
-| clockworkHand | Clockwork Hand | 16 upgrades on alternating floors             | 0.9%        | Above Double Helix's 15 at 1%                           |
-| cogwork       | Cogwork        | 29 payouts on every unlocked floor            | 0.3%        | The largest building-wide payout, above Half Life's 28  |
-| fullSteam     | Full Steam     | 33 free upgrades on every unlocked floor      | 0.3%        | The largest building-wide batch, above Jackpot's 32     |
-| pocketWatch   | Pocket Watch   | 29 payouts from the highest-earning floor     | 0.5%        | The largest top-earner payout, above High Roller's 28   |
-| tubeDelivery  | Tube Delivery  | 31 upgrades on the highest unlocked floor     | 0.5%        | Above Silverware's 29, below Golem's 35                 |
-| windUp        | Wind Up        | 1 tier promotion, then 17 upgrades here       | 0.55%       | Slots between Bottled Nebula's 16 and Eureka's 18       |
+| clockworkHand | Clockwork Hand | 16 upgrades on alternating floors             | 0.9%        | Above Double Helix's 15 at 1%                            |
+| cogwork       | Cogwork        | 29 payouts on every unlocked floor            | 0.3%        | The largest building-wide payout, above Half Life's 28   |
+| fullSteam     | Full Steam     | 33 free upgrades on every unlocked floor      | 0.3%        | The largest building-wide batch, above Jackpot's 32      |
+| pocketWatch   | Pocket Watch   | 29 payouts from the highest-earning floor     | 0.5%        | The largest top-earner payout, above High Roller's 28    |
+| tubeDelivery  | Tube Delivery  | 31 upgrades on the highest unlocked floor     | 0.5%        | Above Silverware's 29, below Golem's 35                  |
+| windUp        | Wind Up        | 1 tier promotion, then 17 upgrades here       | 0.55%       | Slots between Bottled Nebula's 16 and Eureka's 18        |
 
 All nine are single-shot and current-building only, with no map-specific
 behavior. Full Steam and Cogwork skip locked floors; Aether Lantern takes the
