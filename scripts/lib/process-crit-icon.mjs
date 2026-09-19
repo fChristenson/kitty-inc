@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import path from "node:path";
 import { dropSmallOpaqueComponents } from "./drop-small-components.mjs";
+import { dropEdgeTouchingComponents } from "./drop-edge-components.mjs";
 import { writeCritSticker } from "./sticker-border.mjs";
 
 export async function processCritIcon(
@@ -14,6 +15,9 @@ export async function processCritIcon(
     // {left, top, width, height} of the real artwork when the source arrives
     // letterboxed — the border-seeded fill can't start inside a non-white bar
     sourceRect = null,
+    // for sources framed by a rounded "card": pair with a sourceRect that cuts
+    // the frame's straight edges, and this clears the corner arcs it leaves
+    dropEdgeComponents = false,
   } = {},
 ) {
   const assets = path.resolve(import.meta.dirname, "../../src/assets");
@@ -91,6 +95,9 @@ export async function processCritIcon(
           : 0;
   }
   dropSmallOpaqueComponents(data, width, height, channels, 120);
+  if (dropEdgeComponents) {
+    dropEdgeTouchingComponents(data, width, height, channels);
+  }
   let left = width;
   let top = height;
   let right = -1;

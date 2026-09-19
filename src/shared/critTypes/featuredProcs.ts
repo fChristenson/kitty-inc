@@ -2276,6 +2276,60 @@ export const FEATURED_CRIT_INFO = {
     icon: "wheelOfFortune",
     description: "Two tier promotions and thirteen upgrades here",
   },
+  aetherLantern: {
+    label: "Aether Lantern",
+    color: COLOR.springCleaningMint,
+    icon: "aetherLantern",
+    description: "Nineteen upgrades on this floor and every floor below",
+  },
+  boilerRoom: {
+    label: "Boiler Room",
+    color: COLOR.headhunterRust,
+    icon: "boilerRoom",
+    description: "Twenty-two free upgrades on the lowest-level floor",
+  },
+  brassDiver: {
+    label: "Brass Diver",
+    color: COLOR.supplyRunTan,
+    icon: "brassDiver",
+    description: "Thirty-three instant payouts on this floor",
+  },
+  clockworkHand: {
+    label: "Clockwork Hand",
+    color: COLOR.bonusRoundGold,
+    icon: "clockworkHand",
+    description: "Sixteen upgrades on alternating floors",
+  },
+  cogwork: {
+    label: "Cogwork",
+    color: COLOR.mergerGold,
+    icon: "cogwork",
+    description: "Twenty-nine payouts on every unlocked floor",
+  },
+  fullSteam: {
+    label: "Full Steam",
+    color: COLOR.unionBossSlate,
+    icon: "fullSteam",
+    description: "Thirty-three free upgrades on every unlocked floor",
+  },
+  pocketWatch: {
+    label: "Pocket Watch",
+    color: COLOR.gold,
+    icon: "pocketWatch",
+    description: "Twenty-nine payouts from the highest-earning floor",
+  },
+  tubeDelivery: {
+    label: "Tube Delivery",
+    color: COLOR.goldenHandshakeGold,
+    icon: "tubeDelivery",
+    description: "Thirty-one upgrades on the highest unlocked floor",
+  },
+  windUp: {
+    label: "Wind Up",
+    color: COLOR.goldenTicketYellow,
+    icon: "windUp",
+    description: "One tier promotion and seventeen upgrades here",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

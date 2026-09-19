@@ -1231,5 +1231,33 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.wheelOfFortuneTierSteps,
         balance.wheelOfFortuneUpgrades,
       ),
+    aetherLantern: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.aetherLanternUpgrades,
+      ),
+    boilerRoom: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.boilerRoomUpgrades),
+    brassDiver: (context) =>
+      actions.payCycles([context.floor], balance.brassDiverPayouts),
+    clockworkHand: (context) =>
+      actions.upgrade(alternating(context), balance.clockworkHandUpgrades),
+    cogwork: (context) =>
+      actions.payCycles(context.floors, balance.cogworkPayouts),
+    fullSteam: (context) =>
+      actions.upgrade(context.floors, balance.fullSteamUpgrades),
+    pocketWatch: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.pocketWatchPayouts,
+      ),
+    tubeDelivery: (context) =>
+      actions.upgrade([highestFloor(context)], balance.tubeDeliveryUpgrades),
+    windUp: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.windUpTierSteps,
+        balance.windUpUpgrades,
+      ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

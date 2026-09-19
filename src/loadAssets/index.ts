@@ -510,6 +510,15 @@ export const IMAGE_FILES = {
   snakeEyes: "snakeEyes.png",
   twentyOne: "twentyOne.png",
   wheelOfFortune: "wheelOfFortune.png",
+  aetherLantern: "aetherLantern.png",
+  boilerRoom: "boilerRoom.png",
+  brassDiver: "brassDiver.png",
+  clockworkHand: "clockworkHand.png",
+  cogwork: "cogwork.png",
+  fullSteam: "fullSteam.png",
+  pocketWatch: "pocketWatch.png",
+  tubeDelivery: "tubeDelivery.png",
+  windUp: "windUp.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

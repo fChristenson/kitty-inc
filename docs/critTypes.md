@@ -1,5 +1,78 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-19 (steampunk and clockwork)
+
+Nine crits support upgrade clicks and floor unlocks through the shared
+`applyFloorCrit` path. Rewards are immediate, existing crit balance is
+unchanged, and proc chances apply only after a tier and the special gateway
+land, before the shared proc cap; they are not per-click odds.
+
+This is the first batch named under the one-name rule: each source file is the
+crit's display name in camelCase, so `fullSteam.png` becomes "Full Steam" and
+the same string is the registry key and the icon, with nothing to keep in sync.
+
+| Image         | Crit           | Immediate reward                              | Proc chance | Comparison                                              |
+| ------------- | -------------- | --------------------------------------------- | ----------- | ------------------------------------------------------- |
+| aetherLantern | Aether Lantern | 19 upgrades on this floor and every one below | 0.8%        | Above Twenty-One's 17 at 0.9%                           |
+| boilerRoom    | Boiler Room    | 22 free upgrades on the lowest-level floor    | 1.4%        | Above Bullseye's 21 at 1.5%                             |
+| brassDiver    | Brass Diver    | 33 instant payouts on this floor              | 0.5%        | The largest single-floor payout, above Scratch Card's 32 |
+| clockworkHand | Clockwork Hand | 16 upgrades on alternating floors             | 0.9%        | Above Double Helix's 15 at 1%                           |
+| cogwork       | Cogwork        | 29 payouts on every unlocked floor            | 0.3%        | The largest building-wide payout, above Half Life's 28  |
+| fullSteam     | Full Steam     | 33 free upgrades on every unlocked floor      | 0.3%        | The largest building-wide batch, above Jackpot's 32     |
+| pocketWatch   | Pocket Watch   | 29 payouts from the highest-earning floor     | 0.5%        | The largest top-earner payout, above High Roller's 28   |
+| tubeDelivery  | Tube Delivery  | 31 upgrades on the highest unlocked floor     | 0.5%        | Above Silverware's 29, below Golem's 35                 |
+| windUp        | Wind Up        | 1 tier promotion, then 17 upgrades here       | 0.55%       | Slots between Bottled Nebula's 16 and Eureka's 18       |
+
+All nine are single-shot and current-building only, with no map-specific
+behavior. Full Steam and Cogwork skip locked floors; Aether Lantern takes the
+triggering floor plus everything below it; Clockwork Hand walks the building
+stride-by-2 from the ground floor. Boiler Room resolves the lowest-level
+unlocked floor, Tube Delivery the highest unlocked floor, and Pocket Watch the
+current top earner by income rate, so on a one-floor building all three
+collapse onto the triggering floor. Wind Up promotes the triggering floor's
+permanent crit tier and stops at the strongest tier. Neither payout crit
+touches floor collection timers.
+
+Full Steam and Cogwork sit at 0.3% — the Huge band — because upgrading or
+paying every floor at that size reshapes the whole building at once.
+
+Wind Up lands inside the existing single-promotion family (Signet of Skulls 15,
+Bottled Nebula 16, Eureka 18), which has to decrease monotonically with reward
+size. Bottled Nebula and Eureka were both already sitting at 0.6% despite the
+two-upgrade gap, so inserting Wind Up at 0.55% also meant dropping Eureka to
+0.5%. That family now reads 0.7% / 0.6% / 0.55% / 0.5% across 15 / 16 / 17 / 18
+upgrades. No other existing balance changed.
+
+### Processing and verification (steampunk and clockwork)
+
+All nine arrived as `.png`, so each wrapper passes `sourceExtension: ".png"`.
+Three findings worth keeping:
+
+- **The CapCut watermark needed no work.** Every source carries one in a
+  corner, but its darkest pixel measures 206-220 whiteness — above the shared
+  processor's 195 background threshold — so the border-seeded flood fill
+  already erases it. Measure before building a removal step.
+- **`boilerRoom` and `cogwork` ship inside a rounded card with a black frame.**
+  A `sourceRect` cuts the frame's straight runs, but a rectangular crop can't
+  follow a rounded corner, so the four corner arcs survived as a thin ring that
+  blew the tight crop out to the full card. That added
+  `scripts/lib/drop-edge-components.mjs`: after a border-seeded key the real
+  subject is always fenced off from the edge, so anything still touching it is
+  leftover framing. `keepLargestOpaqueComponent` would have been wrong here —
+  Cogwork is four separate gears plus motion arcs, and it would have kept one
+  gear. `pocketWatch` uses the same drop for its much fainter card edge.
+- **Two enclosed holes needed seeding**: Pocket Watch's chain loop, Wind Up's
+  heart-shaped bow and Aether Lantern's hanging ring all fence off white the
+  border fill can't reach. Only genuine holes were seeded — most enclosed white
+  in this batch (gear centres, glass panes, the watch face) is real artwork.
+
+Each icon ships as `public/<name>.png`, `public/stickers/<name>.png` and
+`public/silhouettes/<name>.png`.
+
+`node scripts/test-featured-crits.mjs` passes at 388 entries and
+`npm run build` is clean. In-game celebration rendering and the Special Crits
+menu were not exercised in a browser for this batch.
+
 ## Implemented asset batch: 2026-09-19 (sports, laboratory and casino floor)
 
 Sixteen crits — one leftover high-seas prop, four sports trophies, four

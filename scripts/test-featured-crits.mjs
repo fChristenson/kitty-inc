@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 379);
+  assert.equal(kinds.length, 388);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -579,6 +579,15 @@ try {
     snakeEyes: [[20, 30, 10, 0], 40],
     twentyOne: [[37, 47, 10, 0], 0],
     wheelOfFortune: [[20, 43, 10, 0], 0],
+    aetherLantern: [[39, 49, 10, 0], 0],
+    boilerRoom: [[20, 30, 32, 0], 0],
+    brassDiver: [[20, 30, 10, 0], 99],
+    clockworkHand: [[36, 30, 26, 0], 0],
+    cogwork: [[20, 30, 10, 0], 174],
+    fullSteam: [[53, 63, 43, 0], 0],
+    pocketWatch: [[20, 30, 10, 0], 87],
+    tubeDelivery: [[20, 30, 41, 0], 0],
+    windUp: [[20, 47, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
