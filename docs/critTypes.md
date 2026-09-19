@@ -9,43 +9,43 @@ Rewards are immediate, existing crit balance is unchanged, and proc chances
 apply only after a tier and the special gateway land, before the shared proc
 cap; they are not per-click odds.
 
-| Image          | Crit             | Immediate reward                              | Proc chance | Comparison                                               |
-| -------------- | ---------------- | --------------------------------------------- | ----------- | -------------------------------------------------------- |
-| annaNyavarre   | Anna Nyavarre    | 23 payouts from the highest-earning floor     | 0.8%        | Above Golden Stag's 22 at 0.8%                           |
-| batteryCell    | Battery Life     | 16 free upgrades on the lowest-level floor    | 1.9%        | Between Penny Jar's 15 and Purr Denton's 17              |
-| blackBlade     | Black Blade      | 31 free upgrades on this floor                | 0.4%        | Above Commando's 27, below Cold Steel's 33               |
-| boneFlute      | Bone Solo        | 20 payouts on alternating floors              | 0.9%        | Above Swashbuckler's 19, below Quicksilver's 21          |
-| coldSteel      | Cold Steel       | 33 free upgrades on this floor                | 0.4%        | The largest single-floor batch below Samurai's 30-plus   |
-| commando       | Commando         | 27 free upgrades on this floor                | 0.6%        | Above JC Dentclaw's 26 at 0.5%                           |
-| corvidCrown    | Corvid Crown     | 2 tier promotions, then 10 upgrades here      | 0.6%        | Above Adam Whiskersen's double promotion plus 8          |
-| daedalynx      | Daedalynx        | 24 payouts on every unlocked floor            | 0.5%        | Above Bill Blizzard's 23 at 0.5%                         |
-| dataCube       | Read The Emails  | 12 upgrades on this floor and every one below | 1.2%        | Above Gem Mine's 10 at 1.3%                              |
+| Image          | Crit             | Immediate reward                              | Proc chance | Comparison                                                |
+| -------------- | ---------------- | --------------------------------------------- | ----------- | --------------------------------------------------------- |
+| annaNyavarre   | Anna Nyavarre    | 23 payouts from the highest-earning floor     | 0.8%        | Above Golden Stag's 22 at 0.8%                            |
+| batteryCell    | Battery Life     | 16 free upgrades on the lowest-level floor    | 1.9%        | Between Penny Jar's 15 and Purr Denton's 17               |
+| blackBlade     | Black Blade      | 31 free upgrades on this floor                | 0.4%        | Above Commando's 27, below Cold Steel's 33                |
+| boneFlute      | Bone Solo        | 20 payouts on alternating floors              | 0.9%        | Above Swashbuckler's 19, below Quicksilver's 21           |
+| coldSteel      | Cold Steel       | 33 free upgrades on this floor                | 0.4%        | The largest single-floor batch below Samurai's 30-plus    |
+| commando       | Commando         | 27 free upgrades on this floor                | 0.6%        | Above JC Dentclaw's 26 at 0.5%                            |
+| corvidCrown    | Corvid Crown     | 2 tier promotions, then 10 upgrades here      | 0.6%        | Above Adam Whiskersen's double promotion plus 8           |
+| daedalynx      | Daedalynx        | 24 payouts on every unlocked floor            | 0.5%        | Above Bill Blizzard's 23 at 0.5%                          |
+| dataCube       | Read The Emails  | 12 upgrades on this floor and every one below | 1.2%        | Above Gem Mine's 10 at 1.3%                               |
 | dropTuned      | Drop Tuned       | 13 upgrades on alternating floors             | 1.1%        | Above Cash Cannon's 10 and The Fast and the Furriest's 12 |
-| eternalFlame   | Eternal Flame    | 28 instant payouts on this floor              | 0.6%        | Above The Cure's 27, below Last Call's 29                |
-| forgeAhead     | Forge Ahead      | 30 free upgrades on every unlocked floor      | 0.3%        | Reshapes the whole building, above Shoulder Spikes's 29  |
-| guntherHairman | Gunther Hairman  | 28 free upgrades on this floor                | 0.5%        | Above Commando's 27, below Wrist Work's 29               |
-| heliopaws      | Heliopaws        | 26 free upgrades on every unlocked floor      | 0.4%        | Above Bob Pawge's 24 at 0.5%                             |
-| hornsUp        | Horns Up         | 22 upgrades on the highest unlocked floor     | 0.9%        | Above Shred Metal's 21, below Tempered's 25              |
-| ironKey        | Iron Key         | 19 free upgrades on the lowest-level floor    | 1.7%        | Above Studded Belt's 18 at 1.8%                          |
-| lastCall       | Last Call        | 29 instant payouts on this floor              | 0.6%        | The largest single-floor payout below Despicable Fees    |
-| nanoBlade      | Wrist Work       | 29 free upgrades on this floor                | 0.5%        | Above Gunther Hairman's 28, below Black Blade's 31       |
-| peltCloak      | Pelt Cloak       | 14 upgrades on alternating floors             | 1%          | Above Drop Tuned's 13, and rarer for it                  |
-| pigIron        | Pig Iron         | 31 free upgrades on every unlocked floor      | 0.3%        | The largest building-wide batch, above Forge Ahead's 30  |
-| praxisKit      | Level Up         | 1 tier promotion, then 14 upgrades here       | 0.8%        | One upgrade above Midas Touch's single promotion plus 13 |
-| quickSilver    | Quicksilver      | 21 payouts on alternating floors              | 0.8%        | The largest alternating payout, above Bone Solo's 20     |
-| runicAmulet    | Runic Amulet     | 2 tier promotions, then 11 upgrades here      | 0.6%        | Above Corvid Crown's double promotion plus 10            |
-| scaledGrip     | Scaled Grip      | 32 free upgrades on this floor                | 0.4%        | Between Black Blade's 31 and Cold Steel's 33             |
-| securityTurret | Friendly Fire    | 18 payouts on the highest unlocked floor      | 1%          | Above Gold Mine's 15 at 1.2%                             |
-| shoulderSpikes | Shoulder Spikes  | 29 free upgrades on every unlocked floor      | 0.4%        | Above Heliopaws's 26, below Forge Ahead's 30             |
-| shredMetal     | Shred Metal      | 21 upgrades on the highest unlocked floor     | 1%          | Above Space's 20, below Horns Up's 22                    |
-| signetOfSkulls | Signet of Skulls | 1 tier promotion, then 15 upgrades here       | 0.7%        | The largest single promotion below I Didn't Ask For This |
-| stormFork      | Storm Fork       | 25 payouts on every unlocked floor            | 0.4%        | The largest building-wide payout, above Daedalynx's 24   |
-| studdedBelt    | Studded Belt     | 18 free upgrades on the lowest-level floor    | 1.8%        | Above Purr Denton's 17 at 1.9%                           |
-| swashbuckler   | Swashbuckler     | 19 payouts on alternating floors              | 1%          | Above Fair Exchange's 18 at 1.1%                         |
-| tempered       | Tempered         | 25 upgrades on the highest unlocked floor     | 0.8%        | Above Horns Up's 22, below Strong Return's 26            |
-| theCure        | The Cure         | 27 instant payouts on this floor              | 0.7%        | Above Abra-Cash-Dabra's 25 at 2.5%                       |
-| titaniumGrip   | Titanium Grip    | 24 payouts from the highest-earning floor     | 0.7%        | The largest top-earner payout, above Anna Nyavarre's 23  |
-| wardingSigil   | Warding Sigil    | 13 upgrades on this floor and every one below | 1.1%        | Above Read The Emails's 12, and rarer for it             |
+| eternalFlame   | Eternal Flame    | 28 instant payouts on this floor              | 0.6%        | Above The Cure's 27, below Last Call's 29                 |
+| forgeAhead     | Forge Ahead      | 30 free upgrades on every unlocked floor      | 0.3%        | Reshapes the whole building, above Shoulder Spikes's 29   |
+| guntherHairman | Gunther Hairman  | 28 free upgrades on this floor                | 0.5%        | Above Commando's 27, below Wrist Work's 29                |
+| heliopaws      | Heliopaws        | 26 free upgrades on every unlocked floor      | 0.4%        | Above Bob Pawge's 24 at 0.5%                              |
+| hornsUp        | Horns Up         | 22 upgrades on the highest unlocked floor     | 0.9%        | Above Shred Metal's 21, below Tempered's 25               |
+| ironKey        | Iron Key         | 19 free upgrades on the lowest-level floor    | 1.7%        | Above Studded Belt's 18 at 1.8%                           |
+| lastCall       | Last Call        | 29 instant payouts on this floor              | 0.6%        | The largest single-floor payout below Despicable Fees     |
+| nanoBlade      | Wrist Work       | 29 free upgrades on this floor                | 0.5%        | Above Gunther Hairman's 28, below Black Blade's 31        |
+| peltCloak      | Pelt Cloak       | 14 upgrades on alternating floors             | 1%          | Above Drop Tuned's 13, and rarer for it                   |
+| pigIron        | Pig Iron         | 31 free upgrades on every unlocked floor      | 0.3%        | The largest building-wide batch, above Forge Ahead's 30   |
+| praxisKit      | Level Up         | 1 tier promotion, then 14 upgrades here       | 0.8%        | One upgrade above Midas Touch's single promotion plus 13  |
+| quickSilver    | Quicksilver      | 21 payouts on alternating floors              | 0.8%        | The largest alternating payout, above Bone Solo's 20      |
+| runicAmulet    | Runic Amulet     | 2 tier promotions, then 11 upgrades here      | 0.6%        | Above Corvid Crown's double promotion plus 10             |
+| scaledGrip     | Scaled Grip      | 32 free upgrades on this floor                | 0.4%        | Between Black Blade's 31 and Cold Steel's 33              |
+| securityTurret | Friendly Fire    | 18 payouts on the highest unlocked floor      | 1%          | Above Gold Mine's 15 at 1.2%                              |
+| shoulderSpikes | Shoulder Spikes  | 29 free upgrades on every unlocked floor      | 0.4%        | Above Heliopaws's 26, below Forge Ahead's 30              |
+| shredMetal     | Shred Metal      | 21 upgrades on the highest unlocked floor     | 1%          | Above Space's 20, below Horns Up's 22                     |
+| signetOfSkulls | Signet of Skulls | 1 tier promotion, then 15 upgrades here       | 0.7%        | The largest single promotion below I Didn't Ask For This  |
+| stormFork      | Storm Fork       | 25 payouts on every unlocked floor            | 0.4%        | The largest building-wide payout, above Daedalynx's 24    |
+| studdedBelt    | Studded Belt     | 18 free upgrades on the lowest-level floor    | 1.8%        | Above Purr Denton's 17 at 1.9%                            |
+| swashbuckler   | Swashbuckler     | 19 payouts on alternating floors              | 1%          | Above Fair Exchange's 18 at 1.1%                          |
+| tempered       | Tempered         | 25 upgrades on the highest unlocked floor     | 0.8%        | Above Horns Up's 22, below Strong Return's 26             |
+| theCure        | The Cure         | 27 instant payouts on this floor              | 0.7%        | Above Abra-Cash-Dabra's 25 at 2.5%                        |
+| titaniumGrip   | Titanium Grip    | 24 payouts from the highest-earning floor     | 0.7%        | The largest top-earner payout, above Anna Nyavarre's 23   |
+| wardingSigil   | Warding Sigil    | 13 upgrades on this floor and every one below | 1.1%        | Above Read The Emails's 12, and rarer for it              |
 
 All thirty-five are single-shot and current-building only, with no map-specific
 behavior. Building-wide entries skip locked floors; alternating entries walk
