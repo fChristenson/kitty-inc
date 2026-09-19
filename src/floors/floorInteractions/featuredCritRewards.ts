@@ -1028,5 +1028,103 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         alternating(context),
         balance.youKnowWhatStallionUpgrades,
       ),
+    annaNyavarre: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.annaNyavarrePayouts,
+      ),
+    batteryCell: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.batteryCellUpgrades),
+    blackBlade: (context) =>
+      actions.upgrade([context.floor], balance.blackBladeUpgrades),
+    boneFlute: (context) =>
+      actions.payCycles(alternating(context), balance.boneFlutePayouts),
+    coldSteel: (context) =>
+      actions.upgrade([context.floor], balance.coldSteelUpgrades),
+    commando: (context) =>
+      actions.upgrade([context.floor], balance.commandoUpgrades),
+    corvidCrown: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.corvidCrownTierSteps,
+        balance.corvidCrownUpgrades,
+      ),
+    daedalynx: (context) =>
+      actions.payCycles(context.floors, balance.daedalynxPayouts),
+    dataCube: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.dataCubeUpgrades,
+      ),
+    dropTuned: (context) =>
+      actions.upgrade(alternating(context), balance.dropTunedUpgrades),
+    eternalFlame: (context) =>
+      actions.payCycles([context.floor], balance.eternalFlamePayouts),
+    forgeAhead: (context) =>
+      actions.upgrade(context.floors, balance.forgeAheadUpgrades),
+    guntherHairman: (context) =>
+      actions.upgrade([context.floor], balance.guntherHairmanUpgrades),
+    heliopaws: (context) =>
+      actions.upgrade(context.floors, balance.heliopawsUpgrades),
+    hornsUp: (context) =>
+      actions.upgrade([highestFloor(context)], balance.hornsUpUpgrades),
+    ironKey: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.ironKeyUpgrades),
+    lastCall: (context) =>
+      actions.payCycles([context.floor], balance.lastCallPayouts),
+    nanoBlade: (context) =>
+      actions.upgrade([context.floor], balance.nanoBladeUpgrades),
+    peltCloak: (context) =>
+      actions.upgrade(alternating(context), balance.peltCloakUpgrades),
+    pigIron: (context) =>
+      actions.upgrade(context.floors, balance.pigIronUpgrades),
+    praxisKit: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.praxisKitTierSteps,
+        balance.praxisKitUpgrades,
+      ),
+    quickSilver: (context) =>
+      actions.payCycles(alternating(context), balance.quickSilverPayouts),
+    runicAmulet: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.runicAmuletTierSteps,
+        balance.runicAmuletUpgrades,
+      ),
+    scaledGrip: (context) =>
+      actions.upgrade([context.floor], balance.scaledGripUpgrades),
+    securityTurret: (context) =>
+      actions.payCycles([highestFloor(context)], balance.securityTurretPayouts),
+    shoulderSpikes: (context) =>
+      actions.upgrade(context.floors, balance.shoulderSpikesUpgrades),
+    shredMetal: (context) =>
+      actions.upgrade([highestFloor(context)], balance.shredMetalUpgrades),
+    signetOfSkulls: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.signetOfSkullsTierSteps,
+        balance.signetOfSkullsUpgrades,
+      ),
+    stormFork: (context) =>
+      actions.payCycles(context.floors, balance.stormForkPayouts),
+    studdedBelt: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.studdedBeltUpgrades),
+    swashbuckler: (context) =>
+      actions.payCycles(alternating(context), balance.swashbucklerPayouts),
+    tempered: (context) =>
+      actions.upgrade([highestFloor(context)], balance.temperedUpgrades),
+    theCure: (context) =>
+      actions.payCycles([context.floor], balance.theCurePayouts),
+    titaniumGrip: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.titaniumGripPayouts,
+      ),
+    wardingSigil: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.wardingSigilUpgrades,
+      ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

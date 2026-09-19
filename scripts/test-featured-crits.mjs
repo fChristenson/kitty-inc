@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 318);
+  assert.equal(kinds.length, 353);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -516,6 +516,41 @@ try {
     vaultDoor: [[42, 52, 32, 0], 0],
     wishingWell: [[20, 30, 10, 0], 69],
     youKnowWhatStallion: [[31, 30, 21, 0], 0],
+    annaNyavarre: [[20, 30, 10, 0], 69],
+    batteryCell: [[20, 30, 26, 0], 0],
+    blackBlade: [[20, 61, 10, 0], 0],
+    boneFlute: [[20, 30, 10, 0], 60],
+    coldSteel: [[20, 63, 10, 0], 0],
+    commando: [[20, 57, 10, 0], 0],
+    corvidCrown: [[20, 40, 10, 0], 0],
+    daedalynx: [[20, 30, 10, 0], 144],
+    dataCube: [[32, 42, 10, 0], 0],
+    dropTuned: [[33, 30, 23, 0], 0],
+    eternalFlame: [[20, 30, 10, 0], 84],
+    forgeAhead: [[50, 60, 40, 0], 0],
+    guntherHairman: [[20, 58, 10, 0], 0],
+    heliopaws: [[46, 56, 36, 0], 0],
+    hornsUp: [[20, 30, 32, 0], 0],
+    ironKey: [[20, 30, 29, 0], 0],
+    lastCall: [[20, 30, 10, 0], 87],
+    nanoBlade: [[20, 59, 10, 0], 0],
+    peltCloak: [[34, 30, 24, 0], 0],
+    pigIron: [[51, 61, 41, 0], 0],
+    praxisKit: [[20, 44, 10, 0], 0],
+    quickSilver: [[20, 30, 10, 0], 63],
+    runicAmulet: [[20, 41, 10, 0], 0],
+    scaledGrip: [[20, 62, 10, 0], 0],
+    securityTurret: [[20, 30, 10, 0], 36],
+    shoulderSpikes: [[49, 59, 39, 0], 0],
+    shredMetal: [[20, 30, 31, 0], 0],
+    signetOfSkulls: [[20, 45, 10, 0], 0],
+    stormFork: [[20, 30, 10, 0], 150],
+    studdedBelt: [[20, 30, 28, 0], 0],
+    swashbuckler: [[20, 30, 10, 0], 57],
+    tempered: [[20, 30, 35, 0], 0],
+    theCure: [[20, 30, 10, 0], 81],
+    titaniumGrip: [[20, 30, 10, 0], 72],
+    wardingSigil: [[33, 43, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
