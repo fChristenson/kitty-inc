@@ -1,5 +1,49 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-19 (food, science, treasure and gear)
+
+Twenty-five coherent crits support upgrade clicks and floor unlocks through the
+shared `applyFloorCrit` path. Rewards are immediate, current-building only,
+and existing balance was unchanged. The proc chances remain conditional on a
+tier landing and the special gateway before the shared proc cap; they are not
+per-click odds.
+
+| Image             | Crit               | Immediate reward                  | Proc chance |
+| ----------------- | ------------------ | --------------------------------- | ----------- |
+| ancientRelic      | Ancient Relic      | 35 payouts here                   | 1.4%        |
+| geometricRelic    | Geometric Relic    | 34 payouts here                   | 1.5%        |
+| berryParfait      | Berry Parfait      | 32 payouts on every floor         | 0.2%        |
+| berrySmoothie     | Berry Smoothie     | 32 payouts from top earner        | 0.4%        |
+| butterCroissant   | Butter Croissant   | 39 upgrades here                  | 0.2%        |
+| cheeseWheel       | Cheese Wheel       | 34 payouts here                   | 0.3%        |
+| chromeArm         | Chrome Arm         | 37 upgrades here                  | 0.2%        |
+| circuitBreaker    | Circuit Breaker    | 36 upgrades here                  | 0.2%        |
+| glassWyvern       | Glass Wyvern       | 30 payouts from top earner        | 0.4%        |
+| goldBar           | Gold Bar           | 31 payouts on every floor         | 0.2%        |
+| honeyToast        | Honey Toast        | 23 upgrades on lowest floor       | 1.3%        |
+| potionCommotion   | Potion Commotion   | 30 payouts here                   | 0.4%        |
+| lemonTart         | Lemon Tart         | 36 upgrades on highest floor      | 0.3%        |
+| lifelineLoot      | Lifeline Loot      | 22 upgrades here                  | 1.4%        |
+| moonCloak         | Moon Cloak         | 20 upgrades here and below        | 0.7%        |
+| mossbackManticore | Mossback Manticore | 30 payouts on every floor         | 0.3%        |
+| platinumRing      | Platinum Ring      | 32 upgrades here                  | 0.4%        |
+| sapphireOrbit     | Sapphire Orbit     | 1 promotion plus 20 upgrades      | 0.45%       |
+| roboticGripper    | Robotic Gripper    | 38 upgrades here                  | 0.2%        |
+| silverCoin        | Silver Coin        | 25 payouts on alternating floors  | 0.6%        |
+| spicedChai        | Spiced Chai        | 35 payouts here                   | 0.3%        |
+| stormBoots        | Storm Boots        | 18 upgrades on alternating floors | 0.6%        |
+| sushiPlatter      | Sushi Platter      | 26 payouts on alternating floors  | 0.6%        |
+| thornmailGlove    | Thornmail Glove    | 1 promotion plus 19 upgrades      | 0.4%        |
+| gildedCache       | Gilded Cache       | 35 upgrades on every floor        | 0.25%       |
+
+All raw sources were `.jfif`, already camelCase, and unregistered. Twenty-four
+used the shared near-white processor. `potionCommotion` used a dedicated
+color-distance flood fill because its source had a dark panel background. Every
+icon produced public artwork, a sticker, and an undiscovered silhouette.
+
+`node scripts/test-featured-crits.mjs` passes at 412 entries and `npm run build`
+is clean.
+
 ## Implemented asset batch: 2026-09-19 (steampunk and clockwork)
 
 Nine crits support upgrade clicks and floor unlocks through the shared

@@ -45,22 +45,38 @@ CRIT_ICON_BY_LABEL["Sales event"] = { name: "cashRegister" };
 
 const loadedCritIcons = new Map<ImageName, HTMLImageElement>();
 const requestedCritIcons = new Set<ImageName>();
+const critIconPromises = new Map<ImageName, Promise<HTMLImageElement>>();
 
-// on-demand loader: a given crit icon's fetch/decode only kicks off the
-// first time that crit type actually flashes on screen, instead of every
-// single one being preloaded upfront at module load — most sessions only
-// ever land a handful of these crit types, so eagerly fetching all ~35 icons
-// at startup just to have them "ready" would needlessly bloat initial load.
-// Returns null (draw is skipped for that frame) until the image resolves.
+function requestCritIcon(name: ImageName): Promise<HTMLImageElement> {
+  const pending = critIconPromises.get(name);
+  if (pending) return pending;
+  const promise = loadImageByName(name).then((image) => {
+    loadedCritIcons.set(name, image);
+    return image;
+  });
+  critIconPromises.set(name, promise);
+  requestedCritIcons.add(name);
+  return promise;
+}
+
+// Start every celebration icon request as soon as this module is evaluated.
+// The browser still controls concurrency/cache reuse, but crits no longer wait
+// until their first animation frame to discover an image URL.
+export function preloadCritIcons(): Promise<void> {
+  return Promise.all(
+    [...new Set([
+      ...CRIT_PROC_KINDS.map((kind) => CRIT_PROC_INFO[kind].icon),
+      "cashRegister" as ImageName,
+    ])].map((name) => requestCritIcon(name)),
+  ).then(() => undefined);
+}
+
+void preloadCritIcons().catch(() => undefined);
+
 function getCritIcon(name: ImageName): HTMLImageElement | null {
   const cached = loadedCritIcons.get(name);
   if (cached) return cached;
-  if (!requestedCritIcons.has(name)) {
-    requestedCritIcons.add(name);
-    loadImageByName(name).then((image) => {
-      loadedCritIcons.set(name, image);
-    });
-  }
+  if (!requestedCritIcons.has(name)) requestCritIcon(name);
   return null;
 }
 // extended duration so the initial punch is followed by a tail of decaying minor
@@ -183,21 +199,30 @@ export function triggerScreenShake(options?: {
   };
   const now = Date.now();
   const idle = flashEndsAt === null || now >= flashEndsAt;
-  if (idle) {
-    startFlash(req);
+  const shouldStart = idle || req.priority > activeFlashPriority;
+  if (shouldStart) {
+    const iconName = CRIT_ICON_BY_LABEL[req.label]?.name;
+    const ready = iconName ? requestCritIcon(iconName) : Promise.resolve();
+    ready.then(() => {
+      const currentNow = Date.now();
+      const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
+      if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
+    }).catch(() => {
+      const currentNow = Date.now();
+      const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
+      if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
+    });
     return;
   }
   // a strictly bigger celebration still preempts whatever's currently playing
-  // immediately (an ultra shouldn't wait behind a plain crit); anything else
+  // as soon as its icon is ready (an ultra shouldn't wait behind a plain crit);
+  // anything else
   // (same/lower priority) is simply dropped instead of queued — a chain/boost
   // proc riding the very crit that's already flashing is folded into that same
   // flash by the caller instead of firing a second request (see
   // critCelebration.ts's triggerCritCelebration), so nothing here should ever
   // need a second turn; a genuinely separate, unrelated crit arriving mid-flash
   // is just skipped rather than making the player sit through a backlog
-  if (req.priority > activeFlashPriority) {
-    startFlash(req);
-  }
 }
 
 // call once per frame from gameCanvas.ts's redraw(), before its own dpr/scale

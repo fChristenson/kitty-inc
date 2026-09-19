@@ -256,7 +256,12 @@ repeat the whole table.
 
 ## Crit suggestion quality rules
 
-Every crit name suggestion must have a fun unique name.
+Every crit name suggestion must have a fun, expressive, unique name grounded in
+the artwork or reward. Never use a numeric suffix, Roman numeral, "version 2",
+or a near-duplicate of an existing crit name to distinguish a new entry; name
+the new subject or its visual/reward identity instead. The internal camelCase
+kind, display label, icon basename, source asset, and processor should all use
+that same distinct identity.
 Crit rewards must always be positive and provide instant gratification.
 Crits can have the same reward effect as long as the name is distinct and the values are different.
 For example, a crit can upgrade a floor and another crit can do so but they both must have distinct values for the upgrade effect such as one with +1 and another with +2.

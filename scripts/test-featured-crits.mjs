@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 388);
+  assert.equal(kinds.length, 412);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -561,8 +561,32 @@ try {
     divingBell: [[22, 30, 10, 0], 0],
     flooringInspector: [[35, 45, 10, 0], 0],
     kraken: [[20, 30, 10, 0], 162],
-    lighthouse: [[20, 30, 10, 0], 78],
     messageInABottle: [[20, 30, 30, 0], 0],
+    ancientRelic: [[20, 30, 10, 0], 105],
+    geometricRelic: [[20, 30, 10, 0], 102],
+    berryParfait: [[20, 30, 10, 0], 192],
+    berrySmoothie: [[20, 30, 10, 0], 96],
+    butterCroissant: [[20, 69, 10, 0], 0],
+    cheeseWheel: [[20, 30, 10, 0], 102],
+    chromeArm: [[20, 67, 10, 0], 0],
+    circuitBreaker: [[20, 66, 10, 0], 0],
+    glassWyvern: [[20, 30, 10, 0], 90],
+    goldBar: [[20, 30, 10, 0], 186],
+    honeyToast: [[20, 30, 33, 0], 0],
+    potionCommotion: [[20, 30, 10, 0], 90],
+    lemonTart: [[20, 30, 46, 0], 0],
+    lifelineLoot: [[20, 52, 10, 0], 0],
+    moonCloak: [[40, 50, 10, 0], 0],
+    mossbackManticore: [[20, 30, 10, 0], 180],
+    platinumRing: [[20, 62, 10, 0], 0],
+    sapphireOrbit: [[20, 50, 10, 0], 0],
+    roboticGripper: [[20, 68, 10, 0], 0],
+    silverCoin: [[20, 30, 10, 0], 75],
+    spicedChai: [[20, 30, 10, 0], 105],
+    stormBoots: [[38, 30, 28, 0], 0],
+    sushiPlatter: [[20, 30, 10, 0], 78],
+    thornmailGlove: [[20, 49, 10, 0], 0],
+    gildedCache: [[55, 65, 45, 0], 0],
     bullseye: [[20, 30, 31, 0], 0],
     chainReaction: [[36, 46, 10, 0], 0],
     doubleHelix: [[35, 30, 25, 0], 0],

@@ -8,10 +8,35 @@ The following are keywords that should be referenced in prompts. The content sho
 
 Take care to never copy trademarked content. Instead add a unique twist or original element to the subject. The game is focused around cats and things related to them. Twists should not always be cat focused but is a good choice for when artwork needs a character performing some act or if names need to be changed to avoid direct references.
 
+## Prompt quality rules
+
+- Each prompt must describe one clear subject that could exist as one readable
+  game icon. Do not combine unrelated keywords into a new object.
+- A category is a batch boundary, not a mixing instruction. A food batch should
+  contain recognizable, appetizing food; a science batch should contain one
+  coherent scientific object; a money batch should contain one clear money,
+  treasure or financial object.
+- A playful twist is allowed only when the base subject remains immediately
+  recognizable. A cat wearing goggles is coherent; a crystal compiler,
+  gemstone geyser, or programming-marble hybrid is not.
+- Prefer a real object, creature, tool, dish, artifact or simple scene over an
+  abstract pun. The display name can be funny without forcing the artwork to
+  depict the pun literally.
+- Do not add unrelated effects, materials or props just to represent another
+  keyword. Add only details that belong to the subject or explain its action.
+- Food must look delicious and edible, with natural ingredients and appealing
+  presentation. Do not turn food into rockets, computers, weapons or treasure
+  chests unless the batch explicitly asks for a food-themed fantasy object.
+- Before adding a prompt, ask: “What is the one thing in this image?” If the
+  answer needs “and” to name two unrelated things, rewrite the prompt.
+
 ## General
 
 - Candy
 - Food
+- Animals
+- Plants
+- Desserts
 - Jokes
 - Beverages
 - Science
@@ -265,3 +290,38 @@ Take care to never copy trademarked content. Instead add a unique twist or origi
 - Unique mythical shields
 - Cursed mythical shields
 - Enchanted mythical shields
+
+## Star wars
+
+- Famous characters
+- Iconic items
+- Famous phrases
+- Famous quotes
+
+## Harry Potter
+
+- Famous characters
+- Iconic items
+- Famous phrases
+- Famous quotes
+
+## Lord of the Rings
+
+- Famous characters
+- Iconic items
+- Famous phrases
+- Famous quotes
+
+## Belgarion
+
+- Famous characters
+- Iconic items
+- Famous phrases
+- Famous quotes
+
+## TV Comedy shows
+
+- Famous characters
+- Iconic items
+- Famous phrases
+- Famous quotes

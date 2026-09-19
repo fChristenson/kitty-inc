@@ -1172,11 +1172,6 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       ),
     kraken: (context) =>
       actions.payCycles(context.floors, balance.krakenPayouts),
-    lighthouse: (context) =>
-      actions.payCycles(
-        [selectByRate(context, true)],
-        balance.lighthousePayouts,
-      ),
     messageInABottle: (context) =>
       actions.upgrade([lowestLevel(context)], balance.messageInABottleUpgrades),
     bullseye: (context) =>
@@ -1259,5 +1254,72 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.windUpTierSteps,
         balance.windUpUpgrades,
       ),
+    ancientRelic: (context) =>
+      actions.payCycles([context.floor], balance.ancientRelicPayouts),
+    geometricRelic: (context) =>
+      actions.payCycles([context.floor], balance.geometricRelicPayouts),
+    berryParfait: (context) =>
+      actions.payCycles(context.floors, balance.berryParfaitPayouts),
+    berrySmoothie: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.berrySmoothiePayouts,
+      ),
+    butterCroissant: (context) =>
+      actions.upgrade([context.floor], balance.butterCroissantUpgrades),
+    cheeseWheel: (context) =>
+      actions.payCycles([context.floor], balance.cheeseWheelPayouts),
+    chromeArm: (context) =>
+      actions.upgrade([context.floor], balance.chromeArmUpgrades),
+    circuitBreaker: (context) =>
+      actions.upgrade([context.floor], balance.circuitBreakerUpgrades),
+    glassWyvern: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.glassWyvernPayouts,
+      ),
+    goldBar: (context) =>
+      actions.payCycles(context.floors, balance.goldBarPayouts),
+    honeyToast: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.honeyToastUpgrades),
+    potionCommotion: (context) =>
+      actions.payCycles([context.floor], balance.potionCommotionPayouts),
+    lemonTart: (context) =>
+      actions.upgrade([highestFloor(context)], balance.lemonTartUpgrades),
+    lifelineLoot: (context) =>
+      actions.upgrade([context.floor], balance.lifelineLootUpgrades),
+    moonCloak: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.moonCloakUpgrades,
+      ),
+    mossbackManticore: (context) =>
+      actions.payCycles(context.floors, balance.mossbackManticorePayouts),
+    platinumRing: (context) =>
+      actions.upgrade([context.floor], balance.platinumRingUpgrades),
+    sapphireOrbit: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.sapphireOrbitTierSteps,
+        balance.sapphireOrbitUpgrades,
+      ),
+    roboticGripper: (context) =>
+      actions.upgrade([context.floor], balance.roboticGripperUpgrades),
+    silverCoin: (context) =>
+      actions.payCycles(alternating(context), balance.silverCoinPayouts),
+    spicedChai: (context) =>
+      actions.payCycles([context.floor], balance.spicedChaiPayouts),
+    stormBoots: (context) =>
+      actions.upgrade(alternating(context), balance.stormBootsUpgrades),
+    sushiPlatter: (context) =>
+      actions.payCycles(alternating(context), balance.sushiPlatterPayouts),
+    thornmailGlove: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.thornmailGloveTierSteps,
+        balance.thornmailGloveUpgrades,
+      ),
+    gildedCache: (context) =>
+      actions.upgrade(context.floors, balance.gildedCacheUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
