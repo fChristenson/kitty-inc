@@ -64,10 +64,12 @@ function requestCritIcon(name: ImageName): Promise<HTMLImageElement> {
 // until their first animation frame to discover an image URL.
 export function preloadCritIcons(): Promise<void> {
   return Promise.all(
-    [...new Set([
-      ...CRIT_PROC_KINDS.map((kind) => CRIT_PROC_INFO[kind].icon),
-      "cashRegister" as ImageName,
-    ])].map((name) => requestCritIcon(name)),
+    [
+      ...new Set([
+        ...CRIT_PROC_KINDS.map((kind) => CRIT_PROC_INFO[kind].icon),
+        "cashRegister" as ImageName,
+      ]),
+    ].map((name) => requestCritIcon(name)),
   ).then(() => undefined);
 }
 
@@ -203,15 +205,17 @@ export function triggerScreenShake(options?: {
   if (shouldStart) {
     const iconName = CRIT_ICON_BY_LABEL[req.label]?.name;
     const ready = iconName ? requestCritIcon(iconName) : Promise.resolve();
-    ready.then(() => {
-      const currentNow = Date.now();
-      const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
-      if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
-    }).catch(() => {
-      const currentNow = Date.now();
-      const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
-      if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
-    });
+    ready
+      .then(() => {
+        const currentNow = Date.now();
+        const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
+        if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
+      })
+      .catch(() => {
+        const currentNow = Date.now();
+        const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
+        if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
+      });
     return;
   }
   // a strictly bigger celebration still preempts whatever's currently playing
