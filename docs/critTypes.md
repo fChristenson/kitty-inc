@@ -7,14 +7,14 @@ Six crits support upgrade clicks and floor unlocks through the shared
 unchanged, and proc chances apply only after a tier and the special gateway
 land, before the shared proc cap; they are not per-click odds.
 
-| Image             | Crit                | Immediate reward                                 | Proc chance | Comparison                                              |
-| ----------------- | ------------------- | ------------------------------------------------ | ----------- | ------------------------------------------------------- |
-| captainLeFluff    | Captain Le Fluff    | 28 upgrades on the highest unlocked floor        | 0.6%        | Above Eclipse's 27, below Golem's 35                    |
-| divingBell        | Deep Dive           | 2 free upgrades per floor, cascading down        | 5%          | Bounce's own cascade at double the step, so half as likely |
-| flooringInspector | Flooring Inspector  | 15 upgrades on this floor and every one below    | 1%          | Above Warding Sigil's 13 at 1.1%                        |
-| kraken            | Kraken              | 27 payouts on every unlocked floor               | 0.3%        | The largest building-wide payout, above Black Hole's 26 |
-| lighthouse        | Lighthouse          | 26 payouts from the highest-earning floor        | 0.6%        | The largest top-earner payout, above Treasure Map's 25  |
-| messageInABottle  | Message in a Bottle | 20 free upgrades on the lowest-level floor       | 1.6%        | Above Iron Key's 19 at 1.7%                             |
+| Image             | Crit                | Immediate reward                              | Proc chance | Comparison                                                 |
+| ----------------- | ------------------- | --------------------------------------------- | ----------- | ---------------------------------------------------------- |
+| captainLeFluff    | Captain Le Fluff    | 28 upgrades on the highest unlocked floor     | 0.6%        | Above Eclipse's 27, below Golem's 35                       |
+| divingBell        | Deep Dive           | 2 free upgrades per floor, cascading down     | 5%          | Bounce's own cascade at double the step, so half as likely |
+| flooringInspector | Flooring Inspector  | 15 upgrades on this floor and every one below | 1%          | Above Warding Sigil's 13 at 1.1%                           |
+| kraken            | Kraken              | 27 payouts on every unlocked floor            | 0.3%        | The largest building-wide payout, above Black Hole's 26    |
+| lighthouse        | Lighthouse          | 26 payouts from the highest-earning floor     | 0.6%        | The largest top-earner payout, above Treasure Map's 25     |
+| messageInABottle  | Message in a Bottle | 20 free upgrades on the lowest-level floor    | 1.6%        | Above Iron Key's 19 at 1.7%                                |
 
 **Deep Dive** reuses Bounce's shape rather than a fixed target list: it always
 falls one floor from the floor that crit, then re-rolls

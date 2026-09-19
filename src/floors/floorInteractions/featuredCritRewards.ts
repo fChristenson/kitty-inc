@@ -1178,9 +1178,6 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.lighthousePayouts,
       ),
     messageInABottle: (context) =>
-      actions.upgrade(
-        [lowestLevel(context)],
-        balance.messageInABottleUpgrades,
-      ),
+      actions.upgrade([lowestLevel(context)], balance.messageInABottleUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
