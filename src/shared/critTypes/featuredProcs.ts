@@ -2180,6 +2180,102 @@ export const FEATURED_CRIT_INFO = {
     icon: "messageInABottle",
     description: "Twenty free upgrades on the lowest-level floor",
   },
+  bullseye: {
+    label: "Bullseye",
+    color: COLOR.fullHouseCrimson,
+    icon: "bullseye",
+    description: "Twenty-one free upgrades on the lowest-level floor",
+  },
+  chainReaction: {
+    label: "Chain Reaction",
+    color: COLOR.blue,
+    icon: "chainReaction",
+    description: "Sixteen upgrades on this floor and every floor below",
+  },
+  doubleHelix: {
+    label: "Double Helix",
+    color: COLOR.pairBlue,
+    icon: "doubleHelix",
+    description: "Fifteen upgrades on alternating floors",
+  },
+  eureka: {
+    label: "Eureka",
+    color: COLOR.luckyCloverGreen,
+    icon: "eureka",
+    description: "One tier promotion and eighteen upgrades here",
+  },
+  goldMedal: {
+    label: "Gold Medal",
+    color: COLOR.goldenTicketYellow,
+    icon: "goldMedal",
+    description: "Thirty-one instant payouts on this floor",
+  },
+  halfLife: {
+    label: "Half Life",
+    color: COLOR.suppliesGiveawayLime,
+    icon: "halfLife",
+    description: "Twenty-eight payouts on every unlocked floor",
+  },
+  highRoller: {
+    label: "High Roller",
+    color: COLOR.doubleDownCrimson,
+    icon: "highRoller",
+    description: "Twenty-eight payouts from the highest-earning floor",
+  },
+  jackpot: {
+    label: "Jackpot",
+    color: COLOR.bonusRoundGold,
+    icon: "jackpot",
+    description: "Thirty-two free upgrades on every unlocked floor",
+  },
+  knockout: {
+    label: "Knockout",
+    color: COLOR.red,
+    icon: "knockout",
+    description: "Thirty-four free upgrades on this floor",
+  },
+  pearlDiver: {
+    label: "Pearl Diver",
+    color: COLOR.peppermintPink,
+    icon: "pearlDiver",
+    description: "Twenty-seven payouts from the highest-earning floor",
+  },
+  roundAndRound: {
+    label: "Round and Round",
+    color: COLOR.grandOpeningRose,
+    icon: "roundAndRound",
+    description: "Twenty-three payouts on alternating floors",
+  },
+  scratchCard: {
+    label: "Scratch Card",
+    color: COLOR.internSkyBlue,
+    icon: "scratchCard",
+    description: "Thirty-two instant payouts on this floor",
+  },
+  silverware: {
+    label: "Silverware",
+    color: COLOR.silverTicketGray,
+    icon: "silverware",
+    description: "Twenty-nine upgrades on the highest unlocked floor",
+  },
+  snakeEyes: {
+    label: "Snake Eyes",
+    color: COLOR.white,
+    icon: "snakeEyes",
+    description: "Twenty payouts on the highest unlocked floor",
+  },
+  twentyOne: {
+    label: "Twenty-One",
+    color: COLOR.dressCodeGreen,
+    icon: "twentyOne",
+    description: "Seventeen upgrades on this floor and every floor below",
+  },
+  wheelOfFortune: {
+    label: "Wheel of Fortune",
+    color: COLOR.royalFlushPurple,
+    icon: "wheelOfFortune",
+    description: "Two tier promotions and thirteen upgrades here",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

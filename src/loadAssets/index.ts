@@ -494,6 +494,22 @@ export const IMAGE_FILES = {
   kraken: "kraken.png",
   lighthouse: "lighthouse.png",
   messageInABottle: "messageInABottle.png",
+  bullseye: "bullseye.png",
+  chainReaction: "chainReaction.png",
+  doubleHelix: "doubleHelix.png",
+  eureka: "eureka.png",
+  goldMedal: "goldMedal.png",
+  halfLife: "halfLife.png",
+  highRoller: "highRoller.png",
+  jackpot: "jackpot.png",
+  knockout: "knockout.png",
+  pearlDiver: "pearlDiver.png",
+  roundAndRound: "roundAndRound.png",
+  scratchCard: "scratchCard.png",
+  silverware: "silverware.png",
+  snakeEyes: "snakeEyes.png",
+  twentyOne: "twentyOne.png",
+  wheelOfFortune: "wheelOfFortune.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

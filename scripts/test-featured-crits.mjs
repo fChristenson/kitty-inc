@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 363);
+  assert.equal(kinds.length, 379);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -563,6 +563,22 @@ try {
     kraken: [[20, 30, 10, 0], 162],
     lighthouse: [[20, 30, 10, 0], 78],
     messageInABottle: [[20, 30, 30, 0], 0],
+    bullseye: [[20, 30, 31, 0], 0],
+    chainReaction: [[36, 46, 10, 0], 0],
+    doubleHelix: [[35, 30, 25, 0], 0],
+    eureka: [[20, 48, 10, 0], 0],
+    goldMedal: [[20, 30, 10, 0], 93],
+    halfLife: [[20, 30, 10, 0], 168],
+    highRoller: [[20, 30, 10, 0], 84],
+    jackpot: [[52, 62, 42, 0], 0],
+    knockout: [[20, 64, 10, 0], 0],
+    pearlDiver: [[20, 30, 10, 0], 81],
+    roundAndRound: [[20, 30, 10, 0], 69],
+    scratchCard: [[20, 30, 10, 0], 96],
+    silverware: [[20, 30, 39, 0], 0],
+    snakeEyes: [[20, 30, 10, 0], 40],
+    twentyOne: [[37, 47, 10, 0], 0],
+    wheelOfFortune: [[20, 43, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

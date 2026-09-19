@@ -1179,5 +1179,57 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       ),
     messageInABottle: (context) =>
       actions.upgrade([lowestLevel(context)], balance.messageInABottleUpgrades),
+    bullseye: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.bullseyeUpgrades),
+    chainReaction: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.chainReactionUpgrades,
+      ),
+    doubleHelix: (context) =>
+      actions.upgrade(alternating(context), balance.doubleHelixUpgrades),
+    eureka: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.eurekaTierSteps,
+        balance.eurekaUpgrades,
+      ),
+    goldMedal: (context) =>
+      actions.payCycles([context.floor], balance.goldMedalPayouts),
+    halfLife: (context) =>
+      actions.payCycles(context.floors, balance.halfLifePayouts),
+    highRoller: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.highRollerPayouts,
+      ),
+    jackpot: (context) =>
+      actions.upgrade(context.floors, balance.jackpotUpgrades),
+    knockout: (context) =>
+      actions.upgrade([context.floor], balance.knockoutUpgrades),
+    pearlDiver: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.pearlDiverPayouts,
+      ),
+    roundAndRound: (context) =>
+      actions.payCycles(alternating(context), balance.roundAndRoundPayouts),
+    scratchCard: (context) =>
+      actions.payCycles([context.floor], balance.scratchCardPayouts),
+    silverware: (context) =>
+      actions.upgrade([highestFloor(context)], balance.silverwareUpgrades),
+    snakeEyes: (context) =>
+      actions.payCycles([highestFloor(context)], balance.snakeEyesPayouts),
+    twentyOne: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.twentyOneUpgrades,
+      ),
+    wheelOfFortune: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.wheelOfFortuneTierSteps,
+        balance.wheelOfFortuneUpgrades,
+      ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

@@ -1,5 +1,65 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-19 (sports, laboratory and casino floor)
+
+Sixteen crits — one leftover high-seas prop, four sports trophies, four
+laboratory props and seven casino pieces — support upgrade clicks and floor
+unlocks through the shared `applyFloorCrit` path. Rewards are immediate,
+existing crit balance is unchanged, and proc chances apply only after a tier
+and the special gateway land, before the shared proc cap; they are not
+per-click odds.
+
+| Image          | Crit             | Immediate reward                                 | Proc chance | Comparison                                              |
+| -------------- | ---------------- | ------------------------------------------------ | ----------- | ------------------------------------------------------- |
+| bullseye       | Bullseye         | 21 free upgrades on the lowest-level floor       | 1.5%        | Above Message in a Bottle's 20 at 1.6%                  |
+| chainReaction  | Chain Reaction   | 16 upgrades on this floor and every one below    | 0.9%        | Above Flooring Inspector's 15 at 1%                     |
+| doubleHelix    | Double Helix     | 15 upgrades on alternating floors                | 1%          | Above Pelt Cloak's 14 at 1%                             |
+| eureka         | Eureka           | 1 tier promotion, then 18 upgrades here          | 0.6%        | The largest single promotion below I Didn't Ask For This |
+| goldMedal      | Gold Medal       | 31 instant payouts on this floor                 | 0.6%        | The largest single-floor payout, above Despicable Fees   |
+| halfLife       | Half Life        | 28 payouts on every unlocked floor               | 0.3%        | The largest building-wide payout, above Kraken's 27     |
+| highRoller     | High Roller      | 28 payouts from the highest-earning floor        | 0.5%        | The largest top-earner payout, above Pearl Diver's 27   |
+| jackpot        | Jackpot          | 32 free upgrades on every unlocked floor         | 0.3%        | The largest building-wide batch, above Pig Iron's 31    |
+| knockout       | Knockout         | 34 free upgrades on this floor                   | 0.4%        | Above Cold Steel's 33 at 0.4%                           |
+| pearlDiver     | Pearl Diver      | 27 payouts from the highest-earning floor        | 0.6%        | Above Lighthouse's 26 at 0.6%                           |
+| roundAndRound  | Round and Round  | 23 payouts on alternating floors                 | 0.8%        | The largest alternating payout, above Quicksilver's 21  |
+| scratchCard    | Scratch Card     | 32 instant payouts on this floor                 | 0.6%        | Above Gold Medal's 31, and rarer for it                 |
+| silverware     | Silverware       | 29 upgrades on the highest unlocked floor        | 0.6%        | Above Captain Le Fluff's 28, below Golem's 35           |
+| snakeEyes      | Snake Eyes       | 20 payouts on the highest unlocked floor         | 0.9%        | Above Friendly Fire's 18 at 1%                          |
+| twentyOne      | Twenty-One       | 17 upgrades on this floor and every one below    | 0.9%        | Above Chain Reaction's 16, and equally rare             |
+| wheelOfFortune | Wheel of Fortune | 2 tier promotions, then 13 upgrades here         | 0.5%        | Above Runic Amulet's double promotion plus 11           |
+
+All sixteen are single-shot and current-building only, with no map-specific
+behavior. Half Life and Jackpot skip locked floors; Chain Reaction and
+Twenty-One take the triggering floor plus everything below it; Double Helix and
+Round and Round walk the building stride-by-2 from the ground floor. Bullseye
+resolves the lowest-level unlocked floor, Silverware and Snake Eyes the highest
+unlocked floor, and Pearl Diver / High Roller the current top earner by income
+rate, so on a one-floor building all of those collapse onto the triggering
+floor. Eureka and Wheel of Fortune promote the triggering floor's permanent
+crit tier and stop at the strongest tier. No payout crit in this batch touches
+floor collection timers.
+
+Half Life and Jackpot sit at 0.3% — the Huge band — because paying or upgrading
+every floor at that size reshapes the whole building at once.
+
+### Processing and verification (sports, laboratory and casino floor)
+
+All sixteen arrived already camelCased as `.png` sources, so each wrapper
+passes `sourceExtension: ".png"` to `scripts/lib/process-crit-icon.mjs`. A
+border scan confirmed a near-white background on every one, so the shared
+border-seeded flood fill handled them with no tailored processor, across source
+sizes from 1376x768 up to 2560x2560. A magenta contact sheet confirmed no
+halos, with every detached element surviving: Pearl Diver's bubbles, Eureka's
+floating bulb and spilled droplets, Chain Reaction's separate electrons, Snake
+Eyes' two dice, Scratch Card's loose coin and High Roller's tipped chip.
+
+Each icon ships as both `public/<name>.png` and `public/stickers/<name>.png`
+via `scripts/lib/sticker-border.mjs`.
+
+`node scripts/test-featured-crits.mjs` passes at 379 entries and
+`npm run build` is clean. In-game celebration rendering and the Special Crits
+menu were not exercised in a browser for this batch.
+
 ## Implemented asset batch: 2026-09-19 (high seas)
 
 Six crits support upgrade clicks and floor unlocks through the shared
