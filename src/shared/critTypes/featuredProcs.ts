@@ -2120,6 +2120,30 @@ export const FEATURED_CRIT_INFO = {
     icon: "wardingSigil",
     description: "Thirteen upgrades on this floor and every floor below",
   },
+  blackHole: {
+    label: "Black Hole",
+    color: COLOR.royalFlushPurple,
+    icon: "blackHole",
+    description: "Twenty-six payouts on every unlocked floor",
+  },
+  bottledNebula: {
+    label: "Bottled Nebula",
+    color: COLOR.halloweenSalePurple,
+    icon: "bottledNebula",
+    description: "One tier promotion and sixteen upgrades here",
+  },
+  eclipse: {
+    label: "Eclipse",
+    color: COLOR.orange,
+    icon: "eclipse",
+    description: "Twenty-seven upgrades on the highest unlocked floor",
+  },
+  treasureMap: {
+    label: "Treasure Map",
+    color: COLOR.supplyRunTan,
+    icon: "treasureMap",
+    description: "Twenty-five payouts from the highest-earning floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

@@ -1130,6 +1130,15 @@ export const CONFIG = {
     titaniumGripPayouts: 24,
     wardingSigilChance: 0.011,
     wardingSigilUpgrades: 13,
+    blackHoleChance: 0.003,
+    blackHolePayouts: 26,
+    bottledNebulaChance: 0.006,
+    bottledNebulaTierSteps: 1,
+    bottledNebulaUpgrades: 16,
+    eclipseChance: 0.007,
+    eclipseUpgrades: 27,
+    treasureMapChance: 0.007,
+    treasureMapPayouts: 25,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

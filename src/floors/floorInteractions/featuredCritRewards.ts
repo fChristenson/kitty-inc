@@ -1126,5 +1126,20 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
         balance.wardingSigilUpgrades,
       ),
+    blackHole: (context) =>
+      actions.payCycles(context.floors, balance.blackHolePayouts),
+    bottledNebula: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.bottledNebulaTierSteps,
+        balance.bottledNebulaUpgrades,
+      ),
+    eclipse: (context) =>
+      actions.upgrade([highestFloor(context)], balance.eclipseUpgrades),
+    treasureMap: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.treasureMapPayouts,
+      ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

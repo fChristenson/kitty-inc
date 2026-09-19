@@ -484,6 +484,10 @@ export const IMAGE_FILES = {
   theCure: "theCure.png",
   titaniumGrip: "titaniumGrip.png",
   wardingSigil: "wardingSigil.png",
+  blackHole: "blackHole.png",
+  bottledNebula: "bottledNebula.png",
+  eclipse: "eclipse.png",
+  treasureMap: "treasureMap.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

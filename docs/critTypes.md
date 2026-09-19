@@ -1,5 +1,47 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-19 (cosmos and high seas)
+
+Four crits from the space/sea gap batches support upgrade clicks and floor
+unlocks through the shared `applyFloorCrit` path. Rewards are immediate,
+existing crit balance is unchanged, and proc chances apply only after a tier
+and the special gateway land, before the shared proc cap; they are not
+per-click odds.
+
+| Image         | Crit           | Immediate reward                          | Proc chance | Comparison                                              |
+| ------------- | -------------- | ----------------------------------------- | ----------- | ------------------------------------------------------- |
+| blackHole     | Black Hole     | 26 payouts on every unlocked floor        | 0.3%        | The largest building-wide payout, above Storm Fork's 25 |
+| bottledNebula | Bottled Nebula | 1 tier promotion, then 16 upgrades here   | 0.6%        | One upgrade above Signet of Skulls's promotion plus 15  |
+| eclipse       | Eclipse        | 27 upgrades on the highest unlocked floor | 0.7%        | Above Tempered's 25, below Golem's 35                   |
+| treasureMap   | Treasure Map   | 25 payouts from the highest-earning floor | 0.7%        | The largest top-earner payout, above Titanium Grip's 24 |
+
+All four are single-shot and current-building only, with no map-specific
+behavior. Black Hole skips locked floors; Eclipse targets the highest unlocked
+floor and Treasure Map the current top earner by income rate, so on a one-floor
+building both collapse onto the triggering floor. Bottled Nebula promotes the
+triggering floor's permanent crit tier and stops at the strongest tier. Neither
+payout crit touches floor collection timers.
+
+Black Hole sits at 0.3% — the Huge band — because 26 payouts across every floor
+pays out the whole building at once.
+
+### Processing and verification (cosmos and high seas)
+
+All four arrived already camelCased as `.png` sources, so each wrapper passes
+`sourceExtension: ".png"` to `scripts/lib/process-crit-icon.mjs`. A border scan
+confirmed a near-white background on every one (corner values 253-254), so the
+shared border-seeded flood fill handled them with no tailored processor. Each
+output was checked over magenta: no halos, and the detached details survived
+intact — Black Hole's floating sparkles and streaking comets, and Treasure
+Map's dotted route, which is a run of individually disconnected dots.
+
+Each icon ships as both `public/<name>.png` and `public/stickers/<name>.png`
+via `scripts/lib/sticker-border.mjs`.
+
+`node scripts/test-featured-crits.mjs` passes at 357 entries and
+`npm run build` is clean. In-game celebration rendering and the Special Crits
+menu were not exercised in a browser for this batch.
+
 ## Implemented asset batch: 2026-09-19 (cyber agents, metal loot and earth metals)
 
 Thirty-five crits — six character portraits, six cyber-augmentation props,
