@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 357);
+  assert.equal(kinds.length, 363);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -555,6 +555,14 @@ try {
     bottledNebula: [[20, 46, 10, 0], 0],
     eclipse: [[20, 30, 37, 0], 0],
     treasureMap: [[20, 30, 10, 0], 75],
+    captainLeFluff: [[20, 30, 38, 0], 0],
+    // the cascade always takes its first step and the fixture's crit floor sits
+    // one above the ground, so only floor 0 is ever reached
+    divingBell: [[22, 30, 10, 0], 0],
+    flooringInspector: [[35, 45, 10, 0], 0],
+    kraken: [[20, 30, 10, 0], 162],
+    lighthouse: [[20, 30, 10, 0], 78],
+    messageInABottle: [[20, 30, 30, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

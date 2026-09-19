@@ -1,5 +1,57 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-19 (high seas)
+
+Six crits support upgrade clicks and floor unlocks through the shared
+`applyFloorCrit` path. Rewards are immediate, existing crit balance is
+unchanged, and proc chances apply only after a tier and the special gateway
+land, before the shared proc cap; they are not per-click odds.
+
+| Image             | Crit                | Immediate reward                                 | Proc chance | Comparison                                              |
+| ----------------- | ------------------- | ------------------------------------------------ | ----------- | ------------------------------------------------------- |
+| captainLeFluff    | Captain Le Fluff    | 28 upgrades on the highest unlocked floor        | 0.6%        | Above Eclipse's 27, below Golem's 35                    |
+| divingBell        | Deep Dive           | 2 free upgrades per floor, cascading down        | 5%          | Bounce's own cascade at double the step, so half as likely |
+| flooringInspector | Flooring Inspector  | 15 upgrades on this floor and every one below    | 1%          | Above Warding Sigil's 13 at 1.1%                        |
+| kraken            | Kraken              | 27 payouts on every unlocked floor               | 0.3%        | The largest building-wide payout, above Black Hole's 26 |
+| lighthouse        | Lighthouse          | 26 payouts from the highest-earning floor        | 0.6%        | The largest top-earner payout, above Treasure Map's 25  |
+| messageInABottle  | Message in a Bottle | 20 free upgrades on the lowest-level floor       | 1.6%        | Above Iron Key's 19 at 1.7%                             |
+
+**Deep Dive** reuses Bounce's shape rather than a fixed target list: it always
+falls one floor from the floor that crit, then re-rolls
+`bounceContinueChance` to keep falling, upgrading every floor it reaches by 2
+instead of Bounce's 1. It is deliberately rarer than `bounceChance` (5% against
+8%) for that doubled step. Unlike Bounce it can't pay out nothing — landing on
+the ground floor with nothing below it applies to the triggering floor instead,
+which the suite's single-floor-fallback check enforces.
+
+The other five are single-shot and current-building only, with no map-specific
+behavior. Kraken skips locked floors; Flooring Inspector takes the triggering
+floor plus everything below it; Message in a Bottle resolves the lowest-level
+unlocked floor, Captain Le Fluff the highest unlocked floor, and Lighthouse the
+current top earner by income rate, so on a one-floor building all three
+collapse onto the triggering floor. No payout crit in this batch touches floor
+collection timers.
+
+Kraken sits at 0.3% — the Huge band — because 27 payouts across every floor
+cashes out the whole building at once.
+
+### Processing and verification (high seas)
+
+All six arrived already camelCased as `.png` sources, so each wrapper passes
+`sourceExtension: ".png"` to `scripts/lib/process-crit-icon.mjs`. A border scan
+confirmed a near-white background on every one, so the shared border-seeded
+flood fill handled them with no tailored processor, despite the sources varying
+from 512x512 up to 1968x1968. A magenta contact sheet confirmed no halos, with
+the diving bell's detached bubbles surviving and the lighthouse keeping its own
+blue sky panel, which is part of the artwork rather than background.
+
+Each icon ships as both `public/<name>.png` and `public/stickers/<name>.png`
+via `scripts/lib/sticker-border.mjs`.
+
+`node scripts/test-featured-crits.mjs` passes at 363 entries and
+`npm run build` is clean. In-game celebration rendering and the Special Crits
+menu were not exercised in a browser for this batch.
+
 ## Implemented asset batch: 2026-09-19 (cosmos and high seas)
 
 Four crits from the space/sea gap batches support upgrade clicks and floor

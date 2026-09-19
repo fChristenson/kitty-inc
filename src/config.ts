@@ -1139,6 +1139,20 @@ export const CONFIG = {
     eclipseUpgrades: 27,
     treasureMapChance: 0.007,
     treasureMapPayouts: 25,
+    captainLeFluffChance: 0.006,
+    captainLeFluffUpgrades: 28,
+    // same downward cascade as bounce above, just a bigger step per floor, so
+    // it has to be meaningfully rarer than bounceChance
+    divingBellChance: 0.05,
+    divingBellUpgrades: 2,
+    flooringInspectorChance: 0.01,
+    flooringInspectorUpgrades: 15,
+    krakenChance: 0.003,
+    krakenPayouts: 27,
+    lighthouseChance: 0.006,
+    lighthousePayouts: 26,
+    messageInABottleChance: 0.016,
+    messageInABottleUpgrades: 20,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

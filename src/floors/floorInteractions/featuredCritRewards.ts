@@ -1,6 +1,10 @@
 import { CONFIG } from "../../config";
 import type { Floor } from "../../gameState";
-import { nextCritTier, type FeaturedCritKind } from "../../shared/critTypes";
+import {
+  nextCritTier,
+  BOUNCE_CRIT_CONTINUE_CHANCE,
+  type FeaturedCritKind,
+} from "../../shared/critTypes";
 import { gt, lt, type BigNumber } from "../../shared/bigNumber";
 import type { CritRewardContext } from "./index";
 
@@ -50,6 +54,22 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
     }
     actions.upgrade([floor], upgrades);
+  };
+  // the same walk applyBounceCrit does: always fall one floor, then roll to
+  // keep falling. Returning the targets rather than applying per step keeps it
+  // on the cheap bulk-upgrade path the other featured rewards use. On the
+  // ground floor there's nothing below to reach, so it lands where it started
+  // instead of paying out nothing.
+  const cascadeDown = (context: CritRewardContext) => {
+    const targets: Floor[] = [];
+    let index = context.floors.indexOf(context.floor) - 1;
+    for (;;) {
+      if (index < 0) break;
+      targets.push(context.floors[index]);
+      index -= 1;
+      if (Math.random() >= BOUNCE_CRIT_CONTINUE_CHANCE) break;
+    }
+    return targets.length > 0 ? targets : [context.floor];
   };
 
   return {
@@ -1140,6 +1160,27 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.payCycles(
         [selectByRate(context, true)],
         balance.treasureMapPayouts,
+      ),
+    captainLeFluff: (context) =>
+      actions.upgrade([highestFloor(context)], balance.captainLeFluffUpgrades),
+    divingBell: (context) =>
+      actions.upgrade(cascadeDown(context), balance.divingBellUpgrades),
+    flooringInspector: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.flooringInspectorUpgrades,
+      ),
+    kraken: (context) =>
+      actions.payCycles(context.floors, balance.krakenPayouts),
+    lighthouse: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.lighthousePayouts,
+      ),
+    messageInABottle: (context) =>
+      actions.upgrade(
+        [lowestLevel(context)],
+        balance.messageInABottleUpgrades,
       ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
