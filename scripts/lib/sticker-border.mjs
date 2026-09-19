@@ -195,12 +195,37 @@ export async function addStickerBorder(
     .toFile(destinationPath);
 }
 
-// Every crit icon ships from public/stickers/ (see loadAssets' critAssetUrl),
-// so each freshly processed public/<name>.png needs its sticker cut too.
+// The Special Crits dialog shows an undiscovered crit as a black silhouette.
+// That ships as its own file rather than a CSS filter over the real icon so a
+// crit the player hasn't found never downloads its artwork — and the result is
+// two colours, so it costs about a tenth of the sticker it came from.
+export async function writeSilhouette(stickerPath, destinationPath) {
+  const { data, info } = await sharp(stickerPath)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const { width, height, channels } = info;
+  for (let pixel = 0; pixel < width * height; pixel++) {
+    const base = pixel * channels;
+    data[base] = 0;
+    data[base + 1] = 0;
+    data[base + 2] = 0;
+  }
+  await fs.mkdir(path.dirname(destinationPath), { recursive: true });
+  await sharp(data, { raw: { width, height, channels } })
+    .png({ compressionLevel: 9, palette: true })
+    .toFile(destinationPath);
+}
+
+// Every crit icon ships from public/stickers/ (see loadAssets' getStickerUrl),
+// so each freshly processed public/<name>.png needs its sticker cut and the
+// silhouette the dialog uses before the crit has been discovered.
 export async function writeCritSticker(name) {
   const publicDir = path.resolve(import.meta.dirname, "../../public");
-  await addStickerBorder(
-    path.join(publicDir, `${name}.png`),
-    path.join(publicDir, "stickers", `${name}.png`),
+  const sticker = path.join(publicDir, "stickers", `${name}.png`);
+  await addStickerBorder(path.join(publicDir, `${name}.png`), sticker);
+  await writeSilhouette(
+    sticker,
+    path.join(publicDir, "silhouettes", `${name}.png`),
   );
 }

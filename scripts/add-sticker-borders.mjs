@@ -1,6 +1,10 @@
 import path from "node:path";
 import fs from "node:fs/promises";
-import { addStickerBorder, DEFAULT_BORDER } from "./lib/sticker-border.mjs";
+import {
+  addStickerBorder,
+  writeSilhouette,
+  DEFAULT_BORDER,
+} from "./lib/sticker-border.mjs";
 
 // Regenerates the white-bordered sticker cut of every crit icon into
 // public/stickers/, which is where the Special Crits dialog reads them from.
@@ -66,6 +70,11 @@ const outDir = path.resolve(
   "..",
   outArg ? outArg.slice(6) : "public/stickers",
 );
+const silhouetteDir = path.resolve(
+  import.meta.dirname,
+  "..",
+  "public/silhouettes",
+);
 const requested = args.filter((arg) => !arg.startsWith("--"));
 const names = requested.length ? requested : await critIconFiles();
 
@@ -80,7 +89,9 @@ for (const name of names) {
     missing.push(file);
     continue;
   }
-  await addStickerBorder(source, path.join(outDir, file), border);
+  const sticker = path.join(outDir, file);
+  await addStickerBorder(source, sticker, border);
+  if (!outArg) await writeSilhouette(sticker, path.join(silhouetteDir, file));
   done++;
 }
 console.log(

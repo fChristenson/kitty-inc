@@ -1,6 +1,6 @@
 import { animateDialogClose, cancelDialogClose } from "../../utils";
 import { playSwoosh } from "../../sound";
-import { getStickerUrl } from "../../loadAssets";
+import { getStickerUrl, getSilhouetteUrl } from "../../loadAssets";
 import { arrowIconMarkup } from "../../shared/arrowIcon";
 import {
   CRIT_PROC_KINDS,
@@ -34,6 +34,7 @@ export type { MergeCompaniesResult } from "./economy";
 const CRIT_INFO: {
   kind: CritProcKind;
   icon: string;
+  silhouette: string;
   label: string;
   description: string;
 }[] = CRIT_PROC_KINDS.map((kind) => {
@@ -41,10 +42,13 @@ const CRIT_INFO: {
   return {
     kind,
     icon: getStickerUrl(info.icon),
+    silhouette: getSilhouetteUrl(info.icon),
     label: info.label,
     description: info.description,
   };
 }).sort((a, b) => a.label.localeCompare(b.label));
+
+const INFO_BY_KIND = new Map(CRIT_INFO.map((info) => [info.kind, info]));
 
 // the map view's own prev/next/pointer arrow icon (shared/arrowIcon), rotated
 // to point left via CSS for the detail pane's own back button
@@ -127,11 +131,39 @@ export function wireCorporationBoostMenu(
   sentinel.className = "crit-info-grid__sentinel";
   sentinel.setAttribute("aria-hidden", "true");
 
-  function badgeFor(tile: HTMLElement, count: number): void {
+  // a crit the player has never landed shows as a black silhouette with no way
+  // into its detail card — the artwork is the reward for discovering it, and
+  // pointing the tile at the silhouette file keeps that artwork from being
+  // downloaded at all until then
+  function applyDiscovery(
+    tile: HTMLElement,
+    kind: CritProcKind,
+    count: number,
+  ): void {
+    const info = INFO_BY_KIND.get(kind)!;
+    const discovered = count > 0;
+    tile.classList.toggle("crit-info-tile--undiscovered", !discovered);
+    (tile as HTMLButtonElement).disabled = !discovered;
+    tile.setAttribute(
+      "aria-label",
+      discovered ? info.label : "Undiscovered crit",
+    );
+
+    const image = tile.querySelector<HTMLImageElement>(
+      ".crit-info-tile__icon",
+    )!;
+    const wanted = discovered ? info.icon : info.silhouette;
+    if (image.dataset.src !== wanted) {
+      image.dataset.src = wanted;
+      // only swap the live src once the lazy-load observer has actually
+      // reached this tile, or it would fetch off-screen icons early
+      if (image.hasAttribute("src")) image.src = wanted;
+    }
+
     const existing = tile.querySelector<HTMLElement>(
       ".crit-info-tile__count-badge",
     );
-    if (count <= 0) {
+    if (!discovered) {
       existing?.remove();
       return;
     }
@@ -157,7 +189,7 @@ export function wireCorporationBoostMenu(
       return;
     }
     const fragment = document.createDocumentFragment();
-    for (const { kind, icon, label } of page) {
+    for (const { kind, label } of page) {
       const tile = document.createElement("button");
       tile.type = "button";
       tile.className = "crit-info-tile";
@@ -166,13 +198,13 @@ export function wireCorporationBoostMenu(
       const image = document.createElement("img");
       image.className = "crit-info-tile__icon";
       image.alt = "";
-      image.dataset.src = icon;
       tile.append(image);
-      badgeFor(tile, getCritProcCount(kind));
+      // sets dataset.src to the artwork or the silhouette, whichever applies
+      applyDiscovery(tile, kind, getCritProcCount(kind));
       tiles.set(kind, tile);
       fragment.append(tile);
       if (iconObserver) iconObserver.observe(image);
-      else image.src = icon;
+      else image.src = image.dataset.src ?? "";
     }
     renderedCount += page.length;
     grid.insertBefore(fragment, sentinel);
@@ -217,7 +249,8 @@ export function wireCorporationBoostMenu(
   }
 
   function syncBadges(): void {
-    for (const [kind, tile] of tiles) badgeFor(tile, getCritProcCount(kind));
+    for (const [kind, tile] of tiles)
+      applyDiscovery(tile, kind, getCritProcCount(kind));
   }
 
   function detailStats(kind: CritProcKind): {
@@ -316,12 +349,15 @@ export function wireCorporationBoostMenu(
   }
 
   // one delegated handler instead of one per tile, so pages can be appended to
-  // the grid without rewiring anything
+  // the grid without rewiring anything. The tap events are synthesised rather
+  // than native clicks, so an undiscovered tile's `disabled` has to be checked
+  // here too.
   onTapOrClick(grid, (event) => {
     const tile = (event.target as HTMLElement | null)?.closest<HTMLElement>(
       ".crit-info-tile",
     );
-    const kind = tile?.dataset.kind as CritProcKind | undefined;
+    if (!tile || (tile as HTMLButtonElement).disabled) return;
+    const kind = tile.dataset.kind as CritProcKind | undefined;
     if (kind) showDetail(kind);
   });
 

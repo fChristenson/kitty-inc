@@ -551,6 +551,13 @@ export function getStickerUrl(name: ImageName): string {
   return `${PUBLIC_ASSET_BASE}stickers/${IMAGE_FILES[name]}`;
 }
 
+// flat black cut of the same sticker, shown for a crit the player hasn't
+// discovered yet — its own file so an undiscovered crit never downloads the
+// artwork it's hiding
+export function getSilhouetteUrl(name: ImageName): string {
+  return `${PUBLIC_ASSET_BASE}silhouettes/${IMAGE_FILES[name]}`;
+}
+
 export function loadImageByName(name: ImageName): Promise<HTMLImageElement> {
   return loadImage(getImageUrl(name));
 }

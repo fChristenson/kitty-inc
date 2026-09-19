@@ -1056,6 +1056,18 @@ body {
   transform: translateY(2px);
 }
 
+/* a crit the player hasn't landed yet: the tile serves a flat black silhouette
+   file instead of the artwork (corporationBoostMenu/index.ts's
+   applyDiscovery), so it only needs to stop reading as a pressable button */
+.crit-info-tile--undiscovered {
+  cursor: default;
+  background: var(--color-amber-muted-shadow);
+}
+
+.crit-info-tile--undiscovered:active {
+  transform: none;
+}
+
 .crit-info-tile__icon {
   width: 100%;
   height: 100%;
@@ -1066,6 +1078,12 @@ body {
   filter: drop-shadow(0 0 1px var(--color-wood-outline))
     drop-shadow(0 0 1px var(--color-wood-outline))
     drop-shadow(1px 1px 0 rgb(0 0 0 / 0.55));
+}
+
+/* the silhouette is already solid black, so tracing it again just muddies the
+   edge */
+.crit-info-tile--undiscovered .crit-info-tile__icon {
+  filter: none;
 }
 
 /* pill-shaped "how many times has this crit landed" collectible counter —
