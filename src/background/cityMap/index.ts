@@ -46,14 +46,17 @@ import {
   GRAND_OPENING_CRIT_LABEL,
   GRAND_OPENING_CRIT_COLOR,
   runFirstCritProc,
+  CRIT_PROC_INFO,
+  CRIT_PROC_KINDS,
   type CritTier,
+  type CritProcKind,
   type CritRollResult,
 } from "../../shared/critTypes";
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
 import { createCityTransitions } from "./transitions";
-import { loadSprite, loadImageByName } from "../../loadAssets";
+import { getStickerUrl, loadSprite, loadImageByName } from "../../loadAssets";
 import { type BigNumber, gte, isZero } from "../../shared/bigNumber";
 import {
   triggerScreenShake,
@@ -61,6 +64,7 @@ import {
   drawCritFlash,
   isCritFlashActive,
 } from "../../screenShake";
+import { getWiggleRotation } from "../../shared/wiggle";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -159,6 +163,7 @@ export interface CityMapView {
   // triggered OUTSIDE the barrel-roll gesture itself (see main.ts's
   // corporationUpgradeMenu wiring, right after a newly-bought company becomes active)
   animateSwitchToCompany: (companyIndex: number) => void;
+  showCritBadges: (counts: Partial<Record<CritProcKind, number>>) => void;
   destroy: () => void;
 }
 
@@ -318,6 +323,194 @@ export function createCityMapView(
   // same idea, for a marker's one-shot unlock hop (see getMarkerJumpOffset)
   let hasActiveMarkerJump = false;
 
+  const CRIT_BADGE_PAGE_SIZE = 12;
+  const CRIT_BADGE_SIZE_SCALE = 0.75;
+  const CRIT_BADGE_ANIMATION_MS = 500;
+  const CRIT_BADGE_STAGGER_MS = 200;
+  const CRIT_BADGE_GAP = 8;
+  let critBadgePages: CritProcKind[][] = [];
+  let critBadgePage = 0;
+  let critBadgeCounts: Partial<Record<CritProcKind, number>> = {};
+  let critBadgeAnimation: {
+    startedAt: number;
+    mode: "bottom";
+  } | null = null;
+  const critBadgeImages = new Map<CritProcKind, HTMLImageElement | null>();
+  const scaledCritBadgeImages = new Map<
+    CritProcKind,
+    { source: HTMLImageElement; size: number; canvas: HTMLCanvasElement }
+  >();
+
+  function loadCritBadgeImage(kind: CritProcKind): HTMLImageElement | null {
+    if (critBadgeImages.has(kind)) return critBadgeImages.get(kind) ?? null;
+    const image = new Image();
+    critBadgeImages.set(kind, image);
+    image.onload = () => redraw();
+    image.onerror = () => {
+      critBadgeImages.set(kind, null);
+      scaledCritBadgeImages.delete(kind);
+      redraw();
+    };
+    image.src = getStickerUrl(CRIT_PROC_INFO[kind].icon);
+    return image;
+  }
+
+  function getScaledCritBadgeImage(
+    kind: CritProcKind,
+    image: HTMLImageElement,
+    badgeSize: number,
+  ): HTMLCanvasElement {
+    const cached = scaledCritBadgeImages.get(kind);
+    if (cached?.source === image && cached.size === badgeSize) {
+      return cached.canvas;
+    }
+    const scale = Math.min(
+      badgeSize / image.naturalWidth,
+      badgeSize / image.naturalHeight,
+    );
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.ceil(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.ceil(image.naturalHeight * scale));
+    const context = canvas.getContext("2d")!;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    scaledCritBadgeImages.set(kind, { source: image, size: badgeSize, canvas });
+    return canvas;
+  }
+
+  function showCritBadges(counts: Partial<Record<CritProcKind, number>>): void {
+    const kinds = CRIT_PROC_KINDS.filter((kind) => (counts[kind] ?? 0) > 0);
+    if (kinds.length === 0) return;
+    critBadgeCounts = counts;
+    critBadgePages = [];
+    for (let i = 0; i < kinds.length; i += CRIT_BADGE_PAGE_SIZE) {
+      critBadgePages.push(kinds.slice(i, i + CRIT_BADGE_PAGE_SIZE));
+    }
+    critBadgePage = 0;
+    critBadgeAnimation = { startedAt: Date.now(), mode: "bottom" };
+    for (const kind of critBadgePages[0]) loadCritBadgeImage(kind);
+    redraw();
+  }
+
+  function advanceCritBadgePage(): void {
+    if (critBadgePages.length === 0) return;
+    if (critBadgePage < critBadgePages.length - 1) {
+      critBadgePage += 1;
+      critBadgeAnimation = { startedAt: Date.now(), mode: "bottom" };
+      for (const kind of critBadgePages[critBadgePage])
+        loadCritBadgeImage(kind);
+    } else {
+      critBadgePages = [];
+      critBadgeCounts = {};
+      critBadgeAnimation = null;
+    }
+    redraw();
+  }
+
+  function drawCritBadgeOverlay(now: number): void {
+    if (critBadgePages.length === 0) return;
+    const page = critBadgePages[critBadgePage];
+    const animationDuration =
+      CRIT_BADGE_ANIMATION_MS +
+      Math.max(0, (page.length - 1) * CRIT_BADGE_STAGGER_MS);
+    const progress = critBadgeAnimation
+      ? Math.min(1, (now - critBadgeAnimation.startedAt) / animationDuration)
+      : 1;
+    const eased = 1 - Math.pow(1 - progress, 3);
+    if (progress >= 1) critBadgeAnimation = null;
+
+    const headingH = 34;
+    const badgeSize =
+      CRIT_BADGE_SIZE_SCALE *
+      Math.min(
+        216,
+        (cssW - 48 - CRIT_BADGE_GAP * 2) / 3,
+        (cssH - 40 - headingH - CRIT_BADGE_GAP * 3) / 4,
+      );
+    const panelW = badgeSize * 3 + CRIT_BADGE_GAP * 2;
+    const panelH = badgeSize * 4 + CRIT_BADGE_GAP * 3 + headingH;
+    const panelX = (cssW - panelW) / 2;
+    const panelY = (cssH - panelH) / 2;
+    const offsetY =
+      critBadgeAnimation?.mode === "bottom" ? (1 - eased) * (panelH + 30) : 0;
+    const drawX = panelX;
+    const drawY = panelY + offsetY;
+
+    ctx.save();
+    // Match the idle-income splash: dim the whole map while the reward stickers
+    // take focus, without adding another framed panel behind them.
+    ctx.globalAlpha = 0.7 * eased;
+    ctx.fillStyle = COLOR.black;
+    ctx.fillRect(0, 0, cssW, cssH);
+    ctx.globalAlpha = 0.98;
+    ctx.font = '900 24px "Fredoka", system-ui, sans-serif';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    drawCartoonText(
+      ctx,
+      "Rewards",
+      cssW / 2,
+      panelY - 22,
+      COLOR.white,
+      COLOR.black,
+      5,
+    );
+
+    for (let index = 0; index < page.length; index++) {
+      const kind = page[index];
+      const column = index % 3;
+      const row = Math.floor(index / 3);
+      const x = drawX + column * (badgeSize + CRIT_BADGE_GAP);
+      const y = drawY + headingH + row * (badgeSize + CRIT_BADGE_GAP);
+      const badgeProgress = critBadgeAnimation
+        ? Math.min(
+            1,
+            Math.max(
+              0,
+              (now -
+                critBadgeAnimation.startedAt -
+                index * CRIT_BADGE_STAGGER_MS) /
+                CRIT_BADGE_ANIMATION_MS,
+            ),
+          )
+        : 1;
+      const badgeEased = 1 - Math.pow(1 - badgeProgress, 3);
+      const badgeOffsetY = (1 - badgeEased) * (badgeSize + 28);
+      const badgeCenterX = x + badgeSize / 2;
+      const badgeCenterY = y + badgeSize / 2 + badgeOffsetY;
+      const image = loadCritBadgeImage(kind);
+      ctx.save();
+      ctx.translate(badgeCenterX, badgeCenterY);
+      if (badgeProgress >= 1) ctx.rotate(getWiggleRotation(now, 520));
+      ctx.globalAlpha = 0.98 * badgeEased;
+      if (image?.complete && image.naturalWidth > 0) {
+        const scaledImage = getScaledCritBadgeImage(kind, image, badgeSize);
+        ctx.drawImage(
+          scaledImage,
+          -scaledImage.width / 2,
+          -scaledImage.height / 2,
+        );
+      }
+      const count = critBadgeCounts[kind] ?? 0;
+      {
+        ctx.font = '900 14px "Fredoka", system-ui, sans-serif';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        drawCartoonText(
+          ctx,
+          `x${count}`,
+          badgeSize / 2,
+          -badgeSize / 2,
+          COLOR.white,
+          COLOR.black,
+        );
+      }
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
   function resize(): void {
     const rect = canvas.getBoundingClientRect();
     cssW = rect.width;
@@ -476,14 +669,17 @@ export function createCityMapView(
 
     updateArrows(buildingCount);
     drawCritFlash(ctx, cssW / 2, cssH / 2, cssW, Date.now());
+    drawCritBadgeOverlay(Date.now());
     ctx.restore();
   }
 
   // no previous city before the first one; the next city only opens up once every
   // building in this one has been bought
   function updateArrows(buildingCount: number): void {
-    prevButton.hidden = cityIndex === 0;
-    nextButton.hidden = buildingCount < (cityIndex + 1) * MARKER_COUNT;
+    const rewardsVisible = critBadgePages.length > 0;
+    prevButton.hidden = rewardsVisible || cityIndex === 0;
+    nextButton.hidden =
+      rewardsVisible || buildingCount < (cityIndex + 1) * MARKER_COUNT;
   }
 
   function canvasPoint(event: MouseEvent): { x: number; y: number } {
@@ -631,6 +827,10 @@ export function createCityMapView(
       suppressNextClick = false;
       return;
     }
+    if (critBadgePages.length > 0) {
+      advanceCritBadgePage();
+      return;
+    }
     const p = canvasPoint(event);
     if (p.y < incomeBottomY) {
       deps.onOpenCorporationStats();
@@ -690,6 +890,7 @@ export function createCityMapView(
   function onPointerDown(event: PointerEvent): void {
     clearBuyAllHold(); // safety net against a stale interrupted previous gesture
     suppressNextClick = false; // this is a brand new gesture, not the one that fired
+    if (critBadgePages.length > 0) return;
     const p = canvasPoint(event);
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
     if (hit === null) return;
@@ -766,19 +967,25 @@ export function createCityMapView(
   // affordable-but-locked price is actively wiggling (see hasWigglingMarker,
   // set by the previous redraw), or a marker's unlock hop/coin burst is
   // playing, that specific animation needs real frame-rate smoothness, so the
-  // throttle is skipped entirely for as long as either is showing
+  // throttle is skipped entirely for as long as either is showing. The idle
+  // price wiggle gets its own 30 FPS cap below because it repaints the whole
+  // map canvas and otherwise makes the cost of an increasingly large map
+  // collection visible as dropped frames.
   const TICK_REDRAW_INTERVAL_MS = 100;
+  const WIGGLE_REDRAW_INTERVAL_MS = 33;
   let animationFrameId: number | null = null;
   let lastTickRedraw = 0;
   function tick(): void {
     const now = performance.now();
     const interval =
-      hasWigglingMarker ||
       hasActiveMarkerJump ||
       hasActiveCoinBursts() ||
+      critBadgeAnimation !== null ||
       isCritFlashActive(Date.now())
         ? 0
-        : TICK_REDRAW_INTERVAL_MS;
+        : hasWigglingMarker
+          ? WIGGLE_REDRAW_INTERVAL_MS
+          : TICK_REDRAW_INTERVAL_MS;
     if (now - lastTickRedraw >= interval) {
       lastTickRedraw = now;
       redraw();
@@ -813,6 +1020,7 @@ export function createCityMapView(
     jumpToEnd: (direction) => transitions.jumpToEnd(direction),
     animateSwitchToCompany: (companyIndex) =>
       transitions.animateSwitchToCompany(companyIndex),
+    showCritBadges,
     destroy,
   };
 }

@@ -20,6 +20,9 @@ import {
   LUCKY_CLOVER_CRIT_COUNT,
   LUCKY_CLOVER_CRIT_TIER,
   MYSTIC_UPGRADE_COUNT,
+  CRIT_PROC_KINDS,
+  getCritProcCount,
+  type CritProcKind,
   type CritRollResult,
 } from "./shared/critTypes";
 import {
@@ -504,7 +507,10 @@ async function main() {
   // Applies the complete purple map action to the supplied floor objects and
   // returns the exact money required. Callers pass shallow clones for a pure
   // affordability preview or real floors after pre-spending that amount once.
-  function applyBuildingProgression(floors: Floor[]): BigNumber {
+  function applyBuildingProgression(
+    floors: Floor[],
+    rollCrits = false,
+  ): BigNumber {
     let total = ZERO;
     const addCost = (cost: BigNumber): void => {
       total = add(total, cost);
@@ -515,6 +521,7 @@ async function main() {
       while (floor.upgradeCount < MANAGER_MIN_UPGRADE_COUNT) {
         addCost(floor.upgradeCost);
         increaseIncomeRate(floor);
+        if (rollCrits) rollCritUpgrade(floor);
       }
     }
     for (const floor of floors) {
@@ -552,10 +559,19 @@ async function main() {
   function buyAllFloorUpgradesForBuilding(buildingIndex: number): boolean {
     const floors = buildings[buildingIndex];
     if (!floors) return false;
+    const critCountsBefore = Object.fromEntries(
+      CRIT_PROC_KINDS.map((kind) => [kind, getCritProcCount(kind)]),
+    ) as Record<CritProcKind, number>;
     const cost = getBuildingUpgradeAllCostForMap(buildingIndex);
     if (isZero(cost) || !spendTotalIncome(cost)) return false;
-    applyBuildingProgression(floors);
+    applyBuildingProgression(floors, true);
     persist();
+    const landedCounts: Partial<Record<CritProcKind, number>> = {};
+    for (const kind of CRIT_PROC_KINDS) {
+      const delta = getCritProcCount(kind) - critCountsBefore[kind];
+      if (delta > 0) landedCounts[kind] = delta;
+    }
+    cityMapView.showCritBadges(landedCounts);
     return true;
   }
 
@@ -565,6 +581,9 @@ async function main() {
   function buyCheapestFloorUpgradesForBuilding(buildingIndex: number): boolean {
     const floors = buildings[buildingIndex];
     if (!floors) return false;
+    const critCountsBefore = Object.fromEntries(
+      CRIT_PROC_KINDS.map((kind) => [kind, getCritProcCount(kind)]),
+    ) as Record<CritProcKind, number>;
     let boughtAny = false;
     for (;;) {
       const unlocked = floors.filter((floor) => floor.unlocked);
@@ -577,7 +596,15 @@ async function main() {
       rollCritUpgrade(cheapest);
       boughtAny = true;
     }
-    if (boughtAny) persist();
+    if (boughtAny) {
+      persist();
+      const landedCounts: Partial<Record<CritProcKind, number>> = {};
+      for (const kind of CRIT_PROC_KINDS) {
+        const delta = getCritProcCount(kind) - critCountsBefore[kind];
+        if (delta > 0) landedCounts[kind] = delta;
+      }
+      cityMapView.showCritBadges(landedCounts);
+    }
     return boughtAny;
   }
   // sets EVERY floor a building currently has (locked or not) to the given crit
