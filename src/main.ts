@@ -54,6 +54,7 @@ import {
 } from "./totalIncome";
 import {
   saveBuildings,
+  saveBuildingsImmediately,
   schedulePersist,
   loadBuildings,
   computeIdleIncome,
@@ -846,7 +847,8 @@ async function main() {
       ),
     getBuildingUpgradeAllCost: getBuildingUpgradeAllCostForMap,
     buyBuilding,
-    onStateChanged: persist,
+    onStateChanged: () =>
+      saveBuildingsImmediately(buildings, activeCompanyIndex),
     buyAllFloors: buyAllFloorsForBuilding,
     buyAllFloorUpgrades: buyAllFloorUpgradesForBuilding,
     buyCheapestFloorUpgrades: buyCheapestFloorUpgradesForBuilding,

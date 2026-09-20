@@ -6,6 +6,7 @@ export interface SaveLifecycle {
 
 export function createSaveScheduler<T>(save: (state: T) => void): {
   schedule: (state: T) => void;
+  saveNow: (state: T) => void;
 } {
   let pendingState: T | null = null;
   let pendingHandle: number | null = null;
@@ -27,6 +28,10 @@ export function createSaveScheduler<T>(save: (state: T) => void): {
       } else {
         pendingHandle = window.setTimeout(run, 200);
       }
+    },
+    saveNow: (state) => {
+      pendingState = null;
+      save(state);
     },
   };
 }

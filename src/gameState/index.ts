@@ -465,6 +465,13 @@ export function schedulePersist(buildings: Floor[][], companyIndex = 0): void {
   buildingSaveScheduler.schedule({ buildings, companyIndex });
 }
 
+export function saveBuildingsImmediately(
+  buildings: Floor[][],
+  companyIndex = 0,
+): void {
+  buildingSaveScheduler.saveNow({ buildings, companyIndex });
+}
+
 function fromSavedFloor(sf: SavedFloor): Floor {
   const floor: Floor = {
     bgIndex: sf.bgIndex ?? 0,
