@@ -221,8 +221,18 @@ export function getWorkerTintIndexes(floor: Floor): number[] {
   return indexes;
 }
 
-const LAST_CLOSE_KEY = "cash-clicker:last-close";
-const IDLE_INCOME_MIN_SECONDS = 3; // shorter gaps (a normal page reload) don't count as idle time
+export const LAST_CLOSE_KEY = "cash-clicker:last-close";
+export const IDLE_INCOME_MIN_SECONDS = 3; // shorter gaps (a normal page reload) don't count as idle time
+
+export function getLastCloseTimestamp(): number | null {
+  try {
+    const raw = localStorage.getItem(LAST_CLOSE_KEY);
+    const timestamp = raw ? Number(raw) : NaN;
+    return Number.isFinite(timestamp) ? timestamp : null;
+  } catch {
+    return null;
+  }
+}
 
 // call this from a `beforeunload` listener (see main.ts) — the ONLY writer of this
 // timestamp, so it purely marks "when did the tab actually go away", independent of
@@ -257,13 +267,7 @@ export function computeIdleIncome(
   getIncomeRatePerSecond: (floor: Floor, now: number) => BigNumber,
   incomeBoostMultiplier = 1,
 ): BigNumber {
-  let lastClose: number | null = null;
-  try {
-    const raw = localStorage.getItem(LAST_CLOSE_KEY);
-    lastClose = raw ? Number(raw) : null;
-  } catch {
-    lastClose = null;
-  }
+  const lastClose = getLastCloseTimestamp();
 
   const now = Date.now();
   const elapsedSeconds =

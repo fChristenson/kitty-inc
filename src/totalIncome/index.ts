@@ -20,6 +20,7 @@ import {
   isZero,
   log10,
 } from "../shared/bigNumber";
+import { saveCompanySnapshot } from "../shared/persistence";
 
 export function getTotalIncome(): BigNumber {
   return totalIncome;
@@ -52,6 +53,29 @@ export function getAllCompaniesTotalIncome(): BigNumber {
   let sum = ZERO;
   for (let i = 0; i < count; i++) sum = add(sum, getStoredTotalIncome(i));
   return sum;
+}
+
+// Dormant companies keep only a rate snapshot instead of their full buildings
+// in memory. Use that frozen, already boost-adjusted rate to include their share
+// of the next startup idle-income payout; the active company is handled by
+// gameState.computeIdleIncome with floor-level cycle/boost accuracy.
+export function getDormantCompaniesIdleIncome(
+  fromMs: number,
+  toMs: number,
+): BigNumber {
+  if (toMs <= fromMs) return ZERO;
+  const elapsedSeconds = (toMs - fromMs) / 1000;
+  let idleIncome = ZERO;
+  for (let i = 0; i < getCorporationCount(); i++) {
+    if (i === activeCompanyIndex) continue;
+    const record = loadCompanyRecord(i);
+    if (!record) continue;
+    idleIncome = add(
+      idleIncome,
+      multiply(record.incomeRatePerSecond, elapsedSeconds),
+    );
+  }
+  return idleIncome;
 }
 
 // $ actually spent on upgrades across a company's buildings — same simple
@@ -430,14 +454,17 @@ export function startTotalIncomeTicker(
 // it's only ever fully refreshed by main.ts's switchToCompany snapshot
 function snapshotActiveCompanyRecord(): void {
   const existing = loadCompanyRecord(activeCompanyIndex);
-  saveCompanyRecord(activeCompanyIndex, {
-    bankedTotal: totalIncome,
-    incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
-      tickerBuildings,
-      Date.now(),
-    ),
-    assetValue: existing?.assetValue ?? ZERO,
-    upgradesValue: existing?.upgradesValue ?? ZERO,
-    updatedAt: Date.now(),
-  });
+  saveCompanySnapshot(
+    activeCompanyIndex,
+    {
+      bankedTotal: totalIncome,
+      incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
+        tickerBuildings,
+        Date.now(),
+      ),
+      assetValue: existing?.assetValue ?? ZERO,
+      upgradesValue: existing?.upgradesValue ?? ZERO,
+    },
+    saveCompanyRecord,
+  );
 }

@@ -51,6 +51,7 @@ import {
   spendTotalIncome,
   getTotalIncome,
   getBuildingsCurrentIncomePerSecond,
+  getDormantCompaniesIdleIncome,
 } from "./totalIncome";
 import {
   saveBuildings,
@@ -58,13 +59,15 @@ import {
   schedulePersist,
   loadBuildings,
   computeIdleIncome,
+  getLastCloseTimestamp,
+  IDLE_INCOME_MIN_SECONDS,
   reconcileBoostedAwayIncome,
   markAppClosed,
   initSessionGuard,
   isStorageIntact,
   type Floor,
 } from "./gameState";
-import { bindSaveLifecycle } from "./shared/persistence";
+import { bindSaveLifecycle, saveCompanySnapshot } from "./shared/persistence";
 import {
   getActiveCompanyIndex,
   setActiveCompanyIndex,
@@ -229,16 +232,19 @@ async function main() {
 
   function saveCurrentCompanyStateNow(): void {
     saveBuildingsImmediately(buildings, activeCompanyIndex);
-    saveCompanyRecord(activeCompanyIndex, {
-      bankedTotal: getTotalIncome(),
-      incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
-        buildings,
-        Date.now(),
-      ),
-      assetValue: getCompanyAssetValue(buildings),
-      upgradesValue: getCompanyUpgradesValue(buildings),
-      updatedAt: Date.now(),
-    });
+    saveCompanySnapshot(
+      activeCompanyIndex,
+      {
+        bankedTotal: getTotalIncome(),
+        incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
+          buildings,
+          Date.now(),
+        ),
+        assetValue: getCompanyAssetValue(buildings),
+        upgradesValue: getCompanyUpgradesValue(buildings),
+      },
+      saveCompanyRecord,
+    );
   }
 
   // loads every asset the game needs (floor backgrounds, ground, wall material,
@@ -360,16 +366,19 @@ async function main() {
       // still hold its data — bankedTotal, its rate, and the timestamp all land
       // together, so a dormant company's derived total can never desync from a
       // separately-written "just the total" value (there isn't one anymore)
-      saveCompanyRecord(activeCompanyIndex, {
-        bankedTotal: getTotalIncome(),
-        incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
-          buildings,
-          Date.now(),
-        ),
-        assetValue: getCompanyAssetValue(buildings),
-        upgradesValue: getCompanyUpgradesValue(buildings),
-        updatedAt: Date.now(),
-      });
+      saveCompanySnapshot(
+        activeCompanyIndex,
+        {
+          bankedTotal: getTotalIncome(),
+          incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
+            buildings,
+            Date.now(),
+          ),
+          assetValue: getCompanyAssetValue(buildings),
+          upgradesValue: getCompanyUpgradesValue(buildings),
+        },
+        saveCompanyRecord,
+      );
       saveBuildings(buildings, activeCompanyIndex);
       saveActiveBuildingIndex(activeCompanyIndex, activeBuildingIndex);
     }
@@ -920,13 +929,20 @@ async function main() {
     currentIncomeRatePerSecond,
     getGlobalIncomeBoostMultiplier(),
   );
+  const lastClose = getLastCloseTimestamp();
+  const now = Date.now();
+  const dormantIdleIncome =
+    lastClose !== null && (now - lastClose) / 1000 > IDLE_INCOME_MIN_SECONDS
+      ? getDormantCompaniesIdleIncome(lastClose, now)
+      : fromNumber(0);
+  const totalIdleIncome = add(idleIncome, dormantIdleIncome);
   // saveBuildings directly (not the debounced persist()): computeIdleIncome advances
   // every floor's lastCollectedAt in memory, and that must land before a second quick
   // reload could otherwise re-collect the same already-paid-out idle time
   saveBuildings(buildings, activeCompanyIndex);
-  if (gt(idleIncome, fromNumber(0))) {
-    addTotalIncome(idleIncome);
-    totalEarnedOverlay.show(idleIncome);
+  if (gt(totalIdleIncome, fromNumber(0))) {
+    addTotalIncome(totalIdleIncome);
+    totalEarnedOverlay.show(totalIdleIncome);
   }
 
   gameCanvas.redraw();
