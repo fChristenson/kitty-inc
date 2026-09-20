@@ -32,6 +32,7 @@ import {
   getMarkerJumpOffset,
   MARKER_COIN_BURST_SCALE,
   drawBuyAllFloorsIndicator,
+  drawBuyAllBuildingItemsIndicator,
 } from "./markers";
 import { MAX_FLOORS_PER_BUILDING, rollFloorBuyCrit } from "../../floors";
 import {
@@ -101,10 +102,18 @@ export interface CityMapDeps {
   // there's nothing left to buy (already maxed). Drives the green buy-all-floors
   // dot (see markers.ts's drawBuyAllFloorsIndicator) and its long-press gesture
   getBuildingUnlockAllCost: (buildingIndex: number) => BigNumber;
+  // $ to complete every remaining upgrade, worker, and office item on every
+  // unlocked floor of an already-bought building. Drives the purple indicator
+  // and its higher-priority long-press gesture.
+  getBuildingUpgradeAllCost: (buildingIndex: number) => BigNumber;
   buyBuilding: () => boolean; // unlocks building 1 if affordable
   // long-press-on-the-green-dot gesture below: unlocks every remaining floor of
   // an already-bought building in one shot. Returns whether it succeeded
   buyAllFloors: (buildingIndex: number) => boolean;
+  buyAllFloorUpgrades: (buildingIndex: number) => boolean;
+  // long-press fallback after all floors are unlocked and the purple action is
+  // unavailable: buys as many currently-cheapest floor upgrades as affordable
+  buyCheapestFloorUpgrades: (buildingIndex: number) => boolean;
   // sets EVERY floor this building currently has (locked or not) to
   // result.tier, permanently — the reward for a crit landing on that
   // building's own purchase (see rollFloorBuyCrit below). Does NOT unlock
@@ -430,6 +439,15 @@ export function createCityMapView(
         ) {
           drawBuyAllFloorsIndicator(ctx, cssW, cssH, catSprite, i);
         }
+        if (isZero(unlockAllCost)) {
+          const upgradeAllCost = deps.getBuildingUpgradeAllCost(globalIndex);
+          if (
+            !isZero(upgradeAllCost) &&
+            gte(deps.getTotalIncome(), upgradeAllCost)
+          ) {
+            drawBuyAllBuildingItemsIndicator(ctx, cssW, cssH, catSprite, i);
+          }
+        }
         continue;
       }
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);
@@ -652,11 +670,12 @@ export function createCityMapView(
   }
 
   // long-press-anywhere-on-an-eligible-marker gesture: holding it for
-  // BUY_ALL_HOLD_MS shakes the screen and unlocks every remaining floor of
-  // that building at once (see markers.ts's drawBuyAllFloorsIndicator — the
-  // green dot is a visual affordability cue only, not the hit target, since
-  // its own small radius made the gesture nearly impossible to land in
-  // practice). Suppresses a click landing shortly after (see onClick above)
+  // BUY_ALL_HOLD_MS completes the purple building progression action first,
+  // unlocks every remaining floor for the green action, or falls back to buying
+  // the currently-cheapest upgrades once the first two dots are processed. The
+  // dots are visual affordability cues only, not the hit target, since their
+  // small radius made the gesture nearly impossible to land in practice.
+  // Suppresses a click landing shortly after (see onClick above)
   const BUY_ALL_HOLD_MS = 1000;
   let buyAllHoldTimeout: ReturnType<typeof setTimeout> | null = null;
   let suppressNextClick = false;
@@ -676,11 +695,34 @@ export function createCityMapView(
     if (hit === null) return;
     const globalIndex = cityIndex * MARKER_COUNT + hit;
     if (globalIndex >= deps.getBuildingCount()) return;
-    const cost = deps.getBuildingUnlockAllCost(globalIndex);
-    if (isZero(cost) || !gte(deps.getTotalIncome(), cost)) return;
+    const floorUnlockCost = deps.getBuildingUnlockAllCost(globalIndex);
+    let action: "floors" | "building" | "upgrades" | null = null;
+    if (
+      !isZero(floorUnlockCost) &&
+      gte(deps.getTotalIncome(), floorUnlockCost)
+    ) {
+      action = "floors";
+    } else if (isZero(floorUnlockCost)) {
+      const upgradeAllCost = deps.getBuildingUpgradeAllCost(globalIndex);
+      if (
+        !isZero(upgradeAllCost) &&
+        gte(deps.getTotalIncome(), upgradeAllCost)
+      ) {
+        action = "building";
+      } else {
+        action = "upgrades";
+      }
+    }
+    if (action === null) return;
     buyAllHoldTimeout = setTimeout(() => {
       buyAllHoldTimeout = null;
-      if (deps.buyAllFloors(globalIndex)) {
+      const bought =
+        action === "building"
+          ? deps.buyAllFloorUpgrades(globalIndex)
+          : action === "floors"
+            ? deps.buyAllFloors(globalIndex)
+            : deps.buyCheapestFloorUpgrades(globalIndex);
+      if (bought) {
         playSold();
         suppressNextClick = true;
         // same unlock flourish a normal single-floor buy plays — a maxed-out

@@ -1,7 +1,15 @@
 import "./style.css";
 import { forceTestCrit } from "./floors";
 import { wireCritTestActions } from "./hud";
-import { fromNumber, gt, isZero } from "./shared/bigNumber";
+import {
+  add,
+  fromNumber,
+  gt,
+  isZero,
+  lt,
+  ZERO,
+  type BigNumber,
+} from "./shared/bigNumber";
 import {
   CHAIN_CRIT_CONTINUE_CHANCE,
   nextCritTier,
@@ -30,6 +38,7 @@ import {
   currentIncomeRatePerSecond,
   applyBoostAll,
   MAX_RENDERED_WORKERS,
+  rollCritUpgrade,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -81,6 +90,11 @@ import {
   getGlobalIncomeBoostMultiplier,
   getCompanyAssetValue,
   getCompanyUpgradesValue,
+  getWorkerCost,
+  getOfficeChairsCost,
+  getOfficeSuppliesCost,
+  getManagerCost,
+  MANAGER_MIN_UPGRADE_COUNT,
   mergeCompanies,
   createMapMenuMarkup,
   wireMapMenu,
@@ -486,6 +500,86 @@ async function main() {
     persist();
     return true;
   }
+
+  // Applies the complete purple map action to the supplied floor objects and
+  // returns the exact money required. Callers pass shallow clones for a pure
+  // affordability preview or real floors after pre-spending that amount once.
+  function applyBuildingProgression(floors: Floor[]): BigNumber {
+    let total = ZERO;
+    const addCost = (cost: BigNumber): void => {
+      total = add(total, cost);
+    };
+
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      while (floor.upgradeCount < MANAGER_MIN_UPGRADE_COUNT) {
+        addCost(floor.upgradeCost);
+        increaseIncomeRate(floor);
+      }
+    }
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      while (floor.workerCount < MAX_RENDERED_WORKERS) {
+        addCost(getWorkerCost(floor));
+        floor.workerCount += 1;
+      }
+      if (!floor.hasOfficeChairs) {
+        addCost(getOfficeChairsCost(floor));
+        floor.hasOfficeChairs = true;
+      }
+      if (!floor.hasOfficeSupplies) {
+        addCost(getOfficeSuppliesCost(floor));
+        floor.hasOfficeSupplies = true;
+      }
+      if (
+        !floor.hasManager &&
+        floor.upgradeCount >= MANAGER_MIN_UPGRADE_COUNT
+      ) {
+        addCost(getManagerCost(floor));
+        floor.hasManager = true;
+      }
+    }
+    return total;
+  }
+
+  function getBuildingUpgradeAllCostForMap(buildingIndex: number): BigNumber {
+    const floors = buildings[buildingIndex];
+    if (!floors) return ZERO;
+    const preview = floors.map((floor) => ({ ...floor }));
+    return applyBuildingProgression(preview);
+  }
+
+  function buyAllFloorUpgradesForBuilding(buildingIndex: number): boolean {
+    const floors = buildings[buildingIndex];
+    if (!floors) return false;
+    const cost = getBuildingUpgradeAllCostForMap(buildingIndex);
+    if (isZero(cost) || !spendTotalIncome(cost)) return false;
+    applyBuildingProgression(floors);
+    persist();
+    return true;
+  }
+
+  // Buys the currently-cheapest upgrade repeatedly after the green and purple
+  // map actions have been processed. The floor is re-selected after every
+  // purchase because increaseIncomeRate raises that floor's next cost.
+  function buyCheapestFloorUpgradesForBuilding(buildingIndex: number): boolean {
+    const floors = buildings[buildingIndex];
+    if (!floors) return false;
+    let boughtAny = false;
+    for (;;) {
+      const unlocked = floors.filter((floor) => floor.unlocked);
+      if (unlocked.length === 0) break;
+      const cheapest = unlocked.reduce((lowest, floor) =>
+        lt(floor.upgradeCost, lowest.upgradeCost) ? floor : lowest,
+      );
+      if (!spendTotalIncome(cheapest.upgradeCost)) break;
+      increaseIncomeRate(cheapest);
+      rollCritUpgrade(cheapest);
+      boughtAny = true;
+    }
+    if (boughtAny) persist();
+    return boughtAny;
+  }
   // sets EVERY floor a building currently has (locked or not) to the given crit
   // tier, permanently — no unlocking, no cost (see cityMap/index.ts's map-buy
   // crit celebration). A brand new building only has its one free ground floor
@@ -722,8 +816,11 @@ async function main() {
         buildings[buildingIndex] ?? [],
         getBuildingMultiplier(buildingIndex),
       ),
+    getBuildingUpgradeAllCost: getBuildingUpgradeAllCostForMap,
     buyBuilding,
     buyAllFloors: buyAllFloorsForBuilding,
+    buyAllFloorUpgrades: buyAllFloorUpgradesForBuilding,
+    buyCheapestFloorUpgrades: buyCheapestFloorUpgradesForBuilding,
     setBuildingCritTier,
     onSelectBuilding: (index) => {
       goToBuilding(index);

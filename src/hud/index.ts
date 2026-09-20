@@ -69,6 +69,13 @@ export {
   wireResetButton,
 } from "./testButton";
 export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
+export {
+  getWorkerCost,
+  getOfficeChairsCost,
+  getOfficeSuppliesCost,
+  getManagerCost,
+  MANAGER_MIN_UPGRADE_COUNT,
+} from "./upgradeMenu";
 export type { UpgradeMenu } from "./upgradeMenu";
 export {
   createFloorUpgradeMenuMarkup,

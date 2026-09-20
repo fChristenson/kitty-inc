@@ -2818,7 +2818,7 @@ export const FEATURED_CRIT_INFO = {
     description: "Twenty-nine instant payouts on this floor",
   },
   khadgarPurr: {
-    label: "Khadgar Purr",
+    label: "Khatgar Purr",
     color: COLOR.pairBlue,
     icon: "khadgarPurr",
     description: "Thirty-three free upgrades on every unlocked floor",
