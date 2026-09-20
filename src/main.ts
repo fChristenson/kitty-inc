@@ -944,7 +944,7 @@ async function main() {
   bindSaveLifecycle({
     isIntact: isStorageIntact,
     markClosed: markAppClosed,
-    saveNow: () => saveBuildings(buildings, activeCompanyIndex),
+    saveNow: saveCurrentCompanyStateNow,
   });
 }
 
