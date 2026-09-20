@@ -585,6 +585,8 @@ export const IMAGE_FILES = {
   goldenGardenGolem: "goldenGardenGolem.png",
   moonlitMint: "moonlitMint.png",
   vaultBeetle: "vaultBeetle.png",
+  lionKey: "lionKey.png",
+  restorationProject: "restorationProject.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

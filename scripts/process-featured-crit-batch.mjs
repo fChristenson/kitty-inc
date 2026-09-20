@@ -45,6 +45,8 @@ const names = [
   "goldenGardenGolem",
   "moonlitMint",
   "vaultBeetle",
+  "lionKey",
+  "restorationProject",
 ];
 
 for (const name of names) await processCritIcon(name);

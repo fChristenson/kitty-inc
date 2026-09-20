@@ -1442,5 +1442,13 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.payCycles(alternating(context), balance.moonlitMintPayouts),
     vaultBeetle: (context) =>
       actions.upgrade([context.floor], balance.vaultBeetleUpgrades),
+    lionKey: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.lionKeyTierSteps,
+        balance.lionKeyUpgrades,
+      ),
+    restorationProject: (context) =>
+      actions.upgrade([context.floor], balance.restorationProjectUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

@@ -2726,6 +2726,18 @@ export const FEATURED_CRIT_INFO = {
     icon: "vaultBeetle",
     description: "Thirty-four free upgrades on this floor",
   },
+  lionKey: {
+    label: "Lion Key",
+    color: COLOR.goldenHandshakeGold,
+    icon: "lionKey",
+    description: "One tier promotion and twenty-six upgrades here",
+  },
+  restorationProject: {
+    label: "Restoration Project",
+    color: COLOR.gold,
+    icon: "restorationProject",
+    description: "Thirty free upgrades on this floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

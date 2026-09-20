@@ -1345,6 +1345,11 @@ export const CONFIG = {
     moonlitMintPayouts: 26,
     vaultBeetleChance: 0.002,
     vaultBeetleUpgrades: 34,
+    lionKeyChance: 0.0015,
+    lionKeyTierSteps: 1,
+    lionKeyUpgrades: 26,
+    restorationProjectChance: 0.0025,
+    restorationProjectUpgrades: 30,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

@@ -52,6 +52,8 @@ not a per-click probability.
 | goldenGardenGolem  | Golden Garden Golem    | 33 payouts on every floor         | 0.2%        | Near Ramen Crown's 35 at the same chance                        |
 | moonlitMint        | Moonlit Mint           | 26 payouts on alternating floors  | 0.6%        | More common than Citrus Coin's 33 at 0.4%                       |
 | vaultBeetle        | Vault Beetle           | 34 upgrades here                  | 0.2%        | Near Purge's 33 at the same chance                              |
+| lionKey            | Lion Key               | 1 promotion plus 26 upgrades here | 0.15%       | Stronger than Memory Crystal's 21 upgrades                      |
+| restorationProject | Restoration Project    | 30 upgrades here                  | 0.25%       | Similar to Ember Key's 32 upgrades at 0.25%                     |
 
 Locked floors are excluded from all building-wide, alternating, highest, and
 lowest-floor effects; single-floor fallback behavior remains immediate. Tier
