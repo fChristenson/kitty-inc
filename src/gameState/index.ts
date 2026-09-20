@@ -10,6 +10,7 @@ import {
   gte,
 } from "../shared/bigNumber";
 import type { CritTier } from "../shared/critTypes";
+import { createSaveScheduler } from "../shared/persistence";
 
 // bumped from "cash-clicker:floors" now that this holds Floor[][] (one entry per
 // building) instead of a single Floor[] — old single-building saves just start fresh
@@ -455,25 +456,13 @@ export function saveBuildings(buildings: Floor[][], companyIndex = 0): void {
   }
 }
 
-let pendingSave: number | null = null;
+const buildingSaveScheduler = createSaveScheduler<{
+  buildings: Floor[][];
+  companyIndex: number;
+}>(({ buildings, companyIndex }) => saveBuildings(buildings, companyIndex));
 
-// schedules saveBuildings to run once the browser is idle (or after a short fallback
-// delay on engines without requestIdleCallback, e.g. Safari) instead of serializing
-// every building's floors + writing to localStorage synchronously inside a click
-// handler. Calls made while one is already pending are free — the next run always
-// reads the current buildings array, so rapid clicks/purchases collapse into one write
-// instead of janking a frame the user might also be mid-scroll on.
 export function schedulePersist(buildings: Floor[][], companyIndex = 0): void {
-  if (pendingSave !== null) return;
-  const run = () => {
-    pendingSave = null;
-    saveBuildings(buildings, companyIndex);
-  };
-  if (typeof requestIdleCallback === "function") {
-    pendingSave = requestIdleCallback(run, { timeout: 1000 });
-  } else {
-    pendingSave = window.setTimeout(run, 200);
-  }
+  buildingSaveScheduler.schedule({ buildings, companyIndex });
 }
 
 function fromSavedFloor(sf: SavedFloor): Floor {

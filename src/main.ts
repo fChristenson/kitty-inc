@@ -63,6 +63,7 @@ import {
   isStorageIntact,
   type Floor,
 } from "./gameState";
+import { bindSaveLifecycle } from "./shared/persistence";
 import {
   getActiveCompanyIndex,
   setActiveCompanyIndex,
@@ -845,6 +846,7 @@ async function main() {
       ),
     getBuildingUpgradeAllCost: getBuildingUpgradeAllCostForMap,
     buyBuilding,
+    onStateChanged: persist,
     buyAllFloors: buyAllFloorsForBuilding,
     buyAllFloorUpgrades: buyAllFloorUpgradesForBuilding,
     buyCheapestFloorUpgrades: buyCheapestFloorUpgradesForBuilding,
@@ -924,32 +926,10 @@ async function main() {
   });
   startTotalIncomeTicker(buildings, getGlobalIncomeBoostMultiplier);
 
-  // markAppClosed stamps "now" as the single source of truth computeIdleIncome reads
-  // next load — saveBuildings also runs here so the freshest floor state (workerCount,
-  // upgrades, etc.) is what actually gets restored. Skipped entirely if storage was
-  // cleared out from under this page load (see isStorageIntact) — otherwise this would
-  // just silently undo a player manually clearing their save via DevTools before
-  // closing the tab
-  window.addEventListener("beforeunload", () => {
-    if (!isStorageIntact()) return;
-    markAppClosed();
-    saveBuildings(buildings, activeCompanyIndex);
-  });
-
-  // beforeunload alone is unreliable for catching "the player actually left" —
-  // especially on mobile, where backgrounding/swiping away/OS-killing a tab
-  // very often never fires it at all — which is exactly why the idle-income
-  // popup was reported as inconsistent (last-close simply never got stamped
-  // for however long that session ran). visibilitychange's "hidden" state
-  // fires far more reliably across platforms (backgrounding, locking the
-  // screen, switching apps, and a normal close all trigger it), so stamp the
-  // same close-timestamp there too. Harmless if the player comes right back —
-  // the timestamp just gets refreshed again the next time they actually leave
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState !== "hidden") return;
-    if (!isStorageIntact()) return;
-    markAppClosed();
-    saveBuildings(buildings, activeCompanyIndex);
+  bindSaveLifecycle({
+    isIntact: isStorageIntact,
+    markClosed: markAppClosed,
+    saveNow: () => saveBuildings(buildings, activeCompanyIndex),
   });
 }
 

@@ -110,6 +110,7 @@ export interface CityMapDeps {
   // and its higher-priority long-press gesture.
   getBuildingUpgradeAllCost: (buildingIndex: number) => BigNumber;
   buyBuilding: () => boolean; // unlocks building 1 if affordable
+  onStateChanged: () => void; // schedules persistence after any map-node purchase
   // long-press-on-the-green-dot gesture below: unlocks every remaining floor of
   // an already-bought building in one shot. Returns whether it succeeded
   buyAllFloors: (buildingIndex: number) => boolean;
@@ -873,6 +874,7 @@ export function createCityMapView(
     const buildingCount = deps.getBuildingCount();
     if (globalIndex === buildingCount) {
       if (deps.buyBuilding()) {
+        deps.onStateChanged();
         playSold();
         triggerMarkerJump(globalIndex);
         const { cx, feetY } = markerCenter(cssW, cssH, hit);
@@ -955,6 +957,7 @@ export function createCityMapView(
             ? deps.buyAllFloors(globalIndex)
             : deps.buyCheapestFloorUpgrades(globalIndex);
       if (bought) {
+        deps.onStateChanged();
         playSold();
         suppressNextClick = true;
         // same unlock flourish a normal single-floor buy plays — a maxed-out
