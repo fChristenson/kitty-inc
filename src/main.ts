@@ -227,6 +227,20 @@ async function main() {
     schedulePersist(buildings, activeCompanyIndex);
   }
 
+  function saveCurrentCompanyStateNow(): void {
+    saveBuildingsImmediately(buildings, activeCompanyIndex);
+    saveCompanyRecord(activeCompanyIndex, {
+      bankedTotal: getTotalIncome(),
+      incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
+        buildings,
+        Date.now(),
+      ),
+      assetValue: getCompanyAssetValue(buildings),
+      upgradesValue: getCompanyUpgradesValue(buildings),
+      updatedAt: Date.now(),
+    });
+  }
+
   // loads every asset the game needs (floor backgrounds, ground, wall material,
   // worker/manager sprites) and makes them the active set every draw* function
   // reads from — call before ever showing a building on screen. Roof isn't part
@@ -847,8 +861,7 @@ async function main() {
       ),
     getBuildingUpgradeAllCost: getBuildingUpgradeAllCostForMap,
     buyBuilding,
-    onStateChanged: () =>
-      saveBuildingsImmediately(buildings, activeCompanyIndex),
+    onStateChanged: saveCurrentCompanyStateNow,
     buyAllFloors: buyAllFloorsForBuilding,
     buyAllFloorUpgrades: buyAllFloorUpgradesForBuilding,
     buyCheapestFloorUpgrades: buyCheapestFloorUpgradesForBuilding,
