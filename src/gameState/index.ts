@@ -235,16 +235,12 @@ export function markAppClosed(): void {
   }
 }
 
-// $ every unlocked floor across every building earned, at its own current rate, over
-// the plain wall-clock gap between the last markAppClosed() timestamp and now — a
-// straight rate * elapsedSeconds calculation, not dependent on floor.lastCollectedAt
-// having been kept continuously fresh by some in-session ticker (that ticker can be
-// throttled/paused for all sorts of reasons while the tab sits open; the close
-// timestamp + current rate is the only pair of numbers actually needed here). Must
-// only be called once per page load. Below the quick-refresh gate, every floor's
-// lastCollectedAt is left completely untouched — incomePanel.ts's fill-bar progress
-// is computed straight from lastCollectedAt, so touching it on a quick refresh would
-// silently discard however far into its current cycle a floor already was.
+// $ every unlocked floor across every building earned since that floor's own
+// persisted collection timestamp. The global close timestamp is only a lower bound:
+// visibility changes can mark a page closed while it remains alive, and the live
+// ticker may collect more income afterward. Starting from last-close in that case
+// would pay the same interval twice on the next reload. Must only be called once per
+// page load; after the catch-up, each floor's anchor is moved to now.
 //
 // getIncomeRatePerSecond is injected (rather than imported from floors/incomePanel)
 // so this file doesn't need a real, cycle-risking import from floors/ — main.ts
@@ -281,10 +277,11 @@ export function computeIdleIncome(
   for (const floors of buildings) {
     for (const floor of floors) {
       if (!floor.unlocked) continue;
+      const fromMs = Math.max(lastClose ?? 0, floor.lastCollectedAt);
       idleIncome = add(
         idleIncome,
         multiply(
-          integrateAwayIncome(floor, lastClose, now, getIncomeRatePerSecond),
+          integrateAwayIncome(floor, fromMs, now, getIncomeRatePerSecond),
           incomeBoostMultiplier,
         ),
       );

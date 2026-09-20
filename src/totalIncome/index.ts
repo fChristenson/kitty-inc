@@ -420,11 +420,6 @@ export function startTotalIncomeTicker(
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") collectAll();
   });
-
-  window.addEventListener("beforeunload", () => {
-    if (!isStorageIntact()) return;
-    snapshotActiveCompanyRecord();
-  });
 }
 
 // refreshes the ACTIVE company's own CompanyRecord (bankedTotal + rate,
