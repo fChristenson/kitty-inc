@@ -4,6 +4,22 @@
 
 Use each image name as the output basename. Keep the character recognizable through their silhouette, costume, colors, weapon, and signature accessories, while making the subject unmistakably feline.
 
+### `antleredFoxFortune`
+
+**Antlered Fox Fortune** — Flat vector cartoon of a red fox cat with branching antlers, shiny coins, and a glowing gem tucked into its curled tail, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+
+### `emperorProvidesPurrfection`
+
+**The Emperor Provides Purrfection** — Flat vector cartoon of a blue armored sci-fi space marine cat holding a large coin-emblem, with polished futuristic armor and a proud heroic stance, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+
+### `furionStormpaw`
+
+**Furion Stormpaw** — Flat vector cartoon of an alternate druid cat inspired by Malfurion Stormrage, with huge antler-like horns, leafy green adornments, bark armor, and a nature-themed staff, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+
+### `whatIsBrewing`
+
+**What's Brewing?** — Flat vector cartoon of a cheerful panda cat in a red robe beside bamboo, holding a frothy beer mug with a playful welcoming expression, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
+
 ### `arfthas`
 
 **Arthas Menethil** — Flat vector cartoon of the famous World of Warcraft character Arthas Menethil as an undead frost cat, wearing ornate icy-blue skull armor and a tattered royal cape, gripping a miniature runeblade, glowing cyan eyes, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.

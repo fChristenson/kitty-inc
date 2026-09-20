@@ -2898,6 +2898,30 @@ export const FEATURED_CRIT_INFO = {
     icon: "chenStormstout",
     description: "Twenty-five free upgrades on every unlocked floor",
   },
+  antleredFoxFortune: {
+    label: "Antlered Fox Fortune",
+    color: COLOR.orange,
+    icon: "antleredFoxFortune",
+    description: "Thirty-four free upgrades on this floor",
+  },
+  emperorProvidesPurrfection: {
+    label: "The Emperor Provides",
+    color: COLOR.blue,
+    icon: "emperorProvidesPurrfection",
+    description: "Forty-four instant payouts on every unlocked floor",
+  },
+  furionStormpaw: {
+    label: "Furion Stormpaw",
+    color: COLOR.luckyCloverGreen,
+    icon: "furionStormpaw",
+    description: "Forty-two instant payouts on every unlocked floor",
+  },
+  whatIsBrewing: {
+    label: "What isBrewing?",
+    color: COLOR.teaBreakBrown,
+    icon: "whatIsBrewing",
+    description: "Sixteen instant payouts on this floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

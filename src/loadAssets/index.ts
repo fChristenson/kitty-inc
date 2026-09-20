@@ -613,6 +613,10 @@ export const IMAGE_FILES = {
   tyrandeWhisperpaws: "tyrandeWhisperpaws.png",
   tyrandeStarbow: "tyrandeStarbow.png",
   chenStormstout: "chenStormstout.png",
+  antleredFoxFortune: "antleredFoxFortune.png",
+  emperorProvidesPurrfection: "emperorProvidesPurrfection.png",
+  furionStormpaw: "furionStormpaw.png",
+  whatIsBrewing: "whatIsBrewing.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

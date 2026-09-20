@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 482);
+  assert.equal(kinds.length, 486);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -682,6 +682,10 @@ try {
     tyrandeWhisperpaws: [[20, 30, 10, 0], 228],
     tyrandeStarbow: [[20, 61, 10, 0], 0],
     chenStormstout: [[45, 55, 35, 0], 0],
+    antleredFoxFortune: [[20, 64, 10, 0], 0],
+    emperorProvidesPurrfection: [[20, 30, 10, 0], 264],
+    furionStormpaw: [[20, 30, 10, 0], 252],
+    whatIsBrewing: [[20, 30, 10, 0], 48],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

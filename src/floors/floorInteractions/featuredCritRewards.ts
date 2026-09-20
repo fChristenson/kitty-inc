@@ -1479,10 +1479,7 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
     khadgarPurr: (context) =>
       actions.upgrade(context.floors, balance.khadgarPurrUpgrades),
     garroshHellscreamPurr: (context) =>
-      actions.upgrade(
-        [context.floor],
-        balance.garroshHellscreamPurrUpgrades,
-      ),
+      actions.upgrade([context.floor], balance.garroshHellscreamPurrUpgrades),
     grommewHellscream: (context) =>
       actions.payCycles(context.floors, balance.grommewHellscreamPayouts),
     deathwingTheDestroycat: (context) =>
@@ -1505,5 +1502,16 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.upgrade([context.floor], balance.tyrandeStarbowUpgrades),
     chenStormstout: (context) =>
       actions.upgrade(context.floors, balance.chenStormstoutUpgrades),
+    antleredFoxFortune: (context) =>
+      actions.upgrade([context.floor], balance.antleredFoxFortuneUpgrades),
+    emperorProvidesPurrfection: (context) =>
+      actions.payCycles(
+        context.floors,
+        balance.emperorProvidesPurrfectionPayouts,
+      ),
+    furionStormpaw: (context) =>
+      actions.payCycles(context.floors, balance.furionStormpawPayouts),
+    whatIsBrewing: (context) =>
+      actions.payCycles([context.floor], balance.whatIsBrewingPayouts),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

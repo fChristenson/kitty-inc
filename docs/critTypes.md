@@ -7,40 +7,47 @@ shared floor reward path. Rewards are immediate, use existing upgrade/payout
 shapes, and do not change map behavior. Chances are conditional on a tier and
 the special gateway landing before the shared cap, not per-click odds.
 
-| Image                  | Crit                           | Immediate reward                    | Proc chance | Comparison                                                   |
-| ---------------------- | ------------------------------ | ----------------------------------- | ----------- | ------------------------------------------------------------ |
-| arfthas                | Arthas Meow-nenethil           | 22 upgrades here                    | 0.4%        | Smaller than Varian's 38 at 0.1%                             |
-| guldanMeow             | Gul'dan Meow                   | 31 payouts here                     | 0.3%        | Below Ragnaros's 37 at 0.15%                                 |
-| sargerasPurrgeras      | Sargeras Purrgeras             | 45 upgrades on every unlocked floor | 0.03%       | Building-wide titan reward                                   |
-| sylvanwhisker          | Sylvanas Whiskerunner          | 28 payouts here                     | 0.35%       | Below Gul'dan's 31 at 0.3%                                   |
-| sylvanasWhiskerunner   | Sylvanas Windrunner's Red Hood | 30 payouts here                     | 0.3%        | Alternate Sylvanas reward near the original 28 at 0.35%      |
-| jainaPurrmoore         | Jaina Purrmoore                | 24 upgrades here                    | 0.45%       | More common than Chen's 25-wide reward                       |
-| thrallpaw              | Thrallpaw                      | 32 payouts on every unlocked floor  | 0.15%       | Building-wide and rare                                       |
-| varianWrynnkles        | Varian Wrynnkles               | 38 upgrades here                    | 0.1%        | Strong single-floor upgrade                                  |
-| anduinWrynncat         | Anduin Wrynncat                | 30 payouts here                     | 0.3%        | Below Thrall's building-wide payout                          |
-| illidandelight         | Illidan Stormrage              | 42 upgrades here                    | 0.08%       | Rarer than Varian's 38                                       |
-| malfurionStormpaw      | Malfurion Stormpaw             | 35 payouts on every unlocked floor  | 0.1%        | Building-wide druid reward                                   |
-| voljinWhisker          | Vol'jin Whisker                | 26 upgrades here                    | 0.4%        | Smaller than Illidan's 42                                    |
-| lorthemewPurron        | Lor'themar Purron              | 29 payouts here                     | 0.35%       | Between Sylvanas and Anduin                                  |
-| khadgarPurr            | Khadgar Purr                   | 33 upgrades on every unlocked floor | 0.08%       | Building-wide mage reward                                    |
-| garroshHellscreamPurr  | Garrosh Hellscream Purr        | 48 upgrades here                    | 0.05%       | Rarer than Illidan's 42                                      |
-| grommewHellscream      | Grommash Hellscream            | 40 payouts on every unlocked floor  | 0.08%       | Building-wide berserker payout                               |
-| deathwingTheDestroycat | Deathwing the Destroyer        | 55 upgrades on every unlocked floor | 0.03%       | Largest building-wide reward                                 |
-| deathwingAshwing       | Deathwing Ashwing              | 50 upgrades here                    | 0.05%       | Strong single-floor variant below Deathwing's 55-wide reward |
-| deathwingDestroypurr   | I Am the Destroyer!            | 60 upgrades on every unlocked floor | 0.02%       | Rarer and larger than Deathwing's 55 at 0.03%                |
-| ragnapurrs             | Ragnaros the Firelord          | 37 payouts here                     | 0.15%       | Below Grommash's building-wide payout                        |
-| medivhMewage           | Medivh Mewage                  | 27 upgrades here                    | 0.4%        | Smaller than Illidan's 42                                    |
-| tyrandeWhiskerwind     | Elune-Adore                    | 34 payouts here                     | 0.2%        | Between Ragnaros and Malfurion                               |
-| tyrandeMoonwhisker     | By Elune's Light!              | 32 payouts here                     | 0.25%       | More common and smaller than Tyrande's 34 at 0.2%            |
-| tyrandeWhisperpaws     | The Night Warrior Rises!       | 38 payouts on every unlocked floor  | 0.08%       | Building-wide upgrade in scope over Tyrande's 34 here        |
-| tyrandeStarbow         | Justice for the Kaldorei!      | 31 upgrades here                    | 0.35%       | Common single-floor companion to Tyrande's payout crits      |
-| chenStormstout         | A Toast to Victory!            | 25 upgrades on every unlocked floor | 0.25%       | Building-wide monk reward                                    |
+| Image                      | Crit                             | Immediate reward                    | Proc chance | Comparison                                                   |
+| -------------------------- | -------------------------------- | ----------------------------------- | ----------- | ------------------------------------------------------------ |
+| arfthas                    | Arthas Meow-nenethil             | 22 upgrades here                    | 0.4%        | Smaller than Varian's 38 at 0.1%                             |
+| guldanMeow                 | Gul'dan Meow                     | 31 payouts here                     | 0.3%        | Below Ragnaros's 37 at 0.15%                                 |
+| sargerasPurrgeras          | Sargeras Purrgeras               | 45 upgrades on every unlocked floor | 0.03%       | Building-wide titan reward                                   |
+| sylvanwhisker              | Sylvanas Whiskerunner            | 28 payouts here                     | 0.35%       | Below Gul'dan's 31 at 0.3%                                   |
+| sylvanasWhiskerunner       | Sylvanas Windrunner's Red Hood   | 30 payouts here                     | 0.3%        | Alternate Sylvanas reward near the original 28 at 0.35%      |
+| jainaPurrmoore             | Jaina Purrmoore                  | 24 upgrades here                    | 0.45%       | More common than Chen's 25-wide reward                       |
+| thrallpaw                  | Thrallpaw                        | 32 payouts on every unlocked floor  | 0.15%       | Building-wide and rare                                       |
+| varianWrynnkles            | Varian Wrynnkles                 | 38 upgrades here                    | 0.1%        | Strong single-floor upgrade                                  |
+| anduinWrynncat             | Anduin Wrynncat                  | 30 payouts here                     | 0.3%        | Below Thrall's building-wide payout                          |
+| illidandelight             | Illidan Stormrage                | 42 upgrades here                    | 0.08%       | Rarer than Varian's 38                                       |
+| malfurionStormpaw          | Malfurion Stormpaw               | 35 payouts on every unlocked floor  | 0.1%        | Building-wide druid reward                                   |
+| voljinWhisker              | Vol'jin Whisker                  | 26 upgrades here                    | 0.4%        | Smaller than Illidan's 42                                    |
+| lorthemewPurron            | Lor'themar Purron                | 29 payouts here                     | 0.35%       | Between Sylvanas and Anduin                                  |
+| khadgarPurr                | Khadgar Purr                     | 33 upgrades on every unlocked floor | 0.08%       | Building-wide mage reward                                    |
+| garroshHellscreamPurr      | Garrosh Hellscream Purr          | 48 upgrades here                    | 0.05%       | Rarer than Illidan's 42                                      |
+| grommewHellscream          | Grommash Hellscream              | 40 payouts on every unlocked floor  | 0.08%       | Building-wide berserker payout                               |
+| deathwingTheDestroycat     | Deathwing the Destroyer          | 55 upgrades on every unlocked floor | 0.03%       | Largest building-wide reward                                 |
+| deathwingAshwing           | Deathwing Ashwing                | 50 upgrades here                    | 0.05%       | Strong single-floor variant below Deathwing's 55-wide reward |
+| deathwingDestroypurr       | I Am the Destroyer!              | 60 upgrades on every unlocked floor | 0.02%       | Rarer and larger than Deathwing's 55 at 0.03%                |
+| ragnapurrs                 | Ragnaros the Firelord            | 37 payouts here                     | 0.15%       | Below Grommash's building-wide payout                        |
+| medivhMewage               | Medivh Mewage                    | 27 upgrades here                    | 0.4%        | Smaller than Illidan's 42                                    |
+| tyrandeWhiskerwind         | Elune-Adore                      | 34 payouts here                     | 0.2%        | Between Ragnaros and Malfurion                               |
+| tyrandeMoonwhisker         | By Elune's Light!                | 32 payouts here                     | 0.25%       | More common and smaller than Tyrande's 34 at 0.2%            |
+| tyrandeWhisperpaws         | The Night Warrior Rises!         | 38 payouts on every unlocked floor  | 0.08%       | Building-wide upgrade in scope over Tyrande's 34 here        |
+| tyrandeStarbow             | Justice for the Kaldorei!        | 31 upgrades here                    | 0.35%       | Common single-floor companion to Tyrande's payout crits      |
+| chenStormstout             | A Toast to Victory!              | 25 upgrades on every unlocked floor | 0.25%       | Building-wide monk reward                                    |
+| antleredFoxFortune         | Antlered Fox Fortune             | 34 upgrades here                    | 0.25%       | Single-floor fortune below Illidan's 42 at 0.08%             |
+| emperorProvidesPurrfection | The Emperor Provides Purrfection | 44 payouts on every unlocked floor  | 0.06%       | Rare building-wide payout above Thrall's 32 at 0.15%         |
+| furionStormpaw             | Furion Stormpaw                  | 42 payouts on every unlocked floor  | 0.06%       | Alternate druid reward above Malfurion's 35 at 0.1%          |
+| whatIsBrewing              | What's Brewing?                  | 16 payouts here                     | 0.35%       | Smaller and more common than Chen's 25-wide reward           |
 
 Locked floors are excluded from building-wide rewards; single-floor rewards
 stay on the triggering floor, stack on repeated targets, preserve timers, and
 stop only where the normal upgrade system stops. Maximum-tier behavior and
 single-floor fallback behavior remain unchanged. Raw `.jfif` files are preserved;
 each wrapper emits palette-quantized alpha PNGs in `public/` and `public/stickers/`.
+The four missed raw-only assets use the same shared floor reward path and do not
+change map behavior. Their prompts use the canonical image basenames, and their
+regression coverage checks metadata, processed assets, and exact reward effects.
 
 ## Implemented asset batch: 2026-09-20 (sweets, relics, officers and wargear)
 

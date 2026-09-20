@@ -1402,6 +1402,14 @@ export const CONFIG = {
     tyrandeStarbowUpgrades: 31,
     chenStormstoutChance: 0.0025,
     chenStormstoutUpgrades: 25,
+    antleredFoxFortuneChance: 0.0025,
+    antleredFoxFortuneUpgrades: 34,
+    emperorProvidesPurrfectionChance: 0.0006,
+    emperorProvidesPurrfectionPayouts: 44,
+    furionStormpawChance: 0.0006,
+    furionStormpawPayouts: 42,
+    whatIsBrewingChance: 0.0035,
+    whatIsBrewingPayouts: 16,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.
