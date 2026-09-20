@@ -1,97 +1,221 @@
 # Image prompts
 
-## Template
+## Special crit artwork
 
-"Flat vector cartoon of [SUBJECT], bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Emberwing Dragon
 
-Every entry has one original camelCase name. The name is both the display name
-and asset basename: `lemonTart` means “Lemon Tart” and writes to
-`src/assets/lemonTart.png`. Names avoid trademarked characters, items, quotes
-and locations.
+Flat vector cartoon of a tiny ember-winged dragon clutching a glowing gold coin, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the dragon's flame-shaped wings form a heart around the coin.
 
-Prompt rules: one obvious subject per image; batch categories are not ingredients
-to combine; food must look edible and delicious; science and technology prompts
-must depict one coherent object; jokes belong in the name, not in impossible
-object mashups; a character may have a single coherent costume, role or action.
+### Moonlit Mint
 
-## Food And Beverages
+Flat vector cartoon of a magical peppermint candy wrapped in a crescent moon ribbon, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: tiny stars sparkle from the candy's striped surface.
 
-**lemonTart** — "Flat vector cartoon of a glossy lemon tart on a white dessert plate, golden pastry crust, pale yellow custard, thin lemon slices and a small dusting of sugar, appetizing bakery presentation, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Vault Beetle
 
-**berryParfait** — "Flat vector cartoon of a clear dessert glass layered with vanilla cream, red berries and crunchy granola, a strawberry perched on top, appetizing cafe presentation, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of a jewel-backed beetle carrying a miniature golden vault on its shell, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the vault door is shaped like the beetle's friendly smiling face.
 
-**butterCroissant** — "Flat vector cartoon of a warm golden croissant with crisp layered pastry, a small pat of butter beside it and a few crumbs on a white plate, appetizing bakery presentation, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Thunder Kettle
 
-**spicedChai** — "Flat vector cartoon of a ceramic mug of spiced chai with cinnamon sticks, star anise and a curl of steam, warm caramel foam visible at the top, appetizing cafe presentation, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of a polished tea kettle crackling with harmless golden lightning, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the steam curls into a tiny lightning-bolt crown.
 
-**honeyToast** — "Flat vector cartoon of thick golden toast spread with butter and honey, honey dripping from the edge onto a small wooden board, appetizing breakfast presentation, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Rocket Piggy Bank
 
-**sushiPlatter** — "Flat vector cartoon of a neat ceramic platter holding salmon rolls, cucumber rolls, tamago slices and a small dish of soy sauce, appetizing restaurant presentation, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of a cheerful rocket-shaped piggy bank launching through a ring of coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the coin slot doubles as a glowing cockpit window.
 
-**cheeseWheel** — "Flat vector cartoon of a round aged cheese wheel with one wedge cut away, creamy interior and a few grapes on a wooden board, appetizing deli presentation, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Crystal Caterpillar
 
-**berrySmoothie** — "Flat vector cartoon of a tall glass of thick purple berry smoothie with a reusable straw, blueberries and raspberries arranged beside it, appetizing cafe presentation, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of a friendly caterpillar made from colorful faceted gemstones, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: each jewel segment has a tiny pair of gold spectacles.
 
-## Science And Technology
+### Clockwork Owl
 
-**potionCommotion** — "Flat vector cartoon of a clear conical laboratory flask containing bright teal liquid with a few bubbles, a glass stopper beside it and no other equipment, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of a wise mechanical owl holding a pocket watch in its talons, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the owl's pupils are spinning coin-shaped gears.
 
-**dnaHelix** — "Flat vector cartoon of one clean blue-and-pink DNA double helix with evenly spaced rungs and glossy molecular highlights, no surrounding equipment, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Treasure Toadstool
 
-**solarCell** — "Flat vector cartoon of a single blue photovoltaic solar panel with a silver frame and six neat cell rows, a small mounting bracket beneath it, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of a cheerful red toadstool growing from a pile of gold coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the mushroom cap is a tiny treasure map folded into a crown shape.
 
-**roboticGripper** — "Flat vector cartoon of one compact industrial robotic gripper with three articulated chrome fingers and a red status light, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Sapphire Seahorse
 
-**circuitBreaker** — "Flat vector cartoon of a green circuit board with copper traces, a few black chips and one bright blue indicator light, shown as one clean rectangular board, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of a regal sapphire seahorse swimming through a spiral of silver coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its curled tail forms a miniature safe dial.
 
-**microscope** — "Flat vector cartoon of one compact steel laboratory microscope with a blue eyepiece, rotating objective turret and glass slide on its stage, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Golden Garden Golem
 
-## Money, Metals And Treasures
+Flat vector cartoon of a small stone garden golem covered in gold vines and carrying a blooming coin-flower, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: a tiny friendly worm wears a crown inside the flower.
 
-**silverCoin** — "Flat vector cartoon of one large polished silver coin standing on edge, a simple original paw emblem embossed on its face and a bright rim highlight, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+## General
 
-**goldBar** — "Flat vector cartoon of one heavy rectangular gold bullion bar with beveled edges, warm yellow reflections and a simple blank stamped seal, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Candy
 
-**platinumRing** — "Flat vector cartoon of one polished platinum ring with a single deep blue gemstone in a clean setting, cool white metal reflections and no extra objects, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of an original candy castle made from striped hard candy, gumdrops and a lollipop flag, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the castle drawbridge is a wrapped caramel ribbon.
 
-**gildedCache** — "Flat vector cartoon of one small wooden treasure chest with brass bands, its lid open to reveal a warm golden glow and neatly stacked coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Food
 
-**sapphire** — "Flat vector cartoon of one large faceted blue sapphire gemstone on a small neutral display stand, crisp facets and cool highlights, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of an original stacked comfort-food tower with a toasted sandwich, fries and a tiny sauce cup, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the fries form a golden crown.
 
-**ancientRelic** — "Flat vector cartoon of one worn bronze relic mask with simple geometric carvings, patina in its recesses and a small display shadow beneath it, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Animals
 
-## Original Mythical Items And Creatures
+Flat vector cartoon of an original cheerful red panda carrying a basket of coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its striped tail curls into a question mark.
 
-**moonCloak** — "Flat vector cartoon of one deep blue enchanted cloak hanging from a crescent clasp, its hem dotted with tiny stars, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Plants
 
-**emberCrown** — "Flat vector cartoon of one black iron crown with three small contained orange flames rising from its points, warm sparks beneath a transparent rim, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of an original money tree with coin-shaped leaves, braided trunk and smiling seed pods, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: one root grips a tiny golden watering can.
 
-**glassWyvern** — "Flat vector cartoon of one original translucent glass wyvern with turquoise wings, a ruby heart visible in its chest and a curled crystal tail, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Desserts
 
-**mossbackManticore** — "Flat vector cartoon of one original moss-covered manticore with a lion-like body, small bat wings and a tail ending in three glowing seed pods, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of an original skyscraper parfait with layers of cream, berries, chocolate and a cherry elevator at the top, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the spoon is shaped like a construction crane.
 
-**stormBoots** — "Flat vector cartoon of one pair of cobalt blue enchanted boots with brass buckles, miniature storm clouds trapped around the soles and small lightning beneath the heels, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Jokes
 
-## Steampunk And Cyberpunk
+Flat vector cartoon of an original banana wearing a tiny business suit and slipping on its own briefcase, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: flying coins replace the cartoon stars around its head.
 
-**airship** — "Flat vector cartoon of one fat brass-ribbed dirigible with a wooden gondola, twin propellers and a striped canvas envelope, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Beverages
 
-**pressureGauge** — "Flat vector cartoon of one round brass pressure gauge with a cream dial, red needle and copper pipe elbows, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of an original fizzy soda bottle with a straw, citrus slice and sparkling bubbles shaped like coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the bottle cap is a tiny golden roulette wheel.
 
-**clockworkHand** — "Flat vector cartoon of one brass mechanical hand with jointed finger linkages and exposed gears at the wrist, palm open and fingers half curled, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Science
 
-**neonSign** — "Flat vector cartoon of one buzzing neon sign shaped like an original stylised cat head in hot pink and cyan tubing, one tube flickering dark on a rusted bracket, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of an original alchemy machine with a bubbling flask, crystal coil and floating atom rings, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the final bubble contains a tiny coin constellation.
 
-**adSpace** — "Flat vector cartoon of one floating translucent cyan hologram billboard on a slim post, its projected panel glitching into horizontal scan bands at one corner, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Technology
 
-**chromeArm** — "Flat vector cartoon of one polished chrome prosthetic arm with segmented plating, exposed hydraulic lines and a glowing cyan seam down the forearm, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of an original friendly server robot holding a glowing microchip like a treasure map, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its antenna ends in a miniature flag made of circuit traces.
 
-## Military Gear
+### Money
 
-**ironBanner** — "Flat vector cartoon of one battered iron standard planted in a stone base, a blank crimson pennant snapping from its crossbar and a small brass gear at the top, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of an original coin cannon firing a joyful arc of gold coins into a treasure basket, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the cannon's fuse is a tiny green sprout.
 
-**scoutBinoculars** — "Flat vector cartoon of one pair of compact olive military binoculars with brass hinge plates, a tiny red compass clipped between the barrels and a strap coiled beneath, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Silver
 
-**fieldRadio** — "Flat vector cartoon of one rugged olive field radio with a long antenna, a glowing amber tuning dial and a coiled handset cable, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+Flat vector cartoon of an original silver coin knight with a polished shield and a small blue gemstone crest, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the shield reflects a tiny moon.
 
-**lifelineLoot** — "Flat vector cartoon of one red canvas medic satchel with brass clasps, rolled bandages and a blue glass healing vial peeking from the open flap, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+### Gold
+
+Flat vector cartoon of an original molten-gold crown resting on a velvet cushion, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the crown's points are miniature rising sunbeams.
+
+### Platinum
+
+Flat vector cartoon of an original platinum phoenix feather mounted in a clean metal frame, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the feather tip becomes a tiny starburst.
+
+### Gemstones
+
+Flat vector cartoon of an original treasure geode split open to reveal a rainbow crystal heart, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: one crystal facet resembles a smiling eye.
+
+### Treasures
+
+Flat vector cartoon of an original treasure chest overflowing with coins, pearls and a rolled map, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the chest has tiny mechanical legs ready to run away.
+
+### Artifacts
+
+Flat vector cartoon of an original ancient compass artifact with a jewel needle, carved paw motifs and a brass casing, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the compass needle points toward a floating coin.
+
+### Relics
+
+Flat vector cartoon of an original cracked golden idol with a tiny glowing core visible through the repaired seams, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the relic wears a miniature hard hat.
+
+### Legendary items
+
+Flat vector cartoon of an original legendary vault key with a lion-shaped bow, ruby center and curling metal teeth, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the key casts a crown-shaped highlight.
+
+### Mythical items
+
+Flat vector cartoon of an original cloud-forged treasure hammer with a comet-shaped head and wrapped leather grip, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its striking face contains a tiny smiling sun.
+
+### Rare creatures
+
+Flat vector cartoon of an original velvet-antlered fox spirit with a gemstone tail tip, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its paws leave floating coin-shaped footprints.
+
+## Computer Games
+
+Flat vector cartoon of an original pixel-hero cat holding a coin-shaped power-up in a colorful arcade scene, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the hero's cape is made from a scrolling game map.
+
+## Computer science
+
+Flat vector cartoon of an original artificial-intelligence cat head made from linked nodes, code brackets and a glowing neural core, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the neural core wears tiny round glasses.
+
+## Dirty humor
+
+Flat vector cartoon of an original cheeky whoopee cushion wearing a tuxedo and holding a heart-shaped coin, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: a tiny puff cloud forms a smug mustache.
+
+## Warhammer 40k Space Marines
+
+Flat vector cartoon of an original grimdark space knight in enormous blue power armor holding a coin-shaped relic, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the armor's shoulder emblem is a crowned paw, with no faction symbols or copied insignia.
+
+## World of Warcraft
+
+Flat vector cartoon of an original brightly armored goblin-like treasure engineer beside a glowing loot chest, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the engineer's backpack is powered by a tiny rotating coin turbine, with no game logos or copied characters.
+
+## Deus Ex
+
+Flat vector cartoon of an original cybernetic detective with one glowing amber eye, a trench coat and a mechanical hand holding a data chip, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the data chip is shaped like a golden key, with no franchise symbols or copied character design.
+
+## The Witcher computer games
+
+Flat vector cartoon of an original silver-haired monster hunter holding a coin purse and a short silver blade beside a friendly potion bottle, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the potion bottle contains a tiny glowing coin, with no copied characters, medallions or franchise symbols.
+
+## Dungeon and Dragons
+
+Flat vector cartoon of an original party of four tiny adventurers gathered around a treasure mimic, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the mimic's tongue is a rolled-up tax receipt, with no copyrighted monsters or logos.
+
+## Baldurs Gate computer game series
+
+Flat vector cartoon of an original fantasy adventurer campfire scene with a masked rogue, a spellbook, a coin purse and a winged familiar, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the campfire smoke curls into a question mark, with no copied characters or symbols.
+
+## Fable computer game series
+
+Flat vector cartoon of an original storybook hero in a red coat holding a golden promise ring beside a loyal dog with a coin collar, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the dog carries a tiny quest scroll, with no copied characters or logos.
+
+## Movies
+
+Flat vector cartoon of an original cinema director's clapperboard exploding into popcorn, film strips and gold coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the film reel has a tiny crown in its center.
+
+## Batman
+
+Flat vector cartoon of an original nocturnal masked vigilante cat perched on a rooftop gargoyle while holding a black-and-gold coin, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the cape forms a bat-like silhouette without using any existing superhero emblem or character design.
+
+## Cyberpunk
+
+Flat vector cartoon of an original neon street courier with a chrome arm, luminous visor and coin-shaped data drive, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: a tiny holographic koi swims through the data drive.
+
+## Steampunk
+
+Flat vector cartoon of an original brass airship captain holding a pocket watch and standing beside a wind-up mechanical cat, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the captain's hat is powered by a tiny visible gear.
+
+## Superheroes
+
+Flat vector cartoon of an original caped office hero lifting a giant golden coin above a city skyline, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the cape is patterned like a rising stock chart, with no existing hero symbols.
+
+## Pokemon
+
+Flat vector cartoon of an original pocket-sized electric fox creature with crystal ears, a lightning tail and a berry-shaped energy orb, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its tail forms a coin-shaped spark, with no copied species, balls or franchise symbols.
+
+## Military
+
+Flat vector cartoon of an original compact field radio with a camouflage strap, folded map, signal antenna and brass challenge coin, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the radio's signal waves form a protective shield.
+
+## Monsters & Creatures
+
+Flat vector cartoon of an original friendly three-eyed vault monster with stubby horns, coin scales and a treasure pouch, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: each eye looks in a different direction toward a different coin.
+
+## Mythical Items
+
+Flat vector cartoon of an original phoenix-feather quill writing glowing gold sparks above an enchanted ledger, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the ledger's clasp is a tiny dragon curled around a gemstone.
+
+## Star wars
+
+Flat vector cartoon of an original space pilot in a rounded helmet holding a glowing energy blade and a coin-shaped star chart, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: a tiny maintenance droid projects a treasure map, with no franchise symbols, uniforms or copied characters.
+
+## Harry Potter
+
+Flat vector cartoon of an original young wizard wearing a starry cloak and raising a wand beside a locked coin vault, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the wand tip releases a tiny golden owl, with no house crests, copied characters or franchise marks.
+
+## Lord of the Rings
+
+Flat vector cartoon of an original small woodland ring-bearer carrying a glowing gold ring on a velvet cushion through a miniature mountain pass, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the ring's reflection shows a tiny sunrise, with no copied characters, inscriptions or symbols.
+
+## Belgarion
+
+Flat vector cartoon of an original young farm boy turned sky-blue sorcerer, holding a silver staff and a golden coin under a swirling star, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the staff sprouts a tiny orchard branch, with no copied characters, names or symbols.
+
+## TV Comedy shows
+
+Flat vector cartoon of an original chaotic office sitcom scene with a frazzled manager, a prank prop, a coffee mug and coins flying through the air, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the office printer produces a tiny golden trophy instead of paper.

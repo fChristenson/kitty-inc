@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 412);
+  assert.equal(kinds.length, 454);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -612,6 +612,48 @@ try {
     pocketWatch: [[20, 30, 10, 0], 87],
     tubeDelivery: [[20, 30, 41, 0], 0],
     windUp: [[20, 47, 10, 0], 0],
+    berryShortcake: [[20, 30, 10, 0], 99],
+    brassBanker: [[20, 30, 44, 0], 0],
+    candyCastle: [[20, 30, 10, 0], 216],
+    caramelApple: [[20, 58, 10, 0], 0],
+    catnipSatchel: [[20, 30, 10, 0], 58],
+    cinnamonSwirl: [[46, 30, 36, 0], 0],
+    citrusCoin: [[20, 30, 10, 0], 99],
+    clockworkSatellite: [[20, 30, 40, 0], 0],
+    coinCascade: [[20, 30, 10, 0], 228],
+    comfortFood: [[20, 30, 34, 0], 0],
+    crownHedgehog: [[20, 52, 10, 0], 0],
+    emberKey: [[20, 62, 10, 0], 0],
+    emberwingDragon2: [[20, 30, 10, 0], 90],
+    emperorsFinest: [[20, 30, 10, 0], 222],
+    eternalDuty: [[47, 57, 37, 0], 0],
+    faithIsOurShield: [[20, 54, 10, 0], 0],
+    fearNotThePsyker: [[20, 30, 10, 0], 102],
+    frostRune: [[49, 59, 10, 0], 0],
+    lanternFox: [[20, 30, 10, 0], 93],
+    lanternLynx: [[20, 30, 33, 0], 0],
+    memoryCrystal: [[20, 51, 10, 0], 0],
+    mochaFroth: [[20, 30, 10, 0], 84],
+    coinrootGrove: [[40, 50, 30, 0], 0],
+    neonBeaker: [[20, 30, 10, 0], 96],
+    neverSurrender: [[20, 65, 10, 0], 0],
+    pearlOtter: [[20, 30, 10, 0], 90],
+    pickleParade: [[20, 30, 35, 0], 0],
+    profitPigeon: [[20, 30, 10, 0], 81],
+    purge: [[20, 63, 10, 0], 0],
+    rainbowRelic: [[20, 53, 10, 0], 0],
+    ramenCrown: [[20, 30, 10, 0], 210],
+    redPanda: [[51, 30, 41, 0], 0],
+    silverLaurel: [[20, 30, 10, 0], 58],
+    thunderNachos: [[48, 58, 38, 0], 0],
+    toTheSkies: [[20, 30, 46, 0], 0],
+    treasureTeapot: [[20, 30, 10, 0], 102],
+    whatAreYourOrders: [[20, 30, 40, 0], 0],
+    whisperingOrb: [[20, 55, 10, 0], 0],
+    clockworkOwl: [[20, 57, 10, 0], 0],
+    goldenGardenGolem: [[20, 30, 10, 0], 198],
+    moonlitMint: [[20, 30, 10, 0], 78],
+    vaultBeetle: [[20, 64, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

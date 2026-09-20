@@ -1,5 +1,76 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-20 (sweets, relics, officers and wargear)
+
+Forty-two new featured crits support upgrade clicks and floor unlocks through
+the shared `applyFloorCrit` path. Rewards are immediate and limited to the
+current building; existing balance values were unchanged. Each proc chance is
+conditional on a tier landing and the special gateway before the shared cap,
+not a per-click probability.
+
+| Image | Crit | Immediate reward | Proc chance | Comparison |
+| ----- | ---- | ---------------- | ----------- | ---------- |
+| berryShortcake | Berry Shortcake | 33 payouts here | 0.25% | Below The Cure's 0.7% for 27 payouts |
+| brassBanker | Brass Banker | 34 upgrades on lowest floor | 0.2% | Matches Never Surrender's 35-floor reward band |
+| candyCastle | Candy Castle | 36 payouts on every floor | 0.2% | Below Coin Cascade's 38 payouts at 0.15% |
+| caramelApple | Caramel Apple | 28 upgrades here | 0.4% | Above Ember Key's 32 upgrades at 0.25% |
+| catnipSatchel | Catnip Satchel | 29 payouts from top earner | 0.5% | Below Neon Beaker's 32 payouts at 0.3% |
+| cinnamonSwirl | Cinnamon Swirl | 26 upgrades on alternating floors | 0.4% | Broader than Clockwork Owl's 27 here at 0.4% |
+| citrusCoin | Citrus Coin | 33 payouts on alternating floors | 0.4% | Below Moonlit Mint's 26 at 0.6% by scope |
+| clockworkSatellite | Clockwork Satellite | 30 upgrades on highest floor | 0.3% | Above To the Skies's 36 at 0.15% by rarity |
+| coinCascade | Coin Cascade | 38 payouts on every floor | 0.15% | Rarer than Candy Castle's 36 at 0.2% |
+| comfortFood | Comfort Food | 24 upgrades on lowest floor | 1% | More common than Brass Banker's 34 at 0.2% |
+| crownHedgehog | Crown Hedgehog | 1 promotion plus 22 upgrades here | 0.3% | Smaller than Rainbow Relic's 23-upgrade promotion |
+| emberKey | Ember Key | 32 upgrades here | 0.25% | Above Vault Beetle's 34 here at 0.2% by chance |
+| emberwingDragon2 | Emberwing Dragon Hoard | 30 payouts here | 0.3% | Distinct companion artwork to Emberwing Dragon's upgrade reward |
+| emperorsFinest | Emperor's Finest | 37 payouts on every floor | 0.15% | Near Coin Cascade's 38 at the same chance |
+| eternalDuty | Eternal Duty | 27 upgrades on every floor | 0.4% | Broader than Never Surrender's 35 here at 0.2% |
+| faithIsOurShield | Faith Is Our Shield | 1 promotion plus 24 upgrades here | 0.2% | Stronger than Crown Hedgehog's 22 at 0.3% |
+| fearNotThePsyker | Fear Not the Psyker | 34 payouts here | 0.25% | Above Berry Shortcake's 33 at the same chance |
+| frostRune | Frost Rune | 29 upgrades here and below | 0.4% | Narrower than Eternal Duty's building-wide 27 |
+| lanternFox | Lantern Fox | 31 payouts from top earner | 0.3% | Near Silver Laurel's 29 top-floor payouts at 0.4% |
+| lanternLynx | Lantern Lynx | 23 upgrades on lowest floor | 1.2% | More common than Comfort Food's 24 at 1% |
+| memoryCrystal | Memory Crystal | 1 promotion plus 21 upgrades here | 0.4% | Smaller and more common than Faith Is Our Shield |
+| mochaFroth | Mocha Froth | 28 payouts here | 0.3% | Below Fear Not the Psyker's 34 at 0.25% |
+| coinrootGrove | Coinroot Grove | 20 upgrades on every floor | 0.5% | Building-wide but smaller than Eternal Duty |
+| neonBeaker | Neon Beaker | 32 payouts from top earner | 0.3% | Broader target than Catnip Satchel at 0.5% |
+| neverSurrender | Never Surrender | 35 upgrades here | 0.2% | Near Ember Key's 32 at 0.25% |
+| pearlOtter | Pearl Otter | 30 payouts here | 0.4% | Below Mocha Froth's 28 only by target value |
+| pickleParade | Pickle Parade | 25 upgrades on lowest floor | 0.8% | More common than Brass Banker by scope |
+| profitPigeon | Profit Pigeon | 27 payouts on alternating floors | 0.5% | Smaller than Citrus Coin's 33 at 0.4% |
+| purge | Purge | 33 upgrades here | 0.2% | Near Ember Key's 32 at 0.25% |
+| rainbowRelic | Rainbow Relic | 1 promotion plus 23 upgrades here | 0.3% | Above Crown Hedgehog's 22 at the same chance |
+| ramenCrown | Ramen Crown | 35 payouts on every floor | 0.2% | Below Coin Cascade's 38 at 0.15% |
+| redPanda | Red Panda | 31 upgrades on alternating floors | 0.3% | Broader than Never Surrender's 35 here |
+| silverLaurel | Silver Laurel | 29 payouts from highest floor | 0.4% | Narrower than Lantern Fox's top-earner target |
+| thunderNachos | Thunder Nachos | 28 upgrades on every floor | 0.3% | Building-wide versus Purge's 33 here at 0.2% |
+| toTheSkies | To the Skies | 36 upgrades on highest floor | 0.15% | Rarer than Clockwork Satellite's 30 at 0.3% |
+| treasureTeapot | Treasure Teapot | 34 payouts from top earner | 0.2% | Above Silver Laurel's 29 at 0.4% |
+| whatAreYourOrders | What Are Your Orders | 30 upgrades on lowest floor | 0.4% | More targeted than Thunder Nachos's building-wide reward |
+| whisperingOrb | Whispering Orb | 1 promotion plus 25 upgrades here | 0.2% | Stronger than Rainbow Relic's 23 at 0.3% |
+| clockworkOwl | Clockwork Owl | 27 upgrades here | 0.4% | Below Never Surrender's 35 at 0.2% |
+| goldenGardenGolem | Golden Garden Golem | 33 payouts on every floor | 0.2% | Near Ramen Crown's 35 at the same chance |
+| moonlitMint | Moonlit Mint | 26 payouts on alternating floors | 0.6% | More common than Citrus Coin's 33 at 0.4% |
+| vaultBeetle | Vault Beetle | 34 upgrades here | 0.2% | Near Purge's 33 at the same chance |
+
+Locked floors are excluded from all building-wide, alternating, highest, and
+lowest-floor effects; single-floor fallback behavior remains immediate. Tier
+promotions stop at the maximum tier, and repeated targets stack normally. No
+timers are reset. Map-specific behavior is unchanged: these remain floor and
+floor-unlock featured procs only.
+
+Raw `.jfif` sources were processed with
+`node scripts/process-featured-crit-batch.mjs` through the shared near-white
+processor. The four spaced prompt sources were copied to normalized camelCase
+names while their originals were preserved. `emberwingDragon2.jfif` was
+inspected and proved to be distinct artwork, so it was normalized and
+integrated as Emberwing Dragon Hoard. Every
+included asset produced a palette-quantized, alpha-bearing PNG plus sticker
+and silhouette under `public/`; the generated contact sheet was inspected over
+magenta. `node scripts/test-featured-crits.mjs` passes at 454 entries and
+`npm run build` is clean. Browser interaction checks remain unverified in this
+batch.
+
 ## Implemented asset batch: 2026-09-19 (food, science, treasure and gear)
 
 Twenty-five coherent crits support upgrade clicks and floor unlocks through the
