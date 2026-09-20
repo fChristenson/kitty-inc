@@ -44,15 +44,15 @@ export {
 } from "./boostMenu";
 export type { BoostMenu } from "./boostMenu";
 export {
-  createCorporationBoostMenuMarkup,
-  wireCorporationBoostMenu,
+  createBadgeCollectionMarkup,
+  wireBadgeCollection,
   getGlobalIncomeBoostMultiplier,
   getCompanyAssetValue,
   getActiveCompanyAssetValue,
   getCompanyUpgradesValue,
   mergeCompanies,
 } from "./corporationBoostMenu";
-export type { CorporationBoostMenu } from "./corporationBoostMenu";
+export type { BadgeCollection } from "./corporationBoostMenu";
 export {
   createCorporationStatsMarkup,
   wireCorporationStats,

@@ -74,8 +74,8 @@ import {
   wireCorporationUpgradeMenu,
   createBoostMenuMarkup,
   wireBoostMenu,
-  createCorporationBoostMenuMarkup,
-  wireCorporationBoostMenu,
+  createBadgeCollectionMarkup,
+  wireBadgeCollection,
   createCorporationStatsMarkup,
   wireCorporationStats,
   getGlobalIncomeBoostMultiplier,
@@ -134,7 +134,7 @@ async function main() {
     ${createFloorUpgradeMenuMarkup()}
     ${createCorporationUpgradeMenuMarkup()}
     ${createBoostMenuMarkup()}
-    ${createCorporationBoostMenuMarkup()}
+    ${createBadgeCollectionMarkup()}
     ${createCorporationStatsMarkup()}
     ${createMapMenuMarkup()}
     ${createTotalEarnedOverlayMarkup()}
@@ -449,7 +449,7 @@ async function main() {
     (floor) => gameCanvas.scrollActiveToFloor(floor),
     (floor) => gameCanvas.scrollActiveToFloor(floor),
   );
-  const corporationBoostMenu = wireCorporationBoostMenu(app);
+  const badgeCollection = wireBadgeCollection(app);
   const totalEarnedOverlay = wireTotalEarnedOverlay(app);
   // buys the next building outright if affordable (see buildings.ts's
   // getBuildingPrice, which scales 1000x per building same as its economy).
@@ -758,7 +758,7 @@ async function main() {
       cityMapView.jumpToEnd(1);
     },
     onBoostAll: () => {
-      if (mapOpen) corporationBoostMenu.open();
+      if (mapOpen) badgeCollection.open();
       else boostMenu.open();
     },
     onOpenUpgradeMenu: () => {

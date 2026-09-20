@@ -964,7 +964,7 @@ body {
 /* this dialog's header holds a back arrow before the title, so it reads
    left-to-right instead of pushing the two apart like every other menu's
    title/close pairing does */
-#corporation-boost-menu .worker-menu__header {
+#badge-collection .worker-menu__header {
   justify-content: flex-start;
 }
 
@@ -973,7 +973,7 @@ body {
    height is indefinite as far as percentage resolution goes, so the slider's
    panes below could never size themselves against it and scrolled the whole
    track instead of themselves */
-#corporation-boost-menu .worker-menu__panel {
+#badge-collection .worker-menu__panel {
   height: calc(100vh - 180px - var(--worker-menu-safe-bottom, 3.75rem));
 }
 
@@ -1166,6 +1166,8 @@ body {
 .crit-info-detail__modifier strong {
   color: var(--color-money-green);
   font-size: 1.15em;
+  -webkit-text-stroke: 4px var(--color-white);
+  paint-order: stroke fill;
 }
 
 .crit-info-detail__next {
@@ -1179,6 +1181,8 @@ body {
 
 .crit-info-detail__next strong {
   color: var(--color-money-green);
+  -webkit-text-stroke: 4px var(--color-white);
+  paint-order: stroke fill;
 }
 
 /* header back arrow, only shown while the detail pane is open. The shared

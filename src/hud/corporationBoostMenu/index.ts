@@ -24,14 +24,14 @@ export {
 } from "./economy";
 export type { MergeCompaniesResult } from "./economy";
 
-// every "special crit" piggyback proc (see .github/instructions/special-crits.
+// every collectible crit badge (see .github/instructions/special-crits.
 // instructions.md), for the info list below — derived straight from
 // shared/critTypes's own canonical CRIT_PROC_INFO table (icon/label match each
 // proc's own celebration flash exactly, screenShake.ts/critCelebration.ts)
 // instead of this menu hand-duplicating every label/icon/description a
 // second time. Sorted alphabetically by label — CRIT_PROC_KINDS' own order is
 // roll-rarity-driven, not a sensible reading order for a lookup list
-const CRIT_INFO: {
+const BADGE_INFO: {
   kind: CritProcKind;
   icon: string;
   silhouette: string;
@@ -48,38 +48,38 @@ const CRIT_INFO: {
   };
 }).sort((a, b) => a.label.localeCompare(b.label));
 
-const INFO_BY_KIND = new Map(CRIT_INFO.map((info) => [info.kind, info]));
+const BADGE_INFO_BY_KIND = new Map(BADGE_INFO.map((info) => [info.kind, info]));
 
 // the map view's own prev/next/pointer arrow icon (shared/arrowIcon), rotated
 // to point left via CSS for the detail pane's own back button
 const BACK_ARROW_SVG = arrowIconMarkup(22);
 
-// reuses .worker-menu's styling — a dialog showing every special crit as a
+// reuses .worker-menu's styling — a dialog showing every crit badge as a
 // 3-column grid of icons; tapping one slides the grid out to the left and a
 // full detail card (big icon + name + description) in from the right, with a
 // back arrow in the header to slide back (see render()/showDetail() below)
-export function createCorporationBoostMenuMarkup(): string {
+export function createBadgeCollectionMarkup(): string {
   return `
-    <div class="worker-menu" id="corporation-boost-menu" hidden>
-      <div class="worker-menu__backdrop" id="corporation-boost-menu-backdrop"></div>
+    <div class="worker-menu" id="badge-collection" hidden>
+      <div class="worker-menu__backdrop" id="badge-collection-backdrop"></div>
       <div class="worker-menu__panel">
         <div class="worker-menu__header">
           <button
             type="button"
             class="crit-info-back"
-            id="corporation-boost-menu-back"
+            id="badge-collection-back"
             aria-label="Back to all crits"
             hidden
           >${BACK_ARROW_SVG}</button>
-          <h2>Special Crits</h2>
+          <h2>Badge Collection</h2>
         </div>
-        <div class="crit-info-slider" id="corporation-boost-menu-slider">
+        <div class="crit-info-slider" id="badge-collection-slider">
           <div class="crit-info-slider__track">
             <div class="crit-info-slider__pane">
-              <div class="crit-info-grid" id="corporation-boost-menu-grid"></div>
+              <div class="crit-info-grid" id="badge-collection-grid"></div>
             </div>
             <div class="crit-info-slider__pane">
-              <div class="crit-info-detail" id="corporation-boost-menu-detail"></div>
+              <div class="crit-info-detail" id="badge-collection-detail"></div>
             </div>
           </div>
         </div>
@@ -88,33 +88,29 @@ export function createCorporationBoostMenuMarkup(): string {
   `;
 }
 
-export interface CorporationBoostMenu {
+export interface BadgeCollection {
   open: () => void;
   close: () => void;
   refresh: () => void;
 }
 
-export function wireCorporationBoostMenu(
-  container: HTMLElement,
-): CorporationBoostMenu {
-  const menu = container.querySelector<HTMLDivElement>(
-    "#corporation-boost-menu",
-  )!;
+export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
+  const menu = container.querySelector<HTMLDivElement>("#badge-collection")!;
   const backdrop = container.querySelector<HTMLDivElement>(
-    "#corporation-boost-menu-backdrop",
+    "#badge-collection-backdrop",
   )!;
   const panel = menu.querySelector<HTMLDivElement>(".worker-menu__panel")!;
   const slider = container.querySelector<HTMLDivElement>(
-    "#corporation-boost-menu-slider",
+    "#badge-collection-slider",
   )!;
   const grid = container.querySelector<HTMLDivElement>(
-    "#corporation-boost-menu-grid",
+    "#badge-collection-grid",
   )!;
   const detail = container.querySelector<HTMLDivElement>(
-    "#corporation-boost-menu-detail",
+    "#badge-collection-detail",
   )!;
   const backButton = container.querySelector<HTMLButtonElement>(
-    "#corporation-boost-menu-back",
+    "#badge-collection-back",
   )!;
 
   // which crit the detail pane is currently showing, so refresh() can re-render
@@ -140,7 +136,7 @@ export function wireCorporationBoostMenu(
     kind: CritProcKind,
     count: number,
   ): void {
-    const info = INFO_BY_KIND.get(kind)!;
+    const info = BADGE_INFO_BY_KIND.get(kind)!;
     const discovered = count > 0;
     tile.classList.toggle("crit-info-tile--undiscovered", !discovered);
     (tile as HTMLButtonElement).disabled = !discovered;
@@ -183,7 +179,7 @@ export function wireCorporationBoostMenu(
   const PAGE_SIZE = 60;
 
   function appendPage(): void {
-    const page = CRIT_INFO.slice(renderedCount, renderedCount + PAGE_SIZE);
+    const page = BADGE_INFO.slice(renderedCount, renderedCount + PAGE_SIZE);
     if (page.length === 0) {
       pageObserver?.unobserve(sentinel);
       return;
@@ -208,7 +204,7 @@ export function wireCorporationBoostMenu(
     }
     renderedCount += page.length;
     grid.insertBefore(fragment, sentinel);
-    if (renderedCount >= CRIT_INFO.length) {
+    if (renderedCount >= BADGE_INFO.length) {
       pageObserver?.unobserve(sentinel);
       sentinel.remove();
       return;
@@ -245,7 +241,7 @@ export function wireCorporationBoostMenu(
       pageObserver.observe(sentinel);
       return;
     }
-    while (renderedCount < CRIT_INFO.length) appendPage();
+    while (renderedCount < BADGE_INFO.length) appendPage();
   }
 
   function syncBadges(): void {
@@ -267,14 +263,14 @@ export function wireCorporationBoostMenu(
     return {
       landed: count > 0 ? `Collected ${count}\u00d7` : "Not yet discovered",
       landedNone: count === 0,
-      modifier: `+${incomeModifier.toFixed(2)}%`,
+      modifier: `+${incomeModifier.toFixed(2)}% `,
       nextLabel: `Next boost: ${nextThreshold} collected (`,
-      nextBoost: `+${modifierStep.toFixed(2)}%`,
+      nextBoost: ` +${modifierStep.toFixed(2)}% `,
     };
   }
 
   function renderDetail(): void {
-    const info = CRIT_INFO.find(({ kind }) => kind === openKind);
+    const info = BADGE_INFO.find(({ kind }) => kind === openKind);
     if (!info) return;
     detail.innerHTML = `
       <img src="${info.icon}" class="crit-info-detail__icon" alt="" />
