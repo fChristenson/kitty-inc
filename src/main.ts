@@ -855,6 +855,16 @@ async function main() {
       // topmost unlocked one (see ensureLockedFloorAbove) — the marker should
       // only count floors actually unlocked, not that placeholder
       buildings[buildingIndex]?.filter((floor) => floor.unlocked).length ?? 0,
+    isBuildingFullyManaged: (buildingIndex) => {
+      const unlockedFloors = buildings[buildingIndex]?.filter(
+        (floor) => floor.unlocked,
+      );
+      return (
+        unlockedFloors !== undefined &&
+        unlockedFloors.length > 0 &&
+        unlockedFloors.every((floor) => floor.hasManager)
+      );
+    },
     getBuildingCritTier: (buildingIndex) => {
       const floors = buildings[buildingIndex];
       if (!floors || floors.length === 0) return null;

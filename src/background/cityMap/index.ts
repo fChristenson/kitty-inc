@@ -82,12 +82,14 @@ const STREET_TEXT_GAP_BELOW_INCOME = 12;
 
 let mapImage: HTMLImageElement | null = null;
 let catSprite: HTMLImageElement | null = null;
+let managerSprite: HTMLImageElement | null = null;
 
 // loads the map screen's own backdrop + marker cat sprite
 export async function loadCityMapImage(): Promise<HTMLImageElement> {
-  [mapImage, catSprite] = await Promise.all([
+  [mapImage, catSprite, managerSprite] = await Promise.all([
     loadImageByName("cityMapBackground"),
     loadSprite("worker"),
+    loadSprite("manager"),
   ]);
   return mapImage!;
 }
@@ -97,6 +99,7 @@ export interface CityMapDeps {
   getBuildingCount: () => number; // buildings unlocked so far; building 1 exists once this is >= 2
   getActiveBuildingIndex: () => number; // whichever building's floors are on screen right now
   getBuildingFloorCount: (buildingIndex: number) => number; // for the "X/20" marker readout
+  isBuildingFullyManaged: (buildingIndex: number) => boolean;
   // the crit tier EVERY floor of this building currently shares (see
   // setBuildingCritTier below), or null if they don't all match — colors the
   // "X/20" marker readout so a crit-maxed building stands out on the map
@@ -636,6 +639,9 @@ export function createCityMapView(
     for (let i = 0; i < MARKER_COUNT; i++) {
       const globalIndex = cityIndex * MARKER_COUNT + i;
       if (globalIndex < buildingCount) {
+        const markerSprite = deps.isBuildingFullyManaged(globalIndex)
+          ? managerSprite
+          : catSprite;
         const jumpOffsetY = getMarkerJumpOffset(globalIndex, Date.now());
         if (jumpOffsetY !== 0) hasActiveMarkerJump = true;
         // the hop always wins the pose, same as a worker's click reaction always
@@ -646,7 +652,16 @@ export function createCityMapView(
             : activeIndex === globalIndex
               ? pose
               : CAT_STAND_FRAME;
-        drawCatMarker(ctx, cssW, cssH, catSprite, i, frame, false, jumpOffsetY);
+        drawCatMarker(
+          ctx,
+          cssW,
+          cssH,
+          markerSprite,
+          i,
+          frame,
+          false,
+          jumpOffsetY,
+        );
         const { cx, feetY } = markerCenter(cssW, cssH, i);
         const critTier = deps.getBuildingCritTier(globalIndex);
         drawMarkerFloorCount(
@@ -662,7 +677,7 @@ export function createCityMapView(
           !isZero(unlockAllCost) &&
           gte(deps.getTotalIncome(), unlockAllCost)
         ) {
-          drawBuyAllFloorsIndicator(ctx, cssW, cssH, catSprite, i);
+          drawBuyAllFloorsIndicator(ctx, cssW, cssH, markerSprite, i);
         }
         if (isZero(unlockAllCost)) {
           const upgradeAllCost = deps.getBuildingUpgradeAllCost(globalIndex);
@@ -670,7 +685,7 @@ export function createCityMapView(
             !isZero(upgradeAllCost) &&
             gte(deps.getTotalIncome(), upgradeAllCost)
           ) {
-            drawBuyAllBuildingItemsIndicator(ctx, cssW, cssH, catSprite, i);
+            drawBuyAllBuildingItemsIndicator(ctx, cssW, cssH, markerSprite, i);
           }
         }
         continue;
