@@ -64,7 +64,6 @@ import {
   drawCritFlash,
   isCritFlashActive,
 } from "../../screenShake";
-import { getWiggleRotation } from "../../shared/wiggle";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -205,6 +204,9 @@ export function createCityMapView(
     container.querySelector<HTMLButtonElement>("#city-map-prev")!;
   const nextButton =
     container.querySelector<HTMLButtonElement>("#city-map-next")!;
+  const corpPointer = container.querySelector<HTMLElement>(
+    ".city-map__corp-pointer",
+  )!;
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
@@ -338,7 +340,14 @@ export function createCityMapView(
   const critBadgeImages = new Map<CritProcKind, HTMLImageElement | null>();
   const scaledCritBadgeImages = new Map<
     CritProcKind,
-    { source: HTMLImageElement; size: number; canvas: HTMLCanvasElement }
+    {
+      source: HTMLImageElement;
+      size: number;
+      dpr: number;
+      canvas: HTMLCanvasElement;
+      displayWidth: number;
+      displayHeight: number;
+    }
   >();
 
   function loadCritBadgeImage(kind: CritProcKind): HTMLImageElement | null {
@@ -359,29 +368,49 @@ export function createCityMapView(
     kind: CritProcKind,
     image: HTMLImageElement,
     badgeSize: number,
-  ): HTMLCanvasElement {
+  ): {
+    canvas: HTMLCanvasElement;
+    displayWidth: number;
+    displayHeight: number;
+  } {
+    const dpr = getEffectiveDpr();
     const cached = scaledCritBadgeImages.get(kind);
-    if (cached?.source === image && cached.size === badgeSize) {
-      return cached.canvas;
+    if (
+      cached?.source === image &&
+      cached.size === badgeSize &&
+      cached.dpr === dpr
+    ) {
+      return cached;
     }
     const scale = Math.min(
       badgeSize / image.naturalWidth,
       badgeSize / image.naturalHeight,
     );
+    const displayWidth = image.naturalWidth * scale;
+    const displayHeight = image.naturalHeight * scale;
     const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.ceil(image.naturalWidth * scale));
-    canvas.height = Math.max(1, Math.ceil(image.naturalHeight * scale));
+    canvas.width = Math.max(1, Math.ceil(displayWidth * dpr));
+    canvas.height = Math.max(1, Math.ceil(displayHeight * dpr));
     const context = canvas.getContext("2d")!;
     context.imageSmoothingEnabled = true;
     context.imageSmoothingQuality = "high";
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
-    scaledCritBadgeImages.set(kind, { source: image, size: badgeSize, canvas });
-    return canvas;
+    const cachedBadge = {
+      source: image,
+      size: badgeSize,
+      dpr,
+      canvas,
+      displayWidth,
+      displayHeight,
+    };
+    scaledCritBadgeImages.set(kind, cachedBadge);
+    return cachedBadge;
   }
 
   function showCritBadges(counts: Partial<Record<CritProcKind, number>>): void {
     const kinds = CRIT_PROC_KINDS.filter((kind) => (counts[kind] ?? 0) > 0);
     if (kinds.length === 0) return;
+    corpPointer.hidden = true;
     critBadgeCounts = counts;
     critBadgePages = [];
     for (let i = 0; i < kinds.length; i += CRIT_BADGE_PAGE_SIZE) {
@@ -404,6 +433,7 @@ export function createCityMapView(
       critBadgePages = [];
       critBadgeCounts = {};
       critBadgeAnimation = null;
+      corpPointer.hidden = false;
     }
     redraw();
   }
@@ -482,14 +512,15 @@ export function createCityMapView(
       const image = loadCritBadgeImage(kind);
       ctx.save();
       ctx.translate(badgeCenterX, badgeCenterY);
-      if (badgeProgress >= 1) ctx.rotate(getWiggleRotation(now, 520));
       ctx.globalAlpha = 0.98 * badgeEased;
       if (image?.complete && image.naturalWidth > 0) {
         const scaledImage = getScaledCritBadgeImage(kind, image, badgeSize);
         ctx.drawImage(
-          scaledImage,
-          -scaledImage.width / 2,
-          -scaledImage.height / 2,
+          scaledImage.canvas,
+          -scaledImage.displayWidth / 2,
+          -scaledImage.displayHeight / 2,
+          scaledImage.displayWidth,
+          scaledImage.displayHeight,
         );
       }
       const count = critBadgeCounts[kind] ?? 0;
