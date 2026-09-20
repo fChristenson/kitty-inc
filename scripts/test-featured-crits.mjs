@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 456);
+  assert.equal(kinds.length, 482);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -656,6 +656,32 @@ try {
     vaultBeetle: [[20, 64, 10, 0], 0],
     lionKey: [[20, 56, 10, 0], 0],
     restorationProject: [[20, 60, 10, 0], 0],
+    arfthas: [[20, 52, 10, 0], 0],
+    guldanMeow: [[20, 30, 10, 0], 93],
+    sargerasPurrgeras: [[65, 75, 55, 0], 0],
+    sylvanwhisker: [[20, 30, 10, 0], 84],
+    sylvanasWhiskerunner: [[20, 30, 10, 0], 90],
+    jainaPurrmoore: [[20, 54, 10, 0], 0],
+    thrallpaw: [[20, 30, 10, 0], 192],
+    varianWrynnkles: [[20, 68, 10, 0], 0],
+    anduinWrynncat: [[20, 30, 10, 0], 90],
+    illidandelight: [[20, 72, 10, 0], 0],
+    malfurionStormpaw: [[20, 30, 10, 0], 210],
+    voljinWhisker: [[20, 56, 10, 0], 0],
+    lorthemewPurron: [[20, 30, 10, 0], 87],
+    khadgarPurr: [[53, 63, 43, 0], 0],
+    garroshHellscreamPurr: [[20, 78, 10, 0], 0],
+    grommewHellscream: [[20, 30, 10, 0], 240],
+    deathwingTheDestroycat: [[75, 85, 65, 0], 0],
+    deathwingAshwing: [[20, 80, 10, 0], 0],
+    deathwingDestroypurr: [[80, 90, 70, 0], 0],
+    ragnapurrs: [[20, 30, 10, 0], 111],
+    medivhMewage: [[20, 57, 10, 0], 0],
+    tyrandeWhiskerwind: [[20, 30, 10, 0], 102],
+    tyrandeMoonwhisker: [[20, 30, 10, 0], 96],
+    tyrandeWhisperpaws: [[20, 30, 10, 0], 228],
+    tyrandeStarbow: [[20, 61, 10, 0], 0],
+    chenStormstout: [[45, 55, 35, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

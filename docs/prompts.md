@@ -1,221 +1,113 @@
 # Image prompts
 
-## Special crit artwork
+## World of Warcraft cats
 
-### Emberwing Dragon
+Use each image name as the output basename. Keep the character recognizable through their silhouette, costume, colors, weapon, and signature accessories, while making the subject unmistakably feline.
 
-Flat vector cartoon of a tiny ember-winged dragon clutching a glowing gold coin, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the dragon's flame-shaped wings form a heart around the coin.
+### `arfthas`
 
-### Moonlit Mint
+**Arthas Menethil** — Flat vector cartoon of the famous World of Warcraft character Arthas Menethil as an undead frost cat, wearing ornate icy-blue skull armor and a tattered royal cape, gripping a miniature runeblade, glowing cyan eyes, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-Flat vector cartoon of a magical peppermint candy wrapped in a crescent moon ribbon, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: tiny stars sparkle from the candy's striped surface.
+### `guldanMeow`
 
-### Vault Beetle
+**Gul'dan** — Flat vector cartoon of the famous World of Warcraft character Gul'dan as a sinister fel cat warlock, wearing black-and-green demon armor with curved horns and fel-green eyes, holding a jagged shadowy staff, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-Flat vector cartoon of a jewel-backed beetle carrying a miniature golden vault on its shell, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the vault door is shaped like the beetle's friendly smiling face.
+### `sargerasPurrgeras`
 
-### Thunder Kettle
+**Sargeras** — Flat vector cartoon of the famous World of Warcraft character Sargeras as a colossal demonic titan cat, wearing black-and-red infernal armor, wielding a gigantic flaming sword, glowing fel-green eyes, towering curved horns, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-Flat vector cartoon of a polished tea kettle crackling with harmless golden lightning, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the steam curls into a tiny lightning-bolt crown.
+### `sylvanwhisker`
 
-### Rocket Piggy Bank
+**Sylvanas Windrunner** — Flat vector cartoon of the famous World of Warcraft character Sylvanas Windrunner as an elegant undead ranger cat, wearing dark red-and-black hooded armor, a feathered shoulder guard, and carrying a glowing violet bow, piercing blue eyes, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-Flat vector cartoon of a cheerful rocket-shaped piggy bank launching through a ring of coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the coin slot doubles as a glowing cockpit window.
+### `sylvanasWhiskerunner`
 
-### Crystal Caterpillar
+**Sylvanas Windrunner** — Flat vector cartoon of the famous World of Warcraft character Sylvanas Windrunner as an undead ranger cat in an alternate red hood, drawing a dark bow with a curled tail and vivid blue eyes, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-Flat vector cartoon of a friendly caterpillar made from colorful faceted gemstones, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: each jewel segment has a tiny pair of gold spectacles.
+### `jainaPurrmoore`
 
-### Clockwork Owl
+**Jaina Proudmoore** — Flat vector cartoon of the famous World of Warcraft character Jaina Proudmoore as a clever frost mage cat, wearing a blue-and-gold wizard coat and pointed hat, holding a glowing ice staff with a tiny floating snowflake spell, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-Flat vector cartoon of a wise mechanical owl holding a pocket watch in its talons, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the owl's pupils are spinning coin-shaped gears.
+### `thrallpaw`
 
-### Treasure Toadstool
+**Thrall** — Flat vector cartoon of the famous World of Warcraft character Thrall as a mighty green orc shaman cat, wearing brown leather and metal shoulder armor, gripping a hammer crackling with blue lightning, braided whiskers and a small elemental spark beside him, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-Flat vector cartoon of a cheerful red toadstool growing from a pile of gold coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the mushroom cap is a tiny treasure map folded into a crown shape.
+### `varianWrynnkles`
 
-### Sapphire Seahorse
+**Varian Wrynn** — Flat vector cartoon of the famous World of Warcraft character Varian Wrynn as a proud blue-eyed warrior cat, wearing polished blue-and-gold lion armor and wielding two short royal swords, windswept mane fur, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-Flat vector cartoon of a regal sapphire seahorse swimming through a spiral of silver coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its curled tail forms a miniature safe dial.
+### `anduinWrynncat`
 
-### Golden Garden Golem
+**Anduin Wrynn** — Flat vector cartoon of the famous World of Warcraft character Anduin Wrynn as a gentle priest cat, wearing white-and-gold royal robes with a blue tabard, holding a radiant golden staff and a small glowing healing orb, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-Flat vector cartoon of a small stone garden golem covered in gold vines and carrying a blooming coin-flower, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: a tiny friendly worm wears a crown inside the flower.
+### `illidandelight`
 
-## General
+**Illidan Stormrage** — Flat vector cartoon of the famous World of Warcraft character Illidan Stormrage as a dramatic blind demon-hunter cat, wearing black spiked armor, a red blindfold, and twin curved warglaives glowing with green fel fire, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Candy
+### `malfurionStormpaw`
 
-Flat vector cartoon of an original candy castle made from striped hard candy, gumdrops and a lollipop flag, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the castle drawbridge is a wrapped caramel ribbon.
+**Malfurion Stormrage** — Flat vector cartoon of the famous World of Warcraft character Malfurion Stormrage as an ancient druid cat, wearing bark-textured shoulder armor with leafy vines, huge antler-like horns, and a glowing green acorn staff, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Food
+### `voljinWhisker`
 
-Flat vector cartoon of an original stacked comfort-food tower with a toasted sandwich, fries and a tiny sauce cup, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the fries form a golden crown.
+**Vol'jin** — Flat vector cartoon of the famous World of Warcraft character Vol'jin as a blue troll shadow-hunter cat, wearing bone charms, tribal beads, and a red feather, holding a carved voodoo staff with a tiny spectral flame, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Animals
+### `lorthemewPurron`
 
-Flat vector cartoon of an original cheerful red panda carrying a basket of coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its striped tail curls into a question mark.
+**Lor'themar Theron** — Flat vector cartoon of the famous World of Warcraft character Lor'themar Theron as a regal blood elf cat, wearing bright red-and-gold elven armor, a long crimson cape, and holding an elegant golden sword, emerald eyes and pointed ear tufts, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Plants
+### `khadgarPurr`
 
-Flat vector cartoon of an original money tree with coin-shaped leaves, braided trunk and smiling seed pods, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: one root grips a tiny golden watering can.
+**Khadgar** — Flat vector cartoon of the famous World of Warcraft character Khadgar as a wise elderly mage cat, with white whiskers, a tall purple wizard hat, red-and-gold robes, and a crooked staff topped with a glowing blue crystal, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Desserts
+### `garroshHellscreamPurr`
 
-Flat vector cartoon of an original skyscraper parfait with layers of cream, berries, chocolate and a cherry elevator at the top, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the spoon is shaped like a construction crane.
+**Garrosh Hellscream** — Flat vector cartoon of the famous World of Warcraft character Garrosh Hellscream as a massive battle-scarred orc cat, wearing dark iron armor and a skull belt, raising an oversized axe with red Horde accents, angry orange eyes, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Jokes
+### `grommewHellscream`
 
-Flat vector cartoon of an original banana wearing a tiny business suit and slipping on its own briefcase, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: flying coins replace the cartoon stars around its head.
+**Grommash Hellscream** — Flat vector cartoon of the famous World of Warcraft character Grommash Hellscream as a legendary red-haired orc cat berserker, wearing rugged spiked armor and swinging a huge double-headed axe, fierce grin, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Beverages
+### `deathwingTheDestroycat`
 
-Flat vector cartoon of an original fizzy soda bottle with a straw, citrus slice and sparkling bubbles shaped like coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the bottle cap is a tiny golden roulette wheel.
+**Deathwing** — Flat vector cartoon of the famous World of Warcraft character Deathwing the Destroyer as an enormous black dragon cat, with molten orange cracks across obsidian scales, metal plates bolted to his body, and smoky wings spread wide, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Science
+### `deathwingAshwing`
 
-Flat vector cartoon of an original alchemy machine with a bubbling flask, crystal coil and floating atom rings, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the final bubble contains a tiny coin constellation.
+**Deathwing** — Flat vector cartoon of the famous World of Warcraft character Deathwing the Destroyer as an armored black-and-orange dragon cat with molten cracks, heavy metal plates, and a curled tail, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Technology
+### `deathwingDestroypurr`
 
-Flat vector cartoon of an original friendly server robot holding a glowing microchip like a treasure map, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its antenna ends in a miniature flag made of circuit traces.
+**Deathwing** — Flat vector cartoon of the famous World of Warcraft character Deathwing the Destroyer as a larger armored black-and-orange dragon cat with broad smoky wings, molten cracks, and bolted metal plates, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Money
+### `ragnapurrs`
 
-Flat vector cartoon of an original coin cannon firing a joyful arc of gold coins into a treasure basket, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the cannon's fuse is a tiny green sprout.
+**Ragnaros** — Flat vector cartoon of the famous World of Warcraft character Ragnaros the Firelord as a gigantic fiery elemental cat, with a flaming mane, molten paws, a massive hammer, and bright yellow-orange eyes, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Silver
+### `medivhMewage`
 
-Flat vector cartoon of an original silver coin knight with a polished shield and a small blue gemstone crest, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the shield reflects a tiny moon.
+**Medivh** — Flat vector cartoon of the famous World of Warcraft character Medivh as a mysterious arcane mage cat, wearing a black raven-feather cloak and tall blue wizard hat, holding a staff topped with a glowing purple crystal, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Gold
+### `tyrandeWhiskerwind`
 
-Flat vector cartoon of an original molten-gold crown resting on a velvet cushion, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the crown's points are miniature rising sunbeams.
+**Tyrande Whisperwind** — Flat vector cartoon of the famous World of Warcraft character Tyrande Whisperwind as a fierce night elf priestess cat, wearing silver-and-teal moon armor, a crescent moon circlet, and carrying a glowing bow with starry blue arrows, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Platinum
+### `tyrandeMoonwhisker`
 
-Flat vector cartoon of an original platinum phoenix feather mounted in a clean metal frame, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the feather tip becomes a tiny starburst.
+**Tyrande Whisperwind** — Flat vector cartoon of the famous World of Warcraft character Tyrande Whisperwind as a purple night elf cat in silver armor, holding a turquoise bow in a compact alert pose, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Gemstones
+### `tyrandeWhisperpaws`
 
-Flat vector cartoon of an original treasure geode split open to reveal a rainbow crystal heart, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: one crystal facet resembles a smiling eye.
+**Tyrande Whisperwind** — Flat vector cartoon of the famous World of Warcraft character Tyrande Whisperwind as a purple night elf cat drawing a starry blue bow, wearing silver armor and a moonlit circlet, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Treasures
+### `tyrandeStarbow`
 
-Flat vector cartoon of an original treasure chest overflowing with coins, pearls and a rolled map, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the chest has tiny mechanical legs ready to run away.
+**Tyrande Whisperwind** — Flat vector cartoon of the famous World of Warcraft character Tyrande Whisperwind as a pink-and-purple night elf cat holding a silver bow and a bundle of arrows, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Artifacts
+### `chenStormstout`
 
-Flat vector cartoon of an original ancient compass artifact with a jewel needle, carved paw motifs and a brass casing, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the compass needle points toward a floating coin.
+**Chen Stormstout** — Flat vector cartoon of the famous World of Warcraft character Chen Stormstout as a cheerful pandaren monk cat, with black-and-white fur, a round straw hat, red sash, bamboo staff, and a tiny foaming beer keg, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
-### Relics
+### `leeroyMeowkins`
 
-Flat vector cartoon of an original cracked golden idol with a tiny glowing core visible through the repaired seams, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the relic wears a miniature hard hat.
-
-### Legendary items
-
-Flat vector cartoon of an original legendary vault key with a lion-shaped bow, ruby center and curling metal teeth, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the key casts a crown-shaped highlight.
-
-### Mythical items
-
-Flat vector cartoon of an original cloud-forged treasure hammer with a comet-shaped head and wrapped leather grip, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its striking face contains a tiny smiling sun.
-
-### Rare creatures
-
-Flat vector cartoon of an original velvet-antlered fox spirit with a gemstone tail tip, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its paws leave floating coin-shaped footprints.
-
-## Computer Games
-
-Flat vector cartoon of an original pixel-hero cat holding a coin-shaped power-up in a colorful arcade scene, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the hero's cape is made from a scrolling game map.
-
-## Computer science
-
-Flat vector cartoon of an original artificial-intelligence cat head made from linked nodes, code brackets and a glowing neural core, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the neural core wears tiny round glasses.
-
-## Dirty humor
-
-Flat vector cartoon of an original cheeky whoopee cushion wearing a tuxedo and holding a heart-shaped coin, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: a tiny puff cloud forms a smug mustache.
-
-## Warhammer 40k Space Marines
-
-Flat vector cartoon of an original grimdark space knight in enormous blue power armor holding a coin-shaped relic, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the armor's shoulder emblem is a crowned paw, with no faction symbols or copied insignia.
-
-## World of Warcraft
-
-Flat vector cartoon of an original brightly armored goblin-like treasure engineer beside a glowing loot chest, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the engineer's backpack is powered by a tiny rotating coin turbine, with no game logos or copied characters.
-
-## Deus Ex
-
-Flat vector cartoon of an original cybernetic detective with one glowing amber eye, a trench coat and a mechanical hand holding a data chip, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the data chip is shaped like a golden key, with no franchise symbols or copied character design.
-
-## The Witcher computer games
-
-Flat vector cartoon of an original silver-haired monster hunter holding a coin purse and a short silver blade beside a friendly potion bottle, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the potion bottle contains a tiny glowing coin, with no copied characters, medallions or franchise symbols.
-
-## Dungeon and Dragons
-
-Flat vector cartoon of an original party of four tiny adventurers gathered around a treasure mimic, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the mimic's tongue is a rolled-up tax receipt, with no copyrighted monsters or logos.
-
-## Baldurs Gate computer game series
-
-Flat vector cartoon of an original fantasy adventurer campfire scene with a masked rogue, a spellbook, a coin purse and a winged familiar, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the campfire smoke curls into a question mark, with no copied characters or symbols.
-
-## Fable computer game series
-
-Flat vector cartoon of an original storybook hero in a red coat holding a golden promise ring beside a loyal dog with a coin collar, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the dog carries a tiny quest scroll, with no copied characters or logos.
-
-## Movies
-
-Flat vector cartoon of an original cinema director's clapperboard exploding into popcorn, film strips and gold coins, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the film reel has a tiny crown in its center.
-
-## Batman
-
-Flat vector cartoon of an original nocturnal masked vigilante cat perched on a rooftop gargoyle while holding a black-and-gold coin, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the cape forms a bat-like silhouette without using any existing superhero emblem or character design.
-
-## Cyberpunk
-
-Flat vector cartoon of an original neon street courier with a chrome arm, luminous visor and coin-shaped data drive, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: a tiny holographic koi swims through the data drive.
-
-## Steampunk
-
-Flat vector cartoon of an original brass airship captain holding a pocket watch and standing beside a wind-up mechanical cat, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the captain's hat is powered by a tiny visible gear.
-
-## Superheroes
-
-Flat vector cartoon of an original caped office hero lifting a giant golden coin above a city skyline, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the cape is patterned like a rising stock chart, with no existing hero symbols.
-
-## Pokemon
-
-Flat vector cartoon of an original pocket-sized electric fox creature with crystal ears, a lightning tail and a berry-shaped energy orb, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: its tail forms a coin-shaped spark, with no copied species, balls or franchise symbols.
-
-## Military
-
-Flat vector cartoon of an original compact field radio with a camouflage strap, folded map, signal antenna and brass challenge coin, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the radio's signal waves form a protective shield.
-
-## Monsters & Creatures
-
-Flat vector cartoon of an original friendly three-eyed vault monster with stubby horns, coin scales and a treasure pouch, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: each eye looks in a different direction toward a different coin.
-
-## Mythical Items
-
-Flat vector cartoon of an original phoenix-feather quill writing glowing gold sparks above an enchanted ledger, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the ledger's clasp is a tiny dragon curled around a gemstone.
-
-## Star wars
-
-Flat vector cartoon of an original space pilot in a rounded helmet holding a glowing energy blade and a coin-shaped star chart, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: a tiny maintenance droid projects a treasure map, with no franchise symbols, uniforms or copied characters.
-
-## Harry Potter
-
-Flat vector cartoon of an original young wizard wearing a starry cloak and raising a wand beside a locked coin vault, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the wand tip releases a tiny golden owl, with no house crests, copied characters or franchise marks.
-
-## Lord of the Rings
-
-Flat vector cartoon of an original small woodland ring-bearer carrying a glowing gold ring on a velvet cushion through a miniature mountain pass, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the ring's reflection shows a tiny sunrise, with no copied characters, inscriptions or symbols.
-
-## Belgarion
-
-Flat vector cartoon of an original young farm boy turned sky-blue sorcerer, holding a silver staff and a golden coin under a swirling star, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the staff sprouts a tiny orchard branch, with no copied characters, names or symbols.
-
-## TV Comedy shows
-
-Flat vector cartoon of an original chaotic office sitcom scene with a frazzled manager, a prank prop, a coffee mug and coins flying through the air, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text. Add a unique twist: the office printer produces a tiny golden trophy instead of paper.
+**Leeroy Jenkins** — Flat vector cartoon of the famous World of Warcraft character Leeroy Jenkins as an excited paladin cat charging forward, wearing bright silver-and-gold plate armor, raising a glowing hammer, open-mouthed battle cry, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
