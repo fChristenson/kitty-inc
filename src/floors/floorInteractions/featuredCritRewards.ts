@@ -1321,48 +1321,126 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       ),
     gildedCache: (context) =>
       actions.upgrade(context.floors, balance.gildedCacheUpgrades),
-    berryShortcake: (context) => actions.payCycles([context.floor], balance.berryShortcakePayouts),
-    brassBanker: (context) => actions.upgrade([lowestLevel(context)], balance.brassBankerUpgrades),
-    candyCastle: (context) => actions.payCycles(context.floors, balance.candyCastlePayouts),
-    caramelApple: (context) => actions.upgrade([context.floor], balance.caramelAppleUpgrades),
-    catnipSatchel: (context) => actions.payCycles([highestFloor(context)], balance.catnipSatchelPayouts),
-    cinnamonSwirl: (context) => actions.upgrade(alternating(context), balance.cinnamonSwirlUpgrades),
-    citrusCoin: (context) => actions.payCycles(alternating(context), balance.citrusCoinPayouts),
-    clockworkSatellite: (context) => actions.upgrade([highestFloor(context)], balance.clockworkSatelliteUpgrades),
-    coinCascade: (context) => actions.payCycles(context.floors, balance.coinCascadePayouts),
-    comfortFood: (context) => actions.upgrade([lowestLevel(context)], balance.comfortFoodUpgrades),
-    crownHedgehog: (context) => promoteAndUpgrade(context.floor, balance.crownHedgehogTierSteps, balance.crownHedgehogUpgrades),
-    emberKey: (context) => actions.upgrade([context.floor], balance.emberKeyUpgrades),
-    emberwingDragon2: (context) => actions.payCycles([context.floor], balance.emberwingDragon2Payouts),
-    emperorsFinest: (context) => actions.payCycles(context.floors, balance.emperorsFinestPayouts),
-    eternalDuty: (context) => actions.upgrade(context.floors, balance.eternalDutyUpgrades),
-    faithIsOurShield: (context) => promoteAndUpgrade(context.floor, balance.faithIsOurShieldTierSteps, balance.faithIsOurShieldUpgrades),
-    fearNotThePsyker: (context) => actions.payCycles([context.floor], balance.fearNotThePsykerPayouts),
-    frostRune: (context) => actions.upgrade(context.floors.slice(0, context.floors.indexOf(context.floor) + 1), balance.frostRuneUpgrades),
-    lanternFox: (context) => actions.payCycles([selectByRate(context, true)], balance.lanternFoxPayouts),
-    lanternLynx: (context) => actions.upgrade([lowestLevel(context)], balance.lanternLynxUpgrades),
-    memoryCrystal: (context) => promoteAndUpgrade(context.floor, balance.memoryCrystalTierSteps, balance.memoryCrystalUpgrades),
-    mochaFroth: (context) => actions.payCycles([context.floor], balance.mochaFrothPayouts),
+    berryShortcake: (context) =>
+      actions.payCycles([context.floor], balance.berryShortcakePayouts),
+    brassBanker: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.brassBankerUpgrades),
+    candyCastle: (context) =>
+      actions.payCycles(context.floors, balance.candyCastlePayouts),
+    caramelApple: (context) =>
+      actions.upgrade([context.floor], balance.caramelAppleUpgrades),
+    catnipSatchel: (context) =>
+      actions.payCycles([highestFloor(context)], balance.catnipSatchelPayouts),
+    cinnamonSwirl: (context) =>
+      actions.upgrade(alternating(context), balance.cinnamonSwirlUpgrades),
+    citrusCoin: (context) =>
+      actions.payCycles(alternating(context), balance.citrusCoinPayouts),
+    clockworkSatellite: (context) =>
+      actions.upgrade(
+        [highestFloor(context)],
+        balance.clockworkSatelliteUpgrades,
+      ),
+    coinCascade: (context) =>
+      actions.payCycles(context.floors, balance.coinCascadePayouts),
+    comfortFood: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.comfortFoodUpgrades),
+    crownHedgehog: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.crownHedgehogTierSteps,
+        balance.crownHedgehogUpgrades,
+      ),
+    emberKey: (context) =>
+      actions.upgrade([context.floor], balance.emberKeyUpgrades),
+    emberwingDragon2: (context) =>
+      actions.payCycles([context.floor], balance.emberwingDragon2Payouts),
+    emperorsFinest: (context) =>
+      actions.payCycles(context.floors, balance.emperorsFinestPayouts),
+    eternalDuty: (context) =>
+      actions.upgrade(context.floors, balance.eternalDutyUpgrades),
+    faithIsOurShield: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.faithIsOurShieldTierSteps,
+        balance.faithIsOurShieldUpgrades,
+      ),
+    fearNotThePsyker: (context) =>
+      actions.payCycles([context.floor], balance.fearNotThePsykerPayouts),
+    frostRune: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.frostRuneUpgrades,
+      ),
+    lanternFox: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.lanternFoxPayouts,
+      ),
+    lanternLynx: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.lanternLynxUpgrades),
+    memoryCrystal: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.memoryCrystalTierSteps,
+        balance.memoryCrystalUpgrades,
+      ),
+    mochaFroth: (context) =>
+      actions.payCycles([context.floor], balance.mochaFrothPayouts),
     coinrootGrove: (context) =>
       actions.upgrade(context.floors, balance.coinrootGroveUpgrades),
-    neonBeaker: (context) => actions.payCycles([selectByRate(context, true)], balance.neonBeakerPayouts),
-    neverSurrender: (context) => actions.upgrade([context.floor], balance.neverSurrenderUpgrades),
-    pearlOtter: (context) => actions.payCycles([context.floor], balance.pearlOtterPayouts),
-    pickleParade: (context) => actions.upgrade([lowestLevel(context)], balance.pickleParadeUpgrades),
-    profitPigeon: (context) => actions.payCycles(alternating(context), balance.profitPigeonPayouts),
+    neonBeaker: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.neonBeakerPayouts,
+      ),
+    neverSurrender: (context) =>
+      actions.upgrade([context.floor], balance.neverSurrenderUpgrades),
+    pearlOtter: (context) =>
+      actions.payCycles([context.floor], balance.pearlOtterPayouts),
+    pickleParade: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.pickleParadeUpgrades),
+    profitPigeon: (context) =>
+      actions.payCycles(alternating(context), balance.profitPigeonPayouts),
     purge: (context) => actions.upgrade([context.floor], balance.purgeUpgrades),
-    rainbowRelic: (context) => promoteAndUpgrade(context.floor, balance.rainbowRelicTierSteps, balance.rainbowRelicUpgrades),
-    ramenCrown: (context) => actions.payCycles(context.floors, balance.ramenCrownPayouts),
-    redPanda: (context) => actions.upgrade(alternating(context), balance.redPandaUpgrades),
-    silverLaurel: (context) => actions.payCycles([highestFloor(context)], balance.silverLaurelPayouts),
-    thunderNachos: (context) => actions.upgrade(context.floors, balance.thunderNachosUpgrades),
-    toTheSkies: (context) => actions.upgrade([highestFloor(context)], balance.toTheSkiesUpgrades),
-    treasureTeapot: (context) => actions.payCycles([selectByRate(context, true)], balance.treasureTeapotPayouts),
-    whatAreYourOrders: (context) => actions.upgrade([lowestLevel(context)], balance.whatAreYourOrdersUpgrades),
-    whisperingOrb: (context) => promoteAndUpgrade(context.floor, balance.whisperingOrbTierSteps, balance.whisperingOrbUpgrades),
-    clockworkOwl: (context) => actions.upgrade([context.floor], balance.clockworkOwlUpgrades),
-    goldenGardenGolem: (context) => actions.payCycles(context.floors, balance.goldenGardenGolemPayouts),
-    moonlitMint: (context) => actions.payCycles(alternating(context), balance.moonlitMintPayouts),
-    vaultBeetle: (context) => actions.upgrade([context.floor], balance.vaultBeetleUpgrades),
+    rainbowRelic: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.rainbowRelicTierSteps,
+        balance.rainbowRelicUpgrades,
+      ),
+    ramenCrown: (context) =>
+      actions.payCycles(context.floors, balance.ramenCrownPayouts),
+    redPanda: (context) =>
+      actions.upgrade(alternating(context), balance.redPandaUpgrades),
+    silverLaurel: (context) =>
+      actions.payCycles([highestFloor(context)], balance.silverLaurelPayouts),
+    thunderNachos: (context) =>
+      actions.upgrade(context.floors, balance.thunderNachosUpgrades),
+    toTheSkies: (context) =>
+      actions.upgrade([highestFloor(context)], balance.toTheSkiesUpgrades),
+    treasureTeapot: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.treasureTeapotPayouts,
+      ),
+    whatAreYourOrders: (context) =>
+      actions.upgrade(
+        [lowestLevel(context)],
+        balance.whatAreYourOrdersUpgrades,
+      ),
+    whisperingOrb: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.whisperingOrbTierSteps,
+        balance.whisperingOrbUpgrades,
+      ),
+    clockworkOwl: (context) =>
+      actions.upgrade([context.floor], balance.clockworkOwlUpgrades),
+    goldenGardenGolem: (context) =>
+      actions.payCycles(context.floors, balance.goldenGardenGolemPayouts),
+    moonlitMint: (context) =>
+      actions.payCycles(alternating(context), balance.moonlitMintPayouts),
+    vaultBeetle: (context) =>
+      actions.upgrade([context.floor], balance.vaultBeetleUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
