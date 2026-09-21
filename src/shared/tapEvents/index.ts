@@ -30,3 +30,42 @@ export function onTapOrClick(
     fired = true;
   });
 }
+
+// long enough that a normal tap never triggers the hold action, short enough
+// that deliberately holding the button still feels immediate
+export const DEFAULT_HOLD_MS = 400;
+
+// fires onTap on a normal tap, or onHold once the press is held past holdMs
+// (and then NOT onTap). The hold timer runs off pointerdown/pointerup while
+// the tap itself still goes through onTapOrClick's dedupe above. Returns a
+// teardown that cancels any pending hold.
+export function onTapOrHold(
+  target: HTMLElement,
+  onTap: () => void,
+  onHold: () => void,
+  holdMs: number = DEFAULT_HOLD_MS,
+): () => void {
+  let holdTimeout: ReturnType<typeof setTimeout> | null = null;
+  let holdFired = false;
+  function clearHold(): void {
+    if (holdTimeout !== null) {
+      clearTimeout(holdTimeout);
+      holdTimeout = null;
+    }
+  }
+  target.addEventListener("pointerdown", () => {
+    holdFired = false;
+    clearHold();
+    holdTimeout = setTimeout(() => {
+      holdTimeout = null;
+      holdFired = true;
+      onHold();
+    }, holdMs);
+  });
+  target.addEventListener("pointerup", clearHold);
+  target.addEventListener("pointercancel", clearHold);
+  onTapOrClick(target, () => {
+    if (!holdFired) onTap();
+  });
+  return clearHold;
+}

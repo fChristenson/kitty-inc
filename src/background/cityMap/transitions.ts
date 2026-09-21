@@ -28,6 +28,8 @@ export interface CityTransitionsDeps {
   // applies a city-page delta (mutate cityIndex, persist, redraw) — owned by
   // index.ts since that's where cityIndex itself lives
   shiftCityIndex: (delta: -1 | 1) => void;
+  // same, but straight to the first/last reachable city page in one cut
+  jumpCityIndexToEnd: (delta: -1 | 1) => void;
 }
 
 export interface CityTransitions {
@@ -48,6 +50,9 @@ export interface CityTransitions {
   // anime-style "cut": blur + flash speed lines across the canvas, swap the
   // city page underneath while still covered, then clear
   navigateCity(delta: -1 | 1): void;
+  // same cut as navigateCity, but landing on the first/last reachable city
+  // page instead of the adjacent one — for a HELD (not tapped) side arrow
+  navigateCityToEnd(delta: -1 | 1): void;
   destroy(): void;
 }
 
@@ -97,15 +102,21 @@ export function createCityTransitions(
   }
 
   function navigateCity(delta: -1 | 1): void {
+    cutToCity(delta, () => deps.shiftCityIndex(delta));
+  }
+
+  function navigateCityToEnd(delta: -1 | 1): void {
+    cutToCity(delta, () => deps.jumpCityIndexToEnd(delta));
+  }
+
+  function cutToCity(delta: -1 | 1, applySwap: () => void): void {
     playSwoosh();
     const { cssW, cssH } = deps.getCssSize();
     canvas.classList.add("city-map__canvas--blurred");
     playSpeedLines(speedLinesSvg, cssW, cssH, delta);
     if (swapTimeoutId !== null) clearTimeout(swapTimeoutId);
     if (clearTimeoutId !== null) clearTimeout(clearTimeoutId);
-    swapTimeoutId = setTimeout(() => {
-      deps.shiftCityIndex(delta);
-    }, SWAP_AT_MS);
+    swapTimeoutId = setTimeout(applySwap, SWAP_AT_MS);
     clearTimeoutId = setTimeout(() => {
       canvas.classList.remove("city-map__canvas--blurred");
     }, TRANSITION_MS);
@@ -124,6 +135,7 @@ export function createCityTransitions(
     jumpToEnd,
     animateSwitchToCompany,
     navigateCity,
+    navigateCityToEnd,
     destroy,
   };
 }

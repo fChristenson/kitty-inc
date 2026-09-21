@@ -12,6 +12,7 @@ import { getCityName } from "../../cityName";
 import { setActiveCompanyIndex } from "../../company";
 import { getEffectiveDpr } from "../../shared/devicePixelRatio";
 import { arrowIconMarkup } from "../../shared/arrowIcon";
+import { onTapOrHold } from "../../shared/tapEvents";
 import {
   spawnCoinBurstAt,
   drawActiveCoinBursts,
@@ -298,6 +299,11 @@ export function createCityMapView(
     getSelectedPosition: () => corpBarrel.getSelectedPosition(),
     shiftCityIndex: (delta) => {
       cityIndex += delta;
+      persistCityMapState();
+      redraw();
+    },
+    jumpCityIndexToEnd: (delta) => {
+      cityIndex = delta < 0 ? 0 : lastReachableCityIndex();
       persistCityMapState();
       redraw();
     },
@@ -729,6 +735,12 @@ export function createCityMapView(
       rewardsVisible || buildingCount < (cityIndex + 1) * MARKER_COUNT;
   }
 
+  // the furthest page updateArrows would ever let the player walk to one tap at
+  // a time — the same page count drawCityPageIndicator shows, zero-based
+  function lastReachableCityIndex(): number {
+    return Math.floor(deps.getBuildingCount() / MARKER_COUNT);
+  }
+
   function canvasPoint(event: MouseEvent): { x: number; y: number } {
     const rect = canvas.getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
@@ -993,15 +1005,18 @@ export function createCityMapView(
   window.addEventListener("pointercancel", clearBuyAllHold);
 
   // both arrows are only ever visible when navigating to their side is actually
-  // allowed (see updateArrows in redraw), so a click here never needs to re-check
-  function onPrevClick(): void {
-    transitions.navigateCity(-1);
-  }
-  function onNextClick(): void {
-    transitions.navigateCity(1);
-  }
-  prevButton.addEventListener("click", onPrevClick);
-  nextButton.addEventListener("click", onNextClick);
+  // allowed (see updateArrows in redraw), so a tap here never needs to re-check.
+  // Holding one skips straight to the first/last reachable city page
+  const clearPrevHold = onTapOrHold(
+    prevButton,
+    () => transitions.navigateCity(-1),
+    () => transitions.navigateCityToEnd(-1),
+  );
+  const clearNextHold = onTapOrHold(
+    nextButton,
+    () => transitions.navigateCity(1),
+    () => transitions.navigateCityToEnd(1),
+  );
 
   const resizeObserver = new ResizeObserver(() => redraw());
   resizeObserver.observe(canvas);
@@ -1051,8 +1066,8 @@ export function createCityMapView(
     window.removeEventListener("pointerup", clearBuyAllHold);
     window.removeEventListener("pointercancel", clearBuyAllHold);
     clearBuyAllHold();
-    prevButton.removeEventListener("click", onPrevClick);
-    nextButton.removeEventListener("click", onNextClick);
+    clearPrevHold();
+    clearNextHold();
     resizeObserver.disconnect();
     if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
     transitions.destroy();

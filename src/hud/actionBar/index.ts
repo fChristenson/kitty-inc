@@ -1,6 +1,6 @@
 // the fixed action bar overlaying the bottom of the viewport, independent of any
 // floor/scroll position — its own DOM controls, styled via .action-bar in style.css
-import { onTapOrClick } from "../../shared/tapEvents";
+import { onTapOrClick, onTapOrHold } from "../../shared/tapEvents";
 
 export function createActionBarMarkup(): string {
   return `
@@ -84,52 +84,21 @@ function wireTapButton(button: HTMLButtonElement, onTap: () => void): void {
   onTapOrClick(button, onTap);
 }
 
-// wires a scroll button to fire onClick on a normal tap, or onHold once the
-// press is held past SCROLL_HOLD_MS — the hold timer is tracked directly off
-// pointerdown/pointerup, and the tap itself reuses the shared onTapOrClick
-// dedupe, gated by whether the hold already fired
-function wireHoldableScrollButton(
-  button: HTMLButtonElement,
-  onClick: () => void,
-  onHold: () => void,
-): void {
-  let holdTimeout: ReturnType<typeof setTimeout> | null = null;
-  let holdFired = false;
-  function clearHold(): void {
-    if (holdTimeout !== null) {
-      clearTimeout(holdTimeout);
-      holdTimeout = null;
-    }
-  }
-  button.addEventListener("pointerdown", () => {
-    holdFired = false;
-    clearHold();
-    holdTimeout = setTimeout(() => {
-      holdTimeout = null;
-      holdFired = true;
-      onHold();
-    }, SCROLL_HOLD_MS);
-  });
-  button.addEventListener("pointerup", clearHold);
-  button.addEventListener("pointercancel", clearHold);
-  onTapOrClick(button, () => {
-    if (!holdFired) onClick();
-  });
-}
-
 export function wireActionBar(
   container: HTMLElement,
   handlers: ActionBarHandlers,
 ): void {
-  wireHoldableScrollButton(
+  onTapOrHold(
     container.querySelector<HTMLButtonElement>("#action-bar-scroll-top")!,
     handlers.onScrollTop,
     handlers.onHoldScrollTop,
+    SCROLL_HOLD_MS,
   );
-  wireHoldableScrollButton(
+  onTapOrHold(
     container.querySelector<HTMLButtonElement>("#action-bar-scroll-bottom")!,
     handlers.onScrollBottom,
     handlers.onHoldScrollBottom,
+    SCROLL_HOLD_MS,
   );
   wireTapButton(
     container.querySelector<HTMLButtonElement>("#action-bar-boost-all")!,
