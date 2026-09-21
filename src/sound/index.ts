@@ -65,12 +65,22 @@ let lastArcadeSlotWinPlayTime = 0;
 const SOLD_DEBOUNCE_MS = 60;
 let lastSoldPlayTime = 0;
 
-// an AUTOMATED purchase loop (cityMap's cloud-cat auto-buyer) fires several
-// times a second for minutes on end, so it gets its own far longer debounce
-// instead of the hand-purchase one above — the sound is an occasional cue that
-// it's working, not a per-purchase confirmation
-const AUTO_PURCHASE_DEBOUNCE_MS = 2000;
-let lastAutoPurchasePlayTime = 0;
+// Sounds for actions the GAME takes on its own — the cloud-cat auto-buyer's
+// purchases, a hired manager's periodic re-boost — rather than ones the player
+// clicked. These fire unattended, from more places the longer a save runs (one
+// manager timer per managed floor), so without a shared cap they pile into
+// constant noise. One gate for all of them, so adding another automated sound
+// can't reintroduce the spam.
+const AUTO_ACTION_DEBOUNCE_MS = 2000;
+const lastAutoActionPlayTime = new Map<string, number>();
+
+function autoActionAllowed(key: string): boolean {
+  const now = Date.now();
+  const last = lastAutoActionPlayTime.get(key) ?? 0;
+  if (now - last < AUTO_ACTION_DEBOUNCE_MS) return false;
+  lastAutoActionPlayTime.set(key, now);
+  return true;
+}
 
 let music: HTMLAudioElement | null = null;
 
@@ -258,13 +268,19 @@ export function playSold(): void {
   playSfx("sold", SOLD_VOLUME, 0.5);
 }
 
-// same sound, capped at one per AUTO_PURCHASE_DEBOUNCE_MS — for purchases the
+// same sound, capped at one per AUTO_ACTION_DEBOUNCE_MS — for purchases the
 // game makes on the player's behalf rather than ones they clicked
 export function playAutoPurchase(): void {
-  const now = Date.now();
-  if (now - lastAutoPurchasePlayTime < AUTO_PURCHASE_DEBOUNCE_MS) return;
-  lastAutoPurchasePlayTime = now;
+  if (!autoActionAllowed("autoPurchase")) return;
   playSold();
+}
+
+// the click-celebration bloop a hired manager's own periodic re-boost fires,
+// capped the same way: every managed floor runs its own boost timer, so at
+// scale these overlap into a constant stream
+export function playAutoBoost(): void {
+  if (!autoActionAllowed("autoBoost")) return;
+  playBloop();
 }
 
 // one-shot sound effect for the crit-upgrade "jackpot" moment (see
