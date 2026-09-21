@@ -671,6 +671,9 @@ export const IMAGE_FILES = {
   poisonIvy2: "poisonIvy2.png",
   poisonIvy3: "poisonIvy3.png",
   thePenguin2: "thePenguin2.png",
+  bestestBoy: "bestestBoy.png",
+  doggo: "doggo.png",
+  otterlyAdorable: "otterlyAdorable.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

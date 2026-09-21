@@ -1619,5 +1619,10 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.payCycles(context.floors, balance.poisonIvy3Payouts),
     thePenguin2: (context) =>
       actions.upgrade([context.floor], balance.thePenguin2Upgrades),
+    bestestBoy: (context) =>
+      actions.upgrade([context.floor], balance.bestestBoyUpgrades),
+    doggo: (context) => actions.payCycles(context.floors, balance.doggoPayouts),
+    otterlyAdorable: (context) =>
+      actions.payCycles([context.floor], balance.otterlyAdorablePayouts),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

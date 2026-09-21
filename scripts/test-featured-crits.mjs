@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 540);
+  assert.equal(kinds.length, 543);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -187,6 +187,9 @@ try {
       "whySoSerious",
     ],
     ["moonwalker", "mimeYourBusiness", "spaceAndTime", "pocketDimension"],
+    ["killerCroc2", "bestestBoy", "bane"],
+    ["poisonIvy3", "doggo", "killerCroc"],
+    ["poisonIvy", "otterlyAdorable"],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(
@@ -740,6 +743,9 @@ try {
     poisonIvy2: [[20, 61, 10, 0], 0],
     poisonIvy3: [[20, 30, 10, 0], 222],
     thePenguin2: [[20, 59, 10, 0], 0],
+    bestestBoy: [[20, 71, 10, 0], 0],
+    doggo: [[20, 30, 10, 0], 228],
+    otterlyAdorable: [[20, 30, 10, 0], 105],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

@@ -1,5 +1,41 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-21 (good boys and otters)
+
+Three supplied pet illustrations support upgrade clicks and floor unlocks
+through the shared `applyFloorCrit` path. Rewards are immediate and
+current-building only; no existing crit's balance changed. Proc chances apply
+only after a tier and the special gateway land, before the shared cap, so they
+are not per-click odds.
+
+| Image           | Crit                 | Immediate reward                           | Proc chance | Comparison                                                           |
+| --------------- | -------------------- | ------------------------------------------ | ----------- | -------------------------------------------------------------------- |
+| bestestBoy      | Employee of the Woof | 41 free upgrades on this floor             | 0.12%       | Between Croc Rampage's 39 at 0.15% and Breaking Point's 42 at 0.1%   |
+| doggo           | Shiba Surplus        | 38 instant payouts on every unlocked floor | 0.12%       | Between Venomous Bloom's 37 at 0.15% and Crocodile Cash's 40 at 0.1% |
+| otterlyAdorable | Significant Otter    | 35 instant payouts on this floor           | 0.18%       | Just above Verdant Fortune's 34 at 0.2%, and rarer to match          |
+
+Scope: all three act on the current building only, never the whole company.
+Shiba Surplus skips locked floors and pays each unlocked floor its own payout;
+Employee of the Woof and Significant Otter stay on the triggering floor even
+when it is the only unlocked one. None of them promote a crit tier, so the
+maximum-tier case is unaffected, and none touch collection timers. Repeated
+targets stack additively with any other proc landing in the same cap-limited
+set. No map-specific rewards are implemented, so these stay out of
+`MAP_CRIT_TEST_KINDS` and the map bonus-tier selector.
+
+Processing: regenerate with `node scripts/process-bestestBoy.mjs`,
+`node scripts/process-doggo.mjs`, and `node scripts/process-otterlyAdorable.mjs`.
+Each raw `.jfif` is preserved; the wrappers call
+`scripts/lib/process-crit-icon.mjs`, which border-seeds the near-white
+background (all three sample ~250,252,251 at the edges), tight-crops, caps at
+250px, and writes palette-quantized PNGs to `public/`, `public/stickers/`, and
+`public/silhouettes/`. Cut-outs were inspected on a contrasting background:
+outlines, cream bellies, paws, tails and feet all survive.
+
+Verification: `node scripts/test-featured-crits.mjs` passes with 543 rewards
+(including the three new reward/odds-ordering families), and `npm run build`
+succeeds.
+
 ## Implemented asset batch: 2026-09-21 (Batman characters)
 
 Fifteen supplied Batman-themed illustrations support upgrade clicks and floor

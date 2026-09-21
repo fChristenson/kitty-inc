@@ -1518,6 +1518,12 @@ export const CONFIG = {
     poisonIvy3Payouts: 37,
     thePenguin2Chance: 0.0025,
     thePenguin2Upgrades: 29,
+    bestestBoyChance: 0.0012,
+    bestestBoyUpgrades: 41,
+    doggoChance: 0.0012,
+    doggoPayouts: 38,
+    otterlyAdorableChance: 0.0018,
+    otterlyAdorablePayouts: 35,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

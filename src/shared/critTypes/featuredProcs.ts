@@ -3246,6 +3246,24 @@ export const FEATURED_CRIT_INFO = {
     icon: "thePenguin2",
     description: "Twenty-nine free upgrades on this floor",
   },
+  bestestBoy: {
+    label: "Bestest Boy",
+    color: COLOR.summerSaleOrange,
+    icon: "bestestBoy",
+    description: "Forty-one free upgrades on this floor",
+  },
+  doggo: {
+    label: "Doggo",
+    color: COLOR.roundUpOrange,
+    icon: "doggo",
+    description: "Thirty-eight instant payouts on every unlocked floor",
+  },
+  otterlyAdorable: {
+    label: "Otterly Adorable",
+    color: COLOR.teaBreakBrown,
+    icon: "otterlyAdorable",
+    description: "Thirty-five instant payouts on this floor",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;

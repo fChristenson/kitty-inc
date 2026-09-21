@@ -41,6 +41,7 @@ import {
   currentIncomeRatePerSecond,
   applyBoostAll,
   MAX_RENDERED_WORKERS,
+  MAX_FLOORS_PER_BUILDING,
   rollCritUpgrade,
 } from "./floors";
 import {
@@ -856,12 +857,11 @@ async function main() {
       // only count floors actually unlocked, not that placeholder
       buildings[buildingIndex]?.filter((floor) => floor.unlocked).length ?? 0,
     isBuildingFullyManaged: (buildingIndex) => {
-      const unlockedFloors = buildings[buildingIndex]?.filter(
-        (floor) => floor.unlocked,
-      );
+      const floors = buildings[buildingIndex];
+      if (!floors) return false;
+      const unlockedFloors = floors.filter((floor) => floor.unlocked);
       return (
-        unlockedFloors !== undefined &&
-        unlockedFloors.length > 0 &&
+        unlockedFloors.length >= MAX_FLOORS_PER_BUILDING &&
         unlockedFloors.every((floor) => floor.hasManager)
       );
     },
