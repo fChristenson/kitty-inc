@@ -7,6 +7,7 @@ import {
   playJackpot,
   playPayout,
   playSwoosh,
+  playAutoPurchase,
 } from "../../sound";
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
@@ -413,10 +414,7 @@ export function createCityMapView(
   const BOUGHT_TEXT_FONT_PX = 11;
   const BOUGHT_TEXT_RISE_PER_TICK = 1.2;
   const BOUGHT_TEXT_SPAWN_Y_OFFSET = 40; // above the mascot, not on top of it
-  // the auto-buyer fires several times a second; its purchase sound doesn't
-  const BUY_SOUND_INTERVAL_MS = 2000;
   let autoBuyTimer: ReturnType<typeof setInterval> | null = null;
-  let nextBuySoundAt = 0;
   const badgeFloats: FloatingBadgeParticle[] = [];
   const boughtFloats: FloatingTextParticle[] = [];
   // earned but not yet launched, drained one per BADGE_FLOAT_RELEASE_MS
@@ -447,10 +445,7 @@ export function createCityMapView(
     const now = Date.now();
     if (label === null) return;
     deps.onStateChanged();
-    if (now >= nextBuySoundAt) {
-      nextBuySoundAt = now + BUY_SOUND_INTERVAL_MS;
-      playSold();
-    }
+    playAutoPurchase();
     const { x, y } = cloudCat.cheer(cssW, cssH, now);
     boughtFloats.push(
       createFloatingTextParticle(x, y - BOUGHT_TEXT_SPAWN_Y_OFFSET, label),

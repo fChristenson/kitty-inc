@@ -65,6 +65,13 @@ let lastArcadeSlotWinPlayTime = 0;
 const SOLD_DEBOUNCE_MS = 60;
 let lastSoldPlayTime = 0;
 
+// an AUTOMATED purchase loop (cityMap's cloud-cat auto-buyer) fires several
+// times a second for minutes on end, so it gets its own far longer debounce
+// instead of the hand-purchase one above — the sound is an occasional cue that
+// it's working, not a per-purchase confirmation
+const AUTO_PURCHASE_DEBOUNCE_MS = 2000;
+let lastAutoPurchasePlayTime = 0;
+
 let music: HTMLAudioElement | null = null;
 
 // one shared AudioContext for every one-shot SFX below (NOT the looping background
@@ -249,6 +256,15 @@ export function playSold(): void {
   if (now - lastSoldPlayTime < SOLD_DEBOUNCE_MS) return;
   lastSoldPlayTime = now;
   playSfx("sold", SOLD_VOLUME, 0.5);
+}
+
+// same sound, capped at one per AUTO_PURCHASE_DEBOUNCE_MS — for purchases the
+// game makes on the player's behalf rather than ones they clicked
+export function playAutoPurchase(): void {
+  const now = Date.now();
+  if (now - lastAutoPurchasePlayTime < AUTO_PURCHASE_DEBOUNCE_MS) return;
+  lastAutoPurchasePlayTime = now;
+  playSold();
 }
 
 // one-shot sound effect for the crit-upgrade "jackpot" moment (see
