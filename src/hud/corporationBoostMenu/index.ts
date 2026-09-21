@@ -7,6 +7,7 @@ import {
   CRIT_PROC_INFO,
   getCritProcCount,
   getCritProcIncomeModifierPercent,
+  getCritProcNextMilestoneCount,
 } from "../../shared/critTypes";
 import type { CritProcKind } from "../../shared/critTypes";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
@@ -259,7 +260,7 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
     const count = getCritProcCount(kind);
     const incomeModifier = getCritProcIncomeModifierPercent(kind, count);
     const modifierStep = getCritProcIncomeModifierPercent(kind, 1);
-    const nextThreshold = count === 0 ? 1 : Math.floor(count / 10) * 10 + 10;
+    const nextThreshold = getCritProcNextMilestoneCount(count);
     return {
       landed: count > 0 ? `Collected ${count}\u00d7` : "Not yet discovered",
       landedNone: count === 0,
