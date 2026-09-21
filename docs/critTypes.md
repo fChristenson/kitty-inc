@@ -7,13 +7,13 @@ unlocks through the shared `applyFloorCrit` path. Rewards are immediate and
 current-building only; proc chances apply after a tier and the special gateway
 land, before the shared cap, and are not per-click odds.
 
-| Image family | Scope | Reward range | Processing |
-| ------------ | ----- | ------------ | ---------- |
-| loadedBurger, tacoFeast, pizzaSupreme, ramenBowl | food | 24-27 upgrades or 22 payouts | shared crit-icon pipeline |
-| sushiPlatter2-4, berrySmoothie2-4 | food and smoothies | 23-31 upgrades or 28-31 payouts | shared crit-icon pipeline |
-| icedCoffee, tropicalLemonade, hotChocolate | beverages | 18-24 payouts/upgrades | shared crit-icon pipeline |
-| sunsetMargarita, blueLagoonCocktail1-3, strawberryDaiquiri, mangoMojito1-2, espressoMartini | cocktails | 17-32 payouts/upgrades | shared crit-icon pipeline |
-| chocolateCake, strawberryShortcake, rainbowDonut, iceCreamSundae1-2, macaronTower1-2 | desserts | 21-34 payouts/upgrades | shared crit-icon pipeline |
+| Image family                                                                                | Scope              | Reward range                    | Processing                |
+| ------------------------------------------------------------------------------------------- | ------------------ | ------------------------------- | ------------------------- |
+| loadedBurger, tacoFeast, pizzaSupreme, ramenBowl                                            | food               | 24-27 upgrades or 22 payouts    | shared crit-icon pipeline |
+| sushiPlatter2-4, berrySmoothie2-4                                                           | food and smoothies | 23-31 upgrades or 28-31 payouts | shared crit-icon pipeline |
+| icedCoffee, tropicalLemonade, hotChocolate                                                  | beverages          | 18-24 payouts/upgrades          | shared crit-icon pipeline |
+| sunsetMargarita, blueLagoonCocktail1-3, strawberryDaiquiri, mangoMojito1-2, espressoMartini | cocktails          | 17-32 payouts/upgrades          | shared crit-icon pipeline |
+| chocolateCake, strawberryShortcake, rainbowDonut, iceCreamSundae1-2, macaronTower1-2        | desserts           | 21-34 payouts/upgrades          | shared crit-icon pipeline |
 
 Locked floors are excluded from building-wide rewards; single-floor rewards stay
 on the triggering floor and preserve collection timers. Numbered variants are
