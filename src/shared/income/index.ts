@@ -115,3 +115,13 @@ export function currentIncomeRatePerSecond(
   );
   return divide(amount, intervalSeconds);
 }
+
+// a floor's $/sec counting its PERMANENT office chairs/supplies/manager speed
+// but not the temporary worker boost — the one definition of "unboosted rate"
+// every price and per-click payout built on one is derived from (boostMenu's
+// boost-all cost, upgradeButton's per-click second of income, gameState's idle
+// catch-up). Hand-rolling incomeAmount/incomeIntervalSeconds instead silently
+// dropped the office/manager multiplier from all of them.
+export function baseIncomeRatePerSecond(floor: Floor): BigNumber {
+  return currentIncomeRatePerSecond(floor, officeUpgradeSpeedMultiplier(floor));
+}

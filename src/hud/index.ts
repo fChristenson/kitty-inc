@@ -74,6 +74,11 @@ export {
   getOfficeChairsCost,
   getOfficeSuppliesCost,
   getManagerCost,
+  buyWorker,
+  buyOfficeChairs,
+  buyOfficeSupplies,
+  buyManager,
+  isManagerUnlocked,
   MANAGER_MIN_UPGRADE_COUNT,
 } from "./upgradeMenu";
 export type { UpgradeMenu } from "./upgradeMenu";

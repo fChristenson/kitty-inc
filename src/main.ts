@@ -105,6 +105,11 @@ import {
   getOfficeChairsCost,
   getOfficeSuppliesCost,
   getManagerCost,
+  buyWorker,
+  buyOfficeChairs,
+  buyOfficeSupplies,
+  buyManager,
+  isManagerUnlocked,
   MANAGER_MIN_UPGRADE_COUNT,
   mergeCompanies,
   createMapMenuMarkup,
@@ -633,18 +638,16 @@ async function main() {
 
   // the city map's cloud-cat mascot: a toggleable background auto-buyer that
   // saves the player hunting for what to buy next. Every call buys the single
-  // cheapest thing available ANYWHERE in the company — a locked floor, an
-  // upgrade, a worker, office chairs, office supplies or a manager — so the
-  // whole company fills in from cheap to expensive on its own. Buying nothing
-  // is a normal idle tick, never a stop condition: it just waits for income.
+  // cheapest thing available ANYWHERE in the company — the next building, a
+  // locked floor, an upgrade, a worker, office chairs, office supplies or a
+  // manager — so the whole company fills in from cheap to expensive on its own.
+  // Buying nothing is a normal idle tick, never a stop condition.
   function runCheapestBatch(): CheapestBatch {
     const critCountsBefore = Object.fromEntries(
       CRIT_PROC_KINDS.map((kind) => [kind, getCritProcCount(kind)]),
     ) as Record<CritProcKind, number>;
     const cheapest = cheapestPurchase();
-    if (!cheapest || !spendTotalIncome(cheapest.cost))
-      return { label: null, badges: {} };
-    cheapest.apply();
+    if (!cheapest || !cheapest.buy()) return { label: null, badges: {} };
     persist();
     const badges: Partial<Record<CritProcKind, number>> = {};
     for (const kind of CRIT_PROC_KINDS) {
@@ -657,7 +660,9 @@ async function main() {
   interface AutoPurchase {
     cost: BigNumber;
     label: string;
-    apply: () => void;
+    // spends and applies via the same canonical purchase the menus use;
+    // false when it turned out to be unaffordable
+    buy: () => boolean;
   }
 
   // scans every purchasable thing in the company and returns the cheapest, or
@@ -667,13 +672,18 @@ async function main() {
     const consider = (candidate: AutoPurchase): void => {
       if (!best || lt(candidate.cost, best.cost)) best = candidate;
     };
+    consider({
+      cost: getBuildingPrice(buildings.length),
+      label: "+1 building",
+      buy: buyBuilding,
+    });
     buildings.forEach((floors, buildingIndex) => {
       const top = floors[floors.length - 1];
       if (top && !top.unlocked) {
         consider({
           cost: top.unlockCost,
           label: "+1 floor",
-          apply: () => unlockNextFloor(top, buildingIndex),
+          buy: () => unlockNextFloor(top, buildingIndex),
         });
       }
       for (const floor of floors) {
@@ -681,48 +691,39 @@ async function main() {
         consider({
           cost: floor.upgradeCost,
           label: "+1 upgrade",
-          apply: () => {
+          buy: () => {
+            if (!spendTotalIncome(floor.upgradeCost)) return false;
             increaseIncomeRate(floor);
             rollCritUpgrade(floor);
+            return true;
           },
         });
         if (floor.workerCount < MAX_RENDERED_WORKERS) {
           consider({
             cost: getWorkerCost(floor),
             label: "+1 worker",
-            apply: () => {
-              floor.workerCount += 1;
-            },
+            buy: () => buyWorker(floor),
           });
         }
         if (!floor.hasOfficeChairs) {
           consider({
             cost: getOfficeChairsCost(floor),
             label: "+1 chairs",
-            apply: () => {
-              floor.hasOfficeChairs = true;
-            },
+            buy: () => buyOfficeChairs(floor),
           });
         }
         if (!floor.hasOfficeSupplies) {
           consider({
             cost: getOfficeSuppliesCost(floor),
             label: "+1 supplies",
-            apply: () => {
-              floor.hasOfficeSupplies = true;
-            },
+            buy: () => buyOfficeSupplies(floor),
           });
         }
-        if (
-          !floor.hasManager &&
-          floor.upgradeCount >= MANAGER_MIN_UPGRADE_COUNT
-        ) {
+        if (!floor.hasManager && isManagerUnlocked(floor)) {
           consider({
             cost: getManagerCost(floor),
             label: "+1 manager",
-            apply: () => {
-              floor.hasManager = true;
-            },
+            buy: () => buyManager(floor),
           });
         }
       }
@@ -730,7 +731,8 @@ async function main() {
     return best;
   }
 
-  function unlockNextFloor(floor: Floor, buildingIndex: number): void {
+  function unlockNextFloor(floor: Floor, buildingIndex: number): boolean {
+    if (!spendTotalIncome(floor.unlockCost)) return false;
     unlockFloor(floor);
     ensureLockedFloorAbove({
       floors: buildings[buildingIndex],
@@ -743,6 +745,7 @@ async function main() {
     });
     // same crit shot a hand-bought floor gets, which is what earns the badges
     rollCritUpgrade(floor);
+    return true;
   }
 
   // sets EVERY floor a building currently has (locked or not) to the given crit

@@ -4,7 +4,8 @@
 // stays in this one file instead of being duplicated per event.
 import { smoothstep } from "../../shared/easing";
 import { spawnCoinBurst } from "../coins";
-import { type BigNumber, divide, gte } from "../../shared/bigNumber";
+import { type BigNumber, gte } from "../../shared/bigNumber";
+import { baseIncomeRatePerSecond } from "../../shared/income";
 import { getTotalIncome } from "../../totalIncome";
 import type { Floor } from "../../gameState";
 import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
@@ -361,5 +362,5 @@ export function isUpgradeButtonEnabled(floor: Floor): boolean {
 // click, forever), just read fresh each click and credited straight to the
 // player's total (see floorInteractions/index.ts and hud/boostMenu/index.ts)
 export function floorIncomePerSecond(floor: Floor): BigNumber {
-  return divide(floor.incomeAmount, floor.incomeIntervalSeconds);
+  return baseIncomeRatePerSecond(floor);
 }
