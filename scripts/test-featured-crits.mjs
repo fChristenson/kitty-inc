@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 486);
+  assert.equal(kinds.length, 495);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -686,6 +686,15 @@ try {
     emperorProvidesPurrfection: [[20, 30, 10, 0], 264],
     furionStormpaw: [[20, 30, 10, 0], 252],
     whatIsBrewing: [[20, 30, 10, 0], 48],
+    goldLion: [[20, 30, 10, 0], 162],
+    goldElephant: [[20, 58, 10, 0], 0],
+    goldBear: [[20, 30, 10, 0], 144],
+    goldWolf: [[20, 30, 32, 0], 0],
+    goldOwl: [[20, 30, 10, 0], 40],
+    goldRam: [[38, 30, 28, 0], 0],
+    goldRabbit: [[20, 30, 10, 0], 39],
+    goldCat: [[20, 45, 10, 0], 0],
+    goldenLion: [[20, 50, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

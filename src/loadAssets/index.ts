@@ -617,6 +617,15 @@ export const IMAGE_FILES = {
   emperorProvidesPurrfection: "emperorProvidesPurrfection.png",
   furionStormpaw: "furionStormpaw.png",
   whatIsBrewing: "whatIsBrewing.png",
+  goldLion: "goldLion.png",
+  goldElephant: "goldElephant.png",
+  goldBear: "goldBear.png",
+  goldWolf: "goldWolf.png",
+  goldOwl: "goldOwl.png",
+  goldRam: "goldRam.png",
+  goldRabbit: "goldRabbit.png",
+  goldCat: "goldCat.png",
+  goldenLion: "goldenLion.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

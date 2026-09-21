@@ -1,5 +1,39 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-21 (gold animal statues)
+
+Nine gold-animal illustrations support upgrade clicks and floor unlocks through
+the shared `applyFloorCrit` path. Rewards are immediate, current-building only,
+and existing crit balance was extended with new entries; chances are
+conditional on a tier and the special gateway landing before the shared cap,
+not per-click odds.
+
+| Image        | Crit          | Immediate reward                               | Proc chance | Comparison                                                     |
+| ------------ | ------------- | ---------------------------------------------- | ----------- | -------------------------------------------------------------- |
+| goldLion     | Gilded Pride  | 27 payouts on every unlocked floor             | 0.5%        | Building-wide payout below Bill Blizzard's 23 at 0.5% by scope |
+| goldElephant | Golden Trunk  | 28 free upgrades on this floor                 | 0.45%       | Between Bob Pawge's 24 and JC Dentclaw's 26 by chance          |
+| goldBear     | Bullion Bear  | 24 payouts on every unlocked floor             | 0.55%       | Broad payout below Golden Goose's 21 at 0.7%                   |
+| goldWolf     | Golden Howl   | 22 free upgrades on the highest unlocked floor | 0.6%        | Targeted top-floor reward below Handsome Jake's 18 at 1.2%     |
+| goldOwl      | Owl's Reserve | 20 payouts on the lowest-level floor           | 0.7%        | Targeted low-floor payout above Penny Jar's 15 at 2%           |
+| goldRam      | Ram Raid      | 18 free upgrades on alternating floors         | 0.65%       | Broader than a single-floor 18-upgrade reward                  |
+| goldRabbit   | Golden Hop    | 13 payouts on this floor                       | 1%          | Smaller common payout than What isBrewing?'s 16 at 0.35%       |
+| goldCat      | Golden Purr   | 15 free upgrades on this floor                 | 0.8%        | Below Antlered Fox Fortune's 34 at 0.25%                       |
+| goldenLion   | Lion's Crown  | 1 tier promotion, then 20 free upgrades here   | 0.35%       | Promotion variant below Golden Chalice's 2 plus 7 at 0.8%      |
+
+Locked floors are excluded from building-wide and alternating-floor rewards.
+Single-floor rewards stay on the triggering floor, target selectors collapse to
+that floor in a one-floor building, timers are preserved, and tier promotion
+stops at the strongest tier. These crits have no map-specific behavior.
+
+Each raw `.jfif` source is preserved. Dedicated `scripts/process-<name>.mjs`
+wrappers use `scripts/lib/process-crit-icon.mjs` and emit palette-quantized,
+250px-capped PNGs in `public/`, `public/stickers/`, and `public/silhouettes/`.
+`cloudCatSprites.jfif` was intentionally excluded because it is a sprite-sheet
+source, not a standalone gold-animal crit illustration.
+
+Verification: `node scripts/test-featured-crits.mjs` passes with 495 rewards;
+`npm run build` passes.
+
 ## Implemented asset batch: 2026-09-20 (World of Warcraft cats)
 
 Twenty-six new featured crits support upgrade clicks and floor unlocks through the
