@@ -1,5 +1,32 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-21 (food, beverages, cocktails and desserts)
+
+Thirty supplied food-related illustrations support upgrade clicks and floor
+unlocks through the shared `applyFloorCrit` path. Rewards are immediate and
+current-building only; proc chances apply after a tier and the special gateway
+land, before the shared cap, and are not per-click odds.
+
+| Image family | Scope | Reward range | Processing |
+| ------------ | ----- | ------------ | ---------- |
+| loadedBurger, tacoFeast, pizzaSupreme, ramenBowl | food | 24-27 upgrades or 22 payouts | shared crit-icon pipeline |
+| sushiPlatter2-4, berrySmoothie2-4 | food and smoothies | 23-31 upgrades or 28-31 payouts | shared crit-icon pipeline |
+| icedCoffee, tropicalLemonade, hotChocolate | beverages | 18-24 payouts/upgrades | shared crit-icon pipeline |
+| sunsetMargarita, blueLagoonCocktail1-3, strawberryDaiquiri, mangoMojito1-2, espressoMartini | cocktails | 17-32 payouts/upgrades | shared crit-icon pipeline |
+| chocolateCake, strawberryShortcake, rainbowDonut, iceCreamSundae1-2, macaronTower1-2 | desserts | 21-34 payouts/upgrades | shared crit-icon pipeline |
+
+Locked floors are excluded from building-wide rewards; single-floor rewards stay
+on the triggering floor and preserve collection timers. Numbered variants are
+distinct crits with distinct labels and rewards. `bubbleTea` remains a prompt
+only because no matching raw source image was supplied.
+
+Each raw `.jfif` remains preserved. Dedicated `scripts/process-<name>.mjs`
+wrappers use `scripts/lib/process-crit-icon.mjs` and emit palette-quantized,
+250px-capped PNGs in `public/`, `public/stickers/`, and `public/silhouettes/`.
+
+Verification: `node scripts/test-featured-crits.mjs` passes with 525 rewards;
+`npm run build` follows below.
+
 ## Implemented asset batch: 2026-09-21 (gold animal statues)
 
 Nine gold-animal illustrations support upgrade clicks and floor unlocks through

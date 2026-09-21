@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 495);
+  assert.equal(kinds.length, 525);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -695,6 +695,36 @@ try {
     goldRabbit: [[20, 30, 10, 0], 39],
     goldCat: [[20, 45, 10, 0], 0],
     goldenLion: [[20, 50, 10, 0], 0],
+    loadedBurger: [[20, 54, 10, 0], 0],
+    tacoFeast: [[20, 30, 10, 0], 132],
+    pizzaSupreme: [[20, 56, 10, 0], 0],
+    sushiPlatter2: [[20, 30, 10, 0], 84],
+    sushiPlatter3: [[20, 53, 10, 0], 0],
+    sushiPlatter4: [[20, 30, 10, 0], 180],
+    ramenBowl: [[20, 57, 10, 0], 0],
+    berrySmoothie2: [[20, 30, 10, 0], 87],
+    berrySmoothie3: [[20, 55, 10, 0], 0],
+    berrySmoothie4: [[20, 30, 10, 0], 186],
+    icedCoffee: [[20, 30, 10, 0], 54],
+    tropicalLemonade: [[20, 50, 10, 0], 0],
+    tropicalLemonade2: [[20, 30, 10, 0], 72],
+    hotChocolate: [[20, 49, 10, 0], 0],
+    hotChocolate2: [[20, 30, 10, 0], 126],
+    sunsetMargarita: [[20, 47, 10, 0], 0],
+    blueLagoonCocktail: [[20, 52, 10, 0], 0],
+    blueLagoonCocktail2: [[20, 30, 10, 0], 69],
+    blueLagoonCocktail3: [[20, 55, 10, 0], 0],
+    strawberryDaiquiri: [[20, 30, 10, 0], 81],
+    mangoMojito: [[20, 54, 10, 0], 0],
+    mangoMojito2: [[20, 30, 10, 0], 78],
+    espressoMartini: [[20, 30, 10, 0], 192],
+    chocolateCake: [[20, 60, 10, 0], 0],
+    strawberryShortcake: [[20, 30, 10, 0], 84],
+    rainbowDonut: [[20, 51, 10, 0], 0],
+    iceCreamSundae: [[20, 30, 10, 0], 204],
+    iceCreamSundae2: [[20, 59, 10, 0], 0],
+    macaronTower: [[20, 30, 10, 0], 198],
+    macaronTower2: [[20, 61, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

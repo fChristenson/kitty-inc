@@ -1531,5 +1531,65 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.upgrade([context.floor], balance.goldCatUpgrades),
     goldenLion: (context) =>
       promoteAndUpgrade(context.floor, 1, balance.goldenLionUpgrades),
+    loadedBurger: (context) =>
+      actions.upgrade([context.floor], balance.loadedBurgerUpgrades),
+    tacoFeast: (context) =>
+      actions.payCycles(context.floors, balance.tacoFeastPayouts),
+    pizzaSupreme: (context) =>
+      actions.upgrade([context.floor], balance.pizzaSupremeUpgrades),
+    sushiPlatter2: (context) =>
+      actions.payCycles([context.floor], balance.sushiPlatter2Payouts),
+    sushiPlatter3: (context) =>
+      actions.upgrade([context.floor], balance.sushiPlatter3Upgrades),
+    sushiPlatter4: (context) =>
+      actions.payCycles(context.floors, balance.sushiPlatter4Payouts),
+    ramenBowl: (context) =>
+      actions.upgrade([context.floor], balance.ramenBowlUpgrades),
+    berrySmoothie2: (context) =>
+      actions.payCycles([context.floor], balance.berrySmoothie2Payouts),
+    berrySmoothie3: (context) =>
+      actions.upgrade([context.floor], balance.berrySmoothie3Upgrades),
+    berrySmoothie4: (context) =>
+      actions.payCycles(context.floors, balance.berrySmoothie4Payouts),
+    icedCoffee: (context) =>
+      actions.payCycles([context.floor], balance.icedCoffeePayouts),
+    tropicalLemonade: (context) =>
+      actions.upgrade([context.floor], balance.tropicalLemonadeUpgrades),
+    tropicalLemonade2: (context) =>
+      actions.payCycles([context.floor], balance.tropicalLemonade2Payouts),
+    hotChocolate: (context) =>
+      actions.upgrade([context.floor], balance.hotChocolateUpgrades),
+    hotChocolate2: (context) =>
+      actions.payCycles(context.floors, balance.hotChocolate2Payouts),
+    sunsetMargarita: (context) =>
+      actions.upgrade([context.floor], balance.sunsetMargaritaUpgrades),
+    blueLagoonCocktail: (context) =>
+      actions.upgrade([context.floor], balance.blueLagoonCocktailUpgrades),
+    blueLagoonCocktail2: (context) =>
+      actions.payCycles([context.floor], balance.blueLagoonCocktail2Payouts),
+    blueLagoonCocktail3: (context) =>
+      actions.upgrade([context.floor], balance.blueLagoonCocktail3Upgrades),
+    strawberryDaiquiri: (context) =>
+      actions.payCycles([context.floor], balance.strawberryDaiquiriPayouts),
+    mangoMojito: (context) =>
+      actions.upgrade([context.floor], balance.mangoMojitoUpgrades),
+    mangoMojito2: (context) =>
+      actions.payCycles([context.floor], balance.mangoMojito2Payouts),
+    espressoMartini: (context) =>
+      actions.payCycles(context.floors, balance.espressoMartiniPayouts),
+    chocolateCake: (context) =>
+      actions.upgrade([context.floor], balance.chocolateCakeUpgrades),
+    strawberryShortcake: (context) =>
+      actions.payCycles([context.floor], balance.strawberryShortcakePayouts),
+    rainbowDonut: (context) =>
+      actions.upgrade([context.floor], balance.rainbowDonutUpgrades),
+    iceCreamSundae: (context) =>
+      actions.payCycles(context.floors, balance.iceCreamSundaePayouts),
+    iceCreamSundae2: (context) =>
+      actions.upgrade([context.floor], balance.iceCreamSundae2Upgrades),
+    macaronTower: (context) =>
+      actions.payCycles(context.floors, balance.macaronTowerPayouts),
+    macaronTower2: (context) =>
+      actions.upgrade([context.floor], balance.macaronTower2Upgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
