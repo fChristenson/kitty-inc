@@ -39,6 +39,8 @@ export type SpriteName = keyof typeof SPRITE_FILES;
 export const IMAGE_FILES = {
   city: "city.png", // distant tiled skyline behind buildings
   cityMapBackground: "mapBg.png", // city map screen's own backdrop
+  cloudCatIdle: "cloudCatIdle.png", // city map corner mascot, resting pose
+  cloudCatHappy: "cloudCatHappy.png", // same mascot, cheering pose
   wallMaterial: "wallMaterial.png", // exterior wall/floor-divider tile material
   coin: "coin.png", // flat coin icon (HUD/menus)
   mouse: "mouse.png", // free-boost critter

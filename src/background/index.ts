@@ -10,4 +10,4 @@ export {
   createCityMapView,
   createCityMapMarkup,
 } from "./cityMap";
-export type { CityMapView, CityMapDeps } from "./cityMap";
+export type { CityMapView, CityMapDeps, CheapestBatch } from "./cityMap";

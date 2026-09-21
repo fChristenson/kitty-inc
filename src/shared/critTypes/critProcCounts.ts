@@ -23,13 +23,37 @@ function loadCounts(): CritProcCounts {
 
 const counts: CritProcCounts = loadCounts();
 
-function saveCounts(): void {
+// Writing straight through on every landed proc meant a synchronous
+// JSON.stringify + localStorage.setItem per crit (~60us each), which a bulk
+// buy landing thousands of procs turns into a visible freeze. The in-memory
+// tally stays exact and synchronous; only the write is coalesced.
+let saveScheduled = false;
+
+function writeCounts(): void {
+  saveScheduled = false;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(counts));
   } catch {
     // ignore storage failures (private browsing / full quota) — same as
     // every other persistence call in this codebase
   }
+}
+
+function saveCounts(): void {
+  if (saveScheduled) return;
+  saveScheduled = true;
+  // setTimeout, not requestAnimationFrame: a backgrounded tab pauses rAF
+  // entirely, which would strand the pending tally indefinitely
+  setTimeout(writeCounts, 0);
+}
+
+if (typeof window !== "undefined") {
+  window.addEventListener("pagehide", () => {
+    if (saveScheduled) writeCounts();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && saveScheduled) writeCounts();
+  });
 }
 
 export function recordCritProcLanded(kind: CritProcKind): void {

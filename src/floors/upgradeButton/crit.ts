@@ -396,8 +396,8 @@ import {
 } from "../../shared/critTypes";
 import type { Floor } from "../../gameState";
 import {
-  FEATURED_CRIT_KINDS,
   featuredCritFlags,
+  isFeaturedCritKind,
   forceCritProc,
   readCritProcs,
   type CritProcKind,
@@ -492,10 +492,10 @@ export function rollCritUpgrade(floor: Floor, allowSpecialProcs = true): void {
     critTiers.set(floor, "mega");
     return;
   }
-  rollCrit((result) => {
+  rollCrit((result, landedProcs) => {
     critTiers.set(floor, result.tier);
-    for (const kind of FEATURED_CRIT_KINDS) {
-      if (result[kind]) forceCritProc(kind, floor);
+    for (const kind of landedProcs) {
+      if (isFeaturedCritKind(kind)) forceCritProc(kind, floor);
     }
     if (result.chain) forceChainCritProc(floor);
     if (result.dominoEffect) forceDominoEffectCritProc(floor);
