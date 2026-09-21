@@ -1593,8 +1593,7 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.upgrade([context.floor], balance.macaronTower2Upgrades),
     batman: (context) =>
       actions.upgrade([context.floor], balance.batmanUpgrades),
-    joker: (context) =>
-      actions.payCycles(context.floors, balance.jokerPayouts),
+    joker: (context) => actions.payCycles(context.floors, balance.jokerPayouts),
     harleyQuinn: (context) =>
       actions.upgrade([context.floor], balance.harleyQuinnUpgrades),
     killerCroc: (context) =>
@@ -1609,8 +1608,7 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.payCycles([context.floor], balance.thePenguinPayouts),
     theRiddler: (context) =>
       actions.upgrade([context.floor], balance.theRiddlerUpgrades),
-    bane: (context) =>
-      actions.upgrade([context.floor], balance.baneUpgrades),
+    bane: (context) => actions.upgrade([context.floor], balance.baneUpgrades),
     harleyQuinn2: (context) =>
       actions.payCycles([context.floor], balance.harleyQuinn2Payouts),
     killerCroc2: (context) =>

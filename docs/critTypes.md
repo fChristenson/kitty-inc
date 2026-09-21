@@ -7,12 +7,12 @@ unlocks through the shared `applyFloorCrit` path. Rewards are immediate and
 current-building only; proc chances apply after a tier and the special gateway
 land, before the shared cap, and are not per-click odds.
 
-| Image | Characters | Immediate reward | Proc chance |
-| ----- | ---------- | ---------------- | ----------- |
-| batman, joker, harleyQuinn, mrFreeze, scarecrow, theRiddler | heroes and villains | 27-38 upgrades or 35 payouts | 0.15%-0.25% |
-| killerCroc, poisonIvy, thePenguin | villains | 28-40 payouts | 0.1%-0.3% |
-| bane | villain | 42 free upgrades | 0.1% |
-| harleyQuinn2, killerCroc2, poisonIvy2-3, thePenguin2 | numbered variants | 29-39 upgrades or 33-37 payouts | 0.15%-0.25% |
+| Image                                                       | Characters          | Immediate reward                | Proc chance |
+| ----------------------------------------------------------- | ------------------- | ------------------------------- | ----------- |
+| batman, joker, harleyQuinn, mrFreeze, scarecrow, theRiddler | heroes and villains | 27-38 upgrades or 35 payouts    | 0.15%-0.25% |
+| killerCroc, poisonIvy, thePenguin                           | villains            | 28-40 payouts                   | 0.1%-0.3%   |
+| bane                                                        | villain             | 42 free upgrades                | 0.1%        |
+| harleyQuinn2, killerCroc2, poisonIvy2-3, thePenguin2        | numbered variants   | 29-39 upgrades or 33-37 payouts | 0.15%-0.25% |
 
 Single-floor rewards stay on the triggering floor, building-wide payouts skip
 locked floors, and all rewards preserve collection timers. `catwoman`, `robin`,
