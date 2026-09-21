@@ -656,6 +656,21 @@ export const IMAGE_FILES = {
   iceCreamSundae2: "iceCreamSundae2.png",
   macaronTower: "macaronTower.png",
   macaronTower2: "macaronTower2.png",
+  batman: "batman.png",
+  joker: "joker.png",
+  harleyQuinn: "harleyQuinn.png",
+  killerCroc: "killerCroc.png",
+  mrFreeze: "mrFreeze.png",
+  poisonIvy: "poisonIvy.png",
+  scarecrow: "scarecrow.png",
+  thePenguin: "thePenguin.png",
+  theRiddler: "theRiddler.png",
+  bane: "bane.png",
+  harleyQuinn2: "harleyQuinn2.png",
+  killerCroc2: "killerCroc2.png",
+  poisonIvy2: "poisonIvy2.png",
+  poisonIvy3: "poisonIvy3.png",
+  thePenguin2: "thePenguin2.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

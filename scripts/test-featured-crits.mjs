@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 525);
+  assert.equal(kinds.length, 540);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -725,6 +725,21 @@ try {
     iceCreamSundae2: [[20, 59, 10, 0], 0],
     macaronTower: [[20, 30, 10, 0], 198],
     macaronTower2: [[20, 61, 10, 0], 0],
+    batman: [[20, 68, 10, 0], 0],
+    joker: [[20, 30, 10, 0], 210],
+    harleyQuinn: [[20, 62, 10, 0], 0],
+    killerCroc: [[20, 30, 10, 0], 240],
+    mrFreeze: [[20, 66, 10, 0], 0],
+    poisonIvy: [[20, 30, 10, 0], 102],
+    scarecrow: [[20, 60, 10, 0], 0],
+    thePenguin: [[20, 30, 10, 0], 84],
+    theRiddler: [[20, 57, 10, 0], 0],
+    bane: [[20, 72, 10, 0], 0],
+    harleyQuinn2: [[20, 30, 10, 0], 99],
+    killerCroc2: [[20, 69, 10, 0], 0],
+    poisonIvy2: [[20, 61, 10, 0], 0],
+    poisonIvy3: [[20, 30, 10, 0], 222],
+    thePenguin2: [[20, 59, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
