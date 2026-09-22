@@ -5,8 +5,8 @@ import {
   add,
   fromNumber,
   gt,
+  gte,
   isZero,
-  lt,
   ZERO,
   type BigNumber,
 } from "./shared/bigNumber";
@@ -640,10 +640,10 @@ async function main() {
 
   // the city map's cloud-cat mascot: a toggleable background auto-buyer that
   // saves the player hunting for what to buy next. Every call buys the single
-  // cheapest thing available ANYWHERE in the company — the next building, a
-  // locked floor, an upgrade, a worker, office chairs, office supplies or a
-  // manager — so the whole company fills in from cheap to expensive on its own.
-  // Buying nothing is a normal idle tick, never a stop condition.
+  // most expensive affordable thing available ANYWHERE in the company — the
+  // next building, a locked floor, an upgrade, a worker, office chairs, office
+  // supplies or a manager. Buying nothing is a normal idle tick, never a stop
+  // condition.
   function runCheapestBatch(): CheapestBatch {
     const critCountsBefore = Object.fromEntries(
       CRIT_PROC_KINDS.map((kind) => [kind, getCritProcCount(kind)]),
@@ -667,12 +667,18 @@ async function main() {
     buy: () => boolean;
   }
 
-  // scans every purchasable thing in the company and returns the cheapest, or
-  // null once there's genuinely nothing left to buy anywhere
+  // scans every purchasable thing in the company and returns the most
+  // expensive affordable one, or null once nothing can currently be bought
   function cheapestPurchase(): AutoPurchase | null {
     let best: AutoPurchase | null = null;
     const consider = (candidate: AutoPurchase): void => {
-      if (!best || lt(candidate.cost, best.cost)) best = candidate;
+      if (
+        !gte(getTotalIncome(), candidate.cost) ||
+        (best !== null && !gt(candidate.cost, best.cost))
+      ) {
+        return;
+      }
+      best = candidate;
     };
     consider({
       cost: getBuildingPrice(buildings.length),
