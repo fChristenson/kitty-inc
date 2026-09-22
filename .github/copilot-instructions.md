@@ -108,36 +108,13 @@ Never bypass `MAX_SPECIAL_CRIT_PROCS`'s cap-then-random-pick path.
 
 ### Processing a batch
 
-Use `docs/critTypes.md`'s implemented batch as the report example and read current source files before deciding names, balance, or batch size.
-
 1. Inventory supplied raw assets against the current registry and processing scripts. Account for every requested asset, including explicitly excluded ones.
 2. Compare proposed rewards against `CRIT_PROC_INFO`, handlers, and documentation. Assign unique names and distinct reward values or targets.
 3. Sample actual background pixels and make a labeled, ordered contact sheet. Group only images suited to the same removal technique. Use dedicated `process-<image>.mjs` wrappers around `scripts/lib/process-crit-icon.mjs` when compatible.
 4. Run wrappers. The shared processor removes border-connected background, drops tiny components, tight-crops, caps at 250x250, writes a quantized PNG, and copies it to `themes/references/dist`. Preserve raw sources unless removal is requested.
 5. Inspect every processed icon on a contrasting background. Verify enclosed light details, disconnected real pieces, outlines, feet, crop bounds, dimensions, alpha, indexed palette, and identical root/shipped copies.
 6. Integrate and validate in small slices. Complete metadata, rewards, shipped icons, and generated test controls for every entry before calling the batch done. Do not change unrelated existing crit balance.
-
-### Batch report format
-
-Maintain a section near the top of `docs/critTypes.md`, before brainstorm ideas, titled `Implemented asset batch`. Reuse this document instead of scattering one report per crit.
-
-Start with a short scope paragraph identifying supported events, immediate rewards, and whether existing balance changed. Explain that proc chances are conditional on a tier and the special gateway landing before the shared cap; they are not per-click odds.
-
-Use these exact table columns, one row per implemented crit:
-
-| Image      | Crit        | Immediate reward                  | Proc chance | Comparison                           |
-| ---------- | ----------- | --------------------------------- | ----------- | ------------------------------------ |
-| dinnerTime | Dinner Time | 5 payouts on every unlocked floor | 4%          | Above Fast Forward's 4 payouts at 5% |
-
-- **Image:** asset basename, distinct from display name.
-- **Crit:** exact current canonical label.
-- **Immediate reward:** concrete count/multiplier, target, and timing.
-- **Proc chance:** current configured probability as a percentage.
-- **Comparison:** closest existing crit and useful difference in amount, target, or scope, with odds where relevant.
-
-After the table, state scope and edge cases: current building versus company, locked-floor exclusions, timer preservation/resets, maximum-tier behavior, single-floor behavior, repeated-target stacking, and exact milestone boundaries. Separate map-specific behavior explicitly.
-
-Finish with processing and verification notes: regeneration command, output locations and optimization checks, test controls, commands and results, browser checks, and unverified requirements. The final chat response should summarize the batch and link to this report rather than repeat the whole table.
+e whole table.
 
 ### Batch verification
 
