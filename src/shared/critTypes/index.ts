@@ -1319,8 +1319,8 @@ export function getCritProcNextMilestoneCount(count: number): number {
 }
 
 // scales every badge's bonus at once — the whole collection was outpacing the
-// rest of the economy at the previous 0.01
-const CRIT_PROC_MODIFIER_WEIGHT = 0.001;
+// rest of the economy at the previous 0.001
+const CRIT_PROC_MODIFIER_WEIGHT = 0.0001;
 
 export function getCritProcIncomeModifierPercent(
   kind: CritProcKind,

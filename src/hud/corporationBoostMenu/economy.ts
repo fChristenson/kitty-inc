@@ -230,8 +230,8 @@ export function getGlobalIncomeBoostMultiplier(): number {
   return 1 + getGlobalIncomeBoostPercent() / 100;
 }
 
-// +N.NN% — the leading + marks it as always an increase, never a penalty; plain
-// fixed-point since every banked modifier here stays comfortably small
+// +N.NNN% — the leading + marks it as always an increase, never a penalty; plain
+// fixed-point keeps the smaller badge modifiers visible in Corporation Statistics
 export function formatBoostPercent(percent: number): string {
-  return `+${percent.toFixed(2)}%`;
+  return `+${percent.toFixed(3)}%`;
 }
