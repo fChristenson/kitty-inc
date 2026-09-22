@@ -34,6 +34,11 @@ export interface CloudCat {
   isAwake(): boolean;
   // one hop; returns where the matching coin burst should originate
   cheer(cssW: number, cssH: number, now: number): { x: number; y: number };
+  // the mascot's resting box, for anchoring effects beside it
+  bounds(
+    cssW: number,
+    cssH: number,
+  ): { left: number; top: number; size: number };
   isAnimating(now: number): boolean;
 }
 
@@ -174,6 +179,7 @@ export function createCloudCat(): CloudCat {
       const { size, left, top } = anchor(cssW, cssH);
       return { x: left + size / 2, y: top + size / 2 };
     },
+    bounds: (cssW, cssH) => anchor(cssW, cssH),
     isAnimating(now) {
       return cheerPhase(now) !== null || awake || now - wakeChangedAt < WAKE_MS;
     },

@@ -407,7 +407,7 @@ export function createCityMapView(
   // whether or not the map is on screen, and only stops when toggled back off
   const AUTO_BUY_INTERVAL_MS = 100;
   const BADGE_FLOAT_SIZE = 56;
-  const BADGE_FLOAT_MARGIN = 20;
+  const BADGE_FLOAT_GAP = 10; // clear of the mascot's own box, to its left
   const BADGE_FLOAT_RISE_PER_TICK = 1.1;
   // badges earned together are released one at a time rather than all at once
   const BADGE_FLOAT_RELEASE_MS = 180;
@@ -459,17 +459,18 @@ export function createCityMapView(
     redraw();
   }
 
-  // badges earned mid-run rise out of the bottom-left corner and fade, instead
-  // of the blocking full-screen overlay a manual bulk buy still uses
+  // badges earned mid-run rise beside the mascot and fade, instead of the
+  // blocking full-screen overlay a manual bulk buy still uses
   function releaseBadgeFloats(now: number): void {
     if (pendingBadgeFloats.length === 0) return;
     if (now < nextBadgeReleaseAt) return;
     nextBadgeReleaseAt = now + BADGE_FLOAT_RELEASE_MS;
     const kind = pendingBadgeFloats.shift()!;
+    const cat = cloudCat.bounds(cssW, cssH);
     badgeFloats.push(
       createFloatingBadgeParticle(
-        BADGE_FLOAT_MARGIN + BADGE_FLOAT_SIZE / 2,
-        cssH - BADGE_FLOAT_MARGIN - BADGE_FLOAT_SIZE / 2,
+        cat.left - BADGE_FLOAT_GAP - BADGE_FLOAT_SIZE / 2,
+        cat.top + cat.size / 2,
         loadCritBadgeImage(kind),
       ),
     );
