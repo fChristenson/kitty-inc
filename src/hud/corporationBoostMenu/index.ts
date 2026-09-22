@@ -12,6 +12,7 @@ import {
 import type { CritProcKind } from "../../shared/critTypes";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import { onTapOrClick } from "../../shared/tapEvents";
+import { formatBoostPercent } from "./economy";
 
 export {
   getCompanyBaseModifierPercent,
@@ -264,9 +265,9 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
     return {
       landed: count > 0 ? `Collected ${count}\u00d7` : "Not yet discovered",
       landedNone: count === 0,
-      modifier: `+${incomeModifier.toFixed(2)}% `,
+      modifier: `${formatBoostPercent(incomeModifier)} `,
       nextLabel: `Next boost: ${nextThreshold} collected (`,
-      nextBoost: ` +${modifierStep.toFixed(2)}% `,
+      nextBoost: ` ${formatBoostPercent(modifierStep)} `,
     };
   }
 
