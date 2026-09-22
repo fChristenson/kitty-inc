@@ -18,6 +18,10 @@ export async function processCritIcon(
     // for sources framed by a rounded "card": pair with a sourceRect that cuts
     // the frame's straight edges, and this clears the corner arcs it leaves
     dropEdgeComponents = false,
+    // Remove an enclosed white sticker halo when it borders transparent pixels,
+    // while preserving white details enclosed by the illustration.
+    dropWhiteHalo = false,
+    whiteHaloThreshold = 195,
   } = {},
 ) {
   const assets = path.resolve(import.meta.dirname, "../../src/assets");
@@ -97,6 +101,80 @@ export async function processCritIcon(
   dropSmallOpaqueComponents(data, width, height, channels, 120);
   if (dropEdgeComponents) {
     dropEdgeTouchingComponents(data, width, height, channels);
+  }
+  if (dropWhiteHalo) {
+    let opaqueLeft = width;
+    let opaqueTop = height;
+    let opaqueRight = -1;
+    let opaqueBottom = -1;
+    for (let pixel = 0; pixel < background.length; pixel++) {
+      if (data[pixel * channels + 3] <= 20) continue;
+      const column = pixel % width;
+      const row = Math.floor(pixel / width);
+      opaqueLeft = Math.min(opaqueLeft, column);
+      opaqueTop = Math.min(opaqueTop, row);
+      opaqueRight = Math.max(opaqueRight, column);
+      opaqueBottom = Math.max(opaqueBottom, row);
+    }
+    const visited = new Uint8Array(width * height);
+    const component = [];
+    const queue = new Int32Array(width * height);
+    for (let start = 0; start < visited.length; start++) {
+      if (
+        visited[start] ||
+        data[start * channels + 3] <= 20 ||
+        whiteness(start) < whiteHaloThreshold
+      ) {
+        continue;
+      }
+      let head = 0;
+      let tail = 0;
+      let touchesTransparent = false;
+      let componentLeft = width;
+      let componentTop = height;
+      let componentRight = -1;
+      let componentBottom = -1;
+      component.length = 0;
+      visited[start] = 1;
+      queue[tail++] = start;
+      while (head < tail) {
+        const pixel = queue[head++];
+        component.push(pixel);
+        const column = pixel % width;
+        const row = Math.floor(pixel / width);
+        componentLeft = Math.min(componentLeft, column);
+        componentTop = Math.min(componentTop, row);
+        componentRight = Math.max(componentRight, column);
+        componentBottom = Math.max(componentBottom, row);
+        const neighbors = [];
+        if (column > 0) neighbors.push(pixel - 1);
+        if (column + 1 < width) neighbors.push(pixel + 1);
+        if (pixel >= width) neighbors.push(pixel - width);
+        if (pixel + width < visited.length) neighbors.push(pixel + width);
+        for (const neighbor of neighbors) {
+          if (data[neighbor * channels + 3] <= 20) {
+            touchesTransparent = true;
+            continue;
+          }
+          if (
+            visited[neighbor] ||
+            whiteness(neighbor) < whiteHaloThreshold
+          ) {
+            continue;
+          }
+          visited[neighbor] = 1;
+          queue[tail++] = neighbor;
+        }
+      }
+      const reachesOpaqueEdge =
+        componentLeft <= opaqueLeft + 2 ||
+        componentTop <= opaqueTop + 2 ||
+        componentRight >= opaqueRight - 2 ||
+        componentBottom >= opaqueBottom - 2;
+      if (touchesTransparent || reachesOpaqueEdge) {
+        for (const pixel of component) data[pixel * channels + 3] = 0;
+      }
+    }
   }
   let left = width;
   let top = height;

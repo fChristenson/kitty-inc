@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 590);
+  assert.equal(kinds.length, 613);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -837,6 +837,29 @@ try {
     pocketMoney2: [[20, 30, 10, 0], 222],
     liquidAssets2: [[20, 30, 10, 0], 132],
     pocketMoney: [[20, 45, 10, 0], 0],
+    fortyKOfGold: [[20, 30, 10, 0], 240],
+    chaoticTemptation: [[20, 30, 10, 0], 96],
+    chaoticTemptation2: [[20, 64, 10, 0], 0],
+    chaoticTemptation3: [[56, 30, 46, 0], 0],
+    chaoticTemptation4: [[20, 30, 10, 0], 126],
+    emperorsDividends: [[20, 30, 10, 0], 246],
+    heavyHitter: [[20, 76, 10, 0], 0],
+    iAmSpeed: [[20, 30, 45, 0], 0],
+    neverSurrender2: [[63, 73, 53, 0], 0],
+    plushieDog: [[20, 30, 10, 0], 234],
+    plushieElephant: [[20, 74, 10, 0], 0],
+    plushieHamster: [[20, 30, 10, 0], 108],
+    plushieOtter: [[20, 30, 10, 0], 120],
+    plushiePand: [[20, 30, 10, 0], 228],
+    plushiePenguin: [[20, 67, 10, 0], 0],
+    plushieRabbit: [[55, 30, 45, 0], 0],
+    plushieRacoon: [[20, 30, 10, 0], 126],
+    plushieSeal: [[20, 30, 50, 0], 0],
+    plushieTiger: [[20, 77, 10, 0], 0],
+    powerSword: [[20, 48, 10, 0], 0],
+    powerSword2: [[20, 78, 10, 0], 0],
+    sleepyFox: [[20, 30, 10, 0], 102],
+    sleepyPanda: [[20, 73, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

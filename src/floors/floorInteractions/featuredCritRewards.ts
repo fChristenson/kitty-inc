@@ -1753,5 +1753,61 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
         balance.pocketMoneyTierSteps,
         balance.pocketMoneyUpgrades,
       ),
+    fortyKOfGold: (context) =>
+      actions.payCycles(context.floors, balance.fortyKOfGoldPayouts),
+    chaoticTemptation: (context) =>
+      actions.payCycles([context.floor], balance.chaoticTemptationPayouts),
+    chaoticTemptation2: (context) =>
+      actions.upgrade([context.floor], balance.chaoticTemptation2Upgrades),
+    chaoticTemptation3: (context) =>
+      actions.upgrade(alternating(context), balance.chaoticTemptation3Upgrades),
+    chaoticTemptation4: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.chaoticTemptation4Payouts,
+      ),
+    emperorsDividends: (context) =>
+      actions.payCycles(context.floors, balance.emperorsDividendsPayouts),
+    heavyHitter: (context) =>
+      actions.upgrade([context.floor], balance.heavyHitterUpgrades),
+    iAmSpeed: (context) =>
+      actions.upgrade([highestFloor(context)], balance.iAmSpeedUpgrades),
+    neverSurrender2: (context) =>
+      actions.upgrade(context.floors, balance.neverSurrender2Upgrades),
+    plushieDog: (context) =>
+      actions.payCycles(context.floors, balance.plushieDogPayouts),
+    plushieElephant: (context) =>
+      actions.upgrade([context.floor], balance.plushieElephantUpgrades),
+    plushieHamster: (context) =>
+      actions.payCycles([context.floor], balance.plushieHamsterPayouts),
+    plushieOtter: (context) =>
+      actions.payCycles([context.floor], balance.plushieOtterPayouts),
+    plushiePand: (context) =>
+      actions.payCycles(context.floors, balance.plushiePandPayouts),
+    plushiePenguin: (context) =>
+      actions.upgrade([context.floor], balance.plushiePenguinUpgrades),
+    plushieRabbit: (context) =>
+      actions.upgrade(alternating(context), balance.plushieRabbitUpgrades),
+    plushieRacoon: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.plushieRacoonPayouts,
+      ),
+    plushieSeal: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.plushieSealUpgrades),
+    plushieTiger: (context) =>
+      actions.upgrade([context.floor], balance.plushieTigerUpgrades),
+    powerSword: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.powerSwordTierSteps,
+        balance.powerSwordUpgrades,
+      ),
+    powerSword2: (context) =>
+      actions.upgrade([context.floor], balance.powerSword2Upgrades),
+    sleepyFox: (context) =>
+      actions.payCycles([context.floor], balance.sleepyFoxPayouts),
+    sleepyPanda: (context) =>
+      actions.upgrade([context.floor], balance.sleepyPandaUpgrades),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
