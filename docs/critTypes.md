@@ -1,5 +1,26 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-22 (mythical beasts)
+
+Twenty-three new mythical-beast illustrations are processed and wired through
+the shared `applyFloorCrit` path. Rewards are immediate and current-building
+only; no existing crit balance changed. The existing `velvetManticore` entry
+was preserved, so the numbered velvet manticore sources are separate crits.
+
+The batch includes alicorn, dragon, griffin, hippocampus, hydra, kirin,
+kitsune, manticore, pegasus, phoenix, puppy, salamander, sea serpent,
+thunderbird, treant, unicorn, and velvet manticore variants. Supplied source
+spellings `phoneix` and `seaSerpet` remain the internal asset/kind names while
+their player-facing labels use the corrected spellings.
+
+Every raw `.jfif` remains preserved. Dedicated `scripts/process-<name>.mjs`
+wrappers regenerate the 250px-capped palette PNGs in `public/`,
+`public/stickers/`, and `public/silhouettes/`.
+
+Verification: `node scripts/check-crit-names.mjs`,
+`node scripts/test-featured-crits.mjs` and `npm run build` pass. The regression
+suite now covers 637 crit rewards and validates the new asset properties.
+
 ## Implemented asset batch: 2026-09-22 (chaos, plushies and champions)
 
 Twenty-three supplied illustrations are processed and wired through the shared

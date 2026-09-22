@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 613);
+  assert.equal(kinds.length, 637);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -860,6 +860,30 @@ try {
     powerSword2: [[20, 78, 10, 0], 0],
     sleepyFox: [[20, 30, 10, 0], 102],
     sleepyPanda: [[20, 73, 10, 0], 0],
+    alicorn: [[20, 30, 10, 0], 108],
+    alicorn2: [[20, 71, 10, 0], 0],
+    crystallineDragon: [[67, 77, 57, 0], 0],
+    dragonWithEgg: [[20, 50, 10, 0], 0],
+    griffin: [[20, 30, 10, 0], 240],
+    hippocampus: [[20, 30, 10, 0], 114],
+    hydra: [[64, 30, 54, 0], 0],
+    kirin: [[20, 30, 47, 0], 0],
+    kitsune: [[20, 30, 10, 0], 126],
+    manticore: [[20, 73, 10, 0], 0],
+    manticore2: [[20, 30, 10, 0], 234],
+    manticore3: [[20, 30, 56, 0], 0],
+    pegasus: [[55, 30, 45, 0], 0],
+    phoneix: [[20, 30, 10, 0], 246],
+    puppyPosey: [[20, 78, 10, 0], 0],
+    salamander: [[20, 30, 10, 0], 102],
+    salamander2: [[62, 72, 52, 0], 0],
+    salamander3: [[20, 30, 10, 0], 135],
+    seaSerpet: [[20, 68, 10, 0], 0],
+    thunderbird: [[20, 30, 10, 0], 264],
+    treant: [[60, 70, 50, 0], 0],
+    unicorn: [[20, 30, 10, 0], 108],
+    velvetManticore2: [[20, 52, 10, 0], 0],
+    velvetManticore3: [[20, 79, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
