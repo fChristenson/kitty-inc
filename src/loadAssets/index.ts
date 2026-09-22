@@ -676,6 +676,17 @@ export const IMAGE_FILES = {
   bestestBoy: "bestestBoy.png",
   doggo: "doggo.png",
   otterlyAdorable: "otterlyAdorable.png",
+  apple: "apple.png",
+  bulwark: "bulwark.png",
+  fullPlate: "fullPlate.png",
+  clockworkWizard: "clockworkWizard.png",
+  clockworkWizard2: "clockworkWizard2.png",
+  cupcake: "cupcake.png",
+  donut: "donut.png",
+  metalHeart: "metalHeart.png",
+  metalHeart2: "metalHeart2.png",
+  overlord: "overlord.png",
+  potion: "potion.png",
 } as const;
 export type ImageName = keyof typeof IMAGE_FILES;
 

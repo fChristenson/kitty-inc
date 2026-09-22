@@ -1624,5 +1624,40 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
     doggo: (context) => actions.payCycles(context.floors, balance.doggoPayouts),
     otterlyAdorable: (context) =>
       actions.payCycles([context.floor], balance.otterlyAdorablePayouts),
+    apple: (context) =>
+      actions.payCycles([lowestLevel(context)], balance.applePayouts),
+    cupcake: (context) =>
+      actions.upgrade([context.floor], balance.cupcakeUpgrades),
+    potion: (context) =>
+      actions.upgrade(alternating(context), balance.potionUpgrades),
+    donut: (context) =>
+      actions.payCycles([context.floor], balance.donutPayouts),
+    clockworkWizard2: (context) =>
+      actions.upgrade(
+        [highestFloor(context)],
+        balance.clockworkWizard2Upgrades,
+      ),
+    metalHeart: (context) =>
+      actions.upgrade([context.floor], balance.metalHeartUpgrades),
+    metalHeart2: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.metalHeart2Payouts,
+      ),
+    clockworkWizard: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.clockworkWizardTierSteps,
+        balance.clockworkWizardUpgrades,
+      ),
+    bulwark: (context) =>
+      actions.upgrade([context.floor], balance.bulwarkUpgrades),
+    fullPlate: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.fullPlateUpgrades,
+      ),
+    overlord: (context) =>
+      actions.payCycles(context.floors, balance.overlordPayouts),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

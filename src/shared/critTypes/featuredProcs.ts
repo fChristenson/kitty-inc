@@ -2766,8 +2766,7 @@ export const FEATURED_CRIT_INFO = {
     label: "Sylvanas Whiskerunner",
     color: COLOR.red,
     icon: "sylvanasWhiskerunner",
-    description:
-      "Sylvanas Windrunner grants thirty instant payouts on this floor",
+    description: "Thirty instant payouts on this floor",
   },
   jainaPurrmoore: {
     label: "Jaina Purrmoore",
@@ -3263,6 +3262,72 @@ export const FEATURED_CRIT_INFO = {
     color: COLOR.teaBreakBrown,
     icon: "otterlyAdorable",
     description: "Thirty-five instant payouts on this floor",
+  },
+  apple: {
+    label: "Core Value",
+    color: COLOR.red,
+    icon: "apple",
+    description: "Twenty-two instant payouts on the lowest-level floor",
+  },
+  cupcake: {
+    label: "Buttercream Boom",
+    color: COLOR.mysticTeal,
+    icon: "cupcake",
+    description: "Twenty-six free upgrades on this floor",
+  },
+  potion: {
+    label: "Vial of Ventures",
+    color: COLOR.cyan,
+    icon: "potion",
+    description: "Twenty-four free upgrades on every other floor",
+  },
+  donut: {
+    label: "Glaze Runner",
+    color: COLOR.springSalePink,
+    icon: "donut",
+    description: "Thirty instant payouts on this floor",
+  },
+  clockworkWizard2: {
+    label: "Arcane Automaton",
+    color: COLOR.blue,
+    icon: "clockworkWizard2",
+    description: "Thirty-four free upgrades on the highest unlocked floor",
+  },
+  metalHeart: {
+    label: "Gearheart Guardian",
+    color: COLOR.pairBlue,
+    icon: "metalHeart",
+    description: "Thirty-six free upgrades on this floor",
+  },
+  metalHeart2: {
+    label: "Piston Paladin",
+    color: COLOR.gold,
+    icon: "metalHeart2",
+    description: "Forty-one payouts from the highest-earning floor",
+  },
+  clockworkWizard: {
+    label: "Spellsprocket",
+    color: COLOR.purple,
+    icon: "clockworkWizard",
+    description: "One tier promotion and twelve upgrades here",
+  },
+  bulwark: {
+    label: "Hold the Line",
+    color: COLOR.nightShiftIndigo,
+    icon: "bulwark",
+    description: "Forty-three free upgrades on this floor",
+  },
+  fullPlate: {
+    label: "Ironclad Guarantee",
+    color: COLOR.silverTicketGray,
+    icon: "fullPlate",
+    description: "Thirty-three upgrades on this floor and every floor below",
+  },
+  overlord: {
+    label: "Dread Sovereign",
+    color: COLOR.fullHouseCrimson,
+    icon: "overlord",
+    description: "Forty-five instant payouts on every unlocked floor",
   },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 

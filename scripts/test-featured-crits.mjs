@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 543);
+  assert.equal(kinds.length, 554);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -187,9 +187,12 @@ try {
       "whySoSerious",
     ],
     ["moonwalker", "mimeYourBusiness", "spaceAndTime", "pocketDimension"],
-    ["killerCroc2", "bestestBoy", "bane"],
-    ["poisonIvy3", "doggo", "killerCroc"],
+    ["killerCroc2", "bestestBoy", "bane", "bulwark"],
+    ["poisonIvy3", "doggo", "killerCroc", "overlord"],
     ["poisonIvy", "otterlyAdorable"],
+    ["cupcake", "metalHeart", "bulwark"],
+    ["donut", "clockworkWizard2", "metalHeart2", "clockworkWizard"],
+    ["frostRune", "fullPlate"],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(
@@ -746,6 +749,17 @@ try {
     bestestBoy: [[20, 71, 10, 0], 0],
     doggo: [[20, 30, 10, 0], 228],
     otterlyAdorable: [[20, 30, 10, 0], 105],
+    apple: [[20, 30, 10, 0], 44],
+    cupcake: [[20, 56, 10, 0], 0],
+    potion: [[44, 30, 34, 0], 0],
+    donut: [[20, 30, 10, 0], 90],
+    clockworkWizard2: [[20, 30, 44, 0], 0],
+    metalHeart: [[20, 66, 10, 0], 0],
+    metalHeart2: [[20, 30, 10, 0], 123],
+    clockworkWizard: [[20, 42, 10, 0], 0],
+    bulwark: [[20, 73, 10, 0], 0],
+    fullPlate: [[53, 63, 10, 0], 0],
+    overlord: [[20, 30, 10, 0], 270],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -830,6 +844,8 @@ try {
     if (kind === "velvetManticore")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "elixirUnderMoonlight" || kind === "theAntlerwoodStalker")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "clockworkWizard")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {
