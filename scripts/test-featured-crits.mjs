@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 563);
+  assert.equal(kinds.length, 590);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -198,6 +198,42 @@ try {
     ["doggo", "pokerNight", "killerCroc", "overlord"],
     ["apple", "ponyKeg"],
     ["vodkaWhiskers", "clockworkWizard2"],
+    [
+      "emptyGlass",
+      "amberSpritz",
+      "copperMugMule2",
+      "beerBelly",
+      "negroniNightfall2",
+      "donut",
+      "highRoller3",
+    ],
+    [
+      "blackberryBramble",
+      "bottomsUp",
+      "cupcake",
+      "derbyDayJulep",
+      "hurricaneHour",
+      "cosmoCashout",
+      "metalHeart",
+    ],
+    ["singaporeSling", "wineCountry", "hurricaneHour2"],
+    ["blackberryBramble2", "potion", "frenchSeventyFive"],
+    ["apple", "derbyDayJulep2", "ponyKeg", "allowance"],
+    ["sidecarSurge", "vodkaWhiskers", "clockworkWizard2", "lootBags"],
+    ["queenOfQueens", "copperMugMule", "allowance2"],
+    ["frostRune", "pineappleParadise", "fullPlate"],
+    ["negroniNightfall", "splitThePot"],
+    ["oldFashionedFortune", "metalHeart2", "liquidAssets2"],
+    [
+      "tikiZombie",
+      "longIslandLandslide",
+      "pocketMoney2",
+      "doggo",
+      "pokerNight",
+      "killerCroc",
+      "overlord",
+    ],
+    ["clockworkWizard", "pocketMoney"],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(
@@ -774,6 +810,33 @@ try {
     splitThePot: [[20, 65, 45, 0], 0],
     highRoller2: [[20, 67, 10, 0], 0],
     pokerNight: [[20, 30, 10, 0], 234],
+    emptyGlass: [[20, 30, 10, 0], 57],
+    amberSpritz: [[20, 30, 10, 0], 60],
+    copperMugMule2: [[20, 30, 10, 0], 63],
+    negroniNightfall2: [[20, 30, 10, 0], 72],
+    blackberryBramble: [[20, 52, 10, 0], 0],
+    blackberryBramble2: [[41, 30, 31, 0], 0],
+    singaporeSling: [[20, 30, 10, 0], 75],
+    derbyDayJulep: [[20, 57, 10, 0], 0],
+    derbyDayJulep2: [[20, 30, 10, 0], 52],
+    hurricaneHour: [[20, 58, 10, 0], 0],
+    cosmoCashout: [[20, 59, 10, 0], 0],
+    frenchSeventyFive: [[46, 30, 36, 0], 0],
+    sidecarSurge: [[20, 30, 37, 0], 0],
+    allowance: [[20, 30, 10, 0], 60],
+    hurricaneHour2: [[20, 30, 10, 0], 93],
+    copperMugMule: [[50, 60, 40, 0], 0],
+    pineappleParadise: [[51, 61, 10, 0], 0],
+    negroniNightfall: [[20, 60, 40, 0], 0],
+    oldFashionedFortune: [[20, 30, 10, 0], 102],
+    tikiZombie: [[20, 30, 10, 0], 198],
+    tikiZombie2: [[20, 50, 10, 0], 60],
+    allowance2: [[52, 62, 42, 0], 0],
+    lootBags: [[20, 30, 48, 0], 0],
+    longIslandLandslide: [[20, 30, 10, 0], 216],
+    pocketMoney2: [[20, 30, 10, 0], 222],
+    liquidAssets2: [[20, 30, 10, 0], 132],
+    pocketMoney: [[20, 45, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -860,6 +923,8 @@ try {
     if (kind === "elixirUnderMoonlight" || kind === "theAntlerwoodStalker")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "clockworkWizard")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "pocketMoney")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {

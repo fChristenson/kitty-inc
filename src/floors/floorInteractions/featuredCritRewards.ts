@@ -1679,5 +1679,79 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.upgrade([context.floor], balance.highRoller2Upgrades),
     pokerNight: (context) =>
       actions.payCycles(context.floors, balance.pokerNightPayouts),
+    emptyGlass: (context) =>
+      actions.payCycles([context.floor], balance.emptyGlassPayouts),
+    amberSpritz: (context) =>
+      actions.payCycles([context.floor], balance.amberSpritzPayouts),
+    copperMugMule2: (context) =>
+      actions.payCycles([context.floor], balance.copperMugMule2Payouts),
+    negroniNightfall2: (context) =>
+      actions.payCycles([context.floor], balance.negroniNightfall2Payouts),
+    blackberryBramble: (context) =>
+      actions.upgrade([context.floor], balance.blackberryBrambleUpgrades),
+    blackberryBramble2: (context) =>
+      actions.upgrade(alternating(context), balance.blackberryBramble2Upgrades),
+    singaporeSling: (context) =>
+      actions.payCycles(alternating(context), balance.singaporeSlingPayouts),
+    derbyDayJulep: (context) =>
+      actions.upgrade([context.floor], balance.derbyDayJulepUpgrades),
+    derbyDayJulep2: (context) =>
+      actions.payCycles([lowestLevel(context)], balance.derbyDayJulep2Payouts),
+    hurricaneHour: (context) =>
+      actions.upgrade([context.floor], balance.hurricaneHourUpgrades),
+    cosmoCashout: (context) =>
+      actions.upgrade([context.floor], balance.cosmoCashoutUpgrades),
+    frenchSeventyFive: (context) =>
+      actions.upgrade(alternating(context), balance.frenchSeventyFiveUpgrades),
+    sidecarSurge: (context) =>
+      actions.upgrade([highestFloor(context)], balance.sidecarSurgeUpgrades),
+    allowance: (context) =>
+      actions.payCycles([lowestLevel(context)], balance.allowancePayouts),
+    hurricaneHour2: (context) =>
+      actions.payCycles(alternating(context), balance.hurricaneHour2Payouts),
+    copperMugMule: (context) =>
+      actions.upgrade(context.floors, balance.copperMugMuleUpgrades),
+    pineappleParadise: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.pineappleParadiseUpgrades,
+      ),
+    negroniNightfall: (context) => {
+      actions.upgrade([context.floor], balance.negroniNightfallUpgrades);
+      actions.upgrade(
+        [highestFloor(context)],
+        balance.negroniNightfallUpgrades,
+      );
+    },
+    oldFashionedFortune: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.oldFashionedFortunePayouts,
+      ),
+    tikiZombie: (context) =>
+      actions.payCycles(context.floors, balance.tikiZombiePayouts),
+    tikiZombie2: (context) => {
+      actions.upgrade([context.floor], balance.tikiZombie2Upgrades);
+      actions.payCycles([context.floor], balance.tikiZombie2Payouts);
+    },
+    allowance2: (context) =>
+      actions.upgrade(context.floors, balance.allowance2Upgrades),
+    lootBags: (context) =>
+      actions.upgrade([highestFloor(context)], balance.lootBagsUpgrades),
+    longIslandLandslide: (context) =>
+      actions.payCycles(context.floors, balance.longIslandLandslidePayouts),
+    pocketMoney2: (context) =>
+      actions.payCycles(context.floors, balance.pocketMoney2Payouts),
+    liquidAssets2: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.liquidAssets2Payouts,
+      ),
+    pocketMoney: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.pocketMoneyTierSteps,
+        balance.pocketMoneyUpgrades,
+      ),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
