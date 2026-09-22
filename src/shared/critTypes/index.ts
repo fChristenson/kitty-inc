@@ -1318,13 +1318,17 @@ export function getCritProcNextMilestoneCount(count: number): number {
   return 10 ** getCritProcMilestone(count);
 }
 
+// scales every badge's bonus at once — the whole collection was outpacing the
+// rest of the economy at the previous 0.01
+const CRIT_PROC_MODIFIER_WEIGHT = 0.001;
+
 export function getCritProcIncomeModifierPercent(
   kind: CritProcKind,
   count: number,
 ): number {
   const chance = getCritProcChance(kind);
   if (chance <= 0 || count <= 0) return 0;
-  return getCritProcMilestone(count) * (0.01 / chance);
+  return getCritProcMilestone(count) * (CRIT_PROC_MODIFIER_WEIGHT / chance);
 }
 
 export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
