@@ -53,7 +53,9 @@ const BASE_INCOME_AMOUNT = CONFIG.floors.baseIncomeAmount; // ground floor's sta
 const INCOME_GROWTH_FACTOR = CONFIG.floors.incomeGrowthFactor;
 const BASE_INCOME_INTERVAL_SECONDS = CONFIG.floors.baseIncomeIntervalSeconds; // ground floor's payout interval; each floor above doubles it
 const BASE_UPGRADE_COST = CONFIG.floors.baseUpgradeCost; // ground floor's starting upgrade price; each floor above doubles it
+const UPGRADE_COST_GROWTH_FACTOR = CONFIG.floors.upgradeCostGrowthFactor;
 const BASE_UNLOCK_COST = CONFIG.floors.baseUnlockCost; // floor 2's unlock price; each floor above doubles it
+const UNLOCK_COST_GROWTH_FACTOR = CONFIG.floors.unlockCostGrowthFactor;
 // each upgrade click's payoff scales exactly like the base income (same
 // INCOME_GROWTH_FACTOR), so a higher floor's own upgrades are still worth
 // proportionately more per click than a lower floor's — a flat step here would
@@ -158,7 +160,7 @@ export function computeBaseFloorStats(
       MAX_INCOME_INTERVAL_SECONDS,
     ),
     upgradeCost: multiply(
-      pow(2, floorLevel - 1),
+      pow(UPGRADE_COST_GROWTH_FACTOR, floorLevel - 1),
       BASE_UPGRADE_COST * multiplier,
     ),
     rateStep: multiply(
@@ -188,7 +190,10 @@ export function buildFloor(
     ? groundFloorLocked
       ? fromNumber(BASE_UNLOCK_COST * multiplier)
       : ZERO
-    : multiply(pow(2, floorLevel - 2), BASE_UNLOCK_COST * multiplier);
+    : multiply(
+        pow(UNLOCK_COST_GROWTH_FACTOR, floorLevel - 2),
+        BASE_UNLOCK_COST * multiplier,
+      );
   const unlockCost = multiply(baseUnlockCost, priceDiscountMultiplier);
   // true once this level's own natural (uncapped) interval already exceeds the
   // 1h cap below — set once, forever, regardless of how far upgrades later

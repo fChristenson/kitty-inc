@@ -2,16 +2,17 @@ import { buildFloor } from "../floors";
 import { increaseIncomeRate } from "../floors/incomePanel";
 import type { Floor } from "../gameState";
 import { type BigNumber, pow, multiply } from "../shared/bigNumber";
+import { CONFIG } from "../config";
 
 // each building's $ base values (income/upgrade/unlock/rate-step) are this much
 // bigger than the previous building's — a fresh, much richer economy to grow into
-export const BUILDING_COST_MULTIPLIER = 1000;
+export const BUILDING_COST_MULTIPLIER = CONFIG.buildings.costMultiplier;
 
 export function getBuildingMultiplier(buildingIndex: number): number {
   return BUILDING_COST_MULTIPLIER ** buildingIndex;
 }
 
-const BUILDING_BASE_PRICE = 1_000_000_000; // $ to buy the very first purchasable building (index 1)
+const BUILDING_BASE_PRICE = CONFIG.buildings.basePrice;
 
 // $ cost to buy the next building (nextBuildingIndex === buildings.length, since
 // index 0 is the always-free starting building) — scales by the same

@@ -24,8 +24,16 @@ export const CONFIG = {
     incomeGrowthFactor: 2,
     baseIncomeIntervalSeconds: 1,
     baseUpgradeCost: 1,
+    upgradeCostGrowthFactor: 2,
     baseUnlockCost: 200,
+    unlockCostGrowthFactor: 2,
     baseRateStep: 2,
+  },
+
+  // src/buildings/index.ts — pricing and economy scaling for new buildings.
+  buildings: {
+    costMultiplier: 4000,
+    basePrice: 1_000_000_000,
   },
 
   // src/floors/incomePanel/index.ts — how a floor's income/interval evolve as
