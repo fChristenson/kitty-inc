@@ -61,7 +61,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 554);
+  assert.equal(kinds.length, 563);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -193,6 +193,11 @@ try {
     ["cupcake", "metalHeart", "bulwark"],
     ["donut", "clockworkWizard2", "metalHeart2", "clockworkWizard"],
     ["frostRune", "fullPlate"],
+    ["beerBelly", "donut", "highRoller3", "otterlyAdorable"],
+    ["bottomsUp", "cupcake", "metalHeart", "highRoller2", "bulwark"],
+    ["doggo", "pokerNight", "killerCroc", "overlord"],
+    ["apple", "ponyKeg"],
+    ["vodkaWhiskers", "clockworkWizard2"],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(
@@ -760,6 +765,15 @@ try {
     bulwark: [[20, 73, 10, 0], 0],
     fullPlate: [[53, 63, 10, 0], 0],
     overlord: [[20, 30, 10, 0], 270],
+    beerBelly: [[20, 30, 10, 0], 69],
+    bottomsUp: [[20, 55, 10, 0], 0],
+    wineCountry: [[20, 30, 10, 0], 81],
+    ponyKeg: [[20, 30, 10, 0], 56],
+    vodkaWhiskers: [[20, 30, 41, 0], 0],
+    highRoller3: [[20, 30, 10, 0], 96],
+    splitThePot: [[20, 65, 45, 0], 0],
+    highRoller2: [[20, 67, 10, 0], 0],
+    pokerNight: [[20, 30, 10, 0], 234],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

@@ -2211,7 +2211,10 @@ export const FEATURED_CRIT_INFO = {
     description: "Twenty-eight payouts on every unlocked floor",
   },
   highRoller: {
-    label: "High Roller",
+    // kind kept as-is on purpose: badge counts persist per kind (see
+    // critProcCounts), so renaming it would hand this crit's collection to the
+    // dice-table cat below, which now carries the "High Roller" name instead
+    label: "Stacked Chips",
     color: COLOR.doubleDownCrimson,
     icon: "highRoller",
     description: "Twenty-eight payouts from the highest-earning floor",
@@ -3328,6 +3331,60 @@ export const FEATURED_CRIT_INFO = {
     color: COLOR.fullHouseCrimson,
     icon: "overlord",
     description: "Forty-five instant payouts on every unlocked floor",
+  },
+  beerBelly: {
+    label: "Beer B",
+    color: COLOR.amber,
+    icon: "beerBelly",
+    description: "Twenty-three instant payouts on this floor",
+  },
+  bottomsUp: {
+    label: "Bottoms Up",
+    color: COLOR.teaBreakBrown,
+    icon: "bottomsUp",
+    description: "Twenty-five free upgrades on this floor",
+  },
+  wineCountry: {
+    label: "Wine ",
+    color: COLOR.fullHouseCrimson,
+    icon: "wineCountry",
+    description: "Twenty-seven instant payouts on every other floor",
+  },
+  ponyKeg: {
+    label: "Pony Keg",
+    color: COLOR.chairGiveawayBrown,
+    icon: "ponyKeg",
+    description: "Twenty-eight payouts on the lowest-level floor",
+  },
+  vodkaWhiskers: {
+    label: "Top Shelf",
+    color: COLOR.pairBlue,
+    icon: "vodkaWhiskers",
+    description: "Thirty-one free upgrades on the highest unlocked floor",
+  },
+  highRoller3: {
+    label: "Hot Dice",
+    color: COLOR.red,
+    icon: "highRoller3",
+    description: "Thirty-two instant payouts on this floor",
+  },
+  splitThePot: {
+    label: "High Roller",
+    color: COLOR.luckyCloverGreen,
+    icon: "splitThePot",
+    description: "Thirty-five upgrades here and on the highest floor",
+  },
+  highRoller2: {
+    label: "Chip Leader",
+    color: COLOR.royalFlushPurple,
+    icon: "highRoller2",
+    description: "Thirty-seven free upgrades on this floor",
+  },
+  pokerNight: {
+    label: "Poker Night",
+    color: COLOR.mysticTeal,
+    icon: "pokerNight",
+    description: "Thirty-nine instant payouts on every unlocked floor",
   },
 } as const satisfies Record<string, CritProcDisplayInfo>;
 

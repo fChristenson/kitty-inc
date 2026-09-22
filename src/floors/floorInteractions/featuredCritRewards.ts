@@ -1659,5 +1659,25 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       ),
     overlord: (context) =>
       actions.payCycles(context.floors, balance.overlordPayouts),
+    beerBelly: (context) =>
+      actions.payCycles([context.floor], balance.beerBellyPayouts),
+    bottomsUp: (context) =>
+      actions.upgrade([context.floor], balance.bottomsUpUpgrades),
+    wineCountry: (context) =>
+      actions.payCycles(alternating(context), balance.wineCountryPayouts),
+    ponyKeg: (context) =>
+      actions.payCycles([lowestLevel(context)], balance.ponyKegPayouts),
+    vodkaWhiskers: (context) =>
+      actions.upgrade([highestFloor(context)], balance.vodkaWhiskersUpgrades),
+    highRoller3: (context) =>
+      actions.payCycles([context.floor], balance.highRoller3Payouts),
+    splitThePot: (context) => {
+      actions.upgrade([context.floor], balance.splitThePotUpgrades);
+      actions.upgrade([highestFloor(context)], balance.splitThePotUpgrades);
+    },
+    highRoller2: (context) =>
+      actions.upgrade([context.floor], balance.highRoller2Upgrades),
+    pokerNight: (context) =>
+      actions.payCycles(context.floors, balance.pokerNightPayouts),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
