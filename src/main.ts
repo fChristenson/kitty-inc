@@ -70,6 +70,7 @@ import {
   type Floor,
 } from "./gameState";
 import { bindSaveLifecycle, saveCompanySnapshot } from "./shared/persistence";
+import { suppressNativeContextMenu } from "./shared/tapEvents";
 import { buyCheapestUpgrades } from "./shared/bulkPurchase";
 import {
   getActiveCompanyIndex,
@@ -151,6 +152,7 @@ async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
   if (!app) throw new Error("#app not found");
   initSessionGuard();
+  suppressNativeContextMenu();
   startBackgroundMusic();
   preloadSounds();
 

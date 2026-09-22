@@ -69,3 +69,13 @@ export function onTapOrHold(
   });
   return clearHold;
 }
+
+// The game's own press-and-hold gestures (the map's buy-all markers, the city
+// arrows' jump-to-end) collide with the browser's: on mobile the same hold
+// fires `contextmenu`, which paints the native selection/"Copy" sheet over the
+// page. CSS user-select/touch-callout don't stop that event, so it's cancelled
+// here. Nothing in this game is a document the player would want to select,
+// copy or open a context menu on. Call once at startup.
+export function suppressNativeContextMenu(): void {
+  window.addEventListener("contextmenu", (event) => event.preventDefault());
+}

@@ -41,6 +41,16 @@
   /* iOS Safari's own separate long-press context menu (shows "Copy"/"Look
      Up"/image-save options) isn't covered by user-select alone */
   -webkit-touch-callout: none;
+  /* Android Chrome paints a translucent blue box over whatever a press-and-hold
+     lands on (every long-press gesture in the game: the map's buy-all markers,
+     the city arrows' jump-to-end). Nothing here wants that highlight */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* belt and braces for the same long-press: a browser that still manages to
+   start a selection gets no visible one */
+::selection {
+  background: transparent;
 }
 
 /* buttons/inputs don't inherit the page font-family by default (browser UA
