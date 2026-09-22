@@ -7,31 +7,31 @@ Twenty-three supplied illustrations are processed and wired through the shared
 existing crit balance was changed. Proc chances apply after a tier and the
 special gateway land, before the shared cap.
 
-| Image | Crit | Immediate reward | Proc chance |
-| --- | --- | --- | --- |
-| 40kOfGold | Forty K of Gold | 40 payouts on every unlocked floor | 0.095% |
-| chaoticTemptation | Chaos Dividend | 32 payouts on this floor | 0.2% |
-| chaoticTemptation2 | Chaos Upgrade | 34 upgrades on this floor | 0.18% |
-| chaoticTemptation3 | Chaos Cascade | 36 upgrades on alternating floors | 0.16% |
-| chaoticTemptation4 | Chaos Jackpot | 42 payouts from the highest-earning floor | 0.1% |
-| emperorsDividends | Emperor's Dividends | 41 payouts on every unlocked floor | 0.09% |
-| heavyHitter | Heavy Hitter | 46 upgrades on this floor | 0.07% |
-| iAmSpeed | I Am Speed | 35 upgrades on the highest unlocked floor | 0.14% |
-| neverSurrender2 | Never Yield | 43 upgrades on every unlocked floor | 0.075% |
-| plushieDog | Pawsitive Returns | 39 payouts on every unlocked floor | 0.105% |
-| plushieElephant | Big Ears Bonus | 44 upgrades on this floor | 0.085% |
-| plushieHamster | Hamster Jackpot | 36 payouts on this floor | 0.17% |
-| plushieOtter | Otterly Loaded | 40 payouts on this floor | 0.13% |
-| plushiePand | Bamboo Bonanza | 38 payouts on every unlocked floor | 0.095% |
-| plushiePenguin | Cool Customer | 37 upgrades on this floor | 0.15% |
-| plushieRabbit | Hare Raising | 35 upgrades on alternating floors | 0.12% |
-| plushieRacoon | Trash to Cash | 42 payouts from the highest-earning floor | 0.09% |
-| plushieSeal | Seal of Approval | 40 upgrades on the lowest-level floor | 0.11% |
-| plushieTiger | Tiger's Roar | 47 upgrades on this floor | 0.065% |
-| powerSword | Power Sword | 2 tier promotions and 18 upgrades here | 0.08% |
-| powerSword2 | Sword of the Emperor | 48 upgrades on this floor | 0.055% |
-| sleepyFox | Fox Nap | 34 payouts on this floor | 0.19% |
-| sleepyPanda | Panda Snooze | 43 upgrades on this floor | 0.1% |
+| Image              | Crit                 | Immediate reward                          | Proc chance |
+| ------------------ | -------------------- | ----------------------------------------- | ----------- |
+| 40kOfGold          | Forty K of Gold      | 40 payouts on every unlocked floor        | 0.095%      |
+| chaoticTemptation  | Chaos Dividend       | 32 payouts on this floor                  | 0.2%        |
+| chaoticTemptation2 | Chaos Upgrade        | 34 upgrades on this floor                 | 0.18%       |
+| chaoticTemptation3 | Chaos Cascade        | 36 upgrades on alternating floors         | 0.16%       |
+| chaoticTemptation4 | Chaos Jackpot        | 42 payouts from the highest-earning floor | 0.1%        |
+| emperorsDividends  | Emperor's Dividends  | 41 payouts on every unlocked floor        | 0.09%       |
+| heavyHitter        | Heavy Hitter         | 46 upgrades on this floor                 | 0.07%       |
+| iAmSpeed           | I Am Speed           | 35 upgrades on the highest unlocked floor | 0.14%       |
+| neverSurrender2    | Never Yield          | 43 upgrades on every unlocked floor       | 0.075%      |
+| plushieDog         | Pawsitive Returns    | 39 payouts on every unlocked floor        | 0.105%      |
+| plushieElephant    | Big Ears Bonus       | 44 upgrades on this floor                 | 0.085%      |
+| plushieHamster     | Hamster Jackpot      | 36 payouts on this floor                  | 0.17%       |
+| plushieOtter       | Otterly Loaded       | 40 payouts on this floor                  | 0.13%       |
+| plushiePand        | Bamboo Bonanza       | 38 payouts on every unlocked floor        | 0.095%      |
+| plushiePenguin     | Cool Customer        | 37 upgrades on this floor                 | 0.15%       |
+| plushieRabbit      | Hare Raising         | 35 upgrades on alternating floors         | 0.12%       |
+| plushieRacoon      | Trash to Cash        | 42 payouts from the highest-earning floor | 0.09%       |
+| plushieSeal        | Seal of Approval     | 40 upgrades on the lowest-level floor     | 0.11%       |
+| plushieTiger       | Tiger's Roar         | 47 upgrades on this floor                 | 0.065%      |
+| powerSword         | Power Sword          | 2 tier promotions and 18 upgrades here    | 0.08%       |
+| powerSword2        | Sword of the Emperor | 48 upgrades on this floor                 | 0.055%      |
+| sleepyFox          | Fox Nap              | 34 payouts on this floor                  | 0.19%       |
+| sleepyPanda        | Panda Snooze         | 43 upgrades on this floor                 | 0.1%        |
 
 The `2` source variants remain distinct crits. `40kOfGold` uses the logical
 asset key `fortyKOfGold` because image keys cannot begin with a digit.

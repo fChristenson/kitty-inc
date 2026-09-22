@@ -156,10 +156,7 @@ export async function processCritIcon(
             touchesTransparent = true;
             continue;
           }
-          if (
-            visited[neighbor] ||
-            whiteness(neighbor) < whiteHaloThreshold
-          ) {
+          if (visited[neighbor] || whiteness(neighbor) < whiteHaloThreshold) {
             continue;
           }
           visited[neighbor] = 1;
