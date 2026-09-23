@@ -135,6 +135,7 @@ import {
   gt,
   lt,
   multiply,
+  subtract,
 } from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
 
@@ -1695,7 +1696,27 @@ export function handleFloorClick(
       const goal = getOvertimeTickGoal(floor);
       if (ticksBefore < goal && getOvertimeTicks(floor) >= goal) {
         goalReached = true;
-        floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+        const previousTier = floor.critMultiplierTier;
+        const promotedTier = nextCritTier(previousTier);
+        if (promotedTier !== previousTier) {
+          const base = computeBaseFloorStats(floors.indexOf(floor) + 1, multiplier);
+          const upgradeIncome = multiply(floor.rateStep, floor.upgradeCount);
+          const previousMultiplier = previousTier
+            ? CRIT_TIER_CONFIG[previousTier].multiplier
+            : 1;
+          const bonusIncome = subtract(
+            floor.incomeAmount,
+            add(base.incomeAmount, multiply(upgradeIncome, previousMultiplier)),
+          );
+          floor.incomeAmount = add(
+            add(
+              base.incomeAmount,
+              multiply(upgradeIncome, CRIT_TIER_CONFIG[promotedTier].multiplier),
+            ),
+            bonusIncome,
+          );
+          floor.critMultiplierTier = promotedTier;
+        }
         endOvertimeActiveWindow(floor, Date.now());
         // bar starts at 0 again for the new (bigger) tier's own goal, instead of
         // draining down from the just-maxed value against it

@@ -642,6 +642,79 @@ try {
     },
   });
   try {
+    const { increaseIncomeRateBy } = await server.ssrLoadModule(
+      "/src/floors/incomePanel/index.ts",
+    );
+    const { add } = await server.ssrLoadModule("/src/shared/bigNumber/index.ts");
+    for (const multiplier of [1, 1e200]) {
+      for (const startingTier of [null, "crit", "mega"]) {
+        for (const count of [0, 9, 10, 49, 50, 10000]) {
+          const floors = [1, 2].map((level) =>
+            buildFloor(level, {
+              backgroundCount: 1,
+              multiplier,
+              defaultCritTier: startingTier,
+            }),
+          );
+          const floor = floors[1];
+          floor.unlocked = true;
+          increaseIncomeRateBy(floor, count);
+          const bonus = fromNumber(7 * multiplier);
+          floor.incomeAmount = add(floor.incomeAmount, bonus);
+          const unchanged = {
+            upgradeCount: floor.upgradeCount,
+            upgradeCost: floor.upgradeCost,
+            rateStep: floor.rateStep,
+            incomeIntervalSeconds: floor.incomeIntervalSeconds,
+            lastCollectedAt: floor.lastCollectedAt,
+          };
+          const draft = { buildings: [floors], money: fromNumber(10000) };
+          const deps = { ...depsFor(draft), multiplier };
+          const point = buttons.getButtonCenter(false);
+          const click = () => {
+            const previousRaf = globalThis.requestAnimationFrame;
+            globalThis.requestAnimationFrame = () => 1;
+            try {
+              runDetachedStep(() =>
+                actions.handleFloorClick(deps, floor, point.x, point.y, false),
+              );
+            } finally {
+              if (previousRaf === undefined) delete globalThis.requestAnimationFrame;
+              else globalThis.requestAnimationFrame = previousRaf;
+            }
+          };
+          let previousTier = startingTier;
+          while (previousTier !== "ultra") {
+            buttons.triggerOvertimeBoost(floor, fromNumber(20));
+            floor.overtimeTicks = buttons.getOvertimeTickGoal(floor) - 2;
+            const before = floor.incomeAmount;
+            click();
+            assert.deepEqual(floor.incomeAmount, before, "no early revaluation");
+            assert.equal(floor.critMultiplierTier, previousTier);
+            click();
+            const promotedTier = crit.nextCritTier(previousTier);
+            const reference = buildFloor(2, {
+              backgroundCount: 1,
+              multiplier,
+              defaultCritTier: promotedTier,
+            });
+            increaseIncomeRateBy(reference, count);
+            const expected = toNumber(add(reference.incomeAmount, bonus));
+            assert(
+              Math.abs(toNumber(floor.incomeAmount) / expected - 1) < 1e-12,
+              `${startingTier}: ${count} upgrades revalued at ${promotedTier}`,
+            );
+            assert.equal(floor.critMultiplierTier, promotedTier);
+            for (const [key, value] of Object.entries(unchanged))
+              assert.deepEqual(floor[key], value, `${key} unchanged by overtime`);
+            assert.equal(buttons.getOvertimeTicks(floor), 0);
+            assert.equal(buttons.isOvertimeActive(floor, now), false);
+            previousTier = promotedTier;
+          }
+        }
+      }
+    }
+    console.log("PASS: overtime revalues existing upgrades at each promoted tier without changing costs or timers");
     for (const [tier, randomValues] of [
       ["crit", [0.999999, 0.999999, 0]],
       ["mega", [0.999999, 0]],
