@@ -32,7 +32,7 @@ export const CONFIG = {
 
   // src/buildings/index.ts — pricing and economy scaling for new buildings.
   buildings: {
-    costMultiplier: 4000,
+    costMultiplier: 1_000_000_000,
     basePrice: 1_000_000_000,
   },
 
