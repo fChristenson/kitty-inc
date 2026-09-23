@@ -645,7 +645,9 @@ try {
     const { increaseIncomeRateBy } = await server.ssrLoadModule(
       "/src/floors/incomePanel/index.ts",
     );
-    const { add } = await server.ssrLoadModule("/src/shared/bigNumber/index.ts");
+    const { add } = await server.ssrLoadModule(
+      "/src/shared/bigNumber/index.ts",
+    );
     for (const multiplier of [1, 1e200]) {
       for (const startingTier of [null, "crit", "mega"]) {
         for (const count of [0, 9, 10, 49, 50, 10000]) {
@@ -679,7 +681,8 @@ try {
                 actions.handleFloorClick(deps, floor, point.x, point.y, false),
               );
             } finally {
-              if (previousRaf === undefined) delete globalThis.requestAnimationFrame;
+              if (previousRaf === undefined)
+                delete globalThis.requestAnimationFrame;
               else globalThis.requestAnimationFrame = previousRaf;
             }
           };
@@ -689,7 +692,11 @@ try {
             floor.overtimeTicks = buttons.getOvertimeTickGoal(floor) - 2;
             const before = floor.incomeAmount;
             click();
-            assert.deepEqual(floor.incomeAmount, before, "no early revaluation");
+            assert.deepEqual(
+              floor.incomeAmount,
+              before,
+              "no early revaluation",
+            );
             assert.equal(floor.critMultiplierTier, previousTier);
             click();
             const promotedTier = crit.nextCritTier(previousTier);
@@ -706,7 +713,11 @@ try {
             );
             assert.equal(floor.critMultiplierTier, promotedTier);
             for (const [key, value] of Object.entries(unchanged))
-              assert.deepEqual(floor[key], value, `${key} unchanged by overtime`);
+              assert.deepEqual(
+                floor[key],
+                value,
+                `${key} unchanged by overtime`,
+              );
             assert.equal(buttons.getOvertimeTicks(floor), 0);
             assert.equal(buttons.isOvertimeActive(floor, now), false);
             previousTier = promotedTier;
@@ -714,7 +725,9 @@ try {
         }
       }
     }
-    console.log("PASS: overtime revalues existing upgrades at each promoted tier without changing costs or timers");
+    console.log(
+      "PASS: overtime revalues existing upgrades at each promoted tier without changing costs or timers",
+    );
     for (const [tier, randomValues] of [
       ["crit", [0.999999, 0.999999, 0]],
       ["mega", [0.999999, 0]],

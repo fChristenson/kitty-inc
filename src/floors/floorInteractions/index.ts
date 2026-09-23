@@ -1699,7 +1699,10 @@ export function handleFloorClick(
         const previousTier = floor.critMultiplierTier;
         const promotedTier = nextCritTier(previousTier);
         if (promotedTier !== previousTier) {
-          const base = computeBaseFloorStats(floors.indexOf(floor) + 1, multiplier);
+          const base = computeBaseFloorStats(
+            floors.indexOf(floor) + 1,
+            multiplier,
+          );
           const upgradeIncome = multiply(floor.rateStep, floor.upgradeCount);
           const previousMultiplier = previousTier
             ? CRIT_TIER_CONFIG[previousTier].multiplier
@@ -1711,7 +1714,10 @@ export function handleFloorClick(
           floor.incomeAmount = add(
             add(
               base.incomeAmount,
-              multiply(upgradeIncome, CRIT_TIER_CONFIG[promotedTier].multiplier),
+              multiply(
+                upgradeIncome,
+                CRIT_TIER_CONFIG[promotedTier].multiplier,
+              ),
             ),
             bonusIncome,
           );
