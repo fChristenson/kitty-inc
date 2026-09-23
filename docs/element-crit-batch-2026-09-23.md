@@ -18,27 +18,27 @@ On a single-floor building both rewards apply there. Locked floors and income
 collection timestamps are untouched. Chances continue the existing decreasing
 ladder between neighboring elements; no existing chance was changed.
 
-| Raw source | Crit label | Internal ID / PNG / processor suffix | N | Proc chance |
-| --- | --- | --- | ---: | ---: |
-| osmium.jfif | Osmium Regalia | osmiumRegalia | 76 | 0.200% |
-| iridium.jfif | Iridium Aegis | iridiumAegis | 77 | 0.196% |
-| mercury.jfif | Mercury Flow | mercuryFlow | 80 | 0.184% |
-| thallium.jfif | Thallium Thrive | thalliumThrive | 81 | 0.180% |
-| lead.jfif | Lead Lode | leadLode | 82 | 0.176% |
-| bismuth.jfif | Bismuth Bastion | bismuthBastion | 83 | 0.172% |
-| polonium.jfif | Polonium Prism | poloniumPrism | 84 | 0.168% |
-| astatine.jfif | Astatine Aurora | astatineAurora | 85 | 0.164% |
-| radon.jfif | Radon Ripple | radonRipple | 86 | 0.160% |
-| francium.jfif | Francium Fortune | franciumFortune | 87 | 0.156% |
-| radium.jfif | Radium Rhythm | radiumRhythm | 88 | 0.152% |
-| actinium.jfif | Actinium Arc | actiniumArc | 89 | 0.148% |
-| thorium.jfif | Thorium Throne | thoriumThrone | 90 | 0.144% |
-| protactinium.jfif | Protactinium Orbit | protactiniumOrbit | 91 | 0.140% |
-| neptunium.jfif | Neptunium Nova | neptuniumNova | 93 | 0.132% |
-| americium.jfif | Americium Alarm | americiumAlarm | 95 | 0.124% |
-| curium.jfif | Curium Crucible | curiumCrucible | 96 | 0.120% |
-| berkelium.jfif | Berkelium Breakthrough | berkeliumBreakthrough | 97 | 0.116% |
-| nucleus.jfif | Nucleus Dividend | nucleusDividend | See below | 1.400% |
+| Raw source        | Crit label             | Internal ID / PNG / processor suffix |         N | Proc chance |
+| ----------------- | ---------------------- | ------------------------------------ | --------: | ----------: |
+| osmium.jfif       | Osmium Regalia         | osmiumRegalia                        |        76 |      0.200% |
+| iridium.jfif      | Iridium Aegis          | iridiumAegis                         |        77 |      0.196% |
+| mercury.jfif      | Mercury Flow           | mercuryFlow                          |        80 |      0.184% |
+| thallium.jfif     | Thallium Thrive        | thalliumThrive                       |        81 |      0.180% |
+| lead.jfif         | Lead Lode              | leadLode                             |        82 |      0.176% |
+| bismuth.jfif      | Bismuth Bastion        | bismuthBastion                       |        83 |      0.172% |
+| polonium.jfif     | Polonium Prism         | poloniumPrism                        |        84 |      0.168% |
+| astatine.jfif     | Astatine Aurora        | astatineAurora                       |        85 |      0.164% |
+| radon.jfif        | Radon Ripple           | radonRipple                          |        86 |      0.160% |
+| francium.jfif     | Francium Fortune       | franciumFortune                      |        87 |      0.156% |
+| radium.jfif       | Radium Rhythm          | radiumRhythm                         |        88 |      0.152% |
+| actinium.jfif     | Actinium Arc           | actiniumArc                          |        89 |      0.148% |
+| thorium.jfif      | Thorium Throne         | thoriumThrone                        |        90 |      0.144% |
+| protactinium.jfif | Protactinium Orbit     | protactiniumOrbit                    |        91 |      0.140% |
+| neptunium.jfif    | Neptunium Nova         | neptuniumNova                        |        93 |      0.132% |
+| americium.jfif    | Americium Alarm        | americiumAlarm                       |        95 |      0.124% |
+| curium.jfif       | Curium Crucible        | curiumCrucible                       |        96 |      0.120% |
+| berkelium.jfif    | Berkelium Breakthrough | berkeliumBreakthrough                |        97 |      0.116% |
+| nucleus.jfif      | Nucleus Dividend       | nucleusDividend                      | See below |      1.400% |
 
 Nucleus Dividend grants six upgrades on every unlocked floor and four payouts
 on the triggering floor. Unlike Sugar High's five upgrades and five payouts

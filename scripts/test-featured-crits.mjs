@@ -1040,7 +1040,10 @@ try {
     nucleusTest.context.floor.upgradeCount = level;
     nucleusTest.context.floor.critMultiplierTier = "ultra";
     nucleusTest.rewards.nucleusDividend(nucleusTest.context);
-    assert.deepEqual(nucleusTest.floors.map((floor) => floor.upgradeCount), [26, level + 6, 16, 0]);
+    assert.deepEqual(
+      nucleusTest.floors.map((floor) => floor.upgradeCount),
+      [26, level + 6, 16, 0],
+    );
     assert.equal(nucleusTest.income(), 12);
     assert.equal(nucleusTest.context.floor.critMultiplierTier, "ultra");
     assert(nucleusTest.floors.every((floor) => floor.lastCollectedAt === 123));
@@ -1079,13 +1082,30 @@ try {
   assert(!MAP_CRIT_TEST_KINDS.includes("nucleusDividend"));
   const nucleusIcon = await readFile("public/nucleusDividend.png");
   assert(nucleusIcon.equals(await readFile("src/assets/nucleusDividend.png")));
-  assert(nucleusIcon.equals(await readFile("src/assets/themes/references/dist/nucleusDividend.png")));
-  const newAssetKinds = ["nucleusDividend", ...elementCritBatch
-    .filter(([, , , number]) => [76, 77, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 93, 95, 96, 97].includes(number))
-    .map(([, kind]) => kind)];
+  assert(
+    nucleusIcon.equals(
+      await readFile("src/assets/themes/references/dist/nucleusDividend.png"),
+    ),
+  );
+  const newAssetKinds = [
+    "nucleusDividend",
+    ...elementCritBatch
+      .filter(([, , , number]) =>
+        [
+          76, 77, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 93, 95, 96,
+          97,
+        ].includes(number),
+      )
+      .map(([, kind]) => kind),
+  ];
   for (const kind of newAssetKinds) {
     const silhouette = await sharp(`public/silhouettes/${kind}.png`).metadata();
-    assert(silhouette.width <= 250 && silhouette.height <= 250 && silhouette.hasAlpha && silhouette.isPalette);
+    assert(
+      silhouette.width <= 250 &&
+        silhouette.height <= 250 &&
+        silhouette.hasAlpha &&
+        silhouette.isPalette,
+    );
   }
   for (const kind of ["blessed", "wizard"]) {
     for (const tier of [null, "crit", "mega", "ultra"]) {
