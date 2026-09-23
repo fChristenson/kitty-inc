@@ -1,7 +1,9 @@
 import type { CritProcDisplayInfo } from "./index";
 import { COLOR } from "../../palette";
+import { ELEMENT_CRIT_INFO } from "./elementProcs";
 
 export const FEATURED_CRIT_INFO = {
+  ...ELEMENT_CRIT_INFO,
   ballerina: {
     label: "Pirouette",
     color: COLOR.peppermintPink,

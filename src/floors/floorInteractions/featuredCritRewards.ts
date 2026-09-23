@@ -7,6 +7,7 @@ import {
 } from "../../shared/critTypes";
 import { gt, lt, type BigNumber } from "../../shared/bigNumber";
 import type { CritRewardContext } from "./index";
+import { createElementCritRewards } from "./elementCritRewards";
 
 interface FeaturedRewardActions {
   upgrade: (floors: Floor[], count: number) => void;
@@ -73,6 +74,7 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
   };
 
   return {
+    ...createElementCritRewards(actions),
     ballerina: (context) => {
       actions.upgrade([context.floor], balance.ballerinaUpgrades);
       actions.payCycles([context.floor], balance.ballerinaPayouts);

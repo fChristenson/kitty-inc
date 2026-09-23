@@ -9,6 +9,8 @@ export async function processCritIcon(
   {
     backgroundSeeds = [],
     darkBackgroundThreshold = null,
+    backgroundColor = null,
+    backgroundColorTolerance = 35,
     protectedRects = [],
     sourceExtension = ".jfif",
     sourcePath = null,
@@ -42,7 +44,9 @@ export async function processCritIcon(
   const whiteness = (pixel) =>
     Math.min(...data.subarray(pixel * channels, pixel * channels + 3));
   const isBackgroundColor = (pixel) =>
-    darkBackgroundThreshold === null
+    backgroundColor !== null
+      ? Math.hypot(...backgroundColor.map((channel, index) => data[pixel * channels + index] - channel)) <= backgroundColorTolerance
+      : darkBackgroundThreshold === null
       ? whiteness(pixel) >= 195
       : whiteness(pixel) <= darkBackgroundThreshold;
   const isProtected = (pixel) => {
@@ -90,7 +94,7 @@ export async function processCritIcon(
       (pixel >= width && !background[pixel - width]) ||
       (pixel + width < background.length && !background[pixel + width]);
     data[pixel * channels + 3] =
-      darkBackgroundThreshold !== null
+      darkBackgroundThreshold !== null || backgroundColor !== null
         ? 0
         : touchesContent
           ? Math.round(
