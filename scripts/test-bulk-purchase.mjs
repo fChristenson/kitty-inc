@@ -63,7 +63,11 @@ const {
   const controller = createRenovationController({
     setLoading: (visible) => loading.push(visible),
     showRewards: (rewards) => {
-      assert.equal(loading.at(-1), false, "loading must clear before rewards appear");
+      assert.equal(
+        loading.at(-1),
+        false,
+        "loading must clear before rewards appear",
+      );
       shown.push(rewards);
     },
   });
@@ -113,17 +117,34 @@ const {
     badges: { boost: 2, booty: 1 },
   }));
   const shownBeforeRenovation = shown.length;
-  const nextJob = controller.start(0, 2, () => new Promise((resolve) => {
-    finish = resolve;
-  }));
+  const nextJob = controller.start(
+    0,
+    2,
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
   controller.setView(0, 2, false);
-  assert.equal(loading.at(-1), true, "entering an active renovation shows loading");
-  assert.equal(shown.length, shownBeforeRenovation, "older badges wait for the active renovation");
+  assert.equal(
+    loading.at(-1),
+    true,
+    "entering an active renovation shows loading",
+  );
+  assert.equal(
+    shown.length,
+    shownBeforeRenovation,
+    "older badges wait for the active renovation",
+  );
   controller.setView(0, 2, true);
   controller.setView(0, 3, false);
   controller.setView(0, 2, false);
   assert.equal(loading.at(-1), true);
-  assert.equal(shown.length, shownBeforeRenovation, "revisiting cannot release queued badges early");
+  assert.equal(
+    shown.length,
+    shownBeforeRenovation,
+    "revisiting cannot release queued badges early",
+  );
   finish({ badges: { boost: 4, heavenly: 1 } });
   assert.equal(await nextJob, true);
   assert.equal(loading.at(-1), false);
@@ -134,7 +155,11 @@ const {
     { boost: 7, booty: 1, heavenly: 1 },
     "successive map jobs accumulate unseen rewards",
   );
-  assert.equal(shown.length, shownBeforeRenovation + 1, "combined rewards appear only once");
+  assert.equal(
+    shown.length,
+    shownBeforeRenovation + 1,
+    "combined rewards appear only once",
+  );
 }
 
 {
