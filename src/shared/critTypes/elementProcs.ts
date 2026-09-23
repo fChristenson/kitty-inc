@@ -2,6 +2,126 @@ import type { CritProcDisplayInfo } from "./index";
 import { COLOR } from "../../palette";
 
 export const ELEMENT_CRIT_INFO = {
+  californiumCrescendo: {
+    label: "Californium Crescendo",
+    color: COLOR.blue,
+    icon: "californiumCrescendo",
+    description: "98 upgrades here and 98 payouts on the highest floor",
+  },
+  einsteiniumEpiphany: {
+    label: "Einsteinium Epiphany",
+    color: COLOR.purple,
+    icon: "einsteiniumEpiphany",
+    description: "99 upgrades here and 99 payouts on the highest floor",
+  },
+  fermiumFormula: {
+    label: "Fermium Formula",
+    color: COLOR.cyan,
+    icon: "fermiumFormula",
+    description: "100 upgrades here and 100 payouts on the highest floor",
+  },
+  mendeleviumMajesty: {
+    label: "Mendelevium Majesty",
+    color: COLOR.gold,
+    icon: "mendeleviumMajesty",
+    description: "101 upgrades here and 101 payouts on the highest floor",
+  },
+  nobeliumLaureate: {
+    label: "Nobelium Laureate",
+    color: COLOR.starYellow,
+    icon: "nobeliumLaureate",
+    description: "102 upgrades here and 102 payouts on the highest floor",
+  },
+  lawrenciumLightspeed: {
+    label: "Lawrencium Lightspeed",
+    color: COLOR.moneyGreen,
+    icon: "lawrenciumLightspeed",
+    description: "103 upgrades here and 103 payouts on the highest floor",
+  },
+  rutherfordiumReach: {
+    label: "Rutherfordium Reach",
+    color: COLOR.mysticTeal,
+    icon: "rutherfordiumReach",
+    description: "104 upgrades here and 104 payouts on the highest floor",
+  },
+  seaborgiumSwell: {
+    label: "Seaborgium Swell",
+    color: COLOR.silverTicketGray,
+    icon: "seaborgiumSwell",
+    description: "106 upgrades here and 106 payouts on the highest floor",
+  },
+  bohriumSummit: {
+    label: "Bohrium Summit",
+    color: COLOR.red,
+    icon: "bohriumSummit",
+    description: "107 upgrades here and 107 payouts on the highest floor",
+  },
+  hassiumMeteor: {
+    label: "Hassium Meteor",
+    color: COLOR.peppermintPink,
+    icon: "hassiumMeteor",
+    description: "108 upgrades here and 108 payouts on the highest floor",
+  },
+  meitneriumMarvel: {
+    label: "Meitnerium Marvel",
+    color: COLOR.blue,
+    icon: "meitneriumMarvel",
+    description: "109 upgrades here and 109 payouts on the highest floor",
+  },
+  darmstadtiumDowntown: {
+    label: "Darmstadtium Downtown",
+    color: COLOR.purple,
+    icon: "darmstadtiumDowntown",
+    description: "110 upgrades here and 110 payouts on the highest floor",
+  },
+  roentgeniumRevelation: {
+    label: "Roentgenium Revelation",
+    color: COLOR.cyan,
+    icon: "roentgeniumRevelation",
+    description: "111 upgrades here and 111 payouts on the highest floor",
+  },
+  coperniciumCarousel: {
+    label: "Copernicium Carousel",
+    color: COLOR.gold,
+    icon: "coperniciumCarousel",
+    description: "112 upgrades here and 112 payouts on the highest floor",
+  },
+  nihoniumDaybreak: {
+    label: "Nihonium Daybreak",
+    color: COLOR.starYellow,
+    icon: "nihoniumDaybreak",
+    description: "113 upgrades here and 113 payouts on the highest floor",
+  },
+  fleroviumFortress: {
+    label: "Flerovium Fortress",
+    color: COLOR.moneyGreen,
+    icon: "fleroviumFortress",
+    description: "114 upgrades here and 114 payouts on the highest floor",
+  },
+  moscoviumMosaic: {
+    label: "Moscovium Mosaic",
+    color: COLOR.mysticTeal,
+    icon: "moscoviumMosaic",
+    description: "115 upgrades here and 115 payouts on the highest floor",
+  },
+  livermoriumLightning: {
+    label: "Livermorium Lightning",
+    color: COLOR.silverTicketGray,
+    icon: "livermoriumLightning",
+    description: "116 upgrades here and 116 payouts on the highest floor",
+  },
+  tennessineTwinkle: {
+    label: "Tennessine Twinkle",
+    color: COLOR.red,
+    icon: "tennessineTwinkle",
+    description: "117 upgrades here and 117 payouts on the highest floor",
+  },
+  oganessonOdyssey: {
+    label: "Oganesson Odyssey",
+    color: COLOR.peppermintPink,
+    icon: "oganessonOdyssey",
+    description: "118 upgrades here and 118 payouts on the highest floor",
+  },
   osmiumRegalia: {
     label: "Osmium Regalia",
     color: COLOR.silverTicketGray,
@@ -97,6 +217,12 @@ export const ELEMENT_CRIT_INFO = {
     color: COLOR.mysticTeal,
     icon: "americiumAlarm",
     description: "95 upgrades here and 95 payouts on the highest floor",
+  },
+  plutoniumPulse: {
+    label: "Plutonium Pulse",
+    color: COLOR.orange,
+    icon: "plutoniumPulse",
+    description: "94 upgrades here and 94 payouts on the highest floor",
   },
   curiumCrucible: {
     label: "Curium Crucible",

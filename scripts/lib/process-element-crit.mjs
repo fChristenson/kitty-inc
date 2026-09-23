@@ -6,10 +6,10 @@ import { elementCritBatch } from "./element-crit-batch.mjs";
 export async function processElementCrit(kind) {
   const entry = elementCritBatch.find((entry) => entry[1] === kind);
   if (!entry) throw new Error(`Unknown element crit: ${kind}`);
-  const [source] = entry;
+  const [source, , , , sourceExtension = ".jfif"] = entry;
   const root = path.resolve(import.meta.dirname, "../..");
   const options = {
-    sourcePath: path.join(root, "src/assets", `${source}.jfif`),
+    sourcePath: path.join(root, "src/assets", `${source}${sourceExtension}`),
     ...(source === "krypton"
       ? { backgroundColor: [136, 192, 250], backgroundColorTolerance: 40 }
       : {}),

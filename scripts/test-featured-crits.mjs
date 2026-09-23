@@ -62,7 +62,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 638 + elementCritBatch.length);
+  assert.equal(kinds.length, 639 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -246,6 +246,7 @@ try {
   }
 
   const expected = {
+    heavyElement: [[27, 37, 17, 0], 15],
     nucleusDividend: [[26, 36, 16, 0], 12],
     ...Object.fromEntries(
       elementCritBatch.map(([, kind, , number]) => [
@@ -928,7 +929,7 @@ try {
   }
   for (const [
     index,
-    [source, kind, label, number],
+    [source, kind, label, number, sourceExtension = ".jfif"],
   ] of elementCritBatch.entries()) {
     const elementName =
       source === "phosphor"
@@ -957,7 +958,9 @@ try {
         await readFile(`src/assets/themes/references/dist/${kind}.png`),
       ),
     );
-    assert((await readFile(`src/assets/${source}.jfif`)).length > 0);
+    assert(
+      (await readFile(`src/assets/${source}${sourceExtension}`)).length > 0,
+    );
     const { data, info } = await sharp(root)
       .ensureAlpha()
       .raw()
@@ -1036,6 +1039,17 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {
+    const heavyTest = fixture();
+    heavyTest.context.floor.upgradeCount = level;
+    heavyTest.context.floor.critMultiplierTier = "ultra";
+    heavyTest.rewards.heavyElement(heavyTest.context);
+    assert.deepEqual(
+      heavyTest.floors.map((floor) => floor.upgradeCount),
+      [27, level + 7, 17, 0],
+    );
+    assert.equal(heavyTest.income(), 15);
+    assert.equal(heavyTest.context.floor.critMultiplierTier, "ultra");
+    assert(heavyTest.floors.every((floor) => floor.lastCollectedAt === 123));
     const nucleusTest = fixture();
     nucleusTest.context.floor.upgradeCount = level;
     nucleusTest.context.floor.critMultiplierTier = "ultra";
@@ -1075,7 +1089,23 @@ try {
       assert.equal(test.context.floor.upgradeCount, 26);
       assert.equal(test.income(), 4);
     }
+    if (kind === "heavyElement") {
+      assert.equal(test.context.floor.upgradeCount, 27);
+      assert.equal(test.income(), 5);
+    }
   }
+  assert.equal(CONFIG.crit.heavyElementUpgrades, 7);
+  assert.equal(CONFIG.crit.heavyElementPayouts, 5);
+  assert(CONFIG.crit.heavyElementChance < CONFIG.crit.nucleusDividendChance);
+  assert(CONFIG.crit.oganessonOdysseyChance >= 0.001);
+  assert(!MAP_CRIT_TEST_KINDS.includes("heavyElement"));
+  const heavyIcon = await readFile("public/heavyElement.png");
+  assert(heavyIcon.equals(await readFile("src/assets/heavyElement.png")));
+  assert(
+    heavyIcon.equals(
+      await readFile("src/assets/themes/references/dist/heavyElement.png"),
+    ),
+  );
   assert.equal(CONFIG.crit.nucleusDividendUpgrades, 6);
   assert.equal(CONFIG.crit.nucleusDividendPayouts, 4);
   assert(CONFIG.crit.nucleusDividendChance > CONFIG.crit.sugarHighChance);
@@ -1089,12 +1119,15 @@ try {
   );
   const newAssetKinds = [
     "nucleusDividend",
+    "heavyElement",
     ...elementCritBatch
-      .filter(([, , , number]) =>
-        [
-          76, 77, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 93, 95, 96,
-          97,
-        ].includes(number),
+      .filter(
+        ([, , , number]) =>
+          number >= 98 ||
+          [
+            76, 77, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 93, 95, 96,
+            97,
+          ].includes(number),
       )
       .map(([, kind]) => kind),
   ];

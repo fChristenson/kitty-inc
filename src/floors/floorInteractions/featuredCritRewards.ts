@@ -75,6 +75,10 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
 
   return {
     ...createElementCritRewards(actions),
+    heavyElement: (context) => {
+      actions.upgrade(context.floors, balance.heavyElementUpgrades);
+      actions.payCycles([context.floor], balance.heavyElementPayouts);
+    },
     nucleusDividend: (context) => {
       actions.upgrade(context.floors, balance.nucleusDividendUpgrades);
       actions.payCycles([context.floor], balance.nucleusDividendPayouts);

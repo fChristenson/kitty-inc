@@ -4,6 +4,12 @@ import { ELEMENT_CRIT_INFO } from "./elementProcs";
 
 export const FEATURED_CRIT_INFO = {
   ...ELEMENT_CRIT_INFO,
+  heavyElement: {
+    label: "Heavy Element",
+    color: COLOR.silverTicketGray,
+    icon: "heavyElement",
+    description: "Seven upgrades on every unlocked floor and five payouts here",
+  },
   nucleusDividend: {
     label: "Nucleus Dividend",
     color: COLOR.cyan,

@@ -10,10 +10,13 @@ await fs.mkdir(destination, { recursive: true });
 for (let offset = 0; offset < elementCritBatch.length; offset += 20) {
   const entries = elementCritBatch.slice(offset, offset + 20);
   const layers = [];
-  for (const [index, [source, kind, label]] of entries.entries()) {
+  for (const [
+    index,
+    [source, kind, label, , sourceExtension = ".jfif"],
+  ] of entries.entries()) {
     const input = processed
       ? `public/${kind}.png`
-      : `src/assets/${source}.jfif`;
+      : `src/assets/${source}${sourceExtension}`;
     const image = await sharp(input)
       .resize(210, 190, { fit: "inside" })
       .png()
