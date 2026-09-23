@@ -429,7 +429,9 @@ export function wireUpgradeMenu(
         if (!def) return;
         const nextFloor = findNextEligibleFloor(floors, def.isEligible);
         button.disabled =
-          renovating || !nextFloor || lt(getTotalIncome(), def.getCost(nextFloor));
+          renovating ||
+          !nextFloor ||
+          lt(getTotalIncome(), def.getCost(nextFloor));
       });
   }
 
