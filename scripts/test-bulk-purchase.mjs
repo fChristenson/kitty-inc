@@ -1,5 +1,6 @@
 import { createServer } from "vite";
 import assert from "node:assert/strict";
+import { mock } from "node:test";
 
 const server = await createServer({ server: { middlewareMode: true } });
 const { createPurchaseFeedback, getPurchaseJumpOffset } =
@@ -60,6 +61,7 @@ const {
 {
   const loading = [];
   const shown = [];
+  mock.timers.enable({ apis: ["setTimeout"] });
   const controller = createRenovationController({
     setLoading: (visible) => loading.push(visible),
     showRewards: (rewards) => {
@@ -81,10 +83,14 @@ const {
         finish = resolve;
       }),
   );
+  assert.equal(loading.at(-1), false, "no immediate loading flash");
+  mock.timers.tick(499);
+  assert.equal(loading.at(-1), false, "loading stays hidden below 500ms");
+  mock.timers.tick(1);
   assert.equal(
     loading.at(-1),
     true,
-    "loading appears on the renovating building",
+    "loading appears after 500ms on the renovating building",
   );
   controller.setView(0, 2, true);
   assert.equal(loading.at(-1), false, "map stays usable");
@@ -98,6 +104,7 @@ const {
   assert.deepEqual(shown, [{ heavenly: 1 }]);
   controller.setView(0, 2, false);
   assert.equal(shown.length, 1, "rewards shown once");
+  loading.length = 0;
   await assert.rejects(
     controller.start(0, 2, async () => {
       throw new Error("cancelled");
@@ -106,6 +113,11 @@ const {
   );
   assert.equal(loading.at(-1), false, "failure clears loading");
   await controller.start(0, 2, async () => ({ badges: { boost: 2 } }));
+  mock.timers.tick(500);
+  assert(
+    !loading.includes(true),
+    "quick success and failure never flash loading",
+  );
   assert.deepEqual(
     shown.at(-1),
     { boost: 2 },
@@ -126,10 +138,12 @@ const {
       }),
   );
   controller.setView(0, 2, false);
+  assert.equal(loading.at(-1), false, "new job receives its own loading delay");
+  mock.timers.tick(500);
   assert.equal(
     loading.at(-1),
     true,
-    "entering an active renovation shows loading",
+    "entering a long active renovation shows loading",
   );
   assert.equal(
     shown.length,
@@ -160,6 +174,9 @@ const {
     shownBeforeRenovation + 1,
     "combined rewards appear only once",
   );
+  mock.timers.tick(1000);
+  assert.equal(loading.at(-1), false, "completed jobs cannot reopen loading");
+  mock.timers.reset();
 }
 
 {

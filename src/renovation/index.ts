@@ -22,11 +22,12 @@ export function createRenovationController(options: {
 }) {
   let running: string | null = null;
   let visible: string | null = null;
+  let loadingReady = false;
   const rewards = new Map<string, Rewards>();
   const key = (company: number, building: number) => `${company}:${building}`;
 
   function refresh(): void {
-    options.setLoading(running !== null && running === visible);
+    options.setLoading(loadingReady && running !== null && running === visible);
     if (visible === null || running === visible) return;
     const earned = rewards.get(visible);
     if (!earned) return;
@@ -50,6 +51,11 @@ export function createRenovationController(options: {
       if (running !== null) return false;
       const target = key(company, building);
       running = target;
+      loadingReady = false;
+      const loadingTimer = setTimeout(() => {
+        loadingReady = true;
+        refresh();
+      }, 500);
       refresh();
       try {
         const result = await job();
@@ -64,6 +70,8 @@ export function createRenovationController(options: {
         }
         return true;
       } finally {
+        clearTimeout(loadingTimer);
+        loadingReady = false;
         running = null;
         refresh();
       }

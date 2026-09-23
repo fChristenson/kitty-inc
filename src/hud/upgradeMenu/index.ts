@@ -348,12 +348,11 @@ export function wireUpgradeMenu(
   const panel = menu.querySelector<HTMLDivElement>(".worker-menu__panel")!;
   const list = container.querySelector<HTMLDivElement>("#upgrade-menu-list")!;
   let renovationPlan: RenovationPlan | null = null;
-  let openingBudget: BigNumber;
   let renovating = false;
 
   function render(): void {
     const floors = getFloors();
-    renovationPlan = previewRenovation(floors, openingBudget);
+    renovationPlan = previewRenovation(floors, getTotalIncome());
     list.innerHTML = massActionsMarkup(floors, renovationPlan);
   }
 
@@ -363,6 +362,7 @@ export function wireUpgradeMenu(
     const renovateButton =
       target.closest<HTMLButtonElement>("#renovate-floors");
     if (renovateButton) {
+      updateAffordability();
       const plan = renovationPlan;
       if (!plan || renovateButton.disabled) return;
       const floors = getFloors();
@@ -381,7 +381,6 @@ export function wireUpgradeMenu(
         renovating = false;
         renovateButton.removeAttribute("aria-busy");
         if (!menu.hidden) {
-          openingBudget = getTotalIncome();
           render();
           updateAffordability();
           affordabilityPolling.start();
@@ -414,8 +413,14 @@ export function wireUpgradeMenu(
     const renovateButton =
       list.querySelector<HTMLButtonElement>("#renovate-floors");
     if (renovateButton) {
+      if (!renovating) {
+        renovationPlan = previewRenovation(floors, getTotalIncome());
+        const price = renovateButton.querySelector(".worker-menu__price");
+        if (price) price.textContent = `x${renovationPlan.count}`;
+      }
       renovateButton.disabled =
         renovating ||
+        !canRenovateFloors(floors) ||
         !renovationPlan ||
         renovationPlan.count === 0 ||
         lt(getTotalIncome(), renovationPlan.cost);
@@ -443,7 +448,6 @@ export function wireUpgradeMenu(
 
   function open(): void {
     cancelDialogClose(panel);
-    openingBudget = getTotalIncome();
     render();
     menu.hidden = false;
     updateAffordability();

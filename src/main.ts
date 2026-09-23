@@ -1278,7 +1278,7 @@ async function main() {
   // reload could otherwise re-collect the same already-paid-out idle time
   saveBuildings(buildings, activeCompanyIndex);
   if (gt(totalIdleIncome, fromNumber(0))) {
-    addTotalIncome(totalIdleIncome);
+    addTotalIncome(idleIncome);
     totalEarnedOverlay.show(totalIdleIncome);
   }
 

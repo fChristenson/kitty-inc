@@ -1,9 +1,10 @@
 import { createServer } from "vite";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 
 const server = await createServer({ server: { middlewareMode: true } });
 const income = await server.ssrLoadModule("/src/shared/income/index.ts");
-const { toNumber, fromNumber } = await server.ssrLoadModule(
+const { toNumber, fromNumber, add } = await server.ssrLoadModule(
   "/src/shared/bigNumber/index.ts",
 );
 const { CONFIG } = await server.ssrLoadModule("/src/config.ts");
@@ -81,5 +82,93 @@ for (const f of [
   assert.ok(collected > 0, "a manager-boosted floor should pay out");
 }
 
-console.log("PASS: shared income formula, manager speed applied everywhere");
+{
+  const originalNow = Date.now;
+  const globals = new Map(
+    ["window", "document", "Image", "localStorage"].map((key) => [
+      key,
+      globalThis[key],
+    ]),
+  );
+  const storage = new Map([
+    ["cash-clicker:active-company-index", "1"],
+    [
+      "cash-clicker:corporation-names",
+      JSON.stringify(["First", "Active", "Third"]),
+    ],
+    ["cash-clicker:last-close", "10000"],
+  ]);
+  globalThis.localStorage = {
+    getItem: (key) => storage.get(key) ?? null,
+    setItem: (key, value) => storage.set(key, String(value)),
+    removeItem: (key) => storage.delete(key),
+  };
+  globalThis.window = { addEventListener() {}, removeEventListener() {} };
+  globalThis.document = { addEventListener() {} };
+  globalThis.Image = class {
+    width = 1;
+    height = 1;
+    set src(_value) {
+      queueMicrotask(() => this.onload?.());
+    }
+  };
+  Date.now = () => 20000;
+  try {
+    const companies = await server.ssrLoadModule("/src/company/index.ts");
+    for (const [index, rate] of [3, 2, 5].entries()) {
+      companies.saveCompanyRecord(index, {
+        bankedTotal: fromNumber((index + 1) * 100),
+        incomeRatePerSecond: fromNumber(rate),
+        assetValue: fromNumber(0),
+        upgradesValue: fromNumber(0),
+        updatedAt: 10000,
+      });
+    }
+    const economy = await server.ssrLoadModule("/src/totalIncome/index.ts");
+    const { computeIdleIncome } = await server.ssrLoadModule(
+      "/src/gameState/index.ts",
+    );
+    const buildings = [[floor({ unlocked: true, lastCollectedAt: 10000 })]];
+    const idleIncome = computeIdleIncome(buildings, () => fromNumber(2));
+    const dormantIncome = economy.getDormantCompaniesIdleIncome(10000, 20000);
+    const displayedTotal = add(idleIncome, dormantIncome);
+    economy.addTotalIncome(idleIncome);
+    assert.equal(toNumber(idleIncome), 20);
+    assert.equal(toNumber(dormantIncome), 80);
+    assert.equal(toNumber(displayedTotal), 100);
+    for (const [index, expected] of [130, 220, 350].entries()) {
+      assert(
+        Math.abs(toNumber(economy.getStoredTotalIncome(index)) - expected) <
+          1e-9,
+        `company ${index} retains only its own idle earnings`,
+      );
+    }
+    assert(
+      Math.abs(toNumber(economy.getAllCompaniesTotalIncome()) - 700) < 1e-9,
+    );
+    assert.equal(
+      toNumber(computeIdleIncome(buildings, () => fromNumber(2))),
+      0,
+      "active idle earnings cannot be collected twice",
+    );
+    assert.equal(toNumber(economy.getStoredTotalIncome(0)), 130);
+    assert.equal(toNumber(economy.getStoredTotalIncome(2)), 350);
+    const main = await readFile("src/main.ts", "utf8");
+    assert.match(
+      main,
+      /addTotalIncome\(idleIncome\);\s*totalEarnedOverlay\.show\(totalIdleIncome\)/,
+    );
+    assert.doesNotMatch(main, /addTotalIncome\(totalIdleIncome\)/);
+  } finally {
+    Date.now = originalNow;
+    for (const [key, value] of globals) {
+      if (value === undefined) delete globalThis[key];
+      else globalThis[key] = value;
+    }
+  }
+}
+
+console.log(
+  "PASS: shared income formula, manager speed, per-company idle earnings and combined display",
+);
 await server.close();
