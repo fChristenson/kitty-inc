@@ -95,9 +95,7 @@ export interface Floor {
   aboveCapTier: boolean;
   // "Work overtime" boost's own persisted gauge state (see floors/upgradeButton) —
   // stored directly on the floor (not a WeakMap) so it survives a reload and
-  // follows the floor across building switches; the drain tail is derived purely
-  // from (overtimeTicks, overtimeStartedAt, now) so it correctly keeps draining
-  // across however long the app was actually closed, same as idle income above
+  // follows the floor across building switches until completion or cancellation.
   overtimeTicks: number;
   overtimeEndedAt?: number | null;
   overtimeGoal?: number;

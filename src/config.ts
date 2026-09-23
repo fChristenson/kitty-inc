@@ -2168,7 +2168,6 @@ export const CONFIG = {
       mega: 4,
       ultra: 4,
     },
-    drainMsPerTick: 500,
   },
 
   // src/hud/boostMenu/index.ts — one-time paid boosts.

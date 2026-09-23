@@ -73,9 +73,7 @@ export function getIncomeBarCenter(isGroundFloor: boolean): {
   return { x: PANEL_X + BAR_INSET + BAR_W / 2, y: barY + BAR_H / 2 };
 }
 
-// whether a floor-local point lands on the income bar itself — only meaningful
-// while the "Work overtime" gauge's drain tail is showing it as clickable (see
-// floorInteractions.ts's isOvertimeDraining-gated click handling)
+// Hit testing for the active overtime bar's two-tap cancellation control.
 export function hitTestIncomeBar(
   x: number,
   y: number,

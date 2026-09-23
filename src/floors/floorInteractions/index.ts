@@ -1697,7 +1697,6 @@ export function handleFloorClick(
           floor.critMultiplierTier = promotedTier;
         }
         endOvertimeActiveWindow(floor, Date.now());
-        floor.overtimeTicks = 0;
       }
       persist();
       triggerButtonPress(floor);

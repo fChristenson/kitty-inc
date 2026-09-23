@@ -4,7 +4,6 @@ import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
 import { registerEventButton } from "./shared";
 
-export const OVERTIME_DRAIN_MS_PER_TICK = CONFIG.overtime.drainMsPerTick;
 const cancellationArmed = new WeakSet<Floor>();
 
 export function getOvertimeTickGoal(floor: Floor): number {
@@ -40,8 +39,10 @@ export function isOvertimeActive(floor: Floor, _now: number): boolean {
 
 export function endOvertimeActiveWindow(floor: Floor, now: number): void {
   if (!isOvertimeActive(floor, now)) return;
-  floor.overtimeGoal ??= getOvertimeTickGoal(floor);
-  floor.overtimeEndedAt = now;
+  floor.overtimeStartedAt = null;
+  floor.overtimeEndedAt = null;
+  floor.overtimeTicks = 0;
+  delete floor.overtimeGoal;
   cancellationArmed.delete(floor);
 }
 
@@ -74,25 +75,11 @@ export function getOvertimeTicks(floor: Floor): number {
 }
 
 export function getOvertimeDisplayTicks(floor: Floor, now: number): number {
-  if (isOvertimeActive(floor, now)) return floor.overtimeTicks;
-  if (floor.overtimeEndedAt == null) return 0;
-  const elapsed = Math.max(0, now - floor.overtimeEndedAt);
-  return Math.max(
-    0,
-    floor.overtimeTicks - elapsed / OVERTIME_DRAIN_MS_PER_TICK,
-  );
+  return isOvertimeActive(floor, now) ? floor.overtimeTicks : 0;
 }
 
 export function isOvertimeGaugeVisible(floor: Floor, now: number): boolean {
-  return (
-    isOvertimeActive(floor, now) || getOvertimeDisplayTicks(floor, now) > 0
-  );
-}
-
-export function isOvertimeDraining(floor: Floor, now: number): boolean {
-  return (
-    !isOvertimeActive(floor, now) && getOvertimeDisplayTicks(floor, now) > 0
-  );
+  return isOvertimeActive(floor, now);
 }
 
 export function getOvertimeFillFraction(floor: Floor, now: number): number {
