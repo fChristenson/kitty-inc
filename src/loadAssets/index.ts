@@ -37,6 +37,9 @@ export type SpriteName = keyof typeof SPRITE_FILES;
 // every flat single-file image this game loads, by logical name -> its filename
 // inside dist/ root — same reasoning as SPRITE_FILES above
 export const IMAGE_FILES = {
+  goldenSkull: "goldenSkull.png",
+  lordOfMurder: "lordOfMurder.png",
+  speedDemon: "speedDemon.png",
   bubbleButt: "bubbleButt.png",
   canNotLie: "canNotLie.png",
   badonkadonk: "badonkadonk.png",

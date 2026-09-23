@@ -75,6 +75,19 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
 
   return {
     ...createElementCritRewards(actions),
+    goldenSkull: (context) => {
+      actions.upgrade([context.floor], balance.goldenSkullUpgrades);
+      actions.payCycles([context.floor], balance.goldenSkullPayouts);
+    },
+    lordOfMurder: (context) => {
+      actions.upgrade(context.floors, balance.lordOfMurderUpgrades);
+      actions.payCycles(context.floors, balance.lordOfMurderPayouts);
+    },
+    speedDemon: (context) => {
+      const floor = selectByRate(context, true);
+      actions.upgrade([floor], balance.speedDemonUpgrades);
+      actions.payCycles([floor], balance.speedDemonPayouts);
+    },
     badonkadonk: (context) => {
       actions.upgrade([context.floor], balance.badonkadonkUpgrades);
       actions.payCycles([context.floor], balance.badonkadonkPayouts);

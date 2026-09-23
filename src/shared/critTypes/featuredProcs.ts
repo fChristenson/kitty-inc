@@ -4,6 +4,24 @@ import { ELEMENT_CRIT_INFO } from "./elementProcs";
 
 export const FEATURED_CRIT_INFO = {
   ...ELEMENT_CRIT_INFO,
+  goldenSkull: {
+    label: "Golden Skull",
+    color: COLOR.gold,
+    icon: "goldenSkull",
+    description: "Thirteen free upgrades, then nineteen payouts on this floor",
+  },
+  lordOfMurder: {
+    label: "Lord of Murder",
+    color: COLOR.red,
+    icon: "lordOfMurder",
+    description: "Eight upgrades, then six payouts on every unlocked floor",
+  },
+  speedDemon: {
+    label: "Speed Demon",
+    color: COLOR.cyan,
+    icon: "speedDemon",
+    description: "Eleven upgrades, then seventeen payouts on the highest-earning floor",
+  },
   badonkadonk: {
     label: "Badonkadonk",
     color: COLOR.gold,

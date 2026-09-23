@@ -62,7 +62,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 648 + elementCritBatch.length);
+  assert.equal(kinds.length, 651 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -246,6 +246,9 @@ try {
   }
 
   const expected = {
+    goldenSkull: [[20, 43, 10, 0], 57],
+    lordOfMurder: [[28, 38, 18, 0], 36],
+    speedDemon: [[20, 41, 10, 0], 51],
     badonkadonk: [[20, 40, 10, 0], 36],
     demoncBuns: [[20, 46, 10, 0], 63],
     infernalInterest: [[20, 50, 10, 0], 81],
@@ -936,6 +939,28 @@ try {
       },
     };
   }
+  for (const triggerIndex of [0, 2]) {
+    const test = fixture();
+    test.context.floor = test.floors[triggerIndex];
+    test.rewards.speedDemon(test.context);
+    assert.deepEqual(
+      test.floors.map((floor) => floor.upgradeCount),
+      [20, 41, 10, 0],
+    );
+    assert.equal(test.income(), 51);
+    assert(test.floors.every((floor) => floor.lastCollectedAt === 123));
+  }
+  {
+    const test = fixture();
+    test.floors[0].rate = test.floors[1].rate;
+    test.context.floor = test.floors[0];
+    test.rewards.speedDemon(test.context);
+    assert.deepEqual(
+      test.floors.map((floor) => floor.upgradeCount),
+      [31, 30, 10, 0],
+    );
+    assert.equal(test.income(), 17);
+  }
   for (const [
     index,
     [source, kind, label, number, sourceExtension = ".jfif"],
@@ -1148,6 +1173,9 @@ try {
   assert(CONFIG.crit.ballerinaChance > CONFIG.crit.bubbleButtChance);
   assert(CONFIG.crit.bubbleButtChance > CONFIG.crit.canNotLieChance);
   const newSourceRewards = [
+    ["goldenSkull", "goldenSkull.jfif", 13, 19],
+    ["lordOfMurder", "lordOfMurder.jfif", 8, 6],
+    ["speedDemon", "speedDemon.jfif", 11, 17],
     ["badonkadonk", "badonkadonk.jfif", 10, 12],
     ["demoncBuns", "demoncBuns.jpg", 16, 21],
     ["infernalInterest", "demoncBuns2.jpg", 20, 27],
@@ -1189,10 +1217,12 @@ try {
       "bubbleButt",
       "badonkadonk",
       "canNotLie",
+      "goldenSkull",
       "demoncBuns",
       "infernalInterest",
     ],
-    ["kittyWagon", "wagonWarrior"],
+    ["kittyWagon", "wagonWarrior", "lordOfMurder"],
+    ["canNotLie", "speedDemon", "goldenSkull"],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(
