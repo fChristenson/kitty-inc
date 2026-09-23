@@ -455,24 +455,77 @@ try {
   }
   const { collectDueIncome, currentIncomeRatePerSecond } =
     await server.ssrLoadModule("/src/floors/incomePanel/index.ts");
+  {
+    const items = await server.ssrLoadModule("/src/hud/upgradeMenu/index.ts");
+    const { increaseIncomeRateBy } = await server.ssrLoadModule(
+      "/src/floors/incomePanel/index.ts",
+    );
+    const costs = [
+      (floor) => floor.upgradeCost,
+      items.getWorkerCost,
+      items.getOfficeChairsCost,
+      items.getOfficeSuppliesCost,
+      items.getManagerCost,
+    ];
+    for (const level of [1, 2, 10, 20]) {
+      for (const upgrades of [0, 10, 50]) {
+        const baseline = buildFloor(level, { backgroundCount: 1 });
+        baseline.unlocked = true;
+        increaseIncomeRateBy(baseline, upgrades);
+        const baselineRate = toNumber(
+          currentIncomeRatePerSecond(baseline, Date.now()),
+        );
+        for (const buildingIndex of [1, 2, 5, 40]) {
+          const floor = buildFloor(level, {
+            backgroundCount: 1,
+            multiplier: getBuildingMultiplier(buildingIndex),
+          });
+          floor.unlocked = true;
+          increaseIncomeRateBy(floor, upgrades);
+          const rate = toNumber(currentIncomeRatePerSecond(floor, Date.now()));
+          for (const getCost of costs) {
+            const expectedSeconds = toNumber(getCost(baseline)) / baselineRate;
+            const actualSeconds = toNumber(getCost(floor)) / rate;
+            assert(
+              Math.abs(actualSeconds / expectedSeconds - 1) < 1e-10,
+              `building ${buildingIndex}, floor ${level}, upgrades ${upgrades}: consistent earning time`,
+            );
+          }
+          const workerPrice = items.getWorkerCost(floor);
+          floor.unlockCost = getBuildingPrice(buildingIndex);
+          assert.deepEqual(
+            items.getWorkerCost(floor),
+            workerPrice,
+            "historical expansion price cannot inflate items",
+          );
+          floor.priceDiscountMultiplier = 0.5;
+          assert.deepEqual(
+            items.getWorkerCost(floor),
+            multiply(workerPrice, 0.5),
+            "item discount applies once",
+          );
+        }
+      }
+    }
+    assert.equal(toNumber(getBuildingPrice(1)), 1e9);
+    assert.equal(toNumber(getBuildingPrice(2)), 1e18);
+    console.log(
+      "PASS: local upgrade/item earning times match across buildings; expansion prices remain unchanged",
+    );
+  }
   for (const buildingIndex of [0, 1, 2, 40]) {
     const floors = createBuilding(buildingIndex, 1);
     const multiplier = getBuildingMultiplier(buildingIndex);
     const deps = { floors, backgroundCount: 1, multiplier, onAdd() {} };
-    const base =
-      buildingIndex === 0
-        ? fromNumber(CONFIG.floors.baseUnlockCost)
-        : multiply(
-            getBuildingPrice(buildingIndex),
-            CONFIG.floors.unlockCostBuildingPriceMultiplier,
-          );
+    const base = multiply(fromNumber(multiplier), CONFIG.floors.baseUnlockCost);
     locks.ensureLockedFloorAbove(deps);
     assert.deepEqual(
       floors[1].unlockCost,
       base,
-      "floor two costs twice the building price",
+      "floor prices scale with the local income economy",
     );
-    if (buildingIndex === 1) assert.equal(toNumber(floors[1].unlockCost), 2e9);
+    if (buildingIndex === 1)
+      assert.equal(toNumber(floors[1].unlockCost), 200000);
     const quote = locks.getBuildingUnlockAllCost(floors, multiplier);
     const { add, ZERO } = await server.ssrLoadModule(
       "/src/shared/bigNumber/index.ts",
@@ -509,15 +562,15 @@ try {
     locks.ensureLockedFloorAbove(deps);
     assert.equal(
       toNumber(floors[1].unlockCost),
-      1e9,
-      "discount applies to building-anchored base",
+      100000,
+      "discount applies to the local floor economy",
     );
     locks.unlockFloor(floors[1]);
     const paidPrice = floors[1].unlockCost;
     locks.ensureLockedFloorAbove(deps);
     assert.equal(
       toNumber(floors[2].unlockCost),
-      2e9,
+      200000,
       "future floors inherit discount once",
     );
     floors[2].unlockCost = fromNumber(123);
@@ -526,7 +579,7 @@ try {
     configureBuildingFloorPrices(floors, 1);
     assert.equal(
       toNumber(floors[2].unlockCost),
-      2e9,
+      200000,
       "restored locked floor is repriced",
     );
     assert.deepEqual(
@@ -542,7 +595,7 @@ try {
     configureBuildingFloorPrices(floors, 1);
     assert.equal(
       toNumber(floors[2].unlockCost),
-      2e9,
+      200000,
       "setup does not compound discounts",
     );
   }

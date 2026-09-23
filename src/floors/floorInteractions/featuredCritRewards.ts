@@ -56,6 +56,14 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
     }
     actions.upgrade([floor], upgrades);
   };
+  const upgradeAndPay = (
+    floors: Floor[],
+    upgrades: number,
+    payouts: number,
+  ) => {
+    actions.upgrade(floors, upgrades);
+    actions.payCycles(floors, payouts);
+  };
   // the same walk applyBounceCrit does: always fall one floor, then roll to
   // keep falling. Returning the targets rather than applying per step keeps it
   // on the cheap bulk-upgrade path the other featured rewards use. On the
@@ -75,6 +83,72 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
 
   return {
     ...createElementCritRewards(actions),
+    circuitDuchess: (context) =>
+      upgradeAndPay(
+        [context.floor],
+        balance.circuitDuchessUpgrades,
+        balance.circuitDuchessPayouts,
+      ),
+    cyberCat: (context) =>
+      upgradeAndPay(
+        context.floors,
+        balance.cyberCatUpgrades,
+        balance.cyberCatPayouts,
+      ),
+    chromeChassis: (context) =>
+      upgradeAndPay(
+        context.floors,
+        balance.chromeChassisUpgrades,
+        balance.chromeChassisPayouts,
+      ),
+    elbowRoom: (context) =>
+      upgradeAndPay(
+        [lowestLevel(context)],
+        balance.elbowRoomUpgrades,
+        balance.elbowRoomPayouts,
+      ),
+    heartware: (context) =>
+      upgradeAndPay(
+        [context.floor],
+        balance.heartwareUpgrades,
+        balance.heartwarePayouts,
+      ),
+    pulseDividend: (context) =>
+      upgradeAndPay(
+        [context.floor],
+        balance.pulseDividendUpgrades,
+        balance.pulseDividendPayouts,
+      ),
+    neonNegotiator: (context) =>
+      upgradeAndPay(
+        [selectByRate(context, true)],
+        balance.neonNegotiatorUpgrades,
+        balance.neonNegotiatorPayouts,
+      ),
+    platinumRefrain: (context) =>
+      upgradeAndPay(
+        context.floors,
+        balance.platinumRefrainUpgrades,
+        balance.platinumRefrainPayouts,
+      ),
+    retinaRoyale: (context) =>
+      upgradeAndPay(
+        [selectByRate(context, true)],
+        balance.retinaRoyaleUpgrades,
+        balance.retinaRoyalePayouts,
+      ),
+    silverHandshake: (context) =>
+      upgradeAndPay(
+        [lowestLevel(context)],
+        balance.silverHandshakeUpgrades,
+        balance.silverHandshakePayouts,
+      ),
+    staticEncore: (context) =>
+      upgradeAndPay(
+        alternating(context),
+        balance.staticEncoreUpgrades,
+        balance.staticEncorePayouts,
+      ),
     goldenSkull: (context) => {
       actions.upgrade([context.floor], balance.goldenSkullUpgrades);
       actions.payCycles([context.floor], balance.goldenSkullPayouts);

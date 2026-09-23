@@ -37,6 +37,17 @@ export type SpriteName = keyof typeof SPRITE_FILES;
 // every flat single-file image this game loads, by logical name -> its filename
 // inside dist/ root — same reasoning as SPRITE_FILES above
 export const IMAGE_FILES = {
+  circuitDuchess: "circuitDuchess.png",
+  cyberCat: "cyberCat.png",
+  chromeChassis: "chromeChassis.png",
+  elbowRoom: "elbowRoom.png",
+  heartware: "heartware.png",
+  pulseDividend: "pulseDividend.png",
+  neonNegotiator: "neonNegotiator.png",
+  platinumRefrain: "platinumRefrain.png",
+  retinaRoyale: "retinaRoyale.png",
+  silverHandshake: "silverHandshake.png",
+  staticEncore: "staticEncore.png",
   goldenSkull: "goldenSkull.png",
   lordOfMurder: "lordOfMurder.png",
   speedDemon: "speedDemon.png",

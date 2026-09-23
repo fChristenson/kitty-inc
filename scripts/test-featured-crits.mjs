@@ -62,7 +62,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 651 + elementCritBatch.length);
+  assert.equal(kinds.length, 662 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -246,6 +246,17 @@ try {
   }
 
   const expected = {
+    circuitDuchess: [[20, 36, 10, 0], 39],
+    cyberCat: [[24, 34, 14, 0], 42],
+    chromeChassis: [[26, 36, 16, 0], 30],
+    elbowRoom: [[20, 30, 19, 0], 16],
+    heartware: [[20, 37, 10, 0], 54],
+    pulseDividend: [[20, 39, 10, 0], 72],
+    neonNegotiator: [[20, 38, 10, 0], 33],
+    platinumRefrain: [[27, 37, 17, 0], 48],
+    retinaRoyale: [[20, 40, 10, 0], 48],
+    silverHandshake: [[20, 30, 14, 0], 12],
+    staticEncore: [[25, 30, 15, 0], 21],
     goldenSkull: [[20, 43, 10, 0], 57],
     lordOfMurder: [[28, 38, 18, 0], 36],
     speedDemon: [[20, 41, 10, 0], 51],
@@ -1173,6 +1184,17 @@ try {
   assert(CONFIG.crit.ballerinaChance > CONFIG.crit.bubbleButtChance);
   assert(CONFIG.crit.bubbleButtChance > CONFIG.crit.canNotLieChance);
   const newSourceRewards = [
+    ["circuitDuchess", "circuitDuchess.jfif", 6, 13],
+    ["cyberCat", "cyberCat.jfif", 4, 7],
+    ["chromeChassis", "elbowRoom.jfif", 6, 5],
+    ["elbowRoom", "elbowRoom2.jfif", 9, 8],
+    ["heartware", "heartware.jfif", 7, 18],
+    ["pulseDividend", "heartware2.jfif", 9, 24],
+    ["neonNegotiator", "neonNegotiator.jfif", 8, 11],
+    ["platinumRefrain", "platinumRefrain.jfif", 7, 8],
+    ["retinaRoyale", "retinaRoyale.jfif", 10, 16],
+    ["silverHandshake", "silverHandshake.jfif", 4, 6],
+    ["staticEncore", "staticEncore.jfif", 5, 7],
     ["goldenSkull", "goldenSkull.jfif", 13, 19],
     ["lordOfMurder", "lordOfMurder.jfif", 8, 6],
     ["speedDemon", "speedDemon.jfif", 11, 17],
@@ -1223,6 +1245,11 @@ try {
     ],
     ["kittyWagon", "wagonWarrior", "lordOfMurder"],
     ["canNotLie", "speedDemon", "goldenSkull"],
+    ["madeYouLook", "circuitDuchess", "heartware", "pulseDividend"],
+    ["neonNegotiator", "retinaRoyale", "speedDemon"],
+    ["silverHandshake", "elbowRoom"],
+    ["kittyWagon", "cyberCat", "platinumRefrain"],
+    ["wagonWarrior", "chromeChassis", "platinumRefrain"],
   ]) {
     for (let index = 1; index < family.length; index++) {
       assert(

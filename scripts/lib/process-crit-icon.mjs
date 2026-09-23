@@ -1,5 +1,6 @@
 import sharp from "sharp";
 import path from "node:path";
+import fs from "node:fs/promises";
 import { dropSmallOpaqueComponents } from "./drop-small-components.mjs";
 import { dropEdgeTouchingComponents } from "./drop-edge-components.mjs";
 import { writeCritSticker } from "./sticker-border.mjs";
@@ -14,6 +15,7 @@ export async function processCritIcon(
     protectedRects = [],
     sourceExtension = ".jfif",
     sourcePath = null,
+    copyToAssetDirectories = false,
     // {left, top, width, height} of the real artwork when the source arrives
     // letterboxed — the border-seeded fill can't start inside a non-white bar
     sourceRect = null,
@@ -202,5 +204,14 @@ export async function processCritIcon(
     .png({ compressionLevel: 9, palette: true })
     .toFile(destination);
   await writeCritSticker(name);
+  if (copyToAssetDirectories) {
+    for (const directory of [
+      assets,
+      path.join(assets, "themes/references/dist"),
+    ]) {
+      await fs.mkdir(directory, { recursive: true });
+      await fs.copyFile(destination, path.join(directory, `${name}.png`));
+    }
+  }
   console.log(`Processed and copied ${name}.png`);
 }

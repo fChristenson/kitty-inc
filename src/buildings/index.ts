@@ -6,7 +6,6 @@ import {
   pow,
   multiply,
   multiplyBig,
-  fromNumber,
 } from "../shared/bigNumber";
 import { CONFIG } from "../config";
 
@@ -35,13 +34,10 @@ export function configureBuildingFloorPrices(
 ): void {
   const ground = floors[0];
   if (!ground) return;
-  const base =
-    buildingIndex === 0
-      ? fromNumber(CONFIG.floors.baseUnlockCost)
-      : multiply(
-          getBuildingPrice(buildingIndex),
-          CONFIG.floors.unlockCostBuildingPriceMultiplier,
-        );
+  const base = multiply(
+    pow(CONFIG.floors.floorEconomyMultiplierPerBuilding, buildingIndex),
+    CONFIG.floors.baseUnlockCost,
+  );
   ground.buildingFloorUnlockBaseCost = base;
   for (let index = 1; index < floors.length; index++) {
     const floor = floors[index];

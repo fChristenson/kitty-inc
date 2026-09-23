@@ -19,45 +19,31 @@ import { CONFIG } from "../../config";
 import { createPollingLoop } from "../../shared/pollingLoop";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import { onTapOrClick } from "../../shared/tapEvents";
-import {
-  type BigNumber,
-  fromNumber,
-  multiply,
-  gt,
-  gte,
-  lt,
-} from "../../shared/bigNumber";
+import { type BigNumber, multiply, gte, lt } from "../../shared/bigNumber";
 
 const officeChairsIconUrl = getImageUrl("officeChairsIcon");
 const officeSuppliesIconUrl = getImageUrl("officeSuppliesIcon");
 const skyscraperIconUrl = getImageUrl("skyscraper");
 
-// floor 1's unlockCost is permanently 0 (always free to unlock), so worker pricing
-// needs its own floor price for it instead of reading straight from unlockCost
 const WORKER_BASE_PRICE_FLOOR_1 = CONFIG.upgradeMenu.workerBasePriceFloor1;
 
 function getFloorPrice(floor: Floor): BigNumber {
-  const base = gt(floor.unlockCost, fromNumber(0))
-    ? floor.unlockCost
-    : fromNumber(WORKER_BASE_PRICE_FLOOR_1);
+  const base = multiply(
+    floor.rateStep,
+    WORKER_BASE_PRICE_FLOOR_1 / CONFIG.floors.baseRateStep,
+  );
   // "seasonal sale" crits (see shared/critTypes' SEASONAL_SALE_DISCOUNT_
   // MULTIPLIER) permanently discount this floor's own worker/office chairs/
   // supplies/manager costs, all of which derive from this one price
   return multiply(base, floor.priceDiscountMultiplier);
 }
 
-// the $ cost of a floor's next worker: its floor price (unlock cost, or the floor-1
-// fallback above) times how many workers it already has
+// The next worker costs the floor's income-scaled item price times its worker count.
 export function getWorkerCost(floor: Floor): BigNumber {
   return multiply(getFloorPrice(floor), floor.workerCount);
 }
 
-// $ actually PAID to reach this floor's current workerCount (not the cost of the
-// NEXT one, see getWorkerCost above) — buying the Nth worker cost
-// floorPrice*(N-1) at the time, so cumulative spend is that arithmetic series'
-// sum. Every floor starts with 1 free worker, so only workerCount-1 were ever
-// bought. Used by corporationBoostMenu's company-value calc, which needs real
-// money invested rather than the price of a purchase that hasn't happened yet
+// Values owned workers at the current price schedule; historical prices are not stored.
 export function getWorkersInvestedValue(floor: Floor): BigNumber {
   const bought = Math.max(0, floor.workerCount - 1);
   return multiply(getFloorPrice(floor), (bought * (bought + 1)) / 2);
