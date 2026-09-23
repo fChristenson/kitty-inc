@@ -62,7 +62,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 637 + elementCritBatch.length);
+  assert.equal(kinds.length, 638 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -246,6 +246,7 @@ try {
   }
 
   const expected = {
+    nucleusDividend: [[26, 36, 16, 0], 12],
     ...Object.fromEntries(
       elementCritBatch.map(([, kind, , number]) => [
         kind,
@@ -1035,6 +1036,14 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {
+    const nucleusTest = fixture();
+    nucleusTest.context.floor.upgradeCount = level;
+    nucleusTest.context.floor.critMultiplierTier = "ultra";
+    nucleusTest.rewards.nucleusDividend(nucleusTest.context);
+    assert.deepEqual(nucleusTest.floors.map((floor) => floor.upgradeCount), [26, level + 6, 16, 0]);
+    assert.equal(nucleusTest.income(), 12);
+    assert.equal(nucleusTest.context.floor.critMultiplierTier, "ultra");
+    assert(nucleusTest.floors.every((floor) => floor.lastCollectedAt === 123));
     const test = fixture();
     test.context.floor.upgradeCount = level;
     test.rewards.milestone(test.context);
@@ -1059,6 +1068,24 @@ try {
       test.income() > 0 || test.context.floor.upgradeCount > 20,
       `${kind}: no single-floor reward`,
     );
+    if (kind === "nucleusDividend") {
+      assert.equal(test.context.floor.upgradeCount, 26);
+      assert.equal(test.income(), 4);
+    }
+  }
+  assert.equal(CONFIG.crit.nucleusDividendUpgrades, 6);
+  assert.equal(CONFIG.crit.nucleusDividendPayouts, 4);
+  assert(CONFIG.crit.nucleusDividendChance > CONFIG.crit.sugarHighChance);
+  assert(!MAP_CRIT_TEST_KINDS.includes("nucleusDividend"));
+  const nucleusIcon = await readFile("public/nucleusDividend.png");
+  assert(nucleusIcon.equals(await readFile("src/assets/nucleusDividend.png")));
+  assert(nucleusIcon.equals(await readFile("src/assets/themes/references/dist/nucleusDividend.png")));
+  const newAssetKinds = ["nucleusDividend", ...elementCritBatch
+    .filter(([, , , number]) => [76, 77, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 93, 95, 96, 97].includes(number))
+    .map(([, kind]) => kind)];
+  for (const kind of newAssetKinds) {
+    const silhouette = await sharp(`public/silhouettes/${kind}.png`).metadata();
+    assert(silhouette.width <= 250 && silhouette.height <= 250 && silhouette.hasAlpha && silhouette.isPalette);
   }
   for (const kind of ["blessed", "wizard"]) {
     for (const tier of [null, "crit", "mega", "ultra"]) {

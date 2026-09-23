@@ -102,19 +102,22 @@ Use the batch catalog pattern even when adding one proc. Legacy `X_CRIT_*` const
 4. Process the icon and register its shipped PNG in `loadAssets/IMAGE_FILES`. Metadata supplies generic flash, collection menu, and test button behavior.
 5. Preserve one test button per proc plus Regular Crit in `hud/testButton/critTestActions.ts`, using shared event, tier, bonus-tier, and `forceTestCrit` controls. Never reintroduce separate Spawn, Floor, Map, Mega, or Ultra buttons for each proc.
 6. Map testing must show only procs with actual map rewards. Update `MAP_CRIT_TEST_KINDS` only when map support is implemented, and keep the map bonus-tier selector disabled until such rewards exist.
-7. Extend the existing regression script and write the batch report below.
+7. Extend the existing regression script.
 
 Never bypass `MAX_SPECIAL_CRIT_PROCS`'s cap-then-random-pick path.
+
+Keep crit effects documented in their canonical `CRIT_PROC_INFO` descriptions,
+consistent with the reward handlers. Do not create or update separate crit
+reports, batch reports, or effect documentation unless explicitly requested.
 
 ### Processing a batch
 
 1. Inventory supplied raw assets against the current registry and processing scripts. Account for every requested asset, including explicitly excluded ones.
-2. Compare proposed rewards against `CRIT_PROC_INFO`, handlers, and documentation. Assign unique names and distinct reward values or targets.
+2. Compare proposed rewards against `CRIT_PROC_INFO` descriptions and reward handlers. Assign unique names and distinct reward values or targets.
 3. Sample actual background pixels and make a labeled, ordered contact sheet. Group only images suited to the same removal technique. Use dedicated `process-<image>.mjs` wrappers around `scripts/lib/process-crit-icon.mjs` when compatible.
 4. Run wrappers. The shared processor removes border-connected background, drops tiny components, tight-crops, caps at 250x250, writes a quantized PNG, and copies it to `themes/references/dist`. Preserve raw sources unless removal is requested.
 5. Inspect every processed icon on a contrasting background. Verify enclosed light details, disconnected real pieces, outlines, feet, crop bounds, dimensions, alpha, indexed palette, and identical root/shipped copies.
 6. Integrate and validate in small slices. Complete metadata, rewards, shipped icons, and generated test controls for every entry before calling the batch done. Do not change unrelated existing crit balance.
-e whole table.
 
 ### Batch verification
 
@@ -138,7 +141,7 @@ renaming an existing crit.
 
 Crit rewards must always be positive and provide instant gratification. Crits can share an effect when their names and values are distinct. Crit rewards should not be delayed or require special actions to be realized.
 
-Before accepting a suggestion, compare it against the canonical `CRIT_PROC_INFO` table and current crit documentation. If it overlaps an existing proc, revise the target or effect until the distinction is explicit and useful.
+Before accepting a suggestion, compare it against the canonical `CRIT_PROC_INFO` descriptions and reward handlers. If it overlaps an existing proc, revise the target or effect until the distinction is explicit and useful.
 
 ### Odds must be proportional to the reward
 

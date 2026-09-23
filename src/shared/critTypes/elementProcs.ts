@@ -2,6 +2,114 @@ import type { CritProcDisplayInfo } from "./index";
 import { COLOR } from "../../palette";
 
 export const ELEMENT_CRIT_INFO = {
+  osmiumRegalia: {
+    label: "Osmium Regalia",
+    color: COLOR.silverTicketGray,
+    icon: "osmiumRegalia",
+    description: "76 upgrades here and 76 payouts on the highest floor",
+  },
+  iridiumAegis: {
+    label: "Iridium Aegis",
+    color: COLOR.cyan,
+    icon: "iridiumAegis",
+    description: "77 upgrades here and 77 payouts on the highest floor",
+  },
+  mercuryFlow: {
+    label: "Mercury Flow",
+    color: COLOR.blue,
+    icon: "mercuryFlow",
+    description: "80 upgrades here and 80 payouts on the highest floor",
+  },
+  thalliumThrive: {
+    label: "Thallium Thrive",
+    color: COLOR.moneyGreen,
+    icon: "thalliumThrive",
+    description: "81 upgrades here and 81 payouts on the highest floor",
+  },
+  leadLode: {
+    label: "Lead Lode",
+    color: COLOR.gold,
+    icon: "leadLode",
+    description: "82 upgrades here and 82 payouts on the highest floor",
+  },
+  bismuthBastion: {
+    label: "Bismuth Bastion",
+    color: COLOR.peppermintPink,
+    icon: "bismuthBastion",
+    description: "83 upgrades here and 83 payouts on the highest floor",
+  },
+  poloniumPrism: {
+    label: "Polonium Prism",
+    color: COLOR.red,
+    icon: "poloniumPrism",
+    description: "84 upgrades here and 84 payouts on the highest floor",
+  },
+  astatineAurora: {
+    label: "Astatine Aurora",
+    color: COLOR.mysticTeal,
+    icon: "astatineAurora",
+    description: "85 upgrades here and 85 payouts on the highest floor",
+  },
+  radonRipple: {
+    label: "Radon Ripple",
+    color: COLOR.silverTicketGray,
+    icon: "radonRipple",
+    description: "86 upgrades here and 86 payouts on the highest floor",
+  },
+  franciumFortune: {
+    label: "Francium Fortune",
+    color: COLOR.cyan,
+    icon: "franciumFortune",
+    description: "87 upgrades here and 87 payouts on the highest floor",
+  },
+  radiumRhythm: {
+    label: "Radium Rhythm",
+    color: COLOR.blue,
+    icon: "radiumRhythm",
+    description: "88 upgrades here and 88 payouts on the highest floor",
+  },
+  actiniumArc: {
+    label: "Actinium Arc",
+    color: COLOR.moneyGreen,
+    icon: "actiniumArc",
+    description: "89 upgrades here and 89 payouts on the highest floor",
+  },
+  thoriumThrone: {
+    label: "Thorium Throne",
+    color: COLOR.gold,
+    icon: "thoriumThrone",
+    description: "90 upgrades here and 90 payouts on the highest floor",
+  },
+  protactiniumOrbit: {
+    label: "Protactinium Orbit",
+    color: COLOR.peppermintPink,
+    icon: "protactiniumOrbit",
+    description: "91 upgrades here and 91 payouts on the highest floor",
+  },
+  neptuniumNova: {
+    label: "Neptunium Nova",
+    color: COLOR.red,
+    icon: "neptuniumNova",
+    description: "93 upgrades here and 93 payouts on the highest floor",
+  },
+  americiumAlarm: {
+    label: "Americium Alarm",
+    color: COLOR.mysticTeal,
+    icon: "americiumAlarm",
+    description: "95 upgrades here and 95 payouts on the highest floor",
+  },
+  curiumCrucible: {
+    label: "Curium Crucible",
+    color: COLOR.silverTicketGray,
+    icon: "curiumCrucible",
+    description: "96 upgrades here and 96 payouts on the highest floor",
+  },
+  berkeliumBreakthrough: {
+    label: "Berkelium Breakthrough",
+    color: COLOR.cyan,
+    icon: "berkeliumBreakthrough",
+    description: "97 upgrades here and 97 payouts on the highest floor",
+  },
   hydrogenHype: {
     label: "Hydrogen Hype",
     color: COLOR.blue,
@@ -447,7 +555,7 @@ export const ELEMENT_CRIT_INFO = {
     description: "78 upgrades here and 78 payouts on the highest floor",
   },
   goldenAtom: {
-    label: "Golden Atom",
+    label: "Gold Atom",
     color: COLOR.moneyGreen,
     icon: "goldenAtom",
     description: "79 upgrades here and 79 payouts on the highest floor",

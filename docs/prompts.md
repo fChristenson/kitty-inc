@@ -5,13 +5,6 @@
 - Flat vector cartoon of a plutonium reactor core with ninety-four contained orange electron rings, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean educational game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 
 
-
-
-
-
-
-- Flat vector cartoon of a californium starburst crystal with ninety-eight glowing electron rings, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean educational game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
-- Flat vector cartoon of an einsteinium brain-shaped atom with ninety-nine sparkling electron dots, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean educational game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 - Flat vector cartoon of a fermium laboratory flask atom with one hundred glowing orbital sparks, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean educational game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 - Flat vector cartoon of a mendelevium periodic-table crown with one hundred one electron trails, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean educational game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.
 - Flat vector cartoon of a nobelium medal atom with one hundred two shining electron sparks, bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean educational game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text.

@@ -4,6 +4,12 @@ import { ELEMENT_CRIT_INFO } from "./elementProcs";
 
 export const FEATURED_CRIT_INFO = {
   ...ELEMENT_CRIT_INFO,
+  nucleusDividend: {
+    label: "Nucleus Dividend",
+    color: COLOR.cyan,
+    icon: "nucleusDividend",
+    description: "Six upgrades on every unlocked floor and four payouts here",
+  },
   ballerina: {
     label: "Pirouette",
     color: COLOR.peppermintPink,

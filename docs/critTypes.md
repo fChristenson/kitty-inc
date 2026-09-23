@@ -1,5 +1,14 @@
 # Crit ideas
 
+## Implemented asset batch: 2026-09-23 (heavy elements and Nucleus)
+
+Added 18 element crits from Osmium through Berkelium, plus Nucleus Dividend.
+Element labels include the actual element name. Element rewards continue the
+existing atomic-number upgrade/payout family; Nucleus has a distinct
+building-wide upgrade and single-floor payout reward. Specials remain
+manual-only. See [the batch report](element-crit-batch-2026-09-23.md) for all
+source mappings, odds, processing details, and verification results.
+
 ## Manual-only special crits
 
 Special procs, bonus-tier payouts, and collectible badges are available only
