@@ -246,9 +246,12 @@ try {
   }
 
   const expected = {
-    ...Object.fromEntries(elementCritBatch.map(([, kind, , number]) =>
-      [kind, [[20, 30 + number, 10, 0], 2 * number]],
-    )),
+    ...Object.fromEntries(
+      elementCritBatch.map(([, kind, , number]) => [
+        kind,
+        [[20, 30 + number, 10, 0], 2 * number],
+      ]),
+    ),
     ballerina: [[20, 33, 10, 0], 9],
     cowboy: [[20, 30, 18, 0], 0],
     dinnerTime: [[20, 30, 10, 0], 30],
@@ -922,22 +925,46 @@ try {
       },
     };
   }
-  for (const [index, [source, kind, label, number]] of elementCritBatch.entries()) {
-    const elementName = source === "phosphor"
-      ? "Phosphorus"
-      : source[0].toUpperCase() + source.slice(1);
-    assert(label.split(/[^A-Za-z]+/).includes(elementName), `${kind}: label must include the element name`);
+  for (const [
+    index,
+    [source, kind, label, number],
+  ] of elementCritBatch.entries()) {
+    const elementName =
+      source === "phosphor"
+        ? "Phosphorus"
+        : source[0].toUpperCase() + source.slice(1);
+    assert(
+      label.split(/[^A-Za-z]+/).includes(elementName),
+      `${kind}: label must include the element name`,
+    );
     assert.equal(crit.CRIT_PROC_INFO[kind].label, label);
     assert.equal(CONFIG.crit[`${kind}Upgrades`], number);
     assert.equal(CONFIG.crit[`${kind}Payouts`], number);
-    assert(!MAP_CRIT_TEST_KINDS.includes(kind), `${kind}: no unimplemented map reward`);
-    if (index > 0) assert(crit.getCritProcChance(elementCritBatch[index - 1][1]) > crit.getCritProcChance(kind));
+    assert(
+      !MAP_CRIT_TEST_KINDS.includes(kind),
+      `${kind}: no unimplemented map reward`,
+    );
+    if (index > 0)
+      assert(
+        crit.getCritProcChance(elementCritBatch[index - 1][1]) >
+          crit.getCritProcChance(kind),
+      );
     const root = await readFile(`src/assets/${kind}.png`);
     assert(root.equals(await readFile(`public/${kind}.png`)));
-    assert(root.equals(await readFile(`src/assets/themes/references/dist/${kind}.png`)));
+    assert(
+      root.equals(
+        await readFile(`src/assets/themes/references/dist/${kind}.png`),
+      ),
+    );
     assert((await readFile(`src/assets/${source}.jfif`)).length > 0);
-    const { data, info } = await sharp(root).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-    assert(data.some((value, offset) => offset % info.channels === 3 && value === 0), `${kind}: background not transparent`);
+    const { data, info } = await sharp(root)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    assert(
+      data.some((value, offset) => offset % info.channels === 3 && value === 0),
+      `${kind}: background not transparent`,
+    );
     for (const level of [0, 9, 10, 49, 50]) {
       const test = fixture();
       test.floors.splice(1);
