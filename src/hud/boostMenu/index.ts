@@ -14,6 +14,7 @@ import {
   triggerJumpAll,
   triggerSaleBoost,
   triggerOvertimeBoost,
+  isOvertimeActive,
   currentPayoutAmount,
 } from "../../floors";
 import { baseIncomeRatePerSecond as floorIncomePerSecond } from "../../shared/income";
@@ -100,9 +101,6 @@ export function buySaleBoost(floors: Floor[]): Floor | null {
   return floor;
 }
 
-// same pricing as the Sale boost — both are "pick a random unlocked floor and put
-// it in a temporary 15s spotlight state" purchases (see floors/upgradeButton's
-// triggerOvertimeBoost/OVERTIME_DURATION_MS)
 export function getOvertimeBoostCost(floors: Floor[]): BigNumber {
   return getSaleBoostCost(floors);
 }
@@ -114,12 +112,13 @@ export function getOvertimeBoostCost(floors: Floor[]): BigNumber {
 // is fully blocked (not just "too expensive") once every floor is maxed
 function getOvertimeEligibleFloors(floors: Floor[]): Floor[] {
   return floors.filter(
-    (floor) => floor.unlocked && floor.critMultiplierTier !== "ultra",
+    (floor) => floor.unlocked && floor.critMultiplierTier !== "ultra" &&
+      !isOvertimeActive(floor, Date.now()),
   );
 }
 
 // buys the "Work overtime" boost: spends the cost, then puts one random ELIGIBLE
-// floor's upgrade button into its own 15s overtime event (see
+// floor's upgrade button into its own overtime event (see
 // floors/upgradeButton's triggerOvertimeBoost). Returns the floor the event
 // landed on (so the caller can e.g. scroll to it), or null (refunding nothing
 // spent) if there's no eligible floor to target yet

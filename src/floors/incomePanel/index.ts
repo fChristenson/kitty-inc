@@ -4,11 +4,10 @@ import { MAX_RENDERED_WORKERS } from "../worker";
 import {
   CRIT_TIER_CONFIG,
   isOvertimeGaugeVisible,
-  isOvertimeDraining,
+  isOvertimeCancelArmed,
   getOvertimeFillFraction,
   getOvertimeDisplayTicks,
-  getOvertimeTickGoal,
-  getOvertimeCost,
+  getOvertimeDisplayGoal,
   isFrozenActive,
   isSpendingFreezeActive,
   isRushHourActive,
@@ -18,7 +17,6 @@ import {
   getPriceMatchCost,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
-import { getTotalIncome } from "../../totalIncome";
 import {
   officeUpgradeSpeedMultiplier,
   effectiveIncomeCycle as sharedEffectiveIncomeCycle,
@@ -31,7 +29,6 @@ import {
   add,
   multiply,
   multiplyBig,
-  gte,
   pow,
 } from "../../shared/bigNumber";
 import {
@@ -371,7 +368,7 @@ function formatStaticIncomeRate(floor: Floor, now: number): string {
 // Reads the same drain-aware value/goal the bar's own fill fraction uses, so the
 // number (and its own max) tick down/scale in lockstep with the bar itself
 function formatOvertimeProgress(floor: Floor, now: number): string {
-  return `${Math.floor(getOvertimeDisplayTicks(floor, now))}/${getOvertimeTickGoal(floor)}`;
+  return `${Math.floor(getOvertimeDisplayTicks(floor, now))}/${getOvertimeDisplayGoal(floor)}`;
 }
 
 // the overtime gauge's own fill look: a two-color gradient spanning the WHOLE
@@ -534,28 +531,14 @@ export function drawIncomePanel(
 
   const now = Date.now();
   const timerNow = now;
-  // "Work overtime" boost (see floors/upgradeButton) takes over this floor's whole
-  // bar — a filling gauge instead of the normal payout-cycle fill — for its own
-  // 15s duration, then keeps showing the gauge a little longer while it ticks
-  // back down to 0, before this floor's bar finally reverts to normal
   const overtimeGaugeVisible =
     floor.unlocked && isOvertimeGaugeVisible(floor, now);
-  // during that drain tail specifically (not the initial 15s window), the bar
-  // wiggles like the overtime button itself and becomes clickable (see
-  // floorInteractions.ts) to re-trigger another event on this same floor for the
-  // same cost, letting several chained events fill the gauge all the way — only
-  // wiggles while the player could actually act on it (affordable, and this
-  // floor isn't already maxed at ultra with no further tier to reach)
-  const draining =
-    floor.unlocked &&
-    floor.critMultiplierTier !== "ultra" &&
-    isOvertimeDraining(floor, now) &&
-    gte(getTotalIncome(), getOvertimeCost(floor));
+  const cancellationArmed = isOvertimeCancelArmed(floor, now);
 
   ctx.save();
   const barCenter = getIncomeBarCenter(isGroundFloor);
   ctx.translate(barCenter.x, barCenter.y);
-  if (draining) ctx.rotate(getWiggleRotation(now));
+  if (cancellationArmed) ctx.rotate(getWiggleRotation(now));
   const pressScale = incomeBarPressScale(floor, now);
   ctx.scale(pressScale, pressScale);
   ctx.translate(-barCenter.x, -barCenter.y);

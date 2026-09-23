@@ -224,6 +224,7 @@ export function buildFloor(
     aboveCapTier,
     overtimeTicks: 0,
     overtimeStartedAt: null,
+    overtimeEndedAt: null,
     overtimeCost: ZERO,
     priceDiscountMultiplier,
   };

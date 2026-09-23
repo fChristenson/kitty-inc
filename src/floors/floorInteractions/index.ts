@@ -48,13 +48,11 @@ import {
   FANCY_FRIDAY_CRIT_UPGRADES,
   DOUBLE_DOWN_CRIT_REPEATS,
   endOvertimeActiveWindow,
-  isOvertimeDraining,
-  getOvertimeCost,
-  retriggerOvertimeBoost,
+  canCancelOvertime,
+  tapOvertimeBar,
   addOvertimeTicks,
   getOvertimeTicks,
   getOvertimeTickGoal,
-  resetOvertimeTicks,
   isUpgradeButtonEnabled,
   type CritTier,
   CRIT_TIER_CONFIG,
@@ -75,7 +73,6 @@ import {
   increaseIncomeRateBy,
   UPGRADE_MILESTONE_STEP,
   hitTestIncomeBar,
-  getIncomeBarCenter,
   triggerIncomeBarPress,
   currentPayoutAmount,
   currentIncomeRatePerSecond,
@@ -325,19 +322,6 @@ export interface FloorActionsDeps {
 // this file just reuses it for hitTestFloorHover below
 export { isUpgradeButtonEnabled };
 
-// whether the drain-tail bar (see hitTestIncomeBar) can be clicked to re-trigger
-// another event on this floor right now — an already-ultra (125x) floor has no
-// next crit tier left to promote it to, so the event can't spawn/re-spawn there
-// at all once it's reached that cap (shared by hitTestFloorHover and the actual
-// click handling below, so the cursor and the click agree)
-function canRetriggerOvertime(floor: Floor, now: number): boolean {
-  return (
-    floor.unlocked &&
-    floor.critMultiplierTier !== "ultra" &&
-    isOvertimeDraining(floor, now)
-  );
-}
-
 // whether a floor-local point lands on anything hoverable (cursor should be "pointer")
 export function hitTestFloorHover(
   x: number,
@@ -349,7 +333,7 @@ export function hitTestFloorHover(
     (hitTestUpgradeButton(x, y, isGroundFloor) &&
       floor.unlocked &&
       isUpgradeButtonEnabled(floor)) ||
-    (canRetriggerOvertime(floor, Date.now()) &&
+    (canCancelOvertime(floor, Date.now()) &&
       hitTestIncomeBar(x, y, isGroundFloor)) ||
     hitTestFloorLock(x, y, floor) ||
     hitTestUpgradeArrow(x, y, floor) ||
@@ -1573,24 +1557,13 @@ export function handleFloorClick(
     getScreenCenterLocal,
   } = deps;
 
-  // "Work overtime" boost's drain tail (see floors/upgradeButton): while the
-  // gauge is ticking back down, the bar itself wiggles and becomes clickable —
-  // paying the SAME cost the original purchase did re-triggers another event on
-  // this SAME floor, letting several chained events fill the gauge all the way
-  // (blocked once this floor's already ultra — see canRetriggerOvertime above)
   if (
-    canRetriggerOvertime(floor, Date.now()) &&
+    canCancelOvertime(floor, Date.now()) &&
     hitTestIncomeBar(x, y, isGroundFloor)
   ) {
-    const cost = getOvertimeCost(floor);
-    if (spendTotalIncome(cost)) {
-      retriggerOvertimeBoost(floor, Date.now());
-      persist();
-      playSold();
-      triggerIncomeBarPress(floor);
-      const center = getIncomeBarCenter(isGroundFloor);
-      spawnCoinBurst(floor, center.x, center.y, () => {});
-    }
+    tapOvertimeBar(floor, Date.now());
+    persist();
+    triggerIncomeBarPress(floor);
     return;
   }
 
@@ -1689,13 +1662,14 @@ export function handleFloorClick(
       rollCritUpgrade(floor, false);
       // filling the gauge all the way promotes this floor's own PERMANENT crit
       // tier one step (null -> crit -> mega -> ultra, capped at ultra) and ends
-      // the event early instead of waiting out the rest of its own 15s — only
+      // the event once the gauge is filled — only
       // fires the instant it crosses the goal, not on every click while already
       // maxed, so a long drain-tail re-trigger chain can't over-promote past ultra
       let goalReached = false;
       const goal = getOvertimeTickGoal(floor);
       if (ticksBefore < goal && getOvertimeTicks(floor) >= goal) {
         goalReached = true;
+        floor.overtimeGoal = goal;
         const previousTier = floor.critMultiplierTier;
         const promotedTier = nextCritTier(previousTier);
         if (promotedTier !== previousTier) {
@@ -1724,9 +1698,7 @@ export function handleFloorClick(
           floor.critMultiplierTier = promotedTier;
         }
         endOvertimeActiveWindow(floor, Date.now());
-        // bar starts at 0 again for the new (bigger) tier's own goal, instead of
-        // draining down from the just-maxed value against it
-        resetOvertimeTicks(floor);
+        floor.overtimeTicks = 0;
       }
       persist();
       triggerButtonPress(floor);

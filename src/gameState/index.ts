@@ -1,4 +1,5 @@
 import { snapshotMap } from "../shared/snapshotState";
+import { CONFIG } from "../config";
 import { companyStorageKey } from "../company";
 import {
   type BigNumber,
@@ -98,6 +99,8 @@ export interface Floor {
   // from (overtimeTicks, overtimeStartedAt, now) so it correctly keeps draining
   // across however long the app was actually closed, same as idle income above
   overtimeTicks: number;
+  overtimeEndedAt?: number | null;
+  overtimeGoal?: number;
   overtimeStartedAt: number | null; // Date.now() ms the CURRENT run's window started; null = no run yet
   overtimeCost: BigNumber; // $ paid for the CURRENT run; ZERO if never triggered
   // permanent per-floor price multiplier (default 1), permanently multiplied
@@ -399,6 +402,8 @@ interface SavedFloor {
   critMultiplierTier?: CritTier | null; // added after initial release; older saves default to null on load
   aboveCapTier?: boolean; // added after initial release; older saves default to false on load
   overtimeTicks?: number; // added after initial release; older saves default to 0 on load
+  overtimeEndedAt?: number | null;
+  overtimeGoal?: number;
   overtimeStartedAt?: number | null; // added after initial release; older saves default to null on load
   overtimeCost?: SerializedBigNumber; // added after initial release; older saves default to ZERO on load
   priceDiscountMultiplier?: number; // added after initial release; older saves default to 1 on load
@@ -436,6 +441,8 @@ function toSavedFloor(floor: Floor): SavedFloor {
     critMultiplierTier: floor.critMultiplierTier,
     aboveCapTier: floor.aboveCapTier,
     overtimeTicks: floor.overtimeTicks,
+    overtimeEndedAt: floor.overtimeEndedAt,
+    overtimeGoal: floor.overtimeGoal,
     overtimeStartedAt: floor.overtimeStartedAt,
     overtimeCost: floor.overtimeCost,
     priceDiscountMultiplier: floor.priceDiscountMultiplier,
@@ -493,6 +500,11 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     critMultiplierTier: sf.critMultiplierTier ?? null,
     aboveCapTier: sf.aboveCapTier ?? false,
     overtimeTicks: sf.overtimeTicks ?? 0,
+    overtimeEndedAt: sf.overtimeEndedAt === undefined && sf.overtimeStartedAt != null &&
+      Date.now() >= sf.overtimeStartedAt + CONFIG.overtime.legacyDurationMs
+      ? sf.overtimeStartedAt + CONFIG.overtime.legacyDurationMs
+      : sf.overtimeEndedAt ?? null,
+    overtimeGoal: sf.overtimeGoal,
     overtimeStartedAt: sf.overtimeStartedAt ?? null,
     overtimeCost:
       sf.overtimeCost !== undefined ? toBigNumber(sf.overtimeCost) : ZERO,
