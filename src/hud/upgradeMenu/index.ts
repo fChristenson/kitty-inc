@@ -1,7 +1,6 @@
 import { getCritTier, getUpgradeCost } from "../../floors";
 import type { RenovationPlan } from "../../shared/buildingJob";
 import { isFloorLocked } from "../../shared/detachedJob";
-import { formatPrice } from "../../utils";
 import type { Floor } from "../../gameState";
 import {
   triggerButtonPress,
@@ -305,7 +304,7 @@ function renovateFloorsItemMarkup(
         <img src="${skyscraperIconUrl}" class="worker-menu__icon worker-menu__icon--skyscraper" alt="" />
         Renovate floors
       </span>
-      <span class="worker-menu__price">${formatPrice(plan.cost)} (x${plan.count})</span>
+      <span class="worker-menu__price">x${plan.count}</span>
     </button>
   `;
 }
