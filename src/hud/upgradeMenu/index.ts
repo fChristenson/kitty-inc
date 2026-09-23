@@ -1,3 +1,7 @@
+import { getCritTier, getUpgradeCost } from "../../floors";
+import type { RenovationPlan } from "../../shared/buildingJob";
+import { isFloorLocked } from "../../shared/detachedJob";
+import { formatPrice } from "../../utils";
 import type { Floor } from "../../gameState";
 import {
   triggerButtonPress,
@@ -9,8 +13,6 @@ import {
   MAX_RENDERED_WORKERS,
   getWorkerIconUrl,
   getManagerIconUrl,
-  increaseIncomeRate,
-  rollCritUpgrade,
 } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
@@ -22,7 +24,6 @@ import {
   type BigNumber,
   fromNumber,
   multiply,
-  subtract,
   gt,
   gte,
   lt,
@@ -73,6 +74,7 @@ function getThirdWorkerCost(floor: Floor): BigNumber {
 // buys one more worker for the floor if affordable; returns whether it succeeded. capped
 // at MAX_RENDERED_WORKERS since only that many little figures can ever be drawn per floor
 export function buyWorker(floor: Floor): boolean {
+  if (isFloorLocked(floor)) return false;
   if (floor.workerCount >= MAX_RENDERED_WORKERS) return false;
   if (!spendTotalIncome(getWorkerCost(floor))) return false;
   floor.workerCount += 1;
@@ -88,6 +90,7 @@ export function getOfficeChairsCost(floor: Floor): BigNumber {
 }
 
 export function buyOfficeChairs(floor: Floor): boolean {
+  if (isFloorLocked(floor)) return false;
   if (floor.hasOfficeChairs) return false;
   if (!spendTotalIncome(getOfficeChairsCost(floor))) return false;
   floor.hasOfficeChairs = true;
@@ -101,6 +104,7 @@ export function getOfficeSuppliesCost(floor: Floor): BigNumber {
 }
 
 export function buyOfficeSupplies(floor: Floor): boolean {
+  if (isFloorLocked(floor)) return false;
   if (floor.hasOfficeSupplies) return false;
   if (!spendTotalIncome(getOfficeSuppliesCost(floor))) return false;
   floor.hasOfficeSupplies = true;
@@ -124,6 +128,7 @@ export function isManagerUnlocked(floor: Floor): boolean {
 }
 
 export function buyManager(floor: Floor): boolean {
+  if (isFloorLocked(floor)) return false;
   if (floor.hasManager || !isManagerUnlocked(floor)) return false;
   if (!spendTotalIncome(getManagerCost(floor))) return false;
   floor.hasManager = true;
@@ -176,57 +181,14 @@ function massHireWorkers(floors: Floor[]): boolean {
   return boughtAny;
 }
 
-// the unlocked floor whose own upgradeCost is currently lowest across the whole
-// building — unlike massBuyOneTime/massHireWorkers, a floor's upgradeCost keeps
-// climbing every time it's bought (see incomePanel.ts's increaseIncomeRate), so
-// the cheapest floor can change from one purchase to the next
-function getCheapestUpgradeFloor(floors: Floor[]): Floor | null {
-  const unlocked = floors.filter((floor) => floor.unlocked);
-  if (unlocked.length === 0) return null;
-  return unlocked.reduce((cheapest, floor) =>
-    lt(floor.upgradeCost, cheapest.upgradeCost) ? floor : cheapest,
+function canRenovateFloors(floors: Floor[]): boolean {
+  if (floors.some(isFloorLocked)) return false;
+  const money = getTotalIncome();
+  return floors.some(
+    (floor) =>
+      floor.unlocked &&
+      (getCritTier(floor) !== null || !lt(money, getUpgradeCost(floor))),
   );
-}
-
-// "Renovate floors": repeatedly buys whichever unlocked floor's upgrade is
-// currently cheapest (re-picked after every purchase, since that same floor's
-// cost just rose), across the whole building, until the cheapest one left is no
-// longer affordable
-function massRenovateFloors(floors: Floor[]): boolean {
-  let boughtAny = false;
-  for (;;) {
-    const cheapest = getCheapestUpgradeFloor(floors);
-    if (!cheapest || !spendTotalIncome(cheapest.upgradeCost)) break;
-    increaseIncomeRate(cheapest);
-    rollCritUpgrade(cheapest);
-    boughtAny = true;
-  }
-  return boughtAny;
-}
-
-// pure preview of how many upgrades massRenovateFloors would actually buy right
-// now, for the button's own "x N" label -- runs the identical cheapest-first
-// loop against shallow clones of the unlocked floors (increaseIncomeRate only
-// ever reassigns a clone's own top-level fields, never mutates a shared nested
-// object, so cloning is enough to keep this from touching the real floors or
-// spending any real money) and a local running balance instead of spendTotalIncome
-function countAffordableRenovations(floors: Floor[]): number {
-  const clones = floors
-    .filter((floor) => floor.unlocked)
-    .map((floor) => ({ ...floor }));
-  let remaining = getTotalIncome();
-  let count = 0;
-  for (;;) {
-    if (clones.length === 0) break;
-    const cheapest = clones.reduce((min, floor) =>
-      lt(floor.upgradeCost, min.upgradeCost) ? floor : min,
-    );
-    if (lt(remaining, cheapest.upgradeCost)) break;
-    remaining = subtract(remaining, cheapest.upgradeCost);
-    increaseIncomeRate(cheapest);
-    count += 1;
-  }
-  return count;
 }
 
 interface MassActionDef {
@@ -318,30 +280,32 @@ function massActionItemMarkup(def: MassActionDef, floors: Floor[]): string {
   `;
 }
 
-function massActionsMarkup(floors: Floor[]): string {
+function massActionsMarkup(floors: Floor[], plan: RenovationPlan): string {
   const rows = getMassActionDefs()
     .map((def) => massActionItemMarkup(def, floors))
     .join("");
-  return `${renovateFloorsItemMarkup(floors)}${rows}`;
+  return `${renovateFloorsItemMarkup(floors, plan)}${rows}`;
 }
 
-// top-of-the-list "Renovate floors" row (see massRenovateFloors) — shows how
-// many upgrades are affordable right now (see countAffordableRenovations)
-// instead of a single $ price, since (unlike the other bulk actions) there's
-// no fixed "x N left" count: it just keeps buying across floors until unaffordable
-function renovateFloorsItemMarkup(floors: Floor[]): string {
-  const count = countAffordableRenovations(floors);
+function renovateFloorsItemMarkup(
+  floors: Floor[],
+  plan: RenovationPlan,
+): string {
+  const available =
+    canRenovateFloors(floors) &&
+    plan.count > 0 &&
+    !lt(getTotalIncome(), plan.cost);
   return `
     <button
       class="worker-menu__item"
       id="renovate-floors"
-      ${count > 0 ? "" : "disabled"}
+      ${available ? "" : "disabled"}
     >
       <span class="worker-menu__item-label">
         <img src="${skyscraperIconUrl}" class="worker-menu__icon worker-menu__icon--skyscraper" alt="" />
         Renovate floors
       </span>
-      <span class="worker-menu__price">x${count}</span>
+      <span class="worker-menu__price">${formatPrice(plan.cost)} (x${plan.count})</span>
     </button>
   `;
 }
@@ -375,6 +339,8 @@ export function wireUpgradeMenu(
   container: HTMLElement,
   getFloors: () => Floor[],
   onPurchase: () => void,
+  renovate: (floors: Floor[], plan: RenovationPlan) => Promise<boolean>,
+  previewRenovation: (floors: Floor[], budget: BigNumber) => RenovationPlan,
 ): UpgradeMenu {
   const menu = container.querySelector<HTMLDivElement>("#upgrade-menu")!;
   const backdrop = container.querySelector<HTMLDivElement>(
@@ -382,9 +348,13 @@ export function wireUpgradeMenu(
   )!;
   const panel = menu.querySelector<HTMLDivElement>(".worker-menu__panel")!;
   const list = container.querySelector<HTMLDivElement>("#upgrade-menu-list")!;
+  let renovationPlan: RenovationPlan | null = null;
+  let openingBudget: BigNumber;
 
   function render(): void {
-    list.innerHTML = massActionsMarkup(getFloors());
+    const floors = getFloors();
+    renovationPlan = previewRenovation(floors, openingBudget);
+    list.innerHTML = massActionsMarkup(floors, renovationPlan);
   }
 
   onTapOrClick(list, async (event) => {
@@ -392,12 +362,18 @@ export function wireUpgradeMenu(
     const renovateButton =
       target.closest<HTMLButtonElement>("#renovate-floors");
     if (renovateButton) {
+      const plan = renovationPlan;
+      if (!plan || renovateButton.disabled) return;
       const floors = getFloors();
-      if (massRenovateFloors(floors)) {
-        playSold();
-        await triggerButtonPress(renovateButton);
-        onPurchase();
-        render();
+      affordabilityPolling.stop();
+      menu.hidden = true;
+      try {
+        if (await renovate(floors, plan)) {
+          playSold();
+          onPurchase();
+        }
+      } catch (error) {
+        console.error("Renovation failed", error);
       }
       return;
     }
@@ -426,10 +402,10 @@ export function wireUpgradeMenu(
     const renovateButton =
       list.querySelector<HTMLButtonElement>("#renovate-floors");
     if (renovateButton) {
-      const count = countAffordableRenovations(floors);
-      renovateButton.disabled = count === 0;
-      const priceEl = renovateButton.querySelector(".worker-menu__price");
-      if (priceEl) priceEl.textContent = `x${count}`;
+      renovateButton.disabled =
+        !renovationPlan ||
+        renovationPlan.count === 0 ||
+        lt(getTotalIncome(), renovationPlan.cost);
     }
     list
       .querySelectorAll<HTMLButtonElement>("button[data-mass-action]")
@@ -452,6 +428,7 @@ export function wireUpgradeMenu(
 
   function open(): void {
     cancelDialogClose(panel);
+    openingBudget = getTotalIncome();
     render();
     menu.hidden = false;
     ghostClickGuard.markOpened();

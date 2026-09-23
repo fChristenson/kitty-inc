@@ -1,3 +1,4 @@
+export { getCritTier, getUpgradeCost } from "./upgradeButton";
 import { randomInt } from "../utils";
 import type { Floor } from "../gameState";
 import type { CritTier } from "./upgradeButton";
@@ -312,6 +313,7 @@ export {
   drawIncomePanel,
   getIncomeBarCenter,
   increaseIncomeRate,
+  increaseIncomeRateBy,
 } from "./incomePanel";
 export {
   ensureLockedFloorAbove,
@@ -330,11 +332,15 @@ export {
 export {
   hitTestFloorHover,
   handleFloorClick,
+  performAutomatedUpgradeClick,
+  performAutomatedUpgradeAfterPayment,
+  performAutomatedFloorUnlock,
   isUpgradeButtonEnabled,
   applyChainCrit,
   applyExplosionCrit,
 } from "./floorInteractions";
 export type { ChainCritDeps } from "./floorInteractions";
+export type { FloorActionsDeps } from "./floorInteractions";
 export {
   forceKeynoteCritUpgrade,
   forceKeynoteFloorBuyCrit,

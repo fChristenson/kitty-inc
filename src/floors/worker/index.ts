@@ -213,6 +213,9 @@ export const MAX_RENDERED_WORKERS = 3;
 // its shoulder (rendered facing the opposite way) without actually reversing course
 type Behavior = "walking" | "paused" | "lookingBack";
 
+import { snapshotMap } from "../../shared/snapshotState";
+import { isDetachedJobPending, isFloorLocked } from "../../shared/detachedJob";
+
 interface WalkerState {
   x: number;
   direction: 1 | -1;
@@ -229,7 +232,7 @@ interface FloorWorkers {
 }
 
 // each floor gets its own independent set of walkers, keyed by the floor itself
-const floorWorkers = new WeakMap<Floor, FloorWorkers>();
+const floorWorkers = snapshotMap<Floor, FloorWorkers>();
 
 // picks a color for a new walker: always one none of this floor's other current
 // walkers are already wearing, picked randomly among whichever qualify. Only
@@ -355,7 +358,7 @@ export function applyBoostAll(
   // persisted, Date.now()-based cycle tracking that reads the same boost state
   const now = Date.now();
   for (const floor of floors) {
-    if (!floor.unlocked) continue;
+    if (!floor.unlocked || isFloorLocked(floor)) continue;
     const renderedWorkers = getRenderedWorkerCount(floor);
     for (let i = 0; i < renderedWorkers; i++) {
       activateBoosted(floor, i, now, durationMs);
@@ -366,13 +369,14 @@ export function applyBoostAll(
 // how often a hired manager re-triggers the boost on its own floor, no player
 // action needed
 const MANAGER_AUTO_BOOST_INTERVAL_MS = 20_000;
-const managerNextBoostAt = new WeakMap<Floor, number>();
+const managerNextBoostAt = snapshotMap<Floor, number>();
 
 // once a floor has a manager, it re-boosts every worker (+ itself) on its own
 // floor every MANAGER_AUTO_BOOST_INTERVAL_MS, with the same click/jump
 // celebration + coin burst + sound a real worker click produces — called once
 // per frame from drawWorker below
 function maybeTriggerManagerBoost(floor: Floor, now: number): void {
+  if (isDetachedJobPending() || isFloorLocked(floor)) return;
   if (!floor.hasManager) {
     managerNextBoostAt.delete(floor);
     return;
@@ -422,6 +426,7 @@ export function clickWorker(
   workerIndex: number,
   now: number,
 ): boolean {
+  if (isFloorLocked(floor)) return false;
   const walker = getFloorWorkers(floor, now).walkers[workerIndex];
   if (!walker) return false;
   if (now - walker.clickedAt < CLICK_COOLDOWN_MS) return false;

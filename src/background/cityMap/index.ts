@@ -31,7 +31,6 @@ import {
   drawCatMarker,
   drawLockedMarkerPrice,
   drawMarkerFloorCount,
-  triggerMarkerJump,
   getMarkerJumpOffset,
   MARKER_COIN_BURST_SCALE,
   drawBuyAllFloorsIndicator,
@@ -49,8 +48,6 @@ import {
   GRAND_OPENING_CRIT_LABEL,
   GRAND_OPENING_CRIT_COLOR,
   runFirstCritProc,
-  CRIT_PROC_INFO,
-  CRIT_PROC_KINDS,
   type CritTier,
   type CritProcKind,
   type CritRollResult,
@@ -61,18 +58,20 @@ import { createCorpBarrel } from "./corpBarrel";
 import { createCityTransitions } from "./transitions";
 import { createCloudCat } from "./cloudCat";
 import {
-  createFloatingBadgeParticle,
-  updateFloatingBadgeParticles,
-  drawFloatingBadgeParticle,
-  type FloatingBadgeParticle,
-} from "../../shared/floatingBadges";
-import {
   createFloatingTextParticle,
   updateFloatingTextParticles,
   drawFloatingTextParticle,
   type FloatingTextParticle,
 } from "../../shared/floatingText";
-import { getStickerUrl, loadSprite, loadImageByName } from "../../loadAssets";
+import { loadSprite, loadImageByName } from "../../loadAssets";
+import { getCritBadgeOverlay } from "../../shared/critBadgeOverlay";
+import { createPurchaseFeedback } from "../../shared/purchaseFeedback";
+import {
+  createFloatingBadgeParticle,
+  updateFloatingBadgeParticles,
+  drawFloatingBadgeParticle,
+  type FloatingBadgeParticle,
+} from "../../shared/floatingBadges";
 import { type BigNumber, gte, isZero } from "../../shared/bigNumber";
 import {
   triggerScreenShake,
@@ -137,19 +136,29 @@ export interface CityMapDeps {
   // and its higher-priority long-press gesture.
   getBuildingUpgradeAllCost: (buildingIndex: number) => BigNumber;
   buyBuilding: () => boolean; // unlocks building 1 if affordable
+  canRenovateBuilding: (buildingIndex: number) => boolean;
   onStateChanged: () => void; // schedules persistence after any map-node purchase
   // long-press-on-the-green-dot gesture below: unlocks every remaining floor of
   // an already-bought building in one shot. Returns whether it succeeded
-  buyAllFloors: (buildingIndex: number) => boolean;
-  buyAllFloorUpgrades: (buildingIndex: number) => boolean;
+  buyAllFloors: (
+    buildingIndex: number,
+    onPurchased?: () => void,
+  ) => Promise<boolean>;
+  buyAllFloorUpgrades: (
+    buildingIndex: number,
+    onPurchased?: () => void,
+  ) => Promise<boolean>;
   // long-press fallback after all floors are unlocked and the purple action is
   // unavailable: buys as many currently-cheapest floor upgrades as affordable
-  buyCheapestFloorUpgrades: (buildingIndex: number) => boolean;
+  buyCheapestFloorUpgrades: (
+    buildingIndex: number,
+    onPurchased?: () => void,
+  ) => Promise<boolean>;
   // one batch of the corner mascot's background auto-buyer: works the next few
   // cheapest floors in the company and reports the badges that landed. Buying
   // nothing is normal (the player may just be broke for the moment) — the job
   // runs until the mascot is toggled back off, not until this stops paying out
-  runCheapestBatch: () => CheapestBatch;
+  runCheapestBatch: () => Promise<CheapestBatch>;
   // sets EVERY floor this building currently has (locked or not) to
   // result.tier, permanently — the reward for a crit landing on that
   // building's own purchase (see rollFloorBuyCrit below). Does NOT unlock
@@ -240,9 +249,6 @@ export function createCityMapView(
     container.querySelector<HTMLButtonElement>("#city-map-prev")!;
   const nextButton =
     container.querySelector<HTMLButtonElement>("#city-map-next")!;
-  const corpPointer = container.querySelector<HTMLElement>(
-    ".city-map__corp-pointer",
-  )!;
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
@@ -318,6 +324,25 @@ export function createCityMapView(
   });
   const incomeReadout = createIncomeReadout();
   const cloudCat = createCloudCat();
+  const critBadges = getCritBadgeOverlay();
+  const showCritBadges = critBadges.show;
+  const purchaseFeedback = createPurchaseFeedback({
+    sound: playSold,
+    burst: spawnCoinBurstAt,
+    redraw: () => redraw(),
+  });
+  function showPurchaseFeedback(
+    globalIndex: number,
+    markerIndex: number,
+  ): void {
+    const { cx, feetY } = markerCenter(cssW, cssH, markerIndex);
+    purchaseFeedback(
+      globalIndex,
+      cx,
+      feetY - MARKER_H / 2,
+      MARKER_COIN_BURST_SCALE,
+    );
+  }
   const transitions = createCityTransitions({
     canvas,
     speedLinesSvg,
@@ -364,62 +389,19 @@ export function createCityMapView(
   // at full frame rate instead of its usual throttled cadence
   let hasActiveMarkerJump = false;
 
-  const CRIT_BADGE_PAGE_SIZE = 12;
-  const CRIT_BADGE_SIZE_SCALE = 0.75;
-  const CRIT_BADGE_ANIMATION_MS = 500;
-  const CRIT_BADGE_STAGGER_MS = 200;
-  const CRIT_BADGE_GAP = 8;
-  let critBadgePages: CritProcKind[][] = [];
-  let critBadgePage = 0;
-  let critBadgeCounts: Partial<Record<CritProcKind, number>> = {};
-  let critBadgeAnimation: {
-    startedAt: number;
-    mode: "bottom";
-  } | null = null;
-  const critBadgeImages = new Map<CritProcKind, HTMLImageElement | null>();
-  const scaledCritBadgeImages = new Map<
-    CritProcKind,
-    {
-      source: HTMLImageElement;
-      size: number;
-      dpr: number;
-      canvas: HTMLCanvasElement;
-      displayWidth: number;
-      displayHeight: number;
-    }
-  >();
-
-  function loadCritBadgeImage(kind: CritProcKind): HTMLImageElement | null {
-    if (critBadgeImages.has(kind)) return critBadgeImages.get(kind) ?? null;
-    const image = new Image();
-    critBadgeImages.set(kind, image);
-    image.onload = () => redraw();
-    image.onerror = () => {
-      critBadgeImages.set(kind, null);
-      scaledCritBadgeImages.delete(kind);
-      redraw();
-    };
-    image.src = getStickerUrl(CRIT_PROC_INFO[kind].icon);
-    return image;
-  }
-
   // the corner mascot's background auto-buyer. Toggled by tapping the cat; runs
   // whether or not the map is on screen, and only stops when toggled back off
   const AUTO_BUY_INTERVAL_MS = 100;
   const BADGE_FLOAT_SIZE = 56;
-  const BADGE_FLOAT_GAP = 10; // clear of the mascot's own box, to its left
-  const BADGE_FLOAT_RISE_PER_TICK = 1.1;
-  // badges earned together are released one at a time rather than all at once
   const BADGE_FLOAT_RELEASE_MS = 180;
+  const badgeFloats: FloatingBadgeParticle[] = [];
+  const pendingBadgeFloats: CritProcKind[] = [];
+  let nextBadgeReleaseAt = 0;
   const BOUGHT_TEXT_FONT_PX = 11;
   const BOUGHT_TEXT_RISE_PER_TICK = 1.2;
   const BOUGHT_TEXT_SPAWN_Y_OFFSET = 40; // above the mascot, not on top of it
   let autoBuyTimer: ReturnType<typeof setInterval> | null = null;
-  const badgeFloats: FloatingBadgeParticle[] = [];
   const boughtFloats: FloatingTextParticle[] = [];
-  // earned but not yet launched, drained one per BADGE_FLOAT_RELEASE_MS
-  const pendingBadgeFloats: CritProcKind[] = [];
-  let nextBadgeReleaseAt = 0;
   let lastBadgeFloatUpdate = 0;
 
   function toggleAutoBuyer(): void {
@@ -440,235 +422,60 @@ export function createCityMapView(
     playSwoosh();
   }
 
-  function runAutoBuyBatch(): void {
-    const { label, badges } = deps.runCheapestBatch();
-    const now = Date.now();
-    if (label === null) return;
-    deps.onStateChanged();
-    playAutoPurchase();
-    const { x, y } = cloudCat.cheer(cssW, cssH, now);
-    boughtFloats.push(
-      createFloatingTextParticle(x, y - BOUGHT_TEXT_SPAWN_Y_OFFSET, label),
-    );
-    for (const [kind, count] of Object.entries(badges) as [
-      CritProcKind,
-      number,
-    ][]) {
-      for (let i = 0; i < count; i++) pendingBadgeFloats.push(kind);
+  let autoBuyRunning = false;
+  async function runAutoBuyBatch(): Promise<void> {
+    if (autoBuyRunning || critBadges.visible) return;
+    autoBuyRunning = true;
+    try {
+      const { label, badges } = await deps.runCheapestBatch();
+      const now = Date.now();
+      if (label === null) return;
+      deps.onStateChanged();
+      playAutoPurchase();
+      const { x, y } = cloudCat.cheer(cssW, cssH, now);
+      boughtFloats.push(
+        createFloatingTextParticle(x, y - BOUGHT_TEXT_SPAWN_Y_OFFSET, label),
+      );
+      for (const [kind, count] of Object.entries(badges)) {
+        critBadges.loadImage(kind as CritProcKind);
+        for (let index = 0; index < count; index++)
+          pendingBadgeFloats.push(kind as CritProcKind);
+      }
+      redraw();
+    } catch (error) {
+      stopAutoBuyer();
+      console.error("Automatic purchase failed", error);
+    } finally {
+      autoBuyRunning = false;
     }
-    redraw();
-  }
-
-  // badges earned mid-run rise beside the mascot and fade, instead of the
-  // blocking full-screen overlay a manual bulk buy still uses
-  function releaseBadgeFloats(now: number): void {
-    if (pendingBadgeFloats.length === 0) return;
-    if (now < nextBadgeReleaseAt) return;
-    nextBadgeReleaseAt = now + BADGE_FLOAT_RELEASE_MS;
-    const kind = pendingBadgeFloats.shift()!;
-    const cat = cloudCat.bounds(cssW, cssH);
-    badgeFloats.push(
-      createFloatingBadgeParticle(
-        cat.left - BADGE_FLOAT_GAP - BADGE_FLOAT_SIZE / 2,
-        cat.top + cat.size / 2,
-        loadCritBadgeImage(kind),
-      ),
-    );
   }
 
   function drawBadgeFloats(now: number): void {
-    releaseBadgeFloats(now);
-    if (badgeFloats.length === 0 && boughtFloats.length === 0) {
+    if (pendingBadgeFloats.length > 0 && now >= nextBadgeReleaseAt) {
+      const kind = pendingBadgeFloats.shift()!;
+      const bounds = cloudCat.bounds(cssW, cssH);
+      badgeFloats.push(
+        createFloatingBadgeParticle(
+          bounds.left - 10 - BADGE_FLOAT_SIZE / 2,
+          bounds.top + bounds.size / 2,
+          critBadges.loadImage(kind),
+        ),
+      );
+      nextBadgeReleaseAt = now + BADGE_FLOAT_RELEASE_MS;
+    }
+    if (boughtFloats.length === 0 && badgeFloats.length === 0) {
       lastBadgeFloatUpdate = now;
       return;
     }
     // shared/floatingText's own "~16.67ms per tick" convention
     const dt = Math.min(6, (now - lastBadgeFloatUpdate) / 16.67);
     lastBadgeFloatUpdate = now;
-    updateFloatingBadgeParticles(badgeFloats, dt, BADGE_FLOAT_RISE_PER_TICK);
+    updateFloatingBadgeParticles(badgeFloats, dt, 1.1);
     for (const badge of badgeFloats)
       drawFloatingBadgeParticle(ctx, badge, BADGE_FLOAT_SIZE);
     updateFloatingTextParticles(boughtFloats, dt, BOUGHT_TEXT_RISE_PER_TICK);
     for (const text of boughtFloats)
       drawFloatingTextParticle(ctx, text, BOUGHT_TEXT_FONT_PX);
-  }
-
-  function getScaledCritBadgeImage(
-    kind: CritProcKind,
-    image: HTMLImageElement,
-    badgeSize: number,
-  ): {
-    canvas: HTMLCanvasElement;
-    displayWidth: number;
-    displayHeight: number;
-  } {
-    const dpr = getEffectiveDpr();
-    const cached = scaledCritBadgeImages.get(kind);
-    if (
-      cached?.source === image &&
-      cached.size === badgeSize &&
-      cached.dpr === dpr
-    ) {
-      return cached;
-    }
-    const scale = Math.min(
-      badgeSize / image.naturalWidth,
-      badgeSize / image.naturalHeight,
-    );
-    const displayWidth = image.naturalWidth * scale;
-    const displayHeight = image.naturalHeight * scale;
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.ceil(displayWidth * dpr));
-    canvas.height = Math.max(1, Math.ceil(displayHeight * dpr));
-    const context = canvas.getContext("2d")!;
-    context.imageSmoothingEnabled = true;
-    context.imageSmoothingQuality = "high";
-    context.drawImage(image, 0, 0, canvas.width, canvas.height);
-    const cachedBadge = {
-      source: image,
-      size: badgeSize,
-      dpr,
-      canvas,
-      displayWidth,
-      displayHeight,
-    };
-    scaledCritBadgeImages.set(kind, cachedBadge);
-    return cachedBadge;
-  }
-
-  function showCritBadges(counts: Partial<Record<CritProcKind, number>>): void {
-    const kinds = CRIT_PROC_KINDS.filter((kind) => (counts[kind] ?? 0) > 0);
-    if (kinds.length === 0) return;
-    corpPointer.hidden = true;
-    critBadgeCounts = counts;
-    critBadgePages = [];
-    for (let i = 0; i < kinds.length; i += CRIT_BADGE_PAGE_SIZE) {
-      critBadgePages.push(kinds.slice(i, i + CRIT_BADGE_PAGE_SIZE));
-    }
-    critBadgePage = 0;
-    critBadgeAnimation = { startedAt: Date.now(), mode: "bottom" };
-    for (const kind of critBadgePages[0]) loadCritBadgeImage(kind);
-    redraw();
-  }
-
-  function advanceCritBadgePage(): void {
-    if (critBadgePages.length === 0) return;
-    if (critBadgePage < critBadgePages.length - 1) {
-      critBadgePage += 1;
-      critBadgeAnimation = { startedAt: Date.now(), mode: "bottom" };
-      for (const kind of critBadgePages[critBadgePage])
-        loadCritBadgeImage(kind);
-    } else {
-      critBadgePages = [];
-      critBadgeCounts = {};
-      critBadgeAnimation = null;
-      corpPointer.hidden = false;
-    }
-    redraw();
-  }
-
-  function drawCritBadgeOverlay(now: number): void {
-    if (critBadgePages.length === 0) return;
-    const page = critBadgePages[critBadgePage];
-    const animationDuration =
-      CRIT_BADGE_ANIMATION_MS +
-      Math.max(0, (page.length - 1) * CRIT_BADGE_STAGGER_MS);
-    const progress = critBadgeAnimation
-      ? Math.min(1, (now - critBadgeAnimation.startedAt) / animationDuration)
-      : 1;
-    const eased = 1 - Math.pow(1 - progress, 3);
-    if (progress >= 1) critBadgeAnimation = null;
-
-    const headingH = 34;
-    const badgeSize =
-      CRIT_BADGE_SIZE_SCALE *
-      Math.min(
-        216,
-        (cssW - 48 - CRIT_BADGE_GAP * 2) / 3,
-        (cssH - 40 - headingH - CRIT_BADGE_GAP * 3) / 4,
-      );
-    const panelW = badgeSize * 3 + CRIT_BADGE_GAP * 2;
-    const panelH = badgeSize * 4 + CRIT_BADGE_GAP * 3 + headingH;
-    const panelX = (cssW - panelW) / 2;
-    const panelY = (cssH - panelH) / 2;
-    const offsetY =
-      critBadgeAnimation?.mode === "bottom" ? (1 - eased) * (panelH + 30) : 0;
-    const drawX = panelX;
-    const drawY = panelY + offsetY;
-
-    ctx.save();
-    // Match the idle-income splash: dim the whole map while the reward stickers
-    // take focus, without adding another framed panel behind them.
-    ctx.globalAlpha = 0.7 * eased;
-    ctx.fillStyle = COLOR.black;
-    ctx.fillRect(0, 0, cssW, cssH);
-    ctx.globalAlpha = 0.98;
-    ctx.font = '900 24px "Fredoka", system-ui, sans-serif';
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    drawCartoonText(
-      ctx,
-      "Rewards",
-      cssW / 2,
-      panelY - 22,
-      COLOR.white,
-      COLOR.black,
-      5,
-    );
-
-    for (let index = 0; index < page.length; index++) {
-      const kind = page[index];
-      const column = index % 3;
-      const row = Math.floor(index / 3);
-      const x = drawX + column * (badgeSize + CRIT_BADGE_GAP);
-      const y = drawY + headingH + row * (badgeSize + CRIT_BADGE_GAP);
-      const badgeProgress = critBadgeAnimation
-        ? Math.min(
-            1,
-            Math.max(
-              0,
-              (now -
-                critBadgeAnimation.startedAt -
-                index * CRIT_BADGE_STAGGER_MS) /
-                CRIT_BADGE_ANIMATION_MS,
-            ),
-          )
-        : 1;
-      const badgeEased = 1 - Math.pow(1 - badgeProgress, 3);
-      const badgeOffsetY = (1 - badgeEased) * (badgeSize + 28);
-      const badgeCenterX = x + badgeSize / 2;
-      const badgeCenterY = y + badgeSize / 2 + badgeOffsetY;
-      const image = loadCritBadgeImage(kind);
-      ctx.save();
-      ctx.translate(badgeCenterX, badgeCenterY);
-      ctx.globalAlpha = 0.98 * badgeEased;
-      if (image?.complete && image.naturalWidth > 0) {
-        const scaledImage = getScaledCritBadgeImage(kind, image, badgeSize);
-        ctx.drawImage(
-          scaledImage.canvas,
-          -scaledImage.displayWidth / 2,
-          -scaledImage.displayHeight / 2,
-          scaledImage.displayWidth,
-          scaledImage.displayHeight,
-        );
-      }
-      const count = critBadgeCounts[kind] ?? 0;
-      {
-        ctx.font = '900 14px "Fredoka", system-ui, sans-serif';
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        drawCartoonText(
-          ctx,
-          `x${count}`,
-          badgeSize / 2,
-          -badgeSize / 2,
-          COLOR.white,
-          COLOR.black,
-        );
-      }
-      ctx.restore();
-    }
-    ctx.restore();
   }
 
   function resize(): void {
@@ -842,7 +649,6 @@ export function createCityMapView(
 
     updateArrows(buildingCount);
     drawCritFlash(ctx, cssW / 2, cssH / 2, cssW, Date.now());
-    drawCritBadgeOverlay(Date.now());
     drawBadgeFloats(Date.now());
     ctx.restore();
   }
@@ -850,7 +656,7 @@ export function createCityMapView(
   // no previous city before the first one; the next city only opens up once every
   // building in this one has been bought
   function updateArrows(buildingCount: number): void {
-    const rewardsVisible = critBadgePages.length > 0;
+    const rewardsVisible = critBadges.visible;
     prevButton.hidden = rewardsVisible || cityIndex === 0;
     nextButton.hidden =
       rewardsVisible || buildingCount < (cityIndex + 1) * MARKER_COUNT;
@@ -1010,8 +816,8 @@ export function createCityMapView(
       suppressNextClick = false;
       return;
     }
-    if (critBadgePages.length > 0) {
-      advanceCritBadgePage();
+    if (critBadges.visible) {
+      critBadges.advance();
       return;
     }
     const p = canvasPoint(event);
@@ -1030,11 +836,9 @@ export function createCityMapView(
     const buildingCount = deps.getBuildingCount();
     if (globalIndex === buildingCount) {
       if (deps.buyBuilding()) {
+        showPurchaseFeedback(globalIndex, hit);
         deps.onStateChanged();
-        playSold();
-        triggerMarkerJump(globalIndex);
         const { cx, feetY } = markerCenter(cssW, cssH, hit);
-        spawnCoinBurstAt(cx, feetY - MARKER_H / 2, MARKER_COIN_BURST_SCALE);
         // rare bonus, same one-shot roll a floor-unlock purchase uses — a hit
         // sets every floor this brand new building already has to that tier
         // (still just the one free ground floor + the one locked floor
@@ -1079,50 +883,66 @@ export function createCityMapView(
   function onPointerDown(event: PointerEvent): void {
     clearBuyAllHold(); // safety net against a stale interrupted previous gesture
     suppressNextClick = false; // this is a brand new gesture, not the one that fired
-    if (critBadgePages.length > 0) return;
+    if (critBadges.visible) return;
     const p = canvasPoint(event);
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
     if (hit === null) return;
     const globalIndex = cityIndex * MARKER_COUNT + hit;
     if (globalIndex >= deps.getBuildingCount()) return;
-    const floorUnlockCost = deps.getBuildingUnlockAllCost(globalIndex);
-    let action: "floors" | "building" | "upgrades" | null = null;
-    if (
-      !isZero(floorUnlockCost) &&
-      gte(deps.getTotalIncome(), floorUnlockCost)
-    ) {
-      action = "floors";
-    } else if (isZero(floorUnlockCost)) {
-      const upgradeAllCost = deps.getBuildingUpgradeAllCost(globalIndex);
-      if (
-        !isZero(upgradeAllCost) &&
-        gte(deps.getTotalIncome(), upgradeAllCost)
-      ) {
-        action = "building";
-      } else {
-        action = "upgrades";
-      }
-    }
-    if (action === null) return;
-    buyAllHoldTimeout = setTimeout(() => {
+    const companyIndex = corpBarrel.companyIndexAtPosition(
+      corpBarrel.getSelectedPosition(),
+    );
+    const startedCityIndex = cityIndex;
+    buyAllHoldTimeout = setTimeout(async () => {
       buyAllHoldTimeout = null;
-      const bought =
-        action === "building"
+      if (
+        cityIndex !== startedCityIndex ||
+        corpBarrel.companyIndexAtPosition(corpBarrel.getSelectedPosition()) !==
+          companyIndex
+      )
+        return;
+      suppressNextClick = true;
+      try {
+        if (!deps.canRenovateBuilding(globalIndex)) return;
+        showPurchaseFeedback(globalIndex, hit);
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        if (
+          cityIndex !== startedCityIndex ||
+          corpBarrel.companyIndexAtPosition(
+            corpBarrel.getSelectedPosition(),
+          ) !== companyIndex
+        )
+          return;
+        const floorUnlockCost = deps.getBuildingUnlockAllCost(globalIndex);
+        let action: "floors" | "building" | "upgrades";
+        if (!isZero(floorUnlockCost)) {
+          if (!gte(deps.getTotalIncome(), floorUnlockCost)) return;
+          action = "floors";
+        } else {
+          const upgradeAllCost = deps.getBuildingUpgradeAllCost(globalIndex);
+          action =
+            !isZero(upgradeAllCost) &&
+            gte(deps.getTotalIncome(), upgradeAllCost)
+              ? "building"
+              : "upgrades";
+        }
+        const bought = await (action === "building"
           ? deps.buyAllFloorUpgrades(globalIndex)
           : action === "floors"
             ? deps.buyAllFloors(globalIndex)
-            : deps.buyCheapestFloorUpgrades(globalIndex);
-      if (bought) {
-        deps.onStateChanged();
-        playSold();
-        suppressNextClick = true;
-        // same unlock flourish a normal single-floor buy plays — a maxed-out
-        // building deserves it even more than any one of them individually
-        triggerMarkerJump(globalIndex);
-        const { cx, feetY } = markerCenter(cssW, cssH, hit);
-        spawnCoinBurstAt(cx, feetY - MARKER_H / 2, MARKER_COIN_BURST_SCALE);
+            : deps.buyCheapestFloorUpgrades(globalIndex));
+        if (
+          bought &&
+          corpBarrel.companyIndexAtPosition(
+            corpBarrel.getSelectedPosition(),
+          ) === companyIndex
+        ) {
+          deps.onStateChanged();
+        }
+        redraw();
+      } catch (error) {
+        console.error("Map renovation failed", error);
       }
-      redraw();
     }, BUY_ALL_HOLD_MS);
   }
 
@@ -1170,7 +990,6 @@ export function createCityMapView(
       badgeFloats.length > 0 ||
       boughtFloats.length > 0 ||
       cloudCat.isAnimating(Date.now()) ||
-      critBadgeAnimation !== null ||
       isCritFlashActive(Date.now())
         ? 0
         : REDRAW_INTERVAL_MS;

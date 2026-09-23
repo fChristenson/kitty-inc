@@ -521,6 +521,8 @@ function drainSpecialCelebrationQueue(): void {
 // own color intentionally does NOT always match CRIT_TIER_CONFIG[tier].color (that
 // one's the upgrade BUTTON's color) — mega's button is gold but its flash text is
 // amber/orange per an explicit earlier request, so the flash keeps its own colors
+import { isDetachedJobRunning } from "../../shared/detachedJob";
+
 export function triggerCritCelebration(
   floor: Floor,
   tier: CritTier,
@@ -530,6 +532,12 @@ export function triggerCritCelebration(
   onFollowUpProc?: (kind: CritProcKind) => void,
 ): void {
   const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
+  if (isDetachedJobRunning()) {
+    if (procs?.dejaVu) {
+      for (const kind of pickDejaVuFollowUps(procs)) onFollowUpProc?.(kind);
+    }
+    return;
+  }
   if (landed.length > 0) {
     const now = Date.now();
     for (const kind of landed) {

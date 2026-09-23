@@ -1,3 +1,4 @@
+import { snapshotMap, snapshotSet } from "../snapshotState";
 // The one shared definition of "what crit tiers exist" — CRIT_TIER_CONFIG,
 // CritTier, and every pure tier-comparison/ordering helper live here so any
 // module (floors/upgradeButton's stateful roll/consume logic, floorInteractions,
@@ -32,6 +33,7 @@ export {
 } from "./featuredProcs";
 
 export { getCritProcCount, recordCritProcLanded } from "./critProcCounts";
+export { withDraftCritCounts, commitCritCounts } from "./critProcCounts";
 
 export type CritTier = "crit" | "mega" | "ultra";
 
@@ -351,7 +353,7 @@ export const FROZEN_DURATION_MS = CONFIG.crit.frozenDurationMs;
 // a per-floor start timestamp, not a plain WeakSet flag like every other
 // proc — the price-freeze needs to know WHEN its window ends, not just
 // whether it landed
-const frozenStartedAt = new WeakMap<Floor, number>();
+const frozenStartedAt = snapshotMap<Floor, number>();
 
 export function triggerFrozenCrit(floor: Floor): void {
   frozenStartedAt.set(floor, Date.now());
@@ -369,7 +371,7 @@ export const SPENDING_FREEZE_CRIT_CHANCE = CONFIG.crit.spendingFreezeChance;
 export const SPENDING_FREEZE_CRIT_COLOR = COLOR.spendingFreezeTeal;
 export const SPENDING_FREEZE_CRIT_LABEL = "Spending Freeze";
 export const SPENDING_FREEZE_DURATION_MS = CONFIG.crit.spendingFreezeDurationMs;
-const spendingFreezeStartedAt = new WeakMap<Floor, number>();
+const spendingFreezeStartedAt = snapshotMap<Floor, number>();
 
 export function triggerSpendingFreeze(floors: Floor[]): void {
   const now = Date.now();
@@ -475,7 +477,7 @@ export const RUSH_HOUR_DURATION_MS = CONFIG.crit.rushHourDurationMs;
 export const RUSH_HOUR_INTERVAL_SECONDS = CONFIG.crit.rushHourIntervalSeconds;
 // a per-floor start timestamp, not a plain WeakSet flag — same shape as
 // Frozen's own frozenStartedAt, since this needs to know WHEN its window ends
-const rushHourStartedAt = new WeakMap<Floor, number>();
+const rushHourStartedAt = snapshotMap<Floor, number>();
 
 // building-wide: arms every currently-unlocked floor at once (see
 // floorInteractions.ts's applyRushHourCrit)
@@ -496,7 +498,7 @@ export const RATE_LOCK_CRIT_COLOR = COLOR.rateLockBlue;
 export const RATE_LOCK_CRIT_LABEL = "Rate Lock";
 export const RATE_LOCK_DURATION_MS = CONFIG.crit.rateLockDurationMs;
 export const RATE_LOCK_SPEED_MULTIPLIER = CONFIG.crit.rateLockSpeedMultiplier;
-const rateLockStartedAt = new WeakMap<Floor, number>();
+const rateLockStartedAt = snapshotMap<Floor, number>();
 
 export function triggerRateLockCrit(floor: Floor): void {
   rateLockStartedAt.set(floor, Date.now());
@@ -758,7 +760,7 @@ export const PRICE_MATCH_DURATION_MS = CONFIG.crit.priceMatchDurationMs;
 export const FIRST_CLASS_CRIT_CHANCE = CONFIG.crit.firstClassChance;
 export const FIRST_CLASS_CRIT_COLOR = COLOR.blue;
 export const FIRST_CLASS_CRIT_LABEL = "First Class";
-const priceMatchCosts = new WeakMap<
+const priceMatchCosts = snapshotMap<
   Floor,
   { cost: BigNumber; originalCost: BigNumber; startedAt: number }
 >();
@@ -798,98 +800,98 @@ export const PAYOUT_CRIT_LABEL = "Payout";
 
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
 // the whole "what can ride along with a landed crit" system stays in one place
-const chainCrits = new WeakSet<Floor>();
-const dominoEffectCrits = new WeakSet<Floor>();
-const blueprintCrits = new WeakSet<Floor>();
-const boostCrits = new WeakSet<Floor>();
-const bounceCrits = new WeakSet<Floor>();
-const explosionCrits = new WeakSet<Floor>();
-const bootyCrits = new WeakSet<Floor>();
-const cashFlowCrits = new WeakSet<Floor>();
-const upgradeCrits = new WeakSet<Floor>();
-const peppermintCrits = new WeakSet<Floor>();
-const heavenlyCrits = new WeakSet<Floor>();
-const mysticCrits = new WeakSet<Floor>();
-const keynoteCrits = new WeakSet<Floor>();
-const pairCrits = new WeakSet<Floor>();
-const threeOfAKindCrits = new WeakSet<Floor>();
-const fourOfAKindCrits = new WeakSet<Floor>();
-const fullHouseCrits = new WeakSet<Floor>();
-const royalFlushCrits = new WeakSet<Floor>();
-const luckyNumberCrits = new WeakSet<Floor>();
-const openBookCrits = new WeakSet<Floor>();
-const tickTockCrits = new WeakSet<Floor>();
-const chairGiveawayCrits = new WeakSet<Floor>();
-const suppliesGiveawayCrits = new WeakSet<Floor>();
-const winterSaleCrits = new WeakSet<Floor>();
-const springSaleCrits = new WeakSet<Floor>();
-const summerSaleCrits = new WeakSet<Floor>();
-const autumnSaleCrits = new WeakSet<Floor>();
-const halloweenSaleCrits = new WeakSet<Floor>();
-const easterSaleCrits = new WeakSet<Floor>();
-const sunshineCrits = new WeakSet<Floor>();
-const snowdayCrits = new WeakSet<Floor>();
-const fastForwardCrits = new WeakSet<Floor>();
-const frozenCrits = new WeakSet<Floor>();
-const spendingFreezeCrits = new WeakSet<Floor>();
-const snowballCrits = new WeakSet<Floor>();
-const freeSaleCrits = new WeakSet<Floor>();
-const bullMarketCrits = new WeakSet<Floor>();
-const paydayCrits = new WeakSet<Floor>();
-const goldStandardCrits = new WeakSet<Floor>();
-const nightShiftCrits = new WeakSet<Floor>();
-const internCrits = new WeakSet<Floor>();
-const talentScoutCrits = new WeakSet<Floor>();
-const unionBossCrits = new WeakSet<Floor>();
-const rushHourCrits = new WeakSet<Floor>();
-const rateLockCrits = new WeakSet<Floor>();
-const goldenTicketCrits = new WeakSet<Floor>();
-const silverTicketCrits = new WeakSet<Floor>();
-const goldenParachuteCrits = new WeakSet<Floor>();
-const rainCheckCrits = new WeakSet<Floor>();
-const executiveBonusCrits = new WeakSet<Floor>();
-const powerSurgeCrits = new WeakSet<Floor>();
-const priceMatchCrits = new WeakSet<Floor>();
-const firstClassCrits = new WeakSet<Floor>();
-const payoutCrits = new WeakSet<Floor>();
-const grandOpeningCrits = new WeakSet<Floor>();
-const fullyStaffedCrits = new WeakSet<Floor>();
-const skipCrits = new WeakSet<Floor>();
-const shiftChangeCrits = new WeakSet<Floor>();
-const espressoShotCrits = new WeakSet<Floor>();
-const dejaVuCrits = new WeakSet<Floor>();
-const cloneArmyCrits = new WeakSet<Floor>();
-const luckyCloverCrits = new WeakSet<Floor>();
-const secondWindCrits = new WeakSet<Floor>();
-const executiveOrderCrits = new WeakSet<Floor>();
-const roundUpCrits = new WeakSet<Floor>();
-const safetyNetCrits = new WeakSet<Floor>();
-const floorShareCrits = new WeakSet<Floor>();
-const sameBoatCrits = new WeakSet<Floor>();
-const goldenHandshakeCrits = new WeakSet<Floor>();
-const supplyRunCrits = new WeakSet<Floor>();
-const casualFridayCrits = new WeakSet<Floor>();
-const fancyFridayCrits = new WeakSet<Floor>();
-const fireDrillCrits = new WeakSet<Floor>();
-const bonusRoundCrits = new WeakSet<Floor>();
-const overflowCrits = new WeakSet<Floor>();
-const performanceBonusCrits = new WeakSet<Floor>();
-const teaBreakCrits = new WeakSet<Floor>();
-const doubleDownCrits = new WeakSet<Floor>();
-const coffeeRunCrits = new WeakSet<Floor>();
-const teamBuildingCrits = new WeakSet<Floor>();
-const teamLunchCrits = new WeakSet<Floor>();
-const springCleaningCrits = new WeakSet<Floor>();
-const nightOwlCrits = new WeakSet<Floor>();
-const headhunterCrits = new WeakSet<Floor>();
-const dressCodeCrits = new WeakSet<Floor>();
-const recruitmentDriveCrits = new WeakSet<Floor>();
-const mergerCrits = new WeakSet<Floor>();
-const shareholdersCrits = new WeakSet<Floor>();
+const chainCrits = snapshotSet<Floor>();
+const dominoEffectCrits = snapshotSet<Floor>();
+const blueprintCrits = snapshotSet<Floor>();
+const boostCrits = snapshotSet<Floor>();
+const bounceCrits = snapshotSet<Floor>();
+const explosionCrits = snapshotSet<Floor>();
+const bootyCrits = snapshotSet<Floor>();
+const cashFlowCrits = snapshotSet<Floor>();
+const upgradeCrits = snapshotSet<Floor>();
+const peppermintCrits = snapshotSet<Floor>();
+const heavenlyCrits = snapshotSet<Floor>();
+const mysticCrits = snapshotSet<Floor>();
+const keynoteCrits = snapshotSet<Floor>();
+const pairCrits = snapshotSet<Floor>();
+const threeOfAKindCrits = snapshotSet<Floor>();
+const fourOfAKindCrits = snapshotSet<Floor>();
+const fullHouseCrits = snapshotSet<Floor>();
+const royalFlushCrits = snapshotSet<Floor>();
+const luckyNumberCrits = snapshotSet<Floor>();
+const openBookCrits = snapshotSet<Floor>();
+const tickTockCrits = snapshotSet<Floor>();
+const chairGiveawayCrits = snapshotSet<Floor>();
+const suppliesGiveawayCrits = snapshotSet<Floor>();
+const winterSaleCrits = snapshotSet<Floor>();
+const springSaleCrits = snapshotSet<Floor>();
+const summerSaleCrits = snapshotSet<Floor>();
+const autumnSaleCrits = snapshotSet<Floor>();
+const halloweenSaleCrits = snapshotSet<Floor>();
+const easterSaleCrits = snapshotSet<Floor>();
+const sunshineCrits = snapshotSet<Floor>();
+const snowdayCrits = snapshotSet<Floor>();
+const fastForwardCrits = snapshotSet<Floor>();
+const frozenCrits = snapshotSet<Floor>();
+const spendingFreezeCrits = snapshotSet<Floor>();
+const snowballCrits = snapshotSet<Floor>();
+const freeSaleCrits = snapshotSet<Floor>();
+const bullMarketCrits = snapshotSet<Floor>();
+const paydayCrits = snapshotSet<Floor>();
+const goldStandardCrits = snapshotSet<Floor>();
+const nightShiftCrits = snapshotSet<Floor>();
+const internCrits = snapshotSet<Floor>();
+const talentScoutCrits = snapshotSet<Floor>();
+const unionBossCrits = snapshotSet<Floor>();
+const rushHourCrits = snapshotSet<Floor>();
+const rateLockCrits = snapshotSet<Floor>();
+const goldenTicketCrits = snapshotSet<Floor>();
+const silverTicketCrits = snapshotSet<Floor>();
+const goldenParachuteCrits = snapshotSet<Floor>();
+const rainCheckCrits = snapshotSet<Floor>();
+const executiveBonusCrits = snapshotSet<Floor>();
+const powerSurgeCrits = snapshotSet<Floor>();
+const priceMatchCrits = snapshotSet<Floor>();
+const firstClassCrits = snapshotSet<Floor>();
+const payoutCrits = snapshotSet<Floor>();
+const grandOpeningCrits = snapshotSet<Floor>();
+const fullyStaffedCrits = snapshotSet<Floor>();
+const skipCrits = snapshotSet<Floor>();
+const shiftChangeCrits = snapshotSet<Floor>();
+const espressoShotCrits = snapshotSet<Floor>();
+const dejaVuCrits = snapshotSet<Floor>();
+const cloneArmyCrits = snapshotSet<Floor>();
+const luckyCloverCrits = snapshotSet<Floor>();
+const secondWindCrits = snapshotSet<Floor>();
+const executiveOrderCrits = snapshotSet<Floor>();
+const roundUpCrits = snapshotSet<Floor>();
+const safetyNetCrits = snapshotSet<Floor>();
+const floorShareCrits = snapshotSet<Floor>();
+const sameBoatCrits = snapshotSet<Floor>();
+const goldenHandshakeCrits = snapshotSet<Floor>();
+const supplyRunCrits = snapshotSet<Floor>();
+const casualFridayCrits = snapshotSet<Floor>();
+const fancyFridayCrits = snapshotSet<Floor>();
+const fireDrillCrits = snapshotSet<Floor>();
+const bonusRoundCrits = snapshotSet<Floor>();
+const overflowCrits = snapshotSet<Floor>();
+const performanceBonusCrits = snapshotSet<Floor>();
+const teaBreakCrits = snapshotSet<Floor>();
+const doubleDownCrits = snapshotSet<Floor>();
+const coffeeRunCrits = snapshotSet<Floor>();
+const teamBuildingCrits = snapshotSet<Floor>();
+const teamLunchCrits = snapshotSet<Floor>();
+const springCleaningCrits = snapshotSet<Floor>();
+const nightOwlCrits = snapshotSet<Floor>();
+const headhunterCrits = snapshotSet<Floor>();
+const dressCodeCrits = snapshotSet<Floor>();
+const recruitmentDriveCrits = snapshotSet<Floor>();
+const mergerCrits = snapshotSet<Floor>();
+const shareholdersCrits = snapshotSet<Floor>();
 // "special crit crit" bonus tier riding on an already-landed proc (see
 // rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
 // unlike every other proc this one carries actual tier data, not just a flag
-const bonusTierCrits = new WeakMap<Floor, CritTier>();
+const bonusTierCrits = snapshotMap<Floor, CritTier>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
@@ -1123,7 +1125,7 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
 // CRIT_PROC_KINDS instead of hand-listing all 59 of them again
 const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   ...(Object.fromEntries(
-    FEATURED_CRIT_KINDS.map((kind) => [kind, new WeakSet<Floor>()]),
+    FEATURED_CRIT_KINDS.map((kind) => [kind, snapshotSet<Floor>()]),
   ) as Record<FeaturedCritKind, WeakSet<Floor>>),
   chain: chainCrits,
   dominoEffect: dominoEffectCrits,

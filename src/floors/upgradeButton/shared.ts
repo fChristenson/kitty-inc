@@ -284,13 +284,15 @@ export function stepHoldAnim(
 // (Sale/Frozen's own window) — an event with extra state of its own just
 // wraps this instead of hand-rolling its own WeakMap<Floor, number> +
 // now-startedAt<duration check again
+import { snapshotMap } from "../../shared/snapshotState";
+
 export interface TimedFloorEvent {
   trigger(floor: Floor): void;
   isActive(floor: Floor, now: number): boolean;
 }
 
 export function createTimedFloorEvent(durationMs: number): TimedFloorEvent {
-  const startedAt = new WeakMap<Floor, number>();
+  const startedAt = snapshotMap<Floor, number>();
   return {
     trigger(floor: Floor): void {
       startedAt.set(floor, Date.now());

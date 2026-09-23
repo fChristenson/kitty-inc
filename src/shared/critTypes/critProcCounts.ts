@@ -22,6 +22,28 @@ function loadCounts(): CritProcCounts {
 }
 
 const counts: CritProcCounts = loadCounts();
+let draftCounts: CritProcCounts | null = null;
+
+export function withDraftCritCounts<T>(
+  draft: CritProcCounts,
+  action: () => T,
+): T {
+  const previous = draftCounts;
+  draftCounts = draft;
+  try {
+    return action();
+  } finally {
+    draftCounts = previous;
+  }
+}
+
+export function commitCritCounts(draft: CritProcCounts): void {
+  for (const [kind, count] of Object.entries(draft)) {
+    const key = kind as CritProcKind;
+    counts[key] = (counts[key] ?? 0) + count;
+  }
+  saveCounts();
+}
 
 // Writing straight through on every landed proc meant a synchronous
 // JSON.stringify + localStorage.setItem per crit (~60us each), which a bulk
@@ -57,6 +79,10 @@ if (typeof window !== "undefined") {
 }
 
 export function recordCritProcLanded(kind: CritProcKind): void {
+  if (draftCounts) {
+    draftCounts[kind] = (draftCounts[kind] ?? 0) + 1;
+    return;
+  }
   counts[kind] = (counts[kind] ?? 0) + 1;
   saveCounts();
 }

@@ -1,3 +1,4 @@
+import { snapshotMap } from "../shared/snapshotState";
 import { companyStorageKey } from "../company";
 import {
   type BigNumber,
@@ -110,7 +111,7 @@ export interface Floor {
 
 // gameState.ts is the sole owner of this per-floor data (Floor itself doesn't carry it),
 // keyed by the floor itself the same way worker.ts tracks its own ephemeral walk state
-const workerSlots = new WeakMap<Floor, WorkerSlot[]>();
+const workerSlots = snapshotMap<Floor, WorkerSlot[]>();
 
 function getWorkerSlots(floor: Floor): WorkerSlot[] {
   let slots = workerSlots.get(floor);
@@ -210,7 +211,7 @@ export function getFloorBoostEndsAt(floor: Floor): number {
 // workers is tinted with, keyed by the floor the same way workerSlots is —
 // persisted (see SavedFloor.tintIndexes below) so a worker's color survives a
 // reload instead of being re-randomized every time
-const workerTintIndexes = new WeakMap<Floor, number[]>();
+const workerTintIndexes = snapshotMap<Floor, number[]>();
 
 export function getWorkerTintIndexes(floor: Floor): number[] {
   let indexes = workerTintIndexes.get(floor);

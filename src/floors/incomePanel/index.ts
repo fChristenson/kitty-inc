@@ -26,7 +26,14 @@ import {
   peekDueIncome as sharedPeekDueIncome,
   currentIncomeRatePerSecond as sharedCurrentIncomeRatePerSecond,
 } from "../../shared/income";
-import { type BigNumber, add, multiply, gte } from "../../shared/bigNumber";
+import {
+  type BigNumber,
+  add,
+  multiply,
+  multiplyBig,
+  gte,
+  pow,
+} from "../../shared/bigNumber";
 import {
   drawPill,
   drawPillBorder,
@@ -190,6 +197,42 @@ export function increaseIncomeRate(floor: Floor): void {
   // upgrades alone
   if (floor.upgradeCount % UPGRADES_PER_INTERVAL_HALVING === 0) {
     floor.incomeIntervalSeconds /= 2;
+  }
+}
+
+// Applies many normal upgrade-rate increases in one pass. This is used by crit
+// rewards that replay an existing floor's large upgrade count; iterating once
+// per historical upgrade freezes the main thread on mature floors.
+export function increaseIncomeRateBy(floor: Floor, count: number): void {
+  if (count <= 0) return;
+  const rateMultiplier = floor.critMultiplierTier
+    ? CRIT_TIER_CONFIG[floor.critMultiplierTier].multiplier
+    : 1;
+  floor.incomeAmount = add(
+    floor.incomeAmount,
+    multiply(floor.rateStep, rateMultiplier * count),
+  );
+  if (
+    !isFrozenActive(floor, Date.now()) &&
+    !isSpendingFreezeActive(floor, Date.now()) &&
+    getPriceMatchCost(floor, Date.now()) === null
+  ) {
+    const growth = floor.aboveCapTier
+      ? UPGRADE_COST_GROWTH_ABOVE_CAP
+      : UPGRADE_COST_GROWTH;
+    floor.upgradeCost = multiplyBig(floor.upgradeCost, pow(growth, count));
+  }
+  const previousUpgradeCount = floor.upgradeCount;
+  floor.upgradeCount += count;
+  const previousMilestones = Math.floor(
+    previousUpgradeCount / UPGRADES_PER_INTERVAL_HALVING,
+  );
+  const currentMilestones = Math.floor(
+    floor.upgradeCount / UPGRADES_PER_INTERVAL_HALVING,
+  );
+  const milestoneCount = currentMilestones - previousMilestones;
+  if (milestoneCount > 0) {
+    floor.incomeIntervalSeconds /= Math.pow(2, milestoneCount);
   }
 }
 

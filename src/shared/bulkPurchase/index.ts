@@ -30,6 +30,27 @@ export function buyCheapestUpgrades(
   return bought;
 }
 
+export async function buyCheapestUpgradesAsync(
+  floors: Floor[],
+  spend: (cost: BigNumber) => boolean,
+  buy: (floor: Floor) => void,
+  limit = Infinity,
+): Promise<number> {
+  const heap = floors.slice();
+  for (let i = (heap.length >> 1) - 1; i >= 0; i--) siftDown(heap, i);
+  let bought = 0;
+  while (heap.length > 0 && bought < limit) {
+    const cheapest = heap[0];
+    if (!spend(cheapest.upgradeCost)) break;
+    buy(cheapest);
+    bought += 1;
+    siftDown(heap, 0);
+    if (bought % 64 === 0)
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+  }
+  return bought;
+}
+
 function siftDown(heap: Floor[], start: number): void {
   const length = heap.length;
   let index = start;

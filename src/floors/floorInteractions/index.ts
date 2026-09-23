@@ -1,10 +1,16 @@
 import { createFeaturedCritRewards } from "./featuredCritRewards";
 import {
+  isDetachedJobRunning,
+  isDetachedJobPending,
+  isFloorLocked,
+  liveEffect,
+} from "../../shared/detachedJob";
+import {
   hitTestWorkers,
   clickWorker,
   getWorkerCenter,
   applyBoostAll,
-  triggerJumpAll,
+  triggerJumpAll as animateJumpAll,
   getRenderedWorkerCount,
   MAX_RENDERED_WORKERS,
 } from "../worker";
@@ -12,7 +18,7 @@ import { formatPrice } from "../../utils";
 import {
   hitTestUpgradeButton,
   getButtonCenter,
-  triggerButtonPress,
+  triggerButtonPress as animateButtonPress,
   isCritUpgrade,
   getCritTier,
   getBonusTierCrit,
@@ -66,6 +72,7 @@ import {
 } from "../upgradeButton";
 import {
   increaseIncomeRate,
+  increaseIncomeRateBy,
   UPGRADE_MILESTONE_STEP,
   hitTestIncomeBar,
   getIncomeBarCenter,
@@ -84,7 +91,7 @@ import {
   getActiveCompanyInvestedValue,
 } from "../../totalIncome";
 import { getActiveCompanyIndex } from "../../company";
-import { spawnCoinBurst } from "../coins";
+import { spawnCoinBurst as animateCoinBurst } from "../coins";
 import { spawnFloatingCoins } from "../coinFloat";
 import { spawnIncomeFloatText } from "../incomeFloatText";
 import { getUpgradeIndicatorCenter } from "../star";
@@ -101,7 +108,11 @@ import {
   LUCKY_NUMBER_MIN_FLOORS,
   LUCKY_NUMBER_MAX_FLOORS,
 } from "../../shared/critTypes";
-import { playSold, playBloop, playCoinDrop } from "../../sound";
+import {
+  playSold as soundSold,
+  playBloop as soundBloop,
+  playCoinDrop as soundCoinDrop,
+} from "../../sound";
 import {
   hitTestFloorLock,
   unlockFloor,
@@ -124,6 +135,13 @@ import {
   multiply,
 } from "../../shared/bigNumber";
 import { triggerCritCelebration } from "./critCelebration";
+
+const spawnCoinBurst = liveEffect(animateCoinBurst);
+const triggerButtonPress = liveEffect(animateButtonPress);
+const triggerJumpAll = liveEffect(animateJumpAll);
+const playSold = liveEffect(soundSold);
+const playBloop = liveEffect(soundBloop);
+const playCoinDrop = liveEffect(soundCoinDrop);
 
 // "peppermint crit" (see shared/critTypes' isPeppermintCrit): promotes every
 // OTHER unlocked floor in the building one tier step at once (same
@@ -241,9 +259,7 @@ function applyHeavenlyCrit(deps: FloorActionsDeps): void {
     // (coin burst + milestone check) up to `count` times per floor — with up
     // to ~20 floors this would otherwise be thousands of bursts/rerolls for
     // one proc; still rolls this floor's own next crit exactly once
-    for (let i = 0; i < count; i++) {
-      increaseIncomeRate(floor);
-    }
+    increaseIncomeRateBy(floor, count);
     rollCritUpgrade(floor);
     const center = getButtonCenter(index === 0);
     spawnCoinBurst(floor, center.x, center.y, () => {});
@@ -351,6 +367,7 @@ export function hitTestFloorHover(
 // next crit exactly once on its own, after this has run its full count
 function applyUpgradeTick(floor: Floor, isGroundFloor: boolean): void {
   increaseIncomeRate(floor);
+  if (isDetachedJobRunning()) return;
   const center = getButtonCenter(isGroundFloor);
   // small random jitter so the burst doesn't spawn at the exact same pixel
   // every single click — a random point spanning the button's own inner width
@@ -365,6 +382,86 @@ function applyUpgradeTick(floor: Floor, isGroundFloor: boolean): void {
     spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
     playBloop();
   }
+}
+
+// State-only version of the normal upgrade-button click used by automated
+// buyers. It consumes an already armed crit before paying for a normal upgrade,
+// exactly like the manual click path, so automated purchases cannot overwrite
+// a crit without applying its reward.
+export function performAutomatedUpgradeClick(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  isGroundFloor: boolean,
+): boolean {
+  if (!floor.unlocked || isFloorLocked(floor)) return false;
+  if (isCritUpgrade(floor)) {
+    return performAutomatedUpgradeAfterPayment(
+      deps,
+      floor,
+      isGroundFloor,
+      false,
+    );
+  }
+  if (!spendTotalIncome(getUpgradeCost(floor))) return false;
+  return performAutomatedUpgradeAfterPayment(deps, floor, isGroundFloor, true);
+}
+
+export function performAutomatedUpgradeAfterPayment(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  isGroundFloor: boolean,
+  paid: boolean,
+): boolean {
+  if (!floor.unlocked) return false;
+  if (isCritUpgrade(floor)) {
+    const tier = getCritTier(floor)!;
+    const procs = readCritProcs(floor);
+    const bonusTier = getBonusTierCrit(floor);
+    consumeCritUpgrade(floor);
+    applyFloorCrit(deps, floor, { ...procs, tier, bonusTier });
+    deps.persist();
+    return true;
+  }
+  if (!paid && !spendTotalIncome(getUpgradeCost(floor))) return false;
+  applyUpgradeTick(floor, isGroundFloor);
+  rollCritUpgrade(floor);
+  deps.persist();
+  return true;
+}
+
+// State-only version of a manual floor-unlock click. Floor purchases use their
+// dedicated one-shot crit roll rather than the next-upgrade telegraph.
+export function performAutomatedFloorUnlock(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  prepaid = false,
+): boolean {
+  if (
+    floor.unlocked ||
+    isFloorLocked(floor) ||
+    (!prepaid && !spendTotalIncome(floor.unlockCost))
+  )
+    return false;
+  unlockFloor(floor);
+  ensureLockedFloorAbove({
+    floors: deps.floors,
+    backgroundCount: deps.backgroundCount,
+    multiplier: deps.multiplier,
+    onAdd: deps.onFloorAdded,
+  });
+  const buyTier = rollFloorBuyCrit();
+  if (buyTier) {
+    const forcedBonusTierFloor = deps.floors.find((candidate) =>
+      getBonusTierCrit(candidate),
+    );
+    if (forcedBonusTierFloor) {
+      buyTier.bonusTier = getBonusTierCrit(forcedBonusTierFloor)!;
+      consumeBonusTierCrit(forcedBonusTierFloor);
+    }
+    applyFloorCrit(deps, floor, buyTier);
+  }
+  deps.persist();
+  return true;
 }
 
 // "boost crit" reward (see upgradeButton.ts's isBoostCrit): the SAME building-
@@ -504,8 +601,7 @@ function applyHeadhunterCrit(floor: Floor, floors: Floor[]): void {
 function applyBullMarketCrit(floors: Floor[]): void {
   for (const floor of floors) {
     if (!floor.unlocked) continue;
-    const existing = floor.upgradeCount;
-    for (let i = 0; i < existing; i++) increaseIncomeRate(floor);
+    increaseIncomeRateBy(floor, floor.upgradeCount);
   }
 }
 
@@ -528,7 +624,7 @@ function applyDominoEffectCrit(deps: ChainCritDeps, startIndex: number): void {
         onAdd: onFloorAdded,
       });
     }
-    for (let i = 0; i < count; i++) increaseIncomeRate(target);
+    increaseIncomeRateBy(target, count);
     if (index !== startIndex) rollCritUpgrade(target);
     index += 1;
     if (Math.random() >= DOMINO_EFFECT_CONTINUE_CHANCE) return;
@@ -554,9 +650,7 @@ function applyBlueprintCrit(deps: ChainCritDeps, sourceIndex: number): void {
       onAdd: onFloorAdded,
     });
   }
-  for (let i = 0; i < source.upgradeCount; i++) {
-    increaseIncomeRate(target);
-  }
+  increaseIncomeRateBy(target, source.upgradeCount);
   target.workerCount = source.workerCount;
   target.hasManager = source.hasManager;
 }
@@ -1255,7 +1349,7 @@ const CRIT_REWARDS: Record<CritProcKind, (context: CritRewardContext) => void> =
       upgrade: (floors, count) => {
         for (const floor of floors) {
           if (!floor.unlocked) continue;
-          for (let tick = 0; tick < count; tick++) increaseIncomeRate(floor);
+          increaseIncomeRateBy(floor, count);
         }
       },
       payCycles: applyTickTockCrit,
@@ -1465,6 +1559,11 @@ export function handleFloorClick(
   y: number,
   isGroundFloor: boolean,
 ): void {
+  if (
+    isFloorLocked(floor) ||
+    (isDetachedJobPending() && !isDetachedJobRunning())
+  )
+    return;
   const {
     floors,
     backgroundCount,

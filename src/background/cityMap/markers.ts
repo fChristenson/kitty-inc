@@ -243,25 +243,7 @@ export function drawBuyAllBuildingItemsIndicator(
 // globalIndex so it survives a city-page round trip; getMarkerJumpOffset
 // self-prunes expired entries so this map never grows past however many unlocks
 // are mid-animation
-const MARKER_JUMP_DURATION_MS = 500;
-const MARKER_JUMP_HEIGHT_PX = 8;
-const markerJumpStartedAt = new Map<number, number>();
-
-export function triggerMarkerJump(globalIndex: number): void {
-  markerJumpStartedAt.set(globalIndex, Date.now());
-}
-
-export function getMarkerJumpOffset(globalIndex: number, now: number): number {
-  const startedAt = markerJumpStartedAt.get(globalIndex);
-  if (startedAt === undefined) return 0;
-  const elapsed = now - startedAt;
-  if (elapsed >= MARKER_JUMP_DURATION_MS) {
-    markerJumpStartedAt.delete(globalIndex);
-    return 0;
-  }
-  const t = elapsed / MARKER_JUMP_DURATION_MS;
-  return -MARKER_JUMP_HEIGHT_PX * Math.sin(Math.PI * t);
-}
+export { getPurchaseJumpOffset as getMarkerJumpOffset } from "../../shared/purchaseFeedback";
 
 // spawnCoinBurstAt's default scale (1) is tuned for a full building-width
 // canvas; these markers are tiny by comparison, so shrink it accordingly

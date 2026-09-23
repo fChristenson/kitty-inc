@@ -3,6 +3,7 @@ import { forceTestCrit } from "./floors";
 import { wireCritTestActions } from "./hud";
 import {
   add,
+  subtract,
   fromNumber,
   gt,
   gte,
@@ -20,9 +21,6 @@ import {
   LUCKY_CLOVER_CRIT_COUNT,
   LUCKY_CLOVER_CRIT_TIER,
   MYSTIC_UPGRADE_COUNT,
-  CRIT_PROC_KINDS,
-  getCritProcCount,
-  type CritProcKind,
   type CritRollResult,
 } from "./shared/critTypes";
 import {
@@ -33,7 +31,6 @@ import {
   loadFloatingCoinImage,
   startIncomeTicker,
   ensureLockedFloorAbove,
-  unlockFloor,
   getBuildingUnlockAllCost,
   unlockAllFloors,
   getActiveBackgrounds,
@@ -43,7 +40,15 @@ import {
   applyBoostAll,
   MAX_RENDERED_WORKERS,
   MAX_FLOORS_PER_BUILDING,
-  rollCritUpgrade,
+  FLOOR_W,
+  FLOOR_H,
+  performAutomatedUpgradeClick,
+  performAutomatedUpgradeAfterPayment,
+  performAutomatedFloorUnlock,
+  getCritTier,
+  getUpgradeCost,
+  rollFloorBuyCrit,
+  type FloorActionsDeps,
 } from "./floors";
 import {
   startTotalIncomeTicker,
@@ -54,6 +59,9 @@ import {
   getTotalIncome,
   getBuildingsCurrentIncomePerSecond,
   getDormantCompaniesIdleIncome,
+  withDraftEconomy,
+  commitDraftIncome,
+  addCompanyTotalIncome,
 } from "./totalIncome";
 import {
   saveBuildings,
@@ -71,7 +79,23 @@ import {
 } from "./gameState";
 import { bindSaveLifecycle, saveCompanySnapshot } from "./shared/persistence";
 import { suppressNativeContextMenu } from "./shared/tapEvents";
-import { buyCheapestUpgrades } from "./shared/bulkPurchase";
+import {
+  runBuildingJob,
+  type BuildingDraft,
+  type RenovationPlan,
+} from "./shared/buildingJob";
+import { isDetachedJobPending, isFloorLocked } from "./shared/detachedJob";
+import { getCritBadgeOverlay } from "./shared/critBadgeOverlay";
+import { createLoadingOverlay } from "./shared/loadingOverlay";
+import {
+  createRenovationController,
+  renovateFloors,
+  planRenovation,
+  createFixedRenovationPlan,
+  planBuildingCompletion,
+  createFloorUnlockStep,
+  createBuildingCompletionStep,
+} from "./renovation";
 import {
   getActiveCompanyIndex,
   setActiveCompanyIndex,
@@ -199,6 +223,15 @@ async function main() {
   const buildings: Floor[][] = [];
   let activeBuildingIndex = 0;
   let activeCompanyIndex = getActiveCompanyIndex();
+  let mapOpen = false;
+  const renovationOverlay = createLoadingOverlay(canvas, "Renovating");
+  const renovations = createRenovationController({
+    setLoading: renovationOverlay.show,
+    showRewards: (rewards) => getCritBadgeOverlay().show(rewards),
+  });
+  function refreshRenovationView(): void {
+    renovations.setView(activeCompanyIndex, activeBuildingIndex, mapOpen);
+  }
   // consumed once by the very next onSwitchCompany call (see cityMapView's own
   // deps below) — set right before triggering a post-merge switch animation
   // when the OUTGOING company was itself just merged away, so that switch
@@ -319,31 +352,89 @@ async function main() {
   // to gameCanvas.ts when this is the currently-active/on-screen building — an
   // inactive building's newly-added floor gets picked up automatically the next
   // time the player switches to it (setActiveFloors registers every floor fresh).
-  function setupBuilding(buildingIndex: number): void {
+  function setupBuilding(
+    buildingIndex: number,
+    targetBuildings = buildings,
+  ): void {
     ensureLockedFloorAbove({
-      floors: buildings[buildingIndex],
+      floors: targetBuildings[buildingIndex],
       backgroundCount: getBackgroundUrls().length,
       multiplier: getBuildingMultiplier(buildingIndex),
       onAdd: (floor) => {
-        if (buildingIndex === activeBuildingIndex) {
+        if (
+          targetBuildings === buildings &&
+          buildingIndex === activeBuildingIndex
+        ) {
           gameCanvas.notifyFloorAdded(floor);
         }
       },
     });
   }
 
-  function createMysticBuilding(): void {
-    const mysticBuildingIndex = buildings.length;
-    buildings.push(
+  function createMysticBuilding(targetBuildings = buildings): void {
+    const mysticBuildingIndex = targetBuildings.length;
+    targetBuildings.push(
       createBuilding(mysticBuildingIndex, getBackgroundUrls().length, {
         groundFloorLocked: false,
         initialUpgradeCount: MYSTIC_UPGRADE_COUNT,
       }),
     );
-    const groundFloor = buildings[mysticBuildingIndex]?.[0];
+    const groundFloor = targetBuildings[mysticBuildingIndex]?.[0];
     if (groundFloor) {
-      setupBuilding(mysticBuildingIndex);
+      setupBuilding(mysticBuildingIndex, targetBuildings);
     }
+  }
+
+  function floorActionDeps(
+    buildingIndex: number,
+    targetBuildings = buildings,
+  ): FloorActionsDeps {
+    return {
+      floors: targetBuildings[buildingIndex],
+      backgroundCount: getBackgroundUrls().length,
+      multiplier: getBuildingMultiplier(buildingIndex),
+      persist: () => {
+        if (targetBuildings === buildings) persist();
+      },
+      onFloorAdded: (floor) => {
+        if (
+          targetBuildings === buildings &&
+          buildingIndex === activeBuildingIndex
+        )
+          gameCanvas.notifyFloorAdded(floor);
+      },
+      createMysticBuilding: () => createMysticBuilding(targetBuildings),
+      getCompanyValue: () => getCompanyAssetValue(targetBuildings),
+      applyCompanyWideBoost: () => {
+        for (const floors of targetBuildings) applyBoostAll(floors);
+      },
+      getScreenCenterLocal: () => ({ x: FLOOR_W / 2, y: FLOOR_H / 2 }),
+    };
+  }
+
+  async function purchaseInDraft(
+    step: (draft: BuildingDraft) => boolean,
+  ): Promise<BuildingDraft | null> {
+    if (isDetachedJobPending()) return null;
+    const companyIndex = activeCompanyIndex;
+    const originalGround = buildings[0]?.[0];
+    let committed: BuildingDraft | null = null;
+    await runBuildingJob({
+      buildings,
+      getMoney: getTotalIncome,
+      step: (draft) => withDraftEconomy(draft, () => step(draft)),
+      isCurrent: () =>
+        activeCompanyIndex === companyIndex &&
+        buildings[0]?.[0] === originalGround,
+      commit: (draft) => {
+        buildings.splice(0, buildings.length, ...draft.buildings);
+        commitDraftIncome(draft.money);
+        gameCanvas.setActiveFloors(buildings[activeBuildingIndex], true);
+        persist();
+        committed = draft;
+      },
+    });
+    return committed;
   }
 
   // switches which building is currently displayed — no travel animation yet, just
@@ -353,6 +444,7 @@ async function main() {
     saveActiveBuildingIndex(activeCompanyIndex, buildingIndex);
     await loadBuildingThemeAssets();
     gameCanvas.setActiveFloors(buildings[buildingIndex]);
+    refreshRenovationView();
   }
 
   // switches which corporation is active (see company.ts, cityMap's barrel-roll
@@ -417,6 +509,7 @@ async function main() {
     await loadBuildingThemeAssets();
     await Promise.all([loadCityImage(), loadCityMapImage()]);
     gameCanvas.setActiveFloors(buildings[activeBuildingIndex]);
+    refreshRenovationView();
   }
 
   // dev/test-only controls; markup is stripped entirely in production builds
@@ -446,10 +539,112 @@ async function main() {
     // wired last, so it sees every dropdown/button the block above created
     wireTestActionsFilter(app);
   }
+  function startBuildingRenovation(
+    floors: Floor[],
+    plan: RenovationPlan,
+    action: "upgrades" | "unlock" | "complete" = "upgrades",
+    onPurchased?: () => void,
+  ): Promise<boolean> {
+    const buildingIndex = buildings.indexOf(floors);
+    if (
+      buildingIndex < 0 ||
+      isDetachedJobPending() ||
+      renovations.running ||
+      floors.some(isFloorLocked)
+    )
+      return Promise.resolve(false);
+    const companyIndex = activeCompanyIndex;
+    let mysticBuildings = 0;
+    let companyBoosts = 0;
+    const draftDeps = (draft: BuildingDraft): FloorActionsDeps => ({
+      ...floorActionDeps(buildingIndex, draft.buildings),
+      createMysticBuilding: () => {
+        mysticBuildings++;
+      },
+      applyCompanyWideBoost: () => {
+        applyBoostAll(draft.buildings[buildingIndex]);
+        companyBoosts++;
+      },
+    });
+    const upgrade = (draft: BuildingDraft, floor: Floor): void => {
+      withDraftEconomy(draft, () =>
+        performAutomatedUpgradeAfterPayment(
+          draftDeps(draft),
+          floor,
+          draft.buildings[buildingIndex][0] === floor,
+          true,
+        ),
+      );
+    };
+    refreshRenovationView();
+    return renovations.start(companyIndex, buildingIndex, () =>
+      renovateFloors({
+        plan,
+        buildings,
+        buildingIndex,
+        onPurchased,
+        spend: (cost) => {
+          if (!spendTotalIncome(cost)) return false;
+          saveCurrentCompanyStateNow();
+          return true;
+        },
+        refund: (cost) => {
+          addCompanyTotalIncome(companyIndex, cost);
+          persist();
+        },
+        getMoney: getTotalIncome,
+        isCurrent: () =>
+          activeCompanyIndex === companyIndex &&
+          buildings[buildingIndex] === floors,
+        upgrade,
+        createStep:
+          action === "upgrades"
+            ? undefined
+            : (draft) =>
+                action === "unlock"
+                  ? createFloorUnlockStep(
+                      draft.buildings[buildingIndex],
+                      (floor) =>
+                        withDraftEconomy(draft, () =>
+                          performAutomatedFloorUnlock(
+                            draftDeps(draft),
+                            floor,
+                            true,
+                          ),
+                        ),
+                    )
+                  : createBuildingCompletionStep(
+                      plan,
+                      draft.buildings[buildingIndex],
+                      (floor) => upgrade(draft, floor),
+                      {
+                        managerLevel: MANAGER_MIN_UPGRADE_COUNT,
+                        maxWorkers: MAX_RENDERED_WORKERS,
+                      },
+                    ),
+        commit: (draft, rewardBase) => {
+          buildings[buildingIndex] = draft.buildings[buildingIndex];
+          addCompanyTotalIncome(
+            companyIndex,
+            subtract(draft.money, rewardBase),
+          );
+          for (let count = 0; count < mysticBuildings; count++)
+            createMysticBuilding();
+          if (companyBoosts > 0)
+            for (const targets of buildings) applyBoostAll(targets);
+          if (activeBuildingIndex === buildingIndex)
+            gameCanvas.setActiveFloors(buildings[buildingIndex], true);
+          persist();
+        },
+      }),
+    );
+  }
   const upgradeMenu = wireUpgradeMenu(
     app,
     () => buildings[activeBuildingIndex] ?? [],
     () => persist(),
+    startBuildingRenovation,
+    (floors, budget) => planRenovation(floors, budget),
   );
   // "Create new Corporation" adds a fresh named corporation above the current
   // one in the map's corp-name barrel (see corporationName.ts/cityMap's
@@ -507,12 +702,14 @@ async function main() {
   // buys the next building outright if affordable (see buildings.ts's
   // getBuildingPrice, which scales 1000x per building same as its economy).
   // Returns whether it succeeded so the map menu can decide whether to re-render
-  function buyBuilding(): boolean {
-    const buildingIndex = buildings.length;
+  function buyBuilding(targetBuildings = buildings): boolean {
+    const buildingIndex = targetBuildings.length;
     if (!spendTotalIncome(getBuildingPrice(buildingIndex))) return false;
-    buildings.push(createBuilding(buildingIndex, getBackgroundUrls().length));
-    setupBuilding(buildingIndex);
-    persist();
+    targetBuildings.push(
+      createBuilding(buildingIndex, getBackgroundUrls().length),
+    );
+    setupBuilding(buildingIndex, targetBuildings);
+    if (targetBuildings === buildings) persist();
     return true;
   }
 
@@ -520,122 +717,81 @@ async function main() {
   // the city map's long-press-on-the-green-dot gesture (see cityMap/index.ts,
   // markers.ts's drawBuyAllFloorsIndicator). Returns whether it succeeded (false
   // if there's nothing left to unlock, or it's not actually affordable)
-  function buyAllFloorsForBuilding(buildingIndex: number): boolean {
+  function buyAllFloorsForBuilding(
+    buildingIndex: number,
+    onPurchased?: () => void,
+  ): Promise<boolean> {
     const floors = buildings[buildingIndex];
-    if (!floors) return false;
-    const multiplier = getBuildingMultiplier(buildingIndex);
-    const cost = getBuildingUnlockAllCost(floors, multiplier);
-    if (isZero(cost) || !spendTotalIncome(cost)) return false;
-    unlockAllFloors({
+    if (!floors) return Promise.resolve(false);
+    const cost = getBuildingUnlockAllCost(
       floors,
-      backgroundCount: getBackgroundUrls().length,
-      multiplier,
-      onAdd: (floor) => {
-        if (buildingIndex === activeBuildingIndex) {
-          gameCanvas.notifyFloorAdded(floor);
-        }
-      },
-    });
-    persist();
-    return true;
+      getBuildingMultiplier(buildingIndex),
+    );
+    if (isZero(cost)) return Promise.resolve(false);
+    const count =
+      MAX_FLOORS_PER_BUILDING - floors.filter((floor) => floor.unlocked).length;
+    return startBuildingRenovation(
+      floors,
+      createFixedRenovationPlan(floors, cost, count),
+      "unlock",
+      onPurchased,
+    );
   }
 
-  // Applies the complete purple map action to the supplied floor objects and
-  // returns the exact money required. Callers pass shallow clones for a pure
-  // affordability preview or real floors after pre-spending that amount once.
-  function applyBuildingProgression(
-    floors: Floor[],
-    rollCrits = false,
-  ): BigNumber {
-    let total = ZERO;
-    const addCost = (cost: BigNumber): void => {
-      total = add(total, cost);
-    };
-
-    for (const floor of floors) {
-      if (!floor.unlocked) continue;
-      while (floor.upgradeCount < MANAGER_MIN_UPGRADE_COUNT) {
-        addCost(floor.upgradeCost);
-        increaseIncomeRate(floor);
-        if (rollCrits) rollCritUpgrade(floor);
-      }
-    }
-    for (const floor of floors) {
-      if (!floor.unlocked) continue;
-      while (floor.workerCount < MAX_RENDERED_WORKERS) {
-        addCost(getWorkerCost(floor));
-        floor.workerCount += 1;
-      }
-      if (!floor.hasOfficeChairs) {
-        addCost(getOfficeChairsCost(floor));
-        floor.hasOfficeChairs = true;
-      }
-      if (!floor.hasOfficeSupplies) {
-        addCost(getOfficeSuppliesCost(floor));
-        floor.hasOfficeSupplies = true;
-      }
-      if (
-        !floor.hasManager &&
-        floor.upgradeCount >= MANAGER_MIN_UPGRADE_COUNT
-      ) {
-        addCost(getManagerCost(floor));
-        floor.hasManager = true;
-      }
-    }
-    return total;
+  function getBuildingCompletionPlan(floors: Floor[]): RenovationPlan {
+    return planBuildingCompletion(floors, {
+      managerLevel: MANAGER_MIN_UPGRADE_COUNT,
+      maxWorkers: MAX_RENDERED_WORKERS,
+      increaseIncomeRate,
+      workerCost: getWorkerCost,
+      chairsCost: getOfficeChairsCost,
+      suppliesCost: getOfficeSuppliesCost,
+      managerCost: getManagerCost,
+    });
   }
 
   function getBuildingUpgradeAllCostForMap(buildingIndex: number): BigNumber {
     const floors = buildings[buildingIndex];
     if (!floors) return ZERO;
-    const preview = floors.map((floor) => ({ ...floor }));
-    return applyBuildingProgression(preview);
+    return getBuildingCompletionPlan(floors).cost;
   }
 
-  function buyAllFloorUpgradesForBuilding(buildingIndex: number): boolean {
+  function buyAllFloorUpgradesForBuilding(
+    buildingIndex: number,
+    onPurchased?: () => void,
+  ): Promise<boolean> {
     const floors = buildings[buildingIndex];
-    if (!floors) return false;
-    const critCountsBefore = Object.fromEntries(
-      CRIT_PROC_KINDS.map((kind) => [kind, getCritProcCount(kind)]),
-    ) as Record<CritProcKind, number>;
-    const cost = getBuildingUpgradeAllCostForMap(buildingIndex);
-    if (isZero(cost) || !spendTotalIncome(cost)) return false;
-    applyBuildingProgression(floors, true);
-    persist();
-    const landedCounts: Partial<Record<CritProcKind, number>> = {};
-    for (const kind of CRIT_PROC_KINDS) {
-      const delta = getCritProcCount(kind) - critCountsBefore[kind];
-      if (delta > 0) landedCounts[kind] = delta;
-    }
-    cityMapView.showCritBadges(landedCounts);
-    return true;
+    if (!floors) return Promise.resolve(false);
+    return startBuildingRenovation(
+      floors,
+      getBuildingCompletionPlan(floors),
+      "complete",
+      onPurchased,
+    );
   }
 
   // Buys the currently-cheapest upgrade repeatedly after the green and purple
   // map actions have been processed.
-  function buyCheapestFloorUpgradesForBuilding(buildingIndex: number): boolean {
+  async function buyCheapestFloorUpgradesForBuilding(
+    buildingIndex: number,
+    onPurchased?: () => void,
+  ): Promise<boolean> {
     const floors = buildings[buildingIndex];
-    if (!floors) return false;
-    const critCountsBefore = Object.fromEntries(
-      CRIT_PROC_KINDS.map((kind) => [kind, getCritProcCount(kind)]),
-    ) as Record<CritProcKind, number>;
-    const bought = buyCheapestUpgrades(
-      floors.filter((floor) => floor.unlocked),
-      spendTotalIncome,
-      (floor) => {
-        increaseIncomeRate(floor);
-        rollCritUpgrade(floor);
-      },
-    );
-    if (bought === 0) return false;
-    persist();
-    const landedCounts: Partial<Record<CritProcKind, number>> = {};
-    for (const kind of CRIT_PROC_KINDS) {
-      const delta = getCritProcCount(kind) - critCountsBefore[kind];
-      if (delta > 0) landedCounts[kind] = delta;
-    }
-    cityMapView.showCritBadges(landedCounts);
-    return true;
+    if (
+      !floors ||
+      floors.some(isFloorLocked) ||
+      renovations.running ||
+      isDetachedJobPending()
+    )
+      return false;
+    const companyIndex = activeCompanyIndex;
+    const plan = planRenovation(floors, getTotalIncome());
+    if (
+      activeCompanyIndex !== companyIndex ||
+      buildings[buildingIndex] !== floors
+    )
+      return false;
+    return startBuildingRenovation(floors, plan, "upgrades", onPurchased);
   }
 
   // the city map's cloud-cat mascot: a toggleable background auto-buyer that
@@ -644,19 +800,18 @@ async function main() {
   // next building, a locked floor, an upgrade, a worker, office chairs, office
   // supplies or a manager. Buying nothing is a normal idle tick, never a stop
   // condition.
-  function runCheapestBatch(): CheapestBatch {
-    const critCountsBefore = Object.fromEntries(
-      CRIT_PROC_KINDS.map((kind) => [kind, getCritProcCount(kind)]),
-    ) as Record<CritProcKind, number>;
-    const cheapest = cheapestPurchase();
-    if (!cheapest || !cheapest.buy()) return { label: null, badges: {} };
-    persist();
-    const badges: Partial<Record<CritProcKind, number>> = {};
-    for (const kind of CRIT_PROC_KINDS) {
-      const delta = getCritProcCount(kind) - critCountsBefore[kind];
-      if (delta > 0) badges[kind] = delta;
-    }
-    return { label: cheapest.label, badges };
+  async function runCheapestBatch(): Promise<CheapestBatch> {
+    if (renovations.running || isDetachedJobPending() || !cheapestPurchase())
+      return { label: null, badges: {} };
+    let label: string | null = null;
+    const result = await purchaseInDraft((draft) => {
+      if (label !== null) return false;
+      const purchase = cheapestPurchase(draft.buildings);
+      if (!purchase || !purchase.buy()) return false;
+      label = purchase.label;
+      return true;
+    });
+    return { label: result ? label : null, badges: result?.badges ?? {} };
   }
 
   interface AutoPurchase {
@@ -669,7 +824,7 @@ async function main() {
 
   // scans every purchasable thing in the company and returns the most
   // expensive affordable one, or null once nothing can currently be bought
-  function cheapestPurchase(): AutoPurchase | null {
+  function cheapestPurchase(targetBuildings = buildings): AutoPurchase | null {
     let best: AutoPurchase | null = null;
     const consider = (candidate: AutoPurchase): void => {
       if (
@@ -681,30 +836,40 @@ async function main() {
       best = candidate;
     };
     consider({
-      cost: getBuildingPrice(buildings.length),
+      cost: getBuildingPrice(targetBuildings.length),
       label: "+1 building",
-      buy: buyBuilding,
+      buy: () => {
+        const buildingIndex = targetBuildings.length;
+        if (!buyBuilding(targetBuildings)) return false;
+        const result = rollFloorBuyCrit();
+        if (result) setBuildingCritTier(buildingIndex, result, targetBuildings);
+        return true;
+      },
     });
-    buildings.forEach((floors, buildingIndex) => {
+    targetBuildings.forEach((floors, buildingIndex) => {
       const top = floors[floors.length - 1];
       if (top && !top.unlocked) {
         consider({
           cost: top.unlockCost,
           label: "+1 floor",
-          buy: () => unlockNextFloor(top, buildingIndex),
+          buy: () =>
+            performAutomatedFloorUnlock(
+              floorActionDeps(buildingIndex, targetBuildings),
+              top,
+            ),
         });
       }
       for (const floor of floors) {
         if (!floor.unlocked) continue;
         consider({
-          cost: floor.upgradeCost,
+          cost: getCritTier(floor) ? ZERO : getUpgradeCost(floor),
           label: "+1 upgrade",
-          buy: () => {
-            if (!spendTotalIncome(floor.upgradeCost)) return false;
-            increaseIncomeRate(floor);
-            rollCritUpgrade(floor);
-            return true;
-          },
+          buy: () =>
+            performAutomatedUpgradeClick(
+              floorActionDeps(buildingIndex, targetBuildings),
+              floor,
+              floors[0] === floor,
+            ),
         });
         if (floor.workerCount < MAX_RENDERED_WORKERS) {
           consider({
@@ -739,23 +904,6 @@ async function main() {
     return best;
   }
 
-  function unlockNextFloor(floor: Floor, buildingIndex: number): boolean {
-    if (!spendTotalIncome(floor.unlockCost)) return false;
-    unlockFloor(floor);
-    ensureLockedFloorAbove({
-      floors: buildings[buildingIndex],
-      backgroundCount: getBackgroundUrls().length,
-      multiplier: getBuildingMultiplier(buildingIndex),
-      onAdd: (added) => {
-        if (buildingIndex === activeBuildingIndex)
-          gameCanvas.notifyFloorAdded(added);
-      },
-    });
-    // same crit shot a hand-bought floor gets, which is what earns the badges
-    rollCritUpgrade(floor);
-    return true;
-  }
-
   // sets EVERY floor a building currently has (locked or not) to the given crit
   // tier, permanently — no unlocking, no cost (see cityMap/index.ts's map-buy
   // crit celebration). A brand new building only has its one free ground floor
@@ -773,14 +921,15 @@ async function main() {
   function applyBuildingCritTier(
     buildingIndex: number,
     result: CritRollResult,
+    targetBuildings = buildings,
   ): void {
-    const floors = buildings[buildingIndex];
+    const floors = targetBuildings[buildingIndex];
     if (!floors) return;
     const { tier, chain } = result;
     for (const floor of floors) {
       if (!result.skip) floor.critMultiplierTier = tier;
     }
-    if (result.mystic) createMysticBuilding();
+    if (result.mystic) createMysticBuilding(targetBuildings);
     // reward side of every proc this building-buy event actually supports —
     // one handler per proc kind (see shared/critTypes's applyCritProcs), so
     // this is the ONE place that has to say what "upgrade"/"heavenly" mean
@@ -811,7 +960,10 @@ async function main() {
           backgroundCount: getBackgroundUrls().length,
           multiplier: getBuildingMultiplier(buildingIndex),
           onAdd: (floor) => {
-            if (buildingIndex === activeBuildingIndex) {
+            if (
+              targetBuildings === buildings &&
+              buildingIndex === activeBuildingIndex
+            ) {
               gameCanvas.notifyFloorAdded(floor);
             }
           },
@@ -833,7 +985,10 @@ async function main() {
           backgroundCount: getBackgroundUrls().length,
           multiplier: getBuildingMultiplier(buildingIndex),
           onAdd: (floor) => {
-            if (buildingIndex === activeBuildingIndex) {
+            if (
+              targetBuildings === buildings &&
+              buildingIndex === activeBuildingIndex
+            ) {
               gameCanvas.notifyFloorAdded(floor);
             }
           },
@@ -854,7 +1009,10 @@ async function main() {
           backgroundCount: getBackgroundUrls().length,
           multiplier: getBuildingMultiplier(buildingIndex),
           onAdd: (floor) => {
-            if (buildingIndex === activeBuildingIndex) {
+            if (
+              targetBuildings === buildings &&
+              buildingIndex === activeBuildingIndex
+            ) {
               gameCanvas.notifyFloorAdded(floor);
             }
           },
@@ -877,7 +1035,10 @@ async function main() {
         backgroundCount: getBackgroundUrls().length,
         multiplier: getBuildingMultiplier(buildingIndex),
         onFloorAdded: (floor) => {
-          if (buildingIndex === activeBuildingIndex) {
+          if (
+            targetBuildings === buildings &&
+            buildingIndex === activeBuildingIndex
+          ) {
             gameCanvas.notifyFloorAdded(floor);
           }
         },
@@ -898,15 +1059,18 @@ async function main() {
   function setBuildingCritTier(
     buildingIndex: number,
     result: CritRollResult,
+    targetBuildings = buildings,
   ): void {
-    applyBuildingCritTier(buildingIndex, result);
+    applyBuildingCritTier(buildingIndex, result, targetBuildings);
     if (result.chain) {
       let continueChain = true;
       while (continueChain) {
-        const nextIndex = buildings.length;
-        buildings.push(createBuilding(nextIndex, getBackgroundUrls().length));
-        setupBuilding(nextIndex);
-        applyBuildingCritTier(nextIndex, result);
+        const nextIndex = targetBuildings.length;
+        targetBuildings.push(
+          createBuilding(nextIndex, getBackgroundUrls().length),
+        );
+        setupBuilding(nextIndex, targetBuildings);
+        applyBuildingCritTier(nextIndex, result, targetBuildings);
         continueChain = Math.random() < CHAIN_CRIT_CONTINUE_CHANCE;
       }
     }
@@ -931,13 +1095,15 @@ async function main() {
     ]) {
       if (!count) continue;
       for (let i = 1; i < count; i++) {
-        const nextIndex = buildings.length;
-        buildings.push(createBuilding(nextIndex, getBackgroundUrls().length));
-        setupBuilding(nextIndex);
-        applyBuildingCritTier(nextIndex, result);
+        const nextIndex = targetBuildings.length;
+        targetBuildings.push(
+          createBuilding(nextIndex, getBackgroundUrls().length),
+        );
+        setupBuilding(nextIndex, targetBuildings);
+        applyBuildingCritTier(nextIndex, result, targetBuildings);
       }
     }
-    persist();
+    if (targetBuildings === buildings) persist();
   }
 
   // the old building-picker popup is kept wired (backdrop/list still functional)
@@ -952,7 +1118,6 @@ async function main() {
     buildings,
   );
   // toggles between the building canvas and the static city map canvas
-  let mapOpen = false;
   function closeMapView(): void {
     mapOpen = false;
     canvas.hidden = false;
@@ -964,6 +1129,7 @@ async function main() {
     // the very next redraw()/tick from dividing by a stale zero size
     gameCanvas.resize();
     gameCanvas.redraw();
+    refreshRenovationView();
   }
   function openMapView(): void {
     mapOpen = true;
@@ -971,6 +1137,7 @@ async function main() {
     cityMapEl.hidden = false;
     playSwoosh();
     cityMapView.refresh();
+    refreshRenovationView();
   }
   const cityMapView = createCityMapView(app, {
     getTotalIncome,
@@ -1004,6 +1171,28 @@ async function main() {
         getBuildingMultiplier(buildingIndex),
       ),
     getBuildingUpgradeAllCost: getBuildingUpgradeAllCostForMap,
+    canRenovateBuilding: (buildingIndex) => {
+      const floors = buildings[buildingIndex];
+      if (
+        !floors ||
+        renovations.running ||
+        isDetachedJobPending() ||
+        floors.some(isFloorLocked)
+      )
+        return false;
+      const unlockCost = getBuildingUnlockAllCost(
+        floors,
+        getBuildingMultiplier(buildingIndex),
+      );
+      if (!isZero(unlockCost)) return gte(getTotalIncome(), unlockCost);
+      const completionCost = getBuildingUpgradeAllCostForMap(buildingIndex);
+      return (
+        (!isZero(completionCost) && gte(getTotalIncome(), completionCost)) ||
+        floors.some(
+          (floor) => floor.unlocked && gte(getTotalIncome(), floor.upgradeCost),
+        )
+      );
+    },
     buyBuilding,
     onStateChanged: saveCurrentCompanyStateNow,
     buyAllFloors: buyAllFloorsForBuilding,
@@ -1044,10 +1233,20 @@ async function main() {
       cityMapView.jumpToEnd(1);
     },
     onBoostAll: () => {
+      if (
+        isDetachedJobPending() ||
+        (!mapOpen && buildings[activeBuildingIndex].some(isFloorLocked))
+      )
+        return;
       if (mapOpen) badgeCollection.open();
       else boostMenu.open();
     },
     onOpenUpgradeMenu: () => {
+      if (
+        isDetachedJobPending() ||
+        (!mapOpen && buildings[activeBuildingIndex].some(isFloorLocked))
+      )
+        return;
       if (mapOpen) corporationUpgradeMenu.open();
       else upgradeMenu.open();
     },

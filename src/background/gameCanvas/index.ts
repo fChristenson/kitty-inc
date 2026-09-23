@@ -127,7 +127,7 @@ export interface GameCanvas {
   notifyFloorAdded: (floor: Floor) => void;
   // switches which building's floors are currently displayed — no travel animation
   // yet, just an instant cut to the new street — and resets scroll to ground level
-  setActiveFloors: (floors: Floor[]) => void;
+  setActiveFloors: (floors: Floor[], preserveScroll?: boolean) => void;
   scrollActiveToTop: () => void;
   scrollActiveToBottom: () => void;
   // centers the camera on a given floor of the currently-active building (e.g. a
@@ -189,10 +189,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     clampCamera();
   }
 
-  function setActiveFloors(floors: Floor[]): void {
+  function setActiveFloors(floors: Floor[], preserveScroll = false): void {
+    stopHoldRepeat();
     activeFloors = floors;
     registerFloors(floors);
-    scrollUp = 0;
+    if (!preserveScroll) scrollUp = 0;
     clampCamera();
   }
 

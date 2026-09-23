@@ -21,9 +21,35 @@ import {
   log10,
 } from "../shared/bigNumber";
 import { saveCompanySnapshot } from "../shared/persistence";
+import {
+  isDetachedJobPending,
+  isDetachedJobRunning,
+  isFloorLocked,
+} from "../shared/detachedJob";
 
 export function getTotalIncome(): BigNumber {
   return totalIncome;
+}
+
+export function commitDraftIncome(money: BigNumber): void {
+  totalIncome = money;
+}
+
+export function withDraftEconomy<T>(
+  draft: { buildings: Floor[][]; money: BigNumber },
+  action: () => T,
+): T {
+  const liveMoney = totalIncome;
+  const liveBuildings = tickerBuildings;
+  totalIncome = draft.money;
+  tickerBuildings = draft.buildings;
+  try {
+    return action();
+  } finally {
+    draft.money = totalIncome;
+    totalIncome = liveMoney;
+    tickerBuildings = liveBuildings;
+  }
 }
 
 // reads any company's own current total (not just the currently active one) —
@@ -130,6 +156,7 @@ export function getActiveCompanyInvestedValue(): BigNumber {
 
 // deducts amount from the running total if affordable; returns whether the spend succeeded
 export function spendTotalIncome(amount: BigNumber): boolean {
+  if (isDetachedJobPending() && !isDetachedJobRunning()) return false;
   if (lt(totalIncome, amount)) return false;
   totalIncome = subtract(totalIncome, amount);
   return true;
@@ -407,6 +434,7 @@ export function startTotalIncomeTicker(
     incomeBoostMultiplier = getIncomeBoostMultiplier;
   let lastSave = performance.now();
   function collectAll(): void {
+    if (isDetachedJobPending()) return;
     // Date.now()-based (not performance.now()) since collectDueIncome now reads/writes
     // floor.lastCollectedAt directly, a persisted Date.now()-based timestamp
     const now = Date.now();
@@ -422,7 +450,7 @@ export function startTotalIncomeTicker(
     }
     for (const floors of tickerBuildings) {
       for (const floor of floors) {
-        if (!floor.unlocked) continue;
+        if (!floor.unlocked || isFloorLocked(floor)) continue;
         totalIncome = add(
           totalIncome,
           multiply(collectDueIncome(floor, now), cachedBoostMultiplier),

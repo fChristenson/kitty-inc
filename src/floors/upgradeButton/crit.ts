@@ -1,3 +1,4 @@
+import { snapshotMap, snapshotSet } from "../../shared/snapshotState";
 // The base crit-TIER system (x5/x25/x125 jackpot rolls) — distinct from the
 // "event crit" framework in shared.ts (Sale/Overtime and any future ones): a
 // tier is what's rolled per click and what makes an event's own piggyback
@@ -404,7 +405,7 @@ import {
   type FeaturedCritKind,
 } from "../../shared/critTypes";
 
-const critTiers = new WeakMap<Floor, CritTier>();
+const critTiers = snapshotMap<Floor, CritTier>();
 
 let testCritFloor: Floor | null = null;
 
@@ -456,7 +457,7 @@ export function forceFeaturedFloorBuyCrit(
 // applyGoldenTicketCrit): a one-shot flag consumed by the very next
 // rollCritUpgrade call on this floor, forcing a guaranteed "ultra" tier and
 // skipping rollCrit's own tier/proc chances entirely for that one roll
-const guaranteedUltraCrits = new WeakSet<Floor>();
+const guaranteedUltraCrits = snapshotSet<Floor>();
 
 export function armGuaranteedUltraCrit(floor: Floor): void {
   guaranteedUltraCrits.add(floor);
@@ -465,7 +466,7 @@ export function armGuaranteedUltraCrit(floor: Floor): void {
 // "Silver Ticket" crit's own reward (see floorInteractions.ts's
 // applySilverTicketCrit): same one-shot shape as Golden Ticket above, but
 // forces a guaranteed "mega" tier instead
-const guaranteedMegaCrits = new WeakSet<Floor>();
+const guaranteedMegaCrits = snapshotSet<Floor>();
 
 export function armGuaranteedMegaCrit(floor: Floor): void {
   guaranteedMegaCrits.add(floor);
