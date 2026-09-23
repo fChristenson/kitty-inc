@@ -393,9 +393,118 @@ try {
     "/src/floors/upgradeButton/index.ts",
   );
   const locks = await server.ssrLoadModule("/src/floors/floorLock/index.ts");
+  const { createBuilding, getBuildingMultiplier, getBuildingPrice } =
+    await server.ssrLoadModule("/src/buildings/index.ts");
+  const { CONFIG } = await server.ssrLoadModule("/src/config.ts");
+  {
+    const previousGrowth = CONFIG.floors.floorEconomyMultiplierPerBuilding;
+    const buildingPrice = getBuildingPrice(1);
+    try {
+      CONFIG.floors.floorEconomyMultiplierPerBuilding = 10;
+      assert.equal(getBuildingMultiplier(0), 1);
+      assert.equal(getBuildingMultiplier(1), 10);
+      assert.equal(getBuildingMultiplier(2), 100);
+      const firstPaidFloor = buildFloor(2, {
+        backgroundCount: 1,
+        multiplier: getBuildingMultiplier(1),
+      });
+      const nextFloor = buildFloor(3, {
+        backgroundCount: 1,
+        multiplier: getBuildingMultiplier(1),
+      });
+      assert.equal(
+        toNumber(firstPaidFloor.unlockCost),
+        CONFIG.floors.baseUnlockCost * 10,
+      );
+      assert.equal(
+        toNumber(nextFloor.unlockCost),
+        CONFIG.floors.baseUnlockCost *
+          10 *
+          CONFIG.floors.unlockCostGrowthFactor,
+      );
+      assert.deepEqual(
+        getBuildingPrice(1),
+        buildingPrice,
+        "floor scaling cannot alter building purchase prices",
+      );
+      assert.equal(toNumber(buildingPrice), CONFIG.buildings.basePrice);
+    } finally {
+      CONFIG.floors.floorEconomyMultiplierPerBuilding = previousGrowth;
+    }
+  }
+  const { collectDueIncome, currentIncomeRatePerSecond } =
+    await server.ssrLoadModule("/src/floors/incomePanel/index.ts");
+  for (const buildingIndex of [0, 1, 5]) {
+    const floors = createBuilding(buildingIndex, 1);
+    const ground = floors[0];
+    assert.equal(
+      ground.unlocked,
+      true,
+      "new building includes an unlocked ground floor",
+    );
+    assert.equal(
+      toNumber(ground.unlockCost),
+      0,
+      "ground floor has no extra unlock charge",
+    );
+    assert(toNumber(currentIncomeRatePerSecond(ground, Date.now())) > 0);
+    assert(
+      toNumber(collectDueIncome(ground, ground.lastCollectedAt + 60000)) > 0,
+      "new ground floor earns income without another purchase",
+    );
+    locks.ensureLockedFloorAbove({
+      floors,
+      backgroundCount: 1,
+      multiplier: getBuildingMultiplier(buildingIndex),
+      onAdd() {},
+    });
+    assert.equal(floors.length, 2);
+    assert.equal(floors[0], ground);
+    assert.equal(
+      floors[1].unlocked,
+      false,
+      "only the next floor needs unlocking",
+    );
+    assert(toNumber(floors[1].unlockCost) > 0);
+  }
   const crit = await server.ssrLoadModule("/src/shared/critTypes/index.ts");
   const economy = await server.ssrLoadModule("/src/totalIncome/index.ts");
   const workers = await server.ssrLoadModule("/src/gameState/index.ts");
+  {
+    const previousStorage = globalThis.localStorage;
+    const brokenGround = createBuilding(1, 1, { groundFloorLocked: true })[0];
+    brokenGround.lastCollectedAt = 123;
+    const existingGround = createBuilding(0, 1)[0];
+    existingGround.lastCollectedAt = 456;
+    const saved = JSON.stringify({
+      buildings: [
+        [{ ...brokenGround, workers: [] }],
+        [{ ...existingGround, workers: [] }],
+      ],
+    });
+    globalThis.localStorage = { getItem: () => saved };
+    try {
+      const restored = workers.loadBuildings();
+      assert.equal(
+        restored[0][0].unlocked,
+        true,
+        "old locked ground floors recover on load",
+      );
+      assert.equal(toNumber(restored[0][0].unlockCost), 0);
+      assert(
+        restored[0][0].lastCollectedAt > 123,
+        "new income starts at recovery",
+      );
+      assert.equal(
+        restored[1][0].lastCollectedAt,
+        456,
+        "working ground-floor timers remain untouched",
+      );
+    } finally {
+      if (previousStorage === undefined) delete globalThis.localStorage;
+      else globalThis.localStorage = previousStorage;
+    }
+  }
   const { cloneWithSnapshotState } = await server.ssrLoadModule(
     "/src/shared/snapshotState/index.ts",
   );

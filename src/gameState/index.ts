@@ -516,9 +516,16 @@ export function loadBuildings(companyIndex = 0): Floor[][] {
   try {
     const parsed: SavedFloor[][] | SavedBuildings = JSON.parse(raw);
     const saved = Array.isArray(parsed) ? { buildings: parsed } : parsed;
-    return saved.buildings.map((floors) =>
-      floors.map((sf) => fromSavedFloor(sf)),
-    );
+    return saved.buildings.map((floors) => {
+      const restored = floors.map((sf) => fromSavedFloor(sf));
+      const ground = restored[0];
+      if (ground && !ground.unlocked) {
+        ground.unlocked = true;
+        ground.unlockCost = ZERO;
+        ground.lastCollectedAt = Date.now();
+      }
+      return restored;
+    });
   } catch {
     return [];
   }

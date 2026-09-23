@@ -4,20 +4,16 @@ import type { Floor } from "../gameState";
 import { type BigNumber, pow, multiply } from "../shared/bigNumber";
 import { CONFIG } from "../config";
 
-// each building's $ base values (income/upgrade/unlock/rate-step) are this much
-// bigger than the previous building's — a fresh, much richer economy to grow into
 export const BUILDING_COST_MULTIPLIER = CONFIG.buildings.costMultiplier;
 
 export function getBuildingMultiplier(buildingIndex: number): number {
-  return BUILDING_COST_MULTIPLIER ** buildingIndex;
+  return CONFIG.floors.floorEconomyMultiplierPerBuilding ** buildingIndex;
 }
 
 const BUILDING_BASE_PRICE = CONFIG.buildings.basePrice;
 
 // $ cost to buy the next building (nextBuildingIndex === buildings.length, since
-// index 0 is the always-free starting building) — scales by the same
-// BUILDING_COST_MULTIPLIER as that building's own economy, so the price always keeps
-// pace with how much richer each successive building actually is. Uses
+// index 0 is the always-free starting building), independently of floor scaling. Uses
 // shared/bigNumber's pow (never a raw `**`), so this stays finite even for a
 // very high building index instead of overflowing to Infinity
 export function getBuildingPrice(nextBuildingIndex: number): BigNumber {
@@ -27,10 +23,8 @@ export function getBuildingPrice(nextBuildingIndex: number): BigNumber {
   );
 }
 
-// builds a new building's starting floor list: just its ground floor, locked (and
-// priced) for every building except the very first one, which keeps the original
-// always-free ground floor. floorLock.ts's ensureLockedFloorAbove adds the next
-// (always-locked) floor above it the same way it does for every other building.
+// New buildings include a free, working ground floor. ensureLockedFloorAbove
+// queues the next paid floor above it.
 export function createBuilding(
   buildingIndex: number,
   backgroundCount: number,
@@ -40,7 +34,7 @@ export function createBuilding(
   } = {},
 ): Floor[] {
   const multiplier = getBuildingMultiplier(buildingIndex);
-  const groundFloorLocked = options.groundFloorLocked ?? buildingIndex > 0;
+  const groundFloorLocked = options.groundFloorLocked ?? false;
   const groundFloor = buildFloor(1, {
     backgroundCount,
     multiplier,

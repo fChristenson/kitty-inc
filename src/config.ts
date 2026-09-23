@@ -20,6 +20,7 @@ export const CONFIG = {
   // a single building got tall enough. Keep this <= 2 (the interval-doubling
   // factor) so that snowball never comes back.
   floors: {
+    floorEconomyMultiplierPerBuilding: 1_000,
     baseIncomeAmount: 1,
     incomeGrowthFactor: 2,
     baseIncomeIntervalSeconds: 1,
@@ -30,7 +31,7 @@ export const CONFIG = {
     baseRateStep: 2,
   },
 
-  // src/buildings/index.ts — pricing and economy scaling for new buildings.
+  // src/buildings/index.ts — purchase prices only; floor scaling lives in floors.
   buildings: {
     costMultiplier: 1_000_000_000,
     basePrice: 1_000_000_000,
