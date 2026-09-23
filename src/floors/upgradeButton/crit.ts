@@ -401,6 +401,7 @@ import {
   isFeaturedCritKind,
   forceCritProc,
   readCritProcs,
+  tierOnlyCrit,
   type CritProcKind,
   type FeaturedCritKind,
 } from "../../shared/critTypes";
@@ -595,16 +596,16 @@ export type FloorBuyCritResult = CritRollResult;
 
 let forcedFloorBuyCrit: FloorBuyCritResult | null = null;
 
-export function rollFloorBuyCrit(): FloorBuyCritResult | null {
+export function rollFloorBuyCrit(allowSpecialProcs = true): FloorBuyCritResult | null {
   if (forcedFloorBuyCrit) {
     const result = forcedFloorBuyCrit;
     forcedFloorBuyCrit = null;
-    return result;
+    return allowSpecialProcs ? result : tierOnlyCrit(result.tier);
   }
   let rolled: FloorBuyCritResult | null = null;
   rollCrit((result) => {
     rolled = result;
-  });
+  }, allowSpecialProcs);
   return rolled;
 }
 

@@ -1234,6 +1234,14 @@ export function readCritProcs(floor: Floor): CritProcFlags {
 // a flags record with exactly one proc set — lets a single proc be pushed
 // through the same applyCritProcs dispatcher everything else uses (see
 // critCelebration's Deja Vu follow-ups)
+export function tierOnlyCrit(tier: CritTier): CritRollResult {
+  return {
+    ...Object.fromEntries(CRIT_PROC_KINDS.map((kind) => [kind, false])),
+    tier,
+    bonusTier: null,
+  } as CritRollResult;
+}
+
 export function onlyCritProc(kind: CritProcKind): CritProcFlags {
   const flags = {} as CritProcFlags;
   for (const other of CRIT_PROC_KINDS) flags[other] = other === kind;

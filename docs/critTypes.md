@@ -1,5 +1,17 @@
 # Crit ideas
 
+## Manual-only special crits
+
+Special procs, bonus-tier payouts, and collectible badges are available only
+through manual clicks. Renovation, map long-press bulk actions, and cloud
+auto-purchases roll only regular 5x, 25x, and 125x tiers. They do not grant an
+already-armed special proc or its bonus tier when consuming a crit.
+
+Regular free-upgrade multipliers remain active. Bulk floor unlocks permanently
+apply the rolled floor tier without lowering an existing stronger tier; cloud
+building purchases retain their regular building-tier reward. Manually earned
+badges and existing permanent tiers are not removed.
+
 ## Implemented asset batch: 2026-09-22 (mythical beasts)
 
 Twenty-three new mythical-beast illustrations are processed and wired through

@@ -841,7 +841,7 @@ async function main() {
       buy: () => {
         const buildingIndex = targetBuildings.length;
         if (!buyBuilding(targetBuildings)) return false;
-        const result = rollFloorBuyCrit();
+        const result = rollFloorBuyCrit(false);
         if (result) setBuildingCritTier(buildingIndex, result, targetBuildings);
         return true;
       },

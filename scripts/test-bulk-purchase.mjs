@@ -438,6 +438,55 @@ try {
     },
   });
   try {
+    for (const [tier, randomValues] of [
+      ["crit", [0.999999, 0.999999, 0]],
+      ["mega", [0.999999, 0]],
+      ["ultra", [0]],
+    ]) {
+      const countsBefore = crit.CRIT_PROC_KINDS.map(crit.getCritProcCount);
+      let rollCount = 0;
+      Math.random = () => randomValues[rollCount++] ?? 0;
+      const rolled = buttons.rollFloorBuyCrit(false);
+      assert.equal(rolled.tier, tier, "automated building/floor rolls retain all base tiers");
+      assert.equal(rollCount, randomValues.length, "automated roll never enters the special gateway");
+      assert.equal(rolled.bonusTier, null);
+      assert(crit.CRIT_PROC_KINDS.every((kind) => !rolled[kind]));
+
+      const draft = { buildings: [makeBuilding()], money: fromNumber(10000) };
+      const floor = draft.buildings[0][0];
+      rollCount = 0;
+      runDetachedStep(() => economy.withDraftEconomy(draft, () =>
+        actions.performAutomatedUpgradeClick(depsFor(draft), floor, true)));
+      assert.equal(buttons.getCritTier(floor), tier, "ordinary automated purchase can arm each tier");
+      assert(crit.CRIT_PROC_KINDS.every((kind) => !crit.readCritProcs(floor)[kind]));
+      Math.random = () => 0.999999;
+      const balance = draft.money;
+      runDetachedStep(() => economy.withDraftEconomy(draft, () =>
+        actions.performAutomatedUpgradeClick(depsFor(draft), floor, true)));
+      assert.equal(floor.upgradeCount, 1 + crit.CRIT_TIER_CONFIG[tier].multiplier);
+      assert.deepEqual(draft.money, balance, "base-tier upgrades remain free");
+      for (const existingTier of [null, "ultra"]) {
+        const unlockDraft = { buildings: [makeBuilding()], money: fromNumber(10000) };
+        const target = unlockDraft.buildings[0][2];
+        target.critMultiplierTier = existingTier;
+        buttons.forceTestCrit(target, "heavenly", tier, "ultra", "unlock");
+        runDetachedStep(() => economy.withDraftEconomy(unlockDraft, () =>
+          actions.performAutomatedFloorUnlock(depsFor(unlockDraft), target, true)));
+        assert.equal(target.critMultiplierTier, existingTier ?? tier, "bulk floor tier is permanent and never downgraded");
+        assert.equal(target.upgradeCount, crit.CRIT_TIER_CONFIG[tier].multiplier);
+        assert.equal(unlockDraft.buildings[0].filter((candidate) => candidate.unlocked).length, 3, "no Heavenly reward");
+        assert.deepEqual(unlockDraft.money, fromNumber(10000), "no bonus-tier wallet multiplier");
+      }
+      assert.deepEqual(crit.CRIT_PROC_KINDS.map(crit.getCritProcCount), countsBefore, "automation never awards badges");
+    }
+    Math.random = () => 0;
+    let manualRoll;
+    const manualBadgeCount = crit.CRIT_PROC_KINDS.reduce((sum, kind) => sum + crit.getCritProcCount(kind), 0);
+    crit.rollCrit((result) => { manualRoll = result; });
+    assert(crit.CRIT_PROC_KINDS.some((kind) => manualRoll[kind]), "manual rolls still land special procs");
+    assert(crit.CRIT_PROC_KINDS.reduce((sum, kind) => sum + crit.getCritProcCount(kind), 0) > manualBadgeCount,
+      "manual rolls still grant collectible badges");
+    Math.random = () => 0.999999;
     for (const action of ["unlock", "complete"]) {
       const floors = makeBuilding();
       const liveSnapshot = structuredClone(floors);
@@ -533,10 +582,8 @@ try {
             rewardBase,
             `${action}: no per-step live charges`,
           );
-          assert(
-            toNumber(draft.money) > toNumber(rewardBase),
-            `${action}: Booty reward applied`,
-          );
+          assert.deepEqual(draft.money, rewardBase, `${action}: no Booty reward from automation`);
+          assert.deepEqual(draft.badges, {}, `${action}: no automated badges`);
         },
       });
       assert.equal(charges, 1, `${action}: charges once upfront`);
@@ -550,9 +597,10 @@ try {
         );
         assert.deepEqual(
           result.money,
-          multiply(economy.getTotalIncome(), 2),
+          economy.getTotalIncome(),
           "unlocks don't double-charge draft wallet",
         );
+        assert.equal(result.buildings[0][2].critMultiplierTier, "crit", "bulk unlock retains tier promotion");
       } else {
         for (const floor of result.buildings[0].slice(0, 2)) {
           assert(floor.upgradeCount >= rules.managerLevel);
@@ -567,7 +615,7 @@ try {
       }
     }
     console.log(
-      "PASS: prepaid map unlock/completion jobs, full crit rewards, one commit, and accumulated deferred badges",
+      "PASS: prepaid map unlock/completion jobs retain regular tiers without special rewards or badges",
     );
     const manyFloors = Array.from({ length: 10000 }, () =>
       buildFloor(1, { backgroundCount: 1 }),
@@ -727,6 +775,18 @@ try {
           buildings: [baseline.map(cloneWithSnapshotState)],
           money: fromNumber(10000),
         };
+        const reference = {
+          buildings: [baseline.map(cloneWithSnapshotState)],
+          money: fromNumber(10000),
+        };
+        const referenceFloor = reference.buildings[0][event === "upgrade" ? 1 : 2];
+        if (event === "unlock") referenceFloor.critMultiplierTier = "crit";
+        buttons.forceTestCrit(referenceFloor, null, "crit", null, event);
+        runDetachedStep(() => economy.withDraftEconomy(reference, () => {
+          const point = event === "upgrade" ? buttons.getButtonCenter(false) : locks.getLockCenter();
+          actions.handleFloorClick(depsFor(reference), referenceFloor, point.x, point.y, false);
+        }));
+        let automatedBadges;
         for (const [draft, isManual] of [
           [manual, true],
           [automated, false],
@@ -748,6 +808,9 @@ try {
                   false,
                 );
               } else {
+                const countsBefore = crit.CRIT_PROC_KINDS.map(crit.getCritProcCount);
+                automatedBadges = {};
+                crit.withDraftCritCounts(automatedBadges, () => {
                 const bought =
                   event === "upgrade"
                     ? actions.performAutomatedUpgradeClick(
@@ -760,11 +823,15 @@ try {
                         floor,
                       );
                 assert.equal(bought, true, `${kind}: ${event} completed`);
+                });
+                assert.deepEqual(crit.CRIT_PROC_KINDS.map(crit.getCritProcCount), countsBefore);
               }
             }),
           );
         }
-        assert.deepEqual(automated, manual, `${kind}: ${event} reward parity`);
+        assert.deepEqual(automated, reference, `${kind}: ${event} only grants base tier`);
+        assert.deepEqual(automatedBadges, {}, `${kind}: no automated badge`);
+        if (kind === "booty") assert(toNumber(manual.money) > toNumber(automated.money), "manual special rewards still apply");
       }
     }
 
@@ -814,13 +881,15 @@ try {
     });
     assert.equal(
       committed.buildings[0].filter((floor) => floor.unlocked).length,
-      locks.MAX_FLOORS_PER_BUILDING,
+      2,
     );
     assert(
       committed.buildings[0].every(
-        (floor) => floor.critMultiplierTier === "ultra",
+        (floor) => floor.critMultiplierTier === null,
       ),
     );
+    assert.equal(committed.buildings[0][1].upgradeCount, crit.CRIT_TIER_CONFIG.crit.multiplier);
+    assert.deepEqual(committed.badges, {}, "pre-armed Heavenly never grants automated badges");
     assert.deepEqual(live, untouched);
     assert.deepEqual(economy.getTotalIncome(), originalMoney);
     assert.equal(
@@ -839,7 +908,7 @@ try {
       "no screen celebration queued",
     );
     console.log(
-      `PASS: ${crit.CRIT_PROC_KINDS.length} crits match manual upgrade/unlock rewards; snapshots preserve timers, guarantees, wallet, and silent effects`,
+      `PASS: ${crit.CRIT_PROC_KINDS.length} specials excluded from automated upgrades/unlocks; manual specials and snapshot state preserved`,
     );
   } finally {
     Math.random = originalRandom;

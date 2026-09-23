@@ -103,6 +103,8 @@ import {
   readCritProcs,
   applyCritProcs,
   onlyCritProc,
+  tierOnlyCrit,
+  pickHigherCritTier,
   recordCritProcLanded,
   triggerPriceMatchCrit,
   LUCKY_NUMBER_MIN_FLOORS,
@@ -415,16 +417,14 @@ export function performAutomatedUpgradeAfterPayment(
   if (!floor.unlocked) return false;
   if (isCritUpgrade(floor)) {
     const tier = getCritTier(floor)!;
-    const procs = readCritProcs(floor);
-    const bonusTier = getBonusTierCrit(floor);
     consumeCritUpgrade(floor);
-    applyFloorCrit(deps, floor, { ...procs, tier, bonusTier });
+    applyFloorCrit(deps, floor, tierOnlyCrit(tier), false);
     deps.persist();
     return true;
   }
   if (!paid && !spendTotalIncome(getUpgradeCost(floor))) return false;
   applyUpgradeTick(floor, isGroundFloor);
-  rollCritUpgrade(floor);
+  rollCritUpgrade(floor, false);
   deps.persist();
   return true;
 }
@@ -449,16 +449,10 @@ export function performAutomatedFloorUnlock(
     multiplier: deps.multiplier,
     onAdd: deps.onFloorAdded,
   });
-  const buyTier = rollFloorBuyCrit();
+  const buyTier = rollFloorBuyCrit(false);
   if (buyTier) {
-    const forcedBonusTierFloor = deps.floors.find((candidate) =>
-      getBonusTierCrit(candidate),
-    );
-    if (forcedBonusTierFloor) {
-      buyTier.bonusTier = getBonusTierCrit(forcedBonusTierFloor)!;
-      consumeBonusTierCrit(forcedBonusTierFloor);
-    }
-    applyFloorCrit(deps, floor, buyTier);
+    floor.critMultiplierTier = pickHigherCritTier(floor.critMultiplierTier, buyTier.tier);
+    applyFloorCrit(deps, floor, buyTier, false);
   }
   deps.persist();
   return true;
@@ -1509,12 +1503,14 @@ export function applyFloorCrit(
   deps: FloorActionsDeps,
   floor: Floor,
   result: CritRollResult,
+  allowSpecialProcs = true,
 ): void {
+  if (!allowSpecialProcs) result = tierOnlyCrit(result.tier);
   const isGroundFloor = deps.floors.indexOf(floor) === 0;
   const count = CRIT_TIER_CONFIG[result.tier].multiplier;
   for (let tick = 0; tick < count; tick++)
     applyUpgradeTick(floor, isGroundFloor);
-  rollCritUpgrade(floor);
+  rollCritUpgrade(floor, allowSpecialProcs);
   const context: CritRewardContext = {
     deps,
     floors: deps.floors,
