@@ -5,10 +5,16 @@ await processCritIcon("canNotLie", {
   sourceExtension: ".png",
   backgroundSeeds: [[800, 1000]],
 });
-await fs.mkdir(new URL("../src/assets/themes/references/dist/", import.meta.url), {
-  recursive: true,
-});
+await fs.mkdir(
+  new URL("../src/assets/themes/references/dist/", import.meta.url),
+  {
+    recursive: true,
+  },
+);
 await fs.copyFile(
   new URL("../public/canNotLie.png", import.meta.url),
-  new URL("../src/assets/themes/references/dist/canNotLie.png", import.meta.url),
+  new URL(
+    "../src/assets/themes/references/dist/canNotLie.png",
+    import.meta.url,
+  ),
 );
