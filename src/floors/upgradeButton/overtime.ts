@@ -9,8 +9,10 @@ const cancellationArmed = new WeakSet<Floor>();
 
 export function getOvertimeTickGoal(floor: Floor): number {
   const tier = floor.critMultiplierTier;
-  return CONFIG.overtime.tickGoal *
-    (tier ? CONFIG.overtime.tickGoalMultiplierByTier[tier] : 1);
+  return (
+    CONFIG.overtime.tickGoal *
+    (tier ? CONFIG.overtime.tickGoalMultiplierByTier[tier] : 1)
+  );
 }
 
 export function getOvertimeDisplayGoal(floor: Floor): number {
@@ -43,7 +45,9 @@ export function endOvertimeActiveWindow(floor: Floor, now: number): void {
 }
 
 export function canCancelOvertime(floor: Floor, now: number): boolean {
-  return floor.unlocked && isOvertimeActive(floor, now) && floor.overtimeTicks > 0;
+  return (
+    floor.unlocked && isOvertimeActive(floor, now) && floor.overtimeTicks > 0
+  );
 }
 
 export function isOvertimeCancelArmed(floor: Floor, now: number): boolean {
@@ -58,7 +62,10 @@ export function tapOvertimeBar(floor: Floor, now: number): void {
 
 export function addOvertimeTicks(floor: Floor, count: number): void {
   if (!isOvertimeActive(floor, Date.now())) return;
-  floor.overtimeTicks = Math.min(getOvertimeTickGoal(floor), floor.overtimeTicks + count);
+  floor.overtimeTicks = Math.min(
+    getOvertimeTickGoal(floor),
+    floor.overtimeTicks + count,
+  );
 }
 
 export function getOvertimeTicks(floor: Floor): number {
@@ -69,7 +76,10 @@ export function getOvertimeDisplayTicks(floor: Floor, now: number): number {
   if (isOvertimeActive(floor, now)) return floor.overtimeTicks;
   if (floor.overtimeEndedAt == null) return 0;
   const elapsed = Math.max(0, now - floor.overtimeEndedAt);
-  return Math.max(0, floor.overtimeTicks - elapsed / OVERTIME_DRAIN_MS_PER_TICK);
+  return Math.max(
+    0,
+    floor.overtimeTicks - elapsed / OVERTIME_DRAIN_MS_PER_TICK,
+  );
 }
 
 export function isOvertimeGaugeVisible(floor: Floor, now: number): boolean {
@@ -86,7 +96,10 @@ export function isOvertimeDraining(floor: Floor, now: number): boolean {
 
 export function getOvertimeFillFraction(floor: Floor, now: number): number {
   if (!isOvertimeGaugeVisible(floor, now)) return 0;
-  return Math.min(1, getOvertimeDisplayTicks(floor, now) / getOvertimeDisplayGoal(floor));
+  return Math.min(
+    1,
+    getOvertimeDisplayTicks(floor, now) / getOvertimeDisplayGoal(floor),
+  );
 }
 
 registerEventButton({

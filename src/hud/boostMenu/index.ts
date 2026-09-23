@@ -112,7 +112,9 @@ export function getOvertimeBoostCost(floors: Floor[]): BigNumber {
 // is fully blocked (not just "too expensive") once every floor is maxed
 function getOvertimeEligibleFloors(floors: Floor[]): Floor[] {
   return floors.filter(
-    (floor) => floor.unlocked && floor.critMultiplierTier !== "ultra" &&
+    (floor) =>
+      floor.unlocked &&
+      floor.critMultiplierTier !== "ultra" &&
       !isOvertimeActive(floor, Date.now()),
   );
 }

@@ -793,10 +793,26 @@ try {
             assert.equal(buttons.isOvertimeActive(floor, now), false);
             assert.equal(buttons.getOvertimeDisplayGoal(floor), goal);
             assert.equal(buttons.getOvertimeFillFraction(floor, now), 0);
-            assert.equal(buttons.isOvertimeGaugeVisible(floor, now), false, "completed overtime immediately restores the income bar");
+            assert.equal(
+              buttons.isOvertimeGaugeVisible(floor, now),
+              false,
+              "completed overtime immediately restores the income bar",
+            );
             assert.equal(buttons.isOvertimeCancelArmed(floor, now), false);
-            assert.equal(buttons.getOvertimeDisplayTicks(floor, now + CONFIG.overtime.drainMsPerTick), 0);
-            assert.equal(buttons.isOvertimeGaugeVisible(floor, now + goal * CONFIG.overtime.drainMsPerTick), false);
+            assert.equal(
+              buttons.getOvertimeDisplayTicks(
+                floor,
+                now + CONFIG.overtime.drainMsPerTick,
+              ),
+              0,
+            );
+            assert.equal(
+              buttons.isOvertimeGaugeVisible(
+                floor,
+                now + goal * CONFIG.overtime.drainMsPerTick,
+              ),
+              false,
+            );
             previousTier = promotedTier;
           }
         }
@@ -806,36 +822,87 @@ try {
       "PASS: overtime revalues existing upgrades at each promoted tier without changing costs or timers",
     );
     {
-      const { getIncomeBarCenter } = await server.ssrLoadModule("/src/floors/incomePanel/index.ts");
-      const { buyOvertimeBoost } = await server.ssrLoadModule("/src/hud/boostMenu/index.ts");
+      const { getIncomeBarCenter } = await server.ssrLoadModule(
+        "/src/floors/incomePanel/index.ts",
+      );
+      const { buyOvertimeBoost } = await server.ssrLoadModule(
+        "/src/hud/boostMenu/index.ts",
+      );
       const floor = buildFloor(1, { backgroundCount: 1 });
       const draft = { buildings: [[floor]], money: fromNumber(0) };
       const bar = getIncomeBarCenter(true);
-      const tapBar = () => runDetachedStep(() => economy.withDraftEconomy(draft, () =>
-        actions.handleFloorClick(depsFor(draft), floor, bar.x, bar.y, true),
-      ));
+      const tapBar = () =>
+        runDetachedStep(() =>
+          economy.withDraftEconomy(draft, () =>
+            actions.handleFloorClick(depsFor(draft), floor, bar.x, bar.y, true),
+          ),
+        );
       buttons.triggerOvertimeBoost(floor, fromNumber(20));
       tapBar();
-      assert.equal(buttons.isOvertimeCancelArmed(floor, now), false, "empty bar cannot arm cancellation");
+      assert.equal(
+        buttons.isOvertimeCancelArmed(floor, now),
+        false,
+        "empty bar cannot arm cancellation",
+      );
       buttons.addOvertimeTicks(floor, 10);
-      assert.equal(buttons.isOvertimeActive(floor, now + 86400000), true, "overtime has no timeout");
-      assert.equal(buttons.getOvertimeDisplayTicks(floor, now + 86400000), 10, "unfinished progress does not expire");
-      const before = { tier: floor.critMultiplierTier, income: floor.incomeAmount, count: floor.upgradeCount };
+      assert.equal(
+        buttons.isOvertimeActive(floor, now + 86400000),
+        true,
+        "overtime has no timeout",
+      );
+      assert.equal(
+        buttons.getOvertimeDisplayTicks(floor, now + 86400000),
+        10,
+        "unfinished progress does not expire",
+      );
+      const before = {
+        tier: floor.critMultiplierTier,
+        income: floor.incomeAmount,
+        count: floor.upgradeCount,
+      };
       tapBar();
-      assert.equal(buttons.isOvertimeCancelArmed(floor, now), true, "first tap arms wiggle");
+      assert.equal(
+        buttons.isOvertimeCancelArmed(floor, now),
+        true,
+        "first tap arms wiggle",
+      );
       assert.equal(buttons.isOvertimeActive(floor, now), true);
-      assert.equal(buyOvertimeBoost([floor]), null, "cannot purchase over an active event");
+      assert.equal(
+        buyOvertimeBoost([floor]),
+        null,
+        "cannot purchase over an active event",
+      );
       buttons.triggerOvertimeBoost(floor, fromNumber(99));
-      assert.equal(buttons.getOvertimeTicks(floor), 10, "trigger cannot reset running progress");
+      assert.equal(
+        buttons.getOvertimeTicks(floor),
+        10,
+        "trigger cannot reset running progress",
+      );
       assert.equal(toNumber(buttons.getOvertimeCost(floor)), 20);
       tapBar();
-      assert.equal(buttons.isOvertimeActive(floor, now), false, "second tap aborts");
+      assert.equal(
+        buttons.isOvertimeActive(floor, now),
+        false,
+        "second tap aborts",
+      );
       assert.equal(buttons.isOvertimeCancelArmed(floor, now), false);
-      assert.deepEqual({ tier: floor.critMultiplierTier, income: floor.incomeAmount, count: floor.upgradeCount }, before, "abort grants no tier or upgrade reward");
+      assert.deepEqual(
+        {
+          tier: floor.critMultiplierTier,
+          income: floor.incomeAmount,
+          count: floor.upgradeCount,
+        },
+        before,
+        "abort grants no tier or upgrade reward",
+      );
       assert.equal(toNumber(draft.money), 0, "cancel does not charge money");
       assert.equal(buttons.getOvertimeDisplayTicks(floor, now + 500), 9);
       tapBar();
-      assert.equal(buttons.isOvertimeActive(floor, now), false, "draining bar cannot restart");
+      assert.equal(
+        buttons.isOvertimeActive(floor, now),
+        false,
+        "draining bar cannot restart",
+      );
       const previousStorage = globalThis.localStorage;
       const stored = new Map();
       globalThis.localStorage = {
@@ -845,28 +912,49 @@ try {
       try {
         workers.saveBuildings([[floor]]);
         let restored = workers.loadBuildings()[0][0];
-        assert.equal(buttons.getOvertimeDisplayTicks(restored, now + 500), 9, "drain persists");
+        assert.equal(
+          buttons.getOvertimeDisplayTicks(restored, now + 500),
+          9,
+          "drain persists",
+        );
         assert.equal(buttons.isOvertimeActive(restored, now), false);
         buttons.triggerOvertimeBoost(floor, fromNumber(20));
         buttons.addOvertimeTicks(floor, 15);
         buttons.tapOvertimeBar(floor, now);
         workers.saveBuildings([[floor]]);
         restored = workers.loadBuildings()[0][0];
-        assert.equal(buttons.isOvertimeActive(restored, now + 86400000), true, "unlimited event survives reload");
-        assert.equal(buttons.getOvertimeDisplayTicks(restored, now + 86400000), 15);
-        assert.equal(buttons.isOvertimeCancelArmed(restored, now), false, "cancel confirmation does not survive reload");
+        assert.equal(
+          buttons.isOvertimeActive(restored, now + 86400000),
+          true,
+          "unlimited event survives reload",
+        );
+        assert.equal(
+          buttons.getOvertimeDisplayTicks(restored, now + 86400000),
+          15,
+        );
+        assert.equal(
+          buttons.isOvertimeCancelArmed(restored, now),
+          false,
+          "cancel confirmation does not survive reload",
+        );
         floor.overtimeStartedAt = now - CONFIG.overtime.legacyDurationMs - 500;
         delete floor.overtimeEndedAt;
         delete floor.overtimeGoal;
         workers.saveBuildings([[floor]]);
         restored = workers.loadBuildings()[0][0];
-        assert.equal(buttons.isOvertimeActive(restored, now), false, "expired legacy events stay expired");
+        assert.equal(
+          buttons.isOvertimeActive(restored, now),
+          false,
+          "expired legacy events stay expired",
+        );
         assert.equal(buttons.getOvertimeDisplayTicks(restored, now), 14);
       } finally {
         if (previousStorage === undefined) delete globalThis.localStorage;
         else globalThis.localStorage = previousStorage;
       }
-      console.log("PASS: unlimited overtime, two-tap abort, passive drain, active-purchase exclusion, and saved state");
+      console.log(
+        "PASS: unlimited overtime, two-tap abort, passive drain, active-purchase exclusion, and saved state",
+      );
     }
     for (const [tier, randomValues] of [
       ["crit", [0.999999, 0.999999, 0]],
