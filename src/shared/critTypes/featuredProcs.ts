@@ -20,7 +20,8 @@ export const FEATURED_CRIT_INFO = {
     label: "Speed Demon",
     color: COLOR.cyan,
     icon: "speedDemon",
-    description: "Eleven upgrades, then seventeen payouts on the highest-earning floor",
+    description:
+      "Eleven upgrades, then seventeen payouts on the highest-earning floor",
   },
   badonkadonk: {
     label: "Badonkadonk",
