@@ -72,6 +72,7 @@ export interface Floor {
   upgradeCount: number; // how many upgrades have been bought on this floor
   unlocked: boolean;
   unlockCost: BigNumber; // 0 for floor 1 (always free); doubles starting from floor 2
+  buildingFloorUnlockBaseCost?: BigNumber;
   workerCount: number; // how many workers this floor has bought via workerMenu.ts; scales its boost strength
   lastCollectedAt: number; // Date.now() ms this floor last completed a whole idle-income cycle
   hasOfficeChairs: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true

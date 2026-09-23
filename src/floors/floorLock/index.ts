@@ -85,6 +85,7 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
     backgroundCount: deps.backgroundCount,
     existingBgIndexes: deps.floors.map((f) => f.bgIndex),
     multiplier: deps.multiplier ?? 1,
+    floorUnlockBaseCost: deps.floors[0]?.buildingFloorUnlockBaseCost,
     // a building-wide crit (see cityMap/index.ts) sets every floor to the same
     // tier — a freshly created floor should start as that same tier too, not
     // reset back to null, so "the default floor is the crit version" holds for
@@ -128,6 +129,7 @@ export function getBuildingUnlockAllCost(
       buildFloor(level, {
         backgroundCount: 1,
         multiplier,
+        floorUnlockBaseCost: floors[0]?.buildingFloorUnlockBaseCost,
         priceDiscountMultiplier,
       }).unlockCost,
     );

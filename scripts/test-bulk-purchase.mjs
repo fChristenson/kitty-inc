@@ -393,8 +393,12 @@ try {
     "/src/floors/upgradeButton/index.ts",
   );
   const locks = await server.ssrLoadModule("/src/floors/floorLock/index.ts");
-  const { createBuilding, getBuildingMultiplier, getBuildingPrice } =
-    await server.ssrLoadModule("/src/buildings/index.ts");
+  const {
+    createBuilding,
+    getBuildingMultiplier,
+    getBuildingPrice,
+    configureBuildingFloorPrices,
+  } = await server.ssrLoadModule("/src/buildings/index.ts");
   const { CONFIG } = await server.ssrLoadModule("/src/config.ts");
   {
     const previousGrowth = CONFIG.floors.floorEconomyMultiplierPerBuilding;
@@ -434,6 +438,97 @@ try {
   }
   const { collectDueIncome, currentIncomeRatePerSecond } =
     await server.ssrLoadModule("/src/floors/incomePanel/index.ts");
+  for (const buildingIndex of [0, 1, 2, 40]) {
+    const floors = createBuilding(buildingIndex, 1);
+    const multiplier = getBuildingMultiplier(buildingIndex);
+    const deps = { floors, backgroundCount: 1, multiplier, onAdd() {} };
+    const base =
+      buildingIndex === 0
+        ? fromNumber(CONFIG.floors.baseUnlockCost)
+        : multiply(
+            getBuildingPrice(buildingIndex),
+            CONFIG.floors.unlockCostBuildingPriceMultiplier,
+          );
+    locks.ensureLockedFloorAbove(deps);
+    assert.deepEqual(
+      floors[1].unlockCost,
+      base,
+      "floor two costs twice the building price",
+    );
+    if (buildingIndex === 1) assert.equal(toNumber(floors[1].unlockCost), 2e9);
+    const quote = locks.getBuildingUnlockAllCost(floors, multiplier);
+    const { add, ZERO } = await server.ssrLoadModule(
+      "/src/shared/bigNumber/index.ts",
+    );
+    let actual = ZERO;
+    let expected = base;
+    while (!floors.at(-1).unlocked) {
+      const target = floors.at(-1);
+      assert.equal(target.unlockCost.exponent, expected.exponent);
+      assert(
+        Math.abs(target.unlockCost.mantissa - expected.mantissa) < 1e-12,
+        "each higher floor doubles its unlock price",
+      );
+      actual = add(actual, target.unlockCost);
+      locks.unlockFloor(target);
+      locks.ensureLockedFloorAbove(deps);
+      expected = multiply(expected, CONFIG.floors.unlockCostGrowthFactor);
+    }
+    assert.deepEqual(
+      actual,
+      quote,
+      "bulk quote matches individually unlocked floors",
+    );
+  }
+  {
+    const floors = createBuilding(1, 1);
+    const deps = {
+      floors,
+      backgroundCount: 1,
+      multiplier: getBuildingMultiplier(1),
+      onAdd() {},
+    };
+    floors[0].priceDiscountMultiplier = 0.5;
+    locks.ensureLockedFloorAbove(deps);
+    assert.equal(
+      toNumber(floors[1].unlockCost),
+      1e9,
+      "discount applies to building-anchored base",
+    );
+    locks.unlockFloor(floors[1]);
+    const paidPrice = floors[1].unlockCost;
+    locks.ensureLockedFloorAbove(deps);
+    assert.equal(
+      toNumber(floors[2].unlockCost),
+      2e9,
+      "future floors inherit discount once",
+    );
+    floors[2].unlockCost = fromNumber(123);
+    delete floors[0].buildingFloorUnlockBaseCost;
+    const incomeBefore = floors[0].incomeAmount;
+    configureBuildingFloorPrices(floors, 1);
+    assert.equal(
+      toNumber(floors[2].unlockCost),
+      2e9,
+      "restored locked floor is repriced",
+    );
+    assert.deepEqual(
+      floors[1].unlockCost,
+      paidPrice,
+      "paid floor prices remain historical",
+    );
+    assert.deepEqual(
+      floors[0].incomeAmount,
+      incomeBefore,
+      "unlock pricing does not change income",
+    );
+    configureBuildingFloorPrices(floors, 1);
+    assert.equal(
+      toNumber(floors[2].unlockCost),
+      2e9,
+      "setup does not compound discounts",
+    );
+  }
   for (const buildingIndex of [0, 1, 5]) {
     const floors = createBuilding(buildingIndex, 1);
     const ground = floors[0];

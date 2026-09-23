@@ -1,7 +1,13 @@
 import { buildFloor } from "../floors";
 import { increaseIncomeRate } from "../floors/incomePanel";
 import type { Floor } from "../gameState";
-import { type BigNumber, pow, multiply } from "../shared/bigNumber";
+import {
+  type BigNumber,
+  pow,
+  multiply,
+  multiplyBig,
+  fromNumber,
+} from "../shared/bigNumber";
 import { CONFIG } from "../config";
 
 export const BUILDING_COST_MULTIPLIER = CONFIG.buildings.costMultiplier;
@@ -21,6 +27,30 @@ export function getBuildingPrice(nextBuildingIndex: number): BigNumber {
     pow(BUILDING_COST_MULTIPLIER, nextBuildingIndex - 1),
     BUILDING_BASE_PRICE,
   );
+}
+
+export function configureBuildingFloorPrices(
+  floors: Floor[],
+  buildingIndex: number,
+): void {
+  const ground = floors[0];
+  if (!ground) return;
+  const base =
+    buildingIndex === 0
+      ? fromNumber(CONFIG.floors.baseUnlockCost)
+      : multiply(
+          getBuildingPrice(buildingIndex),
+          CONFIG.floors.unlockCostBuildingPriceMultiplier,
+        );
+  ground.buildingFloorUnlockBaseCost = base;
+  for (let index = 1; index < floors.length; index++) {
+    const floor = floors[index];
+    if (floor.unlocked) continue;
+    floor.unlockCost = multiply(
+      multiplyBig(base, pow(CONFIG.floors.unlockCostGrowthFactor, index - 1)),
+      floor.priceDiscountMultiplier,
+    );
+  }
 }
 
 // New buildings include a free, working ground floor. ensureLockedFloorAbove
@@ -43,7 +73,9 @@ export function createBuilding(
   for (let i = 0; i < (options.initialUpgradeCount ?? 0); i++) {
     increaseIncomeRate(groundFloor);
   }
-  return [groundFloor];
+  const floors = [groundFloor];
+  configureBuildingFloorPrices(floors, buildingIndex);
+  return floors;
 }
 
 // this module's own facade: buildings/ has an outerWall sub-part for internal reuse,

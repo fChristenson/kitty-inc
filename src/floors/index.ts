@@ -12,6 +12,7 @@ import {
   fromNumber,
   pow,
   multiply,
+  multiplyBig,
   ZERO,
 } from "../shared/bigNumber";
 import { CONFIG } from "../config";
@@ -136,6 +137,7 @@ export interface BuildFloorOptions {
   // floorLock.ts's ensureLockedFloorAbove, the only real caller of this)
   priceDiscountMultiplier?: number;
   startingUpgradeCost?: BigNumber;
+  floorUnlockBaseCost?: BigNumber;
 }
 
 // the level-0 (freshly-built, un-upgraded) income/cost/interval stats for a given
@@ -183,17 +185,18 @@ export function buildFloor(
     defaultCritTier = null,
     priceDiscountMultiplier = 1,
     startingUpgradeCost,
+    floorUnlockBaseCost = fromNumber(BASE_UNLOCK_COST * multiplier),
   } = options;
   const isGroundFloor = floorLevel === 1;
   // BigNumber pow/multiply never overflow to Infinity no matter how high
   // floorLevel climbs (unlike plain `2 ** n`) — see shared/bigNumber
   const baseUnlockCost = isGroundFloor
     ? groundFloorLocked
-      ? fromNumber(BASE_UNLOCK_COST * multiplier)
+      ? floorUnlockBaseCost
       : ZERO
-    : multiply(
+    : multiplyBig(
         pow(UNLOCK_COST_GROWTH_FACTOR, floorLevel - 2),
-        BASE_UNLOCK_COST * multiplier,
+        floorUnlockBaseCost,
       );
   const unlockCost = multiply(baseUnlockCost, priceDiscountMultiplier);
   // true once this level's own natural (uncapped) interval already exceeds the

@@ -27,6 +27,7 @@ export const CONFIG = {
     baseUpgradeCost: 1,
     upgradeCostGrowthFactor: 2,
     baseUnlockCost: 200,
+    unlockCostBuildingPriceMultiplier: 2,
     unlockCostGrowthFactor: 2,
     baseRateStep: 2,
   },

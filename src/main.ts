@@ -153,6 +153,7 @@ import {
 } from "./background";
 import {
   createBuilding,
+  configureBuildingFloorPrices,
   getBuildingMultiplier,
   getBuildingPrice,
   loadWallMaterial,
@@ -356,6 +357,7 @@ async function main() {
     buildingIndex: number,
     targetBuildings = buildings,
   ): void {
+    configureBuildingFloorPrices(targetBuildings[buildingIndex], buildingIndex);
     ensureLockedFloorAbove({
       floors: targetBuildings[buildingIndex],
       backgroundCount: getBackgroundUrls().length,
