@@ -1653,7 +1653,6 @@ export function handleFloorClick(
       const tier = getCritTier(floor);
       if (tier) consumeCritUpgrade(floor);
       const ticks = tier ? CRIT_TIER_CONFIG[tier].multiplier : 1;
-      const ticksBefore = getOvertimeTicks(floor);
       addOvertimeTicks(floor, ticks);
       // re-arm the next crit for AFTER this overtime run ends without
       // letting it also roll a piggyback proc while a special event is
@@ -1667,7 +1666,7 @@ export function handleFloorClick(
       // maxed, so a long drain-tail re-trigger chain can't over-promote past ultra
       let goalReached = false;
       const goal = getOvertimeTickGoal(floor);
-      if (ticksBefore < goal && getOvertimeTicks(floor) >= goal) {
+      if (getOvertimeTicks(floor) >= goal) {
         goalReached = true;
         floor.overtimeGoal = goal;
         const previousTier = floor.critMultiplierTier;

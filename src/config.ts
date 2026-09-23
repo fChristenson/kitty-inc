@@ -2159,13 +2159,13 @@ export const CONFIG = {
   // CRIT_TIER_CONFIG) to the floor's own overtime gauge (incomePanel.ts).
   overtime: {
     legacyDurationMs: 15_000,
-    tickGoal: 1000, // base goal for a floor with no permanent crit tier yet
+    tickGoal: 250, // base goal for a floor with no permanent crit tier yet
     // a floor's CURRENT permanent crit tier raises its own gauge's goal further
     // (multiplies the base tickGoal above) — a higher tier already earns more
     // per tick, so its own gauge should take proportionally longer to fill
     tickGoalMultiplierByTier: {
       crit: 2,
-      mega: 3,
+      mega: 4,
       ultra: 4,
     },
     drainMsPerTick: 500,

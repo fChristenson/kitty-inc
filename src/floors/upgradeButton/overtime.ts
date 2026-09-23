@@ -16,6 +16,7 @@ export function getOvertimeTickGoal(floor: Floor): number {
 }
 
 export function getOvertimeDisplayGoal(floor: Floor): number {
+  if (isOvertimeActive(floor, Date.now())) return getOvertimeTickGoal(floor);
   return floor.overtimeGoal ?? getOvertimeTickGoal(floor);
 }
 

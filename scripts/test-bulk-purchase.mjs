@@ -760,6 +760,20 @@ try {
           while (previousTier !== "ultra") {
             buttons.triggerOvertimeBoost(floor, fromNumber(20));
             const goal = buttons.getOvertimeTickGoal(floor);
+            assert.equal(
+              goal,
+              previousTier === null
+                ? 250
+                : previousTier === "crit"
+                  ? 500
+                  : 1000,
+            );
+            floor.overtimeGoal = goal * 4;
+            assert.equal(
+              buttons.getOvertimeDisplayGoal(floor),
+              goal,
+              "running events display the current target",
+            );
             floor.overtimeTicks = goal - 2;
             const before = floor.incomeAmount;
             click();
@@ -769,6 +783,7 @@ try {
               "no early revaluation",
             );
             assert.equal(floor.critMultiplierTier, previousTier);
+            if (count === 10000) floor.overtimeTicks = goal + 5;
             click();
             const promotedTier = crit.nextCritTier(previousTier);
             const reference = buildFloor(2, {
