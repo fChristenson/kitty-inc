@@ -349,6 +349,7 @@ export function wireUpgradeMenu(
   const list = container.querySelector<HTMLDivElement>("#upgrade-menu-list")!;
   let renovationPlan: RenovationPlan | null = null;
   let openingBudget: BigNumber;
+  let renovating = false;
 
   function render(): void {
     const floors = getFloors();
@@ -357,6 +358,7 @@ export function wireUpgradeMenu(
   }
 
   onTapOrClick(list, async (event) => {
+    if (renovating) return;
     const target = event.target as HTMLElement;
     const renovateButton =
       target.closest<HTMLButtonElement>("#renovate-floors");
@@ -364,8 +366,10 @@ export function wireUpgradeMenu(
       const plan = renovationPlan;
       if (!plan || renovateButton.disabled) return;
       const floors = getFloors();
+      renovating = true;
       affordabilityPolling.stop();
-      menu.hidden = true;
+      updateAffordability();
+      renovateButton.setAttribute("aria-busy", "true");
       try {
         if (await renovate(floors, plan)) {
           playSold();
@@ -373,6 +377,15 @@ export function wireUpgradeMenu(
         }
       } catch (error) {
         console.error("Renovation failed", error);
+      } finally {
+        renovating = false;
+        renovateButton.removeAttribute("aria-busy");
+        if (!menu.hidden) {
+          openingBudget = getTotalIncome();
+          render();
+          updateAffordability();
+          affordabilityPolling.start();
+        }
       }
       return;
     }
@@ -402,6 +415,7 @@ export function wireUpgradeMenu(
       list.querySelector<HTMLButtonElement>("#renovate-floors");
     if (renovateButton) {
       renovateButton.disabled =
+        renovating ||
         !renovationPlan ||
         renovationPlan.count === 0 ||
         lt(getTotalIncome(), renovationPlan.cost);
@@ -415,7 +429,7 @@ export function wireUpgradeMenu(
         if (!def) return;
         const nextFloor = findNextEligibleFloor(floors, def.isEligible);
         button.disabled =
-          !nextFloor || lt(getTotalIncome(), def.getCost(nextFloor));
+          renovating || !nextFloor || lt(getTotalIncome(), def.getCost(nextFloor));
       });
   }
 
@@ -430,6 +444,7 @@ export function wireUpgradeMenu(
     openingBudget = getTotalIncome();
     render();
     menu.hidden = false;
+    updateAffordability();
     ghostClickGuard.markOpened();
     playSwoosh();
     affordabilityPolling.start();
