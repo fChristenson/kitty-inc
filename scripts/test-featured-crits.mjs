@@ -62,7 +62,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 639 + elementCritBatch.length);
+  assert.equal(kinds.length, 648 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -246,6 +246,15 @@ try {
   }
 
   const expected = {
+    badonkadonk: [[20, 40, 10, 0], 36],
+    demoncBuns: [[20, 46, 10, 0], 63],
+    infernalInterest: [[20, 50, 10, 0], 81],
+    dropItLow: [[20, 30, 19, 0], 10],
+    kittyWagon: [[23, 33, 13, 0], 12],
+    madeYouLook: [[20, 36, 10, 0], 21],
+    wagonWarrior: [[25, 35, 15, 0], 18],
+    bubbleButt: [[20, 38, 10, 0], 27],
+    canNotLie: [[20, 42, 10, 0], 45],
     heavyElement: [[27, 37, 17, 0], 15],
     nucleusDividend: [[26, 36, 16, 0], 12],
     ...Object.fromEntries(
@@ -1094,6 +1103,104 @@ try {
       assert.equal(test.income(), 5);
     }
   }
+  for (const [kind, upgrades, payouts] of [
+    ["bubbleButt", 8, 9],
+    ["canNotLie", 12, 15],
+  ]) {
+    assert.equal(CONFIG.crit[`${kind}Upgrades`], upgrades);
+    assert.equal(CONFIG.crit[`${kind}Payouts`], payouts);
+    assert(!MAP_CRIT_TEST_KINDS.includes(kind));
+    for (const level of [0, 9, 10, 24, 25, 49, 50]) {
+      for (const tier of [null, "crit", "mega", "ultra"]) {
+        const test = fixture();
+        test.floors.splice(1);
+        test.context.floor = test.floors[0];
+        test.context.floor.upgradeCount = level;
+        test.context.floor.critMultiplierTier = tier;
+        test.rewards[kind](test.context);
+        assert.equal(test.context.floor.upgradeCount, level + upgrades);
+        assert.equal(test.income(), payouts);
+        assert.equal(test.context.floor.critMultiplierTier, tier);
+        assert.equal(test.context.floor.lastCollectedAt, 123);
+      }
+    }
+    const cutout = await readFile(`public/${kind}.png`);
+    assert(
+      cutout.equals(
+        await readFile(`src/assets/themes/references/dist/${kind}.png`),
+      ),
+    );
+    const original = await readFile(`src/assets/${kind}.png`);
+    assert(!original.equals(cutout), `${kind}: raw source overwritten`);
+    const { data, info } = await sharp(cutout)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    assert(
+      data.some((value, offset) => offset % info.channels === 3 && value === 0),
+    );
+    assert(
+      data.some(
+        (value, offset) => offset % info.channels === 3 && value === 255,
+      ),
+    );
+  }
+  assert(CONFIG.crit.ballerinaChance > CONFIG.crit.bubbleButtChance);
+  assert(CONFIG.crit.bubbleButtChance > CONFIG.crit.canNotLieChance);
+  const newSourceRewards = [
+    ["badonkadonk", "badonkadonk.jfif", 10, 12],
+    ["demoncBuns", "demoncBuns.jpg", 16, 21],
+    ["infernalInterest", "demoncBuns2.jpg", 20, 27],
+    ["dropItLow", "dropItLow.jpg", 9, 5],
+    ["kittyWagon", "kittyWagon.jpg", 3, 2],
+    ["madeYouLook", "madeYouLook.jpg", 6, 7],
+    ["wagonWarrior", "wagonWarrior.jpg", 5, 3],
+  ];
+  for (const [kind, source, upgrades, payouts] of newSourceRewards) {
+    assert.equal(CONFIG.crit[`${kind}Upgrades`], upgrades);
+    assert.equal(CONFIG.crit[`${kind}Payouts`], payouts);
+    assert(!MAP_CRIT_TEST_KINDS.includes(kind));
+    for (const level of [0, 9, 10, 24, 25, 49, 50]) {
+      for (const tier of [null, "crit", "mega", "ultra"]) {
+        const test = fixture();
+        test.floors.splice(1);
+        test.context.floor = test.floors[0];
+        test.context.floor.upgradeCount = level;
+        test.context.floor.critMultiplierTier = tier;
+        test.rewards[kind](test.context);
+        assert.equal(test.context.floor.upgradeCount, level + upgrades);
+        assert.equal(test.income(), payouts);
+        assert.equal(test.context.floor.critMultiplierTier, tier);
+        assert.equal(test.context.floor.lastCollectedAt, 123);
+      }
+    }
+    const cutout = await readFile(`public/${kind}.png`);
+    assert(cutout.equals(await readFile(`src/assets/${kind}.png`)));
+    assert(
+      cutout.equals(
+        await readFile(`src/assets/themes/references/dist/${kind}.png`),
+      ),
+    );
+    assert((await readFile(`src/assets/${source}`)).length > 0);
+  }
+  for (const family of [
+    [
+      "madeYouLook",
+      "bubbleButt",
+      "badonkadonk",
+      "canNotLie",
+      "demoncBuns",
+      "infernalInterest",
+    ],
+    ["kittyWagon", "wagonWarrior"],
+  ]) {
+    for (let index = 1; index < family.length; index++) {
+      assert(
+        crit.getCritProcChance(family[index - 1]) >
+          crit.getCritProcChance(family[index]),
+      );
+    }
+  }
   assert.equal(CONFIG.crit.heavyElementUpgrades, 7);
   assert.equal(CONFIG.crit.heavyElementPayouts, 5);
   assert(CONFIG.crit.heavyElementChance < CONFIG.crit.nucleusDividendChance);
@@ -1118,6 +1225,9 @@ try {
     ),
   );
   const newAssetKinds = [
+    ...newSourceRewards.map(([kind]) => kind),
+    "bubbleButt",
+    "canNotLie",
     "nucleusDividend",
     "heavyElement",
     ...elementCritBatch

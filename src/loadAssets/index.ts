@@ -37,6 +37,15 @@ export type SpriteName = keyof typeof SPRITE_FILES;
 // every flat single-file image this game loads, by logical name -> its filename
 // inside dist/ root — same reasoning as SPRITE_FILES above
 export const IMAGE_FILES = {
+  bubbleButt: "bubbleButt.png",
+  canNotLie: "canNotLie.png",
+  badonkadonk: "badonkadonk.png",
+  demoncBuns: "demoncBuns.png",
+  infernalInterest: "infernalInterest.png",
+  dropItLow: "dropItLow.png",
+  kittyWagon: "kittyWagon.png",
+  madeYouLook: "madeYouLook.png",
+  wagonWarrior: "wagonWarrior.png",
   californiumCrescendo: "californiumCrescendo.png",
   einsteiniumEpiphany: "einsteiniumEpiphany.png",
   fermiumFormula: "fermiumFormula.png",

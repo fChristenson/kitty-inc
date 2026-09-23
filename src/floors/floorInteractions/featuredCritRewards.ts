@@ -75,6 +75,43 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
 
   return {
     ...createElementCritRewards(actions),
+    badonkadonk: (context) => {
+      actions.upgrade([context.floor], balance.badonkadonkUpgrades);
+      actions.payCycles([context.floor], balance.badonkadonkPayouts);
+    },
+    demoncBuns: (context) => {
+      actions.upgrade([context.floor], balance.demoncBunsUpgrades);
+      actions.payCycles([context.floor], balance.demoncBunsPayouts);
+    },
+    infernalInterest: (context) => {
+      actions.upgrade([context.floor], balance.infernalInterestUpgrades);
+      actions.payCycles([context.floor], balance.infernalInterestPayouts);
+    },
+    dropItLow: (context) => {
+      const floor = lowestLevel(context);
+      actions.upgrade([floor], balance.dropItLowUpgrades);
+      actions.payCycles([floor], balance.dropItLowPayouts);
+    },
+    kittyWagon: (context) => {
+      actions.upgrade(context.floors, balance.kittyWagonUpgrades);
+      actions.payCycles(context.floors, balance.kittyWagonPayouts);
+    },
+    madeYouLook: (context) => {
+      actions.upgrade([context.floor], balance.madeYouLookUpgrades);
+      actions.payCycles([context.floor], balance.madeYouLookPayouts);
+    },
+    wagonWarrior: (context) => {
+      actions.upgrade(context.floors, balance.wagonWarriorUpgrades);
+      actions.payCycles(context.floors, balance.wagonWarriorPayouts);
+    },
+    bubbleButt: (context) => {
+      actions.upgrade([context.floor], balance.bubbleButtUpgrades);
+      actions.payCycles([context.floor], balance.bubbleButtPayouts);
+    },
+    canNotLie: (context) => {
+      actions.upgrade([context.floor], balance.canNotLieUpgrades);
+      actions.payCycles([context.floor], balance.canNotLiePayouts);
+    },
     heavyElement: (context) => {
       actions.upgrade(context.floors, balance.heavyElementUpgrades);
       actions.payCycles([context.floor], balance.heavyElementPayouts);
