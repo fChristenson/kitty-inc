@@ -451,7 +451,10 @@ export function performAutomatedFloorUnlock(
   });
   const buyTier = rollFloorBuyCrit(false);
   if (buyTier) {
-    floor.critMultiplierTier = pickHigherCritTier(floor.critMultiplierTier, buyTier.tier);
+    floor.critMultiplierTier = pickHigherCritTier(
+      floor.critMultiplierTier,
+      buyTier.tier,
+    );
     applyFloorCrit(deps, floor, buyTier, false);
   }
   deps.persist();
