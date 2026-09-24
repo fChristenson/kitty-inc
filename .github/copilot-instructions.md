@@ -102,7 +102,7 @@ Use the batch catalog pattern even when adding one proc. Legacy `X_CRIT_*` const
 4. Process the icon and register its shipped PNG in `loadAssets/IMAGE_FILES`. Metadata supplies generic flash, collection menu, and test button behavior.
 5. Preserve one test button per proc plus Regular Crit in `hud/testButton/critTestActions.ts`, using shared event, tier, bonus-tier, and `forceTestCrit` controls. Never reintroduce separate Spawn, Floor, Map, Mega, or Ultra buttons for each proc.
 6. Map testing must show only procs with actual map rewards. Update `MAP_CRIT_TEST_KINDS` only when map support is implemented, and keep the map bonus-tier selector disabled until such rewards exist.
-7. Extend the existing regression script.
+7. Validate the changed behavior with focused checks. Do not recreate the removed regression scripts unless explicitly requested.
 
 Never bypass `MAX_SPECIAL_CRIT_PROCS`'s cap-then-random-pick path.
 
@@ -121,7 +121,7 @@ reports, batch reports, or effect documentation unless explicitly requested.
 
 ### Batch verification
 
-- Extend `scripts/test-featured-crits.mjs`; run `node scripts/test-featured-crits.mjs` and `npm run build`. Reuse its Vite `ssrLoadModule` harness instead of adding a new test dependency.
+- Use focused checks for the changed behavior and `npm run build`; do not run or recreate the removed regression scripts or add a new test dependency.
 - Cover concrete reward amounts and targets, single-floor cases, tier caps, milestone boundaries, unchanged timers, proc arming/consuming, tier/gateway misses, shared cap, rarity ordering, and asset properties.
 - Control random sequences for deterministic roll tests. Mutating `CONFIG` after module loading does not update legacy cached chance constants.
 - `BigNumber.subtract` clamps negative results to zero. For signed test deltas on deliberately small balances, compare `toNumber(after) - toNumber(before)`; do not convert real late-game huge balances this way.

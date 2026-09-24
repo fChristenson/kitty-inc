@@ -33,7 +33,7 @@ export const CONFIG = {
 
   // src/buildings/index.ts — purchase prices only; floor scaling lives in floors.
   buildings: {
-    costMultiplier: 1_000_000_000,
+    costMultiplier: 1_000,
     basePrice: 1_000_000_000,
   },
 
@@ -43,11 +43,10 @@ export const CONFIG = {
     minIncomeIntervalSeconds: 1,
     maxIncomeIntervalSeconds: 3600,
     upgradesPerIntervalHalving: 10,
-    upgradeCostGrowth: 1.3,
-    // steeper growth for floors whose natural interval already exceeds
-    // maxIncomeIntervalSeconds (see Floor.aboveCapTier) — offsets them
-    // otherwise earning far more than their level was meant to
-    upgradeCostGrowthAboveCap: 1.6,
+    upgradeCostGrowth: 1.075,
+    upgradeCostGrowthAboveCap: 1.075,
+    previousUpgradeCostGrowth: 1.3,
+    previousUpgradeCostGrowthAboveCap: 1.6,
   },
 
   // src/floors/upgradeButton/index.ts's CRIT_TIER_CONFIG — odds + free-upgrade/
@@ -480,8 +479,8 @@ export const CONFIG = {
     uraniumUpliftChance: 0.00136,
     uraniumUpliftUpgrades: 92,
     uraniumUpliftPayouts: 92,
-    crit: { chance: 0.05, multiplier: 5 },
-    mega: { chance: 0.01, multiplier: 25 },
+    crit: { chance: 0.08, multiplier: 5 },
+    mega: { chance: 0.015, multiplier: 25 },
     ultra: { chance: 0.001, multiplier: 125 },
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
@@ -490,7 +489,7 @@ export const CONFIG = {
     // this time, silently (see rollCrit in shared/critTypes). A hit just
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
-    specialCritGatewayChance: 0.15,
+    specialCritGatewayChance: 0.4,
     // "chain crit" — an extra roll on top of an already-landed crit/mega/ultra
     // (see rollCritUpgrade): applies that same tier's upgrade to the next floor
     // too, then has chainContinueChance to keep going up the building one floor

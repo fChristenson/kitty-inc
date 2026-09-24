@@ -130,20 +130,8 @@ const UPGRADES_PER_INTERVAL_HALVING =
 // upgradeCount hitting a multiple of this is also the "next ten levels" milestone
 // floorInteractions.ts celebrates with an extra coin burst at the upgrade indicator
 export const UPGRADE_MILESTONE_STEP = UPGRADES_PER_INTERVAL_HALVING;
-// each upgrade multiplies the NEXT upgrade's cost by this, instead of a flat x2 —
-// x2 compounded against income that only grows ~linearly (+rateStep) plus a much
-// smaller periodic interval-halving kicker every UPGRADES_PER_INTERVAL_HALVING
-// upgrades diverges hard: the wait for each successive upgrade ballooned to hours,
-// then days, by only the 20th-30th upgrade on a single floor (simulated). 1.3 keeps
-// the early game snappy while still slowing into normal idle-game pacing later,
-// rather than the player hitting a wall almost immediately
+// Cost growth stays close to income's milestone speed growth for sustained progression.
 const UPGRADE_COST_GROWTH = CONFIG.incomePanel.upgradeCostGrowth;
-// floors whose natural (uncapped) interval already exceeds MAX_INCOME_INTERVAL_SECONDS
-// (see Floor.aboveCapTier, set once at creation in floors/index.ts's buildFloor)
-// earn more than their level was ever meant to once upgrades push their interval
-// well below the 1h cap they started pinned at — a steeper growth rate here is
-// what actually offsets that, since it's specifically each upgrade's cost that
-// needs to scale up faster for these floors, not their starting price
 const UPGRADE_COST_GROWTH_ABOVE_CAP =
   CONFIG.incomePanel.upgradeCostGrowthAboveCap;
 

@@ -1412,6 +1412,48 @@ try {
   console.log(
     `PASS: ${kinds.length} rewards, single-floor fallbacks, targeting ties, milestones, tier caps, registry state, roll gates/cap, odds, and icons`,
   );
+  let seed = 20260924;
+  Math.random = () => {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const rolls = 30000;
+  let tierHits = 0;
+  let specialHits = 0;
+  for (let index = 0; index < rolls; index++) {
+    crit.rollCrit((result, landed) => {
+      tierHits++;
+      assert(crit.CRIT_TIER_ORDER.includes(result.tier));
+      assert(landed.length <= crit.MAX_SPECIAL_CRIT_PROCS);
+      if (landed.length > 0) specialHits++;
+    });
+  }
+  const tierChance =
+    1 -
+    crit.CRIT_TIER_ORDER.reduce(
+      (miss, tier) => miss * (1 - crit.CRIT_TIER_CONFIG[tier].chance),
+      1,
+    );
+  const procChance =
+    1 -
+    allKinds.reduce(
+      (miss, kind) => miss * (1 - crit.getCritProcChance(kind)),
+      1,
+    );
+  const specialChance =
+    tierChance * CONFIG.crit.specialCritGatewayChance * procChance;
+  assert(
+    specialChance >= 0.03 && specialChance <= 0.05,
+    "special cadence targets 20-33 eligible rolls",
+  );
+  assert(Math.abs(tierHits / rolls - tierChance) < 0.01);
+  assert(Math.abs(specialHits / rolls - specialChance) < 0.005);
+  for (let index = 0; index < 1000; index++) {
+    crit.rollCrit((_result, landed) => assert.equal(landed.length, 0), false);
+  }
+  console.log(
+    `PASS: seeded special frequency ${((100 * specialHits) / rolls).toFixed(2)}%, expected ${(100 * specialChance).toFixed(2)}%; cap and automation exclusion preserved`,
+  );
 } finally {
   Math.random = originalRandom;
   await server.close();

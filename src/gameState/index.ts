@@ -1,4 +1,5 @@
 import { snapshotMap } from "../shared/snapshotState";
+import { CONFIG } from "../config";
 import { companyStorageKey } from "../company";
 import {
   type BigNumber,
@@ -7,6 +8,8 @@ import {
   toBigNumber,
   add,
   multiply,
+  multiplyBig,
+  pow,
   subtract,
   gte,
 } from "../shared/bigNumber";
@@ -383,6 +386,7 @@ interface SavedFloor {
   incomeAmount: SerializedBigNumber;
   incomeIntervalSeconds: number;
   upgradeCost: SerializedBigNumber;
+  upgradeCostGrowth?: number;
   rateStep: SerializedBigNumber;
   upgradeCount: number;
   workers: WorkerSlot[];
@@ -423,6 +427,9 @@ function toSavedFloor(floor: Floor): SavedFloor {
     incomeAmount: floor.incomeAmount,
     incomeIntervalSeconds: floor.incomeIntervalSeconds,
     upgradeCost: floor.upgradeCost,
+    upgradeCostGrowth: floor.aboveCapTier
+      ? CONFIG.incomePanel.upgradeCostGrowthAboveCap
+      : CONFIG.incomePanel.upgradeCostGrowth,
     rateStep: floor.rateStep,
     upgradeCount: floor.upgradeCount,
     workers: getWorkerSlots(floor),
@@ -480,11 +487,26 @@ export function saveBuildingsImmediately(
 }
 
 function fromSavedFloor(sf: SavedFloor): Floor {
+  const currentGrowth = sf.aboveCapTier
+    ? CONFIG.incomePanel.upgradeCostGrowthAboveCap
+    : CONFIG.incomePanel.upgradeCostGrowth;
+  const savedGrowth =
+    sf.upgradeCostGrowth ??
+    (sf.aboveCapTier
+      ? CONFIG.incomePanel.previousUpgradeCostGrowthAboveCap
+      : CONFIG.incomePanel.previousUpgradeCostGrowth);
+  const upgradeCost = toBigNumber(sf.upgradeCost);
   const floor: Floor = {
     bgIndex: sf.bgIndex ?? 0,
     incomeAmount: toBigNumber(sf.incomeAmount),
     incomeIntervalSeconds: sf.incomeIntervalSeconds,
-    upgradeCost: toBigNumber(sf.upgradeCost),
+    upgradeCost:
+      Number.isFinite(savedGrowth) && savedGrowth > currentGrowth
+        ? multiplyBig(
+            upgradeCost,
+            pow(currentGrowth / savedGrowth, sf.upgradeCount),
+          )
+        : upgradeCost,
     rateStep: toBigNumber(sf.rateStep),
     upgradeCount: sf.upgradeCount,
     unlocked: sf.unlocked,
