@@ -17,21 +17,18 @@ import {
   isOvertimeActive,
   currentPayoutAmount,
 } from "../../floors";
-import { baseIncomeRatePerSecond as floorIncomePerSecond } from "../../shared/income";
 // re-exported for hud/index.ts's own facade — applyBoostAll's canonical home
 // is floors/worker.ts (floorInteractions.ts's boost crit proc uses it too),
 // this module just re-shares it rather than keeping its own duplicate copy
 export { applyBoostAll } from "../../floors";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
-import { CONFIG } from "../../config";
 import {
   type BigNumber,
   ZERO,
   fromNumber,
   add,
   divide,
-  multiply,
   max,
   gte,
   lt,
@@ -41,19 +38,8 @@ const mouseIconUrl = getImageUrl("mouse");
 const cashRegisterIconUrl = getImageUrl("cashRegister");
 const overtimeIconUrl = getImageUrl("clock");
 
-const BOOST_ALL_SECONDS_COST = CONFIG.boostMenu.boostAllSecondsCost; // cost is 5s of current (unboosted) income
-
-// $/sec every unlocked floor is currently earning at its own base rate, ignoring any
-// temporary worker boost already in effect — same shared definition gameState.ts's
-// computeIdleIncome and the upgrade button's per-click second of income use
-function currentIncomePerSecond(floors: Floor[]): BigNumber {
-  return floors
-    .filter((floor) => floor.unlocked)
-    .reduce((sum, floor) => add(sum, floorIncomePerSecond(floor)), ZERO);
-}
-
 export function getBoostAllCost(floors: Floor[]): BigNumber {
-  return multiply(currentIncomePerSecond(floors), BOOST_ALL_SECONDS_COST);
+  return getSaleBoostCost(floors);
 }
 
 // a floor's own currentPayoutAmount (see floors/incomePanel/index.ts — exactly

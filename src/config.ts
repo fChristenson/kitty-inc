@@ -2175,11 +2175,6 @@ export const CONFIG = {
     },
   },
 
-  // src/hud/boostMenu/index.ts — one-time paid boosts.
-  boostMenu: {
-    boostAllSecondsCost: 5, // "Boost all" costs this many seconds of current income
-  },
-
   // src/hud/upgradeMenu/index.ts — per-floor worker/office-upgrade pricing.
   upgradeMenu: {
     workerBasePriceFloor1: 100,

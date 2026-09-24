@@ -828,8 +828,31 @@ try {
       const { getIncomeBarCenter } = await server.ssrLoadModule(
         "/src/floors/incomePanel/index.ts",
       );
-      const { buyOvertimeBoost } = await server.ssrLoadModule(
-        "/src/hud/boostMenu/index.ts",
+      const {
+        buyOvertimeBoost,
+        getBoostAllCost,
+        getSaleBoostCost,
+        getOvertimeBoostCost,
+      } = await server.ssrLoadModule("/src/hud/boostMenu/index.ts");
+      const pricingFloors = makeBuilding();
+      for (const floors of [[], [pricingFloors[0]], pricingFloors]) {
+        assert.deepEqual(
+          getBoostAllCost(floors),
+          getSaleBoostCost(floors),
+          "worker boost matches Sale price",
+        );
+        assert.deepEqual(
+          getBoostAllCost(floors),
+          getOvertimeBoostCost(floors),
+          "worker boost matches Overtime price",
+        );
+      }
+      assert.equal(toNumber(getBoostAllCost([pricingFloors[0]])), 0.5);
+      workers.activateBoosted(pricingFloors[0], 0, now);
+      assert.deepEqual(
+        getBoostAllCost(pricingFloors),
+        getSaleBoostCost(pricingFloors),
+        "active boosts use the same price basis",
       );
       const floor = buildFloor(1, { backgroundCount: 1 });
       const draft = { buildings: [[floor]], money: fromNumber(0) };
