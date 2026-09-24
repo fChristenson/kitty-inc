@@ -178,9 +178,9 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
       actions.upgrade([context.floor], balance.badonkadonkUpgrades);
       actions.payCycles([context.floor], balance.badonkadonkPayouts);
     },
-    demoncBuns: (context) => {
-      actions.upgrade([context.floor], balance.demoncBunsUpgrades);
-      actions.payCycles([context.floor], balance.demoncBunsPayouts);
+    demonicBuns: (context) => {
+      actions.upgrade([context.floor], balance.demonicBunsUpgrades);
+      actions.payCycles([context.floor], balance.demonicBunsPayouts);
     },
     infernalInterest: (context) => {
       actions.upgrade([context.floor], balance.infernalInterestUpgrades);
