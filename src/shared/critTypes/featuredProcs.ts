@@ -4,6 +4,18 @@ import { ELEMENT_CRIT_INFO } from "./elementProcs";
 
 export const FEATURED_CRIT_INFO = {
   ...ELEMENT_CRIT_INFO,
+  chromeDome: {
+    label: "Chrome Dome",
+    color: COLOR.cyan,
+    icon: "chromeDome",
+    description: "Fourteen upgrades, then twenty-three payouts on this floor",
+  },
+  skullSyndicate: {
+    label: "Skull Syndicate",
+    color: COLOR.peppermintPink,
+    icon: "skullSyndicate",
+    description: "Nine upgrades, then seven payouts on every unlocked floor",
+  },
   circuitDuchess: {
     label: "Circuit Duchess",
     color: COLOR.cyan,

@@ -83,6 +83,18 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
 
   return {
     ...createElementCritRewards(actions),
+    chromeDome: (context) =>
+      upgradeAndPay(
+        [context.floor],
+        balance.chromeDomeUpgrades,
+        balance.chromeDomePayouts,
+      ),
+    skullSyndicate: (context) =>
+      upgradeAndPay(
+        context.floors,
+        balance.skullSyndicateUpgrades,
+        balance.skullSyndicatePayouts,
+      ),
     circuitDuchess: (context) =>
       upgradeAndPay(
         [context.floor],

@@ -62,7 +62,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 662 + elementCritBatch.length);
+  assert.equal(kinds.length, 664 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -246,6 +246,8 @@ try {
   }
 
   const expected = {
+    chromeDome: [[20, 44, 10, 0], 69],
+    skullSyndicate: [[29, 39, 19, 0], 42],
     circuitDuchess: [[20, 36, 10, 0], 39],
     cyberCat: [[24, 34, 14, 0], 42],
     chromeChassis: [[26, 36, 16, 0], 30],
@@ -1184,6 +1186,8 @@ try {
   assert(CONFIG.crit.ballerinaChance > CONFIG.crit.bubbleButtChance);
   assert(CONFIG.crit.bubbleButtChance > CONFIG.crit.canNotLieChance);
   const newSourceRewards = [
+    ["chromeDome", "chromeSkull.jfif", 14, 23],
+    ["skullSyndicate", "chromeSkulls.jfif", 9, 7],
     ["circuitDuchess", "circuitDuchess.jfif", 6, 13],
     ["cyberCat", "cyberCat.jfif", 4, 7],
     ["chromeChassis", "elbowRoom.jfif", 6, 5],
@@ -1243,7 +1247,8 @@ try {
       "demoncBuns",
       "infernalInterest",
     ],
-    ["kittyWagon", "wagonWarrior", "lordOfMurder"],
+    ["kittyWagon", "wagonWarrior", "lordOfMurder", "skullSyndicate"],
+    ["goldenSkull", "chromeDome", "infernalInterest"],
     ["canNotLie", "speedDemon", "goldenSkull"],
     ["madeYouLook", "circuitDuchess", "heartware", "pulseDividend"],
     ["neonNegotiator", "retinaRoyale", "speedDemon"],
