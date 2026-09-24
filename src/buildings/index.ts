@@ -9,8 +9,6 @@ import {
 } from "../shared/bigNumber";
 import { CONFIG } from "../config";
 
-export const BUILDING_COST_MULTIPLIER = CONFIG.buildings.costMultiplier;
-
 export function getBuildingMultiplier(buildingIndex: number): number {
   return CONFIG.floors.floorEconomyMultiplierPerBuilding ** buildingIndex;
 }
@@ -23,7 +21,7 @@ const BUILDING_BASE_PRICE = CONFIG.buildings.basePrice;
 // very high building index instead of overflowing to Infinity
 export function getBuildingPrice(nextBuildingIndex: number): BigNumber {
   return multiply(
-    pow(BUILDING_COST_MULTIPLIER, nextBuildingIndex - 1),
+    pow(Math.max(1, nextBuildingIndex), CONFIG.buildings.priceGrowthExponent),
     BUILDING_BASE_PRICE,
   );
 }

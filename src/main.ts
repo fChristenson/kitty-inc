@@ -701,8 +701,7 @@ async function main() {
   );
   const badgeCollection = wireBadgeCollection(app);
   const totalEarnedOverlay = wireTotalEarnedOverlay(app);
-  // buys the next building outright if affordable (see buildings.ts's
-  // getBuildingPrice, which scales 1000x per building same as its economy).
+  // buys the next building outright if affordable at its milestone price.
   // Returns whether it succeeded so the map menu can decide whether to re-render
   function buyBuilding(targetBuildings = buildings): boolean {
     const buildingIndex = targetBuildings.length;

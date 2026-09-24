@@ -33,8 +33,8 @@ export const CONFIG = {
 
   // src/buildings/index.ts — purchase prices only; floor scaling lives in floors.
   buildings: {
-    costMultiplier: 1_000,
-    basePrice: 1_000_000_000,
+    priceGrowthExponent: 30,
+    basePrice: 1e218,
   },
 
   // src/floors/incomePanel/index.ts — how a floor's income/interval evolve as
