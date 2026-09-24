@@ -12,9 +12,15 @@ export function baseFloorInterval(floorLevel: number): number {
 }
 
 export function floorIncomeScale(floorLevel: number): number {
-  return CONFIG.floors.incomeGrowthFactor ** Math.min(
-    floorLevel - 1,
-    Math.log2(CONFIG.incomePanel.maxIncomeIntervalSeconds / CONFIG.floors.baseIncomeIntervalSeconds),
+  return (
+    CONFIG.floors.incomeGrowthFactor **
+    Math.min(
+      floorLevel - 1,
+      Math.log2(
+        CONFIG.incomePanel.maxIncomeIntervalSeconds /
+          CONFIG.floors.baseIncomeIntervalSeconds,
+      ),
+    )
   );
 }
 
@@ -31,12 +37,12 @@ export function upgradeBatchCost(floor: Floor, count: number): BigNumber {
   const start = CONFIG.incomePanel.upgradePriceLevelScale + floor.upgradeCount;
   return multiply(
     floor.upgradeCost,
-    count * (
-      1 + 2 * (count - 1) / start +
-      ((count - 1) * (2 * count - 1)) / start ** 2 +
-      (count * (count - 1) ** 2) / start ** 3 +
-      ((count - 1) * (2 * count - 1) * (3 * count ** 2 - 3 * count - 1)) /
-        (30 * start ** 4)
-    ),
+    count *
+      (1 +
+        (2 * (count - 1)) / start +
+        ((count - 1) * (2 * count - 1)) / start ** 2 +
+        (count * (count - 1) ** 2) / start ** 3 +
+        ((count - 1) * (2 * count - 1) * (3 * count ** 2 - 3 * count - 1)) /
+          (30 * start ** 4)),
   );
 }

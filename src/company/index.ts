@@ -120,7 +120,10 @@ export function saveCompanyRecord(
   record: CompanyRecord,
 ): void {
   const all = loadAllCompanyRecords();
-  all[companyIndex] = { ...record, upgradeEconomyVersion: UPGRADE_ECONOMY_VERSION };
+  all[companyIndex] = {
+    ...record,
+    upgradeEconomyVersion: UPGRADE_ECONOMY_VERSION,
+  };
   saveAllCompanyRecords(all);
 }
 

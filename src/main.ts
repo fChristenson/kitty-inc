@@ -709,7 +709,9 @@ async function main() {
     const purchaseCost = getBuildingPrice(buildingIndex);
     if (!spendTotalIncome(purchaseCost)) return false;
     targetBuildings.push(
-      createBuilding(buildingIndex, getBackgroundUrls().length, { purchaseCost }),
+      createBuilding(buildingIndex, getBackgroundUrls().length, {
+        purchaseCost,
+      }),
     );
     setupBuilding(buildingIndex, targetBuildings);
     if (targetBuildings === buildings) persist();

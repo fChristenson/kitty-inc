@@ -24,11 +24,7 @@ import {
   peekDueIncome as sharedPeekDueIncome,
   currentIncomeRatePerSecond as sharedCurrentIncomeRatePerSecond,
 } from "../../shared/income";
-import {
-  type BigNumber,
-  add,
-  multiply,
-} from "../../shared/bigNumber";
+import { type BigNumber, add, multiply } from "../../shared/bigNumber";
 import {
   drawPill,
   drawPillBorder,
@@ -39,7 +35,10 @@ import {
 } from "../../utils";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
-import { upgradePriceAfter, upgradeSpeedMultiplier } from "../../shared/upgradeEconomy";
+import {
+  upgradePriceAfter,
+  upgradeSpeedMultiplier,
+} from "../../shared/upgradeEconomy";
 
 // panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right).
 // Scaled up from the original 360 as far as the gap to the upgrade button allows. PANEL_X is
@@ -170,7 +169,8 @@ export function increaseIncomeRate(floor: Floor): void {
   // overspeed/"filled bar" trigger) from a boost or office upgrade, never from
   // upgrades alone
   floor.incomeIntervalSeconds *=
-    upgradeSpeedMultiplier(floor.upgradeCount - 1) / upgradeSpeedMultiplier(floor.upgradeCount);
+    upgradeSpeedMultiplier(floor.upgradeCount - 1) /
+    upgradeSpeedMultiplier(floor.upgradeCount);
 }
 
 // Applies many normal upgrade-rate increases in one pass. This is used by crit
@@ -195,7 +195,8 @@ export function increaseIncomeRateBy(floor: Floor, count: number): void {
   const previousUpgradeCount = floor.upgradeCount;
   floor.upgradeCount += count;
   floor.incomeIntervalSeconds *=
-    upgradeSpeedMultiplier(previousUpgradeCount) / upgradeSpeedMultiplier(floor.upgradeCount);
+    upgradeSpeedMultiplier(previousUpgradeCount) /
+    upgradeSpeedMultiplier(floor.upgradeCount);
 }
 
 // how many times faster than its own base incomeIntervalSeconds this floor is

@@ -37,10 +37,17 @@ export function quoteUpgrades(
   function atCutoff(cutoff: number, record = false): BigNumber {
     let total = ZERO;
     for (const curve of curves) {
-      const count = cutoff < curve.logPrice ? 0 : Math.max(0, Math.floor(
-          (CONFIG.incomePanel.upgradePriceLevelScale + curve.floor.upgradeCount) *
-          Math.expm1((cutoff - curve.logPrice) * Math.LN10 / 4),
-        ) + 1);
+      const count =
+        cutoff < curve.logPrice
+          ? 0
+          : Math.max(
+              0,
+              Math.floor(
+                (CONFIG.incomePanel.upgradePriceLevelScale +
+                  curve.floor.upgradeCount) *
+                  Math.expm1(((cutoff - curve.logPrice) * Math.LN10) / 4),
+              ) + 1,
+            );
       if (!Number.isSafeInteger(curve.floor.upgradeCount + count)) {
         return overBudget;
       }
@@ -53,7 +60,8 @@ export function quoteUpgrades(
   }
   let lower =
     curves.reduce(
-      (lowest, curve) => isZero(curve.price) ? lowest : Math.min(lowest, curve.logPrice),
+      (lowest, curve) =>
+        isZero(curve.price) ? lowest : Math.min(lowest, curve.logPrice),
       Infinity,
     ) - 1;
   let upper = log10(money);
@@ -70,7 +78,7 @@ export function quoteUpgrades(
     cost = atCutoff(lower, true);
   }
   for (;;) {
-    let cheapest: typeof curves[number] | undefined;
+    let cheapest: (typeof curves)[number] | undefined;
     let price = money;
     for (const curve of curves) {
       const nextPrice = upgradePriceAfter(curve.floor, purchases[curve.index]);
@@ -80,8 +88,14 @@ export function quoteUpgrades(
       }
     }
     if (!cheapest || lt(money, add(cost, price))) break;
-    if (!Number.isSafeInteger(cheapest.floor.upgradeCount + purchases[cheapest.index] + 1)) {
-      throw new RangeError("Affordable upgrade count exceeds exact numeric precision");
+    if (
+      !Number.isSafeInteger(
+        cheapest.floor.upgradeCount + purchases[cheapest.index] + 1,
+      )
+    ) {
+      throw new RangeError(
+        "Affordable upgrade count exceeds exact numeric precision",
+      );
     }
     cost = add(cost, price);
     purchases[cheapest.index]++;

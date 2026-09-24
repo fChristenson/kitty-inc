@@ -1,6 +1,11 @@
 import { snapshotMap } from "../shared/snapshotState";
 import { CONFIG } from "../config";
-import { baseFloorInterval, floorIncomeScale, upgradeSpeedMultiplier, UPGRADE_ECONOMY_VERSION } from "../shared/upgradeEconomy";
+import {
+  baseFloorInterval,
+  floorIncomeScale,
+  upgradeSpeedMultiplier,
+  UPGRADE_ECONOMY_VERSION,
+} from "../shared/upgradeEconomy";
 import { companyStorageKey } from "../company";
 import {
   type BigNumber,
@@ -494,7 +499,8 @@ export function saveBuildingsImmediately(
 
 function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
   const needsRebalance = (sf.upgradeEconomyVersion ?? 0) < 2;
-  const needsSpeedRebalance = (sf.upgradeEconomyVersion ?? 0) < UPGRADE_ECONOMY_VERSION;
+  const needsSpeedRebalance =
+    (sf.upgradeEconomyVersion ?? 0) < UPGRADE_ECONOMY_VERSION;
   const oldScale = pow(CONFIG.floors.incomeGrowthFactor, floorIndex);
   const inverseOldScale = fromLog10(-log10(oldScale));
   const newScale = floorIncomeScale(floorIndex + 1);
@@ -505,23 +511,29 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
     ? multiply(
         divide(rateStep, CONFIG.floors.baseRateStep * newScale),
         CONFIG.floors.baseUpgradeCost *
-          (1 + sf.upgradeCount / CONFIG.incomePanel.upgradePriceLevelScale) ** 4 *
+          (1 + sf.upgradeCount / CONFIG.incomePanel.upgradePriceLevelScale) **
+            4 *
           (sf.priceDiscountMultiplier ?? 1),
       )
     : (sf.upgradeEconomyVersion ?? 0) < 4
       ? multiply(
           toBigNumber(sf.upgradeCost),
           ((1 + sf.upgradeCount / CONFIG.incomePanel.upgradePriceLevelScale) /
-            (1 + sf.upgradeCount / 10)) ** 4,
+            (1 + sf.upgradeCount / 10)) **
+            4,
         )
       : toBigNumber(sf.upgradeCost);
   const floor: Floor = {
     bgIndex: sf.bgIndex ?? 0,
     incomeAmount: needsRebalance
-      ? multiply(multiplyBig(toBigNumber(sf.incomeAmount), inverseOldScale), newScale)
+      ? multiply(
+          multiplyBig(toBigNumber(sf.incomeAmount), inverseOldScale),
+          newScale,
+        )
       : toBigNumber(sf.incomeAmount),
     incomeIntervalSeconds: needsSpeedRebalance
-      ? baseFloorInterval(floorIndex + 1) / upgradeSpeedMultiplier(sf.upgradeCount)
+      ? baseFloorInterval(floorIndex + 1) /
+        upgradeSpeedMultiplier(sf.upgradeCount)
       : sf.incomeIntervalSeconds,
     upgradeCost,
     rateStep,

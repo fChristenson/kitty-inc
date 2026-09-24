@@ -22,7 +22,10 @@ const BUILDING_BASE_PRICE = CONFIG.buildings.basePrice;
 // very high building index instead of overflowing to Infinity
 export function getBuildingPrice(nextBuildingIndex: number): BigNumber {
   return multiply(
-    pow(CONFIG.floors.floorEconomyMultiplierPerBuilding, Math.max(0, nextBuildingIndex - 1)),
+    pow(
+      CONFIG.floors.floorEconomyMultiplierPerBuilding,
+      Math.max(0, nextBuildingIndex - 1),
+    ),
     BUILDING_BASE_PRICE,
   );
 }
