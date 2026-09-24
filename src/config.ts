@@ -15,7 +15,7 @@ export const CONFIG = {
     baseIncomeAmount: 1,
     incomeGrowthFactor: 2,
     baseIncomeIntervalSeconds: 1,
-    baseUpgradeCost: 1,
+    baseUpgradeCost: 2,
     baseUnlockCost: 200,
     unlockCostGrowthFactor: 2,
     baseRateStep: 2,
@@ -31,7 +31,7 @@ export const CONFIG = {
   incomePanel: {
     minIncomeIntervalSeconds: 0.5,
     maxIncomeIntervalSeconds: 1,
-    upgradeSpeedLevelScale: 10,
+    upgradeSpeedLevelScale: 20,
     upgradeMilestoneStep: 10,
     upgradePriceLevelScale: 3,
   },

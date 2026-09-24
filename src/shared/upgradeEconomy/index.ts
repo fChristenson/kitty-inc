@@ -2,7 +2,7 @@ import { CONFIG } from "../../config";
 import type { Floor } from "../../gameState";
 import { multiply, type BigNumber } from "../bigNumber";
 
-export const UPGRADE_ECONOMY_VERSION = 4;
+export const UPGRADE_ECONOMY_VERSION = 5;
 
 export function baseFloorInterval(floorLevel: number): number {
   return Math.min(

@@ -499,8 +499,7 @@ export function saveBuildingsImmediately(
 
 function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
   const needsRebalance = (sf.upgradeEconomyVersion ?? 0) < 2;
-  const needsSpeedRebalance =
-    (sf.upgradeEconomyVersion ?? 0) < UPGRADE_ECONOMY_VERSION;
+  const needsSpeedRebalance = (sf.upgradeEconomyVersion ?? 0) < 4;
   const oldScale = pow(CONFIG.floors.incomeGrowthFactor, floorIndex);
   const inverseOldScale = fromLog10(-log10(oldScale));
   const newScale = floorIncomeScale(floorIndex + 1);
@@ -518,11 +517,14 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
     : (sf.upgradeEconomyVersion ?? 0) < 4
       ? multiply(
           toBigNumber(sf.upgradeCost),
-          ((1 + sf.upgradeCount / CONFIG.incomePanel.upgradePriceLevelScale) /
-            (1 + sf.upgradeCount / 10)) **
-            4,
+          CONFIG.floors.baseUpgradeCost *
+            ((1 + sf.upgradeCount / CONFIG.incomePanel.upgradePriceLevelScale) /
+              (1 + sf.upgradeCount / 10)) **
+              4,
         )
-      : toBigNumber(sf.upgradeCost);
+      : sf.upgradeEconomyVersion === 4
+        ? multiply(toBigNumber(sf.upgradeCost), CONFIG.floors.baseUpgradeCost)
+        : toBigNumber(sf.upgradeCost);
   const floor: Floor = {
     bgIndex: sf.bgIndex ?? 0,
     incomeAmount: needsRebalance
@@ -534,7 +536,10 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
     incomeIntervalSeconds: needsSpeedRebalance
       ? baseFloorInterval(floorIndex + 1) /
         upgradeSpeedMultiplier(sf.upgradeCount)
-      : sf.incomeIntervalSeconds,
+      : sf.upgradeEconomyVersion === 4
+        ? (sf.incomeIntervalSeconds * (1 + sf.upgradeCount / 10)) /
+          upgradeSpeedMultiplier(sf.upgradeCount)
+        : sf.incomeIntervalSeconds,
     upgradeCost,
     rateStep,
     upgradeCount: sf.upgradeCount,
