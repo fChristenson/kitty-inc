@@ -848,7 +848,26 @@ try {
         );
       }
       assert.equal(toNumber(getBoostAllCost([pricingFloors[0]])), 0.5);
+      const unboostedPrice = getBoostAllCost(pricingFloors);
       workers.activateBoosted(pricingFloors[0], 0, now);
+      for (const getCost of [
+        getBoostAllCost,
+        getSaleBoostCost,
+        getOvertimeBoostCost,
+      ]) {
+        assert.deepEqual(
+          getCost(pricingFloors),
+          unboostedPrice,
+          "temporary worker boost cannot raise boost prices",
+        );
+      }
+      assert.equal(toNumber(getBoostAllCost([pricingFloors[0]])), 0.5);
+      pricingFloors[0].hasManager = true;
+      assert.equal(
+        toNumber(getBoostAllCost([pricingFloors[0]])),
+        1,
+        "permanent office bonuses remain in base payout",
+      );
       assert.deepEqual(
         getBoostAllCost(pricingFloors),
         getSaleBoostCost(pricingFloors),

@@ -15,8 +15,11 @@ import {
   triggerSaleBoost,
   triggerOvertimeBoost,
   isOvertimeActive,
-  currentPayoutAmount,
 } from "../../floors";
+import {
+  effectiveIncomeCycle,
+  officeUpgradeSpeedMultiplier,
+} from "../../shared/income";
 // re-exported for hud/index.ts's own facade — applyBoostAll's canonical home
 // is floors/worker.ts (floorInteractions.ts's boost crit proc uses it too),
 // this module just re-shares it rather than keeping its own duplicate copy
@@ -42,16 +45,20 @@ export function getBoostAllCost(floors: Floor[]): BigNumber {
   return getSaleBoostCost(floors);
 }
 
-// a floor's own currentPayoutAmount (see floors/incomePanel/index.ts — exactly
-// what one Sale click now pays out, 1 full bar's worth), averaged across every
-// unlocked floor since the boost lands on a random one
+// Average unboosted payout, retaining permanent office upgrades.
 function averageFloorPayoutAmount(floors: Floor[]): BigNumber {
   const unlocked = floors.filter((floor) => floor.unlocked);
   if (unlocked.length === 0) return fromNumber(1);
-  const now = Date.now();
   const total = unlocked.reduce(
     (sum, floor) =>
-      add(sum, max(fromNumber(1), currentPayoutAmount(floor, now))),
+      add(
+        sum,
+        max(
+          fromNumber(1),
+          effectiveIncomeCycle(floor, officeUpgradeSpeedMultiplier(floor))
+            .amount,
+        ),
+      ),
     ZERO,
   );
   return divide(total, unlocked.length);
@@ -68,7 +75,7 @@ export function buyBoostAll(floors: Floor[]): boolean {
 }
 
 export function getSaleBoostCost(floors: Floor[]): BigNumber {
-  // half of the floor's own current bar payout — a single sale click now
+  // half of the floor's unboosted bar payout — a single sale click now
   // pays that whole amount back, i.e. at least double the cost
   return divide(averageFloorPayoutAmount(floors), 2);
 }
