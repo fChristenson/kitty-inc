@@ -1,5 +1,4 @@
 import { snapshotMap } from "../shared/snapshotState";
-import { CONFIG } from "../config";
 import { companyStorageKey } from "../company";
 import {
   type BigNumber,
@@ -498,12 +497,7 @@ function fromSavedFloor(sf: SavedFloor): Floor {
     critMultiplierTier: sf.critMultiplierTier ?? null,
     aboveCapTier: sf.aboveCapTier ?? false,
     overtimeTicks: sf.overtimeTicks ?? 0,
-    overtimeEndedAt:
-      sf.overtimeEndedAt === undefined &&
-      sf.overtimeStartedAt != null &&
-      Date.now() >= sf.overtimeStartedAt + CONFIG.overtime.legacyDurationMs
-        ? sf.overtimeStartedAt + CONFIG.overtime.legacyDurationMs
-        : (sf.overtimeEndedAt ?? null),
+    overtimeEndedAt: sf.overtimeEndedAt ?? null,
     overtimeGoal: sf.overtimeGoal,
     overtimeStartedAt: sf.overtimeStartedAt ?? null,
     overtimeCost:

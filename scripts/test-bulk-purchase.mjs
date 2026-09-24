@@ -949,16 +949,21 @@ try {
           false,
           "cancel confirmation does not survive reload",
         );
-        floor.overtimeStartedAt = now - CONFIG.overtime.legacyDurationMs - 500;
+        floor.overtimeStartedAt = now - 86400000;
         delete floor.overtimeEndedAt;
         delete floor.overtimeGoal;
         workers.saveBuildings([[floor]]);
         restored = workers.loadBuildings()[0][0];
         assert.equal(
           buttons.isOvertimeActive(restored, now),
-          false,
-          "expired legacy events stay expired",
+          true,
+          "saved events without an end marker do not expire with time",
         );
+        assert.equal(buttons.getOvertimeDisplayTicks(restored, now), 15);
+        floor.overtimeEndedAt = now - 500;
+        workers.saveBuildings([[floor]]);
+        restored = workers.loadBuildings()[0][0];
+        assert.equal(buttons.isOvertimeActive(restored, now), false);
         assert.equal(buttons.getOvertimeDisplayTicks(restored, now), 0);
         assert.equal(
           buttons.isOvertimeGaugeVisible(restored, now),
