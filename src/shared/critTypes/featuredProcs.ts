@@ -110,8 +110,8 @@ export const FEATURED_CRIT_INFO = {
     icon: "badonkadonk",
     description: "Ten free upgrades, then twelve payouts on this floor",
   },
-  demoncBuns: {
-    label: "Demonc Buns",
+  demonicBuns: {
+    label: "Demonic Buns",
     color: COLOR.red,
     icon: "demoncBuns",
     description: "Sixteen free upgrades, then twenty-one payouts on this floor",
