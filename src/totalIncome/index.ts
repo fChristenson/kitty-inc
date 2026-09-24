@@ -1,6 +1,6 @@
-import { isStorageIntact, type Floor } from "../gameState";
+import { isStorageIntact, loadBuildings, saveBuildingsImmediately, type Floor } from "../gameState";
+import { UPGRADE_ECONOMY_VERSION } from "../shared/upgradeEconomy";
 import { collectDueIncome, currentIncomeRatePerSecond } from "../floors";
-import { getBuildingPrice } from "../buildings";
 import {
   getActiveCompanyIndex,
   loadCompanyRecord,
@@ -68,6 +68,35 @@ export function getStoredTotalIncome(companyIndex: number): BigNumber {
     record.bankedTotal,
     multiply(record.incomeRatePerSecond, elapsedSeconds),
   );
+}
+
+export function rebalanceDormantCompanyEconomies(getMultiplier: () => number): void {
+  const now = Date.now();
+  for (let index = 0; index < getCorporationCount(); index++) {
+    if (index === activeCompanyIndex) continue;
+    const record = loadCompanyRecord(index);
+    if (!record || (record.upgradeEconomyVersion ?? 0) >= UPGRADE_ECONOMY_VERSION) continue;
+    const buildings = loadBuildings(index);
+    if (buildings.length === 0) continue;
+    let rate = ZERO;
+    for (const floors of buildings) {
+      for (const floor of floors) {
+        if (floor.unlocked) rate = add(rate, currentIncomeRatePerSecond(floor, now));
+        floor.lastCollectedAt = now;
+      }
+    }
+    const bankedTotal = add(record.bankedTotal, multiply(
+      record.incomeRatePerSecond,
+      Math.max(0, (now - record.updatedAt) / 1000),
+    ));
+    saveBuildingsImmediately(buildings, index);
+    saveCompanyRecord(index, {
+      ...record,
+      bankedTotal,
+      incomeRatePerSecond: multiply(rate, getMultiplier()),
+      updatedAt: now,
+    });
+  }
 }
 
 // combined totalIncome across every corporation — every corp boost/upgrade
@@ -148,8 +177,8 @@ export function getActiveCompanyInvestedValue(): BigNumber {
       if (floor.unlocked) total = add(total, floor.unlockCost);
     }
   }
-  for (let i = 1; i < tickerBuildings.length; i++) {
-    total = add(total, getBuildingPrice(i));
+  for (const floors of tickerBuildings) {
+    total = add(total, floors[0]?.buildingPurchaseCost ?? ZERO);
   }
   return total;
 }

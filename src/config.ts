@@ -8,24 +8,14 @@
 // module (including circular-import-sensitive ones like floors/index.ts) to read.
 
 export const CONFIG = {
-  // src/floors/index.ts's buildFloor — a new floor's starting stats. Each floor
-  // above the ground floor multiplies its income by incomeGrowthFactor while its
-  // interval only doubles. incomeGrowthFactor is deliberately equal to that
-  // doubling (2) — NOT bigger — so a fresh, un-upgraded floor's base $/s is flat
-  // across every floor level within a building; only accumulated upgrades (and
-  // switching to a whole new, 1000x-richer building) grow $/s from there.
-  // Previously this was 3 (a 1.5x-per-floor $/s runaway on floor depth ALONE),
-  // which let endlessly climbing one building's floors always out-earn buying a
-  // new building by an ever-widening margin — buildings stopped mattering once
-  // a single building got tall enough. Keep this <= 2 (the interval-doubling
-  // factor) so that snowball never comes back.
+  // Floor income and interval scale together up to the starting interval limit.
+  // With a 1s limit, floors share a base rate; buildings scale the whole economy.
   floors: {
     floorEconomyMultiplierPerBuilding: 1_000,
     baseIncomeAmount: 1,
     incomeGrowthFactor: 2,
     baseIncomeIntervalSeconds: 1,
     baseUpgradeCost: 1,
-    upgradeCostGrowthFactor: 2,
     baseUnlockCost: 200,
     unlockCostGrowthFactor: 2,
     baseRateStep: 2,
@@ -33,20 +23,17 @@ export const CONFIG = {
 
   // src/buildings/index.ts — purchase prices only; floor scaling lives in floors.
   buildings: {
-    priceGrowthExponent: 30,
-    basePrice: 1e218,
+    basePrice: 125_000_000_000,
   },
 
   // src/floors/incomePanel/index.ts — how a floor's income/interval evolve as
   // it's upgraded, and the bounds its payout cycle is clamped to.
   incomePanel: {
-    minIncomeIntervalSeconds: 1,
-    maxIncomeIntervalSeconds: 3600,
-    upgradesPerIntervalHalving: 10,
-    upgradeCostGrowth: 1.075,
-    upgradeCostGrowthAboveCap: 1.075,
-    previousUpgradeCostGrowth: 1.3,
-    previousUpgradeCostGrowthAboveCap: 1.6,
+    minIncomeIntervalSeconds: 0.5,
+    maxIncomeIntervalSeconds: 1,
+    upgradeSpeedLevelScale: 10,
+    upgradeMilestoneStep: 10,
+    upgradePriceLevelScale: 3,
   },
 
   // src/floors/upgradeButton/index.ts's CRIT_TIER_CONFIG — odds + free-upgrade/
@@ -490,6 +477,7 @@ export const CONFIG = {
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
     specialCritGatewayChance: 0.4,
+    bonusTierGatewayChance: 0.01,
     // "chain crit" — an extra roll on top of an already-landed crit/mega/ultra
     // (see rollCritUpgrade): applies that same tier's upgrade to the next floor
     // too, then has chainContinueChance to keep going up the building one floor

@@ -53,6 +53,7 @@ import {
 import {
   startTotalIncomeTicker,
   switchActiveCompany,
+  rebalanceDormantCompanyEconomies,
   spendFromAllCompanies,
   addTotalIncome,
   spendTotalIncome,
@@ -705,9 +706,10 @@ async function main() {
   // Returns whether it succeeded so the map menu can decide whether to re-render
   function buyBuilding(targetBuildings = buildings): boolean {
     const buildingIndex = targetBuildings.length;
-    if (!spendTotalIncome(getBuildingPrice(buildingIndex))) return false;
+    const purchaseCost = getBuildingPrice(buildingIndex);
+    if (!spendTotalIncome(purchaseCost)) return false;
     targetBuildings.push(
-      createBuilding(buildingIndex, getBackgroundUrls().length),
+      createBuilding(buildingIndex, getBackgroundUrls().length, { purchaseCost }),
     );
     setupBuilding(buildingIndex, targetBuildings);
     if (targetBuildings === buildings) persist();
@@ -1260,6 +1262,7 @@ async function main() {
   buildings.forEach((_, i) => setupBuilding(i));
   persist();
 
+  rebalanceDormantCompanyEconomies(getGlobalIncomeBoostMultiplier);
   const idleIncome = computeIdleIncome(
     buildings,
     currentIncomeRatePerSecond,

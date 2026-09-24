@@ -6,6 +6,7 @@
 // persisted so a reload resumes the same company.
 import { type BigNumber, toBigNumber } from "../shared/bigNumber";
 import { getCorporationCount } from "../corporationName";
+import { UPGRADE_ECONOMY_VERSION } from "../shared/upgradeEconomy";
 
 const ACTIVE_COMPANY_KEY = "cash-clicker:active-company-index";
 
@@ -49,6 +50,7 @@ export function companyStorageKey(
 // dormant company only ever updated the $ key, so the elapsed-time projection
 // kept compounding against a stale timestamp forever after)
 export interface CompanyRecord {
+  upgradeEconomyVersion?: number;
   bankedTotal: BigNumber; // $ actually banked as of updatedAt
   incomeRatePerSecond: BigNumber; // frozen as of updatedAt; only the active company's own rate can change
   assetValue: BigNumber; // buildings value + upgrades value combined, frozen as of updatedAt
@@ -101,6 +103,7 @@ export function loadCompanyRecord(companyIndex: number): CompanyRecord | null {
   // so it defaults to ZERO instead of invalidating the whole record (same
   // recovery every other one-off added field here would get)
   return {
+    upgradeEconomyVersion: record.upgradeEconomyVersion,
     bankedTotal: toBigNumber(record.bankedTotal),
     incomeRatePerSecond: toBigNumber(record.incomeRatePerSecond),
     assetValue: toBigNumber(record.assetValue),
@@ -117,7 +120,7 @@ export function saveCompanyRecord(
   record: CompanyRecord,
 ): void {
   const all = loadAllCompanyRecords();
-  all[companyIndex] = record;
+  all[companyIndex] = { ...record, upgradeEconomyVersion: UPGRADE_ECONOMY_VERSION };
   saveAllCompanyRecords(all);
 }
 

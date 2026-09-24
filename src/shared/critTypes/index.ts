@@ -2086,7 +2086,10 @@ export function rollCrit(
   // getBonusTierCrit/floorInteractions.ts's applyBonusTierCrit for the
   // reward (multiplies total income by the bonus tier's own multiplier) and
   // critCelebration.ts for the stacked celebration this triggers
-  const bonusTier = kept.size > 0 ? rollTier() : null;
+  const bonusTier =
+    kept.size > 0 && Math.random() < CONFIG.crit.bonusTierGatewayChance
+      ? rollTier()
+      : null;
   const landedProcs = [...kept];
   onLanded(
     {

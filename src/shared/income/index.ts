@@ -50,7 +50,7 @@ export function effectiveIncomeCycle(
 ): EffectiveIncomeCycle {
   const uncappedIntervalSeconds = floor.incomeIntervalSeconds / speedMultiplier;
 
-  if (uncappedIntervalSeconds >= MIN_INCOME_INTERVAL_SECONDS) {
+  if (uncappedIntervalSeconds > MIN_INCOME_INTERVAL_SECONDS) {
     return {
       intervalSeconds: uncappedIntervalSeconds,
       amount: floor.incomeAmount,

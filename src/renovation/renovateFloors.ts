@@ -1,7 +1,6 @@
 import type { Floor } from "../gameState";
 import type { BuildingDraft, RenovationPlan } from "../shared/buildingJob";
 import type { BigNumber } from "../shared/bigNumber";
-import { CONFIG } from "../config";
 import { quoteUpgrades } from "./upgradeQuote";
 import { lockBuilding, runDetachedJob } from "../shared/detachedJob";
 import { cloneWithSnapshotState } from "../shared/snapshotState";
@@ -11,11 +10,7 @@ export function planRenovation(
   floors: Floor[],
   money: BigNumber,
 ): RenovationPlan {
-  const quote = quoteUpgrades(floors, money, (floor) =>
-    floor.aboveCapTier
-      ? CONFIG.incomePanel.upgradeCostGrowthAboveCap
-      : CONFIG.incomePanel.upgradeCostGrowth,
-  );
+  const quote = quoteUpgrades(floors, money);
   return {
     floors: floors.slice(),
     levels: floors.map((floor) => floor.upgradeCount),

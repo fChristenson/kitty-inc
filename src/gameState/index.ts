@@ -1,5 +1,6 @@
 import { snapshotMap } from "../shared/snapshotState";
 import { CONFIG } from "../config";
+import { baseFloorInterval, floorIncomeScale, upgradeSpeedMultiplier, UPGRADE_ECONOMY_VERSION } from "../shared/upgradeEconomy";
 import { companyStorageKey } from "../company";
 import {
   type BigNumber,
@@ -9,6 +10,9 @@ import {
   add,
   multiply,
   multiplyBig,
+  divide,
+  fromLog10,
+  log10,
   pow,
   subtract,
   gte,
@@ -76,6 +80,7 @@ export interface Floor {
   unlocked: boolean;
   unlockCost: BigNumber; // 0 for floor 1 (always free); doubles starting from floor 2
   buildingFloorUnlockBaseCost?: BigNumber;
+  buildingPurchaseCost?: BigNumber;
   workerCount: number; // how many workers this floor has bought via workerMenu.ts; scales its boost strength
   lastCollectedAt: number; // Date.now() ms this floor last completed a whole idle-income cycle
   hasOfficeChairs: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
@@ -387,11 +392,13 @@ interface SavedFloor {
   incomeIntervalSeconds: number;
   upgradeCost: SerializedBigNumber;
   upgradeCostGrowth?: number;
+  upgradeEconomyVersion?: number;
   rateStep: SerializedBigNumber;
   upgradeCount: number;
   workers: WorkerSlot[];
   unlocked: boolean;
   unlockCost: SerializedBigNumber;
+  buildingPurchaseCost?: SerializedBigNumber;
   workerCount?: number; // added after initial release; older saves default to 1 on load
   lastCollectedAt?: number; // added after initial release; older saves default to now() on load
   bgIndex?: number; // added after initial release; older saves default to 0 on load
@@ -427,14 +434,13 @@ function toSavedFloor(floor: Floor): SavedFloor {
     incomeAmount: floor.incomeAmount,
     incomeIntervalSeconds: floor.incomeIntervalSeconds,
     upgradeCost: floor.upgradeCost,
-    upgradeCostGrowth: floor.aboveCapTier
-      ? CONFIG.incomePanel.upgradeCostGrowthAboveCap
-      : CONFIG.incomePanel.upgradeCostGrowth,
+    upgradeEconomyVersion: UPGRADE_ECONOMY_VERSION,
     rateStep: floor.rateStep,
     upgradeCount: floor.upgradeCount,
     workers: getWorkerSlots(floor),
     unlocked: floor.unlocked,
     unlockCost: floor.unlockCost,
+    buildingPurchaseCost: floor.buildingPurchaseCost,
     workerCount: floor.workerCount,
     lastCollectedAt: floor.lastCollectedAt,
     bgIndex: floor.bgIndex,
@@ -486,31 +492,43 @@ export function saveBuildingsImmediately(
   buildingSaveScheduler.saveNow({ buildings, companyIndex });
 }
 
-function fromSavedFloor(sf: SavedFloor): Floor {
-  const currentGrowth = sf.aboveCapTier
-    ? CONFIG.incomePanel.upgradeCostGrowthAboveCap
-    : CONFIG.incomePanel.upgradeCostGrowth;
-  const savedGrowth =
-    sf.upgradeCostGrowth ??
-    (sf.aboveCapTier
-      ? CONFIG.incomePanel.previousUpgradeCostGrowthAboveCap
-      : CONFIG.incomePanel.previousUpgradeCostGrowth);
-  const upgradeCost = toBigNumber(sf.upgradeCost);
+function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
+  const needsRebalance = (sf.upgradeEconomyVersion ?? 0) < 2;
+  const needsSpeedRebalance = (sf.upgradeEconomyVersion ?? 0) < UPGRADE_ECONOMY_VERSION;
+  const oldScale = pow(CONFIG.floors.incomeGrowthFactor, floorIndex);
+  const inverseOldScale = fromLog10(-log10(oldScale));
+  const newScale = floorIncomeScale(floorIndex + 1);
+  const rateStep = needsRebalance
+    ? multiply(multiplyBig(toBigNumber(sf.rateStep), inverseOldScale), newScale)
+    : toBigNumber(sf.rateStep);
+  const upgradeCost = needsRebalance
+    ? multiply(
+        divide(rateStep, CONFIG.floors.baseRateStep * newScale),
+        CONFIG.floors.baseUpgradeCost *
+          (1 + sf.upgradeCount / CONFIG.incomePanel.upgradePriceLevelScale) ** 4 *
+          (sf.priceDiscountMultiplier ?? 1),
+      )
+    : (sf.upgradeEconomyVersion ?? 0) < 4
+      ? multiply(
+          toBigNumber(sf.upgradeCost),
+          ((1 + sf.upgradeCount / CONFIG.incomePanel.upgradePriceLevelScale) /
+            (1 + sf.upgradeCount / 10)) ** 4,
+        )
+      : toBigNumber(sf.upgradeCost);
   const floor: Floor = {
     bgIndex: sf.bgIndex ?? 0,
-    incomeAmount: toBigNumber(sf.incomeAmount),
-    incomeIntervalSeconds: sf.incomeIntervalSeconds,
-    upgradeCost:
-      Number.isFinite(savedGrowth) && savedGrowth > currentGrowth
-        ? multiplyBig(
-            upgradeCost,
-            pow(currentGrowth / savedGrowth, sf.upgradeCount),
-          )
-        : upgradeCost,
-    rateStep: toBigNumber(sf.rateStep),
+    incomeAmount: needsRebalance
+      ? multiply(multiplyBig(toBigNumber(sf.incomeAmount), inverseOldScale), newScale)
+      : toBigNumber(sf.incomeAmount),
+    incomeIntervalSeconds: needsSpeedRebalance
+      ? baseFloorInterval(floorIndex + 1) / upgradeSpeedMultiplier(sf.upgradeCount)
+      : sf.incomeIntervalSeconds,
+    upgradeCost,
+    rateStep,
     upgradeCount: sf.upgradeCount,
     unlocked: sf.unlocked,
     unlockCost: toBigNumber(sf.unlockCost),
+    buildingPurchaseCost: toBigNumber(sf.buildingPurchaseCost),
     workerCount: sf.workerCount ?? 1,
     lastCollectedAt: sf.lastCollectedAt ?? Date.now(),
     hasOfficeChairs: sf.hasOfficeChairs ?? false,
@@ -546,7 +564,7 @@ export function loadBuildings(companyIndex = 0): Floor[][] {
     const parsed: SavedFloor[][] | SavedBuildings = JSON.parse(raw);
     const saved = Array.isArray(parsed) ? { buildings: parsed } : parsed;
     return saved.buildings.map((floors) => {
-      const restored = floors.map((sf) => fromSavedFloor(sf));
+      const restored = floors.map((sf, index) => fromSavedFloor(sf, index));
       const ground = restored[0];
       if (ground && !ground.unlocked) {
         ground.unlocked = true;

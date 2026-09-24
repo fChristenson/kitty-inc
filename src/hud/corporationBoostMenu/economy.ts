@@ -4,7 +4,6 @@ import {
   getCorporationCount,
   regenerateCorporationName,
 } from "../../corporationName";
-import { getBuildingPrice } from "../../buildings";
 import {
   getOfficeChairsCost,
   getOfficeSuppliesCost,
@@ -45,13 +44,10 @@ function compressedScale(amount: BigNumber): number | null {
   return Math.sqrt(logAmount);
 }
 
-// $ "invested" in a company's buildings — sum of what each one (after the
-// always-free first) cost to unlock, same buildings.ts pricing used everywhere
-// else on the map
-function getBuildingsValue(buildingCount: number): BigNumber {
+function getBuildingsValue(buildings: Floor[][]): BigNumber {
   let total = ZERO;
-  for (let i = 1; i < buildingCount; i++)
-    total = add(total, getBuildingPrice(i));
+  for (const floors of buildings)
+    total = add(total, floors[0]?.buildingPurchaseCost ?? ZERO);
   return total;
 }
 
@@ -114,7 +110,7 @@ function getStaffInvestmentValue(buildings: Floor[][]): BigNumber {
 // goes dormant, without duplicating this pricing logic there
 export function getCompanyAssetValue(buildings: Floor[][]): BigNumber {
   return add(
-    add(getBuildingsValue(buildings.length), getUpgradesValue(buildings)),
+    add(getBuildingsValue(buildings), getUpgradesValue(buildings)),
     add(getFloorUnlockValue(buildings), getStaffInvestmentValue(buildings)),
   );
 }

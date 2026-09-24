@@ -28,8 +28,6 @@ import {
   type BigNumber,
   add,
   multiply,
-  multiplyBig,
-  pow,
 } from "../../shared/bigNumber";
 import {
   drawPill,
@@ -41,6 +39,7 @@ import {
 } from "../../utils";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
+import { upgradePriceAfter, upgradeSpeedMultiplier } from "../../shared/upgradeEconomy";
 
 // panel placement, bottom-left corner of each floor (mirrors the upgrade button on the right).
 // Scaled up from the original 360 as far as the gap to the upgrade button allows. PANEL_X is
@@ -125,15 +124,10 @@ let tickerRunning = false;
 // upgrades halve it below this exactly like any other floor (see increaseIncomeRate)
 export const MAX_INCOME_INTERVAL_SECONDS =
   CONFIG.incomePanel.maxIncomeIntervalSeconds;
-const UPGRADES_PER_INTERVAL_HALVING =
-  CONFIG.incomePanel.upgradesPerIntervalHalving;
 // upgradeCount hitting a multiple of this is also the "next ten levels" milestone
 // floorInteractions.ts celebrates with an extra coin burst at the upgrade indicator
-export const UPGRADE_MILESTONE_STEP = UPGRADES_PER_INTERVAL_HALVING;
+export const UPGRADE_MILESTONE_STEP = CONFIG.incomePanel.upgradeMilestoneStep;
 // Cost growth stays close to income's milestone speed growth for sustained progression.
-const UPGRADE_COST_GROWTH = CONFIG.incomePanel.upgradeCostGrowth;
-const UPGRADE_COST_GROWTH_ABOVE_CAP =
-  CONFIG.incomePanel.upgradeCostGrowthAboveCap;
 
 // once a floor's true speed exceeds what a 1s-minimum bar can show as a normal fill
 // (see effectiveIncomeCycle's overspeed flag below), the bar is shown full instead,
@@ -164,10 +158,7 @@ export function increaseIncomeRate(floor: Floor): void {
     !isSpendingFreezeActive(floor, Date.now()) &&
     getPriceMatchCost(floor, Date.now()) === null
   ) {
-    floor.upgradeCost = multiply(
-      floor.upgradeCost,
-      floor.aboveCapTier ? UPGRADE_COST_GROWTH_ABOVE_CAP : UPGRADE_COST_GROWTH,
-    );
+    floor.upgradeCost = upgradePriceAfter(floor, 1);
   }
   floor.upgradeCount += 1;
   // no MIN_INCOME_INTERVAL_SECONDS clamp here — this stores the floor's true,
@@ -178,9 +169,8 @@ export function increaseIncomeRate(floor: Floor): void {
   // uncappedIntervalSeconds could only ever dip below the minimum (the actual
   // overspeed/"filled bar" trigger) from a boost or office upgrade, never from
   // upgrades alone
-  if (floor.upgradeCount % UPGRADES_PER_INTERVAL_HALVING === 0) {
-    floor.incomeIntervalSeconds /= 2;
-  }
+  floor.incomeIntervalSeconds *=
+    upgradeSpeedMultiplier(floor.upgradeCount - 1) / upgradeSpeedMultiplier(floor.upgradeCount);
 }
 
 // Applies many normal upgrade-rate increases in one pass. This is used by crit
@@ -200,23 +190,12 @@ export function increaseIncomeRateBy(floor: Floor, count: number): void {
     !isSpendingFreezeActive(floor, Date.now()) &&
     getPriceMatchCost(floor, Date.now()) === null
   ) {
-    const growth = floor.aboveCapTier
-      ? UPGRADE_COST_GROWTH_ABOVE_CAP
-      : UPGRADE_COST_GROWTH;
-    floor.upgradeCost = multiplyBig(floor.upgradeCost, pow(growth, count));
+    floor.upgradeCost = upgradePriceAfter(floor, count);
   }
   const previousUpgradeCount = floor.upgradeCount;
   floor.upgradeCount += count;
-  const previousMilestones = Math.floor(
-    previousUpgradeCount / UPGRADES_PER_INTERVAL_HALVING,
-  );
-  const currentMilestones = Math.floor(
-    floor.upgradeCount / UPGRADES_PER_INTERVAL_HALVING,
-  );
-  const milestoneCount = currentMilestones - previousMilestones;
-  if (milestoneCount > 0) {
-    floor.incomeIntervalSeconds /= Math.pow(2, milestoneCount);
-  }
+  floor.incomeIntervalSeconds *=
+    upgradeSpeedMultiplier(previousUpgradeCount) / upgradeSpeedMultiplier(floor.upgradeCount);
 }
 
 // how many times faster than its own base incomeIntervalSeconds this floor is
@@ -324,8 +303,6 @@ function remainingCycleSeconds(floor: Floor, now: number): number {
 
 function formatIncomeRate(floor: Floor, now: number): string {
   const { amount, overspeed } = effectiveIncomeCycle(floor, now);
-  // once overspeed, the bar is pinned full and a live countdown against the
-  // artificially-clamped 1s interval wouldn't mean anything real
   const timeText = overspeed
     ? "s"
     : // round, not floor/ceil: flooring a 1s-interval countdown showed "0" for
@@ -333,7 +310,7 @@ function formatIncomeRate(floor: Floor, now: number): string {
       // while ceiling it showed a frozen "1" that never visibly ticked down.
       // Rounding gives an actual "1" then "0" step partway through each cycle
       formatTime(Math.round(remainingCycleSeconds(floor, now)));
-  return `${formatPrice(amount)}/${timeText}`;
+  return `${formatPrice(overspeed ? currentIncomeRatePerSecond(floor, now) : amount)}/${timeText}`;
 }
 
 // static (non-ticking) variant for locked floors: shows the full interval instead of
@@ -346,7 +323,7 @@ function formatStaticIncomeRate(floor: Floor, now: number): string {
     now,
   );
   const timeText = overspeed ? "s" : formatTime(intervalSeconds);
-  return `${formatPrice(amount)}/${timeText}`;
+  return `${formatPrice(overspeed ? currentIncomeRatePerSecond(floor, now) : amount)}/${timeText}`;
 }
 
 // "Work overtime" boost's own progress readout — a plain tick count, not a $/time

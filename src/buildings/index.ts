@@ -3,6 +3,7 @@ import { increaseIncomeRate } from "../floors/incomePanel";
 import type { Floor } from "../gameState";
 import {
   type BigNumber,
+  ZERO,
   pow,
   multiply,
   multiplyBig,
@@ -21,7 +22,7 @@ const BUILDING_BASE_PRICE = CONFIG.buildings.basePrice;
 // very high building index instead of overflowing to Infinity
 export function getBuildingPrice(nextBuildingIndex: number): BigNumber {
   return multiply(
-    pow(Math.max(1, nextBuildingIndex), CONFIG.buildings.priceGrowthExponent),
+    pow(CONFIG.floors.floorEconomyMultiplierPerBuilding, Math.max(0, nextBuildingIndex - 1)),
     BUILDING_BASE_PRICE,
   );
 }
@@ -55,6 +56,7 @@ export function createBuilding(
   options: {
     groundFloorLocked?: boolean;
     initialUpgradeCount?: number;
+    purchaseCost?: BigNumber;
   } = {},
 ): Floor[] {
   const multiplier = getBuildingMultiplier(buildingIndex);
@@ -68,6 +70,7 @@ export function createBuilding(
     increaseIncomeRate(groundFloor);
   }
   const floors = [groundFloor];
+  groundFloor.buildingPurchaseCost = options.purchaseCost ?? ZERO;
   configureBuildingFloorPrices(floors, buildingIndex);
   return floors;
 }
