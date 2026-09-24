@@ -762,11 +762,7 @@ try {
             const goal = buttons.getOvertimeTickGoal(floor);
             assert.equal(
               goal,
-              previousTier === null
-                ? 250
-                : previousTier === "crit"
-                  ? 500
-                  : 1000,
+              previousTier === null ? 125 : previousTier === "crit" ? 250 : 500,
             );
             floor.overtimeGoal = goal * 4;
             assert.equal(
