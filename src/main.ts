@@ -54,7 +54,6 @@ import {
   startTotalIncomeTicker,
   switchActiveCompany,
   rebalanceDormantCompanyEconomies,
-  spendFromAllCompanies,
   addTotalIncome,
   spendTotalIncome,
   getTotalIncome,
@@ -162,7 +161,7 @@ import {
 } from "./buildings";
 import { loadMouseImage, forceSpawnMouse } from "./mouse";
 import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
-import { createNewCorporation, getCorporationPrice } from "./corporationName";
+import { createNewCorporation } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
 import { getBackgroundUrls } from "./loadAssets";
 
@@ -651,8 +650,7 @@ async function main() {
   );
   // "Create new Corporation" adds a fresh named corporation above the current
   // one in the map's corp-name barrel (see corporationName.ts/cityMap's
-  // drawCorporationNames) — roll up with the action bar to reach it. Costs
-  // getCorporationPrice(), same buy-if-affordable pattern as buyBuilding below.
+  // drawCorporationNames) — roll up with the action bar to reach it.
   // Auto-switches to the new company, playing the exact same swoosh +
   // barrel-roll flourish a manual switch gets (see cityMapView's
   // animateSwitchToCompany) — its own completion is what actually calls
@@ -662,9 +660,7 @@ async function main() {
   // hasn't even started sliding away yet
   const corporationUpgradeMenu = wireCorporationUpgradeMenu(
     app,
-    getCorporationPrice,
     () => {
-      if (!spendFromAllCompanies(getCorporationPrice())) return;
       const newIndex = createNewCorporation();
       corporationUpgradeMenu.close();
       setTimeout(() => {

@@ -1,9 +1,4 @@
-import {
-  animateDialogClose,
-  cancelDialogClose,
-  formatPrice,
-} from "../../utils";
-import { getAllCompaniesTotalIncome } from "../../totalIncome";
+import { animateDialogClose, cancelDialogClose } from "../../utils";
 import { getCorporationName } from "../../corporationName";
 import {
   getActiveCompanyIndex,
@@ -11,8 +6,6 @@ import {
 } from "../../company";
 import { playSwoosh, playSold } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
-import { type BigNumber, gte, lt } from "../../shared/bigNumber";
-import { createPollingLoop } from "../../shared/pollingLoop";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import { onTapOrClick } from "../../shared/tapEvents";
 
@@ -47,15 +40,8 @@ export interface CorporationUpgradeMenu {
   close: () => void;
 }
 
-// wires the menu's open/close controls and the "Create new Corporation"/"Merge"
-// items; getCorporationPrice renders the live cost (re-read on open and after
-// every purchase, since it scales up each time); onCreateNewCorporation and
-// onMergeCompanies both fire on click only — the caller (main.ts) is the one
-// that checks affordability/spends the cost/does the actual merge + company
-// switch, same pattern buyBuilding uses
 export function wireCorporationUpgradeMenu(
   container: HTMLElement,
-  getCorporationPrice: () => BigNumber,
   onCreateNewCorporation: () => void,
   onMergeCompanies: (companyIndices: number[]) => void,
 ): CorporationUpgradeMenu {
@@ -114,23 +100,15 @@ export function wireCorporationUpgradeMenu(
   }
 
   function render(): void {
-    const allCompaniesTotalIncome = getAllCompaniesTotalIncome();
-    const corporationPrice = getCorporationPrice();
-    const corporationAffordable = gte(
-      allCompaniesTotalIncome,
-      corporationPrice,
-    );
     list.innerHTML = `
       <button
         class="worker-menu__item"
         id="create-new-corporation"
-        ${corporationAffordable ? "" : "disabled"}
       >
         <span class="worker-menu__item-label">
           <img src="${skyscraperIconUrl}" class="worker-menu__icon worker-menu__icon--skyscraper" alt="" />
           Create new Company
         </span>
-        <span class="worker-menu__price">${formatPrice(corporationPrice)}</span>
       </button>
       ${mergeSectionMarkup()}
     `;
@@ -176,24 +154,6 @@ export function wireCorporationUpgradeMenu(
     render();
   });
 
-  // re-checks affordability on its own while the menu sits open, same as every
-  // other worker-menu (boostMenu/upgradeMenu/corporationBoostMenu/mapMenu), so
-  // a grayed-out item turns clickable again as soon as income catches up
-  // instead of only refreshing on the next open/purchase
-  function updateAffordability(): void {
-    const createButton = list.querySelector<HTMLButtonElement>(
-      "#create-new-corporation",
-    );
-    if (createButton) {
-      createButton.disabled = lt(
-        getAllCompaniesTotalIncome(),
-        getCorporationPrice(),
-      );
-    }
-  }
-
-  const affordabilityPolling = createPollingLoop(updateAffordability, 250);
-
   // opened by a tap on the action bar's own Hire button — same trailing-
   // click-hits-the-new-backdrop risk any button-opened dialog has
   const ghostClickGuard = createGhostClickGuard();
@@ -205,14 +165,12 @@ export function wireCorporationUpgradeMenu(
     menu.hidden = false;
     ghostClickGuard.markOpened();
     playSwoosh();
-    affordabilityPolling.start();
   }
 
   async function close(): Promise<void> {
     playSwoosh();
     await animateDialogClose(panel);
     menu.hidden = true;
-    affordabilityPolling.stop();
   }
 
   onTapOrClick(backdrop, () => {
