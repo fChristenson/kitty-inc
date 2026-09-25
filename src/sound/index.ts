@@ -332,6 +332,13 @@ export function playEventEnded(): void {
   playSfx("notification", NOTIFICATION_VOLUME);
 }
 
+// how long the event-ending cue plays, so animations can span it exactly;
+// falls back to notification.wav's measured length until it has decoded
+export function getEventEndedDurationMs(): number {
+  const buffer = decodedSfxBuffers.get("notification");
+  return buffer ? buffer.duration * 1000 : 1467;
+}
+
 // one-shot sound effect for the even rarer ultra-crit moment (see
 // floorInteractions.ts). Debounced (see PAYOUT_DEBOUNCE_MS) so back-to-back ultra
 // crits during a fast held click can't stack overlapping plays. Capped at ~1.93s

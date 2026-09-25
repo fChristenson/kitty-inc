@@ -12,15 +12,13 @@ import {
   createTimedFloorEvent,
   registerEventButton,
 } from "../../shared/floorEvents";
-import { liveEffect } from "../../shared/detachedJob";
-import { playEventEnded } from "../../sound";
+import { announceEventEnded } from "./shared";
 
 export const SALE_DURATION_MS = CONFIG.sale.durationMs;
 
-// audible cue that the free clicks are over
-const saleEvent = createTimedFloorEvent(
-  SALE_DURATION_MS,
-  liveEffect(playEventEnded),
+// sale-click coins fly into the total, so that's what rolls
+const saleEvent = createTimedFloorEvent(SALE_DURATION_MS, (floor) =>
+  announceEventEnded(floor, "total"),
 );
 
 export function triggerSaleBoost(floor: Floor): void {

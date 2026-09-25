@@ -12,6 +12,12 @@ import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { isCritUpgrade } from "./crit";
 import { getPriceMatchCost } from "../../shared/critTypes";
 import { isFreeClickEventActive } from "../../shared/floorEvents";
+import { liveEffect } from "../../shared/detachedJob";
+import {
+  triggerEventEndRoll,
+  type EventEndRollTarget,
+} from "../../shared/eventEndRoll";
+import { getEventEndedDurationMs, playEventEnded } from "../../sound";
 
 export function getUpgradeCost(floor: Floor, now = Date.now()): BigNumber {
   return getPriceMatchCost(floor, now) ?? floor.upgradeCost;
@@ -264,6 +270,20 @@ export function stepHoldAnim(
     shakeY: (Math.random() - 0.5) * 2 * shakeMagnitude,
   };
 }
+
+// the Sale/Overtime ending cue: the notification sound, with whatever that
+// event's coins flew into rolling a full turn starting with the sound
+const EVENT_END_ROLL_SPEEDUP = 1.5;
+export const announceEventEnded = liveEffect(
+  (floor: Floor, target: EventEndRollTarget) => {
+    playEventEnded();
+    triggerEventEndRoll(
+      floor,
+      target,
+      getEventEndedDurationMs() / EVENT_END_ROLL_SPEEDUP,
+    );
+  },
+);
 
 // whether the upgrade button is currently "enabled" (colored, clickable) —
 // on a free-click event, mid-crit, or plainly affordable — as opposed to

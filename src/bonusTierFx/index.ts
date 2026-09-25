@@ -8,7 +8,7 @@
 // module (like screenShake.ts/coinBurst) avoids a floors->background,
 // floors->hud, or hud->background module-boundary violation.
 import { loadImageByName } from "../loadAssets";
-import { mergeFlashWhite } from "../shared/mergeFlash";
+import { createAbsorbPulse, mergeFlashWhite } from "../shared/mergeFlash";
 
 let coinIcon: HTMLImageElement | null = null;
 loadImageByName("coin").then((image) => {
@@ -166,11 +166,18 @@ export function triggerHudTotalFlash(): void {
 
 let hudPulseAt: number | null = null;
 const HUD_PULSE_FADE_MS = 700;
+const hudAbsorb = createAbsorbPulse();
 
 // call per coin landing in the total (e.g. sale clicks) — keeps the flash
 // alive while coins stream in, fading shortly after the last one
 export function pulseHudTotalFlash(): void {
   hudPulseAt = Date.now();
+  hudAbsorb.hit(hudPulseAt);
+}
+
+// the readout's size bump as coins are absorbed into it
+export function getHudTotalAbsorbScale(now: number): number {
+  return hudAbsorb.scale(now);
 }
 
 // 1 (just triggered) fading linearly down to 0 (back to normal) — hud/'s own

@@ -3,11 +3,7 @@ import { type BigNumber } from "../../shared/bigNumber";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
 import { registerEventButton } from "../../shared/floorEvents";
-import { liveEffect } from "../../shared/detachedJob";
-import { playEventEnded as soundEventEnded } from "../../sound";
-
-// audible cue that the free clicks are over
-const playEventEnded = liveEffect(soundEventEnded);
+import { announceEventEnded } from "./shared";
 
 const cancellationArmed = new WeakSet<Floor>();
 
@@ -49,7 +45,7 @@ export function endOvertimeActiveWindow(floor: Floor, now: number): void {
   floor.overtimeTicks = 0;
   delete floor.overtimeGoal;
   cancellationArmed.delete(floor);
-  playEventEnded();
+  announceEventEnded(floor, "bar");
 }
 
 export function canCancelOvertime(floor: Floor, now: number): boolean {

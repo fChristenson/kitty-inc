@@ -16,7 +16,12 @@ import {
   getPriceMatchCost,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
-import { mergeFlashWhite } from "../../shared/mergeFlash";
+import { getBarRollAngle } from "../../shared/eventEndRoll";
+import {
+  createAbsorbPulse,
+  mergeFlashWhite,
+  type AbsorbPulse,
+} from "../../shared/mergeFlash";
 import {
   officeUpgradeSpeedMultiplier,
   effectiveIncomeCycle as sharedEffectiveIncomeCycle,
@@ -120,6 +125,7 @@ const pendingOvertimeTicks = new WeakMap<
 // longer than any homing coin's flight, so an evicted coin can't pin the readout
 const PENDING_OVERTIME_MAX_AGE_MS = 2500;
 const overtimeFlashedAt = new WeakMap<Floor, number>();
+const overtimeAbsorb = new WeakMap<Floor, AbsorbPulse>();
 const OVERTIME_FLASH_MS = 700;
 
 export function queueOvertimeTickDelivery(floor: Floor, ticks: number): void {
@@ -133,7 +139,14 @@ export function queueOvertimeTickDelivery(floor: Floor, ticks: number): void {
 export function deliverOvertimeTicks(floor: Floor, ticks: number): void {
   const pending = pendingOvertimeTicks.get(floor);
   if (pending) pending.ticks = Math.max(0, pending.ticks - ticks);
-  overtimeFlashedAt.set(floor, Date.now());
+  const now = Date.now();
+  overtimeFlashedAt.set(floor, now);
+  let absorb = overtimeAbsorb.get(floor);
+  if (!absorb) {
+    absorb = createAbsorbPulse();
+    overtimeAbsorb.set(floor, absorb);
+  }
+  absorb.hit(now);
 }
 
 export function clearOvertimeTickDelivery(floor: Floor): void {
@@ -567,7 +580,10 @@ export function drawIncomePanel(
   if (cancellationArmed) ctx.rotate(getWiggleRotation(now));
   else if (flashStrength > 0)
     ctx.rotate(getWiggleRotation(now) * flashStrength);
-  const pressScale = incomeBarPressScale(floor, now);
+  ctx.rotate(getBarRollAngle(floor, now));
+  const pressScale =
+    incomeBarPressScale(floor, now) *
+    (overtimeGaugeVisible ? (overtimeAbsorb.get(floor)?.scale(now) ?? 1) : 1);
   ctx.scale(pressScale, pressScale);
   ctx.translate(-barCenter.x, -barCenter.y);
 
