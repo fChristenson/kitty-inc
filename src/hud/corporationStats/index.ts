@@ -76,8 +76,9 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
     return `$${sign}${mantissa}e${exponentSign}${value.exponent}`;
   }
 
+  let renderedHtml = "";
+
   function render(): void {
-    const scrollTop = list.scrollTop;
     const activeIndices = getActiveCorporationIndices();
     const companyAssetRows = activeIndices
       .map((i) => ({ index: i, name: getCorporationName(i) }))
@@ -145,7 +146,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
       0,
     );
     const totalModifier = companyModifierTotal + critModifierTotal;
-    list.innerHTML = `
+    const html = `
       <h3 class="worker-menu__subheader">Corporation assets</h3>
       ${companyAssetRows}
       <div class="worker-menu__modifier-row worker-menu__modifier-row--total">
@@ -167,6 +168,12 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
         <span>${formatBoostPercent(totalModifier)}</span>
       </div>
     `;
+    // the poll mostly produces identical markup; rebuilding hundreds of rows
+    // (and re-laying them out) four times a second is what stalled frames
+    if (html === renderedHtml) return;
+    renderedHtml = html;
+    const scrollTop = list.scrollTop;
+    list.innerHTML = html;
     list.scrollTop = scrollTop;
   }
 

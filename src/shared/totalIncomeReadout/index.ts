@@ -47,6 +47,17 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
   // what made the number visibly jitter left/right
   let cachedAmountWidth = 0;
   let cachedAmountLength = -1;
+  // the displayed value is usually unchanged between frames, so its formatting
+  // (toLocaleString) and text metrics are reused until it actually moves
+  let formattedMantissa = NaN;
+  let formattedExponent = NaN;
+  let formatted: ReturnType<typeof formatTotalIncomeParts> = {
+    amount: "",
+    unitName: null,
+  };
+  let measuredFont = "";
+  let amountHeight = 0;
+  let unitHeight = 0;
 
   function draw(
     ctx: CanvasRenderingContext2D,
@@ -55,9 +66,19 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     totalIncome: BigNumber,
     { fontSize, unitNameGapPx }: TotalIncomeReadoutOptions,
   ): number {
-    const { amount, unitName } = formatTotalIncomeParts(
-      getAnimatedTotalIncome(totalIncome),
-    );
+    const displayed = getAnimatedTotalIncome(totalIncome);
+    const valueChanged =
+      formattedMantissa !== displayed.mantissa ||
+      formattedExponent !== displayed.exponent;
+    if (valueChanged) {
+      formatted = formatTotalIncomeParts(displayed);
+      formattedMantissa = displayed.mantissa;
+      formattedExponent = displayed.exponent;
+    }
+    const { amount, unitName } = formatted;
+    const font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
+    const remeasure = valueChanged || font !== measuredFont;
+    measuredFont = font;
     const strokeWidth = fontSize * AMOUNT_STROKE_TO_FONT_RATIO;
 
     // "special crit crit" bonus-tier coins merging into the total (see
@@ -80,7 +101,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       ctx.translate(-centerX, -top);
     }
 
-    ctx.font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
+    ctx.font = font;
     if (amount.length !== cachedAmountLength) {
       cachedAmountWidth = ctx.measureText(amount).width;
       cachedAmountLength = amount.length;
@@ -97,12 +118,13 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       strokeWidth,
     );
 
-    const amountMetrics = ctx.measureText(amount);
-    let bottom =
-      top +
-      amountMetrics.actualBoundingBoxAscent +
-      amountMetrics.actualBoundingBoxDescent +
-      strokeWidth / 2;
+    if (remeasure) {
+      const amountMetrics = ctx.measureText(amount);
+      amountHeight =
+        amountMetrics.actualBoundingBoxAscent +
+        amountMetrics.actualBoundingBoxDescent;
+    }
+    let bottom = top + amountHeight + strokeWidth / 2;
 
     if (unitName) {
       const unitFontSize = fontSize * UNIT_FONT_SCALE;
@@ -119,12 +141,13 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         COLOR.white,
         unitStrokeWidth,
       );
-      const unitMetrics = ctx.measureText(unitName);
-      bottom =
-        unitTop +
-        unitMetrics.actualBoundingBoxAscent +
-        unitMetrics.actualBoundingBoxDescent +
-        unitStrokeWidth / 2;
+      if (remeasure) {
+        const unitMetrics = ctx.measureText(unitName);
+        unitHeight =
+          unitMetrics.actualBoundingBoxAscent +
+          unitMetrics.actualBoundingBoxDescent;
+      }
+      bottom = unitTop + unitHeight + unitStrokeWidth / 2;
     }
 
     ctx.restore();

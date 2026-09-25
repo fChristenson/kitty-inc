@@ -12,6 +12,7 @@ import {
   type CritProcKind,
 } from "../shared/critTypes";
 import { drawCritText } from "../shared/critText";
+import { processWhenIdle, runWhenIdle } from "../shared/idle";
 
 // a handful of icons are explicitly designed to spin an extra fixed amount on
 // top of the flash text's own animated entrance rotation (see drawFlashLayer).
@@ -50,7 +51,9 @@ const critIconPromises = new Map<ImageName, Promise<HTMLImageElement>>();
 function requestCritIcon(name: ImageName): Promise<HTMLImageElement> {
   const pending = critIconPromises.get(name);
   if (pending) return pending;
-  const promise = loadImageByName(name).then((image) => {
+  const promise = loadImageByName(name).then(async (image) => {
+    // decode off the draw path, so a celebration's first frame never stalls on it
+    await image.decode().catch(() => undefined);
     loadedCritIcons.set(name, image);
     return image;
   });
@@ -59,21 +62,24 @@ function requestCritIcon(name: ImageName): Promise<HTMLImageElement> {
   return promise;
 }
 
-// Start every celebration icon request as soon as this module is evaluated.
-// The browser still controls concurrency/cache reuse, but crits no longer wait
-// until their first animation frame to discover an image URL.
-export function preloadCritIcons(): Promise<void> {
-  return Promise.all(
-    [
-      ...new Set([
-        ...CRIT_PROC_KINDS.map((kind) => CRIT_PROC_INFO[kind].icon),
-        "cashRegister" as ImageName,
-      ]),
-    ].map((name) => requestCritIcon(name)),
-  ).then(() => undefined);
+// Warms every celebration icon a few at a time during idle frames. Requesting
+// all ~900 at module evaluation competed with the first paint and caused the
+// startup frame drops; getCritIcon still loads any not-yet-warmed icon on demand.
+export function preloadCritIcons(): void {
+  const names = [
+    ...new Set([
+      ...CRIT_PROC_KINDS.map((kind) => CRIT_PROC_INFO[kind].icon),
+      "cashRegister" as ImageName,
+    ]),
+  ];
+  processWhenIdle(
+    names,
+    (name) => void requestCritIcon(name).catch(() => undefined),
+    { chunkSize: 6, timeoutMs: 4000 },
+  );
 }
 
-void preloadCritIcons().catch(() => undefined);
+runWhenIdle(preloadCritIcons, 4000);
 
 function getCritIcon(name: ImageName): HTMLImageElement | null {
   const cached = loadedCritIcons.get(name);
@@ -329,7 +335,7 @@ function getBloomLayer(
   label: string,
   measuredWidth: number,
 ): { canvas: HTMLCanvasElement; width: number; height: number } {
-  const cached = bloomLayerCache.get(label);
+  const cached = touchCached(bloomLayerCache, label);
   if (cached) return cached;
 
   const width = Math.ceil(measuredWidth + BLOOM_PADDING * 2);
@@ -350,7 +356,84 @@ function getBloomLayer(
   ctx.fillText(label, width / 2, height / 2);
 
   const entry = { canvas, width, height };
-  bloomLayerCache.set(label, entry);
+  storeCached(bloomLayerCache, label, entry);
+  return entry;
+}
+
+// ~900 distinct labels exist; unbounded per-label canvases grew memory for the
+// whole session, so both flash caches keep only the most recently shown ones
+const FLASH_CACHE_LIMIT = 24;
+
+function touchCached<T>(cache: Map<string, T>, key: string): T | undefined {
+  const hit = cache.get(key);
+  if (hit !== undefined) {
+    cache.delete(key);
+    cache.set(key, hit);
+  }
+  return hit;
+}
+
+function storeCached<T>(cache: Map<string, T>, key: string, value: T): void {
+  cache.set(key, value);
+  if (cache.size > FLASH_CACHE_LIMIT) {
+    cache.delete(cache.keys().next().value as string);
+  }
+}
+
+const FLASH_FONT_SIZE = 100;
+const FLASH_FONT = `900 ${FLASH_FONT_SIZE}px "Fredoka", system-ui, sans-serif`;
+const labelWidths = new Map<string, number>();
+
+function measureLabel(ctx: CanvasRenderingContext2D, label: string): number {
+  let width = labelWidths.get(label);
+  if (width === undefined) {
+    ctx.font = FLASH_FONT;
+    width = ctx.measureText(label).width;
+    labelWidths.set(label, width);
+  }
+  return width;
+}
+
+// The outlined gradient label, rasterized once at roughly its on-screen pixel
+// density. Re-stroking huge vector text every frame (twice while a frozen
+// background layer shows) was the main per-frame cost of a celebration.
+const textLayerCache = new Map<
+  string,
+  { canvas: HTMLCanvasElement; width: number; height: number }
+>();
+const MAX_TEXT_LAYER_PX = 4096;
+
+function getTextLayer(
+  label: string,
+  color: string,
+  strokeWidth: number,
+  measuredWidth: number,
+  deviceScale: number,
+): { canvas: HTMLCanvasElement; width: number; height: number } {
+  const pad = strokeWidth + 8;
+  const width = measuredWidth + pad * 2;
+  const height = FLASH_FONT_SIZE * 1.6 + pad * 2;
+  // headroom for the grow-in overshoot and wobble; quantized so the animation
+  // reuses one bitmap instead of re-rasterizing as its scale changes
+  const resolution = Math.min(
+    Math.max(0.5, Math.ceil(deviceScale * 1.2 * 2) / 2),
+    MAX_TEXT_LAYER_PX / Math.max(width, height),
+  );
+  const key = `${label}|${color}|${strokeWidth}|${resolution}`;
+  const cached = touchCached(textLayerCache, key);
+  if (cached) return cached;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(width * resolution);
+  canvas.height = Math.ceil(height * resolution);
+  const ctx = canvas.getContext("2d")!;
+  ctx.scale(resolution, resolution);
+  drawCritText(ctx, label, width / 2, height / 2, color, {
+    fontSize: FLASH_FONT_SIZE,
+    strokeWidth,
+  });
+  const entry = { canvas, width, height };
+  storeCached(textLayerCache, key, entry);
   return entry;
 }
 
@@ -490,30 +573,24 @@ function drawFlashLayer(
   growthScale: number,
   rotation: number,
 ): void {
-  // extra-bold weight + a thick outline is what reads as "fat"/chunky at this
-  // size, more than font-size alone (900 is already the heaviest weight
-  // Fredoka ships)
-  const fontSize = 100;
-  const font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
-  ctx.font = font;
   // "full size" (growthScale === 1) is defined as covering 80% of the
   // viewport's width, not a fixed font-size — measure once at the reference
   // 100px size and scale up/down from there so this holds regardless of
   // screen size
-  const measuredWidth = ctx.measureText(label).width;
+  const measuredWidth = measureLabel(ctx, label);
   const targetScale = (viewportWidth * 0.8) / measuredWidth;
   const textScale =
-    label === "Skip" ? measuredWidth / ctx.measureText("Heavenly").width : 1;
+    label === "Skip" ? measuredWidth / measureLabel(ctx, "Heavenly") : 1;
   const scale = growthScale * targetScale;
 
   ctx.save();
+  const base = ctx.getTransform();
+  const fullSizeDeviceScale =
+    Math.hypot(base.a, base.b) * targetScale * textScale;
   ctx.globalAlpha = alpha;
   ctx.translate(centerX, centerY);
   ctx.rotate(rotation);
   ctx.scale(scale, scale);
-  ctx.font = font;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
   // per-crit backdrop icon, drawn behind everything else — same
   // translate/scale/alpha as the text itself (so it pops in/fades together
   // with it). A couple of icons (see CRIT_ICON_BY_LABEL's rotateDeg) also
@@ -544,7 +621,20 @@ function drawFlashLayer(
   ctx.scale(textScale, textScale);
   const bloom = getBloomLayer(label, measuredWidth);
   ctx.drawImage(bloom.canvas, -bloom.width / 2, -bloom.height / 2);
-  drawCritText(ctx, label, 0, 0, color, { fontSize, strokeWidth });
+  const text = getTextLayer(
+    label,
+    color,
+    strokeWidth,
+    measuredWidth,
+    fullSizeDeviceScale,
+  );
+  ctx.drawImage(
+    text.canvas,
+    -text.width / 2,
+    -text.height / 2,
+    text.width,
+    text.height,
+  );
   ctx.restore();
   ctx.restore();
 }

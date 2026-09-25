@@ -430,6 +430,7 @@ export function createCityMapView(
       const { label, badges } = await deps.runCheapestBatch();
       const now = Date.now();
       if (label === null) return;
+      indicatorCosts.clear();
       deps.onStateChanged();
       playAutoPurchase();
       const { x, y } = cloudCat.cheer(cssW, cssH, now);
@@ -529,6 +530,32 @@ export function createCityMapView(
     );
   }
 
+  // the indicator dots' costs simulate whole purchase plans; recomputing them on
+  // every frame of a celebration (when the redraw throttle lifts) was needless
+  const INDICATOR_COST_TTL_MS = 250;
+  const indicatorCosts = new Map<
+    number,
+    { at: number; unlockAllCost: BigNumber; upgradeAllCost: BigNumber | null }
+  >();
+  function getIndicatorCosts(globalIndex: number): {
+    unlockAllCost: BigNumber;
+    upgradeAllCost: BigNumber | null;
+  } {
+    const now = performance.now();
+    const cached = indicatorCosts.get(globalIndex);
+    if (cached && now - cached.at < INDICATOR_COST_TTL_MS) return cached;
+    const unlockAllCost = deps.getBuildingUnlockAllCost(globalIndex);
+    const entry = {
+      at: now,
+      unlockAllCost,
+      upgradeAllCost: isZero(unlockAllCost)
+        ? deps.getBuildingUpgradeAllCost(globalIndex)
+        : null,
+    };
+    indicatorCosts.set(globalIndex, entry);
+    return entry;
+  }
+
   function redraw(): void {
     // re-measure every call instead of trusting whatever resize() last cached —
     // otherwise a redraw sandwiched between the canvas becoming visible and its
@@ -603,21 +630,19 @@ export function createCityMapView(
           MAX_FLOORS_PER_BUILDING,
           critTier ? CRIT_TIER_CONFIG[critTier].color : undefined,
         );
-        const unlockAllCost = deps.getBuildingUnlockAllCost(globalIndex);
+        const { unlockAllCost, upgradeAllCost } = getIndicatorCosts(globalIndex);
         if (
           !isZero(unlockAllCost) &&
           gte(deps.getTotalIncome(), unlockAllCost)
         ) {
           drawBuyAllFloorsIndicator(ctx, cssW, cssH, markerSprite, i);
         }
-        if (isZero(unlockAllCost)) {
-          const upgradeAllCost = deps.getBuildingUpgradeAllCost(globalIndex);
-          if (
-            !isZero(upgradeAllCost) &&
-            gte(deps.getTotalIncome(), upgradeAllCost)
-          ) {
-            drawBuyAllBuildingItemsIndicator(ctx, cssW, cssH, markerSprite, i);
-          }
+        if (
+          upgradeAllCost !== null &&
+          !isZero(upgradeAllCost) &&
+          gte(deps.getTotalIncome(), upgradeAllCost)
+        ) {
+          drawBuyAllBuildingItemsIndicator(ctx, cssW, cssH, markerSprite, i);
         }
         continue;
       }
@@ -836,6 +861,7 @@ export function createCityMapView(
     const buildingCount = deps.getBuildingCount();
     if (globalIndex === buildingCount) {
       if (deps.buyBuilding()) {
+        indicatorCosts.clear();
         showPurchaseFeedback(globalIndex, hit);
         deps.onStateChanged();
         const { cx, feetY } = markerCenter(cssW, cssH, hit);
@@ -939,6 +965,7 @@ export function createCityMapView(
         ) {
           deps.onStateChanged();
         }
+        indicatorCosts.clear();
         redraw();
       } catch (error) {
         console.error("Map renovation failed", error);
@@ -967,12 +994,20 @@ export function createCityMapView(
     () => transitions.navigateCityToEnd(1),
   );
 
-  const resizeObserver = new ResizeObserver(() => redraw());
+  // tracked from the observer rather than measured per tick: while the building
+  // view is up, the hidden map's loop used to force a layout read every frame
+  // (every frame of a celebration, since a crit flash lifts its throttle)
+  let canvasVisible = false;
+  const resizeObserver = new ResizeObserver((entries) => {
+    const box = entries[entries.length - 1].contentRect;
+    canvasVisible = box.width > 0 && box.height > 0;
+    redraw();
+  });
   resizeObserver.observe(canvas);
 
   // keeps the current-building marker's stand/jump cycle animating even though
-  // nothing else on this static map ever changes; cheap to leave running while the
-  // view is hidden too (redraw() no-ops on the then-0x0 canvas). Capped at 30 FPS
+  // nothing else on this static map ever changes; idles while the view is hidden
+  // (see canvasVisible above). Capped at 30 FPS
   // because each redraw repaints the whole canvas, and running that every
   // animation frame is what made opening the map freeze the whole page. The
   // corner mascot's idle float and the affordable-price wiggle both need that
@@ -983,6 +1018,8 @@ export function createCityMapView(
   let animationFrameId: number | null = null;
   let lastTickRedraw = 0;
   function tick(): void {
+    animationFrameId = requestAnimationFrame(tick);
+    if (!canvasVisible) return;
     const now = performance.now();
     const interval =
       hasActiveMarkerJump ||
@@ -997,7 +1034,6 @@ export function createCityMapView(
       lastTickRedraw = now;
       redraw();
     }
-    animationFrameId = requestAnimationFrame(tick);
   }
   animationFrameId = requestAnimationFrame(tick);
 
@@ -1020,6 +1056,7 @@ export function createCityMapView(
 
   return {
     refresh: () => {
+      indicatorCosts.clear();
       cityIndex = Math.floor(deps.getActiveBuildingIndex() / MARKER_COUNT);
       persistCityMapState();
       redraw();

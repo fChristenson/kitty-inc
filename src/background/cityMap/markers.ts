@@ -138,6 +138,52 @@ export function hitTestAnyMarker(
   return null;
 }
 
+// the locked markers' grayscale look baked once per sprite frame — a canvas
+// `filter` on every locked marker, every frame, forces an intermediate
+// filtered render each time
+const grayFrameCache = new WeakMap<
+  HTMLImageElement,
+  Map<number, HTMLCanvasElement>
+>();
+// matches the DPR cap, so the baked frame never gets upscaled on screen
+const GRAY_FRAME_PIXEL_SCALE = 2;
+
+function getGrayFrame(
+  sprite: HTMLImageElement,
+  frame: number,
+  frameW: number,
+  frameH: number,
+  renderW: number,
+): HTMLCanvasElement {
+  let frames = grayFrameCache.get(sprite);
+  if (!frames) {
+    frames = new Map();
+    grayFrameCache.set(sprite, frames);
+  }
+  let canvas = frames.get(frame);
+  if (!canvas) {
+    canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(renderW * GRAY_FRAME_PIXEL_SCALE);
+    canvas.height = Math.ceil(MARKER_H * GRAY_FRAME_PIXEL_SCALE);
+    const ctx = canvas.getContext("2d")!;
+    ctx.imageSmoothingQuality = "high";
+    ctx.filter = "grayscale(1) brightness(0.85)";
+    ctx.drawImage(
+      sprite,
+      frame * frameW,
+      0,
+      frameW,
+      frameH,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+    frames.set(frame, canvas);
+  }
+  return canvas;
+}
+
 export function drawCatMarker(
   ctx: CanvasRenderingContext2D,
   cssW: number,
@@ -148,15 +194,23 @@ export function drawCatMarker(
   grayedOut: boolean,
   jumpOffsetY = 0,
 ): void {
-  if (!catSprite) return;
+  if (!catSprite || catSprite.naturalWidth === 0) return;
   const { cx, feetY } = markerCenter(cssW, cssH, buildingIndex);
   const frameW = catSprite.naturalWidth / CAT_FRAME_COUNT;
   const frameH = catSprite.naturalHeight;
   const renderW = (MARKER_H * frameW) / frameH;
-  ctx.save();
   if (grayedOut) {
-    ctx.filter = "grayscale(1) brightness(0.85)";
+    ctx.save();
     ctx.globalAlpha = 0.75;
+    ctx.drawImage(
+      getGrayFrame(catSprite, frame, frameW, frameH, renderW),
+      cx - renderW / 2,
+      feetY - MARKER_H + jumpOffsetY,
+      renderW,
+      MARKER_H,
+    );
+    ctx.restore();
+    return;
   }
   ctx.drawImage(
     catSprite,
@@ -169,7 +223,6 @@ export function drawCatMarker(
     renderW,
     MARKER_H,
   );
-  ctx.restore();
 }
 
 // small filled dot drawn just left of an unlocked building's own cat marker,

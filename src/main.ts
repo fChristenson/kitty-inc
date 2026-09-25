@@ -164,6 +164,13 @@ import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
 import { getBackgroundUrls } from "./loadAssets";
+import { isCritFlashActive } from "./screenShake";
+import { runWhenIdle } from "./shared/idle";
+import { isDialogOpen } from "./shared/dialogVisibility";
+
+// behind a dialog's dimmed backdrop the building redraws at ~30fps, leaving
+// the frame budget to the dialog's own slide animation and content
+const BEHIND_DIALOG_REDRAW_MS = 33;
 
 // matches style.css's worker-menu-slide-out-* keyframes (0.352s) — the company
 // select menu's own close animation duration
@@ -179,7 +186,8 @@ async function main() {
   initSessionGuard();
   suppressNativeContextMenu();
   startBackgroundMusic();
-  preloadSounds();
+  // creating the AudioContext alone blocked the main thread for tens of ms
+  runWhenIdle(preloadSounds, 1500);
 
   app.innerHTML = `
     <div class="game">
@@ -209,11 +217,13 @@ async function main() {
     document.fonts.load('900 16px "Fredoka"'),
   ]);
 
-  await loadCloudImages();
-  await loadMouseImage();
-  await loadCoinImage();
-  await loadFloatingCoinImage();
-  await loadRoofImage(); // same roof art for every theme, loaded once
+  await Promise.all([
+    loadCloudImages(),
+    loadMouseImage(),
+    loadCoinImage(),
+    loadFloatingCoinImage(),
+    loadRoofImage(), // same roof art for every theme, loaded once
+  ]);
 
   // one Floor[] per building; only one building is ever shown on screen at a time
   // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
@@ -1289,8 +1299,18 @@ async function main() {
   // actually scrolled into view, so this stays cheap no matter how many buildings exist.
   // Skipped while the map view is open: the building canvas is hidden (0x0) then, and
   // its own redraw() math (division by its own now-zero CSS size) would throw
+  let lastBuildingRedrawAt = 0;
   startIncomeTicker(() => {
-    if (!mapOpen) gameCanvas.redraw();
+    if (mapOpen) return;
+    const now = performance.now();
+    if (
+      isDialogOpen() &&
+      !isCritFlashActive(Date.now()) &&
+      now - lastBuildingRedrawAt < BEHIND_DIALOG_REDRAW_MS
+    )
+      return;
+    lastBuildingRedrawAt = now;
+    gameCanvas.redraw();
   });
   startTotalIncomeTicker(buildings, getGlobalIncomeBoostMultiplier);
 
