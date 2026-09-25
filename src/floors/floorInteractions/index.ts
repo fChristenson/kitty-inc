@@ -1,4 +1,4 @@
-import { createFeaturedCritRewards } from "./featuredCritRewards";
+import { createFeaturedCritRewards } from "./featuredRewards";
 import {
   isDetachedJobRunning,
   isDetachedJobPending,

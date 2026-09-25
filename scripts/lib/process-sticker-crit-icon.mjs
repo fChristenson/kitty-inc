@@ -2,6 +2,7 @@ import sharp from "sharp";
 import path from "node:path";
 import { keepLargestOpaqueComponent } from "./keep-largest-component.mjs";
 import { writeCritSticker } from "./sticker-border.mjs";
+import { critIconDir, critIconFile } from "./crit-asset-paths.mjs";
 
 // Variant of process-crit-icon.mjs for "sticker" sources: art that ships with a
 // thick white ring around the subject, fenced off from the real background by
@@ -26,7 +27,9 @@ export async function processStickerCritIcon(
 ) {
   const assets = path.resolve(import.meta.dirname, "../../src/assets");
   const critAssets = path.resolve(import.meta.dirname, "../../public");
-  const { data, info } = await sharp(path.join(assets, `${name}.jfif`))
+  const { data, info } = await sharp(
+    path.join(assets, critIconDir(name), `${name}.jfif`),
+  )
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
@@ -109,7 +112,7 @@ export async function processStickerCritIcon(
     bottom = Math.max(bottom, row);
   }
   if (right < left || bottom < top) throw new Error(`Empty crit icon: ${name}`);
-  const destination = path.join(critAssets, `${name}.png`);
+  const destination = path.join(critAssets, critIconFile(name));
   await sharp(data, { raw: { width, height, channels } })
     .extract({ left, top, width: right - left + 1, height: bottom - top + 1 })
     .resize(250, 250, { fit: "inside", withoutEnlargement: true })

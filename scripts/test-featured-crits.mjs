@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import path from "node:path";
 import sharp from "sharp";
 import { createServer } from "vite";
 import { elementCritBatch } from "./lib/element-crit-batch.mjs";
@@ -16,7 +17,7 @@ try {
     "/src/loadAssets/index.ts",
   );
   const { createFeaturedCritRewards } = await server.ssrLoadModule(
-    "/src/floors/floorInteractions/featuredCritRewards.ts",
+    "/src/floors/floorInteractions/featuredRewards/index.ts",
   );
   const { fromNumber } = await server.ssrLoadModule(
     "/src/shared/bigNumber/index.ts",
@@ -1028,15 +1029,21 @@ try {
         crit.getCritProcChance(elementCritBatch[index - 1][1]) >
           crit.getCritProcChance(kind),
       );
-    const root = await readFile(`src/assets/${kind}.png`);
-    assert(root.equals(await readFile(`public/${kind}.png`)));
+    const root = await readFile(`src/assets/crits/elements/${kind}.png`);
+    assert(root.equals(await readFile(`public/crits/elements/${kind}.png`)));
     assert(
       root.equals(
-        await readFile(`src/assets/themes/references/dist/${kind}.png`),
+        await readFile(
+          `src/assets/themes/references/dist/crits/elements/${kind}.png`,
+        ),
       ),
     );
     assert(
-      (await readFile(`src/assets/${source}${sourceExtension}`)).length > 0,
+      (
+        await readFile(
+          `src/assets/crits/elements/${source}${sourceExtension}`,
+        )
+      ).length > 0,
     );
     const { data, info } = await sharp(root)
       .ensureAlpha()
@@ -1194,13 +1201,15 @@ try {
         assert.equal(test.context.floor.lastCollectedAt, 123);
       }
     }
-    const cutout = await readFile(`public/${kind}.png`);
+    const cutout = await readFile(`public/crits/attitude/${kind}.png`);
     assert(
       cutout.equals(
-        await readFile(`src/assets/themes/references/dist/${kind}.png`),
+        await readFile(
+          `src/assets/themes/references/dist/crits/attitude/${kind}.png`,
+        ),
       ),
     );
-    const original = await readFile(`src/assets/${kind}.png`);
+    const original = await readFile(`src/assets/crits/attitude/${kind}.png`);
     assert(!original.equals(cutout), `${kind}: raw source overwritten`);
     const { data, info } = await sharp(cutout)
       .ensureAlpha()
@@ -1268,7 +1277,10 @@ try {
         await readFile(`src/assets/themes/references/dist/${iconFile}`),
       ),
     );
-    assert((await readFile(`src/assets/${source}`)).length > 0);
+    assert(
+      (await readFile(`src/assets/${path.dirname(iconFile)}/${source}`))
+        .length > 0,
+    );
   }
   for (const family of [
     [
@@ -1301,22 +1313,36 @@ try {
   assert(CONFIG.crit.heavyElementChance < CONFIG.crit.nucleusDividendChance);
   assert(CONFIG.crit.oganessonOdysseyChance >= 0.001);
   assert(!MAP_CRIT_TEST_KINDS.includes("heavyElement"));
-  const heavyIcon = await readFile("public/heavyElement.png");
-  assert(heavyIcon.equals(await readFile("src/assets/heavyElement.png")));
+  const heavyIcon = await readFile("public/crits/elements/heavyElement.png");
   assert(
     heavyIcon.equals(
-      await readFile("src/assets/themes/references/dist/heavyElement.png"),
+      await readFile("src/assets/crits/elements/heavyElement.png"),
+    ),
+  );
+  assert(
+    heavyIcon.equals(
+      await readFile(
+        "src/assets/themes/references/dist/crits/elements/heavyElement.png",
+      ),
     ),
   );
   assert.equal(CONFIG.crit.nucleusDividendUpgrades, 6);
   assert.equal(CONFIG.crit.nucleusDividendPayouts, 4);
   assert(CONFIG.crit.nucleusDividendChance > CONFIG.crit.sugarHighChance);
   assert(!MAP_CRIT_TEST_KINDS.includes("nucleusDividend"));
-  const nucleusIcon = await readFile("public/nucleusDividend.png");
-  assert(nucleusIcon.equals(await readFile("src/assets/nucleusDividend.png")));
+  const nucleusIcon = await readFile(
+    "public/crits/elements/nucleusDividend.png",
+  );
   assert(
     nucleusIcon.equals(
-      await readFile("src/assets/themes/references/dist/nucleusDividend.png"),
+      await readFile("src/assets/crits/elements/nucleusDividend.png"),
+    ),
+  );
+  assert(
+    nucleusIcon.equals(
+      await readFile(
+        "src/assets/themes/references/dist/crits/elements/nucleusDividend.png",
+      ),
     ),
   );
   const newAssetKinds = [

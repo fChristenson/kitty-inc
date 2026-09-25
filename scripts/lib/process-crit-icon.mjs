@@ -4,6 +4,7 @@ import fs from "node:fs/promises";
 import { dropSmallOpaqueComponents } from "./drop-small-components.mjs";
 import { dropEdgeTouchingComponents } from "./drop-edge-components.mjs";
 import { writeCritSticker } from "./sticker-border.mjs";
+import { critIconDir, critIconFile } from "./crit-asset-paths.mjs";
 
 export async function processCritIcon(
   name,
@@ -30,8 +31,9 @@ export async function processCritIcon(
 ) {
   const assets = path.resolve(import.meta.dirname, "../../src/assets");
   const critAssets = path.resolve(import.meta.dirname, "../../public");
+  const category = critIconDir(name);
   const pipeline = sharp(
-    sourcePath ?? path.join(assets, `${name}${sourceExtension}`),
+    sourcePath ?? path.join(assets, category, `${name}${sourceExtension}`),
   ).ensureAlpha();
   const { data, info } = await (
     sourceRect ? pipeline.extract(sourceRect) : pipeline
@@ -197,7 +199,8 @@ export async function processCritIcon(
     bottom = Math.max(bottom, row);
   }
   if (right < left || bottom < top) throw new Error(`Empty crit icon: ${name}`);
-  const destination = path.join(critAssets, `${name}.png`);
+  const destination = path.join(critAssets, critIconFile(name));
+  await fs.mkdir(path.dirname(destination), { recursive: true });
   await sharp(data, { raw: { width, height, channels } })
     .extract({ left, top, width: right - left + 1, height: bottom - top + 1 })
     .resize(250, 250, { fit: "inside", withoutEnlargement: true })
@@ -206,8 +209,8 @@ export async function processCritIcon(
   await writeCritSticker(name);
   if (copyToAssetDirectories) {
     for (const directory of [
-      assets,
-      path.join(assets, "themes/references/dist"),
+      path.join(assets, category),
+      path.join(assets, "themes/references/dist", category),
     ]) {
       await fs.mkdir(directory, { recursive: true });
       await fs.copyFile(destination, path.join(directory, `${name}.png`));

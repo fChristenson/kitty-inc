@@ -1,6 +1,12 @@
 import fs from "node:fs";
+import path from "node:path";
 
-const text = fs.readFileSync("src/shared/critTypes/featuredProcs.ts", "utf8");
+const featuredDir = "src/shared/critTypes/featured";
+const text = fs
+  .readdirSync(featuredDir)
+  .filter((file) => file !== "index.ts")
+  .map((file) => fs.readFileSync(path.join(featuredDir, file), "utf8"))
+  .join("\n");
 const labels = [...text.matchAll(/label: "(.*?)"/g)].map((m) => m[1]);
 const kinds = [...text.matchAll(/^ {2}([a-zA-Z0-9]+): \{/gm)].map((m) => m[1]);
 

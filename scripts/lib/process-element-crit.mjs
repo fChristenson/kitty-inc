@@ -2,14 +2,21 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { processCritIcon } from "./process-crit-icon.mjs";
 import { elementCritBatch } from "./element-crit-batch.mjs";
+import { critIconDir, critIconFile } from "./crit-asset-paths.mjs";
 
 export async function processElementCrit(kind) {
   const entry = elementCritBatch.find((entry) => entry[1] === kind);
   if (!entry) throw new Error(`Unknown element crit: ${kind}`);
   const [source, , , , sourceExtension = ".jfif"] = entry;
   const root = path.resolve(import.meta.dirname, "../..");
+  const category = critIconDir(kind);
   const options = {
-    sourcePath: path.join(root, "src/assets", `${source}${sourceExtension}`),
+    sourcePath: path.join(
+      root,
+      "src/assets",
+      category,
+      `${source}${sourceExtension}`,
+    ),
     ...(source === "krypton"
       ? { backgroundColor: [136, 192, 250], backgroundColorTolerance: 40 }
       : {}),
@@ -19,10 +26,14 @@ export async function processElementCrit(kind) {
   };
   await processCritIcon(kind, options);
   const references = path.join(root, "src/assets/themes/references/dist");
-  await fs.mkdir(references, { recursive: true });
-  for (const destination of [path.join(root, "src/assets"), references])
+  for (const destination of [
+    path.join(root, "src/assets", category),
+    path.join(references, category),
+  ]) {
+    await fs.mkdir(destination, { recursive: true });
     await fs.copyFile(
-      path.join(root, "public", `${kind}.png`),
+      path.join(root, "public", critIconFile(kind)),
       path.join(destination, `${kind}.png`),
     );
+  }
 }

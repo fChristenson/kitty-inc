@@ -1,6 +1,7 @@
 import sharp from "sharp";
 import path from "node:path";
 import fs from "node:fs/promises";
+import { critIconFile } from "./crit-asset-paths.mjs";
 
 // Wraps an already-cut-out crit icon in a smooth white sticker border.
 //
@@ -222,10 +223,8 @@ export async function writeSilhouette(stickerPath, destinationPath) {
 // silhouette the dialog uses before the crit has been discovered.
 export async function writeCritSticker(name) {
   const publicDir = path.resolve(import.meta.dirname, "../../public");
-  const sticker = path.join(publicDir, "stickers", `${name}.png`);
-  await addStickerBorder(path.join(publicDir, `${name}.png`), sticker);
-  await writeSilhouette(
-    sticker,
-    path.join(publicDir, "silhouettes", `${name}.png`),
-  );
+  const file = critIconFile(name);
+  const sticker = path.join(publicDir, "stickers", file);
+  await addStickerBorder(path.join(publicDir, file), sticker);
+  await writeSilhouette(sticker, path.join(publicDir, "silhouettes", file));
 }

@@ -1,0 +1,173 @@
+import type { CritProcDisplayInfo } from "../index";
+import { COLOR } from "../../../palette";
+
+export const GAME_QUOTES_CRIT_INFO = {
+  wizard: {
+    label: "Wizard",
+    color: COLOR.purple,
+    icon: "wizard",
+    description: "Two tier promotions and five upgrades here",
+  },
+  epic: {
+    label: "Epic Loot",
+    color: COLOR.royalFlushPurple,
+    icon: "epic",
+    description: "Forty free upgrades on this floor",
+  },
+  ready: {
+    label: "Dual Wield",
+    color: COLOR.fourOfAKindIndigo,
+    icon: "ready",
+    description: "Four upgrades and four payouts on the top earner",
+  },
+  workWork: {
+    label: "Work Work",
+    color: COLOR.suppliesGiveawayLime,
+    icon: "workWork",
+    description: "Eleven free upgrades on every unlocked floor",
+  },
+  yesWarchief: {
+    label: "Yes, Warchief",
+    color: COLOR.doubleDownCrimson,
+    icon: "yesWarchief",
+    description: "Fourteen instant payouts on every unlocked floor",
+  },
+  youAreNotPrepared: {
+    label: "Not Prepared",
+    color: COLOR.threeOfAKindGreen,
+    icon: "youAreNotPrepared",
+    description: "Two tier promotions and nine upgrades here",
+  },
+  arcana: {
+    label: "Arcane Surge",
+    color: COLOR.pairBlue,
+    icon: "arcana",
+    description: "One tier promotion and twelve upgrades here",
+  },
+  bigDaddy: {
+    label: "Big Daddy",
+    color: COLOR.mysticTeal,
+    icon: "bigDaddy",
+    description: "Forty-five free upgrades on this floor",
+  },
+  chonk: {
+    label: "Chonk",
+    color: COLOR.suppliesGiveawayLime,
+    icon: "chonk",
+    description: "Sixteen instant payouts on this floor",
+  },
+  cyberPunk: {
+    label: "Cyberpunk",
+    color: COLOR.cyan,
+    icon: "cyberPunk",
+    description: "Thirteen free upgrades on this floor",
+  },
+  dodgeThis: {
+    label: "Dodge This",
+    color: COLOR.unionBossSlate,
+    icon: "dodgeThis",
+    description: "Six payouts from the highest-earning floor",
+  },
+  whiteRabbit: {
+    label: "White Rabbit",
+    color: COLOR.silverTicketGray,
+    icon: "whiteRabbit",
+    description: "Five upgrades here and five on the lowest-level floor",
+  },
+  gladiator: {
+    label: "Gladiator",
+    color: COLOR.goldenHandshakeGold,
+    icon: "gladiator",
+    description: "Thirteen free upgrades on every unlocked floor",
+  },
+  iDidntAskForThis: {
+    label: "I Didn't Ask For This",
+    color: COLOR.rainCheckBlue,
+    icon: "iDidntAskForThis",
+    description: "One tier promotion and twenty upgrades here",
+  },
+  iHatePortals: {
+    label: "I Hate Portals",
+    color: COLOR.snowdayFrost,
+    icon: "iHatePortals",
+    description: "Eleven instant payouts on this floor",
+  },
+  littleSister: {
+    label: "Little Sister",
+    color: COLOR.easterSalePink,
+    icon: "littleSister",
+    description: "Seven free upgrades on the lowest-level floor",
+  },
+  magicIsATool: {
+    label: "Magic Is a Tool",
+    color: COLOR.halloweenSalePurple,
+    icon: "magicIsATool",
+    description: "Eight upgrades on alternating floors, from the ground",
+  },
+  megaChonk: {
+    label: "Mega Chonk",
+    color: COLOR.fullHouseCrimson,
+    icon: "megaChonk",
+    description: "Twenty-two instant payouts on this floor",
+  },
+  metal: {
+    label: "Heavy Metal",
+    color: COLOR.goldStandardAmber,
+    icon: "metal",
+    description: "Seventeen free upgrades on the highest floor",
+  },
+  princess: {
+    label: "Princess Cut",
+    color: COLOR.springSalePink,
+    icon: "princess",
+    description: "Thirteen payouts on alternating floors, from the ground",
+  },
+  spaceAndTime: {
+    label: "Space and Time",
+    color: COLOR.nightShiftIndigo,
+    icon: "spaceAndTime",
+    description: "Nine upgrades on this floor and every floor below",
+  },
+  thinkWithYourHead: {
+    label: "Think With Your Head",
+    color: COLOR.executiveOrderTeal,
+    icon: "thinkWithYourHead",
+    description: "Five upgrades and five payouts on the lowest-level floor",
+  },
+  wouldYouKindly: {
+    label: "Would You Kindly",
+    color: COLOR.espressoShotBrown,
+    icon: "wouldYouKindly",
+    description: "Sixteen instant payouts on every unlocked floor",
+  },
+  yesYourHighness: {
+    label: "Yes, Your Highness",
+    color: COLOR.heavenlyGold,
+    icon: "yesYourHighness",
+    description: "Nineteen free upgrades on every unlocked floor",
+  },
+  bulletDodger: {
+    label: "Bullet Dodger",
+    color: COLOR.pairBlue,
+    icon: "bulletDodger",
+    description: "Fourteen free upgrades on this floor",
+  },
+  nothingToSee: {
+    label: "Nothing to See",
+    color: COLOR.bullMarketGreen,
+    icon: "nothingToSee",
+    description: "Twenty instant payouts on this floor",
+  },
+  nowIAmSuspicious: {
+    label: "Now I'm Suspicious",
+    color: COLOR.nightOwlIndigo,
+    icon: "nowIAmSuspicious",
+    description: "Seventeen instant payouts on every unlocked floor",
+  },
+  redOrBlue: {
+    label: "Red or Blue",
+    color: COLOR.grandOpeningRose,
+    icon: "redOrBlue",
+    description: "Six upgrades on the lowest floor; six top-earner payouts",
+  },
+} as const satisfies Record<string, CritProcDisplayInfo>;

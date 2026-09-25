@@ -15,8 +15,8 @@ for (let offset = 0; offset < elementCritBatch.length; offset += 20) {
     [source, kind, label, , sourceExtension = ".jfif"],
   ] of entries.entries()) {
     const input = processed
-      ? `public/${kind}.png`
-      : `src/assets/${source}${sourceExtension}`;
+      ? `public/crits/elements/${kind}.png`
+      : `src/assets/crits/elements/${source}${sourceExtension}`;
     const image = await sharp(input)
       .resize(210, 190, { fit: "inside" })
       .png()

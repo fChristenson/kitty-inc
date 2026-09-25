@@ -97,9 +97,9 @@ Do not add a new preload variable, per-label draw block, or duplicated menu entr
 Use the batch catalog pattern even when adding one proc. Legacy `X_CRIT_*` constants and force helpers remain for existing callers; do not multiply that boilerplate for a new batch.
 
 1. Add `<kind>Chance` and all reward counts, multipliers, and durations to `CONFIG.crit`. `getCritProcChance(kind)` expects that naming convention. Pick odds from the bands below and compare neighboring rewards.
-2. Add `{ label, color, icon, description }` to `FEATURED_CRIT_INFO` in `src/shared/critTypes/featuredProcs.ts`. The existing integration derives the canonical proc registries; do not create a parallel registry.
-3. Implement the effect in `createFeaturedCritRewards` in `src/floors/floorInteractions/featuredCritRewards.ts`, reusing injected upgrade, payout, and rate helpers. Extend the helper interface only for a genuinely new operation.
-4. Process the icon and register its shipped PNG in `loadAssets/IMAGE_FILES`. Metadata supplies generic flash, collection menu, and test button behavior.
+2. Add `{ label, color, icon, description }` to the matching category file in `src/shared/critTypes/featured/<category>.ts` (create a new category file and spread it in `featured/index.ts` when none fits). `FEATURED_CRIT_INFO` is assembled from those files; do not create a parallel registry.
+3. Implement the effect in the matching `src/floors/floorInteractions/featuredRewards/<category>.ts`, reusing the shared helpers from `featuredRewards/helpers.ts`. Extend the helper interface only for a genuinely new operation.
+4. Process the icon and register its shipped PNG in `loadAssets/IMAGE_FILES` as `"crits/<category>/<name>.png"`. Metadata supplies generic flash, collection menu, and test button behavior.
 5. Preserve one test button per proc plus Regular Crit in `hud/testButton/critTestActions.ts`, using shared event, tier, bonus-tier, and `forceTestCrit` controls. Never reintroduce separate Spawn, Floor, Map, Mega, or Ultra buttons for each proc.
 6. Map testing must show only procs with actual map rewards. Update `MAP_CRIT_TEST_KINDS` only when map support is implemented, and keep the map bonus-tier selector disabled until such rewards exist.
 7. Validate the changed behavior with focused checks. Do not recreate the removed regression scripts unless explicitly requested.
@@ -159,7 +159,7 @@ A family of procs must decrease monotonically with reward size. Do not copy the 
 
 ### Processing a new crit's icon
 
-Every special-crit backdrop icon is a raw `src/assets/<name>.jfif` processed by a dedicated `scripts/process-<name>.mjs` into `src/assets/<name>.png`. Never hand-edit a PNG directly or overwrite the raw source. The script must also copy the finished PNG into `src/assets/themes/references/dist/<name>.png`; `loadAssets` reads from that folder.
+Every special-crit backdrop icon is a raw `src/assets/crits/<category>/<name>.jfif` processed by a dedicated `scripts/crits/<category>/process-<name>.mjs` into `public/crits/<category>/<name>.png` (plus a root copy in `src/assets/crits/<category>/`). Never hand-edit a PNG directly or overwrite the raw source. The script must also copy the finished PNG into `src/assets/themes/references/dist/crits/<category>/<name>.png`; the shared processors resolve these category folders from `IMAGE_FILES` via `scripts/lib/crit-asset-paths.mjs`.
 
 Pick a chroma-key technique based on the raw art's actual background:
 
@@ -171,6 +171,6 @@ Pick a chroma-key technique based on the raw art's actual background:
 
 Clean chroma-key noise carefully. Use `keepLargestOpaqueComponent` only when the real icon is one connected shape; preserve legitimate disconnected scene pieces and use a minimum-area floor where appropriate. If the chroma key ate a desired shadow, use `addDropShadow(croppedRgbaBuffer, w, h)` on the already-cropped icon.
 
-Tight-crop to the bounding box after removing stray components, but do not cut legitimate tapered feet, tails, or tips. Resize to fit within 250x250 with `fit: "inside"` and `withoutEnlargement: true`, and always pass `palette: true` with `compressionLevel: 9` to the final `.png()` call. Verify root and shipped copies match, then register `<name>: "<name>.png"` in `loadAssets/index.ts`.
+Tight-crop to the bounding box after removing stray components, but do not cut legitimate tapered feet, tails, or tips. Resize to fit within 250x250 with `fit: "inside"` and `withoutEnlargement: true`, and always pass `palette: true` with `compressionLevel: 9` to the final `.png()` call. Verify root and shipped copies match, then register `<name>: "crits/<category>/<name>.png"` in `loadAssets/index.ts`.
 
 Register metadata rather than adding another draw call. The canonical proc entry's `icon` and `label` feed the generic renderer, lazy icon lookup, and Special Crits menu.

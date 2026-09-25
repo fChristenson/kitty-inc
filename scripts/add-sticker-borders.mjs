@@ -5,6 +5,7 @@ import {
   writeSilhouette,
   DEFAULT_BORDER,
 } from "./lib/sticker-border.mjs";
+import { critIconFile } from "./lib/crit-asset-paths.mjs";
 
 // Regenerates the white-bordered sticker cut of every crit icon into
 // public/stickers/, which is where the Special Crits dialog reads them from.
@@ -43,12 +44,17 @@ async function critIconFiles() {
     ]),
   );
   const files = new Set();
-  for (const entry of await fs.readdir(critTypesDir)) {
-    if (!entry.endsWith(".ts")) continue;
-    const critSource = await fs.readFile(
+  const critSourceFiles = [
+    ...(await fs.readdir(critTypesDir)).map((entry) =>
       path.join(critTypesDir, entry),
-      "utf8",
-    );
+    ),
+    ...(await fs.readdir(path.join(critTypesDir, "featured"))).map((entry) =>
+      path.join(critTypesDir, "featured", entry),
+    ),
+  ];
+  for (const file of critSourceFiles) {
+    if (!file.endsWith(".ts")) continue;
+    const critSource = await fs.readFile(file, "utf8");
     for (const match of critSource.matchAll(/\bicon:\s*"(\w+)"/g)) {
       const filename = filenameByName.get(match[1]);
       if (!filename) throw new Error(`Unregistered crit icon: ${match[1]}`);
@@ -81,7 +87,7 @@ const names = requested.length ? requested : await critIconFiles();
 let done = 0;
 const missing = [];
 for (const name of names) {
-  const file = `${name.replace(/\.png$/, "")}.png`;
+  const file = name.endsWith(".png") ? name : critIconFile(name);
   const source = path.join(publicDir, file);
   try {
     await fs.access(source);
