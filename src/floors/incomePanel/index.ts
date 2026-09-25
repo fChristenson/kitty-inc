@@ -5,7 +5,6 @@ import {
   CRIT_TIER_CONFIG,
   isOvertimeGaugeVisible,
   isOvertimeCancelArmed,
-  getOvertimeFillFraction,
   getOvertimeDisplayTicks,
   getOvertimeDisplayGoal,
   isFrozenActive,
@@ -17,6 +16,7 @@ import {
   getPriceMatchCost,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
+import { mergeFlashWhite } from "../../shared/mergeFlash";
 import {
   officeUpgradeSpeedMultiplier,
   effectiveIncomeCycle as sharedEffectiveIncomeCycle,
@@ -109,6 +109,65 @@ function incomeBarPressScale(floor: Floor, now: number): number {
       Math.exp(-BAR_PRESS_DECAY * t) *
       Math.cos(BAR_PRESS_FREQUENCY * t)
   );
+}
+
+// overtime ticks already credited but still riding coins toward the bar, so the
+// readout only climbs as each coin lands (see floorInteractions' overtime click)
+const pendingOvertimeTicks = new WeakMap<
+  Floor,
+  { ticks: number; queuedAt: number }
+>();
+// longer than any homing coin's flight, so an evicted coin can't pin the readout
+const PENDING_OVERTIME_MAX_AGE_MS = 2500;
+const overtimeFlashedAt = new WeakMap<Floor, number>();
+const OVERTIME_FLASH_MS = 700;
+
+export function queueOvertimeTickDelivery(floor: Floor, ticks: number): void {
+  const pending = pendingOvertimeTicks.get(floor)?.ticks ?? 0;
+  pendingOvertimeTicks.set(floor, {
+    ticks: pending + ticks,
+    queuedAt: Date.now(),
+  });
+}
+
+export function deliverOvertimeTicks(floor: Floor, ticks: number): void {
+  const pending = pendingOvertimeTicks.get(floor);
+  if (pending) pending.ticks = Math.max(0, pending.ticks - ticks);
+  overtimeFlashedAt.set(floor, Date.now());
+}
+
+export function clearOvertimeTickDelivery(floor: Floor): void {
+  pendingOvertimeTicks.delete(floor);
+}
+
+function pendingOvertimeTicksFor(floor: Floor, now: number): number {
+  const pending = pendingOvertimeTicks.get(floor);
+  if (!pending) return 0;
+  if (now - pending.queuedAt > PENDING_OVERTIME_MAX_AGE_MS) {
+    pendingOvertimeTicks.delete(floor);
+    return 0;
+  }
+  return pending.ticks;
+}
+
+function shownOvertimeTicks(floor: Floor, now: number): number {
+  return Math.max(
+    0,
+    getOvertimeDisplayTicks(floor, now) - pendingOvertimeTicksFor(floor, now),
+  );
+}
+
+// 1 right as a coin lands, fading to 0 — same white wiggle the total-income
+// readout does when bonus coins merge into it
+function overtimeFlashStrength(floor: Floor, now: number): number {
+  const flashedAt = overtimeFlashedAt.get(floor);
+  if (flashedAt === undefined) return 0;
+  const elapsed = now - flashedAt;
+  if (elapsed >= OVERTIME_FLASH_MS) {
+    overtimeFlashedAt.delete(floor);
+    return 0;
+  }
+  return 1 - elapsed / OVERTIME_FLASH_MS;
 }
 
 // when each floor's current fill cycle started is floor.lastCollectedAt itself (a
@@ -332,7 +391,7 @@ function formatStaticIncomeRate(floor: Floor, now: number): string {
 // Reads the same drain-aware value/goal the bar's own fill fraction uses, so the
 // number (and its own max) tick down/scale in lockstep with the bar itself
 function formatOvertimeProgress(floor: Floor, now: number): string {
-  return `${Math.floor(getOvertimeDisplayTicks(floor, now))}/${getOvertimeDisplayGoal(floor)}`;
+  return `${Math.floor(shownOvertimeTicks(floor, now))}/${getOvertimeDisplayGoal(floor)}`;
 }
 
 // the overtime gauge's own fill look: a two-color gradient spanning the WHOLE
@@ -498,11 +557,16 @@ export function drawIncomePanel(
   const overtimeGaugeVisible =
     floor.unlocked && isOvertimeGaugeVisible(floor, now);
   const cancellationArmed = isOvertimeCancelArmed(floor, now);
+  const flashStrength = overtimeGaugeVisible
+    ? overtimeFlashStrength(floor, now)
+    : 0;
 
   ctx.save();
   const barCenter = getIncomeBarCenter(isGroundFloor);
   ctx.translate(barCenter.x, barCenter.y);
   if (cancellationArmed) ctx.rotate(getWiggleRotation(now));
+  else if (flashStrength > 0)
+    ctx.rotate(getWiggleRotation(now) * flashStrength);
   const pressScale = incomeBarPressScale(floor, now);
   ctx.scale(pressScale, pressScale);
   ctx.translate(-barCenter.x, -barCenter.y);
@@ -523,7 +587,11 @@ export function drawIncomePanel(
   let fillW = barMinWidth;
   let overspeed = false;
   if (overtimeGaugeVisible) {
-    fillW = Math.max(barMinWidth, barW * getOvertimeFillFraction(floor, now));
+    const goal = getOvertimeDisplayGoal(floor);
+    fillW = Math.max(
+      barMinWidth,
+      barW * Math.min(1, shownOvertimeTicks(floor, now) / goal),
+    );
   } else if (floor.unlocked) {
     const cycle = effectiveIncomeCycle(floor, timerNow);
     overspeed = cycle.overspeed;
@@ -543,6 +611,13 @@ export function drawIncomePanel(
     : COLOR.moneyGreen;
   if (overtimeGaugeVisible) {
     drawGaugeFill(ctx, floor, barX, barY, barW, barH, barRadius, fillW);
+    if (flashStrength > 0) {
+      ctx.globalAlpha = mergeFlashWhite(flashStrength, now);
+      roundRect(ctx, barX, barY, fillW, barH, barRadius);
+      ctx.fillStyle = COLOR.white;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
   } else {
     drawPill(ctx, barX, barY, fillW, barH, fillColor, false, true, barRadius);
   }

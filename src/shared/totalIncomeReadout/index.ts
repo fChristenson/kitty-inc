@@ -6,7 +6,10 @@ import {
   shadeColor,
 } from "../../utils";
 import type { BigNumber } from "../bigNumber";
-import { getHudTotalFlashStrength } from "../../bonusTierFx";
+import {
+  getHudTotalFlashStrength,
+  getHudTotalWhiteMix,
+} from "../../bonusTierFx";
 import { getWiggleRotation } from "../wiggle";
 
 // shared "amount + spelled-out unit name below it" total-income drawing, used by
@@ -87,10 +90,9 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     // amplitude fade back to normal together instead of snapping off
     const now = Date.now();
     const flashStrength = getHudTotalFlashStrength(now);
+    const whiteMix = getHudTotalWhiteMix(now);
     const textColor =
-      flashStrength > 0
-        ? shadeColor(COLOR.moneyGreen, flashStrength)
-        : COLOR.moneyGreen;
+      whiteMix > 0 ? shadeColor(COLOR.moneyGreen, whiteMix) : COLOR.moneyGreen;
     const wiggleRotation =
       flashStrength > 0 ? getWiggleRotation(now) * flashStrength : 0;
 

@@ -8,6 +8,7 @@
 // module (like screenShake.ts/coinBurst) avoids a floors->background,
 // floors->hud, or hud->background module-boundary violation.
 import { loadImageByName } from "../loadAssets";
+import { mergeFlashWhite } from "../shared/mergeFlash";
 
 let coinIcon: HTMLImageElement | null = null;
 loadImageByName("coin").then((image) => {
@@ -163,14 +164,33 @@ export function triggerHudTotalFlash(): void {
   hudFlashStartedAt = Date.now();
 }
 
+let hudPulseAt: number | null = null;
+const HUD_PULSE_FADE_MS = 700;
+
+// call per coin landing in the total (e.g. sale clicks) — keeps the flash
+// alive while coins stream in, fading shortly after the last one
+export function pulseHudTotalFlash(): void {
+  hudPulseAt = Date.now();
+}
+
 // 1 (just triggered) fading linearly down to 0 (back to normal) — hud/'s own
-// readout blends its text color toward white and scales its wiggle by this
+// readout scales its wiggle by this
 export function getHudTotalFlashStrength(now: number): number {
-  if (hudFlashStartedAt === null) return 0;
-  const elapsed = now - hudFlashStartedAt;
-  if (elapsed >= HUD_FLASH_DURATION_MS) {
-    hudFlashStartedAt = null;
-    return 0;
+  let strength = 0;
+  if (hudFlashStartedAt !== null) {
+    const elapsed = now - hudFlashStartedAt;
+    if (elapsed >= HUD_FLASH_DURATION_MS) hudFlashStartedAt = null;
+    else strength = 1 - elapsed / HUD_FLASH_DURATION_MS;
   }
-  return 1 - elapsed / HUD_FLASH_DURATION_MS;
+  if (hudPulseAt !== null) {
+    const elapsed = now - hudPulseAt;
+    if (elapsed >= HUD_PULSE_FADE_MS) hudPulseAt = null;
+    else strength = Math.max(strength, 1 - elapsed / HUD_PULSE_FADE_MS);
+  }
+  return strength;
+}
+
+// how far the readout's text blends toward white right now
+export function getHudTotalWhiteMix(now: number): number {
+  return mergeFlashWhite(getHudTotalFlashStrength(now), now);
 }

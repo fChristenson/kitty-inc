@@ -40,7 +40,27 @@ interface Particle extends CoinBurstSprite {
   gravityRamp: number; // how fast gravity ramps up with age; lower for bills (paper) than coins (metal)
   spinRate: number; // this particle's own frames/tick speed
   spinDir: 1 | -1; // picked once per coin so a burst doesn't spin in lockstep
+  homing?: HomingFlight;
 }
+
+export interface HomingBurstOptions {
+  // floor-local point to fly into; omitted means drawCoins' homeTarget (the total)
+  target?: { x: number; y: number };
+  onFirstArrive?: () => void;
+  onEachArrive?: () => void;
+}
+
+interface HomingGroup extends HomingBurstOptions {
+  fired: boolean;
+}
+
+interface HomingFlight {
+  burstLife: number; // ticks spent bursting out before being pulled in
+  group: HomingGroup;
+}
+
+const HOMING_FLIGHT_TICKS = 32;
+const HOMING_END_RADIUS = 8;
 
 const pool = createParticlePool<Particle>(MAX_PARTICLES);
 
@@ -51,29 +71,66 @@ export function hasActiveCoins(): boolean {
 // draws every particle onto a full-viewport overlay canvas (so a burst can never be
 // clipped by the floor it started on), mapping each particle's floor-local x/y through
 // getFloorRect(floor) — the floor's current on-screen rect in the overlay's own CSS
-// pixel space, null if that floor isn't currently mounted/visible
+// pixel space, null if that floor isn't currently mounted/visible. homeTarget is
+// where homing coins (see spawnHomingCoinBurst) end up, in that same space
 export function drawCoins(
   ctx: CanvasRenderingContext2D,
   getFloorRect: (
     floor: Floor,
   ) => { left: number; top: number; width: number } | null,
+  homeTarget?: { x: number; y: number },
 ): void {
   for (const p of pool.list) {
     const rect = getFloorRect(p.floor);
     if (!rect) continue;
     const scale = rect.width / FLOOR_W;
-    const px = rect.left + p.x * scale;
-    const py = rect.top + p.y * scale;
+    let px = rect.left + p.x * scale;
+    let py = rect.top + p.y * scale;
 
     const t = p.life / p.maxLife;
-    const radius = p.size * (1 - t * 0.3) * scale;
-    ctx.globalAlpha = Math.max(0, 1 - t);
+    let radius = p.size * (1 - t * 0.3) * scale;
+    const groupTarget = p.homing?.group.target;
+    const target = groupTarget
+      ? {
+          x: rect.left + groupTarget.x * scale,
+          y: rect.top + groupTarget.y * scale,
+        }
+      : homeTarget;
+    if (p.homing && target) {
+      const flight = Math.max(
+        0,
+        (p.life - p.homing.burstLife) / HOMING_FLIGHT_TICKS,
+      );
+      // accelerates in, so it reads as being pulled into the target
+      const eased = Math.min(1, flight) ** 2;
+      const burstRadius = p.size * scale;
+      px += (target.x - px) * eased;
+      py += (target.y - py) * eased;
+      radius = burstRadius + (HOMING_END_RADIUS - burstRadius) * eased;
+      ctx.globalAlpha = 1;
+    } else {
+      ctx.globalAlpha = Math.max(0, 1 - t);
+    }
     drawCoinBurstFrame(ctx, p, px, py, radius);
   }
   ctx.globalAlpha = 1;
 }
 
 function advanceCoin(p: Particle, dt: number): void {
+  if (p.homing && p.life >= p.homing.burstLife) {
+    // mid-flight: drawCoins owns the position, only the spin keeps going
+    p.life += dt;
+    p.spinFrame += p.spinDir * p.spinRate * dt;
+    const { group } = p.homing;
+    if (p.life >= p.maxLife) {
+      group.onEachArrive?.();
+      if (!group.fired) {
+        group.fired = true;
+        group.onFirstArrive?.();
+      }
+    }
+    return;
+  }
   p.x += p.vx * dt;
   p.y += p.vy * dt;
   // gravity ramps up with age so coins pop up, then drop heavily rather than
@@ -134,4 +191,49 @@ export function spawnCoinBurst(
     pool.update(dt, advanceCoin);
     onFrame();
   });
+}
+
+// same pop-out as spawnCoinBurst, but every coin then gets pulled into a
+// target instead of falling away. Returns how many coins were spawned
+export function spawnHomingCoinBurst(
+  floor: Floor,
+  x: number,
+  y: number,
+  options: HomingBurstOptions,
+): number {
+  const group: HomingGroup = { ...options, fired: false };
+  const count = randomInt(18, 28);
+  for (let i = 0; i < count; i++) {
+    const angle = -Math.random() * Math.PI;
+    const speed = 3 + Math.random() * 12;
+    const kind: "coin" | "bill" =
+      Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
+    // staggered so the coins stream into the total instead of landing at once
+    const burstLife = 14 + Math.random() * 22;
+    pool.spawn({
+      floor,
+      x: x + (Math.random() - 0.5) * 20,
+      y: y + (Math.random() - 0.5) * 20,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0,
+      maxLife: burstLife + HOMING_FLIGHT_TICKS,
+      size: (22 + Math.random() * 40) * 1.15 * 1.25,
+      gravity: 0.1 + Math.random() * 0.15,
+      gravityRamp: 0,
+      kind,
+      spinFrame:
+        Math.random() *
+        (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
+      spinRate: MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE),
+      spinDir: Math.random() < 0.5 ? 1 : -1,
+      axisAngle: (Math.random() * 2 - 1) * (Math.PI / 2),
+      homing: { burstLife, group },
+    });
+  }
+
+  pool.ensureTicking((dt) => {
+    pool.update(dt, advanceCoin);
+  });
+  return count;
 }

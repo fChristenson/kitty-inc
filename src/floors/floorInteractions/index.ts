@@ -76,6 +76,10 @@ import {
   triggerIncomeBarPress,
   currentPayoutAmount,
   currentIncomeRatePerSecond,
+  getIncomeBarCenter,
+  queueOvertimeTickDelivery,
+  deliverOvertimeTicks,
+  clearOvertimeTickDelivery,
 } from "../incomePanel";
 import {
   spendTotalIncome,
@@ -88,7 +92,11 @@ import {
   getActiveCompanyInvestedValue,
 } from "../../totalIncome";
 import { getActiveCompanyIndex } from "../../company";
-import { spawnCoinBurst as animateCoinBurst } from "../coins";
+import {
+  spawnCoinBurst as animateCoinBurst,
+  spawnHomingCoinBurst as animateHomingCoinBurst,
+} from "../coins";
+import { pulseHudTotalFlash } from "../../bonusTierFx";
 import { spawnFloatingCoins } from "../coinFloat";
 import { spawnIncomeFloatText } from "../incomeFloatText";
 import { getUpgradeIndicatorCenter } from "../star";
@@ -137,6 +145,31 @@ import {
 import { triggerCritCelebration } from "./critCelebration";
 
 const spawnCoinBurst = liveEffect(animateCoinBurst);
+const spawnHomingCoinBurst = liveEffect(animateHomingCoinBurst);
+// each landing coin hands the bar its share of the ticks, so the readout climbs
+// in step with the coins instead of jumping on the click
+const spawnOvertimeCoins = liveEffect(
+  (
+    floor: Floor,
+    x: number,
+    y: number,
+    isGroundFloor: boolean,
+    ticks: number,
+  ) => {
+    queueOvertimeTickDelivery(floor, ticks);
+    let remaining = ticks;
+    let coinsLeft = 0;
+    coinsLeft = animateHomingCoinBurst(floor, x, y, {
+      target: getIncomeBarCenter(isGroundFloor),
+      onEachArrive: () => {
+        const share = coinsLeft > 1 ? remaining / coinsLeft : remaining;
+        remaining -= share;
+        coinsLeft -= 1;
+        deliverOvertimeTicks(floor, share);
+      },
+    });
+  },
+);
 const triggerButtonPress = liveEffect(animateButtonPress);
 const triggerJumpAll = liveEffect(animateJumpAll);
 const playSold = liveEffect(soundSold);
@@ -1634,7 +1667,9 @@ export function handleFloorClick(
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
       const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
-      spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
+      spawnHomingCoinBurst(floor, center.x + jitterX, center.y + jitterY, {
+        onEachArrive: pulseHudTotalFlash,
+      });
       spawnIncomeFloatText(
         floor,
         center.x,
@@ -1653,7 +1688,9 @@ export function handleFloorClick(
       const tier = getCritTier(floor);
       if (tier) consumeCritUpgrade(floor);
       const ticks = tier ? CRIT_TIER_CONFIG[tier].multiplier : 1;
+      const ticksBefore = getOvertimeTicks(floor);
       addOvertimeTicks(floor, ticks);
+      const ticksAdded = getOvertimeTicks(floor) - ticksBefore;
       // re-arm the next crit for AFTER this overtime run ends without
       // letting it also roll a piggyback proc while a special event is
       // already active (see shared/critTypes' rollCrit's own
@@ -1697,6 +1734,7 @@ export function handleFloorClick(
           floor.critMultiplierTier = promotedTier;
         }
         endOvertimeActiveWindow(floor, Date.now());
+        clearOvertimeTickDelivery(floor);
       }
       persist();
       triggerButtonPress(floor);
@@ -1713,7 +1751,17 @@ export function handleFloorClick(
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
       const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
-      spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
+      if (goalReached || ticksAdded <= 0) {
+        spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
+      } else {
+        spawnOvertimeCoins(
+          floor,
+          center.x + jitterX,
+          center.y + jitterY,
+          isGroundFloor,
+          ticksAdded,
+        );
+      }
       spawnIncomeFloatText(
         floor,
         center.x,

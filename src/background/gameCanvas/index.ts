@@ -494,7 +494,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     drawWorldClouds(performance.now());
     drawActiveFloors();
 
-    if (hasActiveCoins()) drawCoins(ctx, getFloorRect);
+    if (hasActiveCoins())
+      drawCoins(ctx, getFloorRect, {
+        x: SLOT_W / 2,
+        y: viewportTopY() + HUD_H / 2,
+      });
 
     ctx.restore();
 
