@@ -7,7 +7,7 @@
 // price growth is paused
 import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
-import { createTimedFloorEvent } from "./shared";
+import { createTimedFloorEvent } from "../../shared/floorEvents";
 
 export const FROZEN_DURATION_MS = CONFIG.crit.frozenDurationMs;
 

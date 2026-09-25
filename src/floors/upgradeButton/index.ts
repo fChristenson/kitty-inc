@@ -4,24 +4,23 @@
 // unchanged; only this directory's own internal layout changed.
 //
 // Layout:
-//   shared.ts   — button geometry/hit-testing, press+hold animations, and the
-//                 "event crit" framework (createTimedFloorEvent,
-//                 registerEventButton/getActiveEventButton) every event file
-//                 below plugs into.
+//   shared.ts   — button geometry/hit-testing and press+hold animations. The
+//                 "event crit" framework every event file below plugs into
+//                 lives in src/shared/floorEvents.
 //   crit.ts     — the base crit-TIER system (x5/x25/x125 rolls + every
 //                 piggyback proc's dev-test force helper).
 //   sale.ts / overtime.ts — one file per "event crit" (a temporary window
 //                 that takes over the button's own color/label/wiggle while
 //                 active). Adding a new one is just a new file in this same
-//                 shape — see shared.ts's own "event crit framework" comment
+//                 shape — see shared/floorEvents' own header comment
 //                 for the exact recipe. Every OTHER piggyback proc (including
 //                 Snowball/Frozen, both formerly event crits here) is a flat,
 //                 not-button-appearance-changing proc with no file of its
 //                 own in this folder — its state (if any beyond a plain
 //                 landed/not-landed flag) lives in shared/critTypes instead.
 //
-// Import order below is also the event-button PRIORITY order (see shared.ts's
-// registerEventButton) for the rare case more than one is active on the same
+// Import order below is also the event-button PRIORITY order (see
+// shared/floorEvents' registerEventButton) for the rare case more than one is active on the same
 // floor at once — keep sale/overtime in this order unless deliberately
 // reprioritizing.
 import { drawCartoonText, drawPill, formatPrice } from "../../utils";
@@ -36,8 +35,8 @@ import {
   getBtnY,
   pressScale,
   stepHoldAnim,
-  getActiveEventButton,
 } from "./shared";
+import { getActiveEventButton } from "../../shared/floorEvents";
 import { getCritTier, CRIT_TIER_CONFIG, type CritTier } from "./crit";
 import "./sale";
 import "./overtime";

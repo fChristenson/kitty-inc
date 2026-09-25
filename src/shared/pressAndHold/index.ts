@@ -10,6 +10,13 @@ export interface PressAndHoldController {
   stop: () => void;
 }
 
+// the one long-press repeat rate; every hold-to-repeat control and the
+// animations that keep pace with it derive their timing from this
+export const LONG_PRESS_TICK_MS = 33;
+// event-click coins land this many long-press ticks after their click (~0.3s),
+// so a held button's readout trails its clicks by one fixed beat
+export const LONG_PRESS_COIN_ARRIVE_MS = LONG_PRESS_TICK_MS * 9;
+
 export function startPressAndHold(
   onFire: () => void,
   intervalMs: number,

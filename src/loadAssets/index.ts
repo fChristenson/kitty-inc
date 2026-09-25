@@ -192,89 +192,89 @@ export const IMAGE_FILES = {
   skyscraper: "skyscraper.png", // Create new Company / Renovate floors icon
   cashRegister: "cashRegister.png", // Trigger sales event's own menu icon
   clock: "clock.png", // Work overtime's own menu icon
-  chain: "chain.png", // Chain crit flash's own backdrop icon
-  dominoEffect: "dominoEffect.png", // Domino Effect crit flash's own backdrop icon
-  blueprint: "blueprint.png", // Blueprint crit flash's own backdrop icon
-  executiveBonus: "executiveBonus.png", // Executive Bonus crit flash's own backdrop icon
-  powerSurge: "powerSurge.png", // Power Surge crit flash's own backdrop icon
-  priceMatch: "priceMatch.png", // Price Match crit flash's own backdrop icon
-  firstClass: "firstClass.png", // First Class crit flash's own backdrop icon
-  ball: "ball.png", // Bounce crit flash's own backdrop icon
-  explosion: "explosion.png", // Explosion crit flash's own backdrop icon
-  booty: "booty.png", // Booty crit flash's own backdrop icon
-  cashFlow: "cashFlow.png", // Cash Flow crit flash's own backdrop icon
-  upgrade: "upgrade.png", // Upgrade crit flash's own backdrop icon
-  peppermint: "peppermint.png", // Peppermint crit flash's own backdrop icon
-  heaven: "heaven.png", // Heavenly crit flash's own backdrop icon
-  skip: "skip.png", // Skip crit flash's own backdrop icon
-  mystic: "mystic.png", // Mystic crit flash's own backdrop icon
-  keynote: "keynote.png", // Keynote crit flash's own backdrop icon
-  pair: "pair.png", // Pair crit flash's own backdrop icon
-  threeOfAKind: "threeOfAKind.png", // Three of a Kind crit flash's own backdrop icon
-  fourOfAKind: "fourOfAKind.png", // Four of a Kind crit flash's own backdrop icon
-  fullHouse: "fullHouse.png", // Full House crit flash's own backdrop icon
-  royalFlush: "royalFlush.png", // Royal Flush crit flash's own backdrop icon
-  winter: "christmasTree.png", // Winter Sale crit flash's own backdrop icon
-  spring: "spring.png", // Spring Sale crit flash's own backdrop icon
-  summer: "summer.png", // Summer Sale crit flash's own backdrop icon
-  autumn: "fall.png", // Autumn Sale crit flash's own backdrop icon
-  halloween: "halloween.png", // Halloween Sale crit flash's own backdrop icon
-  sunny: "sunny.png", // Sunshine crit flash's own backdrop icon
-  snowman: "snowman.png", // Snowday crit flash's own backdrop icon
-  fastforward: "fastforward.png", // Fast Forward crit flash's own backdrop icon
-  icecube: "icecube.png", // Frozen crit flash's own backdrop icon
-  spendingFreeze: "spendingFreeze.png", // Spending Freeze crit flash's own backdrop icon
-  snowball: "snowball.png", // Snowball crit flash's own backdrop icon
-  bull: "bull.png", // Bull Market crit flash's own backdrop icon
-  payday: "payday.png", // Payday crit flash's own backdrop icon
-  goldStandard: "goldStandard.png", // Gold Standard crit flash's own backdrop icon
-  sleepyMoon: "sleepyMoon.png", // Night Shift crit flash's own backdrop icon
-  intern: "intern.png", // Intern crit flash's own backdrop icon
-  talentScout: "talentScout.png", // Talent Scout crit flash's own backdrop icon
-  unionBoss: "unionBoss.png", // Union Boss crit flash's own backdrop icon
-  easterBunny: "easterBunny.png", // Easter Sale crit flash's own backdrop icon
-  sportscar: "sportscar.png", // Rush Hour crit flash's own backdrop icon
-  rateLock: "rateLock.png", // Rate Lock crit flash's own backdrop icon
-  goldenTicket: "goldenTicket.png", // Golden Ticket crit flash's own backdrop icon
-  silverTicket: "silverTicket.png", // Silver Ticket crit flash's own backdrop icon
-  goldenParachute: "goldenParachute.png", // Golden Parachute crit flash's own backdrop icon
-  rainCheck: "rainCheck.png", // Rain Check crit flash's own backdrop icon
-  payout: "payout.png", // Payout crit flash's own backdrop icon
-  grandOpening: "grandOpening.png", // Grand Opening crit flash's own backdrop icon
-  fullyStaffed: "fullyStaffed.png", // Fully Staffed crit flash's own backdrop icon
-  shiftChange: "shiftChange.png", // Shift Change crit flash's own backdrop icon
-  espressoShot: "espressoShot.png", // Espresso Shot crit flash's own backdrop icon
-  dejaVu: "dejaVu.png", // Deja Vu crit flash's own backdrop icon
-  cloneArmy: "cloneArmy.png", // Reinforcements crit flash's own backdrop icon
-  luckyClover: "luckyClover.png", // Lucky Clover crit flash's own backdrop icon
-  secondWind: "secondWind.png", // Second Wind crit flash's own backdrop icon
-  executiveOrder: "executiveOrder.png", // Executive Order crit flash's own backdrop icon
-  roundUp: "roundUp.png", // Round Up crit flash's own backdrop icon
-  safetyNet: "safetyNet.png", // Safety Net crit flash's own backdrop icon
-  floorShare: "floorShare.png", // Floor Share crit flash's own backdrop icon
-  sameBoat: "sameBoat.png", // Same Boat crit flash's own backdrop icon
-  goldenHandshake: "goldenHandshake.png", // Golden Handshake crit flash's own backdrop icon
-  supplyRun: "supplyRun.png", // Supply Run crit flash's own backdrop icon
-  casualFriday: "casualFriday.png", // Casual Friday crit flash's own backdrop icon
-  fancyFriday: "fancyFriday.png", // Fancy Friday crit flash's own backdrop icon
-  fireDrill: "fireDrill.png", // Fire Drill crit flash's own backdrop icon
-  bonusRound: "bonusRound.png", // Bonus Round crit flash's own backdrop icon
-  overflow: "overflow.png", // Overflow crit flash's own backdrop icon
-  performanceBonus: "performanceBonus.png", // Performance Bonus crit flash's own backdrop icon
-  doubleDown: "doubleDown.png", // Double Down crit flash's own backdrop icon
-  coffeeRun: "coffeeRun.png", // Coffee Run crit flash's own backdrop icon
-  teamBuilding: "teamBuilding.png", // Team Building crit flash's own backdrop icon
-  teamLunch: "teamLunch.png", // Team Lunch crit flash's own backdrop icon
-  springCleaning: "springCleaning.png", // Spring Cleaning crit flash's own backdrop icon
-  nightOwl: "nightOwl.png", // Night Owl crit flash's own backdrop icon
-  headhunter: "headhunter.png", // Headhunter crit flash's own backdrop icon
-  dressCode: "dressCode.png", // Dress Code crit flash's own backdrop icon
-  teaBreak: "teaBreak.png", // Tea Break crit flash's own backdrop icon
-  recruitmentDrive: "recruitmentDrive.png", // Recruitment Drive crit flash's own backdrop icon
-  merger: "merger.png", // Merger crit flash's own backdrop icon
-  shareholders: "sharedholders.png", // Shareholders crit flash's own backdrop icon
-  luckyNumber: "luckyNumber.png", // Lucky Number crit flash's own backdrop icon
-  openBook: "openBook.png", // Open Book crit flash's own backdrop icon
+  chain: "crits/classics/chain.png", // Chain crit flash's own backdrop icon
+  dominoEffect: "crits/classics/dominoEffect.png", // Domino Effect crit flash's own backdrop icon
+  blueprint: "crits/classics/blueprint.png", // Blueprint crit flash's own backdrop icon
+  executiveBonus: "crits/riches/executiveBonus.png", // Executive Bonus crit flash's own backdrop icon
+  powerSurge: "crits/classics/powerSurge.png", // Power Surge crit flash's own backdrop icon
+  priceMatch: "crits/riches/priceMatch.png", // Price Match crit flash's own backdrop icon
+  firstClass: "crits/classics/firstClass.png", // First Class crit flash's own backdrop icon
+  ball: "crits/classics/ball.png", // Bounce crit flash's own backdrop icon
+  explosion: "crits/classics/explosion.png", // Explosion crit flash's own backdrop icon
+  booty: "crits/riches/booty.png", // Booty crit flash's own backdrop icon
+  cashFlow: "crits/riches/cashFlow.png", // Cash Flow crit flash's own backdrop icon
+  upgrade: "crits/classics/upgrade.png", // Upgrade crit flash's own backdrop icon
+  peppermint: "crits/classics/peppermint.png", // Peppermint crit flash's own backdrop icon
+  heaven: "crits/classics/heaven.png", // Heavenly crit flash's own backdrop icon
+  skip: "crits/classics/skip.png", // Skip crit flash's own backdrop icon
+  mystic: "crits/classics/mystic.png", // Mystic crit flash's own backdrop icon
+  keynote: "crits/office/keynote.png", // Keynote crit flash's own backdrop icon
+  pair: "crits/gamesOfChance/pair.png", // Pair crit flash's own backdrop icon
+  threeOfAKind: "crits/gamesOfChance/threeOfAKind.png", // Three of a Kind crit flash's own backdrop icon
+  fourOfAKind: "crits/gamesOfChance/fourOfAKind.png", // Four of a Kind crit flash's own backdrop icon
+  fullHouse: "crits/gamesOfChance/fullHouse.png", // Full House crit flash's own backdrop icon
+  royalFlush: "crits/gamesOfChance/royalFlush.png", // Royal Flush crit flash's own backdrop icon
+  winter: "crits/seasons/christmasTree.png", // Winter Sale crit flash's own backdrop icon
+  spring: "crits/seasons/spring.png", // Spring Sale crit flash's own backdrop icon
+  summer: "crits/seasons/summer.png", // Summer Sale crit flash's own backdrop icon
+  autumn: "crits/seasons/fall.png", // Autumn Sale crit flash's own backdrop icon
+  halloween: "crits/seasons/halloween.png", // Halloween Sale crit flash's own backdrop icon
+  sunny: "crits/seasons/sunny.png", // Sunshine crit flash's own backdrop icon
+  snowman: "crits/seasons/snowman.png", // Snowday crit flash's own backdrop icon
+  fastforward: "crits/classics/fastforward.png", // Fast Forward crit flash's own backdrop icon
+  icecube: "crits/seasons/icecube.png", // Frozen crit flash's own backdrop icon
+  spendingFreeze: "crits/seasons/spendingFreeze.png", // Spending Freeze crit flash's own backdrop icon
+  snowball: "crits/seasons/snowball.png", // Snowball crit flash's own backdrop icon
+  bull: "crits/riches/bull.png", // Bull Market crit flash's own backdrop icon
+  payday: "crits/riches/payday.png", // Payday crit flash's own backdrop icon
+  goldStandard: "crits/riches/goldStandard.png", // Gold Standard crit flash's own backdrop icon
+  sleepyMoon: "crits/seasons/sleepyMoon.png", // Night Shift crit flash's own backdrop icon
+  intern: "crits/office/intern.png", // Intern crit flash's own backdrop icon
+  talentScout: "crits/office/talentScout.png", // Talent Scout crit flash's own backdrop icon
+  unionBoss: "crits/office/unionBoss.png", // Union Boss crit flash's own backdrop icon
+  easterBunny: "crits/seasons/easterBunny.png", // Easter Sale crit flash's own backdrop icon
+  sportscar: "crits/classics/sportscar.png", // Rush Hour crit flash's own backdrop icon
+  rateLock: "crits/riches/rateLock.png", // Rate Lock crit flash's own backdrop icon
+  goldenTicket: "crits/goodLuck/goldenTicket.png", // Golden Ticket crit flash's own backdrop icon
+  silverTicket: "crits/goodLuck/silverTicket.png", // Silver Ticket crit flash's own backdrop icon
+  goldenParachute: "crits/riches/goldenParachute.png", // Golden Parachute crit flash's own backdrop icon
+  rainCheck: "crits/office/rainCheck.png", // Rain Check crit flash's own backdrop icon
+  payout: "crits/riches/payout.png", // Payout crit flash's own backdrop icon
+  grandOpening: "crits/office/grandOpening.png", // Grand Opening crit flash's own backdrop icon
+  fullyStaffed: "crits/office/fullyStaffed.png", // Fully Staffed crit flash's own backdrop icon
+  shiftChange: "crits/office/shiftChange.png", // Shift Change crit flash's own backdrop icon
+  espressoShot: "crits/office/espressoShot.png", // Espresso Shot crit flash's own backdrop icon
+  dejaVu: "crits/classics/dejaVu.png", // Deja Vu crit flash's own backdrop icon
+  cloneArmy: "crits/office/cloneArmy.png", // Reinforcements crit flash's own backdrop icon
+  luckyClover: "crits/goodLuck/luckyClover.png", // Lucky Clover crit flash's own backdrop icon
+  secondWind: "crits/office/secondWind.png", // Second Wind crit flash's own backdrop icon
+  executiveOrder: "crits/office/executiveOrder.png", // Executive Order crit flash's own backdrop icon
+  roundUp: "crits/office/roundUp.png", // Round Up crit flash's own backdrop icon
+  safetyNet: "crits/office/safetyNet.png", // Safety Net crit flash's own backdrop icon
+  floorShare: "crits/office/floorShare.png", // Floor Share crit flash's own backdrop icon
+  sameBoat: "crits/office/sameBoat.png", // Same Boat crit flash's own backdrop icon
+  goldenHandshake: "crits/riches/goldenHandshake.png", // Golden Handshake crit flash's own backdrop icon
+  supplyRun: "crits/office/supplyRun.png", // Supply Run crit flash's own backdrop icon
+  casualFriday: "crits/office/casualFriday.png", // Casual Friday crit flash's own backdrop icon
+  fancyFriday: "crits/office/fancyFriday.png", // Fancy Friday crit flash's own backdrop icon
+  fireDrill: "crits/office/fireDrill.png", // Fire Drill crit flash's own backdrop icon
+  bonusRound: "crits/gamesOfChance/bonusRound.png", // Bonus Round crit flash's own backdrop icon
+  overflow: "crits/riches/overflow.png", // Overflow crit flash's own backdrop icon
+  performanceBonus: "crits/riches/performanceBonus.png", // Performance Bonus crit flash's own backdrop icon
+  doubleDown: "crits/gamesOfChance/doubleDown.png", // Double Down crit flash's own backdrop icon
+  coffeeRun: "crits/office/coffeeRun.png", // Coffee Run crit flash's own backdrop icon
+  teamBuilding: "crits/office/teamBuilding.png", // Team Building crit flash's own backdrop icon
+  teamLunch: "crits/office/teamLunch.png", // Team Lunch crit flash's own backdrop icon
+  springCleaning: "crits/office/springCleaning.png", // Spring Cleaning crit flash's own backdrop icon
+  nightOwl: "crits/seasons/nightOwl.png", // Night Owl crit flash's own backdrop icon
+  headhunter: "crits/office/headhunter.png", // Headhunter crit flash's own backdrop icon
+  dressCode: "crits/office/dressCode.png", // Dress Code crit flash's own backdrop icon
+  teaBreak: "crits/office/teaBreak.png", // Tea Break crit flash's own backdrop icon
+  recruitmentDrive: "crits/office/recruitmentDrive.png", // Recruitment Drive crit flash's own backdrop icon
+  merger: "crits/riches/merger.png", // Merger crit flash's own backdrop icon
+  shareholders: "crits/riches/sharedholders.png", // Shareholders crit flash's own backdrop icon
+  luckyNumber: "crits/gamesOfChance/luckyNumber.png", // Lucky Number crit flash's own backdrop icon
+  openBook: "crits/office/openBook.png", // Open Book crit flash's own backdrop icon
   ballerina: "crits/showtime/ballerina.png",
   cowboy: "crits/showtime/cowboy.png",
   dinnerTime: "crits/showtime/dinnerTime.png",
@@ -936,6 +936,7 @@ export const IMAGE_FILES = {
   strudelCuddle: "crits/bakery/strudelCuddle.png",
   appleOfMyEye: "crits/bakery/appleOfMyEye.png",
   turnoverTreasure: "crits/bakery/turnoverTreasure.png",
+  androidAnalyst: "crits/cyberpunk/androidAnalyst.png",
   cocoaClout: "crits/chocolate/cocoaClout.png",
   shadesOfCocoa: "crits/chocolate/shadesOfCocoa.png",
   bigMugEnergy: "crits/chocolate/bigMugEnergy.png",

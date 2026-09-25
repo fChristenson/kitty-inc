@@ -17,8 +17,8 @@ import { createParticlePool } from "../../shared/particlePool";
 const MIN_SPIN_RATE = 0.04; // flipbook frames advanced per physics tick (~16.67ms)
 const MAX_SPIN_RATE = 0.12;
 // hard cap on simultaneously-active particles — a fast press-and-hold can fire a
-// full burst (40-85 particles) every ~10-50ms (see gameCanvas's
-// UPGRADE_HOLD_INTERVAL_MS), spawning particles far faster than a ~1-2s lifespan
+// full burst (40-85 particles) every long-press tick (see shared/pressAndHold's
+// LONG_PRESS_TICK_MS), spawning particles far faster than a ~1-2s lifespan
 // lets them expire; without this cap a sustained hold grows the array (and every
 // frame's update/draw cost) without bound instead of settling at a steady state
 const MAX_PARTICLES = 750;
@@ -48,10 +48,11 @@ export interface HomingBurstOptions {
   target?: { x: number; y: number };
   onFirstArrive?: () => void;
   onEachArrive?: () => void;
-  // ~16.67ms ticks: how long coins pop out (random within [min, max]) and how
-  // long they then take to fly in
+  // ~16.67ms ticks: how long coins pop out (random within [min, max]), and the
+  // fixed tick every coin lands on — so a click's coins always arrive exactly
+  // that long after it, keeping a held button's readout in step with its clicks
   burstTicks?: [number, number];
-  flightTicks?: number;
+  arriveTicks?: number;
 }
 
 interface HomingGroup extends HomingBurstOptions {
@@ -225,8 +226,10 @@ export function spawnHomingCoinBurst(
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
     // staggered so the coins stream into the total instead of landing at once
     const [minBurst, maxBurst] = options.burstTicks ?? HOMING_BURST_TICKS;
-    const flightTicks = options.flightTicks ?? HOMING_FLIGHT_TICKS;
     const burstLife = minBurst + Math.random() * (maxBurst - minBurst);
+    const flightTicks = options.arriveTicks
+      ? Math.max(1, options.arriveTicks - burstLife)
+      : HOMING_FLIGHT_TICKS;
     pool.spawn({
       floor,
       x: x + (Math.random() - 0.5) * 20,

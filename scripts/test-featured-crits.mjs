@@ -63,7 +63,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 747 + elementCritBatch.length);
+  assert.equal(kinds.length, 748 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -949,6 +949,7 @@ try {
     strudelCuddle: [[20, 30, 34, 0], 32],
     appleOfMyEye: [[20, 30, 10, 0], 129],
     turnoverTreasure: [[20, 30, 10, 0], 147],
+    androidAnalyst: [[20, 53, 10, 0], 72],
     cocoaClout: [[20, 52, 10, 0], 60],
     shadesOfCocoa: [[20, 30, 10, 0], 129],
     bigMugEnergy: [[56, 66, 46, 0], 0],

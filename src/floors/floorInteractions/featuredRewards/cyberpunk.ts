@@ -94,5 +94,11 @@ export function createCyberpunkRewards({
       actions.upgrade([context.floor], balance.circuitBreakerUpgrades),
     roboticGripper: (context) =>
       actions.upgrade([context.floor], balance.roboticGripperUpgrades),
+    androidAnalyst: (context) =>
+      upgradeAndPay(
+        [selectByRate(context, true)],
+        balance.androidAnalystUpgrades,
+        balance.androidAnalystPayouts,
+      ),
   } satisfies Record<string, (context: CritRewardContext) => void>;
 }

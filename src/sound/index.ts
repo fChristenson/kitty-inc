@@ -8,6 +8,7 @@ const explosionUrl = soundUrl("explosion.mp3");
 const winUrl = soundUrl("win.wav");
 const payoutUrl = soundUrl("payout.wav");
 const arcadeSlotWinUrl = soundUrl("arcadeSlotWin.wav");
+const notificationUrl = soundUrl("notification.wav");
 
 const MUSIC_VOLUME = 0.3; // 25% quieter than the original 0.4 per explicit request
 const SFX_VOLUME = 0.9;
@@ -23,6 +24,9 @@ const ARCADE_SLOT_WIN_VOLUME = SFX_VOLUME * 0.25;
 // 25% louder than the shared SFX_VOLUME per explicit request — the "cash
 // register" purchase sfx
 const SOLD_VOLUME = SFX_VOLUME * 1.5;
+// 50% louder than the shared SFX_VOLUME per explicit request — the
+// Sale/Overtime event-ending cue
+const NOTIFICATION_VOLUME = SFX_VOLUME * 2;
 
 // a single click can hit several overlapping cats, or a cat and the mouse, in the
 // same synchronous call stack (see gameCanvas.ts's onPointerUp) — this window
@@ -131,6 +135,7 @@ const sfxUrls = {
   win: winUrl,
   payout: payoutUrl,
   arcadeSlotWin: arcadeSlotWinUrl,
+  notification: notificationUrl,
 } as const;
 type SfxName = keyof typeof sfxUrls;
 
@@ -314,6 +319,17 @@ export function playJackpot(): void {
   if (now - lastJackpotPlayTime < JACKPOT_DEBOUNCE_MS) return;
   lastJackpotPlayTime = now;
   playSfx("win", JACKPOT_VOLUME);
+}
+
+// Sale/Overtime running out — debounced so several floors' events expiring
+// together play one cue
+const EVENT_ENDED_DEBOUNCE_MS = 800;
+let lastEventEndedPlayTime = 0;
+export function playEventEnded(): void {
+  const now = Date.now();
+  if (now - lastEventEndedPlayTime < EVENT_ENDED_DEBOUNCE_MS) return;
+  lastEventEndedPlayTime = now;
+  playSfx("notification", NOTIFICATION_VOLUME);
 }
 
 // one-shot sound effect for the even rarer ultra-crit moment (see

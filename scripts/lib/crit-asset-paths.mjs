@@ -21,14 +21,21 @@ function registeredFiles() {
 }
 
 // A crit icon's path relative to public/ (and to src/assets/ and the
-// references dist folder): "crits/<category>/<name>.png" once the crit is
-// registered in a category, plain "<name>.png" while it isn't wired up yet.
+// references dist folder): "crits/<category>/<name>.png". An icon not wired
+// into IMAGE_FILES yet is found by its raw source's category folder, falling
+// back to plain "<name>.png" only if it has none.
 export function critIconFile(name) {
-  return (
-    registeredFiles().find(
-      (file) => file === `${name}.png` || file.endsWith(`/${name}.png`),
-    ) ?? `${name}.png`
+  const file = registeredFiles().find(
+    (file) => file === `${name}.png` || file.endsWith(`/${name}.png`),
   );
+  if (file) return file;
+  const crits = path.join(ROOT, "src/assets/crits");
+  for (const category of fs.existsSync(crits) ? fs.readdirSync(crits) : []) {
+    const dir = path.join(crits, category);
+    if (fs.readdirSync(dir).some((f) => path.parse(f).name === name))
+      return `crits/${category}/${name}.png`;
+  }
+  return `${name}.png`;
 }
 
 export function critIconDir(name) {

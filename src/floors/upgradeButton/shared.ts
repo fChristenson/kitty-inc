@@ -11,6 +11,7 @@ import type { Floor } from "../../gameState";
 import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { isCritUpgrade } from "./crit";
 import { getPriceMatchCost } from "../../shared/critTypes";
+import { isFreeClickEventActive } from "../../shared/floorEvents";
 
 export function getUpgradeCost(floor: Floor, now = Date.now()): BigNumber {
   return getPriceMatchCost(floor, now) ?? floor.upgradeCost;
@@ -264,86 +265,6 @@ export function stepHoldAnim(
   };
 }
 
-// ---------------------------------------------------------------------------
-// "event crit" framework — the shared shape behind Sale/Overtime (and
-// any future one): a temporary, per-floor window that takes over the upgrade
-// button's color/label/wiggle while active. Adding a brand new one is meant
-// to be:
-//   1. a new file (e.g. upgradeButton/thing.ts) that owns that event's own
-//      trigger/isActive state — createTimedFloorEvent below covers the
-//      common "just runs for N ms once triggered" shape; an event with extra
-//      per-run state or persisted-across-reload state (like Overtime's own
-//      gauge) still just wraps its own isActive/trigger with the same
-//      signatures.
-//   2. that file calling registerEventButton once (at module-eval time) with
-//      its own color/label/freeClick — nothing in drawUpgradeButton (index.ts)
-//      or isUpgradeButtonEnabled below needs to change
-// ---------------------------------------------------------------------------
-
-// factory for the common "starts now, runs for a fixed duration" shape
-// (Sale/Frozen's own window) — an event with extra state of its own just
-// wraps this instead of hand-rolling its own WeakMap<Floor, number> +
-// now-startedAt<duration check again
-import { snapshotMap } from "../../shared/snapshotState";
-
-export interface TimedFloorEvent {
-  trigger(floor: Floor): void;
-  isActive(floor: Floor, now: number): boolean;
-}
-
-export function createTimedFloorEvent(durationMs: number): TimedFloorEvent {
-  const startedAt = snapshotMap<Floor, number>();
-  return {
-    trigger(floor: Floor): void {
-      startedAt.set(floor, Date.now());
-    },
-    isActive(floor: Floor, now: number): boolean {
-      const t = startedAt.get(floor);
-      return t !== undefined && now - t < durationMs;
-    },
-  };
-}
-
-// one event type's own registration — see registerEventButton below
-export interface EventButtonDef {
-  // unique per event, used only for the odd bit of debugging/logging
-  key: string;
-  // the button's fill color while this event is the active one
-  color: string;
-  // free clicks (Sale/Overtime) never dim for unaffordability and always
-  // count as "clickable" for isUpgradeButtonEnabled below; an event that
-  // still charges real money while active (Frozen) is false here, so the
-  // button keeps its normal affordability-based dimming
-  freeClick: boolean;
-  isActive(floor: Floor, now: number): boolean;
-  // `critMultiplier` is the landed tier's own multiplier (5/25/125) if a
-  // plain crit is ALSO currently armed on this same floor, else null — lets
-  // an event append its own "x5" the same way Sale/Overtime do; an event
-  // whose reward never scales with tier (Frozen) can just ignore it
-  label(critMultiplier: number | null): string;
-}
-
-const eventButtons: EventButtonDef[] = [];
-
-// call once per event module, at module-eval time (see sale.ts/overtime.ts/
-// frozen.ts's own bottom-of-file call) — registration order is the
-// tie-break priority when (rarely) more than one event is active on the same
-// floor at once, first-registered wins
-export function registerEventButton(def: EventButtonDef): void {
-  eventButtons.push(def);
-}
-
-// the one event (if any) currently governing this floor's button appearance
-export function getActiveEventButton(
-  floor: Floor,
-  now: number,
-): EventButtonDef | null {
-  for (const def of eventButtons) {
-    if (def.isActive(floor, now)) return def;
-  }
-  return null;
-}
-
 // whether the upgrade button is currently "enabled" (colored, clickable) —
 // on a free-click event, mid-crit, or plainly affordable — as opposed to
 // greyed-out. Used by floorInteractions.ts's hitTestFloorHover, gameCanvas.ts's
@@ -353,7 +274,7 @@ export function getActiveEventButton(
 export function isUpgradeButtonEnabled(floor: Floor): boolean {
   const now = Date.now();
   return (
-    eventButtons.some((def) => def.freeClick && def.isActive(floor, now)) ||
+    isFreeClickEventActive(floor, now) ||
     isCritUpgrade(floor) ||
     gte(getTotalIncome(), getUpgradeCost(floor))
   );

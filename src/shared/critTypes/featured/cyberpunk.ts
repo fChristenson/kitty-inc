@@ -101,4 +101,11 @@ export const CYBERPUNK_CRIT_INFO = {
     icon: "roboticGripper",
     description: "Thirty-eight free upgrades on this floor",
   },
+  androidAnalyst: {
+    label: "Android Analyst",
+    color: COLOR.cyan,
+    icon: "androidAnalyst",
+    description:
+      "Twenty-three upgrades and twenty-four payouts on the top earner",
+  },
 } as const satisfies Record<string, CritProcDisplayInfo>;

@@ -8,11 +8,20 @@
 import type { Floor } from "../../gameState";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
-import { createTimedFloorEvent, registerEventButton } from "./shared";
+import {
+  createTimedFloorEvent,
+  registerEventButton,
+} from "../../shared/floorEvents";
+import { liveEffect } from "../../shared/detachedJob";
+import { playEventEnded } from "../../sound";
 
 export const SALE_DURATION_MS = CONFIG.sale.durationMs;
 
-const saleEvent = createTimedFloorEvent(SALE_DURATION_MS);
+// audible cue that the free clicks are over
+const saleEvent = createTimedFloorEvent(
+  SALE_DURATION_MS,
+  liveEffect(playEventEnded),
+);
 
 export function triggerSaleBoost(floor: Floor): void {
   saleEvent.trigger(floor);

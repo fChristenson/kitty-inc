@@ -27,6 +27,7 @@ import { COLOR } from "../../palette";
 import type { BigNumber } from "../../shared/bigNumber";
 import {
   startPressAndHold,
+  LONG_PRESS_TICK_MS,
   type PressAndHoldController,
 } from "../../shared/pressAndHold";
 import { getEffectiveDpr } from "../../shared/devicePixelRatio";
@@ -85,11 +86,6 @@ const DRAG_THRESHOLD_PX = 6; // pointer movement below this still counts as a cl
 // lifts, so a flick keeps coasting briefly instead of stopping dead on release
 const MOMENTUM_DECAY_PER_MS = 0.994;
 const MOMENTUM_MIN_SPEED = 0.02; // world units/ms below which momentum just stops
-// press-and-hold auto-repeat: while the pointer stays down on an upgrade button,
-// its click logic re-fires this often instead of only once on release — short
-// enough to read as spamming the button by hand, not a slow metronome tick.
-// 50% faster repeat rate than the original 50ms per explicit request
-const UPGRADE_HOLD_INTERVAL_MS = 33;
 
 export interface GameCanvasDeps {
   canvas: HTMLCanvasElement;
@@ -681,7 +677,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       fireUpgradeOnce(hit);
       holdController = startPressAndHold(
         () => fireHandleFloorClick(hit),
-        UPGRADE_HOLD_INTERVAL_MS,
+        LONG_PRESS_TICK_MS,
       );
     }
   }
