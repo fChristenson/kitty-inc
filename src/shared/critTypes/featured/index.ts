@@ -37,6 +37,7 @@ import { WARCRAFT_CRIT_INFO } from "./warcraft";
 import { GOLDEN_ANIMALS_CRIT_INFO } from "./goldenAnimals";
 import { PLUSHIES_CRIT_INFO } from "./plushies";
 import { FRUITS_CRIT_INFO } from "./fruits";
+import { CHOCOLATE_CRIT_INFO } from "./chocolate";
 import { CAKES_CRIT_INFO } from "./cakes";
 
 export const FEATURED_CRIT_INFO = {
@@ -79,4 +80,5 @@ export const FEATURED_CRIT_INFO = {
   ...PLUSHIES_CRIT_INFO,
   ...CAKES_CRIT_INFO,
   ...FRUITS_CRIT_INFO,
+  ...CHOCOLATE_CRIT_INFO,
 } as const;

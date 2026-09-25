@@ -98,6 +98,29 @@ export async function processStickerCritIcon(
     }
   }
   keepLargestOpaqueComponent(data, width, height, channels);
+  // faint edge pixels that only bordered the removed stroke would otherwise
+  // survive as a ghost outline around the subject
+  const FAINT_ALPHA = 40;
+  const faint = [];
+  for (let pixel = 0; pixel < background.length; pixel++) {
+    const alpha = data[pixel * channels + 3];
+    if (alpha === 0 || alpha > FAINT_ALPHA) continue;
+    const column = pixel % width;
+    let nearSolid = false;
+    for (let dy = -1; dy <= 1 && !nearSolid; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const x = column + dx;
+        const y = Math.floor(pixel / width) + dy;
+        if (x < 0 || y < 0 || x >= width || y >= height) continue;
+        if (data[(y * width + x) * channels + 3] > FAINT_ALPHA) {
+          nearSolid = true;
+          break;
+        }
+      }
+    }
+    if (!nearSolid) faint.push(pixel);
+  }
+  for (const pixel of faint) data[pixel * channels + 3] = 0;
   let left = width;
   let top = height;
   let right = -1;

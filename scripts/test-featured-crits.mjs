@@ -63,7 +63,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 722 + elementCritBatch.length);
+  assert.equal(kinds.length, 747 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -949,6 +949,31 @@ try {
     strudelCuddle: [[20, 30, 34, 0], 32],
     appleOfMyEye: [[20, 30, 10, 0], 129],
     turnoverTreasure: [[20, 30, 10, 0], 147],
+    cocoaClout: [[20, 52, 10, 0], 60],
+    shadesOfCocoa: [[20, 30, 10, 0], 129],
+    bigMugEnergy: [[56, 66, 46, 0], 0],
+    bonbonBigwig: [[20, 61, 10, 0], 0],
+    ganacheGains: [[59, 69, 10, 0], 0],
+    hazelnutHedgeFund: [[20, 64, 44, 0], 0],
+    spreadTheWealth: [[20, 30, 10, 0], 270],
+    chocolateBarExam: [[62, 30, 52, 0], 0],
+    darkChocolateDeal: [[64, 30, 10, 0], 0],
+    mousseMoxie: [[20, 30, 57, 0], 0],
+    rockyRoadRally: [[66, 30, 10, 0], 0],
+    browniePoints: [[20, 30, 35, 0], 30],
+    torteReform: [[20, 30, 53, 0], 0],
+    justDesserts: [[20, 56, 10, 0], 66],
+    sweetVerdict: [[20, 30, 10, 0], 44],
+    operaCakeOverture: [[20, 56, 10, 0], 0],
+    sacherStockpile: [[20, 30, 10, 0], 94],
+    tripleLayerTreasury: [[58, 68, 48, 0], 0],
+    layeredSecurity: [[20, 55, 10, 0], 69],
+    mississippiMudMillionaire: [[20, 30, 10, 0], 138],
+    swissRollRollover: [[20, 30, 10, 0], 123],
+    chocolateDripDynamo: [[20, 30, 10, 0], 90],
+    marbleCakeMargin: [[20, 70, 50, 0], 0],
+    souffleSurplus: [[61, 71, 10, 0], 0],
+    onTheRise: [[20, 30, 59, 0], 0],
     blackForestFortune: [[20, 48, 10, 0], 72],
     redVelvetRope: [[20, 59, 10, 0], 0],
     tiramisuTycoon: [[20, 54, 10, 0], 63],
@@ -1149,6 +1174,10 @@ try {
     if (kind === "pocketMoney" || kind === "challahCharm")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "custardCrown")
+      assert.equal(test.context.floor.critMultiplierTier, "mega");
+    if (kind === "bonbonBigwig")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "operaCakeOverture")
       assert.equal(test.context.floor.critMultiplierTier, "mega");
     if (kind === "redVelvetRope")
       assert.equal(test.context.floor.critMultiplierTier, "crit");

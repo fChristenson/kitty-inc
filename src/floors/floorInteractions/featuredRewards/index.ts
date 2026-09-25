@@ -42,6 +42,7 @@ import { createWarcraftRewards } from "./warcraft";
 import { createGoldenAnimalsRewards } from "./goldenAnimals";
 import { createPlushiesRewards } from "./plushies";
 import { createFruitsRewards } from "./fruits";
+import { createChocolateRewards } from "./chocolate";
 import { createCakesRewards } from "./cakes";
 
 export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
@@ -86,5 +87,6 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
     ...createPlushiesRewards(helpers),
     ...createCakesRewards(helpers),
     ...createFruitsRewards(helpers),
+    ...createChocolateRewards(helpers),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }

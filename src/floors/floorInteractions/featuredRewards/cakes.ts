@@ -53,5 +53,62 @@ export function createCakesRewards({
       actions.payCycles([highestFloor(context)], balance.lavaCakeLiquidityPayouts),
     upsideDownUpswing: (context) =>
       actions.upgrade(cascadeDown(context), balance.upsideDownUpswingUpgrades),
+    browniePoints: (context) =>
+      upgradeAndPay(
+        [lowestLevel(context)],
+        balance.browniePointsUpgrades,
+        balance.browniePointsPayouts,
+      ),
+    torteReform: (context) =>
+      actions.upgrade([highestFloor(context)], balance.torteReformUpgrades),
+    justDesserts: (context) =>
+      upgradeAndPay(
+        [selectByRate(context, true)],
+        balance.justDessertsUpgrades,
+        balance.justDessertsPayouts,
+      ),
+    sweetVerdict: (context) =>
+      actions.payCycles(
+        [selectByRate(context, false)],
+        balance.sweetVerdictPayouts,
+      ),
+    operaCakeOverture: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.operaCakeOvertureTierSteps,
+        balance.operaCakeOvertureUpgrades,
+      ),
+    sacherStockpile: (context) =>
+      actions.payCycles([highestFloor(context)], balance.sacherStockpilePayouts),
+    tripleLayerTreasury: (context) =>
+      actions.upgrade(context.floors, balance.tripleLayerTreasuryUpgrades),
+    layeredSecurity: (context) =>
+      upgradeAndPay(
+        [context.floor],
+        balance.layeredSecurityUpgrades,
+        balance.layeredSecurityPayouts,
+      ),
+    mississippiMudMillionaire: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.mississippiMudMillionairePayouts,
+      ),
+    swissRollRollover: (context) =>
+      actions.payCycles(alternating(context), balance.swissRollRolloverPayouts),
+    chocolateDripDynamo: (context) =>
+      actions.payCycles([lowestLevel(context)], balance.chocolateDripDynamoPayouts),
+    marbleCakeMargin: (context) => {
+      const highest = highestFloor(context);
+      actions.upgrade([context.floor], balance.marbleCakeMarginUpgrades);
+      if (highest !== context.floor)
+        actions.upgrade([highest], balance.marbleCakeMarginUpgrades);
+    },
+    souffleSurplus: (context) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.souffleSurplusUpgrades,
+      ),
+    onTheRise: (context) =>
+      actions.upgrade([highestFloor(context)], balance.onTheRiseUpgrades),
   } satisfies Record<string, (context: CritRewardContext) => void>;
 }
