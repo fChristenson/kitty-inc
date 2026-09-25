@@ -48,6 +48,10 @@ export interface HomingBurstOptions {
   target?: { x: number; y: number };
   onFirstArrive?: () => void;
   onEachArrive?: () => void;
+  // ~16.67ms ticks: how long coins pop out (random within [min, max]) and how
+  // long they then take to fly in
+  burstTicks?: [number, number];
+  flightTicks?: number;
 }
 
 interface HomingGroup extends HomingBurstOptions {
@@ -56,10 +60,12 @@ interface HomingGroup extends HomingBurstOptions {
 
 interface HomingFlight {
   burstLife: number; // ticks spent bursting out before being pulled in
+  flightTicks: number;
   group: HomingGroup;
 }
 
 const HOMING_FLIGHT_TICKS = 32;
+const HOMING_BURST_TICKS: [number, number] = [14, 36];
 const HOMING_END_RADIUS = 8;
 
 const pool = createParticlePool<Particle>(MAX_PARTICLES);
@@ -108,7 +114,7 @@ export function drawCoins(
     if (p.homing && target) {
       const flight = Math.max(
         0,
-        (p.life - p.homing.burstLife) / HOMING_FLIGHT_TICKS,
+        (p.life - p.homing.burstLife) / p.homing.flightTicks,
       );
       // accelerates in, so it reads as being pulled into the target
       const eased = Math.min(1, flight) ** 2;
@@ -218,7 +224,9 @@ export function spawnHomingCoinBurst(
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
     // staggered so the coins stream into the total instead of landing at once
-    const burstLife = 14 + Math.random() * 22;
+    const [minBurst, maxBurst] = options.burstTicks ?? HOMING_BURST_TICKS;
+    const flightTicks = options.flightTicks ?? HOMING_FLIGHT_TICKS;
+    const burstLife = minBurst + Math.random() * (maxBurst - minBurst);
     pool.spawn({
       floor,
       x: x + (Math.random() - 0.5) * 20,
@@ -226,7 +234,7 @@ export function spawnHomingCoinBurst(
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
       life: 0,
-      maxLife: burstLife + HOMING_FLIGHT_TICKS,
+      maxLife: burstLife + flightTicks,
       size: (22 + Math.random() * 40) * 1.15 * 1.25,
       gravity: 0.1 + Math.random() * 0.15,
       gravityRamp: 0,
@@ -237,7 +245,7 @@ export function spawnHomingCoinBurst(
       spinRate: MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE),
       spinDir: Math.random() < 0.5 ? 1 : -1,
       axisAngle: (Math.random() * 2 - 1) * (Math.PI / 2),
-      homing: { burstLife, group },
+      homing: { burstLife, flightTicks, group },
     });
   }
 

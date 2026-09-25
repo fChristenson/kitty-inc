@@ -146,6 +146,11 @@ import { triggerCritCelebration } from "./critCelebration";
 
 const spawnCoinBurst = liveEffect(animateCoinBurst);
 const spawnHomingCoinBurst = liveEffect(animateHomingCoinBurst);
+// every event-click coin lands within ~0.3s so a held button's effect keeps pace
+const FAST_HOMING = {
+  burstTicks: [4, 8] as [number, number],
+  flightTicks: 10,
+};
 // each landing coin hands the bar its share of the ticks, so the readout climbs
 // in step with the coins instead of jumping on the click
 const spawnOvertimeCoins = liveEffect(
@@ -161,6 +166,7 @@ const spawnOvertimeCoins = liveEffect(
     let coinsLeft = 0;
     coinsLeft = animateHomingCoinBurst(floor, x, y, {
       target: getIncomeBarCenter(isGroundFloor),
+      ...FAST_HOMING,
       onEachArrive: () => {
         const share = coinsLeft > 1 ? remaining / coinsLeft : remaining;
         remaining -= share;
@@ -1668,6 +1674,7 @@ export function handleFloorClick(
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
       const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
       spawnHomingCoinBurst(floor, center.x + jitterX, center.y + jitterY, {
+        ...FAST_HOMING,
         onEachArrive: pulseHudTotalFlash,
       });
       spawnIncomeFloatText(
