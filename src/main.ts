@@ -680,7 +680,7 @@ async function main() {
     // ones, flag the next switch to skip re-snapshotting its now-stale live
     // state over the clear mergeCompanies already wrote to storage for it
     (companyIndices) => {
-      const result = mergeCompanies(companyIndices);
+      const result = mergeCompanies(companyIndices, buildings);
       if (!result) return;
       const mergedAway = new Set(
         companyIndices.filter((index) => index !== result.survivorIndex),

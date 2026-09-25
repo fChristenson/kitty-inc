@@ -51,6 +51,9 @@ export function companyStorageKey(
 // kept compounding against a stale timestamp forever after)
 export interface CompanyRecord {
   upgradeEconomyVersion?: number;
+  inheritedAssetValue?: BigNumber;
+  inheritedUpgradesValue?: BigNumber;
+  inheritedModifierPercent?: number;
   bankedTotal: BigNumber; // $ actually banked as of updatedAt
   incomeRatePerSecond: BigNumber; // frozen as of updatedAt; only the active company's own rate can change
   assetValue: BigNumber; // buildings value + upgrades value combined, frozen as of updatedAt
@@ -104,6 +107,9 @@ export function loadCompanyRecord(companyIndex: number): CompanyRecord | null {
   // recovery every other one-off added field here would get)
   return {
     upgradeEconomyVersion: record.upgradeEconomyVersion,
+    inheritedAssetValue: toBigNumber(record.inheritedAssetValue),
+    inheritedUpgradesValue: toBigNumber(record.inheritedUpgradesValue),
+    inheritedModifierPercent: record.inheritedModifierPercent ?? 0,
     bankedTotal: toBigNumber(record.bankedTotal),
     incomeRatePerSecond: toBigNumber(record.incomeRatePerSecond),
     assetValue: toBigNumber(record.assetValue),
@@ -122,6 +128,14 @@ export function saveCompanyRecord(
   const all = loadAllCompanyRecords();
   all[companyIndex] = {
     ...record,
+    inheritedAssetValue:
+      record.inheritedAssetValue ?? all[companyIndex]?.inheritedAssetValue,
+    inheritedUpgradesValue:
+      record.inheritedUpgradesValue ??
+      all[companyIndex]?.inheritedUpgradesValue,
+    inheritedModifierPercent:
+      record.inheritedModifierPercent ??
+      all[companyIndex]?.inheritedModifierPercent,
     upgradeEconomyVersion: UPGRADE_ECONOMY_VERSION,
   };
   saveAllCompanyRecords(all);

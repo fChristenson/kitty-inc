@@ -154,7 +154,8 @@ export function getDormantCompaniesIdleIncome(
 // sits above totalIncome/ in the dependency graph and must never be
 // imported from here
 function sumUpgradesValue(buildings: Floor[][]): BigNumber {
-  let total = ZERO;
+  let total =
+    loadCompanyRecord(activeCompanyIndex)?.inheritedUpgradesValue ?? ZERO;
   for (const floors of buildings) {
     for (const floor of floors) {
       total = add(total, multiply(floor.rateStep, floor.upgradeCount));
@@ -186,7 +187,14 @@ export function getAllCompaniesUpgradesValue(): BigNumber {
 // every unlocked floor's own unlock price, and each building past the free
 // first one — see "Second Wind" crit's applySecondWindCrit, which refunds it
 export function getActiveCompanyInvestedValue(): BigNumber {
-  let total = sumUpgradesValue(tickerBuildings);
+  const record = loadCompanyRecord(activeCompanyIndex);
+  let total = add(
+    sumUpgradesValue(tickerBuildings),
+    subtract(
+      record?.inheritedAssetValue ?? ZERO,
+      record?.inheritedUpgradesValue ?? ZERO,
+    ),
+  );
   for (const floors of tickerBuildings) {
     for (const floor of floors) {
       if (floor.unlocked) total = add(total, floor.unlockCost);

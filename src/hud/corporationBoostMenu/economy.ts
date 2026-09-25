@@ -1,9 +1,11 @@
-import { loadBuildings, clearBuildings, type Floor } from "../../gameState";
-import { getStoredTotalIncome, addCompanyTotalIncome } from "../../totalIncome";
 import {
-  getCorporationCount,
-  regenerateCorporationName,
-} from "../../corporationName";
+  loadBuildings,
+  clearBuildings,
+  saveBuildingsImmediately,
+  type Floor,
+} from "../../gameState";
+import { getStoredTotalIncome, addCompanyTotalIncome } from "../../totalIncome";
+import { regenerateCorporationName } from "../../corporationName";
 import {
   getOfficeChairsCost,
   getOfficeSuppliesCost,
@@ -15,6 +17,9 @@ import {
   loadCompanyRecord,
   clearCompanyRecord,
   markCompaniesMerged,
+  saveCompanyRecord,
+  getActiveCorporationIndices,
+  isCompanyMerged,
 } from "../../company";
 import {
   type BigNumber,
@@ -67,8 +72,14 @@ function getUpgradesValue(buildings: Floor[][]): BigNumber {
 // exported so main.ts can snapshot just the upgrades portion into a company's
 // CompanyRecord (see company.ts's upgradesValue field) when it goes dormant —
 // getCompanyValue below needs this alone, not bundled with buildings cost
-export function getCompanyUpgradesValue(buildings: Floor[][]): BigNumber {
-  return getUpgradesValue(buildings);
+export function getCompanyUpgradesValue(
+  buildings: Floor[][],
+  companyIndex = getActiveCompanyIndex(),
+): BigNumber {
+  return add(
+    getUpgradesValue(buildings),
+    loadCompanyRecord(companyIndex)?.inheritedUpgradesValue ?? ZERO,
+  );
 }
 
 // $ actually PAID to unlock every floor a company owns — a floor's own
@@ -108,10 +119,16 @@ function getStaffInvestmentValue(buildings: Floor[][]): BigNumber {
 // workers, office purchases, upgrades combined) — exported so main.ts can
 // snapshot a company's CompanyRecord (see company.ts) at the exact moment it
 // goes dormant, without duplicating this pricing logic there
-export function getCompanyAssetValue(buildings: Floor[][]): BigNumber {
+export function getCompanyAssetValue(
+  buildings: Floor[][],
+  companyIndex = getActiveCompanyIndex(),
+): BigNumber {
   return add(
-    add(getBuildingsValue(buildings), getUpgradesValue(buildings)),
-    add(getFloorUnlockValue(buildings), getStaffInvestmentValue(buildings)),
+    add(
+      add(getBuildingsValue(buildings), getUpgradesValue(buildings)),
+      add(getFloorUnlockValue(buildings), getStaffInvestmentValue(buildings)),
+    ),
+    loadCompanyRecord(companyIndex)?.inheritedAssetValue ?? ZERO,
   );
 }
 
@@ -122,8 +139,8 @@ export function getActiveCompanyAssetValue(buildings: Floor[][]): BigNumber {
 // hud/corporationUpgradeMenu's "Merge" action: picks whichever selected company
 // has the most overall progress (total floor count across every one of its
 // buildings — the simplest holistic "how far into the game is this company"
-// signal) to survive, and folds every other selected company's own total income +
-// upgrades value into the survivor's total. The merged-away
+// signal) to survive, and carries cash, asset value and modifier contributions
+// separately into the survivor. The merged-away
 // companies are left permanently empty (0 floors, $0) and hidden from
 // every company list from then on (see company.ts's isCompanyMerged). Any
 // company, including the currently ACTIVE one, can be selected — the caller
@@ -140,12 +157,22 @@ export interface MergeCompaniesResult {
 
 export function mergeCompanies(
   companyIndices: number[],
+  activeBuildings?: Floor[][],
 ): MergeCompaniesResult | null {
+  const eligible = new Set(getActiveCorporationIndices());
+  companyIndices = [...new Set(companyIndices)].filter((index) =>
+    eligible.has(index),
+  );
   if (companyIndices.length < 2) return null;
 
   const buildingsByIndex = new Map<number, Floor[][]>();
   for (const index of companyIndices) {
-    buildingsByIndex.set(index, loadBuildings(index));
+    buildingsByIndex.set(
+      index,
+      index === getActiveCompanyIndex() && activeBuildings
+        ? activeBuildings
+        : loadBuildings(index),
+    );
   }
   const progression = (index: number): number =>
     (buildingsByIndex.get(index) ?? []).reduce(
@@ -156,20 +183,65 @@ export function mergeCompanies(
     progression(index) > progression(best) ? index : best,
   );
 
+  const now = Date.now();
+  const survivorBuildings = buildingsByIndex.get(survivorIndex)!;
+  const survivorRecord = loadCompanyRecord(survivorIndex);
+  let inheritedAssetValue = survivorRecord?.inheritedAssetValue ?? ZERO;
+  let inheritedUpgradesValue = survivorRecord?.inheritedUpgradesValue ?? ZERO;
+  let totalModifier = 0;
   let addedTotal = ZERO;
   for (const index of companyIndices) {
+    const ownedBuildings = buildingsByIndex.get(index)!;
+    const value = getCompanyAssetValue(ownedBuildings, index);
+    totalModifier +=
+      (compressedScale(max(fromNumber(10), value)) ?? 0) * BASE_MODIFIER_RATE +
+      (loadCompanyRecord(index)?.inheritedModifierPercent ?? 0);
     if (index === survivorIndex) continue;
-    addedTotal = add(
-      addedTotal,
-      add(
-        getStoredTotalIncome(index),
-        getUpgradesValue(buildingsByIndex.get(index) ?? []),
-      ),
+    addedTotal = add(addedTotal, getStoredTotalIncome(index));
+    inheritedAssetValue = add(inheritedAssetValue, value);
+    inheritedUpgradesValue = add(
+      inheritedUpgradesValue,
+      getCompanyUpgradesValue(ownedBuildings, index),
     );
+  }
+  const assetValue = add(
+    getCompanyAssetValue(survivorBuildings, survivorIndex),
+    companyIndices
+      .filter((index) => index !== survivorIndex)
+      .reduce(
+        (sum, index) =>
+          add(sum, getCompanyAssetValue(buildingsByIndex.get(index)!, index)),
+        ZERO,
+      ),
+  );
+  addCompanyTotalIncome(survivorIndex, addedTotal);
+  saveCompanyRecord(survivorIndex, {
+    bankedTotal: getStoredTotalIncome(survivorIndex),
+    incomeRatePerSecond: survivorRecord?.incomeRatePerSecond ?? ZERO,
+    assetValue,
+    upgradesValue: add(
+      getUpgradesValue(survivorBuildings),
+      inheritedUpgradesValue,
+    ),
+    inheritedAssetValue,
+    inheritedUpgradesValue,
+    inheritedModifierPercent: Math.max(
+      0,
+      totalModifier -
+        (compressedScale(max(fromNumber(10), assetValue)) ?? 0) *
+          BASE_MODIFIER_RATE,
+    ),
+    updatedAt: now,
+  });
+  if (survivorIndex !== getActiveCompanyIndex()) {
+    for (const floor of survivorBuildings.flat()) floor.lastCollectedAt = now;
+  }
+  saveBuildingsImmediately(survivorBuildings, survivorIndex);
+  for (const index of companyIndices) {
+    if (index === survivorIndex) continue;
     clearBuildings(index);
     clearCompanyRecord(index);
   }
-  addCompanyTotalIncome(survivorIndex, addedTotal);
 
   markCompaniesMerged(
     companyIndices.filter((index) => index !== survivorIndex),
@@ -204,8 +276,12 @@ function getCompanyValue(companyIndex: number): BigNumber {
 const BASE_MODIFIER_RATE = CONFIG.corporation.baseModifierRate;
 
 export function getCompanyBaseModifierPercent(companyIndex: number): number {
+  if (isCompanyMerged(companyIndex)) return 0;
   const companyValue = max(fromNumber(10), getCompanyValue(companyIndex));
-  return (compressedScale(companyValue) ?? 0) * BASE_MODIFIER_RATE;
+  return (
+    (compressedScale(companyValue) ?? 0) * BASE_MODIFIER_RATE +
+    (loadCompanyRecord(companyIndex)?.inheritedModifierPercent ?? 0)
+  );
 }
 
 // summed across every corporation's own base size modifier — the actual
@@ -214,10 +290,9 @@ export function getCompanyBaseModifierPercent(companyIndex: number): number {
 // computeIdleIncome, both take this as an injected multiplier to avoid a
 // circular import back into this hud module)
 export function getGlobalIncomeBoostPercent(): number {
-  const count = getCorporationCount();
   let total = 0;
-  for (let i = 0; i < count; i++) {
-    total += getCompanyBaseModifierPercent(i);
+  for (const index of getActiveCorporationIndices()) {
+    total += getCompanyBaseModifierPercent(index);
   }
   return total;
 }
