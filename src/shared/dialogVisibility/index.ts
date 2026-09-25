@@ -5,8 +5,9 @@ let openDialogCount = 0;
 let observer: MutationObserver | null = null;
 
 function recount(): void {
-  openDialogCount = document.querySelectorAll(".worker-menu:not([hidden])")
-    .length;
+  openDialogCount = document.querySelectorAll(
+    ".worker-menu:not([hidden])",
+  ).length;
 }
 
 function ensureObserving(): void {

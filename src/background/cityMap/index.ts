@@ -630,7 +630,8 @@ export function createCityMapView(
           MAX_FLOORS_PER_BUILDING,
           critTier ? CRIT_TIER_CONFIG[critTier].color : undefined,
         );
-        const { unlockAllCost, upgradeAllCost } = getIndicatorCosts(globalIndex);
+        const { unlockAllCost, upgradeAllCost } =
+          getIndicatorCosts(globalIndex);
         if (
           !isZero(unlockAllCost) &&
           gte(deps.getTotalIncome(), unlockAllCost)
