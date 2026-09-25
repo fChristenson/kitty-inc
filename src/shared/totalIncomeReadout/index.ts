@@ -12,7 +12,7 @@ import {
   getHudTotalWhiteMix,
 } from "../../bonusTierFx";
 import { getWiggleRotation } from "../wiggle";
-import { getTotalRollAngle } from "../eventEndRoll";
+import { getTotalRollPose } from "../eventEndRoll";
 
 // shared "amount + spelled-out unit name below it" total-income drawing, used by
 // both hud/index.ts's top-of-screen HUD and background/cityMap's map readout —
@@ -95,18 +95,19 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     const whiteMix = getHudTotalWhiteMix(now);
     const textColor =
       whiteMix > 0 ? shadeColor(COLOR.moneyGreen, whiteMix) : COLOR.moneyGreen;
+    const roll = getTotalRollPose(now);
     const wiggleRotation =
       (flashStrength > 0 ? getWiggleRotation(now) * flashStrength : 0) +
-      getTotalRollAngle(now);
+      roll.angle;
     const absorbScale = getHudTotalAbsorbScale(now);
 
     ctx.save();
-    if (wiggleRotation !== 0 || absorbScale !== 1) {
+    if (wiggleRotation !== 0 || absorbScale !== 1 || roll.scaleX !== 1) {
       // pivot on the amount's own middle so it swells in place
       const pivotY = top + amountHeight / 2;
       ctx.translate(centerX, pivotY);
       ctx.rotate(wiggleRotation);
-      ctx.scale(absorbScale, absorbScale);
+      ctx.scale(absorbScale * roll.scaleX, absorbScale * roll.scaleY);
       ctx.translate(-centerX, -pivotY);
     }
 

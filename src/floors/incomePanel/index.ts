@@ -16,7 +16,7 @@ import {
   getPriceMatchCost,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
-import { getBarRollAngle } from "../../shared/eventEndRoll";
+import { getBarRollPose } from "../../shared/eventEndRoll";
 import {
   createAbsorbPulse,
   mergeFlashWhite,
@@ -580,7 +580,9 @@ export function drawIncomePanel(
   if (cancellationArmed) ctx.rotate(getWiggleRotation(now));
   else if (flashStrength > 0)
     ctx.rotate(getWiggleRotation(now) * flashStrength);
-  ctx.rotate(getBarRollAngle(floor, now));
+  const roll = getBarRollPose(floor, now);
+  ctx.rotate(roll.angle);
+  ctx.scale(roll.scaleX, roll.scaleY);
   const pressScale =
     incomeBarPressScale(floor, now) *
     (overtimeGaugeVisible ? (overtimeAbsorb.get(floor)?.scale(now) ?? 1) : 1);
