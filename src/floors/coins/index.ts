@@ -64,6 +64,15 @@ const HOMING_END_RADIUS = 8;
 
 const pool = createParticlePool<Particle>(MAX_PARTICLES);
 
+// while a fast hold keeps the pool near its cap, new bursts shrink to the room
+// left (never below a small floor) so earlier coins finish their fall instead
+// of being evicted mid-air
+const CROWDED_BURST_MIN = 10;
+function burstCount(min: number, max: number): number {
+  const room = MAX_PARTICLES - pool.count();
+  return Math.max(CROWDED_BURST_MIN, Math.min(randomInt(min, max), room));
+}
+
 export function hasActiveCoins(): boolean {
   return pool.hasActive();
 }
@@ -154,7 +163,7 @@ export function spawnCoinBurst(
   onFrame: () => void,
   scale = 1,
 ): void {
-  const count = randomInt(40, 85);
+  const count = burstCount(40, 85);
   for (let i = 0; i < count; i++) {
     // upward/outward hemisphere only (not fully random) so coins pop up and out
     // first, then arc back down under gravity instead of scattering downward too
@@ -202,7 +211,7 @@ export function spawnHomingCoinBurst(
   options: HomingBurstOptions,
 ): number {
   const group: HomingGroup = { ...options, fired: false };
-  const count = randomInt(18, 28);
+  const count = burstCount(18, 28);
   for (let i = 0; i < count; i++) {
     const angle = -Math.random() * Math.PI;
     const speed = 3 + Math.random() * 12;

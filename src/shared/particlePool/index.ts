@@ -21,9 +21,9 @@ export interface ParticlePool<T extends PoolParticle> {
   // current particle count — for debug/perf overlays that want to show a
   // live number, not just a boolean
   count(): number;
-  // adds `item`, evicting the OLDEST particle first if already at `maxCount` —
-  // this is the actual leak fix; refusing new particles instead would let a
-  // high-frequency spawner (e.g. a held button) starve a rarer one out entirely
+  // adds `item`; past `maxCount` the OLDEST particles are dropped (in batches)
+  // — refusing new ones instead would let a high-frequency spawner (e.g. a held
+  // button) starve a rarer one out entirely
   spawn(item: T): void;
   // advances every particle via the caller's own per-particle physics, then
   // removes anything whose life has reached maxLife
@@ -38,9 +38,6 @@ export function createParticlePool<T extends PoolParticle>(
   maxCount: number,
 ): ParticlePool<T> {
   const list: T[] = [];
-  // ring-buffer eviction cursor — see spawn() below for why this exists
-  // instead of Array.shift()
-  let nextEvictIndex = 0;
   let animationFrameId: number | null = null;
   let lastTick = 0;
 
@@ -55,34 +52,31 @@ export function createParticlePool<T extends PoolParticle>(
       return list.length;
     },
     spawn(item) {
-      if (list.length < maxCount) {
-        list.push(item);
-        return;
-      }
-      // O(1) ring-buffer eviction: overwrite the oldest slot directly.
-      // Array.shift() is O(n) (re-indexes every remaining element) — once a
-      // sustained hold pins the pool at its cap (confirmed via the perf
-      // overlay: "coin bursts (floor): 500" stuck at max with FPS at 7), a
-      // single burst of 40-85 new particles was doing up to ~85 * 500
-      // element shifts EVERY spawn call, dozens of times a second. This was
-      // the actual mobile lag, not a leak — the array was correctly bounded,
-      // just extremely expensive to maintain at that bound.
-      list[nextEvictIndex] = item;
-      nextEvictIndex = (nextEvictIndex + 1) % maxCount;
+      list.push(item);
+      // list stays in spawn order, so the front is always the oldest. Trimming
+      // in batches keeps this amortized O(1) — a per-spawn shift() at the cap
+      // was the old mobile lag, and overwriting slots in place evicted
+      // freshly spawned coins instead, making bursts vanish mid-fall
+      if (list.length >= maxCount * 1.5) list.splice(0, list.length - maxCount);
     },
     update(dt, advance) {
       for (const p of list) advance(p, dt);
+      let alive = 0;
+      for (const p of list) if (p.life < p.maxLife) alive++;
+      // over the cap: drop the oldest survivors, which are the most faded
+      let skip = Math.max(0, alive - maxCount);
       // single-pass in-place compaction instead of a reverse loop of
-      // list.splice(i, 1) calls — splice is the same O(n)-per-removal cost
-      // as shift(), just as bad here as it was in spawn() above
+      // list.splice(i, 1) calls, which is O(n) per removal
       let writeIndex = 0;
       for (let i = 0; i < list.length; i++) {
-        if (list[i].life < list[i].maxLife) list[writeIndex++] = list[i];
+        if (list[i].life >= list[i].maxLife) continue;
+        if (skip > 0) {
+          skip--;
+          continue;
+        }
+        list[writeIndex++] = list[i];
       }
       list.length = writeIndex;
-      // ring-buffer position only matters between compactions; harmless (and
-      // necessary) to restart it clean right after one
-      nextEvictIndex = 0;
     },
     ensureTicking(step) {
       if (animationFrameId !== null) return;
