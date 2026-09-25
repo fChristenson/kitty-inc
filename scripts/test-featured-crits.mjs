@@ -62,7 +62,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 664 + elementCritBatch.length);
+  assert.equal(kinds.length, 692 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -263,7 +263,7 @@ try {
     lordOfMurder: [[28, 38, 18, 0], 36],
     speedDemon: [[20, 41, 10, 0], 51],
     badonkadonk: [[20, 40, 10, 0], 36],
-    demoncBuns: [[20, 46, 10, 0], 63],
+    demonicBuns: [[20, 46, 10, 0], 63],
     infernalInterest: [[20, 50, 10, 0], 81],
     dropItLow: [[20, 30, 19, 0], 10],
     kittyWagon: [[23, 33, 13, 0], 12],
@@ -918,6 +918,36 @@ try {
     unicorn: [[20, 30, 10, 0], 108],
     velvetManticore2: [[20, 52, 10, 0], 0],
     velvetManticore3: [[20, 79, 10, 0], 0],
+    almondEncore: [[20, 30, 10, 0], 108],
+    babkaRhapsody: [[60, 30, 50, 0], 0],
+    bagelBoulevard: [[20, 30, 10, 0], 228],
+    baguetteBaton: [[20, 30, 49, 0], 0],
+    briocheBonanza: [[20, 74, 10, 0], 0],
+    breadWinner: [[20, 52, 10, 0], 60],
+    challahCharm: [[20, 52, 10, 0], 0],
+    chouxBusiness: [[20, 50, 10, 0], 54],
+    cinnamonSpin: [[20, 60, 40, 0], 0],
+    icingOnTheBun: [[20, 30, 10, 0], 111],
+    cruffinSummit: [[20, 30, 56, 0], 0],
+    custardCrown: [[20, 50, 10, 0], 0],
+    danishDaydream: [[20, 30, 10, 0], 129],
+    eclairFlair: [[20, 77, 10, 0], 0],
+    focacciaFiesta: [[62, 72, 52, 0], 0],
+    jamSession: [[20, 30, 10, 0], 210],
+    sconeWithTheWind: [[60, 30, 10, 0], 0],
+    knotYourAverage: [[20, 68, 48, 0], 0],
+    naanStop: [[20, 30, 10, 0], 264],
+    // the fixture's crit floor sits one above the ground, so the parade's
+    // guaranteed first step lands on floor 0 and has nowhere further to go
+    palmierParade: [[65, 30, 10, 0], 0],
+    pistachioPalace: [[20, 30, 58, 0], 0],
+    pitaPocketPayday: [[20, 30, 10, 0], 138],
+    ryeOnThePrize: [[20, 30, 10, 0], 117],
+    shokupanCloud: [[58, 68, 10, 0], 0],
+    sourdoughSunrise: [[20, 30, 10, 0], 80],
+    strudelCuddle: [[20, 30, 34, 0], 32],
+    appleOfMyEye: [[20, 30, 10, 0], 129],
+    turnoverTreasure: [[20, 30, 10, 0], 147],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -1082,8 +1112,10 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "clockworkWizard")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
-    if (kind === "pocketMoney")
+    if (kind === "pocketMoney" || kind === "challahCharm")
       assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "custardCrown")
+      assert.equal(test.context.floor.critMultiplierTier, "mega");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const heavyTest = fixture();
@@ -1203,7 +1235,7 @@ try {
     ["lordOfMurder", "lordOfMurder.jfif", 8, 6],
     ["speedDemon", "speedDemon.jfif", 11, 17],
     ["badonkadonk", "badonkadonk.jfif", 10, 12],
-    ["demoncBuns", "demoncBuns.jpg", 16, 21],
+    ["demonicBuns", "demoncBuns.jpg", 16, 21],
     ["infernalInterest", "demoncBuns2.jpg", 20, 27],
     ["dropItLow", "dropItLow.jpg", 9, 5],
     ["kittyWagon", "kittyWagon.jpg", 3, 2],
@@ -1228,11 +1260,12 @@ try {
         assert.equal(test.context.floor.lastCollectedAt, 123);
       }
     }
-    const cutout = await readFile(`public/${kind}.png`);
-    assert(cutout.equals(await readFile(`src/assets/${kind}.png`)));
+    const iconFile = IMAGE_FILES[crit.CRIT_PROC_INFO[kind].icon];
+    const cutout = await readFile(`public/${iconFile}`);
+    assert(cutout.equals(await readFile(`src/assets/${iconFile}`)));
     assert(
       cutout.equals(
-        await readFile(`src/assets/themes/references/dist/${kind}.png`),
+        await readFile(`src/assets/themes/references/dist/${iconFile}`),
       ),
     );
     assert((await readFile(`src/assets/${source}`)).length > 0);
@@ -1244,7 +1277,7 @@ try {
       "badonkadonk",
       "canNotLie",
       "goldenSkull",
-      "demoncBuns",
+      "demonicBuns",
       "infernalInterest",
     ],
     ["kittyWagon", "wagonWarrior", "lordOfMurder", "skullSyndicate"],
@@ -1304,7 +1337,9 @@ try {
       .map(([, kind]) => kind),
   ];
   for (const kind of newAssetKinds) {
-    const silhouette = await sharp(`public/silhouettes/${kind}.png`).metadata();
+    const silhouette = await sharp(
+      `public/silhouettes/${IMAGE_FILES[crit.CRIT_PROC_INFO[kind].icon]}`,
+    ).metadata();
     assert(
       silhouette.width <= 250 &&
         silhouette.height <= 250 &&
