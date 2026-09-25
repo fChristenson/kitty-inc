@@ -1039,11 +1039,8 @@ try {
       ),
     );
     assert(
-      (
-        await readFile(
-          `src/assets/crits/elements/${source}${sourceExtension}`,
-        )
-      ).length > 0,
+      (await readFile(`src/assets/crits/elements/${source}${sourceExtension}`))
+        .length > 0,
     );
     const { data, info } = await sharp(root)
       .ensureAlpha()
