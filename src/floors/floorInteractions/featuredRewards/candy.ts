@@ -6,8 +6,11 @@ export function createCandyRewards({
   balance,
   highestFloor,
   lowestLevel,
+  selectByRate,
   alternating,
+  cheapest,
   promoteAndUpgrade,
+  upgradeAndPay,
 }: RewardHelpers) {
   return {
     chocolateFountainOfYouth: (context) =>
@@ -68,5 +71,37 @@ export function createCandyRewards({
       actions.upgrade([context.floor], balance.caramelAppleUpgrades),
     moonlitMint: (context) =>
       actions.payCycles(alternating(context), balance.moonlitMintPayouts),
+    gumdropGazillionaire: (context) =>
+      actions.upgrade(context.floors, balance.gumdropGazillionaireUpgrades),
+    candyCornCornucopia: (context) =>
+      actions.payCycles(context.floors, balance.candyCornCornucopiaPayouts),
+    butterscotchBuyout: (context) =>
+      actions.upgrade([cheapest(context)], balance.butterscotchBuyoutUpgrades),
+    sourStrawSprint: (context) => {
+      const highest = highestFloor(context);
+      actions.upgrade([context.floor], balance.sourStrawSprintUpgrades);
+      if (highest !== context.floor)
+        actions.upgrade([highest], balance.sourStrawSprintUpgrades);
+    },
+    pralinePremium: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.pralinePremiumTierSteps,
+        balance.pralinePremiumUpgrades,
+      ),
+    fizzyFortune: (context) =>
+      actions.payCycles([lowestLevel(context)], balance.fizzyFortunePayouts),
+    marzipanMogul: (context) =>
+      actions.payCycles([context.floor], balance.marzipanMogulPayouts),
+    gummyWormWealth: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.gummyWormWealthUpgrades),
+    chocolateCoinCartel: (context) =>
+      upgradeAndPay(
+        [selectByRate(context, true)],
+        balance.chocolateCoinCartelUpgrades,
+        balance.chocolateCoinCartelPayouts,
+      ),
+    honeycombHustle: (context) =>
+      actions.upgrade(alternating(context), balance.honeycombHustleUpgrades),
   } satisfies Record<string, (context: CritRewardContext) => void>;
 }

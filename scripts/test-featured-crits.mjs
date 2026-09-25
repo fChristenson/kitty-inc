@@ -63,7 +63,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 692 + elementCritBatch.length);
+  assert.equal(kinds.length, 722 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -949,6 +949,36 @@ try {
     strudelCuddle: [[20, 30, 34, 0], 32],
     appleOfMyEye: [[20, 30, 10, 0], 129],
     turnoverTreasure: [[20, 30, 10, 0], 147],
+    blackForestFortune: [[20, 48, 10, 0], 72],
+    redVelvetRope: [[20, 59, 10, 0], 0],
+    tiramisuTycoon: [[20, 54, 10, 0], 63],
+    cheesecakeChairman: [[20, 80, 10, 0], 0],
+    carrotCakeCapital: [[20, 30, 33, 0], 34],
+    angelFoodAscension: [[20, 54, 10, 0], 0],
+    poundCakeProfits: [[20, 30, 10, 0], 123],
+    bundtFund: [[20, 30, 10, 0], 117],
+    lavaCakeLiquidity: [[20, 30, 10, 0], 88],
+    upsideDownUpswing: [[63, 30, 10, 0], 0],
+    watermelonWindfall: [[54, 64, 44, 0], 0],
+    papayaPayroll: [[20, 30, 10, 0], 204],
+    kiwiKickback: [[20, 30, 10, 0], 47],
+    topBanana: [[20, 30, 10, 0], 120],
+    cherryOnTop: [[20, 30, 51, 0], 0],
+    peachPerfect: [[20, 57, 10, 0], 0],
+    plumJob: [[20, 51, 10, 0], 57],
+    dragonfruitDynasty: [[57, 67, 10, 0], 0],
+    grapeExpectations: [[58, 30, 48, 0], 0],
+    pomegranatePortfolio: [[20, 62, 42, 0], 0],
+    gumdropGazillionaire: [[61, 71, 51, 0], 0],
+    candyCornCornucopia: [[20, 30, 10, 0], 246],
+    butterscotchBuyout: [[62, 30, 10, 0], 0],
+    sourStrawSprint: [[20, 66, 46, 0], 0],
+    pralinePremium: [[20, 58, 10, 0], 0],
+    fizzyFortune: [[20, 30, 10, 0], 96],
+    marzipanMogul: [[20, 30, 10, 0], 150],
+    gummyWormWealth: [[20, 30, 54, 0], 0],
+    chocolateCoinCartel: [[20, 49, 10, 0], 75],
+    honeycombHustle: [[56, 30, 46, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -1120,6 +1150,14 @@ try {
       assert.equal(test.context.floor.critMultiplierTier, "crit");
     if (kind === "custardCrown")
       assert.equal(test.context.floor.critMultiplierTier, "mega");
+    if (kind === "redVelvetRope")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "angelFoodAscension")
+      assert.equal(test.context.floor.critMultiplierTier, "mega");
+    if (kind === "peachPerfect")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
+    if (kind === "pralinePremium")
+      assert.equal(test.context.floor.critMultiplierTier, "crit");
   }
   for (const level of [0, 24, 25, 49, 50]) {
     const heavyTest = fixture();
