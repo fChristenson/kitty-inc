@@ -63,8 +63,7 @@ function pose(
     const stretch = Math.sin(Math.PI * Math.min(1, p * 1.6));
     return {
       angle:
-        WINDUP_ANGLE +
-        (Math.PI * 2 + OVERSHOOT_ANGLE - WINDUP_ANGLE) * eased,
+        WINDUP_ANGLE + (Math.PI * 2 + OVERSHOOT_ANGLE - WINDUP_ANGLE) * eased,
       scaleX: 1 + SQUASH * 0.6 * (1 - p) - SQUASH * 0.5 * stretch,
       scaleY: 1 - SQUASH * (1 - p) + SQUASH * stretch,
     };
