@@ -67,6 +67,11 @@ export interface WorkerSlot {
   // slot) so a longer-lasting boost (see shared/critTypes' Sunshine crit) can
   // override it per-activation without a separate parallel mechanism
   durationMs?: number;
+  // this regular worker's "Boost" event tier (see floors/boostEvent), promoted
+  // one crit tier per win. Absent in older saves; permaBoosted is the legacy
+  // single-win flag, read as the first tier
+  permaTier?: CritTier;
+  permaBoosted?: boolean;
 }
 
 export const BOOST_DURATION_MS = 15_000; // boosted state auto-resets this long after being triggered
@@ -121,6 +126,10 @@ export interface Floor {
   // discounted directly (a stored, already-mutable value), this multiplier is
   // only needed for the derived-from-getFloorPrice costs
   priceDiscountMultiplier: number;
+  // the manager's own "Boost" event tier (see floors/boostEvent) — kept on the
+  // floor rather than in a worker slot, since the manager's slot index shifts
+  // whenever another regular worker is hired
+  managerPermaTier?: CritTier | null;
 }
 
 // gameState.ts is the sole owner of this per-floor data (Floor itself doesn't carry it),
@@ -177,6 +186,24 @@ export function activateBoosted(
   slot.boosted = true;
   slot.boostedAt = now;
   slot.durationMs = durationMs;
+}
+
+export function getSlotPermaTier(
+  floor: Floor,
+  workerIndex: number,
+): CritTier | null {
+  const slot = getWorkerSlots(floor)[workerIndex];
+  return slot?.permaTier ?? (slot?.permaBoosted ? "crit" : null);
+}
+
+export function setSlotPermaTier(
+  floor: Floor,
+  workerIndex: number,
+  tier: CritTier,
+): void {
+  const slot = ensureSlot(floor, workerIndex);
+  slot.permaTier = tier;
+  delete slot.permaBoosted;
 }
 
 // how many of a floor's workers are currently boosted; incomePanel.ts uses this to
@@ -420,6 +447,8 @@ interface SavedFloor {
   overtimeStartedAt?: number | null; // added after initial release; older saves default to null on load
   overtimeCost?: SerializedBigNumber; // added after initial release; older saves default to ZERO on load
   priceDiscountMultiplier?: number; // added after initial release; older saves default to 1 on load
+  managerPermaTier?: CritTier | null; // added after initial release; older saves default to null on load
+  managerPermaBoosted?: boolean; // legacy single-win flag, loaded as the first tier
 }
 
 interface SavedBuildings {
@@ -461,6 +490,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
     overtimeStartedAt: floor.overtimeStartedAt,
     overtimeCost: floor.overtimeCost,
     priceDiscountMultiplier: floor.priceDiscountMultiplier,
+    managerPermaTier: floor.managerPermaTier,
   };
 }
 
@@ -560,6 +590,8 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
     overtimeCost:
       sf.overtimeCost !== undefined ? toBigNumber(sf.overtimeCost) : ZERO,
     priceDiscountMultiplier: sf.priceDiscountMultiplier ?? 1,
+    managerPermaTier:
+      sf.managerPermaTier ?? (sf.managerPermaBoosted ? "crit" : null),
   };
   workerSlots.set(floor, sf.workers);
   workerTintIndexes.set(floor, sf.tintIndexes ?? sf.spriteIndexes ?? []);

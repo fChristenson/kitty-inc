@@ -48,6 +48,7 @@ import {
   getCritTier,
   getUpgradeCost,
   rollFloorBuyCrit,
+  forceBoostEvent,
   type FloorActionsDeps,
 } from "./floors";
 import {
@@ -108,6 +109,7 @@ import {
   wireSpawnMouseButton,
   wireTestActionsFilter,
   wireIdleOverlayTestButton,
+  wireBoostEventTestButton,
   wireResetButton,
   createActionBarMarkup,
   wireActionBar,
@@ -547,6 +549,12 @@ async function main() {
     wireIdleOverlayTestButton(app, () =>
       totalEarnedOverlay.show(fromNumber(123456)),
     );
+    // arms the "Boost!" event button on the lowest floor that still has an
+    // un-boosted worker, and scrolls to it
+    wireBoostEventTestButton(app, () => {
+      const floor = forceBoostEvent(buildings[activeBuildingIndex] ?? []);
+      if (floor) gameCanvas.scrollActiveToFloor(floor);
+    });
     wireResetButton(app, buildings);
     // wired last, so it sees every dropdown/button the block above created
     wireTestActionsFilter(app);

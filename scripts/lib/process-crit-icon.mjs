@@ -13,6 +13,8 @@ export async function processCritIcon(
     darkBackgroundThreshold = null,
     backgroundColor = null,
     backgroundColorTolerance = 35,
+    // (r, g, b) => boolean; overrides the colour/whiteness background test
+    backgroundMatch = null,
     protectedRects = [],
     sourceExtension = ".jfif",
     sourcePath = null,
@@ -48,7 +50,13 @@ export async function processCritIcon(
   const whiteness = (pixel) =>
     Math.min(...data.subarray(pixel * channels, pixel * channels + 3));
   const isBackgroundColor = (pixel) =>
-    backgroundColor !== null
+    backgroundMatch !== null
+      ? backgroundMatch(
+          data[pixel * channels],
+          data[pixel * channels + 1],
+          data[pixel * channels + 2],
+        )
+      : backgroundColor !== null
       ? Math.hypot(
           ...backgroundColor.map(
             (channel, index) => data[pixel * channels + index] - channel,
@@ -102,7 +110,9 @@ export async function processCritIcon(
       (pixel >= width && !background[pixel - width]) ||
       (pixel + width < background.length && !background[pixel + width]);
     data[pixel * channels + 3] =
-      darkBackgroundThreshold !== null || backgroundColor !== null
+      darkBackgroundThreshold !== null ||
+      backgroundColor !== null ||
+      backgroundMatch !== null
         ? 0
         : touchesContent
           ? Math.round(

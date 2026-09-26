@@ -1,6 +1,6 @@
 import { FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { countBoostedWorkers, type Floor } from "../../gameState";
-import { MAX_RENDERED_WORKERS } from "../worker";
+import { MAX_RENDERED_WORKERS, permaBoostSpeedMultiplier } from "../worker";
 import {
   CRIT_TIER_CONFIG,
   isOvertimeGaugeVisible,
@@ -281,7 +281,9 @@ function currentSpeedMultiplier(floor: Floor, now: number): number {
   const boostExponent =
     boostedFraction * (floor.workerCount + (floor.hasManager ? 1 : 0));
   const speedMultiplier =
-    2 ** boostExponent * officeUpgradeSpeedMultiplier(floor);
+    2 ** boostExponent *
+    officeUpgradeSpeedMultiplier(floor) *
+    permaBoostSpeedMultiplier(floor, now);
   let effectiveSpeedMultiplier = speedMultiplier;
   if (isRateLockActive(floor, now)) {
     effectiveSpeedMultiplier = Math.max(

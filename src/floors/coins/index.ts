@@ -27,6 +27,8 @@ export async function loadCoinImage(): Promise<HTMLImageElement> {
   return loadCoinBurstImages();
 }
 
+export type CoinLayer = "world" | "overlay";
+
 interface Particle extends CoinBurstSprite {
   floor: Floor; // which floor's screen rect to map this particle's floor-local x/y through
   x: number;
@@ -46,6 +48,9 @@ interface Particle extends CoinBurstSprite {
 export interface HomingBurstOptions {
   // floor-local point to fly into; omitted means drawCoins' homeTarget (the total)
   target?: { x: number; y: number };
+  // "overlay" coins are only drawn by a drawCoins call for that layer (e.g. a
+  // screen freeze's own overlay), never by the normal world pass
+  layer?: CoinLayer;
   onFirstArrive?: () => void;
   onEachArrive?: () => void;
   // ~16.67ms ticks: how long coins pop out (random within [min, max]), and the
@@ -95,8 +100,10 @@ export function drawCoins(
     floor: Floor,
   ) => { left: number; top: number; width: number } | null,
   homeTarget?: { x: number; y: number },
+  layer: CoinLayer = "world",
 ): void {
   for (const p of pool.list) {
+    if ((p.homing?.group.layer ?? "world") !== layer) continue;
     const rect = getFloorRect(p.floor);
     if (!rect) continue;
     const scale = rect.width / FLOOR_W;

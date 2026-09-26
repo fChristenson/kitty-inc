@@ -67,7 +67,15 @@ import {
   BTN_W,
   BTN_H,
   getUpgradeCost,
+  isBoostEventArmed,
+  disarmBoostEvent,
 } from "../upgradeButton";
+import {
+  maybeArmBoostEvent,
+  startBoostEvent,
+  type OnScreenFloors,
+} from "../boostEvent";
+import { isScreenFrozen } from "../../shared/screenFreeze";
 import {
   increaseIncomeRate,
   increaseIncomeRateBy,
@@ -350,6 +358,10 @@ export interface FloorActionsDeps {
   // drawn) into this floor's own local coordinate space, so a coin burst can be
   // anchored there instead of at a fixed floor-local point
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number };
+  // floors currently in view, for the "Boost" event's target pick (see
+  // floors/boostEvent) — omitted off-screen (e.g. map/draft purchases), where
+  // that event simply never starts
+  getOnScreenFloors?: OnScreenFloors;
 }
 
 // re-exported for floors/index.ts's facade — the canonical check now lives in
@@ -1579,6 +1591,7 @@ export function handleFloorClick(
   isGroundFloor: boolean,
 ): void {
   if (
+    isScreenFrozen() ||
     isFloorLocked(floor) ||
     (isDetachedJobPending() && !isDetachedJobRunning())
   )
@@ -1639,6 +1652,19 @@ export function handleFloorClick(
   }
 
   if (hitTestUpgradeButton(x, y, isGroundFloor) && floor.unlocked) {
+    // "Boost" event (see floors/boostEvent): free, and leaves any armed crit
+    // for the next click. If no on-screen worker is left to pick, the button
+    // just disarms and this click falls through as a normal one
+    if (isBoostEventArmed(floor)) {
+      disarmBoostEvent(floor);
+      if (
+        startBoostEvent(floor, isGroundFloor, deps.getOnScreenFloors, persist)
+      ) {
+        triggerButtonPress(floor);
+        playCoinDrop();
+        return;
+      }
+    }
     // "Sale" boost: free clicks that add upgradeCount straight to incomeAmount,
     // instead of the normal cost/rateStep math — takes priority over the crit
     // branch below so a crit rolled during a sale just multiplies this payout
@@ -1798,6 +1824,7 @@ export function handleFloorClick(
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       applyFloorCrit(deps, floor, { ...procs, tier, bonusTier });
+      maybeArmBoostEvent(floor);
       // after the celebration, not before: Deja Vu grants its follow-up procs'
       // rewards synchronously from in there, and they'd otherwise miss this save
       persist();
@@ -1806,6 +1833,7 @@ export function handleFloorClick(
     if (spendTotalIncome(getUpgradeCost(floor))) {
       applyUpgradeTick(floor, isGroundFloor);
       rollCritUpgrade(floor);
+      maybeArmBoostEvent(floor);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();

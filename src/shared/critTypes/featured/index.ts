@@ -44,6 +44,7 @@ import { YAKUZA_CRITS } from "./yakuza";
 import { DEMON_GIRLS_CRITS } from "./demonGirls";
 import { CAT_GIRLS_CRITS } from "./catGirls";
 import { CHROME_GIRLS_CRITS } from "./chromeGirls";
+import { ELEMENTAL_WOMEN_CRITS } from "./elementalWomen";
 
 export const FEATURED_CRITS = {
   ...CYBERPUNK_CRITS,
@@ -91,4 +92,5 @@ export const FEATURED_CRITS = {
   ...DEMON_GIRLS_CRITS,
   ...CAT_GIRLS_CRITS,
   ...CHROME_GIRLS_CRITS,
+  ...ELEMENTAL_WOMEN_CRITS,
 } as const;

@@ -31,6 +31,11 @@ import {
   type PressAndHoldController,
 } from "../../shared/pressAndHold";
 import { getEffectiveDpr } from "../../shared/devicePixelRatio";
+import {
+  isScreenFrozen,
+  getScreenFreezeDim,
+  drawScreenFreezeOverlay,
+} from "../../shared/screenFreeze";
 import type { Floor } from "../../gameState";
 
 // a floor-room hit-test result: which floor a canvas point landed on, its own
@@ -437,6 +442,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return { x: FLOOR_W / 2, y: worldCenterY - floorTop };
   }
 
+  // shared/screenFreeze: the frame captured the moment a freeze began, and the
+  // camera it was drawn with, so the freeze overlay keeps lining up with it
+  let frozenFrame: {
+    image: HTMLCanvasElement;
+    viewportTop: number;
+    scale: number;
+  } | null = null;
+
   function redraw(): void {
     // the canvas measures 0x0 while hidden (e.g. the city map view is showing
     // instead) or for a stray frame or two around a visibility toggle before its
@@ -444,6 +457,60 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // (derived from cssW), so drawing anything against a zero/invalid size produces
     // non-finite coordinates and throws (e.g. inside createLinearGradient)
     if (cssW <= 0 || cssH <= 0) return;
+    if (!isScreenFrozen()) {
+      frozenFrame = null;
+      drawLiveFrame();
+      return;
+    }
+    if (
+      !frozenFrame ||
+      frozenFrame.image.width !== canvas.width ||
+      frozenFrame.image.height !== canvas.height
+    ) {
+      drawLiveFrame();
+      const image = document.createElement("canvas");
+      image.width = canvas.width;
+      image.height = canvas.height;
+      image.getContext("2d")!.drawImage(canvas, 0, 0);
+      frozenFrame = { image, viewportTop: viewportTopY(), scale };
+    } else {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(frozenFrame.image, 0, 0);
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = getScreenFreezeDim();
+    ctx.fillStyle = COLOR.black;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
+    const dpr = getEffectiveDpr();
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.scale(frozenFrame.scale, frozenFrame.scale);
+    ctx.translate(0, -frozenFrame.viewportTop);
+    drawScreenFreezeOverlay(ctx, getFloorRect);
+    ctx.restore();
+  }
+
+  // floors intersecting the viewport, with their world-space tops (see
+  // floors/boostEvent's target pick)
+  function onScreenFloors(): { floor: Floor; top: number }[] {
+    const viewTop = viewportTopY();
+    const viewBottom = viewportBottomY();
+    const { min, max } = visibleFloorIndexRange();
+    const result: { floor: Floor; top: number }[] = [];
+    for (let i = min; i <= max; i++) {
+      const { top, bottom } = floorWorldY(i);
+      if (bottom > viewTop && top < viewBottom)
+        result.push({ floor: activeFloors[i], top });
+    }
+    return result;
+  }
+
+  function drawLiveFrame(): void {
     updateMouse(activeFloors, Date.now());
     const dpr = getEffectiveDpr();
     ctx.save();
@@ -605,6 +672,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         createMysticBuilding: deps.createMysticBuilding,
         onFloorAdded: (floor) => notifyFloorAdded(floor),
         getScreenCenterLocal: screenCenterLocalFor,
+        getOnScreenFloors: onScreenFloors,
       },
       hit.floor,
       hit.localX,
@@ -644,6 +712,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
 
   function onPointerDown(event: PointerEvent): void {
     if (event.pointerType === "mouse" && event.button !== 0) return;
+    // the frozen frame is a still picture: no scrolling or clicking under it
+    if (isScreenFrozen()) return;
     stopMomentum();
     dragPointerId = event.pointerId;
     dragStartX = event.clientX;
@@ -762,6 +832,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
 
   function onWheel(event: WheelEvent): void {
     event.preventDefault();
+    if (isScreenFrozen()) return;
     stopMomentum();
     scrollUp -= event.deltaY / scale;
     clampCamera();

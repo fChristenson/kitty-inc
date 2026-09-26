@@ -34,10 +34,16 @@ export function quoteUpgrades(
     logPrice: log10(entry.price),
   }));
   const overBudget = fromLog10(log10(money) + 1);
+  // huge balances would otherwise plan more upgrades than a job can ever replay
+  const maxCount = (curve: (typeof curves)[number]): number =>
+    Math.min(
+      CONFIG.renovation.maxUpgradesPerFloor,
+      Number.MAX_SAFE_INTEGER - curve.floor.upgradeCount,
+    );
   function atCutoff(cutoff: number, record = false): BigNumber {
     let total = ZERO;
     for (const curve of curves) {
-      const count =
+      const uncapped =
         cutoff < curve.logPrice
           ? 0
           : Math.max(
@@ -48,9 +54,8 @@ export function quoteUpgrades(
                   Math.expm1(((cutoff - curve.logPrice) * Math.LN10) / 4),
               ) + 1,
             );
-      if (!Number.isSafeInteger(curve.floor.upgradeCount + count)) {
-        return overBudget;
-      }
+      if (!Number.isFinite(uncapped)) return overBudget;
+      const count = Math.min(uncapped, maxCount(curve));
       if (record) purchases[curve.index] = count;
       if (count === 0) continue;
       const cost = upgradeBatchCost(curve.floor, count);
@@ -81,6 +86,7 @@ export function quoteUpgrades(
     let cheapest: (typeof curves)[number] | undefined;
     let price = money;
     for (const curve of curves) {
+      if (purchases[curve.index] >= maxCount(curve)) continue;
       const nextPrice = upgradePriceAfter(curve.floor, purchases[curve.index]);
       if (!cheapest || lt(nextPrice, price)) {
         cheapest = curve;
@@ -88,15 +94,6 @@ export function quoteUpgrades(
       }
     }
     if (!cheapest || lt(money, add(cost, price))) break;
-    if (
-      !Number.isSafeInteger(
-        cheapest.floor.upgradeCount + purchases[cheapest.index] + 1,
-      )
-    ) {
-      throw new RangeError(
-        "Affordable upgrade count exceeds exact numeric precision",
-      );
-    }
     cost = add(cost, price);
     purchases[cheapest.index]++;
   }

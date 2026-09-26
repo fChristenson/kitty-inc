@@ -21,8 +21,9 @@
 //
 // Import order below is also the event-button PRIORITY order (see
 // shared/floorEvents' registerEventButton) for the rare case more than one is active on the same
-// floor at once — keep sale/overtime in this order unless deliberately
-// reprioritizing.
+// floor at once — boost is first because its click branch in floorInteractions
+// runs before sale/overtime; keep sale/overtime in this order unless
+// deliberately reprioritizing.
 import { drawCartoonText, drawPill, formatPrice } from "../../utils";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
@@ -38,11 +39,13 @@ import {
 } from "./shared";
 import { getActiveEventButton } from "../../shared/floorEvents";
 import { getCritTier, CRIT_TIER_CONFIG, type CritTier } from "./crit";
+import "./boost";
 import "./sale";
 import "./overtime";
 
 export * from "./shared";
 export * from "./crit";
+export * from "./boost";
 export * from "./sale";
 export * from "./overtime";
 

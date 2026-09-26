@@ -476,7 +476,7 @@ export const CONFIG = {
     // this time, silently (see rollCrit in shared/critTypes). A hit just
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
-    specialCritGatewayChance: 0.05,
+    specialCritGatewayChance: 0.25,
     bonusTierGatewayChance: 0.01,
     // "chain crit" — an extra roll on top of an already-landed crit/mega/ultra
     // (see rollCritUpgrade): applies that same tier's upgrade to the next floor
@@ -2695,11 +2695,123 @@ export const CONFIG = {
     polishedPoutPayouts: 38,
     loweredLensesChance: 0.0011,
     loweredLensesUpgrades: 40,
+    flameFlirtChance: 0.0011,
+    flameFlirtPayouts: 74,
+    tidalTeaseChance: 0.001,
+    tidalTeasePayouts: 61,
+    riptideRomanceChance: 0.0009,
+    riptideRomanceUpgrades: 53,
+    zephyrGlamourChance: 0.0007,
+    zephyrGlamourPayouts: 52,
+    galeGalaChance: 0.0007,
+    galeGalaUpgrades: 48,
+    crosswindCrushChance: 0.0009,
+    crosswindCrushUpgrades: 48,
+    windfallWaltzChance: 0.0011,
+    windfallWaltzPayouts: 71,
+    glacialGlamChance: 0.0011,
+    glacialGlamUpgrades: 76,
+    snowglobeWinkChance: 0.0011,
+    snowglobeWinkPayouts: 73,
+    iceboxIdolChance: 0.0011,
+    iceboxIdolUpgrades: 66,
+    joltValentineChance: 0.0008,
+    joltValentineTierSteps: 1,
+    joltValentineUpgrades: 47,
+    sparkSweetheartChance: 0.001,
+    sparkSweetheartPayouts: 74,
+    voltageVowChance: 0.001,
+    voltageVowUpgrades: 71,
+    magmaMuseChance: 0.0009,
+    magmaMuseUpgrades: 37,
+    magmaMusePayouts: 39,
+    moltenMogulChance: 0.0006,
+    moltenMogulTierSteps: 2,
+    moltenMogulUpgrades: 23,
+    lavaLoungerChance: 0.001,
+    lavaLoungerUpgrades: 41,
+    lavaLoungerPayouts: 43,
+    mossMaidenChance: 0.0011,
+    mossMaidenUpgrades: 72,
+    blossomBashfulChance: 0.0011,
+    blossomBashfulPayouts: 71,
+    bedrockBeautyChance: 0.0011,
+    bedrockBeautyUpgrades: 69,
+    basaltBombshellChance: 0.001,
+    basaltBombshellUpgrades: 34,
+    basaltBombshellPayouts: 36,
+    nuggetKnockoutChance: 0.0008,
+    nuggetKnockoutTierSteps: 1,
+    nuggetKnockoutUpgrades: 51,
+    duneDarlingChance: 0.0009,
+    duneDarlingPayouts: 58,
+    hourglassHeiressChance: 0.001,
+    hourglassHeiressPayouts: 47,
+    sandsOfFortuneChance: 0.0011,
+    sandsOfFortuneUpgrades: 67,
+    vaporVogueChance: 0.0011,
+    vaporVoguePayouts: 72,
+    teatimeTeaseChance: 0.001,
+    teatimeTeaseUpgrades: 45,
+    earlGreyGlamourChance: 0.001,
+    earlGreyGlamourPayouts: 46,
+    tempestTiaraChance: 0.001,
+    tempestTiaraUpgrades: 63,
+    starlightSwoonChance: 0.0006,
+    starlightSwoonUpgrades: 21,
+    starlightSwoonPayouts: 23,
+    stardustSighChance: 0.0009,
+    stardustSighUpgrades: 50,
+    umbraEnchantressChance: 0.0008,
+    umbraEnchantressTierSteps: 1,
+    umbraEnchantressUpgrades: 54,
+    nightfallNudgeChance: 0.0009,
+    nightfallNudgeUpgrades: 49,
+    hoodedHushChance: 0.0009,
+    hoodedHushPayouts: 50,
+    smokescreenSmirkChance: 0.001,
+    smokescreenSmirkPayouts: 48,
+    ringletRascalChance: 0.001,
+    ringletRascalUpgrades: 44,
+    ashenAllureChance: 0.001,
+    ashenAllureUpgrades: 35,
+    ashenAllurePayouts: 37,
+    geodeCoquetteChance: 0.0006,
+    geodeCoquetteTierSteps: 2,
+    geodeCoquetteUpgrades: 17,
+    amethystAllureChance: 0.001,
+    amethystAllureUpgrades: 38,
+    amethystAllurePayouts: 40,
+    crystalCurtsyChance: 0.0008,
+    crystalCurtsyUpgrades: 29,
+    crystalCurtsyPayouts: 31,
+    prismPinupChance: 0.0009,
+    prismPinupUpgrades: 44,
+    prismPinupPayouts: 42,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.
   sale: {
     durationMs: 15_000,
+  },
+
+  // src/renovation — bulk "Renovate floors" purchases replay one upgrade at a
+  // time, so a huge balance's plan is capped per floor
+  renovation: {
+    maxUpgradesPerFloor: 100_000,
+  },
+
+  // src/floors/boostEvent — the rare "Boost" event button. A paid or crit
+  // upgrade click arms it; clicking it freezes the screen, streams coins into
+  // one random on-screen worker (or manager) below the top crit tier, and
+  // promotes it one crit tier (x5 -> x25 -> x125, see CRIT_TIER_CONFIG): while
+  // boosted it multiplies its floor's speed by that tier's multiplier.
+  boostEvent: {
+    chance: 0.005, // per qualifying upgrade click
+    cooldownMs: 30_000, // minimum time between two procs
+    durationMs: 3_000, // whole freeze; the worker's glow changes tier from the first coin landing until it ends
+    // a perma-boosted manager's auto-boost lasts this many times longer
+    managerBoostDurationMultiplier: 2,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Work overtime" boost.

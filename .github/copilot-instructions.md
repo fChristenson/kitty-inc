@@ -30,6 +30,8 @@ The template for prompts used to AI-generate special crit artwork is:
 
 The following keywords should be referenced in prompts. The content should replace the template's `[SUBJECT]`.
 
+Every full prompt (template with `[SUBJECT]` filled in) must be at most 480 characters. The template itself is 296 characters, so each subject must be at most 184 characters. Count the finished prompt before suggesting it and shorten the subject if it runs over.
+
 ## Special crits
 
 A "crit" is a random bonus on an upgrade click. There are two independent layers,
