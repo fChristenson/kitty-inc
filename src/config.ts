@@ -2809,7 +2809,7 @@ export const CONFIG = {
   boostEvent: {
     chance: 0.005, // per qualifying upgrade click
     cooldownMs: 30_000, // minimum time between two procs
-    durationMs: 3_000, // whole freeze; the worker's glow changes tier from the first coin landing until it ends
+    durationMs: 1_800, // whole freeze, matching arcadeSlotWin.wav's audible length; the worker's glow changes tier from the first coin landing until it ends
     // a perma-boosted manager's auto-boost lasts this many times longer
     managerBoostDurationMultiplier: 2,
   },

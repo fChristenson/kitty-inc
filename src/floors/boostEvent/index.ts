@@ -9,6 +9,7 @@ import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
 import { randomInt } from "../../utils";
 import { isFloorLocked } from "../../shared/detachedJob";
+import { playBoostEventStream } from "../../sound";
 import { EVENT_COIN_TIMING } from "../../shared/floorEvents";
 import {
   LONG_PRESS_COIN_ARRIVE_MS,
@@ -144,6 +145,7 @@ export function startBoostEvent(
   running = boost;
   setWorkerSpotlight(target.floor, target.workerIndex);
   freezeScreen(drawOverlay);
+  playBoostEventStream();
 
   // coins are spawned on (and drawn through) the button's own floor, so the
   // worker's spot is converted into that floor's local coordinates

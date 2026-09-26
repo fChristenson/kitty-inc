@@ -366,3 +366,8 @@ export function playArcadeSlotWin(): void {
   lastArcadeSlotWinPlayTime = now;
   playSfx("arcadeSlotWin", ARCADE_SLOT_WIN_VOLUME);
 }
+
+// the same slot-machine sfx over the Boost event's coin stream
+export function playBoostEventStream(): void {
+  playSfx("arcadeSlotWin", ARCADE_SLOT_WIN_VOLUME);
+}
