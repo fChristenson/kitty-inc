@@ -12,7 +12,7 @@ const FLOOD_LO = 195;
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "gamesOfChance");
 const src = path.join(assets, "bonusRound.jfif");
 const dest = path.join(assets, "bonusRound.png");
-const themeDest = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "gamesOfChance",
+const themeDest = path.join(assets, "..", "..", "processedCrits", "gamesOfChance",
   "bonusRound.png",
 );
 

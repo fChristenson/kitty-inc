@@ -14,7 +14,7 @@ const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "c
 const src = path.join(assets, "nightOwl.jfif");
 const dest = path.join(assets, "nightOwl.png");
 // loadAssets' IMAGE_FILES glob only sees the theme's own dist/ root
-const themeDest = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "seasons",
+const themeDest = path.join(assets, "..", "..", "processedCrits", "seasons",
   "nightOwl.png",
 );
 

@@ -5,7 +5,7 @@ import { copyFile } from "node:fs/promises";
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "gamesOfChance");
 const src = path.join(assets, "luckyNumber.jfif");
 const dest = path.join(assets, "luckyNumber.png");
-const shipped = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "gamesOfChance",
+const shipped = path.join(assets, "..", "..", "processedCrits", "gamesOfChance",
   "luckyNumber.png",
 );
 

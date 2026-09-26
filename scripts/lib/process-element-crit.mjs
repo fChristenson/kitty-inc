@@ -25,10 +25,13 @@ export async function processElementCrit(kind) {
       : {}),
   };
   await processCritIcon(kind, options);
-  const references = path.join(root, "src/assets/themes/references/dist");
   for (const destination of [
     path.join(root, "src/assets", category),
-    path.join(references, category),
+    path.join(
+      root,
+      "src/assets/processedCrits",
+      path.relative("crits", category),
+    ),
   ]) {
     await fs.mkdir(destination, { recursive: true });
     await fs.copyFile(

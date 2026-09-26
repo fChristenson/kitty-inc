@@ -10,7 +10,7 @@ const FLOOD_LO = 180;
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "seasons");
 const src = path.join(assets, "spendingFreeze.jfif");
 const dest = path.join(assets, "spendingFreeze.png");
-const themeDest = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "seasons",
+const themeDest = path.join(assets, "..", "..", "processedCrits", "seasons",
   "spendingFreeze.png",
 );
 

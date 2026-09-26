@@ -4,7 +4,7 @@ import { processStickerCritIcon } from "../../lib/process-sticker-crit-icon.mjs"
 await processStickerCritIcon("layeredSecurity", { ringSeed: [590, 37] });
 for (const directory of [
   "../../../src/assets/crits/cakes/",
-  "../../../src/assets/themes/references/dist/crits/cakes/",
+  "../../../src/assets/processedCrits/cakes/",
 ]) {
   await fs.mkdir(new URL(directory, import.meta.url), { recursive: true });
   await fs.copyFile(

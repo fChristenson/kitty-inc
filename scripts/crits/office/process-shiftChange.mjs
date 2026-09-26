@@ -10,7 +10,7 @@ const FLOOD_LO = 195;
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "office");
 const src = path.join(assets, "shiftChange.jfif");
 const dest = path.join(assets, "shiftChange.png");
-const themeDest = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "office",
+const themeDest = path.join(assets, "..", "..", "processedCrits", "office",
   "shiftChange.png",
 );
 

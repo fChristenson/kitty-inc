@@ -210,7 +210,7 @@ export async function processCritIcon(
   if (copyToAssetDirectories) {
     for (const directory of [
       path.join(assets, category),
-      path.join(assets, "themes/references/dist", category),
+      path.join(assets, "processedCrits", path.relative("crits", category)),
     ]) {
       await fs.mkdir(directory, { recursive: true });
       await fs.copyFile(destination, path.join(directory, `${name}.png`));

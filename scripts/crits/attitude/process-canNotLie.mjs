@@ -6,7 +6,7 @@ await processCritIcon("canNotLie", {
   backgroundSeeds: [[800, 1000]],
 });
 await fs.mkdir(
-  new URL("../../../src/assets/themes/references/dist/crits/attitude/", import.meta.url),
+  new URL("../../../src/assets/processedCrits/attitude/", import.meta.url),
   {
     recursive: true,
   },
@@ -14,7 +14,7 @@ await fs.mkdir(
 await fs.copyFile(
   new URL("../../../public/crits/attitude/canNotLie.png", import.meta.url),
   new URL(
-    "../../../src/assets/themes/references/dist/crits/attitude/canNotLie.png",
+    "../../../src/assets/processedCrits/attitude/canNotLie.png",
     import.meta.url,
   ),
 );

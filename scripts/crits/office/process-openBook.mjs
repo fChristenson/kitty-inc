@@ -5,7 +5,7 @@ import { copyFile } from "node:fs/promises";
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "office");
 const src = path.join(assets, "openBook.jfif");
 const dest = path.join(assets, "openBook.png");
-const shipped = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "office",
+const shipped = path.join(assets, "..", "..", "processedCrits", "office",
   "openBook.png",
 );
 

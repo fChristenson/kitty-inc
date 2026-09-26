@@ -12,7 +12,7 @@ const FLOOD_LO = 210;
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "riches");
 const src = path.join(assets, "rateLock.jfif");
 const dest = path.join(assets, "rateLock.png");
-const themeDest = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "riches",
+const themeDest = path.join(assets, "..", "..", "processedCrits", "riches",
   "rateLock.png",
 );
 

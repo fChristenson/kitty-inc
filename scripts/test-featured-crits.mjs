@@ -1089,9 +1089,7 @@ try {
     assert(root.equals(await readFile(`public/crits/elements/${kind}.png`)));
     assert(
       root.equals(
-        await readFile(
-          `src/assets/themes/references/dist/crits/elements/${kind}.png`,
-        ),
+        await readFile(`src/assets/processedCrits/elements/${kind}.png`),
       ),
     );
     assert(
@@ -1269,9 +1267,7 @@ try {
     const cutout = await readFile(`public/crits/attitude/${kind}.png`);
     assert(
       cutout.equals(
-        await readFile(
-          `src/assets/themes/references/dist/crits/attitude/${kind}.png`,
-        ),
+        await readFile(`src/assets/processedCrits/attitude/${kind}.png`),
       ),
     );
     const original = await readFile(`src/assets/crits/attitude/${kind}.png`);
@@ -1339,7 +1335,9 @@ try {
     assert(cutout.equals(await readFile(`src/assets/${iconFile}`)));
     assert(
       cutout.equals(
-        await readFile(`src/assets/themes/references/dist/${iconFile}`),
+        await readFile(
+          `src/assets/processedCrits/${path.relative("crits", iconFile)}`,
+        ),
       ),
     );
     assert(
@@ -1386,9 +1384,7 @@ try {
   );
   assert(
     heavyIcon.equals(
-      await readFile(
-        "src/assets/themes/references/dist/crits/elements/heavyElement.png",
-      ),
+      await readFile("src/assets/processedCrits/elements/heavyElement.png"),
     ),
   );
   assert.equal(CONFIG.crit.nucleusDividendUpgrades, 6);
@@ -1405,9 +1401,7 @@ try {
   );
   assert(
     nucleusIcon.equals(
-      await readFile(
-        "src/assets/themes/references/dist/crits/elements/nucleusDividend.png",
-      ),
+      await readFile("src/assets/processedCrits/elements/nucleusDividend.png"),
     ),
   );
   const newAssetKinds = [

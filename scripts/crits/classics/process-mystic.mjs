@@ -14,7 +14,7 @@ const FLOOD_LO = 220;
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "classics");
 const src = path.join(assets, "mystic.jfif");
 const dest = path.join(assets, "mystic.png");
-const shippedDest = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "classics",
+const shippedDest = path.join(assets, "..", "..", "processedCrits", "classics",
   "mystic.png",
 );
 

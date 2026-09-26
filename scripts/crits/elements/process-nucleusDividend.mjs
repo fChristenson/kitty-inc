@@ -9,7 +9,7 @@ await processCritIcon("nucleusDividend", {
 });
 for (const directory of [
   "../../../src/assets/crits/elements/",
-  "../../../src/assets/themes/references/dist/crits/elements/",
+  "../../../src/assets/processedCrits/elements/",
 ]) {
   await fs.mkdir(new URL(directory, import.meta.url), { recursive: true });
   await fs.copyFile(

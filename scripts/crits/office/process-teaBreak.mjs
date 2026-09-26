@@ -14,7 +14,7 @@ const MIN_KEEP_AREA = 300;
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "office");
 const src = path.join(assets, "teaBreak.jfif");
 const dest = path.join(assets, "teaBreak.png");
-const themeDest = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "office",
+const themeDest = path.join(assets, "..", "..", "processedCrits", "office",
   "teaBreak.png",
 );
 

@@ -10,7 +10,7 @@ const FLOOD_LO = 220;
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "classics");
 const src = path.join(assets, "skip.jfif");
 const dest = path.join(assets, "skip.png");
-const shippedDest = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "classics", "skip.png");
+const shippedDest = path.join(assets, "..", "..", "processedCrits", "classics", "skip.png");
 
 const { data, info } = await sharp(src)
   .ensureAlpha()

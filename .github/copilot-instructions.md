@@ -115,7 +115,7 @@ reports, batch reports, or effect documentation unless explicitly requested.
 1. Inventory supplied raw assets against the current registry and processing scripts. Account for every requested asset, including explicitly excluded ones.
 2. Compare proposed rewards against `CRIT_PROC_INFO` descriptions and reward handlers. Assign unique names and distinct reward values or targets.
 3. Sample actual background pixels and make a labeled, ordered contact sheet. Group only images suited to the same removal technique. Use dedicated `process-<image>.mjs` wrappers around `scripts/lib/process-crit-icon.mjs` when compatible.
-4. Run wrappers. The shared processor removes border-connected background, drops tiny components, tight-crops, caps at 250x250, writes a quantized PNG, and copies it to `themes/references/dist`. Preserve raw sources unless removal is requested.
+4. Run wrappers. The shared processor removes border-connected background, drops tiny components, tight-crops, caps at 250x250, writes a quantized PNG, and copies it to `src/assets/processedCrits/<category>`. Preserve raw sources unless removal is requested.
 5. Inspect every processed icon on a contrasting background. Verify enclosed light details, disconnected real pieces, outlines, feet, crop bounds, dimensions, alpha, indexed palette, and identical root/shipped copies.
 6. Integrate and validate in small slices. Complete metadata, rewards, shipped icons, and generated test controls for every entry before calling the batch done. Do not change unrelated existing crit balance.
 
@@ -159,7 +159,7 @@ A family of procs must decrease monotonically with reward size. Do not copy the 
 
 ### Processing a new crit's icon
 
-Every special-crit backdrop icon is a raw `src/assets/crits/<category>/<name>.jfif` processed by a dedicated `scripts/crits/<category>/process-<name>.mjs` into `public/crits/<category>/<name>.png` (plus a root copy in `src/assets/crits/<category>/`). Never hand-edit a PNG directly or overwrite the raw source. The script must also copy the finished PNG into `src/assets/themes/references/dist/crits/<category>/<name>.png`; the shared processors resolve these category folders from `IMAGE_FILES` via `scripts/lib/crit-asset-paths.mjs`.
+Every special-crit backdrop icon is a raw `src/assets/crits/<category>/<name>.jfif` processed by a dedicated `scripts/crits/<category>/process-<name>.mjs` into `public/crits/<category>/<name>.png` (plus a root copy in `src/assets/crits/<category>/`). Never hand-edit a PNG directly or overwrite the raw source. The script must also copy the finished PNG into `src/assets/processedCrits/<category>/<name>.png`; the shared processors resolve these category folders from `IMAGE_FILES` via `scripts/lib/crit-asset-paths.mjs`.
 
 Pick a chroma-key technique based on the raw art's actual background:
 

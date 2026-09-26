@@ -13,7 +13,7 @@ const FLOOD_LO = 220;
 const assets = path.resolve(import.meta.dirname, "../../..", "src", "assets", "crits", "office");
 const src = path.join(assets, "keynote.jfif");
 const dest = path.join(assets, "keynote.png");
-const shippedDest = path.join(assets, "..", "..", "themes", "references", "dist", "crits", "office",
+const shippedDest = path.join(assets, "..", "..", "processedCrits", "office",
   "keynote.png",
 );
 
