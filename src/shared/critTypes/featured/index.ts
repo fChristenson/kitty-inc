@@ -39,6 +39,8 @@ import { PLUSHIES_CRIT_INFO } from "./plushies";
 import { FRUITS_CRIT_INFO } from "./fruits";
 import { CHOCOLATE_CRIT_INFO } from "./chocolate";
 import { CAKES_CRIT_INFO } from "./cakes";
+import { MAFIA_CRIT_INFO } from "./mafia";
+import { YAKUZA_CRIT_INFO } from "./yakuza";
 
 export const FEATURED_CRIT_INFO = {
   ...CYBERPUNK_CRIT_INFO,
@@ -81,4 +83,6 @@ export const FEATURED_CRIT_INFO = {
   ...CAKES_CRIT_INFO,
   ...FRUITS_CRIT_INFO,
   ...CHOCOLATE_CRIT_INFO,
+  ...MAFIA_CRIT_INFO,
+  ...YAKUZA_CRIT_INFO,
 } as const;

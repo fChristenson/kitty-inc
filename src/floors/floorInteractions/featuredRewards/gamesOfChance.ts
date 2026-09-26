@@ -1,4 +1,3 @@
-import type { Floor } from "../../../gameState";
 import type { CritRewardContext } from "../index";
 import type { RewardHelpers } from "./helpers";
 
@@ -10,15 +9,12 @@ export function createGamesOfChanceRewards({
   selectByRate,
   alternating,
   cheapest,
+  belowAndHere,
+  hereAnd,
   promoteAndUpgrade,
   upgradeAndPay,
   cascadeDown,
 }: RewardHelpers) {
-  const belowAndHere = (context: CritRewardContext) =>
-    context.floors.slice(0, context.floors.indexOf(context.floor) + 1);
-  // a second target that turns out to be this floor only counts once
-  const hereAnd = (context: CritRewardContext, other: Floor) =>
-    other === context.floor ? [context.floor] : [context.floor, other];
   return {
     bullseye: (context) =>
       actions.upgrade([lowestLevel(context)], balance.bullseyeUpgrades),

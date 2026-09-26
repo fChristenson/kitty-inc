@@ -49,6 +49,11 @@ export function createRewardHelpers(actions: FeaturedRewardActions) {
           lt(floor.upgradeCost, best.upgradeCost) ? floor : best,
         context.floor,
       );
+  const belowAndHere = (context: CritRewardContext) =>
+    context.floors.slice(0, context.floors.indexOf(context.floor) + 1);
+  // a second target that turns out to be this floor only counts once
+  const hereAnd = (context: CritRewardContext, other: Floor) =>
+    other === context.floor ? [context.floor] : [context.floor, other];
   const promoteAndUpgrade = (floor: Floor, steps: number, upgrades: number) => {
     for (let step = 0; step < steps; step++) {
       floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
@@ -88,6 +93,8 @@ export function createRewardHelpers(actions: FeaturedRewardActions) {
     selectByRate,
     alternating,
     cheapest,
+    belowAndHere,
+    hereAnd,
     promoteAndUpgrade,
     upgradeAndPay,
     cascadeDown,

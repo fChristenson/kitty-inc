@@ -1,9 +1,6 @@
 import type { FeaturedCritKind } from "../../../shared/critTypes";
 import type { CritRewardContext } from "../index";
-import {
-  createRewardHelpers,
-  type FeaturedRewardActions,
-} from "./helpers";
+import { createRewardHelpers, type FeaturedRewardActions } from "./helpers";
 import { createCyberpunkRewards } from "./cyberpunk";
 import { createAttitudeRewards } from "./attitude";
 import { createElementsRewards } from "./elements";
@@ -44,6 +41,8 @@ import { createPlushiesRewards } from "./plushies";
 import { createFruitsRewards } from "./fruits";
 import { createChocolateRewards } from "./chocolate";
 import { createCakesRewards } from "./cakes";
+import { createMafiaRewards } from "./mafia";
+import { createYakuzaRewards } from "./yakuza";
 
 export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
   const helpers = createRewardHelpers(actions);
@@ -88,5 +87,7 @@ export function createFeaturedCritRewards(actions: FeaturedRewardActions) {
     ...createCakesRewards(helpers),
     ...createFruitsRewards(helpers),
     ...createChocolateRewards(helpers),
+    ...createMafiaRewards(helpers),
+    ...createYakuzaRewards(helpers),
   } satisfies Record<FeaturedCritKind, (context: CritRewardContext) => void>;
 }
