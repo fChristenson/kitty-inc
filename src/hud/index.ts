@@ -67,6 +67,7 @@ export {
   wireTestActionsFilter,
   wireIdleOverlayTestButton,
   wireBoostEventTestButton,
+  wireHuntEventTestButton,
   wireResetButton,
 } from "./testButton";
 export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";

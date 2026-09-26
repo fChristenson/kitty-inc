@@ -25,23 +25,18 @@ import {
   playExplosion,
   playJackpot,
   playPayout,
-  playArcadeSlotWin,
-  playSold,
 } from "../../sound";
-import { spawnBonusTierCoins, triggerHudTotalFlash } from "../../bonusTierFx";
+import {
+  celebrateBonusTier,
+  spawnTierBurstPattern,
+  tierColor,
+} from "../../shared/bonusTierReward";
 import {
   triggerScreenShake,
   isCritFlashActive,
   getFlashHoldEndsAt,
   freezeCritFlashAsBackground,
 } from "../../screenShake";
-import { COLOR } from "../../palette";
-
-function tierColor(tier: CritTier): string {
-  if (tier === "ultra") return COLOR.red;
-  if (tier === "mega") return COLOR.amber;
-  return COLOR.purple;
-}
 
 // the shake/flash/sfx treatment for a landed tier, tier-scaled — `label`/
 // `color` let a piggyback proc (see celebrateChain/celebrateBoost below) show
@@ -114,100 +109,24 @@ function playSpecialFlash(label: string, color: string): void {
   playExplosion();
 }
 
-// bursts on top of whatever the caller's own reward already spawned, so the
-// celebration keeps erupting for as long as the flash/shake animation plays
-// out. First one is dead center (matching the flash text) at 0s; the rest are
-// staggered outward so they read as separate pops, not one simultaneous burst.
-// Each tier up gets more bursts spread wider/longer, matching its bigger
-// shake/flash duration. Re-read fresh at each delayed spawn in case the user
-// scrolls in between
+// tier-sized coin bursts around the screen center, on top of whatever the
+// caller's own reward spawned; re-read fresh per burst in case of scrolling
+function centerBurstSpawner(
+  floor: Floor,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): (offsetX: number, offsetY: number) => void {
+  return (offsetX, offsetY) => {
+    const p = getScreenCenterLocal(floor);
+    spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
+  };
+}
+
 function spawnTierBursts(
   floor: Floor,
   tier: CritTier,
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
 ): void {
-  const CENTER_BURST_OFFSET_PX = 200;
-  const CENTER_BURST_OFFSET_PY = 100;
-  const MEGA_BURST_OFFSET_PX = 260;
-  const MEGA_BURST_OFFSET_PY = 140;
-  const ULTRA_BURST_OFFSET_PX = 320;
-  const ULTRA_BURST_OFFSET_PY = 170;
-  const centerBursts: { offsetX: number; offsetY: number; delayMs: number }[] =
-    tier === "ultra"
-      ? [
-          { offsetX: 0, offsetY: 0, delayMs: 0 },
-          { offsetX: 0, offsetY: -ULTRA_BURST_OFFSET_PY, delayMs: 90 },
-          {
-            offsetX: ULTRA_BURST_OFFSET_PX,
-            offsetY: -ULTRA_BURST_OFFSET_PY / 2,
-            delayMs: 180,
-          },
-          {
-            offsetX: ULTRA_BURST_OFFSET_PX,
-            offsetY: ULTRA_BURST_OFFSET_PY / 2,
-            delayMs: 270,
-          },
-          { offsetX: 0, offsetY: ULTRA_BURST_OFFSET_PY, delayMs: 360 },
-          {
-            offsetX: -ULTRA_BURST_OFFSET_PX,
-            offsetY: ULTRA_BURST_OFFSET_PY / 2,
-            delayMs: 450,
-          },
-          {
-            offsetX: -ULTRA_BURST_OFFSET_PX,
-            offsetY: -ULTRA_BURST_OFFSET_PY / 2,
-            delayMs: 540,
-          },
-        ]
-      : tier === "mega"
-        ? [
-            { offsetX: 0, offsetY: 0, delayMs: 0 },
-            {
-              offsetX: -MEGA_BURST_OFFSET_PX,
-              offsetY: -MEGA_BURST_OFFSET_PY,
-              delayMs: 120,
-            },
-            {
-              offsetX: MEGA_BURST_OFFSET_PX,
-              offsetY: -MEGA_BURST_OFFSET_PY,
-              delayMs: 240,
-            },
-            {
-              offsetX: -MEGA_BURST_OFFSET_PX,
-              offsetY: MEGA_BURST_OFFSET_PY,
-              delayMs: 360,
-            },
-            {
-              offsetX: MEGA_BURST_OFFSET_PX,
-              offsetY: MEGA_BURST_OFFSET_PY,
-              delayMs: 480,
-            },
-          ]
-        : [
-            { offsetX: 0, offsetY: 0, delayMs: 0 },
-            {
-              offsetX: -CENTER_BURST_OFFSET_PX,
-              offsetY: -CENTER_BURST_OFFSET_PY,
-              delayMs: 100,
-            },
-            {
-              offsetX: CENTER_BURST_OFFSET_PX,
-              offsetY: CENTER_BURST_OFFSET_PY,
-              delayMs: 200,
-            },
-          ];
-  for (const { offsetX, offsetY, delayMs } of centerBursts) {
-    // a little random scatter/timing jitter on top of each burst's own base
-    // spot — keeps repeated crits from erupting in the exact same
-    // choreographed pattern every single time
-    const jitterX = offsetX + (Math.random() - 0.5) * 40;
-    const jitterY = offsetY + (Math.random() - 0.5) * 40;
-    const jitteredDelayMs = Math.max(0, delayMs + (Math.random() - 0.5) * 40);
-    setTimeout(() => {
-      const p = getScreenCenterLocal(floor);
-      spawnCoinBurst(floor, p.x + jitterX, p.y + jitterY, () => {});
-    }, jitteredDelayMs);
-  }
+  spawnTierBurstPattern(tier, centerBurstSpawner(floor, getScreenCenterLocal));
 }
 
 function celebrateTier(
@@ -217,57 +136,6 @@ function celebrateTier(
 ): void {
   playTierFlash(tier, CRIT_TIER_CONFIG[tier].label, tierColor(tier));
   spawnTierBursts(floor, tier, getScreenCenterLocal);
-}
-
-// per-tier flash tuning for the "special crit crit" bonus tier's own
-// celebration below — unlike a plain landed tier (celebrateTier above, whose
-// only tier with a strobing hold is ultra), EVERY bonus tier blinks, scaled
-// up per tier so a bigger multiplier sticks around proportionally longer.
-// Each holdMs is an exact odd multiple of blinkHz's own half-cycle
-// (1000/(6*2) ≈ 83.33ms), so the strobe always lands back "on" right as the
-// hold ends and the fade-out can begin smoothly (same reasoning
-// playTierFlash's own ultra branch already documents) — ultra's own value
-// (1250) is unchanged from that existing tier
-const BONUS_TIER_FLASH: Record<
-  CritTier,
-  { intensity: number; strokeWidth: number; holdMs: number; priority: number }
-> = {
-  crit: { intensity: 1.4, strokeWidth: 10, holdMs: 417, priority: 0 },
-  mega: { intensity: 2, strokeWidth: 14, holdMs: 750, priority: 1 },
-  ultra: { intensity: 2.6, strokeWidth: 16, holdMs: 1250, priority: 2 },
-};
-
-// "special crit crit" bonus tier (see shared/critTypes' getBonusTierCrit):
-// always blinks/strobes regardless of which tier (5x/25x/125x) actually
-// landed — the same treatment ultra's own plain-crit flash gets — and always
-// plays arcadeSlotWin.wav instead of that tier's usual sfx, since this is
-// always its own distinct "slot machine hit", not a graduated
-// crit/jackpot/payout escalation
-function celebrateBonusTier(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
-  const { intensity, strokeWidth, holdMs, priority } = BONUS_TIER_FLASH[tier];
-  triggerScreenShake({
-    intensity,
-    label: CRIT_TIER_CONFIG[tier].label,
-    color: tierColor(tier),
-    strokeWidth,
-    blinkHz: 6,
-    holdMs,
-    priority,
-  });
-  playArcadeSlotWin();
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
-  // 3 coins fly from this very flash text up to the total-income readout,
-  // shrinking as they go (see bonusTierFx's own doc comment) — once they all
-  // arrive, the total itself flashes white + wiggles while the purchase sound
-  // plays, so the moment reads as this reward physically merging into the total
-  spawnBonusTierCoins(() => {
-    triggerHudTotalFlash();
-    playSold();
-  });
 }
 
 // chain crit (see upgradeButton.ts's isChainCrit/rollFloorBuyCrit's own chain
@@ -572,7 +440,11 @@ export function triggerCritCelebration(
       specialCelebrationQueue.push({
         kind: "bonusTier",
         queuedAt: now,
-        run: () => celebrateBonusTier(floor, bonusTier, getScreenCenterLocal),
+        run: () =>
+          celebrateBonusTier(
+            bonusTier,
+            centerBurstSpawner(floor, getScreenCenterLocal),
+          ),
       });
     }
     drainSpecialCelebrationQueue();

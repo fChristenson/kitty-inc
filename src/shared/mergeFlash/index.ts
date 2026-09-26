@@ -15,6 +15,30 @@ export function mergeFlashWhite(envelope: number, now: number): number {
   return envelope * WHITE_PEAK * (PULSE_FLOOR + (1 - PULSE_FLOOR) * wave);
 }
 
+// one reused scratch canvas: the image washed toward white inside its own
+// silhouette only ('source-atop' keeps the transparent padding untouched)
+let whiteScratch: HTMLCanvasElement | null = null;
+export function whitenImage(
+  source: CanvasImageSource,
+  width: number,
+  height: number,
+  alpha: number,
+): HTMLCanvasElement {
+  whiteScratch ??= document.createElement("canvas");
+  if (whiteScratch.width !== width) whiteScratch.width = width;
+  if (whiteScratch.height !== height) whiteScratch.height = height;
+  const ctx = whiteScratch.getContext("2d")!;
+  ctx.clearRect(0, 0, width, height);
+  ctx.drawImage(source, 0, 0, width, height);
+  ctx.globalCompositeOperation = "source-atop";
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, width, height);
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = "source-over";
+  return whiteScratch;
+}
+
 // "absorb" size bump when coins land in a target: one swell-and-settle per
 // beat, where a beat is a few long-press ticks so a held button's stream of
 // landings reads as a steady rhythm instead of a 30Hz jitter

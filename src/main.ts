@@ -49,6 +49,7 @@ import {
   getUpgradeCost,
   rollFloorBuyCrit,
   forceBoostEvent,
+  forceHuntEvent,
   type FloorActionsDeps,
 } from "./floors";
 import {
@@ -110,6 +111,7 @@ import {
   wireTestActionsFilter,
   wireIdleOverlayTestButton,
   wireBoostEventTestButton,
+  wireHuntEventTestButton,
   wireResetButton,
   createActionBarMarkup,
   wireActionBar,
@@ -558,6 +560,15 @@ async function main() {
     // un-boosted worker, and scrolls to it
     wireBoostEventTestButton(app, () => {
       const floor = forceBoostEvent(buildings[activeBuildingIndex] ?? []);
+      if (floor) gameCanvas.scrollActiveToFloor(floor);
+    });
+    // spawns a mouse if none is out, arms "Hunt!" on its floor and scrolls there
+    wireHuntEventTestButton(app, () => {
+      let floor = forceHuntEvent();
+      if (!floor) {
+        forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
+        floor = forceHuntEvent();
+      }
       if (floor) gameCanvas.scrollActiveToFloor(floor);
     });
     wireResetButton(app, buildings);

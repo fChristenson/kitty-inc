@@ -1,5 +1,5 @@
-// "Boost" event button: a rare upgrade click (see floors/boostEvent's
-// maybeArmBoostEvent) arms it, and it stays armed until clicked. Clicking it is
+// "Boost" event button: a rare upgrade click (see floors/eventProcs' shared
+// pool) arms it, and it stays armed until clicked. Clicking it is
 // free and starts the screen-freezing worker boost in floors/boostEvent
 import type { Floor } from "../../gameState";
 import { COLOR } from "../../palette";

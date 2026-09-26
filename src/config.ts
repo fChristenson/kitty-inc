@@ -2801,6 +2801,12 @@ export const CONFIG = {
     maxUpgradesPerFloor: 100_000,
   },
 
+  // src/floors/eventProcs — every event button below (Boost, Hunt, ...) shares
+  // one pool: at most one arms per click, then none can arm until this passes
+  eventProcs: {
+    cooldownMs: 30_000,
+  },
+
   // src/floors/boostEvent — the rare "Boost" event button. A paid or crit
   // upgrade click arms it; clicking it freezes the screen, streams coins into
   // one random on-screen worker (or manager) below the top crit tier, and
@@ -2808,10 +2814,18 @@ export const CONFIG = {
   // boosted it multiplies its floor's speed by that tier's multiplier.
   boostEvent: {
     chance: 0.005, // per qualifying upgrade click
-    cooldownMs: 30_000, // minimum time between two procs
-    durationMs: 1_800, // whole freeze, matching arcadeSlotWin.wav's audible length; the worker's glow changes tier from the first coin landing until it ends
     // a perma-boosted manager's auto-boost lasts this many times longer
     managerBoostDurationMultiplier: 2,
+  },
+
+  // src/floors/huntEvent — the rare "Hunt" event button, only armed while the
+  // mouse (src/mouse) is on screen. Clicking it streams coins into the mouse
+  // (same freeze/stream/sound as boostEvent), which then grows, turns red and
+  // restarts its time on screen; clicking that hunted mouse gives its normal
+  // boost plus a guaranteed "special crit crit" bonus tier (5x/25x/125x total
+  // income, weighted by the crit tier odds, see shared/bonusTierReward).
+  huntEvent: {
+    chance: 0.02, // per qualifying upgrade click while the mouse is on screen
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Work overtime" boost.

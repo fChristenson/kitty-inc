@@ -2,7 +2,7 @@
 // the whole screen freezes (shared/screenFreeze), a stream of coins flies from
 // the button into one random on-screen worker (or manager) not yet at the top
 // crit tier, and that worker flashes white, wiggles and its glow crossfades
-// into the next crit tier's color over CONFIG.boostEvent.durationMs. It then
+// into the next crit tier's color over EVENT_STREAM_DURATION_MS. It then
 // unfreezes with the normal worker boost jump, one crit tier higher for good:
 // while boosted it multiplies its floor's speed by that tier's crit multiplier
 import type { Floor } from "../../gameState";
@@ -10,11 +10,7 @@ import { CONFIG } from "../../config";
 import { randomInt } from "../../utils";
 import { isFloorLocked } from "../../shared/detachedJob";
 import { playBoostEventStream } from "../../sound";
-import { EVENT_COIN_TIMING } from "../../shared/floorEvents";
-import {
-  LONG_PRESS_COIN_ARRIVE_MS,
-  LONG_PRESS_TICK_MS,
-} from "../../shared/pressAndHold";
+import { LONG_PRESS_COIN_ARRIVE_MS } from "../../shared/pressAndHold";
 import { mergeFlashWhite } from "../../shared/mergeFlash";
 import { getWiggleRotation } from "../../shared/wiggle";
 import {
@@ -23,14 +19,10 @@ import {
   unfreezeScreen,
   type FloorRectResolver,
 } from "../../shared/screenFreeze";
-import { drawCoins, spawnHomingCoinBurst } from "../coins";
-import {
-  BTN_W,
-  BTN_H,
-  armBoostEvent,
-  getButtonCenter,
-  isBoostEventArmed,
-} from "../upgradeButton";
+import { drawCoins } from "../coins";
+import { armBoostEvent, isBoostEventArmed } from "../upgradeButton";
+import { EVENT_STREAM_DURATION_MS, streamEventCoins } from "./coinStream";
+import { registerEventProc, type OnScreenFloors } from "../eventProcs";
 import {
   celebrateWorkerBoost,
   clearWorkerSpotlight,
@@ -41,9 +33,7 @@ import {
   setWorkerSpotlight,
 } from "../worker";
 
-// which floors currently intersect the viewport, each with its world-space top
-// (the same space gameCanvas's getFloorRect reports)
-export type OnScreenFloors = () => { floor: Floor; top: number }[];
+export type { OnScreenFloors } from "../eventProcs";
 
 interface RunningBoost {
   floor: Floor;
@@ -52,20 +42,15 @@ interface RunningBoost {
 }
 
 let running: RunningBoost | null = null;
-let lastProcAt = -Infinity;
 
-// arms the button on a qualifying upgrade click, at CONFIG.boostEvent.chance,
 // only while this floor still has a worker the event could pick
-export function maybeArmBoostEvent(floor: Floor): void {
-  if (isBoostEventArmed(floor)) return;
-  const now = Date.now();
-  if (now - lastProcAt < CONFIG.boostEvent.cooldownMs) return;
-  if (getBoostEventCandidates(floor).length === 0) return;
-  if (Math.random() < CONFIG.boostEvent.chance) {
-    lastProcAt = now;
-    armBoostEvent(floor);
-  }
-}
+registerEventProc({
+  key: "boost",
+  chance: () => CONFIG.boostEvent.chance,
+  isArmed: isBoostEventArmed,
+  canArm: (floor) => getBoostEventCandidates(floor).length > 0,
+  arm: armBoostEvent,
+});
 
 // dev test hook: arms the first unlocked floor that still has a worker to pick,
 // ignoring chance and cooldown and never starting the cooldown itself
@@ -86,8 +71,7 @@ function drawOverlay(
   const now = performance.now();
   const rect = getFloorRect(running.floor);
   if (rect) {
-    const { durationMs } = CONFIG.boostEvent;
-    const growMs = durationMs - LONG_PRESS_COIN_ARRIVE_MS;
+    const growMs = EVENT_STREAM_DURATION_MS - LONG_PRESS_COIN_ARRIVE_MS;
     const t = Math.min(1, Math.max(0, (now - running.growStartAt) / growMs));
     const eased = t * t * (3 - 2 * t);
     const envelope = now >= running.growStartAt ? 1 : 0;
@@ -135,7 +119,7 @@ export function startBoostEvent(
   const target = candidates[randomInt(0, candidates.length - 1)];
   const { center } = target;
 
-  const { durationMs } = CONFIG.boostEvent;
+  const durationMs = EVENT_STREAM_DURATION_MS;
   const startedAt = performance.now();
   const boost: RunningBoost = {
     floor: target.floor,
@@ -150,27 +134,13 @@ export function startBoostEvent(
   // coins are spawned on (and drawn through) the button's own floor, so the
   // worker's spot is converted into that floor's local coordinates
   const coinTarget = { x: center.x, y: center.y + target.top - sourceTop };
-  const button = getButtonCenter(isGroundFloor);
-  // one burst per press-and-hold tick, like holding the button the whole
-  // time, stopping early enough that the last coins land as the freeze ends
-  const coinBursts =
-    Math.floor((durationMs - LONG_PRESS_COIN_ARRIVE_MS) / LONG_PRESS_TICK_MS) +
-    1;
-  for (let i = 0; i < coinBursts; i++) {
-    setTimeout(() => {
-      if (running !== boost) return;
-      spawnHomingCoinBurst(
-        sourceFloor,
-        button.x + (Math.random() - 0.5) * (BTN_W * 0.75),
-        button.y + (Math.random() - 0.5) * (BTN_H / 2),
-        {
-          ...EVENT_COIN_TIMING,
-          target: coinTarget,
-          layer: "overlay",
-        },
-      );
-    }, i * LONG_PRESS_TICK_MS);
-  }
+  streamEventCoins(
+    sourceFloor,
+    isGroundFloor,
+    coinTarget,
+    durationMs,
+    () => running === boost,
+  );
 
   setTimeout(() => {
     if (running !== boost) return;
@@ -183,3 +153,5 @@ export function startBoostEvent(
   }, durationMs);
   return true;
 }
+
+export { EVENT_STREAM_DURATION_MS, streamEventCoins } from "./coinStream";

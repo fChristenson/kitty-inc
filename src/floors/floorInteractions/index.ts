@@ -69,12 +69,12 @@ import {
   getUpgradeCost,
   isBoostEventArmed,
   disarmBoostEvent,
+  isHuntEventArmed,
+  disarmHuntEvent,
 } from "../upgradeButton";
-import {
-  maybeArmBoostEvent,
-  startBoostEvent,
-  type OnScreenFloors,
-} from "../boostEvent";
+import { startBoostEvent, type OnScreenFloors } from "../boostEvent";
+import { startHuntEvent } from "../huntEvent";
+import { maybeArmEventProc } from "../eventProcs";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import {
   increaseIncomeRate,
@@ -104,7 +104,8 @@ import {
   spawnCoinBurst as animateCoinBurst,
   spawnHomingCoinBurst as animateHomingCoinBurst,
 } from "../coins";
-import { pulseHudTotalFlash } from "../../bonusTierFx";
+import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
+import { applyBonusTierIncome } from "../../shared/bonusTierReward";
 import { EVENT_COIN_TIMING } from "../../shared/floorEvents";
 import { spawnFloatingCoins } from "../coinFloat";
 import { spawnIncomeFloatText } from "../incomeFloatText";
@@ -1130,16 +1131,10 @@ function applyGoldStandardCrit(): void {
   addTotalIncome(multiply(getTotalIncome(), 3));
 }
 
-// "special crit crit" bonus tier (see shared/critTypes's getBonusTierCrit):
-// once ANY piggyback proc lands, it gets its own independent shot at this
-// bonus tier — when it hits, multiplies the currently active company's total
-// income by that tier's own multiplier (5x/25x/125x), same "add
-// (multiplier-1)x more" shape payday/gold standard already use, on top of
-// whatever the proc(s) it rode in on already granted
+// "special crit crit" bonus tier (see shared/critTypes's getBonusTierCrit and
+// shared/bonusTierReward): rides on whatever the proc(s) already granted
 function applyBonusTierCrit(bonusTier: CritTier): void {
-  addTotalIncome(
-    multiply(getTotalIncome(), CRIT_TIER_CONFIG[bonusTier].multiplier - 1),
-  );
+  applyBonusTierIncome(bonusTier);
 }
 
 // "Chair Giveaway"/"Supplies Giveaway" crits (see shared/critTypes's isChairGiveawayCrit/
@@ -1652,6 +1647,16 @@ export function handleFloorClick(
   }
 
   if (hitTestUpgradeButton(x, y, isGroundFloor) && floor.unlocked) {
+    // "Hunt" event (see floors/huntEvent): free like Boost below, falling
+    // through as a normal click if the mouse has left the screen meanwhile
+    if (isHuntEventArmed(floor)) {
+      disarmHuntEvent(floor);
+      if (startHuntEvent(floor, isGroundFloor, deps.getOnScreenFloors)) {
+        triggerButtonPress(floor);
+        playCoinDrop();
+        return;
+      }
+    }
     // "Boost" event (see floors/boostEvent): free, and leaves any armed crit
     // for the next click. If no on-screen worker is left to pick, the button
     // just disarms and this click falls through as a normal one
@@ -1824,7 +1829,7 @@ export function handleFloorClick(
       const bonusTier = getBonusTierCrit(floor);
       consumeCritUpgrade(floor);
       applyFloorCrit(deps, floor, { ...procs, tier, bonusTier });
-      maybeArmBoostEvent(floor);
+      maybeArmEventProc(floor, deps.getOnScreenFloors);
       // after the celebration, not before: Deja Vu grants its follow-up procs'
       // rewards synchronously from in there, and they'd otherwise miss this save
       persist();
@@ -1833,7 +1838,7 @@ export function handleFloorClick(
     if (spendTotalIncome(getUpgradeCost(floor))) {
       applyUpgradeTick(floor, isGroundFloor);
       rollCritUpgrade(floor);
-      maybeArmBoostEvent(floor);
+      maybeArmEventProc(floor, deps.getOnScreenFloors);
       persist();
       triggerButtonPress(floor);
       playCoinDrop();

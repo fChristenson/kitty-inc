@@ -12,6 +12,14 @@ import { applyBoostAll } from "../hud";
 import { playBloop } from "../sound";
 import type { Floor } from "../gameState";
 import { loadImageByName } from "../loadAssets";
+import { COLOR } from "../palette";
+import { registerHuntTarget } from "../shared/huntTarget";
+import { whitenImage } from "../shared/mergeFlash";
+import { pickCritTierByOdds } from "../shared/critTypes";
+import {
+  applyBonusTierIncome,
+  celebrateBonusTier,
+} from "../shared/bonusTierReward";
 
 // a free bonus critter: spawns at random on a random unlocked floor of whichever
 // building is currently active, runs back and forth for a few seconds, and — if
@@ -71,9 +79,16 @@ interface MouseState {
   spawnedAt: number;
   pausedUntil: number; // Date.now() timestamp; holds still until then
   moveStartedAt: number; // Date.now() this dart's movement actually began, once any pause elapses
+  huntedAt: number | null; // Date.now() a Hunt event (floors/huntEvent) marked it
 }
 
+const HUNTED_TINT_ALPHA = 0.5;
+const HUNTED_GROW_SCALE = 1.25;
+// the grow-in lands right as the Hunt event's arcadeSlotWin stream ends
+const HUNTED_GROW_MS = 250;
+
 let mouseImage: HTMLImageElement | null = null;
+let huntedImage: HTMLCanvasElement | null = null;
 let active: MouseState | null = null;
 let lastUpdate = 0;
 let nextSpawnAt = Date.now() + randomInt(MIN_SPAWN_GAP_MS, MAX_SPAWN_GAP_MS);
@@ -128,6 +143,7 @@ function spawnOn(floors: Floor[], now: number): void {
     spawnedAt: now,
     pausedUntil: 0,
     moveStartedAt: now, // overwritten by rollNextDart below, just satisfying the type here
+    huntedAt: null,
   };
   rollNextDart(active, now);
 }
@@ -177,6 +193,28 @@ export function forceSpawnMouse(floors: Floor[]): void {
   spawnOn(floors, Date.now());
 }
 
+// the red-tinted sprite a hunted mouse draws with, built once on first use
+function getHuntedImage(image: HTMLImageElement): HTMLCanvasElement {
+  if (huntedImage) return huntedImage;
+  const canvas = document.createElement("canvas");
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+  const c = canvas.getContext("2d")!;
+  c.drawImage(image, 0, 0);
+  c.globalCompositeOperation = "source-atop";
+  c.globalAlpha = HUNTED_TINT_ALPHA;
+  c.fillStyle = COLOR.red;
+  c.fillRect(0, 0, canvas.width, canvas.height);
+  huntedImage = canvas;
+  return canvas;
+}
+
+function getScale(state: MouseState, now: number): number {
+  if (state.huntedAt === null) return 1;
+  const t = Math.min(1, Math.max(0, (now - state.huntedAt) / HUNTED_GROW_MS));
+  return 1 + (HUNTED_GROW_SCALE - 1) * t * t * (3 - 2 * t);
+}
+
 // draws the mouse into this floor's own canvas, a no-op unless it's the one floor
 // currently hosting it. Bottom-anchored at MOUSE_Y (feet/paws touch the same line
 // the cats stand on), not centered on it
@@ -184,6 +222,17 @@ export function drawMouse(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
   now: number,
+): void {
+  drawMouseSprite(ctx, floor, now, true, 0, 0);
+}
+
+function drawMouseSprite(
+  ctx: CanvasRenderingContext2D,
+  floor: Floor,
+  now: number,
+  animate: boolean,
+  whiteAlpha: number,
+  rotation: number,
 ): void {
   if (!active || !mouseImage || active.floor !== floor) return;
   const { x } = active;
@@ -194,7 +243,7 @@ export function drawMouse(
   let stretchX = 1;
   let stretchY = 1;
   let shear = 0;
-  if (now >= active.pausedUntil) {
+  if (animate && now >= active.pausedUntil) {
     const phase = (now % RUN_CYCLE_MS) / RUN_CYCLE_MS;
     const lift = Math.sin(phase * Math.PI * 2); // full cycle: down, up, down, up
     bob = -Math.abs(lift) * RUN_BOB_HEIGHT;
@@ -220,6 +269,9 @@ export function drawMouse(
 
   ctx.save();
   ctx.translate(x, MOUSE_Y + bob);
+  if (rotation !== 0) ctx.rotate(rotation);
+  const scale = getScale(active, now);
+  ctx.scale(scale, scale);
   ctx.transform(
     active.direction !== ART_FACES ? -stretchX : stretchX,
     0,
@@ -228,17 +280,34 @@ export function drawMouse(
     0,
     0,
   );
-  ctx.drawImage(mouseImage, -RENDER_W / 2, -RENDER_H, RENDER_W, RENDER_H);
+  const sprite =
+    active.huntedAt === null ? mouseImage : getHuntedImage(mouseImage);
+  ctx.drawImage(
+    whiteAlpha > 0
+      ? whitenImage(
+          sprite,
+          mouseImage.naturalWidth,
+          mouseImage.naturalHeight,
+          whiteAlpha,
+        )
+      : sprite,
+    -RENDER_W / 2,
+    -RENDER_H,
+    RENDER_W,
+    RENDER_H,
+  );
   ctx.restore();
 }
 
 // whether a floor-local point lands on the currently-visible mouse on this floor
 export function hitTestMouse(x: number, y: number, floor: Floor): boolean {
   if (!active || active.floor !== floor) return false;
+  const scale = getScale(active, Date.now());
+  const halfW = (RENDER_W * scale) / 2;
   return (
-    x >= active.x - RENDER_W / 2 - HIT_PADDING &&
-    x <= active.x + RENDER_W / 2 + HIT_PADDING &&
-    y >= MOUSE_Y - RENDER_H - HIT_PADDING &&
+    x >= active.x - halfW - HIT_PADDING &&
+    x <= active.x + halfW + HIT_PADDING &&
+    y >= MOUSE_Y - RENDER_H * scale - HIT_PADDING &&
     y <= MOUSE_Y + HIT_PADDING
   );
 }
@@ -259,10 +328,42 @@ export function handleMouseClick(
 ): void {
   if (!hitTestMouse(x, y, floor)) return;
   const burstX = active!.x;
+  const hunted = active!.huntedAt !== null;
   const now = Date.now();
   despawn(now);
   applyBoostAll(floors);
   triggerJumpAll(floors, now);
   playBloop();
   spawnCoinBurst(floor, burstX, MOUSE_Y - RENDER_H / 2, () => {});
+  if (!hunted) return;
+  const origin = { floor, x: burstX, y: MOUSE_Y - RENDER_H / 2 };
+  const tier = pickCritTierByOdds();
+  applyBonusTierIncome(tier);
+  celebrateBonusTier(
+    tier,
+    (offsetX, offsetY) =>
+      spawnCoinBurst(floor, origin.x + offsetX, origin.y + offsetY, () => {}),
+    origin,
+  );
 }
+
+registerHuntTarget({
+  get: () =>
+    active && active.huntedAt === null
+      ? {
+          floor: active.floor,
+          x: active.x,
+          y: MOUSE_Y - RENDER_H / 2,
+        }
+      : null,
+  markHunted: () => {
+    if (!active) return;
+    const now = Date.now();
+    active.huntedAt = now;
+    active.spawnedAt = now;
+    // the freeze paused updateMouse; don't replay that time as one big step
+    lastUpdate = now;
+  },
+  drawStill: (ctx, floor, whiteAlpha, rotation) =>
+    drawMouseSprite(ctx, floor, Date.now(), false, whiteAlpha, rotation),
+});

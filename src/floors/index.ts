@@ -332,6 +332,7 @@ export {
 export type { ChainCritDeps } from "./floorInteractions";
 export type { FloorActionsDeps } from "./floorInteractions";
 export { forceBoostEvent } from "./boostEvent";
+export { forceHuntEvent } from "./huntEvent";
 export {
   forceKeynoteCritUpgrade,
   forceKeynoteFloorBuyCrit,

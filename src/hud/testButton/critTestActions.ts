@@ -50,6 +50,7 @@ export function createTestButtonMarkup(): string {
           <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
           <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
           <button id="test-boost-event" class="game__button">Boost Event</button>
+          <button id="test-hunt-event" class="game__button">Hunt Event</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

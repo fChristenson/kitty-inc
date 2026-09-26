@@ -35,6 +35,15 @@ export function wireBoostEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireHuntEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-hunt-event")!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireResetButton(
   container: HTMLElement,
   buildings: Floor[][],

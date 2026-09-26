@@ -22,7 +22,7 @@ import { drawHud, HUD_H } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
 import { getScreenShakeOffset, drawCritFlash } from "../../screenShake";
-import { drawBonusTierCoins } from "../../bonusTierFx";
+import { drawTotalIncomeCoins } from "../../shared/totalIncomeCoins";
 import { COLOR } from "../../palette";
 import type { BigNumber } from "../../shared/bigNumber";
 import {
@@ -573,13 +573,19 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // instead of guessing a fixed height
     hudBottomY = drawHud(ctx, SLOT_W, getTotalIncome());
     drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
-    drawBonusTierCoins(
+    drawTotalIncomeCoins(
       ctx,
       SLOT_W / 2,
       contentViewportH() / 2,
       SLOT_W / 2,
       HUD_H / 2,
       SLOT_W,
+      (origin) => {
+        const rect = getFloorRect(origin.floor);
+        return rect
+          ? { x: rect.left + origin.x, y: rect.top + origin.y - viewportTopY() }
+          : null;
+      },
       Date.now(),
     );
     ctx.restore();

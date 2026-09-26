@@ -10,7 +10,7 @@ import {
   getHudTotalAbsorbScale,
   getHudTotalFlashStrength,
   getHudTotalWhiteMix,
-} from "../../bonusTierFx";
+} from "../totalIncomeCoins";
 import { getWiggleRotation } from "../wiggle";
 import { getTotalRollPose } from "../eventEndRoll";
 
@@ -87,7 +87,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     const strokeWidth = fontSize * AMOUNT_STROKE_TO_FONT_RATIO;
 
     // "special crit crit" bonus-tier coins merging into the total (see
-    // bonusTierFx) flash this whole readout white and wiggle it briefly —
+    // shared/totalIncomeCoins) flash this whole readout white and wiggle it briefly —
     // strength fades 1 -> 0, so both the color blend and the wiggle's own
     // amplitude fade back to normal together instead of snapping off
     const now = Date.now();

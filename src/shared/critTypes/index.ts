@@ -1958,6 +1958,20 @@ function rollTier(): CritTier | null {
   return null;
 }
 
+// always lands a tier, weighted by each tier's own relative chance
+export function pickCritTierByOdds(): CritTier {
+  const total = CRIT_TIER_ORDER.reduce(
+    (sum, tier) => sum + CRIT_TIER_CONFIG[tier].chance,
+    0,
+  );
+  let roll = Math.random() * total;
+  for (const tier of CRIT_TIER_ORDER) {
+    roll -= CRIT_TIER_CONFIG[tier].chance;
+    if (roll < 0) return tier;
+  }
+  return CRIT_TIER_ORDER[CRIT_TIER_ORDER.length - 1];
+}
+
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
 // for the tier (previously duplicated separately by rollCritUpgrade and
 // rollFloorBuyCrit), then — only if a tier actually landed — rolls the
