@@ -49,7 +49,7 @@ and they must not be confused:
    `shared/critTypes`'s `CRIT_PROC_KINDS`/`CRIT_PROC_INFO` — read it there
    rather than trusting any list written down elsewhere.
 
-All odds/multipliers live in `src/config.ts`'s `CONFIG.crit` — never hardcode a
+All odds/multipliers live in `src/config.ts`'s `CONFIG.crit` (featured crits' values in the per-category `src/critBalance/` files it spreads in) — never hardcode a
 chance or multiplier anywhere else.
 
 ### Every new special crit needs all three
@@ -98,7 +98,7 @@ Do not add a new preload variable, per-label draw block, or duplicated menu entr
 
 Use the batch catalog pattern even when adding one proc. Legacy `X_CRIT_*` constants and force helpers remain for existing callers; do not multiply that boilerplate for a new batch.
 
-1. Add `<kind>Chance` and all reward counts, multipliers, and durations to `CONFIG.crit`. `getCritProcChance(kind)` expects that naming convention. Pick odds from the bands below and compare neighboring rewards.
+1. Add `<kind>Chance` and all reward counts, multipliers, and durations to the matching `src/critBalance/<category>.ts` (same category name as its featured file; create it and spread it in `critBalance/index.ts` for a new category). Those files are spread into `CONFIG.crit`. `getCritProcChance(kind)` expects that naming convention. Pick odds from the bands below and compare neighboring rewards.
 2. Add one `{ label, color, image, description, reward }` entry to the matching category file in `src/shared/critTypes/featured/<category>.ts` (create a new category file and spread it in `featured/index.ts` when none fits). `FEATURED_CRITS` is assembled from those files and is the single registry for a featured crit's metadata, icon and effect — `FeaturedCritDefinition` makes every field mandatory, and `featuredProcs.ts` fails the build if `<kind>Chance` is missing from `CONFIG.crit`. Do not create a parallel registry.
 3. Write `reward` as `(context, { ...helpers }) => ...`, reusing the shared helpers from `featured/rewardHelpers.ts`. Extend the helper set only for a genuinely new operation.
 4. Process the icon and set `image: "crits/<category>/<name>.png"` on the entry; `loadAssets` registers it in `IMAGE_FILES` under the crit's kind automatically, so do not add featured crits to `IMAGE_FILES` by hand. Metadata supplies generic flash, collection menu, and test button behavior.

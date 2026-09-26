@@ -25,7 +25,6 @@ import { randomInt } from "../../utils";
 import { loadSprite } from "../../loadAssets";
 import { spawnCoinBurst } from "../coins";
 import { playAutoBoost } from "../../sound";
-import { CONFIG } from "../../config";
 import { getScreenUnfrozenAt } from "../../shared/screenFreeze";
 import { whitenImage } from "../../shared/mergeFlash";
 
@@ -524,12 +523,8 @@ function maybeTriggerManagerBoost(floor: Floor, now: number): void {
   if (now < nextAt) return;
   const state = getFloorWorkers(floor, now);
   const feetY = WORKER_FEET_Y;
-  // a perma-boosted manager (see floors/boostEvent) boosts for longer
-  const durationMs = floor.managerPermaTier
-    ? BOOST_DURATION_MS * CONFIG.boostEvent.managerBoostDurationMultiplier
-    : BOOST_DURATION_MS;
   state.walkers.forEach((walker, i) => {
-    activateBoosted(floor, i, now, durationMs);
+    activateBoosted(floor, i, now);
     walker.clickedAt = now;
     spawnCoinBurst(floor, walker.x, feetY - RENDER_H / 2, () => {});
   });
