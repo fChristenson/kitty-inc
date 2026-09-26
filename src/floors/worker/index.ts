@@ -227,6 +227,14 @@ type Behavior = "walking" | "paused" | "lookingBack";
 import { snapshotMap } from "../../shared/snapshotState";
 import { isDetachedJobPending, isFloorLocked } from "../../shared/detachedJob";
 
+interface WalkerPose {
+  groundY: number;
+  direction: 1 | -1;
+  frame: number;
+  stretchX: number;
+  stretchY: number;
+}
+
 interface WalkerState {
   x: number;
   direction: 1 | -1;
@@ -238,13 +246,7 @@ interface WalkerState {
   behaviorUntil: number; // when to randomly roll the next behavior
   // exactly how drawWorker last drew this walker, so a screen freeze's overlay
   // (see drawWorkerSpotlight) can redraw it in the very same pose
-  pose?: {
-    groundY: number;
-    direction: 1 | -1;
-    frame: number;
-    stretchX: number;
-    stretchY: number;
-  };
+  pose?: WalkerPose;
 }
 
 interface FloorWorkers {
@@ -439,12 +441,14 @@ export function drawWorkerSpotlight(
   const pose = walker?.pose;
   if (!walker || !pose) return;
   const tier = getWorkerPermaTier(floor, workerIndex);
-  if (tier) drawPermaGlow(ctx, walker.x, pose.groundY, tier, 1 - promotion);
-  drawPermaGlow(ctx, walker.x, pose.groundY, nextCritTier(tier), promotion);
+  const sprite =
+    workerIndex === managerIndexOf(floor) ? managerSprite : workerSprite;
   ctx.save();
   ctx.translate(walker.x, pose.groundY);
   ctx.rotate(rotation);
   ctx.translate(-walker.x, -pose.groundY);
+  if (tier) drawPermaGlow(ctx, walker.x, pose, sprite, tier, 1 - promotion);
+  drawPermaGlow(ctx, walker.x, pose, sprite, nextCritTier(tier), promotion);
   drawFigure(
     ctx,
     walker.x,
@@ -454,7 +458,7 @@ export function drawWorkerSpotlight(
     getWorkerTintIndexes(floor)[workerIndex] ?? 0,
     pose.stretchX,
     pose.stretchY,
-    workerIndex === managerIndexOf(floor) ? managerSprite : workerSprite,
+    sprite,
     whiteAlpha,
   );
   ctx.restore();
@@ -727,48 +731,129 @@ function drawFigure(
 
   ctx.save();
   ctx.translate(cx, groundY);
-  // the jump/click pose (frame 4) is authored mirrored relative to every other
-  // frame in the sheet, so it needs the opposite mirror rule to still face the
-  // walker's actual direction
-  const mirrored = frame === CLICK_FRAME ? direction === 1 : direction === -1;
-  ctx.scale(mirrored ? -stretchX : stretchX, stretchY);
+  ctx.scale(isMirrored(frame, direction) ? -stretchX : stretchX, stretchY);
   ctx.drawImage(image, -renderW / 2, -RENDER_H, renderW, RENDER_H);
   ctx.restore();
 }
 
-const PERMA_GLOW_PULSE_MS = 1200;
+// the jump/click pose (frame 4) is authored mirrored relative to every other
+// frame in the sheet, so it needs the opposite mirror rule to still face the
+// walker's actual direction
+function isMirrored(frame: number, direction: 1 | -1): boolean {
+  return frame === CLICK_FRAME ? direction === 1 : direction === -1;
+}
 
-// the pulsating halo behind a perma-boosted figure, in its tier's crit color;
-// strength 0..1
+const PERMA_GLOW_PULSE_MS = 1200;
+// as fractions of the frame height: solid rim hugging the outline, then its soft fade
+const PERMA_GLOW_SPREAD = 0.035;
+const PERMA_GLOW_BLUR = 0.05;
+const PERMA_GLOW_PULSE_GROW = 0.04;
+const PERMA_GLOW_STAMPS = 16;
+
+const glowFrameCache = new WeakMap<
+  HTMLImageElement,
+  Map<string, HTMLCanvasElement>
+>();
+
+// one frame's silhouette dilated and blurred into a solid tier-colored halo,
+// padded on every side so the fade isn't clipped; built once per frame/tier
+function getGlowFrame(
+  frame: number,
+  tier: CritTier,
+  sprite: HTMLImageElement,
+): HTMLCanvasElement {
+  let bySprite = glowFrameCache.get(sprite);
+  if (!bySprite) {
+    bySprite = new Map();
+    glowFrameCache.set(sprite, bySprite);
+  }
+  const key = `${frame}:${tier}`;
+  const cached = bySprite.get(key);
+  if (cached) return cached;
+
+  const color = CRIT_TIER_CONFIG[tier].color;
+  const frameW = sprite.naturalWidth / FRAME_COUNT;
+  const frameH = sprite.naturalHeight;
+  const spread = frameH * PERMA_GLOW_SPREAD;
+  const blur = frameH * PERMA_GLOW_BLUR;
+  const pad = Math.ceil(spread + blur * 2);
+  const width = Math.ceil(frameW) + pad * 2;
+  const height = frameH + pad * 2;
+
+  const rim = document.createElement("canvas");
+  rim.width = width;
+  rim.height = height;
+  const rimCtx = rim.getContext("2d")!;
+  for (let i = 0; i <= PERMA_GLOW_STAMPS; i++) {
+    const angle = (i / PERMA_GLOW_STAMPS) * Math.PI * 2;
+    const reach = i === PERMA_GLOW_STAMPS ? 0 : spread;
+    rimCtx.drawImage(
+      sprite,
+      frame * frameW,
+      0,
+      frameW,
+      frameH,
+      pad + Math.cos(angle) * reach,
+      pad + Math.sin(angle) * reach,
+      frameW,
+      frameH,
+    );
+  }
+  rimCtx.globalCompositeOperation = "source-in";
+  rimCtx.fillStyle = color;
+  rimCtx.fillRect(0, 0, width, height);
+
+  // shadowBlur (unlike ctx.filter) works on every mobile browser; drawing the
+  // rim off-canvas and offsetting its shadow back leaves only the soft fade
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const glowCtx = canvas.getContext("2d")!;
+  glowCtx.shadowColor = color;
+  glowCtx.shadowBlur = blur;
+  glowCtx.shadowOffsetX = width;
+  glowCtx.drawImage(rim, -width, 0);
+  glowCtx.shadowColor = "transparent";
+  glowCtx.shadowBlur = 0;
+  glowCtx.shadowOffsetX = 0;
+  glowCtx.drawImage(rim, 0, 0);
+
+  bySprite.set(key, canvas);
+  return canvas;
+}
+
+// the pulsating halo hugging a perma-boosted figure's outline, in its tier's
+// crit color; strength 0..1
 function drawPermaGlow(
   ctx: CanvasRenderingContext2D,
   cx: number,
-  groundY: number,
+  pose: WalkerPose,
+  sprite: HTMLImageElement | null,
   tier: CritTier,
   strength: number,
 ): void {
-  if (strength <= 0) return;
-  const color = CRIT_TIER_CONFIG[tier].color;
+  if (strength <= 0 || !sprite) return;
+  const glow = getGlowFrame(pose.frame, tier, sprite);
   const pulse =
     0.5 +
     0.5 * Math.sin((2 * Math.PI * performance.now()) / PERMA_GLOW_PULSE_MS);
-  const cy = groundY - RENDER_H / 2;
-  const radius = RENDER_H * (0.5 + 0.06 * pulse);
-  const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-  glow.addColorStop(0, color);
-  glow.addColorStop(0.72, color);
-  glow.addColorStop(0.86, `${color}B3`);
-  glow.addColorStop(1, `${color}00`);
+  const scale = RENDER_H / sprite.naturalHeight;
+  const w = glow.width * scale;
+  const h = glow.height * scale;
+  const pad = ((glow.height - sprite.naturalHeight) / 2) * scale;
+  const grow = 1 + PERMA_GLOW_PULSE_GROW * pulse;
   ctx.save();
   ctx.globalAlpha = strength * (0.85 + 0.15 * pulse);
-  ctx.fillStyle = glow;
-  // squashed sideways into an ellipse hugging the tall figure
-  ctx.translate(cx, cy);
-  ctx.scale(0.7, 1);
-  ctx.translate(-cx, -cy);
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  ctx.fill();
+  ctx.translate(cx, pose.groundY);
+  ctx.scale(
+    isMirrored(pose.frame, pose.direction) ? -pose.stretchX : pose.stretchX,
+    pose.stretchY,
+  );
+  // swell outward from the body's middle, not from the feet
+  ctx.translate(0, -RENDER_H / 2);
+  ctx.scale(grow, grow);
+  ctx.translate(0, RENDER_H / 2);
+  ctx.drawImage(glow, -w / 2, -RENDER_H - pad, w, h);
   ctx.restore();
 }
 
@@ -892,9 +977,10 @@ export function drawWorker(
       stretchY,
     };
     if (spotlight?.floor === floor && spotlight.workerIndex === i) return;
+    const sprite = i === managerWalkerIndex ? managerSprite : workerSprite;
     const permaTier = getWorkerPermaTier(floor, i);
     if (permaTier)
-      drawPermaGlow(ctx, walker.x, walker.pose.groundY, permaTier, 1);
+      drawPermaGlow(ctx, walker.x, walker.pose, sprite, permaTier, 1);
 
     drawFigure(
       ctx,
@@ -908,7 +994,7 @@ export function drawWorker(
       // the floor's hired manager (see hud/upgradeMenu) is this one extra
       // walker slot, using managerSprite instead of the plain cat one — same
       // tint/movement code either way, just a different base sheet
-      i === managerWalkerIndex ? managerSprite : workerSprite,
+      sprite,
     );
   });
 }
