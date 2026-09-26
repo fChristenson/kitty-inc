@@ -1,3 +1,4 @@
+import type { Floor } from "../../../gameState";
 import type { CritRewardContext } from "../index";
 import type { RewardHelpers } from "./helpers";
 
@@ -8,8 +9,16 @@ export function createGamesOfChanceRewards({
   lowestLevel,
   selectByRate,
   alternating,
+  cheapest,
   promoteAndUpgrade,
+  upgradeAndPay,
+  cascadeDown,
 }: RewardHelpers) {
+  const belowAndHere = (context: CritRewardContext) =>
+    context.floors.slice(0, context.floors.indexOf(context.floor) + 1);
+  // a second target that turns out to be this floor only counts once
+  const hereAnd = (context: CritRewardContext, other: Floor) =>
+    other === context.floor ? [context.floor] : [context.floor, other];
   return {
     bullseye: (context) =>
       actions.upgrade([lowestLevel(context)], balance.bullseyeUpgrades),
@@ -73,5 +82,121 @@ export function createGamesOfChanceRewards({
       actions.upgrade([context.floor], balance.highRoller2Upgrades),
     pokerNight: (context) =>
       actions.payCycles(context.floors, balance.pokerNightPayouts),
+    aceUpTheSleeve: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.aceUpTheSleeveTierSteps,
+        balance.aceUpTheSleeveUpgrades,
+      ),
+    baccaratBaron: (context) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.baccaratBaronPayouts,
+      ),
+    betTheFarm: (context) =>
+      actions.upgrade(context.floors, balance.betTheFarmUpgrades),
+    cardShark: (context) =>
+      upgradeAndPay(
+        [context.floor],
+        balance.cardSharkUpgrades,
+        balance.cardSharkPayouts,
+      ),
+    casinoWhale: (context) =>
+      promoteAndUpgrade(
+        selectByRate(context, true),
+        balance.casinoWhaleTierSteps,
+        balance.casinoWhaleUpgrades,
+      ),
+    croupierSweep: (context) =>
+      actions.upgrade(belowAndHere(context), balance.croupierSweepUpgrades),
+    dealersChoice: (context) =>
+      actions.upgrade(alternating(context), balance.dealersChoiceUpgrades),
+    feedTheKitty: (context) =>
+      actions.upgrade([lowestLevel(context)], balance.feedTheKittyUpgrades),
+    bowlOfBets: (context) =>
+      actions.payCycles([context.floor], balance.bowlOfBetsPayouts),
+    peekabooPot: (context) =>
+      actions.upgrade(
+        hereAnd(context, lowestLevel(context)),
+        balance.peekabooPotUpgrades,
+      ),
+    headsOrTails: (context) =>
+      actions.payCycles(alternating(context), balance.headsOrTailsPayouts),
+    highSteaks: (context) =>
+      actions.upgrade([highestFloor(context)], balance.highSteaksUpgrades),
+    lottoLlama: (context) =>
+      actions.payCycles([highestFloor(context)], balance.lottoLlamaPayouts),
+    mahjongMaestro: (context) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.mahjongMaestroTierSteps,
+        balance.mahjongMaestroUpgrades,
+      ),
+    neonStrip: (context) =>
+      actions.upgrade(cascadeDown(context), balance.neonStripUpgrades),
+    oneArmedBandit: (context) =>
+      upgradeAndPay(
+        [context.floor],
+        balance.oneArmedBanditUpgrades,
+        balance.oneArmedBanditPayouts,
+      ),
+    slotStickup: (context) =>
+      actions.payCycles(
+        [selectByRate(context, false)],
+        balance.slotStickupPayouts,
+      ),
+    pachinkoPlunge: (context) =>
+      actions.payCycles(belowAndHere(context), balance.pachinkoPlungePayouts),
+    photoFinish: (context) =>
+      actions.upgrade(
+        hereAnd(context, highestFloor(context)),
+        balance.photoFinishUpgrades,
+      ),
+    pitBoss: (context) =>
+      actions.upgrade([cheapest(context)], balance.pitBossUpgrades),
+    casinoBouncer: (context) =>
+      actions.upgrade([context.floor], balance.casinoBouncerUpgrades),
+    clipboardKingpin: (context) =>
+      upgradeAndPay(
+        context.floors,
+        balance.clipboardKingpinUpgrades,
+        balance.clipboardKingpinPayouts,
+      ),
+    earpieceEnforcer: (context) =>
+      upgradeAndPay(
+        [highestFloor(context)],
+        balance.earpieceEnforcerUpgrades,
+        balance.earpieceEnforcerPayouts,
+      ),
+    pokerChipmunk: (context) =>
+      actions.payCycles([cheapest(context)], balance.pokerChipmunkPayouts),
+    pokerFace: (context) =>
+      actions.upgrade([selectByRate(context, true)], balance.pokerFaceUpgrades),
+    stoneColdBluff: (context) =>
+      upgradeAndPay(
+        [selectByRate(context, true)],
+        balance.stoneColdBluffUpgrades,
+        balance.stoneColdBluffPayouts,
+      ),
+    deadpanDeal: (context) =>
+      actions.payCycles([lowestLevel(context)], balance.deadpanDealPayouts),
+    rouletteWhirl: (context) =>
+      actions.payCycles(context.floors, balance.rouletteWhirlPayouts),
+    showdown: (context) =>
+      actions.upgrade(
+        hereAnd(context, selectByRate(context, false)),
+        balance.showdownUpgrades,
+      ),
+    highNoonHand: (context) =>
+      actions.payCycles(
+        hereAnd(context, highestFloor(context)),
+        balance.highNoonHandPayouts,
+      ),
+    sicBoShaker: (context) =>
+      upgradeAndPay(
+        alternating(context),
+        balance.sicBoShakerUpgrades,
+        balance.sicBoShakerPayouts,
+      ),
   } satisfies Record<string, (context: CritRewardContext) => void>;
 }

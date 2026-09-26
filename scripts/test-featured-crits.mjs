@@ -63,7 +63,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 748 + elementCritBatch.length);
+  assert.equal(kinds.length, 779 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -1005,6 +1005,37 @@ try {
     gummyWormWealth: [[20, 30, 54, 0], 0],
     chocolateCoinCartel: [[20, 49, 10, 0], 75],
     honeycombHustle: [[56, 30, 46, 0], 0],
+    aceUpTheSleeve: [[20, 63, 10, 0], 0],
+    baccaratBaron: [[20, 30, 10, 0], 147],
+    betTheFarm: [[59, 69, 49, 0], 0],
+    cardShark: [[20, 54, 10, 0], 78],
+    casinoWhale: [[20, 60, 10, 0], 0],
+    croupierSweep: [[63, 73, 10, 0], 0],
+    dealersChoice: [[65, 30, 55, 0], 0],
+    feedTheKitty: [[20, 30, 59, 0], 0],
+    bowlOfBets: [[20, 30, 10, 0], 156],
+    peekabooPot: [[20, 67, 47, 0], 0],
+    headsOrTails: [[20, 30, 10, 0], 141],
+    highSteaks: [[20, 30, 61, 0], 0],
+    lottoLlama: [[20, 30, 10, 0], 106],
+    mahjongMaestro: [[20, 51, 10, 0], 0],
+    neonStrip: [[68, 30, 10, 0], 0],
+    oneArmedBandit: [[20, 59, 10, 0], 93],
+    slotStickup: [[20, 30, 10, 0], 55],
+    pachinkoPlunge: [[20, 30, 10, 0], 176],
+    photoFinish: [[20, 69, 49, 0], 0],
+    pitBoss: [[73, 30, 10, 0], 0],
+    casinoBouncer: [[20, 84, 10, 0], 0],
+    clipboardKingpin: [[38, 48, 28, 0], 96],
+    earpieceEnforcer: [[20, 30, 36, 0], 60],
+    pokerChipmunk: [[20, 30, 10, 0], 57],
+    pokerFace: [[20, 86, 10, 0], 0],
+    stoneColdBluff: [[20, 55, 10, 0], 81],
+    deadpanDeal: [[20, 30, 10, 0], 116],
+    rouletteWhirl: [[20, 30, 10, 0], 258],
+    showdown: [[52, 62, 10, 0], 0],
+    highNoonHand: [[20, 30, 10, 0], 180],
+    sicBoShaker: [[43, 30, 33, 0], 84],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
