@@ -1,113 +1,153 @@
-import type { CritProcDisplayInfo } from "../index";
 import { COLOR } from "../../../palette";
+import type { FeaturedCritDefinition } from "./types";
 
-export const GOTHAM_CRIT_INFO = {
+export const GOTHAM_CRITS = {
   iAmTheNight: {
     label: "I Am the Night",
     color: COLOR.fourOfAKindIndigo,
-    icon: "iAmTheNight",
+    image: "crits/gotham/iAmTheNight.png",
     description: "Twenty-seven free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.iAmTheNightUpgrades),
   },
   tubs: {
     label: "Tubs",
     color: COLOR.rainCheckBlue,
-    icon: "tubs",
+    image: "crits/gotham/tubs.png",
     description: "Twenty-six instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.tubsPayouts),
   },
   whySoSerious: {
     label: "Why So Serious",
     color: COLOR.halloweenSalePurple,
-    icon: "whySoSerious",
+    image: "crits/gotham/whySoSerious.png",
     description: "Two tier promotions and twenty upgrades here",
+    reward: (context, { balance, promoteAndUpgrade }) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.whySoSeriousTierSteps,
+        balance.whySoSeriousUpgrades,
+      ),
   },
   batman: {
     label: "The Dark Knight",
     color: COLOR.black,
-    icon: "batman",
+    image: "crits/gotham/batman.png",
     description: "Thirty-eight free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.batmanUpgrades),
   },
   joker: {
     label: "Joker's Wild",
     color: COLOR.purple,
-    icon: "joker",
+    image: "crits/gotham/joker.png",
     description: "Thirty-five instant payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.jokerPayouts),
   },
   harleyQuinn: {
     label: "Quinn's Whirlwind",
     color: COLOR.springSalePink,
-    icon: "harleyQuinn",
+    image: "crits/gotham/harleyQuinn.png",
     description: "Thirty-two free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.harleyQuinnUpgrades),
   },
   killerCroc: {
     label: "Crocodile Cash",
     color: COLOR.luckyCloverGreen,
-    icon: "killerCroc",
+    image: "crits/gotham/killerCroc.png",
     description: "Forty instant payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.killerCrocPayouts),
   },
   mrFreeze: {
     label: "Cryo Lock",
     color: COLOR.blue,
-    icon: "mrFreeze",
+    image: "crits/gotham/mrFreeze.png",
     description: "Thirty-six free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.mrFreezeUpgrades),
   },
   poisonIvy: {
     label: "Verdant Fortune",
     color: COLOR.luckyCloverGreen,
-    icon: "poisonIvy",
+    image: "crits/gotham/poisonIvy.png",
     description: "Thirty-four instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.poisonIvyPayouts),
   },
   scarecrow: {
     label: "Fear Harvest",
     color: COLOR.teaBreakBrown,
-    icon: "scarecrow",
+    image: "crits/gotham/scarecrow.png",
     description: "Thirty free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.scarecrowUpgrades),
   },
   thePenguin: {
     label: "Iceberg Payday",
     color: COLOR.blue,
-    icon: "thePenguin",
+    image: "crits/gotham/thePenguin.png",
     description: "Twenty-eight instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.thePenguinPayouts),
   },
   theRiddler: {
     label: "Puzzle Box",
     color: COLOR.luckyCloverGreen,
-    icon: "theRiddler",
+    image: "crits/gotham/theRiddler.png",
     description: "Twenty-seven free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.theRiddlerUpgrades),
   },
   bane: {
     label: "Breaking Point",
     color: COLOR.red,
-    icon: "bane",
+    image: "crits/gotham/bane.png",
     description: "Forty-two free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.baneUpgrades),
   },
   harleyQuinn2: {
     label: "Harley Quinn's Encore",
     color: COLOR.springSalePink,
-    icon: "harleyQuinn2",
+    image: "crits/gotham/harleyQuinn2.png",
     description: "Thirty-three instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.harleyQuinn2Payouts),
   },
   killerCroc2: {
     label: "Croc Rampage",
     color: COLOR.luckyCloverGreen,
-    icon: "killerCroc2",
+    image: "crits/gotham/killerCroc2.png",
     description: "Thirty-nine free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.killerCroc2Upgrades),
   },
   poisonIvy2: {
     label: "Ivy's Garden",
     color: COLOR.luckyCloverGreen,
-    icon: "poisonIvy2",
+    image: "crits/gotham/poisonIvy2.png",
     description: "Thirty-one free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.poisonIvy2Upgrades),
   },
   poisonIvy3: {
     label: "Venomous Bloom",
     color: COLOR.luckyCloverGreen,
-    icon: "poisonIvy3",
+    image: "crits/gotham/poisonIvy3.png",
     description: "Thirty-seven instant payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.poisonIvy3Payouts),
   },
   thePenguin2: {
     label: "Penguin's Payday",
     color: COLOR.blue,
-    icon: "thePenguin2",
+    image: "crits/gotham/thePenguin2.png",
     description: "Twenty-nine free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.thePenguin2Upgrades),
   },
-} as const satisfies Record<string, CritProcDisplayInfo>;
+} as const satisfies Record<string, FeaturedCritDefinition>;

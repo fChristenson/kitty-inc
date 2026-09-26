@@ -1,11 +1,8 @@
 import { CONFIG } from "../../../config";
 import type { Floor } from "../../../gameState";
-import {
-  nextCritTier,
-  BOUNCE_CRIT_CONTINUE_CHANCE,
-} from "../../../shared/critTypes";
-import { gt, lt, type BigNumber } from "../../../shared/bigNumber";
-import type { CritRewardContext } from "../index";
+import { nextCritTier, BOUNCE_CRIT_CONTINUE_CHANCE } from "../index";
+import { gt, lt, type BigNumber } from "../../bigNumber";
+import type { FeaturedRewardContext } from "./types";
 
 export interface FeaturedRewardActions {
   upgrade: (floors: Floor[], count: number) => void;
@@ -13,12 +10,12 @@ export interface FeaturedRewardActions {
   incomeRate: (floor: Floor, now: number) => BigNumber;
 }
 
-// the targeting/reward building blocks every featured category's rewards share
+// the targeting/reward building blocks every featured crit's reward shares
 export function createRewardHelpers(actions: FeaturedRewardActions) {
   const balance = CONFIG.crit;
-  const highestFloor = (context: CritRewardContext) =>
+  const highestFloor = (context: FeaturedRewardContext) =>
     context.floors.filter((floor) => floor.unlocked).at(-1) ?? context.floor;
-  const lowestLevel = (context: CritRewardContext) =>
+  const lowestLevel = (context: FeaturedRewardContext) =>
     context.floors
       .filter((floor) => floor.unlocked)
       .reduce(
@@ -26,7 +23,7 @@ export function createRewardHelpers(actions: FeaturedRewardActions) {
           floor.upgradeCount < best.upgradeCount ? floor : best,
         context.floor,
       );
-  const selectByRate = (context: CritRewardContext, highest: boolean) => {
+  const selectByRate = (context: FeaturedRewardContext, highest: boolean) => {
     const now = Date.now();
     const compare = highest ? gt : lt;
     return context.floors
@@ -39,9 +36,9 @@ export function createRewardHelpers(actions: FeaturedRewardActions) {
         context.floor,
       );
   };
-  const alternating = (context: CritRewardContext) =>
+  const alternating = (context: FeaturedRewardContext) =>
     context.floors.filter((floor, index) => floor.unlocked && index % 2 === 0);
-  const cheapest = (context: CritRewardContext) =>
+  const cheapest = (context: FeaturedRewardContext) =>
     context.floors
       .filter((floor) => floor.unlocked)
       .reduce(
@@ -49,10 +46,10 @@ export function createRewardHelpers(actions: FeaturedRewardActions) {
           lt(floor.upgradeCost, best.upgradeCost) ? floor : best,
         context.floor,
       );
-  const belowAndHere = (context: CritRewardContext) =>
+  const belowAndHere = (context: FeaturedRewardContext) =>
     context.floors.slice(0, context.floors.indexOf(context.floor) + 1);
   // a second target that turns out to be this floor only counts once
-  const hereAnd = (context: CritRewardContext, other: Floor) =>
+  const hereAnd = (context: FeaturedRewardContext, other: Floor) =>
     other === context.floor ? [context.floor] : [context.floor, other];
   const promoteAndUpgrade = (floor: Floor, steps: number, upgrades: number) => {
     for (let step = 0; step < steps; step++) {
@@ -68,12 +65,21 @@ export function createRewardHelpers(actions: FeaturedRewardActions) {
     actions.upgrade(floors, upgrades);
     actions.payCycles(floors, payouts);
   };
+  // every element crit's shape: upgrades here, then payouts on the highest floor
+  const upgradeHereAndPayHighest = (
+    context: FeaturedRewardContext,
+    upgrades: number,
+    payouts: number,
+  ) => {
+    actions.upgrade([context.floor], upgrades);
+    actions.payCycles([highestFloor(context)], payouts);
+  };
   // the same walk applyBounceCrit does: always fall one floor, then roll to
   // keep falling. Returning the targets rather than applying per step keeps it
   // on the cheap bulk-upgrade path the other featured rewards use. On the
   // ground floor there's nothing below to reach, so it lands where it started
   // instead of paying out nothing.
-  const cascadeDown = (context: CritRewardContext) => {
+  const cascadeDown = (context: FeaturedRewardContext) => {
     const targets: Floor[] = [];
     let index = context.floors.indexOf(context.floor) - 1;
     for (;;) {
@@ -97,6 +103,7 @@ export function createRewardHelpers(actions: FeaturedRewardActions) {
     hereAnd,
     promoteAndUpgrade,
     upgradeAndPay,
+    upgradeHereAndPayHighest,
     cascadeDown,
   };
 }

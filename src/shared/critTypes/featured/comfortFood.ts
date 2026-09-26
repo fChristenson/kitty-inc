@@ -1,209 +1,304 @@
-import type { CritProcDisplayInfo } from "../index";
 import { COLOR } from "../../../palette";
+import type { FeaturedCritDefinition } from "./types";
 
-export const COMFORT_FOOD_CRIT_INFO = {
+export const COMFORT_FOOD_CRITS = {
   breadyOrNot: {
     label: "Bready or Not",
     color: COLOR.goldenHandshakeGold,
-    icon: "breadyOrNot",
+    image: "crits/comfortFood/breadyOrNot.png",
     description: "Eleven upgrades on this floor and every floor below",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.breadyOrNotUpgrades,
+      ),
   },
   eggcellentWork: {
     label: "Egg-cellent Work",
     color: COLOR.sunshineGold,
-    icon: "eggcellentWork",
+    image: "crits/comfortFood/eggcellentWork.png",
     description: "One tier promotion and eight upgrades here",
+    reward: (context, { balance, promoteAndUpgrade }) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.eggcellentWorkTierSteps,
+        balance.eggcellentWorkUpgrades,
+      ),
   },
   holyGuacamole: {
     label: "Holy Guacamole",
     color: COLOR.dressCodeGreen,
-    icon: "holyGuacamole",
+    image: "crits/comfortFood/holyGuacamole.png",
     description: "Nineteen instant payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.holyGuacamolePayouts),
   },
   loafActually: {
     label: "Loaf Actually",
     color: COLOR.espressoShotBrown,
-    icon: "loafActually",
+    image: "crits/comfortFood/loafActually.png",
     description: "Twelve free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.loafActuallyUpgrades),
   },
   pastaLaVista: {
     label: "Pasta La Vista",
     color: COLOR.orange,
-    icon: "pastaLaVista",
+    image: "crits/comfortFood/pastaLaVista.png",
     description: "Sixteen payouts on alternating floors, from the ground",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.payCycles(alternating(context), balance.pastaLaVistaPayouts),
   },
   souperStar: {
     label: "Souper Star",
     color: COLOR.amberMuted,
-    icon: "souperStar",
+    image: "crits/comfortFood/souperStar.png",
     description: "Sixteen payouts from the highest-earning floor",
+    reward: (context, { actions, balance, selectByRate }) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.souperStarPayouts,
+      ),
   },
   tacoBoutIt: {
     label: "Taco 'Bout It",
     color: COLOR.autumnSaleAmber,
-    icon: "tacoBoutIt",
+    image: "crits/comfortFood/tacoBoutIt.png",
     description: "Four upgrades here and four on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) => {
+      actions.upgrade([context.floor], balance.tacoBoutItUpgrades);
+      actions.upgrade([lowestLevel(context)], balance.tacoBoutItUpgrades);
+    },
   },
   theGreatPancakeStack: {
     label: "The Great Pancake Stack",
     color: COLOR.supplyRunTan,
-    icon: "theGreatPancakeStack",
+    image: "crits/comfortFood/theGreatPancakeStack.png",
     description: "Twenty-one upgrades here and every floor below",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.theGreatPancakeStackUpgrades,
+      ),
   },
   wokAndRoll: {
     label: "Wok and Roll",
     color: COLOR.summerSaleOrange,
-    icon: "wokAndRoll",
+    image: "crits/comfortFood/wokAndRoll.png",
     description: "Twenty-four free upgrades on the highest floor",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.upgrade([highestFloor(context)], balance.wokAndRollUpgrades),
   },
   avocardio: {
     label: "Avocardio",
     color: COLOR.bullMarketGreen,
-    icon: "avocardio",
+    image: "crits/comfortFood/avocardio.png",
     description: "Fifteen free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.avocardioUpgrades),
   },
   butterBelieveIt: {
     label: "Butter Believe It",
     color: COLOR.sunshineGold,
-    icon: "butterBelieveIt",
+    image: "crits/comfortFood/butterBelieveIt.png",
     description: "Eighteen instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.butterBelieveItPayouts),
   },
   cheesePullChampion: {
     label: "Cheese Pull Champion",
     color: COLOR.goldenHandshakeGold,
-    icon: "cheesePullChampion",
+    image: "crits/comfortFood/cheesePullChampion.png",
     description: "Six upgrades and six payouts on this floor",
+    reward: (context, { actions, balance }) => {
+      actions.upgrade([context.floor], balance.cheesePullChampionUpgrades);
+      actions.payCycles([context.floor], balance.cheesePullChampionPayouts);
+    },
   },
   grillSergeant: {
     label: "Grill Sergeant",
     color: COLOR.red,
-    icon: "grillSergeant",
+    image: "crits/comfortFood/grillSergeant.png",
     description: "Twenty free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.grillSergeantUpgrades),
   },
   noodleNap: {
     label: "Noodle Nap",
     color: COLOR.autumnSaleAmber,
-    icon: "noodleNap",
+    image: "crits/comfortFood/noodleNap.png",
     description: "Twenty-two payouts on alternating floors, from the ground",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.payCycles(alternating(context), balance.noodleNapPayouts),
   },
   picklePredicament: {
     label: "Pickle Predicament",
     color: COLOR.dressCodeGreen,
-    icon: "picklePredicament",
+    image: "crits/comfortFood/picklePredicament.png",
     description: "Eight free upgrades on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.upgrade(
+        [lowestLevel(context)],
+        balance.picklePredicamentUpgrades,
+      ),
   },
   hotPotato: {
     label: "Hot Potato",
     color: COLOR.roundUpOrange,
-    icon: "hotPotato",
+    image: "crits/comfortFood/hotPotato.png",
     description: "Eighteen instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.hotPotatoPayouts),
   },
   brunchBoss: {
     label: "Brunch Boss",
     color: COLOR.supplyRunTan,
-    icon: "brunchBoss",
+    image: "crits/comfortFood/brunchBoss.png",
     description: "Seven upgrades and seven payouts on this floor",
+    reward: (context, { actions, balance }) => {
+      actions.upgrade([context.floor], balance.brunchBossUpgrades);
+      actions.payCycles([context.floor], balance.brunchBossPayouts);
+    },
   },
   curryFavour: {
     label: "Curry Favour",
     color: COLOR.halloweenSalePurple,
-    icon: "curryFavour",
+    image: "crits/comfortFood/curryFavour.png",
     description: "Fourteen payouts from the highest-earning floor",
+    reward: (context, { actions, balance, selectByRate }) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.curryFavourPayouts,
+      ),
   },
   dimSumDynasty: {
     label: "Dim Sum Dynasty",
     color: COLOR.goldenHandshakeGold,
-    icon: "dimSumDynasty",
+    image: "crits/comfortFood/dimSumDynasty.png",
     description: "Fifteen free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.dimSumDynastyUpgrades),
   },
   soupDumplingSurgeon: {
     label: "Soup Dumpling Surgeon",
     color: COLOR.teaBreakBrown,
-    icon: "soupDumplingSurgeon",
+    image: "crits/comfortFood/soupDumplingSurgeon.png",
     description: "Five upgrades and ten payouts on this floor",
+    reward: (context, { actions, balance }) => {
+      actions.upgrade([context.floor], balance.soupDumplingSurgeonUpgrades);
+      actions.payCycles([context.floor], balance.soupDumplingSurgeonPayouts);
+    },
   },
   cheeseWheel: {
     label: "Cheese Wheel",
     color: COLOR.gold,
-    icon: "cheeseWheel",
+    image: "crits/comfortFood/cheeseWheel.png",
     description: "Thirty-four instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.cheeseWheelPayouts),
   },
   honeyToast: {
     label: "Honey Toast",
     color: COLOR.goldenTicketYellow,
-    icon: "honeyToast",
+    image: "crits/comfortFood/honeyToast.png",
     description: "Twenty-three free upgrades on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.upgrade([lowestLevel(context)], balance.honeyToastUpgrades),
   },
   sushiPlatter: {
     label: "Sushi Platter",
     color: COLOR.red,
-    icon: "sushiPlatter",
+    image: "crits/comfortFood/sushiPlatter.png",
     description: "Twenty-six payouts on alternating floors",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.payCycles(alternating(context), balance.sushiPlatterPayouts),
   },
   comfortFood: {
     label: "Comfort Food",
     color: COLOR.moneyGreen,
-    icon: "comfortFood",
+    image: "crits/comfortFood/comfortFood.png",
     description: "Twenty-four free upgrades on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.upgrade([lowestLevel(context)], balance.comfortFoodUpgrades),
   },
   pickleParade: {
     label: "Pickle Parade",
     color: COLOR.suppliesGiveawayLime,
-    icon: "pickleParade",
+    image: "crits/comfortFood/pickleParade.png",
     description: "Twenty-five upgrades on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.upgrade([lowestLevel(context)], balance.pickleParadeUpgrades),
   },
   ramenCrown: {
     label: "Ramen Crown",
     color: COLOR.goldenHandshakeGold,
-    icon: "ramenCrown",
+    image: "crits/comfortFood/ramenCrown.png",
     description: "Thirty-five payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.ramenCrownPayouts),
   },
   thunderNachos: {
     label: "Thunder Nachos",
     color: COLOR.orange,
-    icon: "thunderNachos",
+    image: "crits/comfortFood/thunderNachos.png",
     description: "Twenty-eight free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.thunderNachosUpgrades),
   },
   loadedBurger: {
     label: "Loaded Burger",
     color: COLOR.orange,
-    icon: "loadedBurger",
+    image: "crits/comfortFood/loadedBurger.png",
     description: "Twenty-four free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.loadedBurgerUpgrades),
   },
   tacoFeast: {
     label: "Taco Feast",
     color: COLOR.red,
-    icon: "tacoFeast",
+    image: "crits/comfortFood/tacoFeast.png",
     description: "Twenty-two instant payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.tacoFeastPayouts),
   },
   pizzaSupreme: {
     label: "Pizza Supreme",
     color: COLOR.sunshineGold,
-    icon: "pizzaSupreme",
+    image: "crits/comfortFood/pizzaSupreme.png",
     description: "Twenty-six free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.pizzaSupremeUpgrades),
   },
   sushiPlatter2: {
     label: "Sushi Deluxe",
     color: COLOR.blue,
-    icon: "sushiPlatter2",
+    image: "crits/comfortFood/sushiPlatter2.png",
     description: "Twenty-eight instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.sushiPlatter2Payouts),
   },
   sushiPlatter3: {
     label: "Sushi Surge",
     color: COLOR.luckyCloverGreen,
-    icon: "sushiPlatter3",
+    image: "crits/comfortFood/sushiPlatter3.png",
     description: "Twenty-three free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.sushiPlatter3Upgrades),
   },
   sushiPlatter4: {
     label: "Sushi Royal",
     color: COLOR.starYellow,
-    icon: "sushiPlatter4",
+    image: "crits/comfortFood/sushiPlatter4.png",
     description: "Thirty instant payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.sushiPlatter4Payouts),
   },
   ramenBowl: {
     label: "Ramen Bowl",
     color: COLOR.teaBreakBrown,
-    icon: "ramenBowl",
+    image: "crits/comfortFood/ramenBowl.png",
     description: "Twenty-seven free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.ramenBowlUpgrades),
   },
-} as const satisfies Record<string, CritProcDisplayInfo>;
+} as const satisfies Record<string, FeaturedCritDefinition>;

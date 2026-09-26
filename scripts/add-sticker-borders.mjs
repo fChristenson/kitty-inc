@@ -55,6 +55,9 @@ async function critIconFiles() {
   for (const file of critSourceFiles) {
     if (!file.endsWith(".ts")) continue;
     const critSource = await fs.readFile(file, "utf8");
+    for (const match of critSource.matchAll(/\bimage:\s*"([^"]+\.png)"/g)) {
+      files.add(match[1]);
+    }
     for (const match of critSource.matchAll(/\bicon:\s*"(\w+)"/g)) {
       const filename = filenameByName.get(match[1]);
       if (!filename) throw new Error(`Unregistered crit icon: ${match[1]}`);

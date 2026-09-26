@@ -1,233 +1,340 @@
-import type { CritProcDisplayInfo } from "../index";
 import { COLOR } from "../../../palette";
+import type { FeaturedCritDefinition } from "./types";
 
-export const RICHES_CRIT_INFO = {
+export const RICHES_CRITS = {
   adamWhiskersen: {
     label: "Adam Whiskersen",
     color: COLOR.goldStandardAmber,
-    icon: "adamWhiskersen",
+    image: "crits/riches/adamWhiskersen.png",
     description: "Two tier promotions and eight upgrades here",
+    reward: (context, { balance, promoteAndUpgrade }) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.adamWhiskersenTierSteps,
+        balance.adamWhiskersenUpgrades,
+      ),
   },
   bankroll: {
     label: "Bankroll",
     color: COLOR.paydayEmerald,
-    icon: "bankroll",
+    image: "crits/riches/bankroll.png",
     description: "Twenty-five free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.bankrollUpgrades),
   },
   billBlizzard: {
     label: "Bill Blizzard",
     color: COLOR.shareholdersGreen,
-    icon: "billBlizzard",
+    image: "crits/riches/billBlizzard.png",
     description: "Twenty-three payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.billBlizzardPayouts),
   },
   bobPawge: {
     label: "Bob Pawge",
     color: COLOR.nightShiftIndigo,
-    icon: "bobPawge",
+    image: "crits/riches/bobPawge.png",
     description: "Twenty-four free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.bobPawgeUpgrades),
   },
   bullionStack: {
     label: "Bullion Brigade",
     color: COLOR.gold,
-    icon: "bullionStack",
+    image: "crits/riches/bullionStack.png",
     description: "Twenty-four free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.bullionStackUpgrades),
   },
   cashCannon: {
     label: "Cash Cannon",
     color: COLOR.bonusRoundGold,
-    icon: "cashCannon",
+    image: "crits/riches/cashCannon.png",
     description: "Ten upgrades on alternating floors",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.upgrade(alternating(context), balance.cashCannonUpgrades),
   },
   fairExchange: {
     label: "Fair Exchange",
     color: COLOR.mergerGold,
-    icon: "fairExchange",
+    image: "crits/riches/fairExchange.png",
     description: "Eighteen payouts on alternating floors",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.payCycles(alternating(context), balance.fairExchangePayouts),
   },
   gemMine: {
     label: "Gem Mine",
     color: COLOR.pairBlue,
-    icon: "gemMine",
+    image: "crits/riches/gemMine.png",
     description: "Ten upgrades on this floor and every floor below",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.gemMineUpgrades,
+      ),
   },
   goldMine: {
     label: "Gold Mine",
     color: COLOR.supplyRunTan,
-    icon: "goldMine",
+    image: "crits/riches/goldMine.png",
     description: "Fifteen payouts on the highest unlocked floor",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.payCycles([highestFloor(context)], balance.goldMinePayouts),
   },
   goldenChalice: {
     label: "Golden Chalice",
     color: COLOR.sunshineGold,
-    icon: "goldenChalice",
+    image: "crits/riches/goldenChalice.png",
     description: "Two tier promotions and seven upgrades here",
+    reward: (context, { balance, promoteAndUpgrade }) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.goldenChaliceTierSteps,
+        balance.goldenChaliceUpgrades,
+      ),
   },
   goldenGoose: {
     label: "Golden Goose",
     color: COLOR.goldenTicketYellow,
-    icon: "goldenGoose",
+    image: "crits/riches/goldenGoose.png",
     description: "Twenty-one payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.goldenGoosePayouts),
   },
   goldenStag: {
     label: "Golden Stag",
     color: COLOR.heavenlyGold,
-    icon: "goldenStag",
+    image: "crits/riches/goldenStag.png",
     description: "Twenty-two payouts from the highest-earning floor",
+    reward: (context, { actions, balance, selectByRate }) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.goldenStagPayouts,
+      ),
   },
   handsomeJake: {
     label: "Handsome Jake",
     color: COLOR.orange,
-    icon: "handsomeJake",
+    image: "crits/riches/handsomeJake.png",
     description: "Eighteen upgrades on the highest unlocked floor",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.upgrade([highestFloor(context)], balance.handsomeJakeUpgrades),
   },
   jcDentclaw: {
     label: "JC Dentclaw",
     color: COLOR.nightOwlIndigo,
-    icon: "jcDentclaw",
+    image: "crits/riches/jcDentclaw.png",
     description: "Twenty-six free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.jcDentclawUpgrades),
   },
   liquidAssets: {
     label: "Liquid Assets",
     color: COLOR.goldenHandshakeGold,
-    icon: "liquidAssets",
+    image: "crits/riches/liquidAssets.png",
     description: "Twenty-one payouts from the highest-earning floor",
+    reward: (context, { actions, balance, selectByRate }) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.liquidAssetsPayouts,
+      ),
   },
   midasTouch: {
     label: "Midas Touch",
     color: COLOR.goldStandardAmber,
-    icon: "midasTouch",
+    image: "crits/riches/midasTouch.png",
     description: "One tier promotion and thirteen upgrades here",
+    reward: (context, { balance, promoteAndUpgrade }) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.midasTouchTierSteps,
+        balance.midasTouchUpgrades,
+      ),
   },
   moneyPrinter: {
     label: "Money Printer",
     color: COLOR.bullMarketGreen,
-    icon: "moneyPrinter",
+    image: "crits/riches/moneyPrinter.png",
     description: "Twenty-three free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.moneyPrinterUpgrades),
   },
   moneyTree: {
     label: "Money Tree",
     color: COLOR.moneyGreen,
-    icon: "moneyTree",
+    image: "crits/riches/moneyTree.png",
     description: "Twenty-two payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.moneyTreePayouts),
   },
   nuggetAvalanche: {
     label: "Nugget Avalanche",
     color: COLOR.amber,
-    icon: "nuggetAvalanche",
+    image: "crits/riches/nuggetAvalanche.png",
     description: "Seventeen instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.nuggetAvalanchePayouts),
   },
   pennyJar: {
     label: "Penny Jar",
     color: COLOR.headhunterRust,
-    icon: "pennyJar",
+    image: "crits/riches/pennyJar.png",
     description: "Fifteen free upgrades on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.upgrade([lowestLevel(context)], balance.pennyJarUpgrades),
   },
   purrDenton: {
     label: "Purr Denton",
     color: COLOR.fastForwardBlue,
-    icon: "purrDenton",
+    image: "crits/riches/purrDenton.png",
     description: "Seventeen free upgrades on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.upgrade([lowestLevel(context)], balance.purrDentonUpgrades),
   },
   strikeItRich: {
     label: "Strike It Rich",
     color: COLOR.goldenParachuteMarigold,
-    icon: "strikeItRich",
+    image: "crits/riches/strikeItRich.png",
     description: "Sixteen upgrades on the highest unlocked floor",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.upgrade([highestFloor(context)], balance.strikeItRichUpgrades),
   },
   vaultDoor: {
     label: "Vault Door",
     color: COLOR.unionBossSlate,
-    icon: "vaultDoor",
+    image: "crits/riches/vaultDoor.png",
     description: "Twenty-two free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.vaultDoorUpgrades),
   },
   wishingWell: {
     label: "Wishing Well",
     color: COLOR.rainCheckBlue,
-    icon: "wishingWell",
+    image: "crits/riches/wishingWell.png",
     description: "Twenty-three instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.wishingWellPayouts),
   },
   youKnowWhatStallion: {
     label: "You Know What, Stallion",
     color: COLOR.royalFlushPurple,
-    icon: "youKnowWhatStallion",
+    image: "crits/riches/youKnowWhatStallion.png",
     description: "Eleven upgrades on alternating floors",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.upgrade(
+        alternating(context),
+        balance.youKnowWhatStallionUpgrades,
+      ),
   },
   goldBar: {
     label: "Gold Bar",
     color: COLOR.gold,
-    icon: "goldBar",
+    image: "crits/riches/goldBar.png",
     description: "Thirty-one payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.goldBarPayouts),
   },
   silverCoin: {
     label: "Silver Coin",
     color: COLOR.silverTicketGray,
-    icon: "silverCoin",
+    image: "crits/riches/silverCoin.png",
     description: "Twenty-five payouts on alternating floors",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.payCycles(alternating(context), balance.silverCoinPayouts),
   },
   gildedCache: {
     label: "Gilded Cache",
     color: COLOR.gold,
-    icon: "gildedCache",
+    image: "crits/riches/gildedCache.png",
     description: "Thirty-five free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.gildedCacheUpgrades),
   },
   brassBanker: {
     label: "Brass Banker",
     color: COLOR.gold,
-    icon: "brassBanker",
+    image: "crits/riches/brassBanker.png",
     description: "Thirty-four free upgrades on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.upgrade([lowestLevel(context)], balance.brassBankerUpgrades),
   },
   citrusCoin: {
     label: "Citrus Coin",
     color: COLOR.sunshineGold,
-    icon: "citrusCoin",
+    image: "crits/riches/citrusCoin.png",
     description: "Thirty-three payouts on alternating floors",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.payCycles(alternating(context), balance.citrusCoinPayouts),
   },
   coinCascade: {
     label: "Coin Cascade",
     color: COLOR.gold,
-    icon: "coinCascade",
+    image: "crits/riches/coinCascade.png",
     description: "Thirty-eight payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.coinCascadePayouts),
   },
   coinrootGrove: {
     label: "Coinroot Grove",
     color: COLOR.moneyGreen,
-    icon: "coinrootGrove",
+    image: "crits/riches/coinrootGrove.png",
     description: "Twenty free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.coinrootGroveUpgrades),
   },
   allowance: {
     label: "Allowance",
     color: COLOR.moneyGreen,
-    icon: "allowance",
+    image: "crits/riches/allowance.png",
     description: "Thirty payouts on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.payCycles([lowestLevel(context)], balance.allowancePayouts),
   },
   allowance2: {
     label: "Rainy Day Fund",
     color: COLOR.paydayEmerald,
-    icon: "allowance2",
+    image: "crits/riches/allowance2.png",
     description: "Thirty-two free upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.allowance2Upgrades),
   },
   lootBags: {
     label: "Bagged and Tagged",
     color: COLOR.payoutOlive,
-    icon: "lootBags",
+    image: "crits/riches/lootBags.png",
     description: "Thirty-eight upgrades on the highest unlocked floor",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.upgrade([highestFloor(context)], balance.lootBagsUpgrades),
   },
   pocketMoney2: {
     label: "Petty Cash",
     color: COLOR.bullMarketGreen,
-    icon: "pocketMoney2",
+    image: "crits/riches/pocketMoney2.png",
     description: "Thirty-seven instant payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.pocketMoney2Payouts),
   },
   liquidAssets2: {
     label: "Fluid Capital",
     color: COLOR.espressoShotBrown,
-    icon: "liquidAssets2",
+    image: "crits/riches/liquidAssets2.png",
     description: "Forty-four payouts from the highest-earning floor",
+    reward: (context, { actions, balance, selectByRate }) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.liquidAssets2Payouts,
+      ),
   },
   pocketMoney: {
     label: "Pocket Money",
     color: COLOR.coinGold,
-    icon: "pocketMoney",
+    image: "crits/riches/pocketMoney.png",
     description: "One tier promotion and fifteen upgrades here",
+    reward: (context, { balance, promoteAndUpgrade }) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.pocketMoneyTierSteps,
+        balance.pocketMoneyUpgrades,
+      ),
   },
-} as const satisfies Record<string, CritProcDisplayInfo>;
+} as const satisfies Record<string, FeaturedCritDefinition>;

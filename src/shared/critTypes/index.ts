@@ -19,17 +19,23 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { recordCritProcLanded } from "./critProcCounts";
 import {
-  FEATURED_CRIT_INFO,
+  FEATURED_CRITS,
   FEATURED_CRIT_KINDS,
   featuredCritFlags,
   type FeaturedCritKind,
 } from "./featuredProcs";
 
 export {
+  FEATURED_CRITS,
   FEATURED_CRIT_KINDS,
   featuredCritFlags,
   isFeaturedCritKind,
+  createRewardHelpers,
   type FeaturedCritKind,
+  type FeaturedCritDefinition,
+  type FeaturedRewardActions,
+  type FeaturedRewardContext,
+  type RewardHelpers,
 } from "./featuredProcs";
 
 export { getCritProcCount, recordCritProcLanded } from "./critProcCounts";
@@ -1341,8 +1347,16 @@ export function getCritProcIncomeModifierPercent(
   return getCritProcMilestone(count) * (CRIT_PROC_MODIFIER_WEIGHT / chance);
 }
 
+// each featured crit's display half; loadAssets registers its image under its kind
+const FEATURED_CRIT_DISPLAY_INFO = Object.fromEntries(
+  FEATURED_CRIT_KINDS.map((kind) => {
+    const { label, color, description } = FEATURED_CRITS[kind];
+    return [kind, { label, color, icon: kind, description }];
+  }),
+) as Record<FeaturedCritKind, CritProcDisplayInfo>;
+
 export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
-  ...FEATURED_CRIT_INFO,
+  ...FEATURED_CRIT_DISPLAY_INFO,
   chain: {
     label: CHAIN_CRIT_LABEL,
 

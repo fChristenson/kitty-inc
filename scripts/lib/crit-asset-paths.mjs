@@ -16,6 +16,13 @@ function registeredFiles() {
     );
     if (!block) throw new Error("Could not parse IMAGE_FILES");
     registered = [...block[1].matchAll(/"([^"]+\.png)"/g)].map((m) => m[1]);
+    // featured crits carry their own `image` path in their definition
+    const featuredDir = path.join(ROOT, "src/shared/critTypes/featured");
+    for (const file of fs.readdirSync(featuredDir)) {
+      const text = fs.readFileSync(path.join(featuredDir, file), "utf8");
+      for (const m of text.matchAll(/\bimage: "([^"]+\.png)"/g))
+        registered.push(m[1]);
+    }
   }
   return registered;
 }

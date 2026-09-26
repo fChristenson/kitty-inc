@@ -1,12 +1,25 @@
-import { FEATURED_CRIT_INFO } from "./featured";
+import { CONFIG } from "../../config";
+import { FEATURED_CRITS } from "./featured";
 
-export { FEATURED_CRIT_INFO };
+export { FEATURED_CRITS };
+export {
+  createRewardHelpers,
+  type FeaturedRewardActions,
+  type RewardHelpers,
+} from "./featured/rewardHelpers";
+export type {
+  FeaturedCritDefinition,
+  FeaturedRewardContext,
+} from "./featured/types";
 
-
-export type FeaturedCritKind = keyof typeof FEATURED_CRIT_INFO;
+export type FeaturedCritKind = keyof typeof FEATURED_CRITS;
 export const FEATURED_CRIT_KINDS = Object.keys(
-  FEATURED_CRIT_INFO,
+  FEATURED_CRITS,
 ) as FeaturedCritKind[];
+
+// compile-time registration check: every featured crit needs its roll chance
+// in CONFIG.crit, or getCritProcChance would silently read 0
+CONFIG.crit satisfies Record<`${FeaturedCritKind}Chance`, number>;
 
 // every kind set to false, cloned per call below — rebuilding the whole
 // map with Object.fromEntries on every landed crit cost ~0.3ms each, which

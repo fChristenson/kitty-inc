@@ -1,41 +1,59 @@
-import type { CritProcDisplayInfo } from "../index";
 import { COLOR } from "../../../palette";
+import type { FeaturedCritDefinition } from "./types";
 
-export const OCEAN_CRIT_INFO = {
+export const OCEAN_CRITS = {
   treasureMap: {
     label: "Treasure Map",
     color: COLOR.supplyRunTan,
-    icon: "treasureMap",
+    image: "crits/ocean/treasureMap.png",
     description: "Twenty-five payouts from the highest-earning floor",
+    reward: (context, { actions, balance, selectByRate }) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.treasureMapPayouts,
+      ),
   },
   captainLeFluff: {
     label: "Captain Le Fluff",
     color: COLOR.fullHouseCrimson,
-    icon: "captainLeFluff",
+    image: "crits/ocean/captainLeFluff.png",
     description: "Twenty-eight upgrades on the highest unlocked floor",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.upgrade([highestFloor(context)], balance.captainLeFluffUpgrades),
   },
   divingBell: {
     label: "Deep Dive",
     color: COLOR.goldenHandshakeGold,
-    icon: "divingBell",
+    image: "crits/ocean/divingBell.png",
     description: "Two free upgrades cascading down from this floor",
+    reward: (context, { actions, balance, cascadeDown }) =>
+      actions.upgrade(cascadeDown(context), balance.divingBellUpgrades),
   },
   flooringInspector: {
     label: "Flooring Inspector",
     color: COLOR.autumnSaleAmber,
-    icon: "flooringInspector",
+    image: "crits/ocean/flooringInspector.png",
     description: "Fifteen upgrades on this floor and every floor below",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(
+        context.floors.slice(0, context.floors.indexOf(context.floor) + 1),
+        balance.flooringInspectorUpgrades,
+      ),
   },
   kraken: {
     label: "Kraken",
     color: COLOR.royalFlushPurple,
-    icon: "kraken",
+    image: "crits/ocean/kraken.png",
     description: "Twenty-seven payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.krakenPayouts),
   },
   messageInABottle: {
     label: "Message in a Bottle",
     color: COLOR.threeOfAKindGreen,
-    icon: "messageInABottle",
+    image: "crits/ocean/messageInABottle.png",
     description: "Twenty free upgrades on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.upgrade([lowestLevel(context)], balance.messageInABottleUpgrades),
   },
-} as const satisfies Record<string, CritProcDisplayInfo>;
+} as const satisfies Record<string, FeaturedCritDefinition>;
