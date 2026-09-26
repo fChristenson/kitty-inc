@@ -8,6 +8,7 @@ const explosionUrl = soundUrl("explosion.mp3");
 const winUrl = soundUrl("win.wav");
 const payoutUrl = soundUrl("payout.wav");
 const arcadeSlotWinUrl = soundUrl("arcadeSlotWin.wav");
+const magicCoinUrl = soundUrl("magicCoin.wav");
 const notificationUrl = soundUrl("notification.wav");
 
 const MUSIC_VOLUME = 0.3; // 25% quieter than the original 0.4 per explicit request
@@ -59,8 +60,8 @@ const PAYOUT_DEBOUNCE_MS = 800;
 let lastPayoutPlayTime = 0;
 
 // same idea again, for the "special crit crit" bonus-tier moment
-const ARCADE_SLOT_WIN_DEBOUNCE_MS = 800;
-let lastArcadeSlotWinPlayTime = 0;
+const MAGIC_COIN_DEBOUNCE_MS = 800;
+let lastMagicCoinPlayTime = 0;
 
 // any press-and-hold-driven purchase loop (corporationUpgradeMenu's building-
 // upgrade holds, etc.) can call this many times a second — without a debounce, each of
@@ -135,6 +136,7 @@ const sfxUrls = {
   win: winUrl,
   payout: payoutUrl,
   arcadeSlotWin: arcadeSlotWinUrl,
+  magicCoin: magicCoinUrl,
   notification: notificationUrl,
 } as const;
 type SfxName = keyof typeof sfxUrls;
@@ -357,14 +359,14 @@ export function playPayout(): void {
 // one-shot sound effect for the "special crit crit" bonus-tier moment (see
 // critCelebration.ts's celebrateBonusTier) — always this same sfx regardless
 // of which bonus tier (5x/25x/125x) actually landed, since this moment is its
-// own distinct "slot machine hit", not a graduated crit/jackpot/payout escalation.
-// Debounced (see ARCADE_SLOT_WIN_DEBOUNCE_MS) so back-to-back bonus tiers during
+// own distinct "magic coin hit", not a graduated crit/jackpot/payout escalation.
+// Debounced (see MAGIC_COIN_DEBOUNCE_MS) so back-to-back bonus tiers during
 // a fast held click can't stack overlapping plays
-export function playArcadeSlotWin(): void {
+export function playBonusTierMagicCoin(): void {
   const now = Date.now();
-  if (now - lastArcadeSlotWinPlayTime < ARCADE_SLOT_WIN_DEBOUNCE_MS) return;
-  lastArcadeSlotWinPlayTime = now;
-  playSfx("arcadeSlotWin", ARCADE_SLOT_WIN_VOLUME);
+  if (now - lastMagicCoinPlayTime < MAGIC_COIN_DEBOUNCE_MS) return;
+  lastMagicCoinPlayTime = now;
+  playSfx("magicCoin", SFX_VOLUME);
 }
 
 // the same slot-machine sfx over the Boost event's coin stream

@@ -1,11 +1,11 @@
 // The "special crit crit" bonus tier reward: multiplies the active company's
 // total income by a crit tier's multiplier (5x/25x/125x) and plays its
-// celebration — strobing tier flash, arcadeSlotWin, a tier-sized pattern of
+// celebration — strobing tier flash, magicCoin.wav, a tier-sized pattern of
 // coin bursts, and coins flying into the total-income readout. Shared by
 // piggyback-proc bonus tiers (floors/) and the hunted mouse (src/mouse).
 import { addTotalIncome, getTotalIncome } from "../../totalIncome";
 import { triggerScreenShake } from "../../screenShake";
-import { playArcadeSlotWin, playSold } from "../../sound";
+import { playBonusTierMagicCoin, playSold } from "../../sound";
 import { COLOR } from "../../palette";
 import { multiply } from "../bigNumber";
 import { CRIT_TIER_CONFIG, type CritTier } from "../critTypes";
@@ -146,7 +146,7 @@ export function celebrateBonusTier(
     holdMs,
     priority,
   });
-  playArcadeSlotWin();
+  playBonusTierMagicCoin();
   spawnTierBurstPattern(tier, spawnBurst);
   spawnTotalIncomeCoins(() => {
     triggerHudTotalFlash();

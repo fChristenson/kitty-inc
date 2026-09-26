@@ -16,8 +16,8 @@ const COIN_STAGGER_MS = 90;
 // each coin fades in in place first, THEN starts flying — reads as "coins
 // materialize, then get pulled in" instead of popping straight into motion.
 // Held a beat past its own arrival too (the "overshoot"), so the merge
-// trigger (HUD flash + cash register sound) lands after arcadeSlotWin.wav's
-// own win sound has had time to ring out, instead of stepping on top of it
+// trigger (HUD flash + cash register sound) lands after magicCoin.wav has had
+// time to ring out, instead of stepping on top of it
 const FADE_IN_MS = 300;
 const OVERSHOOT_HOLD_MS = 500;
 // the arrival reads as landing a beat too late if it waits for the very last
