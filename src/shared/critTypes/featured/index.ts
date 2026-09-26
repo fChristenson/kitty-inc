@@ -41,6 +41,9 @@ import { CHOCOLATE_CRITS } from "./chocolate";
 import { CAKES_CRITS } from "./cakes";
 import { MAFIA_CRITS } from "./mafia";
 import { YAKUZA_CRITS } from "./yakuza";
+import { DEMON_GIRLS_CRITS } from "./demonGirls";
+import { CAT_GIRLS_CRITS } from "./catGirls";
+import { CHROME_GIRLS_CRITS } from "./chromeGirls";
 
 export const FEATURED_CRITS = {
   ...CYBERPUNK_CRITS,
@@ -85,4 +88,7 @@ export const FEATURED_CRITS = {
   ...CHOCOLATE_CRITS,
   ...MAFIA_CRITS,
   ...YAKUZA_CRITS,
+  ...DEMON_GIRLS_CRITS,
+  ...CAT_GIRLS_CRITS,
+  ...CHROME_GIRLS_CRITS,
 } as const;

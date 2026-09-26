@@ -63,7 +63,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 852 + elementCritBatch.length);
+  assert.equal(kinds.length, 913 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -1109,6 +1109,67 @@ try {
     rubberBandReserve: [[20, 30, 10, 0], 66],
     sovereignSnowglobe: [[20, 69, 10, 0], 0],
     velvetLockbox: [[78, 30, 68, 0], 0],
+    hellfireHeartbreaker: [[20, 72, 10, 0], 0],
+    spadeTailSass: [[20, 98, 10, 0], 0],
+    sinfullySolvent: [[20, 30, 10, 0], 204],
+    slyStack: [[20, 30, 10, 0], 198],
+    lavenderLounge: [[20, 96, 10, 0], 0],
+    pitchforkCharmer: [[20, 65, 10, 0], 111],
+    scarletSaunter: [[74, 84, 10, 0], 0],
+    forkFlourish: [[20, 30, 10, 0], 212],
+    brimstoneBelle: [[20, 30, 10, 0], 300],
+    flapperFlames: [[66, 76, 56, 0], 0],
+    sootAndSequins: [[79, 30, 69, 0], 0],
+    impeccableTaste: [[20, 30, 10, 0], 174],
+    heartsAflame: [[20, 30, 73, 0], 0],
+    finePrintFiend: [[20, 30, 10, 0], 128],
+    signedInScarlet: [[20, 30, 72, 0], 0],
+    termsAndTemptations: [[20, 30, 10, 0], 126],
+    hotTake: [[81, 30, 10, 0], 0],
+    coinFlambe: [[20, 30, 10, 0], 67],
+    rivetRebel: [[78, 30, 10, 0], 0],
+    flickerGrin: [[20, 30, 10, 0], 68],
+    smolderEyes: [[20, 75, 55, 0], 0],
+    crimsonGlare: [[20, 30, 10, 0], 205],
+    midnightSideEye: [[59, 69, 10, 0], 0],
+    amberStare: [[20, 62, 10, 0], 102],
+    pawsAndEffect: [[20, 99, 10, 0], 0],
+    catwalkQueen: [[20, 55, 10, 0], 0],
+    runwayRoyalty: [[20, 97, 10, 0], 0],
+    blueHourStrut: [[20, 30, 10, 0], 207],
+    felineFine: [[20, 30, 74, 0], 0],
+    kittenHeels: [[20, 30, 73, 0], 0],
+    catsPajamas: [[42, 52, 32, 0], 126],
+    bedtimeBonus: [[47, 30, 37, 0], 93],
+    purrsuasion: [[20, 75, 55, 0], 0],
+    coinBoop: [[20, 30, 10, 0], 204],
+    tailSwish: [[75, 85, 10, 0], 0],
+    heartOfChrome: [[20, 73, 10, 0], 0],
+    heartDrive: [[20, 100, 10, 0], 0],
+    chromeCrush: [[20, 63, 10, 0], 105],
+    heartBeam: [[20, 30, 10, 0], 207],
+    puckerProtocol: [[20, 30, 10, 0], 176],
+    alloyAngel: [[20, 49, 10, 0], 0],
+    sereneSeraph: [[20, 30, 10, 0], 306],
+    wingedWealth: [[67, 77, 57, 0], 0],
+    cyberSiren: [[20, 30, 10, 0], 210],
+    micDropMaven: [[20, 98, 10, 0], 0],
+    circuitSerenade: [[80, 30, 70, 0], 0],
+    chromeCrooner: [[20, 30, 10, 0], 177],
+    sunkissedSignal: [[20, 30, 10, 0], 130],
+    wiredWarble: [[20, 30, 75, 0], 0],
+    beltItOut: [[20, 30, 10, 0], 128],
+    glossyGaze: [[20, 30, 74, 0], 0],
+    goldenFreckles: [[20, 30, 10, 0], 68],
+    mirrorBob: [[82, 30, 10, 0], 0],
+    holoHeart: [[79, 30, 10, 0], 0],
+    pixelHeart: [[20, 30, 10, 0], 69],
+    heartProjection: [[20, 30, 10, 0], 216],
+    liquidMetalLashes: [[20, 76, 56, 0], 0],
+    dripAndDazzle: [[20, 30, 10, 0], 210],
+    silverPour: [[20, 30, 40, 0], 64],
+    polishedPout: [[20, 66, 10, 0], 114],
+    loweredLenses: [[60, 70, 10, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({
@@ -1667,8 +1728,8 @@ try {
   const specialChance =
     tierChance * CONFIG.crit.specialCritGatewayChance * procChance;
   assert(
-    specialChance >= 0.03 && specialChance <= 0.05,
-    "special cadence targets 20-33 eligible rolls",
+    specialChance >= 0.003 && specialChance <= 0.007,
+    "special cadence targets roughly one special per 150-330 rolls",
   );
   assert(Math.abs(tierHits / rolls - tierChance) < 0.01);
   assert(Math.abs(specialHits / rolls - specialChance) < 0.005);
