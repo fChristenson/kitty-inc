@@ -1,4 +1,5 @@
 import type { BigNumber } from "../bigNumber";
+import { afterStartup } from "../startupGate";
 
 export interface CompanySnapshotValues {
   bankedTotal: BigNumber;
@@ -29,10 +30,10 @@ export function createSaveScheduler<T>(save: (state: T) => void): {
   saveNow: (state: T) => void;
 } {
   let pendingState: T | null = null;
-  let pendingHandle: number | null = null;
+  let scheduled = false;
 
   const run = (): void => {
-    pendingHandle = null;
+    scheduled = false;
     if (pendingState === null) return;
     const state = pendingState;
     pendingState = null;
@@ -42,12 +43,15 @@ export function createSaveScheduler<T>(save: (state: T) => void): {
   return {
     schedule: (state) => {
       pendingState = state;
-      if (pendingHandle !== null) return;
-      if (typeof requestIdleCallback === "function") {
-        pendingHandle = requestIdleCallback(run, { timeout: 1000 });
-      } else {
-        pendingHandle = window.setTimeout(run, 200);
-      }
+      if (scheduled) return;
+      scheduled = true;
+      afterStartup(() => {
+        if (typeof requestIdleCallback === "function") {
+          requestIdleCallback(run, { timeout: 1000 });
+        } else {
+          window.setTimeout(run, 200);
+        }
+      });
     },
     saveNow: (state) => {
       pendingState = null;

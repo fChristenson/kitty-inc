@@ -1287,6 +1287,7 @@ body {
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
   animation: earned-overlay-backdrop-fade-in 0.3s ease-out;
+  will-change: opacity;
 }
 
 .earned-overlay__content {
@@ -1300,6 +1301,7 @@ body {
   /* old-time cartoon newspaper-headline flourish: spins/grows in from nothing,
      overshoots, settles — see keyframes below */
   animation: earned-overlay-spin-in 0.7s cubic-bezier(0.2, 0.8, 0.3, 1);
+  will-change: scale, rotate, opacity;
 }
 
 .earned-overlay__label {

@@ -1,6 +1,8 @@
 // Runs non-urgent startup work (asset warm-ups, audio setup) outside the
 // frames the game needs for its first paint and first interactions.
 
+import { afterStartup } from "../startupGate";
+
 type IdleDeadlineLike = { timeRemaining: () => number };
 
 function scheduleIdle(
@@ -16,7 +18,7 @@ function scheduleIdle(
 }
 
 export function runWhenIdle(task: () => void, timeoutMs = 2000): void {
-  scheduleIdle(() => task(), timeoutMs);
+  afterStartup(() => scheduleIdle(() => task(), timeoutMs));
 }
 
 // works through `items` a few at a time, only while the browser reports idle
@@ -35,5 +37,5 @@ export function processWhenIdle<T>(
     }
     if (index < items.length) scheduleIdle(step, timeoutMs);
   };
-  scheduleIdle(step, timeoutMs);
+  afterStartup(() => scheduleIdle(step, timeoutMs));
 }

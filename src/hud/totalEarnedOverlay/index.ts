@@ -21,7 +21,8 @@ export function createTotalEarnedOverlayMarkup(): string {
 }
 
 export interface TotalEarnedOverlay {
-  show(totalIncome: BigNumber): void;
+  // resolves once the spin-in animation has finished (or the overlay was dismissed)
+  show(totalIncome: BigNumber): Promise<void>;
 }
 
 export function wireTotalEarnedOverlay(
@@ -34,12 +35,17 @@ export function wireTotalEarnedOverlay(
   const unitNameEl = overlay.querySelector<HTMLSpanElement>(
     ".earned-overlay__unit-name",
   )!;
+  const contentEl = overlay.querySelector<HTMLDivElement>(
+    ".earned-overlay__content",
+  )!;
+  let settleIntro: (() => void) | null = null;
 
   onTapOrClick(overlay, () => {
     overlay.hidden = true;
+    settleIntro?.();
   });
 
-  function show(totalIncome: BigNumber): void {
+  function show(totalIncome: BigNumber): Promise<void> {
     // same split-onto-two-lines shape as the HUD/map's own total-income readout
     // (see shared/totalIncomeReadout) instead of one glued-together string
     const { amount, unitName } = formatTotalIncomeParts(totalIncome);
@@ -59,6 +65,20 @@ export function wireTotalEarnedOverlay(
     setTimeout(() => {
       overlay.hidden = false;
     }, 0);
+    return new Promise<void>((resolve) => {
+      // fallback for when animationend never fires (backgrounded tab, reduced motion)
+      const fallback = window.setTimeout(() => settleIntro?.(), 1500);
+      const onEnd = (event: AnimationEvent): void => {
+        if (event.target === contentEl) settleIntro?.();
+      };
+      settleIntro = () => {
+        settleIntro = null;
+        window.clearTimeout(fallback);
+        contentEl.removeEventListener("animationend", onEnd);
+        resolve();
+      };
+      contentEl.addEventListener("animationend", onEnd);
+    });
   }
 
   return { show };

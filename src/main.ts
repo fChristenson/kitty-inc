@@ -168,6 +168,11 @@ import { observeActionBarHeight } from "./utils";
 import { getBackgroundUrls } from "./loadAssets";
 import { isCritFlashActive } from "./screenShake";
 import { runWhenIdle } from "./shared/idle";
+import {
+  afterStartup,
+  isStartupSettled,
+  markStartupSettled,
+} from "./shared/startupGate";
 import { isDialogOpen } from "./shared/dialogVisibility";
 
 // behind a dialog's dimmed backdrop the building redraws at ~30fps, leaving
@@ -187,7 +192,7 @@ async function main() {
   if (!app) throw new Error("#app not found");
   initSessionGuard();
   suppressNativeContextMenu();
-  startBackgroundMusic();
+  afterStartup(startBackgroundMusic);
   // creating the AudioContext alone blocked the main thread for tens of ms
   runWhenIdle(preloadSounds, 1500);
 
@@ -546,9 +551,9 @@ async function main() {
     // shows the idle-income "You have earned" overlay (see
     // hud/totalEarnedOverlay) on demand, without needing to actually leave and
     // reopen the tab to earn real idle income first
-    wireIdleOverlayTestButton(app, () =>
-      totalEarnedOverlay.show(fromNumber(123456)),
-    );
+    wireIdleOverlayTestButton(app, () => {
+      void totalEarnedOverlay.show(fromNumber(123456));
+    });
     // arms the "Boost!" event button on the lowest floor that still has an
     // un-boosted worker, and scrolls to it
     wireBoostEventTestButton(app, () => {
@@ -1297,7 +1302,9 @@ async function main() {
   saveBuildings(buildings, activeCompanyIndex);
   if (gt(totalIdleIncome, fromNumber(0))) {
     addTotalIncome(idleIncome);
-    totalEarnedOverlay.show(totalIdleIncome);
+    void totalEarnedOverlay.show(totalIdleIncome).then(markStartupSettled);
+  } else {
+    setTimeout(markStartupSettled, 0);
   }
 
   gameCanvas.redraw();
@@ -1309,7 +1316,8 @@ async function main() {
   // its own redraw() math (division by its own now-zero CSS size) would throw
   let lastBuildingRedrawAt = 0;
   startIncomeTicker(() => {
-    if (mapOpen) return;
+    // the frame drawn above stays under the startup overlay until its intro ends
+    if (mapOpen || !isStartupSettled()) return;
     const now = performance.now();
     if (
       isDialogOpen() &&
@@ -1339,7 +1347,7 @@ main();
 // BASE_URL already carries the "/kitty-inc/" GitHub Pages prefix (see
 // vite.config.ts), so this resolves correctly once deployed
 if ("serviceWorker" in navigator && !import.meta.hot) {
-  window.addEventListener("load", () => {
+  afterStartup(() => {
     navigator.serviceWorker
       .register(`${import.meta.env.BASE_URL}sw.js`)
       .catch((err) => console.error("Service worker registration failed", err));
