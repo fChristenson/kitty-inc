@@ -272,4 +272,12 @@ export const CANDY_CRITS = {
     reward: (context, { actions, balance, alternating }) =>
       actions.upgrade(alternating(context), balance.honeycombHustleUpgrades),
   },
+  candyComet: {
+    label: "Candy Comet",
+    color: COLOR.peppermintPink,
+    image: "crits/candy/candyComet.png",
+    description: "Fifty-seven upgrades rolling down the floors below",
+    reward: (context, { actions, balance, cascadeDown }) =>
+      actions.upgrade(cascadeDown(context), balance.candyCometUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

@@ -39,7 +39,7 @@ export function critIconFile(name) {
   const crits = path.join(ROOT, "src/assets/crits");
   for (const category of fs.existsSync(crits) ? fs.readdirSync(crits) : []) {
     const dir = path.join(crits, category);
-    if (fs.readdirSync(dir).some((f) => path.parse(f).name === name))
+    if (fs.readdirSync(dir).some((f) => f.split(".")[0] === name))
       return `crits/${category}/${name}.png`;
   }
   return `${name}.png`;

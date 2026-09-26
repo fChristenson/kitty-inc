@@ -1,0 +1,6 @@
+import { processCritIcon } from "../../lib/process-crit-icon.mjs";
+
+await processCritIcon("demonGirl", {
+  sourceExtension: ".source.png",
+  copyToAssetDirectories: true,
+});

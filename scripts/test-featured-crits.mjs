@@ -63,7 +63,7 @@ try {
   ]) {
     assert(markup.includes(`id="${control}"`));
   }
-  assert.equal(kinds.length, 829 + elementCritBatch.length);
+  assert.equal(kinds.length, 852 + elementCritBatch.length);
   assert.equal(new Set(allKinds).size, allKinds.length);
   assert.equal(
     new Set(allKinds.map((kind) => crit.CRIT_PROC_INFO[kind].label)).size,
@@ -1086,6 +1086,29 @@ try {
     sakuraSworn: [[20, 30, 70, 0], 0],
     shogunShakedown: [[20, 60, 10, 0], 96],
     tanukiTreasurer: [[41, 51, 31, 0], 120],
+    demonGirl: [[20, 64, 10, 0], 108],
+    candyComet: [[77, 30, 10, 0], 0],
+    chromeBear: [[20, 97, 10, 0], 0],
+    chromeCat: [[20, 30, 10, 0], 195],
+    chromeOwl: [[20, 30, 10, 0], 198],
+    chromeWolf: [[20, 94, 10, 0], 0],
+    sterlingSiesta: [[20, 30, 72, 0], 0],
+    chromeGirl: [[20, 61, 10, 0], 99],
+    platinumPaw: [[20, 71, 10, 0], 0],
+    relicCompass: [[20, 30, 71, 0], 0],
+    capitalCarousel: [[20, 30, 10, 0], 294],
+    executiveEscalator: [[72, 82, 10, 0], 0],
+    fiscalFireworks: [[65, 75, 55, 0], 0],
+    gildedGong: [[20, 30, 10, 0], 171],
+    overtimeOracle: [[20, 30, 10, 0], 67],
+    paperworkPaladin: [[80, 30, 10, 0], 0],
+    payrollPagoda: [[20, 30, 10, 0], 208],
+    pensionPinata: [[20, 30, 10, 0], 126],
+    profitPretzel: [[20, 74, 54, 0], 0],
+    receiptRocket: [[20, 30, 10, 0], 124],
+    rubberBandReserve: [[20, 30, 10, 0], 66],
+    sovereignSnowglobe: [[20, 69, 10, 0], 0],
+    velvetLockbox: [[78, 30, 68, 0], 0],
   };
   function fixture() {
     const floors = [20, 30, 10, 0].map((upgradeCount, index) => ({

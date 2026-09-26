@@ -337,4 +337,122 @@ export const RICHES_CRITS = {
         balance.pocketMoneyUpgrades,
       ),
   },
+  capitalCarousel: {
+    label: "Capital Carousel",
+    color: COLOR.grandOpeningRose,
+    image: "crits/riches/capitalCarousel.png",
+    description: "Forty-nine payouts on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles(context.floors, balance.capitalCarouselPayouts),
+  },
+  executiveEscalator: {
+    label: "Executive Escalator",
+    color: COLOR.fastForwardBlue,
+    image: "crits/riches/executiveEscalator.png",
+    description: "Fifty-two upgrades on this floor and every floor below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.upgrade(
+        belowAndHere(context),
+        balance.executiveEscalatorUpgrades,
+      ),
+  },
+  fiscalFireworks: {
+    label: "Fiscal Fireworks",
+    color: COLOR.royalFlushPurple,
+    image: "crits/riches/fiscalFireworks.png",
+    description: "Forty-five upgrades on every unlocked floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade(context.floors, balance.fiscalFireworksUpgrades),
+  },
+  gildedGong: {
+    label: "Gilded Gong",
+    color: COLOR.bonusRoundGold,
+    image: "crits/riches/gildedGong.png",
+    description: "Fifty-seven payouts on alternating floors",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.payCycles(alternating(context), balance.gildedGongPayouts),
+  },
+  overtimeOracle: {
+    label: "Overtime Oracle",
+    color: COLOR.dressCodeGreen,
+    image: "crits/riches/overtimeOracle.png",
+    description: "Sixty-seven payouts on the lowest-earning floor",
+    reward: (context, { actions, balance, selectByRate }) =>
+      actions.payCycles(
+        [selectByRate(context, false)],
+        balance.overtimeOraclePayouts,
+      ),
+  },
+  paperworkPaladin: {
+    label: "Paperwork Paladin",
+    color: COLOR.red,
+    image: "crits/riches/paperworkPaladin.png",
+    description: "Sixty upgrades on the cheapest floor to upgrade",
+    reward: (context, { actions, balance, cheapest }) =>
+      actions.upgrade([cheapest(context)], balance.paperworkPaladinUpgrades),
+  },
+  payrollPagoda: {
+    label: "Payroll Pagoda",
+    color: COLOR.mysticTeal,
+    image: "crits/riches/payrollPagoda.png",
+    description: "Fifty-two payouts on this floor and every floor below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.payCycles(belowAndHere(context), balance.payrollPagodaPayouts),
+  },
+  pensionPinata: {
+    label: "Pension Pinata",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/riches/pensionPinata.png",
+    description: "Sixty-three payouts on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.payCycles([lowestLevel(context)], balance.pensionPinataPayouts),
+  },
+  profitPretzel: {
+    label: "Profit Pretzel",
+    color: COLOR.goldStandardAmber,
+    image: "crits/riches/profitPretzel.png",
+    description: "Forty-four upgrades here and on the lowest-level floor",
+    reward: (context, { actions, balance, hereAnd, lowestLevel }) =>
+      actions.upgrade(
+        hereAnd(context, lowestLevel(context)),
+        balance.profitPretzelUpgrades,
+      ),
+  },
+  receiptRocket: {
+    label: "Receipt Rocket",
+    color: COLOR.internSkyBlue,
+    image: "crits/riches/receiptRocket.png",
+    description: "Sixty-two payouts on the highest unlocked floor",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.payCycles([highestFloor(context)], balance.receiptRocketPayouts),
+  },
+  rubberBandReserve: {
+    label: "Rubber Band Reserve",
+    color: COLOR.goldenTicketYellow,
+    image: "crits/riches/rubberBandReserve.png",
+    description: "Sixty-six payouts on the cheapest floor to upgrade",
+    reward: (context, { actions, balance, cheapest }) =>
+      actions.payCycles([cheapest(context)], balance.rubberBandReservePayouts),
+  },
+  sovereignSnowglobe: {
+    label: "Sovereign Snowglobe",
+    color: COLOR.goldenHandshakeGold,
+    image: "crits/riches/sovereignSnowglobe.png",
+    description:
+      "One tier promotion and thirty-nine upgrades on the top earner",
+    reward: (context, { balance, promoteAndUpgrade, selectByRate }) =>
+      promoteAndUpgrade(
+        selectByRate(context, true),
+        balance.sovereignSnowglobeTierSteps,
+        balance.sovereignSnowglobeUpgrades,
+      ),
+  },
+  velvetLockbox: {
+    label: "Velvet Lockbox",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/riches/velvetLockbox.png",
+    description: "Fifty-eight upgrades on alternating floors",
+    reward: (context, { actions, balance, alternating }) =>
+      actions.upgrade(alternating(context), balance.velvetLockboxUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

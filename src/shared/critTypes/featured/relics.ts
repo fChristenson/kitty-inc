@@ -104,4 +104,12 @@ export const RELICS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.upgrade([context.floor], balance.restorationProjectUpgrades),
   },
+  relicCompass: {
+    label: "Relic Compass",
+    color: COLOR.autumnSaleAmber,
+    image: "crits/relics/relicCompass.png",
+    description: "Sixty-one upgrades on the highest unlocked floor",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.upgrade([highestFloor(context)], balance.relicCompassUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

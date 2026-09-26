@@ -74,4 +74,16 @@ export const GOLDEN_ANIMALS_CRITS = {
     reward: (context, { balance, promoteAndUpgrade }) =>
       promoteAndUpgrade(context.floor, 1, balance.goldenLionUpgrades),
   },
+  platinumPaw: {
+    label: "Platinum Paw",
+    color: COLOR.silverTicketGray,
+    image: "crits/goldenAnimals/platinumPaw.png",
+    description: "One tier promotion and forty-one upgrades here",
+    reward: (context, { balance, promoteAndUpgrade }) =>
+      promoteAndUpgrade(
+        context.floor,
+        balance.platinumPawTierSteps,
+        balance.platinumPawUpgrades,
+      ),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

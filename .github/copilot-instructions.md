@@ -122,6 +122,7 @@ reports, batch reports, or effect documentation unless explicitly requested.
 ### Batch verification
 
 - Use focused checks for the changed behavior and `npm run build`; do not run or recreate the removed regression scripts or add a new test dependency.
+- Run `node scripts/check-crit-images.mjs` after adding or processing crit art: every crit image on disk must belong to a crit record and every record's icon, sticker and silhouette must exist. A raw source that is itself a PNG is named `<kind>.source.png` and read with `sourceExtension: ".source.png"` so the processed root copy can't overwrite it.
 - Cover concrete reward amounts and targets, single-floor cases, tier caps, milestone boundaries, unchanged timers, proc arming/consuming, tier/gateway misses, shared cap, rarity ordering, and asset properties.
 - Control random sequences for deterministic roll tests. Mutating `CONFIG` after module loading does not update legacy cached chance constants.
 - `BigNumber.subtract` clamps negative results to zero. For signed test deltas on deliberately small balances, compare `toNumber(after) - toNumber(before)`; do not convert real late-game huge balances this way.

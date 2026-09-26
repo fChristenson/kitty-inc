@@ -126,4 +126,16 @@ export const ATTITUDE_CRITS = {
       actions.payCycles([context.floor], balance.canNotLiePayouts);
     },
   },
+  demonGirl: {
+    label: "Demon Girl",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/attitude/demonGirl.png",
+    description: "Thirty-four upgrades and thirty-six payouts on this floor",
+    reward: (context, { balance, upgradeAndPay }) =>
+      upgradeAndPay(
+        [context.floor],
+        balance.demonGirlUpgrades,
+        balance.demonGirlPayouts,
+      ),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

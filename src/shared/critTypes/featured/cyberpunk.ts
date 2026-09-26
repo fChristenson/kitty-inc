@@ -198,4 +198,63 @@ export const CYBERPUNK_CRITS = {
         balance.androidAnalystPayouts,
       ),
   },
+  chromeBear: {
+    label: "Chrome Bear",
+    color: COLOR.silverTicketGray,
+    image: "crits/cyberpunk/chromeBear.png",
+    description: "Sixty-seven free upgrades on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.upgrade([context.floor], balance.chromeBearUpgrades),
+  },
+  chromeCat: {
+    label: "Chrome Cat",
+    color: COLOR.internSkyBlue,
+    image: "crits/cyberpunk/chromeCat.png",
+    description: "Sixty-five instant payouts on this floor",
+    reward: (context, { actions, balance }) =>
+      actions.payCycles([context.floor], balance.chromeCatPayouts),
+  },
+  chromeOwl: {
+    label: "Chrome Owl",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/cyberpunk/chromeOwl.png",
+    description: "Sixty-six payouts from the highest-earning floor",
+    reward: (context, { actions, balance, selectByRate }) =>
+      actions.payCycles(
+        [selectByRate(context, true)],
+        balance.chromeOwlPayouts,
+      ),
+  },
+  chromeWolf: {
+    label: "Chrome Wolf",
+    color: COLOR.fastForwardBlue,
+    image: "crits/cyberpunk/chromeWolf.png",
+    description: "Sixty-four upgrades on the top earner",
+    reward: (context, { actions, balance, selectByRate }) =>
+      actions.upgrade(
+        [selectByRate(context, true)],
+        balance.chromeWolfUpgrades,
+      ),
+  },
+  sterlingSiesta: {
+    label: "Sterling Siesta",
+    color: COLOR.silverTicketGray,
+    image: "crits/cyberpunk/sterlingSiesta.png",
+    description: "Sixty-two upgrades on the lowest-level floor",
+    reward: (context, { actions, balance, lowestLevel }) =>
+      actions.upgrade([lowestLevel(context)], balance.sterlingSiestaUpgrades),
+  },
+  chromeGirl: {
+    label: "Chrome Girl",
+    color: COLOR.pairBlue,
+    image: "crits/cyberpunk/chromeGirl.png",
+    description:
+      "Thirty-one upgrades and thirty-three payouts on the top earner",
+    reward: (context, { balance, selectByRate, upgradeAndPay }) =>
+      upgradeAndPay(
+        [selectByRate(context, true)],
+        balance.chromeGirlUpgrades,
+        balance.chromeGirlPayouts,
+      ),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
