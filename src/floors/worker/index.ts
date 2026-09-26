@@ -379,7 +379,10 @@ export function getWorkerPermaTier(
 }
 
 // one crit tier up per event win, capped at the strongest tier
-export function promoteWorkerPermaTier(floor: Floor, workerIndex: number): void {
+export function promoteWorkerPermaTier(
+  floor: Floor,
+  workerIndex: number,
+): void {
   const tier = nextCritTier(getWorkerPermaTier(floor, workerIndex));
   if (workerIndex === managerIndexOf(floor)) floor.managerPermaTier = tier;
   else setSlotPermaTier(floor, workerIndex, tier);
@@ -743,7 +746,8 @@ function drawPermaGlow(
   if (strength <= 0) return;
   const color = CRIT_TIER_CONFIG[tier].color;
   const pulse =
-    0.5 + 0.5 * Math.sin((2 * Math.PI * performance.now()) / PERMA_GLOW_PULSE_MS);
+    0.5 +
+    0.5 * Math.sin((2 * Math.PI * performance.now()) / PERMA_GLOW_PULSE_MS);
   const cy = groundY - RENDER_H / 2;
   const radius = RENDER_H * (0.5 + 0.06 * pulse);
   const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
@@ -767,7 +771,10 @@ function drawPermaGlow(
 // one reused scratch canvas: the frame washed toward white inside its own
 // silhouette only ('source-atop' keeps the transparent padding untouched)
 let whiteScratch: HTMLCanvasElement | null = null;
-function whitenFrame(frame: HTMLCanvasElement, alpha: number): HTMLCanvasElement {
+function whitenFrame(
+  frame: HTMLCanvasElement,
+  alpha: number,
+): HTMLCanvasElement {
   whiteScratch ??= document.createElement("canvas");
   if (whiteScratch.width !== frame.width) whiteScratch.width = frame.width;
   if (whiteScratch.height !== frame.height) whiteScratch.height = frame.height;

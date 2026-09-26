@@ -57,14 +57,14 @@ export async function processCritIcon(
           data[pixel * channels + 2],
         )
       : backgroundColor !== null
-      ? Math.hypot(
-          ...backgroundColor.map(
-            (channel, index) => data[pixel * channels + index] - channel,
-          ),
-        ) <= backgroundColorTolerance
-      : darkBackgroundThreshold === null
-        ? whiteness(pixel) >= 195
-        : whiteness(pixel) <= darkBackgroundThreshold;
+        ? Math.hypot(
+            ...backgroundColor.map(
+              (channel, index) => data[pixel * channels + index] - channel,
+            ),
+          ) <= backgroundColorTolerance
+        : darkBackgroundThreshold === null
+          ? whiteness(pixel) >= 195
+          : whiteness(pixel) <= darkBackgroundThreshold;
   const isProtected = (pixel) => {
     const column = pixel % width;
     const row = Math.floor(pixel / width);
