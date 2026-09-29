@@ -1,133 +1,1427 @@
 import "./style.css";
-import bgUrl from "./assets/bg.png";
+import { forceTestCrit } from "./floors";
+import { wireCritTestActions } from "./hud";
+import {
+  add,
+  subtract,
+  fromNumber,
+  gt,
+  gte,
+  isZero,
+  ZERO,
+  type BigNumber,
+} from "./shared/bigNumber";
+import {
+  CHAIN_CRIT_CONTINUE_CHANCE,
+  nextCritTier,
+  CRIT_TIER_ORDER,
+  CRIT_TIER_CONFIG,
+  applyCritProcs,
+  POKER_HAND_CRIT_COUNTS,
+  LUCKY_CLOVER_CRIT_COUNT,
+  LUCKY_CLOVER_CRIT_TIER,
+  MYSTIC_UPGRADE_COUNT,
+  withDraftCritCounts,
+  commitCritCounts,
+  type CritRollResult,
+} from "./shared/critTypes";
+import {
+  loadFloorBackgrounds,
+  loadGroundImage,
+  loadWorkerSprite,
+  loadCoinImage,
+  loadFloatingCoinImage,
+  startIncomeTicker,
+  ensureLockedFloorAbove,
+  getBuildingUnlockAllCost,
+  unlockAllFloors,
+  getActiveBackgrounds,
+  applyChainCrit,
+  increaseIncomeRate,
+  currentIncomeRatePerSecond,
+  applyBoostAll,
+  MAX_RENDERED_WORKERS,
+  MAX_FLOORS_PER_BUILDING,
+  FLOOR_W,
+  FLOOR_H,
+  performAutomatedUpgradeClick,
+  performAutomatedUpgradeAfterPayment,
+  performAutomatedFloorUnlock,
+  getCritTier,
+  getUpgradeCost,
+  rollFloorBuyCrit,
+  forceBoostEvent,
+  forceUnionEvent,
+  forceKickbackEvent,
+  forceGlimmerEvent,
+  forceHuntEvent,
+  startSwarmEvent,
+  forceRenovateEvent,
+  forceUpgradeEvent,
+  forceUnlockEvent,
+  type FloorActionsDeps,
+} from "./floors";
+import {
+  startTotalIncomeTicker,
+  switchActiveCompany,
+  rebalanceDormantCompanyEconomies,
+  addTotalIncome,
+  spendTotalIncome,
+  getTotalIncome,
+  getBuildingsCurrentIncomePerSecond,
+  getDormantCompaniesIdleIncome,
+  withDraftEconomy,
+  commitDraftIncome,
+  addCompanyTotalIncome,
+} from "./totalIncome";
+import {
+  saveBuildings,
+  saveBuildingsImmediately,
+  schedulePersist,
+  loadBuildings,
+  computeIdleIncome,
+  getLastCloseTimestamp,
+  IDLE_INCOME_MIN_SECONDS,
+  reconcileBoostedAwayIncome,
+  markAppClosed,
+  initSessionGuard,
+  isStorageIntact,
+  type Floor,
+} from "./gameState";
+import { bindSaveLifecycle, saveCompanySnapshot } from "./shared/persistence";
+import { suppressNativeContextMenu } from "./shared/tapEvents";
+import { type BuildingDraft, type RenovationPlan } from "./shared/buildingJob";
+import {
+  isDetachedJobPending,
+  isFloorLocked,
+  runDetachedStep,
+} from "./shared/detachedJob";
+import { getCritBadgeOverlay } from "./shared/critBadgeOverlay";
+import { createLoadingOverlay } from "./shared/loadingOverlay";
+import {
+  createRenovationController,
+  renovateFloors,
+  planRenovation,
+  createFixedRenovationPlan,
+  planBuildingCompletion,
+  createFloorUnlockStep,
+  createBuildingCompletionStep,
+} from "./renovation";
+import {
+  getActiveCompanyIndex,
+  setActiveCompanyIndex,
+  companyStorageKey,
+  saveCompanyRecord,
+} from "./company";
+import {
+  createTestButtonMarkup,
+  wireTestButton,
+  wireSpawnMouseButton,
+  wireTestActionsFilter,
+  wireIdleOverlayTestButton,
+  wireBoostEventTestButton,
+  wireUnionEventTestButton,
+  wireKickbackEventTestButton,
+  wireGlimmerEventTestButton,
+  wireHuntEventTestButton,
+  wireSwarmEventTestButton,
+  wireRenovateEventTestButton,
+  wireUpgradeEventTestButton,
+  wireUnlockEventTestButton,
+  wireResetButton,
+  createActionBarMarkup,
+  wireActionBar,
+  createUpgradeMenuMarkup,
+  wireUpgradeMenu,
+  createFloorUpgradeMenuMarkup,
+  wireFloorUpgradeMenu,
+  createCorporationUpgradeMenuMarkup,
+  wireCorporationUpgradeMenu,
+  createBoostMenuMarkup,
+  wireBoostMenu,
+  createBadgeCollectionMarkup,
+  wireBadgeCollection,
+  createCorporationStatsMarkup,
+  wireCorporationStats,
+  getGlobalIncomeBoostMultiplier,
+  getCompanyAssetValue,
+  getCompanyUpgradesValue,
+  getWorkerCost,
+  getOfficeChairsCost,
+  getOfficeSuppliesCost,
+  getManagerCost,
+  buyWorker,
+  buyOfficeChairs,
+  buyOfficeSupplies,
+  buyManager,
+  isManagerUnlocked,
+  MANAGER_MIN_UPGRADE_COUNT,
+  mergeCompanies,
+  createMapMenuMarkup,
+  wireMapMenu,
+  createTotalEarnedOverlayMarkup,
+  wireTotalEarnedOverlay,
+} from "./hud";
+import {
+  createGameCanvas,
+  loadCityImage,
+  loadCloudImages,
+  loadCityMapImage,
+  createCityMapView,
+  createCityMapMarkup,
+  type CheapestBatch,
+} from "./background";
+import {
+  createBuilding,
+  configureBuildingFloorPrices,
+  getBuildingMultiplier,
+  getBuildingPrice,
+  loadWallMaterial,
+  loadRoofImage,
+} from "./buildings";
+import { loadMouseImage, forceSpawnMouse } from "./mouse";
+import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
+import { createNewCorporation } from "./corporationName";
+import { observeActionBarHeight } from "./utils";
+import { getBackgroundUrls } from "./loadAssets";
+import { isCritFlashActive, warmCritFlashBlooms } from "./screenShake";
+import { runWhenIdle } from "./shared/idle";
+import {
+  afterStartup,
+  isStartupSettled,
+  markStartupSettled,
+  whenDocumentReady,
+} from "./shared/startupGate";
+import { isDialogOpen } from "./shared/dialogVisibility";
 
-const spriteModules = import.meta.glob<string>("./assets/sprites/sprite-*.png", {
-  eager: true,
-  import: "default",
-});
-const spriteUrls = Object.keys(spriteModules)
-  .sort()
-  .map((key) => spriteModules[key]);
+// behind a dialog's dimmed backdrop the building redraws at ~30fps, leaving
+// the frame budget to the dialog's own slide animation and content
+const BEHIND_DIALOG_REDRAW_MS = 33;
 
-// native size of bg.png
-const FLOOR_W = 1248;
-const FLOOR_H = 721;
-
-// the floor plane band inside each bg.png slice (rest is ceiling/walls/windows)
-const FLOOR_BOTTOM = 705;
-const FLOOR_X_MIN = 150;
-const FLOOR_X_MAX = 1100;
-const FURNITURE_MAX_H = 195;
-const FURNITURE_RISE = 60;
-
-interface Placement {
-  img: HTMLImageElement;
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-interface Floor {
-  furniture: Placement[];
-}
-
-function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`failed to load ${src}`));
-    img.src = src;
-  });
-}
-
-function randomInt(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function pickRandomSprites(images: HTMLImageElement[], count: number): HTMLImageElement[] {
-  const pool = [...images];
-  const picked: HTMLImageElement[] = [];
-  for (let i = 0; i < count && pool.length > 0; i++) {
-    const idx = randomInt(0, pool.length - 1);
-    picked.push(pool.splice(idx, 1)[0]);
-  }
-  return picked;
-}
-
-function buildFloor(spriteImages: HTMLImageElement[]): Floor {
-  const count = randomInt(2, 3);
-  const chosen = pickRandomSprites(spriteImages, count);
-  const usableW = FLOOR_X_MAX - FLOOR_X_MIN;
-  const slotWidth = usableW / chosen.length;
-
-  const furniture: Placement[] = chosen.map((img, i) => {
-    const scale = Math.min(FURNITURE_MAX_H / img.naturalHeight, 1);
-    const w = img.naturalWidth * scale;
-    const h = img.naturalHeight * scale;
-    const slotCenter = FLOOR_X_MIN + slotWidth * i + slotWidth / 2;
-    const jitter = (Math.random() - 0.5) * slotWidth * 0.4;
-    const x = Math.min(Math.max(slotCenter + jitter - w / 2, FLOOR_X_MIN), FLOOR_X_MAX - w);
-    const y = FLOOR_BOTTOM - h - FURNITURE_RISE;
-    return { img, x, y, w, h };
-  });
-
-  return { furniture };
-}
+// matches style.css's worker-menu-slide-out-* keyframes (0.352s) — the company
+// select menu's own close animation duration
+const DIALOG_CLOSE_MS = 352;
+// how far ahead of the dialog fully disappearing the map's own switch-company
+// animation should kick in, so the two transitions blend together instead of
+// the switch happening while the dialog hasn't even started moving yet
+const SWITCH_LEAD_MS = 100;
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
   if (!app) throw new Error("#app not found");
+  initSessionGuard();
+  suppressNativeContextMenu();
+  afterStartup(startBackgroundMusic);
+  runWhenIdle(() =>
+    warmCritFlashBlooms(
+      CRIT_TIER_ORDER.map((tier) => CRIT_TIER_CONFIG[tier].label),
+    ),
+  );
+  // creating the AudioContext alone blocked the main thread for tens of ms
+  runWhenIdle(preloadSounds, 1500);
 
   app.innerHTML = `
     <div class="game">
-      <header class="game__header">
-        <h1>Skyscraper Clicker</h1>
-        <p class="game__floor-count">Floors: <span id="floor-count">0</span></p>
-      </header>
-      <div class="game__scroll" id="scroll">
-        <canvas id="building"></canvas>
-      </div>
-      <button id="add-floor" class="game__button">Add Floor</button>
+      <canvas class="game__canvas" id="game-canvas"></canvas>
+      ${createCityMapMarkup()}
+      ${createActionBarMarkup()}
+      ${import.meta.env.MODE !== "production" ? createTestButtonMarkup() : ""}
     </div>
+    ${createUpgradeMenuMarkup()}
+    ${createFloorUpgradeMenuMarkup()}
+    ${createCorporationUpgradeMenuMarkup()}
+    ${createBoostMenuMarkup()}
+    ${createBadgeCollectionMarkup()}
+    ${createCorporationStatsMarkup()}
+    ${createMapMenuMarkup()}
+    ${createTotalEarnedOverlayMarkup()}
   `;
+  const canvas = app.querySelector<HTMLCanvasElement>("#game-canvas")!;
+  const cityMapEl = app.querySelector<HTMLDivElement>("#city-map")!;
+  observeActionBarHeight(app.querySelector<HTMLDivElement>("#action-bar")!);
 
-  const canvas = app.querySelector<HTMLCanvasElement>("#building")!;
-  const ctx = canvas.getContext("2d")!;
-  const scrollEl = app.querySelector<HTMLDivElement>("#scroll")!;
-  const floorCountEl = app.querySelector<HTMLSpanElement>("#floor-count")!;
-  const addFloorBtn = app.querySelector<HTMLButtonElement>("#add-floor")!;
-
-  const [bgImage, ...spriteImages] = await Promise.all([
-    loadImage(bgUrl),
-    ...spriteUrls.map(loadImage),
+  // canvas text doesn't re-render on its own once a web font finishes loading (unlike
+  // DOM text), so every weight the canvas draws with must be loaded before the first
+  // redraw below, or the very first frame silently falls back to system-ui
+  await Promise.all([
+    document.fonts.load('700 16px "Fredoka"'),
+    document.fonts.load('900 16px "Fredoka"'),
   ]);
 
-  const floors: Floor[] = [];
+  await Promise.all([
+    loadCloudImages(),
+    loadMouseImage(),
+    loadCoinImage(),
+    loadFloatingCoinImage(),
+    loadRoofImage(), // same roof art for every theme, loaded once
+  ]);
 
-  function render() {
-    canvas.width = FLOOR_W;
-    canvas.height = Math.max(floors.length, 1) * FLOOR_H;
-    for (let r = 0; r < floors.length; r++) {
-      const floor = floors[floors.length - 1 - r];
-      const offsetY = r * FLOOR_H;
-      ctx.drawImage(bgImage, 0, offsetY, FLOOR_W, FLOOR_H);
-      for (const p of floor.furniture) {
-        ctx.drawImage(p.img, p.x, p.y + offsetY, p.w, p.h);
-      }
+  // one Floor[] per building; only one building is ever shown on screen at a time
+  // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
+  // happens entirely through the map menu below, not by scrolling/swiping.
+  // Belongs entirely to whichever corporation is currently active (see
+  // company.ts) — switching companies below empties this array and refills it
+  // with that other company's own buildings, never mixing the two
+  const buildings: Floor[][] = [];
+  let activeBuildingIndex = 0;
+  let activeCompanyIndex = getActiveCompanyIndex();
+  let mapOpen = false;
+  const renovationOverlay = createLoadingOverlay(canvas, "Renovating");
+  const renovations = createRenovationController({
+    setLoading: renovationOverlay.show,
+    showRewards: (rewards) => getCritBadgeOverlay().show(rewards),
+  });
+  function refreshRenovationView(): void {
+    renovations.setView(activeCompanyIndex, activeBuildingIndex, mapOpen);
+  }
+  // consumed once by the very next onSwitchCompany call (see cityMapView's own
+  // deps below) — set right before triggering a post-merge switch animation
+  // when the OUTGOING company was itself just merged away, so that switch
+  // skips re-snapshotting main.ts's own stale live buildings/total over the
+  // clear mergeCompanies already did for it
+  let skipNextOutgoingSnapshot = false;
+
+  // so a reload lands back on whichever building the player last selected on the
+  // map, namespaced per company (see company.ts's companyStorageKey) since each
+  // company remembers its own last-active building independently
+  const ACTIVE_BUILDING_KEY = "cash-clicker:active-building-index";
+
+  function loadActiveBuildingIndex(companyIndex: number): number {
+    try {
+      const parsed = Number(
+        localStorage.getItem(
+          companyStorageKey(ACTIVE_BUILDING_KEY, companyIndex),
+        ),
+      );
+      return Number.isFinite(parsed) ? parsed : 0;
+    } catch {
+      return 0;
     }
   }
 
-  function addFloor() {
-    floors.push(buildFloor(spriteImages));
-    floorCountEl.textContent = String(floors.length);
-    render();
-    scrollEl.scrollTop = 0; // keep the newest floor in view
+  function saveActiveBuildingIndex(companyIndex: number, index: number): void {
+    try {
+      localStorage.setItem(
+        companyStorageKey(ACTIVE_BUILDING_KEY, companyIndex),
+        String(index),
+      );
+    } catch {
+      // storage unavailable: nothing to persist
+    }
   }
 
-  addFloorBtn.addEventListener("click", addFloor);
+  function persist() {
+    // debounced/idle-scheduled so a click mid-scroll doesn't synchronously serialize
+    // every building's floors + hit localStorage on the same frame (see gameState.ts)
+    schedulePersist(buildings, activeCompanyIndex);
+  }
 
-  addFloor(); // ground floor
+  function saveCurrentCompanyStateNow(): void {
+    saveBuildingsImmediately(buildings, activeCompanyIndex);
+    saveCompanySnapshot(
+      activeCompanyIndex,
+      {
+        bankedTotal: getTotalIncome(),
+        incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
+          buildings,
+          Date.now(),
+        ),
+        assetValue: getCompanyAssetValue(buildings),
+        upgradesValue: getCompanyUpgradesValue(buildings),
+      },
+      saveCompanyRecord,
+    );
+  }
+
+  // loads every asset the game needs (floor backgrounds, ground, wall material,
+  // worker/manager sprites) and makes them the active set every draw* function
+  // reads from — call before ever showing a building on screen. Roof isn't part
+  // of this set (see loadRoofImage, loaded once above).
+  async function loadBuildingThemeAssets(): Promise<void> {
+    await Promise.all([
+      loadFloorBackgrounds(),
+      loadGroundImage(),
+      loadWallMaterial(),
+      loadWorkerSprite(),
+    ]);
+  }
+
+  // loads a company's saved buildings, or starts it off with a single fresh
+  // building if it's never been played before (a brand new corporation, or the
+  // very first run)
+  async function loadOrCreateBuildings(
+    companyIndex: number,
+  ): Promise<Floor[][]> {
+    const restored = loadBuildings(companyIndex);
+    if (restored.length > 0) {
+      return restored;
+    }
+    const themeBackgroundCount = getBackgroundUrls().length;
+    return [createBuilding(0, themeBackgroundCount)];
+  }
+
+  buildings.push(...(await loadOrCreateBuildings(activeCompanyIndex)));
+  activeBuildingIndex = Math.min(
+    Math.max(loadActiveBuildingIndex(activeCompanyIndex), 0),
+    buildings.length - 1,
+  );
+  await loadBuildingThemeAssets();
+  await loadCityImage();
+  await loadCityMapImage();
+
+  const floorUpgradeMenu = wireFloorUpgradeMenu(app, () => persist());
+  const corporationStats = wireCorporationStats(app);
+
+  const gameCanvas = createGameCanvas({
+    canvas,
+    getBackgrounds: getActiveBackgrounds,
+    floors: buildings[activeBuildingIndex],
+    getBuildingMultiplier: () => getBuildingMultiplier(activeBuildingIndex),
+    getCompanyValue: () => getCompanyAssetValue(buildings),
+    applyCompanyWideBoost: () => {
+      for (const floors of buildings) {
+        applyBoostAll(floors);
+      }
+    },
+    createMysticBuilding: () => createMysticBuilding(),
+    persist,
+    onOpenFloorUpgrades: (floor, floorNumber) =>
+      floorUpgradeMenu.open(floor, floorNumber),
+    onOpenCorporationStats: () => corporationStats.open(),
+  });
+
+  // ensures a building's next locked floor is waiting above it; onAdd only forwards
+  // to gameCanvas.ts when this is the currently-active/on-screen building — an
+  // inactive building's newly-added floor gets picked up automatically the next
+  // time the player switches to it (setActiveFloors registers every floor fresh).
+  function setupBuilding(
+    buildingIndex: number,
+    targetBuildings = buildings,
+  ): void {
+    configureBuildingFloorPrices(targetBuildings[buildingIndex], buildingIndex);
+    ensureLockedFloorAbove({
+      floors: targetBuildings[buildingIndex],
+      backgroundCount: getBackgroundUrls().length,
+      multiplier: getBuildingMultiplier(buildingIndex),
+      onAdd: (floor) => {
+        if (
+          targetBuildings === buildings &&
+          buildingIndex === activeBuildingIndex
+        ) {
+          gameCanvas.notifyFloorAdded(floor);
+        }
+      },
+    });
+  }
+
+  function createMysticBuilding(targetBuildings = buildings): void {
+    const mysticBuildingIndex = targetBuildings.length;
+    targetBuildings.push(
+      createBuilding(mysticBuildingIndex, getBackgroundUrls().length, {
+        groundFloorLocked: false,
+        initialUpgradeCount: MYSTIC_UPGRADE_COUNT,
+      }),
+    );
+    const groundFloor = targetBuildings[mysticBuildingIndex]?.[0];
+    if (groundFloor) {
+      setupBuilding(mysticBuildingIndex, targetBuildings);
+    }
+  }
+
+  function floorActionDeps(
+    buildingIndex: number,
+    targetBuildings = buildings,
+  ): FloorActionsDeps {
+    return {
+      floors: targetBuildings[buildingIndex],
+      backgroundCount: getBackgroundUrls().length,
+      multiplier: getBuildingMultiplier(buildingIndex),
+      persist: () => {
+        if (targetBuildings === buildings) persist();
+      },
+      onFloorAdded: (floor) => {
+        if (
+          targetBuildings === buildings &&
+          buildingIndex === activeBuildingIndex
+        )
+          gameCanvas.notifyFloorAdded(floor);
+      },
+      createMysticBuilding: () => createMysticBuilding(targetBuildings),
+      getCompanyValue: () => getCompanyAssetValue(targetBuildings),
+      applyCompanyWideBoost: () => {
+        for (const floors of targetBuildings) applyBoostAll(floors);
+      },
+      getScreenCenterLocal: () => ({ x: FLOOR_W / 2, y: FLOOR_H / 2 }),
+    };
+  }
+
+  // switches which building is currently displayed — no travel animation yet, just
+  // an instant cut to the new street.
+  async function goToBuilding(buildingIndex: number): Promise<void> {
+    activeBuildingIndex = buildingIndex;
+    saveActiveBuildingIndex(activeCompanyIndex, buildingIndex);
+    await loadBuildingThemeAssets();
+    gameCanvas.setActiveFloors(buildings[buildingIndex]);
+    refreshRenovationView();
+  }
+
+  // switches which corporation is active (see company.ts, cityMap's barrel-roll
+  // picker): saves the outgoing company's own buildings/active-building under its
+  // own key, then empties+refills the same buildings array reference (every
+  // closure above captured this array once, not its contents) with the new
+  // company's own separate buildings, its own last-active building, and hands
+  // totalIncome.ts its own separate running total — nothing here is shared
+  // between companies
+  async function switchToCompany(
+    companyIndex: number,
+    // set by the corporation-merge flow below when the OUTGOING company was
+    // itself just merged away (see mergeCompanies) — its storage was already
+    // cleared there, so snapshotting main.ts's own now-stale live buildings/
+    // total over that clear would silently resurrect it. Every other caller
+    // (a normal barrel-roll switch, "Create new Corporation") leaves this off
+    skipOutgoingSnapshot = false,
+  ): Promise<void> {
+    if (!skipOutgoingSnapshot) {
+      // snapshot the OUTGOING company's ENTIRE CompanyRecord (see company.ts) in
+      // one atomic write, while `buildings`/`activeCompanyIndex`/`totalIncome`
+      // still hold its data — bankedTotal, its rate, and the timestamp all land
+      // together, so a dormant company's derived total can never desync from a
+      // separately-written "just the total" value (there isn't one anymore)
+      saveCompanySnapshot(
+        activeCompanyIndex,
+        {
+          bankedTotal: getTotalIncome(),
+          incomeRatePerSecond: getBuildingsCurrentIncomePerSecond(
+            buildings,
+            Date.now(),
+          ),
+          assetValue: getCompanyAssetValue(buildings),
+          upgradesValue: getCompanyUpgradesValue(buildings),
+        },
+        saveCompanyRecord,
+      );
+      saveBuildings(buildings, activeCompanyIndex);
+      saveActiveBuildingIndex(activeCompanyIndex, activeBuildingIndex);
+    }
+
+    activeCompanyIndex = companyIndex;
+    setActiveCompanyIndex(companyIndex);
+    buildings.length = 0;
+    buildings.push(...(await loadOrCreateBuildings(companyIndex)));
+    activeBuildingIndex = Math.min(
+      Math.max(loadActiveBuildingIndex(companyIndex), 0),
+      buildings.length - 1,
+    );
+    buildings.forEach((_, i) => setupBuilding(i));
+
+    switchActiveCompany(companyIndex, buildings);
+    // tops up whatever collectDueIncome is about to pay any floor whose own
+    // worker boost decayed partway through however long this company just sat
+    // dormant (see gameState.ts's own doc comment) — must run AFTER
+    // switchActiveCompany so the credit lands in the now-active company's total
+    const awayBoostIncome = reconcileBoostedAwayIncome(
+      buildings,
+      currentIncomeRatePerSecond,
+    );
+    if (gt(awayBoostIncome, fromNumber(0))) addTotalIncome(awayBoostIncome);
+    await loadBuildingThemeAssets();
+    await Promise.all([loadCityImage(), loadCityMapImage()]);
+    gameCanvas.setActiveFloors(buildings[activeBuildingIndex]);
+    refreshRenovationView();
+  }
+
+  // dev/test-only controls; markup is stripped entirely in production builds
+  if (import.meta.env.MODE !== "production") {
+    wireTestButton(app, () => {
+      // absurdly large: comfortably covers buying dozens of buildings in one go,
+      // many cities deep (see cityName/cityMap's continuously-compounding
+      // BUILDING_COST_MULTIPLIER pricing) — formatCompactNumber's suffix (utils.ts)
+      // is generated algorithmically, not from a fixed list, so it never runs out
+      // of a name for however big this (or totalIncome) ever gets
+      addTotalIncome(fromNumber(1e150));
+    });
+    wireSpawnMouseButton(app, () => {
+      forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
+    });
+    wireCritTestActions(app, (kind, tier, bonusTier, event) => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (floor) forceTestCrit(floor, kind, tier, bonusTier, event);
+    });
+    // shows the idle-income "You have earned" overlay (see
+    // hud/totalEarnedOverlay) on demand, without needing to actually leave and
+    // reopen the tab to earn real idle income first
+    wireIdleOverlayTestButton(app, () => {
+      void totalEarnedOverlay.show(fromNumber(123456));
+    });
+    // arms the "Boost!" event button on the lowest floor that still has an
+    // un-boosted worker, and scrolls to it
+    wireBoostEventTestButton(app, () => {
+      const floor = forceBoostEvent(buildings[activeBuildingIndex] ?? []);
+      if (floor) gameCanvas.scrollActiveToFloor(floor);
+    });
+    // arms "Union!" on the lowest floor with workers to merge, and scrolls to it
+    wireUnionEventTestButton(app, () => {
+      const floor = forceUnionEvent(buildings[activeBuildingIndex] ?? []);
+      if (floor) gameCanvas.scrollActiveToFloor(floor);
+    });
+    // scrolls to the ground floor and arms a crit there carrying Kickback
+    wireKickbackEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceKickbackEvent(floor);
+    });
+    // same, for the Glimmer event
+    wireGlimmerEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceGlimmerEvent(floor);
+    });
+    // spawns a mouse if none is out, arms "Hunt!" on its floor and scrolls there
+    wireHuntEventTestButton(app, () => {
+      let floor = forceHuntEvent();
+      if (!floor) {
+        forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
+        floor = forceHuntEvent();
+      }
+      if (floor) gameCanvas.scrollActiveToFloor(floor);
+    });
+    // scrolls to the ground floor and plays the Swarm proc on its button
+    wireSwarmEventTestButton(app, () => {
+      const floors = buildings[activeBuildingIndex] ?? [];
+      const floor = floors[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      startSwarmEvent(floor, true, floors, gameCanvas.getFloorRect);
+    });
+    // scrolls to the ground floor and arms an x5 crit there carrying Renovate
+    wireRenovateEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceRenovateEvent(floor);
+    });
+    // same, for the Upgrade event
+    wireUpgradeEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceUpgradeEvent(floor);
+    });
+    // arms the Unlock event on the floor right below the locked one
+    wireUnlockEventTestButton(app, (unlockCrit) => {
+      const floors = buildings[activeBuildingIndex] ?? [];
+      const floor = floors[floors.findIndex((f) => !f.unlocked) - 1];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceUnlockEvent(floor, unlockCrit);
+    });
+    wireResetButton(app, buildings);
+    // wired last, so it sees every dropdown/button the block above created
+    wireTestActionsFilter(app);
+  }
+  function startBuildingRenovation(
+    floors: Floor[],
+    plan: RenovationPlan,
+    action: "upgrades" | "unlock" | "complete" = "upgrades",
+    onPurchased?: () => void,
+  ): Promise<boolean> {
+    const buildingIndex = buildings.indexOf(floors);
+    if (
+      buildingIndex < 0 ||
+      isDetachedJobPending() ||
+      renovations.running ||
+      floors.some(isFloorLocked)
+    )
+      return Promise.resolve(false);
+    const companyIndex = activeCompanyIndex;
+    let mysticBuildings = 0;
+    let companyBoosts = 0;
+    const draftDeps = (draft: BuildingDraft): FloorActionsDeps => ({
+      ...floorActionDeps(buildingIndex, draft.buildings),
+      createMysticBuilding: () => {
+        mysticBuildings++;
+      },
+      applyCompanyWideBoost: () => {
+        applyBoostAll(draft.buildings[buildingIndex]);
+        companyBoosts++;
+      },
+    });
+    const upgrade = (draft: BuildingDraft, floor: Floor): void => {
+      withDraftEconomy(draft, () =>
+        performAutomatedUpgradeAfterPayment(
+          draftDeps(draft),
+          floor,
+          draft.buildings[buildingIndex][0] === floor,
+          true,
+        ),
+      );
+    };
+    refreshRenovationView();
+    return renovations.start(companyIndex, buildingIndex, () =>
+      renovateFloors({
+        plan,
+        buildings,
+        buildingIndex,
+        onPurchased,
+        spend: (cost) => {
+          if (!spendTotalIncome(cost)) return false;
+          saveCurrentCompanyStateNow();
+          return true;
+        },
+        refund: (cost) => {
+          addCompanyTotalIncome(companyIndex, cost);
+          persist();
+        },
+        getMoney: getTotalIncome,
+        isCurrent: () =>
+          activeCompanyIndex === companyIndex &&
+          buildings[buildingIndex] === floors,
+        upgrade,
+        createStep:
+          action === "upgrades"
+            ? undefined
+            : (draft) =>
+                action === "unlock"
+                  ? createFloorUnlockStep(
+                      draft.buildings[buildingIndex],
+                      (floor) =>
+                        withDraftEconomy(draft, () =>
+                          performAutomatedFloorUnlock(
+                            draftDeps(draft),
+                            floor,
+                            true,
+                          ),
+                        ),
+                    )
+                  : createBuildingCompletionStep(
+                      plan,
+                      draft.buildings[buildingIndex],
+                      (floor) => upgrade(draft, floor),
+                      {
+                        managerLevel: MANAGER_MIN_UPGRADE_COUNT,
+                        maxWorkers: MAX_RENDERED_WORKERS,
+                      },
+                    ),
+        commit: (draft, rewardBase) => {
+          buildings[buildingIndex] = draft.buildings[buildingIndex];
+          addCompanyTotalIncome(
+            companyIndex,
+            subtract(draft.money, rewardBase),
+          );
+          for (let count = 0; count < mysticBuildings; count++)
+            createMysticBuilding();
+          if (companyBoosts > 0)
+            for (const targets of buildings) applyBoostAll(targets);
+          if (activeBuildingIndex === buildingIndex)
+            gameCanvas.setActiveFloors(buildings[buildingIndex], true);
+          persist();
+        },
+      }),
+    );
+  }
+  const upgradeMenu = wireUpgradeMenu(
+    app,
+    () => buildings[activeBuildingIndex] ?? [],
+    () => persist(),
+    startBuildingRenovation,
+    (floors, budget) => planRenovation(floors, budget),
+  );
+  // "Create new Corporation" adds a fresh named corporation above the current
+  // one in the map's corp-name barrel (see corporationName.ts/cityMap's
+  // drawCorporationNames) — roll up with the action bar to reach it.
+  // Auto-switches to the new company, playing the exact same swoosh +
+  // barrel-roll flourish a manual switch gets (see cityMapView's
+  // animateSwitchToCompany) — its own completion is what actually calls
+  // switchToCompany, same as a normal roll, so there's only ever one switch.
+  // Delayed to start SWITCH_LEAD_MS before the dialog's own close animation
+  // finishes, instead of firing immediately alongside it while the dialog
+  // hasn't even started sliding away yet
+  const corporationUpgradeMenu = wireCorporationUpgradeMenu(
+    app,
+    () => {
+      const newIndex = createNewCorporation();
+      corporationUpgradeMenu.close();
+      setTimeout(() => {
+        playSwoosh();
+        cityMapView.animateSwitchToCompany(newIndex);
+      }, DIALOG_CLOSE_MS - SWITCH_LEAD_MS);
+    },
+    // "Merge" (see hud/corporationUpgradeMenu's own Merge section): folds every
+    // selected company's income/upgrades/stock into whichever one has the most
+    // map progression, then closes the dialog and barrel-rolls to it, same
+    // close+animate choreography as "Create new Corporation" above. If the
+    // company we're switching AWAY from was itself one of the merged-away
+    // ones, flag the next switch to skip re-snapshotting its now-stale live
+    // state over the clear mergeCompanies already wrote to storage for it
+    (companyIndices) => {
+      const result = mergeCompanies(companyIndices, buildings);
+      if (!result) return;
+      const mergedAway = new Set(
+        companyIndices.filter((index) => index !== result.survivorIndex),
+      );
+      skipNextOutgoingSnapshot = mergedAway.has(activeCompanyIndex);
+      corporationUpgradeMenu.close();
+      setTimeout(() => {
+        playSwoosh();
+        cityMapView.animateSwitchToCompany(result.survivorIndex);
+      }, DIALOG_CLOSE_MS - SWITCH_LEAD_MS);
+    },
+  );
+  const boostMenu = wireBoostMenu(
+    app,
+    () => buildings[activeBuildingIndex] ?? [],
+    () => persist(),
+    (floor) => gameCanvas.scrollActiveToFloor(floor),
+    (floor) => gameCanvas.scrollActiveToFloor(floor),
+  );
+  const badgeCollection = wireBadgeCollection(app);
+  const totalEarnedOverlay = wireTotalEarnedOverlay(app);
+  // buys the next building outright if affordable at its milestone price.
+  // Returns whether it succeeded so the map menu can decide whether to re-render
+  function buyBuilding(targetBuildings = buildings): boolean {
+    const buildingIndex = targetBuildings.length;
+    const purchaseCost = getBuildingPrice(buildingIndex);
+    if (!spendTotalIncome(purchaseCost)) return false;
+    targetBuildings.push(
+      createBuilding(buildingIndex, getBackgroundUrls().length, {
+        purchaseCost,
+      }),
+    );
+    setupBuilding(buildingIndex, targetBuildings);
+    if (targetBuildings === buildings) persist();
+    return true;
+  }
+
+  // unlocks every remaining floor of an ALREADY-BOUGHT building in one shot —
+  // the city map's long-press-on-the-green-dot gesture (see cityMap/index.ts,
+  // markers.ts's drawBuyAllFloorsIndicator). Returns whether it succeeded (false
+  // if there's nothing left to unlock, or it's not actually affordable)
+  function buyAllFloorsForBuilding(
+    buildingIndex: number,
+    onPurchased?: () => void,
+  ): Promise<boolean> {
+    const floors = buildings[buildingIndex];
+    if (!floors) return Promise.resolve(false);
+    const cost = getBuildingUnlockAllCost(
+      floors,
+      getBuildingMultiplier(buildingIndex),
+    );
+    if (isZero(cost)) return Promise.resolve(false);
+    const count =
+      MAX_FLOORS_PER_BUILDING - floors.filter((floor) => floor.unlocked).length;
+    return startBuildingRenovation(
+      floors,
+      createFixedRenovationPlan(floors, cost, count),
+      "unlock",
+      onPurchased,
+    );
+  }
+
+  function getBuildingCompletionPlan(floors: Floor[]): RenovationPlan {
+    return planBuildingCompletion(floors, {
+      managerLevel: MANAGER_MIN_UPGRADE_COUNT,
+      maxWorkers: MAX_RENDERED_WORKERS,
+      increaseIncomeRate,
+      workerCost: getWorkerCost,
+      chairsCost: getOfficeChairsCost,
+      suppliesCost: getOfficeSuppliesCost,
+      managerCost: getManagerCost,
+    });
+  }
+
+  function getBuildingUpgradeAllCostForMap(buildingIndex: number): BigNumber {
+    const floors = buildings[buildingIndex];
+    if (!floors) return ZERO;
+    return getBuildingCompletionPlan(floors).cost;
+  }
+
+  function buyAllFloorUpgradesForBuilding(
+    buildingIndex: number,
+    onPurchased?: () => void,
+  ): Promise<boolean> {
+    const floors = buildings[buildingIndex];
+    if (!floors) return Promise.resolve(false);
+    return startBuildingRenovation(
+      floors,
+      getBuildingCompletionPlan(floors),
+      "complete",
+      onPurchased,
+    );
+  }
+
+  // Buys the currently-cheapest upgrade repeatedly after the green and purple
+  // map actions have been processed.
+  async function buyCheapestFloorUpgradesForBuilding(
+    buildingIndex: number,
+    onPurchased?: () => void,
+  ): Promise<boolean> {
+    const floors = buildings[buildingIndex];
+    if (
+      !floors ||
+      floors.some(isFloorLocked) ||
+      renovations.running ||
+      isDetachedJobPending()
+    )
+      return false;
+    const companyIndex = activeCompanyIndex;
+    const plan = planRenovation(floors, getTotalIncome());
+    if (
+      activeCompanyIndex !== companyIndex ||
+      buildings[buildingIndex] !== floors
+    )
+      return false;
+    return startBuildingRenovation(floors, plan, "upgrades", onPurchased);
+  }
+
+  // the city map's cloud-cat mascot: a toggleable background auto-buyer that
+  // saves the player hunting for what to buy next. Every call buys the single
+  // most expensive affordable thing available ANYWHERE in the company — the
+  // next building, a locked floor, an upgrade, a worker, office chairs, office
+  // supplies or a manager. Buying nothing is a normal idle tick, never a stop
+  // condition.
+  async function runCheapestBatch(): Promise<CheapestBatch> {
+    if (renovations.running || isDetachedJobPending() || !cheapestPurchase())
+      return { label: null, badges: {} };
+    // one synchronous purchase can't interleave with anything, so it runs on the
+    // live company — cloning the whole company per purchase stalled frames
+    const draft: BuildingDraft = {
+      buildings,
+      money: structuredClone(getTotalIncome()),
+      badges: {},
+    };
+    let label: string | null = null;
+    runDetachedStep(() =>
+      withDraftCritCounts(draft.badges, () =>
+        withDraftEconomy(draft, () => {
+          const purchase = cheapestPurchase(buildings);
+          if (purchase?.buy()) label = purchase.label;
+        }),
+      ),
+    );
+    if (label === null) return { label: null, badges: {} };
+    commitDraftIncome(draft.money);
+    commitCritCounts(draft.badges);
+    gameCanvas.setActiveFloors(buildings[activeBuildingIndex], true);
+    persist();
+    return { label, badges: draft.badges };
+  }
+
+  interface AutoPurchase {
+    cost: BigNumber;
+    label: string;
+    // spends and applies via the same canonical purchase the menus use;
+    // false when it turned out to be unaffordable
+    buy: () => boolean;
+  }
+
+  // scans every purchasable thing in the company and returns the most
+  // expensive affordable one, or null once nothing can currently be bought
+  function cheapestPurchase(targetBuildings = buildings): AutoPurchase | null {
+    let best: AutoPurchase | null = null;
+    const consider = (candidate: AutoPurchase): void => {
+      if (
+        !gte(getTotalIncome(), candidate.cost) ||
+        (best !== null && !gt(candidate.cost, best.cost))
+      ) {
+        return;
+      }
+      best = candidate;
+    };
+    consider({
+      cost: getBuildingPrice(targetBuildings.length),
+      label: "+1 building",
+      buy: () => {
+        const buildingIndex = targetBuildings.length;
+        if (!buyBuilding(targetBuildings)) return false;
+        const result = rollFloorBuyCrit(false);
+        if (result) setBuildingCritTier(buildingIndex, result, targetBuildings);
+        return true;
+      },
+    });
+    targetBuildings.forEach((floors, buildingIndex) => {
+      const top = floors[floors.length - 1];
+      if (top && !top.unlocked) {
+        consider({
+          cost: top.unlockCost,
+          label: "+1 floor",
+          buy: () =>
+            performAutomatedFloorUnlock(
+              floorActionDeps(buildingIndex, targetBuildings),
+              top,
+            ),
+        });
+      }
+      for (const floor of floors) {
+        if (!floor.unlocked) continue;
+        consider({
+          cost: getCritTier(floor) ? ZERO : getUpgradeCost(floor),
+          label: "+1 upgrade",
+          buy: () =>
+            performAutomatedUpgradeClick(
+              floorActionDeps(buildingIndex, targetBuildings),
+              floor,
+              floors[0] === floor,
+            ),
+        });
+        if (floor.workerCount < MAX_RENDERED_WORKERS) {
+          consider({
+            cost: getWorkerCost(floor),
+            label: "+1 worker",
+            buy: () => buyWorker(floor),
+          });
+        }
+        if (!floor.hasOfficeChairs) {
+          consider({
+            cost: getOfficeChairsCost(floor),
+            label: "+1 chairs",
+            buy: () => buyOfficeChairs(floor),
+          });
+        }
+        if (!floor.hasOfficeSupplies) {
+          consider({
+            cost: getOfficeSuppliesCost(floor),
+            label: "+1 supplies",
+            buy: () => buyOfficeSupplies(floor),
+          });
+        }
+        if (!floor.hasManager && isManagerUnlocked(floor)) {
+          consider({
+            cost: getManagerCost(floor),
+            label: "+1 manager",
+            buy: () => buyManager(floor),
+          });
+        }
+      }
+    });
+    return best;
+  }
+
+  // sets EVERY floor a building currently has (locked or not) to the given crit
+  // tier, permanently — no unlocking, no cost (see cityMap/index.ts's map-buy
+  // crit celebration). A brand new building only has its one free ground floor
+  // + the one locked floor already queued above it at this point; any floor
+  // added later inherits this same tier automatically (see floorLock.ts's
+  // ensureLockedFloorAbove). `chain` (see rollFloorBuyCrit's own chain flag)
+  // additionally UNLOCKS that already-queued locked floor (it already got the
+  // tier from the loop below, but was still sitting locked) and keeps climbing
+  // further above it — same "chain crit" behavior the other 2 crit events
+  // share. Chain must start from index 0 (the ground floor), NOT
+  // floors.length-1 — the walker's first step lands on startIndex+1, and the
+  // queued locked floor is always index 1 at this point (a brand new building
+  // is always exactly [ground, one queued locked floor] here), so starting
+  // any later just skips over it and the chain never actually unlocks anything
+  function applyBuildingCritTier(
+    buildingIndex: number,
+    result: CritRollResult,
+    targetBuildings = buildings,
+  ): void {
+    const floors = targetBuildings[buildingIndex];
+    if (!floors) return;
+    const { tier, chain } = result;
+    for (const floor of floors) {
+      if (!result.skip) floor.critMultiplierTier = tier;
+    }
+    if (result.mystic) createMysticBuilding(targetBuildings);
+    // reward side of every proc this building-buy event actually supports —
+    // one handler per proc kind (see shared/critTypes's applyCritProcs), so
+    // this is the ONE place that has to say what "upgrade"/"heavenly" mean
+    // for a whole building; a proc with no entry here (boost/bounce/
+    // explosion/booty/peppermint don't apply at building scope) is simply
+    // skipped
+    applyCritProcs(result, floors, {
+      // upgrade crit: promotes every floor this building has one further
+      // step past the tier they were just set to above (see
+      // rollFloorBuyCrit's own upgrade flag, applied here instead of
+      // floorInteractions.ts since this is a whole-building event, not a
+      // single Floor)
+      upgrade: (floors) => {
+        for (const floor of floors) {
+          floor.critMultiplierTier = nextCritTier(floor.critMultiplierTier);
+        }
+      },
+      // heavenly crit: the biggest reward of all, applied building-wide —
+      // unlocks every remaining floor for free, maxes every floor's tier,
+      // then grants each one a full max-tier free-upgrade batch. Uses
+      // increaseIncomeRate directly (not floorInteractions.ts's
+      // applyUpgradeTick, which also spawns a coin burst/re-rolls a crit at
+      // a specific ON-SCREEN floor button position) since this building may
+      // not even be the one currently displayed
+      heavenly: (floors) => {
+        unlockAllFloors({
+          floors,
+          backgroundCount: getBackgroundUrls().length,
+          multiplier: getBuildingMultiplier(buildingIndex),
+          onAdd: (floor) => {
+            if (
+              targetBuildings === buildings &&
+              buildingIndex === activeBuildingIndex
+            ) {
+              gameCanvas.notifyFloorAdded(floor);
+            }
+          },
+        });
+        const maxTier = CRIT_TIER_ORDER[0];
+        const count = CRIT_TIER_CONFIG[maxTier].multiplier;
+        for (const floor of floors) {
+          floor.critMultiplierTier = maxTier;
+          for (let i = 0; i < count; i++) {
+            increaseIncomeRate(floor);
+          }
+        }
+      },
+      // skip crit: unlocks every floor and grants its free workers, manager,
+      // office chairs, and supplies without changing tiers or levels
+      skip: (floors) => {
+        unlockAllFloors({
+          floors,
+          backgroundCount: getBackgroundUrls().length,
+          multiplier: getBuildingMultiplier(buildingIndex),
+          onAdd: (floor) => {
+            if (
+              targetBuildings === buildings &&
+              buildingIndex === activeBuildingIndex
+            ) {
+              gameCanvas.notifyFloorAdded(floor);
+            }
+          },
+        });
+        for (const floor of floors) {
+          if (!floor.unlocked) continue;
+          floor.workerCount = MAX_RENDERED_WORKERS;
+          floor.hasManager = true;
+          floor.hasOfficeChairs = true;
+          floor.hasOfficeSupplies = true;
+        }
+      },
+      // grand opening crit: same reward as at floor scope — unlocks every
+      // remaining locked floor of this building for free
+      grandOpening: (floors) => {
+        unlockAllFloors({
+          floors,
+          backgroundCount: getBackgroundUrls().length,
+          multiplier: getBuildingMultiplier(buildingIndex),
+          onAdd: (floor) => {
+            if (
+              targetBuildings === buildings &&
+              buildingIndex === activeBuildingIndex
+            ) {
+              gameCanvas.notifyFloorAdded(floor);
+            }
+          },
+        });
+      },
+      luckyClover: (floors) => {
+        const count = CRIT_TIER_CONFIG[LUCKY_CLOVER_CRIT_TIER].multiplier;
+        for (const floor of floors) {
+          if (!floor.unlocked) continue;
+          for (let run = 0; run < LUCKY_CLOVER_CRIT_COUNT; run++) {
+            for (let i = 0; i < count; i++) increaseIncomeRate(floor);
+          }
+        }
+      },
+    });
+    if (!chain) return;
+    applyChainCrit(
+      {
+        floors,
+        backgroundCount: getBackgroundUrls().length,
+        multiplier: getBuildingMultiplier(buildingIndex),
+        onFloorAdded: (floor) => {
+          if (
+            targetBuildings === buildings &&
+            buildingIndex === activeBuildingIndex
+          ) {
+            gameCanvas.notifyFloorAdded(floor);
+          }
+        },
+      },
+      0,
+      (floor) => {
+        floor.critMultiplierTier = tier;
+      },
+    );
+  }
+  // a chain crit ALWAYS has at least +1 impact area — same guarantee
+  // applyChainCrit's own floor walker already gives (its first extra floor is
+  // unconditional, only whether it keeps going past that is a coin flip).
+  // "The building" being unlocked for THIS event is a whole building, not a
+  // floor, so a chain here must always unlock at least one MORE building
+  // (free, same tier, its own floor-chain too) — only whether it climbs PAST
+  // that first extra building is CHAIN_CRIT_CONTINUE_CHANCE
+  function setBuildingCritTier(
+    buildingIndex: number,
+    result: CritRollResult,
+    targetBuildings = buildings,
+  ): void {
+    applyBuildingCritTier(buildingIndex, result, targetBuildings);
+    if (result.chain) {
+      let continueChain = true;
+      while (continueChain) {
+        const nextIndex = targetBuildings.length;
+        targetBuildings.push(
+          createBuilding(nextIndex, getBackgroundUrls().length),
+        );
+        setupBuilding(nextIndex, targetBuildings);
+        applyBuildingCritTier(nextIndex, result, targetBuildings);
+        continueChain = Math.random() < CHAIN_CRIT_CONTINUE_CHANCE;
+      }
+    }
+    // pair/three of a kind/four of a kind/full house crits (see
+    // shared/critTypes' POKER_HAND_CRIT_COUNTS): at floor scope these
+    // promote a fixed number of floors; at this whole-building scope they
+    // unlock/create that many buildings instead (the building this event is
+    // already for counts as the first of them, so only count-1 MORE get
+    // created here), each set to the same landed tier. Applied independently
+    // per landed kind (MAX_SPECIAL_CRIT_PROCS allows up to 2 to land
+    // together), same as every other proc's reward. Royal Flush is the ONE
+    // exception at floor scope (unlocks/upgrades every floor above it
+    // instead of a fixed 6 — see floorInteractions.ts's applyPokerHandCrit
+    // call), but at this map/building scope it still just unlocks 6
+    // buildings, same as every other poker-hand crit here
+    for (const count of [
+      result.pair && POKER_HAND_CRIT_COUNTS.pair,
+      result.threeOfAKind && POKER_HAND_CRIT_COUNTS.threeOfAKind,
+      result.fourOfAKind && POKER_HAND_CRIT_COUNTS.fourOfAKind,
+      result.fullHouse && POKER_HAND_CRIT_COUNTS.fullHouse,
+      result.royalFlush && POKER_HAND_CRIT_COUNTS.royalFlush,
+    ]) {
+      if (!count) continue;
+      for (let i = 1; i < count; i++) {
+        const nextIndex = targetBuildings.length;
+        targetBuildings.push(
+          createBuilding(nextIndex, getBackgroundUrls().length),
+        );
+        setupBuilding(nextIndex, targetBuildings);
+        applyBuildingCritTier(nextIndex, result, targetBuildings);
+      }
+    }
+    if (targetBuildings === buildings) persist();
+  }
+
+  // the old building-picker popup is kept wired (backdrop/list still functional)
+  // but nothing opens it anymore — it's replaced by tapping the map's own cat
+  // markers (see createCityMapView below)
+  wireMapMenu(
+    app,
+    () => buildings.length,
+    () => activeBuildingIndex,
+    buyBuilding,
+    goToBuilding,
+    buildings,
+  );
+  // toggles between the building canvas and the static city map canvas
+  function closeMapView(): void {
+    mapOpen = false;
+    canvas.hidden = false;
+    cityMapEl.hidden = true;
+    // dropping into a building's floors hands buying back to the player
+    cityMapView.stopAutoBuyer();
+    playSwoosh();
+    // both hidden canvases' ResizeObserver callbacks fire async, too late to save
+    // the very next redraw()/tick from dividing by a stale zero size
+    gameCanvas.resize();
+    gameCanvas.redraw();
+    refreshRenovationView();
+  }
+  function openMapView(): void {
+    mapOpen = true;
+    canvas.hidden = true;
+    cityMapEl.hidden = false;
+    playSwoosh();
+    cityMapView.refresh();
+    refreshRenovationView();
+  }
+  const cityMapView = createCityMapView(app, {
+    getTotalIncome,
+    getBuildingCount: () => buildings.length,
+    getActiveBuildingIndex: () => activeBuildingIndex,
+    getBuildingFloorCount: (buildingIndex) =>
+      // buildings[i] always includes one extra locked floor waiting above the
+      // topmost unlocked one (see ensureLockedFloorAbove) — the marker should
+      // only count floors actually unlocked, not that placeholder
+      buildings[buildingIndex]?.filter((floor) => floor.unlocked).length ?? 0,
+    isBuildingFullyManaged: (buildingIndex) => {
+      const floors = buildings[buildingIndex];
+      if (!floors) return false;
+      const unlockedFloors = floors.filter((floor) => floor.unlocked);
+      return (
+        unlockedFloors.length >= MAX_FLOORS_PER_BUILDING &&
+        unlockedFloors.every((floor) => floor.hasManager)
+      );
+    },
+    getBuildingCritTier: (buildingIndex) => {
+      const floors = buildings[buildingIndex];
+      if (!floors || floors.length === 0) return null;
+      const tier = floors[0].critMultiplierTier;
+      return tier && floors.every((floor) => floor.critMultiplierTier === tier)
+        ? tier
+        : null;
+    },
+    getBuildingUnlockAllCost: (buildingIndex) =>
+      getBuildingUnlockAllCost(
+        buildings[buildingIndex] ?? [],
+        getBuildingMultiplier(buildingIndex),
+      ),
+    getBuildingUpgradeAllCost: getBuildingUpgradeAllCostForMap,
+    canRenovateBuilding: (buildingIndex) => {
+      const floors = buildings[buildingIndex];
+      if (
+        !floors ||
+        renovations.running ||
+        isDetachedJobPending() ||
+        floors.some(isFloorLocked)
+      )
+        return false;
+      const unlockCost = getBuildingUnlockAllCost(
+        floors,
+        getBuildingMultiplier(buildingIndex),
+      );
+      if (!isZero(unlockCost)) return gte(getTotalIncome(), unlockCost);
+      const completionCost = getBuildingUpgradeAllCostForMap(buildingIndex);
+      return (
+        (!isZero(completionCost) && gte(getTotalIncome(), completionCost)) ||
+        floors.some(
+          (floor) => floor.unlocked && gte(getTotalIncome(), floor.upgradeCost),
+        )
+      );
+    },
+    buyBuilding,
+    onStateChanged: saveCurrentCompanyStateNow,
+    buyAllFloors: buyAllFloorsForBuilding,
+    buyAllFloorUpgrades: buyAllFloorUpgradesForBuilding,
+    buyCheapestFloorUpgrades: buyCheapestFloorUpgradesForBuilding,
+    runCheapestBatch,
+    setBuildingCritTier,
+    onSelectBuilding: (index) => {
+      goToBuilding(index);
+      closeMapView();
+    },
+    onSwitchCompany: (companyIndex) => {
+      const skip = skipNextOutgoingSnapshot;
+      skipNextOutgoingSnapshot = false;
+      switchToCompany(companyIndex, skip);
+    },
+    onOpenCorporationStats: () => corporationStats.open(),
+  });
+  wireActionBar(app, {
+    onScrollTop: () => {
+      playSwoosh();
+      if (mapOpen) cityMapView.flashVerticalRays(-1);
+      else gameCanvas.scrollActiveToTop();
+    },
+    onScrollBottom: () => {
+      playSwoosh();
+      if (mapOpen) cityMapView.flashVerticalRays(1);
+      else gameCanvas.scrollActiveToBottom();
+    },
+    onHoldScrollTop: () => {
+      if (!mapOpen) return;
+      playSwoosh();
+      cityMapView.jumpToEnd(-1);
+    },
+    onHoldScrollBottom: () => {
+      if (!mapOpen) return;
+      playSwoosh();
+      cityMapView.jumpToEnd(1);
+    },
+    onBoostAll: () => {
+      if (
+        isDetachedJobPending() ||
+        (!mapOpen && buildings[activeBuildingIndex].some(isFloorLocked))
+      )
+        return;
+      if (mapOpen) badgeCollection.open();
+      else boostMenu.open();
+    },
+    onOpenUpgradeMenu: () => {
+      if (
+        isDetachedJobPending() ||
+        (!mapOpen && buildings[activeBuildingIndex].some(isFloorLocked))
+      )
+        return;
+      if (mapOpen) corporationUpgradeMenu.open();
+      else upgradeMenu.open();
+    },
+    onOpenMapMenu: () => {
+      if (mapOpen) closeMapView();
+      else openMapView();
+    },
+  });
+
+  buildings.forEach((_, i) => setupBuilding(i));
+  persist();
+
+  rebalanceDormantCompanyEconomies(getGlobalIncomeBoostMultiplier);
+  const idleIncome = computeIdleIncome(
+    buildings,
+    currentIncomeRatePerSecond,
+    getGlobalIncomeBoostMultiplier(),
+  );
+  const lastClose = getLastCloseTimestamp();
+  const now = Date.now();
+  const dormantIdleIncome =
+    lastClose !== null && (now - lastClose) / 1000 > IDLE_INCOME_MIN_SECONDS
+      ? getDormantCompaniesIdleIncome(lastClose, now)
+      : fromNumber(0);
+  const totalIdleIncome = add(idleIncome, dormantIdleIncome);
+  // saveBuildings directly (not the debounced persist()): computeIdleIncome advances
+  // every floor's lastCollectedAt in memory, and that must land before a second quick
+  // reload could otherwise re-collect the same already-paid-out idle time
+  saveBuildings(buildings, activeCompanyIndex);
+  if (gt(totalIdleIncome, fromNumber(0))) {
+    addTotalIncome(idleIncome);
+    void whenDocumentReady()
+      .then(() => totalEarnedOverlay.show(totalIdleIncome))
+      .then(markStartupSettled);
+  } else {
+    setTimeout(markStartupSettled, 0);
+  }
+
+  gameCanvas.redraw();
+
+  // one continuous redraw loop drives every animation (workers, clouds, income bars,
+  // coin bursts) — gameCanvas.ts itself only ever draws whichever buildings/floors are
+  // actually scrolled into view, so this stays cheap no matter how many buildings exist.
+  // Skipped while the map view is open: the building canvas is hidden (0x0) then, and
+  // its own redraw() math (division by its own now-zero CSS size) would throw
+  let lastBuildingRedrawAt = 0;
+  startIncomeTicker(() => {
+    // the frame drawn above stays under the startup overlay until its intro ends
+    if (mapOpen || !isStartupSettled()) return;
+    const now = performance.now();
+    if (
+      isDialogOpen() &&
+      !isCritFlashActive(Date.now()) &&
+      now - lastBuildingRedrawAt < BEHIND_DIALOG_REDRAW_MS
+    )
+      return;
+    lastBuildingRedrawAt = now;
+    gameCanvas.redraw();
+  });
+  startTotalIncomeTicker(buildings, getGlobalIncomeBoostMultiplier);
+
+  bindSaveLifecycle({
+    isIntact: isStorageIntact,
+    markClosed: markAppClosed,
+    saveNow: saveCurrentCompanyStateNow,
+  });
 }
 
 main();
+
+// registers the offline/installable-app shell (public/sw.js) — gated on
+// !import.meta.hot rather than MODE, since "npm run dev:prod" (MODE=production)
+// is STILL vite's dev server with HMR, not a real build; import.meta.hot only
+// exists under any Vite dev server (regardless of --mode), so this is the one
+// check that's actually true exclusively for genuinely built/served dist output.
+// BASE_URL already carries the "/kitty-inc/" GitHub Pages prefix (see
+// vite.config.ts), so this resolves correctly once deployed
+if ("serviceWorker" in navigator && !import.meta.hot) {
+  afterStartup(() => {
+    navigator.serviceWorker
+      .register(`${import.meta.env.BASE_URL}sw.js`)
+      .catch((err) => console.error("Service worker registration failed", err));
+  });
+}

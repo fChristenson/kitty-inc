@@ -1,0 +1,23 @@
+// odds and reward sizes for featured/dragonGirls.ts's crits, spread into CONFIG.crit
+export const DRAGON_GIRLS_BALANCE = {
+  crimsonTailCoilChance: 0.00231081602,
+  crimsonTailCoilContinueChance: 0.86,
+  tangerineTailGripChance: 0.00219788357,
+  tangerineTailGripDiscount: 0.182,
+  tealTailSwaggerChance: 0.00254648248,
+  tealTailSwaggerSeconds: 48,
+  sapphireTailSwayChance: 0.00234081577,
+  sapphireTailSwayBoostSeconds: 137,
+  sapphireTailSwayExtraWorkers: 3,
+  scarletCrouchCoilChance: 0.00247632598,
+  scarletCrouchCoilContinueChance: 0.87,
+  azureSquatSwishChance: 0.00216917638,
+  azureSquatSwishDiscount: 0.183,
+  ceruleanCrouchChance: 0.00190779617,
+  ceruleanCrouchSeconds: 50,
+  jadeSquatSpikesChance: 0.00227935355,
+  jadeSquatSpikesBoostSeconds: 139,
+  jadeSquatSpikesExtraWorkers: 3,
+  cherryCrouchWyrmChance: 0.00215350739,
+  cherryCrouchWyrmContinueChance: 0.87,
+} as const;

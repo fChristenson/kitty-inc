@@ -1,0 +1,23 @@
+// odds and reward sizes for featured/bigPersonalities.ts's crits, spread into CONFIG.crit
+export const BIG_PERSONALITIES_BALANCE = {
+  abraCashDabraChance: 0.0107471248,
+  abraCashDabraSeconds: 6,
+  captainOfIndustryChance: 0.0108492732,
+  captainOfIndustryBoostSeconds: 23,
+  captainOfIndustryExtraWorkers: 0,
+  clowningAroundChance: 0.0128252943,
+  clowningAroundFloors: 1,
+  discoDividendChance: 0.0124416695,
+  mimeYourBusinessChance: 0.0127856514,
+  redCarpetTreatmentChance: 0.0121239784,
+  redCarpetTreatmentPayouts: 12,
+  rockTheStockChance: 0.0111081303,
+  rockTheStockShare: 0.033,
+  strongReturnChance: 0.0113980485,
+  theBigCheeseChance: 0.00520961946,
+  theBigCheeseTierSteps: 2,
+  theBigCheeseUpgrades: 30,
+  queenOfQueensChance: 0.0114614634,
+  queenOfQueensTierSteps: 1,
+  queenOfQueensUpgrades: 11,
+} as const;

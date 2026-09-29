@@ -1,0 +1,383 @@
+// Everything the button's own geometry/press-and-hold animation AND every
+// "event crit" module (sale.ts/overtime.ts/...) needs in common
+// lives here — button-specific state that isn't itself a new event type
+// stays in this one file instead of being duplicated per event.
+import { smoothstep } from "../../shared/easing";
+import { spawnCoinBurst } from "../coins";
+import { type BigNumber, gte } from "../../shared/bigNumber";
+import { baseIncomeRatePerSecond } from "../../shared/income";
+import { getTotalIncome } from "../../totalIncome";
+import type { Floor } from "../../gameState";
+import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
+import { isCritUpgrade } from "./crit";
+import { getPriceMatchCost } from "../../shared/critTypes";
+import { isFreeClickEventActive } from "../../shared/floorEvents";
+
+export function getUpgradeCost(floor: Floor, now = Date.now()): BigNumber {
+  return getPriceMatchCost(floor, now) ?? floor.upgradeCost;
+}
+
+// button placement, bottom-right corner of each floor (mirrors the income panel on the left).
+// Width cut 25% from the previous 440 (was matching the income panel 1:1); BTN_X sets its
+// right edge flush against the side wall (FLOOR_W - SIDE_WALL_WIDTH), same alignment rule
+// as the income bar's left edge. BTN_H exactly fills DIVIDER_H, spanning it edge-to-edge
+export const BTN_W = 330;
+export const BTN_H = 140;
+export const BTN_X = FLOOR_W - SIDE_WALL_WIDTH - BTN_W;
+// centered inside the divider band below (see outerWall/index.ts's DIVIDER_H),
+// mounted on top of it since that's drawn first, nudged down 10px from dead
+// center — except the bottom (ground) floor, which stays at dead center. BTN_H
+// leaves just enough divider clearance for this nudge without clipping against
+// the floor canvas edge
+export function getBtnY(isGroundFloor: boolean): number {
+  const base = FLOOR_H - DIVIDER_H / 2 - BTN_H / 2;
+  return isGroundFloor ? base + 2 : base + 10;
+}
+
+function isPointOnButton(
+  x: number,
+  localY: number,
+  isGroundFloor: boolean,
+): boolean {
+  const y = getBtnY(isGroundFloor);
+  return x >= BTN_X && x <= BTN_X + BTN_W && localY >= y && localY <= y + BTN_H;
+}
+
+export function getButtonCenter(isGroundFloor: boolean): {
+  x: number;
+  y: number;
+} {
+  return { x: BTN_X + BTN_W / 2, y: getBtnY(isGroundFloor) + BTN_H / 2 };
+}
+
+// whether a floor-local canvas point falls on the upgrade button
+export function hitTestUpgradeButton(
+  x: number,
+  y: number,
+  isGroundFloor: boolean,
+): boolean {
+  return isPointOnButton(x, y, isGroundFloor);
+}
+
+// a satisfying "juicy" press animation, keyed per floor (each floor's button
+// bounces independently): a quick squash inward followed by a springy overshoot
+// past full size before settling, via a damped-oscillator curve rather than a
+// linear tween — the single overshoot is what reads as bouncy/tactile instead of
+// just "shrinks then grows back"
+const pressedAt = new WeakMap<Floor, number>();
+const PRESS_DURATION_MS = 450;
+const PRESS_AMPLITUDE = 0.18; // how deep the initial squash-in goes (1 - this)
+const PRESS_DECAY = 9; // 1/sec; higher = the bounce dies out faster
+const PRESS_FREQUENCY = 26; // rad/sec; higher = a snappier/quicker bounce
+
+// call right when a purchase actually succeeds (see floorInteractions/index.ts) —
+// every subsequent draw of this floor's button picks the animation up from here
+export function triggerButtonPress(floor: Floor): void {
+  pressedAt.set(resolveButtonFloor(floor), Date.now());
+}
+
+// buttons that are a live clone of another floor's button (see
+// floors/swarmEvent): drawn from, animated by and clicked through that source
+// button's own state for as long as isLinked holds
+interface ButtonMirror {
+  source: Floor;
+  isLinked: () => boolean;
+}
+const mirrors = new WeakMap<Floor, ButtonMirror>();
+const mirrorFollowers = new WeakMap<
+  Floor,
+  { floor: Floor; isGroundFloor: boolean }[]
+>();
+
+export function mirrorUpgradeButton(
+  source: Floor,
+  followers: { floor: Floor; isGroundFloor: boolean }[],
+  isLinked: () => boolean,
+): void {
+  for (const follower of followers) {
+    mirrors.set(follower.floor, { source, isLinked });
+  }
+  mirrorFollowers.set(source, followers);
+}
+
+// the floor whose button state this floor's button shows and acts on
+export function resolveButtonFloor(floor: Floor): Floor {
+  const mirror = mirrors.get(floor);
+  if (!mirror) return floor;
+  if (mirror.isLinked()) return mirror.source;
+  mirrors.delete(floor);
+  return floor;
+}
+
+// the buttons currently mirroring `source`
+export function getButtonMirrors(
+  source: Floor,
+): { floor: Floor; isGroundFloor: boolean }[] {
+  return (mirrorFollowers.get(source) ?? []).filter(
+    (f) => resolveButtonFloor(f.floor) === source,
+  );
+}
+
+export function pressScale(floor: Floor, now: number): number {
+  const startedAt = pressedAt.get(floor);
+  if (startedAt === undefined) return 1;
+  const elapsedMs = now - startedAt;
+  if (elapsedMs >= PRESS_DURATION_MS) return 1;
+  const t = elapsedMs / 1000; // seconds, for the decay/frequency constants above
+  return (
+    1 -
+    PRESS_AMPLITUDE * Math.exp(-PRESS_DECAY * t) * Math.cos(PRESS_FREQUENCY * t)
+  );
+}
+
+// press-and-hold "pressure boiler" animation, independent of pressScale's own
+// one-shot per-purchase bounce above — while the button is held down (see
+// gameCanvas.ts's onPointerDown/onPointerUp calling startButtonHoldAnim/
+// stopButtonHoldAnim), it swells and shakes harder over HOLD_ANIM_GROW_MS,
+// then "pops" (a brief overshoot past its already-swollen size, reading as a
+// distinct snap rather than just smoothly topping out), releases an
+// extra-large coin burst right as the pop starts, and springily deflates back
+// down, immediately looping into a fresh grow phase for as long as the hold
+// keeps going. Letting go at ANY point (mid-grow, mid-pop, or mid-deflate)
+// interrupts that cycle and deflates back to normal from whatever size it
+// currently was, instead of snapping back instantly
+const HOLD_ANIM_GROW_MS = 2000;
+const HOLD_ANIM_POP_MS = 120;
+const HOLD_ANIM_DEFLATE_MS = 350;
+const HOLD_ANIM_RELEASE_DEFLATE_MS = 250;
+const HOLD_ANIM_MAX_SCALE = 1.35; // biggest size reached by the end of a normal grow
+const HOLD_ANIM_POP_SCALE = 1.55; // the brief overshoot past HOLD_ANIM_MAX_SCALE at burst time
+const HOLD_ANIM_MAX_SHAKE_PX = 14;
+const HOLD_ANIM_MAX_WOBBLE_RAD = Math.PI / 12; // 15 degrees to either side
+const HOLD_ANIM_WOBBLE_FREQUENCY = 72;
+// "extra large" burst = this many normal-sized bursts fired together,
+// staggered slightly so they read as one bigger eruption, not a single frame
+// spike — same spawnCoinBurst every purchase already uses, just piled up
+const HOLD_ANIM_BURST_WAVES = 3;
+const HOLD_ANIM_BURST_STAGGER_MS = 50;
+const HOLD_ANIM_BURST_SCALE = 1.25; // each wave's own particles are also 25% bigger/faster
+
+type HoldAnimPhase = "grow" | "pop" | "deflate" | "releasing";
+interface HoldAnimState {
+  phase: HoldAnimPhase;
+  phaseStartedAt: number;
+  // the scale "releasing" started deflating FROM — a release can happen at
+  // any point mid-grow/mid-pop/mid-deflate, so this can't just always be
+  // HOLD_ANIM_POP_SCALE the way the normal burst-triggered deflate can
+  releaseFromScale: number;
+}
+const holdAnimState = new WeakMap<Floor, HoldAnimState>();
+// which button a hold started on actually animates, so its release still
+// reaches it even if a mirror link ended mid-hold
+const heldVia = new WeakMap<Floor, Floor>();
+
+// call once right when the button's press-and-hold begins (gameCanvas.ts's
+// onPointerDown) — starts a fresh grow phase
+export function startButtonHoldAnim(pressed: Floor): void {
+  const floor = resolveButtonFloor(pressed);
+  heldVia.set(pressed, floor);
+  holdAnimState.set(floor, {
+    phase: "grow",
+    phaseStartedAt: Date.now(),
+    releaseFromScale: 1,
+  });
+}
+
+// pure (no mutation, no side effects) — just "how big is the button drawing
+// right now", reused by both stepHoldAnim below and stopButtonHoldAnim (which
+// needs to know where to start deflating FROM the instant a hold ends)
+function computeHoldScale(state: HoldAnimState, now: number): number {
+  const elapsed = now - state.phaseStartedAt;
+  if (state.phase === "grow") {
+    const t = smoothstep(Math.min(1, elapsed / HOLD_ANIM_GROW_MS));
+    return 1 + (HOLD_ANIM_MAX_SCALE - 1) * t;
+  }
+  if (state.phase === "pop") {
+    const t = Math.min(1, elapsed / HOLD_ANIM_POP_MS);
+    return (
+      HOLD_ANIM_MAX_SCALE + (HOLD_ANIM_POP_SCALE - HOLD_ANIM_MAX_SCALE) * t
+    );
+  }
+  if (state.phase === "deflate") {
+    const t = elapsed / 1000;
+    const settle = 1 - Math.exp(-14 * t) * Math.cos(24 * t);
+    return HOLD_ANIM_POP_SCALE - (HOLD_ANIM_POP_SCALE - 1) * settle;
+  }
+  // releasing
+  const t = Math.min(1, elapsed / HOLD_ANIM_RELEASE_DEFLATE_MS);
+  return state.releaseFromScale - (state.releaseFromScale - 1) * smoothstep(t);
+}
+
+// call once right when the hold ends (release/cancel/drag-away — see
+// gameCanvas.ts's onPointerUp) — instead of snapping back instantly, starts a
+// deflate from whatever size the button currently was
+export function stopButtonHoldAnim(pressed: Floor): void {
+  const floor = heldVia.get(pressed) ?? resolveButtonFloor(pressed);
+  heldVia.delete(pressed);
+  const state = holdAnimState.get(floor);
+  if (!state || state.phase === "releasing") return;
+  beginReleasing(floor, state);
+}
+
+// shared by stopButtonHoldAnim above (an actual release) and stepHoldAnim
+// below (the button going grey mid-hold) — both need the exact same "start
+// deflating from whatever size it currently is" transition
+function beginReleasing(floor: Floor, state: HoldAnimState): void {
+  const now = Date.now();
+  holdAnimState.set(floor, {
+    phase: "releasing",
+    phaseStartedAt: now,
+    releaseFromScale: computeHoldScale(state, now),
+  });
+}
+
+// advances the grow/pop/deflate(/releasing) state machine and returns the
+// button's current extra scale + wobble + a small random shake offset —
+// {scale:1,rotation:0,shakeX:0,shakeY:0} once there's no animation left to show
+// at all. Reads AND
+// mutates holdAnimState (same "a draw call also owns firing its own one-shot
+// side effects" pattern this game's other timed animations already use) —
+// cx/cy are where a burst should spawn from (the button's own center)
+export function stepHoldAnim(
+  floor: Floor,
+  now: number,
+  cx: number,
+  cy: number,
+): { scale: number; rotation: number; shakeX: number; shakeY: number } {
+  const state = holdAnimState.get(floor);
+  if (!state) return { scale: 1, rotation: 0, shakeX: 0, shakeY: 0 };
+
+  // Stop building pressure as soon as the button becomes unaffordable. The
+  // purchase repeat may keep trying, but a visibly gray button must not keep
+  // wobbling or growing as though it were still actionable.
+  if (
+    (state.phase === "grow" || state.phase === "pop") &&
+    !isUpgradeButtonEnabled(floor)
+  ) {
+    beginReleasing(floor, state);
+    return stepHoldAnim(floor, now, cx, cy);
+  }
+
+  const elapsed = now - state.phaseStartedAt;
+
+  if (state.phase === "grow" && elapsed >= HOLD_ANIM_GROW_MS) {
+    // the boiler bursts — an extra-large coin burst (both more waves AND each
+    // wave itself scaled up HOLD_ANIM_BURST_SCALE, not just normal-sized
+    // bursts piled up), then a brief overshoot pop before deflating — on
+    // every mirrored clone of this button too
+    const bursts = [
+      { floor, x: cx, y: cy },
+      ...getButtonMirrors(floor).map((f) => ({
+        floor: f.floor,
+        ...getButtonCenter(f.isGroundFloor),
+      })),
+    ];
+    for (let i = 0; i < HOLD_ANIM_BURST_WAVES; i++) {
+      const delayMs = i * HOLD_ANIM_BURST_STAGGER_MS;
+      for (const b of bursts) {
+        if (delayMs === 0) {
+          spawnCoinBurst(b.floor, b.x, b.y, () => {}, HOLD_ANIM_BURST_SCALE);
+        } else {
+          setTimeout(
+            () =>
+              spawnCoinBurst(
+                b.floor,
+                b.x,
+                b.y,
+                () => {},
+                HOLD_ANIM_BURST_SCALE,
+              ),
+            delayMs,
+          );
+        }
+      }
+    }
+    state.phase = "pop";
+    state.phaseStartedAt = now;
+  } else if (state.phase === "pop" && elapsed >= HOLD_ANIM_POP_MS) {
+    state.phase = "deflate";
+    state.phaseStartedAt = now;
+  } else if (state.phase === "deflate" && elapsed >= HOLD_ANIM_DEFLATE_MS) {
+    // still held (state wasn't deleted/reassigned) — loop right back into a
+    // fresh grow
+    state.phase = "grow";
+    state.phaseStartedAt = now;
+  } else if (
+    state.phase === "releasing" &&
+    elapsed >= HOLD_ANIM_RELEASE_DEFLATE_MS
+  ) {
+    holdAnimState.delete(floor);
+    return { scale: 1, rotation: 0, shakeX: 0, shakeY: 0 };
+  }
+
+  return holdAnimPose(state, now);
+}
+
+// the current hold pose without advancing the state machine — how a mirrored
+// clone reads its source button's hold, which that button's own draw advances
+export function peekHoldAnim(
+  floor: Floor,
+  now: number,
+): { scale: number; rotation: number; shakeX: number; shakeY: number } {
+  const state = holdAnimState.get(floor);
+  return state
+    ? holdAnimPose(state, now)
+    : { scale: 1, rotation: 0, shakeX: 0, shakeY: 0 };
+}
+
+function holdAnimPose(
+  state: HoldAnimState,
+  now: number,
+): { scale: number; rotation: number; shakeX: number; shakeY: number } {
+  const scale = computeHoldScale(state, now);
+  // Only vibrate and wobble while actively building pressure. A release or a
+  // post-burst deflate is winding down, not building tension.
+  if (state.phase !== "grow") {
+    return { scale, rotation: 0, shakeX: 0, shakeY: 0 };
+  }
+  const growT = Math.min(1, (now - state.phaseStartedAt) / HOLD_ANIM_GROW_MS);
+  const shakeMagnitude = HOLD_ANIM_MAX_SHAKE_PX * growT * growT;
+  return {
+    scale,
+    rotation:
+      Math.sin(
+        ((now - state.phaseStartedAt) / 1000) * HOLD_ANIM_WOBBLE_FREQUENCY,
+      ) *
+      HOLD_ANIM_MAX_WOBBLE_RAD *
+      growT,
+    shakeX: frameNoise(now, 1) * shakeMagnitude,
+    shakeY: frameNoise(now, 2) * shakeMagnitude,
+  };
+}
+
+// -1..1, the same for every call within one ~16ms frame, so a mirrored clone
+// shakes exactly like its source
+function frameNoise(now: number, seed: number): number {
+  const n =
+    Math.sin(Math.floor(now / 16) * 12.9898 + seed * 78.233) * 43758.5453;
+  return (n - Math.floor(n)) * 2 - 1;
+}
+
+// whether the upgrade button is currently "enabled" (colored, clickable) —
+// on a free-click event, mid-crit, or plainly affordable — as opposed to
+// greyed-out. Used by floorInteractions.ts's hitTestFloorHover, gameCanvas.ts's
+// pointerdown handler (must not start the hold-grow animation on a disabled
+// button), and stepHoldAnim above (must deflate immediately if a
+// hold-in-progress button goes disabled)
+export function isUpgradeButtonEnabled(pressed: Floor): boolean {
+  const floor = resolveButtonFloor(pressed);
+  const now = Date.now();
+  return (
+    isFreeClickEventActive(floor, now) ||
+    isCritUpgrade(floor) ||
+    gte(getTotalIncome(), getUpgradeCost(floor))
+  );
+}
+
+// 1 second's worth of a floor's own current income rate — deliberately NOT added
+// back into floor.incomeAmount itself (that would compound: a bigger rate next
+// click, forever), just read fresh each click and credited straight to the
+// player's total (see floorInteractions/index.ts and hud/boostMenu/index.ts)
+export function floorIncomePerSecond(floor: Floor): BigNumber {
+  return baseIncomeRatePerSecond(floor);
+}

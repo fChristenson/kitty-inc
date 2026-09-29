@@ -1,0 +1,81 @@
+# Workspace instructions
+
+Kitty Inc: a canvas idle/clicker game (Vite + TypeScript, no framework).
+
+## Code rules
+
+- Game logic lives in its own folder under `src/` with one `index.ts` entry; split files past a few hundred lines inside that folder.
+- Code shared between modules goes in `src/shared/<name>/`; modules only import other modules through `shared/`.
+- Build general, reusable UI/animation code; never duplicate logic across modules.
+- All crit odds and amounts live in `CONFIG.crit` (`src/config.ts`, featured values in `src/critBalance/<category>.ts`); never hardcode them elsewhere.
+
+## New images to crits
+
+Everything in progress lives in the gitignored `tmp/`: raws, custom cut-out scripts, lists and review sheets. Only `--apply` writes to `public/` and `src/`.
+
+1. **Intake.** Raws (jfif/jpg/jpeg/webp/png) arrive in the project root or `tmp/`.
+   `node scripts/crit-intake.mjs` puts them all on one labelled sheet, `tmp/_sheets/intake.png`. View only that sheet.
+2. **Name.** Fill `category` and `name` for every entry in `tmp/_intake.json` in one edit. Reuse an existing category (`public/crits/<category>/`) or add a new camelCase one. Then run `node scripts/crit-intake.mjs --move`, which moves each raw to `tmp/<category>/<kind>.<ext>`.
+3. **Scan.** `node scripts/new-crits.mjs --scan` builds `tmp/_new-crits.json`, taking each label from its file name. Fix any "already used" name by renaming the raw, and delete byte-identical `skip` duplicates.
+4. **Preview.** `node scripts/new-crits.mjs` plans each reward and puts every cut-out, on magenta, onto one sheet: `tmp/_sheets/processed.png`. Re-check each name against its art and its planned effect. If one doesn't fit, rename its raw in `tmp/<category>/` and re-run `--scan`.
+5. **Fix poor cuts.** Look for white patches left inside the art (gaps between limbs, faces or arms), light art that was erased (white hair, clothes, chrome highlights, art cut off at the frame edge), and stray specks.
+   - Run `node scripts/new-crits.mjs --custom <kind> ...`. This creates `tmp/<category>/process-<kind>.mjs` from the shared cut-out.
+   - Tweak that script, re-run the preview, and repeat until the sheet is clean.
+6. **Apply.** `node scripts/new-crits.mjs --apply` writes each icon, sticker, silhouette, featured entry and balance line. Any icon whose cut came out below about 640×640 pixel area is then upscaled with Real-ESRGAN (a local AI upscaler, anime model, fetched into `tmp/_esrgan/` on first use). It then **deletes the raw and its script**, so fix every cut before this step.
+7. **Verify.** Run `npm run build`, then check a few new crits in the game.
+
+### Upscaling shipped icons
+
+`node scripts/upscale-crits.mjs [kind ...]` upscales every shipped icon in `public/crits/` that is below about 640×640 area (all of them if no names are passed). It enlarges the finished icon, so hand-tuned cuts are kept; no raw is needed. Originals go to `tmp/_upscale/backup/`, results onto `tmp/_sheets/upscaled.png`. Prefer re-cutting from a raw when one exists; upscale when the raw is gone or small.
+
+### Cut-out fixes (options for `cutOutCritIcon`, see `scripts/lib/crit-cutout.mjs`)
+
+| Problem                                                       | Fix                                                                                                                                                        |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| White gap enclosed by the art                                 | `backgroundSeeds: [[x, y]]` inside the gap. Only use it when the gap is really background: flat white art such as hair, clothing or teeth looks identical. |
+| Art runs off the frame edge and gets eaten                    | `protectedRects` over that edge **and** `dropWhiteHalo: false`                                                                                             |
+| Near-white art erased (chrome, white hair, glossy highlights) | Key only the exact backdrop colour (`backgroundColor: [252,252,252]`, `backgroundColorTolerance: 6`), then feather the light pixels within a few px of it  |
+| Tinted or dark backdrop                                       | `backgroundColor` + tolerance, or `darkBackgroundThreshold`                                                                                                |
+| Frame or letterbox                                            | `sourceRect`                                                                                                                                               |
+| Debris / specks                                               | `keepLargestComponent` or `dropEdgeComponents`                                                                                                             |
+
+### Keep it fast
+
+- Look at one sheet per step, never at each image. Don't build analysis tools to replace looking at the sheet.
+- Re-running `--scan` is safe: entries already in the spec keep their edits.
+- To check shipped names against their art, run `node scripts/crit-overview.mjs [category ...]`. It writes each category's icons with labels to `tmp/_sheets/overview-<category>*.png`, 48 per sheet.
+- Re-cut a shipped crit from its raw in `tmp/crits/<category>/`, if it has one, then run `node scripts/add-sticker-borders.mjs <kind> ...`. Always pass names: with no names it rebuilds all ~1,600 stickers.
+- The template ids for pinning `template` / `group` / `tier` in the spec are in `scripts/lib/crit-templates.mjs`. Pin only when the auto plan fits the art poorly.
+
+## Crit rules
+
+**Two layers.** A crit **tier** (`crit`/`mega`/`ultra`) sets the free upgrades and multiplier. A **proc** ("special crit") rides on a landed tier and is shown only by the celebration flash. The canonical list is `CRIT_PROC_KINDS` / `CRIT_PROC_INFO` in `src/shared/critTypes`.
+
+**Rolling.** Crits are only rolled through `rollCrit` (`shared/critTypes`), in this order:
+
+1. tiers, rarest first;
+2. one `SPECIAL_CRIT_GATEWAY_CHANCE` roll;
+3. every proc independently;
+4. cap the landed procs to `MAX_SPECIAL_CRIT_PROCS` with `pickAtMost`. Never bypass this cap.
+
+**Rewards.** Rewards are applied in `applyFloorCrit(deps, floor, result)` through `CRIT_REWARDS`. Map/building unlock effects stay in `main.ts`; don't claim a floor-only proc works on the map.
+
+**Featured crits.** One entry per crit, `{ label, color, image, description, reward }`, in `src/shared/critTypes/featured/<category>.ts`. `reward` reuses `featured/rewardHelpers.ts`. Icons are registered automatically; never add per-crit draw calls, preloads, menu entries or test buttons.
+
+**Names.** Every crit gets a fun, unique label that fits both its image (who or what is in it, their look, pose or props) and its effect (a pun on money, prices, workers, floors or repeats). Examples: "Moolah Maker" for a cow girl who adds income, and "Copycats" for twin tabby cat girls. Don't just repeat the category word or a generic theme word ("Squat Stash", "Chrome Crouch"), and don't borrow a word the art doesn't show (a feet name on a squat image). No numbers or near-duplicates. The label, camelCase kind and icon basename match; `node scripts/rename-crit.mjs <kind> "<New Label>"` renames a shipped crit everywhere.
+
+**Rewards must be positive and instant.** Never share an effect or description with another crit.
+
+**Effect groups.** `GROUPS` in `scripts/lib/crit-catalog.mjs` sets each group's target share. The planner puts new crits in the groups with the fewest crits for their target. Upgrades and payouts are already full. When a group's templates have no free amounts left, add a new group instead of crowding an old one: a new action in `FeaturedRewardActions` (`featured/rewardHelpers.ts`, bound in `floors/floorInteractions`), its templates in `scripts/lib/crit-templates.mjs` and a `GROUPS` entry matching that action. New effects must be instant and positive: no timers, delays or downsides.
+
+**Odds are balanced by effect, never by image category.** Each effect group's summed odds match its target share, so no group dominates however many images it has. Within a group, bigger rewards are rarer (and always within a template). `scripts/lib/crit-odds.mjs` sets every chance from this, and `--apply` re-runs it; run `node scripts/rebalance-crit-odds.mjs` after any manual chance edit. Featured chances stay within about `0.0016`–`0.013`: below Boost and above Heavenly (`0.0001`, the rarest).
+
+**Icon files.** `public/crits/<category>/<kind>.webp` (pixel area about 640×640, so narrow art gets taller; smaller cuts are upscaled), plus `public/stickers/…webp` and `public/silhouettes/…png`.
+
+## Artwork prompts
+
+Template, with a subject of at most 184 characters so the whole prompt is at most 480:
+
+"Flat vector cartoon of [SUBJECT], bold thick black outlines, cel-shaded flat colors with simple glossy highlights, vibrant saturated palette, clean sticker/game-icon style, centered composition, slight 3D depth but no gradients or textures, isolated on a plain solid white background, no shadows, no text."
+
+Name the crit before describing its art in any prompt list.

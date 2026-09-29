@@ -1,0 +1,446 @@
+import type { Floor } from "../../gameState";
+import { type CritProcKind, type CritProcFlags } from "../../shared/critTypes";
+import { CRIT_PROC_INFO, CRIT_PROC_KINDS } from "../../shared/critTypes";
+import {
+  type CritTier,
+  CRIT_TIER_CONFIG,
+  BOOST_CRIT_COLOR,
+  BOOST_CRIT_LABEL,
+  BOUNCE_CRIT_LABEL,
+  EXPLOSION_CRIT_LABEL,
+  BOOTY_CRIT_COLOR,
+  BOOTY_CRIT_LABEL,
+  HEAVENLY_CRIT_COLOR,
+  HEAVENLY_CRIT_LABEL,
+  SUNSHINE_CRIT_COLOR,
+  SUNSHINE_CRIT_LABEL,
+  SNOWDAY_CRIT_COLOR,
+  SNOWDAY_CRIT_LABEL,
+  NIGHT_SHIFT_CRIT_COLOR,
+  NIGHT_SHIFT_CRIT_LABEL,
+} from "../upgradeButton";
+import { spawnCoinBurst, spawnFreezeCoinBurst } from "../coins";
+import { playCoinDrop } from "../../sound";
+import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
+import {
+  celebrateBonusTier,
+  spawnTierBurstPattern,
+  tierColor,
+} from "../../shared/bonusTierReward";
+import {
+  isCritFlashActive,
+  getFlashHoldEndsAt,
+  freezeCritFlashAsBackground,
+} from "../../screenShake";
+
+// tier-sized coin bursts around the screen center, on top of whatever the
+// caller's own reward spawned; re-read fresh per burst in case of scrolling
+function centerBurstSpawner(
+  floor: Floor,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): (offsetX: number, offsetY: number) => void {
+  return (offsetX, offsetY) => {
+    const p = getScreenCenterLocal(floor);
+    spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
+  };
+}
+
+function spawnTierBursts(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  spawnTierBurstPattern(tier, centerBurstSpawner(floor, getScreenCenterLocal));
+}
+
+function celebrateTier(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playTierFlash(tier, CRIT_TIER_CONFIG[tier].label, tierColor(tier));
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// chain crit (see upgradeButton.ts's isChainCrit/rollFloorBuyCrit's own chain
+// flag): the flash shows the word "Chain" instead of the tier's usual "x5"/
+// "x25"/"x125" number — a celebration-moment-only swap, the upgrade button's
+// own idle/armed label is untouched and still always shows the plain tier
+// label. Keeps the tier's own color (chain has no dedicated color of its own)
+function celebrateChain(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash("Chain", tierColor(tier));
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// boost crit (see upgradeButton.ts's isBoostCrit): same swap as chain above,
+// but with its own dedicated blue and an extra punch (its free-worker payout)
+// on top of the tier's own flash/sound/bursts
+function celebrateBoost(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(BOOST_CRIT_LABEL, BOOST_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
+// sunshine crit (see upgradeButton.ts's isSunshineCrit): same celebration
+// shape as boost above (the reward itself — a longer-lasting free worker
+// boost — is applied by floorInteractions.ts), just its own dedicated gold
+function celebrateSunshine(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(SUNSHINE_CRIT_LABEL, SUNSHINE_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
+// snowday crit (see upgradeButton.ts's isSnowdayCrit): same celebration
+// shape as boost/sunshine above (the reward itself — an even longer-lasting
+// free worker boost — is applied by floorInteractions.ts), its own dedicated
+// frost color
+function celebrateSnowday(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(SNOWDAY_CRIT_LABEL, SNOWDAY_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
+// night shift crit (see upgradeButton.ts's isNightShiftCrit): same
+// celebration shape as boost/sunshine/snowday above (the reward itself — a
+// shorter free worker boost plus a temporary +1-worker boost-strength bonus
+// — is applied by floorInteractions.ts), its own dedicated midnight indigo
+function celebrateNightShift(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(NIGHT_SHIFT_CRIT_LABEL, NIGHT_SHIFT_CRIT_COLOR);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
+// bounce crit (see upgradeButton.ts's isBounceCrit): same swap as chain
+// above, keeping the landed tier's own color (climbing the building from the
+// bottom up is applied by floorInteractions.ts, this only covers the
+// celebration moment)
+function celebrateBounce(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(BOUNCE_CRIT_LABEL, tierColor(tier));
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// heavenly crit (see upgradeButton.ts's isHeavenlyCrit): the single biggest
+// reward in the game, so it gets the same "ultra-strength" flash treatment
+// ultra tiers themselves use (long strobing hold, top priority) regardless of
+// which tier actually landed alongside it — the reward itself (unlock all/
+// max every tier/grant every floor a max-tier upgrade batch) is applied by
+// floorInteractions.ts, this only covers the celebration moment
+function celebrateHeavenly(
+  floor: Floor,
+  _tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playTierFlash("ultra", HEAVENLY_CRIT_LABEL, HEAVENLY_CRIT_COLOR);
+  // always the biggest (ultra-shaped) burst pattern, since this moment is the
+  // biggest regardless of which base tier happened to land with it
+  spawnTierBursts(floor, "ultra", getScreenCenterLocal);
+}
+
+// pair/three of a kind/four of a kind/full house/tick tock crits (see
+// upgradeButton.ts's isPairCrit etc.): same flat "own label + own color"
+// flash shape as boost/booty/upgrade/peppermint above — the reward itself
+// (promoting a fixed number of floors'/buildings' own tier, or paying every
+// floor twice) is applied by floorInteractions.ts/main.ts, this only covers
+// the celebration moment. One shared helper instead of 5 near-identical
+// functions, since only the label/color ever differ between them
+function celebrateFlatProc(
+  label: string,
+  color: string,
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  playSpecialFlash(label, color);
+  spawnTierBursts(floor, tier, getScreenCenterLocal);
+}
+
+// explosion is the one proc whose flash takes the LANDED TIER's color rather
+// than a dedicated one of its own
+function celebrateExplosion(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  celebrateFlatProc(
+    EXPLOSION_CRIT_LABEL,
+    tierColor(tier),
+    floor,
+    tier,
+    getScreenCenterLocal,
+  );
+}
+
+// booty adds a coin drop + burst on top of the standard flash
+function celebrateBooty(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+): void {
+  celebrateFlatProc(
+    BOOTY_CRIT_LABEL,
+    BOOTY_CRIT_COLOR,
+    floor,
+    tier,
+    getScreenCenterLocal,
+  );
+  playCoinDrop();
+  const p = getScreenCenterLocal(floor);
+  spawnCoinBurst(floor, p.x, p.y, () => {});
+}
+
+// chain and boost are both "special" procs riding the SAME landed tier (see
+// isChainCrit/isBoostCrit) — when only one lands it plays immediately same as
+// any plain crit, but when BOTH land on the same click they each get their own
+// full turn, one after another, instead of one replacing (or silently
+// dropping) the other. Regular (non-special) crits never join this queue —
+// they're simply skipped while a special celebration is still due, rather
+// than piling up behind it (see triggerCritCelebration below)
+interface QueuedCelebration {
+  kind: CritProcKind | "bonusTier";
+  queuedAt: number;
+  maxAgeMs?: number;
+  run: () => void;
+}
+const specialCelebrationQueue: QueuedCelebration[] = [];
+let drainingSpecialQueue = false;
+const DEJA_VU_REPEAT_COUNT = 2;
+const DEJA_VU_FOLLOW_UP_MAX_AGE_MS = 5000;
+
+// a bulk-buy hold (x250 multiplier) can land many chain/boost procs far
+// faster than they can each get their own on-screen turn — anything still
+// waiting once it's this stale is long past the moment it actually happened,
+// so it's dropped rather than played back late; and only one of each kind is
+// ever queued at once (see the dedupe in triggerCritCelebration below), so a
+// pile of identical "Chain" procs never replays the same celebration on repeat
+const CELEBRATION_QUEUE_MAX_AGE_MS = 2000;
+
+function drainSpecialCelebrationQueue(): void {
+  if (drainingSpecialQueue) return;
+  drainingSpecialQueue = true;
+  const step = () => {
+    // a queued "special crit crit" bonus tier never waits for the flash ahead
+    // of it to run its full course (grow -> hold -> fade) like every other
+    // queued kind does below — it freezes that flash as a static backdrop
+    // the INSTANT its own hold phase ends (before any fade begins), then
+    // takes over as the still-animating foreground flash drawn on top of it,
+    // so the proc's own celebration reads as "holds, freezes, and the bonus
+    // tier flash stacks over it" instead of "fully fades out, then a
+    // separate flash starts fresh"
+    const next = specialCelebrationQueue[0];
+    if (next?.kind === "bonusTier") {
+      const holdEndsAt = getFlashHoldEndsAt();
+      if (holdEndsAt !== null && Date.now() < holdEndsAt) {
+        setTimeout(step, 50);
+        return;
+      }
+      freezeCritFlashAsBackground();
+      specialCelebrationQueue.shift();
+      next.run();
+      setTimeout(step, 100);
+      return;
+    }
+    if (isCritFlashActive(Date.now())) {
+      setTimeout(step, 100);
+      return;
+    }
+    const popped = specialCelebrationQueue.shift();
+    if (!popped) {
+      drainingSpecialQueue = false;
+      return;
+    }
+    if (
+      Date.now() - popped.queuedAt >
+      (popped.maxAgeMs ?? CELEBRATION_QUEUE_MAX_AGE_MS)
+    ) {
+      step();
+      return;
+    }
+    popped.run();
+    setTimeout(step, 100);
+  };
+  step();
+}
+
+// the one shared "how does a crit tier celebrate" trigger — shake/flash/sfx/coin
+// bursts, tier-scaled. Extracted out of the upgrade-button click branch so any
+// OTHER click that can roll a crit tier (the Sale-boost click below, later a
+// floor-unlock purchase) gets the exact same weighted celebration instead of each
+// call site hand-rolling (and inevitably drifting from) its own copy. Deliberately
+// does NOT decide what a crit actually REWARDS (extra upgrades vs a bigger sale
+// payout vs whatever a future caller wants) — that stays the caller's own concern.
+// Labels always come from CRIT_TIER_CONFIG (the one canonical source); the flash's
+// own color intentionally does NOT always match CRIT_TIER_CONFIG[tier].color (that
+// one's the upgrade BUTTON's color) — mega's button is gold but its flash text is
+// amber/orange per an explicit earlier request, so the flash keeps its own colors
+import { isDetachedJobRunning } from "../../shared/detachedJob";
+
+export function triggerCritCelebration(
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+  procs?: Partial<CritProcFlags>,
+  bonusTier: CritTier | null = null,
+  onFollowUpProc?: (kind: CritProcKind) => void,
+): void {
+  const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
+  if (isDetachedJobRunning()) {
+    if (procs?.dejaVu) {
+      for (const kind of pickDejaVuFollowUps(procs)) onFollowUpProc?.(kind);
+    }
+    return;
+  }
+  if (landed.length > 0) {
+    const now = Date.now();
+    for (const kind of landed) {
+      queueProcCelebration(kind, floor, tier, getScreenCenterLocal, now);
+      // Deja Vu doesn't just FLASH extra procs, it grants them: each follow-up
+      // is applied and tallied through the same path a real roll uses (see
+      // floorInteractions' onFollowUpProc)
+      if (kind === "dejaVu") {
+        for (const followUp of pickDejaVuFollowUps(procs!)) {
+          onFollowUpProc?.(followUp);
+          queueProcCelebration(
+            followUp,
+            floor,
+            tier,
+            getScreenCenterLocal,
+            now,
+            DEJA_VU_FOLLOW_UP_MAX_AGE_MS,
+            true,
+          );
+        }
+      }
+    }
+    // "special crit crit": queued AFTER every proc's own celebration above,
+    // so it plays right after theirs holds/fades — the queue's own
+    // one-at-a-time draining (drainSpecialCelebrationQueue) is what makes
+    // this read as "show the special crit, then stack a plain x5/x25/x125
+    // tier flash on top of it" instead of both flashing simultaneously
+    if (
+      bonusTier &&
+      !specialCelebrationQueue.some((q) => q.kind === "bonusTier")
+    ) {
+      specialCelebrationQueue.push({
+        kind: "bonusTier",
+        queuedAt: now,
+        run: () =>
+          celebrateBonusTier(bonusTier, (offsetX, offsetY, arrival) => {
+            const p = getScreenCenterLocal(floor);
+            spawnFreezeCoinBurst(floor, p.x + offsetX, p.y + offsetY, arrival);
+          }),
+      });
+    }
+    drainSpecialCelebrationQueue();
+    return;
+  }
+  // a plain tier crit with no special proc: only worth celebrating if nothing
+  // special is still queued/playing — omitted entirely rather than cutting in
+  // front of (or piling up behind) whatever special celebration is still due
+  if (specialCelebrationQueue.length > 0 || isCritFlashActive(Date.now())) {
+    return;
+  }
+  celebrateTier(floor, tier, getScreenCenterLocal);
+}
+
+// the handful of procs whose flash is more than the standard label+color
+// treatment celebrateFlatProc gives every other one
+const CUSTOM_PROC_CELEBRATIONS: Partial<
+  Record<
+    CritProcKind,
+    (
+      floor: Floor,
+      tier: CritTier,
+      getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+    ) => void
+  >
+> = {
+  chain: celebrateChain,
+  boost: celebrateBoost,
+  bounce: celebrateBounce,
+  explosion: celebrateExplosion,
+  booty: celebrateBooty,
+  heavenly: celebrateHeavenly,
+  sunshine: celebrateSunshine,
+  snowday: celebrateSnowday,
+  nightShift: celebrateNightShift,
+};
+
+// one of each kind at a time — a rapid pile-up of the same proc (e.g. a
+// bulk-buy hold repeatedly rolling "chain") shouldn't queue up N replays of
+// the identical celebration, just the first still-fresh one
+function queueProcCelebration(
+  kind: CritProcKind,
+  floor: Floor,
+  tier: CritTier,
+  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
+  now: number,
+  maxAgeMs?: number,
+  allowDuplicate = false,
+): void {
+  if (!allowDuplicate && specialCelebrationQueue.some((q) => q.kind === kind))
+    return;
+  const custom = CUSTOM_PROC_CELEBRATIONS[kind];
+  const info = CRIT_PROC_INFO[kind];
+  specialCelebrationQueue.push({
+    kind,
+    queuedAt: now,
+    maxAgeMs,
+    run: () =>
+      custom
+        ? custom(floor, tier, getScreenCenterLocal)
+        : celebrateFlatProc(
+            info.label,
+            info.color,
+            floor,
+            tier,
+            getScreenCenterLocal,
+          ),
+  });
+}
+
+// Deja Vu picks one random proc other than itself and repeats that same proc
+// twice. Avoid procs already shown on this roll so the replay reads as a new
+// bonus rather than a duplicate of the original flash.
+function pickDejaVuFollowUps(procs: Partial<CritProcFlags>): CritProcKind[] {
+  const available = CRIT_PROC_KINDS.filter(
+    (kind) =>
+      kind !== "dejaVu" &&
+      !procs[kind] &&
+      !specialCelebrationQueue.some((q) => q.kind === kind),
+  );
+  if (available.length === 0) return [];
+  const repeated = available[Math.floor(Math.random() * available.length)];
+  return Array.from({ length: DEJA_VU_REPEAT_COUNT }, () => repeated);
+}

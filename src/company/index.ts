@@ -1,0 +1,202 @@
+// Each corporation (see corporationName.ts's naming, cityMap.ts's barrel-roll
+// picker) runs its own completely separate game underneath — own buildings/
+// floors, own totalIncome, own active building/map page, nothing shared between
+// them (see gameState.ts/totalIncome.ts's companyStorageKey usage). This module
+// just owns the single pointer to which one is currently loaded/on-screen,
+// persisted so a reload resumes the same company.
+import { type BigNumber, toBigNumber } from "../shared/bigNumber";
+import { getCorporationCount } from "../corporationName";
+import { UPGRADE_ECONOMY_VERSION } from "../shared/upgradeEconomy";
+
+const ACTIVE_COMPANY_KEY = "cash-clicker:active-company-index";
+
+export function getActiveCompanyIndex(): number {
+  try {
+    const parsed = Number(localStorage.getItem(ACTIVE_COMPANY_KEY));
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function setActiveCompanyIndex(index: number): void {
+  try {
+    localStorage.setItem(ACTIVE_COMPANY_KEY, String(index));
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
+// company 0 keeps every pre-existing plain key (cash-clicker:buildings,
+// cash-clicker:total-income, etc.) so saves from before multi-company support
+// existed aren't orphaned; every other company gets its own key namespaced by index
+export function companyStorageKey(
+  baseKey: string,
+  companyIndex: number,
+): string {
+  return companyIndex === 0 ? baseKey : `${baseKey}:${companyIndex}`;
+}
+
+// the ONLY persisted record of a DORMANT (not currently active) company's money/
+// value — everything totalIncome.ts/corporationBoostMenu.ts need to derive that
+// company's current total and value without ever loading its full buildings/
+// floors array. bankedTotal and updatedAt are always written TOGETHER, in one
+// call, by whichever single write actually changes them (main.ts's
+// switchToCompany snapshotting the outgoing company, or totalIncome.ts spending
+// from/autosaving a dormant one) — there is deliberately no separate "just the
+// total" key anywhere else that could get out of sync with this and silently
+// leave a company's total stuck (this was a real bug: the old design kept the
+// banked $ in one key and the rate/timestamp in another, and a spend against a
+// dormant company only ever updated the $ key, so the elapsed-time projection
+// kept compounding against a stale timestamp forever after)
+export interface CompanyRecord {
+  upgradeEconomyVersion?: number;
+  inheritedAssetValue?: BigNumber;
+  inheritedUpgradesValue?: BigNumber;
+  inheritedModifierPercent?: number;
+  bankedTotal: BigNumber; // $ actually banked as of updatedAt
+  incomeRatePerSecond: BigNumber; // frozen as of updatedAt; only the active company's own rate can change
+  assetValue: BigNumber; // buildings value + upgrades value combined, frozen as of updatedAt
+  upgradesValue: BigNumber; // just the upgrades portion of assetValue — corporationBoostMenu's getCompanyValue uses this alone, not the buildings-cost portion
+  updatedAt: number; // Date.now() this record was last written
+}
+
+// every company's own record lives together in ONE array under ONE key — not one
+// localStorage entry per company — so there's a single object to reason about
+// (and a single atomic read-modify-write per update, never partial/racing writes
+// split across several keys)
+const CORPORATIONS_KEY = "cash-clicker:corporations";
+
+function loadAllCompanyRecords(): (CompanyRecord | null)[] {
+  try {
+    const raw = localStorage.getItem(CORPORATIONS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveAllCompanyRecords(records: (CompanyRecord | null)[]): void {
+  try {
+    localStorage.setItem(CORPORATIONS_KEY, JSON.stringify(records));
+  } catch {
+    // storage unavailable/full: persistence is a nice-to-have, safe to ignore
+  }
+}
+
+export function loadCompanyRecord(companyIndex: number): CompanyRecord | null {
+  const record = loadAllCompanyRecords()[companyIndex];
+  if (
+    !record ||
+    (typeof record.bankedTotal !== "number" &&
+      typeof record.bankedTotal !== "object") ||
+    (typeof record.incomeRatePerSecond !== "number" &&
+      typeof record.incomeRatePerSecond !== "object") ||
+    (typeof record.assetValue !== "number" &&
+      typeof record.assetValue !== "object") ||
+    typeof record.updatedAt !== "number"
+  ) {
+    return null;
+  }
+  // every $ field may still be a plain number here (any record saved before the
+  // BigNumber migration) — toBigNumber normalizes either shape. upgradesValue is
+  // newer than the rest of this record — an older save just won't have it yet,
+  // so it defaults to ZERO instead of invalidating the whole record (same
+  // recovery every other one-off added field here would get)
+  return {
+    upgradeEconomyVersion: record.upgradeEconomyVersion,
+    inheritedAssetValue: toBigNumber(record.inheritedAssetValue),
+    inheritedUpgradesValue: toBigNumber(record.inheritedUpgradesValue),
+    inheritedModifierPercent: record.inheritedModifierPercent ?? 0,
+    bankedTotal: toBigNumber(record.bankedTotal),
+    incomeRatePerSecond: toBigNumber(record.incomeRatePerSecond),
+    assetValue: toBigNumber(record.assetValue),
+    upgradesValue: toBigNumber(record.upgradesValue),
+    updatedAt: record.updatedAt,
+  };
+}
+
+// the only way any code should ever persist a company's income/value snapshot —
+// always overwrites the whole record in one atomic write (read-modify-write the
+// single shared array), never just one field of it
+export function saveCompanyRecord(
+  companyIndex: number,
+  record: CompanyRecord,
+): void {
+  const all = loadAllCompanyRecords();
+  all[companyIndex] = {
+    ...record,
+    inheritedAssetValue:
+      record.inheritedAssetValue ?? all[companyIndex]?.inheritedAssetValue,
+    inheritedUpgradesValue:
+      record.inheritedUpgradesValue ??
+      all[companyIndex]?.inheritedUpgradesValue,
+    inheritedModifierPercent:
+      record.inheritedModifierPercent ??
+      all[companyIndex]?.inheritedModifierPercent,
+    upgradeEconomyVersion: UPGRADE_ECONOMY_VERSION,
+  };
+  saveAllCompanyRecords(all);
+}
+
+// wipes a single company's record (see hud/testButton's per-active-company reset)
+export function clearCompanyRecord(companyIndex: number): void {
+  const all = loadAllCompanyRecords();
+  if (companyIndex < all.length) {
+    all[companyIndex] = null;
+    saveAllCompanyRecords(all);
+  }
+}
+
+// a company absorbed into another via corporationUpgradeMenu's "Merge" action
+// (see hud/corporationBoostMenu/economy.ts's mergeCompanies) — its index/name/
+// records still technically exist (indices are never renumbered), it's just
+// permanently hidden from every company list from then on
+const MERGED_COMPANIES_KEY = "cash-clicker:merged-companies";
+
+function loadMergedCompanies(): number[] {
+  try {
+    const raw = localStorage.getItem(MERGED_COMPANIES_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed)
+      ? parsed.filter((n): n is number => typeof n === "number")
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveMergedCompanies(indices: number[]): void {
+  try {
+    localStorage.setItem(MERGED_COMPANIES_KEY, JSON.stringify(indices));
+  } catch {
+    // storage unavailable: nothing to persist
+  }
+}
+
+export function isCompanyMerged(companyIndex: number): boolean {
+  return loadMergedCompanies().includes(companyIndex);
+}
+
+export function markCompaniesMerged(companyIndices: number[]): void {
+  const merged = new Set(loadMergedCompanies());
+  for (const index of companyIndices) merged.add(index);
+  saveMergedCompanies(Array.from(merged));
+}
+
+// THE single source of truth for "which company indices still represent a
+// real, selectable corporation" (0..getCorporationCount()-1, minus anything
+// isCompanyMerged) — every list of companies shown anywhere (cityMap's
+// corp-name barrel, corporationUpgradeMenu's Merge checklist) must derive
+// from this instead of each independently re-deriving its own
+// `Array.from({length:count})...filter`, which is exactly what let a
+// merged-away company keep showing up in the map's
+// barrel after a merge cleaned up everywhere else
+export function getActiveCorporationIndices(): number[] {
+  const count = getCorporationCount();
+  return Array.from({ length: count }, (_, i) => i).filter(
+    (i) => !isCompanyMerged(i),
+  );
+}

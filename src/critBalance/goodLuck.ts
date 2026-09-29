@@ -1,0 +1,21 @@
+// odds and reward sizes for featured/goodLuck.ts's crits, spread into CONFIG.crit
+export const GOOD_LUCK_BALANCE = {
+  bubbleEconomyChance: 0.0126364702,
+  bubbleEconomyPayouts: 7,
+  cloudNineToFiveChance: 0.0126554546,
+  cloudNineToFiveFloors: 1,
+  luckyLaundromatChance: 0.00701084309,
+  luckyLaundromatUpgrades: 5,
+  luckyLaundromatPayouts: 5,
+  moneyMagnetChance: 0.0117315325,
+  moneyMagnetShare: 0.032,
+  overTheRainbowChance: 0.0115682436,
+  pocketDimensionChance: 0.0123068666,
+  shootingStarEmployeeChance: 0.0120037761,
+  shootingStarEmployeeUpgrades: 23,
+  treasureMeasureChance: 0.0116046546,
+  treasureMeasureSeconds: 5,
+  wishfulBankingChance: 0.00712320745,
+  wishfulBankingTierSteps: 2,
+  wishfulBankingUpgrades: 12,
+} as const;
