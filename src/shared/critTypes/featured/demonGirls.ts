@@ -310,4 +310,44 @@ export const DEMON_GIRLS_CRITS = {
     reward: (context, { actions, lowestLevel, topLevel }) =>
       actions.raiseLevels([lowestLevel(context)], topLevel(context)),
   },
+  blueDevil: {
+    label: "Blue Devil",
+    color: COLOR.internSkyBlue,
+    image: "crits/demonGirls/blueDevil.webp",
+    description: "Grows every unlocked floor's level by 4.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.blueDevilGrowth),
+  },
+  brimstoneBiceps: {
+    label: "Brimstone Biceps",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/demonGirls/brimstoneBiceps.webp",
+    description: "Pays 5 times every unlocked floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash(context.floors, balance.brimstoneBicepsMultiple),
+  },
+  devilMayKiss: {
+    label: "Devil May Kiss",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/demonGirls/devilMayKiss.webp",
+    description: "Grows every unlocked floor's level by 4.2% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.devilMayKissGrowth),
+  },
+  sinnersPlea: {
+    label: "Sinners Plea",
+    color: COLOR.redActive,
+    image: "crits/demonGirls/sinnersPlea.webp",
+    description: "Spreads 51 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.sinnersPleaUpgrades),
+  },
+  tealTemptress: {
+    label: "Teal Temptress",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/demonGirls/tealTemptress.webp",
+    description: "Pays 16 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.tealTemptressMultiple),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

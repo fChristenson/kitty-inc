@@ -17,8 +17,9 @@ import {
 const PRICE_FONT_SIZE = 96;
 const PRICE_FONT = `900 ${PRICE_FONT_SIZE}px "Fredoka", system-ui, sans-serif`;
 const OVERLAY_COLOR = "rgba(30, 30, 30, 0.45)";
-// a just-unlocked floor keeps its overlay while the price slams, then flips it away
-const UNLOCK_FLIP_MS = 350;
+// a just-unlocked floor keeps its overlay while the price slams, then drops it
+const UNLOCK_HOLD_AFTER_SLAM_MS = 100;
+export const UNLOCK_OVERLAY_MS = SLAM_MS + UNLOCK_HOLD_AFTER_SLAM_MS;
 const unlocking = new WeakMap<Floor, number>();
 
 export function startFloorUnlockAnim(floor: Floor): void {
@@ -34,17 +35,11 @@ function drawUnlockingOverlay(
   const startedAt = unlocking.get(floor);
   if (startedAt === undefined) return;
   const now = Date.now();
-  const flip = (now - startedAt - SLAM_MS) / UNLOCK_FLIP_MS;
-  if (flip >= 1) {
+  if (now - startedAt >= UNLOCK_OVERLAY_MS) {
     unlocking.delete(floor);
     return;
   }
   ctx.save();
-  if (flip > 0) {
-    ctx.translate(FLOOR_W / 2, 0);
-    ctx.scale(Math.cos((flip * Math.PI) / 2), 1);
-    ctx.translate(-FLOOR_W / 2, 0);
-  }
   ctx.fillStyle = OVERLAY_COLOR;
   ctx.fillRect(0, 0, FLOOR_W, FLOOR_H);
   const slam = getSlamPose(floor, "lock", now);

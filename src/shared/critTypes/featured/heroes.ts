@@ -129,4 +129,12 @@ export const HEROES_CRITS = {
         balance.victorianExtraWorkers,
       ),
   },
+  uchihaItachi: {
+    label: "Big brother",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/heroes/uchihaItachi.webp",
+    description: "Grows this floor's level by 12.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.uchihaItachiGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

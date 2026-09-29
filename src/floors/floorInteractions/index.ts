@@ -167,6 +167,7 @@ import {
   ensureLockedFloorAbove,
   getLockCenter,
   MAX_FLOORS_PER_BUILDING,
+  UNLOCK_OVERLAY_MS,
 } from "../floorLock";
 import {
   activateBoosted,
@@ -1740,7 +1741,7 @@ function eventProcContext(
 
 // everything a floor unlock does once it's paid for (or granted by an event);
 // fromEvent (the Unlock event) also raises the floor's permanent tier to a
-// landed crit's and slams its price before flipping the overlay away, where a
+// landed crit's and slams its price before dropping the overlay, where a
 // click just bursts coins
 function completeFloorUnlock(
   deps: FloorActionsDeps,
@@ -1782,7 +1783,10 @@ function completeFloorUnlock(
     critNow(deps, floor);
   }
   const center = getLockCenter();
-  spawnCoinBurst(floor, center.x, center.y, () => {});
+  const burst = () => spawnCoinBurst(floor, center.x, center.y, () => {});
+  // an event unlock bursts as its slammed price and overlay disappear
+  if (fromEvent) setTimeout(burst, UNLOCK_OVERLAY_MS);
+  else burst();
 }
 
 export function applyFloorCrit(
