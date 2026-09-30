@@ -1991,29 +1991,29 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance, belowAndHere }) =>
       actions.spreadUpgrades(belowAndHere(context), balance.sereneSqueezeUpgrades),
   },
-  beltedBrute: {
-    label: "Belted Brute",
+  orcMatronHomage: {
+    label: "Orc Matron Homage",
     color: COLOR.suppliesGiveawayLime,
-    image: "crits/muscleGirls/beltedBrute.webp",
+    image: "crits/muscleGirls/orcMatronHomage.webp",
     description: "Pays 57 times this floor's upgrade price in cash",
     reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.beltedBruteMultiple),
+      actions.addUpgradePriceCash([context.floor], balance.orcMatronHomageMultiple),
   },
-  blueSwimsuitBow: {
-    label: "Blue Swimsuit Bow",
+  swimsuitVenus: {
+    label: "Swimsuit Venus",
     color: COLOR.goldenParachuteMarigold,
-    image: "crits/muscleGirls/blueSwimsuitBow.webp",
+    image: "crits/muscleGirls/swimsuitVenus.webp",
     description: "Grows every unlocked floor's level by 6.3% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels(context.floors, balance.blueSwimsuitBowGrowth),
+      actions.growLevels(context.floors, balance.swimsuitVenusGrowth),
   },
-  calfHug: {
-    label: "Calf Hug",
+  calfKissPilgrim: {
+    label: "Calf Kiss Pilgrim",
     color: COLOR.goldenParachuteMarigold,
-    image: "crits/muscleGirls/calfHug.webp",
+    image: "crits/muscleGirls/calfKissPilgrim.webp",
     description: "Spreads 33 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.calfHugUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.calfKissPilgrimUpgrades),
   },
   goldenBraidIdol: {
     label: "Golden Braid Idol",
@@ -2023,69 +2023,69 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash([context.floor], balance.goldenBraidIdolMultiple),
   },
-  greenAdmirer: {
-    label: "Green Admirer",
+  goblinAcolyte: {
+    label: "Goblin Acolyte",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/greenAdmirer.webp",
+    image: "crits/muscleGirls/goblinAcolyte.webp",
     description: "Grows every unlocked floor's level by 6.4% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels(context.floors, balance.greenAdmirerGrowth),
+      actions.growLevels(context.floors, balance.goblinAcolyteGrowth),
   },
-  greenLeggingsGiant: {
-    label: "Green Leggings Giant",
+  greenLeggingsGenuflect: {
+    label: "Green Leggings Genuflect",
     color: COLOR.paydayEmerald,
-    image: "crits/muscleGirls/greenLeggingsGiant.webp",
+    image: "crits/muscleGirls/greenLeggingsGenuflect.webp",
     description: "Spreads 34 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.greenLeggingsGiantUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.greenLeggingsGenuflectUpgrades),
   },
-  greyShortsGaze: {
-    label: "Grey Shorts Gaze",
+  adoringGaze: {
+    label: "Adoring Gaze",
     color: COLOR.summerSaleOrange,
-    image: "crits/muscleGirls/greyShortsGaze.webp",
+    image: "crits/muscleGirls/adoringGaze.webp",
     description: "Pays 59 times this floor's upgrade price in cash",
     reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.greyShortsGazeMultiple),
+      actions.addUpgradePriceCash([context.floor], balance.adoringGazeMultiple),
   },
-  kneepadQueen: {
-    label: "Kneepad Queen",
+  kneepadOrcSovereign: {
+    label: "Kneepad Orc Sovereign",
     color: COLOR.suppliesGiveawayLime,
-    image: "crits/muscleGirls/kneepadQueen.webp",
+    image: "crits/muscleGirls/kneepadOrcSovereign.webp",
     description: "Grows this floor's level by 13.2% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.kneepadQueenGrowth),
+      actions.growLevels([context.floor], balance.kneepadOrcSovereignGrowth),
   },
-  loinclothLegend: {
-    label: "Loincloth Legend",
+  loinclothDeity: {
+    label: "Loincloth Deity",
     color: COLOR.suppliesGiveawayLime,
-    image: "crits/muscleGirls/loinclothLegend.webp",
+    image: "crits/muscleGirls/loinclothDeity.webp",
     description: "Spreads 35 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.loinclothLegendUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.loinclothDeityUpgrades),
   },
-  maroonMountain: {
-    label: "Maroon Mountain",
+  mountainGoddess: {
+    label: "Mountain Goddess",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/maroonMountain.webp",
+    image: "crits/muscleGirls/mountainGoddess.webp",
     description: "Pays 60 times this floor's upgrade price in cash",
     reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.maroonMountainMultiple),
+      actions.addUpgradePriceCash([context.floor], balance.mountainGoddessMultiple),
   },
-  orcLegHug: {
-    label: "Orc Leg Hug",
+  armoredOrcIdol: {
+    label: "Armored Orc Idol",
     color: COLOR.luckyCloverGreen,
-    image: "crits/muscleGirls/orcLegHug.webp",
+    image: "crits/muscleGirls/armoredOrcIdol.webp",
     description: "Grows every unlocked floor's level by 6.5% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels(context.floors, balance.orcLegHugGrowth),
+      actions.growLevels(context.floors, balance.armoredOrcIdolGrowth),
   },
-  pinkBikiniPlea: {
-    label: "Pink Bikini Plea",
+  royalHandKiss: {
+    label: "Royal Hand Kiss",
     color: COLOR.summerSaleOrange,
-    image: "crits/muscleGirls/pinkBikiniPlea.webp",
+    image: "crits/muscleGirls/royalHandKiss.webp",
     description: "Spreads 36 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.pinkBikiniPleaUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.royalHandKissUpgrades),
   },
   pinkBootsPraise: {
     label: "Pink Boots Praise",
@@ -2095,13 +2095,13 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash([context.floor], balance.pinkBootsPraiseMultiple),
   },
-  pinkShortsHug: {
-    label: "Pink Shorts Hug",
+  buzzcutTitaness: {
+    label: "Buzzcut Titaness",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/pinkShortsHug.webp",
+    image: "crits/muscleGirls/buzzcutTitaness.webp",
     description: "Grows this floor's level by 13.3% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.pinkShortsHugGrowth),
+      actions.growLevels([context.floor], balance.buzzcutTitanessGrowth),
   },
   pinkTopPedestal: {
     label: "Pink Top Pedestal",
@@ -2119,29 +2119,29 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash([context.floor], balance.purpleLeggingsReverenceMultiple),
   },
-  redPantsKneel: {
-    label: "Red Pants Kneel",
+  marbleAbsVigil: {
+    label: "Marble Abs Vigil",
     color: COLOR.sameBoatCoral,
-    image: "crits/muscleGirls/redPantsKneel.webp",
+    image: "crits/muscleGirls/marbleAbsVigil.webp",
     description: "Grows this floor's level by 9.3% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.redPantsKneelGrowth),
+      actions.growLevels([context.floor], balance.marbleAbsVigilGrowth),
   },
-  seatedSweetheart: {
-    label: "Seated Sweetheart",
+  seatedEmpress: {
+    label: "Seated Empress",
     color: COLOR.goldenParachuteMarigold,
-    image: "crits/muscleGirls/seatedSweetheart.webp",
+    image: "crits/muscleGirls/seatedEmpress.webp",
     description: "Spreads 38 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.seatedSweetheartUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.seatedEmpressUpgrades),
   },
-  stripedShortsSwoon: {
-    label: "Striped Shorts Swoon",
+  flexSwoon: {
+    label: "Flex Swoon",
     color: COLOR.summerSaleOrange,
-    image: "crits/muscleGirls/stripedShortsSwoon.webp",
+    image: "crits/muscleGirls/flexSwoon.webp",
     description: "Pays 63 times this floor's upgrade price in cash",
     reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.stripedShortsSwoonMultiple),
+      actions.addUpgradePriceCash([context.floor], balance.flexSwoonMultiple),
   },
   tealTribute: {
     label: "Teal Tribute",
@@ -2151,69 +2151,69 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.growLevels([context.floor], balance.tealTributeGrowth),
   },
-  thighHugger: {
-    label: "Thigh Hugger",
+  thunderThighHymn: {
+    label: "Thunder Thigh Hymn",
     color: COLOR.coinGold,
-    image: "crits/muscleGirls/thighHugger.webp",
+    image: "crits/muscleGirls/thunderThighHymn.webp",
     description: "Spreads 39 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.thighHuggerUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.thunderThighHymnUpgrades),
   },
-  legClinger: {
-    label: "Leg Clinger",
+  sculptedLegDevotee: {
+    label: "Sculpted Leg Devotee",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/legClinger.webp",
+    image: "crits/muscleGirls/sculptedLegDevotee.webp",
     description: "Grows this floor's level by 9.8% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.legClingerGrowth),
+      actions.growLevels([context.floor], balance.sculptedLegDevoteeGrowth),
   },
-  goldenThighBow: {
-    label: "Golden Thigh Bow",
+  gildedMuscleBow: {
+    label: "Gilded Muscle Bow",
     color: COLOR.amber,
-    image: "crits/muscleGirls/goldenThighBow.webp",
+    image: "crits/muscleGirls/gildedMuscleBow.webp",
     description: "Spreads 39 free upgrades over the lowest-level floors",
     reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.goldenThighBowUpgrades),
+      actions.spreadUpgrades(context.floors, balance.gildedMuscleBowUpgrades),
   },
-  absAdmirer: {
-    label: "Abs Admirer",
+  washboardKiss: {
+    label: "Washboard Kiss",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/absAdmirer.webp",
+    image: "crits/muscleGirls/washboardKiss.webp",
     description: "Grows this floor's level by 3.2% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.absAdmirerGrowth),
+      actions.growLevels([context.floor], balance.washboardKissGrowth),
   },
-  armsCrossedIdol: {
-    label: "Arms Crossed Idol",
+  armsCrossedGoddess: {
+    label: "Arms Crossed Goddess",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/armsCrossedIdol.webp",
+    image: "crits/muscleGirls/armsCrossedGoddess.webp",
     description: "Spreads 41 free upgrades over the lowest-level floors",
     reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.armsCrossedIdolUpgrades),
+      actions.spreadUpgrades(context.floors, balance.armsCrossedGoddessUpgrades),
   },
-  blackBeltDevotion: {
-    label: "Black Belt Devotion",
+  twinThighDevotion: {
+    label: "Twin Thigh Devotion",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/blackBeltDevotion.webp",
+    image: "crits/muscleGirls/twinThighDevotion.webp",
     description: "Pays 70 times this floor's upgrade price in cash",
     reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.blackBeltDevotionMultiple),
+      actions.addUpgradePriceCash([context.floor], balance.twinThighDevotionMultiple),
   },
-  blueLeotardThrone: {
-    label: "Blue Leotard Throne",
+  leotardDivinity: {
+    label: "Leotard Divinity",
     color: COLOR.coinGold,
-    image: "crits/muscleGirls/blueLeotardThrone.webp",
+    image: "crits/muscleGirls/leotardDivinity.webp",
     description: "Grows this floor's level by 3.3% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.blueLeotardThroneGrowth),
+      actions.growLevels([context.floor], balance.leotardDivinityGrowth),
   },
-  bronzeBicepEmbrace: {
-    label: "Bronze Bicep Embrace",
+  bronzeAbsShrine: {
+    label: "Bronze Abs Shrine",
     color: COLOR.goldenParachuteMarigold,
-    image: "crits/muscleGirls/bronzeBicepEmbrace.webp",
+    image: "crits/muscleGirls/bronzeAbsShrine.webp",
     description: "Spreads 42 free upgrades over the lowest-level floors",
     reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.bronzeBicepEmbraceUpgrades),
+      actions.spreadUpgrades(context.floors, balance.bronzeAbsShrineUpgrades),
   },
   cherryTopColossus: {
     label: "Cherry Top Colossus",
@@ -2223,93 +2223,93 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash([context.floor], balance.cherryTopColossusMultiple),
   },
-  coralCropQueen: {
-    label: "Coral Crop Queen",
+  coralCropVeneration: {
+    label: "Coral Crop Veneration",
     color: COLOR.sameBoatCoral,
-    image: "crits/muscleGirls/coralCropQueen.webp",
+    image: "crits/muscleGirls/coralCropVeneration.webp",
     description: "Grows this floor's level by 3.4% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.coralCropQueenGrowth),
+      actions.growLevels([context.floor], balance.coralCropVenerationGrowth),
   },
-  creamCropCrush: {
-    label: "Cream Crop Crush",
+  creamCropAbs: {
+    label: "Cream Crop Abs",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/creamCropCrush.webp",
+    image: "crits/muscleGirls/creamCropAbs.webp",
     description: "Spreads 43 free upgrades over the lowest-level floors",
     reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.creamCropCrushUpgrades),
+      actions.spreadUpgrades(context.floors, balance.creamCropAbsUpgrades),
   },
-  crimsonCropCuddle: {
-    label: "Crimson Crop Cuddle",
+  crimsonCoreAwe: {
+    label: "Crimson Core Awe",
     color: COLOR.coinGold,
-    image: "crits/muscleGirls/crimsonCropCuddle.webp",
+    image: "crits/muscleGirls/crimsonCoreAwe.webp",
     description: "Pays 72 times this floor's upgrade price in cash",
     reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.crimsonCropCuddleMultiple),
+      actions.addUpgradePriceCash([context.floor], balance.crimsonCoreAweMultiple),
   },
-  deepBowDuo: {
-    label: "Deep Bow Duo",
+  prostratePilgrims: {
+    label: "Prostrate Pilgrims",
     color: COLOR.summerSaleOrange,
-    image: "crits/muscleGirls/deepBowDuo.webp",
+    image: "crits/muscleGirls/prostratePilgrims.webp",
     description: "Grows this floor's level by 3.5% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.deepBowDuoGrowth),
+      actions.growLevels([context.floor], balance.prostratePilgrimsGrowth),
   },
-  doubleLegHug: {
-    label: "Double Leg Hug",
+  pillarLegsPraise: {
+    label: "Pillar Legs Praise",
     color: COLOR.sameBoatCoral,
-    image: "crits/muscleGirls/doubleLegHug.webp",
+    image: "crits/muscleGirls/pillarLegsPraise.webp",
     description: "Spreads 44 free upgrades over the lowest-level floors",
     reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.doubleLegHugUpgrades),
+      actions.spreadUpgrades(context.floors, balance.pillarLegsPraiseUpgrades),
   },
-  emeraldBlondeBow: {
-    label: "Emerald Blonde Bow",
+  platinumAmazon: {
+    label: "Platinum Amazon",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/emeraldBlondeBow.webp",
+    image: "crits/muscleGirls/platinumAmazon.webp",
     description: "Pays 73 times this floor's upgrade price in cash",
     reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.emeraldBlondeBowMultiple),
+      actions.addUpgradePriceCash([context.floor], balance.platinumAmazonMultiple),
   },
-  hipHugHeroine: {
-    label: "Hip Hug Heroine",
+  absAltar: {
+    label: "Abs Altar",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/hipHugHeroine.webp",
+    image: "crits/muscleGirls/absAltar.webp",
     description: "Grows this floor's level by 3.6% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.hipHugHeroineGrowth),
+      actions.growLevels([context.floor], balance.absAltarGrowth),
   },
-  navyKneeNuzzle: {
-    label: "Navy Knee Nuzzle",
+  navySanctum: {
+    label: "Navy Sanctum",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/navyKneeNuzzle.webp",
+    image: "crits/muscleGirls/navySanctum.webp",
     description: "Spreads 55 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.navyKneeNuzzleUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.navySanctumUpgrades),
   },
-  oneKneeWonder: {
-    label: "One Knee Wonder",
+  bentKneeOath: {
+    label: "Bent Knee Oath",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/oneKneeWonder.webp",
+    image: "crits/muscleGirls/bentKneeOath.webp",
     description: "Pays 74 times this floor's upgrade price in cash",
     reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.oneKneeWonderMultiple),
+      actions.addUpgradePriceCash([context.floor], balance.bentKneeOathMultiple),
   },
-  plumTankTitan: {
-    label: "Plum Tank Titan",
+  plumMatriarch: {
+    label: "Plum Matriarch",
     color: COLOR.goldenParachuteMarigold,
-    image: "crits/muscleGirls/plumTankTitan.webp",
+    image: "crits/muscleGirls/plumMatriarch.webp",
     description: "Grows this floor's level by 3.7% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.plumTankTitanGrowth),
+      actions.growLevels([context.floor], balance.plumMatriarchGrowth),
   },
-  ponytailPillar: {
-    label: "Ponytail Pillar",
+  bowingBeforeBeauty: {
+    label: "Bowing Before Beauty",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/ponytailPillar.webp",
+    image: "crits/muscleGirls/bowingBeforeBeauty.webp",
     description: "Spreads 56 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.ponytailPillarUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.bowingBeforeBeautyUpgrades),
   },
   redLeggingsRapture: {
     label: "Red Leggings Rapture",
@@ -2319,45 +2319,45 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash(context.floors, balance.redLeggingsRaptureMultiple),
   },
-  redShortsRest: {
-    label: "Red Shorts Rest",
+  bellyBlessing: {
+    label: "Belly Blessing",
     color: COLOR.goldenParachuteMarigold,
-    image: "crits/muscleGirls/redShortsRest.webp",
+    image: "crits/muscleGirls/bellyBlessing.webp",
     description: "Grows this floor's level by 3.8% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.redShortsRestGrowth),
+      actions.growLevels([context.floor], balance.bellyBlessingGrowth),
   },
-  rustShortsGiantess: {
-    label: "Rust Shorts Giantess",
+  giantessSanctuary: {
+    label: "Giantess Sanctuary",
     color: COLOR.sameBoatCoral,
-    image: "crits/muscleGirls/rustShortsGiantess.webp",
+    image: "crits/muscleGirls/giantessSanctuary.webp",
     description: "Spreads 57 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.rustShortsGiantessUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.giantessSanctuaryUpgrades),
   },
-  sportyPonytailSnug: {
-    label: "Sporty Ponytail Snug",
+  ponytailPriestess: {
+    label: "Ponytail Priestess",
     color: COLOR.sameBoatCoral,
-    image: "crits/muscleGirls/sportyPonytailSnug.webp",
+    image: "crits/muscleGirls/ponytailPriestess.webp",
     description: "Pays 16 times every unlocked floor's upgrade price in cash",
     reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash(context.floors, balance.sportyPonytailSnugMultiple),
+      actions.addUpgradePriceCash(context.floors, balance.ponytailPriestessMultiple),
   },
-  sunsetKneelers: {
-    label: "Sunset Kneelers",
+  sunsetCongregation: {
+    label: "Sunset Congregation",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/sunsetKneelers.webp",
+    image: "crits/muscleGirls/sunsetCongregation.webp",
     description: "Grows this floor's level by 3.9% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.sunsetKneelersGrowth),
+      actions.growLevels([context.floor], balance.sunsetCongregationGrowth),
   },
-  tealShortsSnuggle: {
-    label: "Teal Shorts Snuggle",
+  quadTemple: {
+    label: "Quad Temple",
     color: COLOR.sameBoatCoral,
-    image: "crits/muscleGirls/tealShortsSnuggle.webp",
+    image: "crits/muscleGirls/quadTemple.webp",
     description: "Spreads 58 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.tealShortsSnuggleUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.quadTempleUpgrades),
   },
   aquaShortsMuse: {
     label: "Aqua Shorts Muse",
@@ -2367,21 +2367,21 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash(context.floors, balance.aquaShortsMuseMultiple),
   },
-  grinningGoliath: {
-    label: "Grinning Goliath",
+  twinHandOffering: {
+    label: "Twin Hand Offering",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/grinningGoliath.webp",
+    image: "crits/muscleGirls/twinHandOffering.webp",
     description: "Grows this floor's level by 5.1% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.grinningGoliathGrowth),
+      actions.growLevels([context.floor], balance.twinHandOfferingGrowth),
   },
-  kneelingWaistClinch: {
-    label: "Kneeling Waist Clinch",
+  waistWorship: {
+    label: "Waist Worship",
     color: COLOR.amberMuted,
-    image: "crits/muscleGirls/kneelingWaistClinch.webp",
+    image: "crits/muscleGirls/waistWorship.webp",
     description: "Spreads 59 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.kneelingWaistClinchUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.waistWorshipUpgrades),
   },
   pinkTightsPowerhouse: {
     label: "Pink Tights Powerhouse",
@@ -2391,20 +2391,92 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash(context.floors, balance.pinkTightsPowerhouseMultiple),
   },
-  rainbowShortsSqueeze: {
-    label: "Rainbow Shorts Squeeze",
+  rainbowShortsShrine: {
+    label: "Rainbow Shorts Shrine",
     color: COLOR.coinGold,
-    image: "crits/muscleGirls/rainbowShortsSqueeze.webp",
+    image: "crits/muscleGirls/rainbowShortsShrine.webp",
     description: "Grows this floor's level by 5.2% in free upgrades",
     reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.rainbowShortsSqueezeGrowth),
+      actions.growLevels([context.floor], balance.rainbowShortsShrineGrowth),
   },
-  sunnyWaistbandDiva: {
-    label: "Sunny Waistband Diva",
+  sunnyDivaAltar: {
+    label: "Sunny Diva Altar",
     color: COLOR.summerSaleOrange,
-    image: "crits/muscleGirls/sunnyWaistbandDiva.webp",
+    image: "crits/muscleGirls/sunnyDivaAltar.webp",
     description: "Spreads 60 free upgrades over this floor and the ones below",
     reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.sunnyWaistbandDivaUpgrades),
+      actions.spreadUpgrades(belowAndHere(context), balance.sunnyDivaAltarUpgrades),
+  },
+  emeraldTopAdoration: {
+    label: "Emerald Top Adoration",
+    color: COLOR.coinGold,
+    image: "crits/muscleGirls/emeraldTopAdoration.webp",
+    description: "Pays 19 times every unlocked floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash(context.floors, balance.emeraldTopAdorationMultiple),
+  },
+  quadricepPrayer: {
+    label: "Quadricep Prayer",
+    color: COLOR.coinGold,
+    image: "crits/muscleGirls/quadricepPrayer.webp",
+    description: "Grows this floor's level by 5.3% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.quadricepPrayerGrowth),
+  },
+  blondeDisciple: {
+    label: "Blonde Disciple",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/blondeDisciple.webp",
+    description: "Spreads 61 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.blondeDiscipleUpgrades),
+  },
+  prayingHandsPledge: {
+    label: "Praying Hands Pledge",
+    color: COLOR.coinGold,
+    image: "crits/muscleGirls/prayingHandsPledge.webp",
+    description: "Pays 20 times every unlocked floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash(context.floors, balance.prayingHandsPledgeMultiple),
+  },
+  chiseledAbsKiss: {
+    label: "Chiseled Abs Kiss",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/chiseledAbsKiss.webp",
+    description: "Grows this floor's level by 5.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.chiseledAbsKissGrowth),
+  },
+  absOfStone: {
+    label: "Abs of Stone",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/absOfStone.webp",
+    description: "Spreads 62 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.absOfStoneUpgrades),
+  },
+  abdominalAdoration: {
+    label: "Abdominal Adoration",
+    color: COLOR.summerSaleOrange,
+    image: "crits/muscleGirls/abdominalAdoration.webp",
+    description: "Pays 21 times every unlocked floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash(context.floors, balance.abdominalAdorationMultiple),
+  },
+  abGridGlory: {
+    label: "Ab Grid Glory",
+    color: COLOR.coinGold,
+    image: "crits/muscleGirls/abGridGlory.webp",
+    description: "Grows this floor's level by 5.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.abGridGloryGrowth),
+  },
+  bicepPlea: {
+    label: "Bicep Plea",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/bicepPlea.webp",
+    description: "Spreads 56 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.bicepPleaUpgrades),
   },
 } as const satisfies Record<string, FeaturedCritDefinition>;
