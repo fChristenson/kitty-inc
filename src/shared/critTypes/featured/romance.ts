@@ -922,4 +922,228 @@ export const ROMANCE_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.payCycles([context.floor], balance.tuskKissTallyPayouts),
   },
+  pompadourKiss: {
+    label: "Pompadour Kiss",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/romance/pompadourKiss.webp",
+    description: "Pays 8 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.pompadourKissMultiple),
+  },
+  armCandy: {
+    label: "Arm Candy",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/armCandy.webp",
+    description: "Grows this floor's level by 8.2% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.armCandyGrowth),
+  },
+  blondeBobKiss: {
+    label: "Blonde Bob Kiss",
+    color: COLOR.coinGold,
+    image: "crits/romance/blondeBobKiss.webp",
+    description: "Spreads 17 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.blondeBobKissUpgrades),
+  },
+  blueQuiffPeck: {
+    label: "Blue Quiff Peck",
+    color: COLOR.starYellow,
+    image: "crits/romance/blueQuiffPeck.webp",
+    description: "Pays 28 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.blueQuiffPeckMultiple),
+  },
+  blueGoblinTwins: {
+    label: "Blue Goblin Twins",
+    color: COLOR.moneyGreen,
+    image: "crits/romance/blueGoblinTwins.webp",
+    description: "Grows every unlocked floor's level by 2.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.blueGoblinTwinsGrowth),
+  },
+  buckleUp: {
+    label: "Buckle Up",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/romance/buckleUp.webp",
+    description: "Spreads 54 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.buckleUpUpgrades),
+  },
+  coralCrush: {
+    label: "Coral Crush",
+    color: COLOR.sameBoatCoral,
+    image: "crits/romance/coralCrush.webp",
+    description: "Pays 29 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.coralCrushMultiple),
+  },
+  cottonCandyKiss: {
+    label: "Cotton Candy Kiss",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/romance/cottonCandyKiss.webp",
+    description: "Grows this floor's level by 8.3% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.cottonCandyKissGrowth),
+  },
+  braidedPuckers: {
+    label: "Braided Puckers",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/romance/braidedPuckers.webp",
+    description: "Spreads 18 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.braidedPuckersUpgrades),
+  },
+  fadeAndBraid: {
+    label: "Fade and Braid",
+    color: COLOR.teaBreakBrown,
+    image: "crits/romance/fadeAndBraid.webp",
+    description: "Pays 30 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.fadeAndBraidMultiple),
+  },
+  flaxenBraidPeck: {
+    label: "Flaxen Braid Peck",
+    color: COLOR.amberMuted,
+    image: "crits/romance/flaxenBraidPeck.webp",
+    description: "Grows every unlocked floor's level by 2.6% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.flaxenBraidPeckGrowth),
+  },
+  giggleFit: {
+    label: "Giggle Fit",
+    color: COLOR.sameBoatCoral,
+    image: "crits/romance/giggleFit.webp",
+    description: "Spreads 19 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.giggleFitUpgrades),
+  },
+  goldilocks: {
+    label: "Goldilocks",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/romance/goldilocks.webp",
+    description: "Pays 31 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.goldilocksMultiple),
+  },
+  goblinLipPrint: {
+    label: "Goblin Lip Print",
+    color: COLOR.bullMarketGreen,
+    image: "crits/romance/goblinLipPrint.webp",
+    description: "Grows this floor's level by 8.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.goblinLipPrintGrowth),
+  },
+  loveBite: {
+    label: "Love Bite",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/loveBite.webp",
+    description: "Spreads 20 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.loveBiteUpgrades),
+  },
+  twinPonytails: {
+    label: "Twin Ponytails",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/twinPonytails.webp",
+    description: "Pays 32 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.twinPonytailsMultiple),
+  },
+  lemonCropTop: {
+    label: "Lemon Crop Top",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/lemonCropTop.webp",
+    description: "Grows every unlocked floor's level by 2.7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.lemonCropTopGrowth),
+  },
+  limeCrush: {
+    label: "Lime Crush",
+    color: COLOR.gold,
+    image: "crits/romance/limeCrush.webp",
+    description: "Spreads 21 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.limeCrushUpgrades),
+  },
+  rapunzelSmooch: {
+    label: "Rapunzel Smooch",
+    color: COLOR.amberMuted,
+    image: "crits/romance/rapunzelSmooch.webp",
+    description: "Pays 33 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.rapunzelSmoochMultiple),
+  },
+  lookalikeLipstick: {
+    label: "Lookalike Lipstick",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/lookalikeLipstick.webp",
+    description: "Grows this floor's level by 8.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.lookalikeLipstickGrowth),
+  },
+  necklineKiss: {
+    label: "Neckline Kiss",
+    color: COLOR.amberMuted,
+    image: "crits/romance/necklineKiss.webp",
+    description: "Spreads 22 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.necklineKissUpgrades),
+  },
+  pinkBraidSmooch: {
+    label: "Pink Braid Smooch",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/romance/pinkBraidSmooch.webp",
+    description: "Pays 34 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.pinkBraidSmoochMultiple),
+  },
+  goblinCrush: {
+    label: "Goblin Crush",
+    color: COLOR.gold,
+    image: "crits/romance/goblinCrush.webp",
+    description: "Grows every unlocked floor's level by 2.8% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.goblinCrushGrowth),
+  },
+  smoochDelivery: {
+    label: "Smooch Delivery",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/romance/smoochDelivery.webp",
+    description: "Spreads 21 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.smoochDeliveryUpgrades),
+  },
+  snowcapSnuggle: {
+    label: "Snowcap Snuggle",
+    color: COLOR.amberMuted,
+    image: "crits/romance/snowcapSnuggle.webp",
+    description: "Pays 35 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.snowcapSnuggleMultiple),
+  },
+  tealBraids: {
+    label: "Teal Braids",
+    color: COLOR.amberMuted,
+    image: "crits/romance/tealBraids.webp",
+    description: "Grows this floor's level by 8.6% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.tealBraidsGrowth),
+  },
+  tomboySmooch: {
+    label: "Tomboy Smooch",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/romance/tomboySmooch.webp",
+    description: "Spreads 22 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.tomboySmoochUpgrades),
+  },
+  lipstickTrail: {
+    label: "Lipstick Trail",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/lipstickTrail.webp",
+    description: "Pays 36 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.lipstickTrailMultiple),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

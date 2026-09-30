@@ -1935,4 +1935,60 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance, highestFloor }) =>
       actions.addUpgradePriceCash([highestFloor(context)], balance.valhallaVentureMultiple),
   },
+  redheadHug: {
+    label: "Redhead Hug",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/redheadHug.webp",
+    description: "Spreads 13 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.redheadHugUpgrades),
+  },
+  blueBobNuzzle: {
+    label: "Blue Bob Nuzzle",
+    color: COLOR.summerSaleOrange,
+    image: "crits/muscleGirls/blueBobNuzzle.webp",
+    description: "Pays 5 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.blueBobNuzzleMultiple),
+  },
+  curlyCuddle: {
+    label: "Curly Cuddle",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/curlyCuddle.webp",
+    description: "Grows this floor's level by 8.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.curlyCuddleGrowth),
+  },
+  leanOnMe: {
+    label: "Lean on Me",
+    color: COLOR.summerSaleOrange,
+    image: "crits/muscleGirls/leanOnMe.webp",
+    description: "Spreads 14 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.leanOnMeUpgrades),
+  },
+  pinkPowerhouses: {
+    label: "Pink Powerhouses",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/muscleGirls/pinkPowerhouses.webp",
+    description: "Pays 7 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.pinkPowerhousesMultiple),
+  },
+  ravenSnuggle: {
+    label: "Raven Snuggle",
+    color: COLOR.coinGold,
+    image: "crits/muscleGirls/ravenSnuggle.webp",
+    description: "Grows every unlocked floor's level by 2.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.ravenSnuggleGrowth),
+  },
+  sereneSqueeze: {
+    label: "Serene Squeeze",
+    color: COLOR.coinGold,
+    image: "crits/muscleGirls/sereneSqueeze.webp",
+    description: "Spreads 16 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.sereneSqueezeUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

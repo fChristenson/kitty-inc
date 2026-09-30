@@ -73,4 +73,12 @@ export const GEMS_CRITS = {
         balance.silverRushExtraWorkers,
       ),
   },
+  rainbowGems: {
+    label: "Rainbow Gems",
+    color: COLOR.overflowBlue,
+    image: "crits/gems/rainbowGems.webp",
+    description: "Grows every unlocked floor's level by 2.3% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.rainbowGemsGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

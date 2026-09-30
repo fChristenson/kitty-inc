@@ -772,4 +772,76 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.upgrade([context.floor], balance.toeToToeTradeUpgrades),
   },
+  doubleDuel: {
+    label: "Double Duel",
+    color: COLOR.sameBoatCoral,
+    image: "crits/feet/doubleDuel.webp",
+    description: "Grows every unlocked floor's level by 6.2% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.doubleDuelGrowth),
+  },
+  circleOfToes: {
+    label: "Circle of Toes",
+    color: COLOR.sunshineGold,
+    image: "crits/feet/circleOfToes.webp",
+    description: "Spreads 98 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.circleOfToesUpgrades),
+  },
+  daisyDuel: {
+    label: "Daisy Duel",
+    color: COLOR.threeOfAKindGreen,
+    image: "crits/feet/daisyDuel.webp",
+    description: "Pays 17 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.daisyDuelMultiple),
+  },
+  fullStretch: {
+    label: "Full Stretch",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/feet/fullStretch.webp",
+    description: "Grows every unlocked floor's level by 2.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.fullStretchGrowth),
+  },
+  goblinGrins: {
+    label: "Goblin Grins",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/feet/goblinGrins.webp",
+    description: "Spreads 99 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.goblinGrinsUpgrades),
+  },
+  solePress: {
+    label: "Sole Press",
+    color: COLOR.threeOfAKindGreen,
+    image: "crits/feet/solePress.webp",
+    description: "Pays 11 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.solePressMultiple),
+  },
+  toeTussle: {
+    label: "Toe Tussle",
+    color: COLOR.gold,
+    image: "crits/feet/toeTussle.webp",
+    description: "Grows every unlocked floor's level by 2.2% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.toeTussleGrowth),
+  },
+  toeGrip: {
+    label: "Toe Grip",
+    color: COLOR.amberMuted,
+    image: "crits/feet/toeGrip.webp",
+    description: "Spreads 12 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.toeGripUpgrades),
+  },
+  toePyramid: {
+    label: "Toe Pyramid",
+    color: COLOR.summerSaleOrange,
+    image: "crits/feet/toePyramid.webp",
+    description: "Pays 18 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.toePyramidMultiple),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

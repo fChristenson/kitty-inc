@@ -350,4 +350,52 @@ export const DEMON_GIRLS_CRITS = {
     reward: (context, { actions, balance, highestFloor }) =>
       actions.addUpgradePriceCash([highestFloor(context)], balance.tealTemptressMultiple),
   },
+  hornsAndBraids: {
+    label: "Horns and Braids",
+    color: COLOR.overflowBlue,
+    image: "crits/demonGirls/hornsAndBraids.webp",
+    description: "Grows every unlocked floor's level by 6.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.hornsAndBraidsGrowth),
+  },
+  lipstickDevils: {
+    label: "Lipstick Devils",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/demonGirls/lipstickDevils.webp",
+    description: "Spreads 96 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.lipstickDevilsUpgrades),
+  },
+  flexingFiends: {
+    label: "Flexing Fiends",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/demonGirls/flexingFiends.webp",
+    description: "Pays 51 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.flexingFiendsMultiple),
+  },
+  demonHandshake: {
+    label: "Demon Handshake",
+    color: COLOR.overflowBlue,
+    image: "crits/demonGirls/demonHandshake.webp",
+    description: "Grows this floor's level by 13.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.demonHandshakeGrowth),
+  },
+  ashAndEmber: {
+    label: "Ash and Ember",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/demonGirls/ashAndEmber.webp",
+    description: "Spreads 97 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.ashAndEmberUpgrades),
+  },
+  infernalToeHold: {
+    label: "Infernal Toe Hold",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/demonGirls/infernalToeHold.webp",
+    description: "Pays 22 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.infernalToeHoldMultiple),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
