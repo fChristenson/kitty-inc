@@ -122,6 +122,7 @@ export function drawCoins(
   // is reused for the whole run instead of re-resolved per coin
   let rectFloor: Floor | null = null;
   let rect: { left: number; top: number; width: number } | null = null;
+  const base = ctx.getTransform();
   for (const p of pool.list) {
     if ((p.homing?.group.layer ?? "world") !== layer) continue;
     if (p.floor !== rectFloor) {
@@ -162,7 +163,7 @@ export function drawCoins(
     } else {
       ctx.globalAlpha = Math.max(0, 1 - t);
     }
-    drawCoinBurstFrame(ctx, p, px, py, radius);
+    drawCoinBurstFrame(ctx, p, px, py, radius, base);
     if (p.homing) drawHangGlint(ctx, p, p.homing, px, py, radius);
   }
   ctx.globalAlpha = 1;

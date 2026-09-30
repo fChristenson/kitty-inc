@@ -150,13 +150,16 @@ function advanceCoinBurstParticle(p: CoinBurstParticle, dt: number): void {
 // draws one coin/bill particle centered at (x, y) with the given on-screen
 // radius — a no-op (not a fallback circle) for however briefly the sprites
 // are still loading, since the caller's own particle keeps ticking either way
-// and will simply start being visible once loadCoinBurstImages resolves
+// and will simply start being visible once loadCoinBurstImages resolves.
+// base is ctx's transform for the whole batch (read once by the caller), left
+// in place again afterwards
 export function drawCoinBurstFrame(
   ctx: CanvasRenderingContext2D,
   sprite: CoinBurstSprite,
   x: number,
   y: number,
   radius: number,
+  base: DOMMatrix,
 ): void {
   const frameCanvases =
     sprite.kind === "bill" ? billFrameCanvases : coinFrameCanvases;
@@ -171,13 +174,34 @@ export function drawCoinBurstFrame(
   // frames actually read as the coin thinning, not just shrinking
   const destH = radius * 2;
   const destW = destH * (frameCanvas.width / frameCanvas.height);
-  // undone by hand instead of save()/restore(), which copy the whole canvas
-  // state for each of the hundreds of coins a big burst draws per frame
-  ctx.translate(x, y);
-  ctx.rotate(sprite.axisAngle);
+  const { a, b, c, d, e, f } = base;
+  const px = a * x + c * y + e;
+  const py = b * x + d * y + f;
+  // coins flung past the canvas edge still cost a full draw call each
+  const reach =
+    Math.max(destW, destH) * Math.max(Math.hypot(a, b), Math.hypot(c, d));
+  const { width, height } = ctx.canvas;
+  if (
+    px + reach < 0 ||
+    py + reach < 0 ||
+    px - reach > width ||
+    py - reach > height
+  )
+    return;
+  // one setTransform instead of translate/rotate and back: hundreds of coins
+  // a frame during a big crit
+  const cos = Math.cos(sprite.axisAngle);
+  const sin = Math.sin(sprite.axisAngle);
+  ctx.setTransform(
+    a * cos + c * sin,
+    b * cos + d * sin,
+    c * cos - a * sin,
+    d * cos - b * sin,
+    px,
+    py,
+  );
   ctx.drawImage(frameCanvas, -destW / 2, -destH / 2, destW, destH);
-  ctx.rotate(-sprite.axisAngle);
-  ctx.translate(-x, -y);
+  ctx.setTransform(a, b, c, d, e, f);
 }
 
 // the point on a coin's rim, as drawCoinBurstFrame draws it right now (its
@@ -254,11 +278,12 @@ export function drawActiveCoinBursts(
   const dt = clampedDtSince(lastActiveUpdateAt, now);
   lastActiveUpdateAt = now;
   pool.update(dt, advanceCoinBurstParticle);
+  const base = ctx.getTransform();
   for (const p of pool.list) {
     const t = p.life / p.maxLife;
     const radius = p.size * (1 - t * 0.3);
     ctx.globalAlpha = Math.max(0, 1 - t);
-    drawCoinBurstFrame(ctx, p, p.x, p.y, radius);
+    drawCoinBurstFrame(ctx, p, p.x, p.y, radius, base);
   }
   ctx.globalAlpha = 1;
 }
