@@ -9,7 +9,7 @@ import { drawTwinkle } from "../twinkle";
 import { drawGoldShimmer } from "../goldShimmer";
 import { createTextGlossyGradient, drawCartoonText } from "../../utils";
 import { isDetachedJobRunning } from "../detachedJob";
-import { holdExplosions, playExplosion } from "../../sound";
+import { holdExplosions, playSlamExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 
 export const GLOBAL_SLAM = {};
@@ -80,7 +80,7 @@ export function triggerEventEndSlam(
     const now = Date.now();
     if (now - lastImpactAt >= IMPACT_SHARE_MS) {
       lastImpactAt = now;
-      playExplosion();
+      playSlamExplosion();
       shakeScreen(IMPACT_SHAKE);
     }
   }, SLAM_LAND_MS);

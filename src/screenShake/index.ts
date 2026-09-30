@@ -208,6 +208,12 @@ export function shakeScreen(intensity: number): void {
   kickShake(intensity, Date.now());
 }
 
+// settles any running shake at once, e.g. right before a screen freeze
+// captures its frame
+export function stopScreenShake(): void {
+  shakeStartedAt = null;
+}
+
 export function triggerScreenShake(options?: {
   intensity?: number;
   label?: string;

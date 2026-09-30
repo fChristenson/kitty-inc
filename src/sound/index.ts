@@ -371,6 +371,13 @@ export function holdExplosions(ms: number): void {
   explosionsHeldUntil = Math.max(explosionsHeldUntil, Date.now() + ms);
 }
 
+// a slam's impact bang always plays: a crit bang from the clicks just before
+// (overtime's rapid ticks) must not debounce it away
+export function playSlamExplosion(): void {
+  lastExplosionPlayTime = Date.now();
+  playSfx("explosion", SFX_VOLUME, 0.04);
+}
+
 // one-shot sound effect for clicking a cat or the mouse, and for hitting the
 // every-10th-upgrade floor milestone; debounced (see BLOOP_DEBOUNCE_MS) so one
 // click landing on several targets only plays once

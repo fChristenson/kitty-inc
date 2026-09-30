@@ -22,7 +22,11 @@ import { drawRoof } from "../../buildings";
 import { drawHud, HUD_H } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
-import { getScreenShakeOffset, drawCritFlash } from "../../screenShake";
+import {
+  getScreenShakeOffset,
+  drawCritFlash,
+  stopScreenShake,
+} from "../../screenShake";
 import { COLOR } from "../../palette";
 import type { BigNumber } from "../../shared/bigNumber";
 import {
@@ -478,13 +482,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       return;
     }
     const dpr = getEffectiveDpr();
-    // impacts during a freeze still rattle the frozen frame and its overlay
-    const shake = getScreenShakeOffset(Date.now());
     if (
       !frozenFrame ||
       frozenFrame.image.width !== canvas.width ||
       frozenFrame.image.height !== canvas.height
     ) {
+      // a freeze never starts mid-shake: a rattle baked into the captured
+      // frame would leave it offset from the overlay drawn on top
+      stopScreenShake();
       // a spotlit total is drawn live on top instead of frozen under the dim
       drawLiveFrame(isTotalSpotlit());
       const image = document.createElement("canvas");
@@ -492,13 +497,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       image.height = canvas.height;
       image.getContext("2d")!.drawImage(canvas, 0, 0);
       frozenFrame = { image, viewportTop: viewportTopY(), scale };
-    } else {
-      ctx.save();
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(frozenFrame.image, shake.x * dpr, shake.y * dpr);
-      ctx.restore();
     }
+    // impacts during a freeze still rattle the frozen frame and its overlay
+    const shake = getScreenShakeOffset(Date.now());
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(frozenFrame.image, shake.x * dpr, shake.y * dpr);
+    ctx.restore();
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = getScreenFreezeDim();
