@@ -98,4 +98,156 @@ export const LUCKY_CATS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.upgrade([context.floor], balance.superSharpUpgrades),
   },
+  belleOfTheBall: {
+    label: "Belle Of The Ball",
+    color: COLOR.grandOpeningRose,
+    image: "crits/luckyCats/belleOfTheBall.webp",
+    description: "Grows every unlocked floor's level by 4.6% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.belleOfTheBallGrowth),
+  },
+  blueSnooze: {
+    label: "Blue Snooze",
+    color: COLOR.fastForwardBlue,
+    image: "crits/luckyCats/blueSnooze.webp",
+    description: "Spreads 52 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.blueSnoozeUpgrades),
+  },
+  bottledUp: {
+    label: "Bottled Up",
+    color: COLOR.orange,
+    image: "crits/luckyCats/bottledUp.webp",
+    description: "Pays 19 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.bottledUpMultiple),
+  },
+  brassButtons: {
+    label: "Brass Buttons",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/luckyCats/brassButtons.webp",
+    description: "Grows this floor's level by 12.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.brassButtonsGrowth),
+  },
+  campfireCrew: {
+    label: "Campfire Crew",
+    color: COLOR.amberMuted,
+    image: "crits/luckyCats/campfireCrew.webp",
+    description: "Spreads 87 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.campfireCrewUpgrades),
+  },
+  dapperDividend: {
+    label: "Dapper Dividend",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/luckyCats/dapperDividend.webp",
+    description: "Pays 10 times every unlocked floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash(context.floors, balance.dapperDividendMultiple),
+  },
+  deckChairBoss: {
+    label: "Deck Chair Boss",
+    color: COLOR.amber,
+    image: "crits/luckyCats/deckChairBoss.webp",
+    description: "Grows every unlocked floor's level by 4.7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.deckChairBossGrowth),
+  },
+  firesideChat: {
+    label: "Fireside Chat",
+    color: COLOR.headhunterRust,
+    image: "crits/luckyCats/firesideChat.webp",
+    description: "Spreads 88 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.firesideChatUpgrades),
+  },
+  huddleUp: {
+    label: "Huddle Up",
+    color: COLOR.gold,
+    image: "crits/luckyCats/huddleUp.webp",
+    description: "Pays 15 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.huddleUpMultiple),
+  },
+  jugHugger: {
+    label: "Jug Hugger",
+    color: COLOR.amber,
+    image: "crits/luckyCats/jugHugger.webp",
+    description: "Grows this floor's level by 12.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.jugHuggerGrowth),
+  },
+  kindlingKitties: {
+    label: "Kindling Kitties",
+    color: COLOR.gold,
+    image: "crits/luckyCats/kindlingKitties.webp",
+    description: "Spreads 89 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.kindlingKittiesUpgrades),
+  },
+  oldMoney: {
+    label: "Old Money",
+    color: COLOR.amberMuted,
+    image: "crits/luckyCats/oldMoney.webp",
+    description: "Pays 9 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.oldMoneyMultiple),
+  },
+  paidVacation: {
+    label: "Paid Vacation",
+    color: COLOR.coinGold,
+    image: "crits/luckyCats/paidVacation.webp",
+    description: "Grows every unlocked floor's level by 4.8% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.paidVacationGrowth),
+  },
+  powerNap: {
+    label: "Power Nap",
+    color: COLOR.teamBuildingCoral,
+    image: "crits/luckyCats/powerNap.webp",
+    description: "Spreads 90 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.powerNapUpgrades),
+  },
+  royalTreatment: {
+    label: "Royal Treatment",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/luckyCats/royalTreatment.webp",
+    description: "Pays 16 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.royalTreatmentMultiple),
+  },
+  shadyDeal: {
+    label: "Shady Deal",
+    color: COLOR.springCleaningMint,
+    image: "crits/luckyCats/shadyDeal.webp",
+    description: "Grows this floor's level by 12.6% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.shadyDealGrowth),
+  },
+  sleepItOff: {
+    label: "Sleep It Off",
+    color: COLOR.sameBoatCoral,
+    image: "crits/luckyCats/sleepItOff.webp",
+    description: "Spreads 91 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.sleepItOffUpgrades),
+  },
+  sunnySavings: {
+    label: "Sunny Savings",
+    color: COLOR.amber,
+    image: "crits/luckyCats/sunnySavings.webp",
+    description: "Pays 10 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.sunnySavingsMultiple),
+  },
+  tealAppeal: {
+    label: "Teal Appeal",
+    color: COLOR.sameBoatCoral,
+    image: "crits/luckyCats/tealAppeal.webp",
+    description: "Grows every unlocked floor's level by 4.9% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.tealAppealGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

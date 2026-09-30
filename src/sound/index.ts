@@ -49,6 +49,7 @@ let lastCoinDropPlayTime = 0;
 // playing, that's what actually overloaded into noise, not any one sound alone
 const EXPLOSION_DEBOUNCE_MS = 800;
 let lastExplosionPlayTime = 0;
+let explosionsHeldUntil = 0;
 
 // same idea as EXPLOSION_DEBOUNCE_MS, for the rarer mega-crit jackpot layered sfx
 const JACKPOT_DEBOUNCE_MS = 800;
@@ -358,9 +359,16 @@ export function playAutoBoost(): void {
 // stack multiple full explosions on top of each other
 export function playExplosion(): void {
   const now = Date.now();
+  if (now < explosionsHeldUntil) return;
   if (now - lastExplosionPlayTime < EXPLOSION_DEBOUNCE_MS) return;
   lastExplosionPlayTime = now;
   playSfx("explosion", SFX_VOLUME, 0.04);
+}
+
+// drops every explosion for `ms`, so one that lands at the end of it (a slam's
+// impact) is the one heard
+export function holdExplosions(ms: number): void {
+  explosionsHeldUntil = Math.max(explosionsHeldUntil, Date.now() + ms);
 }
 
 // one-shot sound effect for clicking a cat or the mouse, and for hitting the

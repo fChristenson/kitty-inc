@@ -309,12 +309,7 @@ function drawMouseSprite(
       active.huntedAt === null ? mouseSprite : getHuntedImage(mouseSprite);
     ctx.drawImage(
       whiteAlpha > 0
-        ? whitenImage(
-            sprite,
-            mouseSprite.width,
-            mouseSprite.height,
-            whiteAlpha,
-          )
+        ? whitenImage(sprite, mouseSprite.width, mouseSprite.height, whiteAlpha)
         : sprite,
       -RENDER_W / 2,
       -RENDER_H,

@@ -606,11 +606,40 @@ export function getGlossyGradient(
   const key = `${y}|${h}|${fillColor}`;
   let gradient = byKey.get(key);
   if (!gradient) {
-    gradient = ctx.createLinearGradient(0, y, 0, y + h);
-    gradient.addColorStop(0, shadeColor(fillColor, 0.75));
-    gradient.addColorStop(1, shadeColor(fillColor, -0.15));
+    gradient = createGlossyGradient(ctx, y, h, fillColor);
     byKey.set(key, gradient);
   }
+  return gradient;
+}
+
+// the buttons' glossy fill: light at the top, a touch darker at the bottom
+export function createGlossyGradient(
+  ctx: CanvasRenderingContext2D,
+  y: number,
+  h: number,
+  fillColor: string,
+): CanvasGradient {
+  const gradient = ctx.createLinearGradient(0, y, 0, y + h);
+  gradient.addColorStop(0, shadeColor(fillColor, 0.75));
+  gradient.addColorStop(1, shadeColor(fillColor, -0.15));
+  return gradient;
+}
+
+// the button's gradient for a text's own glyphs (current font and baseline).
+// Thick outlined letters read duller than a button fill of the same colors, so
+// text keeps less of the button's white highlight and ends on the pure color
+const TEXT_GRADIENT_TOP_LIGHTEN = 0.3;
+export function createTextGlossyGradient(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  y: number,
+  fillColor: string,
+): CanvasGradient {
+  const { actualBoundingBoxAscent: ascent, actualBoundingBoxDescent: descent } =
+    ctx.measureText(text);
+  const gradient = ctx.createLinearGradient(0, y - ascent, 0, y + descent);
+  gradient.addColorStop(0, shadeColor(fillColor, TEXT_GRADIENT_TOP_LIGHTEN));
+  gradient.addColorStop(1, fillColor);
   return gradient;
 }
 

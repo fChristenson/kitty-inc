@@ -1,5 +1,9 @@
 import { COLOR } from "../../palette";
-import { drawCartoonText, formatPrice, shadeColor } from "../../utils";
+import {
+  createTextGlossyGradient,
+  drawCartoonText,
+  formatPrice,
+} from "../../utils";
 import type { BigNumber } from "../../shared/bigNumber";
 import {
   getBounceWiggleTransform,
@@ -355,12 +359,8 @@ export function drawMarkerFloorCount(
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   const y = feetY + 4;
+  const label = `${floorCount}/${maxFloors}`;
   let fillStyle: string | CanvasGradient = COLOR.white;
-  if (critColor) {
-    const gradient = ctx.createLinearGradient(cx, y - 7, cx, y + 7);
-    gradient.addColorStop(0, shadeColor(critColor, 0.6));
-    gradient.addColorStop(1, critColor);
-    fillStyle = gradient;
-  }
-  drawCartoonText(ctx, `${floorCount}/${maxFloors}`, cx, y, fillStyle);
+  if (critColor) fillStyle = createTextGlossyGradient(ctx, label, y, critColor);
+  drawCartoonText(ctx, label, cx, y, fillStyle);
 }

@@ -6,7 +6,6 @@ import {
   isFloorLocked,
   liveEffect,
 } from "../../shared/detachedJob";
-import { SLAM_LAND_MS } from "../../shared/eventEndSlam";
 import {
   hitTestWorkers,
   clickWorker,
@@ -2047,12 +2046,12 @@ export function handleFloorClick(
       triggerButtonPress(floor);
       playCoinDrop();
       if (goalReached) {
-        const promoted = floor.critMultiplierTier!;
-        const celebrate = () =>
-          triggerCritCelebration(floor, promoted, getScreenCenterLocal);
-        // revealed as the bar slams down (see announceEventEnded)
-        if (isDetachedJobRunning()) celebrate();
-        else setTimeout(celebrate, SLAM_LAND_MS);
+        // revealed as the bar jumps (see announceEventEnded)
+        triggerCritCelebration(
+          floor,
+          floor.critMultiplierTier!,
+          getScreenCenterLocal,
+        );
       } else if (tier) {
         triggerCritCelebration(floor, tier, getScreenCenterLocal);
       }

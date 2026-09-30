@@ -15,9 +15,11 @@ const crits = path.join(ROOT, "public/crits");
 // `icon` name in critTypes, resolved through loadAssets' IMAGE_FILES
 const read = (file) => fs.readFileSync(path.join(ROOT, file), "utf8");
 const imageFiles = Object.fromEntries(
-  [...read("src/loadAssets/index.ts").matchAll(/^\s+(\w+): "([^"/]+\.webp)"/gm)].map(
-    (m) => [m[1], m[2]],
-  ),
+  [
+    ...read("src/loadAssets/index.ts").matchAll(
+      /^\s+(\w+): "([^"/]+\.webp)"/gm,
+    ),
+  ].map((m) => [m[1], m[2]]),
 );
 const procIcons = [
   ...new Set(
@@ -44,11 +46,14 @@ const backup = (file) => {
   if (!fs.existsSync(target)) fs.copyFileSync(file, target);
 };
 
-for (const file of files) if (isUndersized(await sharp(file).metadata())) backup(file);
+for (const file of files)
+  if (isUndersized(await sharp(file).metadata())) backup(file);
 
 const done = await upscaleCritIcons(files);
 const sheet = await writeContactSheet(
   done.map((file) => [path.basename(file, ".webp"), file]),
   path.join(WORK, "_sheets", "upscaled.png"),
 );
-console.log(`upscaled ${done.length} icon(s)${sheet ? `; ${path.relative(ROOT, sheet)}` : ""}`);
+console.log(
+  `upscaled ${done.length} icon(s)${sheet ? `; ${path.relative(ROOT, sheet)}` : ""}`,
+);

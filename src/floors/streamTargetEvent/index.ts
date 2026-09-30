@@ -152,7 +152,7 @@ export function registerStreamTargetEvent(
       running = null;
       def.setHidden(null);
       unfreezeScreen();
-      // the crit's tier is revealed as the target slams down
+      // the crit's tier is revealed as the target jumps
       const reveal = () => def.onEnd(floor, tier, context, target.floor);
       if (def.slamPart) triggerEventEndSlam(target.floor, def.slamPart, reveal);
       else reveal();

@@ -7,9 +7,9 @@
 import { COLOR } from "../../palette";
 import { drawTwinkle } from "../twinkle";
 import { drawGoldShimmer } from "../goldShimmer";
-import { drawCartoonText } from "../../utils";
+import { createTextGlossyGradient, drawCartoonText } from "../../utils";
 import { isDetachedJobRunning } from "../detachedJob";
-import { playExplosion } from "../../sound";
+import { holdExplosions, playExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 
 export const GLOBAL_SLAM = {};
@@ -59,19 +59,22 @@ let lastImpactAt = -Infinity;
 // how long after triggerEventEndSlam the target hits down
 export const SLAM_LAND_MS = SLAM_MS * LAND_AT;
 
-// onImpact runs as the target hits down, for anything that should land with it
+// onStart runs as the jump starts (the notification it lands with); any
+// explosion it plays is held so the bang comes on the impact instead
 export function triggerEventEndSlam(
   owner: object,
   part: string,
-  onImpact?: () => void,
+  onStart?: () => void,
 ): void {
   let parts = slams.get(owner);
   if (!parts) slams.set(owner, (parts = new Map()));
   parts.set(part, Date.now());
   if (isDetachedJobRunning()) {
-    onImpact?.();
+    onStart?.();
     return;
   }
+  holdExplosions(SLAM_LAND_MS);
+  onStart?.();
   // the stream ends on the impact: an explosion and a screen shake
   setTimeout(() => {
     const now = Date.now();
@@ -80,7 +83,6 @@ export function triggerEventEndSlam(
       playExplosion();
       shakeScreen(IMPACT_SHAKE);
     }
-    onImpact?.();
   }, SLAM_LAND_MS);
 }
 
@@ -334,8 +336,11 @@ export function drawSlamText(
     ctx.restore();
   }
   const strength = textFxStrength(landed);
-  // the x25 crit's yellow, easing back to the normal color at the end
-  const gold = Math.min(1, strength / 0.25);
+  // a pure yellow gold, spanning the glyphs themselves
+  const goldFill =
+    strength > 0
+      ? createTextGlossyGradient(ctx, text, y, COLOR.heavenlyGold)
+      : null;
   const sweep = landed ? flashStrength(landed) : 0;
   let shine: CanvasGradient | null = null;
   if (sweep > 0) {
@@ -360,14 +365,8 @@ export function drawSlamText(
       ctx.save();
       place(l.centerX, l.hop);
     }
-    ctx.fillStyle = fillColor;
+    ctx.fillStyle = goldFill ?? fillColor;
     ctx.fillText(l.char, l.x, y);
-    if (gold > 0) {
-      ctx.globalAlpha = gold;
-      ctx.fillStyle = COLOR.starYellow;
-      ctx.fillText(l.char, l.x, y);
-      ctx.globalAlpha = 1;
-    }
     if (shine) {
       ctx.globalCompositeOperation = "lighter";
       ctx.globalAlpha = 0.9;

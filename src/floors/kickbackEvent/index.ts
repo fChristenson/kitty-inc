@@ -171,7 +171,7 @@ function startKickback(floor: Floor, context: EventProcContext): void {
     unfreezeScreen();
     addTotalIncome(multiply(getTotalIncome(), participants.length));
     triggerHudTotalFlash();
-    // the covered crit's own tier, revealed as the total slams down
+    // the covered crit's own tier, revealed as the total jumps
     triggerEventEndSlam(GLOBAL_SLAM, "total", () =>
       context.applyTierCrit?.(floor, tier),
     );

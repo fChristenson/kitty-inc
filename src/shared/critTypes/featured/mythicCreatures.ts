@@ -405,4 +405,12 @@ export const MYTHIC_CREATURES_CRITS = {
     reward: (_context, { actions, balance }) =>
       actions.addIncomeSeconds(balance.velvetManticore3Seconds),
   },
+  mewtwo: {
+    label: "Mewtwo",
+    color: COLOR.disabledGray,
+    image: "crits/mythicCreatures/mewtwo.webp",
+    description: "Spreads 92 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.mewtwoUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

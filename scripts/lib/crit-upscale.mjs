@@ -70,6 +70,7 @@ export async function upscaleCritIcons(files) {
       .toFile(icon.file);
     done.push(icon.file);
   }
-  for (const dir of [inDir, outDir]) fs.rmSync(dir, { recursive: true, force: true });
+  for (const dir of [inDir, outDir])
+    fs.rmSync(dir, { recursive: true, force: true });
   return done;
 }
