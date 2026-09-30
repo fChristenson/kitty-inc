@@ -22,7 +22,6 @@ import {
   drawStreamOverlay,
   EVENT_STREAM_DURATION_MS,
   streamEventCoins,
-  streamGrowth,
 } from "./coinStream";
 import {
   endEventProc,
@@ -80,7 +79,6 @@ function drawOverlay(
 ): void {
   const boost = running;
   if (!boost) return;
-  const eased = streamGrowth(boost.startedAt, performance.now());
   drawStreamOverlay(
     ctx,
     getFloorRect,
@@ -93,7 +91,6 @@ function drawOverlay(
         ctx,
         boost.floor,
         boost.workerIndex,
-        eased,
         tension.white,
         tension.rotation,
       ),

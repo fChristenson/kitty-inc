@@ -20,7 +20,6 @@ import { armUnionEvent, isUnionEventArmed } from "../upgradeButton";
 import {
   EVENT_STREAM_DURATION_MS,
   streamCoins,
-  streamGrowth,
 } from "../boostEvent/coinStream";
 import { endEventProc, registerEventProc, trackEventProc } from "../eventProcs";
 import {
@@ -75,19 +74,17 @@ function drawOverlay(
     return;
   }
   const now = performance.now();
-  const eased = streamGrowth(union.startedAt, now);
   ctx.save();
   ctx.translate(rect.left, rect.top);
   const { targetIndex, mergedIndexes } = union.plan;
   const { white, rotation } = union.fx.tension(now);
   for (const index of mergedIndexes)
-    drawWorkerSpotlight(ctx, union.floor, index, 0, white, rotation);
+    drawWorkerSpotlight(ctx, union.floor, index, white, rotation);
   union.fx.draw(ctx, union.target.x, union.target.y, (tension) =>
     drawWorkerSpotlight(
       ctx,
       union.floor,
       targetIndex,
-      eased,
       tension.white,
       tension.rotation,
     ),

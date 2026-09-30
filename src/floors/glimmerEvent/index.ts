@@ -217,7 +217,7 @@ function drawCandidates(ctx: CanvasRenderingContext2D, leg: Leg): void {
   for (const index of leg.candidates) {
     ctx.save();
     if (!leg.lit.has(index)) ctx.filter = dim;
-    drawWorkerSpotlight(ctx, leg.floor, index, 0, 0, 0);
+    drawWorkerSpotlight(ctx, leg.floor, index, 0, 0);
     ctx.restore();
   }
 }

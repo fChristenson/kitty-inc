@@ -115,7 +115,7 @@ function drawOverlay(
     if (!rect) continue;
     ctx.save();
     ctx.translate(rect.left, rect.top);
-    drawWorkerSpotlight(ctx, floor, workerIndex, 0, white, rotation);
+    drawWorkerSpotlight(ctx, floor, workerIndex, white, rotation);
     ctx.restore();
   }
   // the spotlit total, with its lights and beats, is drawn live on top by the game canvas

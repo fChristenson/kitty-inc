@@ -130,7 +130,7 @@ export const WARHAMMER_CRITS = {
       ),
   },
   emperorsDividends: {
-    label: "Emperor's Dividends",
+    label: "Praise The Emperor",
     color: COLOR.blue,
     image: "crits/warhammer/emperorsDividends.webp",
     description: "Raises alternating floors to the building's top level",
@@ -191,8 +191,13 @@ export const WARHAMMER_CRITS = {
     label: "Cobalt Juggernaut",
     color: COLOR.nightOwlIndigo,
     image: "crits/warhammer/cobaltJuggernaut.webp",
-    description: "Repeats the crit on the floor below, 10% chance to keep falling",
+    description:
+      "Repeats the crit on the floor below, 10% chance to keep falling",
     reward: (context, { actions, balance }) =>
-      actions.repeatCrit(context, "down", balance.cobaltJuggernautContinueChance),
+      actions.repeatCrit(
+        context,
+        "down",
+        balance.cobaltJuggernautContinueChance,
+      ),
   },
 } as const satisfies Record<string, FeaturedCritDefinition>;
