@@ -4,7 +4,7 @@
 // Bump CACHE_NAME whenever this file's own strategy changes, to drop any stale cache.
 // Also bump it when shipped art is replaced in place (v6: crit icons upscaled),
 // or returning players keep seeing the old cached files.
-const CACHE_NAME = "kitty-inc-v7";
+const CACHE_NAME = "kitty-inc-v9";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
