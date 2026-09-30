@@ -406,7 +406,7 @@ export const MYTHIC_CREATURES_CRITS = {
       actions.addIncomeSeconds(balance.velvetManticore3Seconds),
   },
   mewtwo: {
-    label: "Mewtwo",
+    label: "Not my destiny",
     color: COLOR.disabledGray,
     image: "crits/mythicCreatures/mewtwo.webp",
     description: "Spreads 92 free upgrades over the lowest-level floors",
