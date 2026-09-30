@@ -34,6 +34,7 @@ import {
   startIncomeTicker,
   ensureLockedFloorAbove,
   getBuildingUnlockAllCost,
+  getUniformCritTier,
   unlockAllFloors,
   getActiveBackgrounds,
   applyChainCrit,
@@ -1251,14 +1252,8 @@ async function main() {
         unlockedFloors.every((floor) => floor.hasManager)
       );
     },
-    getBuildingCritTier: (buildingIndex) => {
-      const floors = buildings[buildingIndex];
-      if (!floors || floors.length === 0) return null;
-      const tier = floors[0].critMultiplierTier;
-      return tier && floors.every((floor) => floor.critMultiplierTier === tier)
-        ? tier
-        : null;
-    },
+    getBuildingCritTier: (buildingIndex) =>
+      getUniformCritTier(buildings[buildingIndex] ?? []),
     getBuildingUnlockAllCost: (buildingIndex) =>
       getBuildingUnlockAllCost(
         buildings[buildingIndex] ?? [],

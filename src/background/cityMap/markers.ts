@@ -337,7 +337,7 @@ export function drawLockedMarkerPrice(
 
 // "3/20" floor-count readout under an already-bought building's own marker —
 // how many of MAX_FLOORS_PER_BUILDING (floors/floorLock.ts) it's grown to.
-// Plain white by default; a building whose floors all share the same crit tier
+// Plain white by default; a building with a baseline crit tier
 // (see cityMap/index.ts's getBuildingCritTier) passes that tier's own color,
 // rendered with the same light-to-tier-color glossy gradient screenShake.ts's
 // own crit flash text uses (scaled down to this marker's much smaller font)

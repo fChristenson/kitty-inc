@@ -122,9 +122,9 @@ export interface CityMapDeps {
   getActiveBuildingIndex: () => number; // whichever building's floors are on screen right now
   getBuildingFloorCount: (buildingIndex: number) => number; // for the "X/20" marker readout
   isBuildingFullyManaged: (buildingIndex: number) => boolean;
-  // the crit tier EVERY floor of this building currently shares (see
-  // setBuildingCritTier below), or null if they don't all match — colors the
-  // "X/20" marker readout so a crit-maxed building stands out on the map
+  // the building's baseline crit tier (the lowest tier any of its floors has,
+  // see getUniformCritTier), or null — colors the "X/20" marker readout so a
+  // crit building stands out on the map
   getBuildingCritTier: (buildingIndex: number) => CritTier | null;
   // $ to unlock EVERY remaining locked floor in a building at once — ZERO once
   // there's nothing left to buy (already maxed). Drives the green buy-all-floors
