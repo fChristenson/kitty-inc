@@ -1146,4 +1146,116 @@ export const ROMANCE_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash([context.floor], balance.lipstickTrailMultiple),
   },
+  blueBobSmooch: {
+    label: "Blue Bob Smooch",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/blueBobSmooch.webp",
+    description: "Pays 64 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.blueBobSmoochMultiple),
+  },
+  braidsAndCurls: {
+    label: "Braids And Curls",
+    color: COLOR.supplyRunTan,
+    image: "crits/romance/braidsAndCurls.webp",
+    description: "Grows this floor's level by 9.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.braidsAndCurlsGrowth),
+  },
+  cheekSmoochDuo: {
+    label: "Cheek Smooch Duo",
+    color: COLOR.amberMuted,
+    image: "crits/romance/cheekSmoochDuo.webp",
+    description: "Spreads 36 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.cheekSmoochDuoUpgrades),
+  },
+  cottonCandyCuddle: {
+    label: "Cotton Candy Cuddle",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/romance/cottonCandyCuddle.webp",
+    description: "Pays 65 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.cottonCandyCuddleMultiple),
+  },
+  greenCheekLick: {
+    label: "Green Cheek Lick",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/romance/greenCheekLick.webp",
+    description: "Grows this floor's level by 9.6% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.greenCheekLickGrowth),
+  },
+  leggingsLeanIn: {
+    label: "Leggings Lean In",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/romance/leggingsLeanIn.webp",
+    description: "Spreads 37 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.leggingsLeanInUpgrades),
+  },
+  platinumPeck: {
+    label: "Platinum Peck",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/platinumPeck.webp",
+    description: "Pays 66 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.platinumPeckMultiple),
+  },
+  ponytailPucker: {
+    label: "Ponytail Pucker",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/ponytailPucker.webp",
+    description: "Grows this floor's level by 9.7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.ponytailPuckerGrowth),
+  },
+  tealBraidNuzzle: {
+    label: "Teal Braid Nuzzle",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/tealBraidNuzzle.webp",
+    description: "Spreads 38 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.tealBraidNuzzleUpgrades),
+  },
+  tongueTango: {
+    label: "Tongue Tango",
+    color: COLOR.starYellow,
+    image: "crits/romance/tongueTango.webp",
+    description: "Pays 67 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.tongueTangoMultiple),
+  },
+  buzzcutBraidBuddies: {
+    label: "Buzzcut Braid Buddies",
+    color: COLOR.amberMuted,
+    image: "crits/romance/buzzcutBraidBuddies.webp",
+    description: "Pays 68 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.buzzcutBraidBuddiesMultiple),
+  },
+  hoopEarringKiss: {
+    label: "Hoop Earring Kiss",
+    color: COLOR.sameBoatCoral,
+    image: "crits/romance/hoopEarringKiss.webp",
+    description: "Grows this floor's level by 9.9% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.hoopEarringKissGrowth),
+  },
+  pinkBraidSnuggle: {
+    label: "Pink Braid Snuggle",
+    color: COLOR.summerSaleOrange,
+    image: "crits/romance/pinkBraidSnuggle.webp",
+    description: "Spreads 40 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.pinkBraidSnuggleUpgrades),
+  },
+  violetWavesKiss: {
+    label: "Violet Waves Kiss",
+    color: COLOR.coinGold,
+    image: "crits/romance/violetWavesKiss.webp",
+    description: "Pays 69 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.violetWavesKissMultiple),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

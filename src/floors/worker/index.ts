@@ -123,20 +123,53 @@ let workerSprite: HTMLImageElement | null = null;
 // currently represents a floor's hired manager (see drawWorker below) uses this
 // sheet instead of catSpriteUrl, going through the exact same tint/movement code
 let managerSprite: HTMLImageElement | null = null;
+// a regular worker boosted to any perma crit tier wears this instead
+let permaWorkerSprite: HTMLImageElement | null = null;
+// and a boosted manager wears this
+let permaManagerSprite: HTMLImageElement | null = null;
 let spritesLoaded = false;
+// a sheet with taller cells than the base one (room for a hat) renders taller,
+// so its cat keeps the base sheet's pixel scale
+const renderHeights = new WeakMap<HTMLImageElement, number>();
+
+function renderHeightOf(sprite: HTMLImageElement): number {
+  return renderHeights.get(sprite) ?? RENDER_H;
+}
 
 // loads (or reuses, once already loaded) the base sprite sheets and makes them
 // the active pair drawWorker reads from
 export async function loadWorkerSprite(): Promise<HTMLImageElement> {
   if (spritesLoaded) return workerSprite!;
-  const [worker, manager] = await Promise.all([
+  const [worker, rapper, manager, diva] = await Promise.all([
     loadSprite("worker"),
+    loadSprite("workerRapper"),
     loadSprite("manager"),
+    loadSprite("managerDiva"),
   ]);
   workerSprite = worker;
+  permaWorkerSprite = rapper;
+  renderHeights.set(
+    rapper,
+    (RENDER_H * rapper.naturalHeight) / worker.naturalHeight,
+  );
   managerSprite = manager;
+  permaManagerSprite = diva;
+  renderHeights.set(
+    diva,
+    (RENDER_H * diva.naturalHeight) / manager.naturalHeight,
+  );
   spritesLoaded = true;
   return worker!;
+}
+
+function workerSpriteFor(
+  floor: Floor,
+  workerIndex: number,
+  isManager: boolean,
+): HTMLImageElement | null {
+  const boosted = Boolean(getWorkerPermaTier(floor, workerIndex));
+  if (isManager) return boosted ? permaManagerSprite : managerSprite;
+  return boosted ? permaWorkerSprite : workerSprite;
 }
 
 const workerIconUrlBySprite = new Map<HTMLImageElement, string>();
@@ -571,8 +604,11 @@ export function drawWorkerSpotlight(
   const pose = walker?.pose;
   if (!walker || !pose) return;
   const tier = getWorkerPermaTier(floor, workerIndex);
-  const sprite =
-    workerIndex === managerIndexOf(floor) ? managerSprite : workerSprite;
+  const sprite = workerSpriteFor(
+    floor,
+    workerIndex,
+    workerIndex === managerIndexOf(floor),
+  );
   const now = Date.now();
   const slam = getSlamPose(floor, `worker${workerIndex}`, now);
   drawSlamTarget(ctx, slam, figureBox(walker.x), "figure", draw, now);
@@ -859,17 +895,18 @@ function drawFigure(
   whiteAlpha = 0,
 ): void {
   const recolored = getRecoloredFrame(frame, tintIndex, sprite);
-  if (!recolored) return;
+  if (!recolored || !sprite) return;
   const image =
     whiteAlpha > 0
       ? whitenImage(recolored, recolored.width, recolored.height, whiteAlpha)
       : recolored;
-  const renderW = (RENDER_H * recolored.width) / recolored.height;
+  const renderH = renderHeightOf(sprite);
+  const renderW = (renderH * recolored.width) / recolored.height;
 
   ctx.save();
   ctx.translate(cx, groundY);
   ctx.scale(isMirrored(frame, direction) ? -stretchX : stretchX, stretchY);
-  ctx.drawImage(image, -renderW / 2, -RENDER_H, renderW, RENDER_H);
+  ctx.drawImage(image, -renderW / 2, -renderH, renderW, renderH);
   ctx.restore();
 }
 
@@ -971,7 +1008,8 @@ function drawPermaGlow(
   const pulse =
     0.5 +
     0.5 * Math.sin((2 * Math.PI * performance.now()) / PERMA_GLOW_PULSE_MS);
-  const scale = RENDER_H / sprite.naturalHeight;
+  const renderH = renderHeightOf(sprite);
+  const scale = renderH / sprite.naturalHeight;
   const w = glow.width * scale;
   const h = glow.height * scale;
   const pad = ((glow.height - sprite.naturalHeight) / 2) * scale;
@@ -984,10 +1022,10 @@ function drawPermaGlow(
     pose.stretchY,
   );
   // swell outward from the body's middle, not from the feet
-  ctx.translate(0, -RENDER_H / 2);
+  ctx.translate(0, -renderH / 2);
   ctx.scale(grow, grow);
-  ctx.translate(0, RENDER_H / 2);
-  ctx.drawImage(glow, -w / 2, -RENDER_H - pad, w, h);
+  ctx.translate(0, renderH / 2);
+  ctx.drawImage(glow, -w / 2, -renderH - pad, w, h);
   ctx.restore();
 }
 
@@ -1197,7 +1235,7 @@ export function drawWorker(
       stretchY,
     };
     if (spotlight.get(floor)?.includes(i)) return;
-    const sprite = i === managerWalkerIndex ? managerSprite : workerSprite;
+    const sprite = workerSpriteFor(floor, i, i === managerWalkerIndex);
     const permaTier = getWorkerPermaTier(floor, i);
     if (permaTier) drawPermaTrail(ctx, walker, permaTier, now);
     const slam = getSlamPose(floor, `worker${i}`, now);

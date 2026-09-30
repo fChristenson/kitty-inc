@@ -33,7 +33,9 @@ const cloudFiles = [
 // Every sprite this game loads, by logical name -> its filename in public/assets/.
 const SPRITE_FILES = {
   worker: "workerWalk.webp",
+  workerRapper: "workerRapper.webp",
   manager: "managerWalk.webp",
+  managerDiva: "managerDiva.webp",
   coinSpin: "coinSpin.webp",
   cashBill: "cashBillFlutter.webp",
 } as const;
