@@ -362,4 +362,12 @@ export const CYBERPUNK_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.boostWorkers(context.floors, balance.miniMechaHelmBoostSeconds, balance.miniMechaHelmExtraWorkers),
   },
+  deusEx: {
+    label: "Deus Ex",
+    color: COLOR.overflowBlue,
+    image: "crits/cyberpunk/deusEx.webp",
+    description: "Grows this floor's level by 12.7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.deusExGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

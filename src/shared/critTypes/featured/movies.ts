@@ -117,4 +117,12 @@ export const MOVIES_CRITS = {
         Math.floor(topLevel(context) / 2),
       ),
   },
+  wreckIt: {
+    label: "Wreck It",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/movies/wreckIt.webp",
+    description: "Spreads 93 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.wreckItUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

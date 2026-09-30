@@ -169,4 +169,12 @@ export const CRITTERS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.boostWorkers(context.floors, balance.corgiCrossingBoostSeconds, balance.corgiCrossingExtraWorkers),
   },
+  feetsOfFury: {
+    label: "Feets Of Fury",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/critters/feetsOfFury.webp",
+    description: "Pays 26 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.feetsOfFuryMultiple),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

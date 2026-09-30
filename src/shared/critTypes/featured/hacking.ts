@@ -290,4 +290,20 @@ export const HACKING_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.repeatCrit(context, "both", balance.beanieBuildContinueChance),
   },
+  anonymous: {
+    label: "Anonymous",
+    color: COLOR.overflowBlue,
+    image: "crits/hacking/anonymous.webp",
+    description: "Spreads 53 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.anonymousUpgrades),
+  },
+  anonymousDonor: {
+    label: "Black hat",
+    color: COLOR.overflowBlue,
+    image: "crits/hacking/anonymousDonor.webp",
+    description: "Pays 20 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.anonymousDonorMultiple),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

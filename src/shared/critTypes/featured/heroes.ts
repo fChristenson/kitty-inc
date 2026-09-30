@@ -137,4 +137,12 @@ export const HEROES_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.growLevels([context.floor], balance.uchihaItachiGrowth),
   },
+  geralt: {
+    label: "Butcher of Blaviken",
+    color: COLOR.easterSalePink,
+    image: "crits/heroes/geralt.webp",
+    description: "Grows this floor's level by 12.8% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.geraltGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

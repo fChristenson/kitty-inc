@@ -1879,4 +1879,60 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance, highestFloor }) =>
       actions.addUpgradePriceCash([highestFloor(context)], balance.olivePoutMultiple),
   },
+  axeDeduction: {
+    label: "Axe Deduction",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/muscleGirls/axeDeduction.webp",
+    description: "Pays 11 times every unlocked floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash(context.floors, balance.axeDeductionMultiple),
+  },
+  chopChop: {
+    label: "Chop Chop",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/muscleGirls/chopChop.webp",
+    description: "Grows this floor's level by 12.9% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.chopChopGrowth),
+  },
+  norseCode: {
+    label: "Norse Code",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/muscleGirls/norseCode.webp",
+    description: "Spreads 94 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.norseCodeUpgrades),
+  },
+  plunderPose: {
+    label: "Plunder Pose",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/muscleGirls/plunderPose.webp",
+    description: "Pays 27 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.plunderPoseMultiple),
+  },
+  raidDay: {
+    label: "Raid Day",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/raidDay.webp",
+    description: "Grows this floor's level by 13% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.raidDayGrowth),
+  },
+  shieldMaiden: {
+    label: "Shield Maiden",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/muscleGirls/shieldMaiden.webp",
+    description: "Spreads 95 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.shieldMaidenUpgrades),
+  },
+  valhallaVenture: {
+    label: "Valhalla Venture",
+    color: COLOR.supplyRunTan,
+    image: "crits/muscleGirls/valhallaVenture.webp",
+    description: "Pays 21 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.valhallaVentureMultiple),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
