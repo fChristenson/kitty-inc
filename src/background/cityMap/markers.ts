@@ -193,12 +193,13 @@ export function drawCatMarker(
   frame: number,
   grayedOut: boolean,
   jumpOffsetY = 0,
+  renderH = MARKER_H,
 ): void {
   if (!catSprite || catSprite.naturalWidth === 0) return;
   const { cx, feetY } = markerCenter(cssW, cssH, buildingIndex);
   const frameW = catSprite.naturalWidth / CAT_FRAME_COUNT;
   const frameH = catSprite.naturalHeight;
-  const renderW = (MARKER_H * frameW) / frameH;
+  const renderW = (renderH * frameW) / frameH;
   if (grayedOut) {
     ctx.save();
     ctx.globalAlpha = 0.75;
@@ -219,9 +220,9 @@ export function drawCatMarker(
     frameW,
     frameH,
     cx - renderW / 2,
-    feetY - MARKER_H + jumpOffsetY,
+    feetY - renderH + jumpOffsetY,
     renderW,
-    MARKER_H,
+    renderH,
   );
 }
 

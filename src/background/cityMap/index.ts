@@ -105,15 +105,32 @@ export interface CheapestBatch {
 let mapImage: HTMLImageElement | null = null;
 let catSprite: HTMLImageElement | null = null;
 let managerSprite: HTMLImageElement | null = null;
+// worn instead once every floor of the building is at least the first crit tier
+let permaCatSprite: HTMLImageElement | null = null;
+let permaManagerSprite: HTMLImageElement | null = null;
 
-// loads the map screen's own backdrop + marker cat sprite
+// loads the map screen's own backdrop + marker cat sprites
 export async function loadCityMapImage(): Promise<HTMLImageElement> {
-  [mapImage, catSprite, managerSprite] = await Promise.all([
-    loadImageByName("cityMapBackground"),
-    loadSprite("worker"),
-    loadSprite("manager"),
-  ]);
+  [mapImage, catSprite, managerSprite, permaCatSprite, permaManagerSprite] =
+    await Promise.all([
+      loadImageByName("cityMapBackground"),
+      loadSprite("worker"),
+      loadSprite("manager"),
+      loadSprite("workerRapper"),
+      loadSprite("managerDiva"),
+    ]);
   return mapImage!;
+}
+
+// a taller sheet (room for a hat) renders taller so its cat keeps the base scale
+function markerHeightFor(
+  sprite: HTMLImageElement | null,
+  base: HTMLImageElement | null,
+): number {
+  if (!sprite || !base || sprite === base || base.naturalHeight === 0) {
+    return MARKER_H;
+  }
+  return (MARKER_H * sprite.naturalHeight) / base.naturalHeight;
 }
 
 export interface CityMapDeps {
@@ -609,9 +626,14 @@ export function createCityMapView(
     for (let i = 0; i < MARKER_COUNT; i++) {
       const globalIndex = cityIndex * MARKER_COUNT + i;
       if (globalIndex < buildingCount) {
-        const markerSprite = deps.isBuildingFullyManaged(globalIndex)
-          ? managerSprite
-          : catSprite;
+        const managed = deps.isBuildingFullyManaged(globalIndex);
+        const perma = deps.getBuildingCritTier(globalIndex) !== null;
+        const baseSprite = managed ? managerSprite : catSprite;
+        const markerSprite = perma
+          ? managed
+            ? permaManagerSprite
+            : permaCatSprite
+          : baseSprite;
         const jumpOffsetY = getMarkerJumpOffset(globalIndex, Date.now());
         if (jumpOffsetY !== 0) hasActiveMarkerJump = true;
         // the hop always wins the pose, same as a worker's click reaction always
@@ -631,6 +653,7 @@ export function createCityMapView(
           frame,
           false,
           jumpOffsetY,
+          markerHeightFor(markerSprite, baseSprite),
         );
         const { cx, feetY } = markerCenter(cssW, cssH, i);
         const critTier = deps.getBuildingCritTier(globalIndex);
