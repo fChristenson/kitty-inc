@@ -425,6 +425,11 @@ function regularWorkerCount(floor: Floor): number {
   return getRenderedWorkerCount(floor) - (floor.hasManager ? 1 : 0);
 }
 
+// how many more regular workers the floor has room for
+export function missingWorkerCount(floor: Floor): number {
+  return Math.max(0, MAX_RENDERED_WORKERS - regularWorkerCount(floor));
+}
+
 const OPEN_SPOT_SAMPLES = 24;
 
 // the walkable spot farthest from every walker on the floor (floor-local

@@ -18,7 +18,7 @@ import {
   startMoneyCover,
   type CoverArea,
 } from "../moneyCover";
-import { pathsAlong } from "../riverPaths";
+import { pathsAlong, roundCorners } from "../riverPaths";
 
 const KEY = "ricochet";
 const BOUNCES: [number, number] = [3, 5];
@@ -71,37 +71,7 @@ function bounceLine(area: CoverArea, start: Pt, bounces: number) {
     along += length(corners[i - 1], corners[i]);
     if (i >= 2) bounceAt.push(along);
   }
-  const line: Pt[] = [corners[0]];
-  for (let i = 1; i < corners.length - 1; i++) {
-    const a = corners[i - 1];
-    const b = corners[i];
-    const c = corners[i + 1];
-    const ab = length(a, b);
-    const bc = length(b, c);
-    const r = Math.min(BOUNCE_RADIUS, ab / 2, bc / 2);
-    if (r <= 0) {
-      line.push(b);
-      continue;
-    }
-    const p = {
-      x: b.x + ((a.x - b.x) / ab) * r,
-      y: b.y + ((a.y - b.y) / ab) * r,
-    };
-    const q = {
-      x: b.x + ((c.x - b.x) / bc) * r,
-      y: b.y + ((c.y - b.y) / bc) * r,
-    };
-    // a tight curve from p to q, bent towards the bounce point b
-    for (let j = 0; j <= BOUNCE_STEPS; j++) {
-      const t = j / BOUNCE_STEPS;
-      const u = 1 - t;
-      line.push({
-        x: u * u * p.x + 2 * u * t * b.x + t * t * q.x,
-        y: u * u * p.y + 2 * u * t * b.y + t * t * q.y,
-      });
-    }
-  }
-  line.push(corners[corners.length - 1]);
+  const line = roundCorners(corners, BOUNCE_RADIUS, BOUNCE_STEPS);
   let total = 0;
   for (let i = 1; i < corners.length; i++)
     total += length(corners[i - 1], corners[i]);

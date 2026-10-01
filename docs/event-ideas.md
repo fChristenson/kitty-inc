@@ -18,7 +18,6 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Magnet**: coins pop up all over the screen and get yanked in under a big horseshoe magnet, then flung into the total. Pays floor income × floor number × floors on screen.
 - [x] **Spillover** (was Overflow, a crit name already): the button pours coins into the income bar until it brims over and slams full, then the overflow spills into the total. Pays the full bar plus 2 bonus payouts and restarts the bar.
 - [x] **Waterfall**: coins spill from the top floor in view and tumble down the building's side floor by floor, every button tipping more in, then the falls pour into the total. Payout grows per floor passed.
-- [ ] **Conveyor**: a belt of coins rolls along under the floors in view; each floor's button tosses its own handful on as it passes, then the belt dumps into the total. Pays every floor in view its own payout.
 - [ ] **Coin Toss**: coins stream into one giant coin that flips high, spinning, and lands with a slam. Heads pays ×3, tails ×2 of floor income × floor number.
 - [ ] **Hourglass**: coins pour into an hourglass that flips over, and the coins trickle out of it into the total. Pays a minute of the building's income.
 - [ ] **Rocket**: coins pour into a rocket on the clicked floor that launches up through every floor in view and bursts into a coin firework over the total. Pays the floor's payout once per floor it flies past.
@@ -36,6 +35,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Polish**: lights swirl around the upgrade button and buff it until it shines. Free upgrade levels.
 - [x] **Recruit**: lights stream to an empty spot and form a new worker. A free hire.
 - [x] **Promotion Day**: lights rise from every worker into the floor's tier badge. Floor tier +1.
+- [x] **Conveyor**: glimmer hooks glide in dead straight along a rail, one per worker a floor in view is missing, each dropping its worker onto the floor like a conveyor hook. Fills the floor to its worker cap.
 - [ ] **Meteor Shower**: 3–6 small shooting stars streak down one after another, each striking a different worker. +1 tier per worker struck.
 - [ ] **Fireflies**: lights drift in and wander the floor, then settle one by one into its empty spots, each forming a new worker. Fills the floor to its worker cap.
 - [ ] **Lighthouse**: a beam from the button sweeps round the screen like a lighthouse; every upgrade button it lights shines. Free upgrade levels on every floor in view.

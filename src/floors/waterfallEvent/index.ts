@@ -10,14 +10,13 @@ import { COLOR } from "../../palette";
 import { playBoostEventStream } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { pickCritTierByOdds } from "../../shared/critTypes";
-import { isFloorLocked } from "../../shared/detachedJob";
-import { BTN_W, forceTestCrit, getButtonCenter } from "../upgradeButton";
+import { BTN_W, forceTestCrit } from "../upgradeButton";
 import {
   forceClaimEventProc,
-  isVisibleOnFloor,
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { findOnScreenButtons } from "../onScreenButtons";
 import {
   canStartMoneyCover,
   FLOW_FLIGHT_MS,
@@ -46,22 +45,9 @@ type Pt = { x: number; y: number };
 
 // every open floor's button in view, top first, local to floor's own space
 function findLedges(floor: Floor, context: EventProcContext): Pt[] {
-  const onScreen = context.getOnScreenFloors?.() ?? [];
-  const top = onScreen.find((entry) => entry.floor === floor)?.top;
-  if (top === undefined) return [];
-  return onScreen
-    .filter((entry) => entry.floor.unlocked && !isFloorLocked(entry.floor))
-    .map((entry) => {
-      const button = getButtonCenter(context.floors.indexOf(entry.floor) === 0);
-      return { entry, button };
-    })
-    .filter(({ entry, button }) => isVisibleOnFloor(entry, button.y))
-    .sort((a, b) => a.entry.top - b.entry.top)
+  return findOnScreenButtons(floor, context)
     .slice(0, CONFIG.waterfallEvent.maxFloors)
-    .map(({ entry, button }) => ({
-      x: button.x,
-      y: button.y + entry.top - top,
-    }));
+    .map(({ x, y }) => ({ x, y }));
 }
 
 // the falls' line: off each button, arcing out past its outer edge and down

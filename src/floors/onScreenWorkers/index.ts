@@ -4,6 +4,7 @@ import { critTierRank } from "../../shared/critTypes";
 import { isFloorLocked } from "../../shared/detachedJob";
 import { isVisibleOnFloor, type OnScreenFloors } from "../eventProcs";
 import {
+  findRecruitSpot,
   getBoostEventCandidates,
   getRenderedWorkerCount,
   getWorkerCenter,
@@ -41,6 +42,31 @@ export function findOnScreenWorkers(
     }
   }
   return workers;
+}
+
+export interface RecruitSpot {
+  floor: Floor;
+  // where a free hire would stand, local to its own floor
+  x: number;
+  y: number;
+}
+
+// every open floor in view with room for another worker, with where it'd
+// stand, while floor itself is in view too
+export function findRecruitSpots(
+  floor: Floor,
+  getOnScreenFloors: OnScreenFloors | undefined,
+): RecruitSpot[] {
+  const onScreen = getOnScreenFloors?.() ?? [];
+  if (!onScreen.some((entry) => entry.floor === floor)) return [];
+  const spots: RecruitSpot[] = [];
+  for (const entry of onScreen) {
+    if (!entry.floor.unlocked || isFloorLocked(entry.floor)) continue;
+    const spot = findRecruitSpot(entry.floor);
+    if (spot && isVisibleOnFloor(entry, spot.y))
+      spots.push({ floor: entry.floor, ...spot });
+  }
+  return spots;
 }
 
 // a random one of the lowest perma tier among the workers that can still climb

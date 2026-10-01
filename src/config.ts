@@ -185,6 +185,16 @@ export const CONFIG = {
     maxFloors: 5, // the most buttons the falls cascade over
   },
 
+  // src/floors/conveyorEvent — the rare "Conveyor" event: glimmer hooks glide
+  // in straight along a rail, one per worker a floor in view is missing, and
+  // drop each onto the floor: it fills up to its worker cap
+  conveyorEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    crossMs: 900, // a hook gliding the floor's whole width
+    staggerMs: 300, // between one hook setting off and the next
+    holdMs: 700, // after the last worker lands, before the screen unfreezes
+  },
+
   // src/floors/paydayEvent — the rare "Payday" event: every on-screen worker
   // streams coins into the clicked floor's button, which fires them into the
   // total, paying the floor's payout once per worker

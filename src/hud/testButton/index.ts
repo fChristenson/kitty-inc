@@ -121,6 +121,16 @@ export function wireWaterfallEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireConveyorEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-conveyor-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wirePaydayEventTestButton(
   container: HTMLElement,
   onClick: () => void,

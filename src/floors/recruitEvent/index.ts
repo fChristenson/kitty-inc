@@ -14,7 +14,6 @@ import {
   type StreamSource,
 } from "../../shared/eventStream";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
-import { isFloorLocked } from "../../shared/detachedJob";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -25,7 +24,6 @@ import { forceTestCrit } from "../upgradeButton";
 import {
   endEventProc,
   forceClaimEventProc,
-  isVisibleOnFloor,
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
@@ -33,11 +31,11 @@ import {
   celebrateWorkerBoost,
   clearWorkerSpotlight,
   drawWorkerSpotlight,
-  findRecruitSpot,
   recruitWorker,
   setWorkerSpotlight,
   WORKER_HEIGHT,
 } from "../worker";
+import { findRecruitSpots } from "../onScreenWorkers";
 
 const KEY = "recruit";
 // the forming worker grows from this share of its size up to full
@@ -68,15 +66,7 @@ let running: RunningRecruit | null = null;
 
 // an empty spot on a floor in view, the clicked floor's own first
 function findSpot(floor: Floor, context: EventProcContext): Spot | null {
-  const onScreen = context.getOnScreenFloors?.() ?? [];
-  if (!onScreen.some((entry) => entry.floor === floor)) return null;
-  const spots: Spot[] = [];
-  for (const entry of onScreen) {
-    if (!entry.floor.unlocked || isFloorLocked(entry.floor)) continue;
-    const spot = findRecruitSpot(entry.floor);
-    if (spot && isVisibleOnFloor(entry, spot.y))
-      spots.push({ floor: entry.floor, ...spot });
-  }
+  const spots = findRecruitSpots(floor, context.getOnScreenFloors);
   return (
     spots.find((s) => s.floor === floor) ??
     spots[Math.floor(Math.random() * spots.length)] ??

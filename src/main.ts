@@ -60,6 +60,7 @@ import {
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
+  forceConveyorEvent,
   forcePaydayEvent,
   forcePiggyBankEvent,
   forceJackpotReelsEvent,
@@ -160,6 +161,7 @@ import {
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
+  wireConveyorEventTestButton,
   wirePaydayEventTestButton,
   wirePiggyBankEventTestButton,
   wireJackpotReelsEventTestButton,
@@ -675,6 +677,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceWaterfallEvent(floor);
+    });
+    // same, for the Conveyor event
+    wireConveyorEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceConveyorEvent(floor);
     });
     // same, for the Payday event
     wirePaydayEventTestButton(app, () => {

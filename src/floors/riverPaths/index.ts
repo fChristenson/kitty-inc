@@ -174,6 +174,48 @@ export function riverPaths(
   return pathsAlong(riverLine(area, start, options), count, options.startWidth);
 }
 
+// a line through corners, each inner corner rounded over up to radius px
+// (in `steps` points), just enough that a stream's lanes don't jump there
+export function roundCorners(
+  corners: Pt[],
+  radius: number,
+  steps: number,
+): Pt[] {
+  const length = (a: Pt, b: Pt) => Math.hypot(b.x - a.x, b.y - a.y);
+  const line: Pt[] = [corners[0]];
+  for (let i = 1; i < corners.length - 1; i++) {
+    const a = corners[i - 1];
+    const b = corners[i];
+    const c = corners[i + 1];
+    const ab = length(a, b);
+    const bc = length(b, c);
+    const r = Math.min(radius, ab / 2, bc / 2);
+    if (r <= 0) {
+      line.push(b);
+      continue;
+    }
+    const p = {
+      x: b.x + ((a.x - b.x) / ab) * r,
+      y: b.y + ((a.y - b.y) / ab) * r,
+    };
+    const q = {
+      x: b.x + ((c.x - b.x) / bc) * r,
+      y: b.y + ((c.y - b.y) / bc) * r,
+    };
+    // a tight curve from p to q, bent towards the corner b
+    for (let j = 0; j <= steps; j++) {
+      const t = j / steps;
+      const u = 1 - t;
+      line.push({
+        x: u * u * p.x + 2 * u * t * b.x + t * t * q.x,
+        y: u * u * p.y + 2 * u * t * b.y + t * t * q.y,
+      });
+    }
+  }
+  line.push(corners[corners.length - 1]);
+  return line;
+}
+
 // one path per coin along line (floor-local points), each in its own swaying
 // lane of a stream startWidth px across where it starts, tapering to its head
 export function pathsAlong(
