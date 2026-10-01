@@ -374,6 +374,7 @@ export { forcePromotionDayEvent } from "./promotionDayEvent";
 export { forceAlchemyEvent } from "./alchemyEvent";
 export { forceInvestmentEvent } from "./investmentEvent";
 export { forceDividendsEvent } from "./dividendsEvent";
+export { forceHarvestEvent } from "./harvestEvent";
 export { forceWispEvent } from "./wispEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";

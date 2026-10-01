@@ -544,6 +544,20 @@ export const CONFIG = {
     payouts: 3, // the worker's floor's payouts paid into the total
   },
 
+  // src/floors/harvestEvent — the rare "Harvest" event: the button tosses a
+  // seed beside each worker on the floor; crops shoot up and their coins are
+  // yanked out like carrots into the total as each worker climbs a perma tier
+  harvestEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    seedMs: 500, // each seed's flight from the button to its patch
+    seedGapMs: 120, // between seeds
+    growMs: 1_200, // a crop growing until its coin is ripe
+    popGapMs: 350, // between coins yanked out, left to right
+    streamMs: 500, // each yanked coin's stream into the total
+    holdMs: 400, // after the last stream, before the screen unfreezes
+    payouts: 1, // the floor's payouts per crop
+  },
+
   // src/floors/wispEvent — the rare "Wisp" event: a playful wisp flits
   // between targets in view sprinkling glitter: a worker climbs one perma
   // tier, an income bar one crit tier, a "Lvl N" label gains free levels

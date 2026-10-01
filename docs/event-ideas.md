@@ -56,5 +56,5 @@ Built on `src/floors/revealStage`: the crit click slides a blue stage in over th
 - [x] **Alchemy**: coins stream into a cauldron, which bubbles and shoots lights into a worker. Tier upgrade plus a small payout.
 - [x] **Investment**: coins flow into the income bar, then lights burst out of it into the floor's tier. Payout, then a floor tier.
 - [x] **Dividends**: lights promote a worker, then that worker sprays a coin stream into the total. Tier upgrade plus a payout.
-- [ ] **Harvest**: lights fall onto the floor and sprout into little coin plants that grow, then burst into short coin streams into the total. Pays the floor's payout per plant, and the floor's workers each get +1 tier.
+- [x] **Harvest**: the button tosses a seed beside each worker on the floor; each lands in a puff of dirt and a leafy crop shoots up over a ripening gold coin. Left to right, every coin is yanked out like a carrot, spinning up and bursting into a coin stream into the total as its worker climbs. Pays the floor's payout per crop, and the floor's workers each get +1 tier.
 - [ ] **Coronation**: coins stream into a crown over a floor with no manager; it glows, sheds lights and a manager forms under it. A free manager plus a payout.

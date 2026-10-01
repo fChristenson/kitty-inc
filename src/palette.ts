@@ -221,6 +221,13 @@ export const COLOR = {
   hourglassWood: "#B9773D",
   hourglassWoodDark: "#8A5226",
 
+  // Harvest event's dirt patches, leafy tops and seeds
+  soil: "#8B5A33",
+  soilDark: "#4E301A",
+  cropLeaf: "#4CB944",
+  cropLeafLight: "#9BE36A",
+  seed: "#6B4A2B",
+
   // Rocket event's rocket and its flame
   rocketBody: "#F1F5F9",
   rocketRed: "#E11D48",

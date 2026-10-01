@@ -276,6 +276,16 @@ export function wireDividendsEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireHarvestEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-harvest-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireSparkChainEventTestButton(
   container: HTMLElement,
   onClick: () => void,

@@ -93,6 +93,7 @@ import {
   forceAlchemyEvent,
   forceInvestmentEvent,
   forceDividendsEvent,
+  forceHarvestEvent,
   forceWispEvent,
   forceStreamEvent,
   forceTrailsEvent,
@@ -207,6 +208,7 @@ import {
   wireAlchemyEventTestButton,
   wireInvestmentEventTestButton,
   wireDividendsEventTestButton,
+  wireHarvestEventTestButton,
   wireWispEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
@@ -938,6 +940,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceDividendsEvent(floor);
+    });
+    // same, for the Harvest event
+    wireHarvestEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceHarvestEvent(floor);
     });
     // same, for the Wisp event
     wireWispEventTestButton(app, () => {
