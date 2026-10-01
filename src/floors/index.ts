@@ -363,6 +363,7 @@ export { forceSonicBoomEvent } from "./sonicBoomEvent";
 export { forceMitosisEvent } from "./mitosisEvent";
 export { forcePlinkoEvent } from "./plinkoEvent";
 export { forceHammerThrowEvent } from "./hammerThrowEvent";
+export { forceSnakeEvent } from "./snakeEvent";
 export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forceWaterfallEvent } from "./waterfallEvent";

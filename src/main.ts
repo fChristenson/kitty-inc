@@ -82,6 +82,7 @@ import {
   forceMitosisEvent,
   forcePlinkoEvent,
   forceHammerThrowEvent,
+  forceSnakeEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -221,6 +222,7 @@ import {
   wireMitosisEventTestButton,
   wirePlinkoEventTestButton,
   wireHammerThrowEventTestButton,
+  wireSnakeEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -907,6 +909,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceHammerThrowEvent(floor);
+    });
+    // same, for the Snake event
+    wireSnakeEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceSnakeEvent(floor);
     });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {

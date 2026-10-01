@@ -638,6 +638,14 @@ export function wireHammerThrowEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireSnakeEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-snake-event")!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,
