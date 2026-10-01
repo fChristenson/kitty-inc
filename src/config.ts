@@ -136,8 +136,17 @@ export const CONFIG = {
   // floor's income times its floor number
   burstEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
-    durationMs: 1_000, // ~0.3s blast out, 0.5s hang, then the merge
+    durationMs: 1_000, // ~0.3s blast out, 0.2s hang, then the merge
     mergeMs: 500, // the last part, where the coins fly into the total
+  },
+
+  // src/floors/sprayEvent — the rare "Spray" event: like Burst, but the button
+  // sprays a stream sweeping round it instead of one explosion
+  sprayEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streamMs: 500, // how long the stream sprays
+    durationMs: 1_500, // stream, ~0.3s last coin out, 0.2s hang, then the merge
+    mergeMs: 500,
   },
 
   // src/floors/swarmEvent — the rare "Swarm" event: its proc animation leaves

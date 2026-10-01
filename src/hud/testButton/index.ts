@@ -73,6 +73,15 @@ export function wireBurstEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSprayEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-spray-event")!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireGlimmerEventTestButton(
   container: HTMLElement,
   onClick: () => void,
