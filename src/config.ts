@@ -175,6 +175,16 @@ export const CONFIG = {
     travelMs: 500, // each coin's trip, bounces and all
   },
 
+  // src/floors/waterfallEvent — the rare "Waterfall" event: coins spill off the
+  // top button in view and cascade down the building's side from button to
+  // button, each tipping in more, then pour into the total; pays the floor's
+  // payout once per button the falls pass
+  waterfallEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    dropMs: 250, // each coin's fall from one button to the next
+    maxFloors: 5, // the most buttons the falls cascade over
+  },
+
   // src/floors/paydayEvent — the rare "Payday" event: every on-screen worker
   // streams coins into the clicked floor's button, which fires them into the
   // total, paying the floor's payout once per worker
@@ -231,6 +241,18 @@ export const CONFIG = {
     chance: 0.01, // per crit whose special-crit gateway hit
     streamMs: 800, // how long it keeps raining
     travelMs: 500, // each drop's fall
+    hangMs: 300, // the pool resting after the last drop lands
+    mergeMs: 500, // the pool draining into the total
+    rewardMultiplier: 2, // on top of the floor's income times its floor number
+  },
+
+  // src/floors/trickleEvent — the rare "Trickle" event: like Downpour, but the
+  // coins bounce on every floor in view on their way down to the pool
+  trickleEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streamMs: 800, // how long it keeps raining
+    travelMs: 1_100, // each drop's fall, bounces and all
+    hangMs: 100, // the pool resting after the last drop lands
     mergeMs: 500, // the pool draining into the total
     rewardMultiplier: 2, // on top of the floor's income times its floor number
   },

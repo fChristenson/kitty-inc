@@ -14,8 +14,15 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Jackpot Reels**: coins stream into three slot reels, each stopping on ×1/×2/×5 with a slam. Pays the sum, tripled when all three match.
 - [x] **Chain Pay**: coins hop button → nearest worker → next nearest (up to 8), each worker slamming as it's paid, the last firing into the total. The n-th worker reached pays n payouts.
 - [x] **Downpour** (was Rain Check, a crit name already): coins rain down from above the screen and pool along its bottom, the pool rising, then it drains into the total. Pays floor income × floor number × 2.
+- [x] **Trickle**: rains like Downpour, but every coin bounces on each floor in view on its way down, then settles in the pool and drains into the total. Pays like Downpour.
 - [x] **Magnet**: coins pop up all over the screen and get yanked in under a big horseshoe magnet, then flung into the total. Pays floor income × floor number × floors on screen.
 - [x] **Spillover** (was Overflow, a crit name already): the button pours coins into the income bar until it brims over and slams full, then the overflow spills into the total. Pays the full bar plus 2 bonus payouts and restarts the bar.
+- [x] **Waterfall**: coins spill from the top floor in view and tumble down the building's side floor by floor, every button tipping more in, then the falls pour into the total. Payout grows per floor passed.
+- [ ] **Conveyor**: a belt of coins rolls along under the floors in view; each floor's button tosses its own handful on as it passes, then the belt dumps into the total. Pays every floor in view its own payout.
+- [ ] **Coin Toss**: coins stream into one giant coin that flips high, spinning, and lands with a slam. Heads pays ×3, tails ×2 of floor income × floor number.
+- [ ] **Hourglass**: coins pour into an hourglass that flips over, and the coins trickle out of it into the total. Pays a minute of the building's income.
+- [ ] **Rocket**: coins pour into a rocket on the clicked floor that launches up through every floor in view and bursts into a coin firework over the total. Pays the floor's payout once per floor it flies past.
+- [ ] **Twister**: a funnel of coins zigzags across the screen, sucking a short stream out of every worker it passes, then spins up into the total. Pays the floor's payout once per worker swept up.
 
 ## Glimmer streams (upgrades)
 
@@ -29,9 +36,17 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Polish**: lights swirl around the upgrade button and buff it until it shines. Free upgrade levels.
 - [x] **Recruit**: lights stream to an empty spot and form a new worker. A free hire.
 - [x] **Promotion Day**: lights rise from every worker into the floor's tier badge. Floor tier +1.
+- [ ] **Meteor Shower**: 3–6 small shooting stars streak down one after another, each striking a different worker. +1 tier per worker struck.
+- [ ] **Fireflies**: lights drift in and wander the floor, then settle one by one into its empty spots, each forming a new worker. Fills the floor to its worker cap.
+- [ ] **Lighthouse**: a beam from the button sweeps round the screen like a lighthouse; every upgrade button it lights shines. Free upgrade levels on every floor in view.
+- [ ] **Rising Tide**: a glow floods up the building from the street, lifting every floor in view. Each floor's tier rises to the highest tier among them.
+- [ ] **Beanstalk**: a vine of light grows up from the top floor and curls round the locked floors above. Unlocks the next 2 floors for free.
 
 ## Combos (both)
 
 - [x] **Alchemy**: coins stream into a cauldron, which bubbles and shoots lights into a worker. Tier upgrade plus a small payout.
 - [x] **Investment**: coins flow into the income bar, then lights burst out of it into the floor's tier. Payout, then a floor tier.
 - [x] **Dividends**: lights promote a worker, then that worker sprays a coin stream into the total. Tier upgrade plus a payout.
+- [ ] **Wellspring** (Wishing Well is a crit name already): coins arc from the button into a well; every splash sends a light back up into a worker in view. +1 tier per worker reached plus a payout.
+- [ ] **Harvest**: lights fall onto the floor and sprout into little coin plants that grow, then burst into short coin streams into the total. Pays the floor's payout per plant, and the floor's workers each get +1 tier.
+- [ ] **Coronation**: coins stream into a crown over a floor with no manager; it glows, sheds lights and a manager forms under it. A free manager plus a payout.

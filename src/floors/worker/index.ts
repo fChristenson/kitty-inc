@@ -252,7 +252,7 @@ const BOOSTED_WALK_SPEED = WALK_SPEED * 2;
 // the art's actual floor instead of the area now covered by the taller divider —
 // nudged down an extra WORKER_FEET_Y_NUDGE_PX per an explicit visual tweak request
 export const WORKER_FEET_Y_NUDGE_PX = 46;
-const WORKER_FEET_Y =
+export const WORKER_FEET_Y =
   ROOM_CONTENT_Y_OFFSET + 650 * ROOM_CONTENT_SCALE + WORKER_FEET_Y_NUDGE_PX;
 const CLICK_BOUNCE_MS = 300; // how long the little "boing" reaction plays after a click
 const CLICK_COOLDOWN_MS = 500; // ignore re-clicks faster than this so coin bursts don't stack up

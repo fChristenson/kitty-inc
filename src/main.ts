@@ -59,11 +59,13 @@ import {
   forceFountainEvent,
   forceVortexEvent,
   forceRicochetEvent,
+  forceWaterfallEvent,
   forcePaydayEvent,
   forcePiggyBankEvent,
   forceJackpotReelsEvent,
   forceChainPayEvent,
   forceDownpourEvent,
+  forceTrickleEvent,
   forceMagnetEvent,
   forceSpilloverEvent,
   forceConstellationEvent,
@@ -157,11 +159,13 @@ import {
   wireFountainEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
+  wireWaterfallEventTestButton,
   wirePaydayEventTestButton,
   wirePiggyBankEventTestButton,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireDownpourEventTestButton,
+  wireTrickleEventTestButton,
   wireMagnetEventTestButton,
   wireSpilloverEventTestButton,
   wireConstellationEventTestButton,
@@ -665,6 +669,13 @@ async function main() {
       gameCanvas.scrollActiveToFloor(floor);
       forceRicochetEvent(floor);
     });
+    // same, for the Waterfall event
+    wireWaterfallEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceWaterfallEvent(floor);
+    });
     // same, for the Payday event
     wirePaydayEventTestButton(app, () => {
       const floor = buildings[activeBuildingIndex]?.[0];
@@ -699,6 +710,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceDownpourEvent(floor);
+    });
+    // same, for the Trickle event
+    wireTrickleEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceTrickleEvent(floor);
     });
     // same, for the Magnet event
     wireMagnetEventTestButton(app, () => {

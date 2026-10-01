@@ -111,6 +111,16 @@ export function wireRicochetEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireWaterfallEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-waterfall-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wirePaydayEventTestButton(
   container: HTMLElement,
   onClick: () => void,
@@ -289,6 +299,16 @@ export function wireDownpourEventTestButton(
 ): void {
   const button = container.querySelector<HTMLButtonElement>(
     "#test-downpour-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireTrickleEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-trickle-event",
   )!;
   button.addEventListener("click", onClick);
 }
