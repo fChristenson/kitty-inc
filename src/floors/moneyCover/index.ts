@@ -1,13 +1,13 @@
-// shared core of the money-cover events (Burst, Spray): their crit's click
-// freezes the screen while the button shoots coins and bills straight out to
-// spots covering the whole screen. They hang there, then in the last stretch
-// merge into the total-income readout, which pays the floor's income times its
-// floor number before revealing the covered crit itself
+// shared core of the money-cover events (Burst, Spray, Draw): their crit's
+// click freezes the screen while the button shoots coins and bills straight
+// out to spots laid out by the event. They hang there, then in the last
+// stretch merge into the total-income readout, which pays the floor's income
+// times its floor number before revealing the covered crit itself
 import type { Floor } from "../../gameState";
 import { playCoinDrop, playSold } from "../../sound";
 import { GLOBAL_SLAM, triggerEventEndSlam } from "../../shared/eventEndSlam";
 import { multiply } from "../../shared/bigNumber";
-import { pickCritTierByOdds } from "../../shared/critTypes";
+import { pickCritTierByOdds, type CritTier } from "../../shared/critTypes";
 import {
   pulseHudTotalFlash,
   triggerHudTotalFlash,
@@ -31,15 +31,35 @@ const FLIGHT_TICKS: [number, number] = [18, 29];
 // keeps the coins' spots clear of the screen's edges
 const EDGE_MARGIN = 40;
 
-type Point = { x: number; y: number };
+type Point = { x: number; y: number; maxSize?: number };
+export type CoverArea = {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+};
 
 export interface MoneyCover {
   button: Point;
-  // the screen-covering spots, one per coin, in no visible order
+  // one spot per coin, laid out by the event's own layout
   spots: Point[];
   launch(targets: Point[]): void;
+  // launches targets in order, spread evenly over durationMs
+  stream(targets: Point[], durationMs: number): void;
   isLive(): boolean;
 }
+
+export interface MoneyCoverOptions {
+  layout: (area: CoverArea) => Point[];
+  // the covered crit's tier, revealed at the end; defaults to the crit's own
+  tier?: CritTier;
+  // on top of the floor's income times its floor number
+  rewardMultiplier?: number;
+  // coins land face-on, so a drawn shape is fully covered
+  settleFaceOn?: boolean;
+}
+
+const STREAM_INTERVAL_MS = 16;
 
 let running: { key: string } | null = null;
 
@@ -63,10 +83,7 @@ function drawOverlay(
 
 // one jittered spot per cell of a grid over the area, shuffled, so the coins
 // cover all of it evenly
-function coverSpots(
-  area: { left: number; top: number; right: number; bottom: number },
-  count: number,
-): Point[] {
+export function coverSpots(area: CoverArea, count: number): Point[] {
   const width = area.right - area.left - EDGE_MARGIN * 2;
   const height = area.bottom - area.top - EDGE_MARGIN * 2;
   const cols = Math.max(1, Math.round(Math.sqrt((count * width) / height)));
@@ -89,11 +106,16 @@ export function startMoneyCover(
   key: string,
   floor: Floor,
   context: EventProcContext,
-  coins: number,
   { durationMs, mergeMs }: { durationMs: number; mergeMs: number },
+  {
+    layout,
+    tier: coveredTier,
+    rewardMultiplier = 1,
+    settleFaceOn,
+  }: MoneyCoverOptions,
 ): MoneyCover | null {
   if (!canStartMoneyCover(context)) return null;
-  const tier = context.critTier ?? pickCritTierByOdds();
+  const tier = coveredTier ?? context.critTier ?? pickCritTierByOdds();
   const floorNumber = context.floors.indexOf(floor) + 1;
   const cover = { key };
   running = cover;
@@ -116,6 +138,7 @@ export function startMoneyCover(
       playSold();
     },
     onEachArrive: pulseHudTotalFlash,
+    settleFaceOn,
   };
   const button = getButtonCenter(context.isGroundFloor);
 
@@ -124,7 +147,10 @@ export function startMoneyCover(
     running = null;
     unfreezeScreen();
     addTotalIncome(
-      multiply(currentPayoutAmount(floor, Date.now()), floorNumber),
+      multiply(
+        currentPayoutAmount(floor, Date.now()),
+        floorNumber * rewardMultiplier,
+      ),
     );
     triggerHudTotalFlash();
     // the covered crit's own tier, revealed as the total jumps
@@ -134,11 +160,29 @@ export function startMoneyCover(
     endEventProc(key);
   }, durationMs);
 
+  const launch = (targets: Point[]) =>
+    spawnSprayCoins(floor, button.x, button.y, targets, arrival);
+  const isLive = () => running === cover;
   return {
     button,
-    spots: coverSpots(context.getScreenAreaLocal!(floor), coins),
-    launch: (targets) =>
-      spawnSprayCoins(floor, button.x, button.y, targets, arrival),
-    isLive: () => running === cover,
+    spots: layout(context.getScreenAreaLocal!(floor)),
+    launch,
+    stream: (targets, streamMs) => {
+      const startedAt = performance.now();
+      let emitted = 0;
+      const timer = setInterval(() => {
+        if (!isLive()) return clearInterval(timer);
+        const due = Math.min(
+          targets.length,
+          Math.ceil(
+            ((performance.now() - startedAt) / streamMs) * targets.length,
+          ),
+        );
+        if (due > emitted) launch(targets.slice(emitted, due));
+        emitted = due;
+        if (emitted >= targets.length) clearInterval(timer);
+      }, STREAM_INTERVAL_MS);
+    },
+    isLive,
   };
 }

@@ -65,6 +65,8 @@ export async function loadCoinBurstImages(): Promise<HTMLImageElement> {
   ]);
   coinFrameCanvases = buildFrameCanvases(coin, COIN_SPIN_FRAME_COUNT);
   billFrameCanvases = buildFrameCanvases(bill, BILL_SPIN_FRAME_COUNT);
+  spriteShape.coin = measureFrames(coinFrameCanvases);
+  spriteShape.bill = measureFrames(billFrameCanvases);
   return coin;
 }
 
@@ -72,6 +74,46 @@ export interface CoinBurstSprite {
   kind: "coin" | "bill";
   spinFrame: number; // fractional flipbook position, floored when drawing
   axisAngle: number; // screen-space tilt of the spin's squish axis; 0 if the caller doesn't care
+}
+
+// per sprite: how far from its center it reaches when drawn at radius 1, at
+// any spin frame and tilt (its farthest opaque pixel), and its fullest frame
+// (face-on, covering the most area)
+const spriteShape = {
+  coin: { reach: 1, fullestFrame: 0 },
+  bill: { reach: Math.SQRT2, fullestFrame: 0 },
+};
+
+function measureFrames(frames: HTMLCanvasElement[]) {
+  let reach = 0;
+  let fullestFrame = 0;
+  let fullestArea = 0;
+  frames.forEach((frame, index) => {
+    const { width, height } = frame;
+    const alpha = frame
+      .getContext("2d")!
+      .getImageData(0, 0, width, height).data;
+    let area = 0;
+    for (let y = 0; y < height; y++)
+      for (let x = 0; x < width; x++)
+        if (alpha[(y * width + x) * 4 + 3] > 40) {
+          area++;
+          reach = Math.max(reach, Math.hypot(x - width / 2, y - height / 2));
+        }
+    if (area > fullestArea) {
+      fullestArea = area;
+      fullestFrame = index;
+    }
+  });
+  return { reach: reach / (PRESCALE_CELL_H / 2), fullestFrame };
+}
+
+export function getSpriteReach(kind: CoinBurstSprite["kind"]): number {
+  return spriteShape[kind].reach;
+}
+
+export function getFullestFrame(kind: CoinBurstSprite["kind"]): number {
+  return spriteShape[kind].fullestFrame;
 }
 
 export interface CoinBurstParticle extends CoinBurstSprite {

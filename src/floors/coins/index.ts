@@ -5,6 +5,8 @@ import {
   loadCoinBurstImages,
   drawCoinBurstFrame,
   getCoinRimPoint,
+  getSpriteReach,
+  getFullestFrame,
   COIN_SPIN_FRAME_COUNT,
   BILL_SPIN_FRAME_COUNT,
   COIN_BILL_CHANCE,
@@ -74,6 +76,8 @@ interface HomingGroup extends HomingBurstOptions {
   flew?: boolean;
   // spray coins only: performance.now() they all leave their frozen spots
   releaseAt?: number;
+  // spray coins only: they stop spinning face-on as they land
+  settleFaceOn?: boolean;
 }
 
 interface HomingFlight {
@@ -99,6 +103,10 @@ const HOMING_BURST_TICKS: [number, number] = [14, 36];
 const HOMING_END_RADIUS = 8;
 
 const pool = createParticlePool<Particle>(MAX_PARTICLES);
+// screen-covering spray coins (Burst/Spray/Draw) all hang at once, so they get
+// their own, larger pool instead of evicting each other at MAX_PARTICLES
+const SPRAY_MAX_PARTICLES = 3_000;
+const sprayPool = createParticlePool<Particle>(SPRAY_MAX_PARTICLES);
 
 // while a fast hold keeps the pool near its cap, new bursts shrink to the room
 // left (never below a small floor) so earlier coins finish their fall instead
@@ -113,7 +121,7 @@ function burstCount(min: number, max: number): number {
 }
 
 export function hasActiveCoins(): boolean {
-  return pool.hasActive();
+  return pool.hasActive() || sprayPool.hasActive();
 }
 
 // draws every particle onto a full-viewport overlay canvas (so a burst can never be
@@ -134,49 +142,50 @@ export function drawCoins(
   let rectFloor: Floor | null = null;
   let rect: { left: number; top: number; width: number } | null = null;
   const base = ctx.getTransform();
-  for (const p of pool.list) {
-    if ((p.homing?.group.layer ?? "world") !== layer) continue;
-    if (p.floor !== rectFloor) {
-      rectFloor = p.floor;
-      rect = getFloorRect(p.floor);
-    }
-    if (!rect) continue;
-    const scale = rect.width / FLOOR_W;
-    let px = rect.left + p.x * scale;
-    let py = rect.top + p.y * scale;
+  for (const list of [pool.list, sprayPool.list])
+    for (const p of list) {
+      if ((p.homing?.group.layer ?? "world") !== layer) continue;
+      if (p.floor !== rectFloor) {
+        rectFloor = p.floor;
+        rect = getFloorRect(p.floor);
+      }
+      if (!rect) continue;
+      const scale = rect.width / FLOOR_W;
+      let px = rect.left + p.x * scale;
+      let py = rect.top + p.y * scale;
 
-    const t = p.life / p.maxLife;
-    let radius = p.size * (1 - t * 0.3) * scale;
-    const groupTarget = p.homing?.group.target;
-    const hasTarget = groupTarget !== undefined || homeTarget !== undefined;
-    if (p.homing && hasTarget) {
-      const targetX = groupTarget
-        ? rect.left + groupTarget.x * scale
-        : homeTarget!.x;
-      const targetY = groupTarget
-        ? rect.top + groupTarget.y * scale
-        : homeTarget!.y;
-      const flight = Math.max(
-        0,
-        (p.life - p.homing.burstLife) / p.homing.flightTicks,
-      );
-      // accelerates in, so it reads as being pulled into the target; timed
-      // streams fly at a steady speed and shrink late, so their path stays full
-      const f = Math.min(1, flight);
-      const stream = p.homing.group.arriveTicks !== undefined;
-      const eased = stream ? f : f * f;
-      const shrink = f * f;
-      const burstRadius = p.size * scale;
-      px += (targetX - px) * eased;
-      py += (targetY - py) * eased;
-      radius = burstRadius + (HOMING_END_RADIUS - burstRadius) * shrink;
-      ctx.globalAlpha = 1;
-    } else {
-      ctx.globalAlpha = Math.max(0, 1 - t);
+      const t = p.life / p.maxLife;
+      let radius = p.size * (1 - t * 0.3) * scale;
+      const groupTarget = p.homing?.group.target;
+      const hasTarget = groupTarget !== undefined || homeTarget !== undefined;
+      if (p.homing && hasTarget) {
+        const targetX = groupTarget
+          ? rect.left + groupTarget.x * scale
+          : homeTarget!.x;
+        const targetY = groupTarget
+          ? rect.top + groupTarget.y * scale
+          : homeTarget!.y;
+        const flight = Math.max(
+          0,
+          (p.life - p.homing.burstLife) / p.homing.flightTicks,
+        );
+        // accelerates in, so it reads as being pulled into the target; timed
+        // streams fly at a steady speed and shrink late, so their path stays full
+        const f = Math.min(1, flight);
+        const stream = p.homing.group.arriveTicks !== undefined;
+        const eased = stream ? f : f * f;
+        const shrink = f * f;
+        const burstRadius = p.size * scale;
+        px += (targetX - px) * eased;
+        py += (targetY - py) * eased;
+        radius = burstRadius + (HOMING_END_RADIUS - burstRadius) * shrink;
+        ctx.globalAlpha = 1;
+      } else {
+        ctx.globalAlpha = Math.max(0, 1 - t);
+      }
+      drawCoinBurstFrame(ctx, p, px, py, radius, base);
+      if (p.homing) drawHangGlint(ctx, p, p.homing, px, py, radius);
     }
-    drawCoinBurstFrame(ctx, p, px, py, radius, base);
-    if (p.homing) drawHangGlint(ctx, p, p.homing, px, py, radius);
-  }
   ctx.globalAlpha = 1;
 }
 
@@ -224,6 +233,8 @@ function advanceCoin(p: Particle, dt: number): void {
       p.x = pos.x;
       p.y = pos.y;
       p.spinFrame += p.spinDir * p.spinRate * dt;
+      if (p.life >= spray.outTicks && group.settleFaceOn)
+        p.spinFrame = getFullestFrame(p.kind);
       return;
     }
     if (homing.burstLife === Infinity) {
@@ -449,16 +460,19 @@ export interface SprayOptions {
   onFirstFlight?: () => void;
   onFirstArrive?: () => void;
   onEachArrive?: () => void;
+  // land face-on instead of mid-spin, so the coins cover their spots fully
+  settleFaceOn?: boolean;
 }
 
 // one coin or bill per target (floor-local, like x/y): each is blasted out of
 // (x, y) like a burst coin, lands on its target as it slows, freezes there,
-// then gets pulled into the total at releaseAt
+// then gets pulled into the total at releaseAt. A target's maxSize caps how
+// far its coin or bill may reach from the target, at any spin or tilt
 export function spawnSprayCoins(
   floor: Floor,
   x: number,
   y: number,
-  targets: { x: number; y: number }[],
+  targets: { x: number; y: number; maxSize?: number }[],
   { releaseAt, outTicks, flightTicks, ...arrival }: SprayOptions,
 ): void {
   const group: HomingGroup = {
@@ -470,7 +484,7 @@ export function spawnSprayCoins(
   for (const target of targets) {
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
-    pool.spawn({
+    sprayPool.spawn({
       floor,
       x,
       y,
@@ -478,7 +492,10 @@ export function spawnSprayCoins(
       vy: 0,
       life: 0,
       maxLife: Infinity,
-      size: (22 + Math.random() * 46) * 1.15 * 1.25,
+      size: Math.min(
+        (22 + Math.random() * 46) * 1.15 * 1.25,
+        (target.maxSize ?? Infinity) / getSpriteReach(kind),
+      ),
       gravity: 0,
       gravityRamp: 0,
       kind,
@@ -502,5 +519,5 @@ export function spawnSprayCoins(
       },
     });
   }
-  pool.ensureTicking((dt) => pool.update(dt, advanceCoin));
+  sprayPool.ensureTicking((dt) => sprayPool.update(dt, advanceCoin));
 }

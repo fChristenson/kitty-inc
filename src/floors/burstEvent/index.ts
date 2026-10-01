@@ -11,6 +11,7 @@ import { forceTestCrit } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import {
   canStartMoneyCover,
+  coverSpots,
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
@@ -26,13 +27,9 @@ registerEventProc(
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const cover = startMoneyCover(
-        KEY,
-        floor,
-        context,
-        COINS,
-        CONFIG.burstEvent,
-      );
+      const cover = startMoneyCover(KEY, floor, context, CONFIG.burstEvent, {
+        layout: (area) => coverSpots(area, COINS),
+      });
       if (!cover) return;
       cover.launch(cover.spots);
       playExplosion();

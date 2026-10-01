@@ -11,6 +11,13 @@ import {
 } from "../../sound";
 import type { CritTier } from "../critTypes";
 
+// each tier's flash text outline width, at the flash's FLASH_FONT_SIZE
+export const TIER_FLASH_STROKE_WIDTH: Record<CritTier, number> = {
+  crit: 8,
+  mega: 14,
+  ultra: 16,
+};
+
 // a landed tier's flash, tier-scaled; label/color let a piggyback proc show
 // its own text in place of the tier's "x5"/"x25"/"x125"
 export function playTierFlash(
@@ -27,7 +34,7 @@ export function playTierFlash(
       intensity: 2.6,
       label,
       color,
-      strokeWidth: 16,
+      strokeWidth: TIER_FLASH_STROKE_WIDTH.ultra,
       blinkHz: 6,
       holdMs: 1250,
       priority: 2,
@@ -39,7 +46,7 @@ export function playTierFlash(
       intensity: 1.8,
       label,
       color,
-      strokeWidth: 14,
+      strokeWidth: TIER_FLASH_STROKE_WIDTH.mega,
       priority: 1,
       minDurationMs: getJackpotDurationMs(),
     });
@@ -49,6 +56,7 @@ export function playTierFlash(
     triggerScreenShake({
       label,
       color,
+      strokeWidth: TIER_FLASH_STROKE_WIDTH.crit,
       minDurationMs: getExplosionDurationMs(),
     });
     playCoinDrop();

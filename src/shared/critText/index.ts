@@ -22,6 +22,10 @@ function isLightColor(hex: string): boolean {
   return luminance > LIGHT_COLOR_LUMINANCE;
 }
 
+export function critFont(fontSize: number): string {
+  return `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
+}
+
 export function drawCritText(
   ctx: CanvasRenderingContext2D,
   label: string,
@@ -30,7 +34,7 @@ export function drawCritText(
   color: string,
   { fontSize, strokeWidth }: CritTextStyle,
 ): void {
-  ctx.font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
+  ctx.font = critFont(fontSize);
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   const gradient = ctx.createLinearGradient(

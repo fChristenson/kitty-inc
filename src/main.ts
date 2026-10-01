@@ -56,6 +56,7 @@ import {
   forceKickbackEvent,
   forceBurstEvent,
   forceSprayEvent,
+  forceDrawEvent,
   forceGlimmerEvent,
   forceHuntEvent,
   startSwarmEvent,
@@ -127,6 +128,7 @@ import {
   wireKickbackEventTestButton,
   wireBurstEventTestButton,
   wireSprayEventTestButton,
+  wireDrawEventTestButton,
   wireGlimmerEventTestButton,
   wireHuntEventTestButton,
   wireSwarmEventTestButton,
@@ -589,6 +591,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceSprayEvent(floor);
+    });
+    // same, for the Draw event
+    wireDrawEventTestButton(app, (tier) => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceDrawEvent(floor, tier);
     });
     // same, for the Glimmer event
     wireGlimmerEventTestButton(app, () => {

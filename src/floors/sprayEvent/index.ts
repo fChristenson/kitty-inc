@@ -10,13 +10,13 @@ import { forceTestCrit } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import {
   canStartMoneyCover,
+  coverSpots,
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
 
 const KEY = "spray";
 const COINS = 300;
-const EMIT_INTERVAL_MS = 16;
 
 registerEventProc(
   {
@@ -25,13 +25,9 @@ registerEventProc(
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const cover = startMoneyCover(
-        KEY,
-        floor,
-        context,
-        COINS,
-        CONFIG.sprayEvent,
-      );
+      const cover = startMoneyCover(KEY, floor, context, CONFIG.sprayEvent, {
+        layout: (area) => coverSpots(area, COINS),
+      });
       if (!cover) return;
       // ordered by angle around the button, so the stream sweeps round it
       const { button } = cover;
@@ -43,23 +39,7 @@ registerEventProc(
           Math.PI * 2) %
         (Math.PI * 2);
       const spots = [...cover.spots].sort((a, b) => angleOf(a) - angleOf(b));
-
-      const { streamMs } = CONFIG.sprayEvent;
-      const startedAt = performance.now();
-      let emitted = 0;
-      const emit = () => {
-        if (!cover.isLive()) return clearInterval(timer);
-        const due = Math.min(
-          spots.length,
-          Math.ceil(
-            ((performance.now() - startedAt) / streamMs) * spots.length,
-          ),
-        );
-        if (due > emitted) cover.launch(spots.slice(emitted, due));
-        emitted = due;
-        if (emitted >= spots.length) clearInterval(timer);
-      };
-      const timer = setInterval(emit, EMIT_INTERVAL_MS);
+      cover.stream(spots, CONFIG.sprayEvent.streamMs);
       playBoostEventStream();
     },
   },

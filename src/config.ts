@@ -149,6 +149,15 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/drawEvent — the rare "Draw" event: like Spray, but the stream
+  // draws the crit's own 5/25/125 and the payout is multiplied by it
+  drawEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streamMs: 600, // how long the number takes to draw
+    durationMs: 1_800, // stream, ~0.3s last coin out, 0.4s hang, then the merge
+    mergeMs: 500,
+  },
+
   // src/floors/swarmEvent — the rare "Swarm" event: its proc animation leaves
   // that button armed; clicking it starts a timed swarm sale where every click
   // on it pays a Sale payout from it and each of its mirrored clones

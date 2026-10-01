@@ -82,6 +82,21 @@ export function wireSprayEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+// onClick gets the tier whose number to draw, or undefined to roll it
+export function wireDrawEventTestButton(
+  container: HTMLElement,
+  onClick: (tier: CritTier | undefined) => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-draw-event")!;
+  const select = container.querySelector<HTMLSelectElement>(
+    "#test-draw-event-tier",
+  )!;
+  button.addEventListener("click", () =>
+    onClick(select.value === "random" ? undefined : (select.value as CritTier)),
+  );
+}
+
 export function wireGlimmerEventTestButton(
   container: HTMLElement,
   onClick: () => void,
