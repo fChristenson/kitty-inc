@@ -67,6 +67,7 @@ export function createTestButtonMarkup(): string {
           <button id="test-jackhammer-event" class="game__button">Jackhammer</button>
           <button id="test-pummel-event" class="game__button">Pummel</button>
           <button id="test-overload-event" class="game__button">Overload</button>
+          <button id="test-gatling-event" class="game__button">Gatling</button>
           <button id="test-vortex-event" class="game__button">Vortex</button>
           <button id="test-ricochet-event" class="game__button">Ricochet</button>
           <button id="test-waterfall-event" class="game__button">Waterfall</button>

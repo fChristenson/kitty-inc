@@ -69,6 +69,7 @@ import {
   forceJackhammerEvent,
   forcePummelEvent,
   forceOverloadEvent,
+  forceGatlingEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -195,6 +196,7 @@ import {
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
   wireOverloadEventTestButton,
+  wireGatlingEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -790,6 +792,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceOverloadEvent(floor);
+    });
+    // same, for the Gatling event
+    wireGatlingEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceGatlingEvent(floor);
     });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {

@@ -293,6 +293,17 @@ export const CONFIG = {
     holdMs: 600, // after the blast, before the screen unfreezes
   },
 
+  // src/floors/gatlingEvent — the rare "Gatling" event: wisps fire in like
+  // gatling bullets, each hitting the button and knocking coins out round it,
+  // which merge into the total
+  gatlingEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    fireMs: 1_100, // the burst of fire, speeding up
+    travelMs: 80, // each bullet's flight to the button
+    holdMs: 450, // the coins hanging after the last round
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
