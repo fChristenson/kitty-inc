@@ -64,6 +64,7 @@ export function createTestButtonMarkup(): string {
           <button id="test-thunderclap-event" class="game__button">Thunderclap</button>
           <button id="test-chain-reaction-event" class="game__button">Chain Reaction</button>
           <button id="test-slash-event" class="game__button">Slash</button>
+          <button id="test-jackhammer-event" class="game__button">Jackhammer</button>
           <button id="test-vortex-event" class="game__button">Vortex</button>
           <button id="test-ricochet-event" class="game__button">Ricochet</button>
           <button id="test-waterfall-event" class="game__button">Waterfall</button>
@@ -100,7 +101,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-alchemy-event" class="game__button">Alchemy</button>
           <button id="test-investment-event" class="game__button">Investment</button>
           <button id="test-dividends-event" class="game__button">Dividends</button>
-          <button id="test-harvest-event" class="game__button">Harvest</button>
           <button id="test-wisp-event" class="game__button">Wisp</button>
           <button id="test-stream-event" class="game__button">Stream</button>
           <button id="test-trails-event" class="game__button">Trails</button>

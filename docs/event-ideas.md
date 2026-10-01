@@ -56,7 +56,6 @@ Built on `src/floors/revealStage`: the crit click slides a blue stage in over th
 - [x] **Alchemy**: coins stream into a cauldron, which bubbles and shoots lights into a worker. Tier upgrade plus a small payout.
 - [x] **Investment**: coins flow into the income bar, then lights burst out of it into the floor's tier. Payout, then a floor tier.
 - [x] **Dividends**: lights promote a worker, then that worker sprays a coin stream into the total. Tier upgrade plus a payout.
-- [x] **Harvest**: the button tosses a seed beside each worker on the floor; each lands in a puff of dirt and a leafy crop shoots up over a ripening gold coin. Left to right, every coin is yanked out like a carrot, spinning up and bursting into a coin stream into the total as its worker climbs. Pays the floor's payout per crop, and the floor's workers each get +1 tier.
 
 ## Next ideas
 
@@ -65,6 +64,7 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 ### Coins (free money)
 
 - [x] **Ripple**: coins burst out of the button in round ripples like a stone dropped in a pond (a wide band, a thin ring or two close behind, then the next wide band), each rolling outward at its own pace while the frozen screen under it refracts like water; then the coins sweep into the total. Pays floor income × floor number once per ring.
+- [x] **Jackhammer**: the wisp jackhammers the button, its taps coming ever faster and shorter, each a jolt with coins popping out, building to a blurring frenzy; then it blows apart on the button in a huge blast and shake that sprays coins over the whole screen, and they all sweep into the total. Pays floor income × floor number × 3.
 - [x] **Slash**: three lightning-fast cuts rip across the frozen screen one after another (the wisp streaking edge to edge, leaving a glowing cut), each with a swoosh and a jolt; the cuts smoulder ever brighter for a beat, then all burst open at once in a blinding flare, bang and huge shake, blasting coins out along every cut, which sweep into the total. Pays floor income × floor number × 3.
 - [x] **Chain Reaction**: glowing mines (the wisp) pop up all over the screen; the button blows first and each blast sets off the next nearest mine, the explosions racing across the screen ever bigger and harder shaking, each spraying coins, then the coins sweep into the total. Pays floor income × floor number × 4.
 - [x] **Fuse**: the wisp, as a fizzing spark, races in from the screen's side along a wiggling glowing fuse, ever faster, burning it away behind it; it reaches the button and KABOOM: a huge blast and shake sprays coins across the whole screen, then they sweep into the total. Pays floor income × floor number × 3.

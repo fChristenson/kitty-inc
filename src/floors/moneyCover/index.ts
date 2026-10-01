@@ -91,6 +91,12 @@ export interface MoneyCoverOptions {
     getFloorRect: FloorRectResolver,
     totalTarget: Point,
   ) => void;
+  // like drawExtra, but over the coins
+  drawOver?: (
+    ctx: CanvasRenderingContext2D,
+    getFloorRect: FloorRectResolver,
+    totalTarget: Point,
+  ) => void;
   // water rippling across the frozen frame
   frameRipple?: FrameRippler;
 }
@@ -178,6 +184,7 @@ export function startMoneyCover(
     rewardMultiplier = 1,
     settleFaceOn,
     drawExtra,
+    drawOver,
     frameRipple,
   }: MoneyCoverOptions,
 ): MoneyCover | null {
@@ -190,6 +197,7 @@ export function startMoneyCover(
     (ctx, getFloorRect, totalTarget) => {
       drawExtra?.(ctx, getFloorRect, totalTarget);
       drawOverlay(ctx, getFloorRect, totalTarget);
+      drawOver?.(ctx, getFloorRect, totalTarget);
     },
     { spotlightTotal: true, frameRipple },
   );

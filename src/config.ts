@@ -263,6 +263,16 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/jackhammerEvent — the rare "Jackhammer" event: the wisp
+  // jackhammers the button ever faster, popping coins, then blows apart on it
+  // spraying coins over the screen into the total
+  jackhammerEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    hammerMs: 1_100, // the taps speeding up to a frenzy
+    holdMs: 450, // the coins hanging after the blast
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
@@ -646,20 +656,6 @@ export const CONFIG = {
     liftMs: 900, // the lights streaming into the worker
     sprayMs: 900, // the worker's coins spraying into the total
     payouts: 3, // the worker's floor's payouts paid into the total
-  },
-
-  // src/floors/harvestEvent — the rare "Harvest" event: the button tosses a
-  // seed beside each worker on the floor; crops shoot up and their coins are
-  // yanked out like carrots into the total as each worker climbs a perma tier
-  harvestEvent: {
-    chance: 0.01, // per crit whose special-crit gateway hit
-    seedMs: 500, // each seed's flight from the button to its patch
-    seedGapMs: 120, // between seeds
-    growMs: 1_200, // a crop growing until its coin is ripe
-    popGapMs: 350, // between coins yanked out, left to right
-    streamMs: 500, // each yanked coin's stream into the total
-    holdMs: 400, // after the last stream, before the screen unfreezes
-    payouts: 1, // the floor's payouts per crop
   },
 
   // src/floors/wispEvent — the rare "Wisp" event: a playful wisp flits

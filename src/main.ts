@@ -66,6 +66,7 @@ import {
   forceThunderclapEvent,
   forceChainReactionEvent,
   forceSlashEvent,
+  forceJackhammerEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -102,7 +103,6 @@ import {
   forceAlchemyEvent,
   forceInvestmentEvent,
   forceDividendsEvent,
-  forceHarvestEvent,
   forceWispEvent,
   forceStreamEvent,
   forceTrailsEvent,
@@ -190,6 +190,7 @@ import {
   wireThunderclapEventTestButton,
   wireChainReactionEventTestButton,
   wireSlashEventTestButton,
+  wireJackhammerEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -226,7 +227,6 @@ import {
   wireAlchemyEventTestButton,
   wireInvestmentEventTestButton,
   wireDividendsEventTestButton,
-  wireHarvestEventTestButton,
   wireWispEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
@@ -766,6 +766,13 @@ async function main() {
       gameCanvas.scrollActiveToFloor(floor);
       forceSlashEvent(floor);
     });
+    // same, for the Jackhammer event
+    wireJackhammerEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceJackhammerEvent(floor);
+    });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {
       const floor = buildings[activeBuildingIndex]?.[0];
@@ -1021,13 +1028,6 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceDividendsEvent(floor);
-    });
-    // same, for the Harvest event
-    wireHarvestEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceHarvestEvent(floor);
     });
     // same, for the Wisp event
     wireWispEventTestButton(app, () => {
