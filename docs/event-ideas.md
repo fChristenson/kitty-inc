@@ -15,7 +15,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Chain Pay**: coins hop button → nearest worker → next nearest (up to 8), each worker slamming as it's paid, the last firing into the total. The n-th worker reached pays n payouts.
 - [x] **Downpour** (was Rain Check, a crit name already): coins rain down from above the screen and pool along its bottom, the pool rising, then it drains into the total. Pays floor income × floor number × 2.
 - [x] **Magnet**: coins pop up all over the screen and get yanked in under a big horseshoe magnet, then flung into the total. Pays floor income × floor number × floors on screen.
-- [ ] **Overflow**: the income bar fills with coins until it spills over, and the overflow streams into the total. Fills the bar instantly plus a bonus.
+- [x] **Spillover** (was Overflow, a crit name already): the button pours coins into the income bar until it brims over and slams full, then the overflow spills into the total. Pays the full bar plus 2 bonus payouts and restarts the bar.
 
 ## Glimmer streams (upgrades)
 

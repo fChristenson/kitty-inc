@@ -92,7 +92,7 @@ let running: { key: string } | null = null;
 
 // calls launch with the items due so far, in order, spread over durationMs,
 // along with how late (ms) each one is past its own due time
-function launchOver<T>(
+export function launchOver<T>(
   items: T[],
   durationMs: number,
   isLive: () => boolean,

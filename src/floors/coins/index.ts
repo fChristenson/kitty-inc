@@ -477,6 +477,8 @@ export interface SprayOptions {
   onEachArrive?: () => void;
   // land face-on instead of mid-spin, so the coins cover their spots fully
   settleFaceOn?: boolean;
+  // floor-local point they fly into instead of the total
+  target?: { x: number; y: number };
 }
 
 // one coin or bill per target (floor-local, like x/y): each is blasted out of

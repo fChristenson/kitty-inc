@@ -245,6 +245,16 @@ export const CONFIG = {
     mergeMs: 500, // the fling into the total
   },
 
+  // src/floors/spilloverEvent — the rare "Spillover" event: the button pours
+  // coins into the income bar until it brims over and spills into the total;
+  // pays the full bar plus bonusPayouts more, and restarts the bar
+  spilloverEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    fillMs: 1_000, // the button filling the bar
+    spillMs: 800, // the overflow spilling into the total
+    bonusPayouts: 2,
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

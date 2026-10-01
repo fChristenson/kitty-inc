@@ -67,7 +67,7 @@ function getPanelY(isGroundFloor: boolean): number {
 // the visible bar's own geometry, hoisted out of drawIncomePanel so
 // getIncomeBarCenter below can share it instead of duplicating these numbers
 const BAR_INSET = 18;
-const BAR_W = (PANEL_W - 36) * 1.5;
+export const BAR_W = (PANEL_W - 36) * 1.5;
 // scaled up alongside PANEL_W; still comfortably clears the divider band's vertical bounds
 const BAR_H = 92;
 
@@ -364,6 +364,21 @@ export function currentPayoutAmount(floor: Floor, now: number): BigNumber {
   return effectiveIncomeCycle(floor, now).amount;
 }
 
+// how full (0..1) the bar is through its current cycle; an overspeed bar shows full
+function cycleFill(
+  floor: Floor,
+  cycle: { intervalSeconds: number; overspeed: boolean },
+  now: number,
+): number {
+  if (cycle.overspeed) return 1;
+  const fillDurationMs = cycle.intervalSeconds * 1000;
+  return ((now - floor.lastCollectedAt) % fillDurationMs) / fillDurationMs;
+}
+
+export function incomeBarFill(floor: Floor, now: number): number {
+  return cycleFill(floor, effectiveIncomeCycle(floor, now), now);
+}
+
 // a floor's own $/sec at its current effective rate — same boost-aware cycle math
 // collectDueIncome/peekDueIncome use, just expressed as a flat rate instead of a
 // lump sum. Worker boost state and office-upgrade multipliers are read straight off
@@ -601,8 +616,9 @@ export function drawIncomePanel(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
   isGroundFloor: boolean,
-  // an event overlay's own flashing, wiggling copy (see floors/upgradeEvent)
-  eventFlash?: { whiteAlpha: number; rotation: number },
+  // an event overlay's own flashing, wiggling copy (see floors/upgradeEvent),
+  // optionally filled to `fill` (0..1) instead of the live cycle
+  eventFlash?: { whiteAlpha: number; rotation: number; fill?: number },
 ): void {
   if (floor === hiddenFloor && !eventFlash) return;
   const x = PANEL_X;
@@ -685,15 +701,11 @@ export function drawIncomePanel(
         barW * Math.min(1, shownOvertimeTicks(floor, now) / goal),
       );
     } else if (cycle) {
-      overspeed = cycle.overspeed;
-      if (overspeed) {
-        fillW = barW;
-      } else {
-        const fillDurationMs = cycle.intervalSeconds * 1000;
-        const elapsed = timerNow - floor.lastCollectedAt;
-        const pct = (elapsed % fillDurationMs) / fillDurationMs;
-        fillW = Math.max(barMinWidth, barW * pct);
-      }
+      overspeed = cycle.overspeed && eventFlash?.fill === undefined;
+      fillW = Math.max(
+        barMinWidth,
+        barW * (eventFlash?.fill ?? cycleFill(floor, cycle, timerNow)),
+      );
     }
     // a permanently-crited floor's bar matches its own tier color instead of the
     // usual green, mirroring the upgrade button's own color choice

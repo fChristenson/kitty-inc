@@ -65,6 +65,7 @@ import {
   forceChainPayEvent,
   forceDownpourEvent,
   forceMagnetEvent,
+  forceSpilloverEvent,
   forceStreamEvent,
   forceTrailsEvent,
   forceDrawEvent,
@@ -148,6 +149,7 @@ import {
   wireChainPayEventTestButton,
   wireDownpourEventTestButton,
   wireMagnetEventTestButton,
+  wireSpilloverEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
@@ -676,6 +678,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceMagnetEvent(floor);
+    });
+    // same, for the Spillover event
+    wireSpilloverEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceSpilloverEvent(floor);
     });
     // same, for the Stream event
     wireStreamEventTestButton(app, () => {
