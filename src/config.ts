@@ -177,9 +177,13 @@ export const CONFIG = {
   // it, each hit an explosion that lands free upgrade levels
   wreckingBallEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
-    dropMs: 420, // falling from above the screen onto the bar
-    bounce: 0.45, // each bounce's speed, of the hit before
-    holdMs: 700, // after the last hit, before the screen unfreezes
+    dropMs: 340, // falling from above the screen onto the bar
+    bounce: 0.7, // each bounce's speed, of the hit before (a rubber ball)
+    chargeMs: 450, // resting on the bar, charging up its leap
+    jumpMs: 340, // leaping up jumpHeight px
+    jumpHeight: 420,
+    slamMs: 130, // slamming back down onto the bar
+    holdMs: 600, // after the slam, before the screen unfreezes
     levelShare: 0.1, // free levels in all, of the floor's current level
     minLevels: 10,
   },
