@@ -152,12 +152,24 @@ export function drawCrop(
     // the coin only shows above the ground
     ctx.save();
     ctx.beginPath();
-    ctx.rect(x - COIN_R * 2, groundY - YANK_RISE * 2, COIN_R * 4, YANK_RISE * 2);
+    ctx.rect(
+      x - COIN_R * 2,
+      groundY - YANK_RISE * 2,
+      COIN_R * 4,
+      YANK_RISE * 2,
+    );
     ctx.clip();
     drawCoin(ctx, x, buried, 0);
     ctx.restore();
     drawMound(ctx, x, groundY, size, false);
-    drawTuft(ctx, x, buried - COIN_R * 0.8, ease(clamp01(grow / 0.8)), now, seed);
+    drawTuft(
+      ctx,
+      x,
+      buried - COIN_R * 0.8,
+      ease(clamp01(grow / 0.8)),
+      now,
+      seed,
+    );
     return;
   }
   drawMound(ctx, x, groundY, size, true);
