@@ -22,7 +22,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Constellation**: a light links 3–7 on-screen workers into a star (a pentagram for five), then each node flares. +1 perma tier per linked worker.
 - [x] **Ascend**: a glimmer orb zigzags up the building from below the lowest floor in view, touching each income bar (up to 6). +1 floor tier per touched floor (capped at the top tier).
 - [x] **Blessing**: lights fall gently like snow onto one floor; each worker they touch glows. Every worker on that floor gets +1 tier.
-- [ ] **Halo**: lights orbit a worker, shrink into a halo and settle on its head. That worker jumps to the top tier.
+- [x] **Halo**: lights spiral in to orbit the lowest-tier worker in view, shrink into a halo and settle on its head. That worker jumps to the top tier.
 - [ ] **Comet**: one big light with a long trail streaks diagonally across the screen. Promotes every worker it passes.
 - [ ] **Mentor**: the top-tier worker sends a light stream into the lowest-tier one. The lowest catches up by two tiers.
 - [ ] **Spark Chain**: a light jumps worker to worker like lightning, faster each jump. +1 tier per jump, stopping at the first maxed worker.

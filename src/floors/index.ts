@@ -350,6 +350,7 @@ export { forceSpilloverEvent } from "./spilloverEvent";
 export { forceConstellationEvent } from "./constellationEvent";
 export { forceAscendEvent } from "./ascendEvent";
 export { forceBlessingEvent } from "./blessingEvent";
+export { forceHaloEvent } from "./haloEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";

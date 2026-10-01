@@ -84,6 +84,7 @@ export {
   wireConstellationEventTestButton,
   wireAscendEventTestButton,
   wireBlessingEventTestButton,
+  wireHaloEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
