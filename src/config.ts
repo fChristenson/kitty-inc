@@ -225,6 +225,16 @@ export const CONFIG = {
     maxWorkers: 8,
   },
 
+  // src/floors/downpourEvent — the rare "Downpour" event: coins rain down from
+  // above the screen and pool along its bottom, then drain into the total
+  downpourEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streamMs: 800, // how long it keeps raining
+    travelMs: 500, // each drop's fall
+    mergeMs: 500, // the pool draining into the total
+    rewardMultiplier: 2, // on top of the floor's income times its floor number
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

@@ -63,6 +63,7 @@ import {
   forcePiggyBankEvent,
   forceJackpotReelsEvent,
   forceChainPayEvent,
+  forceDownpourEvent,
   forceStreamEvent,
   forceTrailsEvent,
   forceDrawEvent,
@@ -144,6 +145,7 @@ import {
   wirePiggyBankEventTestButton,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
+  wireDownpourEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
@@ -658,6 +660,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceChainPayEvent(floor);
+    });
+    // same, for the Downpour event
+    wireDownpourEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceDownpourEvent(floor);
     });
     // same, for the Stream event
     wireStreamEventTestButton(app, () => {

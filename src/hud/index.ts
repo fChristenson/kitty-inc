@@ -78,6 +78,7 @@ export {
   wirePiggyBankEventTestButton,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
+  wireDownpourEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
