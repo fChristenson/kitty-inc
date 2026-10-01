@@ -101,6 +101,7 @@ export {
   wireBreakoutEventTestButton,
   wireLineClearEventTestButton,
   wireBreakShotEventTestButton,
+  wireBulletHellEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,

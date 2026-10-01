@@ -86,6 +86,7 @@ import {
   forceBreakoutEvent,
   forceLineClearEvent,
   forceBreakShotEvent,
+  forceBulletHellEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -229,6 +230,7 @@ import {
   wireBreakoutEventTestButton,
   wireLineClearEventTestButton,
   wireBreakShotEventTestButton,
+  wireBulletHellEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -943,6 +945,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceBreakShotEvent(floor);
+    });
+    // same, for the Bullet Hell event
+    wireBulletHellEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceBulletHellEvent(floor);
     });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {

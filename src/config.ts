@@ -491,6 +491,16 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/bulletHellEvent — the rare "Bullet Hell" event: the wisp
+  // sprays spiral arms of wisps that pop into coins at the screen's edges,
+  // then blows in a last ring; the coins merge into the total
+  bulletHellEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    emitMs: 1_300, // spraying, ever faster, before it blows
+    holdMs: 450, // the coins hanging after the last pops
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

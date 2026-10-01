@@ -367,6 +367,7 @@ export { forceSnakeEvent } from "./snakeEvent";
 export { forceBreakoutEvent } from "./breakoutEvent";
 export { forceLineClearEvent } from "./lineClearEvent";
 export { forceBreakShotEvent } from "./breakShotEvent";
+export { forceBulletHellEvent } from "./bulletHellEvent";
 export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forceWaterfallEvent } from "./waterfallEvent";
