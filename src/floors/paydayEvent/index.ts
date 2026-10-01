@@ -156,19 +156,21 @@ function startPayday(floor: Floor, context: EventProcContext): void {
   freezeScreen(drawOverlay, { spotlightTotal: true });
   playBoostEventStream();
 
-  // each floor's workers stream into the button, seen from their own floor
-  for (const source of new Set(workers.map((w) => w.floor))) {
-    const fromFloor = workers.filter((w) => w.floor === source);
-    streamCoins(
-      fromFloor.map((w) => ({ floor: source, x: w.center.x, y: w.center.y })),
-      {
-        target: { x: button.x, y: button.y + floorTop - fromFloor[0].top },
-        durationMs: gatherMs,
-        isRunning: isLive,
-        onEachArrive: () => payday.buttonFx.hit(performance.now()),
-      },
-    );
-  }
+  // one stream for every worker so they share one coin budget, each aimed at
+  // the button as seen from its own floor
+  streamCoins(
+    workers.map((w) => ({
+      floor: w.floor,
+      x: w.center.x,
+      y: w.center.y,
+      target: { x: button.x, y: button.y + floorTop - w.top },
+    })),
+    {
+      durationMs: gatherMs,
+      isRunning: isLive,
+      onEachArrive: () => payday.buttonFx.hit(performance.now()),
+    },
+  );
 
   // then the button fires it all into the total
   setTimeout(() => {

@@ -55,6 +55,8 @@ export interface EventProcContext {
   promoteFloorTier?: (floor: Floor, tier: CritTier) => void;
   // unlocks a locked floor for free, rolling its unlock crit like a bought one
   unlockFloorFree?: (floor: Floor) => void;
+  // gives a floor `levels` free upgrade levels
+  upgradeFloorFree?: (floor: Floor, levels: number) => void;
   // the carrying crit's tier, handed to an event that covers it
   critTier?: CritTier;
 }

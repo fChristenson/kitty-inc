@@ -320,6 +320,16 @@ export const CONFIG = {
     holdMs: 600, // after the last strike, before the screen unfreezes
   },
 
+  // src/floors/polishEvent — the rare "Polish" event: lights swirl round the
+  // upgrade button and buff it until it shines, granting free upgrade levels
+  polishEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    swirlMs: 1_800, // the lights swirling in and buffing the button
+    holdMs: 1_200, // after the shine lands, before the screen unfreezes
+    levelShare: 0.1, // free levels, of the floor's current level
+    minLevels: 10,
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

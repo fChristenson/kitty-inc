@@ -354,6 +354,7 @@ export { forceHaloEvent } from "./haloEvent";
 export { forceCometEvent } from "./cometEvent";
 export { forceMentorEvent } from "./mentorEvent";
 export { forceSparkChainEvent } from "./sparkChainEvent";
+export { forcePolishEvent } from "./polishEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";

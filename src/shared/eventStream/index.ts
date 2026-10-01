@@ -28,6 +28,8 @@ export interface StreamSource {
   // each burst starts somewhere within this box around (x, y)
   spreadX?: number;
   spreadY?: number;
+  // floor-local to this source's floor; overrides the stream's own target
+  target?: Point;
 }
 
 export interface StreamOptions {
@@ -102,16 +104,17 @@ export function streamCoins(
 ): void {
   if (sources.length === 0 || !coinStreamer) return;
   const streamer = coinStreamer;
+  // shared out so many sources still add up to about one stream's coins
   const coins: [number, number] = [
-    Math.max(4, Math.round(18 / sources.length)),
-    Math.max(6, Math.round(28 / sources.length)),
+    Math.max(1, Math.round(18 / sources.length)),
+    Math.max(2, Math.round(28 / sources.length)),
   ];
   scheduleEventStream(durationMs, LONG_PRESS_COIN_ARRIVE_MS, isRunning, () => {
     for (const s of sources) {
       const from = sourcePoint(s);
       streamer.burst(s.floor, from.x, from.y, {
         ...EVENT_COIN_TIMING,
-        target,
+        target: s.target ?? target,
         layer: "overlay",
         onEachArrive,
         coins,
@@ -161,7 +164,7 @@ export function streamGlimmers(
         glimmers.push({
           floor: s.floor,
           from: sourcePoint(s),
-          target: target ?? null,
+          target: s.target ?? target ?? null,
           bend: between(GLIMMER_BEND) * (Math.random() < 0.5 ? -1 : 1),
           launchAt: now,
           arriveAt: now + travel,

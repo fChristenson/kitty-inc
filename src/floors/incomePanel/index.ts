@@ -77,8 +77,25 @@ export function getIncomeBarCenter(isGroundFloor: boolean): {
   x: number;
   y: number;
 } {
-  const barY = getPanelY(isGroundFloor) + PANEL_H / 2 - BAR_H / 2;
-  return { x: PANEL_X + BAR_INSET + BAR_W / 2, y: barY + BAR_H / 2 };
+  const box = getIncomeBarBox(isGroundFloor);
+  return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+}
+
+// the visible income bar's floor-local box and corner radius
+export function getIncomeBarBox(isGroundFloor: boolean): {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  radius: number;
+} {
+  return {
+    x: PANEL_X + BAR_INSET,
+    y: getPanelY(isGroundFloor) + PANEL_H / 2 - BAR_H / 2,
+    width: BAR_W,
+    height: BAR_H,
+    radius: BAR_H / 3,
+  };
 }
 
 // an event overlay draws this floor's bar itself (drawIncomePanel's eventFlash)

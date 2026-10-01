@@ -73,6 +73,7 @@ import {
   forceCometEvent,
   forceMentorEvent,
   forceSparkChainEvent,
+  forcePolishEvent,
   forceStreamEvent,
   forceTrailsEvent,
   forceDrawEvent,
@@ -164,6 +165,7 @@ import {
   wireCometEventTestButton,
   wireMentorEventTestButton,
   wireSparkChainEventTestButton,
+  wirePolishEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
@@ -748,6 +750,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceSparkChainEvent(floor);
+    });
+    // same, for the Polish event
+    wirePolishEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forcePolishEvent(floor);
     });
     // same, for the Stream event
     wireStreamEventTestButton(app, () => {

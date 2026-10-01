@@ -513,13 +513,23 @@ function drawSlamFlash(
 function drawSlamShine(
   ctx: CanvasRenderingContext2D,
   pose: SlamPose,
-  { x, y, width, height }: SlamBox,
+  box: SlamBox,
   radius: number,
 ): void {
   const strength = flashStrength(pose);
-  if (strength <= 0) return;
+  if (strength > 0) drawShineSweep(ctx, box, radius, 1 - strength);
+}
+
+// the slanted shine band t (0..1) of the way across a rounded rect, left to right
+export function drawShineSweep(
+  ctx: CanvasRenderingContext2D,
+  { x, y, width, height }: SlamBox,
+  radius: number,
+  t: number,
+  alpha = 0.9,
+): void {
   const band = height * 1.2;
-  const bandX = x - band + (width + band * 2) * (1 - strength);
+  const bandX = x - band + (width + band * 2) * t;
   ctx.save();
   ctx.beginPath();
   ctx.roundRect(x, y, width, height, radius);
@@ -529,7 +539,7 @@ function drawSlamShine(
   gradient.addColorStop(0.5, COLOR.white);
   gradient.addColorStop(1, `${COLOR.heavenlyGold}00`);
   ctx.globalCompositeOperation = "lighter";
-  ctx.globalAlpha = 0.9;
+  ctx.globalAlpha = alpha;
   ctx.fillStyle = gradient;
   const cy = y + height / 2;
   ctx.translate(0, cy);
