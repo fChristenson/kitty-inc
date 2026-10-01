@@ -230,6 +230,17 @@ export const CONFIG = {
     tailsMultiplier: 2,
   },
 
+  // src/floors/hourglassEvent — the rare "Hourglass" event: the button pours
+  // coins into an hourglass that flips over, and they trickle out of it into
+  // the total; pays `seconds` of the building's income
+  hourglassEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    fillMs: 900, // the button filling the hourglass
+    flipMs: 500, // it turning over
+    drainMs: 1_400, // the coins trickling out into the total
+    seconds: 60,
+  },
+
   // src/floors/jackpotReelsEvent — the rare "Jackpot Reels" event: the button
   // streams coins into three slot reels, which stop one by one with a slam;
   // it pays the floor's income times its floor number times the reels' sum

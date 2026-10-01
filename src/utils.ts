@@ -665,6 +665,19 @@ export function drawCartoonText(
   ctx.fillText(text, x, y);
 }
 
+// fills the current path, then strokes it with the cartoon black outline
+export function fillOutlined(
+  ctx: CanvasRenderingContext2D,
+  fill: string,
+  width: number,
+): void {
+  ctx.fillStyle = fill;
+  ctx.fill();
+  ctx.lineWidth = width;
+  ctx.strokeStyle = COLOR.black;
+  ctx.stroke();
+}
+
 // called per frame by several draws with a small fixed set of colors
 const shadedColors = new Map<string, string>();
 

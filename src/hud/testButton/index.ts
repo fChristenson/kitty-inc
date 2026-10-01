@@ -160,6 +160,16 @@ export function wireCoinTossEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireHourglassEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-hourglass-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireWispEventTestButton(
   container: HTMLElement,
   onClick: () => void,

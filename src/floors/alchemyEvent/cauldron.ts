@@ -3,6 +3,7 @@
 import { COLOR } from "../../palette";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
 import { hash01 } from "../../shared/twinkle";
+import { fillOutlined as outlined } from "../../utils";
 
 const W = 210;
 const H = 150;
@@ -35,14 +36,6 @@ export function cauldronCenter(
   baseY: number,
 ): { x: number; y: number } {
   return { x, y: layout(baseY).bodyY };
-}
-
-function outlined(ctx: CanvasRenderingContext2D, fill: string, width: number) {
-  ctx.fillStyle = fill;
-  ctx.fill();
-  ctx.lineWidth = width;
-  ctx.strokeStyle = COLOR.black;
-  ctx.stroke();
 }
 
 export function drawCauldron(

@@ -217,6 +217,10 @@ export const COLOR = {
   potionGreen: "#7CDB3C",
   potionGreenLight: "#C6F57E",
 
+  // Hourglass event's wooden frame
+  hourglassWood: "#B9773D",
+  hourglassWoodDark: "#8A5226",
+
   // page chrome
   pageBg: "#111417",
   pageText: "#F5F5F5",
