@@ -351,6 +351,7 @@ export { forceJackhammerEvent } from "./jackhammerEvent";
 export { forcePummelEvent } from "./pummelEvent";
 export { forceOverloadEvent } from "./overloadEvent";
 export { forceGatlingEvent } from "./gatlingEvent";
+export { forcePressEvent } from "./pressEvent";
 export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forceWaterfallEvent } from "./waterfallEvent";

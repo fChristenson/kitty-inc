@@ -85,6 +85,7 @@ export {
   wirePummelEventTestButton,
   wireOverloadEventTestButton,
   wireGatlingEventTestButton,
+  wirePressEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,

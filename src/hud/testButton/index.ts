@@ -534,6 +534,14 @@ export function wireGatlingEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wirePressEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-press-event")!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,

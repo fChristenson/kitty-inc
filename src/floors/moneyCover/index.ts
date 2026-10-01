@@ -99,6 +99,8 @@ export interface MoneyCoverOptions {
   ) => void;
   // water rippling across the frozen frame
   frameRipple?: FrameRippler;
+  // right as the screen unfreezes
+  onEnd?: () => void;
 }
 
 const STREAM_INTERVAL_MS = 16;
@@ -186,6 +188,7 @@ export function startMoneyCover(
     drawExtra,
     drawOver,
     frameRipple,
+    onEnd,
   }: MoneyCoverOptions,
 ): MoneyCover | null {
   if (!canStartMoneyCover(context)) return null;
@@ -226,6 +229,7 @@ export function startMoneyCover(
   setTimeout(() => {
     if (running !== cover) return;
     running = null;
+    onEnd?.();
     unfreezeScreen();
     addTotalIncome(
       multiply(
