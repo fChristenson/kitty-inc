@@ -8,8 +8,7 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { multiply } from "../../shared/bigNumber";
-import { isFloorLocked } from "../../shared/detachedJob";
-import { critTierRank, pickCritTierByOdds } from "../../shared/critTypes";
+import { pickCritTierByOdds } from "../../shared/critTypes";
 import {
   createEventFx,
   drawWhiteBurst,
@@ -35,7 +34,6 @@ import { BTN_H, BTN_W, forceTestCrit, getButtonCenter } from "../upgradeButton";
 import {
   endEventProc,
   forceClaimEventProc,
-  isVisibleOnFloor,
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
@@ -44,13 +42,11 @@ import {
   clearWorkerSpotlight,
   drawWorkerSpotlight,
   findOpenSpot,
-  getBoostEventCandidates,
-  getWorkerCenter,
-  getWorkerPermaTier,
   promoteWorkerPermaTier,
   setWorkerSpotlight,
   WORKER_HEIGHT,
 } from "../worker";
+import { findOnScreenWorkers, pickLowestTierClimber } from "../onScreenWorkers";
 import { cauldronCenter, cauldronMouth, drawCauldron } from "./cauldron";
 
 const KEY = "alchemy";
@@ -83,26 +79,17 @@ let running: RunningAlchemy | null = null;
 // an open spot for the cauldron and the floor's lowest-tier climbable worker,
 // both in view on the clicked floor
 function plan(floor: Floor, context: EventProcContext): Plan | null {
-  if (!floor.unlocked || isFloorLocked(floor)) return null;
-  const entry = context.getOnScreenFloors?.().find((f) => f.floor === floor);
-  if (!entry) return null;
-  const workers = getBoostEventCandidates(floor).flatMap((index) => {
-    const center = getWorkerCenter(floor, index);
-    return center && isVisibleOnFloor(entry, center.y)
-      ? [{ index, center }]
-      : [];
-  });
-  if (workers.length === 0) return null;
-  const rank = (index: number) =>
-    critTierRank(getWorkerPermaTier(floor, index));
-  const lowest = Math.min(...workers.map((w) => rank(w.index)));
-  const pool = workers.filter((w) => rank(w.index) === lowest);
-  const pick = pool[Math.floor(Math.random() * pool.length)];
+  const pick = pickLowestTierClimber(
+    (findOnScreenWorkers(floor, context.getOnScreenFloors) ?? []).filter(
+      (w) => w.floor === floor,
+    ),
+  );
+  if (!pick) return null;
   const spot = findOpenSpot(floor);
   return {
     x: spot.x,
     baseY: spot.y + WORKER_HEIGHT / 2,
-    workerIndex: pick.index,
+    workerIndex: pick.workerIndex,
     worker: pick.center,
   };
 }

@@ -7,11 +7,7 @@ import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
-import {
-  CRIT_TIER_ORDER,
-  critTierRank,
-  pickCritTierByOdds,
-} from "../../shared/critTypes";
+import { CRIT_TIER_ORDER, pickCritTierByOdds } from "../../shared/critTypes";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
 import { drawGlimmer, hash01 } from "../../shared/twinkle";
@@ -33,13 +29,16 @@ import {
   celebrateWorkerBoost,
   clearWorkerSpotlight,
   drawWorkerSpotlight,
-  getBoostEventCandidates,
   getWorkerPermaTier,
   promoteWorkerPermaTier,
   setWorkerSpotlights,
   WORKER_HEIGHT,
 } from "../worker";
-import { findOnScreenWorkers, type OnScreenWorker } from "../onScreenWorkers";
+import {
+  findOnScreenWorkers,
+  pickLowestTierClimber,
+  type OnScreenWorker,
+} from "../onScreenWorkers";
 
 const KEY = "halo";
 const LIGHTS = 10;
@@ -91,15 +90,9 @@ function findWorker(
   floor: Floor,
   context: EventProcContext,
 ): OnScreenWorker | null {
-  const candidates = (
-    findOnScreenWorkers(floor, context.getOnScreenFloors) ?? []
-  ).filter((w) => getBoostEventCandidates(w.floor).includes(w.workerIndex));
-  if (candidates.length === 0) return null;
-  const rank = (w: OnScreenWorker) =>
-    critTierRank(getWorkerPermaTier(w.floor, w.workerIndex));
-  const lowest = Math.min(...candidates.map(rank));
-  const pool = candidates.filter((w) => rank(w) === lowest);
-  return pool[Math.floor(Math.random() * pool.length)];
+  return pickLowestTierClimber(
+    findOnScreenWorkers(floor, context.getOnScreenFloors) ?? [],
+  );
 }
 
 registerEventProc(

@@ -1,8 +1,14 @@
 // the workers and managers in view, for events that pull every one of them in
 import type { Floor } from "../../gameState";
+import { critTierRank } from "../../shared/critTypes";
 import { isFloorLocked } from "../../shared/detachedJob";
 import { isVisibleOnFloor, type OnScreenFloors } from "../eventProcs";
-import { getRenderedWorkerCount, getWorkerCenter } from "../worker";
+import {
+  getBoostEventCandidates,
+  getRenderedWorkerCount,
+  getWorkerCenter,
+  getWorkerPermaTier,
+} from "../worker";
 
 export interface OnScreenWorker {
   floor: Floor;
@@ -35,6 +41,21 @@ export function findOnScreenWorkers(
     }
   }
   return workers;
+}
+
+// a random one of the lowest perma tier among the workers that can still climb
+export function pickLowestTierClimber(
+  workers: OnScreenWorker[],
+): OnScreenWorker | null {
+  const climbers = workers.filter((w) =>
+    getBoostEventCandidates(w.floor).includes(w.workerIndex),
+  );
+  if (climbers.length === 0) return null;
+  const rank = (w: OnScreenWorker) =>
+    critTierRank(getWorkerPermaTier(w.floor, w.workerIndex));
+  const lowest = Math.min(...climbers.map(rank));
+  const pool = climbers.filter((w) => rank(w) === lowest);
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // up to max workers in hop order from start, always on to the nearest one not

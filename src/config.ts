@@ -369,6 +369,16 @@ export const CONFIG = {
     payouts: 3, // the full bar's payout times this, paid as it slams
   },
 
+  // src/floors/dividendsEvent — the rare "Dividends" event: lights stream from
+  // the button into the lowest-tier worker in view, which climbs one perma
+  // tier, then sprays a coin stream into the total
+  dividendsEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    liftMs: 900, // the lights streaming into the worker
+    sprayMs: 900, // the worker's coins spraying into the total
+    payouts: 3, // the worker's floor's payouts paid into the total
+  },
+
   // src/floors/wispEvent — the rare "Wisp" event: a playful glimmer orb flits
   // between targets in view sprinkling glitter: a worker climbs one perma
   // tier, an income bar one crit tier, a "Lvl N" label gains free levels

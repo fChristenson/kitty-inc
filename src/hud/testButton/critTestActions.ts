@@ -76,6 +76,7 @@ export function createTestButtonMarkup(): string {
           <button id="test-promotion-day-event" class="game__button">Promotion Day</button>
           <button id="test-alchemy-event" class="game__button">Alchemy</button>
           <button id="test-investment-event" class="game__button">Investment</button>
+          <button id="test-dividends-event" class="game__button">Dividends</button>
           <button id="test-wisp-event" class="game__button">Wisp</button>
           <button id="test-stream-event" class="game__button">Stream</button>
           <button id="test-trails-event" class="game__button">Trails</button>

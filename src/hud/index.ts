@@ -93,6 +93,7 @@ export {
   wirePromotionDayEventTestButton,
   wireAlchemyEventTestButton,
   wireInvestmentEventTestButton,
+  wireDividendsEventTestButton,
   wireWispEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
