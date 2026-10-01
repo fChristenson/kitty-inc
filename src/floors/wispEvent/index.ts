@@ -17,7 +17,12 @@ import {
 import { triggerEventEndSlam } from "../../shared/eventEndSlam";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { hash01 } from "../../shared/twinkle";
-import { drawGlitterLight, drawWisp, swoop, WISP_SIZE } from "../../shared/wisp";
+import {
+  drawGlitterLight,
+  drawWisp,
+  swoop,
+  WISP_SIZE,
+} from "../../shared/wisp";
 import { isFloorLocked } from "../../shared/detachedJob";
 import {
   freezeScreen,
