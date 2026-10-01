@@ -338,6 +338,7 @@ export { forceKickbackEvent } from "./kickbackEvent";
 export { forceBurstEvent } from "./burstEvent";
 export { forceSprayEvent } from "./sprayEvent";
 export { forceStreamEvent } from "./streamEvent";
+export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";
 export { forceGlimmerEvent } from "./glimmerEvent";
 export type { OnScreenFloor } from "./eventProcs";

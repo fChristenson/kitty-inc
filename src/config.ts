@@ -157,6 +157,15 @@ export const CONFIG = {
     travelMs: 8_00, // each coin's trip down the river
   },
 
+  // src/floors/trailsEvent — the rare "Trails" event: like Stream, but many
+  // short streams leave the button one after another, each winding into the total
+  trailsEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    spreadMs: 900, // from the first trail leaving the button to the last
+    pourMs: 200, // how long the button pours each trail
+    travelMs: 700, // each coin's trip down its trail
+  },
+
   // src/floors/drawEvent — the rare "Draw" event: like Spray, but the stream
   // draws the crit's own 5/25/125 and the payout is multiplied by it
   drawEvent: {

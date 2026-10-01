@@ -57,6 +57,7 @@ import {
   forceBurstEvent,
   forceSprayEvent,
   forceStreamEvent,
+  forceTrailsEvent,
   forceDrawEvent,
   forceGlimmerEvent,
   forceHuntEvent,
@@ -130,6 +131,7 @@ import {
   wireBurstEventTestButton,
   wireSprayEventTestButton,
   wireStreamEventTestButton,
+  wireTrailsEventTestButton,
   wireDrawEventTestButton,
   wireGlimmerEventTestButton,
   wireHuntEventTestButton,
@@ -600,6 +602,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceStreamEvent(floor);
+    });
+    // same, for the Trails event
+    wireTrailsEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceTrailsEvent(floor);
     });
     // same, for the Draw event
     wireDrawEventTestButton(app, (tier) => {

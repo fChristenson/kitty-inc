@@ -91,6 +91,15 @@ export function wireStreamEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireTrailsEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-trails-event")!;
+  button.addEventListener("click", onClick);
+}
+
 // onClick gets the tier whose number to draw, or undefined to roll it
 export function wireDrawEventTestButton(
   container: HTMLElement,
