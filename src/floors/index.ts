@@ -337,6 +337,7 @@ export { forceUnionEvent } from "./unionEvent";
 export { forceKickbackEvent } from "./kickbackEvent";
 export { forceBurstEvent } from "./burstEvent";
 export { forceSprayEvent } from "./sprayEvent";
+export { forceStreamEvent } from "./streamEvent";
 export { forceDrawEvent } from "./drawEvent";
 export { forceGlimmerEvent } from "./glimmerEvent";
 export type { OnScreenFloor } from "./eventProcs";

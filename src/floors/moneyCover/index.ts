@@ -1,8 +1,9 @@
-// shared core of the money-cover events (Burst, Spray, Draw): their crit's
-// click freezes the screen while the button shoots coins and bills straight
-// out to spots laid out by the event. They hang there, then in the last
-// stretch merge into the total-income readout, which pays the floor's income
-// times its floor number before revealing the covered crit itself
+// shared core of the money-cover events (Burst, Spray, Draw, Stream): their
+// crit's click freezes the screen while the button shoots coins and bills
+// straight out to spots laid out by the event (or along paths, see flow). They
+// hang there, then in the last stretch merge into the total-income readout,
+// which pays the floor's income times its floor number before revealing the
+// covered crit itself
 import type { Floor } from "../../gameState";
 import { playCoinDrop, playSold } from "../../sound";
 import { GLOBAL_SLAM, triggerEventEndSlam } from "../../shared/eventEndSlam";
@@ -19,7 +20,12 @@ import {
   type FloorRectResolver,
 } from "../../shared/screenFreeze";
 import { addTotalIncome } from "../../totalIncome";
-import { drawCoins, spawnSprayCoins } from "../coins";
+import {
+  drawCoins,
+  spawnPathCoins,
+  spawnSprayCoins,
+  type CoinPath,
+} from "../coins";
 import { currentPayoutAmount } from "../incomePanel";
 import { getButtonCenter } from "../upgradeButton";
 import { endEventProc, type EventProcContext } from "../eventProcs";
@@ -28,6 +34,8 @@ import { endEventProc, type EventProcContext } from "../eventProcs";
 // flight into the total
 const OUT_TICKS: [number, number] = [12, 18];
 const FLIGHT_TICKS: [number, number] = [18, 29];
+// a flowing coin's quick hop from its path's end into the total, at most
+export const FLOW_FLIGHT_MS = 200;
 // keeps the coins' spots clear of the screen's edges
 const EDGE_MARGIN = 40;
 
@@ -41,16 +49,21 @@ export type CoverArea = {
 
 export interface MoneyCover {
   button: Point;
+  // the whole screen, floor-local
+  area: CoverArea;
   // one spot per coin, laid out by the event's own layout
   spots: Point[];
   launch(targets: Point[]): void;
   // launches targets in order, spread evenly over durationMs
   stream(targets: Point[], durationMs: number): void;
+  // launches one coin per path in order, spread evenly over durationMs; each
+  // follows its path for travelMs, then hops on into the total
+  flow(paths: CoinPath[], durationMs: number, travelMs: number): void;
   isLive(): boolean;
 }
 
 export interface MoneyCoverOptions {
-  layout: (area: CoverArea) => Point[];
+  layout?: (area: CoverArea) => Point[];
   // the covered crit's tier, revealed at the end; defaults to the crit's own
   tier?: CritTier;
   // on top of the floor's income times its floor number
@@ -60,8 +73,37 @@ export interface MoneyCoverOptions {
 }
 
 const STREAM_INTERVAL_MS = 16;
+const TICK_MS = 1000 / 60;
 
 let running: { key: string } | null = null;
+
+// calls launch with the items due so far, in order, spread over durationMs,
+// along with how late (ms) each one is past its own due time
+function launchOver<T>(
+  items: T[],
+  durationMs: number,
+  isLive: () => boolean,
+  launch: (batch: T[], lateMs: number[]) => void,
+): void {
+  const startedAt = performance.now();
+  let emitted = 0;
+  const timer = setInterval(() => {
+    if (!isLive()) return clearInterval(timer);
+    const elapsed = performance.now() - startedAt;
+    const due = Math.min(
+      items.length,
+      Math.ceil((elapsed / durationMs) * items.length),
+    );
+    if (due > emitted) {
+      const late: number[] = [];
+      for (let i = emitted; i < due; i++)
+        late.push(elapsed - (i / items.length) * durationMs);
+      launch(items.slice(emitted, due), late);
+    }
+    emitted = due;
+    if (emitted >= items.length) clearInterval(timer);
+  }, STREAM_INTERVAL_MS);
+}
 
 export function isMoneyCoverRunning(key?: string): boolean {
   return running !== null && (key === undefined || running.key === key);
@@ -106,7 +148,7 @@ export function startMoneyCover(
   key: string,
   floor: Floor,
   context: EventProcContext,
-  { durationMs, mergeMs }: { durationMs: number; mergeMs: number },
+  { durationMs, mergeMs = 0 }: { durationMs: number; mergeMs?: number },
   {
     layout,
     tier: coveredTier,
@@ -163,25 +205,32 @@ export function startMoneyCover(
   const launch = (targets: Point[]) =>
     spawnSprayCoins(floor, button.x, button.y, targets, arrival);
   const isLive = () => running === cover;
+  const area = context.getScreenAreaLocal!(floor);
   return {
     button,
-    spots: layout(context.getScreenAreaLocal!(floor)),
+    area,
+    spots: layout?.(area) ?? [],
     launch,
-    stream: (targets, streamMs) => {
-      const startedAt = performance.now();
-      let emitted = 0;
-      const timer = setInterval(() => {
-        if (!isLive()) return clearInterval(timer);
-        const due = Math.min(
-          targets.length,
-          Math.ceil(
-            ((performance.now() - startedAt) / streamMs) * targets.length,
-          ),
-        );
-        if (due > emitted) launch(targets.slice(emitted, due));
-        emitted = due;
-        if (emitted >= targets.length) clearInterval(timer);
-      }, STREAM_INTERVAL_MS);
+    stream: (targets, streamMs) =>
+      launchOver(targets, streamMs, isLive, (batch) => launch(batch)),
+    flow: (paths, streamMs, travelMs) => {
+      const { releaseAt: _, ...pathArrival } = arrival;
+      const ticks = travelMs / TICK_MS;
+      const flight = FLOW_FLIGHT_MS / TICK_MS;
+      // each coin starts as far along as it would be if launched on time, so
+      // a batch spreads out evenly instead of leaving the button in a clump
+      launchOver(paths, streamMs, isLive, (batch, lateMs) =>
+        spawnPathCoins(
+          floor,
+          batch,
+          {
+            ...pathArrival,
+            outTicks: [ticks * 0.97, ticks * 1.03],
+            flightTicks: [flight * 0.6, flight],
+          },
+          lateMs.map((ms) => ms / TICK_MS),
+        ),
+      );
     },
     isLive,
   };

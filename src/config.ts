@@ -149,6 +149,14 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
+  // flow as a river winding and looping across the screen into the total; the
+  // button pours until its head arrives, so the whole event lasts ~2x travelMs
+  streamEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    travelMs: 8_00, // each coin's trip down the river
+  },
+
   // src/floors/drawEvent — the rare "Draw" event: like Spray, but the stream
   // draws the crit's own 5/25/125 and the payout is multiplied by it
   drawEvent: {

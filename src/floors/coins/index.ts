@@ -47,6 +47,8 @@ interface Particle extends CoinBurstSprite {
   spinRate: number; // this particle's own frames/tick speed
   spinDir: 1 | -1; // picked once per coin so a burst doesn't spin in lockstep
   homing?: HomingFlight;
+  // set by a coin path: its size along the way, times size
+  pathScale?: number;
 }
 
 export interface HomingBurstOptions {
@@ -91,14 +93,20 @@ interface HomingFlight {
   holdTicks?: number;
   // set for a spray coin: it flies straight from (x0, y0) to (x1, y1) in
   // outTicks, where it freezes
-  spray?: {
-    x0: number;
-    y0: number;
-    x1: number;
-    y1: number;
-    outTicks: number;
-  };
+  spray?: SprayFlight;
 }
+
+type SprayFlight = {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+  outTicks: number;
+  // instead of the straight line: the point at 0..1 along it, at a steady pace
+  path?: CoinPath;
+};
+
+export type CoinPath = (f: number) => { x: number; y: number; scale?: number };
 
 const HOMING_FLIGHT_TICKS = 32;
 const HOMING_BURST_TICKS: [number, number] = [14, 36];
@@ -177,7 +185,7 @@ export function drawCoins(
         const stream = p.homing.group.arriveTicks !== undefined;
         const eased = stream ? f : f * f;
         const shrink = f * f;
-        const burstRadius = p.size * scale;
+        const burstRadius = p.size * (p.pathScale ?? 1) * scale;
         px += (targetX - px) * eased;
         py += (targetY - py) * eased;
         radius = burstRadius + (HOMING_END_RADIUS - burstRadius) * shrink;
@@ -235,6 +243,7 @@ function advanceCoin(p: Particle, dt: number): void {
       const pos = sprayPosition(spray, p.life);
       p.x = pos.x;
       p.y = pos.y;
+      if (spray.path) p.pathScale = pos.scale;
       p.spinFrame += p.spinDir * p.spinRate * dt;
       if (p.life >= spray.outTicks && group.settleFaceOn)
         p.spinFrame = getFullestFrame(p.kind);
@@ -444,9 +453,10 @@ export function spawnHomingCoinBurst(
 const SPRAY_STOP_TICKS = 6;
 
 function sprayPosition(
-  s: { x0: number; y0: number; x1: number; y1: number; outTicks: number },
+  s: SprayFlight,
   ticks: number,
-): { x: number; y: number } {
+): { x: number; y: number; scale?: number } {
+  if (s.path) return s.path(Math.min(1, ticks / s.outTicks));
   const stop = Math.min(SPRAY_STOP_TICKS, s.outTicks);
   const cruise = s.outTicks - stop;
   const total = cruise + stop / 2;
@@ -485,43 +495,82 @@ export function spawnSprayCoins(
     fired: false,
     releaseAt,
   };
-  for (const target of targets) {
-    const kind: "coin" | "bill" =
-      Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
-    sprayPool.spawn({
-      floor,
-      x,
-      y,
-      vx: 0,
-      vy: 0,
-      life: 0,
-      maxLife: Infinity,
-      size: Math.min(
-        (22 + Math.random() * 46) * 1.15 * 1.25,
-        (target.maxSize ?? Infinity) / getSpriteReach(kind),
-      ),
-      gravity: 0,
-      gravityRamp: 0,
-      kind,
-      spinFrame:
-        Math.random() *
-        (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
-      spinRate: MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE),
-      spinDir: Math.random() < 0.5 ? 1 : -1,
-      axisAngle: (Math.random() * 2 - 1) * (Math.PI / 2),
-      homing: {
-        burstLife: Infinity,
-        flightTicks: randomIn(flightTicks),
-        group,
-        spray: {
-          x0: x,
-          y0: y,
-          x1: target.x,
-          y1: target.y,
-          outTicks: randomIn(outTicks),
-        },
-      },
+  for (const target of targets)
+    spawnSprayCoin(floor, group, flightTicks, target.maxSize, {
+      x0: x,
+      y0: y,
+      x1: target.x,
+      y1: target.y,
+      outTicks: randomIn(outTicks),
     });
-  }
   sprayPool.ensureTicking((dt) => sprayPool.update(dt, advanceCoin));
+}
+
+// one coin or bill per path (floor-local), each following its own path over
+// outTicks, then flying straight on into the total. ages (ticks, per path)
+// start a coin that far along, as if launched that much earlier
+export function spawnPathCoins(
+  floor: Floor,
+  paths: CoinPath[],
+  { outTicks, flightTicks, ...arrival }: Omit<SprayOptions, "releaseAt">,
+  ages: number[] = [],
+): void {
+  const group: HomingGroup = { ...arrival, layer: "overlay", fired: false };
+  paths.forEach((path, i) => {
+    const start = path(0);
+    const end = path(1);
+    const flight: SprayFlight = {
+      x0: start.x,
+      y0: start.y,
+      x1: end.x,
+      y1: end.y,
+      outTicks: randomIn(outTicks),
+      path,
+    };
+    spawnSprayCoin(floor, group, flightTicks, undefined, flight, ages[i]);
+  });
+  sprayPool.ensureTicking((dt) => sprayPool.update(dt, advanceCoin));
+}
+
+function spawnSprayCoin(
+  floor: Floor,
+  group: HomingGroup,
+  flightTicks: [number, number],
+  maxSize: number | undefined,
+  spray: SprayFlight,
+  age = 0,
+): void {
+  const kind: "coin" | "bill" =
+    Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
+  const life = Math.min(Math.max(0, age), spray.outTicks);
+  const at =
+    life > 0 ? sprayPosition(spray, life) : { x: spray.x0, y: spray.y0 };
+  sprayPool.spawn({
+    floor,
+    x: at.x,
+    y: at.y,
+    vx: 0,
+    vy: 0,
+    life,
+    maxLife: Infinity,
+    size: Math.min(
+      (22 + Math.random() * 46) * 1.15 * 1.25,
+      (maxSize ?? Infinity) / getSpriteReach(kind),
+    ),
+    gravity: 0,
+    gravityRamp: 0,
+    kind,
+    spinFrame:
+      Math.random() *
+      (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
+    spinRate: MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE),
+    spinDir: Math.random() < 0.5 ? 1 : -1,
+    axisAngle: (Math.random() * 2 - 1) * (Math.PI / 2),
+    homing: {
+      burstLife: Infinity,
+      flightTicks: randomIn(flightTicks),
+      group,
+      spray,
+    },
+  });
 }
