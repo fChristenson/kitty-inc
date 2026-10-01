@@ -78,6 +78,7 @@ export {
   wireFuseEventTestButton,
   wireSupernovaEventTestButton,
   wireBowlingEventTestButton,
+  wireThunderclapEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
