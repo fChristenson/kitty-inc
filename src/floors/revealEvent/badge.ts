@@ -90,8 +90,7 @@ export function badgeRevealTimeline() {
 function spinAngle(ms: number, tl: Timeline): number {
   const { spinUpMs, correctMs } = CONFIG.revealEvent;
   if (ms < tl.spinAt) return 0;
-  if (ms < tl.swapAt)
-    return SPIN_UP_ANGLE * ((ms - tl.spinAt) / spinUpMs) ** 2;
+  if (ms < tl.swapAt) return SPIN_UP_ANGLE * ((ms - tl.spinAt) / spinUpMs) ** 2;
   if (ms < tl.settleAt)
     return (
       SPIN_UP_ANGLE +
@@ -253,7 +252,8 @@ export function drawBadgeReveal(
       ? SQUASH * Math.exp(-sinceBump / 110) * Math.cos(sinceBump / 55)
       : 0;
   const pop = 1 + POP * flash;
-  const imageAt = (t: number) => (t >= tl.swapAt ? scene.art : scene.silhouette);
+  const imageAt = (t: number) =>
+    t >= tl.swapAt ? scene.art : scene.silhouette;
   const bottom = by + halfH;
   if (ms > tl.spinAt && ms < tl.settleAt)
     // faint copies trailing the fast spin
