@@ -2830,7 +2830,7 @@ export function forceBonusTierCritProc(floor: Floor, tier: CritTier): void {
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),
 // so that's a safe, already-canonical rank to compare tiers by — null (no tier)
 // always loses to any real tier
-function critTierRank(tier: CritTier | null): number {
+export function critTierRank(tier: CritTier | null): number {
   return tier ? CRIT_TIER_CONFIG[tier].multiplier : 0;
 }
 

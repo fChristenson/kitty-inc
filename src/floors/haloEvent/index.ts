@@ -9,8 +9,8 @@ import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import {
   CRIT_TIER_ORDER,
+  critTierRank,
   pickCritTierByOdds,
-  type CritTier,
 } from "../../shared/critTypes";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
@@ -86,13 +86,6 @@ interface RunningHalo {
 
 let running: RunningHalo | null = null;
 
-// higher is closer to the top tier; no tier is lowest
-function tierRank(tier: CritTier | null): number {
-  return tier === null
-    ? -1
-    : CRIT_TIER_ORDER.length - CRIT_TIER_ORDER.indexOf(tier);
-}
-
 // the lowest-tier worker in view that can still climb
 function findWorker(
   floor: Floor,
@@ -103,7 +96,7 @@ function findWorker(
   ).filter((w) => getBoostEventCandidates(w.floor).includes(w.workerIndex));
   if (candidates.length === 0) return null;
   const rank = (w: OnScreenWorker) =>
-    tierRank(getWorkerPermaTier(w.floor, w.workerIndex));
+    critTierRank(getWorkerPermaTier(w.floor, w.workerIndex));
   const lowest = Math.min(...candidates.map(rank));
   const pool = candidates.filter((w) => rank(w) === lowest);
   return pool[Math.floor(Math.random() * pool.length)];

@@ -301,6 +301,14 @@ export const CONFIG = {
     holdMs: 900, // the explosion, before the screen unfreezes
   },
 
+  // src/floors/mentorEvent — the rare "Mentor" event: the top-tier worker in
+  // view streams lights into the lowest-tier one, which climbs up to two tiers
+  mentorEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streamMs: 1800, // the lights streaming over; a tier halfway and one at the end
+    holdMs: 700, // after the last tier, before the screen unfreezes
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs
