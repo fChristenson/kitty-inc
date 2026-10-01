@@ -380,6 +380,42 @@ export const CONFIG = {
     minLevels: 10,
   },
 
+  // src/floors/headHopEvent — the rare "Head Hop" event: the wisp hops
+  // across the clicked floor's workers' heads, each squashing and climbing a
+  // perma tier
+  headHopEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    entryMs: 300, // dropping in onto the first head
+    firstHopMs: 260, // the first hop, shrinking to
+    lastHopMs: 140, // the last
+    launchMs: 280, // rocketing up off the last head
+    holdMs: 650, // after the last head, before the screen unfreezes
+  },
+
+  // src/floors/missileBarrageEvent — the rare "Missile Barrage" event: a
+  // volley of wisp missiles streaks up into every income bar in view, each
+  // hit landing free upgrade levels
+  missileBarrageEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    gapMs: 75, // between launches
+    flightMs: 420, // each missile's flight
+    holdMs: 650, // after the last hit, before the screen unfreezes
+    levelShare: 0.1, // free levels per bar, of its floor's current level
+    minLevels: 10,
+  },
+
+  // src/floors/sonicBoomEvent — the rare "Sonic Boom" event: the wisp revs
+  // up near the middle of the screen, then bursts off it trailing a shock
+  // cone and leaving money behind that merges into the total
+  sonicBoomEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    glideMs: 360, // gliding in and pulling up
+    revMs: 520, // revving up
+    burstMs: 130, // tearing off the screen
+    holdMs: 450, // the coins hanging after it's gone
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

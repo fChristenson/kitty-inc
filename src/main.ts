@@ -76,6 +76,9 @@ import {
   forcePingPongEvent,
   forceSlamDunkEvent,
   forceUppercutEvent,
+  forceHeadHopEvent,
+  forceMissileBarrageEvent,
+  forceSonicBoomEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -209,6 +212,9 @@ import {
   wirePingPongEventTestButton,
   wireSlamDunkEventTestButton,
   wireUppercutEventTestButton,
+  wireHeadHopEventTestButton,
+  wireMissileBarrageEventTestButton,
+  wireSonicBoomEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -853,6 +859,27 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceUppercutEvent(floor);
+    });
+    // same, for the Head Hop event
+    wireHeadHopEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceHeadHopEvent(floor);
+    });
+    // same, for the Missile Barrage event
+    wireMissileBarrageEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceMissileBarrageEvent(floor);
+    });
+    // same, for the Sonic Boom event
+    wireSonicBoomEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceSonicBoomEvent(floor);
     });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {

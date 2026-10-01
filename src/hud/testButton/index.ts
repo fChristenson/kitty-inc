@@ -585,6 +585,33 @@ export function wireUppercutEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireHeadHopEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-head-hop-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+export function wireMissileBarrageEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-missile-barrage-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+export function wireSonicBoomEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-sonic-boom-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,
