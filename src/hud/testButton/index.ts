@@ -664,6 +664,15 @@ export function wireLineClearEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireBreakShotEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-break-shot-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,

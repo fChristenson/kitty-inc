@@ -482,6 +482,15 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/breakShotEvent — the rare "Break Shot" event: the wisp breaks
+  // a rack of pool balls, which scatter and then pop into coins for the total
+  breakShotEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    popMs: 2_200, // the cue's run in and the scatter, before the balls pop
+    holdMs: 450, // the coins hanging after the pop
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
