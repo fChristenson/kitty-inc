@@ -283,6 +283,16 @@ export const CONFIG = {
     holdMs: 450, // after the finale lands, before the screen unfreezes
   },
 
+  // src/floors/overloadEvent — the rare "Overload" event: the clicked floor's
+  // income bar overheats, shuddering and sparking ever harder, then blows in a
+  // huge explosion and jumps one crit tier
+  overloadEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    chargeMs: 1_000, // overheating
+    suckMs: 110, // sucking in before it blows
+    holdMs: 600, // after the blast, before the screen unfreezes
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
