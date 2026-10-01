@@ -159,6 +159,19 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/rippleEvent — the rare "Ripple" event: coins burst out of the
+  // button in round ripples, wide bands each trailed by a thin ring or two,
+  // that keep rolling outward at their own pace, then sweep into the total;
+  // pays once per ring
+  rippleEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    rings: 6,
+    thinGapMs: [90, 140] as [number, number], // a thin ring following close behind
+    wideGapMs: [260, 360] as [number, number], // before the next wide band
+    rippleMs: 2_400, // the rings rolling out, until the coins sweep into the total
+    mergeMs: 500, // the coins flying into the total
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
@@ -281,7 +294,7 @@ export const CONFIG = {
     bumpMs: 380, // it dipping to bump the badge's head and bouncing back up
     spinUpMs: 600, // the shadow spinning ever faster until it flips to the art
     correctMs: 500, // the art's spins overshooting, then turning back to face front
-    holdMs: 1_100, // the settled badge and its name
+    holdMs: 300, // the settled badge and its name
   },
 
   // src/floors/jackpotReelsEvent — the rare "Jackpot Reels" event: the button

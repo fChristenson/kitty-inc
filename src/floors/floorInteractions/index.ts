@@ -85,7 +85,7 @@ import {
 import { startBoostEvent, type OnScreenFloors } from "../boostEvent";
 import { startUnionEvent } from "../unionEvent";
 import { startHuntEvent } from "../huntEvent";
-// registers the Swarm, Kickback, Payday, Piggy Bank, Coin Toss, Hourglass, Rocket, Reveal, Jackpot Reels, Chain Pay, Twister, Downpour, Trickle, Magnet, Spillover, Constellation, Ascend, Rising Tide, Tidal Wave, Beanstalk, Blessing, Halo, Comet, Meteor Shower, Mentor, Spark Chain, Polish, Lighthouse, Recruit, Promotion Day, Alchemy, Investment, Dividends, Harvest, Wisp, Burst, Spray, Fountain, Vortex, Ricochet, Waterfall, Conveyor, Fireflies, Stream, Trails, Draw, Night Sky, Pitcher, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
+// registers the Swarm, Kickback, Payday, Piggy Bank, Coin Toss, Hourglass, Rocket, Reveal, Jackpot Reels, Chain Pay, Twister, Downpour, Trickle, Magnet, Spillover, Constellation, Ascend, Rising Tide, Tidal Wave, Beanstalk, Blessing, Halo, Comet, Meteor Shower, Mentor, Spark Chain, Polish, Lighthouse, Recruit, Promotion Day, Alchemy, Investment, Dividends, Harvest, Wisp, Burst, Spray, Fountain, Ripple, Vortex, Ricochet, Waterfall, Conveyor, Fireflies, Stream, Trails, Draw, Night Sky, Pitcher, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
 import "../swarmEvent";
 import "../kickbackEvent";
 import "../paydayEvent";
@@ -124,6 +124,7 @@ import "../wispEvent";
 import "../burstEvent";
 import "../sprayEvent";
 import "../fountainEvent";
+import "../rippleEvent";
 import "../vortexEvent";
 import "../ricochetEvent";
 import "../waterfallEvent";

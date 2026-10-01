@@ -1,5 +1,6 @@
 // the "Polish" event: it covers its crit, whose click freezes the screen while
-// glimmer lights pop up around the clicked floor's income bar and swirl in
+// lights (the wisp, shared/wisp) pop up around the clicked floor's income bar
+// and swirl in
 // onto it, buffing it in little circles while shine bands sweep across and it
 // glows ever brighter, then they sink into it and it slams, shining: the floor
 // gets free upgrade levels. Then the screen unfreezes and the crit's tier pays out
@@ -15,7 +16,7 @@ import {
   triggerEventEndSlam,
 } from "../../shared/eventEndSlam";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
-import { drawGlimmer } from "../../shared/twinkle";
+import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -37,8 +38,7 @@ import {
 } from "../eventProcs";
 
 const KEY = "polish";
-const LIGHTS = 8;
-const LIGHT_SIZE = 15;
+const LIGHTS = 6;
 const BAR_H = getIncomeBarBox(false).height;
 // the lights start on a ring around the bar and swirl in onto its face
 const RING_RX = BAR_W * 0.62;
@@ -56,8 +56,6 @@ const STAGGER_MS = 70;
 const APPEAR_MS = 250;
 // at the end they sink into the bar's middle over this long
 const CONVERGE_MS = 250;
-const TRAIL = 8;
-const TRAIL_MS = 22;
 // shine bands sweeping the bar as it's buffed, ever closer together, faster
 // and brighter: sweep k starts at 1 - (1 - FIRST) * GAP^k of swirlMs
 const SWEEP_COUNT = 11;
@@ -174,39 +172,14 @@ function drawOverlay(
     if (t > 0 && t < 1) drawShineSweep(ctx, box, box.radius, t, sweep.alpha);
   }
 
-  for (let i = 0; i < LIGHTS; i++) {
-    const head = lightAt(i, ms, cx, cy);
-    if (!head || head.scale <= 0) continue;
-    for (let k = TRAIL; k >= 1; k--) {
-      const point = lightAt(i, ms - k * TRAIL_MS, cx, cy);
-      if (!point) continue;
-      drawGlimmer(
-        ctx,
-        point.x,
-        point.y,
-        LIGHT_SIZE * head.scale * (1 - k / (TRAIL + 1)),
-        now / 200 + k + i,
-        COLOR.heavenlyGold,
-      );
-    }
-    drawGoldShimmer(
+  for (let i = 0; i < LIGHTS; i++)
+    drawWisp(
       ctx,
-      head.x,
-      head.y,
-      LIGHT_SIZE * 1.3 * head.scale,
-      1,
-      3,
+      (t) => lightAt(i, t, cx, cy),
+      ms,
       now,
+      WISP_SIZE * (lightAt(i, ms, cx, cy)?.scale ?? 0),
     );
-    drawGlimmer(
-      ctx,
-      head.x,
-      head.y,
-      LIGHT_SIZE * 1.2 * head.scale,
-      now / 150 + i,
-      COLOR.heavenlyGold,
-    );
-  }
 
   if (event.shinedAt !== null)
     drawPoppingCritText(

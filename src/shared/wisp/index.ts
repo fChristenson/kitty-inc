@@ -24,6 +24,8 @@ const HUDDLE_REACH = 0.5;
 // to SPREAD of the wisp's size and sinking SINK of it by the end
 const TAIL_MS = 3;
 const TAIL_LIFE_MS = 1_200;
+// how long a wisp's trail lingers after it's gone
+export const WISP_TRAIL_MS = TAIL_LIFE_MS;
 const SPREAD = 2.4;
 const SINK = 0.8;
 // a sparkle's glow radius, of the wisp's size; GLINTS of them are tiny crosses

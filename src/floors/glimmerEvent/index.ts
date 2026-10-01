@@ -21,9 +21,13 @@ import {
   type EventFx,
 } from "../../shared/eventFx";
 import { pickCritTierByOdds } from "../../shared/critTypes";
-import { drawGoldShimmer } from "../../shared/goldShimmer";
 import { drawGlimmer } from "../../shared/twinkle";
-import { drawWispHead, drawWispTrail, WISP_SIZE } from "../../shared/wisp";
+import {
+  drawWisp,
+  drawWispHead,
+  drawWispTrail,
+  WISP_SIZE,
+} from "../../shared/wisp";
 import { smoothstep } from "../../shared/easing";
 import {
   freezeScreen,
@@ -69,15 +73,12 @@ const AIM_PULL = 0.6; // of SIZE, drawn back away from the target
 const AIM_GLIMMERS = 5;
 const LANDING_SHAKE = 0.8;
 const FADE_OUT = 0.1; // of a sweep, shrinking away at the very end
-// the intro: balls launched one after another from off screen, each spiralling
-// in over INTRO_TRAVEL_MS so the last lands as the intro ends
-const INTRO_BALLS = 12;
+// the intro: wisps launched one after another from off screen, each
+// spiralling in over INTRO_TRAVEL_MS so the last lands as the intro ends
+const INTRO_BALLS = 8;
 const INTRO_TRAVEL_MS = 900;
 const INTRO_RADIUS = FLOOR_W * 1.6;
 const INTRO_TURNS = 1.25;
-const INTRO_BALL_SIZE = SIZE * 0.65;
-const INTRO_TRAIL = 8;
-const INTRO_TRAIL_STEP = 0.03; // of a ball's path between its trail's glimmers
 
 interface IntroBall {
   launchAt: number;
@@ -203,39 +204,24 @@ function introPoint(ball: IntroBall, y: number, p: number) {
   };
 }
 
-// the balls spiralling in, each with a glittering trail
+// the wisps spiralling in, their trails fading on after they land
 function drawIntroBalls(
   ctx: CanvasRenderingContext2D,
   glimmer: RunningGlimmer,
   now: number,
 ): void {
-  for (const ball of glimmer.balls) {
-    const p = (now - ball.launchAt) / INTRO_TRAVEL_MS;
-    if (p <= 0 || p >= 1) continue;
-    for (let k = INTRO_TRAIL; k >= 1; k--) {
-      const q = p - k * INTRO_TRAIL_STEP;
-      if (q <= 0) continue;
-      const point = introPoint(ball, glimmer.legs[0].y, q);
-      drawGlimmer(
-        ctx,
-        point.x,
-        point.y,
-        INTRO_BALL_SIZE * (1 - k / (INTRO_TRAIL + 1)),
-        now / 200 + k,
-        COLOR.heavenlyGold,
-      );
-    }
-    const head = introPoint(ball, glimmer.legs[0].y, p);
-    drawGoldShimmer(ctx, head.x, head.y, INTRO_BALL_SIZE * 1.2, 1, 3, now);
-    drawGlimmer(
+  const y = glimmer.legs[0].y;
+  for (const ball of glimmer.balls)
+    drawWisp(
       ctx,
-      head.x,
-      head.y,
-      INTRO_BALL_SIZE * 1.3,
-      now / 150,
-      COLOR.heavenlyGold,
+      (t) => {
+        const p = (t - ball.launchAt) / INTRO_TRAVEL_MS;
+        return p < 0 || p > 1 ? null : introPoint(ball, y, p);
+      },
+      now,
+      now,
+      WISP_SIZE,
     );
-  }
 }
 
 // the whole sweep: each leg, with a hop between floors
@@ -395,6 +381,10 @@ function drawOverlay(
   );
   const light = lightAt(glimmer, elapsed, getFloorRect);
   if (!light) return;
+  ctx.save();
+  ctx.translate(rect.left, rect.top);
+  drawIntroBalls(ctx, glimmer, now);
+  ctx.restore();
   drawWispTrail(
     ctx,
     (t) => (t < 0 ? null : lightAt(glimmer, t, getFloorRect)),

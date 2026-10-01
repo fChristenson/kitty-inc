@@ -1,16 +1,15 @@
 // the "Blessing" event: it covers its crit, whose click freezes the screen
-// while golden glimmers drift down like snow over the clicked floor. One flake
-// is meant for each of its workers that can still climb: as it settles on
-// them they glow, play their boost and climb one perma tier. Once the last
-// has landed the screen unfreezes and the crit's tier pays out
+// while lights (the wisp, shared/wisp) drift down like snow over the clicked
+// floor. One is meant for each of its workers that can still climb: as it
+// settles on them they glow, play their boost and climb one perma tier. Once
+// the last has landed the screen unfreezes and the crit's tier pays out
 import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawWhiteBurst } from "../../shared/eventFx";
-import { drawGoldShimmer } from "../../shared/goldShimmer";
-import { drawGlimmer } from "../../shared/twinkle";
+import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
   drawFreezeDimmed,
@@ -38,16 +37,13 @@ import {
 } from "../worker";
 
 const KEY = "blessing";
-// the drifting flakes that land on no one, and how they look and move
-const LOOSE_FLAKES = 45;
-const FLAKE_SIZE: [number, number] = [8, 16];
-const BLESSING_SIZE = 24;
+// the drifting lights that land on no one, and how they move
+const LOOSE_FLAKES = 12;
 const FALL_MS: [number, number] = [1_300, 1_900];
 const SWAY: [number, number] = [20, 55];
 const SWAY_TURNS = 1.3;
 // flakes start this far above the screen
 const START_ABOVE = 40;
-const LAND_FADE_MS = 300;
 const BURST_MS = 500;
 
 const between = ([min, max]: [number, number]) =>
@@ -61,7 +57,6 @@ interface Flake {
   fallMs: number;
   sway: number;
   phase: number;
-  size: number;
   // the worker it blesses; loose flakes have none
   worker: number | null;
 }
@@ -142,23 +137,21 @@ function drawOverlay(
     if (center)
       drawWhiteBurst(ctx, center.x, center.y, (now - at) / BURST_MS, 0.35);
   }
-  for (const flake of event.flakes) {
-    const ms = now - event.startedAt - flake.startAt;
-    if (ms <= 0) continue;
-    // loose flakes melt away once they settle; a blessing one vanishes into its worker
-    const fade =
-      ms <= flake.fallMs
-        ? 1
-        : flake.worker === null
-          ? 1 - (ms - flake.fallMs) / LAND_FADE_MS
-          : 0;
-    if (fade <= 0) continue;
-    const { x, y } = flakeAt(flake, event.top, ms);
-    const size = flake.size * fade;
-    if (flake.worker !== null)
-      drawGoldShimmer(ctx, x, y, size * 1.6, 1, 2, now);
-    drawGlimmer(ctx, x, y, size, now / 600 + flake.phase, COLOR.heavenlyGold);
-  }
+  // each a wisp, gone as it settles, its trail fading on
+  const ms = now - event.startedAt;
+  for (const flake of event.flakes)
+    drawWisp(
+      ctx,
+      (t) => {
+        const local = t - flake.startAt;
+        return local < 0 || local > flake.fallMs
+          ? null
+          : flakeAt(flake, event.top, local);
+      },
+      ms,
+      now,
+      WISP_SIZE,
+    );
   ctx.restore();
 }
 
@@ -171,12 +164,7 @@ function startBlessing(floor: Floor, context: EventProcContext): void {
   const tier = context.critTier ?? pickCritTierByOdds();
   const top = area.top - START_ABOVE;
   const groundY = (getWorkerCenter(floor, 0)?.y ?? 0) + WORKER_HEIGHT * 0.45;
-  const flake = (
-    x1: number,
-    y1: number,
-    worker: number | null,
-    size: number,
-  ): Flake => {
+  const flake = (x1: number, y1: number, worker: number | null): Flake => {
     const fallMs = between(FALL_MS);
     const sway = between(SWAY);
     return {
@@ -187,7 +175,6 @@ function startBlessing(floor: Floor, context: EventProcContext): void {
       fallMs,
       sway,
       phase: Math.random() * Math.PI * 2,
-      size,
       worker,
     };
   };
@@ -197,12 +184,11 @@ function startBlessing(floor: Floor, context: EventProcContext): void {
         area.left + Math.random() * (area.right - area.left),
         groundY - Math.random() * WORKER_HEIGHT * 0.3,
         null,
-        between(FLAKE_SIZE),
       ),
     ),
     ...candidates.map((index) => {
       const center = getWorkerCenter(floor, index)!;
-      return flake(center.x, center.y, index, BLESSING_SIZE);
+      return flake(center.x, center.y, index);
     }),
   ];
   const event: RunningBlessing = {

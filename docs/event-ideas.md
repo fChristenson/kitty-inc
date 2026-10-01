@@ -57,4 +57,22 @@ Built on `src/floors/revealStage`: the crit click slides a blue stage in over th
 - [x] **Investment**: coins flow into the income bar, then lights burst out of it into the floor's tier. Payout, then a floor tier.
 - [x] **Dividends**: lights promote a worker, then that worker sprays a coin stream into the total. Tier upgrade plus a payout.
 - [x] **Harvest**: the button tosses a seed beside each worker on the floor; each lands in a puff of dirt and a leafy crop shoots up over a ripening gold coin. Left to right, every coin is yanked out like a carrot, spinning up and bursting into a coin stream into the total as its worker climbs. Pays the floor's payout per crop, and the floor's workers each get +1 tier.
-- [ ] **Coronation**: coins stream into a crown over a floor with no manager; it glows, sheds lights and a manager forms under it. A free manager plus a payout.
+
+## Next ideas
+
+Built only from coins and bills, the wisp, glitter and simple shapes (lines, rings, bursts): no big drawn props.
+
+### Coins (free money)
+
+- [x] **Ripple**: coins burst out of the button in round ripples like a stone dropped in a pond (a wide band, a thin ring or two close behind, then the next wide band), each rolling outward at its own pace while the frozen screen under it refracts like water; then the coins sweep into the total. Pays floor income × floor number once per ring.
+- [ ] **Coin Tower**: coins drop one by one onto the button and stack into a tall tower that sways harder the higher it gets, until it topples sideways and the coins spill across the screen into the total. Payout grows with the tower's height.
+- [ ] **Stadium Wave**: left to right, every worker in view flips a coin high into the air in turn like a stadium wave; the coins ride the wave's crest across the screen and leap off its end into the total. Pays the floor's payout per worker.
+- [ ] **Juggler**: the clicked floor's top-tier worker juggles coins in a cascade over its head, one more each beat (3 up to 7), then flings them all into the total in one throw. Pays the floor's payout per coin juggled.
+- [ ] **Dominoes**: a row of giant coins stands on edge along the floor; the first tips over and they fall one into the next, each flipping up into the total as it lands. Pays the floor's payout per coin.
+- [ ] **Heartbeat**: the total pulses like a heartbeat, faster and faster; on every beat each income bar in view squirts a quick burst of coins into it. Pays each floor's payout per beat.
+
+### Wisp (upgrades)
+
+- [ ] **Pendulum**: the wisp hangs on a long glowing thread from the top of the screen and swings across the floor like a pendulum; every pass brushes the upgrade button, which gains free levels, until the swing dies down and it settles on the button.
+- [ ] **Lasso**: the wisp circles the clicked floor in a wide loop trailing a glowing rope, tightening it round all its workers until it cinches; the floor's income bar climbs one crit tier.
+- [ ] **Jump Rope**: two wisps hold a glowing thread between them and twirl it like a jump rope as they walk it across the floor; each worker it reaches jumps over it and climbs one perma tier.

@@ -2,8 +2,8 @@
 // crit, whose click slides the stage in over the floors round the black
 // silhouette of a badge the player has never landed (any badge once all are
 // found). A wisp bumps it on the head, spinning it until it flips to the
-// badge's art and its name pops up. The stage slides off and that crit lands,
-// counting toward its badge
+// badge's art under a "New Badge" title. The stage slides off and that crit
+// lands, its own flash naming it, counting toward its badge
 import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
 import { loadImage } from "../../utils";
@@ -70,13 +70,11 @@ function startReveal(floor: Floor, context: EventProcContext): void {
   const pool = unseen.length > 0 ? unseen : CRIT_PROC_KINDS;
   const kind = pool[Math.floor(Math.random() * pool.length)];
   const tier = context.critTier ?? pickCritTierByOdds();
-  const { icon, label, color } = CRIT_PROC_INFO[kind];
+  const { icon } = CRIT_PROC_INFO[kind];
   const scene: BadgeScene = {
     silhouette: null,
     art: null,
-    label,
-    color,
-    title: unseen.length > 0 ? "New Badge!" : "Badge!",
+    title: unseen.length > 0 ? "New Badge" : "Badge",
   };
   const tl = badgeRevealTimeline();
   const beat = startRevealStage(KEY, floor, context, {

@@ -9,8 +9,7 @@ import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { CRIT_TIER_ORDER, pickCritTierByOdds } from "../../shared/critTypes";
 import { drawWhiteBurst } from "../../shared/eventFx";
-import { drawGoldShimmer } from "../../shared/goldShimmer";
-import { drawGlimmer, hash01 } from "../../shared/twinkle";
+import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
   getScreenFreezeDim,
@@ -41,8 +40,9 @@ import {
 } from "../onScreenWorkers";
 
 const KEY = "halo";
-const LIGHTS = 10;
-const LIGHT_SIZE = 16;
+const LIGHTS = 8;
+// the lights' size once they've formed the halo, of a wisp's
+const CROWNED_SIZE = 0.6;
 // the lights start this far out, orbit at ORBIT of the worker's height and
 // settle into a halo HALO_RX wide (of its height) and HALO_SQUASH as tall
 const START_RADIUS = 900;
@@ -66,15 +66,6 @@ const TILT = 0.2;
 const TILT_MS = 260;
 // lights at the back of the ring are this much smaller, behind the worker
 const DEPTH = 0.35;
-const TRAIL = 7;
-const TRAIL_MS = 22;
-// loose glitter: a chance every SHED_MS to drop a speck that drifts down and fades
-const SHED_MS = 35;
-const SHED_CHANCE = 0.6;
-const SHED_LIFE_MS = 500;
-const SHED_SIZE = 0.5; // of LIGHT_SIZE
-const SHED_DRIFT = 24;
-const SHED_FALL = 30;
 const BURST_MS = 600;
 
 interface RunningHalo {
@@ -179,7 +170,7 @@ function lightAt(i: number, ms: number, cx: number, cy: number) {
   };
 }
 
-// light i with its glimmer trail and the loose glitter it sheds
+// light i: a wisp, shrinking a little once the halo forms
 function drawLight(
   ctx: CanvasRenderingContext2D,
   i: number,
@@ -189,37 +180,13 @@ function drawLight(
   cy: number,
   crowned: boolean,
 ): void {
-  const head = lightAt(i, ms, cx, cy);
-  if (!head) return;
-  const size = LIGHT_SIZE * head.scale * (crowned ? 0.6 : 1);
-  for (let e = Math.floor(ms / SHED_MS); e * SHED_MS > ms - SHED_LIFE_MS; e--) {
-    if (hash01(i, e) > SHED_CHANCE) continue;
-    const from = lightAt(i, e * SHED_MS, cx, cy);
-    if (!from) continue;
-    const age = (ms - e * SHED_MS) / SHED_LIFE_MS;
-    drawGlimmer(
-      ctx,
-      from.x + (hash01(e, i) - 0.5) * 2 * SHED_DRIFT * age,
-      from.y + SHED_FALL * age,
-      LIGHT_SIZE * SHED_SIZE * (1 - age) * (0.5 + 0.5 * hash01(e + 0.5, i)),
-      now / 200 + e,
-      COLOR.heavenlyGold,
-    );
-  }
-  for (let k = TRAIL; k >= 1; k--) {
-    const point = lightAt(i, ms - k * TRAIL_MS, cx, cy);
-    if (!point) continue;
-    drawGlimmer(
-      ctx,
-      point.x,
-      point.y,
-      size * (1 - k / (TRAIL + 1)),
-      now / 200 + k + i,
-      COLOR.heavenlyGold,
-    );
-  }
-  if (!crowned) drawGoldShimmer(ctx, head.x, head.y, size * 1.2, 1, 3, now);
-  drawGlimmer(ctx, head.x, head.y, size, now / 150 + i, COLOR.heavenlyGold);
+  drawWisp(
+    ctx,
+    (t) => lightAt(i, t, cx, cy),
+    ms,
+    now,
+    WISP_SIZE * (crowned ? CROWNED_SIZE : 1),
+  );
 }
 
 function drawOverlay(

@@ -28,8 +28,20 @@ export interface FrameMotion {
 }
 const STILL: FrameMotion = { pan: 0, scaleX: 1, scaleY: 1, blur: 0 };
 
+// water rippling across the frozen frame round `center` (world space, like
+// the overlay): within `bands` (radii), it shows offset(r) px refracted outward
+export interface FrameRipple {
+  center: { x: number; y: number };
+  bands: [number, number][];
+  offset: (r: number) => number;
+}
+export type FrameRippler = (
+  getFloorRect: FloorRectResolver,
+) => FrameRipple | null;
+
 let overlay: FreezeOverlay | null = null;
 let motion: (() => FrameMotion) | null = null;
+let ripple: FrameRippler | null = null;
 let frozen = false;
 let totalSpotlit = false;
 let frozenAt = 0;
@@ -39,25 +51,32 @@ const DIM_ALPHA = 0.6;
 const DIM_FADE_MS = 200;
 
 // spotlightTotal keeps the total-income readout live and undimmed on top;
-// frameMotion moves the frozen frame itself
+// frameMotion moves the frozen frame itself, frameRipple ripples it
 export function freezeScreen(
   drawOverlay: FreezeOverlay,
   {
     spotlightTotal = false,
     frameMotion,
-  }: { spotlightTotal?: boolean; frameMotion?: () => FrameMotion } = {},
+    frameRipple,
+  }: {
+    spotlightTotal?: boolean;
+    frameMotion?: () => FrameMotion;
+    frameRipple?: FrameRippler;
+  } = {},
 ): void {
   frozen = true;
   frozenAt = performance.now();
   overlay = drawOverlay;
   totalSpotlit = spotlightTotal;
   motion = frameMotion ?? null;
+  ripple = frameRipple ?? null;
 }
 
 export function unfreezeScreen(): void {
   frozen = false;
   overlay = null;
   motion = null;
+  ripple = null;
   totalSpotlit = false;
   unfrozenAt = Date.now();
 }
@@ -72,6 +91,12 @@ export function isTotalSpotlit(): boolean {
 
 export function getScreenFreezeMotion(): FrameMotion {
   return frozen && motion ? motion() : STILL;
+}
+
+export function getScreenFreezeRipple(
+  getFloorRect: FloorRectResolver,
+): FrameRipple | null {
+  return frozen && ripple ? ripple(getFloorRect) : null;
 }
 
 // Date.now() of the last unfreeze — per-frame movers use it so time spent

@@ -1,17 +1,15 @@
 // the event streams every freeze event plays into its target: either coins
-// (the floor coin system, see registerCoinStream) or glimmer lights, each
+// (the floor coin system, see registerCoinStream) or lights (the wisp), each
 // spawned in bursts per press-and-hold tick from one or more sources, shared
 // out so any number of sources adds up to one steady, gapless stream. Coins
-// are for handing the target free money, glimmers for raising its tier and
+// are for handing the target free money, lights for raising its tier and
 // similar upgrades
 import type { Floor } from "../../gameState";
-import { COLOR } from "../../palette";
 import type { EventFx, StreamTension } from "../eventFx";
 import { EVENT_COIN_TIMING } from "../floorEvents";
-import { drawGoldShimmer } from "../goldShimmer";
 import { LONG_PRESS_COIN_ARRIVE_MS, LONG_PRESS_TICK_MS } from "../pressAndHold";
 import type { FloorRectResolver } from "../screenFreeze";
-import { drawGlimmer } from "../twinkle";
+import { drawWisp, WISP_SIZE, WISP_TRAIL_MS } from "../wisp";
 
 type Point = { x: number; y: number };
 
@@ -127,14 +125,12 @@ export function streamCoins(
   });
 }
 
-// glimmer lights: each flies on its own curve into the target, trailing glitter
+// lights: each a wisp flying its own curve into the target, one leaving a
+// source (taking turns) every LIGHT_EVERY_TICKS
 const GLIMMER_TRAVEL_MS: [number, number] = [380, 480];
-const GLIMMERS_PER_TICK = 2;
-const GLIMMER_SIZE: [number, number] = [18, 30];
+const LIGHT_EVERY_TICKS = 4;
 // how far a light's path bows out to one side, of the distance it flies
 const GLIMMER_BEND: [number, number] = [0.15, 0.4];
-const GLIMMER_TRAIL = 7;
-const GLIMMER_TRAIL_STEP = 0.035; // of a light's path between its trail's glimmers
 
 interface Glimmer {
   floor: Floor;
@@ -144,8 +140,6 @@ interface Glimmer {
   bend: number;
   launchAt: number;
   arriveAt: number;
-  size: number;
-  spin: number;
 }
 
 let glimmers: Glimmer[] = [];
@@ -158,26 +152,24 @@ export function streamGlimmers(
   { target, durationMs, isRunning, onEachArrive }: StreamOptions,
 ): void {
   if (sources.length === 0) return;
-  const perSource = Math.max(1, Math.round(GLIMMERS_PER_TICK / sources.length));
+  let tick = 0;
+  let turn = Math.floor(Math.random() * sources.length);
   scheduleEventStream(durationMs, GLIMMER_TRAVEL_MS[1], isRunning, () => {
+    if (tick++ % LIGHT_EVERY_TICKS !== 0) return;
+    const s = sources[turn++ % sources.length];
     const now = performance.now();
-    for (const s of sources)
-      for (let i = 0; i < perSource; i++) {
-        const travel = between(GLIMMER_TRAVEL_MS);
-        glimmers.push({
-          floor: s.floor,
-          from: sourcePoint(s),
-          target: s.target ?? target ?? null,
-          bend: between(GLIMMER_BEND) * (Math.random() < 0.5 ? -1 : 1),
-          launchAt: now,
-          arriveAt: now + travel,
-          size: between(GLIMMER_SIZE),
-          spin: Math.random() * Math.PI * 2,
-        });
-        setTimeout(() => {
-          if (isRunning()) onEachArrive?.();
-        }, travel);
-      }
+    const travel = between(GLIMMER_TRAVEL_MS);
+    glimmers.push({
+      floor: s.floor,
+      from: sourcePoint(s),
+      target: s.target ?? target ?? null,
+      bend: between(GLIMMER_BEND) * (Math.random() < 0.5 ? -1 : 1),
+      launchAt: now,
+      arriveAt: now + travel,
+    });
+    setTimeout(() => {
+      if (isRunning()) onEachArrive?.();
+    }, travel);
   });
 }
 
@@ -202,7 +194,8 @@ function drawGlimmers(
   homeTarget: Point | undefined,
 ): void {
   const now = performance.now();
-  glimmers = glimmers.filter((g) => now < g.arriveAt);
+  // kept on past arriving while their trails fade
+  glimmers = glimmers.filter((g) => now < g.arriveAt + WISP_TRAIL_MS);
   for (const g of glimmers) {
     const rect = getFloorRect(g.floor);
     if (!rect) continue;
@@ -211,31 +204,20 @@ function drawGlimmers(
       ? { x: rect.left + g.target.x, y: rect.top + g.target.y }
       : homeTarget;
     if (!to) continue;
-    const p = (now - g.launchAt) / (g.arriveAt - g.launchAt);
-    // shrinks as it sinks into the target
-    const size = g.size * (1 - 0.5 * p * p);
-    for (let k = GLIMMER_TRAIL; k >= 1; k--) {
-      const q = p - k * GLIMMER_TRAIL_STEP;
-      if (q <= 0) continue;
-      const point = glimmerPoint(from, to, g.bend, q);
-      drawGlimmer(
-        ctx,
-        point.x,
-        point.y,
-        size * 0.7 * (1 - k / (GLIMMER_TRAIL + 1)),
-        g.spin + now / 200 + k,
-        COLOR.heavenlyGold,
-      );
-    }
-    const head = glimmerPoint(from, to, g.bend, p);
-    drawGoldShimmer(ctx, head.x, head.y, size * 1.1, 1, 3, now);
-    drawGlimmer(
+    drawWisp(
       ctx,
-      head.x,
-      head.y,
-      size,
-      g.spin + now / 150,
-      COLOR.heavenlyGold,
+      (t) =>
+        t < g.launchAt || t > g.arriveAt
+          ? null
+          : glimmerPoint(
+              from,
+              to,
+              g.bend,
+              (t - g.launchAt) / (g.arriveAt - g.launchAt),
+            ),
+      now,
+      now,
+      WISP_SIZE,
     );
   }
 }

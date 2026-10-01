@@ -4,7 +4,7 @@
 // which spins on, overshoots and turns back to settle facing front
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
-import { drawPoppingCritText } from "../../shared/critText";
+import { critFont, drawPoppingCritText } from "../../shared/critText";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawWisp, swoop, WISP_SIZE } from "../../shared/wisp";
 import { radialFade } from "../../shared/goldShimmer";
@@ -15,8 +15,6 @@ type Art = HTMLImageElement | HTMLCanvasElement;
 export interface BadgeScene {
   silhouette: Art | null;
   art: Art | null;
-  label: string;
-  color: string;
   title: string;
 }
 
@@ -54,10 +52,10 @@ const SHADOW = 0.32;
 const BURST_MS = 500;
 const POP_MS = 450;
 const POP = 0.25;
-const NAME_FONT = 64;
 const TITLE_FONT = 72;
+// the title spans this share of the stage's width
+const TITLE_WIDTH = 0.6;
 const TEXT_GAP = 60;
-// the title sits this much farther above the badge than the name below it
 const TITLE_RISE = 1.25;
 
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
@@ -277,25 +275,19 @@ export function drawBadgeReveal(
   if (swapped) drawWhiteBurst(ctx, cx, by, (ms - tl.swapAt) / BURST_MS, 0.7);
   if (ms >= tl.settleAt) {
     const poppedAt = now - (ms - tl.settleAt);
+    ctx.font = critFont(TITLE_FONT);
+    const titleFont =
+      (TITLE_FONT * stage.w * TITLE_WIDTH) / ctx.measureText(scene.title).width;
     drawPoppingCritText(
       ctx,
       scene.title,
       cx,
-      by - (size / 2 + TEXT_GAP) * TITLE_RISE,
+      // its bottom stays put as it grows
+      by - (size / 2 + TEXT_GAP) * TITLE_RISE - (titleFont - TITLE_FONT) / 2,
       COLOR.heavenlyGold,
       poppedAt,
       now,
-      { fontSize: TITLE_FONT, strokeWidth: 10 },
-    );
-    drawPoppingCritText(
-      ctx,
-      scene.label,
-      cx,
-      floorY + size * POOL * POOL_SQUASH + NAME_FONT / 2,
-      scene.color,
-      poppedAt,
-      now,
-      { fontSize: NAME_FONT, strokeWidth: 9 },
+      { fontSize: titleFont, strokeWidth: (10 * titleFont) / TITLE_FONT },
     );
   }
 }

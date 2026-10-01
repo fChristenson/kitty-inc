@@ -18,6 +18,7 @@ import {
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
+  type FrameRippler,
 } from "../../shared/screenFreeze";
 import { addTotalIncome } from "../../totalIncome";
 import {
@@ -69,6 +70,9 @@ export interface MoneyCover {
     hold?: boolean,
     maxSizes?: number[],
   ): void;
+  // launches one coin per path at once, each following its path over exactly
+  // travelMs and hanging at its end until the merge
+  trace(paths: CoinPath[], travelMs: number): void;
   isLive(): boolean;
 }
 
@@ -87,6 +91,8 @@ export interface MoneyCoverOptions {
     getFloorRect: FloorRectResolver,
     totalTarget: Point,
   ) => void;
+  // water rippling across the frozen frame
+  frameRipple?: FrameRippler;
 }
 
 const STREAM_INTERVAL_MS = 16;
@@ -172,6 +178,7 @@ export function startMoneyCover(
     rewardMultiplier = 1,
     settleFaceOn,
     drawExtra,
+    frameRipple,
   }: MoneyCoverOptions,
 ): MoneyCover | null {
   if (!canStartMoneyCover(context)) return null;
@@ -184,7 +191,7 @@ export function startMoneyCover(
       drawExtra?.(ctx, getFloorRect, totalTarget);
       drawOverlay(ctx, getFloorRect, totalTarget);
     },
-    { spotlightTotal: true },
+    { spotlightTotal: true, frameRipple },
   );
 
   let flew = false;
@@ -261,6 +268,10 @@ export function startMoneyCover(
           batch.map((item) => item.maxSize),
         ),
       );
+    },
+    trace: (paths, travelMs) => {
+      const ticks = travelMs / TICK_MS;
+      spawnPathCoins(floor, paths, { ...arrival, outTicks: [ticks, ticks] });
     },
     isLive,
   };

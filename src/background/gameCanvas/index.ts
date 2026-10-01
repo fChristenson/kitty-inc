@@ -35,11 +35,13 @@ import {
   type PressAndHoldController,
 } from "../../shared/pressAndHold";
 import { getEffectiveDpr } from "../../shared/devicePixelRatio";
+import { drawRippleWarp } from "../../shared/rippleWarp";
 import {
   isScreenFrozen,
   isTotalSpotlit,
   getScreenFreezeDim,
   getScreenFreezeMotion,
+  getScreenFreezeRipple,
   drawScreenFreezeOverlay,
   type FloorRectResolver,
 } from "../../shared/screenFreeze";
@@ -525,13 +527,28 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const frameW = canvas.width * motion.scaleX;
     const frameH = canvas.height * motion.scaleY;
     if (motion.blur > 0) ctx.filter = `blur(${motion.blur * dpr}px)`;
-    ctx.drawImage(
-      frozenFrame.image,
-      shake.x * dpr + motion.pan * canvas.width - (frameW - canvas.width) / 2,
-      shake.y * dpr - (frameH - canvas.height) / 2,
-      frameW,
-      frameH,
-    );
+    const box = {
+      x:
+        shake.x * dpr + motion.pan * canvas.width - (frameW - canvas.width) / 2,
+      y: shake.y * dpr - (frameH - canvas.height) / 2,
+      w: frameW,
+      h: frameH,
+    };
+    ctx.drawImage(frozenFrame.image, box.x, box.y, box.w, box.h);
+    const ripple = getScreenFreezeRipple(getFloorRect);
+    if (ripple) {
+      // world space to the canvas's own px, like the overlay below
+      const s = frozenFrame.scale * dpr;
+      drawRippleWarp(
+        ctx,
+        frozenFrame.image,
+        box,
+        shake.x * dpr + ripple.center.x * s,
+        shake.y * dpr + (ripple.center.y - frozenFrame.viewportTop) * s,
+        ripple.bands.map(([from, to]) => [from * s, to * s]),
+        (r) => ripple.offset(r / s) * s,
+      );
+    }
     ctx.restore();
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
