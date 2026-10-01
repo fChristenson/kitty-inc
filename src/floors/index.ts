@@ -365,6 +365,7 @@ export { forcePlinkoEvent } from "./plinkoEvent";
 export { forceHammerThrowEvent } from "./hammerThrowEvent";
 export { forceSnakeEvent } from "./snakeEvent";
 export { forceBreakoutEvent } from "./breakoutEvent";
+export { forceLineClearEvent } from "./lineClearEvent";
 export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forceWaterfallEvent } from "./waterfallEvent";

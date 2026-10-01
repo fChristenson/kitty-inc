@@ -470,6 +470,18 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/lineClearEvent — the rare "Line Clear" event: blocks
+  // hard-drop and stack into four full rows, which clear at once in a blast
+  // of coins into the total
+  lineClearEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    // when each piece slams down, ever quicker
+    landAt: [300, 510, 690, 850, 990, 1_110, 1_215, 1_310, 1_395, 1_475],
+    blinkMs: 260, // the full rows blinking before they clear
+    holdMs: 450, // the coins hanging after the clear
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

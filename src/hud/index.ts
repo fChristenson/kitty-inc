@@ -99,6 +99,7 @@ export {
   wireHammerThrowEventTestButton,
   wireSnakeEventTestButton,
   wireBreakoutEventTestButton,
+  wireLineClearEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
