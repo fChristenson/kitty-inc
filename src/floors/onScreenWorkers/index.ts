@@ -36,3 +36,30 @@ export function findOnScreenWorkers(
   }
   return workers;
 }
+
+// up to max workers in hop order from start, always on to the nearest one not
+// yet reached; start's y is measured like a worker's center.y + top
+export function nearestChain(
+  start: { x: number; y: number },
+  workers: OnScreenWorker[],
+  max: number,
+): OnScreenWorker[] {
+  const left = [...workers];
+  const chain: OnScreenWorker[] = [];
+  let at = start;
+  while (left.length > 0 && chain.length < max) {
+    let best = 0;
+    let bestDistance = Infinity;
+    left.forEach((w, i) => {
+      const d = Math.hypot(w.center.x - at.x, w.center.y + w.top - at.y);
+      if (d < bestDistance) {
+        bestDistance = d;
+        best = i;
+      }
+    });
+    const [next] = left.splice(best, 1);
+    chain.push(next);
+    at = { x: next.center.x, y: next.center.y + next.top };
+  }
+  return chain;
+}

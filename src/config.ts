@@ -309,6 +309,17 @@ export const CONFIG = {
     holdMs: 700, // after the last tier, before the screen unfreezes
   },
 
+  // src/floors/sparkChainEvent — the rare "Spark Chain" event: a light jumps
+  // like lightning worker to worker, faster each jump, each struck worker
+  // climbing one perma tier, until it fizzles on the first maxed one
+  sparkChainEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    firstJumpMs: 550, // the first jump, flight plus rest on the worker
+    speedUp: 0.82, // each jump takes this much of the one before
+    maxJumps: 10,
+    holdMs: 600, // after the last strike, before the screen unfreezes
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

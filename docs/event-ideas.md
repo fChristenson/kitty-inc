@@ -25,7 +25,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Halo**: lights spiral in to orbit the lowest-tier worker in view, shrink into a halo and settle on its head. That worker jumps to the top tier.
 - [x] **Comet**: one big light with a long trail streaks diagonally across the screen. Promotes every worker it passes.
 - [x] **Mentor**: the top-tier worker sends a light stream into the lowest-tier one. The lowest catches up by two tiers.
-- [ ] **Spark Chain**: a light jumps worker to worker like lightning, faster each jump. +1 tier per jump, stopping at the first maxed worker.
+- [x] **Spark Chain**: a light jumps worker to worker like lightning, faster each jump. +1 tier per jump, stopping at the first maxed worker.
 - [ ] **Polish**: lights swirl around the upgrade button and buff it until it shines. Free upgrade levels.
 - [ ] **Recruit**: lights stream to an empty spot and form a new worker. A free hire.
 - [ ] **Promotion Day**: lights rise from every worker into the floor's tier badge. Floor tier +1.

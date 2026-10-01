@@ -47,7 +47,11 @@ import {
   drawWorkerSpotlight,
   setWorkerSpotlights,
 } from "../worker";
-import { findOnScreenWorkers, type OnScreenWorker } from "../onScreenWorkers";
+import {
+  findOnScreenWorkers,
+  nearestChain,
+  type OnScreenWorker,
+} from "../onScreenWorkers";
 
 const KEY = "chainPay";
 
@@ -61,32 +65,6 @@ interface RunningChain {
 let running: RunningChain | null = null;
 
 type Stop = { floor: Floor; top: number; x: number; y: number };
-
-// from the button, always on to the nearest worker not yet reached
-function chainOrder(
-  start: Stop,
-  workers: OnScreenWorker[],
-  max: number,
-): OnScreenWorker[] {
-  const left = [...workers];
-  const chain: OnScreenWorker[] = [];
-  let at = { x: start.x, y: start.y + start.top };
-  while (left.length > 0 && chain.length < max) {
-    let best = 0;
-    let bestDistance = Infinity;
-    left.forEach((w, i) => {
-      const d = Math.hypot(w.center.x - at.x, w.center.y + w.top - at.y);
-      if (d < bestDistance) {
-        bestDistance = d;
-        best = i;
-      }
-    });
-    const [next] = left.splice(best, 1);
-    chain.push(next);
-    at = { x: next.center.x, y: next.center.y + next.top };
-  }
-  return chain;
-}
 
 registerEventProc(
   {
@@ -144,7 +122,12 @@ function startChain(floor: Floor, context: EventProcContext): void {
   )!.top;
   const button = getButtonCenter(context.isGroundFloor);
   const start: Stop = { floor, top: floorTop, ...button };
-  const workers = chainOrder(start, found, maxWorkers);
+  // from the button, always on to the nearest worker not yet reached
+  const workers = nearestChain(
+    { x: start.x, y: start.y + start.top },
+    found,
+    maxWorkers,
+  );
   const chain: RunningChain = {
     floor,
     isGroundFloor: context.isGroundFloor,

@@ -130,6 +130,16 @@ export function wirePiggyBankEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSparkChainEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-spark-chain-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireMentorEventTestButton(
   container: HTMLElement,
   onClick: () => void,
