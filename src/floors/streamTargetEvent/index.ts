@@ -1,5 +1,6 @@
 // a covered-crit event (see floors/eventProcs' EventCritCover): the crit's click
-// freezes the screen and plays the same coin stream + sfx as the other events,
+// freezes the screen and plays a coin or glimmer stream + the same sfx as the
+// other events,
 // from the floor's button into one of its own widgets, which flashes white and
 // wiggles as the coins land. Once the stream ends the event reveals and pays
 // the crit's tier through onEnd
@@ -18,8 +19,9 @@ import { forceTestCrit } from "../upgradeButton";
 import {
   drawStreamOverlay,
   EVENT_STREAM_DURATION_MS,
-  streamEventCoins,
-} from "../boostEvent";
+  type StreamKind,
+} from "../../shared/eventStream";
+import { streamFromButton } from "../boostEvent";
 import {
   endEventProc,
   forceClaimEventProc,
@@ -32,6 +34,8 @@ import {
 export interface StreamTargetEventDef {
   key: string;
   cover: EventCritCover;
+  // coins when it hands the target free money, glimmers when it raises a tier
+  stream: StreamKind;
   chance: () => number;
   // the floor holding the widget, when it isn't the clicked floor itself;
   // null when there's none to target
@@ -139,7 +143,8 @@ export function registerStreamTargetEvent(
     def.setHidden(target.floor);
     freezeScreen(drawOverlay);
     playBoostEventStream();
-    streamEventCoins(
+    streamFromButton(
+      def.stream,
       floor,
       context.isGroundFloor,
       target.point,

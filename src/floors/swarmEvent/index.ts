@@ -1,5 +1,5 @@
 // the "Swarm" event: a rare upgrade click (floors/eventProcs' shared pool)
-// freezes the screen and plays the same coin stream + sfx as the Boost/Hunt
+// freezes the screen and plays a coin stream + the same sfx as the Boost/Hunt
 // events, from that button into the closest unlocked floor's button above and
 // below it (one stream at an end of the building). Those buttons become exact
 // live clones of the pressed one (state, text, crits, press animations and
@@ -19,7 +19,6 @@ import {
   unfreezeScreen,
   type FloorRectResolver,
 } from "../../shared/screenFreeze";
-import { drawCoins } from "../coins";
 import {
   armSwarmEvent,
   clearUpgradeButtonSpotlights,
@@ -30,7 +29,11 @@ import {
   mirrorUpgradeButton,
   setUpgradeButtonSpotlights,
 } from "../upgradeButton";
-import { EVENT_STREAM_DURATION_MS, streamEventCoins } from "../boostEvent";
+import {
+  drawEventStreams,
+  EVENT_STREAM_DURATION_MS,
+} from "../../shared/eventStream";
+import { streamFromButton } from "../boostEvent";
 import { registerEventProc, trackEventProc } from "../eventProcs";
 
 interface SwarmTarget {
@@ -120,7 +123,7 @@ function drawOverlay(
     } else draw(leadWhite);
     ctx.restore();
   }
-  drawCoins(ctx, getFloorRect, undefined, "overlay");
+  drawEventStreams(ctx, getFloorRect);
 }
 
 // also the dev test hook (ignores chance and cooldown); false while another
@@ -157,7 +160,8 @@ export function startSwarmEvent(
   freezeScreen(drawOverlay);
   playBoostEventStream();
   for (const target of receivers) {
-    streamEventCoins(
+    streamFromButton(
+      "coins",
       source,
       isGroundFloor,
       target.point,

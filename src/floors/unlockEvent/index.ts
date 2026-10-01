@@ -29,6 +29,7 @@ function lockedFloorNear(floor: Floor, floors: Floor[]): Floor | null {
 const armUnlockEvent = registerStreamTargetEvent({
   key: "unlock",
   cover: { label: "Unlock", color: COLOR.amber },
+  stream: "coins",
   chance: () => CONFIG.unlockEvent.chance,
   targetFloor: (floor, { floors }) => lockedFloorNear(floor, floors),
   target: () => getLockCenter(),

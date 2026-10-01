@@ -29,12 +29,12 @@ import {
   type FloorRectResolver,
 } from "../../shared/screenFreeze";
 import { addTotalIncome, getTotalIncome } from "../../totalIncome";
-import { drawCoins } from "../coins";
 import { forceTestCrit } from "../upgradeButton";
 import {
+  drawEventStreams,
   EVENT_STREAM_DURATION_MS,
   streamCoins,
-} from "../boostEvent/coinStream";
+} from "../../shared/eventStream";
 import {
   endEventProc,
   forceClaimEventProc,
@@ -119,7 +119,7 @@ function drawOverlay(
     ctx.restore();
   }
   // the spotlit total, with its lights and beats, is drawn live on top by the game canvas
-  drawCoins(ctx, getFloorRect, totalTarget, "overlay");
+  drawEventStreams(ctx, getFloorRect, totalTarget);
 }
 
 function startKickback(floor: Floor, context: EventProcContext): void {

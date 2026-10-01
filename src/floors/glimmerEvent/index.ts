@@ -36,7 +36,7 @@ import { forceTestCrit } from "../upgradeButton";
 import {
   drawStreamOverlay,
   EVENT_STREAM_DURATION_MS,
-} from "../boostEvent/coinStream";
+} from "../../shared/eventStream";
 import {
   endEventProc,
   forceClaimEventProc,

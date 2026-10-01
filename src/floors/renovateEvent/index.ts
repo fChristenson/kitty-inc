@@ -19,6 +19,7 @@ import { registerStreamTargetEvent } from "../streamTargetEvent";
 export const forceRenovateEvent = registerStreamTargetEvent({
   key: "renovate",
   cover: { label: "Renovate", color: COLOR.orange },
+  stream: "coins",
   chance: () => CONFIG.renovateEvent.chance,
   target: (floor) => ({
     x: getUpgradeIndicatorCenter(floor).x,

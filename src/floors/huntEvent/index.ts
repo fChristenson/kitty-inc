@@ -1,5 +1,5 @@
 // the "Hunt" event: once its button (see upgradeButton/hunt.ts) is clicked,
-// the screen freezes and the same coin stream + sfx as the Boost event
+// the screen freezes and the same glimmer stream + sfx as the Boost event
 // (floors/boostEvent) flies from the button into the on-screen mouse. When it
 // ends the mouse grows, turns red and restarts its time on screen; clicking
 // it then (see src/mouse) also multiplies the player's total income
@@ -25,8 +25,8 @@ import { armHuntEvent, isHuntEventArmed } from "../upgradeButton";
 import {
   drawStreamOverlay,
   EVENT_STREAM_DURATION_MS,
-  streamEventCoins,
-} from "../boostEvent";
+} from "../../shared/eventStream";
+import { streamFromButton } from "../boostEvent";
 import {
   endEventProc,
   isVisibleOnFloor,
@@ -114,7 +114,8 @@ export function startHuntEvent(
   running = hunt;
   freezeScreen(drawOverlay);
   playBoostEventStream();
-  streamEventCoins(
+  streamFromButton(
+    "glimmers",
     sourceFloor,
     isGroundFloor,
     { x: target.x, y: target.y + top - sourceTop },

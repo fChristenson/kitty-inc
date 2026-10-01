@@ -14,6 +14,7 @@ import {
 } from "../../coinBurst";
 import { createParticlePool } from "../../shared/particlePool";
 import { drawTwinkle } from "../../shared/twinkle";
+import { registerCoinStream } from "../../shared/eventStream";
 
 // shared coin-burst particle system: any UI element (upgrade button, worker, ...) can
 // spawn a burst at a point and reuse the same rAF-driven physics + rendering
@@ -574,3 +575,9 @@ function spawnSprayCoin(
     },
   });
 }
+
+registerCoinStream({
+  burst: spawnHomingCoinBurst,
+  draw: (ctx, getFloorRect, homeTarget) =>
+    drawCoins(ctx, getFloorRect, homeTarget, "overlay"),
+});

@@ -1,5 +1,5 @@
 // the "Union" event: once its button (see upgradeButton/union.ts) is clicked,
-// the screen freezes (shared/screenFreeze) and coins stream from the floor's
+// the screen freezes (shared/screenFreeze) and glimmer lights stream from the floor's
 // other workers into one of them (its manager when it has one), which flashes
 // and wiggles. It then unfreezes: the merged workers are gone (and can be
 // hired again) and the target has gained one perma tier per merged worker,
@@ -15,12 +15,12 @@ import {
   unfreezeScreen,
   type FloorRectResolver,
 } from "../../shared/screenFreeze";
-import { drawCoins } from "../coins";
 import { armUnionEvent, isUnionEventArmed } from "../upgradeButton";
 import {
+  drawEventStreams,
   EVENT_STREAM_DURATION_MS,
-  streamCoins,
-} from "../boostEvent/coinStream";
+  streamGlimmers,
+} from "../../shared/eventStream";
 import { endEventProc, registerEventProc, trackEventProc } from "../eventProcs";
 import {
   celebrateWorkerBoost,
@@ -70,7 +70,7 @@ function drawOverlay(
   if (!union) return;
   const rect = getFloorRect(union.floor);
   if (!rect) {
-    drawCoins(ctx, getFloorRect, undefined, "overlay");
+    drawEventStreams(ctx, getFloorRect);
     return;
   }
   const now = performance.now();
@@ -90,7 +90,7 @@ function drawOverlay(
     ),
   );
   ctx.restore();
-  drawCoins(ctx, getFloorRect, undefined, "overlay");
+  drawEventStreams(ctx, getFloorRect);
 }
 
 // starts the merge on floor; false (nothing happens) when it no longer has a
@@ -116,7 +116,7 @@ export function startUnionEvent(floor: Floor, persist: () => void): boolean {
   freezeScreen(drawOverlay);
   playBoostEventStream();
 
-  streamCoins(
+  streamGlimmers(
     sources.map((source) => ({ floor, x: source.x, y: source.y })),
     {
       target,

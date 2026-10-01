@@ -1,5 +1,5 @@
 // the "Boost" event: once its button (see upgradeButton/boost.ts) is clicked,
-// the whole screen freezes (shared/screenFreeze), a stream of coins flies from
+// the whole screen freezes (shared/screenFreeze), a stream of glimmer lights flies from
 // the button into one random on-screen worker (or manager) not yet at the top
 // crit tier, and that worker flashes white, wiggles and its glow crossfades
 // into the next crit tier's color over EVENT_STREAM_DURATION_MS. It then
@@ -21,8 +21,8 @@ import { armBoostEvent, isBoostEventArmed } from "../upgradeButton";
 import {
   drawStreamOverlay,
   EVENT_STREAM_DURATION_MS,
-  streamEventCoins,
-} from "./coinStream";
+} from "../../shared/eventStream";
+import { streamFromButton } from "./buttonStream";
 import {
   endEventProc,
   isVisibleOnFloor,
@@ -141,13 +141,14 @@ export function startBoostEvent(
   freezeScreen(drawOverlay);
   playBoostEventStream();
 
-  // coins are spawned on (and drawn through) the button's own floor, so the
+  // the lights fly on (and are drawn through) the button's own floor, so the
   // worker's spot is converted into that floor's local coordinates
-  const coinTarget = { x: center.x, y: center.y + target.top - sourceTop };
-  streamEventCoins(
+  const streamTarget = { x: center.x, y: center.y + target.top - sourceTop };
+  streamFromButton(
+    "glimmers",
     sourceFloor,
     isGroundFloor,
-    coinTarget,
+    streamTarget,
     durationMs,
     () => running === boost,
     () => boost.fx.hit(performance.now()),
@@ -166,9 +167,4 @@ export function startBoostEvent(
   return true;
 }
 
-export {
-  drawStreamOverlay,
-  EVENT_STREAM_DURATION_MS,
-  streamCoins,
-  streamEventCoins,
-} from "./coinStream";
+export { streamFromButton } from "./buttonStream";
