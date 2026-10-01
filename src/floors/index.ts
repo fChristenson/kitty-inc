@@ -360,6 +360,7 @@ export { forceAscendEvent } from "./ascendEvent";
 export { forceBlessingEvent } from "./blessingEvent";
 export { forceHaloEvent } from "./haloEvent";
 export { forceCometEvent } from "./cometEvent";
+export { forceMeteorShowerEvent } from "./meteorShowerEvent";
 export { forceMentorEvent } from "./mentorEvent";
 export { forceSparkChainEvent } from "./sparkChainEvent";
 export { forcePolishEvent } from "./polishEvent";

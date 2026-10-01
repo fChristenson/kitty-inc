@@ -284,6 +284,16 @@ export function wireCometEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireMeteorShowerEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-meteor-shower-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireHaloEventTestButton(
   container: HTMLElement,
   onClick: () => void,

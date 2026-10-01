@@ -7,6 +7,7 @@ import { COLOR } from "../../palette";
 import { createAbsorbPulse } from "../mergeFlash";
 import { LONG_PRESS_TICK_MS } from "../pressAndHold";
 import { drawGoldShimmer, radialFade } from "../goldShimmer";
+import { drawGlimmer, hash01 } from "../twinkle";
 
 const BEAT_MS = LONG_PRESS_TICK_MS * 4;
 const RING_MS = 420;
@@ -347,6 +348,40 @@ export function drawWhiteBurst(
   ctx.arc(x, y, ring, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
+}
+
+const EXPLOSION_BURST_MS = 500;
+const EXPLOSION_SPARK_MS = 800;
+const EXPLOSION_SPARKS = 28;
+
+// an impact ms ago at (x, y): a white burst of `scale`, and glimmer sparks of
+// up to sparkSize flung out to `reach`, slowing and fading
+export function drawExplosion(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  ms: number,
+  now: number,
+  scale: number,
+  reach: number,
+  sparkSize: number,
+): void {
+  drawWhiteBurst(ctx, x, y, ms / EXPLOSION_BURST_MS, scale);
+  const t = ms / EXPLOSION_SPARK_MS;
+  if (t < 0 || t >= 1) return;
+  const out = 1 - (1 - t) ** 3;
+  for (let i = 0; i < EXPLOSION_SPARKS; i++) {
+    const angle = ((i + hash01(i, 4) * 0.5) / EXPLOSION_SPARKS) * Math.PI * 2;
+    const r = reach * (0.45 + 0.55 * hash01(i, 5)) * out;
+    drawGlimmer(
+      ctx,
+      x + Math.cos(angle) * r,
+      y + Math.sin(angle) * r,
+      sparkSize * (0.5 + 0.5 * hash01(i, 6)) * (1 - t),
+      now / 150 + i,
+      COLOR.heavenlyGold,
+    );
+  }
 }
 
 // a four-point twinkle

@@ -79,6 +79,7 @@ import {
   forceBlessingEvent,
   forceHaloEvent,
   forceCometEvent,
+  forceMeteorShowerEvent,
   forceMentorEvent,
   forceSparkChainEvent,
   forcePolishEvent,
@@ -187,6 +188,7 @@ import {
   wireBlessingEventTestButton,
   wireHaloEventTestButton,
   wireCometEventTestButton,
+  wireMeteorShowerEventTestButton,
   wireMentorEventTestButton,
   wireSparkChainEventTestButton,
   wirePolishEventTestButton,
@@ -824,6 +826,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceCometEvent(floor);
+    });
+    // same, for the Meteor Shower event
+    wireMeteorShowerEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceMeteorShowerEvent(floor);
     });
     // same, for the Mentor event
     wireMentorEventTestButton(app, () => {

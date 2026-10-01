@@ -9,8 +9,7 @@ import { COLOR } from "../../palette";
 import { playExplosion, startBoostEventStreamLoop } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { pickCritTierByOdds } from "../../shared/critTypes";
-import { drawWhiteBurst } from "../../shared/eventFx";
-import { drawGlimmer, hash01 } from "../../shared/twinkle";
+import { drawExplosion, drawWhiteBurst } from "../../shared/eventFx";
 import { drawWispHead, drawWispTrail, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
@@ -56,9 +55,7 @@ const TAIL_COLLAPSE_MS = 250;
 // the explosion: a white flash and glimmer sparks flung out to SPARK_REACH
 const EXPLOSION_SCALE = 1.1;
 const EXPLOSION_SHAKE = 1.2;
-const SPARKS = 28;
 const SPARK_REACH = BLAST * 1.3;
-const SPARK_MS = 800;
 const BURST_MS = 500;
 
 interface Point {
@@ -185,28 +182,22 @@ function drawComet(
 }
 
 // the impact: a big white flash and glimmer sparks flung out, slowing and fading
-function drawExplosion(
+function drawCometExplosion(
   ctx: CanvasRenderingContext2D,
   at: Point,
   ms: number,
   now: number,
 ): void {
-  drawWhiteBurst(ctx, at.x, at.y, ms / BURST_MS, EXPLOSION_SCALE);
-  const t = ms / SPARK_MS;
-  if (t >= 1) return;
-  const out = 1 - (1 - t) ** 3;
-  for (let i = 0; i < SPARKS; i++) {
-    const angle = ((i + hash01(i, 4) * 0.5) / SPARKS) * Math.PI * 2;
-    const reach = SPARK_REACH * (0.45 + 0.55 * hash01(i, 5)) * out;
-    drawGlimmer(
-      ctx,
-      at.x + Math.cos(angle) * reach,
-      at.y + Math.sin(angle) * reach,
-      HEAD_SIZE * 0.45 * (0.5 + 0.5 * hash01(i, 6)) * (1 - t),
-      now / 150 + i,
-      COLOR.heavenlyGold,
-    );
-  }
+  drawExplosion(
+    ctx,
+    at.x,
+    at.y,
+    ms,
+    now,
+    EXPLOSION_SCALE,
+    SPARK_REACH,
+    HEAD_SIZE * 0.45,
+  );
 }
 
 function drawOverlay(
@@ -238,7 +229,7 @@ function drawOverlay(
   }
   drawComet(ctx, comet, now - comet.startedAt, now);
   if (comet.hitAt !== null)
-    drawExplosion(ctx, comet.impact, now - comet.hitAt, now);
+    drawCometExplosion(ctx, comet.impact, now - comet.hitAt, now);
 }
 
 function startComet(floor: Floor, context: EventProcContext): void {

@@ -77,6 +77,7 @@ export function createTestButtonMarkup(): string {
           <button id="test-blessing-event" class="game__button">Blessing</button>
           <button id="test-halo-event" class="game__button">Halo</button>
           <button id="test-comet-event" class="game__button">Comet</button>
+          <button id="test-meteor-shower-event" class="game__button">Meteor Shower</button>
           <button id="test-mentor-event" class="game__button">Mentor</button>
           <button id="test-spark-chain-event" class="game__button">Spark Chain</button>
           <button id="test-polish-event" class="game__button">Polish</button>

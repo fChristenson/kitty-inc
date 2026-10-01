@@ -38,7 +38,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Recruit**: lights stream to an empty spot and form a new worker. A free hire.
 - [x] **Promotion Day**: lights rise from every worker into the floor's tier badge. Floor tier +1.
 - [x] **Conveyor**: glimmer hooks glide in dead straight along a rail, one per worker a floor in view is missing, each dropping its worker onto the floor like a conveyor hook. Fills the floor to its worker cap.
-- [ ] **Meteor Shower**: 3–6 small shooting stars streak down one after another, each striking a different worker. +1 tier per worker struck.
+- [x] **Meteor Shower**: 3–6 small shooting stars streak down one after another, each striking a different worker. +1 tier per worker struck.
 - [ ] **Fireflies**: lights drift in and wander the floor, then settle one by one into its empty spots, each forming a new worker. Fills the floor to its worker cap.
 - [ ] **Lighthouse**: a beam from the button sweeps round the screen like a lighthouse; every upgrade button it lights shines. Free upgrade levels on every floor in view.
 - [ ] **Rising Tide**: a glow floods up the building from the street, lifting every floor in view. Each floor's tier rises to the highest tier among them.
