@@ -9,6 +9,7 @@ import {
   getRenderedWorkerCount,
   getWorkerCenter,
   getWorkerPermaTier,
+  WORKER_FEET_Y,
 } from "../worker";
 
 export interface OnScreenWorker {
@@ -67,6 +68,20 @@ export function findRecruitSpots(
       spots.push({ floor: entry.floor, ...spot });
   }
   return spots;
+}
+
+// every floor's ground in view, where its workers stand, top first, local to
+// floor's own space
+export function findFloorLines(
+  floor: Floor,
+  getOnScreenFloors: OnScreenFloors | undefined,
+): number[] {
+  const onScreen = getOnScreenFloors?.() ?? [];
+  const top = onScreen.find((entry) => entry.floor === floor)?.top;
+  if (top === undefined) return [];
+  return onScreen
+    .map((entry) => WORKER_FEET_Y + entry.top - top)
+    .sort((a, b) => a - b);
 }
 
 // a random one of the lowest perma tier among the workers that can still climb

@@ -8,15 +8,11 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { forceTestCrit } from "../upgradeButton";
-import {
-  forceClaimEventProc,
-  registerEventProc,
-  type EventProcContext,
-} from "../eventProcs";
+import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import type { CoinPath } from "../coins";
 import { canStartMoneyCover, isMoneyCoverRunning } from "../moneyCover";
 import { startRain, type RainDrop } from "../rain";
-import { WORKER_FEET_Y } from "../worker";
+import { findFloorLines } from "../onScreenWorkers";
 import { FLOOR_W, SIDE_WALL_WIDTH } from "../constants";
 
 const KEY = "trickle";
@@ -30,16 +26,6 @@ const POOL_CLEARANCE = 25;
 
 const between = ([min, max]: [number, number]) =>
   min + Math.random() * (max - min);
-
-// every floor's ground in view, top first, local to floor's own space
-function findLedges(floor: Floor, context: EventProcContext): number[] {
-  const onScreen = context.getOnScreenFloors?.() ?? [];
-  const top = onScreen.find((entry) => entry.floor === floor)?.top;
-  if (top === undefined) return [];
-  return onScreen
-    .map((entry) => WORKER_FEET_Y + entry.top - top)
-    .sort((a, b) => a - b);
-}
 
 // a drop falling ever faster onto each floor below it, hopping off and
 // slowing at the top of each hop, then falling on into its spot in the pool
@@ -98,7 +84,7 @@ registerEventProc(
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const ledges = findLedges(floor, context);
+      const ledges = findFloorLines(floor, context.getOnScreenFloors);
       startRain(
         KEY,
         floor,

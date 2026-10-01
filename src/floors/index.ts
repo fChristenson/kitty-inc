@@ -346,6 +346,7 @@ export { forcePaydayEvent } from "./paydayEvent";
 export { forcePiggyBankEvent } from "./piggyBankEvent";
 export { forceCoinTossEvent } from "./coinTossEvent";
 export { forceHourglassEvent } from "./hourglassEvent";
+export { forceRocketEvent } from "./rocketEvent";
 export { forceJackpotReelsEvent } from "./jackpotReelsEvent";
 export { forceChainPayEvent } from "./chainPayEvent";
 export { forceDownpourEvent } from "./downpourEvent";

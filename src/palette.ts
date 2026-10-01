@@ -221,6 +221,15 @@ export const COLOR = {
   hourglassWood: "#B9773D",
   hourglassWoodDark: "#8A5226",
 
+  // Rocket event's rocket and its flame
+  rocketBody: "#F1F5F9",
+  rocketRed: "#E11D48",
+  rocketWindow: "#38BDF8",
+  rocketNozzle: "#475569",
+  flameOrange: "#FB923C",
+  flameYellow: "#FDE047",
+  rocketSmoke: "#E5E7EB",
+
   // page chrome
   pageBg: "#111417",
   pageText: "#F5F5F5",

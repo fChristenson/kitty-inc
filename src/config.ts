@@ -241,6 +241,18 @@ export const CONFIG = {
     seconds: 60,
   },
 
+  // src/floors/rocketEvent — the rare "Rocket" event: the button pours coins
+  // into a rocket on the clicked floor that launches up through the floors in
+  // view and bursts into a coin firework that merges into the total; pays once
+  // more per floor it flies past
+  rocketEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    fillMs: 900, // the button filling the rocket
+    flyMs: 450, // its flight up to the burst
+    durationMs: 1_000, // after the burst: blast out, hang, then the merge
+    mergeMs: 500,
+  },
+
   // src/floors/jackpotReelsEvent — the rare "Jackpot Reels" event: the button
   // streams coins into three slot reels, which stop one by one with a slam;
   // it pays the floor's income times its floor number times the reels' sum
