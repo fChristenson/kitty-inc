@@ -20,6 +20,7 @@ const sharedThemeImages = new Set([
   "skyscraper.webp",
   "cashRegister.webp",
   "clock.webp",
+  "slotsFrame.webp",
 ]);
 const backgroundFiles = ["bg2.webp", "bg4.webp", "bg6.webp"];
 const cloudFiles = [
@@ -63,6 +64,7 @@ export const IMAGE_FILES = {
   skyscraper: "skyscraper.webp", // Create new Company / Renovate floors icon
   cashRegister: "cashRegister.webp", // Trigger sales event's own menu icon
   clock: "clock.webp", // Work overtime's own menu icon
+  slotsFrame: "slotsFrame.webp", // Jackpot Reels event's slot machine, windows cut out
   chain: "crits/classics/chain.webp", // Chain crit flash's own backdrop icon
   dominoEffect: "crits/classics/dominoEffect.webp", // Domino Effect crit flash's own backdrop icon
   blueprint: "crits/classics/blueprint.webp", // Blueprint crit flash's own backdrop icon

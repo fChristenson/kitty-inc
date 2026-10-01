@@ -342,6 +342,7 @@ export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forcePaydayEvent } from "./paydayEvent";
 export { forcePiggyBankEvent } from "./piggyBankEvent";
+export { forceJackpotReelsEvent } from "./jackpotReelsEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";
