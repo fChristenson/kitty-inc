@@ -171,7 +171,16 @@ export function riverPaths(
   count: number,
   options: RiverOptions,
 ): CoinPath[] {
-  const line = riverLine(area, start, options);
+  return pathsAlong(riverLine(area, start, options), count, options.startWidth);
+}
+
+// one path per coin along line (floor-local points), each in its own swaying
+// lane of a stream startWidth px across where it starts, tapering to its head
+export function pathsAlong(
+  line: Pt[],
+  count: number,
+  startWidth: number,
+): CoinPath[] {
   const distances = [0];
   for (let i = 1; i < line.length; i++)
     distances.push(
@@ -207,8 +216,7 @@ export function riverPaths(
     const phase = Math.random() * Math.PI * 2;
     paths.push((f) => {
       const p = at(f * total);
-      const width =
-        options.startWidth * (1 - f) ** 2 * Math.min(1, f / SPREAD_IN);
+      const width = startWidth * (1 - f) ** 2 * Math.min(1, f / SPREAD_IN);
       const offset = (lane + sway * Math.sin(phase + f * waves)) * width;
       return {
         x: p.x + p.nx * offset,

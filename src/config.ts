@@ -164,7 +164,15 @@ export const CONFIG = {
   vortexEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
     streamMs: 900, // how long coins keep pouring in
-    travelMs: 1_100, // each coin's swirl into the eye
+    travelMs: 500, // each coin's swirl into the eye
+  },
+
+  // src/floors/ricochetEvent — the rare "Ricochet" event: one fat stream
+  // bounces off the screen's edges 3-5 times before diving into the total,
+  // paying the floor's payout once per bounce
+  ricochetEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    travelMs: 500, // each coin's trip, bounces and all
   },
 
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
@@ -189,7 +197,7 @@ export const CONFIG = {
   drawEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
     streamMs: 600, // how long the number takes to draw
-    durationMs: 1_800, // stream, ~0.3s last coin out, 0.4s hang, then the merge
+    durationMs: 1_600, // stream, ~0.3s last coin out, 0.4s hang, then the merge
     mergeMs: 500,
   },
 

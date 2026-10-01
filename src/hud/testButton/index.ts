@@ -101,6 +101,16 @@ export function wireVortexEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireRicochetEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-ricochet-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireStreamEventTestButton(
   container: HTMLElement,
   onClick: () => void,
