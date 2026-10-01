@@ -17,8 +17,19 @@ export type FreezeOverlay = (
   totalTarget: { x: number; y: number },
 ) => void;
 
+// how the frozen frame is moved: slid sideways by `pan` of the screen's width,
+// scaled round its center (at least 1, so it always covers the screen) and
+// blurred by `blur` CSS px
+export interface FrameMotion {
+  pan: number;
+  scaleX: number;
+  scaleY: number;
+  blur: number;
+}
+const STILL: FrameMotion = { pan: 0, scaleX: 1, scaleY: 1, blur: 0 };
+
 let overlay: FreezeOverlay | null = null;
-let pan: (() => number) | null = null;
+let motion: (() => FrameMotion) | null = null;
 let frozen = false;
 let totalSpotlit = false;
 let frozenAt = 0;
@@ -28,25 +39,25 @@ const DIM_ALPHA = 0.6;
 const DIM_FADE_MS = 200;
 
 // spotlightTotal keeps the total-income readout live and undimmed on top;
-// framePan slides the frozen frame sideways by that share of the screen's width
+// frameMotion moves the frozen frame itself
 export function freezeScreen(
   drawOverlay: FreezeOverlay,
   {
     spotlightTotal = false,
-    framePan,
-  }: { spotlightTotal?: boolean; framePan?: () => number } = {},
+    frameMotion,
+  }: { spotlightTotal?: boolean; frameMotion?: () => FrameMotion } = {},
 ): void {
   frozen = true;
   frozenAt = performance.now();
   overlay = drawOverlay;
   totalSpotlit = spotlightTotal;
-  pan = framePan ?? null;
+  motion = frameMotion ?? null;
 }
 
 export function unfreezeScreen(): void {
   frozen = false;
   overlay = null;
-  pan = null;
+  motion = null;
   totalSpotlit = false;
   unfrozenAt = Date.now();
 }
@@ -59,8 +70,8 @@ export function isTotalSpotlit(): boolean {
   return frozen && totalSpotlit;
 }
 
-export function getScreenFreezePan(): number {
-  return frozen && pan ? pan() : 0;
+export function getScreenFreezeMotion(): FrameMotion {
+  return frozen && motion ? motion() : STILL;
 }
 
 // Date.now() of the last unfreeze — per-frame movers use it so time spent

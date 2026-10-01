@@ -255,7 +255,8 @@ export const CONFIG = {
 
   // src/floors/revealStage — the stage every reveal event plays its reveal on
   revealStage: {
-    slideMs: 450, // the stage sliding in over the floors, and back out
+    windUpMs: 220, // the screen leaning in and rumbling before each whip
+    slideMs: 420, // the whip pan in over the floors, and back out
   },
 
   // src/floors/revealEvent — the rare "Reveal" event: on the reveal stage, a
