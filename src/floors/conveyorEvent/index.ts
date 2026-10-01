@@ -9,7 +9,7 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
-import { drawWisp } from "../../shared/wisp";
+import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -47,7 +47,6 @@ const OFF_SCREEN = 120;
 // a hook rests this long over its spot before letting go; the drop takes DROP_MS
 const PAUSE_MS = 150;
 const DROP_MS = 300;
-const HOOK_SIZE = 26;
 const CARRY_WHITE = 0.5;
 const WHITE_FADE_MS = 350;
 
@@ -159,7 +158,7 @@ function drawOverlay(
       },
       ms,
       now,
-      HOOK_SIZE,
+      WISP_SIZE,
     );
   }
   ctx.restore();

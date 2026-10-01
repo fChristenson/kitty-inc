@@ -14,7 +14,7 @@ import {
   pickCritTierByOdds,
 } from "../../shared/critTypes";
 import { triggerEventEndSlam } from "../../shared/eventEndSlam";
-import { drawWisp } from "../../shared/wisp";
+import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -36,7 +36,6 @@ import {
 } from "../eventProcs";
 
 const KEY = "ascend";
-const ORB_SIZE = 38;
 // the orb starts this far below the lowest bar, and leaves this far above the top one
 const START_DROP = 220;
 const EXIT_RISE = 260;
@@ -182,7 +181,7 @@ function drawOverlay(
     (t) => (t < 0 || t > totalMs ? null : orbAt(stops, t)),
     elapsed,
     now,
-    ORB_SIZE * grow,
+    WISP_SIZE * grow,
   );
 }
 

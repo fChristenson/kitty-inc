@@ -11,7 +11,7 @@ import { shakeScreen } from "../../screenShake";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawGlimmer, hash01 } from "../../shared/twinkle";
-import { drawWispHead, drawWispTrail } from "../../shared/wisp";
+import { drawWispHead, drawWispTrail, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
   getScreenFreezeDim,
@@ -161,7 +161,7 @@ function drawComet(
 
   const along = (t: number) =>
     t >= 0 && t <= streakMs ? headAt(comet, t) : null;
-  drawWispTrail(ctx, along, ms, now, HEAD_SIZE);
+  drawWispTrail(ctx, along, ms, now, WISP_SIZE);
   if (tailLen > 0) {
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
@@ -181,8 +181,7 @@ function drawComet(
     }
     ctx.restore();
   }
-  if (comet.hitAt === null)
-    drawWispHead(ctx, along, ms, now, HEAD_SIZE, 0.4);
+  if (comet.hitAt === null) drawWispHead(ctx, along, ms, now, WISP_SIZE, 0.4);
 }
 
 // the impact: a big white flash and glimmer sparks flung out, slowing and fading

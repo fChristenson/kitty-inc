@@ -8,7 +8,7 @@ import { COLOR } from "../../palette";
 import { playBoostEventStream } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { createEventFx } from "../../shared/eventFx";
-import { drawWisp } from "../../shared/wisp";
+import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import { forceTestCrit } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import type { CoinPath } from "../coins";
@@ -78,7 +78,7 @@ registerEventProc(
             ctx.save();
             ctx.translate(rect.left, rect.top);
             fx.draw(ctx, orb.x, orb.y, ({ white }) =>
-              drawWisp(ctx, () => orb, now, now, ORB_SIZE, white),
+              drawWisp(ctx, () => orb, now, now, WISP_SIZE, white),
             );
             ctx.restore();
           },

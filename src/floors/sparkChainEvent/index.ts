@@ -11,7 +11,7 @@ import { playBloop, playSwoosh, startBoostEventStreamLoop } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawGlimmer, hash01 } from "../../shared/twinkle";
-import { drawWisp } from "../../shared/wisp";
+import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
   getScreenFreezeDim,
@@ -47,7 +47,6 @@ import {
 } from "../onScreenWorkers";
 
 const KEY = "sparkChain";
-const ORB_SIZE = 24;
 // the orb grows on the button before the first strike
 const CHARGE_MS = 400;
 // each jump flies the light this share of its time, then it rests on the worker
@@ -320,7 +319,7 @@ function drawOverlay(
     ms / CHARGE_MS,
     Math.max(0, 1 - (ms - last.landAt) / FADE_MS),
   );
-  drawWisp(ctx, lightAt, ms, now, ORB_SIZE * grow, 0.3);
+  drawWisp(ctx, lightAt, ms, now, WISP_SIZE * grow, 0.3);
 }
 
 function startSparkChain(floor: Floor, context: EventProcContext): void {

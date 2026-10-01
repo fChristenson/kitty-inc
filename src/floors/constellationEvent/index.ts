@@ -9,7 +9,7 @@ import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { pickAtMost, pickCritTierByOdds } from "../../shared/critTypes";
 import { drawGlimmer, hash01 } from "../../shared/twinkle";
-import { drawWisp } from "../../shared/wisp";
+import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import {
   freezeScreen,
@@ -40,7 +40,6 @@ const KEY = "constellation";
 const STAR_SIZE = WORKER_HEIGHT * 0.22;
 // how far above a worker's middle its star hangs, of its height
 const STAR_RISE = 0.15;
-const HEAD_SIZE = WORKER_HEIGHT * 0.18;
 // the glimmers along each link: their spacing (px), size and sideways scatter
 const TRAIL_STEP = 16;
 const TRAIL_SIZE = WORKER_HEIGHT * 0.09;
@@ -231,7 +230,7 @@ function drawOverlay(
     const f = at - s;
     return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f };
   };
-  drawWisp(ctx, headAt, elapsed, now, HEAD_SIZE);
+  drawWisp(ctx, headAt, elapsed, now, WISP_SIZE);
 }
 
 function startConstellation(floor: Floor, context: EventProcContext): void {

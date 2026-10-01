@@ -17,7 +17,7 @@ import {
 import { triggerEventEndSlam } from "../../shared/eventEndSlam";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { hash01 } from "../../shared/twinkle";
-import { drawGlitterLight, drawWisp, swoop } from "../../shared/wisp";
+import { drawGlitterLight, drawWisp, swoop, WISP_SIZE } from "../../shared/wisp";
 import { isFloorLocked } from "../../shared/detachedJob";
 import {
   freezeScreen,
@@ -60,7 +60,6 @@ import {
 import { findOnScreenWorkers } from "../onScreenWorkers";
 
 const KEY = "wisp";
-const ORB_SIZE = 26;
 // it hovers this far above each target, sweeping 2-3 times back and forth
 // across it (at least SWEEP_MIN px either way) while it sprinkles
 const HOVER_RISE = 80;
@@ -305,7 +304,7 @@ function drawOverlay(
   if (hovers.some((h) => h === null)) return;
   const points = hovers as Point[];
   wisp.stops.forEach((_, k) => drawSprinkle(ctx, wisp, points, k, ms, now));
-  drawWisp(ctx, (t) => wispAt(wisp, points, t), ms, now, ORB_SIZE);
+  drawWisp(ctx, (t) => wispAt(wisp, points, t), ms, now, WISP_SIZE);
 }
 
 // nearest first from the entry point, so the wisp doesn't zigzag the whole screen

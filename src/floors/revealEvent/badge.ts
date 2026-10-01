@@ -6,7 +6,7 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { drawPoppingCritText } from "../../shared/critText";
 import { drawWhiteBurst } from "../../shared/eventFx";
-import { drawWisp, swoop } from "../../shared/wisp";
+import { drawWisp, swoop, WISP_SIZE } from "../../shared/wisp";
 import { radialFade } from "../../shared/goldShimmer";
 import type { StageRect } from "../revealStage";
 
@@ -36,7 +36,7 @@ const GHOST_MS = 25;
 // the bump: the share of it spent dipping onto the head, and the squash it leaves
 const CONTACT = 0.45;
 const SQUASH = 0.18;
-const ORB_SIZE = 40;
+const ORB_SIZE = WISP_SIZE;
 const OFF_SCREEN = 120;
 const HOVER_RISE = 110;
 const PERCH_MS = 500;

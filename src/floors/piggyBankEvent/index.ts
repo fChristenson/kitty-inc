@@ -10,7 +10,7 @@ import { shakeScreen } from "../../screenShake";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { createEventFx, drawWhiteBurst } from "../../shared/eventFx";
 import { streamCoins } from "../../shared/eventStream";
-import { drawWisp } from "../../shared/wisp";
+import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import { BTN_H, BTN_W, forceTestCrit } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import {
@@ -22,8 +22,6 @@ import {
 
 const KEY = "piggyBank";
 const COINS = 300;
-// the orb's radius when it bursts; it grows from nothing once the first coins land
-const ORB_SIZE = 110;
 const BURST_SHAKE = 1.2;
 const POP_MS = 400;
 
@@ -61,7 +59,7 @@ registerEventProc(
                   1,
                   (now - firstHitAt) / Math.max(1, burstDueAt - firstHitAt),
                 );
-                const size = ORB_SIZE * (1 - (1 - t) ** 2);
+                const size = WISP_SIZE * (1 - (1 - t) ** 2);
                 fx.draw(ctx, piggy.x, piggy.y, ({ white }) =>
                   drawWisp(ctx, () => piggy, now, now, size, white),
                 );

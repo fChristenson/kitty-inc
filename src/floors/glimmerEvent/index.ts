@@ -23,7 +23,7 @@ import {
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
 import { drawGlimmer } from "../../shared/twinkle";
-import { drawWispHead, drawWispTrail } from "../../shared/wisp";
+import { drawWispHead, drawWispTrail, WISP_SIZE } from "../../shared/wisp";
 import { smoothstep } from "../../shared/easing";
 import {
   freezeScreen,
@@ -179,7 +179,7 @@ function drawLight(
   white: number,
   now: number,
 ): void {
-  drawWispHead(ctx, () => ({ x, y }), now, now, SIZE * growth, white);
+  drawWispHead(ctx, () => ({ x, y }), now, now, WISP_SIZE * growth, white);
 }
 
 // a leg's promotable workers: dimmed like the frozen frame until lit
@@ -400,7 +400,7 @@ function drawOverlay(
     (t) => (t < 0 ? null : lightAt(glimmer, t, getFloorRect)),
     elapsed,
     now,
-    SIZE * growth,
+    WISP_SIZE * growth,
   );
   drawLightPose(ctx, light, growth, now);
 }

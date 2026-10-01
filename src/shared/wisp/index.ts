@@ -8,6 +8,9 @@ import { drawTwinkle, hash01 } from "../twinkle";
 
 export type Point = { x: number; y: number };
 
+// every wisp's size, passed as drawWisp's `size` (times any grow-in)
+export const WISP_SIZE = 40;
+
 // the head: a white-hot core, smeared back along its last few ms of flight,
 // in a soft gold halo, with a few sparkles packed tight round it
 const CORE = 0.7; // its glow radius, of the wisp's size
@@ -180,7 +183,8 @@ export function drawWispHead(
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = previous;
   for (let i = 0; i < HUDDLE; i++) {
-    const angle = hash01(i, 41) * Math.PI * 2 + now / (300 + 200 * hash01(i, 42));
+    const angle =
+      hash01(i, 41) * Math.PI * 2 + now / (300 + 200 * hash01(i, 42));
     const reach = size * HUDDLE_REACH * Math.sqrt(hash01(i, 43));
     drawGlitterLight(
       ctx,
