@@ -508,12 +508,17 @@ export function spawnSprayCoins(
 }
 
 // one coin or bill per path (floor-local), each following its own path over
-// outTicks, then flying straight on into the total. ages (ticks, per path)
-// start a coin that far along, as if launched that much earlier
+// outTicks, then flying straight on into the total (or at releaseAt, if given,
+// hanging at its path's end till then). ages (ticks, per path) start a coin
+// that far along, as if launched that much earlier
 export function spawnPathCoins(
   floor: Floor,
   paths: CoinPath[],
-  { outTicks, flightTicks, ...arrival }: Omit<SprayOptions, "releaseAt">,
+  {
+    outTicks,
+    flightTicks,
+    ...arrival
+  }: Omit<SprayOptions, "releaseAt"> & { releaseAt?: number },
   ages: number[] = [],
 ): void {
   const group: HomingGroup = { ...arrival, layer: "overlay", fired: false };

@@ -57,8 +57,14 @@ export interface MoneyCover {
   // launches targets in order, spread evenly over durationMs
   stream(targets: Point[], durationMs: number): void;
   // launches one coin per path in order, spread evenly over durationMs; each
-  // follows its path for travelMs, then hops on into the total
-  flow(paths: CoinPath[], durationMs: number, travelMs: number): void;
+  // follows its path for travelMs, then hops on into the total, or with hold
+  // hangs at its path's end until the merge like a spot's coin
+  flow(
+    paths: CoinPath[],
+    durationMs: number,
+    travelMs: number,
+    hold?: boolean,
+  ): void;
   isLive(): boolean;
 }
 
@@ -213,7 +219,7 @@ export function startMoneyCover(
     launch,
     stream: (targets, streamMs) =>
       launchOver(targets, streamMs, isLive, (batch) => launch(batch)),
-    flow: (paths, streamMs, travelMs) => {
+    flow: (paths, streamMs, travelMs, hold = false) => {
       const { releaseAt: _, ...pathArrival } = arrival;
       const ticks = travelMs / TICK_MS;
       const flight = FLOW_FLIGHT_MS / TICK_MS;
@@ -223,11 +229,13 @@ export function startMoneyCover(
         spawnPathCoins(
           floor,
           batch,
-          {
-            ...pathArrival,
-            outTicks: [ticks * 0.97, ticks * 1.03],
-            flightTicks: [flight * 0.6, flight],
-          },
+          hold
+            ? { ...arrival, outTicks: [ticks * 0.97, ticks * 1.03] }
+            : {
+                ...pathArrival,
+                outTicks: [ticks * 0.97, ticks * 1.03],
+                flightTicks: [flight * 0.6, flight],
+              },
           lateMs.map((ms) => ms / TICK_MS),
         ),
       );

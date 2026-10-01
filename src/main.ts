@@ -56,6 +56,7 @@ import {
   forceKickbackEvent,
   forceBurstEvent,
   forceSprayEvent,
+  forceFountainEvent,
   forceStreamEvent,
   forceTrailsEvent,
   forceDrawEvent,
@@ -130,6 +131,7 @@ import {
   wireKickbackEventTestButton,
   wireBurstEventTestButton,
   wireSprayEventTestButton,
+  wireFountainEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
@@ -595,6 +597,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceSprayEvent(floor);
+    });
+    // same, for the Fountain event
+    wireFountainEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceFountainEvent(floor);
     });
     // same, for the Stream event
     wireStreamEventTestButton(app, () => {

@@ -149,6 +149,16 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/fountainEvent — the rare "Fountain" event: like Spray, but the
+  // button jets the coins up so they arc over and rain down across the screen
+  fountainEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streamMs: 700, // how long the jet shoots
+    travelMs: 1_000, // each coin's arc up and down
+    durationMs: 2_500, // jet, the last coin's arc, a short hang, then the merge
+    mergeMs: 500,
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs
