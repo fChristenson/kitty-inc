@@ -457,6 +457,14 @@ export function wireOrbitalStrikeEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireFuseEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-fuse-event")!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,

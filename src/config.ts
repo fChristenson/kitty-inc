@@ -199,6 +199,16 @@ export const CONFIG = {
     holdMs: 650, // after the strike, before the screen unfreezes
   },
 
+  // src/floors/fuseEvent — the rare "Fuse" event: a spark races along a
+  // fuse from the screen's side to the button, which blows up spraying coins
+  // across the screen into the total
+  fuseEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    burnMs: 900, // the spark racing along the fuse
+    holdMs: 550, // the coins hanging after the blast
+    mergeMs: 500, // the coins sweeping into the total
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

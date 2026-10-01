@@ -341,6 +341,7 @@ export { forceFountainEvent } from "./fountainEvent";
 export { forceRippleEvent } from "./rippleEvent";
 export { forceWreckingBallEvent } from "./wreckingBallEvent";
 export { forceOrbitalStrikeEvent } from "./orbitalStrikeEvent";
+export { forceFuseEvent } from "./fuseEvent";
 export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forceWaterfallEvent } from "./waterfallEvent";

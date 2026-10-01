@@ -65,6 +65,7 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 ### Coins (free money)
 
 - [x] **Ripple**: coins burst out of the button in round ripples like a stone dropped in a pond (a wide band, a thin ring or two close behind, then the next wide band), each rolling outward at its own pace while the frozen screen under it refracts like water; then the coins sweep into the total. Pays floor income × floor number once per ring.
+- [x] **Fuse**: the wisp, as a fizzing spark, races in from the screen's side along a wiggling glowing fuse, ever faster, burning it away behind it; it reaches the button and KABOOM: a huge blast and shake sprays coins across the whole screen, then they sweep into the total. Pays floor income × floor number × 3.
 - [x] **Orbital Strike**: a spinning targeting reticle closes in on the clicked floor's income bar and locks on, a thin laser flickers down to it, then a blazing beam of light slams down from the sky in a huge blast and shake: the bar jumps one crit tier.
 
 ### Wisp (upgrades)
