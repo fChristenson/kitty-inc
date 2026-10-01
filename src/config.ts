@@ -242,6 +242,16 @@ export const CONFIG = {
     minLevels: 10,
   },
 
+  // src/floors/chainReactionEvent — the rare "Chain Reaction" event: mines
+  // pop up over the screen and blow one after another from the button, each
+  // spraying coins that then sweep into the total
+  chainReactionEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    armMs: 320, // the mines popping up before the button blows
+    holdMs: 450, // after the last blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
