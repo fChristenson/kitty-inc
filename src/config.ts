@@ -458,6 +458,18 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/breakoutEvent — the rare "Breakout" event: the clicked
+  // floor's income bar bats the wisp up through a wall of bricks, each
+  // smashing into coins, until the rest blow at once into the total
+  breakoutEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    dropMs: 180, // the wall slamming down
+    // each volley's climb from the bar to the top, ever quicker (its fall's as long)
+    upMs: [320, 270, 225, 190, 165],
+    holdMs: 450, // the coins hanging after the wall blows
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
