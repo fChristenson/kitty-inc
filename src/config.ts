@@ -318,6 +318,41 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/drillEvent — the rare "Drill" event: the wisp drills through
+  // the clicked floor's income bar from the left and bursts out the other
+  // side, spraying coins into the total
+  drillEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    approachMs: 240, // rocketing in to the bar
+    drillMs: 720, // grinding through it against the resistance
+    exitMs: 160, // shooting on off the screen
+    holdMs: 450, // the coins hanging after it bursts out
+    mergeMs: 500,
+  },
+
+  // src/floors/burrowEvent — the rare "Burrow" event: the wisp falls onto
+  // the clicked floor's upgrade button and bores in, bending it down at the
+  // middle until it explodes, bursting money into the total
+  burrowEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    fallMs: 260, // falling onto the button
+    pushMs: 680, // boring in, bending it ever deeper
+    holdMs: 450, // the coins hanging after it blows
+    mergeMs: 500,
+  },
+
+  // src/floors/pingPongEvent — the rare "Ping Pong" event: a wisp bounces
+  // between the clicked floor's income bar and the roof (the bar above, if
+  // open), each bar hit knocking coins into the total; pays once per bar hit
+  pingPongEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    approachMs: 180, // flying in to its first hit
+    firstRallyMs: 120, // between the first two hits, shrinking to
+    lastRallyMs: 55, // between the last two
+    holdMs: 450, // the coins hanging after the smash
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

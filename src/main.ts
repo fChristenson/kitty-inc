@@ -71,6 +71,9 @@ import {
   forceOverloadEvent,
   forceGatlingEvent,
   forcePressEvent,
+  forceDrillEvent,
+  forceBurrowEvent,
+  forcePingPongEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -199,6 +202,9 @@ import {
   wireOverloadEventTestButton,
   wireGatlingEventTestButton,
   wirePressEventTestButton,
+  wireDrillEventTestButton,
+  wireBurrowEventTestButton,
+  wirePingPongEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -808,6 +814,27 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forcePressEvent(floor);
+    });
+    // same, for the Drill event
+    wireDrillEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceDrillEvent(floor);
+    });
+    // same, for the Burrow event
+    wireBurrowEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceBurrowEvent(floor);
+    });
+    // same, for the Ping Pong event
+    wirePingPongEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forcePingPongEvent(floor);
     });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {
