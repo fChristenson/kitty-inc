@@ -342,6 +342,7 @@ export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forceWaterfallEvent } from "./waterfallEvent";
 export { forceConveyorEvent } from "./conveyorEvent";
+export { forceFirefliesEvent } from "./firefliesEvent";
 export { forcePaydayEvent } from "./paydayEvent";
 export { forcePiggyBankEvent } from "./piggyBankEvent";
 export { forceCoinTossEvent } from "./coinTossEvent";

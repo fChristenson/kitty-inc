@@ -27,14 +27,12 @@ import {
   celebrateWorkerBoost,
   clearWorkerSpotlight,
   drawWorkerSpotlight,
-  findRecruitSpot,
-  missingWorkerCount,
-  recruitWorker,
+  recruitToCap,
   setWorkerSpotlight,
   WORKER_FEET_Y,
   WORKER_HEIGHT,
 } from "../worker";
-import { findRecruitSpots } from "../onScreenWorkers";
+import { findUnderstaffedFloor } from "../onScreenWorkers";
 import { FLOOR_W } from "../constants";
 
 const KEY = "conveyor";
@@ -70,24 +68,15 @@ interface RunningConveyor {
 
 let running: RunningConveyor | null = null;
 
-// the floor in view missing the most workers, the clicked one on a tie
-function findFloor(floor: Floor, context: EventProcContext): Floor | null {
-  const floors = findRecruitSpots(floor, context.getOnScreenFloors).map(
-    (spot) => spot.floor,
-  );
-  if (floors.length === 0) return null;
-  const most = Math.max(...floors.map(missingWorkerCount));
-  const pool = floors.filter((f) => missingWorkerCount(f) === most);
-  return pool.includes(floor) ? floor : pool[0];
-}
-
 registerEventProc(
   {
     key: KEY,
     chance: () => CONFIG.conveyorEvent.chance,
     isInProgress: () => running !== null,
     canArm: (floor, context) =>
-      !running && !isScreenFrozen() && findFloor(floor, context) !== null,
+      !running &&
+      !isScreenFrozen() &&
+      findUnderstaffedFloor(floor, context.getOnScreenFloors) !== null,
     arm: startConveyor,
   },
   { label: "Conveyor", color: COLOR.heavenlyGold },
@@ -166,18 +155,12 @@ function drawOverlay(
 
 function startConveyor(clicked: Floor, context: EventProcContext): void {
   if (running || isScreenFrozen()) return;
-  const floor = findFloor(clicked, context);
+  const floor = findUnderstaffedFloor(clicked, context.getOnScreenFloors);
   if (!floor) return;
   const { crossMs, staggerMs, holdMs } = CONFIG.conveyorEvent;
   const tier = context.critTier ?? pickCritTierByOdds();
   // every missing worker is hired at once, each where it'll be dropped
-  const now = Date.now();
-  const drops: { workerIndex: number; x: number }[] = [];
-  for (let spot = findRecruitSpot(floor); spot; spot = findRecruitSpot(floor)) {
-    const workerIndex = recruitWorker(floor, spot.x, now);
-    if (workerIndex === null) break;
-    drops.push({ workerIndex, x: spot.x });
-  }
+  const drops = recruitToCap(floor, Date.now());
   if (drops.length === 0) return;
   const area = context.getScreenAreaLocal?.(floor);
   const startX = (area?.left ?? 0) - OFF_SCREEN;

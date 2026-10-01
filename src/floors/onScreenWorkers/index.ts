@@ -9,6 +9,7 @@ import {
   getRenderedWorkerCount,
   getWorkerCenter,
   getWorkerPermaTier,
+  missingWorkerCount,
   WORKER_FEET_Y,
 } from "../worker";
 
@@ -68,6 +69,20 @@ export function findRecruitSpots(
       spots.push({ floor: entry.floor, ...spot });
   }
   return spots;
+}
+
+// the floor in view missing the most workers, floor itself on a tie
+export function findUnderstaffedFloor(
+  floor: Floor,
+  getOnScreenFloors: OnScreenFloors | undefined,
+): Floor | null {
+  const floors = findRecruitSpots(floor, getOnScreenFloors).map(
+    (spot) => spot.floor,
+  );
+  if (floors.length === 0) return null;
+  const most = Math.max(...floors.map(missingWorkerCount));
+  const pool = floors.filter((f) => missingWorkerCount(f) === most);
+  return pool.includes(floor) ? floor : pool[0];
 }
 
 // every floor's ground in view, where its workers stand, top first, local to

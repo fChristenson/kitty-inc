@@ -485,6 +485,20 @@ export function recruitWorker(
   return index;
 }
 
+// free hires until the floor is full, each standing where it was hired
+export function recruitToCap(
+  floor: Floor,
+  now: number,
+): { workerIndex: number; x: number }[] {
+  const hires: { workerIndex: number; x: number }[] = [];
+  for (let spot = findRecruitSpot(floor); spot; spot = findRecruitSpot(floor)) {
+    const workerIndex = recruitWorker(floor, spot.x, now);
+    if (workerIndex === null) break;
+    hires.push({ workerIndex, x: spot.x });
+  }
+  return hires;
+}
+
 // a worker's "Boost" event tier (see floors/boostEvent): the manager's lives on
 // the floor itself, a regular worker's in its own persisted slot
 export function getWorkerPermaTier(

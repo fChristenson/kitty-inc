@@ -7,13 +7,11 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
-import { drawWhiteBurst } from "../../shared/eventFx";
 import {
   drawEventStreams,
   streamGlimmers,
   type StreamSource,
 } from "../../shared/eventStream";
-import { drawGoldShimmer } from "../../shared/goldShimmer";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -30,21 +28,15 @@ import {
 import {
   celebrateWorkerBoost,
   clearWorkerSpotlight,
-  drawWorkerSpotlight,
   recruitWorker,
   setWorkerSpotlight,
   WORKER_HEIGHT,
 } from "../worker";
 import { findRecruitSpots } from "../onScreenWorkers";
+import { drawFormingWorker } from "../formingWorker";
 
 const KEY = "recruit";
-// the forming worker grows from this share of its size up to full
-const FORM_SCALE = 0.6;
-// its white glow fades out over this long once it lands
-const WHITE_FADE_MS = 350;
-const GLOW = WORKER_HEIGHT * 0.7;
 const PULSE_MS = 250;
-const BURST_MS = 600;
 // without a known screen area, the lights start this far from the spot
 const FALLBACK_REACH = 900;
 
@@ -108,33 +100,19 @@ function drawOverlay(
     const ms = now - event.startedAt;
     const form = ease(clamp01(ms / CONFIG.recruitEvent.streamMs));
     const pulse = Math.max(0, 1 - (now - event.lastLandedAt) / PULSE_MS);
-    const feetY = y + WORKER_HEIGHT / 2;
     ctx.save();
     ctx.translate(rect.left, rect.top);
-    drawGoldShimmer(
+    drawFormingWorker(
       ctx,
+      floor,
+      event.workerIndex,
       x,
       y,
-      GLOW * (0.5 + 0.5 * form),
-      event.formedAt === null ? Math.max(form, pulse) : 0,
-      2,
+      form,
+      Math.max(form, pulse),
+      event.formedAt,
       now,
-      COLOR.heavenlyGold,
     );
-    ctx.save();
-    const scale = FORM_SCALE + (1 - FORM_SCALE) * form;
-    ctx.globalAlpha = form;
-    ctx.translate(x, feetY);
-    ctx.scale(scale, scale);
-    ctx.translate(-x, -feetY);
-    const white =
-      event.formedAt === null
-        ? 1
-        : 1 - clamp01((now - event.formedAt) / WHITE_FADE_MS);
-    drawWorkerSpotlight(ctx, floor, event.workerIndex, white, 0);
-    ctx.restore();
-    if (event.formedAt !== null)
-      drawWhiteBurst(ctx, x, y, (now - event.formedAt) / BURST_MS, 0.4);
     ctx.restore();
   }
   drawEventStreams(ctx, getFloorRect);
