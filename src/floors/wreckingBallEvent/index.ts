@@ -161,8 +161,7 @@ function drawOverlay(
 
 function startWreckingBall(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
-  if (running || isScreenFrozen() || !context.upgradeFloorFree || !area)
-    return;
+  if (running || isScreenFrozen() || !context.upgradeFloorFree || !area) return;
   const upgradeFloorFree = context.upgradeFloorFree;
   const { dropMs, bounce, holdMs, levelShare, minLevels } =
     CONFIG.wreckingBallEvent;
