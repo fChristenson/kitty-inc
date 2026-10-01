@@ -121,7 +121,11 @@ function drawReel(
     box,
     { radius: 0 },
     () => {
-      for (let k = Math.floor(position) - 1; k <= Math.ceil(position) + 1; k++) {
+      for (
+        let k = Math.floor(position) - 1;
+        k <= Math.ceil(position) + 1;
+        k++
+      ) {
         const symbol = STRIP[mod(k, STRIP.length)];
         drawCritText(
           ctx,
@@ -219,12 +223,10 @@ registerEventProc(
               const cy = frame.y + frame.height / 2;
               drawGoldShimmer(ctx, cx, cy, frame.width * 0.7, 1, 1.5, now);
               reels.forEach((reel, i) =>
-                drawReel(
-                  ctx,
-                  reelBox(i),
-                  reelPosition(reel, startedAt, now),
-                  [slamOwner, `reel${i}`],
-                ),
+                drawReel(ctx, reelBox(i), reelPosition(reel, startedAt, now), [
+                  slamOwner,
+                  `reel${i}`,
+                ]),
               );
               ctx.drawImage(
                 frameImage,
@@ -262,7 +264,10 @@ registerEventProc(
       );
       if (!cover) return;
       const { area, button } = cover;
-      const width = Math.min(FRAME_W, area.right - area.left - FRAME_MARGIN * 2);
+      const width = Math.min(
+        FRAME_W,
+        area.right - area.left - FRAME_MARGIN * 2,
+      );
       const height = (width * FRAME_SIZE.height) / FRAME_SIZE.width;
       frame = {
         x: (area.left + area.right) / 2 - width / 2,
