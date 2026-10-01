@@ -365,6 +365,7 @@ export { forceMeteorShowerEvent } from "./meteorShowerEvent";
 export { forceMentorEvent } from "./mentorEvent";
 export { forceSparkChainEvent } from "./sparkChainEvent";
 export { forcePolishEvent } from "./polishEvent";
+export { forceLighthouseEvent } from "./lighthouseEvent";
 export { forceRecruitEvent } from "./recruitEvent";
 export { forcePromotionDayEvent } from "./promotionDayEvent";
 export { forceAlchemyEvent } from "./alchemyEvent";

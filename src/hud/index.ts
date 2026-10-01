@@ -99,6 +99,7 @@ export {
   wireMentorEventTestButton,
   wireSparkChainEventTestButton,
   wirePolishEventTestButton,
+  wireLighthouseEventTestButton,
   wireRecruitEventTestButton,
   wirePromotionDayEventTestButton,
   wireAlchemyEventTestButton,

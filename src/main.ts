@@ -84,6 +84,7 @@ import {
   forceMentorEvent,
   forceSparkChainEvent,
   forcePolishEvent,
+  forceLighthouseEvent,
   forceRecruitEvent,
   forcePromotionDayEvent,
   forceAlchemyEvent,
@@ -194,6 +195,7 @@ import {
   wireMentorEventTestButton,
   wireSparkChainEventTestButton,
   wirePolishEventTestButton,
+  wireLighthouseEventTestButton,
   wireRecruitEventTestButton,
   wirePromotionDayEventTestButton,
   wireAlchemyEventTestButton,
@@ -863,6 +865,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forcePolishEvent(floor);
+    });
+    // same, for the Lighthouse event
+    wireLighthouseEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceLighthouseEvent(floor);
     });
     // same, for the Recruit event
     wireRecruitEventTestButton(app, () => {

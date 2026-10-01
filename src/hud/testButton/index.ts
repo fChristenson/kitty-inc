@@ -216,6 +216,16 @@ export function wirePolishEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireLighthouseEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-lighthouse-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireRecruitEventTestButton(
   container: HTMLElement,
   onClick: () => void,

@@ -457,6 +457,18 @@ export const CONFIG = {
     minLevels: 10,
   },
 
+  // src/floors/lighthouseEvent — the rare "Lighthouse" event: a lamp in the
+  // middle of the screen sweeps its beam one full turn round; every upgrade
+  // button in view it lights shines, granting free upgrade levels
+  lighthouseEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    flyMs: 450, // the wisp flying up out of the button to the lamp's spot
+    sweepMs: 2_400, // the beam's one full turn
+    holdMs: 900, // after the beam fades, before the screen unfreezes
+    levelShare: 0.1, // free levels per floor, of its current level
+    minLevels: 10,
+  },
+
   // src/floors/recruitEvent — the rare "Recruit" event: lights stream into an
   // empty spot on a floor in view and form a new worker there, a free hire
   recruitEvent: {
