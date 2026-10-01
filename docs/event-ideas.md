@@ -43,7 +43,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Lighthouse**: a beam from the button sweeps round the screen like a lighthouse; every upgrade button it lights shines. Free upgrade levels on every floor in view.
 - [x] **Rising Tide**: a glow floods up the building from the street, lifting every floor in view. Each floor's tier rises to the highest tier among them.
 - [x] **Tidal Wave**: like Rising Tide, but a wall of water sweeps across the screen from one side, its top leaning out like a breaking wave. Same reward.
-- [ ] **Beanstalk**: a vine of light grows up from the top floor and curls round the locked floors above. Unlocks the next 2 floors for free.
+- [x] **Beanstalk**: a vine of light grows up from the top floor and curls round the locked floors above. Unlocks the next 2 floors for free.
 
 ## Reveals
 

@@ -360,6 +360,7 @@ export { forceConstellationEvent } from "./constellationEvent";
 export { forceAscendEvent } from "./ascendEvent";
 export { forceRisingTideEvent } from "./risingTideEvent";
 export { forceTidalWaveEvent } from "./tidalWaveEvent";
+export { forceBeanstalkEvent } from "./beanstalkEvent";
 export { forceBlessingEvent } from "./blessingEvent";
 export { forceHaloEvent } from "./haloEvent";
 export { forceCometEvent } from "./cometEvent";

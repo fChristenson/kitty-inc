@@ -408,6 +408,15 @@ export const CONFIG = {
     holdMs: 600, // after it fades, before the screen unfreezes
   },
 
+  // src/floors/beanstalkEvent — the rare "Beanstalk" event: a vine of light
+  // winds up round the locked floor and the one above it, unlocking both
+  beanstalkEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    growMs: 2_400, // the vine climbing from the top floor up past the locked one
+    holdMs: 500, // after it blooms, before the screen unfreezes
+    secondUnlockMs: 450, // between the two floors unlocking
+  },
+
   // src/floors/blessingEvent — the rare "Blessing" event: golden glimmers snow
   // down over the clicked floor, one settling on each worker, +1 perma tier each
   blessingEvent: {

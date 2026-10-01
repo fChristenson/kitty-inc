@@ -362,6 +362,16 @@ export function wireTidalWaveEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireBeanstalkEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-beanstalk-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireConstellationEventTestButton(
   container: HTMLElement,
   onClick: () => void,

@@ -94,6 +94,7 @@ export {
   wireAscendEventTestButton,
   wireRisingTideEventTestButton,
   wireTidalWaveEventTestButton,
+  wireBeanstalkEventTestButton,
   wireBlessingEventTestButton,
   wireHaloEventTestButton,
   wireCometEventTestButton,

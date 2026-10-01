@@ -79,6 +79,7 @@ import {
   forceAscendEvent,
   forceRisingTideEvent,
   forceTidalWaveEvent,
+  forceBeanstalkEvent,
   forceBlessingEvent,
   forceHaloEvent,
   forceCometEvent,
@@ -192,6 +193,7 @@ import {
   wireAscendEventTestButton,
   wireRisingTideEventTestButton,
   wireTidalWaveEventTestButton,
+  wireBeanstalkEventTestButton,
   wireBlessingEventTestButton,
   wireHaloEventTestButton,
   wireCometEventTestButton,
@@ -834,6 +836,17 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceTidalWaveEvent(floor);
+    });
+    // same, for the Beanstalk event, on the top unlocked floor so the locked
+    // one above it is in view
+    wireBeanstalkEventTestButton(app, () => {
+      const floors = buildings[activeBuildingIndex];
+      if (!floors) return;
+      const lockedIndex = floors.findIndex((f) => !f.unlocked);
+      const floor = floors[lockedIndex - 1] ?? floors[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceBeanstalkEvent(floor);
     });
     // same, for the Blessing event
     wireBlessingEventTestButton(app, () => {
