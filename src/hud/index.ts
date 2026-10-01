@@ -81,6 +81,7 @@ export {
   wireDownpourEventTestButton,
   wireMagnetEventTestButton,
   wireSpilloverEventTestButton,
+  wireConstellationEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,

@@ -19,7 +19,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 
 ## Glimmer streams (upgrades)
 
-- [ ] **Constellation**: lights link several workers into a star pattern, then each node flares. +1 perma tier per linked worker.
+- [x] **Constellation**: a light links 3–7 on-screen workers into a star (a pentagram for five), then each node flares. +1 perma tier per linked worker.
 - [ ] **Ascend**: one light climbs up the building floor by floor, touching each income bar. +1 floor tier per touched floor (capped).
 - [ ] **Blessing**: lights fall gently like snow onto one floor; each worker they touch glows. Every worker on that floor gets +1 tier.
 - [ ] **Halo**: lights orbit a worker, shrink into a halo and settle on its head. That worker jumps to the top tier.

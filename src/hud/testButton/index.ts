@@ -130,6 +130,16 @@ export function wirePiggyBankEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireConstellationEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-constellation-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireSpilloverEventTestButton(
   container: HTMLElement,
   onClick: () => void,

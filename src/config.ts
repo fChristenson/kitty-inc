@@ -255,6 +255,17 @@ export const CONFIG = {
     bonusPayouts: 2,
   },
 
+  // src/floors/constellationEvent — the rare "Constellation" event: a light
+  // links several on-screen workers into a star, then each flares and climbs
+  // one perma tier
+  constellationEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    appearMs: 500, // the stars twinkling up over the workers
+    linkMs: 1_000, // the light drawing the whole star
+    flareGapMs: 220, // between one star flaring and the next
+    maxStars: 7, // at least 3 promotable workers in view are needed
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

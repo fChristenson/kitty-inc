@@ -66,6 +66,7 @@ import {
   forceDownpourEvent,
   forceMagnetEvent,
   forceSpilloverEvent,
+  forceConstellationEvent,
   forceStreamEvent,
   forceTrailsEvent,
   forceDrawEvent,
@@ -150,6 +151,7 @@ import {
   wireDownpourEventTestButton,
   wireMagnetEventTestButton,
   wireSpilloverEventTestButton,
+  wireConstellationEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
@@ -685,6 +687,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceSpilloverEvent(floor);
+    });
+    // same, for the Constellation event
+    wireConstellationEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceConstellationEvent(floor);
     });
     // same, for the Stream event
     wireStreamEventTestButton(app, () => {

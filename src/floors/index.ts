@@ -347,6 +347,7 @@ export { forceChainPayEvent } from "./chainPayEvent";
 export { forceDownpourEvent } from "./downpourEvent";
 export { forceMagnetEvent } from "./magnetEvent";
 export { forceSpilloverEvent } from "./spilloverEvent";
+export { forceConstellationEvent } from "./constellationEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";
