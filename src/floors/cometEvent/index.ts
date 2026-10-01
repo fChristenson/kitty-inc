@@ -11,7 +11,7 @@ import { shakeScreen } from "../../screenShake";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawGlimmer, hash01 } from "../../shared/twinkle";
-import { drawGlimmerOrb } from "../../shared/glimmerOrb";
+import { drawWispHead, drawWispTrail } from "../../shared/wisp";
 import {
   freezeScreen,
   getScreenFreezeDim,
@@ -51,15 +51,8 @@ const TAIL_LAYERS = [
   [HEAD_SIZE * 0.8, COLOR.heavenlyGold, 0.55],
   [HEAD_SIZE * 0.25, COLOR.white, 0.9],
 ] as const;
-const TAIL_GLIMMERS = 14;
 // after the impact the tail is drawn into it over this long
 const TAIL_COLLAPSE_MS = 250;
-// loose glitter: a chance every SHED_MS to drop a speck that drifts and fades
-const SHED_MS = 18;
-const SHED_CHANCE = 0.7;
-const SHED_LIFE_MS = 700;
-const SHED_SPREAD = HEAD_SIZE * 0.8;
-const SHED_FALL = 40;
 // the explosion: a white flash and glimmer sparks flung out to SPARK_REACH
 const EXPLOSION_SCALE = 1.1;
 const EXPLOSION_SHAKE = 1.2;
@@ -166,59 +159,30 @@ function drawComet(
     y: head.y - uy * d + ux * side,
   });
 
-  // glitter shed along the way, drifting off the path and down as it fades
-  for (let e = Math.floor(ms / SHED_MS); e * SHED_MS > ms - SHED_LIFE_MS; e--) {
-    if (e < 0 || e * SHED_MS > streakMs || hash01(e, 1) > SHED_CHANCE) continue;
-    const age = (ms - e * SHED_MS) / SHED_LIFE_MS;
-    const at = headAt(comet, e * SHED_MS);
-    const side = (hash01(e, 2) - 0.5) * 2 * SHED_SPREAD * (0.4 + age);
-    drawGlimmer(
-      ctx,
-      at.x - uy * side,
-      at.y + ux * side + SHED_FALL * age,
-      HEAD_SIZE * 0.35 * (1 - age) * (0.4 + 0.6 * hash01(e, 3)),
-      now / 200 + e,
-      COLOR.heavenlyGold,
-    );
-  }
-  if (tailLen <= 0) return;
-
-  ctx.save();
-  ctx.globalCompositeOperation = "lighter";
-  for (const [width, color, alpha] of TAIL_LAYERS) {
-    ctx.strokeStyle = color;
-    for (let s = 0; s < TAIL_SEGMENTS; s++) {
-      const f = s / TAIL_SEGMENTS;
-      const a = behind(tailLen * f, 0);
-      const b = behind(tailLen * (f + 1 / TAIL_SEGMENTS), 0);
-      ctx.globalAlpha = alpha * (1 - f);
-      ctx.lineWidth = width * (1 - f);
-      ctx.beginPath();
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(b.x, b.y);
-      ctx.stroke();
+  const along = (t: number) =>
+    t >= 0 && t <= streakMs ? headAt(comet, t) : null;
+  drawWispTrail(ctx, along, ms, now, HEAD_SIZE);
+  if (tailLen > 0) {
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    for (const [width, color, alpha] of TAIL_LAYERS) {
+      ctx.strokeStyle = color;
+      for (let s = 0; s < TAIL_SEGMENTS; s++) {
+        const f = s / TAIL_SEGMENTS;
+        const a = behind(tailLen * f, 0);
+        const b = behind(tailLen * (f + 1 / TAIL_SEGMENTS), 0);
+        ctx.globalAlpha = alpha * (1 - f);
+        ctx.lineWidth = width * (1 - f);
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
     }
-  }
-  ctx.restore();
-
-  // glimmers riding the tail, wavering wider toward its end
-  for (let k = TAIL_GLIMMERS; k >= 1; k--) {
-    const f = k / (TAIL_GLIMMERS + 1);
-    const point = behind(
-      tailLen * f,
-      Math.sin(now / 110 + k * 1.7) * HEAD_SIZE * 0.35 * f,
-    );
-    drawGlimmer(
-      ctx,
-      point.x,
-      point.y,
-      HEAD_SIZE * 0.5 * (1 - f),
-      now / 180 + k,
-      COLOR.heavenlyGold,
-    );
+    ctx.restore();
   }
   if (comet.hitAt === null)
-    drawGlimmerOrb(ctx, head.x, head.y, HEAD_SIZE, 0.4, now);
+    drawWispHead(ctx, along, ms, now, HEAD_SIZE, 0.4);
 }
 
 // the impact: a big white flash and glimmer sparks flung out, slowing and fading

@@ -1,5 +1,5 @@
 // the "Wisp" event: it covers its crit, whose click freezes the screen while a
-// playful glimmer orb flits in from off screen like a will-o'-the-wisp,
+// playful wisp (shared/wisp) flits in from off screen like a will-o'-the-wisp,
 // swooping from target to target and hovering over each to sprinkle golden
 // glitter on it: a worker climbs one perma tier, a floor's income bar climbs
 // one crit tier, and a floor's "Lvl N" label gains free levels. Then it flits
@@ -16,8 +16,8 @@ import {
 } from "../../shared/critTypes";
 import { triggerEventEndSlam } from "../../shared/eventEndSlam";
 import { drawWhiteBurst } from "../../shared/eventFx";
-import { drawGlimmer, hash01 } from "../../shared/twinkle";
-import { drawWisp, swoop } from "../../shared/glimmerOrb";
+import { hash01 } from "../../shared/twinkle";
+import { drawGlitterLight, drawWisp, swoop } from "../../shared/wisp";
 import { isFloorLocked } from "../../shared/detachedJob";
 import {
   freezeScreen,
@@ -75,20 +75,11 @@ const WIGGLE_AMP = 26;
 const BOB = 7;
 // it enters and leaves this far past the screen's edges
 const OFF_SCREEN = 120;
-const TRAIL = 14;
-const TRAIL_MS = 22;
-// loose glitter shed off the tail: a chance every SHED_MS of a speck that
-// drifts down and fades over SHED_LIFE_MS
-const SHED_MS = 20;
-const SHED_CHANCE = 0.8;
-const SHED_LIFE_MS = 650;
-const SHED_DRIFT = 22;
-const SHED_FALL = 45;
 // the glitter it sprinkles while sweeping: one speck every SPRINKLE_GAP_MS,
 // falling from the wisp straight down onto the target over FALL_MS
 const SPRINKLE_GAP_MS = 10;
 const FALL_MS = 420;
-const SPECK_SIZE = 10;
+const SPECK_SIZE = 12;
 // the reward lands this far into the sprinkle
 const REWARD_AT = 0.7;
 const BURST_MS = 450;
@@ -239,30 +230,7 @@ function wispAt(wisp: RunningWisp, hovers: Point[], ms: number): Point {
   };
 }
 
-// glitter shed off the tail, drifting down and fading where it was dropped
-function drawShed(
-  ctx: CanvasRenderingContext2D,
-  wisp: RunningWisp,
-  hovers: Point[],
-  ms: number,
-  now: number,
-): void {
-  for (let e = Math.floor(ms / SHED_MS); e * SHED_MS > ms - SHED_LIFE_MS; e--) {
-    if (e < 0 || hash01(e, 11) > SHED_CHANCE) continue;
-    const age = (ms - e * SHED_MS) / SHED_LIFE_MS;
-    const at = wispAt(wisp, hovers, e * SHED_MS);
-    drawGlimmer(
-      ctx,
-      at.x + (hash01(e, 12) - 0.5) * 2 * SHED_DRIFT * age,
-      at.y + SHED_FALL * age * age + (hash01(e, 13) - 0.5) * 12,
-      SPECK_SIZE * (0.4 + 0.8 * hash01(e, 14)) * (1 - age),
-      now / 110 + e,
-      e % 4 === 0 ? COLOR.white : COLOR.heavenlyGold,
-    );
-  }
-}
-
-// stop k's glitter, falling from where the wisp was onto the target
+// glitter it sprinkles, falling from where it was onto the target
 function drawSprinkle(
   ctx: CanvasRenderingContext2D,
   wisp: RunningWisp,
@@ -285,13 +253,14 @@ function drawSprinkle(
     const from = wispAt(wisp, hovers, bornAt);
     // flicked out a little sideways, then falling ever faster
     const drift = (hash01(k, e) - 0.5) * 2 * 18;
-    drawGlimmer(
+    drawGlitterLight(
       ctx,
       from.x + drift * Math.sqrt(t) + Math.sin(t * 7 + e) * 4,
       from.y + (targetY - from.y) * t * t,
       SPECK_SIZE * (0.5 + 0.6 * hash01(e, k)) * (1 - 0.5 * t),
-      now / 120 + e,
-      e % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
+      e,
+      1,
+      now,
     );
   }
 }
@@ -336,16 +305,7 @@ function drawOverlay(
   if (hovers.some((h) => h === null)) return;
   const points = hovers as Point[];
   wisp.stops.forEach((_, k) => drawSprinkle(ctx, wisp, points, k, ms, now));
-  drawShed(ctx, wisp, points, ms, now);
-  drawWisp(
-    ctx,
-    (t) => wispAt(wisp, points, t),
-    ms,
-    now,
-    ORB_SIZE,
-    TRAIL,
-    TRAIL_MS,
-  );
+  drawWisp(ctx, (t) => wispAt(wisp, points, t), ms, now, ORB_SIZE);
 }
 
 // nearest first from the entry point, so the wisp doesn't zigzag the whole screen

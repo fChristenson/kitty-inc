@@ -9,7 +9,7 @@ import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { pickAtMost, pickCritTierByOdds } from "../../shared/critTypes";
 import { drawGlimmer, hash01 } from "../../shared/twinkle";
-import { drawGlimmerOrb } from "../../shared/glimmerOrb";
+import { drawWisp } from "../../shared/wisp";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import {
   freezeScreen,
@@ -156,7 +156,6 @@ function drawOverlay(
     segments,
     Math.max(0, ((elapsed - appearMs) / linkMs) * segments),
   );
-  let head: { x: number; y: number } | null = null;
   for (let s = 0; s < Math.ceil(linked); s++) {
     const a = points[event.path[s]];
     const b = points[event.path[s + 1]];
@@ -200,7 +199,6 @@ function drawOverlay(
         COLOR.heavenlyGold,
       );
     }
-    if (t < 1) head = { x: a.x + dx * t, y: a.y + dy * t };
   }
 
   // each star twinkling up, then flaring as its worker is promoted
@@ -222,7 +220,18 @@ function drawOverlay(
       COLOR.heavenlyGold,
     );
   });
-  if (head) drawGlimmerOrb(ctx, head.x, head.y, HEAD_SIZE, 0, now);
+  // the light laying the lines, `t` ms in; gone once they're all laid
+  const headAt = (t: number) => {
+    const at = ((t - appearMs) / linkMs) * segments;
+    if (at <= 0 || at >= segments) return null;
+    const s = Math.floor(at);
+    const a = points[event.path[s]];
+    const b = points[event.path[s + 1]];
+    if (!a || !b) return null;
+    const f = at - s;
+    return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f };
+  };
+  drawWisp(ctx, headAt, elapsed, now, HEAD_SIZE);
 }
 
 function startConstellation(floor: Floor, context: EventProcContext): void {

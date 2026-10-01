@@ -23,7 +23,7 @@ import {
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
 import { drawGlimmer } from "../../shared/twinkle";
-import { drawGlimmerOrb } from "../../shared/glimmerOrb";
+import { drawWispHead, drawWispTrail } from "../../shared/wisp";
 import { smoothstep } from "../../shared/easing";
 import {
   freezeScreen,
@@ -60,8 +60,6 @@ import {
 const SIZE = WORKER_HEIGHT * 0.25;
 const START_X = FLOOR_X_MIN;
 const END_X = FLOOR_X_MAX + SIZE;
-const TRAIL_GLIMMERS = 6;
-const TRAIL_MS = 45; // between the trail's glimmers along the light's path
 // the jump to the next floor: aiming, the leap, then the landing's squash
 const AIM_MS = 500;
 const JUMP_MS = 260;
@@ -181,7 +179,7 @@ function drawLight(
   white: number,
   now: number,
 ): void {
-  drawGlimmerOrb(ctx, x, y, SIZE * growth, white, now, SIZE);
+  drawWispHead(ctx, () => ({ x, y }), now, now, SIZE * growth, white);
 }
 
 // a leg's promotable workers: dimmed like the frozen frame until lit
@@ -397,20 +395,13 @@ function drawOverlay(
   );
   const light = lightAt(glimmer, elapsed, getFloorRect);
   if (!light) return;
-  // glitter left behind along its path
-  for (let i = 1; i <= TRAIL_GLIMMERS; i++) {
-    const point = lightAt(glimmer, elapsed - i * TRAIL_MS, getFloorRect);
-    if (!point || elapsed - i * TRAIL_MS < 0) continue;
-    const fade = 1 - i / (TRAIL_GLIMMERS + 1);
-    drawGlimmer(
-      ctx,
-      point.x,
-      point.y + Math.sin(now / 90 + i * 1.7) * SIZE * 0.25,
-      SIZE * 0.2 * fade * growth,
-      now / 300 + i,
-      COLOR.heavenlyGold,
-    );
-  }
+  drawWispTrail(
+    ctx,
+    (t) => (t < 0 ? null : lightAt(glimmer, t, getFloorRect)),
+    elapsed,
+    now,
+    SIZE * growth,
+  );
   drawLightPose(ctx, light, growth, now);
 }
 

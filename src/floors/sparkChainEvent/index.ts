@@ -11,7 +11,7 @@ import { playBloop, playSwoosh, startBoostEventStreamLoop } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawGlimmer, hash01 } from "../../shared/twinkle";
-import { drawGlimmerOrb } from "../../shared/glimmerOrb";
+import { drawWisp } from "../../shared/wisp";
 import {
   freezeScreen,
   getScreenFreezeDim,
@@ -68,8 +68,6 @@ const BOLT_LAYERS = [
   [7, COLOR.heavenlyGold, 0.7],
   [2.5, COLOR.white, 1],
 ] as const;
-const TRAIL = 6;
-const TRAIL_STEP = 0.06; // of a jump's flight between the trail's glimmers
 const FADE_MS = 350;
 const BURST_MS = 450;
 
@@ -296,39 +294,33 @@ function drawOverlay(
   }
 
   // the light: on its current stop, or flying the bolt to the next
-  let k = 0;
-  while (k + 1 < spark.stops.length && ms >= spark.stops[k + 1].jumpAt) k++;
-  const stop = spark.stops[k];
-  const to = points[k];
-  const from = points[Math.max(0, k - 1)];
-  if (!to || !from) return;
-  const flight = (q: number): Point => {
-    const t = k === 0 ? 1 : Math.min(1, Math.max(0, q));
-    return { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t };
+  const lightAt = (t: number): Point | null => {
+    if (t < 0) return null;
+    let k = 0;
+    while (k + 1 < spark.stops.length && t >= spark.stops[k + 1].jumpAt) k++;
+    const stop = spark.stops[k];
+    const to = points[k];
+    const from = points[Math.max(0, k - 1)];
+    if (!to || !from) return null;
+    const q =
+      k === 0
+        ? 1
+        : Math.min(
+            1,
+            Math.max(
+              0,
+              (t - stop.jumpAt) / Math.max(1, stop.landAt - stop.jumpAt),
+            ),
+          );
+    return { x: from.x + (to.x - from.x) * q, y: from.y + (to.y - from.y) * q };
   };
-  const p = (ms - stop.jumpAt) / Math.max(1, stop.landAt - stop.jumpAt);
-  if (k > 0 && p < 1)
-    for (let j = TRAIL; j >= 1; j--) {
-      const q = p - j * TRAIL_STEP;
-      if (q <= 0) continue;
-      const point = flight(q);
-      drawGlimmer(
-        ctx,
-        point.x,
-        point.y,
-        ORB_SIZE * 0.7 * (1 - j / (TRAIL + 1)),
-        now / 150 + j,
-        COLOR.heavenlyGold,
-      );
-    }
   const last = spark.stops[spark.stops.length - 1];
   const grow = Math.min(
     1,
     ms / CHARGE_MS,
     Math.max(0, 1 - (ms - last.landAt) / FADE_MS),
   );
-  const head = flight(p);
-  drawGlimmerOrb(ctx, head.x, head.y, ORB_SIZE * grow, 0.3, now);
+  drawWisp(ctx, lightAt, ms, now, ORB_SIZE * grow, 0.3);
 }
 
 function startSparkChain(floor: Floor, context: EventProcContext): void {

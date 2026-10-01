@@ -1,5 +1,5 @@
 // the "Piggy Bank" event: it covers its crit, whose click freezes the screen
-// while the button streams coins into a glimmer orb in the screen's middle that
+// while the button streams coins into a wisp (shared/wisp) in the screen's middle that
 // swells and wiggles until it bursts, showering the screen with coins that
 // merge into the total (see ../moneyCover)
 import type { Floor } from "../../gameState";
@@ -10,7 +10,7 @@ import { shakeScreen } from "../../screenShake";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { createEventFx, drawWhiteBurst } from "../../shared/eventFx";
 import { streamCoins } from "../../shared/eventStream";
-import { drawGlimmerOrb } from "../../shared/glimmerOrb";
+import { drawWisp } from "../../shared/wisp";
 import { BTN_H, BTN_W, forceTestCrit } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import {
@@ -63,7 +63,7 @@ registerEventProc(
                 );
                 const size = ORB_SIZE * (1 - (1 - t) ** 2);
                 fx.draw(ctx, piggy.x, piggy.y, ({ white }) =>
-                  drawGlimmerOrb(ctx, piggy.x, piggy.y, size, white, now),
+                  drawWisp(ctx, () => piggy, now, now, size, white),
                 );
               }
             } else

@@ -1,5 +1,5 @@
 // the "Ascend" event: it covers its crit, whose click freezes the screen while
-// a glimmer orb rises from below the lowest floor in view and zigzags up the
+// a wisp (shared/wisp) rises from below the lowest floor in view and zigzags up the
 // building, touching each floor's income bar on its way: every bar it touches
 // slams and climbs one perma crit tier. Then the orb floats off, the screen
 // unfreezes and the crit's tier pays out
@@ -14,8 +14,7 @@ import {
   pickCritTierByOdds,
 } from "../../shared/critTypes";
 import { triggerEventEndSlam } from "../../shared/eventEndSlam";
-import { drawGlimmer } from "../../shared/twinkle";
-import { drawGlimmerOrb } from "../../shared/glimmerOrb";
+import { drawWisp } from "../../shared/wisp";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -43,8 +42,6 @@ const START_DROP = 220;
 const EXIT_RISE = 260;
 // each hop swings this far (px) out to the side, alternating
 const SWING = 140;
-const TRAIL_GLIMMERS = 8;
-const TRAIL_MS = 35;
 const FLASH_MS = 500;
 
 interface Rung {
@@ -173,19 +170,6 @@ function drawOverlay(
     { x: last.x, y: last.y - EXIT_RISE },
   ];
   const elapsed = now - event.startedAt;
-  // the glitter it leaves behind, then the orb itself
-  for (let i = TRAIL_GLIMMERS; i >= 1; i--) {
-    if (elapsed - i * TRAIL_MS < 0) continue;
-    const point = orbAt(stops, elapsed - i * TRAIL_MS);
-    drawGlimmer(
-      ctx,
-      point.x,
-      point.y,
-      ORB_SIZE * 0.35 * (1 - i / (TRAIL_GLIMMERS + 1)),
-      now / 300 + i,
-      COLOR.heavenlyGold,
-    );
-  }
   const totalMs = (stops.length - 1) * CONFIG.ascendEvent.hopMs;
   // grows in at the start and shrinks away on its way out
   const grow = Math.min(
@@ -193,8 +177,13 @@ function drawOverlay(
     elapsed / 300,
     Math.max(0, (totalMs - elapsed) / 300),
   );
-  const orb = orbAt(stops, elapsed);
-  drawGlimmerOrb(ctx, orb.x, orb.y, ORB_SIZE * grow, 0, now);
+  drawWisp(
+    ctx,
+    (t) => (t < 0 || t > totalMs ? null : orbAt(stops, t)),
+    elapsed,
+    now,
+    ORB_SIZE * grow,
+  );
 }
 
 function startAscend(floor: Floor, context: EventProcContext): void {

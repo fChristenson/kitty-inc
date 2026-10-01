@@ -6,7 +6,7 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { drawPoppingCritText } from "../../shared/critText";
 import { drawWhiteBurst } from "../../shared/eventFx";
-import { drawWisp, swoop } from "../../shared/glimmerOrb";
+import { drawWisp, swoop } from "../../shared/wisp";
 import { radialFade } from "../../shared/goldShimmer";
 import type { StageRect } from "../revealStage";
 
@@ -36,9 +36,7 @@ const GHOST_MS = 25;
 // the bump: the share of it spent dipping onto the head, and the squash it leaves
 const CONTACT = 0.45;
 const SQUASH = 0.18;
-const ORB_SIZE = 34;
-const TRAIL = 14;
-const TRAIL_MS = 18;
+const ORB_SIZE = 40;
 const OFF_SCREEN = 120;
 const HOVER_RISE = 110;
 const PERCH_MS = 500;
@@ -274,8 +272,6 @@ export function drawBadgeReveal(
     ms,
     now,
     ORB_SIZE,
-    TRAIL,
-    TRAIL_MS,
   );
 
   if (swapped) drawWhiteBurst(ctx, cx, by, (ms - tl.swapAt) / BURST_MS, 0.7);

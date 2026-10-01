@@ -1,5 +1,5 @@
 // the "Magnet" event: it covers its crit, whose click freezes the screen while
-// a glimmer orb hangs over the screen's middle and coins and bills pop up all
+// a wisp (shared/wisp) hangs over the screen's middle and coins and bills pop up all
 // over the screen, get yanked in to cling around it, then are all flung into
 // the total (see ../moneyCover). Pays once per floor on screen
 import type { Floor } from "../../gameState";
@@ -8,7 +8,7 @@ import { COLOR } from "../../palette";
 import { playBoostEventStream } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { createEventFx } from "../../shared/eventFx";
-import { drawGlimmerOrb } from "../../shared/glimmerOrb";
+import { drawWisp } from "../../shared/wisp";
 import { forceTestCrit } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import type { CoinPath } from "../coins";
@@ -78,7 +78,7 @@ registerEventProc(
             ctx.save();
             ctx.translate(rect.left, rect.top);
             fx.draw(ctx, orb.x, orb.y, ({ white }) =>
-              drawGlimmerOrb(ctx, orb.x, orb.y, ORB_SIZE, white, now),
+              drawWisp(ctx, () => orb, now, now, ORB_SIZE, white),
             );
             ctx.restore();
           },

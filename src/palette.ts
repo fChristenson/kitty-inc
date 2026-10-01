@@ -230,6 +230,10 @@ export const COLOR = {
   flameYellow: "#FDE047",
   rocketSmoke: "#E5E7EB",
 
+  // the wisp's golden glitter (shared/wisp)
+  wispGlitter: "#FFE9A8",
+  wispSand: "#F2B33D",
+
   // Reveal event's blue "new badge" stage and its speed stripes
   revealSky: "#6FD0FF",
   revealBlue: "#1E5BD8",

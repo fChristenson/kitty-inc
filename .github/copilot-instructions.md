@@ -8,6 +8,7 @@ Kitty Inc: a canvas idle/clicker game (Vite + TypeScript, no framework).
 - Code shared between modules goes in `src/shared/<name>/`; modules only import other modules through `shared/`.
 - Build general, reusable UI/animation code; never duplicate logic across modules.
 - All crit odds and amounts live in `CONFIG.crit` (`src/config.ts`, featured values in `src/critBalance/<category>.ts`); never hardcode them elsewhere.
+- Every orb, wisp or travelling light (a glowing point that flies or hovers, with or without a trail) is the wisp from `src/shared/wisp`: `drawWisp(ctx, at, ms, now, size, heat?)`, where `at(ms)` gives its path (a fixed point for one hovering in place), or `drawWispTrail` + `drawWispHead` when the head needs its own transform. It is the only such effect: never hand-draw an orb, glimmer ball or light trail.
 
 ## New images to crits
 

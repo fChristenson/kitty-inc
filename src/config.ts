@@ -354,7 +354,7 @@ export const CONFIG = {
     maxStars: 7, // at least 3 promotable workers in view are needed
   },
 
-  // src/floors/ascendEvent — the rare "Ascend" event: a glimmer orb zigzags up
+  // src/floors/ascendEvent — the rare "Ascend" event: a wisp zigzags up
   // the building touching each income bar in view, +1 perma tier each
   ascendEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -467,7 +467,7 @@ export const CONFIG = {
     payouts: 3, // the worker's floor's payouts paid into the total
   },
 
-  // src/floors/wispEvent — the rare "Wisp" event: a playful glimmer orb flits
+  // src/floors/wispEvent — the rare "Wisp" event: a playful wisp flits
   // between targets in view sprinkling glitter: a worker climbs one perma
   // tier, an income bar one crit tier, a "Lvl N" label gains free levels
   wispEvent: {

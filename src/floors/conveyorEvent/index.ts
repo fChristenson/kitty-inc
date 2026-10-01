@@ -9,8 +9,7 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
-import { drawGoldShimmer } from "../../shared/goldShimmer";
-import { drawGlimmer } from "../../shared/twinkle";
+import { drawWisp } from "../../shared/wisp";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -48,9 +47,7 @@ const OFF_SCREEN = 120;
 // a hook rests this long over its spot before letting go; the drop takes DROP_MS
 const PAUSE_MS = 150;
 const DROP_MS = 300;
-const HOOK_SIZE = 22;
-const TRAIL = 6;
-const TRAIL_GAP = 16; // px between a moving hook's trailing glimmers
+const HOOK_SIZE = 26;
 const CARRY_WHITE = 0.5;
 const WHITE_FADE_MS = 350;
 
@@ -154,19 +151,16 @@ function drawOverlay(
       ctx.restore();
     }
     if (x === null) continue;
-    const moving = ms < hook.arriveAt || ms >= hook.releaseAt;
-    if (moving)
-      for (let k = TRAIL; k >= 1; k--)
-        drawGlimmer(
-          ctx,
-          x - k * TRAIL_GAP,
-          RAIL_Y,
-          HOOK_SIZE * 0.7 * (1 - k / (TRAIL + 1)),
-          now / 200 + k,
-          COLOR.heavenlyGold,
-        );
-    drawGoldShimmer(ctx, x, RAIL_Y, HOOK_SIZE * 1.4, 1, 3, now);
-    drawGlimmer(ctx, x, RAIL_Y, HOOK_SIZE, now / 150, COLOR.heavenlyGold);
+    drawWisp(
+      ctx,
+      (t) => {
+        const at = hookX(event, hook, t);
+        return at === null ? null : { x: at, y: RAIL_Y };
+      },
+      ms,
+      now,
+      HOOK_SIZE,
+    );
   }
   ctx.restore();
 }
