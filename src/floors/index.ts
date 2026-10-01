@@ -360,6 +360,7 @@ export { forceUppercutEvent } from "./uppercutEvent";
 export { forceHeadHopEvent } from "./headHopEvent";
 export { forceMissileBarrageEvent } from "./missileBarrageEvent";
 export { forceSonicBoomEvent } from "./sonicBoomEvent";
+export { forceMitosisEvent } from "./mitosisEvent";
 export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forceWaterfallEvent } from "./waterfallEvent";

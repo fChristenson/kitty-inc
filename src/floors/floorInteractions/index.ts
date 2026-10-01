@@ -85,7 +85,7 @@ import {
 import { startBoostEvent, type OnScreenFloors } from "../boostEvent";
 import { startUnionEvent } from "../unionEvent";
 import { startHuntEvent } from "../huntEvent";
-// registers the Swarm, Kickback, Payday, Piggy Bank, Coin Toss, Hourglass, Rocket, Reveal, Jackpot Reels, Chain Pay, Twister, Downpour, Trickle, Magnet, Spillover, Constellation, Ascend, Rising Tide, Tidal Wave, Beanstalk, Blessing, Halo, Comet, Meteor Shower, Mentor, Spark Chain, Polish, Lighthouse, Recruit, Promotion Day, Alchemy, Investment, Dividends, Wisp, Burst, Spray, Fountain, Ripple, Wrecking Ball, Orbital Strike, Fuse, Supernova, Bowling, Thunderclap, Chain Reaction, Slash, Jackhammer, Pummel, Overload, Gatling, Press, Drill, Burrow, Ping Pong, Slam Dunk, Uppercut, Head Hop, Missile Barrage, Sonic Boom, Vortex, Ricochet, Waterfall, Conveyor, Fireflies, Stream, Trails, Draw, Night Sky, Pitcher, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
+// registers the Swarm, Kickback, Payday, Piggy Bank, Coin Toss, Hourglass, Rocket, Reveal, Jackpot Reels, Chain Pay, Twister, Downpour, Trickle, Magnet, Spillover, Constellation, Ascend, Rising Tide, Tidal Wave, Beanstalk, Blessing, Halo, Comet, Meteor Shower, Mentor, Spark Chain, Polish, Lighthouse, Recruit, Promotion Day, Alchemy, Investment, Dividends, Wisp, Burst, Spray, Fountain, Ripple, Wrecking Ball, Orbital Strike, Fuse, Supernova, Bowling, Thunderclap, Chain Reaction, Slash, Jackhammer, Pummel, Overload, Gatling, Press, Drill, Burrow, Ping Pong, Slam Dunk, Uppercut, Head Hop, Missile Barrage, Sonic Boom, Mitosis, Vortex, Ricochet, Waterfall, Conveyor, Fireflies, Stream, Trails, Draw, Night Sky, Pitcher, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
 import "../swarmEvent";
 import "../kickbackEvent";
 import "../paydayEvent";
@@ -145,6 +145,7 @@ import "../uppercutEvent";
 import "../headHopEvent";
 import "../missileBarrageEvent";
 import "../sonicBoomEvent";
+import "../mitosisEvent";
 import "../vortexEvent";
 import "../ricochetEvent";
 import "../waterfallEvent";

@@ -405,14 +405,25 @@ export const CONFIG = {
   },
 
   // src/floors/sonicBoomEvent — the rare "Sonic Boom" event: the wisp revs
-  // up near the middle of the screen, then bursts off it trailing a shock
-  // cone and leaving money behind that merges into the total
+  // up near the middle of the screen, then bursts off it leaving a ball and
+  // a trail of money behind that merge into the total
   sonicBoomEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
     glideMs: 360, // gliding in and pulling up
     revMs: 520, // revving up
     burstMs: 130, // tearing off the screen
     holdMs: 450, // the coins hanging after it's gone
+    mergeMs: 500,
+  },
+
+  // src/floors/mitosisEvent — the rare "Mitosis" event: the wisp splits in
+  // two again and again, bouncing round the screen, until the swarm blows at
+  // once, spraying coins into the total
+  mitosisEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    // each generation's flight before it splits (the last: before it blows)
+    genMs: [360, 290, 230, 185, 150, 130],
+    holdMs: 450, // the coins hanging after the swarm blows
     mergeMs: 500,
   },
 

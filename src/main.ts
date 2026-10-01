@@ -79,6 +79,7 @@ import {
   forceHeadHopEvent,
   forceMissileBarrageEvent,
   forceSonicBoomEvent,
+  forceMitosisEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -215,6 +216,7 @@ import {
   wireHeadHopEventTestButton,
   wireMissileBarrageEventTestButton,
   wireSonicBoomEventTestButton,
+  wireMitosisEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -880,6 +882,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceSonicBoomEvent(floor);
+    });
+    // same, for the Mitosis event
+    wireMitosisEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceMitosisEvent(floor);
     });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {
