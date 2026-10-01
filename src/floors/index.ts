@@ -345,6 +345,7 @@ export { forcePiggyBankEvent } from "./piggyBankEvent";
 export { forceJackpotReelsEvent } from "./jackpotReelsEvent";
 export { forceChainPayEvent } from "./chainPayEvent";
 export { forceDownpourEvent } from "./downpourEvent";
+export { forceMagnetEvent } from "./magnetEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";

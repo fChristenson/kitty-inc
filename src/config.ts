@@ -235,6 +235,16 @@ export const CONFIG = {
     rewardMultiplier: 2, // on top of the floor's income times its floor number
   },
 
+  // src/floors/magnetEvent — the rare "Magnet" event: a big magnet yanks coins
+  // in from all over the screen, then flings them into the total, paying the
+  // floor's income times its floor number once per floor on screen
+  magnetEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streamMs: 700, // how long coins keep popping up
+    travelMs: 600, // each coin's pull into the magnet
+    mergeMs: 500, // the fling into the total
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

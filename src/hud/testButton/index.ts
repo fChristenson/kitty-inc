@@ -130,6 +130,15 @@ export function wirePiggyBankEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireMagnetEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-magnet-event")!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireDownpourEventTestButton(
   container: HTMLElement,
   onClick: () => void,
