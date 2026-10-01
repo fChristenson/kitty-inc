@@ -188,7 +188,11 @@ function drawOverlay(
   }
   const totalMs = (stops.length - 1) * CONFIG.ascendEvent.hopMs;
   // grows in at the start and shrinks away on its way out
-  const grow = Math.min(1, elapsed / 300, Math.max(0, (totalMs - elapsed) / 300));
+  const grow = Math.min(
+    1,
+    elapsed / 300,
+    Math.max(0, (totalMs - elapsed) / 300),
+  );
   const orb = orbAt(stops, elapsed);
   drawGlimmerOrb(ctx, orb.x, orb.y, ORB_SIZE * grow, 0, now);
 }
