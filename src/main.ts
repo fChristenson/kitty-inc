@@ -77,6 +77,8 @@ import {
   forceSpilloverEvent,
   forceConstellationEvent,
   forceAscendEvent,
+  forceRisingTideEvent,
+  forceTidalWaveEvent,
   forceBlessingEvent,
   forceHaloEvent,
   forceCometEvent,
@@ -188,6 +190,8 @@ import {
   wireSpilloverEventTestButton,
   wireConstellationEventTestButton,
   wireAscendEventTestButton,
+  wireRisingTideEventTestButton,
+  wireTidalWaveEventTestButton,
   wireBlessingEventTestButton,
   wireHaloEventTestButton,
   wireCometEventTestButton,
@@ -816,6 +820,20 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceAscendEvent(floor);
+    });
+    // same, for the Rising Tide event
+    wireRisingTideEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceRisingTideEvent(floor);
+    });
+    // same, for the Tidal Wave event
+    wireTidalWaveEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceTidalWaveEvent(floor);
     });
     // same, for the Blessing event
     wireBlessingEventTestButton(app, () => {

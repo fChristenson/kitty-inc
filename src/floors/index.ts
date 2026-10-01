@@ -358,6 +358,8 @@ export { forceMagnetEvent } from "./magnetEvent";
 export { forceSpilloverEvent } from "./spilloverEvent";
 export { forceConstellationEvent } from "./constellationEvent";
 export { forceAscendEvent } from "./ascendEvent";
+export { forceRisingTideEvent } from "./risingTideEvent";
+export { forceTidalWaveEvent } from "./tidalWaveEvent";
 export { forceBlessingEvent } from "./blessingEvent";
 export { forceHaloEvent } from "./haloEvent";
 export { forceCometEvent } from "./cometEvent";

@@ -342,6 +342,26 @@ export function wireAscendEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireRisingTideEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-rising-tide-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
+export function wireTidalWaveEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-tidal-wave-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireConstellationEventTestButton(
   container: HTMLElement,
   onClick: () => void,

@@ -389,6 +389,25 @@ export const CONFIG = {
     maxFloors: 6, // the most bars it touches
   },
 
+  // src/floors/risingTideEvent — the rare "Rising Tide" event: blue water
+  // floods up the building, lifting every floor in view to the highest floor
+  // tier among them
+  risingTideEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    riseMs: 2_200, // the tide rising from below the screen to above it
+    fadeMs: 400, // it fading away once risen
+    holdMs: 600, // after it fades, before the screen unfreezes
+  },
+
+  // src/floors/tidalWaveEvent — the rare "Tidal Wave" event: a wall of water
+  // sweeps across the screen, lifting floors like the Rising Tide
+  tidalWaveEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    sweepMs: 1_800, // the wave crossing from one side of the screen past the other
+    fadeMs: 400, // the water fading away once it's covered the screen
+    holdMs: 600, // after it fades, before the screen unfreezes
+  },
+
   // src/floors/blessingEvent — the rare "Blessing" event: golden glimmers snow
   // down over the clicked floor, one settling on each worker, +1 perma tier each
   blessingEvent: {

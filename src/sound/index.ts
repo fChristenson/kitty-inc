@@ -9,6 +9,7 @@ const winUrl = soundUrl("win.mp3");
 const payoutUrl = soundUrl("payout.mp3");
 const arcadeSlotWinUrl = soundUrl("arcadeSlotWin.mp3");
 const notificationUrl = soundUrl("notification.mp3");
+const liquidBubbleUrl = soundUrl("liquidBubble.wav");
 
 const MUSIC_VOLUME = 0.3; // 25% quieter than the original 0.4 per explicit request
 const SFX_VOLUME = 0.9;
@@ -133,6 +134,7 @@ const sfxUrls = {
   payout: payoutUrl,
   arcadeSlotWin: arcadeSlotWinUrl,
   notification: notificationUrl,
+  liquidBubble: liquidBubbleUrl,
 } as const;
 type SfxName = keyof typeof sfxUrls;
 
@@ -475,4 +477,10 @@ export function playBoostEventStream(): void {
 // once the event is over
 export function startBoostEventStreamLoop(): (fadeOutSeconds?: number) => void {
   return startSfxSustained("arcadeSlotWin", ARCADE_SLOT_WIN_VOLUME);
+}
+
+// bubbling water for an event's flood: the bubble's audible start on a loop
+// (the file trails off into silence); call the returned stop once it's over
+export function startWaterLoop(): (fadeOutSeconds?: number) => void {
+  return startSfxSustained("liquidBubble", SFX_VOLUME);
 }

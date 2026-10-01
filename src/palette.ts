@@ -237,6 +237,9 @@ export const COLOR = {
   // Reveal event's blue "new badge" stage and its speed stripes
   revealSky: "#6FD0FF",
   revealBlue: "#1E5BD8",
+  // the Rising Tide's water, clear near its surface, deep further down
+  tideShallow: "#4FC3F7",
+  tideDeep: "#1565C0",
   revealDeep: "#0A1A5C",
   revealStripe: "#9ADCFF",
 
