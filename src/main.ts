@@ -62,6 +62,7 @@ import {
   forceOrbitalStrikeEvent,
   forceFuseEvent,
   forceSupernovaEvent,
+  forceBowlingEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -182,6 +183,7 @@ import {
   wireOrbitalStrikeEventTestButton,
   wireFuseEventTestButton,
   wireSupernovaEventTestButton,
+  wireBowlingEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -729,6 +731,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceSupernovaEvent(floor);
+    });
+    // same, for the Bowling event
+    wireBowlingEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceBowlingEvent(floor);
     });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {

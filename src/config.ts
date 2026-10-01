@@ -220,6 +220,16 @@ export const CONFIG = {
     holdMs: 450, // after it's gone, before the screen unfreezes
   },
 
+  // src/floors/bowlingEvent — the rare "Bowling" event: the wisp rolls along
+  // the clicked floor like a bowling ball, knocking every worker flying; each
+  // lands and climbs one perma tier
+  bowlingEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    rollMs: 650, // the ball crossing the screen
+    flyMs: 600, // each knocked worker's flip, up and back down
+    holdMs: 500, // after the ball's gone and the last lands
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

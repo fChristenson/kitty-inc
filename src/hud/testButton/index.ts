@@ -474,6 +474,15 @@ export function wireSupernovaEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireBowlingEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-bowling-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,
