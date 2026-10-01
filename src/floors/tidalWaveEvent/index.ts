@@ -13,6 +13,7 @@ import {
   tidalWave,
   waveFrontAt,
   waveReach,
+  waveTail,
   type TidalWave,
 } from "../../shared/water";
 import {
@@ -80,18 +81,17 @@ export function forceTidalWaveEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-// the crest's x ms in, easing in and out of the sweep
+// the crest's x ms in, rolling across at a steady speed
 function crestX(run: RunningWave, ms: number): number {
   const u = Math.min(1, Math.max(0, ms / CONFIG.tidalWaveEvent.sweepMs));
-  const e = (1 - Math.cos(Math.PI * u)) / 2;
-  return run.from + (run.to - run.from) * e;
+  return run.from + (run.to - run.from) * u;
 }
 
 // when the wave's front reaches local point (x, y)
 function reachAt(run: RunningWave, x: number, y: number): number {
   const crest = x - run.dir * waveFrontAt(run.wave, run.baseY - y);
-  const e = Math.min(1, Math.max(0, (crest - run.from) / (run.to - run.from)));
-  return (CONFIG.tidalWaveEvent.sweepMs * Math.acos(1 - 2 * e)) / Math.PI;
+  const u = Math.min(1, Math.max(0, (crest - run.from) / (run.to - run.from)));
+  return CONFIG.tidalWaveEvent.sweepMs * u;
 }
 
 function drawOverlay(
@@ -105,18 +105,9 @@ function drawOverlay(
   drawFloodBars(ctx, getFloorRect, run.lift, now);
   const rect = getFloorRect(run.floor);
   if (!rect) return;
-  const { sweepMs, fadeMs } = CONFIG.tidalWaveEvent;
   ctx.save();
   ctx.translate(rect.left, rect.top);
-  drawTidalWave(
-    ctx,
-    run.wave,
-    crestX(run, ms),
-    run.baseY,
-    run.dir,
-    Math.max(0, 1 - Math.max(0, ms - sweepMs) / fadeMs),
-    now,
-  );
+  drawTidalWave(ctx, run.wave, crestX(run, ms), run.baseY, run.dir, 1, now);
   ctx.restore();
 }
 
@@ -125,14 +116,14 @@ function startWave(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   const lift = planFloodLift(floor, context);
   if (!area || !lift) return;
-  const { sweepMs, fadeMs, holdMs } = CONFIG.tidalWaveEvent;
+  const { sweepMs } = CONFIG.tidalWaveEvent;
   const tier = context.critTier ?? pickCritTierByOdds();
   const dir: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
   const wave = tidalWave((area.bottom - area.top) * CREST_SHARE + SINK);
-  // in from just past the near side, front first, until its crest has rolled
-  // past the far side
+  // in from just past the near side, front first, until its whole back has
+  // rolled out past the far side
   const ahead = waveReach(wave) + MARGIN;
-  const behind = MARGIN + wave.back * 0.5;
+  const behind = waveTail(wave) + MARGIN;
   const run: RunningWave = {
     floor,
     lift,
@@ -159,17 +150,14 @@ function startWave(floor: Floor, context: EventProcContext): void {
         reachAt(run, lifted.bar.x, lifted.bar.y),
       );
 
-  setTimeout(stopSound, sweepMs);
-  setTimeout(
-    () => {
-      if (!isLive()) return;
-      running = null;
-      hideFloodBars(null);
-      unfreezeScreen();
-      // the covered crit's own tier, which also saves the promotions
-      context.applyTierCrit?.(floor, tier);
-      endEventProc(KEY);
-    },
-    sweepMs + fadeMs + holdMs,
-  );
+  setTimeout(() => {
+    if (!isLive()) return;
+    stopSound();
+    running = null;
+    hideFloodBars(null);
+    unfreezeScreen();
+    // the covered crit's own tier, which also saves the promotions
+    context.applyTierCrit?.(floor, tier);
+    endEventProc(KEY);
+  }, sweepMs);
 }

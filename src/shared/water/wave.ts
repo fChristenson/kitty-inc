@@ -14,19 +14,10 @@ export interface TidalWave {
   // how wide its front and back slopes spread
   front: number;
   back: number;
-  // the water it leaves behind: its height, and how far behind the crest it runs
-  trail: number;
-  trailLength: number;
 }
 
 export function tidalWave(height: number): TidalWave {
-  return {
-    height,
-    front: height * 0.35,
-    back: height * 0.8,
-    trail: height * 0.12,
-    trailLength: height * 2,
-  };
+  return { height, front: height * 0.35, back: height * 0.55 };
 }
 
 // a slope falling away from the crest: 1 at it, easing out to 0
@@ -34,12 +25,10 @@ const sech2 = (x: number) => 1 / Math.cosh(x) ** 2;
 
 // the surface's height x ahead of the crest (behind it if negative)
 function surfaceAt(wave: TidalWave, x: number): number {
-  return x >= 0
-    ? wave.height * sech2(x / wave.front)
-    : wave.trail + (wave.height - wave.trail) * sech2(x / wave.back);
+  return wave.height * sech2(x / (x >= 0 ? wave.front : wave.back));
 }
 
-// where its front counts as starting: this share of its height
+// where its slopes count as reaching the ground: this share of its height
 const TOE = 0.02;
 
 // how far ahead of the crest the front is at height h
@@ -48,9 +37,12 @@ export function waveFrontAt(wave: TidalWave, h: number): number {
   return wave.front * Math.acosh(1 / Math.sqrt(share));
 }
 
-// how far ahead of the crest its front reaches
+// how far ahead of the crest its front reaches, and behind it its back
 export function waveReach(wave: TidalWave): number {
   return waveFrontAt(wave, 0);
+}
+export function waveTail(wave: TidalWave): number {
+  return wave.back * Math.acosh(1 / Math.sqrt(TOE));
 }
 
 const STEPS = 260;
@@ -76,8 +68,9 @@ export function drawTidalWave(
   });
   // the surface front to back, rippling a little more the higher it stands
   const reach = waveReach(wave);
+  const tail = waveTail(wave);
   const surface = Array.from({ length: STEPS + 1 }, (_, i) => {
-    const x = reach - ((reach + wave.trailLength) * i) / STEPS;
+    const x = reach - ((reach + tail) * i) / STEPS;
     const h = surfaceAt(wave, x);
     const ripple =
       Math.sin(x * 0.01 - t * 4) * 10 * (h / wave.height) +
@@ -85,11 +78,7 @@ export function drawTidalWave(
     return toWorld(x, Math.max(0, h + ripple));
   });
   const below = 200;
-  const outline = [
-    toWorld(reach, -below),
-    ...surface,
-    toWorld(-wave.trailLength, -below),
-  ];
+  const outline = [toWorld(reach, -below), ...surface, toWorld(-tail, -below)];
   const trace = (points: Point[]) => {
     ctx.beginPath();
     points.forEach((p, i) =>
@@ -97,7 +86,7 @@ export function drawTidalWave(
     );
   };
   // the front and crest, where the foam rides
-  const crestIndex = Math.round((reach / (reach + wave.trailLength)) * STEPS);
+  const crestIndex = Math.round((reach / (reach + tail)) * STEPS);
   const foamed = surface.slice(
     Math.round(crestIndex * 0.35),
     crestIndex + Math.round(STEPS * 0.06),

@@ -27,7 +27,7 @@ import { drawWispHead, drawWispTrail, WISP_SIZE } from "../../shared/wisp";
 import { smoothstep } from "../../shared/easing";
 import {
   freezeScreen,
-  getScreenFreezeDim,
+  drawFreezeDimmed,
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
@@ -184,13 +184,13 @@ function drawLight(
 
 // a leg's promotable workers: dimmed like the frozen frame until lit
 function drawCandidates(ctx: CanvasRenderingContext2D, leg: Leg): void {
-  const dim = `brightness(${1 - getScreenFreezeDim()})`;
-  for (const index of leg.candidates) {
-    ctx.save();
-    if (!leg.lit.has(index)) ctx.filter = dim;
-    drawWorkerSpotlight(ctx, leg.floor, index, 0, 0);
-    ctx.restore();
-  }
+  drawFreezeDimmed(ctx, (layer) => {
+    for (const index of leg.candidates)
+      if (!leg.lit.has(index))
+        drawWorkerSpotlight(layer, leg.floor, index, 0, 0);
+  });
+  for (const index of leg.candidates)
+    if (leg.lit.has(index)) drawWorkerSpotlight(ctx, leg.floor, index, 0, 0);
 }
 
 // where a ball is p (0..1) along its spiral into the light's start

@@ -16,7 +16,7 @@ import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawWisp, swoop, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
-  getScreenFreezeDim,
+  drawFreezeDimmed,
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
@@ -215,27 +215,29 @@ function drawOverlay(
   const now = performance.now();
   const ms = now - event.startedAt;
   const { flyMs, sweepMs } = CONFIG.lighthouseEvent;
-  const dim = `brightness(${1 - getScreenFreezeDim()})`;
 
   // everything sits dim in the dark until the beam finds it
-  for (const part of event.parts) {
+  const drawAt = (c: CanvasRenderingContext2D, part: Part) => {
     const own = getFloorRect(part.floor);
-    if (!own) continue;
-    ctx.save();
-    ctx.translate(own.left, own.top);
-    if (part.shinedAt === null) ctx.filter = dim;
-    drawPart(ctx, part);
-    ctx.filter = "none";
+    if (!own) return;
+    c.save();
+    c.translate(own.left, own.top);
+    drawPart(c, part);
     if (part.shinedAt !== null)
       drawWhiteBurst(
-        ctx,
+        c,
         part.local.x,
         part.local.y,
         (now - part.shinedAt) / BURST_MS,
         0.3,
       );
-    ctx.restore();
-  }
+    c.restore();
+  };
+  drawFreezeDimmed(ctx, (layer) => {
+    for (const part of event.parts)
+      if (part.shinedAt === null) drawAt(layer, part);
+  });
+  for (const part of event.parts) if (part.shinedAt !== null) drawAt(ctx, part);
 
   ctx.save();
   ctx.translate(rect.left, rect.top);
@@ -304,19 +306,17 @@ function startLighthouse(floor: Floor, context: EventProcContext): void {
       shinedAt: null,
     };
   });
-  const rewards: Reward[] = [...new Set(parts.map((p) => p.floor))].map(
-    (f) => {
-      const own = parts.filter((p) => p.floor === f);
-      return {
-        floor: f,
-        levels: Math.max(minLevels, Math.round(f.upgradeCount * levelShare)),
-        part:
-          own.find((p) => p.kind === "star") ??
-          own.reduce((last, p) => (p.litAt > last.litAt ? p : last)),
-        landedAt: null,
-      };
-    },
-  );
+  const rewards: Reward[] = [...new Set(parts.map((p) => p.floor))].map((f) => {
+    const own = parts.filter((p) => p.floor === f);
+    return {
+      floor: f,
+      levels: Math.max(minLevels, Math.round(f.upgradeCount * levelShare)),
+      part:
+        own.find((p) => p.kind === "star") ??
+        own.reduce((last, p) => (p.litAt > last.litAt ? p : last)),
+      landedAt: null,
+    };
+  });
   const event: RunningLighthouse = {
     floor,
     button,

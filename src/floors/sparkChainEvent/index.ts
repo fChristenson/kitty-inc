@@ -14,7 +14,7 @@ import { drawGlimmer, hash01 } from "../../shared/twinkle";
 import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
-  getScreenFreezeDim,
+  drawFreezeDimmed,
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
@@ -239,7 +239,6 @@ function drawOverlay(
   if (!spark) return;
   const now = performance.now();
   const ms = now - spark.startedAt;
-  const dim = `brightness(${1 - getScreenFreezeDim()})`;
   const points: (Point | null)[] = spark.stops.map((stop) => {
     const rect = getFloorRect(stop.floor);
     return rect && { x: rect.left + stop.x, y: rect.top + stop.y };
@@ -252,14 +251,24 @@ function drawOverlay(
     drawUpgradeButtonSpotlight(ctx, spark.floor, spark.isGroundFloor, 0);
     ctx.restore();
   }
-  spark.stops.forEach((stop, i) => {
+  const drawStopWorker = (
+    c: CanvasRenderingContext2D,
+    stop: (typeof spark.stops)[number],
+  ) => {
     const rect = getFloorRect(stop.floor);
     if (!stop.worker || !rect) return;
-    ctx.save();
-    ctx.translate(rect.left, rect.top);
-    if (!spark.struck.has(i)) ctx.filter = dim;
-    drawWorkerSpotlight(ctx, stop.floor, stop.worker.workerIndex, 0, 0);
-    ctx.restore();
+    c.save();
+    c.translate(rect.left, rect.top);
+    drawWorkerSpotlight(c, stop.floor, stop.worker.workerIndex, 0, 0);
+    c.restore();
+  };
+  drawFreezeDimmed(ctx, (layer) =>
+    spark.stops.forEach((stop, i) => {
+      if (!spark.struck.has(i)) drawStopWorker(layer, stop);
+    }),
+  );
+  spark.stops.forEach((stop, i) => {
+    if (spark.struck.has(i)) drawStopWorker(ctx, stop);
   });
 
   // the bolts: lit while the light flies, fading once it lands

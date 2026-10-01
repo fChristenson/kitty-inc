@@ -403,9 +403,7 @@ export const CONFIG = {
   // sweeps across the screen, lifting floors like the Rising Tide
   tidalWaveEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
-    sweepMs: 1_800, // the wave crossing from one side of the screen past the other
-    fadeMs: 400, // the water fading away once it's covered the screen
-    holdMs: 600, // after it fades, before the screen unfreezes
+    sweepMs: 1200, // the wave rolling in from one side until it's fully out the other
   },
 
   // src/floors/beanstalkEvent — the rare "Beanstalk" event: a vine of light

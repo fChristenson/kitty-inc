@@ -26,7 +26,7 @@ import {
 import { isFloorLocked } from "../../shared/detachedJob";
 import {
   freezeScreen,
-  getScreenFreezeDim,
+  drawFreezeDimmed,
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
@@ -277,31 +277,34 @@ function drawOverlay(
   if (!wisp) return;
   const now = performance.now();
   const ms = now - wisp.startedAt;
-  const dim = `brightness(${1 - getScreenFreezeDim()})`;
 
-  for (const stop of wisp.stops) {
-    const rect = getFloorRect(stop.floor);
-    if (!rect) continue;
-    ctx.save();
-    ctx.translate(rect.left, rect.top);
-    if (stop.reachedAt === null) ctx.filter = dim;
+  const drawStop = (c: CanvasRenderingContext2D, stop: Stop) => {
     if (stop.kind === "worker")
-      drawWorkerSpotlight(ctx, stop.floor, stop.workerIndex, 0, 0);
+      drawWorkerSpotlight(c, stop.floor, stop.workerIndex, 0, 0);
     else if (stop.kind === "bar")
-      drawIncomePanel(ctx, stop.floor, stop.isGroundFloor, {
+      drawIncomePanel(c, stop.floor, stop.isGroundFloor, {
         whiteAlpha: 0,
         rotation: 0,
       });
-    else drawUpgradeStarSpotlight(ctx, stop.floor);
-    ctx.filter = "none";
-    if (stop.reachedAt !== null)
-      drawWhiteBurst(
-        ctx,
-        stop.x,
-        stop.y,
-        (now - stop.reachedAt) / BURST_MS,
-        0.3,
-      );
+    else drawUpgradeStarSpotlight(c, stop.floor);
+  };
+  drawFreezeDimmed(ctx, (layer) => {
+    for (const stop of wisp.stops) {
+      const rect = getFloorRect(stop.floor);
+      if (!rect || stop.reachedAt !== null) continue;
+      layer.save();
+      layer.translate(rect.left, rect.top);
+      drawStop(layer, stop);
+      layer.restore();
+    }
+  });
+  for (const stop of wisp.stops) {
+    const rect = getFloorRect(stop.floor);
+    if (!rect || stop.reachedAt === null) continue;
+    ctx.save();
+    ctx.translate(rect.left, rect.top);
+    drawStop(ctx, stop);
+    drawWhiteBurst(ctx, stop.x, stop.y, (now - stop.reachedAt) / BURST_MS, 0.3);
     ctx.restore();
   }
 

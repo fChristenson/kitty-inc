@@ -14,7 +14,7 @@ import { drawExplosion, drawWhiteBurst } from "../../shared/eventFx";
 import { drawWispHead, drawWispTrail, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
-  getScreenFreezeDim,
+  drawFreezeDimmed,
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
@@ -156,25 +156,34 @@ function drawOverlay(
   if (!shower) return;
   const now = performance.now();
   const ms = now - shower.startedAt;
-  const dim = `brightness(${1 - getScreenFreezeDim()})`;
+  const drawStruck = (c: CanvasRenderingContext2D, meteor: Meteor) => {
+    const { floor, workerIndex } = meteor.worker;
+    const rect = getFloorRect(floor);
+    if (!rect) return;
+    c.save();
+    c.translate(rect.left, rect.top);
+    drawWorkerSpotlight(c, floor, workerIndex, 0, 0);
+    c.restore();
+  };
+  drawFreezeDimmed(ctx, (layer) => {
+    for (const meteor of shower.meteors)
+      if (meteor.hitAt === null) drawStruck(layer, meteor);
+  });
   for (const meteor of shower.meteors) {
-    const { floor, workerIndex, center } = meteor.worker;
+    if (meteor.hitAt === null) continue;
+    drawStruck(ctx, meteor);
+    const { floor, center } = meteor.worker;
     const rect = getFloorRect(floor);
     if (!rect) continue;
     ctx.save();
     ctx.translate(rect.left, rect.top);
-    ctx.save();
-    if (meteor.hitAt === null) ctx.filter = dim;
-    drawWorkerSpotlight(ctx, floor, workerIndex, 0, 0);
-    ctx.restore();
-    if (meteor.hitAt !== null)
-      drawWhiteBurst(
-        ctx,
-        center.x,
-        center.y,
-        (now - meteor.hitAt) / BURST_MS,
-        0.3,
-      );
+    drawWhiteBurst(
+      ctx,
+      center.x,
+      center.y,
+      (now - meteor.hitAt) / BURST_MS,
+      0.3,
+    );
     ctx.restore();
   }
   for (const meteor of shower.meteors) {

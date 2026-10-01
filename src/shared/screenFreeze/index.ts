@@ -86,6 +86,46 @@ export function getScreenFreezeDim(): number {
   return DIM_ALPHA * Math.min(1, (performance.now() - frozenAt) / DIM_FADE_MS);
 }
 
+let dimLayer: HTMLCanvasElement | null = null;
+
+// whatever draw() lays down (in ctx's current transform), washed as dark as
+// the frozen frame, all in one pass: a brightness filter per item stalls the
+// frame badly while many items are still dim
+export function drawFreezeDimmed(
+  ctx: CanvasRenderingContext2D,
+  draw: (layer: CanvasRenderingContext2D) => void,
+): void {
+  const dim = getScreenFreezeDim();
+  if (dim <= 0) {
+    draw(ctx);
+    return;
+  }
+  const { width, height } = ctx.canvas;
+  dimLayer ??= document.createElement("canvas");
+  if (dimLayer.width !== width || dimLayer.height !== height) {
+    dimLayer.width = width;
+    dimLayer.height = height;
+  }
+  const layer = dimLayer.getContext("2d")!;
+  layer.setTransform(1, 0, 0, 1, 0, 0);
+  layer.clearRect(0, 0, width, height);
+  layer.setTransform(ctx.getTransform());
+  layer.save();
+  draw(layer);
+  layer.restore();
+  layer.setTransform(1, 0, 0, 1, 0, 0);
+  layer.globalCompositeOperation = "source-atop";
+  layer.globalAlpha = dim;
+  layer.fillStyle = "#000";
+  layer.fillRect(0, 0, width, height);
+  layer.globalCompositeOperation = "source-over";
+  layer.globalAlpha = 1;
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(dimLayer, 0, 0);
+  ctx.restore();
+}
+
 export function drawScreenFreezeOverlay(
   ctx: CanvasRenderingContext2D,
   getFloorRect: FloorRectResolver,

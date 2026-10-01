@@ -13,7 +13,7 @@ import { drawGoldShimmer } from "../../shared/goldShimmer";
 import { drawGlimmer } from "../../shared/twinkle";
 import {
   freezeScreen,
-  getScreenFreezeDim,
+  drawFreezeDimmed,
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
@@ -127,15 +127,16 @@ function drawOverlay(
   const rect = getFloorRect(event.floor);
   if (!rect) return;
   const now = performance.now();
-  const dim = `brightness(${1 - getScreenFreezeDim()})`;
   ctx.save();
   ctx.translate(rect.left, rect.top);
-  for (const index of event.candidates) {
-    ctx.save();
-    if (!event.blessed.has(index)) ctx.filter = dim;
-    drawWorkerSpotlight(ctx, event.floor, index, 0, 0);
-    ctx.restore();
-  }
+  drawFreezeDimmed(ctx, (layer) => {
+    for (const index of event.candidates)
+      if (!event.blessed.has(index))
+        drawWorkerSpotlight(layer, event.floor, index, 0, 0);
+  });
+  for (const index of event.candidates)
+    if (event.blessed.has(index))
+      drawWorkerSpotlight(ctx, event.floor, index, 0, 0);
   for (const [index, at] of event.blessed) {
     const center = getWorkerCenter(event.floor, index);
     if (center)

@@ -13,7 +13,7 @@ import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import {
   freezeScreen,
-  getScreenFreezeDim,
+  drawFreezeDimmed,
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
@@ -137,16 +137,23 @@ function drawOverlay(
   const { appearMs, linkMs } = CONFIG.constellationEvent;
   const now = performance.now();
   const elapsed = now - event.startedAt;
-  const dim = `brightness(${1 - getScreenFreezeDim()})`;
-  for (const star of event.stars) {
+  const drawStar = (
+    c: CanvasRenderingContext2D,
+    star: (typeof event.stars)[number],
+  ) => {
     const rect = getFloorRect(star.worker.floor);
-    if (!rect) continue;
-    ctx.save();
-    ctx.translate(rect.left, rect.top);
-    if (star.flaredAt === null) ctx.filter = dim;
-    drawWorkerSpotlight(ctx, star.worker.floor, star.worker.workerIndex, 0, 0);
-    ctx.restore();
-  }
+    if (!rect) return;
+    c.save();
+    c.translate(rect.left, rect.top);
+    drawWorkerSpotlight(c, star.worker.floor, star.worker.workerIndex, 0, 0);
+    c.restore();
+  };
+  drawFreezeDimmed(ctx, (layer) => {
+    for (const star of event.stars)
+      if (star.flaredAt === null) drawStar(layer, star);
+  });
+  for (const star of event.stars)
+    if (star.flaredAt !== null) drawStar(ctx, star);
   const points = event.stars.map((star) => starPoint(star, getFloorRect));
 
   // the glimmer trails laid so far, then the light laying the next one

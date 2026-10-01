@@ -13,7 +13,7 @@ import { drawExplosion, drawWhiteBurst } from "../../shared/eventFx";
 import { drawWispHead, drawWispTrail, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
-  getScreenFreezeDim,
+  drawFreezeDimmed,
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
@@ -207,24 +207,30 @@ function drawOverlay(
   const comet = running;
   if (!comet) return;
   const now = performance.now();
-  const dim = `brightness(${1 - getScreenFreezeDim()})`;
-  for (const { floor, workerIndex, center } of comet.caught) {
+  const drawCaught = (c: CanvasRenderingContext2D) => {
+    for (const { floor, workerIndex } of comet.caught) {
+      const rect = getFloorRect(floor);
+      if (!rect) continue;
+      c.save();
+      c.translate(rect.left, rect.top);
+      drawWorkerSpotlight(c, floor, workerIndex, 0, 0);
+      c.restore();
+    }
+  };
+  if (comet.hitAt === null) drawFreezeDimmed(ctx, drawCaught);
+  else drawCaught(ctx);
+  for (const { floor, center } of comet.caught) {
     const rect = getFloorRect(floor);
-    if (!rect) continue;
+    if (!rect || comet.hitAt === null) continue;
     ctx.save();
     ctx.translate(rect.left, rect.top);
-    ctx.save();
-    if (comet.hitAt === null) ctx.filter = dim;
-    drawWorkerSpotlight(ctx, floor, workerIndex, 0, 0);
-    ctx.restore();
-    if (comet.hitAt !== null)
-      drawWhiteBurst(
-        ctx,
-        center.x,
-        center.y,
-        (now - comet.hitAt) / BURST_MS,
-        0.35,
-      );
+    drawWhiteBurst(
+      ctx,
+      center.x,
+      center.y,
+      (now - comet.hitAt) / BURST_MS,
+      0.35,
+    );
     ctx.restore();
   }
   drawComet(ctx, comet, now - comet.startedAt, now);
