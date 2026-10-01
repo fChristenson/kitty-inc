@@ -527,9 +527,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (motion.blur > 0) ctx.filter = `blur(${motion.blur * dpr}px)`;
     ctx.drawImage(
       frozenFrame.image,
-      shake.x * dpr +
-        motion.pan * canvas.width -
-        (frameW - canvas.width) / 2,
+      shake.x * dpr + motion.pan * canvas.width - (frameW - canvas.width) / 2,
       shake.y * dpr - (frameH - canvas.height) / 2,
       frameW,
       frameH,

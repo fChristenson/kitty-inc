@@ -79,8 +79,7 @@ let running: RunningStage | null = null;
 const ease = (t: number) => t * t * (3 - 2 * t);
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 // ease-in-out quint: slow off the mark, a whip through the middle
-const whip = (t: number) =>
-  t < 0.5 ? 16 * t ** 5 : 1 - (-2 * t + 2) ** 5 / 2;
+const whip = (t: number) => (t < 0.5 ? 16 * t ** 5 : 1 - (-2 * t + 2) ** 5 / 2);
 
 export function isRevealStageRunning(key?: string): boolean {
   return running !== null && (key === undefined || running.key === key);
@@ -142,10 +141,7 @@ export function revealStageFrameMotion(
   ms: number,
   durationMs: number,
 ): FrameMotion {
-  const { share, leaving, warp, windUp, rumble } = stageMotion(
-    ms,
-    durationMs,
-  );
+  const { share, leaving, warp, windUp, rumble } = stageMotion(ms, durationMs);
   return {
     pan: (leaving ? share + 1 : share - 1) + rumble,
     // just wide enough that the rumble never bares a screen edge
