@@ -23,6 +23,14 @@ export interface OnScreenFloor {
 }
 export type OnScreenFloors = () => OnScreenFloor[];
 
+// the whole visible canvas in a floor's own local coordinates
+export type ScreenAreaLocal = (floor: Floor) => {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+};
+
 // how far inside the visible band an event target's center must sit
 const TARGET_VISIBLE_MARGIN = 40;
 
@@ -39,6 +47,7 @@ export interface EventProcContext {
   floors: Floor[];
   getOnScreenFloors?: OnScreenFloors;
   getFloorRect?: FloorRectResolver;
+  getScreenAreaLocal?: ScreenAreaLocal;
   isGroundFloor: boolean;
   // lands one regular crit tier on a floor of this building, paid out at once
   applyTierCrit?: (floor: Floor, tier: CritTier) => void;

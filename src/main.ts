@@ -54,6 +54,7 @@ import {
   forceBoostEvent,
   forceUnionEvent,
   forceKickbackEvent,
+  forceBurstEvent,
   forceGlimmerEvent,
   forceHuntEvent,
   startSwarmEvent,
@@ -123,6 +124,7 @@ import {
   wireBoostEventTestButton,
   wireUnionEventTestButton,
   wireKickbackEventTestButton,
+  wireBurstEventTestButton,
   wireGlimmerEventTestButton,
   wireHuntEventTestButton,
   wireSwarmEventTestButton,
@@ -571,6 +573,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceKickbackEvent(floor);
+    });
+    // same, for the Burst event
+    wireBurstEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceBurstEvent(floor);
     });
     // same, for the Glimmer event
     wireGlimmerEventTestButton(app, () => {

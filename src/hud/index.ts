@@ -69,6 +69,7 @@ export {
   wireBoostEventTestButton,
   wireUnionEventTestButton,
   wireKickbackEventTestButton,
+  wireBurstEventTestButton,
   wireGlimmerEventTestButton,
   wireHuntEventTestButton,
   wireSwarmEventTestButton,

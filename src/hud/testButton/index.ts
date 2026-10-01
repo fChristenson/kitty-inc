@@ -64,6 +64,15 @@ export function wireKickbackEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireBurstEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-burst-event")!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireGlimmerEventTestButton(
   container: HTMLElement,
   onClick: () => void,

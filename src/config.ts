@@ -130,6 +130,16 @@ export const CONFIG = {
     chance: 0.065, // per crit whose special-crit gateway hit, mouse on screen
   },
 
+  // src/floors/burstEvent — the rare "Burst" event: its crit's click freezes
+  // the screen while its button blows out one explosion of coins and bills over
+  // the whole screen; they hang there, then merge into the total, paying the
+  // floor's income times its floor number
+  burstEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    durationMs: 1_000, // ~0.3s blast out, 0.5s hang, then the merge
+    mergeMs: 500, // the last part, where the coins fly into the total
+  },
+
   // src/floors/swarmEvent — the rare "Swarm" event: its proc animation leaves
   // that button armed; clicking it starts a timed swarm sale where every click
   // on it pays a Sale payout from it and each of its mirrored clones

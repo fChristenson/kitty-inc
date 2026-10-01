@@ -72,6 +72,8 @@ interface HomingGroup extends HomingBurstOptions {
   // freeze bursts only: the first coin leaving its frozen spot for the target
   onFirstFlight?: () => void;
   flew?: boolean;
+  // spray coins only: performance.now() they all leave their frozen spots
+  releaseAt?: number;
 }
 
 interface HomingFlight {
@@ -81,6 +83,15 @@ interface HomingFlight {
   // set for a freeze burst: burstLife stays Infinity until the coin tops out,
   // then it hangs there this many ticks before flying
   holdTicks?: number;
+  // set for a spray coin: it flies straight from (x0, y0) to (x1, y1) in
+  // outTicks, where it freezes
+  spray?: {
+    x0: number;
+    y0: number;
+    x1: number;
+    y1: number;
+    outTicks: number;
+  };
 }
 
 const HOMING_FLIGHT_TICKS = 32;
@@ -205,6 +216,26 @@ function drawHangGlint(
 
 function advanceCoin(p: Particle, dt: number): void {
   const homing = p.homing;
+  if (homing?.spray) {
+    const { spray, group } = homing;
+    if (p.life < spray.outTicks) {
+      p.life = Math.min(spray.outTicks, p.life + dt);
+      const pos = sprayPosition(spray, p.life);
+      p.x = pos.x;
+      p.y = pos.y;
+      p.spinFrame += p.spinDir * p.spinRate * dt;
+      return;
+    }
+    if (homing.burstLife === Infinity) {
+      if (performance.now() < (group.releaseAt ?? 0)) return;
+      homing.burstLife = p.life;
+      p.maxLife = p.life + homing.flightTicks;
+      if (!group.flew) {
+        group.flew = true;
+        group.onFirstFlight?.();
+      }
+    }
+  }
   if (homing?.holdTicks !== undefined) {
     // a freeze-burst coin topping out: it hangs right here, then flies
     if (homing.burstLife === Infinity && p.vy >= 0) {
@@ -392,4 +423,84 @@ export function spawnHomingCoinBurst(
     pool.update(dt, advanceCoin);
   });
   return count;
+}
+
+// spray coins fly at constant speed, braking to a stop only in the last 0.1s
+const SPRAY_STOP_TICKS = 6;
+
+function sprayPosition(
+  s: { x0: number; y0: number; x1: number; y1: number; outTicks: number },
+  ticks: number,
+): { x: number; y: number } {
+  const stop = Math.min(SPRAY_STOP_TICKS, s.outTicks);
+  const cruise = s.outTicks - stop;
+  const total = cruise + stop / 2;
+  const brake = Math.max(0, ticks - cruise);
+  const f =
+    (Math.min(ticks, cruise) + brake - (brake * brake) / (2 * stop)) / total;
+  return { x: s.x0 + (s.x1 - s.x0) * f, y: s.y0 + (s.y1 - s.y0) * f };
+}
+
+export interface SprayOptions {
+  // performance.now() every coin leaves its frozen spot for the total
+  releaseAt: number;
+  outTicks: [number, number]; // how long each coin takes to reach its spot
+  flightTicks: [number, number]; // and then to fly into the total
+  onFirstFlight?: () => void;
+  onFirstArrive?: () => void;
+  onEachArrive?: () => void;
+}
+
+// one coin or bill per target (floor-local, like x/y): each is blasted out of
+// (x, y) like a burst coin, lands on its target as it slows, freezes there,
+// then gets pulled into the total at releaseAt
+export function spawnSprayCoins(
+  floor: Floor,
+  x: number,
+  y: number,
+  targets: { x: number; y: number }[],
+  { releaseAt, outTicks, flightTicks, ...arrival }: SprayOptions,
+): void {
+  const group: HomingGroup = {
+    ...arrival,
+    layer: "overlay",
+    fired: false,
+    releaseAt,
+  };
+  for (const target of targets) {
+    const kind: "coin" | "bill" =
+      Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
+    pool.spawn({
+      floor,
+      x,
+      y,
+      vx: 0,
+      vy: 0,
+      life: 0,
+      maxLife: Infinity,
+      size: (22 + Math.random() * 46) * 1.15 * 1.25,
+      gravity: 0,
+      gravityRamp: 0,
+      kind,
+      spinFrame:
+        Math.random() *
+        (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
+      spinRate: MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE),
+      spinDir: Math.random() < 0.5 ? 1 : -1,
+      axisAngle: (Math.random() * 2 - 1) * (Math.PI / 2),
+      homing: {
+        burstLife: Infinity,
+        flightTicks: randomIn(flightTicks),
+        group,
+        spray: {
+          x0: x,
+          y0: y,
+          x1: target.x,
+          y1: target.y,
+          outTicks: randomIn(outTicks),
+        },
+      },
+    });
+  }
+  pool.ensureTicking((dt) => pool.update(dt, advanceCoin));
 }

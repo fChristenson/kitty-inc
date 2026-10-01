@@ -461,6 +461,23 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return { x: FLOOR_W / 2, y: worldCenterY - floorTop };
   }
 
+  // the whole visible canvas, side gutters included, in floor's local space
+  function screenAreaLocalFor(floor: Floor): {
+    left: number;
+    top: number;
+    right: number;
+    bottom: number;
+  } {
+    const loc = floorLocation.get(floor);
+    const floorTop = loc ? floorWorldY(loc.floorIndex).top : 0;
+    return {
+      left: -GUTTER_W,
+      top: viewportTopY() - floorTop,
+      right: FLOOR_W + GUTTER_W,
+      bottom: viewportBottomY() - floorTop,
+    };
+  }
+
   // shared/screenFreeze: the frame captured the moment a freeze began, and the
   // camera it was drawn with, so the freeze overlay keeps lining up with it
   let frozenFrame: {
@@ -703,6 +720,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         createMysticBuilding: deps.createMysticBuilding,
         onFloorAdded: (floor) => notifyFloorAdded(floor),
         getScreenCenterLocal: screenCenterLocalFor,
+        getScreenAreaLocal: screenAreaLocalFor,
         getOnScreenFloors: onScreenFloors,
         getFloorRect,
       },

@@ -335,6 +335,7 @@ export type { FloorActionsDeps } from "./floorInteractions";
 export { forceBoostEvent } from "./boostEvent";
 export { forceUnionEvent } from "./unionEvent";
 export { forceKickbackEvent } from "./kickbackEvent";
+export { forceBurstEvent } from "./burstEvent";
 export { forceGlimmerEvent } from "./glimmerEvent";
 export type { OnScreenFloor } from "./eventProcs";
 export { forceHuntEvent } from "./huntEvent";

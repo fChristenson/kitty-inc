@@ -85,9 +85,10 @@ import {
 import { startBoostEvent, type OnScreenFloors } from "../boostEvent";
 import { startUnionEvent } from "../unionEvent";
 import { startHuntEvent } from "../huntEvent";
-// registers the Swarm, Kickback, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
+// registers the Swarm, Kickback, Burst, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
 import "../swarmEvent";
 import "../kickbackEvent";
+import "../burstEvent";
 import "../glimmerEvent";
 import "../renovateEvent";
 import "../upgradeEvent";
@@ -97,6 +98,7 @@ import {
   getClaimedEventCover,
   takeClaimedEventProc,
   type EventProcContext,
+  type ScreenAreaLocal,
 } from "../eventProcs";
 import {
   isScreenFrozen,
@@ -389,6 +391,7 @@ export interface FloorActionsDeps {
   // drawn) into this floor's own local coordinate space, so a coin burst can be
   // anchored there instead of at a fixed floor-local point
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number };
+  getScreenAreaLocal?: ScreenAreaLocal;
   // floors currently in view, for the "Boost" event's target pick (see
   // floors/boostEvent) — omitted off-screen (e.g. map/draft purchases), where
   // that event simply never starts
@@ -1720,6 +1723,7 @@ function eventProcContext(
     floors: deps.floors,
     getOnScreenFloors: deps.getOnScreenFloors,
     getFloorRect: deps.getFloorRect,
+    getScreenAreaLocal: deps.getScreenAreaLocal,
     isGroundFloor,
     applyTierCrit: (floor, tier) => {
       applyFloorCrit(deps, floor, tierOnlyCrit(tier), false);
