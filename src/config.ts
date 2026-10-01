@@ -427,6 +427,17 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/plinkoEvent — the rare "Plinko" event: wisp balls clatter
+  // down a triangle of pegs, each hit a coin, and slam into the bottom,
+  // spraying coins into the total
+  plinkoEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    // when each ball drops in, ever quicker
+    dropAt: [0, 170, 310, 430, 530, 610],
+    holdMs: 450, // the coins hanging after the last lands
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
