@@ -4,16 +4,19 @@ import { COLOR } from "../../palette";
 
 const RAY_COUNT = 14;
 
-// color at (x, y) fading to transparent at radius; color must be "#rrggbb"
+// color at (x, y) fading to transparent at radius, staying solid out to the
+// `solid` share of it; color must be "#rrggbb"
 export function radialFade(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   radius: number,
   color: string,
+  solid = 0,
 ): CanvasGradient {
   const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
   gradient.addColorStop(0, color);
+  if (solid > 0) gradient.addColorStop(solid, color);
   gradient.addColorStop(1, `${color}00`);
   return gradient;
 }

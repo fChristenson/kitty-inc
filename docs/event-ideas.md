@@ -42,6 +42,12 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [ ] **Rising Tide**: a glow floods up the building from the street, lifting every floor in view. Each floor's tier rises to the highest tier among them.
 - [ ] **Beanstalk**: a vine of light grows up from the top floor and curls round the locked floors above. Unlocks the next 2 floors for free.
 
+## Reveals
+
+Built on `src/floors/revealStage`: the crit click slides a blue stage in over the floors like a camera pan, the reward is revealed on it, then the stage slides out and the reward lands.
+
+- [x] **Reveal**: the black silhouette of a badge never landed floats over a pool of light; a wisp bumps it on the head and it spins until it flips to the badge's art. That crit then lands on the floor.
+
 ## Combos (both)
 
 - [x] **Alchemy**: coins stream into a cauldron, which bubbles and shoots lights into a worker. Tier upgrade plus a small payout.

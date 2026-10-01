@@ -230,6 +230,12 @@ export const COLOR = {
   flameYellow: "#FDE047",
   rocketSmoke: "#E5E7EB",
 
+  // Reveal event's blue "new badge" stage and its speed stripes
+  revealSky: "#6FD0FF",
+  revealBlue: "#1E5BD8",
+  revealDeep: "#0A1A5C",
+  revealStripe: "#9ADCFF",
+
   // page chrome
   pageBg: "#111417",
   pageText: "#F5F5F5",

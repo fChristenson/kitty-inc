@@ -4,7 +4,7 @@
 // upgradeButton/crit.ts's rollCritUpgrade) and arms once the player clicks
 // it, sharing CONFIG.eventProcs.cooldownMs across them all
 import type { Floor } from "../../gameState";
-import type { CritTier } from "../../shared/critTypes";
+import type { CritProcKind, CritTier } from "../../shared/critTypes";
 import { CONFIG } from "../../config";
 import type { FloorRectResolver } from "../../shared/screenFreeze";
 import {
@@ -51,6 +51,8 @@ export interface EventProcContext {
   isGroundFloor: boolean;
   // lands one regular crit tier on a floor of this building, paid out at once
   applyTierCrit?: (floor: Floor, tier: CritTier) => void;
+  // the same, carrying special crit `kind`, which counts toward its badge
+  applyProcCrit?: (floor: Floor, tier: CritTier, kind: CritProcKind) => void;
   // sets a floor's permanent crit tier, celebrated like that tier's crit
   promoteFloorTier?: (floor: Floor, tier: CritTier) => void;
   // unlocks a locked floor for free, rolling its unlock crit like a bought one

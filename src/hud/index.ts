@@ -81,6 +81,7 @@ export {
   wireCoinTossEventTestButton,
   wireHourglassEventTestButton,
   wireRocketEventTestButton,
+  wireRevealEventTestButton,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireDownpourEventTestButton,

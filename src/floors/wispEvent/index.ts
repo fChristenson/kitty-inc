@@ -17,7 +17,7 @@ import {
 import { triggerEventEndSlam } from "../../shared/eventEndSlam";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawGlimmer, hash01 } from "../../shared/twinkle";
-import { drawGlimmerOrb } from "../../shared/glimmerOrb";
+import { drawWisp, swoop } from "../../shared/glimmerOrb";
 import { isFloorLocked } from "../../shared/detachedJob";
 import {
   freezeScreen,
@@ -192,7 +192,6 @@ export function forceWispEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const ease = (t: number) => t * t * (3 - 2 * t);
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // where the wisp hovers over each stop, in world space; null while a floor is out of view
@@ -206,22 +205,6 @@ function hoverPoints(
   });
 }
 
-// a swoop from a to b, t 0..1: bowed out to one side and wiggling
-function swoop(a: Point, b: Point, t: number, seed: number): Point {
-  const e = ease(t);
-  const dx = b.x - a.x;
-  const dy = b.y - a.y;
-  const length = Math.hypot(dx, dy) || 1;
-  const bend = (hash01(seed, 1) - 0.5) * 2 * SWOOP_BEND;
-  const wiggle =
-    Math.sin(t * WIGGLES * Math.PI * 2) * WIGGLE_AMP * Math.sin(Math.PI * t);
-  const side = bend * length * 4 * e * (1 - e) + wiggle;
-  return {
-    x: a.x + dx * e - (dy / length) * side,
-    y: a.y + dy * e + (dx / length) * side,
-  };
-}
-
 // the wisp `ms` in: swooping to each stop in turn, sweeping back and forth
 // over it while it sprinkles, then swooping off the screen
 function wispAt(wisp: RunningWisp, hovers: Point[], ms: number): Point {
@@ -232,7 +215,15 @@ function wispAt(wisp: RunningWisp, hovers: Point[], ms: number): Point {
   const bob = { x: Math.cos(ms / 260) * BOB, y: Math.sin(ms / 190) * BOB };
   const from = k === 0 ? wisp.from : hovers[k - 1];
   if (k === hovers.length || within < flyMs) {
-    const point = swoop(from, hovers[k] ?? wisp.to, clamp01(within / flyMs), k);
+    const point = swoop(
+      from,
+      hovers[k] ?? wisp.to,
+      clamp01(within / flyMs),
+      k,
+      SWOOP_BEND,
+      WIGGLES,
+      WIGGLE_AMP,
+    );
     return { x: point.x + bob.x, y: point.y + bob.y };
   }
   const h = (within - flyMs) / sprinkleMs;
@@ -346,21 +337,15 @@ function drawOverlay(
   const points = hovers as Point[];
   wisp.stops.forEach((_, k) => drawSprinkle(ctx, wisp, points, k, ms, now));
   drawShed(ctx, wisp, points, ms, now);
-  for (let j = TRAIL; j >= 1; j--) {
-    const point = wispAt(wisp, points, ms - j * TRAIL_MS);
-    drawGlimmer(
-      ctx,
-      point.x,
-      point.y,
-      ORB_SIZE * 0.7 * (1 - j / (TRAIL + 1)),
-      now / 160 + j,
-      j % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
-    );
-  }
-  const head = wispAt(wisp, points, ms);
-  // a soft flicker, like a will-o'-the-wisp
-  const flicker = 1 + 0.08 * Math.sin(now / 70) * Math.sin(now / 113);
-  drawGlimmerOrb(ctx, head.x, head.y, ORB_SIZE * flicker, 0.3, now);
+  drawWisp(
+    ctx,
+    (t) => wispAt(wisp, points, t),
+    ms,
+    now,
+    ORB_SIZE,
+    TRAIL,
+    TRAIL_MS,
+  );
 }
 
 // nearest first from the entry point, so the wisp doesn't zigzag the whole screen

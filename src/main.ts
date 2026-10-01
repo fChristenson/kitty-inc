@@ -66,6 +66,7 @@ import {
   forceCoinTossEvent,
   forceHourglassEvent,
   forceRocketEvent,
+  forceRevealEvent,
   forceJackpotReelsEvent,
   forceChainPayEvent,
   forceDownpourEvent,
@@ -170,6 +171,7 @@ import {
   wireCoinTossEventTestButton,
   wireHourglassEventTestButton,
   wireRocketEventTestButton,
+  wireRevealEventTestButton,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireDownpourEventTestButton,
@@ -725,6 +727,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceRocketEvent(floor);
+    });
+    // same, for the Reveal event
+    wireRevealEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceRevealEvent(floor);
     });
     // same, for the Jackpot Reels event
     wireJackpotReelsEventTestButton(app, () => {

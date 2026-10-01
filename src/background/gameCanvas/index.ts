@@ -39,6 +39,7 @@ import {
   isScreenFrozen,
   isTotalSpotlit,
   getScreenFreezeDim,
+  getScreenFreezePan,
   drawScreenFreezeOverlay,
   type FloorRectResolver,
 } from "../../shared/screenFreeze";
@@ -520,7 +521,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(frozenFrame.image, shake.x * dpr, shake.y * dpr);
+    ctx.drawImage(
+      frozenFrame.image,
+      shake.x * dpr + getScreenFreezePan() * canvas.width,
+      shake.y * dpr,
+    );
     ctx.restore();
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);

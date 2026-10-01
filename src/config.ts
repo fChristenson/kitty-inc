@@ -253,6 +253,24 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/revealStage — the stage every reveal event plays its reveal on
+  revealStage: {
+    slideMs: 450, // the stage sliding in over the floors, and back out
+  },
+
+  // src/floors/revealEvent — the rare "Reveal" event: on the reveal stage, a
+  // wisp bumps the silhouette of a badge never landed into a spin that flips
+  // it to the badge's art, and then that crit lands on the floor
+  revealEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    flyMs: 750, // the wisp swooping in from off screen to over the badge
+    hoverMs: 250, // it hovering there
+    bumpMs: 380, // it dipping to bump the badge's head and bouncing back up
+    spinUpMs: 600, // the shadow spinning ever faster until it flips to the art
+    correctMs: 500, // the art's spins overshooting, then turning back to face front
+    holdMs: 1_100, // the settled badge and its name
+  },
+
   // src/floors/jackpotReelsEvent — the rare "Jackpot Reels" event: the button
   // streams coins into three slot reels, which stop one by one with a slam;
   // it pays the floor's income times its floor number times the reels' sum
