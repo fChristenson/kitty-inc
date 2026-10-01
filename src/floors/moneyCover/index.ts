@@ -54,6 +54,8 @@ export interface MoneyCover {
   // one spot per coin, laid out by the event's own layout
   spots: Point[];
   launch(targets: Point[]): void;
+  // like launch, but shot out of `from` (floor-local) instead of the button
+  launchFrom(from: Point, targets: Point[]): void;
   // launches targets in order, spread evenly over durationMs
   stream(targets: Point[], durationMs: number): void;
   // launches one coin per path in order, spread evenly over durationMs; each
@@ -76,6 +78,11 @@ export interface MoneyCoverOptions {
   rewardMultiplier?: number;
   // coins land face-on, so a drawn shape is fully covered
   settleFaceOn?: boolean;
+  // the event's own drawing in the freeze overlay, under the coins
+  drawExtra?: (
+    ctx: CanvasRenderingContext2D,
+    getFloorRect: FloorRectResolver,
+  ) => void;
 }
 
 const STREAM_INTERVAL_MS = 16;
@@ -160,6 +167,7 @@ export function startMoneyCover(
     tier: coveredTier,
     rewardMultiplier = 1,
     settleFaceOn,
+    drawExtra,
   }: MoneyCoverOptions,
 ): MoneyCover | null {
   if (!canStartMoneyCover(context)) return null;
@@ -167,7 +175,13 @@ export function startMoneyCover(
   const floorNumber = context.floors.indexOf(floor) + 1;
   const cover = { key };
   running = cover;
-  freezeScreen(drawOverlay, { spotlightTotal: true });
+  freezeScreen(
+    (ctx, getFloorRect, totalTarget) => {
+      drawExtra?.(ctx, getFloorRect);
+      drawOverlay(ctx, getFloorRect, totalTarget);
+    },
+    { spotlightTotal: true },
+  );
 
   let flew = false;
   let arrived = false;
@@ -217,6 +231,8 @@ export function startMoneyCover(
     area,
     spots: layout?.(area) ?? [],
     launch,
+    launchFrom: (from, targets) =>
+      spawnSprayCoins(floor, from.x, from.y, targets, arrival),
     stream: (targets, streamMs) =>
       launchOver(targets, streamMs, isLive, (batch) => launch(batch)),
     flow: (paths, streamMs, travelMs, hold = false) => {

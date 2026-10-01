@@ -22,7 +22,8 @@ import {
 } from "../../shared/eventFx";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
-import { drawGlimmer, drawGlimmerAura } from "../../shared/twinkle";
+import { drawGlimmer } from "../../shared/twinkle";
+import { drawGlimmerOrb } from "../../shared/glimmerOrb";
 import { smoothstep } from "../../shared/easing";
 import {
   freezeScreen,
@@ -59,7 +60,6 @@ import {
 const SIZE = WORKER_HEIGHT * 0.25;
 const START_X = FLOOR_X_MIN;
 const END_X = FLOOR_X_MAX + SIZE;
-const SWIRL_GLIMMERS = 4;
 const TRAIL_GLIMMERS = 6;
 const TRAIL_MS = 45; // between the trail's glimmers along the light's path
 // the jump to the next floor: aiming, the leap, then the landing's squash
@@ -181,34 +181,7 @@ function drawLight(
   white: number,
   now: number,
 ): void {
-  const size = SIZE * growth;
-  if (size <= 0) return;
-  drawGoldShimmer(ctx, x, y, size * 0.9, 1, 3, now);
-  const spin = ((now / 1000) * 5) % (Math.PI * 2);
-  for (let i = 0; i < SWIRL_GLIMMERS; i++) {
-    const angle = spin + (i / SWIRL_GLIMMERS) * Math.PI * 2;
-    const radius = size * (0.3 + 0.1 * Math.sin(spin * 2 + i));
-    drawGlimmer(
-      ctx,
-      x + Math.cos(angle) * radius,
-      y + Math.sin(angle) * radius,
-      size * 0.25,
-      angle,
-      COLOR.heavenlyGold,
-    );
-  }
-  drawGlimmerAura(
-    ctx,
-    x,
-    y + size * 0.6,
-    size * 1.2,
-    size * 1.2,
-    size * 0.3,
-    COLOR.heavenlyGold,
-    SIZE,
-    now,
-  );
-  drawGlimmer(ctx, x, y, size * (0.35 + 0.25 * white), -spin, COLOR.white);
+  drawGlimmerOrb(ctx, x, y, SIZE * growth, white, now, SIZE);
 }
 
 // a leg's promotable workers: dimmed like the frozen frame until lit

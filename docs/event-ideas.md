@@ -10,7 +10,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Vortex**: coins spiral in from all four screen edges in a tightening whirlpool under the total, sinking into it. Pays floor income × floor number (like Spray).
 - [x] **Ricochet**: one fat stream bounces off the screen edges like a pinball (3–5 bounces) before diving into the total. Payout grows per bounce.
 - [x] **Payday**: every on-screen worker sends a short coin stream back to the button, which then fires one big stream into the total. Pays the floor's payout once per worker.
-- [ ] **Piggy Bank**: coins stream into a piggy that swells and wiggles, then bursts into a coin shower into the total. Pays a lump sum.
+- [x] **Piggy Bank**: coins stream into a piggy that swells and wiggles, then bursts into a coin shower into the total. Pays a lump sum.
 - [ ] **Jackpot Reels**: coins stream into three slot reels, each stopping on 5/25/125 with a slam. Pays by combo.
 - [ ] **Chain Pay**: coins hop worker → worker along the floor, each hop sparking a mini burst, ending in the total. Pays per worker reached.
 - [ ] **Rain Check**: coins fall from the top like rain and pool on the floor, which then drains into the total. Pays income over time, all at once.

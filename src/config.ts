@@ -154,8 +154,8 @@ export const CONFIG = {
   fountainEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
     streamMs: 700, // how long the jet shoots
-    travelMs: 1_000, // each coin's arc up and down
-    durationMs: 2_500, // jet, the last coin's arc, a short hang, then the merge
+    travelMs: 700, // each coin's arc up and down
+    durationMs: 2000, // jet, the last coin's arc, a short hang, then the merge
     mergeMs: 500,
   },
 
@@ -183,6 +183,17 @@ export const CONFIG = {
     gatherMs: 700, // the workers paying into the button
     payoutMs: 700, // the button firing it all into the total
     maxWorkers: 12,
+  },
+
+  // src/floors/piggyBankEvent — the rare "Piggy Bank" event: the button streams
+  // coins into a piggy bank that swells and wiggles, then bursts, showering
+  // the screen with coins that merge into the total
+  piggyBankEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    fillMs: 900, // the button filling the piggy
+    durationMs: 1_000, // after the burst: ~0.3s blast out, 0.2s hang, then the merge
+    mergeMs: 500,
+    rewardMultiplier: 3, // on top of the floor's income times its floor number
   },
 
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
