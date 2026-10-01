@@ -330,6 +330,19 @@ export const CONFIG = {
     minLevels: 10,
   },
 
+  // src/floors/wispEvent — the rare "Wisp" event: a playful glimmer orb flits
+  // between targets in view sprinkling glitter: a worker climbs one perma
+  // tier, an income bar one crit tier, a "Lvl N" label gains free levels
+  wispEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    flyMs: 550, // each swoop to the next target, and off the screen
+    sprinkleMs: 1_100, // sweeping back and forth over a target, sprinkling it
+    holdMs: 400, // after it's gone, before the screen unfreezes
+    minStops: 1,
+    maxStops: 5,
+    levels: 10, // free levels for a sprinkled "Lvl N" label
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

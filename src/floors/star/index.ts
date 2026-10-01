@@ -54,7 +54,15 @@ export function drawUpgradeStar(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
 ): void {
-  if (floor === hiddenFloor) return;
+  if (hiddenFloors.has(floor)) return;
+  drawUpgradeStarSpotlight(ctx, floor);
+}
+
+// the live label, slam and all, for an event overlay that hid it
+export function drawUpgradeStarSpotlight(
+  ctx: CanvasRenderingContext2D,
+  floor: Floor,
+): void {
   const slam = getSlamPose(floor, "star", Date.now());
   const box = {
     x: MARGIN_X,
@@ -80,10 +88,13 @@ export function drawUpgradeStar(
   });
 }
 
-// an event overlay draws this floor's label itself (drawUpgradeStarStill) instead
-let hiddenFloor: Floor | null = null;
+// an event overlay draws these floors' labels itself instead
+let hiddenFloors: ReadonlySet<Floor> = new Set();
 export function setUpgradeStarHidden(floor: Floor | null): void {
-  hiddenFloor = floor;
+  setUpgradeStarsHidden(floor ? [floor] : []);
+}
+export function setUpgradeStarsHidden(floors: Floor[]): void {
+  hiddenFloors = new Set(floors);
 }
 
 // the label washed toward white and rotated around its own center
