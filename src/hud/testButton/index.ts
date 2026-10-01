@@ -150,6 +150,16 @@ export function wirePiggyBankEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireCoinTossEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-coin-toss-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireWispEventTestButton(
   container: HTMLElement,
   onClick: () => void,
