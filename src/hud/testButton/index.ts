@@ -414,6 +414,38 @@ export function wireDrawEventTestButton(
   );
 }
 
+// onClick gets the tier whose number to trace, or undefined to roll it
+export function wireNightSkyEventTestButton(
+  container: HTMLElement,
+  onClick: (tier: CritTier | undefined) => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-night-sky-event",
+  )!;
+  const select = container.querySelector<HTMLSelectElement>(
+    "#test-night-sky-event-tier",
+  )!;
+  button.addEventListener("click", () =>
+    onClick(select.value === "random" ? undefined : (select.value as CritTier)),
+  );
+}
+
+// onClick gets the tier whose number to draw, or undefined to roll it
+export function wirePitcherEventTestButton(
+  container: HTMLElement,
+  onClick: (tier: CritTier | undefined) => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-pitcher-event",
+  )!;
+  const select = container.querySelector<HTMLSelectElement>(
+    "#test-pitcher-event-tier",
+  )!;
+  button.addEventListener("click", () =>
+    onClick(select.value === "random" ? undefined : (select.value as CritTier)),
+  );
+}
+
 export function wireGlimmerEventTestButton(
   container: HTMLElement,
   onClick: () => void,

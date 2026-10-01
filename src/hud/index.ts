@@ -105,6 +105,8 @@ export {
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
+  wireNightSkyEventTestButton,
+  wirePitcherEventTestButton,
   wireGlimmerEventTestButton,
   wireHuntEventTestButton,
   wireSwarmEventTestButton,

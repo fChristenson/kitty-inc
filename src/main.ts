@@ -90,6 +90,8 @@ import {
   forceStreamEvent,
   forceTrailsEvent,
   forceDrawEvent,
+  forceNightSkyEvent,
+  forcePitcherEvent,
   forceGlimmerEvent,
   forceHuntEvent,
   startSwarmEvent,
@@ -195,6 +197,8 @@ import {
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
+  wireNightSkyEventTestButton,
+  wirePitcherEventTestButton,
   wireGlimmerEventTestButton,
   wireHuntEventTestButton,
   wireSwarmEventTestButton,
@@ -895,6 +899,20 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceDrawEvent(floor, tier);
+    });
+    // same, for the Night Sky event
+    wireNightSkyEventTestButton(app, (tier) => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceNightSkyEvent(floor, tier);
+    });
+    // same, for the Pitcher event
+    wirePitcherEventTestButton(app, (tier) => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forcePitcherEvent(floor, tier);
     });
     // same, for the Glimmer event
     wireGlimmerEventTestButton(app, () => {

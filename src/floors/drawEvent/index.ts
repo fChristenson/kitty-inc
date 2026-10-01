@@ -11,7 +11,13 @@ import {
   pickCritTierByOdds,
   type CritTier,
 } from "../../shared/critTypes";
-import { critFont } from "../../shared/critText";
+import {
+  fitGlyph,
+  NUMBER_HEIGHT_SHARE,
+  NUMBER_SAMPLE_SIZE,
+  NUMBER_WIDTH_SHARE,
+  rasterizeNumber,
+} from "../../shared/numberGlyph";
 import { forceTestCrit } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import {
@@ -22,11 +28,6 @@ import {
 } from "../moneyCover";
 
 const KEY = "draw";
-// glyph size it's rasterised at before scaling onto the screen
-const SAMPLE_FONT_SIZE = 200;
-// share of the screen the number may span
-const MAX_WIDTH_SHARE = 0.95;
-const MAX_HEIGHT_SHARE = 0.6;
 // floor-local distance between the coins filling the number, widened on big
 // screens so the fill never takes more than MAX_FILL_COINS
 const SPOT_SPACING = 18;
@@ -36,8 +37,6 @@ const MIN_COIN_SIZE = 10;
 // the outline's ring of coins: their radius, and centre spacing in radii
 const EDGE_COIN_SIZE = 16;
 const EDGE_SPACING = 1.3;
-// clear space between digits, as a share of the font size
-const DIGIT_GAP = 0.12;
 
 type Spot = { x: number; y: number; maxSize: number };
 
@@ -79,59 +78,18 @@ function inkDistances(ink: Uint8Array, width: number, height: number) {
 // area; each caps its coin's radius at its distance to the edge, so no coin
 // pokes out of the number
 export function numberSpots(text: string, area: CoverArea): Spot[] {
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
-  ctx.font = critFont(SAMPLE_FONT_SIZE);
-  const pad = 2;
-  // each digit laid out on its own, a clear gap apart, so they never merge
-  const gap = SAMPLE_FONT_SIZE * DIGIT_GAP;
-  const chars = [...text].map((char) => {
-    const m = ctx.measureText(char);
-    return {
-      char,
-      left: m.actualBoundingBoxLeft,
-      width: m.actualBoundingBoxLeft + m.actualBoundingBoxRight,
-      ascent: m.actualBoundingBoxAscent,
-      descent: m.actualBoundingBoxDescent,
-    };
-  });
-  const ascent = Math.max(...chars.map((c) => c.ascent));
-  const descent = Math.max(...chars.map((c) => c.descent));
-  const width = Math.ceil(
-    chars.reduce((sum, c) => sum + c.width, 0) +
-      gap * (chars.length - 1) +
-      pad * 2,
-  );
-  const height = Math.ceil(ascent + descent) + pad * 2;
-  canvas.width = width;
-  canvas.height = height;
-  ctx.font = critFont(SAMPLE_FONT_SIZE);
-  ctx.textAlign = "left";
-  ctx.textBaseline = "alphabetic";
-  let cursor = pad;
-  for (const c of chars) {
-    ctx.fillText(c.char, cursor + c.left, pad + ascent);
-    cursor += c.width + gap;
-  }
-  const alpha = ctx.getImageData(0, 0, width, height).data;
-  const ink = new Uint8Array(width * height);
-  let inkPixels = 0;
-  for (let i = 0; i < ink.length; i++)
-    if (alpha[i * 4 + 3] > 128) {
-      ink[i] = 1;
-      inkPixels++;
-    }
-  const dist = inkDistances(ink, width, height);
-
-  const scale = Math.min(
-    ((area.right - area.left) * MAX_WIDTH_SHARE) / width,
-    ((area.bottom - area.top) * MAX_HEIGHT_SHARE) / height,
+  const glyph = rasterizeNumber(text, NUMBER_SAMPLE_SIZE);
+  const { width, height, inkPixels } = glyph;
+  const dist = inkDistances(glyph.ink, width, height);
+  const { scale, originX, originY } = fitGlyph(
+    glyph,
+    area,
+    NUMBER_WIDTH_SHARE,
+    NUMBER_HEIGHT_SHARE,
   );
   const step =
     Math.max(SPOT_SPACING, Math.sqrt(inkPixels / MAX_FILL_COINS) * scale) /
     scale;
-  const originX = (area.left + area.right) / 2 - (width * scale) / 2;
-  const originY = (area.top + area.bottom) / 2 - (height * scale) / 2;
   const spots: Spot[] = [];
   for (let y = 0; y < height; y += step)
     for (let x = 0; x < width; x += step) {

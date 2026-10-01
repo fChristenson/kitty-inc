@@ -512,7 +512,8 @@ export function spawnSprayCoins(
 // one coin or bill per path (floor-local), each following its own path over
 // outTicks, then flying straight on into the total (or at releaseAt, if given,
 // hanging at its path's end till then). ages (ticks, per path) start a coin
-// that far along, as if launched that much earlier
+// that far along, as if launched that much earlier; maxSizes (per path) cap
+// how far a coin may reach from its path's end, like a spray target's maxSize
 export function spawnPathCoins(
   floor: Floor,
   paths: CoinPath[],
@@ -522,6 +523,7 @@ export function spawnPathCoins(
     ...arrival
   }: Omit<SprayOptions, "releaseAt"> & { releaseAt?: number },
   ages: number[] = [],
+  maxSizes: (number | undefined)[] = [],
 ): void {
   const group: HomingGroup = { ...arrival, layer: "overlay", fired: false };
   paths.forEach((path, i) => {
@@ -535,7 +537,7 @@ export function spawnPathCoins(
       outTicks: randomIn(outTicks),
       path,
     };
-    spawnSprayCoin(floor, group, flightTicks, undefined, flight, ages[i]);
+    spawnSprayCoin(floor, group, flightTicks, maxSizes[i], flight, ages[i]);
   });
   sprayPool.ensureTicking((dt) => sprayPool.update(dt, advanceCoin));
 }

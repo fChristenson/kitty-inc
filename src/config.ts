@@ -506,6 +506,35 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/nightSkyEvent — the rare "Night Sky" event: the wisp traces
+  // the crit's own 5/25/125 in twinkling stars, which stream into the total;
+  // pays like Draw
+  nightSkyEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    flightMs: 2_300, // the wisp's whole flight, out of the button and off the screen
+    hopMs: 120, // added per hop between strokes
+    showMs: 400, // the finished number twinkling before its stars fly
+    mergeSpreadMs: 300, // from the first star leaving for the total to the last
+    mergeFlyMs: 500, // each star's flight into the total
+  },
+
+  // src/floors/pitcherEvent — the rare "Pitcher" event: the wisp draws the
+  // crit's own 5/25/125 in solid lines open at the top, and money pours down
+  // into each finished digit, filling it; pays like Draw
+  pitcherEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    flightMs: 2_300, // the wisp's whole flight, out of the button and off the screen
+    hopMs: 120, // added per hop between strokes
+    gapShare: 0.14, // the open top of each digit, of its height
+    pourDelayMs: 120, // from a digit's last line to its pour
+    pourMs: 800, // how long each digit's pour lasts
+    travelMs: 650, // each coin's fall from the top of the screen to its spot
+    hangMs: 400, // the full number hanging before the merge
+    mergeMs: 500,
+    breakSpreadMs: 150, // the lines' sparkles leaving for the total, first to last
+    breakFlyMs: 350, // each sparkle's flight into the total
+  },
+
   // src/floors/swarmEvent — the rare "Swarm" event: its proc animation leaves
   // that button armed; clicking it starts a timed swarm sale where every click
   // on it pays a Sale payout from it and each of its mirrored clones

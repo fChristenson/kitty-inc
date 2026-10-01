@@ -89,6 +89,10 @@ export function createTestButtonMarkup(): string {
           <button id="test-trails-event" class="game__button">Trails</button>
           <button id="test-draw-event" class="game__button">Draw</button>
           <label>Draw number <select id="test-draw-event-tier"><option value="random">Random</option>${tiers}</select></label>
+          <button id="test-night-sky-event" class="game__button">Night Sky</button>
+          <label>Night Sky number <select id="test-night-sky-event-tier"><option value="random">Random</option>${tiers}</select></label>
+          <button id="test-pitcher-event" class="game__button">Pitcher</button>
+          <label>Pitcher number <select id="test-pitcher-event-tier"><option value="random">Random</option>${tiers}</select></label>
           <button id="test-glimmer-event" class="game__button">Glimmer</button>
           <button id="test-hunt-event" class="game__button">Hunt</button>
           <button id="test-swarm-event" class="game__button">Swarm</button>

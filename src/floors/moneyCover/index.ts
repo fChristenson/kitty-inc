@@ -60,12 +60,14 @@ export interface MoneyCover {
   stream(targets: Point[], durationMs: number): void;
   // launches one coin per path in order, spread evenly over durationMs; each
   // follows its path for travelMs, then hops on into the total, or with hold
-  // hangs at its path's end until the merge like a spot's coin
+  // hangs at its path's end until the merge like a spot's coin (its size
+  // capped by maxSizes, per path, like a spot's maxSize)
   flow(
     paths: CoinPath[],
     durationMs: number,
     travelMs: number,
     hold?: boolean,
+    maxSizes?: number[],
   ): void;
   isLive(): boolean;
 }
@@ -78,10 +80,12 @@ export interface MoneyCoverOptions {
   rewardMultiplier?: number;
   // coins land face-on, so a drawn shape is fully covered
   settleFaceOn?: boolean;
-  // the event's own drawing in the freeze overlay, under the coins
+  // the event's own drawing in the freeze overlay, under the coins;
+  // totalTarget is the total-income readout, in the same world space
   drawExtra?: (
     ctx: CanvasRenderingContext2D,
     getFloorRect: FloorRectResolver,
+    totalTarget: Point,
   ) => void;
 }
 
@@ -177,7 +181,7 @@ export function startMoneyCover(
   running = cover;
   freezeScreen(
     (ctx, getFloorRect, totalTarget) => {
-      drawExtra?.(ctx, getFloorRect);
+      drawExtra?.(ctx, getFloorRect, totalTarget);
       drawOverlay(ctx, getFloorRect, totalTarget);
     },
     { spotlightTotal: true },
@@ -235,16 +239,17 @@ export function startMoneyCover(
       spawnSprayCoins(floor, from.x, from.y, targets, arrival),
     stream: (targets, streamMs) =>
       launchOver(targets, streamMs, isLive, (batch) => launch(batch)),
-    flow: (paths, streamMs, travelMs, hold = false) => {
+    flow: (paths, streamMs, travelMs, hold = false, maxSizes = []) => {
       const { releaseAt: _, ...pathArrival } = arrival;
       const ticks = travelMs / TICK_MS;
       const flight = FLOW_FLIGHT_MS / TICK_MS;
+      const items = paths.map((path, i) => ({ path, maxSize: maxSizes[i] }));
       // each coin starts as far along as it would be if launched on time, so
       // a batch spreads out evenly instead of leaving the button in a clump
-      launchOver(paths, streamMs, isLive, (batch, lateMs) =>
+      launchOver(items, streamMs, isLive, (batch, lateMs) =>
         spawnPathCoins(
           floor,
-          batch,
+          batch.map((item) => item.path),
           hold
             ? { ...arrival, outTicks: [ticks * 0.97, ticks * 1.03] }
             : {
@@ -253,6 +258,7 @@ export function startMoneyCover(
                 flightTicks: [flight * 0.6, flight],
               },
           lateMs.map((ms) => ms / TICK_MS),
+          batch.map((item) => item.maxSize),
         ),
       );
     },

@@ -371,6 +371,8 @@ export { forceWispEvent } from "./wispEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";
+export { forceNightSkyEvent } from "./nightSkyEvent";
+export { forcePitcherEvent } from "./pitcherEvent";
 export { forceGlimmerEvent } from "./glimmerEvent";
 export type { OnScreenFloor } from "./eventProcs";
 export { forceHuntEvent } from "./huntEvent";

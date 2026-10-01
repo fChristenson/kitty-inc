@@ -22,6 +22,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Hourglass**: coins pour into an hourglass that flips over, and the coins trickle out of it into the total. Pays a minute of the building's income.
 - [x] **Rocket**: coins pour into a rocket on the clicked floor that launches up through every floor in view and bursts into a coin firework over the total. Pays the floor's payout once per floor it flies past.
 - [x] **Night Sky**: the wisp flies out of the button and traces the crit's 5/25/125 outline in twinkling stars, which then stream into the total. Pays like Draw: times that number.
+- [x] **Pitcher**: the wisp draws the crit's 5/25/125 in solid lines, each digit open at the top; as each digit closes, money pours down from the top of the screen and fills it, then the full number merges into the total. Pays like Draw.
 - [ ] **Twister**: a funnel of coins zigzags across the screen, sucking a short stream out of every worker it passes, then spins up into the total. Pays the floor's payout once per worker swept up.
 
 ## Glimmer streams (upgrades)
