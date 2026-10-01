@@ -274,6 +274,13 @@ export const CONFIG = {
     maxFloors: 6, // the most bars it touches
   },
 
+  // src/floors/blessingEvent — the rare "Blessing" event: golden glimmers snow
+  // down over the clicked floor, one settling on each worker, +1 perma tier each
+  blessingEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    snowMs: 2_400, // how long flakes keep starting to fall
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

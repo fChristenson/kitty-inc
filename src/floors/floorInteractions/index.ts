@@ -85,7 +85,7 @@ import {
 import { startBoostEvent, type OnScreenFloors } from "../boostEvent";
 import { startUnionEvent } from "../unionEvent";
 import { startHuntEvent } from "../huntEvent";
-// registers the Swarm, Kickback, Payday, Piggy Bank, Jackpot Reels, Chain Pay, Downpour, Magnet, Spillover, Constellation, Ascend, Burst, Spray, Fountain, Vortex, Ricochet, Stream, Trails, Draw, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
+// registers the Swarm, Kickback, Payday, Piggy Bank, Jackpot Reels, Chain Pay, Downpour, Magnet, Spillover, Constellation, Ascend, Blessing, Burst, Spray, Fountain, Vortex, Ricochet, Stream, Trails, Draw, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
 import "../swarmEvent";
 import "../kickbackEvent";
 import "../paydayEvent";
@@ -97,6 +97,7 @@ import "../magnetEvent";
 import "../spilloverEvent";
 import "../constellationEvent";
 import "../ascendEvent";
+import "../blessingEvent";
 import "../burstEvent";
 import "../sprayEvent";
 import "../fountainEvent";
