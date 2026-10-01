@@ -338,6 +338,15 @@ export const CONFIG = {
     holdMs: 900, // after the new worker lands, before the screen unfreezes
   },
 
+  // src/floors/promotionDayEvent — the rare "Promotion Day" event: lights rise
+  // from every worker on the clicked floor into its income bar, which climbs
+  // one crit tier
+  promotionDayEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streamMs: 1_800, // the lights rising into the bar
+    holdMs: 900, // after the promotion lands, before the screen unfreezes
+  },
+
   // src/floors/wispEvent — the rare "Wisp" event: a playful glimmer orb flits
   // between targets in view sprinkling glitter: a worker climbs one perma
   // tier, an income bar one crit tier, a "Lvl N" label gains free levels

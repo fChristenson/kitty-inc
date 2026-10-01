@@ -75,6 +75,7 @@ import {
   forceSparkChainEvent,
   forcePolishEvent,
   forceRecruitEvent,
+  forcePromotionDayEvent,
   forceWispEvent,
   forceStreamEvent,
   forceTrailsEvent,
@@ -169,6 +170,7 @@ import {
   wireSparkChainEventTestButton,
   wirePolishEventTestButton,
   wireRecruitEventTestButton,
+  wirePromotionDayEventTestButton,
   wireWispEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
@@ -768,6 +770,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceRecruitEvent(floor);
+    });
+    // same, for the Promotion Day event
+    wirePromotionDayEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forcePromotionDayEvent(floor);
     });
     // same, for the Wisp event
     wireWispEventTestButton(app, () => {

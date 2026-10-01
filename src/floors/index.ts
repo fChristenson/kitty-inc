@@ -356,6 +356,7 @@ export { forceMentorEvent } from "./mentorEvent";
 export { forceSparkChainEvent } from "./sparkChainEvent";
 export { forcePolishEvent } from "./polishEvent";
 export { forceRecruitEvent } from "./recruitEvent";
+export { forcePromotionDayEvent } from "./promotionDayEvent";
 export { forceWispEvent } from "./wispEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";

@@ -158,6 +158,16 @@ export function wireRecruitEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wirePromotionDayEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-promotion-day-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireSparkChainEventTestButton(
   container: HTMLElement,
   onClick: () => void,

@@ -90,6 +90,7 @@ export {
   wireSparkChainEventTestButton,
   wirePolishEventTestButton,
   wireRecruitEventTestButton,
+  wirePromotionDayEventTestButton,
   wireWispEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
