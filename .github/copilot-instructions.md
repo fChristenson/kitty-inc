@@ -48,6 +48,14 @@ Everything in progress lives in the gitignored `tmp/`: raws, custom cut-out scri
 - Re-cut a shipped crit from its raw in `tmp/crits/<category>/`, if it has one, then run `node scripts/add-sticker-borders.mjs <kind> ...`. Always pass names: with no names it rebuilds all ~1,600 stickers.
 - The template ids for pinning `template` / `group` / `tier` in the spec are in `scripts/lib/crit-templates.mjs`. Pin only when the auto plan fits the art poorly.
 
+## Event rules
+
+Events (`src/floors/*Event`, listed in `docs/event-ideas.md`), like crits, must all be distinct.
+
+- **Never confusable.** Each event must look different enough that a player can't mistake it for another. Swapping only the prop or colour of an existing event's sequence is not a new event: "the button pours coins into a cauldron, which shoots lights at a worker" and the same thing with a well are the same event.
+- **Own staging.** Give each its own idea for what happens on screen: its own motion, shapes, layout and beats. Before building one, compare its plan against every existing event and change it if any one reads the same.
+- **Share code, not looks.** Reuse the shared plumbing (streams, wisp, freeze, spotlights) rather than copying it, but the sequence the player sees must be unique.
+
 ## Crit rules
 
 **Two layers.** A crit **tier** (`crit`/`mega`/`ultra`) sets the free upgrades and multiplier. A **proc** ("special crit") rides on a landed tier and is shown only by the celebration flash. The canonical list is `CRIT_PROC_KINDS` / `CRIT_PROC_INFO` in `src/shared/critTypes`.

@@ -2,14 +2,21 @@
 import type { Floor } from "../../gameState";
 import { critTierRank } from "../../shared/critTypes";
 import { isFloorLocked } from "../../shared/detachedJob";
+import { drawWhiteBurst } from "../../shared/eventFx";
+import {
+  drawFreezeDimmed,
+  type FloorRectResolver,
+} from "../../shared/screenFreeze";
 import { isVisibleOnFloor, type OnScreenFloors } from "../eventProcs";
 import {
+  drawWorkerSpotlight,
   findRecruitSpot,
   getBoostEventCandidates,
   getRenderedWorkerCount,
   getWorkerCenter,
   getWorkerPermaTier,
   missingWorkerCount,
+  setWorkerSpotlights,
   WORKER_FEET_Y,
 } from "../worker";
 
@@ -44,6 +51,66 @@ export function findOnScreenWorkers(
     }
   }
   return workers;
+}
+
+// a worker that can still climb a perma tier
+export const isClimber = (w: OnScreenWorker): boolean =>
+  getBoostEventCandidates(w.floor).includes(w.workerIndex);
+
+// every climber in view, while floor itself is in view too
+export function findClimbers(
+  floor: Floor,
+  getOnScreenFloors: OnScreenFloors | undefined,
+): OnScreenWorker[] {
+  return (findOnScreenWorkers(floor, getOnScreenFloors) ?? []).filter(
+    isClimber,
+  );
+}
+
+// lifts workers out of the frozen frame for the overlay to draw
+export function spotlightWorkers(workers: OnScreenWorker[]): void {
+  const byFloor = new Map<Floor, number[]>();
+  for (const w of workers)
+    byFloor.set(w.floor, [...(byFloor.get(w.floor) ?? []), w.workerIndex]);
+  setWorkerSpotlights(
+    [...byFloor].map(([floor, workerIndexes]) => ({ floor, workerIndexes })),
+  );
+}
+
+const STRUCK_BURST_MS = 500;
+
+// spotlit workers, washed as dark as the frozen frame until struckAt is set,
+// then lit up in a white burst
+export function drawStruckWorkers(
+  ctx: CanvasRenderingContext2D,
+  getFloorRect: FloorRectResolver,
+  struck: { worker: OnScreenWorker; struckAt: number | null }[],
+  now: number,
+): void {
+  const draw = (c: CanvasRenderingContext2D, w: OnScreenWorker) => {
+    const rect = getFloorRect(w.floor);
+    if (!rect) return;
+    c.save();
+    c.translate(rect.left, rect.top);
+    drawWorkerSpotlight(c, w.floor, w.workerIndex, 0, 0);
+    c.restore();
+  };
+  drawFreezeDimmed(ctx, (layer) => {
+    for (const s of struck) if (s.struckAt === null) draw(layer, s.worker);
+  });
+  for (const { worker, struckAt } of struck) {
+    if (struckAt === null) continue;
+    draw(ctx, worker);
+    const rect = getFloorRect(worker.floor);
+    if (rect)
+      drawWhiteBurst(
+        ctx,
+        rect.left + worker.center.x,
+        rect.top + worker.center.y,
+        (now - struckAt) / STRUCK_BURST_MS,
+        0.3,
+      );
+  }
 }
 
 export interface RecruitSpot {
@@ -103,9 +170,7 @@ export function findFloorLines(
 export function pickLowestTierClimber(
   workers: OnScreenWorker[],
 ): OnScreenWorker | null {
-  const climbers = workers.filter((w) =>
-    getBoostEventCandidates(w.floor).includes(w.workerIndex),
-  );
+  const climbers = workers.filter(isClimber);
   if (climbers.length === 0) return null;
   const rank = (w: OnScreenWorker) =>
     critTierRank(getWorkerPermaTier(w.floor, w.workerIndex));

@@ -10,11 +10,10 @@ import { COLOR } from "../../palette";
 import { playExplosion, startBoostEventStreamLoop } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { pickAtMost, pickCritTierByOdds } from "../../shared/critTypes";
-import { drawExplosion, drawWhiteBurst } from "../../shared/eventFx";
+import { drawExplosion } from "../../shared/eventFx";
 import { drawWispHead, drawWispTrail, WISP_SIZE } from "../../shared/wisp";
 import {
   freezeScreen,
-  drawFreezeDimmed,
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
@@ -29,13 +28,15 @@ import {
 import {
   celebrateWorkerBoost,
   clearWorkerSpotlight,
-  drawWorkerSpotlight,
-  getBoostEventCandidates,
   promoteWorkerPermaTier,
-  setWorkerSpotlights,
   WORKER_HEIGHT,
 } from "../worker";
-import { findOnScreenWorkers, type OnScreenWorker } from "../onScreenWorkers";
+import {
+  drawStruckWorkers,
+  findClimbers,
+  spotlightWorkers,
+  type OnScreenWorker,
+} from "../onScreenWorkers";
 
 const KEY = "meteorShower";
 // every meteor leans this far sideways per px down, give or take SLANT_JITTER,
@@ -48,7 +49,6 @@ const EXPLOSION_SCALE = 0.45;
 const EXPLOSION_SHAKE = 0.5;
 const SPARK_REACH = WORKER_HEIGHT * 0.8;
 const SPARK_SIZE = 14;
-const BURST_MS = 500;
 
 interface Point {
   x: number;
@@ -71,22 +71,13 @@ interface RunningShower {
 
 let running: RunningShower | null = null;
 
-function climbableWorkers(
-  floor: Floor,
-  context: EventProcContext,
-): OnScreenWorker[] {
-  return (findOnScreenWorkers(floor, context.getOnScreenFloors) ?? []).filter(
-    (w) => getBoostEventCandidates(w.floor).includes(w.workerIndex),
-  );
-}
-
 // 3-6 different climbable workers in view, struck left to right or right to
 // left as the shower slants, each by a meteor coming down from above the screen
 function planShower(floor: Floor, context: EventProcContext): Meteor[] | null {
   const rect = context.getFloorRect?.(floor);
   const area = context.getScreenAreaLocal?.(floor);
   if (!rect || !area) return null;
-  const workers = climbableWorkers(floor, context);
+  const workers = findClimbers(floor, context.getOnScreenFloors);
   if (workers.length === 0) return null;
   const { minMeteors, maxMeteors, gapMs } = CONFIG.meteorShowerEvent;
   const count =
@@ -125,7 +116,7 @@ registerEventProc(
     canArm: (floor, context) =>
       !running &&
       !isScreenFrozen() &&
-      climbableWorkers(floor, context).length > 0,
+      findClimbers(floor, context.getOnScreenFloors).length > 0,
     arm: startShower,
   },
   { label: "Meteor Shower", color: COLOR.heavenlyGold },
@@ -156,36 +147,12 @@ function drawOverlay(
   if (!shower) return;
   const now = performance.now();
   const ms = now - shower.startedAt;
-  const drawStruck = (c: CanvasRenderingContext2D, meteor: Meteor) => {
-    const { floor, workerIndex } = meteor.worker;
-    const rect = getFloorRect(floor);
-    if (!rect) return;
-    c.save();
-    c.translate(rect.left, rect.top);
-    drawWorkerSpotlight(c, floor, workerIndex, 0, 0);
-    c.restore();
-  };
-  drawFreezeDimmed(ctx, (layer) => {
-    for (const meteor of shower.meteors)
-      if (meteor.hitAt === null) drawStruck(layer, meteor);
-  });
-  for (const meteor of shower.meteors) {
-    if (meteor.hitAt === null) continue;
-    drawStruck(ctx, meteor);
-    const { floor, center } = meteor.worker;
-    const rect = getFloorRect(floor);
-    if (!rect) continue;
-    ctx.save();
-    ctx.translate(rect.left, rect.top);
-    drawWhiteBurst(
-      ctx,
-      center.x,
-      center.y,
-      (now - meteor.hitAt) / BURST_MS,
-      0.3,
-    );
-    ctx.restore();
-  }
+  drawStruckWorkers(
+    ctx,
+    getFloorRect,
+    shower.meteors.map((m) => ({ worker: m.worker, struckAt: m.hitAt })),
+    now,
+  );
   for (const meteor of shower.meteors) {
     const along = (t: number) => meteorAt(meteor, t - meteor.launchAt);
     drawWispTrail(ctx, along, ms, now, WISP_SIZE);
@@ -214,15 +181,7 @@ function startShower(floor: Floor, context: EventProcContext): void {
   const shower: RunningShower = { meteors, startedAt: performance.now() };
   running = shower;
   const isLive = () => running === shower;
-  const byFloor = new Map<Floor, number[]>();
-  for (const { worker } of meteors)
-    byFloor.set(worker.floor, [
-      ...(byFloor.get(worker.floor) ?? []),
-      worker.workerIndex,
-    ]);
-  setWorkerSpotlights(
-    [...byFloor].map(([f, workerIndexes]) => ({ floor: f, workerIndexes })),
-  );
+  spotlightWorkers(meteors.map((m) => m.worker));
   freezeScreen(drawOverlay);
   const stopSound = startBoostEventStreamLoop();
 
