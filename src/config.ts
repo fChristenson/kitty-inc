@@ -172,6 +172,18 @@ export const CONFIG = {
     mergeMs: 500, // the coins flying into the total
   },
 
+  // src/floors/wreckingBallEvent — the rare "Wrecking Ball" event: the wisp
+  // drops like a heavy ball onto the clicked floor's income bar and bounces on
+  // it, each hit an explosion that lands free upgrade levels
+  wreckingBallEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    dropMs: 420, // falling from above the screen onto the bar
+    bounce: 0.45, // each bounce's speed, of the hit before
+    holdMs: 700, // after the last hit, before the screen unfreezes
+    levelShare: 0.1, // free levels in all, of the floor's current level
+    minLevels: 10,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

@@ -55,6 +55,7 @@ Events (`src/floors/*Event`, listed in `docs/event-ideas.md`), like crits, must 
 - **Never confusable.** Each event must look different enough that a player can't mistake it for another. Swapping only the prop or colour of an existing event's sequence is not a new event: "the button pours coins into a cauldron, which shoots lights at a worker" and the same thing with a well are the same event.
 - **Own staging.** Give each its own idea for what happens on screen: its own motion, shapes, layout and beats. Before building one, compare its plan against every existing event and change it if any one reads the same.
 - **Share code, not looks.** Reuse the shared plumbing (streams, wisp, freeze, spotlights) rather than copying it, but the sequence the player sees must be unique.
+- **Fast and dramatic.** The game runs on intense shakes and crits: every event hits hard and quick (about 1.5–2.5s), building to impacts with `shakeScreen`, `drawExplosion`/`drawWhiteBurst`, slams and sound. Nothing slow, gentle or drawn out.
 
 ## Crit rules
 

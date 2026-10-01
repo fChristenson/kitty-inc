@@ -58,6 +58,7 @@ import {
   forceSprayEvent,
   forceFountainEvent,
   forceRippleEvent,
+  forceWreckingBallEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -174,6 +175,7 @@ import {
   wireSprayEventTestButton,
   wireFountainEventTestButton,
   wireRippleEventTestButton,
+  wireWreckingBallEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -693,6 +695,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceRippleEvent(floor);
+    });
+    // same, for the Wrecking Ball event
+    wireWreckingBallEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceWreckingBallEvent(floor);
     });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {
