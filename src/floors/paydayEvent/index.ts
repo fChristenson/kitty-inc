@@ -156,8 +156,8 @@ function startPayday(floor: Floor, context: EventProcContext): void {
   freezeScreen(drawOverlay, { spotlightTotal: true });
   playBoostEventStream();
 
-  // one stream for every worker so they share one coin budget, each aimed at
-  // the button as seen from its own floor
+  // a whole stream from every worker, each aimed at the button as seen from
+  // its own floor
   streamCoins(
     workers.map((w) => ({
       floor: w.floor,
@@ -169,6 +169,7 @@ function startPayday(floor: Floor, context: EventProcContext): void {
       durationMs: gatherMs,
       isRunning: isLive,
       onEachArrive: () => payday.buttonFx.hit(performance.now()),
+      fullPerSource: true,
     },
   );
 

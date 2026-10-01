@@ -38,6 +38,8 @@ export interface StreamOptions {
   durationMs: number;
   isRunning: () => boolean;
   onEachArrive?: () => void;
+  // every source streams a whole stream's coins instead of sharing one
+  fullPerSource?: boolean;
 }
 
 // the coin side lives with the floors' coin system, which registers it here
@@ -100,14 +102,15 @@ const sourcePoint = (s: StreamSource) => ({
 
 export function streamCoins(
   sources: StreamSource[],
-  { target, durationMs, isRunning, onEachArrive }: StreamOptions,
+  { target, durationMs, isRunning, onEachArrive, fullPerSource }: StreamOptions,
 ): void {
   if (sources.length === 0 || !coinStreamer) return;
   const streamer = coinStreamer;
   // shared out so many sources still add up to about one stream's coins
+  const shares = fullPerSource ? 1 : sources.length;
   const coins: [number, number] = [
-    Math.max(1, Math.round(18 / sources.length)),
-    Math.max(2, Math.round(28 / sources.length)),
+    Math.max(1, Math.round(18 / shares)),
+    Math.max(2, Math.round(28 / shares)),
   ];
   scheduleEventStream(durationMs, LONG_PRESS_COIN_ARRIVE_MS, isRunning, () => {
     for (const s of sources) {

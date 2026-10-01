@@ -425,18 +425,17 @@ function regularWorkerCount(floor: Floor): number {
   return getRenderedWorkerCount(floor) - (floor.hasManager ? 1 : 0);
 }
 
-const RECRUIT_SPOT_SAMPLES = 24;
+const OPEN_SPOT_SAMPLES = 24;
 
-// where a free hire would stand (floor-local center): the walkable spot
-// farthest from every walker there, or null once its workers are maxed
-export function findRecruitSpot(floor: Floor): { x: number; y: number } | null {
-  if (regularWorkerCount(floor) >= MAX_RENDERED_WORKERS) return null;
+// the walkable spot farthest from every walker on the floor (floor-local
+// center at worker height), where an event can stand something
+export function findOpenSpot(floor: Floor): { x: number; y: number } {
   const walkers = floorWorkers.get(floor)?.walkers ?? [];
   let bestX = (FLOOR_X_MIN + FLOOR_X_MAX) / 2;
   let bestGap = -1;
-  for (let i = 0; i <= RECRUIT_SPOT_SAMPLES; i++) {
+  for (let i = 0; i <= OPEN_SPOT_SAMPLES; i++) {
     const x =
-      FLOOR_X_MIN + ((FLOOR_X_MAX - FLOOR_X_MIN) * i) / RECRUIT_SPOT_SAMPLES;
+      FLOOR_X_MIN + ((FLOOR_X_MAX - FLOOR_X_MIN) * i) / OPEN_SPOT_SAMPLES;
     const gap = Math.min(...walkers.map((w) => Math.abs(w.x - x)));
     if (gap > bestGap) {
       bestGap = gap;
@@ -444,6 +443,12 @@ export function findRecruitSpot(floor: Floor): { x: number; y: number } | null {
     }
   }
   return { x: bestX, y: WORKER_FEET_Y - RENDER_H / 2 };
+}
+
+// where a free hire would stand, or null once its workers are maxed
+export function findRecruitSpot(floor: Floor): { x: number; y: number } | null {
+  if (regularWorkerCount(floor) >= MAX_RENDERED_WORKERS) return null;
+  return findOpenSpot(floor);
 }
 
 // a free hire standing at x facing the camera; it joins ahead of the manager,

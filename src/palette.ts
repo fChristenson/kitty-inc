@@ -211,6 +211,12 @@ export const COLOR = {
   woodRing: "#FAF2DD",
   woodText: "#3A2A18",
 
+  // Alchemy event's cauldron and its brew
+  cauldronIron: "#3F4654",
+  cauldronIronDark: "#262B35",
+  potionGreen: "#7CDB3C",
+  potionGreenLight: "#C6F57E",
+
   // page chrome
   pageBg: "#111417",
   pageText: "#F5F5F5",

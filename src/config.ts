@@ -182,7 +182,7 @@ export const CONFIG = {
     chance: 0.01, // per crit whose special-crit gateway hit
     gatherMs: 700, // the workers paying into the button
     payoutMs: 700, // the button firing it all into the total
-    maxWorkers: 12,
+    maxWorkers: 3,
   },
 
   // src/floors/piggyBankEvent — the rare "Piggy Bank" event: the button streams
@@ -345,6 +345,17 @@ export const CONFIG = {
     chance: 0.01, // per crit whose special-crit gateway hit
     streamMs: 1_800, // the lights rising into the bar
     holdMs: 900, // after the promotion lands, before the screen unfreezes
+  },
+
+  // src/floors/alchemyEvent — the rare "Alchemy" event: the button pours coins
+  // into a cauldron that bubbles up and shoots lights into the lowest-tier
+  // worker on the floor: it climbs one perma tier and the floor pays out
+  alchemyEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    brewMs: 1_400, // coins pouring in, the brew bubbling up
+    shootMs: 800, // the lights shooting into the worker
+    holdMs: 800, // after the worker lands, before the screen unfreezes
+    payouts: 2, // the floor's payouts paid with the promotion
   },
 
   // src/floors/wispEvent — the rare "Wisp" event: a playful glimmer orb flits

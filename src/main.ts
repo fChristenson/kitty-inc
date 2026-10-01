@@ -76,6 +76,7 @@ import {
   forcePolishEvent,
   forceRecruitEvent,
   forcePromotionDayEvent,
+  forceAlchemyEvent,
   forceWispEvent,
   forceStreamEvent,
   forceTrailsEvent,
@@ -171,6 +172,7 @@ import {
   wirePolishEventTestButton,
   wireRecruitEventTestButton,
   wirePromotionDayEventTestButton,
+  wireAlchemyEventTestButton,
   wireWispEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
@@ -777,6 +779,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forcePromotionDayEvent(floor);
+    });
+    // same, for the Alchemy event
+    wireAlchemyEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceAlchemyEvent(floor);
     });
     // same, for the Wisp event
     wireWispEventTestButton(app, () => {
