@@ -16,10 +16,7 @@ import {
   nextCritTier,
   pickCritTierByOdds,
 } from "../../shared/critTypes";
-import {
-  SLAM_LAND_MS,
-  triggerEventEndSlam,
-} from "../../shared/eventEndSlam";
+import { SLAM_LAND_MS, triggerEventEndSlam } from "../../shared/eventEndSlam";
 import { drawExplosion, drawWhiteBurst } from "../../shared/eventFx";
 import { drawWisp, WISP_SIZE, type Point } from "../../shared/wisp";
 import {
@@ -219,8 +216,7 @@ function planPummel(box: {
 function wander(striker: Striker, ms: number): Point {
   const { phase } = striker;
   return {
-    x:
-      Math.sin(ms / 170 + phase) * WANDER + Math.sin(ms / 37 + phase) * BUZZ,
+    x: Math.sin(ms / 170 + phase) * WANDER + Math.sin(ms / 37 + phase) * BUZZ,
     y:
       Math.cos(ms / 130 + phase * 1.7) * WANDER +
       Math.cos(ms / 29 + phase * 2) * BUZZ,
