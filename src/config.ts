@@ -261,7 +261,7 @@ export const CONFIG = {
   constellationEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
     appearMs: 500, // the stars twinkling up over the workers
-    linkMs: 1_000, // the light drawing the whole star
+    linkMs: 800, // the light drawing the whole star
     flareGapMs: 220, // between one star flaring and the next
     maxStars: 7, // at least 3 promotable workers in view are needed
   },
