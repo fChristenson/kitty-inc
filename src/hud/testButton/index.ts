@@ -501,6 +501,14 @@ export function wireChainReactionEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireSlashEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-slash-event")!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,

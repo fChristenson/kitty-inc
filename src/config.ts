@@ -252,6 +252,17 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
+  // across the screen, smoulder, then burst open blasting coins into the total
+  slashEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    slashMs: 110, // each cut streaking across
+    gapMs: 170, // between cuts
+    smoulderMs: 300, // the cuts glowing ever brighter before they burst
+    holdMs: 500, // the coins hanging after the burst
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
