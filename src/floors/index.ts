@@ -351,6 +351,7 @@ export { forceConstellationEvent } from "./constellationEvent";
 export { forceAscendEvent } from "./ascendEvent";
 export { forceBlessingEvent } from "./blessingEvent";
 export { forceHaloEvent } from "./haloEvent";
+export { forceCometEvent } from "./cometEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";

@@ -292,6 +292,15 @@ export const CONFIG = {
     holdMs: 900, // the halo glowing before the screen unfreezes
   },
 
+  // src/floors/cometEvent — the rare "Comet" event: a big light streaks
+  // diagonally down into a worker and explodes, each worker in the blast
+  // climbing one perma tier
+  cometEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streakMs: 500, // the comet coming down from above the screen into its worker
+    holdMs: 900, // the explosion, before the screen unfreezes
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

@@ -70,6 +70,7 @@ import {
   forceAscendEvent,
   forceBlessingEvent,
   forceHaloEvent,
+  forceCometEvent,
   forceStreamEvent,
   forceTrailsEvent,
   forceDrawEvent,
@@ -158,6 +159,7 @@ import {
   wireAscendEventTestButton,
   wireBlessingEventTestButton,
   wireHaloEventTestButton,
+  wireCometEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,
@@ -721,6 +723,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceHaloEvent(floor);
+    });
+    // same, for the Comet event
+    wireCometEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceCometEvent(floor);
     });
     // same, for the Stream event
     wireStreamEventTestButton(app, () => {
