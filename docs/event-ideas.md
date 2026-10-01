@@ -65,10 +65,9 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 ### Coins (free money)
 
 - [x] **Ripple**: coins burst out of the button in round ripples like a stone dropped in a pond (a wide band, a thin ring or two close behind, then the next wide band), each rolling outward at its own pace while the frozen screen under it refracts like water; then the coins sweep into the total. Pays floor income × floor number once per ring.
-- [ ] **Dominoes**: a row of giant coins stands on edge along the floor; the first tips over and they fall one into the next, each flipping up into the total as it lands. Pays the floor's payout per coin.
+- [x] **Orbital Strike**: a spinning targeting reticle closes in on the clicked floor's income bar and locks on, a thin laser flickers down to it, then a blazing beam of light slams down from the sky in a huge blast and shake: the bar jumps one crit tier.
 
 ### Wisp (upgrades)
 
 - [x] **Wrecking Ball**: the wisp drops like a heavy ball from above the screen onto the clicked floor's income bar and bounces on it, each bounce lower as it drifts across until it rests on it; then it charges up, trembling and swelling, leaps high and slams down onto the bar, vanishing in a huge blast and shake. Every touch lands free upgrade levels, with a flash, sparks, shake and bar jolt as strong as its impact, so the last little bounces are minor.
-- [ ] **Lasso**: the wisp circles the clicked floor in a wide loop trailing a glowing rope, tightening it round all its workers until it cinches; the floor's income bar climbs one crit tier.
 - [ ] **Jump Rope**: two wisps hold a glowing thread between them and twirl it like a jump rope as they walk it across the floor; each worker it reaches jumps over it and climbs one perma tier.

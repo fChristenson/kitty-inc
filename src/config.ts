@@ -188,6 +188,17 @@ export const CONFIG = {
     minLevels: 10,
   },
 
+  // src/floors/orbitalStrikeEvent — the rare "Orbital Strike" event: a
+  // reticle locks onto the clicked floor's income bar and a beam of light
+  // slams down onto it from the sky, blasting it up a crit tier
+  orbitalStrikeEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    lockMs: 520, // the reticle closing in and locking on
+    aimMs: 220, // the thin targeting laser flickering
+    beamMs: 260, // the beam blazing after it strikes
+    holdMs: 650, // after the strike, before the screen unfreezes
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
