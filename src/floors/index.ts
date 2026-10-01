@@ -338,6 +338,7 @@ export { forceKickbackEvent } from "./kickbackEvent";
 export { forceBurstEvent } from "./burstEvent";
 export { forceSprayEvent } from "./sprayEvent";
 export { forceFountainEvent } from "./fountainEvent";
+export { forceVortexEvent } from "./vortexEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";

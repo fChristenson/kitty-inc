@@ -159,6 +159,14 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
+  // coins pour in from every screen edge and swirl into the total
+  vortexEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    streamMs: 900, // how long coins keep pouring in
+    travelMs: 1_100, // each coin's swirl into the eye
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

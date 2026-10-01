@@ -92,6 +92,15 @@ export function wireFountainEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireVortexEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-vortex-event")!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireStreamEventTestButton(
   container: HTMLElement,
   onClick: () => void,
