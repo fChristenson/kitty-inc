@@ -438,6 +438,16 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/hammerThrowEvent — the rare "Hammer Throw" event: the wisp
+  // whirls round the clicked floor's button, then is flung into the screen's
+  // edge, bursting coins back across the screen into the total
+  hammerThrowEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    whirlMs: 1_100, // whirling ever faster before it's let go
+    holdMs: 450, // the coins hanging after it hits
+    mergeMs: 500,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

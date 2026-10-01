@@ -629,6 +629,15 @@ export function wirePlinkoEventTestButton(
     container.querySelector<HTMLButtonElement>("#test-plinko-event")!;
   button.addEventListener("click", onClick);
 }
+export function wireHammerThrowEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-hammer-throw-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,

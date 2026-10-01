@@ -19,6 +19,7 @@ import {
   unfreezeScreen,
   type FloorRectResolver,
   type FrameRippler,
+  type FrameMotion,
 } from "../../shared/screenFreeze";
 import { addTotalIncome } from "../../totalIncome";
 import {
@@ -99,6 +100,8 @@ export interface MoneyCoverOptions {
   ) => void;
   // water rippling across the frozen frame
   frameRipple?: FrameRippler;
+  // the frozen frame slid and zoomed
+  frameMotion?: () => FrameMotion;
   // right as the screen unfreezes
   onEnd?: () => void;
 }
@@ -188,6 +191,7 @@ export function startMoneyCover(
     drawExtra,
     drawOver,
     frameRipple,
+    frameMotion,
     onEnd,
   }: MoneyCoverOptions,
 ): MoneyCover | null {
@@ -202,7 +206,7 @@ export function startMoneyCover(
       drawOverlay(ctx, getFloorRect, totalTarget);
       drawOver?.(ctx, getFloorRect, totalTarget);
     },
-    { spotlightTotal: true, frameRipple },
+    { spotlightTotal: true, frameRipple, frameMotion },
   );
 
   let flew = false;

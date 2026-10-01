@@ -96,6 +96,7 @@ export {
   wireSonicBoomEventTestButton,
   wireMitosisEventTestButton,
   wirePlinkoEventTestButton,
+  wireHammerThrowEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
