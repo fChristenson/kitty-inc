@@ -215,6 +215,16 @@ export const CONFIG = {
     matchBonus: 3, // the sum's multiplier when all three reels match
   },
 
+  // src/floors/chainPayEvent — the rare "Chain Pay" event: a coin stream hops
+  // from the button through on-screen workers into the total; the n-th worker
+  // reached pays the floor's payout n times over
+  chainPayEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    hopMs: 450, // each hop from one stop to the next
+    payoutMs: 700, // the last worker firing it all into the total
+    maxWorkers: 8,
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

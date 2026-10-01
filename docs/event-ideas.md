@@ -12,7 +12,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Payday**: every on-screen worker sends a short coin stream back to the button, which then fires one big stream into the total. Pays the floor's payout once per worker.
 - [x] **Piggy Bank**: coins stream into a piggy that swells and wiggles, then bursts into a coin shower into the total. Pays a lump sum.
 - [x] **Jackpot Reels**: coins stream into three slot reels, each stopping on ×1/×2/×5 with a slam. Pays the sum, tripled when all three match.
-- [ ] **Chain Pay**: coins hop worker → worker along the floor, each hop sparking a mini burst, ending in the total. Pays per worker reached.
+- [x] **Chain Pay**: coins hop button → nearest worker → next nearest (up to 8), each worker slamming as it's paid, the last firing into the total. The n-th worker reached pays n payouts.
 - [ ] **Rain Check**: coins fall from the top like rain and pool on the floor, which then drains into the total. Pays income over time, all at once.
 - [ ] **Magnet**: a big magnet pulls every coin on screen in, then flings them into the total. Pays income × floors on screen.
 - [ ] **Overflow**: the income bar fills with coins until it spills over, and the overflow streams into the total. Fills the bar instantly plus a bonus.

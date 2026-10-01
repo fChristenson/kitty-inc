@@ -6,7 +6,6 @@
 import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
-import { isFloorLocked } from "../../shared/detachedJob";
 import { playBoostEventStream, playSold } from "../../sound";
 import {
   addTargetStream,
@@ -42,28 +41,20 @@ import {
 import {
   endEventProc,
   forceClaimEventProc,
-  isVisibleOnFloor,
   registerEventProc,
   type EventProcContext,
-  type OnScreenFloors,
 } from "../eventProcs";
 import {
   clearWorkerSpotlight,
   drawWorkerSpotlight,
-  getRenderedWorkerCount,
-  getWorkerCenter,
   setWorkerSpotlights,
 } from "../worker";
+import {
+  findOnScreenWorkers as findWorkers,
+  type OnScreenWorker as Worker,
+} from "../onScreenWorkers";
 
 const KEY = "payday";
-
-interface Worker {
-  floor: Floor;
-  // its floor's top, in the same space as the clicked floor's
-  top: number;
-  workerIndex: number;
-  center: { x: number; y: number };
-}
 
 interface RunningPayday {
   floor: Floor;
@@ -75,31 +66,6 @@ interface RunningPayday {
 }
 
 let running: RunningPayday | null = null;
-
-// every worker and manager in view on an open floor, while floor itself is in
-// view too; null when it isn't
-function findWorkers(
-  floor: Floor,
-  getOnScreenFloors: OnScreenFloors | undefined,
-): Worker[] | null {
-  const onScreen = getOnScreenFloors?.();
-  if (!onScreen?.some((entry) => entry.floor === floor)) return null;
-  const workers: Worker[] = [];
-  for (const entry of onScreen) {
-    if (!entry.floor.unlocked || isFloorLocked(entry.floor)) continue;
-    for (let i = 0; i < getRenderedWorkerCount(entry.floor); i++) {
-      const center = getWorkerCenter(entry.floor, i);
-      if (center && isVisibleOnFloor(entry, center.y))
-        workers.push({
-          floor: entry.floor,
-          top: entry.top,
-          workerIndex: i,
-          center,
-        });
-    }
-  }
-  return workers;
-}
 
 registerEventProc(
   {
