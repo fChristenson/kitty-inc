@@ -266,6 +266,14 @@ export const CONFIG = {
     maxStars: 7, // at least 3 promotable workers in view are needed
   },
 
+  // src/floors/ascendEvent — the rare "Ascend" event: a glimmer orb zigzags up
+  // the building touching each income bar in view, +1 perma tier each
+  ascendEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    hopMs: 450, // each hop from one bar to the next
+    maxFloors: 6, // the most bars it touches
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs

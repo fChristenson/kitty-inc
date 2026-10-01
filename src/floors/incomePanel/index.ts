@@ -82,9 +82,12 @@ export function getIncomeBarCenter(isGroundFloor: boolean): {
 }
 
 // an event overlay draws this floor's bar itself (drawIncomePanel's eventFlash)
-let hiddenFloor: Floor | null = null;
+let hiddenFloors: ReadonlySet<Floor> = new Set();
 export function setIncomePanelHidden(floor: Floor | null): void {
-  hiddenFloor = floor;
+  setIncomePanelsHidden(floor ? [floor] : []);
+}
+export function setIncomePanelsHidden(floors: Floor[]): void {
+  hiddenFloors = new Set(floors);
 }
 
 // Hit testing for the active overtime bar's two-tap cancellation control.
@@ -620,7 +623,7 @@ export function drawIncomePanel(
   // optionally filled to `fill` (0..1) instead of the live cycle
   eventFlash?: { whiteAlpha: number; rotation: number; fill?: number },
 ): void {
-  if (floor === hiddenFloor && !eventFlash) return;
+  if (hiddenFloors.has(floor) && !eventFlash) return;
   const x = PANEL_X;
   const y = getPanelY(isGroundFloor);
 

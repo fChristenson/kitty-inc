@@ -348,6 +348,7 @@ export { forceDownpourEvent } from "./downpourEvent";
 export { forceMagnetEvent } from "./magnetEvent";
 export { forceSpilloverEvent } from "./spilloverEvent";
 export { forceConstellationEvent } from "./constellationEvent";
+export { forceAscendEvent } from "./ascendEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";
