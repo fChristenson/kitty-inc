@@ -350,6 +350,7 @@ export { forceRocketEvent } from "./rocketEvent";
 export { forceRevealEvent } from "./revealEvent";
 export { forceJackpotReelsEvent } from "./jackpotReelsEvent";
 export { forceChainPayEvent } from "./chainPayEvent";
+export { forceTwisterEvent } from "./twisterEvent";
 export { forceDownpourEvent } from "./downpourEvent";
 export { forceTrickleEvent } from "./trickleEvent";
 export { forceMagnetEvent } from "./magnetEvent";

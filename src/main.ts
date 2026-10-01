@@ -69,6 +69,7 @@ import {
   forceRevealEvent,
   forceJackpotReelsEvent,
   forceChainPayEvent,
+  forceTwisterEvent,
   forceDownpourEvent,
   forceTrickleEvent,
   forceMagnetEvent,
@@ -176,6 +177,7 @@ import {
   wireRevealEventTestButton,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
+  wireTwisterEventTestButton,
   wireDownpourEventTestButton,
   wireTrickleEventTestButton,
   wireMagnetEventTestButton,
@@ -752,6 +754,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceChainPayEvent(floor);
+    });
+    // same, for the Twister event
+    wireTwisterEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceTwisterEvent(floor);
     });
     // same, for the Downpour event
     wireDownpourEventTestButton(app, () => {
