@@ -431,6 +431,15 @@ export function getWorkerPermaTier(
     : getSlotPermaTier(floor, workerIndex);
 }
 
+// every figure on the floor, manager included, has a perma tier
+export function hasOnlyPermaWorkers(floor: Floor): boolean {
+  const count = getRenderedWorkerCount(floor);
+  for (let i = 0; i < count; i++) {
+    if (!getWorkerPermaTier(floor, i)) return false;
+  }
+  return count > 0;
+}
+
 // one crit tier up per event win, capped at the strongest tier
 export function promoteWorkerPermaTier(
   floor: Floor,

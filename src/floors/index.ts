@@ -367,6 +367,7 @@ export {
   WORKER_FEET_Y_NUDGE_PX,
 } from "./worker";
 export { drawUpgradeStar, getUpgradeIndicatorCenter } from "./star";
+export { drawDiscoFloor } from "./disco";
 export {
   drawUpgradeArrow,
   hitTestUpgradeArrow,

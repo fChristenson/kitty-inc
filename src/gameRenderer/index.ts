@@ -1,5 +1,6 @@
 import {
   drawFloor,
+  drawDiscoFloor,
   drawWorker,
   getBoostedWorkerCenters,
   tickWorkerOffscreen,
@@ -65,6 +66,7 @@ export function drawFloorContent(
   const now = Date.now();
   const isGroundFloor = floorNumber === 1;
   drawFloor(ctx, backgrounds[floor.bgIndex] ?? backgrounds[0], floor);
+  drawDiscoFloor(ctx, floor, now);
   drawOuterWall(ctx);
   drawWorker(ctx, floor, now);
   drawMouse(ctx, floor, now);
