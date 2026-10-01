@@ -353,6 +353,33 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/slamDunkEvent — the rare "Slam Dunk" event: the wisp dribbles
+  // across the clicked floor, leaps and dunks into the total readout, which
+  // explodes in coins that merge back into it
+  slamDunkEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    // the drop in, then each dribble, quicker and quicker
+    bounceMs: [200, 190, 160, 135, 115],
+    riseMs: 320, // leaping up over the total
+    dunkMs: 110, // slamming down into it
+    holdMs: 450, // the coins hanging after the dunk
+    mergeMs: 500,
+  },
+
+  // src/floors/uppercutEvent — the rare "Uppercut" event: the wisp
+  // uppercuts the clicked floor's income bar into the air; it flips and
+  // crashes back down with free upgrade levels
+  uppercutEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    swoopMs: 300, // swooping in under the bar
+    riseMs: 360, // the bar flying up, flipping
+    hangMs: 110, // hanging at the top
+    fallMs: 170, // crashing back down
+    holdMs: 600, // after it lands, before the screen unfreezes
+    levelShare: 0.1, // free levels, of the floor's current level
+    minLevels: 10,
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

@@ -567,6 +567,24 @@ export function wirePingPongEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireSlamDunkEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-slam-dunk-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+export function wireUppercutEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-uppercut-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,

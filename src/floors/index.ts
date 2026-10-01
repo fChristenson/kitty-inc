@@ -355,6 +355,8 @@ export { forcePressEvent } from "./pressEvent";
 export { forceDrillEvent } from "./drillEvent";
 export { forceBurrowEvent } from "./burrowEvent";
 export { forcePingPongEvent } from "./pingPongEvent";
+export { forceSlamDunkEvent } from "./slamDunkEvent";
+export { forceUppercutEvent } from "./uppercutEvent";
 export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forceWaterfallEvent } from "./waterfallEvent";

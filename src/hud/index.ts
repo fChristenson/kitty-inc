@@ -89,6 +89,8 @@ export {
   wireDrillEventTestButton,
   wireBurrowEventTestButton,
   wirePingPongEventTestButton,
+  wireSlamDunkEventTestButton,
+  wireUppercutEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
