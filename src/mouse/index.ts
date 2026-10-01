@@ -366,6 +366,7 @@ export function handleMouseClick(
       origin.x + offsetX,
       origin.y + offsetY,
       arrival,
+      false,
     ),
   );
 }

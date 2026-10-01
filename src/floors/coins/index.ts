@@ -74,6 +74,8 @@ interface HomingGroup extends HomingBurstOptions {
   // freeze bursts only: the first coin leaving its frozen spot for the target
   onFirstFlight?: () => void;
   flew?: boolean;
+  // freeze bursts only: false skips the glints while they hang
+  glint?: boolean;
   // spray coins only: performance.now() they all leave their frozen spots
   releaseAt?: number;
   // spray coins only: they stop spinning face-on as they land
@@ -203,6 +205,7 @@ function drawHangGlint(
   radius: number,
 ): void {
   if (homing.holdTicks === undefined || homing.burstLife === Infinity) return;
+  if (homing.group.glint === false) return;
   const left = homing.burstLife - p.life;
   if (left <= 0) return;
   // axisAngle is random per coin, so it picks which coins glint and when
@@ -326,8 +329,9 @@ export function spawnFreezeCoinBurst(
   arrival: Pick<HomingBurstOptions, "onFirstArrive" | "onEachArrive"> & {
     onFirstFlight?: () => void;
   },
+  glint = true,
 ): void {
-  spawnBurstParticles(floor, x, y, 1, { ...arrival, fired: false });
+  spawnBurstParticles(floor, x, y, 1, { ...arrival, fired: false, glint });
   pool.ensureTicking((dt) => pool.update(dt, advanceCoin));
 }
 
