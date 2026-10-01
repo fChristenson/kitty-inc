@@ -218,6 +218,20 @@ export function removeWorkerSlots(floor: Floor, workerIndexes: number[]): void {
   }
 }
 
+// a fresh slot and this tint pick at a new worker index, shifting every later
+// worker (and the manager's trailing slot) up one
+export function insertWorkerSlot(
+  floor: Floor,
+  index: number,
+  tintIndex: number,
+): void {
+  const slots = getWorkerSlots(floor);
+  if (index < slots.length)
+    slots.splice(index, 0, { boosted: false, boostedAt: -Infinity });
+  const tints = getWorkerTintIndexes(floor);
+  tints.splice(Math.min(index, tints.length), 0, tintIndex);
+}
+
 // how many of a floor's workers are currently boosted; incomePanel.ts uses this to
 // scale the income rate delay down per boosted worker
 export function countBoostedWorkers(floor: Floor, now: number): number {

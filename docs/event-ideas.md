@@ -27,7 +27,7 @@ Every effect is instant and positive. Build on `src/shared/eventStream` (target 
 - [x] **Mentor**: the top-tier worker sends a light stream into the lowest-tier one. The lowest catches up by two tiers.
 - [x] **Spark Chain**: a light jumps worker to worker like lightning, faster each jump. +1 tier per jump, stopping at the first maxed worker.
 - [x] **Polish**: lights swirl around the upgrade button and buff it until it shines. Free upgrade levels.
-- [ ] **Recruit**: lights stream to an empty spot and form a new worker. A free hire.
+- [x] **Recruit**: lights stream to an empty spot and form a new worker. A free hire.
 - [ ] **Promotion Day**: lights rise from every worker into the floor's tier badge. Floor tier +1.
 
 ## Combos (both)

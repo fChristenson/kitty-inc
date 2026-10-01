@@ -14,6 +14,7 @@ import {
   getSlotPermaTier,
   setSlotPermaTier,
   removeWorkerSlots,
+  insertWorkerSlot,
   type Floor,
 } from "../../gameState";
 import {
@@ -418,6 +419,60 @@ export function getRenderedWorkerCount(floor: Floor): number {
 
 function managerIndexOf(floor: Floor): number {
   return floor.hasManager ? getRenderedWorkerCount(floor) - 1 : -1;
+}
+
+function regularWorkerCount(floor: Floor): number {
+  return getRenderedWorkerCount(floor) - (floor.hasManager ? 1 : 0);
+}
+
+const RECRUIT_SPOT_SAMPLES = 24;
+
+// where a free hire would stand (floor-local center): the walkable spot
+// farthest from every walker there, or null once its workers are maxed
+export function findRecruitSpot(floor: Floor): { x: number; y: number } | null {
+  if (regularWorkerCount(floor) >= MAX_RENDERED_WORKERS) return null;
+  const walkers = floorWorkers.get(floor)?.walkers ?? [];
+  let bestX = (FLOOR_X_MIN + FLOOR_X_MAX) / 2;
+  let bestGap = -1;
+  for (let i = 0; i <= RECRUIT_SPOT_SAMPLES; i++) {
+    const x =
+      FLOOR_X_MIN + ((FLOOR_X_MAX - FLOOR_X_MIN) * i) / RECRUIT_SPOT_SAMPLES;
+    const gap = Math.min(...walkers.map((w) => Math.abs(w.x - x)));
+    if (gap > bestGap) {
+      bestGap = gap;
+      bestX = x;
+    }
+  }
+  return { x: bestX, y: WORKER_FEET_Y - RENDER_H / 2 };
+}
+
+// a free hire standing at x facing the camera; it joins ahead of the manager,
+// so the manager keeps its own walker, slot and color. Returns its index
+export function recruitWorker(
+  floor: Floor,
+  x: number,
+  now: number,
+): number | null {
+  const index = regularWorkerCount(floor);
+  if (index >= MAX_RENDERED_WORKERS) return null;
+  const state = getFloorWorkers(floor, now);
+  insertWorkerSlot(floor, index, pickTintIndex(getWorkerTintIndexes(floor)));
+  floor.workerCount = index + 1;
+  const walker: WalkerState = {
+    ...makeWalker(index, index + 1, now),
+    x,
+    behavior: "paused",
+    behaviorUntil: now + randomInt(...PAUSE_MS_RANGE),
+  };
+  walker.pose = {
+    groundY: WORKER_FEET_Y,
+    direction: walker.direction,
+    frame: TURN_FRAMES[0],
+    stretchX: 1,
+    stretchY: 1,
+  };
+  state.walkers.splice(index, 0, walker);
+  return index;
 }
 
 // a worker's "Boost" event tier (see floors/boostEvent): the manager's lives on
