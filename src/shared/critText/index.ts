@@ -55,3 +55,26 @@ export function drawCritText(
     strokeWidth,
   );
 }
+
+const POP_MS = 300;
+const POP_SCALE = 0.4;
+
+// an event's reward label landing at (x, y): it pops in big at poppedAt
+// (performance.now()) and settles
+export function drawPoppingCritText(
+  ctx: CanvasRenderingContext2D,
+  label: string,
+  x: number,
+  y: number,
+  color: string,
+  poppedAt: number,
+  now: number,
+  style: CritTextStyle,
+): void {
+  const pop = 1 + POP_SCALE * Math.max(0, 1 - (now - poppedAt) / POP_MS);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(pop, pop);
+  drawCritText(ctx, label, 0, 0, color, style);
+  ctx.restore();
+}

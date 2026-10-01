@@ -13,7 +13,7 @@ import {
   nextCritTier,
   pickCritTierByOdds,
 } from "../../shared/critTypes";
-import { drawCritText } from "../../shared/critText";
+import { drawPoppingCritText } from "../../shared/critText";
 import { createEventFx, type EventFx } from "../../shared/eventFx";
 import { triggerEventEndSlam } from "../../shared/eventEndSlam";
 import { drawEventStreams, streamGlimmers } from "../../shared/eventStream";
@@ -49,7 +49,6 @@ import {
 const KEY = "promotionDay";
 const WORKER_GLOW = WORKER_HEIGHT * 0.5;
 const LABEL_FONT = 64;
-const LABEL_POP_MS = 300;
 const LABEL_RISE = 70;
 
 interface RunningPromotion {
@@ -131,20 +130,17 @@ function drawOverlay(
       }),
     );
     const tier = event.floor.critMultiplierTier;
-    if (event.promotedAt !== null && tier) {
-      const pop =
-        1 + 0.4 * Math.max(0, 1 - (now - event.promotedAt) / LABEL_POP_MS);
-      ctx.translate(x, y - LABEL_RISE);
-      ctx.scale(pop, pop);
-      drawCritText(
+    if (event.promotedAt !== null && tier)
+      drawPoppingCritText(
         ctx,
         CRIT_TIER_CONFIG[tier].label,
-        0,
-        0,
+        x,
+        y - LABEL_RISE,
         CRIT_TIER_CONFIG[tier].color,
+        event.promotedAt,
+        now,
         { fontSize: LABEL_FONT, strokeWidth: 8 },
       );
-    }
     ctx.restore();
   }
   drawEventStreams(ctx, getFloorRect);

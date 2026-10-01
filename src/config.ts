@@ -358,6 +358,17 @@ export const CONFIG = {
     payouts: 2, // the floor's payouts paid with the promotion
   },
 
+  // src/floors/investmentEvent — the rare "Investment" event: the button pours
+  // coins into the income bar until it slams full and pays out, then lights
+  // burst out of the bar into the button and the floor climbs one crit tier
+  investmentEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    fillMs: 1_000, // the coins filling the bar
+    liftMs: 900, // the lights bursting from the bar into the button
+    holdMs: 900, // after the promotion lands, before the screen unfreezes
+    payouts: 3, // the full bar's payout times this, paid as it slams
+  },
+
   // src/floors/wispEvent — the rare "Wisp" event: a playful glimmer orb flits
   // between targets in view sprinkling glitter: a worker climbs one perma
   // tier, an income bar one crit tier, a "Lvl N" label gains free levels

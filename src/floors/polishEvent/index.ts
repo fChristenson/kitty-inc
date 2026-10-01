@@ -8,7 +8,7 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { playSwoosh, startBoostEventStreamLoop } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
-import { drawCritText } from "../../shared/critText";
+import { drawPoppingCritText } from "../../shared/critText";
 import {
   drawShineSweep,
   SLAM_LAND_MS,
@@ -80,7 +80,6 @@ const SWEEPS = Array.from({ length: SWEEP_COUNT }, (_, k) => {
 const WHITE_MAX = 0.35;
 const GLOW = BAR_H * 2.2;
 const LABEL_FONT = 56;
-const LABEL_POP_MS = 300;
 
 interface RunningPolish {
   floor: Floor;
@@ -209,16 +208,17 @@ function drawOverlay(
     );
   }
 
-  if (event.shinedAt !== null) {
-    const pop =
-      1 + 0.4 * Math.max(0, 1 - (now - event.shinedAt) / LABEL_POP_MS);
-    ctx.translate(cx, box.y - LABEL_FONT * 0.6);
-    ctx.scale(pop, pop);
-    drawCritText(ctx, `+${event.levels} Lvl`, 0, 0, COLOR.heavenlyGold, {
-      fontSize: LABEL_FONT,
-      strokeWidth: 8,
-    });
-  }
+  if (event.shinedAt !== null)
+    drawPoppingCritText(
+      ctx,
+      `+${event.levels} Lvl`,
+      cx,
+      box.y - LABEL_FONT * 0.6,
+      COLOR.heavenlyGold,
+      event.shinedAt,
+      now,
+      { fontSize: LABEL_FONT, strokeWidth: 8 },
+    );
   ctx.restore();
 }
 
