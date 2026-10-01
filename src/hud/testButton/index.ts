@@ -508,6 +508,15 @@ export function wireJackhammerEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wirePummelEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-pummel-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireChainPayEventTestButton(
   container: HTMLElement,
   onClick: () => void,

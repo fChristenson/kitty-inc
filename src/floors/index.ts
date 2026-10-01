@@ -348,6 +348,7 @@ export { forceThunderclapEvent } from "./thunderclapEvent";
 export { forceChainReactionEvent } from "./chainReactionEvent";
 export { forceSlashEvent } from "./slashEvent";
 export { forceJackhammerEvent } from "./jackhammerEvent";
+export { forcePummelEvent } from "./pummelEvent";
 export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
 export { forceWaterfallEvent } from "./waterfallEvent";

@@ -273,6 +273,16 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/pummelEvent — the rare "Pummel" event: a swarm of wisps
+  // slams into the clicked floor's income bar from every side, then it slams
+  // in an explosion and jumps one crit tier
+  pummelEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    strikeMs: 140, // each wisp's wind-up and dash into the bar
+    bounceMs: 150, // bouncing back off it to its spot
+    holdMs: 450, // after the finale lands, before the screen unfreezes
+  },
+
   // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {

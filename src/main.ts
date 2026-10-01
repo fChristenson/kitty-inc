@@ -67,6 +67,7 @@ import {
   forceChainReactionEvent,
   forceSlashEvent,
   forceJackhammerEvent,
+  forcePummelEvent,
   forceVortexEvent,
   forceRicochetEvent,
   forceWaterfallEvent,
@@ -191,6 +192,7 @@ import {
   wireChainReactionEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
+  wirePummelEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
   wireWaterfallEventTestButton,
@@ -772,6 +774,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceJackhammerEvent(floor);
+    });
+    // same, for the Pummel event
+    wirePummelEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forcePummelEvent(floor);
     });
     // same, for the Vortex event
     wireVortexEventTestButton(app, () => {
