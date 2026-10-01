@@ -103,7 +103,10 @@ function drawOverlay(
     const now = performance.now();
     const rising =
       event.promotedAt === null
-        ? Math.min(1, (now - event.startedAt) / CONFIG.promotionDayEvent.streamMs)
+        ? Math.min(
+            1,
+            (now - event.startedAt) / CONFIG.promotionDayEvent.streamMs,
+          )
         : 0;
     ctx.save();
     ctx.translate(rect.left, rect.top);
