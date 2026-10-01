@@ -340,6 +340,7 @@ export { forceSprayEvent } from "./sprayEvent";
 export { forceFountainEvent } from "./fountainEvent";
 export { forceVortexEvent } from "./vortexEvent";
 export { forceRicochetEvent } from "./ricochetEvent";
+export { forcePaydayEvent } from "./paydayEvent";
 export { forceStreamEvent } from "./streamEvent";
 export { forceTrailsEvent } from "./trailsEvent";
 export { forceDrawEvent } from "./drawEvent";

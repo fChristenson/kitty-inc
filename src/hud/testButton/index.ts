@@ -111,6 +111,15 @@ export function wireRicochetEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wirePaydayEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-payday-event")!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireStreamEventTestButton(
   container: HTMLElement,
   onClick: () => void,

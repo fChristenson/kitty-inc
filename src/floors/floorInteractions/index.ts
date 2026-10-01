@@ -85,9 +85,10 @@ import {
 import { startBoostEvent, type OnScreenFloors } from "../boostEvent";
 import { startUnionEvent } from "../unionEvent";
 import { startHuntEvent } from "../huntEvent";
-// registers the Swarm, Kickback, Burst, Spray, Fountain, Vortex, Ricochet, Stream, Trails, Draw, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
+// registers the Swarm, Kickback, Payday, Burst, Spray, Fountain, Vortex, Ricochet, Stream, Trails, Draw, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
 import "../swarmEvent";
 import "../kickbackEvent";
+import "../paydayEvent";
 import "../burstEvent";
 import "../sprayEvent";
 import "../fountainEvent";

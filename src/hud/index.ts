@@ -74,6 +74,7 @@ export {
   wireFountainEventTestButton,
   wireVortexEventTestButton,
   wireRicochetEventTestButton,
+  wirePaydayEventTestButton,
   wireStreamEventTestButton,
   wireTrailsEventTestButton,
   wireDrawEventTestButton,

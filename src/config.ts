@@ -175,6 +175,16 @@ export const CONFIG = {
     travelMs: 500, // each coin's trip, bounces and all
   },
 
+  // src/floors/paydayEvent — the rare "Payday" event: every on-screen worker
+  // streams coins into the clicked floor's button, which fires them into the
+  // total, paying the floor's payout once per worker
+  paydayEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    gatherMs: 700, // the workers paying into the button
+    payoutMs: 700, // the button firing it all into the total
+    maxWorkers: 12,
+  },
+
   // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs
@@ -189,7 +199,7 @@ export const CONFIG = {
     chance: 0.01, // per crit whose special-crit gateway hit
     spreadMs: 900, // from the first trail leaving the button to the last
     pourMs: 200, // how long the button pours each trail
-    travelMs: 700, // each coin's trip down its trail
+    travelMs: 400, // each coin's trip down its trail
   },
 
   // src/floors/drawEvent — the rare "Draw" event: like Spray, but the stream
