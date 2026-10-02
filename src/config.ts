@@ -561,6 +561,129 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // the wisp coin events on src/floors/wispCover, each with its chance per
+  // crit whose special-crit gateway hit, its timings, then holdMs (after the
+  // finale, before the coins sweep in) and mergeMs
+  // src/floors/kaleidoscopeEvent: six wisps bloom a flower, petal by petal
+  kaleidoscopeEvent: {
+    chance: 0.01,
+    petalMs: [360, 170] as [number, number], // each petal out and back
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/zipperEvent: zigzag stitches down, then unzip up into the total
+  zipperEvent: {
+    chance: 0.01,
+    stitchMs: [170, 70] as [number, number], // each stitch across
+    unzipMs: 380, // ripping back up into the total
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/screensaverEvent: DVD-screensaver bounces into a corner
+  screensaverEvent: {
+    chance: 0.01,
+    flightMs: 1_900, // from popping up to hitting the corner
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/sprinklerEvent: the button sprinkles drops that land as coins
+  sprinklerEvent: {
+    chance: 0.01,
+    sprayMs: 1_300, // sweeping, before the last whirl
+    emitMs: [80, 40] as [number, number], // between drops, quickening
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/clockworkEvent: a second hand ticks round twice to midnight
+  clockworkEvent: {
+    chance: 0.01,
+    tickMs: [160, 35] as [number, number], // between ticks, quickening
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/holeInOneEvent: chipped in, two bounces, round the rim, in
+  holeInOneEvent: {
+    chance: 0.01,
+    hopMs: [560, 320, 220], // the lob, then each bounce
+    rimMs: 420, // whirling round the rim and dropping in
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/leapfrogEvent: two wisps leapfrog across, then into the total
+  leapfrogEvent: {
+    chance: 0.01,
+    vaultMs: [300, 170] as [number, number], // each vault, quickening
+    finalMs: 320, // both leaping into the total
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/lineupEvent: scattered wisps line up, then fire into the total
+  lineupEvent: {
+    chance: 0.01,
+    alignMs: 320, // snapping into the row
+    trembleMs: 220, // the row trembling before it fires
+    fireMs: [140, 50] as [number, number], // between shots, quickening
+    flyMs: 150, // each wisp's flight into the total
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/stampedeEvent: a herd gallops across, then charges the total
+  stampedeEvent: {
+    chance: 0.01,
+    runMs: 900, // each wisp's gallop across
+    chargeMs: 320, // each wisp's charge up into the total
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/wormholeEvent: the wisp blinks from spot to spot, then the total
+  wormholeEvent: {
+    chance: 0.01,
+    jumpMs: [260, 120] as [number, number], // each dart before it blinks out
+    finalMs: 220, // shooting up into the total
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/splatEvent: the wisp hurtles at the screen and splats on it
+  splatEvent: {
+    chance: 0.01,
+    rushMs: [450, 280] as [number, number], // each bounce off and rush back in
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/rouletteEvent: the ball whips round a wheel of coin pockets
+  rouletteEvent: {
+    chance: 0.01,
+    spinMs: 850, // whipping round the rim
+    dropMs: 180, // dropping in toward the pockets
+    hopMs: 110, // each clatter pocket to pocket
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/freeKickEvent: two shots blocked by the wall, then the top corner
+  freeKickEvent: {
+    chance: 0.01,
+    kickMs: 300, // each shot up into the wall
+    reboundMs: 200, // bouncing back off the bottom
+    curlMs: 450, // the bending shot into the total
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/slalomEvent: the wisp carves round gates down to the button
+  slalomEvent: {
+    chance: 0.01,
+    gateMs: [320, 170] as [number, number], // each turn, quickening
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // src/floors/lightningEvent: bolts crack down onto the button
+  lightningEvent: {
+    chance: 0.01,
+    strikeMs: 110, // each bolt streaking down
+    gapMs: [380, 220] as [number, number], // between bolts, quickening
+    holdMs: 450,
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {

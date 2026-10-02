@@ -91,6 +91,21 @@ import {
   forceYoYoEvent,
   forceRacetrackEvent,
   forceSwingEvent,
+  forceKaleidoscopeEvent,
+  forceZipperEvent,
+  forceScreensaverEvent,
+  forceSprinklerEvent,
+  forceClockworkEvent,
+  forceHoleInOneEvent,
+  forceLeapfrogEvent,
+  forceLineupEvent,
+  forceStampedeEvent,
+  forceWormholeEvent,
+  forceSplatEvent,
+  forceRouletteEvent,
+  forceFreeKickEvent,
+  forceSlalomEvent,
+  forceLightningEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -262,6 +277,7 @@ import {
   wireYoYoEventTestButton,
   wireRacetrackEventTestButton,
   wireSwingEventTestButton,
+  wireEventTestButtons,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
@@ -1034,6 +1050,31 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceSwingEvent(floor);
+    });
+    // the rest of the event test buttons, each forcing its event on the
+    // active building's ground floor
+    const forceOnActive = (force: typeof forceSwingEvent) => () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      force(floor);
+    };
+    wireEventTestButtons(app, {
+      kaleidoscope: forceOnActive(forceKaleidoscopeEvent),
+      zipper: forceOnActive(forceZipperEvent),
+      screensaver: forceOnActive(forceScreensaverEvent),
+      sprinkler: forceOnActive(forceSprinklerEvent),
+      clockwork: forceOnActive(forceClockworkEvent),
+      "hole-in-one": forceOnActive(forceHoleInOneEvent),
+      leapfrog: forceOnActive(forceLeapfrogEvent),
+      lineup: forceOnActive(forceLineupEvent),
+      stampede: forceOnActive(forceStampedeEvent),
+      wormhole: forceOnActive(forceWormholeEvent),
+      splat: forceOnActive(forceSplatEvent),
+      roulette: forceOnActive(forceRouletteEvent),
+      "free-kick": forceOnActive(forceFreeKickEvent),
+      slalom: forceOnActive(forceSlalomEvent),
+      lightning: forceOnActive(forceLightningEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

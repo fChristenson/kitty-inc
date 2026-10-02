@@ -714,6 +714,16 @@ export function wireSwingEventTestButton(
     container.querySelector<HTMLButtonElement>("#test-swing-event")!;
   button.addEventListener("click", onClick);
 }
+// wires each "#test-<name>-event" button to its handler
+export function wireEventTestButtons(
+  container: HTMLElement,
+  handlers: Record<string, () => void>,
+): void {
+  for (const [name, onClick] of Object.entries(handlers))
+    container
+      .querySelector<HTMLButtonElement>(`#test-${name}-event`)!
+      .addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

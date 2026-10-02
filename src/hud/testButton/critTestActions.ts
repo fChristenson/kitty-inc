@@ -89,6 +89,21 @@ export function createTestButtonMarkup(): string {
           <button id="test-yo-yo-event" class="game__button">Yo-Yo</button>
           <button id="test-racetrack-event" class="game__button">Racetrack</button>
           <button id="test-swing-event" class="game__button">Swing</button>
+          <button id="test-kaleidoscope-event" class="game__button">Kaleidoscope</button>
+          <button id="test-zipper-event" class="game__button">Zipper</button>
+          <button id="test-screensaver-event" class="game__button">Screensaver</button>
+          <button id="test-sprinkler-event" class="game__button">Sprinkler</button>
+          <button id="test-clockwork-event" class="game__button">Clockwork</button>
+          <button id="test-hole-in-one-event" class="game__button">Hole in One</button>
+          <button id="test-leapfrog-event" class="game__button">Leapfrog</button>
+          <button id="test-lineup-event" class="game__button">Lineup</button>
+          <button id="test-stampede-event" class="game__button">Stampede</button>
+          <button id="test-wormhole-event" class="game__button">Wormhole</button>
+          <button id="test-splat-event" class="game__button">Splat</button>
+          <button id="test-roulette-event" class="game__button">Roulette</button>
+          <button id="test-free-kick-event" class="game__button">Free Kick</button>
+          <button id="test-slalom-event" class="game__button">Slalom</button>
+          <button id="test-lightning-event" class="game__button">Lightning</button>
           <button id="test-slash-event" class="game__button">Slash</button>
           <button id="test-jackhammer-event" class="game__button">Jackhammer</button>
           <button id="test-pummel-event" class="game__button">Pummel</button>

@@ -106,6 +106,7 @@ export {
   wireYoYoEventTestButton,
   wireRacetrackEventTestButton,
   wireSwingEventTestButton,
+  wireEventTestButtons,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
