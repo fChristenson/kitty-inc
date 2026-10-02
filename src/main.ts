@@ -240,6 +240,12 @@ import {
   forceMirrorBallEvent,
   forcePlasmaGlobeEvent,
   forceJellyEvent,
+  forceShockwaveEvent,
+  forcePassTheParcelEvent,
+  forceGardenHoseEvent,
+  forceBurningGlassEvent,
+  forceStormFrontEvent,
+  forceSlidePuzzleEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1346,6 +1352,12 @@ async function main() {
       "mirror-ball": forceOnActive(forceMirrorBallEvent),
       "plasma-globe": forceOnActive(forcePlasmaGlobeEvent),
       jelly: forceOnActive(forceJellyEvent),
+      shockwave: forceOnActive(forceShockwaveEvent),
+      "pass-the-parcel": forceOnActive(forcePassTheParcelEvent),
+      "garden-hose": forceOnActive(forceGardenHoseEvent),
+      "burning-glass": forceOnActive(forceBurningGlassEvent),
+      "storm-front": forceOnActive(forceStormFrontEvent),
+      "slide-puzzle": forceOnActive(forceSlidePuzzleEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

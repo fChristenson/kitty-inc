@@ -1856,6 +1856,61 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, levels + cash: src/floors/shockwaveEvent: rings of cash ripple out
+  // of the button over the bars
+  shockwaveEvent: {
+    chance: 0.01,
+    gapsMs: [380, 240] as [number, number], // between rings, quickening
+    expandMs: 650, // each ring racing out to the edges
+    flightMs: 450, // the cash surging back into the total
+    levelShare: 0.04, // of each bar's levels, per ring
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, worker tiers: src/floors/passTheParcelEvent: workers toss a wisp on
+  passTheParcelEvent: {
+    chance: 0.01,
+    tossesMs: [420, 200] as [number, number], // each toss, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, free hires + cash: src/floors/gardenHoseEvent: a jet of cash waters
+  // empty spots into new workers
+  gardenHoseEvent: {
+    chance: 0.01,
+    swingMs: 160, // the jet swinging onto its next aim
+    dwellsMs: [260, 140] as [number, number], // soaking each spot, quickening
+    flightMs: 380, // each coin's arc
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, levels + a crit tier: src/floors/burningGlassEvent: focused light
+  // scorches the bars and ignites the clicked one
+  burningGlassEvent: {
+    chance: 0.01,
+    focusMs: 350, // the shaft narrowing to a point
+    legsMs: [340, 200] as [number, number], // hunting to each bar, quickening
+    igniteMs: 450, // focusing down on the clicked bar
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, worker tiers + levels: src/floors/stormFrontEvent: a wall of
+  // lightning marches across the screen
+  stormFrontEvent: {
+    chance: 0.01,
+    sweepMs: 1_700, // the front crossing, speeding up
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/slidePuzzleEvent: the screen as a slide puzzle
+  slidePuzzleEvent: {
+    chance: 0.01,
+    slidesMs: [150, 80] as [number, number], // each slide, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
