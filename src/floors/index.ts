@@ -350,6 +350,7 @@ export { forceChainReactionEvent } from "./chainReactionEvent";
 export { forceBullseyeEvent } from "./bullseyeEvent";
 export { forcePopcornEvent } from "./popcornEvent";
 export { forceNewtonsCradleEvent } from "./newtonsCradleEvent";
+export { forceJuggleEvent } from "./juggleEvent";
 export { forceSlashEvent } from "./slashEvent";
 export { forceJackhammerEvent } from "./jackhammerEvent";
 export { forcePummelEvent } from "./pummelEvent";

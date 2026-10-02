@@ -302,6 +302,17 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/juggleEvent — the rare "Juggle" event: three wisps juggled
+  // round a figure of eight, ever faster and higher, each catch tossing
+  // coins, until all three are hurled up into one blast
+  juggleEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    beatMs: [200, 95] as [number, number], // between throws, quickening
+    riseMs: 300, // after the last beat, the balls hurled up to meet
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {

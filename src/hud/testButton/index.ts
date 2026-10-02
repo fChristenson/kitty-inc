@@ -527,6 +527,14 @@ export function wireNewtonsCradleEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireJuggleEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-juggle-event")!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

@@ -84,6 +84,7 @@ export {
   wireBullseyeEventTestButton,
   wirePopcornEventTestButton,
   wireNewtonsCradleEventTestButton,
+  wireJuggleEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
