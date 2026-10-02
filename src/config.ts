@@ -1749,6 +1749,60 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, levels + cash: src/floors/terracesEvent: cash spills bar to bar
+  terracesEvent: {
+    chance: 0.01,
+    pourMs: 500, // the column from the sky onto the top bar
+    fallsMs: [380, 220] as [number, number], // each spill onto the next bar
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp, an unlock: src/floors/batteringRamEvent: a wisp rams the locked floor
+  batteringRamEvent: {
+    chance: 0.01,
+    swoopMs: 350, // swooping in under the floor
+    drawsMs: [320, 200] as [number, number], // each draw-back, quickening
+    strikeMs: 110, // each ram up into the floor
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, levels + a crit tier + cash: src/floors/tetherballEvent: a wisp on a
+  // rope of cash winds round the clicked bar
+  tetherballEvent: {
+    chance: 0.01,
+    launchMs: 250, // flying out to the rope's length
+    spinMs: 1_500, // winding in, ever faster
+    levelShare: 0.1, // of the bar's levels, per lap
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, free hires: src/floors/projectorEvent: beams project new workers
+  projectorEvent: {
+    chance: 0.01,
+    riseMs: 300, // the lens rising off the button
+    aimMs: 150, // each aim laser
+    beamsMs: [340, 180] as [number, number], // each projection, quickening
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // lightning, levels + a crit tier: src/floors/clearEvent: paddles shock the
+  // clicked bar
+  clearEvent: {
+    chance: 0.01,
+    swoopMs: 300, // the paddles swooping in
+    chargesMs: [600, 380] as [number, number], // each charge-up, quickening
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/infinityMirrorEvent: the screen nests in itself
+  infinityMirrorEvent: {
+    chance: 0.01,
+    diveMs: 1_600, // diving in through the copies, speeding up
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,

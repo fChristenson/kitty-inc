@@ -228,6 +228,12 @@ import {
   forceCheckoutEvent,
   forceLightningRodEvent,
   forceFlagEvent,
+  forceTerracesEvent,
+  forceBatteringRamEvent,
+  forceTetherballEvent,
+  forceProjectorEvent,
+  forceClearEvent,
+  forceInfinityMirrorEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1322,6 +1328,12 @@ async function main() {
       checkout: forceOnActive(forceCheckoutEvent),
       "lightning-rod": forceOnActive(forceLightningRodEvent),
       flag: forceOnActive(forceFlagEvent),
+      terraces: forceOnActive(forceTerracesEvent),
+      "battering-ram": forceOnActive(forceBatteringRamEvent),
+      tetherball: forceOnActive(forceTetherballEvent),
+      projector: forceOnActive(forceProjectorEvent),
+      clear: forceOnActive(forceClearEvent),
+      "infinity-mirror": forceOnActive(forceInfinityMirrorEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
