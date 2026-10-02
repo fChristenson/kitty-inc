@@ -47,7 +47,8 @@ export const forceLaserGridEvent = registerWispEvent(
   "Laser Grid",
   () => CONFIG.laserGridEvent.chance,
   (floor, context, area) => {
-    const { gapMs, aimMs, zipMs, flightMs, holdMs, mergeMs } = CONFIG.laserGridEvent;
+    const { gapMs, aimMs, zipMs, flightMs, holdMs, mergeMs } =
+      CONFIG.laserGridEvent;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);
@@ -71,7 +72,11 @@ export const forceLaserGridEvent = registerWispEvent(
     const builtAt = lasers[lasers.length - 1].fireAt + zipMs;
     const collapseAt = builtAt + gapMs;
     const travelMs = collapseAt + COLLAPSE_MS + flightMs;
-    const tip = (l: (typeof lasers)[number], ms: number, into: Point): Point => {
+    const tip = (
+      l: (typeof lasers)[number],
+      ms: number,
+      into: Point,
+    ): Point => {
       const u = clamp01((ms - l.fireAt) / zipMs);
       into.x = l.from.x + (l.to.x - l.from.x) * u;
       into.y = l.from.y + (l.to.y - l.from.y) * u;
@@ -85,7 +90,10 @@ export const forceLaserGridEvent = registerWispEvent(
         const at = { x: d.from.x, y: a.from.y };
         if (at.y < Math.min(d.from.y, d.to.y)) continue;
         const reach = (l: typeof a) =>
-          l.fireAt + zipMs * (Math.hypot(at.x - l.from.x, at.y - l.from.y) / Math.hypot(l.to.x - l.from.x, l.to.y - l.from.y));
+          l.fireAt +
+          zipMs *
+            (Math.hypot(at.x - l.from.x, at.y - l.from.y) /
+              Math.hypot(l.to.x - l.from.x, l.to.y - l.from.y));
         crossings.push({ at, ms: Math.max(reach(a), reach(d)) });
       }
 
@@ -102,29 +110,52 @@ export const forceLaserGridEvent = registerWispEvent(
         return (f) => {
           const ms = f * travelMs;
           if (ms < shownAt) return { x: spot.x, y: spot.y, scale: 0 };
-          if (ms < leave) return { x: spot.x, y: spot.y, scale: COIN * Math.min(1, (ms - shownAt) / POP_MS) };
+          if (ms < leave)
+            return {
+              x: spot.x,
+              y: spot.y,
+              scale: COIN * Math.min(1, (ms - shownAt) / POP_MS),
+            };
           const total = cover?.total() ?? fallback;
-          const p = bezier(spot, { x: spot.x, y: total.y }, total, easeIn(clamp01((ms - leave) / flightMs)), {
-            x: 0,
-            y: 0,
-          });
+          const p = bezier(
+            spot,
+            { x: spot.x, y: total.y },
+            total,
+            easeIn(clamp01((ms - leave) / flightMs)),
+            {
+              x: 0,
+              y: 0,
+            },
+          );
           return { x: p.x, y: p.y, scale: COIN };
         };
       }),
     );
 
-    const fires = createBeats(lasers, (l) => l.fireAt, () => {
-      if (!cover?.isLive()) return;
-      playSwoosh();
-      shakeScreen(FIRE_SHAKE);
-    });
-    const crossing = createBeats(crossings, (c) => c.ms, (c) => {
-      cover!.burst(c.at, CROSS_BURST);
-      if (!cover!.isLive()) return;
-      playBloop();
-      shakeScreen(CROSS_SHAKE);
-    });
-    const finale = createBeats([travelMs], (ms) => ms, () => cover!.blast(cover!.total() ?? fallback));
+    const fires = createBeats(
+      lasers,
+      (l) => l.fireAt,
+      () => {
+        if (!cover?.isLive()) return;
+        playSwoosh();
+        shakeScreen(FIRE_SHAKE);
+      },
+    );
+    const crossing = createBeats(
+      crossings,
+      (c) => c.ms,
+      (c) => {
+        cover!.burst(c.at, CROSS_BURST);
+        if (!cover!.isLive()) return;
+        playBloop();
+        shakeScreen(CROSS_SHAKE);
+      },
+    );
+    const finale = createBeats(
+      [travelMs],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? fallback),
+    );
     const head = { x: 0, y: 0 };
 
     const cover = startWispCover(
@@ -148,10 +179,18 @@ export const forceLaserGridEvent = registerWispEvent(
               drawAimLaser(ctx, l.from, l.to);
               continue;
             }
-            const blaze = lerp([BLAZE, 1], clamp01((ms - l.fireAt) / (zipMs * 2)));
+            const blaze = lerp(
+              [BLAZE, 1],
+              clamp01((ms - l.fireAt) / (zipMs * 2)),
+            );
             tip(l, ms, head);
             drawBeam(ctx, l.from, head, BEAM * blaze * fade);
-            drawBeamFlare(ctx, head, BEAM * (ms < l.fireAt + zipMs ? 1.5 : 0.8), fade);
+            drawBeamFlare(
+              ctx,
+              head,
+              BEAM * (ms < l.fireAt + zipMs ? 1.5 : 0.8),
+              fade,
+            );
           }
         },
       },

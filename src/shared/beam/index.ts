@@ -88,13 +88,18 @@ export function drawBeamFlare(
   ctx.globalAlpha = alpha;
   drawGlow(ctx, FLARE_GLOW, at.x, at.y, r * 2);
   drawGlow(ctx, FLARE, at.x, at.y, r);
-  const count = Math.min(SPARKS[1], Math.max(SPARKS[0], Math.round(r * SPARKS_PER_PX)));
+  const count = Math.min(
+    SPARKS[1],
+    Math.max(SPARKS[0], Math.round(r * SPARKS_PER_PX)),
+  );
   for (let i = 0; i < count; i++) {
     const clock = now + hash01(i, 1) * SPARK_MS;
     const life = Math.floor(clock / SPARK_MS);
     const t = (clock % SPARK_MS) / SPARK_MS;
     const angle = hash01(i, life) * Math.PI * 2;
-    const reach = r * (SPARK_REACH[0] + (SPARK_REACH[1] - SPARK_REACH[0]) * hash01(life, i));
+    const reach =
+      r *
+      (SPARK_REACH[0] + (SPARK_REACH[1] - SPARK_REACH[0]) * hash01(life, i));
     const out = reach * t * (2 - t);
     stampGlimmer(
       ctx,
@@ -108,7 +113,14 @@ export function drawBeamFlare(
   for (let i = 0; i < CRACKLE; i++) {
     const a = Math.random() * Math.PI * 2;
     const d = Math.random() * r * 0.8;
-    stampGlimmer(ctx, at.x + Math.cos(a) * d, at.y + Math.sin(a) * d, r * 0.35 * Math.random(), a, COLOR.white);
+    stampGlimmer(
+      ctx,
+      at.x + Math.cos(a) * d,
+      at.y + Math.sin(a) * d,
+      r * 0.35 * Math.random(),
+      a,
+      COLOR.white,
+    );
   }
   ctx.restore();
 }

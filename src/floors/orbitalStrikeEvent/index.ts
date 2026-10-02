@@ -113,7 +113,6 @@ export function forceOrbitalStrikeEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 function strikeMs(): number {
   const { lockMs, aimMs } = CONFIG.orbitalStrikeEvent;
   return lockMs + aimMs;

@@ -45,23 +45,34 @@ export const forceSearchlightsEvent = registerWispEvent(
   "Searchlights",
   () => CONFIG.searchlightsEvent.chance,
   (floor, context, area) => {
-    const { searchMs, lockMs, streamMs, travelMs, holdMs, mergeMs } = CONFIG.searchlightsEvent;
+    const { searchMs, lockMs, streamMs, travelMs, holdMs, mergeMs } =
+      CONFIG.searchlightsEvent;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);
     const long = height * LONG;
-    const bases: Point[] = BASES.map((s) => ({ x: area.left + width * s, y: area.bottom + 10 }));
-    const phases = BASES.map((_, k) => (k / BASES.length) * Math.PI * 2 + Math.random());
+    const bases: Point[] = BASES.map((s) => ({
+      x: area.left + width * s,
+      y: area.bottom + 10,
+    }));
+    const phases = BASES.map(
+      (_, k) => (k / BASES.length) * Math.PI * 2 + Math.random(),
+    );
     // each light's angle (0 = straight up) while searching
     const sweep = (k: number, ms: number) =>
       SWING * Math.sin(Math.PI * 2 * SWEEP_HZ * (ms / 1000) + phases[k]);
     const lockAt = searchMs + lockMs;
     // the angle onto the total from each base
-    const onTotal = bases.map((b) => Math.atan2(fallback.x - b.x, b.y - fallback.y));
+    const onTotal = bases.map((b) =>
+      Math.atan2(fallback.x - b.x, b.y - fallback.y),
+    );
     const angle = (k: number, ms: number) => {
       if (ms < searchMs) return sweep(k, ms);
       const from = sweep(k, searchMs);
-      return from + (onTotal[k] - from) * easeOutCubic(clamp01((ms - searchMs) / lockMs));
+      return (
+        from +
+        (onTotal[k] - from) * easeOutCubic(clamp01((ms - searchMs) / lockMs))
+      );
     };
     const end = (k: number, ms: number, length: number, into: Point): Point => {
       const a = angle(k, ms);
@@ -74,23 +85,40 @@ export const forceSearchlightsEvent = registerWispEvent(
       const k = n % BASES.length;
       const ms = searchMs * ((n + 0.6) / (STASHES + 0.2));
       const at = end(k, ms, long * between(REACH), { x: 0, y: 0 });
-      at.y = Math.max(area.top + height * 0.25, Math.min(area.bottom - 30, at.y));
+      at.y = Math.max(
+        area.top + height * 0.25,
+        Math.min(area.bottom - 30, at.y),
+      );
       const bend = { x: at.x, y: fallback.y };
-      const line = sampleLine((u) => bezier(at, bend, fallback, u, { x: 0, y: 0 }), 30);
+      const line = sampleLine(
+        (u) => bezier(at, bend, fallback, u, { x: 0, y: 0 }),
+        30,
+      );
       return { at, ms, line };
     });
     const pour: Pour = { coinsAlong: 520, width: 40, streamMs, travelMs };
     const lastStart = stashes[STASHES - 1].ms;
-    const durationMs = Math.max(pourDurationMs(lastStart, pour), lockAt + holdMs + mergeMs);
+    const durationMs = Math.max(
+      pourDurationMs(lastStart, pour),
+      lockAt + holdMs + mergeMs,
+    );
 
-    const catches = createBeats(stashes, (s) => s.ms, (s) => {
-      cover!.burst(s.at, CATCH_BURST);
-      pourLine(cover!, s.line, pour);
-      if (!cover!.isLive()) return;
-      playBloop();
-      shakeScreen(CATCH_SHAKE);
-    });
-    const lock = createBeats([lockAt], (ms) => ms, () => cover!.blast(cover!.total() ?? fallback));
+    const catches = createBeats(
+      stashes,
+      (s) => s.ms,
+      (s) => {
+        cover!.burst(s.at, CATCH_BURST);
+        pourLine(cover!, s.line, pour);
+        if (!cover!.isLive()) return;
+        playBloop();
+        shakeScreen(CATCH_SHAKE);
+      },
+    );
+    const lock = createBeats(
+      [lockAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? fallback),
+    );
     const tip = { x: 0, y: 0 };
 
     const cover = startWispCover(
@@ -110,14 +138,32 @@ export const forceSearchlightsEvent = registerWispEvent(
           const total = cover?.total() ?? fallback;
           bases.forEach((b, k) => {
             // locking on, each beam ends on the total
-            const length = ms < searchMs ? long : long + (Math.hypot(total.x - b.x, total.y - b.y) - long) * clamp01((ms - searchMs) / lockMs);
+            const length =
+              ms < searchMs
+                ? long
+                : long +
+                  (Math.hypot(total.x - b.x, total.y - b.y) - long) *
+                    clamp01((ms - searchMs) / lockMs);
             end(k, ms, length, tip);
-            drawBeam(ctx, b, tip, BEAM * (0.9 + 0.1 * Math.sin(ms / 40 + k)), fade);
-            if (ms >= searchMs) drawBeamFlare(ctx, tip, FLARE * clamp01((ms - searchMs) / lockMs), fade);
+            drawBeam(
+              ctx,
+              b,
+              tip,
+              BEAM * (0.9 + 0.1 * Math.sin(ms / 40 + k)),
+              fade,
+            );
+            if (ms >= searchMs)
+              drawBeamFlare(
+                ctx,
+                tip,
+                FLARE * clamp01((ms - searchMs) / lockMs),
+                fade,
+              );
           });
           for (const s of stashes) {
             const since = ms - s.ms;
-            if (since >= 0 && since < 300) drawBeamFlare(ctx, s.at, FLARE * (1 - since / 300));
+            if (since >= 0 && since < 300)
+              drawBeamFlare(ctx, s.at, FLARE * (1 - since / 300));
           }
         },
       },

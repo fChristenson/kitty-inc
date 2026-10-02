@@ -45,8 +45,16 @@ export const forceBeamClashEvent = registerWispEvent(
   "Beam Clash",
   () => CONFIG.beamClashEvent.chance,
   (floor, context, area) => {
-    const { aimMs, fireMs, clashMs, overloadMs, streamMs, travelMs, holdMs, mergeMs } =
-      CONFIG.beamClashEvent;
+    const {
+      aimMs,
+      fireMs,
+      clashMs,
+      overloadMs,
+      streamMs,
+      travelMs,
+      holdMs,
+      mergeMs,
+    } = CONFIG.beamClashEvent;
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const fallback = totalSpot(area);
@@ -70,33 +78,69 @@ export const forceBeamClashEvent = registerWispEvent(
       let x = mid;
       for (const s of shoves) {
         if (ms < s.at) break;
-        x = from + (s.to - from) * easeOutCubic(clamp01((ms - s.at) / (shoveGap * 0.6)));
+        x =
+          from +
+          (s.to - from) * easeOutCubic(clamp01((ms - s.at) / (shoveGap * 0.6)));
         from = s.to;
       }
       const back = clamp01((ms - meetAt - clashMs) / overloadMs);
       return x + (mid - x) * back;
     };
     const clash: Point = { x: mid, y };
-    const geyser = sampleLine((u) => bezier(clash, { x: mid, y: fallback.y + height * 0.2 }, fallback, u, { x: 0, y: 0 }), 30);
+    const geyser = sampleLine(
+      (u) =>
+        bezier(clash, { x: mid, y: fallback.y + height * 0.2 }, fallback, u, {
+          x: 0,
+          y: 0,
+        }),
+      30,
+    );
     const pour: Pour = { coinsAlong: 1_400, width: 90, streamMs, travelMs };
     const topAt = blowAt + travelMs;
-    const durationMs = Math.max(pourDurationMs(blowAt, pour), topAt + holdMs + mergeMs);
+    const durationMs = Math.max(
+      pourDurationMs(blowAt, pour),
+      topAt + holdMs + mergeMs,
+    );
 
-    const shoving = createBeats(shoves, (s) => s.at, (s, k) => {
-      const at = { x: s.to, y };
-      const t = k / (SHOVES - 1);
-      cover!.launchFrom(at, sprayTargets(at, SHOVE_COINS, SHOVE_REACH, -Math.PI / 2, Math.PI * 1.4));
-      if (!cover!.isLive()) return;
-      playExplosion();
-      shakeScreen(lerp(SHOVE_SHAKE, t));
-    });
-    const blow = createBeats([blowAt], (ms) => ms, () => {
-      cover!.blast(clash);
-      pourLine(cover!, geyser, pour);
-    });
-    const finale = createBeats([topAt], (ms) => ms, () => cover!.blast(cover!.total() ?? fallback));
+    const shoving = createBeats(
+      shoves,
+      (s) => s.at,
+      (s, k) => {
+        const at = { x: s.to, y };
+        const t = k / (SHOVES - 1);
+        cover!.launchFrom(
+          at,
+          sprayTargets(
+            at,
+            SHOVE_COINS,
+            SHOVE_REACH,
+            -Math.PI / 2,
+            Math.PI * 1.4,
+          ),
+        );
+        if (!cover!.isLive()) return;
+        playExplosion();
+        shakeScreen(lerp(SHOVE_SHAKE, t));
+      },
+    );
+    const blow = createBeats(
+      [blowAt],
+      (ms) => ms,
+      () => {
+        cover!.blast(clash);
+        pourLine(cover!, geyser, pour);
+      },
+    );
+    const finale = createBeats(
+      [topAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? fallback),
+    );
     const meet = { x: 0, y };
-    const tips = [{ x: 0, y }, { x: 0, y }];
+    const tips = [
+      { x: 0, y },
+      { x: 0, y },
+    ];
 
     const cover = startWispCover(
       KEY,
@@ -126,7 +170,12 @@ export const forceBeamClashEvent = registerWispEvent(
             tips[k].x = side.x + (meet.x - side.x) * reach;
             drawBeam(ctx, side, tips[k], wobble);
           });
-          if (ms >= meetAt) drawBeamFlare(ctx, meet, lerp(FLARE, strain) * (0.85 + 0.15 * Math.random()));
+          if (ms >= meetAt)
+            drawBeamFlare(
+              ctx,
+              meet,
+              lerp(FLARE, strain) * (0.85 + 0.15 * Math.random()),
+            );
         },
       },
     );

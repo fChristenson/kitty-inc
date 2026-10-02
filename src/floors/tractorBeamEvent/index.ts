@@ -39,7 +39,8 @@ export const forceTractorBeamEvent = registerWispEvent(
   "Tractor Beam",
   () => CONFIG.tractorBeamEvent.chance,
   (floor, context, area) => {
-    const { aimMs, openMs, liftMs, riseMs, holdMs, mergeMs } = CONFIG.tractorBeamEvent;
+    const { aimMs, openMs, liftMs, riseMs, holdMs, mergeMs } =
+      CONFIG.tractorBeamEvent;
     const width = area.right - area.left;
     const button = getButtonCenter(context.isGroundFloor);
     const fallback = totalSpot(area);
@@ -69,18 +70,29 @@ export const forceTractorBeamEvent = registerWispEvent(
         return {
           x: cx + Math.sin(a) * half,
           y: button.y + (total.y - button.y) * up,
-          scale: COIN * (DEEP + (1 - DEEP) * (0.5 + 0.5 * Math.cos(a))) * (1 - 0.5 * up),
+          scale:
+            COIN *
+            (DEEP + (1 - DEEP) * (0.5 + 0.5 * Math.cos(a))) *
+            (1 - 0.5 * up),
         };
       };
     });
 
     let lastRumble = -Infinity;
-    const open = createBeats([aimMs], (ms) => ms, () => {
-      if (!cover?.isLive()) return;
-      playSwoosh();
-      shakeScreen(OPEN_SHAKE);
-    });
-    const shut = createBeats([shutAt], (ms) => ms, () => cover!.blast(cover!.total() ?? fallback));
+    const open = createBeats(
+      [aimMs],
+      (ms) => ms,
+      () => {
+        if (!cover?.isLive()) return;
+        playSwoosh();
+        shakeScreen(OPEN_SHAKE);
+      },
+    );
+    const shut = createBeats(
+      [shutAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? fallback),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -92,7 +104,12 @@ export const forceTractorBeamEvent = registerWispEvent(
         tick: (ms, now) => {
           open.tick(ms, now);
           shut.tick(ms, now);
-          if (ms > aimMs && ms < shutAt && now - lastRumble >= RUMBLE_MS && cover?.isLive()) {
+          if (
+            ms > aimMs &&
+            ms < shutAt &&
+            now - lastRumble >= RUMBLE_MS &&
+            cover?.isLive()
+          ) {
             lastRumble = now;
             shakeScreen(RUMBLE);
           }

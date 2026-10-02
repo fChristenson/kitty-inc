@@ -58,7 +58,10 @@ export const forceEtchEvent = registerWispEvent(
       x: area.left + width * (flip ? 1 - p.x : p.x),
       y: area.top + height * p.y,
     }));
-    const scrawl = sampleLine((u) => alongRoute(corners, u, { x: 0, y: 0 }), STEPS * (corners.length - 1));
+    const scrawl = sampleLine(
+      (u) => alongRoute(corners, u, { x: 0, y: 0 }),
+      STEPS * (corners.length - 1),
+    );
     const along = measure(scrawl);
     // the trail runs on off the scrawl's end into the total
     const run = [...scrawl, fallback];
@@ -81,27 +84,49 @@ export const forceEtchEvent = registerWispEvent(
       return (f) => {
         const ms = f * travelMs;
         if (ms < shownAt) return { x: spot.x, y: spot.y, scale: 0 };
-        if (ms < runFrom) return { x: spot.x, y: spot.y, scale: COIN * Math.min(1, (ms - shownAt) / POP_MS) };
+        if (ms < runFrom)
+          return {
+            x: spot.x,
+            y: spot.y,
+            scale: COIN * Math.min(1, (ms - shownAt) / POP_MS),
+          };
         run[run.length - 1] = cover?.total() ?? fallback;
-        const p = pointAlong(run, runAlong, s * share + (ms - runFrom) / runMs, { x: 0, y: 0 });
+        const p = pointAlong(
+          run,
+          runAlong,
+          s * share + (ms - runFrom) / runMs,
+          { x: 0, y: 0 },
+        );
         return { x: p.x, y: p.y, scale: COIN };
       };
     });
 
     let lastRumble = -Infinity;
-    const turning = createBeats(turns, (t) => t.ms, (t, k) => {
-      cover!.burst(t.at, TURN_BURST);
-      if (!cover!.isLive()) return;
-      playBloop();
-      shakeScreen(lerp(TURN_SHAKE, k / Math.max(1, turns.length - 1)));
-    });
-    const snap = createBeats([etchMs], (ms) => ms, () => {
-      cover!.burst(corners[corners.length - 1], 1.2);
-      if (!cover!.isLive()) return;
-      playExplosion();
-      shakeScreen(SNAP_SHAKE);
-    });
-    const finale = createBeats([travelMs], (ms) => ms, () => cover!.blast(cover!.total() ?? fallback));
+    const turning = createBeats(
+      turns,
+      (t) => t.ms,
+      (t, k) => {
+        cover!.burst(t.at, TURN_BURST);
+        if (!cover!.isLive()) return;
+        playBloop();
+        shakeScreen(lerp(TURN_SHAKE, k / Math.max(1, turns.length - 1)));
+      },
+    );
+    const snap = createBeats(
+      [etchMs],
+      (ms) => ms,
+      () => {
+        cover!.burst(corners[corners.length - 1], 1.2);
+        if (!cover!.isLive()) return;
+        playExplosion();
+        shakeScreen(SNAP_SHAKE);
+      },
+    );
+    const finale = createBeats(
+      [travelMs],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? fallback),
+    );
     const tip = { x: 0, y: 0 };
 
     const cover = startWispCover(
