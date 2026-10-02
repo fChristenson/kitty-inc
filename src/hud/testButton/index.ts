@@ -491,6 +491,15 @@ export function wireChainReactionEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireBullseyeEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-bullseye-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

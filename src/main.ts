@@ -65,6 +65,7 @@ import {
   forceBowlingEvent,
   forceThunderclapEvent,
   forceChainReactionEvent,
+  forceBullseyeEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -209,6 +210,7 @@ import {
   wireBowlingEventTestButton,
   wireThunderclapEventTestButton,
   wireChainReactionEventTestButton,
+  wireBullseyeEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
@@ -798,6 +800,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceChainReactionEvent(floor);
+    });
+    // same, for the Bullseye event
+    wireBullseyeEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceBullseyeEvent(floor);
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

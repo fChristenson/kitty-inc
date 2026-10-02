@@ -346,6 +346,7 @@ export { forceSupernovaEvent } from "./supernovaEvent";
 export { forceBowlingEvent } from "./bowlingEvent";
 export { forceThunderclapEvent } from "./thunderclapEvent";
 export { forceChainReactionEvent } from "./chainReactionEvent";
+export { forceBullseyeEvent } from "./bullseyeEvent";
 export { forceSlashEvent } from "./slashEvent";
 export { forceJackhammerEvent } from "./jackhammerEvent";
 export { forcePummelEvent } from "./pummelEvent";
