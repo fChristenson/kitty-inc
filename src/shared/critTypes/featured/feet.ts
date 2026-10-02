@@ -1380,4 +1380,260 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash([context.floor], balance.yellowHeelPeckMultiple),
   },
+  bigSoleSpread: {
+    label: "Big Sole Spread",
+    color: COLOR.coinGold,
+    image: "crits/feet/bigSoleSpread.webp",
+    description: "Grows this floor's level by 14.7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.bigSoleSpreadGrowth),
+  },
+  blondeBallUp: {
+    label: "Blonde Ball Up",
+    color: COLOR.sameBoatCoral,
+    image: "crits/feet/blondeBallUp.webp",
+    description: "Spreads 132 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.blondeBallUpUpgrades),
+  },
+  bumblebeeLegs: {
+    label: "Bumblebee Legs",
+    color: COLOR.amberMuted,
+    image: "crits/feet/bumblebeeLegs.webp",
+    description: "Pays 122 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.bumblebeeLegsMultiple),
+  },
+  bunTopPike: {
+    label: "Bun Top Pike",
+    color: COLOR.summerSaleOrange,
+    image: "crits/feet/bunTopPike.webp",
+    description: "Grows this floor's level by 14.8% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.bunTopPikeGrowth),
+  },
+  butterflySplit: {
+    label: "Butterfly Split",
+    color: COLOR.starYellow,
+    image: "crits/feet/butterflySplit.webp",
+    description: "Spreads 133 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.butterflySplitUpgrades),
+  },
+  candyLeggingsKick: {
+    label: "Candy Leggings Kick",
+    color: COLOR.summerSaleOrange,
+    image: "crits/feet/candyLeggingsKick.webp",
+    description: "Pays 123 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.candyLeggingsKickMultiple),
+  },
+  cobaltBobKick: {
+    label: "Cobalt Bob Kick",
+    color: COLOR.summerSaleOrange,
+    image: "crits/feet/cobaltBobKick.webp",
+    description: "Grows this floor's level by 14.9% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.cobaltBobKickGrowth),
+  },
+  coralCrisscross: {
+    label: "Coral Crisscross",
+    color: COLOR.amberMuted,
+    image: "crits/feet/coralCrisscross.webp",
+    description: "Spreads 134 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.coralCrisscrossUpgrades),
+  },
+  crisscrossBun: {
+    label: "Crisscross Bun",
+    color: COLOR.amberMuted,
+    image: "crits/feet/crisscrossBun.webp",
+    description: "Pays 124 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.crisscrossBunMultiple),
+  },
+  frogSitFlex: {
+    label: "Frog Sit Flex",
+    color: COLOR.summerSaleOrange,
+    image: "crits/feet/frogSitFlex.webp",
+    description: "Grows every unlocked floor's level by 6.6% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.frogSitFlexGrowth),
+  },
+  goldenLocksLegUp: {
+    label: "Golden Locks Leg Up",
+    color: COLOR.starYellow,
+    image: "crits/feet/goldenLocksLegUp.webp",
+    description: "Spreads 135 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.goldenLocksLegUpUpgrades),
+  },
+  huggedStilts: {
+    label: "Hugged Stilts",
+    color: COLOR.amberMuted,
+    image: "crits/feet/huggedStilts.webp",
+    description: "Pays 125 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.huggedStiltsMultiple),
+  },
+  kneeHugHuddle: {
+    label: "Knee Hug Huddle",
+    color: COLOR.amberMuted,
+    image: "crits/feet/kneeHugHuddle.webp",
+    description: "Grows every unlocked floor's level by 6.7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.kneeHugHuddleGrowth),
+  },
+  lowFadeFootrest: {
+    label: "Low Fade Footrest",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/feet/lowFadeFootrest.webp",
+    description: "Spreads 136 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.lowFadeFootrestUpgrades),
+  },
+  mintShortsLift: {
+    label: "Mint Shorts Lift",
+    color: COLOR.summerSaleOrange,
+    image: "crits/feet/mintShortsLift.webp",
+    description: "Pays 126 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.mintShortsLiftMultiple),
+  },
+  patchworkPantsHug: {
+    label: "Patchwork Pants Hug",
+    color: COLOR.fastForwardBlue,
+    image: "crits/feet/patchworkPantsHug.webp",
+    description: "Grows every unlocked floor's level by 6.8% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.patchworkPantsHugGrowth),
+  },
+  pinkCropPowerhouse: {
+    label: "Pink Crop Powerhouse",
+    color: COLOR.amberMuted,
+    image: "crits/feet/pinkCropPowerhouse.webp",
+    description: "Spreads 137 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.pinkCropPowerhouseUpgrades),
+  },
+  pinkShortsSlant: {
+    label: "Pink Shorts Slant",
+    color: COLOR.amberMuted,
+    image: "crits/feet/pinkShortsSlant.webp",
+    description: "Pays 127 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.pinkShortsSlantMultiple),
+  },
+  ponytailVSplit: {
+    label: "Ponytail V Split",
+    color: COLOR.fastForwardBlue,
+    image: "crits/feet/ponytailVSplit.webp",
+    description: "Grows every unlocked floor's level by 6.9% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.ponytailVSplitGrowth),
+  },
+  rainbowShortsSprawl: {
+    label: "Rainbow Shorts Sprawl",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/feet/rainbowShortsSprawl.webp",
+    description: "Spreads 138 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.rainbowShortsSprawlUpgrades),
+  },
+  reclineRaise: {
+    label: "Recline Raise",
+    color: COLOR.amberMuted,
+    image: "crits/feet/reclineRaise.webp",
+    description: "Pays 128 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.reclineRaiseMultiple),
+  },
+  redheadCrossover: {
+    label: "Redhead Crossover",
+    color: COLOR.sameBoatCoral,
+    image: "crits/feet/redheadCrossover.webp",
+    description: "Grows every unlocked floor's level by 7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.redheadCrossoverGrowth),
+  },
+  redTankRaise: {
+    label: "Red Tank Raise",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/feet/redTankRaise.webp",
+    description: "Spreads 139 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.redTankRaiseUpgrades),
+  },
+  sidewaysSoles: {
+    label: "Sideways Soles",
+    color: COLOR.sameBoatCoral,
+    image: "crits/feet/sidewaysSoles.webp",
+    description: "Pays 129 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.sidewaysSolesMultiple),
+  },
+  soleSandwich: {
+    label: "Sole Sandwich",
+    color: COLOR.coinGold,
+    image: "crits/feet/soleSandwich.webp",
+    description: "Grows every unlocked floor's level by 7.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.soleSandwichGrowth),
+  },
+  stripedLeggingsStretch: {
+    label: "Striped Leggings Stretch",
+    color: COLOR.fastForwardBlue,
+    image: "crits/feet/stripedLeggingsStretch.webp",
+    description: "Spreads 140 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.stripedLeggingsStretchUpgrades),
+  },
+  tealHairSockShow: {
+    label: "Teal Hair Sock Show",
+    color: COLOR.coinGold,
+    image: "crits/feet/tealHairSockShow.webp",
+    description: "Pays 130 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.tealHairSockShowMultiple),
+  },
+  tealTankTiptoes: {
+    label: "Teal Tank Tiptoes",
+    color: COLOR.amberMuted,
+    image: "crits/feet/tealTankTiptoes.webp",
+    description: "Grows every unlocked floor's level by 7.2% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.tealTankTiptoesGrowth),
+  },
+  tuckedTight: {
+    label: "Tucked Tight",
+    color: COLOR.summerSaleOrange,
+    image: "crits/feet/tuckedTight.webp",
+    description: "Spreads 141 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.tuckedTightUpgrades),
+  },
+  victoryVSoles: {
+    label: "Victory V Soles",
+    color: COLOR.starYellow,
+    image: "crits/feet/victoryVSoles.webp",
+    description: "Pays 131 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.victoryVSolesMultiple),
+  },
+  cherryBobBundle: {
+    label: "Cherry Bob Bundle",
+    color: COLOR.teamBuildingCoral,
+    image: "crits/feet/cherryBobBundle.webp",
+    description: "Grows every unlocked floor's level by 7.3% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.cherryBobBundleGrowth),
+  },
+  toeStackLean: {
+    label: "Toe Stack Lean",
+    color: COLOR.amberMuted,
+    image: "crits/feet/toeStackLean.webp",
+    description: "Spreads 142 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.toeStackLeanUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
