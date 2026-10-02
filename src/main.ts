@@ -195,6 +195,12 @@ import {
   forceTeslaCoilEvent,
   forceJacobsLadderEvent,
   forceComicBookEvent,
+  forceAvalancheEvent,
+  forceBeehiveEvent,
+  forcePogoEvent,
+  forceLaserHarpEvent,
+  forceLichtenbergEvent,
+  forceShatterEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1253,6 +1259,12 @@ async function main() {
       "tesla-coil": forceOnActive(forceTeslaCoilEvent),
       "jacobs-ladder": forceOnActive(forceJacobsLadderEvent),
       "comic-book": forceOnActive(forceComicBookEvent),
+      avalanche: forceOnActive(forceAvalancheEvent),
+      beehive: forceOnActive(forceBeehiveEvent),
+      pogo: forceOnActive(forcePogoEvent),
+      "laser-harp": forceOnActive(forceLaserHarpEvent),
+      lichtenberg: forceOnActive(forceLichtenbergEvent),
+      shatter: forceOnActive(forceShatterEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

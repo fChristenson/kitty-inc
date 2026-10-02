@@ -1451,6 +1451,65 @@ export const CONFIG = {
     holdMs: 700,
     mergeMs: 0,
   },
+  // money, cash + levels: src/floors/avalancheEvent: a torrent of cash roars
+  // down the screen, burying the bars
+  avalancheEvent: {
+    chance: 0.01,
+    streamMs: 900, // the cash breaking loose
+    fallMs: 700, // each coin's slide down
+    drainMs: 300, // the heap setting off for the total
+    flightMs: 420, // each coin's flight into the total
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 200,
+    mergeMs: 500,
+  },
+  // wisp, worker tiers: src/floors/beehiveEvent: a swarm buzzes worker to worker
+  beehiveEvent: {
+    chance: 0.01,
+    flightsMs: [360, 200] as [number, number], // swooping to each worker
+    buzzesMs: [320, 160] as [number, number], // whirling on each head
+    burstMs: 300, // the swarm bursting outward
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, cash + levels: src/floors/pogoEvent: a wisp pogos bar to bar on a
+  // jet of cash
+  pogoEvent: {
+    chance: 0.01,
+    hopsMs: [420, 230] as [number, number], // each hop, quickening
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, levels: src/floors/laserHarpEvent: a wisp plucks laser strings
+  laserHarpEvent: {
+    chance: 0.01,
+    igniteMs: 300, // the strings shooting up
+    entryMs: 220, // the wisp swooping in
+    gapsMs: [170, 70] as [number, number], // between plucks, quickening
+    finaleMs: 300, // every string blazing at once
+    levelShare: 0.05, // of a bar's levels, per pluck
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // lightning, levels + tier: src/floors/lichtenbergEvent: a branching tree of
+  // lightning grows down onto the bars
+  lichtenbergEvent: {
+    chance: 0.01,
+    limbsMs: [360, 150] as [number, number], // each trunk step and its branch
+    dischargeMs: 320, // the whole tree blazing at once
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/shatterEvent: the screen shatters like glass
+  shatterEvent: {
+    chance: 0.01,
+    knocksMs: [180, 520, 820], // each knock, the last shattering it
+    fallMs: 900, // the shards blowing out and falling away
+    holdMs: 200,
+    mergeMs: 500,
+  },
   // mix, levels + tier + cash: src/floors/whipEvent: a whip of flowing cash
   // cracks against the bars
   whipEvent: {
