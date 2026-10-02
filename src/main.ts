@@ -222,6 +222,12 @@ import {
   forceStormSurgeEvent,
   forceSmashAndGrabEvent,
   forceShrinkRayEvent,
+  forceSandstormEvent,
+  forceJuggernautEvent,
+  forceFuelLineEvent,
+  forceCheckoutEvent,
+  forceLightningRodEvent,
+  forceFlagEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1310,6 +1316,12 @@ async function main() {
       "storm-surge": forceOnActive(forceStormSurgeEvent),
       "smash-and-grab": forceOnActive(forceSmashAndGrabEvent),
       "shrink-ray": forceOnActive(forceShrinkRayEvent),
+      sandstorm: forceOnActive(forceSandstormEvent),
+      juggernaut: forceOnActive(forceJuggernautEvent),
+      "fuel-line": forceOnActive(forceFuelLineEvent),
+      checkout: forceOnActive(forceCheckoutEvent),
+      "lightning-rod": forceOnActive(forceLightningRodEvent),
+      flag: forceOnActive(forceFlagEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

@@ -1691,6 +1691,64 @@ export const CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
+  // money, worker tiers + cash: src/floors/sandstormEvent: a storm of cash
+  // blows across the screen, over the workers
+  sandstormEvent: {
+    chance: 0.01,
+    streamMs: 800, // the storm blowing in
+    crossMs: 650, // a coin's run across, at its base speed
+    flightMs: 350, // whirling up into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, levels + a crit tier: src/floors/juggernautEvent: a swelling wisp
+  // careens wall to wall down onto the clicked bar
+  juggernautEvent: {
+    chance: 0.01,
+    legsMs: [420, 180] as [number, number], // each wall-to-wall leg, quickening
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // mix, a crit tier + levels + cash: src/floors/fuelLineEvent: a hose of
+  // cash pumps into the clicked bar
+  fuelLineEvent: {
+    chance: 0.01,
+    plugMs: 500, // the wisp diving down with the hose
+    fillMs: 300, // the hose filling behind it
+    pumpGapsMs: [380, 220] as [number, number], // between pumps, quickening
+    pumpTravelMs: 260, // each slug's run down the hose
+    pulseMs: 140, // each slug's length
+    levelShare: 0.1, // of the bar's levels, per pump
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, levels + cash: src/floors/checkoutEvent: a scan beam sweeps each bar
+  checkoutEvent: {
+    chance: 0.01,
+    hopMs: 160, // the scanner hopping to its next bar
+    scansMs: [340, 180] as [number, number], // each sweep, quickening
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // lightning, an unlock: src/floors/lightningRodEvent: bolts charge the
+  // locked floor till it bursts open
+  lightningRodEvent: {
+    chance: 0.01,
+    gapsMs: [320, 140] as [number, number], // between strikes, quickening
+    finalGapMs: 300, // the last strike to the colossal bolt
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/flagEvent: the screen ripples like a flag
+  flagEvent: {
+    chance: 0.01,
+    waveMs: 1_900, // the ripple growing, then snapping straight
+    gusts: 5, // crests flinging cash
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
