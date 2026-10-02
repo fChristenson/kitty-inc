@@ -544,6 +544,15 @@ export function wireBoomerangEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireHeartbeatEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-heartbeat-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

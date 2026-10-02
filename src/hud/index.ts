@@ -86,6 +86,7 @@ export {
   wireNewtonsCradleEventTestButton,
   wireJuggleEventTestButton,
   wireBoomerangEventTestButton,
+  wireHeartbeatEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,

@@ -352,6 +352,7 @@ export { forcePopcornEvent } from "./popcornEvent";
 export { forceNewtonsCradleEvent } from "./newtonsCradleEvent";
 export { forceJuggleEvent } from "./juggleEvent";
 export { forceBoomerangEvent } from "./boomerangEvent";
+export { forceHeartbeatEvent } from "./heartbeatEvent";
 export { forceSlashEvent } from "./slashEvent";
 export { forceJackhammerEvent } from "./jackhammerEvent";
 export { forcePummelEvent } from "./pummelEvent";
