@@ -709,6 +709,149 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // wisps and flowing cash together, on src/floors/wispCover + cashFlow
+  // src/floors/siphonEvent: a wisp under the total siphons a spiral of cash
+  siphonEvent: {
+    chance: 0.01,
+    streamMs: 1_200, // the river pouring
+    travelMs: 800, // each coin's trip up the straw
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // src/floors/crossfireEvent: four corner wisps fire rivers that geyser up
+  crossfireEvent: {
+    chance: 0.01,
+    fireMs: 600, // each corner pouring
+    travelMs: 600, // each coin's trip down a river
+    geyserMs: 500, // the geyser pouring
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // src/floors/gravityWellEvent: rivers whip round a planet wisp into the total
+  gravityWellEvent: {
+    chance: 0.01,
+    gapMs: 160, // between rivers
+    streamMs: 500, // how long each pours
+    travelMs: 750, // each coin's trip round the planet
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // src/floors/splashdownEvent: a meteor wisp lands in a crown splash of cash
+  splashdownEvent: {
+    chance: 0.01,
+    fallMs: 380, // the meteor falling
+    splashMs: 600, // the crown pouring
+    travelMs: 650, // each coin's arc out of the impact
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // src/floors/geysersEvent: wisps along the bottom erupt geysers of cash
+  geysersEvent: {
+    chance: 0.01,
+    leadMs: 300, // the wisps popping up before the first eruption
+    gapMs: 200, // between eruptions
+    streamMs: 550, // how long each erupts
+    travelMs: 700, // each coin's trip up a geyser and over
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // src/floors/cashCannonEvent: the button shoots slugs of cash at wisps
+  cashCannonEvent: {
+    chance: 0.01,
+    leadMs: 250, // the targets popping up before the first shot
+    gapsMs: [330, 280, 230, 200], // between shots, quickening
+    slugMs: 250, // each slug pouring
+    travelMs: 380, // each coin's trip to its target
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // src/floors/hooverEvent: a vacuum wisp slurps up puddles of cash
+  hooverEvent: {
+    chance: 0.01,
+    gapMs: 110, // between jets
+    jetMs: 250, // each jet gushing
+    flyMs: 380, // each coin's arc into its puddle
+    leadMs: 450, // before the vacuum sets off
+    vacuumMs: 1_400, // the vacuum's run, puddles to total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // src/floors/airShowEvent: a V of wisps loops trailing contrails of cash
+  airShowEvent: {
+    chance: 0.01,
+    streamMs: 900, // each contrail pouring
+    travelMs: 1_250, // each coin's (and wisp's) trip round the loop
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // src/floors/leakEvent: a swelling wisp springs leaks of cash, then bursts
+  leakEvent: {
+    chance: 0.01,
+    leadMs: 300, // swelling before the first leak
+    gapMs: 210, // between leaks
+    travelMs: 700, // each coin's trip up a leak's jet
+    gushMs: 450, // the final gush pouring
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // src/floors/climbEvent: a river zigzags up a ladder of wisps to the total
+  climbEvent: {
+    chance: 0.01,
+    leadMs: 300, // the ladder popping up before the river
+    streamMs: 1_000, // the river pouring
+    travelMs: 1_100, // each coin's climb
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // src/floors/kiteEvent: a kite wisp flies on a string of cash, snaps, dives
+  kiteEvent: {
+    chance: 0.01,
+    riseMs: 400, // the kite rising off the button
+    flyMs: 900, // the kite swooping
+    flowMs: 600, // each coin's climb up the string
+    diveMs: 380, // the kite diving into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // src/floors/rainbowEvent: a wisp arcs over, laying a rainbow of cash
+  rainbowEvent: {
+    chance: 0.01,
+    streamMs: 900, // the bands pouring
+    travelMs: 900, // each coin's trip over the arch
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // src/floors/branchesEvent: a wisp splits and splits, branching the cash
+  branchesEvent: {
+    chance: 0.01,
+    streamMs: 800, // the tree pouring
+    travelMs: 1_100, // each coin's trip up the longest branch
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // src/floors/tugOfWarEvent: two wisps heave a rope of cash till it snaps
+  tugOfWarEvent: {
+    chance: 0.01,
+    fillMs: 350, // the button gushing the rope full
+    flyMs: 300, // each coin's arc up onto the rope
+    flowMs: 900, // each coin's run along the rope
+    leadMs: 450, // before the first heave
+    heaveGapMs: 230, // between heaves
+    recoilMs: 180, // the snapped halves whipping back
+    jetMs: 280, // each wisp flinging its half
+    flightMs: 350, // each coin's (and wisp's) flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // src/floors/waterwheelEvent: cash pours over a spinning wheel of wisps
+  waterwheelEvent: {
+    chance: 0.01,
+    streamMs: 1_300, // the falls pouring
+    travelMs: 1_000, // each coin's trip over the wheel and into the total
+    holdMs: 350,
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {

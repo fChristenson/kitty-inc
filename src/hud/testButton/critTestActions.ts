@@ -107,6 +107,21 @@ export function createTestButtonMarkup(): string {
           <button id="test-fire-hose-event" class="game__button">Fire Hose</button>
           <button id="test-confluence-event" class="game__button">Confluence</button>
           <button id="test-slosh-event" class="game__button">Slosh</button>
+          <button id="test-siphon-event" class="game__button">Siphon</button>
+          <button id="test-crossfire-event" class="game__button">Crossfire</button>
+          <button id="test-gravity-well-event" class="game__button">Gravity Well</button>
+          <button id="test-splashdown-event" class="game__button">Splashdown</button>
+          <button id="test-geysers-event" class="game__button">Geysers</button>
+          <button id="test-cash-cannon-event" class="game__button">Cash Cannon</button>
+          <button id="test-hoover-event" class="game__button">Hoover</button>
+          <button id="test-air-show-event" class="game__button">Air Show</button>
+          <button id="test-leak-event" class="game__button">Leak</button>
+          <button id="test-climb-event" class="game__button">Climb</button>
+          <button id="test-kite-event" class="game__button">Kite</button>
+          <button id="test-rainbow-event" class="game__button">Rainbow</button>
+          <button id="test-branches-event" class="game__button">Branches</button>
+          <button id="test-tug-of-war-event" class="game__button">Tug of War</button>
+          <button id="test-waterwheel-event" class="game__button">Waterwheel</button>
           <button id="test-slash-event" class="game__button">Slash</button>
           <button id="test-jackhammer-event" class="game__button">Jackhammer</button>
           <button id="test-pummel-event" class="game__button">Pummel</button>
