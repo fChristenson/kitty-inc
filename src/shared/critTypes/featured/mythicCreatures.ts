@@ -413,4 +413,12 @@ export const MYTHIC_CREATURES_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.spreadUpgrades(context.floors, balance.mewtwoUpgrades),
   },
+  purplePoltergeist: {
+    label: "Purple Poltergeist",
+    color: COLOR.fancyFridayIndigo,
+    image: "crits/mythicCreatures/purplePoltergeist.webp",
+    description: "Spreads 167 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.purplePoltergeistUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

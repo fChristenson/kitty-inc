@@ -1,0 +1,21 @@
+// odds and reward sizes for featured/pirates.ts's crits, spread into CONFIG.crit
+export const PIRATES_BALANCE = {
+  anchorInkChance: 0.00166047117,
+  anchorInkGrowth: 0.201,
+  blueSailsChance: 0.00161632262,
+  blueSailsUpgrades: 169,
+  grumpyDeckhandsChance: 0.00165538579,
+  grumpyDeckhandsGrowth: 0.202,
+  hookAndScarChance: 0.00161604989,
+  hookAndScarUpgrades: 170,
+  plumedPowerhouseChance: 0.0016507214,
+  plumedPowerhouseGrowth: 0.203,
+  shipmateSqueezeChance: 0.0016158483,
+  shipmateSqueezeUpgrades: 171,
+  skullHatCrestChance: 0.00164645682,
+  skullHatCrestGrowth: 0.204,
+  stripedSkipperChance: 0.0016157056,
+  stripedSkipperUpgrades: 172,
+  tealPatchChance: 0.0016425712,
+  tealPatchGrowth: 0.205,
+} as const;

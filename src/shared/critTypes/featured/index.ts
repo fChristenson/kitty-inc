@@ -66,6 +66,10 @@ import { RUNES_CRITS } from "./runes";
 import { LUCKY_CATS_CRITS } from "./luckyCats";
 import { WRESTLING_CRITS } from "./wrestling";
 import { GOTH_GIRLS_CRITS } from "./gothGirls";
+import { CAT_DOCTORS_CRITS } from "./catDoctors";
+import { CAT_SCIENTISTS_CRITS } from "./catScientists";
+import { PIRATES_CRITS } from "./pirates";
+import { POLICE_CRITS } from "./police";
 
 export const FEATURED_CRITS = {
   ...CYBERPUNK_CRITS,
@@ -135,4 +139,8 @@ export const FEATURED_CRITS = {
   ...LUCKY_CATS_CRITS,
   ...WRESTLING_CRITS,
   ...GOTH_GIRLS_CRITS,
+  ...CAT_DOCTORS_CRITS,
+  ...CAT_SCIENTISTS_CRITS,
+  ...PIRATES_CRITS,
+  ...POLICE_CRITS,
 } as const;

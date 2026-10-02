@@ -81,4 +81,12 @@ export const PARTY_CRITS = {
     reward: (context, { actions }) =>
       actions.startEvent([context.floor], "frozen"),
   },
+  bottleRockets: {
+    label: "Bottle Rockets",
+    color: COLOR.sunshineGold,
+    image: "crits/party/bottleRockets.webp",
+    description: "Spreads 168 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.bottleRocketsUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

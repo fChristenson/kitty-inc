@@ -29,4 +29,12 @@ export const COSMOS_CRITS = {
     reward: (context, { actions, lowestLevel }) =>
       actions.armCrit([lowestLevel(context)], "crit"),
   },
+  joinTheDots: {
+    label: "Join The Dots",
+    color: COLOR.fastForwardBlue,
+    image: "crits/cosmos/joinTheDots.webp",
+    description: "Grows this floor's level by 19.9% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.joinTheDotsGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

@@ -67,6 +67,10 @@ import { RUNES_BALANCE } from "./runes";
 import { LUCKY_CATS_BALANCE } from "./luckyCats";
 import { WRESTLING_BALANCE } from "./wrestling";
 import { GOTH_GIRLS_BALANCE } from "./gothGirls";
+import { CAT_DOCTORS_BALANCE } from "./catDoctors";
+import { CAT_SCIENTISTS_BALANCE } from "./catScientists";
+import { PIRATES_BALANCE } from "./pirates";
+import { POLICE_BALANCE } from "./police";
 
 export const FEATURED_CRIT_BALANCE = {
   ...CYBERPUNK_BALANCE,
@@ -136,4 +140,8 @@ export const FEATURED_CRIT_BALANCE = {
   ...LUCKY_CATS_BALANCE,
   ...WRESTLING_BALANCE,
   ...GOTH_GIRLS_BALANCE,
+  ...CAT_DOCTORS_BALANCE,
+  ...CAT_SCIENTISTS_BALANCE,
+  ...PIRATES_BALANCE,
+  ...POLICE_BALANCE,
 } as const;

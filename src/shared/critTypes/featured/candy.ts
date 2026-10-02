@@ -353,4 +353,28 @@ export const CANDY_CRITS = {
     reward: (context, { actions, belowAndHere }) =>
       actions.raiseLevels(belowAndHere(context), context.floor.upgradeCount),
   },
+  chocBlockJumble: {
+    label: "Choc Block Jumble",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/candy/chocBlockJumble.webp",
+    description: "Spreads 162 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.chocBlockJumbleUpgrades),
+  },
+  pinwheelPile: {
+    label: "Pinwheel Pile",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/candy/pinwheelPile.webp",
+    description: "Grows this floor's level by 19.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.pinwheelPileGrowth),
+  },
+  twistWrapTumble: {
+    label: "Twist Wrap Tumble",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/candy/twistWrapTumble.webp",
+    description: "Spreads 163 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.twistWrapTumbleUpgrades),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

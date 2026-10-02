@@ -1,0 +1,21 @@
+// odds and reward sizes for featured/police.ts's crits, spread into CONFIG.crit
+export const POLICE_BALANCE = {
+  backwardGlanceChance: 0.00161561022,
+  backwardGlanceUpgrades: 173,
+  beatCopBicepsChance: 0.00163904402,
+  beatCopBicepsGrowth: 0.206,
+  bustedBurglarChance: 0.00161555139,
+  bustedBurglarUpgrades: 174,
+  closeShaveChance: 0.00163585509,
+  closeShaveGrowth: 0.207,
+  greenCollarChance: 0.00161551921,
+  greenCollarUpgrades: 175,
+  nightstickChance: 0.00163298458,
+  nightstickGrowth: 0.208,
+  ravenCurlsChance: 0.0016155048,
+  ravenCurlsUpgrades: 176,
+  silverShieldChance: 0.00163041303,
+  silverShieldGrowth: 0.209,
+  topBrassChance: 0.00161550045,
+  topBrassUpgrades: 177,
+} as const;

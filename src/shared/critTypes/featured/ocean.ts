@@ -52,4 +52,12 @@ export const OCEAN_CRITS = {
     description: "Arms this floor's next click as an x5 crit",
     reward: (context, { actions }) => actions.armCrit([context.floor], "crit"),
   },
+  lemonSails: {
+    label: "Lemon Sails",
+    color: COLOR.starYellow,
+    image: "crits/ocean/lemonSails.webp",
+    description: "Grows this floor's level by 20% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.lemonSailsGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
