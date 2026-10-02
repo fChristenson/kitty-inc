@@ -29,6 +29,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01, between } from "../../shared/easing";
 
 const KEY = "popcorn";
 const REWARD = 3;
@@ -68,9 +69,6 @@ const BLAST_SCALE = 1.6;
 const SPARK_REACH = 340;
 const SPARK_SIZE = 20;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
 
 interface Twitch {
   at: number;

@@ -21,6 +21,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01 } from "../../shared/easing";
 
 const KEY = "lineClear";
 const REWARD = 4;
@@ -152,8 +153,6 @@ const BLOCK_COIN_REACH: [number, number] = [40, 240];
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 registerEventProc(
   {

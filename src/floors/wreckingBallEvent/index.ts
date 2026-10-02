@@ -38,6 +38,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { clamp01 } from "../../shared/easing";
 
 const KEY = "wreckingBall";
 // dropped from this far above the screen
@@ -135,7 +136,6 @@ export function forceWreckingBallEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // how far through charging up it is, 0..1
 function chargeAt(ball: RunningBall, ms: number): number {

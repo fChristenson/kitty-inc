@@ -21,6 +21,14 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import {
+  lerp,
+  clamp01,
+  between,
+  smoothstep as smooth,
+} from "../../shared/easing";
+import { ringTargets } from "../../shared/coinTargets";
+import { createGlowSprite, drawGlowSprite } from "../../shared/glowShape";
 
 const KEY = "shellGame";
 const REWARD = 4;
@@ -63,16 +71,7 @@ const BLAST_SCALE = 1.9;
 const SPARK_REACH = 400;
 const SPARK_SIZE = 22;
 // the look
-const EDGE_WIDTH = 5;
-const GLOW_WIDTH = 16;
 const BAND = 0.22;
-// the cup sprite's pixels per screen unit, crisp when the view zooms in
-const SPRITE_SCALE = 1.5;
-
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
-const smooth = (u: number) => u * u * (3 - 2 * u);
 
 interface Swap {
   at: number;
@@ -200,68 +199,38 @@ registerEventProc(
         return { x: pose.x, y: pose.y - cupH * WISP_UP };
       };
 
-      // the cup drawn once at full size, its mouth's middle at (baseX, baseY),
-      // then stamped scaled for every pose
-      const pad = GLOW_WIDTH;
-      const baseX = pad + cupW / 2;
-      const baseY = pad + cupH * 1.08;
-      const spriteW = cupW + pad * 2;
-      const spriteH = cupH * 1.2 + pad * 2;
-      const sprite = document.createElement("canvas");
-      sprite.width = Math.ceil(spriteW * SPRITE_SCALE);
-      sprite.height = Math.ceil(spriteH * SPRITE_SCALE);
-      {
-        const s = sprite.getContext("2d")!;
-        s.scale(SPRITE_SCALE, SPRITE_SCALE);
-        s.lineJoin = "round";
-        const w = cupW;
-        const h = cupH;
-        const top = w * TOP_W;
-        s.beginPath();
-        s.moveTo(baseX - w / 2, baseY);
-        s.lineTo(baseX - top / 2, baseY - h);
-        s.quadraticCurveTo(baseX, baseY - h * 1.08, baseX + top / 2, baseY - h);
-        s.lineTo(baseX + w / 2, baseY);
-        s.quadraticCurveTo(baseX, baseY + h * 0.12, baseX - w / 2, baseY);
-        s.closePath();
-        s.globalAlpha = 0.4;
-        s.strokeStyle = COLOR.heavenlyGold;
-        s.lineWidth = GLOW_WIDTH;
-        s.stroke();
-        s.globalAlpha = 1;
-        s.fillStyle = COLOR.heavenlyGold;
-        s.fill();
-        s.strokeStyle = COLOR.white;
-        s.lineWidth = EDGE_WIDTH;
-        s.stroke();
-        // a white band round its middle
-        const bandY = baseY - h * 0.45;
-        const bandW = w - (w - top) * 0.45;
-        s.beginPath();
-        s.moveTo(baseX - bandW / 2, bandY);
-        s.quadraticCurveTo(
-          baseX,
-          bandY + h * BAND * 0.3,
-          baseX + bandW / 2,
-          bandY,
-        );
-        s.stroke();
-      }
+      // the cup traced once round its mouth's middle, then stamped for every pose
+      const top = cupW * TOP_W;
+      const bandY = -cupH * 0.45;
+      const bandW = cupW - (cupW - top) * 0.45;
+      const cup = createGlowSprite(
+        {
+          left: -cupW / 2,
+          top: -cupH * 1.08,
+          width: cupW,
+          height: cupH * 1.2,
+        },
+        (s) => {
+          s.moveTo(-cupW / 2, 0);
+          s.lineTo(-top / 2, -cupH);
+          s.quadraticCurveTo(0, -cupH * 1.08, top / 2, -cupH);
+          s.lineTo(cupW / 2, 0);
+          s.quadraticCurveTo(0, cupH * 0.12, -cupW / 2, 0);
+          s.closePath();
+        },
+        {
+          // a white band round its middle
+          details: (s) => {
+            s.moveTo(-bandW / 2, bandY);
+            s.quadraticCurveTo(0, bandY + cupH * BAND * 0.3, bandW / 2, bandY);
+          },
+        },
+      );
       const drawCup = (
         ctx: CanvasRenderingContext2D,
         pose: CupPose,
         grow: number,
-      ) => {
-        const k = pose.scale * grow;
-        if (k <= 0) return;
-        ctx.drawImage(
-          sprite,
-          pose.x - baseX * k,
-          pose.y - baseY * k,
-          spriteW * k,
-          spriteH * k,
-        );
-      };
+      ) => drawGlowSprite(ctx, cup, pose.x, pose.y, pose.scale * grow);
 
       const cover = startMoneyCover(
         KEY,
@@ -380,17 +349,7 @@ registerEventProc(
         const at = wispAt(blastAt - 1) ?? center;
         playSlamExplosion();
         shakeScreen(FINAL_SHAKE);
-        cover.launchFrom(
-          at,
-          Array.from({ length: FINAL_COINS }, (_, i) => {
-            const angle = (i / FINAL_COINS) * Math.PI * 2;
-            const r = between(FINAL_RING);
-            return {
-              x: at.x + Math.cos(angle) * r,
-              y: at.y + Math.sin(angle) * r,
-            };
-          }),
-        );
+        cover.launchFrom(at, ringTargets(at, FINAL_COINS, FINAL_RING));
       }
     },
   },

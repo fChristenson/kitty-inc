@@ -32,6 +32,7 @@ import { WORKER_FEET_Y } from "../worker";
 import { findFloorLines } from "../onScreenWorkers";
 import { FLOOR_W } from "../constants";
 import { drawRocket, ROCKET_HEIGHT, ROCKET_WINDOW } from "./rocket";
+import { clamp01, easeOut } from "../../shared/easing";
 
 const KEY = "rocket";
 const COINS = 260;
@@ -72,8 +73,6 @@ const PUFF_MS = 450;
 
 type Pt = { x: number; y: number };
 
-const easeOut = (t: number) => 1 - (1 - t) ** 2;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // streaks of light rushing down past the rocket at (x, y), speed 0..1
 function drawWarps(

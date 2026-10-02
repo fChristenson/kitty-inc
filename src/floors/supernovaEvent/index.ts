@@ -42,6 +42,7 @@ import {
   spotlightWorkers,
   type OnScreenWorker,
 } from "../onScreenWorkers";
+import { clamp01 } from "../../shared/easing";
 
 const KEY = "supernova";
 // charging: swelling to SWELL times its size, pulsing from PULSE_HZ[0] to
@@ -99,7 +100,6 @@ export function forceSupernovaEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 function blastMs(): number {
   const { chargeMs, collapseMs } = CONFIG.supernovaEvent;

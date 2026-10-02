@@ -20,6 +20,9 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01 } from "../../shared/easing";
+import { ringTargets, sprayTargets } from "../../shared/coinTargets";
+import { createGlowSprite, drawGlowSprite } from "../../shared/glowShape";
 
 const KEY = "whackAMole";
 const REWARD = 4;
@@ -67,12 +70,6 @@ const SPARK_REACH = 400;
 const SPARK_SIZE = 22;
 // the look
 const RIM_WIDTH = 6;
-const EDGE_WIDTH = 5;
-const GLOW_WIDTH = 16;
-
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
 
 interface Mole {
   hole: Point;
@@ -180,52 +177,43 @@ registerEventProc(
         return { x: mole.hole.x, y: mole.hole.y - lift * rise };
       };
 
+      // the mallet at its base size, traced once round its pivot (the
+      // handle's end), its head on the left
+      const length = hole * LENGTH;
+      const head = hole * HEAD;
+      const thick = hole * HEAD_THICK;
+      const grip = hole * GRIP;
+      const mallet = createGlowSprite(
+        {
+          left: -length - thick / 2,
+          top: -head / 2,
+          width: length + thick / 2,
+          height: head,
+        },
+        (s) => {
+          s.roundRect(
+            -length + thick / 2,
+            -grip / 2,
+            length - thick / 2,
+            grip,
+            grip / 2,
+          );
+          s.roundRect(-length - thick / 2, -head / 2, thick, head, thick * 0.3);
+        },
+        { maxScale: FINAL_GROW },
+      );
       const drawMallet = (ctx: CanvasRenderingContext2D, ms: number) => {
         const { strike, raise, grow } = malletAt(ms);
-        const size = hole * grow;
-        const length = size * LENGTH;
-        const head = size * HEAD;
-        const thick = size * HEAD_THICK;
         const show = clamp01(ms / OPEN_MS);
         // it pivots on the end of its handle, off to the strike's right
-        ctx.save();
-        ctx.translate(strike.x + length, strike.y - head / 2);
-        ctx.rotate(raise);
-        ctx.scale(show, show);
-        const handle = () => {
-          ctx.beginPath();
-          ctx.roundRect(
-            -length,
-            (-size * GRIP) / 2,
-            length,
-            size * GRIP,
-            size * GRIP * 0.5,
-          );
-        };
-        const top = () => {
-          ctx.beginPath();
-          ctx.roundRect(
-            -length - thick / 2,
-            -head / 2,
-            thick,
-            head,
-            thick * 0.3,
-          );
-        };
-        for (const shape of [handle, top]) {
-          shape();
-          ctx.globalAlpha = 0.4;
-          ctx.strokeStyle = COLOR.heavenlyGold;
-          ctx.lineWidth = GLOW_WIDTH;
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-          ctx.fillStyle = COLOR.heavenlyGold;
-          ctx.fill();
-          ctx.strokeStyle = COLOR.white;
-          ctx.lineWidth = EDGE_WIDTH;
-          ctx.stroke();
-        }
-        ctx.restore();
+        drawGlowSprite(
+          ctx,
+          mallet,
+          strike.x + length * grow,
+          strike.y - (head * grow) / 2,
+          grow * show,
+          raise,
+        );
       };
 
       const cover = startMoneyCover(
@@ -330,17 +318,7 @@ registerEventProc(
         if (mole.final) {
           playSlamExplosion();
           shakeScreen(FINAL_SHAKE);
-          cover.launchFrom(
-            at,
-            Array.from({ length: FINAL_COINS }, (_, k) => {
-              const angle = (k / FINAL_COINS) * Math.PI * 2;
-              const r = between(FINAL_RING);
-              return {
-                x: at.x + Math.cos(angle) * r,
-                y: at.y + Math.sin(angle) * r,
-              };
-            }),
-          );
+          cover.launchFrom(at, ringTargets(at, FINAL_COINS, FINAL_RING));
           return;
         }
         const t = i / (MOLES - 1);
@@ -348,14 +326,13 @@ registerEventProc(
         shakeScreen(lerp(WHACK_SHAKE, t));
         cover.launchFrom(
           at,
-          Array.from({ length: Math.round(lerp(WHACK_COINS, t)) }, () => {
-            const angle = -Math.PI * Math.random();
-            const r = between(SPRAY);
-            return {
-              x: at.x + Math.cos(angle) * r,
-              y: at.y + Math.sin(angle) * r,
-            };
-          }),
+          sprayTargets(
+            at,
+            Math.round(lerp(WHACK_COINS, t)),
+            SPRAY,
+            -Math.PI / 2,
+            Math.PI,
+          ),
         );
       }
     },

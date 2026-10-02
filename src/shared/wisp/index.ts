@@ -3,7 +3,7 @@
 // it and scatters wider and sinks a little as it dims. Shared by every event
 // that sends one flitting about, with the playful swoop it flies along
 import { COLOR } from "../../palette";
-import { radialFade } from "../goldShimmer";
+import { fadeStops, glowSprite } from "../glowSprite";
 import { hash01, paintTwinkleAt, stampTwinkle } from "../twinkle";
 
 export type Point = { x: number; y: number };
@@ -188,24 +188,8 @@ function drawGlint(
 }
 
 // the head's soft gold halo, fading out to its edge
-const HALO_SPRITE_HALF = 64;
-let haloCanvas: HTMLCanvasElement | null = null;
-
-function haloSprite(): HTMLCanvasElement {
-  if (haloCanvas) return haloCanvas;
-  haloCanvas = document.createElement("canvas");
-  haloCanvas.width = haloCanvas.height = HALO_SPRITE_HALF * 2;
-  const ctx = haloCanvas.getContext("2d")!;
-  ctx.fillStyle = radialFade(
-    ctx,
-    HALO_SPRITE_HALF,
-    HALO_SPRITE_HALF,
-    HALO_SPRITE_HALF,
-    COLOR.heavenlyGold,
-  );
-  ctx.fillRect(0, 0, HALO_SPRITE_HALF * 2, HALO_SPRITE_HALF * 2);
-  return haloCanvas;
-}
+const HALO_STOPS = fadeStops(COLOR.heavenlyGold);
+const haloSprite = () => glowSprite(HALO_STOPS);
 
 // a sparkle dimmer than this isn't worth a draw
 const MIN_ALPHA = 0.02;
@@ -366,6 +350,23 @@ export function drawWisp(
 ): void {
   drawWispTrail(ctx, at, ms, now, size);
   drawWispHead(ctx, at, ms, now, size, heat);
+}
+
+// drawWisp for a wisp only on stage from fromMs to toMs: costs nothing before
+// it starts or once its trail has faded. Prefer this for any wisp that ends
+export function drawWispBetween(
+  ctx: CanvasRenderingContext2D,
+  at: (ms: number) => Point | null,
+  ms: number,
+  now: number,
+  size: number,
+  heat: number,
+  fromMs: number,
+  toMs: number,
+): void {
+  if (ms < fromMs || ms > toMs + TAIL_LIFE_MS) return;
+  if (ms > toMs) drawWispTrail(ctx, at, ms, now, size);
+  else drawWisp(ctx, at, ms, now, size, heat);
 }
 
 // just the sparkle trail, for a caller drawing the head under its own transform

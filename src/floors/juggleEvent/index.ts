@@ -20,6 +20,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01, between } from "../../shared/easing";
 
 const KEY = "juggle";
 const REWARD = 4;
@@ -55,9 +56,6 @@ const BLAST_SCALE = 1.8;
 const SPARK_REACH = 380;
 const SPARK_SIZE = 22;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
 const mix = (a: Point, b: Point, u: number): Point => ({
   x: a.x + (b.x - a.x) * u,
   y: a.y + (b.y - a.y) * u,

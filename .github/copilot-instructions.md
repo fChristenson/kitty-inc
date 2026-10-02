@@ -58,6 +58,27 @@ Events (`src/floors/*Event`, listed in `docs/event-ideas.md`), like crits, must 
 - **Fast and dramatic.** The game runs on intense shakes and crits: every event hits hard and quick (about 1.5–2.5s), building to impacts with `shakeScreen`, `drawExplosion`/`drawWhiteBurst`, slams and sound. Nothing slow, gentle or drawn out.
 - **Never spin the view.** Never rotate, spin or tumble the whole screen or frozen frame: it's dizzying. Shake, slide and zoom only.
 
+### Event drawing libs
+
+Events must run smoothly on phones, so draw them with the shared libs below. Don't rebuild these inside an event.
+
+| Need                                                       | Use                                                                                                                                      |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Easing, ranges, timing                                     | `shared/easing`: `lerp`, `between`, `clamp01`, `smoothstep`, `easeIn`/`easeOut`/`easeOutCubic`/`easeOutBack`, `progress`                 |
+| Coin landing spots                                         | `shared/coinTargets`: `ringTargets`, `sprayTargets`, `clampTargetsY`                                                                     |
+| Beats fired once as the frame passes them (hits, landings) | `shared/eventBeats`: `createBeats(items, dueAt, fire)`, then `tick(ms, now)` each frame                                                  |
+| Props (cups, planks, mallets, any gold shape)              | `shared/glowShape`: `createGlowSprite` once at arm, then `drawGlowSprite(ctx, sprite, x, y, scale, rotation)`. No per-frame path strokes |
+| Soft round glows, pools, shadows, flashes                  | `shared/glowSprite`: `drawGlow` / `glowSprite` with stops hoisted to a constant. No per-frame `createRadialGradient`                     |
+| Orbs, wisps, travelling lights                             | `shared/wisp`: `drawWisp`, or `drawWispBetween` for a wisp that is only on screen for part of the event (it is culled outside that span) |
+| Sparkles in a loop                                         | `shared/twinkle`: `stampGlimmer` with `"lighter"` set once around the loop                                                               |
+| Text drawn every frame                                     | `shared/critText`: `drawCachedCritText`                                                                                                  |
+| Impacts                                                    | `shared/eventFx`: `drawWhiteBurst`, `drawExplosion`                                                                                      |
+| Dimmed frozen frame                                        | `shared/screenFreeze`: `drawFreezeDimmed` with a stable key                                                                              |
+
+- Build sprites, paths and lookups once when the event arms, not each frame. Don't allocate in the draw loop.
+- Skip anything past its window, such as dead wisps, faded trails and finished bursts. Return early once the event's visuals are done.
+- Never use `ctx.filter` or `shadowBlur` in a frame.
+
 ## Crit rules
 
 **Two layers.** A crit **tier** (`crit`/`mega`/`ultra`) sets the free upgrades and multiplier. A **proc** ("special crit") rides on a landed tier and is shown only by the celebration flash. The canonical list is `CRIT_PROC_KINDS` / `CRIT_PROC_INFO` in `src/shared/critTypes`.

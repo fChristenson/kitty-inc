@@ -19,6 +19,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01 } from "../../shared/easing";
 
 const KEY = "sonicBoom";
 const REWARD = 3;
@@ -46,8 +47,6 @@ const BALL_R = 120;
 const COINS = 44;
 const SPRAY: [number, number] = [4, 40];
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 registerEventProc(
   {

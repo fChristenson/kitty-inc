@@ -63,6 +63,7 @@ import {
   WORKER_HEIGHT,
 } from "../worker";
 import { findOnScreenWorkers } from "../onScreenWorkers";
+import { clamp01 } from "../../shared/easing";
 
 const KEY = "wisp";
 // it hovers this far above each target, sweeping 2-3 times back and forth
@@ -187,7 +188,6 @@ export function forceWispEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // where the wisp hovers over each stop, in world space; null while a floor is out of view
 function hoverPoints(

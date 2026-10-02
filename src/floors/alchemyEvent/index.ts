@@ -48,6 +48,7 @@ import {
 } from "../worker";
 import { findOnScreenWorkers, pickLowestTierClimber } from "../onScreenWorkers";
 import { cauldronCenter, cauldronMouth, drawCauldron } from "./cauldron";
+import { clamp01, smoothstep as ease } from "../../shared/easing";
 
 const KEY = "alchemy";
 const APPEAR_MS = 250;
@@ -112,8 +113,6 @@ export function forceAlchemyEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const ease = (t: number) => t * t * (3 - 2 * t);
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 function drawOverlay(
   ctx: CanvasRenderingContext2D,

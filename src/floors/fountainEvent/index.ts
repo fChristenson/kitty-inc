@@ -17,6 +17,7 @@ import {
   startMoneyCover,
   type CoverArea,
 } from "../moneyCover";
+import { between } from "../../shared/easing";
 
 const KEY = "fountain";
 const COINS = 300;
@@ -27,8 +28,6 @@ const PEAK: [number, number] = [0.04, 0.2];
 // arcs always rise at least this far above where they start or land
 const MIN_RISE = 120;
 
-const between = ([min, max]: [number, number]) =>
-  min + Math.random() * (max - min);
 
 // a thrown coin's arc from the button's jet to its landing spot
 function arcPath(

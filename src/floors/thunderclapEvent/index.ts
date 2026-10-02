@@ -38,6 +38,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { clamp01 } from "../../shared/easing";
 
 const KEY = "thunderclap";
 // the wisps start this far off the screen's sides, speeding up (their share
@@ -138,7 +139,6 @@ export function forceThunderclapEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // how far the shockwave has spread since the clap
 function waveSpread(clap: RunningClap, since: number): number {

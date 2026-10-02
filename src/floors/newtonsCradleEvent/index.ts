@@ -26,6 +26,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01 } from "../../shared/easing";
 
 const KEY = "newtonsCradle";
 const REWARD = 4;
@@ -57,8 +58,6 @@ const BLAST_SCALE = 1.8;
 const SPARK_REACH = 380;
 const SPARK_SIZE = 22;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 interface Clack {
   at: number;

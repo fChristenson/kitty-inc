@@ -27,6 +27,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp } from "../../shared/easing";
 
 const KEY = "snake";
 const REWARD = 4;
@@ -65,7 +66,6 @@ const BURST_REACH: [number, number] = [60, 300];
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 // snack spots over the area, spaced apart, visited nearest first from `from`
 function pickSnacks(

@@ -24,6 +24,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp } from "../../shared/easing";
 
 const KEY = "gatling";
 const REWARD = 3;
@@ -59,7 +60,6 @@ interface Shot {
   landedAt: number | null;
 }
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 // a spot `reach` px from the button, every way round
 function around(button: Point, reach: number, angle: number): Point {

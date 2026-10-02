@@ -20,6 +20,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp } from "../../shared/easing";
 
 const KEY = "chainReaction";
 const MINES = 8;
@@ -42,7 +43,6 @@ const SPARK_SIZE = 18;
 const COINS: [number, number] = [5, 12];
 const SPRAY_R: [number, number] = [60, 220];
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 // the mines in order, each the nearest still unlit one to the last
 function chainFrom(start: Point, spots: Point[]): Point[] {

@@ -21,6 +21,8 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01, between, smoothstep as smooth } from "../../shared/easing";
+import { ringTargets, sprayTargets } from "../../shared/coinTargets";
 
 const KEY = "clash";
 const REWARD = 4;
@@ -56,10 +58,6 @@ const BLAST_SCALE = 2;
 const SPARK_REACH = 420;
 const SPARK_SIZE = 24;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
-const smooth = (u: number) => u * u * (3 - 2 * u);
 
 interface Slam {
   at: number;
@@ -242,14 +240,7 @@ registerEventProc(
           shakeScreen(FINAL_SHAKE);
           cover.launchFrom(
             center,
-            Array.from({ length: FINAL_COINS }, (_, i) => {
-              const angle = (i / FINAL_COINS) * Math.PI * 2;
-              const r = between(FINAL_RING);
-              return {
-                x: center.x + Math.cos(angle) * r,
-                y: center.y + Math.sin(angle) * r,
-              };
-            }),
+            ringTargets(center, FINAL_COINS, FINAL_RING),
           );
           return;
         }
@@ -259,14 +250,7 @@ registerEventProc(
         shakeScreen(lerp(SLAM_SHAKE, t));
         cover.launchFrom(
           center,
-          Array.from({ length: Math.round(lerp(SLAM_COINS, t)) }, () => {
-            const angle = Math.random() * Math.PI * 2;
-            const r = between(SPRAY);
-            return {
-              x: center.x + Math.cos(angle) * r,
-              y: center.y + Math.sin(angle) * r,
-            };
-          }),
+          sprayTargets(center, Math.round(lerp(SLAM_COINS, t)), SPRAY),
         );
       }
     },

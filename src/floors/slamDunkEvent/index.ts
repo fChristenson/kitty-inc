@@ -25,6 +25,7 @@ import {
   startMoneyCover,
 } from "../moneyCover";
 import { WORKER_FEET_Y } from "../worker";
+import { lerp } from "../../shared/easing";
 
 const KEY = "slamDunk";
 const REWARD = 4;
@@ -51,7 +52,6 @@ const COINS = 40;
 const COIN_DROP: [number, number] = [80, 520];
 const COIN_SIDE = 420;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 registerEventProc(
   {

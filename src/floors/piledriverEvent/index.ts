@@ -41,6 +41,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { lerp, clamp01 } from "../../shared/easing";
 
 const KEY = "piledriver";
 // the wisp charges this far below the top of the screen, swelling to
@@ -93,8 +94,6 @@ interface RunningPiledriver {
 
 let running: RunningPiledriver | null = null;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // every visible upgrade button on the open floors in view, top to bottom
 function findButtons(

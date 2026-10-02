@@ -20,6 +20,8 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01, between } from "../../shared/easing";
+import { ringTargets } from "../../shared/coinTargets";
 
 const KEY = "scratch";
 const REWARD = 4;
@@ -61,9 +63,6 @@ const SPARK_SIZE = 22;
 const TEAR_BURST = 0.18;
 const TEAR_BURST_MS = 260;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
 
 interface Tear {
   from: Point;
@@ -291,14 +290,7 @@ registerEventProc(
         }
         cover.launchFrom(
           center,
-          Array.from({ length: FINAL_COINS }, (_, i) => {
-            const angle = (i / FINAL_COINS) * Math.PI * 2;
-            const r = between(FINAL_RING);
-            return {
-              x: center.x + Math.cos(angle) * r,
-              y: center.y + Math.sin(angle) * r,
-            };
-          }),
+          ringTargets(center, FINAL_COINS, FINAL_RING),
         );
       }
     },

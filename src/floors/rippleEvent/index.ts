@@ -20,6 +20,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { clamp01, between } from "../../shared/easing";
 
 const KEY = "ripple";
 // the first ring rolls out this far by the end, of the screen's longer side
@@ -69,9 +70,6 @@ interface Ring {
   bobPhase: number;
 }
 
-const between = ([min, max]: [number, number]) =>
-  min + Math.random() * (max - min);
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // a wide band, then one or two thin rings close behind, then the next wide
 // one; each rolling its own way

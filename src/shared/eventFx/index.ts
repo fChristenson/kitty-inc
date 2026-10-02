@@ -6,8 +6,9 @@
 import { COLOR } from "../../palette";
 import { createAbsorbPulse } from "../mergeFlash";
 import { LONG_PRESS_TICK_MS } from "../pressAndHold";
-import { drawGoldShimmer, radialFade } from "../goldShimmer";
-import { drawGlimmer, hash01 } from "../twinkle";
+import { drawGoldShimmer } from "../goldShimmer";
+import { fadeStops, glowSprite } from "../glowSprite";
+import { hash01, stampGlimmer } from "../twinkle";
 
 const BEAT_MS = LONG_PRESS_TICK_MS * 4;
 const RING_MS = 420;
@@ -325,24 +326,8 @@ export function createEventFx(
 }
 
 // a white glow fading out to its edge, stamped instead of a gradient per burst
-const FLASH_SPRITE_HALF = 64;
-let flashCanvas: HTMLCanvasElement | null = null;
-
-function flashSprite(): HTMLCanvasElement {
-  if (flashCanvas) return flashCanvas;
-  flashCanvas = document.createElement("canvas");
-  flashCanvas.width = flashCanvas.height = FLASH_SPRITE_HALF * 2;
-  const ctx = flashCanvas.getContext("2d")!;
-  ctx.fillStyle = radialFade(
-    ctx,
-    FLASH_SPRITE_HALF,
-    FLASH_SPRITE_HALF,
-    FLASH_SPRITE_HALF,
-    COLOR.white,
-  );
-  ctx.fillRect(0, 0, FLASH_SPRITE_HALF * 2, FLASH_SPRITE_HALF * 2);
-  return flashCanvas;
-}
+const FLASH_STOPS = fadeStops(COLOR.white);
+const flashSprite = () => glowSprite(FLASH_STOPS);
 
 // a white flash and shockwave ring bursting out of (x, y), t 0..1 through it;
 // the stream's climax, and scaled down for smaller impacts
@@ -389,10 +374,12 @@ export function drawExplosion(
   const t = ms / EXPLOSION_SPARK_MS;
   if (t < 0 || t >= 1) return;
   const out = 1 - (1 - t) ** 3;
+  const previous = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = "lighter";
   for (let i = 0; i < EXPLOSION_SPARKS; i++) {
     const angle = ((i + hash01(i, 4) * 0.5) / EXPLOSION_SPARKS) * Math.PI * 2;
     const r = reach * (0.45 + 0.55 * hash01(i, 5)) * out;
-    drawGlimmer(
+    stampGlimmer(
       ctx,
       x + Math.cos(angle) * r,
       y + Math.sin(angle) * r,
@@ -401,6 +388,7 @@ export function drawExplosion(
       COLOR.heavenlyGold,
     );
   }
+  ctx.globalCompositeOperation = previous;
 }
 
 // a four-point twinkle

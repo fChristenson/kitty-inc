@@ -7,8 +7,9 @@ import { COLOR } from "../../palette";
 import { critFont, drawPoppingCritText } from "../../shared/critText";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawWisp, swoop, WISP_SIZE } from "../../shared/wisp";
-import { radialFade } from "../../shared/goldShimmer";
+import { fadeStops, glowSprite, type FadeStops } from "../../shared/glowSprite";
 import type { StageRect } from "../revealStage";
+import { clamp01, easeOutBack } from "../../shared/easing";
 
 type Art = HTMLImageElement | HTMLCanvasElement;
 
@@ -57,9 +58,6 @@ const TITLE_FONT = 72;
 const TITLE_WIDTH = 0.6;
 const TEXT_GAP = 60;
 const TITLE_RISE = 1.25;
-
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const easeOutBack = (t: number) => 1 + 2.7 * (t - 1) ** 3 + 1.7 * (t - 1) ** 2;
 
 // when each beat starts, in ms from the stage being fully in
 export function badgeRevealTimeline() {
@@ -185,19 +183,14 @@ function drawSpotlight(
 }
 
 // a soft round fade, drawn once per color and stamped every frame
-const FADE_HALF = 128;
-const fadeSprites = new Map<string, HTMLCanvasElement>();
-function fadeSprite(color: string, solid: number): HTMLCanvasElement {
+const fadeSprite = (color: string, solid: number) =>
+  glowSprite(fadeStopsOf(color, solid));
+const fadeCache = new Map<string, FadeStops>();
+function fadeStopsOf(color: string, solid: number): FadeStops {
   const key = `${color}|${solid}`;
-  let sprite = fadeSprites.get(key);
-  if (sprite) return sprite;
-  sprite = document.createElement("canvas");
-  sprite.width = sprite.height = FADE_HALF * 2;
-  const c = sprite.getContext("2d")!;
-  c.fillStyle = radialFade(c, FADE_HALF, FADE_HALF, FADE_HALF, color, solid);
-  c.fillRect(0, 0, FADE_HALF * 2, FADE_HALF * 2);
-  fadeSprites.set(key, sprite);
-  return sprite;
+  let stops = fadeCache.get(key);
+  if (!stops) fadeCache.set(key, (stops = fadeStops(color, solid)));
+  return stops;
 }
 
 // the art's shape filled flat black

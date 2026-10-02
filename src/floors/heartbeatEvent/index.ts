@@ -37,6 +37,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { lerp, clamp01 } from "../../shared/easing";
 
 const KEY = "heartbeat";
 const BEATS = 7;
@@ -93,8 +94,6 @@ interface RunningHeartbeat {
 
 let running: RunningHeartbeat | null = null;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 registerEventProc(
   {

@@ -38,6 +38,7 @@ import {
   pickLowestTierClimber,
   type OnScreenWorker,
 } from "../onScreenWorkers";
+import { clamp01, smoothstep as ease } from "../../shared/easing";
 
 const KEY = "halo";
 const LIGHTS = 8;
@@ -104,8 +105,6 @@ export function forceHaloEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const ease = (t: number) => t * t * (3 - 2 * t);
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // the ring's turns `ms` in, spinning ever faster until crowned
 function ringTurns(ms: number): number {

@@ -34,6 +34,7 @@ import {
 } from "../worker";
 import { findRecruitSpots } from "../onScreenWorkers";
 import { drawFormingWorker } from "../formingWorker";
+import { clamp01, smoothstep as ease } from "../../shared/easing";
 
 const KEY = "recruit";
 const PULSE_MS = 250;
@@ -84,8 +85,6 @@ export function forceRecruitEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const ease = (t: number) => t * t * (3 - 2 * t);
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 function drawOverlay(
   ctx: CanvasRenderingContext2D,

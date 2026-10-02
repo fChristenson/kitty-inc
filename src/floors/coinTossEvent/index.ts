@@ -25,6 +25,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { easeOut as ease } from "../../shared/easing";
 
 const KEY = "coinToss";
 const COINS = 300;
@@ -39,7 +40,6 @@ const POP_MS = 400;
 const LABEL_FONT = 72;
 const LABEL_RISE = 80; // px between the coin's top and the label
 
-const ease = (t: number) => 1 - (1 - t) ** 2;
 
 registerEventProc(
   {

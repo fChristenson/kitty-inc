@@ -35,6 +35,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { lerp, clamp01 } from "../../shared/easing";
 
 const KEY = "overload";
 // overheating: shuddering up to SHUDDER px, flashing white up to FLASH_PEAK
@@ -98,8 +99,6 @@ export function forceOverloadEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 function blowMs(): number {
   const { chargeMs, suckMs } = CONFIG.overloadEvent;

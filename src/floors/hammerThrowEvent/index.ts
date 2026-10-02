@@ -22,6 +22,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp } from "../../shared/easing";
 
 const KEY = "hammerThrow";
 const REWARD = 4;
@@ -46,7 +47,6 @@ const COINS = 56;
 const FAN = 1.3;
 const COIN_REACH: [number, number] = [0.15, 0.9];
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 registerEventProc(
   {

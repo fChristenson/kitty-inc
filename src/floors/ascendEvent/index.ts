@@ -34,6 +34,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { smoothstep as easeInOut } from "../../shared/easing";
 
 const KEY = "ascend";
 // the orb starts this far below the lowest bar, and leaves this far above the top one
@@ -112,7 +113,6 @@ function barPoint(
   return { x: rect.left + bar.x, y: rect.top + bar.y };
 }
 
-const easeInOut = (t: number) => t * t * (3 - 2 * t);
 
 // where the orb is `elapsed` ms into the climb: hop k swings out to one side
 // and lands on stop k + 1 (stop 0 below the first bar, the last above the top)

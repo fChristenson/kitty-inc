@@ -36,6 +36,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { clamp01 } from "../../shared/easing";
 
 const KEY = "uppercut";
 // the wisp swoops in from this far off the screen's left edge, this far
@@ -97,7 +98,6 @@ export function forceUppercutEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 function beats() {
   const { swoopMs, riseMs, hangMs, fallMs } = CONFIG.uppercutEvent;

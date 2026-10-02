@@ -26,6 +26,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, easeOutBack } from "../../shared/easing";
 
 const KEY = "breakShot";
 const REWARD = 4;
@@ -69,8 +70,6 @@ const POP_COIN_REACH: [number, number] = [30, 180];
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const easeOutBack = (t: number) => 1 + 2.7 * (t - 1) ** 3 + 1.7 * (t - 1) ** 2;
 
 interface Ball {
   x: number;

@@ -26,6 +26,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp } from "../../shared/easing";
 
 const KEY = "bullseye";
 const REWARD = 4;
@@ -60,7 +61,6 @@ const BLAST_SCALE = 1.7;
 const SPARK_REACH = 340;
 const SPARK_SIZE = 20;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 interface Target extends Point {
   r: number;

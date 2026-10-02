@@ -22,6 +22,9 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01, between } from "../../shared/easing";
+import { ringTargets } from "../../shared/coinTargets";
+import { createGlowSprite, drawGlowSprite } from "../../shared/glowShape";
 
 const KEY = "seesaw";
 const REWARD = 4;
@@ -60,13 +63,6 @@ const FINAL_SHAKE = 2.8;
 const BLAST_SCALE = 1.9;
 const SPARK_REACH = 400;
 const SPARK_SIZE = 22;
-// the look
-const EDGE_WIDTH = 5;
-const GLOW_WIDTH = 16;
-
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
 
 interface Landing {
   at: number;
@@ -177,47 +173,27 @@ registerEventProc(
         return seatAt(side, tiltAt(ms));
       };
 
+      // the fulcrum (its tip the origin) and plank (centred), traced once
+      const fw = width * FULCRUM_W;
+      const fh = width * FULCRUM_H;
+      const fulcrum = createGlowSprite(
+        { left: -fw / 2, top: 0, width: fw, height: fh },
+        (s) => {
+          s.moveTo(0, 0);
+          s.lineTo(fw / 2, fh);
+          s.lineTo(-fw / 2, fh);
+          s.closePath();
+        },
+      );
+      const plank = createGlowSprite(
+        { left: -half, top: -thick / 2, width: half * 2, height: thick },
+        (s) => s.roundRect(-half, -thick / 2, half * 2, thick, thick / 2),
+      );
       const drawSeesaw = (ctx: CanvasRenderingContext2D, ms: number) => {
         const grow = 1 - (1 - clamp01(ms / POP_MS)) ** 3;
         if (grow <= 0) return;
-        const shapes = [
-          () => {
-            const fw = width * FULCRUM_W * grow;
-            const fh = width * FULCRUM_H * grow;
-            ctx.beginPath();
-            ctx.moveTo(pivot.x, pivot.y);
-            ctx.lineTo(pivot.x + fw / 2, pivot.y + fh);
-            ctx.lineTo(pivot.x - fw / 2, pivot.y + fh);
-            ctx.closePath();
-          },
-          () => {
-            ctx.save();
-            ctx.translate(pivot.x, pivot.y);
-            ctx.rotate(tiltAt(ms));
-            ctx.beginPath();
-            ctx.roundRect(
-              -half * grow,
-              -thick / 2,
-              half * 2 * grow,
-              thick,
-              thick / 2,
-            );
-            ctx.restore();
-          },
-        ];
-        for (const shape of shapes) {
-          shape();
-          ctx.globalAlpha = 0.4;
-          ctx.strokeStyle = COLOR.heavenlyGold;
-          ctx.lineWidth = GLOW_WIDTH;
-          ctx.stroke();
-          ctx.globalAlpha = 1;
-          ctx.fillStyle = COLOR.heavenlyGold;
-          ctx.fill();
-          ctx.strokeStyle = COLOR.white;
-          ctx.lineWidth = EDGE_WIDTH;
-          ctx.stroke();
-        }
+        drawGlowSprite(ctx, fulcrum, pivot.x, pivot.y, grow);
+        drawGlowSprite(ctx, plank, pivot.x, pivot.y, grow, tiltAt(ms));
       };
 
       const cover = startMoneyCover(
@@ -300,17 +276,7 @@ registerEventProc(
           playSlamExplosion();
           playSwoosh();
           shakeScreen(FINAL_SHAKE);
-          cover.launchFrom(
-            at,
-            Array.from({ length: FINAL_COINS }, (_, i) => {
-              const angle = (i / FINAL_COINS) * Math.PI * 2;
-              const r = between(FINAL_RING);
-              return {
-                x: at.x + Math.cos(angle) * r,
-                y: at.y + Math.sin(angle) * r,
-              };
-            }),
-          );
+          cover.launchFrom(at, ringTargets(at, FINAL_COINS, FINAL_RING));
           return;
         }
         const t = k / (LANDINGS - 2);

@@ -46,6 +46,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { between } from "../../shared/easing";
 
 const KEY = "spillover";
 // the spill pours out along this much of the bar's width
@@ -60,8 +61,6 @@ const ARC_MS = 450;
 const SLIDE_TICKS: [number, number] = [4, 8];
 const TICK_MS = 1000 / 60;
 
-const between = ([min, max]: [number, number]) =>
-  min + Math.random() * (max - min);
 
 // a coin's arc from the button to the bar, f (0..1) along the bar's width
 function sprayArc(

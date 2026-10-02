@@ -33,6 +33,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp } from "../../shared/easing";
 
 const KEY = "pingPong";
 // contacts in the rally, alternating bar and roof, starting and ending on
@@ -86,7 +87,6 @@ interface Contact {
   landedAt: number | null;
 }
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 // the clicked floor's bar, and the bar above it if that floor's open and in
 // view, local to the clicked floor

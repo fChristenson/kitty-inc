@@ -25,6 +25,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp } from "../../shared/easing";
 
 const KEY = "mitosis";
 const REWARD = 4;
@@ -51,7 +52,6 @@ const POP_COIN_REACH: [number, number] = [40, 180];
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 // p bounced back and forth between lo and hi
 function fold(p: number, lo: number, hi: number): number {

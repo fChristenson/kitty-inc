@@ -34,6 +34,7 @@ import {
 import { findUnderstaffedFloor } from "../onScreenWorkers";
 import { drawFormingWorker } from "../formingWorker";
 import { FLOOR_W } from "../constants";
+import { clamp01, smoothstep as ease } from "../../shared/easing";
 
 const KEY = "fireflies";
 // fireflies drift in from this far beyond the screen's edges, a little apart
@@ -83,8 +84,6 @@ export function forceFirefliesEvent(floor: Floor): void {
 }
 
 const between = (min: number, max: number) => min + Math.random() * (max - min);
-const ease = (t: number) => t * t * (3 - 2 * t);
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // a firefly's flight, ms from the event's start: drifting in from an edge,
 // lazily looping round the floor, then gliding into its spot

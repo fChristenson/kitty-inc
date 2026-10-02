@@ -45,6 +45,7 @@ import {
   spotlightWorkers,
   type OnScreenWorker,
 } from "../onScreenWorkers";
+import { lerp, clamp01 } from "../../shared/easing";
 
 const KEY = "paparazzi";
 // flashes per worker on the floor, at least MIN_FLASHES in all; each lands up
@@ -97,8 +98,6 @@ interface RunningPaparazzi {
 
 let running: RunningPaparazzi | null = null;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // every worker on floor in view
 function subjectsOn(floor: Floor, context: EventProcContext): OnScreenWorker[] {

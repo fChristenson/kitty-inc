@@ -20,6 +20,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { clamp01 } from "../../shared/easing";
 
 const KEY = "fuse";
 const COINS = 70;
@@ -131,7 +132,6 @@ export function forceFuseEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // a wiggling line from start to end, straight at both ends
 function planFuse(start: Point, end: Point): Point[] {

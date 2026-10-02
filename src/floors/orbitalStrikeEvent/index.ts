@@ -37,6 +37,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { clamp01 } from "../../shared/easing";
 
 const KEY = "orbitalStrike";
 // the brackets close in from this many times the bar's size to PAD px clear
@@ -111,7 +112,6 @@ export function forceOrbitalStrikeEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 function strikeMs(): number {
   const { lockMs, aimMs } = CONFIG.orbitalStrikeEvent;

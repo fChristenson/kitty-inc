@@ -28,6 +28,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01 } from "../../shared/easing";
 
 const KEY = "burrow";
 const REWARD = 3;
@@ -60,8 +61,6 @@ const SPARK_SIZE = 22;
 const COINS = 46;
 const COIN_R: [number, number] = [110, 440];
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 let scratch: HTMLCanvasElement | null = null;
 // what the scratch last held, so it's only redrawn when the button's look changes

@@ -36,6 +36,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { clamp01, smoothstep as ease } from "../../shared/easing";
 
 const KEY = "polish";
 const LIGHTS = 6;
@@ -111,8 +112,6 @@ export function forcePolishEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const ease = (t: number) => t * t * (3 - 2 * t);
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 // light i `ms` in around the bar's middle (cx, cy), or null before it pops up
 function lightAt(i: number, ms: number, cx: number, cy: number) {

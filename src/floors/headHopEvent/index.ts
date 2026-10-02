@@ -45,6 +45,7 @@ import {
   spotlightWorkers,
   type OnScreenWorker,
 } from "../onScreenWorkers";
+import { lerp } from "../../shared/easing";
 
 const KEY = "headHop";
 // the ball's radius, touching each head as it lands
@@ -114,7 +115,6 @@ export function forceHeadHopEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 // the ball ms in: dropping in, hopping head to head in arcs, then rocketing
 // up off the screen from the last

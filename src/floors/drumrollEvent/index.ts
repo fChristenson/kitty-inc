@@ -22,6 +22,8 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01, between } from "../../shared/easing";
+import { ringTargets } from "../../shared/coinTargets";
 
 const KEY = "drumroll";
 const REWARD = 4;
@@ -68,9 +70,6 @@ const BLAST_SCALE = 1.9;
 const SPARK_REACH = 400;
 const SPARK_SIZE = 22;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
 
 interface Tap {
   at: number;
@@ -284,14 +283,7 @@ registerEventProc(
         shakeScreen(FINAL_SHAKE);
         cover.launchFrom(
           head,
-          Array.from({ length: FINAL_COINS }, (_, i) => {
-            const angle = (i / FINAL_COINS) * Math.PI * 2;
-            const r = between(FINAL_RING);
-            return {
-              x: head.x + Math.cos(angle) * r,
-              y: head.y + Math.sin(angle) * r,
-            };
-          }),
+          ringTargets(head, FINAL_COINS, FINAL_RING),
         );
       }
     },

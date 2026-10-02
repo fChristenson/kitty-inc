@@ -43,6 +43,7 @@ import {
   spotlightWorkers,
   type OnScreenWorker,
 } from "../onScreenWorkers";
+import { clamp01 } from "../../shared/easing";
 
 const KEY = "bowling";
 // the ball rolls from this far off the screen's left edge to this far off its
@@ -107,7 +108,6 @@ export function forceBowlingEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
 function ballX(bowl: RunningBowl, ms: number): number {
   const u = clamp01(ms / CONFIG.bowlingEvent.rollMs) ** ROLL_EASE;

@@ -32,6 +32,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01 } from "../../shared/easing";
 
 const KEY = "drill";
 const REWARD = 3;
@@ -68,8 +69,6 @@ const COINS = 40;
 const CONE = 1.4;
 const COIN_R: [number, number] = [80, 420];
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 registerEventProc(
   {

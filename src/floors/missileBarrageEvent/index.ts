@@ -44,6 +44,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../eventProcs";
+import { lerp } from "../../shared/easing";
 
 const KEY = "missileBarrage";
 // missiles per bar
@@ -152,7 +153,6 @@ export function forceMissileBarrageEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 // a missile ms in: along its bowed path, speeding up
 function missileAt(missile: Missile, ms: number): Point | null {

@@ -7,6 +7,7 @@
 import { COLOR } from "../../palette";
 import { drawTwinkle } from "../twinkle";
 import { drawGoldShimmer } from "../goldShimmer";
+import { glowSprite, type FadeStops } from "../glowSprite";
 import { createTextGlossyGradient, drawCartoonText } from "../../utils";
 import { isDetachedJobRunning } from "../detachedJob";
 import { holdExplosions, playSlamExplosion } from "../../sound";
@@ -505,28 +506,12 @@ function drawSlamFlash(
 }
 
 // the flash's glow, drawn once and stamped
-const FLASH_HALF = 128;
-let flashSprite: HTMLCanvasElement | null = null;
-function slamFlashSprite(): HTMLCanvasElement {
-  if (flashSprite) return flashSprite;
-  flashSprite = document.createElement("canvas");
-  flashSprite.width = flashSprite.height = FLASH_HALF * 2;
-  const c = flashSprite.getContext("2d")!;
-  const gradient = c.createRadialGradient(
-    FLASH_HALF,
-    FLASH_HALF,
-    0,
-    FLASH_HALF,
-    FLASH_HALF,
-    FLASH_HALF,
-  );
-  gradient.addColorStop(0, COLOR.white);
-  gradient.addColorStop(0.35, COLOR.heavenlyGold);
-  gradient.addColorStop(1, `${COLOR.heavenlyGold}00`);
-  c.fillStyle = gradient;
-  c.fillRect(0, 0, FLASH_HALF * 2, FLASH_HALF * 2);
-  return flashSprite;
-}
+const FLASH_STOPS: FadeStops = [
+  [0, COLOR.white],
+  [0.35, COLOR.heavenlyGold],
+  [1, `${COLOR.heavenlyGold}00`],
+];
+const slamFlashSprite = () => glowSprite(FLASH_STOPS);
 
 // a slanted gold shine band sweeping left to right across a rounded rect
 function drawSlamShine(

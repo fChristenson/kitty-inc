@@ -28,6 +28,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01, smoothstep as easeInOut } from "../../shared/easing";
 
 const KEY = "breakout";
 const REWARD = 4;
@@ -74,9 +75,6 @@ const BLOW_COIN_REACH: [number, number] = [40, 200];
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const easeInOut = (t: number) => t * t * (3 - 2 * t);
 
 // p bounced back and forth between lo and hi
 function fold(p: number, lo: number, hi: number): number {

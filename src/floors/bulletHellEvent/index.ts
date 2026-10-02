@@ -26,6 +26,7 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp } from "../../shared/easing";
 
 const KEY = "bulletHell";
 const REWARD = 4;
@@ -61,7 +62,6 @@ const SPARK_SIZE = 24;
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 interface Bullet {
   bornAt: number;

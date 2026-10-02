@@ -26,6 +26,8 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01, between } from "../../shared/easing";
+import { ringTargets, sprayTargets } from "../../shared/coinTargets";
 
 const KEY = "asteroids";
 const REWARD = 4;
@@ -62,9 +64,6 @@ const BLAST_SCALE = 1.8;
 const SPARK_REACH = 380;
 const SPARK_SIZE = 22;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
 
 interface Rock {
   big: boolean;
@@ -318,14 +317,7 @@ registerEventProc(
           shakeScreen(FINAL_SHAKE);
           cover.launchFrom(
             at,
-            Array.from({ length: FINAL_COINS }, (_, k) => {
-              const angle = (k / FINAL_COINS) * Math.PI * 2;
-              const r = between(FINAL_RING);
-              return {
-                x: at.x + Math.cos(angle) * r,
-                y: at.y + Math.sin(angle) * r,
-              };
-            }),
+            ringTargets(at, FINAL_COINS, FINAL_RING),
           );
           return;
         }
@@ -334,14 +326,7 @@ registerEventProc(
         shakeScreen(lerp(HIT_SHAKE, i / (shots.length - 1)));
         cover.launchFrom(
           at,
-          Array.from({ length: rock.big ? BIG_COINS : SMALL_COINS }, () => {
-            const angle = Math.random() * Math.PI * 2;
-            const r = between(SPRAY);
-            return {
-              x: at.x + Math.cos(angle) * r,
-              y: at.y + Math.sin(angle) * r,
-            };
-          }),
+          sprayTargets(at, rock.big ? BIG_COINS : SMALL_COINS, SPRAY),
         );
       }
     },

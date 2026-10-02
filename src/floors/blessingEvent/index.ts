@@ -35,6 +35,7 @@ import {
   setWorkerSpotlights,
   WORKER_HEIGHT,
 } from "../worker";
+import { between } from "../../shared/easing";
 
 const KEY = "blessing";
 // the drifting lights that land on no one, and how they move
@@ -46,8 +47,6 @@ const SWAY_TURNS = 1.3;
 const START_ABOVE = 40;
 const BURST_MS = 500;
 
-const between = ([min, max]: [number, number]) =>
-  min + Math.random() * (max - min);
 
 interface Flake {
   x0: number;

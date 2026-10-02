@@ -20,6 +20,8 @@ import {
   isMoneyCoverRunning,
   startMoneyCover,
 } from "../moneyCover";
+import { lerp, clamp01, between } from "../../shared/easing";
+import { ringTargets, sprayTargets } from "../../shared/coinTargets";
 
 const KEY = "boomerang";
 const REWARD = 4;
@@ -49,9 +51,6 @@ const BLAST_SCALE = 1.8;
 const SPARK_REACH = 380;
 const SPARK_SIZE = 22;
 
-const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
-const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
-const between = (range: [number, number]) => lerp(range, Math.random());
 
 interface Throw {
   at: number;
@@ -211,14 +210,7 @@ registerEventProc(
           shakeScreen(FINAL_SHAKE);
           cover.launchFrom(
             button,
-            Array.from({ length: FINAL_COINS }, (_, i) => {
-              const angle = (i / FINAL_COINS) * Math.PI * 2;
-              const r = between(FINAL_RING);
-              return {
-                x: button.x + Math.cos(angle) * r,
-                y: button.y + Math.sin(angle) * r,
-              };
-            }),
+            ringTargets(button, FINAL_COINS, FINAL_RING),
           );
           return;
         }
@@ -227,14 +219,7 @@ registerEventProc(
         shakeScreen(lerp(CATCH_SHAKE, k / (throws.length - 2)));
         cover.launchFrom(
           button,
-          Array.from({ length: CATCH_COINS }, () => {
-            const angle = Math.random() * Math.PI * 2;
-            const r = between(SPRAY);
-            return {
-              x: button.x + Math.cos(angle) * r,
-              y: button.y + Math.sin(angle) * r,
-            };
-          }),
+          sprayTargets(button, CATCH_COINS, SPRAY),
         );
       }
     },

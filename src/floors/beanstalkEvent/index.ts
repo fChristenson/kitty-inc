@@ -39,6 +39,7 @@ import {
   type EventProcContext,
 } from "../eventProcs";
 import { FLOOR_H, FLOOR_W } from "../constants";
+import { smoothstep as ease } from "../../shared/easing";
 
 const KEY = "beanstalk";
 // the vine sprouts this far below the locked floor and winds this wide round
@@ -100,7 +101,6 @@ export function forceBeanstalkEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-const ease = (t: number) => t * t * (3 - 2 * t);
 
 // how far up its climb the vine is ms in, 0..1
 function progressAt(ms: number): number {

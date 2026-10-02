@@ -14,6 +14,7 @@ import { canStartMoneyCover, isMoneyCoverRunning } from "../moneyCover";
 import { startRain, type RainDrop } from "../rain";
 import { findFloorLines } from "../onScreenWorkers";
 import { FLOOR_W, SIDE_WALL_WIDTH } from "../constants";
+import { between } from "../../shared/easing";
 
 const KEY = "trickle";
 // how high a drop hops off each floor, and off the bottom as it settles
@@ -24,8 +25,6 @@ const POOL_DEPTH = 45;
 // the pool stays at least this far below the lowest floor in view
 const POOL_CLEARANCE = 25;
 
-const between = ([min, max]: [number, number]) =>
-  min + Math.random() * (max - min);
 
 // a drop falling ever faster onto each floor below it, hopping off and
 // slowing at the top of each hop, then falling on into its spot in the pool
