@@ -53,26 +53,42 @@ function getSprite(color: string): HTMLCanvasElement {
 }
 
 // small stamps come pre-rotated at a size near their own, so the hundreds a
-// trail draws are plain unscaled-ish copies: no transform, no big downscale
+// trail draws are plain unscaled-ish copies: no transform, no big downscale.
+// Every one of a color sits on one atlas canvas, so the GPU draws them all
+// from one texture
 const SMALL_HALVES = [8, 16, 32, 64];
 // a twinkle looks the same turned a quarter turn
-const TURN_STEPS = 32;
+const TURN_STEPS = 16;
 const QUARTER = Math.PI / 2;
-// per color: per size level, per turn step
-const smallSprites = new Map<string, HTMLCanvasElement[][]>();
+// kept clear round each cell so neighbours never bleed in when scaled
+const CELL_PAD = 2;
+const cellSize = (level: number) => SMALL_HALVES[level] * 2 + CELL_PAD * 2;
+const rowTops = SMALL_HALVES.map((_, level) =>
+  SMALL_HALVES.slice(0, level).reduce((sum, _h, l) => sum + cellSize(l), 0),
+);
+const atlases = new Map<string, HTMLCanvasElement>();
 
-function getSmallSprite(
-  color: string,
-  level: number,
-  step: number,
-): HTMLCanvasElement {
-  let levels = smallSprites.get(color);
-  if (!levels) smallSprites.set(color, (levels = SMALL_HALVES.map(() => [])));
-  return (levels[level][step] ??= paintTwinkle(
-    SMALL_HALVES[level],
-    (step / TURN_STEPS) * QUARTER,
-    color,
-  ));
+function getAtlas(color: string): HTMLCanvasElement {
+  let atlas = atlases.get(color);
+  if (atlas) return atlas;
+  atlas = document.createElement("canvas");
+  const last = SMALL_HALVES.length - 1;
+  atlas.width = TURN_STEPS * cellSize(last);
+  atlas.height = rowTops[last] + cellSize(last);
+  const ctx = atlas.getContext("2d")!;
+  SMALL_HALVES.forEach((half, level) => {
+    for (let step = 0; step < TURN_STEPS; step++)
+      paintTwinkleAt(
+        ctx,
+        step * cellSize(level) + CELL_PAD + half,
+        rowTops[level] + CELL_PAD + half,
+        half,
+        (step / TURN_STEPS) * QUARTER,
+        color,
+      );
+  });
+  atlases.set(color, atlas);
+  return atlas;
 }
 
 // a twinkle stamp in whatever composite ctx is already set to
@@ -98,8 +114,13 @@ export function stampTwinkle(
   }
   const turn = ((rotation % QUARTER) + QUARTER) % QUARTER;
   const step = Math.round((turn / QUARTER) * TURN_STEPS) % TURN_STEPS;
+  const half = SMALL_HALVES[level];
   ctx.drawImage(
-    getSmallSprite(color, level, step),
+    getAtlas(color),
+    step * cellSize(level) + CELL_PAD,
+    rowTops[level] + CELL_PAD,
+    half * 2,
+    half * 2,
     x - size,
     y - size,
     size * 2,

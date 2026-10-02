@@ -1064,9 +1064,10 @@ function lookBackFrameFor(walker: WalkerState, now: number): number {
 }
 
 // a perma-boosted walker drops glitter in its tier's color on the floor behind
-// it while walking; each twinkle pops in, then shrinks away
-const TRAIL_SPAWN_MS = 90;
-const TRAIL_LIFE_MS = 2700;
+// it while walking; each twinkle pops in, then shrinks away. Kept sparse: a
+// few floors of perma workers stamp all of it every frame
+const TRAIL_SPAWN_MS = 200;
+const TRAIL_LIFE_MS = 1_600;
 const TRAIL_SIZE = 30;
 const TRAIL_MAX_CATCH_UP = 5;
 

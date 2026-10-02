@@ -41,10 +41,10 @@ const FLOOR_LINE = 650 / FLOOR_H;
 // every disco floor shows the same show, so it's drawn once into shared
 // layers (the soft lights at LIGHT_SCALE, the ball at BALL_SCALE) every
 // REFRESH_MS and stamped onto each floor
-const LIGHT_SCALE = 0.5;
-const BALL_SCALE = 2;
+const LIGHT_SCALE = 0.35;
+const BALL_SCALE = 1.5;
 const BALL_HALF = BALL_RADIUS + SHINE_SIZE + 4;
-const REFRESH_MS = 33;
+const REFRESH_MS = 50;
 
 const room = {
   x: SIDE_WALL_WIDTH - ROOM_WALL_OVERLAP_PX,
