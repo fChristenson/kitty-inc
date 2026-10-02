@@ -1636,4 +1636,44 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.spreadUpgrades(context.floors, balance.toeStackLeanUpgrades),
   },
+  armbandGoblinLounge: {
+    label: "Armband Goblin Lounge",
+    color: COLOR.bullMarketGreen,
+    image: "crits/feet/armbandGoblinLounge.webp",
+    description: "Pays 132 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.armbandGoblinLoungeMultiple),
+  },
+  cobaltCropGoblin: {
+    label: "Cobalt Crop Goblin",
+    color: COLOR.moneyGreen,
+    image: "crits/feet/cobaltCropGoblin.webp",
+    description: "Grows every unlocked floor's level by 7.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.cobaltCropGoblinGrowth),
+  },
+  goblinKneeSqueeze: {
+    label: "Goblin Knee Squeeze",
+    color: COLOR.moneyGreen,
+    image: "crits/feet/goblinKneeSqueeze.webp",
+    description: "Spreads 143 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.goblinKneeSqueezeUpgrades),
+  },
+  plumBunGoblin: {
+    label: "Plum Bun Goblin",
+    color: COLOR.disabledGray,
+    image: "crits/feet/plumBunGoblin.webp",
+    description: "Pays 133 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.plumBunGoblinMultiple),
+  },
+  tealTopGoblin: {
+    label: "Teal Top Goblin",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/feet/tealTopGoblin.webp",
+    description: "Grows every unlocked floor's level by 7.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.tealTopGoblinGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
