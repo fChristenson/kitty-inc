@@ -570,6 +570,15 @@ export function wireAsteroidsEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireWhackAMoleEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-whack-a-mole-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

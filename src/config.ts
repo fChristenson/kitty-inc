@@ -361,6 +361,18 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/whackAMoleEvent — the rare "Whack-a-Mole" event: wisps pop up
+  // out of a grid of holes and a big gold mallet whacks each into coins, ever
+  // faster, until it smashes a huge last one and the coins sweep in
+  whackAMoleEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    firstWhackMs: 380, // the holes opening and the mallet's first swing
+    gapMs: [260, 120] as [number, number], // between whacks, quickening
+    finalMs: 520, // the mallet swelling and rearing back for the last
+    holdMs: 450, // after the last whack, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {

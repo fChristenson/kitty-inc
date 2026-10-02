@@ -1,11 +1,11 @@
 // the "Asteroids" event: it covers its crit, whose click freezes the screen
-// while big glowing gold rocks tumble in round its middle, where the wisp
-// hangs like a little ship. It blasts shot after shot at them, ever faster,
-// kicking back with each: every big rock it hits cracks with a flash, a bang
-// and a jolt into two smaller ones flying apart and a spray of coins, and
-// every small one bursts into coins. The last blows in a huge blast and
-// shake, and the coins sweep into the total. Pays floor income × floor
-// number × REWARD (see ../moneyCover)
+// while big wisps drift in round its middle, where a smaller wisp hangs like
+// a little ship. It blasts shot after shot at them, ever faster, kicking back
+// with each: every big wisp it hits cracks with a flash, a bang and a jolt
+// into two smaller ones flying apart and a spray of coins, and every small
+// one bursts into coins. The last blows in a huge blast and shake, and the
+// coins sweep into the total. Pays floor income × floor number × REWARD
+// (see ../moneyCover)
 import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
@@ -30,22 +30,18 @@ import {
 const KEY = "asteroids";
 const REWARD = 4;
 const BIG_ROCKS = 4;
-// the rocks: BIG_SIZE of the screen's width across (the cracked halves
+// the asteroids: wisps at BIG_SIZE of the screen's width (the cracked halves
 // SPLIT of that), starting RING of its half-size out from the middle,
-// drifting DRIFT px/s in and round and tumbling up to SPIN rad/s; the halves
-// fly KICK px/s apart. Each a jagged ring of CORNERS corners
-const BIG_SIZE = 0.16;
-const SPLIT = 0.58;
+// drifting DRIFT px/s in and round; the halves fly KICK px/s apart
+const BIG_SIZE = 0.1;
+const SPLIT = 0.6;
 const RING = 0.62;
 const DRIFT: [number, number] = [20, 45];
-const SPIN = 2.2;
 const KICK = 110;
-const CORNERS = 9;
-const ROUGH: [number, number] = [0.72, 1.05];
 const POP_MS = 220;
-// the ship: the wisp at SHIP_SIZE of the screen's width, kicked RECOIL px
+// the ship: a wisp at SHIP_SIZE of the screen's width, kicked RECOIL px
 // back from each shot, settling over RECOIL_MS; each shot a smaller wisp
-const SHIP_SIZE = 0.065;
+const SHIP_SIZE = 0.05;
 const RECOIL = 26;
 const RECOIL_MS = 90;
 const SHOT_SIZE = 0.5;
@@ -65,10 +61,6 @@ const FINAL_SHAKE = 2.7;
 const BLAST_SCALE = 1.8;
 const SPARK_REACH = 380;
 const SPARK_SIZE = 22;
-// the rocks' look
-const GLOW_WIDTH = 14;
-const EDGE_WIDTH = 4;
-const FILL_ALPHA = 0.35;
 
 const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
@@ -76,14 +68,11 @@ const between = (range: [number, number]) => lerp(range, Math.random());
 
 interface Rock {
   big: boolean;
-  radius: number;
+  size: number;
   bornAt: number;
   from: Point;
   // px/s
   velocity: Point;
-  spin: number;
-  turn: number;
-  corners: number[];
   // ms in the shot meant for it lands, and performance.now() once it has
   hitAt: number;
   hitFiredAt: number | null;
@@ -101,8 +90,6 @@ const rockAt = (rock: Rock, ms: number): Point => {
     y: rock.from.y + rock.velocity.y * s,
   };
 };
-
-const jagged = () => Array.from({ length: CORNERS }, () => between(ROUGH));
 
 registerEventProc(
   {
@@ -122,7 +109,7 @@ registerEventProc(
         y: (area.top + area.bottom) / 2,
       };
       const half = Math.min(width, height) / 2;
-      const bigRadius = (width * BIG_SIZE) / 2;
+      const bigSize = width * BIG_SIZE;
       const shipSize = Math.max(WISP_SIZE, width * SHIP_SIZE);
 
       const start = Math.random() * Math.PI * 2;
@@ -134,7 +121,7 @@ registerEventProc(
         const round = (Math.random() < 0.5 ? -1 : 1) * between(DRIFT);
         return {
           big: true,
-          radius: bigRadius,
+          size: bigSize,
           bornAt: 0,
           from: {
             x: center.x + out.x * half * RING,
@@ -144,9 +131,6 @@ registerEventProc(
             x: -out.x * inward - out.y * round,
             y: -out.y * inward + out.x * round,
           },
-          spin: (Math.random() * 2 - 1) * SPIN,
-          turn: Math.random() * Math.PI * 2,
-          corners: jagged(),
           hitAt: Infinity,
           hitFiredAt: null,
         };
@@ -170,16 +154,13 @@ registerEventProc(
           for (const side of [-1, 1]) {
             const piece: Rock = {
               big: false,
-              radius: bigRadius * SPLIT,
+              size: bigSize * SPLIT,
               bornAt: rock.hitAt,
               from: at,
               velocity: {
                 x: rock.velocity.x + side * Math.cos(away) * KICK,
                 y: rock.velocity.y + side * Math.sin(away) * KICK,
               },
-              spin: rock.spin * -1.5,
-              turn: rock.turn,
-              corners: jagged(),
               hitAt: Infinity,
               hitFiredAt: null,
             };
@@ -221,37 +202,8 @@ registerEventProc(
         };
       };
 
-      const drawRock = (
-        ctx: CanvasRenderingContext2D,
-        rock: Rock,
-        ms: number,
-      ) => {
-        const at = rockAt(rock, ms);
-        const pop = rock.big ? clamp01(ms / POP_MS) : 1;
-        const r = rock.radius * (1 - (1 - pop) ** 3);
-        if (r <= 0) return;
-        const turn = rock.turn + (rock.spin * (ms - rock.bornAt)) / 1000;
-        ctx.beginPath();
-        rock.corners.forEach((rough, k) => {
-          const angle = turn + (k / CORNERS) * Math.PI * 2;
-          const x = at.x + Math.cos(angle) * r * rough;
-          const y = at.y + Math.sin(angle) * r * rough;
-          if (k === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        });
-        ctx.closePath();
-        ctx.globalAlpha = FILL_ALPHA;
-        ctx.fillStyle = COLOR.heavenlyGold;
-        ctx.fill();
-        ctx.globalAlpha = 0.4;
-        ctx.strokeStyle = COLOR.heavenlyGold;
-        ctx.lineWidth = GLOW_WIDTH;
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-        ctx.strokeStyle = COLOR.white;
-        ctx.lineWidth = EDGE_WIDTH;
-        ctx.stroke();
-      };
+      const asteroidAt = (rock: Rock, ms: number): Point | null =>
+        ms < rock.bornAt || ms >= rock.hitAt ? null : rockAt(rock, ms);
 
       const cover = startMoneyCover(
         KEY,
@@ -271,10 +223,6 @@ registerEventProc(
             });
             ctx.save();
             ctx.translate(rect.left, rect.top);
-            ctx.lineJoin = "round";
-            for (const rock of rocks)
-              if (ms >= rock.bornAt && ms < rock.hitAt) drawRock(ctx, rock, ms);
-            ctx.globalAlpha = 1;
             shots.forEach((shot, i) => {
               const since = ms - shot.firedAt;
               if (since >= 0 && since < MUZZLE_MS)
@@ -311,7 +259,7 @@ registerEventProc(
             }
             ctx.restore();
           },
-          // the ship and its shots over the coins they blast out
+          // the asteroids, ship and shots over the coins they blast out
           drawOver: (ctx, getFloorRect) => {
             const rect = getFloorRect(floor);
             if (!rect) return;
@@ -321,6 +269,18 @@ registerEventProc(
             ctx.save();
             ctx.translate(rect.left, rect.top);
             const pop = clamp01(ms / POP_MS);
+            for (const rock of rocks) {
+              if (ms < rock.bornAt || ms > rock.hitAt + WISP_TRAIL_MS) continue;
+              const grow = rock.big ? 1 - (1 - pop) ** 3 : 1;
+              drawWisp(
+                ctx,
+                (t) => asteroidAt(rock, t),
+                ms,
+                now,
+                rock.size * grow,
+                0.2,
+              );
+            }
             drawWisp(ctx, shipAt, ms, now, shipSize * pop, heat);
             for (const shot of shots) {
               const since = ms - shot.firedAt;
