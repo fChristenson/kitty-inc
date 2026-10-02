@@ -359,6 +359,7 @@ export { forceWhackAMoleEvent } from "./whackAMoleEvent";
 export { forceDrumrollEvent } from "./drumrollEvent";
 export { forceShellGameEvent } from "./shellGameEvent";
 export { forceSeesawEvent } from "./seesawEvent";
+export { forceScratchEvent } from "./scratchEvent";
 export { forceSlashEvent } from "./slashEvent";
 export { forceJackhammerEvent } from "./jackhammerEvent";
 export { forcePummelEvent } from "./pummelEvent";

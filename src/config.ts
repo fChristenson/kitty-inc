@@ -409,6 +409,18 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/scratchEvent — the rare "Scratch" event: claw marks rake
+  // across the clicked floor's income bar, ever faster, then all burst into
+  // coins in a huge blast, and the coins sweep into the total
+  scratchEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    firstSwipeMs: 120, // before the first swipe
+    gapMs: [150, 45] as [number, number], // between swipes, quickening
+    chargeMs: 380, // the tears blazing and trembling before they burst
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {
