@@ -9,7 +9,10 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { playBoostEventStream, playExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
-import { createCritTextSprite, drawCritTextSprite } from "../../shared/critText";
+import {
+  createCritTextSprite,
+  drawCritTextSprite,
+} from "../../shared/critText";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, easeOutCubic, lerp } from "../../shared/easing";
 import { ringTargets } from "../../shared/coinTargets";

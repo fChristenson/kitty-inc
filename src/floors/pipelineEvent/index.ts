@@ -13,7 +13,13 @@ import { registerWispEvent, startWispCover } from "../wispCover";
 import { lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { roundCorners } from "../riverPaths";
-import { measure, pourDurationMs, pourLine, totalSpot, type Pour } from "../cashFlow";
+import {
+  measure,
+  pourDurationMs,
+  pourLine,
+  totalSpot,
+  type Pour,
+} from "../cashFlow";
 import type { Point } from "../../shared/wisp";
 
 const KEY = "pipeline";
@@ -50,19 +56,30 @@ export const forcePipelineEvent = registerWispEvent(
     const line = roundCorners(corners, BEND, 4);
     const along = measure(corners);
     const length = along[along.length - 1];
-    const bends = corners.slice(1, -1).map((at, k) => ({ at, ms: (travelMs * along[k + 1]) / length }));
+    const bends = corners
+      .slice(1, -1)
+      .map((at, k) => ({ at, ms: (travelMs * along[k + 1]) / length }));
     const pour: Pour = { coinsAlong: 1_500, width: 64, streamMs, travelMs };
-    const durationMs = Math.max(pourDurationMs(0, pour), travelMs + holdMs + mergeMs);
+    const durationMs = Math.max(
+      pourDurationMs(0, pour),
+      travelMs + holdMs + mergeMs,
+    );
 
-    const clanks = createBeats(bends, (b) => b.ms, (b, k) => {
-      const t = k / Math.max(1, bends.length - 1);
-      cover!.burst(b.at, lerp(BEND_BURST, t));
-      if (!cover!.isLive()) return;
-      playExplosion();
-      shakeScreen(lerp(BEND_SHAKE, t));
-    });
-    const finale = createBeats([travelMs], (ms) => ms, () =>
-      cover!.blast(cover!.total() ?? total),
+    const clanks = createBeats(
+      bends,
+      (b) => b.ms,
+      (b, k) => {
+        const t = k / Math.max(1, bends.length - 1);
+        cover!.burst(b.at, lerp(BEND_BURST, t));
+        if (!cover!.isLive()) return;
+        playExplosion();
+        shakeScreen(lerp(BEND_SHAKE, t));
+      },
+    );
+    const finale = createBeats(
+      [travelMs],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? total),
     );
 
     const cover = startWispCover(

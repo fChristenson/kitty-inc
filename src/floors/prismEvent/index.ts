@@ -54,12 +54,24 @@ export const forcePrismEvent = registerWispEvent(
     const lines = RAYS.map((deg) => {
       const a = (deg * Math.PI) / 180;
       const out = {
-        x: Math.min(area.right, Math.max(area.left, prism.x + Math.cos(a) * span * RAY)),
+        x: Math.min(
+          area.right,
+          Math.max(area.left, prism.x + Math.cos(a) * span * RAY),
+        ),
         y: Math.max(area.top, prism.y + Math.sin(a) * span * RAY),
       };
       return [
-        ...sampleLine((u) => ({ x: button.x + (prism.x - button.x) * u, y: button.y + (prism.y - button.y) * u }), STEPS),
-        ...sampleLine((u) => bezier(prism, out, total, u, { x: 0, y: 0 }), 50).slice(1),
+        ...sampleLine(
+          (u) => ({
+            x: button.x + (prism.x - button.x) * u,
+            y: button.y + (prism.y - button.y) * u,
+          }),
+          STEPS,
+        ),
+        ...sampleLine(
+          (u) => bezier(prism, out, total, u, { x: 0, y: 0 }),
+          50,
+        ).slice(1),
       ];
     });
     // one speed for every ray, so they leave the beam together
@@ -74,19 +86,30 @@ export const forcePrismEvent = registerWispEvent(
     const splitAt = (travelMs * lengths[0][STEPS]) / longest;
     const arrivals = pours.map((p) => p.travelMs);
     const lastIn = arrivals.indexOf(Math.max(...arrivals));
-    const durationMs = Math.max(pourDurationMs(0, pours[lastIn]), arrivals[lastIn] + holdMs + mergeMs);
+    const durationMs = Math.max(
+      pourDurationMs(0, pours[lastIn]),
+      arrivals[lastIn] + holdMs + mergeMs,
+    );
 
-    const split = createBeats([splitAt], (ms) => ms, () => {
-      cover!.burst(prism, SPLIT_BURST);
-      if (!cover!.isLive()) return;
-      playExplosion();
-      shakeScreen(SPLIT_SHAKE);
-    });
-    const landings = createBeats(arrivals, (ms) => ms, (_, k) => {
-      const at = cover!.total() ?? total;
-      if (k === lastIn) cover!.blast(at);
-      else cover!.burst(at, LAND_BURST);
-    });
+    const split = createBeats(
+      [splitAt],
+      (ms) => ms,
+      () => {
+        cover!.burst(prism, SPLIT_BURST);
+        if (!cover!.isLive()) return;
+        playExplosion();
+        shakeScreen(SPLIT_SHAKE);
+      },
+    );
+    const landings = createBeats(
+      arrivals,
+      (ms) => ms,
+      (_, k) => {
+        const at = cover!.total() ?? total;
+        if (k === lastIn) cover!.blast(at);
+        else cover!.burst(at, LAND_BURST);
+      },
+    );
 
     const cover = startWispCover(
       KEY,

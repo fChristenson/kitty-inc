@@ -54,11 +54,24 @@ export const forceSkiJumpEvent = registerWispEvent(
     const dip = spot(DIP);
     const lip = spot(LIP);
     const line = [
-      ...sampleLine((u) => bezier(start, { x: start.x, y: dip.y }, dip, u, { x: 0, y: 0 }), STEPS),
-      ...sampleLine((u) => bezier(dip, { x: lip.x, y: dip.y }, lip, u, { x: 0, y: 0 }), STEPS).slice(1),
+      ...sampleLine(
+        (u) => bezier(start, { x: start.x, y: dip.y }, dip, u, { x: 0, y: 0 }),
+        STEPS,
+      ),
+      ...sampleLine(
+        (u) => bezier(dip, { x: lip.x, y: dip.y }, lip, u, { x: 0, y: 0 }),
+        STEPS,
+      ).slice(1),
       // off the lip, up over the screen and down into the total
       ...sampleLine(
-        (u) => bezier(lip, { x: lip.x + (lip.x - dip.x) * 0.3, y: area.top - height * 0.05 }, total, u, { x: 0, y: 0 }),
+        (u) =>
+          bezier(
+            lip,
+            { x: lip.x + (lip.x - dip.x) * 0.3, y: area.top - height * 0.05 },
+            total,
+            u,
+            { x: 0, y: 0 },
+          ),
         STEPS * 2,
       ).slice(1),
     ];
@@ -67,24 +80,31 @@ export const forceSkiJumpEvent = registerWispEvent(
     const dipAt = (travelMs * along[STEPS]) / length;
     const lipAt = (travelMs * along[STEPS * 2]) / length;
     const pour: Pour = { coinsAlong: 2_000, width: 50, streamMs, travelMs };
-    const durationMs = Math.max(pourDurationMs(0, pour), travelMs + holdMs + mergeMs);
+    const durationMs = Math.max(
+      pourDurationMs(0, pour),
+      travelMs + holdMs + mergeMs,
+    );
     const skier = riverHead(line, travelMs);
 
-    const beats = createBeats([dipAt, lipAt, travelMs], (ms) => ms, (_, k) => {
-      if (k === 2) {
-        cover!.blast(cover!.total() ?? total);
-        return;
-      }
-      if (k === 1) cover!.burst(lip, LIP_BURST);
-      if (!cover!.isLive()) return;
-      if (k === 0) {
-        playBloop();
-        shakeScreen(DIP_SHAKE);
-        return;
-      }
-      playSwoosh();
-      shakeScreen(LIP_SHAKE);
-    });
+    const beats = createBeats(
+      [dipAt, lipAt, travelMs],
+      (ms) => ms,
+      (_, k) => {
+        if (k === 2) {
+          cover!.blast(cover!.total() ?? total);
+          return;
+        }
+        if (k === 1) cover!.burst(lip, LIP_BURST);
+        if (!cover!.isLive()) return;
+        if (k === 0) {
+          playBloop();
+          shakeScreen(DIP_SHAKE);
+          return;
+        }
+        playSwoosh();
+        shakeScreen(LIP_SHAKE);
+      },
+    );
 
     const cover = startWispCover(
       KEY,
@@ -95,7 +115,16 @@ export const forceSkiJumpEvent = registerWispEvent(
         rewardMultiplier: REWARD,
         tick: (ms, now) => beats.tick(ms, now),
         drawOver: (ctx, ms, now) =>
-          drawWispBetween(ctx, skier, ms, now, Math.max(WISP_SIZE, width * SKIER), ms > lipAt ? 1 : 0.5, 0, travelMs),
+          drawWispBetween(
+            ctx,
+            skier,
+            ms,
+            now,
+            Math.max(WISP_SIZE, width * SKIER),
+            ms > lipAt ? 1 : 0.5,
+            0,
+            travelMs,
+          ),
       },
     );
     if (!cover) return;

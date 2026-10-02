@@ -43,11 +43,15 @@ export const forceDiveBombEvent = registerWispEvent(
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const button = getButtonCenter(context.isGroundFloor);
-    const hub = { x: (area.left + area.right) / 2, y: area.top + height * HIGH };
+    const hub = {
+      x: (area.left + area.right) / 2,
+      y: area.top + height * HIGH,
+    };
     const r = width * RING;
     const way = Math.random() < 0.5 ? 1 : -1;
     const ring = (k: number, ms: number, into: Point): Point => {
-      const a = way * Math.PI * 2 * TURN_HZ * (ms / 1000) + (k / BOMBERS) * Math.PI * 2;
+      const a =
+        way * Math.PI * 2 * TURN_HZ * (ms / 1000) + (k / BOMBERS) * Math.PI * 2;
       into.x = hub.x + Math.cos(a) * r;
       into.y = hub.y + Math.sin(a) * r * SQUASH;
       return into;
@@ -74,26 +78,52 @@ export const forceDiveBombEvent = registerWispEvent(
         }
         ring(k, d.from, peel);
         // a swooping plunge, bowing out past where it peeled off
-        const bend = { x: peel.x + (peel.x - hub.x) * 0.6, y: button.y - height * 0.15 };
-        return bezier(peel, bend, button, easeIn(clamp01((ms - d.from) / diveMs)), into);
+        const bend = {
+          x: peel.x + (peel.x - hub.x) * 0.6,
+          y: button.y - height * 0.15,
+        };
+        return bezier(
+          peel,
+          bend,
+          button,
+          easeIn(clamp01((ms - d.from) / diveMs)),
+          into,
+        );
       };
     });
 
-    const peels = createBeats(dives, (d) => d.from, () => {
-      if (cover?.isLive()) playSwoosh();
-    });
-    const hits = createBeats(dives, (d) => d.hitAt, (_, k) => {
-      if (k === BOMBERS - 1) {
-        cover!.blast(button);
-        return;
-      }
-      const t = k / (BOMBERS - 2);
-      cover!.burst(button, lerp(HIT_BURST, t));
-      cover!.launchFrom(button, sprayTargets(button, HIT_COINS[k], HIT_REACH, -Math.PI / 2, Math.PI * 1.2));
-      if (!cover!.isLive()) return;
-      playExplosion();
-      shakeScreen(lerp(HIT_SHAKE, t));
-    });
+    const peels = createBeats(
+      dives,
+      (d) => d.from,
+      () => {
+        if (cover?.isLive()) playSwoosh();
+      },
+    );
+    const hits = createBeats(
+      dives,
+      (d) => d.hitAt,
+      (_, k) => {
+        if (k === BOMBERS - 1) {
+          cover!.blast(button);
+          return;
+        }
+        const t = k / (BOMBERS - 2);
+        cover!.burst(button, lerp(HIT_BURST, t));
+        cover!.launchFrom(
+          button,
+          sprayTargets(
+            button,
+            HIT_COINS[k],
+            HIT_REACH,
+            -Math.PI / 2,
+            Math.PI * 1.2,
+          ),
+        );
+        if (!cover!.isLive()) return;
+        playExplosion();
+        shakeScreen(lerp(HIT_SHAKE, t));
+      },
+    );
 
     const cover = startWispCover(
       KEY,
@@ -109,7 +139,16 @@ export const forceDiveBombEvent = registerWispEvent(
         drawOver: (ctx, ms, now) => {
           const size = Math.max(WISP_SIZE, width * WISP);
           bombers.forEach((at, k) =>
-            drawWispBetween(ctx, at, ms, now, size, ms >= dives[k].from ? 1 : 0.3, 0, dives[k].hitAt),
+            drawWispBetween(
+              ctx,
+              at,
+              ms,
+              now,
+              size,
+              ms >= dives[k].from ? 1 : 0.3,
+              0,
+              dives[k].hitAt,
+            ),
           );
         },
       },

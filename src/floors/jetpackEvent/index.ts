@@ -12,7 +12,13 @@ import { drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
 import type { CoinPath } from "../coins";
 import { getButtonCenter } from "../upgradeButton";
 import { registerWispEvent, startWispCover } from "../wispCover";
-import { between, clamp01, easeIn, lerp, smoothstep } from "../../shared/easing";
+import {
+  between,
+  clamp01,
+  easeIn,
+  lerp,
+  smoothstep,
+} from "../../shared/easing";
 import { bezier } from "../../shared/curves";
 import { createBeats } from "../../shared/eventBeats";
 import { totalSpot } from "../cashFlow";
@@ -53,7 +59,9 @@ export const forceJetpackEvent = registerWispEvent(
       const u = clamp01(ms / flyMs);
       const up = smoothstep(u);
       into.x =
-        button.x + (total.x - button.x) * up + way * width * SWAY * Math.sin(Math.PI * 2 * WOBBLES * u) * (1 - u);
+        button.x +
+        (total.x - button.x) * up +
+        way * width * SWAY * Math.sin(Math.PI * 2 * WOBBLES * u) * (1 - u);
       into.y = button.y + (total.y - button.y) * up;
       return into;
     };
@@ -83,16 +91,26 @@ export const forceJetpackEvent = registerWispEvent(
         if (ms < leave) return { ...at(ms), scale: COIN };
         const start = at(leave);
         const total = cover?.total() ?? fallback;
-        const p = bezier(start, { x: start.x, y: total.y }, total, easeIn(clamp01((ms - leave) / flightMs)), {
-          x: 0,
-          y: 0,
-        });
+        const p = bezier(
+          start,
+          { x: start.x, y: total.y },
+          total,
+          easeIn(clamp01((ms - leave) / flightMs)),
+          {
+            x: 0,
+            y: 0,
+          },
+        );
         return { x: p.x, y: p.y, scale: COIN };
       };
     });
 
     let lastRumble = -Infinity;
-    const finale = createBeats([flyMs], (ms) => ms, () => cover!.blast(cover!.total() ?? fallback));
+    const finale = createBeats(
+      [flyMs],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? fallback),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -110,7 +128,16 @@ export const forceJetpackEvent = registerWispEvent(
         },
         drawOver: (ctx, ms, now) => {
           const heat = clamp01(ms / flyMs);
-          drawWispBetween(ctx, jetAt, ms, now, Math.max(WISP_SIZE, width * lerp(WISP, heat)), heat, 0, flyMs);
+          drawWispBetween(
+            ctx,
+            jetAt,
+            ms,
+            now,
+            Math.max(WISP_SIZE, width * lerp(WISP, heat)),
+            heat,
+            0,
+            flyMs,
+          );
         },
       },
     );

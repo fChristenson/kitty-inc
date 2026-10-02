@@ -34,7 +34,10 @@ export const forceBassDropEvent = registerWispEvent(
   (floor, context, area) => {
     const { beatMs, silenceMs, holdMs, mergeMs } = CONFIG.bassDropEvent;
     const span = Math.min(area.right - area.left, area.bottom - area.top);
-    const mid = { x: (area.left + area.right) / 2, y: (area.top + area.bottom) / 2 };
+    const mid = {
+      x: (area.left + area.right) / 2,
+      y: (area.top + area.bottom) / 2,
+    };
     const pulses: { at: number; size: number }[] = [];
     for (let k = 0; k < BEATS; k++) pulses.push({ at: k * beatMs, size: 0 });
     let at = BEATS * beatMs;
@@ -45,23 +48,34 @@ export const forceBassDropEvent = registerWispEvent(
     }
     const dropAt = at + silenceMs;
 
-    const beats = createBeats(pulses, (p) => p.at, (p) => {
-      cover!.burst(mid, lerp([BEAT.burst, ROLL_PEAK.burst], p.size));
-      if (!cover!.isLive()) return;
-      playBloop();
-      shakeScreen(lerp([BEAT.shake, ROLL_PEAK.shake], p.size));
-    });
-    const drop = createBeats([dropAt], (ms) => ms, () => {
-      cover!.blast(mid);
-      cover!.launchFrom(
-        mid,
-        clampTargetsY(
-          sprayTargets(mid, DROP_COINS, [span * DROP_REACH[0], span * DROP_REACH[1]]),
-          area.top + 40,
-          area.bottom - 20,
-        ),
-      );
-    });
+    const beats = createBeats(
+      pulses,
+      (p) => p.at,
+      (p) => {
+        cover!.burst(mid, lerp([BEAT.burst, ROLL_PEAK.burst], p.size));
+        if (!cover!.isLive()) return;
+        playBloop();
+        shakeScreen(lerp([BEAT.shake, ROLL_PEAK.shake], p.size));
+      },
+    );
+    const drop = createBeats(
+      [dropAt],
+      (ms) => ms,
+      () => {
+        cover!.blast(mid);
+        cover!.launchFrom(
+          mid,
+          clampTargetsY(
+            sprayTargets(mid, DROP_COINS, [
+              span * DROP_REACH[0],
+              span * DROP_REACH[1],
+            ]),
+            area.top + 40,
+            area.bottom - 20,
+          ),
+        );
+      },
+    );
 
     const cover = startWispCover(
       KEY,

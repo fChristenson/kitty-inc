@@ -75,17 +75,29 @@ export const forceSlinkyEvent = registerWispEvent(
     });
     const pour: Pour = { coinsAlong: 1_700, width: 24, streamMs, travelMs };
     const endAt = streamMs + travelMs;
-    const durationMs = Math.max(pourDurationMs(0, pour), endAt + holdMs + mergeMs);
+    const durationMs = Math.max(
+      pourDurationMs(0, pour),
+      endAt + holdMs + mergeMs,
+    );
 
-    const coiling = createBeats(loops, (l) => l.at, (l, k) => {
-      const t = k / (LOOPS - 1);
-      cover!.burst(pointAlong(middle, spineAlong, l.u, { x: 0, y: 0 }), lerp(LOOP_BURST, t));
-      if (!cover!.isLive()) return;
-      playBloop();
-      shakeScreen(lerp(LOOP_SHAKE, t));
-    });
-    const finale = createBeats([endAt], (ms) => ms, () =>
-      cover!.blast(cover!.total() ?? total),
+    const coiling = createBeats(
+      loops,
+      (l) => l.at,
+      (l, k) => {
+        const t = k / (LOOPS - 1);
+        cover!.burst(
+          pointAlong(middle, spineAlong, l.u, { x: 0, y: 0 }),
+          lerp(LOOP_BURST, t),
+        );
+        if (!cover!.isLive()) return;
+        playBloop();
+        shakeScreen(lerp(LOOP_SHAKE, t));
+      },
+    );
+    const finale = createBeats(
+      [endAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? total),
     );
 
     const cover = startWispCover(

@@ -48,11 +48,13 @@ export const forceTrampolineEvent = registerWispEvent(
     const g = (2 * (ground - top)) / (dropMs * dropMs);
     const hops = BOUNCES.map((share) => climb * share);
     const landings: number[] = [dropMs];
-    for (const h of hops) landings.push(landings[landings.length - 1] + 2 * Math.sqrt((2 * h) / g));
+    for (const h of hops)
+      landings.push(landings[landings.length - 1] + 2 * Math.sqrt((2 * h) / g));
     const launchAt = landings[landings.length - 1];
     const inAt = launchAt + Math.sqrt((2 * climb) / g);
     // drifting across toward the total, a step per bounce
-    const xAt = (ms: number) => startX + (fallback.x - startX) * clamp01(ms / inAt);
+    const xAt = (ms: number) =>
+      startX + (fallback.x - startX) * clamp01(ms / inAt);
     const into = { x: 0, y: 0 };
     const wispAt = (ms: number): Point | null => {
       if (ms < 0 || ms >= inAt) return null;
@@ -75,16 +77,33 @@ export const forceTrampolineEvent = registerWispEvent(
       return into;
     };
 
-    const slams = createBeats(landings, (ms) => ms, (ms, k) => {
-      const t = k / (landings.length - 1);
-      const at = { x: xAt(ms), y: ground };
-      cover!.burst(at, lerp(LAND_BURST, t));
-      cover!.launchFrom(at, sprayTargets(at, LAND_COINS[k], LAND_REACH, -Math.PI / 2, Math.PI * 0.8));
-      if (!cover!.isLive()) return;
-      playExplosion();
-      shakeScreen(lerp(LAND_SHAKE, t));
-    });
-    const finale = createBeats([inAt], (ms) => ms, () => cover!.blast(cover!.total() ?? fallback));
+    const slams = createBeats(
+      landings,
+      (ms) => ms,
+      (ms, k) => {
+        const t = k / (landings.length - 1);
+        const at = { x: xAt(ms), y: ground };
+        cover!.burst(at, lerp(LAND_BURST, t));
+        cover!.launchFrom(
+          at,
+          sprayTargets(
+            at,
+            LAND_COINS[k],
+            LAND_REACH,
+            -Math.PI / 2,
+            Math.PI * 0.8,
+          ),
+        );
+        if (!cover!.isLive()) return;
+        playExplosion();
+        shakeScreen(lerp(LAND_SHAKE, t));
+      },
+    );
+    const finale = createBeats(
+      [inAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? fallback),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -100,8 +119,18 @@ export const forceTrampolineEvent = registerWispEvent(
         drawOver: (ctx, ms, now) => {
           const latest = slams.latest();
           const squash = latest ? clamp01((now - latest.at) / SQUASH_MS) : 1;
-          const size = Math.max(WISP_SIZE, width * WISP) * (1 - SQUASH * (1 - squash));
-          drawWispBetween(ctx, wispAt, ms, now, size, clamp01(ms / inAt), 0, inAt);
+          const size =
+            Math.max(WISP_SIZE, width * WISP) * (1 - SQUASH * (1 - squash));
+          drawWispBetween(
+            ctx,
+            wispAt,
+            ms,
+            now,
+            size,
+            clamp01(ms / inAt),
+            0,
+            inAt,
+          );
         },
       },
     );

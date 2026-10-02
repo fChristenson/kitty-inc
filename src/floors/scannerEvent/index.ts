@@ -47,10 +47,13 @@ export const forceScannerEvent = registerWispEvent(
     // the line's height ms in: down, a beat at the bottom, then back up to
     // the total
     const lineY = (ms: number) => {
-      if (ms < scanMs) return area.top + (bottom - area.top) * clamp01(ms / scanMs);
+      if (ms < scanMs)
+        return area.top + (bottom - area.top) * clamp01(ms / scanMs);
       if (ms < upFrom) return bottom;
       const total = cover?.total() ?? fallback;
-      return bottom + (total.y - bottom) * easeIn(clamp01((ms - upFrom) / sweepMs));
+      return (
+        bottom + (total.y - bottom) * easeIn(clamp01((ms - upFrom) / sweepMs))
+      );
     };
     const band = document.createElement("canvas");
     band.width = 4;
@@ -70,7 +73,10 @@ export const forceScannerEvent = registerWispEvent(
       const y = top + Math.random() * (bottom - top - 10);
       const shownAt = (scanMs * (y - area.top)) / (bottom - area.top);
       // caught as the line comes back up past it (easeIn: solve for when)
-      const caughtUp = Math.min(0.98, Math.sqrt(Math.max(0, bottom - y) / (bottom - fallback.y)));
+      const caughtUp = Math.min(
+        0.98,
+        Math.sqrt(Math.max(0, bottom - y) / (bottom - fallback.y)),
+      );
       const caughtAt = upFrom + sweepMs * caughtUp;
       const lag = (Math.random() - 0.5) * RIDE * 2;
       return (f) => {
@@ -80,7 +86,9 @@ export const forceScannerEvent = registerWispEvent(
           return { x, y, scale: COIN * Math.min(1, (ms - shownAt) / POP_MS) };
         const total = cover?.total() ?? fallback;
         // from where it was caught, gathering in onto the total
-        const s = clamp01((clamp01((ms - upFrom) / sweepMs) - caughtUp) / (1 - caughtUp || 1));
+        const s = clamp01(
+          (clamp01((ms - upFrom) / sweepMs) - caughtUp) / (1 - caughtUp || 1),
+        );
         return {
           x: x + (total.x - x) * s * s,
           y: lineY(ms) + lag * Math.sin(Math.PI * s),
@@ -90,12 +98,20 @@ export const forceScannerEvent = registerWispEvent(
     });
 
     let lastRumble = -Infinity;
-    const turn = createBeats([scanMs], (ms) => ms, () => {
-      if (!cover?.isLive()) return;
-      playSwoosh();
-      shakeScreen(TURN_SHAKE);
-    });
-    const finale = createBeats([travelMs], (ms) => ms, () => cover!.blast(cover!.total() ?? fallback));
+    const turn = createBeats(
+      [scanMs],
+      (ms) => ms,
+      () => {
+        if (!cover?.isLive()) return;
+        playSwoosh();
+        shakeScreen(TURN_SHAKE);
+      },
+    );
+    const finale = createBeats(
+      [travelMs],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? fallback),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -107,7 +123,11 @@ export const forceScannerEvent = registerWispEvent(
         tick: (ms, now) => {
           turn.tick(ms, now);
           finale.tick(ms, now);
-          if (ms < travelMs && now - lastRumble >= RUMBLE_MS && cover?.isLive()) {
+          if (
+            ms < travelMs &&
+            now - lastRumble >= RUMBLE_MS &&
+            cover?.isLive()
+          ) {
             lastRumble = now;
             shakeScreen(RUMBLE);
           }

@@ -50,7 +50,9 @@ export const forceHummingbirdEvent = registerWispEvent(
     const fallback = totalSpot(area);
     const flip = Math.random() < 0.5;
     const stops = STOPS.map((s) => ({
-      x: area.left + width * ((flip ? 1 - s.x : s.x) + (Math.random() - 0.5) * JITTER),
+      x:
+        area.left +
+        width * ((flip ? 1 - s.x : s.x) + (Math.random() - 0.5) * JITTER),
       y: area.top + height * (s.y + (Math.random() - 0.5) * JITTER),
     }));
     // [arrive, leave] at each stop: a dart there, then a hover
@@ -66,9 +68,19 @@ export const forceHummingbirdEvent = registerWispEvent(
     const wispAt = (ms: number): Point | null => {
       if (ms < 0 || ms >= inAt) return null;
       const k = visits.findIndex((v) => ms < v.leave);
-      const from = k <= 0 ? (k === 0 ? button : visits[visits.length - 1].at) : visits[k - 1].at;
+      const from =
+        k <= 0
+          ? k === 0
+            ? button
+            : visits[visits.length - 1].at
+          : visits[k - 1].at;
       const to = k < 0 ? (cover?.total() ?? fallback) : visits[k].at;
-      const departed = k <= 0 ? (k === 0 ? 0 : visits[visits.length - 1].leave) : visits[k - 1].leave;
+      const departed =
+        k <= 0
+          ? k === 0
+            ? 0
+            : visits[visits.length - 1].leave
+          : visits[k - 1].leave;
       const u = clamp01((ms - departed) / dartMs);
       if (u < 1) {
         const e = easeOutCubic(u);
@@ -81,15 +93,23 @@ export const forceHummingbirdEvent = registerWispEvent(
       return into;
     };
 
-    const stopping = createBeats(visits, (v) => v.arrive, (v, k) => {
-      const t = k / (visits.length - 1);
-      cover!.burst(v.at, STOP_BURST);
-      cover!.launchFrom(v.at, ringTargets(v.at, STOP_COINS, STOP_REACH));
-      if (!cover!.isLive()) return;
-      playBloop();
-      shakeScreen(lerp(STOP_SHAKE, t));
-    });
-    const finale = createBeats([inAt], (ms) => ms, () => cover!.blast(cover!.total() ?? fallback));
+    const stopping = createBeats(
+      visits,
+      (v) => v.arrive,
+      (v, k) => {
+        const t = k / (visits.length - 1);
+        cover!.burst(v.at, STOP_BURST);
+        cover!.launchFrom(v.at, ringTargets(v.at, STOP_COINS, STOP_REACH));
+        if (!cover!.isLive()) return;
+        playBloop();
+        shakeScreen(lerp(STOP_SHAKE, t));
+      },
+    );
+    const finale = createBeats(
+      [inAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? fallback),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -103,7 +123,16 @@ export const forceHummingbirdEvent = registerWispEvent(
           finale.tick(ms, now);
         },
         drawOver: (ctx, ms, now) =>
-          drawWispBetween(ctx, wispAt, ms, now, Math.max(WISP_SIZE, width * WISP), clamp01(ms / inAt), 0, inAt),
+          drawWispBetween(
+            ctx,
+            wispAt,
+            ms,
+            now,
+            Math.max(WISP_SIZE, width * WISP),
+            clamp01(ms / inAt),
+            0,
+            inAt,
+          ),
       },
     );
     if (!cover) return;
