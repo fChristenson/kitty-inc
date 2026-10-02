@@ -177,4 +177,12 @@ export const CRITTERS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash([context.floor], balance.feetsOfFuryMultiple),
   },
+  denimRat: {
+    label: "Denim Rat",
+    color: COLOR.coffeeRunTeal,
+    image: "crits/critters/denimRat.webp",
+    description: "Grows this floor's level by 26.6% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.denimRatGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

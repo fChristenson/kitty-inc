@@ -165,4 +165,20 @@ export const CAT_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.repeatCrit(context, "both", balance.whiskerWinkContinueChance),
   },
+  primaryPaws: {
+    label: "Primary Paws",
+    color: COLOR.fastForwardBlue,
+    image: "crits/catGirls/primaryPaws.webp",
+    description: "Grows this floor's level by 25.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.primaryPawsGrowth),
+  },
+  snowyAndSandy: {
+    label: "Snowy And Sandy",
+    color: COLOR.amberMuted,
+    image: "crits/catGirls/snowyAndSandy.webp",
+    description: "Grows this floor's level by 25.2% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.snowyAndSandyGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

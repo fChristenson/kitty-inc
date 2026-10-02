@@ -178,4 +178,28 @@ export const COW_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.unlockFloors(context, balance.stampedeStocksFloors),
   },
+  coneLick: {
+    label: "Cone Lick",
+    color: COLOR.fastForwardBlue,
+    image: "crits/cowGirls/coneLick.webp",
+    description: "Grows this floor's level by 26.3% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.coneLickGrowth),
+  },
+  softServeShare: {
+    label: "Soft Serve Share",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/cowGirls/softServeShare.webp",
+    description: "Grows this floor's level by 26.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.softServeShareGrowth),
+  },
+  strawberryScoop: {
+    label: "Strawberry Scoop",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/cowGirls/strawberryScoop.webp",
+    description: "Grows this floor's level by 26.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.strawberryScoopGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

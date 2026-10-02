@@ -273,4 +273,60 @@ export const CHROME_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.growLevels(context.floors, balance.standingOvationGrowth),
   },
+  bicepBooster: {
+    label: "Bicep Booster",
+    color: COLOR.overflowBlue,
+    image: "crits/chromeGirls/bicepBooster.webp",
+    description: "Grows this floor's level by 25.3% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.bicepBoosterGrowth),
+  },
+  blueBoltFlex: {
+    label: "Blue Bolt Flex",
+    color: COLOR.overflowBlue,
+    image: "crits/chromeGirls/blueBoltFlex.webp",
+    description: "Grows this floor's level by 25.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.blueBoltFlexGrowth),
+  },
+  chromeKnuckles: {
+    label: "Chrome Knuckles",
+    color: COLOR.fastForwardBlue,
+    image: "crits/chromeGirls/chromeKnuckles.webp",
+    description: "Grows this floor's level by 25.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.chromeKnucklesGrowth),
+  },
+  headsetMech: {
+    label: "Headset Mech",
+    color: COLOR.fastForwardBlue,
+    image: "crits/chromeGirls/headsetMech.webp",
+    description: "Grows this floor's level by 25.6% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.headsetMechGrowth),
+  },
+  pinkPiston: {
+    label: "Pink Piston",
+    color: COLOR.sameBoatCoral,
+    image: "crits/chromeGirls/pinkPiston.webp",
+    description: "Grows this floor's level by 25.7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.pinkPistonGrowth),
+  },
+  silverMechSuit: {
+    label: "Silver Mech Suit",
+    color: COLOR.overflowBlue,
+    image: "crits/chromeGirls/silverMechSuit.webp",
+    description: "Grows this floor's level by 25.8% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.silverMechSuitGrowth),
+  },
+  topazCore: {
+    label: "Topaz Core",
+    color: COLOR.fastForwardBlue,
+    image: "crits/chromeGirls/topazCore.webp",
+    description: "Grows this floor's level by 25.9% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.topazCoreGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

@@ -71,6 +71,9 @@ import { CAT_DOCTORS_BALANCE } from "./catDoctors";
 import { CAT_SCIENTISTS_BALANCE } from "./catScientists";
 import { PIRATES_BALANCE } from "./pirates";
 import { POLICE_BALANCE } from "./police";
+import { CLEANERS_BALANCE } from "./cleaners";
+import { BEDTIME_BALANCE } from "./bedtime";
+import { SPACE_KNIGHTS_BALANCE } from "./spaceKnights";
 
 export const FEATURED_CRIT_BALANCE = {
   ...CYBERPUNK_BALANCE,
@@ -144,4 +147,7 @@ export const FEATURED_CRIT_BALANCE = {
   ...CAT_SCIENTISTS_BALANCE,
   ...PIRATES_BALANCE,
   ...POLICE_BALANCE,
+  ...CLEANERS_BALANCE,
+  ...BEDTIME_BALANCE,
+  ...SPACE_KNIGHTS_BALANCE,
 } as const;

@@ -2663,4 +2663,36 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.growLevels([context.floor], balance.yellowShortsSmackGrowth),
   },
+  bearyBuff: {
+    label: "Beary Buff",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/muscleGirls/bearyBuff.webp",
+    description: "Grows this floor's level by 26.7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.bearyBuffGrowth),
+  },
+  gingerGnawers: {
+    label: "Ginger Gnawers",
+    color: COLOR.orange,
+    image: "crits/muscleGirls/gingerGnawers.webp",
+    description: "Grows this floor's level by 26.8% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.gingerGnawersGrowth),
+  },
+  hippoHeavyweights: {
+    label: "Hippo Heavyweights",
+    color: COLOR.fastForwardBlue,
+    image: "crits/muscleGirls/hippoHeavyweights.webp",
+    description: "Grows this floor's level by 26.9% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.hippoHeavyweightsGrowth),
+  },
+  labRatLifters: {
+    label: "Lab Rat Lifters",
+    color: COLOR.overflowBlue,
+    image: "crits/muscleGirls/labRatLifters.webp",
+    description: "Grows this floor's level by 27% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.labRatLiftersGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

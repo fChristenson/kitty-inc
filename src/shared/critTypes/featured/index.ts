@@ -70,6 +70,9 @@ import { CAT_DOCTORS_CRITS } from "./catDoctors";
 import { CAT_SCIENTISTS_CRITS } from "./catScientists";
 import { PIRATES_CRITS } from "./pirates";
 import { POLICE_CRITS } from "./police";
+import { CLEANERS_CRITS } from "./cleaners";
+import { BEDTIME_CRITS } from "./bedtime";
+import { SPACE_KNIGHTS_CRITS } from "./spaceKnights";
 
 export const FEATURED_CRITS = {
   ...CYBERPUNK_CRITS,
@@ -143,4 +146,7 @@ export const FEATURED_CRITS = {
   ...CAT_SCIENTISTS_CRITS,
   ...PIRATES_CRITS,
   ...POLICE_CRITS,
+  ...CLEANERS_CRITS,
+  ...BEDTIME_CRITS,
+  ...SPACE_KNIGHTS_CRITS,
 } as const;
