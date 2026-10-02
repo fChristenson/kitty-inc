@@ -252,6 +252,12 @@ import {
   forceRailgunEvent,
   forceThunderdomeEvent,
   forceMeltEvent,
+  forceFloodEvent,
+  forcePiedPiperEvent,
+  forceTentaclesEvent,
+  forceLaserPendulumEvent,
+  forceElectricEelEvent,
+  forceDoubleVisionEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1370,6 +1376,12 @@ async function main() {
       railgun: forceOnActive(forceRailgunEvent),
       thunderdome: forceOnActive(forceThunderdomeEvent),
       melt: forceOnActive(forceMeltEvent),
+      flood: forceOnActive(forceFloodEvent),
+      "pied-piper": forceOnActive(forcePiedPiperEvent),
+      tentacles: forceOnActive(forceTentaclesEvent),
+      "laser-pendulum": forceOnActive(forceLaserPendulumEvent),
+      "electric-eel": forceOnActive(forceElectricEelEvent),
+      "double-vision": forceOnActive(forceDoubleVisionEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

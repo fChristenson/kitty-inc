@@ -1968,6 +1968,64 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, levels + cash: src/floors/floodEvent: a flood of cash rises up the
+  // screen over the bars
+  floodEvent: {
+    chance: 0.01,
+    riseMs: 1_300, // the surface rising, speeding up
+    drainMs: 300, // from the top layer to the bottom setting off
+    flightMs: 400, // each coin's surge into the total
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, worker tiers + a crit tier: src/floors/piedPiperEvent: a wisp leads
+  // a growing train past the workers into the clicked bar
+  piedPiperEvent: {
+    chance: 0.01,
+    leadMs: 1_500, // the piper's run from the button to the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, an unlock + cash: src/floors/tentaclesEvent: tentacles of cash rip
+  // the locked floor open
+  tentaclesEvent: {
+    chance: 0.01,
+    riseMs: 300, // the wisp rising under the floor
+    gapsMs: [220, 120] as [number, number], // between tentacles, quickening
+    reachMs: 300, // each tentacle's lash up to its grip
+    heaveMs: 400, // all of them heaving before it rips
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, levels + a crit tier: src/floors/laserPendulumEvent: a swinging
+  // beam slices the bars
+  laserPendulumEvent: {
+    chance: 0.01,
+    swingMs: 1_500, // swinging, ever wider
+    periodsMs: [800, 450] as [number, number], // each swing, quickening
+    lockMs: 220, // whipping round onto the clicked bar
+    levelShare: 0.05, // of each bar's levels, per slice
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, cash: src/floors/electricEelEvent: an eel of cash crackles
+  // across the screen
+  electricEelEvent: {
+    chance: 0.01,
+    swimMs: 1_500, // swimming across in S-waves
+    diveMs: 300, // diving into the total
+    discharges: 4, // its body flaring and lashing bolts
+    holdMs: 200,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/doubleVisionEvent: the screen seen double
+  doubleVisionEvent: {
+    chance: 0.01,
+    lurchesMs: [100, 420, 700, 940, 1_140], // each lurch apart
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
