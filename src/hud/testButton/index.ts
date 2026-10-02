@@ -630,6 +630,57 @@ export function wireBumpersEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireCatcherEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-catcher-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+export function wireImplosionEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-implosion-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+export function wireAtomEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-atom-event")!;
+  button.addEventListener("click", onClick);
+}
+export function wireSpiralEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-spiral-event")!;
+  button.addEventListener("click", onClick);
+}
+export function wireLoopEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-loop-event")!;
+  button.addEventListener("click", onClick);
+}
+export function wireEternityEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-eternity-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

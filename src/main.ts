@@ -81,6 +81,12 @@ import {
   forceScratchEvent,
   forceTagEvent,
   forceBumpersEvent,
+  forceCatcherEvent,
+  forceImplosionEvent,
+  forceAtomEvent,
+  forceSpiralEvent,
+  forceLoopEvent,
+  forceEternityEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -242,6 +248,12 @@ import {
   wireScratchEventTestButton,
   wireTagEventTestButton,
   wireBumpersEventTestButton,
+  wireCatcherEventTestButton,
+  wireImplosionEventTestButton,
+  wireAtomEventTestButton,
+  wireSpiralEventTestButton,
+  wireLoopEventTestButton,
+  wireEternityEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
@@ -944,6 +956,48 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceBumpersEvent(floor);
+    });
+    // same, for the Catcher event
+    wireCatcherEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceCatcherEvent(floor);
+    });
+    // same, for the Implosion event
+    wireImplosionEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceImplosionEvent(floor);
+    });
+    // same, for the Atom event
+    wireAtomEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceAtomEvent(floor);
+    });
+    // same, for the Spiral event
+    wireSpiralEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceSpiralEvent(floor);
+    });
+    // same, for the Loop event
+    wireLoopEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceLoopEvent(floor);
+    });
+    // same, for the Eternity event
+    wireEternityEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceEternityEvent(floor);
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

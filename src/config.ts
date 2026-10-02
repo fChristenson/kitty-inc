@@ -444,6 +444,80 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/catcherEvent — the rare "Catcher" event: a catcher wisp
+  // dashes along the button's row catching wisps dropping from the top, ever
+  // faster, then catches a huge one on the button in a huge blast
+  catcherEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    firstCatchMs: 450, // the first drop's catch
+    gapMs: [260, 110] as [number, number], // between catches, quickening
+    fallMs: [420, 260] as [number, number], // each drop's fall, quickening
+    finalFallMs: 520, // the huge drop's plunge
+    finalGapMs: 450, // from the last small catch to the huge one
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
+  // src/floors/implosionEvent — the rare "Implosion" event: rings of wisps
+  // collapse onto the button from beyond the screen, ever faster, swelling
+  // its core, until a last ring blows it in a huge blast
+  implosionEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    firstRingMs: 450, // the first ring's slam
+    gapMs: [300, 130] as [number, number], // between slams, quickening
+    collapseMs: [450, 280] as [number, number], // each ring closing in, quickening
+    finalMs: 520, // the last ring closing in
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
+  // src/floors/atomEvent — the rare "Atom" event: three electron wisps whirl
+  // round a nucleus wisp on crossing orbits, ever faster, slinging coins,
+  // then collapse into it and it splits in a huge blast
+  atomEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    spinMs: 1_700, // from the orbits growing in to the split
+    collapseMs: 400, // the orbits collapsing, at the end of the spin
+    holdMs: 500, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
+  // src/floors/spiralEvent — the rare "Spiral" event: the wisp flies in and
+  // loops a wide spiral into the screen's middle, shedding coins, then shoots
+  // up into the total and explodes
+  spiralEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    spiralMs: 1_500, // from flying in to reaching the middle
+    chargeMs: 150, // hanging in the middle, trembling
+    shootMs: 140, // shooting up into the total
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
+  // src/floors/loopEvent — the rare "Loop" event: the wisp flies in, loops
+  // a wide circle round the screen's middle, then flies straight up into the
+  // total and explodes
+  loopEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    entryMs: 220, // flying in onto the circle
+    loopMs: 1_800, // the loops, speeding up
+    shootMs: 200, // flying straight up into the total
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
+  // src/floors/eternityEvent — the rare "Eternity" event: the wisp races
+  // twice round a huge infinity sign across the screen, shedding coins, then
+  // flies up into the total and explodes
+  eternityEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    entryMs: 200, // shooting up onto the sign's tip
+    passMs: 700, // each pass round the sign
+    shootMs: 200, // flying up into the total
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {
