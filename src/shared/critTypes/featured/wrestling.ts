@@ -162,4 +162,108 @@ export const WRESTLING_CRITS = {
     reward: (context, { actions, balance, belowAndHere }) =>
       actions.spreadUpgrades(belowAndHere(context), balance.sneakerTakedownUpgrades),
   },
+  allFoursAmbush: {
+    label: "All Fours Ambush",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/wrestling/allFoursAmbush.webp",
+    description: "Spreads 157 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.allFoursAmbushUpgrades),
+  },
+  braidedBearHug: {
+    label: "Braided Bear Hug",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/wrestling/braidedBearHug.webp",
+    description: "Pays 147 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.braidedBearHugMultiple),
+  },
+  cornrowCradle: {
+    label: "Cornrow Cradle",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/wrestling/cornrowCradle.webp",
+    description: "Grows this floor's level by 19% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.cornrowCradleGrowth),
+  },
+  goldCuffCrush: {
+    label: "Gold Cuff Crush",
+    color: COLOR.amberMuted,
+    image: "crits/wrestling/goldCuffCrush.webp",
+    description: "Spreads 158 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.goldCuffCrushUpgrades),
+  },
+  legTangle: {
+    label: "Leg Tangle",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/wrestling/legTangle.webp",
+    description: "Pays 148 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.legTangleMultiple),
+  },
+  lemonSqueeze: {
+    label: "Lemon Squeeze",
+    color: COLOR.starYellow,
+    image: "crits/wrestling/lemonSqueeze.webp",
+    description: "Grows this floor's level by 19.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.lemonSqueezeGrowth),
+  },
+  pinkOverGreen: {
+    label: "Pink Over Green",
+    color: COLOR.summerSaleOrange,
+    image: "crits/wrestling/pinkOverGreen.webp",
+    description: "Spreads 159 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.pinkOverGreenUpgrades),
+  },
+  platinumPinfall: {
+    label: "Platinum Pinfall",
+    color: COLOR.overflowBlue,
+    image: "crits/wrestling/platinumPinfall.webp",
+    description: "Pays 149 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.platinumPinfallMultiple),
+  },
+  rubySideControl: {
+    label: "Ruby Side Control",
+    color: COLOR.amberMuted,
+    image: "crits/wrestling/rubySideControl.webp",
+    description: "Grows this floor's level by 19.2% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.rubySideControlGrowth),
+  },
+  sleeperHold: {
+    label: "Sleeper Hold",
+    color: COLOR.amberMuted,
+    image: "crits/wrestling/sleeperHold.webp",
+    description: "Spreads 160 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.sleeperHoldUpgrades),
+  },
+  sunnySideHug: {
+    label: "Sunny Side Hug",
+    color: COLOR.supplyRunTan,
+    image: "crits/wrestling/sunnySideHug.webp",
+    description: "Grows this floor's level by 19.3% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.sunnySideHugGrowth),
+  },
+  tangerineTakedown: {
+    label: "Tangerine Takedown",
+    color: COLOR.amberMuted,
+    image: "crits/wrestling/tangerineTakedown.webp",
+    description: "Spreads 161 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.tangerineTakedownUpgrades),
+  },
+  undercutUpperHand: {
+    label: "Undercut Upper Hand",
+    color: COLOR.amberMuted,
+    image: "crits/wrestling/undercutUpperHand.webp",
+    description: "Grows this floor's level by 19.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.undercutUpperHandGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

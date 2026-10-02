@@ -66,6 +66,7 @@ import { VAMPIRES_BALANCE } from "./vampires";
 import { RUNES_BALANCE } from "./runes";
 import { LUCKY_CATS_BALANCE } from "./luckyCats";
 import { WRESTLING_BALANCE } from "./wrestling";
+import { GOTH_GIRLS_BALANCE } from "./gothGirls";
 
 export const FEATURED_CRIT_BALANCE = {
   ...CYBERPUNK_BALANCE,
@@ -134,4 +135,5 @@ export const FEATURED_CRIT_BALANCE = {
   ...RUNES_BALANCE,
   ...LUCKY_CATS_BALANCE,
   ...WRESTLING_BALANCE,
+  ...GOTH_GIRLS_BALANCE,
 } as const;

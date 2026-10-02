@@ -65,6 +65,7 @@ import { VAMPIRES_CRITS } from "./vampires";
 import { RUNES_CRITS } from "./runes";
 import { LUCKY_CATS_CRITS } from "./luckyCats";
 import { WRESTLING_CRITS } from "./wrestling";
+import { GOTH_GIRLS_CRITS } from "./gothGirls";
 
 export const FEATURED_CRITS = {
   ...CYBERPUNK_CRITS,
@@ -133,4 +134,5 @@ export const FEATURED_CRITS = {
   ...RUNES_CRITS,
   ...LUCKY_CATS_CRITS,
   ...WRESTLING_CRITS,
+  ...GOTH_GIRLS_CRITS,
 } as const;

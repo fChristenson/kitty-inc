@@ -2479,4 +2479,188 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.spreadUpgrades(context.floors, balance.bicepPleaUpgrades),
   },
+  armInArm: {
+    label: "Arm In Arm",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/muscleGirls/armInArm.webp",
+    description: "Pays 139 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.armInArmMultiple),
+  },
+  boxBraidBoost: {
+    label: "Box Braid Boost",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/boxBraidBoost.webp",
+    description: "Grows this floor's level by 18.2% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.boxBraidBoostGrowth),
+  },
+  braidWatch: {
+    label: "Braid Watch",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/braidWatch.webp",
+    description: "Spreads 150 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.braidWatchUpgrades),
+  },
+  buzzcutBackside: {
+    label: "Buzzcut Backside",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/buzzcutBackside.webp",
+    description: "Pays 140 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.buzzcutBacksideMultiple),
+  },
+  formCheck: {
+    label: "Form Check",
+    color: COLOR.coinGold,
+    image: "crits/muscleGirls/formCheck.webp",
+    description: "Grows this floor's level by 18.3% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.formCheckGrowth),
+  },
+  glovedSwat: {
+    label: "Gloved Swat",
+    color: COLOR.roundUpOrange,
+    image: "crits/muscleGirls/glovedSwat.webp",
+    description: "Spreads 151 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.glovedSwatUpgrades),
+  },
+  grapeSpandex: {
+    label: "Grape Spandex",
+    color: COLOR.overflowBlue,
+    image: "crits/muscleGirls/grapeSpandex.webp",
+    description: "Pays 141 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.grapeSpandexMultiple),
+  },
+  headbandTwins: {
+    label: "Headband Twins",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/headbandTwins.webp",
+    description: "Grows this floor's level by 18.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.headbandTwinsGrowth),
+  },
+  highlighterLeggings: {
+    label: "Highlighter Leggings",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/muscleGirls/highlighterLeggings.webp",
+    description: "Spreads 152 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.highlighterLeggingsUpgrades),
+  },
+  hipNuzzle: {
+    label: "Hip Nuzzle",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/hipNuzzle.webp",
+    description: "Pays 142 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.hipNuzzleMultiple),
+  },
+  hitchhikerThumb: {
+    label: "Hitchhiker Thumb",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/hitchhikerThumb.webp",
+    description: "Grows this floor's level by 18.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.hitchhikerThumbGrowth),
+  },
+  ivoryShorts: {
+    label: "Ivory Shorts",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/ivoryShorts.webp",
+    description: "Spreads 153 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.ivoryShortsUpgrades),
+  },
+  lowLunge: {
+    label: "Low Lunge",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/lowLunge.webp",
+    description: "Pays 143 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.lowLungeMultiple),
+  },
+  magentaHype: {
+    label: "Magenta Hype",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/magentaHype.webp",
+    description: "Grows this floor's level by 18.6% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.magentaHypeGrowth),
+  },
+  matchingSneakers: {
+    label: "Matching Sneakers",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/matchingSneakers.webp",
+    description: "Spreads 154 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.matchingSneakersUpgrades),
+  },
+  neonTrimNudge: {
+    label: "Neon Trim Nudge",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/neonTrimNudge.webp",
+    description: "Pays 144 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.neonTrimNudgeMultiple),
+  },
+  orangeAndLime: {
+    label: "Orange And Lime",
+    color: COLOR.summerSaleOrange,
+    image: "crits/muscleGirls/orangeAndLime.webp",
+    description: "Grows this floor's level by 18.7% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.orangeAndLimeGrowth),
+  },
+  peekabooBuddy: {
+    label: "Peekaboo Buddy",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/peekabooBuddy.webp",
+    description: "Spreads 155 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.peekabooBuddyUpgrades),
+  },
+  pinkTankPat: {
+    label: "Pink Tank Pat",
+    color: COLOR.fastForwardBlue,
+    image: "crits/muscleGirls/pinkTankPat.webp",
+    description: "Pays 145 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.pinkTankPatMultiple),
+  },
+  redSockSumo: {
+    label: "Red Sock Sumo",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/redSockSumo.webp",
+    description: "Grows this floor's level by 18.8% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.redSockSumoGrowth),
+  },
+  sidelineCoach: {
+    label: "Sideline Coach",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/sidelineCoach.webp",
+    description: "Spreads 156 free upgrades over the lowest-level floors",
+    reward: (context, { actions, balance }) =>
+      actions.spreadUpgrades(context.floors, balance.sidelineCoachUpgrades),
+  },
+  steadyingHand: {
+    label: "Steadying Hand",
+    color: COLOR.amberMuted,
+    image: "crits/muscleGirls/steadyingHand.webp",
+    description: "Pays 146 times this floor's upgrade price in cash",
+    reward: (context, { actions, balance }) =>
+      actions.addUpgradePriceCash([context.floor], balance.steadyingHandMultiple),
+  },
+  yellowShortsSmack: {
+    label: "Yellow Shorts Smack",
+    color: COLOR.coinGold,
+    image: "crits/muscleGirls/yellowShortsSmack.webp",
+    description: "Grows this floor's level by 18.9% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels([context.floor], balance.yellowShortsSmackGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
