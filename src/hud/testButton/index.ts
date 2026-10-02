@@ -614,6 +614,13 @@ export function wireScratchEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireTagEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>("#test-tag-event")!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

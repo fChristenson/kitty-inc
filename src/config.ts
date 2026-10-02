@@ -421,6 +421,17 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/tagEvent — the rare "Tag" event: a big wisp chases a small
+  // one darting round the screen, ever faster, knocking coins loose, and
+  // catches it on the button in a huge blast
+  tagEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    dodgeMs: [300, 130] as [number, number], // each dart, quickening
+    lagMs: 300, // how far behind the chaser starts, closing to nothing
+    holdMs: 500, // after the catch, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {
