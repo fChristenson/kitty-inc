@@ -429,6 +429,16 @@ export const CONFIG = {
     holdMs: 650, // after the last head, before the screen unfreezes
   },
 
+  // src/floors/paparazziEvent — the rare "Paparazzi" event: camera flashes
+  // go off round the clicked floor's workers, ever faster; each worker caught
+  // climbs a perma tier, then every camera fires at once
+  paparazziEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    flashMs: 1_200, // the random flashes, piling up toward the end
+    finalGapMs: 120, // after the last flash, every camera at once
+    holdMs: 650, // after that, before the screen unfreezes
+  },
+
   // src/floors/missileBarrageEvent — the rare "Missile Barrage" event: a
   // volley of wisp missiles streaks up into every income bar in view, each
   // hit landing free upgrade levels

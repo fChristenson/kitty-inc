@@ -80,6 +80,7 @@ import {
   forceSlamDunkEvent,
   forceUppercutEvent,
   forceHeadHopEvent,
+  forcePaparazziEvent,
   forceMissileBarrageEvent,
   forceSonicBoomEvent,
   forceMitosisEvent,
@@ -227,6 +228,7 @@ import {
   wireSlamDunkEventTestButton,
   wireUppercutEventTestButton,
   wireHeadHopEventTestButton,
+  wirePaparazziEventTestButton,
   wireMissileBarrageEventTestButton,
   wireSonicBoomEventTestButton,
   wireMitosisEventTestButton,
@@ -909,6 +911,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceHeadHopEvent(floor);
+    });
+    // same, for the Paparazzi event
+    wirePaparazziEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forcePaparazziEvent(floor);
     });
     // same, for the Missile Barrage event
     wireMissileBarrageEventTestButton(app, () => {

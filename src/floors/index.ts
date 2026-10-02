@@ -361,6 +361,7 @@ export { forcePingPongEvent } from "./pingPongEvent";
 export { forceSlamDunkEvent } from "./slamDunkEvent";
 export { forceUppercutEvent } from "./uppercutEvent";
 export { forceHeadHopEvent } from "./headHopEvent";
+export { forcePaparazziEvent } from "./paparazziEvent";
 export { forceMissileBarrageEvent } from "./missileBarrageEvent";
 export { forceSonicBoomEvent } from "./sonicBoomEvent";
 export { forceMitosisEvent } from "./mitosisEvent";

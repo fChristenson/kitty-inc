@@ -621,6 +621,15 @@ export function wireHeadHopEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wirePaparazziEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-paparazzi-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireMissileBarrageEventTestButton(
   container: HTMLElement,
   onClick: () => void,
