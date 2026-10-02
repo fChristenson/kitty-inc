@@ -145,8 +145,15 @@ function startHeartbeat(floor: Floor, context: EventProcContext): void {
   const area = context.getScreenAreaLocal?.(floor);
   const upgradeFloorFree = context.upgradeFloorFree;
   if (!area || !upgradeFloorFree) return;
-  const { firstBeatMs, gapMs, spikeMs, finalMs, holdMs, levelShare, minLevels } =
-    CONFIG.heartbeatEvent;
+  const {
+    firstBeatMs,
+    gapMs,
+    spikeMs,
+    finalMs,
+    holdMs,
+    levelShare,
+    minLevels,
+  } = CONFIG.heartbeatEvent;
   const tier = context.critTier ?? pickCritTierByOdds();
   const button = getButtonCenter(context.isGroundFloor);
   const room = Math.max(0, button.y - (area.top + TOP_MARGIN));
