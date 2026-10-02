@@ -1,10 +1,11 @@
 // the "Drumroll" event: it covers its crit, whose click freezes the screen
-// while a big gold drum pops up in the middle of it and two wisps drop onto
-// it like drumsticks. They beat it in turn, ever faster, into a blurring
-// drumroll, the drumhead jumping at every hit as coins bounce off it and the
-// screen rumbles harder. Then both fly high, hang trembling, and slam down
-// together, bursting the drum in a huge blast and shake, and the coins sweep
-// into the total. Pays floor income × floor number × REWARD (see ../moneyCover)
+// while a ring of glitter swirls up in the middle of it and two wisps drop
+// into it like drumsticks. They beat on it in turn, ever faster, into a
+// blurring drumroll, the ring jumping and flaring at every hit as coins
+// bounce out and the screen rumbles harder. Then both fly high, hang
+// trembling, and slam down together in a huge blast and shake, and the coins
+// sweep into the total. Pays floor income × floor number × REWARD (see
+// ../moneyCover)
 import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
@@ -12,7 +13,8 @@ import { playBloop, playSlamExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawExplosion, drawWhiteBurst } from "../../shared/eventFx";
-import { drawWisp, type Point } from "../../shared/wisp";
+import { drawGlitterLight, drawWisp, type Point } from "../../shared/wisp";
+import { hash01 } from "../../shared/twinkle";
 import { forceTestCrit } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import {
@@ -24,24 +26,31 @@ import {
 const KEY = "drumroll";
 const REWARD = 4;
 const TAPS = 18;
-// the drum, as shares of the screen's width: RADIUS across its head, its
-// head TILT of that tall and its body BODY of that deep, its head DROP of
-// the screen's height below the middle; popping in over POP_MS
+// the ring: GLITTER sparkles round the impact area in a drumhead's tilted
+// oval, RADIUS of the screen's width across and TILT of that tall, DROP of
+// the screen's height below its middle, each up to SPARKLE of the screen's
+// width, wobbling WOBBLE of the radius in and out and turning SPIN rad/s;
+// growing in over POP_MS
 const RADIUS = 0.28;
 const TILT = 0.3;
-const BODY = 0.75;
 const DROP = 0.1;
+const GLITTER = 56;
+const SPARKLE = 0.014;
+const WOBBLE = 0.08;
+const SPIN = 0.6;
 const POP_MS = 200;
-const LACES = 8;
 // the sticks: wisps at STICK of the screen's width, striking SPOT of the
-// head's radius either side of its middle, lifting LIFT of the screen's
+// ring's radius either side of its middle, lifting LIFT of the screen's
 // height between hits (shrinking as the roll quickens)
 const STICK = 0.06;
 const SPOT = 0.45;
 const LIFT: [number, number] = [0.22, 0.05];
-// each tap: the head dips DIP of its height and flashes, a jolt and a coin
+// each tap: the ring jumps out PULSE of its radius and flares, the dim white
+// head inside it (HEAD_ALPHA) dips DIP of its height and flashes, a jolt and a coin
+const PULSE = 0.12;
+const PULSE_MS = 90;
+const HEAD_ALPHA = 0.55;
 const DIP = 0.25;
-const DIP_MS = 70;
 const TAP_BURST = 0.18;
 const TAP_BURST_MS = 160;
 const TAP_SHAKE: [number, number] = [0.2, 0.9];
@@ -58,10 +67,6 @@ const FINAL_SHAKE = 2.8;
 const BLAST_SCALE = 1.9;
 const SPARK_REACH = 400;
 const SPARK_SIZE = 22;
-// the look
-const EDGE_WIDTH = 5;
-const GLOW_WIDTH = 16;
-const LACE_WIDTH = 3;
 
 const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
@@ -87,15 +92,13 @@ registerEventProc(
         CONFIG.drumrollEvent;
       const width = area.right - area.left;
       const height = area.bottom - area.top;
-      const rx = width * RADIUS;
-      const ry = rx * TILT;
+      const radius = width * RADIUS;
       const head = {
         x: (area.left + area.right) / 2,
         y: (area.top + area.bottom) / 2 + height * DROP,
       };
-      const body = rx * BODY;
       const stick = width * STICK;
-      const spots = [head.x - rx * SPOT, head.x + rx * SPOT];
+      const spots = [head.x - radius * SPOT, head.x + radius * SPOT];
 
       let at = firstTapMs;
       const taps: Tap[] = Array.from({ length: TAPS }, (_, k) => {
@@ -145,59 +148,57 @@ registerEventProc(
         return { x: x + (head.x - x) * v, y: top + (head.y - top) * v };
       };
 
-      const drawDrum = (
+      const drawRing = (
         ctx: CanvasRenderingContext2D,
         ms: number,
         now: number,
       ) => {
-        const pop = clamp01(ms / POP_MS);
-        const grow = 1 - (1 - pop) ** 3;
+        const grow = 1 - (1 - clamp01(ms / POP_MS)) ** 3;
         if (grow <= 0) return;
         const latest = [...taps].reverse().find((tap) => tap.firedAt !== null);
         const since = latest?.firedAt != null ? now - latest.firedAt : Infinity;
-        const dip = DIP * Math.exp(-since / DIP_MS);
-        ctx.save();
-        ctx.translate(head.x, head.y);
-        ctx.scale(grow, grow);
-        // the body: its sides and bottom rim, then the laces round it
+        const kick = Math.exp(-since / PULSE_MS);
+        const heat = clamp01(ms / lastTap.at);
+        const r = radius * grow * (1 + PULSE * kick);
+        const turn = (SPIN * (1 + heat) * ms) / 1000;
+        // the dim white drumhead inside, dipping and flashing as it's hit
+        const dip = DIP * kick;
+        const ry = radius * grow * TILT;
         ctx.beginPath();
-        ctx.moveTo(-rx, 0);
-        ctx.lineTo(-rx, body);
-        ctx.ellipse(0, body, rx, ry, 0, Math.PI, 0, true);
-        ctx.lineTo(rx, 0);
-        ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI);
-        ctx.closePath();
-        ctx.globalAlpha = 0.4;
-        ctx.strokeStyle = COLOR.heavenlyGold;
-        ctx.lineWidth = GLOW_WIDTH;
-        ctx.stroke();
-        ctx.globalAlpha = 0.85;
-        ctx.fillStyle = COLOR.heavenlyGold;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-        ctx.strokeStyle = COLOR.white;
-        ctx.lineWidth = EDGE_WIDTH;
-        ctx.stroke();
-        ctx.beginPath();
-        for (let i = 0; i < LACES; i++) {
-          const a = Math.PI * (i / LACES);
-          const b = Math.PI * ((i + 0.5) / LACES);
-          ctx.moveTo(-rx * Math.cos(a), ry * Math.sin(a) + body * 0.1);
-          ctx.lineTo(-rx * Math.cos(b), body + ry * Math.sin(b) - body * 0.1);
-        }
-        ctx.lineWidth = LACE_WIDTH;
-        ctx.stroke();
-        // the head, dipping and flashing as it's hit
-        ctx.beginPath();
-        ctx.ellipse(0, ry * dip, rx, ry * (1 - dip), 0, 0, Math.PI * 2);
+        ctx.ellipse(
+          head.x,
+          head.y + ry * dip,
+          radius * grow,
+          ry * (1 - dip),
+          0,
+          0,
+          Math.PI * 2,
+        );
         ctx.fillStyle = COLOR.white;
-        ctx.globalAlpha = 0.55 + 0.45 * clamp01(dip / DIP);
+        ctx.globalAlpha = HEAD_ALPHA + (1 - HEAD_ALPHA) * kick;
         ctx.fill();
         ctx.globalAlpha = 1;
-        ctx.lineWidth = EDGE_WIDTH;
-        ctx.strokeStyle = COLOR.heavenlyGold;
-        ctx.stroke();
-        ctx.restore();
+        for (let i = 0; i < GLITTER; i++) {
+          const angle = turn + (i / GLITTER) * Math.PI * 2;
+          const wobble =
+            1 +
+            WOBBLE *
+              Math.sin(ms / 90 + hash01(i, 3) * Math.PI * 2) *
+              (hash01(i, 5) * 2 - 1);
+          drawGlitterLight(
+            ctx,
+            head.x + Math.cos(angle) * r * wobble,
+            head.y + Math.sin(angle) * r * TILT * wobble,
+            width *
+              SPARKLE *
+              (0.5 + 0.7 * hash01(i, 7)) *
+              (1 + 0.6 * kick) *
+              grow,
+            i,
+            Math.min(1, 0.55 + 0.25 * heat + 0.4 * kick),
+            now,
+          );
+        }
       };
 
       const cover = startMoneyCover(
@@ -218,7 +219,7 @@ registerEventProc(
             if (slammedAt === null && ms >= slamAt) slam(now);
             ctx.save();
             ctx.translate(rect.left, rect.top);
-            if (slammedAt === null) drawDrum(ctx, ms, now);
+            if (slammedAt === null) drawRing(ctx, ms, now);
             for (const tap of taps) {
               if (tap.firedAt === null) continue;
               drawWhiteBurst(
