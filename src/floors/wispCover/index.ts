@@ -1,8 +1,10 @@
-// the shared stage for wisp coin events: a money cover whose overlay hands
+// the shared stage for wisp and coin events: a money cover whose overlay hands
 // the event floor-local ms/now and the total's spot, ticks its beats, and
-// draws the bursts and blasts it fires, so each event only plots its wisps.
-// Fire hits with burst()/launchFrom and the finale with blast()
+// draws the bursts and blasts it fires, so each event only plots its wisps or
+// its coins' paths. Fire hits with burst()/launchFrom and the finale with
+// blast()
 import type { Floor } from "../../gameState";
+import type { CoinPath } from "../coins";
 import { COLOR } from "../../palette";
 import {
   forceClaimEventProc,
@@ -45,6 +47,9 @@ export interface WispCover {
   total(): Point | null;
   isLive(): boolean;
   launchFrom(from: Point, targets: Point[]): void;
+  // one coin per path (floor-local, f 0..1 over travelMs, its scale sizing the
+  // coin), all set off at once, each hanging at its path's end till the merge
+  trace(paths: CoinPath[], travelMs: number): void;
   // a white burst of `scale` at `at`, drawn under the coins
   burst(at: Point, scale: number): void;
   // the finale: a huge blast and shake, a ring of coins out of `at` (the
@@ -159,6 +164,9 @@ export function startWispCover(
     isLive: cover.isLive,
     launchFrom: (from, targets) => {
       if (cover.isLive()) cover.launchFrom(from, targets);
+    },
+    trace: (paths, travelMs) => {
+      if (cover.isLive()) cover.trace(paths, travelMs);
     },
     burst: (at, scale) =>
       bursts.push({ x: at.x, y: at.y, at: performance.now(), scale }),
