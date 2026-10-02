@@ -354,6 +354,7 @@ export { forceJuggleEvent } from "./juggleEvent";
 export { forceBoomerangEvent } from "./boomerangEvent";
 export { forceHeartbeatEvent } from "./heartbeatEvent";
 export { forceClashEvent } from "./clashEvent";
+export { forceAsteroidsEvent } from "./asteroidsEvent";
 export { forceSlashEvent } from "./slashEvent";
 export { forceJackhammerEvent } from "./jackhammerEvent";
 export { forcePummelEvent } from "./pummelEvent";
