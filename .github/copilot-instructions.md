@@ -52,6 +52,22 @@ Everything in progress lives in the gitignored `tmp/`: raws, custom cut-out scri
 
 Events (`src/floors/*Event`, listed in `docs/event-ideas.md`), like crits, must all be distinct.
 
+### Base templates
+
+By default every new event is one of three kinds:
+
+| Kind      | What it is                                                                                                                                   | Built on                                                                   |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| **Money** | Cash moving as a liquid: big rivers, jets, pools and geysers of hundreds to thousands of coins. Never a few dozen coins arranged in a shape. | `floors/cashFlow` (`pourLine`) or `cover.flow` / `trace` on `wispCover`    |
+| **Wisp**  | Wisps flying, chasing, orbiting and colliding, with coins only as bursts and blasts.                                                         | `floors/wispCover` + `shared/wisp`                                         |
+| **Mix**   | Wisps and flowing cash working together: a wisp leads, feeds, drinks or fires a river of cash.                                               | `floors/cashFlow` (`riverHead` for a wisp at a river's head) + `wispCover` |
+
+No custom drawn props or art in any of them: just wisps, coins, bursts and glitter.
+
+**Experiments.** Whenever you add a batch, also add a few events that break from these three templates to try something new, and say which ones they are.
+
+### Rules for every event
+
 - **Never confusable.** Each event must look different enough that a player can't mistake it for another. Swapping only the prop or colour of an existing event's sequence is not a new event: "the button pours coins into a cauldron, which shoots lights at a worker" and the same thing with a well are the same event.
 - **Own staging.** Give each its own idea for what happens on screen: its own motion, shapes, layout and beats. Before building one, compare its plan against every existing event and change it if any one reads the same.
 - **Share code, not looks.** Reuse the shared plumbing (streams, wisp, freeze, spotlights) rather than copying it, but the sequence the player sees must be unique.
