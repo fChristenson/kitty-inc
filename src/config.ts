@@ -1158,6 +1158,98 @@ export const CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
+  // money: src/floors/waterShowEvent: fountain jets of cash put on a show
+  waterShowEvent: {
+    chance: 0.01,
+    actMs: 520, // between acts
+    streamMs: 380, // each jet pouring
+    travelMs: 480, // each coin's arc
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // money: src/floors/mercuryEvent: droplets of cash merge into one blob
+  mercuryEvent: {
+    chance: 0.01,
+    spillMs: 380, // the droplets splashing out
+    mergeGapMs: 110, // between merges
+    slideMs: 240, // each pair sliding together
+    flightMs: 380, // the blob shooting into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/alignmentEvent: orbiting wisps line up, then fire
+  alignmentEvent: {
+    chance: 0.01,
+    orbitMs: 1_500, // circling until they line up
+    lineMs: 200, // lined up, blazing
+    fireMs: 260, // each wisp's flight into the total
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/dandelionEvent: a puff of seed wisps blown into the total
+  dandelionEvent: {
+    chance: 0.01,
+    gatherMs: 700, // the puffball swelling
+    tearGapMs: 50, // between seeds tearing off
+    flightMs: 650, // each seed's flight
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // mix: src/floors/bobberEvent: a wisp rides a jet of cash that surges higher
+  bobberEvent: {
+    chance: 0.01,
+    levelMs: 480, // between surges
+    launchMs: 260, // the wisp fired into the total
+    sweepMs: 250, // the pool erupting after it
+    flightMs: 380, // each coin's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix: src/floors/fishingEvent: a wisp lure cast on a line of cash
+  fishingEvent: {
+    chance: 0.01,
+    castMs: 600, // the cast (and each coin's trip down the line)
+    streamMs: 1_100, // the line paying out
+    bitesMs: [300, 560], // bites, after it lands
+    strikeMs: 300, // whipped up into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam: src/floors/scissorsEvent: beams open like scissors up to the total
+  scissorsEvent: {
+    chance: 0.01,
+    swingMs: 320, // the blades swinging in to cross
+    openMs: 1_200, // the blades swinging open
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // beam: src/floors/pulseRifleEvent: the button charges, then fires pulses
+  pulseRifleEvent: {
+    chance: 0.01,
+    chargeMs: 700, // charging
+    gapMs: 170, // between pulses
+    boltMs: 220, // each pulse's flight into the total
+    slugMs: 130, // the slug of cash each drags
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/splitEvent: the screen splits open, then slams shut
+  splitEvent: {
+    chance: 0.01,
+    crackMs: 300, // the crack zipping across
+    openMs: 260, // the halves heaving apart
+    gushMs: 700, // cash gushing out of the gap
+    slamMs: 120, // slamming back together
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/pixelateEvent: the screen pixelates, then snaps back
+  pixelateEvent: {
+    chance: 0.01,
+    gapsMs: [340, 170] as [number, number], // between beats, quickening
+    holdMs: 450,
+    mergeMs: 500,
+  },
 
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total

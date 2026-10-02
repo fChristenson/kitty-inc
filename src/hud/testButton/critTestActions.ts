@@ -157,6 +157,16 @@ export function createTestButtonMarkup(): string {
           <button id="test-ion-storm-event" class="game__button">Ion Storm</button>
           <button id="test-glitch-event" class="game__button">Glitch</button>
           <button id="test-magnifier-event" class="game__button">Magnifier</button>
+          <button id="test-water-show-event" class="game__button">Water Show</button>
+          <button id="test-mercury-event" class="game__button">Mercury</button>
+          <button id="test-alignment-event" class="game__button">Alignment</button>
+          <button id="test-dandelion-event" class="game__button">Dandelion</button>
+          <button id="test-bobber-event" class="game__button">Bobber</button>
+          <button id="test-fishing-event" class="game__button">Fishing</button>
+          <button id="test-scissors-event" class="game__button">Scissors</button>
+          <button id="test-pulse-rifle-event" class="game__button">Pulse Rifle</button>
+          <button id="test-split-event" class="game__button">Split</button>
+          <button id="test-pixelate-event" class="game__button">Pixelate</button>
           <button id="test-slash-event" class="game__button">Slash</button>
           <button id="test-jackhammer-event" class="game__button">Jackhammer</button>
           <button id="test-pummel-event" class="game__button">Pummel</button>
