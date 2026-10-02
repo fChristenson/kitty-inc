@@ -38,6 +38,13 @@ const SHINE_SIZE = 24;
 const FLECK_COUNT = 46;
 // the room art's own floor line, as a fraction of its height
 const FLOOR_LINE = 650 / FLOOR_H;
+// every disco floor shows the same show, so it's drawn once into shared
+// layers (the soft lights at LIGHT_SCALE, the ball at BALL_SCALE) every
+// REFRESH_MS and stamped onto each floor
+const LIGHT_SCALE = 0.5;
+const BALL_SCALE = 2;
+const BALL_HALF = BALL_RADIUS + SHINE_SIZE + 4;
+const REFRESH_MS = 33;
 
 const room = {
   x: SIDE_WALL_WIDTH - ROOM_WALL_OVERLAP_PX,
@@ -100,13 +107,6 @@ function drawMirrorBall(
   y: number,
   now: number,
 ): void {
-  ctx.strokeStyle = "rgba(220, 220, 230, 0.8)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(x, room.y);
-  ctx.lineTo(x, y - BALL_RADIUS);
-  ctx.stroke();
-
   const body = ctx.createRadialGradient(
     x - BALL_RADIUS * 0.35,
     y - BALL_RADIUS * 0.35,
@@ -196,23 +196,39 @@ function drawReflections(
   now: number,
 ): void {
   const turn = (now / (FACET_STEP_MS * FACET_COLUMNS * 2)) * Math.PI * 2;
+  const sprite = fleckSprite();
   for (let i = 0; i < FLECK_COUNT; i++) {
     const azimuth = hash01(i, 7) * Math.PI * 2 + turn;
     const depth = Math.cos(azimuth);
     if (depth <= 0) continue;
     const fx = ballX + Math.sin(azimuth) * room.w * 0.6;
     const fy = room.y + room.h * (0.08 + 0.88 * hash01(i, 8));
-    const radius = 3 + 4 * hash01(i, 9);
-    const alpha = depth * 0.8;
-    ctx.fillStyle = `rgba(255, 255, 255, ${alpha * 0.25})`;
-    ctx.beginPath();
-    ctx.arc(fx, fy, radius * 2.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-    ctx.beginPath();
-    ctx.arc(fx, fy, radius, 0, Math.PI * 2);
-    ctx.fill();
+    const halo = (3 + 4 * hash01(i, 9)) * FLECK_HALO;
+    ctx.globalAlpha = depth * 0.8;
+    ctx.drawImage(sprite, fx - halo, fy - halo, halo * 2, halo * 2);
   }
+  ctx.globalAlpha = 1;
+}
+
+// a fleck: a bright dot in a faint halo FLECK_HALO times its radius
+const FLECK_HALO = 2.2;
+const FLECK_SPRITE_HALF = 16;
+let fleckCanvas: HTMLCanvasElement | null = null;
+function fleckSprite(): HTMLCanvasElement {
+  if (fleckCanvas) return fleckCanvas;
+  fleckCanvas = document.createElement("canvas");
+  fleckCanvas.width = fleckCanvas.height = FLECK_SPRITE_HALF * 2;
+  const ctx = fleckCanvas.getContext("2d")!;
+  const c = FLECK_SPRITE_HALF;
+  ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+  ctx.beginPath();
+  ctx.arc(c, c, c, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(c, c, c / FLECK_HALO, 0, Math.PI * 2);
+  ctx.fill();
+  return fleckCanvas;
 }
 
 // drawn right over the room art, under the walls and workers; ctx is translated
@@ -223,35 +239,94 @@ export function drawDiscoFloor(
   now: number,
 ): void {
   if (!floor.unlocked || !hasOnlyPermaWorkers(floor)) return;
+  const { lights, ball } = refreshLayers(now);
+  const ballX = room.x + room.w / 2;
+  const ballY = room.y + BALL_DROP;
   ctx.save();
-  ctx.beginPath();
-  ctx.rect(room.x, room.y, room.w, room.h);
-  ctx.clip();
-
   ctx.fillStyle = `rgba(0, 0, 0, ${DIM_ALPHA})`;
   ctx.fillRect(room.x, room.y, room.w, room.h);
+  ctx.globalCompositeOperation = "lighter";
+  ctx.drawImage(lights, room.x, room.y, room.w, room.h);
+  ctx.globalCompositeOperation = "source-over";
+  ctx.strokeStyle = "rgba(220, 220, 230, 0.8)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(ballX, room.y);
+  ctx.lineTo(ballX, ballY - BALL_RADIUS);
+  ctx.stroke();
+  ctx.drawImage(
+    ball,
+    ballX - BALL_HALF,
+    ballY - BALL_HALF,
+    BALL_HALF * 2,
+    BALL_HALF * 2,
+  );
+  ctx.restore();
+}
+
+let lightsLayer: HTMLCanvasElement | null = null;
+let ballLayer: HTMLCanvasElement | null = null;
+let refreshedAt = -Infinity;
+
+// the show's beams, spots and flecks, and its ball, redrawn at most every REFRESH_MS
+function refreshLayers(now: number): {
+  lights: HTMLCanvasElement;
+  ball: HTMLCanvasElement;
+} {
+  if (!lightsLayer || !ballLayer) {
+    lightsLayer = document.createElement("canvas");
+    lightsLayer.width = Math.ceil(room.w * LIGHT_SCALE);
+    lightsLayer.height = Math.ceil(room.h * LIGHT_SCALE);
+    ballLayer = document.createElement("canvas");
+    ballLayer.width = ballLayer.height = Math.ceil(BALL_HALF * 2 * BALL_SCALE);
+  }
+  if (Math.abs(now - refreshedAt) < REFRESH_MS)
+    return { lights: lightsLayer, ball: ballLayer };
+  refreshedAt = now;
 
   const ballX = room.x + room.w / 2;
   const ballY = room.y + BALL_DROP;
+  const lights = lightsLayer.getContext("2d")!;
+  lights.setTransform(1, 0, 0, 1, 0, 0);
+  lights.clearRect(0, 0, lightsLayer.width, lightsLayer.height);
+  lights.setTransform(
+    LIGHT_SCALE,
+    0,
+    0,
+    LIGHT_SCALE,
+    -room.x * LIGHT_SCALE,
+    -room.y * LIGHT_SCALE,
+  );
   const baseHue = now * HUE_SPEED;
-  ctx.globalCompositeOperation = "lighter";
+  lights.globalCompositeOperation = "lighter";
   for (let i = 0; i < BEAM_COUNT; i++) {
     const phase = (i / BEAM_COUNT) * Math.PI * 2;
     const angle =
       ((i - (BEAM_COUNT - 1) / 2) / BEAM_COUNT) * 1.4 +
       Math.sin((now / BEAM_PERIOD_MS) * Math.PI * 2 + phase) * BEAM_SWEEP;
-    drawBeam(ctx, ballX, ballY, angle, room.h * 1.2, baseHue + i * 90);
+    drawBeam(lights, ballX, ballY, angle, room.h * 1.2, baseHue + i * 90);
   }
   const floorY = room.y + room.h * FLOOR_LINE;
   for (let i = 0; i < SPOT_COUNT; i++) {
     const phase = (i / SPOT_COUNT) * Math.PI * 2;
     const t = Math.sin((now / SPOT_PERIOD_MS) * Math.PI * 2 + phase * 1.7);
     const x = room.x + room.w * (0.5 + 0.42 * t);
-    drawSpot(ctx, x, floorY, 120, baseHue + 180 + i * 72);
+    drawSpot(lights, x, floorY, 120, baseHue + 180 + i * 72);
   }
-  drawReflections(ctx, ballX, now);
-  ctx.globalCompositeOperation = "source-over";
+  drawReflections(lights, ballX, now);
+  lights.globalCompositeOperation = "source-over";
 
-  drawMirrorBall(ctx, ballX, ballY, now);
-  ctx.restore();
+  const ball = ballLayer.getContext("2d")!;
+  ball.setTransform(1, 0, 0, 1, 0, 0);
+  ball.clearRect(0, 0, ballLayer.width, ballLayer.height);
+  ball.setTransform(
+    BALL_SCALE,
+    0,
+    0,
+    BALL_SCALE,
+    (BALL_HALF - ballX) * BALL_SCALE,
+    (BALL_HALF - ballY) * BALL_SCALE,
+  );
+  drawMirrorBall(ball, ballX, ballY, now);
+  return { lights: lightsLayer, ball: ballLayer };
 }

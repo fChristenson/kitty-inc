@@ -38,8 +38,8 @@ import {
 
 const KEY = "blessing";
 // the drifting lights that land on no one, and how they move
-const LOOSE_FLAKES = 12;
-const FALL_MS: [number, number] = [1_300, 1_900];
+const LOOSE_FLAKES = 5;
+const FALL_MS: [number, number] = [900, 1_300];
 const SWAY: [number, number] = [20, 55];
 const SWAY_TURNS = 1.3;
 // flakes start this far above the screen

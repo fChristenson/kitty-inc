@@ -940,7 +940,7 @@ export const CONFIG = {
   // down over the clicked floor, one settling on each worker, +1 perma tier each
   blessingEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
-    snowMs: 2_400, // how long flakes keep starting to fall
+    snowMs: 1_500, // how long flakes keep starting to fall
   },
 
   // src/floors/haloEvent — the rare "Halo" event: glimmer lights orbit the
