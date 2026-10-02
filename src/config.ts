@@ -373,6 +373,18 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/drumrollEvent — the rare "Drumroll" event: two wisps beat a
+  // big gold drum into a blurring drumroll, coins bouncing off it, then slam
+  // down together and burst it, and the coins sweep into the total
+  drumrollEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    firstTapMs: 250, // the drum popping up and the sticks dropping in
+    gapMs: [130, 35] as [number, number], // between taps, quickening
+    finalMs: 450, // the sticks rising, hanging and slamming down together
+    holdMs: 450, // after the slam, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {

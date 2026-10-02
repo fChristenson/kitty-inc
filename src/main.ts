@@ -75,6 +75,7 @@ import {
   forceClashEvent,
   forceAsteroidsEvent,
   forceWhackAMoleEvent,
+  forceDrumrollEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -230,6 +231,7 @@ import {
   wireClashEventTestButton,
   wireAsteroidsEventTestButton,
   wireWhackAMoleEventTestButton,
+  wireDrumrollEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
@@ -890,6 +892,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceWhackAMoleEvent(floor);
+    });
+    // same, for the Drumroll event
+    wireDrumrollEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceDrumrollEvent(floor);
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
