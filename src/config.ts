@@ -313,6 +313,16 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/boomerangEvent — the rare "Boomerang" event: the wisp is
+  // hurled out on wide loops that whip back into the button, shedding coins
+  // all along them, until the last catch blasts and the coins sweep in
+  boomerangEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    throwMs: [560, 380] as [number, number], // each loop out and back, quickening
+    holdMs: 450, // after the last catch, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {

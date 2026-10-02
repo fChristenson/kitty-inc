@@ -535,6 +535,15 @@ export function wireJuggleEventTestButton(
     container.querySelector<HTMLButtonElement>("#test-juggle-event")!;
   button.addEventListener("click", onClick);
 }
+export function wireBoomerangEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-boomerang-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

@@ -70,6 +70,7 @@ import {
   forcePopcornEvent,
   forceNewtonsCradleEvent,
   forceJuggleEvent,
+  forceBoomerangEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -220,6 +221,7 @@ import {
   wirePopcornEventTestButton,
   wireNewtonsCradleEventTestButton,
   wireJuggleEventTestButton,
+  wireBoomerangEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
@@ -845,6 +847,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceJuggleEvent(floor);
+    });
+    // same, for the Boomerang event
+    wireBoomerangEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceBoomerangEvent(floor);
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
