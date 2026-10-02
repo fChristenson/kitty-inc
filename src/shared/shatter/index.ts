@@ -4,6 +4,7 @@
 // drawUnder (under its coins), in floor-local coords
 import { clamp01, easeOut } from "../easing";
 import { drawBeam } from "../beam";
+import { copyScreen, drawScreenPart, type ScreenCopy } from "../screenCopy";
 import type { Point } from "../wisp";
 
 const CRACK_WIDTH = 5;
@@ -28,8 +29,7 @@ export interface Pane {
   // each crack's corner points, out from the impact past the screen's edge
   cracks: Point[][];
   shards: Shard[];
-  copy: HTMLCanvasElement | null;
-  copyAt: DOMMatrix | null;
+  copy: ScreenCopy | null;
 }
 
 export interface PaneOptions {
@@ -106,7 +106,7 @@ export function createPane(
       });
     }
   }
-  return { impact, cracks: lines, shards, copy: null, copyAt: null };
+  return { impact, cracks: lines, shards, copy: null };
 }
 
 // the cracks, each running out from the impact once ms passes openedAt(i)
@@ -133,13 +133,7 @@ export function drawCracks(
 // copies the frozen screen once (call every frame from drawUnder from
 // PANE_COPY_EARLY_MS before the shatter, before drawing over it)
 export function copyPane(ctx: CanvasRenderingContext2D, pane: Pane): void {
-  if (pane.copy) return;
-  const copy = document.createElement("canvas");
-  copy.width = ctx.canvas.width;
-  copy.height = ctx.canvas.height;
-  copy.getContext("2d")!.drawImage(ctx.canvas, 0, 0);
-  pane.copy = copy;
-  pane.copyAt = ctx.getTransform();
+  pane.copy ??= copyScreen(ctx);
 }
 
 // every shard, t ms into its flight (gravity pulling it down), at alpha;
@@ -152,8 +146,7 @@ export function drawShards(
   move?: (shard: Shard, t: number, into: Point) => void,
 ): void {
   const copy = pane.copy;
-  const m = pane.copyAt;
-  if (!copy || !m || alpha <= 0) return;
+  if (!copy || alpha <= 0) return;
   ctx.save();
   ctx.globalAlpha = alpha;
   for (const s of pane.shards) {
@@ -162,11 +155,7 @@ export function drawShards(
     move?.(s, t, scratch);
     const dx = scratch.x;
     const dy = scratch.y;
-    const sx = Math.max(0, m.a * s.box.x + m.e);
-    const sy = Math.max(0, m.d * s.box.y + m.f);
-    const sw = Math.min(copy.width, m.a * (s.box.x + s.box.w) + m.e) - sx;
-    const sh = Math.min(copy.height, m.d * (s.box.y + s.box.h) + m.f) - sy;
-    if (sw <= 0 || sh <= 0) continue;
+    const { x, y, w, h } = s.box;
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(s.poly[0].x + dx, s.poly[0].y + dy);
@@ -174,17 +163,7 @@ export function drawShards(
       ctx.lineTo(s.poly[k].x + dx, s.poly[k].y + dy);
     ctx.closePath();
     ctx.clip();
-    ctx.drawImage(
-      copy,
-      sx,
-      sy,
-      sw,
-      sh,
-      (sx - m.e) / m.a + dx,
-      (sy - m.f) / m.d + dy,
-      sw / m.a,
-      sh / m.d,
-    );
+    drawScreenPart(ctx, copy, x, y, w, h, x + dx, y + dy, w, h);
     ctx.restore();
   }
   ctx.restore();
@@ -212,5 +191,4 @@ export function drawPaneFlash(
 // frees the copy once the event's done with it
 export function releasePane(pane: Pane): void {
   pane.copy = null;
-  pane.copyAt = null;
 }

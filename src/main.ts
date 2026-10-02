@@ -201,6 +201,13 @@ import {
   forceLaserHarpEvent,
   forceLichtenbergEvent,
   forceShatterEvent,
+  forceFunnelEvent,
+  forceGrappleEvent,
+  forceSurfEvent,
+  forceLaserTagEvent,
+  forceBallLightningEvent,
+  forceEventHorizonEvent,
+  forceTileFlipEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1265,6 +1272,13 @@ async function main() {
       "laser-harp": forceOnActive(forceLaserHarpEvent),
       lichtenberg: forceOnActive(forceLichtenbergEvent),
       shatter: forceOnActive(forceShatterEvent),
+      funnel: forceOnActive(forceFunnelEvent),
+      grapple: forceOnActive(forceGrappleEvent),
+      surf: forceOnActive(forceSurfEvent),
+      "laser-tag": forceOnActive(forceLaserTagEvent),
+      "ball-lightning": forceOnActive(forceBallLightningEvent),
+      "event-horizon": forceOnActive(forceEventHorizonEvent),
+      "tile-flip": forceOnActive(forceTileFlipEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

@@ -1502,12 +1502,80 @@ export const CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/shatterEvent: the screen shatters like glass
+  // shatter, cash: src/floors/shatterEvent: the screen shatters like glass
   shatterEvent: {
     chance: 0.01,
     knocksMs: [180, 520, 820], // each knock, the last shattering it
     fallMs: 900, // the shards blowing out and falling away
     holdMs: 200,
+    mergeMs: 500,
+  },
+  // money, cash + levels + tier: src/floors/funnelEvent: cash funnels down
+  // into the clicked floor's bar
+  funnelEvent: {
+    chance: 0.01,
+    streamMs: 1_000, // cash pouring in
+    fallMs: 650, // each coin's fall down the funnel
+    levelShare: 0.04, // of the bar's levels, per gulp
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp, levels: src/floors/grappleEvent: a wisp swings bar to bar
+  grappleEvent: {
+    chance: 0.01,
+    swingsMs: [520, 300] as [number, number], // each swing, quickening
+    slamMs: 150, // after letting go of the last bar
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // mix, cash: src/floors/surfEvent: a wisp surfs a wave of cash
+  surfEvent: {
+    chance: 0.01,
+    rollMs: 1_500, // the wave rolling across
+    drainMs: 300, // the wave breaking into the total
+    flightMs: 420, // each coin's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, worker tiers: src/floors/laserTagEvent: workers tag each other
+  laserTagEvent: {
+    chance: 0.01,
+    gapsMs: [260, 110] as [number, number], // between tags, quickening
+    aimMs: 140, // each aim line flickering
+    fireMs: 160, // each beam blazing
+    volleyMs: 300, // every worker firing at once
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // lightning, levels + worker tiers: src/floors/ballLightningEvent: a ball
+  // of lightning careens round zapping bars and workers
+  ballLightningEvent: {
+    chance: 0.01,
+    legsMs: [380, 190] as [number, number], // each swerve to a target
+    diveMs: 200, // diving into the clicked floor's bar
+    levelShare: 0.1, // of a bar's levels
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // shatter, levels + tier: src/floors/eventHorizonEvent: the shards are
+  // sucked into the clicked floor's bar
+  eventHorizonEvent: {
+    chance: 0.01,
+    knocksMs: [200, 480, 700, 900], // each knock, the last shattering it
+    pullMs: 750, // the shards sucked in
+    levelShare: 0.06, // of the bar's levels, per knock
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
+  tileFlipEvent: {
+    chance: 0.01,
+    waveMs: 700, // the flip wave racing out
+    flipMs: 220, // each tile flipping
+    showMs: 250, // the screen all gold
+    backMs: 200, // every tile flipping back
+    holdMs: 300,
     mergeMs: 500,
   },
   // mix, levels + tier + cash: src/floors/whipEvent: a whip of flowing cash
