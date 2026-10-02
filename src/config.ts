@@ -49,6 +49,9 @@ export const CONFIG = {
     crit: { chance: 0.08, multiplier: 5 },
     mega: { chance: 0.015, multiplier: 25 },
     ultra: { chance: 0.001, multiplier: 125 },
+    // a boosted perma worker speeds its floor up by its tier's multiplier to
+    // this power: 0.43 gives x2/x4/x8, about one more boosted worker per step
+    permaBoostExponent: 0.43,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (src/critBalance) are even

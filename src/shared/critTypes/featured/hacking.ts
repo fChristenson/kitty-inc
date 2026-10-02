@@ -306,4 +306,76 @@ export const HACKING_CRITS = {
     reward: (context, { actions, balance, highestFloor }) =>
       actions.addUpgradePriceCash([highestFloor(context)], balance.anonymousDonorMultiple),
   },
+  crossedMarkers: {
+    label: "Crossed Markers",
+    color: COLOR.fastForwardBlue,
+    image: "crits/hacking/crossedMarkers.webp",
+    description: "Promotes 84% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.crossedMarkersShare, 2),
+  },
+  graffitiMask: {
+    label: "Graffiti Mask",
+    color: COLOR.cyan,
+    image: "crits/hacking/graffitiMask.webp",
+    description: "Promotes 61.5% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.graffitiMaskShare, 1),
+  },
+  headphoneHood: {
+    label: "Headphone Hood",
+    color: COLOR.cyan,
+    image: "crits/hacking/headphoneHood.webp",
+    description: "Promotes 84.5% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.headphoneHoodShare, 2),
+  },
+  laptopReaper: {
+    label: "Laptop Reaper",
+    color: COLOR.cyan,
+    image: "crits/hacking/laptopReaper.webp",
+    description: "Promotes 62% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.laptopReaperShare, 1),
+  },
+  limeHoodie: {
+    label: "Lime Hoodie",
+    color: COLOR.fastForwardBlue,
+    image: "crits/hacking/limeHoodie.webp",
+    description: "Promotes 85% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.limeHoodieShare, 2),
+  },
+  magentaHood: {
+    label: "Magenta Hood",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/hacking/magentaHood.webp",
+    description: "Promotes 62.5% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.magentaHoodShare, 1),
+  },
+  neonTypist: {
+    label: "Neon Typist",
+    color: COLOR.internSkyBlue,
+    image: "crits/hacking/neonTypist.webp",
+    description: "Promotes 85.5% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.neonTypistShare, 2),
+  },
+  skullTagger: {
+    label: "Skull Tagger",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/hacking/skullTagger.webp",
+    description: "Promotes 63% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.skullTaggerShare, 1),
+  },
+  usbHood: {
+    label: "USB Hood",
+    color: COLOR.fastForwardBlue,
+    image: "crits/hacking/usbHood.webp",
+    description: "Promotes 86% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.usbHoodShare, 2),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

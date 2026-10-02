@@ -200,4 +200,300 @@ export const WARHAMMER_CRITS = {
         balance.cobaltJuggernautContinueChance,
       ),
   },
+  amberVisor: {
+    label: "Amber Visor",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/amberVisor.webp",
+    description: "Promotes 87% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.amberVisorShare, 2),
+  },
+  blueGemPlate: {
+    label: "Blue Gem Plate",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/blueGemPlate.webp",
+    description: "Promotes 64.5% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.blueGemPlateShare, 1),
+  },
+  bolterAim: {
+    label: "Bolter Aim",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/bolterAim.webp",
+    description: "Promotes 87.5% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.bolterAimShare, 2),
+  },
+  bullseyePauldron: {
+    label: "Bullseye Pauldron",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/bullseyePauldron.webp",
+    description: "Promotes 65% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.bullseyePauldronShare, 1),
+  },
+  copperGrille: {
+    label: "Copper Grille",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/copperGrille.webp",
+    description: "Promotes 88% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.copperGrilleShare, 2),
+  },
+  crimsonStare: {
+    label: "Crimson Stare",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/crimsonStare.webp",
+    description: "Promotes 65.5% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.crimsonStareShare, 1),
+  },
+  crimsonWingHelm: {
+    label: "Crimson Wing Helm",
+    color: COLOR.rainCheckBlue,
+    image: "crits/warhammer/crimsonWingHelm.webp",
+    description: "Promotes 88.5% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.crimsonWingHelmShare, 2),
+  },
+  crossedBarrels: {
+    label: "Crossed Barrels",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/crossedBarrels.webp",
+    description: "Promotes 66% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.crossedBarrelsShare, 1),
+  },
+  eagleCrest: {
+    label: "Eagle Crest",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/eagleCrest.webp",
+    description: "Promotes 89% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.eagleCrestShare, 2),
+  },
+  eagleHelm: {
+    label: "Eagle Helm",
+    color: COLOR.rainCheckBlue,
+    image: "crits/warhammer/eagleHelm.webp",
+    description: "Promotes 66.5% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.eagleHelmShare, 1),
+  },
+  eagleMedallion: {
+    label: "Eagle Medallion",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/eagleMedallion.webp",
+    description: "Promotes 89.5% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.eagleMedallionShare, 2),
+  },
+  gemSkull: {
+    label: "Gem Skull",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/gemSkull.webp",
+    description: "Promotes 67% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.gemSkullShare, 1),
+  },
+  goldCrestBulk: {
+    label: "Gold Crest Bulk",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/goldCrestBulk.webp",
+    description: "Promotes 100% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.goldCrestBulkShare, 2),
+  },
+  goldenWingHelm: {
+    label: "Golden Wing Helm",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/goldenWingHelm.webp",
+    description: "Adds 110s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.goldenWingHelmSeconds),
+  },
+  goldFaceplate: {
+    label: "Gold Faceplate",
+    color: COLOR.rainCheckBlue,
+    image: "crits/warhammer/goldFaceplate.webp",
+    description: "Adds 111s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.goldFaceplateSeconds),
+  },
+  goldGlyphs: {
+    label: "Gold Glyphs",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/goldGlyphs.webp",
+    description: "Adds 112s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.goldGlyphsSeconds),
+  },
+  goldTrim: {
+    label: "Gold Trim",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/goldTrim.webp",
+    description: "Adds 35.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.goldTrimShare),
+  },
+  greenVisor: {
+    label: "Green Visor",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/greenVisor.webp",
+    description: "Adds 35.2% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.greenVisorShare),
+  },
+  gunwingSkull: {
+    label: "Gunwing Skull",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/gunwingSkull.webp",
+    description: "Adds 35.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.gunwingSkullShare),
+  },
+  redChestPlate: {
+    label: "Red Chest Plate",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/redChestPlate.webp",
+    description: "Adds 35.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.redChestPlateShare),
+  },
+  redEyeGunner: {
+    label: "Red Eye Gunner",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/redEyeGunner.webp",
+    description: "Adds 35.5% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.redEyeGunnerShare),
+  },
+  redLaurelSkull: {
+    label: "Red Laurel Skull",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/redLaurelSkull.webp",
+    description: "Adds 35.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.redLaurelSkullShare),
+  },
+  redStarPauldron: {
+    label: "Red Star Pauldron",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/redStarPauldron.webp",
+    description: "Adds 35.7% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.redStarPauldronShare),
+  },
+  redStripeHelm: {
+    label: "Red Stripe Helm",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/redStripeHelm.webp",
+    description: "Adds 35.8% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.redStripeHelmShare),
+  },
+  shieldWings: {
+    label: "Shield Wings",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/shieldWings.webp",
+    description: "Adds 35.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.shieldWingsShare),
+  },
+  shoulderSigils: {
+    label: "Shoulder Sigils",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/shoulderSigils.webp",
+    description: "Adds 36% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.shoulderSigilsShare),
+  },
+  sigilChest: {
+    label: "Sigil Chest",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/sigilChest.webp",
+    description: "Adds 36.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.sigilChestShare),
+  },
+  silverVisor: {
+    label: "Silver Visor",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/silverVisor.webp",
+    description: "Adds 36.2% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.silverVisorShare),
+  },
+  silverWings: {
+    label: "Silver Wings",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/silverWings.webp",
+    description: "Adds 36.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.silverWingsShare),
+  },
+  skullPauldron: {
+    label: "Skull Pauldron",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/skullPauldron.webp",
+    description: "Adds 36.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.skullPauldronShare),
+  },
+  snowCrest: {
+    label: "Snow Crest",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/snowCrest.webp",
+    description: "Adds 36.5% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.snowCrestShare),
+  },
+  splitSkull: {
+    label: "Split Skull",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/splitSkull.webp",
+    description: "Adds 36.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.splitSkullShare),
+  },
+  steelFaceplate: {
+    label: "Steel Faceplate",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/steelFaceplate.webp",
+    description: "Adds 36.7% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.steelFaceplateShare),
+  },
+  tealVisor: {
+    label: "Teal Visor",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/tealVisor.webp",
+    description: "Adds 36.8% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.tealVisorShare),
+  },
+  whiteRune: {
+    label: "White Rune",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/whiteRune.webp",
+    description: "Adds 36.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.whiteRuneShare),
+  },
+  wingedSkull: {
+    label: "Winged Skull",
+    color: COLOR.fastForwardBlue,
+    image: "crits/warhammer/wingedSkull.webp",
+    description: "Adds 37% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.wingedSkullShare),
+  },
+  yellowVisor: {
+    label: "Yellow Visor",
+    color: COLOR.overflowBlue,
+    image: "crits/warhammer/yellowVisor.webp",
+    description: "Adds 37.2% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.yellowVisorShare),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

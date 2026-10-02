@@ -1,11 +1,11 @@
 // odds and reward sizes for featured/plushies.ts's crits, spread into CONFIG.crit
 export const PLUSHIES_BALANCE = {
-  plushieDogChance: 0.00663838379,
+  plushieDogChance: 0.00671282772,
   plushieDogBoostSeconds: 48,
   plushieDogExtraWorkers: 1,
-  plushieElephantChance: 0.00523619926,
+  plushieElephantChance: 0.00531725066,
   plushieElephantContinueChance: 0.77,
-  plushieHamsterChance: 0.00539033002,
+  plushieHamsterChance: 0.00514597184,
   plushieHamsterShare: 0.113,
   plushieOtterChance: 0.0113888414,
   plushieOtterFloors: 1,
@@ -15,7 +15,7 @@ export const PLUSHIES_BALANCE = {
   plushiePenguinFloors: 1,
   plushieRabbitChance: 0.00782500285,
   plushieRabbitUpgrades: 35,
-  plushieRacoonChance: 0.00168157418,
+  plushieRacoonChance: 0.00164257187,
   plushieRacoonShare: 0.371,
   plushieSealChance: 0.0107825634,
   plushieSealUpgrades: 40,

@@ -24,6 +24,7 @@ import {
   type CritTier,
 } from "../../shared/critTypes";
 import { randomInt } from "../../utils";
+import { CONFIG } from "../../config";
 import { loadSprite } from "../../loadAssets";
 import { spawnCoinBurst } from "../coins";
 import { playAutoBoost } from "../../sound";
@@ -635,15 +636,16 @@ export function mergeWorkersInto(floor: Floor, plan: UnionPlan): number {
   return targetIndex - mergedIndexes.filter((i) => i < targetIndex).length;
 }
 
-// every currently-boosted perma worker multiplies its floor's speed by its
-// tier's crit multiplier
+// every currently-boosted perma worker speeds its floor up by its tier's crit
+// multiplier, drawn back by CONFIG.crit.permaBoostExponent
 export function permaBoostSpeedMultiplier(floor: Floor, now: number): number {
   let multiplier = 1;
   const rendered = getRenderedWorkerCount(floor);
   for (let i = 0; i < rendered; i++) {
     const tier = getWorkerPermaTier(floor, i);
     if (tier && isBoosted(floor, i, now))
-      multiplier *= CRIT_TIER_CONFIG[tier].multiplier;
+      multiplier *=
+        CRIT_TIER_CONFIG[tier].multiplier ** CONFIG.crit.permaBoostExponent;
   }
   return multiplier;
 }

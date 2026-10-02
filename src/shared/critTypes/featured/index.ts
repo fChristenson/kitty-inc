@@ -74,6 +74,7 @@ import { CLEANERS_CRITS } from "./cleaners";
 import { BEDTIME_CRITS } from "./bedtime";
 import { SPACE_KNIGHTS_CRITS } from "./spaceKnights";
 import { SILVER_DUOS_CRITS } from "./silverDuos";
+import { SOLDIERS_CRITS } from "./soldiers";
 
 export const FEATURED_CRITS = {
   ...CYBERPUNK_CRITS,
@@ -151,4 +152,5 @@ export const FEATURED_CRITS = {
   ...BEDTIME_CRITS,
   ...SPACE_KNIGHTS_CRITS,
   ...SILVER_DUOS_CRITS,
+  ...SOLDIERS_CRITS,
 } as const;

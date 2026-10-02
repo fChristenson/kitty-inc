@@ -146,4 +146,28 @@ export const CAT_MARTIAL_ARTS_CRITS = {
     reward: (_context, { actions, balance }) =>
       actions.addIncomeShare(balance.tigerClawStanceShare),
   },
+  goldenFurFury: {
+    label: "Golden Fur Fury",
+    color: COLOR.starYellow,
+    image: "crits/catMartialArts/goldenFurFury.webp",
+    description: "Promotes 60.5% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.goldenFurFuryShare, 1),
+  },
+  spikyBlueCat: {
+    label: "Spiky Blue Cat",
+    color: COLOR.fastForwardBlue,
+    image: "crits/catMartialArts/spikyBlueCat.webp",
+    description: "Promotes 83.5% of this floor's workers two perma tiers",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers([context.floor], balance.spikyBlueCatShare, 2),
+  },
+  spikyManeKitty: {
+    label: "Spiky Mane Kitty",
+    color: COLOR.orange,
+    image: "crits/catMartialArts/spikyManeKitty.webp",
+    description: "Promotes 61% of this building's workers one perma tier",
+    reward: (context, { actions, balance }) =>
+      actions.raiseWorkerTiers(context.floors, balance.spikyManeKittyShare, 1),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
