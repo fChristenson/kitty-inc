@@ -246,6 +246,12 @@ import {
   forceBurningGlassEvent,
   forceStormFrontEvent,
   forceSlidePuzzleEvent,
+  forceWhirlpoolEvent,
+  forceSatellitesEvent,
+  forceTypewriterEvent,
+  forceRailgunEvent,
+  forceThunderdomeEvent,
+  forceMeltEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1358,6 +1364,12 @@ async function main() {
       "burning-glass": forceOnActive(forceBurningGlassEvent),
       "storm-front": forceOnActive(forceStormFrontEvent),
       "slide-puzzle": forceOnActive(forceSlidePuzzleEvent),
+      whirlpool: forceOnActive(forceWhirlpoolEvent),
+      satellites: forceOnActive(forceSatellitesEvent),
+      typewriter: forceOnActive(forceTypewriterEvent),
+      railgun: forceOnActive(forceRailgunEvent),
+      thunderdome: forceOnActive(forceThunderdomeEvent),
+      melt: forceOnActive(forceMeltEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

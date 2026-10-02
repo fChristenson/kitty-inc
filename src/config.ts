@@ -1911,6 +1911,63 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, levels + a crit tier + cash: src/floors/whirlpoolEvent: cash
+  // spirals into the clicked bar
+  whirlpoolEvent: {
+    chance: 0.01,
+    streamMs: 1_200, // the rivers pouring in
+    spiralMs: 700, // each coin's spiral in
+    levelShare: 0.1, // of the bar's levels, per gulp
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp, levels: src/floors/satellitesEvent: wisps skim the bars into orbit
+  satellitesEvent: {
+    chance: 0.01,
+    launchGapsMs: [300, 160] as [number, number], // between launches, quickening
+    approachMs: 420, // each one's run in through its bar to its ring
+    circleMs: 400, // all of them circling
+    collapseMs: 300, // the orbits decaying onto the button
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, worker tiers + cash: src/floors/typewriterEvent: a wisp types rows of
+  // cash through the workers
+  typewriterEvent: {
+    chance: 0.01,
+    linesMs: [520, 300] as [number, number], // each line typed, quickening
+    returnMs: 140, // each carriage return
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, cash: src/floors/railgunEvent: rails build up and fire a slug of cash
+  railgunEvent: {
+    chance: 0.01,
+    buildsMs: [220, 110] as [number, number], // each section, quickening
+    chargeMs: 350, // crackling before it fires
+    fireMs: 160, // the slug's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // lightning, levels + a crit tier: src/floors/thunderdomeEvent: a cage of
+  // lightning snaps shut on the clicked bar
+  thunderdomeEvent: {
+    chance: 0.01,
+    formMs: 250, // the cage cracking into being
+    holdsMs: [380, 200] as [number, number], // between snaps, quickening
+    levelShare: 0.1, // of the bar's levels, per snap
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/meltEvent: the screen melts like wax
+  meltEvent: {
+    chance: 0.01,
+    meltMs: 1_700, // sagging, before it snaps back
+    drips: 5, // cash dripping off the deepest sag
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
