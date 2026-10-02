@@ -340,6 +340,7 @@ export { forceSprayEvent } from "./sprayEvent";
 export { forceFountainEvent } from "./fountainEvent";
 export { forceRippleEvent } from "./rippleEvent";
 export { forceWreckingBallEvent } from "./wreckingBallEvent";
+export { forcePiledriverEvent } from "./piledriverEvent";
 export { forceOrbitalStrikeEvent } from "./orbitalStrikeEvent";
 export { forceFuseEvent } from "./fuseEvent";
 export { forceSupernovaEvent } from "./supernovaEvent";

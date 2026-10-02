@@ -59,6 +59,7 @@ import {
   forceFountainEvent,
   forceRippleEvent,
   forceWreckingBallEvent,
+  forcePiledriverEvent,
   forceOrbitalStrikeEvent,
   forceFuseEvent,
   forceSupernovaEvent,
@@ -204,6 +205,7 @@ import {
   wireFountainEventTestButton,
   wireRippleEventTestButton,
   wireWreckingBallEventTestButton,
+  wirePiledriverEventTestButton,
   wireOrbitalStrikeEventTestButton,
   wireFuseEventTestButton,
   wireSupernovaEventTestButton,
@@ -758,6 +760,13 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceWreckingBallEvent(floor);
+    });
+    // same, for the Piledriver event
+    wirePiledriverEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forcePiledriverEvent(floor);
     });
     // same, for the Orbital Strike event
     wireOrbitalStrikeEventTestButton(app, () => {

@@ -438,6 +438,15 @@ export function wireWreckingBallEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wirePiledriverEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-piledriver-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireOrbitalStrikeEventTestButton(
   container: HTMLElement,
   onClick: () => void,

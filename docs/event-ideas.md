@@ -97,3 +97,4 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 ### Wisp (upgrades)
 
 - [x] **Wrecking Ball**: the wisp drops like a heavy ball from above the screen onto the clicked floor's income bar and bounces on it, each bounce lower as it drifts across until it rests on it; then it charges up, trembling and swelling, leaps high and slams down onto the bar, vanishing in a huge blast and shake. Every touch lands free upgrade levels, with a flash, sparks, shake and bar jolt as strong as its impact, so the last little bounces are minor.
+- [x] **Piledriver**: the wisp appears over the top of the screen above the upgrade buttons, swelling, trembling and heating up as the screen rumbles, then plunges straight down, ever faster, smashing through every upgrade button in view: each squashes flat with a flash, a bang and a jolt and lands free upgrade levels; it craters into the bottom of the screen in a huge blast and shake.

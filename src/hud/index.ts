@@ -74,6 +74,7 @@ export {
   wireFountainEventTestButton,
   wireRippleEventTestButton,
   wireWreckingBallEventTestButton,
+  wirePiledriverEventTestButton,
   wireOrbitalStrikeEventTestButton,
   wireFuseEventTestButton,
   wireSupernovaEventTestButton,
