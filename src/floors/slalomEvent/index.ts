@@ -36,7 +36,13 @@ const SNOW: [number, number] = [60, 200];
 const SNOW_SPAN = 1.3;
 
 // a Catmull-Rom curve through b and c, steered by a and d, t 0..1
-function catmull(a: number, b: number, c: number, d: number, t: number): number {
+function catmull(
+  a: number,
+  b: number,
+  c: number,
+  d: number,
+  t: number,
+): number {
   return (
     0.5 *
     (2 * b +
@@ -93,8 +99,10 @@ export const forceSlalomEvent = registerWispEvent(
       return point;
     };
     // each gate stands until the skier rounds it
-    const gatePaths = gates.map((g, k) => (ms: number): Point | null =>
-      ms < 0 || ms >= reachAt[k + 1] ? null : g,
+    const gatePaths = gates.map(
+      (g, k) =>
+        (ms: number): Point | null =>
+          ms < 0 || ms >= reachAt[k + 1] ? null : g,
     );
 
     const beats = createBeats(
@@ -115,7 +123,16 @@ export const forceSlalomEvent = registerWispEvent(
           const heat = clamp01(ms / blastAt);
           const pop = easeOutBack(clamp01(ms / POP_MS));
           gatePaths.forEach((path, k) =>
-            drawWispBetween(ctx, path, ms, now, gateSize * pop, 0.3, 0, reachAt[k + 1]),
+            drawWispBetween(
+              ctx,
+              path,
+              ms,
+              now,
+              gateSize * pop,
+              0.3,
+              0,
+              reachAt[k + 1],
+            ),
           );
           drawWispBetween(ctx, skierAt, ms, now, skier, heat, POP_MS, blastAt);
         },

@@ -47,11 +47,20 @@ export const forceHoleInOneEvent = registerWispEvent(
     // from the side with more room
     const dir = button.x - area.left > area.right - button.x ? 1 : -1;
     const clampX = (x: number) =>
-      Math.min(area.right - width * EDGE, Math.max(area.left + width * EDGE, x));
+      Math.min(
+        area.right - width * EDGE,
+        Math.max(area.left + width * EDGE, x),
+      );
     const rim = width * RIM;
     const spots: Point[] = [
-      { x: dir === 1 ? area.left - width * 0.2 : area.right + width * 0.2, y: area.bottom },
-      ...LANDINGS.map((s) => ({ x: clampX(button.x - dir * width * s), y: button.y })),
+      {
+        x: dir === 1 ? area.left - width * 0.2 : area.right + width * 0.2,
+        y: area.bottom,
+      },
+      ...LANDINGS.map((s) => ({
+        x: clampX(button.x - dir * width * s),
+        y: button.y,
+      })),
       { x: button.x - dir * rim, y: button.y },
     ];
     const landAt: number[] = [];
@@ -83,7 +92,8 @@ export const forceHoleInOneEvent = registerWispEvent(
       }
       const u = (ms - rimFrom) / rimMs;
       const r = rim * (1 - easeIn(u));
-      const angle = rimStart + rimWay * TURNS * Math.PI * 2 * (u * (2 - u) * 0.6 + u * 0.4);
+      const angle =
+        rimStart + rimWay * TURNS * Math.PI * 2 * (u * (2 - u) * 0.6 + u * 0.4);
       point.x = button.x + Math.cos(angle) * r;
       point.y = button.y + Math.sin(angle) * r * 0.5;
       return point;
@@ -117,7 +127,13 @@ export const forceHoleInOneEvent = registerWispEvent(
       cover!.burst(spot, lerp(LAND_BURST, t));
       cover!.launchFrom(
         spot,
-        sprayTargets(spot, LAND_COINS, KICK, dir === 1 ? -Math.PI / 4 : (-3 * Math.PI) / 4, KICK_SPAN),
+        sprayTargets(
+          spot,
+          LAND_COINS,
+          KICK,
+          dir === 1 ? -Math.PI / 4 : (-3 * Math.PI) / 4,
+          KICK_SPAN,
+        ),
       );
       if (!cover!.isLive()) return;
       playExplosion();

@@ -56,8 +56,10 @@ export const forceStampedeEvent = registerWispEvent(
     const height = area.bottom - area.top;
     const size = Math.max(WISP_SIZE, width * WISP);
     const dir = Math.random() < 0.5 ? 1 : -1;
-    const startX = dir === 1 ? area.left - width * OFF : area.right + width * OFF;
-    const turnX = dir === 1 ? area.right - width * TURN : area.left + width * TURN;
+    const startX =
+      dir === 1 ? area.left - width * OFF : area.right + width * OFF;
+    const turnX =
+      dir === 1 ? area.right - width * TURN : area.left + width * TURN;
 
     const herd: Runner[] = Array.from({ length: HERD }, (_, i) => {
       const from = (i / (HERD - 1)) * STAGGER_MS * (0.7 + 0.3 * Math.random());
@@ -76,7 +78,10 @@ export const forceStampedeEvent = registerWispEvent(
             const u = (ms - from) / runMs;
             point.x = startX + (turnX - startX) * u;
             point.y =
-              y - height * HOP * Math.abs(Math.sin((Math.PI * (ms - from)) / STRIDE_MS));
+              y -
+              height *
+                HOP *
+                Math.abs(Math.sin((Math.PI * (ms - from)) / STRIDE_MS));
             return point;
           }
           const total = cover?.total();
@@ -124,7 +129,11 @@ export const forceStampedeEvent = registerWispEvent(
         tick: (ms, now) => {
           hooves.tick(ms, now);
           hits.tick(ms, now);
-          if (ms < lastTurn && now - lastRumble >= RUMBLE_MS && cover?.isLive()) {
+          if (
+            ms < lastTurn &&
+            now - lastRumble >= RUMBLE_MS &&
+            cover?.isLive()
+          ) {
             lastRumble = now;
             shakeScreen(lerp(RUMBLE, clamp01(ms / lastTurn)));
           }

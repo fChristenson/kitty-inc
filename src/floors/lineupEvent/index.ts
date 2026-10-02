@@ -94,7 +94,9 @@ export const forceLineupEvent = registerWispEvent(
         }
         if (ms < firedAt[i]) {
           const shake =
-            ms < fireFrom ? TREMBLE * size * ((ms - linedAt) / trembleMs) : TREMBLE * size;
+            ms < fireFrom
+              ? TREMBLE * size * ((ms - linedAt) / trembleMs)
+              : TREMBLE * size;
           point.x = row[i].x + Math.sin(ms * 0.13 + i) * shake;
           point.y = row[i].y + Math.cos(ms * 0.11 + i * 2) * shake;
           return point;
@@ -114,7 +116,11 @@ export const forceLineupEvent = registerWispEvent(
       (_, i) => i * POP_GAP_MS,
       () => cover!.isLive() && playBloop(),
     );
-    const lined = createBeats([linedAt], (ms) => ms, () => linedUp());
+    const lined = createBeats(
+      [linedAt],
+      (ms) => ms,
+      () => linedUp(),
+    );
     const fires = createBeats(
       order,
       (i) => firedAt[i],
@@ -140,7 +146,9 @@ export const forceLineupEvent = registerWispEvent(
           hits.tick(ms, now);
           if (ms >= linedAt && ms < lastHit && now - lastRumble >= RUMBLE_MS) {
             lastRumble = now;
-            shakeScreen(lerp(RUMBLE, clamp01((ms - linedAt) / (lastHit - linedAt))));
+            shakeScreen(
+              lerp(RUMBLE, clamp01((ms - linedAt) / (lastHit - linedAt))),
+            );
           }
         },
         drawOver: (ctx, ms, now) => {

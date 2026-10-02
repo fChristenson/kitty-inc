@@ -140,10 +140,14 @@ export const forceWormholeEvent = registerWispEvent(
           VANISH_BURST,
         ),
     );
-    const finale = createBeats([blastAt], (ms) => ms, () => {
-      const total = cover!.total();
-      if (total) cover!.blast(total);
-    });
+    const finale = createBeats(
+      [blastAt],
+      (ms) => ms,
+      () => {
+        const total = cover!.total();
+        if (total) cover!.blast(total);
+      },
+    );
 
     const cover = startWispCover(
       KEY,
@@ -159,7 +163,16 @@ export const forceWormholeEvent = registerWispEvent(
         },
         drawOver: (ctx, ms, now) => {
           const heat = clamp01(ms / blastAt);
-          drawWispBetween(ctx, wispAt, ms, now, size * scaleAt(ms), heat, 0, blastAt);
+          drawWispBetween(
+            ctx,
+            wispAt,
+            ms,
+            now,
+            size * scaleAt(ms),
+            heat,
+            0,
+            blastAt,
+          );
         },
       },
     );
@@ -169,7 +182,9 @@ export const forceWormholeEvent = registerWispEvent(
       const t = k / JUMPS;
       const j = jumps[k];
       const total = cover!.total();
-      const at = j ? j.from : total && { x: total.x, y: total.y + height * FINAL_BELOW };
+      const at = j
+        ? j.from
+        : total && { x: total.x, y: total.y + height * FINAL_BELOW };
       if (!at) return;
       cover!.burst(at, lerp(EMERGE_BURST, t));
       cover!.launchFrom(

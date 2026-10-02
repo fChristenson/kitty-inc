@@ -57,11 +57,17 @@ export const forceLightningEvent = registerWispEvent(
     const bolts: Bolt[] = [];
     let at = FIRST_MS;
     for (let b = 0; b < BOLTS; b++) {
-      const sky = { x: middleX + between([-SKY, SKY]) * width, y: area.top - size };
+      const sky = {
+        x: middleX + between([-SKY, SKY]) * width,
+        y: area.top - size,
+      };
       const joints: Point[] = Array.from({ length: JOINTS + 1 }, (_, k) => {
         const f = k / JOINTS;
         // kinked hardest in the middle, pinned at both ends
-        const jag = k === 0 || k === JOINTS ? 0 : between([-JAG, JAG]) * width * Math.sin(Math.PI * f);
+        const jag =
+          k === 0 || k === JOINTS
+            ? 0
+            : between([-JAG, JAG]) * width * Math.sin(Math.PI * f);
         return {
           x: sky.x + (button.x - sky.x) * f + jag,
           y: sky.y + (button.y - sky.y) * f,
@@ -134,7 +140,13 @@ export const forceLightningEvent = registerWispEvent(
       cover!.burst(button, lerp(STRIKE_BURST, t));
       cover!.launchFrom(
         button,
-        sprayTargets(button, Math.round(lerp(STRIKE_COINS, t)), SPRAY, -Math.PI / 2, SPRAY_SPAN),
+        sprayTargets(
+          button,
+          Math.round(lerp(STRIKE_COINS, t)),
+          SPRAY,
+          -Math.PI / 2,
+          SPRAY_SPAN,
+        ),
       );
       if (!cover!.isLive()) return;
       playExplosion();

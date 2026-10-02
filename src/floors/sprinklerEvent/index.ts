@@ -58,12 +58,14 @@ export const forceSprinklerEvent = registerWispEvent(
 
     const aimAt = (ms: number) => {
       const u = clamp01(ms / sprayMs);
-      const phase = Math.PI * 2 * CYCLES * ((1 - SPEEDUP) * u + SPEEDUP * u * u);
+      const phase =
+        Math.PI * 2 * CYCLES * ((1 - SPEEDUP) * u + SPEEDUP * u * u);
       return -Math.PI / 2 + side * SWEEP * Math.sin(phase);
     };
     const flight = (angle: number, tau: number, into: Point): Point => {
       into.x = nozzle.x + Math.cos(angle) * speed * tau;
-      into.y = nozzle.y + Math.sin(angle) * speed * tau + 0.5 * gravity * tau * tau;
+      into.y =
+        nozzle.y + Math.sin(angle) * speed * tau + 0.5 * gravity * tau * tau;
       return into;
     };
     const dropOf = (at: number, angle: number): Drop => {
@@ -72,7 +74,9 @@ export const forceSprinklerEvent = registerWispEvent(
         at,
         angle,
         path: (ms) =>
-          ms < at || ms >= at + FLIGHT_MS ? null : flight(angle, ms - at, point),
+          ms < at || ms >= at + FLIGHT_MS
+            ? null
+            : flight(angle, ms - at, point),
         landing: flight(angle, FLIGHT_MS, { x: 0, y: 0 }),
       };
     };
@@ -117,7 +121,16 @@ export const forceSprinklerEvent = registerWispEvent(
         drawOver: (ctx, ms, now) => {
           const heat = clamp01(ms / blastAt);
           for (const d of drops)
-            drawWispBetween(ctx, d.path, ms, now, dropSize, heat, d.at, d.at + FLIGHT_MS);
+            drawWispBetween(
+              ctx,
+              d.path,
+              ms,
+              now,
+              dropSize,
+              heat,
+              d.at,
+              d.at + FLIGHT_MS,
+            );
           drawWispBetween(ctx, nozzleAt, ms, now, nozzleSize, heat, 0, blastAt);
         },
       },

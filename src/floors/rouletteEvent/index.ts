@@ -91,7 +91,13 @@ export const forceRouletteEvent = registerWispEvent(
     };
 
     const beats = createBeats(
-      [dropFrom, ...Array.from({ length: HOPS }, (_, k) => clatterFrom + hopMs * (k + 1))],
+      [
+        dropFrom,
+        ...Array.from(
+          { length: HOPS },
+          (_, k) => clatterFrom + hopMs * (k + 1),
+        ),
+      ],
       (ms) => ms,
       (_, k) => (k === 0 ? cover!.isLive() && playSwoosh() : bounced(k - 1)),
     );

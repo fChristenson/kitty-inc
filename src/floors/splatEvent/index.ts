@@ -117,7 +117,10 @@ export const forceSplatEvent = registerWispEvent(
       }
       const t = k / (HITS - 2);
       cover!.burst(p, lerp(SPLAT_BURST, t));
-      cover!.launchFrom(p, ringTargets(p, Math.round(lerp(SPLAT_COINS, t)), SPLASH));
+      cover!.launchFrom(
+        p,
+        ringTargets(p, Math.round(lerp(SPLAT_COINS, t)), SPLASH),
+      );
       if (!cover!.isLive()) return;
       playExplosion();
       shakeScreen(lerp(SPLAT_SHAKE, t));

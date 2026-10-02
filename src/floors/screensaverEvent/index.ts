@@ -106,7 +106,11 @@ export const forceScreensaverEvent = registerWispEvent(
       (b) => b.at,
       (b, k) => bounced(b.spot, b.inward, k),
     );
-    const hit = createBeats([flightMs], (ms) => ms, () => cover!.blast(corner, CORNER_COINS));
+    const hit = createBeats(
+      [flightMs],
+      (ms) => ms,
+      () => cover!.blast(corner, CORNER_COINS),
+    );
 
     const cover = startWispCover(
       KEY,

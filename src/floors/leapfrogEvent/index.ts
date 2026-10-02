@@ -44,7 +44,8 @@ export const forceLeapfrogEvent = registerWispEvent(
     const size = Math.max(WISP_SIZE, width * WISP);
     const dir = Math.random() < 0.5 ? 1 : -1;
     const y = (area.top + area.bottom) / 2 + height * DROP;
-    const first = dir === 1 ? area.left + width * MARGIN : area.right - width * MARGIN;
+    const first =
+      dir === 1 ? area.left + width * MARGIN : area.right - width * MARGIN;
     const step = (dir * (width * (1 - MARGIN * 2))) / (VAULTS + 1);
     const spots: Point[] = Array.from({ length: VAULTS + 2 }, (_, k) => ({
       x: first + step * k,
@@ -72,7 +73,8 @@ export const forceLeapfrogEvent = registerWispEvent(
           const a = spots[k];
           const b = spots[k + 2];
           into.x = a.x + (b.x - a.x) * u;
-          into.y = y - height * lerp(HEIGHT, k / (VAULTS - 1)) * 4 * u * (1 - u);
+          into.y =
+            y - height * lerp(HEIGHT, k / (VAULTS - 1)) * 4 * u * (1 - u);
           return into;
         }
         rest = spots[k + 2];

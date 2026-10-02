@@ -10,7 +10,13 @@ import { playBloop } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
-import { between, clamp01, easeOutBack, easeOutCubic, lerp } from "../../shared/easing";
+import {
+  between,
+  clamp01,
+  easeOutBack,
+  easeOutCubic,
+  lerp,
+} from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 
 const KEY = "clockwork";
@@ -46,8 +52,12 @@ export const forceClockworkEvent = registerWispEvent(
     };
     const radius = Math.min(width, height) * RADIUS;
     const hand = Math.max(WISP_SIZE, width * HAND);
-    const hub = HUB.map((s) => Math.max(WISP_SIZE, width * s)) as [number, number];
-    const angleOf = (hour: number) => -Math.PI / 2 + (hour / HOURS) * Math.PI * 2;
+    const hub = HUB.map((s) => Math.max(WISP_SIZE, width * s)) as [
+      number,
+      number,
+    ];
+    const angleOf = (hour: number) =>
+      -Math.PI / 2 + (hour / HOURS) * Math.PI * 2;
     const hours = Array.from({ length: HOURS }, (_, h) => ({
       x: middle.x + Math.cos(angleOf(h)) * radius,
       y: middle.y + Math.sin(angleOf(h)) * radius,
@@ -101,7 +111,16 @@ export const forceClockworkEvent = registerWispEvent(
         drawOver: (ctx, ms, now) => {
           const heat = clamp01(ms / blastAt);
           const pop = easeOutBack(clamp01(ms / POP_MS));
-          drawWispBetween(ctx, hubAt, ms, now, lerp(hub, heat) * pop, heat, 0, blastAt);
+          drawWispBetween(
+            ctx,
+            hubAt,
+            ms,
+            now,
+            lerp(hub, heat) * pop,
+            heat,
+            0,
+            blastAt,
+          );
           drawWispBetween(ctx, handAt, ms, now, hand * pop, heat, 0, blastAt);
         },
       },

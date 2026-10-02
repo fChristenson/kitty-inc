@@ -153,14 +153,19 @@ export const forceZipperEvent = registerWispEvent(
       const t = k / STITCHES;
       cover!.burst(p, lerp(TURN_BURST, t));
       const out = p.x === left ? -1 : 1;
-      cover!.launchFrom(p, [{ x: p.x + out * lerp(TOSS, Math.random()), y: p.y }]);
+      cover!.launchFrom(p, [
+        { x: p.x + out * lerp(TOSS, Math.random()), y: p.y },
+      ]);
       if (!cover!.isLive()) return;
       playBloop();
       shakeScreen(lerp(TURN_SHAKE, t));
     }
     function opened(p: Point): void {
       cover!.burst(p, OPEN_BURST);
-      cover!.launchFrom(p, sprayTargets(p, OPEN_COINS, OPEN_SPRAY, 0, Math.PI * 2));
+      cover!.launchFrom(
+        p,
+        sprayTargets(p, OPEN_COINS, OPEN_SPRAY, 0, Math.PI * 2),
+      );
       if (!cover!.isLive()) return;
       playExplosion();
       shakeScreen(OPEN_SHAKE);

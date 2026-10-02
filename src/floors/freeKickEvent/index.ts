@@ -72,7 +72,11 @@ export const forceFreeKickEvent = registerWispEvent(
     };
 
     // kick, rebound, kick, rebound, curl
-    const kickAt = [POP_MS, POP_MS + kickMs + reboundMs, POP_MS + (kickMs + reboundMs) * 2];
+    const kickAt = [
+      POP_MS,
+      POP_MS + kickMs + reboundMs,
+      POP_MS + (kickMs + reboundMs) * 2,
+    ];
     const blockAt = [kickAt[0] + kickMs, kickAt[1] + kickMs];
     const blastAt = kickAt[2] + curlMs;
 
@@ -112,7 +116,8 @@ export const forceFreeKickEvent = registerWispEvent(
         let lift = 0;
         for (const k of kickAt) {
           const u = (ms - k) / kickMs;
-          if (u > 0.3 && u < 1.3) lift = Math.max(lift, Math.sin(Math.PI * (u - 0.3)));
+          if (u > 0.3 && u < 1.3)
+            lift = Math.max(lift, Math.sin(Math.PI * (u - 0.3)));
         }
         let knock = 0;
         blockAt.forEach((b, n) => {
@@ -148,7 +153,16 @@ export const forceFreeKickEvent = registerWispEvent(
           const heat = clamp01(ms / blastAt);
           const pop = easeOutBack(clamp01(ms / POP_MS));
           for (const path of defenders)
-            drawWispBetween(ctx, path, ms, now, defender * pop, heat * 0.5, 0, blastAt);
+            drawWispBetween(
+              ctx,
+              path,
+              ms,
+              now,
+              defender * pop,
+              heat * 0.5,
+              0,
+              blastAt,
+            );
           drawWispBetween(ctx, ballAt, ms, now, ball, heat, 0, blastAt);
         },
       },
