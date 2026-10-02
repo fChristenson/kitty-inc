@@ -73,6 +73,7 @@ import { POLICE_CRITS } from "./police";
 import { CLEANERS_CRITS } from "./cleaners";
 import { BEDTIME_CRITS } from "./bedtime";
 import { SPACE_KNIGHTS_CRITS } from "./spaceKnights";
+import { SILVER_DUOS_CRITS } from "./silverDuos";
 
 export const FEATURED_CRITS = {
   ...CYBERPUNK_CRITS,
@@ -149,4 +150,5 @@ export const FEATURED_CRITS = {
   ...CLEANERS_CRITS,
   ...BEDTIME_CRITS,
   ...SPACE_KNIGHTS_CRITS,
+  ...SILVER_DUOS_CRITS,
 } as const;

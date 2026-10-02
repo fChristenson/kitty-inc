@@ -597,6 +597,44 @@ export const TEMPLATES = [
         `actions.spreadUpgrades(belowAndHere(context), balance.${k}Upgrades)`,
       ),
   }),
+  // 16 Worker perma tiers
+  template("workerTiersBuilding", "workerTiers", {
+    tiers: {
+      1: { Share: 0.05 },
+      2: { Share: 0.1 },
+      3: { Share: 0.2 },
+      4: { Share: 0.35 },
+      5: { Share: 0.55 },
+      6: { Share: 0.8 },
+    },
+    steps: { Share: 0.005 },
+    max: { Share: 1 },
+    description: (p) =>
+      `Promotes ${percent(p.Share)} of this building's workers one perma tier`,
+    reward: (k) =>
+      call(
+        "context, { actions, balance }",
+        `actions.raiseWorkerTiers(context.floors, balance.${k}Share, 1)`,
+      ),
+  }),
+  template("workerTiersFloor", "workerTiers", {
+    tiers: {
+      2: { Share: 0.25 },
+      3: { Share: 0.4 },
+      4: { Share: 0.6 },
+      5: { Share: 0.8 },
+      6: { Share: 1 },
+    },
+    steps: { Share: 0.005 },
+    max: { Share: 1 },
+    description: (p) =>
+      `Promotes ${percent(p.Share)} of this floor's workers two perma tiers`,
+    reward: (k) =>
+      call(
+        "context, { actions, balance }",
+        `actions.raiseWorkerTiers([context.floor], balance.${k}Share, 2)`,
+      ),
+  }),
   // 1 Free upgrades (already at its share; only when nothing else fits)
   template("upgradeHere", "upgrades", {
     tiers: {

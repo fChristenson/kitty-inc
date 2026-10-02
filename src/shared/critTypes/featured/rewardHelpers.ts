@@ -56,6 +56,8 @@ export interface FeaturedRewardActions {
   growLevels: (floors: Floor[], fraction: number) => void;
   // hands out `total` free upgrades one by one to the lowest-level floor
   spreadUpgrades: (floors: Floor[], total: number) => void;
+  // promotes `share` (at least one) of the floors' climbable workers `steps` perma tiers each
+  raiseWorkerTiers: (floors: Floor[], share: number, steps: number) => void;
   startEvent: (floors: Floor[], event: FeaturedEventKind) => void;
 }
 

@@ -52,6 +52,8 @@ Everything in progress lives in the gitignored `tmp/`: raws, custom cut-out scri
 
 **The goal.** The whole game is a slot machine: every crit and every event is a pull of the lever. Each event must be a fun surprise to watch that ends in a reward, engaging from the first frame to the payoff, and only ever beneficial: no losses, no waiting, no downsides, nothing the player has to do. Judge every idea by "is this a thrill to see land?".
 
+The crazier and more unexpected the event, the better. Never compromise on performance, poor performing events are worse than boring ones.
+
 Events (`src/floors/*Event`, listed in `docs/event-ideas.md`), like crits, must all be distinct.
 
 ### Rewards

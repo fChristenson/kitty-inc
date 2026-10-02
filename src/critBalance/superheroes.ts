@@ -1,9 +1,9 @@
 // odds and reward sizes for featured/superheroes.ts's crits, spread into CONFIG.crit
 export const SUPERHEROES_BALANCE = {
   purrfectOriginChance: 0.0127213777,
-  capeEscapeChance: 0.0114016524,
+  capeEscapeChance: 0.0114234441,
   capeEscapeDiscount: 0.013,
-  thunderPawsChance: 0.0112312966,
+  thunderPawsChance: 0.0112559337,
   thunderPawsBoostSeconds: 23,
   thunderPawsExtraWorkers: 0,
   clawAndOrderChance: 0.0123519534,

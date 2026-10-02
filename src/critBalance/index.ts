@@ -74,6 +74,7 @@ import { POLICE_BALANCE } from "./police";
 import { CLEANERS_BALANCE } from "./cleaners";
 import { BEDTIME_BALANCE } from "./bedtime";
 import { SPACE_KNIGHTS_BALANCE } from "./spaceKnights";
+import { SILVER_DUOS_BALANCE } from "./silverDuos";
 
 export const FEATURED_CRIT_BALANCE = {
   ...CYBERPUNK_BALANCE,
@@ -150,4 +151,5 @@ export const FEATURED_CRIT_BALANCE = {
   ...CLEANERS_BALANCE,
   ...BEDTIME_BALANCE,
   ...SPACE_KNIGHTS_BALANCE,
+  ...SILVER_DUOS_BALANCE,
 } as const;

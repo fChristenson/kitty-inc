@@ -20,6 +20,7 @@ export const GROUPS = [
     /actions\.(hireWorkers|hireManagers|giveOfficeChairs|giveOfficeSupplies)/,
   ],
   ["unlocks", "Unlocks", 7, /actions\.unlockFloors/],
+  ["workerTiers", "Worker perma tiers", 5, /actions\.raiseWorkerTiers/],
   ["repeats", "Crit repeats and walks", 9, /actions\.repeatCrit|cascade/i],
   [
     "promotion",

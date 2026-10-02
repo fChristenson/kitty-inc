@@ -14,6 +14,9 @@ import {
   triggerJumpAll as animateJumpAll,
   getRenderedWorkerCount,
   MAX_RENDERED_WORKERS,
+  getBoostEventCandidates,
+  promoteWorkerPermaTier,
+  celebrateWorkerBoost,
 } from "../worker";
 import {
   hitTestUpgradeButton,
@@ -1629,6 +1632,8 @@ function asRewardContext(context: FeaturedRewardContext): CritRewardContext {
   return context as CritRewardContext;
 }
 
+const CELEBRATED_PROMOTIONS = 6;
+
 const CRIT_REWARDS: Record<CritProcKind, (context: CritRewardContext) => void> =
   {
     ...createFeaturedCritRewards({
@@ -1746,6 +1751,29 @@ const CRIT_REWARDS: Record<CritProcKind, (context: CritRewardContext) => void> =
           given[lowest] += 1;
         }
         unlocked.forEach((floor, j) => increaseIncomeRateBy(floor, given[j]));
+      },
+      raiseWorkerTiers: (floors, share, steps) => {
+        const climbers = floors
+          .filter((floor) => floor.unlocked)
+          .flatMap((floor) =>
+            getBoostEventCandidates(floor).map((workerIndex) => ({
+              floor,
+              workerIndex,
+            })),
+          )
+          .sort(() => Math.random() - 0.5);
+        const count = Math.min(
+          climbers.length,
+          Math.max(1, Math.ceil(climbers.length * share)),
+        );
+        const now = Date.now();
+        climbers.slice(0, count).forEach(({ floor, workerIndex }, i) => {
+          for (let step = 0; step < steps; step++)
+            promoteWorkerPermaTier(floor, workerIndex);
+          // only a few celebrate, so a big promotion doesn't stack dozens of sounds
+          if (i < CELEBRATED_PROMOTIONS)
+            celebrateWorkerBoost(floor, workerIndex, now);
+        });
       },
       startEvent: (floors, event) => {
         const unlocked = floors.filter((floor) => floor.unlocked);
