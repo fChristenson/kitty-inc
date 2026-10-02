@@ -136,6 +136,21 @@ export function drawGlimmer(
   drawTwinkle(ctx, x, y, size * 0.5, rotation, COLOR.white);
 }
 
+// drawGlimmer in whatever composite ctx is already set to ("lighter"), for
+// loops stamping many
+export function stampGlimmer(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  rotation: number,
+  color: string,
+): void {
+  if (size <= 0) return;
+  stampTwinkle(ctx, x, y, size, rotation, color);
+  stampTwinkle(ctx, x, y, size * 0.5, rotation, COLOR.white);
+}
+
 export function hash01(a: number, b: number): number {
   const v = Math.sin(a * 12.9898 + b * 78.233) * 43758.5453;
   return v - Math.floor(v);

@@ -8,7 +8,7 @@ import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { pickAtMost, pickCritTierByOdds } from "../../shared/critTypes";
-import { drawGlimmer, hash01 } from "../../shared/twinkle";
+import { drawGlimmer, hash01, stampGlimmer } from "../../shared/twinkle";
 import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import {
@@ -41,7 +41,7 @@ const STAR_SIZE = WORKER_HEIGHT * 0.22;
 // how far above a worker's middle its star hangs, of its height
 const STAR_RISE = 0.15;
 // the glimmers along each link: their spacing (px), size and sideways scatter
-const TRAIL_STEP = 16;
+const TRAIL_STEP = 22;
 const TRAIL_SIZE = WORKER_HEIGHT * 0.09;
 const TRAIL_SCATTER = 6;
 const LINE_WIDTH = 7;
@@ -195,12 +195,14 @@ function drawOverlay(
       ctx.stroke();
     }
     ctx.restore();
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
     for (let k = 0, d = TRAIL_STEP / 2; d < laid; k++, d += TRAIL_STEP) {
       const scatter = (hash01(s, k) - 0.5) * 2 * TRAIL_SCATTER;
       const twinkle = 0.5 + 0.5 * Math.sin(now / 140 + hash01(k, s) * 20);
       // fresh glimmers near the light start big and settle
       const fresh = Math.max(0, 1 - (laid - d) / (TRAIL_STEP * 4));
-      drawGlimmer(
+      stampGlimmer(
         ctx,
         a.x + (dx * d) / length - (dy / length) * scatter,
         a.y + (dy * d) / length + (dx / length) * scatter,
@@ -209,6 +211,7 @@ function drawOverlay(
         COLOR.heavenlyGold,
       );
     }
+    ctx.restore();
   }
 
   // each star twinkling up, then flaring as its worker is promoted

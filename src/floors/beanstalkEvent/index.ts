@@ -131,6 +131,26 @@ function vineAt(event: RunningBeanstalk, p: number): Point & { depth: number } {
   };
 }
 
+// the grown vine's points, shared by its back and front passes each frame
+let vinePoints: {
+  event: RunningBeanstalk;
+  grown: number;
+  points: (Point & { depth: number })[];
+} | null = null;
+function pointsOf(
+  event: RunningBeanstalk,
+  grown: number,
+): (Point & { depth: number })[] {
+  if (vinePoints?.event === event && vinePoints.grown === grown)
+    return vinePoints.points;
+  const count = Math.max(1, Math.round(POINTS * grown));
+  const points = Array.from({ length: count + 1 }, (_, i) =>
+    vineAt(event, (grown * i) / count),
+  );
+  vinePoints = { event, grown, points };
+  return points;
+}
+
 // the grown vine's front or back stretches, glowing
 function drawVine(
   ctx: CanvasRenderingContext2D,
@@ -139,10 +159,8 @@ function drawVine(
   front: boolean,
   now: number,
 ): void {
-  const count = Math.max(1, Math.round(POINTS * grown));
-  const points = Array.from({ length: count + 1 }, (_, i) =>
-    vineAt(event, (grown * i) / count),
-  );
+  const points = pointsOf(event, grown);
+  const count = points.length - 1;
   const path = new Path2D();
   let drawing = false;
   for (const p of points) {

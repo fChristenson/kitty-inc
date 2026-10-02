@@ -497,16 +497,35 @@ function drawSlamFlash(
   const strength = flashStrength(pose);
   if (strength <= 0) return;
   const r = radius * (1 + 0.6 * (1 - strength));
-  const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-  gradient.addColorStop(0, COLOR.white);
-  gradient.addColorStop(0.35, COLOR.heavenlyGold);
-  gradient.addColorStop(1, `${COLOR.heavenlyGold}00`);
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
   ctx.globalAlpha = strength * 0.85;
-  ctx.fillStyle = gradient;
-  ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+  ctx.drawImage(slamFlashSprite(), cx - r, cy - r, r * 2, r * 2);
   ctx.restore();
+}
+
+// the flash's glow, drawn once and stamped
+const FLASH_HALF = 128;
+let flashSprite: HTMLCanvasElement | null = null;
+function slamFlashSprite(): HTMLCanvasElement {
+  if (flashSprite) return flashSprite;
+  flashSprite = document.createElement("canvas");
+  flashSprite.width = flashSprite.height = FLASH_HALF * 2;
+  const c = flashSprite.getContext("2d")!;
+  const gradient = c.createRadialGradient(
+    FLASH_HALF,
+    FLASH_HALF,
+    0,
+    FLASH_HALF,
+    FLASH_HALF,
+    FLASH_HALF,
+  );
+  gradient.addColorStop(0, COLOR.white);
+  gradient.addColorStop(0.35, COLOR.heavenlyGold);
+  gradient.addColorStop(1, `${COLOR.heavenlyGold}00`);
+  c.fillStyle = gradient;
+  c.fillRect(0, 0, FLASH_HALF * 2, FLASH_HALF * 2);
+  return flashSprite;
 }
 
 // a slanted gold shine band sweeping left to right across a rounded rect

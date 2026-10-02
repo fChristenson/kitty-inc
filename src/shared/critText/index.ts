@@ -94,6 +94,31 @@ function critTextSprite(
   return sprite;
 }
 
+// drawCritText from a cached sprite, for labels redrawn every frame
+export function drawCachedCritText(
+  ctx: CanvasRenderingContext2D,
+  label: string,
+  x: number,
+  y: number,
+  color: string,
+  style: CritTextStyle,
+): void {
+  const { a, b } = ctx.getTransform();
+  const scale = Math.ceil(Math.hypot(a, b) * 4) / 4;
+  const sprite = critTextSprite(label, color, style, scale);
+  if (!sprite) {
+    drawCritText(ctx, label, x, y, color, style);
+    return;
+  }
+  ctx.drawImage(
+    sprite.canvas,
+    x - sprite.width / 2,
+    y - sprite.height / 2,
+    sprite.width,
+    sprite.height,
+  );
+}
+
 // an event's reward label landing at (x, y): it pops in big at poppedAt
 // (performance.now()) and settles
 export function drawPoppingCritText(

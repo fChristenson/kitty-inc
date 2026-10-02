@@ -173,20 +173,28 @@ registerEventProc(
       const last = shots[shots.length - 1].rock;
       const startedAt = performance.now();
 
-      // the ship, kicked back from where each shot went
+      // the ship, kicked back from where each shot went (aims worked out once:
+      // the trail asks for the ship's place hundreds of times a frame)
+      const kicks = shots.map((shot) => {
+        const target = rockAt(shot.rock, shot.rock.hitAt);
+        const length =
+          Math.hypot(target.x - center.x, target.y - center.y) || 1;
+        return {
+          firedAt: shot.firedAt,
+          dx: (target.x - center.x) / length,
+          dy: (target.y - center.y) / length,
+        };
+      });
       const recoilOf = (ms: number): Point => {
         let x = 0;
         let y = 0;
-        for (const shot of shots) {
+        for (const shot of kicks) {
           const since = ms - shot.firedAt;
           if (since < 0) break;
           if (since > RECOIL_MS * 5) continue;
-          const target = rockAt(shot.rock, shot.rock.hitAt);
-          const length =
-            Math.hypot(target.x - center.x, target.y - center.y) || 1;
           const kick = RECOIL * Math.exp(-since / RECOIL_MS);
-          x -= ((target.x - center.x) / length) * kick;
-          y -= ((target.y - center.y) / length) * kick;
+          x -= shot.dx * kick;
+          y -= shot.dy * kick;
         }
         return { x: center.x + x, y: center.y + y };
       };

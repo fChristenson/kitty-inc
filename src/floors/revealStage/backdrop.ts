@@ -68,6 +68,30 @@ function drawFeather(
   ctx.drawImage(featherCanvas, x, stage.y, width, stage.h);
 }
 
+// the sky and its two feathered edges, smooth gradients only, drawn once per
+// stage size this small and stretched
+const BACKDROP_RES: Range = [384, 192];
+let backdrop: { w: number; h: number; canvas: HTMLCanvasElement } | null = null;
+
+function backdropSprite(w: number, h: number): HTMLCanvasElement {
+  if (backdrop && backdrop.w === w && backdrop.h === h) return backdrop.canvas;
+  const canvas = backdrop?.canvas ?? document.createElement("canvas");
+  const [resW, resH] = BACKDROP_RES;
+  canvas.width = resW;
+  canvas.height = resH;
+  const ctx = canvas.getContext("2d")!;
+  const feather = w * FEATHER;
+  const stage = { x: 0, y: 0, w, h };
+  ctx.setTransform(resW / (w + feather * 2), 0, 0, resH / h, 0, 0);
+  ctx.translate(feather, 0);
+  ctx.fillStyle = skyGradient(ctx, stage);
+  ctx.fillRect(0, 0, w, h);
+  drawFeather(ctx, stage, -feather, feather, true);
+  drawFeather(ctx, stage, w, feather, false);
+  backdrop = { w, h, canvas };
+  return canvas;
+}
+
 // multiplies into the caller's globalAlpha
 export function drawStageBackdrop(
   ctx: CanvasRenderingContext2D,
@@ -76,11 +100,8 @@ export function drawStageBackdrop(
 ): void {
   const { x, y, w, h } = stage;
   const fade = ctx.globalAlpha;
-  ctx.fillStyle = skyGradient(ctx, stage);
-  ctx.fillRect(x, y, w, h);
   const feather = w * FEATHER;
-  drawFeather(ctx, stage, x - feather, feather, true);
-  drawFeather(ctx, stage, x + w, feather, false);
+  ctx.drawImage(backdropSprite(w, h), x - feather, y, w + feather * 2, h);
   ctx.save();
   ctx.beginPath();
   ctx.rect(x, y, w, h);

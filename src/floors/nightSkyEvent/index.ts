@@ -15,7 +15,7 @@ import {
 } from "../../shared/critTypes";
 import type { Point } from "../../shared/numberGlyph";
 import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
-import { drawGlimmer } from "../../shared/twinkle";
+import { stampGlimmer } from "../../shared/twinkle";
 import { drawWisp, WISP_SIZE } from "../../shared/wisp";
 import { forceTestCrit, getButtonCenter } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
@@ -99,6 +99,8 @@ registerEventProc(
             if (!rect) return;
             const now = performance.now();
             const ms = now - startedAt;
+            const previous = ctx.globalCompositeOperation;
+            ctx.globalCompositeOperation = "lighter";
             stars.forEach((star, i) => {
               if (ms < star.revealAt) return;
               const p = (ms - flyAt(i)) / mergeFlyMs;
@@ -115,7 +117,7 @@ registerEventProc(
                 1 +
                 STAR_POP * Math.max(0, 1 - (ms - star.revealAt) / STAR_POP_MS);
               const twinkle = 0.75 + 0.25 * Math.sin(now / 200 + i * 1.7);
-              drawGlimmer(
+              stampGlimmer(
                 ctx,
                 at.x,
                 at.y,
@@ -124,6 +126,7 @@ registerEventProc(
                 COLOR.heavenlyGold,
               );
             });
+            ctx.globalCompositeOperation = previous;
             ctx.save();
             ctx.translate(rect.left, rect.top);
             drawWisp(ctx, flight.wispAt, ms, now, WISP_SIZE);

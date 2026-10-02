@@ -10,7 +10,7 @@ import { loadImageByName } from "../../loadAssets";
 import { playBoostEventStream, playExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { pickCritTierByOdds } from "../../shared/critTypes";
-import { drawCritText } from "../../shared/critText";
+import { drawCachedCritText } from "../../shared/critText";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { drawGoldShimmer } from "../../shared/goldShimmer";
 import { drawGlimmerAura } from "../../shared/twinkle";
@@ -127,7 +127,7 @@ function drawReel(
         k++
       ) {
         const symbol = STRIP[mod(k, STRIP.length)];
-        drawCritText(
+        drawCachedCritText(
           ctx,
           `×${symbols[symbol].value}`,
           cx,
@@ -139,14 +139,29 @@ function drawReel(
     },
   );
   // shaded top and bottom, so it reads as a turning drum
-  const shade = ctx.createLinearGradient(0, y, 0, y + height);
+  ctx.fillStyle = reelShade(ctx, y, height);
+  ctx.fillRect(x, y, width, height);
+  ctx.restore();
+}
+
+// a reel's shade only depends on where its window sits, so it's built once
+const shades = new Map<string, CanvasGradient>();
+function reelShade(
+  ctx: CanvasRenderingContext2D,
+  y: number,
+  height: number,
+): CanvasGradient {
+  const key = `${y}|${height}`;
+  let shade = shades.get(key);
+  if (shade) return shade;
+  if (shades.size > 12) shades.clear();
+  shade = ctx.createLinearGradient(0, y, 0, y + height);
   shade.addColorStop(0, "rgba(0, 0, 0, 0.45)");
   shade.addColorStop(0.3, "rgba(0, 0, 0, 0)");
   shade.addColorStop(0.7, "rgba(0, 0, 0, 0)");
   shade.addColorStop(1, "rgba(0, 0, 0, 0.45)");
-  ctx.fillStyle = shade;
-  ctx.fillRect(x, y, width, height);
-  ctx.restore();
+  shades.set(key, shade);
+  return shade;
 }
 
 registerEventProc(
@@ -252,7 +267,7 @@ registerEventProc(
                   1 + 0.4 * Math.max(0, 1 - (now - labelAt) / LABEL_POP_MS);
                 ctx.translate(cx, frame.y - LABEL_FONT * 0.6);
                 ctx.scale(pop, pop);
-                drawCritText(ctx, label, 0, 0, COLOR.heavenlyGold, {
+                drawCachedCritText(ctx, label, 0, 0, COLOR.heavenlyGold, {
                   fontSize: LABEL_FONT,
                   strokeWidth: 8,
                 });

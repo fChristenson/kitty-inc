@@ -163,7 +163,9 @@ function beamAngle(ms: number): number {
   return START_ANGLE + u * Math.PI * 2;
 }
 
-// a wedge of light from the lamp, fading out along its reach
+// a wedge of light from the lamp, fading out along its reach; the lamp never
+// moves, so its gradient is built once
+let wedgeGradient: { lamp: Point; gradient: CanvasGradient } | null = null;
 function drawWedge(
   ctx: CanvasRenderingContext2D,
   lamp: Point,
@@ -171,21 +173,24 @@ function drawWedge(
   half: number,
   alpha: number,
 ): void {
-  const gradient = ctx.createRadialGradient(
-    lamp.x,
-    lamp.y,
-    0,
-    lamp.x,
-    lamp.y,
-    BEAM_REACH,
-  );
-  gradient.addColorStop(0, COLOR.white);
-  gradient.addColorStop(0.15, `${COLOR.heavenlyGold}cc`);
-  gradient.addColorStop(1, `${COLOR.heavenlyGold}00`);
+  if (wedgeGradient?.lamp !== lamp) {
+    const gradient = ctx.createRadialGradient(
+      lamp.x,
+      lamp.y,
+      0,
+      lamp.x,
+      lamp.y,
+      BEAM_REACH,
+    );
+    gradient.addColorStop(0, COLOR.white);
+    gradient.addColorStop(0.15, `${COLOR.heavenlyGold}cc`);
+    gradient.addColorStop(1, `${COLOR.heavenlyGold}00`);
+    wedgeGradient = { lamp, gradient };
+  }
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
   ctx.globalAlpha = alpha;
-  ctx.fillStyle = gradient;
+  ctx.fillStyle = wedgeGradient.gradient;
   ctx.beginPath();
   ctx.moveTo(lamp.x, lamp.y);
   ctx.arc(lamp.x, lamp.y, BEAM_REACH, angle - half, angle + half);

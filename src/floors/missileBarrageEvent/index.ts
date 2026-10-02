@@ -18,7 +18,12 @@ import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawPoppingCritText } from "../../shared/critText";
 import { isFloorLocked } from "../../shared/detachedJob";
 import { drawExplosion } from "../../shared/eventFx";
-import { drawWisp, WISP_SIZE, type Point } from "../../shared/wisp";
+import {
+  drawWisp,
+  WISP_SIZE,
+  WISP_TRAIL_MS,
+  type Point,
+} from "../../shared/wisp";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -248,7 +253,8 @@ function drawOverlay(
       HIT_SPARK,
     );
   }
-  for (const missile of barrage.missiles)
+  for (const missile of barrage.missiles) {
+    if (ms < missile.launchAt || ms > missile.hitAt + WISP_TRAIL_MS) continue;
     drawWisp(
       ctx,
       (t) => missileAt(missile, t),
@@ -257,6 +263,7 @@ function drawOverlay(
       WISP_SIZE * MISSILE_SIZE,
       1,
     );
+  }
   for (const target of barrage.targets)
     if (target.lastHitAt !== null)
       drawPoppingCritText(

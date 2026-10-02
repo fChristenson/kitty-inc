@@ -112,6 +112,8 @@ registerEventProc(
       const hangEnd = riseEnd + finalMs * HANG;
       const startedAt = performance.now();
       let slammedAt: number | null = null;
+      let latestTapAt: number | null = null;
+      const ownTaps = [0, 1].map((side) => taps.filter((t) => t.side === side));
 
       const liftAt = (ms: number) =>
         height * lerp(LIFT, clamp01(ms / lastTap.at));
@@ -119,7 +121,7 @@ registerEventProc(
       // rising high, hanging, and slamming into the middle with the other
       const stickAt = (side: number, ms: number): Point | null => {
         if (ms < 0 || ms >= slamAt) return null;
-        const own = taps.filter((tap) => tap.side === side);
+        const own = ownTaps[side];
         const x = spots[side];
         if (ms < own[0].at) {
           const u = ms / own[0].at;
@@ -155,8 +157,7 @@ registerEventProc(
       ) => {
         const grow = 1 - (1 - clamp01(ms / POP_MS)) ** 3;
         if (grow <= 0) return;
-        const latest = [...taps].reverse().find((tap) => tap.firedAt !== null);
-        const since = latest?.firedAt != null ? now - latest.firedAt : Infinity;
+        const since = latestTapAt !== null ? now - latestTapAt : Infinity;
         const kick = Math.exp(-since / PULSE_MS);
         const heat = clamp01(ms / lastTap.at);
         const r = radius * grow * (1 + PULSE * kick);
@@ -263,6 +264,7 @@ registerEventProc(
       // on the frame each stick hits the drum
       function beat(tap: Tap, k: number, now: number): void {
         tap.firedAt = now;
+        latestTapAt = now;
         if (!cover?.isLive()) return;
         playBloop();
         shakeScreen(lerp(TAP_SHAKE, k / (TAPS - 1)));

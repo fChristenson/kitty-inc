@@ -13,7 +13,12 @@ import { playBloop, playSlamExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawExplosion, drawWhiteBurst } from "../../shared/eventFx";
-import { drawWisp, WISP_SIZE, type Point } from "../../shared/wisp";
+import {
+  drawWisp,
+  WISP_SIZE,
+  WISP_TRAIL_MS,
+  type Point,
+} from "../../shared/wisp";
 import { forceTestCrit, getButtonCenter } from "../upgradeButton";
 import { forceClaimEventProc, registerEventProc } from "../eventProcs";
 import {
@@ -267,7 +272,9 @@ registerEventProc(
             if (!rect) return;
             const now = performance.now();
             const ms = now - startedAt;
-            const at = Math.min(ms, simMs);
+            if (ms > popMs + WISP_TRAIL_MS) return;
+            // past the pop their trails fade on from where the sim ended
+            const at = ms >= popMs ? ms : Math.min(ms, simMs);
             const grow = easeOutBack(Math.min(1, ms / POP_IN_MS));
             ctx.save();
             ctx.translate(rect.left, rect.top);

@@ -11,7 +11,12 @@ import { playExplosion, startBoostEventStreamLoop } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { pickAtMost, pickCritTierByOdds } from "../../shared/critTypes";
 import { drawExplosion } from "../../shared/eventFx";
-import { drawWispHead, drawWispTrail, WISP_SIZE } from "../../shared/wisp";
+import {
+  drawWispHead,
+  drawWispTrail,
+  WISP_SIZE,
+  WISP_TRAIL_MS,
+} from "../../shared/wisp";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -66,6 +71,8 @@ interface Meteor {
 
 interface RunningShower {
   meteors: Meteor[];
+  // kept the same array so the dimmed workers' layer is reused
+  struck: { worker: OnScreenWorker; struckAt: number | null }[];
   startedAt: number;
 }
 
@@ -147,15 +154,11 @@ function drawOverlay(
   if (!shower) return;
   const now = performance.now();
   const ms = now - shower.startedAt;
-  drawStruckWorkers(
-    ctx,
-    getFloorRect,
-    shower.meteors.map((m) => ({ worker: m.worker, struckAt: m.hitAt })),
-    now,
-  );
+  drawStruckWorkers(ctx, getFloorRect, shower.struck, now);
   for (const meteor of shower.meteors) {
     const along = (t: number) => meteorAt(meteor, t - meteor.launchAt);
-    drawWispTrail(ctx, along, ms, now, WISP_SIZE);
+    if (meteor.hitAt === null || now - meteor.hitAt < WISP_TRAIL_MS)
+      drawWispTrail(ctx, along, ms, now, WISP_SIZE);
     if (meteor.hitAt === null)
       drawWispHead(ctx, along, ms, now, WISP_SIZE, 0.4);
     else
@@ -178,23 +181,29 @@ function startShower(floor: Floor, context: EventProcContext): void {
   if (!meteors) return;
   const { streakMs, holdMs } = CONFIG.meteorShowerEvent;
   const tier = context.critTier ?? pickCritTierByOdds();
-  const shower: RunningShower = { meteors, startedAt: performance.now() };
+  const shower: RunningShower = {
+    meteors,
+    struck: meteors.map((m) => ({ worker: m.worker, struckAt: null })),
+    startedAt: performance.now(),
+  };
   running = shower;
   const isLive = () => running === shower;
   spotlightWorkers(meteors.map((m) => m.worker));
   freezeScreen(drawOverlay);
   const stopSound = startBoostEventStreamLoop();
 
-  for (const meteor of meteors)
+  meteors.forEach((meteor, i) =>
     setTimeout(() => {
       if (!isLive()) return;
       meteor.hitAt = performance.now();
+      shower.struck[i].struckAt = meteor.hitAt;
       playExplosion();
       shakeScreen(EXPLOSION_SHAKE);
       const { floor: f, workerIndex } = meteor.worker;
       promoteWorkerPermaTier(f, workerIndex);
       celebrateWorkerBoost(f, workerIndex, Date.now());
-    }, meteor.launchAt + streakMs);
+    }, meteor.launchAt + streakMs),
+  );
 
   const lastHit = meteors[meteors.length - 1].launchAt + streakMs;
   setTimeout(stopSound, lastHit);

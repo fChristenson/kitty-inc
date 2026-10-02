@@ -211,25 +211,59 @@ function haloSprite(): HTMLCanvasElement {
 const MIN_ALPHA = 0.02;
 
 // every trail drawn in one frame shares this many sparkles: a lone wisp gets
-// its full trail, a swarm thins each one (keeping the same sparkles each frame)
+// its full trail, a swarm thins each one (keeping the same sparkles each frame).
+// The budget shrinks toward TRAIL_BUDGET_MIN while frames run slow
 const TRAIL_BUDGET = 900;
+const TRAIL_BUDGET_MIN = 350;
+const SLOW_FRAME_MS = 21;
 const FULL_TRAIL = TAIL_LIFE_MS / TAIL_MS;
 // a trail drawn this long after the last one starts a new frame
 const FRAME_GAP_MS = 4;
 let lastTrailAt = -Infinity;
+let frameStartedAt = -Infinity;
+let frameGapMs = 16;
+let trailBudget = TRAIL_BUDGET;
+// trails that shed a sparkle: a wisp long gone doesn't thin the live ones
 let trailsThisFrame = 0;
 let trailsLastFrame = 0;
+// heads drawn: past HEAD_FULL in a frame each gets a lighter smear and huddle
+const HEAD_FULL = 10;
+let headsThisFrame = 0;
+let headsLastFrame = 0;
+let lastHeadAt = -Infinity;
+
+function startFrameIfNew(t: number): void {
+  if (t - Math.max(lastTrailAt, lastHeadAt) <= FRAME_GAP_MS) return;
+  if (frameStartedAt > -Infinity) {
+    frameGapMs = frameGapMs * 0.8 + Math.min(100, t - frameStartedAt) * 0.2;
+    trailBudget =
+      frameGapMs > SLOW_FRAME_MS
+        ? Math.max(TRAIL_BUDGET_MIN, trailBudget * 0.9)
+        : Math.min(TRAIL_BUDGET, trailBudget * 1.02);
+  }
+  frameStartedAt = t;
+  trailsLastFrame = trailsThisFrame;
+  trailsThisFrame = 0;
+  headsLastFrame = headsThisFrame;
+  headsThisFrame = 0;
+}
 
 function trailStride(): number {
   const t = performance.now();
-  if (t - lastTrailAt > FRAME_GAP_MS) {
-    trailsLastFrame = trailsThisFrame;
-    trailsThisFrame = 0;
-  }
+  startFrameIfNew(t);
   lastTrailAt = t;
-  trailsThisFrame++;
-  const trails = Math.max(trailsThisFrame, trailsLastFrame);
-  return Math.max(1, Math.ceil((trails * FULL_TRAIL) / TRAIL_BUDGET));
+  const trails = Math.max(trailsThisFrame + 1, trailsLastFrame);
+  return Math.max(1, Math.ceil((trails * FULL_TRAIL) / trailBudget));
+}
+
+// 1 for the first HEAD_FULL heads in a frame, falling as more crowd in
+function headDetail(): number {
+  const t = performance.now();
+  startFrameIfNew(t);
+  lastHeadAt = t;
+  headsThisFrame++;
+  const heads = Math.max(headsThisFrame, headsLastFrame);
+  return heads <= HEAD_FULL ? 1 : Math.max(0.2, HEAD_FULL / heads);
 }
 
 // each trail sparkle's looks, hashed once per slot rather than every frame
@@ -353,6 +387,7 @@ export function drawWispTrail(
   ctx.globalCompositeOperation = "lighter";
   const first = Math.floor((ms - TAIL_LIFE_MS) / TAIL_MS);
   const start = (Math.floor(first / stride) + 1) * stride;
+  let shed = false;
   for (let e = start; e <= Math.floor(ms / TAIL_MS); e += stride) {
     const bornAt = e * TAIL_MS;
     const age = (ms - bornAt) / TAIL_LIFE_MS;
@@ -360,6 +395,7 @@ export function drawWispTrail(
     if (alpha < MIN_ALPHA) continue;
     const from = at(bornAt);
     if (!from) continue;
+    shed = true;
     // tight behind the head, scattering wider (mostly near the middle) as it ages
     const slot = e & (SLOTS - 1);
     const spread = size * SPREAD * age ** 0.7 * slotSpread[slot];
@@ -376,6 +412,7 @@ export function drawWispTrail(
       now,
     );
   }
+  if (shed) trailsThisFrame++;
   lastTrailAt = performance.now();
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = previous;
@@ -392,19 +429,22 @@ export function drawWispHead(
 ): void {
   const head = at(ms);
   if (!head || size <= 0) return;
+  const detail = headDetail();
+  const smear = Math.max(1, Math.round(SMEAR * detail));
+  const huddle = Math.round(HUDDLE * detail);
   const halo = size * HALO * (1 + 0.5 * heat);
   ctx.globalAlpha = Math.min(1, HALO_ALPHA * (1 + heat));
   ctx.drawImage(haloSprite(), head.x - halo, head.y - halo, halo * 2, halo * 2);
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
   const core = size * CORE * (1 + 0.6 * heat);
-  for (let k = SMEAR; k >= 0; k--) {
-    const p = at(ms - k * SMEAR_MS) ?? head;
-    ctx.globalAlpha = 1 - k / (SMEAR + 1);
-    drawGlow(ctx, p.x, p.y, core * (1 - (0.6 * k) / SMEAR), 0);
+  for (let k = smear; k >= 0; k--) {
+    const p = at(ms - (k * SMEAR * SMEAR_MS) / smear) ?? head;
+    ctx.globalAlpha = 1 - k / (smear + 1);
+    drawGlow(ctx, p.x, p.y, core * (1 - (0.6 * k) / smear), 0);
   }
   ctx.globalAlpha = 1;
-  for (let i = 0; i < HUDDLE; i++) {
+  for (let i = 0; i < huddle; i++) {
     const angle =
       hash01(i, 41) * Math.PI * 2 + now / (300 + 200 * hash01(i, 42));
     const reach = size * HUDDLE_REACH * Math.sqrt(hash01(i, 43));

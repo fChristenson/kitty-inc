@@ -5,8 +5,10 @@
 // falling ones like light on wave crests
 type Box = { x: number; y: number; w: number; h: number };
 
-// the slices each band is cut into, px across
+// the slices each band is cut into, px across, widened so a frame never
+// redraws the image more than MAX_RINGS times
 const STEP = 6;
+const MAX_RINGS = 24;
 // leaves the middle alone, where a ring's scale would blow up
 const MIN_RADIUS = 24;
 // light/shade per px of offset change per px of radius, and their cap
@@ -24,9 +26,15 @@ export function drawRippleWarp(
   bands: [number, number][],
   offset: (r: number) => number,
 ): void {
-  for (const [from, to] of mergeBands(bands)) {
-    for (let r0 = Math.max(MIN_RADIUS, from); r0 < to; r0 += STEP) {
-      const r1 = Math.min(to, r0 + STEP);
+  const merged = mergeBands(bands);
+  const span = merged.reduce(
+    (sum, [from, to]) => sum + Math.max(0, to - Math.max(MIN_RADIUS, from)),
+    0,
+  );
+  const step = Math.max(STEP, span / MAX_RINGS);
+  for (const [from, to] of merged) {
+    for (let r0 = Math.max(MIN_RADIUS, from); r0 < to; r0 += step) {
+      const r1 = Math.min(to, r0 + step);
       const r = (r0 + r1) / 2;
       const d = offset(r);
       const slope = (offset(r + 1) - offset(r - 1)) / 2;

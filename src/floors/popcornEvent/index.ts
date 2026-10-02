@@ -17,6 +17,7 @@ import {
   drawWisp,
   drawWispHead,
   WISP_SIZE,
+  WISP_TRAIL_MS,
   type Point,
 } from "../../shared/wisp";
 import { FLOOR_W, SIDE_WALL_WIDTH } from "../constants";
@@ -96,7 +97,11 @@ function planTwitches(appearAt: number, popAt: number): Twitch[] {
     const heat = clamp01(at / popAt);
     const ms = between(TWITCH_MS);
     if (at + ms > popAt) break;
-    twitches.push({ at, ms, up: lerp(TWITCH_UP, heat) * (0.5 + Math.random()) });
+    twitches.push({
+      at,
+      ms,
+      up: lerp(TWITCH_UP, heat) * (0.5 + Math.random()),
+    });
     at += ms + lerp(TWITCH_GAP_MS, heat) * (0.4 + Math.random() * 1.2);
   }
   return twitches;
@@ -122,7 +127,8 @@ registerEventProc(
       if (!area) return;
       const { heatMs, popMs, jumpMs, holdMs, mergeMs } = CONFIG.popcornEvent;
       const left = Math.max(area.left, SIDE_WALL_WIDTH) + ROW_MARGIN;
-      const right = Math.min(area.right, FLOOR_W - SIDE_WALL_WIDTH) - ROW_MARGIN;
+      const right =
+        Math.min(area.right, FLOOR_W - SIDE_WALL_WIDTH) - ROW_MARGIN;
       const rowY = Math.min(WORKER_FEET_Y, area.bottom - ROW_MARGIN);
       const ceiling = area.top + ROW_MARGIN;
       // pops pile up toward the end: share √r of the way through popMs
@@ -149,7 +155,8 @@ registerEventProc(
               right,
               Math.max(
                 left,
-                x + (Math.random() < 0.5 ? -1 : 1) * (final ? 0 : between(SIDE)),
+                x +
+                  (Math.random() < 0.5 ? -1 : 1) * (final ? 0 : between(SIDE)),
               ),
             ),
             y: Math.max(ceiling, y - (final ? FINAL_LEAP : between(LEAP))),
@@ -242,7 +249,10 @@ registerEventProc(
               const heat = clamp01(ms / kernel.popAt);
               if (kernel.poppedAt === null) {
                 const appear = clamp01((ms - kernel.appearAt) / APPEAR_MS);
-                const at = { x: kernel.x, y: kernel.y - twitchLift(kernel, ms) };
+                const at = {
+                  x: kernel.x,
+                  y: kernel.y - twitchLift(kernel, ms),
+                };
                 drawWispHead(
                   ctx,
                   () => at,
@@ -253,6 +263,7 @@ registerEventProc(
                 );
                 continue;
               }
+              if (ms > kernel.popAt + jumpMs + WISP_TRAIL_MS) continue;
               drawWisp(
                 ctx,
                 (t) => leapAt(kernel, t),
@@ -301,7 +312,10 @@ registerEventProc(
           apex,
           Array.from({ length: PUFF_COINS }, () => ({
             x: apex.x + (Math.random() * 2 - 1) * PUFF_SPREAD,
-            y: Math.max(ceiling, apex.y + (Math.random() * 2 - 1) * PUFF_SPREAD),
+            y: Math.max(
+              ceiling,
+              apex.y + (Math.random() * 2 - 1) * PUFF_SPREAD,
+            ),
           })),
         );
       }

@@ -489,7 +489,25 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     scale: number;
     lastDim: number;
     dimmed: { image: HTMLCanvasElement; alpha: number } | null;
+    soft: HTMLCanvasElement | null;
   } | null = null;
+
+  // the frozen frame shrunk this many times, so stretching it back blurs it
+  const SOFT_FRAME_SCALE = 6;
+  function softFrozenFrame(frame: {
+    image: HTMLCanvasElement;
+    soft: HTMLCanvasElement | null;
+  }): HTMLCanvasElement {
+    if (frame.soft) return frame.soft;
+    const soft = document.createElement("canvas");
+    soft.width = Math.max(1, Math.ceil(frame.image.width / SOFT_FRAME_SCALE));
+    soft.height = Math.max(1, Math.ceil(frame.image.height / SOFT_FRAME_SCALE));
+    const sctx = soft.getContext("2d")!;
+    sctx.imageSmoothingQuality = "high";
+    sctx.drawImage(frame.image, 0, 0, soft.width, soft.height);
+    frame.soft = soft;
+    return soft;
+  }
 
   function redraw(): void {
     // the canvas measures 0x0 while hidden (e.g. the city map view is showing
@@ -524,6 +542,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         scale,
         lastDim: -1,
         dimmed: null,
+        soft: null,
       };
     }
     // impacts during a freeze still rattle the frozen frame and its overlay
@@ -574,7 +593,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const frameW = canvas.width * motion.scaleX;
       const frameH = canvas.height * motion.scaleY;
-      if (motion.blur > 0) ctx.filter = `blur(${motion.blur * dpr}px)`;
       const box = {
         x:
           shake.x * dpr +
@@ -585,6 +603,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         h: frameH,
       };
       ctx.drawImage(frozenFrame.image, box.x, box.y, box.w, box.h);
+      // a motion blur: the frame shrunk once and stretched back is soft for
+      // free, faded in over it (a blur filter per frame stalls phones)
+      if (motion.blur > 0) {
+        const soft = softFrozenFrame(frozenFrame);
+        ctx.globalAlpha = Math.min(1, (motion.blur * dpr) / SOFT_FRAME_SCALE);
+        ctx.drawImage(soft, box.x, box.y, box.w, box.h);
+        ctx.globalAlpha = 1;
+      }
       if (ripple) {
         // world space to the canvas's own px, like the overlay below
         const s = frozenFrame.scale * dpr;

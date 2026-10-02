@@ -66,6 +66,8 @@ const SPARK_SIZE = 22;
 const EDGE_WIDTH = 5;
 const GLOW_WIDTH = 16;
 const BAND = 0.22;
+// the cup sprite's pixels per screen unit, crisp when the view zooms in
+const SPRITE_SCALE = 1.5;
 
 const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
@@ -134,22 +136,25 @@ registerEventProc(
       let blastedAt: number | null = null;
 
       // which slot each cup sits in once every swap before ms has finished,
-      // and the swap under way at ms, if any
-      const slotsAt = (ms: number) => {
+      // and the swap under way at ms, if any; the wisp's trail samples this
+      // hundreds of times a frame, so every swap's slots are worked out up front
+      const slotsBefore: number[][] = [];
+      {
         const slots = [0, 1, 2];
-        let moving: Swap | null = null;
         for (const swap of swaps) {
-          if (ms < swap.at) break;
-          if (ms < swap.at + swap.ms) {
-            moving = swap;
-            break;
-          }
+          slotsBefore.push([...slots]);
           const ca = slots.indexOf(swap.a);
           const cb = slots.indexOf(swap.b);
           slots[ca] = swap.b;
           slots[cb] = swap.a;
         }
-        return { slots, moving };
+        slotsBefore.push(slots);
+      }
+      const slotsAt = (ms: number) => {
+        let i = 0;
+        while (i < swaps.length && ms >= swaps[i].at + swaps[i].ms) i++;
+        const moving = i < swaps.length && ms >= swaps[i].at ? swaps[i] : null;
+        return { slots: slotsBefore[i], moving };
       };
       const cupAt = (cup: number, ms: number): CupPose => {
         const { slots, moving } = slotsAt(ms);
@@ -195,56 +200,67 @@ registerEventProc(
         return { x: pose.x, y: pose.y - cupH * WISP_UP };
       };
 
+      // the cup drawn once at full size, its mouth's middle at (baseX, baseY),
+      // then stamped scaled for every pose
+      const pad = GLOW_WIDTH;
+      const baseX = pad + cupW / 2;
+      const baseY = pad + cupH * 1.08;
+      const spriteW = cupW + pad * 2;
+      const spriteH = cupH * 1.2 + pad * 2;
+      const sprite = document.createElement("canvas");
+      sprite.width = Math.ceil(spriteW * SPRITE_SCALE);
+      sprite.height = Math.ceil(spriteH * SPRITE_SCALE);
+      {
+        const s = sprite.getContext("2d")!;
+        s.scale(SPRITE_SCALE, SPRITE_SCALE);
+        s.lineJoin = "round";
+        const w = cupW;
+        const h = cupH;
+        const top = w * TOP_W;
+        s.beginPath();
+        s.moveTo(baseX - w / 2, baseY);
+        s.lineTo(baseX - top / 2, baseY - h);
+        s.quadraticCurveTo(baseX, baseY - h * 1.08, baseX + top / 2, baseY - h);
+        s.lineTo(baseX + w / 2, baseY);
+        s.quadraticCurveTo(baseX, baseY + h * 0.12, baseX - w / 2, baseY);
+        s.closePath();
+        s.globalAlpha = 0.4;
+        s.strokeStyle = COLOR.heavenlyGold;
+        s.lineWidth = GLOW_WIDTH;
+        s.stroke();
+        s.globalAlpha = 1;
+        s.fillStyle = COLOR.heavenlyGold;
+        s.fill();
+        s.strokeStyle = COLOR.white;
+        s.lineWidth = EDGE_WIDTH;
+        s.stroke();
+        // a white band round its middle
+        const bandY = baseY - h * 0.45;
+        const bandW = w - (w - top) * 0.45;
+        s.beginPath();
+        s.moveTo(baseX - bandW / 2, bandY);
+        s.quadraticCurveTo(
+          baseX,
+          bandY + h * BAND * 0.3,
+          baseX + bandW / 2,
+          bandY,
+        );
+        s.stroke();
+      }
       const drawCup = (
         ctx: CanvasRenderingContext2D,
         pose: CupPose,
         grow: number,
       ) => {
-        const w = cupW * pose.scale * grow;
-        const h = cupH * pose.scale * grow;
-        const top = w * TOP_W;
-        const outline = () => {
-          ctx.beginPath();
-          ctx.moveTo(pose.x - w / 2, pose.y);
-          ctx.lineTo(pose.x - top / 2, pose.y - h);
-          ctx.quadraticCurveTo(
-            pose.x,
-            pose.y - h * 1.08,
-            pose.x + top / 2,
-            pose.y - h,
-          );
-          ctx.lineTo(pose.x + w / 2, pose.y);
-          ctx.quadraticCurveTo(
-            pose.x,
-            pose.y + h * 0.12,
-            pose.x - w / 2,
-            pose.y,
-          );
-          ctx.closePath();
-        };
-        outline();
-        ctx.globalAlpha = 0.4;
-        ctx.strokeStyle = COLOR.heavenlyGold;
-        ctx.lineWidth = GLOW_WIDTH;
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = COLOR.heavenlyGold;
-        ctx.fill();
-        ctx.strokeStyle = COLOR.white;
-        ctx.lineWidth = EDGE_WIDTH;
-        ctx.stroke();
-        // a white band round its middle
-        const bandY = pose.y - h * 0.45;
-        const bandW = w - (w - top) * 0.45;
-        ctx.beginPath();
-        ctx.moveTo(pose.x - bandW / 2, bandY);
-        ctx.quadraticCurveTo(
-          pose.x,
-          bandY + h * BAND * 0.3,
-          pose.x + bandW / 2,
-          bandY,
+        const k = pose.scale * grow;
+        if (k <= 0) return;
+        ctx.drawImage(
+          sprite,
+          pose.x - baseX * k,
+          pose.y - baseY * k,
+          spriteW * k,
+          spriteH * k,
         );
-        ctx.stroke();
       };
 
       const cover = startMoneyCover(
@@ -318,7 +334,6 @@ registerEventProc(
               }));
               // the ones swinging behind first
               poses.sort((p, q) => p.pose.y - q.pose.y);
-              ctx.lineJoin = "round";
               for (const { pose, grow: g } of poses) drawCup(ctx, pose, g);
             }
             ctx.restore();

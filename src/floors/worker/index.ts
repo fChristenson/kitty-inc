@@ -28,7 +28,6 @@ import { loadSprite } from "../../loadAssets";
 import { spawnCoinBurst } from "../coins";
 import { playAutoBoost } from "../../sound";
 import { getScreenUnfrozenAt } from "../../shared/screenFreeze";
-import { washImage } from "../../shared/mergeFlash";
 import {
   drawSlamTarget,
   getSlamPose,
@@ -983,24 +982,55 @@ function drawFigure(
 ): void {
   const recolored = getRecoloredFrame(frame, tintIndex, sprite);
   if (!recolored || !sprite) return;
-  const image =
-    whiteAlpha > 0 || dimAlpha > 0
-      ? washImage(
-          recolored,
-          recolored.width,
-          recolored.height,
-          whiteAlpha,
-          dimAlpha,
-        )
-      : recolored;
   const renderH = renderHeightOf(sprite);
   const renderW = (renderH * recolored.width) / recolored.height;
 
   ctx.save();
   ctx.translate(cx, groundY);
   ctx.scale(isMirrored(frame, direction) ? -stretchX : stretchX, stretchY);
-  ctx.drawImage(image, -renderW / 2, -renderH, renderW, renderH);
+  ctx.drawImage(recolored, -renderW / 2, -renderH, renderW, renderH);
+  // washed toward white, then black, by its own silhouette laid over it
+  const alpha = ctx.globalAlpha;
+  for (const [wash, color] of [
+    [whiteAlpha, "#FFFFFF"],
+    [dimAlpha, "#000000"],
+  ] as const) {
+    if (wash <= 0) continue;
+    ctx.globalAlpha = alpha * wash;
+    ctx.drawImage(
+      silhouetteOf(recolored, color),
+      -renderW / 2,
+      -renderH,
+      renderW,
+      renderH,
+    );
+  }
   ctx.restore();
+}
+
+// a frame's shape filled in one color, built once per frame and color
+const silhouettes = new WeakMap<
+  HTMLCanvasElement,
+  Map<string, HTMLCanvasElement>
+>();
+function silhouetteOf(
+  frame: HTMLCanvasElement,
+  color: string,
+): HTMLCanvasElement {
+  let byColor = silhouettes.get(frame);
+  if (!byColor) silhouettes.set(frame, (byColor = new Map()));
+  let silhouette = byColor.get(color);
+  if (silhouette) return silhouette;
+  silhouette = document.createElement("canvas");
+  silhouette.width = frame.width;
+  silhouette.height = frame.height;
+  const c = silhouette.getContext("2d")!;
+  c.drawImage(frame, 0, 0);
+  c.globalCompositeOperation = "source-in";
+  c.fillStyle = color;
+  c.fillRect(0, 0, frame.width, frame.height);
+  byColor.set(color, silhouette);
+  return silhouette;
 }
 
 // the jump/click pose (frame 4) is authored mirrored relative to every other

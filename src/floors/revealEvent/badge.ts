@@ -164,14 +164,40 @@ function drawSpotlight(
   ctx.scale(1, POOL_SQUASH);
   const pool = size * POOL;
   ctx.globalAlpha = Math.min(1, 0.6 * strength);
-  ctx.fillStyle = radialFade(ctx, 0, 0, pool, COLOR.white, POOL_SOLID);
-  ctx.fillRect(-pool, -pool, pool * 2, pool * 2);
+  ctx.drawImage(
+    fadeSprite(COLOR.white, POOL_SOLID),
+    -pool,
+    -pool,
+    pool * 2,
+    pool * 2,
+  );
   ctx.scale(shadowScale, 1);
   const shadow = size * SHADOW;
   ctx.globalAlpha = 0.5;
-  ctx.fillStyle = radialFade(ctx, 0, 0, shadow, COLOR.black, SHADOW_SOLID);
-  ctx.fillRect(-shadow, -shadow, shadow * 2, shadow * 2);
+  ctx.drawImage(
+    fadeSprite(COLOR.black, SHADOW_SOLID),
+    -shadow,
+    -shadow,
+    shadow * 2,
+    shadow * 2,
+  );
   ctx.restore();
+}
+
+// a soft round fade, drawn once per color and stamped every frame
+const FADE_HALF = 128;
+const fadeSprites = new Map<string, HTMLCanvasElement>();
+function fadeSprite(color: string, solid: number): HTMLCanvasElement {
+  const key = `${color}|${solid}`;
+  let sprite = fadeSprites.get(key);
+  if (sprite) return sprite;
+  sprite = document.createElement("canvas");
+  sprite.width = sprite.height = FADE_HALF * 2;
+  const c = sprite.getContext("2d")!;
+  c.fillStyle = radialFade(c, FADE_HALF, FADE_HALF, FADE_HALF, color, solid);
+  c.fillRect(0, 0, FADE_HALF * 2, FADE_HALF * 2);
+  fadeSprites.set(key, sprite);
+  return sprite;
 }
 
 // the art's shape filled flat black

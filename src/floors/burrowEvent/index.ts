@@ -42,7 +42,7 @@ const TREMBLE = 3;
 // columns
 const PAD = 24;
 const SCRATCH_RES = 2;
-const SLICE = 4;
+const SLICE = 8;
 // landing on it, and the rumble as it bores in
 const LAND_SHAKE = 0.9;
 const LAND_BURST = 0.3;
@@ -64,6 +64,8 @@ const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 let scratch: HTMLCanvasElement | null = null;
+// what the scratch last held, so it's only redrawn when the button's look changes
+let scratchOf: { floor: Floor; white: number } | null = null;
 
 // the button bent down `depth` px at its middle, tapering smoothly to its ends
 function drawBentButton(
@@ -77,20 +79,27 @@ function drawBentButton(
   const w = BTN_W + PAD * 2;
   const h = BTN_H + PAD * 2;
   scratch ??= document.createElement("canvas");
-  if (scratch.width !== w * SCRATCH_RES) scratch.width = w * SCRATCH_RES;
-  if (scratch.height !== h * SCRATCH_RES) scratch.height = h * SCRATCH_RES;
-  const sctx = scratch.getContext("2d")!;
-  sctx.setTransform(1, 0, 0, 1, 0, 0);
-  sctx.clearRect(0, 0, scratch.width, scratch.height);
-  sctx.setTransform(
-    SCRATCH_RES,
-    0,
-    0,
-    SCRATCH_RES,
-    -(BTN_X - PAD) * SCRATCH_RES,
-    -(top - PAD) * SCRATCH_RES,
-  );
-  drawUpgradeButtonSpotlight(sctx, floor, isGroundFloor, whiteAlpha);
+  const white = Math.round(whiteAlpha * 20) / 20;
+  if (
+    scratch.width !== w * SCRATCH_RES ||
+    scratch.height !== h * SCRATCH_RES ||
+    scratchOf?.floor !== floor ||
+    scratchOf.white !== white
+  ) {
+    scratch.width = w * SCRATCH_RES;
+    scratch.height = h * SCRATCH_RES;
+    const sctx = scratch.getContext("2d")!;
+    sctx.setTransform(
+      SCRATCH_RES,
+      0,
+      0,
+      SCRATCH_RES,
+      -(BTN_X - PAD) * SCRATCH_RES,
+      -(top - PAD) * SCRATCH_RES,
+    );
+    drawUpgradeButtonSpotlight(sctx, floor, isGroundFloor, white);
+    scratchOf = { floor, white };
+  }
   const mid = BTN_X + BTN_W / 2;
   for (let x = 0; x < w; x += SLICE) {
     const u = (BTN_X - PAD + x + SLICE / 2 - mid) / (BTN_W / 2 + PAD);
@@ -146,6 +155,7 @@ registerEventProc(
       const startedAt = performance.now();
       let landedAt: number | null = null;
       let blewAt: number | null = null;
+      scratchOf = null;
 
       setUpgradeButtonSpotlights([floor]);
       const cover = startMoneyCover(

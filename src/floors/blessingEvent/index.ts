@@ -9,7 +9,7 @@ import { COLOR } from "../../palette";
 import { startBoostEventStreamLoop } from "../../sound";
 import { pickCritTierByOdds } from "../../shared/critTypes";
 import { drawWhiteBurst } from "../../shared/eventFx";
-import { drawWisp, WISP_SIZE } from "../../shared/wisp";
+import { drawWisp, WISP_SIZE, WISP_TRAIL_MS } from "../../shared/wisp";
 import {
   freezeScreen,
   drawFreezeDimmed,
@@ -143,7 +143,9 @@ function drawOverlay(
   }
   // each a wisp, gone as it settles, its trail fading on
   const ms = now - event.startedAt;
-  for (const flake of event.flakes)
+  for (const flake of event.flakes) {
+    const local = ms - flake.startAt;
+    if (local < 0 || local > flake.fallMs + WISP_TRAIL_MS) continue;
     drawWisp(
       ctx,
       (t) => {
@@ -156,6 +158,7 @@ function drawOverlay(
       now,
       WISP_SIZE,
     );
+  }
   ctx.restore();
 }
 

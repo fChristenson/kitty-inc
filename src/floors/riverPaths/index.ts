@@ -230,7 +230,9 @@ export function pathsAlong(
         Math.hypot(line[i].x - line[i - 1].x, line[i].y - line[i - 1].y),
     );
   const total = distances[distances.length - 1];
-  // the point s px along the line, with its unit normal
+  // the point s px along the line, with its unit normal, written into one
+  // reused scratch (every coin asks every frame)
+  const scratch = { x: 0, y: 0, nx: 0, ny: 0 };
   const at = (s: number) => {
     let lo = 0;
     let hi = line.length - 1;
@@ -243,12 +245,11 @@ export function pathsAlong(
     const b = line[hi];
     const span = distances[hi] - distances[lo] || 1;
     const f = Math.min(1, Math.max(0, (s - distances[lo]) / span));
-    return {
-      x: a.x + (b.x - a.x) * f,
-      y: a.y + (b.y - a.y) * f,
-      nx: -(b.y - a.y) / span,
-      ny: (b.x - a.x) / span,
-    };
+    scratch.x = a.x + (b.x - a.x) * f;
+    scratch.y = a.y + (b.y - a.y) * f;
+    scratch.nx = -(b.y - a.y) / span;
+    scratch.ny = (b.x - a.x) / span;
+    return scratch;
   };
   const paths: CoinPath[] = [];
   for (let i = 0; i < count; i++) {

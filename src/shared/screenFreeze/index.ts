@@ -131,7 +131,9 @@ export function drawFreezeDimmed(
   draw: (layer: CanvasRenderingContext2D) => void,
   key?: readonly unknown[],
 ): void {
-  const dim = getScreenFreezeDim();
+  // stepped while the wash fades in, so the layer is redrawn a few times, not every frame
+  const raw = getScreenFreezeDim();
+  const dim = raw >= DIM_ALPHA ? raw : Math.round(raw * 20) / 20;
   if (dim <= 0) {
     draw(ctx);
     return;

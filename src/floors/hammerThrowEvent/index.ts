@@ -109,9 +109,10 @@ registerEventProc(
         {
           rewardMultiplier: REWARD,
           frameMotion: (): FrameMotion => {
-            if (hitAt === null)
+            const t = hitAt === null ? Infinity : performance.now() - hitAt;
+            // still once the knock has died out, so the cheap frozen frame returns
+            if (t > KNOCK_MS * 6)
               return { pan: 0, scaleX: 1, scaleY: 1, blur: 0 };
-            const t = performance.now() - hitAt;
             const knock = KNOCK * Math.exp(-t / KNOCK_MS);
             // scaled up by at least twice the pan, so no edge ever shows
             const scale = 1 + 2 * knock;

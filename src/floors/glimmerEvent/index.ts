@@ -183,19 +183,36 @@ function drawLight(
   drawWispHead(ctx, () => ({ x, y }), now, now, WISP_SIZE * growth, white);
 }
 
-// a leg's promotable workers: dimmed like the frozen frame until lit
-function drawCandidates(ctx: CanvasRenderingContext2D, leg: Leg): void {
-  drawFreezeDimmed(
-    ctx,
-    (layer) => {
+// every leg's promotable workers: dimmed like the frozen frame until lit, all
+// through one cached layer
+function drawCandidates(
+  ctx: CanvasRenderingContext2D,
+  glimmer: RunningGlimmer,
+  getFloorRect: FloorRectResolver,
+): void {
+  const eachLeg = (
+    c: CanvasRenderingContext2D,
+    draw: (c: CanvasRenderingContext2D, leg: Leg, index: number) => void,
+    lit: boolean,
+  ) => {
+    for (const leg of glimmer.legs) {
+      const legRect = getFloorRect(leg.floor);
+      if (!legRect) continue;
+      c.save();
+      c.translate(legRect.left, legRect.top);
       for (const index of leg.candidates)
-        if (!leg.lit.has(index))
-          drawWorkerSpotlight(layer, leg.floor, index, 0, 0);
-    },
-    [leg, leg.lit.size],
-  );
-  for (const index of leg.candidates)
-    if (leg.lit.has(index)) drawWorkerSpotlight(ctx, leg.floor, index, 0, 0);
+        if (leg.lit.has(index) === lit) draw(c, leg, index);
+      c.restore();
+    }
+  };
+  const spotlight = (c: CanvasRenderingContext2D, leg: Leg, index: number) =>
+    drawWorkerSpotlight(c, leg.floor, index, 0, 0);
+  const litCount = glimmer.legs.reduce((sum, leg) => sum + leg.lit.size, 0);
+  drawFreezeDimmed(ctx, (layer) => eachLeg(layer, spotlight, false), [
+    glimmer,
+    litCount,
+  ]);
+  eachLeg(ctx, spotlight, true);
 }
 
 // where a ball is p (0..1) along its spiral into the light's start
@@ -343,14 +360,7 @@ function drawOverlay(
   const rect = getFloorRect(first.floor);
   if (!rect) return;
   const now = performance.now();
-  for (const leg of glimmer.legs) {
-    const legRect = getFloorRect(leg.floor);
-    if (!legRect) continue;
-    ctx.save();
-    ctx.translate(legRect.left, legRect.top);
-    drawCandidates(ctx, leg);
-    ctx.restore();
-  }
+  drawCandidates(ctx, glimmer, getFloorRect);
   if (glimmer.sweepAt === null) {
     const growth = smoothstep(
       Math.min(
