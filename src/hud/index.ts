@@ -92,6 +92,7 @@ export {
   wireWhackAMoleEventTestButton,
   wireDrumrollEventTestButton,
   wireShellGameEventTestButton,
+  wireSeesawEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,

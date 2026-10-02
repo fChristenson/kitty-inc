@@ -397,6 +397,18 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/seesawEvent — the rare "Seesaw" event: two wisps catapult
+  // each other ever higher off a gold seesaw, coins flung at every landing,
+  // until the last rockets the other off the top in a huge blast
+  seesawEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    introMs: 320, // the seesaw popping up and the first wisp dropping in
+    flightMs: [300, 400] as [number, number], // each launch up and back down, growing
+    flipMs: 90, // the plank snapping over on each landing
+    holdMs: 500, // after the last landing, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {

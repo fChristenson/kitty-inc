@@ -597,6 +597,14 @@ export function wireShellGameEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireSeesawEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-seesaw-event")!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,
