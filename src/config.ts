@@ -1629,6 +1629,68 @@ export const CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
+  // money, hires + cash: src/floors/cocoonEvent: cash whirls into cocoons that
+  // burst into new workers
+  cocoonEvent: {
+    chance: 0.01,
+    streamMs: 900, // the cash pouring in
+    flyMs: 450, // each coin's flight into its cocoon
+    gapMs: 220, // between the cocoons bursting
+    flingMs: 300, // a burst cocoon's cash flying out
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp, levels: src/floors/gravityAssistEvent: a wisp slingshots round the bars
+  gravityAssistEvent: {
+    chance: 0.01,
+    flightMs: 1_900, // the whole flight, speeding up
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // mix, cash + levels: src/floors/zipLineEvent: wisps zip down lines of cash
+  // from the total onto the bars
+  zipLineEvent: {
+    chance: 0.01,
+    zipsMs: [480, 260] as [number, number], // each zip, quickening
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, an unlock: src/floors/breachEvent: two beams cut the locked floor open
+  breachEvent: {
+    chance: 0.01,
+    aimMs: 300, // the aim lasers flickering
+    cutMs: 1_200, // the beams cutting round, speeding up
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // lightning, cash: src/floors/stormSurgeEvent: bolts strike a river of cash
+  stormSurgeEvent: {
+    chance: 0.01,
+    streamMs: 1_100, // the river pouring
+    travelMs: 1_400, // each coin's run along the river
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // shatter, cash: src/floors/smashAndGrabEvent: the shards fly into the total
+  smashAndGrabEvent: {
+    chance: 0.01,
+    knocksMs: [180, 460, 720], // each knock, the last shattering it
+    grabMs: 700, // from the nearest shard set off to the farthest
+    flyMs: 380, // each shard's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, a crit tier: src/floors/shrinkRayEvent: the screen shrinks away
+  shrinkRayEvent: {
+    chance: 0.01,
+    zapsMs: [250, 580, 860], // each zap
+    smallMs: 320, // shrunk to a speck, before springing back
+    popMs: 260, // springing back to full size
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,

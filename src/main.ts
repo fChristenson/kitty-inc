@@ -215,6 +215,13 @@ import {
   forceSparkOfLifeEvent,
   forceGlassRainEvent,
   forceFoldEvent,
+  forceCocoonEvent,
+  forceGravityAssistEvent,
+  forceZipLineEvent,
+  forceBreachEvent,
+  forceStormSurgeEvent,
+  forceSmashAndGrabEvent,
+  forceShrinkRayEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -535,6 +542,9 @@ const DIALOG_CLOSE_MS = 352;
 // animation should kick in, so the two transitions blend together instead of
 // the switch happening while the dialog hasn't even started moving yet
 const SWITCH_LEAD_MS = 100;
+// Sale and Overtime scroll their floor's button this far down the screen,
+// below the middle, nearer a phone user's thumb
+const BOOST_BUTTON_SCREEN_SHARE = 0.6;
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -1293,6 +1303,13 @@ async function main() {
       "spark-of-life": forceOnActive(forceSparkOfLifeEvent),
       "glass-rain": forceOnActive(forceGlassRainEvent),
       fold: forceOnActive(forceFoldEvent),
+      cocoon: forceOnActive(forceCocoonEvent),
+      "gravity-assist": forceOnActive(forceGravityAssistEvent),
+      "zip-line": forceOnActive(forceZipLineEvent),
+      breach: forceOnActive(forceBreachEvent),
+      "storm-surge": forceOnActive(forceStormSurgeEvent),
+      "smash-and-grab": forceOnActive(forceSmashAndGrabEvent),
+      "shrink-ray": forceOnActive(forceShrinkRayEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
@@ -1955,8 +1972,8 @@ async function main() {
     app,
     () => buildings[activeBuildingIndex] ?? [],
     () => persist(),
-    (floor) => gameCanvas.scrollActiveToFloor(floor),
-    (floor) => gameCanvas.scrollActiveToFloor(floor),
+    (floor) => gameCanvas.scrollActiveToFloor(floor, BOOST_BUTTON_SCREEN_SHARE),
+    (floor) => gameCanvas.scrollActiveToFloor(floor, BOOST_BUTTON_SCREEN_SHARE),
   );
   const badgeCollection = wireBadgeCollection(app);
   const totalEarnedOverlay = wireTotalEarnedOverlay(app);

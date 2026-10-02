@@ -12,6 +12,7 @@ import {
   startButtonHoldAnim,
   stopButtonHoldAnim,
   isUpgradeButtonEnabled,
+  getButtonCenter,
   type OnScreenFloor,
 } from "../../floors";
 import { drawFloorContent, tickFloorOffscreen } from "../../gameRenderer";
@@ -145,7 +146,7 @@ export interface GameCanvas {
   scrollActiveToBottom: () => void;
   // centers the camera on a given floor of the currently-active building (e.g. a
   // boost that landed on a random floor) — no-op if that floor isn't registered
-  scrollActiveToFloor: (floor: Floor) => void;
+  scrollActiveToFloor: (floor: Floor, buttonAt?: number) => void;
   // a floor's world-space rect, null when it isn't in the active building
   getFloorRect: FloorRectResolver;
 }
@@ -213,13 +214,20 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
 
   // centers the camera vertically on whichever floor this is, if it's a currently
-  // registered floor of the active building
-  function scrollActiveToFloor(floor: Floor): void {
+  // registered floor of the active building; with buttonAt, it lands the floor's
+  // upgrade button that share (0..1) of the screen down from the top instead
+  function scrollActiveToFloor(floor: Floor, buttonAt?: number): void {
     const location = floorLocation.get(floor);
     if (!location) return;
     const { top, bottom } = floorWorldY(location.floorIndex);
-    const floorCenterY = (top + bottom) / 2;
-    scrollUp = GROUND_H - contentViewportH() / 2 - floorCenterY;
+    const viewH = contentViewportH();
+    if (buttonAt === undefined) {
+      const floorCenterY = (top + bottom) / 2;
+      scrollUp = GROUND_H - viewH / 2 - floorCenterY;
+    } else {
+      const buttonY = top + getButtonCenter(location.floorIndex === 0).y;
+      scrollUp = GROUND_H - viewH * (1 - buttonAt) - buttonY;
+    }
     clampCamera();
   }
 
