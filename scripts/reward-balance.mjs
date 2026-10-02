@@ -77,7 +77,11 @@ const interval = 1 / ((1 + L / 20) * E * officeSpeed);
 const payoutSeconds = Math.max(interval, 0.5); // one payout, in seconds of its floor
 const upgradeCost = (level) => 2 * ((3 + level) / 3) ** 4;
 const upgradesValue =
-  F * Array.from({ length: L }, (_, n) => upgradeCost(n)).reduce((a, b) => a + b, 0);
+  F *
+  Array.from({ length: L }, (_, n) => upgradeCost(n)).reduce(
+    (a, b) => a + b,
+    0,
+  );
 const unlockCost = (index) => 200 * 2 ** (index - 1);
 const TIER_LEVELS = { crit: 5, mega: 25, ultra: 125 };
 
@@ -186,19 +190,19 @@ async function main() {
 
     // ---------- legacy procs: hand-modelled from src/critBalance/procs ----------
     const featuredKinds = new Set(Object.keys(crit.FEATURED_CRITS));
-    const legacy = crit.CRIT_PROC_KINDS.filter((k) => !featuredKinds.has(k)).map(
-      (kind) => {
-        const model = LEGACY[kind];
-        return {
-          source: "legacy",
-          kind,
-          label: crit.CRIT_PROC_INFO[kind]?.label ?? kind,
-          chance: c[`${kind}Chance`] ?? 0,
-          effects: model ? model({ tierLevels, c }) : [],
-          modelled: !!model,
-        };
-      },
-    );
+    const legacy = crit.CRIT_PROC_KINDS.filter(
+      (k) => !featuredKinds.has(k),
+    ).map((kind) => {
+      const model = LEGACY[kind];
+      return {
+        source: "legacy",
+        kind,
+        label: crit.CRIT_PROC_INFO[kind]?.label ?? kind,
+        chance: c[`${kind}Chance`] ?? 0,
+        effects: model ? model({ tierLevels, c }) : [],
+        modelled: !!model,
+      };
+    });
 
     // ---------- events: classified from their source ----------
     const events = readdirSync("src/floors")
@@ -210,8 +214,7 @@ async function main() {
     const clicksPerHour = S.cps * 3600;
     const gatewayPerSec = S.cps * pCrit * c.specialCritGatewayChance;
     const armWeight = events.reduce((s, e) => s + e.chance * e.arm, 0);
-    const pEvent =
-      1 - events.reduce((p, e) => p * (1 - e.chance * e.arm), 1);
+    const pEvent = 1 - events.reduce((p, e) => p * (1 - e.chance * e.arm), 1);
     const cycle =
       CONFIG.eventProcs.cooldownMs / 1000 +
       S.eventMs / 1000 +
@@ -243,7 +246,21 @@ async function main() {
       r.powerPerHour = r.perHour * r.value;
     }
 
-    report({ CONFIG, pTier, pCrit, gatewayPerSec, pEvent, eventsPerHour, procGatewaysPerHour, lambda, all, tiers, featured, legacy, events });
+    report({
+      CONFIG,
+      pTier,
+      pCrit,
+      gatewayPerSec,
+      pEvent,
+      eventsPerHour,
+      procGatewaysPerHour,
+      lambda,
+      all,
+      tiers,
+      featured,
+      legacy,
+      events,
+    });
   });
 }
 
@@ -269,7 +286,10 @@ function calls(source) {
       if (source[i] === "(") depth++;
       else if (source[i] === ")") depth--;
     }
-    out.push({ name: m[1].replace("actions.", ""), args: split(source.slice(start, i - 1)) });
+    out.push({
+      name: m[1].replace("actions.", ""),
+      args: split(source.slice(start, i - 1)),
+    });
   }
   return out;
 }
@@ -524,7 +544,8 @@ function eventEntry(dir, CONFIG) {
   } catch {
     return null;
   }
-  const label = src.match(/registerWispEvent\(\s*KEY,\s*"([^"]+)"/)?.[1] ?? name;
+  const label =
+    src.match(/registerWispEvent\(\s*KEY,\s*"([^"]+)"/)?.[1] ?? name;
   const constant = (id) => {
     const m = src.match(new RegExp(`const ${id} = ([\\d_.]+)`));
     return m ? Number(m[1].replace(/_/g, "")) : null;
@@ -536,7 +557,9 @@ function eventEntry(dir, CONFIG) {
     const reward = src.match(/rewardMultiplier:\s*([\w.]+)/)?.[1];
     const multiple =
       reward === undefined
-        ? /\brewardMultiplier\b|addTotalIncome\(|currentPayoutAmount|getTotalIncome\(/.test(src)
+        ? /\brewardMultiplier\b|addTotalIncome\(|currentPayoutAmount|getTotalIncome\(/.test(
+            src,
+          )
           ? 4
           : /startMoneyCover\(/.test(src)
             ? 1 // moneyCover's default
@@ -547,20 +570,37 @@ function eventEntry(dir, CONFIG) {
     if (multiple > 0) effects.push(eventCash(multiple));
     if (/\.levels\(|giveBarLevels|upgradeFloorFree/.test(src)) {
       const single = /bars: \[own\]/.test(src);
-      const bars = single ? 1 : Math.min(S.view, constant("MAX_BARS") ?? S.view);
+      const bars = single
+        ? 1
+        : Math.min(S.view, constant("MAX_BARS") ?? S.view);
       const hits = Number(src.match(MULTI_HIT)?.[1] ?? 1);
       const share = cfg?.levelShare ?? 0.1;
       effects.push(levels(Math.max(2, Math.round(L * share)) * hits, bars));
     }
-    if (/\.tierUp\(|giveBarTier|promoteFloorTier|critMultiplierTier\s*=\s*next/.test(src))
+    if (
+      /\.tierUp\(|giveBarTier|promoteFloorTier|critMultiplierTier\s*=\s*next/.test(
+        src,
+      )
+    )
       effects.push(floorTier(1, 1));
-    if (/\.promote\(|promoteWorkerPermaTier|giveWorkerTier|mergeWorkersInto/.test(src))
+    if (
+      /\.promote\(|promoteWorkerPermaTier|giveWorkerTier|mergeWorkersInto/.test(
+        src,
+      )
+    )
       effects.push(
-        workerTier(1, Math.min(S.viewWorkers, constant("MAX_WORKERS") ?? S.viewWorkers)),
+        workerTier(
+          1,
+          Math.min(S.viewWorkers, constant("MAX_WORKERS") ?? S.viewWorkers),
+        ),
       );
     if (/giveHire|recruitWorker|recruitToCap/.test(src))
       effects.push(
-        hire(1, Math.min(S.hireSpots, constant("MAX_HIRES") ?? S.hireSpots), true),
+        hire(
+          1,
+          Math.min(S.hireSpots, constant("MAX_HIRES") ?? S.hireSpots),
+          true,
+        ),
       );
     if (/unlockFloorFree/.test(src)) effects.push(unlock(1));
   }
@@ -600,7 +640,9 @@ const fmt = (n, digits = 1) =>
       : n.toFixed(digits);
 const pct = (n) => `${fmt(100 * n)}%`;
 const row = (cells, widths) =>
-  cells.map((cell, i) => String(cell)[i === 0 ? "padEnd" : "padStart"](widths[i])).join("  ");
+  cells
+    .map((cell, i) => String(cell)[i === 0 ? "padEnd" : "padStart"](widths[i]))
+    .join("  ");
 
 function table(title, header, rows) {
   const widths = header.map((h, i) =>
@@ -614,7 +656,9 @@ function table(title, header, rows) {
 
 function report(ctx) {
   const { all, events, featured, legacy } = ctx;
-  console.log("Reward balance (power = minutes of total income; permanent gains count over the horizon)");
+  console.log(
+    "Reward balance (power = minutes of total income; permanent gains count over the horizon)",
+  );
   console.log(
     `building: ${F} floors at level ${L}, tier x${T}, ${W} workers (perma x${S.perma}, boosted ${pct(S.uptime)}), horizon ${S.horizon}s, ${S.cps} clicks/s`,
   );
@@ -631,7 +675,10 @@ function report(ctx) {
     ["unit", "minutes"],
     [
       ["1 free level on one floor", levels(1, 1)],
-      ["10% of a floor's level (event bar levels)", levels(Math.max(2, Math.round(L * 0.1)), 1)],
+      [
+        "10% of a floor's level (event bar levels)",
+        levels(Math.max(2, Math.round(L * 0.1)), 1),
+      ],
       ["1 floor crit tier step", floorTier(1, 1)],
       ["1 worker perma tier step", workerTier(1, 1)],
       ["1 hire on a floor with room", hire(1, 1, true)],
@@ -648,7 +695,12 @@ function report(ctx) {
   const totalPower = all.reduce((s, r) => s + r.powerPerHour, 0);
   const cell = (rows, type) =>
     rows.reduce(
-      (s, r) => s + r.perHour * r.effects.filter((e) => e.type === type).reduce((a, e) => a + minutes(e), 0),
+      (s, r) =>
+        s +
+        r.perHour *
+          r.effects
+            .filter((e) => e.type === type)
+            .reduce((a, e) => a + minutes(e), 0),
       0,
     );
   table(
@@ -659,7 +711,10 @@ function report(ctx) {
       const sum = rows.reduce((s, r) => s + r.powerPerHour, 0);
       return [
         source,
-        fmt(rows.reduce((s, r) => s + r.perHour, 0), 0),
+        fmt(
+          rows.reduce((s, r) => s + r.perHour, 0),
+          0,
+        ),
         ...TYPES.map((t) => fmt(cell(rows, t))),
         fmt(sum),
         pct(sum / totalPower),
@@ -667,7 +722,10 @@ function report(ctx) {
     }).concat([
       [
         "all",
-        fmt(all.reduce((s, r) => s + r.perHour, 0), 0),
+        fmt(
+          all.reduce((s, r) => s + r.perHour, 0),
+          0,
+        ),
         ...TYPES.map((t) => fmt(cell(all, t))),
         fmt(totalPower),
         "100%",
@@ -678,7 +736,12 @@ function report(ctx) {
   // volume: how much of each reward lands per hour
   const amount = (type) =>
     all.reduce(
-      (s, r) => s + r.perHour * r.effects.filter((e) => e.type === type).reduce((a, e) => a + e.amount, 0),
+      (s, r) =>
+        s +
+        r.perHour *
+          r.effects
+            .filter((e) => e.type === type)
+            .reduce((a, e) => a + e.amount, 0),
       0,
     );
   table(
@@ -688,7 +751,11 @@ function report(ctx) {
       ["levels", fmt(amount("levels"), 0), "free levels"],
       ["floorTier", fmt(amount("floorTier"), 2), "floor crit tier steps"],
       ["workerTier", fmt(amount("workerTier"), 2), "worker perma tier steps"],
-      ["staff", fmt(amount("staff"), 2), "hires/managers/office items that land"],
+      [
+        "staff",
+        fmt(amount("staff"), 2),
+        "hires/managers/office items that land",
+      ],
       ["unlock", fmt(amount("unlock"), 2), "free floors"],
       ["cash", fmt(amount("cash"), 0), "seconds of income (flat cash only)"],
     ],
@@ -702,7 +769,14 @@ function report(ctx) {
       const rows = all.filter((r) => r.main === type);
       const perHour = rows.reduce((s, r) => s + r.perHour, 0);
       const power = rows.reduce((s, r) => s + r.powerPerHour, 0);
-      return [type, rows.length, fmt(perHour, 1), fmt(power / perHour, 2), fmt(power), pct(power / totalPower)];
+      return [
+        type,
+        rows.length,
+        fmt(perHour, 1),
+        fmt(power / perHour, 2),
+        fmt(power),
+        pct(power / totalPower),
+      ];
     }),
   );
 
@@ -715,17 +789,31 @@ function report(ctx) {
     fmt(r.powerPerHour, 1),
     pct(r.powerPerHour / totalPower),
   ];
-  const header = ["reward", "type", "chance", "per hour", "min/hit", "power/h", "share"];
+  const header = [
+    "reward",
+    "type",
+    "chance",
+    "per hour",
+    "min/hit",
+    "power/h",
+    "share",
+  ];
   const ranked = all.filter((r) => r.source !== "critTier");
   table(
     `Top ${S.top} by power per hour`,
     header,
-    [...ranked].sort((a, b) => b.powerPerHour - a.powerPerHour).slice(0, S.top).map(line),
+    [...ranked]
+      .sort((a, b) => b.powerPerHour - a.powerPerHour)
+      .slice(0, S.top)
+      .map(line),
   );
   table(
     `Top ${S.top} biggest single hits`,
     header,
-    [...ranked].sort((a, b) => b.value - a.value).slice(0, S.top).map(line),
+    [...ranked]
+      .sort((a, b) => b.value - a.value)
+      .slice(0, S.top)
+      .map(line),
   );
 
   const unmodelled = ranked.filter((r) => !r.modelled && r.chance > 0);
@@ -739,7 +827,9 @@ function report(ctx) {
     table(
       `All ${args.list}, by power per hour`,
       header,
-      [...lists[args.list]].sort((a, b) => b.powerPerHour - a.powerPerHour).map(line),
+      [...lists[args.list]]
+        .sort((a, b) => b.powerPerHour - a.powerPerHour)
+        .map(line),
     );
 
   if (args.json) {
@@ -749,18 +839,31 @@ function report(ctx) {
       JSON.stringify(
         {
           settings: S,
-          rewards: all.map(({ source, kind, label, chance, arm, perHour, value, powerPerHour, main, effects }) => ({
-            source,
-            kind,
-            label,
-            chance,
-            arm,
-            perHour,
-            minutesPerHit: value,
-            powerPerHour,
-            main,
-            effects: effects.map((e) => ({ ...e, minutes: minutes(e) })),
-          })),
+          rewards: all.map(
+            ({
+              source,
+              kind,
+              label,
+              chance,
+              arm,
+              perHour,
+              value,
+              powerPerHour,
+              main,
+              effects,
+            }) => ({
+              source,
+              kind,
+              label,
+              chance,
+              arm,
+              perHour,
+              minutesPerHit: value,
+              powerPerHour,
+              main,
+              effects: effects.map((e) => ({ ...e, minutes: minutes(e) })),
+            }),
+          ),
         },
         null,
         2,
