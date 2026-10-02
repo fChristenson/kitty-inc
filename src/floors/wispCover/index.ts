@@ -86,6 +86,8 @@ export interface WispCoverOptions {
   workers?: RewardWorker[];
   // every frame, before drawing: fire the event's beats
   tick?: (ms: number, now: number) => void;
+  // as the screen unfreezes: rewards that play out on the live screen
+  onEnd?: () => void;
   // floor-local, under the coins and over them
   drawUnder?: (ctx: CanvasRenderingContext2D, ms: number, now: number) => void;
   drawOver?: (ctx: CanvasRenderingContext2D, ms: number, now: number) => void;
@@ -140,6 +142,7 @@ export function startWispCover(
     bars = [],
     workers = [],
     tick,
+    onEnd,
     drawUnder,
     drawOver,
   }: WispCoverOptions,
@@ -162,6 +165,7 @@ export function startWispCover(
     onEnd: () => {
       for (const w of workers) giveWorkerTier(w);
       release();
+      onEnd?.();
     },
     drawExtra: (ctx, getFloorRect, totalTarget) => {
       const rect = getFloorRect(floor);

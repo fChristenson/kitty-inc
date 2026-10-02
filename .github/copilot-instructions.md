@@ -62,7 +62,7 @@ Vary what an event gives, so the player never knows what's coming: cash, free up
 
 Don't end every event by flying into the total-income readout: finish on whatever got rewarded (the bars, the workers, the button, a new floor), and keep total finales for cash events.
 
-On `wispCover` that's: find targets with `floors/eventRewards` (`findRewardBars`, `findRewardWorkers`, `levelsFor`), hand them to `startWispCover({ bars, workers })` (it draws, jolts and tallies them), and land each with `cover.levels` / `tierUp` / `promote`, finishing with `cover.slam(bar)`. `rewardMultiplier: 0` pays no cash and skips the total finale; a cash event that ends elsewhere sets `endOnTotal: false`. Gate the event on its targets with `registerWispEvent`'s `canArm`.
+On `wispCover` that's: find targets with `floors/eventRewards` (`findRewardBars`, `findRewardWorkers`, `levelsFor`), hand them to `startWispCover({ bars, workers })` (it draws, jolts and tallies them), and land each with `cover.levels` / `tierUp` / `promote`, finishing with `cover.slam(bar)`. Free hires: `findRewardHires` + `giveHire` on the hit, drawn forming by `drawRewardHires` in `drawOver`. A free floor: `findRewardLocked`, then `context.unlockFloorFree` from `startWispCover`'s `onEnd` (so its unlock plays on the live screen). `rewardMultiplier: 0` pays no cash and skips the total finale; a cash event that ends elsewhere sets `endOnTotal: false`. Gate the event on its targets with `registerWispEvent`'s `canArm`.
 
 ### Base templates
 

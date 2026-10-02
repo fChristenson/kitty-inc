@@ -22,10 +22,18 @@ import {
 import {
   drawStruckWorkers,
   findOnScreenWorkers,
+  findRecruitSpots,
   isClimber,
   type OnScreenWorker,
 } from "../onScreenWorkers";
-import { celebrateWorkerBoost, promoteWorkerPermaTier } from "../worker";
+import {
+  celebrateWorkerBoost,
+  promoteWorkerPermaTier,
+  recruitWorker,
+} from "../worker";
+import { drawFormingWorker } from "../formingWorker";
+import { getLockCenter, MAX_FLOORS_PER_BUILDING } from "../floorLock";
+import { clamp01 } from "../../shared/easing";
 
 // a hit jolts its bar JOLT px the way it came from, flashing it white
 const JOLT = 14;
@@ -206,4 +214,95 @@ export function drawRewardWorkers(
   now: number,
 ): void {
   if (workers.length > 0) drawStruckWorkers(ctx, getFloorRect, workers, now);
+}
+
+// a free hire landing on a floor in view: where it'll stand (y local to the
+// clicked floor, ownY to its own) and, once hired, its worker
+export interface RewardHire {
+  floor: Floor;
+  x: number;
+  y: number;
+  ownY: number;
+  workerIndex: number | null;
+  hiredAt: number | null;
+}
+
+// one free hire for every open floor in view with room for another worker
+export function findRewardHires(
+  floor: Floor,
+  context: EventProcContext,
+): RewardHire[] {
+  const onScreen = context.getOnScreenFloors?.() ?? [];
+  const top = onScreen.find((entry) => entry.floor === floor)?.top;
+  if (top === undefined) return [];
+  return findRecruitSpots(floor, context.getOnScreenFloors).map((spot) => {
+    const entry = onScreen.find((e) => e.floor === spot.floor)!;
+    return {
+      floor: spot.floor,
+      x: spot.x,
+      y: spot.y + entry.top - top,
+      ownY: spot.y,
+      workerIndex: null,
+      hiredAt: null,
+    };
+  });
+}
+
+// hires it now (it forms in where it stands, see drawRewardHires)
+export function giveHire(hire: RewardHire): void {
+  if (hire.hiredAt !== null) return;
+  hire.hiredAt = performance.now();
+  hire.workerIndex = recruitWorker(hire.floor, hire.x, Date.now());
+  if (hire.workerIndex !== null)
+    celebrateWorkerBoost(hire.floor, hire.workerIndex, Date.now());
+}
+
+// ctx local to the clicked floor: each hire grows in out of a golden glow
+// over formMs once hired
+export function drawRewardHires(
+  ctx: CanvasRenderingContext2D,
+  hires: RewardHire[],
+  now: number,
+  formMs = 300,
+): void {
+  for (const hire of hires) {
+    if (hire.hiredAt === null || hire.workerIndex === null) continue;
+    const form = clamp01((now - hire.hiredAt) / formMs);
+    ctx.save();
+    ctx.translate(0, hire.y - hire.ownY);
+    drawFormingWorker(
+      ctx,
+      hire.floor,
+      hire.workerIndex,
+      hire.x,
+      hire.ownY,
+      form,
+      1,
+      form >= 1 ? hire.hiredAt + formMs : null,
+      now,
+    );
+    ctx.restore();
+  }
+}
+
+// the building's locked floor while it's in view with room above it, and how
+// far below the clicked floor's top its own top sits
+export function findRewardLocked(
+  floor: Floor,
+  context: EventProcContext,
+): { floor: Floor; offsetY: number } | null {
+  if (!context.unlockFloorFree) return null;
+  const locked = context.floors.find((f) => !f.unlocked);
+  if (!locked || isFloorLocked(locked)) return null;
+  if (context.floors.length >= MAX_FLOORS_PER_BUILDING) return null;
+  const onScreen = context.getOnScreenFloors?.() ?? [];
+  const top = onScreen.find((entry) => entry.floor === floor)?.top;
+  const entry = onScreen.find((e) => e.floor === locked);
+  if (
+    top === undefined ||
+    !entry ||
+    !isVisibleOnFloor(entry, getLockCenter().y)
+  )
+    return null;
+  return { floor: locked, offsetY: entry.top - top };
 }

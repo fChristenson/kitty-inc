@@ -208,6 +208,13 @@ import {
   forceBallLightningEvent,
   forceEventHorizonEvent,
   forceTileFlipEvent,
+  forceGusherEvent,
+  forcePinataEvent,
+  forceGiftWrapEvent,
+  forceTriangulateEvent,
+  forceSparkOfLifeEvent,
+  forceGlassRainEvent,
+  forceFoldEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1279,6 +1286,13 @@ async function main() {
       "ball-lightning": forceOnActive(forceBallLightningEvent),
       "event-horizon": forceOnActive(forceEventHorizonEvent),
       "tile-flip": forceOnActive(forceTileFlipEvent),
+      gusher: forceOnActive(forceGusherEvent),
+      pinata: forceOnActive(forcePinataEvent),
+      "gift-wrap": forceOnActive(forceGiftWrapEvent),
+      triangulate: forceOnActive(forceTriangulateEvent),
+      "spark-of-life": forceOnActive(forceSparkOfLifeEvent),
+      "glass-rain": forceOnActive(forceGlassRainEvent),
+      fold: forceOnActive(forceFoldEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

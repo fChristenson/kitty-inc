@@ -1568,6 +1568,67 @@ export const CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
+  // money, cash + an unlock: src/floors/gusherEvent: a jet of cash fills the
+  // locked floor
+  gusherEvent: {
+    chance: 0.01,
+    streamMs: 1_000, // the jet gushing
+    riseMs: 600, // each coin's trip up and into the tank
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, cash: src/floors/pinataEvent: wisps whack a swinging wisp piñata
+  pinataEvent: {
+    chance: 0.01,
+    dropMs: 280, // the piñata dropping in
+    gapsMs: [220, 90] as [number, number], // between whacks, quickening
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // mix, worker tiers + cash: src/floors/giftWrapEvent: a ribbon of cash
+  // loops round the workers
+  giftWrapEvent: {
+    chance: 0.01,
+    travelMs: 1_700, // the wisp's run round every worker and up
+    streamMs: 900, // the ribbon pouring after it
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, levels + tier: src/floors/triangulateEvent: three lasers lock onto bars
+  triangulateEvent: {
+    chance: 0.01,
+    huntsMs: [420, 200] as [number, number], // hunting each bar, quickening
+    fireMs: 150, // the three beams firing
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // lightning, hires: src/floors/sparkOfLifeEvent: bolts bring new workers to life
+  sparkOfLifeEvent: {
+    chance: 0.01,
+    chargeMs: 450, // sparks crackling before the first bolt
+    gapsMs: [360, 180] as [number, number], // between bolts, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // shatter, levels: src/floors/glassRainEvent: the shards rain down past the bars
+  glassRainEvent: {
+    chance: 0.01,
+    knocksMs: [180, 450, 680], // each knock, the last shattering it
+    fallMs: 1_000, // the glass raining down
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/foldEvent: the screen folds up like paper
+  foldEvent: {
+    chance: 0.01,
+    foldMs: 320, // each fold
+    gapMs: 180, // between the folds
+    holdOpenMs: 220, // folded up, before springing open
+    holdMs: 300,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
