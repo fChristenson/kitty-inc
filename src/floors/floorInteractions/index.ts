@@ -85,7 +85,7 @@ import {
 import { startBoostEvent, type OnScreenFloors } from "../boostEvent";
 import { startUnionEvent } from "../unionEvent";
 import { startHuntEvent } from "../huntEvent";
-// registers the Swarm, Kickback, Payday, Piggy Bank, Coin Toss, Hourglass, Rocket, Reveal, Jackpot Reels, Chain Pay, Twister, Downpour, Trickle, Magnet, Spillover, Constellation, Ascend, Rising Tide, Tidal Wave, Beanstalk, Blessing, Halo, Comet, Meteor Shower, Mentor, Spark Chain, Polish, Lighthouse, Recruit, Promotion Day, Alchemy, Investment, Dividends, Wisp, Burst, Spray, Fountain, Ripple, Wrecking Ball, Piledriver, Orbital Strike, Fuse, Supernova, Bowling, Thunderclap, Chain Reaction, Bullseye, Popcorn, Newton's Cradle, Juggle, Boomerang, Heartbeat, Clash, Asteroids, Whack-a-Mole, Drumroll, Shell Game, Seesaw, Scratch, Tag, Bumpers, Catcher, Implosion, Atom, Spiral, Loop, Eternity, Helix, Yo-Yo, Racetrack, Swing, Kaleidoscope, Zipper, Screensaver, Sprinkler, Clockwork, Hole in One, Leapfrog, Lineup, Stampede, Wormhole, Splat, Roulette, Free Kick, Slalom, Lightning, Slash, Jackhammer, Pummel, Overload, Gatling, Press, Drill, Burrow, Ping Pong, Slam Dunk, Uppercut, Head Hop, Paparazzi, Missile Barrage, Sonic Boom, Mitosis, Plinko, Hammer Throw, Snake, Breakout, Line Clear, Break Shot, Bullet Hell, Vortex, Ricochet, Waterfall, Conveyor, Fireflies, Stream, Trails, Draw, Night Sky, Pitcher, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
+// registers the Swarm, Kickback, Payday, Piggy Bank, Coin Toss, Hourglass, Rocket, Reveal, Jackpot Reels, Chain Pay, Twister, Downpour, Trickle, Magnet, Spillover, Constellation, Ascend, Rising Tide, Tidal Wave, Beanstalk, Blessing, Halo, Comet, Meteor Shower, Mentor, Spark Chain, Polish, Lighthouse, Recruit, Promotion Day, Alchemy, Investment, Dividends, Wisp, Burst, Spray, Fountain, Ripple, Wrecking Ball, Piledriver, Orbital Strike, Fuse, Supernova, Bowling, Thunderclap, Chain Reaction, Bullseye, Popcorn, Newton's Cradle, Juggle, Boomerang, Heartbeat, Clash, Asteroids, Whack-a-Mole, Drumroll, Shell Game, Seesaw, Scratch, Tag, Bumpers, Catcher, Implosion, Atom, Spiral, Loop, Eternity, Helix, Yo-Yo, Racetrack, Swing, Kaleidoscope, Zipper, Screensaver, Sprinkler, Clockwork, Hole in One, Leapfrog, Lineup, Stampede, Wormhole, Splat, Roulette, Free Kick, Slalom, Lightning, Fire Hose, Confluence, Slosh, Slash, Jackhammer, Pummel, Overload, Gatling, Press, Drill, Burrow, Ping Pong, Slam Dunk, Uppercut, Head Hop, Paparazzi, Missile Barrage, Sonic Boom, Mitosis, Plinko, Hammer Throw, Snake, Breakout, Line Clear, Break Shot, Bullet Hell, Vortex, Ricochet, Waterfall, Conveyor, Fireflies, Stream, Trails, Draw, Night Sky, Pitcher, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
 import "../swarmEvent";
 import "../kickbackEvent";
 import "../paydayEvent";
@@ -172,6 +172,9 @@ import "../rouletteEvent";
 import "../freeKickEvent";
 import "../slalomEvent";
 import "../lightningEvent";
+import "../fireHoseEvent";
+import "../confluenceEvent";
+import "../sloshEvent";
 import "../slashEvent";
 import "../jackhammerEvent";
 import "../pummelEvent";

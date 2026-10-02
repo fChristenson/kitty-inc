@@ -14,6 +14,7 @@ import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, easeOutBack, lerp } from "../../shared/easing";
 import { sprayTargets } from "../../shared/coinTargets";
 import { createBeats } from "../../shared/eventBeats";
+import { catmull } from "../../shared/curves";
 
 const KEY = "slalom";
 const REWARD = 4;
@@ -34,23 +35,6 @@ const GATE_SHAKE: [number, number] = [0.5, 1.4];
 const GATE_COINS: [number, number] = [3, 5];
 const SNOW: [number, number] = [60, 200];
 const SNOW_SPAN = 1.3;
-
-// a Catmull-Rom curve through b and c, steered by a and d, t 0..1
-function catmull(
-  a: number,
-  b: number,
-  c: number,
-  d: number,
-  t: number,
-): number {
-  return (
-    0.5 *
-    (2 * b +
-      (c - a) * t +
-      (2 * a - 5 * b + 4 * c - d) * t * t +
-      (3 * b - a - 3 * c + d) * t * t * t)
-  );
-}
 
 export const forceSlalomEvent = registerWispEvent(
   KEY,

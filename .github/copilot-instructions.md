@@ -62,17 +62,21 @@ Events (`src/floors/*Event`, listed in `docs/event-ideas.md`), like crits, must 
 
 Events must run smoothly on phones, so draw them with the shared libs below. Don't rebuild these inside an event.
 
-| Need | Use |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- || A wisp coin event's whole stage | `floors/wispCover`: `registerWispEvent` (returns the force hook) and `startWispCover` (ticks beats, `burst`, `blast`, `total()`); wire its test button through `wireEventTestButtons` in `main.ts` || Easing, ranges, timing | `shared/easing`: `lerp`, `between`, `clamp01`, `smoothstep`, `easeIn`/`easeOut`/`easeOutCubic`/`easeOutBack`, `progress` |
-| Coin landing spots | `shared/coinTargets`: `ringTargets`, `sprayTargets`, `clampTargetsY` |
-| Beats fired once as the frame passes them (hits, landings) | `shared/eventBeats`: `createBeats(items, dueAt, fire)`, then `tick(ms, now)` each frame |
-| Props (cups, planks, mallets, any gold shape) | `shared/glowShape`: `createGlowSprite` once at arm, then `drawGlowSprite(ctx, sprite, x, y, scale, rotation)`. No per-frame path strokes |
-| Soft round glows, pools, shadows, flashes | `shared/glowSprite`: `drawGlow` / `glowSprite` with stops hoisted to a constant. No per-frame `createRadialGradient` |
-| Orbs, wisps, travelling lights | `shared/wisp`: `drawWisp`, or `drawWispBetween` for a wisp that is only on screen for part of the event (it is culled outside that span) |
-| Sparkles in a loop | `shared/twinkle`: `stampGlimmer` with `"lighter"` set once around the loop |
-| Text drawn every frame | `shared/critText`: `drawCachedCritText` |
-| Impacts | `shared/eventFx`: `drawWhiteBurst`, `drawExplosion` |
-| Dimmed frozen frame | `shared/screenFreeze`: `drawFreezeDimmed` with a stable key |
+| Need                                                       | Use                                                                                                                                                                                                |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A wisp or coin event's whole stage                         | `floors/wispCover`: `registerWispEvent` (returns the force hook) and `startWispCover` (ticks beats, `burst`, `blast`, `total()`); wire its test button through `wireEventTestButtons` in `main.ts` |
+| Coins that dance (formations, flocks, trains)              | `startWispCover(...).trace(paths, travelMs)`: one coin per `CoinPath` (`f` 0..1 over travelMs, `scale` sizes it, 0 hides it); return a fresh point per call                                        |
+| Curves for paths                                           | `shared/curves`: `bezier`, `alongRoute` (smooth through points), `catmull`                                                                                                                         |
+| Easing, ranges, timing                                     | `shared/easing`: `lerp`, `between`, `clamp01`, `smoothstep`, `easeIn`/`easeOut`/`easeOutCubic`/`easeOutBack`, `progress`                                                                           |
+| Coin landing spots                                         | `shared/coinTargets`: `ringTargets`, `sprayTargets`, `clampTargetsY`                                                                                                                               |
+| Beats fired once as the frame passes them (hits, landings) | `shared/eventBeats`: `createBeats(items, dueAt, fire)`, then `tick(ms, now)` each frame                                                                                                            |
+| Props (cups, planks, mallets, any gold shape)              | `shared/glowShape`: `createGlowSprite` once at arm, then `drawGlowSprite(ctx, sprite, x, y, scale, rotation)`. No per-frame path strokes                                                           |
+| Soft round glows, pools, shadows, flashes                  | `shared/glowSprite`: `drawGlow` / `glowSprite` with stops hoisted to a constant. No per-frame `createRadialGradient`                                                                               |
+| Orbs, wisps, travelling lights                             | `shared/wisp`: `drawWisp`, or `drawWispBetween` for a wisp that is only on screen for part of the event (it is culled outside that span)                                                           |
+| Sparkles in a loop                                         | `shared/twinkle`: `stampGlimmer` with `"lighter"` set once around the loop                                                                                                                         |
+| Text drawn every frame                                     | `shared/critText`: `drawCachedCritText`                                                                                                                                                            |
+| Impacts                                                    | `shared/eventFx`: `drawWhiteBurst`, `drawExplosion`                                                                                                                                                |
+| Dimmed frozen frame                                        | `shared/screenFreeze`: `drawFreezeDimmed` with a stable key                                                                                                                                        |
 
 - Build sprites, paths and lookups once when the event arms, not each frame. Don't allocate in the draw loop.
 - Skip anything past its window, such as dead wisps, faded trails and finished bursts. Return early once the event's visuals are done.

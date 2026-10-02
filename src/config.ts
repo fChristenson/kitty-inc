@@ -684,6 +684,31 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // the flowing-cash events on src/floors/wispCover, poured like Stream's river
+  // src/floors/fireHoseEvent: a whipping jet of cash gushes into the total
+  fireHoseEvent: {
+    chance: 0.01,
+    sprayMs: 1_500, // the hose gushing
+    travelMs: 800, // each coin's trip out the jet and round into the total
+  },
+  // src/floors/confluenceEvent: rivers pour in and merge into one into the total
+  confluenceEvent: {
+    chance: 0.01,
+    staggerMs: 150, // between rivers starting to pour
+    pourMs: 900, // how long each pours
+    travelMs: 800, // each coin's trip down its river and up the trunk
+  },
+  // src/floors/sloshEvent: a pool of cash sloshes, then surges into the total
+  sloshEvent: {
+    chance: 0.01,
+    pourMs: 550, // the button gushing the pool full
+    fallMs: 300, // each coin's fall into the pool
+    sloshMs: 420, // each slosh across
+    surgeMs: 400, // each coin's surge up the wall into the total
+    holdMs: 450,
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {

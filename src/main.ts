@@ -106,6 +106,9 @@ import {
   forceFreeKickEvent,
   forceSlalomEvent,
   forceLightningEvent,
+  forceFireHoseEvent,
+  forceConfluenceEvent,
+  forceSloshEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1075,6 +1078,9 @@ async function main() {
       "free-kick": forceOnActive(forceFreeKickEvent),
       slalom: forceOnActive(forceSlalomEvent),
       lightning: forceOnActive(forceLightningEvent),
+      "fire-hose": forceOnActive(forceFireHoseEvent),
+      confluence: forceOnActive(forceConfluenceEvent),
+      slosh: forceOnActive(forceSloshEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
