@@ -1421,6 +1421,88 @@ export const CONFIG = {
     holdMs: 700,
     mergeMs: 500,
   },
+  // money, worker tiers + cash: src/floors/cashShowerEvent: a column of cash
+  // showers down onto worker after worker
+  cashShowerEvent: {
+    chance: 0.01,
+    gapsMs: [300, 140] as [number, number], // between showers, quickening
+    streamMs: 280, // each shower pouring
+    travelMs: 220, // each coin's fall
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // money, cash: src/floors/catherineWheelEvent: the button spins like a
+  // firework wheel, spraying four jets of cash into spiral arms
+  catherineWheelEvent: {
+    chance: 0.01,
+    spinMs: 1_400, // spraying, ever faster
+    spinRate: [0.004, 0.02] as [number, number], // rad per ms, speeding up
+    outMs: 520, // each coin flying out along its arm
+    flightMs: 380, // each coin's flight on into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, levels: src/floors/multiballEvent: three balls pinball off the bars
+  multiballEvent: {
+    chance: 0.01,
+    playMs: 1_500, // pinballing round the screen
+    slamMs: 200, // all three diving into the clicked floor's bar
+    levelShare: 0.03, // of a bar's levels, per bounce
+    holdMs: 700,
+    mergeMs: 0,
+  },
+  // mix, levels + tier + cash: src/floors/whipEvent: a whip of flowing cash
+  // cracks against the bars
+  whipEvent: {
+    chance: 0.01,
+    unfurlMs: 300, // the whip pouring out of the button
+    cracksMs: [380, 220] as [number, number], // between cracks, quickening
+    levelShare: 0.1, // of a bar's levels, per crack
+    sweepMs: 280, // the whip's cash setting off for the total
+    flightMs: 360, // each coin's flight into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, levels: src/floors/batteryEvent: every bar fires a laser blast
+  batteryEvent: {
+    chance: 0.01,
+    gapsMs: [260, 110] as [number, number], // between shots, quickening
+    aimMs: 120, // each shot's aim laser
+    fireMs: 160, // each shot blazing
+    volleyMs: 300, // every bar firing at once
+    levelShare: 0.06, // of a bar's levels, per shot
+    holdMs: 700,
+    mergeMs: 0,
+  },
+  // lightning, levels + worker tiers: src/floors/teslaCoilEvent: a coil
+  // throws ever longer arcs
+  teslaCoilEvent: {
+    chance: 0.01,
+    pulseGapsMs: [360, 200] as [number, number], // between pulses, quickening
+    arcMs: 160, // each pulse's arcs crackling
+    overloadMs: 320, // the coil overloading
+    levelShare: 0.04, // of a bar's levels, per arc
+    holdMs: 700,
+    mergeMs: 0,
+  },
+  // lightning, levels: src/floors/jacobsLadderEvent: an arc climbs the building
+  jacobsLadderEvent: {
+    chance: 0.01,
+    igniteMs: 260, // the arc striking up between its electrodes
+    climbMs: 1_200, // climbing to the top of the screen
+    levelShare: 0.12, // of each bar's levels
+    holdMs: 700,
+    mergeMs: 0,
+  },
+  // experiment, mixed rewards: src/floors/comicBookEvent: comic-book sound
+  // effects slam over every reward
+  comicBookEvent: {
+    chance: 0.01,
+    gapsMs: [330, 160] as [number, number], // between hits, quickening
+    levelShare: 0.1, // of a bar's levels
+    holdMs: 800,
+    mergeMs: 0,
+  },
 
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
