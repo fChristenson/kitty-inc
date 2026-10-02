@@ -1070,6 +1070,94 @@ export const CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
+  // money: src/floors/butterflyEvent: mirrored rivers open into butterfly wings
+  butterflyEvent: {
+    chance: 0.01,
+    streamMs: 900, // the rivers pouring
+    travelMs: 1_300, // each coin's trip round a wing and up into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // money: src/floors/kelpEvent: stalks of cash grow, sway, then lean into the total
+  kelpEvent: {
+    chance: 0.01,
+    growMs: 450, // each stalk growing
+    swayMs: 500, // all of them swaying
+    leanMs: 300, // leaning over onto the total
+    flowMs: 650, // each coin's climb up a stalk
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/pendulumWaveEvent: a row of pendulum wisps swing in waves
+  pendulumWaveEvent: {
+    chance: 0.01,
+    swingMs: 1_400, // swinging
+    fireMs: 280, // each wisp's flight into the total
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/formationEvent: wisps snap through formations, then fire
+  formationEvent: {
+    chance: 0.01,
+    snapMs: 170, // each snap into a formation
+    holdShapeMs: 190, // holding it
+    fireMs: 260, // each wisp's flight into the total
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // mix: src/floors/ouroborosEvent: a wisp closes a ring of cash, which spins in
+  ouroborosEvent: {
+    chance: 0.01,
+    ringMs: 600, // the head running the first lap
+    spinMs: 800, // the ring spinning up and shrinking
+    collapseMs: 350, // collapsing into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // mix: src/floors/bowstringEvent: a wisp arrow drawn on a string of cash
+  bowstringEvent: {
+    chance: 0.01,
+    stringMs: 450, // the string of cash forming
+    drawMs: 750, // drawn back
+    flightMs: 300, // the arrow's flight into the total
+    flowMs: 500, // each coin's run along the string
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam: src/floors/superlaserEvent: beams converge, then one colossal shot
+  superlaserEvent: {
+    chance: 0.01,
+    aimMs: 250, // the aim lasers flickering
+    gapMs: 110, // between emitters firing
+    chargeMs: 350, // the focus charging once every beam is in
+    streamMs: 450, // the cash roaring up the shot
+    travelMs: 450, // each coin's trip up it
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam: src/floors/ionStormEvent: beams stab down all over, then the button
+  ionStormEvent: {
+    chance: 0.01,
+    aimMs: 120, // each aim line flickering before its beam
+    gapsMs: [220, 70] as [number, number], // between strikes, quickening
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/glitchEvent: the screen glitches, then reboots
+  glitchEvent: {
+    chance: 0.01,
+    gapsMs: [260, 70] as [number, number], // between glitches, quickening
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/magnifierEvent: a lens zooms in, cash bursts out
+  magnifierEvent: {
+    chance: 0.01,
+    glideMs: 250, // gliding to each stop
+    zoomMs: 300, // zooming in and out at a stop
+    holdMs: 350,
+    mergeMs: 500,
+  },
 
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total

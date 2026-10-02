@@ -85,7 +85,7 @@ import {
 import { startBoostEvent, type OnScreenFloors } from "../boostEvent";
 import { startUnionEvent } from "../unionEvent";
 import { startHuntEvent } from "../huntEvent";
-// registers the Swarm, Kickback, Payday, Piggy Bank, Coin Toss, Hourglass, Rocket, Reveal, Jackpot Reels, Chain Pay, Twister, Downpour, Trickle, Magnet, Spillover, Constellation, Ascend, Rising Tide, Tidal Wave, Beanstalk, Blessing, Halo, Comet, Meteor Shower, Mentor, Spark Chain, Polish, Lighthouse, Recruit, Promotion Day, Alchemy, Investment, Dividends, Wisp, Burst, Spray, Fountain, Ripple, Wrecking Ball, Piledriver, Orbital Strike, Fuse, Supernova, Bowling, Thunderclap, Chain Reaction, Bullseye, Popcorn, Newton's Cradle, Juggle, Boomerang, Heartbeat, Clash, Asteroids, Whack-a-Mole, Drumroll, Shell Game, Seesaw, Scratch, Tag, Bumpers, Catcher, Implosion, Atom, Spiral, Loop, Eternity, Helix, Yo-Yo, Racetrack, Swing, Kaleidoscope, Zipper, Screensaver, Sprinkler, Clockwork, Hole in One, Leapfrog, Lineup, Stampede, Wormhole, Splat, Roulette, Free Kick, Slalom, Lightning, Fire Hose, Confluence, Slosh, Siphon, Crossfire, Gravity Well, Splashdown, Geysers, Cash Cannon, Hoover, Air Show, Leak, Climb, Kite, Rainbow, Branches, Tug of War, Waterwheel, Braid, Skim, Lattice, Fireworks, Slingshot, Marquee, Crop Duster, Bolas, Countdown, Sparkler, Slinky, Pipeline, Prism, Trampoline, Hummingbird, Dive Bomb, Ski Jump, Jetpack, Bass Drop, Scanner, Laser Grid, Etch, Searchlights, Tractor Beam, Beam Clash, Slash, Jackhammer, Pummel, Overload, Gatling, Press, Drill, Burrow, Ping Pong, Slam Dunk, Uppercut, Head Hop, Paparazzi, Missile Barrage, Sonic Boom, Mitosis, Plinko, Hammer Throw, Snake, Breakout, Line Clear, Break Shot, Bullet Hell, Vortex, Ricochet, Waterfall, Conveyor, Fireflies, Stream, Trails, Draw, Night Sky, Pitcher, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
+// registers the Swarm, Kickback, Payday, Piggy Bank, Coin Toss, Hourglass, Rocket, Reveal, Jackpot Reels, Chain Pay, Twister, Downpour, Trickle, Magnet, Spillover, Constellation, Ascend, Rising Tide, Tidal Wave, Beanstalk, Blessing, Halo, Comet, Meteor Shower, Mentor, Spark Chain, Polish, Lighthouse, Recruit, Promotion Day, Alchemy, Investment, Dividends, Wisp, Burst, Spray, Fountain, Ripple, Wrecking Ball, Piledriver, Orbital Strike, Fuse, Supernova, Bowling, Thunderclap, Chain Reaction, Bullseye, Popcorn, Newton's Cradle, Juggle, Boomerang, Heartbeat, Clash, Asteroids, Whack-a-Mole, Drumroll, Shell Game, Seesaw, Scratch, Tag, Bumpers, Catcher, Implosion, Atom, Spiral, Loop, Eternity, Helix, Yo-Yo, Racetrack, Swing, Kaleidoscope, Zipper, Screensaver, Sprinkler, Clockwork, Hole in One, Leapfrog, Lineup, Stampede, Wormhole, Splat, Roulette, Free Kick, Slalom, Lightning, Fire Hose, Confluence, Slosh, Siphon, Crossfire, Gravity Well, Splashdown, Geysers, Cash Cannon, Hoover, Air Show, Leak, Climb, Kite, Rainbow, Branches, Tug of War, Waterwheel, Braid, Skim, Lattice, Fireworks, Slingshot, Marquee, Crop Duster, Bolas, Countdown, Sparkler, Slinky, Pipeline, Prism, Trampoline, Hummingbird, Dive Bomb, Ski Jump, Jetpack, Bass Drop, Scanner, Laser Grid, Etch, Searchlights, Tractor Beam, Beam Clash, Butterfly, Kelp, Pendulum Wave, Formation, Ouroboros, Bowstring, Superlaser, Ion Storm, Glitch, Magnifier, Slash, Jackhammer, Pummel, Overload, Gatling, Press, Drill, Burrow, Ping Pong, Slam Dunk, Uppercut, Head Hop, Paparazzi, Missile Barrage, Sonic Boom, Mitosis, Plinko, Hammer Throw, Snake, Breakout, Line Clear, Break Shot, Bullet Hell, Vortex, Ricochet, Waterfall, Conveyor, Fireflies, Stream, Trails, Draw, Night Sky, Pitcher, Glimmer, Renovate, Upgrade and Unlock procs in the shared event pool
 import "../swarmEvent";
 import "../kickbackEvent";
 import "../paydayEvent";
@@ -215,6 +215,16 @@ import "../etchEvent";
 import "../searchlightsEvent";
 import "../tractorBeamEvent";
 import "../beamClashEvent";
+import "../butterflyEvent";
+import "../kelpEvent";
+import "../pendulumWaveEvent";
+import "../formationEvent";
+import "../ouroborosEvent";
+import "../bowstringEvent";
+import "../superlaserEvent";
+import "../ionStormEvent";
+import "../glitchEvent";
+import "../magnifierEvent";
 import "../slashEvent";
 import "../jackhammerEvent";
 import "../pummelEvent";
