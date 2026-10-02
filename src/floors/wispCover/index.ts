@@ -29,6 +29,19 @@ import {
 } from "../../shared/totalIncomeCoins";
 import { ringTargets } from "../../shared/coinTargets";
 import type { Point } from "../../shared/wisp";
+import { setIncomePanelsHidden } from "../incomePanel";
+import { spotlightWorkers } from "../onScreenWorkers";
+import { clearWorkerSpotlight } from "../worker";
+import { triggerEventEndSlam } from "../../shared/eventEndSlam";
+import {
+  drawRewardBars,
+  drawRewardWorkers,
+  giveBarLevels,
+  giveBarTier,
+  giveWorkerTier,
+  type RewardBar,
+  type RewardWorker,
+} from "../eventRewards";
 
 const BURST_MS = 240;
 // a blast's look and its ring of coins
@@ -53,12 +66,24 @@ export interface WispCover {
   // a white burst of `scale` at `at`, drawn under the coins
   burst(at: Point, scale: number): void;
   // the finale: a huge blast and shake, a ring of coins out of `at` (the
-  // total flashing if it's there)
+  // total flashing if it's there); no coins when the event pays no cash
   blast(at: Point, coins?: number): void;
+  // non-cash rewards, each landing with a flash and a jolt (away from `from`)
+  levels(bar: RewardBar, levels: number, from?: Point): void;
+  tierUp(bar: RewardBar, from?: Point): void;
+  promote(worker: RewardWorker): void;
+  // the bar's jackpot slam, for a finale landing on it
+  slam(bar: RewardBar): void;
 }
 
 export interface WispCoverOptions {
+  // 0 pays no cash: then the cover ends without the total's finale
   rewardMultiplier: number;
+  // false: a cash event whose finale lands elsewhere (defaults to paying cash)
+  endOnTotal?: boolean;
+  // the income bars and workers it rewards, which it draws itself
+  bars?: RewardBar[];
+  workers?: RewardWorker[];
   // every frame, before drawing: fire the event's beats
   tick?: (ms: number, now: number) => void;
   // floor-local, under the coins and over them
@@ -74,20 +99,23 @@ interface Flash {
 }
 
 // registers a covering coin event `key` shown on its crit as `label`, armed
-// with the screen's floor-local area; returns its dev test hook, which arms a
-// crit on floor (tier by the crit odds) carrying it
+// with the screen's floor-local area (only when canArm, if given, agrees);
+// returns its dev test hook, which arms a crit on floor (tier by the crit
+// odds) carrying it
 export function registerWispEvent(
   key: string,
   label: string,
   chance: () => number,
   arm: (floor: Floor, context: EventProcContext, area: CoverArea) => void,
+  canArm?: (floor: Floor, context: EventProcContext) => boolean,
 ): (floor: Floor) => void {
   registerEventProc(
     {
       key,
       chance,
       isInProgress: () => isMoneyCoverRunning(key),
-      canArm: (_floor, context) => canStartMoneyCover(context),
+      canArm: (floor, context) =>
+        canStartMoneyCover(context) && (canArm?.(floor, context) ?? true),
       arm: (floor, context) => {
         const area = context.getScreenAreaLocal?.(floor);
         if (area) arm(floor, context, area);
@@ -106,14 +134,35 @@ export function startWispCover(
   floor: Floor,
   context: EventProcContext,
   timing: { durationMs: number; mergeMs: number },
-  { rewardMultiplier, tick, drawUnder, drawOver }: WispCoverOptions,
+  {
+    rewardMultiplier,
+    endOnTotal,
+    bars = [],
+    workers = [],
+    tick,
+    drawUnder,
+    drawOver,
+  }: WispCoverOptions,
 ): WispCover | null {
   const startedAt = performance.now();
   let total: Point | null = null;
   const bursts: Flash[] = [];
   const blasts: Flash[] = [];
+  const cash = rewardMultiplier > 0;
+  // lifted out of the frozen frame for the overlay to draw them
+  setIncomePanelsHidden(bars.map((bar) => bar.floor));
+  spotlightWorkers(workers.map((w) => w.worker));
+  const release = () => {
+    setIncomePanelsHidden([]);
+    clearWorkerSpotlight();
+  };
   const cover = startMoneyCover(key, floor, context, timing, {
     rewardMultiplier,
+    endOnTotal: endOnTotal ?? cash,
+    onEnd: () => {
+      for (const w of workers) giveWorkerTier(w);
+      release();
+    },
     drawExtra: (ctx, getFloorRect, totalTarget) => {
       const rect = getFloorRect(floor);
       if (!rect) return;
@@ -121,8 +170,10 @@ export function startWispCover(
       const now = performance.now();
       const ms = now - startedAt;
       tick?.(ms, now);
+      drawRewardWorkers(ctx, getFloorRect, workers, now);
       ctx.save();
       ctx.translate(rect.left, rect.top);
+      drawRewardBars(ctx, bars, now);
       for (let i = bursts.length - 1; i >= 0; i--) {
         const b = bursts[i];
         const t = (now - b.at) / BURST_MS;
@@ -156,21 +207,24 @@ export function startWispCover(
         }
       : undefined,
   });
-  if (!cover) return null;
+  if (!cover) {
+    release();
+    return null;
+  }
   return {
     cover,
     startedAt,
     total: () => total,
     isLive: cover.isLive,
     launchFrom: (from, targets) => {
-      if (cover.isLive()) cover.launchFrom(from, targets);
+      if (cash && cover.isLive()) cover.launchFrom(from, targets);
     },
     trace: (paths, travelMs) => {
-      if (cover.isLive()) cover.trace(paths, travelMs);
+      if (cash && cover.isLive()) cover.trace(paths, travelMs);
     },
     burst: (at, scale) =>
       bursts.push({ x: at.x, y: at.y, at: performance.now(), scale }),
-    blast: (at, coins = BLAST_COINS) => {
+    blast: (at, coins = cash ? BLAST_COINS : 0) => {
       blasts.push({ x: at.x, y: at.y, at: performance.now(), scale: 1 });
       if (!cover.isLive()) return;
       playSlamExplosion();
@@ -179,7 +233,19 @@ export function startWispCover(
         triggerHudTotalFlash();
         pulseHudTotalFlash();
       }
-      cover.launchFrom(at, ringTargets(at, coins, BLAST_RING));
+      if (coins > 0) cover.launchFrom(at, ringTargets(at, coins, BLAST_RING));
+    },
+    levels: (bar, levels, from) => {
+      if (cover.isLive()) giveBarLevels(context, bar, levels, from);
+    },
+    tierUp: (bar, from) => {
+      if (cover.isLive()) giveBarTier(bar, from);
+    },
+    promote: (worker) => {
+      if (cover.isLive()) giveWorkerTier(worker);
+    },
+    slam: (bar) => {
+      if (cover.isLive()) triggerEventEndSlam(bar.floor, "bar");
     },
   };
 }

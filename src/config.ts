@@ -1363,6 +1363,64 @@ export const CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
+  // beam, levels + worker tiers: src/floors/chainLightningEvent: lightning
+  // forks from bar to worker to bar
+  chainLightningEvent: {
+    chance: 0.01,
+    gapsMs: [300, 110] as [number, number], // between strikes, quickening
+    boltMs: 170, // each bolt crackling
+    finaleMs: 280, // the whole chain blazing at once
+    levelShare: 0.12, // of each bar's levels
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // beam, worker tiers: src/floors/lockOnEvent: an aim laser locks on and fires
+  lockOnEvent: {
+    chance: 0.01,
+    huntsMs: [420, 180] as [number, number], // hunting each target, quickening
+    fireMs: 120, // each shot
+    volleyMs: 260, // every beam blazing at once at the end
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // mix, cash + levels: src/floors/stitchEvent: a river of cash threads the bars
+  stitchEvent: {
+    chance: 0.01,
+    travelMs: 1_300, // the needle's run through every bar
+    streamMs: 700, // the river pouring after it
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // money, cash + levels + tier: src/floors/stockpileEvent: cash heaps on bars
+  stockpileEvent: {
+    chance: 0.01,
+    rainMs: 800, // the cash raining down onto the bars
+    soakMs: 160, // each heap sinking into its bar
+    gapMs: 140, // between heaps sinking
+    eruptMs: 300, // the cash bursting back out of each bar
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, tier + levels: src/floors/spotWeldEvent: two beams weld a bar
+  spotWeldEvent: {
+    chance: 0.01,
+    aimMs: 240, // the aim lasers flickering
+    weldMs: 1_100, // the beams welding in from both ends
+    levelShare: 0.04, // of the bar's levels, per quarter welded
+    holdMs: 700,
+    mergeMs: 0,
+  },
+  // experiment, a surprise reward: src/floors/reelsEvent: the screen spins
+  // like three slot reels
+  reelsEvent: {
+    chance: 0.01,
+    stopsMs: [700, 1_000, 1_350], // each reel stopping
+    levelShare: 0.15, // of each bar's levels, when it pays levels
+    holdMs: 700,
+    mergeMs: 500,
+  },
 
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total

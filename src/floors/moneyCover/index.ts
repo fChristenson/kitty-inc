@@ -81,8 +81,11 @@ export interface MoneyCoverOptions {
   layout?: (area: CoverArea) => Point[];
   // the covered crit's tier, revealed at the end; defaults to the crit's own
   tier?: CritTier;
-  // on top of the floor's income times its floor number
+  // on top of the floor's income times its floor number; 0 pays no cash
   rewardMultiplier?: number;
+  // false: no spotlit total and no slam on it at the end, for events whose
+  // reward lands elsewhere (bars, workers)
+  endOnTotal?: boolean;
   // coins land face-on, so a drawn shape is fully covered
   settleFaceOn?: boolean;
   // the event's own drawing in the freeze overlay, under the coins;
@@ -187,6 +190,7 @@ export function startMoneyCover(
     layout,
     tier: coveredTier,
     rewardMultiplier = 1,
+    endOnTotal = true,
     settleFaceOn,
     drawExtra,
     drawOver,
@@ -206,7 +210,7 @@ export function startMoneyCover(
       drawOverlay(ctx, getFloorRect, totalTarget);
       drawOver?.(ctx, getFloorRect, totalTarget);
     },
-    { spotlightTotal: true, frameRipple, frameMotion },
+    { spotlightTotal: endOnTotal, frameRipple, frameMotion },
   );
 
   let flew = false;
@@ -235,17 +239,20 @@ export function startMoneyCover(
     running = null;
     onEnd?.();
     unfreezeScreen();
-    addTotalIncome(
-      multiply(
-        currentPayoutAmount(floor, Date.now()),
-        floorNumber * rewardMultiplier,
-      ),
-    );
-    triggerHudTotalFlash();
-    // the covered crit's own tier, revealed as the total jumps
-    triggerEventEndSlam(GLOBAL_SLAM, "total", () =>
-      context.applyTierCrit?.(floor, tier),
-    );
+    if (rewardMultiplier > 0)
+      addTotalIncome(
+        multiply(
+          currentPayoutAmount(floor, Date.now()),
+          floorNumber * rewardMultiplier,
+        ),
+      );
+    if (endOnTotal) {
+      triggerHudTotalFlash();
+      // the covered crit's own tier, revealed as the total jumps
+      triggerEventEndSlam(GLOBAL_SLAM, "total", () =>
+        context.applyTierCrit?.(floor, tier),
+      );
+    } else context.applyTierCrit?.(floor, tier);
     endEventProc(key);
   }, durationMs);
 

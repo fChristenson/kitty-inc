@@ -181,6 +181,12 @@ import {
   forceCookieCutterEvent,
   forceCinematicEvent,
   forceNegativeEvent,
+  forceChainLightningEvent,
+  forceLockOnEvent,
+  forceStitchEvent,
+  forceStockpileEvent,
+  forceSpotWeldEvent,
+  forceReelsEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1225,6 +1231,12 @@ async function main() {
       "cookie-cutter": forceOnActive(forceCookieCutterEvent),
       cinematic: forceOnActive(forceCinematicEvent),
       negative: forceOnActive(forceNegativeEvent),
+      "chain-lightning": forceOnActive(forceChainLightningEvent),
+      "lock-on": forceOnActive(forceLockOnEvent),
+      stitch: forceOnActive(forceStitchEvent),
+      stockpile: forceOnActive(forceStockpileEvent),
+      "spot-weld": forceOnActive(forceSpotWeldEvent),
+      reels: forceOnActive(forceReelsEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
