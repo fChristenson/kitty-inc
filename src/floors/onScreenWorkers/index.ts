@@ -95,9 +95,13 @@ export function drawStruckWorkers(
     drawWorkerSpotlight(c, w.floor, w.workerIndex, 0, 0);
     c.restore();
   };
-  drawFreezeDimmed(ctx, (layer) => {
-    for (const s of struck) if (s.struckAt === null) draw(layer, s.worker);
-  });
+  drawFreezeDimmed(
+    ctx,
+    (layer) => {
+      for (const s of struck) if (s.struckAt === null) draw(layer, s.worker);
+    },
+    [struck, struck.filter((s) => s.struckAt === null).length],
+  );
   for (const { worker, struckAt } of struck) {
     if (struckAt === null) continue;
     draw(ctx, worker);

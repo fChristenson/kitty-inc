@@ -96,4 +96,3 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 ### Wisp (upgrades)
 
 - [x] **Wrecking Ball**: the wisp drops like a heavy ball from above the screen onto the clicked floor's income bar and bounces on it, each bounce lower as it drifts across until it rests on it; then it charges up, trembling and swelling, leaps high and slams down onto the bar, vanishing in a huge blast and shake. Every touch lands free upgrade levels, with a flash, sparks, shake and bar jolt as strong as its impact, so the last little bounces are minor.
-- [ ] **Jump Rope**: two wisps hold a glowing thread between them and twirl it like a jump rope as they walk it across the floor; each worker it reaches jumps over it and climbs one perma tier.

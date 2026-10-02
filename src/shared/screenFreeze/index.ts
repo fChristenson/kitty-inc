@@ -66,6 +66,7 @@ export function freezeScreen(
 ): void {
   frozen = true;
   frozenAt = performance.now();
+  dimKey = null;
   overlay = drawOverlay;
   totalSpotlit = spotlightTotal;
   motion = frameMotion ?? null;
@@ -112,13 +113,23 @@ export function getScreenFreezeDim(): number {
 }
 
 let dimLayer: HTMLCanvasElement | null = null;
+// what the dim layer last held: its key, wash and the transform it was drawn in
+let dimKey: readonly unknown[] | null = null;
+let dimAlpha = 0;
+let dimDrawnIn: DOMMatrix | null = null;
+
+const sameKey = (a: readonly unknown[], b: readonly unknown[]) =>
+  a.length === b.length && a.every((value, i) => value === b[i]);
 
 // whatever draw() lays down (in ctx's current transform), washed as dark as
 // the frozen frame, all in one pass: a brightness filter per item stalls the
-// frame badly while many items are still dim
+// frame badly while many items are still dim. Pass a key that changes
+// whenever draw() would draw something different, and the dimmed layer is
+// reused (shaken along with the frame) instead of redrawn every frame
 export function drawFreezeDimmed(
   ctx: CanvasRenderingContext2D,
   draw: (layer: CanvasRenderingContext2D) => void,
+  key?: readonly unknown[],
 ): void {
   const dim = getScreenFreezeDim();
   if (dim <= 0) {
@@ -127,26 +138,42 @@ export function drawFreezeDimmed(
   }
   const { width, height } = ctx.canvas;
   dimLayer ??= document.createElement("canvas");
-  if (dimLayer.width !== width || dimLayer.height !== height) {
-    dimLayer.width = width;
-    dimLayer.height = height;
+  const transform = ctx.getTransform();
+  const reuse =
+    key !== undefined &&
+    dimKey !== null &&
+    sameKey(key, dimKey) &&
+    dim === dimAlpha &&
+    dimDrawnIn !== null &&
+    dimLayer.width === width &&
+    dimLayer.height === height;
+  if (!reuse) {
+    if (dimLayer.width !== width || dimLayer.height !== height) {
+      dimLayer.width = width;
+      dimLayer.height = height;
+    }
+    const layer = dimLayer.getContext("2d")!;
+    layer.setTransform(1, 0, 0, 1, 0, 0);
+    layer.clearRect(0, 0, width, height);
+    layer.setTransform(transform);
+    layer.save();
+    draw(layer);
+    layer.restore();
+    layer.setTransform(1, 0, 0, 1, 0, 0);
+    layer.globalCompositeOperation = "source-atop";
+    layer.globalAlpha = dim;
+    layer.fillStyle = "#000";
+    layer.fillRect(0, 0, width, height);
+    layer.globalCompositeOperation = "source-over";
+    layer.globalAlpha = 1;
+    dimKey = key ?? null;
+    dimAlpha = dim;
+    dimDrawnIn = transform;
   }
-  const layer = dimLayer.getContext("2d")!;
-  layer.setTransform(1, 0, 0, 1, 0, 0);
-  layer.clearRect(0, 0, width, height);
-  layer.setTransform(ctx.getTransform());
-  layer.save();
-  draw(layer);
-  layer.restore();
-  layer.setTransform(1, 0, 0, 1, 0, 0);
-  layer.globalCompositeOperation = "source-atop";
-  layer.globalAlpha = dim;
-  layer.fillStyle = "#000";
-  layer.fillRect(0, 0, width, height);
-  layer.globalCompositeOperation = "source-over";
-  layer.globalAlpha = 1;
   ctx.save();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  // laid down in the transform it was drawn in, moved by any change since
+  if (reuse) ctx.setTransform(transform.multiply(dimDrawnIn!.inverse()));
+  else ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.drawImage(dimLayer, 0, 0);
   ctx.restore();
 }

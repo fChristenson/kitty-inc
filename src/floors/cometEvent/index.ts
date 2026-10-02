@@ -217,7 +217,7 @@ function drawOverlay(
       c.restore();
     }
   };
-  if (comet.hitAt === null) drawFreezeDimmed(ctx, drawCaught);
+  if (comet.hitAt === null) drawFreezeDimmed(ctx, drawCaught, [comet]);
   else drawCaught(ctx);
   for (const { floor, center } of comet.caught) {
     const rect = getFloorRect(floor);

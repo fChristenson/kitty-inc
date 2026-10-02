@@ -324,6 +324,26 @@ export function createEventFx(
   };
 }
 
+// a white glow fading out to its edge, stamped instead of a gradient per burst
+const FLASH_SPRITE_HALF = 64;
+let flashCanvas: HTMLCanvasElement | null = null;
+
+function flashSprite(): HTMLCanvasElement {
+  if (flashCanvas) return flashCanvas;
+  flashCanvas = document.createElement("canvas");
+  flashCanvas.width = flashCanvas.height = FLASH_SPRITE_HALF * 2;
+  const ctx = flashCanvas.getContext("2d")!;
+  ctx.fillStyle = radialFade(
+    ctx,
+    FLASH_SPRITE_HALF,
+    FLASH_SPRITE_HALF,
+    FLASH_SPRITE_HALF,
+    COLOR.white,
+  );
+  ctx.fillRect(0, 0, FLASH_SPRITE_HALF * 2, FLASH_SPRITE_HALF * 2);
+  return flashCanvas;
+}
+
 // a white flash and shockwave ring bursting out of (x, y), t 0..1 through it;
 // the stream's climax, and scaled down for smaller impacts
 export function drawWhiteBurst(
@@ -338,8 +358,7 @@ export function drawWhiteBurst(
   const radius = (60 + 440 * t) * scale;
   ctx.globalCompositeOperation = "lighter";
   ctx.globalAlpha = Math.sin(Math.PI * t) * 0.95;
-  ctx.fillStyle = radialFade(ctx, x, y, radius, COLOR.white);
-  ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+  ctx.drawImage(flashSprite(), x - radius, y - radius, radius * 2, radius * 2);
   const ring = (30 + 520 * (1 - (1 - t) ** 3)) * scale;
   ctx.globalAlpha = 1 - t;
   ctx.strokeStyle = COLOR.white;

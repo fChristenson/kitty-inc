@@ -28,7 +28,7 @@ import { loadSprite } from "../../loadAssets";
 import { spawnCoinBurst } from "../coins";
 import { playAutoBoost } from "../../sound";
 import { getScreenUnfrozenAt } from "../../shared/screenFreeze";
-import { whitenImage } from "../../shared/mergeFlash";
+import { washImage } from "../../shared/mergeFlash";
 import {
   drawSlamTarget,
   getSlamPose,
@@ -678,13 +678,14 @@ export function clearWorkerSpotlight(): void {
 }
 
 // draws the spotlighted walker frozen in its last drawn pose, tilted by
-// rotation around its feet, and washed whiteAlpha white
+// rotation around its feet, and washed whiteAlpha white, then dimAlpha dark
 export function drawWorkerSpotlight(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
   workerIndex: number,
   whiteAlpha: number,
   rotation: number,
+  dimAlpha = 0,
 ): void {
   const walker = floorWorkers.get(floor)?.walkers[workerIndex];
   const pose = walker?.pose;
@@ -715,6 +716,7 @@ export function drawWorkerSpotlight(
       pose.stretchY,
       sprite,
       whiteAlpha,
+      dimAlpha,
     );
     ctx.restore();
   }
@@ -976,12 +978,19 @@ function drawFigure(
   stretchY: number,
   sprite: HTMLImageElement | null,
   whiteAlpha = 0,
+  dimAlpha = 0,
 ): void {
   const recolored = getRecoloredFrame(frame, tintIndex, sprite);
   if (!recolored || !sprite) return;
   const image =
-    whiteAlpha > 0
-      ? whitenImage(recolored, recolored.width, recolored.height, whiteAlpha)
+    whiteAlpha > 0 || dimAlpha > 0
+      ? washImage(
+          recolored,
+          recolored.width,
+          recolored.height,
+          whiteAlpha,
+          dimAlpha,
+        )
       : recolored;
   const renderH = renderHeightOf(sprite);
   const renderW = (renderH * recolored.width) / recolored.height;

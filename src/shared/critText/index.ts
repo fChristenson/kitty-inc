@@ -59,6 +59,41 @@ export function drawCritText(
 const POP_MS = 300;
 const POP_SCALE = 0.4;
 
+// stroked text is slow to raster, so a reward label is drawn once per look
+// and canvas scale into a sprite, at its popped-in size, then stamped
+const MAX_TEXT_SPRITES = 64;
+const textSprites = new Map<
+  string,
+  { canvas: HTMLCanvasElement; width: number; height: number }
+>();
+
+function critTextSprite(
+  label: string,
+  color: string,
+  style: CritTextStyle,
+  scale: number,
+): { canvas: HTMLCanvasElement; width: number; height: number } | null {
+  const font = critFont(style.fontSize);
+  // never bake in the fallback font while Fredoka is still loading
+  if (!document.fonts.check(font)) return null;
+  const key = `${label}|${color}|${style.fontSize}|${style.strokeWidth}|${scale}`;
+  let sprite = textSprites.get(key);
+  if (sprite) return sprite;
+  if (textSprites.size >= MAX_TEXT_SPRITES) textSprites.clear();
+  const canvas = document.createElement("canvas");
+  const c = canvas.getContext("2d")!;
+  c.font = font;
+  const width = c.measureText(label).width + style.strokeWidth * 2 + 8;
+  const height = style.fontSize * 1.4 + style.strokeWidth * 2;
+  canvas.width = Math.ceil(width * scale);
+  canvas.height = Math.ceil(height * scale);
+  c.scale(scale, scale);
+  drawCritText(c, label, width / 2, height / 2, color, style);
+  sprite = { canvas, width, height };
+  textSprites.set(key, sprite);
+  return sprite;
+}
+
 // an event's reward label landing at (x, y): it pops in big at poppedAt
 // (performance.now()) and settles
 export function drawPoppingCritText(
@@ -72,6 +107,16 @@ export function drawPoppingCritText(
   style: CritTextStyle,
 ): void {
   const pop = 1 + POP_SCALE * Math.max(0, 1 - (now - poppedAt) / POP_MS);
+  const { a, b } = ctx.getTransform();
+  // canvas px per unit at its biggest, in quarter steps
+  const scale = Math.ceil(Math.hypot(a, b) * (1 + POP_SCALE) * 4) / 4;
+  const sprite = critTextSprite(label, color, style, scale);
+  if (sprite) {
+    const w = sprite.width * pop;
+    const h = sprite.height * pop;
+    ctx.drawImage(sprite.canvas, x - w / 2, y - h / 2, w, h);
+    return;
+  }
   ctx.save();
   ctx.translate(x, y);
   ctx.scale(pop, pop);

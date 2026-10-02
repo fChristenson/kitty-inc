@@ -177,10 +177,14 @@ function drawOverlay(
   ctx.save();
   ctx.translate(rect.left, rect.top);
 
-  drawFreezeDimmed(ctx, (layer) => {
-    for (const pin of bowl.pins)
-      if (pin.hitAt === null) drawPin(layer, pin, now);
-  });
+  drawFreezeDimmed(
+    ctx,
+    (layer) => {
+      for (const pin of bowl.pins)
+        if (pin.hitAt === null) drawPin(layer, pin, now);
+    },
+    [bowl, bowl.pins.filter((pin) => pin.hitAt === null).length],
+  );
   for (const pin of bowl.pins) {
     if (pin.hitAt === null) continue;
     drawPin(ctx, pin, now);

@@ -185,11 +185,15 @@ function drawLight(
 
 // a leg's promotable workers: dimmed like the frozen frame until lit
 function drawCandidates(ctx: CanvasRenderingContext2D, leg: Leg): void {
-  drawFreezeDimmed(ctx, (layer) => {
-    for (const index of leg.candidates)
-      if (!leg.lit.has(index))
-        drawWorkerSpotlight(layer, leg.floor, index, 0, 0);
-  });
+  drawFreezeDimmed(
+    ctx,
+    (layer) => {
+      for (const index of leg.candidates)
+        if (!leg.lit.has(index))
+          drawWorkerSpotlight(layer, leg.floor, index, 0, 0);
+    },
+    [leg, leg.lit.size],
+  );
   for (const index of leg.candidates)
     if (leg.lit.has(index)) drawWorkerSpotlight(ctx, leg.floor, index, 0, 0);
 }

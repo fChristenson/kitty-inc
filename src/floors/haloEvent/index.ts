@@ -207,11 +207,14 @@ function drawOverlay(
   ctx.translate(rect.left, rect.top);
   for (let i = 0; i < LIGHTS; i++)
     if (!isFront(i)) drawLight(ctx, i, ms, now, center.x, center.y, crowned);
-  ctx.save();
-  if (event.crownedAt === null)
-    ctx.filter = `brightness(${1 - getScreenFreezeDim()})`;
-  drawWorkerSpotlight(ctx, floor, workerIndex, 0, 0);
-  ctx.restore();
+  drawWorkerSpotlight(
+    ctx,
+    floor,
+    workerIndex,
+    0,
+    0,
+    event.crownedAt === null ? getScreenFreezeDim() : 0,
+  );
 
   // the halo ring itself glows in once the lights have settled
   const haloX = center.x;

@@ -156,11 +156,8 @@ function drawOverlay(
         now,
         COLOR.potionGreen,
       );
-    ctx.save();
     const dim = getScreenFreezeDim() * (1 - shot);
-    if (dim > 0) ctx.filter = `brightness(${1 - dim})`;
-    drawWorkerSpotlight(ctx, event.floor, event.workerIndex, 0, 0);
-    ctx.restore();
+    drawWorkerSpotlight(ctx, event.floor, event.workerIndex, 0, 0, dim);
     if (event.promotedAt !== null)
       drawWhiteBurst(
         ctx,

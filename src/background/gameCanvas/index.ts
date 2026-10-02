@@ -487,6 +487,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     image: HTMLCanvasElement;
     viewportTop: number;
     scale: number;
+    lastDim: number;
+    dimmed: { image: HTMLCanvasElement; alpha: number } | null;
   } | null = null;
 
   function redraw(): void {
@@ -516,46 +518,95 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       image.width = canvas.width;
       image.height = canvas.height;
       image.getContext("2d")!.drawImage(canvas, 0, 0);
-      frozenFrame = { image, viewportTop: viewportTopY(), scale };
+      frozenFrame = {
+        image,
+        viewportTop: viewportTopY(),
+        scale,
+        lastDim: -1,
+        dimmed: null,
+      };
     }
     // impacts during a freeze still rattle the frozen frame and its overlay
     const shake = getScreenShakeOffset(Date.now());
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     const motion = getScreenFreezeMotion();
-    const frameW = canvas.width * motion.scaleX;
-    const frameH = canvas.height * motion.scaleY;
-    if (motion.blur > 0) ctx.filter = `blur(${motion.blur * dpr}px)`;
-    const box = {
-      x:
-        shake.x * dpr + motion.pan * canvas.width - (frameW - canvas.width) / 2,
-      y: shake.y * dpr - (frameH - canvas.height) / 2,
-      w: frameW,
-      h: frameH,
-    };
-    ctx.drawImage(frozenFrame.image, box.x, box.y, box.w, box.h);
     const ripple = getScreenFreezeRipple(getFloorRect);
-    if (ripple) {
-      // world space to the canvas's own px, like the overlay below
-      const s = frozenFrame.scale * dpr;
-      drawRippleWarp(
-        ctx,
-        frozenFrame.image,
-        box,
-        shake.x * dpr + ripple.center.x * s,
-        shake.y * dpr + (ripple.center.y - frozenFrame.viewportTop) * s,
-        ripple.bands.map(([from, to]) => [from * s, to * s]),
-        (r) => ripple.offset(r / s) * s,
-      );
+    const dim = getScreenFreezeDim();
+    const still =
+      !ripple &&
+      motion.pan === 0 &&
+      motion.scaleX === 1 &&
+      motion.scaleY === 1 &&
+      motion.blur === 0;
+    // once the wash has settled, one pass of a pre-dimmed copy replaces
+    // clearing, drawing the frame and washing it every frame
+    if (still && dim > 0 && dim === frozenFrame.lastDim) {
+      if (frozenFrame.dimmed?.alpha !== dim) {
+        const dimmed = document.createElement("canvas");
+        dimmed.width = canvas.width;
+        dimmed.height = canvas.height;
+        const dctx = dimmed.getContext("2d")!;
+        dctx.drawImage(frozenFrame.image, 0, 0);
+        dctx.globalAlpha = dim;
+        dctx.fillStyle = COLOR.black;
+        dctx.fillRect(0, 0, canvas.width, canvas.height);
+        frozenFrame.dimmed = { image: dimmed, alpha: dim };
+      }
+      const x = Math.round(shake.x * dpr);
+      const y = Math.round(shake.y * dpr);
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalCompositeOperation = "copy";
+      ctx.drawImage(frozenFrame.dimmed.image, x, y);
+      ctx.globalCompositeOperation = "source-over";
+      // the strips a rattle uncovers, washed like the rest
+      if (x !== 0 || y !== 0) {
+        ctx.globalAlpha = dim;
+        ctx.fillStyle = COLOR.black;
+        if (x > 0) ctx.fillRect(0, 0, x, canvas.height);
+        if (x < 0) ctx.fillRect(canvas.width + x, 0, -x, canvas.height);
+        if (y > 0) ctx.fillRect(0, 0, canvas.width, y);
+        if (y < 0) ctx.fillRect(0, canvas.height + y, canvas.width, -y);
+      }
+      ctx.restore();
+    } else {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const frameW = canvas.width * motion.scaleX;
+      const frameH = canvas.height * motion.scaleY;
+      if (motion.blur > 0) ctx.filter = `blur(${motion.blur * dpr}px)`;
+      const box = {
+        x:
+          shake.x * dpr +
+          motion.pan * canvas.width -
+          (frameW - canvas.width) / 2,
+        y: shake.y * dpr - (frameH - canvas.height) / 2,
+        w: frameW,
+        h: frameH,
+      };
+      ctx.drawImage(frozenFrame.image, box.x, box.y, box.w, box.h);
+      if (ripple) {
+        // world space to the canvas's own px, like the overlay below
+        const s = frozenFrame.scale * dpr;
+        drawRippleWarp(
+          ctx,
+          frozenFrame.image,
+          box,
+          shake.x * dpr + ripple.center.x * s,
+          shake.y * dpr + (ripple.center.y - frozenFrame.viewportTop) * s,
+          ripple.bands.map(([from, to]) => [from * s, to * s]),
+          (r) => ripple.offset(r / s) * s,
+        );
+      }
+      ctx.restore();
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.globalAlpha = dim;
+      ctx.fillStyle = COLOR.black;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
     }
-    ctx.restore();
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.globalAlpha = getScreenFreezeDim();
-    ctx.fillStyle = COLOR.black;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.restore();
+    frozenFrame.lastDim = dim;
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.translate(shake.x, shake.y);

@@ -129,11 +129,8 @@ function drawOverlay(
         COLOR.heavenlyGold,
       );
     // the worker brightens out of the dimmed frame as the lights land
-    ctx.save();
     const dim = getScreenFreezeDim() * (1 - lift);
-    if (dim > 0) ctx.filter = `brightness(${1 - dim})`;
-    drawWorkerSpotlight(ctx, floor, workerIndex, 0, 0);
-    ctx.restore();
+    drawWorkerSpotlight(ctx, floor, workerIndex, 0, 0, dim);
     if (event.promotedAt !== null)
       drawWhiteBurst(
         ctx,

@@ -262,10 +262,13 @@ function drawOverlay(
     drawWorkerSpotlight(c, stop.floor, stop.worker.workerIndex, 0, 0);
     c.restore();
   };
-  drawFreezeDimmed(ctx, (layer) =>
-    spark.stops.forEach((stop, i) => {
-      if (!spark.struck.has(i)) drawStopWorker(layer, stop);
-    }),
+  drawFreezeDimmed(
+    ctx,
+    (layer) =>
+      spark.stops.forEach((stop, i) => {
+        if (!spark.struck.has(i)) drawStopWorker(layer, stop);
+      }),
+    [spark, spark.struck.size],
   );
   spark.stops.forEach((stop, i) => {
     if (spark.struck.has(i)) drawStopWorker(ctx, stop);

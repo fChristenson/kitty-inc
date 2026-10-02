@@ -120,8 +120,7 @@ function drawOverlay(
     if (!rect) continue;
     ctx.save();
     ctx.translate(rect.left, rect.top);
-    if (dim > 0) ctx.filter = `brightness(${1 - dim})`;
-    drawWorkerSpotlight(ctx, worker.floor, worker.workerIndex, 0, 0);
+    drawWorkerSpotlight(ctx, worker.floor, worker.workerIndex, 0, 0, dim);
     ctx.restore();
   }
 

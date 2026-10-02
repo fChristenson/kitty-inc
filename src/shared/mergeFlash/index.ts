@@ -15,28 +15,45 @@ export function mergeFlashWhite(envelope: number, now: number): number {
   return envelope * WHITE_PEAK * (PULSE_FLOOR + (1 - PULSE_FLOOR) * wave);
 }
 
-// one reused scratch canvas: the image washed toward white inside its own
-// silhouette only ('source-atop' keeps the transparent padding untouched)
-let whiteScratch: HTMLCanvasElement | null = null;
+// one reused scratch canvas: the image washed toward white, then toward black
+// (like a brightness filter, without its costly offscreen pass), inside its
+// own silhouette only ('source-atop' keeps the transparent padding untouched)
+let washScratch: HTMLCanvasElement | null = null;
+export function washImage(
+  source: CanvasImageSource,
+  width: number,
+  height: number,
+  white: number,
+  dark: number,
+): HTMLCanvasElement {
+  washScratch ??= document.createElement("canvas");
+  if (washScratch.width !== width) washScratch.width = width;
+  if (washScratch.height !== height) washScratch.height = height;
+  const ctx = washScratch.getContext("2d")!;
+  ctx.clearRect(0, 0, width, height);
+  ctx.drawImage(source, 0, 0, width, height);
+  ctx.globalCompositeOperation = "source-atop";
+  for (const [alpha, color] of [
+    [white, "#FFFFFF"],
+    [dark, "#000000"],
+  ] as const) {
+    if (alpha <= 0) continue;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, width, height);
+  }
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = "source-over";
+  return washScratch;
+}
+
 export function whitenImage(
   source: CanvasImageSource,
   width: number,
   height: number,
   alpha: number,
 ): HTMLCanvasElement {
-  whiteScratch ??= document.createElement("canvas");
-  if (whiteScratch.width !== width) whiteScratch.width = width;
-  if (whiteScratch.height !== height) whiteScratch.height = height;
-  const ctx = whiteScratch.getContext("2d")!;
-  ctx.clearRect(0, 0, width, height);
-  ctx.drawImage(source, 0, 0, width, height);
-  ctx.globalCompositeOperation = "source-atop";
-  ctx.globalAlpha = alpha;
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(0, 0, width, height);
-  ctx.globalAlpha = 1;
-  ctx.globalCompositeOperation = "source-over";
-  return whiteScratch;
+  return washImage(source, width, height, alpha, 0);
 }
 
 // "absorb" size bump when coins land in a target: one swell-and-settle per

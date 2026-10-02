@@ -148,10 +148,14 @@ function drawOverlay(
     drawWorkerSpotlight(c, star.worker.floor, star.worker.workerIndex, 0, 0);
     c.restore();
   };
-  drawFreezeDimmed(ctx, (layer) => {
-    for (const star of event.stars)
-      if (star.flaredAt === null) drawStar(layer, star);
-  });
+  drawFreezeDimmed(
+    ctx,
+    (layer) => {
+      for (const star of event.stars)
+        if (star.flaredAt === null) drawStar(layer, star);
+    },
+    [event, event.stars.filter((star) => star.flaredAt === null).length],
+  );
   for (const star of event.stars)
     if (star.flaredAt !== null) drawStar(ctx, star);
   const points = event.stars.map((star) => starPoint(star, getFloorRect));

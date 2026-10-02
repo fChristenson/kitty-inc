@@ -185,11 +185,14 @@ function drawOverlay(
     drawWorkerSpotlight(c, worker.floor, worker.workerIndex, 0, 0);
     c.restore();
   };
-  drawFreezeDimmed(ctx, (layer) =>
-    hop.heads.forEach((head, i) => {
-      if (head.hitAt === null)
-        drawHead(layer, head, i === hop.heads.length - 1);
-    }),
+  drawFreezeDimmed(
+    ctx,
+    (layer) =>
+      hop.heads.forEach((head, i) => {
+        if (head.hitAt === null)
+          drawHead(layer, head, i === hop.heads.length - 1);
+      }),
+    [hop, hop.heads.filter((head) => head.hitAt === null).length],
   );
   hop.heads.forEach((head, i) => {
     if (head.hitAt === null) return;

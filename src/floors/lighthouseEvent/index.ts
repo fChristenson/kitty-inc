@@ -233,10 +233,14 @@ function drawOverlay(
       );
     c.restore();
   };
-  drawFreezeDimmed(ctx, (layer) => {
-    for (const part of event.parts)
-      if (part.shinedAt === null) drawAt(layer, part);
-  });
+  drawFreezeDimmed(
+    ctx,
+    (layer) => {
+      for (const part of event.parts)
+        if (part.shinedAt === null) drawAt(layer, part);
+    },
+    [event, event.parts.filter((part) => part.shinedAt === null).length],
+  );
   for (const part of event.parts) if (part.shinedAt !== null) drawAt(ctx, part);
 
   ctx.save();

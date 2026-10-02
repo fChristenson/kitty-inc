@@ -4,7 +4,7 @@
 // that sends one flitting about, with the playful swoop it flies along
 import { COLOR } from "../../palette";
 import { radialFade } from "../goldShimmer";
-import { drawTwinkle, hash01 } from "../twinkle";
+import { hash01, paintTwinkleAt, stampTwinkle } from "../twinkle";
 
 export type Point = { x: number; y: number };
 
@@ -22,7 +22,7 @@ const HUDDLE = 10;
 const HUDDLE_REACH = 0.5;
 // the trail: a sparkle shed every TAIL_MS living TAIL_LIFE_MS, scattering out
 // to SPREAD of the wisp's size and sinking SINK of it by the end
-const TAIL_MS = 3;
+const TAIL_MS = 4;
 const TAIL_LIFE_MS = 1_200;
 // how long a wisp's trail lingers after it's gone
 export const WISP_TRAIL_MS = TAIL_LIFE_MS;
@@ -43,43 +43,250 @@ const SPARKLE_COLORS = [
   COLOR.wispGlitter,
 ] as const;
 
-// a soft glowing dot with a tiny white-hot middle; rendered once per color
-const SPRITE_HALF = 32;
-const sprites = new Map<string, HTMLCanvasElement>();
+// every sparkle the wisp stamps, all on one canvas so the GPU can draw a
+// whole trail from one texture: per color a soft glowing dot with a tiny
+// white-hot middle, and its twinkle at a few sizes and turns
+const ATLAS_COLORS = [COLOR.white, COLOR.wispGlitter, COLOR.heavenlyGold];
+const SPARKLE_COLOR_INDEX = SPARKLE_COLORS.map((c) => ATLAS_COLORS.indexOf(c));
+const GLOW_HALF = 32;
+const GLINT_HALVES = [8, 16, 32, 64];
+// a twinkle looks the same turned a quarter turn; trail sparkles never spin,
+// so a few turns are plenty
+const GLINT_TURNS = 8;
+const QUARTER = Math.PI / 2;
+// kept clear round each cell so neighbours never bleed in when scaled
+const PAD = 2;
+// atlas px to spare per world unit, for canvases scaled up a little
+const GLINT_SHARPNESS = 1.25;
 
-function glowSprite(color: string): HTMLCanvasElement {
-  let canvas = sprites.get(color);
-  if (canvas) return canvas;
-  canvas = document.createElement("canvas");
-  canvas.width = canvas.height = SPRITE_HALF * 2;
+interface Cell {
+  x: number;
+  y: number;
+  half: number;
+}
+
+let atlas: HTMLCanvasElement | null = null;
+const glowCells: Cell[] = [];
+// [color][size][turn]
+const glintCells: Cell[][][] = [];
+
+function buildAtlas(): HTMLCanvasElement {
+  const rowWidth =
+    GLINT_TURNS * (GLINT_HALVES[GLINT_HALVES.length - 1] * 2 + PAD * 2);
+  const blockHeight =
+    GLOW_HALF * 2 +
+    PAD * 2 +
+    GLINT_HALVES.reduce((sum, half) => sum + half * 2 + PAD * 2, 0);
+  const canvas = document.createElement("canvas");
+  canvas.width = rowWidth;
+  canvas.height = blockHeight * ATLAS_COLORS.length;
   const ctx = canvas.getContext("2d")!;
-  const glow = ctx.createRadialGradient(
-    SPRITE_HALF,
-    SPRITE_HALF,
-    0,
-    SPRITE_HALF,
-    SPRITE_HALF,
-    SPRITE_HALF,
-  );
-  glow.addColorStop(0, COLOR.white);
-  glow.addColorStop(0.15, COLOR.white);
-  glow.addColorStop(0.3, `${color}AA`);
-  glow.addColorStop(0.6, `${color}22`);
-  glow.addColorStop(1, `${color}00`);
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, SPRITE_HALF * 2, SPRITE_HALF * 2);
-  sprites.set(color, canvas);
+  ATLAS_COLORS.forEach((color, c) => {
+    let top = c * blockHeight;
+    const glow: Cell = {
+      x: PAD + GLOW_HALF,
+      y: top + PAD + GLOW_HALF,
+      half: GLOW_HALF,
+    };
+    const g = ctx.createRadialGradient(
+      glow.x,
+      glow.y,
+      0,
+      glow.x,
+      glow.y,
+      GLOW_HALF,
+    );
+    g.addColorStop(0, COLOR.white);
+    g.addColorStop(0.15, COLOR.white);
+    g.addColorStop(0.3, `${color}AA`);
+    g.addColorStop(0.6, `${color}22`);
+    g.addColorStop(1, `${color}00`);
+    ctx.fillStyle = g;
+    ctx.fillRect(
+      glow.x - GLOW_HALF,
+      glow.y - GLOW_HALF,
+      GLOW_HALF * 2,
+      GLOW_HALF * 2,
+    );
+    glowCells[c] = glow;
+    top += GLOW_HALF * 2 + PAD * 2;
+    glintCells[c] = GLINT_HALVES.map((half) => {
+      const row = Array.from({ length: GLINT_TURNS }, (_, step) => {
+        const cell: Cell = {
+          x: step * (half * 2 + PAD * 2) + PAD + half,
+          y: top + PAD + half,
+          half,
+        };
+        paintTwinkleAt(
+          ctx,
+          cell.x,
+          cell.y,
+          half,
+          (step / GLINT_TURNS) * QUARTER,
+          color,
+        );
+        return cell;
+      });
+      top += half * 2 + PAD * 2;
+      return row;
+    });
+  });
   return canvas;
 }
 
+function stampCell(
+  ctx: CanvasRenderingContext2D,
+  cell: Cell,
+  x: number,
+  y: number,
+  r: number,
+): void {
+  ctx.drawImage(
+    atlas!,
+    cell.x - cell.half,
+    cell.y - cell.half,
+    cell.half * 2,
+    cell.half * 2,
+    x - r,
+    y - r,
+    r * 2,
+    r * 2,
+  );
+}
+
+// colorIndex into ATLAS_COLORS
 function drawGlow(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
   r: number,
-  color: string,
+  colorIndex: number,
 ): void {
-  ctx.drawImage(glowSprite(color), x - r, y - r, r * 2, r * 2);
+  atlas ??= buildAtlas();
+  stampCell(ctx, glowCells[colorIndex], x, y, r);
+}
+
+function drawGlint(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  turn: number,
+  colorIndex: number,
+): void {
+  atlas ??= buildAtlas();
+  const need = size * GLINT_SHARPNESS;
+  let level = 0;
+  while (level < GLINT_HALVES.length && GLINT_HALVES[level] < need) level++;
+  if (level === GLINT_HALVES.length) {
+    stampTwinkle(ctx, x, y, size, turn, ATLAS_COLORS[colorIndex]);
+    return;
+  }
+  const quarterTurn = ((turn % QUARTER) + QUARTER) % QUARTER;
+  const step = Math.round((quarterTurn / QUARTER) * GLINT_TURNS) % GLINT_TURNS;
+  stampCell(ctx, glintCells[colorIndex][level][step], x, y, size);
+}
+
+// the head's soft gold halo, fading out to its edge
+const HALO_SPRITE_HALF = 64;
+let haloCanvas: HTMLCanvasElement | null = null;
+
+function haloSprite(): HTMLCanvasElement {
+  if (haloCanvas) return haloCanvas;
+  haloCanvas = document.createElement("canvas");
+  haloCanvas.width = haloCanvas.height = HALO_SPRITE_HALF * 2;
+  const ctx = haloCanvas.getContext("2d")!;
+  ctx.fillStyle = radialFade(
+    ctx,
+    HALO_SPRITE_HALF,
+    HALO_SPRITE_HALF,
+    HALO_SPRITE_HALF,
+    COLOR.heavenlyGold,
+  );
+  ctx.fillRect(0, 0, HALO_SPRITE_HALF * 2, HALO_SPRITE_HALF * 2);
+  return haloCanvas;
+}
+
+// a sparkle dimmer than this isn't worth a draw
+const MIN_ALPHA = 0.02;
+
+// every trail drawn in one frame shares this many sparkles: a lone wisp gets
+// its full trail, a swarm thins each one (keeping the same sparkles each frame)
+const TRAIL_BUDGET = 900;
+const FULL_TRAIL = TAIL_LIFE_MS / TAIL_MS;
+// a trail drawn this long after the last one starts a new frame
+const FRAME_GAP_MS = 4;
+let lastTrailAt = -Infinity;
+let trailsThisFrame = 0;
+let trailsLastFrame = 0;
+
+function trailStride(): number {
+  const t = performance.now();
+  if (t - lastTrailAt > FRAME_GAP_MS) {
+    trailsLastFrame = trailsThisFrame;
+    trailsThisFrame = 0;
+  }
+  lastTrailAt = t;
+  trailsThisFrame++;
+  const trails = Math.max(trailsThisFrame, trailsLastFrame);
+  return Math.max(1, Math.ceil((trails * FULL_TRAIL) / TRAIL_BUDGET));
+}
+
+// each trail sparkle's looks, hashed once per slot rather than every frame
+// (slots repeat every SLOTS sparkles, many seconds of trail apart)
+const SLOTS = 4096;
+const slotCos = new Float32Array(SLOTS);
+const slotSin = new Float32Array(SLOTS);
+const slotSpread = new Float32Array(SLOTS);
+const slotSize = new Float32Array(SLOTS);
+const slotRate = new Float32Array(SLOTS);
+const slotTurn = new Float32Array(SLOTS);
+const slotGlint = new Uint8Array(SLOTS);
+for (let i = 0; i < SLOTS; i++) {
+  const angle = hash01(i, 31) * Math.PI * 2;
+  slotCos[i] = Math.cos(angle);
+  slotSin[i] = Math.sin(angle);
+  slotSpread[i] = Math.abs(hash01(i, 32) + hash01(i, 33) - 1);
+  slotSize[i] = SPARKLE[0] + (SPARKLE[1] - SPARKLE[0]) * hash01(i, 34) ** 2;
+  slotRate[i] = sparkleRate(i);
+  slotTurn[i] = hash01(i, 73);
+  slotGlint[i] = hash01(i, 72) < GLINTS ? 1 : 0;
+}
+
+// radians of flicker per ms
+function sparkleRate(seed: number): number {
+  return (
+    (Math.PI * 2) /
+    (TWINKLE_MS[0] + (TWINKLE_MS[1] - TWINKLE_MS[0]) * hash01(seed, 71))
+  );
+}
+
+// one sparkle, in the "lighter" composite the caller already set
+function stampSparkle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number,
+  seed: number,
+  rate: number,
+  glint: boolean,
+  turn: number,
+  alpha: number,
+  now: number,
+): void {
+  if (r <= 0) return;
+  const wave = 0.5 + 0.5 * Math.sin(now * rate + seed);
+  const wave2 = wave * wave;
+  const shown = Math.min(
+    1,
+    alpha * (TWINKLE_MIN + (1 - TWINKLE_MIN) * wave2 * wave2),
+  );
+  if (shown < MIN_ALPHA) return;
+  const colorIndex =
+    SPARKLE_COLOR_INDEX[Math.abs(seed) % SPARKLE_COLOR_INDEX.length];
+  ctx.globalAlpha = shown;
+  if (glint) drawGlint(ctx, x, y, r * GLINT_SIZE, turn, colorIndex);
+  else drawGlow(ctx, x, y, r, colorIndex);
 }
 
 // one tiny twinkling sparkle of glow radius r at (x, y); seed picks its
@@ -94,19 +301,20 @@ export function drawGlitterLight(
   now: number,
 ): void {
   if (r <= 0 || alpha <= 0) return;
-  const period =
-    TWINKLE_MS[0] + (TWINKLE_MS[1] - TWINKLE_MS[0]) * hash01(seed, 71);
-  const flicker =
-    TWINKLE_MIN +
-    (1 - TWINKLE_MIN) *
-      (0.5 + 0.5 * Math.sin((now / period) * Math.PI * 2 + seed)) ** 4;
-  const color = SPARKLE_COLORS[Math.abs(seed) % SPARKLE_COLORS.length];
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
-  ctx.globalAlpha = Math.min(1, alpha * flicker);
-  if (hash01(seed, 72) < GLINTS)
-    drawTwinkle(ctx, x, y, r * GLINT_SIZE, hash01(seed, 73), color);
-  else drawGlow(ctx, x, y, r, color);
+  stampSparkle(
+    ctx,
+    x,
+    y,
+    r,
+    seed,
+    sparkleRate(seed),
+    hash01(seed, 72) < GLINTS,
+    hash01(seed, 73),
+    alpha,
+    now,
+  );
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = previous;
 }
@@ -135,28 +343,42 @@ export function drawWispTrail(
   size: number,
 ): void {
   if (size <= 0) return;
+  const stride = trailStride();
+  // a thinned trail's sparkles brighten (and grow a touch) to keep its glow;
+  // the look was tuned at one sparkle per 3ms
+  const thinned = (stride * TAIL_MS) / 3;
+  const grow = thinned ** 0.12;
+  const brighten = thinned ** 0.45;
+  const previous = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = "lighter";
   const first = Math.floor((ms - TAIL_LIFE_MS) / TAIL_MS);
-  for (let e = first + 1; e <= Math.floor(ms / TAIL_MS); e++) {
+  const start = (Math.floor(first / stride) + 1) * stride;
+  for (let e = start; e <= Math.floor(ms / TAIL_MS); e += stride) {
     const bornAt = e * TAIL_MS;
+    const age = (ms - bornAt) / TAIL_LIFE_MS;
+    const alpha = (1 - age) ** 1.2;
+    if (alpha < MIN_ALPHA) continue;
     const from = at(bornAt);
     if (!from) continue;
-    const age = (ms - bornAt) / TAIL_LIFE_MS;
     // tight behind the head, scattering wider (mostly near the middle) as it ages
-    const angle = hash01(e, 31) * Math.PI * 2;
-    const spread =
-      size * SPREAD * age ** 0.7 * Math.abs(hash01(e, 32) + hash01(e, 33) - 1);
-    drawGlitterLight(
+    const slot = e & (SLOTS - 1);
+    const spread = size * SPREAD * age ** 0.7 * slotSpread[slot];
+    stampSparkle(
       ctx,
-      from.x + Math.cos(angle) * spread,
-      from.y + Math.sin(angle) * spread + size * SINK * age * age,
-      size *
-        (SPARKLE[0] + (SPARKLE[1] - SPARKLE[0]) * hash01(e, 34) ** 2) *
-        (1 - 0.4 * age),
+      from.x + slotCos[slot] * spread,
+      from.y + slotSin[slot] * spread + size * SINK * age * age,
+      size * slotSize[slot] * (1 - 0.4 * age) * grow,
       e,
-      (1 - age) ** 1.2,
+      slotRate[slot],
+      slotGlint[slot] === 1,
+      slotTurn[slot],
+      alpha * brighten,
       now,
     );
   }
+  lastTrailAt = performance.now();
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = previous;
 }
 
 // just the head, smeared back along at() over its last few ms of flight
@@ -172,32 +394,36 @@ export function drawWispHead(
   if (!head || size <= 0) return;
   const halo = size * HALO * (1 + 0.5 * heat);
   ctx.globalAlpha = Math.min(1, HALO_ALPHA * (1 + heat));
-  ctx.fillStyle = radialFade(ctx, head.x, head.y, halo, COLOR.heavenlyGold);
-  ctx.fillRect(head.x - halo, head.y - halo, halo * 2, halo * 2);
+  ctx.drawImage(haloSprite(), head.x - halo, head.y - halo, halo * 2, halo * 2);
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
   const core = size * CORE * (1 + 0.6 * heat);
   for (let k = SMEAR; k >= 0; k--) {
     const p = at(ms - k * SMEAR_MS) ?? head;
     ctx.globalAlpha = 1 - k / (SMEAR + 1);
-    drawGlow(ctx, p.x, p.y, core * (1 - (0.6 * k) / SMEAR), COLOR.white);
+    drawGlow(ctx, p.x, p.y, core * (1 - (0.6 * k) / SMEAR), 0);
   }
   ctx.globalAlpha = 1;
-  ctx.globalCompositeOperation = previous;
   for (let i = 0; i < HUDDLE; i++) {
     const angle =
       hash01(i, 41) * Math.PI * 2 + now / (300 + 200 * hash01(i, 42));
     const reach = size * HUDDLE_REACH * Math.sqrt(hash01(i, 43));
-    drawGlitterLight(
+    const seed = i + 1000;
+    stampSparkle(
       ctx,
       head.x + Math.cos(angle) * reach,
       head.y + Math.sin(angle) * reach,
       size * SPARKLE[1],
-      i + 1000,
+      seed,
+      slotRate[seed],
+      slotGlint[seed] === 1,
+      slotTurn[seed],
       1,
       now,
     );
   }
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = previous;
 }
 
 // a playful swoop from a to b, t 0..1: bowed out to one side by up to `bend`

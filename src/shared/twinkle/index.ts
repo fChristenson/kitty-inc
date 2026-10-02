@@ -5,26 +5,106 @@
 import { COLOR } from "../../palette";
 
 const SPRITE_HALF = 128;
-const sprites = new Map<string, HTMLCanvasElement>();
+const bigSprites = new Map<string, HTMLCanvasElement>();
 
-function getSprite(color: string): HTMLCanvasElement {
-  let sprite = sprites.get(color);
-  if (sprite) return sprite;
-  sprite = document.createElement("canvas");
-  sprite.width = sprite.height = SPRITE_HALF * 2;
-  const ctx = sprite.getContext("2d")!;
-  ctx.translate(SPRITE_HALF, SPRITE_HALF);
-  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, SPRITE_HALF * 0.5);
+// paints a twinkle of `half` centered at (cx, cy), turned by rotation
+export function paintTwinkleAt(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  half: number,
+  rotation: number,
+  color: string,
+): void {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(cx - half, cy - half, half * 2, half * 2);
+  ctx.clip();
+  ctx.translate(cx, cy);
+  ctx.rotate(rotation);
+  const core = ctx.createRadialGradient(0, 0, 0, 0, 0, half * 0.5);
   core.addColorStop(0, color);
   core.addColorStop(1, `${color}00`);
   ctx.fillStyle = core;
-  ctx.fillRect(-SPRITE_HALF, -SPRITE_HALF, SPRITE_HALF * 2, SPRITE_HALF * 2);
+  ctx.fillRect(-half * 2, -half * 2, half * 4, half * 4);
   ctx.fillStyle = color;
-  drawCross(ctx, SPRITE_HALF, 0.08);
+  drawCross(ctx, half, 0.08);
   ctx.rotate(Math.PI / 4);
-  drawCross(ctx, SPRITE_HALF * 0.45, 0.12);
-  sprites.set(color, sprite);
+  drawCross(ctx, half * 0.45, 0.12);
+  ctx.restore();
+}
+
+function paintTwinkle(
+  half: number,
+  rotation: number,
+  color: string,
+): HTMLCanvasElement {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = half * 2;
+  paintTwinkleAt(canvas.getContext("2d")!, half, half, half, rotation, color);
+  return canvas;
+}
+
+function getSprite(color: string): HTMLCanvasElement {
+  let sprite = bigSprites.get(color);
+  if (!sprite)
+    bigSprites.set(color, (sprite = paintTwinkle(SPRITE_HALF, 0, color)));
   return sprite;
+}
+
+// small stamps come pre-rotated at a size near their own, so the hundreds a
+// trail draws are plain unscaled-ish copies: no transform, no big downscale
+const SMALL_HALVES = [8, 16, 32, 64];
+// a twinkle looks the same turned a quarter turn
+const TURN_STEPS = 32;
+const QUARTER = Math.PI / 2;
+// per color: per size level, per turn step
+const smallSprites = new Map<string, HTMLCanvasElement[][]>();
+
+function getSmallSprite(
+  color: string,
+  level: number,
+  step: number,
+): HTMLCanvasElement {
+  let levels = smallSprites.get(color);
+  if (!levels) smallSprites.set(color, (levels = SMALL_HALVES.map(() => [])));
+  return (levels[level][step] ??= paintTwinkle(
+    SMALL_HALVES[level],
+    (step / TURN_STEPS) * QUARTER,
+    color,
+  ));
+}
+
+// a twinkle stamp in whatever composite ctx is already set to
+export function stampTwinkle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  rotation: number,
+  color: string,
+): void {
+  // sprite px per world unit to spare, for canvases scaled up to 2x
+  const need = size * 2;
+  let level = 0;
+  while (level < SMALL_HALVES.length && SMALL_HALVES[level] < need) level++;
+  if (level === SMALL_HALVES.length) {
+    ctx.translate(x, y);
+    ctx.rotate(rotation);
+    ctx.drawImage(getSprite(color), -size, -size, size * 2, size * 2);
+    ctx.rotate(-rotation);
+    ctx.translate(-x, -y);
+    return;
+  }
+  const turn = ((rotation % QUARTER) + QUARTER) % QUARTER;
+  const step = Math.round((turn / QUARTER) * TURN_STEPS) % TURN_STEPS;
+  ctx.drawImage(
+    getSmallSprite(color, level, step),
+    x - size,
+    y - size,
+    size * 2,
+    size * 2,
+  );
 }
 
 export function drawTwinkle(
@@ -37,15 +117,9 @@ export function drawTwinkle(
   additive = true,
 ): void {
   if (size <= 0) return;
-  const sprite = getSprite(color);
   const previous = ctx.globalCompositeOperation;
   if (additive) ctx.globalCompositeOperation = "lighter";
-  // undone by hand: save()/restore() per stamp is the costly part
-  ctx.translate(x, y);
-  ctx.rotate(rotation);
-  ctx.drawImage(sprite, -size, -size, size * 2, size * 2);
-  ctx.rotate(-rotation);
-  ctx.translate(-x, -y);
+  stampTwinkle(ctx, x, y, size, rotation, color);
   ctx.globalCompositeOperation = previous;
 }
 

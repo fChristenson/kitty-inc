@@ -124,11 +124,15 @@ function drawOverlay(
   const now = performance.now();
   ctx.save();
   ctx.translate(rect.left, rect.top);
-  drawFreezeDimmed(ctx, (layer) => {
-    for (const index of event.candidates)
-      if (!event.blessed.has(index))
-        drawWorkerSpotlight(layer, event.floor, index, 0, 0);
-  });
+  drawFreezeDimmed(
+    ctx,
+    (layer) => {
+      for (const index of event.candidates)
+        if (!event.blessed.has(index))
+          drawWorkerSpotlight(layer, event.floor, index, 0, 0);
+    },
+    [event, event.blessed.size],
+  );
   for (const index of event.candidates)
     if (event.blessed.has(index))
       drawWorkerSpotlight(ctx, event.floor, index, 0, 0);

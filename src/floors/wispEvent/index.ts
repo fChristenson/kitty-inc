@@ -288,16 +288,20 @@ function drawOverlay(
       });
     else drawUpgradeStarSpotlight(c, stop.floor);
   };
-  drawFreezeDimmed(ctx, (layer) => {
-    for (const stop of wisp.stops) {
-      const rect = getFloorRect(stop.floor);
-      if (!rect || stop.reachedAt !== null) continue;
-      layer.save();
-      layer.translate(rect.left, rect.top);
-      drawStop(layer, stop);
-      layer.restore();
-    }
-  });
+  drawFreezeDimmed(
+    ctx,
+    (layer) => {
+      for (const stop of wisp.stops) {
+        const rect = getFloorRect(stop.floor);
+        if (!rect || stop.reachedAt !== null) continue;
+        layer.save();
+        layer.translate(rect.left, rect.top);
+        drawStop(layer, stop);
+        layer.restore();
+      }
+    },
+    [wisp, wisp.stops.filter((stop) => stop.reachedAt === null).length],
+  );
   for (const stop of wisp.stops) {
     const rect = getFloorRect(stop.floor);
     if (!rect || stop.reachedAt === null) continue;
