@@ -277,6 +277,18 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/popcornEvent — the rare "Popcorn" event: a row of kernels
+  // heats up along the clicked floor and pops at random, ever faster, each
+  // leaping up and bursting into coins that then sweep into the total
+  popcornEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    heatMs: 500, // the kernels heating up before the first can pop
+    popMs: 1_000, // the random pops, piling up toward the end
+    jumpMs: 300, // each popped kernel's leap up to where it bursts
+    holdMs: 450, // after the last burst, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {
