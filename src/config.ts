@@ -1803,6 +1803,59 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, levels + cash: src/floors/elevatorEvent: a column of cash climbs a
+  // shaft, branching into every bar
+  elevatorEvent: {
+    chance: 0.01,
+    riseMs: 1_300, // the column climbing to the top bar
+    branchMs: 260, // each branch's run into its bar
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp, free hires: src/floors/migrationEvent: a V of wisps drops hires
+  migrationEvent: {
+    chance: 0.01,
+    crossMs: 2_000, // the flock crossing the screen
+    firstPeelMs: 500, // the first bird peeling off
+    peelGapsMs: [380, 220] as [number, number], // between peels, quickening
+    diveMs: 320, // each bird's swoop onto its spot
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // mix, an unlock + cash: src/floors/corkscrewEvent: a wisp corkscrews up to
+  // the locked floor trailing cash
+  corkscrewEvent: {
+    chance: 0.01,
+    climbMs: 900, // corkscrewing up the building
+    orbitMs: 900, // whirling round the locked floor, ever tighter
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, worker tiers: src/floors/mirrorBallEvent: wheeling beams over workers
+  mirrorBallEvent: {
+    chance: 0.01,
+    dropMs: 300, // the ball dropping in
+    spinMs: 1_500, // the beams wheeling round, speeding up
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // lightning, cash: src/floors/plasmaGlobeEvent: tendrils draw cash into a core
+  plasmaGlobeEvent: {
+    chance: 0.01,
+    writheMs: 1_700, // the tendrils writhing, before they whip onto the total
+    pulses: 5, // flares spraying coins
+    flowMs: 500, // each coin's crawl down a tendril
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/jellyEvent: the screen wobbles like jelly
+  jellyEvent: {
+    chance: 0.01,
+    thumpsMs: [150, 550, 850, 1_080], // each thump from the button
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,

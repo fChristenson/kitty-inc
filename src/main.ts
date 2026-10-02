@@ -234,6 +234,12 @@ import {
   forceProjectorEvent,
   forceClearEvent,
   forceInfinityMirrorEvent,
+  forceElevatorEvent,
+  forceMigrationEvent,
+  forceCorkscrewEvent,
+  forceMirrorBallEvent,
+  forcePlasmaGlobeEvent,
+  forceJellyEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1334,6 +1340,12 @@ async function main() {
       projector: forceOnActive(forceProjectorEvent),
       clear: forceOnActive(forceClearEvent),
       "infinity-mirror": forceOnActive(forceInfinityMirrorEvent),
+      elevator: forceOnActive(forceElevatorEvent),
+      migration: forceOnActive(forceMigrationEvent),
+      corkscrew: forceOnActive(forceCorkscrewEvent),
+      "mirror-ball": forceOnActive(forceMirrorBallEvent),
+      "plasma-globe": forceOnActive(forcePlasmaGlobeEvent),
+      jelly: forceOnActive(forceJellyEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
