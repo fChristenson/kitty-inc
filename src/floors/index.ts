@@ -361,6 +361,7 @@ export { forceShellGameEvent } from "./shellGameEvent";
 export { forceSeesawEvent } from "./seesawEvent";
 export { forceScratchEvent } from "./scratchEvent";
 export { forceTagEvent } from "./tagEvent";
+export { forceBumpersEvent } from "./bumpersEvent";
 export { forceSlashEvent } from "./slashEvent";
 export { forceJackhammerEvent } from "./jackhammerEvent";
 export { forcePummelEvent } from "./pummelEvent";
