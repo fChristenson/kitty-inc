@@ -1,4 +1,5 @@
 import { createFeaturedCritRewards } from "./featuredRewards";
+import { CONFIG } from "../../config";
 import type { FeaturedRewardContext } from "../../shared/critTypes";
 import {
   isDetachedJobRunning,
@@ -382,6 +383,7 @@ import {
   hitTestIncomeBar,
   triggerIncomeBarPress,
   currentPayoutAmount,
+  rewardPayoutAmount,
   currentIncomeRatePerSecond,
   getIncomeBarCenter,
   queueOvertimeTickDelivery,
@@ -1106,7 +1108,7 @@ function applyTickTockCrit(floors: Floor[], multiplier = 2): void {
   let total: BigNumber = ZERO;
   for (const floor of floors) {
     if (!floor.unlocked) continue;
-    total = add(total, multiply(currentPayoutAmount(floor, now), multiplier));
+    total = add(total, multiply(rewardPayoutAmount(floor, now), multiplier));
   }
   addTotalIncome(total);
 }
@@ -1126,7 +1128,7 @@ function applyFireDrillCrit(floors: Floor[]): void {
   let total: BigNumber = ZERO;
   for (const floor of floors) {
     if (!floor.unlocked) continue;
-    total = add(total, currentPayoutAmount(floor, now));
+    total = add(total, rewardPayoutAmount(floor, now));
     floor.lastCollectedAt = now;
   }
   addTotalIncome(total);
@@ -1137,7 +1139,7 @@ function applyFireDrillCrit(floors: Floor[]): void {
 // untouched.
 function applyBonusRoundCrit(floor: Floor): void {
   const now = Date.now();
-  addTotalIncome(multiply(currentPayoutAmount(floor, now), 2));
+  addTotalIncome(multiply(rewardPayoutAmount(floor, now), 2));
   floor.lastCollectedAt = now;
 }
 
@@ -1146,7 +1148,7 @@ function applyBonusRoundCrit(floor: Floor): void {
 // untouched.
 function applyOverflowCrit(floor: Floor): void {
   const now = Date.now();
-  addTotalIncome(multiply(currentPayoutAmount(floor, now), 5));
+  addTotalIncome(multiply(rewardPayoutAmount(floor, now), 5));
   floor.lastCollectedAt = now;
 }
 
@@ -1158,10 +1160,7 @@ function applyPerformanceBonusCrit(floors: Floor[]): void {
   for (const floor of floors) {
     if (!floor.unlocked) continue;
     const staffingUnits = floor.workerCount + (floor.hasManager ? 1 : 0);
-    total = add(
-      total,
-      multiply(currentPayoutAmount(floor, now), staffingUnits),
-    );
+    total = add(total, multiply(rewardPayoutAmount(floor, now), staffingUnits));
     floor.lastCollectedAt = now;
   }
   addTotalIncome(total);
@@ -1250,6 +1249,7 @@ function unlockFloorsAbove(
     if (!next) break;
     if (!next.unlocked) {
       unlockFloor(next);
+      levelFreeFloor(deps.floors, next);
       unlockedCount++;
       ensureLockedFloorAbove({
         floors: deps.floors,
@@ -1260,6 +1260,15 @@ function unlockFloorsAbove(
     }
     nextIndex++;
   }
+}
+
+function levelFreeFloor(floors: Floor[], floor: Floor): void {
+  const below = floors[floors.indexOf(floor) - 1];
+  if (!below) return;
+  const level = Math.round(
+    below.upgradeCount * CONFIG.crit.freeFloorLevelShare,
+  );
+  increaseIncomeRateBy(floor, level - floor.upgradeCount);
 }
 
 // "frozen crit" (see shared/critTypes's isFrozenCrit): no instant payout —
@@ -1743,10 +1752,12 @@ const CRIT_REWARDS: Record<CritProcKind, (context: CritRewardContext) => void> =
       hireWorkers: (floors, count) => {
         for (const floor of floors) {
           if (!floor.unlocked) continue;
-          floor.workerCount = Math.min(
-            MAX_RENDERED_WORKERS,
-            floor.workerCount + count,
-          );
+          const room = Math.max(0, MAX_RENDERED_WORKERS - floor.workerCount);
+          floor.workerCount += Math.min(count, room);
+          // each hire with no room left promotes a worker a perma tier instead
+          const promotable = getBoostEventCandidates(floor);
+          for (let i = 0; i < count - room && i < promotable.length; i++)
+            promoteWorkerPermaTier(floor, promotable[i]);
         }
       },
       hireManagers: (floors) => {
@@ -2040,6 +2051,7 @@ function eventProcContext(
     },
     unlockFloorFree: (floor) => {
       completeFloorUnlock(deps, floor, true);
+      levelFreeFloor(deps.floors, floor);
       deps.persist();
     },
     upgradeFloorFree: (floor, levels) => {

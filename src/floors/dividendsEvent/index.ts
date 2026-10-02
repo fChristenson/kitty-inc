@@ -35,7 +35,7 @@ import {
   type FloorRectResolver,
 } from "../../shared/screenFreeze";
 import { addTotalIncome } from "../../totalIncome";
-import { currentPayoutAmount } from "../incomePanel";
+import { rewardPayoutAmount } from "../incomePanel";
 import { BTN_H, BTN_W, forceTestCrit, getButtonCenter } from "../upgradeButton";
 import {
   endEventProc,
@@ -227,7 +227,7 @@ function startDividends(floor: Floor, context: EventProcContext): void {
     clearWorkerSpotlight();
     unfreezeScreen();
     addTotalIncome(
-      multiply(currentPayoutAmount(worker.floor, Date.now()), payouts),
+      multiply(rewardPayoutAmount(worker.floor, Date.now()), payouts),
     );
     triggerHudTotalFlash();
     // the covered crit's own tier, revealed as the total jumps

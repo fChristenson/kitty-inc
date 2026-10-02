@@ -30,7 +30,7 @@ import { drawEventStreams, streamCoins } from "../../shared/eventStream";
 import { addTotalIncome } from "../../totalIncome";
 import {
   BAR_W,
-  currentPayoutAmount,
+  rewardPayoutAmount,
   drawIncomePanel,
   getIncomeBarCenter,
   incomeBarFill,
@@ -60,7 +60,6 @@ const ARC_RISE: [number, number] = [90, 200];
 const ARC_MS = 450;
 const SLIDE_TICKS: [number, number] = [4, 8];
 const TICK_MS = 1000 / 60;
-
 
 // a coin's arc from the button to the bar, f (0..1) along the bar's width
 function sprayArc(
@@ -212,7 +211,7 @@ function startSpill(floor: Floor, context: EventProcContext): void {
     setIncomePanelHidden(null);
     unfreezeScreen();
     const now = Date.now();
-    addTotalIncome(multiply(currentPayoutAmount(floor, now), 1 + bonusPayouts));
+    addTotalIncome(multiply(rewardPayoutAmount(floor, now), 1 + bonusPayouts));
     floor.lastCollectedAt = now;
     triggerHudTotalFlash();
     triggerEventEndSlam(GLOBAL_SLAM, "total", () =>

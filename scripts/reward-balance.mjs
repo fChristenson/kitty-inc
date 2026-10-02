@@ -14,7 +14,7 @@ import { withGame } from "./lib/crit-catalog.mjs";
 
 const DEFAULTS = {
   floors: 6, // unlocked floors in the building
-  maxFloors: 10, // floors a building can have (for "unlock every floor")
+  maxFloors: 20, // floors a building can have (MAX_FLOORS_PER_BUILDING)
   level: 60, // each floor's upgrade level
   tier: 1, // each floor's crit tier multiplier now (1, 5, 25 or 125)
   growth: 30, // levels each floor gains over the horizon (floor tiers pay off on these)
@@ -57,11 +57,14 @@ const T = S.tier;
 const W = Math.min(3, S.workers);
 const A0 = L * T; // levels weighted by the tier each was bought at
 // a boosted perma worker's speed-up is its tier multiplier to this power
-const PERMA_EXP = Number(
-  readFileSync("src/config.ts", "utf8").match(
-    /permaBoostExponent:\s*([\d.]+)/,
-  )?.[1] ?? 1,
-);
+const configSource = readFileSync("src/config.ts", "utf8");
+const configNumber = (key, fallback) =>
+  Number(
+    configSource.match(new RegExp(`${key}:\\s*([\\d.]+)`))?.[1] ?? fallback,
+  );
+const PERMA_EXP = configNumber("permaBoostExponent", 1);
+const PAYOUT_SECONDS = configNumber("payoutSeconds", 0);
+const FREE_FLOOR_SHARE = configNumber("freeFloorLevelShare", 0);
 // a floor's income, up to the building scale (which cancels out)
 const base = (level, weighted) => (1 + 2 * weighted) * (1 + level / 20);
 // boost speed with every worker boosted
@@ -74,7 +77,7 @@ const officeSpeed = 4 ** S.office;
 const floorRate = base(L, A0) * E * officeSpeed;
 const R = F * floorRate; // total income per second
 const interval = 1 / ((1 + L / 20) * E * officeSpeed);
-const payoutSeconds = Math.max(interval, 0.5); // one payout, in seconds of its floor
+const payoutSeconds = PAYOUT_SECONDS || Math.max(interval, 0.5); // one reward payout, in seconds of its floor
 const upgradeCost = (level) => 2 * ((3 + level) / 3) ** 4;
 const upgradesValue =
   F *
@@ -112,13 +115,16 @@ const workerTier = (steps, k = 1) => {
     1 - S.uptime + S.uptime * boostSpeed(W, S.managers) * step ** each;
   return fx("workerTier", steps * k, ((boosted / E - 1) * floorsHit) / F);
 };
-// sure: the hire lands on a floor with room (events pick such floors)
+// sure: the hire lands on a floor with room (events pick such floors); a
+// featured hire on a full floor promotes a worker a perma tier instead
 const hire = (n, k = 1, sure = false) => {
   k = clampFloors(k);
   const w = Math.min(3, W + n);
   const r = avgSpeed(w, S.managers) / E - 1;
   const share = sure ? 1 : 1 - S.staffed;
-  return fx("staff", n * k * share, (r * k * share) / F);
+  const full = sure ? 0 : S.staffed;
+  const promoted = full * k * workerTier(1, Math.min(n, W)).perm;
+  return fx("staff", n * k * share, (r * k * share) / F + promoted);
 };
 const manager = (k = 1) => {
   k = clampFloors(k);
@@ -130,12 +136,14 @@ const office = (n, k = 1) => {
   const share = 1 - S.office;
   return fx("staff", n * k * share, ((2 ** n - 1) * k * share) / F);
 };
-// copy: the new floor arrives as good as the one it copies
+// copy: the new floor arrives as good as the one it copies; otherwise it
+// starts at FREE_FLOOR_SHARE of the level below
 const unlock = (n, copy = false) => {
   n = Math.max(0, Math.min(n, S.maxFloors - F));
   let cost = 0;
   for (let i = 0; i < n; i++) cost += unlockCost(F + i);
-  const each = copy ? 1 : base(0, 0) / base(L, A0);
+  const start = Math.round(L * FREE_FLOOR_SHARE);
+  const each = copy ? 1 : base(start, start * T) / base(L, A0);
   return fx("unlock", n, (n * each) / F, cost / R);
 };
 const cash = (seconds) => fx("cash", seconds, 0, seconds);

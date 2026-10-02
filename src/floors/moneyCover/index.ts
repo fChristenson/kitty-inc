@@ -28,7 +28,7 @@ import {
   spawnSprayCoins,
   type CoinPath,
 } from "../coins";
-import { currentPayoutAmount } from "../incomePanel";
+import { rewardPayoutAmount } from "../incomePanel";
 import { getButtonCenter } from "../upgradeButton";
 import { endEventProc, type EventProcContext } from "../eventProcs";
 
@@ -242,7 +242,7 @@ export function startMoneyCover(
     if (rewardMultiplier > 0)
       addTotalIncome(
         multiply(
-          currentPayoutAmount(floor, Date.now()),
+          rewardPayoutAmount(floor, Date.now()),
           floorNumber * rewardMultiplier,
         ),
       );

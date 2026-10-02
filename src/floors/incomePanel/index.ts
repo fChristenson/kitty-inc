@@ -414,6 +414,14 @@ export function currentIncomeRatePerSecond(
   );
 }
 
+// one payout granted by a crit or event: CONFIG.crit.payoutSeconds of the floor's income
+export function rewardPayoutAmount(floor: Floor, now: number): BigNumber {
+  return multiply(
+    currentIncomeRatePerSecond(floor, now),
+    CONFIG.crit.payoutSeconds,
+  );
+}
+
 // seconds left until the current fill cycle completes, counting down from the full
 // interval to 0 in lockstep with drawIncomePanel's own bar-fill percentage (same
 // lastCollectedAt anchor and modulo-wrap), instead of always showing the constant interval

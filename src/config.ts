@@ -52,6 +52,12 @@ export const CONFIG = {
     // a boosted perma worker speeds its floor up by its tier's multiplier to
     // this power: 0.43 gives x2/x4/x8, about one more boosted worker per step
     permaBoostExponent: 0.43,
+    // one reward payout (payout crits, cash events) pays this many seconds of
+    // its floor's income; a bar cycle is under a second, too small to feel
+    payoutSeconds: 30,
+    // a floor unlocked for free starts at this share of the level below it,
+    // so a free floor is still worth having once floors are cheap
+    freeFloorLevelShare: 0.5,
     // gateway roll for the whole "special crit" (chain/boost/bounce/
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (src/critBalance) are even

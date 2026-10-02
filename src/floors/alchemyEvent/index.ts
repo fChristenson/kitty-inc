@@ -29,7 +29,7 @@ import {
   type FloorRectResolver,
 } from "../../shared/screenFreeze";
 import { addTotalIncome } from "../../totalIncome";
-import { currentPayoutAmount } from "../incomePanel";
+import { rewardPayoutAmount } from "../incomePanel";
 import { BTN_H, BTN_W, forceTestCrit, getButtonCenter } from "../upgradeButton";
 import {
   endEventProc,
@@ -112,7 +112,6 @@ export function forceAlchemyEvent(floor: Floor): void {
   forceTestCrit(floor, null, pickCritTierByOdds(), null, "upgrade");
   forceClaimEventProc(KEY, floor);
 }
-
 
 function drawOverlay(
   ctx: CanvasRenderingContext2D,
@@ -253,7 +252,7 @@ function startAlchemy(floor: Floor, context: EventProcContext): void {
     promoteWorkerPermaTier(floor, event.workerIndex);
     const now = Date.now();
     celebrateWorkerBoost(floor, event.workerIndex, now);
-    addTotalIncome(multiply(currentPayoutAmount(floor, now), payouts));
+    addTotalIncome(multiply(rewardPayoutAmount(floor, now), payouts));
     triggerHudTotalFlash();
   }, brewMs + shootMs);
 

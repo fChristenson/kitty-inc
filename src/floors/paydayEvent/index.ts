@@ -28,7 +28,7 @@ import {
 } from "../../shared/screenFreeze";
 import { drawEventStreams, streamCoins } from "../../shared/eventStream";
 import { addTotalIncome } from "../../totalIncome";
-import { currentPayoutAmount } from "../incomePanel";
+import { rewardPayoutAmount } from "../incomePanel";
 import {
   BTN_H,
   BTN_W,
@@ -206,7 +206,7 @@ function startPayday(floor: Floor, context: EventProcContext): void {
     clearUpgradeButtonSpotlights();
     unfreezeScreen();
     addTotalIncome(
-      multiply(currentPayoutAmount(floor, Date.now()), workers.length),
+      multiply(rewardPayoutAmount(floor, Date.now()), workers.length),
     );
     triggerHudTotalFlash();
     // the covered crit's own tier, revealed as the total jumps

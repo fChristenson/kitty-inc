@@ -28,7 +28,7 @@ import {
 } from "../../shared/screenFreeze";
 import { drawEventStreams, streamCoins } from "../../shared/eventStream";
 import { addTotalIncome } from "../../totalIncome";
-import { currentPayoutAmount } from "../incomePanel";
+import { rewardPayoutAmount } from "../incomePanel";
 import {
   clearUpgradeButtonSpotlights,
   drawUpgradeButtonSpotlight,
@@ -197,7 +197,7 @@ function startChain(floor: Floor, context: EventProcContext): void {
     // the n-th worker reached pays n payouts: 1 + 2 + ... + n
     const n = workers.length;
     addTotalIncome(
-      multiply(currentPayoutAmount(floor, Date.now()), (n * (n + 1)) / 2),
+      multiply(rewardPayoutAmount(floor, Date.now()), (n * (n + 1)) / 2),
     );
     triggerHudTotalFlash();
     triggerEventEndSlam(GLOBAL_SLAM, "total", () =>

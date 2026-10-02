@@ -33,7 +33,7 @@ import {
 import { addTotalIncome } from "../../totalIncome";
 import {
   BAR_W,
-  currentPayoutAmount,
+  rewardPayoutAmount,
   drawIncomePanel,
   getIncomeBarCenter,
   incomeBarFill,
@@ -204,7 +204,7 @@ function startInvestment(floor: Floor, context: EventProcContext): void {
     if (!isLive()) return;
     const now = Date.now();
     triggerEventEndSlam(floor, "bar");
-    addTotalIncome(multiply(currentPayoutAmount(floor, now), payouts));
+    addTotalIncome(multiply(rewardPayoutAmount(floor, now), payouts));
     floor.lastCollectedAt = now;
     triggerHudTotalFlash();
     playSold();

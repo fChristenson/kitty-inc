@@ -35,7 +35,7 @@ import {
 } from "../../shared/screenFreeze";
 import { drawEventStreams, streamCoins } from "../../shared/eventStream";
 import { addTotalIncome } from "../../totalIncome";
-import { currentPayoutAmount } from "../incomePanel";
+import { rewardPayoutAmount } from "../incomePanel";
 import { forceTestCrit, getButtonCenter } from "../upgradeButton";
 import {
   endEventProc,
@@ -342,7 +342,7 @@ function startTwister(floor: Floor, context: EventProcContext): void {
     clearWorkerSpotlight();
     unfreezeScreen();
     addTotalIncome(
-      multiply(currentPayoutAmount(floor, Date.now()), workers.length),
+      multiply(rewardPayoutAmount(floor, Date.now()), workers.length),
     );
     triggerHudTotalFlash();
     // the covered crit's own tier, revealed as the total jumps
