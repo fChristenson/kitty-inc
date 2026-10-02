@@ -518,6 +518,15 @@ export function wirePopcornEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireNewtonsCradleEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-newtons-cradle-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

@@ -83,6 +83,7 @@ export {
   wireChainReactionEventTestButton,
   wireBullseyeEventTestButton,
   wirePopcornEventTestButton,
+  wireNewtonsCradleEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
