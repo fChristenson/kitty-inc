@@ -119,6 +119,45 @@ export function drawCachedCritText(
   );
 }
 
+// a label rastered once (at res px per unit) for an event to stamp at any
+// scale every frame, e.g. slamming in from huge; build it when the event arms
+export interface CritTextSprite {
+  canvas: HTMLCanvasElement;
+  width: number;
+  height: number;
+}
+
+export function createCritTextSprite(
+  label: string,
+  color: string,
+  style: CritTextStyle,
+  res = 2,
+): CritTextSprite {
+  const canvas = document.createElement("canvas");
+  const c = canvas.getContext("2d")!;
+  c.font = critFont(style.fontSize);
+  const width = c.measureText(label).width + style.strokeWidth * 2 + 8;
+  const height = style.fontSize * 1.4 + style.strokeWidth * 2;
+  canvas.width = Math.ceil(width * res);
+  canvas.height = Math.ceil(height * res);
+  c.scale(res, res);
+  drawCritText(c, label, width / 2, height / 2, color, style);
+  return { canvas, width, height };
+}
+
+// the sprite centered on (x, y) at `scale`
+export function drawCritTextSprite(
+  ctx: CanvasRenderingContext2D,
+  sprite: CritTextSprite,
+  x: number,
+  y: number,
+  scale = 1,
+): void {
+  const w = sprite.width * scale;
+  const h = sprite.height * scale;
+  ctx.drawImage(sprite.canvas, x - w / 2, y - h / 2, w, h);
+}
+
 // an event's reward label landing at (x, y): it pops in big at poppedAt
 // (performance.now()) and settles
 export function drawPoppingCritText(

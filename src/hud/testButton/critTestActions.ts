@@ -122,6 +122,26 @@ export function createTestButtonMarkup(): string {
           <button id="test-branches-event" class="game__button">Branches</button>
           <button id="test-tug-of-war-event" class="game__button">Tug of War</button>
           <button id="test-waterwheel-event" class="game__button">Waterwheel</button>
+          <button id="test-braid-event" class="game__button">Braid</button>
+          <button id="test-skim-event" class="game__button">Skim</button>
+          <button id="test-lattice-event" class="game__button">Lattice</button>
+          <button id="test-fireworks-event" class="game__button">Fireworks</button>
+          <button id="test-slingshot-event" class="game__button">Slingshot</button>
+          <button id="test-marquee-event" class="game__button">Marquee</button>
+          <button id="test-crop-duster-event" class="game__button">Crop Duster</button>
+          <button id="test-bolas-event" class="game__button">Bolas</button>
+          <button id="test-countdown-event" class="game__button">Countdown</button>
+          <button id="test-sparkler-event" class="game__button">Sparkler</button>
+          <button id="test-slinky-event" class="game__button">Slinky</button>
+          <button id="test-pipeline-event" class="game__button">Pipeline</button>
+          <button id="test-prism-event" class="game__button">Prism</button>
+          <button id="test-trampoline-event" class="game__button">Trampoline</button>
+          <button id="test-hummingbird-event" class="game__button">Hummingbird</button>
+          <button id="test-dive-bomb-event" class="game__button">Dive Bomb</button>
+          <button id="test-ski-jump-event" class="game__button">Ski Jump</button>
+          <button id="test-jetpack-event" class="game__button">Jetpack</button>
+          <button id="test-bass-drop-event" class="game__button">Bass Drop</button>
+          <button id="test-scanner-event" class="game__button">Scanner</button>
           <button id="test-slash-event" class="game__button">Slash</button>
           <button id="test-jackhammer-event" class="game__button">Jackhammer</button>
           <button id="test-pummel-event" class="game__button">Pummel</button>

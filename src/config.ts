@@ -852,6 +852,174 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // money: src/floors/braidEvent: three rivers braid up into the total
+  braidEvent: {
+    chance: 0.01,
+    streamMs: 1_100, // the strands pouring
+    travelMs: 900, // each coin's climb
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // money: src/floors/skimEvent: a river skips across the screen like a stone
+  skimEvent: {
+    chance: 0.01,
+    streamMs: 700, // the river pouring
+    travelMs: 1_300, // each coin's trip, every skip and up into the total
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // money: src/floors/latticeEvent: diagonal rivers weave a net up the screen
+  latticeEvent: {
+    chance: 0.01,
+    gapMs: 90, // between rivers launching
+    streamMs: 700, // how long each pours
+    travelMs: 1_000, // each coin's climb
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/fireworksEvent: rocket wisps burst into rings of stars
+  fireworksEvent: {
+    chance: 0.01,
+    gapMs: 300, // between launches
+    riseMs: 380, // each shell rising
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/slingshotEvent: a wisp drawn back, banks off two walls
+  slingshotEvent: {
+    chance: 0.01,
+    pullMs: 900, // drawn back
+    flightMs: 650, // let go, off both walls and into the total
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/marqueeEvent: a light chases round a ring of bulb wisps
+  marqueeEvent: {
+    chance: 0.01,
+    chaseMs: 1_300, // the light chasing round, speeding up
+    blazeMs: 200, // every bulb blazing before they fire
+    fireMs: 280, // each bulb's flight into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // mix: src/floors/cropDusterEvent: a wisp lays curtains of cash, pass by pass
+  cropDusterEvent: {
+    chance: 0.01,
+    passMs: 420, // each pass across
+    fallMs: 450, // each coin's fall
+    climbMs: 300, // pulling up into the total
+    sweepMs: 300, // the heap sweeping up after it
+    flightMs: 320, // each coin's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix: src/floors/bolasEvent: two wisps whirl on a rope of cash
+  bolasEvent: {
+    chance: 0.01,
+    flightMs: 1_700, // the bolas's flight into the total
+    flowMs: 500, // each coin's run along the rope
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/countdownEvent: 3, 2, 1, GO! slams, then a geyser
+  countdownEvent: {
+    chance: 0.01,
+    beatMs: 380, // between slams
+    streamMs: 450, // the geyser pouring
+    travelMs: 550, // each coin's trip up it
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/sparklerEvent: the button fizzes glitter, then pops
+  sparklerEvent: {
+    chance: 0.01,
+    burnMs: 1_500, // the sparkler fizzing
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // money: src/floors/slinkyEvent: a river coils in loops into the total
+  slinkyEvent: {
+    chance: 0.01,
+    streamMs: 1_000, // the river pouring
+    travelMs: 1_100, // each coin's trip round every coil
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // money: src/floors/pipelineEvent: a river runs right-angle pipes to the total
+  pipelineEvent: {
+    chance: 0.01,
+    streamMs: 900, // the river pouring
+    travelMs: 1_200, // each coin's trip through the pipes
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // money: src/floors/prismEvent: a beam of cash splits into a fan of rivers
+  prismEvent: {
+    chance: 0.01,
+    streamMs: 900, // the beam pouring
+    travelMs: 1_100, // each coin's trip up the beam and round the longest ray
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/trampolineEvent: a wisp bounces ever higher into the total
+  trampolineEvent: {
+    chance: 0.01,
+    dropMs: 300, // the first drop from the top
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/hummingbirdEvent: a wisp hovers and darts stop to stop
+  hummingbirdEvent: {
+    chance: 0.01,
+    dartMs: 70, // each dart between stops
+    hoverMs: [260, 110] as [number, number], // each hover, first to last
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/diveBombEvent: circling wisps dive-bomb the button
+  diveBombEvent: {
+    chance: 0.01,
+    circleMs: 650, // the ring circling before the first dive
+    gapsMs: [300, 250, 200, 160], // between dives, quickening
+    diveMs: 260, // each plunge
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // mix: src/floors/skiJumpEvent: a wisp skis a river of cash off a jump
+  skiJumpEvent: {
+    chance: 0.01,
+    streamMs: 900, // the river pouring
+    travelMs: 1_400, // the skier's (and each coin's) run, jump and landing
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // mix: src/floors/jetpackEvent: a wisp rides a jet of cash up into the total
+  jetpackEvent: {
+    chance: 0.01,
+    flyMs: 1_500, // the climb to the total
+    sweepMs: 250, // the pool erupting after it
+    flightMs: 380, // each coin's flight up into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/bassDropEvent: beats, a snare roll, silence, drop
+  bassDropEvent: {
+    chance: 0.01,
+    beatMs: 260, // between the heavy beats (the roll speeds up from half this)
+    silenceMs: 220, // the dead beat before the drop
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/scannerEvent: a scan line reveals cash, then scoops it
+  scannerEvent: {
+    chance: 0.01,
+    scanMs: 800, // the line sweeping down
+    pauseMs: 120, // at the bottom
+    sweepMs: 650, // sweeping back up into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {
