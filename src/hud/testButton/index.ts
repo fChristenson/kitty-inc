@@ -588,6 +588,15 @@ export function wireDrumrollEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireShellGameEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-shell-game-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,
