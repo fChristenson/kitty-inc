@@ -1250,6 +1250,119 @@ export const CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
+  // money: src/floors/damBurstEvent: a cliff of cash bursts and floods across
+  damBurstEvent: {
+    chance: 0.01,
+    fillMs: 1_000, // the heap piling up against the dam
+    spreadMs: 220, // the flood front reaching the far side
+    floodMs: 620, // each coin's flood across and up into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // money: src/floors/spiderwebEvent: spokes, then a spiral, of cash
+  spiderwebEvent: {
+    chance: 0.01,
+    spokeGapMs: 70, // between spokes shooting out
+    spokeStreamMs: 520, // each spoke pouring
+    spokeTravelMs: 260, // each coin's trip out a spoke
+    spiralStreamMs: 600, // the spiral pouring
+    spiralTravelMs: 760, // each coin's trip round the spiral
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // money: src/floors/curtainEvent: a curtain of cash drops, opens, flies up
+  curtainEvent: {
+    chance: 0.01,
+    dropMs: 420, // the curtain dropping
+    hangMs: 260, // hanging, rippling
+    openMs: 420, // drawn open to the sides
+    sweepMs: 260, // the coins setting off for the total, top rows first
+    flightMs: 420, // each coin's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/jellyfishEvent: a wisp jellyfish pulses up into the total
+  jellyfishEvent: {
+    chance: 0.01,
+    pulseGapsMs: [380, 220] as [number, number], // between pulses, quickening
+    diveMs: 240, // the last dive into the total
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/polarityEvent: a swarm snaps between two poles
+  polarityEvent: {
+    chance: 0.01,
+    gatherMs: 320, // the swarm gathering on the first pole
+    flipGapsMs: [360, 150] as [number, number], // between flips, quickening
+    dashMs: 130, // the swarm's dash across
+    slamMs: 200, // the poles slamming together
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // wisp: src/floors/colliderEvent: two wisps race round a ring and collide
+  colliderEvent: {
+    chance: 0.01,
+    runMs: 1_400, // racing round the ring
+    dashMs: 160, // dashing in to collide
+    debrisMs: 320, // the debris flying out
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // mix: src/floors/sheepdogEvent: a wisp herds a spill of cash into the total
+  sheepdogEvent: {
+    chance: 0.01,
+    spillMs: 380, // the cash spilling out
+    dartGapsMs: [320, 190] as [number, number], // between darts, quickening
+    squeezeMs: 220, // the herd squeezing after a dart
+    sweepMs: 280, // the herd setting off for the total
+    flightMs: 420, // each coin's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix: src/floors/dragonEvent: a wisp head leads a rippling body of cash
+  dragonEvent: {
+    chance: 0.01,
+    flightMs: 1_700, // the head's flight into the total
+    bodyMs: 650, // how far behind the head the tail trails
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam: src/floors/reflectorEvent: a beam bounces mirror to mirror
+  reflectorEvent: {
+    chance: 0.01,
+    popMs: 260, // the mirrors popping up
+    aimMs: 260, // the aim laser flickering
+    legsMs: [240, 120] as [number, number], // each leg of the beam, quickening
+    streamMs: 380, // cash pouring down each leg
+    travelMs: 260, // each coin's trip down a leg
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // beam: src/floors/cookieCutterEvent: a beam cuts a disc out of the screen
+  cookieCutterEvent: {
+    chance: 0.01,
+    aimMs: 240, // the aim laser flickering
+    cutMs: 900, // the beam cutting round
+    liftMs: 380, // the disc flying into the total
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/cinematicEvent: letterbox bars and punch-in zooms
+  cinematicEvent: {
+    chance: 0.01,
+    barsMs: 180, // the bars slamming in
+    punchGapsMs: [360, 220] as [number, number], // between punches, quickening
+    punchMs: 110, // each zoom punching in
+    holdMs: 450,
+    mergeMs: 500,
+  },
+  // experiment: src/floors/negativeEvent: the screen strobes to a negative
+  negativeEvent: {
+    chance: 0.01,
+    gapsMs: [300, 90] as [number, number], // between flips, quickening
+    holdMs: 450,
+    mergeMs: 500,
+  },
 
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
