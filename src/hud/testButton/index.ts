@@ -681,6 +681,39 @@ export function wireEternityEventTestButton(
   )!;
   button.addEventListener("click", onClick);
 }
+export function wireHelixEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-helix-event")!;
+  button.addEventListener("click", onClick);
+}
+export function wireYoYoEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-yo-yo-event")!;
+  button.addEventListener("click", onClick);
+}
+export function wireRacetrackEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-racetrack-event",
+  )!;
+  button.addEventListener("click", onClick);
+}
+export function wireSwingEventTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button =
+    container.querySelector<HTMLButtonElement>("#test-swing-event")!;
+  button.addEventListener("click", onClick);
+}
 export function wireSlashEventTestButton(
   container: HTMLElement,
   onClick: () => void,

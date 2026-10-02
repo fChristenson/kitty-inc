@@ -518,6 +518,49 @@ export const CONFIG = {
     mergeMs: 500,
   },
 
+  // src/floors/helixEvent — the rare "Helix" event: two wisps twist round
+  // each other in a double helix from the button up into the total, flinging
+  // coins at every crossing, then fuse into it and explode
+  helixEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    riseMs: 1_700, // from the button up into the total, speeding up
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
+  // src/floors/yoYoEvent — the rare "Yo-Yo" event: the wisp yo-yos from the
+  // total down onto the button and back, ever faster, then snaps into the
+  // total and explodes
+  yoYoEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    throwMs: [440, 220] as [number, number], // each throw down and back, quickening
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
+  // src/floors/racetrackEvent — the rare "Racetrack" event: the wisp laps a
+  // track round the screen's edges, ever faster, drifting coins off every
+  // corner, then peels off into the total and explodes
+  racetrackEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    entryMs: 150, // racing in onto the track
+    raceMs: 1_600, // the laps, speeding up
+    shootMs: 140, // peeling off into the total
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
+  // src/floors/swingEvent — the rare "Swing" event: the wisp swings like a
+  // pendulum, ever wider, flinging coins at every top, then lets go into the
+  // total and explodes
+  swingEvent: {
+    chance: 0.01, // per crit whose special-crit gateway hit
+    swingMs: [340, 200] as [number, number], // each swing, quickening
+    shootMs: 180, // flying from the last top into the total
+    holdMs: 450, // after the blast, before the coins sweep in
+    mergeMs: 500,
+  },
+
   // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {

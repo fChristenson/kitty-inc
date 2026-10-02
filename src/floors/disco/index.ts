@@ -38,13 +38,14 @@ const SHINE_SIZE = 24;
 const FLECK_COUNT = 46;
 // the room art's own floor line, as a fraction of its height
 const FLOOR_LINE = 650 / FLOOR_H;
-// every disco floor shows the same show, so it's drawn once into shared
-// layers (the soft lights at LIGHT_SCALE, the ball at BALL_SCALE) every
-// REFRESH_MS and stamped onto each floor
+// every disco floor shows the same show, so it's drawn once a frame into
+// shared layers (the soft lights at LIGHT_SCALE, the ball at BALL_SCALE) and
+// stamped onto each floor; calls within SAME_FRAME_MS reuse that frame's
+// layers. Refreshing less often than every frame made the beams stagger
 const LIGHT_SCALE = 0.35;
 const BALL_SCALE = 1.5;
 const BALL_HALF = BALL_RADIUS + SHINE_SIZE + 4;
-const REFRESH_MS = 50;
+const SAME_FRAME_MS = 4;
 
 const room = {
   x: SIDE_WALL_WIDTH - ROOM_WALL_OVERLAP_PX,
@@ -268,7 +269,7 @@ let lightsLayer: HTMLCanvasElement | null = null;
 let ballLayer: HTMLCanvasElement | null = null;
 let refreshedAt = -Infinity;
 
-// the show's beams, spots and flecks, and its ball, redrawn at most every REFRESH_MS
+// the show's beams, spots and flecks, and its ball, redrawn once a frame
 function refreshLayers(now: number): {
   lights: HTMLCanvasElement;
   ball: HTMLCanvasElement;
@@ -280,7 +281,7 @@ function refreshLayers(now: number): {
     ballLayer = document.createElement("canvas");
     ballLayer.width = ballLayer.height = Math.ceil(BALL_HALF * 2 * BALL_SCALE);
   }
-  if (Math.abs(now - refreshedAt) < REFRESH_MS)
+  if (Math.abs(now - refreshedAt) < SAME_FRAME_MS)
     return { lights: lightsLayer, ball: ballLayer };
   refreshedAt = now;
 

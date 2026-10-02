@@ -87,6 +87,10 @@ import {
   forceSpiralEvent,
   forceLoopEvent,
   forceEternityEvent,
+  forceHelixEvent,
+  forceYoYoEvent,
+  forceRacetrackEvent,
+  forceSwingEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -254,6 +258,10 @@ import {
   wireSpiralEventTestButton,
   wireLoopEventTestButton,
   wireEternityEventTestButton,
+  wireHelixEventTestButton,
+  wireYoYoEventTestButton,
+  wireRacetrackEventTestButton,
+  wireSwingEventTestButton,
   wireSlashEventTestButton,
   wireJackhammerEventTestButton,
   wirePummelEventTestButton,
@@ -998,6 +1006,34 @@ async function main() {
       if (!floor) return;
       gameCanvas.scrollActiveToFloor(floor);
       forceEternityEvent(floor);
+    });
+    // same, for the Helix event
+    wireHelixEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceHelixEvent(floor);
+    });
+    // same, for the Yo-Yo event
+    wireYoYoEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceYoYoEvent(floor);
+    });
+    // same, for the Racetrack event
+    wireRacetrackEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceRacetrackEvent(floor);
+    });
+    // same, for the Swing event
+    wireSwingEventTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (!floor) return;
+      gameCanvas.scrollActiveToFloor(floor);
+      forceSwingEvent(floor);
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
