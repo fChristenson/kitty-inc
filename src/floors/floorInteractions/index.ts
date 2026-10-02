@@ -1754,10 +1754,10 @@ const CRIT_REWARDS: Record<CritProcKind, (context: CritRewardContext) => void> =
           if (!floor.unlocked) continue;
           const room = Math.max(0, MAX_RENDERED_WORKERS - floor.workerCount);
           floor.workerCount += Math.min(count, room);
-          // each hire with no room left promotes a worker a perma tier instead
+          // a floor with no room for the hires promotes one worker a perma tier instead
           const promotable = getBoostEventCandidates(floor);
-          for (let i = 0; i < count - room && i < promotable.length; i++)
-            promoteWorkerPermaTier(floor, promotable[i]);
+          if (count > room && promotable.length > 0)
+            promoteWorkerPermaTier(floor, promotable[0]);
         }
       },
       hireManagers: (floors) => {

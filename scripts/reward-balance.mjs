@@ -115,17 +115,18 @@ const workerTier = (steps, k = 1) => {
     1 - S.uptime + S.uptime * boostSpeed(W, S.managers) * step ** each;
   return fx("workerTier", steps * k, ((boosted / E - 1) * floorsHit) / F);
 };
-// sure: the hire lands on a floor with room (events pick such floors); a
-// featured hire on a full floor promotes a worker a perma tier instead
-const hire = (n, k = 1, sure = false) => {
+// sure: the hire lands on a floor with room (events pick such floors);
+// promotes: a full floor promotes one worker a perma tier instead (featured)
+const hire = (n, k = 1, sure = false, promotes = true) => {
   k = clampFloors(k);
   const w = Math.min(3, W + n);
   const r = avgSpeed(w, S.managers) / E - 1;
   const share = sure ? 1 : 1 - S.staffed;
-  const full = sure ? 0 : S.staffed;
-  const promoted = full * k * workerTier(1, Math.min(n, W)).perm;
+  const full = sure || !promotes ? 0 : S.staffed;
+  const promoted = full * k * workerTier(1, 1).perm;
   return fx("staff", n * k * share, (r * k * share) / F + promoted);
 };
+const legacyHire = (n, k = 1) => hire(n, k, false, false);
 const manager = (k = 1) => {
   k = clampFloors(k);
   const r = avgSpeed(W, 1) / E - 1;
@@ -499,18 +500,18 @@ const LEGACY = {
   // staffing
   chairGiveaway: () => [office(1, 1)],
   suppliesGiveaway: () => [office(1, 1)],
-  intern: () => [hire(1, 1)],
-  talentScout: () => [hire(1, 1), boost(15, 1)],
+  intern: () => [legacyHire(1, 1)],
+  talentScout: () => [legacyHire(1, 1), boost(15, 1)],
   unionBoss: () => [manager(1)],
-  fullyStaffed: () => [hire(3, F), manager(F)],
-  shiftChange: () => [hire(3, 2)],
-  cloneArmy: () => [hire(3, F)],
+  fullyStaffed: () => [legacyHire(3, F), manager(F)],
+  shiftChange: () => [legacyHire(3, 2)],
+  cloneArmy: () => [legacyHire(3, F)],
   goldenHandshake: () => [manager(F)],
   supplyRun: () => [office(2, 1)],
-  teamBuilding: () => [hire(1, F)],
-  headhunter: () => [hire(3, 1)],
-  dressCode: () => [hire(1, F)], // ~ manager or worker
-  recruitmentDrive: () => [hire(3, 2)],
+  teamBuilding: () => [legacyHire(1, F)],
+  headhunter: () => [legacyHire(3, 1)],
+  dressCode: () => [legacyHire(1, F)], // ~ manager or worker
+  recruitmentDrive: () => [legacyHire(3, 2)],
   // tiers
   upgrade: () => [floorTier(1, 1)],
   peppermint: () => [floorTier(1, F - 1)],
