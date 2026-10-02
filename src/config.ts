@@ -1010,12 +1010,63 @@ export const CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // experiment: src/floors/scannerEvent: a scan line reveals cash, then scoops it
+  // beam: src/floors/scannerEvent: a scan line reveals cash, then scoops it
   scannerEvent: {
     chance: 0.01,
     scanMs: 800, // the line sweeping down
     pauseMs: 120, // at the bottom
     sweepMs: 650, // sweeping back up into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam: src/floors/laserGridEvent: lasers build a grid, cash pops along them
+  laserGridEvent: {
+    chance: 0.01,
+    gapMs: 200, // between lasers
+    aimMs: 140, // each aim line flickering before it fires
+    zipMs: 110, // each beam blazing from edge to edge
+    flightMs: 380, // each coin's flight into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam: src/floors/etchEvent: a beam scrawls a trail of cash that runs home
+  etchEvent: {
+    chance: 0.01,
+    etchMs: 1_000, // the beam scrawling
+    pauseMs: 120, // before the trail runs
+    runMs: 650, // the trail running into the total
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam: src/floors/searchlightsEvent: searchlights catch stashes of cash
+  searchlightsEvent: {
+    chance: 0.01,
+    searchMs: 1_300, // the lights sweeping
+    lockMs: 280, // swinging round onto the total
+    streamMs: 350, // each stash's geyser pouring
+    travelMs: 500, // each coin's trip up a geyser
+    holdMs: 350,
+    mergeMs: 500,
+  },
+  // beam: src/floors/tractorBeamEvent: a beam lifts a spiral of cash up
+  tractorBeamEvent: {
+    chance: 0.01,
+    aimMs: 260, // the beam flickering down
+    openMs: 220, // blazing open
+    liftMs: 900, // coins being lifted off the button
+    riseMs: 550, // each coin's spiral up
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam: src/floors/beamClashEvent: two beams clash, then a geyser of cash
+  beamClashEvent: {
+    chance: 0.01,
+    aimMs: 250, // the aim lasers flickering
+    fireMs: 150, // the beams firing in to meet
+    clashMs: 1_000, // the clash shoving back and forth
+    overloadMs: 200, // overloading before they blow
+    streamMs: 400, // the geyser pouring
+    travelMs: 450, // each coin's trip up it
     holdMs: 300,
     mergeMs: 500,
   },

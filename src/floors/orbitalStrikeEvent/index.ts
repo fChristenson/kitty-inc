@@ -19,6 +19,7 @@ import {
   pickCritTierByOdds,
 } from "../../shared/critTypes";
 import { drawExplosion } from "../../shared/eventFx";
+import { drawBeamFlare } from "../../shared/beam";
 import {
   freezeScreen,
   isScreenFrozen,
@@ -231,6 +232,7 @@ function drawBeam(
     ctx.fillRect(cx - width / 2, strike.skyY, width, bottom - strike.skyY);
   }
   ctx.restore();
+  drawBeamFlare(ctx, { x: cx, y: bottom }, box.width * 0.4 * thin);
 }
 
 function drawOverlay(

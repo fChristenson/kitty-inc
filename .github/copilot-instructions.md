@@ -54,17 +54,18 @@ Events (`src/floors/*Event`, listed in `docs/event-ideas.md`), like crits, must 
 
 ### Base templates
 
-By default every new event is one of three kinds:
+By default every new event is one of four kinds:
 
 | Kind      | What it is                                                                                                                                   | Built on                                                                   |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | **Money** | Cash moving as a liquid: big rivers, jets, pools and geysers of hundreds to thousands of coins. Never a few dozen coins arranged in a shape. | `floors/cashFlow` (`pourLine`) or `cover.flow` / `trace` on `wispCover`    |
 | **Wisp**  | Wisps flying, chasing, orbiting and colliding, with coins only as bursts and blasts.                                                         | `floors/wispCover` + `shared/wisp`                                         |
 | **Mix**   | Wisps and flowing cash working together: a wisp leads, feeds, drinks or fires a river of cash.                                               | `floors/cashFlow` (`riverHead` for a wisp at a river's head) + `wispCover` |
+| **Beam**  | Blazing beams of light that aim, fire, sweep, scan, cut and lock on (like Scanner and Orbital Strike), revealing, carrying or blasting big amounts of cash. | `shared/beam` (`drawBeam`, `drawAimLaser`, `drawBeamFlare`) + `wispCover` / `cashFlow` |
 
-No custom drawn props or art in any of them: just wisps, coins, bursts and glitter.
+No custom drawn props or art in any of them: just wisps, coins, beams, bursts and glitter.
 
-**Experiments.** Whenever you add a batch, also add a few events that break from these three templates to try something new, and say which ones they are.
+**Experiments.** Whenever you add a batch, also add a few events that break from these four templates to try something new, and say which ones they are.
 
 ### Rules for every event
 
@@ -88,6 +89,7 @@ Events must run smoothly on phones, so draw them with the shared libs below. Don
 | Beats fired once as the frame passes them (hits, landings) | `shared/eventBeats`: `createBeats(items, dueAt, fire)`, then `tick(ms, now)` each frame                                                                                                            |
 | Props (cups, planks, mallets, any gold shape)              | `shared/glowShape`: `createGlowSprite` once at arm, then `drawGlowSprite(ctx, sprite, x, y, scale, rotation)`. No per-frame path strokes                                                           |
 | Soft round glows, pools, shadows, flashes                  | `shared/glowSprite`: `drawGlow` / `glowSprite` with stops hoisted to a constant. No per-frame `createRadialGradient`                                                                               |
+| Beams, lasers, scan lines                                  | `shared/beam`: `drawBeam(ctx, from, to, width, alpha)` between any two points, `drawAimLaser` for a flickering aim line, `drawBeamFlare` where it lands                                             |
 | Orbs, wisps, travelling lights                             | `shared/wisp`: `drawWisp`, or `drawWispBetween` for a wisp that is only on screen for part of the event (it is culled outside that span)                                                           |
 | Sparkles in a loop                                         | `shared/twinkle`: `stampGlimmer` with `"lighter"` set once around the loop                                                                                                                         |
 | Text drawn every frame                                     | `shared/critText`: `drawCachedCritText`                                                                                                                                                            |

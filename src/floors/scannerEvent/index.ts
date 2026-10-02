@@ -1,7 +1,6 @@
-// the "Scanner" event (an experiment beyond the money/wisp templates: a
-// scan line): it covers its crit, whose click freezes the screen while a
-// blazing scan line sweeps down it from top to bottom, cash popping into
-// sight everywhere it passes as if it had been hiding in the screen; it hits
+// the "Scanner" event (beam): it covers its crit, whose click freezes the
+// screen while a blazing scan line sweeps down it from top to bottom, cash
+// popping into sight everywhere it passes as if it had been hiding in it; it hits
 // the bottom with a jolt and sweeps straight back up, scooping every coin
 // up with it into one line that it rams into the total-income readout in a
 // huge blast and shake, and the coins sweep into the total. Pays floor
@@ -13,6 +12,7 @@ import type { CoinPath } from "../coins";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, easeIn, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
+import { drawBeam, drawBeamFlare } from "../../shared/beam";
 import { totalSpot } from "../cashFlow";
 
 const KEY = "scanner";
@@ -55,18 +55,6 @@ export const forceScannerEvent = registerWispEvent(
         bottom + (total.y - bottom) * easeIn(clamp01((ms - upFrom) / sweepMs))
       );
     };
-    const band = document.createElement("canvas");
-    band.width = 4;
-    band.height = BAND;
-    const b = band.getContext("2d")!;
-    const fade = b.createLinearGradient(0, 0, 0, BAND);
-    fade.addColorStop(0, "rgba(255,215,0,0)");
-    fade.addColorStop(0.45, "rgba(255,240,170,0.9)");
-    fade.addColorStop(0.5, "rgba(255,255,255,1)");
-    fade.addColorStop(0.55, "rgba(255,240,170,0.9)");
-    fade.addColorStop(1, "rgba(255,215,0,0)");
-    b.fillStyle = fade;
-    b.fillRect(0, 0, 4, BAND);
 
     const paths: CoinPath[] = Array.from({ length: COINS }, () => {
       const x = area.left + Math.random() * width;
@@ -132,16 +120,17 @@ export const forceScannerEvent = registerWispEvent(
             shakeScreen(RUMBLE);
           }
         },
-        drawOver: (ctx, ms) => {
+        drawOver: (ctx, ms, now) => {
           if (ms >= travelMs) return;
           const total = cover?.total() ?? fallback;
           // narrowing onto the total on the way up
           const up = ms < upFrom ? 0 : clamp01((ms - upFrom) / sweepMs);
           const half = lerp([width / 2, 20], up * up);
           const cx = lerp([(area.left + area.right) / 2, total.x], up);
-          ctx.globalCompositeOperation = "lighter";
-          ctx.drawImage(band, cx - half, lineY(ms) - BAND / 2, half * 2, BAND);
-          ctx.globalCompositeOperation = "source-over";
+          const y = lineY(ms);
+          drawBeam(ctx, { x: cx - half, y }, { x: cx + half, y }, BAND);
+          drawBeamFlare(ctx, { x: cx - half, y }, BAND * 0.5, 1, now);
+          drawBeamFlare(ctx, { x: cx + half, y }, BAND * 0.5, 1, now);
         },
       },
     );

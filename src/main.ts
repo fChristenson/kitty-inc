@@ -144,6 +144,11 @@ import {
   forceJetpackEvent,
   forceBassDropEvent,
   forceScannerEvent,
+  forceLaserGridEvent,
+  forceEtchEvent,
+  forceSearchlightsEvent,
+  forceTractorBeamEvent,
+  forceBeamClashEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1151,6 +1156,11 @@ async function main() {
       jetpack: forceOnActive(forceJetpackEvent),
       "bass-drop": forceOnActive(forceBassDropEvent),
       scanner: forceOnActive(forceScannerEvent),
+      "laser-grid": forceOnActive(forceLaserGridEvent),
+      etch: forceOnActive(forceEtchEvent),
+      searchlights: forceOnActive(forceSearchlightsEvent),
+      "tractor-beam": forceOnActive(forceTractorBeamEvent),
+      "beam-clash": forceOnActive(forceBeamClashEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
