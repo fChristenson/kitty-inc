@@ -46,6 +46,11 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-chain-fountain-event" class="game__button">Chain Fountain</button>
           <button id="test-smoke-rings-event" class="game__button">Smoke Rings</button>
           <button id="test-water-salute-event" class="game__button">Water Salute</button>
@@ -66,11 +71,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-tumble-fire-event" class="game__button">Tumble Fire</button>
           <button id="test-roll-up-event" class="game__button">Roll Up</button>
           <button id="test-shredder-event" class="game__button">Shredder</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-whip-zoom-event" class="game__button">Whip Zoom</button>
           <button id="test-iris-out-event" class="game__button">Iris Out</button>
           <button id="test-screen-reels-event" class="game__button">Screen Reels</button>
