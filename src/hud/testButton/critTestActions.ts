@@ -46,6 +46,61 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-half-pipe-event" class="game__button">Half-Pipe</button>
+          <button id="test-knot-event" class="game__button">Knot</button>
+          <button id="test-ticker-tape-event" class="game__button">Ticker Tape</button>
+          <button id="test-cash-bridge-event" class="game__button">Cash Bridge</button>
+          <button id="test-skipping-stone-event" class="game__button">Skipping Stone</button>
+          <button id="test-woodpecker-event" class="game__button">Woodpecker</button>
+          <button id="test-frisbee-event" class="game__button">Frisbee</button>
+          <button id="test-kangaroo-event" class="game__button">Kangaroo</button>
+          <button id="test-badminton-event" class="game__button">Badminton</button>
+          <button id="test-tumbleweed-event" class="game__button">Tumbleweed</button>
+          <button id="test-shuttle-run-event" class="game__button">Shuttle Run</button>
+          <button id="test-echolocation-event" class="game__button">Echolocation</button>
+          <button id="test-lacrosse-event" class="game__button">Lacrosse</button>
+          <button id="test-jet-ski-event" class="game__button">Jet Ski</button>
+          <button id="test-drinking-straw-event" class="game__button">Drinking Straw</button>
+          <button id="test-sea-serpent-event" class="game__button">Sea Serpent</button>
+          <button id="test-magic-trick-event" class="game__button">Magic Trick</button>
+          <button id="test-fountain-pen-event" class="game__button">Fountain Pen</button>
+          <button id="test-spool-event" class="game__button">Spool</button>
+          <button id="test-laser-rain-event" class="game__button">Laser Rain</button>
+          <button id="test-cross-cut-event" class="game__button">Cross-Cut</button>
+          <button id="test-heliograph-event" class="game__button">Heliograph</button>
+          <button id="test-starburst-event" class="game__button">Starburst</button>
+          <button id="test-thunder-drum-event" class="game__button">Thunder Drum</button>
+          <button id="test-bolt-barrage-event" class="game__button">Bolt Barrage</button>
+          <button id="test-coilgun-event" class="game__button">Coilgun</button>
+          <button id="test-snowflake-event" class="game__button">Snowflake</button>
+          <button id="test-bomb-snake-event" class="game__button">Bomb Snake</button>
+          <button id="test-spider-mines-event" class="game__button">Spider Mines</button>
+          <button id="test-crossette-event" class="game__button">Crossette</button>
+          <button id="test-spiral-charge-event" class="game__button">Spiral Charge</button>
+          <button id="test-bomb-bubbles-event" class="game__button">Bomb Bubbles</button>
+          <button id="test-rocket-sled-event" class="game__button">Rocket Sled</button>
+          <button id="test-dynamite-fishing-event" class="game__button">Dynamite Fishing</button>
+          <button id="test-charge-shot-event" class="game__button">Charge Shot</button>
+          <button id="test-corkscrew-rounds-event" class="game__button">Corkscrew Rounds</button>
+          <button id="test-orbital-guns-event" class="game__button">Orbital Guns</button>
+          <button id="test-tracer-rounds-event" class="game__button">Tracer Rounds</button>
+          <button id="test-pellet-storm-event" class="game__button">Pellet Storm</button>
+          <button id="test-bullet-snake-event" class="game__button">Bullet Snake</button>
+          <button id="test-rock-paper-scissors-event" class="game__button">Rock Paper Scissors</button>
+          <button id="test-limbo-event" class="game__button">Limbo</button>
+          <button id="test-quiz-show-event" class="game__button">Quiz Show</button>
+          <button id="test-sumo-event" class="game__button">Sumo</button>
+          <button id="test-paper-toss-event" class="game__button">Paper Toss</button>
+          <button id="test-arm-wrestling-event" class="game__button">Arm Wrestling</button>
+          <button id="test-keepy-uppy-event" class="game__button">Keepy Uppy</button>
+          <button id="test-pin-the-tail-event" class="game__button">Pin the Tail</button>
+          <button id="test-trust-fall-event" class="game__button">Trust Fall</button>
+          <button id="test-bubble-gum-event" class="game__button">Bubble Gum</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-bolt-of-cash-event" class="game__button">Bolt of Cash</button>
           <button id="test-pendulum-pour-event" class="game__button">Pendulum Pour</button>
           <button id="test-pop-the-cork-event" class="game__button">Pop the Cork</button>
@@ -95,11 +150,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-cash-register-event" class="game__button">Cash Register</button>
           <button id="test-horse-race-event" class="game__button">Horse Race</button>
           <button id="test-dunk-tank-event" class="game__button">Dunk Tank</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-bungee-event" class="game__button">Bungee</button>
           <button id="test-funnel-cake-event" class="game__button">Funnel Cake</button>
           <button id="test-chrysanthemum-event" class="game__button">Chrysanthemum</button>
