@@ -24,7 +24,8 @@
 // floor at once — boost/hunt/swarm come first because their click branches in
 // floorInteractions run before sale/overtime; keep sale/overtime in this order unless
 // deliberately reprioritizing.
-import { drawCartoonText, drawPill, formatPrice } from "../../utils";
+import { drawCartoonText, formatPrice } from "../../utils";
+import { drawLiquidButton } from "../../shared/liquidFill";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
@@ -37,6 +38,7 @@ import {
   BTN_H,
   BTN_X,
   getBtnY,
+  getHoldHeat,
   peekHoldAnim,
   pressScale,
   resolveButtonFloor,
@@ -45,6 +47,8 @@ import {
 import { getActiveEventButton } from "../../shared/floorEvents";
 import { getCritTier, CRIT_TIER_CONFIG, type CritTier } from "./crit";
 import { getClaimedEventCover } from "../eventProcs";
+import { isSaleActive } from "./sale";
+import { isOvertimeActive } from "./overtime";
 import "./boost";
 import "./hunt";
 import "./swarm";
@@ -60,6 +64,14 @@ export * from "./swarm";
 export * from "./union";
 export * from "./sale";
 export * from "./overtime";
+
+// how hard the button and its bar boil: a long press, or a full boil all
+// through a Sale or Overtime
+export function getBoilHeat(floor: Floor, now: number): number {
+  const source = resolveButtonFloor(floor);
+  if (isSaleActive(source, now) || isOvertimeActive(source, now)) return 1;
+  return getHoldHeat(source, now);
+}
 
 // the buttons a screen freeze's overlay redraws itself (see
 // drawUpgradeButtonSpotlight), so the normal pass leaves them out
@@ -159,17 +171,16 @@ function renderUpgradeButton(
     } else if (hovered) {
       ctx.filter = "brightness(0.85)";
     }
-    // rounded RECTANGLE, not a full pill — ref.png's button corners are only modestly
-    // rounded, unlike the fully-stadium-shaped income bar. Must clear the combined
-    // black+white+dark ring inset (~21% of BTN_H) with room to spare, or the
-    // innermost green fill's own radius gets clamped to 0 and its corners go square
-    // even though the outer rings are still visibly rounded
-    drawPill(
+    // rounded RECTANGLE, not a full pill — ref.png's button corners are only
+    // modestly rounded, unlike the fully-stadium-shaped income bar
+    drawLiquidButton(
       ctx,
+      own,
       x,
       y,
       BTN_W,
       BTN_H,
+      40,
       crit
         ? (cover?.color ?? CRIT_TIER_CONFIG[critTier as CritTier].color)
         : activeEvent
@@ -179,9 +190,9 @@ function renderUpgradeButton(
             : affordable
               ? COLOR.moneyGreen
               : COLOR.disabledGray,
-      true,
-      true,
-      40,
+      now,
+      getBoilHeat(floor, now),
+      (crit || activeEvent ? getWiggleRotation(now) : 0) + holdAnim.rotation,
     );
 
     ctx.font = '900 52px "Fredoka", system-ui, sans-serif';

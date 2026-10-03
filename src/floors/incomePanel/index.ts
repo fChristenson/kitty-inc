@@ -14,6 +14,8 @@ import {
   isRateLockActive,
   RATE_LOCK_SPEED_MULTIPLIER,
   getPriceMatchCost,
+  getBoilHeat,
+  getHoldHeat,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
@@ -36,13 +38,17 @@ import {
 } from "../../shared/income";
 import { type BigNumber, add, multiply } from "../../shared/bigNumber";
 import {
-  drawPill,
-  drawPillBorder,
   drawCartoonText,
   formatPrice,
   formatTime,
   roundRect,
 } from "../../utils";
+import { drawLiquidBar } from "../../shared/liquidFill";
+import {
+  drawBoilingBar,
+  drawPressureBar,
+  type PressurePose,
+} from "../../shared/pressureBar";
 import { COLOR } from "../../palette";
 import { CONFIG } from "../../config";
 import {
@@ -231,16 +237,6 @@ export const MAX_INCOME_INTERVAL_SECONDS =
 // floorInteractions.ts celebrates with an extra coin burst at the upgrade indicator
 export const UPGRADE_MILESTONE_STEP = CONFIG.incomePanel.upgradeMilestoneStep;
 // Cost growth stays close to income's milestone speed growth for sustained progression.
-
-// once a floor's true speed exceeds what a 1s-minimum bar can show as a normal fill
-// (see effectiveIncomeCycle's overspeed flag below), the bar is shown full instead,
-// with this ray orbiting its border at a fixed pace to signal "still ticking"
-const OVERSPEED_RAY_LAP_MS = 900;
-// the ray covers this fraction of one full lap, broken into this many short
-// segments so its per-segment alpha fade reads as one smooth gradient trail
-const OVERSPEED_RAY_TAIL_LAP_FRACTION = 0.22;
-const OVERSPEED_RAY_TAIL_SEGMENTS = 32;
-const OVERSPEED_RAY_WIDTH = 8;
 
 export function increaseIncomeRate(floor: Floor): void {
   // a permanently-crited floor (see floorInteractions.ts's rollFloorBuyCrit)
@@ -494,23 +490,6 @@ function getGaugeGradientColors(floor: Floor): [string, string] {
   }
 }
 
-function drawGaugeFill(
-  ctx: CanvasRenderingContext2D,
-  floor: Floor,
-  barX: number,
-  barY: number,
-  barW: number,
-  barH: number,
-  radius: number,
-  fillW: number,
-): void {
-  if (fillW <= 0) return;
-  const [fromColor, toColor] = getGaugeGradientColors(floor);
-  roundRect(ctx, barX, barY, fillW, barH, radius);
-  ctx.fillStyle = getGaugeGradient(ctx, barX, barW, fromColor, toColor);
-  ctx.fill();
-}
-
 // horizontal and drawn at the bar's fixed local geometry, so built once per
 // (ctx, x, width, colors) instead of every frame for every gauge
 const gaugeGradients = new WeakMap<
@@ -536,88 +515,6 @@ function getGaugeGradient(
     byKey.set(key, gradient);
   }
   return gradient;
-}
-
-// walks clockwise around a rounded rect's own outline; t is a 0..1 lap fraction,
-// starting at the middle of the top edge
-function roundedRectPerimeterPoint(
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-  t: number,
-): { x: number; y: number } {
-  const straightW = w - 2 * r;
-  const straightH = h - 2 * r;
-  const arcLen = (Math.PI / 2) * r;
-  const total = 2 * straightW + 2 * straightH + 4 * arcLen;
-  let d = (((t % 1) + 1) % 1) * total;
-
-  if (d < straightW) return { x: x + r + d, y };
-  d -= straightW;
-  if (d < arcLen) {
-    const a = -Math.PI / 2 + (d / arcLen) * (Math.PI / 2);
-    return { x: x + w - r + r * Math.cos(a), y: y + r + r * Math.sin(a) };
-  }
-  d -= arcLen;
-  if (d < straightH) return { x: x + w, y: y + r + d };
-  d -= straightH;
-  if (d < arcLen) {
-    const a = 0 + (d / arcLen) * (Math.PI / 2);
-    return { x: x + w - r + r * Math.cos(a), y: y + h - r + r * Math.sin(a) };
-  }
-  d -= arcLen;
-  if (d < straightW) return { x: x + w - r - d, y: y + h };
-  d -= straightW;
-  if (d < arcLen) {
-    const a = Math.PI / 2 + (d / arcLen) * (Math.PI / 2);
-    return { x: x + r + r * Math.cos(a), y: y + h - r + r * Math.sin(a) };
-  }
-  d -= arcLen;
-  if (d < straightH) return { x, y: y + h - r - d };
-  d -= straightH;
-  const a = Math.PI + (d / arcLen) * (Math.PI / 2);
-  return { x: x + r + r * Math.cos(a), y: y + r + r * Math.sin(a) };
-}
-
-// a bright gradient ray sweeping around the bar's border at a fixed pace, fading out
-// along its own trailing length, for a floor pinned at the overspeed clamp. Drawn as
-// many short stroked segments (rather than one path) since canvas strokes can't fade
-// along their own length any other way — each segment's own alpha steps the fade
-// from transparent at the tail up to fully opaque at the head, reading as one
-// continuous ray
-function drawOverspeedRay(
-  ctx: CanvasRenderingContext2D,
-  barX: number,
-  barY: number,
-  barW: number,
-  barH: number,
-  radius: number,
-  now: number,
-): void {
-  const headT = (now % OVERSPEED_RAY_LAP_MS) / OVERSPEED_RAY_LAP_MS;
-  ctx.lineWidth = OVERSPEED_RAY_WIDTH;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = COLOR.white;
-  const baseAlpha = ctx.globalAlpha;
-  for (let i = OVERSPEED_RAY_TAIL_SEGMENTS; i >= 1; i--) {
-    const t0 =
-      headT -
-      (i / OVERSPEED_RAY_TAIL_SEGMENTS) * OVERSPEED_RAY_TAIL_LAP_FRACTION;
-    const t1 =
-      headT -
-      ((i - 1) / OVERSPEED_RAY_TAIL_SEGMENTS) * OVERSPEED_RAY_TAIL_LAP_FRACTION;
-    const p0 = roundedRectPerimeterPoint(barX, barY, barW, barH, radius, t0);
-    const p1 = roundedRectPerimeterPoint(barX, barY, barW, barH, radius, t1);
-    const alpha = 1 - i / OVERSPEED_RAY_TAIL_SEGMENTS;
-    ctx.beginPath();
-    ctx.moveTo(p0.x, p0.y);
-    ctx.lineTo(p1.x, p1.y);
-    ctx.globalAlpha = baseAlpha * alpha;
-    ctx.stroke();
-  }
-  ctx.globalAlpha = baseAlpha;
 }
 
 // starts the persistent redraw loop that animates every floor's fill bar; safe to call more than
@@ -702,18 +599,6 @@ export function drawIncomePanel(
     ctx.scale(pressScale, pressScale);
     ctx.translate(-barCenter.x, -barCenter.y);
 
-    drawPill(
-      ctx,
-      barX,
-      barY,
-      barW,
-      barH,
-      COLOR.incomeTrack,
-      false,
-      true,
-      barRadius,
-    );
-
     // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
     let fillW = barMinWidth;
     let overspeed = false;
@@ -740,8 +625,51 @@ export function drawIncomePanel(
     const fillColor = floor.critMultiplierTier
       ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
       : COLOR.moneyGreen;
+    let pressure: PressurePose | null = null;
+    const boilHeat = getBoilHeat(floor, now);
+    const holdHeat = getHoldHeat(floor, now);
     if (overtimeGaugeVisible) {
-      drawGaugeFill(ctx, floor, barX, barY, barW, barH, barRadius, fillW);
+      // the gauge is liquid too, in its tier-preview colors, boiling and
+      // straining while overtime runs
+      const [fromColor, toColor] = getGaugeGradientColors(floor);
+      const paint = (
+        c: CanvasRenderingContext2D,
+        gx: number,
+        _gy: number,
+        gw: number,
+      ): CanvasGradient => getGaugeGradient(c, gx, gw, fromColor, toColor);
+      if (boilHeat > 0) {
+        pressure = drawBoilingBar(
+          ctx,
+          floor,
+          barX,
+          barY,
+          barW,
+          barH,
+          barRadius,
+          fillW,
+          COLOR.amber,
+          now,
+          boilHeat,
+          holdHeat,
+          paint,
+        );
+      } else {
+        drawLiquidBar(
+          ctx,
+          floor,
+          barX,
+          barY,
+          barW,
+          barH,
+          barRadius,
+          fillW,
+          COLOR.amber,
+          now,
+          0,
+          paint,
+        );
+      }
       const whiteAlpha = Math.max(
         flashStrength > 0 ? mergeFlashWhite(flashStrength, now) : 0,
         tension?.white ?? 0,
@@ -753,22 +681,51 @@ export function drawIncomePanel(
         ctx.fill();
         ctx.globalAlpha = 1;
       }
+    } else if (overspeed) {
+      pressure = drawPressureBar(
+        ctx,
+        floor,
+        barX,
+        barY,
+        barW,
+        barH,
+        barRadius,
+        fillW,
+        fillColor,
+        now,
+        boilHeat,
+        holdHeat,
+      );
+    } else if (holdHeat > 0) {
+      pressure = drawBoilingBar(
+        ctx,
+        floor,
+        barX,
+        barY,
+        barW,
+        barH,
+        barRadius,
+        fillW,
+        fillColor,
+        now,
+        boilHeat,
+        holdHeat,
+      );
     } else {
-      drawPill(ctx, barX, barY, fillW, barH, fillColor, false, true, barRadius);
+      drawLiquidBar(
+        ctx,
+        floor,
+        barX,
+        barY,
+        barW,
+        barH,
+        barRadius,
+        fillW,
+        fillColor,
+        now,
+        boilHeat,
+      );
     }
-    // ring stroked last, on top of both fills, so it always reads as one continuous
-    // black/white/dark-green border around the whole capsule regardless of fill width
-    drawPillBorder(
-      ctx,
-      barX,
-      barY,
-      barW,
-      barH,
-      barRadius,
-      overtimeGaugeVisible ? COLOR.amber : fillColor,
-    );
-    if (overspeed)
-      drawOverspeedRay(ctx, barX, barY, barW, barH, barRadius, now);
     if (eventFlash && eventFlash.whiteAlpha > 0) {
       ctx.globalAlpha = eventFlash.whiteAlpha;
       roundRect(ctx, barX, barY, barW, barH, barRadius);
@@ -783,6 +740,12 @@ export function drawIncomePanel(
     ctx.font = '900 44px "Fredoka", system-ui, sans-serif';
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+    // the text swells and shakes with a pressurised bar
+    if (pressure) {
+      ctx.translate(barX + barW / 2 + pressure.shakeX, barY + barH / 2);
+      ctx.scale(pressure.textScale, pressure.textScale);
+      ctx.translate(-(barX + barW / 2), -(barY + barH / 2));
+    }
     drawCartoonText(
       ctx,
       overtimeGaugeVisible

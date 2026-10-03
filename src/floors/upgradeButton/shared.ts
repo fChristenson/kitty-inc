@@ -165,6 +165,9 @@ interface HoldAnimState {
   // any point mid-grow/mid-pop/mid-deflate, so this can't just always be
   // HOLD_ANIM_POP_SCALE the way the normal burst-triggered deflate can
   releaseFromScale: number;
+  // when the press began, and the boil's heat when it was released
+  heldSince: number;
+  releaseFromHeat: number;
 }
 const holdAnimState = new WeakMap<Floor, HoldAnimState>();
 // which button a hold started on actually animates, so its release still
@@ -180,6 +183,8 @@ export function startButtonHoldAnim(pressed: Floor): void {
     phase: "grow",
     phaseStartedAt: Date.now(),
     releaseFromScale: 1,
+    heldSince: Date.now(),
+    releaseFromHeat: 0,
   });
 }
 
@@ -208,6 +213,27 @@ function computeHoldScale(state: HoldAnimState, now: number): number {
   return state.releaseFromScale - (state.releaseFromScale - 1) * smoothstep(t);
 }
 
+// how hot a held button's liquid is, 0..1: it starts boiling
+// BOIL_DELAY_MS into the hold, is at a full boil BOIL_RAMP_MS later, and
+// simmers down over the release
+const BOIL_DELAY_MS = 200;
+const BOIL_RAMP_MS = 250;
+function holdHeat(state: HoldAnimState, now: number): number {
+  if (state.phase === "releasing") {
+    const t = Math.min(
+      1,
+      (now - state.phaseStartedAt) / HOLD_ANIM_RELEASE_DEFLATE_MS,
+    );
+    return state.releaseFromHeat * (1 - t);
+  }
+  const t = (now - state.heldSince - BOIL_DELAY_MS) / BOIL_RAMP_MS;
+  return Math.min(1, Math.max(0, t));
+}
+export function getHoldHeat(floor: Floor, now: number): number {
+  const state = holdAnimState.get(resolveButtonFloor(floor));
+  return state ? holdHeat(state, now) : 0;
+}
+
 // call once right when the hold ends (release/cancel/drag-away — see
 // gameCanvas.ts's onPointerUp) — instead of snapping back instantly, starts a
 // deflate from whatever size the button currently was
@@ -228,6 +254,8 @@ function beginReleasing(floor: Floor, state: HoldAnimState): void {
     phase: "releasing",
     phaseStartedAt: now,
     releaseFromScale: computeHoldScale(state, now),
+    heldSince: state.heldSince,
+    releaseFromHeat: holdHeat(state, now),
   });
 }
 
