@@ -13,7 +13,12 @@ import { drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
-import { aimBullet, drawBullets, drawMuzzleFlash, type Bullet } from "../../shared/bullets";
+import {
+  aimBullet,
+  drawBullets,
+  drawMuzzleFlash,
+  type Bullet,
+} from "../../shared/bullets";
 import { findRewardBars, type RewardBar } from "../eventRewards";
 
 const KEY = "crisscross";
@@ -55,8 +60,14 @@ export const forceCrisscrossEvent = registerWispEvent(
       const right = bar.box.x + bar.box.width + REACH;
       // the top gun runs left to right, the bottom one back
       const lanes: [Point, Point][] = [
-        [{ x: left, y: bar.center.y - LANE }, { x: right, y: bar.center.y - LANE }],
-        [{ x: right, y: bar.center.y + LANE }, { x: left, y: bar.center.y + LANE }],
+        [
+          { x: left, y: bar.center.y - LANE },
+          { x: right, y: bar.center.y - LANE },
+        ],
+        [
+          { x: right, y: bar.center.y + LANE },
+          { x: left, y: bar.center.y + LANE },
+        ],
       ];
       const shots = lanes.flatMap(([from, to], side) =>
         Array.from({ length: SHOTS }, (_, i) => {
@@ -64,7 +75,10 @@ export const forceCrisscrossEvent = registerWispEvent(
           const firedAt = starts + span * u;
           const gun = { x: lerp([from.x, to.x], u), y: from.y };
           const dir = to.x > from.x ? 1 : -1;
-          const target = { x: gun.x + dir * SLANT, y: bar.center.y - (gun.y - bar.center.y) };
+          const target = {
+            x: gun.x + dir * SLANT,
+            y: bar.center.y - (gun.y - bar.center.y),
+          };
           return {
             bullet: aimBullet(gun, target, firedAt, BULLET_SPEED),
             side,
@@ -81,7 +95,10 @@ export const forceCrisscrossEvent = registerWispEvent(
       p.lanes.map(([from, to]) => {
         const spot: Point = { x: 0, y: from.y };
         return (ms: number): Point => {
-          spot.x = lerp([from.x, to.x], clamp01((ms - p.starts) / (p.ends - p.starts)));
+          spot.x = lerp(
+            [from.x, to.x],
+            clamp01((ms - p.starts) / (p.ends - p.starts)),
+          );
           return spot;
         };
       }),
@@ -130,14 +147,33 @@ export const forceCrisscrossEvent = registerWispEvent(
             if (ms < p.starts || ms > p.ends + FLASH_MS) continue;
             for (const s of p.shots) {
               const t = (ms - s.bullet.firedAt) / FLASH_MS;
-              if (t > 0 && t < 1) drawMuzzleFlash(ctx, s.bullet.from, s.angle, t, FLASH);
+              if (t > 0 && t < 1)
+                drawMuzzleFlash(ctx, s.bullet.from, s.angle, t, FLASH);
             }
           }
           drawBullets(ctx, bullets, ms, now, undefined, true);
           for (let i = 0; i < passes.length; i++) {
             const p = passes[i];
-            drawWispBetween(ctx, gunAts[i * 2], ms, now, WISP_SIZE * GUN, 0.5, p.starts, p.ends);
-            drawWispBetween(ctx, gunAts[i * 2 + 1], ms, now, WISP_SIZE * GUN, 0.5, p.starts, p.ends);
+            drawWispBetween(
+              ctx,
+              gunAts[i * 2],
+              ms,
+              now,
+              WISP_SIZE * GUN,
+              0.5,
+              p.starts,
+              p.ends,
+            );
+            drawWispBetween(
+              ctx,
+              gunAts[i * 2 + 1],
+              ms,
+              now,
+              WISP_SIZE * GUN,
+              0.5,
+              p.starts,
+              p.ends,
+            );
           }
         },
       },

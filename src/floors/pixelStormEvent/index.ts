@@ -13,7 +13,13 @@ import { COLOR } from "../../palette";
 import { getButtonCenter } from "../upgradeButton";
 import type { Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
-import { clamp01, easeIn, easeOutBack, lerp, smoothstep } from "../../shared/easing";
+import {
+  clamp01,
+  easeIn,
+  easeOutBack,
+  lerp,
+  smoothstep,
+} from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { hash01 } from "../../shared/twinkle";
 import { clampTargetsY, sprayTargets } from "../../shared/coinTargets";
@@ -58,8 +64,10 @@ export const forcePixelStormEvent = registerWispEvent(
       const r = Math.floor(i / COLS);
       const home = { x: left + c * tileW, y: top + r * tileH };
       const d =
-        Math.hypot(home.x + tileW / 2 - button.x, home.y + tileH / 2 - button.y) /
-        reach;
+        Math.hypot(
+          home.x + tileW / 2 - button.x,
+          home.y + tileH / 2 - button.y,
+        ) / reach;
       return {
         home,
         row: r,

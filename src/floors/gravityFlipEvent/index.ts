@@ -107,7 +107,18 @@ export const forceGravityFlipEvent = registerWispEvent(
           ctx.globalCompositeOperation = "source-over";
           ctx.globalAlpha = 1;
           const dy = lift(ms) * height;
-          drawScreenPart(ctx, shot, left, top, width, height, left, top + dy, width, height);
+          drawScreenPart(
+            ctx,
+            shot,
+            left,
+            top,
+            width,
+            height,
+            left,
+            top + dy,
+            width,
+            height,
+          );
           ctx.restore();
         },
       },

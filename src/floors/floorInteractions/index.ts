@@ -2092,10 +2092,7 @@ function applyTeamLunchCrit(floor: Floor): void {
 // more per upgrade from here on. A floor already at the top tier has nothing
 // to trade its upgrades for, so it's skipped entirely. Workers/manager/office
 // upgrades and the building's accumulated price discount all survive
-function applySpringCleaningCrit(
-  floors: Floor[],
-  multiplier: BigNumber,
-): void {
+function applySpringCleaningCrit(floors: Floor[], multiplier: BigNumber): void {
   for (const [index, floor] of floors.entries()) {
     if (!floor.unlocked) continue;
     const promoted = nextCritTier(floor.critMultiplierTier);

@@ -37,7 +37,8 @@ const RIP_SHAKE: [number, number] = [0.5, 1.3];
 // the part of polygon `poly` on one side of the line p·DIR = d
 function cut(poly: Point[], d: number, beyond: boolean): Point[] {
   const out: Point[] = [];
-  const side = (p: Point) => (p.x * DIR.x + p.y * DIR.y - d) * (beyond ? 1 : -1);
+  const side = (p: Point) =>
+    (p.x * DIR.x + p.y * DIR.y - d) * (beyond ? 1 : -1);
   for (let i = 0; i < poly.length; i++) {
     const a = poly[i];
     const b = poly[(i + 1) % poly.length];
@@ -54,7 +55,9 @@ function cut(poly: Point[], d: number, beyond: boolean): Point[] {
 
 function trace(ctx: CanvasRenderingContext2D, poly: Point[]): void {
   ctx.beginPath();
-  poly.forEach((p, i) => (i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y)));
+  poly.forEach((p, i) =>
+    i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y),
+  );
   ctx.closePath();
 }
 
@@ -109,7 +112,11 @@ export const forceStickerPeelEvent = registerWispEvent(
         const at = foldPoint(line(ms));
         cover!.launchFrom(
           at,
-          clampTargetsY(sprayTargets(at, COINS, [60, 240]), top + 40, area.bottom - 40),
+          clampTargetsY(
+            sprayTargets(at, COINS, [60, 240]),
+            top + 40,
+            area.bottom - 40,
+          ),
         );
         if (!cover!.isLive()) return;
         playBloop();
@@ -158,7 +165,18 @@ export const forceStickerPeelEvent = registerWispEvent(
             ctx.save();
             trace(ctx, kept);
             ctx.clip();
-            drawScreenPart(ctx, shot, left, top, width, height, left, top, width, height);
+            drawScreenPart(
+              ctx,
+              shot,
+              left,
+              top,
+              width,
+              height,
+              left,
+              top,
+              width,
+              height,
+            );
             ctx.restore();
           }
           // the flap folded back over it, gold side up

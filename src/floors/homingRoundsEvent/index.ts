@@ -15,7 +15,11 @@ import { registerWispEvent, startWispCover } from "../wispCover";
 import { lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { bezier } from "../../shared/curves";
-import { drawBullets, drawMuzzleFlash, type Bullet } from "../../shared/bullets";
+import {
+  drawBullets,
+  drawMuzzleFlash,
+  type Bullet,
+} from "../../shared/bullets";
 import { findRewardWorkers, type RewardWorker } from "../eventRewards";
 
 const KEY = "homingRounds";
@@ -29,7 +33,13 @@ const FLASH = 50;
 const HIT_SHAKE: [number, number] = [0.6, 1.3];
 
 // a round flying from `from`, swung out through `bend`, onto `to`
-function homingRound(from: Point, bend: Point, to: Point, firedAt: number, hitAt: number): Bullet {
+function homingRound(
+  from: Point,
+  bend: Point,
+  to: Point,
+  firedAt: number,
+  hitAt: number,
+): Bullet {
   const spot: Point = { x: 0, y: 0 };
   const dx = bend.x - from.x;
   const dy = bend.y - from.y;
@@ -64,9 +74,21 @@ export const forceHomingRoundsEvent = registerWispEvent(
       clock += lerp(volleysMs, k / Math.max(1, workers.length - 1));
       const rounds = Array.from({ length: ROUNDS }, (_, r) => {
         const angle = -Math.PI / 2 + FAN * (r / (ROUNDS - 1) - 0.5);
-        const bend = { x: gun.x + Math.cos(angle) * REACH, y: gun.y + Math.sin(angle) * REACH };
+        const bend = {
+          x: gun.x + Math.cos(angle) * REACH,
+          y: gun.y + Math.sin(angle) * REACH,
+        };
         const firedAt = fires + r * SHOT_GAP_MS;
-        return { angle, bullet: homingRound(gun, bend, worker.at, firedAt, firedAt + flightMs) };
+        return {
+          angle,
+          bullet: homingRound(
+            gun,
+            bend,
+            worker.at,
+            firedAt,
+            firedAt + flightMs,
+          ),
+        };
       });
       return { worker, rounds, lands: rounds[ROUNDS - 1].bullet.hitAt };
     });

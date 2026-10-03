@@ -94,7 +94,10 @@ export const forceBombGarlandEvent = registerWispEvent(
         const a = (c / CLUSTER) * Math.PI * 2 + k;
         const at = g.bombs[Math.round(mid)].at;
         return {
-          at: { x: at.x + Math.cos(a) * CLUSTER_REACH, y: at.y + Math.sin(a) * CLUSTER_REACH },
+          at: {
+            x: at.x + Math.cos(a) * CLUSTER_REACH,
+            y: at.y + Math.sin(a) * CLUSTER_REACH,
+          },
           ms: g.meets + 60 + c * 25,
           size: CLUSTER_SIZE,
         };
@@ -102,19 +105,35 @@ export const forceBombGarlandEvent = registerWispEvent(
     ]);
     // one bang per pair racing in, the ends of each garland onward
     const chainBeats = garlands.flatMap((g) =>
-      Array.from({ length: Math.floor(mid) }, (_, s) => g.lit + (s * (g.meets - g.lit)) / mid),
+      Array.from(
+        { length: Math.floor(mid) },
+        (_, s) => g.lit + (s * (g.meets - g.lit)) / mid,
+      ),
     );
 
-    const chaining = createBeats(chainBeats, (ms) => ms, (_, k) => {
-      if (!cover?.isLive()) return;
-      playExplosion();
-      shakeScreen(lerp(CHAIN_SHAKE, (k % Math.floor(mid)) / Math.max(1, Math.floor(mid) - 1)));
-    });
+    const chaining = createBeats(
+      chainBeats,
+      (ms) => ms,
+      (_, k) => {
+        if (!cover?.isLive()) return;
+        playExplosion();
+        shakeScreen(
+          lerp(
+            CHAIN_SHAKE,
+            (k % Math.floor(mid)) / Math.max(1, Math.floor(mid) - 1),
+          ),
+        );
+      },
+    );
     const meeting = createBeats(
       garlands,
       (g) => g.meets,
       (g, k) => {
-        cover!.levels(g.bar, levelsFor(g.bar.floor, levelShare, 2), g.bombs[Math.round(mid)].at);
+        cover!.levels(
+          g.bar,
+          levelsFor(g.bar.floor, levelShare, 2),
+          g.bombs[Math.round(mid)].at,
+        );
         if (g === last) {
           for (const bar of bars) cover!.slam(bar);
           cover!.blast(g.bar.center);
@@ -143,10 +162,18 @@ export const forceBombGarlandEvent = registerWispEvent(
             const { g, b } = allBombs[i];
             const at = bombAts[i](ms);
             if (!at) continue;
-            if (ms >= g.lit) drawLitFuse(ctx, at, clamp01((ms - g.lit) / (b.blows - g.lit || 1)), FUSE, now);
+            if (ms >= g.lit)
+              drawLitFuse(
+                ctx,
+                at,
+                clamp01((ms - g.lit) / (b.blows - g.lit || 1)),
+                FUSE,
+                now,
+              );
             drawWispHead(ctx, bombAts[i], ms, now, WISP_SIZE * BOMB);
           }
-          for (const blast of blasts) drawDetonation(ctx, blast.at, ms - blast.ms, blast.size, now);
+          for (const blast of blasts)
+            drawDetonation(ctx, blast.at, ms - blast.ms, blast.size, now);
         },
       },
     );

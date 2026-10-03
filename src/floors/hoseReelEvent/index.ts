@@ -58,33 +58,62 @@ export const forceHoseReelEvent = registerWispEvent(
     }, 160);
     const back = [...out].reverse();
     back.push(total);
-    const unreel: Pour = { coinsAlong: 200, width: 30, streamMs: unreelMs * 0.8, travelMs: unreelMs };
-    const reel: Pour = { coinsAlong: 260, width: 36, streamMs: reelMs * 0.8, travelMs: reelMs };
+    const unreel: Pour = {
+      coinsAlong: 200,
+      width: 30,
+      streamMs: unreelMs * 0.8,
+      travelMs: unreelMs,
+    };
+    const reel: Pour = {
+      coinsAlong: 260,
+      width: 36,
+      streamMs: reelMs * 0.8,
+      travelMs: reelMs,
+    };
     const endAt = unreelMs + reelMs;
     const loops = Array.from({ length: LOOPS }, (_, k) => {
       const i = Math.round((0.1 + (0.9 * (k + 0.5)) / LOOPS) * 160);
       return { at: out[i], ms: (unreelMs * i) / 160 };
     });
-    const durationMs = Math.max(pourDurationMs(unreelMs, reel), endAt + holdMs + mergeMs);
+    const durationMs = Math.max(
+      pourDurationMs(unreelMs, reel),
+      endAt + holdMs + mergeMs,
+    );
     const outHead = riverHead(out, unreelMs);
     const backHead = riverHead(back, reelMs, unreelMs);
-    const nozzle = (ms: number): Point | null => outHead(Math.max(0, ms)) ?? backHead(ms);
+    const nozzle = (ms: number): Point | null =>
+      outHead(Math.max(0, ms)) ?? backHead(ms);
 
-    const pouring = createBeats([0, unreelMs], (ms) => ms, (ms) => {
-      if (ms === 0) pourLine(cover!, out, unreel);
-      else pourLine(cover!, back, reel);
-    });
+    const pouring = createBeats(
+      [0, unreelMs],
+      (ms) => ms,
+      (ms) => {
+        if (ms === 0) pourLine(cover!, out, unreel);
+        else pourLine(cover!, back, reel);
+      },
+    );
     const looping = createBeats(
       loops,
       (l) => l.ms,
       (l, k) => {
-        cover!.launchFrom(l.at, clampTargetsY(ringTargets(l.at, COINS, [40, 160]), area.top + 40, area.bottom - 40));
+        cover!.launchFrom(
+          l.at,
+          clampTargetsY(
+            ringTargets(l.at, COINS, [40, 160]),
+            area.top + 40,
+            area.bottom - 40,
+          ),
+        );
         if (!cover!.isLive()) return;
         playBloop();
         shakeScreen(lerp(LOOP_SHAKE, k / (LOOPS - 1)));
       },
     );
-    const finale = createBeats([endAt], (ms) => ms, () => cover!.blast(cover!.total() ?? total));
+    const finale = createBeats(
+      [endAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? total),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -99,7 +128,16 @@ export const forceHoseReelEvent = registerWispEvent(
           finale.tick(ms, now);
         },
         drawOver: (ctx, ms, now) =>
-          drawWispBetween(ctx, nozzle, ms, now, WISP_SIZE * WISP, 0.7, 0, endAt),
+          drawWispBetween(
+            ctx,
+            nozzle,
+            ms,
+            now,
+            WISP_SIZE * WISP,
+            0.7,
+            0,
+            endAt,
+          ),
       },
     );
     if (!cover) return;

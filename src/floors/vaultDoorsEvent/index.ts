@@ -50,7 +50,8 @@ export const forceVaultDoorsEvent = registerWispEvent(
     const endAt = slamAt + slamMs;
     const gap = (ms: number) => {
       if (ms < opensAt) return 0;
-      if (ms < slamAt) return OPEN * smoothstep(clamp01((ms - opensAt) / openMs));
+      if (ms < slamAt)
+        return OPEN * smoothstep(clamp01((ms - opensAt) / openMs));
       return OPEN * (1 - easeIn(clamp01((ms - slamAt) / slamMs)));
     };
     const rivers = Array.from({ length: RIVERS }, (_, i) => {
@@ -67,7 +68,12 @@ export const forceVaultDoorsEvent = registerWispEvent(
         30,
       );
     });
-    const pour: Pour = { coinsAlong: 220, width: 46, streamMs: floodMs * 0.7, travelMs: 520 };
+    const pour: Pour = {
+      coinsAlong: 220,
+      width: 46,
+      streamMs: floodMs * 0.7,
+      travelMs: 520,
+    };
 
     let shot: ScreenCopy | null = null;
     const beats = createBeats(
@@ -117,8 +123,30 @@ export const forceVaultDoorsEvent = registerWispEvent(
             drawGlow(ctx, GLOW, mid.x, mid.y, g * 1.2, 3);
             ctx.globalCompositeOperation = "source-over";
           }
-          drawScreenPart(ctx, shot, left, top, half, height, left - g, top, half, height);
-          drawScreenPart(ctx, shot, mid.x, top, half, height, mid.x + g, top, half, height);
+          drawScreenPart(
+            ctx,
+            shot,
+            left,
+            top,
+            half,
+            height,
+            left - g,
+            top,
+            half,
+            height,
+          );
+          drawScreenPart(
+            ctx,
+            shot,
+            mid.x,
+            top,
+            half,
+            height,
+            mid.x + g,
+            top,
+            half,
+            height,
+          );
           ctx.fillStyle = COLOR.heavenlyGold;
           ctx.fillRect(mid.x - g - EDGE, top, EDGE, height);
           ctx.fillRect(mid.x + g, top, EDGE, height);

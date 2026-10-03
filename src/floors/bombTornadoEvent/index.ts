@@ -48,7 +48,10 @@ export const forceBombTornadoEvent = registerWispEvent(
   () => CONFIG.bombTornadoEvent.chance,
   (floor, context, area) => {
     const { spinUpMs, flingsMs, holdMs, mergeMs } = CONFIG.bombTornadoEvent;
-    const base: Point = { x: (area.left + area.right) / 2, y: area.bottom - 90 };
+    const base: Point = {
+      x: (area.left + area.right) / 2,
+      y: area.bottom - 90,
+    };
     const height = (area.bottom - area.top) * HEIGHT;
     let clock = spinUpMs;
     const flungAt: number[] = [];
@@ -61,7 +64,9 @@ export const forceBombTornadoEvent = registerWispEvent(
     const turnAt = (ms: number) => {
       const s = Math.min(ms, coreAt) / 1000;
       const span = coreAt / 1000;
-      return Math.PI * 2 * (LAPS[0] * s + ((LAPS[1] - LAPS[0]) * s * s) / (2 * span));
+      return (
+        Math.PI * 2 * (LAPS[0] * s + ((LAPS[1] - LAPS[0]) * s * s) / (2 * span))
+      );
     };
     const orbit = (h: number, phase: number, ms: number, into: Point) => {
       const a = phase + turnAt(ms);
@@ -110,7 +115,10 @@ export const forceBombTornadoEvent = registerWispEvent(
       ...Array.from({ length: CLUSTER }, (_, c) => {
         const a = (c / CLUSTER) * Math.PI * 2 + k;
         return {
-          at: { x: b.lands.x + Math.cos(a) * CLUSTER_REACH, y: b.lands.y + Math.sin(a) * CLUSTER_REACH },
+          at: {
+            x: b.lands.x + Math.cos(a) * CLUSTER_REACH,
+            y: b.lands.y + Math.sin(a) * CLUSTER_REACH,
+          },
           ms: b.blows + CLUSTER_MS + c * 30,
           size: CLUSTER_SIZE,
         };
@@ -122,13 +130,24 @@ export const forceBombTornadoEvent = registerWispEvent(
       bombs,
       (b) => b.blows,
       (b, k) => {
-        cover!.launchFrom(b.lands, clampTargetsY(ringTargets(b.lands, COINS, [60, 220]), area.top + 40, area.bottom - 30));
+        cover!.launchFrom(
+          b.lands,
+          clampTargetsY(
+            ringTargets(b.lands, COINS, [60, 220]),
+            area.top + 40,
+            area.bottom - 30,
+          ),
+        );
         if (!cover!.isLive()) return;
         playExplosion();
         shakeScreen(lerp(BLAST_SHAKE, k / (BOMBS - 1)));
       },
     );
-    const finale = createBeats([coreAt], (ms) => ms, () => cover!.blast(core));
+    const finale = createBeats(
+      [coreAt],
+      (ms) => ms,
+      () => cover!.blast(core),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -149,7 +168,8 @@ export const forceBombTornadoEvent = registerWispEvent(
             drawLitFuse(ctx, at, clamp01(ms / b.blows), FUSE, now);
             drawWispHead(ctx, b.at, ms, now, WISP_SIZE * BOMB);
           }
-          for (const blast of blasts) drawDetonation(ctx, blast.at, ms - blast.ms, blast.size, now);
+          for (const blast of blasts)
+            drawDetonation(ctx, blast.at, ms - blast.ms, blast.size, now);
         },
       },
     );

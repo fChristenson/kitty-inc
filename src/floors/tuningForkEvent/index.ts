@@ -13,7 +13,12 @@ import { drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
-import { createBolt, drawBolt, drawStrike, type Bolt } from "../../shared/lightning";
+import {
+  createBolt,
+  drawBolt,
+  drawStrike,
+  type Bolt,
+} from "../../shared/lightning";
 import { findRewardBars, type RewardBar } from "../eventRewards";
 
 const KEY = "tuningFork";
@@ -50,7 +55,8 @@ export const forceTuningForkEvent = registerWispEvent(
     let clock = 0;
     const forks: Fork[] = bars.map((bar, k) => {
       const starts = clock;
-      const strikes = starts + ENTER_MS + lerp(humsMs, k / Math.max(1, bars.length - 1));
+      const strikes =
+        starts + ENTER_MS + lerp(humsMs, k / Math.max(1, bars.length - 1));
       const hits = strikes + STRIKE_MS;
       clock = hits;
       const prongs: [Point, Point] = [
@@ -64,21 +70,32 @@ export const forceTuningForkEvent = registerWispEvent(
         hits,
         prongs,
         arc: createBolt(prongs[0], prongs[1], 0),
-        stabs: [createBolt(prongs[0], bar.center, 1), createBolt(prongs[1], bar.center, 1)],
+        stabs: [
+          createBolt(prongs[0], bar.center, 1),
+          createBolt(prongs[1], bar.center, 1),
+        ],
       };
     });
     const last = forks[forks.length - 1];
     const endAt = last.hits + AFTER_MS;
     // where each prong is at ms: dropping in, humming, then slamming down
     const place = (f: Fork, ms: number) => {
-      const hum = clamp01((ms - f.starts - ENTER_MS) / (f.strikes - f.starts - ENTER_MS));
+      const hum = clamp01(
+        (ms - f.starts - ENTER_MS) / (f.strikes - f.starts - ENTER_MS),
+      );
       const swing =
         ms < f.strikes
-          ? lerp(SWING, hum) * Math.sin(((ms - f.starts) / 1000) * Math.PI * 2 * lerp(HUM_HZ, hum * hum))
+          ? lerp(SWING, hum) *
+            Math.sin(
+              ((ms - f.starts) / 1000) * Math.PI * 2 * lerp(HUM_HZ, hum * hum),
+            )
           : 0;
       const drop = easeOut(clamp01((ms - f.starts) / ENTER_MS));
       const slam = easeIn(clamp01((ms - f.strikes) / STRIKE_MS));
-      const y = lerp([f.bar.center.y - RISE * 2.5, f.bar.center.y - RISE], drop);
+      const y = lerp(
+        [f.bar.center.y - RISE * 2.5, f.bar.center.y - RISE],
+        drop,
+      );
       for (let side = 0; side < 2; side++) {
         const p = f.prongs[side];
         const out = (side === 0 ? -1 : 1) * (GAP / 2 + swing);
@@ -86,11 +103,17 @@ export const forceTuningForkEvent = registerWispEvent(
         p.y = lerp([y, f.bar.box.y - 6], slam);
       }
     };
-    const prongs = forks.flatMap((f) => f.prongs.map((p) => (ms: number) => (place(f, ms), p)));
+    const prongs = forks.flatMap((f) =>
+      f.prongs.map((p) => (ms: number) => (place(f, ms), p)),
+    );
 
-    const humming = createBeats(forks, (f) => f.starts + ENTER_MS, () => {
-      if (cover?.isLive()) playBloop();
-    });
+    const humming = createBeats(
+      forks,
+      (f) => f.starts + ENTER_MS,
+      () => {
+        if (cover?.isLive()) playBloop();
+      },
+    );
     const striking = createBeats(
       forks,
       (f) => f.hits,
@@ -126,18 +149,39 @@ export const forceTuningForkEvent = registerWispEvent(
             const f = forks[i];
             if (ms < f.starts || ms > f.hits + AFTER_MS) continue;
             place(f, ms);
-            const hum = clamp01((ms - f.starts - ENTER_MS) / (f.strikes - f.starts - ENTER_MS));
+            const hum = clamp01(
+              (ms - f.starts - ENTER_MS) / (f.strikes - f.starts - ENTER_MS),
+            );
             // flickers on and off, ever faster, until it holds solid
             const flicker = Math.sin(ms / lerp([60, 8], hum)) > 0.6 - 1.6 * hum;
-            if (ms < f.strikes && hum > 0 && flicker) drawBolt(ctx, f.arc, 0.4 + 0.6 * hum, 0.6);
+            if (ms < f.strikes && hum > 0 && flicker)
+              drawBolt(ctx, f.arc, 0.4 + 0.6 * hum, 0.6);
             if (ms >= f.hits) {
               const fade = 1 - (ms - f.hits) / AFTER_MS;
               drawBolt(ctx, f.stabs[0], fade, 0.9);
               drawBolt(ctx, f.stabs[1], fade, 0.9);
               drawStrike(ctx, f.bar.center, fade, 1, now);
             }
-            drawWispBetween(ctx, prongs[i * 2], ms, now, WISP_SIZE * WISP, 0.5, f.starts, f.hits + AFTER_MS);
-            drawWispBetween(ctx, prongs[i * 2 + 1], ms, now, WISP_SIZE * WISP, 0.5, f.starts, f.hits + AFTER_MS);
+            drawWispBetween(
+              ctx,
+              prongs[i * 2],
+              ms,
+              now,
+              WISP_SIZE * WISP,
+              0.5,
+              f.starts,
+              f.hits + AFTER_MS,
+            );
+            drawWispBetween(
+              ctx,
+              prongs[i * 2 + 1],
+              ms,
+              now,
+              WISP_SIZE * WISP,
+              0.5,
+              f.starts,
+              f.hits + AFTER_MS,
+            );
           }
         },
       },

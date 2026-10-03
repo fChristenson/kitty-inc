@@ -85,10 +85,17 @@ export const forceMirrorBoxEvent = registerWispEvent(
       (ms) => ms,
       (_, k) => {
         const m = MIRRORS[k];
-        const at = { x: m.x === 0 ? (left + right) / 2 : ax, y: m.y === 0 ? (top + bottom) / 2 : ay };
+        const at = {
+          x: m.x === 0 ? (left + right) / 2 : ax,
+          y: m.y === 0 ? (top + bottom) / 2 : ay,
+        };
         cover!.launchFrom(
           at,
-          clampTargetsY(sprayTargets(at, COINS, [60, 240]), top + 40, bottom - 40),
+          clampTargetsY(
+            sprayTargets(at, COINS, [60, 240]),
+            top + 40,
+            bottom - 40,
+          ),
         );
         if (!cover!.isLive()) return;
         playBloop();
@@ -127,7 +134,18 @@ export const forceMirrorBoxEvent = registerWispEvent(
           ctx.beginPath();
           ctx.rect(left, top, right - left, bottom - top);
           ctx.clip();
-          drawScreenPart(ctx, shot, left, top, right - left, bottom - top, left, top, right - left, bottom - top);
+          drawScreenPart(
+            ctx,
+            shot,
+            left,
+            top,
+            right - left,
+            bottom - top,
+            left,
+            top,
+            right - left,
+            bottom - top,
+          );
           if (m.x !== 0) mirror(ctx, shot, m.x, 0, s);
           if (m.y !== 0) mirror(ctx, shot, 0, m.y, s);
           if (m.x !== 0 && m.y !== 0) mirror(ctx, shot, m.x, m.y, s);

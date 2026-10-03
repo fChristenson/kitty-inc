@@ -14,7 +14,12 @@ import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { drawBeam, drawBeamFlare } from "../../shared/beam";
-import { drawRewardHires, findRewardHires, giveHire, type RewardHire } from "../eventRewards";
+import {
+  drawRewardHires,
+  findRewardHires,
+  giveHire,
+  type RewardHire,
+} from "../eventRewards";
 
 const KEY = "lightDominoes";
 const MAX_HIRES = 6;
@@ -56,7 +61,10 @@ export const forceLightDominoesEvent = registerWispEvent(
       const from = bases[bases.length - 1];
       let best = 0;
       for (let i = 1; i < left.length; i++)
-        if (Math.hypot(left[i].x - from.x, left[i].y - from.y) < Math.hypot(left[best].x - from.x, left[best].y - from.y))
+        if (
+          Math.hypot(left[i].x - from.x, left[i].y - from.y) <
+          Math.hypot(left[best].x - from.x, left[best].y - from.y)
+        )
           best = i;
       const [hire] = left.splice(best, 1);
       hires.push(hire);
@@ -76,7 +84,10 @@ export const forceLightDominoesEvent = registerWispEvent(
         base,
         length: Math.hypot(to.x - base.x, to.y - base.y),
         upright,
-        fallen: Math.abs(fallen - upright) > Math.PI ? fallen + Math.PI * 2 * Math.sign(upright - fallen) : fallen,
+        fallen:
+          Math.abs(fallen - upright) > Math.PI
+            ? fallen + Math.PI * 2 * Math.sign(upright - fallen)
+            : fallen,
         rises: RISE_STAGGER * k,
         falls,
         lands,

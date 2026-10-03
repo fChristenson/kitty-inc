@@ -59,7 +59,12 @@ export const forcePopUpEvent = registerWispEvent(
         if (p.band !== band) continue;
         const t = (ms - p.at) / POP_MS;
         if (t > 0 && t < 1)
-          s = Math.max(s, 1 + (p.at === allAt ? POP * 1.6 : POP) * Math.sin(Math.PI * easeOutBack(clamp01(t * 1.2))));
+          s = Math.max(
+            s,
+            1 +
+              (p.at === allAt ? POP * 1.6 : POP) *
+                Math.sin(Math.PI * easeOutBack(clamp01(t * 1.2))),
+          );
       }
       return s;
     };
@@ -72,7 +77,11 @@ export const forcePopUpEvent = registerWispEvent(
         const at = { x: left + width / 2, y: top + (p.band + 0.5) * bandH };
         cover!.launchFrom(
           at,
-          clampTargetsY(sprayTargets(at, COINS, [60, 240], -Math.PI / 2, Math.PI), top + 40, area.bottom - 40),
+          clampTargetsY(
+            sprayTargets(at, COINS, [60, 240], -Math.PI / 2, Math.PI),
+            top + 40,
+            area.bottom - 40,
+          ),
         );
         if (!cover!.isLive()) return;
         playBloop();
@@ -103,12 +112,23 @@ export const forcePopUpEvent = registerWispEvent(
           }
           shot ??= copyScreen(ctx);
           ctx.save();
-          drawScreenPart(ctx, shot, left, top, width, height, left, top, width, height);
+          drawScreenPart(
+            ctx,
+            shot,
+            left,
+            top,
+            width,
+            height,
+            left,
+            top,
+            width,
+            height,
+          );
           // flat bands first, then the popped ones over them, biggest last
           for (let pass = 0; pass < 2; pass++)
             for (let b = 0; b < BANDS; b++) {
               const s = bandScale(b, ms);
-              if ((s > 1) !== (pass === 1)) continue;
+              if (s > 1 !== (pass === 1)) continue;
               const y = top + b * bandH;
               const w = width * s;
               const h = bandH * s;
@@ -116,7 +136,12 @@ export const forcePopUpEvent = registerWispEvent(
               const yy = y + (bandH - h) / 2;
               if (s > 1) {
                 ctx.fillStyle = SHADOW_FILL;
-                ctx.fillRect(x + SHADOW * (s - 1) * 8, yy + SHADOW * (s - 1) * 8, w, h);
+                ctx.fillRect(
+                  x + SHADOW * (s - 1) * 8,
+                  yy + SHADOW * (s - 1) * 8,
+                  w,
+                  h,
+                );
               }
               drawScreenPart(ctx, shot, left, y, width, bandH, x, yy, w, h);
             }

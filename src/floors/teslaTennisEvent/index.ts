@@ -15,7 +15,12 @@ import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, lerp, smoothstep } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { clampTargetsY, sprayTargets } from "../../shared/coinTargets";
-import { createBolt, drawBolt, drawStrike, type Bolt } from "../../shared/lightning";
+import {
+  createBolt,
+  drawBolt,
+  drawStrike,
+  type Bolt,
+} from "../../shared/lightning";
 import { totalSpot } from "../cashFlow";
 
 const KEY = "teslaTennis";
@@ -52,12 +57,21 @@ export const forceTeslaTennisEvent = registerWispEvent(
     const hits: Hit[] = Array.from({ length: RETURNS }, (_, k) => {
       const side = (k + 1) % 2;
       clock += lerp(shotsMs, k / RETURNS);
-      const at = { x: xs[side] + (side === 0 ? REACH : -REACH), y: lerp([top, bottom], Math.random()) };
-      return { at, side, ms: clock, bolt: createBolt({ x: xs[side], y: at.y }, at, 1) };
+      const at = {
+        x: xs[side] + (side === 0 ? REACH : -REACH),
+        y: lerp([top, bottom], Math.random()),
+      };
+      return {
+        at,
+        side,
+        ms: clock,
+        bolt: createBolt({ x: xs[side], y: at.y }, at, 1),
+      };
     });
     const smashAt = clock + lerp(shotsMs, 1);
     const endAt = smashAt;
-    const route: { from: Point; to: Point; starts: number; ends: number }[] = [];
+    const route: { from: Point; to: Point; starts: number; ends: number }[] =
+      [];
     let from: Point = button;
     let starts = 0;
     for (const h of hits) {
@@ -89,7 +103,10 @@ export const forceTeslaTennisEvent = registerWispEvent(
             since = h.ms;
             continue;
           }
-          y = lerp([y, h.at.y], smoothstep(clamp01((ms - since) / Math.max(1, h.ms - since))));
+          y = lerp(
+            [y, h.at.y],
+            smoothstep(clamp01((ms - since) / Math.max(1, h.ms - since))),
+          );
           break;
         }
         at.y = y;
@@ -103,13 +120,24 @@ export const forceTeslaTennisEvent = registerWispEvent(
       (h, k) => {
         cover!.burst(h.at, 0.4);
         const aim = h.side === 0 ? 0 : Math.PI;
-        cover!.launchFrom(h.at, clampTargetsY(sprayTargets(h.at, COINS, [60, 220], aim, 1.6), area.top + 40, area.bottom - 40));
+        cover!.launchFrom(
+          h.at,
+          clampTargetsY(
+            sprayTargets(h.at, COINS, [60, 220], aim, 1.6),
+            area.top + 40,
+            area.bottom - 40,
+          ),
+        );
         if (!cover!.isLive()) return;
         playExplosion();
         shakeScreen(lerp(HIT_SHAKE, k / (RETURNS - 1)));
       },
     );
-    const finale = createBeats([smashAt], (ms) => ms, () => cover!.blast(cover!.total() ?? total));
+    const finale = createBeats(
+      [smashAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? total),
+    );
 
     const cover = startWispCover(
       KEY,

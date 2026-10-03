@@ -10,7 +10,13 @@ import { playBoostEventStream, playExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { COLOR } from "../../palette";
 import { registerWispEvent, startWispCover } from "../wispCover";
-import { clamp01, easeIn, easeOutBack, easeOutCubic, lerp } from "../../shared/easing";
+import {
+  clamp01,
+  easeIn,
+  easeOutBack,
+  easeOutCubic,
+  lerp,
+} from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { drawGlow, fadeStops } from "../../shared/glowSprite";
 import { clampTargetsY, ringTargets } from "../../shared/coinTargets";
@@ -52,12 +58,15 @@ export const forcePullBackEvent = registerWispEvent(
     const slamAt = clock + 120;
     const endAt = slamAt + slamMs;
     const scale = (ms: number) => {
-      if (ms < pullMs) return lerp([1, SMALL], easeOutCubic(clamp01(ms / pullMs)));
-      if (ms >= slamAt) return lerp([SMALL, 1], easeIn(clamp01((ms - slamAt) / slamMs)));
+      if (ms < pullMs)
+        return lerp([1, SMALL], easeOutCubic(clamp01(ms / pullMs)));
+      if (ms >= slamAt)
+        return lerp([SMALL, 1], easeIn(clamp01((ms - slamAt) / slamMs)));
       let s = SMALL;
       for (const t of thumps) {
         const p = (ms - t) / PUNCH_MS;
-        if (p > 0 && p < 1) s = SMALL * (1 + PUNCH * Math.sin(Math.PI * easeOutBack(p)));
+        if (p > 0 && p < 1)
+          s = SMALL * (1 + PUNCH * Math.sin(Math.PI * easeOutBack(p)));
       }
       return s;
     };
@@ -70,7 +79,11 @@ export const forcePullBackEvent = registerWispEvent(
         const reach: [number, number] = [width * SMALL * 0.6, width * 0.55];
         cover!.launchFrom(
           mid,
-          clampTargetsY(ringTargets(mid, COINS, reach), top + 40, area.bottom - 40),
+          clampTargetsY(
+            ringTargets(mid, COINS, reach),
+            top + 40,
+            area.bottom - 40,
+          ),
         );
         if (!cover!.isLive()) return;
         playExplosion();
@@ -112,8 +125,24 @@ export const forcePullBackEvent = registerWispEvent(
           ctx.globalCompositeOperation = "source-over";
           ctx.globalAlpha = 1;
           ctx.fillStyle = COLOR.heavenlyGold;
-          ctx.fillRect(mid.x - w / 2 - FRAME, mid.y - h / 2 - FRAME, w + FRAME * 2, h + FRAME * 2);
-          drawScreenPart(ctx, shot, left, top, width, height, mid.x - w / 2, mid.y - h / 2, w, h);
+          ctx.fillRect(
+            mid.x - w / 2 - FRAME,
+            mid.y - h / 2 - FRAME,
+            w + FRAME * 2,
+            h + FRAME * 2,
+          );
+          drawScreenPart(
+            ctx,
+            shot,
+            left,
+            top,
+            width,
+            height,
+            mid.x - w / 2,
+            mid.y - h / 2,
+            w,
+            h,
+          );
           ctx.restore();
         },
       },

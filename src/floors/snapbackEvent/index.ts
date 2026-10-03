@@ -14,8 +14,17 @@ import type { Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { easeIn, easeOut, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
-import { drawBullets, drawMuzzleFlash, type Bullet } from "../../shared/bullets";
-import { drawRewardHires, findRewardHires, giveHire, type RewardHire } from "../eventRewards";
+import {
+  drawBullets,
+  drawMuzzleFlash,
+  type Bullet,
+} from "../../shared/bullets";
+import {
+  drawRewardHires,
+  findRewardHires,
+  giveHire,
+  type RewardHire,
+} from "../eventRewards";
 
 const KEY = "snapback";
 const MAX_HIRES = 6;
@@ -31,11 +40,19 @@ const FLASH = 50;
 const SNAP_SHAKE: [number, number] = [0.6, 1.3];
 
 // a round past `spot` to `over`, hanging there, then snapping back onto `spot`
-function snapRound(from: Point, spot: Point, firedAt: number, hitAt: number): Bullet {
+function snapRound(
+  from: Point,
+  spot: Point,
+  firedAt: number,
+  hitAt: number,
+): Bullet {
   const dx = spot.x - from.x;
   const dy = spot.y - from.y;
   const length = Math.hypot(dx, dy) || 1;
-  const over = { x: spot.x + (dx / length) * OVERSHOOT, y: spot.y + (dy / length) * OVERSHOOT };
+  const over = {
+    x: spot.x + (dx / length) * OVERSHOOT,
+    y: spot.y + (dy / length) * OVERSHOOT,
+  };
   const at: Point = { x: 0, y: 0 };
   return {
     from,
@@ -81,7 +98,12 @@ export const forceSnapbackEvent = registerWispEvent(
       const firedAt = clock;
       clock += lerp(shotsMs, t);
       const bullet = snapRound(gun, spot, firedAt, firedAt + lerp(flightMs, t));
-      return { hire, spot, bullet, angle: Math.atan2(spot.y - gun.y, spot.x - gun.x) };
+      return {
+        hire,
+        spot,
+        bullet,
+        angle: Math.atan2(spot.y - gun.y, spot.x - gun.x),
+      };
     });
     const endAt = Math.max(...shots.map((s) => s.bullet.hitAt));
     const last = shots.find((s) => s.bullet.hitAt === endAt)!;

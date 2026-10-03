@@ -32,7 +32,12 @@ export const forceChampagneTowerEvent = registerWispEvent(
       CONFIG.champagneTowerEvent;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
-    const pour: Pour = { coinsAlong: 160, width: 30, streamMs: fillMs, travelMs: pourMs };
+    const pour: Pour = {
+      coinsAlong: 160,
+      width: 30,
+      streamMs: fillMs,
+      travelMs: pourMs,
+    };
     const line = (a: Point, b: Point, bend: Point) =>
       sampleLine((u) => bezier(a, bend, b, u, { x: 0, y: 0 }), 24);
     // each glass's rim, and where its overflow lands on the next one down
@@ -49,7 +54,10 @@ export const forceChampagneTowerEvent = registerWispEvent(
     const first = bars[0].center;
     const rivers: { line: Point[]; starts: number }[] = [
       {
-        line: line({ x: first.x, y: area.top }, first, { x: first.x, y: (area.top + first.y) / 2 }),
+        line: line({ x: first.x, y: area.top }, first, {
+          x: first.x,
+          y: (area.top + first.y) / 2,
+        }),
         starts: 0,
       },
     ];
@@ -57,7 +65,10 @@ export const forceChampagneTowerEvent = registerWispEvent(
       const filledAt = pourMs + k * (pourMs + fillMs);
       const below = bars[k + 1]?.center ?? null;
       for (const side of [-1, 1])
-        rivers.push({ line: spill(bar, below, side), starts: filledAt + fillMs * 0.5 });
+        rivers.push({
+          line: spill(bar, below, side),
+          starts: filledAt + fillMs * 0.5,
+        });
       return { bar, fills: filledAt, last: k === bars.length - 1 };
     });
     const endAt = fills[fills.length - 1].fills + fillMs * 0.5 + pourMs;

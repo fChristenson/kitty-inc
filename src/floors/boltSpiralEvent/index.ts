@@ -40,8 +40,12 @@ export const forceBoltSpiralEvent = registerWispEvent(
     const { spinMs, levelShare, holdMs, mergeMs } = CONFIG.boltSpiralEvent;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
-    const hub: Point = { x: (area.left + area.right) / 2, y: (area.top + area.bottom) / 2 };
-    const reach = Math.max(...bars.map((b) => Math.abs(b.center.y - hub.y))) + REACH_PAST;
+    const hub: Point = {
+      x: (area.left + area.right) / 2,
+      y: (area.top + area.bottom) / 2,
+    };
+    const reach =
+      Math.max(...bars.map((b) => Math.abs(b.center.y - hub.y))) + REACH_PAST;
     // turning ever faster, so the angle runs as u squared
     const path = sampleLine((u) => {
       const a = -Math.PI / 2 + TURNS * Math.PI * 2 * u * u;
@@ -85,10 +89,14 @@ export const forceBoltSpiralEvent = registerWispEvent(
         shakeScreen(lerp(HIT_SHAKE, k / Math.max(1, hits.length - 1)));
       },
     );
-    const finale = createBeats([endAt], (ms) => ms, () => {
-      for (const bar of bars) cover!.slam(bar);
-      cover!.blast(hub);
-    });
+    const finale = createBeats(
+      [endAt],
+      (ms) => ms,
+      () => {
+        for (const bar of bars) cover!.slam(bar);
+        cover!.blast(hub);
+      },
+    );
 
     const cover = startWispCover(
       KEY,

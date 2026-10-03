@@ -10,7 +10,12 @@ import { CONFIG } from "../../config";
 import { playBoostEventStream, playExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { getButtonCenter } from "../upgradeButton";
-import { drawWispBetween, drawWispHead, WISP_SIZE, type Point } from "../../shared/wisp";
+import {
+  drawWispBetween,
+  drawWispHead,
+  WISP_SIZE,
+  type Point,
+} from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, easeIn, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
@@ -45,15 +50,22 @@ export const forceMultistageEvent = registerWispEvent(
     if (!locked) return;
     const button = getButtonCenter(context.isGroundFloor);
     const lock: Point = { x: FLOOR_W / 2, y: locked.offsetY + FLOOR_H / 2 };
-    const bend = { x: lerp([area.left, area.right], button.x < lock.x ? 0.2 : 0.8), y: (button.y + lock.y) / 2 };
-    const line = sampleLine((u) => bezier(button, bend, lock, u, { x: 0, y: 0 }), 80);
+    const bend = {
+      x: lerp([area.left, area.right], button.x < lock.x ? 0.2 : 0.8),
+      y: (button.y + lock.y) / 2,
+    };
+    const line = sampleLine(
+      (u) => bezier(button, bend, lock, u, { x: 0, y: 0 }),
+      80,
+    );
     const along = measure(line);
     const length = along[along.length - 1];
     // each burnout kicks it faster: share of the flight time per leg shrinks
     const legShares = [0.4, 0.27, 0.19, 0.14];
     const marks = [0, ...BURNOUTS, 1];
     const times = [0];
-    for (const share of legShares) times.push(times[times.length - 1] + share * flightMs);
+    for (const share of legShares)
+      times.push(times[times.length - 1] + share * flightMs);
     const progress = (ms: number) => {
       const t = clamp01(ms / flightMs) * flightMs;
       let k = 0;
@@ -63,7 +75,12 @@ export const forceMultistageEvent = registerWispEvent(
     };
     const burnouts = BURNOUTS.map((share, s) => ({
       ms: times[s + 1],
-      at: pointAlong(line, along, Math.max(0, share - ((s + 1) * STAGE_GAP) / length), { x: 0, y: 0 }),
+      at: pointAlong(
+        line,
+        along,
+        Math.max(0, share - ((s + 1) * STAGE_GAP) / length),
+        { x: 0, y: 0 },
+      ),
     }));
     const endAt = flightMs;
     const blasts = burnouts.flatMap((b, s) => [
@@ -71,14 +88,18 @@ export const forceMultistageEvent = registerWispEvent(
       ...Array.from({ length: CLUSTER }, (_, c) => {
         const a = (c / CLUSTER) * Math.PI * 2 + s;
         return {
-          at: { x: b.at.x + Math.cos(a) * CLUSTER_REACH, y: b.at.y + Math.sin(a) * CLUSTER_REACH },
+          at: {
+            x: b.at.x + Math.cos(a) * CLUSTER_REACH,
+            y: b.at.y + Math.sin(a) * CLUSTER_REACH,
+          },
           ms: b.ms + CLUSTER_MS + c * 25,
           size: CLUSTER_SIZE,
         };
       }),
     ]);
     const headAt: Point = { x: 0, y: 0 };
-    const warhead = (ms: number) => pointAlong(line, along, progress(Math.max(0, ms)), headAt);
+    const warhead = (ms: number) =>
+      pointAlong(line, along, progress(Math.max(0, ms)), headAt);
     // stage s rides (s + 1) gaps behind the warhead until it blows
     const stages = Array.from({ length: STAGES }, (_, s) => {
       const spot: Point = { x: 0, y: 0 };
@@ -98,7 +119,11 @@ export const forceMultistageEvent = registerWispEvent(
         shakeScreen(lerp(STAGE_SHAKE, s / (STAGES - 1)));
       },
     );
-    const finale = createBeats([endAt], (ms) => ms, () => cover!.blast(lock));
+    const finale = createBeats(
+      [endAt],
+      (ms) => ms,
+      () => cover!.blast(lock),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -119,8 +144,18 @@ export const forceMultistageEvent = registerWispEvent(
             drawLitFuse(ctx, at, clamp01(ms / burnouts[s].ms), FUSE, now);
             drawWispHead(ctx, stages[s], ms, now, WISP_SIZE * STAGE);
           }
-          for (const b of blasts) drawDetonation(ctx, b.at, ms - b.ms, b.size, now);
-          drawWispBetween(ctx, warhead, ms, now, WISP_SIZE * WARHEAD, 1, 0, endAt);
+          for (const b of blasts)
+            drawDetonation(ctx, b.at, ms - b.ms, b.size, now);
+          drawWispBetween(
+            ctx,
+            warhead,
+            ms,
+            now,
+            WISP_SIZE * WARHEAD,
+            1,
+            0,
+            endAt,
+          );
         },
       },
     );

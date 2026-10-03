@@ -60,7 +60,10 @@ export const forcePryBarEvent = registerWispEvent(
         const p = pumps[k];
         if (ms < p.starts) break;
         const heave = easeIn(clamp01((ms - p.starts) / (p.heaves - p.starts)));
-        const back = k === PUMPS - 1 ? 0 : easeOut(clamp01((ms - p.heaves) / (p.ends - p.heaves)));
+        const back =
+          k === PUMPS - 1
+            ? 0
+            : easeOut(clamp01((ms - p.heaves) / (p.ends - p.heaves)));
         turn += (PRY / PUMPS) * (heave - RECOIL * back * (1 - k / PUMPS));
       }
       return turn;
@@ -70,7 +73,10 @@ export const forcePryBarEvent = registerWispEvent(
     const pivotAt: Point = { x: 0, y: 0 };
     const pivot = (ms: number): Point => {
       pivotAt.x = fulcrum.x;
-      pivotAt.y = lerp([fulcrum.y + 300, fulcrum.y], easeOut(clamp01(ms / DROP_MS)));
+      pivotAt.y = lerp(
+        [fulcrum.y + 300, fulcrum.y],
+        easeOut(clamp01(ms / DROP_MS)),
+      );
       return pivotAt;
     };
     const lever = (ms: number) => {
@@ -82,10 +88,14 @@ export const forcePryBarEvent = registerWispEvent(
       handle.y = fulcrum.y - Math.sin(a) * HANDLE;
     };
 
-    const slamming = createBeats([slams], (ms) => ms, () => {
-      cover!.burst(lock, 0.4);
-      if (cover!.isLive()) playExplosion();
-    });
+    const slamming = createBeats(
+      [slams],
+      (ms) => ms,
+      () => {
+        cover!.burst(lock, 0.4);
+        if (cover!.isLive()) playExplosion();
+      },
+    );
     const prying = createBeats(
       pumps,
       (p) => p.heaves,

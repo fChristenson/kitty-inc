@@ -45,7 +45,8 @@ export const forceOrbitSwapEvent = registerWispEvent(
     const orbits: Orbit[] = bars.map((bar, k) => {
       const starts = clock;
       const circles = starts + ARRIVE_MS;
-      const smashes = circles + lerp(orbitsMs, k / Math.max(1, bars.length - 1));
+      const smashes =
+        circles + lerp(orbitsMs, k / Math.max(1, bars.length - 1));
       clock = smashes;
       const orbit = { bar, from, starts, circles, smashes };
       from = bar.center;
@@ -56,7 +57,9 @@ export const forceOrbitSwapEvent = registerWispEvent(
     // the two wisps meet at the bar's ends every half lap; on the last
     // meeting the orbit has shrunk onto the bar's middle
     const angleAt = (o: Orbit, ms: number) =>
-      Math.PI * MEETS * easeIn(clamp01((ms - o.circles) / (o.smashes - o.circles)));
+      Math.PI *
+      MEETS *
+      easeIn(clamp01((ms - o.circles) / (o.smashes - o.circles)));
     const wisps = [1, -1].map((dir) => {
       const at: Point = { x: 0, y: 0 };
       return (ms: number): Point => {

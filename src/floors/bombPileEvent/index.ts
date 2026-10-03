@@ -34,7 +34,13 @@ const CHAIN_SHAKE: [number, number] = [0.5, 1.2];
 
 interface Pile {
   bar: RewardBar;
-  bombs: { at: Point; drops: number; lands: number; blows: number; spot: Point }[];
+  bombs: {
+    at: Point;
+    drops: number;
+    lands: number;
+    blows: number;
+    spot: Point;
+  }[];
   base: number;
 }
 
@@ -52,7 +58,10 @@ export const forceBombPileEvent = registerWispEvent(
       const bombs = Array.from({ length: PILE }, (_, i) => {
         const drops = clock + i * gap;
         return {
-          at: { x: bar.center.x + (i % 2 === 0 ? -4 : 4), y: bar.box.y - STACK * (i + 0.5) },
+          at: {
+            x: bar.center.x + (i % 2 === 0 ? -4 : 4),
+            y: bar.box.y - STACK * (i + 0.5),
+          },
           drops,
           lands: drops + DROP_MS,
           blows: 0,
@@ -77,11 +86,18 @@ export const forceBombPileEvent = registerWispEvent(
       }),
     );
     const blasts = piles.flatMap((p, k) => [
-      ...p.bombs.map((b, i) => ({ at: b.at, ms: b.blows, size: i === 0 ? BASE_BLAST : BLAST })),
+      ...p.bombs.map((b, i) => ({
+        at: b.at,
+        ms: b.blows,
+        size: i === 0 ? BASE_BLAST : BLAST,
+      })),
       ...Array.from({ length: CLUSTER }, (_, c) => {
         const a = (c / CLUSTER) * Math.PI * 2 + k;
         return {
-          at: { x: p.bar.center.x + Math.cos(a) * CLUSTER_REACH, y: p.bar.center.y + Math.sin(a) * CLUSTER_REACH * 0.5 },
+          at: {
+            x: p.bar.center.x + Math.cos(a) * CLUSTER_REACH,
+            y: p.bar.center.y + Math.sin(a) * CLUSTER_REACH * 0.5,
+          },
           ms: p.base + 60 + c * 25,
           size: CLUSTER_SIZE,
         };
@@ -89,11 +105,15 @@ export const forceBombPileEvent = registerWispEvent(
     ]);
     const allBombs = piles.flatMap((p) => p.bombs);
 
-    const thudding = createBeats(allBombs, (b) => b.lands, () => {
-      if (!cover?.isLive()) return;
-      playBloop();
-      shakeScreen(THUD_SHAKE);
-    });
+    const thudding = createBeats(
+      allBombs,
+      (b) => b.lands,
+      () => {
+        if (!cover?.isLive()) return;
+        playBloop();
+        shakeScreen(THUD_SHAKE);
+      },
+    );
     const chaining = createBeats(
       allBombs.filter((_, i) => i % PILE !== 0),
       (b) => b.blows,
@@ -138,10 +158,18 @@ export const forceBombPileEvent = registerWispEvent(
             const b = allBombs[i];
             const at = bombAts[i](ms);
             if (!at) continue;
-            if (ms >= b.lands) drawLitFuse(ctx, at, clamp01((ms - b.lands) / (b.blows - b.lands)), FUSE, now);
+            if (ms >= b.lands)
+              drawLitFuse(
+                ctx,
+                at,
+                clamp01((ms - b.lands) / (b.blows - b.lands)),
+                FUSE,
+                now,
+              );
             drawWispHead(ctx, bombAts[i], ms, now, WISP_SIZE * BOMB);
           }
-          for (const blast of blasts) drawDetonation(ctx, blast.at, ms - blast.ms, blast.size, now);
+          for (const blast of blasts)
+            drawDetonation(ctx, blast.at, ms - blast.ms, blast.size, now);
         },
       },
     );

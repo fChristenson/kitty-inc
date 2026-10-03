@@ -10,7 +10,12 @@ import { CONFIG } from "../../config";
 import { playBoostEventStream, playExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { getButtonCenter } from "../upgradeButton";
-import { drawWispBetween, drawWispHead, WISP_SIZE, type Point } from "../../shared/wisp";
+import {
+  drawWispBetween,
+  drawWispHead,
+  WISP_SIZE,
+  type Point,
+} from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, easeIn, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
@@ -69,7 +74,10 @@ export const forceBombBoomerangEvent = registerWispEvent(
     const drops: Drop[] = workers.map((worker, k) => {
       let best = 0;
       for (let i = 1; i < line.length; i++)
-        if (Math.hypot(line[i].x - overs[k].x, line[i].y - overs[k].y) < Math.hypot(line[best].x - overs[k].x, line[best].y - overs[k].y))
+        if (
+          Math.hypot(line[i].x - overs[k].x, line[i].y - overs[k].y) <
+          Math.hypot(line[best].x - overs[k].x, line[best].y - overs[k].y)
+        )
           best = i;
       const from = line[best];
       const dropsAt = timeOf(along[best]);
@@ -93,7 +101,10 @@ export const forceBombBoomerangEvent = registerWispEvent(
       ...Array.from({ length: CLUSTER }, (_, c) => {
         const a = (c / CLUSTER) * Math.PI * 2 + k;
         return {
-          at: { x: d.worker.at.x + Math.cos(a) * CLUSTER_REACH, y: d.worker.at.y + Math.sin(a) * CLUSTER_REACH },
+          at: {
+            x: d.worker.at.x + Math.cos(a) * CLUSTER_REACH,
+            y: d.worker.at.y + Math.sin(a) * CLUSTER_REACH,
+          },
           ms: d.lands + CLUSTER_MS + c * 30,
           size: CLUSTER_SIZE,
         };
@@ -115,7 +126,11 @@ export const forceBombBoomerangEvent = registerWispEvent(
         shakeScreen(lerp(BLAST_SHAKE, k / Math.max(1, drops.length - 1)));
       },
     );
-    const finale = createBeats([endAt], (ms) => ms, () => cover!.blast(button));
+    const finale = createBeats(
+      [endAt],
+      (ms) => ms,
+      () => cover!.blast(button),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -133,12 +148,29 @@ export const forceBombBoomerangEvent = registerWispEvent(
           for (const d of drops) {
             if (ms < d.drops || ms >= d.lands) continue;
             const at = d.at(ms)!;
-            drawLitFuse(ctx, at, clamp01((ms - d.drops) / DROP_MS), FUSE * 0.6, now);
+            drawLitFuse(
+              ctx,
+              at,
+              clamp01((ms - d.drops) / DROP_MS),
+              FUSE * 0.6,
+              now,
+            );
             drawWispHead(ctx, d.at, ms, now, WISP_SIZE * BOMBLET);
           }
-          for (const b of blasts) drawDetonation(ctx, b.at, ms - b.ms, b.size, now);
-          if (ms >= 0 && ms < endAt) drawLitFuse(ctx, boomerang(ms), ms / endAt, FUSE, now);
-          drawWispBetween(ctx, boomerang, ms, now, WISP_SIZE * BOOMERANG, 0.8, 0, endAt);
+          for (const b of blasts)
+            drawDetonation(ctx, b.at, ms - b.ms, b.size, now);
+          if (ms >= 0 && ms < endAt)
+            drawLitFuse(ctx, boomerang(ms), ms / endAt, FUSE, now);
+          drawWispBetween(
+            ctx,
+            boomerang,
+            ms,
+            now,
+            WISP_SIZE * BOOMERANG,
+            0.8,
+            0,
+            endAt,
+          );
         },
       },
     );

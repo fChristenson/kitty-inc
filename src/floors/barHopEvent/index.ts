@@ -47,7 +47,10 @@ export const forceBarHopEvent = registerWispEvent(
       for (let h = 0; h < HOPS_PER_BAR; h++)
         spots.push({ at: { x: ends[h], y: bar.box.y }, bar });
     });
-    spots.push({ at: { x: (area.left + area.right) / 2, y: area.bottom - 60 }, bar: null });
+    spots.push({
+      at: { x: (area.left + area.right) / 2, y: area.bottom - 60 },
+      bar: null,
+    });
     let clock = 0;
     let from: Point = getButtonCenter(context.isGroundFloor);
     const hops: Hop[] = spots.map((s, k) => {

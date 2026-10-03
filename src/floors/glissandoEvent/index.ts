@@ -60,11 +60,18 @@ export const forceGlissandoEvent = registerWispEvent(
       for (const press of presses) {
         if (press.key !== key) continue;
         const t = (ms - press.at) / (press.at === slamAt ? slamMs : PRESS_MS);
-        if (t > 0 && t < 1) p = Math.max(p, Math.sin(Math.PI * t) * (press.at === slamAt ? 1.6 : 1));
+        if (t > 0 && t < 1)
+          p = Math.max(
+            p,
+            Math.sin(Math.PI * t) * (press.at === slamAt ? 1.6 : 1),
+          );
       }
       return p;
     };
-    const runStarts = Array.from({ length: RUNS }, (_, r) => presses[r * KEYS].at);
+    const runStarts = Array.from(
+      { length: RUNS },
+      (_, r) => presses[r * KEYS].at,
+    );
     let lastBloop = -Infinity;
 
     let shot: ScreenCopy | null = null;
@@ -75,7 +82,11 @@ export const forceGlissandoEvent = registerWispEvent(
         const at = { x: left + (p.key + 0.5) * keyW, y: top + 60 };
         cover!.launchFrom(
           at,
-          clampTargetsY(sprayTargets(at, COINS, [40, 160], Math.PI / 2, Math.PI * 0.6), top + 40, area.bottom - 40),
+          clampTargetsY(
+            sprayTargets(at, COINS, [40, 160], Math.PI / 2, Math.PI * 0.6),
+            top + 40,
+            area.bottom - 40,
+          ),
         );
         if (!cover!.isLive() || p.at - lastBloop < BLOOP_GAP_MS) return;
         lastBloop = p.at;
@@ -130,7 +141,18 @@ export const forceGlissandoEvent = registerWispEvent(
             const p = depth(k, ms);
             const x = left + k * keyW;
             const y = top + p * PRESS;
-            drawScreenPart(ctx, shot, x, top, keyW - GAP, height, x, y, keyW - GAP, height);
+            drawScreenPart(
+              ctx,
+              shot,
+              x,
+              top,
+              keyW - GAP,
+              height,
+              x,
+              y,
+              keyW - GAP,
+              height,
+            );
             if (p > 0) {
               ctx.globalAlpha = Math.min(1, SHADE * p);
               ctx.fillStyle = COLOR.black;

@@ -46,7 +46,12 @@ export const forceSidewinderEvent = registerWispEvent(
       for (let w = 0; w <= WAVES * 2; w++) {
         const u = w / (WAVES * 2);
         route.push({
-          x: lerp(ltr ? [area.left + EDGE, area.right - EDGE] : [area.right - EDGE, area.left + EDGE], u),
+          x: lerp(
+            ltr
+              ? [area.left + EDGE, area.right - EDGE]
+              : [area.right - EDGE, area.left + EDGE],
+            u,
+          ),
           y: y + (w % 2 === 0 ? -WAVE : WAVE),
         });
       }
@@ -76,7 +81,11 @@ export const forceSidewinderEvent = registerWispEvent(
       (f, k) => {
         cover!.launchFrom(
           f.at,
-          clampTargetsY(sprayTargets(f.at, COINS, [40, 160]), area.top + 40, area.bottom - 40),
+          clampTargetsY(
+            sprayTargets(f.at, COINS, [40, 160]),
+            area.top + 40,
+            area.bottom - 40,
+          ),
         );
         if (!cover!.isLive() || f.ms - lastPop < 50) return;
         lastPop = f.ms;
@@ -84,7 +93,11 @@ export const forceSidewinderEvent = registerWispEvent(
         shakeScreen(lerp(FLICK_SHAKE, k / (flicks.length - 1)));
       },
     );
-    const finale = createBeats([endAt], (ms) => ms, () => cover!.blast(cover!.total() ?? total));
+    const finale = createBeats(
+      [endAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? total),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -98,7 +111,16 @@ export const forceSidewinderEvent = registerWispEvent(
           finale.tick(ms, now);
         },
         drawOver: (ctx, ms, now) =>
-          drawWispBetween(ctx, snake, ms, now, WISP_SIZE * WISP, clamp01(ms / endAt), 0, endAt),
+          drawWispBetween(
+            ctx,
+            snake,
+            ms,
+            now,
+            WISP_SIZE * WISP,
+            clamp01(ms / endAt),
+            0,
+            endAt,
+          ),
       },
     );
     if (!cover) return;

@@ -13,7 +13,13 @@ import { registerWispEvent, startWispCover } from "../wispCover";
 import { lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { alongRoute } from "../../shared/curves";
-import { measure, pourDurationMs, pourLine, sampleLine, type Pour } from "../cashFlow";
+import {
+  measure,
+  pourDurationMs,
+  pourLine,
+  sampleLine,
+  type Pour,
+} from "../cashFlow";
 import { drawRewardHires, findRewardHires, giveHire } from "../eventRewards";
 
 const KEY = "irrigation";
@@ -52,7 +58,12 @@ export const forceIrrigationEvent = registerWispEvent(
         const along = measure(line);
         const travelMs = along[along.length - 1] / speed;
         const starts = k * SPREAD_MS;
-        const pour: Pour = { coinsAlong: 200, width: 26, streamMs: travelMs * 0.6, travelMs };
+        const pour: Pour = {
+          coinsAlong: 200,
+          width: 26,
+          streamMs: travelMs * 0.6,
+          travelMs,
+        };
         return { hire, spot, line, pour, starts, floods: starts + travelMs };
       })
       .sort((a, b) => a.floods - b.floods);
@@ -63,7 +74,11 @@ export const forceIrrigationEvent = registerWispEvent(
       endAt + holdMs + mergeMs,
     );
 
-    const pouring = createBeats(channels, (c) => c.starts, (c) => pourLine(cover!, c.line, c.pour));
+    const pouring = createBeats(
+      channels,
+      (c) => c.starts,
+      (c) => pourLine(cover!, c.line, c.pour),
+    );
     const flooding = createBeats(
       channels,
       (c) => c.floods,

@@ -240,9 +240,7 @@ export function triggerScreenShake(options?: {
   const shouldStart = idle || req.priority > activeFlashPriority;
   if (shouldStart) {
     const iconName = CRIT_ICON_BY_LABEL[req.label]?.name;
-    const ready = iconName
-      ? requestCritIcon(iconName)
-      : Promise.resolve(null);
+    const ready = iconName ? requestCritIcon(iconName) : Promise.resolve(null);
     // the label's blurred glow is costly to build; do it before the flash
     // starts, not on its first animated frame
     if (req.label) {

@@ -13,7 +13,12 @@ import type { Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
-import { createBolt, drawBolt, drawStrike, type Bolt } from "../../shared/lightning";
+import {
+  createBolt,
+  drawBolt,
+  drawStrike,
+  type Bolt,
+} from "../../shared/lightning";
 import { findRewardWorkers, type RewardWorker } from "../eventRewards";
 
 const KEY = "groundCurrent";
@@ -47,7 +52,11 @@ export const forceGroundCurrentEvent = registerWispEvent(
       y: Math.max(...workers.map((w) => w.at.y)) + FEET,
     };
     const sky = createBolt({ x: ground.x + 40, y: area.top - 40 }, ground, 3);
-    const far = Math.max(...workers.map((w) => Math.hypot(w.at.x - ground.x, w.at.y + FEET - ground.y)));
+    const far = Math.max(
+      ...workers.map((w) =>
+        Math.hypot(w.at.x - ground.x, w.at.y + FEET - ground.y),
+      ),
+    );
     const legs: Leg[] = workers.map((worker) => {
       const feet = { x: worker.at.x, y: worker.at.y + FEET };
       const tip = { x: ground.x, y: ground.y };
@@ -67,12 +76,16 @@ export const forceGroundCurrentEvent = registerWispEvent(
     const last = legs[legs.length - 1];
     const endAt = last.reaches + LEAP_MS;
 
-    const striking = createBeats([0], (ms) => ms, () => {
-      cover!.burst(ground, 0.8);
-      if (!cover!.isLive()) return;
-      playExplosion();
-      shakeScreen(1.2);
-    });
+    const striking = createBeats(
+      [0],
+      (ms) => ms,
+      () => {
+        cover!.burst(ground, 0.8);
+        if (!cover!.isLive()) return;
+        playExplosion();
+        shakeScreen(1.2);
+      },
+    );
     const leaping = createBeats(
       legs,
       (l) => l.reaches,

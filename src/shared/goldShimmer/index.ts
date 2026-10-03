@@ -62,9 +62,7 @@ const spriteCache = new Map<
 const shimmerCache = new Map<string, HTMLCanvasElement>();
 
 function getShimmer(color: string, strength: number): HTMLCanvasElement {
-  const step = Math.round(
-    Math.min(1, Math.max(0, strength)) * STRENGTH_STEPS,
-  );
+  const step = Math.round(Math.min(1, Math.max(0, strength)) * STRENGTH_STEPS);
   const key = `${color}|${step}`;
   let sprite = shimmerCache.get(key);
   if (sprite) return sprite;

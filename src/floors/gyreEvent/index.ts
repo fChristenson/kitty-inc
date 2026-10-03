@@ -82,7 +82,16 @@ export const forceGyreEvent = registerWispEvent(
         drawOver: (ctx, ms, now) => {
           for (const g of gyres)
             for (const w of g.wisps)
-              drawWispBetween(ctx, w, ms, now, WISP_SIZE * WISP, 0.6, g.starts, g.lands);
+              drawWispBetween(
+                ctx,
+                w,
+                ms,
+                now,
+                WISP_SIZE * WISP,
+                0.6,
+                g.starts,
+                g.lands,
+              );
         },
       },
     );

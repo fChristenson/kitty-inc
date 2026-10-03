@@ -1,10 +1,6 @@
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
-import {
-  playSold,
-  playPayout,
-  playAutoPurchase,
-} from "../../sound";
+import { playSold, playPayout, playAutoPurchase } from "../../sound";
 import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
 import { tierColor } from "../../shared/bonusTierReward";
 import { getBuildingPrice } from "../../buildings";

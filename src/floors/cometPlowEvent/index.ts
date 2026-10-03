@@ -36,14 +36,26 @@ export const forceCometPlowEvent = registerWispEvent(
     const y0 = area.top - 60;
     const ground: Point = { x, y: area.bottom - 60 };
     // the comet's fall speeds up, so it reaches y at plowMs * sqrt(share)
-    const reach = (y: number) => plowMs * Math.sqrt(clamp01((y - y0) / (ground.y - y0)));
-    const wake: Pour = { coinsAlong: 160, width: 30, streamMs: 160, travelMs: 380 };
+    const reach = (y: number) =>
+      plowMs * Math.sqrt(clamp01((y - y0) / (ground.y - y0)));
+    const wake: Pour = {
+      coinsAlong: 160,
+      width: 30,
+      streamMs: 160,
+      travelMs: 380,
+    };
     const passes = bars.map((bar) => {
       const at: Point = { x, y: bar.center.y };
       const lines = [-1, 1].map((side) =>
         sampleLine(
           (u) =>
-            bezier(at, { x: x + side * WAKE * 0.6, y: at.y - WAKE_RISE }, { x: x + side * WAKE, y: at.y + 30 }, u, { x: 0, y: 0 }),
+            bezier(
+              at,
+              { x: x + side * WAKE * 0.6, y: at.y - WAKE_RISE },
+              { x: x + side * WAKE, y: at.y + 30 },
+              u,
+              { x: 0, y: 0 },
+            ),
           20,
         ),
       );
@@ -72,10 +84,14 @@ export const forceCometPlowEvent = registerWispEvent(
         shakeScreen(lerp(PLOW_SHAKE, k / Math.max(1, passes.length - 1)));
       },
     );
-    const finale = createBeats([endAt], (ms) => ms, () => {
-      for (const bar of bars) cover!.slam(bar);
-      cover!.blast(ground);
-    });
+    const finale = createBeats(
+      [endAt],
+      (ms) => ms,
+      () => {
+        for (const bar of bars) cover!.slam(bar);
+        cover!.blast(ground);
+      },
+    );
 
     const cover = startWispCover(
       KEY,

@@ -53,7 +53,9 @@ export const forceCuckooEvent = registerWispEvent(
           if (ms < flies) {
             const u = clamp01((ms - pops) / (flies - pops));
             at.x = button.x;
-            at.y = button.y - BOING * Math.abs(Math.sin(Math.PI * BOINGS * u)) * (0.5 + u);
+            at.y =
+              button.y -
+              BOING * Math.abs(Math.sin(Math.PI * BOINGS * u)) * (0.5 + u);
             return at;
           }
           const u = clamp01((ms - flies) / (lands - flies));
@@ -66,12 +68,19 @@ export const forceCuckooEvent = registerWispEvent(
     const last = birds[birds.length - 1];
     const endAt = Math.max(...birds.map((b) => b.lands));
     const boings = birds.flatMap((b) =>
-      Array.from({ length: BOINGS }, (_, i) => b.pops + ((i + 0.5) / BOINGS) * (b.flies - b.pops)),
+      Array.from(
+        { length: BOINGS },
+        (_, i) => b.pops + ((i + 0.5) / BOINGS) * (b.flies - b.pops),
+      ),
     );
 
-    const boinging = createBeats(boings, (ms) => ms, () => {
-      if (cover?.isLive()) playBloop();
-    });
+    const boinging = createBeats(
+      boings,
+      (ms) => ms,
+      () => {
+        if (cover?.isLive()) playBloop();
+      },
+    );
     const landing = createBeats(
       birds,
       (b) => b.lands,
@@ -102,7 +111,16 @@ export const forceCuckooEvent = registerWispEvent(
         drawOver: (ctx, ms, now) => {
           drawRewardHires(ctx, hires, now, FORM_MS);
           for (const b of birds)
-            drawWispBetween(ctx, b.at, ms, now, WISP_SIZE * WISP, 0.6, b.pops, b.lands);
+            drawWispBetween(
+              ctx,
+              b.at,
+              ms,
+              now,
+              WISP_SIZE * WISP,
+              0.6,
+              b.pops,
+              b.lands,
+            );
         },
       },
     );

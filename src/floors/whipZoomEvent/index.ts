@@ -50,7 +50,10 @@ export const forceWhipZoomEvent = registerWispEvent(
     const width = area.right - area.left;
     const height = area.bottom - area.top;
     const mid = { x: left + width / 2, y: top + height / 2 };
-    const keys: Key[] = [{ at: 0, ...mid, zoom: 1 }, { at: LEAD_MS, ...mid, zoom: 1 }];
+    const keys: Key[] = [
+      { at: 0, ...mid, zoom: 1 },
+      { at: LEAD_MS, ...mid, zoom: 1 },
+    ];
     const hits: { bar: RewardBar; at: number; last: boolean }[] = [];
     let clock = LEAD_MS;
     bars.forEach((bar, k) => {
@@ -58,7 +61,11 @@ export const forceWhipZoomEvent = registerWispEvent(
       const hold = lerp(holdsMs, k / Math.max(1, bars.length - 1));
       keys.push({ at: arrives, ...bar.center, zoom: ZOOM });
       keys.push({ at: arrives + hold, ...bar.center, zoom: ZOOM });
-      hits.push({ bar, at: arrives + hold * HIT_SHARE, last: k === bars.length - 1 });
+      hits.push({
+        bar,
+        at: arrives + hold * HIT_SHARE,
+        last: k === bars.length - 1,
+      });
       clock = arrives + hold;
     });
     const endAt = clock + outMs;
@@ -126,7 +133,18 @@ export const forceWhipZoomEvent = registerWispEvent(
           ctx.rect(left, top, width, height);
           ctx.clip();
           look(ctx, ms);
-          drawScreenPart(ctx, shot, left, top, width, height, left, top, width, height);
+          drawScreenPart(
+            ctx,
+            shot,
+            left,
+            top,
+            width,
+            height,
+            left,
+            top,
+            width,
+            height,
+          );
           // the live bars over their frozen selves, so their tiers land in view
           drawRewardBars(ctx, bars, now);
           ctx.restore();
@@ -138,7 +156,13 @@ export const forceWhipZoomEvent = registerWispEvent(
           for (const h of hits) {
             const t = (ms - h.at) / BURST_MS;
             if (t > 0 && t < 1)
-              drawWhiteBurst(ctx, h.bar.center.x, h.bar.center.y, t, h.last ? 0.8 : 0.5);
+              drawWhiteBurst(
+                ctx,
+                h.bar.center.x,
+                h.bar.center.y,
+                t,
+                h.last ? 0.8 : 0.5,
+              );
           }
           ctx.restore();
         },

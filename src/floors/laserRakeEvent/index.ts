@@ -15,7 +15,13 @@ import { createBeats } from "../../shared/eventBeats";
 import { bezier } from "../../shared/curves";
 import { clampTargetsY, sprayTargets } from "../../shared/coinTargets";
 import { drawBeam, drawBeamFlare } from "../../shared/beam";
-import { pourDurationMs, pourLine, sampleLine, totalSpot, type Pour } from "../cashFlow";
+import {
+  pourDurationMs,
+  pourLine,
+  sampleLine,
+  totalSpot,
+  type Pour,
+} from "../cashFlow";
 
 const KEY = "laserRake";
 const REWARD = 4;
@@ -38,7 +44,9 @@ export const forceLaserRakeEvent = registerWispEvent(
     const total = totalSpot(area);
     const top = area.top + 200;
     const bottom = area.bottom - 120;
-    const ys = Array.from({ length: TEETH }, (_, i) => lerp([top, bottom], i / (TEETH - 1)));
+    const ys = Array.from({ length: TEETH }, (_, i) =>
+      lerp([top, bottom], i / (TEETH - 1)),
+    );
     const xs = Array.from({ length: STROKES + 1 }, (_, k) =>
       lerp([area.right + TOOTH, area.left + EDGE + TOOTH], k / STROKES),
     );
@@ -52,15 +60,27 @@ export const forceLaserRakeEvent = registerWispEvent(
     const endAt = gathers + gatherMs;
     const heap: Point = { x: xs[STROKES] - TOOTH, y: (top + bottom) / 2 };
     const line = sampleLine(
-      (u) => bezier(heap, { x: heap.x, y: total.y + 60 }, total, u, { x: 0, y: 0 }),
+      (u) =>
+        bezier(heap, { x: heap.x, y: total.y + 60 }, total, u, { x: 0, y: 0 }),
       30,
     );
-    const pour: Pour = { coinsAlong: 260, width: 46, streamMs: gatherMs * 0.6, travelMs: gatherMs };
-    const durationMs = Math.max(pourDurationMs(gathers, pour), endAt + holdMs + mergeMs);
+    const pour: Pour = {
+      coinsAlong: 260,
+      width: 46,
+      streamMs: gatherMs * 0.6,
+      travelMs: gatherMs,
+    };
+    const durationMs = Math.max(
+      pourDurationMs(gathers, pour),
+      endAt + holdMs + mergeMs,
+    );
     const spineX = (ms: number) => {
       let s = strokes[0];
       for (const stroke of strokes) if (ms >= stroke.starts) s = stroke;
-      return lerp([s.from, s.to], easeOut(clamp01((ms - s.starts) / (s.ends - s.starts))));
+      return lerp(
+        [s.from, s.to],
+        easeOut(clamp01((ms - s.starts) / (s.ends - s.starts))),
+      );
     };
     const roots = ys.map((y) => ({ x: 0, y }));
     const tip: Point = { x: 0, y: 0 };
@@ -74,15 +94,30 @@ export const forceLaserRakeEvent = registerWispEvent(
       (s, k) => {
         for (const y of ys) {
           const at = { x: s.to - TOOTH, y };
-          cover!.launchFrom(at, clampTargetsY(sprayTargets(at, COINS, [50, 170], Math.PI, 1.4), area.top + 40, area.bottom - 40));
+          cover!.launchFrom(
+            at,
+            clampTargetsY(
+              sprayTargets(at, COINS, [50, 170], Math.PI, 1.4),
+              area.top + 40,
+              area.bottom - 40,
+            ),
+          );
         }
         if (!cover!.isLive()) return;
         playBloop();
         shakeScreen(lerp(STROKE_SHAKE, k / (STROKES - 1)));
       },
     );
-    const gathering = createBeats([gathers], (ms) => ms, () => pourLine(cover!, line, pour));
-    const finale = createBeats([endAt], (ms) => ms, () => cover!.blast(cover!.total() ?? total));
+    const gathering = createBeats(
+      [gathers],
+      (ms) => ms,
+      () => pourLine(cover!, line, pour),
+    );
+    const finale = createBeats(
+      [endAt],
+      (ms) => ms,
+      () => cover!.blast(cover!.total() ?? total),
+    );
 
     const cover = startWispCover(
       KEY,
@@ -111,7 +146,16 @@ export const forceLaserRakeEvent = registerWispEvent(
             drawBeamFlare(ctx, tip, 9, 0.7, now);
           }
           for (const knuckle of knuckles)
-            drawWispBetween(ctx, knuckle, ms, now, WISP_SIZE * WISP, 0.5, 0, endAt);
+            drawWispBetween(
+              ctx,
+              knuckle,
+              ms,
+              now,
+              WISP_SIZE * WISP,
+              0.5,
+              0,
+              endAt,
+            );
         },
       },
     );

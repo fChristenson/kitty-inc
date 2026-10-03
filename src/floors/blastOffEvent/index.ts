@@ -69,10 +69,16 @@ export const forceBlastOffEvent = registerWispEvent(
         30,
       );
     });
-    const pour: Pour = { coinsAlong: 180, width: 40, streamMs: launchMs + awayMs * 0.6, travelMs: 520 };
+    const pour: Pour = {
+      coinsAlong: 180,
+      width: 40,
+      streamMs: launchMs + awayMs * 0.6,
+      travelMs: 520,
+    };
     const lift = (ms: number) => {
       if (ms < shudderMs) return 0;
-      if (ms < shudderMs + launchMs) return -easeIn(clamp01((ms - shudderMs) / launchMs));
+      if (ms < shudderMs + launchMs)
+        return -easeIn(clamp01((ms - shudderMs) / launchMs));
       if (ms < dropsAt) return -1;
       return -1 + easeIn(clamp01((ms - dropsAt) / dropMs));
     };

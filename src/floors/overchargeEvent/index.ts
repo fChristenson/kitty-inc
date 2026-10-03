@@ -55,10 +55,14 @@ export const forceOverchargeEvent = registerWispEvent(
         shakeScreen(lerp(FIRE_SHAKE, k / Math.max(1, shots.length - 1)));
       },
     );
-    const finale = createBeats([volleyAt], (ms) => ms, () => {
-      for (const bar of bars) cover!.levels(bar, 0, lock);
-      cover!.blast(lock);
-    });
+    const finale = createBeats(
+      [volleyAt],
+      (ms) => ms,
+      () => {
+        for (const bar of bars) cover!.levels(bar, 0, lock);
+        cover!.blast(lock);
+      },
+    );
 
     const cover = startWispCover(
       KEY,
@@ -87,7 +91,13 @@ export const forceOverchargeEvent = registerWispEvent(
           }
           if (ms < endAt) {
             const charge = fired / shots.length;
-            drawBeamFlare(ctx, lock, lerp(CHARGE_R, charge), 0.4 + 0.6 * charge, now);
+            drawBeamFlare(
+              ctx,
+              lock,
+              lerp(CHARGE_R, charge),
+              0.4 + 0.6 * charge,
+              now,
+            );
             return;
           }
           const fade = 1 - clamp01((ms - endAt) / VOLLEY_MS);

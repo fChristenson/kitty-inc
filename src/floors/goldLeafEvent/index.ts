@@ -126,7 +126,16 @@ export const forceGoldLeafEvent = registerWispEvent(
           ctx.restore();
         },
         drawOver: (ctx, ms, now) =>
-          drawWispBetween(ctx, wisp, ms, now, WISP_SIZE * WISP, 0.7, 0, lastTouch),
+          drawWispBetween(
+            ctx,
+            wisp,
+            ms,
+            now,
+            WISP_SIZE * WISP,
+            0.7,
+            0,
+            lastTouch,
+          ),
       },
     );
     if (!cover) return;

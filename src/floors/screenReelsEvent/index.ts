@@ -111,8 +111,30 @@ export const forceScreenReelsEvent = registerWispEvent(
           ctx.clip();
           for (const r of reels) {
             const o = offset(r, ms);
-            drawScreenPart(ctx, shot, r.x, top, reelW, height, r.x, top + o, reelW, height);
-            drawScreenPart(ctx, shot, r.x, top, reelW, height, r.x, top + o - height, reelW, height);
+            drawScreenPart(
+              ctx,
+              shot,
+              r.x,
+              top,
+              reelW,
+              height,
+              r.x,
+              top + o,
+              reelW,
+              height,
+            );
+            drawScreenPart(
+              ctx,
+              shot,
+              r.x,
+              top,
+              reelW,
+              height,
+              r.x,
+              top + o - height,
+              reelW,
+              height,
+            );
           }
           ctx.fillStyle = COLOR.heavenlyGold;
           for (let c = 1; c < REELS; c++)

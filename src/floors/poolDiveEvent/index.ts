@@ -16,7 +16,13 @@ import { clamp01, easeIn, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { bezier } from "../../shared/curves";
 import { clampTargetsY, sprayTargets } from "../../shared/coinTargets";
-import { pourDurationMs, pourLine, riverHead, sampleLine, type Pour } from "../cashFlow";
+import {
+  pourDurationMs,
+  pourLine,
+  riverHead,
+  sampleLine,
+  type Pour,
+} from "../cashFlow";
 import { drawRewardHires, findRewardHires, giveHire } from "../eventRewards";
 
 const KEY = "poolDive";
@@ -39,9 +45,24 @@ export const forcePoolDiveEvent = registerWispEvent(
     const hires = findRewardHires(floor, context).slice(0, MAX_HIRES);
     if (hires.length === 0) return;
     const button = getButtonCenter(context.isGroundFloor);
-    const pool: Point = { x: (area.left + area.right) / 2, y: area.bottom - POOL_UP };
-    const fill = sampleLine((u) => bezier(button, { x: pool.x, y: button.y - 120 }, pool, u, { x: 0, y: 0 }), 30);
-    const fillPour: Pour = { coinsAlong: 260, width: 50, streamMs: fillMs, travelMs: fillMs * 0.7 };
+    const pool: Point = {
+      x: (area.left + area.right) / 2,
+      y: area.bottom - POOL_UP,
+    };
+    const fill = sampleLine(
+      (u) =>
+        bezier(button, { x: pool.x, y: button.y - 120 }, pool, u, {
+          x: 0,
+          y: 0,
+        }),
+      30,
+    );
+    const fillPour: Pour = {
+      coinsAlong: 260,
+      width: 50,
+      streamMs: fillMs,
+      travelMs: fillMs * 0.7,
+    };
     const dives = fillMs * 0.7;
     const splashAt = dives + diveMs;
     let clock = splashAt;
@@ -64,7 +85,12 @@ export const forcePoolDiveEvent = registerWispEvent(
         starts,
         lands: starts + travelMs,
         head: riverHead(line, travelMs, starts),
-        pour: { coinsAlong: 180, width: 30, streamMs: travelMs * 0.6, travelMs } as Pour,
+        pour: {
+          coinsAlong: 180,
+          width: 30,
+          streamMs: travelMs * 0.6,
+          travelMs,
+        } as Pour,
       };
     });
     const last = jets[jets.length - 1];
@@ -88,15 +114,34 @@ export const forcePoolDiveEvent = registerWispEvent(
       return null;
     };
 
-    const pouring = createBeats([0], (ms) => ms, () => pourLine(cover!, fill, fillPour));
-    const splashing = createBeats([splashAt], (ms) => ms, () => {
-      cover!.burst(pool, 0.8);
-      cover!.launchFrom(pool, clampTargetsY(sprayTargets(pool, SPLASH, [80, 300], -Math.PI / 2, Math.PI * 0.8), area.top + 40, area.bottom - 20));
-      if (!cover!.isLive()) return;
-      playExplosion();
-      shakeScreen(1.2);
-    });
-    const jetting = createBeats(jets, (j) => j.starts, (j) => pourLine(cover!, j.line, j.pour));
+    const pouring = createBeats(
+      [0],
+      (ms) => ms,
+      () => pourLine(cover!, fill, fillPour),
+    );
+    const splashing = createBeats(
+      [splashAt],
+      (ms) => ms,
+      () => {
+        cover!.burst(pool, 0.8);
+        cover!.launchFrom(
+          pool,
+          clampTargetsY(
+            sprayTargets(pool, SPLASH, [80, 300], -Math.PI / 2, Math.PI * 0.8),
+            area.top + 40,
+            area.bottom - 20,
+          ),
+        );
+        if (!cover!.isLive()) return;
+        playExplosion();
+        shakeScreen(1.2);
+      },
+    );
+    const jetting = createBeats(
+      jets,
+      (j) => j.starts,
+      (j) => pourLine(cover!, j.line, j.pour),
+    );
     const landing = createBeats(
       jets,
       (j) => j.lands,
@@ -129,7 +174,16 @@ export const forcePoolDiveEvent = registerWispEvent(
         },
         drawOver: (ctx, ms, now) => {
           drawRewardHires(ctx, hires, now, FORM_MS);
-          drawWispBetween(ctx, diver, ms, now, WISP_SIZE * WISP, 0.7, dives, endAt);
+          drawWispBetween(
+            ctx,
+            diver,
+            ms,
+            now,
+            WISP_SIZE * WISP,
+            0.7,
+            dives,
+            endAt,
+          );
         },
       },
     );

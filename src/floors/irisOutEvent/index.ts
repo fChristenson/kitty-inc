@@ -11,7 +11,13 @@ import { shakeScreen } from "../../screenShake";
 import { COLOR } from "../../palette";
 import type { Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
-import { clamp01, easeIn, easeOut, easeOutBack, lerp } from "../../shared/easing";
+import {
+  clamp01,
+  easeIn,
+  easeOut,
+  easeOutBack,
+  lerp,
+} from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { drawWhiteBurst } from "../../shared/eventFx";
 import { findRewardWorkers, type RewardWorker } from "../eventRewards";
@@ -53,7 +59,8 @@ export const forceIrisOutEvent = registerWispEvent(
     const shots: Shot[] = workers.map((worker, k) => {
       const moves = clock;
       const lands = moves + (k === 0 ? closeMs : moveMs);
-      const hits = lands + lerp(holdsMs, k / Math.max(1, workers.length - 1)) * 0.4;
+      const hits =
+        lands + lerp(holdsMs, k / Math.max(1, workers.length - 1)) * 0.4;
       clock = lands + lerp(holdsMs, k / Math.max(1, workers.length - 1));
       const shot = { worker, moves, lands, hits, from };
       from = worker.at;
@@ -120,7 +127,8 @@ export const forceIrisOutEvent = registerWispEvent(
           if (ms >= endAt) return;
           for (const s of shots) {
             const t = (ms - s.hits) / BURST_MS;
-            if (t > 0 && t < 1) drawWhiteBurst(ctx, s.worker.at.x, s.worker.at.y, t, 0.5);
+            if (t > 0 && t < 1)
+              drawWhiteBurst(ctx, s.worker.at.x, s.worker.at.y, t, 0.5);
           }
           const h = iris(ms);
           ctx.save();

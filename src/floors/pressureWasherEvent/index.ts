@@ -31,7 +31,12 @@ export const forcePressureWasherEvent = registerWispEvent(
       .slice(0, MAX_WORKERS)
       .sort((a, b) => a.at.x - b.at.x);
     if (workers.length === 0) return;
-    const pour: Pour = { coinsAlong: 420, width: 14, streamMs: jetMs * 0.8, travelMs: jetMs };
+    const pour: Pour = {
+      coinsAlong: 420,
+      width: 14,
+      streamMs: jetMs * 0.8,
+      travelMs: jetMs,
+    };
     let clock = 0;
     const jets = workers.map((worker, k) => {
       const nozzle: Point = {
@@ -51,9 +56,16 @@ export const forcePressureWasherEvent = registerWispEvent(
     });
     const last = jets[jets.length - 1];
     const endAt = last.hits;
-    const durationMs = Math.max(pourDurationMs(last.starts, pour), endAt + holdMs + mergeMs);
+    const durationMs = Math.max(
+      pourDurationMs(last.starts, pour),
+      endAt + holdMs + mergeMs,
+    );
 
-    const spraying = createBeats(jets, (j) => j.starts, (j) => pourLine(cover!, j.line, pour));
+    const spraying = createBeats(
+      jets,
+      (j) => j.starts,
+      (j) => pourLine(cover!, j.line, pour),
+    );
     const hitting = createBeats(
       jets,
       (j) => j.hits,

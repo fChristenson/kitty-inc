@@ -13,7 +13,11 @@ import { drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, easeOut, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
-import { drawBullets, drawMuzzleFlash, type Bullet } from "../../shared/bullets";
+import {
+  drawBullets,
+  drawMuzzleFlash,
+  type Bullet,
+} from "../../shared/bullets";
 import { findRewardBars, levelsFor, type RewardBar } from "../eventRewards";
 
 const KEY = "waveCannon";
@@ -55,7 +59,10 @@ function waveRound(
       if (ms < firedAt || ms >= hitAt) return null;
       const u = (ms - firedAt) / (hitAt - firedAt);
       // it ripples hardest mid-flight and lands dead on the bar
-      const off = Math.sin((u * WAVES + phase) * Math.PI * 2) * swell * Math.sin(Math.PI * u);
+      const off =
+        Math.sin((u * WAVES + phase) * Math.PI * 2) *
+        swell *
+        Math.sin(Math.PI * u);
       spot.x = from.x + dx * u + nx * off;
       spot.y = from.y + dy * u + ny * off;
       return spot;
@@ -77,7 +84,8 @@ export const forceWaveCannonEvent = registerWispEvent(
   "Wave Cannon",
   () => CONFIG.waveCannonEvent.chance,
   (floor, context, area) => {
-    const { volleysMs, flightMs, levelShare, holdMs, mergeMs } = CONFIG.waveCannonEvent;
+    const { volleysMs, flightMs, levelShare, holdMs, mergeMs } =
+      CONFIG.waveCannonEvent;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
     const x = area.left + 40;
@@ -89,7 +97,14 @@ export const forceWaveCannonEvent = registerWispEvent(
       const from: Point = { x, y: bar.center.y + 120 * (k % 2 === 0 ? 1 : -1) };
       const travel = lerp(flightMs, t);
       const rounds = Array.from({ length: ROUNDS }, (_, r) =>
-        waveRound(from, bar.center, lerp(SWELL, t), r / ROUNDS, fires + r * SHOT_GAP_MS, fires + r * SHOT_GAP_MS + travel),
+        waveRound(
+          from,
+          bar.center,
+          lerp(SWELL, t),
+          r / ROUNDS,
+          fires + r * SHOT_GAP_MS,
+          fires + r * SHOT_GAP_MS + travel,
+        ),
       );
       clock = fires + lerp(volleysMs, t);
       return {
@@ -110,7 +125,10 @@ export const forceWaveCannonEvent = registerWispEvent(
       for (const volley of volleys) if (ms >= volley.aims) v = volley;
       const prev = volleys[volleys.indexOf(v) - 1];
       const fromY = prev ? prev.rounds[0].from.y : v.rounds[0].from.y;
-      muzzle.y = lerp([fromY, v.rounds[0].from.y], easeOut(clamp01((ms - v.aims) / AIM_MS)));
+      muzzle.y = lerp(
+        [fromY, v.rounds[0].from.y],
+        easeOut(clamp01((ms - v.aims) / AIM_MS)),
+      );
       return muzzle;
     };
 
@@ -118,17 +136,25 @@ export const forceWaveCannonEvent = registerWispEvent(
       volleys,
       (v) => v.rounds[0].hitAt,
       (v, k) => {
-        cover!.levels(v.bar, levelsFor(v.bar.floor, levelShare, 2), v.rounds[0].from);
+        cover!.levels(
+          v.bar,
+          levelsFor(v.bar.floor, levelShare, 2),
+          v.rounds[0].from,
+        );
         cover!.burst(v.bar.center, 0.6);
         if (!cover!.isLive()) return;
         playExplosion();
         shakeScreen(lerp(CRASH_SHAKE, k / Math.max(1, volleys.length - 1)));
       },
     );
-    const finale = createBeats([endAt], (ms) => ms, () => {
-      for (const bar of bars) cover!.slam(bar);
-      cover!.blast(last.bar.center);
-    });
+    const finale = createBeats(
+      [endAt],
+      (ms) => ms,
+      () => {
+        for (const bar of bars) cover!.slam(bar);
+        cover!.blast(last.bar.center);
+      },
+    );
 
     const cover = startWispCover(
       KEY,
@@ -145,12 +171,22 @@ export const forceWaveCannonEvent = registerWispEvent(
         drawOver: (ctx, ms, now) => {
           if (ms < 0 || ms > endAt) return;
           for (const v of volleys) {
-            if (ms < v.fires || ms > v.fires + ROUNDS * SHOT_GAP_MS + FLASH_MS) continue;
+            if (ms < v.fires || ms > v.fires + ROUNDS * SHOT_GAP_MS + FLASH_MS)
+              continue;
             const t = ((ms - v.fires) % SHOT_GAP_MS) / FLASH_MS;
             drawMuzzleFlash(ctx, v.rounds[0].from, v.angle, t, FLASH);
           }
           drawBullets(ctx, bullets, ms, now);
-          drawWispBetween(ctx, cannon, ms, now, WISP_SIZE * CANNON, 0.6, 0, endAt);
+          drawWispBetween(
+            ctx,
+            cannon,
+            ms,
+            now,
+            WISP_SIZE * CANNON,
+            0.6,
+            0,
+            endAt,
+          );
         },
       },
     );

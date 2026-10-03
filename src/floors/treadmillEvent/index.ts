@@ -99,8 +99,30 @@ export const forceTreadmillEvent = registerWispEvent(
           ctx.beginPath();
           ctx.rect(left, top, width, height);
           ctx.clip();
-          drawScreenPart(ctx, shot, left, top, width, height, left + o, top, width, height);
-          drawScreenPart(ctx, shot, left, top, width, height, left + o - width, top, width, height);
+          drawScreenPart(
+            ctx,
+            shot,
+            left,
+            top,
+            width,
+            height,
+            left + o,
+            top,
+            width,
+            height,
+          );
+          drawScreenPart(
+            ctx,
+            shot,
+            left,
+            top,
+            width,
+            height,
+            left + o - width,
+            top,
+            width,
+            height,
+          );
           ctx.fillStyle = COLOR.heavenlyGold;
           ctx.fillRect(left + o - SEAM / 2, top, SEAM, height);
           ctx.restore();

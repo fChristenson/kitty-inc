@@ -69,7 +69,10 @@ export const forceBubbleBlowerEvent = registerWispEvent(
     const bubblePaths = (b: (typeof blows)[number]) =>
       Array.from({ length: BUBBLE }, (_, i) => {
         const a = (i / BUBBLE) * Math.PI * 2;
-        const ring = { x: b.worker.at.x + Math.cos(a) * RADIUS, y: b.worker.at.y + Math.sin(a) * RADIUS };
+        const ring = {
+          x: b.worker.at.x + Math.cos(a) * RADIUS,
+          y: b.worker.at.y + Math.sin(a) * RADIUS,
+        };
         return (f: number) => {
           const blown = smoothstep(clamp01(f / BLOW_SHARE));
           const rise = smoothstep(clamp01((f - BLOW_SHARE) / (1 - BLOW_SHARE)));
@@ -81,7 +84,11 @@ export const forceBubbleBlowerEvent = registerWispEvent(
         };
       });
 
-    const blowing = createBeats(blows, (b) => b.blowsAt, (b) => cover!.trace(bubblePaths(b), b.span));
+    const blowing = createBeats(
+      blows,
+      (b) => b.blowsAt,
+      (b) => cover!.trace(bubblePaths(b), b.span),
+    );
     const popping = createBeats(
       blows,
       (b) => b.pops,
@@ -93,7 +100,14 @@ export const forceBubbleBlowerEvent = registerWispEvent(
           return;
         }
         cover!.burst(at, 0.6);
-        cover!.launchFrom(at, clampTargetsY(ringTargets(at, POP_COINS, [RADIUS, RADIUS * 2.5]), area.top + 40, area.bottom - 40));
+        cover!.launchFrom(
+          at,
+          clampTargetsY(
+            ringTargets(at, POP_COINS, [RADIUS, RADIUS * 2.5]),
+            area.top + 40,
+            area.bottom - 40,
+          ),
+        );
         if (!cover!.isLive()) return;
         playExplosion();
         shakeScreen(lerp(POP_SHAKE, k / Math.max(1, blows.length - 1)));

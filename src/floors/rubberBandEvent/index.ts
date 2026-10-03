@@ -72,10 +72,15 @@ export const forceRubberBandEvent = registerWispEvent(
     const endAt = last.snaps + QUIVER_MS;
     // how far above the bar the band's middle is at ms
     const lift = (b: Band, ms: number) => {
-      if (ms < b.lets) return b.pull * easeOut(clamp01((ms - b.starts) / (b.lets - b.starts)));
+      if (ms < b.lets)
+        return b.pull * easeOut(clamp01((ms - b.starts) / (b.lets - b.starts)));
       if (ms < b.snaps) return b.pull * (1 - easeIn((ms - b.lets) / SNAP_MS));
       const t = ms - b.snaps;
-      return -QUIVER * Math.exp(-t / QUIVER_DECAY) * Math.cos((2 * Math.PI * t) / QUIVER_WOBBLE);
+      return (
+        -QUIVER *
+        Math.exp(-t / QUIVER_DECAY) *
+        Math.cos((2 * Math.PI * t) / QUIVER_WOBBLE)
+      );
     };
     const grabbers = bands.map((b) => (ms: number) => {
       b.mid.y = b.bar.center.y - lift(b, ms);
@@ -83,14 +88,21 @@ export const forceRubberBandEvent = registerWispEvent(
     });
     const anchors = bands.flatMap((b) => [() => b.left, () => b.right]);
 
-    const humming = createBeats(bands, (b) => b.starts, () => {
-      if (cover?.isLive()) playBloop();
-    });
+    const humming = createBeats(
+      bands,
+      (b) => b.starts,
+      () => {
+        if (cover?.isLive()) playBloop();
+      },
+    );
     const snapping = createBeats(
       bands,
       (b) => b.snaps,
       (b, k) => {
-        cover!.levels(b.bar, levelsFor(b.bar.floor, levelShare, 2), { x: b.mid.x, y: b.mid.y - 100 });
+        cover!.levels(b.bar, levelsFor(b.bar.floor, levelShare, 2), {
+          x: b.mid.x,
+          y: b.mid.y - 100,
+        });
         if (b === last) {
           for (const bar of bars) cover!.slam(bar);
           cover!.blast(b.bar.center);
@@ -123,12 +135,31 @@ export const forceRubberBandEvent = registerWispEvent(
             const mid = grabbers[i](ms);
             const fade = 1 - clamp01((ms - b.snaps) / QUIVER_MS);
             // stretched thinner and hotter the further it's drawn back
-            const stretch = 1 - 0.4 * clamp01((b.bar.center.y - mid.y) / b.pull);
+            const stretch =
+              1 - 0.4 * clamp01((b.bar.center.y - mid.y) / b.pull);
             drawBeam(ctx, b.left, mid, BAND * stretch, 0.85 * fade);
             drawBeam(ctx, mid, b.right, BAND * stretch, 0.85 * fade);
             if (ms < b.snaps) drawBeamFlare(ctx, mid, 12, 0.8, now);
-            drawWispBetween(ctx, anchors[i * 2], ms, now, WISP_SIZE * WISP, 0.5, b.starts, b.snaps + QUIVER_MS);
-            drawWispBetween(ctx, anchors[i * 2 + 1], ms, now, WISP_SIZE * WISP, 0.5, b.starts, b.snaps + QUIVER_MS);
+            drawWispBetween(
+              ctx,
+              anchors[i * 2],
+              ms,
+              now,
+              WISP_SIZE * WISP,
+              0.5,
+              b.starts,
+              b.snaps + QUIVER_MS,
+            );
+            drawWispBetween(
+              ctx,
+              anchors[i * 2 + 1],
+              ms,
+              now,
+              WISP_SIZE * WISP,
+              0.5,
+              b.starts,
+              b.snaps + QUIVER_MS,
+            );
           }
         },
       },

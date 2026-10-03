@@ -45,14 +45,32 @@ export const forceWaterspoutEvent = registerWispEvent(
         };
       }, 90),
     );
-    const pour: Pour = { coinsAlong: 260, width: 30, streamMs: climbMs * 0.7, travelMs: climbMs };
-    const floors = Math.max(1, Math.round(Math.abs(button.y - lock.y) / FLOOR_H));
-    const passes = Array.from({ length: floors - 1 }, (_, j) => (climbMs * (j + 1)) / floors);
-    const durationMs = Math.max(pourDurationMs(0, pour), climbMs + holdMs + mergeMs);
+    const pour: Pour = {
+      coinsAlong: 260,
+      width: 30,
+      streamMs: climbMs * 0.7,
+      travelMs: climbMs,
+    };
+    const floors = Math.max(
+      1,
+      Math.round(Math.abs(button.y - lock.y) / FLOOR_H),
+    );
+    const passes = Array.from(
+      { length: floors - 1 },
+      (_, j) => (climbMs * (j + 1)) / floors,
+    );
+    const durationMs = Math.max(
+      pourDurationMs(0, pour),
+      climbMs + holdMs + mergeMs,
+    );
 
-    const pouring = createBeats([0], (ms) => ms, () => {
-      for (const line of strands) pourLine(cover!, line, pour);
-    });
+    const pouring = createBeats(
+      [0],
+      (ms) => ms,
+      () => {
+        for (const line of strands) pourLine(cover!, line, pour);
+      },
+    );
     const passing = createBeats(
       passes,
       (ms) => ms,
@@ -62,7 +80,11 @@ export const forceWaterspoutEvent = registerWispEvent(
         shakeScreen(lerp(FLOOR_SHAKE, k / Math.max(1, passes.length - 1)));
       },
     );
-    const finale = createBeats([climbMs], (ms) => ms, () => cover!.blast(lock));
+    const finale = createBeats(
+      [climbMs],
+      (ms) => ms,
+      () => cover!.blast(lock),
+    );
 
     const cover = startWispCover(
       KEY,

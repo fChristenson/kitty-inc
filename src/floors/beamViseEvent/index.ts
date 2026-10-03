@@ -105,10 +105,15 @@ export const forceBeamViseEvent = registerWispEvent(
             const ends = next ? next.starts + SLIDE_MS : g.bites + LET_GO_MS;
             if (ms < g.starts || ms > ends) continue;
             let shut = 0;
-            for (const c of g.cranks) shut += easeOut(clamp01((ms - c + CRANK_MS) / CRANK_MS));
-            const gap = lerp([OPEN, g.bar.box.height / 2 + JAW / 2], shut / CRANKS);
+            for (const c of g.cranks)
+              shut += easeOut(clamp01((ms - c + CRANK_MS) / CRANK_MS));
+            const gap = lerp(
+              [OPEN, g.bar.box.height / 2 + JAW / 2],
+              shut / CRANKS,
+            );
             const slide = easeOut(clamp01((ms - g.starts) / SLIDE_MS));
-            const fade = ms > g.bites ? 1 - clamp01((ms - g.bites) / LET_GO_MS) : 1;
+            const fade =
+              ms > g.bites ? 1 - clamp01((ms - g.bites) / LET_GO_MS) : 1;
             for (const side of [-1, 1]) {
               left.y = right.y = g.bar.center.y + side * gap;
               const reach = lerp([0, area.right - area.left], slide);

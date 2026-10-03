@@ -70,10 +70,22 @@ export const forcePinballRiverEvent = registerWispEvent(
       at,
       ms: (travelMs * legs[k + 1]) / length,
     }));
-    const pour: Pour = { coinsAlong: 240, width: 34, streamMs: travelMs * 0.6, travelMs };
-    const durationMs = Math.max(pourDurationMs(0, pour), travelMs + holdMs + mergeMs);
+    const pour: Pour = {
+      coinsAlong: 240,
+      width: 34,
+      streamMs: travelMs * 0.6,
+      travelMs,
+    };
+    const durationMs = Math.max(
+      pourDurationMs(0, pour),
+      travelMs + holdMs + mergeMs,
+    );
 
-    const pouring = createBeats([0], (ms) => ms, () => pourLine(cover!, line, pour));
+    const pouring = createBeats(
+      [0],
+      (ms) => ms,
+      () => pourLine(cover!, line, pour),
+    );
     const banking = createBeats(
       banks,
       (b) => b.ms,
@@ -81,7 +93,11 @@ export const forcePinballRiverEvent = registerWispEvent(
         cover!.burst(b.at, 0.5);
         cover!.launchFrom(
           b.at,
-          clampTargetsY(ringTargets(b.at, COINS, COIN_REACH), area.top + 40, area.bottom - 40),
+          clampTargetsY(
+            ringTargets(b.at, COINS, COIN_REACH),
+            area.top + 40,
+            area.bottom - 40,
+          ),
         );
         if (!cover!.isLive()) return;
         playExplosion();
