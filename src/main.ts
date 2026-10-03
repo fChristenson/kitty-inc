@@ -264,6 +264,12 @@ import {
   forceHyperspaceEvent,
   forceJavelinEvent,
   forceShuffleEvent,
+  forceMushroomCloudEvent,
+  forceRelayEvent,
+  forceLaserPointerEvent,
+  forceStormChaserEvent,
+  forceBaitBallEvent,
+  forceVideoWallEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1394,6 +1400,12 @@ async function main() {
       hyperspace: forceOnActive(forceHyperspaceEvent),
       javelin: forceOnActive(forceJavelinEvent),
       shuffle: forceOnActive(forceShuffleEvent),
+      "mushroom-cloud": forceOnActive(forceMushroomCloudEvent),
+      relay: forceOnActive(forceRelayEvent),
+      "laser-pointer": forceOnActive(forceLaserPointerEvent),
+      "storm-chaser": forceOnActive(forceStormChaserEvent),
+      "bait-ball": forceOnActive(forceBaitBallEvent),
+      "video-wall": forceOnActive(forceVideoWallEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

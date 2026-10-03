@@ -2101,6 +2101,66 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, levels + cash: src/floors/mushroomCloudEvent: a column of cash
+  // billows up into a rolling mushroom cap
+  mushroomCloudEvent: {
+    chance: 0.01,
+    fallMs: 350, // the wisp plummeting onto the button
+    riseMs: 800, // the cap shooting up the screen
+    billowMs: 450, // churning ever faster at the top
+    flightMs: 380, // each coin's suck into the total
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, levels + a crit tier: src/floors/relayEvent: wisp runners sprint
+  // the bars, passing a baton
+  relayEvent: {
+    chance: 0.01,
+    legsMs: [440, 260] as [number, number], // each leg's sprint, quickening
+    tossMs: 140, // each baton toss
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // beam, worker tiers: src/floors/laserPointerEvent: wisp kittens chase a
+  // laser dot onto the workers
+  laserPointerEvent: {
+    chance: 0.01,
+    dartsMs: [180, 100] as [number, number], // each dart of the dot, quickening
+    holdsMs: [80, 20] as [number, number], // the dot staying on a worker after the pounce
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, worker tiers + levels + a crit tier: src/floors/stormChaserEvent:
+  // bolts crack down on a fleeing wisp's heels
+  stormChaserEvent: {
+    chance: 0.01,
+    runMs: 1_700, // the wisp's run, picking up speed
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, cash: src/floors/baitBallEvent: wisp hunters slash through a milling
+  // shoal of cash
+  baitBallEvent: {
+    chance: 0.01,
+    formMs: 450, // the shoal balling up mid-screen
+    slashesMs: [700, 1_000, 1_220], // each hunter crossing its middle
+    dashMs: 260, // each hunter's dash across the screen
+    flightMs: 380, // each coin's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/videoWallEvent: the screen tiled into a wall
+  // of copies of itself
+  videoWallEvent: {
+    chance: 0.01,
+    beatsMs: [120, 420, 680, 900], // each punch out to a bigger wall
+    zoomMs: 280, // the button's screen zooming back to fill the view
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
