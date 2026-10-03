@@ -2161,6 +2161,90 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, levels + cash: src/floors/ferrofluidEvent: a pool of cash bristles
+  // into spikes that stab up into the bars
+  ferrofluidEvent: {
+    chance: 0.01,
+    pourMs: 350, // the button gushing out the pool
+    gapsMs: [260, 160] as [number, number], // between spikes, quickening
+    stabMs: 200, // each spike shooting up into its bar
+    slumpMs: 180, // the spikes slumping back into the pool
+    flightMs: 380, // each coin's surge into the total
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, worker tiers: src/floors/hideAndSeekEvent: wisps hide behind the
+  // workers and a seeker hunts them down
+  hideAndSeekEvent: {
+    chance: 0.01,
+    hideMs: 300, // the hiders scattering
+    countMs: 450, // the seeker counting down on the button
+    dashesMs: [300, 160] as [number, number], // each dash to a hider, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, cash: src/floors/magicCarpetEvent: a wisp rides a rippling carpet of
+  // cash round the screen
+  magicCarpetEvent: {
+    chance: 0.01,
+    unrollMs: 300, // the carpet unrolling under the rider
+    flyMs: 1_500, // swooping round, picking up speed
+    pileMs: 400, // the carpet piling into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, levels: src/floors/spirographEvent: a beam strung between two
+  // whirling wisps traces a rosette
+  spirographEvent: {
+    chance: 0.01,
+    enterMs: 250, // the wisps flying out onto their rings
+    whirlMs: 1_300, // whirling, ever faster
+    collapseMs: 250, // spiralling into the middle
+    levelShare: 0.04, // of each bar's levels, per sweep
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, worker tiers + levels + a crit tier: src/floors/electricNetEvent:
+  // a net of lightning drops over the screen and cinches on the clicked bar
+  electricNetEvent: {
+    chance: 0.01,
+    dropMs: 1_100, // the net falling, speeding up
+    cinchMs: 300, // cinching shut round the clicked bar
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, an unlock: src/floors/demolitionEvent: bomb wisps on the
+  // locked floor's corners blow it open
+  demolitionEvent: {
+    chance: 0.01,
+    flyMs: 300, // each charge flying to its corner
+    fuseMs: 700, // the fuses burning down
+    gapMs: 110, // between the corner blasts
+    finalGapMs: 220, // the last corner to the colossal middle charge
+    holdMs: 300,
+    mergeMs: 0,
+  },
+  // gunfire, hires: src/floors/shootingGalleryEvent: a gun shoots down
+  // sliding targets over the empty spots
+  shootingGalleryEvent: {
+    chance: 0.01,
+    popMs: 250, // the targets popping up
+    burstsMs: [300, 160] as [number, number], // before each burst, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/collapseEvent: the screen's storeys collapse
+  // into a heap and spring back
+  collapseEvent: {
+    chance: 0.01,
+    gapsMs: [240, 110] as [number, number], // between storeys giving way
+    fallMs: 200, // each storey's drop
+    springMs: 260, // springing back up
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
