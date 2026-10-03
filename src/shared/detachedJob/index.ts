@@ -54,14 +54,13 @@ export async function runDetachedJob<T>(options: {
     for (;;) {
       if (options.isCurrent && !options.isCurrent()) return false;
       const startedAt = performance.now();
-      for (let count = 0; count < 64; count++) {
+      do {
         if (!runDetachedStep(() => options.step(draft))) {
           if (changed) options.commit(draft);
           return changed;
         }
         changed = true;
-        if (performance.now() - startedAt >= 8) break;
-      }
+      } while (performance.now() - startedAt < 8);
       await new Promise<void>((resolve) => setTimeout(resolve, 0));
     }
   } finally {

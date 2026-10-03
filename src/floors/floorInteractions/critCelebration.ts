@@ -314,13 +314,13 @@ export function triggerCritCelebration(
   bonusTier: CritTier | null = null,
   onFollowUpProc?: (kind: CritProcKind) => void,
 ): void {
-  const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
   if (isDetachedJobRunning()) {
     if (procs?.dejaVu) {
       for (const kind of pickDejaVuFollowUps(procs)) onFollowUpProc?.(kind);
     }
     return;
   }
+  const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
   if (landed.length > 0) {
     const now = Date.now();
     for (const kind of landed) {

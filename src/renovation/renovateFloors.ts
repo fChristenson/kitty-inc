@@ -53,6 +53,15 @@ export function createPrepaidRenovationStep(
   };
 }
 
+// jobs to settle right away when the player leaves (see stopRenovationsNow)
+const stoppers = new Set<() => void>();
+
+// called when the player leaves the game: every running renovation stops on
+// the spot, keeping what it bought (keepPartialOnStop) or refunding its cost
+export function stopRenovationsNow(): void {
+  for (const stop of [...stoppers]) stop();
+}
+
 export async function renovateFloors(options: {
   plan: RenovationPlan;
   buildings: Floor[][];
@@ -62,9 +71,11 @@ export async function renovateFloors(options: {
   refund: (cost: BigNumber) => void;
   getMoney: () => BigNumber;
   upgrade: (draft: BuildingDraft, floor: Floor) => void;
-  createStep?: (draft: BuildingDraft) => () => boolean;
+  createStep?: (draft: BuildingDraft) => (() => boolean) | undefined;
   commit: (draft: BuildingDraft, rewardBase: BigNumber) => void;
   isCurrent: () => boolean;
+  // the draft's wallet holds the unspent budget, so a stopped job can commit
+  keepPartialOnStop?: boolean;
 }): Promise<BuildingDraft | null> {
   const floors = options.buildings[options.buildingIndex];
   if (
@@ -77,11 +88,33 @@ export async function renovateFloors(options: {
   const rewardBase = options.getMoney();
   let result: BuildingDraft | null = null;
   let step: (() => boolean) | undefined;
+  let readyDraft: BuildingDraft | null = null;
+  let stopped = false;
+  let settled = false;
+  const settle = (): void => {
+    if (settled) return;
+    settled = true;
+    stoppers.delete(stop);
+    unlock();
+    if (!result) options.refund(options.plan.cost);
+  };
+  const commit = (draft: BuildingDraft): void => {
+    options.commit(draft, rewardBase);
+    commitCritCounts(draft.badges);
+    result = draft;
+  };
+  const stop = (): void => {
+    stopped = true;
+    if (options.keepPartialOnStop && readyDraft && !result) commit(readyDraft);
+    settle();
+  };
+  stoppers.add(stop);
+  const isCurrent = (): boolean => !stopped && options.isCurrent();
   try {
     options.onPurchased?.();
     await runDetachedJob({
       exclusive: false,
-      isCurrent: options.isCurrent,
+      isCurrent,
       clone: async (): Promise<BuildingDraft> => {
         const copies: Floor[] = [];
         const draft: BuildingDraft = {
@@ -92,7 +125,7 @@ export async function renovateFloors(options: {
         draft.buildings[options.buildingIndex] = copies;
         let startedAt = performance.now();
         for (const floor of floors) {
-          if (!options.isCurrent()) break;
+          if (!isCurrent()) break;
           copies.push(cloneWithSnapshotState(floor));
           if (performance.now() - startedAt >= 8) {
             await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -104,18 +137,16 @@ export async function renovateFloors(options: {
           createPrepaidRenovationStep(options.plan, copies, (floor) =>
             options.upgrade(draft, floor),
           );
+        if (isCurrent()) readyDraft = draft;
         return draft;
       },
       step: (draft) => withDraftCritCounts(draft.badges, () => step!()),
       commit: (draft) => {
-        options.commit(draft, rewardBase);
-        commitCritCounts(draft.badges);
-        result = draft;
+        if (!stopped) commit(draft);
       },
     });
     return result;
   } finally {
-    unlock();
-    if (!result) options.refund(options.plan.cost);
+    settle();
   }
 }

@@ -1243,11 +1243,7 @@ export function readCritProcs(floor: Floor): CritProcFlags {
 // through the same applyCritProcs dispatcher everything else uses (see
 // critCelebration's Deja Vu follow-ups)
 export function tierOnlyCrit(tier: CritTier): CritRollResult {
-  return {
-    ...Object.fromEntries(CRIT_PROC_KINDS.map((kind) => [kind, false])),
-    tier,
-    bonusTier: null,
-  } as CritRollResult;
+  return critResult(tier, null);
 }
 
 export function onlyCritProc(kind: CritProcKind): CritProcFlags {
@@ -2036,6 +2032,18 @@ const ALL_CRIT_PROC_FLAGS_FALSE = Object.fromEntries(
   CRIT_PROC_KINDS.map((kind) => [kind, false]),
 ) as CritProcFlags;
 
+// a result whose procs all read false through the shared prototype, so a roll
+// never copies every one of the ~1,700 proc flags (a renovation rolls thousands)
+function critResult(
+  tier: CritTier,
+  bonusTier: CritTier | null,
+): CritRollResult {
+  const result = Object.create(ALL_CRIT_PROC_FLAGS_FALSE) as CritRollResult;
+  result.tier = tier;
+  result.bonusTier = bonusTier;
+  return result;
+}
+
 // the ONE shared "roll a crit" entry point: walks CRIT_TIER_ORDER rarest-first
 // for the tier (previously duplicated separately by rollCritUpgrade and
 // rollFloorBuyCrit), then — only if a tier actually landed — rolls the
@@ -2086,11 +2094,7 @@ export function rollCrit(
       ? rollTier()
       : null;
   const landedProcs = [...kept];
-  const result = {
-    ...ALL_CRIT_PROC_FLAGS_FALSE,
-    tier,
-    bonusTier,
-  } as CritRollResult;
+  const result = critResult(tier, bonusTier);
   for (const kind of landedProcs) result[kind] = true;
   notifyCritProcsArmed(landedProcs);
   onLanded(result, landedProcs);

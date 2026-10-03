@@ -7,7 +7,6 @@ import {
   fromNumber,
   gt,
   gte,
-  isZero,
   ZERO,
   type BigNumber,
 } from "./shared/bigNumber";
@@ -33,7 +32,6 @@ import {
   loadFloatingCoinImage,
   startIncomeTicker,
   ensureLockedFloorAbove,
-  getBuildingUnlockAllCost,
   getUniformCritTier,
   unlockAllFloors,
   getActiveBackgrounds,
@@ -782,9 +780,9 @@ import { createLoadingOverlay } from "./shared/loadingOverlay";
 import {
   createRenovationController,
   renovateFloors,
+  stopRenovationsNow,
   planRenovation,
   createFixedRenovationPlan,
-  planBuildingCompletion,
   createFloorUnlockStep,
   createBuildingCompletionStep,
 } from "./renovation";
@@ -2719,7 +2717,7 @@ async function main() {
   function startBuildingRenovation(
     floors: Floor[],
     plan: RenovationPlan,
-    action: "upgrades" | "unlock" | "complete" = "upgrades",
+    action: "upgrades" | "unlock" | "complete" | "buyAll" = "upgrades",
     onPurchased?: () => void,
   ): Promise<boolean> {
     const buildingIndex = buildings.indexOf(floors);
@@ -2774,31 +2772,39 @@ async function main() {
           activeCompanyIndex === companyIndex &&
           buildings[buildingIndex] === floors,
         upgrade,
-        createStep:
-          action === "upgrades"
-            ? undefined
-            : (draft) =>
-                action === "unlock"
-                  ? createFloorUnlockStep(
-                      draft.buildings[buildingIndex],
-                      (floor) =>
-                        withDraftEconomy(draft, () =>
-                          performAutomatedFloorUnlock(
-                            draftDeps(draft),
-                            floor,
-                            true,
-                          ),
-                        ),
-                    )
-                  : createBuildingCompletionStep(
-                      plan,
-                      draft.buildings[buildingIndex],
-                      (floor) => upgrade(draft, floor),
-                      {
-                        managerLevel: MANAGER_MIN_UPGRADE_COUNT,
-                        maxWorkers: MAX_RENDERED_WORKERS,
-                      },
-                    ),
+        keepPartialOnStop: action === "buyAll",
+        createStep: (draft) => {
+          if (action === "unlock")
+            return createFloorUnlockStep(
+              draft.buildings[buildingIndex],
+              (floor) =>
+                withDraftEconomy(draft, () =>
+                  performAutomatedFloorUnlock(draftDeps(draft), floor, true),
+                ),
+            );
+          if (action === "complete")
+            return createBuildingCompletionStep(
+              plan,
+              draft.buildings[buildingIndex],
+              (floor) => upgrade(draft, floor),
+              {
+                managerLevel: MANAGER_MIN_UPGRADE_COUNT,
+                maxWorkers: MAX_RENDERED_WORKERS,
+              },
+            );
+          if (action === "buyAll") {
+            // the prepaid budget is the draft's wallet; what's left is refunded on commit
+            draft.money = add(draft.money, plan.cost);
+            return () =>
+              withDraftEconomy(
+                draft,
+                () =>
+                  cheapestPurchase(draft.buildings, buildingIndex)?.buy() ??
+                  false,
+              );
+          }
+          return undefined;
+        },
         commit: (draft, rewardBase) => {
           buildings[buildingIndex] = draft.buildings[buildingIndex];
           addCompanyTotalIncome(
@@ -2889,93 +2895,10 @@ async function main() {
     return true;
   }
 
-  // unlocks every remaining floor of an ALREADY-BOUGHT building in one shot —
-  // the city map's long-press-on-the-green-dot gesture (see cityMap/index.ts,
-  // markers.ts's drawBuyAllFloorsIndicator). Returns whether it succeeded (false
-  // if there's nothing left to unlock, or it's not actually affordable)
-  function buyAllFloorsForBuilding(
-    buildingIndex: number,
-    onPurchased?: () => void,
-  ): Promise<boolean> {
-    const floors = buildings[buildingIndex];
-    if (!floors) return Promise.resolve(false);
-    const cost = getBuildingUnlockAllCost(
-      floors,
-      getBuildingMultiplier(buildingIndex),
-    );
-    if (isZero(cost)) return Promise.resolve(false);
-    const count =
-      MAX_FLOORS_PER_BUILDING - floors.filter((floor) => floor.unlocked).length;
-    return startBuildingRenovation(
-      floors,
-      createFixedRenovationPlan(floors, cost, count),
-      "unlock",
-      onPurchased,
-    );
-  }
-
-  function getBuildingCompletionPlan(floors: Floor[]): RenovationPlan {
-    return planBuildingCompletion(floors, {
-      managerLevel: MANAGER_MIN_UPGRADE_COUNT,
-      maxWorkers: MAX_RENDERED_WORKERS,
-      increaseIncomeRate,
-      workerCost: getWorkerCost,
-      chairsCost: getOfficeChairsCost,
-      suppliesCost: getOfficeSuppliesCost,
-      managerCost: getManagerCost,
-    });
-  }
-
-  function getBuildingUpgradeAllCostForMap(buildingIndex: number): BigNumber {
-    const floors = buildings[buildingIndex];
-    if (!floors) return ZERO;
-    return getBuildingCompletionPlan(floors).cost;
-  }
-
-  function buyAllFloorUpgradesForBuilding(
-    buildingIndex: number,
-    onPurchased?: () => void,
-  ): Promise<boolean> {
-    const floors = buildings[buildingIndex];
-    if (!floors) return Promise.resolve(false);
-    return startBuildingRenovation(
-      floors,
-      getBuildingCompletionPlan(floors),
-      "complete",
-      onPurchased,
-    );
-  }
-
-  // Buys the currently-cheapest upgrade repeatedly after the green and purple
-  // map actions have been processed.
-  async function buyCheapestFloorUpgradesForBuilding(
-    buildingIndex: number,
-    onPurchased?: () => void,
-  ): Promise<boolean> {
-    const floors = buildings[buildingIndex];
-    if (
-      !floors ||
-      floors.some(isFloorLocked) ||
-      renovations.running ||
-      isDetachedJobPending()
-    )
-      return false;
-    const companyIndex = activeCompanyIndex;
-    const plan = planRenovation(floors, getTotalIncome());
-    if (
-      activeCompanyIndex !== companyIndex ||
-      buildings[buildingIndex] !== floors
-    )
-      return false;
-    return startBuildingRenovation(floors, plan, "upgrades", onPurchased);
-  }
-
   // the city map's cloud-cat mascot: a toggleable background auto-buyer that
-  // saves the player hunting for what to buy next. Every call buys the single
-  // most expensive affordable thing available ANYWHERE in the company — the
-  // next building, a locked floor, an upgrade, a worker, office chairs, office
-  // supplies or a manager. Buying nothing is a normal idle tick, never a stop
-  // condition.
+  // buys the single most expensive affordable thing in the company — the next
+  // building, a locked floor, an upgrade, a worker, office chairs, office
+  // supplies or a manager.
   async function runCheapestBatch(): Promise<CheapestBatch> {
     if (renovations.running || isDetachedJobPending() || !cheapestPurchase())
       return { label: null, badges: {} };
@@ -3003,6 +2926,21 @@ async function main() {
     return { label, badges: draft.badges };
   }
 
+  // a map marker's long-press: a renovation that prepays the whole wallet, buys
+  // the building's most expensive affordable item until none is left, and
+  // refunds the rest on commit
+  function buyOutBuilding(buildingIndex: number): Promise<boolean> {
+    const floors = buildings[buildingIndex];
+    if (!floors || !cheapestPurchase(buildings, buildingIndex))
+      return Promise.resolve(false);
+    const budget = structuredClone(getTotalIncome());
+    return startBuildingRenovation(
+      floors,
+      createFixedRenovationPlan(floors, budget, 1),
+      "buyAll",
+    );
+  }
+
   interface AutoPurchase {
     cost: BigNumber;
     label: string;
@@ -3011,9 +2949,13 @@ async function main() {
     buy: () => boolean;
   }
 
-  // scans every purchasable thing in the company and returns the most
-  // expensive affordable one, or null once nothing can currently be bought
-  function cheapestPurchase(targetBuildings = buildings): AutoPurchase | null {
+  // scans every purchasable thing in the company (or just one building, when
+  // onlyBuildingIndex is given) and returns the most expensive affordable one,
+  // or null once nothing can currently be bought
+  function cheapestPurchase(
+    targetBuildings = buildings,
+    onlyBuildingIndex?: number,
+  ): AutoPurchase | null {
     let best: AutoPurchase | null = null;
     const consider = (candidate: AutoPurchase): void => {
       if (
@@ -3024,18 +2966,26 @@ async function main() {
       }
       best = candidate;
     };
-    consider({
-      cost: getBuildingPrice(targetBuildings.length),
-      label: "+1 building",
-      buy: () => {
-        const buildingIndex = targetBuildings.length;
-        if (!buyBuilding(targetBuildings)) return false;
-        const result = rollFloorBuyCrit(false);
-        if (result) setBuildingCritTier(buildingIndex, result, targetBuildings);
-        return true;
-      },
-    });
+    if (onlyBuildingIndex === undefined) {
+      consider({
+        cost: getBuildingPrice(targetBuildings.length),
+        label: "+1 building",
+        buy: () => {
+          const buildingIndex = targetBuildings.length;
+          if (!buyBuilding(targetBuildings)) return false;
+          const result = rollFloorBuyCrit(false);
+          if (result)
+            setBuildingCritTier(buildingIndex, result, targetBuildings);
+          return true;
+        },
+      });
+    }
     targetBuildings.forEach((floors, buildingIndex) => {
+      if (
+        onlyBuildingIndex !== undefined &&
+        buildingIndex !== onlyBuildingIndex
+      )
+        return;
       const top = floors[floors.length - 1];
       if (top && !top.unlocked) {
         consider({
@@ -3348,40 +3298,12 @@ async function main() {
     },
     getBuildingCritTier: (buildingIndex) =>
       getUniformCritTier(buildings[buildingIndex] ?? []),
-    getBuildingUnlockAllCost: (buildingIndex) =>
-      getBuildingUnlockAllCost(
-        buildings[buildingIndex] ?? [],
-        getBuildingMultiplier(buildingIndex),
-      ),
-    getBuildingUpgradeAllCost: getBuildingUpgradeAllCostForMap,
-    canRenovateBuilding: (buildingIndex) => {
-      const floors = buildings[buildingIndex];
-      if (
-        !floors ||
-        renovations.running ||
-        isDetachedJobPending() ||
-        floors.some(isFloorLocked)
-      )
-        return false;
-      const unlockCost = getBuildingUnlockAllCost(
-        floors,
-        getBuildingMultiplier(buildingIndex),
-      );
-      if (!isZero(unlockCost)) return gte(getTotalIncome(), unlockCost);
-      const completionCost = getBuildingUpgradeAllCostForMap(buildingIndex);
-      return (
-        (!isZero(completionCost) && gte(getTotalIncome(), completionCost)) ||
-        floors.some(
-          (floor) => floor.unlocked && gte(getTotalIncome(), floor.upgradeCost),
-        )
-      );
-    },
+    isBuildingRenovating: (buildingIndex) =>
+      renovations.isRunning(activeCompanyIndex, buildingIndex),
     buyBuilding,
     onStateChanged: saveCurrentCompanyStateNow,
-    buyAllFloors: buyAllFloorsForBuilding,
-    buyAllFloorUpgrades: buyAllFloorUpgradesForBuilding,
-    buyCheapestFloorUpgrades: buyCheapestFloorUpgradesForBuilding,
     runCheapestBatch,
+    buyOutBuilding,
     setBuildingCritTier,
     onSelectBuilding: (index) => {
       goToBuilding(index);
@@ -3494,7 +3416,10 @@ async function main() {
   bindSaveLifecycle({
     isIntact: isStorageIntact,
     markClosed: markAppClosed,
-    saveNow: saveCurrentCompanyStateNow,
+    saveNow: () => {
+      stopRenovationsNow();
+      saveCurrentCompanyStateNow();
+    },
   });
 }
 

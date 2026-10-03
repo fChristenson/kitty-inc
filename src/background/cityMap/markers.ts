@@ -226,70 +226,6 @@ export function drawCatMarker(
   );
 }
 
-// small filled dot drawn just left of an unlocked building's own cat marker,
-// once the company has enough money to unlock every remaining floor in that
-// building in one shot (see cityMap/index.ts's long-press-to-buy-all-floors
-// gesture, and floors/floorLock.ts's getBuildingUnlockAllCost)
-const BUY_ALL_INDICATOR_RADIUS = 4.5;
-// gap between the circle's own right edge and the cat sprite's left edge
-const BUY_ALL_INDICATOR_GAP = -64;
-// nudges the circle down from its default vertical-center position
-const BUY_ALL_INDICATOR_Y_OFFSET = 36;
-
-export function drawBuyAllFloorsIndicator(
-  ctx: CanvasRenderingContext2D,
-  cssW: number,
-  cssH: number,
-  catSprite: HTMLImageElement | null,
-  buildingIndex: number,
-): void {
-  if (!catSprite) return;
-  const { cx, feetY } = markerCenter(cssW, cssH, buildingIndex);
-  const frameW = catSprite.naturalWidth / CAT_FRAME_COUNT;
-  const frameH = catSprite.naturalHeight;
-  const renderW = (MARKER_H * frameW) / frameH;
-  const circleX =
-    cx - renderW / 2 - BUY_ALL_INDICATOR_GAP - BUY_ALL_INDICATOR_RADIUS;
-  const circleY = feetY - MARKER_H / 2 + BUY_ALL_INDICATOR_Y_OFFSET;
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(circleX, circleY, BUY_ALL_INDICATOR_RADIUS, 0, Math.PI * 2);
-  ctx.fillStyle = COLOR.moneyGreen;
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = COLOR.white;
-  ctx.stroke();
-  ctx.restore();
-}
-
-// same placement and affordance treatment as the green floor-unlock indicator;
-// the city map chooses which long-press action wins when both are available
-export function drawBuyAllBuildingItemsIndicator(
-  ctx: CanvasRenderingContext2D,
-  cssW: number,
-  cssH: number,
-  catSprite: HTMLImageElement | null,
-  buildingIndex: number,
-): void {
-  if (!catSprite) return;
-  const { cx, feetY } = markerCenter(cssW, cssH, buildingIndex);
-  const frameW = catSprite.naturalWidth / CAT_FRAME_COUNT;
-  const frameH = catSprite.naturalHeight;
-  const renderW = (MARKER_H * frameW) / frameH;
-  const circleX =
-    cx - renderW / 2 - BUY_ALL_INDICATOR_GAP - BUY_ALL_INDICATOR_RADIUS;
-  const circleY = feetY - MARKER_H / 2 + BUY_ALL_INDICATOR_Y_OFFSET;
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(circleX, circleY, BUY_ALL_INDICATOR_RADIUS, 0, Math.PI * 2);
-  ctx.fillStyle = COLOR.purple;
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = COLOR.white;
-  ctx.stroke();
-  ctx.restore();
-}
-
 // one-shot hop played the instant a building's marker actually unlocks — same
 // shape (sin(t*pi)) and CAT_JUMP_FRAME/CLICK_FRAME swap as floors/worker's own
 // click-reaction bounce, but slower/lower (worker's 300ms/14px reads as too
@@ -333,6 +269,45 @@ export function drawLockedMarkerPrice(
   ctx.translate(cx, priceY + translateY);
   ctx.scale(scaleX, scaleY);
   drawCartoonText(ctx, formatPrice(price), 0, 0, COLOR.white);
+  ctx.restore();
+}
+
+// spinner beside a bought marker's cat while its building is renovating, in
+// the old buy-all dot's spot and size
+const SPINNER_RADIUS = 4.5;
+const SPINNER_GAP = -64;
+const SPINNER_Y_OFFSET = 36;
+const SPINNER_TURN_MS = 800;
+
+export function drawMarkerSpinner(
+  ctx: CanvasRenderingContext2D,
+  cssW: number,
+  cssH: number,
+  catSprite: HTMLImageElement | null,
+  buildingIndex: number,
+  now: number,
+): void {
+  if (!catSprite) return;
+  const { cx, feetY } = markerCenter(cssW, cssH, buildingIndex);
+  const frameW = catSprite.naturalWidth / CAT_FRAME_COUNT;
+  const renderW = (MARKER_H * frameW) / catSprite.naturalHeight;
+  const x = cx - renderW / 2 - SPINNER_GAP - SPINNER_RADIUS;
+  const y = feetY - MARKER_H / 2 + SPINNER_Y_OFFSET;
+  const start = ((now % SPINNER_TURN_MS) / SPINNER_TURN_MS) * Math.PI * 2;
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.arc(x, y, SPINNER_RADIUS, 0, Math.PI * 2);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = COLOR.black;
+  ctx.stroke();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "rgb(255 255 255 / 30%)";
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(x, y, SPINNER_RADIUS, start, start + Math.PI * 0.6);
+  ctx.strokeStyle = COLOR.white;
+  ctx.stroke();
   ctx.restore();
 }
 

@@ -3,6 +3,7 @@ import type { CritProcKind } from "../shared/critTypes";
 
 export {
   renovateFloors,
+  stopRenovationsNow,
   planRenovation,
   isRenovationPlanCurrent,
   createPrepaidRenovationStep,
@@ -38,6 +39,9 @@ export function createRenovationController(options: {
   return {
     get running(): boolean {
       return running !== null;
+    },
+    isRunning(company: number, building: number): boolean {
+      return running === key(company, building);
     },
     setView(company: number, building: number, mapOpen: boolean): void {
       visible = mapOpen ? null : key(company, building);

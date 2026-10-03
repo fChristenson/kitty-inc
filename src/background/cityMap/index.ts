@@ -30,10 +30,9 @@ import {
   drawCatMarker,
   drawLockedMarkerPrice,
   drawMarkerFloorCount,
+  drawMarkerSpinner,
   getMarkerJumpOffset,
   MARKER_COIN_BURST_SCALE,
-  drawBuyAllFloorsIndicator,
-  drawBuyAllBuildingItemsIndicator,
 } from "./markers";
 import { MAX_FLOORS_PER_BUILDING, rollFloorBuyCrit } from "../../floors";
 import {
@@ -71,7 +70,7 @@ import {
   drawFloatingBadgeParticle,
   type FloatingBadgeParticle,
 } from "../../shared/floatingBadges";
-import { type BigNumber, gte, isZero } from "../../shared/bigNumber";
+import { type BigNumber, gte } from "../../shared/bigNumber";
 import {
   triggerScreenShake,
   getScreenShakeOffset,
@@ -143,38 +142,15 @@ export interface CityMapDeps {
   // see getUniformCritTier), or null — colors the "X/20" marker readout so a
   // crit building stands out on the map
   getBuildingCritTier: (buildingIndex: number) => CritTier | null;
-  // $ to unlock EVERY remaining locked floor in a building at once — ZERO once
-  // there's nothing left to buy (already maxed). Drives the green buy-all-floors
-  // dot (see markers.ts's drawBuyAllFloorsIndicator) and its long-press gesture
-  getBuildingUnlockAllCost: (buildingIndex: number) => BigNumber;
-  // $ to complete every remaining upgrade, worker, and office item on every
-  // unlocked floor of an already-bought building. Drives the purple indicator
-  // and its higher-priority long-press gesture.
-  getBuildingUpgradeAllCost: (buildingIndex: number) => BigNumber;
+  isBuildingRenovating: (buildingIndex: number) => boolean;
   buyBuilding: () => boolean; // unlocks building 1 if affordable
-  canRenovateBuilding: (buildingIndex: number) => boolean;
   onStateChanged: () => void; // schedules persistence after any map-node purchase
-  // long-press-on-the-green-dot gesture below: unlocks every remaining floor of
-  // an already-bought building in one shot. Returns whether it succeeded
-  buyAllFloors: (
-    buildingIndex: number,
-    onPurchased?: () => void,
-  ) => Promise<boolean>;
-  buyAllFloorUpgrades: (
-    buildingIndex: number,
-    onPurchased?: () => void,
-  ) => Promise<boolean>;
-  // long-press fallback after all floors are unlocked and the purple action is
-  // unavailable: buys as many currently-cheapest floor upgrades as affordable
-  buyCheapestFloorUpgrades: (
-    buildingIndex: number,
-    onPurchased?: () => void,
-  ) => Promise<boolean>;
-  // one batch of the corner mascot's background auto-buyer: works the next few
-  // cheapest floors in the company and reports the badges that landed. Buying
-  // nothing is normal (the player may just be broke for the moment) — the job
-  // runs until the mascot is toggled back off, not until this stops paying out
+  // one purchase of the auto-buyer: the most expensive affordable thing in the
+  // whole company, or only in buildingIndex's building when given (a marker's
+  // long-press). label is null when nothing could be bought
   runCheapestBatch: () => Promise<CheapestBatch>;
+  // long-press on a bought marker: buys everything affordable in that building
+  buyOutBuilding: (buildingIndex: number) => Promise<boolean>;
   // sets EVERY floor this building currently has (locked or not) to
   // result.tier, permanently — the reward for a crit landing on that
   // building's own purchase (see rollFloorBuyCrit below). Does NOT unlock
@@ -413,7 +389,7 @@ export function createCityMapView(
   const BADGE_FLOAT_SIZE = 56;
   const BADGE_FLOAT_RELEASE_MS = 180;
   const badgeFloats: FloatingBadgeParticle[] = [];
-  const pendingBadgeFloats: CritProcKind[] = [];
+  const pendingBadgeFloats: { kind: CritProcKind; x: number; y: number }[] = [];
   let nextBadgeReleaseAt = 0;
   const BOUGHT_TEXT_FONT_PX = 11;
   const BOUGHT_TEXT_RISE_PER_TICK = 1.2;
@@ -451,24 +427,28 @@ export function createCityMapView(
   }
 
   let autoBuyRunning = false;
+  // the cloud cat's single purchase for the whole company
   async function runAutoBuyBatch(): Promise<void> {
     if (autoBuyRunning || critBadges.visible) return;
     autoBuyRunning = true;
     try {
       const { label, badges } = await deps.runCheapestBatch();
-      const now = Date.now();
       if (label === null) return;
-      indicatorCosts.clear();
       deps.onStateChanged();
       playAutoPurchase();
-      const { x, y } = cloudCat.cheer(cssW, cssH, now);
+      const { x, y } = cloudCat.cheer(cssW, cssH, Date.now());
+      const bounds = cloudCat.bounds(cssW, cssH);
       boughtFloats.push(
         createFloatingTextParticle(x, y - BOUGHT_TEXT_SPAWN_Y_OFFSET, label),
       );
       for (const [kind, count] of Object.entries(badges)) {
         critBadges.loadImage(kind as CritProcKind);
         for (let index = 0; index < count; index++)
-          pendingBadgeFloats.push(kind as CritProcKind);
+          pendingBadgeFloats.push({
+            kind: kind as CritProcKind,
+            x: bounds.left - 10 - BADGE_FLOAT_SIZE / 2,
+            y: bounds.top + bounds.size / 2,
+          });
       }
       redraw();
     } catch (error) {
@@ -479,16 +459,34 @@ export function createCityMapView(
     }
   }
 
+  // a marker's long-press buys out that building as one renovation job
+  const markerHop = createPurchaseFeedback({
+    sound: playAutoPurchase,
+    burst: spawnCoinBurstAt,
+    redraw: () => redraw(),
+  });
+  function selectedCompanyIndex(): number {
+    return corpBarrel.companyIndexAtPosition(corpBarrel.getSelectedPosition());
+  }
+  async function buyOutMarker(
+    globalIndex: number,
+    markerIndex: number,
+  ): Promise<void> {
+    const { cx, feetY } = markerCenter(cssW, cssH, markerIndex);
+    markerHop(globalIndex, cx, feetY - MARKER_H / 2, MARKER_COIN_BURST_SCALE);
+    try {
+      if (await deps.buyOutBuilding(globalIndex)) deps.onStateChanged();
+    } catch (error) {
+      console.error("Building buy-out failed", error);
+    }
+    redraw();
+  }
+
   function drawBadgeFloats(now: number): void {
     if (pendingBadgeFloats.length > 0 && now >= nextBadgeReleaseAt) {
-      const kind = pendingBadgeFloats.shift()!;
-      const bounds = cloudCat.bounds(cssW, cssH);
+      const { kind, x, y } = pendingBadgeFloats.shift()!;
       badgeFloats.push(
-        createFloatingBadgeParticle(
-          bounds.left - 10 - BADGE_FLOAT_SIZE / 2,
-          bounds.top + bounds.size / 2,
-          critBadges.loadImage(kind),
-        ),
+        createFloatingBadgeParticle(x, y, critBadges.loadImage(kind)),
       );
       nextBadgeReleaseAt = now + BADGE_FLOAT_RELEASE_MS;
     }
@@ -556,32 +554,6 @@ export function createCityMapView(
       COLOR.black,
       5,
     );
-  }
-
-  // the indicator dots' costs simulate whole purchase plans; recomputing them on
-  // every frame of a celebration (when the redraw throttle lifts) was needless
-  const INDICATOR_COST_TTL_MS = 250;
-  const indicatorCosts = new Map<
-    number,
-    { at: number; unlockAllCost: BigNumber; upgradeAllCost: BigNumber | null }
-  >();
-  function getIndicatorCosts(globalIndex: number): {
-    unlockAllCost: BigNumber;
-    upgradeAllCost: BigNumber | null;
-  } {
-    const now = performance.now();
-    const cached = indicatorCosts.get(globalIndex);
-    if (cached && now - cached.at < INDICATOR_COST_TTL_MS) return cached;
-    const unlockAllCost = deps.getBuildingUnlockAllCost(globalIndex);
-    const entry = {
-      at: now,
-      unlockAllCost,
-      upgradeAllCost: isZero(unlockAllCost)
-        ? deps.getBuildingUpgradeAllCost(globalIndex)
-        : null,
-    };
-    indicatorCosts.set(globalIndex, entry);
-    return entry;
   }
 
   function redraw(): void {
@@ -665,21 +637,8 @@ export function createCityMapView(
           MAX_FLOORS_PER_BUILDING,
           critTier ? CRIT_TIER_CONFIG[critTier].color : undefined,
         );
-        const { unlockAllCost, upgradeAllCost } =
-          getIndicatorCosts(globalIndex);
-        if (
-          !isZero(unlockAllCost) &&
-          gte(deps.getTotalIncome(), unlockAllCost)
-        ) {
-          drawBuyAllFloorsIndicator(ctx, cssW, cssH, markerSprite, i);
-        }
-        if (
-          upgradeAllCost !== null &&
-          !isZero(upgradeAllCost) &&
-          gte(deps.getTotalIncome(), upgradeAllCost)
-        ) {
-          drawBuyAllBuildingItemsIndicator(ctx, cssW, cssH, markerSprite, i);
-        }
+        if (deps.isBuildingRenovating(globalIndex))
+          drawMarkerSpinner(ctx, cssW, cssH, markerSprite, i, Date.now());
         continue;
       }
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);
@@ -850,7 +809,6 @@ export function createCityMapView(
     const buildingCount = deps.getBuildingCount();
     if (globalIndex === buildingCount) {
       if (deps.buyBuilding()) {
-        indicatorCosts.clear();
         showPurchaseFeedback(globalIndex, hit);
         deps.onStateChanged();
         const { cx, feetY } = markerCenter(cssW, cssH, hit);
@@ -877,13 +835,10 @@ export function createCityMapView(
     canvas.style.cursor = "default";
   }
 
-  // long-press-anywhere-on-an-eligible-marker gesture: holding it for
-  // BUY_ALL_HOLD_MS completes the purple building progression action first,
-  // unlocks every remaining floor for the green action, or falls back to buying
-  // the currently-cheapest upgrades once the first two dots are processed. The
-  // dots are visual affordability cues only, not the hit target, since their
-  // small radius made the gesture nearly impossible to land in practice.
-  // Suppresses a click landing shortly after (see onClick above)
+  // long-press on a bought building's marker: holding it for BUY_ALL_HOLD_MS
+  // keeps buying the most expensive affordable thing in that building (same
+  // purchases as the cloud cat's auto-buyer) until nothing more can be bought.
+  // Suppresses the click landing right after (see onClick above)
   const BUY_ALL_HOLD_MS = 1000;
   let buyAllHoldTimeout: ReturnType<typeof setTimeout> | null = null;
   let suppressNextClick = false;
@@ -904,61 +859,17 @@ export function createCityMapView(
     if (hit === null) return;
     const globalIndex = cityIndex * MARKER_COUNT + hit;
     if (globalIndex >= deps.getBuildingCount()) return;
-    const companyIndex = corpBarrel.companyIndexAtPosition(
-      corpBarrel.getSelectedPosition(),
-    );
+    const companyIndex = selectedCompanyIndex();
     const startedCityIndex = cityIndex;
-    buyAllHoldTimeout = setTimeout(async () => {
+    buyAllHoldTimeout = setTimeout(() => {
       buyAllHoldTimeout = null;
       if (
         cityIndex !== startedCityIndex ||
-        corpBarrel.companyIndexAtPosition(corpBarrel.getSelectedPosition()) !==
-          companyIndex
+        selectedCompanyIndex() !== companyIndex
       )
         return;
       suppressNextClick = true;
-      try {
-        if (!deps.canRenovateBuilding(globalIndex)) return;
-        showPurchaseFeedback(globalIndex, hit);
-        await new Promise<void>((resolve) => setTimeout(resolve, 0));
-        if (
-          cityIndex !== startedCityIndex ||
-          corpBarrel.companyIndexAtPosition(
-            corpBarrel.getSelectedPosition(),
-          ) !== companyIndex
-        )
-          return;
-        const floorUnlockCost = deps.getBuildingUnlockAllCost(globalIndex);
-        let action: "floors" | "building" | "upgrades";
-        if (!isZero(floorUnlockCost)) {
-          if (!gte(deps.getTotalIncome(), floorUnlockCost)) return;
-          action = "floors";
-        } else {
-          const upgradeAllCost = deps.getBuildingUpgradeAllCost(globalIndex);
-          action =
-            !isZero(upgradeAllCost) &&
-            gte(deps.getTotalIncome(), upgradeAllCost)
-              ? "building"
-              : "upgrades";
-        }
-        const bought = await (action === "building"
-          ? deps.buyAllFloorUpgrades(globalIndex)
-          : action === "floors"
-            ? deps.buyAllFloors(globalIndex)
-            : deps.buyCheapestFloorUpgrades(globalIndex));
-        if (
-          bought &&
-          corpBarrel.companyIndexAtPosition(
-            corpBarrel.getSelectedPosition(),
-          ) === companyIndex
-        ) {
-          deps.onStateChanged();
-        }
-        indicatorCosts.clear();
-        redraw();
-      } catch (error) {
-        console.error("Map renovation failed", error);
-      }
+      void buyOutMarker(globalIndex, hit);
     }, BUY_ALL_HOLD_MS);
   }
 
@@ -1046,7 +957,6 @@ export function createCityMapView(
 
   return {
     refresh: () => {
-      indicatorCosts.clear();
       cityIndex = Math.floor(deps.getActiveBuildingIndex() / MARKER_COUNT);
       persistCityMapState();
       redraw();
