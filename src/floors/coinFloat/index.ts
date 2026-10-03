@@ -11,9 +11,9 @@ import { createParticlePool } from "../../shared/particlePool";
 // but these bubbles only ever render at a ~48px max diameter, so drawing the
 // full-res source every animation frame would resample it down from scratch
 // on every single frame. Downscaled once here onto an offscreen canvas sized
-// with generous headroom for high-DPI screens, then THAT small canvas is what
-// every frame actually draws
-const COIN_CANVAS_SIZE = 160;
+// with headroom for the ~0.7 device px per world unit the game canvas reaches
+// at most, then THAT small canvas is what every frame actually draws
+const COIN_CANVAS_SIZE = 64;
 let coinCanvas: HTMLCanvasElement | null = null;
 
 export async function loadFloatingCoinImage(): Promise<HTMLImageElement> {
@@ -56,20 +56,19 @@ interface FloatingCoin {
 // call, cheap enough that a much higher cap costs nothing even if it's never
 // actually reached
 const pool = createParticlePool<FloatingCoin>(6000);
+const MAX_SPARE = 1000;
 
 // the live coins grouped by floor, refreshed each physics step, so drawing one
-// floor doesn't walk every other floor's coins in the shared pool
-const byFloor = new Map<Floor, FloatingCoin[]>();
+// floor doesn't walk every other floor's coins in the shared pool. Buckets are
+// overwritten in place up to their count, never emptied, so they don't regrow
+const byFloor = new Map<Floor, { coins: FloatingCoin[]; count: number }>();
 
 function rebucket(): void {
-  for (const bucket of byFloor.values()) bucket.length = 0;
+  for (const bucket of byFloor.values()) bucket.count = 0;
   for (const c of pool.list) {
     let bucket = byFloor.get(c.floor);
-    if (!bucket) byFloor.set(c.floor, (bucket = []));
-    bucket.push(c);
-  }
-  for (const [floor, bucket] of byFloor) {
-    if (bucket.length === 0) byFloor.delete(floor);
+    if (!bucket) byFloor.set(c.floor, (bucket = { coins: [], count: 0 }));
+    bucket.coins[bucket.count++] = c;
   }
 }
 
@@ -85,9 +84,11 @@ export function drawFloatingCoins(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
 ): void {
-  const coins = byFloor.get(floor);
-  if (!coins) return;
-  for (const c of coins) {
+  const bucket = byFloor.get(floor);
+  if (!bucket || bucket.count === 0) return;
+  const coins = bucket.coins;
+  for (let i = 0; i < bucket.count; i++) {
+    const c = coins[i];
     const y = c.y;
     const t = c.life / c.maxLife;
     const radius = c.size * (1 - t * 0.3);
@@ -103,8 +104,15 @@ export function drawFloatingCoins(
     ctx.globalAlpha = Math.max(0, 1 - t) * blinkFactor;
 
     if (coinCanvas) {
-      const size = radius * 2;
-      ctx.drawImage(coinCanvas, c.x - radius, y - radius, size, size);
+      // whole units: fractional draw args are boxed, hundreds a frame
+      const size = Math.round(radius * 2);
+      ctx.drawImage(
+        coinCanvas,
+        Math.round(c.x - radius),
+        Math.round(y - radius),
+        size,
+        size,
+      );
     }
   }
   ctx.globalAlpha = 1;
@@ -137,24 +145,30 @@ export function spawnFloatingCoins(
   for (let i = 0; i < count; i++) {
     const startOffset =
       (i - (count - 1) / 2) * spacing + (Math.random() - 0.5) * 15;
-    pool.spawn({
-      floor,
-      x: x + startOffset,
-      originX: x,
-      startOffset,
-      y: y + (Math.random() - 0.5) * 20,
-      vy: -(0.6 + Math.random() * 0.6),
-      life: 0,
-      maxLife: 110 + Math.random() * 40,
-      size: 16 + Math.random() * 8,
-      wobblePhase: Math.random() * Math.PI * 2,
-      blinkIntensity,
-    });
+    // reused once faded, so a steady trickle never feeds the garbage collector
+    const c = spare.pop() ?? ({} as FloatingCoin);
+    c.floor = floor;
+    c.x = x + startOffset;
+    c.originX = x;
+    c.startOffset = startOffset;
+    c.y = y + (Math.random() - 0.5) * 20;
+    c.vy = -(0.6 + Math.random() * 0.6);
+    c.life = 0;
+    c.maxLife = 110 + Math.random() * 40;
+    c.size = 16 + Math.random() * 8;
+    c.wobblePhase = Math.random() * Math.PI * 2;
+    c.blinkIntensity = blinkIntensity;
+    pool.spawn(c);
   }
 
   pool.ensureTicking((dt) => {
-    pool.update(dt, advanceFloatingCoin);
+    pool.update(dt, advanceFloatingCoin, recycle);
     rebucket();
     onFrame();
   });
+}
+
+const spare: FloatingCoin[] = [];
+function recycle(c: FloatingCoin): void {
+  if (spare.length < MAX_SPARE) spare.push(c);
 }

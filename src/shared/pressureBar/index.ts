@@ -35,7 +35,9 @@ const MAX_RES = 2;
 const PAD_X = 30;
 const PAD_Y = 40;
 const SLICE = 8;
-const CALM_SLICE = 16;
+const CALM_SLICE = 24;
+// the glow's one stretch: the dome's bulge across its middle
+const GLOW_BULGE = 0.6;
 const INSET = 9;
 const FLAT = new Float32Array([0]);
 
@@ -201,8 +203,8 @@ function drawLights(
   }
 }
 
-// a calm, full bar warped straight from its cached layers: slices of its
-// liquid, its bubbles moved with the bulge, then slices of its rim and glow
+// a calm, full bar warped straight from its one cached layer in slices, its
+// bubbles moved with the bulge, and its glow stretched by the middle's bulge
 function drawCalmWarped(
   ctx: CanvasRenderingContext2D,
   key: object,
@@ -229,52 +231,38 @@ function drawCalmWarped(
   const seam = warped ? 0.6 : 0;
   const cx = x + w / 2 + shakeX;
   const cy = y + h / 2;
-  const alpha = ctx.globalAlpha;
-  for (let pass = 0; pass < 2; pass++) {
-    const source = pass === 0 ? bar.fill : bar.over;
-    for (let i = 0; i < profile.length; i++) {
-      const sx = i * slice;
-      const sw = Math.min(slice, w - sx);
-      const sh = h * (1 + bulge * profile[i]);
-      const dx = cx + (sx - w / 2) * stretch;
-      ctx.drawImage(
-        source,
-        sx,
-        0,
-        sw,
-        h,
-        dx,
-        cy - sh / 2,
-        sw * stretch + seam,
-        sh,
-      );
-      if (pass === 1 && flash > 0) {
-        ctx.globalAlpha = alpha * flash;
-        ctx.drawImage(
-          L.glow,
-          sx,
-          0,
-          sw,
-          h,
-          dx,
-          cy - sh / 2,
-          sw * stretch + seam,
-          sh,
-        );
-        ctx.globalAlpha = alpha;
-      }
-    }
-    if (pass > 0) break;
-    const spots = bar.bubbles;
-    for (let i = 0; i < spots.length; i += 3) {
-      const k = Math.min(profile.length - 1, Math.floor(spots[i] / slice));
-      stampBubble(
-        ctx,
-        cx + (spots[i] - w / 2) * stretch,
-        cy + (spots[i + 1] - h / 2) * (1 + bulge * profile[k]),
-        spots[i + 2],
-      );
-    }
+  for (let i = 0; i < profile.length; i++) {
+    const sx = i * slice;
+    const sw = Math.min(slice, w - sx);
+    const sh = h * (1 + bulge * profile[i]);
+    ctx.drawImage(
+      bar.bar,
+      sx,
+      0,
+      sw,
+      h,
+      cx + (sx - w / 2) * stretch,
+      cy - sh / 2,
+      sw * stretch + seam,
+      sh,
+    );
+  }
+  const spots = bar.bubbles;
+  for (let i = 0; i < spots.length; i += 3) {
+    const k = Math.min(profile.length - 1, Math.floor(spots[i] / slice));
+    stampBubble(
+      ctx,
+      cx + (spots[i] - w / 2) * stretch,
+      cy + (spots[i + 1] - h / 2) * (1 + bulge * profile[k]),
+      spots[i + 2],
+    );
+  }
+  if (flash > 0) {
+    const alpha = ctx.globalAlpha;
+    const gh = h * (1 + bulge * GLOW_BULGE);
+    ctx.globalAlpha = alpha * flash;
+    ctx.drawImage(L.glow, cx - (w / 2) * stretch, cy - gh / 2, w * stretch, gh);
+    ctx.globalAlpha = alpha;
   }
   if (burst > 0)
     drawBurst(ctx, L, cx, cy, burst, stretch, bulge, profile, slice);

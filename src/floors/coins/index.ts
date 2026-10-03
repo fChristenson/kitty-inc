@@ -314,7 +314,7 @@ export function spawnCoinBurst(
 ): void {
   spawnBurstParticles(floor, x, y, scale, null);
   pool.ensureTicking((dt) => {
-    pool.update(dt, advanceCoin);
+    pool.update(dt, advanceCoin, recycleCoin);
     onFrame();
   });
 }
@@ -342,7 +342,14 @@ export function spawnFreezeCoinBurst(
   glint = true,
 ): void {
   spawnBurstParticles(floor, x, y, 1, { ...arrival, fired: false, glint });
-  pool.ensureTicking((dt) => pool.update(dt, advanceCoin));
+  pool.ensureTicking((dt) => pool.update(dt, advanceCoin, recycleCoin));
+}
+
+// faded burst coins, reused by the next burst so a stream of bursts (managers
+// re-boosting every floor) doesn't keep feeding the garbage collector
+const spareCoins: Particle[] = [];
+function recycleCoin(p: Particle): void {
+  if (spareCoins.length < MAX_PARTICLES) spareCoins.push(p);
 }
 
 function spawnBurstParticles(
@@ -362,37 +369,39 @@ function spawnBurstParticles(
     const spread = freezeGroup ? FREEZE_SPAWN_SPREAD_PX : 20 * scale;
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
-    pool.spawn({
-      floor,
-      x: x + (Math.random() - 0.5) * spread,
-      y: y + (Math.random() - 0.5) * spread,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      life: 0,
-      maxLife: freezeGroup ? Infinity : 45 + Math.random() * 75,
-      size: (22 + Math.random() * 46) * scale * 1.15 * 1.25,
-      // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
-      // full fall speed more gradually
-      gravity:
-        Math.max(0, 0.2 + Math.random() * 0.35 - (kind === "bill" ? 0.2 : 0)) *
-        scale,
-      gravityRamp: (kind === "bill" ? 0.05 : 0.08) * scale,
-      kind,
-      spinFrame:
-        Math.random() *
-        (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
-      spinRate: MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE),
-      spinDir: Math.random() < 0.5 ? 1 : -1,
-      axisAngle: (Math.random() * 2 - 1) * (Math.PI / 2),
-      homing: freezeGroup
-        ? {
-            burstLife: Infinity,
-            flightTicks: randomIn(FREEZE_FLIGHT_TICKS),
-            group: freezeGroup,
-            holdTicks: randomIn(FREEZE_HOLD_TICKS),
-          }
-        : undefined,
-    });
+    const p = spareCoins.pop() ?? ({} as Particle);
+    p.floor = floor;
+    p.x = x + (Math.random() - 0.5) * spread;
+    p.y = y + (Math.random() - 0.5) * spread;
+    p.vx = Math.cos(angle) * speed;
+    p.vy = Math.sin(angle) * speed;
+    p.life = 0;
+    p.maxLife = freezeGroup ? Infinity : 45 + Math.random() * 75;
+    p.size = (22 + Math.random() * 46) * scale * 1.15 * 1.25;
+    // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
+    // full fall speed more gradually
+    p.gravity =
+      Math.max(0, 0.2 + Math.random() * 0.35 - (kind === "bill" ? 0.2 : 0)) *
+      scale;
+    p.gravityRamp = (kind === "bill" ? 0.05 : 0.08) * scale;
+    p.kind = kind;
+    p.spinFrame =
+      Math.random() *
+      (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT);
+    p.spinRate =
+      MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE);
+    p.spinDir = Math.random() < 0.5 ? 1 : -1;
+    p.axisAngle = (Math.random() * 2 - 1) * (Math.PI / 2);
+    p.homing = freezeGroup
+      ? {
+          burstLife: Infinity,
+          flightTicks: randomIn(FREEZE_FLIGHT_TICKS),
+          group: freezeGroup,
+          holdTicks: randomIn(FREEZE_HOLD_TICKS),
+        }
+      : undefined;
+    p.pathScale = undefined;
+    pool.spawn(p);
   }
 }
 
@@ -445,7 +454,7 @@ export function spawnHomingCoinBurst(
   }
 
   pool.ensureTicking((dt) => {
-    pool.update(dt, advanceCoin);
+    pool.update(dt, advanceCoin, recycleCoin);
   });
   return count;
 }

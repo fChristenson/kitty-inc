@@ -189,6 +189,11 @@ function advanceCoinBurstParticle(p: CoinBurstParticle, dt: number): void {
   p.spinFrame += p.spinDir * p.spinRate * dt;
 }
 
+let batchBase: DOMMatrix | null = null;
+let batchScale = 1;
+let batchWidth = 0;
+let batchHeight = 0;
+
 // draws one coin/bill particle centered at (x, y) with the given on-screen
 // radius — a no-op (not a fallback circle) for however briefly the sprites
 // are still loading, since the caller's own particle keeps ticking either way
@@ -217,17 +222,23 @@ export function drawCoinBurstFrame(
   const destH = radius * 2;
   const destW = destH * (frameCanvas.width / frameCanvas.height);
   const { a, b, c, d, e, f } = base;
+  // the batch's scale and canvas size, read once per batch (base is fresh
+  // per batch) instead of two hypots and two DOM reads per coin
+  if (base !== batchBase) {
+    batchBase = base;
+    batchScale = Math.max(Math.hypot(a, b), Math.hypot(c, d));
+    batchWidth = ctx.canvas.width;
+    batchHeight = ctx.canvas.height;
+  }
   const px = a * x + c * y + e;
   const py = b * x + d * y + f;
   // coins flung past the canvas edge still cost a full draw call each
-  const reach =
-    Math.max(destW, destH) * Math.max(Math.hypot(a, b), Math.hypot(c, d));
-  const { width, height } = ctx.canvas;
+  const reach = Math.max(destW, destH) * batchScale;
   if (
     px + reach < 0 ||
     py + reach < 0 ||
-    px - reach > width ||
-    py - reach > height
+    px - reach > batchWidth ||
+    py - reach > batchHeight
   )
     return;
   // one setTransform instead of translate/rotate and back: hundreds of coins

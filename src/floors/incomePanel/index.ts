@@ -38,12 +38,13 @@ import {
 } from "../../shared/income";
 import { type BigNumber, add, multiply } from "../../shared/bigNumber";
 import {
-  drawCartoonText,
+  drawCachedCartoonText,
   formatPrice,
   formatTime,
   roundRect,
 } from "../../utils";
-import { drawLiquidBar } from "../../shared/liquidFill";
+import { drawLiquidBar, prewarmLiquidBar } from "../../shared/liquidFill";
+import { runWhenIdle } from "../../shared/idle";
 import {
   drawBoilingBar,
   drawPressureBar,
@@ -76,6 +77,13 @@ const BAR_INSET = 18;
 export const BAR_W = (PANEL_W - 36) * 1.5;
 // scaled up alongside PANEL_W; still comfortably clears the divider band's vertical bounds
 const BAR_H = 92;
+
+runWhenIdle(() =>
+  prewarmLiquidBar(BAR_W, BAR_H, BAR_H / 3, [
+    COLOR.moneyGreen,
+    ...Object.values(CRIT_TIER_CONFIG).map((tier) => tier.color),
+  ]),
+);
 
 // center of the visible income bar, floor-local — for spawning effects (e.g. the
 // "Sale" boost's floating +income text) right on top of it
@@ -713,7 +721,7 @@ export function drawIncomePanel(
       ctx.scale(pressure.textScale, pressure.textScale);
       ctx.translate(-(barX + barW / 2), -(barY + barH / 2));
     }
-    drawCartoonText(
+    drawCachedCartoonText(
       ctx,
       overtimeGaugeVisible
         ? formatOvertimeProgress(floor, now)
@@ -722,6 +730,7 @@ export function drawIncomePanel(
           : formatStaticIncomeRate(floor, now),
       barX + barW / 2,
       barY + barH / 2 + 1,
+      44,
     );
     ctx.restore();
   };

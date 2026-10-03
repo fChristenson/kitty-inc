@@ -264,10 +264,29 @@ export function formatPrice(value: BigNumber): string {
 // edge of the HUD
 export function formatTotalIncome(value: BigNumber): string {
   if (value.exponent < 12) {
-    return `$${Math.floor(Math.max(0, toNumber(value))).toLocaleString("en-US")}`;
+    return `$${withCommas(Math.max(0, toNumber(value)))}`;
   }
   return formatPrice(value);
 }
+
+// "1234567" -> "1,234,567" for a whole number under 1e21; toLocaleString is
+// far too slow for a readout redrawn every frame
+function withCommas(value: number): string {
+  const digits = Math.floor(value).toString();
+  let out = "";
+  for (let i = 0; i < digits.length; i++) {
+    if (i > 0 && (digits.length - i) % 3 === 0) out += ",";
+    out += digits[i];
+  }
+  return out;
+}
+
+// the readout asks every frame, usually for the value it asked for last
+const lastTotalParts = {
+  mantissa: NaN,
+  exponent: NaN,
+  parts: { amount: "", unitName: null as string | null },
+};
 
 // same total-income number, but split into the plain amount and the full spelled-out
 // unit name as two separate strings (e.g. { amount: "$1", unitName: "Undecillion" })
@@ -279,17 +298,26 @@ export function formatTotalIncomeParts(value: BigNumber): {
   amount: string;
   unitName: string | null;
 } {
+  if (
+    value.mantissa === lastTotalParts.mantissa &&
+    value.exponent === lastTotalParts.exponent
+  )
+    return lastTotalParts.parts;
+  lastTotalParts.mantissa = value.mantissa;
+  lastTotalParts.exponent = value.exponent;
   if (value.exponent < 12) {
-    return {
-      amount: `$${Math.floor(Math.max(0, toNumber(value))).toLocaleString("en-US")}`,
+    lastTotalParts.parts = {
+      amount: `$${withCommas(Math.max(0, toNumber(value)))}`,
       unitName: null,
     };
+    return lastTotalParts.parts;
   }
   const { mantissa, tier } = expandedTier(value);
-  return {
-    amount: `$${Math.round(mantissa).toLocaleString("en-US")}`,
+  lastTotalParts.parts = {
+    amount: `$${withCommas(Math.round(mantissa))}`,
     unitName: illionName(tier),
   };
+  return lastTotalParts.parts;
 }
 
 // same total-income number as formatTotalIncomeParts, but joined onto one line
@@ -663,6 +691,51 @@ export function drawCartoonText(
   ctx.strokeText(text, x, y);
   ctx.fillStyle = fillColor;
   ctx.fillText(text, x, y);
+}
+
+// drawCartoonText's default white-on-black look for a label redrawn every
+// frame but rarely changing (prices, rates): stroked text is slow to raster,
+// so each (font, text) is rastered once and stamped. ctx.font must already be
+// set (its px size is fontSize) and the text centered on (x, y)
+const cartoonTextSprites = new Map<string, Map<string, HTMLCanvasElement>>();
+const readyFonts = new Set<string>();
+const MAX_CARTOON_TEXTS_PER_FONT = 160;
+const CARTOON_STROKE = 5;
+export function drawCachedCartoonText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  fontSize: number,
+): void {
+  const font = ctx.font;
+  if (!readyFonts.has(font)) {
+    // never bake in the fallback font while Fredoka is still loading
+    if (!document.fonts.check(font)) {
+      drawCartoonText(ctx, text, x, y);
+      return;
+    }
+    readyFonts.add(font);
+  }
+  let byText = cartoonTextSprites.get(font);
+  if (!byText) cartoonTextSprites.set(font, (byText = new Map()));
+  let sprite = byText.get(text);
+  if (!sprite) {
+    if (byText.size >= MAX_CARTOON_TEXTS_PER_FONT) byText.clear();
+    sprite = document.createElement("canvas");
+    const c = sprite.getContext("2d")!;
+    c.font = font;
+    sprite.width = Math.ceil(
+      c.measureText(text).width + CARTOON_STROKE * 2 + 4,
+    );
+    sprite.height = Math.ceil(fontSize * 1.4 + CARTOON_STROKE * 2);
+    c.font = font;
+    c.textAlign = "center";
+    c.textBaseline = "middle";
+    drawCartoonText(c, text, sprite.width / 2, sprite.height / 2);
+    byText.set(text, sprite);
+  }
+  ctx.drawImage(sprite, x - sprite.width / 2, y - sprite.height / 2);
 }
 
 // fills the current path, then strokes it with the cartoon black outline

@@ -6132,6 +6132,99 @@ export const CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
+  // money, levels + cash: src/floors/spillwayEvent: a pool spills a curtain
+  // of cash down past every bar
+  spillwayEvent: {
+    chance: 0.01,
+    feedMs: 380, // the river filling the pool
+    sheetMs: 900, // the curtain's fall top to bottom
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // money, cash: src/floors/crosscurrentsEvent: two rivers weave up, crossing
+  crosscurrentsEvent: {
+    chance: 0.01,
+    travelMs: 1400, // each river's run up into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // money, tiers + cash: src/floors/oxbowEvent: a river loops round each bar
+  oxbowEvent: {
+    chance: 0.01,
+    loopsMs: [700, 480] as [number, number], // each river's run, quickening
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // money, worker tiers + cash: src/floors/breakersEvent: waves crash on workers
+  breakersEvent: {
+    chance: 0.01,
+    gapsMs: [300, 160] as [number, number], // between waves, quickening
+    waveMs: 520, // each wave's surge up and over
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // money, hires + cash: src/floors/rivuletsEvent: trickles meet at each spot
+  rivuletsEvent: {
+    chance: 0.01,
+    gapsMs: [240, 120] as [number, number], // between pairs, quickening
+    runMs: 560, // each trickle's run in from the edge
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // money, a free floor + cash: src/floors/torrentEvent: a zigzag torrent up
+  torrentEvent: {
+    chance: 0.01,
+    climbMs: 1200, // the torrent's climb to the lock
+    holdMs: 500,
+    mergeMs: 300,
+  },
+  // wisp, levels: src/floors/lissajousEvent: a Lissajous figure over the bars
+  lissajousEvent: {
+    chance: 0.01,
+    traceMs: 1700, // the figure, quickening
+    levelShare: 0.03, // of a bar's levels, per crossing
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, tiers: src/floors/moonHopEvent: orbits each bar and slingshots on
+  moonHopEvent: {
+    chance: 0.01,
+    orbitsMs: [560, 360] as [number, number], // each orbit, quickening
+    hopMs: 160, // each slingshot to the next orbit
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, hires: src/floors/peekabooEvent: wisps peek, duck and spring up
+  peekabooEvent: {
+    chance: 0.01,
+    gapsMs: [240, 130] as [number, number], // between spots, quickening
+    peekMs: 440, // each peek, duck and spring
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, worker tiers: src/floors/tiltAWhirlEvent: a whirling ride per worker
+  tiltAWhirlEvent: {
+    chance: 0.01,
+    spinsMs: [560, 360] as [number, number], // each whirl, quickening
+    hopMs: 150, // the ride's hop to the next worker
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, cash: src/floors/waterStriderEvent: darting glides that ripple coins
+  waterStriderEvent: {
+    chance: 0.01,
+    glidesMs: [260, 110] as [number, number], // each glide, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, a free floor: src/floors/ropeClimbEvent: hand over hand up to the lock
+  ropeClimbEvent: {
+    chance: 0.01,
+    pullsMs: [190, 110] as [number, number], // each pull, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,

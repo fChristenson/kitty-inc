@@ -1,5 +1,6 @@
 import {
   loadBuildings,
+  readSavedBuildings,
   clearBuildings,
   saveBuildingsImmediately,
   type Floor,
@@ -258,9 +259,22 @@ export function mergeCompanies(
 // active company reads its own live buildings (freshest); any dormant
 // company reads its persisted CompanyRecord's own frozen assetValue instead
 // of ever loading its full buildings/floors array
+// the active company's value as of its saved buildings: the income ticker asks
+// every second, and re-parsing and re-pricing every floor each time fed the
+// garbage collector, so it's only redone once the save itself changes
+let activeValue: {
+  index: number;
+  saved: string | null;
+  value: BigNumber;
+} | null = null;
 function getCompanyValue(companyIndex: number): BigNumber {
   if (companyIndex === getActiveCompanyIndex()) {
-    return getCompanyAssetValue(loadBuildings(companyIndex));
+    const saved = readSavedBuildings(companyIndex);
+    if (activeValue?.index === companyIndex && activeValue.saved === saved)
+      return activeValue.value;
+    const value = getCompanyAssetValue(loadBuildings(companyIndex));
+    activeValue = { index: companyIndex, saved, value };
+    return value;
   }
   return loadCompanyRecord(companyIndex)?.assetValue ?? ZERO;
 }

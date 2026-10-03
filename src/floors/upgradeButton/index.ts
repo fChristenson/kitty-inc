@@ -24,8 +24,9 @@
 // floor at once — boost/hunt/swarm come first because their click branches in
 // floorInteractions run before sale/overtime; keep sale/overtime in this order unless
 // deliberately reprioritizing.
-import { drawCartoonText, formatPrice } from "../../utils";
-import { drawLiquidButton } from "../../shared/liquidFill";
+import { drawCachedCartoonText, formatPrice } from "../../utils";
+import { drawLiquidButton, prewarmLiquidButton } from "../../shared/liquidFill";
+import { runWhenIdle } from "../../shared/idle";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
@@ -67,6 +68,19 @@ export * from "./overtime";
 
 // how hard the button and its bar boil: a long press, or a full boil all
 // through a Sale or Overtime
+// every color the button takes on outside a covering event's own
+runWhenIdle(() =>
+  prewarmLiquidButton(BTN_W, BTN_H, 40, [
+    COLOR.moneyGreen,
+    COLOR.disabledGray,
+    COLOR.amber,
+    COLOR.cyan,
+    COLOR.red,
+    COLOR.purple,
+    ...Object.values(CRIT_TIER_CONFIG).map((tier) => tier.color),
+  ]),
+);
+
 export function getBoilHeat(floor: Floor, now: number): number {
   const source = resolveButtonFloor(floor);
   if (isSaleActive(source, now) || isOvertimeActive(source, now)) return 1;
@@ -203,7 +217,7 @@ function renderUpgradeButton(
       : crit
         ? (cover?.label ?? CRIT_TIER_CONFIG[critTier as CritTier].label)
         : formatPrice(cost);
-    drawCartoonText(ctx, label, cx, cy);
+    drawCachedCartoonText(ctx, label, cx, cy, 52);
     if (whiteAlpha > 0) {
       ctx.filter = "none";
       ctx.globalAlpha = whiteAlpha;

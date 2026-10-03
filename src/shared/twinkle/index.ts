@@ -67,9 +67,12 @@ const rowTops = SMALL_HALVES.map((_, level) =>
   SMALL_HALVES.slice(0, level).reduce((sum, _h, l) => sum + cellSize(l), 0),
 );
 const atlases = new Map<string, HTMLCanvasElement>();
+const pairedAtlases = new Map<string, HTMLCanvasElement>();
 
-function getAtlas(color: string): HTMLCanvasElement {
-  let atlas = atlases.get(color);
+// paired: each cell also carries a white twinkle half its size added over it
+function getAtlas(color: string, paired = false): HTMLCanvasElement {
+  const cache = paired ? pairedAtlases : atlases;
+  let atlas = cache.get(color);
   if (atlas) return atlas;
   atlas = document.createElement("canvas");
   const last = SMALL_HALVES.length - 1;
@@ -77,17 +80,18 @@ function getAtlas(color: string): HTMLCanvasElement {
   atlas.height = rowTops[last] + cellSize(last);
   const ctx = atlas.getContext("2d")!;
   SMALL_HALVES.forEach((half, level) => {
-    for (let step = 0; step < TURN_STEPS; step++)
-      paintTwinkleAt(
-        ctx,
-        step * cellSize(level) + CELL_PAD + half,
-        rowTops[level] + CELL_PAD + half,
-        half,
-        (step / TURN_STEPS) * QUARTER,
-        color,
-      );
+    for (let step = 0; step < TURN_STEPS; step++) {
+      const cx = step * cellSize(level) + CELL_PAD + half;
+      const cy = rowTops[level] + CELL_PAD + half;
+      const turn = (step / TURN_STEPS) * QUARTER;
+      paintTwinkleAt(ctx, cx, cy, half, turn, color);
+      if (!paired) continue;
+      ctx.globalCompositeOperation = "lighter";
+      paintTwinkleAt(ctx, cx, cy, half * 0.5, turn, COLOR.white);
+      ctx.globalCompositeOperation = "source-over";
+    }
   });
-  atlases.set(color, atlas);
+  cache.set(color, atlas);
   return atlas;
 }
 
@@ -99,6 +103,8 @@ export function stampTwinkle(
   size: number,
   rotation: number,
   color: string,
+  // with a white twinkle half its size laid additively over it, in one stamp
+  paired = false,
 ): void {
   // sprite px per world unit to spare, for canvases scaled up to 2x
   const need = size * 2;
@@ -108,6 +114,12 @@ export function stampTwinkle(
     ctx.translate(x, y);
     ctx.rotate(rotation);
     ctx.drawImage(getSprite(color), -size, -size, size * 2, size * 2);
+    if (paired) {
+      const previous = ctx.globalCompositeOperation;
+      ctx.globalCompositeOperation = "lighter";
+      ctx.drawImage(getSprite(COLOR.white), -size / 2, -size / 2, size, size);
+      ctx.globalCompositeOperation = previous;
+    }
     ctx.rotate(-rotation);
     ctx.translate(-x, -y);
     return;
@@ -116,7 +128,7 @@ export function stampTwinkle(
   const step = Math.round((turn / QUARTER) * TURN_STEPS) % TURN_STEPS;
   const half = SMALL_HALVES[level];
   ctx.drawImage(
-    getAtlas(color),
+    getAtlas(color, paired),
     step * cellSize(level) + CELL_PAD,
     rowTops[level] + CELL_PAD,
     half * 2,

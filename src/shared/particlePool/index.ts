@@ -26,8 +26,13 @@ export interface ParticlePool<T extends PoolParticle> {
   // button) starve a rarer one out entirely
   spawn(item: T): void;
   // advances every particle via the caller's own per-particle physics, then
-  // removes anything whose life has reached maxLife
-  update(dt: number, advance: (item: T, dt: number) => void): void;
+  // removes anything whose life has reached maxLife, handing each removed one
+  // to `recycle` (if given) so the caller can reuse it instead of allocating
+  update(
+    dt: number,
+    advance: (item: T, dt: number) => void,
+    recycle?: (item: T) => void,
+  ): void;
   // starts (no-ops if already running) a self-scheduling rAF loop: each frame
   // computes dt clamped to [0,3] "~16.67ms ticks", calls `step(dt)`, then only
   // reschedules itself while `hasActive()` is still true afterward
@@ -59,7 +64,7 @@ export function createParticlePool<T extends PoolParticle>(
       // freshly spawned coins instead, making bursts vanish mid-fall
       if (list.length >= maxCount * 1.5) list.splice(0, list.length - maxCount);
     },
-    update(dt, advance) {
+    update(dt, advance, recycle) {
       for (const p of list) advance(p, dt);
       let alive = 0;
       for (const p of list) if (p.life < p.maxLife) alive++;
@@ -69,12 +74,17 @@ export function createParticlePool<T extends PoolParticle>(
       // list.splice(i, 1) calls, which is O(n) per removal
       let writeIndex = 0;
       for (let i = 0; i < list.length; i++) {
-        if (list[i].life >= list[i].maxLife) continue;
-        if (skip > 0) {
-          skip--;
+        const p = list[i];
+        if (p.life >= p.maxLife) {
+          recycle?.(p);
           continue;
         }
-        list[writeIndex++] = list[i];
+        if (skip > 0) {
+          skip--;
+          recycle?.(p);
+          continue;
+        }
+        list[writeIndex++] = p;
       }
       list.length = writeIndex;
     },

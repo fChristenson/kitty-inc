@@ -6,6 +6,7 @@ import {
   shadeColor,
 } from "../../utils";
 import { hash01 } from "../twinkle";
+import { processWhenIdle } from "../idle";
 
 // the "liquid" look of the upgrade button and income bar: sloshing cash with
 // rising bubbles. `heat` (0..1: a long press, a Sale, Overtime) brings it to
@@ -221,6 +222,21 @@ function remember<T>(cache: Map<string, T>, key: string, value: T): T {
   return value;
 }
 
+// a cached layer: its canvas, until a bitmap of it is ready. Drawing a canvas
+// the first time costs a snapshot of it (several ms, more on phones), so
+// that's done off the frame by createImageBitmap
+type Layer = HTMLCanvasElement | ImageBitmap;
+function toBitmap<T>(owner: T, key: keyof T): void {
+  const source = owner[key];
+  if (!(source instanceof HTMLCanvasElement)) return;
+  void createImageBitmap(source).then(
+    (bitmap) => {
+      (owner[key] as Layer) = bitmap;
+    },
+    () => {},
+  );
+}
+
 // a calm bubble's ring, pre-drawn per whole size
 const bubbleSprites: HTMLCanvasElement[] = [];
 export function stampBubble(
@@ -274,10 +290,10 @@ interface ButtonLayers {
   w: number;
   h: number;
   r: number;
-  under: HTMLCanvasElement;
-  back: HTMLCanvasElement;
-  front: HTMLCanvasElement;
-  over: HTMLCanvasElement;
+  under: Layer;
+  back: Layer;
+  front: Layer;
+  over: Layer;
   stripTop: number;
   stripH: number;
   inset: number;
@@ -355,18 +371,23 @@ function getButtonLayers(
   o.restore();
   drawPillBorder(o, 0, 0, w, h, r, color);
 
-  return remember(buttonLayers, color, {
+  const layers = remember(buttonLayers, color, {
     w,
     h,
     r,
-    under: u.canvas,
-    back: b.canvas,
-    front: f.canvas,
-    over: o.canvas,
+    under: u.canvas as Layer,
+    back: b.canvas as Layer,
+    front: f.canvas as Layer,
+    over: o.canvas as Layer,
     stripTop,
     stripH,
     inset,
   });
+  toBitmap(layers, "under");
+  toBitmap(layers, "back");
+  toBitmap(layers, "front");
+  toBitmap(layers, "over");
+  return layers;
 }
 
 function drawCalmButton(
@@ -426,10 +447,10 @@ interface BarLayers {
   w: number;
   h: number;
   r: number;
-  under: HTMLCanvasElement;
-  body: HTMLCanvasElement;
-  over: HTMLCanvasElement;
-  full: HTMLCanvasElement | null;
+  under: Layer;
+  body: Layer;
+  over: Layer;
+  full: Layer | null;
 }
 const barLayers = new Map<string, BarLayers>();
 function getBarLayers(
@@ -465,15 +486,19 @@ function getBarLayers(
   o.fill();
   drawPillBorder(o, 0, 0, w, h, r, color);
 
-  return remember(barLayers, key, {
+  const layers = remember(barLayers, key, {
     w,
     h,
     r,
-    under: u.canvas,
-    body: b.canvas,
-    over: o.canvas,
-    full: null,
+    under: u.canvas as Layer,
+    body: b.canvas as Layer,
+    over: o.canvas as Layer,
+    full: null as Layer | null,
   });
+  toBitmap(layers, "under");
+  toBitmap(layers, "body");
+  toBitmap(layers, "over");
+  return layers;
 }
 
 // the calm bubbles drifting along a bar filled to fillW: x, y, size triples,
@@ -528,17 +553,15 @@ function drawCalmBar(
   ctx.drawImage(L.over, x, y);
 }
 
-// a calm, full bar's layers for a caller that warps it (see pressureBar):
-// its liquid (fill), its shine and border (over) and its bubbles (x, y, size
-// triples, local to the bar)
+// a calm, full bar's look for a caller that warps it (see pressureBar): the
+// whole bar baked into one layer (bar), and its bubbles (x, y, size triples,
+// local to the bar) to stamp over it
 export interface CalmFullBar {
-  fill: HTMLCanvasElement;
-  over: HTMLCanvasElement;
+  bar: Layer;
   bubbles: Float32Array;
 }
 const calmFullBar: CalmFullBar = {
-  fill: null!,
-  over: null!,
+  bar: null!,
   bubbles: barBubbleSpots,
 };
 export function getCalmFullBar(
@@ -555,10 +578,11 @@ export function getCalmFullBar(
     const c = layer(w, h);
     c.drawImage(L.under, 0, 0);
     c.drawImage(L.body, 0, 0);
+    c.drawImage(L.over, 0, 0);
     L.full = c.canvas;
+    toBitmap(L, "full");
   }
-  calmFullBar.fill = L.full;
-  calmFullBar.over = L.over;
+  calmFullBar.bar = L.full;
   placeBarBubbles(h, w, t);
   return calmFullBar;
 }
@@ -660,6 +684,30 @@ function drawRisingBubbles(
     );
   }
   ctx.strokeStyle = BUBBLE_STROKE;
+}
+
+// builds the calm layers for colors the game will show (crit tiers, events)
+// in idle time, so a button or bar switching color never builds them mid-play
+export function prewarmLiquidButton(
+  w: number,
+  h: number,
+  r: number,
+  colors: readonly string[],
+): void {
+  processWhenIdle(colors, (color) => getButtonLayers(w, h, r, color), {
+    chunkSize: 1,
+  });
+}
+
+export function prewarmLiquidBar(
+  w: number,
+  h: number,
+  r: number,
+  colors: readonly string[],
+): void {
+  processWhenIdle(colors, (color) => getBarLayers(w, h, r, color), {
+    chunkSize: 1,
+  });
 }
 
 export function drawLiquidButton(

@@ -624,6 +624,16 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
   return floor;
 }
 
+// the saved buildings exactly as stored, for callers that only need to know
+// whether they changed
+export function readSavedBuildings(companyIndex = 0): string | null {
+  try {
+    return localStorage.getItem(companyStorageKey(STORAGE_KEY, companyIndex));
+  } catch {
+    return null;
+  }
+}
+
 // rebuilds Floor[][] (one Floor[] per building) from localStorage; returns [] if
 // nothing is saved or storage is unreadable
 export function loadBuildings(companyIndex = 0): Floor[][] {

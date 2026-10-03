@@ -240,17 +240,64 @@ function maxDigitWidth(ctx: CanvasRenderingContext2D): number {
 }
 
 // measureText per frame for every letter adds up; widths only change with font
-const textWidths = new Map<string, number>();
+const textWidths = new Map<string, Map<string, number>>();
 const TEXT_WIDTH_CACHE_LIMIT = 2000;
 function measure(ctx: CanvasRenderingContext2D, text: string): number {
-  const key = `${ctx.font}|${text}`;
-  let width = textWidths.get(key);
+  let byText = textWidths.get(ctx.font);
+  if (!byText) textWidths.set(ctx.font, (byText = new Map()));
+  let width = byText.get(text);
   if (width === undefined) {
-    if (textWidths.size >= TEXT_WIDTH_CACHE_LIMIT) textWidths.clear();
+    if (byText.size >= TEXT_WIDTH_CACHE_LIMIT) byText.clear();
     width = ctx.measureText(text).width;
-    textWidths.set(key, width);
+    byText.set(text, width);
   }
   return width;
+}
+
+const isDigit = (char: string): boolean => char >= "0" && char <= "9";
+
+// tabular text at rest, every frame for counting numbers: laid out and drawn
+// letter by letter without building any per-letter objects
+function drawTabularText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  fillColor: string,
+  strokeColor: string,
+  strokeWidth: number,
+): void {
+  const digitCell = maxDigitWidth(ctx);
+  let fullWidth = 0;
+  for (let i = 0; i < text.length; i++)
+    fullWidth += isDigit(text[i]) ? digitCell : measure(ctx, text[i]);
+  const align = ctx.textAlign;
+  const left =
+    align === "center"
+      ? x - fullWidth / 2
+      : align === "right" || align === "end"
+        ? x - fullWidth
+        : x;
+  ctx.save();
+  ctx.textAlign = "left";
+  ctx.lineJoin = "round";
+  ctx.miterLimit = 2;
+  ctx.lineWidth = strokeWidth;
+  ctx.strokeStyle = strokeColor;
+  ctx.fillStyle = fillColor;
+  for (let pass = 0; pass < 2; pass++) {
+    let at = left;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const width = measure(ctx, char);
+      const cell = isDigit(char) ? digitCell : width;
+      const lx = at + (isDigit(char) ? (cell - width) / 2 : 0);
+      if (pass === 0) ctx.strokeText(char, lx, y);
+      else ctx.fillText(char, lx, y);
+      at += cell;
+    }
+  }
+  ctx.restore();
 }
 
 // drawCartoonText, but once the slam lands the white shine sweeps across the
@@ -272,6 +319,10 @@ export function drawSlamText(
   const landed = pose && pose.landedMs >= 0 ? pose : null;
   if (!landed && !tabular) {
     drawCartoonText(ctx, text, x, y, fillColor, strokeColor, strokeWidth);
+    return;
+  }
+  if (!landed) {
+    drawTabularText(ctx, text, x, y, fillColor, strokeColor, strokeWidth);
     return;
   }
   const chars = [...text];
