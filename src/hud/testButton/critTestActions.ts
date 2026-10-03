@@ -46,6 +46,59 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
+          <button id="test-sluice-event" class="game__button">Sluice</button>
+          <button id="test-foundry-event" class="game__button">Foundry</button>
+          <button id="test-jet-stream-event" class="game__button">Jet Stream</button>
+          <button id="test-moat-event" class="game__button">Moat</button>
+          <button id="test-seep-event" class="game__button">Seep</button>
+          <button id="test-meander-event" class="game__button">Meander</button>
+          <button id="test-waltz-event" class="game__button">Waltz</button>
+          <button id="test-gyroscope-event" class="game__button">Gyroscope</button>
+          <button id="test-dragonfly-event" class="game__button">Dragonfly</button>
+          <button id="test-ring-toss-event" class="game__button">Ring Toss</button>
+          <button id="test-slipstream-event" class="game__button">Slipstream</button>
+          <button id="test-sheet-music-event" class="game__button">Sheet Music</button>
+          <button id="test-leaf-blower-event" class="game__button">Leaf Blower</button>
+          <button id="test-loom-event" class="game__button">Loom</button>
+          <button id="test-high-dive-event" class="game__button">High Dive</button>
+          <button id="test-sower-event" class="game__button">Sower</button>
+          <button id="test-courier-event" class="game__button">Courier</button>
+          <button id="test-rodeo-event" class="game__button">Rodeo</button>
+          <button id="test-crosshair-event" class="game__button">Crosshair</button>
+          <button id="test-iris-event" class="game__button">Iris</button>
+          <button id="test-bank-shot-event" class="game__button">Bank Shot</button>
+          <button id="test-sunbeams-event" class="game__button">Sunbeams</button>
+          <button id="test-stargate-event" class="game__button">Stargate</button>
+          <button id="test-cats-cradle-event" class="game__button">Cat's Cradle</button>
+          <button id="test-thunderhead-event" class="game__button">Thunderhead</button>
+          <button id="test-pitchfork-event" class="game__button">Pitchfork</button>
+          <button id="test-jumper-cables-event" class="game__button">Jumper Cables</button>
+          <button id="test-lash-event" class="game__button">Lash</button>
+          <button id="test-spark-plug-event" class="game__button">Spark Plug</button>
+          <button id="test-live-wire-event" class="game__button">Live Wire</button>
+          <button id="test-fuse-race-event" class="game__button">Fuse Race</button>
+          <button id="test-bouncing-betty-event" class="game__button">Bouncing Betty</button>
+          <button id="test-pressure-cooker-event" class="game__button">Pressure Cooker</button>
+          <button id="test-hot-potato-event" class="game__button">Hot Potato</button>
+          <button id="test-daisy-chain-event" class="game__button">Daisy Chain</button>
+          <button id="test-shaped-charge-event" class="game__button">Shaped Charge</button>
+          <button id="test-detcord-event" class="game__button">Detcord</button>
+          <button id="test-bullet-bloom-event" class="game__button">Bullet Bloom</button>
+          <button id="test-high-noon-event" class="game__button">High Noon</button>
+          <button id="test-hailfire-event" class="game__button">Hailfire</button>
+          <button id="test-dervish-event" class="game__button">Dervish</button>
+          <button id="test-invaders-event" class="game__button">Invaders</button>
+          <button id="test-gun-kata-event" class="game__button">Gun Kata</button>
+          <button id="test-lockbuster-event" class="game__button">Lockbuster</button>
+          <button id="test-connect-four-event" class="game__button">Connect Four</button>
+          <button id="test-combo-event" class="game__button">Combo</button>
+          <button id="test-skee-ball-event" class="game__button">Skee Ball</button>
+          <button id="test-bubble-shooter-event" class="game__button">Bubble Shooter</button>
           <button id="test-mandala-event" class="game__button">Mandala</button>
           <button id="test-zen-garden-event" class="game__button">Zen Garden</button>
           <button id="test-accordion-event" class="game__button">Accordion</button>
@@ -96,11 +149,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-memory-match-event" class="game__button">Memory Match</button>
           <button id="test-tic-tac-toe-event" class="game__button">Tic-Tac-Toe</button>
           <button id="test-rev-counter-event" class="game__button">Rev Counter</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-lava-lamp-event" class="game__button">Lava Lamp</button>
           <button id="test-dominoes-event" class="game__button">Dominoes</button>
           <button id="test-inkblot-event" class="game__button">Inkblot</button>
