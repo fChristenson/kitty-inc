@@ -1,5 +1,10 @@
 import { COLOR } from "../../palette";
-import { drawPillBorder, getGlossyGradient, shadeColor } from "../../utils";
+import {
+  createGlossyGradient,
+  drawPillBorder,
+  getGlossyGradient,
+  shadeColor,
+} from "../../utils";
 import { hash01 } from "../twinkle";
 
 // the "liquid" look of the upgrade button and income bar: sloshing cash with
@@ -7,16 +12,13 @@ import { hash01 } from "../twinkle";
 // a rolling boil: the surface churns harder and faster, and more, bigger
 // bubbles rush up and burst at the surface, flicking droplets. The button's
 // liquid also sloshes against its own wiggle.
-// Drawn every frame for every floor on screen, so: no per-frame allocation,
-// one stroke for all plain bubbles, and no surface math while it's calm.
+// Drawn every frame for every floor on screen, and phones choke on per-frame
+// clips and wavy paths, so a calm widget is only blits of layers built once:
+// its waves are pre-drawn strips slid sideways. Only a boiling or sloshing
+// one is drawn live.
 
-export type LiquidPaint = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-) => string | CanvasGradient;
+// a horizontal gradient across the whole bar, from the first color to the second
+export type LiquidGauge = readonly [string, string];
 
 const BOIL_SPEED = 3;
 const BOIL_WAVES = 12;
@@ -40,6 +42,24 @@ const BAR_SHINE = "rgba(255,255,255,0.22)";
 const POP_SHARE = 0.1;
 // surface sample spacing, px
 const STEP = 8;
+// the button's calm surface: its rest height (of h), wave, bob (of h), and the
+// back wave's rise above it
+const REST = 0.3;
+const CALM_AMP = 6;
+const BOB = 0.04;
+const BACK_RISE = 6;
+const WAVE_K = 28;
+const WAVE_LEN = Math.PI * 2 * WAVE_K;
+// px the front wave strip fades into the body below it
+const STRIP_FADE = 10;
+// calm bubbles rise from under the button's rim
+const BUBBLE_FLOOR = 24;
+const BAR_BUBBLE_MARGIN = 14;
+const EDGE_AMP = 9;
+const EDGE_ROW = 3;
+const MAX_LAYER_SETS = 24;
+const BUBBLE_RES = 2;
+const MAX_BUBBLE_SPRITE = 6;
 
 // each widget runs its own clock (sped up by its heat), keyed by its floor
 interface Clock {
@@ -188,6 +208,385 @@ function addBubble(
   ctx.arc(x, y, size, 0, Math.PI * 2);
 }
 
+function layer(w: number, h: number): CanvasRenderingContext2D {
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(w);
+  canvas.height = Math.ceil(h);
+  return canvas.getContext("2d")!;
+}
+
+function remember<T>(cache: Map<string, T>, key: string, value: T): T {
+  if (cache.size >= MAX_LAYER_SETS) cache.delete(cache.keys().next().value!);
+  cache.set(key, value);
+  return value;
+}
+
+// a calm bubble's ring, pre-drawn per whole size
+const bubbleSprites: HTMLCanvasElement[] = [];
+export function stampBubble(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+): void {
+  const i = Math.max(1, Math.min(MAX_BUBBLE_SPRITE, Math.round(size)));
+  let sprite = bubbleSprites[i];
+  if (!sprite) {
+    const box = (i + BUBBLE_WIDTH) * 2;
+    const c = layer(box * BUBBLE_RES, box * BUBBLE_RES);
+    c.scale(BUBBLE_RES, BUBBLE_RES);
+    c.strokeStyle = BUBBLE_STROKE;
+    c.lineWidth = BUBBLE_WIDTH;
+    c.beginPath();
+    c.arc(box / 2, box / 2, i, 0, Math.PI * 2);
+    c.stroke();
+    sprite = bubbleSprites[i] = c.canvas;
+  }
+  const half = size + BUBBLE_WIDTH;
+  ctx.drawImage(sprite, x - half, y - half, half * 2, half * 2);
+}
+
+// a wavy-topped body from base ± amp down to bottom, across width
+function waveBody(
+  c: CanvasRenderingContext2D,
+  width: number,
+  base: number,
+  amp: number,
+  bottom: number,
+): void {
+  c.beginPath();
+  c.moveTo(0, bottom);
+  for (let px = 0; px <= width; px += 4)
+    c.lineTo(px, base + amp * Math.sin(px / WAVE_K));
+  c.lineTo(width, bottom);
+  c.closePath();
+}
+
+// where a strip's column starts for a wave at `phase`
+function waveShift(phase: number): number {
+  return (((phase * WAVE_K) % WAVE_LEN) + WAVE_LEN) % WAVE_LEN;
+}
+
+// the calm button: the base and the liquid's body under its waves (under),
+// the back and front waves as strips a wavelength longer than the button,
+// and the reflection and border (over)
+interface ButtonLayers {
+  w: number;
+  h: number;
+  r: number;
+  under: HTMLCanvasElement;
+  back: HTMLCanvasElement;
+  front: HTMLCanvasElement;
+  over: HTMLCanvasElement;
+  stripTop: number;
+  stripH: number;
+  inset: number;
+}
+const buttonLayers = new Map<string, ButtonLayers>();
+function getButtonLayers(
+  w: number,
+  h: number,
+  r: number,
+  color: string,
+): ButtonLayers {
+  const hit = buttonLayers.get(color);
+  if (hit && hit.w === w && hit.h === h && hit.r === r) return hit;
+  const restY = h * REST;
+  const bob = h * BOB;
+  const stripTop = Math.floor(restY - BACK_RISE - CALM_AMP - 3);
+  // the body starts under the lowest trough; the front strip runs past it
+  // by a bob and its fade, so they always overlap
+  const bodyTop = restY + CALM_AMP + bob + 1;
+  const stripH = Math.ceil(bodyTop + bob + STRIP_FADE + 1) - stripTop;
+  const stripW = Math.ceil(w + WAVE_LEN) + 2;
+  // the strips stay clear of the top corners (the rim hides the gap)
+  const cr = Math.max(0, Math.min(r, w / 2, h / 2));
+  const reach = stripTop - bob;
+  const inset =
+    reach < cr ? Math.ceil(cr - Math.sqrt(cr * cr - (cr - reach) ** 2)) + 1 : 1;
+
+  const u = layer(w, h);
+  roundedPath(u, 0, 0, w, h, r);
+  u.fillStyle = shadeColor(color, -0.62);
+  u.fill();
+  u.clip();
+  u.fillStyle = createGlossyGradient(u, restY - 8, h - restY + 8, color);
+  u.fillRect(0, bodyTop, w, h - bodyTop);
+
+  const b = layer(stripW, stripH);
+  waveBody(
+    b,
+    stripW,
+    restY - BACK_RISE - stripTop,
+    CALM_AMP + 1,
+    restY + CALM_AMP + 2 - stripTop,
+  );
+  b.globalAlpha = BACK_WAVE_ALPHA;
+  b.fillStyle = shadeColor(color, 0.35);
+  b.fill();
+
+  const f = layer(stripW, stripH);
+  waveBody(f, stripW, restY - stripTop, CALM_AMP, stripH);
+  f.fillStyle = createGlossyGradient(
+    f,
+    restY - 8 - stripTop,
+    h - restY + 8,
+    color,
+  );
+  f.fill();
+  f.globalCompositeOperation = "destination-out";
+  const fade = f.createLinearGradient(0, stripH - STRIP_FADE, 0, stripH);
+  fade.addColorStop(0, "rgba(0,0,0,0)");
+  fade.addColorStop(1, "rgba(0,0,0,1)");
+  f.fillStyle = fade;
+  f.fillRect(0, stripH - STRIP_FADE, stripW, STRIP_FADE);
+
+  const o = layer(w, h);
+  o.save();
+  roundedPath(o, 0, 0, w, h, r);
+  o.clip();
+  o.beginPath();
+  o.moveTo(30, 0);
+  o.lineTo(70, 0);
+  o.lineTo(20, h);
+  o.lineTo(-20, h);
+  o.fillStyle = REFLECTION;
+  o.fill();
+  o.restore();
+  drawPillBorder(o, 0, 0, w, h, r, color);
+
+  return remember(buttonLayers, color, {
+    w,
+    h,
+    r,
+    under: u.canvas,
+    back: b.canvas,
+    front: f.canvas,
+    over: o.canvas,
+    stripTop,
+    stripH,
+    inset,
+  });
+}
+
+function drawCalmButton(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+  color: string,
+  t: number,
+): void {
+  const L = getButtonLayers(w, h, r, color);
+  const bob = h * BOB * Math.sin(t / 420);
+  const span = w - L.inset * 2;
+  const dx = x + L.inset;
+  const dy = y + L.stripTop + bob;
+  ctx.drawImage(L.under, x, y);
+  ctx.drawImage(
+    L.back,
+    L.inset + waveShift(t / 210 + 2),
+    0,
+    span,
+    L.stripH,
+    dx,
+    dy,
+    span,
+    L.stripH,
+  );
+  ctx.drawImage(
+    L.front,
+    L.inset + waveShift(t / 260),
+    0,
+    span,
+    L.stripH,
+    dx,
+    dy,
+    span,
+    L.stripH,
+  );
+  const bottom = y + h - BUBBLE_FLOOR;
+  const surface = y + h * REST + bob;
+  const runW = w - 40;
+  for (let i = 0; i < CALM_BUBBLES; i++) {
+    const bubble = BUBBLES[i];
+    const p = (t / 1000 / bubble.speed + bubble.phase) % 1;
+    const px = 20 + bubble.x * runW;
+    const top = surface + CALM_AMP * Math.sin(px / WAVE_K + t / 260);
+    stampBubble(ctx, x + px, bottom - p * (bottom - top), bubble.size);
+  }
+  ctx.drawImage(L.over, x, y);
+}
+
+// the calm bar: its empty track (under), its liquid full across (body), its
+// shine and border (over), and both of the first two at once (full)
+interface BarLayers {
+  w: number;
+  h: number;
+  r: number;
+  under: HTMLCanvasElement;
+  body: HTMLCanvasElement;
+  over: HTMLCanvasElement;
+  full: HTMLCanvasElement | null;
+}
+const barLayers = new Map<string, BarLayers>();
+function getBarLayers(
+  w: number,
+  h: number,
+  r: number,
+  color: string,
+  gauge?: LiquidGauge,
+): BarLayers {
+  const key = gauge ? `${color}|${gauge[0]}|${gauge[1]}` : color;
+  const hit = barLayers.get(key);
+  if (hit && hit.w === w && hit.h === h && hit.r === r) return hit;
+  const u = layer(w, h);
+  roundedPath(u, 0, 0, w, h, r);
+  u.fillStyle = COLOR.incomeTrack;
+  u.fill();
+
+  const b = layer(w, h);
+  roundedPath(b, 0, 0, w, h, r);
+  if (gauge) {
+    const gradient = b.createLinearGradient(0, 0, w, 0);
+    gradient.addColorStop(0, gauge[0]);
+    gradient.addColorStop(1, gauge[1]);
+    b.fillStyle = gradient;
+  } else {
+    b.fillStyle = createGlossyGradient(b, 0, h, color);
+  }
+  b.fill();
+
+  const o = layer(w, h);
+  roundedPath(o, 16, 9, w - 32, h * 0.24, 12);
+  o.fillStyle = BAR_SHINE;
+  o.fill();
+  drawPillBorder(o, 0, 0, w, h, r, color);
+
+  return remember(barLayers, key, {
+    w,
+    h,
+    r,
+    under: u.canvas,
+    body: b.canvas,
+    over: o.canvas,
+    full: null,
+  });
+}
+
+// the calm bubbles drifting along a bar filled to fillW: x, y, size triples,
+// local to the bar
+const barBubbleSpots = new Float32Array(CALM_BUBBLES * 3);
+function placeBarBubbles(h: number, fillW: number, t: number): Float32Array {
+  const run = Math.max(0, fillW - BAR_BUBBLE_MARGIN * 2);
+  for (let i = 0; i < CALM_BUBBLES; i++) {
+    const bubble = BUBBLES[i];
+    const p = (t / 1400 / bubble.speed + bubble.phase) % 1;
+    barBubbleSpots[i * 3] = BAR_BUBBLE_MARGIN + p * run;
+    barBubbleSpots[i * 3 + 1] =
+      18 + bubble.x * (h - 36) + Math.sin(t / 200 + bubble.phase * 9) * 4;
+    barBubbleSpots[i * 3 + 2] = bubble.size;
+  }
+  return barBubbleSpots;
+}
+
+function drawCalmBar(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+  fillW: number,
+  color: string,
+  t: number,
+  gauge?: LiquidGauge,
+): void {
+  const L = getBarLayers(w, h, r, color, gauge);
+  ctx.drawImage(L.under, x, y);
+  const straight = Math.min(w, Math.max(0, fillW - EDGE_AMP));
+  if (straight >= 1)
+    ctx.drawImage(L.body, 0, 0, straight, h, x, y, straight, h);
+  // the sloshing leading edge, a row at a time, each a pixel over its
+  // neighbours so no seams show
+  const from = Math.max(0, straight - 1);
+  for (let yy = 0; yy < h; yy += EDGE_ROW) {
+    const reach = Math.min(
+      w,
+      fillW + Math.sin((yy + EDGE_ROW / 2) / 11 + t / 110) * EDGE_AMP,
+    );
+    const rowW = reach - from;
+    const rowH = Math.min(EDGE_ROW + 1, h - yy);
+    if (rowW > 0)
+      ctx.drawImage(L.body, from, yy, rowW, rowH, x + from, y + yy, rowW, rowH);
+  }
+  const spots = placeBarBubbles(h, fillW, t);
+  for (let i = 0; i < spots.length; i += 3)
+    stampBubble(ctx, x + spots[i], y + spots[i + 1], spots[i + 2]);
+  ctx.drawImage(L.over, x, y);
+}
+
+// a calm, full bar's layers for a caller that warps it (see pressureBar):
+// its liquid (fill), its shine and border (over) and its bubbles (x, y, size
+// triples, local to the bar)
+export interface CalmFullBar {
+  fill: HTMLCanvasElement;
+  over: HTMLCanvasElement;
+  bubbles: Float32Array;
+}
+const calmFullBar: CalmFullBar = {
+  fill: null!,
+  over: null!,
+  bubbles: barBubbleSpots,
+};
+export function getCalmFullBar(
+  key: object,
+  w: number,
+  h: number,
+  r: number,
+  color: string,
+  now: number,
+): CalmFullBar {
+  const t = tick(barClocks, key, now, 1);
+  const L = getBarLayers(w, h, r, color);
+  if (!L.full) {
+    const c = layer(w, h);
+    c.drawImage(L.under, 0, 0);
+    c.drawImage(L.body, 0, 0);
+    L.full = c.canvas;
+  }
+  calmFullBar.fill = L.full;
+  calmFullBar.over = L.over;
+  placeBarBubbles(h, w, t);
+  return calmFullBar;
+}
+
+// the gauge's gradient on a live-drawn bar
+const gaugeGradients = new WeakMap<
+  CanvasRenderingContext2D,
+  Map<string, CanvasGradient>
+>();
+function gaugeGradient(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  w: number,
+  gauge: LiquidGauge,
+): CanvasGradient {
+  let byKey = gaugeGradients.get(ctx);
+  if (!byKey) gaugeGradients.set(ctx, (byKey = new Map()));
+  const key = `${x}|${w}|${gauge[0]}|${gauge[1]}`;
+  let gradient = byKey.get(key);
+  if (!gradient) {
+    gradient = ctx.createLinearGradient(x, 0, x + w, 0);
+    gradient.addColorStop(0, gauge[0]);
+    gradient.addColorStop(1, gauge[1]);
+    byKey.set(key, gradient);
+  }
+  return gradient;
+}
+
 // a bubble bursting at the surface: a ring and two flicked droplets
 function drawPop(
   ctx: CanvasRenderingContext2D,
@@ -279,8 +678,12 @@ export function drawLiquidButton(
 ): void {
   const t = tick(buttonClocks, key, now, 1 + heat * BOIL_SPEED);
   const slosh = stepSlosh(key, now, wiggle);
+  if (heat === 0 && slosh.angle === 0 && slosh.velocity === 0) {
+    drawCalmButton(ctx, x, y, w, h, r, color, t);
+    return;
+  }
   const lean = Math.abs(slosh.angle);
-  const restY = y + h * 0.3;
+  const restY = y + h * REST;
   // sloshing smooths the little waves out
   const amp = (6 + heat * BOIL_WAVES) * (1 - Math.min(0.6, lean * 2));
   const s = buttonSurface;
@@ -321,7 +724,7 @@ export function drawLiquidButton(
     x,
     20,
     w - 40,
-    y + h,
+    y + h - BUBBLE_FLOOR,
     0,
     CALM_BUBBLES + Math.round(heat * BOIL_BUBBLES),
     1000,
@@ -372,10 +775,13 @@ export function drawLiquidBar(
   color: string,
   now: number,
   heat = 0,
-  // the liquid's own paint, when it isn't the border color's gloss
-  paint?: LiquidPaint,
+  gauge?: LiquidGauge,
 ): void {
   const t = tick(barClocks, key, now, 1 + heat * BOIL_SPEED);
+  if (heat === 0) {
+    drawCalmBar(ctx, x, y, w, h, r, fillW, color, t, gauge);
+    return;
+  }
   roundedPath(ctx, x, y, w, h, r);
   ctx.fillStyle = COLOR.incomeTrack;
   ctx.fill();
@@ -392,57 +798,42 @@ export function drawLiquidBar(
   s.chaosPhase = t / 150;
   ctx.beginPath();
   ctx.moveTo(x, y + h);
-  if (heat > 0) {
-    for (let px = 0; px < fillW; px += STEP)
-      ctx.lineTo(x + px, surfaceY(s, px));
-  } else {
-    ctx.lineTo(x, s.base);
-  }
+  for (let px = 0; px < fillW; px += STEP) ctx.lineTo(x + px, surfaceY(s, px));
   // the sloshing leading edge
   const edge = x + fillW;
-  const edgeAmp = 9 + heat * 8;
+  const edgeAmp = EDGE_AMP + heat * 8;
   for (let yy = 0; yy <= h; yy += 4) {
     ctx.lineTo(edge + Math.sin(yy / 11 + t / 110) * edgeAmp, y + yy);
   }
   ctx.closePath();
-  ctx.fillStyle = paint
-    ? paint(ctx, x, y, w, h)
+  ctx.fillStyle = gauge
+    ? gaugeGradient(ctx, x, w, gauge)
     : getGlossyGradient(ctx, y, h, color);
   ctx.fill();
   // calm bubbles drift along the bar
   ctx.strokeStyle = BUBBLE_STROKE;
   ctx.lineWidth = BUBBLE_WIDTH;
-  const run = Math.max(0, fillW - 14);
+  const spots = placeBarBubbles(h, fillW, t);
   ctx.beginPath();
-  for (let i = 0; i < CALM_BUBBLES; i++) {
-    const bubble = BUBBLES[i];
-    const p = (t / 1400 / bubble.speed + bubble.phase) % 1;
-    addBubble(
-      ctx,
-      x + p * run,
-      y + 18 + bubble.x * (h - 36) + Math.sin(t / 200 + bubble.phase * 9) * 4,
-      bubble.size,
-    );
-  }
+  for (let i = 0; i < spots.length; i += 3)
+    addBubble(ctx, x + spots[i], y + spots[i + 1], spots[i + 2]);
   ctx.stroke();
   // the boil's bubbles rush straight up and burst at the surface
-  if (heat > 0) {
-    drawRisingBubbles(
-      ctx,
-      s,
-      x,
-      14,
-      Math.max(0, fillW - 34),
-      y + h,
-      CALM_BUBBLES,
-      CALM_BUBBLES + Math.round(heat * BOIL_BUBBLES),
-      700,
-      t,
-      heat,
-      0.6,
-      0,
-    );
-  }
+  drawRisingBubbles(
+    ctx,
+    s,
+    x,
+    14,
+    Math.max(0, fillW - 34),
+    y + h,
+    CALM_BUBBLES,
+    CALM_BUBBLES + Math.round(heat * BOIL_BUBBLES),
+    700,
+    t,
+    heat,
+    0.6,
+    0,
+  );
   roundedPath(ctx, x + 16, y + 9, w - 32, h * 0.24, 12);
   ctx.fillStyle = BAR_SHINE;
   ctx.fill();

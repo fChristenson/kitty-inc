@@ -490,33 +490,6 @@ function getGaugeGradientColors(floor: Floor): [string, string] {
   }
 }
 
-// horizontal and drawn at the bar's fixed local geometry, so built once per
-// (ctx, x, width, colors) instead of every frame for every gauge
-const gaugeGradients = new WeakMap<
-  CanvasRenderingContext2D,
-  Map<string, CanvasGradient>
->();
-
-function getGaugeGradient(
-  ctx: CanvasRenderingContext2D,
-  barX: number,
-  barW: number,
-  fromColor: string,
-  toColor: string,
-): CanvasGradient {
-  let byKey = gaugeGradients.get(ctx);
-  if (!byKey) gaugeGradients.set(ctx, (byKey = new Map()));
-  const key = `${barX}|${barW}|${fromColor}|${toColor}`;
-  let gradient = byKey.get(key);
-  if (!gradient) {
-    gradient = ctx.createLinearGradient(barX, 0, barX + barW, 0);
-    gradient.addColorStop(0, fromColor);
-    gradient.addColorStop(1, toColor);
-    byKey.set(key, gradient);
-  }
-  return gradient;
-}
-
 // starts the persistent redraw loop that animates every floor's fill bar; safe to call more than
 // once. now that main.ts only ever redraws the small fixed-size visible-viewport canvas (not
 // every floor), a full rAF cadence is cheap and gives a smooth-looking fill instead of visible steps
@@ -631,13 +604,7 @@ export function drawIncomePanel(
     if (overtimeGaugeVisible) {
       // the gauge is liquid too, in its tier-preview colors, boiling and
       // straining while overtime runs
-      const [fromColor, toColor] = getGaugeGradientColors(floor);
-      const paint = (
-        c: CanvasRenderingContext2D,
-        gx: number,
-        _gy: number,
-        gw: number,
-      ): CanvasGradient => getGaugeGradient(c, gx, gw, fromColor, toColor);
+      const gauge = getGaugeGradientColors(floor);
       if (boilHeat > 0) {
         pressure = drawBoilingBar(
           ctx,
@@ -652,7 +619,7 @@ export function drawIncomePanel(
           now,
           boilHeat,
           holdHeat,
-          paint,
+          gauge,
         );
       } else {
         drawLiquidBar(
@@ -667,7 +634,7 @@ export function drawIncomePanel(
           COLOR.amber,
           now,
           0,
-          paint,
+          gauge,
         );
       }
       const whiteAlpha = Math.max(
