@@ -2245,6 +2245,88 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, cash: src/floors/volcanoEvent: the button erupts a fountain of
+  // cash and lobs lava bombs of it across the screen
+  volcanoEvent: {
+    chance: 0.01,
+    eruptMs: 900, // the fountain roaring
+    bombGapsMs: [240, 140] as [number, number], // between bombs, quickening
+    lobMs: 420, // each bomb's flight
+    flightMs: 380, // each coin's surge into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, hires: src/floors/skydiversEvent: wisps free-fall into a ring, then
+  // break off and parachute onto empty spots
+  skydiversEvent: {
+    chance: 0.01,
+    fallMs: 650, // free-falling into the ring
+    holdLinkMs: 180, // falling linked up
+    divesMs: [260, 380] as [number, number], // each diver's plunge to its chute
+    floatMs: 320, // floating down under the chute
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, cash: src/floors/speedboatEvent: a wisp speedboat carves S-turns
+  // trailing a V-shaped wake of cash
+  speedboatEvent: {
+    chance: 0.01,
+    runMs: 1_500, // carving across, picking up speed
+    flightMs: 380, // each wake coin's wash into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, levels + a crit tier: src/floors/peacockEvent: a fan of beams
+  // unfurls from the button and snaps shut on the clicked bar
+  peacockEvent: {
+    chance: 0.01,
+    opensMs: [150, 70] as [number, number], // between ribs opening, quickening
+    snapMs: 160, // each rib snapping open
+    shimmerMs: 250, // the open fan shimmering
+    shutMs: 180, // snapping shut onto the clicked bar
+    levelShare: 0.05, // of each bar's levels, per rib
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, crit tiers: src/floors/stormWingsEvent: a wisp on wings of
+  // lightning beats bolts down onto the bars
+  stormWingsEvent: {
+    chance: 0.01,
+    flyMs: 1_400, // flying over the bars
+    diveMs: 260, // diving into the clicked bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, worker tiers: src/floors/clusterBombEvent: a bomb bursts into
+  // bomblets that blow up on the workers
+  clusterBombEvent: {
+    chance: 0.01,
+    lobMs: 600, // the bomb's lob up to its burst
+    scatterMs: 380, // the first bomblet's fall
+    staggerMs: 90, // between bomblets landing
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, levels: src/floors/strafingRunEvent: a gunship rakes the bars
+  // with wisp bullets pass after pass
+  strafingRunEvent: {
+    chance: 0.01,
+    passesMs: [420, 260] as [number, number], // each pass, quickening
+    turnMs: 140, // each hairpin between passes
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/stainedGlassEvent: the screen turns into a
+  // stained-glass window that light floods through
+  stainedGlassEvent: {
+    chance: 0.01,
+    leadMs: 250, // the leading creeping over the screen
+    shineMs: 1_000, // light flooding pane after pane
+    blazeMs: 280, // the window blazing white and clearing
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,

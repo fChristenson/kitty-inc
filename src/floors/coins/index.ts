@@ -554,11 +554,15 @@ function spawnSprayCoin(
     Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
   const life = Math.min(Math.max(0, age), spray.outTicks);
   const at =
-    life > 0 ? sprayPosition(spray, life) : { x: spray.x0, y: spray.y0 };
+    life > 0 || spray.path
+      ? sprayPosition(spray, life)
+      : { x: spray.x0, y: spray.y0 };
   sprayPool.spawn({
     floor,
     x: at.x,
     y: at.y,
+    // a path's own scale from the first frame, so hidden coins never flash
+    pathScale: spray.path ? at.scale : undefined,
     vx: 0,
     vy: 0,
     life,
