@@ -46,22 +46,11 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-uprising-event" class="game__button">Uprising</button>
-          <button id="test-swing-ride-event" class="game__button">Swing Ride</button>
-          <button id="test-lawnmower-event" class="game__button">Lawnmower</button>
-          <button id="test-light-show-event" class="game__button">Light Show</button>
-          <button id="test-bug-zapper-event" class="game__button">Bug Zapper</button>
-          <button id="test-firecrackers-event" class="game__button">Firecrackers</button>
-          <button id="test-six-shooter-event" class="game__button">Six-Shooter</button>
-          <button id="test-thermal-event" class="game__button">Thermal</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Test Actions</summary>
+        <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="add-money" class="game__button">Add Money</button>
-          <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
-          <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
           <button id="test-boost-event" class="game__button">Boost</button>
           <button id="test-union-event" class="game__button">Union</button>
           <button id="test-kickback-event" class="game__button">Kickback</button>
@@ -297,6 +286,14 @@ export function createTestButtonMarkup(): string {
           <button id="test-cluster-bomb-event" class="game__button">Cluster Bomb</button>
           <button id="test-strafing-run-event" class="game__button">Strafing Run</button>
           <button id="test-stained-glass-event" class="game__button">Stained Glass</button>
+          <button id="test-uprising-event" class="game__button">Uprising</button>
+          <button id="test-swing-ride-event" class="game__button">Swing Ride</button>
+          <button id="test-lawnmower-event" class="game__button">Lawnmower</button>
+          <button id="test-light-show-event" class="game__button">Light Show</button>
+          <button id="test-bug-zapper-event" class="game__button">Bug Zapper</button>
+          <button id="test-firecrackers-event" class="game__button">Firecrackers</button>
+          <button id="test-six-shooter-event" class="game__button">Six-Shooter</button>
+          <button id="test-thermal-event" class="game__button">Thermal</button>
           <button id="test-slash-event" class="game__button">Slash</button>
           <button id="test-jackhammer-event" class="game__button">Jackhammer</button>
           <button id="test-pummel-event" class="game__button">Pummel</button>
@@ -372,6 +369,44 @@ export function createTestButtonMarkup(): string {
           <button id="test-upgrade-event" class="game__button">Upgrade</button>
           <button id="test-unlock-event" class="game__button">Unlock</button>
           <label>Unlock crit <select id="test-unlock-event-crit"><option value="random">Random</option><option value="none">No crit</option>${tiers}</select></label>
+          <button id="test-stalactites-event" class="game__button">Stalactites</button>
+          <button id="test-kintsugi-event" class="game__button">Kintsugi</button>
+          <button id="test-galaxy-event" class="game__button">Galaxy</button>
+          <button id="test-snowdrift-event" class="game__button">Snowdrift</button>
+          <button id="test-snowball-event" class="game__button">Snowball</button>
+          <button id="test-cartwheel-event" class="game__button">Cartwheel</button>
+          <button id="test-matryoshka-event" class="game__button">Matryoshka</button>
+          <button id="test-salmon-run-event" class="game__button">Salmon Run</button>
+          <button id="test-moon-tide-event" class="game__button">Moon Tide</button>
+          <button id="test-candy-floss-event" class="game__button">Candy Floss</button>
+          <button id="test-figure-skater-event" class="game__button">Figure Skater</button>
+          <button id="test-tripwire-event" class="game__button">Tripwire</button>
+          <button id="test-sunrise-event" class="game__button">Sunrise</button>
+          <button id="test-rally-event" class="game__button">Rally</button>
+          <button id="test-ignition-event" class="game__button">Ignition</button>
+          <button id="test-trident-event" class="game__button">Trident</button>
+          <button id="test-crawl-event" class="game__button">Crawl</button>
+          <button id="test-carpet-bombing-event" class="game__button">Carpet Bombing</button>
+          <button id="test-time-bomb-event" class="game__button">Time Bomb</button>
+          <button id="test-bunker-buster-event" class="game__button">Bunker Buster</button>
+          <button id="test-grenade-toss-event" class="game__button">Grenade Toss</button>
+          <button id="test-depth-charges-event" class="game__button">Depth Charges</button>
+          <button id="test-firing-squad-event" class="game__button">Firing Squad</button>
+          <button id="test-akimbo-event" class="game__button">Akimbo</button>
+          <button id="test-flak-barrage-event" class="game__button">Flak Barrage</button>
+          <button id="test-sniper-nest-event" class="game__button">Sniper Nest</button>
+          <button id="test-rewind-event" class="game__button">Rewind</button>
+          <button id="test-morse-code-event" class="game__button">Morse Code</button>
+          <button id="test-stadium-wave-event" class="game__button">Stadium Wave</button>
+          <button id="test-knights-tour-event" class="game__button">Knight's Tour</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Test Actions</summary>
+        <div class="test-actions-dropdown__menu">
+          <button id="add-money" class="game__button">Add Money</button>
+          <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
+          <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

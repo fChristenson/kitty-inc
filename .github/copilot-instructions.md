@@ -82,7 +82,7 @@ No custom drawn props or art in any of them: just wisps, coins, beams, bolts, bu
 
 **Experiments.** Whenever you add a batch, also add a few events that break from these templates to try something new, and say which ones they are.
 
-**Test buttons.** A new batch's test buttons go in the **New Events** dropdown at the top of the test bar (`hud/testButton/critTestActions.ts`), so they're easy to find. Once the user has tested them, move them down into **Test Actions**.
+**Test buttons.** A new batch's test buttons go in the **New Events** dropdown at the top of the test bar (`hud/testButton/critTestActions.ts`), so they're easy to find. Once the user has tested them, move them down into **Events**.
 
 ### Rules for every event
 
