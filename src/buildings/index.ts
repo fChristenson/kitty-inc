@@ -1,17 +1,23 @@
-import { buildFloor } from "../floors";
-import { increaseIncomeRate } from "../floors/incomePanel";
+import { buildFloor, computeBaseFloorStats } from "../floors";
+import {
+  increaseIncomeRate,
+  increaseIncomeRateBy,
+} from "../floors/incomePanel";
 import type { Floor } from "../gameState";
 import {
   type BigNumber,
   ZERO,
+  isZero,
   pow,
   multiply,
   multiplyBig,
 } from "../shared/bigNumber";
 import { CONFIG } from "../config";
 
-export function getBuildingMultiplier(buildingIndex: number): number {
-  return CONFIG.floors.floorEconomyMultiplierPerBuilding ** buildingIndex;
+// a BigNumber: 1000 ** index overflows a plain number past ~100 buildings,
+// which zeroed every new or reset floor's income and price there
+export function getBuildingMultiplier(buildingIndex: number): BigNumber {
+  return pow(CONFIG.floors.floorEconomyMultiplierPerBuilding, buildingIndex);
 }
 
 const BUILDING_BASE_PRICE = CONFIG.buildings.basePrice;
@@ -76,6 +82,29 @@ export function createBuilding(
   groundFloor.buildingPurchaseCost = options.purchaseCost ?? ZERO;
   configureBuildingFloorPrices(floors, buildingIndex);
   return floors;
+}
+
+// floors zeroed by the old overflowing multiplier: rebuilt from their level-0
+// stats and replayed to the level they had
+export function repairZeroedFloors(
+  floors: Floor[],
+  buildingIndex: number,
+): void {
+  const multiplier = getBuildingMultiplier(buildingIndex);
+  floors.forEach((floor, index) => {
+    if (!isZero(floor.rateStep)) return;
+    const level = Number.isFinite(floor.upgradeCount) ? floor.upgradeCount : 0;
+    const base = computeBaseFloorStats(index + 1, multiplier);
+    floor.incomeAmount = base.incomeAmount;
+    floor.incomeIntervalSeconds = base.incomeIntervalSeconds;
+    floor.rateStep = base.rateStep;
+    floor.upgradeCost = multiply(
+      base.upgradeCost,
+      floor.priceDiscountMultiplier,
+    );
+    floor.upgradeCount = 0;
+    increaseIncomeRateBy(floor, level);
+  });
 }
 
 // this module's own facade: buildings/ has an outerWall sub-part for internal reuse,

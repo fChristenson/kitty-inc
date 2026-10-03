@@ -151,7 +151,7 @@ export function unlockFloor(floor: Floor): void {
 interface EnsureLockedFloorDeps {
   floors: Floor[];
   backgroundCount: number;
-  multiplier?: number; // this building's economy scale (buildings/index.ts); defaults to 1
+  multiplier?: BigNumber; // this building's economy scale (buildings/index.ts); defaults to 1
   onAdd: (floor: Floor) => void;
   startingUpgradeCost?: import("../../shared/bigNumber").BigNumber;
 }
@@ -172,7 +172,7 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
   const floor = buildFloor(deps.floors.length + 1, {
     backgroundCount: deps.backgroundCount,
     existingBgIndexes: deps.floors.map((f) => f.bgIndex),
-    multiplier: deps.multiplier ?? 1,
+    multiplier: deps.multiplier,
     floorUnlockBaseCost: deps.floors[0]?.buildingFloorUnlockBaseCost,
     // a building-wide crit (see cityMap/index.ts) sets every floor to the same
     // tier — a freshly created floor should start as that same tier too, not
@@ -201,7 +201,7 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
 // everything else about the result
 export function getBuildingUnlockAllCost(
   floors: Floor[],
-  multiplier: number,
+  multiplier: BigNumber,
 ): BigNumber {
   const top = floors[floors.length - 1];
   if (!top || top.unlocked) return ZERO;

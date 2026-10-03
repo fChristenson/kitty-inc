@@ -39,6 +39,24 @@ export function runDetachedStep<T>(step: () => T): T {
   }
 }
 
+// how long one slice of a background job may run each frame
+export const JOB_SLICE_MS = 5;
+
+// resolves once the next frame has painted (or after 100ms in a hidden tab,
+// where rAF stops), so a job never runs two slices between frames
+export function yieldToFrame(): Promise<void> {
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = (): void => {
+      if (done) return;
+      done = true;
+      resolve();
+    };
+    requestAnimationFrame(() => setTimeout(finish, 0));
+    setTimeout(finish, 100);
+  });
+}
+
 export async function runDetachedJob<T>(options: {
   clone: () => T | Promise<T>;
   step: (draft: T) => boolean;
@@ -48,7 +66,7 @@ export async function runDetachedJob<T>(options: {
 }): Promise<boolean> {
   if (options.exclusive !== false) pendingJobs++;
   try {
-    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    await yieldToFrame();
     const draft = await options.clone();
     let changed = false;
     for (;;) {
@@ -60,8 +78,8 @@ export async function runDetachedJob<T>(options: {
           return changed;
         }
         changed = true;
-      } while (performance.now() - startedAt < 8);
-      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+      } while (performance.now() - startedAt < JOB_SLICE_MS);
+      await yieldToFrame();
     }
   } finally {
     if (options.exclusive !== false) pendingJobs--;

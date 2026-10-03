@@ -2,7 +2,12 @@ import type { Floor } from "../gameState";
 import type { BuildingDraft, RenovationPlan } from "../shared/buildingJob";
 import type { BigNumber } from "../shared/bigNumber";
 import { quoteUpgrades } from "./upgradeQuote";
-import { lockBuilding, runDetachedJob } from "../shared/detachedJob";
+import {
+  JOB_SLICE_MS,
+  lockBuilding,
+  runDetachedJob,
+  yieldToFrame,
+} from "../shared/detachedJob";
 import { cloneWithSnapshotState } from "../shared/snapshotState";
 import { withDraftCritCounts, commitCritCounts } from "../shared/critTypes";
 
@@ -127,8 +132,8 @@ export async function renovateFloors(options: {
         for (const floor of floors) {
           if (!isCurrent()) break;
           copies.push(cloneWithSnapshotState(floor));
-          if (performance.now() - startedAt >= 8) {
-            await new Promise<void>((resolve) => setTimeout(resolve, 0));
+          if (performance.now() - startedAt >= JOB_SLICE_MS) {
+            await yieldToFrame();
             startedAt = performance.now();
           }
         }

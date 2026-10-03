@@ -826,6 +826,56 @@ import "../bulletCageEvent";
 import "../gunslingerEvent";
 import "../bulletWheelEvent";
 import "../bulletLadderEvent";
+import "../whipZoomEvent";
+import "../irisOutEvent";
+import "../screenReelsEvent";
+import "../goldLeafEvent";
+import "../pixelStormEvent";
+import "../gravityFlipEvent";
+import "../echoEvent";
+import "../mirrorBoxEvent";
+import "../pullBackEvent";
+import "../treadmillEvent";
+import "../blastOffEvent";
+import "../popUpEvent";
+import "../stickerPeelEvent";
+import "../glissandoEvent";
+import "../vaultDoorsEvent";
+import "../champagneTowerEvent";
+import "../pinballRiverEvent";
+import "../pressureWasherEvent";
+import "../irrigationEvent";
+import "../waterspoutEvent";
+import "../sidewinderEvent";
+import "../orbitSwapEvent";
+import "../cuckooEvent";
+import "../gyreEvent";
+import "../barHopEvent";
+import "../cometPlowEvent";
+import "../hoseReelEvent";
+import "../geyserRiderEvent";
+import "../bubbleBlowerEvent";
+import "../poolDiveEvent";
+import "../rubberBandEvent";
+import "../beamViseEvent";
+import "../laserRakeEvent";
+import "../lightDominoesEvent";
+import "../pryBarEvent";
+import "../teslaTennisEvent";
+import "../tuningForkEvent";
+import "../boltSpiralEvent";
+import "../groundCurrentEvent";
+import "../overchargeEvent";
+import "../bombTornadoEvent";
+import "../bombBoomerangEvent";
+import "../multistageEvent";
+import "../bombPileEvent";
+import "../bombGarlandEvent";
+import "../homingRoundsEvent";
+import "../waveCannonEvent";
+import "../snapbackEvent";
+import "../bulletFunnelEvent";
+import "../crisscrossEvent";
 import "../slashEvent";
 import "../jackhammerEvent";
 import "../pummelEvent";
@@ -1149,7 +1199,7 @@ function applyPokerHandCrit(
 export interface FloorActionsDeps {
   floors: Floor[];
   backgroundCount: number;
-  multiplier: number; // this building's economy scale (buildings/index.ts)
+  multiplier: BigNumber; // this building's economy scale (buildings/index.ts)
   persist: () => void;
   // gameCanvas.ts's own continuous per-frame redraw already picks up any state change
   // on the next tick, so these just need to register the new floor for hit-testing/
@@ -1504,7 +1554,7 @@ function applyBlueprintCrit(deps: ChainCritDeps, sourceIndex: number): void {
 export interface ChainCritDeps {
   floors: Floor[];
   backgroundCount: number;
-  multiplier: number;
+  multiplier: BigNumber;
   onFloorAdded: (floor: Floor) => void;
 }
 
@@ -2042,7 +2092,10 @@ function applyTeamLunchCrit(floor: Floor): void {
 // more per upgrade from here on. A floor already at the top tier has nothing
 // to trade its upgrades for, so it's skipped entirely. Workers/manager/office
 // upgrades and the building's accumulated price discount all survive
-function applySpringCleaningCrit(floors: Floor[], multiplier: number): void {
+function applySpringCleaningCrit(
+  floors: Floor[],
+  multiplier: BigNumber,
+): void {
   for (const [index, floor] of floors.entries()) {
     if (!floor.unlocked) continue;
     const promoted = nextCritTier(floor.critMultiplierTier);
@@ -2193,7 +2246,7 @@ export interface CritRewardContext {
   // how many free upgrade ticks the landed tier is worth
   count: number;
   // this building's own economy scale (see buildings/getBuildingMultiplier)
-  multiplier: number;
+  multiplier: BigNumber;
 }
 
 // featured rewards only see their own narrow context type, but are always

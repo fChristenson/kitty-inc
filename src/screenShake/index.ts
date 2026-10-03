@@ -240,7 +240,9 @@ export function triggerScreenShake(options?: {
   const shouldStart = idle || req.priority > activeFlashPriority;
   if (shouldStart) {
     const iconName = CRIT_ICON_BY_LABEL[req.label]?.name;
-    const ready = iconName ? requestCritIcon(iconName) : Promise.resolve();
+    const ready = iconName
+      ? requestCritIcon(iconName)
+      : Promise.resolve(null);
     // the label's blurred glow is costly to build; do it before the flash
     // starts, not on its first animated frame
     if (req.label) {
@@ -248,7 +250,13 @@ export function triggerScreenShake(options?: {
       warmTextLayer(req.label, req.color, req.strokeWidth);
     }
     ready
-      .then(() => {
+      .then(async (icon) => {
+        // decoded off the main thread again (the browser may have dropped it)
+        // and resampled to its on-screen size before the reveal's first frame
+        if (icon) {
+          await icon.decode().catch(() => undefined);
+          warmIconLayer(req.label);
+        }
         const currentNow = Date.now();
         const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
         if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
@@ -531,6 +539,56 @@ function fitIconSize(
   return { w: icon.width * scale, h: icon.height * scale };
 }
 
+// the icon resampled once to about its on-screen pixel size: filtering the
+// big source up/down while it turns, every frame, dropped frames on phones
+const iconLayerCache = new Map<string, HTMLCanvasElement>();
+const ICON_LAYER_LIMIT = 3;
+const ICON_LAYER_STEP_PX = 32;
+const MAX_ICON_LAYER_PX = 2048;
+
+function getIconLayer(
+  name: ImageName,
+  icon: HTMLImageElement,
+  w: number,
+  h: number,
+  pixelScale: number,
+): HTMLCanvasElement {
+  const fit = Math.min(1, MAX_ICON_LAYER_PX / Math.max(w, h) / pixelScale);
+  const width = Math.max(
+    ICON_LAYER_STEP_PX,
+    Math.ceil((w * pixelScale * fit) / ICON_LAYER_STEP_PX) * ICON_LAYER_STEP_PX,
+  );
+  const key = `${name}|${width}`;
+  const cached = touchCached(iconLayerCache, key);
+  if (cached) return cached;
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = Math.max(1, Math.round((width * h) / w));
+  const layerCtx = canvas.getContext("2d")!;
+  layerCtx.imageSmoothingEnabled = true;
+  layerCtx.imageSmoothingQuality = "high";
+  layerCtx.drawImage(icon, 0, 0, canvas.width, canvas.height);
+  iconLayerCache.set(key, canvas);
+  if (iconLayerCache.size > ICON_LAYER_LIMIT)
+    iconLayerCache.delete(iconLayerCache.keys().next().value as string);
+  return canvas;
+}
+
+function warmIconLayer(label: string): void {
+  const config = CRIT_ICON_BY_LABEL[label];
+  const icon = config ? loadedCritIcons.get(config.name) : undefined;
+  if (!config || !icon || lastViewportWidth <= 0) return;
+  const ctx = getScratchCtx();
+  const { targetScale } = flashLayerScales(
+    ctx,
+    label,
+    lastViewportWidth,
+    lastDrawScale,
+  );
+  const { w, h } = fitIconSize(icon, measureLabel(ctx, label) * 0.85);
+  getIconLayer(config.name, icon, w, h, targetScale * lastDrawScale);
+}
+
 // full size covers 80% of the viewport's width
 function flashLayerScales(
   ctx: CanvasRenderingContext2D,
@@ -723,18 +781,22 @@ function drawFlashLayer(
   // spin an extra fixed amount of their own on top of the text's animated
   // entrance rotation, scoped to their own save/restore so that extra spin
   // doesn't also rotate the bloom/text drawn after it.
-  if (critIcon && iconSize) {
+  if (critIcon && iconSize && critIconConfig) {
     const { w: iconW, h: iconH } = iconSize;
-    // icons are at most 250x250 but drawn several times larger on phones
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
-    if (critIconConfig?.rotateDeg) {
+    const layer = getIconLayer(
+      critIconConfig.name,
+      critIcon,
+      iconW,
+      iconH,
+      targetScale * lastDrawScale,
+    );
+    if (critIconConfig.rotateDeg) {
       ctx.save();
       ctx.rotate((critIconConfig.rotateDeg * Math.PI) / 180);
-      ctx.drawImage(critIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+      ctx.drawImage(layer, -iconW / 2, -iconH / 2, iconW, iconH);
       ctx.restore();
     } else {
-      ctx.drawImage(critIcon, -iconW / 2, -iconH / 2, iconW, iconH);
+      ctx.drawImage(layer, -iconW / 2, -iconH / 2, iconW, iconH);
     }
   }
   // bloom: a soft white glow behind the crisp text below. shadowBlur is

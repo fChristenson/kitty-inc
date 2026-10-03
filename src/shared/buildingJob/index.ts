@@ -5,7 +5,12 @@ import {
   commitCritCounts,
   withDraftCritCounts,
 } from "../critTypes";
-import { isDetachedJobPending, runDetachedJob } from "../detachedJob";
+import {
+  isDetachedJobPending,
+  JOB_SLICE_MS,
+  runDetachedJob,
+  yieldToFrame,
+} from "../detachedJob";
 import { cloneWithSnapshotState } from "../snapshotState";
 
 export interface BuildingDraft {
@@ -36,8 +41,8 @@ export async function runBuildingJob(options: {
         for (const floor of floors) {
           if (!options.isCurrent()) return draft;
           copies.push(cloneWithSnapshotState(floor));
-          if (performance.now() - startedAt >= 8) {
-            await new Promise<void>((resolve) => setTimeout(resolve, 0));
+          if (performance.now() - startedAt >= JOB_SLICE_MS) {
+            await yieldToFrame();
             startedAt = performance.now();
           }
         }

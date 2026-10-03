@@ -53,8 +53,6 @@ export const IMAGE_FILES = {
   ...FEATURED_CRIT_IMAGE_FILES,
   city: "city.webp", // distant tiled skyline behind buildings
   cityMapBackground: "mapBg.webp", // city map screen's own backdrop
-  cloudCatIdle: "cloudCatIdle.webp", // city map corner mascot, resting pose
-  cloudCatHappy: "cloudCatHappy.webp", // same mascot, cheering pose
   wallMaterial: "wallMaterial.webp", // exterior wall/floor-divider tile material
   coin: "coin.webp", // flat coin icon (HUD/menus)
   mouse: "mouse.webp", // free-boost critter

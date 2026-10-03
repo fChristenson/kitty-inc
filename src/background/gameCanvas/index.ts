@@ -112,7 +112,7 @@ export interface GameCanvasDeps {
   // buildings can have completely different themes
   getBackgrounds: () => HTMLImageElement[];
   floors: Floor[]; // the initially-active building's floors
-  getBuildingMultiplier: () => number; // the currently-active building's economy scale
+  getBuildingMultiplier: () => BigNumber; // the currently-active building's economy scale
   getCompanyValue: () => BigNumber;
   applyCompanyWideBoost: () => void;
   createMysticBuilding: () => void;

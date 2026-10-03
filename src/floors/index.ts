@@ -60,6 +60,7 @@ const UNLOCK_COST_GROWTH_FACTOR = CONFIG.floors.unlockCostGrowthFactor;
 // proportionately more per click than a lower floor's — a flat step here would
 // let enough flat-rate floor-1 upgrades out-earn a higher, unupgraded floor
 const BASE_RATE_STEP = CONFIG.floors.baseRateStep;
+const ONE = fromNumber(1);
 
 // every processed floor background (see scripts/process-background-floors.mjs,
 // which writes into dist/backgrounds/ — see ../loadAssets)
@@ -121,7 +122,7 @@ export function pickBackgroundIndex(
 export interface BuildFloorOptions {
   backgroundCount: number;
   existingBgIndexes?: number[];
-  multiplier?: number;
+  multiplier?: BigNumber;
   groundFloorLocked?: boolean;
   // a building-wide crit (see cityMap/index.ts) sets every floor to the same
   // tier — a freshly created floor starts as this tier too instead of null
@@ -143,7 +144,7 @@ export interface BuildFloorOptions {
 // (see floorInteractions.ts's Spring Cleaning crit, which resets a floor to it)
 export function computeBaseFloorStats(
   floorLevel: number,
-  multiplier: number,
+  multiplier: BigNumber,
 ): {
   incomeAmount: BigNumber;
   incomeIntervalSeconds: number;
@@ -152,10 +153,10 @@ export function computeBaseFloorStats(
 } {
   const incomeScale = floorIncomeScale(floorLevel);
   return {
-    incomeAmount: fromNumber(incomeScale * BASE_INCOME_AMOUNT * multiplier),
+    incomeAmount: multiply(multiplier, incomeScale * BASE_INCOME_AMOUNT),
     incomeIntervalSeconds: baseFloorInterval(floorLevel),
-    upgradeCost: fromNumber(BASE_UPGRADE_COST * multiplier),
-    rateStep: fromNumber(incomeScale * BASE_RATE_STEP * multiplier),
+    upgradeCost: multiply(multiplier, BASE_UPGRADE_COST),
+    rateStep: multiply(multiplier, incomeScale * BASE_RATE_STEP),
   };
 }
 
@@ -166,12 +167,12 @@ export function buildFloor(
   const {
     backgroundCount,
     existingBgIndexes = [],
-    multiplier = 1,
+    multiplier = ONE,
     groundFloorLocked = false,
     defaultCritTier = null,
     priceDiscountMultiplier = 1,
     startingUpgradeCost,
-    floorUnlockBaseCost = fromNumber(BASE_UNLOCK_COST * multiplier),
+    floorUnlockBaseCost = multiply(multiplier, BASE_UNLOCK_COST),
   } = options;
   const isGroundFloor = floorLevel === 1;
   // BigNumber pow/multiply never overflow to Infinity no matter how high
@@ -1037,6 +1038,56 @@ export { forceBulletCageEvent } from "./bulletCageEvent";
 export { forceGunslingerEvent } from "./gunslingerEvent";
 export { forceBulletWheelEvent } from "./bulletWheelEvent";
 export { forceBulletLadderEvent } from "./bulletLadderEvent";
+export { forceWhipZoomEvent } from "./whipZoomEvent";
+export { forceIrisOutEvent } from "./irisOutEvent";
+export { forceScreenReelsEvent } from "./screenReelsEvent";
+export { forceGoldLeafEvent } from "./goldLeafEvent";
+export { forcePixelStormEvent } from "./pixelStormEvent";
+export { forceGravityFlipEvent } from "./gravityFlipEvent";
+export { forceEchoEvent } from "./echoEvent";
+export { forceMirrorBoxEvent } from "./mirrorBoxEvent";
+export { forcePullBackEvent } from "./pullBackEvent";
+export { forceTreadmillEvent } from "./treadmillEvent";
+export { forceBlastOffEvent } from "./blastOffEvent";
+export { forcePopUpEvent } from "./popUpEvent";
+export { forceStickerPeelEvent } from "./stickerPeelEvent";
+export { forceGlissandoEvent } from "./glissandoEvent";
+export { forceVaultDoorsEvent } from "./vaultDoorsEvent";
+export { forceChampagneTowerEvent } from "./champagneTowerEvent";
+export { forcePinballRiverEvent } from "./pinballRiverEvent";
+export { forcePressureWasherEvent } from "./pressureWasherEvent";
+export { forceIrrigationEvent } from "./irrigationEvent";
+export { forceWaterspoutEvent } from "./waterspoutEvent";
+export { forceSidewinderEvent } from "./sidewinderEvent";
+export { forceOrbitSwapEvent } from "./orbitSwapEvent";
+export { forceCuckooEvent } from "./cuckooEvent";
+export { forceGyreEvent } from "./gyreEvent";
+export { forceBarHopEvent } from "./barHopEvent";
+export { forceCometPlowEvent } from "./cometPlowEvent";
+export { forceHoseReelEvent } from "./hoseReelEvent";
+export { forceGeyserRiderEvent } from "./geyserRiderEvent";
+export { forceBubbleBlowerEvent } from "./bubbleBlowerEvent";
+export { forcePoolDiveEvent } from "./poolDiveEvent";
+export { forceRubberBandEvent } from "./rubberBandEvent";
+export { forceBeamViseEvent } from "./beamViseEvent";
+export { forceLaserRakeEvent } from "./laserRakeEvent";
+export { forceLightDominoesEvent } from "./lightDominoesEvent";
+export { forcePryBarEvent } from "./pryBarEvent";
+export { forceTeslaTennisEvent } from "./teslaTennisEvent";
+export { forceTuningForkEvent } from "./tuningForkEvent";
+export { forceBoltSpiralEvent } from "./boltSpiralEvent";
+export { forceGroundCurrentEvent } from "./groundCurrentEvent";
+export { forceOverchargeEvent } from "./overchargeEvent";
+export { forceBombTornadoEvent } from "./bombTornadoEvent";
+export { forceBombBoomerangEvent } from "./bombBoomerangEvent";
+export { forceMultistageEvent } from "./multistageEvent";
+export { forceBombPileEvent } from "./bombPileEvent";
+export { forceBombGarlandEvent } from "./bombGarlandEvent";
+export { forceHomingRoundsEvent } from "./homingRoundsEvent";
+export { forceWaveCannonEvent } from "./waveCannonEvent";
+export { forceSnapbackEvent } from "./snapbackEvent";
+export { forceBulletFunnelEvent } from "./bulletFunnelEvent";
+export { forceCrisscrossEvent } from "./crisscrossEvent";
 export { forceSlashEvent } from "./slashEvent";
 export { forceJackhammerEvent } from "./jackhammerEvent";
 export { forcePummelEvent } from "./pummelEvent";

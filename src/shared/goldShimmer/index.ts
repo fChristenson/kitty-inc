@@ -23,8 +23,9 @@ export function radialFade(
 
 // strength 0..1 brightens it; the rays reach 1.3x radius and turn
 // spinPerSec radians a second. Multiplies into the caller's globalAlpha.
-// Glow and rays are each rendered once per color and stamped every frame:
-// rebuilding their gradients and ray paths per frame stuttered under bursts
+// Glow and rays are baked into one sprite per color and strength (the glow is
+// round, so it turns with the rays unchanged): one big additive stamp a frame
+// instead of two, as it covers most of the screen behind a crit image
 export function drawGoldShimmer(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -36,32 +37,57 @@ export function drawGoldShimmer(
   color: string = COLOR.coinGold,
 ): void {
   if (radius <= 0) return;
-  const { glow, rays } = getSprites(color);
-  const alpha = ctx.globalAlpha;
+  const sprite = getShimmer(color, strength);
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
-  ctx.globalAlpha = alpha * (0.35 + 0.45 * strength);
-  ctx.drawImage(glow, x - radius, y - radius, radius * 2, radius * 2);
-
   // wrapped: canvas rotates in float precision, so a Date.now()-sized angle
   // snaps to a few fixed steps and the rays look frozen
   const spin = ((now / 1000) * spinPerSec) % (Math.PI * 2);
-  const rayLength = radius * 1.3;
-  ctx.globalAlpha = alpha * (0.15 + 0.35 * strength);
+  const reach = radius * RAY_REACH;
   ctx.translate(x, y);
   ctx.rotate(spin);
-  ctx.drawImage(rays, -rayLength, -rayLength, rayLength * 2, rayLength * 2);
+  ctx.drawImage(sprite, -reach, -reach, reach * 2, reach * 2);
   ctx.rotate(-spin);
   ctx.translate(-x, -y);
-  ctx.globalAlpha = alpha;
   ctx.globalCompositeOperation = previous;
 }
 
 const SPRITE_HALF = 256;
+const RAY_REACH = 1.3;
+const STRENGTH_STEPS = 10;
 const spriteCache = new Map<
   string,
   { glow: HTMLCanvasElement; rays: HTMLCanvasElement }
 >();
+const shimmerCache = new Map<string, HTMLCanvasElement>();
+
+function getShimmer(color: string, strength: number): HTMLCanvasElement {
+  const step = Math.round(
+    Math.min(1, Math.max(0, strength)) * STRENGTH_STEPS,
+  );
+  const key = `${color}|${step}`;
+  let sprite = shimmerCache.get(key);
+  if (sprite) return sprite;
+  const s = step / STRENGTH_STEPS;
+  const { glow, rays } = getSprites(color);
+  sprite = document.createElement("canvas");
+  sprite.width = sprite.height = SPRITE_HALF * 2;
+  const spriteCtx = sprite.getContext("2d")!;
+  spriteCtx.globalCompositeOperation = "lighter";
+  spriteCtx.globalAlpha = 0.15 + 0.35 * s;
+  spriteCtx.drawImage(rays, 0, 0);
+  const glowHalf = SPRITE_HALF / RAY_REACH;
+  spriteCtx.globalAlpha = 0.35 + 0.45 * s;
+  spriteCtx.drawImage(
+    glow,
+    SPRITE_HALF - glowHalf,
+    SPRITE_HALF - glowHalf,
+    glowHalf * 2,
+    glowHalf * 2,
+  );
+  shimmerCache.set(key, sprite);
+  return sprite;
+}
 
 function getSprites(color: string): {
   glow: HTMLCanvasElement;

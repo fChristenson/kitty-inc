@@ -3,7 +3,6 @@ import { COLOR } from "../../palette";
 import {
   playSold,
   playPayout,
-  playSwoosh,
   playAutoPurchase,
 } from "../../sound";
 import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
@@ -54,22 +53,9 @@ import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
 import { createCityTransitions } from "./transitions";
-import { createCloudCat } from "./cloudCat";
-import {
-  createFloatingTextParticle,
-  updateFloatingTextParticles,
-  drawFloatingTextParticle,
-  type FloatingTextParticle,
-} from "../../shared/floatingText";
 import { loadSprite, loadImageByName } from "../../loadAssets";
 import { getCritBadgeOverlay } from "../../shared/critBadgeOverlay";
 import { createPurchaseFeedback } from "../../shared/purchaseFeedback";
-import {
-  createFloatingBadgeParticle,
-  updateFloatingBadgeParticles,
-  drawFloatingBadgeParticle,
-  type FloatingBadgeParticle,
-} from "../../shared/floatingBadges";
 import { type BigNumber, gte } from "../../shared/bigNumber";
 import {
   triggerScreenShake,
@@ -92,14 +78,6 @@ import {
 // below it (see drawStreetText) — the name itself comes from cityName.ts's
 // getCityName, keyed by which city (5-building page) is currently being viewed
 const STREET_TEXT_GAP_BELOW_INCOME = 12;
-
-// what one tick of the corner mascot's auto-buyer got through — one purchase
-// at most, `label` describing it ("+1 floor", "+1 worker", ...) or null when
-// nothing was affordable
-export interface CheapestBatch {
-  label: string | null;
-  badges: Partial<Record<CritProcKind, number>>;
-}
 
 let mapImage: HTMLImageElement | null = null;
 let catSprite: HTMLImageElement | null = null;
@@ -145,10 +123,6 @@ export interface CityMapDeps {
   isBuildingRenovating: (buildingIndex: number) => boolean;
   buyBuilding: () => boolean; // unlocks building 1 if affordable
   onStateChanged: () => void; // schedules persistence after any map-node purchase
-  // one purchase of the auto-buyer: the most expensive affordable thing in the
-  // whole company, or only in buildingIndex's building when given (a marker's
-  // long-press). label is null when nothing could be bought
-  runCheapestBatch: () => Promise<CheapestBatch>;
   // long-press on a bought marker: buys everything affordable in that building
   buyOutBuilding: (buildingIndex: number) => Promise<boolean>;
   // sets EVERY floor this building currently has (locked or not) to
@@ -197,9 +171,6 @@ export interface CityMapView {
   // corporationUpgradeMenu wiring, right after a newly-bought company becomes active)
   animateSwitchToCompany: (companyIndex: number) => void;
   showCritBadges: (counts: Partial<Record<CritProcKind, number>>) => void;
-  // switches the corner mascot's auto-buyer off if it's running — leaving the
-  // map for a building's floors hands control back to the player
-  stopAutoBuyer: () => void;
   destroy: () => void;
 }
 
@@ -315,7 +286,6 @@ export function createCityMapView(
     onCompanySelected: handleCompanySelected,
   });
   const incomeReadout = createIncomeReadout();
-  const cloudCat = createCloudCat();
   const critBadges = getCritBadgeOverlay();
   const showCritBadges = critBadges.show;
   const purchaseFeedback = createPurchaseFeedback({
@@ -383,82 +353,6 @@ export function createCityMapView(
   // same, for an affordable locked marker's bouncing price
   let hasWigglingPrice = false;
 
-  // the corner mascot's background auto-buyer. Toggled by tapping the cat; runs
-  // whether or not the map is on screen, and only stops when toggled back off
-  const AUTO_BUY_INTERVAL_MS = 100;
-  const BADGE_FLOAT_SIZE = 56;
-  const BADGE_FLOAT_RELEASE_MS = 180;
-  const badgeFloats: FloatingBadgeParticle[] = [];
-  const pendingBadgeFloats: { kind: CritProcKind; x: number; y: number }[] = [];
-  let nextBadgeReleaseAt = 0;
-  const BOUGHT_TEXT_FONT_PX = 11;
-  const BOUGHT_TEXT_RISE_PER_TICK = 1.2;
-  const BOUGHT_TEXT_SPAWN_Y_OFFSET = 40; // above the mascot, not on top of it
-  let autoBuyTimer: ReturnType<typeof setTimeout> | null = null;
-  const boughtFloats: FloatingTextParticle[] = [];
-  let lastBadgeFloatUpdate = 0;
-
-  function toggleAutoBuyer(): void {
-    if (autoBuyTimer !== null) {
-      stopAutoBuyer();
-      return;
-    }
-    cloudCat.setAwake(true, Date.now());
-    playSwoosh();
-    scheduleAutoBuy(AUTO_BUY_INTERVAL_MS);
-  }
-
-  function scheduleAutoBuy(delayMs: number): void {
-    const timer = setTimeout(async () => {
-      await runAutoBuyBatch();
-      // stopped (or stopped and restarted) while this batch ran
-      if (autoBuyTimer !== timer) return;
-      scheduleAutoBuy(AUTO_BUY_INTERVAL_MS);
-    }, delayMs);
-    autoBuyTimer = timer;
-  }
-
-  function stopAutoBuyer(): void {
-    if (autoBuyTimer === null) return;
-    clearTimeout(autoBuyTimer);
-    autoBuyTimer = null;
-    cloudCat.setAwake(false, Date.now());
-    playSwoosh();
-  }
-
-  let autoBuyRunning = false;
-  // the cloud cat's single purchase for the whole company
-  async function runAutoBuyBatch(): Promise<void> {
-    if (autoBuyRunning || critBadges.visible) return;
-    autoBuyRunning = true;
-    try {
-      const { label, badges } = await deps.runCheapestBatch();
-      if (label === null) return;
-      deps.onStateChanged();
-      playAutoPurchase();
-      const { x, y } = cloudCat.cheer(cssW, cssH, Date.now());
-      const bounds = cloudCat.bounds(cssW, cssH);
-      boughtFloats.push(
-        createFloatingTextParticle(x, y - BOUGHT_TEXT_SPAWN_Y_OFFSET, label),
-      );
-      for (const [kind, count] of Object.entries(badges)) {
-        critBadges.loadImage(kind as CritProcKind);
-        for (let index = 0; index < count; index++)
-          pendingBadgeFloats.push({
-            kind: kind as CritProcKind,
-            x: bounds.left - 10 - BADGE_FLOAT_SIZE / 2,
-            y: bounds.top + bounds.size / 2,
-          });
-      }
-      redraw();
-    } catch (error) {
-      stopAutoBuyer();
-      console.error("Automatic purchase failed", error);
-    } finally {
-      autoBuyRunning = false;
-    }
-  }
-
   // a marker's long-press buys out that building as one renovation job
   const markerHop = createPurchaseFeedback({
     sound: playAutoPurchase,
@@ -475,34 +369,11 @@ export function createCityMapView(
     const { cx, feetY } = markerCenter(cssW, cssH, markerIndex);
     markerHop(globalIndex, cx, feetY - MARKER_H / 2, MARKER_COIN_BURST_SCALE);
     try {
-      if (await deps.buyOutBuilding(globalIndex)) deps.onStateChanged();
+      await deps.buyOutBuilding(globalIndex);
     } catch (error) {
       console.error("Building buy-out failed", error);
     }
     redraw();
-  }
-
-  function drawBadgeFloats(now: number): void {
-    if (pendingBadgeFloats.length > 0 && now >= nextBadgeReleaseAt) {
-      const { kind, x, y } = pendingBadgeFloats.shift()!;
-      badgeFloats.push(
-        createFloatingBadgeParticle(x, y, critBadges.loadImage(kind)),
-      );
-      nextBadgeReleaseAt = now + BADGE_FLOAT_RELEASE_MS;
-    }
-    if (boughtFloats.length === 0 && badgeFloats.length === 0) {
-      lastBadgeFloatUpdate = now;
-      return;
-    }
-    // shared/floatingText's own "~16.67ms per tick" convention
-    const dt = Math.min(6, (now - lastBadgeFloatUpdate) / 16.67);
-    lastBadgeFloatUpdate = now;
-    updateFloatingBadgeParticles(badgeFloats, dt, 1.1);
-    for (const badge of badgeFloats)
-      drawFloatingBadgeParticle(ctx, badge, BADGE_FLOAT_SIZE);
-    updateFloatingTextParticles(boughtFloats, dt, BOUGHT_TEXT_RISE_PER_TICK);
-    for (const text of boughtFloats)
-      drawFloatingTextParticle(ctx, text, BOUGHT_TEXT_FONT_PX);
   }
 
   function resize(): void {
@@ -648,9 +519,6 @@ export function createCityMapView(
       if (affordable) hasWigglingPrice = true;
       drawLockedMarkerPrice(ctx, cx, feetY, price, affordable);
     }
-    // before the coin bursts below, so the burst its own tap spawns reads as
-    // coins flying out toward the player rather than behind it
-    cloudCat.draw(ctx, cssW, cssH, Date.now());
     // performance.now(), NOT Date.now() — drawActiveCoinBursts's own
     // lastActiveUpdateAt gate is shared across every caller of this flat-canvas
     // burst API, and every OTHER caller feeds it a performance.now()-based
@@ -670,8 +538,6 @@ export function createCityMapView(
 
     updateArrows(buildingCount);
     drawCritFlash(ctx, cssW / 2, cssH / 2, cssW, Date.now());
-    // sub-millisecond clock so the float's per-frame step doesn't jitter
-    drawBadgeFloats(performance.now());
     ctx.restore();
   }
 
@@ -702,10 +568,7 @@ export function createCityMapView(
       return;
     }
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
-    canvas.style.cursor =
-      hit !== null || cloudCat.hitTest(cssW, cssH, p.x, p.y)
-        ? "pointer"
-        : "default";
+    canvas.style.cursor = hit !== null ? "pointer" : "default";
   }
 
   // same tiered shake/sfx language as floors/floorInteractions/critCelebration.ts's
@@ -796,11 +659,6 @@ export function createCityMapView(
     const p = canvasPoint(event);
     if (p.y < incomeBottomY) {
       deps.onOpenCorporationStats();
-      return;
-    }
-    if (cloudCat.hitTest(cssW, cssH, p.x, p.y)) {
-      toggleAutoBuyer();
-      redraw();
       return;
     }
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
@@ -909,10 +767,9 @@ export function createCityMapView(
   // nothing else on this static map ever changes; idles while the view is hidden
   // (see canvasVisible above). Capped at 30 FPS
   // because each redraw repaints the whole canvas, and running that every
-  // animation frame is what made opening the map freeze the whole page. The
-  // corner mascot's idle float needs that floor to glide instead of step. A
-  // marker's unlock hop, an affordable price's wiggle, a coin burst, a crit
-  // flash or the mascot's own cheer each need real frame-rate smoothness, so the
+  // animation frame is what made opening the map freeze the whole page. A
+  // marker's unlock hop, an affordable price's wiggle, a coin burst or a crit
+  // flash each need real frame-rate smoothness, so the
   // throttle is skipped entirely for as long as one is showing.
   const REDRAW_INTERVAL_MS = 33;
   let animationFrameId: number | null = null;
@@ -925,9 +782,6 @@ export function createCityMapView(
       hasActiveMarkerJump ||
       hasWigglingPrice ||
       hasActiveCoinBursts() ||
-      badgeFloats.length > 0 ||
-      boughtFloats.length > 0 ||
-      cloudCat.isAnimating(Date.now()) ||
       isCritFlashActive(Date.now())
         ? 0
         : REDRAW_INTERVAL_MS;
@@ -948,7 +802,6 @@ export function createCityMapView(
     clearBuyAllHold();
     clearPrevHold();
     clearNextHold();
-    if (autoBuyTimer !== null) clearTimeout(autoBuyTimer);
     resizeObserver.disconnect();
     if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
     transitions.destroy();
@@ -966,7 +819,6 @@ export function createCityMapView(
     animateSwitchToCompany: (companyIndex) =>
       transitions.animateSwitchToCompany(companyIndex),
     showCritBadges,
-    stopAutoBuyer,
     destroy,
   };
 }

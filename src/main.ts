@@ -7,6 +7,7 @@ import {
   fromNumber,
   gt,
   gte,
+  isZero,
   ZERO,
   type BigNumber,
 } from "./shared/bigNumber";
@@ -20,8 +21,6 @@ import {
   LUCKY_CLOVER_CRIT_COUNT,
   LUCKY_CLOVER_CRIT_TIER,
   MYSTIC_UPGRADE_COUNT,
-  withDraftCritCounts,
-  commitCritCounts,
   type CritRollResult,
 } from "./shared/critTypes";
 import {
@@ -754,6 +753,56 @@ import {
   forceGunslingerEvent,
   forceBulletWheelEvent,
   forceBulletLadderEvent,
+  forceWhipZoomEvent,
+  forceIrisOutEvent,
+  forceScreenReelsEvent,
+  forceGoldLeafEvent,
+  forcePixelStormEvent,
+  forceGravityFlipEvent,
+  forceEchoEvent,
+  forceMirrorBoxEvent,
+  forcePullBackEvent,
+  forceTreadmillEvent,
+  forceBlastOffEvent,
+  forcePopUpEvent,
+  forceStickerPeelEvent,
+  forceGlissandoEvent,
+  forceVaultDoorsEvent,
+  forceChampagneTowerEvent,
+  forcePinballRiverEvent,
+  forcePressureWasherEvent,
+  forceIrrigationEvent,
+  forceWaterspoutEvent,
+  forceSidewinderEvent,
+  forceOrbitSwapEvent,
+  forceCuckooEvent,
+  forceGyreEvent,
+  forceBarHopEvent,
+  forceCometPlowEvent,
+  forceHoseReelEvent,
+  forceGeyserRiderEvent,
+  forceBubbleBlowerEvent,
+  forcePoolDiveEvent,
+  forceRubberBandEvent,
+  forceBeamViseEvent,
+  forceLaserRakeEvent,
+  forceLightDominoesEvent,
+  forcePryBarEvent,
+  forceTeslaTennisEvent,
+  forceTuningForkEvent,
+  forceBoltSpiralEvent,
+  forceGroundCurrentEvent,
+  forceOverchargeEvent,
+  forceBombTornadoEvent,
+  forceBombBoomerangEvent,
+  forceMultistageEvent,
+  forceBombPileEvent,
+  forceBombGarlandEvent,
+  forceHomingRoundsEvent,
+  forceWaveCannonEvent,
+  forceSnapbackEvent,
+  forceBulletFunnelEvent,
+  forceCrisscrossEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -837,7 +886,6 @@ import {
   getBuildingsCurrentIncomePerSecond,
   getDormantCompaniesIdleIncome,
   withDraftEconomy,
-  commitDraftIncome,
   addCompanyTotalIncome,
 } from "./totalIncome";
 import {
@@ -857,11 +905,7 @@ import {
 import { bindSaveLifecycle, saveCompanySnapshot } from "./shared/persistence";
 import { suppressNativeContextMenu } from "./shared/tapEvents";
 import { type BuildingDraft, type RenovationPlan } from "./shared/buildingJob";
-import {
-  isDetachedJobPending,
-  isFloorLocked,
-  runDetachedStep,
-} from "./shared/detachedJob";
+import { isDetachedJobPending, isFloorLocked } from "./shared/detachedJob";
 import { getCritBadgeOverlay } from "./shared/critBadgeOverlay";
 import { createLoadingOverlay } from "./shared/loadingOverlay";
 import {
@@ -1039,12 +1083,12 @@ import {
   loadCityMapImage,
   createCityMapView,
   createCityMapMarkup,
-  type CheapestBatch,
 } from "./background";
 import {
   createBuilding,
   configureBuildingFloorPrices,
   getBuildingMultiplier,
+  repairZeroedFloors,
   getBuildingPrice,
   loadWallMaterial,
   loadRoofImage,
@@ -1078,6 +1122,8 @@ const SWITCH_LEAD_MS = 100;
 // Sale and Overtime scroll their floor's button this far down the screen,
 // below the middle, nearer a phone user's thumb
 const BOOST_BUTTON_SCREEN_SHARE = 0.6;
+// a buy-out always ends, even if something keeps being affordable
+const BUY_ALL_MAX_PURCHASES = 20_000;
 
 async function main() {
   const app = document.querySelector<HTMLDivElement>("#app");
@@ -1206,6 +1252,22 @@ async function main() {
     );
   }
 
+  // the full save serializes every building, so a background job's saves wait
+  // until its opening hop and coin burst have played
+  let companySaveQueued = false;
+  function saveCurrentCompanyStateSoon(): void {
+    if (companySaveQueued) return;
+    companySaveQueued = true;
+    setTimeout(
+      () =>
+        runWhenIdle(() => {
+          companySaveQueued = false;
+          saveCurrentCompanyStateNow();
+        }, 1000),
+      1000,
+    );
+  }
+
   // loads every asset the game needs (floor backgrounds, ground, wall material,
   // worker/manager sprites) and makes them the active set every draw* function
   // reads from — call before ever showing a building on screen. Roof isn't part
@@ -1227,6 +1289,7 @@ async function main() {
   ): Promise<Floor[][]> {
     const restored = loadBuildings(companyIndex);
     if (restored.length > 0) {
+      restored.forEach(repairZeroedFloors);
       return restored;
     }
     const themeBackgroundCount = getBackgroundUrls().length;
@@ -2377,6 +2440,56 @@ async function main() {
       gunslinger: forceOnActive(forceGunslingerEvent),
       "bullet-wheel": forceOnActive(forceBulletWheelEvent),
       "bullet-ladder": forceOnActive(forceBulletLadderEvent),
+      "whip-zoom": forceOnActive(forceWhipZoomEvent),
+      "iris-out": forceOnActive(forceIrisOutEvent),
+      "screen-reels": forceOnActive(forceScreenReelsEvent),
+      "gold-leaf": forceOnActive(forceGoldLeafEvent),
+      "pixel-storm": forceOnActive(forcePixelStormEvent),
+      "gravity-flip": forceOnActive(forceGravityFlipEvent),
+      echo: forceOnActive(forceEchoEvent),
+      "mirror-box": forceOnActive(forceMirrorBoxEvent),
+      "pull-back": forceOnActive(forcePullBackEvent),
+      treadmill: forceOnActive(forceTreadmillEvent),
+      "blast-off": forceOnActive(forceBlastOffEvent),
+      "pop-up": forceOnActive(forcePopUpEvent),
+      "sticker-peel": forceOnActive(forceStickerPeelEvent),
+      glissando: forceOnActive(forceGlissandoEvent),
+      "vault-doors": forceOnActive(forceVaultDoorsEvent),
+      "champagne-tower": forceOnActive(forceChampagneTowerEvent),
+      "pinball-river": forceOnActive(forcePinballRiverEvent),
+      "pressure-washer": forceOnActive(forcePressureWasherEvent),
+      irrigation: forceOnActive(forceIrrigationEvent),
+      waterspout: forceOnActive(forceWaterspoutEvent),
+      sidewinder: forceOnActive(forceSidewinderEvent),
+      "orbit-swap": forceOnActive(forceOrbitSwapEvent),
+      cuckoo: forceOnActive(forceCuckooEvent),
+      gyre: forceOnActive(forceGyreEvent),
+      "bar-hop": forceOnActive(forceBarHopEvent),
+      "comet-plow": forceOnActive(forceCometPlowEvent),
+      "hose-reel": forceOnActive(forceHoseReelEvent),
+      "geyser-rider": forceOnActive(forceGeyserRiderEvent),
+      "bubble-blower": forceOnActive(forceBubbleBlowerEvent),
+      "pool-dive": forceOnActive(forcePoolDiveEvent),
+      "rubber-band": forceOnActive(forceRubberBandEvent),
+      "beam-vise": forceOnActive(forceBeamViseEvent),
+      "laser-rake": forceOnActive(forceLaserRakeEvent),
+      "light-dominoes": forceOnActive(forceLightDominoesEvent),
+      "pry-bar": forceOnActive(forcePryBarEvent),
+      "tesla-tennis": forceOnActive(forceTeslaTennisEvent),
+      "tuning-fork": forceOnActive(forceTuningForkEvent),
+      "bolt-spiral": forceOnActive(forceBoltSpiralEvent),
+      "ground-current": forceOnActive(forceGroundCurrentEvent),
+      overcharge: forceOnActive(forceOverchargeEvent),
+      "bomb-tornado": forceOnActive(forceBombTornadoEvent),
+      "bomb-boomerang": forceOnActive(forceBombBoomerangEvent),
+      multistage: forceOnActive(forceMultistageEvent),
+      "bomb-pile": forceOnActive(forceBombPileEvent),
+      "bomb-garland": forceOnActive(forceBombGarlandEvent),
+      "homing-rounds": forceOnActive(forceHomingRoundsEvent),
+      "wave-cannon": forceOnActive(forceWaveCannonEvent),
+      snapback: forceOnActive(forceSnapbackEvent),
+      "bullet-funnel": forceOnActive(forceBulletFunnelEvent),
+      crisscross: forceOnActive(forceCrisscrossEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {
@@ -2934,7 +3047,7 @@ async function main() {
         onPurchased,
         spend: (cost) => {
           if (!spendTotalIncome(cost)) return false;
-          saveCurrentCompanyStateNow();
+          saveCurrentCompanyStateSoon();
           return true;
         },
         refund: (cost) => {
@@ -2969,7 +3082,9 @@ async function main() {
           if (action === "buyAll") {
             // the prepaid budget is the draft's wallet; what's left is refunded on commit
             draft.money = add(draft.money, plan.cost);
+            let purchases = 0;
             return () =>
+              purchases++ < BUY_ALL_MAX_PURCHASES &&
               withDraftEconomy(
                 draft,
                 () =>
@@ -3069,37 +3184,6 @@ async function main() {
     return true;
   }
 
-  // the city map's cloud-cat mascot: a toggleable background auto-buyer that
-  // buys the single most expensive affordable thing in the company — the next
-  // building, a locked floor, an upgrade, a worker, office chairs, office
-  // supplies or a manager.
-  async function runCheapestBatch(): Promise<CheapestBatch> {
-    if (renovations.running || isDetachedJobPending() || !cheapestPurchase())
-      return { label: null, badges: {} };
-    // one synchronous purchase can't interleave with anything, so it runs on the
-    // live company — cloning the whole company per purchase stalled frames
-    const draft: BuildingDraft = {
-      buildings,
-      money: structuredClone(getTotalIncome()),
-      badges: {},
-    };
-    let label: string | null = null;
-    runDetachedStep(() =>
-      withDraftCritCounts(draft.badges, () =>
-        withDraftEconomy(draft, () => {
-          const purchase = cheapestPurchase(buildings);
-          if (purchase?.buy()) label = purchase.label;
-        }),
-      ),
-    );
-    if (label === null) return { label: null, badges: {} };
-    commitDraftIncome(draft.money);
-    commitCritCounts(draft.badges);
-    gameCanvas.setActiveFloors(buildings[activeBuildingIndex], true);
-    persist();
-    return { label, badges: draft.badges };
-  }
-
   // a map marker's long-press: a renovation that prepays the whole wallet, buys
   // the building's most expensive affordable item until none is left, and
   // refunds the rest on commit
@@ -3112,7 +3196,10 @@ async function main() {
       floors,
       createFixedRenovationPlan(floors, budget, 1),
       "buyAll",
-    );
+    ).then((bought) => {
+      if (bought) saveCurrentCompanyStateSoon();
+      return bought;
+    });
   }
 
   interface AutoPurchase {
@@ -3174,16 +3261,20 @@ async function main() {
       }
       for (const floor of floors) {
         if (!floor.unlocked) continue;
-        consider({
-          cost: getCritTier(floor) ? ZERO : getUpgradeCost(floor),
-          label: "+1 upgrade",
-          buy: () =>
-            performAutomatedUpgradeClick(
-              floorActionDeps(buildingIndex, targetBuildings),
-              floor,
-              floors[0] === floor,
-            ),
-        });
+        const armed = getCritTier(floor) !== null;
+        const upgradeCost = getUpgradeCost(floor);
+        // a broken $0 price would otherwise be bought forever
+        if (armed || !isZero(upgradeCost))
+          consider({
+            cost: armed ? ZERO : upgradeCost,
+            label: "+1 upgrade",
+            buy: () =>
+              performAutomatedUpgradeClick(
+                floorActionDeps(buildingIndex, targetBuildings),
+                floor,
+                floors[0] === floor,
+              ),
+          });
         if (floor.workerCount < MAX_RENDERED_WORKERS) {
           consider({
             cost: getWorkerCost(floor),
@@ -3435,8 +3526,6 @@ async function main() {
     mapOpen = false;
     canvas.hidden = false;
     cityMapEl.hidden = true;
-    // dropping into a building's floors hands buying back to the player
-    cityMapView.stopAutoBuyer();
     playSwoosh();
     // both hidden canvases' ResizeObserver callbacks fire async, too late to save
     // the very next redraw()/tick from dividing by a stale zero size
@@ -3476,7 +3565,6 @@ async function main() {
       renovations.isRunning(activeCompanyIndex, buildingIndex),
     buyBuilding,
     onStateChanged: saveCurrentCompanyStateNow,
-    runCheapestBatch,
     buyOutBuilding,
     setBuildingCritTier,
     onSelectBuilding: (index) => {

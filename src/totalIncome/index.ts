@@ -36,10 +36,6 @@ export function getTotalIncome(): BigNumber {
   return totalIncome;
 }
 
-export function commitDraftIncome(money: BigNumber): void {
-  totalIncome = money;
-}
-
 export function withDraftEconomy<T>(
   draft: { buildings: Floor[][]; money: BigNumber },
   action: () => T,
