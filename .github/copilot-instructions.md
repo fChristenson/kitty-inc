@@ -99,6 +99,7 @@ Tie a shake and a bang to every blast, on the frame it lands. Pile them up at ea
 - **Share code, not looks.** Reuse the shared plumbing (streams, wisp, freeze, spotlights) rather than copying it, but the sequence the player sees must be unique.
 - **Fast and dramatic.** The game runs on intense shakes and crits: every event hits hard and quick (about 1.5–2.5s), building to impacts with `shakeScreen`, `drawExplosion`/`drawWhiteBurst`, slams and sound. Nothing slow, gentle or drawn out.
 - **Never spin the view.** Never rotate, spin or tumble the whole screen or frozen frame: it's dizzying. Shake, slide and zoom only.
+- **Never built on text.** An event is told through motion, wisps, coins and impacts. A short callout is fine as garnish, but no event may hinge on reading words (calls and answers, counting, jokes, card names, spelled letters): there's no time to read them.
 
 ### Event drawing libs
 

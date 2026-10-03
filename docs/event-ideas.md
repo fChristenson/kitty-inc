@@ -715,13 +715,52 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Bullet Weave** (gunfire; worker perma tiers): two guns weave a lattice of waving bullets across each worker.
 - [x] **Bullet Fountain** (gunfire; levels): a gun sprays a sweeping fountain of bullets that arc up and rain onto the bars, then a last spray onto every bar at once.
 - [x] **Covering Fire** (gunfire; free hires): guns rake the screen with suppressing fire while recruits dash cover to cover to every empty spot.
-- [x] **Auction** (experiment: an auction; cash): a gavel bangs on climbing bids, "GOING ONCE!", "GOING TWICE!", "SOLD!" and a torrent of cash.
 - [x] **Checkers** (experiment: checkers; crit tiers): a checker double- and triple-jumps up the bars ("JUMP!") to "KING ME!", every jumped bar a crit tier.
 - [x] **Minesweeper** (experiment: the Minesweeper game; cash): squares flood open spitting coins, then the hidden mines blow in a chain: "CLEARED!".
-- [x] **Cheer Squad** (experiment: a cheer squad; worker perma tiers): "GIVE ME A K!" ... "KITTY!", each letter a worker up a perma tier.
 - [x] **Jack-in-the-Box** (experiment: a jack-in-the-box; a free floor): a crank winds faster, "POP!", and a jack springs up floor by floor onto the lock.
-- [x] **Fortune Teller** (experiment: a fortune teller; cash): a crystal ball's visions ("I SEE...", "RICHES!") spin out coins, then it cracks into a geyser of cash.
-- [x] **Magic 8-Ball** (experiment: a magic 8-ball; crit tiers): shaken over each bar, it answers "SIGNS POINT TO YES!" and the bar jumps a crit tier.
+- [x] **Spillway** (money; levels and cash): a river fills a pool along the top, which spills a curtain of cash down the whole screen, every bar it crashes past landing free levels.
+- [x] **Crosscurrents** (money; cash): two rivers burst in from the bottom corners and weave up, crossing again and again in splashes of coins, braiding into the total.
+- [x] **Oxbow** (money; crit tiers and cash): a meandering river loops right round each bar and cuts it off like an oxbow lake, a crit tier as the loop closes.
+- [x] **Breakers** (money; worker perma tiers and cash): great breaking waves of cash rear up off the bottom and curl over onto each worker.
+- [x] **Rivulets** (money; free hires and cash): pairs of trickles wriggle in from both screen edges and meet at each empty spot, where a worker forms in the puddle.
+- [x] **Torrent** (money; a free floor and cash): a torrent of cash zigzags up the building wall to wall and smashes into the lock.
+- [x] **Lissajous** (wisp; levels): a wisp traces a quickening Lissajous figure over the bars, free levels at every crossing.
+- [x] **Moon Hop** (wisp; crit tiers): a moon wisp whips round each bar in a tilted orbit and slingshots on to the next, each fling a crit tier.
+- [x] **Peekaboo** (wisp; free hires): wisps peek up out of each empty spot, duck, then spring up and burst into new workers.
+- [x] **Tilt-a-Whirl** (wisp; worker perma tiers): a whirling ride of three wisps on a spinning hub circles each worker, then snaps onto it.
+- [x] **Water Strider** (wisp; cash): a strider wisp darts in sudden glides that stop dead, every stop rippling glitter and flicking coins.
+- [x] **Rope Climb** (wisp; a free floor): a wisp lassos a glitter rope up to the lock and climbs it hand over hand, swinging in to smash it open.
+- [x] **Paddle Steamer** (mix; cash): a paddle wheel of wisps rolls along the bottom, every paddle over the top flinging an arc of cash, then the hub launches into the total.
+- [x] **Jet Wash** (mix; crit tiers and cash): a jet wisp buzzes low along each bar, its wash a river of cash sheeting onto it, pulling up for a crit tier.
+- [x] **Bellows** (mix; levels and cash): a wisp breathes in a ring of coins, swelling, then squeezes a jet of cash onto each bar, and the last onto all.
+- [x] **Rain Dance** (mix; free hires and cash): a wisp spins over each empty spot, raining cash until a worker sprouts from the puddle.
+- [x] **Ski Tow** (mix; worker perma tiers and cash): a tow wisp hauls a cable of cash up through every worker, each snagged up a tier, into the total.
+- [x] **Ribbon Dancer** (mix; cash): a wisp twirls a ribbon of cash in loops and figure-eights, each flourish cracking coins, then whips it into the total.
+- [x] **Laser Turnstile** (beam; levels): a cross of four beams spins round a hub among the bars, quickening, free levels with every sweep.
+- [x] **Light Bridge** (beam; free hires): beams arch out of the button into bridges, a runner racing over each to land a new worker.
+- [x] **Laser Web** (beam; crit tiers): six wisps fan into a hexagon round each bar, beams joining rim and spokes into a web that cinches on for a tier.
+- [x] **Footlights** (beam; worker perma tiers): footlight wisps along the bottom aim, then blaze crossing beams onto each worker; on the last, every light fires.
+- [x] **Fusion Beam** (beam; a free floor): eight wisps fly in and fire beams into a focus, which fires one fused beam up into the lock.
+- [x] **Pinpoint** (beam; cash): six edge emitters aim at a spot, then all fire, beams converging in a flare and a ring of coins, last onto the total.
+- [x] **Galvanize** (lightning; levels): bolts arc between the bars end to end, crackling up and down the stack, then one bolt chains through them all.
+- [x] **Spark Jump** (lightning; free hires): a spark leaps in jagged bolts from spot to spot, each strike jolting a new worker into being.
+- [x] **Static Cling** (lightning; cash): a wisp scuffs back and forth building static, snapping bolts at spots that cling with coins, then discharges into the total.
+- [x] **Capacitor** (lightning; crit tiers): two electrodes pump crackling charges into each bar, then discharge a fat bolt across it for a tier.
+- [x] **Spark Train** (lightning; worker perma tiers): a rail of lightning snaps out worker to worker, then a spark rides it, striking each up a tier.
+- [x] **Arc Bridge** (lightning; a free floor): two pylon wisps climb the screen's sides with a bolt bridging them, then slam into the lock.
+- [x] **Daisy Cutter** (explosion; levels): a huge bomb drops and blows, its shockwave rings sweeping the bars in chains of blasts.
+- [x] **Ripple Mines** (explosion; free hires): mines pop up on the empty spots; the button blows and its rippling shockwave sets each off in a cluster, a worker forming.
+- [x] **Bomb Yo-Yo** (explosion; crit tiers): a bomb on a glitter string is flung onto each bar, blowing in a cluster, and yanked back up relit.
+- [x] **Bomb Hail** (explosion; cash): lit bombs hail down at a slant in growing volleys, the last eight landing together.
+- [x] **Ground Pound** (explosion; worker perma tiers): a huge bomb leaps from worker to worker, each pound a blast with a ring of smaller ones.
+- [x] **Cherry Bomb** (explosion; cash): a pair of bombs swings on a stem, snaps off to the bottom corners, and chains of blasts race to meet in the middle.
+- [x] **Bomb Crown** (explosion; a free floor): ten bombs ring the lock like a crown, spinning, blowing in turn, then the lock goes up.
+- [x] **Bullet Comb** (gunfire; levels): a gun at the edge rakes each bar with a comb of six parallel bullets.
+- [x] **Bullet Braid** (gunfire; crit tiers): three guns fire streams that braid round each other onto each bar.
+- [x] **Bullet Cage** (gunfire; worker perma tiers): a gun circles each worker, every bullet timed to slam in at once as a ring of bars.
+- [x] **Gunslinger** (gunfire; free hires): a gun twirls round the button, flips up high and fans a shot at every empty spot.
+- [x] **Bullet Wheel** (gunfire; cash): a rolling wheel of six guns sprays volleys outward, bullets popping into coins at the edges, then fires one into the total.
+- [x] **Bullet Ladder** (gunfire; a free floor): two guns climb the sides, crossfiring a rung at every step, then shoot the lock open.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.
