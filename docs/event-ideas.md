@@ -575,6 +575,55 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Flappy Wisp** (experiment: the flappy-bird game; cash): a wisp flaps through gaps in sliding pillars of light, each pass a burst of coins.
 - [x] **Buried Treasure** (experiment: a treasure hunt; cash): a digger follows a trail to a cross of light and digs up a geyser of cash.
 - [x] **Air Hockey** (experiment: an air hockey table; cash): mallets smack a puck back and forth off the rails until it smashes into the goal.
+- [x] **Bolt of Cash** (money; crit tiers and cash): zigzag rivers of cash crack down out of the sky like lightning onto bar after bar, each jumping a crit tier.
+- [x] **Pendulum Pour** (money; levels and cash): a jet of cash swings like a pendulum back and forth across the bars, every sweep landing free levels.
+- [x] **Pop the Cork** (money; cash): the button shakes harder and harder until its cork pops and gush after gush of cash fountains out.
+- [x] **Wall Jump** (wisp; levels): a wisp wall-jumps up the screen, kicking off each bar for free levels.
+- [x] **Superball** (wisp; cash): a superball bounces round the screen gaining speed every bounce, each a burst of coins, until it bursts.
+- [x] **Spin Dash** (wisp; crit tiers): a wisp revs up spinning on the spot, then dashes into a bar for a crit tier, rebounding to rev again.
+- [x] **Cupid** (wisp; worker perma tiers): a cupid wisp looses arrows arcing high onto worker after worker.
+- [x] **Stork** (wisp; free hires): a stork flies across the top of the screen dropping a bundle onto every empty spot.
+- [x] **Paper Plane** (wisp; a free floor): a paper plane loops, stalls and dives, then spears into the locked floor.
+- [x] **Spike** (wisp; crit tiers): a ball is set high over each bar and a spiker leaps to slam it down for a crit tier.
+- [x] **Toaster** (wisp; cash): toast wisps pop up out of the button round after round, bursting into coins at the top of their flight.
+- [x] **Xylophone** (wisp; levels): a mallet plays a glissando down the bars and back, each ringing strike landing free levels.
+- [x] **Birthday Candles** (wisp; worker perma tiers): flames light on every worker, then a gust blows them out one after another.
+- [x] **Drop Tower** (wisp; levels): a rider is shot to the top and drops, braking hard on each bar for free levels.
+- [x] **Arrow Volley** (wisp; crit tiers): archers in the corner rain volley after volley of arrows along the bars.
+- [x] **Make a Wish** (mix; worker perma tiers and cash): a river of cash pours into a wishing well and wishes leap out onto the workers.
+- [x] **Blunderbuss** (mix; cash): a gun sprays cones of cash and its recoil kicks it across the screen to fire again.
+- [x] **Genie** (mix; free hires and cash): cash spirals up like smoke into a genie, who flings rivers of cash onto empty spots.
+- [x] **Solar Flare** (beam; cash): a sun throws looping arches of light across the screen, then erupts every way at once.
+- [x] **Heat Vision** (beam; worker perma tiers): a pair of eyes aims and sears twin beams onto worker after worker.
+- [x] **Print Head** (beam; free hires): a print head zips back and forth printing a column of light that becomes a new worker.
+- [x] **Aurora** (beam; crit tiers): rippling curtains of light pour down over bar after bar.
+- [x] **Thunder Rings** (lightning; cash): every strike from the sky blasts a swelling ring of lightning out across the screen.
+- [x] **Arc Weld** (lightning; crit tiers): two electrodes weld along a bar toward each other, an arc crackling between them.
+- [x] **Storm Kite** (lightning; cash): lightning strikes a kite and sparks race down its string to burst out of the button.
+- [x] **Volcanic Lightning** (lightning; levels): an ash plume billows out of the button and bolts leap from it onto the bars.
+- [x] **Sculptor** (lightning; free hires): a ring of nodes fires converging bolts that strike new workers into being.
+- [x] **Grand Finale** (explosion; cash): a chain of shells across the sky, then cluster shells, then a salvo all going off together.
+- [x] **Bomb Bouquet** (explosion; worker perma tiers): stems of bombs chain out from the button and bloom in clusters on the workers.
+- [x] **Cascade** (explosion; cash): a chain across the top drops bomblet pairs, which drop big bombs, blasts cascading down the screen.
+- [x] **Pinball Bomb** (explosion; crit tiers): a bomb banks off the walls blowing at every bounce, then bursts in a cluster on a bar.
+- [x] **Bomb Train** (explosion; free hires): a train of bombs drops a car on every empty spot, each blowing in a cluster, then the engine blows.
+- [x] **Breaching Charge** (explosion; a free floor): a ring of charges chains round the lock, a core cluster blows, then the main charge.
+- [x] **Confetti Cannon** (explosion; levels): corner cannons fire shells that burst over the bars into chains of bomblets.
+- [x] **Ammo Belt** (gunfire; levels): a belt-fed gun rakes burst after burst into the bars as its belt runs down.
+- [x] **Gauntlet** (gunfire; cash): a runner dashes between rows of guns, every near miss smacking coins out behind it.
+- [x] **Turret Tower** (gunfire; worker perma tiers): turrets stack into a tower and each fires a burst at its worker.
+- [x] **Shell Casings** (gunfire; cash): a gun sweeps a burst across the sky, its spent casings tinkling into coins.
+- [x] **Darts** (experiment: a darts match; crit tiers): darts thunk into a board of light, scores slamming up, to a "BULLSEYE!".
+- [x] **Battleship** (experiment: the Battleship game; cash): shots land "HIT!" on a grid until each hidden ship is "SUNK!".
+- [x] **Interceptors** (experiment: the Missile Command game; cash): interceptor blasts catch falling missiles, setting off chains across the sky.
+- [x] **Land Grab** (experiment: the Qix arcade game; cash): a cutter slices the screen into pieces, each claimed piece spewing coins.
+- [x] **Duck Duck Goose** (experiment: the playground game; worker perma tiers): "DUCK!" taps round the workers until "GOOSE!" and a chase.
+- [x] **Ringer** (experiment: the game of marbles; cash): a shooter knocks marbles out of a ring of light, each bursting into coins.
+- [x] **Hurdles** (experiment: a hurdles race; levels): a runner zigzags down the bars clearing a hurdle of light on each.
+- [x] **Lucky Roll** (experiment: a board game of ladders; levels): dice rolls hop a token to ladders of light that climb onto the bars.
+- [x] **Cash Register** (experiment: ringing up a sale; cash): keys punch the sale up to "KA-CHING!" and a torrent of cash gushes out.
+- [x] **Horse Race** (experiment: a day at the races; crit tiers): horses race down the bars' lanes, each crossing the line for a crit tier.
+- [x] **Dunk Tank** (experiment: the fairground dunk tank; crit tiers): pitches hit targets and dunk wisps into the bars.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.

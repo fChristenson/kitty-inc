@@ -1,9 +1,9 @@
 // odds and reward sizes for featured/catScientists.ts's crits, spread into CONFIG.crit
 export const CAT_SCIENTISTS_BALANCE = {
-  calicoChemistChance: 0.00162252705,
+  calicoChemistChance: 0.00162255794,
   calicoChemistUpgrades: 165,
-  fourEyesChance: 0.00169859717,
+  fourEyesChance: 0.00169885323,
   fourEyesGrowth: 0.198,
-  underTheMicroscopeChance: 0.00162112508,
+  underTheMicroscopeChance: 0.00162115055,
   underTheMicroscopeUpgrades: 166,
 } as const;

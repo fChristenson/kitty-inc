@@ -2791,4 +2791,20 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (_context, { actions, balance }) =>
       actions.addIncomeShare(balance.trackStarShare),
   },
+  pewterPlunge: {
+    label: "Pewter Plunge",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/pewterPlunge.webp",
+    description: "Adds 40.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.pewterPlungeShare),
+  },
+  sterlingProwl: {
+    label: "Sterling Prowl",
+    color: COLOR.disabledGray,
+    image: "crits/muscleGirls/sterlingProwl.webp",
+    description: "Adds 40.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.sterlingProwlShare),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

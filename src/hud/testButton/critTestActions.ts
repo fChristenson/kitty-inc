@@ -46,6 +46,60 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-bolt-of-cash-event" class="game__button">Bolt of Cash</button>
+          <button id="test-pendulum-pour-event" class="game__button">Pendulum Pour</button>
+          <button id="test-pop-the-cork-event" class="game__button">Pop the Cork</button>
+          <button id="test-wall-jump-event" class="game__button">Wall Jump</button>
+          <button id="test-superball-event" class="game__button">Superball</button>
+          <button id="test-spin-dash-event" class="game__button">Spin Dash</button>
+          <button id="test-cupid-event" class="game__button">Cupid</button>
+          <button id="test-stork-event" class="game__button">Stork</button>
+          <button id="test-paper-plane-event" class="game__button">Paper Plane</button>
+          <button id="test-spike-event" class="game__button">Spike</button>
+          <button id="test-toaster-event" class="game__button">Toaster</button>
+          <button id="test-xylophone-event" class="game__button">Xylophone</button>
+          <button id="test-birthday-candles-event" class="game__button">Birthday Candles</button>
+          <button id="test-drop-tower-event" class="game__button">Drop Tower</button>
+          <button id="test-arrow-volley-event" class="game__button">Arrow Volley</button>
+          <button id="test-make-a-wish-event" class="game__button">Make a Wish</button>
+          <button id="test-blunderbuss-event" class="game__button">Blunderbuss</button>
+          <button id="test-genie-event" class="game__button">Genie</button>
+          <button id="test-solar-flare-event" class="game__button">Solar Flare</button>
+          <button id="test-heat-vision-event" class="game__button">Heat Vision</button>
+          <button id="test-print-head-event" class="game__button">Print Head</button>
+          <button id="test-aurora-event" class="game__button">Aurora</button>
+          <button id="test-thunder-rings-event" class="game__button">Thunder Rings</button>
+          <button id="test-arc-weld-event" class="game__button">Arc Weld</button>
+          <button id="test-storm-kite-event" class="game__button">Storm Kite</button>
+          <button id="test-volcanic-lightning-event" class="game__button">Volcanic Lightning</button>
+          <button id="test-sculptor-event" class="game__button">Sculptor</button>
+          <button id="test-grand-finale-event" class="game__button">Grand Finale</button>
+          <button id="test-bomb-bouquet-event" class="game__button">Bomb Bouquet</button>
+          <button id="test-cascade-event" class="game__button">Cascade</button>
+          <button id="test-pinball-bomb-event" class="game__button">Pinball Bomb</button>
+          <button id="test-bomb-train-event" class="game__button">Bomb Train</button>
+          <button id="test-breaching-charge-event" class="game__button">Breaching Charge</button>
+          <button id="test-confetti-cannon-event" class="game__button">Confetti Cannon</button>
+          <button id="test-ammo-belt-event" class="game__button">Ammo Belt</button>
+          <button id="test-gauntlet-event" class="game__button">Gauntlet</button>
+          <button id="test-turret-tower-event" class="game__button">Turret Tower</button>
+          <button id="test-shell-casings-event" class="game__button">Shell Casings</button>
+          <button id="test-darts-event" class="game__button">Darts</button>
+          <button id="test-battleship-event" class="game__button">Battleship</button>
+          <button id="test-interceptors-event" class="game__button">Interceptors</button>
+          <button id="test-land-grab-event" class="game__button">Land Grab</button>
+          <button id="test-duck-duck-goose-event" class="game__button">Duck Duck Goose</button>
+          <button id="test-ringer-event" class="game__button">Ringer</button>
+          <button id="test-hurdles-event" class="game__button">Hurdles</button>
+          <button id="test-lucky-roll-event" class="game__button">Lucky Roll</button>
+          <button id="test-cash-register-event" class="game__button">Cash Register</button>
+          <button id="test-horse-race-event" class="game__button">Horse Race</button>
+          <button id="test-dunk-tank-event" class="game__button">Dunk Tank</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-bungee-event" class="game__button">Bungee</button>
           <button id="test-funnel-cake-event" class="game__button">Funnel Cake</button>
           <button id="test-chrysanthemum-event" class="game__button">Chrysanthemum</button>
@@ -94,11 +148,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-flappy-wisp-event" class="game__button">Flappy Wisp</button>
           <button id="test-buried-treasure-event" class="game__button">Buried Treasure</button>
           <button id="test-air-hockey-event" class="game__button">Air Hockey</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-delta-event" class="game__button">Delta</button>
           <button id="test-hydrant-event" class="game__button">Hydrant</button>
           <button id="test-cloverleaf-event" class="game__button">Cloverleaf</button>

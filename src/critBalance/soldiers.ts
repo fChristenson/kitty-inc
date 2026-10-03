@@ -1,9 +1,9 @@
 // odds and reward sizes for featured/soldiers.ts's crits, spread into CONFIG.crit
 export const SOLDIERS_BALANCE = {
-  goggledGruntChance: 0.00163957022,
+  goggledGruntChance: 0.00163965941,
   goggledGruntShare: 0.635,
-  greenSkullTrooperChance: 0.00187718597,
+  greenSkullTrooperChance: 0.00187777914,
   greenSkullTrooperShare: 0.865,
-  wreathedSkullHelmChance: 0.00163369848,
+  wreathedSkullHelmChance: 0.00163376898,
   wreathedSkullHelmShare: 0.64,
 } as const;
