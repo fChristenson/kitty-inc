@@ -1,6 +1,9 @@
 // the one set of crit flash presets (text + shake + its sfx), shared by the
 // floors' crit celebrations and the city map's building crits
-import { triggerScreenShake } from "../../screenShake";
+import {
+  SPECIAL_FLASH_STROKE_WIDTH,
+  triggerScreenShake,
+} from "../../screenShake";
 import {
   getExplosionDurationMs,
   getJackpotDurationMs,
@@ -75,7 +78,7 @@ export function playSpecialFlash(
     intensity: 1.8,
     label,
     color,
-    strokeWidth: 14,
+    strokeWidth: SPECIAL_FLASH_STROKE_WIDTH,
     priority: 1,
     holdMs: 600,
   });

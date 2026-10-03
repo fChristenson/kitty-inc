@@ -64,12 +64,25 @@ function requestCritIcon(name: ImageName): Promise<HTMLImageElement> {
   return promise;
 }
 
+// a special crit's flash outline width (see shared/critFlash playSpecialFlash)
+export const SPECIAL_FLASH_STROKE_WIDTH = 14;
+
 // Loading all ~1400 celebration icons up front stalled the first seconds of
 // play, so each icon warms when its proc is armed, well before it can flash;
-// getCritIcon still loads any icon on demand.
+// getCritIcon still loads any icon on demand. Its flash bitmap is baked then
+// too, at idle, instead of on the click that shows it.
 onCritProcsArmed((kinds) => {
-  for (const kind of kinds)
-    void requestCritIcon(CRIT_PROC_INFO[kind].icon).catch(() => undefined);
+  for (const kind of kinds) {
+    const { icon, label, color } = CRIT_PROC_INFO[kind];
+    void requestCritIcon(icon)
+      .then(() =>
+        runWhenIdle(
+          () => warmFlashBitmap(label, color, SPECIAL_FLASH_STROKE_WIDTH),
+          500,
+        ),
+      )
+      .catch(() => undefined);
+  }
 });
 runWhenIdle(
   () => void requestCritIcon("cashRegister").catch(() => undefined),
@@ -241,25 +254,18 @@ export function triggerScreenShake(options?: {
   if (shouldStart) {
     const iconName = CRIT_ICON_BY_LABEL[req.label]?.name;
     const ready = iconName ? requestCritIcon(iconName) : Promise.resolve(null);
-    // the label's blurred glow is costly to build; do it before the flash
-    // starts, not on its first animated frame
-    if (req.label) {
-      warmCritFlashBlooms([req.label]);
-      warmTextLayer(req.label, req.color, req.strokeWidth);
-    }
     ready
       .then(async (icon) => {
-        // decoded off the main thread again (the browser may have dropped it)
-        // and resampled to its on-screen size before the reveal's first frame
-        if (icon) {
-          await icon.decode().catch(() => undefined);
-          warmIconLayer(req.label);
-        }
+        // decoded off the main thread again (the browser may have dropped it),
+        // then baked with the label before the reveal's first frame
+        if (icon) await icon.decode().catch(() => undefined);
+        warmFlashBitmap(req.label, req.color, req.strokeWidth);
         const currentNow = Date.now();
         const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
         if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
       })
       .catch(() => {
+        warmFlashBitmap(req.label, req.color, req.strokeWidth);
         const currentNow = Date.now();
         const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
         if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
@@ -480,46 +486,93 @@ function measureLabel(ctx: CanvasRenderingContext2D, label: string): number {
   return width;
 }
 
-// The outlined gradient label, rasterized once at roughly its on-screen pixel
-// density. Re-stroking huge vector text every frame (twice while a frozen
-// background layer shows) was the main per-frame cost of a celebration.
-const textLayerCache = new Map<
-  string,
-  { canvas: HTMLCanvasElement; width: number; height: number }
->();
-const MAX_TEXT_LAYER_PX = 4096;
+// The whole flash (icon, bloom and outlined label) baked into one bitmap at
+// about its on-screen pixel density, so each frame is one stamp instead of
+// three big overlapping ones; that overdraw dropped frames on phones.
+interface FlashBitmap {
+  canvas: HTMLCanvasElement;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+const flashBitmapCache = new Map<string, FlashBitmap>();
+const FLASH_BITMAP_LIMIT = 3;
+const MAX_FLASH_BITMAP_PX = 2048;
 
-function getTextLayer(
+function getFlashBitmap(
   label: string,
   color: string,
   strokeWidth: number,
-  measuredWidth: number,
-  deviceScale: number,
-): { canvas: HTMLCanvasElement; width: number; height: number } {
-  const pad = strokeWidth + 8;
-  const width = measuredWidth + pad * 2;
-  const height = FLASH_FONT_SIZE * 1.6 + pad * 2;
-  // headroom for the grow-in overshoot and wobble; quantized so the animation
-  // reuses one bitmap instead of re-rasterizing as its scale changes
-  const resolution = Math.min(
-    Math.max(0.5, Math.ceil(deviceScale * 1.2 * 2) / 2),
-    MAX_TEXT_LAYER_PX / Math.max(width, height),
+  viewportWidth: number,
+): FlashBitmap {
+  const ctx = getScratchCtx();
+  const measuredWidth = measureLabel(ctx, label);
+  const { targetScale, textScale } = flashLayerScales(
+    ctx,
+    label,
+    viewportWidth,
   );
-  const key = `${label}|${color}|${strokeWidth}|${resolution}`;
-  const cached = touchCached(textLayerCache, key);
+  const config = CRIT_ICON_BY_LABEL[label];
+  const icon = config ? getCritIcon(config.name) : null;
+  const iconSize = icon ? fitIconSize(icon, measuredWidth * 0.85) : null;
+  // headroom for the wobble; quantized so the key stays put
+  const wanted = Math.ceil(targetScale * lastDrawScale * 1.1 * 4) / 4;
+  const fontReady = document.fonts.check(FLASH_FONT);
+  const key = `${label}|${color}|${strokeWidth}|${icon ? config!.name : ""}|${wanted}|${fontReady}`;
+  const cached = touchCached(flashBitmapCache, key);
   if (cached) return cached;
 
+  const bloom = getBloomLayer(label, measuredWidth);
+  const textY = iconSize ? iconSize.h * 0.3 : 0;
+  let halfW = (bloom.width * textScale) / 2;
+  let top = textY - (bloom.height * textScale) / 2;
+  let bottom = textY + (bloom.height * textScale) / 2;
+  const turn = ((config?.rotateDeg ?? 0) * Math.PI) / 180;
+  if (iconSize) {
+    const cos = Math.abs(Math.cos(turn));
+    const sin = Math.abs(Math.sin(turn));
+    halfW = Math.max(halfW, (iconSize.w * cos + iconSize.h * sin) / 2);
+    const halfH = (iconSize.w * sin + iconSize.h * cos) / 2;
+    top = Math.min(top, -halfH);
+    bottom = Math.max(bottom, halfH);
+  }
+  const width = halfW * 2;
+  const height = bottom - top;
+  const resolution = Math.min(
+    wanted,
+    MAX_FLASH_BITMAP_PX / Math.max(width, height),
+  );
   const canvas = document.createElement("canvas");
   canvas.width = Math.ceil(width * resolution);
   canvas.height = Math.ceil(height * resolution);
-  const ctx = canvas.getContext("2d")!;
-  ctx.scale(resolution, resolution);
-  drawCritText(ctx, label, width / 2, height / 2, color, {
+  const layerCtx = canvas.getContext("2d")!;
+  layerCtx.scale(resolution, resolution);
+  layerCtx.translate(halfW, -top);
+  if (icon && iconSize) {
+    layerCtx.imageSmoothingEnabled = true;
+    layerCtx.imageSmoothingQuality = "high";
+    layerCtx.rotate(turn);
+    layerCtx.drawImage(
+      icon,
+      -iconSize.w / 2,
+      -iconSize.h / 2,
+      iconSize.w,
+      iconSize.h,
+    );
+    layerCtx.rotate(-turn);
+  }
+  layerCtx.translate(0, textY);
+  layerCtx.scale(textScale, textScale);
+  layerCtx.drawImage(bloom.canvas, -bloom.width / 2, -bloom.height / 2);
+  drawCritText(layerCtx, label, 0, 0, color, {
     fontSize: FLASH_FONT_SIZE,
     strokeWidth,
   });
-  const entry = { canvas, width, height };
-  storeCached(textLayerCache, key, entry);
+  const entry = { canvas, x: -halfW, y: top, width, height };
+  flashBitmapCache.set(key, entry);
+  if (flashBitmapCache.size > FLASH_BITMAP_LIMIT)
+    flashBitmapCache.delete(flashBitmapCache.keys().next().value as string);
   return entry;
 }
 
@@ -537,99 +590,31 @@ function fitIconSize(
   return { w: icon.width * scale, h: icon.height * scale };
 }
 
-// the icon resampled once to about its on-screen pixel size: filtering the
-// big source up/down while it turns, every frame, dropped frames on phones
-const iconLayerCache = new Map<string, HTMLCanvasElement>();
-const ICON_LAYER_LIMIT = 3;
-const ICON_LAYER_STEP_PX = 32;
-const MAX_ICON_LAYER_PX = 2048;
-
-function getIconLayer(
-  name: ImageName,
-  icon: HTMLImageElement,
-  w: number,
-  h: number,
-  pixelScale: number,
-): HTMLCanvasElement {
-  const fit = Math.min(1, MAX_ICON_LAYER_PX / Math.max(w, h) / pixelScale);
-  const width = Math.max(
-    ICON_LAYER_STEP_PX,
-    Math.ceil((w * pixelScale * fit) / ICON_LAYER_STEP_PX) * ICON_LAYER_STEP_PX,
-  );
-  const key = `${name}|${width}`;
-  const cached = touchCached(iconLayerCache, key);
-  if (cached) return cached;
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = Math.max(1, Math.round((width * h) / w));
-  const layerCtx = canvas.getContext("2d")!;
-  layerCtx.imageSmoothingEnabled = true;
-  layerCtx.imageSmoothingQuality = "high";
-  layerCtx.drawImage(icon, 0, 0, canvas.width, canvas.height);
-  iconLayerCache.set(key, canvas);
-  if (iconLayerCache.size > ICON_LAYER_LIMIT)
-    iconLayerCache.delete(iconLayerCache.keys().next().value as string);
-  return canvas;
-}
-
-function warmIconLayer(label: string): void {
-  const config = CRIT_ICON_BY_LABEL[label];
-  const icon = config ? loadedCritIcons.get(config.name) : undefined;
-  if (!config || !icon || lastViewportWidth <= 0) return;
-  const ctx = getScratchCtx();
-  const { targetScale } = flashLayerScales(
-    ctx,
-    label,
-    lastViewportWidth,
-    lastDrawScale,
-  );
-  const { w, h } = fitIconSize(icon, measureLabel(ctx, label) * 0.85);
-  getIconLayer(config.name, icon, w, h, targetScale * lastDrawScale);
-}
-
 // full size covers 80% of the viewport's width
 function flashLayerScales(
   ctx: CanvasRenderingContext2D,
   label: string,
   viewportWidth: number,
-  drawScale: number,
-): { targetScale: number; textScale: number; deviceScale: number } {
+): { targetScale: number; textScale: number } {
   const measuredWidth = measureLabel(ctx, label);
   const targetScale = (viewportWidth * 0.8) / measuredWidth;
   const textScale =
     label === "Skip" ? measuredWidth / measureLabel(ctx, "Heavenly") : 1;
-  return {
-    targetScale,
-    textScale,
-    deviceScale: drawScale * targetScale * textScale,
-  };
+  return { targetScale, textScale };
 }
 
-// the last frame's draw scale, so a new label's text bitmap can be built
-// before its flash starts instead of stalling the reveal's first frame
+// the last frame's draw scale, so a new label's bitmap can be built before
+// its flash starts instead of stalling the reveal's first frame
 let lastDrawScale = 1;
 let lastViewportWidth = 0;
 
-function warmTextLayer(
+function warmFlashBitmap(
   label: string,
   color: string,
   strokeWidth: number,
 ): void {
-  if (lastViewportWidth <= 0) return;
-  const ctx = getScratchCtx();
-  const { deviceScale } = flashLayerScales(
-    ctx,
-    label,
-    lastViewportWidth,
-    lastDrawScale,
-  );
-  getTextLayer(
-    label,
-    color,
-    strokeWidth,
-    measureLabel(ctx, label),
-    deviceScale,
-  );
+  if (label && lastViewportWidth > 0)
+    getFlashBitmap(label, color, strokeWidth, lastViewportWidth);
 }
 
 export function drawCritFlash(
@@ -655,6 +640,7 @@ export function drawCritFlash(
       1,
       wobble.scale,
       wobble.rotation,
+      1,
     );
   }
   if (flashStartedAt === null || flashEndsAt === null) {
@@ -680,6 +666,7 @@ export function drawCritFlash(
   let growthScale = wobble.scale;
   let rotation = wobble.rotation;
   let alpha = 1;
+  let raysScale = 1;
   if (elapsed >= GROWTH_DURATION_MS && elapsed < holdEndsAt) {
     // sticks at full size/opacity (optionally strobing) — the phase a "sticky"
     // tier (ultra) uses to stay noticeable well past the initial pop-in. Every
@@ -700,6 +687,7 @@ export function drawCritFlash(
   if (elapsed < ENTRY_LAND_MS) {
     const entry = entryPose(elapsed / ENTRY_LAND_MS);
     growthScale *= entry.scale;
+    raysScale = entry.scale;
     rotation += entry.rotation;
     // the blink keeps its own beat under the reveal (x125's tones follow it)
     alpha *= entry.alpha;
@@ -716,14 +704,12 @@ export function drawCritFlash(
     alpha,
     growthScale,
     rotation,
+    raysScale,
   );
 }
 
-// draws one flash "layer" — icon + bloom + glossy gradient text + outline —
-// at a given alpha/scale/rotation. Shared by drawCritFlash's own animated
-// foreground flash AND its static, frozen background layer (see
-// freezeCritFlashAsBackground) so neither has to duplicate this whole
-// per-proc icon lookup + bloom + text-drawing block
+// one flash layer, its rays behind its baked bitmap, at a given alpha, scale
+// and rotation: the animated foreground and the frozen background share it
 function drawFlashLayer(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -735,95 +721,34 @@ function drawFlashLayer(
   alpha: number,
   growthScale: number,
   rotation: number,
+  raysScale: number,
 ): void {
   // an empty label is a shake with no text at all
   if (!label) return;
-  const measuredWidth = measureLabel(ctx, label);
-  const { targetScale, textScale, deviceScale } = flashLayerScales(
-    ctx,
-    label,
-    viewportWidth,
-    lastDrawScale,
-  );
-  const scale = growthScale * targetScale;
-
+  const scratch = getScratchCtx();
+  const { targetScale } = flashLayerScales(scratch, label, viewportWidth);
+  const bitmap = getFlashBitmap(label, color, strokeWidth, viewportWidth);
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.translate(centerX, centerY);
-  const critIconConfig = CRIT_ICON_BY_LABEL[label];
-  const critIcon = critIconConfig ? getCritIcon(critIconConfig.name) : null;
-  const iconSize = critIcon
-    ? fitIconSize(critIcon, measuredWidth * 0.85)
-    : null;
-  if (iconSize) {
-    // outside the text's wobble so the rays turn steadily; only the grow-in
-    // (never its overshoot or wobble) sizes it
+  const config = CRIT_ICON_BY_LABEL[label];
+  const icon = config ? getCritIcon(config.name) : null;
+  if (icon) {
+    const { w, h } = fitIconSize(icon, measureLabel(scratch, label) * 0.85);
+    // outside the wobble so the rays turn steadily; only the reveal sizes them
     drawGoldShimmer(
       ctx,
       0,
       0,
-      Math.max(iconSize.w, iconSize.h) *
-        0.75 *
-        targetScale *
-        Math.min(1, growthScale),
+      Math.max(w, h) * 0.75 * targetScale * raysScale,
       1,
       CRIT_SHIMMER_SPIN,
       performance.now(),
     );
   }
   ctx.rotate(rotation);
+  const scale = growthScale * targetScale;
   ctx.scale(scale, scale);
-  // per-crit backdrop icon, drawn behind everything else — same
-  // translate/scale/alpha as the text itself (so it pops in/fades together
-  // with it). A couple of icons (see CRIT_ICON_BY_LABEL's rotateDeg) also
-  // spin an extra fixed amount of their own on top of the text's animated
-  // entrance rotation, scoped to their own save/restore so that extra spin
-  // doesn't also rotate the bloom/text drawn after it.
-  if (critIcon && iconSize && critIconConfig) {
-    const { w: iconW, h: iconH } = iconSize;
-    const layer = getIconLayer(
-      critIconConfig.name,
-      critIcon,
-      iconW,
-      iconH,
-      targetScale * lastDrawScale,
-    );
-    if (critIconConfig.rotateDeg) {
-      ctx.save();
-      ctx.rotate((critIconConfig.rotateDeg * Math.PI) / 180);
-      ctx.drawImage(layer, -iconW / 2, -iconH / 2, iconW, iconH);
-      ctx.restore();
-    } else {
-      ctx.drawImage(layer, -iconW / 2, -iconH / 2, iconW, iconH);
-    }
-  }
-  // bloom: a soft white glow behind the crisp text below. shadowBlur is
-  // expensive at this text's huge on-screen scale (it's a full offscreen
-  // blur convolution) — recomputing it via fillText every single animation
-  // frame is what caused visible frame drops on mobile during crit
-  // celebrations. getBloomLayer below renders this exact glow ONCE per
-  // distinct label (cached), so every frame after the first is just a plain
-  // drawImage of that cached bitmap instead of a fresh blur
-  ctx.save();
-  // centered 20% up from the image's bottom edge
-  if (iconSize) ctx.translate(0, iconSize.h * 0.3);
-  ctx.scale(textScale, textScale);
-  const bloom = getBloomLayer(label, measuredWidth);
-  ctx.drawImage(bloom.canvas, -bloom.width / 2, -bloom.height / 2);
-  const text = getTextLayer(
-    label,
-    color,
-    strokeWidth,
-    measuredWidth,
-    deviceScale,
-  );
-  ctx.drawImage(
-    text.canvas,
-    -text.width / 2,
-    -text.height / 2,
-    text.width,
-    text.height,
-  );
-  ctx.restore();
+  ctx.drawImage(bitmap.canvas, bitmap.x, bitmap.y, bitmap.width, bitmap.height);
   ctx.restore();
 }

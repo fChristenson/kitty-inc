@@ -46,6 +46,31 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-chain-fountain-event" class="game__button">Chain Fountain</button>
+          <button id="test-smoke-rings-event" class="game__button">Smoke Rings</button>
+          <button id="test-water-salute-event" class="game__button">Water Salute</button>
+          <button id="test-double-pendulum-event" class="game__button">Double Pendulum</button>
+          <button id="test-trapeze-event" class="game__button">Trapeze</button>
+          <button id="test-diabolo-event" class="game__button">Diabolo</button>
+          <button id="test-zorb-event" class="game__button">Zorb</button>
+          <button id="test-hoop-dive-event" class="game__button">Hoop Dive</button>
+          <button id="test-spin-art-event" class="game__button">Spin Art</button>
+          <button id="test-paper-cutter-event" class="game__button">Paper Cutter</button>
+          <button id="test-flippers-event" class="game__button">Flippers</button>
+          <button id="test-drawbridge-event" class="game__button">Drawbridge</button>
+          <button id="test-flail-event" class="game__button">Flail</button>
+          <button id="test-vine-swing-event" class="game__button">Vine Swing</button>
+          <button id="test-bomb-snowball-event" class="game__button">Bomb Snowball</button>
+          <button id="test-gerb-event" class="game__button">Gerb</button>
+          <button id="test-recoil-event" class="game__button">Recoil</button>
+          <button id="test-tumble-fire-event" class="game__button">Tumble Fire</button>
+          <button id="test-roll-up-event" class="game__button">Roll Up</button>
+          <button id="test-shredder-event" class="game__button">Shredder</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-whip-zoom-event" class="game__button">Whip Zoom</button>
           <button id="test-iris-out-event" class="game__button">Iris Out</button>
           <button id="test-screen-reels-event" class="game__button">Screen Reels</button>
@@ -96,11 +121,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-snapback-event" class="game__button">Snapback</button>
           <button id="test-bullet-funnel-event" class="game__button">Bullet Funnel</button>
           <button id="test-crisscross-event" class="game__button">Crisscross</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-spillway-event" class="game__button">Spillway</button>
           <button id="test-crosscurrents-event" class="game__button">Crosscurrents</button>
           <button id="test-oxbow-event" class="game__button">Oxbow</button>

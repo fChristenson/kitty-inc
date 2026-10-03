@@ -742,6 +742,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // so the actual bottom edge is captured for the HUD tap-zone hit-test below
     // instead of guessing a fixed height
     if (!skipHud) hudBottomY = drawHud(ctx, SLOT_W, getTotalIncome());
+    // the flash holds still while the world rattles: its huge rays judder otherwise
+    ctx.translate(-shake.x / scale, -shake.y / scale);
     drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
     ctx.restore();
   }

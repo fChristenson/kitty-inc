@@ -6820,6 +6820,175 @@ export const CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
+  // batch 32
+  // money, cash: src/floors/chainFountainEvent: a rope of cash leaps out of a heap in rising arches
+  chainFountainEvent: {
+    chance: 0.01,
+    archesMs: [420, 240] as [number, number], // between arches, quickening
+    travelMs: [560, 380] as [number, number], // each arch's pour
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // money, levels and cash: src/floors/smokeRingsEvent: rolling rings of cash sail up through the bars
+  smokeRingsEvent: {
+    chance: 0.01,
+    puffsMs: [380, 220] as [number, number], // between puffs, quickening
+    riseMs: 750,
+    levelShare: 0.02, // per ring passing a bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // money, crit tiers and cash: src/floors/waterSaluteEvent: twin jets arch over each bar and crash down
+  waterSaluteEvent: {
+    chance: 0.01,
+    salutesMs: [460, 280] as [number, number], // between salutes, quickening
+    travelMs: [520, 380] as [number, number], // each jet's flight
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp, worker perma tiers: src/floors/doublePendulumEvent: a chaotic double pendulum whips the workers
+  doublePendulumEvent: {
+    chance: 0.01,
+    flailMs: 1800,
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, free hires: src/floors/trapezeEvent: flyers somersault between trapezes onto spots
+  trapezeEvent: {
+    chance: 0.01,
+    periodMs: 440, // each trapeze's swing
+    flingMs: 340,
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, levels: src/floors/diaboloEvent: a diabolo is whipped, flung up and smashed onto each bar
+  diaboloEvent: {
+    chance: 0.01,
+    whipsMs: [380, 220] as [number, number], // each whip, quickening
+    upMs: 200,
+    downMs: 160,
+    levelShare: 0.04,
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, cash: src/floors/zorbEvent: a ball of cash bounds round the screen with a wisp inside
+  zorbEvent: {
+    chance: 0.01,
+    gatherMs: 260,
+    bounceMs: 1400,
+    flightMs: 380, // up into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix, crit tiers and cash: src/floors/hoopDiveEvent: a wisp dives through hoops of cash onto the bars
+  hoopDiveEvent: {
+    chance: 0.01,
+    legsMs: [520, 320] as [number, number], // each climb and dive, quickening
+    formMs: 260, // a hoop springing out of the button
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // mix, worker perma tiers and cash: src/floors/spinArtEvent: a whirl flings streaks of cash onto the workers
+  spinArtEvent: {
+    chance: 0.01,
+    feedMs: 400, // the river reaching the whirl
+    flingsMs: [300, 160] as [number, number], // between flings, quickening
+    flightMs: 320,
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // beam, levels: src/floors/paperCutterEvent: a blade of light chops down onto each bar
+  paperCutterEvent: {
+    chance: 0.01,
+    cutsMs: [480, 280] as [number, number], // each lift and chop, quickening
+    levelShare: 0.04,
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // beam, cash: src/floors/flippersEvent: beam flippers rally a wisp ball up the screen
+  flippersEvent: {
+    chance: 0.01,
+    dropMs: 320,
+    shotsMs: [400, 220] as [number, number], // each shot up and back, quickening
+    finalMs: 380,
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, a free floor: src/floors/drawbridgeEvent: two spans of light clank down onto the lock
+  drawbridgeEvent: {
+    chance: 0.01,
+    clanksMs: [320, 180] as [number, number], // between clanks, quickening
+    dropMs: 220,
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, crit tiers: src/floors/flailEvent: a ball on a lightning chain whirls and smashes each bar
+  flailEvent: {
+    chance: 0.01,
+    whirlsMs: [640, 380] as [number, number], // each whirl, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, cash: src/floors/vineSwingEvent: a wisp swings up the screen on lightning vines
+  vineSwingEvent: {
+    chance: 0.01,
+    swingsMs: [440, 280] as [number, number], // each swing, quickening
+    leapMs: 120,
+    finalMs: 380,
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // explosion, free hires: src/floors/bombSnowballEvent: a snowball of bombs blows them onto the spots
+  bombSnowballEvent: {
+    chance: 0.01,
+    rollMs: 1000,
+    shudderMs: 260,
+    flyMs: 320,
+    staggerMs: 90, // between landings
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, crit tiers: src/floors/gerbEvent: a bomb fountain on each bar spurts bomblets, then blows
+  gerbEvent: {
+    chance: 0.01,
+    dropMs: 160,
+    spurtsMs: [90, 60] as [number, number], // between spurts, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, cash: src/floors/recoilEvent: a gun is hurled round the screen by its own recoil
+  recoilEvent: {
+    chance: 0.01,
+    shotsMs: [300, 130] as [number, number], // between shots, quickening
+    finalMs: 260, // the last slug of cash pouring out
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, levels: src/floors/tumbleFireEvent: a tumbling gun fires at every bar it swings past
+  tumbleFireEvent: {
+    chance: 0.01,
+    fallMs: 1600,
+    levelShare: 0.02, // per burst
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/rollUpEvent: the screen rolls up like a blind
+  rollUpEvent: {
+    chance: 0.01,
+    rollMs: 900,
+    hangMs: 300,
+    snapMs: 200,
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/shredderEvent: the screen is fed through a shredder
+  shredderEvent: {
+    chance: 0.01,
+    jerksMs: [300, 160] as [number, number], // between jerks, quickening
+    spitMs: 220,
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,

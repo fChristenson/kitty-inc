@@ -533,6 +533,8 @@ export function createCityMapView(
     drawCityPageIndicator(buildingCount);
 
     updateArrows(buildingCount);
+    // the flash holds still while the map rattles
+    ctx.translate(-shake.x, -shake.y);
     drawCritFlash(ctx, cssW / 2, cssH / 2, cssW, Date.now());
     ctx.restore();
   }
