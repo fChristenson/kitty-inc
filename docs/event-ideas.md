@@ -527,6 +527,54 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Safecracker** (experiment: a safe's dial; a free floor): a pointer spins a dial of ticks round the lock to three numbers and the lock pops.
 - [x] **Gumball Machine** (experiment: a gumball machine; free hires): a churning globe of gumball wisps drops one per crank, bouncing onto empty spots.
 - [x] **Ninja** (experiment: a fruit-slicing game; cash): tossed wisps are slashed in two at the top of their throws, bursting into coins.
+- [x] **Bungee** (money; crit tiers and cash): a thick rope of cash plunges from the top onto a bar, recoils, and plunges onto the next, each landing a crit tier.
+- [x] **Funnel Cake** (money; cash): a river of cash drizzles back and forth across the screen in tight loopy curls, row after row.
+- [x] **Chrysanthemum** (money; free hires and cash): a river shoots up and bursts into drooping streamers of cash that curl down onto every empty spot.
+- [x] **Crossroads** (money; cash): four rivers rush in head-on from each side of the screen, collide in the middle and erupt in a geyser into the total.
+- [x] **Waterslide** (money; levels and cash): a river races down a winding slide, whipping round a loop-the-loop at every bar.
+- [x] **Banner** (money; cash): rivers of cash unfurl across the screen like waving banners, one under the other, the last cracking like a whip.
+- [x] **Haunt** (wisp; worker perma tiers): a ghost wisp swoops straight through each worker, in one side and out the other, looping back for the next.
+- [x] **Maple Seeds** (wisp; cash): seed wisps flung high come twirling down in spirals all over the screen, each landing in a burst of coins.
+- [x] **Donuts** (wisp; levels): a wisp screeches onto each bar and spins tight donuts round it like a stunt car.
+- [x] **Hamster Wheel** (wisp; cash): a runner spins a wheel of wisps ever faster, flinging coins off the top, until the wheel bursts into the total.
+- [x] **Lunar Lander** (wisp; a free floor): a lander arcs over the building and descends onto the locked floor in thruster puffs, touching down to burst it open.
+- [x] **Dowsing** (wisp; free hires): a dowsing wisp swings back and forth hunting, shivers over an empty spot and plunges onto it as a new worker forms.
+- [x] **Matador** (wisp; crit tiers): a bull wisp charges a matador on each bar, who whips aside so the bull smashes into the bar.
+- [x] **Flash Flood** (mix; cash): a wisp flees across the screen with a wall of cash flooding behind it that swallows it at the total.
+- [x] **Dolphin** (mix; levels and cash): a dolphin wisp rides a river of cash along the bottom and leaps up to nose each bar.
+- [x] **Puffer** (mix; cash): a puffer wisp gulps rivers of cash from every edge, swelling, then puffs out spikes of cash every way.
+- [x] **Hockey Stop** (mix; free hires and cash): a skater wisp glides spot to spot and digs in hockey stops, spraying fans of cash as workers form.
+- [x] **Twirl** (mix; crit tiers and cash): a wisp twirls over a bar flaring a skirt of cash, then stamps down for a crit tier.
+- [x] **Whale** (mix; worker perma tiers and cash): a whale cruises a river of cash along the bottom, blowing spouts up onto each worker.
+- [x] **Light Painting** (beam; cash): a wisp paints a looping figure in lasting beams of light, which flares and bursts into coins all along it.
+- [x] **Saber Throw** (beam; crit tiers): a spinning blade of light is hurled in a curving arc through bar after bar.
+- [x] **Laser Maze** (beam; a free floor): a maze of beam walls snaps in ahead of a wisp threading right-angle turns up to the locked floor.
+- [x] **Tape Measure** (beam; levels): a beam tape pulls out along each bar, ticking at every mark, then snaps back.
+- [x] **Pulsar** (beam; cash): a pulsar spins twin opposite beams ever faster, every half turn throwing coins out at the edges.
+- [x] **Short Circuit** (lightning; levels): a bolt arcs from bar to bar down the stack and back up, ever faster, then every gap arcs at once.
+- [x] **Conductor** (lightning; crit tiers): a conductor wisp beats time with its baton, and every fourth beat a bolt strikes a bar.
+- [x] **Double Strike** (lightning; worker perma tiers): a thin leader marks each worker, then lightning strikes twice in the same place.
+- [x] **Lightning Fence** (lightning; a free floor): posts plant in a zigzag up to the locked floor and current races post to post into the lock.
+- [x] **Heat Lightning** (lightning; free hires): sheet lightning flickers across the sky, each big flash dropping a bolt onto an empty spot.
+- [x] **Powder Kegs** (explosion; levels): rows of kegs chain-blast along each bar, the last keg on a row bursting into a cluster that sets off the next row.
+- [x] **Bomb Fountain** (explosion; cash): a fountain of bombs rains down in a rolling chain of blasts, every third a cluster, the last a ring round one huge blast.
+- [x] **Frag Out** (explosion; worker perma tiers): grenades blow on each worker, their fragments popping in a crackling chain.
+- [x] **Fault Line** (explosion; crit tiers): charges chain along a jagged fault to each bar, where a ring of charges erupts at once round a big blast.
+- [x] **Willow Shells** (explosion; free hires): shells burst high into clusters of bomblets that droop down in chains onto empty spots.
+- [x] **Swarm Strike** (explosion; a free floor): a swarm of bombs circles the locked floor and dives in one by one, the last three together.
+- [x] **Concentric** (explosion; cash): a centre blast sets rings of bombs off in chains, ring after ring, the outer ring blowing all at once.
+- [x] **Graze** (gunfire; crit tiers): a tiny dodger threads a boss's bullet spiral, grazing past rounds, diving onto bar after bar.
+- [x] **Hotfoot** (gunfire; worker perma tiers): a gunslinger stitches rounds along the floor up to each worker's feet.
+- [x] **Dogfight** (gunfire; cash): two fighters loop the screen, the chaser's misses popping into coins, until it downs the leader.
+- [x] **Bullet Rose** (gunfire; cash): rings of bullets fly at varied speeds, opening into the petals of a rose.
+- [x] **Armor Piercer** (gunfire; levels): a sniper's heavy rounds punch down through the whole stack of bars in slanting lines.
+- [x] **Spotter** (gunfire; free hires): a spotter paints each empty spot with an aim line and a sniper's round lands as a new worker.
+- [x] **Peg Solitaire** (experiment: the peg board game; cash): pegs hop over each other into holes, every jumped peg bursting into coins.
+- [x] **Marble Drop** (experiment: the marbles-on-sticks game; free hires): rods yanked from a nest drop marbles bouncing onto empty spots.
+- [x] **Statues** (experiment: red light, green light; worker perma tiers): runners sprint on "GO!" and freeze on "STOP!" until they tag their workers.
+- [x] **Flappy Wisp** (experiment: the flappy-bird game; cash): a wisp flaps through gaps in sliding pillars of light, each pass a burst of coins.
+- [x] **Buried Treasure** (experiment: a treasure hunt; cash): a digger follows a trail to a cross of light and digs up a geyser of cash.
+- [x] **Air Hockey** (experiment: an air hockey table; cash): mallets smack a puck back and forth off the rails until it smashes into the goal.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.
