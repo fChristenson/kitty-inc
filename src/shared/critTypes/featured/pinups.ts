@@ -234,4 +234,76 @@ export const PINUPS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.growLevels(context.floors, balance.velvetAllowanceGrowth),
   },
+  bikiniLine: {
+    label: "Bikini Line",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pinups/bikiniLine.webp",
+    description: "Adds 45.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.bikiniLineShare),
+  },
+  garterGirls: {
+    label: "Garter Girls",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pinups/garterGirls.webp",
+    description: "Adds 45.7% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.garterGirlsShare),
+  },
+  goGoBoots: {
+    label: "Go Go Boots",
+    color: COLOR.gold,
+    image: "crits/pinups/goGoBoots.webp",
+    description: "Adds 45.8% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.goGoBootsShare),
+  },
+  heelClickers: {
+    label: "Heel Clickers",
+    color: COLOR.summerSaleOrange,
+    image: "crits/pinups/heelClickers.webp",
+    description: "Adds 45.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.heelClickersShare),
+  },
+  hipPop: {
+    label: "Hip Pop",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pinups/hipPop.webp",
+    description: "Adds 46% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.hipPopShare),
+  },
+  kneelAndPeek: {
+    label: "Kneel And Peek",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pinups/kneelAndPeek.webp",
+    description: "Adds 46.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.kneelAndPeekShare),
+  },
+  lavenderLegs: {
+    label: "Lavender Legs",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/pinups/lavenderLegs.webp",
+    description: "Adds 46.2% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.lavenderLegsShare),
+  },
+  neonLocks: {
+    label: "Neon Locks",
+    color: COLOR.amberMuted,
+    image: "crits/pinups/neonLocks.webp",
+    description: "Adds 46.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.neonLocksShare),
+  },
+  peekabooPair: {
+    label: "Peekaboo Pair",
+    color: COLOR.summerSaleOrange,
+    image: "crits/pinups/peekabooPair.webp",
+    description: "Adds 46.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.peekabooPairShare),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

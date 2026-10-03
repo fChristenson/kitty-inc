@@ -50,4 +50,20 @@ export const GIRL_POWER_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.repeatCrit(context, "up", balance.leopardLineupContinueChance),
   },
+  bleacherCheer: {
+    label: "Bleacher Cheer",
+    color: COLOR.amberMuted,
+    image: "crits/girlPower/bleacherCheer.webp",
+    description: "Adds 41.8% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.bleacherCheerShare),
+  },
+  carpoolCool: {
+    label: "Carpool Cool",
+    color: COLOR.coffeeRunTeal,
+    image: "crits/girlPower/carpoolCool.webp",
+    description: "Adds 41.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.carpoolCoolShare),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

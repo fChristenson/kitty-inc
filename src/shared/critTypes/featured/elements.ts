@@ -1147,4 +1147,12 @@ export const ELEMENTS_CRITS = {
     reward: (_context, { actions, balance }) =>
       actions.addIncomeSeconds(balance.nucleusDividendSeconds),
   },
+  quicksilverDrop: {
+    label: "Quicksilver Drop",
+    color: COLOR.overflowBlue,
+    image: "crits/elements/quicksilverDrop.webp",
+    description: "Adds 41.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.quicksilverDropShare),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

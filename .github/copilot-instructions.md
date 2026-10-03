@@ -17,12 +17,12 @@ Everything in progress lives in the gitignored `tmp/`: raws, custom cut-out scri
 1. **Intake.** Raws (jfif/jpg/jpeg/webp/png) arrive in the project root or `tmp/`.
    `node scripts/crit-intake.mjs` puts them all on one labelled sheet, `tmp/_sheets/intake.png`. View only that sheet.
 2. **Name.** Fill `category` and `name` for every entry in `tmp/_intake.json` in one edit. Reuse an existing category (`public/crits/<category>/`) or add a new camelCase one. Then run `node scripts/crit-intake.mjs --move`, which moves each raw to `tmp/<category>/<kind>.<ext>`.
-3. **Scan.** `node scripts/new-crits.mjs --scan` builds `tmp/_new-crits.json`, taking each label from its file name. Fix any "already used" name by renaming the raw, and delete byte-identical `skip` duplicates.
+3. **Scan.** `node scripts/new-crits.mjs --scan` builds `tmp/_new-crits.json`, taking each label from its file name. Fix any "already used" name by renaming the raw. Byte-identical `skip` duplicates: tell the user and leave them; never delete a raw unless the user says so.
 4. **Preview.** `node scripts/new-crits.mjs` plans each reward and puts every cut-out, on magenta, onto one sheet: `tmp/_sheets/processed.png`. Re-check each name against its art (the image, not the effect, drives the name). If one doesn't fit, rename its raw in `tmp/<category>/` and re-run `--scan`.
 5. **Fix poor cuts.** Look for white patches left inside the art (gaps between limbs, faces or arms), light art that was erased (white hair, clothes, chrome highlights, art cut off at the frame edge), and stray specks.
    - Run `node scripts/new-crits.mjs --custom <kind> ...`. This creates `tmp/<category>/process-<kind>.mjs` from the shared cut-out.
    - Tweak that script, re-run the preview, and repeat until the sheet is clean.
-6. **Apply.** `node scripts/new-crits.mjs --apply` writes each icon, sticker, silhouette, featured entry and balance line. Any icon whose cut came out below about 640×640 pixel area is then upscaled with Real-ESRGAN (a local AI upscaler, anime model, fetched into `tmp/_esrgan/` on first use). It then **deletes the raw and its script**, so fix every cut before this step.
+6. **Apply.** `node scripts/new-crits.mjs --apply` writes each icon, sticker, silhouette, featured entry and balance line. Any icon whose cut came out below about 640×640 pixel area is then upscaled with Real-ESRGAN (a local AI upscaler, anime model, fetched into `tmp/_esrgan/` on first use). It then **moves the raw and its script into `tmp/crits/<category>/`** (named after the crit) for later re-cuts. **Never delete an original raw**, by script or by hand.
 7. **Verify.** Run `npm run build`, then check a few new crits in the game.
 
 ### Upscaling shipped icons

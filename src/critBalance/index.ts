@@ -76,6 +76,14 @@ import { BEDTIME_BALANCE } from "./bedtime";
 import { SPACE_KNIGHTS_BALANCE } from "./spaceKnights";
 import { SILVER_DUOS_BALANCE } from "./silverDuos";
 import { SOLDIERS_BALANCE } from "./soldiers";
+import { ANCIENT_ROME_BALANCE } from "./ancientRome";
+import { DINER_BALANCE } from "./diner";
+import { FIREFIGHTERS_BALANCE } from "./firefighters";
+import { HOT_TUBS_BALANCE } from "./hotTubs";
+import { MEDICS_BALANCE } from "./medics";
+import { RED_CARPET_BALANCE } from "./redCarpet";
+import { TRAVEL_BALANCE } from "./travel";
+import { WILD_WEST_BALANCE } from "./wildWest";
 
 export const FEATURED_CRIT_BALANCE = {
   ...CYBERPUNK_BALANCE,
@@ -154,4 +162,12 @@ export const FEATURED_CRIT_BALANCE = {
   ...SPACE_KNIGHTS_BALANCE,
   ...SILVER_DUOS_BALANCE,
   ...SOLDIERS_BALANCE,
+  ...ANCIENT_ROME_BALANCE,
+  ...DINER_BALANCE,
+  ...FIREFIGHTERS_BALANCE,
+  ...HOT_TUBS_BALANCE,
+  ...MEDICS_BALANCE,
+  ...RED_CARPET_BALANCE,
+  ...TRAVEL_BALANCE,
+  ...WILD_WEST_BALANCE,
 } as const;

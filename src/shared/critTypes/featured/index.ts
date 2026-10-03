@@ -75,6 +75,14 @@ import { BEDTIME_CRITS } from "./bedtime";
 import { SPACE_KNIGHTS_CRITS } from "./spaceKnights";
 import { SILVER_DUOS_CRITS } from "./silverDuos";
 import { SOLDIERS_CRITS } from "./soldiers";
+import { ANCIENT_ROME_CRITS } from "./ancientRome";
+import { DINER_CRITS } from "./diner";
+import { FIREFIGHTERS_CRITS } from "./firefighters";
+import { HOT_TUBS_CRITS } from "./hotTubs";
+import { MEDICS_CRITS } from "./medics";
+import { RED_CARPET_CRITS } from "./redCarpet";
+import { TRAVEL_CRITS } from "./travel";
+import { WILD_WEST_CRITS } from "./wildWest";
 
 export const FEATURED_CRITS = {
   ...CYBERPUNK_CRITS,
@@ -153,4 +161,12 @@ export const FEATURED_CRITS = {
   ...SPACE_KNIGHTS_CRITS,
   ...SILVER_DUOS_CRITS,
   ...SOLDIERS_CRITS,
+  ...ANCIENT_ROME_CRITS,
+  ...DINER_CRITS,
+  ...FIREFIGHTERS_CRITS,
+  ...HOT_TUBS_CRITS,
+  ...MEDICS_CRITS,
+  ...RED_CARPET_CRITS,
+  ...TRAVEL_CRITS,
+  ...WILD_WEST_CRITS,
 } as const;

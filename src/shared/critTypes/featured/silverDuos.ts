@@ -48,7 +48,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/blueLipsRecline.webp",
     description: "Promotes 25.5% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.blueLipsReclineShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.blueLipsReclineShare,
+        2,
+      ),
   },
   blueLipstick: {
     label: "Blue Lipstick",
@@ -160,7 +164,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/crimsonTopSpread.webp",
     description: "Promotes 27% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.crimsonTopSpreadShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.crimsonTopSpreadShare,
+        2,
+      ),
   },
   crossedArms: {
     label: "Crossed Arms",
@@ -176,7 +184,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/crossedLegsChill.webp",
     description: "Promotes 27.5% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.crossedLegsChillShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.crossedLegsChillShare,
+        2,
+      ),
   },
   cueBallCuties: {
     label: "Cue Ball Cuties",
@@ -288,7 +300,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/greenShortsTwins.webp",
     description: "Promotes 31% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.greenShortsTwinsShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.greenShortsTwinsShare,
+        2,
+      ),
   },
   greyLeggings: {
     label: "Grey Leggings",
@@ -328,7 +344,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/highPonytailPair.webp",
     description: "Promotes 21.5% of this building's workers one perma tier",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers(context.floors, balance.highPonytailPairShare, 1),
+      actions.raiseWorkerTiers(
+        context.floors,
+        balance.highPonytailPairShare,
+        1,
+      ),
   },
   indigoUpdo: {
     label: "Indigo Updo",
@@ -416,7 +436,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/longPonytailRecline.webp",
     description: "Promotes 44% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.longPonytailReclineShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.longPonytailReclineShare,
+        2,
+      ),
   },
   lotusLounge: {
     label: "Lotus Lounge",
@@ -440,7 +464,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/midnightManeSprawl.webp",
     description: "Promotes 25% of this building's workers one perma tier",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers(context.floors, balance.midnightManeSprawlShare, 1),
+      actions.raiseWorkerTiers(
+        context.floors,
+        balance.midnightManeSprawlShare,
+        1,
+      ),
   },
   mintAndMarigold: {
     label: "Mint And Marigold",
@@ -448,7 +476,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/mintAndMarigold.webp",
     description: "Promotes 45% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.mintAndMarigoldShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.mintAndMarigoldShare,
+        2,
+      ),
   },
   mirrorPixies: {
     label: "Mirror Pixies",
@@ -560,7 +592,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/pixieAndPonytail.webp",
     description: "Promotes 35% of this building's workers one perma tier",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers(context.floors, balance.pixieAndPonytailShare, 1),
+      actions.raiseWorkerTiers(
+        context.floors,
+        balance.pixieAndPonytailShare,
+        1,
+      ),
   },
   pixieBesties: {
     label: "Pixie Besties",
@@ -656,7 +692,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/rustTopWristbands.webp",
     description: "Promotes 62.5% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.rustTopWristbandsShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.rustTopWristbandsShare,
+        2,
+      ),
   },
   shySitters: {
     label: "Shy Sitters",
@@ -736,7 +776,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/sweatpantsSmiles.webp",
     description: "Promotes 65% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.sweatpantsSmilesShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.sweatpantsSmilesShare,
+        2,
+      ),
   },
   tangerineShorts: {
     label: "Tangerine Shorts",
@@ -752,7 +796,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/tealAndPinkKicks.webp",
     description: "Promotes 65.5% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.tealAndPinkKicksShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.tealAndPinkKicksShare,
+        2,
+      ),
   },
   tealPixie: {
     label: "Teal Pixie",
@@ -808,7 +856,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/undercutBraidDuo.webp",
     description: "Promotes 44% of this building's workers one perma tier",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers(context.floors, balance.undercutBraidDuoShare, 1),
+      actions.raiseWorkerTiers(
+        context.floors,
+        balance.undercutBraidDuoShare,
+        1,
+      ),
   },
   wideSitBraid: {
     label: "Wide Sit Braid",
@@ -904,7 +956,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/pinkStripeLeggings.webp",
     description: "Promotes 57.5% of this building's workers one perma tier",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers(context.floors, balance.pinkStripeLeggingsShare, 1),
+      actions.raiseWorkerTiers(
+        context.floors,
+        balance.pinkStripeLeggingsShare,
+        1,
+      ),
   },
   plumLipsPower: {
     label: "Plum Lips Power",
@@ -928,7 +984,11 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/silverPonytailLean.webp",
     description: "Promotes 81% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.silverPonytailLeanShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.silverPonytailLeanShare,
+        2,
+      ),
   },
   spikyCropBraid: {
     label: "Spiky Crop Braid",
@@ -992,6 +1052,322 @@ export const SILVER_DUOS_CRITS = {
     image: "crits/silverDuos/yellowWaistband.webp",
     description: "Promotes 83% of this floor's workers two perma tiers",
     reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers([context.floor], balance.yellowWaistbandShare, 2),
+      actions.raiseWorkerTiers(
+        [context.floor],
+        balance.yellowWaistbandShare,
+        2,
+      ),
+  },
+  ballroomSnapshot: {
+    label: "Ballroom Snapshot",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/silverDuos/ballroomSnapshot.webp",
+    description: "Adds 157s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.ballroomSnapshotSeconds),
+  },
+  bangsAndBlues: {
+    label: "Bangs And Blues",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/silverDuos/bangsAndBlues.webp",
+    description: "Adds 158s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.bangsAndBluesSeconds),
+  },
+  bigSmile: {
+    label: "Big Smile",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/bigSmile.webp",
+    description: "Adds 159s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.bigSmileSeconds),
+  },
+  blackTieBall: {
+    label: "Black Tie Ball",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/silverDuos/blackTieBall.webp",
+    description: "Adds 160s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.blackTieBallSeconds),
+  },
+  blueSteelRedHot: {
+    label: "Blue Steel Red Hot",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/blueSteelRedHot.webp",
+    description: "Adds 161s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.blueSteelRedHotSeconds),
+  },
+  bodiceBulk: {
+    label: "Bodice Bulk",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/silverDuos/bodiceBulk.webp",
+    description: "Adds 162s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.bodiceBulkSeconds),
+  },
+  capeSwish: {
+    label: "Cape Swish",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/capeSwish.webp",
+    description: "Adds 164s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.capeSwishSeconds),
+  },
+  cocktailHour: {
+    label: "Cocktail Hour",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/cocktailHour.webp",
+    description: "Adds 165s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.cocktailHourSeconds),
+  },
+  cuddleUp: {
+    label: "Cuddle Up",
+    color: COLOR.redActive,
+    image: "crits/silverDuos/cuddleUp.webp",
+    description: "Adds 166s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.cuddleUpSeconds),
+  },
+  discoDiva: {
+    label: "Disco Diva",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/discoDiva.webp",
+    description: "Adds 167s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.discoDivaSeconds),
+  },
+  fuchsiaFortress: {
+    label: "Fuchsia Fortress",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/silverDuos/fuchsiaFortress.webp",
+    description: "Adds 60.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.fuchsiaFortressShare),
+  },
+  halterHuddle: {
+    label: "Halter Huddle",
+    color: COLOR.redActive,
+    image: "crits/silverDuos/halterHuddle.webp",
+    description: "Adds 60.2% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.halterHuddleShare),
+  },
+  helloGorgeous: {
+    label: "Hello Gorgeous",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/silverDuos/helloGorgeous.webp",
+    description: "Adds 60.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.helloGorgeousShare),
+  },
+  hugItOut: {
+    label: "Hug It Out",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/hugItOut.webp",
+    description: "Adds 60.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.hugItOutShare),
+  },
+  jadeGiantess: {
+    label: "Jade Giantess",
+    color: COLOR.dressCodeGreen,
+    image: "crits/silverDuos/jadeGiantess.webp",
+    description: "Adds 60.5% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.jadeGiantessShare),
+  },
+  jewelTones: {
+    label: "Jewel Tones",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/silverDuos/jewelTones.webp",
+    description: "Adds 60.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.jewelTonesShare),
+  },
+  matchingTrims: {
+    label: "Matching Trims",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/silverDuos/matchingTrims.webp",
+    description: "Adds 60.7% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.matchingTrimsShare),
+  },
+  merlotMoment: {
+    label: "Merlot Moment",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/silverDuos/merlotMoment.webp",
+    description: "Adds 60.8% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.merlotMomentShare),
+  },
+  mermaidTail: {
+    label: "Mermaid Tail",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/mermaidTail.webp",
+    description: "Adds 60.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.mermaidTailShare),
+  },
+  navyShimmer: {
+    label: "Navy Shimmer",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/silverDuos/navyShimmer.webp",
+    description: "Adds 61% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.navyShimmerShare),
+  },
+  offTheShoulder: {
+    label: "Off The Shoulder",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/silverDuos/offTheShoulder.webp",
+    description: "Adds 61.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.offTheShoulderShare),
+  },
+  photoBooth: {
+    label: "Photo Booth",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/photoBooth.webp",
+    description: "Adds 61.2% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.photoBoothShare),
+  },
+  pixieCuts: {
+    label: "Pixie Cuts",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/pixieCuts.webp",
+    description: "Adds 61.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.pixieCutsShare),
+  },
+  ponytailPride: {
+    label: "Ponytail Pride",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/ponytailPride.webp",
+    description: "Adds 61.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.ponytailPrideShare),
+  },
+  poutAndPose: {
+    label: "Pout And Pose",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/poutAndPose.webp",
+    description: "Adds 61.5% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.poutAndPoseShare),
+  },
+  powerBun: {
+    label: "Power Bun",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/powerBun.webp",
+    description: "Adds 61.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.powerBunShare),
+  },
+  promenade: {
+    label: "Promenade",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/silverDuos/promenade.webp",
+    description: "Adds 61.7% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.promenadeShare),
+  },
+  proudGuardian: {
+    label: "Proud Guardian",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/proudGuardian.webp",
+    description: "Adds 61.8% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.proudGuardianShare),
+  },
+  purpleReign: {
+    label: "Purple Reign",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/purpleReign.webp",
+    description: "Adds 61.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.purpleReignShare),
+  },
+  rainbowHem: {
+    label: "Rainbow Hem",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/rainbowHem.webp",
+    description: "Adds 62% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.rainbowHemShare),
+  },
+  sequinSqueeze: {
+    label: "Sequin Squeeze",
+    color: COLOR.coffeeRunTeal,
+    image: "crits/silverDuos/sequinSqueeze.webp",
+    description: "Adds 62.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.sequinSqueezeShare),
+  },
+  slenderSwirl: {
+    label: "Slender Swirl",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/silverDuos/slenderSwirl.webp",
+    description: "Adds 62.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.slenderSwirlShare),
+  },
+  smirkAndWink: {
+    label: "Smirk And Wink",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/silverDuos/smirkAndWink.webp",
+    description: "Adds 62.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.smirkAndWinkShare),
+  },
+  sunnyCurls: {
+    label: "Sunny Curls",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/sunnyCurls.webp",
+    description: "Adds 62.5% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.sunnyCurlsShare),
+  },
+  tallAndTiny: {
+    label: "Tall And Tiny",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/tallAndTiny.webp",
+    description: "Adds 62.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.tallAndTinyShare),
+  },
+  chinLift: {
+    label: "Chin Lift",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/silverDuos/chinLift.webp",
+    description: "Adds 63.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.chinLiftShare),
+  },
+  earringGlint: {
+    label: "Earring Glint",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/silverDuos/earringGlint.webp",
+    description: "Adds 64% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.earringGlintShare),
+  },
+  jadeAndNavy: {
+    label: "Jade And Navy",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/silverDuos/jadeAndNavy.webp",
+    description: "Adds 64.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.jadeAndNavyShare),
+  },
+  pinkGloves: {
+    label: "Pink Gloves",
+    color: COLOR.overflowBlue,
+    image: "crits/silverDuos/pinkGloves.webp",
+    description: "Adds 64.2% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.pinkGlovesShare),
   },
 } as const satisfies Record<string, FeaturedCritDefinition>;

@@ -185,4 +185,20 @@ export const CRITTERS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.growLevels([context.floor], balance.denimRatGrowth),
   },
+  kettleCrew: {
+    label: "Kettle Crew",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/critters/kettleCrew.webp",
+    description: "Adds 40.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.kettleCrewShare),
+  },
+  shipshapeCats: {
+    label: "Shipshape Cats",
+    color: COLOR.amberMuted,
+    image: "crits/critters/shipshapeCats.webp",
+    description: "Adds 41% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.shipshapeCatsShare),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

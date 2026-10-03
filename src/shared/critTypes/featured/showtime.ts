@@ -122,4 +122,20 @@ export const SHOWTIME_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.payCycles(context.floors, balance.yesChefPayouts),
   },
+  curtainCall: {
+    label: "Curtain Call",
+    color: COLOR.sameBoatCoral,
+    image: "crits/showtime/curtainCall.webp",
+    description: "Adds 155s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.curtainCallSeconds),
+  },
+  showgirlStrut: {
+    label: "Showgirl Strut",
+    color: COLOR.sameBoatCoral,
+    image: "crits/showtime/showgirlStrut.webp",
+    description: "Adds 156s of your company's income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeSeconds(balance.showgirlStrutSeconds),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

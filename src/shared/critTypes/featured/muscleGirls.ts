@@ -2695,4 +2695,100 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.growLevels([context.floor], balance.labRatLiftersGrowth),
   },
+  backDay: {
+    label: "Back Day",
+    color: COLOR.summerSaleOrange,
+    image: "crits/muscleGirls/backDay.webp",
+    description: "Adds 44.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.backDayShare),
+  },
+  backpackBabes: {
+    label: "Backpack Babes",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/backpackBabes.webp",
+    description: "Adds 44.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.backpackBabesShare),
+  },
+  blondeBicep: {
+    label: "Blonde Bicep",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/blondeBicep.webp",
+    description: "Adds 44.5% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.blondeBicepShare),
+  },
+  floorWork: {
+    label: "Floor Work",
+    color: COLOR.supplyRunTan,
+    image: "crits/muscleGirls/floorWork.webp",
+    description: "Adds 44.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.floorWorkShare),
+  },
+  gymBuddies: {
+    label: "Gym Buddies",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/gymBuddies.webp",
+    description: "Adds 44.7% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.gymBuddiesShare),
+  },
+  kickoff: {
+    label: "Kickoff",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/kickoff.webp",
+    description: "Adds 44.8% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.kickoffShare),
+  },
+  redZone: {
+    label: "Red Zone",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/redZone.webp",
+    description: "Adds 44.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.redZoneShare),
+  },
+  spandexSquad: {
+    label: "Spandex Squad",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/spandexSquad.webp",
+    description: "Adds 45% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.spandexSquadShare),
+  },
+  spotterPair: {
+    label: "Spotter Pair",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/spotterPair.webp",
+    description: "Adds 45.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.spotterPairShare),
+  },
+  sweatbandSmiles: {
+    label: "Sweatband Smiles",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/sweatbandSmiles.webp",
+    description: "Adds 45.2% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.sweatbandSmilesShare),
+  },
+  synchronizedSquat: {
+    label: "Synchronized Squat",
+    color: COLOR.sameBoatCoral,
+    image: "crits/muscleGirls/synchronizedSquat.webp",
+    description: "Adds 45.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.synchronizedSquatShare),
+  },
+  trackStar: {
+    label: "Track Star",
+    color: COLOR.summerSaleOrange,
+    image: "crits/muscleGirls/trackStar.webp",
+    description: "Adds 45.5% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.trackStarShare),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

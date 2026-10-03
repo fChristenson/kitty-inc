@@ -329,4 +329,148 @@ export const CHROME_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.growLevels([context.floor], balance.topazCoreGrowth),
   },
+  blueBelleWave: {
+    label: "Blue Belle Wave",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/chromeGirls/blueBelleWave.webp",
+    description: "Adds 38.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.blueBelleWaveShare),
+  },
+  cherrySlit: {
+    label: "Cherry Slit",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/chromeGirls/cherrySlit.webp",
+    description: "Adds 38.5% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.cherrySlitShare),
+  },
+  cobaltPose: {
+    label: "Cobalt Pose",
+    color: COLOR.overflowBlue,
+    image: "crits/chromeGirls/cobaltPose.webp",
+    description: "Adds 38.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.cobaltPoseShare),
+  },
+  hourglassHips: {
+    label: "Hourglass Hips",
+    color: COLOR.redActive,
+    image: "crits/chromeGirls/hourglassHips.webp",
+    description: "Adds 38.7% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.hourglassHipsShare),
+  },
+  midnightStrapless: {
+    label: "Midnight Strapless",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/chromeGirls/midnightStrapless.webp",
+    description: "Adds 38.8% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.midnightStraplessShare),
+  },
+  pageantPump: {
+    label: "Pageant Pump",
+    color: COLOR.fastForwardBlue,
+    image: "crits/chromeGirls/pageantPump.webp",
+    description: "Adds 38.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.pageantPumpShare),
+  },
+  pinkSash: {
+    label: "Pink Sash",
+    color: COLOR.fastForwardBlue,
+    image: "crits/chromeGirls/pinkSash.webp",
+    description: "Adds 39% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.pinkSashShare),
+  },
+  plumPower: {
+    label: "Plum Power",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/chromeGirls/plumPower.webp",
+    description: "Adds 39.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.plumPowerShare),
+  },
+  redVelvet: {
+    label: "Red Velvet",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/chromeGirls/redVelvet.webp",
+    description: "Adds 39.3% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.redVelvetShare),
+  },
+  rougeNoir: {
+    label: "Rouge Noir",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/chromeGirls/rougeNoir.webp",
+    description: "Adds 39.4% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.rougeNoirShare),
+  },
+  royalDrape: {
+    label: "Royal Drape",
+    color: COLOR.overflowBlue,
+    image: "crits/chromeGirls/royalDrape.webp",
+    description: "Adds 39.5% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.royalDrapeShare),
+  },
+  rubyBallgown: {
+    label: "Ruby Ballgown",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/chromeGirls/rubyBallgown.webp",
+    description: "Adds 39.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.rubyBallgownShare),
+  },
+  sapphireGala: {
+    label: "Sapphire Gala",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/chromeGirls/sapphireGala.webp",
+    description: "Adds 39.7% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.sapphireGalaShare),
+  },
+  tealTress: {
+    label: "Teal Tress",
+    color: COLOR.overflowBlue,
+    image: "crits/chromeGirls/tealTress.webp",
+    description: "Adds 39.8% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.tealTressShare),
+  },
+  twilightGlam: {
+    label: "Twilight Glam",
+    color: COLOR.overflowBlue,
+    image: "crits/chromeGirls/twilightGlam.webp",
+    description: "Adds 39.9% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.twilightGlamShare),
+  },
+  twoToneTease: {
+    label: "Two Tone Tease",
+    color: COLOR.overflowBlue,
+    image: "crits/chromeGirls/twoToneTease.webp",
+    description: "Adds 40% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.twoToneTeaseShare),
+  },
+  violetFlex: {
+    label: "Violet Flex",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/chromeGirls/violetFlex.webp",
+    description: "Adds 40.1% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.violetFlexShare),
+  },
+  satinSalute: {
+    label: "Satin Salute",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/chromeGirls/satinSalute.webp",
+    description: "Adds 63.6% of your total income",
+    reward: (_context, { actions, balance }) =>
+      actions.addIncomeShare(balance.satinSaluteShare),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;

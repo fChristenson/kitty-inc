@@ -640,9 +640,29 @@ async function apply(specs, plans) {
       ].join("\n"),
     );
 
-    fs.rmSync(path.join(ROOT, spec.source));
-    if (spec.processor)
-      fs.rmSync(path.join(ROOT, spec.processor), { force: true });
+    // never delete a raw: archive it (and its cut-out script) for re-cuts
+    const archive = path.join(ROOT, "tmp/crits", category);
+    fs.mkdirSync(archive, { recursive: true });
+    const keep = (from, name) => {
+      let to = path.join(archive, name);
+      for (let n = 2; fs.existsSync(to); n++)
+        to = path.join(archive, name.replace(/(\.[^.]+)$/, `-${n}$1`));
+      fs.copyFileSync(path.join(ROOT, from), to);
+      if (fs.statSync(to).size !== fs.statSync(path.join(ROOT, from)).size)
+        throw new Error(`archiving ${from} failed; raw left in place`);
+      fs.rmSync(path.join(ROOT, from));
+      return to;
+    };
+    keep(spec.source, `${kind}${path.extname(spec.source)}`);
+    if (spec.processor && fs.existsSync(path.join(ROOT, spec.processor))) {
+      const script = keep(spec.processor, `process-${kind}.mjs`);
+      fs.writeFileSync(
+        script,
+        fs
+          .readFileSync(script, "utf8")
+          .replaceAll('"../../scripts/', '"../../../scripts/'),
+      );
+    }
     remaining.splice(remaining.indexOf(spec), 1);
     writeSpecs(remaining);
     added.push([`${kind} (${color})`, icon]);
