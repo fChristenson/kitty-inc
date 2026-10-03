@@ -46,6 +46,56 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-lava-lamp-event" class="game__button">Lava Lamp</button>
+          <button id="test-dominoes-event" class="game__button">Dominoes</button>
+          <button id="test-inkblot-event" class="game__button">Inkblot</button>
+          <button id="test-soft-serve-event" class="game__button">Soft Serve</button>
+          <button id="test-dollar-sign-event" class="game__button">Dollar Sign</button>
+          <button id="test-mobius-event" class="game__button">Mobius</button>
+          <button id="test-swiss-roll-event" class="game__button">Swiss Roll</button>
+          <button id="test-dodgeball-event" class="game__button">Dodgeball</button>
+          <button id="test-conga-line-event" class="game__button">Conga Line</button>
+          <button id="test-spinning-top-event" class="game__button">Spinning Top</button>
+          <button id="test-gobbler-event" class="game__button">Gobbler</button>
+          <button id="test-majorette-event" class="game__button">Majorette</button>
+          <button id="test-hula-hoop-event" class="game__button">Hula Hoop</button>
+          <button id="test-calligraphy-event" class="game__button">Calligraphy</button>
+          <button id="test-snake-charmer-event" class="game__button">Snake Charmer</button>
+          <button id="test-plate-spinner-event" class="game__button">Plate Spinner</button>
+          <button id="test-ferris-wheel-event" class="game__button">Ferris Wheel</button>
+          <button id="test-bucket-brigade-event" class="game__button">Bucket Brigade</button>
+          <button id="test-sky-lanterns-event" class="game__button">Sky Lanterns</button>
+          <button id="test-engraver-event" class="game__button">Engraver</button>
+          <button id="test-x-ray-event" class="game__button">X-Ray</button>
+          <button id="test-laser-lasso-event" class="game__button">Laser Lasso</button>
+          <button id="test-hex-ring-event" class="game__button">Hex Ring</button>
+          <button id="test-portcullis-event" class="game__button">Portcullis</button>
+          <button id="test-keyhole-event" class="game__button">Keyhole</button>
+          <button id="test-defibrillator-event" class="game__button">Defibrillator</button>
+          <button id="test-circuit-board-event" class="game__button">Circuit Board</button>
+          <button id="test-mjolnir-event" class="game__button">Mjolnir</button>
+          <button id="test-arc-flash-event" class="game__button">Arc Flash</button>
+          <button id="test-four-corners-event" class="game__button">Four Corners</button>
+          <button id="test-bolt-wheel-event" class="game__button">Bolt Wheel</button>
+          <button id="test-minefield-event" class="game__button">Minefield</button>
+          <button id="test-cannonade-event" class="game__button">Cannonade</button>
+          <button id="test-sticky-bombs-event" class="game__button">Sticky Bombs</button>
+          <button id="test-crossblast-event" class="game__button">Crossblast</button>
+          <button id="test-mortar-event" class="game__button">Mortar</button>
+          <button id="test-flashbang-event" class="game__button">Flashbang</button>
+          <button id="test-sentry-turret-event" class="game__button">Sentry Turret</button>
+          <button id="test-shotgun-event" class="game__button">Shotgun</button>
+          <button id="test-boss-fight-event" class="game__button">Boss Fight</button>
+          <button id="test-gunship-event" class="game__button">Gunship</button>
+          <button id="test-bullet-time-event" class="game__button">Bullet Time</button>
+          <button id="test-flechettes-event" class="game__button">Flechettes</button>
+          <button id="test-radar-event" class="game__button">Radar</button>
+          <button id="test-bingo-event" class="game__button">Bingo</button>
+          <button id="test-lane-hopper-event" class="game__button">Lane Hopper</button>
+          <button id="test-simon-says-event" class="game__button">Simon Says</button>
+          <button id="test-equalizer-event" class="game__button">Equalizer</button>
+          <button id="test-loading-bar-event" class="game__button">Loading Bar</button>
+          <button id="test-dice-roll-event" class="game__button">Dice Roll</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

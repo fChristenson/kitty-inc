@@ -1097,6 +1097,24 @@ export function wireResetButton(
   });
 }
 
+// sorts every dropdown's buttons by name; a control (label) right after a
+// button moves with it, and controls ahead of the first button stay on top
+export function sortTestActionMenus(container: HTMLElement): void {
+  for (const menu of container.querySelectorAll<HTMLElement>(
+    ".test-actions-dropdown__menu",
+  )) {
+    const groups: Element[][] = [];
+    for (const child of Array.from(menu.children)) {
+      if (child instanceof HTMLButtonElement) groups.push([child]);
+      else if (groups.length) groups[groups.length - 1].push(child);
+    }
+    groups.sort((a, b) =>
+      (a[0].textContent ?? "").localeCompare(b[0].textContent ?? ""),
+    );
+    for (const group of groups) menu.append(...group);
+  }
+}
+
 // live text filter over every dev button in the bar. Matching buttons stay
 // visible and their section is forced open; a section with no matches is
 // hidden entirely. Whatever the player had open by hand is remembered and

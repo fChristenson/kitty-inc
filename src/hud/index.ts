@@ -65,6 +65,7 @@ export {
   wireTestButton,
   wireSpawnMouseButton,
   wireTestActionsFilter,
+  sortTestActionMenus,
   wireIdleOverlayTestButton,
   wireBoostEventTestButton,
   wireUnionEventTestButton,

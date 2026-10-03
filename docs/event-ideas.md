@@ -329,6 +329,56 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Morse Code** (experiment: the button blinks morse; crit tiers): a wisp blinks dots (sparks) and dashes (beams) at the bars; each finished letter jumps its bar a crit tier.
 - [x] **Stadium Wave** (experiment: a crowd wave over the workers; worker perma tiers): stacks of wisps over the workers leap in a rolling stadium wave, each lift a perma tier, then the whole crowd leaps at once.
 - [x] **Knight's Tour** (experiment: chess knight moves; free hires): a wisp hops in L-shaped knight moves, landing on empty spots that become new workers.
+- [x] **Lava Lamp** (money; cash): the button pours cash into gooey blobs along the bottom that rise one by one like lava-lamp wax, stretching as they climb, then ooze together and surge into the total.
+- [x] **Dominoes** (money; levels and cash): a line of standing coins zigzags along the bars; the topple races down it ever faster, each bar it runs off getting free levels, then the line surges into the total.
+- [x] **Inkblot** (money; cash): mirrored blots of cash splat out of the screen's middle line like a Rorschach test, then the halves fold shut and the blot surges into the total.
+- [x] **Soft Serve** (money; cash): a stream of cash from the top pipes itself into a giant soft-serve swirl, coil by coil, then it is slurped into the total from the top down.
+- [x] **Dollar Sign** (money; cash): a torrent of cash writes a giant dollar sign across the screen; it throbs three times, ever harder, then bursts into the total.
+- [x] **Mobius** (money; cash): cash loops into a twisted Möbius band that turns ever faster, then snaps and unzips into the total as one long ribbon.
+- [x] **Swiss Roll** (money; levels and cash): a sheet of cash over the whole screen curls up from the bottom into a spinning log, every bar it rolls over getting free levels, and is flung into the total.
+- [x] **Dodgeball** (wisp; cash): two teams of wisps line the screen's sides and hurl balls that smash together mid-screen in sprays of coins; then both teams let fly at once.
+- [x] **Conga Line** (wisp; free hires): a conga line of wisps dances from spot to spot, the back dancer peeling off at each as a new worker.
+- [x] **Spinning Top** (wisp; levels): a spinning top wisp with a whirling rim wanders in ever wider wobbly loops, grinding free levels into every bar it crosses, then topples.
+- [x] **Gobbler** (wisp; cash): a chomper wisp gobbles zigzag rows of pellets like an arcade game, every pellet a pop of coins and every power pellet a bang.
+- [x] **Majorette** (wisp; crit tiers): a twirling baton of two wisps is flung high, landing on bar after bar for a crit tier each.
+- [x] **Hula Hoop** (wisp; worker perma tiers): a hoop of wisps drops over each worker and whirls round its waist faster and faster until it flicks off with a perma tier.
+- [x] **Calligraphy** (mix; cash): a brush wisp paints sweeping strokes of cash, fat where it lingers and thin where it flies, then dives into the total and the strokes lift after it.
+- [x] **Snake Charmer** (mix; worker perma tiers and cash): a cobra of cash rises from the button swaying and strikes worker after worker, then dives into the total.
+- [x] **Plate Spinner** (mix; levels and cash): a wisp spins up a plate of cash over each bar for free levels; the plates spin faster, then fly off into the total.
+- [x] **Ferris Wheel** (mix; free hires and cash): a Ferris wheel of cash turns ever faster, each wisp car letting go over the top onto an empty spot as a new worker.
+- [x] **Bucket Brigade** (mix; cash): a zigzag line of wisps passes slug after slug of cash hand to hand up into the total.
+- [x] **Sky Lanterns** (mix; a free floor and cash): wisp lanterns trailing strings of cash float up and gather round the locked floor, which bursts open.
+- [x] **Engraver** (beam; crit tiers): a wisp head rasters a beam across each bar line by line like a laser engraver, each finished bar jumping a crit tier.
+- [x] **X-Ray** (beam; free hires): a sheet of light stretched between two wisps sweeps down the screen, revealing a new worker at every empty spot it passes.
+- [x] **Laser Lasso** (beam; worker perma tiers): a wisp twirls a loop of light, throws it over each worker and cinches it tight for a perma tier.
+- [x] **Hex Ring** (beam; cash): six wisps lock into a hexagon of beams that turns and snaps tighter, spitting coins from its corners, then crushes to a point.
+- [x] **Portcullis** (beam; levels): bars of light slam down into a gate across the screen, then a crossbar slams across at every bar for free levels.
+- [x] **Keyhole** (beam; a free floor): a beam burns a giant keyhole into the locked floor; a key wisp shoots in and turns, click, click, clunk, and the floor bursts open.
+- [x] **Defibrillator** (lightning; worker perma tiers): two paddle wisps charge up either side of each worker and slam in, a bolt cracking through it for a perma tier.
+- [x] **Circuit Board** (lightning; levels): a spark races from the button along square-cornered circuit traces to each bar, lighting the trace behind it and landing free levels.
+- [x] **Mjolnir** (lightning; crit tiers): a hammer wisp charges at the top of the screen as bolts feed it, then smashes down onto a bar for a crit tier, again and again.
+- [x] **Arc Flash** (lightning; cash): wisps scatter over the screen and bolts arc between pairs of them ever faster, each popping coins, then every wisp arcs to the middle.
+- [x] **Four Corners** (lightning; a free floor): corner wisps crack bolts into an X across the screen, then climb the edges dragging its crossing up onto the locked floor.
+- [x] **Bolt Wheel** (lightning; free hires): four lightning spokes wheel round a hub ever faster, striking a new worker into every empty spot they sweep over.
+- [x] **Minefield** (explosion; levels): mines are scattered along the bars and a runner zigzags across them setting them off, every cleared bar getting free levels.
+- [x] **Cannonade** (explosion; crit tiers): a cannon wisp at the screen's side lobs fizzing shells onto bar after bar, each blast a crit tier.
+- [x] **Sticky Bombs** (explosion; worker perma tiers): bombs splat onto every worker and stick, fuses blinking, then go off in a rattling chain along the row.
+- [x] **Crossblast** (explosion; free hires): bombs dropped beside empty spots blow crosses of blasts along their rows and columns like an arcade bomber, forming new workers.
+- [x] **Mortar** (explosion; cash): a mortar thumps shells out of the top of the screen that come whistling back down in a walking barrage marching up the screen.
+- [x] **Flashbang** (explosion; a free floor): flashbangs tossed at the locked floor white out the whole screen, the third blowing the floor open.
+- [x] **Sentry Turret** (gunfire; levels): a turret wisp mid-screen swings its muzzle to each bar and rattles off a burst for free levels, then sprays a ring every way.
+- [x] **Shotgun** (gunfire; worker perma tiers): a gun wisp sidles up to each worker, pumps chk-chk and blasts a spray of pellets for a perma tier.
+- [x] **Boss Fight** (gunfire; cash): a fighter wisp strafes along the bottom hosing bullets into a huge boss wisp that sprays rings back, every hit knocking out coins.
+- [x] **Gunship** (gunfire; free hires): a gunship wisp circles the whole screen firing inward bursts onto empty spots, each forming a new worker.
+- [x] **Bullet Time** (gunfire; crit tiers): a volley at the bars freezes mid-air, creeping and glowing, then time snaps back at four times speed and every bar jumps a crit tier.
+- [x] **Flechettes** (gunfire; a free floor): shells fired at the locked floor burst into hails of wisp darts that riddle it until it tears open.
+- [x] **Radar** (experiment: the screen as a radar scope; worker perma tiers): the screen dims into a radar display round the button; every worker the sweep passes blips and climbs a perma tier.
+- [x] **Bingo** (experiment: a giant bingo card; cash): dots on a five by five card get daubed one by one with coins until a row fills; a wisp streaks along it and BINGO! slams down.
+- [x] **Lane Hopper** (experiment: an arcade road crossing; free hires and cash): lanes of cash stream across like traffic and a frog wisp hops across them onto empty spots as new workers.
+- [x] **Simon Says** (experiment: a memory game; crit tiers): four great glowing pads flash out ever longer patterns, each finished round jumping a bar a crit tier.
+- [x] **Equalizer** (experiment: a graphic equalizer; levels): columns of glowing segments bounce to a beat, each beat leaping up to a bar for free levels, then max out on the drop.
+- [x] **Loading Bar** (experiment: a loading screen; cash): a giant progress bar fills with cash in stalls and lurches, the percentage ticking, until COMPLETE! slams down.
+- [x] **Dice Roll** (experiment: a giant dice throw; levels): two dice of wisp pips tumble across the screen and settle on a roll, then every pip flies to a bar for free levels.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.
