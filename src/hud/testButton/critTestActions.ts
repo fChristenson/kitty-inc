@@ -46,6 +46,56 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-delta-event" class="game__button">Delta</button>
+          <button id="test-hydrant-event" class="game__button">Hydrant</button>
+          <button id="test-cloverleaf-event" class="game__button">Cloverleaf</button>
+          <button id="test-pinstripe-event" class="game__button">Pinstripe</button>
+          <button id="test-faucet-event" class="game__button">Faucet</button>
+          <button id="test-showerhead-event" class="game__button">Showerhead</button>
+          <button id="test-binary-star-event" class="game__button">Binary Star</button>
+          <button id="test-hopscotch-event" class="game__button">Hopscotch</button>
+          <button id="test-tadpoles-event" class="game__button">Tadpoles</button>
+          <button id="test-blink-event" class="game__button">Blink</button>
+          <button id="test-bumper-cars-event" class="game__button">Bumper Cars</button>
+          <button id="test-pigeons-event" class="game__button">Pigeons</button>
+          <button id="test-squid-event" class="game__button">Squid</button>
+          <button id="test-water-pistol-event" class="game__button">Water Pistol</button>
+          <button id="test-poi-event" class="game__button">Poi</button>
+          <button id="test-bartender-event" class="game__button">Bartender</button>
+          <button id="test-pole-vault-event" class="game__button">Pole Vault</button>
+          <button id="test-paint-roller-event" class="game__button">Paint Roller</button>
+          <button id="test-buzzsaw-event" class="game__button">Buzzsaw</button>
+          <button id="test-light-cycles-event" class="game__button">Light Cycles</button>
+          <button id="test-fiber-optic-event" class="game__button">Fiber Optic</button>
+          <button id="test-daddy-longlegs-event" class="game__button">Daddy Longlegs</button>
+          <button id="test-knighthood-event" class="game__button">Knighthood</button>
+          <button id="test-cutting-torch-event" class="game__button">Cutting Torch</button>
+          <button id="test-st-elmos-fire-event" class="game__button">St. Elmo's Fire</button>
+          <button id="test-stepped-leader-event" class="game__button">Stepped Leader</button>
+          <button id="test-trolley-event" class="game__button">Trolley</button>
+          <button id="test-bolt-bounce-event" class="game__button">Bolt Bounce</button>
+          <button id="test-storm-crown-event" class="game__button">Storm Crown</button>
+          <button id="test-van-de-graaff-event" class="game__button">Van de Graaff</button>
+          <button id="test-barrel-roll-event" class="game__button">Barrel Roll</button>
+          <button id="test-bomb-stack-event" class="game__button">Bomb Stack</button>
+          <button id="test-roman-candle-event" class="game__button">Roman Candle</button>
+          <button id="test-whistlers-event" class="game__button">Whistlers</button>
+          <button id="test-trebuchet-event" class="game__button">Trebuchet</button>
+          <button id="test-drop-pods-event" class="game__button">Drop Pods</button>
+          <button id="test-bomb-carousel-event" class="game__button">Bomb Carousel</button>
+          <button id="test-last-stand-event" class="game__button">Last Stand</button>
+          <button id="test-tin-can-event" class="game__button">Tin Can</button>
+          <button id="test-point-defense-event" class="game__button">Point Defense</button>
+          <button id="test-target-practice-event" class="game__button">Target Practice</button>
+          <button id="test-flare-gun-event" class="game__button">Flare Gun</button>
+          <button id="test-rappel-event" class="game__button">Rappel</button>
+          <button id="test-stacker-event" class="game__button">Stacker</button>
+          <button id="test-coin-pusher-event" class="game__button">Coin Pusher</button>
+          <button id="test-high-striker-event" class="game__button">High Striker</button>
+          <button id="test-note-highway-event" class="game__button">Note Highway</button>
+          <button id="test-safecracker-event" class="game__button">Safecracker</button>
+          <button id="test-gumball-machine-event" class="game__button">Gumball Machine</button>
+          <button id="test-ninja-event" class="game__button">Ninja</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

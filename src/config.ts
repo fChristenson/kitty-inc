@@ -4066,6 +4066,448 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, worker tiers + cash: src/floors/deltaEvent: a river of cash fans out
+  // into a delta onto the workers
+  deltaEvent: {
+    chance: 0.01,
+    streamMs: 900, // the river pouring
+    travelMs: 700, // each coin's trip down the trunk
+    channelMs: 450, // each channel's run to its worker
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // money, cash: src/floors/hydrantEvent: jets of cash burst out every way
+  hydrantEvent: {
+    chance: 0.01,
+    streamMs: 700, // each jet pouring
+    travelMs: 600, // each coin's trip to the edge
+    secondMs: 450, // the second ring of jets bursting
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // money, cash: src/floors/cloverleafEvent: a river of cash loops a giant
+  // four-leaf clover
+  cloverleafEvent: {
+    chance: 0.01,
+    streamMs: 900, // the river pouring
+    travelMs: 1_500, // each coin's trip round the clover
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // money, levels + cash: src/floors/pinstripeEvent: rivers of cash shoot across
+  // along the bars
+  pinstripeEvent: {
+    chance: 0.01,
+    gapsMs: [260, 140] as [number, number], // between stripes, quickening
+    streamMs: 500, // each stripe pouring
+    travelMs: 600, // each coin's trip across
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // money, crit tier + cash: src/floors/faucetEvent: a tap drips cash onto the
+  // clicked bar, then gushes
+  faucetEvent: {
+    chance: 0.01,
+    dripsMs: [300, 120] as [number, number], // between drips, quickening
+    fallMs: 350, // each drop's fall
+    gushMs: 500, // the gush pouring
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // money, hires + cash: src/floors/showerheadEvent: a showerhead sprays rivers
+  // of cash onto empty spots
+  showerheadEvent: {
+    chance: 0.01,
+    riseMs: 300, // the showerhead rising
+    streamMs: 700, // each river pouring
+    travelMs: 550, // each coin's trip down
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, crit tiers: src/floors/binaryStarEvent: two wisps spiral in, merge
+  // and jet into the bars
+  binaryStarEvent: {
+    chance: 0.01,
+    spiralMs: 1_300, // the spiral in, quickening
+    jetMs: 250, // each jet's flight to its bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, levels: src/floors/hopscotchEvent: a wisp plays hopscotch up the bars
+  hopscotchEvent: {
+    chance: 0.01,
+    hopsMs: [380, 200] as [number, number], // each hop, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, hires: src/floors/tadpolesEvent: a mother wisp lays tadpoles that
+  // wriggle onto empty spots
+  tadpolesEvent: {
+    chance: 0.01,
+    swimMs: 300, // the mother swimming out
+    gapsMs: [260, 130] as [number, number], // between tadpoles, quickening
+    wriggleMs: 550, // each tadpole's wriggle
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, worker tiers: src/floors/blinkEvent: a wisp blinks from worker to
+  // worker
+  blinkEvent: {
+    chance: 0.01,
+    staysMs: [340, 170] as [number, number], // each stay, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, cash: src/floors/bumperCarsEvent: wisps career round like bumper cars
+  bumperCarsEvent: {
+    chance: 0.01,
+    driveMs: 1_700, // the bumping, speeding up
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, cash: src/floors/pigeonsEvent: a flock perches, then bursts into
+  // flight
+  pigeonsEvent: {
+    chance: 0.01,
+    flutterMs: 700, // the flock fluttering down
+    perchMs: 350, // the flock perched
+    flyMs: 450, // each bird's flight to the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix, cash: src/floors/squidEvent: a squid wisp jets up the screen squirting
+  // cash
+  squidEvent: {
+    chance: 0.01,
+    spurtsMs: [320, 170] as [number, number], // each spurt, quickening
+    squirtMs: 200, // each squirt pouring
+    travelMs: 450, // each coin's trip back
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix, worker tiers + cash: src/floors/waterPistolEvent: a wisp drinks a
+  // river of cash and squirts the workers
+  waterPistolEvent: {
+    chance: 0.01,
+    diveMs: 250, // the dive to the bottom
+    drinkMs: 450, // the drink
+    gapsMs: [220, 120] as [number, number], // between squirts, quickening
+    squirtMs: 350, // each squirt's trip to its worker
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix, cash: src/floors/poiEvent: two poi wisps swing rivers of cash into
+  // flowers
+  poiEvent: {
+    chance: 0.01,
+    streamMs: 1_100, // the rivers pouring
+    travelMs: 1_600, // the poi's loop
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix, crit tiers + cash: src/floors/bartenderEvent: two wisps flair-toss a
+  // slug of cash, then pour it on the bars
+  bartenderEvent: {
+    chance: 0.01,
+    tossesMs: [380, 200] as [number, number], // each toss, quickening
+    pourMs: 350, // each pour onto its bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix, unlock + cash: src/floors/poleVaultEvent: a wisp sprints a river of
+  // cash and vaults into the locked floor
+  poleVaultEvent: {
+    chance: 0.01,
+    streamMs: 900, // the river pouring
+    travelMs: 1_400, // the run and the vault
+    holdMs: 500,
+    mergeMs: 500,
+  },
+  // mix, levels + cash: src/floors/paintRollerEvent: a roller wisp paints the
+  // bars with cash
+  paintRollerEvent: {
+    chance: 0.01,
+    streamMs: 1_000, // the stripe pouring
+    travelMs: 1_600, // the roller's trip over every bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, crit tiers: src/floors/buzzsawEvent: a buzzsaw of beams grinds into
+  // the bars
+  buzzsawEvent: {
+    chance: 0.01,
+    rollMs: 250, // each roll to a bar
+    grindsMs: [450, 250] as [number, number], // each grind, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // beam, levels: src/floors/lightCyclesEvent: two light cycles race walls of
+  // light through the bars
+  lightCyclesEvent: {
+    chance: 0.01,
+    raceMs: 1_600, // the race
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // beam, hires: src/floors/fiberOpticEvent: curving fibers of light carry
+  // pulses onto empty spots
+  fiberOpticEvent: {
+    chance: 0.01,
+    gapsMs: [260, 130] as [number, number], // between fibers, quickening
+    fiberMs: 400, // each pulse's run
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // beam, cash: src/floors/daddyLonglegsEvent: a wisp strides up the screen on
+  // legs of light
+  daddyLonglegsEvent: {
+    chance: 0.01,
+    walkMs: 1_800, // the walk
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, worker tiers: src/floors/knighthoodEvent: a blade of light dubs the
+  // workers
+  knighthoodEvent: {
+    chance: 0.01,
+    knightsMs: [500, 260] as [number, number], // each dubbing, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // beam, unlock: src/floors/cuttingTorchEvent: a torch beam cuts round the
+  // locked floor's lock
+  cuttingTorchEvent: {
+    chance: 0.01,
+    flyMs: 300, // the torch flying up
+    cutMs: 1_300, // the cut round, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, worker tiers: src/floors/stElmosFireEvent: crackling coronas
+  // build round the workers until bolts strike
+  stElmosFireEvent: {
+    chance: 0.01,
+    coronaMs: 500, // each corona building
+    gapsMs: [300, 150] as [number, number], // between workers, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, unlock: src/floors/steppedLeaderEvent: a stepped leader creeps up
+  // to the locked floor
+  steppedLeaderEvent: {
+    chance: 0.01,
+    stepsMs: [180, 70] as [number, number], // each step, quickening
+    strokeMs: 400, // the return stroke
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, levels: src/floors/trolleyEvent: a trolley on a live wire drops
+  // bolts on the bars
+  trolleyEvent: {
+    chance: 0.01,
+    runsMs: [550, 320] as [number, number], // each run, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, cash: src/floors/boltBounceEvent: a bolt ricochets round the
+  // screen
+  boltBounceEvent: {
+    chance: 0.01,
+    legsMs: [220, 90] as [number, number], // each leg, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // lightning, crit tiers: src/floors/stormCrownEvent: a crown of wisps hurls
+  // bolts into the bars
+  stormCrownEvent: {
+    chance: 0.01,
+    volleysMs: [500, 300] as [number, number], // each bar's volley, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, hires: src/floors/vanDeGraaffEvent: a charged dome throws bolts
+  // onto empty spots
+  vanDeGraaffEvent: {
+    chance: 0.01,
+    chargeMs: 600, // the dome charging
+    gapsMs: [220, 110] as [number, number], // between bolts, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, levels: src/floors/barrelRollEvent: bomb barrels roll down the
+  // rows onto the bars
+  barrelRollEvent: {
+    chance: 0.01,
+    gapsMs: [300, 180] as [number, number], // between barrels, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/bombStackEvent: a pyramid of bombs blows from
+  // the bottom up
+  bombStackEvent: {
+    chance: 0.01,
+    stackMs: 600, // the stack piling up
+    blowsMs: [350, 250] as [number, number], // between rows, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // explosion, crit tiers: src/floors/romanCandleEvent: a roman candle pops
+  // bombs onto the bars
+  romanCandleEvent: {
+    chance: 0.01,
+    popsMs: [260, 140] as [number, number], // between pops, quickening
+    flightMs: 450, // each bomb's flight
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, worker tiers: src/floors/whistlersEvent: whistling rockets
+  // corkscrew onto the workers
+  whistlersEvent: {
+    chance: 0.01,
+    gapsMs: [240, 120] as [number, number], // between launches, quickening
+    flightMs: 600, // each rocket's flight
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, unlock: src/floors/trebuchetEvent: a trebuchet flings bombs into
+  // the locked floor
+  trebuchetEvent: {
+    chance: 0.01,
+    throwsMs: [700, 500] as [number, number], // each throw, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, hires: src/floors/dropPodsEvent: bomb pods slam down onto empty
+  // spots
+  dropPodsEvent: {
+    chance: 0.01,
+    gapsMs: [260, 130] as [number, number], // between pods, quickening
+    fallMs: 450, // each pod's fall
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/bombCarouselEvent: a whirling ring of bombs
+  // flings out across the screen
+  bombCarouselEvent: {
+    chance: 0.01,
+    spinMs: 900, // the ring spinning up
+    flingMs: 300, // each bomb's fling
+    releasesMs: 600, // the ring letting go round
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, cash: src/floors/lastStandEvent: a gunner guns down waves of wisps
+  lastStandEvent: {
+    chance: 0.01,
+    wavesMs: [550, 450] as [number, number], // between waves, quickening
+    approachMs: 700, // each raider's charge
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, crit tiers: src/floors/tinCanEvent: a can kept hopping by gunfire
+  // is knocked onto the bars
+  tinCanEvent: {
+    chance: 0.01,
+    hopsMs: [320, 200] as [number, number], // each hop, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, worker tiers: src/floors/pointDefenseEvent: a turret shoots down
+  // wisps over the workers
+  pointDefenseEvent: {
+    chance: 0.01,
+    gapsMs: [260, 140] as [number, number], // between kills, quickening
+    fallMs: 550, // each wisp's fall
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, cash: src/floors/targetPracticeEvent: pop-up targets drilled into
+  // coins
+  targetPracticeEvent: {
+    chance: 0.01,
+    targetsMs: [220, 110] as [number, number], // between targets, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, hires: src/floors/flareGunEvent: flares hang over empty spots and
+  // drop
+  flareGunEvent: {
+    chance: 0.01,
+    gapsMs: [220, 120] as [number, number], // between flares, quickening
+    hangMs: 250, // each flare hanging
+    dropMs: 250, // each flare's drop
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, levels: src/floors/rappelEvent: a gunner rappels down, raking the
+  // bars
+  rappelEvent: {
+    chance: 0.01,
+    boundsMs: [450, 300] as [number, number], // each bound, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, crit tiers: src/floors/stackerEvent: rows of wisps stack up like
+  // the arcade game
+  stackerEvent: {
+    chance: 0.01,
+    rowsMs: [420, 200] as [number, number], // each row's slide, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/coinPusherEvent: a pusher shoves cash off a
+  // ledge
+  coinPusherEvent: {
+    chance: 0.01,
+    pushesMs: [380, 220] as [number, number], // each push, quickening
+    streamMs: 1_300, // the feed pouring
+    travelMs: 500, // each coin's trip to the ledge
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, levels: src/floors/highStrikerEvent: a mallet fires a puck up to
+  // ring the bell
+  highStrikerEvent: {
+    chance: 0.01,
+    strikesMs: [550, 700] as [number, number], // each strike, flying higher
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, worker tiers: src/floors/noteHighwayEvent: notes stream down
+  // lanes in a rhythm game
+  noteHighwayEvent: {
+    chance: 0.01,
+    notesMs: [180, 90] as [number, number], // between notes, quickening
+    fallMs: 500, // each note's fall
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, unlock: src/floors/safecrackerEvent: a dial spun to its
+  // combination opens the locked floor
+  safecrackerEvent: {
+    chance: 0.01,
+    spinsMs: [650, 450] as [number, number], // each spin, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, hires: src/floors/gumballMachineEvent: a gumball machine drops
+  // gumballs onto empty spots
+  gumballMachineEvent: {
+    chance: 0.01,
+    fillMs: 500, // the globe filling
+    cranksMs: [300, 160] as [number, number], // between cranks, quickening
+    rollMs: 450, // each gumball's bounce down
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/ninjaEvent: tossed wisps sliced into coins
+  ninjaEvent: {
+    chance: 0.01,
+    tossesMs: [200, 90] as [number, number], // between tosses, quickening
+    flightMs: 800, // each toss's flight
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
