@@ -251,7 +251,7 @@ export const WARCRAFT_CRITS = {
       actions.repeatCrit(context, "both", balance.furionStormpawContinueChance),
   },
   whatIsBrewing: {
-    label: "What is brewing?",
+    label: "What Is Brewing?",
     color: COLOR.teaBreakBrown,
     image: "crits/warcraft/whatIsBrewing.webp",
     description: "Sixteen instant payouts on this floor",
@@ -264,7 +264,11 @@ export const WARCRAFT_CRITS = {
     image: "crits/warcraft/grimVanguard.webp",
     description: "Boosts every worker for 21s",
     reward: (context, { actions, balance }) =>
-      actions.boostWorkers(context.floors, balance.grimVanguardBoostSeconds, balance.grimVanguardExtraWorkers),
+      actions.boostWorkers(
+        context.floors,
+        balance.grimVanguardBoostSeconds,
+        balance.grimVanguardExtraWorkers,
+      ),
   },
   lightforgedPaladin: {
     label: "Lightforged Paladin",

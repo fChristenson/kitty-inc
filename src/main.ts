@@ -258,6 +258,12 @@ import {
   forceLaserPendulumEvent,
   forceElectricEelEvent,
   forceDoubleVisionEvent,
+  forceHoneyEvent,
+  forceMusicalChairsEvent,
+  forceBubbleWandEvent,
+  forceHyperspaceEvent,
+  forceJavelinEvent,
+  forceShuffleEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -1382,6 +1388,12 @@ async function main() {
       "laser-pendulum": forceOnActive(forceLaserPendulumEvent),
       "electric-eel": forceOnActive(forceElectricEelEvent),
       "double-vision": forceOnActive(forceDoubleVisionEvent),
+      honey: forceOnActive(forceHoneyEvent),
+      "musical-chairs": forceOnActive(forceMusicalChairsEvent),
+      "bubble-wand": forceOnActive(forceBubbleWandEvent),
+      hyperspace: forceOnActive(forceHyperspaceEvent),
+      javelin: forceOnActive(forceJavelinEvent),
+      shuffle: forceOnActive(forceShuffleEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

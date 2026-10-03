@@ -2035,6 +2035,72 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, levels + cash: src/floors/honeyEvent: a thread of cash drizzles
+  // down like honey, coiling into heaps on the bars
+  honeyEvent: {
+    chance: 0.01,
+    poursMs: [520, 320] as [number, number], // each heap, quickening
+    swingMs: 110, // the thread swinging on to the next heap
+    settleMs: 100, // the last coins landing before the heaps lift
+    flightMs: 350, // each coin's slurp into the total
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, worker tiers + a crit tier: src/floors/musicalChairsEvent: wisps race
+  // round the workers and scramble for them when the music stops
+  musicalChairsEvent: {
+    chance: 0.01,
+    circleMs: 1_100, // racing round, ever faster
+    dashMs: 220, // each wisp's dive onto its worker
+    outMs: 260, // the odd one out's dive into the clicked bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, hires + cash: src/floors/bubbleWandEvent: a wisp blows bubbles of
+  // cash that pop into new workers
+  bubbleWandEvent: {
+    chance: 0.01,
+    riseMs: 220, // the wand floating up
+    gapsMs: [300, 180] as [number, number], // between bubbles, quickening
+    inflateMs: 240, // each bubble swelling out of the wand
+    floatMs: 380, // each bubble drifting to its spot
+    popMs: 260, // the cash flung out of a pop
+    diveMs: 280, // the wand diving into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, cash: src/floors/hyperspaceEvent: stars of light and cash streak out
+  // at light speed, then snap back and fire into the total
+  hyperspaceEvent: {
+    chance: 0.01,
+    chargeMs: 400, // stars drifting out before the jump
+    warpMs: 900, // streaking, ever faster
+    dropMs: 200, // every streak snapping back into the button
+    fireMs: 280, // the beam into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // lightning, levels + a crit tier: src/floors/javelinEvent: bolts hurled
+  // like javelins stick in the bars, then discharge
+  javelinEvent: {
+    chance: 0.01,
+    gapsMs: [420, 240] as [number, number], // between throws, quickening
+    flyMs: 150, // each javelin's flight
+    chargeMs: 320, // crackling before they all discharge
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/shuffleEvent: the screen riffled like a deck
+  shuffleEvent: {
+    chance: 0.01,
+    cutMs: 180, // the halves pulling apart
+    rifflesMs: [600, 420] as [number, number], // each riffle, quicker
+    squareMs: 160, // the deck squaring back up
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
