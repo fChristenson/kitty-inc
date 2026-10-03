@@ -71,7 +71,6 @@ export const forceClusterBombEvent = registerWispEvent(
       return {
         worker,
         lands,
-        seed: k * 13,
         at: (ms: number): Point | null => {
           if (ms < burstAt || ms >= lands) return null;
           return bezier(
@@ -144,7 +143,7 @@ export const forceClusterBombEvent = registerWispEvent(
             0,
             burstAt,
           );
-          drawDetonation(ctx, apex, ms - burstAt, BURST, now, 1);
+          drawDetonation(ctx, apex, ms - burstAt, BURST, now);
           for (const b of bomblets) {
             const p = b.at(ms);
             if (p)
@@ -165,7 +164,7 @@ export const forceClusterBombEvent = registerWispEvent(
               burstAt,
               b.lands,
             );
-            drawDetonation(ctx, b.worker.at, ms - b.lands, BLAST, now, b.seed);
+            drawDetonation(ctx, b.worker.at, ms - b.lands, BLAST, now);
           }
         },
       },

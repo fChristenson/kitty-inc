@@ -2327,6 +2327,85 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // money, levels + cash: src/floors/uprisingEvent: walls of cash climb the
+  // screen's sides and crash together at the top
+  uprisingEvent: {
+    chance: 0.01,
+    riseMs: 1_000, // the walls climbing, ever faster
+    curlMs: 300, // curling over to meet in the middle
+    flightMs: 380, // each coin's pour into the total
+    levelShare: 0.1, // of each bar's levels
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, worker tiers: src/floors/swingRideEvent: riders whirl out on a
+  // swing ride and are flung onto the workers
+  swingRideEvent: {
+    chance: 0.01,
+    spinMs: 1_100, // spinning up
+    snapsMs: [160, 90] as [number, number], // between chains snapping, quickening
+    flyMs: 320, // each rider's flight onto its worker
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, cash: src/floors/lawnmowerEvent: a wisp mows stripes of cash across
+  // the screen
+  lawnmowerEvent: {
+    chance: 0.01,
+    stripesMs: [280, 160] as [number, number], // each stripe, quickening
+    turnMs: 90, // each turn down into the next stripe
+    diveMs: 200, // the mower diving into the total
+    flightMs: 340, // each coin's rake into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, cash: src/floors/lightShowEvent: emitters along the bottom put on a
+  // concert laser show
+  lightShowEvent: {
+    chance: 0.01,
+    beatsMs: [200, 480, 730, 950, 1_150, 1_330], // each change; the last locks on the total
+    lockMs: 260, // the beams burning into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // lightning, levels + a crit tier: src/floors/bugZapperEvent: the clicked
+  // bar zaps wisp bugs that fly near it
+  bugZapperEvent: {
+    chance: 0.01,
+    flyMs: 450, // each bug's flight in
+    gapsMs: [200, 80] as [number, number], // between zaps, quickening
+    levelShare: 0.03, // of the bar's levels, per zap
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, an unlock: src/floors/firecrackersEvent: a string of
+  // firecrackers pops up the screen to a banger on the locked floor
+  firecrackersEvent: {
+    chance: 0.01,
+    runMs: 1_300, // the spark racing up the string
+    fuseMs: 350, // the banger fizzing before it blows
+    holdMs: 300,
+    mergeMs: 0,
+  },
+  // gunfire, hires: src/floors/sixShooterEvent: ricochet shots onto empty
+  // spots, each a new worker
+  sixShooterEvent: {
+    chance: 0.01,
+    drawMs: 250, // the gunslinger rising
+    gapsMs: [220, 110] as [number, number], // between shots, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/thermalEvent: the screen seen through a
+  // thermal camera
+  thermalEvent: {
+    chance: 0.01,
+    washMs: 250, // washing into the thermal image
+    flaresMs: 1_000, // the hot spots flaring, ever faster
+    overheatMs: 280, // overheating white and snapping back
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,

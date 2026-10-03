@@ -44,6 +44,19 @@ export function createTestButtonMarkup(): string {
       <input type="search" id="test-actions-filter" class="test-actions-filter" placeholder="Filter actions" autocomplete="off" />
       <p class="test-actions-empty" id="test-actions-empty" hidden>No matches</p>
       <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">New Events</summary>
+        <div class="test-actions-dropdown__menu">
+          <button id="test-uprising-event" class="game__button">Uprising</button>
+          <button id="test-swing-ride-event" class="game__button">Swing Ride</button>
+          <button id="test-lawnmower-event" class="game__button">Lawnmower</button>
+          <button id="test-light-show-event" class="game__button">Light Show</button>
+          <button id="test-bug-zapper-event" class="game__button">Bug Zapper</button>
+          <button id="test-firecrackers-event" class="game__button">Firecrackers</button>
+          <button id="test-six-shooter-event" class="game__button">Six-Shooter</button>
+          <button id="test-thermal-event" class="game__button">Thermal</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Test Actions</summary>
         <div class="test-actions-dropdown__menu">
           <button id="add-money" class="game__button">Add Money</button>

@@ -67,7 +67,6 @@ export const forceDemolitionEvent = registerWispEvent(
       return {
         at,
         boom,
-        seed: k * 7,
         wisp: (ms: number): Point | null => {
           if (ms < leaves || ms >= boom) return null;
           return ms < leaves + flyMs
@@ -141,9 +140,9 @@ export const forceDemolitionEvent = registerWispEvent(
               c.fromMs,
               c.boom,
             );
-            drawDetonation(ctx, c.at, ms - c.boom, BLAST, now, c.seed);
+            drawDetonation(ctx, c.at, ms - c.boom, BLAST, now);
           }
-          drawDetonation(ctx, centre, ms - finalAt, FINAL, now, 99);
+          drawDetonation(ctx, centre, ms - finalAt, FINAL, now);
         },
       },
     );
