@@ -46,6 +46,23 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-airbrush-event" class="game__button">Airbrush</button>
+          <button id="test-capillary-event" class="game__button">Capillary</button>
+          <button id="test-battle-tops-event" class="game__button">Battle Tops</button>
+          <button id="test-pneumatic-tubes-event" class="game__button">Pneumatic Tubes</button>
+          <button id="test-star-polygon-event" class="game__button">Star Polygon</button>
+          <button id="test-volt-spider-event" class="game__button">Volt Spider</button>
+          <button id="test-orbital-decay-event" class="game__button">Orbital Decay</button>
+          <button id="test-spray-and-pray-event" class="game__button">Spray and Pray</button>
+          <button id="test-shuttle-event" class="game__button">Shuttle</button>
+          <button id="test-drill-duel-event" class="game__button">Drill Duel</button>
+          <button id="test-tower-of-hanoi-event" class="game__button">Tower of Hanoi</button>
+          <button id="test-rule-30-event" class="game__button">Rule 30</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-fountain-show-event" class="game__button">Fountain Show</button>
           <button id="test-spinning-plates-event" class="game__button">Spinning Plates</button>
           <button id="test-scoops-event" class="game__button">Scoops</button>
@@ -57,11 +74,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-oil-strike-event" class="game__button">Oil Strike</button>
           <button id="test-harmonograph-event" class="game__button">Harmonograph</button>
           <button id="test-quicksort-event" class="game__button">Quicksort</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-auger-event" class="game__button">Auger</button>
           <button id="test-tidal-bore-event" class="game__button">Tidal Bore</button>
           <button id="test-scrum-event" class="game__button">Scrum</button>

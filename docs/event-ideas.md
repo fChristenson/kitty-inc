@@ -944,6 +944,18 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Oil Strike** (drill; cash): drills plunge onto the bottom of the screen and bore in until each strikes a gusher of cash arcing into the total.
 - [x] **Harmonograph** (experiment: a harmonograph's pendulums; cash): a pendulum-swung pen draws a winding gold rosette, faster and faster, then it bursts into cash.
 - [x] **Quicksort** (experiment: a sorting algorithm; cash): quicksort swaps jumbled gold columns into a staircase, then cash cascades down it into the total.
+- [x] **Capillary** (money; levels and cash): thin threads of cash creep up out of a pool against gravity onto the bars, then the pool drains up them into the total.
+- [x] **Battle Tops** (wisp; crit tiers): two spinning tops battle in an arena over each bar, clashing harder each time, until the winner spins down onto it.
+- [x] **Pneumatic Tubes** (mix; free hires and cash): capsule wisps ride the heads of gushing tubes of cash out of the button onto empty spots.
+- [x] **Star Polygon** (beam; worker perma tiers): a beam tip draws a seven-pointed star round each worker, corner by corner, flashing as it closes.
+- [x] **Volt Spider** (lightning; a free floor): a spider wisp on four legs of lightning scuttles up the building, every planted step a crack, and bites into the lock.
+- [x] **Orbital Decay** (explosion; cash): bombs orbiting the button spiral in faster and crash into it one by one, the last three together in a colossal blast.
+- [x] **Spray and Pray** (gunfire; levels): a turret at the bottom rakes a stream of bullets along each bar in turn, then sprays them all wildly.
+- [x] **Shuttle** (bounce; crit tiers): a ball shuttles up and down between each bar and the one below, faster and faster, the last bounce off each a tier.
+- [x] **Drill Duel** (drill; worker perma tiers): two drill heads grind point to point over each worker until one shatters and the winner bores into the worker.
+- [x] **Tower of Hanoi** (experiment: the Tower of Hanoi puzzle; cash): glowing disks move peg to peg in the optimal solution, faster and faster, then the finished tower pours cash.
+- [x] **Rule 30** (experiment: Wolfram's Rule 30 automaton; cash): rows of gold cells cascade down from one cell into a chaotic triangle, then burst into cash.
+- [x] **Airbrush** (spray; crit tiers): an airbrush wisp sweeps a cone of gold mist back and forth along each bar, coating it thicker each pass until it flashes for a tier.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.

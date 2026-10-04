@@ -7983,6 +7983,102 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 44
+  // money, levels and cash: src/floors/capillaryEvent: threads of cash creep up from a pool onto the bars
+  capillaryEvent: {
+    chance: 0.01,
+    spreadMs: 350, // the pool spreading
+    climbsMs: [800, 520] as [number, number], // each thread's climb, quickening
+    levelShare: 0.03, // per bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, crit tiers: src/floors/battleTopsEvent: spinning tops battle over each bar, the winner landing on it
+  battleTopsEvent: {
+    chance: 0.01,
+    staggerMs: 260, // between battles starting
+    clashesMs: [280, 170] as [number, number], // between clashes, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, free hires and cash: src/floors/pneumaticTubesEvent: capsules ride tubes of cash onto empty spots
+  pneumaticTubesEvent: {
+    chance: 0.01,
+    firesMs: [260, 130] as [number, number], // between tubes, quickening
+    travelMs: 520, // a capsule's trip down its tube
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, worker perma tiers: src/floors/starPolygonEvent: a beam draws a seven-pointed star round each worker
+  starPolygonEvent: {
+    chance: 0.01,
+    edgesMs: [80, 45] as [number, number], // each edge, the first star to the last
+    overlap: 0.6, // how far through a star the next one starts
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, a free floor: src/floors/voltSpiderEvent: a spider on legs of lightning climbs to the lock
+  voltSpiderEvent: {
+    chance: 0.01,
+    stepsMs: [220, 110] as [number, number], // each stride, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/orbitalDecayEvent: orbiting bombs spiral in and crash into the button
+  orbitalDecayEvent: {
+    chance: 0.01,
+    firstMs: 700, // the first bomb's spiral in
+    hitsMs: [220, 120] as [number, number], // between impacts, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, levels: src/floors/sprayAndPrayEvent: a turret rakes a stream of bullets along each bar
+  sprayAndPrayEvent: {
+    chance: 0.01,
+    firstMs: 200,
+    shotsMs: [45, 25] as [number, number], // between shots, quickening
+    wildGapMs: 150,
+    levelShare: 0.02, // per sweep
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, crit tiers: src/floors/shuttleEvent: a ball shuttles up and down between each pair of bars
+  shuttleEvent: {
+    chance: 0.01,
+    legMs: [200, 90] as [number, number], // each leg, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // drill, worker perma tiers: src/floors/drillDuelEvent: drills grind head to head, the winner bores into a worker
+  drillDuelEvent: {
+    chance: 0.01,
+    approachMs: 220,
+    grindsMs: [420, 260] as [number, number], // each grind, quickening
+    boreMs: 280, // the winner boring into its worker
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/towerOfHanoiEvent: the Tower of Hanoi solves itself
+  towerOfHanoiEvent: {
+    chance: 0.01,
+    movesMs: [90, 25] as [number, number], // each move, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/rule30Event: the Rule 30 automaton cascades down the screen
+  rule30Event: {
+    chance: 0.01,
+    pourMs: 1500, // the rows cascading down
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // spray, crit tiers: src/floors/airbrushEvent: an airbrush sprays a gold coat along each bar
+  airbrushEvent: {
+    chance: 0.01,
+    passesMs: [260, 160] as [number, number], // each pass along a bar, the first bar to the last
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
