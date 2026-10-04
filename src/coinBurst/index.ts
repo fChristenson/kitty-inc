@@ -2,6 +2,12 @@ import { randomInt } from "../utils";
 import { loadSprite } from "../loadAssets";
 import { createParticlePool, clampedDtSince } from "../shared/particlePool";
 import { runWhenIdle } from "../shared/idle";
+import {
+  createSpriteTexture,
+  drawSprites,
+  SPRITE_FLOATS,
+  type SpriteTexture,
+} from "../shared/spriteBatch";
 
 // shared coin/bill flipbook sprites + the actual particle physics/draw math —
 // floors/coins (particles glued to a specific Floor's own on-screen rect) and
@@ -72,7 +78,43 @@ export async function loadCoinBurstImages(): Promise<HTMLImageElement> {
   const billFrames = billFrameCanvases;
   runWhenIdle(() => (coinAtlas = buildAtlas(coinFrames)));
   runWhenIdle(() => (billAtlas = buildAtlas(billFrames)));
+  runWhenIdle(() => buildSheet(coinFrames, billFrames));
   return coin;
+}
+
+// every coin and bill frame on one WebGL texture, for batches (see
+// beginCoinBatch); each frame's texture rect, coins first, then bills
+const SHEET_PAD = 4;
+let sheet: SpriteTexture | null = null;
+const sheetRects = new Float32Array(
+  (COIN_SPIN_FRAME_COUNT + BILL_SPIN_FRAME_COUNT) * 4,
+);
+
+function buildSheet(
+  coinFrames: HTMLCanvasElement[],
+  billFrames: HTMLCanvasElement[],
+): void {
+  const rows = [coinFrames, billFrames];
+  const cellW = Math.max(coinFrames[0].width, billFrames[0].width);
+  const cellH = PRESCALE_CELL_H;
+  const canvas = document.createElement("canvas");
+  canvas.width = (cellW + SHEET_PAD) * COIN_SPIN_FRAME_COUNT;
+  canvas.height = (cellH + SHEET_PAD) * rows.length;
+  const ctx = canvas.getContext("2d")!;
+  let id = 0;
+  rows.forEach((frames, row) => {
+    frames.forEach((frame, i) => {
+      const x = i * (cellW + SHEET_PAD);
+      const y = row * (cellH + SHEET_PAD);
+      ctx.drawImage(frame, x, y);
+      sheetRects[id * 4] = x / canvas.width;
+      sheetRects[id * 4 + 1] = y / canvas.height;
+      sheetRects[id * 4 + 2] = (x + frame.width) / canvas.width;
+      sheetRects[id * 4 + 3] = (y + frame.height) / canvas.height;
+      id++;
+    });
+  });
+  sheet = createSpriteTexture(canvas);
 }
 
 // every frame at every tilt, pre-rotated onto one atlas per sprite, so a
@@ -234,6 +276,119 @@ let batchE = 0;
 let batchF = 0;
 let batchUpright = true;
 
+// between beginCoinBatch and endCoinBatch, drawCoinBurstFrame queues its
+// coins in the canvas's device pixels and endCoinBatch draws them all at once
+// on WebGL. A batch smaller than SMALL_BATCH is drawn the 2D way: stamping
+// the WebGL canvas costs about as much as that many coins
+const SMALL_BATCH = 64;
+let batchCtx: CanvasRenderingContext2D | null = null;
+let queue = new Float32Array(SPRITE_FLOATS * 1024);
+let queueFrames = new Uint8Array(1024);
+let queued = 0;
+let boxLeft = 0;
+let boxTop = 0;
+let boxRight = 0;
+let boxBottom = 0;
+
+// no-op until the coin sheet is ready (or without WebGL): coins then draw
+// one by one as they're called
+export function beginCoinBatch(ctx: CanvasRenderingContext2D): void {
+  if (!sheet) return;
+  batchCtx = ctx;
+  queued = 0;
+  boxLeft = boxTop = Infinity;
+  boxRight = boxBottom = -Infinity;
+}
+
+export function endCoinBatch(ctx: CanvasRenderingContext2D): void {
+  if (batchCtx !== ctx) return;
+  batchCtx = null;
+  if (queued === 0) return;
+  if (
+    queued >= SMALL_BATCH &&
+    drawSprites(
+      ctx,
+      sheet!,
+      queue,
+      queued,
+      boxLeft,
+      boxTop,
+      boxRight,
+      boxBottom,
+    )
+  )
+    return;
+  // each queued coin's own device-pixel transform, on a unit square
+  ctx.save();
+  for (let i = 0; i < queued; i++) {
+    const o = i * SPRITE_FLOATS;
+    const id = queueFrames[i];
+    const frame =
+      id < COIN_SPIN_FRAME_COUNT
+        ? coinFrameCanvases![id]
+        : billFrameCanvases![id - COIN_SPIN_FRAME_COUNT];
+    ctx.globalAlpha = queue[o + 10];
+    ctx.setTransform(
+      queue[o + 2],
+      queue[o + 3],
+      queue[o + 4],
+      queue[o + 5],
+      queue[o],
+      queue[o + 1],
+    );
+    ctx.drawImage(frame, -1, -1, 2, 2);
+  }
+  ctx.restore();
+}
+
+function queueCoin(
+  frameId: number,
+  px: number,
+  py: number,
+  ux: number,
+  uy: number,
+  vx: number,
+  vy: number,
+  alpha: number,
+): void {
+  const reachX = Math.abs(ux) + Math.abs(vx);
+  const reachY = Math.abs(uy) + Math.abs(vy);
+  if (
+    px + reachX < 0 ||
+    py + reachY < 0 ||
+    px - reachX > batchWidth ||
+    py - reachY > batchHeight ||
+    alpha <= 0
+  )
+    return;
+  if ((queued + 1) * SPRITE_FLOATS > queue.length) {
+    const grown = new Float32Array(queue.length * 2);
+    grown.set(queue);
+    queue = grown;
+    const grownFrames = new Uint8Array(queueFrames.length * 2);
+    grownFrames.set(queueFrames);
+    queueFrames = grownFrames;
+  }
+  const o = queued * SPRITE_FLOATS;
+  const r = frameId * 4;
+  queue[o] = px;
+  queue[o + 1] = py;
+  queue[o + 2] = ux;
+  queue[o + 3] = uy;
+  queue[o + 4] = vx;
+  queue[o + 5] = vy;
+  queue[o + 6] = sheetRects[r];
+  queue[o + 7] = sheetRects[r + 1];
+  queue[o + 8] = sheetRects[r + 2];
+  queue[o + 9] = sheetRects[r + 3];
+  queue[o + 10] = alpha;
+  queueFrames[queued++] = frameId;
+  if (px - reachX < boxLeft) boxLeft = px - reachX;
+  if (py - reachY < boxTop) boxTop = py - reachY;
+  if (px + reachX > boxRight) boxRight = px + reachX;
+  if (py + reachY > boxBottom) boxBottom = py + reachY;
+}
+
 // draws one coin/bill particle centered at (x, y) with the given on-screen
 // radius — a no-op (not a fallback circle) for however briefly the sprites
 // are still loading, since the caller's own particle keeps ticking either way
@@ -282,6 +437,24 @@ export function drawCoinBurstFrame(
   const f = batchF;
   const px = a * x + c * y + e;
   const py = b * x + d * y + f;
+  if (batchCtx === ctx) {
+    const frameCanvas = frameCanvases[frame];
+    const halfH = destH / 2;
+    const halfW = halfH * (frameCanvas.width / frameCanvas.height);
+    const cos = Math.cos(sprite.axisAngle);
+    const sin = Math.sin(sprite.axisAngle);
+    queueCoin(
+      (sprite.kind === "bill" ? COIN_SPIN_FRAME_COUNT : 0) + frame,
+      px,
+      py,
+      (a * cos + c * sin) * halfW,
+      (b * cos + d * sin) * halfW,
+      (c * cos - a * sin) * halfH,
+      (d * cos - b * sin) * halfH,
+      ctx.globalAlpha,
+    );
+    return;
+  }
   const atlas = sprite.kind === "bill" ? billAtlas : coinAtlas;
   const step = Math.round((sprite.axisAngle + Math.PI / 2) / AXIS_STEP);
   if (
@@ -418,6 +591,7 @@ export function drawActiveCoinBursts(
   lastActiveUpdateAt = now;
   pool.update(dt, advanceCoinBurstParticle);
   const base = ctx.getTransform();
+  beginCoinBatch(ctx);
   for (const p of pool.list) {
     const t = p.life / p.maxLife;
     const radius = p.size * (1 - t * 0.3);
@@ -425,4 +599,5 @@ export function drawActiveCoinBursts(
     drawCoinBurstFrame(ctx, p, p.x, p.y, radius, base);
   }
   ctx.globalAlpha = 1;
+  endCoinBatch(ctx);
 }

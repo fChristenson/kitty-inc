@@ -3,10 +3,12 @@
 // streaks wrapping round its front
 import { COLOR } from "../../palette";
 import {
+  beginCoinBatch,
   BILL_SPIN_FRAME_COUNT,
   COIN_BILL_CHANCE,
   COIN_SPIN_FRAME_COUNT,
   drawCoinBurstFrame,
+  endCoinBatch,
   type CoinBurstSprite,
 } from "../../coinBurst";
 import { WORKER_HEIGHT } from "../worker";
@@ -136,6 +138,7 @@ export function drawFunnel(
   ctx.fill();
   ctx.restore();
   const base = ctx.getTransform();
+  beginCoinBatch(ctx);
   for (const p of placed) {
     ctx.globalAlpha = p.depth < 0 ? 0.75 : 1;
     drawCoinBurstFrame(
@@ -148,6 +151,7 @@ export function drawFunnel(
     );
   }
   ctx.globalAlpha = 1;
+  endCoinBatch(ctx);
   streaks(true);
 }
 

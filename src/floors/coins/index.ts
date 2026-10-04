@@ -4,6 +4,8 @@ import { FLOOR_W } from "../constants";
 import {
   loadCoinBurstImages,
   drawCoinBurstFrame,
+  beginCoinBatch,
+  endCoinBatch,
   getCoinRimPoint,
   getSpriteReach,
   getFullestFrame,
@@ -153,6 +155,8 @@ export function drawCoins(
   let rectFloor: Floor | null = null;
   let rect: { left: number; top: number; width: number } | null = null;
   const base = ctx.getTransform();
+  beginCoinBatch(ctx);
+  glints = 0;
   for (const list of [pool.list, sprayPool.list])
     for (const p of list) {
       if ((p.homing?.group.layer ?? "world") !== layer) continue;
@@ -195,10 +199,34 @@ export function drawCoins(
         ctx.globalAlpha = Math.max(0, 1 - t);
       }
       drawCoinBurstFrame(ctx, p, px, py, radius, base);
-      if (p.homing) drawHangGlint(ctx, p, p.homing, px, py, radius);
+      // glints go over every coin, after the batch
+      if (p.homing?.holdTicks !== undefined) {
+        glintCoins[glints] = p;
+        glintSpots[glints * 3] = px;
+        glintSpots[glints * 3 + 1] = py;
+        glintSpots[glints * 3 + 2] = radius;
+        glints++;
+      }
     }
   ctx.globalAlpha = 1;
+  endCoinBatch(ctx);
+  for (let i = 0; i < glints; i++) {
+    const p = glintCoins[i];
+    drawHangGlint(
+      ctx,
+      p,
+      p.homing!,
+      glintSpots[i * 3],
+      glintSpots[i * 3 + 1],
+      glintSpots[i * 3 + 2],
+    );
+  }
 }
+
+// hanging coins seen this draw, and where: reused, never shrunk
+const glintCoins: Particle[] = [];
+const glintSpots: number[] = [];
+let glints = 0;
 
 // a few freeze-burst coins hanging mid-air catch the light: one quick, sharp
 // glint each, at its own moment of the hang, so they sparkle one by one
