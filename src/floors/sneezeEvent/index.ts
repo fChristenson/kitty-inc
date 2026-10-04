@@ -62,14 +62,21 @@ export const forceSneezeEvent = registerWispEvent(
     const clicked = bars.find((b) => b.floor === floor) ?? bars[0];
     if (!clicked) return;
     const others = bars.filter((b) => b !== clicked);
-    const targets = [others[0] ?? clicked, others[1] ?? others[0] ?? clicked, clicked];
+    const targets = [
+      others[0] ?? clicked,
+      others[1] ?? others[0] ?? clicked,
+      clicked,
+    ];
     // it sneezes from the side farther from the clicked bar's middle
     const left = clicked.center.x > (area.left + area.right) / 2;
     const x = left ? area.left + INSET : area.right - INSET;
     const sneezes: Sneeze[] = targets.map((bar, k) => {
       const from: Point = {
         x,
-        y: Math.min(area.bottom - 60, Math.max(area.top + 60, bar.center.y - RISE)),
+        y: Math.min(
+          area.bottom - 60,
+          Math.max(area.top + 60, bar.center.y - RISE),
+        ),
       };
       const at = windupMs + k * gapMs;
       const aim = Math.atan2(bar.center.y - from.y, bar.center.x - from.x);
@@ -105,7 +112,9 @@ export const forceSneezeEvent = registerWispEvent(
         if (ms >= leaves)
           return lerp(
             [sneezes[k - 1].from.y, s.from.y],
-            smoothstep(clamp01((ms - leaves) / (s.at - s.windup * 0.3 - leaves))),
+            smoothstep(
+              clamp01((ms - leaves) / (s.at - s.windup * 0.3 - leaves)),
+            ),
           );
       }
       return sneezes[0].from.y;
@@ -126,8 +135,13 @@ export const forceSneezeEvent = registerWispEvent(
       const w = ms < s.at ? windupOf(ms) : 0;
       const lurch = ms >= s.at ? 1 - clamp01((ms - s.at) / LURCH_MS) : 0;
       const jitter = 6 * w * w;
-      sneezer.x = x + away * REAR * easeIn(w) - away * LURCH * lurch + Math.sin(ms * 0.08) * jitter;
-      sneezer.y = facing(ms) - REAR * 0.5 * easeIn(w) + Math.cos(ms * 0.11) * jitter;
+      sneezer.x =
+        x +
+        away * REAR * easeIn(w) -
+        away * LURCH * lurch +
+        Math.sin(ms * 0.08) * jitter;
+      sneezer.y =
+        facing(ms) - REAR * 0.5 * easeIn(w) + Math.cos(ms * 0.11) * jitter;
       return sneezer;
     };
 
@@ -194,13 +208,23 @@ export const forceSneezeEvent = registerWispEvent(
               COAT * (1 - clamp01((ms - last.lands) / MIST_MS)),
               1 - clamp01(t * 2),
             );
-            if (t < 1) drawSprayMist(ctx, s.bar.center, ms - s.lands, 1 - t, MIST, now);
+            if (t < 1)
+              drawSprayMist(ctx, s.bar.center, ms - s.lands, 1 - t, MIST, now);
           }
           for (const s of sneezes)
-            for (const spray of s.sprays) drawSpray(ctx, spray, ms, now, DROPLET);
+            for (const spray of s.sprays)
+              drawSpray(ctx, spray, ms, now, DROPLET);
           const s = current(ms);
-          const swell = ms < s.at ? 1 + SWELL[sneezes.indexOf(s)] * windupOf(ms) ** 2 : 1;
-          drawWisp(ctx, sneezerAt, ms, now, SNEEZER * swell, 0.3 + 0.6 * (swell - 1));
+          const swell =
+            ms < s.at ? 1 + SWELL[sneezes.indexOf(s)] * windupOf(ms) ** 2 : 1;
+          drawWisp(
+            ctx,
+            sneezerAt,
+            ms,
+            now,
+            SNEEZER * swell,
+            0.3 + 0.6 * (swell - 1),
+          );
         },
       },
     );

@@ -70,11 +70,17 @@ export const forceCutTheRopeEvent = registerWispEvent(
       y: Math.max(area.top + 140, bar.box.y - HANG),
     };
     const anchors = ANCHORS.map((share, k) => ({
-      x: Math.min(area.right - 30, Math.max(area.left + 30, hang.x + share * width)),
+      x: Math.min(
+        area.right - 30,
+        Math.max(area.left + 30, hang.x + share * width),
+      ),
       y: area.top + (k < 2 ? 30 : 10),
     }));
     const gun: Point = {
-      x: hang.x > (area.left + area.right) / 2 ? area.left + 80 : area.right - 80,
+      x:
+        hang.x > (area.left + area.right) / 2
+          ? area.left + 80
+          : area.right - 80,
       y: Math.min(area.bottom - 80, hang.y + 180),
     };
     const landing: Point = { x: hang.x, y: bar.box.y };
@@ -82,21 +88,24 @@ export const forceCutTheRopeEvent = registerWispEvent(
     // the weight springs toward a new rest after every cut, swinging past it
     const cuts: Cut[] = [];
     const swing = (c: Cut, t: number, into: Point) => {
-      const k = Math.exp(-t / SWING_DECAY) * Math.cos((2 * Math.PI * t) / SWING_PERIOD);
+      const k =
+        Math.exp(-t / SWING_DECAY) * Math.cos((2 * Math.PI * t) / SWING_PERIOD);
       into.x = c.rest.x + (c.from.x - c.rest.x) * k;
       into.y = c.rest.y + (c.from.y - c.rest.y) * k;
       return into;
     };
     const weightBefore = (ms: number, into: Point): Point => {
       for (let k = cuts.length - 1; k >= 0; k--)
-        if (ms >= cuts[k].bullet.hitAt) return swing(cuts[k], ms - cuts[k].bullet.hitAt, into);
+        if (ms >= cuts[k].bullet.hitAt)
+          return swing(cuts[k], ms - cuts[k].bullet.hitAt, into);
       into.x = hang.x + Math.sin(ms * 0.004) * 4;
       into.y = hang.y;
       return into;
     };
     let fires: number = FIRST_MS;
     anchors.forEach((anchor, k) => {
-      if (k > 0) fires += lerp(shotsMs, (k - 1) / Math.max(1, anchors.length - 2));
+      if (k > 0)
+        fires += lerp(shotsMs, (k - 1) / Math.max(1, anchors.length - 2));
       // aimed at the rope's middle where it'll be when the round gets there
       const aim: Point = { x: 0, y: 0 };
       let hitAt = fires;
@@ -111,7 +120,9 @@ export const forceCutTheRopeEvent = registerWispEvent(
       const left = anchors.slice(k + 1);
       const rest: Point = left.length
         ? {
-            x: hang.x * 0.5 + (left.reduce((s, a) => s + a.x, 0) / left.length) * 0.5,
+            x:
+              hang.x * 0.5 +
+              (left.reduce((s, a) => s + a.x, 0) / left.length) * 0.5,
             y: hang.y + DROP_PER_CUT * (k + 1),
           }
         : from;

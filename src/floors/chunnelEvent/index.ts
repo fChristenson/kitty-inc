@@ -14,7 +14,12 @@ import { WISP_SIZE, type Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
-import { drawGrind, planDrill, planGrind, type Grind } from "../../shared/drill";
+import {
+  drawGrind,
+  planDrill,
+  planGrind,
+  type Grind,
+} from "../../shared/drill";
 import { drawBeam, drawBeamFlare } from "../../shared/beam";
 import { findRewardBars, levelsFor } from "../eventRewards";
 
@@ -102,7 +107,11 @@ export const forceChunnelEvent = registerWispEvent(
       [meetAt],
       (ms) => ms,
       () => {
-        cover!.levels(bar, levelsFor(bar.floor, levelShare * MEET_SHARE, 5), middle);
+        cover!.levels(
+          bar,
+          levelsFor(bar.floor, levelShare * MEET_SHARE, 5),
+          middle,
+        );
         cover!.slam(bar);
         cover!.blast(middle);
       },
@@ -127,7 +136,13 @@ export const forceChunnelEvent = registerWispEvent(
           const fade = 1 - clamp01((ms - meetAt) / MEET_MS);
           for (const g of grinds)
             if (ms >= g.bites && fade > 0)
-              drawBeam(ctx, g.drill.target, ms >= meetAt ? middle : tip(g, ms), TUNNEL, 0.7 * fade);
+              drawBeam(
+                ctx,
+                g.drill.target,
+                ms >= meetAt ? middle : tip(g, ms),
+                TUNNEL,
+                0.7 * fade,
+              );
           for (const g of grinds) drawGrind(ctx, g, ms, now, SIZE, SPRAY);
           const t = (ms - meetAt) / MEET_MS;
           if (t >= 0 && t < 1)

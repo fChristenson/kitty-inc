@@ -85,8 +85,7 @@ export const forceHiccupsEvent = registerWispEvent(
         });
       }
     });
-    const endAt =
-      Math.max(final, ...sats.map((s) => s.ms)) + DETONATION_MS;
+    const endAt = Math.max(final, ...sats.map((s) => s.ms)) + DETONATION_MS;
 
     // the bomb shows before each blow, swelling and fizzing
     const bomb: Point = { x: 0, y: 0 };
@@ -101,7 +100,8 @@ export const forceHiccupsEvent = registerWispEvent(
     const bombAt = (ms: number): Point | null => {
       const k = hiccupAt(ms);
       if (k < 0) return null;
-      const tremble = 2 + 6 * clamp01((ms - showsFrom[k]) / (blows[k] - showsFrom[k]));
+      const tremble =
+        2 + 6 * clamp01((ms - showsFrom[k]) / (blows[k] - showsFrom[k]));
       bomb.x = centre.x + Math.sin(ms * 0.07) * tremble;
       bomb.y = centre.y + Math.cos(ms * 0.09) * tremble;
       return bomb;
@@ -180,15 +180,30 @@ export const forceHiccupsEvent = registerWispEvent(
           const k = hiccupAt(ms);
           const at = bombAt(ms);
           if (at) {
-            const burn = clamp01((ms - showsFrom[k]) / (blows[k] - showsFrom[k]));
+            const burn = clamp01(
+              (ms - showsFrom[k]) / (blows[k] - showsFrom[k]),
+            );
             drawLitFuse(ctx, at, burn, FUSE * BOMBS[k], now);
-            drawWispHead(ctx, bombAt, ms, now, WISP_SIZE * BOMBS[k], 0.4 + 0.5 * burn);
+            drawWispHead(
+              ctx,
+              bombAt,
+              ms,
+              now,
+              WISP_SIZE * BOMBS[k],
+              0.4 + 0.5 * burn,
+            );
           }
           for (let i = 0; i < sats.length; i++) {
             const s = sats[i];
             if (ms >= s.litAt && ms < s.ms) {
               const pop = easeOut(clamp01((ms - s.litAt) / 120));
-              drawLitFuse(ctx, s.at, clamp01((ms - s.litAt) / (s.ms - s.litAt)), SAT_FUSE, now);
+              drawLitFuse(
+                ctx,
+                s.at,
+                clamp01((ms - s.litAt) / (s.ms - s.litAt)),
+                SAT_FUSE,
+                now,
+              );
               drawWispHead(ctx, satAts[i], ms, now, WISP_SIZE * SAT * pop, 0.6);
             }
             drawDetonation(ctx, s.at, ms - s.ms, SAT_BLAST, now);

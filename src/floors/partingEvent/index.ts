@@ -144,10 +144,16 @@ export const forcePartingEvent = registerWispEvent(
         return wisp;
       }
       if (ms < crashed) {
-        wisp.y = lerp([seaTop, floorOf.y], smoothstep(clamp01((ms - partAt) / partMs)));
+        wisp.y = lerp(
+          [seaTop, floorOf.y],
+          smoothstep(clamp01((ms - partAt) / partMs)),
+        );
         return wisp;
       }
-      wisp.y = lerp([floorOf.y, total.y], easeIn(clamp01((ms - crashed) / leapMs)));
+      wisp.y = lerp(
+        [floorOf.y, total.y],
+        easeIn(clamp01((ms - crashed) / leapMs)),
+      );
       wisp.x = lerp([mid, total.x], easeIn(clamp01((ms - crashed) / leapMs)));
       return wisp;
     };

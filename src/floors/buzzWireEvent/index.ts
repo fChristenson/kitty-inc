@@ -20,7 +20,12 @@ import { clamp01, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
 import { alongRoute } from "../../shared/curves";
 import { drawBeam } from "../../shared/beam";
-import { createBolt, drawBolt, drawStrike, type Bolt } from "../../shared/lightning";
+import {
+  createBolt,
+  drawBolt,
+  drawStrike,
+  type Bolt,
+} from "../../shared/lightning";
 import { measure, pointAlong, sampleLine } from "../cashFlow";
 import { findRewardBars, levelsFor, type RewardBar } from "../eventRewards";
 
@@ -55,7 +60,8 @@ export const forceBuzzWireEvent = registerWispEvent(
     const { runMs, levelShare, holdMs, mergeMs } = CONFIG.buzzWireEvent;
     const bars = findRewardBars(floor, context).slice(0, MAX_BARS);
     if (bars.length === 0) return;
-    const clicked = bars.find((b) => b.floor === floor) ?? bars[bars.length - 1];
+    const clicked =
+      bars.find((b) => b.floor === floor) ?? bars[bars.length - 1];
     const order = [...bars.filter((b) => b !== clicked), clicked];
 
     // weaving over each bar in turn, swinging out to a side between them

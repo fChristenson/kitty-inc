@@ -56,19 +56,25 @@ function playGame(): { line: number; captures: number[] }[] {
     if (id < hLines) {
       const r = Math.floor(id / COLS);
       const c = id % COLS;
-      return [r - 1, r].filter((row) => row >= 0 && row < ROWS).map((row) => row * COLS + c);
+      return [r - 1, r]
+        .filter((row) => row >= 0 && row < ROWS)
+        .map((row) => row * COLS + c);
     }
     const j = id - hLines;
     const r = Math.floor(j / (COLS + 1));
     const c = j % (COLS + 1);
-    return [c - 1, c].filter((col) => col >= 0 && col < COLS).map((col) => r * COLS + col);
+    return [c - 1, c]
+      .filter((col) => col >= 0 && col < COLS)
+      .map((col) => r * COLS + col);
   };
   const sides = new Array(ROWS * COLS).fill(0);
   const free = Array.from({ length: count }, (_, i) => i);
   const pick = (ids: number[]) => ids[Math.floor(Math.random() * ids.length)];
   const moves: { line: number; captures: number[] }[] = [];
   while (free.length) {
-    const closing = free.filter((id) => boxesOf(id).some((b) => sides[b] === 3));
+    const closing = free.filter((id) =>
+      boxesOf(id).some((b) => sides[b] === 3),
+    );
     const safe = free.filter((id) => boxesOf(id).every((b) => sides[b] < 2));
     const line = pick(closing.length ? closing : safe.length ? safe : free);
     free.splice(free.indexOf(line), 1);
@@ -144,7 +150,12 @@ export const forceDotsAndBoxesEvent = registerWispEvent(
       let k = 0;
       while (k < moves.length - 1 && ms >= moves[k + 1].ms) k++;
       const prev = k > 0 ? moves[k - 1].mid : centre;
-      const u = easeOut(clamp01((ms - (k > 0 ? moves[k - 1].ms : 0)) / Math.max(1, moves[k].ms - (k > 0 ? moves[k - 1].ms : 0))));
+      const u = easeOut(
+        clamp01(
+          (ms - (k > 0 ? moves[k - 1].ms : 0)) /
+            Math.max(1, moves[k].ms - (k > 0 ? moves[k - 1].ms : 0)),
+        ),
+      );
       pen.x = lerp([prev.x, moves[k].mid.x], u);
       pen.y = lerp([prev.y, moves[k].mid.y], u);
       return pen;
@@ -215,7 +226,15 @@ export const forceDotsAndBoxesEvent = registerWispEvent(
           }
           const pop = easeOut(clamp01(ms / POP_MS));
           for (let i = 0; i < dots.length; i++)
-            drawGlitterLight(ctx, dots[i].x, dots[i].y, DOT * pop, i, fade, now);
+            drawGlitterLight(
+              ctx,
+              dots[i].x,
+              dots[i].y,
+              DOT * pop,
+              i,
+              fade,
+              now,
+            );
           drawWisp(ctx, penAt, ms, now, WISP_SIZE * PEN, 0.7);
         },
       },

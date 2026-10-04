@@ -8,11 +8,7 @@
 // heap, which settles with a jolt and drops onto the bar in a huge blast of
 // free levels. Then the crit's tier pays out
 import { CONFIG } from "../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playSwoosh,
-} from "../../sound";
+import { playBloop, playBoostEventStream, playSwoosh } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { COLOR } from "../../palette";
 import { drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
@@ -141,7 +137,12 @@ export const forcePillowFightEvent = registerWispEvent(
       liftMs,
     );
     const swept = simulateSweep(sweep, spots);
-    const mounds = heapSpots({ x: heapX, y: heapY + MOUND_H / 2 }, FEATHERS, MOUND_W, MOUND_H);
+    const mounds = heapSpots(
+      { x: heapX, y: heapY + MOUND_H / 2 },
+      FEATHERS,
+      MOUND_W,
+      MOUND_H,
+    );
     const gathered = sweep.endMs + GATHER_MS;
     const landsAt = gathered + DROP_MS;
     const endAt = landsAt + FADE_MS;
@@ -155,7 +156,8 @@ export const forcePillowFightEvent = registerWispEvent(
         let off: number;
         let lift = 0;
         if (ms < smacks[0]) {
-          off = TOUCH + (1 - easeIn(ms / smacks[0])) * (centre.x - area.left + 100);
+          off =
+            TOUCH + (1 - easeIn(ms / smacks[0])) * (centre.x - area.left + 100);
         } else if (ms < lastSmack) {
           let k = 0;
           while (ms >= smacks[k + 1]) k++;
@@ -271,7 +273,16 @@ export const forcePillowFightEvent = registerWispEvent(
           }
           ctx.restore();
           for (const at of pillows)
-            drawWispBetween(ctx, at, ms, now, WISP_SIZE * PILLOW, 0.5, 0, lastSmack + 300);
+            drawWispBetween(
+              ctx,
+              at,
+              ms,
+              now,
+              WISP_SIZE * PILLOW,
+              0.5,
+              0,
+              lastSmack + 300,
+            );
           // faded in on its first stroke's start and out after its last
           const b = sweep.at(
             Math.min(Math.max(ms, sweep.startMs), sweep.endMs - 1),

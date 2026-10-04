@@ -11,7 +11,12 @@ import { CONFIG } from "../../config";
 import { playBloop, playBoostEventStream, playExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { getButtonCenter } from "../upgradeButton";
-import { drawWisp, drawWispHead, WISP_SIZE, type Point } from "../../shared/wisp";
+import {
+  drawWisp,
+  drawWispHead,
+  WISP_SIZE,
+  type Point,
+} from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
@@ -64,7 +69,8 @@ export const forceWhisperingGalleryEvent = registerWispEvent(
       const qa = (ex * ex) / (a * a) + (ey * ey) / (b * b);
       const qb = 2 * ((px * ex) / (a * a) + (py * ey) / (b * b));
       const qc = (px * px) / (a * a) + (py * py) / (b * b) - 1;
-      const t = (-qb + Math.sqrt(Math.max(0, qb * qb - 4 * qa * qc))) / (2 * qa);
+      const t =
+        (-qb + Math.sqrt(Math.max(0, qb * qb - 4 * qa * qc))) / (2 * qa);
       return { x: p.x + dx * t, y: p.y + dy * t };
     };
     // every chord off the wall runs through the other focus
@@ -165,7 +171,8 @@ export const forceWhisperingGalleryEvent = registerWispEvent(
             drawWispHead(ctx, buttonAt, ms, now, WISP_SIZE * FOCUS, 0.3);
             drawWispHead(ctx, lockAt, ms, now, WISP_SIZE * FOCUS, 0.3);
           }
-          for (const w of walls) drawBounceSplash(ctx, w, ms - w.ms, SPLASH, now);
+          for (const w of walls)
+            drawBounceSplash(ctx, w, ms - w.ms, SPLASH, now);
           drawWisp(ctx, ballAt, ms, now, WISP_SIZE * BALL, 0.8);
         },
       },

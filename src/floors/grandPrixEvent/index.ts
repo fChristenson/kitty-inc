@@ -17,10 +17,7 @@ import { planRace } from "../../shared/race";
 import { createBeats } from "../../shared/eventBeats";
 import { drawDetonation } from "../../shared/explosion";
 import { measure } from "../cashFlow";
-import {
-  findRewardWorkers,
-  type RewardWorker,
-} from "../eventRewards";
+import { findRewardWorkers, type RewardWorker } from "../eventRewards";
 import type { Floor } from "../../gameState";
 import type { EventProcContext } from "../eventProcs";
 
@@ -93,7 +90,9 @@ export const forceGrandPrixEvent = registerWispEvent(
     const targets = [near[0], near[1] ?? near[0]];
     const lead: Point = { x: out.x + DIVE_LEAD, y: out.y };
     for (let i = 1; i <= DIVE_STEPS; i++)
-      line.push(bezier(out, lead, targets[0].at, i / DIVE_STEPS, { x: 0, y: 0 }));
+      line.push(
+        bezier(out, lead, targets[0].at, i / DIVE_STEPS, { x: 0, y: 0 }),
+      );
     const along = measure(line);
     const race = planRace(
       line,
@@ -110,7 +109,13 @@ export const forceGrandPrixEvent = registerWispEvent(
       const t = ms - racer * gapMs;
       if (racer === 0 || t < diveMs) return race.at(t, spots[racer]);
       const u = clamp01((t - diveMs) / (raceMs - diveMs));
-      return bezier(out, lead, targets[1].at, u * (0.6 + 0.4 * u), spots[racer]);
+      return bezier(
+        out,
+        lead,
+        targets[1].at,
+        u * (0.6 + 0.4 * u),
+        spots[racer],
+      );
     });
     const size = Math.max(WISP_SIZE, width * WISP);
 
@@ -175,7 +180,13 @@ export const forceGrandPrixEvent = registerWispEvent(
               racer * gapMs,
               arrivals[racer],
             );
-          drawDetonation(ctx, targets[0].at, ms - arrivals[0], FIRST_BLAST, now);
+          drawDetonation(
+            ctx,
+            targets[0].at,
+            ms - arrivals[0],
+            FIRST_BLAST,
+            now,
+          );
         },
       },
     );
