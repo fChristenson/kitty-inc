@@ -46,6 +46,22 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-tumbler-event" class="game__button">Tumbler</button>
+          <button id="test-waggle-dance-event" class="game__button">Waggle Dance</button>
+          <button id="test-water-cycle-event" class="game__button">Water Cycle</button>
+          <button id="test-folding-rule-event" class="game__button">Folding Rule</button>
+          <button id="test-arc-swarm-event" class="game__button">Arc Swarm</button>
+          <button id="test-lockstep-event" class="game__button">Lockstep</button>
+          <button id="test-hacky-sack-event" class="game__button">Hacky Sack</button>
+          <button id="test-woodworm-event" class="game__button">Woodworm</button>
+          <button id="test-graffiti-event" class="game__button">Graffiti</button>
+          <button id="test-voronoi-event" class="game__button">Voronoi</button>
+          <button id="test-percolation-event" class="game__button">Percolation</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-gloop-event" class="game__button">Gloop</button>
           <button id="test-escape-velocity-event" class="game__button">Escape Velocity</button>
           <button id="test-sungrazer-event" class="game__button">Sungrazer</button>
@@ -58,11 +74,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-car-wash-event" class="game__button">Car Wash</button>
           <button id="test-dragon-curve-event" class="game__button">Dragon Curve</button>
           <button id="test-lights-out-event" class="game__button">Lights Out</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-calving-event" class="game__button">Calving</button>
           <button id="test-phoenix-event" class="game__button">Phoenix</button>
           <button id="test-steam-train-event" class="game__button">Steam Train</button>

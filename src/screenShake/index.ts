@@ -147,13 +147,11 @@ let activeFlashPriority = -1;
 // null means nothing frozen. Set only by freezeCritFlashAsBackground below
 // (see critCelebration.ts's "special crit crit" stacking): once the foreground
 // proc's own flash finishes its hold phase, it's captured here (frozen at full
-// size/opacity, no further growth/wobble/fade) so the bonus tier's own flash
+// size/opacity, no further growth/fade) so the bonus tier's own flash
 // can animate on top of it, and both are cleared together once THAT flash ends
 let bgFlashLabel: string | null = null;
 let bgFlashColor: string = COLOR.purple;
 let bgFlashStrokeWidth = 8;
-// it keeps wobbling on its own flash's timing, so it never sits frozen
-let bgFlashStartedAt = 0;
 
 interface FlashRequest {
   intensity: number;
@@ -319,17 +317,16 @@ export function getScreenShakeOffset(now: number): { x: number; y: number } {
 // several seconds. Call from gameCanvas.ts's redraw() in plain screen space, after
 // the shake translate has been undone, so the text itself doesn't rattle along with
 // the world
-// once settled, a small continuous rotation/scale wobble keeps the text
-// feeling "alive" instead of a static held frame —
-// subtle enough not to fight the deliberate blink/fade phases
-const WOBBLE_ROTATION_DEG = 1.25;
-const WOBBLE_SCALE_AMOUNT = 0.025;
-const WOBBLE_HZ = 1.8;
 // the reveal: grows up from nothing while spinning in and lands at full size
-// on the wobble's max-right angle, right on the explosion sfx, so the wobble
-// takes over with a full swing left. Plays over the start of the timeline
-// without shifting any timing (holds, blinks)
+// on the swing's max-right angle, right on the explosion sfx, then swings
+// once and settles still. Plays over the start of the timeline without
+// shifting any timing (holds, blinks)
 const ENTRY_LAND_MS = 50;
+const SETTLE_ROTATION_DEG = 1.25;
+const SETTLE_SCALE_AMOUNT = 0.025;
+const SETTLE_HZ = 1.8;
+// the swing dies out over one full cycle, then the flash holds still
+const SETTLE_MS = 1000 / SETTLE_HZ;
 
 function entryPose(p: number): {
   scale: number;
@@ -337,7 +334,7 @@ function entryPose(p: number): {
   alpha: number;
 } {
   // grows faster into the landing so it hits; the spin slows to a stop on
-  // the wobble's turnaround so the two join without a jolt
+  // the swing's turnaround so the two join without a jolt
   const turn = 1 - (1 - p) ** 2;
   return {
     scale: p * p,
@@ -345,17 +342,17 @@ function entryPose(p: number): {
     alpha: Math.min(1, p * 3),
   };
 }
-// radians/sec the reward shimmer behind a special crit's image turns
-const CRIT_SHIMMER_SPIN = 1.2;
 
-// the small steady wobble every flash layer rides, elapsedMs into its flash;
-// at its max-right angle as the reveal lands, so it swings left from there
-function wobblePose(elapsedMs: number): { scale: number; rotation: number } {
-  const t = (elapsedMs - ENTRY_LAND_MS) / 1000;
-  const wobble = Math.cos(t * WOBBLE_HZ * Math.PI * 2);
+// the swing the reveal lands into, elapsedMs into its flash: from max-right
+// it swings left and back, fading to rest by SETTLE_MS after the landing
+function settlePose(elapsedMs: number): { scale: number; rotation: number } {
+  const t = Math.max(0, elapsedMs - ENTRY_LAND_MS);
+  if (t >= SETTLE_MS) return { scale: 1, rotation: 0 };
+  const fade = (1 - t / SETTLE_MS) ** 2;
+  const swing = Math.cos((t / 1000) * SETTLE_HZ * Math.PI * 2) * fade;
   return {
-    scale: 1 + wobble * WOBBLE_SCALE_AMOUNT,
-    rotation: wobble * WOBBLE_ROTATION_DEG * (Math.PI / 180),
+    scale: 1 + swing * SETTLE_SCALE_AMOUNT,
+    rotation: swing * SETTLE_ROTATION_DEG * (Math.PI / 180),
   };
 }
 
@@ -390,7 +387,6 @@ export function freezeCritFlashAsBackground(): void {
   bgFlashLabel = flashLabel;
   bgFlashColor = flashColor;
   bgFlashStrokeWidth = flashStrokeWidth;
-  bgFlashStartedAt = flashStartedAt;
   flashStartedAt = null;
   flashEndsAt = null;
   activeFlashPriority = -1;
@@ -527,7 +523,7 @@ function getFlashBitmap(
   const config = CRIT_ICON_BY_LABEL[label];
   const icon = config ? getCritIcon(config.name) : null;
   const iconSize = icon ? fitIconSize(icon, measuredWidth * 0.85) : null;
-  // headroom for the wobble; quantized so the key stays put
+  // headroom for the landing swing; quantized so the key stays put
   const wanted = Math.ceil(targetScale * lastDrawScale * 1.1 * 4) / 4;
   fontReady ||= document.fonts.check(FLASH_FONT);
   const key = `${label}|${color}|${strokeWidth}|${icon ? config!.name : ""}|${wanted}|${fontReady}`;
@@ -645,7 +641,6 @@ export function drawCritFlash(
   lastDrawScale = Math.hypot(base.a, base.b);
   lastViewportWidth = viewportWidth;
   if (bgFlashLabel !== null) {
-    const wobble = wobblePose(now - bgFlashStartedAt);
     drawFlashLayer(
       ctx,
       centerX,
@@ -655,8 +650,8 @@ export function drawCritFlash(
       bgFlashColor,
       bgFlashStrokeWidth,
       1,
-      wobble.scale,
-      wobble.rotation,
+      1,
+      0,
       1,
     );
   }
@@ -678,10 +673,9 @@ export function drawCritFlash(
   const holdEndsAt = GROWTH_DURATION_MS + flashHoldMs;
   const totalLifetimeMs = flashEndsAt - flashStartedAt;
 
-  // the same small steady wobble rides every phase
-  const wobble = wobblePose(elapsed);
-  let growthScale = wobble.scale;
-  let rotation = wobble.rotation;
+  const settle = settlePose(elapsed);
+  let growthScale = settle.scale;
+  let rotation = settle.rotation;
   let alpha = 1;
   let raysScale = 1;
   if (elapsed >= GROWTH_DURATION_MS && elapsed < holdEndsAt) {
@@ -752,14 +746,14 @@ function drawFlashLayer(
   const icon = config ? getCritIcon(config.name) : null;
   if (icon) {
     const { w, h } = fitIconSize(icon, measureLabel(scratch, label) * 0.85);
-    // outside the wobble so the rays turn steadily; only the reveal sizes them
+    // only the reveal sizes the rays; they hold still
     drawGoldShimmer(
       ctx,
       0,
       0,
       Math.max(w, h) * 0.75 * targetScale * raysScale,
       1,
-      CRIT_SHIMMER_SPIN,
+      0,
       performance.now(),
     );
   }

@@ -980,6 +980,17 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Car Wash** (spray; worker perma tiers): a gantry of nozzles rolls down the screen spraying a curtain of gold mist that coats every worker it passes.
 - [x] **Dragon Curve** (experiment: the Heighway dragon fractal; cash): a line folds a copy of itself round its end again and again into the dragon, then bursts into cash.
 - [x] **Lights Out** (experiment: the Lights Out puzzle; cash): a cursor presses lights that flip in crosses until the whole board blazes gold and bursts into cash.
+- [x] **Tumbler** (money; cash): cash rides up the wall of a spinning drum and pours back across it like a cement mixer, spinning up until the drum bursts into the total.
+- [x] **Waggle Dance** (wisp; free hires): a scout wisp waggle-dances toward each empty spot, then a stream of bees flies out along the heading and swarms it into a new worker.
+- [x] **Water Cycle** (mix; crit tiers and cash): a sun wisp evaporates a pool of cash up into clouds over the bars, which burst and rain onto them.
+- [x] **Folding Rule** (beam; crit tiers): a carpenter's folding rule of beams unfolds along each bar hinge by hinge, each snap a flare.
+- [x] **Arc Swarm** (lightning; worker perma tiers): a swarm of sparks webbed to their nearest neighbours by lightning dives one by one onto the workers.
+- [x] **Lockstep** (explosion; cash): groups of bombs blink out of step, pull into time and go off together the moment they flash in unison.
+- [x] **Hacky Sack** (bounce; worker perma tiers): a ring of players kicks a ball across the circle round each worker, then smashes it down onto them.
+- [x] **Woodworm** (drill; levels): a swarm of tiny drills rains onto each bar and riddles it with holes.
+- [x] **Graffiti** (spray; a free floor): a nozzle wisp tags the lock in zigzags of gold mist until it's covered and bursts open.
+- [x] **Voronoi** (experiment: a Voronoi diagram; cash): regions grow from seeds until they meet along blazing seams, then the seeds burst into cash.
+- [x] **Percolation** (experiment: site percolation; cash): cells open at random until one island links top to bottom, then cash pours down through it.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.

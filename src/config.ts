@@ -8266,6 +8266,88 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 47
+  // money, cash: src/floors/tumblerEvent: cash tumbles round a spinning drum that bursts
+  tumblerEvent: {
+    chance: 0.01,
+    spinMs: 1400, // the drum spinning up
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, free hires: src/floors/waggleDanceEvent: a scout's waggle dance sends bees to each empty spot
+  waggleDanceEvent: {
+    chance: 0.01,
+    runsMs: [150, 80] as [number, number], // each waggle run, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, crit tiers and cash: src/floors/waterCycleEvent: a sun evaporates a pool into clouds that rain onto the bars
+  waterCycleEvent: {
+    chance: 0.01,
+    riseMs: 500, // the cash evaporating up into clouds
+    rainsMs: [300, 180] as [number, number], // between clouds bursting, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, crit tiers: src/floors/foldingRuleEvent: a folding rule of beams unfolds along each bar
+  foldingRuleEvent: {
+    chance: 0.01,
+    hingesMs: [110, 60] as [number, number], // each hinge opening, the first bar to the last
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, worker perma tiers: src/floors/arcSwarmEvent: a swarm webbed by lightning dives onto the workers
+  arcSwarmEvent: {
+    chance: 0.01,
+    swarmMs: 650, // the swarm weaving before the first dive
+    divesMs: [260, 140] as [number, number], // between dives, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/lockstepEvent: groups of bombs blink into step and go off together
+  lockstepEvent: {
+    chance: 0.01,
+    pullsMs: [250, 600, 950] as [number, number, number], // when each group starts pulling into step
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // bounce, worker perma tiers: src/floors/hackySackEvent: a ring of players kicks a ball round each worker
+  hackySackEvent: {
+    chance: 0.01,
+    kicksMs: [150, 95] as [number, number], // each kick, the first worker to the last
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // drill, levels: src/floors/woodwormEvent: a swarm of tiny drills riddles each bar
+  woodwormEvent: {
+    chance: 0.01,
+    approachMs: 180,
+    boresMs: [320, 200] as [number, number], // each bar's boring, quickening
+    levelShare: 0.03, // per bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // spray, a free floor: src/floors/graffitiEvent: a nozzle tags the lock in zigzags of gold mist
+  graffitiEvent: {
+    chance: 0.01,
+    strokesMs: [200, 90] as [number, number], // each stroke, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/voronoiEvent: regions grow from seeds into a Voronoi diagram
+  voronoiEvent: {
+    chance: 0.01,
+    growMs: 1600, // the regions growing till they fill the screen
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/percolationEvent: cells open at random till an island spans the screen
+  percolationEvent: {
+    chance: 0.01,
+    openMs: 1400, // till the spanning island links up
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
