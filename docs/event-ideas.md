@@ -956,6 +956,18 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Tower of Hanoi** (experiment: the Tower of Hanoi puzzle; cash): glowing disks move peg to peg in the optimal solution, faster and faster, then the finished tower pours cash.
 - [x] **Rule 30** (experiment: Wolfram's Rule 30 automaton; cash): rows of gold cells cascade down from one cell into a chaotic triangle, then burst into cash.
 - [x] **Airbrush** (spray; crit tiers): an airbrush wisp sweeps a cone of gold mist back and forth along each bar, coating it thicker each pass until it flashes for a tier.
+- [x] **Calving** (money; levels and cash): slabs crack off a towering cliff of cash at the screen's edge and topple flat onto the bars like a calving glacier.
+- [x] **Phoenix** (wisp; crit tiers): a firebird wisp dives on each bar, bursts into whirling embers and is reborn out of them, bigger each time.
+- [x] **Steam Train** (mix; free hires and cash): a locomotive wisp with carriages chugs a winding line puffing billows of cash, dropping a new worker at every stop.
+- [x] **Light Sail** (beam; a free floor): emitters along the bottom lock beams onto a sail wisp one by one, each kicking it faster up into the lock.
+- [x] **Inchworm** (lightning; crit tiers): an arch of two bolts inches along each bar, every planted foot a strike, then rears up and slams down for a tier.
+- [x] **Critical Mass** (explosion; cash): bombs from all over pack into balls that cook off from the outside in, each core a big blast and cluster, the last colossal.
+- [x] **Knife Thrower** (gunfire; worker perma tiers): a gun wisp outlines each worker in rounds like a knife thrower's act, the closed outline flaring for a tier.
+- [x] **Compactor** (bounce; levels): walls of light close in on each bar while a ball ricochets between them ever faster, until they crush it onto the bar.
+- [x] **Core Sample** (drill; levels): one drill bores straight down through every bar in the stack, punching out of each for levels.
+- [x] **Foam Party** (spray; worker perma tiers): two foam-cannon wisps flank each worker and coat it from both sides until it flashes for a tier.
+- [x] **Langton's Ant** (experiment: Langton's ant; cash): an ant wisp flips cells into a chaotic gold blob until it breaks out along its diagonal highway, then the cells burst into cash.
+- [x] **Othello** (experiment: a self-playing Othello game; cash): gold and white discs flip in rippling cascades, move after move, until gold wins and its discs burst into cash.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.

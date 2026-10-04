@@ -46,6 +46,23 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-calving-event" class="game__button">Calving</button>
+          <button id="test-phoenix-event" class="game__button">Phoenix</button>
+          <button id="test-steam-train-event" class="game__button">Steam Train</button>
+          <button id="test-light-sail-event" class="game__button">Light Sail</button>
+          <button id="test-inchworm-event" class="game__button">Inchworm</button>
+          <button id="test-critical-mass-event" class="game__button">Critical Mass</button>
+          <button id="test-knife-thrower-event" class="game__button">Knife Thrower</button>
+          <button id="test-compactor-event" class="game__button">Compactor</button>
+          <button id="test-core-sample-event" class="game__button">Core Sample</button>
+          <button id="test-foam-party-event" class="game__button">Foam Party</button>
+          <button id="test-langtons-ant-event" class="game__button">Langton's Ant</button>
+          <button id="test-othello-event" class="game__button">Othello</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-airbrush-event" class="game__button">Airbrush</button>
           <button id="test-capillary-event" class="game__button">Capillary</button>
           <button id="test-battle-tops-event" class="game__button">Battle Tops</button>
@@ -58,11 +75,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-drill-duel-event" class="game__button">Drill Duel</button>
           <button id="test-tower-of-hanoi-event" class="game__button">Tower of Hanoi</button>
           <button id="test-rule-30-event" class="game__button">Rule 30</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-fountain-show-event" class="game__button">Fountain Show</button>
           <button id="test-spinning-plates-event" class="game__button">Spinning Plates</button>
           <button id="test-scoops-event" class="game__button">Scoops</button>

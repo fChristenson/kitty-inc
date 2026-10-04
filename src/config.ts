@@ -8079,6 +8079,100 @@ export const CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
+  // batch 45
+  // money, levels and cash: src/floors/calvingEvent: slabs of a cash cliff topple onto the bars
+  calvingEvent: {
+    chance: 0.01,
+    riseMs: 300, // the cliff heaping up
+    topplesMs: [420, 260] as [number, number], // each slab's topple, quickening
+    levelShare: 0.03, // per bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, crit tiers: src/floors/phoenixEvent: a firebird bursts on each bar and is reborn
+  phoenixEvent: {
+    chance: 0.01,
+    swoopsMs: [380, 220] as [number, number], // each dive, quickening
+    reformMs: 300, // embers flung out and back
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, free hires and cash: src/floors/steamTrainEvent: a train puffing cash drops workers at each stop
+  steamTrainEvent: {
+    chance: 0.01,
+    legsMs: [460, 280] as [number, number], // between stops, quickening
+    dwellMs: 120,
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, a free floor: src/floors/lightSailEvent: beams from below push a sail up into the lock
+  lightSailEvent: {
+    chance: 0.01,
+    chargeMs: 220,
+    riseMs: 1000, // from the first beam to the smash
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, crit tiers: src/floors/inchwormEvent: a lightning inchworm inches along each bar
+  inchwormEvent: {
+    chance: 0.01,
+    stepsMs: [200, 110] as [number, number], // each inch, the first bar to the last
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/criticalMassEvent: bombs pack into balls that cook off outside in
+  criticalMassEvent: {
+    chance: 0.01,
+    gatherMs: 500, // the first ball packing
+    ballsMs: [200, 120] as [number, number], // after a core, till the next ball packs
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, worker perma tiers: src/floors/knifeThrowerEvent: shots outline each worker
+  knifeThrowerEvent: {
+    chance: 0.01,
+    shotsMs: [55, 30] as [number, number], // between shots, the first worker to the last
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, levels: src/floors/compactorEvent: closing walls crush a ricocheting ball onto each bar
+  compactorEvent: {
+    chance: 0.01,
+    closesMs: [520, 320] as [number, number], // each bar's walls closing, quickening
+    levelShare: 0.03, // per bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // drill, levels: src/floors/coreSampleEvent: a drill bores down through every bar in the stack
+  coreSampleEvent: {
+    chance: 0.01,
+    approachMs: 240,
+    boresMs: [320, 180] as [number, number], // each bar's boring, quickening
+    levelShare: 0.03, // per bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // spray, worker perma tiers: src/floors/foamPartyEvent: two foam cannons coat each worker
+  foamPartyEvent: {
+    chance: 0.01,
+    coatsMs: [440, 280] as [number, number], // each coat, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/langtonsAntEvent: Langton's ant scrawls chaos, then its highway
+  langtonsAntEvent: {
+    chance: 0.01,
+    runMs: 1800, // all its steps, accelerating
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/othelloEvent: a game of Othello plays itself out
+  othelloEvent: {
+    chance: 0.01,
+    movesMs: [90, 30] as [number, number], // between moves, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
