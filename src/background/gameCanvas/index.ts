@@ -149,6 +149,12 @@ export interface GameCanvas {
   scrollActiveToFloor: (floor: Floor, buttonAt?: number) => void;
   // a floor's world-space rect, null when it isn't in the active building
   getFloorRect: FloorRectResolver;
+  // a floor-local point in client px, null when it isn't in the active building
+  floorToClient: (
+    floor: Floor,
+    x: number,
+    y: number,
+  ) => { x: number; y: number } | null;
 }
 
 // this is the single module that owns the game's 2D world: how big it is (scaled to
@@ -1040,5 +1046,15 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     },
     scrollActiveToFloor,
     getFloorRect,
+    floorToClient: (floor, x, y) => {
+      const loc = floorLocation.get(floor);
+      if (!loc) return null;
+      const rect = canvas.getBoundingClientRect();
+      const worldY = floorWorldY(loc.floorIndex).top + y;
+      return {
+        x: rect.left + (GUTTER_W + x) * scale,
+        y: rect.top + (worldY - viewportTopY()) * scale,
+      };
+    },
   };
 }

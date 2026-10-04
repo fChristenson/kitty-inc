@@ -8,7 +8,11 @@ import { COLOR } from "../../palette";
 import { drawTwinkle } from "../twinkle";
 import { drawGoldShimmer } from "../goldShimmer";
 import { glowSprite, type FadeStops } from "../glowSprite";
-import { createTextGlossyGradient, drawCartoonText } from "../../utils";
+import {
+  createTextGlossyGradient,
+  drawCartoonText,
+  shadeColor,
+} from "../../utils";
 import { isDetachedJobRunning } from "../detachedJob";
 import { holdExplosions, playSlamExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
@@ -37,7 +41,6 @@ const TEXT_FX_MS = 1100;
 const TEXT_POP = 0.55;
 const TEXT_POP_RISE_MS = 90;
 // the same shine sweep as drawSlamShine, then a sparkle twinkles at the end
-const SHINE_SKEW = 0.4;
 const SPARKLE_START_MS = FLASH_MS - 80;
 const SPARKLE_MS = 1100;
 const SPARKLE_IN = 0.12; // of SPARKLE_MS spent growing, and shrinking below
@@ -303,7 +306,9 @@ function drawTabularText(
 // drawCartoonText, but once the slam lands the white shine sweeps across the
 // glowing letters, each hopping as it passes (the text's own part of
 // drawSlamTarget). tabular lays digits out in fixed cells, always, so a
-// counting number never shifts sideways
+// counting number never shifts sideways. whiteMix 0..1 blends the fill toward
+// white; moving says the text is swelling, wiggling or flashing this frame, so
+// it's stamped from sprites like a landed slam (see SlamGlyph)
 export function drawSlamText(
   ctx: CanvasRenderingContext2D,
   pose: SlamPose | null,
@@ -315,36 +320,28 @@ export function drawSlamText(
   strokeColor: string = COLOR.black,
   strokeWidth = 5,
   tabular = false,
+  whiteMix = 0,
+  moving = false,
 ): void {
-  const landed = pose && pose.landedMs >= 0 ? pose : null;
-  if (!landed && !tabular) {
-    drawCartoonText(ctx, text, x, y, fillColor, strokeColor, strokeWidth);
+  // past TEXT_FX_MS no letter hops, shines or glows: it's the text at rest
+  const landed =
+    pose && pose.landedMs >= 0 && pose.landedMs < TEXT_FX_MS ? pose : null;
+  const ready = isFontReady(ctx.font);
+  if (ready && ((pose && pose.landedMs < 0) || (tabular && !moving)))
+    warmSlamGlyphs(ctx, text, fillColor, strokeColor, strokeWidth);
+  if (!ready || (!landed && !moving)) {
+    const fill = whiteMix > 0 ? shadeColor(fillColor, whiteMix) : fillColor;
+    if (tabular)
+      drawTabularText(ctx, text, x, y, fill, strokeColor, strokeWidth);
+    else drawCartoonText(ctx, text, x, y, fill, strokeColor, strokeWidth);
     return;
   }
-  if (!landed) {
-    drawTabularText(ctx, text, x, y, fillColor, strokeColor, strokeWidth);
-    return;
-  }
-  const chars = [...text];
   const digitCell = tabular ? maxDigitWidth(ctx) : 0;
   let fullWidth = 0;
-  let prefix = "";
-  const cells = chars.map((char) => {
-    const width = measure(ctx, char);
-    const isDigit = tabular && char >= "0" && char <= "9";
-    const start = fullWidth;
-    if (tabular) {
-      fullWidth += isDigit ? digitCell : width;
-    } else {
-      // measured through this letter so the kerning before it is kept
-      prefix += char;
-      fullWidth = measure(ctx, prefix);
-    }
-    const cellWidth = fullWidth - start;
-    // a digit centers in its cell; a kerned letter sits flush right, after the kern
-    const inset = isDigit ? (cellWidth - width) / 2 : cellWidth - width;
-    return { char, start, cellWidth, inset };
-  });
+  if (!tabular) fullWidth = measure(ctx, text);
+  else
+    for (let i = 0; i < text.length; i++)
+      fullWidth += isDigit(text[i]) ? digitCell : measure(ctx, text[i]);
   const align = ctx.textAlign;
   const left =
     align === "center"
@@ -354,82 +351,238 @@ export function drawSlamText(
         : x;
   const band = height * 1.2;
   const path = fullWidth + band * 2;
-  const letters = cells.map(({ char, start, cellWidth, inset }) => {
-    const centerX = left + start + cellWidth / 2;
-    return {
-      char,
-      x: left + start + inset,
-      centerX,
-      hop: landed ? hopAt(landed, (centerX - left + band) / path) : 0,
-    };
-  });
   const footY = y + height;
-  const place = (centerX: number, hop: number) => {
-    const s = 1 + WAVE_SCALE * hop;
-    ctx.translate(centerX, footY - WAVE_HOP * height * hop);
-    ctx.scale(s, s);
-    ctx.translate(-centerX, -footY);
-  };
+  const sweep = landed ? flashStrength(landed) : 0;
+  // where the shine band (its slanted gradient, 0..1 across) has got to
+  const x0 = left - band + path * (1 - sweep) - band;
+  const glyphs = getSlamGlyphSet(
+    ctx,
+    text,
+    fillColor,
+    strokeColor,
+    strokeWidth,
+  );
+  const alpha = ctx.globalAlpha;
   ctx.save();
   ctx.textAlign = "left";
-  ctx.lineJoin = "round";
-  ctx.miterLimit = 2;
-  ctx.lineWidth = strokeWidth;
-  ctx.strokeStyle = strokeColor;
-  // every outline first, so a letter's stroke never covers its neighbour's fill
-  for (const l of letters) {
-    if (l.hop === 0) {
-      ctx.strokeText(l.char, l.x, y);
-      continue;
+  // pass 0: every outline first, so a letter's stroke never covers its
+  // neighbour's fill; pass 1: the fills, and any shine or white over them
+  for (let pass = 0; pass < 2; pass++) {
+    let start = 0;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      const width = measure(ctx, char);
+      const digit = tabular && isDigit(char);
+      // a kerned letter is measured through itself, so the kern before it is kept
+      const end = tabular
+        ? start + (digit ? digitCell : width)
+        : measure(ctx, text.slice(0, i + 1));
+      const cellWidth = end - start;
+      // a digit centers in its cell; a kerned letter sits flush right, after the kern
+      const lx = left + start + (digit ? (cellWidth - width) / 2 : cellWidth - width);
+      const centerX = left + start + cellWidth / 2;
+      start = end;
+      if (char === " ") continue;
+      const glyph = getSlamGlyph(ctx, glyphs, char);
+      const hop = landed ? hopAt(landed, (centerX - left + band) / path) : 0;
+      if (hop !== 0) {
+        ctx.save();
+        const s = 1 + WAVE_SCALE * hop;
+        ctx.translate(centerX, footY - WAVE_HOP * height * hop);
+        ctx.scale(s, s);
+        ctx.translate(-centerX, -footY);
+      }
+      if (pass === 0) stampGlyph(ctx, glyph, OUTLINE_CELL, lx, y, 0, 1);
+      else if (!landed) {
+        stampGlyph(ctx, glyph, FILL_CELL, lx, y, 0, 1);
+        if (whiteMix > 0) {
+          ctx.globalAlpha = alpha * Math.min(1, whiteMix);
+          stampGlyph(ctx, glyph, WHITE_CELL, lx, y, 0, 1);
+          ctx.globalAlpha = alpha;
+        }
+      } else {
+        stampGlyph(ctx, glyph, GOLD_CELL, lx, y, 0, 1);
+        if (sweep > 0) {
+          // the band lights each letter in slices, each as bright as the
+          // band is at its middle
+          ctx.globalCompositeOperation = "lighter";
+          for (let k = 0; k < SHINE_SLICES; k++) {
+            const sliceX = lx - glyph.left + ((k + 0.5) / SHINE_SLICES) * glyph.w;
+            const t = (sliceX - x0) / (band * 2);
+            if (t <= 0 || t >= 1) continue;
+            ctx.globalAlpha = alpha * 0.9 * (1 - Math.abs(2 * t - 1));
+            stampGlyph(ctx, glyph, WHITE_CELL, lx, y, k / SHINE_SLICES, 1 / SHINE_SLICES);
+          }
+          ctx.globalCompositeOperation = "source-over";
+          ctx.globalAlpha = alpha;
+        }
+      }
+      if (hop !== 0) ctx.restore();
     }
-    ctx.save();
-    place(l.centerX, l.hop);
-    ctx.strokeText(l.char, l.x, y);
-    ctx.restore();
-  }
-  const strength = textFxStrength(landed);
-  // a pure yellow gold, spanning the glyphs themselves
-  const goldFill =
-    strength > 0
-      ? createTextGlossyGradient(ctx, text, y, COLOR.heavenlyGold)
-      : null;
-  const sweep = landed ? flashStrength(landed) : 0;
-  let shine: CanvasGradient | null = null;
-  if (sweep > 0) {
-    const bandX = left - band + path * (1 - sweep);
-    // along the normal of the slanted band, so it matches drawSlamShine's skew
-    const cy = y + height / 2;
-    const norm = 1 + SHINE_SKEW ** 2;
-    const x0 = bandX - band;
-    shine = ctx.createLinearGradient(
-      x0,
-      cy,
-      x0 + (band * 2) / norm,
-      cy + (band * 2 * SHINE_SKEW) / norm,
-    );
-    shine.addColorStop(0, `${COLOR.heavenlyGold}00`);
-    shine.addColorStop(0.5, COLOR.white);
-    shine.addColorStop(1, `${COLOR.heavenlyGold}00`);
-  }
-  for (const l of letters) {
-    const hopping = l.hop !== 0;
-    if (hopping) {
-      ctx.save();
-      place(l.centerX, l.hop);
-    }
-    ctx.fillStyle = goldFill ?? fillColor;
-    ctx.fillText(l.char, l.x, y);
-    if (shine) {
-      ctx.globalCompositeOperation = "lighter";
-      ctx.globalAlpha = 0.9;
-      ctx.fillStyle = shine;
-      ctx.fillText(l.char, l.x, y);
-      ctx.globalCompositeOperation = "source-over";
-      ctx.globalAlpha = 1;
-    }
-    if (hopping) ctx.restore();
   }
   ctx.restore();
+}
+
+// a slamming or swelling text's letters are stamped from sprites rastered
+// once per font: big text under a fresh transform every frame (each hop, pop,
+// squash and wiggle) is re-rastered glyph by glyph, which stalled every slam
+// onto the total. Each sprite holds the letter's outline, its gold fill, a
+// white copy (the shine, and the fill's blend toward white) and its plain
+// fill, side by side, at GLYPH_SCALE so the pop stays crisp
+const GLYPH_SCALE = 1.25;
+const OUTLINE_CELL = 0;
+const GOLD_CELL = 1;
+const WHITE_CELL = 2;
+const FILL_CELL = 3;
+const SHINE_SLICES = 3;
+const MAX_GLYPH_SETS = 16;
+// warmed a few letters a frame (at rest, or while the target is in the air)
+// so the frame a text starts moving doesn't raster them all at once
+const WARM_PER_FRAME = 3;
+interface SlamGlyph {
+  canvas: HTMLCanvasElement;
+  cellW: number;
+  cellH: number;
+  // the letter's origin from its cell's top-left, and the cell's size, in
+  // the text's own px
+  left: number;
+  up: number;
+  w: number;
+  h: number;
+}
+interface SlamGlyphSet {
+  glyphs: Map<string, SlamGlyph>;
+  // the gold gradient spans this whole text's glyphs
+  text: string;
+  fillColor: string;
+  strokeColor: string;
+  strokeWidth: number;
+}
+const glyphSets = new Map<string, SlamGlyphSet>();
+const readyFonts = new Set<string>();
+
+// never bake a fallback font while Fredoka is still loading
+function isFontReady(font: string): boolean {
+  if (readyFonts.has(font)) return true;
+  if (!document.fonts.check(font)) return false;
+  readyFonts.add(font);
+  return true;
+}
+
+function getSlamGlyphSet(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  fillColor: string,
+  strokeColor: string,
+  strokeWidth: number,
+): SlamGlyphSet {
+  const metrics = ctx.measureText(text);
+  const ascent = Math.round(metrics.actualBoundingBoxAscent);
+  const descent = Math.round(metrics.actualBoundingBoxDescent);
+  const key = `${ctx.font}|${ctx.textBaseline}|${fillColor}|${strokeColor}|${strokeWidth}|${ascent}|${descent}`;
+  let set = glyphSets.get(key);
+  if (!set) {
+    if (glyphSets.size >= MAX_GLYPH_SETS) glyphSets.clear();
+    set = { glyphs: new Map(), text, fillColor, strokeColor, strokeWidth };
+    glyphSets.set(key, set);
+  }
+  return set;
+}
+
+// the text a resting readout last warmed, once all its letters are baked
+let warmedFont = "";
+let warmedText = "";
+
+function warmSlamGlyphs(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  fillColor: string,
+  strokeColor: string,
+  strokeWidth: number,
+): void {
+  if (text === warmedText && ctx.font === warmedFont) return;
+  const set = getSlamGlyphSet(ctx, text, fillColor, strokeColor, strokeWidth);
+  let baked = 0;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (char === " " || set.glyphs.has(char)) continue;
+    if (baked === WARM_PER_FRAME) return;
+    getSlamGlyph(ctx, set, char);
+    baked++;
+  }
+  warmedText = text;
+  warmedFont = ctx.font;
+}
+
+function getSlamGlyph(
+  ctx: CanvasRenderingContext2D,
+  set: SlamGlyphSet,
+  char: string,
+): SlamGlyph {
+  let glyph = set.glyphs.get(char);
+  if (glyph) return glyph;
+  // measured as it's drawn, left-aligned from its origin
+  const align = ctx.textAlign;
+  ctx.textAlign = "left";
+  const metrics = ctx.measureText(char);
+  ctx.textAlign = align;
+  const pad = set.strokeWidth / 2 + 2;
+  const left = metrics.actualBoundingBoxLeft + pad;
+  const up = metrics.actualBoundingBoxAscent + pad;
+  const cellW = Math.ceil(
+    (left + metrics.actualBoundingBoxRight + pad) * GLYPH_SCALE,
+  );
+  const cellH = Math.ceil(
+    (up + metrics.actualBoundingBoxDescent + pad) * GLYPH_SCALE,
+  );
+  const w = cellW / GLYPH_SCALE;
+  const canvas = document.createElement("canvas");
+  canvas.width = cellW * 4;
+  canvas.height = cellH;
+  const c = canvas.getContext("2d")!;
+  c.scale(GLYPH_SCALE, GLYPH_SCALE);
+  c.font = ctx.font;
+  c.textBaseline = ctx.textBaseline;
+  c.textAlign = "left";
+  c.lineJoin = "round";
+  c.miterLimit = 2;
+  c.lineWidth = set.strokeWidth;
+  c.strokeStyle = set.strokeColor;
+  c.strokeText(char, w * OUTLINE_CELL + left, up);
+  // a pure yellow gold, spanning the whole text's glyphs
+  c.fillStyle = createTextGlossyGradient(c, set.text, up, COLOR.heavenlyGold);
+  c.fillText(char, w * GOLD_CELL + left, up);
+  c.fillStyle = COLOR.white;
+  c.fillText(char, w * WHITE_CELL + left, up);
+  c.fillStyle = set.fillColor;
+  c.fillText(char, w * FILL_CELL + left, up);
+  glyph = { canvas, cellW, cellH, left, up, w, h: cellH / GLYPH_SCALE };
+  set.glyphs.set(char, glyph);
+  return glyph;
+}
+
+// one cell of a glyph with its origin at (x, y), or the slice of it from
+// `from` 0..1 across, `share` of its width
+function stampGlyph(
+  ctx: CanvasRenderingContext2D,
+  glyph: SlamGlyph,
+  cell: number,
+  x: number,
+  y: number,
+  from: number,
+  share: number,
+): void {
+  ctx.drawImage(
+    glyph.canvas,
+    glyph.cellW * (cell + from),
+    0,
+    glyph.cellW * share,
+    glyph.cellH,
+    x - glyph.left + glyph.w * from,
+    y - glyph.up,
+    glyph.w * share,
+    glyph.h,
+  );
 }
 
 export interface SlamBox {

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Kitty Inc perf rig</title>
+    <style>
+        /* the test bar stays clickable for the scenarios, just out of the layout */
+        .test-actions-bar {
+            display: none !important;
+        }
+
+        body.running #perf-panel {
+            display: none;
+        }
+
+        #perf-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 1000;
+            width: min(720px, 100vw);
+            max-height: 100vh;
+            overflow: auto;
+            background: rgba(16, 20, 34, 0.94);
+            color: #e8ecf8;
+            font: 12px/1.4 system-ui, sans-serif;
+            box-shadow: -2px 0 12px rgba(0, 0, 0, 0.5);
+        }
+
+        #perf-panel header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: #232a44;
+            position: sticky;
+            top: 0;
+        }
+
+        #perf-panel.collapsed #perf-body {
+            display: none;
+        }
+
+        #perf-panel.collapsed {
+            width: auto;
+        }
+
+        #perf-body {
+            padding: 8px 10px;
+        }
+
+        #perf-panel .env {
+            opacity: 0.75;
+            margin: 0 0 6px;
+        }
+
+        #perf-panel .scenarios {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 12px;
+        }
+
+        #perf-panel .buttons {
+            display: flex;
+            gap: 6px;
+            margin: 8px 0;
+        }
+
+        #perf-panel button {
+            font: inherit;
+            padding: 3px 8px;
+            cursor: pointer;
+        }
+
+        #perf-panel table {
+            border-collapse: collapse;
+            width: 100%;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #perf-panel th,
+        #perf-panel td {
+            padding: 2px 5px;
+            text-align: right;
+            border-bottom: 1px solid #2c3352;
+            white-space: nowrap;
+        }
+
+        #perf-panel th:first-child,
+        #perf-panel td:first-child {
+            text-align: left;
+        }
+
+        #perf-panel tr.details td {
+            text-align: left;
+            white-space: normal;
+            opacity: 0.85;
+        }
+
+        #perf-panel ul {
+            margin: 2px 0;
+            padding-left: 18px;
+        }
+
+        #perf-panel .worse {
+            color: #ff7a7a;
+        }
+
+        #perf-panel .better {
+            color: #7dff9c;
+        }
+
+        #perf-panel .same {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app"></div>
+    <script type="module" src="./rig.ts"></script>
+</body>
+
+</html>

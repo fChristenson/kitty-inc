@@ -1352,6 +1352,7 @@ import {
   whenDocumentReady,
 } from "./shared/startupGate";
 import { isDialogOpen } from "./shared/dialogVisibility";
+import { exposePerfBridge } from "./shared/perfBridge";
 
 // behind a dialog's dimmed backdrop the building redraws at ~30fps, leaving
 // the frame budget to the dialog's own slide animation and content
@@ -1713,6 +1714,14 @@ async function main() {
 
   // dev/test-only controls; markup is stripped entirely in production builds
   if (import.meta.env.MODE !== "production") {
+    exposePerfBridge({
+      getActiveFloors: () => buildings[activeBuildingIndex],
+      floorToClient: gameCanvas.floorToClient,
+      scrollToFloor: gameCanvas.scrollActiveToFloor,
+      wrapRedraw: (wrap) => {
+        gameCanvas.redraw = wrap(gameCanvas.redraw);
+      },
+    });
     wireTestButton(app, () => {
       // absurdly large: comfortably covers buying dozens of buildings in one go,
       // many cities deep (see cityName/cityMap's continuously-compounding

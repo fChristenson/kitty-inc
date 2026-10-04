@@ -2,7 +2,6 @@ import { COLOR } from "../../palette";
 import {
   formatTotalIncomeParts,
   getAnimatedTotalIncome,
-  shadeColor,
 } from "../../utils";
 import type { BigNumber } from "../bigNumber";
 import {
@@ -100,8 +99,6 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     // a freeze event streaming into the total drives its build-up instead
     const tension = getTargetTension(GLOBAL_SLAM, "total");
     const whiteMix = Math.max(getHudTotalWhiteMix(now), tension?.white ?? 0);
-    const textColor =
-      whiteMix > 0 ? shadeColor(COLOR.moneyGreen, whiteMix) : COLOR.moneyGreen;
     const slam = getSlamPose(GLOBAL_SLAM, "total", now);
     const wiggleRotation = tension
       ? tension.rotation
@@ -110,6 +107,12 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         : 0;
     // a stream's fx swells and shakes the readout itself (see drawTargetStream)
     const absorbScale = tension ? 1 : getHudTotalAbsorbScale(now);
+    // swelling, wiggling or whitening: stamped from sprites (see drawSlamText)
+    const moving =
+      tension !== null ||
+      wiggleRotation !== 0 ||
+      absorbScale !== 1 ||
+      whiteMix > 0;
     const pivotY = top + amountHeight / 2;
     let bottom = top;
 
@@ -149,10 +152,12 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         centerX,
         top,
         amountHeight,
-        textColor,
+        COLOR.moneyGreen,
         COLOR.white,
         strokeWidth,
         true,
+        whiteMix,
+        moving,
       );
 
       if (remeasure) {
@@ -176,9 +181,12 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
           centerX,
           unitTop,
           unitHeight,
-          textColor,
+          COLOR.moneyGreen,
           COLOR.white,
           unitStrokeWidth,
+          false,
+          whiteMix,
+          moving,
         );
         if (remeasure) {
           const unitMetrics = ctx.measureText(unitName);
