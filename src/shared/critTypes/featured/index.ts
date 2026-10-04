@@ -83,6 +83,7 @@ import { MEDICS_CRITS } from "./medics";
 import { RED_CARPET_CRITS } from "./redCarpet";
 import { TRAVEL_CRITS } from "./travel";
 import { WILD_WEST_CRITS } from "./wildWest";
+import { WORLD_FEASTS_CRITS } from "./worldFeasts";
 
 export const FEATURED_CRITS = {
   ...CYBERPUNK_CRITS,
@@ -169,4 +170,5 @@ export const FEATURED_CRITS = {
   ...RED_CARPET_CRITS,
   ...TRAVEL_CRITS,
   ...WILD_WEST_CRITS,
+  ...WORLD_FEASTS_CRITS,
 } as const;

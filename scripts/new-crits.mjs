@@ -292,6 +292,7 @@ function placeCrit(catalog, template, tier, usedDescriptions) {
     .sort((a, b) => uses(a) - uses(b));
   const [bandLow, bandHigh] = tierBand(tier);
   let fallback = null;
+  let tie = null;
   for (const params of candidates) {
     const size = template.size(params);
     const low = Math.max(
@@ -316,8 +317,18 @@ function placeCrit(catalog, template, tier, usedDescriptions) {
         chance: pickChance(catalog, low, high),
         warning: `chance outside T${tier}'s band to keep same-template order`,
       };
+    // the rebalance's rank curve flattens a group's rarest crits onto one
+    // chance; a tie is fine, as the rebalance orders a template by size
+    if (!tie)
+      tie = {
+        params,
+        chance: Math.min(Math.max(low, high), CHANCE_RANGE[1]),
+        warning:
+          "ties a same-template crit's chance; the rebalance orders them by size",
+      };
   }
   if (fallback) return fallback;
+  if (tie) return tie;
   throw new Error(
     `${template.id} T${tier}: no unused amount fits between the existing same-template crits`,
   );

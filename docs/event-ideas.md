@@ -852,6 +852,36 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Tin Roof** (bounce; levels and cash): hail of cash pelts the bars and bounces off them in shrinking hops, every bar ringing with levels.
 - [x] **Crumple** (experiment: the screen is crumpled up; cash): the screen scrunches into a ball that's tossed up and bursts into cash as the pieces smooth back flat.
 - [x] **Minimize** (experiment: the screen is minimized; cash): the screen is sucked into the total like a minimized window, which bursts with loops of cash before it genies back out.
+- [x] **Jumping Jets** (money; crit tiers and cash): jets of cash leap in arcs like theme-park leaping fountains, zigzagging bar to bar up the screen, then into the total.
+- [x] **Bubble Chamber** (wisp; free hires): the button smashes open like a particle collision and wisps curl in tightening spirals onto the empty spots.
+- [x] **Cast Net** (mix; worker perma tiers and cash): a fisher wisp whirls and casts nets of cash that open wide and cinch onto pairs of workers.
+- [x] **Hoberman** (beam; a free floor): a scissoring ring of beams breathes in and out round the lock, springs wide and snaps shut, crushing it open.
+- [x] **Excalibur** (lightning; levels): a lightning sword is heaved out of the button, every heave arcing into a bar, then raised to fork into them all.
+- [x] **Pistons** (explosion; cash): bomb cylinders along the bottom fire in an engine's firing order, revving up, jets of cash spurting, then all redline at once.
+- [x] **William Tell** (gunfire; worker perma tiers): apples bounce onto the workers' heads and are shot off one by one from the screen's edge.
+- [x] **Foosball** (bounce; levels and cash): foosball rods on the bars kick a ball up the screen, banking off the walls, into the total.
+- [x] **Rubber Sheet** (experiment: the screen stretches like rubber; cash): a wisp hauls the screen down like a rubber sheet and lets go, flinging a geyser of cash.
+- [x] **Rattle** (experiment: the screen rattles to pieces; cash): the screen's tiles hop higher and higher like crockery on a shaking table, then slam flat.
+- [x] **Eddies** (money; cash): a river of cash surges past a wisp rock, shedding swirling eddies above and below that spin downstream and whirl up into the total.
+- [x] **Tube Man** (wisp; worker perma tiers): an inflatable tube man of wisps billows out of the button and flops over to slap each worker.
+- [x] **Deflate** (mix; levels and cash): a wisp blows a balloon of cash and lets go; it zips wildly past every bar spraying cash as it shrinks, into the total.
+- [x] **Gear Train** (beam; a free floor): gears of beams clank into a chain from the button to the lock, whirl up and wrench it open.
+- [x] **Upstrike** (lightning; crit tiers): upward lightning tears out of each bar, forking as it climbs to the top of the screen.
+- [x] **Creeping Barrage** (explosion; levels): rows of shells burst along each bar in turn, creeping up the screen, the last row all at once.
+- [x] **Ballistic Pendulum** (gunfire; crit tiers): bobs hanging under the bars are shot and swing up to smash into them.
+- [x] **Ring Taw** (bounce; free hires): a shooter knocks marbles out of a glitter ring; each banks off the screen's side onto an empty spot.
+- [x] **Rainy Window** (experiment: rain on the screen's glass; cash): drops splat onto the screen as little upside-down lenses and run down, each off the bottom pouring cash.
+- [x] **Inflate** (experiment: the screen blows up like a balloon; cash): the screen bulges out in breaths, then pops into flying pieces and cash, which fly back together.
+- [x] **Dome Fountains** (money; levels and cash): each bar blooms into a bell fountain, a fan of jets of cash arching over in a dome and splashing down along it.
+- [x] **Bell Ringers** (wisp; crit tiers): bell wisps on ropes over the bars ring a peal, swinging higher every round, then swing over the top and crash down onto the bars.
+- [x] **Wet Dog** (mix; cash): a downpour of cash soaks a wisp, which shakes it off like a wet dog in sprays flung every way.
+- [x] **Tower Crane** (beam; a free floor): a crane of beams swings its jib over the lock, hooks it and heaves until it rips it out.
+- [x] **Bead Lightning** (lightning; worker perma tiers): a colossal bolt fades into a string of glowing beads that peel off and zip onto the workers.
+- [x] **Rockslide** (explosion; levels): lit bombs bound down the bars like boulders, blasting at every bounce, then the heap at the bottom blows.
+- [x] **Tight Group** (gunfire; crit tiers): a sharpshooter puts shot after shot through the same spot on each bar, the spot glowing hotter till it jumps a crit tier.
+- [x] **Jacks** (bounce; free hires): a hand tosses a ball, scoops a jack while it bounces, catches it and flicks the jack onto an empty spot.
+- [x] **Reflecting Pool** (experiment: a pool mirrors the screen; cash): a pool rises over the screen's lower half, mirroring it upside down, rippling as cash pours in.
+- [x] **Pin Art** (experiment: the screen as a pin-art toy; cash): a push behind the screen pops its pins out in a snaking trail and punched patches, then a bulge and a slam.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.

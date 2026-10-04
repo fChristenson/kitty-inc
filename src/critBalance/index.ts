@@ -84,6 +84,7 @@ import { MEDICS_BALANCE } from "./medics";
 import { RED_CARPET_BALANCE } from "./redCarpet";
 import { TRAVEL_BALANCE } from "./travel";
 import { WILD_WEST_BALANCE } from "./wildWest";
+import { WORLD_FEASTS_BALANCE } from "./worldFeasts";
 
 export const FEATURED_CRIT_BALANCE = {
   ...CYBERPUNK_BALANCE,
@@ -170,4 +171,5 @@ export const FEATURED_CRIT_BALANCE = {
   ...RED_CARPET_BALANCE,
   ...TRAVEL_BALANCE,
   ...WILD_WEST_BALANCE,
+  ...WORLD_FEASTS_BALANCE,
 } as const;

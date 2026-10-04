@@ -124,4 +124,44 @@ export const DESSERTS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.payCycles([context.floor], balance.donutPayouts),
   },
+  berryCreamTray: {
+    label: "Berry Cream Tray",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/desserts/berryCreamTray.webp",
+    description: "Boosts every worker for 174s, counting as 3 extra workers",
+    reward: (context, { actions, balance }) =>
+      actions.boostWorkers(context.floors, balance.berryCreamTrayBoostSeconds, balance.berryCreamTrayExtraWorkers),
+  },
+  brownieBunch: {
+    label: "Brownie Bunch",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/desserts/brownieBunch.webp",
+    description: "Boosts every worker for 175s, counting as 3 extra workers",
+    reward: (context, { actions, balance }) =>
+      actions.boostWorkers(context.floors, balance.brownieBunchBoostSeconds, balance.brownieBunchExtraWorkers),
+  },
+  chocolateSpreadMorning: {
+    label: "Chocolate Spread Morning",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/desserts/chocolateSpreadMorning.webp",
+    description: "Boosts every worker for 176s, counting as 3 extra workers",
+    reward: (context, { actions, balance }) =>
+      actions.boostWorkers(context.floors, balance.chocolateSpreadMorningBoostSeconds, balance.chocolateSpreadMorningExtraWorkers),
+  },
+  macaronMedley: {
+    label: "Macaron Medley",
+    color: COLOR.fullHouseCrimson,
+    image: "crits/desserts/macaronMedley.webp",
+    description: "Boosts every worker for 177s, counting as 3 extra workers",
+    reward: (context, { actions, balance }) =>
+      actions.boostWorkers(context.floors, balance.macaronMedleyBoostSeconds, balance.macaronMedleyExtraWorkers),
+  },
+  pinkFrostingTrio: {
+    label: "Pink Frosting Trio",
+    color: COLOR.grandOpeningRose,
+    image: "crits/desserts/pinkFrostingTrio.webp",
+    description: "Boosts every worker for 178s, counting as 3 extra workers",
+    reward: (context, { actions, balance }) =>
+      actions.boostWorkers(context.floors, balance.pinkFrostingTrioBoostSeconds, balance.pinkFrostingTrioExtraWorkers),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
