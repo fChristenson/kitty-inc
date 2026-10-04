@@ -46,11 +46,32 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-stunt-track-event" class="game__button">Stunt Track</button>
+          <button id="test-fleas-event" class="game__button">Fleas</button>
+          <button id="test-hand-pump-event" class="game__button">Hand Pump</button>
+          <button id="test-pick-up-sticks-event" class="game__button">Pick-Up Sticks</button>
+          <button id="test-thunder-shell-event" class="game__button">Thunder Shell</button>
+          <button id="test-mid-air-event" class="game__button">Mid-Air</button>
+          <button id="test-chain-fire-event" class="game__button">Chain Fire</button>
+          <button id="test-rim-shot-event" class="game__button">Rim Shot</button>
+          <button id="test-tin-roof-event" class="game__button">Tin Roof</button>
+          <button id="test-crumple-event" class="game__button">Crumple</button>
+          <button id="test-minimize-event" class="game__button">Minimize</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-head-on-event" class="game__button">Head-On</button>
+          <button id="test-pyramid-event" class="game__button">Pyramid</button>
+          <button id="test-pizza-toss-event" class="game__button">Pizza Toss</button>
+          <button id="test-compass-event" class="game__button">Compass</button>
+          <button id="test-skewer-event" class="game__button">Skewer</button>
+          <button id="test-bomb-comet-event" class="game__button">Bomb Comet</button>
+          <button id="test-kaboom-event" class="game__button">Kaboom</button>
+          <button id="test-return-fire-event" class="game__button">Return Fire</button>
+          <button id="test-frosted-glass-event" class="game__button">Frosted Glass</button>
+          <button id="test-switch-off-event" class="game__button">Switch Off</button>
           <button id="test-chain-fountain-event" class="game__button">Chain Fountain</button>
           <button id="test-smoke-rings-event" class="game__button">Smoke Rings</button>
           <button id="test-water-salute-event" class="game__button">Water Salute</button>
