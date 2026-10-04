@@ -9,6 +9,7 @@ import { drawGlow, fadeStops, type FadeStops } from "../glowSprite";
 import { drawGlitterLight, drawWispBetween, type Point } from "../wisp";
 import { clamp01, easeIn, easeOut, lerp } from "../easing";
 import { hash01 } from "../twinkle";
+import { drawBeam } from "../beam";
 
 export interface Drill {
   target: Point;
@@ -224,6 +225,85 @@ export function drawDrillSparks(
     );
   }
 }
+
+// sparks a side, each relit every SPRAY_MS once it lands
+const SPRAY_SPARKS = 160;
+const SPRAY_MS = 560;
+// px per ms (per px of size) they fly out at, and px per ms² they fall
+const SPRAY_SPEED: [number, number] = [0.016, 0.05];
+const SPRAY_FALL = 0.0001;
+// the streak behind each spark, in ms of its flight
+const STREAK_MS = 40;
+// rad they tilt back out of the hole, off straight along the surface
+const SPRAY_TILT: [number, number] = [0.15, 1.25];
+
+// the gush of sparks a bit grinding into something hard throws out of both
+// sides of its hole: white-hot streaks flung out along the surface that arc
+// over and fall, with heavier chips among them, msSince it bit in, angle the
+// way it's boring, intensity 0..1 (more and faster sparks, above 1 too)
+export function drawDrillSpray(
+  ctx: CanvasRenderingContext2D,
+  at: Point,
+  angle: number,
+  msSince: number,
+  intensity: number,
+  size: number,
+  now: number,
+): void {
+  if (msSince < 0 || intensity <= 0) return;
+  const previous = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = "lighter";
+  // the white-hot contact
+  ctx.globalAlpha =
+    Math.min(1, intensity) * (0.75 + 0.25 * Math.sin(now * 0.09));
+  drawGlow(ctx, GOLD, at.x, at.y, size * 1.6);
+  drawGlow(ctx, WHITE, at.x, at.y, size * 0.6);
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = previous;
+  for (let side = -1; side <= 1; side += 2)
+    for (let i = 0; i < SPRAY_SPARKS; i++) {
+      const seed = i + (side > 0 ? 500 : 900);
+      const clock = msSince + hash01(seed, 7) * SPRAY_MS;
+      const life = Math.floor(clock / SPRAY_MS);
+      const t = clock % SPRAY_MS;
+      // none flying yet that would have left before it bit in
+      if (life === 0 && t > msSince) continue;
+      // the gentler the grind, the fewer sparks
+      if (hash01(seed, life) > intensity) continue;
+      const chip = i % 4 === 0;
+      const a =
+        angle + side * (Math.PI / 2 + lerp(SPRAY_TILT, hash01(life, seed)));
+      const speed =
+        size *
+        lerp(SPRAY_SPEED, hash01(seed, life + 3)) *
+        (chip ? 0.55 : 1) *
+        (0.7 + 0.3 * Math.min(1.5, intensity));
+      const fall = size * SPRAY_FALL * (chip ? 1.8 : 1);
+      const fade = 1 - t / SPRAY_MS;
+      const x = at.x + Math.cos(a) * speed * t;
+      const y = at.y + Math.sin(a) * speed * t + 0.5 * fall * t * t;
+      if (chip) {
+        drawGlitterLight(ctx, x, y, size * 0.2, seed, fade, now);
+        continue;
+      }
+      // a streak back along where it just flew
+      const s = Math.max(0, t - STREAK_MS);
+      sparkTail.x = at.x + Math.cos(a) * speed * s;
+      sparkTail.y = at.y + Math.sin(a) * speed * s + 0.5 * fall * s * s;
+      sparkHead.x = x;
+      sparkHead.y = y;
+      drawBeam(
+        ctx,
+        sparkTail,
+        sparkHead,
+        size * 0.13 * (0.4 + 0.6 * fade),
+        fade,
+      );
+    }
+}
+
+const sparkTail: Point = { x: 0, y: 0 };
+const sparkHead: Point = { x: 0, y: 0 };
 
 // the hole bored into the target at `at`, depth 0..1
 export function drawDrillHole(

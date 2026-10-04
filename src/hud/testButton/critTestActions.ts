@@ -46,6 +46,23 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-curves-event" class="game__button">Curves</button>
+          <button id="test-breakthrough-event" class="game__button">Breakthrough</button>
+          <button id="test-dune-event" class="game__button">Dune</button>
+          <button id="test-string-of-pearls-event" class="game__button">String of Pearls</button>
+          <button id="test-river-juggler-event" class="game__button">River Juggler</button>
+          <button id="test-like-charges-event" class="game__button">Like Charges</button>
+          <button id="test-collision-course-event" class="game__button">Collision Course</button>
+          <button id="test-target-wheel-event" class="game__button">Target Wheel</button>
+          <button id="test-spinning-hexagon-event" class="game__button">Spinning Hexagon</button>
+          <button id="test-bead-drill-event" class="game__button">Bead Drill</button>
+          <button id="test-hydroseeder-event" class="game__button">Hydroseeder</button>
+          <button id="test-mancala-event" class="game__button">Mancala</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-tumbler-event" class="game__button">Tumbler</button>
           <button id="test-waggle-dance-event" class="game__button">Waggle Dance</button>
           <button id="test-water-cycle-event" class="game__button">Water Cycle</button>
@@ -57,11 +74,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-graffiti-event" class="game__button">Graffiti</button>
           <button id="test-voronoi-event" class="game__button">Voronoi</button>
           <button id="test-percolation-event" class="game__button">Percolation</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-gloop-event" class="game__button">Gloop</button>
           <button id="test-escape-velocity-event" class="game__button">Escape Velocity</button>
           <button id="test-sungrazer-event" class="game__button">Sungrazer</button>
@@ -96,7 +108,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-spray-and-pray-event" class="game__button">Spray and Pray</button>
           <button id="test-shuttle-event" class="game__button">Shuttle</button>
           <button id="test-drill-duel-event" class="game__button">Drill Duel</button>
-          <button id="test-tower-of-hanoi-event" class="game__button">Tower of Hanoi</button>
           <button id="test-rule-30-event" class="game__button">Rule 30</button>
           <button id="test-fountain-show-event" class="game__button">Fountain Show</button>
           <button id="test-spinning-plates-event" class="game__button">Spinning Plates</button>

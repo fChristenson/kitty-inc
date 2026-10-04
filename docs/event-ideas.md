@@ -953,7 +953,6 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Spray and Pray** (gunfire; levels): a turret at the bottom rakes a stream of bullets along each bar in turn, then sprays them all wildly.
 - [x] **Shuttle** (bounce; crit tiers): a ball shuttles up and down between each bar and the one below, faster and faster, the last bounce off each a tier.
 - [x] **Drill Duel** (drill; worker perma tiers): two drill heads grind point to point over each worker until one shatters and the winner bores into the worker.
-- [x] **Tower of Hanoi** (experiment: the Tower of Hanoi puzzle; cash): glowing disks move peg to peg in the optimal solution, faster and faster, then the finished tower pours cash.
 - [x] **Rule 30** (experiment: Wolfram's Rule 30 automaton; cash): rows of gold cells cascade down from one cell into a chaotic triangle, then burst into cash.
 - [x] **Airbrush** (spray; crit tiers): an airbrush wisp sweeps a cone of gold mist back and forth along each bar, coating it thicker each pass until it flashes for a tier.
 - [x] **Calving** (money; levels and cash): slabs crack off a towering cliff of cash at the screen's edge and topple flat onto the bars like a calving glacier.
@@ -991,6 +990,18 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Graffiti** (spray; a free floor): a nozzle wisp tags the lock in zigzags of gold mist until it's covered and bursts open.
 - [x] **Voronoi** (experiment: a Voronoi diagram; cash): regions grow from seeds until they meet along blazing seams, then the seeds burst into cash.
 - [x] **Percolation** (experiment: site percolation; cash): cells open at random until one island links top to bottom, then cash pours down through it.
+- [x] **Dune** (money; levels and cash): a dune of cash crawls along the bottom, cash climbing its back and avalanching down its face, then its crest blows off onto the bars.
+- [x] **String of Pearls** (wisp; levels): a comet tears into a string of fragments that peel off one by one and plunge onto the bars.
+- [x] **River Juggler** (mix; crit tiers and cash): two hand wisps juggle arcing rivers of cash in a crossing cascade, then hurl them onto the bars.
+- [x] **Like Charges** (lightning; crit tiers): charged sparks burst out of the button shoving each other apart, arcs crackling between near ones, then each discharges onto a bar.
+- [x] **Collision Course** (explosion; cash): two overlapping rings of bombs spin against each other, pairs blowing head-on wherever the rings cross.
+- [x] **Target Wheel** (gunfire; crit tiers): guns spin a wheel of targets faster with every hit until it flies apart onto the bars.
+- [x] **Spinning Hexagon** (bounce; cash): a ball bounces round inside a spinning hexagon of light, every bounce spraying cash, until the walls burst.
+- [x] **Bead Drill** (drill; a free floor): a drill bores up through a string of beads of light, then through the lock.
+- [x] **Hydroseeder** (spray; free hires): a nozzle sprays gold seed-mist over each empty spot until a worker sprouts out of it.
+- [x] **Breakthrough** (drill; levels and a crit tier): a drill-headed wisp slams into the middle of the clicked bar, stalls grinding against it, then bores through in shoves as glitter gushes out of both sides of the hole.
+- [x] **Curves** (wisp; cash): two wisps race in flat out, one on the other's tail, brake into a tight hairpin round the clicked button like racers on a track, then power out and dash into the total one after the other in a big blast and a huge one.
+- [x] **Mancala** (experiment: a self-playing mancala game; cash): seeds are sown pit to pit with captures, then all sweep into gold's store, which bursts into cash.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.

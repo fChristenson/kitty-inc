@@ -8058,13 +8058,6 @@ export const CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/towerOfHanoiEvent: the Tower of Hanoi solves itself
-  towerOfHanoiEvent: {
-    chance: 0.01,
-    movesMs: [90, 25] as [number, number], // each move, quickening
-    holdMs: 250,
-    mergeMs: 500,
-  },
   // experiment, cash: src/floors/rule30Event: the Rule 30 automaton cascades down the screen
   rule30Event: {
     chance: 0.01,
@@ -8345,6 +8338,100 @@ export const CONFIG = {
   percolationEvent: {
     chance: 0.01,
     openMs: 1400, // till the spanning island links up
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // batch 48
+  // money, levels and cash: src/floors/duneEvent: a crawling dune of cash blows its crest onto the bars
+  duneEvent: {
+    chance: 0.01,
+    crawlMs: 1300, // the dune crawling across
+    levelShare: 0.03, // per bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, levels: src/floors/stringOfPearlsEvent: a comet tears into fragments that plunge onto the bars
+  stringOfPearlsEvent: {
+    chance: 0.01,
+    travelMs: 1300, // the comet's whole path over the bars
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, crit tiers and cash: src/floors/riverJugglerEvent: two hands juggle rivers of cash, then hurl them onto the bars
+  riverJugglerEvent: {
+    chance: 0.01,
+    throwsMs: [200, 110] as [number, number], // between throws, quickening
+    flightMs: 360, // each river's flight
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // lightning, crit tiers: src/floors/likeChargesEvent: repelling charges spread out, then discharge onto the bars
+  likeChargesEvent: {
+    chance: 0.01,
+    spreadMs: 800, // the charges shoving apart
+    firesMs: [180, 90] as [number, number], // between discharges, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/collisionCourseEvent: two counter-spinning rings of bombs collide where they cross
+  collisionCourseEvent: {
+    chance: 0.01,
+    firstMs: 500, // the first pair meeting
+    gapsMs: [230, 110] as [number, number], // between collisions, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, crit tiers: src/floors/targetWheelEvent: shots spin a wheel of targets till it flies apart onto the bars
+  targetWheelEvent: {
+    chance: 0.01,
+    shotsMs: [110, 45] as [number, number], // between hits, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, cash: src/floors/spinningHexagonEvent: a ball bounces round inside a spinning hexagon
+  spinningHexagonEvent: {
+    chance: 0.01,
+    spinMs: 1700, // the hexagon spinning up till it bursts
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // drill, a free floor: src/floors/beadDrillEvent: a drill bores up through a string of beads into the lock
+  beadDrillEvent: {
+    chance: 0.01,
+    approachMs: 160,
+    boresMs: [220, 120] as [number, number], // each bead's boring, quickening; the lock takes the last
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // spray, free hires: src/floors/hydroseederEvent: a nozzle sprays seed-mist on each empty spot till a worker sprouts
+  hydroseederEvent: {
+    chance: 0.01,
+    passesMs: [170, 100] as [number, number], // each pass of a spot, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/mancalaEvent: a game of mancala plays itself out
+  mancalaEvent: {
+    chance: 0.01,
+    movesMs: [120, 40] as [number, number], // between moves, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // drill, levels and a crit tier: src/floors/breakthroughEvent: a drill stalls on the clicked bar, then bores through it
+  breakthroughEvent: {
+    chance: 0.01,
+    approachMs: 280, // the drill screaming down
+    stallMs: 750, // grinding in place against the bar
+    boreMs: 1600, // boring through once it gives
+    levelShare: 0.05,
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, cash: src/floors/curvesEvent: two racing wisps take a hairpin round the clicked button, then dash into the total
+  curvesEvent: {
+    chance: 0.01,
+    raceMs: 900, // the leader's run: flat out in, braking round the button's end, powering out into the total
+    gapMs: 120, // the chaser on its tail, slamming in after it
     holdMs: 250,
     mergeMs: 500,
   },
