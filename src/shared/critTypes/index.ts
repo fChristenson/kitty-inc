@@ -1232,9 +1232,10 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
 export type CritProcFlags = Record<CritProcKind, boolean>;
 
 export function readCritProcs(floor: Floor): CritProcFlags {
-  const flags = {} as CritProcFlags;
+  // unset procs read false through the prototype (see critResult)
+  const flags = Object.create(ALL_CRIT_PROC_FLAGS_FALSE) as CritProcFlags;
   for (const kind of CRIT_PROC_KINDS) {
-    flags[kind] = CRIT_PROC_SETS[kind].has(floor);
+    if (CRIT_PROC_SETS[kind].has(floor)) flags[kind] = true;
   }
   return flags;
 }

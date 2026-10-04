@@ -71,15 +71,19 @@ export const SPECIAL_FLASH_STROKE_WIDTH = 14;
 // play, so each icon warms when its proc is armed, well before it can flash;
 // getCritIcon still loads any icon on demand. Its flash bitmap is baked then
 // too, at idle, instead of on the click that shows it.
+let latestArmedLabel = "";
 onCritProcsArmed((kinds) => {
   for (const kind of kinds) {
     const { icon, label, color } = CRIT_PROC_INFO[kind];
+    latestArmedLabel = label;
     void requestCritIcon(icon)
       .then(() =>
-        runWhenIdle(
-          () => warmFlashBitmap(label, color, SPECIAL_FLASH_STROKE_WIDTH),
-          500,
-        ),
+        runWhenIdle(() => {
+          // a held button arms procs far faster than they flash: bake only the
+          // newest, and never under a playing flash (it would stutter)
+          if (label === latestArmedLabel && !isCritFlashActive(Date.now()))
+            warmFlashBitmap(label, color, SPECIAL_FLASH_STROKE_WIDTH);
+        }, 500),
       )
       .catch(() => undefined);
   }
@@ -408,6 +412,9 @@ const BLOOM_BLUR = 45;
 // generous padding so the blur's own soft falloff never gets clipped by the
 // cache canvas's own edge
 const BLOOM_PADDING = BLOOM_BLUR * 3;
+// the glow is soft anyway, so it's blurred at a third of the size and
+// stretched back up: a full-size shadowBlur stalled held clicks on phones
+const BLOOM_RES = 1 / 3;
 
 function getBloomLayer(
   label: string,
@@ -419,16 +426,18 @@ function getBloomLayer(
   const width = Math.ceil(measuredWidth + BLOOM_PADDING * 2);
   const height = Math.ceil(100 + BLOOM_PADDING * 2);
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = Math.ceil(width * BLOOM_RES);
+  canvas.height = Math.ceil(height * BLOOM_RES);
   const ctx = canvas.getContext("2d")!;
+  ctx.scale(BLOOM_RES, BLOOM_RES);
   ctx.font = BLOOM_FONT;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   // stacked twice for intensity — canvas shadowBlur alone reads faint at this
   // text's huge on-screen scale
   ctx.shadowColor = COLOR.white;
-  ctx.shadowBlur = BLOOM_BLUR;
+  // shadowBlur ignores the transform, so it scales by hand
+  ctx.shadowBlur = BLOOM_BLUR * BLOOM_RES;
   ctx.fillStyle = COLOR.white;
   ctx.fillText(label, width / 2, height / 2);
   ctx.fillText(label, width / 2, height / 2);
@@ -497,6 +506,8 @@ interface FlashBitmap {
   height: number;
 }
 const flashBitmapCache = new Map<string, FlashBitmap>();
+// checked every frame until the font loads, then never again
+let fontReady = false;
 const FLASH_BITMAP_LIMIT = 3;
 const MAX_FLASH_BITMAP_PX = 2048;
 
@@ -518,7 +529,7 @@ function getFlashBitmap(
   const iconSize = icon ? fitIconSize(icon, measuredWidth * 0.85) : null;
   // headroom for the wobble; quantized so the key stays put
   const wanted = Math.ceil(targetScale * lastDrawScale * 1.1 * 4) / 4;
-  const fontReady = document.fonts.check(FLASH_FONT);
+  fontReady ||= document.fonts.check(FLASH_FONT);
   const key = `${label}|${color}|${strokeWidth}|${icon ? config!.name : ""}|${wanted}|${fontReady}`;
   const cached = touchCached(flashBitmapCache, key);
   if (cached) return cached;
@@ -564,7 +575,13 @@ function getFlashBitmap(
   }
   layerCtx.translate(0, textY);
   layerCtx.scale(textScale, textScale);
-  layerCtx.drawImage(bloom.canvas, -bloom.width / 2, -bloom.height / 2);
+  layerCtx.drawImage(
+    bloom.canvas,
+    -bloom.width / 2,
+    -bloom.height / 2,
+    bloom.width,
+    bloom.height,
+  );
   drawCritText(layerCtx, label, 0, 0, color, {
     fontSize: FLASH_FONT_SIZE,
     strokeWidth,

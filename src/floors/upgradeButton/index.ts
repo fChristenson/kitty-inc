@@ -179,11 +179,12 @@ function renderUpgradeButton(
     ctx.rotate(holdAnim.rotation);
     ctx.scale(scale * holdAnim.scale, scale * holdAnim.scale);
     ctx.translate(-cx, -cy);
+    let dim = false;
     if (!crit && !activeEvent?.freeClick) {
       if (!affordable) ctx.globalAlpha = 0.5;
-      else if (hovered) ctx.filter = "brightness(0.85)";
+      else if (hovered) dim = true;
     } else if (hovered) {
-      ctx.filter = "brightness(0.85)";
+      dim = true;
     }
     // rounded RECTANGLE, not a full pill — ref.png's button corners are only
     // modestly rounded, unlike the fully-stadium-shaped income bar
@@ -218,8 +219,15 @@ function renderUpgradeButton(
         ? (cover?.label ?? CRIT_TIER_CONFIG[critTier as CritTier].label)
         : formatPrice(cost);
     drawCachedCartoonText(ctx, label, cx, cy, 52);
+    // a hover darkening; ctx.filter here cost every frame of a mouse hold
+    if (dim) {
+      ctx.globalAlpha = 0.15;
+      ctx.fillStyle = COLOR.black;
+      ctx.beginPath();
+      ctx.roundRect(x, y, BTN_W, BTN_H, 40);
+      ctx.fill();
+    }
     if (whiteAlpha > 0) {
-      ctx.filter = "none";
       ctx.globalAlpha = whiteAlpha;
       ctx.fillStyle = COLOR.white;
       ctx.beginPath();

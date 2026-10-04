@@ -7456,6 +7456,92 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 38
+  // money, crit tiers and cash: src/floors/twinWhirlpoolsEvent: two whirlpools of cash orbit and merge
+  twinWhirlpoolsEvent: {
+    chance: 0.01,
+    formMs: 500, // pouring in and spinning up over the bars
+    orbitMs: 1100, // wheeling round each other into one
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, free hires: src/floors/hatchlingsEvent: egg wisps drop onto the spots, rock and hatch
+  hatchlingsEvent: {
+    chance: 0.01,
+    dropGapMs: 70, // between eggs dropping
+    rockMs: 300, // rocking before the first hatches
+    hatchesMs: [260, 140] as [number, number], // between hatchings, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, levels and cash: src/floors/butterfingersEvent: a waiter wisp trips and spills a heap of cash over the bars
+  butterfingersEvent: {
+    chance: 0.01,
+    pourMs: 350, // heaping up on the tray
+    walkMs: 900, // teetering across
+    spillMs: 650, // the spill landing
+    levelShare: 0.03, // per bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, a free floor: src/floors/lockPickEvent: a pick beam pushes up the lock's pins one by one
+  lockPickEvent: {
+    chance: 0.01,
+    pinsMs: [300, 160] as [number, number], // each pin, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, crit tiers: src/floors/blacksmithEvent: bolts hammer an anvil wisp, sparks forge the bars
+  blacksmithEvent: {
+    chance: 0.01,
+    warmMs: 260,
+    blowsMs: [320, 170] as [number, number], // between blows, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/seismicChargesEvent: charges blow in a chain, their shockwaves meet in a colossal blast
+  seismicChargesEvent: {
+    chance: 0.01,
+    fuseMs: 300,
+    chainMs: [220, 130] as [number, number], // between charges, quickening
+    meetMs: 420, // the last ring rolling out to the meeting point
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, levels: src/floors/skipShotsEvent: shots skip off the screen's bottom up into the bars
+  skipShotsEvent: {
+    chance: 0.01,
+    aimMs: 150,
+    shotsMs: [200, 100] as [number, number], // between shots, quickening
+    volleyGapMs: 180,
+    levelShare: 0.01, // per hit
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, worker perma tiers: src/floors/jumpingBeansEvent: beans hop higher and higher on the workers
+  jumpingBeansEvent: {
+    chance: 0.01,
+    staggerMs: 60, // between beans setting off
+    hopMs: [180, 250] as [number, number], // each hop, from the first to the towering last
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/swissCheeseEvent: holes punched through the screen gush cash
+  swissCheeseEvent: {
+    chance: 0.01,
+    punchMs: [200, 90] as [number, number], // between holes, quickening
+    flareGapMs: 200,
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/explodedViewEvent: the screen bursts apart in tiles and slams back
+  explodedViewEvent: {
+    chance: 0.01,
+    pulseGapMs: [420, 340] as [number, number], // between jolts apart
+    openMs: 250, // held wide open before slamming back
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,

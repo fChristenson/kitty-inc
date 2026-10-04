@@ -947,6 +947,16 @@ import "../tightGroupEvent";
 import "../jacksEvent";
 import "../reflectingPoolEvent";
 import "../pinArtEvent";
+import "../twinWhirlpoolsEvent";
+import "../hatchlingsEvent";
+import "../butterfingersEvent";
+import "../lockPickEvent";
+import "../blacksmithEvent";
+import "../seismicChargesEvent";
+import "../skipShotsEvent";
+import "../jumpingBeansEvent";
+import "../swissCheeseEvent";
+import "../explodedViewEvent";
 import "../slashEvent";
 import "../jackhammerEvent";
 import "../pummelEvent";
@@ -3049,7 +3059,7 @@ export function handleFloorClick(
       if (covered) {
         triggerButtonPress(floor);
       } else {
-        applyFloorCrit(deps, floor, { ...procs, tier, bonusTier });
+        applyFloorCrit(deps, floor, Object.assign(procs, { tier, bonusTier }));
         // the special event this crit carried instead of a special crit
         if (carriesEvent && !cover) armTakenEventProc(floor, eventContext);
       }
