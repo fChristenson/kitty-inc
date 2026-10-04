@@ -1043,6 +1043,11 @@ import {
   forceHologramEvent,
   forceLeafFallEvent,
   forceThreeBodyEvent,
+  forceSinkholeEvent,
+  forceBackwashEvent,
+  forceDeflectorEvent,
+  forceSunflowerEvent,
+  forceConvexHullEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -2970,6 +2975,11 @@ async function main() {
       hologram: forceOnActive(forceHologramEvent),
       "leaf-fall": forceOnActive(forceLeafFallEvent),
       "three-body": forceOnActive(forceThreeBodyEvent),
+      sinkhole: forceOnActive(forceSinkholeEvent),
+      backwash: forceOnActive(forceBackwashEvent),
+      deflector: forceOnActive(forceDeflectorEvent),
+      sunflower: forceOnActive(forceSunflowerEvent),
+      "convex-hull": forceOnActive(forceConvexHullEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

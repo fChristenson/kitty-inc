@@ -8341,6 +8341,53 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 54
+  // clutter, a crit tier: src/floors/sinkholeEvent: a gravity hole gulps a checkerboard of glitter in, then sinks onto the clicked bar
+  sinkholeEvent: {
+    chance: 0.01,
+    spillMs: 380, // the glitter blown out over the screen
+    gulpMs: 260, // each gulp (the last runs twice as long)
+    gapMs: 140, // between gulps
+    sinkMs: 280, // the hole sinking onto the bar
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // clutter, a free floor: src/floors/backwashEvent: an invisible tide surges glitter up the screen into the lock
+  backwashEvent: {
+    chance: 0.01,
+    rainMs: 450, // the glitter raining down
+    surgeMs: 300, // each surge of the tide
+    backMs: 150, // each backwash
+    gatherMs: 380, // the last surge gathering it under the lock
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // gunfire, free hires: src/floors/deflectorEvent: shots glance off a spinning bar of light onto the empty spots
+  deflectorEvent: {
+    chance: 0.01,
+    fireMs: [220, 80] as [number, number], // between shots, quickening
+    speed: 1.8, // px per ms
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // explosion, levels: src/floors/sunflowerEvent: a chain of blasts races round a sunflower spiral of bombs into its heart
+  sunflowerEvent: {
+    chance: 0.01,
+    growMs: 360, // the seeds popping out
+    chainMs: [55, 22] as [number, number], // between blasts, quickening
+    levelShare: 0.05,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/convexHullEvent: a band gift-wraps scattered pins, then snaps in and scoops them into the total
+  convexHullEvent: {
+    chance: 0.01,
+    pinMs: 300, // the pins popping up
+    wrapMs: [220, 90] as [number, number], // each wrapping step, quickening
+    snapMs: 360, // the band snapping in
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 53
   // money, levels + cash: src/floors/rogueWaveEvent: two swells meet in a sea of cash and rear up into a rogue wave
   rogueWaveEvent: {

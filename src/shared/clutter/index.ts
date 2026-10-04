@@ -341,12 +341,13 @@ export interface Plough {
 }
 
 // a gravity hole: pulls every bit in (pull px/ms² at PULL_AT px, falling
-// off with distance; swirl spins them round it as they fall), and bits that
-// reach its core are caught and ride with it, settling into a tight heap
+// off with distance, fixed or a function of ms for gulps; swirl spins them
+// round it as they fall), and bits that reach its core are caught and ride
+// with it, settling into a tight heap
 export interface GravityHole {
   kind: "hole";
   at: (ms: number, into: Point) => Point | null;
-  pull: number;
+  pull: number | ((ms: number) => number);
   core: number;
   swirl?: number;
 }
@@ -393,11 +394,14 @@ export function simulateClean(
   const at = cleaners.map(() => ({ x: 0, y: 0 }));
   const was = cleaners.map(() => ({ x: NaN, y: NaN }));
   const live = cleaners.map(() => false);
+  const pulls = cleaners.map(() => 0);
   const push: Point = { x: 0, y: 0 };
   for (let s = 0; s < steps; s++) {
     const ms = startMs + s * STEP;
     cleaners.forEach((c, k) => {
       live[k] = c.kind !== "force" && c.at(ms, at[k]) !== null;
+      if (c.kind === "hole")
+        pulls[k] = typeof c.pull === "number" ? c.pull : c.pull(ms);
     });
     for (let i = 0; i < n; i++) {
       const held = caught[i];
@@ -438,7 +442,7 @@ export function simulateClean(
             offY[i] = -dy;
             break;
           }
-          const a = (c.pull * PULL_AT) / d;
+          const a = (pulls[k] * PULL_AT) / d;
           const swirl = c.swirl ?? 0;
           ax += ((dx - dy * swirl) / d) * a;
           ay += ((dy + dx * swirl) / d) * a;
