@@ -281,6 +281,43 @@ function drawTabularText(
       : align === "right" || align === "end"
         ? x - fullWidth
         : x;
+  const m = ctx.getTransform();
+  if (
+    m.b === 0 &&
+    m.c === 0 &&
+    m.a > 0 &&
+    m.a === m.d &&
+    isFontReady(ctx.font)
+  ) {
+    const set = getRestGlyphSet(ctx, fillColor, strokeColor, strokeWidth, m.a);
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    for (let pass = 0; pass < 2; pass++) {
+      let at = left;
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const width = measure(ctx, char);
+        const cell = isDigit(char) ? digitCell : width;
+        const lx = at + (isDigit(char) ? (cell - width) / 2 : 0);
+        at += cell;
+        if (char === " ") continue;
+        const glyph = getRestGlyph(ctx, set, char);
+        ctx.drawImage(
+          glyph.canvas,
+          pass * glyph.cellW,
+          0,
+          glyph.cellW,
+          glyph.cellH,
+          Math.round(m.a * lx + m.e - glyph.left),
+          Math.round(m.d * y + m.f - glyph.up),
+          glyph.cellW,
+          glyph.cellH,
+        );
+      }
+    }
+    ctx.restore();
+    return;
+  }
   ctx.save();
   ctx.textAlign = "left";
   ctx.lineJoin = "round";
@@ -301,6 +338,86 @@ function drawTabularText(
     }
   }
   ctx.restore();
+}
+
+// a resting counter's letters, rastered once at the canvas's own scale (an
+// outline cell and a fill cell) and stamped 1:1 on whole pixels: the text
+// costs a few cheap blits a frame instead of re-rastered glyphs
+interface RestGlyph {
+  canvas: HTMLCanvasElement;
+  cellW: number;
+  cellH: number;
+  // the letter's origin from its cell's top-left, in canvas px
+  left: number;
+  up: number;
+}
+interface RestGlyphSet {
+  glyphs: Map<string, RestGlyph>;
+  fillColor: string;
+  strokeColor: string;
+  strokeWidth: number;
+  scale: number;
+}
+const restGlyphSets = new Map<string, RestGlyphSet>();
+const MAX_REST_GLYPH_SETS = 8;
+
+function getRestGlyphSet(
+  ctx: CanvasRenderingContext2D,
+  fillColor: string,
+  strokeColor: string,
+  strokeWidth: number,
+  scale: number,
+): RestGlyphSet {
+  const key = `${ctx.font}|${ctx.textBaseline}|${fillColor}|${strokeColor}|${strokeWidth}|${scale}`;
+  let set = restGlyphSets.get(key);
+  if (!set) {
+    if (restGlyphSets.size >= MAX_REST_GLYPH_SETS) restGlyphSets.clear();
+    set = { glyphs: new Map(), fillColor, strokeColor, strokeWidth, scale };
+    restGlyphSets.set(key, set);
+  }
+  return set;
+}
+
+function getRestGlyph(
+  ctx: CanvasRenderingContext2D,
+  set: RestGlyphSet,
+  char: string,
+): RestGlyph {
+  let glyph = set.glyphs.get(char);
+  if (glyph) return glyph;
+  const align = ctx.textAlign;
+  ctx.textAlign = "left";
+  const metrics = ctx.measureText(char);
+  ctx.textAlign = align;
+  const { scale } = set;
+  const pad = set.strokeWidth / 2 + 2;
+  const left = (metrics.actualBoundingBoxLeft + pad) * scale;
+  const up = (metrics.actualBoundingBoxAscent + pad) * scale;
+  const cellW = Math.ceil(
+    left + (metrics.actualBoundingBoxRight + pad) * scale,
+  );
+  const cellH = Math.ceil(
+    up + (metrics.actualBoundingBoxDescent + pad) * scale,
+  );
+  const canvas = document.createElement("canvas");
+  canvas.width = cellW * 2;
+  canvas.height = cellH;
+  const c = canvas.getContext("2d")!;
+  c.font = ctx.font;
+  c.textBaseline = ctx.textBaseline;
+  c.textAlign = "left";
+  c.lineJoin = "round";
+  c.miterLimit = 2;
+  c.lineWidth = set.strokeWidth;
+  c.strokeStyle = set.strokeColor;
+  c.fillStyle = set.fillColor;
+  c.setTransform(scale, 0, 0, scale, left, up);
+  c.strokeText(char, 0, 0);
+  c.setTransform(scale, 0, 0, scale, cellW + left, up);
+  c.fillText(char, 0, 0);
+  glyph = { canvas, cellW, cellH, left, up };
+  set.glyphs.set(char, glyph);
+  return glyph;
 }
 
 // drawCartoonText, but once the slam lands the white shine sweeps across the

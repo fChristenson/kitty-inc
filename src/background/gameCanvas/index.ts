@@ -15,7 +15,11 @@ import {
   getButtonCenter,
   type OnScreenFloor,
 } from "../../floors";
-import { drawFloorContent, tickFloorOffscreen } from "../../gameRenderer";
+import {
+  drawFloorBubbles,
+  drawFloorContent,
+  tickFloorOffscreen,
+} from "../../gameRenderer";
 import { drawClouds, CLOUD_MAX_RADIUS } from "../clouds";
 import { drawCity, CITY_MAX_HEIGHT, getCitySkyGroundColor } from "../city";
 import { drawStars } from "../stars";
@@ -436,6 +440,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       }
       ctx.save();
       ctx.translate(GUTTER_W, top);
+      if (bottom < viewportTopY() || top > viewportBottomY()) {
+        drawFloorBubbles(ctx, activeFloors[i]);
+        ctx.restore();
+        continue;
+      }
       const buttonHovered =
         hoveredPoint !== null &&
         hoveredPoint.floor === activeFloors[i] &&

@@ -1204,7 +1204,6 @@ import {
   announceEventStartClick,
   EVENT_COIN_TIMING,
 } from "../../shared/floorEvents";
-import { spawnFloatingCoins } from "../coinFloat";
 import { getUpgradeIndicatorCenter } from "../star";
 import { hitTestUpgradeArrow } from "../upgradeArrow";
 import { computeBaseFloorStats } from "..";
@@ -3250,12 +3249,7 @@ export function handleFloorClick(
     if (!clickWorker(floor, workerIndex, Date.now())) continue;
     playBloop();
     const center = getWorkerCenter(floor, workerIndex);
-    if (center) {
-      spawnCoinBurst(floor, center.x, center.y, () => {});
-      // start the float right away at just this worker, so the boost visibly
-      // kicks in immediately instead of waiting for the next periodic tick
-      spawnFloatingCoins(floor, center.x, center.y, () => {});
-    }
+    if (center) spawnCoinBurst(floor, center.x, center.y, () => {});
     // clicking a worker only (re)activates that specific worker's boost/15s timer.
     // Date.now()-based (not performance.now()) so it matches incomePanel.ts's
     // persisted, Date.now()-based cycle tracking that reads the same boost state

@@ -1417,7 +1417,7 @@ export {
 } from "./upgradeButton";
 export {
   drawWorker,
-  getBoostedWorkerCenters,
+  drawWorkerBoosts,
   tickWorkerOffscreen,
   loadWorkerSprite,
   getWorkerIconUrl,
@@ -1585,9 +1585,5 @@ export {
   CHAIN_CRIT_CONTINUE_CHANCE,
 } from "./upgradeButton";
 export type { CritTier } from "./upgradeButton";
-export {
-  spawnFloatingCoins,
-  drawFloatingCoins,
-  loadFloatingCoinImage,
-} from "./coinFloat";
+export { loadFloatingCoinImage } from "./coinFloat";
 export { spawnIncomeFloatText, drawIncomeFloatText } from "./incomeFloatText";

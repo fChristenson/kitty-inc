@@ -173,6 +173,17 @@ export function isBoosted(
   return expireIfStale(ensureSlot(floor, workerIndex), now);
 }
 
+// when a worker's latest boost started and when it runs out (ms), whether or
+// not it's still running; -Infinity if it was never boosted
+export function getBoostStartedAt(floor: Floor, workerIndex: number): number {
+  return ensureSlot(floor, workerIndex).boostedAt;
+}
+
+export function getBoostEndsAt(floor: Floor, workerIndex: number): number {
+  const slot = ensureSlot(floor, workerIndex);
+  return slot.boostedAt + (slot.durationMs ?? BOOST_DURATION_MS);
+}
+
 // durationMs (default BOOST_DURATION_MS) lets a caller grant a longer-lasting
 // boost than the normal one (see shared/critTypes' Sunshine crit) without
 // touching any other activation's own duration
@@ -240,7 +251,7 @@ export function countBoostedWorkers(floor: Floor, now: number): number {
 }
 
 // ms left on a worker's boost, 0 once expired/never boosted; worker.ts's
-// getBoostedWorkerCenters uses this to flag which centers should blink as urgent
+// drawWorkerBoosts uses this to flag which workers should blink as urgent
 export function getBoostRemainingMs(
   floor: Floor,
   workerIndex: number,
