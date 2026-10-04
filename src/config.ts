@@ -7542,6 +7542,94 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 39
+  // money, cash: src/floors/riptideEvent: opposing bands of cash torn into one rip current
+  riptideEvent: {
+    chance: 0.01,
+    streamMs: 900, // the bands streaming, speeding up
+    ripMs: 450, // bands torn into the rip, middle first
+    pullMs: 650, // the rip's run up into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, worker perma tiers: src/floors/fencingEvent: fencer wisps duel over each worker, then lunge
+  fencingEvent: {
+    chance: 0.01,
+    staggerMs: 130, // between bouts starting
+    boutMs: [320, 200] as [number, number], // between clashes, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, levels and cash: src/floors/waterTowerEvent: a tank of cash pumped up high bursts onto the bars
+  waterTowerEvent: {
+    chance: 0.01,
+    fillMs: 700, // pumping up into the tank
+    swellMs: 350, // shuddering full
+    levelShare: 0.03, // per bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, crit tiers: src/floors/barberPoleEvent: barber-pole stripes of light spin along each bar
+  barberPoleEvent: {
+    chance: 0.01,
+    staggerMs: 220, // between poles lighting up
+    spinMs: 1000, // the first pole's spin
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, a free floor: src/floors/ionCannonEvent: tendrils charge a core that fires into the lock
+  ionCannonEvent: {
+    chance: 0.01,
+    chargeMs: [230, 90] as [number, number], // between tendrils, quickening
+    aimMs: 220,
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, levels: src/floors/claymoreEvent: fan blasts up through each bar, set off one by one
+  claymoreEvent: {
+    chance: 0.01,
+    fuseMs: 300,
+    chainMs: [330, 200] as [number, number], // between bars, quickening
+    levelShare: 0.02, // per blast round
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, free hires: src/floors/pepperboxEvent: a spinning ring of barrels fires onto empty spots
+  pepperboxEvent: {
+    chance: 0.01,
+    spinUpMs: 400,
+    shotsMs: [220, 110] as [number, number], // between shots, quickening
+    volleyGapMs: 200,
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, crit tiers: src/floors/squashEvent: rallies off the top and side walls onto the bars
+  squashEvent: {
+    chance: 0.01,
+    firstMs: 200,
+    ralliesMs: [380, 220] as [number, number], // between rallies, quickening
+    legMs: [240, 160] as [number, number], // each leg, from the first rally to the last
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/verticalHoldEvent: the screen rolls like a TV losing vertical hold
+  verticalHoldEvent: {
+    chance: 0.01,
+    slipMs: 250, // jittering before it rolls
+    rollsMs: [380, 150] as [number, number], // each roll, quickening
+    lockMs: 260, // the last part-roll back into place
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/halftoneEvent: the screen turns into gold halftone dots that peel off as cash
+  halftoneEvent: {
+    chance: 0.01,
+    sweepMs: 450, // the ring sweeping the print over the screen
+    showMs: 350,
+    peelMs: 900, // dots peeling off and swirling into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,

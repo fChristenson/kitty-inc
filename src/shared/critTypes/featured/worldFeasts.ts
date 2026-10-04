@@ -762,4 +762,236 @@ export const WORLD_FEASTS_CRITS = {
     reward: (context, { actions, balance, belowAndHere }) =>
       actions.spreadUpgrades(belowAndHere(context), balance.yellowSpoonRiceUpgrades),
   },
+  acaiBoard: {
+    label: "Acai Board",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/acaiBoard.webp",
+    description: "Pays 83 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.acaiBoardMultiple),
+  },
+  baklavaMezze: {
+    label: "Baklava Mezze",
+    color: COLOR.amberMuted,
+    image: "crits/worldFeasts/baklavaMezze.webp",
+    description: "Spreads 94 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.baklavaMezzeUpgrades),
+  },
+  bambooTraySatay: {
+    label: "Bamboo Tray Satay",
+    color: COLOR.amberMuted,
+    image: "crits/worldFeasts/bambooTraySatay.webp",
+    description: "Pays 84 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.bambooTraySatayMultiple),
+  },
+  bananaLeafSatay: {
+    label: "Banana Leaf Satay",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/bananaLeafSatay.webp",
+    description: "Spreads 95 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.bananaLeafSatayUpgrades),
+  },
+  bunAndFillet: {
+    label: "Bun And Fillet",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/bunAndFillet.webp",
+    description: "Pays 85 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.bunAndFilletMultiple),
+  },
+  cevapiEspresso: {
+    label: "Cevapi Espresso",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/cevapiEspresso.webp",
+    description: "Spreads 96 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.cevapiEspressoUpgrades),
+  },
+  clayPotYogurt: {
+    label: "Clay Pot Yogurt",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/clayPotYogurt.webp",
+    description: "Pays 86 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.clayPotYogurtMultiple),
+  },
+  copperPotKebabs: {
+    label: "Copper Pot Kebabs",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/copperPotKebabs.webp",
+    description: "Spreads 97 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.copperPotKebabsUpgrades),
+  },
+  cucumberSoupMeze: {
+    label: "Cucumber Soup Meze",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/cucumberSoupMeze.webp",
+    description: "Pays 87 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.cucumberSoupMezeMultiple),
+  },
+  ebaAndOkra: {
+    label: "Eba And Okra",
+    color: COLOR.supplyRunTan,
+    image: "crits/worldFeasts/ebaAndOkra.webp",
+    description: "Spreads 98 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.ebaAndOkraUpgrades),
+  },
+  feijoadaFiesta: {
+    label: "Feijoada Fiesta",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/feijoadaFiesta.webp",
+    description: "Pays 88 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.feijoadaFiestaMultiple),
+  },
+  flatbreadFingers: {
+    label: "Flatbread Fingers",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/flatbreadFingers.webp",
+    description: "Spreads 99 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.flatbreadFingersUpgrades),
+  },
+  fufuMound: {
+    label: "Fufu Mound",
+    color: COLOR.supplyRunTan,
+    image: "crits/worldFeasts/fufuMound.webp",
+    description: "Pays 89 times the highest floor's upgrade price in cash",
+    reward: (context, { actions, balance, highestFloor }) =>
+      actions.addUpgradePriceCash([highestFloor(context)], balance.fufuMoundMultiple),
+  },
+  grilledPorkNoodles: {
+    label: "Grilled Pork Noodles",
+    color: COLOR.headhunterRust,
+    image: "crits/worldFeasts/grilledPorkNoodles.webp",
+    description: "Spreads 100 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.grilledPorkNoodlesUpgrades),
+  },
+  honeyPotBanitsa: {
+    label: "Honey Pot Banitsa",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/honeyPotBanitsa.webp",
+    description: "Spreads 101 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.honeyPotBanitsaUpgrades),
+  },
+  islandTwinFish: {
+    label: "Island Twin Fish",
+    color: COLOR.overflowBlue,
+    image: "crits/worldFeasts/islandTwinFish.webp",
+    description: "Spreads 102 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.islandTwinFishUpgrades),
+  },
+  leafCupCurry: {
+    label: "Leaf Cup Curry",
+    color: COLOR.payoutOlive,
+    image: "crits/worldFeasts/leafCupCurry.webp",
+    description: "Spreads 103 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.leafCupCurryUpgrades),
+  },
+  mapleSyrupBagel: {
+    label: "Maple Syrup Bagel",
+    color: COLOR.headhunterRust,
+    image: "crits/worldFeasts/mapleSyrupBagel.webp",
+    description: "Spreads 104 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.mapleSyrupBagelUpgrades),
+  },
+  nanaimoPoutine: {
+    label: "Nanaimo Poutine",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/nanaimoPoutine.webp",
+    description: "Spreads 105 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.nanaimoPoutineUpgrades),
+  },
+  puffPuffSpread: {
+    label: "Puff Puff Spread",
+    color: COLOR.amber,
+    image: "crits/worldFeasts/puffPuffSpread.webp",
+    description: "Spreads 106 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.puffPuffSpreadUpgrades),
+  },
+  quesoFritoPlate: {
+    label: "Queso Frito Plate",
+    color: COLOR.starYellow,
+    image: "crits/worldFeasts/quesoFritoPlate.webp",
+    description: "Grows every unlocked floor's level by 10.1% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.quesoFritoPlateGrowth),
+  },
+  roastedPepperFeast: {
+    label: "Roasted Pepper Feast",
+    color: COLOR.redActive,
+    image: "crits/worldFeasts/roastedPepperFeast.webp",
+    description: "Spreads 107 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.roastedPepperFeastUpgrades),
+  },
+  sambalDrumstick: {
+    label: "Sambal Drumstick",
+    color: COLOR.headhunterRust,
+    image: "crits/worldFeasts/sambalDrumstick.webp",
+    description: "Grows every unlocked floor's level by 10.2% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.sambalDrumstickGrowth),
+  },
+  stickyRiceCloud: {
+    label: "Sticky Rice Cloud",
+    color: COLOR.amber,
+    image: "crits/worldFeasts/stickyRiceCloud.webp",
+    description: "Spreads 108 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.stickyRiceCloudUpgrades),
+  },
+  sunnyEggFishFry: {
+    label: "Sunny Egg Fish Fry",
+    color: COLOR.supplyRunTan,
+    image: "crits/worldFeasts/sunnyEggFishFry.webp",
+    description: "Grows every unlocked floor's level by 10.3% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.sunnyEggFishFryGrowth),
+  },
+  tomatoRiceCatch: {
+    label: "Tomato Rice Catch",
+    color: COLOR.headhunterRust,
+    image: "crits/worldFeasts/tomatoRiceCatch.webp",
+    description: "Spreads 109 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.tomatoRiceCatchUpgrades),
+  },
+  waakyePlate: {
+    label: "Waakye Plate",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/waakyePlate.webp",
+    description: "Grows every unlocked floor's level by 10.4% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.waakyePlateGrowth),
+  },
+  wovenTrayGrill: {
+    label: "Woven Tray Grill",
+    color: COLOR.gold,
+    image: "crits/worldFeasts/wovenTrayGrill.webp",
+    description: "Spreads 110 free upgrades over this floor and the ones below",
+    reward: (context, { actions, balance, belowAndHere }) =>
+      actions.spreadUpgrades(belowAndHere(context), balance.wovenTrayGrillUpgrades),
+  },
+  suyaAndStew: {
+    label: "Suya And Stew",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/worldFeasts/suyaAndStew.webp",
+    description: "Grows every unlocked floor's level by 10.5% in free upgrades",
+    reward: (context, { actions, balance }) =>
+      actions.growLevels(context.floors, balance.suyaAndStewGrowth),
+  },
 } as const satisfies Record<string, FeaturedCritDefinition>;
