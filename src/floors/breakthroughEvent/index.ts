@@ -12,9 +12,9 @@ import { playBloop, playBoostEventStream, playExplosion } from "../../sound";
 import { shakeScreen } from "../../screenShake";
 import { WISP_SIZE, type Point } from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
-import { clamp01, lerp } from "../../shared/easing";
+import { lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
-import { drawDrill, drawDrillSpray, planDrill } from "../../shared/drill";
+import { drawGrind, planDrill, planGrind } from "../../shared/drill";
 import { findRewardBars, levelsFor } from "../eventRewards";
 
 const KEY = "breakthrough";
@@ -24,12 +24,6 @@ const PUSHES = 8;
 const EXIT = 150;
 const EXIT_MS = 160;
 const SPRAY = WISP_SIZE * 1.3;
-// px the drill judders while it's stalled on the bar, and once it bites in
-const JUDDER: [number, number] = [5, 2.5];
-// how hard it grinds: a steady gush while stalled, building as it bores
-const GRIND_STALLED = 1.0;
-const GRIND_BORING: [number, number] = [0.85, 1.5];
-const RUMBLE_MS = 90;
 const HIT_SHAKE = 1.0;
 const RUMBLE_SHAKE = 0.25;
 const PUSH_SHAKE: [number, number] = [0.35, 0.8];
@@ -57,17 +51,8 @@ export const forceBreakthroughEvent = registerWispEvent(
       exit: EXIT,
       exitMs: EXIT_MS,
     });
-    const hits = drill.bites;
-    const gives = hits + stallMs;
-    // the drill's own clock: held at the bite while it stalls, then on
-    const drillMs = (ms: number) =>
-      ms < hits ? ms : ms < gives ? hits + 1 : ms - stallMs;
-    const pushes = drill.pushes.slice(0, -1).map((ms) => ms + stallMs);
-    const through = drill.through + stallMs;
-    const endAt = drill.endMs + stallMs;
-    const rumbles: number[] = [];
-    for (let ms = hits + RUMBLE_MS; ms < gives; ms += RUMBLE_MS)
-      rumbles.push(ms);
+    const grind = planGrind(drill, stallMs);
+    const { bites: hits, pushes, rumbles, through, endMs: endAt } = grind;
     const under: Point = {
       x: target.x,
       y: bar.box.y + bar.box.height,
@@ -126,30 +111,7 @@ export const forceBreakthroughEvent = registerWispEvent(
         },
         drawOver: (ctx, ms, now) => {
           if (ms < 0 || ms > endAt + 600) return;
-          const biting = ms >= hits && ms < through;
-          const judder = biting ? (ms < gives ? JUDDER[0] : JUDDER[1]) : 0;
-          ctx.save();
-          ctx.translate(
-            Math.sin(ms * 0.9) * judder,
-            Math.cos(ms * 1.3) * judder * 0.5,
-          );
-          drawDrill(ctx, drill, drillMs(ms), now, SIZE);
-          ctx.restore();
-          if (ms < hits || ms > through + 300) return;
-          const grind =
-            ms < gives
-              ? GRIND_STALLED
-              : lerp(GRIND_BORING, clamp01((ms - gives) / (through - gives)));
-          const intensity = grind * (1 - clamp01((ms - through) / 300));
-          drawDrillSpray(
-            ctx,
-            target,
-            drill.angle,
-            ms - hits,
-            intensity,
-            SPRAY,
-            now,
-          );
+          drawGrind(ctx, grind, ms, now, SIZE, SPRAY);
         },
       },
     );

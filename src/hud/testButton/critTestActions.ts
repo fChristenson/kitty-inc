@@ -46,6 +46,24 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-archimedes-screw-event" class="game__button">Archimedes Screw</button>
+          <button id="test-murmuration-event" class="game__button">Murmuration</button>
+          <button id="test-spirit-bomb-event" class="game__button">Spirit Bomb</button>
+          <button id="test-metronome-event" class="game__button">Metronome</button>
+          <button id="test-power-grid-event" class="game__button">Power Grid</button>
+          <button id="test-bomb-bowling-event" class="game__button">Bomb Bowling</button>
+          <button id="test-showdown-event" class="game__button">Showdown</button>
+          <button id="test-jump-rope-event" class="game__button">Jump Rope</button>
+          <button id="test-strongbox-event" class="game__button">Strongbox</button>
+          <button id="test-snow-cannon-event" class="game__button">Snow Cannon</button>
+          <button id="test-hill-climb-event" class="game__button">Hill Climb</button>
+          <button id="test-abacus-event" class="game__button">Abacus</button>
+          <button id="test-coral-event" class="game__button">Coral</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-curves-event" class="game__button">Curves</button>
           <button id="test-breakthrough-event" class="game__button">Breakthrough</button>
           <button id="test-dune-event" class="game__button">Dune</button>
@@ -58,11 +76,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-bead-drill-event" class="game__button">Bead Drill</button>
           <button id="test-hydroseeder-event" class="game__button">Hydroseeder</button>
           <button id="test-mancala-event" class="game__button">Mancala</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-tumbler-event" class="game__button">Tumbler</button>
           <button id="test-waggle-dance-event" class="game__button">Waggle Dance</button>
           <button id="test-water-cycle-event" class="game__button">Water Cycle</button>

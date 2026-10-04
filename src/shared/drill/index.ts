@@ -375,3 +375,85 @@ export function drawDrill(
       now,
     );
 }
+
+// a drill grinding through something hard: it stalls on the bite, then bores
+// on, its times shifted by the stall
+export interface Grind {
+  drill: Drill;
+  stallMs: number;
+  bites: number;
+  // when the stall gives, each shove but the punch-through, and that
+  gives: number;
+  pushes: number[];
+  through: number;
+  endMs: number;
+  // rumbles while it stalls, every RUMBLE_MS
+  rumbles: number[];
+}
+
+const RUMBLE_MS = 90;
+// px the drill judders while it's stalled, and once it's boring in
+const JUDDER: [number, number] = [5, 2.5];
+// how hard it grinds: a steady gush while stalled, building as it bores
+const GRIND_STALLED = 1;
+const GRIND_BORING: [number, number] = [0.85, 1.5];
+const SPRAY_FADE_MS = 300;
+
+// the drill held stallMs on its bite, grinding in place, before it bores on
+export function planGrind(drill: Drill, stallMs: number): Grind {
+  const bites = drill.bites;
+  const gives = bites + stallMs;
+  const rumbles: number[] = [];
+  for (let ms = bites + RUMBLE_MS; ms < gives; ms += RUMBLE_MS)
+    rumbles.push(ms);
+  return {
+    drill,
+    stallMs,
+    bites,
+    gives,
+    pushes: drill.pushes.slice(0, -1).map((ms) => ms + stallMs),
+    through: drill.through + stallMs,
+    endMs: drill.endMs + stallMs,
+    rumbles,
+  };
+}
+
+// the grinding drill at ms: juddering while it bites (hardest stalled), with
+// the gush of sparks out of its hole, `spray` px the sparks' scale
+export function drawGrind(
+  ctx: CanvasRenderingContext2D,
+  grind: Grind,
+  ms: number,
+  now: number,
+  size: number,
+  spray: number,
+): void {
+  const { drill, bites, gives, through, stallMs } = grind;
+  const biting = ms >= bites && ms < through;
+  const judder = biting ? (ms < gives ? JUDDER[0] : JUDDER[1]) : 0;
+  ctx.save();
+  ctx.translate(Math.sin(ms * 0.9) * judder, Math.cos(ms * 1.3) * judder * 0.5);
+  // its own clock is held at the bite while it stalls
+  drawDrill(
+    ctx,
+    drill,
+    ms < bites ? ms : ms < gives ? bites + 1 : ms - stallMs,
+    now,
+    size,
+  );
+  ctx.restore();
+  if (ms < bites || ms > through + SPRAY_FADE_MS) return;
+  const hard =
+    ms < gives
+      ? GRIND_STALLED
+      : lerp(GRIND_BORING, clamp01((ms - gives) / (through - gives)));
+  drawDrillSpray(
+    ctx,
+    drill.target,
+    drill.angle,
+    ms - bites,
+    hard * (1 - clamp01((ms - through) / SPRAY_FADE_MS)),
+    spray,
+    now,
+  );
+}

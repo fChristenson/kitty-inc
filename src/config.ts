@@ -8341,6 +8341,112 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 49
+  // money, levels + cash: src/floors/archimedesScrewEvent: cash winds up a turning screw, jetting onto the bars
+  archimedesScrewEvent: {
+    chance: 0.01,
+    streamMs: 800, // cash pouring onto the screw's foot
+    climbMs: 1000, // each coin's climb up it
+    levelShare: 0.05,
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp, free hires: src/floors/murmurationEvent: a flock of wisps swirls like starlings, then dives onto empty spots
+  murmurationEvent: {
+    chance: 0.01,
+    flockMs: 1200, // the flock swirling
+    diveMs: 380, // each stream's dive
+    gapMs: 130, // between streams peeling off
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // mix, a crit tier + cash: src/floors/spiritBombEvent: rivers of cash swell an orb that's hurled onto the bar
+  spiritBombEvent: {
+    chance: 0.01,
+    gatherMs: 1200, // the rivers swelling the orb
+    throwMs: 260, // hurled down onto the bar
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // beam, crit tiers: src/floors/metronomeEvent: a metronome beam ticks across the bars
+  metronomeEvent: {
+    chance: 0.01,
+    ticksMs: [380, 190] as [number, number], // each swing, quickening
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // lightning, levels: src/floors/powerGridEvent: bolts zigzag pylon to pylon up the bars like a grid powering up
+  powerGridEvent: {
+    chance: 0.01,
+    linksMs: [240, 110] as [number, number], // between lines, quickening
+    levelShare: 0.05,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/bombBowlingEvent: a bomb bowls into a rack of bomb pins
+  bombBowlingEvent: {
+    chance: 0.01,
+    rollMs: 650, // the ball rolling in
+    chainMs: 650, // the strike tearing through the rack to the ball's blast
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, crit tiers: src/floors/showdownEvent: two gunslingers' shots meet head-on over each bar
+  showdownEvent: {
+    chance: 0.01,
+    roundsMs: [460, 280] as [number, number], // each round, quickening
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // bounce, levels + a crit tier: src/floors/jumpRopeEvent: a wisp skips a rope of light on the clicked bar
+  jumpRopeEvent: {
+    chance: 0.01,
+    jumpMs: 1500, // the skipping, the rope turning ever faster
+    leapMs: 420, // the last leap and slam
+    levelShare: 0.02,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // drill, cash: src/floors/strongboxEvent: a drill grinds into the total readout like a safecracker
+  strongboxEvent: {
+    chance: 0.01,
+    approachMs: 300, // the drill screaming up
+    stallMs: 650, // grinding in place against the total
+    boreMs: 1500, // boring through once it gives
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // spray, a free floor: src/floors/snowCannonEvent: a snow cannon buries the lock in falling gold mist
+  snowCannonEvent: {
+    chance: 0.01,
+    burstsMs: [420, 300] as [number, number], // each burst, shortening
+    gapMs: 140, // between bursts
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // race, a crit tier + levels: src/floors/hillClimbEvent: two racers switchback up the bars into the top one
+  hillClimbEvent: {
+    chance: 0.01,
+    raceMs: 1800, // the leader's climb
+    gapMs: 120, // the chaser on its tail
+    levelShare: 0.05,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/abacusEvent: an abacus counts itself up to 9999 and carries over
+  abacusEvent: {
+    chance: 0.01,
+    countMs: 1500, // counting up, ever faster
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/coralEvent: a coral of light grows out of the button by diffusion-limited aggregation
+  coralEvent: {
+    chance: 0.01,
+    growMs: 1500, // the coral growing
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 48
   // money, levels and cash: src/floors/duneEvent: a crawling dune of cash blows its crest onto the bars
   duneEvent: {
