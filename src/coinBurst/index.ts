@@ -65,9 +65,60 @@ export async function loadCoinBurstImages(): Promise<HTMLImageElement> {
   ]);
   coinFrameCanvases = buildFrameCanvases(coin, COIN_SPIN_FRAME_COUNT);
   billFrameCanvases = buildFrameCanvases(bill, BILL_SPIN_FRAME_COUNT);
+  coinAtlas = buildAtlas(coinFrameCanvases);
+  billAtlas = buildAtlas(billFrameCanvases);
   spriteShape.coin = measureFrames(coinFrameCanvases);
   spriteShape.bill = measureFrames(billFrameCanvases);
   return coin;
+}
+
+// every frame at every tilt, pre-rotated onto one atlas per sprite, so a
+// coin is one upright blit from one texture: no per-coin transforms, which
+// cost phones dearly with hundreds of coins in the air during a long press
+const ATLAS_FRAME_H = 128;
+// tilts across [-π/2, π/2], both ends included
+const AXIS_STEPS = 8;
+const AXIS_STEP = Math.PI / AXIS_STEPS;
+// coins drawn bigger than this share over the atlas's own frame height take
+// the full-size frames instead, so they stay sharp
+const ATLAS_MAX_UPSCALE = 1.25;
+interface Atlas {
+  image: HTMLCanvasElement | ImageBitmap;
+  cell: number;
+}
+let coinAtlas: Atlas | null = null;
+let billAtlas: Atlas | null = null;
+
+function buildAtlas(frames: HTMLCanvasElement[]): Atlas {
+  const frameW = ATLAS_FRAME_H * (frames[0].width / frames[0].height);
+  const cell = Math.ceil(Math.hypot(frameW, ATLAS_FRAME_H)) + 4;
+  const canvas = document.createElement("canvas");
+  canvas.width = cell * (AXIS_STEPS + 1);
+  canvas.height = cell * frames.length;
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingQuality = "high";
+  frames.forEach((frame, row) => {
+    for (let step = 0; step <= AXIS_STEPS; step++) {
+      ctx.setTransform(1, 0, 0, 1, (step + 0.5) * cell, (row + 0.5) * cell);
+      ctx.rotate(-Math.PI / 2 + step * AXIS_STEP);
+      ctx.drawImage(
+        frame,
+        -frameW / 2,
+        -ATLAS_FRAME_H / 2,
+        frameW,
+        ATLAS_FRAME_H,
+      );
+    }
+  });
+  const atlas: Atlas = { image: canvas, cell };
+  // a canvas's first draw costs a snapshot of it; a bitmap's doesn't
+  void createImageBitmap(canvas).then(
+    (bitmap) => {
+      atlas.image = bitmap;
+    },
+    () => {},
+  );
+  return atlas;
 }
 
 export interface CoinBurstSprite {
@@ -193,6 +244,13 @@ let batchBase: DOMMatrix | null = null;
 let batchScale = 1;
 let batchWidth = 0;
 let batchHeight = 0;
+let batchA = 1;
+let batchB = 0;
+let batchC = 0;
+let batchD = 1;
+let batchE = 0;
+let batchF = 0;
+let batchUpright = true;
 
 // draws one coin/bill particle centered at (x, y) with the given on-screen
 // radius — a no-op (not a fallback circle) for however briefly the sprites
@@ -215,23 +273,69 @@ export function drawCoinBurstFrame(
     sprite.kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT;
   const frame =
     ((Math.floor(sprite.spinFrame) % frameCount) + frameCount) % frameCount;
+  const destH = radius * 2;
+  // the batch's matrix, scale and canvas size, read once per batch (base is
+  // fresh per batch): DOMMatrix getters and DOM reads per coin add up
+  if (base !== batchBase) {
+    batchBase = base;
+    batchA = base.a;
+    batchB = base.b;
+    batchC = base.c;
+    batchD = base.d;
+    batchE = base.e;
+    batchF = base.f;
+    batchUpright = batchB === 0 && batchC === 0;
+    batchScale = Math.max(
+      Math.hypot(batchA, batchB),
+      Math.hypot(batchC, batchD),
+    );
+    batchWidth = ctx.canvas.width;
+    batchHeight = ctx.canvas.height;
+  }
+  const a = batchA;
+  const b = batchB;
+  const c = batchC;
+  const d = batchD;
+  const e = batchE;
+  const f = batchF;
+  const px = a * x + c * y + e;
+  const py = b * x + d * y + f;
+  const atlas = sprite.kind === "bill" ? billAtlas : coinAtlas;
+  const step = Math.round((sprite.axisAngle + Math.PI / 2) / AXIS_STEP);
+  if (
+    atlas &&
+    batchUpright &&
+    step >= 0 &&
+    step <= AXIS_STEPS &&
+    destH * batchScale <= ATLAS_FRAME_H * ATLAS_MAX_UPSCALE
+  ) {
+    const side = atlas.cell * (destH / ATLAS_FRAME_H);
+    const reach = side * batchScale;
+    if (
+      px + reach < 0 ||
+      py + reach < 0 ||
+      px - reach > batchWidth ||
+      py - reach > batchHeight
+    )
+      return;
+    ctx.drawImage(
+      atlas.image,
+      step * atlas.cell,
+      frame * atlas.cell,
+      atlas.cell,
+      atlas.cell,
+      x - side / 2,
+      y - side / 2,
+      side,
+      side,
+    );
+    return;
+  }
   const frameCanvas = frameCanvases[frame];
   // frames share one cell size, so the coin's diameter maps to height and width
   // follows the cell's own aspect ratio — that's what makes thinner edge-on
   // frames actually read as the coin thinning, not just shrinking
-  const destH = radius * 2;
   const destW = destH * (frameCanvas.width / frameCanvas.height);
-  const { a, b, c, d, e, f } = base;
-  // the batch's scale and canvas size, read once per batch (base is fresh
-  // per batch) instead of two hypots and two DOM reads per coin
-  if (base !== batchBase) {
-    batchBase = base;
-    batchScale = Math.max(Math.hypot(a, b), Math.hypot(c, d));
-    batchWidth = ctx.canvas.width;
-    batchHeight = ctx.canvas.height;
-  }
-  const px = a * x + c * y + e;
-  const py = b * x + d * y + f;
   // coins flung past the canvas edge still cost a full draw call each
   const reach = Math.max(destW, destH) * batchScale;
   if (

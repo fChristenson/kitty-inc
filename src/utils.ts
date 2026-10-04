@@ -701,6 +701,106 @@ const cartoonTextSprites = new Map<string, Map<string, HTMLCanvasElement>>();
 const readyFonts = new Set<string>();
 const MAX_CARTOON_TEXTS_PER_FONT = 160;
 const CARTOON_STROKE = 5;
+// a label changing every click or two (a held button's price, a counting
+// gauge) would build a canvas per value: until a text has been drawn this many
+// times it's stamped glyph by glyph from per-letter sprites instead
+const BAKE_AFTER_DRAWS = 8;
+const MAX_PENDING_TEXTS = 400;
+const pendingTexts = new Map<string, Map<string, number>>();
+// each letter's outline (left half) and fill (right half), drawn left-aligned
+// GLYPH_PAD in from its cell's left edge
+const GLYPH_PAD = CARTOON_STROKE + 2;
+const glyphSprites = new Map<
+  string,
+  Map<string, { canvas: HTMLCanvasElement; cellW: number }>
+>();
+// each pending text's letter offsets from its left edge, then its full width
+const glyphLayouts = new Map<string, Map<string, Float32Array>>();
+
+function cartoonTextHeight(fontSize: number): number {
+  return Math.ceil(fontSize * 1.4 + CARTOON_STROKE * 2);
+}
+
+function getGlyph(
+  font: string,
+  char: string,
+  fontSize: number,
+): { canvas: HTMLCanvasElement; cellW: number } {
+  let byChar = glyphSprites.get(font);
+  if (!byChar) glyphSprites.set(font, (byChar = new Map()));
+  let glyph = byChar.get(char);
+  if (glyph) return glyph;
+  const canvas = document.createElement("canvas");
+  const c = canvas.getContext("2d")!;
+  c.font = font;
+  const cellW = Math.ceil(c.measureText(char).width + GLYPH_PAD * 2);
+  const h = cartoonTextHeight(fontSize);
+  canvas.width = cellW * 2;
+  canvas.height = h;
+  c.font = font;
+  c.textAlign = "left";
+  c.textBaseline = "middle";
+  c.lineJoin = "round";
+  c.miterLimit = 2;
+  c.lineWidth = CARTOON_STROKE;
+  c.strokeStyle = COLOR.black;
+  c.strokeText(char, GLYPH_PAD, h / 2);
+  c.fillStyle = COLOR.white;
+  c.fillText(char, cellW + GLYPH_PAD, h / 2);
+  glyph = { canvas, cellW };
+  byChar.set(char, glyph);
+  return glyph;
+}
+
+function glyphLayout(
+  ctx: CanvasRenderingContext2D,
+  font: string,
+  text: string,
+): Float32Array {
+  let byText = glyphLayouts.get(font);
+  if (!byText) glyphLayouts.set(font, (byText = new Map()));
+  let layout = byText.get(text);
+  if (layout) return layout;
+  if (byText.size >= MAX_PENDING_TEXTS) byText.clear();
+  // measured through each letter, so kerning is kept
+  layout = new Float32Array(text.length + 1);
+  for (let i = 1; i <= text.length; i++)
+    layout[i] = ctx.measureText(text.slice(0, i)).width;
+  byText.set(text, layout);
+  return layout;
+}
+
+// every outline first, then every fill, so no outline covers a neighbour
+function drawGlyphText(
+  ctx: CanvasRenderingContext2D,
+  font: string,
+  text: string,
+  x: number,
+  y: number,
+  fontSize: number,
+): void {
+  const layout = glyphLayout(ctx, font, text);
+  const left = x - layout[text.length] / 2 - GLYPH_PAD;
+  const h = cartoonTextHeight(fontSize);
+  const top = y - h / 2;
+  for (let pass = 0; pass < 2; pass++)
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === " ") continue;
+      const glyph = getGlyph(font, text[i], fontSize);
+      ctx.drawImage(
+        glyph.canvas,
+        pass * glyph.cellW,
+        0,
+        glyph.cellW,
+        h,
+        left + layout[i],
+        top,
+        glyph.cellW,
+        h,
+      );
+    }
+}
+
 export function drawCachedCartoonText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -721,6 +821,16 @@ export function drawCachedCartoonText(
   if (!byText) cartoonTextSprites.set(font, (byText = new Map()));
   let sprite = byText.get(text);
   if (!sprite) {
+    let pending = pendingTexts.get(font);
+    if (!pending) pendingTexts.set(font, (pending = new Map()));
+    const draws = (pending.get(text) ?? 0) + 1;
+    if (draws < BAKE_AFTER_DRAWS) {
+      if (pending.size >= MAX_PENDING_TEXTS) pending.clear();
+      pending.set(text, draws);
+      drawGlyphText(ctx, font, text, x, y, fontSize);
+      return;
+    }
+    pending.delete(text);
     if (byText.size >= MAX_CARTOON_TEXTS_PER_FONT) byText.clear();
     sprite = document.createElement("canvas");
     const c = sprite.getContext("2d")!;
@@ -728,7 +838,7 @@ export function drawCachedCartoonText(
     sprite.width = Math.ceil(
       c.measureText(text).width + CARTOON_STROKE * 2 + 4,
     );
-    sprite.height = Math.ceil(fontSize * 1.4 + CARTOON_STROKE * 2);
+    sprite.height = cartoonTextHeight(fontSize);
     c.font = font;
     c.textAlign = "center";
     c.textBaseline = "middle";

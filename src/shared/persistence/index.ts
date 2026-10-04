@@ -25,6 +25,10 @@ export interface SaveLifecycle {
   saveNow: () => void;
 }
 
+// a busy frame loop (a long press on a phone) never goes idle, so this is how
+// often a save forces itself in; leaving the page saves straight away anyway
+const IDLE_SAVE_TIMEOUT_MS = 5000;
+
 export function createSaveScheduler<T>(save: (state: T) => void): {
   schedule: (state: T) => void;
   saveNow: (state: T) => void;
@@ -47,7 +51,7 @@ export function createSaveScheduler<T>(save: (state: T) => void): {
       scheduled = true;
       afterStartup(() => {
         if (typeof requestIdleCallback === "function") {
-          requestIdleCallback(run, { timeout: 1000 });
+          requestIdleCallback(run, { timeout: IDLE_SAVE_TIMEOUT_MS });
         } else {
           window.setTimeout(run, 200);
         }

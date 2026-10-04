@@ -46,16 +46,16 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-sinkhole-event" class="game__button">Sinkhole</button>
-          <button id="test-backwash-event" class="game__button">Backwash</button>
-          <button id="test-deflector-event" class="game__button">Deflector</button>
-          <button id="test-sunflower-event" class="game__button">Sunflower</button>
-          <button id="test-convex-hull-event" class="game__button">Convex Hull</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-sinkhole-event" class="game__button">Sinkhole</button>
+          <button id="test-backwash-event" class="game__button">Backwash</button>
+          <button id="test-deflector-event" class="game__button">Deflector</button>
+          <button id="test-sunflower-event" class="game__button">Sunflower</button>
+          <button id="test-convex-hull-event" class="game__button">Convex Hull</button>
           <button id="test-rogue-wave-event" class="game__button">Rogue Wave</button>
           <button id="test-thunder-egg-event" class="game__button">Thunder Egg</button>
           <button id="test-hologram-event" class="game__button">Hologram</button>

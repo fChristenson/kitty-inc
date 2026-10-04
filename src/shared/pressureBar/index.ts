@@ -34,7 +34,7 @@ const MAX_RES = 2;
 // room around the bar on the spare canvas for its bulging outline
 const PAD_X = 30;
 const PAD_Y = 40;
-const SLICE = 8;
+const SLICE = 16;
 const CALM_SLICE = 24;
 // the glow's one stretch: the dome's bulge across its middle
 const GLOW_BULGE = 0.6;
