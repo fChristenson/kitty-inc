@@ -46,6 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-blowhole-event" class="game__button">Blowhole</button>
+          <button id="test-lamplighter-event" class="game__button">Lamplighter</button>
+          <button id="test-fire-brigade-event" class="game__button">Fire Brigade</button>
+          <button id="test-spokes-event" class="game__button">Spokes</button>
+          <button id="test-thunder-ring-event" class="game__button">Thunder Ring</button>
+          <button id="test-bottle-rocket-event" class="game__button">Bottle Rocket</button>
+          <button id="test-skeet-event" class="game__button">Skeet</button>
+          <button id="test-tennis-event" class="game__button">Tennis</button>
+          <button id="test-interlace-event" class="game__button">Interlace</button>
+          <button id="test-mirror-mirror-event" class="game__button">Mirror Mirror</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-riptide-event" class="game__button">Riptide</button>
           <button id="test-fencing-event" class="game__button">Fencing</button>
           <button id="test-water-tower-event" class="game__button">Water Tower</button>
@@ -56,11 +71,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-squash-event" class="game__button">Squash</button>
           <button id="test-vertical-hold-event" class="game__button">Vertical Hold</button>
           <button id="test-halftone-event" class="game__button">Halftone</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-twin-whirlpools-event" class="game__button">Twin Whirlpools</button>
           <button id="test-hatchlings-event" class="game__button">Hatchlings</button>
           <button id="test-butterfingers-event" class="game__button">Butterfingers</button>

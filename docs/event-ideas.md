@@ -902,6 +902,16 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Squash** (bounce; crit tiers): a player wisp on the button smashes rallies off the top and a side wall down onto the bars.
 - [x] **Vertical Hold** (experiment: an old TV losing vertical hold; cash): the screen slips and rolls, wrapping round with a blazing bar that gushes cash each pass, then locks back in place.
 - [x] **Halftone** (experiment: the screen as a halftone print; cash): a ring sweeps the screen into gold halftone dots that peel off in a wave and swirl into the total.
+- [x] **Blowhole** (money; levels and cash): a heaving sea of cash rolls along the bottom, each swell blasting a jet up through a blowhole into a bar, then the whole sea surges up into the total.
+- [x] **Lamplighter** (wisp; worker perma tiers): a lamplighter wisp hops lamp to lamp over the workers, each lamp blazing up as it lands, then all flare at once.
+- [x] **Fire Brigade** (mix; a free floor and cash): three nozzle wisps along the bottom arc jets of cash onto the lock one after another until it bursts open.
+- [x] **Spokes** (beam; crit tiers): a wheel of beam spokes drops onto each bar and rolls along it, grinding sparks, then bursts outward at the far end.
+- [x] **Thunder Ring** (lightning; free hires): a ring of bolts surges out from the button, striking each empty spot it sweeps over into a new worker.
+- [x] **Bottle Rocket** (explosion; levels): zigzag rockets burst on the bars in blasts and clusters, each blast lighting the next rocket, the last colossal.
+- [x] **Skeet** (gunfire; cash): clay wisps are flung up from the corners and shot out of the sky at the top of their arcs, gushing cash, then a double.
+- [x] **Tennis** (bounce; crit tiers): two players rally a ball across the screen, every shot bouncing once on a bar, until a smash.
+- [x] **Interlace** (experiment: a glitching interlaced signal; cash): the screen tears into lines sliding apart sideways in rippling jolts, gushing cash, then snaps back.
+- [x] **Mirror Mirror** (experiment: the screen folds into its mirror image; cash): the left half unfolds over the right, then the top over the bottom, cash pouring from the seams, then it snaps back.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.

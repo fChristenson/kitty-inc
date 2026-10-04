@@ -7630,6 +7630,94 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 40
+  // money, levels and cash: src/floors/blowholeEvent: a heaving sea of cash blasts jets up into the bars
+  blowholeEvent: {
+    chance: 0.01,
+    swellMs: 450, // the sea rolling in before the first jet
+    jetsMs: [380, 240] as [number, number], // between jets, quickening
+    levelShare: 0.03, // per bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, worker perma tiers: src/floors/lamplighterEvent: a wisp hops lamp to lamp over the workers
+  lamplighterEvent: {
+    chance: 0.01,
+    appearMs: 200,
+    hopMs: [320, 180] as [number, number], // each hop, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, a free floor and cash: src/floors/fireBrigadeEvent: three nozzles arc jets of cash onto the lock
+  fireBrigadeEvent: {
+    chance: 0.01,
+    opensMs: [380, 260] as [number, number], // between nozzles opening
+    travelMs: 520, // a jet's flight to the lock
+    blastMs: 300, // all three blasting before it bursts
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, crit tiers: src/floors/spokesEvent: wheels of beam spokes roll along the bars
+  spokesEvent: {
+    chance: 0.01,
+    staggerMs: 200, // between wheels dropping
+    rollMs: [900, 650] as [number, number], // each roll, the first to the last
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, free hires: src/floors/thunderRingEvent: a ring of bolts surges out over the empty spots
+  thunderRingEvent: {
+    chance: 0.01,
+    surges: 4,
+    surgeMs: 180, // each surge outward
+    gapMs: [220, 100] as [number, number], // between surges, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, levels: src/floors/bottleRocketEvent: zigzag rockets burst on the bars, each lighting the next
+  bottleRocketEvent: {
+    chance: 0.01,
+    fuseMs: 300,
+    flightsMs: [480, 300] as [number, number], // each flight, quickening
+    levelShare: 0.03, // per rocket
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, cash: src/floors/skeetEvent: a gun shoots clay wisps out of the sky at the top of their arcs
+  skeetEvent: {
+    chance: 0.01,
+    riseMs: 420, // a clay's climb to the top of its arc
+    throwsMs: [260, 140] as [number, number], // between throws, quickening
+    doubleGapMs: 200,
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // bounce, crit tiers: src/floors/tennisEvent: a rally bouncing once on a bar every shot
+  tennisEvent: {
+    chance: 0.01,
+    serveMs: 200,
+    legMs: [300, 170] as [number, number], // each leg, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/interlaceEvent: the screen tears into sliding interlaced lines
+  interlaceEvent: {
+    chance: 0.01,
+    joltsMs: [380, 300] as [number, number], // between jolts
+    tornMs: 250, // held torn before snapping back
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/mirrorMirrorEvent: the screen folds into a mirrored kaleidoscope
+  mirrorMirrorEvent: {
+    chance: 0.01,
+    foldMs: 260, // each half unfolding
+    gapMs: 250, // between the folds
+    showMs: 350, // the four-way mirror held
+    snapMs: 140,
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
