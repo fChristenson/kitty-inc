@@ -719,6 +719,11 @@ export function drawCritFlash(
   );
 }
 
+// one full sway of the rays behind a crit image (a reveal sees it turn back
+// at least once), and how far it turns each way
+const RAY_SWAY_MS = 1600;
+const RAY_SWAY_RAD = 0.12;
+
 // one flash layer, its rays behind its baked bitmap, at a given alpha, scale
 // and rotation: the animated foreground and the frozen background share it
 function drawFlashLayer(
@@ -746,7 +751,11 @@ function drawFlashLayer(
   const icon = config ? getCritIcon(config.name) : null;
   if (icon) {
     const { w, h } = fitIconSize(icon, measureLabel(scratch, label) * 0.85);
-    // only the reveal sizes the rays; they hold still
+    // the rays sway gently back and forth, like searchlights at a gala
+    const sway =
+      RAY_SWAY_RAD *
+      Math.sin(((performance.now() % RAY_SWAY_MS) / RAY_SWAY_MS) * Math.PI * 2);
+    ctx.rotate(sway);
     drawGoldShimmer(
       ctx,
       0,
@@ -756,6 +765,7 @@ function drawFlashLayer(
       0,
       performance.now(),
     );
+    ctx.rotate(-sway);
   }
   ctx.rotate(rotation);
   const scale = growthScale * targetScale;
