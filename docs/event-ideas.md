@@ -1014,6 +1014,18 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Hill Climb** (race; a crit tier and levels): two racers switchback up the stack, hairpinning round each bar's end, then slam into the top bar one after the other.
 - [x] **Abacus** (experiment: an abacus counting itself up; cash): beads click across the rods ever faster, carries rippling up, until 9999 carries over every rod at once and the beads burst into cash.
 - [x] **Coral** (experiment: diffusion-limited aggregation; cash): wandering glints stick one by one to a growth on the button until a branching coral of light blazes and bursts into cash.
+- [x] **Chladni** (money; cash): the button sprays a cloud of coins over a plate that dance into Chladni nodal figures, each finer as a tone climbs, then leap into the total.
+- [x] **Afterimage** (wisp; levels): a wisp blitzes between stops on the bars, leaving frozen afterimages that streak one by one into the clicked bar, each a jolt of levels.
+- [x] **Snow Globe** (mix; free hires + cash): a glitter globe of whirling cash is shaken three times, then shatters and its flakes drift down into new hires.
+- [x] **Sundial** (beam; worker perma): a sun wisp arcs over the button and its beam sweeps round below it like a sundial's shadow, promoting each worker it crosses.
+- [x] **Riveter** (gunfire; crit tiers): a rivet gun hops along each bar hammering in a row of rivets, every one a muzzle flash and a jolt, the bar's last its crit tier.
+- [x] **Paddle Ball** (bounce; a free floor): a paddle at the button smacks a ball on a glittering elastic up into the lock, faster and harder, till it breaks open.
+- [x] **Geode** (drill; cash): a geode of light crashes down mid-screen; a drill grinds into its crust, stalls, bores in shove by shove and cracks it open into crystals and cash.
+- [x] **Fog Machine** (spray; levels): nozzles in the bottom corners pump out gold fog that rises up the screen like a tide, coating and levelling each bar it swallows.
+- [x] **Chicane** (race; free hires): two racers flick down round the button's inner end through a tight chicane and swoop onto new hires one after the other.
+- [x] **Epicycles** (experiment: Fourier epicycles; cash): a chain of spinning arms draws a heart in coins, which blazes and bursts into the total.
+- [x] **Sieve** (experiment: Sieve of Eratosthenes; cash): a cursor sieves a 7 × 7 grid of dots down to its primes, which fire their cash in a rippling chain.
+- [x] **Clutter** (clutter; cash): a wisp streaks in and blows up, scattering coins evenly over the whole screen; one huge glittering broom sweeps them down into a line in brisk strokes, then in from both sides into one heap that lifts off into the total.
 - [x] **Mancala** (experiment: a self-playing mancala game; cash): seeds are sown pit to pit with captures, then all sweep into gold's store, which bursts into cash.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.

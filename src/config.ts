@@ -8341,6 +8341,103 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 50
+  // money, cash: src/floors/chladniEvent: a cloud of coins dances into Chladni plate figures as a tone climbs
+  chladniEvent: {
+    chance: 0.01,
+    toneMs: 420, // each figure
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // wisp, levels: src/floors/afterimageEvent: a blitzing wisp leaves afterimages that streak into the clicked bar
+  afterimageEvent: {
+    chance: 0.01,
+    dashMs: 110, // each blitz between stops
+    pauseMs: 70, // frozen at a stop
+    streakGapMs: 70, // between afterimages streaking home
+    streakMs: 220, // each afterimage's streak
+    levelShare: 0.03,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // mix, free hires + cash: src/floors/snowGlobeEvent: a shaken glitter globe of whirling cash shatters into flakes that hire
+  snowGlobeEvent: {
+    chance: 0.01,
+    shakeMs: 1300, // the three shakes
+    holdMs: 400,
+    mergeMs: 500,
+  },
+  // beam, worker perma: src/floors/sundialEvent: a sun arcs over the button and its beam sweeps round like a sundial's shadow
+  sundialEvent: {
+    chance: 0.01,
+    riseMs: 300, // the sun rising
+    sweepMs: 1500, // its beam sweeping round
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // gunfire, crit tiers: src/floors/riveterEvent: a rivet gun hops along the bars firing rivets into them
+  riveterEvent: {
+    chance: 0.01,
+    rivetsMs: [140, 70] as [number, number], // between rivets, quickening
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // bounce, a free floor: src/floors/paddleBallEvent: a paddle smacks a ball on an elastic into the lock till it breaks
+  paddleBallEvent: {
+    chance: 0.01,
+    tripsMs: [520, 260] as [number, number], // each round trip, quickening
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // drill, cash: src/floors/geodeEvent: a drill grinds into a geode that cracks open into cash
+  geodeEvent: {
+    chance: 0.01,
+    approachMs: 260, // the drill screaming in
+    stallMs: 700, // stalled on the crust
+    boreMs: 1300, // boring through
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // spray, levels: src/floors/fogMachineEvent: fog machines fill the screen with gold fog that swallows the bars
+  fogMachineEvent: {
+    chance: 0.01,
+    riseMs: 1500, // the fog rising up the screen
+    levelShare: 0.05,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // race, free hires: src/floors/chicaneEvent: two racers flick through a chicane round the button and swoop onto hires
+  chicaneEvent: {
+    chance: 0.01,
+    raceMs: 1100, // the leader's race
+    gapMs: 120, // the chaser behind it
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/epicyclesEvent: spinning Fourier arms draw a heart in coins
+  epicyclesEvent: {
+    chance: 0.01,
+    drawMs: 1300, // the tip drawing the heart
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/sieveEvent: a cursor sieves a grid of dots down to its primes, which fire cash
+  sieveEvent: {
+    chance: 0.01,
+    hopsMs: [70, 30] as [number, number], // each hop, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, cash: src/floors/clutterEvent: a wisp blasts coins evenly over the screen, one big broom sweeps them into a heap
+  clutterEvent: {
+    chance: 0.01,
+    enterMs: 300, // the wisp streaking in
+    scatterMs: 400, // coins flung all over
+    dragMs: 120, // each broom stroke's drag (7 strokes)
+    liftMs: 60, // lifting it back to re-plant
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 49
   // money, levels + cash: src/floors/archimedesScrewEvent: cash winds up a turning screw, jetting onto the bars
   archimedesScrewEvent: {

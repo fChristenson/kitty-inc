@@ -46,6 +46,23 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-clutter-event" class="game__button">Clutter</button>
+          <button id="test-chladni-event" class="game__button">Chladni</button>
+          <button id="test-afterimage-event" class="game__button">Afterimage</button>
+          <button id="test-snow-globe-event" class="game__button">Snow Globe</button>
+          <button id="test-sundial-event" class="game__button">Sundial</button>
+          <button id="test-riveter-event" class="game__button">Riveter</button>
+          <button id="test-paddle-ball-event" class="game__button">Paddle Ball</button>
+          <button id="test-geode-event" class="game__button">Geode</button>
+          <button id="test-fog-machine-event" class="game__button">Fog Machine</button>
+          <button id="test-chicane-event" class="game__button">Chicane</button>
+          <button id="test-epicycles-event" class="game__button">Epicycles</button>
+          <button id="test-sieve-event" class="game__button">Sieve</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-archimedes-screw-event" class="game__button">Archimedes Screw</button>
           <button id="test-murmuration-event" class="game__button">Murmuration</button>
           <button id="test-spirit-bomb-event" class="game__button">Spirit Bomb</button>
@@ -59,11 +76,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-hill-climb-event" class="game__button">Hill Climb</button>
           <button id="test-abacus-event" class="game__button">Abacus</button>
           <button id="test-coral-event" class="game__button">Coral</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-curves-event" class="game__button">Curves</button>
           <button id="test-breakthrough-event" class="game__button">Breakthrough</button>
           <button id="test-dune-event" class="game__button">Dune</button>
