@@ -1,8 +1,5 @@
 import { COLOR } from "../../palette";
-import {
-  formatTotalIncomeParts,
-  getAnimatedTotalIncome,
-} from "../../utils";
+import { formatTotalIncomeParts, getAnimatedTotalIncome } from "../../utils";
 import type { BigNumber } from "../bigNumber";
 import {
   getHudTotalAbsorbScale,

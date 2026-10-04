@@ -71,8 +71,8 @@ let frameNumber = 0;
 const HEAP_EVERY = 10;
 
 const memory = () =>
-  (performance as Performance & { memory?: { usedJSHeapSize: number } })
-    .memory?.usedJSHeapSize ?? 0;
+  (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory
+    ?.usedJSHeapSize ?? 0;
 
 // a short "file:line < file:line" of who made a canvas
 function caller(): string {

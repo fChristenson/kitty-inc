@@ -379,7 +379,8 @@ export function drawSlamText(
         : measure(ctx, text.slice(0, i + 1));
       const cellWidth = end - start;
       // a digit centers in its cell; a kerned letter sits flush right, after the kern
-      const lx = left + start + (digit ? (cellWidth - width) / 2 : cellWidth - width);
+      const lx =
+        left + start + (digit ? (cellWidth - width) / 2 : cellWidth - width);
       const centerX = left + start + cellWidth / 2;
       start = end;
       if (char === " ") continue;
@@ -407,11 +408,20 @@ export function drawSlamText(
           // band is at its middle
           ctx.globalCompositeOperation = "lighter";
           for (let k = 0; k < SHINE_SLICES; k++) {
-            const sliceX = lx - glyph.left + ((k + 0.5) / SHINE_SLICES) * glyph.w;
+            const sliceX =
+              lx - glyph.left + ((k + 0.5) / SHINE_SLICES) * glyph.w;
             const t = (sliceX - x0) / (band * 2);
             if (t <= 0 || t >= 1) continue;
             ctx.globalAlpha = alpha * 0.9 * (1 - Math.abs(2 * t - 1));
-            stampGlyph(ctx, glyph, WHITE_CELL, lx, y, k / SHINE_SLICES, 1 / SHINE_SLICES);
+            stampGlyph(
+              ctx,
+              glyph,
+              WHITE_CELL,
+              lx,
+              y,
+              k / SHINE_SLICES,
+              1 / SHINE_SLICES,
+            );
           }
           ctx.globalCompositeOperation = "source-over";
           ctx.globalAlpha = alpha;

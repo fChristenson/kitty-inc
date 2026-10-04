@@ -11,7 +11,10 @@ export function loadResults(key: "last" | "baseline"): Summary[] {
   return raw ? (JSON.parse(raw) as Summary[]) : [];
 }
 
-export function saveResults(key: "last" | "baseline", results: Summary[]): void {
+export function saveResults(
+  key: "last" | "baseline",
+  results: Summary[],
+): void {
   realStorage.setItem(
     key === "last" ? LAST_KEY : BASELINE_KEY,
     JSON.stringify(results),
@@ -137,7 +140,9 @@ export function mountPanel(actions: PanelActions): {
     panel.classList.toggle("collapsed");
   });
   panel.querySelector("#perf-none")!.addEventListener("click", () => {
-    for (const box of panel.querySelectorAll<HTMLInputElement>(".scenarios input"))
+    for (const box of panel.querySelectorAll<HTMLInputElement>(
+      ".scenarios input",
+    ))
       box.checked = false;
   });
   panel.querySelector("#perf-run")!.addEventListener("click", () => {
