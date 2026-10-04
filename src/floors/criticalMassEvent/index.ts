@@ -144,26 +144,26 @@ export const forceCriticalMassEvent = registerWispEvent(
       }
       packs = coreAt + lerp(ballsMs, t);
     });
-    const finalBlast = blasts.reduce((a, b) =>
-      b.size === COLOSSAL ? b : a,
-    );
+    const finalBlast = blasts.reduce((a, b) => (b.size === COLOSSAL ? b : a));
     const endAt = Math.max(...blasts.map((b) => b.ms)) + DETONATION_MS;
     const spot: Point = { x: 0, y: 0 };
-    const atOf = (b: Bomb) => (ms: number): Point | null => {
-      if (ms < b.appears || ms >= b.blows) return null;
-      if (ms < b.packs) {
-        const u = smoothstep(
-          clamp01((ms - b.appears - POP_MS) / (b.packs - b.appears - POP_MS)),
-        );
-        spot.x = lerp([b.from.x, b.slot.x], u);
-        spot.y = lerp([b.from.y, b.slot.y], u);
+    const atOf =
+      (b: Bomb) =>
+      (ms: number): Point | null => {
+        if (ms < b.appears || ms >= b.blows) return null;
+        if (ms < b.packs) {
+          const u = smoothstep(
+            clamp01((ms - b.appears - POP_MS) / (b.packs - b.appears - POP_MS)),
+          );
+          spot.x = lerp([b.from.x, b.slot.x], u);
+          spot.y = lerp([b.from.y, b.slot.y], u);
+          return spot;
+        }
+        const shake = SHUDDER * Math.min(1, (ms - b.packs) / SHUDDER_MS);
+        spot.x = b.slot.x + Math.sin(ms * 0.9 + b.slot.y) * shake;
+        spot.y = b.slot.y + Math.cos(ms * 1.1 + b.slot.x) * shake;
         return spot;
-      }
-      const shake = SHUDDER * Math.min(1, (ms - b.packs) / SHUDDER_MS);
-      spot.x = b.slot.x + Math.sin(ms * 0.9 + b.slot.y) * shake;
-      spot.y = b.slot.y + Math.cos(ms * 1.1 + b.slot.x) * shake;
-      return spot;
-    };
+      };
     const ats = bombs.map(atOf);
 
     let bang = -Infinity;

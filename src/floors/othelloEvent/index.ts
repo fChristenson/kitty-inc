@@ -77,7 +77,14 @@ function flipsFor(board: Int8Array, cell: number, who: number): Move["flips"] {
       y += dy;
       far++;
     }
-    if (run.length && x >= 0 && x < N && y >= 0 && y < N && board[y * N + x] === who)
+    if (
+      run.length &&
+      x >= 0 &&
+      x < N &&
+      y >= 0 &&
+      y < N &&
+      board[y * N + x] === who
+    )
       flips.push(...run);
   }
   return flips;

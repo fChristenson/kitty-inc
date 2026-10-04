@@ -54,10 +54,7 @@ export const forceLightSailEvent = registerWispEvent(
     const hits = chargeMs + riseMs;
     const emitters: Emitter[] = ORDER.map((slot, i) => ({
       at: {
-        x: lerp(
-          [area.left + INSET, area.right - INSET],
-          slot / (EMITTERS - 1),
-        ),
+        x: lerp([area.left + INSET, area.right - INSET], slot / (EMITTERS - 1)),
         y: area.bottom - LOW,
       },
       fires: chargeMs + riseMs * 0.55 * (i / (EMITTERS - 1)) ** 0.8,
@@ -136,8 +133,7 @@ export const forceLightSailEvent = registerWispEvent(
             );
             drawBeamFlare(ctx, e.at, 18 + 14 * kick, fade, now);
           }
-          if (ms >= emitters[0].fires)
-            drawBeamFlare(ctx, sail, 30, fade, now);
+          if (ms >= emitters[0].fires) drawBeamFlare(ctx, sail, 30, fade, now);
           const charge = clamp01(ms / chargeMs);
           drawWisp(
             ctx,

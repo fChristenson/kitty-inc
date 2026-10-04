@@ -69,7 +69,8 @@ export const forceFoamPartyEvent = registerWispEvent(
         parks(x + SIDE, y + BELOW),
       ];
       const arrives = clock;
-      const coats = arrives + lerp(coatsMs, k / Math.max(1, workers.length - 1));
+      const coats =
+        arrives + lerp(coatsMs, k / Math.max(1, workers.length - 1));
       clock = coats + GLIDE_MS;
       const sprays = [0, 1].map((side) => {
         const from = spots[side];
@@ -162,7 +163,8 @@ export const forceFoamPartyEvent = registerWispEvent(
             const flash = ms > s.coats ? 1 - (ms - s.coats) / FLASH_MS : 0;
             drawSprayCoat(ctx, s.worker.at, COAT_W, COAT_H, coverage, flash);
             if (ms > s.coats) continue;
-            for (const spray of s.sprays) drawSpray(ctx, spray, ms, now, DROPLET);
+            for (const spray of s.sprays)
+              drawSpray(ctx, spray, ms, now, DROPLET);
             drawSprayMist(ctx, s.worker.at, ms - lands, 1, DROPLET * 1.4, now);
           }
           for (const cannon of cannons)

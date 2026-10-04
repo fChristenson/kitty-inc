@@ -119,12 +119,17 @@ export const forceSteamTrainEvent = registerWispEvent(
     };
     const locoAt = (ms: number): Point =>
       alongRoute(route, uAt(Math.max(0, ms)), spot);
-    const carriages = [1, 2].map((n) => (ms: number) =>
-      locoAt(ms - n * CARRIAGE_LAG_MS),
+    const carriages = [1, 2].map(
+      (n) => (ms: number) => locoAt(ms - n * CARRIAGE_LAG_MS),
     );
     // a billow out of the stack at every chuff while it's moving, puffing up
     // and back the way it came
-    const pour: Pour = { coinsAlong: 26, width: 28, streamMs: 80, travelMs: 380 };
+    const pour: Pour = {
+      coinsAlong: 26,
+      width: 28,
+      streamMs: 80,
+      travelMs: 380,
+    };
     const chuffs: { ms: number; line: Point[] }[] = [];
     const into: Point = { x: 0, y: 0 };
     for (let ms = 0; ms < endAt; ms += CHUFF_MS) {
@@ -195,16 +200,7 @@ export const forceSteamTrainEvent = registerWispEvent(
           if (ms <= endAt)
             for (const c of carriages)
               drawWispHead(ctx, c, ms, now, WISP_SIZE * CARRIAGE, 0.6);
-          drawWispBetween(
-            ctx,
-            locoAt,
-            ms,
-            now,
-            WISP_SIZE * LOCO,
-            1,
-            0,
-            endAt,
-          );
+          drawWispBetween(ctx, locoAt, ms, now, WISP_SIZE * LOCO, 1, 0, endAt);
         },
       },
     );

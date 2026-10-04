@@ -216,16 +216,7 @@ export const forceCompactorEvent = registerWispEvent(
           }
           for (const b of bounces)
             drawBounceSplash(ctx, b, ms - b.ms, SPLASH, now);
-          drawWispBetween(
-            ctx,
-            ballAt,
-            ms,
-            now,
-            WISP_SIZE * 0.4,
-            1,
-            0,
-            endAt,
-          );
+          drawWispBetween(ctx, ballAt, ms, now, WISP_SIZE * 0.4, 1, 0, endAt);
         },
       },
     );

@@ -103,8 +103,7 @@ export const forceCalvingEvent = registerWispEvent(
           const ms = f * travel;
           if (ms < s.topples) {
             const grow = easeOut(clamp01((ms - appears) / 220));
-            const shudder =
-              ms > s.cracks ? Math.sin(ms * 0.9 + phase) * 3 : 0;
+            const shudder = ms > s.cracks ? Math.sin(ms * 0.9 + phase) * 3 : 0;
             return {
               x: pivot.x + dx + shudder,
               y: pivot.y + dy,

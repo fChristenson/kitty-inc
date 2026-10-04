@@ -67,7 +67,15 @@ export const forcePhoenixEvent = registerWispEvent(
       const bursts = starts + lerp(swoopsMs, t);
       const reborn = bursts + reformMs;
       clock = reborn;
-      const dive = { bar, from, bend, starts, bursts, reborn, size: lerp(SIZE, t) };
+      const dive = {
+        bar,
+        from,
+        bend,
+        starts,
+        bursts,
+        reborn,
+        size: lerp(SIZE, t),
+      };
       from = to;
       return dive;
     });
