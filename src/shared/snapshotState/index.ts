@@ -9,8 +9,9 @@ export function snapshotMap<Key extends object, Value>(): WeakMap<Key, Value> {
   return values;
 }
 
-export function snapshotSet<Key extends object>(): WeakSet<Key> {
-  const values = new WeakSet<Key>();
+export function snapshotSet<Key extends object>(
+  values: WeakSet<Key> = new WeakSet<Key>(),
+): WeakSet<Key> {
   copiers.push((source, target) => {
     if (values.has(source as Key)) values.add(target as Key);
   });

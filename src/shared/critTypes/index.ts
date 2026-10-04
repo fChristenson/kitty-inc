@@ -1,4 +1,4 @@
-import { snapshotMap, snapshotSet } from "../snapshotState";
+import { snapshotMap, snapshotSet as snapshotWeakSet } from "../snapshotState";
 // The one shared definition of "what crit tiers exist" — CRIT_TIER_CONFIG,
 // CritTier, and every pure tier-comparison/ordering helper live here so any
 // module (floors/upgradeButton's stateful roll/consume logic, floorInteractions,
@@ -16,6 +16,7 @@ import type { Floor } from "../../gameState";
 import type { ImageName } from "../../loadAssets";
 import type { BigNumber } from "../../shared/bigNumber";
 import { CONFIG } from "../../config";
+import { critRandom } from "../critRandom";
 import { COLOR } from "../../palette";
 import { recordCritProcLanded } from "./critProcCounts";
 import {
@@ -804,7 +805,29 @@ export const PAYOUT_CRIT_COLOR = COLOR.payoutOlive;
 export const PAYOUT_CRIT_LABEL = "Payout";
 
 // state for all eight piggyback procs lives here too (not upgradeButton.ts) so
-// the whole "what can ride along with a landed crit" system stays in one place
+// the whole "what can ride along with a landed crit" system stays in one place.
+// Every proc set counts, per floor, how many procs are armed on it, so a
+// crit's reads, clears and dispatch skip all ~1,700 kinds when none are
+const armedProcCounts = new WeakMap<Floor, number>();
+
+class ProcSet extends WeakSet<Floor> {
+  add(floor: Floor): this {
+    if (!super.has(floor))
+      armedProcCounts.set(floor, (armedProcCounts.get(floor) ?? 0) + 1);
+    return super.add(floor);
+  }
+  delete(floor: Floor): boolean {
+    if (!super.delete(floor)) return false;
+    armedProcCounts.set(floor, (armedProcCounts.get(floor) ?? 1) - 1);
+    return true;
+  }
+}
+
+// every proc set in this file: a counted snapshotSet
+function snapshotSet<_ extends Floor>(): WeakSet<Floor> {
+  return snapshotWeakSet<Floor>(new ProcSet());
+}
+
 const chainCrits = snapshotSet<Floor>();
 const dominoEffectCrits = snapshotSet<Floor>();
 const blueprintCrits = snapshotSet<Floor>();
@@ -908,18 +931,25 @@ export const MAX_SPECIAL_CRIT_PROCS = 1;
 
 // gateway roll checked ONCE before any individual proc chance is even rolled
 // (see CONFIG.crit's own comment) — a miss here skips the whole system
-// silently for this crit, no procs possible at all this time
-export const SPECIAL_CRIT_GATEWAY_CHANCE = CONFIG.crit.specialCritGatewayChance;
+// silently for this crit, no procs possible at all this time. An object so the
+// perf rig can switch procs and events off
+export const SPECIAL_CRIT_GATEWAY: { chance: number } = {
+  chance: CONFIG.crit.specialCritGatewayChance,
+};
 
 // uniformly random ordered pick of up to `max` items — a partial Fisher-Yates
 // that tracks only the swapped slots, so it costs O(max) and never copies or
 // mutates `items`
-export function pickAtMost<T>(items: readonly T[], max: number): T[] {
+export function pickAtMost<T>(
+  items: readonly T[],
+  max: number,
+  random: () => number = Math.random,
+): T[] {
   const count = Math.min(max, items.length);
   const swapped = new Map<number, number>();
   const picked: T[] = [];
   for (let i = 0; i < count; i++) {
-    const j = i + Math.floor(Math.random() * (items.length - i));
+    const j = i + Math.floor(random() * (items.length - i));
     picked.push(items[swapped.get(j) ?? j]);
     swapped.set(j, swapped.get(i) ?? i);
   }
@@ -1234,6 +1264,7 @@ export type CritProcFlags = Record<CritProcKind, boolean>;
 export function readCritProcs(floor: Floor): CritProcFlags {
   // unset procs read false through the prototype (see critResult)
   const flags = Object.create(ALL_CRIT_PROC_FLAGS_FALSE) as CritProcFlags;
+  if (!armedProcCounts.get(floor)) return flags;
   for (const kind of CRIT_PROC_KINDS) {
     if (CRIT_PROC_SETS[kind].has(floor)) flags[kind] = true;
   }
@@ -1292,9 +1323,26 @@ export function applyCritProcs<TContext>(
   ctx: TContext,
   handlers: CritProcHandlers<TContext>,
 ): void {
-  for (const kind of CRIT_PROC_KINDS) {
-    if (result[kind]) handlers[kind]?.(ctx);
-  }
+  for (const kind of landedProcKinds(result)) handlers[kind]?.(ctx);
+}
+
+const PROC_ORDER = new Map<string, number>(
+  CRIT_PROC_KINDS.map((kind, i) => [kind, i]),
+);
+
+// the procs set true on result, in CRIT_PROC_KINDS order: results keep only
+// their landed procs as own fields (the rest read false through a
+// prototype), so this skips walking every kind
+function landedProcKinds(
+  result: Pick<CritRollResult, CritProcKind>,
+): CritProcKind[] {
+  const landed: CritProcKind[] = [];
+  for (const key of Object.keys(result))
+    if (PROC_ORDER.has(key) && result[key as CritProcKind])
+      landed.push(key as CritProcKind);
+  if (landed.length > 1)
+    landed.sort((a, b) => PROC_ORDER.get(a)! - PROC_ORDER.get(b)!);
+  return landed;
 }
 
 // same idea, but for a mutually-exclusive "only the FIRST matching landed
@@ -1309,7 +1357,8 @@ export function runFirstCritProc<TContext>(
   handlers: CritProcHandlers<TContext>,
   order: readonly CritProcKind[] = CRIT_PROC_KINDS,
 ): boolean {
-  for (const kind of order) {
+  const kinds = order === CRIT_PROC_KINDS ? landedProcKinds(result) : order;
+  for (const kind of kinds) {
     if (result[kind] && handlers[kind]) {
       handlers[kind]!(ctx);
       return true;
@@ -1967,7 +2016,7 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
 // odds, per-tier, with zero duplicated logic
 function rollTier(): CritTier | null {
   for (const tier of CRIT_TIER_ORDER) {
-    if (Math.random() < CRIT_TIER_CONFIG[tier].chance) return tier;
+    if (critRandom() < CRIT_TIER_CONFIG[tier].chance) return tier;
   }
   return null;
 }
@@ -1978,7 +2027,7 @@ export function pickCritTierByOdds(): CritTier {
     (sum, tier) => sum + CRIT_TIER_CONFIG[tier].chance,
     0,
   );
-  let roll = Math.random() * total;
+  let roll = critRandom() * total;
   for (const tier of CRIT_TIER_ORDER) {
     roll -= CRIT_TIER_CONFIG[tier].chance;
     if (roll < 0) return tier;
@@ -2009,7 +2058,7 @@ const PROC_CHANCE_GROUPS = (() => {
 // procs skipped before the next hit — Geometric(chance), the exact gap left by
 // rolling each proc's own `Math.random() < chance` one at a time
 function landedGap(logMiss: number): number {
-  return Math.floor(Math.log(1 - Math.random()) / logMiss);
+  return Math.floor(Math.log(1 - critRandom()) / logMiss);
 }
 
 // every proc that lands this roll, each independently against its own chance
@@ -2074,11 +2123,11 @@ export function rollCrit(
   if (tier === null) return;
   const landed =
     allowSpecialProcs &&
-    Math.random() < SPECIAL_CRIT_GATEWAY_CHANCE &&
+    critRandom() < SPECIAL_CRIT_GATEWAY.chance &&
     !claimSpecialSlot?.()
       ? rollLandedProcs()
       : [];
-  const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS));
+  const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS, critRandom));
   // real-roll-only tally for the "Special Crits" info menu's collectible
   // count badges — see shared/critTypes/critProcCounts.ts
   for (const kind of kept) recordCritProcLanded(kind);
@@ -2091,7 +2140,7 @@ export function rollCrit(
   // reward (multiplies total income by the bonus tier's own multiplier) and
   // critCelebration.ts for the stacked celebration this triggers
   const bonusTier =
-    kept.size > 0 && Math.random() < CONFIG.crit.bonusTierGatewayChance
+    kept.size > 0 && critRandom() < CONFIG.crit.bonusTierGatewayChance
       ? rollTier()
       : null;
   const landedProcs = [...kept];
@@ -2467,7 +2516,8 @@ export function consumeBonusTierCrit(floor: Floor): void {
 
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
-  for (const kind of CRIT_PROC_KINDS) CRIT_PROC_SETS[kind].delete(floor);
+  if (armedProcCounts.get(floor))
+    for (const kind of CRIT_PROC_KINDS) CRIT_PROC_SETS[kind].delete(floor);
   bonusTierCrits.delete(floor);
 }
 

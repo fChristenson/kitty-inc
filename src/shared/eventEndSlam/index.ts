@@ -231,23 +231,31 @@ function hopAt(pose: SlamPose, along: number): number {
 
 // widest digit per font, so tabular text gives every digit the same cell
 const digitWidths = new Map<string, number>();
-function maxDigitWidth(ctx: CanvasRenderingContext2D): number {
-  let width = digitWidths.get(ctx.font);
+function maxDigitWidth(
+  ctx: CanvasRenderingContext2D,
+  font: string = ctx.font,
+): number {
+  let width = digitWidths.get(font);
   if (width === undefined) {
     width = 0;
     for (let d = 0; d <= 9; d++)
-      width = Math.max(width, measure(ctx, String(d)));
-    digitWidths.set(ctx.font, width);
+      width = Math.max(width, measure(ctx, String(d), font));
+    digitWidths.set(font, width);
   }
   return width;
 }
 
-// measureText per frame for every letter adds up; widths only change with font
+// measureText per frame for every letter adds up; widths only change with
+// font. Pass font when measuring many: reading ctx.font builds a new string
 const textWidths = new Map<string, Map<string, number>>();
 const TEXT_WIDTH_CACHE_LIMIT = 2000;
-function measure(ctx: CanvasRenderingContext2D, text: string): number {
-  let byText = textWidths.get(ctx.font);
-  if (!byText) textWidths.set(ctx.font, (byText = new Map()));
+function measure(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  font: string = ctx.font,
+): number {
+  let byText = textWidths.get(font);
+  if (!byText) textWidths.set(font, (byText = new Map()));
   let width = byText.get(text);
   if (width === undefined) {
     if (byText.size >= TEXT_WIDTH_CACHE_LIMIT) byText.clear();
@@ -259,9 +267,10 @@ function measure(ctx: CanvasRenderingContext2D, text: string): number {
 
 const isDigit = (char: string): boolean => char >= "0" && char <= "9";
 
-// tabular text at rest, every frame for counting numbers: laid out and drawn
-// letter by letter without building any per-letter objects
-function drawTabularText(
+// text at rest, every frame: tabular for counting numbers, otherwise kerned.
+// Stamped from sprites at the canvas's own scale when it can be, else drawn
+// as text letter by letter (tabular) or whole (kerned)
+function drawRestText(
   ctx: CanvasRenderingContext2D,
   text: string,
   x: number,
@@ -269,11 +278,22 @@ function drawTabularText(
   fillColor: string,
   strokeColor: string,
   strokeWidth: number,
+  tabular: boolean,
 ): void {
-  const digitCell = maxDigitWidth(ctx);
+  const font = ctx.font;
+  const m = ctx.getTransform();
+  const stamped =
+    m.b === 0 && m.c === 0 && m.a > 0 && m.a === m.d && isFontReady(font);
+  if (!stamped && !tabular) {
+    drawCartoonText(ctx, text, x, y, fillColor, strokeColor, strokeWidth);
+    return;
+  }
+  const digitCell = tabular ? maxDigitWidth(ctx, font) : 0;
   let fullWidth = 0;
-  for (let i = 0; i < text.length; i++)
-    fullWidth += isDigit(text[i]) ? digitCell : measure(ctx, text[i]);
+  if (!tabular) fullWidth = measure(ctx, text, font);
+  else
+    for (let i = 0; i < text.length; i++)
+      fullWidth += isDigit(text[i]) ? digitCell : measure(ctx, text[i], font);
   const align = ctx.textAlign;
   const left =
     align === "center"
@@ -281,25 +301,26 @@ function drawTabularText(
       : align === "right" || align === "end"
         ? x - fullWidth
         : x;
-  const m = ctx.getTransform();
-  if (
-    m.b === 0 &&
-    m.c === 0 &&
-    m.a > 0 &&
-    m.a === m.d &&
-    isFontReady(ctx.font)
-  ) {
+  if (stamped) {
     const set = getRestGlyphSet(ctx, fillColor, strokeColor, strokeWidth, m.a);
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     for (let pass = 0; pass < 2; pass++) {
-      let at = left;
+      let start = 0;
       for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        const width = measure(ctx, char);
-        const cell = isDigit(char) ? digitCell : width;
-        const lx = at + (isDigit(char) ? (cell - width) / 2 : 0);
-        at += cell;
+        const width = measure(ctx, char, font);
+        const digit = tabular && isDigit(char);
+        // a kerned letter is measured through itself, so the kern before it is kept
+        const end = tabular
+          ? start + (digit ? digitCell : width)
+          : measure(ctx, text.slice(0, i + 1), font);
+        const cellWidth = end - start;
+        const lx =
+          left +
+          start +
+          (digit ? (cellWidth - width) / 2 : tabular ? 0 : cellWidth - width);
+        start = end;
         if (char === " ") continue;
         const glyph = getRestGlyph(ctx, set, char);
         ctx.drawImage(
@@ -329,7 +350,7 @@ function drawTabularText(
     let at = left;
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
-      const width = measure(ctx, char);
+      const width = measure(ctx, char, font);
       const cell = isDigit(char) ? digitCell : width;
       const lx = at + (isDigit(char) ? (cell - width) / 2 : 0);
       if (pass === 0) ctx.strokeText(char, lx, y);
@@ -425,7 +446,8 @@ function getRestGlyph(
 // drawSlamTarget). tabular lays digits out in fixed cells, always, so a
 // counting number never shifts sideways. whiteMix 0..1 blends the fill toward
 // white; moving says the text is swelling, wiggling or flashing this frame, so
-// it's stamped from sprites like a landed slam (see SlamGlyph)
+// it's stamped from sprites like a landed slam (see SlamGlyph). A caller that
+// passes moving gets its sprites warmed while the text rests
 export function drawSlamText(
   ctx: CanvasRenderingContext2D,
   pose: SlamPose | null,
@@ -438,27 +460,26 @@ export function drawSlamText(
   strokeWidth = 5,
   tabular = false,
   whiteMix = 0,
-  moving = false,
+  moving?: boolean,
 ): void {
   // past TEXT_FX_MS no letter hops, shines or glows: it's the text at rest
   const landed =
     pose && pose.landedMs >= 0 && pose.landedMs < TEXT_FX_MS ? pose : null;
-  const ready = isFontReady(ctx.font);
-  if (ready && ((pose && pose.landedMs < 0) || (tabular && !moving)))
+  const font = ctx.font;
+  const ready = isFontReady(font);
+  if (ready && ((pose && pose.landedMs < 0) || moving === false))
     warmSlamGlyphs(ctx, text, fillColor, strokeColor, strokeWidth);
   if (!ready || (!landed && !moving)) {
     const fill = whiteMix > 0 ? shadeColor(fillColor, whiteMix) : fillColor;
-    if (tabular)
-      drawTabularText(ctx, text, x, y, fill, strokeColor, strokeWidth);
-    else drawCartoonText(ctx, text, x, y, fill, strokeColor, strokeWidth);
+    drawRestText(ctx, text, x, y, fill, strokeColor, strokeWidth, tabular);
     return;
   }
-  const digitCell = tabular ? maxDigitWidth(ctx) : 0;
+  const digitCell = tabular ? maxDigitWidth(ctx, font) : 0;
   let fullWidth = 0;
-  if (!tabular) fullWidth = measure(ctx, text);
+  if (!tabular) fullWidth = measure(ctx, text, font);
   else
     for (let i = 0; i < text.length; i++)
-      fullWidth += isDigit(text[i]) ? digitCell : measure(ctx, text[i]);
+      fullWidth += isDigit(text[i]) ? digitCell : measure(ctx, text[i], font);
   const align = ctx.textAlign;
   const left =
     align === "center"
@@ -488,12 +509,12 @@ export function drawSlamText(
     let start = 0;
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
-      const width = measure(ctx, char);
+      const width = measure(ctx, char, font);
       const digit = tabular && isDigit(char);
       // a kerned letter is measured through itself, so the kern before it is kept
       const end = tabular
         ? start + (digit ? digitCell : width)
-        : measure(ctx, text.slice(0, i + 1));
+        : measure(ctx, text.slice(0, i + 1), font);
       const cellWidth = end - start;
       // a digit centers in its cell; a kerned letter sits flush right, after the kern
       const lx =
@@ -609,16 +630,19 @@ function getSlamGlyphSet(
   const key = `${ctx.font}|${ctx.textBaseline}|${fillColor}|${strokeColor}|${strokeWidth}|${ascent}|${descent}`;
   let set = glyphSets.get(key);
   if (!set) {
-    if (glyphSets.size >= MAX_GLYPH_SETS) glyphSets.clear();
+    if (glyphSets.size >= MAX_GLYPH_SETS) {
+      glyphSets.clear();
+      warmedSets.clear();
+    }
     set = { glyphs: new Map(), text, fillColor, strokeColor, strokeWidth };
     glyphSets.set(key, set);
   }
   return set;
 }
 
-// the text a resting readout last warmed, once all its letters are baked
-let warmedFont = "";
-let warmedText = "";
+// per font, the set a resting text last warmed: a counting readout's text
+// changes every frame, so it isn't measured again to find its set
+const warmedSets = new Map<string, SlamGlyphSet>();
 
 function warmSlamGlyphs(
   ctx: CanvasRenderingContext2D,
@@ -627,18 +651,23 @@ function warmSlamGlyphs(
   strokeColor: string,
   strokeWidth: number,
 ): void {
-  if (text === warmedText && ctx.font === warmedFont) return;
-  const set = getSlamGlyphSet(ctx, text, fillColor, strokeColor, strokeWidth);
+  let set = warmedSets.get(ctx.font);
+  if (
+    !set ||
+    set.fillColor !== fillColor ||
+    set.strokeColor !== strokeColor ||
+    set.strokeWidth !== strokeWidth
+  ) {
+    set = getSlamGlyphSet(ctx, text, fillColor, strokeColor, strokeWidth);
+    warmedSets.set(ctx.font, set);
+  }
   let baked = 0;
-  for (let i = 0; i < text.length; i++) {
+  for (let i = 0; i < text.length && baked < WARM_PER_FRAME; i++) {
     const char = text[i];
     if (char === " " || set.glyphs.has(char)) continue;
-    if (baked === WARM_PER_FRAME) return;
     getSlamGlyph(ctx, set, char);
     baked++;
   }
-  warmedText = text;
-  warmedFont = ctx.font;
 }
 
 function getSlamGlyph(

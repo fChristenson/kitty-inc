@@ -10,6 +10,12 @@
 // ?counts=0                  don't count canvas calls (lowest overhead timing)
 // ?warmup=2500               ms between boot and a scenario's own setup
 // ?reseed=1                  rebuild the fixture from a fresh game first
+// ?crits=on|tiers|off        crit odds for runs without their own @mode
+// ?seed=1                    the crit dice's seed, so a run lands the same
+//                            crits every time; 0 rolls freely
+//
+// A run name can carry its crit mode: hold@off (no crits), hold@tiers (crit
+// tiers, no procs or events), hold@on.
 //
 // window.perfRig drives it from a console or Playwright: queue(names),
 // run(name) on the current page, results, done.
@@ -29,6 +35,8 @@ const options = {
   maxed: params.get("maxed") === "1",
   counts: params.get("counts") !== "0",
   warmup: Number(params.get("warmup") ?? 2500),
+  crits: params.get("crits") ?? "on",
+  seed: Number(params.get("seed") ?? 1),
 };
 
 const sleep = (ms: number) =>
@@ -83,23 +91,46 @@ async function boot(): Promise<void> {
   const { whenPerfBridge } = await import("../src/shared/perfBridge");
   const bridge = await whenPerfBridge();
   bridge.wrapRedraw(timeRedraw);
-  const { SCENARIOS, SAMPLE_EVENTS, eventIds, eventScenario } =
-    await import("./scenarios");
+  const {
+    SCENARIOS,
+    SAMPLE_EVENTS,
+    CRIT_MODES,
+    eventIds,
+    eventScenario,
+    parseRunName,
+    prepareRun,
+  } = await import("./scenarios");
+  const defaultMode =
+    options.crits in CRIT_MODES
+      ? (options.crits as keyof typeof CRIT_MODES)
+      : "on";
 
   const find = (name: string) =>
     SCENARIOS.find((s) => s.name === name) ??
     (name.startsWith("event:") ? eventScenario(name.slice(6)) : null);
-  // "events" and "events-all" stand for a sample of events, or every one
+  // "events" and "events-all" stand for a sample of events, or every one,
+  // keeping any @mode
   const expand = (names: string[]) =>
     names.flatMap((name) => {
       const known = new Set(eventIds());
-      if (name === "events")
+      const { base, mode } = parseRunName(name);
+      const suffix = mode ? `@${mode}` : "";
+      if (base === "events")
         return SAMPLE_EVENTS.filter((id) => known.has(id)).map(
-          (id) => `event:${id}`,
+          (id) => `event:${id}${suffix}`,
         );
-      if (name === "events-all") return [...known].map((id) => `event:${id}`);
+      if (base === "events-all")
+        return [...known].map((id) => `event:${id}${suffix}`);
       return [name];
     });
+  // a run under its crit mode and freshly seeded dice, named as asked
+  const runNamed = async (name: string): Promise<Summary | null> => {
+    const { base, mode } = parseRunName(name);
+    const scenario = find(base);
+    if (!scenario) return null;
+    prepareRun(mode ?? defaultMode, options.seed);
+    return { ...(await scenario.run(bridge)), name };
+  };
 
   rig.queue = (names) => {
     sessionStorage.setItem(RESULTS_KEY, "[]");
@@ -107,14 +138,14 @@ async function boot(): Promise<void> {
     location.reload();
   };
   rig.run = async (name) => {
-    const scenario = find(name);
-    if (!scenario) throw new Error(`no scenario ${name}`);
-    return scenario.run(bridge);
+    const summary = await runNamed(name);
+    if (!summary) throw new Error(`no scenario ${name}`);
+    return summary;
   };
 
   if (current) {
     // a queue entry from before expand() existed
-    if (current === "events" || current === "events-all") {
+    if (parseRunName(current).base.startsWith("events")) {
       queue = [...expand([current]), ...queue.slice(1)];
       sessionStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
       location.reload();
@@ -126,10 +157,10 @@ async function boot(): Promise<void> {
       summary = stop("startup");
     } else {
       await sleep(options.warmup);
-      const scenario = find(current);
-      summary = scenario
-        ? await scenario.run(bridge)
-        : { ...stop(current), name: `${current} (unknown)` };
+      summary = (await runNamed(current)) ?? {
+        ...stop(current),
+        name: `${current} (unknown)`,
+      };
     }
     const results = [...readSession(), summary];
     sessionStorage.setItem(RESULTS_KEY, JSON.stringify(results));
@@ -153,11 +184,12 @@ async function boot(): Promise<void> {
       { name: "events-all", about: "every event with a test button (slow)" },
     ],
     onRun: rig.queue,
+    critModes: CRIT_MODES,
     onReseed: () => {
       clearBase();
       location.reload();
     },
-    environment: `${innerWidth}×${innerHeight} @${devicePixelRatio}x · ${options.floors} floors${options.heavy ? ", heavy" : ""}${options.maxed ? ", maxed" : ""} · counts ${options.counts ? "on" : "off"} · throttle the CPU in DevTools for phone-like numbers`,
+    environment: `${innerWidth}×${innerHeight} @${devicePixelRatio}x · ${options.floors} floors${options.heavy ? ", heavy" : ""}${options.maxed ? ", maxed" : ""} · counts ${options.counts ? "on" : "off"} · crit seed ${options.seed || "free"} · throttle the CPU in DevTools for phone-like numbers`,
   });
   panel.showResults(rig.results);
   rig.done = true;

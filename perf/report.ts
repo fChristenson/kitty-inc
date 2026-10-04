@@ -23,6 +23,8 @@ export function saveResults(
 
 export interface PanelActions {
   scenarios: { name: string; about: string }[];
+  // crit mode -> what it means; every selected scenario runs once per mode
+  critModes: Record<string, string>;
   onRun: (names: string[]) => void;
   onReseed: () => void;
   environment: string;
@@ -110,6 +112,12 @@ export function mountPanel(actions: PanelActions): {
         `<label title="${s.about}"><input type="checkbox" value="${s.name}" ${s.name === "events-all" ? "" : "checked"} /> ${s.name}</label>`,
     )
     .join("");
+  const modes = Object.entries(actions.critModes)
+    .map(
+      ([mode, about]) =>
+        `<label title="${about}"><input type="checkbox" value="${mode}" ${mode === "on" ? "checked" : ""} /> crits ${mode}</label>`,
+    )
+    .join("");
   panel.innerHTML = `
     <header>
       <b>Perf rig</b>
@@ -118,6 +126,7 @@ export function mountPanel(actions: PanelActions): {
     <div id="perf-body">
       <p class="env">${actions.environment}</p>
       <div class="scenarios">${options}</div>
+      <div class="scenarios modes">${modes}</div>
       <div class="buttons">
         <button id="perf-run">Run selected</button>
         <button id="perf-none">None</button>
@@ -141,15 +150,26 @@ export function mountPanel(actions: PanelActions): {
   });
   panel.querySelector("#perf-none")!.addEventListener("click", () => {
     for (const box of panel.querySelectorAll<HTMLInputElement>(
-      ".scenarios input",
+      ".scenarios:not(.modes) input",
     ))
       box.checked = false;
   });
   panel.querySelector("#perf-run")!.addEventListener("click", () => {
     const names = [
-      ...panel.querySelectorAll<HTMLInputElement>(".scenarios input:checked"),
+      ...panel.querySelectorAll<HTMLInputElement>(
+        ".scenarios:not(.modes) input:checked",
+      ),
     ].map((box) => box.value);
-    if (names.length) actions.onRun(names);
+    const modes = [
+      ...panel.querySelectorAll<HTMLInputElement>(".modes input:checked"),
+    ].map((box) => box.value);
+    // startup runs before any crit could land: once is enough
+    const runs = (modes.length ? modes : ["on"]).flatMap((mode) =>
+      names
+        .filter((name) => mode === "on" || name !== "startup")
+        .map((name) => (mode === "on" ? name : `${name}@${mode}`)),
+    );
+    if (runs.length) actions.onRun(runs);
   });
   panel
     .querySelector("#perf-reseed")!

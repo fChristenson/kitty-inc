@@ -4,6 +4,7 @@
 // pool can be claimed while another is claimed, armed or playing out, and the
 // cooldown only starts once it has finished
 import { pickAtMost } from "../critTypes";
+import { critRandom } from "../critRandom";
 
 export interface EventProcDef<TTarget, TContext> {
   key: string;
@@ -67,9 +68,9 @@ export function createEventProcPool<TTarget, TContext>(
       const now = Date.now();
       settle(now);
       if (active || now - cooldownFrom < cooldownMs()) return false;
-      for (const def of pickAtMost(defs, defs.length)) {
+      for (const def of pickAtMost(defs, defs.length, critRandom)) {
         if (!def.canArm(target, context)) continue;
-        if (Math.random() < def.chance()) {
+        if (critRandom() < def.chance()) {
           active = { def, target, state: "claimed" };
           return true;
         }
