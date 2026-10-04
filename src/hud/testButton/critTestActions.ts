@@ -46,6 +46,43 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-fountain-show-event" class="game__button">Fountain Show</button>
+          <button id="test-spinning-plates-event" class="game__button">Spinning Plates</button>
+          <button id="test-scoops-event" class="game__button">Scoops</button>
+          <button id="test-solar-furnace-event" class="game__button">Solar Furnace</button>
+          <button id="test-lightning-hands-event" class="game__button">Lightning Hands</button>
+          <button id="test-ring-of-fire-event" class="game__button">Ring of Fire</button>
+          <button id="test-bullet-clash-event" class="game__button">Bullet Clash</button>
+          <button id="test-bounce-pass-event" class="game__button">Bounce Pass</button>
+          <button id="test-oil-strike-event" class="game__button">Oil Strike</button>
+          <button id="test-harmonograph-event" class="game__button">Harmonograph</button>
+          <button id="test-quicksort-event" class="game__button">Quicksort</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
+          <button id="test-auger-event" class="game__button">Auger</button>
+          <button id="test-tidal-bore-event" class="game__button">Tidal Bore</button>
+          <button id="test-scrum-event" class="game__button">Scrum</button>
+          <button id="test-gold-rush-event" class="game__button">Gold Rush</button>
+          <button id="test-suspension-bridge-event" class="game__button">Suspension Bridge</button>
+          <button id="test-redline-event" class="game__button">Redline</button>
+          <button id="test-willow-event" class="game__button">Willow</button>
+          <button id="test-quickdraw-event" class="game__button">Quickdraw</button>
+          <button id="test-galilean-cannon-event" class="game__button">Galilean Cannon</button>
+          <button id="test-chaos-game-event" class="game__button">Chaos Game</button>
+          <button id="test-sandpile-event" class="game__button">Sandpile</button>
+          <button id="test-cotton-candy-event" class="game__button">Cotton Candy</button>
+          <button id="test-peloton-event" class="game__button">Peloton</button>
+          <button id="test-drinking-bird-event" class="game__button">Drinking Bird</button>
+          <button id="test-laser-drill-event" class="game__button">Laser Drill</button>
+          <button id="test-hair-raiser-event" class="game__button">Hair Raiser</button>
+          <button id="test-detonator-event" class="game__button">Detonator</button>
+          <button id="test-bullet-rain-event" class="game__button">Bullet Rain</button>
+          <button id="test-bouncy-castle-event" class="game__button">Bouncy Castle</button>
+          <button id="test-game-of-life-event" class="game__button">Game of Life</button>
+          <button id="test-labyrinth-event" class="game__button">Labyrinth</button>
           <button id="test-blowhole-event" class="game__button">Blowhole</button>
           <button id="test-lamplighter-event" class="game__button">Lamplighter</button>
           <button id="test-fire-brigade-event" class="game__button">Fire Brigade</button>
@@ -56,11 +93,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-tennis-event" class="game__button">Tennis</button>
           <button id="test-interlace-event" class="game__button">Interlace</button>
           <button id="test-mirror-mirror-event" class="game__button">Mirror Mirror</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-riptide-event" class="game__button">Riptide</button>
           <button id="test-fencing-event" class="game__button">Fencing</button>
           <button id="test-water-tower-event" class="game__button">Water Tower</button>
