@@ -52,14 +52,6 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.discountPrices(context.floors, balance.footInTheDoorDiscount),
   },
-  footlooseFunds: {
-    label: "Footloose Funds",
-    color: COLOR.chairGiveawayBrown,
-    image: "crits/feet/footlooseFunds.webp",
-    description: "Adds 10.2% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.footlooseFundsShare),
-  },
   heelTurnHaul: {
     label: "Heel Turn Haul",
     color: COLOR.peppermintPink,
@@ -75,14 +67,6 @@ export const FEET_CRITS = {
     description: "Arms every floor's next click as an x5 crit",
     reward: (context, { actions }) =>
       actions.armCrit(context.floors, "crit"),
-  },
-  sandalScandal: {
-    label: "Sandal Scandal",
-    color: COLOR.amberMuted,
-    image: "crits/feet/sandalScandal.webp",
-    description: "Raises alternating floors to the building's top level",
-    reward: (context, { actions, alternating, topLevel }) =>
-      actions.raiseLevels(alternating(context), topLevel(context)),
   },
   sockItAway: {
     label: "Sock It Away",
@@ -156,14 +140,6 @@ export const FEET_CRITS = {
     reward: (_context, { actions, balance }) =>
       actions.addIncomeShare(balance.kittyToeCapitalShare),
   },
-  pawPedicure: {
-    label: "Paw Pedicure",
-    color: COLOR.coinGold,
-    image: "crits/feet/pawPedicure.webp",
-    description: "Boosts every worker for 41s",
-    reward: (context, { actions, balance }) =>
-      actions.boostWorkers(context.floors, balance.pawPedicureBoostSeconds, balance.pawPedicureExtraWorkers),
-  },
   pawprintProfits: {
     label: "Pawprint Profits",
     color: COLOR.amberMuted,
@@ -188,14 +164,6 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.discountPrices(context.floors, balance.whiskerWalkDiscount),
   },
-  chromeSoleShine: {
-    label: "Chrome Sole Shine",
-    color: COLOR.overflowBlue,
-    image: "crits/feet/chromeSoleShine.webp",
-    description: "Repeats the crit above and below, 97% chance to keep spreading",
-    reward: (context, { actions, balance }) =>
-      actions.repeatCrit(context, "both", balance.chromeSoleShineContinueChance),
-  },
   doubleSoleMoo: {
     label: "Double Sole Moo",
     color: COLOR.sameBoatCoral,
@@ -203,14 +171,6 @@ export const FEET_CRITS = {
     description: "Cuts every price in this building by 16.5%",
     reward: (context, { actions, balance }) =>
       actions.discountPrices(context.floors, balance.doubleSoleMooDiscount),
-  },
-  jadeTalonToes: {
-    label: "Jade Talon Toes",
-    color: COLOR.threeOfAKindGreen,
-    image: "crits/feet/jadeTalonToes.webp",
-    description: "Repeats the crit on the floor below, 82% chance to keep falling",
-    reward: (context, { actions, balance }) =>
-      actions.repeatCrit(context, "down", balance.jadeTalonToesContinueChance),
   },
   magentaScaleSoles: {
     label: "Magenta Scale Soles",
@@ -300,22 +260,6 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.boostWorkers(context.floors, balance.cuddleClanComfortBoostSeconds, balance.cuddleClanComfortExtraWorkers),
   },
-  cutoffCash: {
-    label: "Cutoff Cash",
-    color: COLOR.suppliesGiveawayLime,
-    image: "crits/feet/cutoffCash.webp",
-    description: "Repeats the crit on the floor above, 89% chance to keep climbing",
-    reward: (context, { actions, balance }) =>
-      actions.repeatCrit(context, "up", balance.cutoffCashContinueChance),
-  },
-  greenFootRub: {
-    label: "Green Foot Rub",
-    color: COLOR.suppliesGiveawayLime,
-    image: "crits/feet/greenFootRub.webp",
-    description: "Cuts every price in this building by 18.7%",
-    reward: (context, { actions, balance }) =>
-      actions.discountPrices(context.floors, balance.greenFootRubDiscount),
-  },
   hotPinkPads: {
     label: "Hot Pink Pads",
     color: COLOR.sameBoatCoral,
@@ -371,14 +315,6 @@ export const FEET_CRITS = {
     description: "Repeats the crit on the floor above, 90% chance to keep climbing",
     reward: (context, { actions, balance }) =>
       actions.repeatCrit(context, "up", balance.muscleToeMogulContinueChance),
-  },
-  neonSoleSquad: {
-    label: "Neon Sole Squad",
-    color: COLOR.moneyGreen,
-    image: "crits/feet/neonSoleSquad.webp",
-    description: "Cuts every price in this building by 18.9%",
-    reward: (context, { actions, balance }) =>
-      actions.discountPrices(context.floors, balance.neonSoleSquadDiscount),
   },
   overallProfits: {
     label: "Overall Profits",
@@ -436,14 +372,6 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.repeatCrit(context, "up", balance.tickleTaxContinueChance),
   },
-  tripleToeThreat: {
-    label: "Triple Toe Threat",
-    color: COLOR.luckyCloverGreen,
-    image: "crits/feet/tripleToeThreat.webp",
-    description: "Cuts every price in this building by 19.1%",
-    reward: (context, { actions, balance }) =>
-      actions.discountPrices(context.floors, balance.tripleToeThreatDiscount),
-  },
   tuskedToeTrade: {
     label: "Tusked Toe Trade",
     color: COLOR.suppliesGiveawayLime,
@@ -500,14 +428,6 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.discountPrices(context.floors, balance.bloodBankDiscount),
   },
-  bloodSisters: {
-    label: "Blood Sisters",
-    color: COLOR.sameBoatCoral,
-    image: "crits/feet/bloodSisters.webp",
-    description: "Adds 21.9% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.bloodSistersShare),
-  },
   cryptKeeper: {
     label: "Crypt Keeper",
     color: COLOR.doubleDownCrimson,
@@ -539,14 +459,6 @@ export const FEET_CRITS = {
     description: "Boosts every worker for 164s, counting as 3 extra workers",
     reward: (context, { actions, balance }) =>
       actions.boostWorkers(context.floors, balance.ghostOfAChanceBoostSeconds, balance.ghostOfAChanceExtraWorkers),
-  },
-  nightKicker: {
-    label: "Night Kicker",
-    color: COLOR.doubleDownCrimson,
-    image: "crits/feet/nightKicker.webp",
-    description: "Cuts every price in this building by 20.7%",
-    reward: (context, { actions, balance }) =>
-      actions.discountPrices(context.floors, balance.nightKickerDiscount),
   },
   oddCouple: {
     label: "Odd Couple",
@@ -587,22 +499,6 @@ export const FEET_CRITS = {
     description: "Boosts every worker for 166s, counting as 3 extra workers",
     reward: (context, { actions, balance }) =>
       actions.boostWorkers(context.floors, balance.woodlandWanderersBoostSeconds, balance.woodlandWanderersExtraWorkers),
-  },
-  ballGownBonus: {
-    label: "Ball Gown Bonus",
-    color: COLOR.overflowBlue,
-    image: "crits/feet/ballGownBonus.webp",
-    description: "Adds 22.6% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.ballGownBonusShare),
-  },
-  fullCircleCapital: {
-    label: "Full Circle Capital",
-    color: COLOR.overflowBlue,
-    image: "crits/feet/fullCircleCapital.webp",
-    description: "Adds 22.7% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.fullCircleCapitalShare),
   },
   legUpLedger: {
     label: "Leg Up Ledger",
@@ -724,14 +620,6 @@ export const FEET_CRITS = {
     reward: (_context, { actions, balance }) =>
       actions.addIncomeShare(balance.splitTheProfitsShare),
   },
-  tickledPinkPayout: {
-    label: "Tickled Pink Payout",
-    color: COLOR.summerSaleOrange,
-    image: "crits/feet/tickledPinkPayout.webp",
-    description: "Nine instant payouts on this floor",
-    reward: (context, { actions, balance }) =>
-      actions.payCycles([context.floor], balance.tickledPinkPayoutPayouts),
-  },
   emeraldToeEarnings: {
     label: "Emerald Toe Earnings",
     color: COLOR.paydayEmerald,
@@ -772,22 +660,6 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.upgrade([context.floor], balance.toeToToeTradeUpgrades),
   },
-  doubleDuel: {
-    label: "Double Duel",
-    color: COLOR.sameBoatCoral,
-    image: "crits/feet/doubleDuel.webp",
-    description: "Grows every unlocked floor's level by 6.2% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels(context.floors, balance.doubleDuelGrowth),
-  },
-  circleOfToes: {
-    label: "Circle of Toes",
-    color: COLOR.sunshineGold,
-    image: "crits/feet/circleOfToes.webp",
-    description: "Spreads 98 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.circleOfToesUpgrades),
-  },
   daisyDuel: {
     label: "Daisy Duel",
     color: COLOR.threeOfAKindGreen,
@@ -796,14 +668,6 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.addUpgradePriceCash([context.floor], balance.daisyDuelMultiple),
   },
-  fullStretch: {
-    label: "Full Stretch",
-    color: COLOR.suppliesGiveawayLime,
-    image: "crits/feet/fullStretch.webp",
-    description: "Grows every unlocked floor's level by 2.1% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels(context.floors, balance.fullStretchGrowth),
-  },
   goblinGrins: {
     label: "Goblin Grins",
     color: COLOR.suppliesGiveawayLime,
@@ -811,14 +675,6 @@ export const FEET_CRITS = {
     description: "Spreads 99 free upgrades over the lowest-level floors",
     reward: (context, { actions, balance }) =>
       actions.spreadUpgrades(context.floors, balance.goblinGrinsUpgrades),
-  },
-  solePress: {
-    label: "Sole Press",
-    color: COLOR.threeOfAKindGreen,
-    image: "crits/feet/solePress.webp",
-    description: "Pays 11 times the highest floor's upgrade price in cash",
-    reward: (context, { actions, balance, highestFloor }) =>
-      actions.addUpgradePriceCash([highestFloor(context)], balance.solePressMultiple),
   },
   toeTussle: {
     label: "Toe Tussle",
@@ -1051,14 +907,6 @@ export const FEET_CRITS = {
     description: "Grows this floor's level by 6.4% in free upgrades",
     reward: (context, { actions, balance }) =>
       actions.growLevels([context.floor], balance.handOnHipKissGrowth),
-  },
-  highKickKiss: {
-    label: "High Kick Kiss",
-    color: COLOR.amberMuted,
-    image: "crits/feet/highKickKiss.webp",
-    description: "Spreads 65 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.highKickKissUpgrades),
   },
   hoopEarringSmooch: {
     label: "Hoop Earring Smooch",
@@ -1436,14 +1284,6 @@ export const FEET_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.growLevels([context.floor], balance.cobaltBobKickGrowth),
   },
-  coralCrisscross: {
-    label: "Coral Crisscross",
-    color: COLOR.amberMuted,
-    image: "crits/feet/coralCrisscross.webp",
-    description: "Spreads 134 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.coralCrisscrossUpgrades),
-  },
   crisscrossBun: {
     label: "Crisscross Bun",
     color: COLOR.amberMuted,
@@ -1579,38 +1419,6 @@ export const FEET_CRITS = {
     description: "Grows every unlocked floor's level by 7.1% in free upgrades",
     reward: (context, { actions, balance }) =>
       actions.growLevels(context.floors, balance.soleSandwichGrowth),
-  },
-  stripedLeggingsStretch: {
-    label: "Striped Leggings Stretch",
-    color: COLOR.fastForwardBlue,
-    image: "crits/feet/stripedLeggingsStretch.webp",
-    description: "Spreads 140 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.stripedLeggingsStretchUpgrades),
-  },
-  tealHairSockShow: {
-    label: "Teal Hair Sock Show",
-    color: COLOR.coinGold,
-    image: "crits/feet/tealHairSockShow.webp",
-    description: "Pays 130 times this floor's upgrade price in cash",
-    reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.tealHairSockShowMultiple),
-  },
-  tealTankTiptoes: {
-    label: "Teal Tank Tiptoes",
-    color: COLOR.amberMuted,
-    image: "crits/feet/tealTankTiptoes.webp",
-    description: "Grows every unlocked floor's level by 7.2% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels(context.floors, balance.tealTankTiptoesGrowth),
-  },
-  tuckedTight: {
-    label: "Tucked Tight",
-    color: COLOR.summerSaleOrange,
-    image: "crits/feet/tuckedTight.webp",
-    description: "Spreads 141 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.tuckedTightUpgrades),
   },
   victoryVSoles: {
     label: "Victory V Soles",

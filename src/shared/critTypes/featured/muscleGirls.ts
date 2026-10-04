@@ -610,14 +610,6 @@ export const MUSCLE_GIRLS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.repeatCrit(context, "both", balance.lizardLoungeContinueChance),
   },
-  pamperedPaws: {
-    label: "Pampered Paws",
-    color: COLOR.goldenHandshakeGold,
-    image: "crits/muscleGirls/pamperedPaws.webp",
-    description: "Cuts every price in this building by 4.9%",
-    reward: (context, { actions, balance }) =>
-      actions.discountPrices(context.floors, balance.pamperedPawsDiscount),
-  },
   blondeAmbition: {
     label: "Blonde Ambition",
     color: COLOR.fireDrillRed,

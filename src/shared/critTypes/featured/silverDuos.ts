@@ -790,18 +790,6 @@ export const SILVER_DUOS_CRITS = {
     reward: (context, { actions, balance }) =>
       actions.raiseWorkerTiers(context.floors, balance.tangerineShortsShare, 1),
   },
-  tealAndPinkKicks: {
-    label: "Teal And Pink Kicks",
-    color: COLOR.peppermintPink,
-    image: "crits/silverDuos/tealAndPinkKicks.webp",
-    description: "Promotes 65.5% of this floor's workers two perma tiers",
-    reward: (context, { actions, balance }) =>
-      actions.raiseWorkerTiers(
-        [context.floor],
-        balance.tealAndPinkKicksShare,
-        2,
-      ),
-  },
   tealPixie: {
     label: "Teal Pixie",
     color: COLOR.overflowBlue,

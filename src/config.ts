@@ -8341,6 +8341,98 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 51
+  // money, cash: src/floors/partingEvent: a sea of cash parts into towering walls that crash back into a geyser
+  partingEvent: {
+    chance: 0.01,
+    floodMs: 500, // the sea rising
+    partMs: 450, // parting into two walls
+    standMs: 380, // the walls standing, trembling
+    crashMs: 200, // slamming back together
+    spoutMs: 320, // the geyser's coins leaving, top first
+    leapMs: 380, // each one's leap into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // lightning, levels: src/floors/buzzWireEvent: a ring races down a wire weaving over the bars, arcing into each
+  buzzWireEvent: {
+    chance: 0.01,
+    runMs: 1700, // the ring's run down the wire, speeding up
+    levelShare: 0.03, // per arc
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/hiccupsEvent: a huge bomb blows, sucks its blast back in and blows bigger, twice
+  hiccupsEvent: {
+    chance: 0.01,
+    fuseMs: 450, // the bomb fizzing before its first blast
+    outMs: 260, // each hiccup's blast
+    inMs: 200, // sucked back in
+    pauseMs: 90, // swollen, before the next
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, a crit tier: src/floors/cutTheRopeEvent: a gun shoots the ropes holding a weight that drops onto the bar
+  cutTheRopeEvent: {
+    chance: 0.01,
+    shotsMs: [320, 170] as [number, number], // between shots, quickening
+    dropMs: 320, // the weight's fall
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // bounce, a free floor: src/floors/whisperingGalleryEvent: a ball banks round an ellipse through its foci, the button and the lock
+  whisperingGalleryEvent: {
+    chance: 0.01,
+    drawMs: 220, // the ellipse drawing itself
+    legsMs: [300, 140] as [number, number], // each chord, quickening
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // drill, levels: src/floors/chunnelEvent: two drills bore into the bar's ends and meet in its middle
+  chunnelEvent: {
+    chance: 0.01,
+    approachMs: 260,
+    stallMs: 550, // stalled on the bite
+    boreMs: 1300, // boring to the middle
+    levelShare: 0.02, // per shove
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // spray, crit tiers: src/floors/sneezeEvent: a wisp winds up and sneezes clouds of gold mist onto the bars
+  sneezeEvent: {
+    chance: 0.01,
+    windupMs: 560, // the first wind-up
+    gapMs: 560, // between sneezes
+    burstMs: 200, // each sneeze
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // race, worker perma: src/floors/grandPrixEvent: two racers hairpin round a worker and dive onto workers
+  grandPrixEvent: {
+    chance: 0.01,
+    raceMs: 1200, // the leader's race
+    gapMs: 120, // the chaser behind it
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // clutter, levels: src/floors/pillowFightEvent: a pillow fight fills the screen with feathers, a broom sweeps them onto the bar
+  pillowFightEvent: {
+    chance: 0.01,
+    swingMs: 260, // the pillows swinging in to the first smack
+    flutterMs: 650, // each feather drifting down
+    dragMs: 120, // each broom stroke's drag (8 strokes)
+    liftMs: 60,
+    levelShare: 0.12,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/dotsAndBoxesEvent: a self-playing game of dots and boxes, every box bursting into cash
+  dotsAndBoxesEvent: {
+    chance: 0.01,
+    movesMs: [75, 30] as [number, number], // between moves, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 50
   // money, cash: src/floors/chladniEvent: a cloud of coins dances into Chladni plate figures as a tone climbs
   chladniEvent: {

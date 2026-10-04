@@ -1,6 +1,6 @@
 // odds and reward sizes for featured/ocean.ts's crits, spread into CONFIG.crit
 export const OCEAN_BALANCE = {
-  treasureMapChance: 0.00667537729,
+  treasureMapChance: 0.0066470436,
   treasureMapSeconds: 12,
   captainLeFluffChance: 0.011655067,
   captainLeFluffUpgrades: 28,
@@ -10,9 +10,9 @@ export const OCEAN_BALANCE = {
   divingBellUpgrades: 2,
   flooringInspectorChance: 0.0124689054,
   flooringInspectorUpgrades: 15,
-  krakenChance: 0.00533869684,
+  krakenChance: 0.00530678373,
   krakenPayouts: 27,
   messageInABottleChance: 0.0122791926,
-  lemonSailsChance: 0.0016985311,
+  lemonSailsChance: 0.00170065311,
   lemonSailsGrowth: 0.2,
 } as const;

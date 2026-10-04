@@ -46,6 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-parting-event" class="game__button">Parting</button>
+          <button id="test-buzz-wire-event" class="game__button">Buzz Wire</button>
+          <button id="test-hiccups-event" class="game__button">Hiccups</button>
+          <button id="test-cut-the-rope-event" class="game__button">Cut the Rope</button>
+          <button id="test-whispering-gallery-event" class="game__button">Whispering Gallery</button>
+          <button id="test-chunnel-event" class="game__button">Chunnel</button>
+          <button id="test-sneeze-event" class="game__button">Sneeze</button>
+          <button id="test-grand-prix-event" class="game__button">Grand Prix</button>
+          <button id="test-pillow-fight-event" class="game__button">Pillow Fight</button>
+          <button id="test-dots-and-boxes-event" class="game__button">Dots and Boxes</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-clutter-event" class="game__button">Clutter</button>
           <button id="test-chladni-event" class="game__button">Chladni</button>
           <button id="test-afterimage-event" class="game__button">Afterimage</button>
@@ -58,11 +73,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-chicane-event" class="game__button">Chicane</button>
           <button id="test-epicycles-event" class="game__button">Epicycles</button>
           <button id="test-sieve-event" class="game__button">Sieve</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-archimedes-screw-event" class="game__button">Archimedes Screw</button>
           <button id="test-murmuration-event" class="game__button">Murmuration</button>
           <button id="test-spirit-bomb-event" class="game__button">Spirit Bomb</button>
