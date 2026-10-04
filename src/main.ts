@@ -1038,6 +1038,11 @@ import {
   forceDelugeEvent,
   forceMonacoEvent,
   forceGlitterSpillEvent,
+  forceRogueWaveEvent,
+  forceThunderEggEvent,
+  forceHologramEvent,
+  forceLeafFallEvent,
+  forceThreeBodyEvent,
   forceSlashEvent,
   forceJackhammerEvent,
   forcePummelEvent,
@@ -2960,6 +2965,11 @@ async function main() {
       deluge: forceOnActive(forceDelugeEvent),
       monaco: forceOnActive(forceMonacoEvent),
       "glitter-spill": forceOnActive(forceGlitterSpillEvent),
+      "rogue-wave": forceOnActive(forceRogueWaveEvent),
+      "thunder-egg": forceOnActive(forceThunderEggEvent),
+      hologram: forceOnActive(forceHologramEvent),
+      "leaf-fall": forceOnActive(forceLeafFallEvent),
+      "three-body": forceOnActive(forceThreeBodyEvent),
     });
     // same, for the Slash event
     wireSlashEventTestButton(app, () => {

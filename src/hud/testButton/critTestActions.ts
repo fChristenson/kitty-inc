@@ -46,6 +46,16 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-rogue-wave-event" class="game__button">Rogue Wave</button>
+          <button id="test-thunder-egg-event" class="game__button">Thunder Egg</button>
+          <button id="test-hologram-event" class="game__button">Hologram</button>
+          <button id="test-leaf-fall-event" class="game__button">Leaf Fall</button>
+          <button id="test-three-body-event" class="game__button">Three-Body</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-holding-pattern-event" class="game__button">Holding Pattern</button>
           <button id="test-tanker-event" class="game__button">Tanker</button>
           <button id="test-vapor-cloud-event" class="game__button">Vapor Cloud</button>
@@ -55,11 +65,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-deluge-event" class="game__button">Deluge</button>
           <button id="test-monaco-event" class="game__button">Monaco</button>
           <button id="test-glitter-spill-event" class="game__button">Glitter Spill</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-parting-event" class="game__button">Parting</button>
           <button id="test-buzz-wire-event" class="game__button">Buzz Wire</button>
           <button id="test-hiccups-event" class="game__button">Hiccups</button>

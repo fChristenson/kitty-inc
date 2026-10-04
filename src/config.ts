@@ -8341,6 +8341,51 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 53
+  // money, levels + cash: src/floors/rogueWaveEvent: two swells meet in a sea of cash and rear up into a rogue wave
+  rogueWaveEvent: {
+    chance: 0.01,
+    floodMs: 400, // the sea rising
+    swellMs: 700, // the swells rolling in to meet
+    spoutMs: 500, // the peak shooting up the screen
+    leapMs: 360, // each coin's leap into the total
+    levelShare: 0.04,
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // lightning, a crit tier: src/floors/thunderEggEvent: bolts crack a giant egg of light open over the clicked bar
+  thunderEggEvent: {
+    chance: 0.01,
+    strikesMs: [260, 110] as [number, number], // between strikes, quickening
+    dropMs: 260, // what hatches slamming onto the bar
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // beam, free hires: src/floors/hologramEvent: a projector beams spinning wireframes that turn into new workers
+  hologramEvent: {
+    chance: 0.01,
+    buildMs: 380, // each wireframe building up
+    gapMs: 200, // between wireframes
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // clutter, worker perma: src/floors/leafFallEvent: glitter leaves fall all over, a broom sweeps them into a heap on a worker
+  leafFallEvent: {
+    chance: 0.01,
+    fallMs: 700, // the leaves falling
+    dragMs: 120, // each broom stroke's drag (6 strokes)
+    liftMs: 60,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/threeBodyEvent: three wisps tangle in a chaotic three-body dance until one is flung out
+  threeBodyEvent: {
+    chance: 0.01,
+    danceMs: 1500, // the chaotic dance
+    flingMs: 320, // the flung one's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 52
   // wisp, levels: src/floors/holdingPatternEvent: wisp planes circle a holding stack, then land on the bars one by one
   holdingPatternEvent: {
