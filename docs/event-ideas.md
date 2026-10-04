@@ -968,6 +968,18 @@ Built only from coins and bills, the wisp, glitter and simple shapes (lines, rin
 - [x] **Foam Party** (spray; worker perma tiers): two foam-cannon wisps flank each worker and coat it from both sides until it flashes for a tier.
 - [x] **Langton's Ant** (experiment: Langton's ant; cash): an ant wisp flips cells into a chaotic gold blob until it breaks out along its diagonal highway, then the cells burst into cash.
 - [x] **Othello** (experiment: a self-playing Othello game; cash): gold and white discs flip in rippling cascades, move after move, until gold wins and its discs burst into cash.
+- [x] **Gloop** (money; levels and cash): a pool of cash along the bottom swells into huge wobbling bubbles under the bars that burst and splash up onto them.
+- [x] **Escape Velocity** (wisp; a free floor): a probe whips round the button on ever wider orbits, a burn at every close pass, until it breaks free into the lock.
+- [x] **Sungrazer** (mix; crit tiers and cash): a comet hairpins round the button, its tail of cash blown straight out and sweeping over the bars like a searchlight.
+- [x] **Fractal Tree** (beam; levels): a trunk of light forks again and again into a tree of beams whose last branches lash onto the bars.
+- [x] **Switchboard** (lightning; worker perma tiers): sparks run live cords of lightning out of the button and plug them into the workers, then the whole board surges.
+- [x] **Interference** (explosion; cash): three bombs throw out shockwave rings, and every point where two rings cross blows up in chains along curving lines.
+- [x] **Tower Defense** (gunfire; cash): gun towers at the bends of a winding road shred a column of creep wisps into cash, then a boss soaks up every tower's fire.
+- [x] **Bounce Wave** (bounce; crit tiers): a row of balls, each bouncing a touch quicker, drifts into waves and snakes, lands in unison, then springs onto the bars.
+- [x] **Mole** (drill; free hires): a drill tunnels under each empty spot and bores up out of the floor, a new worker climbing out of the hole.
+- [x] **Car Wash** (spray; worker perma tiers): a gantry of nozzles rolls down the screen spraying a curtain of gold mist that coats every worker it passes.
+- [x] **Dragon Curve** (experiment: the Heighway dragon fractal; cash): a line folds a copy of itself round its end again and again into the dragon, then bursts into cash.
+- [x] **Lights Out** (experiment: the Lights Out puzzle; cash): a cursor presses lights that flip in crosses until the whole board blazes gold and bursts into cash.
 - [x] **Kaleidoscope**: six wisps burst out of the screen's middle in a perfect six-fold flower and swing back in, petal after petal, each wider and faster and turned half a petal from the last; every petal tip a flash and a coin from each wisp, every meeting in the middle a pop and a jolt; then they slam together in the middle in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Zipper**: the wisp stitches down the screen in a tight zigzag from edge to edge like a zipper's teeth, ever faster, every turn a flash, a click, a jolt and a coin; at the bottom it rips straight back up the middle, every stitch it passes bursting open in a flash and a spray of coins, and slams into the total in a huge blast and shake. Pays floor income × floor number × 4.
 - [x] **Screensaver**: the wisp drifts dead straight at a slant like an old DVD screensaver, bouncing off the screen's edges, ever faster, every bounce a flash, a boing, a jolt and a coin; until it hits a corner dead on and the corner blows in a huge blast and shake. Pays floor income × floor number × 4.

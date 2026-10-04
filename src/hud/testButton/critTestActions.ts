@@ -46,6 +46,23 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-gloop-event" class="game__button">Gloop</button>
+          <button id="test-escape-velocity-event" class="game__button">Escape Velocity</button>
+          <button id="test-sungrazer-event" class="game__button">Sungrazer</button>
+          <button id="test-fractal-tree-event" class="game__button">Fractal Tree</button>
+          <button id="test-switchboard-event" class="game__button">Switchboard</button>
+          <button id="test-interference-event" class="game__button">Interference</button>
+          <button id="test-tower-defense-event" class="game__button">Tower Defense</button>
+          <button id="test-bounce-wave-event" class="game__button">Bounce Wave</button>
+          <button id="test-mole-event" class="game__button">Mole</button>
+          <button id="test-car-wash-event" class="game__button">Car Wash</button>
+          <button id="test-dragon-curve-event" class="game__button">Dragon Curve</button>
+          <button id="test-lights-out-event" class="game__button">Lights Out</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-calving-event" class="game__button">Calving</button>
           <button id="test-phoenix-event" class="game__button">Phoenix</button>
           <button id="test-steam-train-event" class="game__button">Steam Train</button>
@@ -58,11 +75,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-foam-party-event" class="game__button">Foam Party</button>
           <button id="test-langtons-ant-event" class="game__button">Langton's Ant</button>
           <button id="test-othello-event" class="game__button">Othello</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-airbrush-event" class="game__button">Airbrush</button>
           <button id="test-capillary-event" class="game__button">Capillary</button>
           <button id="test-battle-tops-event" class="game__button">Battle Tops</button>

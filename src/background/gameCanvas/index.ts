@@ -538,8 +538,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       // a freeze never starts mid-shake: a rattle baked into the captured
       // frame would leave it offset from the overlay drawn on top
       stopScreenShake();
-      // a spotlit total is drawn live on top instead of frozen under the dim
-      drawLiveFrame(isTotalSpotlit());
+      // a spotlit total is drawn live on top instead of frozen under the dim;
+      // the crit flash too, so it never rattles along with the frozen frame
+      drawLiveFrame(isTotalSpotlit(), true);
       const image = document.createElement("canvas");
       image.width = canvas.width;
       image.height = canvas.height;
@@ -658,6 +659,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       drawHud(ctx, SLOT_W, getTotalIncome());
       ctx.restore();
     }
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.scale(scale, scale);
+    drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
+    ctx.restore();
   }
 
   // floors intersecting the viewport, with their world-space tops and the
@@ -680,7 +686,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return result;
   }
 
-  function drawLiveFrame(skipHud = false): void {
+  function drawLiveFrame(skipHud = false, skipFlash = false): void {
     updateMouse(activeFloors, Date.now());
     const dpr = getEffectiveDpr();
     ctx.save();
@@ -744,7 +750,14 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     if (!skipHud) hudBottomY = drawHud(ctx, SLOT_W, getTotalIncome());
     // the flash holds still while the world rattles: its huge rays judder otherwise
     ctx.translate(-shake.x / scale, -shake.y / scale);
-    drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
+    if (!skipFlash)
+      drawCritFlash(
+        ctx,
+        SLOT_W / 2,
+        contentViewportH() / 2,
+        SLOT_W,
+        Date.now(),
+      );
     ctx.restore();
   }
 

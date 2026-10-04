@@ -8173,6 +8173,99 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 46
+  // money, levels and cash: src/floors/gloopEvent: bubbles swell in a pool of cash and burst onto the bars
+  gloopEvent: {
+    chance: 0.01,
+    swellsMs: [520, 320] as [number, number], // each bubble swelling, quickening
+    levelShare: 0.03, // per bar
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // wisp, a free floor: src/floors/escapeVelocityEvent: a probe burns out of orbit round the button into the lock
+  escapeVelocityEvent: {
+    chance: 0.01,
+    orbitsMs: [440, 300] as [number, number], // each orbit, quickening
+    escapeMs: 320, // from the last burn to the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, crit tiers and cash: src/floors/sungrazerEvent: a comet whips round the button, its cash tail sweeping the bars
+  sungrazerEvent: {
+    chance: 0.01,
+    passMs: 1500, // the whole pass round the button
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, levels: src/floors/fractalTreeEvent: a tree of beams forks up from the button and lashes onto the bars
+  fractalTreeEvent: {
+    chance: 0.01,
+    growsMs: [300, 160] as [number, number], // each generation, quickening
+    lashMs: 180, // each lash onto a bar
+    levelShare: 0.03, // per bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, worker perma tiers: src/floors/switchboardEvent: sparks plug live cords from the button into the workers
+  switchboardEvent: {
+    chance: 0.01,
+    runsMs: [300, 160] as [number, number], // each spark's run, quickening
+    surgeAfterMs: 200, // the last plug to the surge
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, cash: src/floors/interferenceEvent: crossing shockwave rings set off chains of blasts
+  interferenceEvent: {
+    chance: 0.01,
+    blowsMs: [420, 580, 740] as [number, number, number], // each bomb going off
+    ringMs: 1000, // from the last bomb to the rings closing
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, cash: src/floors/towerDefenseEvent: towers gun down creeps marching along a road
+  towerDefenseEvent: {
+    chance: 0.01,
+    walkMs: 1100, // a creep's walk down the whole road
+    spawnsMs: [90, 40] as [number, number], // between creeps, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // bounce, crit tiers: src/floors/bounceWaveEvent: a row of balls bounces out of step into waves, then onto the bars
+  bounceWaveEvent: {
+    chance: 0.01,
+    waveMs: 1500, // till every ball lands in step again
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // drill, free hires: src/floors/moleEvent: a drill bores up out of the floor under each empty spot
+  moleEvent: {
+    chance: 0.01,
+    divesMs: [340, 220] as [number, number], // each dive under a spot, quickening
+    boresMs: [280, 180] as [number, number], // each bore up, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // spray, worker perma tiers: src/floors/carWashEvent: a gantry of nozzles sprays a curtain down the screen
+  carWashEvent: {
+    chance: 0.01,
+    sweepMs: 1600, // the gantry rolling down the screen
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/dragonCurveEvent: the dragon fractal folds itself out
+  dragonCurveEvent: {
+    chance: 0.01,
+    foldsMs: [240, 90] as [number, number], // each fold, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, cash: src/floors/lightsOutEvent: the Lights Out puzzle solves itself
+  lightsOutEvent: {
+    chance: 0.01,
+    pressesMs: [150, 60] as [number, number], // between presses, quickening
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
