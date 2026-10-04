@@ -94,13 +94,6 @@ export const CAT_GIRLS_CRITS = {
     reward: (_context, { actions, balance }) =>
       actions.addIncomeShare(balance.coinBoopShare),
   },
-  tailSwish: {
-    label: "Tail Swish",
-    color: COLOR.royalFlushPurple,
-    image: "crits/catGirls/tailSwish.webp",
-    description: "Arms every floor's next click as an x5 crit",
-    reward: (context, { actions }) => actions.armCrit(context.floors, "crit"),
-  },
   topCat: {
     label: "Top Cat",
     color: COLOR.overflowBlue,

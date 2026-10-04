@@ -10,14 +10,6 @@ export const COW_GIRLS_CRITS = {
     reward: (context, { actions }) =>
       actions.armCrit(context.floors, "crit"),
   },
-  cashCow: {
-    label: "Cash Cow",
-    color: COLOR.nightOwlIndigo,
-    image: "crits/cowGirls/cashCow.webp",
-    description: "Boosts every worker for 19s",
-    reward: (context, { actions, balance }) =>
-      actions.boostWorkers(context.floors, balance.cashCowBoostSeconds, balance.cashCowExtraWorkers),
-  },
   cowbellCashout: {
     label: "Cowbell Cashout",
     color: COLOR.headhunterRust,
@@ -41,14 +33,6 @@ export const COW_GIRLS_CRITS = {
     description: "One tier promotion and seven upgrades here",
     reward: (context, { balance, promoteAndUpgrade }) =>
       promoteAndUpgrade(context.floor, balance.herdMentalityTierSteps, balance.herdMentalityUpgrades),
-  },
-  holsteinHustle: {
-    label: "Holstein Hustle",
-    color: COLOR.springCleaningMint,
-    image: "crits/cowGirls/holsteinHustle.webp",
-    description: "Raises the lowest-level floor to the building's top level",
-    reward: (context, { actions, lowestLevel, topLevel }) =>
-      actions.raiseLevels([lowestLevel(context)], topLevel(context)),
   },
   moolahMaiden: {
     label: "Moolah Maiden",

@@ -8341,6 +8341,86 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 52
+  // wisp, levels: src/floors/holdingPatternEvent: wisp planes circle a holding stack, then land on the bars one by one
+  holdingPatternEvent: {
+    chance: 0.01,
+    circleMs: 520, // circling before the first landing
+    landGapMs: 260, // between landings
+    approachMs: 320, // each approach
+    skidMs: 220, // skidding along the bar
+    levelShare: 0.04,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // mix, levels + cash: src/floors/tankerEvent: a tanker refuels wisps through hoses of cash, which break off onto the bars
+  tankerEvent: {
+    chance: 0.01,
+    flyMs: 1900, // the tanker crossing the screen
+    hoseMs: 260, // each coin's trip down a hose
+    diveMs: 320, // each receiver's dive onto its bar
+    levelShare: 0.05,
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // explosion, cash: src/floors/vaporCloudEvent: a cloud of glittering fuel spreads over the screen and a spark detonates it
+  vaporCloudEvent: {
+    chance: 0.01,
+    spreadMs: 650, // the cloud spreading
+    frontMs: 700, // the detonation front crossing it
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // gunfire, a crit tier: src/floors/shieldBreakerEvent: guns pound a shield round the button till it shatters
+  shieldBreakerEvent: {
+    chance: 0.01,
+    shotsMs: [120, 55] as [number, number], // between shots, quickening
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // bounce, levels: src/floors/bottleneckEvent: a ball ricochets down a narrowing funnel, ever faster, onto the bar
+  bottleneckEvent: {
+    chance: 0.01,
+    legsMs: [260, 45] as [number, number], // each ricochet, quickening
+    levelShare: 0.015, // per bounce
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // drill, worker perma: src/floors/skylightEvent: a drill bores up through the ceiling and light pours onto the workers
+  skylightEvent: {
+    chance: 0.01,
+    approachMs: 240,
+    stallMs: 550,
+    boreMs: 1200,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // spray, levels: src/floors/delugeEvent: sprinkler heads burst open over the bars one after another
+  delugeEvent: {
+    chance: 0.01,
+    headsMs: [240, 110] as [number, number], // between heads bursting, quickening
+    sprayMs: 520, // each head's spray
+    levelShare: 0.04,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // race, a crit tier: src/floors/monacoEvent: two racers hairpin round the total and dive onto the clicked bar
+  monacoEvent: {
+    chance: 0.01,
+    raceMs: 1150, // the leader's race
+    gapMs: 120, // the chaser behind it
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // clutter, a free floor: src/floors/glitterSpillEvent: spilt glitter is swept up into a heap and shoved into the lock
+  glitterSpillEvent: {
+    chance: 0.01,
+    spillMs: 600, // the spill spreading
+    dragMs: 120, // each broom stroke's drag (7 strokes)
+    liftMs: 60,
+    holdMs: 400,
+    mergeMs: 0,
+  },
   // batch 51
   // money, cash: src/floors/partingEvent: a sea of cash parts into towering walls that crash back into a geyser
   partingEvent: {

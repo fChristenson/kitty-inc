@@ -46,6 +46,20 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-holding-pattern-event" class="game__button">Holding Pattern</button>
+          <button id="test-tanker-event" class="game__button">Tanker</button>
+          <button id="test-vapor-cloud-event" class="game__button">Vapor Cloud</button>
+          <button id="test-shield-breaker-event" class="game__button">Shield Breaker</button>
+          <button id="test-bottleneck-event" class="game__button">Bottleneck</button>
+          <button id="test-skylight-event" class="game__button">Skylight</button>
+          <button id="test-deluge-event" class="game__button">Deluge</button>
+          <button id="test-monaco-event" class="game__button">Monaco</button>
+          <button id="test-glitter-spill-event" class="game__button">Glitter Spill</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
           <button id="test-parting-event" class="game__button">Parting</button>
           <button id="test-buzz-wire-event" class="game__button">Buzz Wire</button>
           <button id="test-hiccups-event" class="game__button">Hiccups</button>
@@ -56,11 +70,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-grand-prix-event" class="game__button">Grand Prix</button>
           <button id="test-pillow-fight-event" class="game__button">Pillow Fight</button>
           <button id="test-dots-and-boxes-event" class="game__button">Dots and Boxes</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-clutter-event" class="game__button">Clutter</button>
           <button id="test-chladni-event" class="game__button">Chladni</button>
           <button id="test-afterimage-event" class="game__button">Afterimage</button>

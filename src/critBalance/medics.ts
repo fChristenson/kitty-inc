@@ -1,12 +1,12 @@
 // odds and reward sizes for featured/medics.ts's crits, spread into CONFIG.crit
 export const MEDICS_BALANCE = {
-  bedsideMannerChance: 0.00161572773,
+  bedsideMannerChance: 0.00161572496,
   bedsideMannerShare: 0.439,
-  houseCallChance: 0.0016156967,
+  houseCallChance: 0.00161569428,
   houseCallShare: 0.44,
-  scrubsUpChance: 0.00161568261,
+  scrubsUpChance: 0.00161568035,
   scrubsUpShare: 0.441,
-  stethoscopesChance: 0.00161565703,
+  stethoscopesChance: 0.00161565506,
   stethoscopesShare: 0.442,
   pinkScrubsChance: 0.0016155,
   pinkScrubsShare: 0.638,
