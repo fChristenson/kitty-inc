@@ -653,6 +653,7 @@ export function drawCritFlash(
       1,
       0,
       1,
+      now,
     );
   }
   if (flashStartedAt === null || flashEndsAt === null) {
@@ -716,16 +717,26 @@ export function drawCritFlash(
     growthScale,
     rotation,
     raysScale,
+    elapsed,
   );
 }
 
-// one full sway of the rays behind a crit image (a reveal sees it turn back
-// at least once), and how far it turns each way
-const RAY_SWAY_MS = 1600;
+// one full sway of the rays behind a crit image, a few to a reveal, and how
+// far they turn each way
+const RAY_SWAY_MS = 900;
 const RAY_SWAY_RAD = 0.12;
+// one full sway of the badge over its rays, and how far it turns each way
+const BADGE_SWAY_MS = 1100;
+const BADGE_SWAY_RAD = 0.05;
+
+// -1..1 over each periodMs; wrapped so a long-running clock keeps its precision
+function wave(now: number, periodMs: number): number {
+  return Math.sin(((now % periodMs) / periodMs) * Math.PI * 2);
+}
 
 // one flash layer, its rays behind its baked bitmap, at a given alpha, scale
-// and rotation: the animated foreground and the frozen background share it
+// and rotation: the animated foreground and the frozen background share it.
+// motionMs drives the sways: ms into the flash, so every reveal starts mid-swing
 function drawFlashLayer(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -738,6 +749,7 @@ function drawFlashLayer(
   growthScale: number,
   rotation: number,
   raysScale: number,
+  motionMs: number,
 ): void {
   // an empty label is a shake with no text at all
   if (!label) return;
@@ -749,12 +761,11 @@ function drawFlashLayer(
   ctx.translate(centerX, centerY);
   const config = CRIT_ICON_BY_LABEL[label];
   const icon = config ? getCritIcon(config.name) : null;
+  const now = performance.now();
   if (icon) {
     const { w, h } = fitIconSize(icon, measureLabel(scratch, label) * 0.85);
     // the rays sway gently back and forth, like searchlights at a gala
-    const sway =
-      RAY_SWAY_RAD *
-      Math.sin(((performance.now() % RAY_SWAY_MS) / RAY_SWAY_MS) * Math.PI * 2);
+    const sway = RAY_SWAY_RAD * wave(motionMs, RAY_SWAY_MS);
     ctx.rotate(sway);
     drawGoldShimmer(
       ctx,
@@ -763,11 +774,13 @@ function drawFlashLayer(
       Math.max(w, h) * 0.75 * targetScale * raysScale,
       1,
       0,
-      performance.now(),
+      now,
     );
     ctx.rotate(-sway);
   }
   ctx.rotate(rotation);
+  // the badge sways a little back and forth
+  if (icon) ctx.rotate(BADGE_SWAY_RAD * wave(motionMs, BADGE_SWAY_MS));
   const scale = growthScale * targetScale;
   ctx.scale(scale, scale);
   ctx.drawImage(bitmap.canvas, bitmap.x, bitmap.y, bitmap.width, bitmap.height);
