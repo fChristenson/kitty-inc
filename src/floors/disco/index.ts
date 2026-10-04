@@ -12,16 +12,9 @@ import { drawTwinkle, hash01 } from "../../shared/twinkle";
 import type { Floor } from "../../gameState";
 
 // a floor whose every worker is perma-tiered turns into a disco: the room art is
-// dimmed and coloured beams sweep down from a mirror ball, with spots on the floor
+// dimmed under a spinning mirror ball scattering white flecks of light
 
 const DIM_ALPHA = 0.5;
-const BEAM_COUNT = 4;
-const BEAM_HALF_ANGLE = 0.13;
-const BEAM_SWEEP = 0.65;
-const BEAM_PERIOD_MS = 3400;
-const SPOT_COUNT = 5;
-const SPOT_PERIOD_MS = 5200;
-const HUE_SPEED = 0.06; // degrees per ms
 const BALL_RADIUS = 45;
 const BALL_DROP = 70;
 // one facet column passes per this long; a full turn is 12 of them
@@ -36,14 +29,11 @@ const SHINE_COUNT = 6;
 const SHINE_MS = 800;
 const SHINE_SIZE = 24;
 const FLECK_COUNT = 46;
-// the room art's own floor line, as a fraction of its height
-const FLOOR_LINE = 650 / FLOOR_H;
-// the soft lights are sprites per hue step (at LIGHT_SCALE) stamped straight
-// onto each disco floor; the ball is redrawn into one shared layer (at
-// BALL_SCALE) at most every BALL_REFRESH_MS and stamped too
-const LIGHT_SCALE = 0.35;
-const HUE_STEPS = 36;
-const SPOT_RADIUS = 120;
+// every disco floor stamps the same two shared layers: the flecks, redrawn
+// once a frame (at FLECK_SCALE), and the ball with its string, redrawn at
+// most every BALL_REFRESH_MS (at BALL_SCALE)
+const FLECK_SCALE = 0.6;
+const FLECK_REFRESH_MS = 8;
 const BALL_SCALE = 1.5;
 const BALL_HALF = BALL_RADIUS + SHINE_SIZE + 4;
 const BALL_REFRESH_MS = 40;
@@ -54,102 +44,8 @@ const room = {
   w: FLOOR_W * ROOM_CONTENT_SCALE_X,
   h: FLOOR_H * ROOM_CONTENT_SCALE,
 };
-const beamLength = room.h * 1.2;
-const beamHalfW = Math.sin(BEAM_HALF_ANGLE) * beamLength;
-
-function hueColor(hue: number, alpha: number): string {
-  return `hsla(${hue % 360}, 100%, 60%, ${alpha})`;
-}
-
-function hueStep(hue: number): number {
-  return Math.round(((hue % 360) + 360) / (360 / HUE_STEPS)) % HUE_STEPS;
-}
-
-function lightCanvas(w: number, h: number): CanvasRenderingContext2D {
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.ceil(w * LIGHT_SCALE));
-  canvas.height = Math.max(1, Math.ceil(h * LIGHT_SCALE));
-  const c = canvas.getContext("2d")!;
-  c.scale(LIGHT_SCALE, LIGHT_SCALE);
-  return c;
-}
-
-// a beam fanning down from its apex at the top middle, fading along its length
-const beamSprites: HTMLCanvasElement[] = [];
-function beamSprite(step: number): HTMLCanvasElement {
-  let sprite = beamSprites[step];
-  if (sprite) return sprite;
-  const c = lightCanvas(beamHalfW * 2, beamLength);
-  const hue = (step * 360) / HUE_STEPS;
-  const gradient = c.createLinearGradient(0, 0, 0, beamLength);
-  gradient.addColorStop(0, hueColor(hue, 0.55));
-  gradient.addColorStop(1, hueColor(hue, 0));
-  c.fillStyle = gradient;
-  c.beginPath();
-  c.moveTo(beamHalfW, 0);
-  c.lineTo(0, Math.cos(BEAM_HALF_ANGLE) * beamLength);
-  c.lineTo(beamHalfW * 2, Math.cos(BEAM_HALF_ANGLE) * beamLength);
-  c.closePath();
-  c.fill();
-  return (beamSprites[step] = c.canvas);
-}
-
-// a round glow, squashed into a floor spot when stamped
-const spotSprites: HTMLCanvasElement[] = [];
-function spotSprite(step: number): HTMLCanvasElement {
-  let sprite = spotSprites[step];
-  if (sprite) return sprite;
-  const c = lightCanvas(SPOT_RADIUS * 2, SPOT_RADIUS * 2);
-  const hue = (step * 360) / HUE_STEPS;
-  const gradient = c.createRadialGradient(
-    SPOT_RADIUS,
-    SPOT_RADIUS,
-    0,
-    SPOT_RADIUS,
-    SPOT_RADIUS,
-    SPOT_RADIUS,
-  );
-  gradient.addColorStop(0, hueColor(hue, 0.5));
-  gradient.addColorStop(1, hueColor(hue, 0));
-  c.fillStyle = gradient;
-  c.fillRect(0, 0, SPOT_RADIUS * 2, SPOT_RADIUS * 2);
-  return (spotSprites[step] = c.canvas);
-}
-
-function drawBeam(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  angle: number,
-  hue: number,
-): void {
-  ctx.translate(x, y);
-  ctx.rotate(-angle);
-  ctx.drawImage(
-    beamSprite(hueStep(hue)),
-    -beamHalfW,
-    0,
-    beamHalfW * 2,
-    beamLength,
-  );
-  ctx.rotate(angle);
-  ctx.translate(-x, -y);
-}
-
-function drawSpot(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  hue: number,
-): void {
-  ctx.drawImage(
-    spotSprite(hueStep(hue)),
-    x - SPOT_RADIUS,
-    y - SPOT_RADIUS * 0.3,
-    SPOT_RADIUS * 2,
-    SPOT_RADIUS * 0.6,
-  );
-}
+const ballX = room.x + room.w / 2;
+const ballY = room.y + BALL_DROP;
 
 function drawMirrorBall(
   ctx: CanvasRenderingContext2D,
@@ -242,11 +138,7 @@ function drawMirrorBall(
 
 // the ball's reflected light: flecks on the back wall and floor, sweeping
 // sideways with its spin and fading out as they turn away
-function drawReflections(
-  ctx: CanvasRenderingContext2D,
-  ballX: number,
-  now: number,
-): void {
+function drawReflections(ctx: CanvasRenderingContext2D, now: number): void {
   const turn = (now / (FACET_STEP_MS * FACET_COLUMNS * 2)) * Math.PI * 2;
   const sprite = fleckSprite();
   for (let i = 0; i < FLECK_COUNT; i++) {
@@ -300,50 +192,22 @@ function fleckSprite(): HTMLCanvasElement {
 }
 
 // drawn right over the room art, under the walls and workers; ctx is translated
-// to the floor's own top-left
+// to the floor's own top-left. Three stamps a floor: the dim, the flecks and
+// the ball, the last two shared by every disco floor
 export function drawDiscoFloor(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
   now: number,
 ): void {
   if (!floor.unlocked || !hasOnlyPermaWorkers(floor)) return;
+  const flecks = refreshFlecks(now);
   const ball = refreshBall(now);
-  const ballX = room.x + room.w / 2;
-  const ballY = room.y + BALL_DROP;
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(room.x, room.y, room.w, room.h);
-  ctx.clip();
   ctx.fillStyle = DIM;
   ctx.fillRect(room.x, room.y, room.w, room.h);
+  const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
-  const baseHue = now * HUE_SPEED;
-  for (let i = 0; i < BEAM_COUNT; i++) {
-    const phase = (i / BEAM_COUNT) * Math.PI * 2;
-    const angle =
-      ((i - (BEAM_COUNT - 1) / 2) / BEAM_COUNT) * 1.4 +
-      Math.sin((now / BEAM_PERIOD_MS) * Math.PI * 2 + phase) * BEAM_SWEEP;
-    drawBeam(ctx, ballX, ballY, angle, baseHue + i * 90);
-  }
-  const floorY = room.y + room.h * FLOOR_LINE;
-  for (let i = 0; i < SPOT_COUNT; i++) {
-    const phase = (i / SPOT_COUNT) * Math.PI * 2;
-    const t = Math.sin((now / SPOT_PERIOD_MS) * Math.PI * 2 + phase * 1.7);
-    drawSpot(
-      ctx,
-      room.x + room.w * (0.5 + 0.42 * t),
-      floorY,
-      baseHue + 180 + i * 72,
-    );
-  }
-  drawReflections(ctx, ballX, now);
-  ctx.globalCompositeOperation = "source-over";
-  ctx.strokeStyle = STRING;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(ballX, room.y);
-  ctx.lineTo(ballX, ballY - BALL_RADIUS);
-  ctx.stroke();
+  ctx.drawImage(flecks, room.x, room.y, room.w, room.h);
+  ctx.globalCompositeOperation = previous;
   ctx.drawImage(
     ball,
     ballX - BALL_HALF,
@@ -351,16 +215,42 @@ export function drawDiscoFloor(
     BALL_HALF * 2,
     BALL_HALF * 2,
   );
-  ctx.restore();
 }
 
 const DIM = `rgba(0, 0, 0, ${DIM_ALPHA})`;
 const STRING = "rgba(220, 220, 230, 0.8)";
+let fleckLayer: HTMLCanvasElement | null = null;
+let flecksAt = -Infinity;
+
+// the room's flecks of light, redrawn once a frame for every disco floor
+function refreshFlecks(now: number): HTMLCanvasElement {
+  if (!fleckLayer) {
+    fleckLayer = document.createElement("canvas");
+    fleckLayer.width = Math.ceil(room.w * FLECK_SCALE);
+    fleckLayer.height = Math.ceil(room.h * FLECK_SCALE);
+  }
+  if (now >= flecksAt && now - flecksAt < FLECK_REFRESH_MS) return fleckLayer;
+  flecksAt = now;
+  const c = fleckLayer.getContext("2d")!;
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.clearRect(0, 0, fleckLayer.width, fleckLayer.height);
+  c.setTransform(
+    FLECK_SCALE,
+    0,
+    0,
+    FLECK_SCALE,
+    -room.x * FLECK_SCALE,
+    -room.y * FLECK_SCALE,
+  );
+  drawReflections(c, now);
+  return fleckLayer;
+}
+
 let ballLayer: HTMLCanvasElement | null = null;
 let refreshedAt = -Infinity;
 
-// the spinning ball, shared by every disco floor and redrawn a few dozen
-// times a second rather than once per floor per frame
+// the spinning ball and its string, shared by every disco floor and redrawn a
+// few dozen times a second rather than once per floor per frame
 function refreshBall(now: number): HTMLCanvasElement {
   if (!ballLayer) {
     ballLayer = document.createElement("canvas");
@@ -369,8 +259,6 @@ function refreshBall(now: number): HTMLCanvasElement {
   if (now >= refreshedAt && now - refreshedAt < BALL_REFRESH_MS)
     return ballLayer;
   refreshedAt = now;
-  const ballX = room.x + room.w / 2;
-  const ballY = room.y + BALL_DROP;
   const ball = ballLayer.getContext("2d")!;
   ball.setTransform(1, 0, 0, 1, 0, 0);
   ball.clearRect(0, 0, ballLayer.width, ballLayer.height);
@@ -382,6 +270,12 @@ function refreshBall(now: number): HTMLCanvasElement {
     (BALL_HALF - ballX) * BALL_SCALE,
     (BALL_HALF - ballY) * BALL_SCALE,
   );
+  ball.strokeStyle = STRING;
+  ball.lineWidth = 2;
+  ball.beginPath();
+  ball.moveTo(ballX, room.y);
+  ball.lineTo(ballX, ballY - BALL_RADIUS);
+  ball.stroke();
   drawMirrorBall(ball, ballX, ballY, now);
   return ballLayer;
 }

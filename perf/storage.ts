@@ -63,6 +63,8 @@ export interface FixtureOptions {
   heavy: boolean;
   // heavy, but every figure at the top perma tier and the bars overspeeding
   maxed: boolean;
+  // false: the managers stay unpromoted, so no floor turns into a disco
+  disco: boolean;
 }
 
 interface SavedWorker {
@@ -74,7 +76,12 @@ interface SavedWorker {
 type SavedFloor = Record<string, unknown> & { workers?: SavedWorker[] };
 
 // loads the fresh save, grown into a busy building, as the game's storage
-export function loadFixture({ floors, heavy, maxed }: FixtureOptions): void {
+export function loadFixture({
+  floors,
+  heavy,
+  maxed,
+  disco,
+}: FixtureOptions): void {
   const base = JSON.parse(realStorage.getItem(BASE_KEY)!) as Record<
     string,
     string
@@ -106,7 +113,13 @@ export function loadFixture({ floors, heavy, maxed }: FixtureOptions): void {
         durationMs: 3_600_000,
         permaTier: maxed || (i % 2 === 0 && k < 2) ? "ultra" : undefined,
       }));
-      floor.managerPermaTier = maxed ? "ultra" : i % 3 === 0 ? "mega" : null;
+      floor.managerPermaTier = maxed
+        ? disco
+          ? "ultra"
+          : null
+        : i % 3 === 0
+          ? "mega"
+          : null;
     }
     if (maxed) {
       floor.upgradeCount = 400;
