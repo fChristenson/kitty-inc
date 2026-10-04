@@ -1,6 +1,7 @@
 import { randomInt } from "../utils";
 import { loadSprite } from "../loadAssets";
 import { createParticlePool, clampedDtSince } from "../shared/particlePool";
+import { runWhenIdle } from "../shared/idle";
 
 // shared coin/bill flipbook sprites + the actual particle physics/draw math —
 // floors/coins (particles glued to a specific Floor's own on-screen rect) and
@@ -65,10 +66,12 @@ export async function loadCoinBurstImages(): Promise<HTMLImageElement> {
   ]);
   coinFrameCanvases = buildFrameCanvases(coin, COIN_SPIN_FRAME_COUNT);
   billFrameCanvases = buildFrameCanvases(bill, BILL_SPIN_FRAME_COUNT);
-  coinAtlas = buildAtlas(coinFrameCanvases);
-  billAtlas = buildAtlas(billFrameCanvases);
-  spriteShape.coin = measureFrames(coinFrameCanvases);
-  spriteShape.bill = measureFrames(billFrameCanvases);
+  // off the startup path, each on its own idle slot: until then coins draw
+  // from the full-size frames
+  const coinFrames = coinFrameCanvases;
+  const billFrames = billFrameCanvases;
+  runWhenIdle(() => (coinAtlas = buildAtlas(coinFrames)));
+  runWhenIdle(() => (billAtlas = buildAtlas(billFrames)));
   return coin;
 }
 
@@ -129,35 +132,14 @@ export interface CoinBurstSprite {
 
 // per sprite: how far from its center it reaches when drawn at radius 1, at
 // any spin frame and tilt (its farthest opaque pixel), and its fullest frame
-// (face-on, covering the most area)
+// (face-on, covering the most area). Measured once from coinSpin.webp and
+// cashBillFlutter.webp (alpha > 40, frames scaled to radius 1) and kept as
+// constants: reading the pixels back at startup stalled phones. Re-measure
+// if either sheet changes
 const spriteShape = {
-  coin: { reach: 1, fullestFrame: 0 },
-  bill: { reach: Math.SQRT2, fullestFrame: 0 },
+  coin: { reach: 0.55, fullestFrame: 0 },
+  bill: { reach: 0.98, fullestFrame: 0 },
 };
-
-function measureFrames(frames: HTMLCanvasElement[]) {
-  let reach = 0;
-  let fullestFrame = 0;
-  let fullestArea = 0;
-  frames.forEach((frame, index) => {
-    const { width, height } = frame;
-    const alpha = frame
-      .getContext("2d")!
-      .getImageData(0, 0, width, height).data;
-    let area = 0;
-    for (let y = 0; y < height; y++)
-      for (let x = 0; x < width; x++)
-        if (alpha[(y * width + x) * 4 + 3] > 40) {
-          area++;
-          reach = Math.max(reach, Math.hypot(x - width / 2, y - height / 2));
-        }
-    if (area > fullestArea) {
-      fullestArea = area;
-      fullestFrame = index;
-    }
-  });
-  return { reach: reach / (PRESCALE_CELL_H / 2), fullestFrame };
-}
 
 export function getSpriteReach(kind: CoinBurstSprite["kind"]): number {
   return spriteShape[kind].reach;

@@ -14,7 +14,14 @@ import {
 export function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve(img);
+    // decoded off the main thread before it's handed out, so its first
+    // drawImage doesn't decode it synchronously mid-frame (a startup stall on
+    // phones, image after image)
+    img.onload = () =>
+      void img.decode().then(
+        () => resolve(img),
+        () => resolve(img),
+      );
     img.onerror = () => reject(new Error(`failed to load ${src}`));
     img.src = src;
   });

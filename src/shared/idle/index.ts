@@ -5,6 +5,29 @@ import { afterStartup } from "../startupGate";
 
 type IdleDeadlineLike = { timeRemaining: () => number };
 
+// no idle API (Safari): jobs run one at a time, spaced out and on a small
+// time budget, so the warm-ups trickle in between frames instead of all
+// landing together on the game's first frames
+const FALLBACK_GAP_MS = 50;
+const FALLBACK_BUDGET_MS = 6;
+const fallbackQueue: ((deadline: IdleDeadlineLike) => void)[] = [];
+let fallbackScheduled = false;
+
+function pumpFallback(): void {
+  fallbackScheduled = false;
+  const job = fallbackQueue.shift();
+  if (!job) return;
+  const end = performance.now() + FALLBACK_BUDGET_MS;
+  job({ timeRemaining: () => Math.max(0, end - performance.now()) });
+  scheduleFallback();
+}
+
+function scheduleFallback(): void {
+  if (fallbackScheduled || fallbackQueue.length === 0) return;
+  fallbackScheduled = true;
+  window.setTimeout(pumpFallback, FALLBACK_GAP_MS);
+}
+
 function scheduleIdle(
   callback: (deadline: IdleDeadlineLike) => void,
   timeoutMs: number,
@@ -12,8 +35,8 @@ function scheduleIdle(
   if (typeof requestIdleCallback === "function") {
     requestIdleCallback(callback, { timeout: timeoutMs });
   } else {
-    // no idle API (Safari): a short timer still yields to rendering between chunks
-    window.setTimeout(() => callback({ timeRemaining: () => 8 }), 16);
+    fallbackQueue.push(callback);
+    scheduleFallback();
   }
 }
 
