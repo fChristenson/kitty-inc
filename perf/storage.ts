@@ -113,11 +113,7 @@ export function loadFixture({
         durationMs: 3_600_000,
         permaTier: maxed || (i % 2 === 0 && k < 2) ? "ultra" : undefined,
       }));
-      floor.managerPermaTier = maxed
-        ? "ultra"
-        : i % 3 === 0
-          ? "mega"
-          : null;
+      floor.managerPermaTier = maxed ? "ultra" : i % 3 === 0 ? "mega" : null;
     }
     if (maxed) {
       floor.upgradeCount = 400;
