@@ -8343,6 +8343,202 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 69
+  // drill, levels: src/floors/pilotHoleEvent: three ever bigger drills bore the same spot on the clicked bar one after another
+  pilotHoleEvent: {
+    chance: 0.01,
+    approachMs: 220, // each bit dropping onto the spot
+    stallMs: 650, // the biggest bit's stall (the smaller ones' are shorter)
+    boreMs: 900, // the biggest bit's bore (the smaller ones' are shorter)
+    levelShare: 0.012, // the smallest bit's levels; bigger bits give 2x and 4x
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // race, cash: src/floors/pitStopEvent: two racers hairpin round the top bar, pit under the button for cash and launch into the total
+  pitStopEvent: {
+    chance: 0.01,
+    raceMs: 1500, // the race, not counting the pit stop
+    gapMs: 120, // the chaser behind the leader
+    pitMs: 380, // stopped dead in the pit, refuelling
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // clutter, a crit tier: src/floors/blackHoleMergerEvent: two gravity holes spiral in round each other gulping the glitter, merge and sink onto the clicked bar
+  blackHoleMergerEvent: {
+    chance: 0.01,
+    rippleMs: 400, // the glitter rippling out in rings
+    spiralMs: 1300, // the holes spiralling in
+    sinkMs: 260, // the merged hole sinking onto the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, free hires: src/floors/accretionEvent: a dust disk round a star wisp clumps into planets, which drop onto the empty spots
+  accretionEvent: {
+    chance: 0.01,
+    growMs: 300, // the star flaring and the disk whirling up
+    accreteMs: 1300, // the dust clumping into planets
+    gapMs: 130, // between planets breaking orbit
+    dropMs: 380, // each planet's arc onto its spot
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, worker perma tiers: src/floors/maxwellsDemonEvent: a demon at a gate sorts a box of hot and cold glimmers, then the hot gas blasts onto the workers
+  maxwellsDemonEvent: {
+    chance: 0.01,
+    growMs: 250, // the box snapping up
+    sortMs: 1300, // the demon sorting the gas
+    slamMs: 180, // the gate slammed shut before the wall bursts
+    burstMs: 380, // each glimmer's flight onto its worker
+    gapMs: 90, // between workers
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // batch 68
+  // explosion, levels: src/floors/fissionEvent: a neutron splits a bomb, whose neutrons split two more, then four, then eight, in a doubling chain reaction
+  fissionEvent: {
+    chance: 0.01,
+    growMs: 300, // the bombs popping up
+    levelShare: 0.01, // levels per split
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, free hires: src/floors/hydraEvent: the button shoots a hydra's heads off, two sprouting for each, then a burst takes the last four onto the empty spots
+  hydraEvent: {
+    chance: 0.01,
+    growMs: 250, // the hydra rearing up
+    gapMs: 190, // between shots
+    sproutMs: 160, // two new heads sprouting
+    volleyGapMs: 45, // between the last burst's shots
+    dropMs: 380, // a severed head's arc onto its spot
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // beam, worker perma tiers: src/floors/opticalTweezersEvent: three crossing beams trap beads one by one and haul them onto the workers
+  opticalTweezersEvent: {
+    chance: 0.01,
+    growMs: 300, // the beads spat up and the beams blazing in
+    carryMs: 1700, // every dart and haul, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, a crit tier: src/floors/travellingSalesmanEvent: a tangled tour through a dozen cities uncrosses itself by 2-opt, then cinches onto the clicked bar
+  travellingSalesmanEvent: {
+    chance: 0.01,
+    growMs: 300, // the cities and the tangled loop appearing
+    solveMs: 1200, // every swap, quickening
+    lapMs: 350, // a wisp racing round the finished tour
+    cinchMs: 200, // the loop cinching onto the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // money, cash: src/floors/spinCycleEvent: cash gushes into a drum that rocks, spins it into a whirling ring, then peels it off the top into the total
+  spinCycleEvent: {
+    chance: 0.01,
+    pourMs: 320, // the gush into the drum
+    rockMs: 400, // the drum rocking the pool
+    spinMs: 800, // spinning up
+    liftMs: 340, // each coin's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // batch 67
+  // bounce, levels: src/floors/clackersEvent: a hand wisp swings two balls on strings like the clacker toy, clacking ever faster for levels
+  clackersEvent: {
+    chance: 0.01,
+    growMs: 250, // the balls dropping to hang off the hand
+    clackMs: 1700, // from the first pump to the last smash
+    levelShare: 0.012, // levels per clack
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, cash: src/floors/shishiOdoshiEvent: a spout wisp fills a bamboo-fountain rocker of light with cash, which tips, gushes onto a heap and clacks back
+  shishiOdoshiEvent: {
+    chance: 0.01,
+    growMs: 250, // the rocker rising
+    pourMs: 1700, // the four fill-tip-clack cycles, quickening
+    surgeMs: 300, // the heap lifting off
+    liftMs: 320, // each coin's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, a free floor: src/floors/isingModelEvent: a grid of little magnets cools into one, then is pulled into the lock like iron filings
+  isingModelEvent: {
+    chance: 0.01,
+    growMs: 300, // the grid popping in
+    coolMs: 1300, // the cooling, flips rippling through
+    blazeMs: 200, // the aligned grid blazing
+    pullMs: 500, // the pull into the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, a crit tier: src/floors/faradayCageEvent: lightning hammers a cage of light over the clicked bar, then a colossal bolt crushes it into the bar
+  faradayCageEvent: {
+    chance: 0.01,
+    dropMs: 280, // the cage dropping over the bar
+    strikeMs: 1100, // the strikes, quickening
+    finalMs: 250, // the pause before the colossal bolt
+    crushMs: 180, // the cage crushing onto the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, free hires: src/floors/freeThrowsEvent: the button shoots ball wisps through rims of light over the empty spots, a worker forming where each lands
+  freeThrowsEvent: {
+    chance: 0.01,
+    growMs: 250, // the rims popping up
+    shotMs: 520, // each shot's flight to its rim
+    gapMs: 260, // between shots
+    dropMs: 200, // dropping through onto the spot
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // batch 66
+  // experiment, a crit tier: src/floors/towerOfHanoiEvent: bars of light solve the Tower of Hanoi on three pegs on the clicked bar, then hammer it a crit tier
+  towerOfHanoiEvent: {
+    chance: 0.01,
+    growMs: 300, // the pegs shooting up and the stack dropping on
+    solveMs: 1600, // all 31 moves, quickening
+    hammerMs: 200, // the finished tower hammering down
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // clutter, a free floor: src/floors/rockTheBoatEvent: the screen rocks like a boat, sloshing a mess of glitter side to side, then pours it into the lock
+  rockTheBoatEvent: {
+    chance: 0.01,
+    dumpMs: 350, // the glitter washing down
+    tiltMs: 520, // each roll, sliding it all one way
+    pourMs: 600, // the last roll pouring it into the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // spray, levels: src/floors/windowWasherEvent: a window washer's platform drops bar to bar, misting each gold and squeegeeing it clean for levels
+  windowWasherEvent: {
+    chance: 0.01,
+    enterMs: 300, // the platform dropping in
+    sprayMs: 300, // misting a bar back and forth
+    wipeMs: 140, // the squeegee stroke
+    dropMs: 120, // dropping to the next bar
+    levelShare: 0.03, // levels per bar washed
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // race, worker perma tiers: src/floors/tandemDriftEvent: two racers drift nose to tail round the workers in hairpins, tails out, smoke pouring
+  tandemDriftEvent: {
+    chance: 0.01,
+    raceMs: 2000, // the leader's whole run
+    gapMs: 120, // the chaser's gap behind
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // drill, free hires: src/floors/postHolesEvent: drills dive onto the empty spots and grind down through the floor, a new worker springing up out of each hole
+  postHolesEvent: {
+    chance: 0.01,
+    approachMs: 220, // each drill's dive
+    stallMs: 350, // stalled grinding on the bite
+    boreMs: 1100, // boring through shove by shove
+    staggerMs: 450, // between drills
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 65
   // explosion, crit tiers: src/floors/incomingEvent: bombs swell in out of the distance onto the bars in chained cluster blasts, then a giant one onto the clicked bar
   incomingEvent: {

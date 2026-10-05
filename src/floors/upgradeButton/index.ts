@@ -179,9 +179,10 @@ function renderUpgradeButton(
   function drawBody(): void {
     const wiggle =
       (crit || activeEvent ? getWiggleRotation(now) : 0) + holdAnim.rotation;
-    // Sale and Overtime already wiggle the button
+    // a wiggling button (a crit, an event, a Sale) only rocks, like the Sale:
+    // squashing it while it's rotated warps it
     const jelly =
-      isSaleActive(floor, now) || isOvertimeActive(floor, now)
+      crit || activeEvent
         ? null
         : getJellyPose(own, now, getBoilHeat(floor, now), wiggle);
     ctx.save();

@@ -46,16 +46,36 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-incoming-event" class="game__button">Incoming</button>
-          <button id="test-string-art-event" class="game__button">String Art</button>
-          <button id="test-petanque-event" class="game__button">Pétanque</button>
-          <button id="test-centipede-event" class="game__button">Centipede</button>
-          <button id="test-mandelbrot-event" class="game__button">Mandelbrot</button>
+          <button id="test-pilot-hole-event" class="game__button">Pilot Hole</button>
+          <button id="test-pit-stop-event" class="game__button">Pit Stop</button>
+          <button id="test-black-hole-merger-event" class="game__button">Black Hole Merger</button>
+          <button id="test-accretion-event" class="game__button">Accretion</button>
+          <button id="test-maxwells-demon-event" class="game__button">Maxwell's Demon</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-fission-event" class="game__button">Fission</button>
+          <button id="test-hydra-event" class="game__button">Hydra</button>
+          <button id="test-optical-tweezers-event" class="game__button">Optical Tweezers</button>
+          <button id="test-travelling-salesman-event" class="game__button">Travelling Salesman</button>
+          <button id="test-spin-cycle-event" class="game__button">Spin Cycle</button>
+          <button id="test-clackers-event" class="game__button">Clackers</button>
+          <button id="test-shishi-odoshi-event" class="game__button">Shishi-odoshi</button>
+          <button id="test-ising-model-event" class="game__button">Ising Model</button>
+          <button id="test-faraday-cage-event" class="game__button">Faraday Cage</button>
+          <button id="test-free-throws-event" class="game__button">Free Throws</button>
+          <button id="test-tower-of-hanoi-event" class="game__button">Tower of Hanoi</button>
+          <button id="test-rock-the-boat-event" class="game__button">Rock the Boat</button>
+          <button id="test-window-washer-event" class="game__button">Window Washer</button>
+          <button id="test-tandem-drift-event" class="game__button">Tandem Drift</button>
+          <button id="test-post-holes-event" class="game__button">Post Holes</button>
+          <button id="test-incoming-event" class="game__button">Incoming</button>
+          <button id="test-string-art-event" class="game__button">String Art</button>
+          <button id="test-petanque-event" class="game__button">Pétanque</button>
+          <button id="test-centipede-event" class="game__button">Centipede</button>
+          <button id="test-mandelbrot-event" class="game__button">Mandelbrot</button>
           <button id="test-podium-event" class="game__button">Podium</button>
           <button id="test-robovac-event" class="game__button">Robovac</button>
           <button id="test-figure-eight-event" class="game__button">Figure Eight</button>
