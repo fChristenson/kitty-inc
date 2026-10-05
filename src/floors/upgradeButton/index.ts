@@ -179,7 +179,11 @@ function renderUpgradeButton(
   function drawBody(): void {
     const wiggle =
       (crit || activeEvent ? getWiggleRotation(now) : 0) + holdAnim.rotation;
-    const jelly = getJellyPose(own, now, getBoilHeat(floor, now), wiggle);
+    // Sale and Overtime already wiggle the button
+    const jelly =
+      isSaleActive(floor, now) || isOvertimeActive(floor, now)
+        ? null
+        : getJellyPose(own, now, getBoilHeat(floor, now), wiggle);
     ctx.save();
     ctx.translate(cx + holdAnim.shakeX, cy + holdAnim.shakeY);
     if (crit || activeEvent) {
@@ -187,7 +191,7 @@ function renderUpgradeButton(
     }
     ctx.rotate(holdAnim.rotation);
     ctx.scale(scale * holdAnim.scale, scale * holdAnim.scale);
-    ctx.scale(jelly.sx, jelly.sy);
+    if (jelly) ctx.scale(jelly.sx, jelly.sy);
     ctx.translate(-cx, -cy);
     let dim = false;
     if (!crit && !activeEvent?.freeClick) {
