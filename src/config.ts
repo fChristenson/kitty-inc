@@ -8343,6 +8343,54 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 61
+  // race, a crit tier: src/floors/timeTrialEvent: a racer chases a ghost lap round the button's end, overtakes it and dives onto the clicked bar
+  timeTrialEvent: {
+    chance: 0.01,
+    raceMs: 1300, // the ghost's lap
+    leadMs: 180, // the ghost's head start
+    beatMs: 80, // how far ahead of the ghost the racer finishes
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // clutter, worker perma tiers: src/floors/dustBunniesEvent: a broom sweeps blown dust into a line, then into a bunny per worker
+  dustBunniesEvent: {
+    chance: 0.01,
+    blowMs: 450, // the gust blowing the dust in
+    dragMs: 110, // each broom stroke
+    liftMs: 50, // swinging to the next stroke
+    gatherMs: 150, // the bunnies settling
+    hopMs: 340, // each bunny's hop onto its worker
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // wisp, free hires: src/floors/magneticPendulumEvent: a pendulum wisp swings chaotically between magnets over the empty spots
+  magneticPendulumEvent: {
+    chance: 0.01,
+    swingMs: 2000, // the chaotic swing
+    settleMs: 220, // caught on its magnet
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/deCasteljauEvent: de Casteljau's scaffold sweeps out a Bézier curve, then cash pours along it
+  deCasteljauEvent: {
+    chance: 0.01,
+    growMs: 250, // the control points flaring up
+    drawMs: 1100, // the scaffold sweeping out the curve
+    travelMs: 700, // each coin's trip along the curve
+    streamMs: 600, // how long the cash pours
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, levels: src/floors/buffonsNeedleEvent: needles rain onto the bars, each landing across one levelling it
+  buffonsNeedleEvent: {
+    chance: 0.01,
+    dropMs: [70, 25] as [number, number], // between needles, quickening
+    fallMs: 260, // each needle's tumble down
+    levelShare: 0.01, // levels per needle across a bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 60
   // drill, a crit tier: src/floors/frackingEvent: a drill curves in sideways, grinds along inside the clicked bar, then it fractures in a chain of blasts
   frackingEvent: {
