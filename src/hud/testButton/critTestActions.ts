@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-pursuit-event" class="game__button">Pursuit</button>
-          <button id="test-fractal-charge-event" class="game__button">Fractal Charge</button>
-          <button id="test-snowplow-event" class="game__button">Snowplow</button>
-          <button id="test-franklins-kite-event" class="game__button">Franklin's Kite</button>
-          <button id="test-sokoban-event" class="game__button">Sokoban</button>
+          <button id="test-fracking-event" class="game__button">Fracking</button>
+          <button id="test-chopper-event" class="game__button">Chopper</button>
+          <button id="test-extinguisher-event" class="game__button">Extinguisher</button>
+          <button id="test-golden-spiral-event" class="game__button">Golden Spiral</button>
+          <button id="test-wildfire-event" class="game__button">Wildfire</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-pursuit-event" class="game__button">Pursuit</button>
+          <button id="test-fractal-charge-event" class="game__button">Fractal Charge</button>
+          <button id="test-snowplow-event" class="game__button">Snowplow</button>
+          <button id="test-franklins-kite-event" class="game__button">Franklin's Kite</button>
+          <button id="test-sokoban-event" class="game__button">Sokoban</button>
           <button id="test-billows-event" class="game__button">Billows</button>
           <button id="test-moire-event" class="game__button">Moiré</button>
           <button id="test-pole-position-event" class="game__button">Pole Position</button>

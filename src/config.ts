@@ -8343,6 +8343,54 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 60
+  // drill, a crit tier: src/floors/frackingEvent: a drill curves in sideways, grinds along inside the clicked bar, then it fractures in a chain of blasts
+  frackingEvent: {
+    chance: 0.01,
+    curveMs: 380, // screaming down and round into the bar's end
+    stallMs: 700, // grinding in place on the bite
+    boreMs: 1500, // boring along inside the bar
+    fractureMs: 90, // between the fracture blasts
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // beam, free hires: src/floors/chopperEvent: a rotor of beams lifts off the button and hovers over each empty spot, setting down a worker
+  chopperEvent: {
+    chance: 0.01,
+    spinUpMs: 380, // the rotor spinning up
+    flyMs: [300, 200] as [number, number], // each hop to a spot, quickening
+    hoverMs: 220, // hovering over each spot
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // spray, worker perma tiers: src/floors/extinguisherEvent: a nozzle darts worker to worker blasting each in a recoiling burst of mist
+  extinguisherEvent: {
+    chance: 0.01,
+    dartMs: [260, 160] as [number, number], // each dart to a firing spot, quickening
+    blastMs: [320, 220] as [number, number], // each blast, quickening
+    lastBlastMs: 520, // the last, long double blast
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/goldenSpiralEvent: Fibonacci squares snap in, then a wisp leads cash round the golden spiral into the total
+  goldenSpiralEvent: {
+    chance: 0.01,
+    buildMs: [160, 90] as [number, number], // between squares, quickening
+    traceMs: 900, // the wisp round the spiral
+    streamMs: 700, // how long the cash pours
+    flyMs: 260, // off the spiral's end into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, levels: src/floors/wildfireEvent: lightning sets a forest of glimmer trees ablaze and the fire front sweeps the bars
+  wildfireEvent: {
+    chance: 0.01,
+    growMs: 300, // the forest sprouting
+    stepMs: [90, 45] as [number, number], // each generation of the fire, quickening
+    levelShare: 0.04, // levels where the front crosses a bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 59
   // wisp, free hires: src/floors/pursuitEvent: wisps on a polygon's corners chase each other in along pursuit spirals, then burst onto the empty spots
   pursuitEvent: {

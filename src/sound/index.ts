@@ -77,7 +77,7 @@ const AUTO_ACTION_DEBOUNCE_MS = 2000;
 const lastAutoActionPlayTime = new Map<string, number>();
 
 function autoActionAllowed(key: string): boolean {
-  const now = Date.now();
+  const now = performance.now();
   const last = lastAutoActionPlayTime.get(key) ?? 0;
   if (now - last < AUTO_ACTION_DEBOUNCE_MS) return false;
   lastAutoActionPlayTime.set(key, now);
@@ -313,7 +313,7 @@ export function startBackgroundMusic(): void {
 // Debounced (see COIN_DROP_DEBOUNCE_MS) so the press-and-hold auto-repeat's fastest
 // tier doesn't stack dozens of overlapping plays into distorted noise
 export function playCoinDrop(): void {
-  const now = Date.now();
+  const now = performance.now();
   if (now - lastCoinDropPlayTime < COIN_DROP_DEBOUNCE_MS) return;
   lastCoinDropPlayTime = now;
   playSfx("coinDrop", COIN_DROP_VOLUME);
@@ -332,7 +332,8 @@ export function playSwoosh(): void {
 // Debounced (see SOLD_DEBOUNCE_MS) so a press-and-hold purchase loop drops excess
 // plays instead of queuing a backlog that keeps audibly firing after the hold ends
 export function playSold(): void {
-  const now = Date.now();
+  // real time: Date.now() stands still while a dialog pauses the game
+  const now = performance.now();
   if (now - lastSoldPlayTime < SOLD_DEBOUNCE_MS) return;
   lastSoldPlayTime = now;
   playSfx("sold", SOLD_VOLUME, 0.5);
@@ -360,7 +361,7 @@ export function playAutoBoost(): void {
 // EXPLOSION_DEBOUNCE_MS) so back-to-back crits during a fast held click can't
 // stack multiple full explosions on top of each other
 export function playExplosion(): void {
-  const now = Date.now();
+  const now = performance.now();
   if (now < explosionsHeldUntil) return;
   if (now - lastExplosionPlayTime < EXPLOSION_DEBOUNCE_MS) return;
   lastExplosionPlayTime = now;
@@ -370,13 +371,13 @@ export function playExplosion(): void {
 // drops every explosion for `ms`, so one that lands at the end of it (a slam's
 // impact) is the one heard
 export function holdExplosions(ms: number): void {
-  explosionsHeldUntil = Math.max(explosionsHeldUntil, Date.now() + ms);
+  explosionsHeldUntil = Math.max(explosionsHeldUntil, performance.now() + ms);
 }
 
 // a slam's impact bang always plays: a crit bang from the clicks just before
 // (overtime's rapid ticks) must not debounce it away
 export function playSlamExplosion(): void {
-  lastExplosionPlayTime = Date.now();
+  lastExplosionPlayTime = performance.now();
   playSfx("explosion", SFX_VOLUME, 0.04);
 }
 
@@ -384,7 +385,7 @@ export function playSlamExplosion(): void {
 // every-10th-upgrade floor milestone; debounced (see BLOOP_DEBOUNCE_MS) so one
 // click landing on several targets only plays once
 export function playBloop(): void {
-  const now = Date.now();
+  const now = performance.now();
   if (now - lastBloopPlayTime < BLOOP_DEBOUNCE_MS) return;
   lastBloopPlayTime = now;
   playSfx("bloop", SFX_VOLUME);
@@ -394,7 +395,7 @@ export function playBloop(): void {
 // floorInteractions.ts). Debounced (see JACKPOT_DEBOUNCE_MS) so back-to-back mega
 // crits during a fast held click can't stack overlapping plays
 export function playJackpot(): void {
-  const now = Date.now();
+  const now = performance.now();
   if (now - lastJackpotPlayTime < JACKPOT_DEBOUNCE_MS) return;
   lastJackpotPlayTime = now;
   playSfx("win", JACKPOT_VOLUME);
@@ -405,7 +406,7 @@ export function playJackpot(): void {
 const EVENT_ENDED_DEBOUNCE_MS = 800;
 let lastEventEndedPlayTime = 0;
 export function playEventEnded(): void {
-  const now = Date.now();
+  const now = performance.now();
   if (now - lastEventEndedPlayTime < EVENT_ENDED_DEBOUNCE_MS) return;
   lastEventEndedPlayTime = now;
   playSfx("notification", NOTIFICATION_VOLUME);
@@ -462,7 +463,7 @@ export function getJackpotDurationMs(): number {
 // sound outlasting the (now much shorter) flash by playing the full ~3s .wav
 // past the point the screen's gone quiet
 export function playPayout(): void {
-  const now = Date.now();
+  const now = performance.now();
   if (now - lastPayoutPlayTime < PAYOUT_DEBOUNCE_MS) return;
   lastPayoutPlayTime = now;
   playSfx("payout", SFX_VOLUME, 0, 1, 1.926, 0.576);
