@@ -15,6 +15,11 @@ import {
 import { drawCritText } from "../shared/critText";
 import { runWhenIdle } from "../shared/idle";
 import { drawGoldShimmer } from "../shared/goldShimmer";
+import {
+  drawCritSparks,
+  startCritSparks,
+  stopCritSparks,
+} from "../shared/critSparks";
 
 // a handful of icons are explicitly designed to spin an extra fixed amount on
 // top of the flash text's own animated entrance rotation (see drawFlashLayer).
@@ -190,6 +195,9 @@ function startFlash(req: FlashRequest): void {
   flashHoldMs = holdMs;
   activeFlashPriority = req.priority;
   flashEndsAt = now + GROWTH_DURATION_MS + holdMs + fadeDurationMs;
+  // a featured crit's image is its own show
+  if (CRIT_ICON_BY_LABEL[req.label]) stopCritSparks();
+  else startCritSparks(req.priority, now);
 }
 
 // a special crit's image stays up this much longer before fading
@@ -665,6 +673,17 @@ export function warmCritFlashes(
 }
 
 export function drawCritFlash(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  viewportWidth: number,
+  now: number,
+): void {
+  drawFlashLayers(ctx, centerX, centerY, viewportWidth, now);
+  drawCritSparks(ctx, centerX, centerY, viewportWidth, now);
+}
+
+function drawFlashLayers(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
