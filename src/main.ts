@@ -3709,23 +3709,19 @@ async function main() {
   // barrel-roll flourish a manual switch gets (see cityMapView's
   // animateSwitchToCompany) — its own completion is what actually calls
   // switchToCompany, same as a normal roll, so there's only ever one switch.
-  // Delayed to start SWITCH_LEAD_MS before the dialog's own close animation
-  // finishes, instead of firing immediately alongside it while the dialog
-  // hasn't even started sliding away yet
+  // The dialog is shut at once rather than slid out, so the roll has the
+  // screen to itself
   const corporationUpgradeMenu = wireCorporationUpgradeMenu(
     app,
     () => {
       const newIndex = createNewCorporation();
-      corporationUpgradeMenu.close();
-      setTimeout(() => {
-        playSwoosh();
-        cityMapView.animateSwitchToCompany(newIndex);
-      }, DIALOG_CLOSE_MS - SWITCH_LEAD_MS);
+      corporationUpgradeMenu.dismiss();
+      playSwoosh();
+      cityMapView.animateSwitchToCompany(newIndex);
     },
     // "Merge" (see hud/corporationUpgradeMenu's own Merge section): folds every
     // selected company's income/upgrades/stock into whichever one has the most
-    // map progression, then closes the dialog and barrel-rolls to it, same
-    // close+animate choreography as "Create new Corporation" above. If the
+    // map progression, then closes the dialog and barrel-rolls to it. If the
     // company we're switching AWAY from was itself one of the merged-away
     // ones, flag the next switch to skip re-snapshotting its now-stale live
     // state over the clear mergeCompanies already wrote to storage for it

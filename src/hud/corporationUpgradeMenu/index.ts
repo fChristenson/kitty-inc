@@ -38,6 +38,8 @@ export function createCorporationUpgradeMenuMarkup(): string {
 export interface CorporationUpgradeMenu {
   open: () => void;
   close: () => void;
+  // hides it at once, no slide-out, for a switch that takes over the screen
+  dismiss: () => void;
 }
 
 export function wireCorporationUpgradeMenu(
@@ -149,9 +151,8 @@ export function wireCorporationUpgradeMenu(
     }
     const button = target.closest<HTMLButtonElement>("#create-new-corporation");
     if (!button || button.disabled) return;
-    onCreateNewCorporation();
     playSold();
-    render();
+    onCreateNewCorporation();
   });
 
   // opened by a tap on the action bar's own Hire button — same trailing-
@@ -173,10 +174,15 @@ export function wireCorporationUpgradeMenu(
     menu.hidden = true;
   }
 
+  function dismiss(): void {
+    cancelDialogClose(panel);
+    menu.hidden = true;
+  }
+
   onTapOrClick(backdrop, () => {
     if (ghostClickGuard.shouldIgnore()) return;
     close();
   });
 
-  return { open, close };
+  return { open, close, dismiss };
 }
