@@ -8343,6 +8343,49 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 62
+  // explosion, a free floor: src/floors/fuseMazeEvent: a flame floods a maze of fuse cord, every dead end a bomb, the far corner's cord into the lock
+  fuseMazeEvent: {
+    chance: 0.01,
+    growMs: 300, // the maze snapping out
+    stepMs: [28, 14] as [number, number], // the flame from cell to cell, quickening
+    finalMs: 260, // the last cord out to the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, levels: src/floors/barBilliardsEvent: a ball ricochets about inside the clicked bar, then smashes out of its top
+  barBilliardsEvent: {
+    chance: 0.01,
+    dropMs: 260, // the ball dropping into the bar
+    exitMs: 200, // smashing out of its top
+    levelShare: 0.006, // levels per bounce
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // wisp, free hires: src/floors/levyFlightEvent: a forager wisp skitters in flurries and dashes across the screen onto each empty spot
+  levyFlightEvent: {
+    chance: 0.01,
+    hopMs: 40, // each skittering hop
+    dashMs: [320, 200] as [number, number], // each dash to a spot, quickening
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, a crit tier: src/floors/brachistochroneEvent: wisps race down a ramp, a drop and a cycloid onto the clicked bar
+  brachistochroneEvent: {
+    chance: 0.01,
+    growMs: 300, // the tracks snapping in
+    raceMs: 1400, // the slowest wisp's run
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, worker perma tiers: src/floors/ulamSpiralEvent: a counter winds out a square spiral, the primes flaring, then flying onto the workers
+  ulamSpiralEvent: {
+    chance: 0.01,
+    stepMs: [14, 6] as [number, number], // each count, quickening
+    flyMs: 340, // each prime's flight onto its worker
+    holdMs: 400,
+    mergeMs: 0,
+  },
   // batch 61
   // race, a crit tier: src/floors/timeTrialEvent: a racer chases a ghost lap round the button's end, overtakes it and dives onto the clicked bar
   timeTrialEvent: {

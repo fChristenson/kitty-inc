@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-time-trial-event" class="game__button">Time Trial</button>
-          <button id="test-dust-bunnies-event" class="game__button">Dust Bunnies</button>
-          <button id="test-magnetic-pendulum-event" class="game__button">Magnetic Pendulum</button>
-          <button id="test-de-casteljau-event" class="game__button">de Casteljau</button>
-          <button id="test-buffons-needle-event" class="game__button">Buffon's Needle</button>
+          <button id="test-fuse-maze-event" class="game__button">Fuse Maze</button>
+          <button id="test-bar-billiards-event" class="game__button">Bar Billiards</button>
+          <button id="test-levy-flight-event" class="game__button">Lévy Flight</button>
+          <button id="test-brachistochrone-event" class="game__button">Brachistochrone</button>
+          <button id="test-ulam-spiral-event" class="game__button">Ulam Spiral</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-time-trial-event" class="game__button">Time Trial</button>
+          <button id="test-dust-bunnies-event" class="game__button">Dust Bunnies</button>
+          <button id="test-magnetic-pendulum-event" class="game__button">Magnetic Pendulum</button>
+          <button id="test-de-casteljau-event" class="game__button">de Casteljau</button>
+          <button id="test-buffons-needle-event" class="game__button">Buffon's Needle</button>
           <button id="test-fracking-event" class="game__button">Fracking</button>
           <button id="test-chopper-event" class="game__button">Chopper</button>
           <button id="test-extinguisher-event" class="game__button">Extinguisher</button>
