@@ -8343,6 +8343,54 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 57
+  // explosion, a free floor: src/floors/seedPodsEvent: bomb pods burst in a chain up to the lock, flinging seed bombs
+  seedPodsEvent: {
+    chance: 0.01,
+    growMs: 360, // the pods swelling up
+    fuseMs: 380, // the first pod's fuse after that
+    seedMs: [380, 240] as [number, number], // each pod's seeds in flight, quickening
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, a crit tier: src/floors/rippleFireEvent: a row of guns ripple-fires into the clicked bar, then volleys all at once
+  rippleFireEvent: {
+    chance: 0.01,
+    readyMs: 200, // before the first shot
+    rippleMs: [70, 35] as [number, number], // between shots of a pass, quickening
+    passGapMs: 140, // between passes
+    speed: 2.2, // px per ms
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // lightning, levels: src/floors/sparkChamberEvent: charged wisps streak across, sparking onto every bar their tracks cross
+  sparkChamberEvent: {
+    chance: 0.01,
+    trackMs: [700, 420] as [number, number], // each particle's streak, quickening
+    gapMs: 120, // between particles
+    levelShare: 0.02, // per spark
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // mix, free hires + cash: src/floors/turbineEvent: a river of cash spins up a turbine that flings blades onto the empty spots
+  turbineEvent: {
+    chance: 0.01,
+    feedMs: 450, // the river reaching the hub
+    spinMs: 1000, // spinning up
+    flyMs: 360, // each blade's flight onto its spot
+    riseMs: 280, // the hub rising into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, worker perma tiers: src/floors/strangeAttractorEvent: a wisp draws the Lorenz butterfly, which bursts onto the workers
+  strangeAttractorEvent: {
+    chance: 0.01,
+    traceMs: 1600, // drawing the butterfly, ever faster
+    gatherMs: 120, // before it bursts
+    flyMs: 320, // each glimmer's flight onto its worker
+    holdMs: 400,
+    mergeMs: 0,
+  },
   // batch 56
   // bounce, free hires: src/floors/topsyTurvyEvent: balls bounce floor to ceiling as gravity flips, then drop onto the empty spots
   topsyTurvyEvent: {

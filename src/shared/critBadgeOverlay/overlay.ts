@@ -106,7 +106,7 @@ export function createCritBadgeRenderer(
       critBadgePages.push(kinds.slice(i, i + CRIT_BADGE_PAGE_SIZE));
     }
     critBadgePage = 0;
-    critBadgeAnimation = { startedAt: Date.now(), mode: "bottom" };
+    critBadgeAnimation = { startedAt: performance.now(), mode: "bottom" };
     for (const kind of critBadgePages[0]) loadCritBadgeImage(kind);
     redraw();
   }
@@ -115,7 +115,7 @@ export function createCritBadgeRenderer(
     if (critBadgePages.length === 0) return;
     if (critBadgePage < critBadgePages.length - 1) {
       critBadgePage += 1;
-      critBadgeAnimation = { startedAt: Date.now(), mode: "bottom" };
+      critBadgeAnimation = { startedAt: performance.now(), mode: "bottom" };
       for (const kind of critBadgePages[critBadgePage])
         loadCritBadgeImage(kind);
     } else {

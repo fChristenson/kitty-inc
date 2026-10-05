@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-topsy-turvy-event" class="game__button">Topsy-Turvy</button>
-          <button id="test-gold-plating-event" class="game__button">Gold Plating</button>
-          <button id="test-crosswind-event" class="game__button">Crosswind</button>
-          <button id="test-hailstone-event" class="game__button">Hailstone</button>
-          <button id="test-hilbert-curve-event" class="game__button">Hilbert Curve</button>
+          <button id="test-seed-pods-event" class="game__button">Seed Pods</button>
+          <button id="test-ripple-fire-event" class="game__button">Ripple Fire</button>
+          <button id="test-spark-chamber-event" class="game__button">Spark Chamber</button>
+          <button id="test-turbine-event" class="game__button">Turbine</button>
+          <button id="test-strange-attractor-event" class="game__button">Strange Attractor</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-topsy-turvy-event" class="game__button">Topsy-Turvy</button>
+          <button id="test-gold-plating-event" class="game__button">Gold Plating</button>
+          <button id="test-crosswind-event" class="game__button">Crosswind</button>
+          <button id="test-hailstone-event" class="game__button">Hailstone</button>
+          <button id="test-hilbert-curve-event" class="game__button">Hilbert Curve</button>
           <button id="test-le-mans-event" class="game__button">Le Mans</button>
           <button id="test-tunnel-borer-event" class="game__button">Tunnel Borer</button>
           <button id="test-harpoon-event" class="game__button">Harpoon</button>

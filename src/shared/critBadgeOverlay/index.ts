@@ -31,7 +31,7 @@ function createOverlay() {
     (visible) => {
       canvas.hidden = !visible;
       if (visible) {
-        openedAt = Date.now();
+        openedAt = performance.now();
         previousFocus = document.activeElement as HTMLElement | null;
         canvas.focus();
       } else {
@@ -51,12 +51,12 @@ function createOverlay() {
     if (canvas.height !== height) canvas.height = height;
     context.setTransform(dpr, 0, 0, dpr, 0, 0);
     context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    renderer.draw(Date.now());
+    renderer.draw(performance.now());
     if (renderer.animating) frame = requestAnimationFrame(redraw);
   }
 
   onTapOrClick(canvas, () => {
-    if (Date.now() - openedAt < 300) return;
+    if (performance.now() - openedAt < 300) return;
     renderer.advance();
   });
   canvas.addEventListener("keydown", (event) => {

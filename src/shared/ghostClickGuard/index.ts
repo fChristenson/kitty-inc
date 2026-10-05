@@ -15,13 +15,14 @@ export interface GhostClickGuard {
 }
 
 export function createGhostClickGuard(delayMs = 500): GhostClickGuard {
+  // real time: Date.now() is the game clock, which stops while a dialog is open
   let openedAt = 0;
   return {
     markOpened() {
-      openedAt = Date.now();
+      openedAt = performance.now();
     },
     shouldIgnore() {
-      return Date.now() - openedAt < delayMs;
+      return performance.now() - openedAt < delayMs;
     },
   };
 }
