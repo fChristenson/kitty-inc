@@ -38,6 +38,8 @@ export const CONFIG = {
     upgradeSpeedLevelScale: 20,
     upgradeMilestoneStep: 10,
     upgradePriceLevelScale: 3,
+    // a floor stops taking upgrades here; Sales and Overtime still play on it
+    maxFloorLevel: 1000,
   },
 
   // src/floors/upgradeButton/index.ts's CRIT_TIER_CONFIG — odds + free-upgrade/

@@ -1,5 +1,10 @@
 import { FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
-import { countBoostedWorkers, type Floor } from "../../gameState";
+import {
+  countBoostedWorkers,
+  isFloorMaxed,
+  MAX_FLOOR_LEVEL,
+  type Floor,
+} from "../../gameState";
 import { MAX_RENDERED_WORKERS, permaBoostSpeedMultiplier } from "../worker";
 import {
   CRIT_TIER_CONFIG,
@@ -247,6 +252,7 @@ export const UPGRADE_MILESTONE_STEP = CONFIG.incomePanel.upgradeMilestoneStep;
 // Cost growth stays close to income's milestone speed growth for sustained progression.
 
 export function increaseIncomeRate(floor: Floor): void {
+  if (isFloorMaxed(floor)) return;
   // a permanently-crited floor (see floorInteractions.ts's rollFloorBuyCrit)
   // multiplies every upgrade's own rate gain by that tier's multiplier, forever —
   // distinct from the temporary crit-jackpot's free stacked upgrades
@@ -285,6 +291,7 @@ export function increaseIncomeRate(floor: Floor): void {
 // rewards that replay an existing floor's large upgrade count; iterating once
 // per historical upgrade freezes the main thread on mature floors.
 export function increaseIncomeRateBy(floor: Floor, count: number): void {
+  count = Math.min(count, MAX_FLOOR_LEVEL - floor.upgradeCount);
   if (count <= 0) return;
   const rateMultiplier = floor.critMultiplierTier
     ? CRIT_TIER_CONFIG[floor.critMultiplierTier].multiplier

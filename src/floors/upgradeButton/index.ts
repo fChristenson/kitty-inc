@@ -33,7 +33,7 @@ import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
 import type { BigNumber } from "../../shared/bigNumber";
 import { gte } from "../../shared/bigNumber";
 import { getTotalIncome } from "../../totalIncome";
-import type { Floor } from "../../gameState";
+import { isFloorMaxed, type Floor } from "../../gameState";
 import {
   BTN_W,
   BTN_H,
@@ -142,29 +142,31 @@ function renderUpgradeButton(
   // a mirrored button (see shared.ts's mirrorUpgradeButton) shows its source's state
   const floor = resolveButtonFloor(own);
   const mirrored = floor !== own;
+  const now = Date.now();
+  // the one event (if any) currently governing this floor's button
+  // appearance — see shared.ts's own "event crit framework" comment
+  const activeEvent = getActiveEventButton(floor, now);
+  // at the level cap only an event's free clicks still play; any armed crit waits
+  const maxed = !activeEvent && isFloorMaxed(floor);
   const cost = mirrored ? floor.upgradeCost : ownCost;
-  const affordable = mirrored
-    ? gte(getTotalIncome(), floor.upgradeCost)
-    : ownAffordable;
+  const affordable =
+    !maxed &&
+    (mirrored ? gte(getTotalIncome(), floor.upgradeCost) : ownAffordable);
   const x = BTN_X;
   const y = getBtnY(isGroundFloor);
   const cx = x + BTN_W / 2;
   const cy = y + BTN_H / 2;
-  const now = Date.now();
   const scale = pressScale(floor, now);
   const holdAnim = mirrored
     ? peekHoldAnim(floor, now)
     : stepHoldAnim(floor, now, cx, cy);
-  const critTier = getCritTier(floor);
+  const critTier = maxed ? null : getCritTier(floor);
   const crit = critTier !== null;
   // an event covering this crit (see floors/eventProcs) hides its tier
   const cover = crit ? getClaimedEventCover(floor) : null;
   const critMultiplier = crit
     ? CRIT_TIER_CONFIG[critTier as CritTier].multiplier
     : null;
-  // the one event (if any) currently governing this floor's button
-  // appearance — see shared.ts's own "event crit framework" comment
-  const activeEvent = getActiveEventButton(floor, now);
   const slam = getSlamPose(own, "button", now);
   const box = { x, y, width: BTN_W, height: BTN_H };
 
@@ -200,7 +202,7 @@ function renderUpgradeButton(
         ? (cover?.color ?? CRIT_TIER_CONFIG[critTier as CritTier].color)
         : activeEvent
           ? activeEvent.color
-          : floor.critMultiplierTier
+          : floor.critMultiplierTier && !maxed
             ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
             : affordable
               ? COLOR.moneyGreen
@@ -217,7 +219,9 @@ function renderUpgradeButton(
       ? activeEvent.label(critMultiplier)
       : crit
         ? (cover?.label ?? CRIT_TIER_CONFIG[critTier as CritTier].label)
-        : formatPrice(cost);
+        : maxed
+          ? "MAX"
+          : formatPrice(cost);
     drawCachedCartoonText(ctx, label, cx, cy, 52);
     // a hover darkening; ctx.filter here cost every frame of a mouse hold
     if (dim) {

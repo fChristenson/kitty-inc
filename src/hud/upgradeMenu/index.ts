@@ -1,7 +1,7 @@
 import { getCritTier, getUpgradeCost } from "../../floors";
 import type { RenovationPlan } from "../../shared/buildingJob";
 import { isFloorLocked } from "../../shared/detachedJob";
-import type { Floor } from "../../gameState";
+import { isFloorMaxed, type Floor } from "../../gameState";
 import {
   triggerButtonPress,
   animateDialogClose,
@@ -172,6 +172,7 @@ function canRenovateFloors(floors: Floor[]): boolean {
   return floors.some(
     (floor) =>
       floor.unlocked &&
+      !isFloorMaxed(floor) &&
       (getCritTier(floor) !== null || !lt(money, getUpgradeCost(floor))),
   );
 }

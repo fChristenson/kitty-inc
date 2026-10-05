@@ -1145,6 +1145,7 @@ import {
   markAppClosed,
   initSessionGuard,
   isStorageIntact,
+  isFloorMaxed,
   type Floor,
 } from "./gameState";
 import { bindSaveLifecycle, saveCompanySnapshot } from "./shared/persistence";
@@ -3763,7 +3764,7 @@ async function main() {
         const armed = getCritTier(floor) !== null;
         const upgradeCost = getUpgradeCost(floor);
         // a broken $0 price would otherwise be bought forever
-        if (armed || !isZero(upgradeCost))
+        if (!isFloorMaxed(floor) && (armed || !isZero(upgradeCost)))
           consider({
             cost: armed ? ZERO : upgradeCost,
             label: "+1 upgrade",

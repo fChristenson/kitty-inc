@@ -1,7 +1,8 @@
-import type { Floor } from "../../gameState";
+import { isFloorMaxed, type Floor } from "../../gameState";
 import { COLOR } from "../../palette";
-import { drawCartoonText } from "../../utils";
+import { createTextGlossyGradient, drawCartoonText } from "../../utils";
 import {
+  SLAM_GOLD,
   drawSlamTarget,
   drawSlamText,
   getSlamPose,
@@ -82,7 +83,7 @@ export function drawUpgradeStarSpotlight(
       MARGIN_X,
       STAR_Y,
       FONT_SIZE,
-      COLOR.white,
+      isFloorMaxed(floor) ? SLAM_GOLD : COLOR.white,
     );
     ctx.restore();
   });
@@ -114,7 +115,15 @@ export function drawUpgradeStarStill(
   ctx.font = FONT;
   ctx.textAlign = "left";
   ctx.textBaseline = "top";
-  drawCartoonText(ctx, text, MARGIN_X, STAR_Y);
+  drawCartoonText(
+    ctx,
+    text,
+    MARGIN_X,
+    STAR_Y,
+    isFloorMaxed(floor)
+      ? createTextGlossyGradient(ctx, text, STAR_Y, COLOR.heavenlyGold)
+      : COLOR.white,
+  );
   if (whiteAlpha > 0) {
     ctx.globalAlpha = whiteAlpha;
     drawCartoonText(ctx, text, MARGIN_X, STAR_Y, COLOR.white, COLOR.white);

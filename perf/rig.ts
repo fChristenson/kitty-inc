@@ -5,9 +5,9 @@
 // ?run=idle,hold,events      runs those at once, then shows the report
 // ?floors=10                 unlocked floors in the fixture building
 // ?light=1                   no boosted workers, perma tiers or managers
-// ?maxed=1                   every cat and manager at the top perma tier (a
-//                            disco on every floor), high levels, overspeed bars
-// ?disco=0                   no discos: the managers stay unpromoted
+// ?maxed=1                   every cat and manager at the top perma tier,
+//                            high levels, overspeed bars
+// ?level=1000                every floor at that level
 // ?counts=0                  don't count canvas calls (lowest overhead timing)
 // ?warmup=2500               ms between boot and a scenario's own setup
 // ?reseed=1                  rebuild the fixture from a fresh game first
@@ -34,7 +34,7 @@ const options = {
   floors: Number(params.get("floors") ?? 10),
   heavy: params.get("light") !== "1",
   maxed: params.get("maxed") === "1",
-  disco: params.get("disco") !== "0",
+  level: params.has("level") ? Number(params.get("level")) : null,
   counts: params.get("counts") !== "0",
   warmup: Number(params.get("warmup") ?? 2500),
   crits: params.get("crits") ?? "on",

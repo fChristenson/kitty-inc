@@ -1238,6 +1238,7 @@ import {
 import {
   activateBoosted,
   BOOST_DURATION_MS,
+  isFloorMaxed,
   type Floor,
 } from "../../gameState";
 import {
@@ -1530,7 +1531,8 @@ export function performAutomatedUpgradeClick(
   floor: Floor,
   isGroundFloor: boolean,
 ): boolean {
-  if (!floor.unlocked || isFloorLocked(floor)) return false;
+  if (!floor.unlocked || isFloorLocked(floor) || isFloorMaxed(floor))
+    return false;
   if (isCritUpgrade(floor)) {
     return performAutomatedUpgradeAfterPayment(
       deps,
@@ -3204,6 +3206,7 @@ export function handleFloorClick(
     // isBoostCrit) additionally free-activates this floor's own workers —
     // neither ever changes the button's own pre-click appearance, both only
     // read the flag right here, at the moment the already-armed tier is spent
+    if (isFloorMaxed(floor)) return;
     if (isCritUpgrade(floor)) {
       const tier = getCritTier(floor)!;
       const procs = readCritProcs(floor);

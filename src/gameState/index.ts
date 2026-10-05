@@ -75,6 +75,13 @@ export interface WorkerSlot {
 }
 
 export const BOOST_DURATION_MS = 15_000; // boosted state auto-resets this long after being triggered
+
+export const MAX_FLOOR_LEVEL = CONFIG.incomePanel.maxFloorLevel;
+
+// a floor at the level cap: its button no longer upgrades it
+export function isFloorMaxed(floor: Floor): boolean {
+  return floor.upgradeCount >= MAX_FLOOR_LEVEL;
+}
 // floors/coinFloat.ts blinks a boosted worker's floating coins once this little
 // time is left, so letting a boost run out down to the wire visibly reads as
 // "about to lose this" instead of it just quietly expiring

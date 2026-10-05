@@ -19,6 +19,21 @@ import { shakeScreen } from "../../screenShake";
 
 export const GLOBAL_SLAM = {};
 
+// a fill colour for drawSlamText: the slam's own glossy gold, at rest too
+export const SLAM_GOLD = "slam-gold";
+// the glyphs a resting SLAM_GOLD text measures its gloss over, so every letter matches
+const SLAM_GOLD_REF = "Lvl0123456789";
+function resolveFill(
+  c: CanvasRenderingContext2D,
+  fillColor: string,
+  text: string,
+  y: number,
+): string | CanvasGradient {
+  return fillColor === SLAM_GOLD
+    ? createTextGlossyGradient(c, text, y, COLOR.heavenlyGold)
+    : fillColor;
+}
+
 export const SLAM_MS = 800;
 const CROUCH_END = 0.12;
 const APEX_AT = 0.3;
@@ -285,7 +300,8 @@ function drawRestText(
   const stamped =
     m.b === 0 && m.c === 0 && m.a > 0 && m.a === m.d && isFontReady(font);
   if (!stamped && !tabular) {
-    drawCartoonText(ctx, text, x, y, fillColor, strokeColor, strokeWidth);
+    const fill = resolveFill(ctx, fillColor, text, y);
+    drawCartoonText(ctx, text, x, y, fill, strokeColor, strokeWidth);
     return;
   }
   const digitCell = tabular ? maxDigitWidth(ctx, font) : 0;
@@ -345,7 +361,7 @@ function drawRestText(
   ctx.miterLimit = 2;
   ctx.lineWidth = strokeWidth;
   ctx.strokeStyle = strokeColor;
-  ctx.fillStyle = fillColor;
+  ctx.fillStyle = resolveFill(ctx, fillColor, text, y);
   for (let pass = 0; pass < 2; pass++) {
     let at = left;
     for (let i = 0; i < text.length; i++) {
@@ -431,10 +447,10 @@ function getRestGlyph(
   c.miterLimit = 2;
   c.lineWidth = set.strokeWidth;
   c.strokeStyle = set.strokeColor;
-  c.fillStyle = set.fillColor;
   c.setTransform(scale, 0, 0, scale, left, up);
   c.strokeText(char, 0, 0);
   c.setTransform(scale, 0, 0, scale, cellW + left, up);
+  c.fillStyle = resolveFill(c, set.fillColor, SLAM_GOLD_REF, 0);
   c.fillText(char, 0, 0);
   glyph = { canvas, cellW, cellH, left, up };
   set.glyphs.set(char, glyph);
@@ -470,7 +486,10 @@ export function drawSlamText(
   if (ready && ((pose && pose.landedMs < 0) || moving === false))
     warmSlamGlyphs(ctx, text, fillColor, strokeColor, strokeWidth);
   if (!ready || (!landed && !moving)) {
-    const fill = whiteMix > 0 ? shadeColor(fillColor, whiteMix) : fillColor;
+    const fill =
+      whiteMix > 0 && fillColor !== SLAM_GOLD
+        ? shadeColor(fillColor, whiteMix)
+        : fillColor;
     drawRestText(ctx, text, x, y, fill, strokeColor, strokeWidth, tabular);
     return;
   }
@@ -706,11 +725,12 @@ function getSlamGlyph(
   c.strokeStyle = set.strokeColor;
   c.strokeText(char, w * OUTLINE_CELL + left, up);
   // a pure yellow gold, spanning the whole text's glyphs
-  c.fillStyle = createTextGlossyGradient(c, set.text, up, COLOR.heavenlyGold);
+  const gold = createTextGlossyGradient(c, set.text, up, COLOR.heavenlyGold);
+  c.fillStyle = gold;
   c.fillText(char, w * GOLD_CELL + left, up);
   c.fillStyle = COLOR.white;
   c.fillText(char, w * WHITE_CELL + left, up);
-  c.fillStyle = set.fillColor;
+  c.fillStyle = set.fillColor === SLAM_GOLD ? gold : set.fillColor;
   c.fillText(char, w * FILL_CELL + left, up);
   glyph = { canvas, cellW, cellH, left, up, w, h: cellH / GLYPH_SCALE };
   set.glyphs.set(char, glyph);

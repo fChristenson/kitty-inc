@@ -22,7 +22,11 @@ export function quoteUpgrades(
       floor,
       unlocked: floor.unlocked,
     }))
-    .filter((entry) => entry.unlocked);
+    .filter(
+      (entry) =>
+        entry.unlocked &&
+        entry.floor.upgradeCount < CONFIG.incomePanel.maxFloorLevel,
+    );
   const purchases = floors.map(() => 0);
   if (entries.length === 0 || isZero(money))
     return { purchases, cost: ZERO, count: 0 };
@@ -38,7 +42,7 @@ export function quoteUpgrades(
   const maxCount = (curve: (typeof curves)[number]): number =>
     Math.min(
       CONFIG.renovation.maxUpgradesPerFloor,
-      Number.MAX_SAFE_INTEGER - curve.floor.upgradeCount,
+      CONFIG.incomePanel.maxFloorLevel - curve.floor.upgradeCount,
     );
   function atCutoff(cutoff: number, record = false): BigNumber {
     let total = ZERO;

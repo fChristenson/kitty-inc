@@ -7,7 +7,7 @@ import { spawnCoinBurst } from "../coins";
 import { type BigNumber, gte } from "../../shared/bigNumber";
 import { baseIncomeRatePerSecond } from "../../shared/income";
 import { getTotalIncome } from "../../totalIncome";
-import type { Floor } from "../../gameState";
+import { isFloorMaxed, type Floor } from "../../gameState";
 import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
 import { isCritUpgrade } from "./crit";
 import { getPriceMatchCost } from "../../shared/critTypes";
@@ -397,8 +397,8 @@ export function isUpgradeButtonEnabled(pressed: Floor): boolean {
   const now = Date.now();
   return (
     isFreeClickEventActive(floor, now) ||
-    isCritUpgrade(floor) ||
-    gte(getTotalIncome(), getUpgradeCost(floor))
+    (!isFloorMaxed(floor) &&
+      (isCritUpgrade(floor) || gte(getTotalIncome(), getUpgradeCost(floor))))
   );
 }
 

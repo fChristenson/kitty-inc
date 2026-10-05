@@ -2,7 +2,7 @@
 // upgrade levels and crit tiers on the income bars in view, perma tiers on
 // the workers in view. The cover draws the bars and workers it was handed,
 // jolting and flashing each as it's rewarded with a tally over it
-import type { Floor } from "../../gameState";
+import { isFloorMaxed, type Floor } from "../../gameState";
 import { COLOR } from "../../palette";
 import {
   CRIT_TIER_CONFIG,
@@ -77,6 +77,7 @@ export function findRewardBars(
       const isGroundFloor = context.floors.indexOf(entry.floor) === 0;
       if (
         !entry.floor.unlocked ||
+        isFloorMaxed(entry.floor) ||
         isFloorLocked(entry.floor) ||
         !isVisibleOnFloor(entry, getIncomeBarCenter(isGroundFloor).y)
       )
