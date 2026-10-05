@@ -8343,6 +8343,56 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 65
+  // explosion, crit tiers: src/floors/incomingEvent: bombs swell in out of the distance onto the bars in chained cluster blasts, then a giant one onto the clicked bar
+  incomingEvent: {
+    chance: 0.01,
+    flyMs: 800, // each bomb's flight in out of the distance
+    gapMs: 170, // between landings
+    giantMs: 1300, // the giant bomb's flight
+    holdMs: 600,
+    mergeMs: 0,
+  },
+  // beam, levels: src/floors/stringArtEvent: strings of light shoot pin to rail like string art, bowing four curves between two bars, then fold flat onto them
+  stringArtEvent: {
+    chance: 0.01,
+    pinMs: 250, // the pins and rails popping up
+    weaveMs: 1150, // from the first string to the last
+    shootMs: 110, // each string shooting across
+    blazeMs: 250, // the finished web blazing
+    foldMs: 260, // the strings folding down onto their bars
+    levelShare: 0.012, // levels per string
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, a free floor: src/floors/petanqueEvent: boules lobbed round a jack under the lock, the last one knocking the closest into the lock
+  petanqueEvent: {
+    chance: 0.01,
+    lobMs: 420, // each lob up to the lock
+    gapMs: 260, // between throws
+    rollMs: 300, // a boule's bounces on to a stop
+    knockMs: 260, // the knocked boule's hop into the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, worker perma tiers: src/floors/centipedeEvent: the button shoots an arcade centipede apart segment by segment, each dropping onto a worker
+  centipedeEvent: {
+    chance: 0.01,
+    crawlMs: 2000, // the centipede's crawl down its rows
+    dropMs: 320, // each shot segment's drop onto its worker
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/mandelbrotEvent: a grid of coins iterated z² + c, escapees peeling off into the total until the Mandelbrot set stands
+  mandelbrotEvent: {
+    chance: 0.01,
+    fillMs: 450, // the grid of coins fanning up out of the button
+    iterMs: 1150, // the escapes, step by step
+    flyMs: 500, // each escapee's flight into the total
+    surgeMs: 350, // the set surging into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 64
   // spray, levels: src/floors/podiumEvent: a bottle wisp is shaken up, pops its cork and whips a spray up the bars like champagne
   podiumEvent: {

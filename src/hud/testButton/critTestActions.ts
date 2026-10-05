@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-podium-event" class="game__button">Podium</button>
-          <button id="test-robovac-event" class="game__button">Robovac</button>
-          <button id="test-figure-eight-event" class="game__button">Figure Eight</button>
-          <button id="test-bonanza-event" class="game__button">Bonanza</button>
-          <button id="test-pi-clacks-event" class="game__button">Pi Clacks</button>
+          <button id="test-incoming-event" class="game__button">Incoming</button>
+          <button id="test-string-art-event" class="game__button">String Art</button>
+          <button id="test-petanque-event" class="game__button">Pétanque</button>
+          <button id="test-centipede-event" class="game__button">Centipede</button>
+          <button id="test-mandelbrot-event" class="game__button">Mandelbrot</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-podium-event" class="game__button">Podium</button>
+          <button id="test-robovac-event" class="game__button">Robovac</button>
+          <button id="test-figure-eight-event" class="game__button">Figure Eight</button>
+          <button id="test-bonanza-event" class="game__button">Bonanza</button>
+          <button id="test-pi-clacks-event" class="game__button">Pi Clacks</button>
           <button id="test-galton-board-event" class="game__button">Galton Board</button>
           <button id="test-poohsticks-event" class="game__button">Poohsticks</button>
           <button id="test-fire-for-effect-event" class="game__button">Fire for Effect</button>

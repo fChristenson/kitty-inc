@@ -657,6 +657,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       ctx.restore();
     }
     frozenFrame.lastDim = dim;
+    // under the event overlay: an event always plays over the crit flash
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.scale(scale, scale);
+    drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
+    ctx.restore();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.translate(shake.x, shake.y);
@@ -674,11 +680,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       drawHud(ctx, SLOT_W, getTotalIncome());
       ctx.restore();
     }
-    ctx.save();
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.scale(scale, scale);
-    drawCritFlash(ctx, SLOT_W / 2, contentViewportH() / 2, SLOT_W, Date.now());
-    ctx.restore();
   }
 
   // floors intersecting the viewport, with their world-space tops and the
