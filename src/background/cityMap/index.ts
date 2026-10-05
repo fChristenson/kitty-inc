@@ -59,6 +59,7 @@ import {
   drawCritFlash,
   isCritFlashActive,
 } from "../../screenShake";
+import { isDialogOpen, isDialogSliding } from "../../shared/dialogVisibility";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
 // zoomed out to fill the view, with a cat marker per building standing in for the
@@ -774,7 +775,8 @@ export function createCityMapView(
   let lastTickRedraw = 0;
   function tick(): void {
     animationFrameId = requestAnimationFrame(tick);
-    if (!canvasVisible) return;
+    // frozen behind any dialog, like the building view: the dialog gets the main thread
+    if (!canvasVisible || isDialogOpen() || isDialogSliding()) return;
     const now = performance.now();
     const interval =
       hasActiveMarkerJump ||

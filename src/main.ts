@@ -1344,7 +1344,6 @@ import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
 import { getBackgroundUrls } from "./loadAssets";
-import { isCritFlashActive } from "./screenShake";
 import { warmTierFlashes } from "./shared/critFlash";
 import { runWhenIdle } from "./shared/idle";
 import {
@@ -1355,10 +1354,6 @@ import {
 } from "./shared/startupGate";
 import { isDialogOpen, isDialogSliding } from "./shared/dialogVisibility";
 import { exposePerfBridge } from "./shared/perfBridge";
-
-// behind a dialog's dimmed backdrop the building redraws at ~30fps, leaving
-// the frame budget to the dialog's own slide animation and content
-const BEHIND_DIALOG_REDRAW_MS = 33;
 
 // matches style.css's worker-menu-slide-out-* keyframes (0.352s) — the company
 // select menu's own close animation duration
@@ -4156,19 +4151,11 @@ async function main() {
   // actually scrolled into view, so this stays cheap no matter how many buildings exist.
   // Skipped while the map view is open: the building canvas is hidden (0x0) then, and
   // its own redraw() math (division by its own now-zero CSS size) would throw
-  let lastBuildingRedrawAt = 0;
+  // Frozen behind any dialog (open or sliding): the dialog gets the main thread
   startIncomeTicker(() => {
     // the frame drawn above stays under the startup overlay until its intro ends
     if (mapOpen || !isStartupSettled()) return;
-    const now = performance.now();
-    if (isDialogSliding() && !isCritFlashActive(Date.now())) return;
-    if (
-      isDialogOpen() &&
-      !isCritFlashActive(Date.now()) &&
-      now - lastBuildingRedrawAt < BEHIND_DIALOG_REDRAW_MS
-    )
-      return;
-    lastBuildingRedrawAt = now;
+    if (isDialogOpen() || isDialogSliding()) return;
     gameCanvas.redraw();
   });
   startTotalIncomeTicker(buildings, getGlobalIncomeBoostMultiplier);
