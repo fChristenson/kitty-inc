@@ -56,7 +56,10 @@ export const forceDeCasteljauEvent = registerWispEvent(
     const h = area.bottom - area.top;
     const control: Point[] = [
       getButtonCenter(context.isGroundFloor),
-      ...MIDDLE.map(([u, v]) => ({ x: area.left + w * u, y: area.top + h * v })),
+      ...MIDDLE.map(([u, v]) => ({
+        x: area.left + w * u,
+        y: area.top + h * v,
+      })),
       fallback,
     ];
     // the scaffold at t: every level's points, the last one on the curve
@@ -145,26 +148,58 @@ export const forceDeCasteljauEvent = registerWispEvent(
           const drawn = Math.floor(t * CURVE_STEPS);
           const curveFade = 1 - clamp01((ms - pourAt) / travelMs);
           for (let i = 1; i <= drawn; i++)
-            drawBeam(ctx, line[i - 1], line[i], CURVE_W, CURVE_ALPHA * curveFade);
+            drawBeam(
+              ctx,
+              line[i - 1],
+              line[i],
+              CURVE_W,
+              CURVE_ALPHA * curveFade,
+            );
           if (fade > 0) {
             for (let i = 1; i < control.length; i++)
-              drawBeam(ctx, control[i - 1], control[i], WIDTHS[0], ALPHAS[0] * grow * fade);
+              drawBeam(
+                ctx,
+                control[i - 1],
+                control[i],
+                WIDTHS[0],
+                ALPHAS[0] * grow * fade,
+              );
             if (ms >= sweepAt) {
               build(t);
               for (let l = 0; l < 2; l++) {
                 const pts = levels[l];
                 for (let i = 1; i < pts.length; i++)
-                  drawBeam(ctx, pts[i - 1], pts[i], WIDTHS[l + 1], ALPHAS[l + 1] * fade);
+                  drawBeam(
+                    ctx,
+                    pts[i - 1],
+                    pts[i],
+                    WIDTHS[l + 1],
+                    ALPHAS[l + 1] * fade,
+                  );
               }
             }
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
             for (const p of control)
-              stampGlimmer(ctx, p.x, p.y, POINT * 1.4 * grow * fade, ms * 0.004, COLOR.white);
+              stampGlimmer(
+                ctx,
+                p.x,
+                p.y,
+                POINT * 1.4 * grow * fade,
+                ms * 0.004,
+                COLOR.white,
+              );
             if (ms >= sweepAt)
               for (let l = 0; l < 2; l++)
                 for (const p of levels[l])
-                  stampGlimmer(ctx, p.x, p.y, POINT * fade, ms * 0.004, COLOR.heavenlyGold);
+                  stampGlimmer(
+                    ctx,
+                    p.x,
+                    p.y,
+                    POINT * fade,
+                    ms * 0.004,
+                    COLOR.heavenlyGold,
+                  );
             ctx.restore();
           }
           drawWispBetween(ctx, tipAt, ms, now, HEAD, 0.7, sweepAt, doneAt);

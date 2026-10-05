@@ -102,8 +102,18 @@ export const forceDustBunniesEvent = registerWispEvent(
       const lo = area.left + segment * k - 20;
       const hi = area.left + segment * (k + 1) + 20;
       strokes.push(
-        { from: { x: lo, y: mid }, to: { x: b.x - 24, y: mid }, heading: 0, length: SHORT },
-        { from: { x: hi, y: mid }, to: { x: b.x + 24, y: mid }, heading: Math.PI, length: SHORT },
+        {
+          from: { x: lo, y: mid },
+          to: { x: b.x - 24, y: mid },
+          heading: 0,
+          length: SHORT,
+        },
+        {
+          from: { x: hi, y: mid },
+          to: { x: b.x + 24, y: mid },
+          heading: Math.PI,
+          length: SHORT,
+        },
       );
     });
     const sweep = planSweep(strokes, blowMs, dragMs, liftMs);
@@ -118,7 +128,9 @@ export const forceDustBunniesEvent = registerWispEvent(
           best = k;
       return best;
     });
-    const heaps = bunnies.map((b) => heapSpots({ x: b.x, y: b.y + HEAP_H / 2 }, BITS, HEAP_W, HEAP_H));
+    const heaps = bunnies.map((b) =>
+      heapSpots({ x: b.x, y: b.y + HEAP_H / 2 }, BITS, HEAP_W, HEAP_H),
+    );
     const hopsAt = workers.map((_, k) => sweptAt + gatherMs + k * hopMs * 0.4);
     const landsAt = hopsAt.map((ms) => ms + hopMs);
     const endAt = landsAt[n - 1];
@@ -212,7 +224,13 @@ export const forceDustBunniesEvent = registerWispEvent(
             } else {
               const from = heaps[k][i];
               const to = workers[k].at;
-              bezier(from, bends[k], to, easeIn(clamp01((ms - hopsAt[k]) / hopMs)), bit);
+              bezier(
+                from,
+                bends[k],
+                to,
+                easeIn(clamp01((ms - hopsAt[k]) / hopMs)),
+                bit,
+              );
             }
             stampGlimmer(
               ctx,

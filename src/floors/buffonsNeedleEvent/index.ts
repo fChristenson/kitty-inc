@@ -72,8 +72,7 @@ export const forceBuffonsNeedleEvent = registerWispEvent(
       const crossed =
         bars.find((b) => {
           if (Math.abs(at.y - b.center.y) > half) return false;
-          const cx =
-            at.x + (b.center.y - at.y) / Math.tan(angle || 1e-6);
+          const cx = at.x + (b.center.y - at.y) / Math.tan(angle || 1e-6);
           return cx >= b.box.x && cx <= b.box.x + b.box.width;
         }) ?? null;
       const cross = crossed
@@ -93,16 +92,15 @@ export const forceBuffonsNeedleEvent = registerWispEvent(
       needles,
       (n) => n.lands,
       (n, k, now) => {
-        if (n.bar) cover!.levels(n.bar, levelsFor(n.bar.floor, levelShare, 1), n.at);
+        if (n.bar)
+          cover!.levels(n.bar, levelsFor(n.bar.floor, levelShare, 1), n.at);
         if (!cover!.isLive()) return;
         if (now - soundAt >= SOUND_GAP_MS) {
           soundAt = now;
           if (n.bar) playExplosion();
           else playBloop();
         }
-        shakeScreen(
-          n.bar ? lerp(CROSS_SHAKE, k / (NEEDLES - 1)) : LAND_SHAKE,
-        );
+        shakeScreen(n.bar ? lerp(CROSS_SHAKE, k / (NEEDLES - 1)) : LAND_SHAKE);
       },
     );
     const finale = createBeats(
@@ -147,9 +145,18 @@ export const forceBuffonsNeedleEvent = registerWispEvent(
               since < 0
                 ? 0.8
                 : n.bar
-                  ? lerp([0.5, 0.95], ms >= endAt ? flash : Math.max(0, 1 - since / 300))
+                  ? lerp(
+                      [0.5, 0.95],
+                      ms >= endAt ? flash : Math.max(0, 1 - since / 300),
+                    )
                   : 0.25;
-            drawBeam(ctx, a, b, NEEDLE_W * (n.bar && since >= 0 ? 1.4 : 1), alpha);
+            drawBeam(
+              ctx,
+              a,
+              b,
+              NEEDLE_W * (n.bar && since >= 0 ? 1.4 : 1),
+              alpha,
+            );
             if (n.bar && since >= 0 && since < 400)
               drawBeamFlare(ctx, n.cross, FLARE, 1 - since / 400, now);
             if (n.bar && ms >= endAt && ms < endAt + 400)

@@ -175,7 +175,14 @@ export const forceMagneticPendulumEvent = registerWispEvent(
                 COLOR.heavenlyGold,
               );
             }
-          stampGlimmer(ctx, pivot.x, pivot.y, 18 * grow * fade, ms * 0.004, COLOR.white);
+          stampGlimmer(
+            ctx,
+            pivot.x,
+            pivot.y,
+            18 * grow * fade,
+            ms * 0.004,
+            COLOR.white,
+          );
           ctx.restore();
           const bob = bobAt(ms);
           drawBeam(ctx, pivot, bob, THREAD_W, THREAD_ALPHA * fade);
