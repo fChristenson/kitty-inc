@@ -8343,6 +8343,53 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 58
+  // money, cash: src/floors/billowsEvent: two shearing currents of cash roll up into curling billows that peel off into the total
+  billowsEvent: {
+    chance: 0.01,
+    floodMs: 400, // the currents flooding in
+    rollMs: 1100, // the billows winding up
+    peelMs: 450, // the billows peeling off one after another
+    riseMs: 320, // each coin's rise into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // beam, a crit tier: src/floors/moireEvent: two fans of beams swing through each other in moiré, then lock onto the clicked bar
+  moireEvent: {
+    chance: 0.01,
+    growMs: 220, // the fans blazing up
+    sweepMs: 1500, // swinging and closing in
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // race, a free floor: src/floors/polePositionEvent: two racers hairpin round the lock and dive onto it
+  polePositionEvent: {
+    chance: 0.01,
+    raceMs: 1150, // the leader's race
+    gapMs: 120, // the chaser behind it
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // drill, levels: src/floors/countersinkEvent: a drill grinds into the clicked floor's Lvl label, every shove ticking it up
+  countersinkEvent: {
+    chance: 0.01,
+    approachMs: 280, // the drill screaming down
+    stallMs: 750, // grinding in place on the label
+    boreMs: 1500, // boring through once it gives
+    pushShare: 0.01, // levels per shove
+    levelShare: 0.05, // levels on the punch-through
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, free hires: src/floors/busyBeaverEvent: a Turing machine head runs the 4-state busy beaver, then its 1s fly onto the empty spots
+  busyBeaverEvent: {
+    chance: 0.01,
+    bootMs: 200, // the tape and head appearing
+    stepMs: [22, 8] as [number, number], // each of the 107 steps, quickening
+    flyMs: 320, // each mark's flight onto its spot
+    holdMs: 400,
+    mergeMs: 0,
+  },
   // batch 57
   // explosion, a free floor: src/floors/seedPodsEvent: bomb pods burst in a chain up to the lock, flinging seed bombs
   seedPodsEvent: {
