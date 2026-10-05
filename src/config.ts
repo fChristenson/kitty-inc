@@ -8343,6 +8343,56 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 70
+  // galaxy, worker perma tiers: src/floors/tidalTailsEvent: two galaxies swing past each other, tearing off tidal tails of glitter that rain onto the workers
+  tidalTailsEvent: {
+    chance: 0.01,
+    growMs: 250, // the galaxies swirling up
+    passMs: 1300, // their sweep past each other
+    gapMs: 90, // between workers' showers
+    dropMs: 420, // each star's fall onto its worker
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // galaxy, levels: src/floors/hypervelocityEvent: stars sink onto a galaxy's binary core and are slung out onto the bars
+  hypervelocityEvent: {
+    chance: 0.01,
+    growMs: 250, // the galaxy swirling up
+    sinkMs: 500, // each runner sinking onto the binary
+    gapMs: 230, // between slings, quickening
+    flyMs: 300, // each flung star's flight onto its bar
+    levelShare: 0.012, // levels per hit
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // galaxy, a crit tier: src/floors/quasarEvent: a galaxy drains into its core, which fires twin jets, one onto the clicked bar
+  quasarEvent: {
+    chance: 0.01,
+    growMs: 250, // the galaxy swirling up
+    feedMs: 1200, // its stars spiralling into the core
+    jetMs: 150, // the jets reaching out
+    blazeMs: 350, // the jets blazing on
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, free hires: src/floors/volleyballEvent: player wisps bump, set and spike a ball onto the empty spots over a net of light
+  volleyballEvent: {
+    chance: 0.01,
+    growMs: 250, // the net and players popping up
+    legMs: 240, // the serve or bounce over, and the bump (the set is a bit quicker)
+    spikeMs: 150, // the spike onto the spot
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/smartRocketsEvent: swarms of rocket wisps evolve by a genetic algorithm to fly round a beam into the total
+  smartRocketsEvent: {
+    chance: 0.01,
+    growMs: 250, // the beam slamming across
+    flyMs: 480, // each swarm's flight (later ones quicker)
+    gapMs: 80, // between swarms
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 69
   // drill, levels: src/floors/pilotHoleEvent: three ever bigger drills bore the same spot on the clicked bar one after another
   pilotHoleEvent: {

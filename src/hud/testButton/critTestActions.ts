@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-pilot-hole-event" class="game__button">Pilot Hole</button>
-          <button id="test-pit-stop-event" class="game__button">Pit Stop</button>
-          <button id="test-black-hole-merger-event" class="game__button">Black Hole Merger</button>
-          <button id="test-accretion-event" class="game__button">Accretion</button>
-          <button id="test-maxwells-demon-event" class="game__button">Maxwell's Demon</button>
+          <button id="test-tidal-tails-event" class="game__button">Tidal Tails</button>
+          <button id="test-hypervelocity-event" class="game__button">Hypervelocity</button>
+          <button id="test-quasar-event" class="game__button">Quasar</button>
+          <button id="test-volleyball-event" class="game__button">Volleyball</button>
+          <button id="test-smart-rockets-event" class="game__button">Smart Rockets</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-pilot-hole-event" class="game__button">Pilot Hole</button>
+          <button id="test-pit-stop-event" class="game__button">Pit Stop</button>
+          <button id="test-black-hole-merger-event" class="game__button">Black Hole Merger</button>
+          <button id="test-accretion-event" class="game__button">Accretion</button>
+          <button id="test-maxwells-demon-event" class="game__button">Maxwell's Demon</button>
           <button id="test-fission-event" class="game__button">Fission</button>
           <button id="test-hydra-event" class="game__button">Hydra</button>
           <button id="test-optical-tweezers-event" class="game__button">Optical Tweezers</button>
