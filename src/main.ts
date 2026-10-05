@@ -1344,7 +1344,8 @@ import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
 import { getBackgroundUrls } from "./loadAssets";
-import { isCritFlashActive, warmCritFlashBlooms } from "./screenShake";
+import { isCritFlashActive } from "./screenShake";
+import { warmTierFlashes } from "./shared/critFlash";
 import { runWhenIdle } from "./shared/idle";
 import {
   afterStartup,
@@ -1352,7 +1353,7 @@ import {
   markStartupSettled,
   whenDocumentReady,
 } from "./shared/startupGate";
-import { isDialogOpen } from "./shared/dialogVisibility";
+import { isDialogOpen, isDialogSliding } from "./shared/dialogVisibility";
 import { exposePerfBridge } from "./shared/perfBridge";
 
 // behind a dialog's dimmed backdrop the building redraws at ~30fps, leaving
@@ -1378,11 +1379,7 @@ async function main() {
   initSessionGuard();
   suppressNativeContextMenu();
   afterStartup(startBackgroundMusic);
-  runWhenIdle(() =>
-    warmCritFlashBlooms(
-      CRIT_TIER_ORDER.map((tier) => CRIT_TIER_CONFIG[tier].label),
-    ),
-  );
+  warmTierFlashes();
   // creating the AudioContext alone blocked the main thread for tens of ms
   runWhenIdle(preloadSounds, 1500);
 
@@ -4164,6 +4161,7 @@ async function main() {
     // the frame drawn above stays under the startup overlay until its intro ends
     if (mapOpen || !isStartupSettled()) return;
     const now = performance.now();
+    if (isDialogSliding() && !isCritFlashActive(Date.now())) return;
     if (
       isDialogOpen() &&
       !isCritFlashActive(Date.now()) &&

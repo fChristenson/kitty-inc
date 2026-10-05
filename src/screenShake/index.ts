@@ -405,9 +405,9 @@ const bloomLayerCache = new Map<
 >();
 const BLOOM_FONT = '900 100px "Fredoka", system-ui, sans-serif';
 const BLOOM_BLUR = 45;
-// generous padding so the blur's own soft falloff never gets clipped by the
-// cache canvas's own edge
-const BLOOM_PADDING = BLOOM_BLUR * 3;
+// past 4 sigma (shadowBlur is 2 sigma) the glow is invisible; any wider only
+// grows the flash bitmap
+const BLOOM_PADDING = BLOOM_BLUR * 2;
 // the glow is soft anyway, so it's blurred at a third of the size and
 // stretched back up: a full-size shadowBlur stalled held clicks on phones
 const BLOOM_RES = 1 / 3;
@@ -448,13 +448,6 @@ let scratchCtx: CanvasRenderingContext2D | null = null;
 function getScratchCtx(): CanvasRenderingContext2D {
   scratchCtx ??= document.createElement("canvas").getContext("2d")!;
   return scratchCtx;
-}
-
-// builds the blurred bloom for labels that flash often (the crit tiers) ahead
-// of time, so their first celebration doesn't pay for the blur mid-animation
-export function warmCritFlashBlooms(labels: string[]): void {
-  const ctx = getScratchCtx();
-  for (const label of labels) getBloomLayer(label, measureLabel(ctx, label));
 }
 
 // ~900 distinct labels exist; unbounded per-label canvases grew memory for the
@@ -500,12 +493,34 @@ interface FlashBitmap {
   y: number;
   width: number;
   height: number;
+  label: string;
 }
 const flashBitmapCache = new Map<string, FlashBitmap>();
 // checked every frame until the font loads, then never again
 let fontReady = false;
 const FLASH_BITMAP_LIMIT = 3;
 const MAX_FLASH_BITMAP_PX = 2048;
+// the tier flashes land most often: built ahead and never evicted, so a crit
+// never rebuilds its (up to 2048px) bitmap on the frame it shakes
+const pinnedFlashLabels = new Set<string>();
+
+function storeFlashBitmap(key: string, entry: FlashBitmap): void {
+  const pinned = pinnedFlashLabels.has(entry.label);
+  let unpinned = 0;
+  for (const [k, e] of flashBitmapCache) {
+    // a pinned label keeps only its newest bitmap (the size moves on resize)
+    if (pinned && e.label === entry.label) flashBitmapCache.delete(k);
+    else if (!pinnedFlashLabels.has(e.label)) unpinned++;
+  }
+  flashBitmapCache.set(key, entry);
+  if (pinned) return;
+  for (const [k, e] of flashBitmapCache) {
+    if (unpinned < FLASH_BITMAP_LIMIT) return;
+    if (pinnedFlashLabels.has(e.label)) continue;
+    flashBitmapCache.delete(k);
+    unpinned--;
+  }
+}
 
 function getFlashBitmap(
   label: string,
@@ -582,10 +597,8 @@ function getFlashBitmap(
     fontSize: FLASH_FONT_SIZE,
     strokeWidth,
   });
-  const entry = { canvas, x: -halfW, y: top, width, height };
-  flashBitmapCache.set(key, entry);
-  if (flashBitmapCache.size > FLASH_BITMAP_LIMIT)
-    flashBitmapCache.delete(flashBitmapCache.keys().next().value as string);
+  const entry = { canvas, x: -halfW, y: top, width, height, label };
+  storeFlashBitmap(key, entry);
   return entry;
 }
 
@@ -628,6 +641,27 @@ function warmFlashBitmap(
 ): void {
   if (label && lastViewportWidth > 0)
     getFlashBitmap(label, color, strokeWidth, lastViewportWidth);
+}
+
+// builds these flashes' bitmaps at idle, once the canvas has a size and the
+// font has loaded, and keeps them for the session
+export function warmCritFlashes(
+  flashes: { label: string; color: string; strokeWidth: number }[],
+): void {
+  for (const { label } of flashes) pinnedFlashLabels.add(label);
+  const warm = (): void => {
+    if (
+      lastViewportWidth === 0 ||
+      !document.fonts.check(FLASH_FONT) ||
+      isCritFlashActive(Date.now())
+    ) {
+      runWhenIdle(warm, 1000);
+      return;
+    }
+    for (const { label, color, strokeWidth } of flashes)
+      warmFlashBitmap(label, color, strokeWidth);
+  };
+  runWhenIdle(warm, 1000);
 }
 
 export function drawCritFlash(

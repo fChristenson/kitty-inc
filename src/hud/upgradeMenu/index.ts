@@ -403,7 +403,9 @@ export function wireUpgradeMenu(
       if (!renovating) {
         renovationPlan = previewRenovation(floors, getTotalIncome());
         const price = renovateButton.querySelector(".worker-menu__price");
-        if (price) price.textContent = `x${renovationPlan.count}`;
+        const text = `x${renovationPlan.count}`;
+        // an unchanged write still re-lays out and repaints the panel
+        if (price && price.textContent !== text) price.textContent = text;
       }
       renovateButton.disabled =
         renovating ||
@@ -437,7 +439,8 @@ export function wireUpgradeMenu(
     cancelDialogClose(panel);
     render();
     menu.hidden = false;
-    updateAffordability();
+    // render's markup already holds fresh prices; only a running renovation differs
+    if (renovating) updateAffordability();
     ghostClickGuard.markOpened();
     playSwoosh();
     affordabilityPolling.start();

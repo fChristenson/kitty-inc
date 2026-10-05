@@ -318,7 +318,14 @@ function drawRestText(
         ? x - fullWidth
         : x;
   if (stamped) {
-    const set = getRestGlyphSet(ctx, fillColor, strokeColor, strokeWidth, m.a);
+    const set = getRestGlyphSet(
+      ctx,
+      font,
+      fillColor,
+      strokeColor,
+      strokeWidth,
+      m.a,
+    );
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     for (let pass = 0; pass < 2; pass++) {
@@ -390,28 +397,53 @@ interface RestGlyph {
 }
 interface RestGlyphSet {
   glyphs: Map<string, RestGlyph>;
+  baseline: CanvasTextBaseline;
   fillColor: string;
   strokeColor: string;
   strokeWidth: number;
   scale: number;
 }
-const restGlyphSets = new Map<string, RestGlyphSet>();
+// by font, then a short list: every resting text looks its set up each frame
+const restGlyphSets = new Map<string, RestGlyphSet[]>();
 const MAX_REST_GLYPH_SETS = 8;
+let restGlyphSetCount = 0;
 
 function getRestGlyphSet(
   ctx: CanvasRenderingContext2D,
+  font: string,
   fillColor: string,
   strokeColor: string,
   strokeWidth: number,
   scale: number,
 ): RestGlyphSet {
-  const key = `${ctx.font}|${ctx.textBaseline}|${fillColor}|${strokeColor}|${strokeWidth}|${scale}`;
-  let set = restGlyphSets.get(key);
-  if (!set) {
-    if (restGlyphSets.size >= MAX_REST_GLYPH_SETS) restGlyphSets.clear();
-    set = { glyphs: new Map(), fillColor, strokeColor, strokeWidth, scale };
-    restGlyphSets.set(key, set);
+  const baseline = ctx.textBaseline;
+  let sets = restGlyphSets.get(font);
+  if (sets)
+    for (const set of sets)
+      if (
+        set.scale === scale &&
+        set.fillColor === fillColor &&
+        set.strokeWidth === strokeWidth &&
+        set.strokeColor === strokeColor &&
+        set.baseline === baseline
+      )
+        return set;
+  if (restGlyphSetCount >= MAX_REST_GLYPH_SETS) {
+    restGlyphSets.clear();
+    restGlyphSetCount = 0;
+    sets = undefined;
   }
+  const set: RestGlyphSet = {
+    glyphs: new Map(),
+    baseline,
+    fillColor,
+    strokeColor,
+    strokeWidth,
+    scale,
+  };
+  if (sets) sets.push(set);
+  else restGlyphSets.set(font, [set]);
+  restGlyphSetCount++;
   return set;
 }
 

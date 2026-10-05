@@ -324,6 +324,22 @@ export const SCENARIOS: Scenario[] = [
     },
   },
   {
+    name: "shake-storm",
+    about: "shakes every 150ms, stacked to the max, while holding the button",
+    run: async (bridge) => {
+      click("#add-money");
+      const floor = second(bridge);
+      bridge.scrollToFloor(floor, 0.6);
+      await sleep(300);
+      const release = press(bridge, floor);
+      const stopShakes = every(150, () => shakeScreen(1.3));
+      const summary = await measure("shake-storm", 8000);
+      stopShakes();
+      release();
+      return summary;
+    },
+  },
+  {
     name: "chaos",
     about: "holding the button while crits land and coin bursts storm",
     run: async (bridge) => {

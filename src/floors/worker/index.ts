@@ -163,6 +163,15 @@ export async function loadWorkerSprite(): Promise<HTMLImageElement> {
     (RENDER_H * diva.naturalHeight) / manager.naturalHeight,
   );
   spritesLoaded = true;
+  // cropped at idle: the Upgrades dialog's first open did it mid slide-in
+  runWhenIdle(() => {
+    for (const url of [getWorkerIconUrl(), getManagerIconUrl()]) {
+      if (!url) continue;
+      const image = new Image();
+      image.src = url;
+      void image.decode().catch(() => undefined);
+    }
+  }, 3000);
   return worker!;
 }
 

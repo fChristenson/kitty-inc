@@ -3,6 +3,7 @@
 import {
   SPECIAL_FLASH_STROKE_WIDTH,
   triggerScreenShake,
+  warmCritFlashes,
 } from "../../screenShake";
 import {
   getExplosionDurationMs,
@@ -12,7 +13,8 @@ import {
   playJackpot,
   playPayout,
 } from "../../sound";
-import type { CritTier } from "../critTypes";
+import { CRIT_TIER_CONFIG, CRIT_TIER_ORDER, type CritTier } from "../critTypes";
+import { tierColor } from "../bonusTierReward";
 
 // each tier's flash text outline width, at the flash's FLASH_FONT_SIZE
 export const TIER_FLASH_STROKE_WIDTH: Record<CritTier, number> = {
@@ -20,6 +22,17 @@ export const TIER_FLASH_STROKE_WIDTH: Record<CritTier, number> = {
   mega: 14,
   ultra: 16,
 };
+
+// the plain x5/x25/x125 flashes, built at idle before the first crit lands
+export function warmTierFlashes(): void {
+  warmCritFlashes(
+    CRIT_TIER_ORDER.map((tier) => ({
+      label: CRIT_TIER_CONFIG[tier].label,
+      color: tierColor(tier),
+      strokeWidth: TIER_FLASH_STROKE_WIDTH[tier],
+    })),
+  );
+}
 
 // a landed tier's flash, tier-scaled; label/color let a piggyback proc show
 // its own text in place of the tier's "x5"/"x25"/"x125"

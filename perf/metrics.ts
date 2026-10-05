@@ -92,6 +92,13 @@ function caller(): string {
     .join(" < ");
 }
 
+// a CPU profile shows this right after each hitch: the samples just before it
+// are the work that held the frame up
+function hitchMarker(): void {
+  const until = performance.now() + 0.3;
+  while (performance.now() < until);
+}
+
 // wraps the canvas API once, before the game boots
 export function instrument(countCalls: boolean): void {
   if (countCalls) {
@@ -133,7 +140,10 @@ export function instrument(countCalls: boolean): void {
   }).observe({ type: "longtask", buffered: false });
   const frame = (t: number) => {
     requestAnimationFrame(frame);
-    if (recording && lastFrame > 0) deltas.push(t - lastFrame);
+    if (recording && lastFrame > 0) {
+      deltas.push(t - lastFrame);
+      if (t - lastFrame > 50) hitchMarker();
+    }
     lastFrame = t;
     if (!recording || ++frameNumber % HEAP_EVERY !== 0) return;
     const heap = memory();
