@@ -774,9 +774,8 @@ const MANAGER_AUTO_BOOST_INTERVAL_MS = 20_000;
 const managerNextBoostAt = snapshotMap<Floor, number>();
 
 // once a floor has a manager, it re-boosts every worker (+ itself) on its own
-// floor every MANAGER_AUTO_BOOST_INTERVAL_MS, with the same click/jump
-// celebration + coin burst + sound a real worker click produces — called once
-// per frame from drawWorker below
+// floor every MANAGER_AUTO_BOOST_INTERVAL_MS, with the same jump + sound a
+// real worker click produces — called once per frame from drawWorker below
 function maybeTriggerManagerBoost(floor: Floor, now: number): void {
   if (isDetachedJobPending() || isFloorLocked(floor)) return;
   if (!floor.hasManager) {
@@ -786,7 +785,7 @@ function maybeTriggerManagerBoost(floor: Floor, now: number): void {
   const nextAt = managerNextBoostAt.get(floor);
   if (nextAt === undefined) {
     // every floor is first seen on the same frame at startup: a random first
-    // wait keeps every manager's coin bursts from landing on one frame
+    // wait keeps every manager's boost from landing on one frame
     managerNextBoostAt.set(
       floor,
       now + MANAGER_AUTO_BOOST_INTERVAL_MS * (0.5 + Math.random()),
@@ -795,11 +794,9 @@ function maybeTriggerManagerBoost(floor: Floor, now: number): void {
   }
   if (now < nextAt) return;
   const state = getFloorWorkers(floor, now);
-  const feetY = WORKER_FEET_Y;
   state.walkers.forEach((walker, i) => {
     activateBoosted(floor, i, now);
     walker.clickedAt = now;
-    spawnCoinBurst(floor, walker.x, feetY - RENDER_H / 2, () => {});
   });
   // once per floor, not once per walker, and capped across every managed floor
   playAutoBoost();

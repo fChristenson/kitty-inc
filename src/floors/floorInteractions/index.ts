@@ -10,7 +10,6 @@ import {
 import {
   hitTestWorkers,
   clickWorker,
-  getWorkerCenter,
   applyBoostAll,
   triggerJumpAll as animateJumpAll,
   getRenderedWorkerCount,
@@ -1116,6 +1115,11 @@ import "../thunderEggEvent";
 import "../hologramEvent";
 import "../leafFallEvent";
 import "../threeBodyEvent";
+import "../leMansEvent";
+import "../tunnelBorerEvent";
+import "../harpoonEvent";
+import "../eightQueensEvent";
+import "../shortestPathEvent";
 import "../sinkholeEvent";
 import "../backwashEvent";
 import "../deflectorEvent";
@@ -1344,7 +1348,6 @@ function applySafetyNetCrit(floors: Floor[]): void {
 function applyFloorShareCrit(
   floors: Floor[],
   target: Floor,
-  isGroundFloor: boolean,
   levelMultiplier = 1,
 ): void {
   const targetIndex = floors.indexOf(target);
@@ -1363,8 +1366,6 @@ function applyFloorShareCrit(
     target.incomeAmount,
     multiply(target.rateStep, sharedLevel * levelMultiplier * rateMultiplier),
   );
-  const center = getButtonCenter(isGroundFloor);
-  spawnCoinBurst(target, center.x, center.y, () => {});
 }
 
 // "Casual Friday"/"Fancy Friday" crits (see shared/critTypes's
@@ -1395,7 +1396,7 @@ function applyHeavenlyCrit(deps: FloorActionsDeps): void {
   });
   const maxTier = CRIT_TIER_ORDER[0];
   const count = CRIT_TIER_CONFIG[maxTier].multiplier;
-  deps.floors.forEach((floor, index) => {
+  deps.floors.forEach((floor) => {
     floor.critMultiplierTier = maxTier;
     // cheap direct rate bump instead of replaying the full applyUpgradeTick
     // (coin burst + milestone check) up to `count` times per floor — with up
@@ -1403,8 +1404,6 @@ function applyHeavenlyCrit(deps: FloorActionsDeps): void {
     // one proc
     increaseIncomeRateBy(floor, count);
     critNow(deps, floor);
-    const center = getButtonCenter(index === 0);
-    spawnCoinBurst(floor, center.x, center.y, () => {});
   });
 }
 
@@ -1501,9 +1500,14 @@ export function hitTestFloorHover(
 // multiplier (e.g. x125) would otherwise reroll the special-crit gateway once
 // per free tick instead of once for the whole crit; only the player's own
 // upgrade-button click rolls the next crit, once, after this has run its full count
-function applyUpgradeTick(floor: Floor, isGroundFloor: boolean): void {
+// burst: only a bought upgrade bursts coins; crit rewards stay coinless
+function applyUpgradeTick(
+  floor: Floor,
+  isGroundFloor: boolean,
+  burst = false,
+): void {
   increaseIncomeRate(floor);
-  if (isDetachedJobRunning()) return;
+  if (!burst || isDetachedJobRunning()) return;
   const center = getButtonCenter(isGroundFloor);
   // small random jitter so the burst doesn't spawn at the exact same pixel
   // every single click — a random point spanning the button's own inner width
@@ -1561,7 +1565,7 @@ export function performAutomatedUpgradeAfterPayment(
     return true;
   }
   if (!paid && !spendTotalIncome(getUpgradeCost(floor))) return false;
-  applyUpgradeTick(floor, isGroundFloor);
+  applyUpgradeTick(floor, isGroundFloor, true);
   rollCritUpgrade(floor, false);
   deps.persist();
   return true;
@@ -2750,8 +2754,8 @@ const CRIT_REWARDS: Record<CritProcKind, (context: CritRewardContext) => void> =
     executiveOrder: (c) => applyExecutiveOrderCrit(c.floors),
     roundUp: (c) => applyRoundUpCrit(c.floors),
     safetyNet: (c) => applySafetyNetCrit(c.floors),
-    floorShare: (c) => applyFloorShareCrit(c.floors, c.floor, c.isGroundFloor),
-    sameBoat: (c) => applyFloorShareCrit(c.floors, c.floor, c.isGroundFloor, 2),
+    floorShare: (c) => applyFloorShareCrit(c.floors, c.floor),
+    sameBoat: (c) => applyFloorShareCrit(c.floors, c.floor, 2),
     goldenHandshake: (c) => applyGoldenHandshakeCrit(c.floors),
     supplyRun: (c) => applySupplyRunCrit(c.floor),
     casualFriday: (c) =>
@@ -3235,7 +3239,7 @@ export function handleFloorClick(
       return;
     }
     if (spendTotalIncome(getUpgradeCost(floor))) {
-      applyUpgradeTick(floor, isGroundFloor);
+      applyUpgradeTick(floor, isGroundFloor, true);
       rollCritUpgrade(floor, true, eventProcContext(deps, isGroundFloor));
       persist();
       triggerButtonPress(floor);
@@ -3251,8 +3255,6 @@ export function handleFloorClick(
     // against to time the click-bounce/jump-sprite reaction
     if (!clickWorker(floor, workerIndex, Date.now())) continue;
     playBloop();
-    const center = getWorkerCenter(floor, workerIndex);
-    if (center) spawnCoinBurst(floor, center.x, center.y, () => {});
     // clicking a worker only (re)activates that specific worker's boost/15s timer.
     // Date.now()-based (not performance.now()) so it matches incomePanel.ts's
     // persisted, Date.now()-based cycle tracking that reads the same boost state

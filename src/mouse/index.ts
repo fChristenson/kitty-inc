@@ -4,7 +4,6 @@ import {
   ROOM_CONTENT_SCALE,
   WALK_SPEED,
   WORKER_FEET_Y_NUDGE_PX,
-  spawnCoinBurst,
   spawnFreezeCoinBurst,
   triggerJumpAll,
 } from "../floors";
@@ -333,8 +332,8 @@ export function hitTestMouse(x: number, y: number, floor: Floor): boolean {
   );
 }
 
-// if the click actually landed on the mouse, it disappears (with the same coin-burst
-// pop every other click reward gets), every worker in the (whole) building gets a
+// if the click actually landed on the mouse, it disappears, every worker in the
+// (whole) building gets a
 // free boost, and every one of those workers also plays its click-bounce/jump
 // animation right away (a building-wide "yay!" instead of just the boost itself).
 // This never blocks the caller's own click handling for anything else under the
@@ -355,7 +354,6 @@ export function handleMouseClick(
   applyBoostAll(floors);
   triggerJumpAll(floors, now);
   playBloop();
-  spawnCoinBurst(floor, burstX, MOUSE_Y - RENDER_H / 2, () => {});
   if (!hunted) return;
   const origin = { x: burstX, y: MOUSE_Y - RENDER_H / 2 };
   const tier = pickCritTierByOdds();

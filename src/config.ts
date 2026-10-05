@@ -8343,6 +8343,57 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 55
+  // race, levels: src/floors/leMansEvent: two racers launch off the button and hairpin round the clicked bar's far end onto it
+  leMansEvent: {
+    chance: 0.01,
+    raceMs: 1300, // the leader's race, from a standstill
+    gapMs: 120, // the chaser behind it
+    levelShare: 0.05, // the leader's; the chaser lands twice as many
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // drill, a free floor: src/floors/tunnelBorerEvent: a drill bores in through the outer wall and on into the lock
+  tunnelBorerEvent: {
+    chance: 0.01,
+    approachMs: 260, // the drill screaming in
+    stallMs: 750, // grinding in place against the wall
+    boreMs: 1500, // boring through once it gives
+    exitMs: 220, // rocketing across the floor into the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, levels + cash: src/floors/harpoonEvent: the button harpoons the bars on lines of cash, tugs them, then rips into the total
+  harpoonEvent: {
+    chance: 0.01,
+    fireGapMs: 140, // between harpoons
+    flightMs: 220, // each harpoon's flight
+    streamMs: 1000, // each line of cash pouring
+    tugGapMs: 260, // between tugs
+    ripMs: 340, // the harpoons whipped up into the total
+    levelShare: 0.02, // per bar, on the spear and each tug
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, crit tiers: src/floors/eightQueensEvent: a board solves the eight queens by backtracking; they dive onto the bar
+  eightQueensEvent: {
+    chance: 0.01,
+    boardMs: 250, // the board popping in
+    stepMs: [50, 16] as [number, number], // each solver step, quickening
+    flyGapMs: 45, // between queens diving
+    flyMs: 240, // each queen's dive
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, worker perma tiers: src/floors/shortestPathEvent: Dijkstra's front floods a road map from the button; wisps race the shortest ways to the workers
+  shortestPathEvent: {
+    chance: 0.01,
+    appearMs: 150, // the road map fading in
+    waveMs: 1100, // the front reaching the farthest worker
+    rideMs: 260, // each wisp racing down its shortest path
+    holdMs: 400,
+    mergeMs: 0,
+  },
   // batch 54
   // clutter, a crit tier: src/floors/sinkholeEvent: a gravity hole gulps a checkerboard of glitter in, then sinks onto the clicked bar
   sinkholeEvent: {

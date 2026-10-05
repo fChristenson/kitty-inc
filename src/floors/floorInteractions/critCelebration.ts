@@ -19,47 +19,19 @@ import {
   NIGHT_SHIFT_CRIT_COLOR,
   NIGHT_SHIFT_CRIT_LABEL,
 } from "../upgradeButton";
-import { spawnCoinBurst, spawnFreezeCoinBurst } from "../coins";
+import { spawnFreezeCoinBurst } from "../coins";
 import { playCoinDrop } from "../../sound";
 import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
-import {
-  celebrateBonusTier,
-  spawnTierBurstPattern,
-  tierColor,
-} from "../../shared/bonusTierReward";
+import { celebrateBonusTier, tierColor } from "../../shared/bonusTierReward";
 import {
   isCritFlashActive,
   getFlashHoldEndsAt,
   freezeCritFlashAsBackground,
 } from "../../screenShake";
 
-// tier-sized coin bursts around the screen center, on top of whatever the
-// caller's own reward spawned; re-read fresh per burst in case of scrolling
-function centerBurstSpawner(
-  floor: Floor,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): (offsetX: number, offsetY: number) => void {
-  return (offsetX, offsetY) => {
-    const p = getScreenCenterLocal(floor);
-    spawnCoinBurst(floor, p.x + offsetX, p.y + offsetY, () => {});
-  };
-}
-
-function spawnTierBursts(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
-  spawnTierBurstPattern(tier, centerBurstSpawner(floor, getScreenCenterLocal));
-}
-
-function celebrateTier(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
+// crit celebrations are flash + sound only: no coin bursts (perf)
+function celebrateTier(tier: CritTier): void {
   playTierFlash(tier, CRIT_TIER_CONFIG[tier].label, tierColor(tier));
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
 }
 
 // chain crit (see upgradeButton.ts's isChainCrit/rollFloorBuyCrit's own chain
@@ -67,88 +39,49 @@ function celebrateTier(
 // "x25"/"x125" number — a celebration-moment-only swap, the upgrade button's
 // own idle/armed label is untouched and still always shows the plain tier
 // label. Keeps the tier's own color (chain has no dedicated color of its own)
-function celebrateChain(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
+function celebrateChain(tier: CritTier): void {
   playSpecialFlash("Chain", tierColor(tier));
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
 }
 
 // boost crit (see upgradeButton.ts's isBoostCrit): same swap as chain above,
-// but with its own dedicated blue and an extra punch (its free-worker payout)
-// on top of the tier's own flash/sound/bursts
-function celebrateBoost(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
+// but with its own dedicated blue and an extra coin-drop sound
+function celebrateBoost(): void {
   playSpecialFlash(BOOST_CRIT_LABEL, BOOST_CRIT_COLOR);
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
   playCoinDrop();
-  const p = getScreenCenterLocal(floor);
-  spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
 // sunshine crit (see upgradeButton.ts's isSunshineCrit): same celebration
 // shape as boost above (the reward itself — a longer-lasting free worker
 // boost — is applied by floorInteractions.ts), just its own dedicated gold
-function celebrateSunshine(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
+function celebrateSunshine(): void {
   playSpecialFlash(SUNSHINE_CRIT_LABEL, SUNSHINE_CRIT_COLOR);
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
   playCoinDrop();
-  const p = getScreenCenterLocal(floor);
-  spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
 // snowday crit (see upgradeButton.ts's isSnowdayCrit): same celebration
 // shape as boost/sunshine above (the reward itself — an even longer-lasting
 // free worker boost — is applied by floorInteractions.ts), its own dedicated
 // frost color
-function celebrateSnowday(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
+function celebrateSnowday(): void {
   playSpecialFlash(SNOWDAY_CRIT_LABEL, SNOWDAY_CRIT_COLOR);
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
   playCoinDrop();
-  const p = getScreenCenterLocal(floor);
-  spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
 // night shift crit (see upgradeButton.ts's isNightShiftCrit): same
 // celebration shape as boost/sunshine/snowday above (the reward itself — a
 // shorter free worker boost plus a temporary +1-worker boost-strength bonus
 // — is applied by floorInteractions.ts), its own dedicated midnight indigo
-function celebrateNightShift(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
+function celebrateNightShift(): void {
   playSpecialFlash(NIGHT_SHIFT_CRIT_LABEL, NIGHT_SHIFT_CRIT_COLOR);
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
   playCoinDrop();
-  const p = getScreenCenterLocal(floor);
-  spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
 // bounce crit (see upgradeButton.ts's isBounceCrit): same swap as chain
 // above, keeping the landed tier's own color (climbing the building from the
 // bottom up is applied by floorInteractions.ts, this only covers the
 // celebration moment)
-function celebrateBounce(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
+function celebrateBounce(tier: CritTier): void {
   playSpecialFlash(BOUNCE_CRIT_LABEL, tierColor(tier));
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
 }
 
 // heavenly crit (see upgradeButton.ts's isHeavenlyCrit): the single biggest
@@ -157,15 +90,8 @@ function celebrateBounce(
 // which tier actually landed alongside it — the reward itself (unlock all/
 // max every tier/grant every floor a max-tier upgrade batch) is applied by
 // floorInteractions.ts, this only covers the celebration moment
-function celebrateHeavenly(
-  floor: Floor,
-  _tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
+function celebrateHeavenly(): void {
   playTierFlash("ultra", HEAVENLY_CRIT_LABEL, HEAVENLY_CRIT_COLOR);
-  // always the biggest (ultra-shaped) burst pattern, since this moment is the
-  // biggest regardless of which base tier happened to land with it
-  spawnTierBursts(floor, "ultra", getScreenCenterLocal);
 }
 
 // pair/three of a kind/four of a kind/full house/tick tock crits (see
@@ -175,49 +101,20 @@ function celebrateHeavenly(
 // floor twice) is applied by floorInteractions.ts/main.ts, this only covers
 // the celebration moment. One shared helper instead of 5 near-identical
 // functions, since only the label/color ever differ between them
-function celebrateFlatProc(
-  label: string,
-  color: string,
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
+function celebrateFlatProc(label: string, color: string): void {
   playSpecialFlash(label, color);
-  spawnTierBursts(floor, tier, getScreenCenterLocal);
 }
 
 // explosion is the one proc whose flash takes the LANDED TIER's color rather
 // than a dedicated one of its own
-function celebrateExplosion(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
-  celebrateFlatProc(
-    EXPLOSION_CRIT_LABEL,
-    tierColor(tier),
-    floor,
-    tier,
-    getScreenCenterLocal,
-  );
+function celebrateExplosion(tier: CritTier): void {
+  celebrateFlatProc(EXPLOSION_CRIT_LABEL, tierColor(tier));
 }
 
-// booty adds a coin drop + burst on top of the standard flash
-function celebrateBooty(
-  floor: Floor,
-  tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-): void {
-  celebrateFlatProc(
-    BOOTY_CRIT_LABEL,
-    BOOTY_CRIT_COLOR,
-    floor,
-    tier,
-    getScreenCenterLocal,
-  );
+// booty adds a coin drop sound on top of the standard flash
+function celebrateBooty(): void {
+  celebrateFlatProc(BOOTY_CRIT_LABEL, BOOTY_CRIT_COLOR);
   playCoinDrop();
-  const p = getScreenCenterLocal(floor);
-  spawnCoinBurst(floor, p.x, p.y, () => {});
 }
 
 // chain and boost are both "special" procs riding the SAME landed tier (see
@@ -324,7 +221,7 @@ export function triggerCritCelebration(
   if (landed.length > 0) {
     const now = Date.now();
     for (const kind of landed) {
-      queueProcCelebration(kind, floor, tier, getScreenCenterLocal, now);
+      queueProcCelebration(kind, tier, now);
       // Deja Vu doesn't just FLASH extra procs, it grants them: each follow-up
       // is applied and tallied through the same path a real roll uses (see
       // floorInteractions' onFollowUpProc)
@@ -333,9 +230,7 @@ export function triggerCritCelebration(
           onFollowUpProc?.(followUp);
           queueProcCelebration(
             followUp,
-            floor,
             tier,
-            getScreenCenterLocal,
             now,
             DEJA_VU_FOLLOW_UP_MAX_AGE_MS,
             true,
@@ -371,20 +266,13 @@ export function triggerCritCelebration(
   if (specialCelebrationQueue.length > 0 || isCritFlashActive(Date.now())) {
     return;
   }
-  celebrateTier(floor, tier, getScreenCenterLocal);
+  celebrateTier(tier);
 }
 
 // the handful of procs whose flash is more than the standard label+color
 // treatment celebrateFlatProc gives every other one
 const CUSTOM_PROC_CELEBRATIONS: Partial<
-  Record<
-    CritProcKind,
-    (
-      floor: Floor,
-      tier: CritTier,
-      getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
-    ) => void
-  >
+  Record<CritProcKind, (tier: CritTier) => void>
 > = {
   chain: celebrateChain,
   boost: celebrateBoost,
@@ -402,9 +290,7 @@ const CUSTOM_PROC_CELEBRATIONS: Partial<
 // the identical celebration, just the first still-fresh one
 function queueProcCelebration(
   kind: CritProcKind,
-  floor: Floor,
   tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
   now: number,
   maxAgeMs?: number,
   allowDuplicate = false,
@@ -418,15 +304,7 @@ function queueProcCelebration(
     queuedAt: now,
     maxAgeMs,
     run: () =>
-      custom
-        ? custom(floor, tier, getScreenCenterLocal)
-        : celebrateFlatProc(
-            info.label,
-            info.color,
-            floor,
-            tier,
-            getScreenCenterLocal,
-          ),
+      custom ? custom(tier) : celebrateFlatProc(info.label, info.color),
   });
 }
 
