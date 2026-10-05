@@ -8343,6 +8343,56 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 56
+  // bounce, free hires: src/floors/topsyTurvyEvent: balls bounce floor to ceiling as gravity flips, then drop onto the empty spots
+  topsyTurvyEvent: {
+    chance: 0.01,
+    launchMs: 320, // each ball's hop out of the button
+    staggerMs: 60, // between balls
+    firstHopsMs: 200, // hopping along the floor before the first flip
+    fallMs: [260, 180] as [number, number], // each fall to the far side, quickening
+    hopsMs: [240, 160] as [number, number], // the hops after each fall, quickening
+    dropMs: 300, // the last drop the whole way down onto a spot
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // spray, a crit tier: src/floors/goldPlatingEvent: four nozzles whirl round the clicked bar spraying it gold
+  goldPlatingEvent: {
+    chance: 0.01,
+    flyMs: 260, // the nozzles flying out to their ring
+    sprayMs: 1500, // whirling and spraying, ever faster
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // clutter, worker perma tiers: src/floors/crosswindEvent: gusts squeeze a spiral of glitter into a column, then a heap
+  crosswindEvent: {
+    chance: 0.01,
+    spillMs: 320, // the glitter blown out over the screen
+    gustMs: 280, // each gust (5)
+    gapMs: 60, // between gusts
+    gatherMs: 150, // the heap settling
+    flyMs: 300, // each bit's flight onto its worker
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, levels: src/floors/hailstoneEvent: a wisp bounces through a Collatz sequence onto the clicked bar
+  hailstoneEvent: {
+    chance: 0.01,
+    stepMs: [130, 60] as [number, number], // each hop, quickening
+    levelShare: 0.06,
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/hilbertCurveEvent: a Hilbert curve refines, then a river of cash winds along it into the total
+  hilbertCurveEvent: {
+    chance: 0.01,
+    refineMs: 170, // each preview order
+    traceMs: 1100, // the river's head winding the whole curve
+    streamMs: 450, // how long the river pours
+    flyMs: 260, // the head shooting up into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 55
   // race, levels: src/floors/leMansEvent: two racers launch off the button and hairpin round the clicked bar's far end onto it
   leMansEvent: {

@@ -1,3 +1,5 @@
+// first: every module's Date.now() reads the game clock
+import "./shared/gameClock";
 import "./style.css";
 import { forceTestCrit } from "./floors";
 import { wireCritTestActions } from "./hud";
@@ -1043,6 +1045,11 @@ import {
   forceHologramEvent,
   forceLeafFallEvent,
   forceThreeBodyEvent,
+  forceTopsyTurvyEvent,
+  forceGoldPlatingEvent,
+  forceCrosswindEvent,
+  forceHailstoneEvent,
+  forceHilbertCurveEvent,
   forceLeMansEvent,
   forceTunnelBorerEvent,
   forceHarpoonEvent,
@@ -2982,6 +2989,11 @@ async function main() {
       hologram: forceOnActive(forceHologramEvent),
       "leaf-fall": forceOnActive(forceLeafFallEvent),
       "three-body": forceOnActive(forceThreeBodyEvent),
+      "topsy-turvy": forceOnActive(forceTopsyTurvyEvent),
+      "gold-plating": forceOnActive(forceGoldPlatingEvent),
+      crosswind: forceOnActive(forceCrosswindEvent),
+      hailstone: forceOnActive(forceHailstoneEvent),
+      "hilbert-curve": forceOnActive(forceHilbertCurveEvent),
       "le-mans": forceOnActive(forceLeMansEvent),
       "tunnel-borer": forceOnActive(forceTunnelBorerEvent),
       harpoon: forceOnActive(forceHarpoonEvent),

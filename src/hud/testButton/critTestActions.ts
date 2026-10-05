@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-le-mans-event" class="game__button">Le Mans</button>
-          <button id="test-tunnel-borer-event" class="game__button">Tunnel Borer</button>
-          <button id="test-harpoon-event" class="game__button">Harpoon</button>
-          <button id="test-eight-queens-event" class="game__button">Eight Queens</button>
-          <button id="test-shortest-path-event" class="game__button">Shortest Path</button>
+          <button id="test-topsy-turvy-event" class="game__button">Topsy-Turvy</button>
+          <button id="test-gold-plating-event" class="game__button">Gold Plating</button>
+          <button id="test-crosswind-event" class="game__button">Crosswind</button>
+          <button id="test-hailstone-event" class="game__button">Hailstone</button>
+          <button id="test-hilbert-curve-event" class="game__button">Hilbert Curve</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-le-mans-event" class="game__button">Le Mans</button>
+          <button id="test-tunnel-borer-event" class="game__button">Tunnel Borer</button>
+          <button id="test-harpoon-event" class="game__button">Harpoon</button>
+          <button id="test-eight-queens-event" class="game__button">Eight Queens</button>
+          <button id="test-shortest-path-event" class="game__button">Shortest Path</button>
           <button id="test-sinkhole-event" class="game__button">Sinkhole</button>
           <button id="test-backwash-event" class="game__button">Backwash</button>
           <button id="test-deflector-event" class="game__button">Deflector</button>

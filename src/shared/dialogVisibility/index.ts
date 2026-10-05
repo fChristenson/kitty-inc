@@ -1,5 +1,7 @@
 // Whether any modal `.worker-menu` dialog is currently shown, kept up to date
-// by one attribute observer instead of querying the DOM from every frame.
+// by one attribute observer instead of querying the DOM from every frame. The
+// game is paused while one is open.
+import { pauseGame, resumeGame } from "../gameClock";
 
 let openDialogCount = 0;
 let observer: MutationObserver | null = null;
@@ -8,6 +10,8 @@ function recount(): void {
   openDialogCount = document.querySelectorAll(
     ".worker-menu:not([hidden])",
   ).length;
+  if (openDialogCount > 0) pauseGame();
+  else resumeGame();
 }
 
 function ensureObserving(): void {
