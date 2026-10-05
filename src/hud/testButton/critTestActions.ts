@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-tidal-tails-event" class="game__button">Tidal Tails</button>
-          <button id="test-hypervelocity-event" class="game__button">Hypervelocity</button>
-          <button id="test-quasar-event" class="game__button">Quasar</button>
-          <button id="test-volleyball-event" class="game__button">Volleyball</button>
-          <button id="test-smart-rockets-event" class="game__button">Smart Rockets</button>
+          <button id="test-bomb-mobile-event" class="game__button">Bomb Mobile</button>
+          <button id="test-ring-galaxy-event" class="game__button">Ring Galaxy</button>
+          <button id="test-gravitational-lens-event" class="game__button">Gravitational Lens</button>
+          <button id="test-convection-event" class="game__button">Convection</button>
+          <button id="test-paintball-event" class="game__button">Paintball</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-tidal-tails-event" class="game__button">Tidal Tails</button>
+          <button id="test-hypervelocity-event" class="game__button">Hypervelocity</button>
+          <button id="test-quasar-event" class="game__button">Quasar</button>
+          <button id="test-volleyball-event" class="game__button">Volleyball</button>
+          <button id="test-smart-rockets-event" class="game__button">Smart Rockets</button>
           <button id="test-pilot-hole-event" class="game__button">Pilot Hole</button>
           <button id="test-pit-stop-event" class="game__button">Pit Stop</button>
           <button id="test-black-hole-merger-event" class="game__button">Black Hole Merger</button>

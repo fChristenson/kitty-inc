@@ -8343,6 +8343,59 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 71
+  // explosion, a crit tier: src/floors/bombMobileEvent: a turning mobile of lit bombs blows tier by tier, then its giant drops onto the clicked bar
+  bombMobileEvent: {
+    chance: 0.01,
+    dropMs: 300, // the mobile dropping in
+    spinMs: 450, // turning faster, fuses blinking quicker
+    tipGapMs: 110, // between the four tip bombs
+    midGapMs: 160, // between the two big bombs
+    fallMs: 260, // the giant's drop onto the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // galaxy, cash: src/floors/ringGalaxyEvent: a dwarf punches through a galaxy's core, sending a ring of starbirth out through it, its knots flung into the total
+  ringGalaxyEvent: {
+    chance: 0.01,
+    growMs: 250, // the galaxy swirling up
+    diveMs: 350, // the dwarf's dive to the core
+    ringMs: 900, // the ring rippling out to the rim
+    gapMs: 50, // between knots flung off
+    liftMs: 380, // each knot's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // galaxy, free hires: src/floors/gravitationalLensEvent: a heavy wisp lenses a galaxy's light into arcs and an Einstein ring, which breaks onto the empty spots
+  gravitationalLensEvent: {
+    chance: 0.01,
+    growMs: 250, // the galaxy swirling up
+    driftMs: 1000, // the lens drifting in front of the core
+    ringMs: 300, // the Einstein ring blazing
+    gapMs: 110, // between pieces flung off
+    dropMs: 380, // each piece's arc onto its spot
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, worker perma tiers: src/floors/convectionEvent: jittering glitter organises into convection rolls whose hot plumes erupt onto the workers
+  convectionEvent: {
+    chance: 0.01,
+    settleMs: 350, // the glitter jittering at random
+    boilMs: 1100, // the rolls setting in and quickening
+    gapMs: 90, // between workers' streams
+    dropMs: 400, // each grain's arc onto its worker
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, levels: src/floors/paintballEvent: guns at both edges trade volleys of pellets that splat gold onto the bars
+  paintballEvent: {
+    chance: 0.01,
+    growMs: 250, // the guns popping up
+    volleyMs: 230, // between volleys, quickening
+    levelShare: 0.012, // levels per bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 70
   // galaxy, worker perma tiers: src/floors/tidalTailsEvent: two galaxies swing past each other, tearing off tidal tails of glitter that rain onto the workers
   tidalTailsEvent: {
