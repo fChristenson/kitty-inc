@@ -85,7 +85,12 @@ export const forceHilbertCurveEvent = registerWispEvent(
     const previews = PREVIEWS.map(curve);
     const line = curve(ORDER);
     const pourAt = PREVIEWS.length * refineMs;
-    const pour: Pour = { coinsAlong: 2_400, width: 22, streamMs, travelMs: traceMs };
+    const pour: Pour = {
+      coinsAlong: 2_400,
+      width: 22,
+      streamMs,
+      travelMs: traceMs,
+    };
     const head = riverHead(line, traceMs, pourAt);
     const outAt = pourAt + traceMs;
     const inAt = outAt + flyMs;
@@ -155,7 +160,8 @@ export const forceHilbertCurveEvent = registerWispEvent(
             if (since < 0) continue;
             const next = k + 1 < previews.length ? refineMs : traceMs * 0.5;
             const a =
-              easeOut(clamp01(since / 80)) * (1 - clamp01((since - refineMs) / next));
+              easeOut(clamp01(since / 80)) *
+              (1 - clamp01((since - refineMs) / next));
             if (a <= 0) continue;
             const pts = previews[k];
             for (let i = 1; i < pts.length; i++)

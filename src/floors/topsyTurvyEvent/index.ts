@@ -165,7 +165,13 @@ export const forceTopsyTurvyEvent = registerWispEvent(
         );
         const end = j + 1 < FLIPS ? flips[j + 1] : dropsAt;
         // off the ceiling the hops bow down
-        hopAlong(to, slams[j], end, hopLift(j + 1) * (upward ? -1 : 1), upward ? DOWN : UP);
+        hopAlong(
+          to,
+          slams[j],
+          end,
+          hopLift(j + 1) * (upward ? -1 : 1),
+          upward ? DOWN : UP,
+        );
       }
       // the last flip: from wherever it is, straight down onto its spot
       const last = legs[legs.length - 1].to;
@@ -194,8 +200,7 @@ export const forceTopsyTurvyEvent = registerWispEvent(
       const raw = clamp01((ms - leg.starts) / (leg.ends - leg.starts || 1));
       const u = leg.fall ? easeIn(raw) : raw;
       spot.x = lerp([leg.from.x, leg.to.x], u);
-      spot.y =
-        lerp([leg.from.y, leg.to.y], u) - 4 * leg.lift * raw * (1 - raw);
+      spot.y = lerp([leg.from.y, leg.to.y], u) - 4 * leg.lift * raw * (1 - raw);
       return spot;
     });
     const last = balls.reduce((a, b) => (b.lands > a.lands ? b : a));
@@ -292,7 +297,8 @@ export const forceTopsyTurvyEvent = registerWispEvent(
                 flipped++;
                 since = ms - at;
               }
-            const flash = flipped > 0 ? 1 - clamp01(since / SURFACE_FLASH_MS) : 0;
+            const flash =
+              flipped > 0 ? 1 - clamp01(since / SURFACE_FLASH_MS) : 0;
             const downIsFloor = flipped % 2 === 0;
             for (let side = 0; side < 2; side++) {
               const isFloor = side === 0;

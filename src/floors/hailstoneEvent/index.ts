@@ -127,7 +127,13 @@ export const forceHailstoneEvent = registerWispEvent(
           let landed = 0;
           while (landed < steps && path.bounces[landed].ms <= ms) landed++;
           for (let i = 1; i <= landed; i++)
-            drawBeam(ctx, points[i - 1], points[i], CHART_W, CHART_ALPHA * fade);
+            drawBeam(
+              ctx,
+              points[i - 1],
+              points[i],
+              CHART_W,
+              CHART_ALPHA * fade,
+            );
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
           ctx.globalAlpha = fade;
