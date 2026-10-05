@@ -58,6 +58,25 @@ export function getStarRightX(floor: Floor): number {
   return MARGIN_X + labelWidth(floor);
 }
 
+// where something parked after the label sits: past the widest 3-digit "Lvl N",
+// so it holds still while the number counts up and pops
+let widestThreeDigits = 0;
+export function getStarAnchorX(floor: Floor): number {
+  if (widestThreeDigits === 0) {
+    measureCtx ??= document.createElement("canvas").getContext("2d")!;
+    measureCtx.font = FONT;
+    let widest = 0;
+    for (let d = 0; d <= 9; d++)
+      widest = Math.max(
+        widest,
+        measureCtx.measureText(`Lvl ${d}${d}${d}`).width,
+      );
+    if (!document.fonts.check(FONT)) return MARGIN_X + widest;
+    widestThreeDigits = widest;
+  }
+  return MARGIN_X + Math.max(widestThreeDigits, labelWidth(floor));
+}
+
 // shows a "Lvl N" label for how many upgrades this floor has bought, drawn at the
 // room's inside top-left corner
 export function drawUpgradeStar(

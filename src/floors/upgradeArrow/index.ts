@@ -1,7 +1,7 @@
 import type { Floor } from "../../gameState";
 import { COLOR } from "../../palette";
 import { drawArrowIcon } from "../../shared/arrowIcon";
-import { STAR_Y, STAR_BOTTOM_Y, getStarRightX } from "../star";
+import { STAR_Y, STAR_BOTTOM_Y, getStarAnchorX } from "../star";
 import {
   getBounceWiggleTransform,
   BOUNCE_WIGGLE_PERIOD_MS,
@@ -17,11 +17,11 @@ const GAP_AFTER_STAR = 24;
 const ICON_SIZE = 52; // matches the map arrows' own on-screen size
 const HIT_RADIUS = 40; // a bit more generous than the icon itself, for tapping
 
-// tracks the star label's own right edge (varies with floor.upgradeCount's
-// digit count), so the arrow keeps the same fixed gap as the number grows
+// parked past the widest 3-digit label (see floors/star), so it never jiggles
+// as the number counts up
 function getIconCenter(floor: Floor): { x: number; y: number } {
   return {
-    x: getStarRightX(floor) + GAP_AFTER_STAR + ICON_SIZE / 2,
+    x: getStarAnchorX(floor) + GAP_AFTER_STAR + ICON_SIZE / 2,
     y: STAR_Y + (STAR_BOTTOM_Y - STAR_Y) / 2,
   };
 }
