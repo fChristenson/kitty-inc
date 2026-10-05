@@ -10,7 +10,7 @@ export const FRUITS_BALANCE = {
   topBananaChance: 0.00728042539,
   topBananaBoostSeconds: 45,
   topBananaExtraWorkers: 1,
-  cherryOnTopChance: 0.00754574678,
+  cherryOnTopChance: 0.00754574679,
   cherryOnTopDiscount: 0.047,
   peachPerfectChance: 0.0111331977,
   peachPerfectTierSteps: 1,

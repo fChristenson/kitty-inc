@@ -7,7 +7,7 @@ export const CAT_GIRLS_BALANCE = {
   runwayRoyaltyChance: 0.00919753032,
   runwayRoyaltyTierSteps: 2,
   runwayRoyaltyUpgrades: 10,
-  blueHourStrutChance: 0.00564366827,
+  blueHourStrutChance: 0.00564366828,
   blueHourStrutDiscount: 0.104,
   felineFineChance: 0.00995284305,
   felineFineUpgrades: 64,

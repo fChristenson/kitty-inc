@@ -23,6 +23,7 @@ import {
   LUCKY_CLOVER_CRIT_COUNT,
   LUCKY_CLOVER_CRIT_TIER,
   MYSTIC_UPGRADE_COUNT,
+  loadFeaturedRewards,
   type CritRollResult,
 } from "./shared/critTypes";
 import {
@@ -50,1127 +51,8 @@ import {
   getCritTier,
   getUpgradeCost,
   rollFloorBuyCrit,
-  forceBoostEvent,
-  forceUnionEvent,
-  forceKickbackEvent,
-  forceBurstEvent,
-  forceSprayEvent,
-  forceFountainEvent,
-  forceRippleEvent,
-  forceWreckingBallEvent,
-  forcePiledriverEvent,
-  forceOrbitalStrikeEvent,
-  forceFuseEvent,
-  forceSupernovaEvent,
-  forceBowlingEvent,
-  forceThunderclapEvent,
-  forceChainReactionEvent,
-  forceBullseyeEvent,
-  forcePopcornEvent,
-  forceNewtonsCradleEvent,
-  forceJuggleEvent,
-  forceBoomerangEvent,
-  forceHeartbeatEvent,
-  forceClashEvent,
-  forceAsteroidsEvent,
-  forceWhackAMoleEvent,
-  forceDrumrollEvent,
-  forceShellGameEvent,
-  forceSeesawEvent,
-  forceScratchEvent,
-  forceTagEvent,
-  forceBumpersEvent,
-  forceCatcherEvent,
-  forceImplosionEvent,
-  forceAtomEvent,
-  forceSpiralEvent,
-  forceLoopEvent,
-  forceEternityEvent,
-  forceHelixEvent,
-  forceYoYoEvent,
-  forceRacetrackEvent,
-  forceSwingEvent,
-  forceKaleidoscopeEvent,
-  forceZipperEvent,
-  forceScreensaverEvent,
-  forceSprinklerEvent,
-  forceClockworkEvent,
-  forceHoleInOneEvent,
-  forceLeapfrogEvent,
-  forceLineupEvent,
-  forceStampedeEvent,
-  forceWormholeEvent,
-  forceSplatEvent,
-  forceRouletteEvent,
-  forceFreeKickEvent,
-  forceSlalomEvent,
-  forceLightningEvent,
-  forceFireHoseEvent,
-  forceConfluenceEvent,
-  forceSloshEvent,
-  forceSiphonEvent,
-  forceCrossfireEvent,
-  forceGravityWellEvent,
-  forceSplashdownEvent,
-  forceGeysersEvent,
-  forceCashCannonEvent,
-  forceHooverEvent,
-  forceAirShowEvent,
-  forceLeakEvent,
-  forceClimbEvent,
-  forceKiteEvent,
-  forceRainbowEvent,
-  forceBranchesEvent,
-  forceTugOfWarEvent,
-  forceWaterwheelEvent,
-  forceBraidEvent,
-  forceSkimEvent,
-  forceLatticeEvent,
-  forceFireworksEvent,
-  forceSlingshotEvent,
-  forceMarqueeEvent,
-  forceCropDusterEvent,
-  forceBolasEvent,
-  forceCountdownEvent,
-  forceSparklerEvent,
-  forceSlinkyEvent,
-  forcePipelineEvent,
-  forcePrismEvent,
-  forceTrampolineEvent,
-  forceHummingbirdEvent,
-  forceDiveBombEvent,
-  forceSkiJumpEvent,
-  forceJetpackEvent,
-  forceBassDropEvent,
-  forceScannerEvent,
-  forceLaserGridEvent,
-  forceEtchEvent,
-  forceSearchlightsEvent,
-  forceTractorBeamEvent,
-  forceBeamClashEvent,
-  forceButterflyEvent,
-  forceKelpEvent,
-  forcePendulumWaveEvent,
-  forceFormationEvent,
-  forceOuroborosEvent,
-  forceBowstringEvent,
-  forceSuperlaserEvent,
-  forceIonStormEvent,
-  forceGlitchEvent,
-  forceMagnifierEvent,
-  forceWaterShowEvent,
-  forceMercuryEvent,
-  forceAlignmentEvent,
-  forceDandelionEvent,
-  forceBobberEvent,
-  forceFishingEvent,
-  forceScissorsEvent,
-  forcePulseRifleEvent,
-  forceSplitEvent,
-  forcePixelateEvent,
-  forceDamBurstEvent,
-  forceSpiderwebEvent,
-  forceCurtainEvent,
-  forceJellyfishEvent,
-  forcePolarityEvent,
-  forceColliderEvent,
-  forceSheepdogEvent,
-  forceDragonEvent,
-  forceReflectorEvent,
-  forceCookieCutterEvent,
-  forceCinematicEvent,
-  forceNegativeEvent,
-  forceChainLightningEvent,
-  forceLockOnEvent,
-  forceStitchEvent,
-  forceStockpileEvent,
-  forceSpotWeldEvent,
-  forceReelsEvent,
-  forceCashShowerEvent,
-  forceCatherineWheelEvent,
-  forceMultiballEvent,
-  forceWhipEvent,
-  forceBatteryEvent,
-  forceTeslaCoilEvent,
-  forceJacobsLadderEvent,
-  forceComicBookEvent,
-  forceAvalancheEvent,
-  forceBeehiveEvent,
-  forcePogoEvent,
-  forceLaserHarpEvent,
-  forceLichtenbergEvent,
-  forceShatterEvent,
-  forceFunnelEvent,
-  forceGrappleEvent,
-  forceSurfEvent,
-  forceLaserTagEvent,
-  forceBallLightningEvent,
-  forceEventHorizonEvent,
-  forceTileFlipEvent,
-  forceGusherEvent,
-  forcePinataEvent,
-  forceGiftWrapEvent,
-  forceTriangulateEvent,
-  forceSparkOfLifeEvent,
-  forceGlassRainEvent,
-  forceFoldEvent,
-  forceCocoonEvent,
-  forceGravityAssistEvent,
-  forceZipLineEvent,
-  forceBreachEvent,
-  forceStormSurgeEvent,
-  forceSmashAndGrabEvent,
-  forceShrinkRayEvent,
-  forceSandstormEvent,
-  forceJuggernautEvent,
-  forceFuelLineEvent,
-  forceCheckoutEvent,
-  forceLightningRodEvent,
-  forceFlagEvent,
-  forceTerracesEvent,
-  forceBatteringRamEvent,
-  forceTetherballEvent,
-  forceProjectorEvent,
-  forceClearEvent,
-  forceInfinityMirrorEvent,
-  forceElevatorEvent,
-  forceMigrationEvent,
-  forceCorkscrewEvent,
-  forceMirrorBallEvent,
-  forcePlasmaGlobeEvent,
-  forceJellyEvent,
-  forceShockwaveEvent,
-  forcePassTheParcelEvent,
-  forceGardenHoseEvent,
-  forceBurningGlassEvent,
-  forceStormFrontEvent,
-  forceSlidePuzzleEvent,
-  forceWhirlpoolEvent,
-  forceSatellitesEvent,
-  forceTypewriterEvent,
-  forceRailgunEvent,
-  forceThunderdomeEvent,
-  forceMeltEvent,
-  forceFloodEvent,
-  forcePiedPiperEvent,
-  forceTentaclesEvent,
-  forceLaserPendulumEvent,
-  forceElectricEelEvent,
-  forceDoubleVisionEvent,
-  forceHoneyEvent,
-  forceMusicalChairsEvent,
-  forceBubbleWandEvent,
-  forceHyperspaceEvent,
-  forceJavelinEvent,
-  forceShuffleEvent,
-  forceMushroomCloudEvent,
-  forceRelayEvent,
-  forceLaserPointerEvent,
-  forceStormChaserEvent,
-  forceBaitBallEvent,
-  forceVideoWallEvent,
-  forceFerrofluidEvent,
-  forceHideAndSeekEvent,
-  forceMagicCarpetEvent,
-  forceSpirographEvent,
-  forceElectricNetEvent,
-  forceDemolitionEvent,
-  forceShootingGalleryEvent,
-  forceCollapseEvent,
-  forceVolcanoEvent,
-  forceSkydiversEvent,
-  forceSpeedboatEvent,
-  forcePeacockEvent,
-  forceStormWingsEvent,
-  forceClusterBombEvent,
-  forceStrafingRunEvent,
-  forceStainedGlassEvent,
-  forceUprisingEvent,
-  forceSwingRideEvent,
-  forceLawnmowerEvent,
-  forceLightShowEvent,
-  forceBugZapperEvent,
-  forceFirecrackersEvent,
-  forceSixShooterEvent,
-  forceThermalEvent,
-  forceStalactitesEvent,
-  forceKintsugiEvent,
-  forceGalaxyEvent,
-  forceSnowdriftEvent,
-  forceSnowballEvent,
-  forceCartwheelEvent,
-  forceMatryoshkaEvent,
-  forceSalmonRunEvent,
-  forceMoonTideEvent,
-  forceCandyFlossEvent,
-  forceFigureSkaterEvent,
-  forceTripwireEvent,
-  forceSunriseEvent,
-  forceRallyEvent,
-  forceIgnitionEvent,
-  forceTridentEvent,
-  forceCrawlEvent,
-  forceCarpetBombingEvent,
-  forceTimeBombEvent,
-  forceBunkerBusterEvent,
-  forceGrenadeTossEvent,
-  forceDepthChargesEvent,
-  forceFiringSquadEvent,
-  forceAkimboEvent,
-  forceFlakBarrageEvent,
-  forceSniperNestEvent,
-  forceRewindEvent,
-  forceMorseCodeEvent,
-  forceStadiumWaveEvent,
-  forceKnightsTourEvent,
-  forceLavaLampEvent,
-  forceDominoesEvent,
-  forceInkblotEvent,
-  forceSoftServeEvent,
-  forceDollarSignEvent,
-  forceMobiusEvent,
-  forceSwissRollEvent,
-  forceDodgeballEvent,
-  forceCongaLineEvent,
-  forceSpinningTopEvent,
-  forceGobblerEvent,
-  forceMajoretteEvent,
-  forceHulaHoopEvent,
-  forceCalligraphyEvent,
-  forceSnakeCharmerEvent,
-  forcePlateSpinnerEvent,
-  forceFerrisWheelEvent,
-  forceBucketBrigadeEvent,
-  forceSkyLanternsEvent,
-  forceEngraverEvent,
-  forceXRayEvent,
-  forceLaserLassoEvent,
-  forceHexRingEvent,
-  forcePortcullisEvent,
-  forceKeyholeEvent,
-  forceDefibrillatorEvent,
-  forceCircuitBoardEvent,
-  forceMjolnirEvent,
-  forceArcFlashEvent,
-  forceFourCornersEvent,
-  forceBoltWheelEvent,
-  forceMinefieldEvent,
-  forceCannonadeEvent,
-  forceStickyBombsEvent,
-  forceCrossblastEvent,
-  forceMortarEvent,
-  forceFlashbangEvent,
-  forceSentryTurretEvent,
-  forceShotgunEvent,
-  forceBossFightEvent,
-  forceGunshipEvent,
-  forceBulletTimeEvent,
-  forceFlechettesEvent,
-  forceRadarEvent,
-  forceBingoEvent,
-  forceLaneHopperEvent,
-  forceSimonSaysEvent,
-  forceEqualizerEvent,
-  forceLoadingBarEvent,
-  forceDiceRollEvent,
-  forceMandalaEvent,
-  forceZenGardenEvent,
-  forceAccordionEvent,
-  forceFizzEvent,
-  forceSoundwaveEvent,
-  forceTaffyEvent,
-  forceDripPaintingEvent,
-  forceMothsEvent,
-  forceCurlingEvent,
-  forceClotheslineEvent,
-  forceBalloonPopEvent,
-  forceSpinBottleEvent,
-  forceSkyWriterEvent,
-  forceGoldPanEvent,
-  forceBulldozerEvent,
-  forceKoiPondEvent,
-  forcePipeOrganEvent,
-  forceAntTrailEvent,
-  forceHotAirBalloonEvent,
-  forceLensFlareEvent,
-  forceTightropeEvent,
-  forceNeonSignEvent,
-  forceLightCageEvent,
-  forceStairwayEvent,
-  forceBeaconsEvent,
-  forceAnvilCrawlerEvent,
-  forceNeuronsEvent,
-  forceBottledBoltEvent,
-  forceThunderbirdEvent,
-  forceSparkGapEvent,
-  forceStaticShockEvent,
-  forceRocketJumpEvent,
-  forceTorpedoesEvent,
-  forceAirstrikeEvent,
-  forceDambusterEvent,
-  forceAirburstEvent,
-  forceBombPinwheelEvent,
-  forceBulletCurtainEvent,
-  forceTrickShotEvent,
-  forceRailShooterEvent,
-  forceSkeetShootEvent,
-  forceTripleTapEvent,
-  forceTommyGunEvent,
-  forceSweeperEvent,
-  forceClawMachineEvent,
-  forceLotteryEvent,
-  forceWordGuessEvent,
-  forceMemoryMatchEvent,
-  forceTicTacToeEvent,
-  forceRevCounterEvent,
-  forceSluiceEvent,
-  forceFoundryEvent,
-  forceJetStreamEvent,
-  forceMoatEvent,
-  forceSeepEvent,
-  forceMeanderEvent,
-  forceWaltzEvent,
-  forceGyroscopeEvent,
-  forceDragonflyEvent,
-  forceRingTossEvent,
-  forceSlipstreamEvent,
-  forceSheetMusicEvent,
-  forceLeafBlowerEvent,
-  forceLoomEvent,
-  forceHighDiveEvent,
-  forceSowerEvent,
-  forceCourierEvent,
-  forceRodeoEvent,
-  forceCrosshairEvent,
-  forceIrisEvent,
-  forceBankShotEvent,
-  forceSunbeamsEvent,
-  forceStargateEvent,
-  forceCatsCradleEvent,
-  forceThunderheadEvent,
-  forcePitchforkEvent,
-  forceJumperCablesEvent,
-  forceLashEvent,
-  forceSparkPlugEvent,
-  forceLiveWireEvent,
-  forceFuseRaceEvent,
-  forceBouncingBettyEvent,
-  forcePressureCookerEvent,
-  forceHotPotatoEvent,
-  forceDaisyChainEvent,
-  forceShapedChargeEvent,
-  forceDetcordEvent,
-  forceBulletBloomEvent,
-  forceHighNoonEvent,
-  forceHailfireEvent,
-  forceDervishEvent,
-  forceInvadersEvent,
-  forceGunKataEvent,
-  forceLockbusterEvent,
-  forceConnectFourEvent,
-  forceComboEvent,
-  forceSkeeBallEvent,
-  forceBubbleShooterEvent,
-  forceDeltaEvent,
-  forceHydrantEvent,
-  forceCloverleafEvent,
-  forcePinstripeEvent,
-  forceFaucetEvent,
-  forceShowerheadEvent,
-  forceBinaryStarEvent,
-  forceHopscotchEvent,
-  forceTadpolesEvent,
-  forceBlinkEvent,
-  forceBumperCarsEvent,
-  forcePigeonsEvent,
-  forceSquidEvent,
-  forceWaterPistolEvent,
-  forcePoiEvent,
-  forceBartenderEvent,
-  forcePoleVaultEvent,
-  forcePaintRollerEvent,
-  forceBuzzsawEvent,
-  forceLightCyclesEvent,
-  forceFiberOpticEvent,
-  forceDaddyLonglegsEvent,
-  forceKnighthoodEvent,
-  forceCuttingTorchEvent,
-  forceStElmosFireEvent,
-  forceSteppedLeaderEvent,
-  forceTrolleyEvent,
-  forceBoltBounceEvent,
-  forceStormCrownEvent,
-  forceVanDeGraaffEvent,
-  forceBarrelRollEvent,
-  forceBombStackEvent,
-  forceRomanCandleEvent,
-  forceWhistlersEvent,
-  forceTrebuchetEvent,
-  forceDropPodsEvent,
-  forceBombCarouselEvent,
-  forceLastStandEvent,
-  forceTinCanEvent,
-  forcePointDefenseEvent,
-  forceTargetPracticeEvent,
-  forceFlareGunEvent,
-  forceRappelEvent,
-  forceStackerEvent,
-  forceCoinPusherEvent,
-  forceHighStrikerEvent,
-  forceNoteHighwayEvent,
-  forceSafecrackerEvent,
-  forceGumballMachineEvent,
-  forceNinjaEvent,
-  forceBungeeEvent,
-  forceFunnelCakeEvent,
-  forceChrysanthemumEvent,
-  forceCrossroadsEvent,
-  forceWaterslideEvent,
-  forceBannerEvent,
-  forceHauntEvent,
-  forceMapleSeedsEvent,
-  forceDonutsEvent,
-  forceHamsterWheelEvent,
-  forceLunarLanderEvent,
-  forceDowsingEvent,
-  forceMatadorEvent,
-  forceFlashFloodEvent,
-  forceDolphinEvent,
-  forcePufferEvent,
-  forceHockeyStopEvent,
-  forceTwirlEvent,
-  forceWhaleEvent,
-  forceLightPaintingEvent,
-  forceSaberThrowEvent,
-  forceLaserMazeEvent,
-  forceTapeMeasureEvent,
-  forcePulsarEvent,
-  forceShortCircuitEvent,
-  forceConductorEvent,
-  forceDoubleStrikeEvent,
-  forceLightningFenceEvent,
-  forceHeatLightningEvent,
-  forcePowderKegsEvent,
-  forceBombFountainEvent,
-  forceFragOutEvent,
-  forceFaultLineEvent,
-  forceWillowShellsEvent,
-  forceSwarmStrikeEvent,
-  forceConcentricEvent,
-  forceGrazeEvent,
-  forceHotfootEvent,
-  forceDogfightEvent,
-  forceBulletRoseEvent,
-  forceArmorPiercerEvent,
-  forceSpotterEvent,
-  forcePegSolitaireEvent,
-  forceMarbleDropEvent,
-  forceStatuesEvent,
-  forceFlappyWispEvent,
-  forceBuriedTreasureEvent,
-  forceAirHockeyEvent,
-  forceBoltOfCashEvent,
-  forcePendulumPourEvent,
-  forcePopTheCorkEvent,
-  forceWallJumpEvent,
-  forceSuperballEvent,
-  forceSpinDashEvent,
-  forceCupidEvent,
-  forceStorkEvent,
-  forcePaperPlaneEvent,
-  forceSpikeEvent,
-  forceToasterEvent,
-  forceXylophoneEvent,
-  forceBirthdayCandlesEvent,
-  forceDropTowerEvent,
-  forceArrowVolleyEvent,
-  forceMakeAWishEvent,
-  forceBlunderbussEvent,
-  forceGenieEvent,
-  forceSolarFlareEvent,
-  forceHeatVisionEvent,
-  forcePrintHeadEvent,
-  forceAuroraEvent,
-  forceThunderRingsEvent,
-  forceArcWeldEvent,
-  forceStormKiteEvent,
-  forceVolcanicLightningEvent,
-  forceSculptorEvent,
-  forceGrandFinaleEvent,
-  forceBombBouquetEvent,
-  forceCascadeEvent,
-  forcePinballBombEvent,
-  forceBombTrainEvent,
-  forceBreachingChargeEvent,
-  forceConfettiCannonEvent,
-  forceAmmoBeltEvent,
-  forceGauntletEvent,
-  forceTurretTowerEvent,
-  forceShellCasingsEvent,
-  forceDartsEvent,
-  forceBattleshipEvent,
-  forceInterceptorsEvent,
-  forceLandGrabEvent,
-  forceDuckDuckGooseEvent,
-  forceRingerEvent,
-  forceHurdlesEvent,
-  forceLuckyRollEvent,
-  forceCashRegisterEvent,
-  forceHorseRaceEvent,
-  forceDunkTankEvent,
-  forceHalfPipeEvent,
-  forceKnotEvent,
-  forceTickerTapeEvent,
-  forceCashBridgeEvent,
-  forceSkippingStoneEvent,
-  forceWoodpeckerEvent,
-  forceFrisbeeEvent,
-  forceKangarooEvent,
-  forceBadmintonEvent,
-  forceTumbleweedEvent,
-  forceShuttleRunEvent,
-  forceEcholocationEvent,
-  forceLacrosseEvent,
-  forceJetSkiEvent,
-  forceDrinkingStrawEvent,
-  forceSeaSerpentEvent,
-  forceMagicTrickEvent,
-  forceFountainPenEvent,
-  forceSpoolEvent,
-  forceLaserRainEvent,
-  forceCrossCutEvent,
-  forceHeliographEvent,
-  forceStarburstEvent,
-  forceThunderDrumEvent,
-  forceBoltBarrageEvent,
-  forceCoilgunEvent,
-  forceSnowflakeEvent,
-  forceBombSnakeEvent,
-  forceSpiderMinesEvent,
-  forceCrossetteEvent,
-  forceSpiralChargeEvent,
-  forceBombBubblesEvent,
-  forceRocketSledEvent,
-  forceDynamiteFishingEvent,
-  forceChargeShotEvent,
-  forceCorkscrewRoundsEvent,
-  forceOrbitalGunsEvent,
-  forceTracerRoundsEvent,
-  forcePelletStormEvent,
-  forceBulletSnakeEvent,
-  forceRockPaperScissorsEvent,
-  forceLimboEvent,
-  forceQuizShowEvent,
-  forceSumoEvent,
-  forcePaperTossEvent,
-  forceArmWrestlingEvent,
-  forceKeepyUppyEvent,
-  forcePinTheTailEvent,
-  forceTrustFallEvent,
-  forceBubbleGumEvent,
-  forceCanalLocksEvent,
-  forceBobsledEvent,
-  forceSpringLoadedEvent,
-  forceInfluxEvent,
-  forceUnevenBarsEvent,
-  forceBumblebeeEvent,
-  forceShotPutEvent,
-  forceHumanCannonballEvent,
-  forceFoxAndHoundsEvent,
-  forceKingfisherEvent,
-  forceJoustEvent,
-  forcePelicanEvent,
-  forceDragsterEvent,
-  forceFireBreatherEvent,
-  forceBucketSwingEvent,
-  forcePuppeteerEvent,
-  forceCoronaEvent,
-  forcePillarsEvent,
-  forceLaserLadderEvent,
-  forceBeamSplitterEvent,
-  forceTeleporterEvent,
-  forceRingLightEvent,
-  forceTaserEvent,
-  forceArcFurnaceEvent,
-  forceFiveFingersEvent,
-  forceCattleProdEvent,
-  forceBoltSlingEvent,
-  forceCollidingStormsEvent,
-  forceBombJugglerEvent,
-  forceBombSquadEvent,
-  forceSplitterEvent,
-  forceBombPendulumEvent,
-  forceParadropEvent,
-  forceBombPachinkoEvent,
-  forceFuseClockEvent,
-  forceHedgehogEvent,
-  forceSplitShotEvent,
-  forceBulletLassoEvent,
-  forceBulletWeaveEvent,
-  forceBulletFountainEvent,
-  forceCoveringFireEvent,
-  forceCheckersEvent,
-  forceMinesweeperEvent,
-  forceJackInTheBoxEvent,
-  forceSpillwayEvent,
-  forceCrosscurrentsEvent,
-  forceOxbowEvent,
-  forceBreakersEvent,
-  forceRivuletsEvent,
-  forceTorrentEvent,
-  forceLissajousEvent,
-  forceMoonHopEvent,
-  forcePeekabooEvent,
-  forceTiltAWhirlEvent,
-  forceWaterStriderEvent,
-  forceRopeClimbEvent,
-  forcePaddleSteamerEvent,
-  forceJetWashEvent,
-  forceBellowsEvent,
-  forceRainDanceEvent,
-  forceSkiTowEvent,
-  forceRibbonDancerEvent,
-  forceLaserTurnstileEvent,
-  forceLightBridgeEvent,
-  forceLaserWebEvent,
-  forceFootlightsEvent,
-  forceFusionBeamEvent,
-  forcePinpointEvent,
-  forceGalvanizeEvent,
-  forceSparkJumpEvent,
-  forceStaticClingEvent,
-  forceCapacitorEvent,
-  forceSparkTrainEvent,
-  forceArcBridgeEvent,
-  forceDaisyCutterEvent,
-  forceRippleMinesEvent,
-  forceBombYoYoEvent,
-  forceBombHailEvent,
-  forceGroundPoundEvent,
-  forceCherryBombEvent,
-  forceBombCrownEvent,
-  forceBulletCombEvent,
-  forceBulletBraidEvent,
-  forceBulletCageEvent,
-  forceGunslingerEvent,
-  forceBulletWheelEvent,
-  forceBulletLadderEvent,
-  forceWhipZoomEvent,
-  forceIrisOutEvent,
-  forceScreenReelsEvent,
-  forceGoldLeafEvent,
-  forcePixelStormEvent,
-  forceGravityFlipEvent,
-  forceEchoEvent,
-  forceMirrorBoxEvent,
-  forcePullBackEvent,
-  forceTreadmillEvent,
-  forceBlastOffEvent,
-  forcePopUpEvent,
-  forceStickerPeelEvent,
-  forceGlissandoEvent,
-  forceVaultDoorsEvent,
-  forceChampagneTowerEvent,
-  forcePinballRiverEvent,
-  forcePressureWasherEvent,
-  forceIrrigationEvent,
-  forceWaterspoutEvent,
-  forceSidewinderEvent,
-  forceOrbitSwapEvent,
-  forceCuckooEvent,
-  forceGyreEvent,
-  forceBarHopEvent,
-  forceCometPlowEvent,
-  forceHoseReelEvent,
-  forceGeyserRiderEvent,
-  forceBubbleBlowerEvent,
-  forcePoolDiveEvent,
-  forceRubberBandEvent,
-  forceBeamViseEvent,
-  forceLaserRakeEvent,
-  forceLightDominoesEvent,
-  forcePryBarEvent,
-  forceTeslaTennisEvent,
-  forceTuningForkEvent,
-  forceBoltSpiralEvent,
-  forceGroundCurrentEvent,
-  forceOverchargeEvent,
-  forceBombTornadoEvent,
-  forceBombBoomerangEvent,
-  forceMultistageEvent,
-  forceBombPileEvent,
-  forceBombGarlandEvent,
-  forceHomingRoundsEvent,
-  forceWaveCannonEvent,
-  forceSnapbackEvent,
-  forceBulletFunnelEvent,
-  forceCrisscrossEvent,
-  forceChainFountainEvent,
-  forceSmokeRingsEvent,
-  forceWaterSaluteEvent,
-  forceDoublePendulumEvent,
-  forceTrapezeEvent,
-  forceDiaboloEvent,
-  forceZorbEvent,
-  forceHoopDiveEvent,
-  forceSpinArtEvent,
-  forcePaperCutterEvent,
-  forceFlippersEvent,
-  forceDrawbridgeEvent,
-  forceFlailEvent,
-  forceVineSwingEvent,
-  forceBombSnowballEvent,
-  forceGerbEvent,
-  forceRecoilEvent,
-  forceTumbleFireEvent,
-  forceRollUpEvent,
-  forceShredderEvent,
-  forceHeadOnEvent,
-  forcePyramidEvent,
-  forcePizzaTossEvent,
-  forceCompassEvent,
-  forceSkewerEvent,
-  forceBombCometEvent,
-  forceKaboomEvent,
-  forceReturnFireEvent,
-  forceFrostedGlassEvent,
-  forceSwitchOffEvent,
-  forceStuntTrackEvent,
-  forceFleasEvent,
-  forceHandPumpEvent,
-  forcePickUpSticksEvent,
-  forceThunderShellEvent,
-  forceMidAirEvent,
-  forceChainFireEvent,
-  forceRimShotEvent,
-  forceTinRoofEvent,
-  forceCrumpleEvent,
-  forceMinimizeEvent,
-  forceJumpingJetsEvent,
-  forceBubbleChamberEvent,
-  forceCastNetEvent,
-  forceHobermanEvent,
-  forceExcaliburEvent,
-  forcePistonsEvent,
-  forceWilliamTellEvent,
-  forceFoosballEvent,
-  forceRubberSheetEvent,
-  forceRattleEvent,
-  forceEddiesEvent,
-  forceTubeManEvent,
-  forceDeflateEvent,
-  forceGearTrainEvent,
-  forceUpstrikeEvent,
-  forceCreepingBarrageEvent,
-  forceBallisticPendulumEvent,
-  forceRingTawEvent,
-  forceRainyWindowEvent,
-  forceInflateEvent,
-  forceDomeFountainsEvent,
-  forceBellRingersEvent,
-  forceWetDogEvent,
-  forceTowerCraneEvent,
-  forceBeadLightningEvent,
-  forceRockslideEvent,
-  forceTightGroupEvent,
-  forceJacksEvent,
-  forceReflectingPoolEvent,
-  forcePinArtEvent,
-  forceTwinWhirlpoolsEvent,
-  forceHatchlingsEvent,
-  forceButterfingersEvent,
-  forceLockPickEvent,
-  forceBlacksmithEvent,
-  forceSeismicChargesEvent,
-  forceSkipShotsEvent,
-  forceJumpingBeansEvent,
-  forceSwissCheeseEvent,
-  forceExplodedViewEvent,
-  forceRiptideEvent,
-  forceFencingEvent,
-  forceWaterTowerEvent,
-  forceBarberPoleEvent,
-  forceIonCannonEvent,
-  forceClaymoreEvent,
-  forcePepperboxEvent,
-  forceSquashEvent,
-  forceVerticalHoldEvent,
-  forceHalftoneEvent,
-  forceBlowholeEvent,
-  forceLamplighterEvent,
-  forceFireBrigadeEvent,
-  forceSpokesEvent,
-  forceThunderRingEvent,
-  forceBottleRocketEvent,
-  forceSkeetEvent,
-  forceTennisEvent,
-  forceInterlaceEvent,
-  forceMirrorMirrorEvent,
-  forceCottonCandyEvent,
-  forcePelotonEvent,
-  forceDrinkingBirdEvent,
-  forceLaserDrillEvent,
-  forceHairRaiserEvent,
-  forceDetonatorEvent,
-  forceBulletRainEvent,
-  forceBouncyCastleEvent,
-  forceGameOfLifeEvent,
-  forceLabyrinthEvent,
-  forceTidalBoreEvent,
-  forceScrumEvent,
-  forceGoldRushEvent,
-  forceSuspensionBridgeEvent,
-  forceRedlineEvent,
-  forceWillowEvent,
-  forceQuickdrawEvent,
-  forceGalileanCannonEvent,
-  forceChaosGameEvent,
-  forceSandpileEvent,
-  forceAugerEvent,
-  forceFountainShowEvent,
-  forceSpinningPlatesEvent,
-  forceScoopsEvent,
-  forceSolarFurnaceEvent,
-  forceLightningHandsEvent,
-  forceRingOfFireEvent,
-  forceBulletClashEvent,
-  forceBouncePassEvent,
-  forceOilStrikeEvent,
-  forceHarmonographEvent,
-  forceQuicksortEvent,
-  forceCapillaryEvent,
-  forceBattleTopsEvent,
-  forcePneumaticTubesEvent,
-  forceStarPolygonEvent,
-  forceVoltSpiderEvent,
-  forceOrbitalDecayEvent,
-  forceSprayAndPrayEvent,
-  forceShuttleEvent,
-  forceDrillDuelEvent,
-  forceRule30Event,
-  forceAirbrushEvent,
-  forceCalvingEvent,
-  forcePhoenixEvent,
-  forceSteamTrainEvent,
-  forceLightSailEvent,
-  forceInchwormEvent,
-  forceCriticalMassEvent,
-  forceKnifeThrowerEvent,
-  forceCompactorEvent,
-  forceCoreSampleEvent,
-  forceFoamPartyEvent,
-  forceLangtonsAntEvent,
-  forceOthelloEvent,
-  forceGloopEvent,
-  forceEscapeVelocityEvent,
-  forceSungrazerEvent,
-  forceFractalTreeEvent,
-  forceSwitchboardEvent,
-  forceInterferenceEvent,
-  forceTowerDefenseEvent,
-  forceBounceWaveEvent,
-  forceMoleEvent,
-  forceCarWashEvent,
-  forceDragonCurveEvent,
-  forceLightsOutEvent,
-  forceTumblerEvent,
-  forceWaggleDanceEvent,
-  forceWaterCycleEvent,
-  forceFoldingRuleEvent,
-  forceArcSwarmEvent,
-  forceLockstepEvent,
-  forceHackySackEvent,
-  forceWoodwormEvent,
-  forceGraffitiEvent,
-  forceVoronoiEvent,
-  forcePercolationEvent,
-  forceDuneEvent,
-  forceStringOfPearlsEvent,
-  forceRiverJugglerEvent,
-  forceLikeChargesEvent,
-  forceCollisionCourseEvent,
-  forceTargetWheelEvent,
-  forceSpinningHexagonEvent,
-  forceBeadDrillEvent,
-  forceHydroseederEvent,
-  forceMancalaEvent,
-  forceBreakthroughEvent,
-  forceCurvesEvent,
-  forceArchimedesScrewEvent,
-  forceMurmurationEvent,
-  forceSpiritBombEvent,
-  forceMetronomeEvent,
-  forcePowerGridEvent,
-  forceBombBowlingEvent,
-  forceShowdownEvent,
-  forceJumpRopeEvent,
-  forceStrongboxEvent,
-  forceSnowCannonEvent,
-  forceHillClimbEvent,
-  forceAbacusEvent,
-  forceCoralEvent,
-  forceChladniEvent,
-  forceAfterimageEvent,
-  forceSnowGlobeEvent,
-  forceSundialEvent,
-  forceRiveterEvent,
-  forcePaddleBallEvent,
-  forceGeodeEvent,
-  forceFogMachineEvent,
-  forceChicaneEvent,
-  forceEpicyclesEvent,
-  forceSieveEvent,
-  forceClutterEvent,
-  forcePartingEvent,
-  forceBuzzWireEvent,
-  forceHiccupsEvent,
-  forceCutTheRopeEvent,
-  forceWhisperingGalleryEvent,
-  forceChunnelEvent,
-  forceSneezeEvent,
-  forceGrandPrixEvent,
-  forcePillowFightEvent,
-  forceDotsAndBoxesEvent,
-  forceHoldingPatternEvent,
-  forceTankerEvent,
-  forceVaporCloudEvent,
-  forceShieldBreakerEvent,
-  forceBottleneckEvent,
-  forceSkylightEvent,
-  forceDelugeEvent,
-  forceMonacoEvent,
-  forceGlitterSpillEvent,
-  forceRogueWaveEvent,
-  forceThunderEggEvent,
-  forceHologramEvent,
-  forceLeafFallEvent,
-  forceThreeBodyEvent,
-  forceBillowsEvent,
-  forceMoireEvent,
-  forcePolePositionEvent,
-  forceCountersinkEvent,
-  forceBusyBeaverEvent,
-  forcePursuitEvent,
-  forceFractalChargeEvent,
-  forceSnowplowEvent,
-  forceFranklinsKiteEvent,
-  forceSokobanEvent,
-  forceFrackingEvent,
-  forceChopperEvent,
-  forceExtinguisherEvent,
-  forceGoldenSpiralEvent,
-  forceWildfireEvent,
-  forceTimeTrialEvent,
-  forceDustBunniesEvent,
-  forceMagneticPendulumEvent,
-  forceDeCasteljauEvent,
-  forceBuffonsNeedleEvent,
-  forceFuseMazeEvent,
-  forceBarBilliardsEvent,
-  forceLevyFlightEvent,
-  forceBrachistochroneEvent,
-  forceUlamSpiralEvent,
-  forceGaltonBoardEvent,
-  forcePoohsticksEvent,
-  forceFireForEffectEvent,
-  forceEyewallEvent,
-  forceJosephusEvent,
-  forcePodiumEvent,
-  forceRobovacEvent,
-  forceFigureEightEvent,
-  forceBonanzaEvent,
-  forcePiClacksEvent,
-  forceSeedPodsEvent,
-  forceRippleFireEvent,
-  forceSparkChamberEvent,
-  forceTurbineEvent,
-  forceStrangeAttractorEvent,
-  forceTopsyTurvyEvent,
-  forceGoldPlatingEvent,
-  forceCrosswindEvent,
-  forceHailstoneEvent,
-  forceHilbertCurveEvent,
-  forceLeMansEvent,
-  forceTunnelBorerEvent,
-  forceHarpoonEvent,
-  forceEightQueensEvent,
-  forceShortestPathEvent,
-  forceSinkholeEvent,
-  forceBackwashEvent,
-  forceDeflectorEvent,
-  forceSunflowerEvent,
-  forceConvexHullEvent,
-  forceSlashEvent,
-  forceJackhammerEvent,
-  forcePummelEvent,
-  forceOverloadEvent,
-  forceGatlingEvent,
-  forcePressEvent,
-  forceDrillEvent,
-  forceBurrowEvent,
-  forcePingPongEvent,
-  forceSlamDunkEvent,
-  forceUppercutEvent,
-  forceHeadHopEvent,
-  forcePaparazziEvent,
-  forceMissileBarrageEvent,
-  forceSonicBoomEvent,
-  forceMitosisEvent,
-  forcePlinkoEvent,
-  forceHammerThrowEvent,
-  forceSnakeEvent,
-  forceBreakoutEvent,
-  forceLineClearEvent,
-  forceBreakShotEvent,
-  forceBulletHellEvent,
-  forceVortexEvent,
-  forceRicochetEvent,
-  forceWaterfallEvent,
-  forceConveyorEvent,
-  forceFirefliesEvent,
-  forcePaydayEvent,
-  forcePiggyBankEvent,
-  forceCoinTossEvent,
-  forceHourglassEvent,
-  forceRocketEvent,
-  forceRevealEvent,
-  forceJackpotReelsEvent,
-  forceChainPayEvent,
-  forceTwisterEvent,
-  forceDownpourEvent,
-  forceTrickleEvent,
-  forceMagnetEvent,
-  forceSpilloverEvent,
-  forceConstellationEvent,
-  forceAscendEvent,
-  forceRisingTideEvent,
-  forceTidalWaveEvent,
-  forceBeanstalkEvent,
-  forceBlessingEvent,
-  forceHaloEvent,
-  forceCometEvent,
-  forceMeteorShowerEvent,
-  forceMentorEvent,
-  forceSparkChainEvent,
-  forcePolishEvent,
-  forceLighthouseEvent,
-  forceRecruitEvent,
-  forcePromotionDayEvent,
-  forceAlchemyEvent,
-  forceInvestmentEvent,
-  forceDividendsEvent,
-  forceWispEvent,
-  forceStreamEvent,
-  forceTrailsEvent,
-  forceDrawEvent,
-  forceNightSkyEvent,
-  forcePitcherEvent,
-  forceGlimmerEvent,
-  forceHuntEvent,
-  startSwarmEvent,
-  forceRenovateEvent,
-  forceUpgradeEvent,
-  forceUnlockEvent,
+  loadEventCatalog,
+  type EventCatalog,
   type FloorActionsDeps,
 } from "./floors";
 import {
@@ -1429,6 +311,11 @@ async function main() {
   warmTierFlashes();
   // creating the AudioContext alone blocked the main thread for tens of ms
   runWhenIdle(preloadSounds, 1500);
+  // the events and featured crit rewards are most of the code: kept out of the
+  // startup bundle, they load once the first screen is up (crits roll without
+  // them till then)
+  runWhenIdle(() => void loadFeaturedRewards(), 2000);
+  runWhenIdle(() => void loadEventCatalog(), 3000);
 
   app.innerHTML = `
     <div class="game">
@@ -1788,1808 +675,2157 @@ async function main() {
     wireIdleOverlayTestButton(app, () => {
       void totalEarnedOverlay.show(fromNumber(123456));
     });
+    // the event modules load in their own chunk (floors/eventLoader): each
+    // event test button loads it first, then runs with it as `ev`
+    let ev!: EventCatalog;
+    const later =
+      <A extends unknown[]>(run: (...args: A) => void) =>
+      (...args: A): void => {
+        void loadEventCatalog().then((events) => {
+          ev = events;
+          run(...args);
+        });
+      };
     // arms the "Boost!" event button on the lowest floor that still has an
     // un-boosted worker, and scrolls to it
-    wireBoostEventTestButton(app, () => {
-      const floor = forceBoostEvent(buildings[activeBuildingIndex] ?? []);
-      if (floor) gameCanvas.scrollActiveToFloor(floor);
-    });
+    wireBoostEventTestButton(
+      app,
+      later(() => {
+        const floor = ev.forceBoostEvent(buildings[activeBuildingIndex] ?? []);
+        if (floor) gameCanvas.scrollActiveToFloor(floor);
+      }),
+    );
     // arms "Union!" on the lowest floor with workers to merge, and scrolls to it
-    wireUnionEventTestButton(app, () => {
-      const floor = forceUnionEvent(buildings[activeBuildingIndex] ?? []);
-      if (floor) gameCanvas.scrollActiveToFloor(floor);
-    });
+    wireUnionEventTestButton(
+      app,
+      later(() => {
+        const floor = ev.forceUnionEvent(buildings[activeBuildingIndex] ?? []);
+        if (floor) gameCanvas.scrollActiveToFloor(floor);
+      }),
+    );
     // scrolls to the ground floor and arms a crit there carrying Kickback
-    wireKickbackEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceKickbackEvent(floor);
-    });
+    wireKickbackEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceKickbackEvent(floor);
+      }),
+    );
     // same, for the Burst event
-    wireBurstEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBurstEvent(floor);
-    });
+    wireBurstEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBurstEvent(floor);
+      }),
+    );
     // same, for the Spray event
-    wireSprayEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSprayEvent(floor);
-    });
+    wireSprayEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSprayEvent(floor);
+      }),
+    );
     // same, for the Fountain event
-    wireFountainEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceFountainEvent(floor);
-    });
+    wireFountainEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceFountainEvent(floor);
+      }),
+    );
     // same, for the Ripple event
-    wireRippleEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceRippleEvent(floor);
-    });
+    wireRippleEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceRippleEvent(floor);
+      }),
+    );
     // same, for the Wrecking Ball event
-    wireWreckingBallEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceWreckingBallEvent(floor);
-    });
+    wireWreckingBallEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceWreckingBallEvent(floor);
+      }),
+    );
     // same, for the Piledriver event
-    wirePiledriverEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePiledriverEvent(floor);
-    });
+    wirePiledriverEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePiledriverEvent(floor);
+      }),
+    );
     // same, for the Orbital Strike event
-    wireOrbitalStrikeEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceOrbitalStrikeEvent(floor);
-    });
+    wireOrbitalStrikeEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceOrbitalStrikeEvent(floor);
+      }),
+    );
     // same, for the Fuse event
-    wireFuseEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceFuseEvent(floor);
-    });
+    wireFuseEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceFuseEvent(floor);
+      }),
+    );
     // same, for the Supernova event
-    wireSupernovaEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSupernovaEvent(floor);
-    });
+    wireSupernovaEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSupernovaEvent(floor);
+      }),
+    );
     // same, for the Bowling event
-    wireBowlingEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBowlingEvent(floor);
-    });
+    wireBowlingEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBowlingEvent(floor);
+      }),
+    );
     // same, for the Thunderclap event
-    wireThunderclapEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceThunderclapEvent(floor);
-    });
+    wireThunderclapEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceThunderclapEvent(floor);
+      }),
+    );
     // same, for the Chain Reaction event
-    wireChainReactionEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceChainReactionEvent(floor);
-    });
+    wireChainReactionEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceChainReactionEvent(floor);
+      }),
+    );
     // same, for the Bullseye event
-    wireBullseyeEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBullseyeEvent(floor);
-    });
+    wireBullseyeEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBullseyeEvent(floor);
+      }),
+    );
     // same, for the Popcorn event
-    wirePopcornEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePopcornEvent(floor);
-    });
+    wirePopcornEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePopcornEvent(floor);
+      }),
+    );
     // same, for the Newton's Cradle event
-    wireNewtonsCradleEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceNewtonsCradleEvent(floor);
-    });
+    wireNewtonsCradleEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceNewtonsCradleEvent(floor);
+      }),
+    );
     // same, for the Juggle event
-    wireJuggleEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceJuggleEvent(floor);
-    });
+    wireJuggleEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceJuggleEvent(floor);
+      }),
+    );
     // same, for the Boomerang event
-    wireBoomerangEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBoomerangEvent(floor);
-    });
+    wireBoomerangEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBoomerangEvent(floor);
+      }),
+    );
     // same, for the Heartbeat event
-    wireHeartbeatEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceHeartbeatEvent(floor);
-    });
+    wireHeartbeatEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceHeartbeatEvent(floor);
+      }),
+    );
     // same, for the Clash event
-    wireClashEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceClashEvent(floor);
-    });
+    wireClashEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceClashEvent(floor);
+      }),
+    );
     // same, for the Asteroids event
-    wireAsteroidsEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceAsteroidsEvent(floor);
-    });
+    wireAsteroidsEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceAsteroidsEvent(floor);
+      }),
+    );
     // same, for the Whack-a-Mole event
-    wireWhackAMoleEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceWhackAMoleEvent(floor);
-    });
+    wireWhackAMoleEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceWhackAMoleEvent(floor);
+      }),
+    );
     // same, for the Drumroll event
-    wireDrumrollEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceDrumrollEvent(floor);
-    });
+    wireDrumrollEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceDrumrollEvent(floor);
+      }),
+    );
     // same, for the Shell Game event
-    wireShellGameEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceShellGameEvent(floor);
-    });
+    wireShellGameEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceShellGameEvent(floor);
+      }),
+    );
     // same, for the Seesaw event
-    wireSeesawEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSeesawEvent(floor);
-    });
+    wireSeesawEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSeesawEvent(floor);
+      }),
+    );
     // same, for the Scratch event
-    wireScratchEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceScratchEvent(floor);
-    });
+    wireScratchEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceScratchEvent(floor);
+      }),
+    );
     // same, for the Tag event
-    wireTagEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceTagEvent(floor);
-    });
+    wireTagEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceTagEvent(floor);
+      }),
+    );
     // same, for the Bumpers event
-    wireBumpersEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBumpersEvent(floor);
-    });
+    wireBumpersEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBumpersEvent(floor);
+      }),
+    );
     // same, for the Catcher event
-    wireCatcherEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceCatcherEvent(floor);
-    });
+    wireCatcherEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceCatcherEvent(floor);
+      }),
+    );
     // same, for the Implosion event
-    wireImplosionEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceImplosionEvent(floor);
-    });
+    wireImplosionEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceImplosionEvent(floor);
+      }),
+    );
     // same, for the Atom event
-    wireAtomEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceAtomEvent(floor);
-    });
+    wireAtomEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceAtomEvent(floor);
+      }),
+    );
     // same, for the Spiral event
-    wireSpiralEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSpiralEvent(floor);
-    });
+    wireSpiralEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSpiralEvent(floor);
+      }),
+    );
     // same, for the Loop event
-    wireLoopEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceLoopEvent(floor);
-    });
+    wireLoopEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceLoopEvent(floor);
+      }),
+    );
     // same, for the Eternity event
-    wireEternityEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceEternityEvent(floor);
-    });
+    wireEternityEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceEternityEvent(floor);
+      }),
+    );
     // same, for the Helix event
-    wireHelixEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceHelixEvent(floor);
-    });
+    wireHelixEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceHelixEvent(floor);
+      }),
+    );
     // same, for the Yo-Yo event
-    wireYoYoEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceYoYoEvent(floor);
-    });
+    wireYoYoEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceYoYoEvent(floor);
+      }),
+    );
     // same, for the Racetrack event
-    wireRacetrackEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceRacetrackEvent(floor);
-    });
+    wireRacetrackEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceRacetrackEvent(floor);
+      }),
+    );
     // same, for the Swing event
-    wireSwingEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSwingEvent(floor);
-    });
+    wireSwingEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSwingEvent(floor);
+      }),
+    );
     // the rest of the event test buttons, each forcing its event on the
     // active building's ground floor
-    const forceOnActive = (force: typeof forceSwingEvent) => () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      force(floor);
-    };
+    const forceOnActive = (
+      pick: (events: EventCatalog) => (floor: Floor) => void,
+    ) =>
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        pick(ev)(floor);
+      });
     wireEventTestButtons(app, {
-      kaleidoscope: forceOnActive(forceKaleidoscopeEvent),
-      zipper: forceOnActive(forceZipperEvent),
-      screensaver: forceOnActive(forceScreensaverEvent),
-      sprinkler: forceOnActive(forceSprinklerEvent),
-      clockwork: forceOnActive(forceClockworkEvent),
-      "hole-in-one": forceOnActive(forceHoleInOneEvent),
-      leapfrog: forceOnActive(forceLeapfrogEvent),
-      lineup: forceOnActive(forceLineupEvent),
-      stampede: forceOnActive(forceStampedeEvent),
-      wormhole: forceOnActive(forceWormholeEvent),
-      splat: forceOnActive(forceSplatEvent),
-      roulette: forceOnActive(forceRouletteEvent),
-      "free-kick": forceOnActive(forceFreeKickEvent),
-      slalom: forceOnActive(forceSlalomEvent),
-      lightning: forceOnActive(forceLightningEvent),
-      "fire-hose": forceOnActive(forceFireHoseEvent),
-      confluence: forceOnActive(forceConfluenceEvent),
-      slosh: forceOnActive(forceSloshEvent),
-      siphon: forceOnActive(forceSiphonEvent),
-      crossfire: forceOnActive(forceCrossfireEvent),
-      "gravity-well": forceOnActive(forceGravityWellEvent),
-      splashdown: forceOnActive(forceSplashdownEvent),
-      geysers: forceOnActive(forceGeysersEvent),
-      "cash-cannon": forceOnActive(forceCashCannonEvent),
-      hoover: forceOnActive(forceHooverEvent),
-      "air-show": forceOnActive(forceAirShowEvent),
-      leak: forceOnActive(forceLeakEvent),
-      climb: forceOnActive(forceClimbEvent),
-      kite: forceOnActive(forceKiteEvent),
-      rainbow: forceOnActive(forceRainbowEvent),
-      branches: forceOnActive(forceBranchesEvent),
-      "tug-of-war": forceOnActive(forceTugOfWarEvent),
-      waterwheel: forceOnActive(forceWaterwheelEvent),
-      braid: forceOnActive(forceBraidEvent),
-      skim: forceOnActive(forceSkimEvent),
-      lattice: forceOnActive(forceLatticeEvent),
-      fireworks: forceOnActive(forceFireworksEvent),
-      slingshot: forceOnActive(forceSlingshotEvent),
-      marquee: forceOnActive(forceMarqueeEvent),
-      "crop-duster": forceOnActive(forceCropDusterEvent),
-      bolas: forceOnActive(forceBolasEvent),
-      countdown: forceOnActive(forceCountdownEvent),
-      sparkler: forceOnActive(forceSparklerEvent),
-      slinky: forceOnActive(forceSlinkyEvent),
-      pipeline: forceOnActive(forcePipelineEvent),
-      prism: forceOnActive(forcePrismEvent),
-      trampoline: forceOnActive(forceTrampolineEvent),
-      hummingbird: forceOnActive(forceHummingbirdEvent),
-      "dive-bomb": forceOnActive(forceDiveBombEvent),
-      "ski-jump": forceOnActive(forceSkiJumpEvent),
-      jetpack: forceOnActive(forceJetpackEvent),
-      "bass-drop": forceOnActive(forceBassDropEvent),
-      scanner: forceOnActive(forceScannerEvent),
-      "laser-grid": forceOnActive(forceLaserGridEvent),
-      etch: forceOnActive(forceEtchEvent),
-      searchlights: forceOnActive(forceSearchlightsEvent),
-      "tractor-beam": forceOnActive(forceTractorBeamEvent),
-      "beam-clash": forceOnActive(forceBeamClashEvent),
-      butterfly: forceOnActive(forceButterflyEvent),
-      kelp: forceOnActive(forceKelpEvent),
-      "pendulum-wave": forceOnActive(forcePendulumWaveEvent),
-      formation: forceOnActive(forceFormationEvent),
-      ouroboros: forceOnActive(forceOuroborosEvent),
-      bowstring: forceOnActive(forceBowstringEvent),
-      superlaser: forceOnActive(forceSuperlaserEvent),
-      "ion-storm": forceOnActive(forceIonStormEvent),
-      glitch: forceOnActive(forceGlitchEvent),
-      magnifier: forceOnActive(forceMagnifierEvent),
-      "water-show": forceOnActive(forceWaterShowEvent),
-      mercury: forceOnActive(forceMercuryEvent),
-      alignment: forceOnActive(forceAlignmentEvent),
-      dandelion: forceOnActive(forceDandelionEvent),
-      bobber: forceOnActive(forceBobberEvent),
-      fishing: forceOnActive(forceFishingEvent),
-      scissors: forceOnActive(forceScissorsEvent),
-      "pulse-rifle": forceOnActive(forcePulseRifleEvent),
-      split: forceOnActive(forceSplitEvent),
-      pixelate: forceOnActive(forcePixelateEvent),
-      "dam-burst": forceOnActive(forceDamBurstEvent),
-      spiderweb: forceOnActive(forceSpiderwebEvent),
-      curtain: forceOnActive(forceCurtainEvent),
-      jellyfish: forceOnActive(forceJellyfishEvent),
-      polarity: forceOnActive(forcePolarityEvent),
-      collider: forceOnActive(forceColliderEvent),
-      sheepdog: forceOnActive(forceSheepdogEvent),
-      dragon: forceOnActive(forceDragonEvent),
-      reflector: forceOnActive(forceReflectorEvent),
-      "cookie-cutter": forceOnActive(forceCookieCutterEvent),
-      cinematic: forceOnActive(forceCinematicEvent),
-      negative: forceOnActive(forceNegativeEvent),
-      "chain-lightning": forceOnActive(forceChainLightningEvent),
-      "lock-on": forceOnActive(forceLockOnEvent),
-      stitch: forceOnActive(forceStitchEvent),
-      stockpile: forceOnActive(forceStockpileEvent),
-      "spot-weld": forceOnActive(forceSpotWeldEvent),
-      reels: forceOnActive(forceReelsEvent),
-      "cash-shower": forceOnActive(forceCashShowerEvent),
-      "catherine-wheel": forceOnActive(forceCatherineWheelEvent),
-      multiball: forceOnActive(forceMultiballEvent),
-      whip: forceOnActive(forceWhipEvent),
-      battery: forceOnActive(forceBatteryEvent),
-      "tesla-coil": forceOnActive(forceTeslaCoilEvent),
-      "jacobs-ladder": forceOnActive(forceJacobsLadderEvent),
-      "comic-book": forceOnActive(forceComicBookEvent),
-      avalanche: forceOnActive(forceAvalancheEvent),
-      beehive: forceOnActive(forceBeehiveEvent),
-      pogo: forceOnActive(forcePogoEvent),
-      "laser-harp": forceOnActive(forceLaserHarpEvent),
-      lichtenberg: forceOnActive(forceLichtenbergEvent),
-      shatter: forceOnActive(forceShatterEvent),
-      funnel: forceOnActive(forceFunnelEvent),
-      grapple: forceOnActive(forceGrappleEvent),
-      surf: forceOnActive(forceSurfEvent),
-      "laser-tag": forceOnActive(forceLaserTagEvent),
-      "ball-lightning": forceOnActive(forceBallLightningEvent),
-      "event-horizon": forceOnActive(forceEventHorizonEvent),
-      "tile-flip": forceOnActive(forceTileFlipEvent),
-      gusher: forceOnActive(forceGusherEvent),
-      pinata: forceOnActive(forcePinataEvent),
-      "gift-wrap": forceOnActive(forceGiftWrapEvent),
-      triangulate: forceOnActive(forceTriangulateEvent),
-      "spark-of-life": forceOnActive(forceSparkOfLifeEvent),
-      "glass-rain": forceOnActive(forceGlassRainEvent),
-      fold: forceOnActive(forceFoldEvent),
-      cocoon: forceOnActive(forceCocoonEvent),
-      "gravity-assist": forceOnActive(forceGravityAssistEvent),
-      "zip-line": forceOnActive(forceZipLineEvent),
-      breach: forceOnActive(forceBreachEvent),
-      "storm-surge": forceOnActive(forceStormSurgeEvent),
-      "smash-and-grab": forceOnActive(forceSmashAndGrabEvent),
-      "shrink-ray": forceOnActive(forceShrinkRayEvent),
-      sandstorm: forceOnActive(forceSandstormEvent),
-      juggernaut: forceOnActive(forceJuggernautEvent),
-      "fuel-line": forceOnActive(forceFuelLineEvent),
-      checkout: forceOnActive(forceCheckoutEvent),
-      "lightning-rod": forceOnActive(forceLightningRodEvent),
-      flag: forceOnActive(forceFlagEvent),
-      terraces: forceOnActive(forceTerracesEvent),
-      "battering-ram": forceOnActive(forceBatteringRamEvent),
-      tetherball: forceOnActive(forceTetherballEvent),
-      projector: forceOnActive(forceProjectorEvent),
-      clear: forceOnActive(forceClearEvent),
-      "infinity-mirror": forceOnActive(forceInfinityMirrorEvent),
-      elevator: forceOnActive(forceElevatorEvent),
-      migration: forceOnActive(forceMigrationEvent),
-      corkscrew: forceOnActive(forceCorkscrewEvent),
-      "mirror-ball": forceOnActive(forceMirrorBallEvent),
-      "plasma-globe": forceOnActive(forcePlasmaGlobeEvent),
-      jelly: forceOnActive(forceJellyEvent),
-      shockwave: forceOnActive(forceShockwaveEvent),
-      "pass-the-parcel": forceOnActive(forcePassTheParcelEvent),
-      "garden-hose": forceOnActive(forceGardenHoseEvent),
-      "burning-glass": forceOnActive(forceBurningGlassEvent),
-      "storm-front": forceOnActive(forceStormFrontEvent),
-      "slide-puzzle": forceOnActive(forceSlidePuzzleEvent),
-      whirlpool: forceOnActive(forceWhirlpoolEvent),
-      satellites: forceOnActive(forceSatellitesEvent),
-      typewriter: forceOnActive(forceTypewriterEvent),
-      railgun: forceOnActive(forceRailgunEvent),
-      thunderdome: forceOnActive(forceThunderdomeEvent),
-      melt: forceOnActive(forceMeltEvent),
-      flood: forceOnActive(forceFloodEvent),
-      "pied-piper": forceOnActive(forcePiedPiperEvent),
-      tentacles: forceOnActive(forceTentaclesEvent),
-      "laser-pendulum": forceOnActive(forceLaserPendulumEvent),
-      "electric-eel": forceOnActive(forceElectricEelEvent),
-      "double-vision": forceOnActive(forceDoubleVisionEvent),
-      honey: forceOnActive(forceHoneyEvent),
-      "musical-chairs": forceOnActive(forceMusicalChairsEvent),
-      "bubble-wand": forceOnActive(forceBubbleWandEvent),
-      hyperspace: forceOnActive(forceHyperspaceEvent),
-      javelin: forceOnActive(forceJavelinEvent),
-      shuffle: forceOnActive(forceShuffleEvent),
-      "mushroom-cloud": forceOnActive(forceMushroomCloudEvent),
-      relay: forceOnActive(forceRelayEvent),
-      "laser-pointer": forceOnActive(forceLaserPointerEvent),
-      "storm-chaser": forceOnActive(forceStormChaserEvent),
-      "bait-ball": forceOnActive(forceBaitBallEvent),
-      "video-wall": forceOnActive(forceVideoWallEvent),
-      ferrofluid: forceOnActive(forceFerrofluidEvent),
-      "hide-and-seek": forceOnActive(forceHideAndSeekEvent),
-      "magic-carpet": forceOnActive(forceMagicCarpetEvent),
-      spirograph: forceOnActive(forceSpirographEvent),
-      "electric-net": forceOnActive(forceElectricNetEvent),
-      demolition: forceOnActive(forceDemolitionEvent),
-      "shooting-gallery": forceOnActive(forceShootingGalleryEvent),
-      collapse: forceOnActive(forceCollapseEvent),
-      volcano: forceOnActive(forceVolcanoEvent),
-      skydivers: forceOnActive(forceSkydiversEvent),
-      speedboat: forceOnActive(forceSpeedboatEvent),
-      peacock: forceOnActive(forcePeacockEvent),
-      "storm-wings": forceOnActive(forceStormWingsEvent),
-      "cluster-bomb": forceOnActive(forceClusterBombEvent),
-      "strafing-run": forceOnActive(forceStrafingRunEvent),
-      "stained-glass": forceOnActive(forceStainedGlassEvent),
-      uprising: forceOnActive(forceUprisingEvent),
-      "swing-ride": forceOnActive(forceSwingRideEvent),
-      lawnmower: forceOnActive(forceLawnmowerEvent),
-      "light-show": forceOnActive(forceLightShowEvent),
-      "bug-zapper": forceOnActive(forceBugZapperEvent),
-      firecrackers: forceOnActive(forceFirecrackersEvent),
-      "six-shooter": forceOnActive(forceSixShooterEvent),
-      thermal: forceOnActive(forceThermalEvent),
-      stalactites: forceOnActive(forceStalactitesEvent),
-      kintsugi: forceOnActive(forceKintsugiEvent),
-      galaxy: forceOnActive(forceGalaxyEvent),
-      snowdrift: forceOnActive(forceSnowdriftEvent),
-      snowball: forceOnActive(forceSnowballEvent),
-      cartwheel: forceOnActive(forceCartwheelEvent),
-      matryoshka: forceOnActive(forceMatryoshkaEvent),
-      "salmon-run": forceOnActive(forceSalmonRunEvent),
-      "moon-tide": forceOnActive(forceMoonTideEvent),
-      "candy-floss": forceOnActive(forceCandyFlossEvent),
-      "figure-skater": forceOnActive(forceFigureSkaterEvent),
-      tripwire: forceOnActive(forceTripwireEvent),
-      sunrise: forceOnActive(forceSunriseEvent),
-      rally: forceOnActive(forceRallyEvent),
-      ignition: forceOnActive(forceIgnitionEvent),
-      trident: forceOnActive(forceTridentEvent),
-      crawl: forceOnActive(forceCrawlEvent),
-      "carpet-bombing": forceOnActive(forceCarpetBombingEvent),
-      "time-bomb": forceOnActive(forceTimeBombEvent),
-      "bunker-buster": forceOnActive(forceBunkerBusterEvent),
-      "grenade-toss": forceOnActive(forceGrenadeTossEvent),
-      "depth-charges": forceOnActive(forceDepthChargesEvent),
-      "firing-squad": forceOnActive(forceFiringSquadEvent),
-      akimbo: forceOnActive(forceAkimboEvent),
-      "flak-barrage": forceOnActive(forceFlakBarrageEvent),
-      "sniper-nest": forceOnActive(forceSniperNestEvent),
-      rewind: forceOnActive(forceRewindEvent),
-      "morse-code": forceOnActive(forceMorseCodeEvent),
-      "stadium-wave": forceOnActive(forceStadiumWaveEvent),
-      "knights-tour": forceOnActive(forceKnightsTourEvent),
-      "lava-lamp": forceOnActive(forceLavaLampEvent),
-      dominoes: forceOnActive(forceDominoesEvent),
-      inkblot: forceOnActive(forceInkblotEvent),
-      "soft-serve": forceOnActive(forceSoftServeEvent),
-      "dollar-sign": forceOnActive(forceDollarSignEvent),
-      mobius: forceOnActive(forceMobiusEvent),
-      "swiss-roll": forceOnActive(forceSwissRollEvent),
-      dodgeball: forceOnActive(forceDodgeballEvent),
-      "conga-line": forceOnActive(forceCongaLineEvent),
-      "spinning-top": forceOnActive(forceSpinningTopEvent),
-      gobbler: forceOnActive(forceGobblerEvent),
-      majorette: forceOnActive(forceMajoretteEvent),
-      "hula-hoop": forceOnActive(forceHulaHoopEvent),
-      calligraphy: forceOnActive(forceCalligraphyEvent),
-      "snake-charmer": forceOnActive(forceSnakeCharmerEvent),
-      "plate-spinner": forceOnActive(forcePlateSpinnerEvent),
-      "ferris-wheel": forceOnActive(forceFerrisWheelEvent),
-      "bucket-brigade": forceOnActive(forceBucketBrigadeEvent),
-      "sky-lanterns": forceOnActive(forceSkyLanternsEvent),
-      engraver: forceOnActive(forceEngraverEvent),
-      "x-ray": forceOnActive(forceXRayEvent),
-      "laser-lasso": forceOnActive(forceLaserLassoEvent),
-      "hex-ring": forceOnActive(forceHexRingEvent),
-      portcullis: forceOnActive(forcePortcullisEvent),
-      keyhole: forceOnActive(forceKeyholeEvent),
-      defibrillator: forceOnActive(forceDefibrillatorEvent),
-      "circuit-board": forceOnActive(forceCircuitBoardEvent),
-      mjolnir: forceOnActive(forceMjolnirEvent),
-      "arc-flash": forceOnActive(forceArcFlashEvent),
-      "four-corners": forceOnActive(forceFourCornersEvent),
-      "bolt-wheel": forceOnActive(forceBoltWheelEvent),
-      minefield: forceOnActive(forceMinefieldEvent),
-      cannonade: forceOnActive(forceCannonadeEvent),
-      "sticky-bombs": forceOnActive(forceStickyBombsEvent),
-      crossblast: forceOnActive(forceCrossblastEvent),
-      mortar: forceOnActive(forceMortarEvent),
-      flashbang: forceOnActive(forceFlashbangEvent),
-      "sentry-turret": forceOnActive(forceSentryTurretEvent),
-      shotgun: forceOnActive(forceShotgunEvent),
-      "boss-fight": forceOnActive(forceBossFightEvent),
-      gunship: forceOnActive(forceGunshipEvent),
-      "bullet-time": forceOnActive(forceBulletTimeEvent),
-      flechettes: forceOnActive(forceFlechettesEvent),
-      radar: forceOnActive(forceRadarEvent),
-      bingo: forceOnActive(forceBingoEvent),
-      "lane-hopper": forceOnActive(forceLaneHopperEvent),
-      "simon-says": forceOnActive(forceSimonSaysEvent),
-      equalizer: forceOnActive(forceEqualizerEvent),
-      "loading-bar": forceOnActive(forceLoadingBarEvent),
-      "dice-roll": forceOnActive(forceDiceRollEvent),
-      mandala: forceOnActive(forceMandalaEvent),
-      "zen-garden": forceOnActive(forceZenGardenEvent),
-      accordion: forceOnActive(forceAccordionEvent),
-      fizz: forceOnActive(forceFizzEvent),
-      soundwave: forceOnActive(forceSoundwaveEvent),
-      taffy: forceOnActive(forceTaffyEvent),
-      "drip-painting": forceOnActive(forceDripPaintingEvent),
-      moths: forceOnActive(forceMothsEvent),
-      curling: forceOnActive(forceCurlingEvent),
-      clothesline: forceOnActive(forceClotheslineEvent),
-      "balloon-pop": forceOnActive(forceBalloonPopEvent),
-      "spin-bottle": forceOnActive(forceSpinBottleEvent),
-      "sky-writer": forceOnActive(forceSkyWriterEvent),
-      "gold-pan": forceOnActive(forceGoldPanEvent),
-      bulldozer: forceOnActive(forceBulldozerEvent),
-      "koi-pond": forceOnActive(forceKoiPondEvent),
-      "pipe-organ": forceOnActive(forcePipeOrganEvent),
-      "ant-trail": forceOnActive(forceAntTrailEvent),
-      "hot-air-balloon": forceOnActive(forceHotAirBalloonEvent),
-      "lens-flare": forceOnActive(forceLensFlareEvent),
-      tightrope: forceOnActive(forceTightropeEvent),
-      "neon-sign": forceOnActive(forceNeonSignEvent),
-      "light-cage": forceOnActive(forceLightCageEvent),
-      stairway: forceOnActive(forceStairwayEvent),
-      beacons: forceOnActive(forceBeaconsEvent),
-      "anvil-crawler": forceOnActive(forceAnvilCrawlerEvent),
-      neurons: forceOnActive(forceNeuronsEvent),
-      "bottled-bolt": forceOnActive(forceBottledBoltEvent),
-      thunderbird: forceOnActive(forceThunderbirdEvent),
-      "spark-gap": forceOnActive(forceSparkGapEvent),
-      "static-shock": forceOnActive(forceStaticShockEvent),
-      "rocket-jump": forceOnActive(forceRocketJumpEvent),
-      torpedoes: forceOnActive(forceTorpedoesEvent),
-      airstrike: forceOnActive(forceAirstrikeEvent),
-      dambuster: forceOnActive(forceDambusterEvent),
-      airburst: forceOnActive(forceAirburstEvent),
-      "bomb-pinwheel": forceOnActive(forceBombPinwheelEvent),
-      "bullet-curtain": forceOnActive(forceBulletCurtainEvent),
-      "trick-shot": forceOnActive(forceTrickShotEvent),
-      "rail-shooter": forceOnActive(forceRailShooterEvent),
-      "skeet-shoot": forceOnActive(forceSkeetShootEvent),
-      "triple-tap": forceOnActive(forceTripleTapEvent),
-      "tommy-gun": forceOnActive(forceTommyGunEvent),
-      sweeper: forceOnActive(forceSweeperEvent),
-      "claw-machine": forceOnActive(forceClawMachineEvent),
-      lottery: forceOnActive(forceLotteryEvent),
-      "word-guess": forceOnActive(forceWordGuessEvent),
-      "memory-match": forceOnActive(forceMemoryMatchEvent),
-      "tic-tac-toe": forceOnActive(forceTicTacToeEvent),
-      "rev-counter": forceOnActive(forceRevCounterEvent),
-      sluice: forceOnActive(forceSluiceEvent),
-      foundry: forceOnActive(forceFoundryEvent),
-      "jet-stream": forceOnActive(forceJetStreamEvent),
-      moat: forceOnActive(forceMoatEvent),
-      seep: forceOnActive(forceSeepEvent),
-      meander: forceOnActive(forceMeanderEvent),
-      waltz: forceOnActive(forceWaltzEvent),
-      gyroscope: forceOnActive(forceGyroscopeEvent),
-      dragonfly: forceOnActive(forceDragonflyEvent),
-      "ring-toss": forceOnActive(forceRingTossEvent),
-      slipstream: forceOnActive(forceSlipstreamEvent),
-      "sheet-music": forceOnActive(forceSheetMusicEvent),
-      "leaf-blower": forceOnActive(forceLeafBlowerEvent),
-      loom: forceOnActive(forceLoomEvent),
-      "high-dive": forceOnActive(forceHighDiveEvent),
-      sower: forceOnActive(forceSowerEvent),
-      courier: forceOnActive(forceCourierEvent),
-      rodeo: forceOnActive(forceRodeoEvent),
-      crosshair: forceOnActive(forceCrosshairEvent),
-      iris: forceOnActive(forceIrisEvent),
-      "bank-shot": forceOnActive(forceBankShotEvent),
-      sunbeams: forceOnActive(forceSunbeamsEvent),
-      stargate: forceOnActive(forceStargateEvent),
-      "cats-cradle": forceOnActive(forceCatsCradleEvent),
-      thunderhead: forceOnActive(forceThunderheadEvent),
-      pitchfork: forceOnActive(forcePitchforkEvent),
-      "jumper-cables": forceOnActive(forceJumperCablesEvent),
-      lash: forceOnActive(forceLashEvent),
-      "spark-plug": forceOnActive(forceSparkPlugEvent),
-      "live-wire": forceOnActive(forceLiveWireEvent),
-      "fuse-race": forceOnActive(forceFuseRaceEvent),
-      "bouncing-betty": forceOnActive(forceBouncingBettyEvent),
-      "pressure-cooker": forceOnActive(forcePressureCookerEvent),
-      "hot-potato": forceOnActive(forceHotPotatoEvent),
-      "daisy-chain": forceOnActive(forceDaisyChainEvent),
-      "shaped-charge": forceOnActive(forceShapedChargeEvent),
-      detcord: forceOnActive(forceDetcordEvent),
-      "bullet-bloom": forceOnActive(forceBulletBloomEvent),
-      "high-noon": forceOnActive(forceHighNoonEvent),
-      hailfire: forceOnActive(forceHailfireEvent),
-      dervish: forceOnActive(forceDervishEvent),
-      invaders: forceOnActive(forceInvadersEvent),
-      "gun-kata": forceOnActive(forceGunKataEvent),
-      lockbuster: forceOnActive(forceLockbusterEvent),
-      "connect-four": forceOnActive(forceConnectFourEvent),
-      combo: forceOnActive(forceComboEvent),
-      "skee-ball": forceOnActive(forceSkeeBallEvent),
-      "bubble-shooter": forceOnActive(forceBubbleShooterEvent),
-      delta: forceOnActive(forceDeltaEvent),
-      hydrant: forceOnActive(forceHydrantEvent),
-      cloverleaf: forceOnActive(forceCloverleafEvent),
-      pinstripe: forceOnActive(forcePinstripeEvent),
-      faucet: forceOnActive(forceFaucetEvent),
-      showerhead: forceOnActive(forceShowerheadEvent),
-      "binary-star": forceOnActive(forceBinaryStarEvent),
-      hopscotch: forceOnActive(forceHopscotchEvent),
-      tadpoles: forceOnActive(forceTadpolesEvent),
-      blink: forceOnActive(forceBlinkEvent),
-      "bumper-cars": forceOnActive(forceBumperCarsEvent),
-      pigeons: forceOnActive(forcePigeonsEvent),
-      squid: forceOnActive(forceSquidEvent),
-      "water-pistol": forceOnActive(forceWaterPistolEvent),
-      poi: forceOnActive(forcePoiEvent),
-      bartender: forceOnActive(forceBartenderEvent),
-      "pole-vault": forceOnActive(forcePoleVaultEvent),
-      "paint-roller": forceOnActive(forcePaintRollerEvent),
-      buzzsaw: forceOnActive(forceBuzzsawEvent),
-      "light-cycles": forceOnActive(forceLightCyclesEvent),
-      "fiber-optic": forceOnActive(forceFiberOpticEvent),
-      "daddy-longlegs": forceOnActive(forceDaddyLonglegsEvent),
-      knighthood: forceOnActive(forceKnighthoodEvent),
-      "cutting-torch": forceOnActive(forceCuttingTorchEvent),
-      "st-elmos-fire": forceOnActive(forceStElmosFireEvent),
-      "stepped-leader": forceOnActive(forceSteppedLeaderEvent),
-      trolley: forceOnActive(forceTrolleyEvent),
-      "bolt-bounce": forceOnActive(forceBoltBounceEvent),
-      "storm-crown": forceOnActive(forceStormCrownEvent),
-      "van-de-graaff": forceOnActive(forceVanDeGraaffEvent),
-      "barrel-roll": forceOnActive(forceBarrelRollEvent),
-      "bomb-stack": forceOnActive(forceBombStackEvent),
-      "roman-candle": forceOnActive(forceRomanCandleEvent),
-      whistlers: forceOnActive(forceWhistlersEvent),
-      trebuchet: forceOnActive(forceTrebuchetEvent),
-      "drop-pods": forceOnActive(forceDropPodsEvent),
-      "bomb-carousel": forceOnActive(forceBombCarouselEvent),
-      "last-stand": forceOnActive(forceLastStandEvent),
-      "tin-can": forceOnActive(forceTinCanEvent),
-      "point-defense": forceOnActive(forcePointDefenseEvent),
-      "target-practice": forceOnActive(forceTargetPracticeEvent),
-      "flare-gun": forceOnActive(forceFlareGunEvent),
-      rappel: forceOnActive(forceRappelEvent),
-      stacker: forceOnActive(forceStackerEvent),
-      "coin-pusher": forceOnActive(forceCoinPusherEvent),
-      "high-striker": forceOnActive(forceHighStrikerEvent),
-      "note-highway": forceOnActive(forceNoteHighwayEvent),
-      safecracker: forceOnActive(forceSafecrackerEvent),
-      "gumball-machine": forceOnActive(forceGumballMachineEvent),
-      ninja: forceOnActive(forceNinjaEvent),
-      bungee: forceOnActive(forceBungeeEvent),
-      "funnel-cake": forceOnActive(forceFunnelCakeEvent),
-      chrysanthemum: forceOnActive(forceChrysanthemumEvent),
-      crossroads: forceOnActive(forceCrossroadsEvent),
-      waterslide: forceOnActive(forceWaterslideEvent),
-      banner: forceOnActive(forceBannerEvent),
-      haunt: forceOnActive(forceHauntEvent),
-      "maple-seeds": forceOnActive(forceMapleSeedsEvent),
-      donuts: forceOnActive(forceDonutsEvent),
-      "hamster-wheel": forceOnActive(forceHamsterWheelEvent),
-      "lunar-lander": forceOnActive(forceLunarLanderEvent),
-      dowsing: forceOnActive(forceDowsingEvent),
-      matador: forceOnActive(forceMatadorEvent),
-      "flash-flood": forceOnActive(forceFlashFloodEvent),
-      dolphin: forceOnActive(forceDolphinEvent),
-      puffer: forceOnActive(forcePufferEvent),
-      "hockey-stop": forceOnActive(forceHockeyStopEvent),
-      twirl: forceOnActive(forceTwirlEvent),
-      whale: forceOnActive(forceWhaleEvent),
-      "light-painting": forceOnActive(forceLightPaintingEvent),
-      "saber-throw": forceOnActive(forceSaberThrowEvent),
-      "laser-maze": forceOnActive(forceLaserMazeEvent),
-      "tape-measure": forceOnActive(forceTapeMeasureEvent),
-      pulsar: forceOnActive(forcePulsarEvent),
-      "short-circuit": forceOnActive(forceShortCircuitEvent),
-      conductor: forceOnActive(forceConductorEvent),
-      "double-strike": forceOnActive(forceDoubleStrikeEvent),
-      "lightning-fence": forceOnActive(forceLightningFenceEvent),
-      "heat-lightning": forceOnActive(forceHeatLightningEvent),
-      "powder-kegs": forceOnActive(forcePowderKegsEvent),
-      "bomb-fountain": forceOnActive(forceBombFountainEvent),
-      "frag-out": forceOnActive(forceFragOutEvent),
-      "fault-line": forceOnActive(forceFaultLineEvent),
-      "willow-shells": forceOnActive(forceWillowShellsEvent),
-      "swarm-strike": forceOnActive(forceSwarmStrikeEvent),
-      concentric: forceOnActive(forceConcentricEvent),
-      graze: forceOnActive(forceGrazeEvent),
-      hotfoot: forceOnActive(forceHotfootEvent),
-      dogfight: forceOnActive(forceDogfightEvent),
-      "bullet-rose": forceOnActive(forceBulletRoseEvent),
-      "armor-piercer": forceOnActive(forceArmorPiercerEvent),
-      spotter: forceOnActive(forceSpotterEvent),
-      "peg-solitaire": forceOnActive(forcePegSolitaireEvent),
-      "marble-drop": forceOnActive(forceMarbleDropEvent),
-      statues: forceOnActive(forceStatuesEvent),
-      "flappy-wisp": forceOnActive(forceFlappyWispEvent),
-      "buried-treasure": forceOnActive(forceBuriedTreasureEvent),
-      "air-hockey": forceOnActive(forceAirHockeyEvent),
-      "bolt-of-cash": forceOnActive(forceBoltOfCashEvent),
-      "pendulum-pour": forceOnActive(forcePendulumPourEvent),
-      "pop-the-cork": forceOnActive(forcePopTheCorkEvent),
-      "wall-jump": forceOnActive(forceWallJumpEvent),
-      superball: forceOnActive(forceSuperballEvent),
-      "spin-dash": forceOnActive(forceSpinDashEvent),
-      cupid: forceOnActive(forceCupidEvent),
-      stork: forceOnActive(forceStorkEvent),
-      "paper-plane": forceOnActive(forcePaperPlaneEvent),
-      spike: forceOnActive(forceSpikeEvent),
-      toaster: forceOnActive(forceToasterEvent),
-      xylophone: forceOnActive(forceXylophoneEvent),
-      "birthday-candles": forceOnActive(forceBirthdayCandlesEvent),
-      "drop-tower": forceOnActive(forceDropTowerEvent),
-      "arrow-volley": forceOnActive(forceArrowVolleyEvent),
-      "make-a-wish": forceOnActive(forceMakeAWishEvent),
-      blunderbuss: forceOnActive(forceBlunderbussEvent),
-      genie: forceOnActive(forceGenieEvent),
-      "solar-flare": forceOnActive(forceSolarFlareEvent),
-      "heat-vision": forceOnActive(forceHeatVisionEvent),
-      "print-head": forceOnActive(forcePrintHeadEvent),
-      aurora: forceOnActive(forceAuroraEvent),
-      "thunder-rings": forceOnActive(forceThunderRingsEvent),
-      "arc-weld": forceOnActive(forceArcWeldEvent),
-      "storm-kite": forceOnActive(forceStormKiteEvent),
-      "volcanic-lightning": forceOnActive(forceVolcanicLightningEvent),
-      sculptor: forceOnActive(forceSculptorEvent),
-      "grand-finale": forceOnActive(forceGrandFinaleEvent),
-      "bomb-bouquet": forceOnActive(forceBombBouquetEvent),
-      cascade: forceOnActive(forceCascadeEvent),
-      "pinball-bomb": forceOnActive(forcePinballBombEvent),
-      "bomb-train": forceOnActive(forceBombTrainEvent),
-      "breaching-charge": forceOnActive(forceBreachingChargeEvent),
-      "confetti-cannon": forceOnActive(forceConfettiCannonEvent),
-      "ammo-belt": forceOnActive(forceAmmoBeltEvent),
-      gauntlet: forceOnActive(forceGauntletEvent),
-      "turret-tower": forceOnActive(forceTurretTowerEvent),
-      "shell-casings": forceOnActive(forceShellCasingsEvent),
-      darts: forceOnActive(forceDartsEvent),
-      battleship: forceOnActive(forceBattleshipEvent),
-      interceptors: forceOnActive(forceInterceptorsEvent),
-      "land-grab": forceOnActive(forceLandGrabEvent),
-      "duck-duck-goose": forceOnActive(forceDuckDuckGooseEvent),
-      ringer: forceOnActive(forceRingerEvent),
-      hurdles: forceOnActive(forceHurdlesEvent),
-      "lucky-roll": forceOnActive(forceLuckyRollEvent),
-      "cash-register": forceOnActive(forceCashRegisterEvent),
-      "horse-race": forceOnActive(forceHorseRaceEvent),
-      "dunk-tank": forceOnActive(forceDunkTankEvent),
-      "half-pipe": forceOnActive(forceHalfPipeEvent),
-      knot: forceOnActive(forceKnotEvent),
-      "ticker-tape": forceOnActive(forceTickerTapeEvent),
-      "cash-bridge": forceOnActive(forceCashBridgeEvent),
-      "skipping-stone": forceOnActive(forceSkippingStoneEvent),
-      woodpecker: forceOnActive(forceWoodpeckerEvent),
-      frisbee: forceOnActive(forceFrisbeeEvent),
-      kangaroo: forceOnActive(forceKangarooEvent),
-      badminton: forceOnActive(forceBadmintonEvent),
-      tumbleweed: forceOnActive(forceTumbleweedEvent),
-      "shuttle-run": forceOnActive(forceShuttleRunEvent),
-      echolocation: forceOnActive(forceEcholocationEvent),
-      lacrosse: forceOnActive(forceLacrosseEvent),
-      "jet-ski": forceOnActive(forceJetSkiEvent),
-      "drinking-straw": forceOnActive(forceDrinkingStrawEvent),
-      "sea-serpent": forceOnActive(forceSeaSerpentEvent),
-      "magic-trick": forceOnActive(forceMagicTrickEvent),
-      "fountain-pen": forceOnActive(forceFountainPenEvent),
-      spool: forceOnActive(forceSpoolEvent),
-      "laser-rain": forceOnActive(forceLaserRainEvent),
-      "cross-cut": forceOnActive(forceCrossCutEvent),
-      heliograph: forceOnActive(forceHeliographEvent),
-      starburst: forceOnActive(forceStarburstEvent),
-      "thunder-drum": forceOnActive(forceThunderDrumEvent),
-      "bolt-barrage": forceOnActive(forceBoltBarrageEvent),
-      coilgun: forceOnActive(forceCoilgunEvent),
-      snowflake: forceOnActive(forceSnowflakeEvent),
-      "bomb-snake": forceOnActive(forceBombSnakeEvent),
-      "spider-mines": forceOnActive(forceSpiderMinesEvent),
-      crossette: forceOnActive(forceCrossetteEvent),
-      "spiral-charge": forceOnActive(forceSpiralChargeEvent),
-      "bomb-bubbles": forceOnActive(forceBombBubblesEvent),
-      "rocket-sled": forceOnActive(forceRocketSledEvent),
-      "dynamite-fishing": forceOnActive(forceDynamiteFishingEvent),
-      "charge-shot": forceOnActive(forceChargeShotEvent),
-      "corkscrew-rounds": forceOnActive(forceCorkscrewRoundsEvent),
-      "orbital-guns": forceOnActive(forceOrbitalGunsEvent),
-      "tracer-rounds": forceOnActive(forceTracerRoundsEvent),
-      "pellet-storm": forceOnActive(forcePelletStormEvent),
-      "bullet-snake": forceOnActive(forceBulletSnakeEvent),
-      "rock-paper-scissors": forceOnActive(forceRockPaperScissorsEvent),
-      limbo: forceOnActive(forceLimboEvent),
-      "quiz-show": forceOnActive(forceQuizShowEvent),
-      sumo: forceOnActive(forceSumoEvent),
-      "paper-toss": forceOnActive(forcePaperTossEvent),
-      "arm-wrestling": forceOnActive(forceArmWrestlingEvent),
-      "keepy-uppy": forceOnActive(forceKeepyUppyEvent),
-      "pin-the-tail": forceOnActive(forcePinTheTailEvent),
-      "trust-fall": forceOnActive(forceTrustFallEvent),
-      "bubble-gum": forceOnActive(forceBubbleGumEvent),
-      "canal-locks": forceOnActive(forceCanalLocksEvent),
-      bobsled: forceOnActive(forceBobsledEvent),
-      "spring-loaded": forceOnActive(forceSpringLoadedEvent),
-      influx: forceOnActive(forceInfluxEvent),
-      "uneven-bars": forceOnActive(forceUnevenBarsEvent),
-      bumblebee: forceOnActive(forceBumblebeeEvent),
-      "shot-put": forceOnActive(forceShotPutEvent),
-      "human-cannonball": forceOnActive(forceHumanCannonballEvent),
-      "fox-and-hounds": forceOnActive(forceFoxAndHoundsEvent),
-      kingfisher: forceOnActive(forceKingfisherEvent),
-      joust: forceOnActive(forceJoustEvent),
-      pelican: forceOnActive(forcePelicanEvent),
-      dragster: forceOnActive(forceDragsterEvent),
-      "fire-breather": forceOnActive(forceFireBreatherEvent),
-      "bucket-swing": forceOnActive(forceBucketSwingEvent),
-      puppeteer: forceOnActive(forcePuppeteerEvent),
-      corona: forceOnActive(forceCoronaEvent),
-      pillars: forceOnActive(forcePillarsEvent),
-      "laser-ladder": forceOnActive(forceLaserLadderEvent),
-      "beam-splitter": forceOnActive(forceBeamSplitterEvent),
-      teleporter: forceOnActive(forceTeleporterEvent),
-      "ring-light": forceOnActive(forceRingLightEvent),
-      taser: forceOnActive(forceTaserEvent),
-      "arc-furnace": forceOnActive(forceArcFurnaceEvent),
-      "five-fingers": forceOnActive(forceFiveFingersEvent),
-      "cattle-prod": forceOnActive(forceCattleProdEvent),
-      "bolt-sling": forceOnActive(forceBoltSlingEvent),
-      "colliding-storms": forceOnActive(forceCollidingStormsEvent),
-      "bomb-juggler": forceOnActive(forceBombJugglerEvent),
-      "bomb-squad": forceOnActive(forceBombSquadEvent),
-      splitter: forceOnActive(forceSplitterEvent),
-      "bomb-pendulum": forceOnActive(forceBombPendulumEvent),
-      paradrop: forceOnActive(forceParadropEvent),
-      "bomb-pachinko": forceOnActive(forceBombPachinkoEvent),
-      "fuse-clock": forceOnActive(forceFuseClockEvent),
-      hedgehog: forceOnActive(forceHedgehogEvent),
-      "split-shot": forceOnActive(forceSplitShotEvent),
-      "bullet-lasso": forceOnActive(forceBulletLassoEvent),
-      "bullet-weave": forceOnActive(forceBulletWeaveEvent),
-      "bullet-fountain": forceOnActive(forceBulletFountainEvent),
-      "covering-fire": forceOnActive(forceCoveringFireEvent),
-      checkers: forceOnActive(forceCheckersEvent),
-      minesweeper: forceOnActive(forceMinesweeperEvent),
-      "jack-in-the-box": forceOnActive(forceJackInTheBoxEvent),
-      spillway: forceOnActive(forceSpillwayEvent),
-      crosscurrents: forceOnActive(forceCrosscurrentsEvent),
-      oxbow: forceOnActive(forceOxbowEvent),
-      breakers: forceOnActive(forceBreakersEvent),
-      rivulets: forceOnActive(forceRivuletsEvent),
-      torrent: forceOnActive(forceTorrentEvent),
-      lissajous: forceOnActive(forceLissajousEvent),
-      "moon-hop": forceOnActive(forceMoonHopEvent),
-      peekaboo: forceOnActive(forcePeekabooEvent),
-      "tilt-a-whirl": forceOnActive(forceTiltAWhirlEvent),
-      "water-strider": forceOnActive(forceWaterStriderEvent),
-      "rope-climb": forceOnActive(forceRopeClimbEvent),
-      "paddle-steamer": forceOnActive(forcePaddleSteamerEvent),
-      "jet-wash": forceOnActive(forceJetWashEvent),
-      bellows: forceOnActive(forceBellowsEvent),
-      "rain-dance": forceOnActive(forceRainDanceEvent),
-      "ski-tow": forceOnActive(forceSkiTowEvent),
-      "ribbon-dancer": forceOnActive(forceRibbonDancerEvent),
-      "laser-turnstile": forceOnActive(forceLaserTurnstileEvent),
-      "light-bridge": forceOnActive(forceLightBridgeEvent),
-      "laser-web": forceOnActive(forceLaserWebEvent),
-      footlights: forceOnActive(forceFootlightsEvent),
-      "fusion-beam": forceOnActive(forceFusionBeamEvent),
-      pinpoint: forceOnActive(forcePinpointEvent),
-      galvanize: forceOnActive(forceGalvanizeEvent),
-      "spark-jump": forceOnActive(forceSparkJumpEvent),
-      "static-cling": forceOnActive(forceStaticClingEvent),
-      capacitor: forceOnActive(forceCapacitorEvent),
-      "spark-train": forceOnActive(forceSparkTrainEvent),
-      "arc-bridge": forceOnActive(forceArcBridgeEvent),
-      "daisy-cutter": forceOnActive(forceDaisyCutterEvent),
-      "ripple-mines": forceOnActive(forceRippleMinesEvent),
-      "bomb-yo-yo": forceOnActive(forceBombYoYoEvent),
-      "bomb-hail": forceOnActive(forceBombHailEvent),
-      "ground-pound": forceOnActive(forceGroundPoundEvent),
-      "cherry-bomb": forceOnActive(forceCherryBombEvent),
-      "bomb-crown": forceOnActive(forceBombCrownEvent),
-      "bullet-comb": forceOnActive(forceBulletCombEvent),
-      "bullet-braid": forceOnActive(forceBulletBraidEvent),
-      "bullet-cage": forceOnActive(forceBulletCageEvent),
-      gunslinger: forceOnActive(forceGunslingerEvent),
-      "bullet-wheel": forceOnActive(forceBulletWheelEvent),
-      "bullet-ladder": forceOnActive(forceBulletLadderEvent),
-      "whip-zoom": forceOnActive(forceWhipZoomEvent),
-      "iris-out": forceOnActive(forceIrisOutEvent),
-      "screen-reels": forceOnActive(forceScreenReelsEvent),
-      "gold-leaf": forceOnActive(forceGoldLeafEvent),
-      "pixel-storm": forceOnActive(forcePixelStormEvent),
-      "gravity-flip": forceOnActive(forceGravityFlipEvent),
-      echo: forceOnActive(forceEchoEvent),
-      "mirror-box": forceOnActive(forceMirrorBoxEvent),
-      "pull-back": forceOnActive(forcePullBackEvent),
-      treadmill: forceOnActive(forceTreadmillEvent),
-      "blast-off": forceOnActive(forceBlastOffEvent),
-      "pop-up": forceOnActive(forcePopUpEvent),
-      "sticker-peel": forceOnActive(forceStickerPeelEvent),
-      glissando: forceOnActive(forceGlissandoEvent),
-      "vault-doors": forceOnActive(forceVaultDoorsEvent),
-      "champagne-tower": forceOnActive(forceChampagneTowerEvent),
-      "pinball-river": forceOnActive(forcePinballRiverEvent),
-      "pressure-washer": forceOnActive(forcePressureWasherEvent),
-      irrigation: forceOnActive(forceIrrigationEvent),
-      waterspout: forceOnActive(forceWaterspoutEvent),
-      sidewinder: forceOnActive(forceSidewinderEvent),
-      "orbit-swap": forceOnActive(forceOrbitSwapEvent),
-      cuckoo: forceOnActive(forceCuckooEvent),
-      gyre: forceOnActive(forceGyreEvent),
-      "bar-hop": forceOnActive(forceBarHopEvent),
-      "comet-plow": forceOnActive(forceCometPlowEvent),
-      "hose-reel": forceOnActive(forceHoseReelEvent),
-      "geyser-rider": forceOnActive(forceGeyserRiderEvent),
-      "bubble-blower": forceOnActive(forceBubbleBlowerEvent),
-      "pool-dive": forceOnActive(forcePoolDiveEvent),
-      "rubber-band": forceOnActive(forceRubberBandEvent),
-      "beam-vise": forceOnActive(forceBeamViseEvent),
-      "laser-rake": forceOnActive(forceLaserRakeEvent),
-      "light-dominoes": forceOnActive(forceLightDominoesEvent),
-      "pry-bar": forceOnActive(forcePryBarEvent),
-      "tesla-tennis": forceOnActive(forceTeslaTennisEvent),
-      "tuning-fork": forceOnActive(forceTuningForkEvent),
-      "bolt-spiral": forceOnActive(forceBoltSpiralEvent),
-      "ground-current": forceOnActive(forceGroundCurrentEvent),
-      overcharge: forceOnActive(forceOverchargeEvent),
-      "bomb-tornado": forceOnActive(forceBombTornadoEvent),
-      "bomb-boomerang": forceOnActive(forceBombBoomerangEvent),
-      multistage: forceOnActive(forceMultistageEvent),
-      "bomb-pile": forceOnActive(forceBombPileEvent),
-      "bomb-garland": forceOnActive(forceBombGarlandEvent),
-      "homing-rounds": forceOnActive(forceHomingRoundsEvent),
-      "wave-cannon": forceOnActive(forceWaveCannonEvent),
-      snapback: forceOnActive(forceSnapbackEvent),
-      "bullet-funnel": forceOnActive(forceBulletFunnelEvent),
-      crisscross: forceOnActive(forceCrisscrossEvent),
-      "chain-fountain": forceOnActive(forceChainFountainEvent),
-      "smoke-rings": forceOnActive(forceSmokeRingsEvent),
-      "water-salute": forceOnActive(forceWaterSaluteEvent),
-      "double-pendulum": forceOnActive(forceDoublePendulumEvent),
-      trapeze: forceOnActive(forceTrapezeEvent),
-      diabolo: forceOnActive(forceDiaboloEvent),
-      zorb: forceOnActive(forceZorbEvent),
-      "hoop-dive": forceOnActive(forceHoopDiveEvent),
-      "spin-art": forceOnActive(forceSpinArtEvent),
-      "paper-cutter": forceOnActive(forcePaperCutterEvent),
-      flippers: forceOnActive(forceFlippersEvent),
-      drawbridge: forceOnActive(forceDrawbridgeEvent),
-      flail: forceOnActive(forceFlailEvent),
-      "vine-swing": forceOnActive(forceVineSwingEvent),
-      "bomb-snowball": forceOnActive(forceBombSnowballEvent),
-      gerb: forceOnActive(forceGerbEvent),
-      recoil: forceOnActive(forceRecoilEvent),
-      "tumble-fire": forceOnActive(forceTumbleFireEvent),
-      "roll-up": forceOnActive(forceRollUpEvent),
-      shredder: forceOnActive(forceShredderEvent),
-      "head-on": forceOnActive(forceHeadOnEvent),
-      pyramid: forceOnActive(forcePyramidEvent),
-      "pizza-toss": forceOnActive(forcePizzaTossEvent),
-      compass: forceOnActive(forceCompassEvent),
-      skewer: forceOnActive(forceSkewerEvent),
-      "bomb-comet": forceOnActive(forceBombCometEvent),
-      kaboom: forceOnActive(forceKaboomEvent),
-      "return-fire": forceOnActive(forceReturnFireEvent),
-      "frosted-glass": forceOnActive(forceFrostedGlassEvent),
-      "switch-off": forceOnActive(forceSwitchOffEvent),
-      "stunt-track": forceOnActive(forceStuntTrackEvent),
-      fleas: forceOnActive(forceFleasEvent),
-      "hand-pump": forceOnActive(forceHandPumpEvent),
-      "pick-up-sticks": forceOnActive(forcePickUpSticksEvent),
-      "thunder-shell": forceOnActive(forceThunderShellEvent),
-      "mid-air": forceOnActive(forceMidAirEvent),
-      "chain-fire": forceOnActive(forceChainFireEvent),
-      "rim-shot": forceOnActive(forceRimShotEvent),
-      "tin-roof": forceOnActive(forceTinRoofEvent),
-      crumple: forceOnActive(forceCrumpleEvent),
-      minimize: forceOnActive(forceMinimizeEvent),
-      "jumping-jets": forceOnActive(forceJumpingJetsEvent),
-      "bubble-chamber": forceOnActive(forceBubbleChamberEvent),
-      "cast-net": forceOnActive(forceCastNetEvent),
-      hoberman: forceOnActive(forceHobermanEvent),
-      excalibur: forceOnActive(forceExcaliburEvent),
-      pistons: forceOnActive(forcePistonsEvent),
-      "william-tell": forceOnActive(forceWilliamTellEvent),
-      foosball: forceOnActive(forceFoosballEvent),
-      "rubber-sheet": forceOnActive(forceRubberSheetEvent),
-      rattle: forceOnActive(forceRattleEvent),
-      eddies: forceOnActive(forceEddiesEvent),
-      "tube-man": forceOnActive(forceTubeManEvent),
-      deflate: forceOnActive(forceDeflateEvent),
-      "gear-train": forceOnActive(forceGearTrainEvent),
-      upstrike: forceOnActive(forceUpstrikeEvent),
-      "creeping-barrage": forceOnActive(forceCreepingBarrageEvent),
-      "ballistic-pendulum": forceOnActive(forceBallisticPendulumEvent),
-      "ring-taw": forceOnActive(forceRingTawEvent),
-      "rainy-window": forceOnActive(forceRainyWindowEvent),
-      inflate: forceOnActive(forceInflateEvent),
-      "dome-fountains": forceOnActive(forceDomeFountainsEvent),
-      "bell-ringers": forceOnActive(forceBellRingersEvent),
-      "wet-dog": forceOnActive(forceWetDogEvent),
-      "tower-crane": forceOnActive(forceTowerCraneEvent),
-      "bead-lightning": forceOnActive(forceBeadLightningEvent),
-      rockslide: forceOnActive(forceRockslideEvent),
-      "tight-group": forceOnActive(forceTightGroupEvent),
-      jacks: forceOnActive(forceJacksEvent),
-      "reflecting-pool": forceOnActive(forceReflectingPoolEvent),
-      "pin-art": forceOnActive(forcePinArtEvent),
-      "twin-whirlpools": forceOnActive(forceTwinWhirlpoolsEvent),
-      hatchlings: forceOnActive(forceHatchlingsEvent),
-      butterfingers: forceOnActive(forceButterfingersEvent),
-      "lock-pick": forceOnActive(forceLockPickEvent),
-      blacksmith: forceOnActive(forceBlacksmithEvent),
-      "seismic-charges": forceOnActive(forceSeismicChargesEvent),
-      "skip-shots": forceOnActive(forceSkipShotsEvent),
-      "jumping-beans": forceOnActive(forceJumpingBeansEvent),
-      "swiss-cheese": forceOnActive(forceSwissCheeseEvent),
-      "exploded-view": forceOnActive(forceExplodedViewEvent),
-      riptide: forceOnActive(forceRiptideEvent),
-      fencing: forceOnActive(forceFencingEvent),
-      "water-tower": forceOnActive(forceWaterTowerEvent),
-      "barber-pole": forceOnActive(forceBarberPoleEvent),
-      "ion-cannon": forceOnActive(forceIonCannonEvent),
-      claymore: forceOnActive(forceClaymoreEvent),
-      pepperbox: forceOnActive(forcePepperboxEvent),
-      squash: forceOnActive(forceSquashEvent),
-      "vertical-hold": forceOnActive(forceVerticalHoldEvent),
-      halftone: forceOnActive(forceHalftoneEvent),
-      blowhole: forceOnActive(forceBlowholeEvent),
-      lamplighter: forceOnActive(forceLamplighterEvent),
-      "fire-brigade": forceOnActive(forceFireBrigadeEvent),
-      spokes: forceOnActive(forceSpokesEvent),
-      "thunder-ring": forceOnActive(forceThunderRingEvent),
-      "bottle-rocket": forceOnActive(forceBottleRocketEvent),
-      skeet: forceOnActive(forceSkeetEvent),
-      tennis: forceOnActive(forceTennisEvent),
-      interlace: forceOnActive(forceInterlaceEvent),
-      "mirror-mirror": forceOnActive(forceMirrorMirrorEvent),
-      "cotton-candy": forceOnActive(forceCottonCandyEvent),
-      peloton: forceOnActive(forcePelotonEvent),
-      "drinking-bird": forceOnActive(forceDrinkingBirdEvent),
-      "laser-drill": forceOnActive(forceLaserDrillEvent),
-      "hair-raiser": forceOnActive(forceHairRaiserEvent),
-      detonator: forceOnActive(forceDetonatorEvent),
-      "bullet-rain": forceOnActive(forceBulletRainEvent),
-      "bouncy-castle": forceOnActive(forceBouncyCastleEvent),
-      "game-of-life": forceOnActive(forceGameOfLifeEvent),
-      labyrinth: forceOnActive(forceLabyrinthEvent),
-      "tidal-bore": forceOnActive(forceTidalBoreEvent),
-      scrum: forceOnActive(forceScrumEvent),
-      "gold-rush": forceOnActive(forceGoldRushEvent),
-      "suspension-bridge": forceOnActive(forceSuspensionBridgeEvent),
-      redline: forceOnActive(forceRedlineEvent),
-      willow: forceOnActive(forceWillowEvent),
-      quickdraw: forceOnActive(forceQuickdrawEvent),
-      "galilean-cannon": forceOnActive(forceGalileanCannonEvent),
-      "chaos-game": forceOnActive(forceChaosGameEvent),
-      sandpile: forceOnActive(forceSandpileEvent),
-      auger: forceOnActive(forceAugerEvent),
-      "fountain-show": forceOnActive(forceFountainShowEvent),
-      "spinning-plates": forceOnActive(forceSpinningPlatesEvent),
-      scoops: forceOnActive(forceScoopsEvent),
-      "solar-furnace": forceOnActive(forceSolarFurnaceEvent),
-      "lightning-hands": forceOnActive(forceLightningHandsEvent),
-      "ring-of-fire": forceOnActive(forceRingOfFireEvent),
-      "bullet-clash": forceOnActive(forceBulletClashEvent),
-      "bounce-pass": forceOnActive(forceBouncePassEvent),
-      "oil-strike": forceOnActive(forceOilStrikeEvent),
-      harmonograph: forceOnActive(forceHarmonographEvent),
-      quicksort: forceOnActive(forceQuicksortEvent),
-      capillary: forceOnActive(forceCapillaryEvent),
-      "battle-tops": forceOnActive(forceBattleTopsEvent),
-      "pneumatic-tubes": forceOnActive(forcePneumaticTubesEvent),
-      "star-polygon": forceOnActive(forceStarPolygonEvent),
-      "volt-spider": forceOnActive(forceVoltSpiderEvent),
-      "orbital-decay": forceOnActive(forceOrbitalDecayEvent),
-      "spray-and-pray": forceOnActive(forceSprayAndPrayEvent),
-      shuttle: forceOnActive(forceShuttleEvent),
-      "drill-duel": forceOnActive(forceDrillDuelEvent),
-      "rule-30": forceOnActive(forceRule30Event),
-      airbrush: forceOnActive(forceAirbrushEvent),
-      calving: forceOnActive(forceCalvingEvent),
-      phoenix: forceOnActive(forcePhoenixEvent),
-      "steam-train": forceOnActive(forceSteamTrainEvent),
-      "light-sail": forceOnActive(forceLightSailEvent),
-      inchworm: forceOnActive(forceInchwormEvent),
-      "critical-mass": forceOnActive(forceCriticalMassEvent),
-      "knife-thrower": forceOnActive(forceKnifeThrowerEvent),
-      compactor: forceOnActive(forceCompactorEvent),
-      "core-sample": forceOnActive(forceCoreSampleEvent),
-      "foam-party": forceOnActive(forceFoamPartyEvent),
-      "langtons-ant": forceOnActive(forceLangtonsAntEvent),
-      othello: forceOnActive(forceOthelloEvent),
-      gloop: forceOnActive(forceGloopEvent),
-      "escape-velocity": forceOnActive(forceEscapeVelocityEvent),
-      sungrazer: forceOnActive(forceSungrazerEvent),
-      "fractal-tree": forceOnActive(forceFractalTreeEvent),
-      switchboard: forceOnActive(forceSwitchboardEvent),
-      interference: forceOnActive(forceInterferenceEvent),
-      "tower-defense": forceOnActive(forceTowerDefenseEvent),
-      "bounce-wave": forceOnActive(forceBounceWaveEvent),
-      mole: forceOnActive(forceMoleEvent),
-      "car-wash": forceOnActive(forceCarWashEvent),
-      "dragon-curve": forceOnActive(forceDragonCurveEvent),
-      "lights-out": forceOnActive(forceLightsOutEvent),
-      tumbler: forceOnActive(forceTumblerEvent),
-      "waggle-dance": forceOnActive(forceWaggleDanceEvent),
-      "water-cycle": forceOnActive(forceWaterCycleEvent),
-      "folding-rule": forceOnActive(forceFoldingRuleEvent),
-      "arc-swarm": forceOnActive(forceArcSwarmEvent),
-      lockstep: forceOnActive(forceLockstepEvent),
-      "hacky-sack": forceOnActive(forceHackySackEvent),
-      woodworm: forceOnActive(forceWoodwormEvent),
-      graffiti: forceOnActive(forceGraffitiEvent),
-      voronoi: forceOnActive(forceVoronoiEvent),
-      percolation: forceOnActive(forcePercolationEvent),
-      dune: forceOnActive(forceDuneEvent),
-      "string-of-pearls": forceOnActive(forceStringOfPearlsEvent),
-      "river-juggler": forceOnActive(forceRiverJugglerEvent),
-      "like-charges": forceOnActive(forceLikeChargesEvent),
-      "collision-course": forceOnActive(forceCollisionCourseEvent),
-      "target-wheel": forceOnActive(forceTargetWheelEvent),
-      "spinning-hexagon": forceOnActive(forceSpinningHexagonEvent),
-      "bead-drill": forceOnActive(forceBeadDrillEvent),
-      hydroseeder: forceOnActive(forceHydroseederEvent),
-      mancala: forceOnActive(forceMancalaEvent),
-      breakthrough: forceOnActive(forceBreakthroughEvent),
-      curves: forceOnActive(forceCurvesEvent),
-      "archimedes-screw": forceOnActive(forceArchimedesScrewEvent),
-      murmuration: forceOnActive(forceMurmurationEvent),
-      "spirit-bomb": forceOnActive(forceSpiritBombEvent),
-      metronome: forceOnActive(forceMetronomeEvent),
-      "power-grid": forceOnActive(forcePowerGridEvent),
-      "bomb-bowling": forceOnActive(forceBombBowlingEvent),
-      showdown: forceOnActive(forceShowdownEvent),
-      "jump-rope": forceOnActive(forceJumpRopeEvent),
-      strongbox: forceOnActive(forceStrongboxEvent),
-      "snow-cannon": forceOnActive(forceSnowCannonEvent),
-      "hill-climb": forceOnActive(forceHillClimbEvent),
-      abacus: forceOnActive(forceAbacusEvent),
-      coral: forceOnActive(forceCoralEvent),
-      chladni: forceOnActive(forceChladniEvent),
-      afterimage: forceOnActive(forceAfterimageEvent),
-      "snow-globe": forceOnActive(forceSnowGlobeEvent),
-      sundial: forceOnActive(forceSundialEvent),
-      riveter: forceOnActive(forceRiveterEvent),
-      "paddle-ball": forceOnActive(forcePaddleBallEvent),
-      geode: forceOnActive(forceGeodeEvent),
-      "fog-machine": forceOnActive(forceFogMachineEvent),
-      chicane: forceOnActive(forceChicaneEvent),
-      epicycles: forceOnActive(forceEpicyclesEvent),
-      sieve: forceOnActive(forceSieveEvent),
-      clutter: forceOnActive(forceClutterEvent),
-      parting: forceOnActive(forcePartingEvent),
-      "buzz-wire": forceOnActive(forceBuzzWireEvent),
-      hiccups: forceOnActive(forceHiccupsEvent),
-      "cut-the-rope": forceOnActive(forceCutTheRopeEvent),
-      "whispering-gallery": forceOnActive(forceWhisperingGalleryEvent),
-      chunnel: forceOnActive(forceChunnelEvent),
-      sneeze: forceOnActive(forceSneezeEvent),
-      "grand-prix": forceOnActive(forceGrandPrixEvent),
-      "pillow-fight": forceOnActive(forcePillowFightEvent),
-      "dots-and-boxes": forceOnActive(forceDotsAndBoxesEvent),
-      "holding-pattern": forceOnActive(forceHoldingPatternEvent),
-      tanker: forceOnActive(forceTankerEvent),
-      "vapor-cloud": forceOnActive(forceVaporCloudEvent),
-      "shield-breaker": forceOnActive(forceShieldBreakerEvent),
-      bottleneck: forceOnActive(forceBottleneckEvent),
-      skylight: forceOnActive(forceSkylightEvent),
-      deluge: forceOnActive(forceDelugeEvent),
-      monaco: forceOnActive(forceMonacoEvent),
-      "glitter-spill": forceOnActive(forceGlitterSpillEvent),
-      "rogue-wave": forceOnActive(forceRogueWaveEvent),
-      "thunder-egg": forceOnActive(forceThunderEggEvent),
-      hologram: forceOnActive(forceHologramEvent),
-      "leaf-fall": forceOnActive(forceLeafFallEvent),
-      "three-body": forceOnActive(forceThreeBodyEvent),
-      billows: forceOnActive(forceBillowsEvent),
-      moire: forceOnActive(forceMoireEvent),
-      "pole-position": forceOnActive(forcePolePositionEvent),
-      countersink: forceOnActive(forceCountersinkEvent),
-      "busy-beaver": forceOnActive(forceBusyBeaverEvent),
-      pursuit: forceOnActive(forcePursuitEvent),
-      "fractal-charge": forceOnActive(forceFractalChargeEvent),
-      snowplow: forceOnActive(forceSnowplowEvent),
-      "franklins-kite": forceOnActive(forceFranklinsKiteEvent),
-      sokoban: forceOnActive(forceSokobanEvent),
-      fracking: forceOnActive(forceFrackingEvent),
-      chopper: forceOnActive(forceChopperEvent),
-      extinguisher: forceOnActive(forceExtinguisherEvent),
-      "golden-spiral": forceOnActive(forceGoldenSpiralEvent),
-      wildfire: forceOnActive(forceWildfireEvent),
-      "time-trial": forceOnActive(forceTimeTrialEvent),
-      "dust-bunnies": forceOnActive(forceDustBunniesEvent),
-      "magnetic-pendulum": forceOnActive(forceMagneticPendulumEvent),
-      "de-casteljau": forceOnActive(forceDeCasteljauEvent),
-      "buffons-needle": forceOnActive(forceBuffonsNeedleEvent),
-      "fuse-maze": forceOnActive(forceFuseMazeEvent),
-      "bar-billiards": forceOnActive(forceBarBilliardsEvent),
-      "levy-flight": forceOnActive(forceLevyFlightEvent),
-      brachistochrone: forceOnActive(forceBrachistochroneEvent),
-      "ulam-spiral": forceOnActive(forceUlamSpiralEvent),
-      "galton-board": forceOnActive(forceGaltonBoardEvent),
-      poohsticks: forceOnActive(forcePoohsticksEvent),
-      "fire-for-effect": forceOnActive(forceFireForEffectEvent),
-      eyewall: forceOnActive(forceEyewallEvent),
-      josephus: forceOnActive(forceJosephusEvent),
-      podium: forceOnActive(forcePodiumEvent),
-      robovac: forceOnActive(forceRobovacEvent),
-      "figure-eight": forceOnActive(forceFigureEightEvent),
-      bonanza: forceOnActive(forceBonanzaEvent),
-      "pi-clacks": forceOnActive(forcePiClacksEvent),
-      "seed-pods": forceOnActive(forceSeedPodsEvent),
-      "ripple-fire": forceOnActive(forceRippleFireEvent),
-      "spark-chamber": forceOnActive(forceSparkChamberEvent),
-      turbine: forceOnActive(forceTurbineEvent),
-      "strange-attractor": forceOnActive(forceStrangeAttractorEvent),
-      "topsy-turvy": forceOnActive(forceTopsyTurvyEvent),
-      "gold-plating": forceOnActive(forceGoldPlatingEvent),
-      crosswind: forceOnActive(forceCrosswindEvent),
-      hailstone: forceOnActive(forceHailstoneEvent),
-      "hilbert-curve": forceOnActive(forceHilbertCurveEvent),
-      "le-mans": forceOnActive(forceLeMansEvent),
-      "tunnel-borer": forceOnActive(forceTunnelBorerEvent),
-      harpoon: forceOnActive(forceHarpoonEvent),
-      "eight-queens": forceOnActive(forceEightQueensEvent),
-      "shortest-path": forceOnActive(forceShortestPathEvent),
-      sinkhole: forceOnActive(forceSinkholeEvent),
-      backwash: forceOnActive(forceBackwashEvent),
-      deflector: forceOnActive(forceDeflectorEvent),
-      sunflower: forceOnActive(forceSunflowerEvent),
-      "convex-hull": forceOnActive(forceConvexHullEvent),
+      kaleidoscope: forceOnActive((e) => e.forceKaleidoscopeEvent),
+      zipper: forceOnActive((e) => e.forceZipperEvent),
+      screensaver: forceOnActive((e) => e.forceScreensaverEvent),
+      sprinkler: forceOnActive((e) => e.forceSprinklerEvent),
+      clockwork: forceOnActive((e) => e.forceClockworkEvent),
+      "hole-in-one": forceOnActive((e) => e.forceHoleInOneEvent),
+      leapfrog: forceOnActive((e) => e.forceLeapfrogEvent),
+      lineup: forceOnActive((e) => e.forceLineupEvent),
+      stampede: forceOnActive((e) => e.forceStampedeEvent),
+      wormhole: forceOnActive((e) => e.forceWormholeEvent),
+      splat: forceOnActive((e) => e.forceSplatEvent),
+      roulette: forceOnActive((e) => e.forceRouletteEvent),
+      "free-kick": forceOnActive((e) => e.forceFreeKickEvent),
+      slalom: forceOnActive((e) => e.forceSlalomEvent),
+      lightning: forceOnActive((e) => e.forceLightningEvent),
+      "fire-hose": forceOnActive((e) => e.forceFireHoseEvent),
+      confluence: forceOnActive((e) => e.forceConfluenceEvent),
+      slosh: forceOnActive((e) => e.forceSloshEvent),
+      siphon: forceOnActive((e) => e.forceSiphonEvent),
+      crossfire: forceOnActive((e) => e.forceCrossfireEvent),
+      "gravity-well": forceOnActive((e) => e.forceGravityWellEvent),
+      splashdown: forceOnActive((e) => e.forceSplashdownEvent),
+      geysers: forceOnActive((e) => e.forceGeysersEvent),
+      "cash-cannon": forceOnActive((e) => e.forceCashCannonEvent),
+      hoover: forceOnActive((e) => e.forceHooverEvent),
+      "air-show": forceOnActive((e) => e.forceAirShowEvent),
+      leak: forceOnActive((e) => e.forceLeakEvent),
+      climb: forceOnActive((e) => e.forceClimbEvent),
+      kite: forceOnActive((e) => e.forceKiteEvent),
+      rainbow: forceOnActive((e) => e.forceRainbowEvent),
+      branches: forceOnActive((e) => e.forceBranchesEvent),
+      "tug-of-war": forceOnActive((e) => e.forceTugOfWarEvent),
+      waterwheel: forceOnActive((e) => e.forceWaterwheelEvent),
+      braid: forceOnActive((e) => e.forceBraidEvent),
+      skim: forceOnActive((e) => e.forceSkimEvent),
+      lattice: forceOnActive((e) => e.forceLatticeEvent),
+      fireworks: forceOnActive((e) => e.forceFireworksEvent),
+      slingshot: forceOnActive((e) => e.forceSlingshotEvent),
+      marquee: forceOnActive((e) => e.forceMarqueeEvent),
+      "crop-duster": forceOnActive((e) => e.forceCropDusterEvent),
+      bolas: forceOnActive((e) => e.forceBolasEvent),
+      countdown: forceOnActive((e) => e.forceCountdownEvent),
+      sparkler: forceOnActive((e) => e.forceSparklerEvent),
+      slinky: forceOnActive((e) => e.forceSlinkyEvent),
+      pipeline: forceOnActive((e) => e.forcePipelineEvent),
+      prism: forceOnActive((e) => e.forcePrismEvent),
+      trampoline: forceOnActive((e) => e.forceTrampolineEvent),
+      hummingbird: forceOnActive((e) => e.forceHummingbirdEvent),
+      "dive-bomb": forceOnActive((e) => e.forceDiveBombEvent),
+      "ski-jump": forceOnActive((e) => e.forceSkiJumpEvent),
+      jetpack: forceOnActive((e) => e.forceJetpackEvent),
+      "bass-drop": forceOnActive((e) => e.forceBassDropEvent),
+      scanner: forceOnActive((e) => e.forceScannerEvent),
+      "laser-grid": forceOnActive((e) => e.forceLaserGridEvent),
+      etch: forceOnActive((e) => e.forceEtchEvent),
+      searchlights: forceOnActive((e) => e.forceSearchlightsEvent),
+      "tractor-beam": forceOnActive((e) => e.forceTractorBeamEvent),
+      "beam-clash": forceOnActive((e) => e.forceBeamClashEvent),
+      butterfly: forceOnActive((e) => e.forceButterflyEvent),
+      kelp: forceOnActive((e) => e.forceKelpEvent),
+      "pendulum-wave": forceOnActive((e) => e.forcePendulumWaveEvent),
+      formation: forceOnActive((e) => e.forceFormationEvent),
+      ouroboros: forceOnActive((e) => e.forceOuroborosEvent),
+      bowstring: forceOnActive((e) => e.forceBowstringEvent),
+      superlaser: forceOnActive((e) => e.forceSuperlaserEvent),
+      "ion-storm": forceOnActive((e) => e.forceIonStormEvent),
+      glitch: forceOnActive((e) => e.forceGlitchEvent),
+      magnifier: forceOnActive((e) => e.forceMagnifierEvent),
+      "water-show": forceOnActive((e) => e.forceWaterShowEvent),
+      mercury: forceOnActive((e) => e.forceMercuryEvent),
+      alignment: forceOnActive((e) => e.forceAlignmentEvent),
+      dandelion: forceOnActive((e) => e.forceDandelionEvent),
+      bobber: forceOnActive((e) => e.forceBobberEvent),
+      fishing: forceOnActive((e) => e.forceFishingEvent),
+      scissors: forceOnActive((e) => e.forceScissorsEvent),
+      "pulse-rifle": forceOnActive((e) => e.forcePulseRifleEvent),
+      split: forceOnActive((e) => e.forceSplitEvent),
+      pixelate: forceOnActive((e) => e.forcePixelateEvent),
+      "dam-burst": forceOnActive((e) => e.forceDamBurstEvent),
+      spiderweb: forceOnActive((e) => e.forceSpiderwebEvent),
+      curtain: forceOnActive((e) => e.forceCurtainEvent),
+      jellyfish: forceOnActive((e) => e.forceJellyfishEvent),
+      polarity: forceOnActive((e) => e.forcePolarityEvent),
+      collider: forceOnActive((e) => e.forceColliderEvent),
+      sheepdog: forceOnActive((e) => e.forceSheepdogEvent),
+      dragon: forceOnActive((e) => e.forceDragonEvent),
+      reflector: forceOnActive((e) => e.forceReflectorEvent),
+      "cookie-cutter": forceOnActive((e) => e.forceCookieCutterEvent),
+      cinematic: forceOnActive((e) => e.forceCinematicEvent),
+      negative: forceOnActive((e) => e.forceNegativeEvent),
+      "chain-lightning": forceOnActive((e) => e.forceChainLightningEvent),
+      "lock-on": forceOnActive((e) => e.forceLockOnEvent),
+      stitch: forceOnActive((e) => e.forceStitchEvent),
+      stockpile: forceOnActive((e) => e.forceStockpileEvent),
+      "spot-weld": forceOnActive((e) => e.forceSpotWeldEvent),
+      reels: forceOnActive((e) => e.forceReelsEvent),
+      "cash-shower": forceOnActive((e) => e.forceCashShowerEvent),
+      "catherine-wheel": forceOnActive((e) => e.forceCatherineWheelEvent),
+      multiball: forceOnActive((e) => e.forceMultiballEvent),
+      whip: forceOnActive((e) => e.forceWhipEvent),
+      battery: forceOnActive((e) => e.forceBatteryEvent),
+      "tesla-coil": forceOnActive((e) => e.forceTeslaCoilEvent),
+      "jacobs-ladder": forceOnActive((e) => e.forceJacobsLadderEvent),
+      "comic-book": forceOnActive((e) => e.forceComicBookEvent),
+      avalanche: forceOnActive((e) => e.forceAvalancheEvent),
+      beehive: forceOnActive((e) => e.forceBeehiveEvent),
+      pogo: forceOnActive((e) => e.forcePogoEvent),
+      "laser-harp": forceOnActive((e) => e.forceLaserHarpEvent),
+      lichtenberg: forceOnActive((e) => e.forceLichtenbergEvent),
+      shatter: forceOnActive((e) => e.forceShatterEvent),
+      funnel: forceOnActive((e) => e.forceFunnelEvent),
+      grapple: forceOnActive((e) => e.forceGrappleEvent),
+      surf: forceOnActive((e) => e.forceSurfEvent),
+      "laser-tag": forceOnActive((e) => e.forceLaserTagEvent),
+      "ball-lightning": forceOnActive((e) => e.forceBallLightningEvent),
+      "event-horizon": forceOnActive((e) => e.forceEventHorizonEvent),
+      "tile-flip": forceOnActive((e) => e.forceTileFlipEvent),
+      gusher: forceOnActive((e) => e.forceGusherEvent),
+      pinata: forceOnActive((e) => e.forcePinataEvent),
+      "gift-wrap": forceOnActive((e) => e.forceGiftWrapEvent),
+      triangulate: forceOnActive((e) => e.forceTriangulateEvent),
+      "spark-of-life": forceOnActive((e) => e.forceSparkOfLifeEvent),
+      "glass-rain": forceOnActive((e) => e.forceGlassRainEvent),
+      fold: forceOnActive((e) => e.forceFoldEvent),
+      cocoon: forceOnActive((e) => e.forceCocoonEvent),
+      "gravity-assist": forceOnActive((e) => e.forceGravityAssistEvent),
+      "zip-line": forceOnActive((e) => e.forceZipLineEvent),
+      breach: forceOnActive((e) => e.forceBreachEvent),
+      "storm-surge": forceOnActive((e) => e.forceStormSurgeEvent),
+      "smash-and-grab": forceOnActive((e) => e.forceSmashAndGrabEvent),
+      "shrink-ray": forceOnActive((e) => e.forceShrinkRayEvent),
+      sandstorm: forceOnActive((e) => e.forceSandstormEvent),
+      juggernaut: forceOnActive((e) => e.forceJuggernautEvent),
+      "fuel-line": forceOnActive((e) => e.forceFuelLineEvent),
+      checkout: forceOnActive((e) => e.forceCheckoutEvent),
+      "lightning-rod": forceOnActive((e) => e.forceLightningRodEvent),
+      flag: forceOnActive((e) => e.forceFlagEvent),
+      terraces: forceOnActive((e) => e.forceTerracesEvent),
+      "battering-ram": forceOnActive((e) => e.forceBatteringRamEvent),
+      tetherball: forceOnActive((e) => e.forceTetherballEvent),
+      projector: forceOnActive((e) => e.forceProjectorEvent),
+      clear: forceOnActive((e) => e.forceClearEvent),
+      "infinity-mirror": forceOnActive((e) => e.forceInfinityMirrorEvent),
+      elevator: forceOnActive((e) => e.forceElevatorEvent),
+      migration: forceOnActive((e) => e.forceMigrationEvent),
+      corkscrew: forceOnActive((e) => e.forceCorkscrewEvent),
+      "mirror-ball": forceOnActive((e) => e.forceMirrorBallEvent),
+      "plasma-globe": forceOnActive((e) => e.forcePlasmaGlobeEvent),
+      jelly: forceOnActive((e) => e.forceJellyEvent),
+      shockwave: forceOnActive((e) => e.forceShockwaveEvent),
+      "pass-the-parcel": forceOnActive((e) => e.forcePassTheParcelEvent),
+      "garden-hose": forceOnActive((e) => e.forceGardenHoseEvent),
+      "burning-glass": forceOnActive((e) => e.forceBurningGlassEvent),
+      "storm-front": forceOnActive((e) => e.forceStormFrontEvent),
+      "slide-puzzle": forceOnActive((e) => e.forceSlidePuzzleEvent),
+      whirlpool: forceOnActive((e) => e.forceWhirlpoolEvent),
+      satellites: forceOnActive((e) => e.forceSatellitesEvent),
+      typewriter: forceOnActive((e) => e.forceTypewriterEvent),
+      railgun: forceOnActive((e) => e.forceRailgunEvent),
+      thunderdome: forceOnActive((e) => e.forceThunderdomeEvent),
+      melt: forceOnActive((e) => e.forceMeltEvent),
+      flood: forceOnActive((e) => e.forceFloodEvent),
+      "pied-piper": forceOnActive((e) => e.forcePiedPiperEvent),
+      tentacles: forceOnActive((e) => e.forceTentaclesEvent),
+      "laser-pendulum": forceOnActive((e) => e.forceLaserPendulumEvent),
+      "electric-eel": forceOnActive((e) => e.forceElectricEelEvent),
+      "double-vision": forceOnActive((e) => e.forceDoubleVisionEvent),
+      honey: forceOnActive((e) => e.forceHoneyEvent),
+      "musical-chairs": forceOnActive((e) => e.forceMusicalChairsEvent),
+      "bubble-wand": forceOnActive((e) => e.forceBubbleWandEvent),
+      hyperspace: forceOnActive((e) => e.forceHyperspaceEvent),
+      javelin: forceOnActive((e) => e.forceJavelinEvent),
+      shuffle: forceOnActive((e) => e.forceShuffleEvent),
+      "mushroom-cloud": forceOnActive((e) => e.forceMushroomCloudEvent),
+      relay: forceOnActive((e) => e.forceRelayEvent),
+      "laser-pointer": forceOnActive((e) => e.forceLaserPointerEvent),
+      "storm-chaser": forceOnActive((e) => e.forceStormChaserEvent),
+      "bait-ball": forceOnActive((e) => e.forceBaitBallEvent),
+      "video-wall": forceOnActive((e) => e.forceVideoWallEvent),
+      ferrofluid: forceOnActive((e) => e.forceFerrofluidEvent),
+      "hide-and-seek": forceOnActive((e) => e.forceHideAndSeekEvent),
+      "magic-carpet": forceOnActive((e) => e.forceMagicCarpetEvent),
+      spirograph: forceOnActive((e) => e.forceSpirographEvent),
+      "electric-net": forceOnActive((e) => e.forceElectricNetEvent),
+      demolition: forceOnActive((e) => e.forceDemolitionEvent),
+      "shooting-gallery": forceOnActive((e) => e.forceShootingGalleryEvent),
+      collapse: forceOnActive((e) => e.forceCollapseEvent),
+      volcano: forceOnActive((e) => e.forceVolcanoEvent),
+      skydivers: forceOnActive((e) => e.forceSkydiversEvent),
+      speedboat: forceOnActive((e) => e.forceSpeedboatEvent),
+      peacock: forceOnActive((e) => e.forcePeacockEvent),
+      "storm-wings": forceOnActive((e) => e.forceStormWingsEvent),
+      "cluster-bomb": forceOnActive((e) => e.forceClusterBombEvent),
+      "strafing-run": forceOnActive((e) => e.forceStrafingRunEvent),
+      "stained-glass": forceOnActive((e) => e.forceStainedGlassEvent),
+      uprising: forceOnActive((e) => e.forceUprisingEvent),
+      "swing-ride": forceOnActive((e) => e.forceSwingRideEvent),
+      lawnmower: forceOnActive((e) => e.forceLawnmowerEvent),
+      "light-show": forceOnActive((e) => e.forceLightShowEvent),
+      "bug-zapper": forceOnActive((e) => e.forceBugZapperEvent),
+      firecrackers: forceOnActive((e) => e.forceFirecrackersEvent),
+      "six-shooter": forceOnActive((e) => e.forceSixShooterEvent),
+      thermal: forceOnActive((e) => e.forceThermalEvent),
+      stalactites: forceOnActive((e) => e.forceStalactitesEvent),
+      kintsugi: forceOnActive((e) => e.forceKintsugiEvent),
+      galaxy: forceOnActive((e) => e.forceGalaxyEvent),
+      snowdrift: forceOnActive((e) => e.forceSnowdriftEvent),
+      snowball: forceOnActive((e) => e.forceSnowballEvent),
+      cartwheel: forceOnActive((e) => e.forceCartwheelEvent),
+      matryoshka: forceOnActive((e) => e.forceMatryoshkaEvent),
+      "salmon-run": forceOnActive((e) => e.forceSalmonRunEvent),
+      "moon-tide": forceOnActive((e) => e.forceMoonTideEvent),
+      "candy-floss": forceOnActive((e) => e.forceCandyFlossEvent),
+      "figure-skater": forceOnActive((e) => e.forceFigureSkaterEvent),
+      tripwire: forceOnActive((e) => e.forceTripwireEvent),
+      sunrise: forceOnActive((e) => e.forceSunriseEvent),
+      rally: forceOnActive((e) => e.forceRallyEvent),
+      ignition: forceOnActive((e) => e.forceIgnitionEvent),
+      trident: forceOnActive((e) => e.forceTridentEvent),
+      crawl: forceOnActive((e) => e.forceCrawlEvent),
+      "carpet-bombing": forceOnActive((e) => e.forceCarpetBombingEvent),
+      "time-bomb": forceOnActive((e) => e.forceTimeBombEvent),
+      "bunker-buster": forceOnActive((e) => e.forceBunkerBusterEvent),
+      "grenade-toss": forceOnActive((e) => e.forceGrenadeTossEvent),
+      "depth-charges": forceOnActive((e) => e.forceDepthChargesEvent),
+      "firing-squad": forceOnActive((e) => e.forceFiringSquadEvent),
+      akimbo: forceOnActive((e) => e.forceAkimboEvent),
+      "flak-barrage": forceOnActive((e) => e.forceFlakBarrageEvent),
+      "sniper-nest": forceOnActive((e) => e.forceSniperNestEvent),
+      rewind: forceOnActive((e) => e.forceRewindEvent),
+      "morse-code": forceOnActive((e) => e.forceMorseCodeEvent),
+      "stadium-wave": forceOnActive((e) => e.forceStadiumWaveEvent),
+      "knights-tour": forceOnActive((e) => e.forceKnightsTourEvent),
+      "lava-lamp": forceOnActive((e) => e.forceLavaLampEvent),
+      dominoes: forceOnActive((e) => e.forceDominoesEvent),
+      inkblot: forceOnActive((e) => e.forceInkblotEvent),
+      "soft-serve": forceOnActive((e) => e.forceSoftServeEvent),
+      "dollar-sign": forceOnActive((e) => e.forceDollarSignEvent),
+      mobius: forceOnActive((e) => e.forceMobiusEvent),
+      "swiss-roll": forceOnActive((e) => e.forceSwissRollEvent),
+      dodgeball: forceOnActive((e) => e.forceDodgeballEvent),
+      "conga-line": forceOnActive((e) => e.forceCongaLineEvent),
+      "spinning-top": forceOnActive((e) => e.forceSpinningTopEvent),
+      gobbler: forceOnActive((e) => e.forceGobblerEvent),
+      majorette: forceOnActive((e) => e.forceMajoretteEvent),
+      "hula-hoop": forceOnActive((e) => e.forceHulaHoopEvent),
+      calligraphy: forceOnActive((e) => e.forceCalligraphyEvent),
+      "snake-charmer": forceOnActive((e) => e.forceSnakeCharmerEvent),
+      "plate-spinner": forceOnActive((e) => e.forcePlateSpinnerEvent),
+      "ferris-wheel": forceOnActive((e) => e.forceFerrisWheelEvent),
+      "bucket-brigade": forceOnActive((e) => e.forceBucketBrigadeEvent),
+      "sky-lanterns": forceOnActive((e) => e.forceSkyLanternsEvent),
+      engraver: forceOnActive((e) => e.forceEngraverEvent),
+      "x-ray": forceOnActive((e) => e.forceXRayEvent),
+      "laser-lasso": forceOnActive((e) => e.forceLaserLassoEvent),
+      "hex-ring": forceOnActive((e) => e.forceHexRingEvent),
+      portcullis: forceOnActive((e) => e.forcePortcullisEvent),
+      keyhole: forceOnActive((e) => e.forceKeyholeEvent),
+      defibrillator: forceOnActive((e) => e.forceDefibrillatorEvent),
+      "circuit-board": forceOnActive((e) => e.forceCircuitBoardEvent),
+      mjolnir: forceOnActive((e) => e.forceMjolnirEvent),
+      "arc-flash": forceOnActive((e) => e.forceArcFlashEvent),
+      "four-corners": forceOnActive((e) => e.forceFourCornersEvent),
+      "bolt-wheel": forceOnActive((e) => e.forceBoltWheelEvent),
+      minefield: forceOnActive((e) => e.forceMinefieldEvent),
+      cannonade: forceOnActive((e) => e.forceCannonadeEvent),
+      "sticky-bombs": forceOnActive((e) => e.forceStickyBombsEvent),
+      crossblast: forceOnActive((e) => e.forceCrossblastEvent),
+      mortar: forceOnActive((e) => e.forceMortarEvent),
+      flashbang: forceOnActive((e) => e.forceFlashbangEvent),
+      "sentry-turret": forceOnActive((e) => e.forceSentryTurretEvent),
+      shotgun: forceOnActive((e) => e.forceShotgunEvent),
+      "boss-fight": forceOnActive((e) => e.forceBossFightEvent),
+      gunship: forceOnActive((e) => e.forceGunshipEvent),
+      "bullet-time": forceOnActive((e) => e.forceBulletTimeEvent),
+      flechettes: forceOnActive((e) => e.forceFlechettesEvent),
+      radar: forceOnActive((e) => e.forceRadarEvent),
+      bingo: forceOnActive((e) => e.forceBingoEvent),
+      "lane-hopper": forceOnActive((e) => e.forceLaneHopperEvent),
+      "simon-says": forceOnActive((e) => e.forceSimonSaysEvent),
+      equalizer: forceOnActive((e) => e.forceEqualizerEvent),
+      "loading-bar": forceOnActive((e) => e.forceLoadingBarEvent),
+      "dice-roll": forceOnActive((e) => e.forceDiceRollEvent),
+      mandala: forceOnActive((e) => e.forceMandalaEvent),
+      "zen-garden": forceOnActive((e) => e.forceZenGardenEvent),
+      accordion: forceOnActive((e) => e.forceAccordionEvent),
+      fizz: forceOnActive((e) => e.forceFizzEvent),
+      soundwave: forceOnActive((e) => e.forceSoundwaveEvent),
+      taffy: forceOnActive((e) => e.forceTaffyEvent),
+      "drip-painting": forceOnActive((e) => e.forceDripPaintingEvent),
+      moths: forceOnActive((e) => e.forceMothsEvent),
+      curling: forceOnActive((e) => e.forceCurlingEvent),
+      clothesline: forceOnActive((e) => e.forceClotheslineEvent),
+      "balloon-pop": forceOnActive((e) => e.forceBalloonPopEvent),
+      "spin-bottle": forceOnActive((e) => e.forceSpinBottleEvent),
+      "sky-writer": forceOnActive((e) => e.forceSkyWriterEvent),
+      "gold-pan": forceOnActive((e) => e.forceGoldPanEvent),
+      bulldozer: forceOnActive((e) => e.forceBulldozerEvent),
+      "koi-pond": forceOnActive((e) => e.forceKoiPondEvent),
+      "pipe-organ": forceOnActive((e) => e.forcePipeOrganEvent),
+      "ant-trail": forceOnActive((e) => e.forceAntTrailEvent),
+      "hot-air-balloon": forceOnActive((e) => e.forceHotAirBalloonEvent),
+      "lens-flare": forceOnActive((e) => e.forceLensFlareEvent),
+      tightrope: forceOnActive((e) => e.forceTightropeEvent),
+      "neon-sign": forceOnActive((e) => e.forceNeonSignEvent),
+      "light-cage": forceOnActive((e) => e.forceLightCageEvent),
+      stairway: forceOnActive((e) => e.forceStairwayEvent),
+      beacons: forceOnActive((e) => e.forceBeaconsEvent),
+      "anvil-crawler": forceOnActive((e) => e.forceAnvilCrawlerEvent),
+      neurons: forceOnActive((e) => e.forceNeuronsEvent),
+      "bottled-bolt": forceOnActive((e) => e.forceBottledBoltEvent),
+      thunderbird: forceOnActive((e) => e.forceThunderbirdEvent),
+      "spark-gap": forceOnActive((e) => e.forceSparkGapEvent),
+      "static-shock": forceOnActive((e) => e.forceStaticShockEvent),
+      "rocket-jump": forceOnActive((e) => e.forceRocketJumpEvent),
+      torpedoes: forceOnActive((e) => e.forceTorpedoesEvent),
+      airstrike: forceOnActive((e) => e.forceAirstrikeEvent),
+      dambuster: forceOnActive((e) => e.forceDambusterEvent),
+      airburst: forceOnActive((e) => e.forceAirburstEvent),
+      "bomb-pinwheel": forceOnActive((e) => e.forceBombPinwheelEvent),
+      "bullet-curtain": forceOnActive((e) => e.forceBulletCurtainEvent),
+      "trick-shot": forceOnActive((e) => e.forceTrickShotEvent),
+      "rail-shooter": forceOnActive((e) => e.forceRailShooterEvent),
+      "skeet-shoot": forceOnActive((e) => e.forceSkeetShootEvent),
+      "triple-tap": forceOnActive((e) => e.forceTripleTapEvent),
+      "tommy-gun": forceOnActive((e) => e.forceTommyGunEvent),
+      sweeper: forceOnActive((e) => e.forceSweeperEvent),
+      "claw-machine": forceOnActive((e) => e.forceClawMachineEvent),
+      lottery: forceOnActive((e) => e.forceLotteryEvent),
+      "word-guess": forceOnActive((e) => e.forceWordGuessEvent),
+      "memory-match": forceOnActive((e) => e.forceMemoryMatchEvent),
+      "tic-tac-toe": forceOnActive((e) => e.forceTicTacToeEvent),
+      "rev-counter": forceOnActive((e) => e.forceRevCounterEvent),
+      sluice: forceOnActive((e) => e.forceSluiceEvent),
+      foundry: forceOnActive((e) => e.forceFoundryEvent),
+      "jet-stream": forceOnActive((e) => e.forceJetStreamEvent),
+      moat: forceOnActive((e) => e.forceMoatEvent),
+      seep: forceOnActive((e) => e.forceSeepEvent),
+      meander: forceOnActive((e) => e.forceMeanderEvent),
+      waltz: forceOnActive((e) => e.forceWaltzEvent),
+      gyroscope: forceOnActive((e) => e.forceGyroscopeEvent),
+      dragonfly: forceOnActive((e) => e.forceDragonflyEvent),
+      "ring-toss": forceOnActive((e) => e.forceRingTossEvent),
+      slipstream: forceOnActive((e) => e.forceSlipstreamEvent),
+      "sheet-music": forceOnActive((e) => e.forceSheetMusicEvent),
+      "leaf-blower": forceOnActive((e) => e.forceLeafBlowerEvent),
+      loom: forceOnActive((e) => e.forceLoomEvent),
+      "high-dive": forceOnActive((e) => e.forceHighDiveEvent),
+      sower: forceOnActive((e) => e.forceSowerEvent),
+      courier: forceOnActive((e) => e.forceCourierEvent),
+      rodeo: forceOnActive((e) => e.forceRodeoEvent),
+      crosshair: forceOnActive((e) => e.forceCrosshairEvent),
+      iris: forceOnActive((e) => e.forceIrisEvent),
+      "bank-shot": forceOnActive((e) => e.forceBankShotEvent),
+      sunbeams: forceOnActive((e) => e.forceSunbeamsEvent),
+      stargate: forceOnActive((e) => e.forceStargateEvent),
+      "cats-cradle": forceOnActive((e) => e.forceCatsCradleEvent),
+      thunderhead: forceOnActive((e) => e.forceThunderheadEvent),
+      pitchfork: forceOnActive((e) => e.forcePitchforkEvent),
+      "jumper-cables": forceOnActive((e) => e.forceJumperCablesEvent),
+      lash: forceOnActive((e) => e.forceLashEvent),
+      "spark-plug": forceOnActive((e) => e.forceSparkPlugEvent),
+      "live-wire": forceOnActive((e) => e.forceLiveWireEvent),
+      "fuse-race": forceOnActive((e) => e.forceFuseRaceEvent),
+      "bouncing-betty": forceOnActive((e) => e.forceBouncingBettyEvent),
+      "pressure-cooker": forceOnActive((e) => e.forcePressureCookerEvent),
+      "hot-potato": forceOnActive((e) => e.forceHotPotatoEvent),
+      "daisy-chain": forceOnActive((e) => e.forceDaisyChainEvent),
+      "shaped-charge": forceOnActive((e) => e.forceShapedChargeEvent),
+      detcord: forceOnActive((e) => e.forceDetcordEvent),
+      "bullet-bloom": forceOnActive((e) => e.forceBulletBloomEvent),
+      "high-noon": forceOnActive((e) => e.forceHighNoonEvent),
+      hailfire: forceOnActive((e) => e.forceHailfireEvent),
+      dervish: forceOnActive((e) => e.forceDervishEvent),
+      invaders: forceOnActive((e) => e.forceInvadersEvent),
+      "gun-kata": forceOnActive((e) => e.forceGunKataEvent),
+      lockbuster: forceOnActive((e) => e.forceLockbusterEvent),
+      "connect-four": forceOnActive((e) => e.forceConnectFourEvent),
+      combo: forceOnActive((e) => e.forceComboEvent),
+      "skee-ball": forceOnActive((e) => e.forceSkeeBallEvent),
+      "bubble-shooter": forceOnActive((e) => e.forceBubbleShooterEvent),
+      delta: forceOnActive((e) => e.forceDeltaEvent),
+      hydrant: forceOnActive((e) => e.forceHydrantEvent),
+      cloverleaf: forceOnActive((e) => e.forceCloverleafEvent),
+      pinstripe: forceOnActive((e) => e.forcePinstripeEvent),
+      faucet: forceOnActive((e) => e.forceFaucetEvent),
+      showerhead: forceOnActive((e) => e.forceShowerheadEvent),
+      "binary-star": forceOnActive((e) => e.forceBinaryStarEvent),
+      hopscotch: forceOnActive((e) => e.forceHopscotchEvent),
+      tadpoles: forceOnActive((e) => e.forceTadpolesEvent),
+      blink: forceOnActive((e) => e.forceBlinkEvent),
+      "bumper-cars": forceOnActive((e) => e.forceBumperCarsEvent),
+      pigeons: forceOnActive((e) => e.forcePigeonsEvent),
+      squid: forceOnActive((e) => e.forceSquidEvent),
+      "water-pistol": forceOnActive((e) => e.forceWaterPistolEvent),
+      poi: forceOnActive((e) => e.forcePoiEvent),
+      bartender: forceOnActive((e) => e.forceBartenderEvent),
+      "pole-vault": forceOnActive((e) => e.forcePoleVaultEvent),
+      "paint-roller": forceOnActive((e) => e.forcePaintRollerEvent),
+      buzzsaw: forceOnActive((e) => e.forceBuzzsawEvent),
+      "light-cycles": forceOnActive((e) => e.forceLightCyclesEvent),
+      "fiber-optic": forceOnActive((e) => e.forceFiberOpticEvent),
+      "daddy-longlegs": forceOnActive((e) => e.forceDaddyLonglegsEvent),
+      knighthood: forceOnActive((e) => e.forceKnighthoodEvent),
+      "cutting-torch": forceOnActive((e) => e.forceCuttingTorchEvent),
+      "st-elmos-fire": forceOnActive((e) => e.forceStElmosFireEvent),
+      "stepped-leader": forceOnActive((e) => e.forceSteppedLeaderEvent),
+      trolley: forceOnActive((e) => e.forceTrolleyEvent),
+      "bolt-bounce": forceOnActive((e) => e.forceBoltBounceEvent),
+      "storm-crown": forceOnActive((e) => e.forceStormCrownEvent),
+      "van-de-graaff": forceOnActive((e) => e.forceVanDeGraaffEvent),
+      "barrel-roll": forceOnActive((e) => e.forceBarrelRollEvent),
+      "bomb-stack": forceOnActive((e) => e.forceBombStackEvent),
+      "roman-candle": forceOnActive((e) => e.forceRomanCandleEvent),
+      whistlers: forceOnActive((e) => e.forceWhistlersEvent),
+      trebuchet: forceOnActive((e) => e.forceTrebuchetEvent),
+      "drop-pods": forceOnActive((e) => e.forceDropPodsEvent),
+      "bomb-carousel": forceOnActive((e) => e.forceBombCarouselEvent),
+      "last-stand": forceOnActive((e) => e.forceLastStandEvent),
+      "tin-can": forceOnActive((e) => e.forceTinCanEvent),
+      "point-defense": forceOnActive((e) => e.forcePointDefenseEvent),
+      "target-practice": forceOnActive((e) => e.forceTargetPracticeEvent),
+      "flare-gun": forceOnActive((e) => e.forceFlareGunEvent),
+      rappel: forceOnActive((e) => e.forceRappelEvent),
+      stacker: forceOnActive((e) => e.forceStackerEvent),
+      "coin-pusher": forceOnActive((e) => e.forceCoinPusherEvent),
+      "high-striker": forceOnActive((e) => e.forceHighStrikerEvent),
+      "note-highway": forceOnActive((e) => e.forceNoteHighwayEvent),
+      safecracker: forceOnActive((e) => e.forceSafecrackerEvent),
+      "gumball-machine": forceOnActive((e) => e.forceGumballMachineEvent),
+      ninja: forceOnActive((e) => e.forceNinjaEvent),
+      bungee: forceOnActive((e) => e.forceBungeeEvent),
+      "funnel-cake": forceOnActive((e) => e.forceFunnelCakeEvent),
+      chrysanthemum: forceOnActive((e) => e.forceChrysanthemumEvent),
+      crossroads: forceOnActive((e) => e.forceCrossroadsEvent),
+      waterslide: forceOnActive((e) => e.forceWaterslideEvent),
+      banner: forceOnActive((e) => e.forceBannerEvent),
+      haunt: forceOnActive((e) => e.forceHauntEvent),
+      "maple-seeds": forceOnActive((e) => e.forceMapleSeedsEvent),
+      donuts: forceOnActive((e) => e.forceDonutsEvent),
+      "hamster-wheel": forceOnActive((e) => e.forceHamsterWheelEvent),
+      "lunar-lander": forceOnActive((e) => e.forceLunarLanderEvent),
+      dowsing: forceOnActive((e) => e.forceDowsingEvent),
+      matador: forceOnActive((e) => e.forceMatadorEvent),
+      "flash-flood": forceOnActive((e) => e.forceFlashFloodEvent),
+      dolphin: forceOnActive((e) => e.forceDolphinEvent),
+      puffer: forceOnActive((e) => e.forcePufferEvent),
+      "hockey-stop": forceOnActive((e) => e.forceHockeyStopEvent),
+      twirl: forceOnActive((e) => e.forceTwirlEvent),
+      whale: forceOnActive((e) => e.forceWhaleEvent),
+      "light-painting": forceOnActive((e) => e.forceLightPaintingEvent),
+      "saber-throw": forceOnActive((e) => e.forceSaberThrowEvent),
+      "laser-maze": forceOnActive((e) => e.forceLaserMazeEvent),
+      "tape-measure": forceOnActive((e) => e.forceTapeMeasureEvent),
+      pulsar: forceOnActive((e) => e.forcePulsarEvent),
+      "short-circuit": forceOnActive((e) => e.forceShortCircuitEvent),
+      conductor: forceOnActive((e) => e.forceConductorEvent),
+      "double-strike": forceOnActive((e) => e.forceDoubleStrikeEvent),
+      "lightning-fence": forceOnActive((e) => e.forceLightningFenceEvent),
+      "heat-lightning": forceOnActive((e) => e.forceHeatLightningEvent),
+      "powder-kegs": forceOnActive((e) => e.forcePowderKegsEvent),
+      "bomb-fountain": forceOnActive((e) => e.forceBombFountainEvent),
+      "frag-out": forceOnActive((e) => e.forceFragOutEvent),
+      "fault-line": forceOnActive((e) => e.forceFaultLineEvent),
+      "willow-shells": forceOnActive((e) => e.forceWillowShellsEvent),
+      "swarm-strike": forceOnActive((e) => e.forceSwarmStrikeEvent),
+      concentric: forceOnActive((e) => e.forceConcentricEvent),
+      graze: forceOnActive((e) => e.forceGrazeEvent),
+      hotfoot: forceOnActive((e) => e.forceHotfootEvent),
+      dogfight: forceOnActive((e) => e.forceDogfightEvent),
+      "bullet-rose": forceOnActive((e) => e.forceBulletRoseEvent),
+      "armor-piercer": forceOnActive((e) => e.forceArmorPiercerEvent),
+      spotter: forceOnActive((e) => e.forceSpotterEvent),
+      "peg-solitaire": forceOnActive((e) => e.forcePegSolitaireEvent),
+      "marble-drop": forceOnActive((e) => e.forceMarbleDropEvent),
+      statues: forceOnActive((e) => e.forceStatuesEvent),
+      "flappy-wisp": forceOnActive((e) => e.forceFlappyWispEvent),
+      "buried-treasure": forceOnActive((e) => e.forceBuriedTreasureEvent),
+      "air-hockey": forceOnActive((e) => e.forceAirHockeyEvent),
+      "bolt-of-cash": forceOnActive((e) => e.forceBoltOfCashEvent),
+      "pendulum-pour": forceOnActive((e) => e.forcePendulumPourEvent),
+      "pop-the-cork": forceOnActive((e) => e.forcePopTheCorkEvent),
+      "wall-jump": forceOnActive((e) => e.forceWallJumpEvent),
+      superball: forceOnActive((e) => e.forceSuperballEvent),
+      "spin-dash": forceOnActive((e) => e.forceSpinDashEvent),
+      cupid: forceOnActive((e) => e.forceCupidEvent),
+      stork: forceOnActive((e) => e.forceStorkEvent),
+      "paper-plane": forceOnActive((e) => e.forcePaperPlaneEvent),
+      spike: forceOnActive((e) => e.forceSpikeEvent),
+      toaster: forceOnActive((e) => e.forceToasterEvent),
+      xylophone: forceOnActive((e) => e.forceXylophoneEvent),
+      "birthday-candles": forceOnActive((e) => e.forceBirthdayCandlesEvent),
+      "drop-tower": forceOnActive((e) => e.forceDropTowerEvent),
+      "arrow-volley": forceOnActive((e) => e.forceArrowVolleyEvent),
+      "make-a-wish": forceOnActive((e) => e.forceMakeAWishEvent),
+      blunderbuss: forceOnActive((e) => e.forceBlunderbussEvent),
+      genie: forceOnActive((e) => e.forceGenieEvent),
+      "solar-flare": forceOnActive((e) => e.forceSolarFlareEvent),
+      "heat-vision": forceOnActive((e) => e.forceHeatVisionEvent),
+      "print-head": forceOnActive((e) => e.forcePrintHeadEvent),
+      aurora: forceOnActive((e) => e.forceAuroraEvent),
+      "thunder-rings": forceOnActive((e) => e.forceThunderRingsEvent),
+      "arc-weld": forceOnActive((e) => e.forceArcWeldEvent),
+      "storm-kite": forceOnActive((e) => e.forceStormKiteEvent),
+      "volcanic-lightning": forceOnActive((e) => e.forceVolcanicLightningEvent),
+      sculptor: forceOnActive((e) => e.forceSculptorEvent),
+      "grand-finale": forceOnActive((e) => e.forceGrandFinaleEvent),
+      "bomb-bouquet": forceOnActive((e) => e.forceBombBouquetEvent),
+      cascade: forceOnActive((e) => e.forceCascadeEvent),
+      "pinball-bomb": forceOnActive((e) => e.forcePinballBombEvent),
+      "bomb-train": forceOnActive((e) => e.forceBombTrainEvent),
+      "breaching-charge": forceOnActive((e) => e.forceBreachingChargeEvent),
+      "confetti-cannon": forceOnActive((e) => e.forceConfettiCannonEvent),
+      "ammo-belt": forceOnActive((e) => e.forceAmmoBeltEvent),
+      gauntlet: forceOnActive((e) => e.forceGauntletEvent),
+      "turret-tower": forceOnActive((e) => e.forceTurretTowerEvent),
+      "shell-casings": forceOnActive((e) => e.forceShellCasingsEvent),
+      darts: forceOnActive((e) => e.forceDartsEvent),
+      battleship: forceOnActive((e) => e.forceBattleshipEvent),
+      interceptors: forceOnActive((e) => e.forceInterceptorsEvent),
+      "land-grab": forceOnActive((e) => e.forceLandGrabEvent),
+      "duck-duck-goose": forceOnActive((e) => e.forceDuckDuckGooseEvent),
+      ringer: forceOnActive((e) => e.forceRingerEvent),
+      hurdles: forceOnActive((e) => e.forceHurdlesEvent),
+      "lucky-roll": forceOnActive((e) => e.forceLuckyRollEvent),
+      "cash-register": forceOnActive((e) => e.forceCashRegisterEvent),
+      "horse-race": forceOnActive((e) => e.forceHorseRaceEvent),
+      "dunk-tank": forceOnActive((e) => e.forceDunkTankEvent),
+      "half-pipe": forceOnActive((e) => e.forceHalfPipeEvent),
+      knot: forceOnActive((e) => e.forceKnotEvent),
+      "ticker-tape": forceOnActive((e) => e.forceTickerTapeEvent),
+      "cash-bridge": forceOnActive((e) => e.forceCashBridgeEvent),
+      "skipping-stone": forceOnActive((e) => e.forceSkippingStoneEvent),
+      woodpecker: forceOnActive((e) => e.forceWoodpeckerEvent),
+      frisbee: forceOnActive((e) => e.forceFrisbeeEvent),
+      kangaroo: forceOnActive((e) => e.forceKangarooEvent),
+      badminton: forceOnActive((e) => e.forceBadmintonEvent),
+      tumbleweed: forceOnActive((e) => e.forceTumbleweedEvent),
+      "shuttle-run": forceOnActive((e) => e.forceShuttleRunEvent),
+      echolocation: forceOnActive((e) => e.forceEcholocationEvent),
+      lacrosse: forceOnActive((e) => e.forceLacrosseEvent),
+      "jet-ski": forceOnActive((e) => e.forceJetSkiEvent),
+      "drinking-straw": forceOnActive((e) => e.forceDrinkingStrawEvent),
+      "sea-serpent": forceOnActive((e) => e.forceSeaSerpentEvent),
+      "magic-trick": forceOnActive((e) => e.forceMagicTrickEvent),
+      "fountain-pen": forceOnActive((e) => e.forceFountainPenEvent),
+      spool: forceOnActive((e) => e.forceSpoolEvent),
+      "laser-rain": forceOnActive((e) => e.forceLaserRainEvent),
+      "cross-cut": forceOnActive((e) => e.forceCrossCutEvent),
+      heliograph: forceOnActive((e) => e.forceHeliographEvent),
+      starburst: forceOnActive((e) => e.forceStarburstEvent),
+      "thunder-drum": forceOnActive((e) => e.forceThunderDrumEvent),
+      "bolt-barrage": forceOnActive((e) => e.forceBoltBarrageEvent),
+      coilgun: forceOnActive((e) => e.forceCoilgunEvent),
+      snowflake: forceOnActive((e) => e.forceSnowflakeEvent),
+      "bomb-snake": forceOnActive((e) => e.forceBombSnakeEvent),
+      "spider-mines": forceOnActive((e) => e.forceSpiderMinesEvent),
+      crossette: forceOnActive((e) => e.forceCrossetteEvent),
+      "spiral-charge": forceOnActive((e) => e.forceSpiralChargeEvent),
+      "bomb-bubbles": forceOnActive((e) => e.forceBombBubblesEvent),
+      "rocket-sled": forceOnActive((e) => e.forceRocketSledEvent),
+      "dynamite-fishing": forceOnActive((e) => e.forceDynamiteFishingEvent),
+      "charge-shot": forceOnActive((e) => e.forceChargeShotEvent),
+      "corkscrew-rounds": forceOnActive((e) => e.forceCorkscrewRoundsEvent),
+      "orbital-guns": forceOnActive((e) => e.forceOrbitalGunsEvent),
+      "tracer-rounds": forceOnActive((e) => e.forceTracerRoundsEvent),
+      "pellet-storm": forceOnActive((e) => e.forcePelletStormEvent),
+      "bullet-snake": forceOnActive((e) => e.forceBulletSnakeEvent),
+      "rock-paper-scissors": forceOnActive(
+        (e) => e.forceRockPaperScissorsEvent,
+      ),
+      limbo: forceOnActive((e) => e.forceLimboEvent),
+      "quiz-show": forceOnActive((e) => e.forceQuizShowEvent),
+      sumo: forceOnActive((e) => e.forceSumoEvent),
+      "paper-toss": forceOnActive((e) => e.forcePaperTossEvent),
+      "arm-wrestling": forceOnActive((e) => e.forceArmWrestlingEvent),
+      "keepy-uppy": forceOnActive((e) => e.forceKeepyUppyEvent),
+      "pin-the-tail": forceOnActive((e) => e.forcePinTheTailEvent),
+      "trust-fall": forceOnActive((e) => e.forceTrustFallEvent),
+      "bubble-gum": forceOnActive((e) => e.forceBubbleGumEvent),
+      "canal-locks": forceOnActive((e) => e.forceCanalLocksEvent),
+      bobsled: forceOnActive((e) => e.forceBobsledEvent),
+      "spring-loaded": forceOnActive((e) => e.forceSpringLoadedEvent),
+      influx: forceOnActive((e) => e.forceInfluxEvent),
+      "uneven-bars": forceOnActive((e) => e.forceUnevenBarsEvent),
+      bumblebee: forceOnActive((e) => e.forceBumblebeeEvent),
+      "shot-put": forceOnActive((e) => e.forceShotPutEvent),
+      "human-cannonball": forceOnActive((e) => e.forceHumanCannonballEvent),
+      "fox-and-hounds": forceOnActive((e) => e.forceFoxAndHoundsEvent),
+      kingfisher: forceOnActive((e) => e.forceKingfisherEvent),
+      joust: forceOnActive((e) => e.forceJoustEvent),
+      pelican: forceOnActive((e) => e.forcePelicanEvent),
+      dragster: forceOnActive((e) => e.forceDragsterEvent),
+      "fire-breather": forceOnActive((e) => e.forceFireBreatherEvent),
+      "bucket-swing": forceOnActive((e) => e.forceBucketSwingEvent),
+      puppeteer: forceOnActive((e) => e.forcePuppeteerEvent),
+      corona: forceOnActive((e) => e.forceCoronaEvent),
+      pillars: forceOnActive((e) => e.forcePillarsEvent),
+      "laser-ladder": forceOnActive((e) => e.forceLaserLadderEvent),
+      "beam-splitter": forceOnActive((e) => e.forceBeamSplitterEvent),
+      teleporter: forceOnActive((e) => e.forceTeleporterEvent),
+      "ring-light": forceOnActive((e) => e.forceRingLightEvent),
+      taser: forceOnActive((e) => e.forceTaserEvent),
+      "arc-furnace": forceOnActive((e) => e.forceArcFurnaceEvent),
+      "five-fingers": forceOnActive((e) => e.forceFiveFingersEvent),
+      "cattle-prod": forceOnActive((e) => e.forceCattleProdEvent),
+      "bolt-sling": forceOnActive((e) => e.forceBoltSlingEvent),
+      "colliding-storms": forceOnActive((e) => e.forceCollidingStormsEvent),
+      "bomb-juggler": forceOnActive((e) => e.forceBombJugglerEvent),
+      "bomb-squad": forceOnActive((e) => e.forceBombSquadEvent),
+      splitter: forceOnActive((e) => e.forceSplitterEvent),
+      "bomb-pendulum": forceOnActive((e) => e.forceBombPendulumEvent),
+      paradrop: forceOnActive((e) => e.forceParadropEvent),
+      "bomb-pachinko": forceOnActive((e) => e.forceBombPachinkoEvent),
+      "fuse-clock": forceOnActive((e) => e.forceFuseClockEvent),
+      hedgehog: forceOnActive((e) => e.forceHedgehogEvent),
+      "split-shot": forceOnActive((e) => e.forceSplitShotEvent),
+      "bullet-lasso": forceOnActive((e) => e.forceBulletLassoEvent),
+      "bullet-weave": forceOnActive((e) => e.forceBulletWeaveEvent),
+      "bullet-fountain": forceOnActive((e) => e.forceBulletFountainEvent),
+      "covering-fire": forceOnActive((e) => e.forceCoveringFireEvent),
+      checkers: forceOnActive((e) => e.forceCheckersEvent),
+      minesweeper: forceOnActive((e) => e.forceMinesweeperEvent),
+      "jack-in-the-box": forceOnActive((e) => e.forceJackInTheBoxEvent),
+      spillway: forceOnActive((e) => e.forceSpillwayEvent),
+      crosscurrents: forceOnActive((e) => e.forceCrosscurrentsEvent),
+      oxbow: forceOnActive((e) => e.forceOxbowEvent),
+      breakers: forceOnActive((e) => e.forceBreakersEvent),
+      rivulets: forceOnActive((e) => e.forceRivuletsEvent),
+      torrent: forceOnActive((e) => e.forceTorrentEvent),
+      lissajous: forceOnActive((e) => e.forceLissajousEvent),
+      "moon-hop": forceOnActive((e) => e.forceMoonHopEvent),
+      peekaboo: forceOnActive((e) => e.forcePeekabooEvent),
+      "tilt-a-whirl": forceOnActive((e) => e.forceTiltAWhirlEvent),
+      "water-strider": forceOnActive((e) => e.forceWaterStriderEvent),
+      "rope-climb": forceOnActive((e) => e.forceRopeClimbEvent),
+      "paddle-steamer": forceOnActive((e) => e.forcePaddleSteamerEvent),
+      "jet-wash": forceOnActive((e) => e.forceJetWashEvent),
+      bellows: forceOnActive((e) => e.forceBellowsEvent),
+      "rain-dance": forceOnActive((e) => e.forceRainDanceEvent),
+      "ski-tow": forceOnActive((e) => e.forceSkiTowEvent),
+      "ribbon-dancer": forceOnActive((e) => e.forceRibbonDancerEvent),
+      "laser-turnstile": forceOnActive((e) => e.forceLaserTurnstileEvent),
+      "light-bridge": forceOnActive((e) => e.forceLightBridgeEvent),
+      "laser-web": forceOnActive((e) => e.forceLaserWebEvent),
+      footlights: forceOnActive((e) => e.forceFootlightsEvent),
+      "fusion-beam": forceOnActive((e) => e.forceFusionBeamEvent),
+      pinpoint: forceOnActive((e) => e.forcePinpointEvent),
+      galvanize: forceOnActive((e) => e.forceGalvanizeEvent),
+      "spark-jump": forceOnActive((e) => e.forceSparkJumpEvent),
+      "static-cling": forceOnActive((e) => e.forceStaticClingEvent),
+      capacitor: forceOnActive((e) => e.forceCapacitorEvent),
+      "spark-train": forceOnActive((e) => e.forceSparkTrainEvent),
+      "arc-bridge": forceOnActive((e) => e.forceArcBridgeEvent),
+      "daisy-cutter": forceOnActive((e) => e.forceDaisyCutterEvent),
+      "ripple-mines": forceOnActive((e) => e.forceRippleMinesEvent),
+      "bomb-yo-yo": forceOnActive((e) => e.forceBombYoYoEvent),
+      "bomb-hail": forceOnActive((e) => e.forceBombHailEvent),
+      "ground-pound": forceOnActive((e) => e.forceGroundPoundEvent),
+      "cherry-bomb": forceOnActive((e) => e.forceCherryBombEvent),
+      "bomb-crown": forceOnActive((e) => e.forceBombCrownEvent),
+      "bullet-comb": forceOnActive((e) => e.forceBulletCombEvent),
+      "bullet-braid": forceOnActive((e) => e.forceBulletBraidEvent),
+      "bullet-cage": forceOnActive((e) => e.forceBulletCageEvent),
+      gunslinger: forceOnActive((e) => e.forceGunslingerEvent),
+      "bullet-wheel": forceOnActive((e) => e.forceBulletWheelEvent),
+      "bullet-ladder": forceOnActive((e) => e.forceBulletLadderEvent),
+      "whip-zoom": forceOnActive((e) => e.forceWhipZoomEvent),
+      "iris-out": forceOnActive((e) => e.forceIrisOutEvent),
+      "screen-reels": forceOnActive((e) => e.forceScreenReelsEvent),
+      "gold-leaf": forceOnActive((e) => e.forceGoldLeafEvent),
+      "pixel-storm": forceOnActive((e) => e.forcePixelStormEvent),
+      "gravity-flip": forceOnActive((e) => e.forceGravityFlipEvent),
+      echo: forceOnActive((e) => e.forceEchoEvent),
+      "mirror-box": forceOnActive((e) => e.forceMirrorBoxEvent),
+      "pull-back": forceOnActive((e) => e.forcePullBackEvent),
+      treadmill: forceOnActive((e) => e.forceTreadmillEvent),
+      "blast-off": forceOnActive((e) => e.forceBlastOffEvent),
+      "pop-up": forceOnActive((e) => e.forcePopUpEvent),
+      "sticker-peel": forceOnActive((e) => e.forceStickerPeelEvent),
+      glissando: forceOnActive((e) => e.forceGlissandoEvent),
+      "vault-doors": forceOnActive((e) => e.forceVaultDoorsEvent),
+      "champagne-tower": forceOnActive((e) => e.forceChampagneTowerEvent),
+      "pinball-river": forceOnActive((e) => e.forcePinballRiverEvent),
+      "pressure-washer": forceOnActive((e) => e.forcePressureWasherEvent),
+      irrigation: forceOnActive((e) => e.forceIrrigationEvent),
+      waterspout: forceOnActive((e) => e.forceWaterspoutEvent),
+      sidewinder: forceOnActive((e) => e.forceSidewinderEvent),
+      "orbit-swap": forceOnActive((e) => e.forceOrbitSwapEvent),
+      cuckoo: forceOnActive((e) => e.forceCuckooEvent),
+      gyre: forceOnActive((e) => e.forceGyreEvent),
+      "bar-hop": forceOnActive((e) => e.forceBarHopEvent),
+      "comet-plow": forceOnActive((e) => e.forceCometPlowEvent),
+      "hose-reel": forceOnActive((e) => e.forceHoseReelEvent),
+      "geyser-rider": forceOnActive((e) => e.forceGeyserRiderEvent),
+      "bubble-blower": forceOnActive((e) => e.forceBubbleBlowerEvent),
+      "pool-dive": forceOnActive((e) => e.forcePoolDiveEvent),
+      "rubber-band": forceOnActive((e) => e.forceRubberBandEvent),
+      "beam-vise": forceOnActive((e) => e.forceBeamViseEvent),
+      "laser-rake": forceOnActive((e) => e.forceLaserRakeEvent),
+      "light-dominoes": forceOnActive((e) => e.forceLightDominoesEvent),
+      "pry-bar": forceOnActive((e) => e.forcePryBarEvent),
+      "tesla-tennis": forceOnActive((e) => e.forceTeslaTennisEvent),
+      "tuning-fork": forceOnActive((e) => e.forceTuningForkEvent),
+      "bolt-spiral": forceOnActive((e) => e.forceBoltSpiralEvent),
+      "ground-current": forceOnActive((e) => e.forceGroundCurrentEvent),
+      overcharge: forceOnActive((e) => e.forceOverchargeEvent),
+      "bomb-tornado": forceOnActive((e) => e.forceBombTornadoEvent),
+      "bomb-boomerang": forceOnActive((e) => e.forceBombBoomerangEvent),
+      multistage: forceOnActive((e) => e.forceMultistageEvent),
+      "bomb-pile": forceOnActive((e) => e.forceBombPileEvent),
+      "bomb-garland": forceOnActive((e) => e.forceBombGarlandEvent),
+      "homing-rounds": forceOnActive((e) => e.forceHomingRoundsEvent),
+      "wave-cannon": forceOnActive((e) => e.forceWaveCannonEvent),
+      snapback: forceOnActive((e) => e.forceSnapbackEvent),
+      "bullet-funnel": forceOnActive((e) => e.forceBulletFunnelEvent),
+      crisscross: forceOnActive((e) => e.forceCrisscrossEvent),
+      "chain-fountain": forceOnActive((e) => e.forceChainFountainEvent),
+      "smoke-rings": forceOnActive((e) => e.forceSmokeRingsEvent),
+      "water-salute": forceOnActive((e) => e.forceWaterSaluteEvent),
+      "double-pendulum": forceOnActive((e) => e.forceDoublePendulumEvent),
+      trapeze: forceOnActive((e) => e.forceTrapezeEvent),
+      diabolo: forceOnActive((e) => e.forceDiaboloEvent),
+      zorb: forceOnActive((e) => e.forceZorbEvent),
+      "hoop-dive": forceOnActive((e) => e.forceHoopDiveEvent),
+      "spin-art": forceOnActive((e) => e.forceSpinArtEvent),
+      "paper-cutter": forceOnActive((e) => e.forcePaperCutterEvent),
+      flippers: forceOnActive((e) => e.forceFlippersEvent),
+      drawbridge: forceOnActive((e) => e.forceDrawbridgeEvent),
+      flail: forceOnActive((e) => e.forceFlailEvent),
+      "vine-swing": forceOnActive((e) => e.forceVineSwingEvent),
+      "bomb-snowball": forceOnActive((e) => e.forceBombSnowballEvent),
+      gerb: forceOnActive((e) => e.forceGerbEvent),
+      recoil: forceOnActive((e) => e.forceRecoilEvent),
+      "tumble-fire": forceOnActive((e) => e.forceTumbleFireEvent),
+      "roll-up": forceOnActive((e) => e.forceRollUpEvent),
+      shredder: forceOnActive((e) => e.forceShredderEvent),
+      "head-on": forceOnActive((e) => e.forceHeadOnEvent),
+      pyramid: forceOnActive((e) => e.forcePyramidEvent),
+      "pizza-toss": forceOnActive((e) => e.forcePizzaTossEvent),
+      compass: forceOnActive((e) => e.forceCompassEvent),
+      skewer: forceOnActive((e) => e.forceSkewerEvent),
+      "bomb-comet": forceOnActive((e) => e.forceBombCometEvent),
+      kaboom: forceOnActive((e) => e.forceKaboomEvent),
+      "return-fire": forceOnActive((e) => e.forceReturnFireEvent),
+      "frosted-glass": forceOnActive((e) => e.forceFrostedGlassEvent),
+      "switch-off": forceOnActive((e) => e.forceSwitchOffEvent),
+      "stunt-track": forceOnActive((e) => e.forceStuntTrackEvent),
+      fleas: forceOnActive((e) => e.forceFleasEvent),
+      "hand-pump": forceOnActive((e) => e.forceHandPumpEvent),
+      "pick-up-sticks": forceOnActive((e) => e.forcePickUpSticksEvent),
+      "thunder-shell": forceOnActive((e) => e.forceThunderShellEvent),
+      "mid-air": forceOnActive((e) => e.forceMidAirEvent),
+      "chain-fire": forceOnActive((e) => e.forceChainFireEvent),
+      "rim-shot": forceOnActive((e) => e.forceRimShotEvent),
+      "tin-roof": forceOnActive((e) => e.forceTinRoofEvent),
+      crumple: forceOnActive((e) => e.forceCrumpleEvent),
+      minimize: forceOnActive((e) => e.forceMinimizeEvent),
+      "jumping-jets": forceOnActive((e) => e.forceJumpingJetsEvent),
+      "bubble-chamber": forceOnActive((e) => e.forceBubbleChamberEvent),
+      "cast-net": forceOnActive((e) => e.forceCastNetEvent),
+      hoberman: forceOnActive((e) => e.forceHobermanEvent),
+      excalibur: forceOnActive((e) => e.forceExcaliburEvent),
+      pistons: forceOnActive((e) => e.forcePistonsEvent),
+      "william-tell": forceOnActive((e) => e.forceWilliamTellEvent),
+      foosball: forceOnActive((e) => e.forceFoosballEvent),
+      "rubber-sheet": forceOnActive((e) => e.forceRubberSheetEvent),
+      rattle: forceOnActive((e) => e.forceRattleEvent),
+      eddies: forceOnActive((e) => e.forceEddiesEvent),
+      "tube-man": forceOnActive((e) => e.forceTubeManEvent),
+      deflate: forceOnActive((e) => e.forceDeflateEvent),
+      "gear-train": forceOnActive((e) => e.forceGearTrainEvent),
+      upstrike: forceOnActive((e) => e.forceUpstrikeEvent),
+      "creeping-barrage": forceOnActive((e) => e.forceCreepingBarrageEvent),
+      "ballistic-pendulum": forceOnActive((e) => e.forceBallisticPendulumEvent),
+      "ring-taw": forceOnActive((e) => e.forceRingTawEvent),
+      "rainy-window": forceOnActive((e) => e.forceRainyWindowEvent),
+      inflate: forceOnActive((e) => e.forceInflateEvent),
+      "dome-fountains": forceOnActive((e) => e.forceDomeFountainsEvent),
+      "bell-ringers": forceOnActive((e) => e.forceBellRingersEvent),
+      "wet-dog": forceOnActive((e) => e.forceWetDogEvent),
+      "tower-crane": forceOnActive((e) => e.forceTowerCraneEvent),
+      "bead-lightning": forceOnActive((e) => e.forceBeadLightningEvent),
+      rockslide: forceOnActive((e) => e.forceRockslideEvent),
+      "tight-group": forceOnActive((e) => e.forceTightGroupEvent),
+      jacks: forceOnActive((e) => e.forceJacksEvent),
+      "reflecting-pool": forceOnActive((e) => e.forceReflectingPoolEvent),
+      "pin-art": forceOnActive((e) => e.forcePinArtEvent),
+      "twin-whirlpools": forceOnActive((e) => e.forceTwinWhirlpoolsEvent),
+      hatchlings: forceOnActive((e) => e.forceHatchlingsEvent),
+      butterfingers: forceOnActive((e) => e.forceButterfingersEvent),
+      "lock-pick": forceOnActive((e) => e.forceLockPickEvent),
+      blacksmith: forceOnActive((e) => e.forceBlacksmithEvent),
+      "seismic-charges": forceOnActive((e) => e.forceSeismicChargesEvent),
+      "skip-shots": forceOnActive((e) => e.forceSkipShotsEvent),
+      "jumping-beans": forceOnActive((e) => e.forceJumpingBeansEvent),
+      "swiss-cheese": forceOnActive((e) => e.forceSwissCheeseEvent),
+      "exploded-view": forceOnActive((e) => e.forceExplodedViewEvent),
+      riptide: forceOnActive((e) => e.forceRiptideEvent),
+      fencing: forceOnActive((e) => e.forceFencingEvent),
+      "water-tower": forceOnActive((e) => e.forceWaterTowerEvent),
+      "barber-pole": forceOnActive((e) => e.forceBarberPoleEvent),
+      "ion-cannon": forceOnActive((e) => e.forceIonCannonEvent),
+      claymore: forceOnActive((e) => e.forceClaymoreEvent),
+      pepperbox: forceOnActive((e) => e.forcePepperboxEvent),
+      squash: forceOnActive((e) => e.forceSquashEvent),
+      "vertical-hold": forceOnActive((e) => e.forceVerticalHoldEvent),
+      halftone: forceOnActive((e) => e.forceHalftoneEvent),
+      blowhole: forceOnActive((e) => e.forceBlowholeEvent),
+      lamplighter: forceOnActive((e) => e.forceLamplighterEvent),
+      "fire-brigade": forceOnActive((e) => e.forceFireBrigadeEvent),
+      spokes: forceOnActive((e) => e.forceSpokesEvent),
+      "thunder-ring": forceOnActive((e) => e.forceThunderRingEvent),
+      "bottle-rocket": forceOnActive((e) => e.forceBottleRocketEvent),
+      skeet: forceOnActive((e) => e.forceSkeetEvent),
+      tennis: forceOnActive((e) => e.forceTennisEvent),
+      interlace: forceOnActive((e) => e.forceInterlaceEvent),
+      "mirror-mirror": forceOnActive((e) => e.forceMirrorMirrorEvent),
+      "cotton-candy": forceOnActive((e) => e.forceCottonCandyEvent),
+      peloton: forceOnActive((e) => e.forcePelotonEvent),
+      "drinking-bird": forceOnActive((e) => e.forceDrinkingBirdEvent),
+      "laser-drill": forceOnActive((e) => e.forceLaserDrillEvent),
+      "hair-raiser": forceOnActive((e) => e.forceHairRaiserEvent),
+      detonator: forceOnActive((e) => e.forceDetonatorEvent),
+      "bullet-rain": forceOnActive((e) => e.forceBulletRainEvent),
+      "bouncy-castle": forceOnActive((e) => e.forceBouncyCastleEvent),
+      "game-of-life": forceOnActive((e) => e.forceGameOfLifeEvent),
+      labyrinth: forceOnActive((e) => e.forceLabyrinthEvent),
+      "tidal-bore": forceOnActive((e) => e.forceTidalBoreEvent),
+      scrum: forceOnActive((e) => e.forceScrumEvent),
+      "gold-rush": forceOnActive((e) => e.forceGoldRushEvent),
+      "suspension-bridge": forceOnActive((e) => e.forceSuspensionBridgeEvent),
+      redline: forceOnActive((e) => e.forceRedlineEvent),
+      willow: forceOnActive((e) => e.forceWillowEvent),
+      quickdraw: forceOnActive((e) => e.forceQuickdrawEvent),
+      "galilean-cannon": forceOnActive((e) => e.forceGalileanCannonEvent),
+      "chaos-game": forceOnActive((e) => e.forceChaosGameEvent),
+      sandpile: forceOnActive((e) => e.forceSandpileEvent),
+      auger: forceOnActive((e) => e.forceAugerEvent),
+      "fountain-show": forceOnActive((e) => e.forceFountainShowEvent),
+      "spinning-plates": forceOnActive((e) => e.forceSpinningPlatesEvent),
+      scoops: forceOnActive((e) => e.forceScoopsEvent),
+      "solar-furnace": forceOnActive((e) => e.forceSolarFurnaceEvent),
+      "lightning-hands": forceOnActive((e) => e.forceLightningHandsEvent),
+      "ring-of-fire": forceOnActive((e) => e.forceRingOfFireEvent),
+      "bullet-clash": forceOnActive((e) => e.forceBulletClashEvent),
+      "bounce-pass": forceOnActive((e) => e.forceBouncePassEvent),
+      "oil-strike": forceOnActive((e) => e.forceOilStrikeEvent),
+      harmonograph: forceOnActive((e) => e.forceHarmonographEvent),
+      quicksort: forceOnActive((e) => e.forceQuicksortEvent),
+      capillary: forceOnActive((e) => e.forceCapillaryEvent),
+      "battle-tops": forceOnActive((e) => e.forceBattleTopsEvent),
+      "pneumatic-tubes": forceOnActive((e) => e.forcePneumaticTubesEvent),
+      "star-polygon": forceOnActive((e) => e.forceStarPolygonEvent),
+      "volt-spider": forceOnActive((e) => e.forceVoltSpiderEvent),
+      "orbital-decay": forceOnActive((e) => e.forceOrbitalDecayEvent),
+      "spray-and-pray": forceOnActive((e) => e.forceSprayAndPrayEvent),
+      shuttle: forceOnActive((e) => e.forceShuttleEvent),
+      "drill-duel": forceOnActive((e) => e.forceDrillDuelEvent),
+      "rule-30": forceOnActive((e) => e.forceRule30Event),
+      airbrush: forceOnActive((e) => e.forceAirbrushEvent),
+      calving: forceOnActive((e) => e.forceCalvingEvent),
+      phoenix: forceOnActive((e) => e.forcePhoenixEvent),
+      "steam-train": forceOnActive((e) => e.forceSteamTrainEvent),
+      "light-sail": forceOnActive((e) => e.forceLightSailEvent),
+      inchworm: forceOnActive((e) => e.forceInchwormEvent),
+      "critical-mass": forceOnActive((e) => e.forceCriticalMassEvent),
+      "knife-thrower": forceOnActive((e) => e.forceKnifeThrowerEvent),
+      compactor: forceOnActive((e) => e.forceCompactorEvent),
+      "core-sample": forceOnActive((e) => e.forceCoreSampleEvent),
+      "foam-party": forceOnActive((e) => e.forceFoamPartyEvent),
+      "langtons-ant": forceOnActive((e) => e.forceLangtonsAntEvent),
+      othello: forceOnActive((e) => e.forceOthelloEvent),
+      gloop: forceOnActive((e) => e.forceGloopEvent),
+      "escape-velocity": forceOnActive((e) => e.forceEscapeVelocityEvent),
+      sungrazer: forceOnActive((e) => e.forceSungrazerEvent),
+      "fractal-tree": forceOnActive((e) => e.forceFractalTreeEvent),
+      switchboard: forceOnActive((e) => e.forceSwitchboardEvent),
+      interference: forceOnActive((e) => e.forceInterferenceEvent),
+      "tower-defense": forceOnActive((e) => e.forceTowerDefenseEvent),
+      "bounce-wave": forceOnActive((e) => e.forceBounceWaveEvent),
+      mole: forceOnActive((e) => e.forceMoleEvent),
+      "car-wash": forceOnActive((e) => e.forceCarWashEvent),
+      "dragon-curve": forceOnActive((e) => e.forceDragonCurveEvent),
+      "lights-out": forceOnActive((e) => e.forceLightsOutEvent),
+      tumbler: forceOnActive((e) => e.forceTumblerEvent),
+      "waggle-dance": forceOnActive((e) => e.forceWaggleDanceEvent),
+      "water-cycle": forceOnActive((e) => e.forceWaterCycleEvent),
+      "folding-rule": forceOnActive((e) => e.forceFoldingRuleEvent),
+      "arc-swarm": forceOnActive((e) => e.forceArcSwarmEvent),
+      lockstep: forceOnActive((e) => e.forceLockstepEvent),
+      "hacky-sack": forceOnActive((e) => e.forceHackySackEvent),
+      woodworm: forceOnActive((e) => e.forceWoodwormEvent),
+      graffiti: forceOnActive((e) => e.forceGraffitiEvent),
+      voronoi: forceOnActive((e) => e.forceVoronoiEvent),
+      percolation: forceOnActive((e) => e.forcePercolationEvent),
+      dune: forceOnActive((e) => e.forceDuneEvent),
+      "string-of-pearls": forceOnActive((e) => e.forceStringOfPearlsEvent),
+      "river-juggler": forceOnActive((e) => e.forceRiverJugglerEvent),
+      "like-charges": forceOnActive((e) => e.forceLikeChargesEvent),
+      "collision-course": forceOnActive((e) => e.forceCollisionCourseEvent),
+      "target-wheel": forceOnActive((e) => e.forceTargetWheelEvent),
+      "spinning-hexagon": forceOnActive((e) => e.forceSpinningHexagonEvent),
+      "bead-drill": forceOnActive((e) => e.forceBeadDrillEvent),
+      hydroseeder: forceOnActive((e) => e.forceHydroseederEvent),
+      mancala: forceOnActive((e) => e.forceMancalaEvent),
+      breakthrough: forceOnActive((e) => e.forceBreakthroughEvent),
+      curves: forceOnActive((e) => e.forceCurvesEvent),
+      "archimedes-screw": forceOnActive((e) => e.forceArchimedesScrewEvent),
+      murmuration: forceOnActive((e) => e.forceMurmurationEvent),
+      "spirit-bomb": forceOnActive((e) => e.forceSpiritBombEvent),
+      metronome: forceOnActive((e) => e.forceMetronomeEvent),
+      "power-grid": forceOnActive((e) => e.forcePowerGridEvent),
+      "bomb-bowling": forceOnActive((e) => e.forceBombBowlingEvent),
+      showdown: forceOnActive((e) => e.forceShowdownEvent),
+      "jump-rope": forceOnActive((e) => e.forceJumpRopeEvent),
+      strongbox: forceOnActive((e) => e.forceStrongboxEvent),
+      "snow-cannon": forceOnActive((e) => e.forceSnowCannonEvent),
+      "hill-climb": forceOnActive((e) => e.forceHillClimbEvent),
+      abacus: forceOnActive((e) => e.forceAbacusEvent),
+      coral: forceOnActive((e) => e.forceCoralEvent),
+      chladni: forceOnActive((e) => e.forceChladniEvent),
+      afterimage: forceOnActive((e) => e.forceAfterimageEvent),
+      "snow-globe": forceOnActive((e) => e.forceSnowGlobeEvent),
+      sundial: forceOnActive((e) => e.forceSundialEvent),
+      riveter: forceOnActive((e) => e.forceRiveterEvent),
+      "paddle-ball": forceOnActive((e) => e.forcePaddleBallEvent),
+      geode: forceOnActive((e) => e.forceGeodeEvent),
+      "fog-machine": forceOnActive((e) => e.forceFogMachineEvent),
+      chicane: forceOnActive((e) => e.forceChicaneEvent),
+      epicycles: forceOnActive((e) => e.forceEpicyclesEvent),
+      sieve: forceOnActive((e) => e.forceSieveEvent),
+      clutter: forceOnActive((e) => e.forceClutterEvent),
+      parting: forceOnActive((e) => e.forcePartingEvent),
+      "buzz-wire": forceOnActive((e) => e.forceBuzzWireEvent),
+      hiccups: forceOnActive((e) => e.forceHiccupsEvent),
+      "cut-the-rope": forceOnActive((e) => e.forceCutTheRopeEvent),
+      "whispering-gallery": forceOnActive((e) => e.forceWhisperingGalleryEvent),
+      chunnel: forceOnActive((e) => e.forceChunnelEvent),
+      sneeze: forceOnActive((e) => e.forceSneezeEvent),
+      "grand-prix": forceOnActive((e) => e.forceGrandPrixEvent),
+      "pillow-fight": forceOnActive((e) => e.forcePillowFightEvent),
+      "dots-and-boxes": forceOnActive((e) => e.forceDotsAndBoxesEvent),
+      "holding-pattern": forceOnActive((e) => e.forceHoldingPatternEvent),
+      tanker: forceOnActive((e) => e.forceTankerEvent),
+      "vapor-cloud": forceOnActive((e) => e.forceVaporCloudEvent),
+      "shield-breaker": forceOnActive((e) => e.forceShieldBreakerEvent),
+      bottleneck: forceOnActive((e) => e.forceBottleneckEvent),
+      skylight: forceOnActive((e) => e.forceSkylightEvent),
+      deluge: forceOnActive((e) => e.forceDelugeEvent),
+      monaco: forceOnActive((e) => e.forceMonacoEvent),
+      "glitter-spill": forceOnActive((e) => e.forceGlitterSpillEvent),
+      "rogue-wave": forceOnActive((e) => e.forceRogueWaveEvent),
+      "thunder-egg": forceOnActive((e) => e.forceThunderEggEvent),
+      hologram: forceOnActive((e) => e.forceHologramEvent),
+      "leaf-fall": forceOnActive((e) => e.forceLeafFallEvent),
+      "three-body": forceOnActive((e) => e.forceThreeBodyEvent),
+      billows: forceOnActive((e) => e.forceBillowsEvent),
+      moire: forceOnActive((e) => e.forceMoireEvent),
+      "pole-position": forceOnActive((e) => e.forcePolePositionEvent),
+      countersink: forceOnActive((e) => e.forceCountersinkEvent),
+      "busy-beaver": forceOnActive((e) => e.forceBusyBeaverEvent),
+      pursuit: forceOnActive((e) => e.forcePursuitEvent),
+      "fractal-charge": forceOnActive((e) => e.forceFractalChargeEvent),
+      snowplow: forceOnActive((e) => e.forceSnowplowEvent),
+      "franklins-kite": forceOnActive((e) => e.forceFranklinsKiteEvent),
+      sokoban: forceOnActive((e) => e.forceSokobanEvent),
+      fracking: forceOnActive((e) => e.forceFrackingEvent),
+      chopper: forceOnActive((e) => e.forceChopperEvent),
+      extinguisher: forceOnActive((e) => e.forceExtinguisherEvent),
+      "golden-spiral": forceOnActive((e) => e.forceGoldenSpiralEvent),
+      wildfire: forceOnActive((e) => e.forceWildfireEvent),
+      "time-trial": forceOnActive((e) => e.forceTimeTrialEvent),
+      "dust-bunnies": forceOnActive((e) => e.forceDustBunniesEvent),
+      "magnetic-pendulum": forceOnActive((e) => e.forceMagneticPendulumEvent),
+      "de-casteljau": forceOnActive((e) => e.forceDeCasteljauEvent),
+      "buffons-needle": forceOnActive((e) => e.forceBuffonsNeedleEvent),
+      "fuse-maze": forceOnActive((e) => e.forceFuseMazeEvent),
+      "bar-billiards": forceOnActive((e) => e.forceBarBilliardsEvent),
+      "levy-flight": forceOnActive((e) => e.forceLevyFlightEvent),
+      brachistochrone: forceOnActive((e) => e.forceBrachistochroneEvent),
+      "ulam-spiral": forceOnActive((e) => e.forceUlamSpiralEvent),
+      "galton-board": forceOnActive((e) => e.forceGaltonBoardEvent),
+      poohsticks: forceOnActive((e) => e.forcePoohsticksEvent),
+      "fire-for-effect": forceOnActive((e) => e.forceFireForEffectEvent),
+      eyewall: forceOnActive((e) => e.forceEyewallEvent),
+      josephus: forceOnActive((e) => e.forceJosephusEvent),
+      podium: forceOnActive((e) => e.forcePodiumEvent),
+      robovac: forceOnActive((e) => e.forceRobovacEvent),
+      "figure-eight": forceOnActive((e) => e.forceFigureEightEvent),
+      bonanza: forceOnActive((e) => e.forceBonanzaEvent),
+      "pi-clacks": forceOnActive((e) => e.forcePiClacksEvent),
+      "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
+      "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
+      "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
+      turbine: forceOnActive((e) => e.forceTurbineEvent),
+      "strange-attractor": forceOnActive((e) => e.forceStrangeAttractorEvent),
+      "topsy-turvy": forceOnActive((e) => e.forceTopsyTurvyEvent),
+      "gold-plating": forceOnActive((e) => e.forceGoldPlatingEvent),
+      crosswind: forceOnActive((e) => e.forceCrosswindEvent),
+      hailstone: forceOnActive((e) => e.forceHailstoneEvent),
+      "hilbert-curve": forceOnActive((e) => e.forceHilbertCurveEvent),
+      "le-mans": forceOnActive((e) => e.forceLeMansEvent),
+      "tunnel-borer": forceOnActive((e) => e.forceTunnelBorerEvent),
+      harpoon: forceOnActive((e) => e.forceHarpoonEvent),
+      "eight-queens": forceOnActive((e) => e.forceEightQueensEvent),
+      "shortest-path": forceOnActive((e) => e.forceShortestPathEvent),
+      sinkhole: forceOnActive((e) => e.forceSinkholeEvent),
+      backwash: forceOnActive((e) => e.forceBackwashEvent),
+      deflector: forceOnActive((e) => e.forceDeflectorEvent),
+      sunflower: forceOnActive((e) => e.forceSunflowerEvent),
+      "convex-hull": forceOnActive((e) => e.forceConvexHullEvent),
     });
     // same, for the Slash event
-    wireSlashEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSlashEvent(floor);
-    });
+    wireSlashEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSlashEvent(floor);
+      }),
+    );
     // same, for the Jackhammer event
-    wireJackhammerEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceJackhammerEvent(floor);
-    });
+    wireJackhammerEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceJackhammerEvent(floor);
+      }),
+    );
     // same, for the Pummel event
-    wirePummelEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePummelEvent(floor);
-    });
+    wirePummelEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePummelEvent(floor);
+      }),
+    );
     // same, for the Overload event
-    wireOverloadEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceOverloadEvent(floor);
-    });
+    wireOverloadEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceOverloadEvent(floor);
+      }),
+    );
     // same, for the Gatling event
-    wireGatlingEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceGatlingEvent(floor);
-    });
+    wireGatlingEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceGatlingEvent(floor);
+      }),
+    );
     // same, for the Press event
-    wirePressEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePressEvent(floor);
-    });
+    wirePressEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePressEvent(floor);
+      }),
+    );
     // same, for the Drill event
-    wireDrillEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceDrillEvent(floor);
-    });
+    wireDrillEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceDrillEvent(floor);
+      }),
+    );
     // same, for the Burrow event
-    wireBurrowEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBurrowEvent(floor);
-    });
+    wireBurrowEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBurrowEvent(floor);
+      }),
+    );
     // same, for the Ping Pong event
-    wirePingPongEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePingPongEvent(floor);
-    });
+    wirePingPongEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePingPongEvent(floor);
+      }),
+    );
     // same, for the Slam Dunk event
-    wireSlamDunkEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSlamDunkEvent(floor);
-    });
+    wireSlamDunkEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSlamDunkEvent(floor);
+      }),
+    );
     // same, for the Uppercut event
-    wireUppercutEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceUppercutEvent(floor);
-    });
+    wireUppercutEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceUppercutEvent(floor);
+      }),
+    );
     // same, for the Head Hop event
-    wireHeadHopEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceHeadHopEvent(floor);
-    });
+    wireHeadHopEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceHeadHopEvent(floor);
+      }),
+    );
     // same, for the Paparazzi event
-    wirePaparazziEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePaparazziEvent(floor);
-    });
+    wirePaparazziEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePaparazziEvent(floor);
+      }),
+    );
     // same, for the Missile Barrage event
-    wireMissileBarrageEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceMissileBarrageEvent(floor);
-    });
+    wireMissileBarrageEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceMissileBarrageEvent(floor);
+      }),
+    );
     // same, for the Sonic Boom event
-    wireSonicBoomEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSonicBoomEvent(floor);
-    });
+    wireSonicBoomEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSonicBoomEvent(floor);
+      }),
+    );
     // same, for the Mitosis event
-    wireMitosisEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceMitosisEvent(floor);
-    });
+    wireMitosisEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceMitosisEvent(floor);
+      }),
+    );
     // same, for the Plinko event
-    wirePlinkoEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePlinkoEvent(floor);
-    });
+    wirePlinkoEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePlinkoEvent(floor);
+      }),
+    );
     // same, for the Hammer Throw event
-    wireHammerThrowEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceHammerThrowEvent(floor);
-    });
+    wireHammerThrowEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceHammerThrowEvent(floor);
+      }),
+    );
     // same, for the Snake event
-    wireSnakeEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSnakeEvent(floor);
-    });
+    wireSnakeEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSnakeEvent(floor);
+      }),
+    );
     // same, for the Breakout event
-    wireBreakoutEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBreakoutEvent(floor);
-    });
+    wireBreakoutEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBreakoutEvent(floor);
+      }),
+    );
     // same, for the Line Clear event
-    wireLineClearEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceLineClearEvent(floor);
-    });
+    wireLineClearEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceLineClearEvent(floor);
+      }),
+    );
     // same, for the Break Shot event
-    wireBreakShotEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBreakShotEvent(floor);
-    });
+    wireBreakShotEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBreakShotEvent(floor);
+      }),
+    );
     // same, for the Bullet Hell event
-    wireBulletHellEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBulletHellEvent(floor);
-    });
+    wireBulletHellEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBulletHellEvent(floor);
+      }),
+    );
     // same, for the Vortex event
-    wireVortexEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceVortexEvent(floor);
-    });
+    wireVortexEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceVortexEvent(floor);
+      }),
+    );
     // same, for the Ricochet event
-    wireRicochetEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceRicochetEvent(floor);
-    });
+    wireRicochetEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceRicochetEvent(floor);
+      }),
+    );
     // same, for the Waterfall event
-    wireWaterfallEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceWaterfallEvent(floor);
-    });
+    wireWaterfallEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceWaterfallEvent(floor);
+      }),
+    );
     // same, for the Conveyor event
-    wireConveyorEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceConveyorEvent(floor);
-    });
+    wireConveyorEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceConveyorEvent(floor);
+      }),
+    );
     // same, for the Fireflies event
-    wireFirefliesEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceFirefliesEvent(floor);
-    });
+    wireFirefliesEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceFirefliesEvent(floor);
+      }),
+    );
     // same, for the Payday event
-    wirePaydayEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePaydayEvent(floor);
-    });
+    wirePaydayEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePaydayEvent(floor);
+      }),
+    );
     // same, for the Piggy Bank event
-    wirePiggyBankEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePiggyBankEvent(floor);
-    });
+    wirePiggyBankEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePiggyBankEvent(floor);
+      }),
+    );
     // same, for the Coin Toss event
-    wireCoinTossEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceCoinTossEvent(floor);
-    });
+    wireCoinTossEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceCoinTossEvent(floor);
+      }),
+    );
     // same, for the Hourglass event
-    wireHourglassEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceHourglassEvent(floor);
-    });
+    wireHourglassEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceHourglassEvent(floor);
+      }),
+    );
     // same, for the Rocket event
-    wireRocketEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceRocketEvent(floor);
-    });
+    wireRocketEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceRocketEvent(floor);
+      }),
+    );
     // same, for the Reveal event
-    wireRevealEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceRevealEvent(floor);
-    });
+    wireRevealEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceRevealEvent(floor);
+      }),
+    );
     // same, for the Jackpot Reels event
-    wireJackpotReelsEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceJackpotReelsEvent(floor);
-    });
+    wireJackpotReelsEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceJackpotReelsEvent(floor);
+      }),
+    );
     // same, for the Chain Pay event
-    wireChainPayEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceChainPayEvent(floor);
-    });
+    wireChainPayEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceChainPayEvent(floor);
+      }),
+    );
     // same, for the Twister event
-    wireTwisterEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceTwisterEvent(floor);
-    });
+    wireTwisterEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceTwisterEvent(floor);
+      }),
+    );
     // same, for the Downpour event
-    wireDownpourEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceDownpourEvent(floor);
-    });
+    wireDownpourEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceDownpourEvent(floor);
+      }),
+    );
     // same, for the Trickle event
-    wireTrickleEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceTrickleEvent(floor);
-    });
+    wireTrickleEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceTrickleEvent(floor);
+      }),
+    );
     // same, for the Magnet event
-    wireMagnetEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceMagnetEvent(floor);
-    });
+    wireMagnetEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceMagnetEvent(floor);
+      }),
+    );
     // same, for the Spillover event
-    wireSpilloverEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSpilloverEvent(floor);
-    });
+    wireSpilloverEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSpilloverEvent(floor);
+      }),
+    );
     // same, for the Constellation event
-    wireConstellationEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceConstellationEvent(floor);
-    });
+    wireConstellationEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceConstellationEvent(floor);
+      }),
+    );
     // same, for the Ascend event
-    wireAscendEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceAscendEvent(floor);
-    });
+    wireAscendEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceAscendEvent(floor);
+      }),
+    );
     // same, for the Rising Tide event
-    wireRisingTideEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceRisingTideEvent(floor);
-    });
+    wireRisingTideEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceRisingTideEvent(floor);
+      }),
+    );
     // same, for the Tidal Wave event
-    wireTidalWaveEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceTidalWaveEvent(floor);
-    });
+    wireTidalWaveEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceTidalWaveEvent(floor);
+      }),
+    );
     // same, for the Beanstalk event, on the top unlocked floor so the locked
     // one above it is in view
-    wireBeanstalkEventTestButton(app, () => {
-      const floors = buildings[activeBuildingIndex];
-      if (!floors) return;
-      const lockedIndex = floors.findIndex((f) => !f.unlocked);
-      const floor = floors[lockedIndex - 1] ?? floors[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBeanstalkEvent(floor);
-    });
+    wireBeanstalkEventTestButton(
+      app,
+      later(() => {
+        const floors = buildings[activeBuildingIndex];
+        if (!floors) return;
+        const lockedIndex = floors.findIndex((f) => !f.unlocked);
+        const floor = floors[lockedIndex - 1] ?? floors[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBeanstalkEvent(floor);
+      }),
+    );
     // same, for the Blessing event
-    wireBlessingEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceBlessingEvent(floor);
-    });
+    wireBlessingEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceBlessingEvent(floor);
+      }),
+    );
     // same, for the Halo event
-    wireHaloEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceHaloEvent(floor);
-    });
+    wireHaloEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceHaloEvent(floor);
+      }),
+    );
     // same, for the Comet event
-    wireCometEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceCometEvent(floor);
-    });
+    wireCometEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceCometEvent(floor);
+      }),
+    );
     // same, for the Meteor Shower event
-    wireMeteorShowerEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceMeteorShowerEvent(floor);
-    });
+    wireMeteorShowerEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceMeteorShowerEvent(floor);
+      }),
+    );
     // same, for the Mentor event
-    wireMentorEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceMentorEvent(floor);
-    });
+    wireMentorEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceMentorEvent(floor);
+      }),
+    );
     // same, for the Spark Chain event
-    wireSparkChainEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceSparkChainEvent(floor);
-    });
+    wireSparkChainEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceSparkChainEvent(floor);
+      }),
+    );
     // same, for the Polish event
-    wirePolishEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePolishEvent(floor);
-    });
+    wirePolishEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePolishEvent(floor);
+      }),
+    );
     // same, for the Lighthouse event
-    wireLighthouseEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceLighthouseEvent(floor);
-    });
+    wireLighthouseEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceLighthouseEvent(floor);
+      }),
+    );
     // same, for the Recruit event
-    wireRecruitEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceRecruitEvent(floor);
-    });
+    wireRecruitEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceRecruitEvent(floor);
+      }),
+    );
     // same, for the Promotion Day event
-    wirePromotionDayEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePromotionDayEvent(floor);
-    });
+    wirePromotionDayEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePromotionDayEvent(floor);
+      }),
+    );
     // same, for the Alchemy event
-    wireAlchemyEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceAlchemyEvent(floor);
-    });
+    wireAlchemyEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceAlchemyEvent(floor);
+      }),
+    );
     // same, for the Investment event
-    wireInvestmentEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceInvestmentEvent(floor);
-    });
+    wireInvestmentEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceInvestmentEvent(floor);
+      }),
+    );
     // same, for the Dividends event
-    wireDividendsEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceDividendsEvent(floor);
-    });
+    wireDividendsEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceDividendsEvent(floor);
+      }),
+    );
     // same, for the Wisp event
-    wireWispEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceWispEvent(floor);
-    });
+    wireWispEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceWispEvent(floor);
+      }),
+    );
     // same, for the Stream event
-    wireStreamEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceStreamEvent(floor);
-    });
+    wireStreamEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceStreamEvent(floor);
+      }),
+    );
     // same, for the Trails event
-    wireTrailsEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceTrailsEvent(floor);
-    });
+    wireTrailsEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceTrailsEvent(floor);
+      }),
+    );
     // same, for the Draw event
-    wireDrawEventTestButton(app, (tier) => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceDrawEvent(floor, tier);
-    });
+    wireDrawEventTestButton(
+      app,
+      later((tier) => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceDrawEvent(floor, tier);
+      }),
+    );
     // same, for the Night Sky event
-    wireNightSkyEventTestButton(app, (tier) => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceNightSkyEvent(floor, tier);
-    });
+    wireNightSkyEventTestButton(
+      app,
+      later((tier) => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceNightSkyEvent(floor, tier);
+      }),
+    );
     // same, for the Pitcher event
-    wirePitcherEventTestButton(app, (tier) => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forcePitcherEvent(floor, tier);
-    });
+    wirePitcherEventTestButton(
+      app,
+      later((tier) => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forcePitcherEvent(floor, tier);
+      }),
+    );
     // same, for the Glimmer event
-    wireGlimmerEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceGlimmerEvent(floor);
-    });
+    wireGlimmerEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceGlimmerEvent(floor);
+      }),
+    );
     // spawns a mouse if none is out, arms "Hunt!" on its floor and scrolls there
-    wireHuntEventTestButton(app, () => {
-      let floor = forceHuntEvent();
-      if (!floor) {
-        forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
-        floor = forceHuntEvent();
-      }
-      if (floor) gameCanvas.scrollActiveToFloor(floor);
-    });
+    wireHuntEventTestButton(
+      app,
+      later(() => {
+        let floor = ev.forceHuntEvent();
+        if (!floor) {
+          forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
+          floor = ev.forceHuntEvent();
+        }
+        if (floor) gameCanvas.scrollActiveToFloor(floor);
+      }),
+    );
     // scrolls to the ground floor and plays the Swarm proc on its button
-    wireSwarmEventTestButton(app, () => {
-      const floors = buildings[activeBuildingIndex] ?? [];
-      const floor = floors[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      startSwarmEvent(floor, true, floors, gameCanvas.getFloorRect);
-    });
+    wireSwarmEventTestButton(
+      app,
+      later(() => {
+        const floors = buildings[activeBuildingIndex] ?? [];
+        const floor = floors[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.startSwarmEvent(floor, true, floors, gameCanvas.getFloorRect);
+      }),
+    );
     // scrolls to the ground floor and arms an x5 crit there carrying Renovate
-    wireRenovateEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceRenovateEvent(floor);
-    });
+    wireRenovateEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceRenovateEvent(floor);
+      }),
+    );
     // same, for the Upgrade event
-    wireUpgradeEventTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceUpgradeEvent(floor);
-    });
+    wireUpgradeEventTestButton(
+      app,
+      later(() => {
+        const floor = buildings[activeBuildingIndex]?.[0];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceUpgradeEvent(floor);
+      }),
+    );
     // arms the Unlock event on the floor right below the locked one
-    wireUnlockEventTestButton(app, (unlockCrit) => {
-      const floors = buildings[activeBuildingIndex] ?? [];
-      const floor = floors[floors.findIndex((f) => !f.unlocked) - 1];
-      if (!floor) return;
-      gameCanvas.scrollActiveToFloor(floor);
-      forceUnlockEvent(floor, unlockCrit);
-    });
+    wireUnlockEventTestButton(
+      app,
+      later((unlockCrit) => {
+        const floors = buildings[activeBuildingIndex] ?? [];
+        const floor = floors[floors.findIndex((f) => !f.unlocked) - 1];
+        if (!floor) return;
+        gameCanvas.scrollActiveToFloor(floor);
+        ev.forceUnlockEvent(floor, unlockCrit);
+      }),
+    );
     wireResetButton(app, buildings);
     // wired last, so it sees every dropdown/button the block above created
     sortTestActionMenus(app);

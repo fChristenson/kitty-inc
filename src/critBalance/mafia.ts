@@ -1,6 +1,6 @@
 // odds and reward sizes for featured/mafia.ts's crits, spread into CONFIG.crit
 export const MAFIA_BALANCE = {
-  theCatfatherChance: 0.00797283756,
+  theCatfatherChance: 0.00797283757,
   theCatfatherTierSteps: 2,
   theCatfatherUpgrades: 23,
   unrefusableOfferChance: 0.00754662558,

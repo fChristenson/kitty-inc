@@ -7,14 +7,11 @@ export interface FeaturedRewardContext {
   floor: Floor;
 }
 
-// everything one featured crit is: its display metadata, its icon file and
-// the reward it applies, so a crit can't be registered with any part missing.
-// `image` is the icon's path under public/; loadAssets registers it under the
-// crit's own kind, so the crit's ImageName is its kind
-export interface FeaturedCritDefinition {
-  label: string;
-  color: string;
-  image: `crits/${string}/${string}.webp`;
-  description: string;
-  reward: (context: FeaturedRewardContext, helpers: RewardHelpers) => void;
-}
+// what a featured crit does when it lands
+export type FeaturedReward = (
+  context: FeaturedRewardContext,
+  helpers: RewardHelpers,
+) => void;
+
+// one reward for every crit in a category's data (shared/critData), no extras
+export type FeaturedRewards<Data> = Record<keyof Data, FeaturedReward>;

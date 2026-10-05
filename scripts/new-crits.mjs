@@ -56,6 +56,7 @@ const ROOT = path.resolve(import.meta.dirname, "..");
 const INBOX = WORK;
 const SHEETS = path.join(WORK, "_sheets");
 const FEATURED = path.join(ROOT, "src/shared/critTypes/featured");
+const DATA = path.join(ROOT, "src/shared/critData");
 const BALANCE = path.join(ROOT, "src/critBalance");
 const RAW_EXTENSIONS = [".jfif", ".jpg", ".jpeg", ".webp", ".png"];
 const args = process.argv.slice(2);
@@ -474,9 +475,9 @@ function planBatch(specs, { CONFIG, crit }) {
 function paletteColors() {
   const palette = fs.readFileSync(path.join(ROOT, "src/palette.ts"), "utf8");
   const used = new Set();
-  for (const file of fs.readdirSync(FEATURED))
+  for (const file of fs.readdirSync(DATA))
     for (const match of fs
-      .readFileSync(path.join(FEATURED, file), "utf8")
+      .readFileSync(path.join(DATA, file), "utf8")
       .matchAll(/COLOR\.(\w+)/g))
       used.add(match[1]);
   return [...palette.matchAll(/^\s+(\w+): "#([0-9A-Fa-f]{6})"/gm)]
@@ -545,7 +546,7 @@ function insertBefore(file, marker, text) {
   );
 }
 
-// a new category gets its featured + balance files, spread into both registries
+// a new category gets its data, reward and balance files, spread into the registries
 function ensureCategory(category) {
   const constant = category
     .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
@@ -567,10 +568,16 @@ function ensureCategory(category) {
     console.log(`created ${rel(target)}`);
   };
   register(
-    FEATURED,
+    DATA,
     `${constant}_CRITS`,
-    'import { COLOR } from "../../../palette";\nimport type { FeaturedCritDefinition } from "./types";\n\n',
-    "} as const satisfies Record<string, FeaturedCritDefinition>;",
+    'import { COLOR } from "../../palette";\nimport type { FeaturedCritData } from "./types";\n\n',
+    "} as const satisfies Record<string, FeaturedCritData>;",
+  );
+  register(
+    FEATURED,
+    `${constant}_REWARDS`,
+    `import type { ${constant}_CRITS } from "../../critData/${category}";\nimport type { FeaturedRewards } from "./types";\n\n`,
+    `} satisfies FeaturedRewards<typeof ${constant}_CRITS>;`,
   );
   register(
     BALANCE,
@@ -627,7 +634,7 @@ async function apply(specs, plans) {
         `${kind}: COLOR.${color} isn't used by any featured crit yet`,
       );
     insertBefore(
-      path.join(FEATURED, `${category}.ts`),
+      path.join(DATA, `${category}.ts`),
       "} as const satisfies",
       [
         `  ${kind}: {`,
@@ -635,9 +642,14 @@ async function apply(specs, plans) {
         `    color: COLOR.${color},`,
         `    image: "${file}",`,
         `    description: ${JSON.stringify(plan.description)},`,
-        `    reward: ${plan.template.reward(kind)},`,
         "  },\n",
       ].join("\n"),
+    );
+    // templates indent the reward as a field of the entry; it's the entry here
+    insertBefore(
+      path.join(FEATURED, `${category}.ts`),
+      "} satisfies",
+      `  ${kind}: ${plan.template.reward(kind).replaceAll("\n  ", "\n")},\n`,
     );
     insertBefore(
       path.join(BALANCE, `${category}.ts`),

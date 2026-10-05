@@ -36,7 +36,7 @@ export const CAT_MARTIAL_ARTS_BALANCE = {
   sumoChonkExtraWorkers: 2,
   bellyBumpBanzaiChance: 0.00316589007,
   bellyBumpBanzaiContinueChance: 0.95,
-  tailWhipKickChance: 0.0037885997,
+  tailWhipKickChance: 0.00378859971,
   tailWhipKickDiscount: 0.163,
   tigerClawStanceChance: 0.00291595834,
   tigerClawStanceShare: 0.132,

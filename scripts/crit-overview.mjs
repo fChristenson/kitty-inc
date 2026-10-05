@@ -9,7 +9,7 @@ import path from "node:path";
 import { ROOT, WORK } from "./lib/crit-asset-paths.mjs";
 import { writeContactSheet } from "./lib/contact-sheet.mjs";
 
-const FEATURED = path.join(ROOT, "src/shared/critTypes/featured");
+const FEATURED = path.join(ROOT, "src/shared/critData");
 const args = process.argv.slice(2);
 const perSheet = Number(
   args.find((arg) => arg.startsWith("--per-sheet="))?.split("=")[1] ?? 48,
@@ -20,10 +20,7 @@ const ENTRY =
 
 const categories = fs
   .readdirSync(FEATURED)
-  .filter(
-    (file) =>
-      file.endsWith(".ts") && !/^(index|types|rewardHelpers)\.ts$/.test(file),
-  )
+  .filter((file) => file.endsWith(".ts") && !/^(index|types)\.ts$/.test(file))
   .map((file) => path.basename(file, ".ts"))
   .filter((category) => wanted.length === 0 || wanted.includes(category));
 const unknown = wanted.filter((category) => !categories.includes(category));

@@ -4,6 +4,7 @@
 import {
   applyBoostAll,
   getButtonCenter,
+  loadEventCatalog,
   spawnCoinBurst,
   triggerOvertimeBoost,
 } from "../src/floors";
@@ -376,6 +377,8 @@ export function eventScenario(id: string): Scenario {
     name,
     about: `the ${id} event, start to finish`,
     run: async (bridge) => {
+      // the events load after startup; the test button waits for them too
+      await loadEventCatalog();
       click("#add-money");
       click(`#test-${id}-event`);
       await sleep(200);

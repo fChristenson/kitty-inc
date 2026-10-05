@@ -1,5 +1,6 @@
 import { CONFIG } from "../../config";
-import { FEATURED_CRITS } from "./featured";
+import { FEATURED_CRITS } from "../critData";
+import type { FeaturedReward } from "./featured/types";
 
 export { FEATURED_CRITS };
 export {
@@ -7,15 +8,29 @@ export {
   type FeaturedRewardActions,
   type RewardHelpers,
 } from "./featured/rewardHelpers";
-export type {
-  FeaturedCritDefinition,
-  FeaturedRewardContext,
-} from "./featured/types";
+export type { FeaturedCritData } from "../critData/types";
+export type { FeaturedReward, FeaturedRewardContext } from "./featured/types";
 
 export type FeaturedCritKind = keyof typeof FEATURED_CRITS;
 export const FEATURED_CRIT_KINDS = Object.keys(
   FEATURED_CRITS,
 ) as FeaturedCritKind[];
+
+type FeaturedRewardTable = Record<FeaturedCritKind, FeaturedReward>;
+let rewards: FeaturedRewardTable | null = null;
+let loadingRewards: Promise<FeaturedRewardTable> | null = null;
+
+// the rewards are a big chunk of code, so they load after startup (main.ts);
+// featured crits don't roll until they're in
+export function loadFeaturedRewards(): Promise<FeaturedRewardTable> {
+  return (loadingRewards ??= import("./featured").then(
+    ({ FEATURED_REWARDS }) => (rewards = FEATURED_REWARDS),
+  ));
+}
+
+export function getFeaturedRewards(): FeaturedRewardTable | null {
+  return rewards;
+}
 
 // compile-time registration check: every featured crit needs its roll chance
 // in CONFIG.crit, or getCritProcChance would silently read 0

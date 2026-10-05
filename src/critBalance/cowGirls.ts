@@ -35,7 +35,7 @@ export const COW_GIRLS_BALANCE = {
   milkmaidMarginUpgrades: 9,
   mooMentumChance: 0.0110167425,
   mooMentumDiscount: 0.014,
-  prairiePaydayChance: 0.00444906453,
+  prairiePaydayChance: 0.00444906454,
   prairiePaydayShare: 0.101,
   spottedFortuneChance: 0.00639522987,
   stampedeStocksChance: 0.0106674105,

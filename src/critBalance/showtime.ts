@@ -17,7 +17,7 @@ export const SHOWTIME_BALANCE = {
   ninjaChance: 0.0117316982,
   ninjaBoostSeconds: 22,
   ninjaExtraWorkers: 0,
-  obeliskChance: 0.00997009294,
+  obeliskChance: 0.00997009295,
   obeliskTierSteps: 2,
   obeliskUpgrades: 2,
   sharpShooterChance: 0.0126080141,

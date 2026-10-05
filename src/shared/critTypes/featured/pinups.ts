@@ -1,309 +1,81 @@
-import { COLOR } from "../../../palette";
-import type { FeaturedCritDefinition } from "./types";
+import type { PINUPS_CRITS } from "../../critData/pinups";
+import type { FeaturedRewards } from "./types";
 
-export const PINUPS_CRITS = {
-  swimsuitSweetheart: {
-    label: "Swimsuit Sweetheart",
-    color: COLOR.coinGold,
-    image: "crits/pinups/swimsuitSweetheart.webp",
-    description: "Boosts every worker for 79s, counting as 2 extra workers",
-    reward: (context, { actions, balance }) =>
-      actions.boostWorkers(context.floors, balance.swimsuitSweetheartBoostSeconds, balance.swimsuitSweetheartExtraWorkers),
-  },
-  hoopDreamDiva: {
-    label: "Hoop Dream Diva",
-    color: COLOR.summerSaleOrange,
-    image: "crits/pinups/hoopDreamDiva.webp",
-    description: "Repeats the crit above and below, 89% chance to keep spreading",
-    reward: (context, { actions, balance }) =>
-      actions.repeatCrit(context, "both", balance.hoopDreamDivaContinueChance),
-  },
-  bathtubBullion: {
-    label: "Bathtub Bullion",
-    color: COLOR.mysticTeal,
-    image: "crits/pinups/bathtubBullion.webp",
-    description: "Pays 4 times the highest floor's upgrade price in cash",
-    reward: (context, { actions, balance, highestFloor }) =>
-      actions.addUpgradePriceCash([highestFloor(context)], balance.bathtubBullionMultiple),
-  },
-  bedroomBudget: {
-    label: "Bedroom Budget",
-    color: COLOR.sameBoatCoral,
-    image: "crits/pinups/bedroomBudget.webp",
-    description: "Spreads 80 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.bedroomBudgetUpgrades),
-  },
-  burlesqueBonus: {
-    label: "Burlesque Bonus",
-    color: COLOR.fastForwardBlue,
-    image: "crits/pinups/burlesqueBonus.webp",
-    description: "Spreads 75 free upgrades over this floor and the ones below",
-    reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.burlesqueBonusUpgrades),
-  },
-  cashConfetti: {
-    label: "Cash Confetti",
-    color: COLOR.overflowBlue,
-    image: "crits/pinups/cashConfetti.webp",
-    description: "Pays 8 times every unlocked floor's upgrade price in cash",
-    reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash(context.floors, balance.cashConfettiMultiple),
-  },
-  cheekyCheckbook: {
-    label: "Cheeky Checkbook",
-    color: COLOR.amberMuted,
-    image: "crits/pinups/cheekyCheckbook.webp",
-    description: "Pays 12 times this floor's upgrade price in cash",
-    reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.cheekyCheckbookMultiple),
-  },
-  coffeeBreakGains: {
-    label: "Coffee Break Gains",
-    color: COLOR.doubleDownCrimson,
-    image: "crits/pinups/coffeeBreakGains.webp",
-    description: "Spreads 55 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.coffeeBreakGainsUpgrades),
-  },
-  dowagerDividend: {
-    label: "Dowager Dividend",
-    color: COLOR.doubleDownCrimson,
-    image: "crits/pinups/dowagerDividend.webp",
-    description: "Grows every unlocked floor's level by 10% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels(context.floors, balance.dowagerDividendGrowth),
-  },
-  emeraldWindfall: {
-    label: "Emerald Windfall",
-    color: COLOR.summerSaleOrange,
-    image: "crits/pinups/emeraldWindfall.webp",
-    description: "Spreads 45 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.emeraldWindfallUpgrades),
-  },
-  friskyBusiness: {
-    label: "Frisky Business",
-    color: COLOR.sameBoatCoral,
-    image: "crits/pinups/friskyBusiness.webp",
-    description: "Spreads 15 free upgrades over this floor and the ones below",
-    reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.friskyBusinessUpgrades),
-  },
-  garterStash: {
-    label: "Garter Stash",
-    color: COLOR.headhunterRust,
-    image: "crits/pinups/garterStash.webp",
-    description: "Pays 6 times this floor's upgrade price in cash",
-    reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.garterStashMultiple),
-  },
-  goldenHandcuffs: {
-    label: "Golden Handcuffs",
-    color: COLOR.nightShiftIndigo,
-    image: "crits/pinups/goldenHandcuffs.webp",
-    description: "Pays 8 times the highest floor's upgrade price in cash",
-    reward: (context, { actions, balance, highestFloor }) =>
-      actions.addUpgradePriceCash([highestFloor(context)], balance.goldenHandcuffsMultiple),
-  },
-  housekeepingHaul: {
-    label: "Housekeeping Haul",
-    color: COLOR.overflowBlue,
-    image: "crits/pinups/housekeepingHaul.webp",
-    description: "Spreads 35 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.housekeepingHaulUpgrades),
-  },
-  hushMoney: {
-    label: "Hush Money",
-    color: COLOR.coinGold,
-    image: "crits/pinups/hushMoney.webp",
-    description: "Pays 25 times this floor's upgrade price in cash",
-    reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.hushMoneyMultiple),
-  },
-  jackpotShowgirl: {
-    label: "Jackpot Showgirl",
-    color: COLOR.redActive,
-    image: "crits/pinups/jackpotShowgirl.webp",
-    description: "Pays 30 times the highest floor's upgrade price in cash",
-    reward: (context, { actions, balance, highestFloor }) =>
-      actions.addUpgradePriceCash([highestFloor(context)], balance.jackpotShowgirlMultiple),
-  },
-  lapOfLuxury: {
-    label: "Lap Of Luxury",
-    color: COLOR.gold,
-    image: "crits/pinups/lapOfLuxury.webp",
-    description: "Grows this floor's level by 12% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.lapOfLuxuryGrowth),
-  },
-  leatherAndLucre: {
-    label: "Leather And Lucre",
-    color: COLOR.amberMuted,
-    image: "crits/pinups/leatherAndLucre.webp",
-    description: "Grows this floor's level by 18% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.leatherAndLucreGrowth),
-  },
-  maidInGold: {
-    label: "Maid In Gold",
-    color: COLOR.gold,
-    image: "crits/pinups/maidInGold.webp",
-    description: "Spreads 20 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.maidInGoldUpgrades),
-  },
-  makeItRain: {
-    label: "Make It Rain",
-    color: COLOR.summerSaleOrange,
-    image: "crits/pinups/makeItRain.webp",
-    description: "Pays 4 times every unlocked floor's upgrade price in cash",
-    reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash(context.floors, balance.makeItRainMultiple),
-  },
-  nightcapNestEgg: {
-    label: "Nightcap Nest Egg",
-    color: COLOR.coinGold,
-    image: "crits/pinups/nightcapNestEgg.webp",
-    description: "Spreads 120 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.nightcapNestEggUpgrades),
-  },
-  pillowTalkProfits: {
-    label: "Pillow Talk Profits",
-    color: COLOR.sameBoatCoral,
-    image: "crits/pinups/pillowTalkProfits.webp",
-    description: "Spreads 50 free upgrades over this floor and the ones below",
-    reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.pillowTalkProfitsUpgrades),
-  },
-  roomService: {
-    label: "Room Service",
-    color: COLOR.gold,
-    image: "crits/pinups/roomService.webp",
-    description: "Spreads 10 free upgrades over the lowest-level floors",
-    reward: (context, { actions, balance }) =>
-      actions.spreadUpgrades(context.floors, balance.roomServiceUpgrades),
-  },
-  silkAndStocks: {
-    label: "Silk And Stocks",
-    color: COLOR.redActive,
-    image: "crits/pinups/silkAndStocks.webp",
-    description: "Spreads 30 free upgrades over this floor and the ones below",
-    reward: (context, { actions, balance, belowAndHere }) =>
-      actions.spreadUpgrades(belowAndHere(context), balance.silkAndStocksUpgrades),
-  },
-  slotSiren: {
-    label: "Slot Siren",
-    color: COLOR.doubleDownCrimson,
-    image: "crits/pinups/slotSiren.webp",
-    description: "Pays 15 times the highest floor's upgrade price in cash",
-    reward: (context, { actions, balance, highestFloor }) =>
-      actions.addUpgradePriceCash([highestFloor(context)], balance.slotSirenMultiple),
-  },
-  sugarMama: {
-    label: "Sugar Mama",
-    color: COLOR.doubleDownCrimson,
-    image: "crits/pinups/sugarMama.webp",
-    description: "Grows every unlocked floor's level by 2% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels(context.floors, balance.sugarMamaGrowth),
-  },
-  tipMe: {
-    label: "Tip Me",
-    color: COLOR.grandOpeningRose,
-    image: "crits/pinups/tipMe.webp",
-    description: "Pays 3 times this floor's upgrade price in cash",
-    reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.tipMeMultiple),
-  },
-  vaultVixen: {
-    label: "Vault Vixen",
-    color: COLOR.gold,
-    image: "crits/pinups/vaultVixen.webp",
-    description: "Pays 50 times this floor's upgrade price in cash",
-    reward: (context, { actions, balance }) =>
-      actions.addUpgradePriceCash([context.floor], balance.vaultVixenMultiple),
-  },
-  velvetAllowance: {
-    label: "Velvet Allowance",
-    color: COLOR.dressCodeGreen,
-    image: "crits/pinups/velvetAllowance.webp",
-    description: "Grows every unlocked floor's level by 6% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels(context.floors, balance.velvetAllowanceGrowth),
-  },
-  bikiniLine: {
-    label: "Bikini Line",
-    color: COLOR.sameBoatCoral,
-    image: "crits/pinups/bikiniLine.webp",
-    description: "Adds 45.6% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.bikiniLineShare),
-  },
-  garterGirls: {
-    label: "Garter Girls",
-    color: COLOR.sameBoatCoral,
-    image: "crits/pinups/garterGirls.webp",
-    description: "Adds 45.7% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.garterGirlsShare),
-  },
-  goGoBoots: {
-    label: "Go Go Boots",
-    color: COLOR.gold,
-    image: "crits/pinups/goGoBoots.webp",
-    description: "Adds 45.8% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.goGoBootsShare),
-  },
-  heelClickers: {
-    label: "Heel Clickers",
-    color: COLOR.summerSaleOrange,
-    image: "crits/pinups/heelClickers.webp",
-    description: "Adds 45.9% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.heelClickersShare),
-  },
-  hipPop: {
-    label: "Hip Pop",
-    color: COLOR.sameBoatCoral,
-    image: "crits/pinups/hipPop.webp",
-    description: "Adds 46% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.hipPopShare),
-  },
-  kneelAndPeek: {
-    label: "Kneel And Peek",
-    color: COLOR.sameBoatCoral,
-    image: "crits/pinups/kneelAndPeek.webp",
-    description: "Adds 46.1% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.kneelAndPeekShare),
-  },
-  lavenderLegs: {
-    label: "Lavender Legs",
-    color: COLOR.nightShiftIndigo,
-    image: "crits/pinups/lavenderLegs.webp",
-    description: "Adds 46.2% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.lavenderLegsShare),
-  },
-  neonLocks: {
-    label: "Neon Locks",
-    color: COLOR.amberMuted,
-    image: "crits/pinups/neonLocks.webp",
-    description: "Adds 46.3% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.neonLocksShare),
-  },
-  peekabooPair: {
-    label: "Peekaboo Pair",
-    color: COLOR.summerSaleOrange,
-    image: "crits/pinups/peekabooPair.webp",
-    description: "Adds 46.4% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.peekabooPairShare),
-  },
-} as const satisfies Record<string, FeaturedCritDefinition>;
+export const PINUPS_REWARDS = {
+  swimsuitSweetheart: (context, { actions, balance }) =>
+    actions.boostWorkers(context.floors, balance.swimsuitSweetheartBoostSeconds, balance.swimsuitSweetheartExtraWorkers),
+  hoopDreamDiva: (context, { actions, balance }) =>
+    actions.repeatCrit(context, "both", balance.hoopDreamDivaContinueChance),
+  bathtubBullion: (context, { actions, balance, highestFloor }) =>
+    actions.addUpgradePriceCash([highestFloor(context)], balance.bathtubBullionMultiple),
+  bedroomBudget: (context, { actions, balance }) =>
+    actions.spreadUpgrades(context.floors, balance.bedroomBudgetUpgrades),
+  burlesqueBonus: (context, { actions, balance, belowAndHere }) =>
+    actions.spreadUpgrades(belowAndHere(context), balance.burlesqueBonusUpgrades),
+  cashConfetti: (context, { actions, balance }) =>
+    actions.addUpgradePriceCash(context.floors, balance.cashConfettiMultiple),
+  cheekyCheckbook: (context, { actions, balance }) =>
+    actions.addUpgradePriceCash([context.floor], balance.cheekyCheckbookMultiple),
+  coffeeBreakGains: (context, { actions, balance }) =>
+    actions.spreadUpgrades(context.floors, balance.coffeeBreakGainsUpgrades),
+  dowagerDividend: (context, { actions, balance }) =>
+    actions.growLevels(context.floors, balance.dowagerDividendGrowth),
+  emeraldWindfall: (context, { actions, balance }) =>
+    actions.spreadUpgrades(context.floors, balance.emeraldWindfallUpgrades),
+  friskyBusiness: (context, { actions, balance, belowAndHere }) =>
+    actions.spreadUpgrades(belowAndHere(context), balance.friskyBusinessUpgrades),
+  garterStash: (context, { actions, balance }) =>
+    actions.addUpgradePriceCash([context.floor], balance.garterStashMultiple),
+  goldenHandcuffs: (context, { actions, balance, highestFloor }) =>
+    actions.addUpgradePriceCash([highestFloor(context)], balance.goldenHandcuffsMultiple),
+  housekeepingHaul: (context, { actions, balance }) =>
+    actions.spreadUpgrades(context.floors, balance.housekeepingHaulUpgrades),
+  hushMoney: (context, { actions, balance }) =>
+    actions.addUpgradePriceCash([context.floor], balance.hushMoneyMultiple),
+  jackpotShowgirl: (context, { actions, balance, highestFloor }) =>
+    actions.addUpgradePriceCash([highestFloor(context)], balance.jackpotShowgirlMultiple),
+  lapOfLuxury: (context, { actions, balance }) =>
+    actions.growLevels([context.floor], balance.lapOfLuxuryGrowth),
+  leatherAndLucre: (context, { actions, balance }) =>
+    actions.growLevels([context.floor], balance.leatherAndLucreGrowth),
+  maidInGold: (context, { actions, balance }) =>
+    actions.spreadUpgrades(context.floors, balance.maidInGoldUpgrades),
+  makeItRain: (context, { actions, balance }) =>
+    actions.addUpgradePriceCash(context.floors, balance.makeItRainMultiple),
+  nightcapNestEgg: (context, { actions, balance }) =>
+    actions.spreadUpgrades(context.floors, balance.nightcapNestEggUpgrades),
+  pillowTalkProfits: (context, { actions, balance, belowAndHere }) =>
+    actions.spreadUpgrades(belowAndHere(context), balance.pillowTalkProfitsUpgrades),
+  roomService: (context, { actions, balance }) =>
+    actions.spreadUpgrades(context.floors, balance.roomServiceUpgrades),
+  silkAndStocks: (context, { actions, balance, belowAndHere }) =>
+    actions.spreadUpgrades(belowAndHere(context), balance.silkAndStocksUpgrades),
+  slotSiren: (context, { actions, balance, highestFloor }) =>
+    actions.addUpgradePriceCash([highestFloor(context)], balance.slotSirenMultiple),
+  sugarMama: (context, { actions, balance }) =>
+    actions.growLevels(context.floors, balance.sugarMamaGrowth),
+  tipMe: (context, { actions, balance }) =>
+    actions.addUpgradePriceCash([context.floor], balance.tipMeMultiple),
+  vaultVixen: (context, { actions, balance }) =>
+    actions.addUpgradePriceCash([context.floor], balance.vaultVixenMultiple),
+  velvetAllowance: (context, { actions, balance }) =>
+    actions.growLevels(context.floors, balance.velvetAllowanceGrowth),
+  bikiniLine: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.bikiniLineShare),
+  garterGirls: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.garterGirlsShare),
+  goGoBoots: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.goGoBootsShare),
+  heelClickers: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.heelClickersShare),
+  hipPop: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.hipPopShare),
+  kneelAndPeek: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.kneelAndPeekShare),
+  lavenderLegs: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.lavenderLegsShare),
+  neonLocks: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.neonLocksShare),
+  peekabooPair: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.peekabooPairShare),
+} satisfies FeaturedRewards<typeof PINUPS_CRITS>;

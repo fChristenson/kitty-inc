@@ -1,4 +1,4 @@
-// Renames shipped featured crits: registry entry, balance keys and icon,
+// Renames shipped featured crits: data and reward entries, balance keys and icon,
 // sticker and silhouette files (moved with git mv).
 //   node scripts/rename-crit.mjs <kind> "<New Label>" [<kind> "<New Label>" ...]
 import fs from "node:fs";
@@ -6,6 +6,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { ROOT, camelCase } from "./lib/crit-asset-paths.mjs";
 
+const DATA = path.join(ROOT, "src/shared/critData");
 const FEATURED = path.join(ROOT, "src/shared/critTypes/featured");
 const BALANCE = path.join(ROOT, "src/critBalance");
 const args = process.argv.slice(2);
@@ -15,9 +16,9 @@ if (args.length === 0 || args.length % 2)
   );
 
 const featuredFiles = fs
-  .readdirSync(FEATURED)
+  .readdirSync(DATA)
   .filter((file) => file.endsWith(".ts"))
-  .map((file) => path.join(FEATURED, file));
+  .map((file) => path.join(DATA, file));
 const read = (file) => fs.readFileSync(file, "utf8");
 const labelTaken = (label) =>
   featuredFiles.some((file) =>
@@ -53,13 +54,25 @@ for (let index = 0; index < args.length; index += 2) {
     .replace(
       `crits/${category}/${kind}.webp`,
       `crits/${category}/${newKind}.webp`,
-    )
+    );
+  source = source.slice(0, start) + entry + source.slice(end);
+  fs.writeFileSync(file, source);
+
+  const rewardFile = path.join(FEATURED, `${category}.ts`);
+  let rewards = read(rewardFile);
+  const rewardStart = rewards.search(new RegExp(`^ {2}${kind}:`, "m"));
+  if (rewardStart < 0) throw new Error(`${kind}: no reward entry`);
+  const next = rewards.slice(rewardStart + 1).search(/^( {2}\w+:|\})/m);
+  const rewardEnd = rewardStart + 1 + next;
+  const reward = rewards
+    .slice(rewardStart, rewardEnd)
+    .replace(`  ${kind}:`, `  ${newKind}:`)
     .replace(
       new RegExp(`\\bbalance\\.${kind}(?=[A-Z])`, "g"),
       `balance.${newKind}`,
     );
-  source = source.slice(0, start) + entry + source.slice(end);
-  fs.writeFileSync(file, source);
+  rewards = rewards.slice(0, rewardStart) + reward + rewards.slice(rewardEnd);
+  fs.writeFileSync(rewardFile, rewards);
 
   const balanceFile = path.join(BALANCE, `${category}.ts`);
   fs.writeFileSync(

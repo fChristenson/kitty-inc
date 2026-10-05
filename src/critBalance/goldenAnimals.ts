@@ -1,6 +1,6 @@
 // odds and reward sizes for featured/goldenAnimals.ts's crits, spread into CONFIG.crit
 export const GOLDEN_ANIMALS_BALANCE = {
-  goldLionChance: 0.00537309305,
+  goldLionChance: 0.00537309306,
   goldLionSeconds: 13,
   goldElephantChance: 0.00544807546,
   goldElephantShare: 0.067,
@@ -12,7 +12,7 @@ export const GOLDEN_ANIMALS_BALANCE = {
   goldOwlSeconds: 11,
   goldRamChance: 0.00693660572,
   goldRamShare: 0.056,
-  goldRabbitChance: 0.0077951227,
+  goldRabbitChance: 0.00779512271,
   goldRabbitSeconds: 10,
   goldCatChance: 0.00756997313,
   goldCatShare: 0.053,

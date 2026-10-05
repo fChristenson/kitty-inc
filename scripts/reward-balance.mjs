@@ -185,7 +185,7 @@ async function main() {
 
     // ---------- featured crits: parsed from their reward source ----------
     const featured = Object.entries(crit.FEATURED_CRITS).map(([kind, def]) => {
-      const source = def.reward.toString();
+      const source = crit.FEATURED_REWARDS[kind].toString();
       const effects = featuredEffects(source, c, tierLevels);
       return {
         source: "featured",

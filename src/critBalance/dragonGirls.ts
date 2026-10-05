@@ -9,7 +9,7 @@ export const DRAGON_GIRLS_BALANCE = {
   sapphireTailSwayChance: 0.00317432873,
   sapphireTailSwayBoostSeconds: 137,
   sapphireTailSwayExtraWorkers: 3,
-  scarletCrouchCoilChance: 0.00336338342,
+  scarletCrouchCoilChance: 0.00336338343,
   scarletCrouchCoilContinueChance: 0.87,
   azureSquatSwishChance: 0.00284432889,
   azureSquatSwishDiscount: 0.183,

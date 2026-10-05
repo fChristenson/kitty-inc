@@ -8,7 +8,7 @@ export const YAKUZA_BALANCE = {
   teboriTabbyChance: 0.00884098809,
   indigoInkwellChance: 0.0108366784,
   indigoInkwellFloors: 1,
-  dragonBackpieceChance: 0.0084964078,
+  dragonBackpieceChance: 0.00849640781,
   dragonBackpieceTierSteps: 2,
   dragonBackpieceUpgrades: 20,
   dragonPearlPactChance: 0.00733488523,

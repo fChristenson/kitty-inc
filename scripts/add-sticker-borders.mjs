@@ -48,8 +48,8 @@ async function critIconFiles() {
     ...(await fs.readdir(critTypesDir)).map((entry) =>
       path.join(critTypesDir, entry),
     ),
-    ...(await fs.readdir(path.join(critTypesDir, "featured"))).map((entry) =>
-      path.join(critTypesDir, "featured", entry),
+    ...(await fs.readdir(path.join(critTypesDir, "../critData"))).map((entry) =>
+      path.join(critTypesDir, "../critData", entry),
     ),
   ];
   for (const file of critSourceFiles) {
@@ -98,7 +98,11 @@ for (const name of names) {
     missing.push(file);
     continue;
   }
-  const sticker = await addStickerBorder(source, path.join(outDir, file), border);
+  const sticker = await addStickerBorder(
+    source,
+    path.join(outDir, file),
+    border,
+  );
   if (!outArg)
     await writeSilhouette(
       sticker,

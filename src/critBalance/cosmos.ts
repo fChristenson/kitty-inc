@@ -5,6 +5,6 @@ export const COSMOS_BALANCE = {
   bottledNebulaTierSteps: 1,
   bottledNebulaUpgrades: 16,
   eclipseChance: 0.0117413997,
-  joinTheDotsChance: 0.00170664752,
+  joinTheDotsChance: 0.00170664753,
   joinTheDotsGrowth: 0.199,
 } as const;

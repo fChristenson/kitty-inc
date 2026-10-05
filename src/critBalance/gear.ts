@@ -5,7 +5,7 @@ export const GEAR_BALANCE = {
   batteryCellChance: 0.0113777842,
   batteryCellContinueChance: 0.15,
   blackBladeChance: 0.0112730183,
-  boneFluteChance: 0.00771601561,
+  boneFluteChance: 0.00771601562,
   boneFlutePayouts: 20,
   coldSteelChance: 0.0100768677,
   coldSteelContinueChance: 0.31,

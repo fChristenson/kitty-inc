@@ -1,189 +1,51 @@
-import { COLOR } from "../../../palette";
-import type { FeaturedCritDefinition } from "./types";
+import type { COW_GIRLS_CRITS } from "../../critData/cowGirls";
+import type { FeaturedRewards } from "./types";
 
-export const COW_GIRLS_CRITS = {
-  bullRunBelle: {
-    label: "Bull Run Belle",
-    color: COLOR.chairGiveawayBrown,
-    image: "crits/cowGirls/bullRunBelle.webp",
-    description: "Arms every floor's next click as an x5 crit",
-    reward: (context, { actions }) =>
-      actions.armCrit(context.floors, "crit"),
-  },
-  cowbellCashout: {
-    label: "Cowbell Cashout",
-    color: COLOR.headhunterRust,
-    image: "crits/cowGirls/cowbellCashout.webp",
-    description: "Hires 1 free worker on this floor",
-    reward: (context, { actions, balance }) =>
-      actions.hireWorkers([context.floor], balance.cowbellCashoutWorkers),
-  },
-  grazingGains: {
-    label: "Grazing Gains",
-    color: COLOR.supplyRunTan,
-    image: "crits/cowGirls/grazingGains.webp",
-    description: "Repeats the crit on the floor below, 14% chance to keep falling",
-    reward: (context, { actions, balance }) =>
-      actions.repeatCrit(context, "down", balance.grazingGainsContinueChance),
-  },
-  herdMentality: {
-    label: "Herd Mentality",
-    color: COLOR.amber,
-    image: "crits/cowGirls/herdMentality.webp",
-    description: "One tier promotion and seven upgrades here",
-    reward: (context, { balance, promoteAndUpgrade }) =>
-      promoteAndUpgrade(context.floor, balance.herdMentalityTierSteps, balance.herdMentalityUpgrades),
-  },
-  moolahMaiden: {
-    label: "Moolah Maiden",
-    color: COLOR.springSalePink,
-    image: "crits/cowGirls/moolahMaiden.webp",
-    description: "Unlocks the next 2 floors for free",
-    reward: (context, { actions, balance }) =>
-      actions.unlockFloors(context, balance.moolahMaidenFloors),
-  },
-  pasturePrime: {
-    label: "Pasture Prime",
-    color: COLOR.nightOwlIndigo,
-    image: "crits/cowGirls/pasturePrime.webp",
-    description: "Cuts every price in this building by 1%",
-    reward: (context, { actions, balance }) =>
-      actions.discountPrices(context.floors, balance.pasturePrimeDiscount),
-  },
-  rodeoReturns: {
-    label: "Rodeo Returns",
-    color: COLOR.chairGiveawayBrown,
-    image: "crits/cowGirls/rodeoReturns.webp",
-    description: "Adds 43s of your company's income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeSeconds(balance.rodeoReturnsSeconds),
-  },
-  barnyardBullion: {
-    label: "Barnyard Bullion",
-    color: COLOR.overflowBlue,
-    image: "crits/cowGirls/barnyardBullion.webp",
-    description: "One tier promotion and eight upgrades here",
-    reward: (context, { balance, promoteAndUpgrade }) =>
-      promoteAndUpgrade(context.floor, balance.barnyardBullionTierSteps, balance.barnyardBullionUpgrades),
-  },
-  bovineBonus: {
-    label: "Bovine Bonus",
-    color: COLOR.teamBuildingCoral,
-    image: "crits/cowGirls/bovineBonus.webp",
-    description: "Cuts every price in this building by 1.3%",
-    reward: (context, { actions, balance }) =>
-      actions.discountPrices(context.floors, balance.bovineBonusDiscount),
-  },
-  butterBarons: {
-    label: "Butter Barons",
-    color: COLOR.teamBuildingCoral,
-    image: "crits/cowGirls/butterBarons.webp",
-    description: "Adds 5s of your company's income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeSeconds(balance.butterBaronsSeconds),
-  },
-  cattleCall: {
-    label: "Cattle Call",
-    color: COLOR.amberMuted,
-    image: "crits/cowGirls/cattleCall.webp",
-    description: "Raises the lowest-level floor to the building's top level",
-    reward: (context, { actions, lowestLevel, topLevel }) =>
-      actions.raiseLevels([lowestLevel(context)], topLevel(context)),
-  },
-  cudChewerCash: {
-    label: "Cud Chewer Cash",
-    color: COLOR.chairGiveawayBrown,
-    image: "crits/cowGirls/cudChewerCash.webp",
-    description: "Unlocks the next 5 floors for free",
-    reward: (context, { actions, balance }) =>
-      actions.unlockFloors(context, balance.cudChewerCashFloors),
-  },
-  heiferHedgeFund: {
-    label: "Heifer Hedge Fund",
-    color: COLOR.nightOwlIndigo,
-    image: "crits/cowGirls/heiferHedgeFund.webp",
-    description: "Boosts every worker for 30s",
-    reward: (context, { actions, balance }) =>
-      actions.boostWorkers(context.floors, balance.heiferHedgeFundBoostSeconds, balance.heiferHedgeFundExtraWorkers),
-  },
-  hornOfPlenty: {
-    label: "Horn Of Plenty",
-    color: COLOR.amberMuted,
-    image: "crits/cowGirls/hornOfPlenty.webp",
-    description: "Free office supplies for every unlocked floor",
-    reward: (context, { actions }) =>
-      actions.giveOfficeSupplies(context.floors),
-  },
-  lassoLoot: {
-    label: "Lasso Loot",
-    color: COLOR.goldenParachuteMarigold,
-    image: "crits/cowGirls/lassoLoot.webp",
-    description: "Repeats the crit on the floor above, 12% chance to keep climbing",
-    reward: (context, { actions, balance }) =>
-      actions.repeatCrit(context, "up", balance.lassoLootContinueChance),
-  },
-  milkmaidMargin: {
-    label: "Milkmaid Margin",
-    color: COLOR.overflowBlue,
-    image: "crits/cowGirls/milkmaidMargin.webp",
-    description: "One tier promotion and nine upgrades here",
-    reward: (context, { balance, promoteAndUpgrade }) =>
-      promoteAndUpgrade(context.floor, balance.milkmaidMarginTierSteps, balance.milkmaidMarginUpgrades),
-  },
-  mooMentum: {
-    label: "Moo Mentum",
-    color: COLOR.nightOwlIndigo,
-    image: "crits/cowGirls/mooMentum.webp",
-    description: "Cuts every price in this building by 1.4%",
-    reward: (context, { actions, balance }) =>
-      actions.discountPrices(context.floors, balance.mooMentumDiscount),
-  },
-  prairiePayday: {
-    label: "Prairie Payday",
-    color: COLOR.teaBreakBrown,
-    image: "crits/cowGirls/prairiePayday.webp",
-    description: "Adds 10.1% of your total income",
-    reward: (_context, { actions, balance }) =>
-      actions.addIncomeShare(balance.prairiePaydayShare),
-  },
-  spottedFortune: {
-    label: "Spotted Fortune",
-    color: COLOR.rainCheckBlue,
-    image: "crits/cowGirls/spottedFortune.webp",
-    description: "Raises alternating floors to the building's top level",
-    reward: (context, { actions, alternating, topLevel }) =>
-      actions.raiseLevels(alternating(context), topLevel(context)),
-  },
-  stampedeStocks: {
-    label: "Stampede Stocks",
-    color: COLOR.goldenParachuteMarigold,
-    image: "crits/cowGirls/stampedeStocks.webp",
-    description: "Unlocks the next 2 floors for free",
-    reward: (context, { actions, balance }) =>
-      actions.unlockFloors(context, balance.stampedeStocksFloors),
-  },
-  coneLick: {
-    label: "Cone Lick",
-    color: COLOR.fastForwardBlue,
-    image: "crits/cowGirls/coneLick.webp",
-    description: "Grows this floor's level by 26.3% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.coneLickGrowth),
-  },
-  softServeShare: {
-    label: "Soft Serve Share",
-    color: COLOR.nightOwlIndigo,
-    image: "crits/cowGirls/softServeShare.webp",
-    description: "Grows this floor's level by 26.4% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.softServeShareGrowth),
-  },
-  strawberryScoop: {
-    label: "Strawberry Scoop",
-    color: COLOR.chairGiveawayBrown,
-    image: "crits/cowGirls/strawberryScoop.webp",
-    description: "Grows this floor's level by 26.5% in free upgrades",
-    reward: (context, { actions, balance }) =>
-      actions.growLevels([context.floor], balance.strawberryScoopGrowth),
-  },
-} as const satisfies Record<string, FeaturedCritDefinition>;
+export const COW_GIRLS_REWARDS = {
+  bullRunBelle: (context, { actions }) =>
+    actions.armCrit(context.floors, "crit"),
+  cowbellCashout: (context, { actions, balance }) =>
+    actions.hireWorkers([context.floor], balance.cowbellCashoutWorkers),
+  grazingGains: (context, { actions, balance }) =>
+    actions.repeatCrit(context, "down", balance.grazingGainsContinueChance),
+  herdMentality: (context, { balance, promoteAndUpgrade }) =>
+    promoteAndUpgrade(context.floor, balance.herdMentalityTierSteps, balance.herdMentalityUpgrades),
+  moolahMaiden: (context, { actions, balance }) =>
+    actions.unlockFloors(context, balance.moolahMaidenFloors),
+  pasturePrime: (context, { actions, balance }) =>
+    actions.discountPrices(context.floors, balance.pasturePrimeDiscount),
+  rodeoReturns: (_context, { actions, balance }) =>
+    actions.addIncomeSeconds(balance.rodeoReturnsSeconds),
+  barnyardBullion: (context, { balance, promoteAndUpgrade }) =>
+    promoteAndUpgrade(context.floor, balance.barnyardBullionTierSteps, balance.barnyardBullionUpgrades),
+  bovineBonus: (context, { actions, balance }) =>
+    actions.discountPrices(context.floors, balance.bovineBonusDiscount),
+  butterBarons: (_context, { actions, balance }) =>
+    actions.addIncomeSeconds(balance.butterBaronsSeconds),
+  cattleCall: (context, { actions, lowestLevel, topLevel }) =>
+    actions.raiseLevels([lowestLevel(context)], topLevel(context)),
+  cudChewerCash: (context, { actions, balance }) =>
+    actions.unlockFloors(context, balance.cudChewerCashFloors),
+  heiferHedgeFund: (context, { actions, balance }) =>
+    actions.boostWorkers(context.floors, balance.heiferHedgeFundBoostSeconds, balance.heiferHedgeFundExtraWorkers),
+  hornOfPlenty: (context, { actions }) =>
+    actions.giveOfficeSupplies(context.floors),
+  lassoLoot: (context, { actions, balance }) =>
+    actions.repeatCrit(context, "up", balance.lassoLootContinueChance),
+  milkmaidMargin: (context, { balance, promoteAndUpgrade }) =>
+    promoteAndUpgrade(context.floor, balance.milkmaidMarginTierSteps, balance.milkmaidMarginUpgrades),
+  mooMentum: (context, { actions, balance }) =>
+    actions.discountPrices(context.floors, balance.mooMentumDiscount),
+  prairiePayday: (_context, { actions, balance }) =>
+    actions.addIncomeShare(balance.prairiePaydayShare),
+  spottedFortune: (context, { actions, alternating, topLevel }) =>
+    actions.raiseLevels(alternating(context), topLevel(context)),
+  stampedeStocks: (context, { actions, balance }) =>
+    actions.unlockFloors(context, balance.stampedeStocksFloors),
+  coneLick: (context, { actions, balance }) =>
+    actions.growLevels([context.floor], balance.coneLickGrowth),
+  softServeShare: (context, { actions, balance }) =>
+    actions.growLevels([context.floor], balance.softServeShareGrowth),
+  strawberryScoop: (context, { actions, balance }) =>
+    actions.growLevels([context.floor], balance.strawberryScoopGrowth),
+} satisfies FeaturedRewards<typeof COW_GIRLS_CRITS>;

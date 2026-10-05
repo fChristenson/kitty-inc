@@ -26,7 +26,7 @@ export const PIZZA_BALANCE = {
   pestoPrestoExtraWorkers: 1,
   pineappleDappleChance: 0.00559498013,
   pineappleDappleContinueChance: 0.63,
-  sicilianVermilionChance: 0.00656935175,
+  sicilianVermilionChance: 0.00656935176,
   sicilianVermilionTierSteps: 2,
   sicilianVermilionUpgrades: 36,
   truffleRuffleChance: 0.00552728512,

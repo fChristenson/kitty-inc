@@ -31,7 +31,7 @@ export const CRITTERS_BALANCE = {
   sleepyFoxPayouts: 34,
   sleepyPandaChance: 0.00685071834,
   sleepyPandaDiscount: 0.064,
-  samoyedSmileChance: 0.00936747424,
+  samoyedSmileChance: 0.00936747425,
   samoyedSmilePayouts: 39,
   fluffballChance: 0.00773887872,
   fluffballDiscount: 0.046,

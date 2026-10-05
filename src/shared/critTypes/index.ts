@@ -22,6 +22,8 @@ import { recordCritProcLanded } from "./critProcCounts";
 import {
   FEATURED_CRITS,
   FEATURED_CRIT_KINDS,
+  getFeaturedRewards,
+  isFeaturedCritKind,
   type FeaturedCritKind,
 } from "./featuredProcs";
 
@@ -31,8 +33,11 @@ export {
   featuredCritFlags,
   isFeaturedCritKind,
   createRewardHelpers,
+  loadFeaturedRewards,
+  getFeaturedRewards,
   type FeaturedCritKind,
-  type FeaturedCritDefinition,
+  type FeaturedCritData,
+  type FeaturedReward,
   type FeaturedRewardActions,
   type FeaturedRewardContext,
   type RewardHelpers,
@@ -2066,13 +2071,14 @@ function landedGap(logMiss: number): number {
 // O(distinct chances + landed) instead of O(all procs)
 export function rollLandedProcs(): CritProcKind[] {
   const landed: CritProcKind[] = [];
+  const featuredReady = getFeaturedRewards() !== null;
   for (const { logMiss, kinds } of PROC_CHANCE_GROUPS) {
     for (
       let i = landedGap(logMiss);
       i < kinds.length;
       i += 1 + landedGap(logMiss)
     ) {
-      landed.push(kinds[i]);
+      if (featuredReady || !isFeaturedCritKind(kinds[i])) landed.push(kinds[i]);
     }
   }
   return landed;

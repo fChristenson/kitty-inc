@@ -10,9 +10,9 @@ export const OCEAN_BALANCE = {
   divingBellUpgrades: 2,
   flooringInspectorChance: 0.0124689054,
   flooringInspectorUpgrades: 15,
-  krakenChance: 0.00530199229,
+  krakenChance: 0.0053019923,
   krakenPayouts: 27,
   messageInABottleChance: 0.0122623507,
-  lemonSailsChance: 0.0017002353,
+  lemonSailsChance: 0.00170023531,
   lemonSailsGrowth: 0.2,
 } as const;

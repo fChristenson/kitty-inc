@@ -67,8 +67,11 @@ export async function withGame(run) {
   });
   try {
     const { CONFIG } = await server.ssrLoadModule("/src/config.ts");
-    const crit = await server.ssrLoadModule("/src/shared/critTypes/index.ts");
-    return await run({ CONFIG, crit });
+    const types = await server.ssrLoadModule("/src/shared/critTypes/index.ts");
+    const { FEATURED_REWARDS } = await server.ssrLoadModule(
+      "/src/shared/critTypes/featured/index.ts",
+    );
+    return await run({ CONFIG, crit: { ...types, FEATURED_REWARDS } });
   } finally {
     await server.close();
   }
@@ -76,7 +79,7 @@ export async function withGame(run) {
 
 export function loadCatalog({ CONFIG, crit }) {
   return Object.entries(crit.FEATURED_CRITS).map(([kind, def]) => {
-    const source = def.reward.toString();
+    const source = crit.FEATURED_REWARDS[kind].toString();
     const template = matchTemplate(kind, source, def.description);
     const chance = CONFIG.crit[`${kind}Chance`];
     return {

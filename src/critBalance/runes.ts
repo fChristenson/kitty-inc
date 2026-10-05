@@ -2,7 +2,7 @@
 export const RUNES_BALANCE = {
   axeOfAssetsChance: 0.00955053806,
   axeOfAssetsUpgrades: 56,
-  broochBankrollChance: 0.00720783948,
+  broochBankrollChance: 0.00720783949,
   broochBankrollPayouts: 62,
   bucklerBucksChance: 0.00716549064,
   bucklerBucksPayouts: 63,
