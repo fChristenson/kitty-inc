@@ -2385,13 +2385,18 @@ function applyTeamLunchCrit(floor: Floor): void {
 // each unlocked floor back to its own level-0 economy (rate/interval/cost, no
 // banked upgrades) but one permanent tier higher — a fresh floor that earns
 // more per upgrade from here on. A floor already at the top tier has nothing
-// to trade its upgrades for, so it's skipped entirely. Workers/manager/office
+// to trade its upgrades for, so it's skipped entirely, and a floor at the
+// level cap keeps its levels and just goes up the tier. Workers/manager/office
 // upgrades and the building's accumulated price discount all survive
 function applySpringCleaningCrit(floors: Floor[], multiplier: BigNumber): void {
   for (const [index, floor] of floors.entries()) {
     if (!floor.unlocked) continue;
     const promoted = nextCritTier(floor.critMultiplierTier);
     if (promoted === floor.critMultiplierTier) continue;
+    if (isFloorMaxed(floor)) {
+      promoteTierKeepingLevel(floor, index + 1, multiplier, promoted);
+      continue;
+    }
     const base = computeBaseFloorStats(index + 1, multiplier);
     floor.incomeAmount = base.incomeAmount;
     floor.incomeIntervalSeconds = base.incomeIntervalSeconds;
@@ -2403,6 +2408,34 @@ function applySpringCleaningCrit(floors: Floor[], multiplier: BigNumber): void {
     floor.upgradeCount = 0;
     floor.critMultiplierTier = promoted;
   }
+}
+
+// promotes floor (the building's floorNumber-th) to tier with every upgrade it
+// has kept: its upgrades' share of the income re-earned at the new tier's
+// multiplier, on top of its base and any bonus it had
+function promoteTierKeepingLevel(
+  floor: Floor,
+  floorNumber: number,
+  multiplier: BigNumber,
+  tier: CritTier,
+): void {
+  const base = computeBaseFloorStats(floorNumber, multiplier);
+  const upgradeIncome = multiply(floor.rateStep, floor.upgradeCount);
+  const previousMultiplier = floor.critMultiplierTier
+    ? CRIT_TIER_CONFIG[floor.critMultiplierTier].multiplier
+    : 1;
+  const bonusIncome = subtract(
+    floor.incomeAmount,
+    add(base.incomeAmount, multiply(upgradeIncome, previousMultiplier)),
+  );
+  floor.incomeAmount = add(
+    add(
+      base.incomeAmount,
+      multiply(upgradeIncome, CRIT_TIER_CONFIG[tier].multiplier),
+    ),
+    bonusIncome,
+  );
+  floor.critMultiplierTier = tier;
 }
 
 // "Rush Hour" crit (see shared/critTypes's isRushHourCrit): no instant
@@ -3180,31 +3213,13 @@ export function handleFloorClick(
         floor.overtimeGoal = goal;
         const previousTier = floor.critMultiplierTier;
         const promotedTier = nextCritTier(previousTier);
-        if (promotedTier !== previousTier) {
-          const base = computeBaseFloorStats(
+        if (promotedTier !== previousTier)
+          promoteTierKeepingLevel(
+            floor,
             floors.indexOf(floor) + 1,
             multiplier,
+            promotedTier,
           );
-          const upgradeIncome = multiply(floor.rateStep, floor.upgradeCount);
-          const previousMultiplier = previousTier
-            ? CRIT_TIER_CONFIG[previousTier].multiplier
-            : 1;
-          const bonusIncome = subtract(
-            floor.incomeAmount,
-            add(base.incomeAmount, multiply(upgradeIncome, previousMultiplier)),
-          );
-          floor.incomeAmount = add(
-            add(
-              base.incomeAmount,
-              multiply(
-                upgradeIncome,
-                CRIT_TIER_CONFIG[promotedTier].multiplier,
-              ),
-            ),
-            bonusIncome,
-          );
-          floor.critMultiplierTier = promotedTier;
-        }
         endOvertimeActiveWindow(floor, Date.now());
         clearOvertimeTickDelivery(floor);
       }
