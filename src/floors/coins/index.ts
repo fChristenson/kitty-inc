@@ -30,8 +30,10 @@ const MAX_SPIN_RATE = 0.12;
 // full burst (40-85 particles) every long-press tick (see shared/pressAndHold's
 // LONG_PRESS_TICK_MS), spawning particles far faster than a ~1-2s lifespan
 // lets them expire; without this cap a sustained hold grows the array (and every
-// frame's update/draw cost) without bound instead of settling at a steady state
-const MAX_PARTICLES = 750;
+// frame's update/draw cost) without bound instead of settling at a steady state.
+// High enough that a held button's flow pours out thick, like a liquid; the
+// coins draw in one WebGL batch, which the 3,000-coin spray pool shows holds up
+const MAX_PARTICLES = 1_500;
 
 export async function loadCoinImage(): Promise<HTMLImageElement> {
   return loadCoinBurstImages();
@@ -201,7 +203,7 @@ export function drawCoins(
         py += (targetY - py) * eased;
         radius = burstRadius + (HOMING_END_RADIUS - burstRadius) * shrink;
       } else {
-        alpha = Math.max(0, 1 - t);
+        alpha = Math.max(0, 1 - t * t);
       }
       if (batched) {
         coinSpot[0] = px;
