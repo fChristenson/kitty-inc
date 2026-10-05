@@ -1,18 +1,13 @@
 import { COLOR } from "../../palette";
-import {
-  drawLiquidBar,
-  getCalmFullBar,
-  stampBubble,
-  type LiquidGauge,
-} from "../liquidFill";
+import { drawChevronBar, getFullBar, type BarGauge } from "../glossyWidgets";
 
-// the liquid bar warped by pressure. A floor too fast to show a fill swells
-// slowly then rushes, vibrating faster and faster like a kettle, then bursts
-// light out from its middle and springs back; a long press swells its middle
-// as if about to burst.
-// The warp stamps the bar back in thin vertical slices, each stretched by the
-// bulge there. A calm bar's slices come straight from its cached layers; a
-// boiling one is redrawn onto a spare canvas first, so only that one costs.
+// the income bar under pressure. A floor too fast to show a fill beats like a
+// racing heart, swelling with a glowing halo (two scaled blits). Held, it
+// swells slowly then rushes, vibrating faster and faster like a kettle, then
+// bursts light out from its middle and springs back; a long press swells its
+// middle as if about to burst.
+// That warp stamps the bar back in thin vertical slices, each stretched by the
+// bulge there, after redrawing it onto a spare canvas, so only a held bar costs.
 const CYCLE_MS = 1100;
 const BUILD = 0.62;
 const BURST_SHARE = 0.28;
@@ -35,9 +30,12 @@ const MAX_RES = 2;
 const PAD_X = 30;
 const PAD_Y = 40;
 const SLICE = 16;
-const CALM_SLICE = 24;
-// the glow's one stretch: the dome's bulge across its middle
-const GLOW_BULGE = 0.6;
+const BEAT_MS = 700;
+const BEAT_STRETCH_X = 0.015;
+const BEAT_STRETCH_Y = 0.14;
+const BEAT_HALO_Y = 0.2;
+const BEAT_HALO_ALPHA = 0.3;
+const BEAT_TEXT = 0.1;
 const INSET = 9;
 const FLAT = new Float32Array([0]);
 
@@ -73,19 +71,6 @@ function domeProfile(w: number): Float32Array {
       profile[i] = Math.sin(Math.PI * u) ** 1.4;
     }
     profiles.set(w, profile);
-  }
-  return profile;
-}
-const calmProfiles = new Map<number, Float32Array>();
-function calmProfile(w: number): Float32Array {
-  let profile = calmProfiles.get(w);
-  if (!profile) {
-    const count = Math.ceil(w / CALM_SLICE);
-    profile = new Float32Array(count);
-    for (let i = 0; i < count; i++)
-      profile[i] =
-        Math.sin(Math.PI * Math.min(1, ((i + 0.5) * CALM_SLICE) / w)) ** 1.4;
-    calmProfiles.set(w, profile);
   }
   return profile;
 }
@@ -203,9 +188,8 @@ function drawLights(
   }
 }
 
-// a calm, full bar warped straight from its one cached layer in slices, its
-// bubbles moved with the bulge, and its glow stretched by the middle's bulge
-function drawCalmWarped(
+// a calm, full bar's racing heartbeat: two quick swells a beat, with its halo
+function drawHeartbeat(
   ctx: CanvasRenderingContext2D,
   key: object,
   x: number,
@@ -215,57 +199,27 @@ function drawCalmWarped(
   r: number,
   color: string,
   now: number,
-  inflation: number,
-  burst: number,
-  shakeX: number,
-  glow: number,
-): void {
-  const bar = getCalmFullBar(key, w, h, r, color, now);
-  const L = getLights(w, h, r);
-  const flash = Math.min(1, BURST_FLASH * burst + glow);
-  const warped = Math.abs(inflation) >= WARP_EPSILON;
-  const slice = warped ? CALM_SLICE : w;
-  const profile = warped ? calmProfile(w) : FLAT;
-  const stretch = warped ? 1 + STRETCH_X * inflation : 1;
-  const bulge = warped ? BULGE * inflation : 0;
-  const seam = warped ? 0.6 : 0;
-  const cx = x + w / 2 + shakeX;
+): PressurePose {
+  const t = (now + offsetOf(key)) % BEAT_MS;
+  const beat =
+    Math.exp(-(((t - 60) / 50) ** 2)) +
+    0.6 * Math.exp(-(((t - 260) / 50) ** 2));
+  const full = getFullBar(w, h, r, color);
+  const cx = x + w / 2;
   const cy = y + h / 2;
-  for (let i = 0; i < profile.length; i++) {
-    const sx = i * slice;
-    const sw = Math.min(slice, w - sx);
-    const sh = h * (1 + bulge * profile[i]);
-    ctx.drawImage(
-      bar.bar,
-      sx,
-      0,
-      sw,
-      h,
-      cx + (sx - w / 2) * stretch,
-      cy - sh / 2,
-      sw * stretch + seam,
-      sh,
-    );
-  }
-  const spots = bar.bubbles;
-  for (let i = 0; i < spots.length; i += 3) {
-    const k = Math.min(profile.length - 1, Math.floor(spots[i] / slice));
-    stampBubble(
-      ctx,
-      cx + (spots[i] - w / 2) * stretch,
-      cy + (spots[i + 1] - h / 2) * (1 + bulge * profile[k]),
-      spots[i + 2],
-    );
-  }
-  if (flash > 0) {
-    const alpha = ctx.globalAlpha;
-    const gh = h * (1 + bulge * GLOW_BULGE);
-    ctx.globalAlpha = alpha * flash;
-    ctx.drawImage(L.glow, cx - (w / 2) * stretch, cy - gh / 2, w * stretch, gh);
-    ctx.globalAlpha = alpha;
-  }
-  if (burst > 0)
-    drawBurst(ctx, L, cx, cy, burst, stretch, bulge, profile, slice);
+  const alpha = ctx.globalAlpha;
+  const haloW = full.halo.width * (1 + BEAT_STRETCH_X * beat);
+  const haloH = full.halo.height * (1 + BEAT_HALO_Y * beat);
+  ctx.globalAlpha =
+    alpha * (BEAT_HALO_ALPHA + (1 - BEAT_HALO_ALPHA) * Math.min(1, beat));
+  ctx.drawImage(full.halo, cx - haloW / 2, cy - haloH / 2, haloW, haloH);
+  ctx.globalAlpha = alpha;
+  const barW = w * (1 + BEAT_STRETCH_X * beat);
+  const barH = h * (1 + BEAT_STRETCH_Y * beat);
+  ctx.drawImage(full.bar, cx - barW / 2, cy - barH / 2, barW, barH);
+  sharedPose.textScale = 1 + BEAT_TEXT * beat;
+  sharedPose.shakeX = 0;
+  return sharedPose;
 }
 
 const boil = { inflation: 0, shakeX: 0 };
@@ -291,6 +245,8 @@ export function drawPressureBar(
   // how far a long press swells it (the boil alone doesn't warp it)
   warpHeat = heat,
 ): PressurePose {
+  if (heat === 0 && fillW >= w)
+    return drawHeartbeat(ctx, key, x, y, w, h, r, color, now);
   const t = ((now + offsetOf(key)) % CYCLE_MS) / CYCLE_MS;
   const p = Math.min(1, t / BUILD);
   const sinceRelease = t < BUILD ? -1 : ((t - BUILD) * CYCLE_MS) / 1000;
@@ -306,27 +262,6 @@ export function drawPressureBar(
         p *
         p
       : 0;
-  if (heat === 0 && fillW >= w) {
-    const pose = sharedPose;
-    pose.textScale = 1 + TEXT_SWELL * Math.max(0, inflation);
-    pose.shakeX = shakeX;
-    drawCalmWarped(
-      ctx,
-      key,
-      x,
-      y,
-      w,
-      h,
-      r,
-      color,
-      now,
-      inflation,
-      burst,
-      shakeX,
-      FLASH * Math.max(0, inflation),
-    );
-    return pose;
-  }
   const swell = boilWarp(warpHeat, now);
   return renderWarped(
     ctx,
@@ -347,7 +282,7 @@ export function drawPressureBar(
   );
 }
 
-// the liquid bar boiling under a held button, bulging in the middle
+// the bar racing under a held button, bulging in the middle
 export function drawBoilingBar(
   ctx: CanvasRenderingContext2D,
   key: object,
@@ -361,7 +296,7 @@ export function drawBoilingBar(
   now: number,
   heat: number,
   warpHeat = heat,
-  gauge?: LiquidGauge,
+  gauge?: BarGauge,
 ): PressurePose {
   const swell = boilWarp(warpHeat, now);
   return renderWarped(
@@ -400,7 +335,7 @@ function renderWarped(
   burst: number,
   shakeX: number,
   glow: number,
-  gauge?: LiquidGauge,
+  gauge?: BarGauge,
 ): PressurePose {
   // reused: read straight away by the caller
   const pose = sharedPose;
@@ -408,7 +343,7 @@ function renderWarped(
   pose.shakeX = shakeX;
   if (Math.abs(inflation) < WARP_EPSILON) {
     if (shakeX !== 0) ctx.translate(shakeX, 0);
-    drawLiquidBar(ctx, key, x, y, w, h, r, fillW, color, now, heat, gauge);
+    drawChevronBar(ctx, key, x, y, w, h, r, fillW, color, now, heat, gauge);
     drawLights(ctx, x, y, w, h, r, burst, glow);
     if (shakeX !== 0) ctx.translate(-shakeX, 0);
     return pose;
@@ -429,7 +364,7 @@ function renderWarped(
     flat.clearRect(0, 0, pxW, pxH);
   }
   flat.setTransform(res, 0, 0, res, 0, 0);
-  drawLiquidBar(
+  drawChevronBar(
     flat,
     key,
     PAD_X,

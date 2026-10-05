@@ -48,7 +48,7 @@ import {
   formatTime,
   roundRect,
 } from "../../utils";
-import { drawLiquidBar, prewarmLiquidBar } from "../../shared/liquidFill";
+import { drawChevronBar, prewarmChevronBar } from "../../shared/glossyWidgets";
 import { runWhenIdle } from "../../shared/idle";
 import {
   drawBoilingBar,
@@ -84,7 +84,7 @@ export const BAR_W = (PANEL_W - 36) * 1.5;
 const BAR_H = 92;
 
 runWhenIdle(() =>
-  prewarmLiquidBar(BAR_W, BAR_H, BAR_H / 3, [
+  prewarmChevronBar(BAR_W, BAR_H, BAR_H / 3, [
     COLOR.moneyGreen,
     ...Object.values(CRIT_TIER_CONFIG).map((tier) => tier.color),
   ]),
@@ -617,7 +617,7 @@ export function drawIncomePanel(
     const boilHeat = getBoilHeat(floor, now);
     const holdHeat = getHoldHeat(floor, now);
     if (overtimeGaugeVisible) {
-      // the gauge is liquid too, in its tier-preview colors, boiling and
+      // the gauge flows too, in its tier-preview colors, racing and
       // straining while overtime runs
       const gauge = getGaugeGradientColors(floor);
       if (boilHeat > 0) {
@@ -637,7 +637,7 @@ export function drawIncomePanel(
           gauge,
         );
       } else {
-        drawLiquidBar(
+        drawChevronBar(
           ctx,
           floor,
           barX,
@@ -694,7 +694,7 @@ export function drawIncomePanel(
         holdHeat,
       );
     } else {
-      drawLiquidBar(
+      drawChevronBar(
         ctx,
         floor,
         barX,

@@ -285,10 +285,9 @@ let batchCtx: CanvasRenderingContext2D | null = null;
 let queue = new Float32Array(SPRITE_FLOATS * 1024);
 let queueFrames = new Uint8Array(1024);
 let queued = 0;
-let boxLeft = 0;
-let boxTop = 0;
-let boxRight = 0;
-let boxBottom = 0;
+// the batch's bounds (left, top, right, bottom): a typed array, since writing
+// a fractional number into a module variable boxes a fresh heap number per coin
+const box = new Float64Array(4);
 
 // no-op until the coin sheet is ready (or without WebGL): coins then draw
 // one by one as they're called
@@ -296,8 +295,13 @@ export function beginCoinBatch(ctx: CanvasRenderingContext2D): void {
   if (!sheet) return;
   batchCtx = ctx;
   queued = 0;
-  boxLeft = boxTop = Infinity;
-  boxRight = boxBottom = -Infinity;
+  box[0] = box[1] = Infinity;
+  box[2] = box[3] = -Infinity;
+}
+
+// whether coins drawn on ctx now are queued into an open batch
+export function isCoinBatchOpen(ctx: CanvasRenderingContext2D): boolean {
+  return batchCtx === ctx;
 }
 
 export function endCoinBatch(ctx: CanvasRenderingContext2D): void {
@@ -306,16 +310,7 @@ export function endCoinBatch(ctx: CanvasRenderingContext2D): void {
   if (queued === 0) return;
   if (
     queued >= SMALL_BATCH &&
-    drawSprites(
-      ctx,
-      sheet!,
-      queue,
-      queued,
-      boxLeft,
-      boxTop,
-      boxRight,
-      boxBottom,
-    )
+    drawSprites(ctx, sheet!, queue, queued, box[0], box[1], box[2], box[3])
   )
     return;
   // each queued coin's own device-pixel transform, on a unit square
@@ -341,6 +336,97 @@ export function endCoinBatch(ctx: CanvasRenderingContext2D): void {
   ctx.restore();
 }
 
+function growQueue(): void {
+  const grown = new Float32Array(queue.length * 2);
+  grown.set(queue);
+  queue = grown;
+  const grownFrames = new Uint8Array(queueFrames.length * 2);
+  grownFrames.set(queueFrames);
+  queueFrames = grownFrames;
+}
+
+// the batch's matrix, scale and canvas size, read once per batch (base is
+// fresh per batch): DOMMatrix getters and DOM reads per coin add up
+function readBatchMatrix(ctx: CanvasRenderingContext2D, base: DOMMatrix): void {
+  batchBase = base;
+  batchA = base.a;
+  batchB = base.b;
+  batchC = base.c;
+  batchD = base.d;
+  batchE = base.e;
+  batchF = base.f;
+  batchUpright = batchB === 0 && batchC === 0;
+  batchScale = Math.max(Math.hypot(batchA, batchB), Math.hypot(batchC, batchD));
+  batchWidth = ctx.canvas.width;
+  batchHeight = ctx.canvas.height;
+}
+
+// drawCoinBurstFrame's batched path for a caller that already knows the batch
+// is open on ctx (see isCoinBatchOpen), its coin's x, y, radius and alpha
+// written into coinSpot first: fractional numbers passed as arguments get
+// boxed into a fresh heap number each, per coin per frame
+export const coinSpot = new Float64Array(4);
+export function queueCoinSprite(
+  ctx: CanvasRenderingContext2D,
+  sprite: CoinBurstSprite,
+  base: DOMMatrix,
+): void {
+  const x = coinSpot[0];
+  const y = coinSpot[1];
+  const radius = coinSpot[2];
+  const alpha = coinSpot[3];
+  const bill = sprite.kind === "bill";
+  const frameCanvases = bill ? billFrameCanvases : coinFrameCanvases;
+  if (!frameCanvases || alpha <= 0) return;
+  const frameCount = bill ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT;
+  const frame =
+    ((Math.floor(sprite.spinFrame) % frameCount) + frameCount) % frameCount;
+  if (base !== batchBase) readBatchMatrix(ctx, base);
+  const a = batchA;
+  const b = batchB;
+  const c = batchC;
+  const d = batchD;
+  const px = a * x + c * y + batchE;
+  const py = b * x + d * y + batchF;
+  const frameCanvas = frameCanvases[frame];
+  const halfW = radius * (frameCanvas.width / frameCanvas.height);
+  const cos = Math.cos(sprite.axisAngle);
+  const sin = Math.sin(sprite.axisAngle);
+  const ux = (a * cos + c * sin) * halfW;
+  const uy = (b * cos + d * sin) * halfW;
+  const vx = (c * cos - a * sin) * radius;
+  const vy = (d * cos - b * sin) * radius;
+  const reachX = Math.abs(ux) + Math.abs(vx);
+  const reachY = Math.abs(uy) + Math.abs(vy);
+  if (
+    px + reachX < 0 ||
+    py + reachY < 0 ||
+    px - reachX > batchWidth ||
+    py - reachY > batchHeight
+  )
+    return;
+  if ((queued + 1) * SPRITE_FLOATS > queue.length) growQueue();
+  const frameId = (bill ? COIN_SPIN_FRAME_COUNT : 0) + frame;
+  const o = queued * SPRITE_FLOATS;
+  const r = frameId * 4;
+  queue[o] = px;
+  queue[o + 1] = py;
+  queue[o + 2] = ux;
+  queue[o + 3] = uy;
+  queue[o + 4] = vx;
+  queue[o + 5] = vy;
+  queue[o + 6] = sheetRects[r];
+  queue[o + 7] = sheetRects[r + 1];
+  queue[o + 8] = sheetRects[r + 2];
+  queue[o + 9] = sheetRects[r + 3];
+  queue[o + 10] = alpha;
+  queueFrames[queued++] = frameId;
+  if (px - reachX < box[0]) box[0] = px - reachX;
+  if (py - reachY < box[1]) box[1] = py - reachY;
+  if (px + reachX > box[2]) box[2] = px + reachX;
+  if (py + reachY > box[3]) box[3] = py + reachY;
+}
+
 function queueCoin(
   frameId: number,
   px: number,
@@ -361,14 +447,7 @@ function queueCoin(
     alpha <= 0
   )
     return;
-  if ((queued + 1) * SPRITE_FLOATS > queue.length) {
-    const grown = new Float32Array(queue.length * 2);
-    grown.set(queue);
-    queue = grown;
-    const grownFrames = new Uint8Array(queueFrames.length * 2);
-    grownFrames.set(queueFrames);
-    queueFrames = grownFrames;
-  }
+  if ((queued + 1) * SPRITE_FLOATS > queue.length) growQueue();
   const o = queued * SPRITE_FLOATS;
   const r = frameId * 4;
   queue[o] = px;
@@ -383,10 +462,10 @@ function queueCoin(
   queue[o + 9] = sheetRects[r + 3];
   queue[o + 10] = alpha;
   queueFrames[queued++] = frameId;
-  if (px - reachX < boxLeft) boxLeft = px - reachX;
-  if (py - reachY < boxTop) boxTop = py - reachY;
-  if (px + reachX > boxRight) boxRight = px + reachX;
-  if (py + reachY > boxBottom) boxBottom = py + reachY;
+  if (px - reachX < box[0]) box[0] = px - reachX;
+  if (py - reachY < box[1]) box[1] = py - reachY;
+  if (px + reachX > box[2]) box[2] = px + reachX;
+  if (py + reachY > box[3]) box[3] = py + reachY;
 }
 
 // draws one coin/bill particle centered at (x, y) with the given on-screen
@@ -411,24 +490,7 @@ export function drawCoinBurstFrame(
   const frame =
     ((Math.floor(sprite.spinFrame) % frameCount) + frameCount) % frameCount;
   const destH = radius * 2;
-  // the batch's matrix, scale and canvas size, read once per batch (base is
-  // fresh per batch): DOMMatrix getters and DOM reads per coin add up
-  if (base !== batchBase) {
-    batchBase = base;
-    batchA = base.a;
-    batchB = base.b;
-    batchC = base.c;
-    batchD = base.d;
-    batchE = base.e;
-    batchF = base.f;
-    batchUpright = batchB === 0 && batchC === 0;
-    batchScale = Math.max(
-      Math.hypot(batchA, batchB),
-      Math.hypot(batchC, batchD),
-    );
-    batchWidth = ctx.canvas.width;
-    batchHeight = ctx.canvas.height;
-  }
+  if (base !== batchBase) readBatchMatrix(ctx, base);
   const a = batchA;
   const b = batchB;
   const c = batchC;

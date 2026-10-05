@@ -6,6 +6,9 @@ import {
   drawCoinBurstFrame,
   beginCoinBatch,
   endCoinBatch,
+  isCoinBatchOpen,
+  queueCoinSprite,
+  coinSpot,
   getCoinRimPoint,
   getSpriteReach,
   getFullestFrame,
@@ -156,6 +159,8 @@ export function drawCoins(
   let rect: { left: number; top: number; width: number } | null = null;
   const base = ctx.getTransform();
   beginCoinBatch(ctx);
+  // batched coins carry their alpha themselves; otherwise it goes on ctx
+  const batched = isCoinBatchOpen(ctx);
   glints = 0;
   for (const list of [pool.list, sprayPool.list])
     for (const p of list) {
@@ -173,6 +178,7 @@ export function drawCoins(
       let radius = p.size * (1 - t * 0.3) * scale;
       const groupTarget = p.homing?.group.target;
       const hasTarget = groupTarget !== undefined || homeTarget !== undefined;
+      let alpha = 1;
       if (p.homing && hasTarget) {
         const targetX = groupTarget
           ? rect.left + groupTarget.x * scale
@@ -194,11 +200,19 @@ export function drawCoins(
         px += (targetX - px) * eased;
         py += (targetY - py) * eased;
         radius = burstRadius + (HOMING_END_RADIUS - burstRadius) * shrink;
-        ctx.globalAlpha = 1;
       } else {
-        ctx.globalAlpha = Math.max(0, 1 - t);
+        alpha = Math.max(0, 1 - t);
       }
-      drawCoinBurstFrame(ctx, p, px, py, radius, base);
+      if (batched) {
+        coinSpot[0] = px;
+        coinSpot[1] = py;
+        coinSpot[2] = radius;
+        coinSpot[3] = alpha;
+        queueCoinSprite(ctx, p, base);
+      } else {
+        ctx.globalAlpha = alpha;
+        drawCoinBurstFrame(ctx, p, px, py, radius, base);
+      }
       // glints go over every coin, after the batch
       if (p.homing?.holdTicks !== undefined) {
         glintCoins[glints] = p;

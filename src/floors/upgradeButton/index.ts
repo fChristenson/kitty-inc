@@ -25,7 +25,11 @@
 // floorInteractions run before sale/overtime; keep sale/overtime in this order unless
 // deliberately reprioritizing.
 import { drawCachedCartoonText, formatPrice } from "../../utils";
-import { drawLiquidButton, prewarmLiquidButton } from "../../shared/liquidFill";
+import {
+  drawJellyButton,
+  getJellyPose,
+  prewarmJellyButton,
+} from "../../shared/glossyWidgets";
 import { runWhenIdle } from "../../shared/idle";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
@@ -70,7 +74,7 @@ export * from "./overtime";
 // through a Sale or Overtime
 // every color the button takes on outside a covering event's own
 runWhenIdle(() =>
-  prewarmLiquidButton(BTN_W, BTN_H, 40, [
+  prewarmJellyButton(BTN_W, BTN_H, 40, [
     COLOR.moneyGreen,
     COLOR.disabledGray,
     COLOR.amber,
@@ -173,6 +177,9 @@ function renderUpgradeButton(
   drawSlamTarget(ctx, slam, box, { radius: 40 }, drawBody, now);
 
   function drawBody(): void {
+    const wiggle =
+      (crit || activeEvent ? getWiggleRotation(now) : 0) + holdAnim.rotation;
+    const jelly = getJellyPose(own, now, getBoilHeat(floor, now), wiggle);
     ctx.save();
     ctx.translate(cx + holdAnim.shakeX, cy + holdAnim.shakeY);
     if (crit || activeEvent) {
@@ -180,6 +187,7 @@ function renderUpgradeButton(
     }
     ctx.rotate(holdAnim.rotation);
     ctx.scale(scale * holdAnim.scale, scale * holdAnim.scale);
+    ctx.scale(jelly.sx, jelly.sy);
     ctx.translate(-cx, -cy);
     let dim = false;
     if (!crit && !activeEvent?.freeClick) {
@@ -190,9 +198,8 @@ function renderUpgradeButton(
     }
     // rounded RECTANGLE, not a full pill — ref.png's button corners are only
     // modestly rounded, unlike the fully-stadium-shaped income bar
-    drawLiquidButton(
+    drawJellyButton(
       ctx,
-      own,
       x,
       y,
       BTN_W,
@@ -207,9 +214,6 @@ function renderUpgradeButton(
             : affordable
               ? COLOR.moneyGreen
               : COLOR.disabledGray,
-      now,
-      getBoilHeat(floor, now),
-      (crit || activeEvent ? getWiggleRotation(now) : 0) + holdAnim.rotation,
     );
 
     ctx.font = '900 52px "Fredoka", system-ui, sans-serif';

@@ -25,12 +25,21 @@ function labelText(floor: Floor): string {
 }
 
 // throwaway canvas just for measureText — floorInteractions.ts needs the label's
-// real width to aim a coin burst at its center, but has no live ctx of its own
+// real width to aim a coin burst at its center, but has no live ctx of its own.
+// Asked every frame per floor (see floors/upgradeArrow), so cached per count
 let measureCtx: CanvasRenderingContext2D | null = null;
+const widths = new Map<number, number>();
 function labelWidth(floor: Floor): number {
-  measureCtx ??= document.createElement("canvas").getContext("2d")!;
-  measureCtx.font = FONT;
-  return measureCtx.measureText(labelText(floor)).width;
+  const count = floor.upgradeCount;
+  let width = widths.get(count);
+  if (width === undefined) {
+    measureCtx ??= document.createElement("canvas").getContext("2d")!;
+    measureCtx.font = FONT;
+    width = measureCtx.measureText(labelText(floor)).width;
+    if (widths.size > 500) widths.clear();
+    widths.set(count, width);
+  }
+  return width;
 }
 
 // floor-local center of the indicator (accounting for the label's own text width),
@@ -78,6 +87,7 @@ export function drawUpgradeStarSpotlight(
     popMs = Infinity;
   }
   const popping = popMs < POP_MS;
+  if (!slam && !popping && drawRestingLabel(ctx, floor)) return;
   drawSlamTarget(ctx, slam, box, "text", () => {
     ctx.save();
     ctx.font = FONT;
@@ -115,6 +125,60 @@ export function drawUpgradeStarSpotlight(
     );
     ctx.restore();
   });
+}
+
+// the resting label, kept as one bitmap per floor at the canvas's own scale:
+// stamping it glyph by glyph every frame for every floor in view added up
+const LABEL_PAD = 6;
+interface RestingLabel {
+  canvas: HTMLCanvasElement;
+  text: string;
+  fill: string;
+  scale: number;
+}
+const restingLabels = new WeakMap<Floor, RestingLabel>();
+let fontReady = false;
+
+// false when ctx is rotated or skewed: the caller draws it the slow way then
+function drawRestingLabel(
+  ctx: CanvasRenderingContext2D,
+  floor: Floor,
+): boolean {
+  const m = ctx.getTransform();
+  if (m.b !== 0 || m.c !== 0 || m.a <= 0 || m.a !== m.d) return false;
+  // never bake a fallback font while Fredoka is still loading
+  fontReady ||= document.fonts.check(FONT);
+  if (!fontReady) return false;
+  const text = labelText(floor);
+  const fill = isFloorMaxed(floor) ? SLAM_GOLD : COLOR.white;
+  let label = restingLabels.get(floor);
+  if (
+    !label ||
+    label.text !== text ||
+    label.fill !== fill ||
+    label.scale !== m.a
+  ) {
+    const canvas = label?.canvas ?? document.createElement("canvas");
+    canvas.width = Math.ceil((labelWidth(floor) + LABEL_PAD * 2) * m.a);
+    canvas.height = Math.ceil((FONT_SIZE + LABEL_PAD * 2) * m.a);
+    const c = canvas.getContext("2d")!;
+    c.setTransform(m.a, 0, 0, m.a, LABEL_PAD * m.a, LABEL_PAD * m.a);
+    c.font = FONT;
+    c.textAlign = "left";
+    c.textBaseline = "top";
+    drawSlamText(c, null, text, 0, 0, FONT_SIZE, fill);
+    label = { canvas, text, fill, scale: m.a };
+    restingLabels.set(floor, label);
+  }
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.drawImage(
+    label.canvas,
+    Math.round(m.a * (MARGIN_X - LABEL_PAD) + m.e),
+    Math.round(m.d * (STAR_Y - LABEL_PAD) + m.f),
+  );
+  ctx.restore();
+  return true;
 }
 
 // the label's pop on every 10th level
