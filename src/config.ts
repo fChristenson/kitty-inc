@@ -8343,6 +8343,59 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 63
+  // money, cash: src/floors/galtonBoardEvent: a jet of cash pours down through a triangle of pegs into a bell curve of heaps, which surge into the total
+  galtonBoardEvent: {
+    chance: 0.01,
+    growMs: 250, // the pegs popping up
+    riseMs: 260, // each coin's trip up the jet to the top peg
+    pegMs: 50, // each bounce down a row of pegs
+    streamMs: 600, // how long the jet pours
+    fallMs: 180, // each coin's drop onto its heap
+    surgeMs: 400, // the heaps lifting off, one after another
+    liftMs: 300, // each coin's flight up into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // mix, free hires and cash: src/floors/poohsticksEvent: stick wisps race down a winding river of cash, each leaping out onto an empty spot
+  poohsticksEvent: {
+    chance: 0.01,
+    travelMs: 900, // each coin's trip down the river
+    streamMs: 1300, // how long the river pours
+    dropMs: 250, // the first stick plopping in
+    raceMs: 1300, // a stick's trip down the river at its average speed
+    leapMs: 320, // each stick's leap onto its spot
+    holdMs: 300,
+    mergeMs: 500,
+  },
+  // gunfire, a crit tier: src/floors/fireForEffectEvent: ranging shells bracket the clicked bar over and short, then the battery pounds it in salvos
+  fireForEffectEvent: {
+    chance: 0.01,
+    readyMs: 150, // before the first ranging shot
+    rangeGapMs: [340, 220] as [number, number], // between ranging shots, quickening
+    flightMs: 420, // each shell's flight
+    salvoGapMs: 240, // between salvos
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, levels and a crit tier: src/floors/eyewallEvent: lightning strikes a whirling eyewall as it tightens onto the clicked bar
+  eyewallEvent: {
+    chance: 0.01,
+    spinMs: 300, // the wall spinning up
+    gapMs: [190, 60] as [number, number], // between strikes, quickening
+    levelShare: 0.008, // levels per strike on a bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, a free floor: src/floors/josephusEvent: a hunter wisp blows up every second wisp round a ring; the survivor flies into the lock
+  josephusEvent: {
+    chance: 0.01,
+    growMs: 300, // the ring flaring up
+    hopMs: [100, 45] as [number, number], // each hop round the ring, quickening
+    flyMs: 380, // the survivor's flight to the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 62
   // explosion, a free floor: src/floors/fuseMazeEvent: a flame floods a maze of fuse cord, every dead end a bomb, the far corner's cord into the lock
   fuseMazeEvent: {
