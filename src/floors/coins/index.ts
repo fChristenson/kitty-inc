@@ -412,26 +412,53 @@ const BEAT_GRAVITY = 0.7;
 const BEAT_LIFE = 0.5;
 // a burst this long after the last starts a fresh run of beats
 const RUN_GAP_MS = 250;
+// every PLUME_EVERY-th beat opens with a plume: for PLUME_MS a share of each
+// burst's coins shoots straight up in a tight column, way above the rest
+const PLUME_EVERY = 3;
+const PLUME_MS = 160;
+const PLUME_SHARE = 0.5;
+const PLUME_CONE = 0.5;
+const PLUME_SPEED: [number, number] = [40, 55];
+const PLUME_LIFE: [number, number] = [90, 140];
+// each plume leans off the vertical by a random tilt (rad), side to side in turn
+const PLUME_TILT: [number, number] = [0.15, 0.75];
 let runStartedAt = -Infinity;
 let lastBurstAt = -Infinity;
-// set by burstPressure: how much faster and fuller the bursts come, and how
-// heavy (0..1) their coins are
+let plumeIndex = -1;
+let plumeTilt = 0;
+// set by burstPressure: how much faster and fuller the bursts come, how
+// heavy (0..1) their coins are, and whether a plume is shooting up
 let pressure = 1;
 let weight = 0;
+let plume = false;
 function beatSwell(since: number, ms: number): number {
   const t = since / ms;
   if (t < 0 || t >= 1) return 0;
   return t < BEAT_RISE ? t / BEAT_RISE : (1 - t) / (1 - BEAT_RISE);
 }
 function burstPressure(now: number): void {
-  if (now - lastBurstAt > RUN_GAP_MS) runStartedAt = now;
+  if (now - lastBurstAt > RUN_GAP_MS) {
+    runStartedAt = now;
+    plumeIndex = -1;
+  }
   lastBurstAt = now;
   // a lone tap lands on the run's start, where the beat is still at rest
-  const beat = (now - runStartedAt) % BEAT_MS;
+  const held = now - runStartedAt;
+  const beat = held % BEAT_MS;
   const lub = beatSwell(beat, LUB_MS);
   const dub = beatSwell(beat - DUB_AT, DUB_MS);
   pressure = 1 + LUB * lub + DUB * dub;
   weight = Math.max(lub, dub * 0.4);
+  plume =
+    Math.floor(held / BEAT_MS) % PLUME_EVERY === PLUME_EVERY - 1 &&
+    beat < PLUME_MS;
+  const index = Math.floor(held / (BEAT_MS * PLUME_EVERY));
+  if (plume && index !== plumeIndex) {
+    plumeIndex = index;
+    const side =
+      plumeTilt > 0 ? -1 : plumeTilt < 0 ? 1 : Math.random() < 0.5 ? -1 : 1;
+    plumeTilt = side * randomIn(PLUME_TILT);
+  }
 }
 
 function spawnBurstParticles(
@@ -444,22 +471,28 @@ function spawnBurstParticles(
   if (freezeGroup) {
     pressure = 1;
     weight = 0;
+    plume = false;
   } else burstPressure(performance.now());
   const count = burstCount(
     Math.round(40 * pressure),
     Math.round(85 * pressure),
   );
   for (let i = 0; i < count; i++) {
+    const jet = plume && Math.random() < PLUME_SHARE;
+    const w = jet ? 0 : weight;
     // upward/outward hemisphere only (not fully random) so coins pop up and out
     // first, then arc back down under gravity instead of scattering downward
     // too; a heavy beat throws them more steeply up
     const angle =
-      -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * (1 - 0.35 * weight);
-    const speed =
-      (3 + Math.random() * 16) *
-      scale *
-      pressure *
-      (freezeGroup ? FREEZE_SPEED_BOOST : 1);
+      -Math.PI / 2 +
+      (jet ? plumeTilt : 0) +
+      (Math.random() - 0.5) * (jet ? PLUME_CONE : Math.PI * (1 - 0.35 * w));
+    const speed = jet
+      ? randomIn(PLUME_SPEED) * scale
+      : (3 + Math.random() * 16) *
+        scale *
+        pressure *
+        (freezeGroup ? FREEZE_SPEED_BOOST : 1);
     const spread = freezeGroup ? FREEZE_SPAWN_SPREAD_PX : 20 * scale;
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
@@ -472,19 +505,17 @@ function spawnBurstParticles(
     p.life = 0;
     p.maxLife = freezeGroup
       ? Infinity
-      : (45 + Math.random() * 75) * (1 + BEAT_LIFE * weight);
+      : jet
+        ? randomIn(PLUME_LIFE)
+        : (45 + Math.random() * 75) * (1 + BEAT_LIFE * w);
     p.size =
-      (22 + Math.random() * 46) *
-      scale *
-      1.15 *
-      1.25 *
-      (1 + BEAT_SIZE * weight);
+      (22 + Math.random() * 46) * scale * 1.15 * 1.25 * (1 + BEAT_SIZE * w);
     // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
     // full fall speed more gradually
     p.gravity =
       Math.max(0, 0.2 + Math.random() * 0.35 - (kind === "bill" ? 0.2 : 0)) *
       scale *
-      (1 + BEAT_GRAVITY * weight);
+      (1 + BEAT_GRAVITY * w);
     p.gravityRamp = (kind === "bill" ? 0.05 : 0.08) * scale;
     p.kind = kind;
     p.spinFrame =
