@@ -1208,7 +1208,7 @@ import {
   announceEventStartClick,
   EVENT_COIN_TIMING,
 } from "../../shared/floorEvents";
-import { getUpgradeIndicatorCenter } from "../star";
+import { triggerLevelPop } from "../star";
 import { hitTestUpgradeArrow } from "../upgradeArrow";
 import { computeBaseFloorStats } from "..";
 import {
@@ -1507,7 +1507,14 @@ function applyUpgradeTick(
   burst = false,
 ): void {
   increaseIncomeRate(floor);
-  if (!burst || isDetachedJobRunning()) return;
+  if (isDetachedJobRunning()) return;
+  // every 10th upgrade (the milestone that halves the income interval) the
+  // level label pops
+  if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
+    triggerLevelPop(floor);
+    playBloop();
+  }
+  if (!burst) return;
   const center = getButtonCenter(isGroundFloor);
   // small random jitter so the burst doesn't spawn at the exact same pixel
   // every single click — a random point spanning the button's own inner width
@@ -1515,13 +1522,6 @@ function applyUpgradeTick(
   const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
   const jitterY = (Math.random() - 0.5) * (BTN_H / 2);
   spawnCoinBurst(floor, center.x + jitterX, center.y + jitterY, () => {});
-  // extra celebration burst right on the upgrade indicator every 10th upgrade,
-  // same milestone that halves this floor's income interval
-  if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
-    const indicatorCenter = getUpgradeIndicatorCenter(floor);
-    spawnCoinBurst(floor, indicatorCenter.x, indicatorCenter.y, () => {});
-    playBloop();
-  }
 }
 
 // State-only version of the normal upgrade-button click used by automated

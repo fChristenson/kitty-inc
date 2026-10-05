@@ -71,11 +71,33 @@ export function drawUpgradeStarSpotlight(
     width: slam ? labelWidth(floor) : 0,
     height: FONT_SIZE,
   };
+  const now = performance.now();
+  let popMs = now - (pops.get(floor) ?? -Infinity);
+  if (popMs >= POP_MS) {
+    pops.delete(floor);
+    popMs = Infinity;
+  }
+  const popping = popMs < POP_MS;
   drawSlamTarget(ctx, slam, box, "text", () => {
     ctx.save();
     ctx.font = FONT;
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
+    // blown out big, then wobbling back like jelly, never smaller than at rest
+    const pop = popping
+      ? POP * Math.exp(-popMs / POP_DECAY_MS) * Math.min(1, popMs / POP_RISE_MS)
+      : 0;
+    if (pop > 0) {
+      const phase = (popMs / POP_WOBBLE_MS) * Math.PI * 2;
+      const cx = MARGIN_X + labelWidth(floor) / 2;
+      const cy = STAR_Y + FONT_SIZE / 2;
+      ctx.translate(cx, cy);
+      ctx.scale(
+        1 + pop * (0.5 + 0.5 * Math.cos(phase)),
+        1 + pop * (0.5 + 0.5 * Math.cos(phase + 0.9)),
+      );
+      ctx.translate(-cx, -cy);
+    }
     drawSlamText(
       ctx,
       slam,
@@ -84,9 +106,26 @@ export function drawUpgradeStarSpotlight(
       STAR_Y,
       FONT_SIZE,
       isFloorMaxed(floor) ? SLAM_GOLD : COLOR.white,
+      COLOR.black,
+      5,
+      false,
+      0,
+      // stamped from sprites while it warps
+      popping || undefined,
     );
     ctx.restore();
   });
+}
+
+// the label's pop on every 10th level
+const POP = 0.6;
+const POP_MS = 700;
+const POP_RISE_MS = 40;
+const POP_DECAY_MS = 170;
+const POP_WOBBLE_MS = 230;
+const pops = new WeakMap<Floor, number>();
+export function triggerLevelPop(floor: Floor): void {
+  pops.set(floor, performance.now());
 }
 
 // an event overlay draws these floors' labels itself instead
