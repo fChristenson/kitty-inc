@@ -1,12 +1,13 @@
-// the glitter that bursts out round a crit's flash: hundreds of gold and white
-// sparks flung out from the middle, slowing and falling as they burn out,
-// drawn in one WebGL batch (see ../spriteBatch); bigger crits throw more,
-// further. Every spark is a
+// the glitter that bursts out round a crit's flash: hundreds of the wisp's
+// own twinkling sparkles (see ../wisp) flung out from the middle, slowing
+// and falling as they burn out, drawn in one WebGL batch (see
+// ../spriteBatch); bigger crits throw more, further. Every sparkle is a
 // pure function of its index and the time since the crit, so there are no
 // particle arrays to update or collect. Without WebGL2 a few dozen are
 // stamped the 2D way instead
 import { COLOR } from "../../palette";
-import { stampGlimmer, hash01 } from "../twinkle";
+import { hash01, paintTwinkleAt } from "../twinkle";
+import { drawGlitterLight } from "../wisp";
 import { runWhenIdle } from "../idle";
 import {
   createSpriteTexture,
@@ -31,15 +32,23 @@ const GRAVITY = 0.0004;
 const SIZE: [number, number] = [6, 14];
 const FALLBACK_SPARKS = 24;
 const CELL = 64;
+// the wisp's sparkle looks: its colors in turn, the share that are twinkle
+// crosses (GLINT_SIZE times their glow radius), and their flicker
+const COLORS = [COLOR.white, COLOR.wispGlitter, COLOR.heavenlyGold];
+const COLOR_TURN = [0, 1, 0, 2, 1];
+const GLINTS = 0.3;
+const GLINT_SIZE = 2.4;
+const TWINKLE_MIN = 0.2;
+const TWINKLE_MS: [number, number] = [90, 260];
 
 const lerp = ([a, b]: [number, number], t: number) => a + (b - a) * t;
 
 let startedAt: number | null = null;
 let level = 0;
 
-// sparks i, t ms after the crit, at `scale`, local to the burst's middle
+// sparkle i, t ms after the crit, at `scale`, local to the burst's middle:
+// x, y, glow radius, alpha
 const spark = new Float64Array(4);
-let sparkWhite = false;
 function sparkAt(i: number, t: number, scale: number): boolean {
   const life = lerp(LIFE, hash01(i, 4));
   if (t < 0 || t >= life) return false;
@@ -49,23 +58,40 @@ function sparkAt(i: number, t: number, scale: number): boolean {
   const k = t / life;
   spark[0] = Math.cos(a) * d;
   spark[1] = Math.sin(a) * d + GRAVITY * scale * t * t;
-  spark[2] = lerp(SIZE, hash01(i, 3)) * (1 - 0.5 * k) * Math.sqrt(scale);
+  spark[2] = lerp(SIZE, hash01(i, 3) ** 2) * (1 - 0.5 * k) * Math.sqrt(scale);
   spark[3] = 1 - k * k;
-  sparkWhite = i % 3 === 0;
   return true;
 }
 
-// a gold and a white glimmer side by side, for the batch
+// sparkle i's twinkle t ms in: dim most of the time, flaring now and then
+function twinkle(i: number, t: number): number {
+  const rate = (Math.PI * 2) / lerp(TWINKLE_MS, hash01(i, 71));
+  const wave = (0.5 + 0.5 * Math.sin(t * rate + i)) ** 4;
+  return TWINKLE_MIN + (1 - TWINKLE_MIN) * wave;
+}
+
+// the wisp's sparkles for the batch: a glowing dot per color on the top row,
+// a twinkle cross per color under it
 let sheet: SpriteTexture | null = null;
 function getSheet(): SpriteTexture | null {
   if (sheet) return sheet;
   const canvas = document.createElement("canvas");
-  canvas.width = CELL * 2;
-  canvas.height = CELL;
+  canvas.width = CELL * COLORS.length;
+  canvas.height = CELL * 2;
   const c = canvas.getContext("2d")!;
-  c.globalCompositeOperation = "lighter";
-  stampGlimmer(c, CELL / 2, CELL / 2, CELL * 0.44, 0, COLOR.heavenlyGold);
-  stampGlimmer(c, CELL * 1.5, CELL / 2, CELL * 0.44, 0, COLOR.white);
+  const half = CELL / 2;
+  COLORS.forEach((color, k) => {
+    const x = CELL * k + half;
+    const g = c.createRadialGradient(x, half, 0, x, half, half);
+    g.addColorStop(0, COLOR.white);
+    g.addColorStop(0.15, COLOR.white);
+    g.addColorStop(0.3, `${color}AA`);
+    g.addColorStop(0.6, `${color}22`);
+    g.addColorStop(1, `${color}00`);
+    c.fillStyle = g;
+    c.fillRect(CELL * k, 0, CELL, CELL);
+    paintTwinkleAt(c, x, CELL + half, half - 2, 0, color);
+  });
   sheet = createSpriteTexture(canvas);
   return sheet;
 }
@@ -135,10 +161,13 @@ function drawBatch(
     const ly = y + spark[1];
     const cx = m.a * lx + m.c * ly + m.e;
     const cy = m.b * lx + m.d * ly + m.f;
-    const s = spark[2] * px;
-    const turn = i + t * 0.004;
+    const glint = hash01(i, 72) < GLINTS;
+    const s = spark[2] * px * (glint ? GLINT_SIZE : 1);
+    // crosses sit at their own still turn, like the wisp's trail
+    const turn = hash01(i, 73) * (Math.PI / 2);
     const cos = Math.cos(turn) * s;
     const sin = Math.sin(turn) * s;
+    const col = COLOR_TURN[i % COLOR_TURN.length];
     const o = n * SPRITE_FLOATS;
     data[o] = cx;
     data[o + 1] = cy;
@@ -146,11 +175,11 @@ function drawBatch(
     data[o + 3] = sin;
     data[o + 4] = -sin;
     data[o + 5] = cos;
-    data[o + 6] = sparkWhite ? 0.5 : 0;
-    data[o + 7] = 0;
-    data[o + 8] = sparkWhite ? 1 : 0.5;
-    data[o + 9] = 1;
-    data[o + 10] = spark[3];
+    data[o + 6] = col / COLORS.length;
+    data[o + 7] = glint ? 0.5 : 0;
+    data[o + 8] = (col + 1) / COLORS.length;
+    data[o + 9] = glint ? 1 : 0.5;
+    data[o + 10] = spark[3] * twinkle(i, t);
     n++;
     const reach = s * 1.42;
     if (cx - reach < left) left = cx - reach;
@@ -172,15 +201,6 @@ function drawFallback(
 ): void {
   for (let i = 0; i < FALLBACK_SPARKS; i++) {
     if (!sparkAt(i, t, scale)) continue;
-    ctx.globalAlpha = spark[3];
-    stampGlimmer(
-      ctx,
-      x + spark[0],
-      y + spark[1],
-      spark[2],
-      i + t * 0.004,
-      sparkWhite ? COLOR.white : COLOR.heavenlyGold,
-    );
+    drawGlitterLight(ctx, x + spark[0], y + spark[1], spark[2], i, spark[3], t);
   }
-  ctx.globalAlpha = 1;
 }

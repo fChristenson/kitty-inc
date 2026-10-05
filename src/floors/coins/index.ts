@@ -394,6 +394,44 @@ function recycleCoin(p: Particle): void {
   if (spareCoins.length < MAX_PARTICLES) spareCoins.push(p);
 }
 
+// the flow's heartbeat: while bursts keep coming (a held upgrade button), the
+// flow throbs on a steady lub-dub, a strong beat then a weaker one, each
+// throwing a slug of bigger, heavier coins further that drops hard
+const BEAT_MS = 700;
+const LUB_MS = 260;
+const DUB_AT = 220;
+const DUB_MS = 200;
+const LUB = 1.1;
+const DUB = 0.6;
+// share of a beat spent swelling up; the rest it tails off
+const BEAT_RISE = 0.2;
+const BEAT_SIZE = 0.35;
+const BEAT_GRAVITY = 0.7;
+const BEAT_LIFE = 0.5;
+// a burst this long after the last starts a fresh run of beats
+const RUN_GAP_MS = 250;
+let runStartedAt = -Infinity;
+let lastBurstAt = -Infinity;
+// set by burstPressure: how much faster and fuller the bursts come, and how
+// heavy (0..1) their coins are
+let pressure = 1;
+let weight = 0;
+function beatSwell(since: number, ms: number): number {
+  const t = since / ms;
+  if (t < 0 || t >= 1) return 0;
+  return t < BEAT_RISE ? t / BEAT_RISE : (1 - t) / (1 - BEAT_RISE);
+}
+function burstPressure(now: number): void {
+  if (now - lastBurstAt > RUN_GAP_MS) runStartedAt = now;
+  lastBurstAt = now;
+  // a lone tap lands on the run's start, where the beat is still at rest
+  const beat = (now - runStartedAt) % BEAT_MS;
+  const lub = beatSwell(beat, LUB_MS);
+  const dub = beatSwell(beat - DUB_AT, DUB_MS);
+  pressure = 1 + LUB * lub + DUB * dub;
+  weight = Math.max(lub, dub * 0.4);
+}
+
 function spawnBurstParticles(
   floor: Floor,
   x: number,
@@ -401,13 +439,25 @@ function spawnBurstParticles(
   scale: number,
   freezeGroup: HomingGroup | null,
 ): void {
-  const count = burstCount(40, 85);
+  if (freezeGroup) {
+    pressure = 1;
+    weight = 0;
+  } else burstPressure(performance.now());
+  const count = burstCount(
+    Math.round(40 * pressure),
+    Math.round(85 * pressure),
+  );
   for (let i = 0; i < count; i++) {
     // upward/outward hemisphere only (not fully random) so coins pop up and out
-    // first, then arc back down under gravity instead of scattering downward too
-    const angle = -Math.random() * Math.PI;
+    // first, then arc back down under gravity instead of scattering downward
+    // too; a heavy beat throws them more steeply up
+    const angle =
+      -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * (1 - 0.35 * weight);
     const speed =
-      (3 + Math.random() * 16) * scale * (freezeGroup ? FREEZE_SPEED_BOOST : 1);
+      (3 + Math.random() * 16) *
+      scale *
+      pressure *
+      (freezeGroup ? FREEZE_SPEED_BOOST : 1);
     const spread = freezeGroup ? FREEZE_SPAWN_SPREAD_PX : 20 * scale;
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
@@ -418,13 +468,21 @@ function spawnBurstParticles(
     p.vx = Math.cos(angle) * speed;
     p.vy = Math.sin(angle) * speed;
     p.life = 0;
-    p.maxLife = freezeGroup ? Infinity : 45 + Math.random() * 75;
-    p.size = (22 + Math.random() * 46) * scale * 1.15 * 1.25;
+    p.maxLife = freezeGroup
+      ? Infinity
+      : (45 + Math.random() * 75) * (1 + BEAT_LIFE * weight);
+    p.size =
+      (22 + Math.random() * 46) *
+      scale *
+      1.15 *
+      1.25 *
+      (1 + BEAT_SIZE * weight);
     // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
     // full fall speed more gradually
     p.gravity =
       Math.max(0, 0.2 + Math.random() * 0.35 - (kind === "bill" ? 0.2 : 0)) *
-      scale;
+      scale *
+      (1 + BEAT_GRAVITY * weight);
     p.gravityRamp = (kind === "bill" ? 0.05 : 0.08) * scale;
     p.kind = kind;
     p.spinFrame =
