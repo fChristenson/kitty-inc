@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-galton-board-event" class="game__button">Galton Board</button>
-          <button id="test-poohsticks-event" class="game__button">Poohsticks</button>
-          <button id="test-fire-for-effect-event" class="game__button">Fire for Effect</button>
-          <button id="test-eyewall-event" class="game__button">Eyewall</button>
-          <button id="test-josephus-event" class="game__button">Josephus</button>
+          <button id="test-podium-event" class="game__button">Podium</button>
+          <button id="test-robovac-event" class="game__button">Robovac</button>
+          <button id="test-figure-eight-event" class="game__button">Figure Eight</button>
+          <button id="test-bonanza-event" class="game__button">Bonanza</button>
+          <button id="test-pi-clacks-event" class="game__button">Pi Clacks</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-galton-board-event" class="game__button">Galton Board</button>
+          <button id="test-poohsticks-event" class="game__button">Poohsticks</button>
+          <button id="test-fire-for-effect-event" class="game__button">Fire for Effect</button>
+          <button id="test-eyewall-event" class="game__button">Eyewall</button>
+          <button id="test-josephus-event" class="game__button">Josephus</button>
           <button id="test-fuse-maze-event" class="game__button">Fuse Maze</button>
           <button id="test-bar-billiards-event" class="game__button">Bar Billiards</button>
           <button id="test-levy-flight-event" class="game__button">Lévy Flight</button>

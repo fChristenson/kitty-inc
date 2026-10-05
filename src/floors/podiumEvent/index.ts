@@ -14,7 +14,12 @@ import {
   playSwoosh,
 } from "../../sound";
 import { shakeScreen } from "../../screenShake";
-import { drawWisp, drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
+import {
+  drawWisp,
+  drawWispBetween,
+  WISP_SIZE,
+  type Point,
+} from "../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../wispCover";
 import { clamp01, easeIn, lerp } from "../../shared/easing";
 import { createBeats } from "../../shared/eventBeats";
@@ -183,8 +188,25 @@ export const forcePodiumEvent = registerWispEvent(
                 now,
               );
           }
-          drawWispBetween(ctx, corkAt, ms, now, CORK, 0.8, popAt, popAt + CORK_MS);
-          if (ms < endAt) drawWisp(ctx, bottleAt, ms, now, BOTTLE, ms < popAt ? clamp01(ms / shakeMs) : 1);
+          drawWispBetween(
+            ctx,
+            corkAt,
+            ms,
+            now,
+            CORK,
+            0.8,
+            popAt,
+            popAt + CORK_MS,
+          );
+          if (ms < endAt)
+            drawWisp(
+              ctx,
+              bottleAt,
+              ms,
+              now,
+              BOTTLE,
+              ms < popAt ? clamp01(ms / shakeMs) : 1,
+            );
         },
       },
     );

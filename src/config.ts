@@ -8343,6 +8343,54 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 64
+  // spray, levels: src/floors/podiumEvent: a bottle wisp is shaken up, pops its cork and whips a spray up the bars like champagne
+  podiumEvent: {
+    chance: 0.01,
+    shakeMs: 450, // the bottle being shaken up
+    legMs: 260, // the spray raking each bar
+    levelShare: 0.02, // levels per bar soaked
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // clutter, a free floor: src/floors/robovacEvent: a gravity hole spirals and bumps round like a robot vacuum, eating glitter, then docks in the lock
+  robovacEvent: {
+    chance: 0.01,
+    dumpMs: 400, // the glitter raining down
+    spiralMs: 650, // the spiral out round the button
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // race, free hires: src/floors/figureEightEvent: two racers lap a figure eight round the button and a far bar, then dive onto empty spots
+  figureEightEvent: {
+    chance: 0.01,
+    raceMs: 1700, // the leader's lap and dive
+    gapMs: 120, // the chaser's gap behind
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // drill, cash: src/floors/bonanzaEvent: a drill grinds down through a heap of cash, coins geysering out, then it surges into the total
+  bonanzaEvent: {
+    chance: 0.01,
+    pileMs: 380, // the heap pouring down
+    approachMs: 220, // the drill's dive onto the peak
+    stallMs: 450, // stalled grinding on the bite
+    boreMs: 1200, // boring down shove by shove
+    drainMs: 300, // the heap lifting off
+    liftMs: 320, // each coin's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, a crit tier: src/floors/piClacksEvent: a heavy wisp drives a light one into a wall, 31 clacks counting out pi
+  piClacksEvent: {
+    chance: 0.01,
+    growMs: 300, // the wall snapping up and the big wisp rolling in
+    clackMs: 1400, // from the first roll to the last clack
+    rollMs: 200, // the big wisp rolling off
+    slamMs: 300, // its leap back down onto the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 63
   // money, cash: src/floors/galtonBoardEvent: a jet of cash pours down through a triangle of pegs into a bell curve of heaps, which surge into the total
   galtonBoardEvent: {
