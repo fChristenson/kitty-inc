@@ -8343,6 +8343,55 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 59
+  // wisp, free hires: src/floors/pursuitEvent: wisps on a polygon's corners chase each other in along pursuit spirals, then burst onto the empty spots
+  pursuitEvent: {
+    chance: 0.01,
+    chaseMs: 1500, // closing in till they meet
+    flyMs: 340, // each flight onto its spot
+    holdMs: 400,
+    mergeMs: 0,
+  },
+  // explosion, levels: src/floors/fractalChargeEvent: bombs split down Sierpinski's triangle, 1, 3, 9, 27
+  fractalChargeEvent: {
+    chance: 0.01,
+    lobMs: 420, // the first bomb lobbed into the middle
+    flyMs: [300, 250, 220] as number[], // each later generation's throw
+    fuseMs: [320, 220, 170, 150] as number[], // each generation's fuse once landed
+    levelShare: 0.03, // levels per generation on each bar it reaches
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // clutter, a free floor: src/floors/snowplowEvent: two plough wisps clear snowed glitter lane by lane into a ridge, then heap it onto the lock
+  snowplowEvent: {
+    chance: 0.01,
+    snowMs: 450, // the glitter snowing down
+    passMs: [230, 140] as [number, number], // each lane's pass, quickening
+    liftMs: 80, // each lift back out to the next lane
+    ridgeMs: 380, // ploughing the ridge onto the lock
+    gatherMs: 220, // the heap settling
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, levels: src/floors/franklinsKiteEvent: lightning strikes a kite, the charge runs down to the key, which sparks onto the bars
+  franklinsKiteEvent: {
+    chance: 0.01,
+    riseMs: 450, // the kite soaring up
+    gapMs: [420, 260] as [number, number], // between strikes, quickening
+    levelShare: 0.04, // levels per spark
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/sokobanEvent: a keeper wisp plays a Sokoban puzzle, shoving heaps of cash onto targets
+  sokobanEvent: {
+    chance: 0.01,
+    dropMs: 350, // the heaps dropping in
+    stepMs: [95, 50] as [number, number], // each of the keeper's 23 steps, quickening
+    burstMs: 250, // the targets blazing before the heaps burst
+    riseMs: 400, // each coin's rise into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 58
   // money, cash: src/floors/billowsEvent: two shearing currents of cash roll up into curling billows that peel off into the total
   billowsEvent: {

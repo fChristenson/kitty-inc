@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-billows-event" class="game__button">Billows</button>
-          <button id="test-moire-event" class="game__button">Moiré</button>
-          <button id="test-pole-position-event" class="game__button">Pole Position</button>
-          <button id="test-countersink-event" class="game__button">Countersink</button>
-          <button id="test-busy-beaver-event" class="game__button">Busy Beaver</button>
+          <button id="test-pursuit-event" class="game__button">Pursuit</button>
+          <button id="test-fractal-charge-event" class="game__button">Fractal Charge</button>
+          <button id="test-snowplow-event" class="game__button">Snowplow</button>
+          <button id="test-franklins-kite-event" class="game__button">Franklin's Kite</button>
+          <button id="test-sokoban-event" class="game__button">Sokoban</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-billows-event" class="game__button">Billows</button>
+          <button id="test-moire-event" class="game__button">Moiré</button>
+          <button id="test-pole-position-event" class="game__button">Pole Position</button>
+          <button id="test-countersink-event" class="game__button">Countersink</button>
+          <button id="test-busy-beaver-event" class="game__button">Busy Beaver</button>
           <button id="test-seed-pods-event" class="game__button">Seed Pods</button>
           <button id="test-ripple-fire-event" class="game__button">Ripple Fire</button>
           <button id="test-spark-chamber-event" class="game__button">Spark Chamber</button>
