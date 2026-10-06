@@ -95,9 +95,9 @@ export const CONFIG = {
 
   // src/floors/eventProcs — what a regular crit's special slot carries (once
   // its gateway hits), picked by weight: a badge crit (the featured and other
-  // special crits in src/critBalance), an animated crit (the *Event blocks
-  // below) or a bullet hell crit. Each event type has its own pool: none of
-  // that type can land again until cooldownMs after one has fully played out
+  // special crits in src/critBalance) or an animated crit (the *Event blocks
+  // below). Each event type has its own pool: none of that type can land
+  // again until cooldownMs after one has fully played out
   specialCrits: {
     badgeCrit: {
       weight: 1,
@@ -105,153 +105,6 @@ export const CONFIG = {
     animatedCrit: {
       weight: 1,
       cooldownMs: 30_000,
-    },
-    bulletHellCrit: {
-      weight: 1,
-      cooldownMs: 60_000,
-      // src/floors/bulletHellGame — wisps fly round the frozen screen and
-      // holding the upgrade button fires shots at them; each one hit blows
-      // into cash for the total. Each game pairs a way the wisps move with a
-      // kind of shot (field docs in bulletHellGame/types.ts)
-      games: {
-        // rapid straight shots at wisps looping all over the screen
-        gatling: {
-          label: "Gatling",
-          chance: 0.02,
-          playMs: 9000,
-          mergeMs: 600,
-          hitReward: 0.4,
-          wisps: {
-            move: "loop",
-            laps: [0.18, 0.4] as [number, number],
-            speedUp: 1.8,
-            max: 7,
-            group: 1,
-            spawnMs: [700, 260] as [number, number],
-            size: 1.1,
-            split: 0,
-          },
-          shots: {
-            kind: "straight",
-            fireMs: 90,
-            speed: 2.6,
-            size: 0.45,
-            jitter: 0.06,
-          },
-        },
-        // homing missiles peel off both ways and curve onto darting wisps
-        seekers: {
-          label: "Seekers",
-          chance: 0.02,
-          playMs: 9000,
-          mergeMs: 600,
-          hitReward: 0.5,
-          wisps: {
-            move: "dart",
-            hopMs: [250, 700] as [number, number],
-            reach: [200, 600] as [number, number],
-            snapMs: 260,
-            max: 6,
-            group: 1,
-            spawnMs: [800, 380] as [number, number],
-            size: 1,
-            split: 0,
-          },
-          shots: {
-            kind: "homing",
-            fireMs: 190,
-            speed: [0.5, 2.4] as [number, number],
-            accelMs: 450,
-            turn: 0.009,
-            lifeMs: 2200,
-            size: 0.55,
-          },
-        },
-        // lobbed bombs burst into chains of bomblets through swarming flocks
-        carpetBomb: {
-          label: "Carpet Bomb",
-          chance: 0.02,
-          playMs: 9000,
-          mergeMs: 600,
-          hitReward: 0.15,
-          wisps: {
-            move: "flock",
-            leaderLaps: [0.08, 0.2] as [number, number],
-            swarmRadius: [50, 240] as [number, number],
-            swirlHz: 0.45,
-            snapMs: 380,
-            max: 24,
-            group: 8,
-            spawnMs: [1500, 800] as [number, number],
-            size: 0.75,
-            split: 0,
-          },
-          shots: {
-            kind: "cluster",
-            fireMs: 550,
-            fuseMs: 650,
-            lift: 320,
-            size: 1.6,
-            blast: 140,
-            bomblets: 12,
-            bombletSpeed: 1.1,
-            bombletFuseMs: [260, 440] as [number, number],
-            bombletBlast: 75,
-          },
-        },
-        // shots bank off the screen's edges, piercing wisps circling on rings
-        ricochet: {
-          label: "Ricochet",
-          chance: 0.02,
-          playMs: 9000,
-          mergeMs: 600,
-          hitReward: 0.3,
-          wisps: {
-            move: "orbit",
-            rings: [0.3, 0.58, 0.85],
-            squash: 0.8,
-            lapsHz: [0.12, 0.28] as [number, number],
-            max: 12,
-            group: 1,
-            spawnMs: [500, 220] as [number, number],
-            size: 0.9,
-            split: 0,
-          },
-          shots: {
-            kind: "bounce",
-            fireMs: 150,
-            speed: 2.1,
-            size: 0.5,
-            bounces: 5,
-            pierce: 2,
-          },
-        },
-        // shotgun fans at big drifting wisps that split smaller and faster
-        splitters: {
-          label: "Splitters",
-          chance: 0.02,
-          playMs: 9000,
-          mergeMs: 600,
-          hitReward: 0.25,
-          wisps: {
-            move: "drift",
-            speed: [0.22, 0.4] as [number, number],
-            max: 6,
-            group: 1,
-            spawnMs: [1300, 800] as [number, number],
-            size: 2,
-            split: 2,
-          },
-          shots: {
-            kind: "spread",
-            fireMs: 260,
-            speed: 2.2,
-            size: 0.45,
-            pellets: 5,
-            fan: 0.55,
-          },
-        },
-      },
     },
   },
 

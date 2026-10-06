@@ -78,6 +78,8 @@ export interface MoneyCover {
   // coins blasted out of `from` to targets that fly straight on into the
   // total, without waiting for the merge
   cashOut(from: Point, targets: Point[]): void;
+  // ends the cover ms from now instead of at its durationMs
+  finishIn(ms: number): void;
   isLive(): boolean;
 }
 
@@ -242,7 +244,7 @@ export function startMoneyCover(
   };
   const button = getButtonCenter(context.isGroundFloor);
 
-  setTimeout(() => {
+  const finish = () => {
     if (running !== cover) return;
     running = null;
     onEnd?.();
@@ -263,7 +265,8 @@ export function startMoneyCover(
       );
     } else context.applyTierCrit?.(floor, tier);
     endEventProc(key);
-  }, durationMs);
+  };
+  let endTimer = setTimeout(finish, durationMs);
 
   const launch = (targets: Point[]) =>
     spawnSprayCoins(floor, button.x, button.y, targets, arrival);
@@ -310,6 +313,10 @@ export function startMoneyCover(
         ...arrival,
         releaseAt: 0,
       }),
+    finishIn: (ms) => {
+      clearTimeout(endTimer);
+      endTimer = setTimeout(finish, ms);
+    },
     isLive,
   };
 }

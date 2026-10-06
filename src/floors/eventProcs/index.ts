@@ -80,10 +80,10 @@ type FloorEventPool = EventProcPool<Floor, EventProcContext>;
 // weight in CONFIG.specialCrits. A badge crit (featured or other special crit)
 // rolls in shared/critTypes' rollCrit; each event crit type is a pool of
 // events here, with its own cooldown
-export type EventCritType = "animatedCrit" | "bulletHellCrit";
+export type EventCritType = "animatedCrit";
 export type SpecialCritType = "badgeCrit" | EventCritType;
 
-const EVENT_CRIT_TYPES: EventCritType[] = ["animatedCrit", "bulletHellCrit"];
+const EVENT_CRIT_TYPES: EventCritType[] = ["animatedCrit"];
 const SPECIAL_CRIT_TYPES: SpecialCritType[] = [
   "badgeCrit",
   ...EVENT_CRIT_TYPES,

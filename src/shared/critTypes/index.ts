@@ -2101,7 +2101,7 @@ export function rollCrit(
   // reacting to what landed can walk it instead of all of CRIT_PROC_KINDS
   onLanded: (result: CritRollResult, landedProcs: CritProcKind[]) => void,
   allowSpecialProcs = true,
-  // an event crit type (animatedCrit or bulletHellCrit, floors/eventProcs)
+  // an event crit type (animatedCrit, floors/eventProcs)
   // taking the gateway's slot, true when it did — then no badge crit rolls at
   // all, so only one or the other lands
   claimSpecialSlot?: () => boolean,

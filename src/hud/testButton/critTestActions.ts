@@ -44,16 +44,6 @@ export function createTestButtonMarkup(): string {
       <input type="search" id="test-actions-filter" class="test-actions-filter" placeholder="Filter actions" autocomplete="off" />
       <p class="test-actions-empty" id="test-actions-empty" hidden>No matches</p>
       <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Bullet Hell</summary>
-        <div class="test-actions-dropdown__menu">
-          <button id="test-bullet-hell-gatling-event" class="game__button">Gatling</button>
-          <button id="test-bullet-hell-seekers-event" class="game__button">Seekers</button>
-          <button id="test-bullet-hell-carpet-bomb-event" class="game__button">Carpet Bomb</button>
-          <button id="test-bullet-hell-ricochet-event" class="game__button">Ricochet</button>
-          <button id="test-bullet-hell-splitters-event" class="game__button">Splitters</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
           <button id="test-pincushion-event" class="game__button">Pincushion</button>

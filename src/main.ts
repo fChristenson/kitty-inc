@@ -2154,21 +2154,6 @@ async function main() {
       plugholes: forceOnActive((e) => e.forcePlugholesEvent),
       "apollonian-gasket": forceOnActive((e) => e.forceApollonianGasketEvent),
       "drone-show": forceOnActive((e) => e.forceDroneShowEvent),
-      "bullet-hell-gatling": forceOnActive(
-        (e) => (floor) => e.forceBulletHellGame("gatling", floor),
-      ),
-      "bullet-hell-seekers": forceOnActive(
-        (e) => (floor) => e.forceBulletHellGame("seekers", floor),
-      ),
-      "bullet-hell-carpet-bomb": forceOnActive(
-        (e) => (floor) => e.forceBulletHellGame("carpetBomb", floor),
-      ),
-      "bullet-hell-ricochet": forceOnActive(
-        (e) => (floor) => e.forceBulletHellGame("ricochet", floor),
-      ),
-      "bullet-hell-splitters": forceOnActive(
-        (e) => (floor) => e.forceBulletHellGame("splitters", floor),
-      ),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

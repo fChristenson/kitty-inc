@@ -22,6 +22,11 @@ import {
 } from "../moneyCover";
 import { lerp, clamp01, between } from "../../shared/easing";
 import { ringTargets } from "../../shared/coinTargets";
+import {
+  drawClawTears,
+  tearSpine as spine,
+  type ClawTear,
+} from "../../shared/clawTear";
 
 const KEY = "scratch";
 const REWARD = 4;
@@ -63,12 +68,7 @@ const SPARK_SIZE = 22;
 const TEAR_BURST = 0.18;
 const TEAR_BURST_MS = 260;
 
-
-interface Tear {
-  from: Point;
-  to: Point;
-  // the bow's sideways push at its middle
-  bow: Point;
+interface Tear extends ClawTear {
   at: number;
   rakeMs: number;
 }
@@ -78,45 +78,6 @@ interface Swipe {
   end: Point;
   tears: Tear[];
   firedAt: number | null;
-}
-
-// a tear's spine point share u along it
-function spine(tear: Tear, u: number): Point {
-  const lift = 4 * u * (1 - u);
-  return {
-    x: tear.from.x + (tear.to.x - tear.from.x) * u + tear.bow.x * lift,
-    y: tear.from.y + (tear.to.y - tear.from.y) * u + tear.bow.y * lift,
-  };
-}
-
-// a tapered tear from its start to `reach` along it, `width` at its thickest
-function traceTear(
-  ctx: CanvasRenderingContext2D,
-  tear: Tear,
-  reach: number,
-  width: number,
-  jitter: Point,
-): void {
-  const steps = 10;
-  const dx = tear.to.x - tear.from.x;
-  const dy = tear.to.y - tear.from.y;
-  const length = Math.hypot(dx, dy) || 1;
-  const nx = -dy / length;
-  const ny = dx / length;
-  const left: Point[] = [];
-  const right: Point[] = [];
-  for (let i = 0; i <= steps; i++) {
-    const u = (i / steps) * reach;
-    const p = spine(tear, u);
-    // pointed at both ends, thickest a third of the way in
-    const w = (width / 2) * Math.sin(Math.PI * Math.min(1, u ** 0.8));
-    left.push({ x: p.x + nx * w + jitter.x, y: p.y + ny * w + jitter.y });
-    right.push({ x: p.x - nx * w + jitter.x, y: p.y - ny * w + jitter.y });
-  }
-  ctx.moveTo(left[0].x, left[0].y);
-  for (const p of left) ctx.lineTo(p.x, p.y);
-  for (let i = right.length - 1; i >= 0; i--) ctx.lineTo(right[i].x, right[i].y);
-  ctx.closePath();
 }
 
 registerEventProc(
@@ -155,8 +116,14 @@ registerEventProc(
           const reach = length * (c === 1 ? 1 : 0.85);
           const base = { x: mid.x + across.x * off, y: mid.y + across.y * off };
           return {
-            from: { x: base.x - (dir.x * reach) / 2, y: base.y - (dir.y * reach) / 2 },
-            to: { x: base.x + (dir.x * reach) / 2, y: base.y + (dir.y * reach) / 2 },
+            from: {
+              x: base.x - (dir.x * reach) / 2,
+              y: base.y - (dir.y * reach) / 2,
+            },
+            to: {
+              x: base.x + (dir.x * reach) / 2,
+              y: base.y + (dir.y * reach) / 2,
+            },
             bow: {
               x: across.x * bowSide * reach * BOW,
               y: across.y * bowSide * reach * BOW,
@@ -180,38 +147,23 @@ registerEventProc(
       const drawTears = (ctx: CanvasRenderingContext2D, ms: number) => {
         const charge = clamp01((ms - chargeFrom) / chargeMs);
         const shake = TREMBLE * charge;
-        const glow = (draw: (tear: Tear, reach: number, alpha: number) => void) => {
-          for (const tear of tears) {
-            const reach = clamp01((ms - tear.at) / tear.rakeMs);
-            if (reach <= 0) continue;
-            const flash = Math.max(0, 1 - (ms - tear.at - tear.rakeMs) / FLASH_MS);
-            draw(tear, reach, Math.max(EMBER + (1 - EMBER) * charge, Math.min(1, flash)));
-          }
-        };
-        ctx.save();
-        ctx.globalCompositeOperation = "lighter";
-        ctx.fillStyle = COLOR.heavenlyGold;
-        glow((tear, reach, alpha) => {
-          ctx.globalAlpha = 0.45 * alpha;
-          ctx.beginPath();
-          traceTear(ctx, tear, reach, WIDTH * GLOW * (1 + 0.5 * charge), {
-            x: Math.sin(ms * 1.3 + tear.at) * shake,
-            y: Math.sin(ms * 1.7 + tear.at) * shake,
-          });
-          ctx.fill();
+        drawClawTears(ctx, tears, WIDTH, (tear, look) => {
+          const reach = clamp01((ms - tear.at) / tear.rakeMs);
+          if (reach <= 0) return false;
+          const flash = Math.max(
+            0,
+            1 - (ms - tear.at - tear.rakeMs) / FLASH_MS,
+          );
+          look.reach = reach;
+          look.alpha = Math.max(
+            EMBER + (1 - EMBER) * charge,
+            Math.min(1, flash),
+          );
+          look.glow = GLOW * (1 + 0.5 * charge);
+          look.jitter.x = Math.sin(ms * 1.3 + tear.at) * shake;
+          look.jitter.y = Math.sin(ms * 1.7 + tear.at) * shake;
+          return true;
         });
-        ctx.globalCompositeOperation = "source-over";
-        ctx.fillStyle = COLOR.white;
-        glow((tear, reach, alpha) => {
-          ctx.globalAlpha = alpha;
-          ctx.beginPath();
-          traceTear(ctx, tear, reach, WIDTH, {
-            x: Math.sin(ms * 1.3 + tear.at) * shake,
-            y: Math.sin(ms * 1.7 + tear.at) * shake,
-          });
-          ctx.fill();
-        });
-        ctx.restore();
       };
 
       const cover = startMoneyCover(
@@ -227,9 +179,14 @@ registerEventProc(
             const now = performance.now();
             const ms = now - startedAt;
             swipes.forEach((swipe, k) => {
-              if (swipe.firedAt === null && ms >= swipe.at) swiped(swipe, k, now);
+              if (swipe.firedAt === null && ms >= swipe.at)
+                swiped(swipe, k, now);
             });
-            if (ms >= chargeFrom && ms < blastAt && now - lastRumble >= RUMBLE_MS) {
+            if (
+              ms >= chargeFrom &&
+              ms < blastAt &&
+              now - lastRumble >= RUMBLE_MS
+            ) {
               lastRumble = now;
               shakeScreen(lerp(RUMBLE, (ms - chargeFrom) / chargeMs));
             }
@@ -245,7 +202,13 @@ registerEventProc(
             if (blastedAt !== null) {
               for (const tear of tears) {
                 const mid = spine(tear, 0.5);
-                drawWhiteBurst(ctx, mid.x, mid.y, (now - blastedAt) / TEAR_BURST_MS, TEAR_BURST);
+                drawWhiteBurst(
+                  ctx,
+                  mid.x,
+                  mid.y,
+                  (now - blastedAt) / TEAR_BURST_MS,
+                  TEAR_BURST,
+                );
               }
               drawExplosion(
                 ctx,
@@ -284,14 +247,14 @@ registerEventProc(
             const angle = Math.random() * Math.PI * 2;
             const r = between(SPRAY);
             cover.launchFrom(from, [
-              { x: from.x + Math.cos(angle) * r, y: from.y + Math.sin(angle) * r },
+              {
+                x: from.x + Math.cos(angle) * r,
+                y: from.y + Math.sin(angle) * r,
+              },
             ]);
           }
         }
-        cover.launchFrom(
-          center,
-          ringTargets(center, FINAL_COINS, FINAL_RING),
-        );
+        cover.launchFrom(center, ringTargets(center, FINAL_COINS, FINAL_RING));
       }
     },
   },
