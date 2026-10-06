@@ -26,7 +26,7 @@ export const GOTH_GIRLS_BALANCE = {
   septumSirenGrowth: 0.079,
   skullBarretteChance: 0.00173284747,
   skullBarretteUpgrades: 148,
-  studdedVestFlexChance: 0.00171027072,
+  studdedVestFlexChance: 0.00171027073,
   studdedVestFlexMultiple: 138,
   tealStreakBobChance: 0.0019046048,
   tealStreakBobGrowth: 0.181,

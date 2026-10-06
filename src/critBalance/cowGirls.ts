@@ -30,7 +30,7 @@ export const COW_GIRLS_BALANCE = {
   hornOfPlentyChance: 0.0101726677,
   lassoLootChance: 0.012393712,
   lassoLootContinueChance: 0.12,
-  milkmaidMarginChance: 0.0122192262,
+  milkmaidMarginChance: 0.0122192263,
   milkmaidMarginTierSteps: 1,
   milkmaidMarginUpgrades: 9,
   mooMentumChance: 0.0110167425,

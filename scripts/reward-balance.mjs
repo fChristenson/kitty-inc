@@ -193,7 +193,7 @@ async function main() {
         source: "featured",
         kind,
         label: def.label,
-        chance: c[`${kind}Chance`] ?? 0,
+        chance: crit.getCritProcChance(kind),
         effects,
         modelled: effects.length > 0,
       };

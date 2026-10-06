@@ -34,7 +34,7 @@ export const RUNES_BALANCE = {
   runeCloakReserveShare: 0.263,
   runeRingReturnsChance: 0.00170119212,
   runeRingReturnsShare: 0.264,
-  runeStoneRichesChance: 0.00581025101,
+  runeStoneRichesChance: 0.00581025102,
   runeStoneRichesPayouts: 83,
   shieldWallStreetChance: 0.00169842098,
   shieldWallStreetShare: 0.265,

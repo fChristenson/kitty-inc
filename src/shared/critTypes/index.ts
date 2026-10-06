@@ -24,6 +24,7 @@ import {
   FEATURED_CRIT_KINDS,
   getFeaturedRewards,
   isFeaturedCritKind,
+  rollFeaturedCategory,
   type FeaturedCritKind,
 } from "./featuredProcs";
 
@@ -1387,7 +1388,7 @@ export interface CritProcDisplayInfo {
 
 // A proc's collection modifier is inverse to its configured roll chance:
 // rarer crits grant a larger income bonus per collection milestone. Milestones
-// are powers of ten (1, 10, 100, ...), not every tenth collection.
+// are powers of ten (1, 10, 100, ...), not every tenth collection
 export function getCritProcChance(kind: CritProcKind): number {
   const chanceKey = `${kind}Chance` as keyof typeof CONFIG.crit;
   const chance = CONFIG.crit[chanceKey];
@@ -2040,8 +2041,8 @@ export function pickCritTierByOdds(): CritTier {
   return CRIT_TIER_ORDER[CRIT_TIER_ORDER.length - 1];
 }
 
-// every proc bucketed by its exact chance, so rollLandedProcs can jump
-// straight from one landed proc to the next inside a bucket
+// every non-featured proc bucketed by its exact chance, so rollLandedProcs can
+// jump straight from one landed proc to the next inside a bucket
 const PROC_CHANCE_GROUPS = (() => {
   const byChance = new Map<number, CritProcKind[]>();
   for (const kind of new Set(CRIT_PROC_KINDS)) {
@@ -2049,7 +2050,7 @@ const PROC_CHANCE_GROUPS = (() => {
     if (!(chance >= 0 && chance <= 1)) {
       throw new Error(`CONFIG.crit.${kind}Chance must be in [0, 1]: ${chance}`);
     }
-    if (chance === 0) continue;
+    if (chance === 0 || isFeaturedCritKind(kind)) continue;
     const kinds = byChance.get(chance);
     if (kinds) kinds.push(kind);
     else byChance.set(chance, [kind]);
@@ -2067,20 +2068,20 @@ function landedGap(logMiss: number): number {
 }
 
 // every proc that lands this roll, each independently against its own chance
-// — same distribution as rolling all of CRIT_PROC_KINDS one by one, but costs
-// O(distinct chances + landed) instead of O(all procs)
+// (O(distinct chances + landed), not O(all procs)); featured crits roll only
+// in one category picked at random, so every category is seen as often
 export function rollLandedProcs(): CritProcKind[] {
   const landed: CritProcKind[] = [];
-  const featuredReady = getFeaturedRewards() !== null;
   for (const { logMiss, kinds } of PROC_CHANCE_GROUPS) {
     for (
       let i = landedGap(logMiss);
       i < kinds.length;
       i += 1 + landedGap(logMiss)
-    ) {
-      if (featuredReady || !isFeaturedCritKind(kinds[i])) landed.push(kinds[i]);
-    }
+    )
+      landed.push(kinds[i]);
   }
+  if (getFeaturedRewards() !== null)
+    landed.push(...rollFeaturedCategory(critRandom));
   return landed;
 }
 

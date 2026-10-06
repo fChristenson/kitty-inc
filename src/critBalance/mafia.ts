@@ -9,7 +9,7 @@ export const MAFIA_BALANCE = {
   briefcaseBonusDiscount: 0.048,
   violinCaseCaperChance: 0.00775836282,
   violinCaseCaperPayouts: 59,
-  technicolorTakeChance: 0.00288726114,
+  technicolorTakeChance: 0.00288726115,
   technicolorTakePayouts: 46,
   stringsAttachedChance: 0.00660439106,
   stringsAttachedUpgrades: 52,

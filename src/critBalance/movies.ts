@@ -21,6 +21,6 @@ export const MOVIES_BALANCE = {
   theGreatCatsbyTierSteps: 1,
   theGreatCatsbyUpgrades: 30,
   theLordOfTheRingBindersChance: 0.0116380917,
-  wreckItChance: 0.00280713822,
+  wreckItChance: 0.00280713823,
   wreckItUpgrades: 93,
 } as const;

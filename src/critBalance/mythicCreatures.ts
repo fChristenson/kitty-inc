@@ -84,7 +84,7 @@ export const MYTHIC_CREATURES_BALANCE = {
   treantContinueChance: 0.6,
   unicornChance: 0.00945216023,
   unicornPayouts: 36,
-  velvetManticore2Chance: 0.00815899422,
+  velvetManticore2Chance: 0.00815899423,
   velvetManticore2TierSteps: 2,
   velvetManticore2Upgrades: 22,
   velvetManticore3Chance: 0.0016155,

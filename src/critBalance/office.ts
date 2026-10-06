@@ -13,7 +13,7 @@ export const OFFICE_BALANCE = {
   casualMondayChance: 0.0124430404,
   deskJockeyChance: 0.0128809192,
   deskJockeyUpgrades: 6,
-  inboxZeroGravityChance: 0.00763132084,
+  inboxZeroGravityChance: 0.00763132085,
   inboxZeroGravityPayouts: 12,
   beanCounterChance: 0.0127820538,
   beanCounterTierSteps: 1,

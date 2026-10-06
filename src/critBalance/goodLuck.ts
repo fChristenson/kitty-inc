@@ -4,7 +4,7 @@ export const GOOD_LUCK_BALANCE = {
   bubbleEconomyPayouts: 7,
   cloudNineToFiveChance: 0.0126780161,
   cloudNineToFiveFloors: 1,
-  luckyLaundromatChance: 0.0082241743,
+  luckyLaundromatChance: 0.00822417431,
   luckyLaundromatUpgrades: 5,
   luckyLaundromatPayouts: 5,
   moneyMagnetChance: 0.0112976594,

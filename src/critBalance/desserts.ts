@@ -1,6 +1,6 @@
 // odds and reward sizes for featured/desserts.ts's crits, spread into CONFIG.crit
 export const DESSERTS_BALANCE = {
-  berryParfaitChance: 0.00496313733,
+  berryParfaitChance: 0.00496313734,
   berryParfaitPayouts: 32,
   lemonTartChance: 0.00963828673,
   lemonTartContinueChance: 0.34,

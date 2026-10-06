@@ -47,6 +47,34 @@ export function isFeaturedCritKind(kind: string): kind is FeaturedCritKind {
   return kind in ALL_FEATURED_FLAGS_FALSE;
 }
 
+// every image category (its critData/<category>.ts file) with its crits and
+// their chances
+const FEATURED_CATEGORIES = (() => {
+  const byCategory = new Map<string, FeaturedCritKind[]>();
+  for (const kind of FEATURED_CRIT_KINDS) {
+    const category = FEATURED_CRITS[kind].image.split("/")[1];
+    const kinds = byCategory.get(category);
+    if (kinds) kinds.push(kind);
+    else byCategory.set(category, [kind]);
+  }
+  return [...byCategory.values()].map((kinds) => ({
+    kinds,
+    chances: kinds.map(
+      (kind) =>
+        CONFIG.crit[`${kind}Chance` as keyof typeof CONFIG.crit] as number,
+    ),
+  }));
+})();
+
+// picks one category at random, then rolls each of its crits on its own chance
+export function rollFeaturedCategory(
+  random: () => number,
+): FeaturedCritKind[] {
+  const { kinds, chances } =
+    FEATURED_CATEGORIES[Math.floor(random() * FEATURED_CATEGORIES.length)];
+  return kinds.filter((_, i) => random() < chances[i]);
+}
+
 export function featuredCritFlags(
   enabled: ReadonlySet<string> = new Set(),
 ): Record<FeaturedCritKind, boolean> {

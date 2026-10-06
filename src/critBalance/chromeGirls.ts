@@ -36,7 +36,7 @@ export const CHROME_GIRLS_BALANCE = {
   goldenFrecklesChance: 0.00307174172,
   goldenFrecklesSeconds: 26,
   mirrorBobChance: 0.0105115797,
-  holoHeartChance: 0.00630281225,
+  holoHeartChance: 0.00630281226,
   holoHeartUpgrades: 59,
   pixelHeartChance: 0.00807626794,
   pixelHeartBoostSeconds: 34,

@@ -21,7 +21,7 @@ export const BAKERY_BALANCE = {
   chouxBusinessDiscount: 0.041,
   cinnamonSpinChance: 0.00852938598,
   cinnamonSpinContinueChance: 0.55,
-  icingOnTheBunChance: 0.00551377005,
+  icingOnTheBunChance: 0.00551377006,
   icingOnTheBunPayouts: 37,
   cruffinSummitChance: 0.00835719984,
   cruffinSummitFloors: 3,

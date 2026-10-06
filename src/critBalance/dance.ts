@@ -16,7 +16,7 @@ export const DANCE_BALANCE = {
   shuffleTheFundsChance: 0.0125683129,
   tangoTenderChance: 0.0128373384,
   tangoTenderUpgrades: 7,
-  tapThatAssetChance: 0.00903503283,
+  tapThatAssetChance: 0.00903503284,
   tapThatAssetShare: 0.037,
   waltzStreetChance: 0.0086708574,
   waltzStreetUpgrades: 17,

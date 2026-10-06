@@ -1,6 +1,6 @@
 // odds and reward sizes for featured/relics.ts's crits, spread into CONFIG.crit
 export const RELICS_BALANCE = {
-  ancientRelicChance: 0.00966387356,
+  ancientRelicChance: 0.00966387357,
   ancientRelicPayouts: 35,
   geometricRelicChance: 0.0109451173,
   geometricRelicDiscount: 0.014,

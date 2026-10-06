@@ -85,8 +85,8 @@ export const DEMON_GIRLS_BALANCE = {
   flexingFiendsMultiple: 51,
   demonHandshakeChance: 0.00242129172,
   demonHandshakeGrowth: 0.131,
-  ashAndEmberChance: 0.00261765313,
+  ashAndEmberChance: 0.00261765314,
   ashAndEmberUpgrades: 97,
-  infernalToeHoldChance: 0.00467244936,
+  infernalToeHoldChance: 0.00467244937,
   infernalToeHoldMultiple: 22,
 } as const;

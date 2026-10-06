@@ -1,8 +1,11 @@
-// Sets every featured crit's chance from its effect group and its rank in it:
-// each group's summed odds match its target share (GROUPS in crit-catalog.mjs),
-// so no group dominates however many images it has, and inside a group the
-// bigger rewards are rarer. Chances only depend on each crit's rank, so
-// re-running it after adding crits never drifts. Rewrites src/critBalance/*.ts.
+// Sets every featured crit's Chance so each effect group's summed chances
+// match its target share (GROUPS in crit-catalog.mjs). Image categories need
+// nothing here: the game picks one category file at random per roll and rolls
+// only its crits, so every category is seen as often however many it has.
+// Each crit's Chance is its rank in its group (inside a group the bigger
+// rewards are rarer, within CHANCE_RANGE). Chances only depend on each
+// crit's rank, so re-running it after adding crits never drifts. Rewrites
+// src/critBalance/*.ts.
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -42,9 +45,8 @@ function curveFor(n, want) {
   return Math.sqrt(lo * hi);
 }
 
-export function planCritOdds(catalog) {
-  const total = catalog.reduce((sum, entry) => sum + entry.chance, 0);
-  const targetSum = GROUPS.reduce((sum, group) => sum + group.target, 0);
+// each crit's rank chance, every group's curve fitted to its share
+function rankChances(catalog, total, targetSum) {
   const groups = GROUPS.map((group) => ({
     ...group,
     // current order is the magnitude order: most common (smallest) first
@@ -95,29 +97,41 @@ export function planCritOdds(catalog) {
         Number(chanceAt(i, group.members.length, group.curve).toPrecision(9)),
       ),
     );
-  const newTotal = [...chances.values()].reduce((sum, value) => sum + value, 0);
-  const report = groups.map((group) => ({
-    id: group.id,
-    count: group.members.length,
-    target: (100 * group.target) / targetSum,
-    before:
-      (100 * group.members.reduce((sum, entry) => sum + entry.chance, 0)) /
-      total,
-    after:
-      (100 *
-        group.members.reduce(
-          (sum, entry) => sum + chances.get(entry.kind),
-          0,
-        )) /
-      newTotal,
-  }));
+  return chances;
+}
+
+export function planCritOdds(catalog) {
+  const total = catalog.reduce((sum, entry) => sum + entry.chance, 0);
+  const targetSum = GROUPS.reduce((sum, group) => sum + group.target, 0);
+  const chances = rankChances(catalog, total, targetSum);
+  const after = (entry) => chances.get(entry.kind);
+  const newTotal = catalog.reduce((sum, entry) => sum + after(entry), 0);
+  const share = (entries, of, sum) =>
+    (100 * entries.reduce((s, entry) => s + of(entry), 0)) / sum;
+  const groupIds = new Set(catalog.map((entry) => entry.group));
+  const groupWeight = GROUPS.filter((g) => groupIds.has(g.id)).reduce(
+    (sum, group) => sum + group.target,
+    0,
+  );
+  const report = GROUPS.filter((group) => groupIds.has(group.id)).map(
+    (group) => {
+      const entries = catalog.filter((entry) => entry.group === group.id);
+      return {
+        id: group.id,
+        count: entries.length,
+        target: (100 * group.target) / groupWeight,
+        before: share(entries, (entry) => entry.chance, total),
+        after: share(entries, after, newTotal),
+      };
+    },
+  );
   return { chances, report };
 }
 
 export function writeChances(chances) {
   let changed = 0;
   for (const file of fs.readdirSync(BALANCE)) {
-    if (file === "index.ts" || !file.endsWith(".ts")) continue;
+    if (!file.endsWith(".ts") || file === "index.ts") continue;
     const target = path.join(BALANCE, file);
     const source = fs.readFileSync(target, "utf8");
     const next = source.replace(
@@ -139,7 +153,7 @@ export async function rebalanceCritOdds({ write = true } = {}) {
   const { chances, report } = await withGame((game) =>
     planCritOdds(loadCatalog(game)),
   );
-  console.log("effect group      crits  target%  before%  after%");
+  console.log("effect group     crits  target%  before%  after%");
   for (const row of report)
     console.log(
       `${row.id.padEnd(16)} ${String(row.count).padStart(6)}  ${row.target.toFixed(1).padStart(7)}  ${row.before.toFixed(1).padStart(7)}  ${row.after.toFixed(1).padStart(6)}`,

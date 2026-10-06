@@ -27,7 +27,7 @@ export const GOTHAM_BALANCE = {
   baneChance: 0.0106594876,
   baneUpgrades: 42,
   harleyQuinn2Chance: 0.0103750264,
-  killerCroc2Chance: 0.00842275872,
+  killerCroc2Chance: 0.00842275873,
   killerCroc2BoostSeconds: 31,
   killerCroc2ExtraWorkers: 0,
   poisonIvy2Chance: 0.0114335861,

@@ -36,7 +36,7 @@ export const LUCKY_CATS_BALANCE = {
   campfireCrewUpgrades: 87,
   dapperDividendChance: 0.00511035301,
   dapperDividendMultiple: 10,
-  deckChairBossChance: 0.00678058346,
+  deckChairBossChance: 0.00678058347,
   deckChairBossGrowth: 0.047,
   firesideChatChance: 0.00308240291,
   firesideChatUpgrades: 88,

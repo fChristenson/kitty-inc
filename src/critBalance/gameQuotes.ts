@@ -11,7 +11,7 @@ export const GAME_QUOTES_BALANCE = {
   workWorkChance: 0.0127581761,
   yesWarchiefChance: 0.006826695,
   yesWarchiefPayouts: 14,
-  youAreNotPreparedChance: 0.00932001108,
+  youAreNotPreparedChance: 0.00932001109,
   youAreNotPreparedTierSteps: 2,
   youAreNotPreparedUpgrades: 9,
   arcanaChance: 0.0120237018,

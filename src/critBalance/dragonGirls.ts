@@ -2,7 +2,7 @@
 export const DRAGON_GIRLS_BALANCE = {
   crimsonTailCoilChance: 0.00309943514,
   crimsonTailCoilContinueChance: 0.86,
-  tangerineTailGripChance: 0.00288833124,
+  tangerineTailGripChance: 0.00288833125,
   tangerineTailGripDiscount: 0.182,
   tealTailSwaggerChance: 0.00221901281,
   tealTailSwaggerSeconds: 48,

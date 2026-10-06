@@ -13,7 +13,7 @@ export const DINER_BALANCE = {
   centreStageBurgerDiscount: 0.218,
   cheeseburgerDuoChance: 0.00170315069,
   cheeseburgerDuoDiscount: 0.219,
-  fullFryUpChance: 0.001680799,
+  fullFryUpChance: 0.00168079901,
   fullFryUpDiscount: 0.22,
   peasAndBaconChance: 0.00166017667,
   peasAndBaconDiscount: 0.221,
