@@ -30,7 +30,7 @@ export const CONFIG = {
   // office chairs, supplies and manager); floor scaling lives in floors.
   // Each building after scales by floorEconomyMultiplierPerBuilding
   buildings: {
-    unlockMinutesAtMax: 10,
+    unlockMinutesAtMax: 180,
   },
 
   // src/floors/incomePanel/index.ts — how a floor's income/interval evolve as
@@ -41,9 +41,9 @@ export const CONFIG = {
     upgradeSpeedLevelScale: 20,
     upgradeMilestoneStep: 10,
     // an upgrade costs baseUpgradeCost seconds of its floor's own income, a
-    // span growing by this share per level: ~100s at level 1000, so a building
-    // maxes out in about 80 minutes of steady buying
-    upgradePaybackGrowth: 0.05,
+    // span growing by this share per level: ~1000s at level 1000, so a building
+    // takes about 9 hours of steady buying to max out
+    upgradePaybackGrowth: 0.5,
     // a floor stops taking upgrades here; Sales and Overtime still play on it
     maxFloorLevel: 1000,
   },
