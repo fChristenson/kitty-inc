@@ -409,16 +409,6 @@ export const SNOWBALL_CRIT_CHANCE = CONFIG.crit.snowballChance;
 export const SNOWBALL_CRIT_COLOR = COLOR.snowballBlue;
 export const SNOWBALL_CRIT_LABEL = "Snowball";
 
-// "free sale crit" — also no instant reward: arming this proc just marks
-// the floor so that, once the crit is actually clicked, floorInteractions.ts's
-// applyFreeSaleCrit calls the SAME triggerSaleBoost hud/boostMenu.ts's paid
-// purchase already uses — a free ride on the existing "Sale" event (own
-// window/button state/payout math all reused as-is, see upgradeButton.ts's
-// sale.ts), just armed by a crit roll instead of spent cash
-export const FREE_SALE_CRIT_CHANCE = CONFIG.crit.freeSaleChance;
-export const FREE_SALE_CRIT_COLOR = COLOR.amber;
-export const FREE_SALE_CRIT_LABEL = "Sales";
-
 // "bull market crit" — an instant, flat, building-wide reward: doubles
 // every unlocked floor's own upgradeCount at once (see
 // floorInteractions.ts's applyBullMarketCrit, which reads each floor's
@@ -869,7 +859,6 @@ const fastForwardCrits = snapshotSet<Floor>();
 const frozenCrits = snapshotSet<Floor>();
 const spendingFreezeCrits = snapshotSet<Floor>();
 const snowballCrits = snapshotSet<Floor>();
-const freeSaleCrits = snapshotSet<Floor>();
 const bullMarketCrits = snapshotSet<Floor>();
 const paydayCrits = snapshotSet<Floor>();
 const goldStandardCrits = snapshotSet<Floor>();
@@ -1008,7 +997,6 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   frozen: boolean;
   spendingFreeze: boolean;
   snowball: boolean;
-  freeSale: boolean;
   bullMarket: boolean;
   payday: boolean;
   goldStandard: boolean;
@@ -1107,7 +1095,6 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "frozen",
   "spendingFreeze",
   "snowball",
-  "freeSale",
   "bullMarket",
   "payday",
   "goldStandard",
@@ -1206,7 +1193,6 @@ const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
   frozen: frozenCrits,
   spendingFreeze: spendingFreezeCrits,
   snowball: snowballCrits,
-  freeSale: freeSaleCrits,
   bullMarket: bullMarketCrits,
   payday: paydayCrits,
   goldStandard: goldStandardCrits,
@@ -1668,13 +1654,6 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
     color: SNOWBALL_CRIT_COLOR,
     icon: "snowball",
     description: "Pays every floor once, times floors unlocked",
-  },
-  freeSale: {
-    label: FREE_SALE_CRIT_LABEL,
-
-    color: FREE_SALE_CRIT_COLOR,
-    icon: "cashRegister",
-    description: "Starts a free Sales event on this floor",
   },
   bullMarket: {
     label: BULL_MARKET_CRIT_LABEL,
@@ -2299,10 +2278,6 @@ export function isSnowballCrit(floor: Floor): boolean {
   return snowballCrits.has(floor);
 }
 
-export function isFreeSaleCrit(floor: Floor): boolean {
-  return freeSaleCrits.has(floor);
-}
-
 export function isBullMarketCrit(floor: Floor): boolean {
   return bullMarketCrits.has(floor);
 }
@@ -2669,10 +2644,6 @@ export function forceSpendingFreezeCritProc(floor: Floor): void {
 
 export function forceSnowballCritProc(floor: Floor): void {
   snowballCrits.add(floor);
-}
-
-export function forceFreeSaleCritProc(floor: Floor): void {
-  freeSaleCrits.add(floor);
 }
 
 export function forceBullMarketCritProc(floor: Floor): void {

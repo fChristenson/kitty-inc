@@ -108,8 +108,6 @@ export {
   isSpendingFreezeActive,
   SNOWBALL_CRIT_COLOR,
   SNOWBALL_CRIT_LABEL,
-  FREE_SALE_CRIT_COLOR,
-  FREE_SALE_CRIT_LABEL,
   BULL_MARKET_CRIT_COLOR,
   BULL_MARKET_CRIT_LABEL,
   PAYDAY_CRIT_COLOR,
@@ -245,7 +243,6 @@ export {
   isFrozenCrit,
   isSpendingFreezeCrit,
   isSnowballCrit,
-  isFreeSaleCrit,
   isBullMarketCrit,
   isPaydayCrit,
   isGoldStandardCrit,
@@ -341,7 +338,6 @@ import {
   forceFrozenCritProc,
   forceSpendingFreezeCritProc,
   forceSnowballCritProc,
-  forceFreeSaleCritProc,
   forceBullMarketCritProc,
   forcePaydayCritProc,
   forceGoldStandardCritProc,
@@ -554,7 +550,6 @@ export function rollCritUpgrade(
       if (result.frozen) forceFrozenCritProc(floor);
       if (result.spendingFreeze) forceSpendingFreezeCritProc(floor);
       if (result.snowball) forceSnowballCritProc(floor);
-      if (result.freeSale) forceFreeSaleCritProc(floor);
       if (result.bullMarket) forceBullMarketCritProc(floor);
       if (result.payday) forcePaydayCritProc(floor);
       if (result.goldStandard) forceGoldStandardCritProc(floor);
@@ -687,7 +682,6 @@ export function forceFloorBuyCrit(
   fastForward = false,
   frozen = false,
   snowball = false,
-  freeSale = false,
   bullMarket = false,
   payday = false,
   goldStandard = false,
@@ -758,7 +752,6 @@ export function forceFloorBuyCrit(
     frozen,
     spendingFreeze: false,
     snowball,
-    freeSale,
     bullMarket,
     payday,
     goldStandard,
@@ -1281,11 +1274,6 @@ export function forceSpendingFreezeCritUpgrade(floor: Floor): void {
 export function forceSnowballCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceSnowballCritProc(floor);
-}
-
-export function forceFreeSaleCritUpgrade(floor: Floor): void {
-  critTiers.set(floor, "crit");
-  forceFreeSaleCritProc(floor);
 }
 
 export function forceBullMarketCritUpgrade(floor: Floor): void {

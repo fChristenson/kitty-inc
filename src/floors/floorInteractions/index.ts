@@ -1021,14 +1021,6 @@ function applySnowballCrit(floors: Floor[]): void {
   applyTickTockCrit(floors, unlockedCount);
 }
 
-// "free sale crit" (see shared/critTypes's isFreeSaleCrit): no reward of its
-// own — just calls the SAME triggerSaleBoost hud/boostMenu.ts's paid
-// purchase already uses, starting an ordinary "Sale" event on this ONE
-// floor for free (own window/button state/payout math all reused as-is)
-function applyFreeSaleCrit(floor: Floor): void {
-  triggerSaleBoost(floor);
-}
-
 // "Grand Opening" crit (see shared/critTypes's isGrandOpeningCrit): unlocks
 // every currently-locked floor in this building for free, preserving each
 // floor's own existing tier/rate/upgrade state (unlike heavenly, which also
@@ -1687,7 +1679,6 @@ const CRIT_REWARDS: Record<CritProcKind, (context: CritRewardContext) => void> =
     frozen: (c) => applyFrozenCrit(c.floor),
     spendingFreeze: (c) => applySpendingFreezeCrit(c.floors),
     snowball: (c) => applySnowballCrit(c.floors),
-    freeSale: (c) => applyFreeSaleCrit(c.floor),
     payday: () => applyPaydayCrit(),
     goldStandard: () => applyGoldStandardCrit(),
     nightShift: (c) => applyNightShiftCrit(c.floors),

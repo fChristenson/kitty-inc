@@ -33,11 +33,6 @@ export const SALES_BALANCE = {
   // price for the whole building for a short window
   spendingFreezeChance: 0.05,
   spendingFreezeDurationMs: 5000,
-  // "free sale crit" — no reward of its own: just triggers the SAME "Sale"
-  // event hud/boostMenu's paid purchase starts (see
-  // floorInteractions.ts's applyFreeSaleCrit/upgradeButton.ts's
-  // triggerSaleBoost), for free
-  freeSaleChance: 0.08,
   priceMatchChance: 0.05,
   priceMatchDurationMs: 5000,
 } as const;

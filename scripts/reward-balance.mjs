@@ -497,7 +497,6 @@ const LEGACY = {
   easterSale: ({ c }) => [discount(c.easterSaleDiscount ?? 0.5)],
   frozen: () => [priceLock(5)],
   spendingFreeze: () => [priceLock(5 * F)],
-  freeSale: () => [timedDiscount(0.5, 15)], // ~ the paid Sale's size
   priceMatch: () => [priceLock(5)],
   // staffing
   chairGiveaway: () => [office(1, 1)],

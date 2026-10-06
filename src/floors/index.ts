@@ -416,7 +416,6 @@ export {
   forceFrozenCritUpgrade,
   forceSpendingFreezeCritUpgrade,
   forceSnowballCritUpgrade,
-  forceFreeSaleCritUpgrade,
   forceBullMarketCritUpgrade,
   forcePaydayCritUpgrade,
   forceGoldStandardCritUpgrade,
