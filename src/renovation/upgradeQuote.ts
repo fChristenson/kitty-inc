@@ -9,7 +9,11 @@ import {
 } from "../shared/bigNumber";
 import type { Floor } from "../gameState";
 import { CONFIG } from "../config";
-import { upgradePriceAfter, upgradeBatchCost } from "../shared/upgradeEconomy";
+import {
+  upgradePriceAfter,
+  upgradeBatchCost,
+  upgradesWithin,
+} from "../shared/upgradeEconomy";
 
 export function quoteUpgrades(
   floors: Floor[],
@@ -47,17 +51,7 @@ export function quoteUpgrades(
   function atCutoff(cutoff: number, record = false): BigNumber {
     let total = ZERO;
     for (const curve of curves) {
-      const uncapped =
-        cutoff < curve.logPrice
-          ? 0
-          : Math.max(
-              0,
-              Math.floor(
-                (CONFIG.incomePanel.upgradePriceLevelScale +
-                  curve.floor.upgradeCount) *
-                  Math.expm1(((cutoff - curve.logPrice) * Math.LN10) / 4),
-              ) + 1,
-            );
+      const uncapped = upgradesWithin(curve.floor, curve.logPrice, cutoff);
       if (!Number.isFinite(uncapped)) return overBudget;
       const count = Math.min(uncapped, maxCount(curve));
       if (record) purchases[curve.index] = count;

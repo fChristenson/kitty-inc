@@ -13,6 +13,8 @@ import {
   multiplyBig,
 } from "../shared/bigNumber";
 import { CONFIG } from "../config";
+import { floorRateFactor } from "../shared/upgradeEconomy";
+import { MAX_FLOORS_PER_BUILDING } from "../floors/floorLock";
 
 // a BigNumber: 1000 ** index overflows a plain number past ~100 buildings,
 // which zeroed every new or reset floor's income and price there
@@ -20,7 +22,15 @@ export function getBuildingMultiplier(buildingIndex: number): BigNumber {
   return pow(CONFIG.floors.floorEconomyMultiplierPerBuilding, buildingIndex);
 }
 
-const BUILDING_BASE_PRICE = CONFIG.buildings.basePrice;
+// a fully upgraded first building's income per second: every floor maxed with
+// all three office upgrades
+const MAXED_BUILDING_INCOME =
+  MAX_FLOORS_PER_BUILDING *
+  CONFIG.floors.baseIncomeAmount *
+  floorRateFactor(CONFIG.incomePanel.maxFloorLevel) *
+  CONFIG.officeUpgrades.speedMultiplierPerUpgrade ** 3;
+const BUILDING_BASE_PRICE =
+  MAXED_BUILDING_INCOME * 60 * CONFIG.buildings.unlockMinutesAtMax;
 
 // $ cost to buy the next building (nextBuildingIndex === buildings.length, since
 // index 0 is the always-free starting building), independently of floor scaling. Uses

@@ -78,7 +78,9 @@ const floorRate = base(L, A0) * E * officeSpeed;
 const R = F * floorRate; // total income per second
 const interval = 1 / ((1 + L / 20) * E * officeSpeed);
 const payoutSeconds = PAYOUT_SECONDS || Math.max(interval, 0.5); // one reward payout, in seconds of its floor
-const upgradeCost = (level) => 2 * ((3 + level) / 3) ** 4;
+const PAYBACK_GROWTH = configNumber("upgradePaybackGrowth", 0.05);
+const upgradeCost = (level) =>
+  2 * (1 + 2 * level) * (1 + level / 20) * (1 + PAYBACK_GROWTH * level);
 const upgradesValue =
   F *
   Array.from({ length: L }, (_, n) => upgradeCost(n)).reduce(

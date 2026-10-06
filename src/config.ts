@@ -25,9 +25,12 @@ export const CONFIG = {
     baseRateStep: 2,
   },
 
-  // src/buildings/index.ts — purchase prices only; floor scaling lives in floors.
+  // src/buildings/index.ts — the next building costs this many minutes of a
+  // fully upgraded building's income (every floor at maxFloorLevel with its
+  // office chairs, supplies and manager); floor scaling lives in floors.
+  // Each building after scales by floorEconomyMultiplierPerBuilding
   buildings: {
-    basePrice: 125_000_000_000,
+    unlockMinutesAtMax: 10,
   },
 
   // src/floors/incomePanel/index.ts — how a floor's income/interval evolve as
@@ -37,7 +40,10 @@ export const CONFIG = {
     maxIncomeIntervalSeconds: 1,
     upgradeSpeedLevelScale: 20,
     upgradeMilestoneStep: 10,
-    upgradePriceLevelScale: 3,
+    // an upgrade costs baseUpgradeCost seconds of its floor's own income, a
+    // span growing by this share per level: ~100s at level 1000, so a building
+    // maxes out in about 80 minutes of steady buying
+    upgradePaybackGrowth: 0.05,
     // a floor stops taking upgrades here; Sales and Overtime still play on it
     maxFloorLevel: 1000,
   },

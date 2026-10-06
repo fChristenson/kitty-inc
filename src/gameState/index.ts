@@ -4,6 +4,7 @@ import {
   baseFloorInterval,
   floorIncomeScale,
   upgradeSpeedMultiplier,
+  upgradePriceFactor,
   UPGRADE_ECONOMY_VERSION,
 } from "../shared/upgradeEconomy";
 import { companyStorageKey } from "../company";
@@ -580,25 +581,17 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
   const rateStep = needsRebalance
     ? multiply(multiplyBig(toBigNumber(sf.rateStep), inverseOldScale), newScale)
     : toBigNumber(sf.rateStep);
-  const upgradeCost = needsRebalance
-    ? multiply(
-        divide(rateStep, CONFIG.floors.baseRateStep * newScale),
-        CONFIG.floors.baseUpgradeCost *
-          (1 + sf.upgradeCount / CONFIG.incomePanel.upgradePriceLevelScale) **
-            4 *
-          (sf.priceDiscountMultiplier ?? 1),
-      )
-    : (sf.upgradeEconomyVersion ?? 0) < 4
-      ? multiply(
-          toBigNumber(sf.upgradeCost),
+  // every older save is repriced on the current curve from its level: the
+  // building's scale is rateStep over its floor's base rate step
+  const upgradeCost =
+    (sf.upgradeEconomyVersion ?? 0) >= UPGRADE_ECONOMY_VERSION
+      ? toBigNumber(sf.upgradeCost)
+      : multiply(
+          divide(rateStep, CONFIG.floors.baseRateStep * newScale),
           CONFIG.floors.baseUpgradeCost *
-            ((1 + sf.upgradeCount / CONFIG.incomePanel.upgradePriceLevelScale) /
-              (1 + sf.upgradeCount / 10)) **
-              4,
-        )
-      : sf.upgradeEconomyVersion === 4
-        ? multiply(toBigNumber(sf.upgradeCost), CONFIG.floors.baseUpgradeCost)
-        : toBigNumber(sf.upgradeCost);
+            upgradePriceFactor(sf.upgradeCount) *
+            (sf.priceDiscountMultiplier ?? 1),
+        );
   const floor: Floor = {
     bgIndex: sf.bgIndex ?? 0,
     incomeAmount: needsRebalance
