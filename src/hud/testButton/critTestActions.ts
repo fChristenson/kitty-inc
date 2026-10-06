@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-sweetheart-event" class="game__button">Sweetheart</button>
-          <button id="test-mint-event" class="game__button">Mint</button>
-          <button id="test-cat-sketch-event" class="game__button">Cat Sketch</button>
-          <button id="test-stencil-event" class="game__button">Stencil</button>
-          <button id="test-denoise-event" class="game__button">Denoise</button>
+          <button id="test-pincushion-event" class="game__button">Pincushion</button>
+          <button id="test-updraft-event" class="game__button">Updraft</button>
+          <button id="test-plugholes-event" class="game__button">Plugholes</button>
+          <button id="test-apollonian-gasket-event" class="game__button">Apollonian Gasket</button>
+          <button id="test-drone-show-event" class="game__button">Drone Show</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-sweetheart-event" class="game__button">Sweetheart</button>
+          <button id="test-mint-event" class="game__button">Mint</button>
+          <button id="test-cat-sketch-event" class="game__button">Cat Sketch</button>
+          <button id="test-stencil-event" class="game__button">Stencil</button>
+          <button id="test-denoise-event" class="game__button">Denoise</button>
           <button id="test-barred-spiral-event" class="game__button">Barred Spiral</button>
           <button id="test-bullet-mosaic-event" class="game__button">Bullet Mosaic</button>
           <button id="test-bomb-grapes-event" class="game__button">Bomb Grapes</button>

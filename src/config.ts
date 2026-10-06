@@ -8354,6 +8354,59 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 77
+  // drill, a crit tier: src/floors/pincushionEvent: four drills grind into the clicked button from the diagonals until it blows
+  pincushionEvent: {
+    chance: 0.01,
+    approachMs: 260, // each drill's flight in
+    arriveGapMs: 90, // between drills slamming in round the ring
+    stallMs: 600, // each drill stalled on its bite, grinding
+    boreMs: 1300, // each drill's shoves, rattling round the ring
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, cash: src/floors/updraftEvent: a glider wisp corkscrews up erupting columns of cash, then shoots into the total
+  updraftEvent: {
+    chance: 0.01,
+    climbsMs: [650, 420] as [number, number], // each corkscrew up a column, quickening
+    glideMs: 220, // gliding across to the next column
+    diveMs: 240, // the dive into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // clutter, free hires: src/floors/plugholesEvent: plugholes over the empty spots drain the screen's glitter and drop it in as hires
+  plugholesEvent: {
+    chance: 0.01,
+    spillMs: 450, // the glitter whirling out over the screen
+    openGapMs: 160, // between holes opening
+    drainMs: 1300, // the holes draining the screen, gulp by gulp
+    popMs: 260, // each heap dropping into its spot
+    popGapMs: 110,
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, levels: src/floors/apollonianGasketEvent: circles pack every gap in a ring of light, then fly onto the bars
+  apollonianGasketEvent: {
+    chance: 0.01,
+    growMs: 1500, // every circle popping in, biggest first, quickening
+    blazeMs: 260, // the finished gasket blazing
+    collapseMs: 220, // collapsing into a wisp
+    flyMs: 300, // each wisp's arc onto its bar
+    gapMs: 90, // between wisps
+    levelShare: 0.04, // levels per bar (twice on the clicked one)
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // drawing, a free floor: src/floors/droneShowEvent: glitter drones lift off and form a giant lightning bolt, which strikes the lock
+  droneShowEvent: {
+    chance: 0.01,
+    flyMs: 1300, // every drone launched, quickening
+    climbMs: 420, // each drone's climb into place
+    blazeMs: 260, // the finished bolt blazing
+    strikeMs: 220, // the bolt hurling itself into the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 76
   // drawing, worker perma tiers: src/floors/sweetheartEvent: a pen wisp draws a giant glitter heart, which beats and bursts onto the workers
   sweetheartEvent: {

@@ -419,7 +419,8 @@ export function planGrind(drill: Drill, stallMs: number): Grind {
 }
 
 // the grinding drill at ms: juddering while it bites (hardest stalled), with
-// the gush of sparks out of its hole, `spray` px the sparks' scale
+// the gush of sparks out of its hole, `spray` px the sparks' scale (`gush`
+// thins it, for several drills grinding at once)
 export function drawGrind(
   ctx: CanvasRenderingContext2D,
   grind: Grind,
@@ -427,6 +428,7 @@ export function drawGrind(
   now: number,
   size: number,
   spray: number,
+  gush = 1,
 ): void {
   const { drill, bites, gives, through, stallMs } = grind;
   const biting = ms >= bites && ms < through;
@@ -452,7 +454,7 @@ export function drawGrind(
     drill.target,
     drill.angle,
     ms - bites,
-    hard * (1 - clamp01((ms - through) / SPRAY_FADE_MS)),
+    hard * gush * (1 - clamp01((ms - through) / SPRAY_FADE_MS)),
     spray,
     now,
   );
