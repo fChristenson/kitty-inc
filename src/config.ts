@@ -8354,6 +8354,56 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 76
+  // drawing, worker perma tiers: src/floors/sweetheartEvent: a pen wisp draws a giant glitter heart, which beats and bursts onto the workers
+  sweetheartEvent: {
+    chance: 0.01,
+    drawMs: 1300, // the pen drawing the heart, quickening
+    burstMs: 400, // each shower's arc onto its worker
+    gapMs: 90, // between showers
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // drawing, a crit tier: src/floors/mintEvent: glitter rains into a giant coin mould over the clicked bar, which flips down onto it
+  mintEvent: {
+    chance: 0.01,
+    pourMs: 1200, // every tile landing, bottom row first, quickening
+    fallMs: 250, // each drop's fall
+    blazeMs: 250, // the finished coin blazing
+    dropMs: 350, // the coin flipping down onto the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // lightning, free hires: src/floors/catSketchEvent: bolts etch a cat's head in glitter over each empty spot, which drops in as a hire
+  catSketchEvent: {
+    chance: 0.01,
+    strikeMs: 650, // one sketch's strikes (the first slower, the last quicker)
+    blazeMs: 150, // a finished sketch blazing
+    dropMs: 200, // the sketch dropping onto its spot
+    gapMs: 60, // before the next sketch
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // spray, levels: src/floors/stencilEvent: an airbrush rasters a giant gem out of the mist, which shatters onto the bars
+  stencilEvent: {
+    chance: 0.01,
+    sprayMs: 1200, // every pass, quickening
+    blazeMs: 200, // the finished gem blazing
+    shatterMs: 380, // each tile's arc onto its bar
+    levelShare: 0.03, // levels per bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/denoiseEvent: a fog of random dots denoises step by step into a giant crown, which pours into the total
+  denoiseEvent: {
+    chance: 0.01,
+    fogMs: 200, // the noise fading in
+    stepsMs: 1300, // every denoising step, quickening
+    blazeMs: 220, // the finished crown blazing
+    flightMs: 450, // each dot's flight into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 75
   // galaxy, levels: src/floors/barredSpiralEvent: a galaxy's bar spins up, flinging the wisps piling at its ends onto the bars
   barredSpiralEvent: {

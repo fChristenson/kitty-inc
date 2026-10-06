@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-barred-spiral-event" class="game__button">Barred Spiral</button>
-          <button id="test-bullet-mosaic-event" class="game__button">Bullet Mosaic</button>
-          <button id="test-bomb-grapes-event" class="game__button">Bomb Grapes</button>
-          <button id="test-flow-field-event" class="game__button">Flow Field</button>
-          <button id="test-rally-jump-event" class="game__button">Rally Jump</button>
+          <button id="test-sweetheart-event" class="game__button">Sweetheart</button>
+          <button id="test-mint-event" class="game__button">Mint</button>
+          <button id="test-cat-sketch-event" class="game__button">Cat Sketch</button>
+          <button id="test-stencil-event" class="game__button">Stencil</button>
+          <button id="test-denoise-event" class="game__button">Denoise</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-barred-spiral-event" class="game__button">Barred Spiral</button>
+          <button id="test-bullet-mosaic-event" class="game__button">Bullet Mosaic</button>
+          <button id="test-bomb-grapes-event" class="game__button">Bomb Grapes</button>
+          <button id="test-flow-field-event" class="game__button">Flow Field</button>
+          <button id="test-rally-jump-event" class="game__button">Rally Jump</button>
           <button id="test-iron-filings-event" class="game__button">Iron Filings</button>
           <button id="test-sync-event" class="game__button">Sync</button>
           <button id="test-roche-lobe-event" class="game__button">Roche Lobe</button>
