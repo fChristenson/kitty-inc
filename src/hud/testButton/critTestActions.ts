@@ -46,16 +46,26 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-polar-ring-event" class="game__button">Polar Ring</button>
-          <button id="test-kebab-event" class="game__button">Kebab</button>
-          <button id="test-katamari-event" class="game__button">Katamari</button>
-          <button id="test-harmonics-event" class="game__button">Harmonics</button>
-          <button id="test-stairwell-event" class="game__button">Stairwell</button>
+          <button id="test-barred-spiral-event" class="game__button">Barred Spiral</button>
+          <button id="test-bullet-mosaic-event" class="game__button">Bullet Mosaic</button>
+          <button id="test-bomb-grapes-event" class="game__button">Bomb Grapes</button>
+          <button id="test-flow-field-event" class="game__button">Flow Field</button>
+          <button id="test-rally-jump-event" class="game__button">Rally Jump</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-iron-filings-event" class="game__button">Iron Filings</button>
+          <button id="test-sync-event" class="game__button">Sync</button>
+          <button id="test-roche-lobe-event" class="game__button">Roche Lobe</button>
+          <button id="test-marbles-event" class="game__button">Marbles</button>
+          <button id="test-bomb-shuffleboard-event" class="game__button">Bomb Shuffleboard</button>
+          <button id="test-polar-ring-event" class="game__button">Polar Ring</button>
+          <button id="test-kebab-event" class="game__button">Kebab</button>
+          <button id="test-katamari-event" class="game__button">Katamari</button>
+          <button id="test-harmonics-event" class="game__button">Harmonics</button>
+          <button id="test-stairwell-event" class="game__button">Stairwell</button>
           <button id="test-kirkwood-gaps-event" class="game__button">Kirkwood Gaps</button>
           <button id="test-periscope-event" class="game__button">Periscope</button>
           <button id="test-water-ski-event" class="game__button">Water Ski</button>

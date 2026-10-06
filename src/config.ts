@@ -8354,6 +8354,105 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 75
+  // galaxy, levels: src/floors/barredSpiralEvent: a galaxy's bar spins up, flinging the wisps piling at its ends onto the bars
+  barredSpiralEvent: {
+    chance: 0.01,
+    growMs: 250, // the galaxy swirling up
+    spinMs: 1500, // the bar spinning up
+    flyMs: 320, // each flung wisp's arc onto its bar
+    levelShare: 0.012, // levels per hit
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // gunfire, a crit tier: src/floors/bulletMosaicEvent: two guns stud a giant star of bullets over the clicked bar, which slams onto it
+  bulletMosaicEvent: {
+    chance: 0.01,
+    growMs: 250, // the guns rising
+    fireMs: 1300, // every stud shot in, quickening
+    blazeMs: 250, // the finished star blazing
+    slamMs: 160, // the star slamming onto the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, free hires: src/floors/bombGrapesEvent: bunches of bomb grapes on a vine pop in chains, their hearts dropping onto the empty spots
+  bombGrapesEvent: {
+    chance: 0.01,
+    growMs: 250, // the vine and bunches dropping in
+    popGapMs: 70, // between grapes blowing, quickening by bunch
+    bunchGapMs: 60, // after a heart drops, before the next bunch starts
+    fallMs: 220, // a heart's drop onto its spot
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, cash: src/floors/flowFieldEvent: coins ride a swirling flow field in streams and eddies, then pour into the total
+  flowFieldEvent: {
+    chance: 0.01,
+    scatterMs: 300, // the coins scattering over the screen
+    flowMs: 1100, // riding the field
+    pourMs: 600, // the field bending into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // race, worker perma tiers: src/floors/rallyJumpEvent: two racers hairpin round the top bar, fly a jump, hairpin round a worker and dive onto another
+  rallyJumpEvent: {
+    chance: 0.01,
+    raceMs: 1700, // the leader's whole run
+    gapMs: 120, // the chaser behind it
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // batch 74
+  // clutter, levels: src/floors/ironFilingsEvent: the clicked bar turns into a bar magnet, its field dragging filings in arcs onto its poles
+  ironFilingsEvent: {
+    chance: 0.01,
+    sprinkleMs: 350, // the filings sprinkled over the screen
+    pullMs: 1200, // the field's pulses dragging them onto the poles
+    slamMs: 260, // the two heaps slamming into the bar's middle
+    levelShare: 0.03, // levels landed
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, worker perma tiers: src/floors/syncEvent: a field of spinning, blinking wisps couples up and syncs into unison flashes, then streams onto the workers
+  syncEvent: {
+    chance: 0.01,
+    growMs: 250, // the field lighting up
+    syncMs: 1500, // random blinks pulling into unison
+    dropMs: 380, // each wisp's fall onto its worker
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // galaxy, cash: src/floors/rocheLobeEvent: a small hot wisp peels a stream of glitter off a big star into a disk, which blows in a nova of coins
+  rocheLobeEvent: {
+    chance: 0.01,
+    growMs: 250, // the stars swirling up
+    feedMs: 1100, // the stream peeling off
+    flowMs: 350, // each grain's arc across
+    liftMs: 400, // the nova's coins flying into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // bounce, free hires: src/floors/marblesEvent: a shooter marble knocks marbles out of a glitter ring onto the empty spots
+  marblesEvent: {
+    chance: 0.01,
+    growMs: 250, // the ring and marbles appearing
+    shotMs: 220, // each flick, quickening
+    pauseMs: 140, // rolling to a stop before the next flick
+    knockMs: 160, // a knocked marble skidding to the ring's edge
+    dropMs: 380, // its arc onto its spot
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // explosion, levels and a crit tier: src/floors/bombShuffleboardEvent: lit bomb pucks glide along the bars and blow in a chain, a giant last on the clicked bar
+  bombShuffleboardEvent: {
+    chance: 0.01,
+    slideMs: 320, // each puck's glide to a stop
+    fuseMs: 220, // its fuse burning down once it stops
+    giantFuseMs: 400, // the giant's
+    levelShare: 0.012, // levels per blast
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 73
   // galaxy, a crit tier: src/floors/polarRingEvent: a ring of stars over a galaxy's poles tips down onto its disk, then showers onto the clicked bar
   polarRingEvent: {
