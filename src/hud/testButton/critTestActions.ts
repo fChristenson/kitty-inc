@@ -46,16 +46,21 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-pincushion-event" class="game__button">Pincushion</button>
-          <button id="test-updraft-event" class="game__button">Updraft</button>
-          <button id="test-plugholes-event" class="game__button">Plugholes</button>
-          <button id="test-apollonian-gasket-event" class="game__button">Apollonian Gasket</button>
-          <button id="test-drone-show-event" class="game__button">Drone Show</button>
+          <button id="test-marx-generator-event" class="game__button">Marx Generator</button>
+          <button id="test-oort-cloud-event" class="game__button">Oort Cloud</button>
+          <button id="test-double-slit-event" class="game__button">Double Slit</button>
+          <button id="test-blast-sweep-event" class="game__button">Blast Sweep</button>
+          <button id="test-hydraulic-jump-event" class="game__button">Hydraulic Jump</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-pincushion-event" class="game__button">Pincushion</button>
+          <button id="test-updraft-event" class="game__button">Updraft</button>
+          <button id="test-plugholes-event" class="game__button">Plugholes</button>
+          <button id="test-apollonian-gasket-event" class="game__button">Apollonian Gasket</button>
+          <button id="test-drone-show-event" class="game__button">Drone Show</button>
           <button id="test-sweetheart-event" class="game__button">Sweetheart</button>
           <button id="test-mint-event" class="game__button">Mint</button>
           <button id="test-cat-sketch-event" class="game__button">Cat Sketch</button>

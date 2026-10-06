@@ -8361,6 +8361,60 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 78
+  // lightning, a crit tier: src/floors/marxGeneratorEvent: a tower of spark gaps fires gap by gap up the screen, then dumps one colossal bolt onto the clicked bar
+  marxGeneratorEvent: {
+    chance: 0.01,
+    chargeMs: 380, // the electrodes popping in, bottom to top
+    fireMs: 1150, // every gap firing up the tower, quickening
+    dischargeMs: 220, // the top gap to the colossal bolt
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // galaxy, worker perma tiers: src/floors/oortCloudEvent: a rogue star knocks comets out of a halo; they whip round the sun and fling onto the workers
+  oortCloudEvent: {
+    chance: 0.01,
+    growMs: 350, // the halo and the sun flaring up
+    passMs: 600, // the rogue star streaking across the halo
+    plungeMs: 450, // each knocked comet sliding onto its plunging orbit
+    whipMs: 380, // whipping round the sun before breaking orbit
+    gapMs: 110, // between the workers' comets breaking orbit
+    flyMs: 320, // each comet's arc onto its worker
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // experiment, levels: src/floors/doubleSlitEvent: particles fired through two slits pile up in interference fringes on the bars
+  doubleSlitEvent: {
+    chance: 0.01,
+    setupMs: 250, // the slit wall snapping up
+    emitMs: 1300, // every particle fired, quickening
+    flyMs: 240, // each particle's flight through a slit onto the screen
+    blazeMs: 200, // the finished pattern to the first fringe blazing
+    smearMs: 260, // each fringe smearing along its bar
+    gapMs: 110, // between fringes
+    levelShare: 0.04, // levels per bar (twice on the clicked one)
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // clutter, a free floor: src/floors/blastSweepEvent: a ring of bombs round the lock blows the glitter mess in onto it, which blows it open
+  blastSweepEvent: {
+    chance: 0.01,
+    spillMs: 420, // the glitter flung out over the screen
+    fuseMs: 320, // the bombs' fuses fizzing before the first blast
+    blastsMs: 1050, // every bomb blowing round the ring, quickening
+    implodeMs: 420, // the mess drawn in onto the lock
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // money, cash: src/floors/hydraulicJumpEvent: a sheet of cash rears into a swelling roller, which breaks up into the total
+  hydraulicJumpEvent: {
+    chance: 0.01,
+    streamMs: 1000, // the sheet shooting out of the button
+    growMs: 1200, // the roller swelling, from the jump forming to it breaking
+    riseMs: 380, // each coin's rise into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 77
   // drill, a crit tier: src/floors/pincushionEvent: four drills grind into the clicked button from the diagonals until it blows
   pincushionEvent: {
