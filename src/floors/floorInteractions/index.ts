@@ -416,7 +416,7 @@ export function hitTestFloorHover(
   );
 }
 
-const UPGRADE_SOUND_STEP = 50;
+const UPGRADE_SOUND_STEP = 100;
 
 // one upgrade tick's worth of logic — rate increase, the small jittered coin
 // burst at the button, and the every-10th-upgrade milestone burst (same one
