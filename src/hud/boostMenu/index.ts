@@ -24,7 +24,7 @@ import {
 // is floors/worker.ts (floorInteractions.ts's boost crit proc uses it too),
 // this module just re-shares it rather than keeping its own duplicate copy
 export { applyBoostAll } from "../../floors";
-import { playSwoosh, playSold } from "../../sound";
+import { playSwoosh, playSold, playBloop } from "../../sound";
 import { getImageUrl } from "../../loadAssets";
 import {
   type BigNumber,
@@ -231,7 +231,9 @@ export function wireBoostMenu(
         playSold();
         await triggerButtonPress(speedUpButton);
         onPurchase();
-        render();
+        await close();
+        // the cats' jump plays once the game resumes behind the closed menu
+        playBloop();
       }
       return;
     }

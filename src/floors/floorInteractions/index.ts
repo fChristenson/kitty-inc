@@ -416,8 +416,6 @@ export function hitTestFloorHover(
   );
 }
 
-const UPGRADE_SOUND_STEP = 100;
-
 // one upgrade tick's worth of logic — rate increase, the small jittered coin
 // burst at the button, and the every-10th-upgrade milestone burst (same one
 // that halves the floor's income interval, see incomePanel.ts). Shared by a
@@ -438,11 +436,8 @@ function applyUpgradeTick(
   increaseIncomeRate(floor);
   if (isDetachedJobRunning()) return;
   // every 10th upgrade (the milestone that halves the income interval) the
-  // level label pops; it bloops only every UPGRADE_SOUND_STEP levels
-  if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) {
-    triggerLevelPop(floor);
-    if (floor.upgradeCount % UPGRADE_SOUND_STEP === 0) playBloop();
-  }
+  // level label pops
+  if (floor.upgradeCount % UPGRADE_MILESTONE_STEP === 0) triggerLevelPop(floor);
   if (!burst) return;
   const center = getButtonCenter(isGroundFloor);
   // small random jitter so the burst doesn't spawn at the exact same pixel
