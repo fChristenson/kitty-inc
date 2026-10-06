@@ -8343,6 +8343,47 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 72
+  // galaxy, free hires: src/floors/kirkwoodGapsEvent: a giant planet's resonances sweep bands out of an asteroid belt into wisps that drop onto the empty spots
+  kirkwoodGapsEvent: {
+    chance: 0.01,
+    growMs: 250, // the belt swirling up
+    firstMs: 300, // before the first gap opens
+    gapMs: 260, // between gaps opening
+    sweepMs: 450, // a band's asteroids gathering into a wisp
+    dropMs: 380, // each wisp's arc onto its spot
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // beam, a crit tier: src/floors/periscopeEvent: a beam bounces up a zigzag of mirror wisps, then the top one sends it down onto the clicked bar
+  periscopeEvent: {
+    chance: 0.01,
+    growMs: 250, // the mirrors popping up
+    legMs: 240, // the beam's run to the next mirror, quickening
+    finalMs: 260, // the last run down onto the bar
+    blazeMs: 350, // the beam blazing on the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // mix, cash: src/floors/waterSkiEvent: a boat wisp carves S-bends trailing a wake of cash, a skier jumping it, into the total
+  waterSkiEvent: {
+    chance: 0.01,
+    runMs: 1600, // the boat's run into the total
+    letGoMs: 260, // the skier's flight in after it
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // bounce, levels: src/floors/jaiAlaiEvent: a player wisp loops the ball round its basket and hurls it onto bar after bar
+  jaiAlaiEvent: {
+    chance: 0.01,
+    growMs: 250, // the player popping up
+    loopMs: 220, // the ball looping round the basket
+    hurlMs: 150, // the throw onto the bar
+    backMs: 300, // the rebound down to the next catch
+    levelShare: 0.012, // levels per hit
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 71
   // explosion, a crit tier: src/floors/bombMobileEvent: a turning mobile of lit bombs blows tier by tier, then its giant drops onto the clicked bar
   bombMobileEvent: {

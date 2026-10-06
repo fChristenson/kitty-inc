@@ -32,7 +32,7 @@ const TURN_HZ: [number, number][] = [
   [-0.35, -1.4],
 ];
 const BOMBS = [WISP_SIZE * 2.2, WISP_SIZE * 1.4, WISP_SIZE];
-const BLASTS = [1000, 520, 400];
+const BLASTS = [820, 430, 340];
 const STRING_W = 3;
 const ARM_W = 6;
 // each blast bursts into a cluster of CLUSTER this far round it

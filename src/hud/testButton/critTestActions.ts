@@ -46,16 +46,20 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-bomb-mobile-event" class="game__button">Bomb Mobile</button>
-          <button id="test-ring-galaxy-event" class="game__button">Ring Galaxy</button>
-          <button id="test-gravitational-lens-event" class="game__button">Gravitational Lens</button>
-          <button id="test-convection-event" class="game__button">Convection</button>
-          <button id="test-paintball-event" class="game__button">Paintball</button>
+          <button id="test-kirkwood-gaps-event" class="game__button">Kirkwood Gaps</button>
+          <button id="test-periscope-event" class="game__button">Periscope</button>
+          <button id="test-water-ski-event" class="game__button">Water Ski</button>
+          <button id="test-jai-alai-event" class="game__button">Jai Alai</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-bomb-mobile-event" class="game__button">Bomb Mobile</button>
+          <button id="test-ring-galaxy-event" class="game__button">Ring Galaxy</button>
+          <button id="test-gravitational-lens-event" class="game__button">Gravitational Lens</button>
+          <button id="test-convection-event" class="game__button">Convection</button>
+          <button id="test-paintball-event" class="game__button">Paintball</button>
           <button id="test-tidal-tails-event" class="game__button">Tidal Tails</button>
           <button id="test-hypervelocity-event" class="game__button">Hypervelocity</button>
           <button id="test-quasar-event" class="game__button">Quasar</button>
