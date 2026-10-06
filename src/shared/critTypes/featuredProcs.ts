@@ -67,9 +67,7 @@ const FEATURED_CATEGORIES = (() => {
 })();
 
 // picks one category at random, then rolls each of its crits on its own chance
-export function rollFeaturedCategory(
-  random: () => number,
-): FeaturedCritKind[] {
+export function rollFeaturedCategory(random: () => number): FeaturedCritKind[] {
   const { kinds, chances } =
     FEATURED_CATEGORIES[Math.floor(random() * FEATURED_CATEGORIES.length)];
   return kinds.filter((_, i) => random() < chances[i]);
