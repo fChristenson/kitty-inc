@@ -514,8 +514,11 @@ export function createCityMapView(
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);
       const { cx, feetY } = markerCenter(cssW, cssH, i);
       const price = getBuildingPrice(globalIndex);
+      // only the next building in line can be bought, so only it wiggles
       const affordable =
-        deps.canBuyBuilding() && gte(deps.getTotalIncome(), price);
+        globalIndex === buildingCount &&
+        deps.canBuyBuilding() &&
+        gte(deps.getTotalIncome(), price);
       if (affordable) hasWigglingPrice = true;
       drawLockedMarkerPrice(ctx, cx, feetY, price, affordable);
     }
