@@ -8354,6 +8354,54 @@ export const CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 73
+  // galaxy, a crit tier: src/floors/polarRingEvent: a ring of stars over a galaxy's poles tips down onto its disk, then showers onto the clicked bar
+  polarRingEvent: {
+    chance: 0.01,
+    growMs: 250, // the galaxy and its ring swirling up
+    tipMs: 1100, // the ring tipping over in quickening lurches
+    spreadMs: 250, // the ring's stars leaving one after another
+    rainMs: 400, // each star's fall onto the bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // drill, worker perma tiers: src/floors/kebabEvent: a drill skewers a row of workers one after another like a kebab
+  kebabEvent: {
+    chance: 0.01,
+    approachMs: 260, // the drill flying in from the side
+    stallMs: 450, // the first bite's stall (later ones half as long)
+    boreMs: 600, // the first bore (later ones half as long)
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // money, cash: src/floors/katamariEvent: a ball of cash rolls along the bars picking up the coins on them, then into the total
+  katamariEvent: {
+    chance: 0.01,
+    dropMs: 250, // the ball dropping onto the top bar
+    rollMs: 420, // each roll along a bar, quickening
+    fallMs: 160, // tumbling off a bar's end onto the next
+    launchMs: 380, // the leap into the total
+    holdMs: 250,
+    mergeMs: 500,
+  },
+  // experiment, free hires: src/floors/harmonicsEvent: a string of light hums up through its harmonics, then each loop flings a piece onto an empty spot
+  harmonicsEvent: {
+    chance: 0.01,
+    growMs: 250, // the string stretching out
+    modeMs: 380, // each harmonic, quickening
+    gapMs: 90, // between pieces flung off
+    dropMs: 380, // each piece's arc onto its spot
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // bounce, levels: src/floors/stairwellEvent: a ball bounces down the bars end to end like a superball down a stairwell
+  stairwellEvent: {
+    chance: 0.01,
+    hopMs: 260, // each bounce, quickening
+    levelShare: 0.012, // levels per bounce
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 72
   // galaxy, free hires: src/floors/kirkwoodGapsEvent: a giant planet's resonances sweep bands out of an asteroid belt into wisps that drop onto the empty spots
   kirkwoodGapsEvent: {

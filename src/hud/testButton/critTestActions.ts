@@ -46,15 +46,20 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-kirkwood-gaps-event" class="game__button">Kirkwood Gaps</button>
-          <button id="test-periscope-event" class="game__button">Periscope</button>
-          <button id="test-water-ski-event" class="game__button">Water Ski</button>
-          <button id="test-jai-alai-event" class="game__button">Jai Alai</button>
+          <button id="test-polar-ring-event" class="game__button">Polar Ring</button>
+          <button id="test-kebab-event" class="game__button">Kebab</button>
+          <button id="test-katamari-event" class="game__button">Katamari</button>
+          <button id="test-harmonics-event" class="game__button">Harmonics</button>
+          <button id="test-stairwell-event" class="game__button">Stairwell</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-kirkwood-gaps-event" class="game__button">Kirkwood Gaps</button>
+          <button id="test-periscope-event" class="game__button">Periscope</button>
+          <button id="test-water-ski-event" class="game__button">Water Ski</button>
+          <button id="test-jai-alai-event" class="game__button">Jai Alai</button>
           <button id="test-bomb-mobile-event" class="game__button">Bomb Mobile</button>
           <button id="test-ring-galaxy-event" class="game__button">Ring Galaxy</button>
           <button id="test-gravitational-lens-event" class="game__button">Gravitational Lens</button>
