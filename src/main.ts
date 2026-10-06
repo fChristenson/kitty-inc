@@ -654,6 +654,10 @@ async function main() {
       wrapRedraw: (wrap) => {
         gameCanvas.redraw = wrap(gameCanvas.redraw);
       },
+      buildingCount: () => buildings.length,
+      goToBuilding,
+      activeCompany: () => activeCompanyIndex,
+      switchCompany: (index) => switchToCompany(index),
     });
     wireTestButton(app, () => {
       // absurdly large: comfortably covers buying dozens of buildings in one go,

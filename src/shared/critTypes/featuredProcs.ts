@@ -60,7 +60,8 @@ const FEATURED_GROUPS = (() => {
     total: 0,
   }));
   for (const kind of FEATURED_CRIT_KINDS) {
-    const group = groups[groupOf.get(FEATURED_CRITS[kind].image.split("/")[1])!];
+    const group =
+      groups[groupOf.get(FEATURED_CRITS[kind].image.split("/")[1])!];
     const chance = CONFIG.crit[
       `${kind}Chance` as keyof typeof CONFIG.crit
     ] as number;

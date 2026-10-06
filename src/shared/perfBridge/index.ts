@@ -14,6 +14,11 @@ export interface PerfBridge {
   scrollToFloor: (floor: Floor, buttonAt?: number) => void;
   // swaps the per-frame redraw for wrap(redraw), so the rig can time it
   wrapRedraw: (wrap: (redraw: () => void) => () => void) => void;
+  // the active company's buildings, and moving between them and companies
+  buildingCount: () => number;
+  goToBuilding: (index: number) => Promise<void>;
+  activeCompany: () => number;
+  switchCompany: (index: number) => Promise<void>;
 }
 
 let bridge: PerfBridge | null = null;

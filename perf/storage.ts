@@ -57,8 +57,12 @@ export async function seedBase(): Promise<void> {
 }
 
 export interface FixtureOptions {
-  // unlocked floors in the building
+  // unlocked floors in each building
   floors: number;
+  // buildings in the company, each with `floors` floors; the last is on screen
+  buildings: number;
+  // companies, every one a copy of the first
+  companies: number;
   // every worker boosted, half of them perma tiers, managers on every floor
   heavy: boolean;
   // heavy, but every figure at the top perma tier and the bars overspeeding
@@ -74,10 +78,39 @@ interface SavedWorker {
   permaTier?: string;
 }
 type SavedFloor = Record<string, unknown> & { workers?: SavedWorker[] };
+interface Big {
+  mantissa: number;
+  exponent: number;
+}
 
-// loads the fresh save, grown into a busy building, as the game's storage
+const MONEY_FIELDS = [
+  "incomeAmount",
+  "rateStep",
+  "upgradeCost",
+  "unlockCost",
+  "buildingPurchaseCost",
+];
+// each building earns and costs 1000x the one before, like the game's own
+const BUILDING_EXPONENT = 3;
+// floors/floorLock's MAX_FLOORS_PER_BUILDING (not imported: game modules must
+// only load once the memory storage is in place)
+const MAX_FLOORS = 20;
+
+function scaleMoney(floor: SavedFloor, exponent: number): void {
+  for (const field of MONEY_FIELDS) {
+    const value = floor[field] as Big | undefined;
+    if (value && typeof value === "object" && value.mantissa !== 0)
+      floor[field] = { ...value, exponent: value.exponent + exponent };
+  }
+}
+
+const big = (exponent: number): Big => ({ mantissa: 1, exponent });
+
+// loads the fresh save, grown into a busy company, as the game's storage
 export function loadFixture({
   floors,
+  buildings,
+  companies,
   heavy,
   maxed,
   level,
@@ -95,34 +128,69 @@ export function loadFixture({
   };
   const [ground, locked] = save.buildings[0];
   const now = Date.now();
-  const built: SavedFloor[] = [];
-  for (let i = 0; i < floors; i++) {
-    const floor: SavedFloor = structuredClone(ground);
-    floor.unlocked = true;
-    floor.bgIndex = i % 3;
-    floor.lastCollectedAt = now;
-    if (heavy || maxed) {
-      floor.workerCount = 3;
-      floor.hasManager = true;
-      floor.hasOfficeChairs = true;
-      floor.hasOfficeSupplies = true;
-      floor.tintIndexes = [1, 2, 3];
-      floor.workers = [0, 1, 2].map((k) => ({
-        boosted: true,
-        boostedAt: now,
-        durationMs: 3_600_000,
-        permaTier: maxed || (i % 2 === 0 && k < 2) ? "ultra" : undefined,
-      }));
-      floor.managerPermaTier = maxed ? "ultra" : i % 3 === 0 ? "mega" : null;
+  const buildFloors = (building: number): SavedFloor[] => {
+    const built: SavedFloor[] = [];
+    for (let i = 0; i < floors; i++) {
+      const floor: SavedFloor = structuredClone(ground);
+      floor.unlocked = true;
+      floor.bgIndex = i % 3;
+      floor.lastCollectedAt = now;
+      if (heavy || maxed) {
+        floor.workerCount = 3;
+        floor.hasManager = true;
+        floor.hasOfficeChairs = true;
+        floor.hasOfficeSupplies = true;
+        floor.tintIndexes = [1, 2, 3];
+        floor.workers = [0, 1, 2].map((k) => ({
+          boosted: true,
+          boostedAt: now,
+          durationMs: 3_600_000,
+          permaTier: maxed || (i % 2 === 0 && k < 2) ? "ultra" : undefined,
+        }));
+        floor.managerPermaTier = maxed ? "ultra" : i % 3 === 0 ? "mega" : null;
+      }
+      if (maxed) {
+        floor.upgradeCount = 400;
+        floor.incomeIntervalSeconds = 0.01;
+      }
+      if (level !== null) floor.upgradeCount = level;
+      scaleMoney(floor, building * BUILDING_EXPONENT);
+      built.push(floor);
     }
-    if (maxed) {
-      floor.upgradeCount = 400;
-      floor.incomeIntervalSeconds = 0.01;
+    if (locked && floors < MAX_FLOORS) {
+      const next: SavedFloor = structuredClone(locked);
+      scaleMoney(next, building * BUILDING_EXPONENT);
+      built.push(next);
     }
-    if (level !== null) floor.upgradeCount = level;
-    built.push(floor);
+    return built;
+  };
+  save.buildings = Array.from({ length: buildings }, (_, b) => buildFloors(b));
+  const saved = JSON.stringify(save);
+  const top = buildings * BUILDING_EXPONENT;
+  const names = JSON.parse(
+    base["cash-clicker:corporation-names"] ?? "[]",
+  ) as string[];
+  const records = [];
+  for (let c = 0; c < companies; c++) {
+    const suffix = c === 0 ? "" : `:${c}`;
+    memory.setItem(`cash-clicker:buildings${suffix}`, saved);
+    memory.setItem(
+      `cash-clicker:active-building-index${suffix}`,
+      String(buildings - 1),
+    );
+    names[c] ??= `Perf Corp ${c + 1}`;
+    records.push({
+      upgradeEconomyVersion: ground.upgradeEconomyVersion,
+      bankedTotal: big(top + 40),
+      incomeRatePerSecond: big(top + 30),
+      assetValue: big(top + 45),
+      upgradesValue: big(top + 44),
+      updatedAt: now,
+    });
   }
-  if (locked) built.push(locked);
-  save.buildings[0] = built;
-  memory.setItem("cash-clicker:buildings", JSON.stringify(save));
+  if (companies > 1 || buildings > 1) {
+    memory.setItem("cash-clicker:corporation-names", JSON.stringify(names));
+    memory.setItem("cash-clicker:corporations", JSON.stringify(records));
+    memory.setItem("cash-clicker:active-company-index", "0");
+  }
 }

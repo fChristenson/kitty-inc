@@ -282,6 +282,49 @@ function measure(
 
 const isDigit = (char: string): boolean => char >= "0" && char <= "9";
 
+// where each letter of a text at rest starts, from its left edge, and the
+// whole width: worked out once per text, not per letter every frame
+interface RestLayout {
+  width: number;
+  offsets: Float64Array;
+}
+const restLayouts = [
+  new Map<string, Map<string, RestLayout>>(),
+  new Map<string, Map<string, RestLayout>>(),
+];
+function restLayout(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  font: string,
+  tabular: boolean,
+): RestLayout {
+  const byFont = restLayouts[tabular ? 1 : 0];
+  let byText = byFont.get(font);
+  if (!byText) byFont.set(font, (byText = new Map()));
+  let layout = byText.get(text);
+  if (layout) return layout;
+  if (byText.size >= TEXT_WIDTH_CACHE_LIMIT) byText.clear();
+  const digitCell = tabular ? maxDigitWidth(ctx, font) : 0;
+  const offsets = new Float64Array(text.length);
+  let start = 0;
+  for (let i = 0; i < text.length; i++) {
+    const width = measure(ctx, text[i], font);
+    const digit = tabular && isDigit(text[i]);
+    // a kerned letter is measured through itself, so the kern before it is kept
+    const end = tabular
+      ? start + (digit ? digitCell : width)
+      : measure(ctx, text.slice(0, i + 1), font);
+    const cellWidth = end - start;
+    offsets[i] =
+      start +
+      (digit ? (cellWidth - width) / 2 : tabular ? 0 : cellWidth - width);
+    start = end;
+  }
+  layout = { width: tabular ? start : measure(ctx, text, font), offsets };
+  byText.set(text, layout);
+  return layout;
+}
+
 // text at rest, every frame: tabular for counting numbers, otherwise kerned.
 // Stamped from sprites at the canvas's own scale when it can be, else drawn
 // as text letter by letter (tabular) or whole (kerned)
@@ -305,11 +348,8 @@ function drawRestText(
     return;
   }
   const digitCell = tabular ? maxDigitWidth(ctx, font) : 0;
-  let fullWidth = 0;
-  if (!tabular) fullWidth = measure(ctx, text, font);
-  else
-    for (let i = 0; i < text.length; i++)
-      fullWidth += isDigit(text[i]) ? digitCell : measure(ctx, text[i], font);
+  const layout = restLayout(ctx, text, font, tabular);
+  const fullWidth = layout.width;
   const align = ctx.textAlign;
   const left =
     align === "center"
@@ -329,22 +369,10 @@ function drawRestText(
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     for (let pass = 0; pass < 2; pass++) {
-      let start = 0;
       for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        const width = measure(ctx, char, font);
-        const digit = tabular && isDigit(char);
-        // a kerned letter is measured through itself, so the kern before it is kept
-        const end = tabular
-          ? start + (digit ? digitCell : width)
-          : measure(ctx, text.slice(0, i + 1), font);
-        const cellWidth = end - start;
-        const lx =
-          left +
-          start +
-          (digit ? (cellWidth - width) / 2 : tabular ? 0 : cellWidth - width);
-        start = end;
         if (char === " ") continue;
+        const lx = left + layout.offsets[i];
         const glyph = getRestGlyph(ctx, set, char);
         ctx.drawImage(
           glyph.canvas,

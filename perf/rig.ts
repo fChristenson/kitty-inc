@@ -3,7 +3,12 @@
 // particles or timers), collecting a summary per scenario.
 //
 // ?run=idle,hold,events      runs those at once, then shows the report
-// ?floors=10                 unlocked floors in the fixture building
+//                            ("late" runs the big-company set; pair with ?late=1)
+// ?floors=10                 unlocked floors in each fixture building
+// ?buildings=1               buildings in the company (the last on screen)
+// ?companies=1               companies, each a copy of the first
+// ?late=1                    a late-game save: 30 full buildings in each of
+//                            6 companies, maxed (the others still override)
 // ?light=1                   no boosted workers, perma tiers or managers
 // ?maxed=1                   every cat and manager at the top perma tier,
 //                            high levels, overspeed bars
@@ -30,10 +35,13 @@ const AUTORUN_KEY = "perf-rig:autorun";
 const STARTUP_MS = 10_000;
 
 const params = new URLSearchParams(location.search);
+const late = params.get("late") === "1";
 const options = {
-  floors: Number(params.get("floors") ?? 10),
+  floors: Number(params.get("floors") ?? (late ? 20 : 10)),
+  buildings: Number(params.get("buildings") ?? (late ? 30 : 1)),
+  companies: Number(params.get("companies") ?? (late ? 6 : 1)),
   heavy: params.get("light") !== "1",
-  maxed: params.get("maxed") === "1",
+  maxed: params.has("maxed") ? params.get("maxed") === "1" : late,
   level: params.has("level") ? Number(params.get("level")) : null,
   counts: params.get("counts") !== "0",
   warmup: Number(params.get("warmup") ?? 2500),
@@ -96,6 +104,7 @@ async function boot(): Promise<void> {
   const {
     SCENARIOS,
     SAMPLE_EVENTS,
+    LATE_SCENARIOS,
     CRIT_MODES,
     eventIds,
     eventScenario,
@@ -123,6 +132,10 @@ async function boot(): Promise<void> {
         );
       if (base === "events-all")
         return [...known].map((id) => `event:${id}${suffix}`);
+      if (base === "late")
+        return LATE_SCENARIOS.map((id) =>
+          id === "startup" ? id : `${id}${suffix}`,
+        );
       return [name];
     });
   // a run under its crit mode and freshly seeded dice, named as asked
@@ -146,9 +159,10 @@ async function boot(): Promise<void> {
   };
 
   if (current) {
-    // a queue entry from before expand() existed
-    if (parseRunName(current).base.startsWith("events")) {
-      queue = [...expand([current]), ...queue.slice(1)];
+    // a set queued before expand() could run (a ?run= autorun)
+    const expanded = expand([current]);
+    if (expanded.length !== 1 || expanded[0] !== current) {
+      queue = [...expanded, ...queue.slice(1)];
       sessionStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
       location.reload();
       return;
@@ -184,6 +198,10 @@ async function boot(): Promise<void> {
       ...SCENARIOS,
       { name: "events", about: "a sample of events across the templates" },
       { name: "events-all", about: "every event with a test button (slow)" },
+      {
+        name: "late",
+        about: "what grows with the company; open with ?late=1 for a big save",
+      },
     ],
     onRun: rig.queue,
     critModes: CRIT_MODES,
@@ -191,7 +209,7 @@ async function boot(): Promise<void> {
       clearBase();
       location.reload();
     },
-    environment: `${innerWidth}×${innerHeight} @${devicePixelRatio}x · ${options.floors} floors${options.heavy ? ", heavy" : ""}${options.maxed ? ", maxed" : ""} · counts ${options.counts ? "on" : "off"} · crit seed ${options.seed || "free"} · throttle the CPU in DevTools for phone-like numbers`,
+    environment: `${innerWidth}×${innerHeight} @${devicePixelRatio}x · ${options.companies > 1 ? `${options.companies} companies × ` : ""}${options.buildings > 1 ? `${options.buildings} buildings × ` : ""}${options.floors} floors${options.heavy ? ", heavy" : ""}${options.maxed ? ", maxed" : ""} · counts ${options.counts ? "on" : "off"} · crit seed ${options.seed || "free"} · throttle the CPU in DevTools for phone-like numbers`,
   });
   panel.showResults(rig.results);
   rig.done = true;

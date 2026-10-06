@@ -53,6 +53,12 @@ function normalize(mantissa: number, exponent: number): BigNumber {
   const sign = mantissa < 0 ? -1 : 1;
   let m = Math.abs(mantissa);
   let e = exponent;
+  // one exact-as-possible rescale instead of a digit at a time
+  const shift = m >= 10 || m < 1 ? Math.floor(Math.log10(m)) : 0;
+  if (shift !== 0 && shift <= 300 && shift >= -300) {
+    m = shift > 0 ? m / 10 ** shift : m * 10 ** -shift;
+    e += shift;
+  }
   while (m >= 10) {
     m /= 10;
     e += 1;
@@ -114,11 +120,18 @@ export function multiplyBig(a: BigNumber, b: BigNumber): BigNumber {
   return normalize(a.mantissa * b.mantissa, a.exponent + b.exponent);
 }
 
+// past this, a scalar's mantissa/exponent split goes through fromNumber
+const DIRECT_SCALAR_LIMIT = 1e15;
+
 // scales by a plain finite multiplier (a growth rate like 1.3, a percentage
 // like 0.1, a boost multiplier, ...) — scalar itself is never expected to be
 // astronomically large, so fromNumber(scalar) is always safe
 export function multiply(a: BigNumber, scalar: number): BigNumber {
   if (scalar === 0 || isZero(a)) return ZERO;
+  // the hot path (income ticks, prices): no string round trip through fromNumber
+  const size = scalar < 0 ? -scalar : scalar;
+  if (size < DIRECT_SCALAR_LIMIT && size > 1 / DIRECT_SCALAR_LIMIT)
+    return normalize(a.mantissa * scalar, a.exponent);
   return multiplyBig(a, fromNumber(scalar));
 }
 
@@ -126,7 +139,7 @@ export function multiply(a: BigNumber, scalar: number): BigNumber {
 // same "scalar is never astronomically large" assumption as multiply
 export function divide(a: BigNumber, scalar: number): BigNumber {
   if (isZero(a) || scalar === 0) return ZERO;
-  return multiplyBig(a, fromNumber(1 / scalar));
+  return multiply(a, 1 / scalar);
 }
 
 // base**exponent via exponentiation by squaring — never computes `base **

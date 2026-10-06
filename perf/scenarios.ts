@@ -10,12 +10,14 @@ import {
 } from "../src/floors";
 import { fromNumber } from "../src/shared/bigNumber";
 import {
+  CRIT_PROC_INFO,
   CRIT_PROC_KINDS,
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
   FEATURED_CRIT_KINDS,
   SPECIAL_CRIT_GATEWAY,
 } from "../src/shared/critTypes";
+import { getActiveCorporationIndices } from "../src/company";
 import { setCritRandom } from "../src/shared/critRandom";
 import { shakeScreen } from "../src/screenShake";
 import type { Floor } from "../src/gameState";
@@ -190,6 +192,10 @@ function forceCrit(bridge: PerfBridge, kind: string, tier: string): void {
 
 const FEATURED = new Set<string>(FEATURED_CRIT_KINDS);
 const PROCS = CRIT_PROC_KINDS.filter((kind) => !FEATURED.has(kind));
+// procs that reach past the crit's floor: every floor, building or worker
+const WIDE_PROCS = PROCS.filter((kind) =>
+  /\b(every|all)\b/i.test(CRIT_PROC_INFO[kind].description),
+);
 const pick = <T>(items: readonly T[]): T =>
   items[Math.floor(scenarioRandom() * items.length)];
 
@@ -368,6 +374,42 @@ export const SCENARIOS: Scenario[] = [
       return summary;
     },
   },
+  {
+    name: "wide-crits",
+    about: "a crit reaching every floor or building every 1.5s (try ?late=1)",
+    run: critSeries("wide-crits", 1500, () => pick(WIDE_PROCS)),
+  },
+  {
+    name: "building-hop",
+    about: "switching to another building every 600ms (try ?late=1)",
+    run: async (bridge) => {
+      const count = bridge.buildingCount();
+      let n = 0;
+      const stopHop = every(600, () => {
+        n = (n + 7) % count;
+        void bridge.goToBuilding(n);
+      });
+      const summary = await measure("building-hop", 6000);
+      stopHop();
+      return summary;
+    },
+  },
+  {
+    name: "company-switch",
+    about:
+      "switching company every 1.5s: saves one, loads the next (try ?late=1)",
+    run: async (bridge) => {
+      const companies = getActiveCorporationIndices();
+      let n = Math.max(0, companies.indexOf(bridge.activeCompany()));
+      const stopSwitch = every(1500, () => {
+        n = (n + 1) % companies.length;
+        void bridge.switchCompany(companies[n]);
+      });
+      const summary = await measure("company-switch", 9000);
+      stopSwitch();
+      return summary;
+    },
+  },
 ];
 
 // one event: armed on the ground floor from its test button, then tapped
@@ -411,4 +453,17 @@ export const SAMPLE_EVENTS = [
   "spirit-bomb",
   "chladni",
   "arc-swarm",
+];
+
+// what grows with the company: run with ?late=1
+export const LATE_SCENARIOS = [
+  "startup",
+  "idle",
+  "scroll",
+  "hold",
+  "crits",
+  "wide-crits",
+  "map",
+  "building-hop",
+  "company-switch",
 ];

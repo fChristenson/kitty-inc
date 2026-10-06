@@ -254,8 +254,10 @@ export function insertWorkerSlot(
 // how many of a floor's workers are currently boosted; incomePanel.ts uses this to
 // scale the income rate delay down per boosted worker
 export function countBoostedWorkers(floor: Floor, now: number): number {
-  return getWorkerSlots(floor).filter((slot) => expireIfStale(slot, now))
-    .length;
+  let count = 0;
+  for (const slot of getWorkerSlots(floor))
+    if (expireIfStale(slot, now)) count++;
+  return count;
 }
 
 // ms left on a worker's boost, 0 once expired/never boosted; worker.ts's
@@ -501,6 +503,7 @@ interface SavedBuildings {
 }
 
 export function clearBuildings(companyIndex = 0): void {
+  savedVersion++;
   try {
     localStorage.removeItem(companyStorageKey(STORAGE_KEY, companyIndex));
   } catch {
@@ -546,6 +549,7 @@ export function saveBuildings(buildings: Floor[][], companyIndex = 0): void {
   const saved: SavedBuildings = {
     buildings: data,
   };
+  savedVersion++;
   try {
     localStorage.setItem(
       companyStorageKey(STORAGE_KEY, companyIndex),
@@ -562,7 +566,11 @@ const buildingSaveScheduler = createSaveScheduler<{
 }>(({ buildings, companyIndex }) => saveBuildings(buildings, companyIndex));
 
 export function schedulePersist(buildings: Floor[][], companyIndex = 0): void {
-  buildingSaveScheduler.schedule({ buildings, companyIndex });
+  // a copy: switching company refills the same array before the save runs
+  buildingSaveScheduler.schedule({
+    buildings: buildings.slice(),
+    companyIndex,
+  });
 }
 
 export function saveBuildingsImmediately(
@@ -635,14 +643,11 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
   return floor;
 }
 
-// the saved buildings exactly as stored, for callers that only need to know
-// whether they changed
-export function readSavedBuildings(companyIndex = 0): string | null {
-  try {
-    return localStorage.getItem(companyStorageKey(STORAGE_KEY, companyIndex));
-  } catch {
-    return null;
-  }
+// bumped by every buildings save or clear, so a reader can tell the saved
+// buildings changed without reading the whole save back
+let savedVersion = 0;
+export function getSavedBuildingsVersion(): number {
+  return savedVersion;
 }
 
 // rebuilds Floor[][] (one Floor[] per building) from localStorage; returns [] if

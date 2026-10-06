@@ -1,11 +1,15 @@
 import {
   loadBuildings,
-  readSavedBuildings,
+  getSavedBuildingsVersion,
   clearBuildings,
   saveBuildingsImmediately,
   type Floor,
 } from "../../gameState";
-import { getStoredTotalIncome, addCompanyTotalIncome } from "../../totalIncome";
+import {
+  getStoredTotalIncome,
+  addCompanyTotalIncome,
+  getActiveBuildings,
+} from "../../totalIncome";
 import { regenerateCorporationName } from "../../corporationName";
 import {
   getOfficeChairsCost,
@@ -259,20 +263,23 @@ export function mergeCompanies(
 // active company reads its own live buildings (freshest); any dormant
 // company reads its persisted CompanyRecord's own frozen assetValue instead
 // of ever loading its full buildings/floors array
-// the active company's value as of its saved buildings: the income ticker asks
-// every second, and re-parsing and re-pricing every floor each time fed the
-// garbage collector, so it's only redone once the save itself changes
+// the active company's value as of its last buildings save: the income ticker
+// asks every second, and re-pricing every floor each time fed the garbage
+// collector, so it's only redone once a save happened
 let activeValue: {
   index: number;
-  saved: string | null;
+  saved: number;
   value: BigNumber;
 } | null = null;
 function getCompanyValue(companyIndex: number): BigNumber {
   if (companyIndex === getActiveCompanyIndex()) {
-    const saved = readSavedBuildings(companyIndex);
+    const saved = getSavedBuildingsVersion();
     if (activeValue?.index === companyIndex && activeValue.saved === saved)
       return activeValue.value;
-    const value = getCompanyAssetValue(loadBuildings(companyIndex));
+    const live = getActiveBuildings();
+    const value = getCompanyAssetValue(
+      live && live.length > 0 ? live : loadBuildings(companyIndex),
+    );
     activeValue = { index: companyIndex, saved, value };
     return value;
   }

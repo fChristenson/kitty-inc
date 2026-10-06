@@ -67,12 +67,21 @@ export interface CompanyRecord {
 // split across several keys)
 const CORPORATIONS_KEY = "cash-clicker:corporations";
 
+// the last parse, reused while the stored string is unchanged: the ticker and
+// the global boost read every company's record several times a second
+let parsedRecords: { raw: string; records: (CompanyRecord | null)[] } | null =
+  null;
+
 function loadAllCompanyRecords(): (CompanyRecord | null)[] {
   try {
     const raw = localStorage.getItem(CORPORATIONS_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (parsedRecords?.raw !== raw) {
+      const parsed = JSON.parse(raw);
+      parsedRecords = { raw, records: Array.isArray(parsed) ? parsed : [] };
+    }
+    // a copy: saveCompanyRecord writes into the array it gets
+    return parsedRecords.records.slice();
   } catch {
     return [];
   }

@@ -36,6 +36,9 @@ export function getTotalIncome(): BigNumber {
   return totalIncome;
 }
 
+// background jobs running against a draft economy (withDraftEconomy)
+let drafting = 0;
+
 export function withDraftEconomy<T>(
   draft: { buildings: Floor[][]; money: BigNumber },
   action: () => T,
@@ -44,9 +47,11 @@ export function withDraftEconomy<T>(
   const liveBuildings = tickerBuildings;
   totalIncome = draft.money;
   tickerBuildings = draft.buildings;
+  drafting++;
   try {
     return action();
   } finally {
+    drafting--;
     draft.money = totalIncome;
     totalIncome = liveMoney;
     tickerBuildings = liveBuildings;
@@ -168,6 +173,12 @@ export function getStoredUpgradesValue(companyIndex: number): BigNumber {
   if (companyIndex === activeCompanyIndex)
     return sumUpgradesValue(tickerBuildings);
   return loadCompanyRecord(companyIndex)?.upgradesValue ?? ZERO;
+}
+
+// the active company's live buildings, as the ticker pays them; null while a
+// background job has a draft swapped in
+export function getActiveBuildings(): Floor[][] | null {
+  return drafting > 0 ? null : tickerBuildings;
 }
 
 // combined upgrades value across every corporation — see "Payout" crit's own
@@ -496,15 +507,14 @@ export function startTotalIncomeTicker(
       cachedBoostMultiplier = incomeBoostMultiplier();
       cachedBoostMultiplierAt = now;
     }
+    let collected = ZERO;
     for (const floors of tickerBuildings) {
       for (const floor of floors) {
         if (!floor.unlocked || isFloorLocked(floor)) continue;
-        totalIncome = add(
-          totalIncome,
-          multiply(collectDueIncome(floor, now), cachedBoostMultiplier),
-        );
+        collected = add(collected, collectDueIncome(floor, now));
       }
     }
+    totalIncome = add(totalIncome, multiply(collected, cachedBoostMultiplier));
 
     const nowPerf = performance.now();
     if (nowPerf - lastSave >= SAVE_INTERVAL_MS) {

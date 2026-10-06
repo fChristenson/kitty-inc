@@ -28,6 +28,9 @@ export interface SaveLifecycle {
 // a busy frame loop (a long press on a phone) never goes idle, so this is how
 // often a save forces itself in; leaving the page saves straight away anyway
 const IDLE_SAVE_TIMEOUT_MS = 5000;
+// a long press asks for a save after every click, and a save serializes every
+// building of the company, so background saves keep at least this far apart
+const MIN_SAVE_GAP_MS = 2000;
 
 export function createSaveScheduler<T>(save: (state: T) => void): {
   schedule: (state: T) => void;
@@ -35,13 +38,22 @@ export function createSaveScheduler<T>(save: (state: T) => void): {
 } {
   let pendingState: T | null = null;
   let scheduled = false;
+  let savedAt = -Infinity;
 
   const run = (): void => {
     scheduled = false;
     if (pendingState === null) return;
     const state = pendingState;
     pendingState = null;
+    savedAt = performance.now();
     save(state);
+  };
+  const request = (): void => {
+    if (typeof requestIdleCallback === "function") {
+      requestIdleCallback(run, { timeout: IDLE_SAVE_TIMEOUT_MS });
+    } else {
+      window.setTimeout(run, 200);
+    }
   };
 
   return {
@@ -50,15 +62,14 @@ export function createSaveScheduler<T>(save: (state: T) => void): {
       if (scheduled) return;
       scheduled = true;
       afterStartup(() => {
-        if (typeof requestIdleCallback === "function") {
-          requestIdleCallback(run, { timeout: IDLE_SAVE_TIMEOUT_MS });
-        } else {
-          window.setTimeout(run, 200);
-        }
+        const wait = savedAt + MIN_SAVE_GAP_MS - performance.now();
+        if (wait > 0) window.setTimeout(request, wait);
+        else request();
       });
     },
     saveNow: (state) => {
       pendingState = null;
+      savedAt = performance.now();
       save(state);
     },
   };

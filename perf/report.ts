@@ -109,7 +109,7 @@ export function mountPanel(actions: PanelActions): {
   const options = actions.scenarios
     .map(
       (s) =>
-        `<label title="${s.about}"><input type="checkbox" value="${s.name}" ${s.name === "events-all" ? "" : "checked"} /> ${s.name}</label>`,
+        `<label title="${s.about}"><input type="checkbox" value="${s.name}" ${s.name === "events-all" || s.name === "late" ? "" : "checked"} /> ${s.name}</label>`,
     )
     .join("");
   const modes = Object.entries(actions.critModes)
