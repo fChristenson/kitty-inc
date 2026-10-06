@@ -28,6 +28,7 @@ import {
   getFlashHoldEndsAt,
   freezeCritFlashAsBackground,
 } from "../../screenShake";
+import { getScreenUnfrozenAt, isScreenFrozen } from "../../shared/screenFreeze";
 
 // crit celebrations are flash + sound only: no coin bursts (perf)
 function celebrateTier(tier: CritTier): void {
@@ -147,6 +148,11 @@ function drainSpecialCelebrationQueue(): void {
   if (drainingSpecialQueue) return;
   drainingSpecialQueue = true;
   const step = () => {
+    // an event owns the screen: celebrations wait until it ends
+    if (isScreenFrozen()) {
+      setTimeout(step, 100);
+      return;
+    }
     // a queued "special crit crit" bonus tier never waits for the flash ahead
     // of it to run its full course (grow -> hold -> fade) like every other
     // queued kind does below — it freezes that flash as a static backdrop
@@ -178,7 +184,7 @@ function drainSpecialCelebrationQueue(): void {
       return;
     }
     if (
-      Date.now() - popped.queuedAt >
+      Date.now() - Math.max(popped.queuedAt, getScreenUnfrozenAt()) >
       (popped.maxAgeMs ?? CELEBRATION_QUEUE_MAX_AGE_MS)
     ) {
       step();
@@ -263,7 +269,11 @@ export function triggerCritCelebration(
   // a plain tier crit with no special proc: only worth celebrating if nothing
   // special is still queued/playing — omitted entirely rather than cutting in
   // front of (or piling up behind) whatever special celebration is still due
-  if (specialCelebrationQueue.length > 0 || isCritFlashActive(Date.now())) {
+  if (
+    isScreenFrozen() ||
+    specialCelebrationQueue.length > 0 ||
+    isCritFlashActive(Date.now())
+  ) {
     return;
   }
   celebrateTier(tier);

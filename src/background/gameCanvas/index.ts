@@ -30,7 +30,7 @@ import { getTotalIncome } from "../../totalIncome";
 import {
   getScreenShakeOffset,
   drawCritFlash,
-  isCritFlashActive,
+  syncCritFlashPause,
   stopScreenShake,
 } from "../../screenShake";
 import { COLOR } from "../../palette";
@@ -582,29 +582,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       motion.scaleX === 1 &&
       motion.scaleY === 1 &&
       motion.blur === 0;
-    // the crit flash sits under the wash with the frozen frame, so an event
-    // always plays over a crit reveal that was still showing
-    const drawFlash = () => {
-      ctx.save();
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.scale(scale, scale);
-      drawCritFlash(
-        ctx,
-        SLOT_W / 2,
-        contentViewportH() / 2,
-        SLOT_W,
-        Date.now(),
-      );
-      ctx.restore();
-    };
+    syncCritFlashPause(Date.now());
     // once the wash has settled, one pass of a pre-dimmed copy replaces
     // clearing, drawing the frame and washing it every frame
-    if (
-      still &&
-      dim > 0 &&
-      dim === frozenFrame.lastDim &&
-      !isCritFlashActive(Date.now())
-    ) {
+    if (still && dim > 0 && dim === frozenFrame.lastDim) {
       if (frozenFrame.dimmed?.alpha !== dim) {
         const dimmed = document.createElement("canvas");
         dimmed.width = canvas.width;
@@ -633,7 +614,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         if (y < 0) ctx.fillRect(0, canvas.height + y, canvas.width, -y);
       }
       ctx.restore();
-      drawFlash();
     } else {
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -672,7 +652,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         );
       }
       ctx.restore();
-      drawFlash();
       ctx.save();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.globalAlpha = dim;

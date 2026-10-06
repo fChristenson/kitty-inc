@@ -15,6 +15,7 @@ import {
 import { drawCritText } from "../shared/critText";
 import { runWhenIdle } from "../shared/idle";
 import { drawGoldShimmer } from "../shared/goldShimmer";
+import { isScreenFrozen } from "../shared/screenFreeze";
 import {
   drawCritSparks,
   startCritSparks,
@@ -158,6 +159,21 @@ let bgFlashLabel: string | null = null;
 let bgFlashColor: string = COLOR.purple;
 let bgFlashStrokeWidth = 8;
 
+// an event's screen freeze hides the flash and stops its clock until it ends
+let flashPausedAt: number | null = null;
+
+export function syncCritFlashPause(now: number): void {
+  if (isScreenFrozen()) {
+    flashPausedAt ??= now;
+    return;
+  }
+  if (flashPausedAt === null) return;
+  const pausedMs = now - flashPausedAt;
+  flashPausedAt = null;
+  if (flashStartedAt !== null) flashStartedAt += pausedMs;
+  if (flashEndsAt !== null) flashEndsAt += pausedMs;
+}
+
 interface FlashRequest {
   intensity: number;
   label: string;
@@ -181,7 +197,8 @@ const FLASH_DURATION_MS = 260;
 const FLASH_SPIN_DEG = -220;
 
 function startFlash(req: FlashRequest): void {
-  const now = Date.now();
+  syncCritFlashPause(Date.now());
+  const now = flashPausedAt ?? Date.now();
   const fadeDurationMs = FLASH_DURATION_MS * req.intensity - GROWTH_DURATION_MS;
   const holdMs = Math.max(
     req.holdMs + iconExtraHoldMs(req),
@@ -369,7 +386,8 @@ function settlePose(elapsedMs: number): { scale: number; rotation: number } {
 // long as the flash is still playing, without triggering drawCritFlash's own
 // side effect of clearing the state once expired
 export function isCritFlashActive(now: number): boolean {
-  return flashEndsAt !== null && now < flashEndsAt;
+  syncCritFlashPause(now);
+  return flashEndsAt !== null && (flashPausedAt ?? now) < flashEndsAt;
 }
 
 // absolute timestamp the CURRENT foreground flash's hold phase ends (right
@@ -679,6 +697,8 @@ export function drawCritFlash(
   viewportWidth: number,
   now: number,
 ): void {
+  syncCritFlashPause(now);
+  if (flashPausedAt !== null) return;
   drawFlashLayers(ctx, centerX, centerY, viewportWidth, now);
   drawCritSparks(ctx, centerX, centerY, viewportWidth, now);
 }
