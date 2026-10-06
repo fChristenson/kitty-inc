@@ -270,6 +270,7 @@ import {
   getBuildingMultiplier,
   repairZeroedFloors,
   getBuildingPrice,
+  canBuyNextBuilding,
   loadWallMaterial,
   loadRoofImage,
 } from "./buildings";
@@ -3039,6 +3040,7 @@ async function main() {
   // Returns whether it succeeded so the map menu can decide whether to re-render
   function buyBuilding(targetBuildings = buildings): boolean {
     const buildingIndex = targetBuildings.length;
+    if (!canBuyNextBuilding(targetBuildings)) return false;
     const purchaseCost = getBuildingPrice(buildingIndex);
     if (!spendTotalIncome(purchaseCost)) return false;
     targetBuildings.push(
@@ -3094,7 +3096,10 @@ async function main() {
       }
       best = candidate;
     };
-    if (onlyBuildingIndex === undefined) {
+    if (
+      onlyBuildingIndex === undefined &&
+      canBuyNextBuilding(targetBuildings)
+    ) {
       consider({
         cost: getBuildingPrice(targetBuildings.length),
         label: "+1 building",
@@ -3431,6 +3436,7 @@ async function main() {
     isBuildingRenovating: (buildingIndex) =>
       renovations.isRunning(activeCompanyIndex, buildingIndex),
     buyBuilding,
+    canBuyBuilding: () => canBuyNextBuilding(buildings),
     onStateChanged: saveCurrentCompanyStateNow,
     buyOutBuilding,
     setBuildingCritTier,

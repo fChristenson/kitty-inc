@@ -31,6 +31,8 @@ export const CONFIG = {
   // Each building after scales by floorEconomyMultiplierPerBuilding
   buildings: {
     unlockMinutesAtMax: 180,
+    // the next building can only be bought once the newest one is maxed out
+    requireMaxedBuilding: true,
   },
 
   // src/floors/incomePanel/index.ts — how a floor's income/interval evolve as
@@ -46,6 +48,9 @@ export const CONFIG = {
     upgradePaybackGrowth: 0.5,
     // a floor stops taking upgrades here; Sales and Overtime still play on it
     maxFloorLevel: 1000,
+    // a floor at maxFloorLevel earns this many times its income, so finishing
+    // a building pays far more than buying the next one early
+    maxedFloorIncomeMultiplier: 10,
   },
 
   // src/floors/upgradeButton/index.ts's CRIT_TIER_CONFIG — odds + free-upgrade/

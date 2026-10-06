@@ -6,7 +6,7 @@ import {
   animateDialogClose,
   cancelDialogClose,
 } from "../../utils";
-import { getBuildingPrice } from "../../buildings";
+import { canBuyNextBuilding, getBuildingPrice } from "../../buildings";
 import { playSwoosh, playSold } from "../../sound";
 import { gte, lt } from "../../shared/bigNumber";
 import { createPollingLoop } from "../../shared/pollingLoop";
@@ -73,14 +73,15 @@ export function wireMapMenu(
     }).join("");
 
     const price = getBuildingPrice(count);
-    const affordable = gte(getTotalIncome(), price);
+    const open = canBuyNextBuilding(buildings);
+    const affordable = open && gte(getTotalIncome(), price);
     const buyItem = `
       <button
         class="worker-menu__item"
         id="map-menu-buy-building"
         ${affordable ? "" : "disabled"}
       >
-        <span>Unlock a new building</span>
+        <span>${open ? "Unlock a new building" : "Max out this building first"}</span>
         <span class="worker-menu__price">${formatPrice(price)}</span>
       </button>
     `;
@@ -132,10 +133,9 @@ export function wireMapMenu(
       "#map-menu-buy-building",
     );
     if (button) {
-      button.disabled = lt(
-        getTotalIncome(),
-        getBuildingPrice(getBuildingCount()),
-      );
+      button.disabled =
+        !canBuyNextBuilding(buildings) ||
+        lt(getTotalIncome(), getBuildingPrice(getBuildingCount()));
     }
   }
 

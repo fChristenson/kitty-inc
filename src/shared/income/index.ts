@@ -49,11 +49,18 @@ export function effectiveIncomeCycle(
   speedMultiplier: number,
 ): EffectiveIncomeCycle {
   const uncappedIntervalSeconds = floor.incomeIntervalSeconds / speedMultiplier;
+  const base =
+    floor.upgradeCount >= CONFIG.incomePanel.maxFloorLevel
+      ? multiply(
+          floor.incomeAmount,
+          CONFIG.incomePanel.maxedFloorIncomeMultiplier,
+        )
+      : floor.incomeAmount;
 
   if (uncappedIntervalSeconds > MIN_INCOME_INTERVAL_SECONDS) {
     return {
       intervalSeconds: uncappedIntervalSeconds,
-      amount: floor.incomeAmount,
+      amount: base,
       overspeed: false,
     };
   }
@@ -61,7 +68,7 @@ export function effectiveIncomeCycle(
     MIN_INCOME_INTERVAL_SECONDS / uncappedIntervalSeconds;
   return {
     intervalSeconds: MIN_INCOME_INTERVAL_SECONDS,
-    amount: multiply(floor.incomeAmount, overspeedMultiplier),
+    amount: multiply(base, overspeedMultiplier),
     overspeed: true,
   };
 }

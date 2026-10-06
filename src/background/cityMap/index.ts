@@ -119,6 +119,8 @@ export interface CityMapDeps {
   getBuildingCritTier: (buildingIndex: number) => CritTier | null;
   isBuildingRenovating: (buildingIndex: number) => boolean;
   buyBuilding: () => boolean; // unlocks building 1 if affordable
+  // whether the newest building is maxed out, opening the next one
+  canBuyBuilding: () => boolean;
   onStateChanged: () => void; // schedules persistence after any map-node purchase
   // long-press on a bought marker: buys everything affordable in that building
   buyOutBuilding: (buildingIndex: number) => Promise<boolean>;
@@ -512,7 +514,8 @@ export function createCityMapView(
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);
       const { cx, feetY } = markerCenter(cssW, cssH, i);
       const price = getBuildingPrice(globalIndex);
-      const affordable = gte(deps.getTotalIncome(), price);
+      const affordable =
+        deps.canBuyBuilding() && gte(deps.getTotalIncome(), price);
       if (affordable) hasWigglingPrice = true;
       drawLockedMarkerPrice(ctx, cx, feetY, price, affordable);
     }

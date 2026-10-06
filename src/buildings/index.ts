@@ -22,15 +22,35 @@ export function getBuildingMultiplier(buildingIndex: number): BigNumber {
   return pow(CONFIG.floors.floorEconomyMultiplierPerBuilding, buildingIndex);
 }
 
-// a fully upgraded first building's income per second: every floor maxed with
-// all three office upgrades
+// a fully upgraded first building's income per second: every floor maxed (with
+// its maxed bonus) and all three office upgrades
 const MAXED_BUILDING_INCOME =
   MAX_FLOORS_PER_BUILDING *
   CONFIG.floors.baseIncomeAmount *
   floorRateFactor(CONFIG.incomePanel.maxFloorLevel) *
+  CONFIG.incomePanel.maxedFloorIncomeMultiplier *
   CONFIG.officeUpgrades.speedMultiplierPerUpgrade ** 3;
 const BUILDING_BASE_PRICE =
   MAXED_BUILDING_INCOME * 60 * CONFIG.buildings.unlockMinutesAtMax;
+
+// every floor of the building unlocked and at the level cap
+export function isBuildingMaxed(floors: readonly Floor[]): boolean {
+  const unlocked = floors.filter((floor) => floor.unlocked);
+  return (
+    unlocked.length >= MAX_FLOORS_PER_BUILDING &&
+    unlocked.every(
+      (floor) => floor.upgradeCount >= CONFIG.incomePanel.maxFloorLevel,
+    )
+  );
+}
+
+// the next building opens once the newest one is maxed out
+export function canBuyNextBuilding(buildings: readonly Floor[][]): boolean {
+  const newest = buildings[buildings.length - 1];
+  return (
+    !newest || !CONFIG.buildings.requireMaxedBuilding || isBuildingMaxed(newest)
+  );
+}
 
 // $ cost to buy the next building (nextBuildingIndex === buildings.length, since
 // index 0 is the always-free starting building), independently of floor scaling. Uses
