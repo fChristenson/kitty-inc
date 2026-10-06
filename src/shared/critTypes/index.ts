@@ -24,7 +24,7 @@ import {
   FEATURED_CRIT_KINDS,
   getFeaturedRewards,
   isFeaturedCritKind,
-  rollFeaturedCategory,
+  rollFeaturedCrit,
   type FeaturedCritKind,
 } from "./featuredProcs";
 
@@ -2047,8 +2047,8 @@ function landedGap(logMiss: number): number {
 }
 
 // every proc that lands this roll, each independently against its own chance
-// (O(distinct chances + landed), not O(all procs)); featured crits roll only
-// in one category picked at random, so every category is seen as often
+// (O(distinct chances + landed), not O(all procs)); plus one featured crit from
+// a main category picked at random (rollFeaturedCrit), so every one is seen as often
 export function rollLandedProcs(): CritProcKind[] {
   const landed: CritProcKind[] = [];
   for (const { logMiss, kinds } of PROC_CHANCE_GROUPS) {
@@ -2060,7 +2060,7 @@ export function rollLandedProcs(): CritProcKind[] {
       landed.push(kinds[i]);
   }
   if (getFeaturedRewards() !== null)
-    landed.push(...rollFeaturedCategory(critRandom));
+    landed.push(...rollFeaturedCrit(critRandom));
   return landed;
 }
 

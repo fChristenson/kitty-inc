@@ -1,0 +1,173 @@
+import { COLOR } from "../../palette";
+import type { FeaturedCritData } from "./types";
+
+export const FOOTWEAR_AND_LEGWEAR_CRITS = {
+  sockItAway: {
+    label: "Sock It Away",
+    color: COLOR.teamBuildingCoral,
+    image: "crits/footwearAndLegwear/sockItAway.webp",
+    description: "Boosts every worker for 19s",
+  },
+  overallProfits: {
+    label: "Overall Profits",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/footwearAndLegwear/overallProfits.webp",
+    description: "Adds 56s of your company's income",
+  },
+  tightLacedTeam: {
+    label: "Tight Laced Team",
+    color: COLOR.sameBoatCoral,
+    image: "crits/footwearAndLegwear/tightLacedTeam.webp",
+    description: "Boosts every worker for 173s, counting as 3 extra workers",
+  },
+  twinBraidTreads: {
+    label: "Twin Braid Treads",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/footwearAndLegwear/twinBraidTreads.webp",
+    description: "Repeats the crit on the floor below, 91% chance to keep falling",
+  },
+  bumblebeeLegs: {
+    label: "Bumblebee Legs",
+    color: COLOR.amberMuted,
+    image: "crits/footwearAndLegwear/bumblebeeLegs.webp",
+    description: "Pays 122 times this floor's upgrade price in cash",
+  },
+  candyLeggingsKick: {
+    label: "Candy Leggings Kick",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/candyLeggingsKick.webp",
+    description: "Pays 123 times this floor's upgrade price in cash",
+  },
+  blueLeggingsPeck: {
+    label: "Blue Leggings Peck",
+    color: COLOR.fastForwardBlue,
+    image: "crits/footwearAndLegwear/blueLeggingsPeck.webp",
+    description: "Grows this floor's level by 5.7% in free upgrades",
+  },
+  rainbowLeggingsPucker: {
+    label: "Rainbow Leggings Pucker",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/rainbowLeggingsPucker.webp",
+    description: "Pays 115 times this floor's upgrade price in cash",
+  },
+  neonPantsPeck: {
+    label: "Neon Pants Peck",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/neonPantsPeck.webp",
+    description: "Grows this floor's level by 13.7% in free upgrades",
+  },
+  magentaPantsMwah: {
+    label: "Magenta Pants Mwah",
+    color: COLOR.coinGold,
+    image: "crits/footwearAndLegwear/magentaPantsMwah.webp",
+    description: "Pays 110 times this floor's upgrade price in cash",
+  },
+  pinkHeelPeck: {
+    label: "Pink Heel Peck",
+    color: COLOR.coinGold,
+    image: "crits/footwearAndLegwear/pinkHeelPeck.webp",
+    description: "Pays 113 times this floor's upgrade price in cash",
+  },
+  yellowHeelPeck: {
+    label: "Yellow Heel Peck",
+    color: COLOR.coinGold,
+    image: "crits/footwearAndLegwear/yellowHeelPeck.webp",
+    description: "Pays 121 times this floor's upgrade price in cash",
+  },
+  brickShortsPucker: {
+    label: "Brick Shorts Pucker",
+    color: COLOR.amberMuted,
+    image: "crits/footwearAndLegwear/brickShortsPucker.webp",
+    description: "Pays 102 times this floor's upgrade price in cash",
+  },
+  maroonShortsMwah: {
+    label: "Maroon Shorts Mwah",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/maroonShortsMwah.webp",
+    description: "Grows this floor's level by 13.6% in free upgrades",
+  },
+  peachShortsPucker: {
+    label: "Peach Shorts Pucker",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/peachShortsPucker.webp",
+    description: "Pays 112 times this floor's upgrade price in cash",
+  },
+  rustShortsSmooch: {
+    label: "Rust Shorts Smooch",
+    color: COLOR.amberMuted,
+    image: "crits/footwearAndLegwear/rustShortsSmooch.webp",
+    description: "Pays 116 times this floor's upgrade price in cash",
+  },
+  kneePadKiss: {
+    label: "Knee Pad Kiss",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/kneePadKiss.webp",
+    description: "Spreads 66 free upgrades over the lowest-level floors",
+  },
+  patchworkPantsHug: {
+    label: "Patchwork Pants Hug",
+    color: COLOR.fastForwardBlue,
+    image: "crits/footwearAndLegwear/patchworkPantsHug.webp",
+    description: "Grows every unlocked floor's level by 6.8% in free upgrades",
+  },
+  mintShortsLift: {
+    label: "Mint Shorts Lift",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/mintShortsLift.webp",
+    description: "Pays 126 times this floor's upgrade price in cash",
+  },
+  rainbowShortsSprawl: {
+    label: "Rainbow Shorts Sprawl",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/footwearAndLegwear/rainbowShortsSprawl.webp",
+    description: "Spreads 138 free upgrades over the lowest-level floors",
+  },
+  pinkShortsSlant: {
+    label: "Pink Shorts Slant",
+    color: COLOR.amberMuted,
+    image: "crits/footwearAndLegwear/pinkShortsSlant.webp",
+    description: "Pays 127 times this floor's upgrade price in cash",
+  },
+  petticoatPriceCut: {
+    label: "Petticoat Price Cut",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/petticoatPriceCut.webp",
+    description: "Cuts every price in this building by 21.5%",
+  },
+  rainbowRuffleRally: {
+    label: "Rainbow Ruffle Rally",
+    color: COLOR.fastForwardBlue,
+    image: "crits/footwearAndLegwear/rainbowRuffleRally.webp",
+    description: "Boosts every worker for 172s, counting as 3 extra workers",
+  },
+  leotardKiss: {
+    label: "Leotard Kiss",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/leotardKiss.webp",
+    description: "Spreads 67 free upgrades over the lowest-level floors",
+  },
+  crimsonCropPucker: {
+    label: "Crimson Crop Pucker",
+    color: COLOR.summerSaleOrange,
+    image: "crits/footwearAndLegwear/crimsonCropPucker.webp",
+    description: "Grows this floor's level by 6% in free upgrades",
+  },
+  pinkStripePucker: {
+    label: "Pink Stripe Pucker",
+    color: COLOR.amberMuted,
+    image: "crits/footwearAndLegwear/pinkStripePucker.webp",
+    description: "Pays 114 times this floor's upgrade price in cash",
+  },
+  pocketPucker: {
+    label: "Pocket Pucker",
+    color: COLOR.sameBoatCoral,
+    image: "crits/footwearAndLegwear/pocketPucker.webp",
+    description: "Grows this floor's level by 14% in free upgrades",
+  },
+  redCarpetClearance: {
+    label: "Red Carpet Clearance",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/footwearAndLegwear/redCarpetClearance.webp",
+    description: "Cuts every price in this building by 21.6%",
+  },
+} as const satisfies Record<string, FeaturedCritData>;

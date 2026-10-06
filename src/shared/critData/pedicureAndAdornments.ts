@@ -1,0 +1,167 @@
+import { COLOR } from "../../palette";
+import type { FeaturedCritData } from "./types";
+
+export const PEDICURE_AND_ADORNMENTS_CRITS = {
+  pedicurePayout: {
+    label: "Pedicure Payout",
+    color: COLOR.supplyRunTan,
+    image: "crits/pedicureAndAdornments/pedicurePayout.webp",
+    description: "Arms every floor's next click as an x5 crit",
+  },
+  toeRingRiches: {
+    label: "Toe Ring Riches",
+    color: COLOR.amberMuted,
+    image: "crits/pedicureAndAdornments/toeRingRiches.webp",
+    description: "Cuts every price in this building by 2.1%",
+  },
+  punkRockPedicure: {
+    label: "Punk Rock Pedicure",
+    color: COLOR.gold,
+    image: "crits/pedicureAndAdornments/punkRockPedicure.webp",
+    description: "Boosts every worker for 146s, counting as 3 extra workers",
+  },
+  bigHoopHustle: {
+    label: "Big Hoop Hustle",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/pedicureAndAdornments/bigHoopHustle.webp",
+    description: "Repeats the crit on the floor below, 88% chance to keep falling",
+  },
+  bluePolishPucker: {
+    label: "Blue Polish Pucker",
+    color: COLOR.amberMuted,
+    image: "crits/pedicureAndAdornments/bluePolishPucker.webp",
+    description: "Pays 101 times this floor's upgrade price in cash",
+  },
+  greenToeGreenbacks: {
+    label: "Green Toe Greenbacks",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/pedicureAndAdornments/greenToeGreenbacks.webp",
+    description: "Thirty-seven instant payouts on this floor",
+  },
+  emeraldToeEarnings: {
+    label: "Emerald Toe Earnings",
+    color: COLOR.paydayEmerald,
+    image: "crits/pedicureAndAdornments/emeraldToeEarnings.webp",
+    description: "Adds 24.1% of your total income",
+  },
+  greenToenailTease: {
+    label: "Green Toenail Tease",
+    color: COLOR.amberMuted,
+    image: "crits/pedicureAndAdornments/greenToenailTease.webp",
+    description: "Pays 107 times this floor's upgrade price in cash",
+  },
+  pinkNailPointer: {
+    label: "Pink Nail Pointer",
+    color: COLOR.summerSaleOrange,
+    image: "crits/pedicureAndAdornments/pinkNailPointer.webp",
+    description: "Grows this floor's level by 13.9% in free upgrades",
+  },
+  tangerineToes: {
+    label: "Tangerine Toes",
+    color: COLOR.orange,
+    image: "crits/pedicureAndAdornments/tangerineToes.webp",
+    description: "Grows this floor's level by 14.4% in free upgrades",
+  },
+  salmonToesTease: {
+    label: "Salmon Toes Tease",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pedicureAndAdornments/salmonToesTease.webp",
+    description: "Spreads 127 free upgrades over the lowest-level floors",
+  },
+  tropicToesKiss: {
+    label: "Tropic Toes Kiss",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pedicureAndAdornments/tropicToesKiss.webp",
+    description: "Pays 120 times this floor's upgrade price in cash",
+  },
+  coralToeCurl: {
+    label: "Coral Toe Curl",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pedicureAndAdornments/coralToeCurl.webp",
+    description: "Pays 103 times this floor's upgrade price in cash",
+  },
+  hoopEarringSmooch: {
+    label: "Hoop Earring Smooch",
+    color: COLOR.summerSaleOrange,
+    image: "crits/pedicureAndAdornments/hoopEarringSmooch.webp",
+    description: "Pays 108 times this floor's upgrade price in cash",
+  },
+  goldWristbandKiss: {
+    label: "Gold Wristband Kiss",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pedicureAndAdornments/goldWristbandKiss.webp",
+    description: "Spreads 64 free upgrades over the lowest-level floors",
+  },
+  bandanaSmooch: {
+    label: "Bandana Smooch",
+    color: COLOR.summerSaleOrange,
+    image: "crits/pedicureAndAdornments/bandanaSmooch.webp",
+    description: "Grows this floor's level by 5.6% in free upgrades",
+  },
+  ankleAsset: {
+    label: "Ankle Asset",
+    color: COLOR.springSalePink,
+    image: "crits/pedicureAndAdornments/ankleAsset.webp",
+    description: "Unlocks the next 2 floors for free",
+  },
+  hotPinkPads: {
+    label: "Hot Pink Pads",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pedicureAndAdornments/hotPinkPads.webp",
+    description: "Adds 54s of your company's income",
+  },
+  hotPinkStreak: {
+    label: "Hot Pink Streak",
+    color: COLOR.coinGold,
+    image: "crits/pedicureAndAdornments/hotPinkStreak.webp",
+    description: "Grows this floor's level by 13.4% in free upgrades",
+  },
+  daisyDuel: {
+    label: "Daisy Duel",
+    color: COLOR.threeOfAKindGreen,
+    image: "crits/pedicureAndAdornments/daisyDuel.webp",
+    description: "Pays 17 times this floor's upgrade price in cash",
+  },
+  pinkHeadbandPointer: {
+    label: "Pink Headband Pointer",
+    color: COLOR.summerSaleOrange,
+    image: "crits/pedicureAndAdornments/pinkHeadbandPointer.webp",
+    description: "Spreads 123 free upgrades over the lowest-level floors",
+  },
+  redHotSole: {
+    label: "Red Hot Sole",
+    color: COLOR.sameBoatCoral,
+    image: "crits/pedicureAndAdornments/redHotSole.webp",
+    description: "Grows this floor's level by 14.1% in free upgrades",
+  },
+  lemonSole: {
+    label: "Lemon Sole",
+    color: COLOR.coinGold,
+    image: "crits/pedicureAndAdornments/lemonSole.webp",
+    description: "Cuts every price in this building by 18.8%",
+  },
+  goldenBeltGrind: {
+    label: "Golden Belt Grind",
+    color: COLOR.overflowBlue,
+    image: "crits/pedicureAndAdornments/goldenBeltGrind.webp",
+    description: "Boosts every worker for 170s, counting as 3 extra workers",
+  },
+  bubblegumTwins: {
+    label: "Bubblegum Twins",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/pedicureAndAdornments/bubblegumTwins.webp",
+    description: "Cuts every price in this building by 18.6%",
+  },
+  sunsetSoleSavings: {
+    label: "Sunset Sole Savings",
+    color: COLOR.rainCheckBlue,
+    image: "crits/pedicureAndAdornments/sunsetSoleSavings.webp",
+    description: "Adds 23% of your total income",
+  },
+  topBunToes: {
+    label: "Top Bun Toes",
+    color: COLOR.amberMuted,
+    image: "crits/pedicureAndAdornments/topBunToes.webp",
+    description: "Grows this floor's level by 14.5% in free upgrades",
+  },
+} as const satisfies Record<string, FeaturedCritData>;

@@ -1,0 +1,173 @@
+import { COLOR } from "../../palette";
+import type { FeaturedCritData } from "./types";
+
+export const DARK_BEAUTIES_CRITS = {
+  fishnetSleeves: {
+    label: "Fishnet Sleeves",
+    color: COLOR.sameBoatCoral,
+    image: "crits/darkBeauties/fishnetSleeves.webp",
+    description: "Spreads 144 free upgrades over the lowest-level floors",
+  },
+  greenEyeshadow: {
+    label: "Green Eyeshadow",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/darkBeauties/greenEyeshadow.webp",
+    description: "Pays 134 times this floor's upgrade price in cash",
+  },
+  heartTattoo: {
+    label: "Heart Tattoo",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/darkBeauties/heartTattoo.webp",
+    description: "Grows every unlocked floor's level by 7.6% in free upgrades",
+  },
+  lilacBiceps: {
+    label: "Lilac Biceps",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/darkBeauties/lilacBiceps.webp",
+    description: "Spreads 145 free upgrades over the lowest-level floors",
+  },
+  moonPendant: {
+    label: "Moon Pendant",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/darkBeauties/moonPendant.webp",
+    description: "Pays 135 times this floor's upgrade price in cash",
+  },
+  motoJacket: {
+    label: "Moto Jacket",
+    color: COLOR.unionBossSlate,
+    image: "crits/darkBeauties/motoJacket.webp",
+    description: "Grows every unlocked floor's level by 7.7% in free upgrades",
+  },
+  noseStudSmirk: {
+    label: "Nose Stud Smirk",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/darkBeauties/noseStudSmirk.webp",
+    description: "Spreads 146 free upgrades over the lowest-level floors",
+  },
+  operaGloves: {
+    label: "Opera Gloves",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/darkBeauties/operaGloves.webp",
+    description: "Pays 136 times this floor's upgrade price in cash",
+  },
+  pinkEdgeBangs: {
+    label: "Pink Edge Bangs",
+    color: COLOR.fancyFridayIndigo,
+    image: "crits/darkBeauties/pinkEdgeBangs.webp",
+    description: "Grows every unlocked floor's level by 7.8% in free upgrades",
+  },
+  plumMiniskirt: {
+    label: "Plum Miniskirt",
+    color: COLOR.unionBossSlate,
+    image: "crits/darkBeauties/plumMiniskirt.webp",
+    description: "Spreads 147 free upgrades over the lowest-level floors",
+  },
+  ringChoker: {
+    label: "Ring Choker",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/darkBeauties/ringChoker.webp",
+    description: "Pays 137 times this floor's upgrade price in cash",
+  },
+  septumSiren: {
+    label: "Septum Siren",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/darkBeauties/septumSiren.webp",
+    description: "Grows every unlocked floor's level by 7.9% in free upgrades",
+  },
+  skullBarrette: {
+    label: "Skull Barrette",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/darkBeauties/skullBarrette.webp",
+    description: "Spreads 148 free upgrades over the lowest-level floors",
+  },
+  studdedVestFlex: {
+    label: "Studded Vest Flex",
+    color: COLOR.peppermintPink,
+    image: "crits/darkBeauties/studdedVestFlex.webp",
+    description: "Pays 138 times this floor's upgrade price in cash",
+  },
+  tealStreakBob: {
+    label: "Teal Streak Bob",
+    color: COLOR.coffeeRunTeal,
+    image: "crits/darkBeauties/tealStreakBob.webp",
+    description: "Grows this floor's level by 18.1% in free upgrades",
+  },
+  violetCropTop: {
+    label: "Violet Crop Top",
+    color: COLOR.peppermintPink,
+    image: "crits/darkBeauties/violetCropTop.webp",
+    description: "Spreads 149 free upgrades over the lowest-level floors",
+  },
+  nosferatuSquat: {
+    label: "Nosferatu Squat",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/darkBeauties/nosferatuSquat.webp",
+    description: "Cuts every price in this building by 18.5%",
+  },
+  violetCapeCrusher: {
+    label: "Violet Cape Crusher",
+    color: COLOR.doubleDownCrimson,
+    image: "crits/darkBeauties/violetCapeCrusher.webp",
+    description: "Adds 52s of your company's income",
+  },
+  countCrouch: {
+    label: "Count Crouch",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/darkBeauties/countCrouch.webp",
+    description: "Boosts every worker for 141s, counting as 3 extra workers",
+  },
+  crimsonTailCoil: {
+    label: "Crimson Tail Coil",
+    color: COLOR.redActive,
+    image: "crits/darkBeauties/crimsonTailCoil.webp",
+    description: "Repeats the crit on the floor below, 86% chance to keep falling",
+  },
+  tangerineTailGrip: {
+    label: "Tangerine Tail Grip",
+    color: COLOR.roundUpOrange,
+    image: "crits/darkBeauties/tangerineTailGrip.webp",
+    description: "Cuts every price in this building by 18.2%",
+  },
+  tealTailSwagger: {
+    label: "Teal Tail Swagger",
+    color: COLOR.rainCheckBlue,
+    image: "crits/darkBeauties/tealTailSwagger.webp",
+    description: "Adds 48s of your company's income",
+  },
+  sapphireTailSway: {
+    label: "Sapphire Tail Sway",
+    color: COLOR.fastForwardBlue,
+    image: "crits/darkBeauties/sapphireTailSway.webp",
+    description: "Boosts every worker for 137s, counting as 3 extra workers",
+  },
+  scarletCrouchCoil: {
+    label: "Scarlet Crouch Coil",
+    color: COLOR.redActive,
+    image: "crits/darkBeauties/scarletCrouchCoil.webp",
+    description: "Repeats the crit on the floor above, 87% chance to keep climbing",
+  },
+  azureSquatSwish: {
+    label: "Azure Squat Swish",
+    color: COLOR.fastForwardBlue,
+    image: "crits/darkBeauties/azureSquatSwish.webp",
+    description: "Cuts every price in this building by 18.3%",
+  },
+  ceruleanCrouch: {
+    label: "Cerulean Crouch",
+    color: COLOR.springCleaningMint,
+    image: "crits/darkBeauties/ceruleanCrouch.webp",
+    description: "Adds 50s of your company's income",
+  },
+  jadeSquatSpikes: {
+    label: "Jade Squat Spikes",
+    color: COLOR.paydayEmerald,
+    image: "crits/darkBeauties/jadeSquatSpikes.webp",
+    description: "Boosts every worker for 139s, counting as 3 extra workers",
+  },
+  cherryCrouchWyrm: {
+    label: "Cherry Crouch Wyrm",
+    color: COLOR.redActive,
+    image: "crits/darkBeauties/cherryCrouchWyrm.webp",
+    description: "Repeats the crit on the floor below, 87% chance to keep falling",
+  },
+} as const satisfies Record<string, FeaturedCritData>;

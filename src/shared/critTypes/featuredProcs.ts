@@ -1,5 +1,6 @@
 import { CONFIG } from "../../config";
 import { FEATURED_CRITS } from "../critData";
+import { CRIT_GROUPS } from "../critData/groups";
 import type { FeaturedReward } from "./featured/types";
 
 export { FEATURED_CRITS };
@@ -47,30 +48,39 @@ export function isFeaturedCritKind(kind: string): kind is FeaturedCritKind {
   return kind in ALL_FEATURED_FLAGS_FALSE;
 }
 
-// every image category (its critData/<category>.ts file) with its crits and
-// their chances
-const FEATURED_CATEGORIES = (() => {
-  const byCategory = new Map<string, FeaturedCritKind[]>();
-  for (const kind of FEATURED_CRIT_KINDS) {
-    const category = FEATURED_CRITS[kind].image.split("/")[1];
-    const kinds = byCategory.get(category);
-    if (kinds) kinds.push(kind);
-    else byCategory.set(category, [kind]);
-  }
-  return [...byCategory.values()].map((kinds) => ({
-    kinds,
-    chances: kinds.map(
-      (kind) =>
-        CONFIG.crit[`${kind}Chance` as keyof typeof CONFIG.crit] as number,
-    ),
+// every main category (CRIT_GROUPS), as all its crits and their chances
+const FEATURED_GROUPS = (() => {
+  const groupOf = new Map<string, number>();
+  Object.values(CRIT_GROUPS).forEach((categories, group) => {
+    for (const category of categories) groupOf.set(category, group);
+  });
+  const groups = Object.values(CRIT_GROUPS).map(() => ({
+    kinds: [] as FeaturedCritKind[],
+    chances: [] as number[],
+    total: 0,
   }));
+  for (const kind of FEATURED_CRIT_KINDS) {
+    const group = groups[groupOf.get(FEATURED_CRITS[kind].image.split("/")[1])!];
+    const chance = CONFIG.crit[
+      `${kind}Chance` as keyof typeof CONFIG.crit
+    ] as number;
+    group.kinds.push(kind);
+    group.chances.push(chance);
+    group.total += chance;
+  }
+  return groups;
 })();
 
-// picks one category at random, then rolls each of its crits on its own chance
-export function rollFeaturedCategory(random: () => number): FeaturedCritKind[] {
-  const { kinds, chances } =
-    FEATURED_CATEGORIES[Math.floor(random() * FEATURED_CATEGORIES.length)];
-  return kinds.filter((_, i) => random() < chances[i]);
+// picks a main category at random, then one of its crits weighted by its chance
+export function rollFeaturedCrit(random: () => number): FeaturedCritKind[] {
+  const { kinds, chances, total } =
+    FEATURED_GROUPS[Math.floor(random() * FEATURED_GROUPS.length)];
+  let roll = random() * total;
+  for (let i = 0; i < kinds.length; i++) {
+    roll -= chances[i];
+    if (roll < 0) return [kinds[i]];
+  }
+  return [kinds[kinds.length - 1]];
 }
 
 export function featuredCritFlags(

@@ -551,6 +551,7 @@ function ensureCategory(category) {
   const constant = category
     .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
     .toUpperCase();
+  const isNew = !fs.existsSync(path.join(DATA, `${category}.ts`));
   const register = (dir, name, header, closing) => {
     const target = path.join(dir, `${category}.ts`);
     if (fs.existsSync(target)) return;
@@ -585,6 +586,10 @@ function ensureCategory(category) {
     `// odds and reward sizes for featured/${category}.ts's crits, spread into CONFIG.crit\n`,
     "} as const;",
   );
+  if (isNew)
+    console.log(
+      `add ${category} to its main category in src/shared/critData/groups.ts`,
+    );
 }
 
 async function preview(specs, plans) {

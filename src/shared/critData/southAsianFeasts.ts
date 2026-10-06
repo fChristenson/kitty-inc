@@ -1,0 +1,155 @@
+import { COLOR } from "../../palette";
+import type { FeaturedCritData } from "./types";
+
+export const SOUTH_ASIAN_FEASTS_CRITS = {
+  bananaFishPlate: {
+    label: "Banana Fish Plate",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/southAsianFeasts/bananaFishPlate.webp",
+    description: "Promotes 80.5% of this building's workers one perma tier",
+  },
+  basilBanquet: {
+    label: "Basil Banquet",
+    color: COLOR.headhunterRust,
+    image: "crits/southAsianFeasts/basilBanquet.webp",
+    description: "Promotes 81.5% of this building's workers one perma tier",
+  },
+  chutneyPlate: {
+    label: "Chutney Plate",
+    color: COLOR.gold,
+    image: "crits/southAsianFeasts/chutneyPlate.webp",
+    description: "Promotes 86% of this building's workers one perma tier",
+  },
+  coconutBrunch: {
+    label: "Coconut Brunch",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/southAsianFeasts/coconutBrunch.webp",
+    description: "Promotes 86.5% of this building's workers one perma tier",
+  },
+  curryRound: {
+    label: "Curry Round",
+    color: COLOR.gold,
+    image: "crits/southAsianFeasts/curryRound.webp",
+    description: "Pays 40 times the highest floor's upgrade price in cash",
+  },
+  eggplantCurry: {
+    label: "Eggplant Curry",
+    color: COLOR.amber,
+    image: "crits/southAsianFeasts/eggplantCurry.webp",
+    description: "Pays 42 times the highest floor's upgrade price in cash",
+  },
+  goldenNaan: {
+    label: "Golden Naan",
+    color: COLOR.gold,
+    image: "crits/southAsianFeasts/goldenNaan.webp",
+    description: "Pays 61 times the highest floor's upgrade price in cash",
+  },
+  mangoPlatter: {
+    label: "Mango Platter",
+    color: COLOR.starYellow,
+    image: "crits/southAsianFeasts/mangoPlatter.webp",
+    description: "Spreads 76 free upgrades over this floor and the ones below",
+  },
+  prawnAndRoast: {
+    label: "Prawn And Roast",
+    color: COLOR.supplyRunTan,
+    image: "crits/southAsianFeasts/prawnAndRoast.webp",
+    description: "Spreads 81 free upgrades over this floor and the ones below",
+  },
+  redRimFish: {
+    label: "Red Rim Fish",
+    color: COLOR.sameBoatCoral,
+    image: "crits/southAsianFeasts/redRimFish.webp",
+    description: "Spreads 83 free upgrades over this floor and the ones below",
+  },
+  rolledWrapSkewers: {
+    label: "Rolled Wrap Skewers",
+    color: COLOR.amberMuted,
+    image: "crits/southAsianFeasts/rolledWrapSkewers.webp",
+    description: "Promotes 96% of this building's workers one perma tier",
+  },
+  royalBuffet: {
+    label: "Royal Buffet",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/southAsianFeasts/royalBuffet.webp",
+    description: "Pays 73 times the highest floor's upgrade price in cash",
+  },
+  saffronSpread: {
+    label: "Saffron Spread",
+    color: COLOR.headhunterRust,
+    image: "crits/southAsianFeasts/saffronSpread.webp",
+    description: "Spreads 84 free upgrades over this floor and the ones below",
+  },
+  samosaCurry: {
+    label: "Samosa Curry",
+    color: COLOR.headhunterRust,
+    image: "crits/southAsianFeasts/samosaCurry.webp",
+    description: "Spreads 85 free upgrades over this floor and the ones below",
+  },
+  shrimpTray: {
+    label: "Shrimp Tray",
+    color: COLOR.supplyRunTan,
+    image: "crits/southAsianFeasts/shrimpTray.webp",
+    description: "Spreads 86 free upgrades over this floor and the ones below",
+  },
+  wickerBasketBites: {
+    label: "Wicker Basket Bites",
+    color: COLOR.amberMuted,
+    image: "crits/southAsianFeasts/wickerBasketBites.webp",
+    description: "Spreads 92 free upgrades over this floor and the ones below",
+  },
+  yellowSpoonRice: {
+    label: "Yellow Spoon Rice",
+    color: COLOR.gold,
+    image: "crits/southAsianFeasts/yellowSpoonRice.webp",
+    description: "Spreads 93 free upgrades over this floor and the ones below",
+  },
+  bambooTraySatay: {
+    label: "Bamboo Tray Satay",
+    color: COLOR.amberMuted,
+    image: "crits/southAsianFeasts/bambooTraySatay.webp",
+    description: "Pays 84 times the highest floor's upgrade price in cash",
+  },
+  bananaLeafSatay: {
+    label: "Banana Leaf Satay",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/southAsianFeasts/bananaLeafSatay.webp",
+    description: "Spreads 95 free upgrades over this floor and the ones below",
+  },
+  clayPotYogurt: {
+    label: "Clay Pot Yogurt",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/southAsianFeasts/clayPotYogurt.webp",
+    description: "Pays 86 times the highest floor's upgrade price in cash",
+  },
+  copperPotKebabs: {
+    label: "Copper Pot Kebabs",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/southAsianFeasts/copperPotKebabs.webp",
+    description: "Spreads 97 free upgrades over this floor and the ones below",
+  },
+  grilledPorkNoodles: {
+    label: "Grilled Pork Noodles",
+    color: COLOR.headhunterRust,
+    image: "crits/southAsianFeasts/grilledPorkNoodles.webp",
+    description: "Spreads 100 free upgrades over this floor and the ones below",
+  },
+  leafCupCurry: {
+    label: "Leaf Cup Curry",
+    color: COLOR.payoutOlive,
+    image: "crits/southAsianFeasts/leafCupCurry.webp",
+    description: "Spreads 103 free upgrades over this floor and the ones below",
+  },
+  sambalDrumstick: {
+    label: "Sambal Drumstick",
+    color: COLOR.headhunterRust,
+    image: "crits/southAsianFeasts/sambalDrumstick.webp",
+    description: "Grows every unlocked floor's level by 10.2% in free upgrades",
+  },
+  sunnyEggFishFry: {
+    label: "Sunny Egg Fish Fry",
+    color: COLOR.supplyRunTan,
+    image: "crits/southAsianFeasts/sunnyEggFishFry.webp",
+    description: "Grows every unlocked floor's level by 10.3% in free upgrades",
+  },
+} as const satisfies Record<string, FeaturedCritData>;
