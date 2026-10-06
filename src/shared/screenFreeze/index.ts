@@ -39,9 +39,18 @@ export type FrameRippler = (
   getFloorRect: FloorRectResolver,
 ) => FrameRipple | null;
 
+// a freeze that still takes presses on one floor's upgrade button: fire runs
+// on the press and then every intervalMs while it's held
+export interface FreezeButton {
+  floor: Floor;
+  fire: () => void;
+  intervalMs: number;
+}
+
 let overlay: FreezeOverlay | null = null;
 let motion: (() => FrameMotion) | null = null;
 let ripple: FrameRippler | null = null;
+let button: FreezeButton | null = null;
 let frozen = false;
 let totalSpotlit = false;
 let frozenAt = 0;
@@ -51,17 +60,20 @@ const DIM_ALPHA = 0.6;
 const DIM_FADE_MS = 200;
 
 // spotlightTotal keeps the total-income readout live and undimmed on top;
-// frameMotion moves the frozen frame itself, frameRipple ripples it
+// frameMotion moves the frozen frame itself, frameRipple ripples it; pressable
+// keeps one upgrade button playable under the freeze
 export function freezeScreen(
   drawOverlay: FreezeOverlay,
   {
     spotlightTotal = false,
     frameMotion,
     frameRipple,
+    pressable,
   }: {
     spotlightTotal?: boolean;
     frameMotion?: () => FrameMotion;
     frameRipple?: FrameRippler;
+    pressable?: FreezeButton;
   } = {},
 ): void {
   frozen = true;
@@ -71,6 +83,7 @@ export function freezeScreen(
   totalSpotlit = spotlightTotal;
   motion = frameMotion ?? null;
   ripple = frameRipple ?? null;
+  button = pressable ?? null;
 }
 
 export function unfreezeScreen(): void {
@@ -78,12 +91,18 @@ export function unfreezeScreen(): void {
   overlay = null;
   motion = null;
   ripple = null;
+  button = null;
   totalSpotlit = false;
   unfrozenAt = Date.now();
 }
 
 export function isScreenFrozen(): boolean {
   return frozen;
+}
+
+// the upgrade button the current freeze still lets the player press, if any
+export function getFreezeButton(): FreezeButton | null {
+  return frozen ? button : null;
 }
 
 export function isTotalSpotlit(): boolean {

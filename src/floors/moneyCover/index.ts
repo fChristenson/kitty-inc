@@ -18,6 +18,7 @@ import {
   isScreenFrozen,
   unfreezeScreen,
   type FloorRectResolver,
+  type FreezeButton,
   type FrameRippler,
   type FrameMotion,
 } from "../../shared/screenFreeze";
@@ -74,6 +75,9 @@ export interface MoneyCover {
   // launches one coin per path at once, each following its path over exactly
   // travelMs and hanging at its end until the merge
   trace(paths: CoinPath[], travelMs: number): void;
+  // coins blasted out of `from` to targets that fly straight on into the
+  // total, without waiting for the merge
+  cashOut(from: Point, targets: Point[]): void;
   isLive(): boolean;
 }
 
@@ -81,8 +85,9 @@ export interface MoneyCoverOptions {
   layout?: (area: CoverArea) => Point[];
   // the covered crit's tier, revealed at the end; defaults to the crit's own
   tier?: CritTier;
-  // on top of the floor's income times its floor number; 0 pays no cash
-  rewardMultiplier?: number;
+  // on top of the floor's income times its floor number; 0 pays no cash. A
+  // function is read at the end, for a payout earned while it played
+  rewardMultiplier?: number | (() => number);
   // false: no spotlit total and no slam on it at the end, for events whose
   // reward lands elsewhere (bars, workers)
   endOnTotal?: boolean;
@@ -107,6 +112,8 @@ export interface MoneyCoverOptions {
   frameMotion?: () => FrameMotion;
   // right as the screen unfreezes
   onEnd?: () => void;
+  // the upgrade button the player can still press under the freeze
+  pressable?: FreezeButton;
 }
 
 const STREAM_INTERVAL_MS = 16;
@@ -197,6 +204,7 @@ export function startMoneyCover(
     frameRipple,
     frameMotion,
     onEnd,
+    pressable,
   }: MoneyCoverOptions,
 ): MoneyCover | null {
   if (!canStartMoneyCover(context)) return null;
@@ -210,7 +218,7 @@ export function startMoneyCover(
       drawOverlay(ctx, getFloorRect, totalTarget);
       drawOver?.(ctx, getFloorRect, totalTarget);
     },
-    { spotlightTotal: endOnTotal, frameRipple, frameMotion },
+    { spotlightTotal: endOnTotal, frameRipple, frameMotion, pressable },
   );
 
   let flew = false;
@@ -239,12 +247,13 @@ export function startMoneyCover(
     running = null;
     onEnd?.();
     unfreezeScreen();
-    if (rewardMultiplier > 0)
+    const reward =
+      typeof rewardMultiplier === "number"
+        ? rewardMultiplier
+        : rewardMultiplier();
+    if (reward > 0)
       addTotalIncome(
-        multiply(
-          rewardPayoutAmount(floor, Date.now()),
-          floorNumber * rewardMultiplier,
-        ),
+        multiply(rewardPayoutAmount(floor, Date.now()), floorNumber * reward),
       );
     if (endOnTotal) {
       triggerHudTotalFlash();
@@ -296,6 +305,11 @@ export function startMoneyCover(
       const ticks = travelMs / TICK_MS;
       spawnPathCoins(floor, paths, { ...arrival, outTicks: [ticks, ticks] });
     },
+    cashOut: (from, targets) =>
+      spawnSprayCoins(floor, from.x, from.y, targets, {
+        ...arrival,
+        releaseAt: 0,
+      }),
     isLive,
   };
 }

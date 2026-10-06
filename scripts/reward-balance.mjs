@@ -224,14 +224,18 @@ async function main() {
     // ---------- how often each lands, per hour ----------
     const clicksPerHour = S.cps * 3600;
     const gatewayPerSec = S.cps * pCrit * c.specialCritGatewayChance;
+    // the share of gateways that pick each special crit type
+    const types = CONFIG.specialCrits;
+    const weights = Object.values(types).reduce((s, t) => s + t.weight, 0);
     const armWeight = events.reduce((s, e) => s + e.chance * e.arm, 0);
-    const pEvent = 1 - events.reduce((p, e) => p * (1 - e.chance * e.arm), 1);
+    const pEvent = types.animatedCrit.weight / weights;
     const cycle =
-      CONFIG.eventProcs.cooldownMs / 1000 +
+      types.animatedCrit.cooldownMs / 1000 +
       S.eventMs / 1000 +
       1 / (gatewayPerSec * pEvent);
     const eventsPerHour = 3600 / cycle;
-    const procGatewaysPerHour = gatewayPerSec * 3600 - eventsPerHour;
+    const procGatewaysPerHour =
+      (gatewayPerSec * 3600 * types.badgeCrit.weight) / weights;
     const procs = [...featured, ...legacy];
     const lambda = procs.reduce((s, p) => s + p.chance, 0);
     for (const p of procs) {
@@ -673,7 +677,7 @@ function report(ctx) {
     `building: ${F} floors at level ${L}, tier x${T}, ${W} workers (perma x${S.perma}, boosted ${pct(S.uptime)}), horizon ${S.horizon}s, ${S.cps} clicks/s`,
   );
   console.log(
-    `per click: crit ${pct(ctx.pCrit)} (crit ${pct(ctx.pTier.crit)}, mega ${pct(ctx.pTier.mega)}, ultra ${pct(ctx.pTier.ultra)}); special slot ${fmt(ctx.gatewayPerSec * 3600, 0)}/h -> ${fmt(ctx.eventsPerHour, 0)} events/h (any event claims ${pct(ctx.pEvent)} of free slots), ${fmt(ctx.procGatewaysPerHour, 0)} proc slots/h (a proc lands in ${pct(1 - Math.exp(-ctx.lambda))})`,
+    `per click: crit ${pct(ctx.pCrit)} (crit ${pct(ctx.pTier.crit)}, mega ${pct(ctx.pTier.mega)}, ultra ${pct(ctx.pTier.ultra)}); special slot ${fmt(ctx.gatewayPerSec * 3600, 0)}/h -> ${fmt(ctx.eventsPerHour, 0)} events/h (animated crits pick ${pct(ctx.pEvent)} of slots), ${fmt(ctx.procGatewaysPerHour, 0)} proc slots/h (a proc lands in ${pct(1 - Math.exp(-ctx.lambda))})`,
   );
   console.log(
     `one level here: +${pct(levels(1, 1).perm * F)} to its floor; one floor tier step: +${pct(floorTier(1, 1).perm * F * 2)} to its floor by the horizon; one worker perma step: +${pct(workerTier(1, 1).perm * F)} to its floor`,

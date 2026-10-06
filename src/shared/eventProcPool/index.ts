@@ -1,9 +1,9 @@
 // A pool of rare "event button" procs sharing one cooldown. A landed crit's
-// special slot can be claimed by one of them (rolled in random order, each at
-// its own chance), which then arms once that crit is clicked. No event in the
-// pool can be claimed while another is claimed, armed or playing out, and the
-// cooldown only starts once it has finished
-import { pickAtMost } from "../critTypes";
+// special slot handed to the pool is claimed by one of them (picked among
+// those that can arm, weighted by their chances), which then arms once that
+// crit is clicked. No event in the pool can be claimed while another is
+// claimed, armed or playing out, and the cooldown only starts once it has
+// finished
 import { critRandom } from "../critRandom";
 
 export interface EventProcDef<TTarget, TContext> {
@@ -17,7 +17,8 @@ export interface EventProcDef<TTarget, TContext> {
 
 export interface EventProcPool<TTarget, TContext> {
   register(def: EventProcDef<TTarget, TContext>): void;
-  // true when an event claimed target's crit
+  // true when an event claimed target's crit: always one of those that can
+  // arm, unless the pool is busy or cooling down
   claim(target: TTarget, context: TContext): boolean;
   // true when target's crit carried a claim; it then waits for armTaken
   take(target: TTarget): boolean;
@@ -68,12 +69,20 @@ export function createEventProcPool<TTarget, TContext>(
       const now = Date.now();
       settle(now);
       if (active || now - cooldownFrom < cooldownMs()) return false;
-      for (const def of pickAtMost(defs, defs.length, critRandom)) {
-        if (!def.canArm(target, context)) continue;
-        if (critRandom() < def.chance()) {
+      // weighted picks until one can arm, so only the picked are checked
+      const left = defs.filter((def) => def.chance() > 0);
+      let total = left.reduce((sum, def) => sum + def.chance(), 0);
+      while (left.length > 0) {
+        let roll = critRandom() * total;
+        let i = 0;
+        while (i < left.length - 1 && (roll -= left[i].chance()) >= 0) i++;
+        const def = left[i];
+        if (def.canArm(target, context)) {
           active = { def, target, state: "claimed" };
           return true;
         }
+        total -= def.chance();
+        left.splice(i, 1);
       }
       return false;
     },

@@ -43,6 +43,7 @@ import { getEffectiveDpr } from "../../shared/devicePixelRatio";
 import { drawRippleWarp } from "../../shared/rippleWarp";
 import {
   isScreenFrozen,
+  getFreezeButton,
   isTotalSpotlit,
   getScreenFreezeDim,
   getScreenFreezeMotion,
@@ -906,8 +907,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
 
   function onPointerDown(event: PointerEvent): void {
     if (event.pointerType === "mouse" && event.button !== 0) return;
-    // the frozen frame is a still picture: no scrolling or clicking under it
-    if (isScreenFrozen()) return;
+    // the frozen frame is a still picture: no scrolling or clicking under it,
+    // bar the one button a playable freeze leaves live
+    if (isScreenFrozen()) {
+      pressFreezeButton(event);
+      return;
+    }
     stopMomentum();
     dragPointerId = event.pointerId;
     dragStartX = event.clientX;
@@ -939,11 +944,38 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         startButtonHoldAnim(hit.floor);
       }
       fireUpgradeOnce(hit);
-      holdController = startPressAndHold(
-        () => fireHandleFloorClick(hit),
-        LONG_PRESS_TICK_MS,
-      );
+      // a press that starts a playable freeze on this button keeps playing it
+      holdController = startPressAndHold(() => {
+        const button = getFreezeButton();
+        if (button?.floor === hit.floor) button.fire();
+        else fireHandleFloorClick(hit);
+      }, LONG_PRESS_TICK_MS);
     }
+  }
+
+  // a press on the button a playable freeze leaves live: fires it, then keeps
+  // firing at its own rate while held
+  function pressFreezeButton(event: PointerEvent): void {
+    const button = getFreezeButton();
+    if (!button) return;
+    const p = canvasPoint(event);
+    if (p.y < hudBottomY) return;
+    const hit = hitTestPoint(p.x, p.y);
+    if (
+      !hit ||
+      hit.floor !== button.floor ||
+      !hitTestUpgradeButton(hit.localX, hit.localY, hit.isGroundFloor)
+    )
+      return;
+    stopHoldRepeat();
+    dragPointerId = event.pointerId;
+    dragging = false;
+    didDrag = false;
+    hudTapDown = false;
+    upgradeFiredOnDown = true;
+    canvas.setPointerCapture(event.pointerId);
+    button.fire();
+    holdController = startPressAndHold(button.fire, button.intervalMs);
   }
 
   function onPointerMove(event: PointerEvent): void {
@@ -975,6 +1007,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         : null;
       return;
     }
+    // a held freeze button never scrolls the frozen frame
+    if (isScreenFrozen()) return;
 
     const dy = event.clientY - lastY;
     const now = performance.now();

@@ -1,15 +1,17 @@
-// the floor view's one pool of event-button procs (Boost, Hunt, Swarm): each
-// event module registers itself. Like a special crit, an event only lands on
-// a crit — it claims that crit's special slot when the crit is rolled (see
+// the floor view's pools of event procs, one per EventCritType: each event
+// module registers itself. Like a special crit, an event only lands on a crit
+// — it claims that crit's special slot when the crit is rolled (see
 // upgradeButton/crit.ts's rollCritUpgrade) and arms once the player clicks
-// it, sharing CONFIG.eventProcs.cooldownMs across them all
+// it; the events of one type share that type's cooldown
 import type { Floor } from "../../gameState";
 import type { CritProcKind, CritTier } from "../../shared/critTypes";
+import { critRandom } from "../../shared/critRandom";
 import { CONFIG } from "../../config";
 import type { FloorRectResolver } from "../../shared/screenFreeze";
 import {
   createEventProcPool,
   type EventProcDef,
+  type EventProcPool,
 } from "../../shared/eventProcPool";
 
 // which floors currently intersect the viewport, each with its world-space top
@@ -72,62 +74,95 @@ export interface EventCritCover {
 const covers = new Map<string, EventCritCover>();
 
 type FloorEventProc = EventProcDef<Floor, EventProcContext>;
+type FloorEventPool = EventProcPool<Floor, EventProcContext>;
 
-const pool = createEventProcPool<Floor, EventProcContext>(
-  () => CONFIG.eventProcs.cooldownMs,
+// what a regular crit's special slot carries: one of these, picked by its
+// weight in CONFIG.specialCrits. A badge crit (featured or other special crit)
+// rolls in shared/critTypes' rollCrit; each event crit type is a pool of
+// events here, with its own cooldown
+export type EventCritType = "animatedCrit" | "bulletHellCrit";
+export type SpecialCritType = "badgeCrit" | EventCritType;
+
+const EVENT_CRIT_TYPES: EventCritType[] = ["animatedCrit", "bulletHellCrit"];
+const SPECIAL_CRIT_TYPES: SpecialCritType[] = [
+  "badgeCrit",
+  ...EVENT_CRIT_TYPES,
+];
+const pools = new Map<EventCritType, FloorEventPool>(
+  EVENT_CRIT_TYPES.map((type) => [
+    type,
+    createEventProcPool<Floor, EventProcContext>(
+      () => CONFIG.specialCrits[type].cooldownMs,
+    ),
+  ]),
 );
+const poolOfKey = new Map<string, FloorEventPool>();
 
 export function registerEventProc(
   def: FloorEventProc,
   cover?: EventCritCover,
+  type: EventCritType = "animatedCrit",
 ): void {
+  const pool = pools.get(type)!;
   pool.register(def);
+  poolOfKey.set(def.key, pool);
   if (cover) covers.set(def.key, cover);
 }
 
 // the cover of the event claiming floor's armed crit, if it has one
 export function getClaimedEventCover(floor: Floor): EventCritCover | null {
-  const key = pool.claimedKey(floor);
-  return key === null ? null : (covers.get(key) ?? null);
+  for (const pool of pools.values()) {
+    const key = pool.claimedKey(floor);
+    if (key !== null) return covers.get(key) ?? null;
+  }
+  return null;
 }
 
-// true when an event claimed the special slot of the crit being rolled on floor
+// picks what the crit being rolled on floor carries, by CONFIG.specialCrits'
+// weights: true when an event crit type's pool claimed it; false leaves it to
+// the badge crit roll (also when the picked type is cooling down or none of
+// its events can arm)
 export function claimEventProc(
   floor: Floor,
   context: EventProcContext,
 ): boolean {
-  return pool.claim(floor, context);
+  const weight = (type: SpecialCritType) => CONFIG.specialCrits[type].weight;
+  let roll =
+    critRandom() * SPECIAL_CRIT_TYPES.reduce((sum, t) => sum + weight(t), 0);
+  const type =
+    SPECIAL_CRIT_TYPES.find((t) => (roll -= weight(t)) < 0) ?? "badgeCrit";
+  return type !== "badgeCrit" && pools.get(type)!.claim(floor, context);
 }
 
 // call right before the player's click spends floor's crit: true when that
 // crit carried an event, which armTakenEventProc then arms
 export function takeClaimedEventProc(floor: Floor): boolean {
-  return pool.take(floor);
+  return [...pools.values()].some((pool) => pool.take(floor));
 }
 
 // floor's crit was spent some other way, so its claimed event never happens
 export function dropClaimedEventProc(floor: Floor): void {
-  pool.drop(floor);
+  for (const pool of pools.values()) pool.drop(floor);
 }
 
 export function armTakenEventProc(
   floor: Floor,
   context: EventProcContext,
 ): boolean {
-  return pool.armTaken(floor, context);
+  return [...pools.values()].some((pool) => pool.armTaken(floor, context));
 }
 
 // an event calls this the moment it has fully played out, starting the cooldown
 export function endEventProc(key: string): void {
-  pool.ended(key);
+  poolOfKey.get(key)?.ended(key);
 }
 
 // for events started outside a roll (dev test hooks)
 export function trackEventProc(key: string, floor: Floor): void {
-  pool.track(key, floor);
+  poolOfKey.get(key)?.track(key, floor);
 }
 
 // dev test hook: floor's armed crit carries this event once clicked
 export function forceClaimEventProc(key: string, floor: Floor): void {
-  pool.forceClaim(key, floor);
+  poolOfKey.get(key)?.forceClaim(key, floor);
 }
