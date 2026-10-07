@@ -114,6 +114,9 @@ export function takeBadgeFoilReveal(kind: CritProcKind): BadgeFoil | null {
 }
 
 // dev test hook: the next landing of `kind` reveals `foil`
-export function queueBadgeFoilReveal(kind: CritProcKind, foil: BadgeFoil): void {
+export function queueBadgeFoilReveal(
+  kind: CritProcKind,
+  foil: BadgeFoil,
+): void {
   pendingFoils.set(kind, foil);
 }
