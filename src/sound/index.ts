@@ -362,19 +362,26 @@ export function playAutoBoost(): void {
 // stack multiple full explosions on top of each other
 export function playExplosion(): void {
   const now = performance.now();
+  // a debounced bang still buzzes: each crit in a quick run is felt
+  vibrateFor(getExplosionDurationMs());
   if (now < explosionsHeldUntil) return;
   if (now - lastExplosionPlayTime < EXPLOSION_DEBOUNCE_MS) return;
   lastExplosionPlayTime = now;
   playSfx("explosion", SFX_VOLUME, 0.04);
-  vibrateFor(getExplosionDurationMs());
 }
 
 // the phone buzzes for as long as a crit's sound is heard, less a beat;
 // Android only (iOS has no vibration API)
 const VIBRATE_TRIM_MS = 200;
+let vibratingUntil = 0;
 function vibrateFor(soundMs: number): void {
   if (typeof navigator.vibrate !== "function") return;
-  navigator.vibrate(Math.max(0, Math.round(soundMs - VIBRATE_TRIM_MS)));
+  const ms = Math.max(0, Math.round(soundMs - VIBRATE_TRIM_MS));
+  const now = performance.now();
+  // a new buzz replaces the running one, so never cut a longer one short
+  if (now + ms <= vibratingUntil) return;
+  vibratingUntil = now + ms;
+  navigator.vibrate(ms);
 }
 
 // drops every explosion for `ms`, so one that lands at the end of it (a slam's
@@ -406,10 +413,10 @@ export function playBloop(): void {
 // crits during a fast held click can't stack overlapping plays
 export function playJackpot(): void {
   const now = performance.now();
+  vibrateFor(getJackpotDurationMs());
   if (now - lastJackpotPlayTime < JACKPOT_DEBOUNCE_MS) return;
   lastJackpotPlayTime = now;
   playSfx("win", JACKPOT_VOLUME);
-  vibrateFor(getJackpotDurationMs());
 }
 
 // Sale/Overtime running out — debounced so several floors' events expiring
@@ -477,10 +484,10 @@ const PAYOUT_PLAY_SECONDS = 1.926;
 const PAYOUT_FADE_SECONDS = 0.576;
 export function playPayout(): void {
   const now = performance.now();
+  vibrateFor((PAYOUT_PLAY_SECONDS - PAYOUT_FADE_SECONDS) * 1000);
   if (now - lastPayoutPlayTime < PAYOUT_DEBOUNCE_MS) return;
   lastPayoutPlayTime = now;
   playSfx("payout", SFX_VOLUME, 0, 1, PAYOUT_PLAY_SECONDS, PAYOUT_FADE_SECONDS);
-  vibrateFor((PAYOUT_PLAY_SECONDS - PAYOUT_FADE_SECONDS) * 1000);
 }
 
 // the same slot-machine sfx over the Boost event's coin stream
