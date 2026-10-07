@@ -384,6 +384,17 @@ function vibrateFor(soundMs: number): void {
   navigator.vibrate(ms);
 }
 
+// the buzz a crit tier's sound brings, for a crit that lands without it
+export function vibrateCritTier(tier: "crit" | "mega" | "ultra"): void {
+  vibrateFor(
+    tier === "ultra"
+      ? PAYOUT_AUDIBLE_MS
+      : tier === "mega"
+        ? getJackpotDurationMs()
+        : getExplosionDurationMs(),
+  );
+}
+
 // drops every explosion for `ms`, so one that lands at the end of it (a slam's
 // impact) is the one heard
 export function holdExplosions(ms: number): void {
@@ -482,9 +493,10 @@ export function getJackpotDurationMs(): number {
 // past the point the screen's gone quiet
 const PAYOUT_PLAY_SECONDS = 1.926;
 const PAYOUT_FADE_SECONDS = 0.576;
+const PAYOUT_AUDIBLE_MS = (PAYOUT_PLAY_SECONDS - PAYOUT_FADE_SECONDS) * 1000;
 export function playPayout(): void {
   const now = performance.now();
-  vibrateFor((PAYOUT_PLAY_SECONDS - PAYOUT_FADE_SECONDS) * 1000);
+  vibrateFor(PAYOUT_AUDIBLE_MS);
   if (now - lastPayoutPlayTime < PAYOUT_DEBOUNCE_MS) return;
   lastPayoutPlayTime = now;
   playSfx("payout", SFX_VOLUME, 0, 1, PAYOUT_PLAY_SECONDS, PAYOUT_FADE_SECONDS);

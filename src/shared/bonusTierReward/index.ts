@@ -6,7 +6,7 @@
 // (src/mouse).
 import { addTotalIncome, getTotalIncome } from "../../totalIncome";
 import { triggerScreenShake } from "../../screenShake";
-import { playCoinDrop, playSold } from "../../sound";
+import { playCoinDrop, playSold, vibrateCritTier } from "../../sound";
 import { COLOR } from "../../palette";
 import { multiply } from "../bigNumber";
 import { CRIT_TIER_CONFIG, type CritTier } from "../critTypes";
@@ -145,6 +145,7 @@ export function celebrateBonusTier(
   const { intensity, holdMs, priority } = BONUS_TIER_SHAKE[tier];
   triggerScreenShake({ intensity, label: "", holdMs, priority });
   playCoinDrop();
+  vibrateCritTier(tier);
   let flew = false;
   let arrived = false;
   let slamTimer: ReturnType<typeof setTimeout> | undefined;
