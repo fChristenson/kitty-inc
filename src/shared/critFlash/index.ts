@@ -23,6 +23,12 @@ export const TIER_FLASH_STROKE_WIDTH: Record<CritTier, number> = {
   ultra: 16,
 };
 
+export const TIER_SHAKE_INTENSITY: Record<CritTier, number> = {
+  crit: 1,
+  mega: 1.8,
+  ultra: 2.6,
+};
+
 // the plain x5/x25/x125 flashes, built at idle before the first crit lands
 export function warmTierFlashes(): void {
   warmCritFlashes(
@@ -47,7 +53,7 @@ export function playTierFlash(
     // (~1.93s) matches playPayout's own capped length. Priority 2 can never
     // be cut off by a smaller crit landing right after
     triggerScreenShake({
-      intensity: 2.6,
+      intensity: TIER_SHAKE_INTENSITY.ultra,
       label,
       color,
       strokeWidth: TIER_FLASH_STROKE_WIDTH.ultra,
@@ -59,7 +65,7 @@ export function playTierFlash(
   } else if (tier === "mega") {
     // priority 1: can interrupt a plain crit, never an ultra
     triggerScreenShake({
-      intensity: 1.8,
+      intensity: TIER_SHAKE_INTENSITY.mega,
       label,
       color,
       strokeWidth: TIER_FLASH_STROKE_WIDTH.mega,
@@ -70,6 +76,7 @@ export function playTierFlash(
   } else {
     // priority 0: the only tier a still-playing bigger flash suppresses
     triggerScreenShake({
+      intensity: TIER_SHAKE_INTENSITY.crit,
       label,
       color,
       strokeWidth: TIER_FLASH_STROKE_WIDTH.crit,

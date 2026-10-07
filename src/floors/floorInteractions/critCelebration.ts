@@ -21,12 +21,17 @@ import {
 } from "../upgradeButton";
 import { spawnFreezeCoinBurst } from "../coins";
 import { playCoinDrop } from "../../sound";
-import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
+import {
+  playTierFlash,
+  playSpecialFlash,
+  TIER_SHAKE_INTENSITY,
+} from "../../shared/critFlash";
 import { celebrateBonusTier, tierColor } from "../../shared/bonusTierReward";
 import {
   isCritFlashActive,
   getFlashHoldEndsAt,
   freezeCritFlashAsBackground,
+  shakeScreen,
 } from "../../screenShake";
 import { getScreenUnfrozenAt, isScreenFrozen } from "../../shared/screenFreeze";
 
@@ -269,11 +274,10 @@ export function triggerCritCelebration(
   // a plain tier crit with no special proc: only worth celebrating if nothing
   // special is still queued/playing — omitted entirely rather than cutting in
   // front of (or piling up behind) whatever special celebration is still due
-  if (
-    isScreenFrozen() ||
-    specialCelebrationQueue.length > 0 ||
-    isCritFlashActive(Date.now())
-  ) {
+  if (isScreenFrozen()) return;
+  if (specialCelebrationQueue.length > 0 || isCritFlashActive(Date.now())) {
+    // still hits (and buzzes), e.g. every crit of a long press
+    shakeScreen(TIER_SHAKE_INTENSITY[tier]);
     return;
   }
   celebrateTier(tier);

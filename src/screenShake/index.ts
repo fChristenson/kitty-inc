@@ -244,16 +244,23 @@ function kickShake(intensity: number, now: number): void {
   vibrate(intensity, now);
 }
 
-// a buzz per shake, bigger shakes buzzing longer; Android only (iOS has no
-// vibration API) and only after the player's first tap
-const VIBRATE_MS_PER_INTENSITY = 40;
-const VIBRATE_MAX_MS = 200;
+// a buzz per shake, as long as the shake's strong first half; Android only
+// (iOS has no vibration API) and only after the player's first tap
+const VIBRATE_SHARE_OF_SHAKE = 0.5;
+const VIBRATE_MIN_MS = 120;
+const VIBRATE_MAX_MS = 1000;
 let vibratingUntil = 0;
 
 function vibrate(intensity: number, now: number): void {
   if (typeof navigator.vibrate !== "function") return;
   const ms = Math.round(
-    Math.min(VIBRATE_MAX_MS, VIBRATE_MS_PER_INTENSITY * intensity),
+    Math.min(
+      VIBRATE_MAX_MS,
+      Math.max(
+        VIBRATE_MIN_MS,
+        SHAKE_DURATION_MS * intensity * VIBRATE_SHARE_OF_SHAKE,
+      ),
+    ),
   );
   // a new call cuts the running buzz short, so a smaller one never replaces it
   if (now + ms <= vibratingUntil) return;
