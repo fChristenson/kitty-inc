@@ -1,11 +1,13 @@
-// The ~1,100 event modules are most of the game's code, so they ship in 8
-// chunks. One loads once the game is on screen (main.ts) and another after each
-// event plays out, in the cooldown when none can land, so no chunk's load
-// competes with startup or with an event. Only the loaded events can claim a
-// crit; crits roll as plain crits until the first chunk is in.
+// The ~1,100 event modules are most of the game's code, so they ship in
+// chunks: a small starter pile of every look loads once the game is on screen
+// (main.ts), then one of the 8 big parts after each event plays out, in the
+// cooldown when none can land, so no chunk's load competes with startup or
+// with an event. Only the loaded events can claim a crit; crits roll as plain
+// crits until the starter pile is in.
 import { runWhenIdle } from "../../shared/idle";
 
 const PARTS = [
+  () => import("./eventsStarter"),
   () => import("./events0"),
   () => import("./events1"),
   () => import("./events2"),
@@ -16,7 +18,8 @@ const PARTS = [
   () => import("./events7"),
 ];
 
-export type EventCatalog = typeof import("./events0") &
+export type EventCatalog = typeof import("./eventsStarter") &
+  typeof import("./events0") &
   typeof import("./events1") &
   typeof import("./events2") &
   typeof import("./events3") &
@@ -28,8 +31,6 @@ export type EventCatalog = typeof import("./events0") &
 const PART_GAP_TIMEOUT_MS = 1000;
 
 const parts = new Map<number, Promise<object>>();
-// a random chunk comes first, so a session can open on any of the events
-const firstPart = Math.floor(Math.random() * PARTS.length);
 let partsRequested = 0;
 let loading: Promise<EventCatalog> | null = null;
 
@@ -49,7 +50,7 @@ function idleGap(): Promise<void> {
 // loads the next chunk of events, if any are left
 export function loadNextEventPart(): Promise<unknown> {
   if (partsRequested >= PARTS.length) return Promise.resolve();
-  return loadPart((firstPart + partsRequested++) % PARTS.length);
+  return loadPart(partsRequested++);
 }
 
 // every event, one chunk per idle gap (dev test buttons, the perf rig)

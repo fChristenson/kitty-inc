@@ -46,7 +46,7 @@ Everything in progress lives in the gitignored `tmp/`: raws, custom cut-out scri
 - Re-running `--scan` is safe: entries already in the spec keep their edits.
 - To check shipped names against their art, run `node scripts/crit-overview.mjs [category ...]`. It writes each category's icons with labels to `tmp/_sheets/overview-<category>*.png`, 48 per sheet.
 - To find shipped icons with residue around the art (a faint ghost of the raw's outline or backdrop), run `node scripts/crit-residue.mjs [category ...]`. It lists the worst and paints the residue green on `tmp/_sheets/residue.png`; re-cut those.
-- Re-cut a shipped crit from its raw in `tmp/crits/<category>/`, if it has one, then run `node scripts/add-sticker-borders.mjs <kind> ...`. Always pass names: with no names it rebuilds all ~1,600 stickers.
+- Re-cut a shipped crit from its raw in `tmp/crits/<category>/`, if it has one. `npm run build` rebuilds the sticker and silhouette of every icon whose content changed (tracked in `scripts/sticker-sources.json`).
 - The template ids for pinning `template` / `group` / `tier` in the spec are in `scripts/lib/crit-templates.mjs`. Pin only when the auto plan fits the art poorly.
 
 ## Event rules

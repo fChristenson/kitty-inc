@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:prod": "vite --mode production",
+    "prebuild": "node scripts/add-sticker-borders.mjs --stale",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

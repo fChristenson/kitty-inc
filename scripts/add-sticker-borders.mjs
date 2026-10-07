@@ -1,5 +1,6 @@
 import path from "node:path";
 import fs from "node:fs/promises";
+import { createHash } from "node:crypto";
 import {
   addStickerBorder,
   writeSilhouette,
@@ -12,6 +13,8 @@ import { critIconFile } from "./lib/crit-asset-paths.mjs";
 //
 //   node scripts/add-sticker-borders.mjs                # every crit icon
 //   node scripts/add-sticker-borders.mjs ninja cowboy   # just these
+//   node scripts/add-sticker-borders.mjs --stale        # only icons changed since
+//                                                       # their sticker (npm run build)
 //   node scripts/add-sticker-borders.mjs --border=14    # thicker white
 //   node scripts/add-sticker-borders.mjs --out=tmp      # somewhere else
 
@@ -68,6 +71,7 @@ async function critIconFiles() {
 }
 
 const args = process.argv.slice(2);
+const stale = args.includes("--stale");
 const borderArg = args.find((arg) => arg.startsWith("--border="));
 const outArg = args.find((arg) => arg.startsWith("--out="));
 const border = borderArg ? Number(borderArg.slice(9)) : DEFAULT_BORDER;
@@ -87,15 +91,38 @@ const silhouetteDir = path.resolve(
 const requested = args.filter((arg) => !arg.startsWith("--"));
 const names = requested.length ? requested : await critIconFiles();
 
+// each icon's content hash when its sticker was last built: file times don't
+// survive git, hashes do
+const sourcesFile = path.join(import.meta.dirname, "sticker-sources.json");
+const sources = JSON.parse(
+  await fs.readFile(sourcesFile, "utf8").catch(() => "null"),
+);
+const hashes = sources ?? {};
+// null for a missing icon; read in parallel, so the check before every build
+// stays quick
+const iconHashes = await Promise.all(
+  names.map((name) => {
+    const file = name.endsWith(".webp") ? name : critIconFile(name);
+    return fs.readFile(path.join(publicDir, file)).then(
+      (data) => createHash("sha1").update(data).digest("hex"),
+      () => null,
+    );
+  }),
+);
+
 let done = 0;
 const missing = [];
-for (const name of names) {
+for (const [index, name] of names.entries()) {
   const file = name.endsWith(".webp") ? name : critIconFile(name);
   const source = path.join(publicDir, file);
-  try {
-    await fs.access(source);
-  } catch {
+  const hash = iconHashes[index];
+  if (hash === null) {
     missing.push(file);
+    continue;
+  }
+  // first run: the shipped stickers are taken as built from today's icons
+  if (stale && (!sources || hashes[file] === hash)) {
+    hashes[file] = hash;
     continue;
   }
   const sticker = await addStickerBorder(
@@ -108,11 +135,17 @@ for (const name of names) {
       sticker,
       path.join(silhouetteDir, file.replace(/\.webp$/, ".png")),
     );
+  if (!outArg) hashes[file] = hash;
   done++;
 }
-console.log(
-  `Added a ${border}px white sticker border to ${done} icon(s) -> ${path.relative(process.cwd(), outDir)}`,
-);
+if (!outArg) {
+  const sorted = Object.fromEntries(Object.entries(hashes).sort());
+  await fs.writeFile(sourcesFile, `${JSON.stringify(sorted, null, 2)}\n`);
+}
+if (!stale || done > 0)
+  console.log(
+    `Added a ${border}px white sticker border to ${done} icon(s) -> ${path.relative(process.cwd(), outDir)}`,
+  );
 if (missing.length) {
   console.warn(
     `Skipped ${missing.length} missing icon(s): ${missing.join(", ")}`,

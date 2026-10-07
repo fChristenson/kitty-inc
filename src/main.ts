@@ -315,7 +315,7 @@ async function main() {
   runWhenIdle(preloadSounds, 1500);
   // the events and featured crit rewards are most of the code: kept out of the
   // startup bundle, they load once the first screen is up (crits roll without
-  // them till then); only one chunk of events, the rest after events play
+  // them till then); only the starter pile of events, the rest after events play
   runWhenIdle(() => void loadFeaturedRewards(), 2000);
   runWhenIdle(() => void loadNextEventPart(), 3000);
 
