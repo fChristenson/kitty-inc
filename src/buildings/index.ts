@@ -7,11 +7,14 @@ import type { Floor } from "../gameState";
 import {
   type BigNumber,
   ZERO,
+  add,
   isZero,
+  max,
   pow,
   multiply,
   multiplyBig,
 } from "../shared/bigNumber";
+import { nominalIncomeRatePerSecond } from "../shared/income";
 import { CONFIG } from "../config";
 import { floorRateFactor } from "../shared/upgradeEconomy";
 import { MAX_FLOORS_PER_BUILDING } from "../floors/floorLock";
@@ -52,17 +55,47 @@ export function canBuyNextBuilding(buildings: readonly Floor[][]): boolean {
   );
 }
 
+// the company's nominal income (see shared/income), re-summed at most once a
+// second: the map draws the next building's price every frame
+const INCOME_CACHE_MS = 1000;
+const incomeCache = new WeakMap<
+  readonly Floor[][],
+  { at: number; income: BigNumber }
+>();
+function companyNominalIncome(buildings: readonly Floor[][]): BigNumber {
+  const now = Date.now();
+  const cached = incomeCache.get(buildings);
+  if (cached && now - cached.at < INCOME_CACHE_MS) return cached.income;
+  let income = ZERO;
+  for (const floors of buildings)
+    for (const floor of floors)
+      if (floor.unlocked)
+        income = add(income, nominalIncomeRatePerSecond(floor));
+  incomeCache.set(buildings, { at: now, income });
+  return income;
+}
+
 // $ cost to buy the next building (nextBuildingIndex === buildings.length, since
-// index 0 is the always-free starting building), independently of floor scaling. Uses
-// shared/bigNumber's pow (never a raw `**`), so this stays finite even for a
-// very high building index instead of overflowing to Infinity
-export function getBuildingPrice(nextBuildingIndex: number): BigNumber {
-  return multiply(
-    pow(
-      CONFIG.floors.floorEconomyMultiplierPerBuilding,
-      Math.max(0, nextBuildingIndex - 1),
+// index 0 is the always-free starting building): its milestone price, or
+// CONFIG.buildings.unlockIncomeMinutes of the company's nominal income, whichever
+// is higher. Uses shared/bigNumber's pow (never a raw `**`), so this stays
+// finite even for a very high building index instead of overflowing to Infinity
+export function getBuildingPrice(
+  nextBuildingIndex: number,
+  buildings: readonly Floor[][],
+): BigNumber {
+  return max(
+    multiply(
+      pow(
+        CONFIG.floors.floorEconomyMultiplierPerBuilding,
+        Math.max(0, nextBuildingIndex - 1),
+      ),
+      BUILDING_BASE_PRICE,
     ),
-    BUILDING_BASE_PRICE,
+    multiply(
+      companyNominalIncome(buildings),
+      CONFIG.buildings.unlockIncomeMinutes * 60,
+    ),
   );
 }
 

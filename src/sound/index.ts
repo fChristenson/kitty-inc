@@ -69,8 +69,8 @@ let lastPayoutPlayTime = 0;
 const SOLD_DEBOUNCE_MS = 60;
 let lastSoldPlayTime = 0;
 
-// Sounds for actions the GAME takes on its own — the cloud-cat auto-buyer's
-// purchases, a hired manager's periodic re-boost — rather than ones the player
+// Sounds for actions the GAME takes on its own — the map marker's long-press
+// buyer's purchases, a hired manager's periodic re-boost — rather than ones the player
 // clicked. These fire unattended, from more places the longer a save runs (one
 // manager timer per managed floor), so without a shared cap they pile into
 // constant noise. One gate for all of them, so adding another automated sound

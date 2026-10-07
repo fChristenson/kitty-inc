@@ -308,6 +308,7 @@ export {
 } from "./incomePanel";
 export {
   ensureLockedFloorAbove,
+  refreshFloorUnlockPrice,
   unlockFloor,
   drawFloorLock,
   MAX_FLOORS_PER_BUILDING,

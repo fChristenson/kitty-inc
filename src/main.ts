@@ -3076,7 +3076,7 @@ async function main() {
   function buyBuilding(targetBuildings = buildings): boolean {
     const buildingIndex = targetBuildings.length;
     if (!canBuyNextBuilding(targetBuildings)) return false;
-    const purchaseCost = getBuildingPrice(buildingIndex);
+    const purchaseCost = getBuildingPrice(buildingIndex, targetBuildings);
     if (!spendTotalIncome(purchaseCost)) return false;
     targetBuildings.push(
       createBuilding(buildingIndex, getBackgroundUrls().length, {
@@ -3136,7 +3136,7 @@ async function main() {
       canBuyNextBuilding(targetBuildings)
     ) {
       consider({
-        cost: getBuildingPrice(targetBuildings.length),
+        cost: getBuildingPrice(targetBuildings.length, targetBuildings),
         label: "+1 building",
         buy: () => {
           const buildingIndex = targetBuildings.length;
@@ -3472,6 +3472,7 @@ async function main() {
       renovations.isRunning(activeCompanyIndex, buildingIndex),
     buyBuilding,
     canBuyBuilding: () => canBuyNextBuilding(buildings),
+    getBuildingPrice: (index) => getBuildingPrice(index, buildings),
     onStateChanged: saveCurrentCompanyStateNow,
     buyOutBuilding,
     setBuildingCritTier,

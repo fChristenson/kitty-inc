@@ -13,6 +13,7 @@
 import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
 import { type BigNumber, ZERO, multiply, divide } from "../bigNumber";
+import { floorRateFactor } from "../upgradeEconomy";
 
 // once a floor's true speed exceeds this, any faster payout folds into a bigger
 // $ amount per cycle instead of a faster-than-manageable bar fill/catch-up loop
@@ -131,4 +132,20 @@ export function currentIncomeRatePerSecond(
 // dropped the office/manager multiplier from all of them.
 export function baseIncomeRatePerSecond(floor: Floor): BigNumber {
   return currentIncomeRatePerSecond(floor, officeUpgradeSpeedMultiplier(floor));
+}
+
+// what a floor's levels and office items alone earn, with no crit tier, perma
+// tier or boost: prices built on it leave every lucky multiplier as profit
+export function nominalIncomeRatePerSecond(floor: Floor): BigNumber {
+  const maxed =
+    floor.upgradeCount >= CONFIG.incomePanel.maxFloorLevel
+      ? CONFIG.incomePanel.maxedFloorIncomeMultiplier
+      : 1;
+  return multiply(
+    floor.rateStep,
+    (CONFIG.floors.baseIncomeAmount / CONFIG.floors.baseRateStep) *
+      floorRateFactor(floor.upgradeCount) *
+      officeUpgradeSpeedMultiplier(floor) *
+      maxed,
+  );
 }

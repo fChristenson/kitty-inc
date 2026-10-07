@@ -3,7 +3,6 @@ import { COLOR } from "../../palette";
 import { playSold, playPayout, playAutoPurchase } from "../../sound";
 import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
 import { tierColor } from "../../shared/bonusTierReward";
-import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
 import { setActiveCompanyIndex } from "../../company";
 import { getEffectiveDpr } from "../../shared/devicePixelRatio";
@@ -121,6 +120,7 @@ export interface CityMapDeps {
   buyBuilding: () => boolean; // unlocks building 1 if affordable
   // whether the newest building is maxed out, opening the next one
   canBuyBuilding: () => boolean;
+  getBuildingPrice: (buildingIndex: number) => BigNumber;
   onStateChanged: () => void; // schedules persistence after any map-node purchase
   // long-press on a bought marker: buys everything affordable in that building
   buyOutBuilding: (buildingIndex: number) => Promise<boolean>;
@@ -513,7 +513,7 @@ export function createCityMapView(
       }
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);
       const { cx, feetY } = markerCenter(cssW, cssH, i);
-      const price = getBuildingPrice(globalIndex);
+      const price = deps.getBuildingPrice(globalIndex);
       // only the next building in line can be bought, so only it wiggles
       const affordable =
         globalIndex === buildingCount &&
@@ -699,8 +699,8 @@ export function createCityMapView(
   }
 
   // long-press on a bought building's marker: holding it for BUY_ALL_HOLD_MS
-  // keeps buying the most expensive affordable thing in that building (same
-  // purchases as the cloud cat's auto-buyer) until nothing more can be bought.
+  // keeps buying the most expensive affordable thing in that building until
+  // nothing more can be bought.
   // Suppresses the click landing right after (see onClick above)
   const BUY_ALL_HOLD_MS = 1000;
   let buyAllHoldTimeout: ReturnType<typeof setTimeout> | null = null;
