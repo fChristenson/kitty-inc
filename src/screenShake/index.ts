@@ -16,6 +16,7 @@ import { drawCritText } from "../shared/critText";
 import { runWhenIdle } from "../shared/idle";
 import { drawGoldShimmer } from "../shared/goldShimmer";
 import { isScreenFrozen } from "../shared/screenFreeze";
+import { getExplosionDurationMs } from "../sound";
 import {
   drawCritSparks,
   startCritSparks,
@@ -187,23 +188,18 @@ function buzzForFlash(now: number): void {
   if (left <= 0 && flashPausedAt === null) return;
   const ms = Math.max(0, Math.round(left));
   navigator.vibrate(
-    ms > 0 && CRIT_ICON_BY_LABEL[flashLabel] ? softBuzz(ms) : ms,
+    CRIT_ICON_BY_LABEL[flashLabel] ? Math.min(ms, badgeBuzzMs()) : ms,
   );
 }
 
-// a badge crit buzzes softer: the motor can't be turned down, so it pulses
-// on for BADGE_BUZZ_DUTY of each cycle instead (Chrome caps a pattern at 99 steps)
-const BADGE_BUZZ_DUTY = 0.75;
-const BADGE_BUZZ_CYCLE_MS = 40;
-const MAX_BUZZ_STEPS = 98;
+// a badge crit buzzes this much longer than a regular x5 crit (whose flash,
+// and so buzz, lasts as long as its explosion sound), not its whole long flash
+const BADGE_BUZZ_SCALE = 1.25;
 
-function softBuzz(ms: number): number[] {
-  const cycleMs = Math.max(BADGE_BUZZ_CYCLE_MS, (ms * 2) / MAX_BUZZ_STEPS);
-  const on = Math.round(cycleMs * BADGE_BUZZ_DUTY);
-  const off = Math.round(cycleMs - on);
-  const pattern: number[] = [];
-  for (let t = 0; t < ms; t += on + off) pattern.push(on, off);
-  return pattern;
+function badgeBuzzMs(): number {
+  return Math.round(
+    BADGE_BUZZ_SCALE * Math.max(getExplosionDurationMs(), FLASH_DURATION_MS),
+  );
 }
 
 interface FlashRequest {
