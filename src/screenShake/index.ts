@@ -241,6 +241,24 @@ function kickShake(intensity: number, now: number): void {
   shakeMagnitudeScale = 0.85 + Math.random() * 0.3;
   shakePhaseX = Math.random() * Math.PI * 2;
   shakePhaseY = Math.random() * Math.PI * 2;
+  vibrate(intensity, now);
+}
+
+// a buzz per shake, bigger shakes buzzing longer; Android only (iOS has no
+// vibration API) and only after the player's first tap
+const VIBRATE_MS_PER_INTENSITY = 40;
+const VIBRATE_MAX_MS = 200;
+let vibratingUntil = 0;
+
+function vibrate(intensity: number, now: number): void {
+  if (typeof navigator.vibrate !== "function") return;
+  const ms = Math.round(
+    Math.min(VIBRATE_MAX_MS, VIBRATE_MS_PER_INTENSITY * intensity),
+  );
+  // a new call cuts the running buzz short, so a smaller one never replaces it
+  if (now + ms <= vibratingUntil) return;
+  vibratingUntil = now + ms;
+  navigator.vibrate(ms);
 }
 
 // a shake with no flash, so it never holds up a crit's own flash
