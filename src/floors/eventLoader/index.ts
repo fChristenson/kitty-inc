@@ -1,7 +1,8 @@
-// The ~1,100 event modules are most of the game's code, so they ship in
-// their own chunks, loaded after the game is on screen (main.ts), one part
-// per idle gap so no single parse/eval lands as one long freeze. Until they
-// arrive no event can claim a crit; crits roll as plain crits meanwhile.
+// The ~1,100 event modules are most of the game's code, so they ship in 8
+// chunks. One loads once the game is on screen (main.ts) and another after each
+// event plays out, in the cooldown when none can land, so no chunk's load
+// competes with startup or with an event. Only the loaded events can claim a
+// crit; crits roll as plain crits until the first chunk is in.
 import { runWhenIdle } from "../../shared/idle";
 
 const PARTS = [
@@ -26,19 +27,39 @@ export type EventCatalog = typeof import("./events0") &
 
 const PART_GAP_TIMEOUT_MS = 1000;
 
+const parts = new Map<number, Promise<object>>();
+// a random chunk comes first, so a session can open on any of the events
+const firstPart = Math.floor(Math.random() * PARTS.length);
+let partsRequested = 0;
 let loading: Promise<EventCatalog> | null = null;
+
+function loadPart(index: number): Promise<object> {
+  let part = parts.get(index);
+  if (!part) {
+    part = PARTS[index]();
+    parts.set(index, part);
+  }
+  return part;
+}
 
 function idleGap(): Promise<void> {
   return new Promise((resolve) => runWhenIdle(resolve, PART_GAP_TIMEOUT_MS));
 }
 
+// loads the next chunk of events, if any are left
+export function loadNextEventPart(): Promise<unknown> {
+  if (partsRequested >= PARTS.length) return Promise.resolve();
+  return loadPart((firstPart + partsRequested++) % PARTS.length);
+}
+
+// every event, one chunk per idle gap (dev test buttons, the perf rig)
 export function loadEventCatalog(): Promise<EventCatalog> {
   return (loading ??= (async () => {
-    const parts: object[] = [];
-    for (const load of PARTS) {
-      if (parts.length > 0) await idleGap();
-      parts.push(await load());
+    const loaded: object[] = [];
+    for (let i = 0; i < PARTS.length; i++) {
+      if (loaded.length > 0 && !parts.has(i)) await idleGap();
+      loaded.push(await loadPart(i));
     }
-    return Object.assign({}, ...parts) as EventCatalog;
+    return Object.assign({}, ...loaded) as EventCatalog;
   })());
 }

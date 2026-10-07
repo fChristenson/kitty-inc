@@ -101,28 +101,33 @@ const AudioContextCtor: typeof AudioContext | undefined =
   (window as unknown as { webkitAudioContext?: typeof AudioContext })
     .webkitAudioContext;
 let audioCtx: AudioContext | null = null;
-function getAudioContext(): AudioContext | null {
-  if (!AudioContextCtor) return null; // unsupported browser — callers no-op via optional chaining
-  // "interactive" asks for the smallest output buffer the device supports, so a
-  // scheduled sound reaches the speakers as soon as possible — the default
-  // ("balanced") trades latency for power on some platforms, which reads as the
-  // sfx lagging behind the click that caused it
-  if (!audioCtx)
+
+// opening the audio device blocks the main thread for 40-450ms, so the context
+// waits for the first tap or key (it can't play before one anyway)
+function createAudioContextOnGesture(): void {
+  if (!AudioContextCtor) return;
+  const create = () => {
+    window.removeEventListener("pointerdown", create, true);
+    window.removeEventListener("keydown", create, true);
+    // "interactive" asks for the smallest output buffer the device supports, so a
+    // scheduled sound reaches the speakers as soon as possible
     audioCtx = new AudioContextCtor({ latencyHint: "interactive" });
-  return audioCtx;
+    resumeAudioContextOnGesture(audioCtx);
+  };
+  window.addEventListener("pointerdown", create, true);
+  window.addEventListener("keydown", create, true);
 }
 
-// same autoplay-policy workaround startBackgroundMusic already needs for <audio> —
-// a fresh AudioContext starts "suspended" until the user has interacted with the
-// page at least once
+// a touch pointerdown doesn't count as a user activation, so the context can
+// start "suspended"; the next activating event resumes it
 function resumeAudioContextOnGesture(ctx: AudioContext): void {
   if (ctx.state === "running") return;
   const retry = () => {
     ctx.resume().catch(() => {});
-    window.removeEventListener("pointerdown", retry);
+    window.removeEventListener("pointerup", retry);
     window.removeEventListener("keydown", retry);
   };
-  window.addEventListener("pointerdown", retry);
+  window.addEventListener("pointerup", retry);
   window.addEventListener("keydown", retry);
 }
 
@@ -140,12 +145,16 @@ const sfxUrls = {
 } as const;
 type SfxName = keyof typeof sfxUrls;
 
+const DECODE_SAMPLE_RATE = 48000;
 const sfxBufferCache = new Map<SfxName, Promise<AudioBuffer>>();
 // the RESOLVED buffers, kept alongside the promise cache above purely so playSfx
 // can start an already-decoded sound synchronously — see startBuffer's call sites
 const decodedSfxBuffers = new Map<SfxName, AudioBuffer>();
 
-function loadSfxBuffer(ctx: AudioContext, name: SfxName): Promise<AudioBuffer> {
+function loadSfxBuffer(
+  ctx: BaseAudioContext,
+  name: SfxName,
+): Promise<AudioBuffer> {
   const cached = sfxBufferCache.get(name);
   if (cached) return cached;
   const promise = fetch(sfxUrls[name])
@@ -165,11 +174,12 @@ function loadSfxBuffer(ctx: AudioContext, name: SfxName): Promise<AudioBuffer> {
 // already-decoded buffer instead of fetching/decoding for the first time on that
 // very click
 export function preloadSounds(): void {
-  const ctx = getAudioContext();
-  if (!ctx) return;
-  resumeAudioContextOnGesture(ctx);
+  createAudioContextOnGesture();
+  // decoded buffers play in any context; an offline one opens no audio device
+  if (typeof OfflineAudioContext !== "function") return;
+  const decoder = new OfflineAudioContext(1, 1, DECODE_SAMPLE_RATE);
   (Object.keys(sfxUrls) as SfxName[]).forEach((name) => {
-    loadSfxBuffer(ctx, name).catch(() => {});
+    loadSfxBuffer(decoder, name).catch(() => {});
   });
 }
 
@@ -217,7 +227,7 @@ function withSfxBuffer(
   name: SfxName,
   play: (ctx: AudioContext, buffer: AudioBuffer) => void,
 ): void {
-  const ctx = getAudioContext();
+  const ctx = audioCtx;
   if (!ctx) return;
   const decoded = decodedSfxBuffers.get(name);
   if (decoded) {

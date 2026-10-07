@@ -163,15 +163,17 @@ export async function loadWorkerSprite(): Promise<HTMLImageElement> {
     (RENDER_H * diva.naturalHeight) / manager.naturalHeight,
   );
   spritesLoaded = true;
-  // cropped at idle: the Upgrades dialog's first open did it mid slide-in
-  runWhenIdle(() => {
-    for (const url of [getWorkerIconUrl(), getManagerIconUrl()]) {
-      if (!url) continue;
+  // cropped at idle, one per task: the Upgrades dialog's first open did it mid
+  // slide-in
+  for (const getUrl of [getWorkerIconUrl, getManagerIconUrl]) {
+    runWhenIdle(() => {
+      const url = getUrl();
+      if (!url) return;
       const image = new Image();
       image.src = url;
       void image.decode().catch(() => undefined);
-    }
-  }, 3000);
+    }, 3000);
+  }
   return worker!;
 }
 
@@ -187,6 +189,8 @@ function workerSpriteFor(
 
 const workerIconUrlBySprite = new Map<HTMLImageElement, string>();
 const managerIconUrlBySprite = new Map<HTMLImageElement, string>();
+// the menu icon's frame height before cropping: sharp at 28px on a 3x screen
+const ICON_FRAME_H = 160;
 
 // crops sprite's TURN_FRAMES[0] pose (the plain, untinted, camera-facing neutral
 // pose already in every walk-cycle sheet) down to its own actual non-transparent
@@ -197,17 +201,32 @@ const managerIconUrlBySprite = new Map<HTMLImageElement, string>();
 // to fill as much of the icon box as its own aspect ratio allows, with nothing
 // cut off — reused by both getWorkerIconUrl and getManagerIconUrl below
 function cropCameraFacingIconUrl(sprite: HTMLImageElement): string {
-  const frameW = sprite.naturalWidth / FRAME_COUNT;
-  const frameH = sprite.naturalHeight;
-  const frameX = TURN_FRAMES[0] * frameW;
+  const sourceW = sprite.naturalWidth / FRAME_COUNT;
+  const sourceH = sprite.naturalHeight;
+  // the icon shows at 28px: scanning and encoding the full-size frame cost ~40ms
+  const scale = Math.min(1, ICON_FRAME_H / sourceH);
+  const frameW = Math.round(sourceW * scale);
+  const frameH = Math.round(sourceH * scale);
+  const sourceX = TURN_FRAMES[0] * sourceW;
 
   // isolate just this one frame first so the bounding-box scan below only sees
   // its own content, not the sheet's other frames
   const frameCanvas = document.createElement("canvas");
   frameCanvas.width = frameW;
   frameCanvas.height = frameH;
-  const frameCtx = frameCanvas.getContext("2d")!;
-  frameCtx.drawImage(sprite, frameX, 0, frameW, frameH, 0, 0, frameW, frameH);
+  const frameCtx = frameCanvas.getContext("2d", { willReadFrequently: true })!;
+  frameCtx.imageSmoothingQuality = "high";
+  frameCtx.drawImage(
+    sprite,
+    sourceX,
+    0,
+    sourceW,
+    sourceH,
+    0,
+    0,
+    frameW,
+    frameH,
+  );
 
   const { data } = frameCtx.getImageData(0, 0, frameW, frameH);
   let minX = frameW;
@@ -229,7 +248,7 @@ function cropCameraFacingIconUrl(sprite: HTMLImageElement): string {
   const canvas = document.createElement("canvas");
   canvas.width = cropW;
   canvas.height = cropH;
-  const ctx = canvas.getContext("2d")!;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   ctx.drawImage(frameCanvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
   return canvas.toDataURL("image/png");
 }

@@ -333,7 +333,11 @@ export {
 } from "./floorInteractions";
 export type { ChainCritDeps } from "./floorInteractions";
 export type { FloorActionsDeps } from "./floorInteractions";
-export { loadEventCatalog, type EventCatalog } from "./eventLoader";
+export {
+  loadEventCatalog,
+  loadNextEventPart,
+  type EventCatalog,
+} from "./eventLoader";
 export type { OnScreenFloor } from "./eventProcs";
 export {
   forceKeynoteCritUpgrade,

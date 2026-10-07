@@ -52,6 +52,7 @@ import {
   getUpgradeCost,
   rollFloorBuyCrit,
   loadEventCatalog,
+  loadNextEventPart,
   type EventCatalog,
   type FloorActionsDeps,
 } from "./floors";
@@ -314,9 +315,9 @@ async function main() {
   runWhenIdle(preloadSounds, 1500);
   // the events and featured crit rewards are most of the code: kept out of the
   // startup bundle, they load once the first screen is up (crits roll without
-  // them till then)
+  // them till then); only one chunk of events, the rest after events play
   runWhenIdle(() => void loadFeaturedRewards(), 2000);
-  runWhenIdle(() => void loadEventCatalog(), 3000);
+  runWhenIdle(() => void loadNextEventPart(), 3000);
 
   app.innerHTML = `
     <div class="game">
