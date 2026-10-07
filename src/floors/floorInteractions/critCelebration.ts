@@ -20,7 +20,7 @@ import {
   NIGHT_SHIFT_CRIT_LABEL,
 } from "../upgradeButton";
 import { spawnFreezeCoinBurst } from "../coins";
-import { playCoinDrop, vibrateCritTier } from "../../sound";
+import { playCoinDrop } from "../../sound";
 import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
 import { celebrateBonusTier, tierColor } from "../../shared/bonusTierReward";
 import {
@@ -269,10 +269,11 @@ export function triggerCritCelebration(
   // a plain tier crit with no special proc: only worth celebrating if nothing
   // special is still queued/playing — omitted entirely rather than cutting in
   // front of (or piling up behind) whatever special celebration is still due
-  if (isScreenFrozen()) return;
-  if (specialCelebrationQueue.length > 0 || isCritFlashActive(Date.now())) {
-    // no flash of its own, but still felt
-    vibrateCritTier(tier);
+  if (
+    isScreenFrozen() ||
+    specialCelebrationQueue.length > 0 ||
+    isCritFlashActive(Date.now())
+  ) {
     return;
   }
   celebrateTier(tier);
