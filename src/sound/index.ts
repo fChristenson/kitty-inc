@@ -374,7 +374,7 @@ export function playExplosion(): void {
 // an event's bangs buzz the phone (crits buzz with their flash, see
 // screenShake); Android only, iOS has no vibration API
 const VIBRATE_TRIM_MS = 200;
-export const MAX_VIBRATE_MS = 300;
+export const MAX_VIBRATE_MS = 100;
 let vibratingUntil = 0;
 function buzzDuringEvent(soundMs: number): void {
   if (!isScreenFrozen() || typeof navigator.vibrate !== "function") return;
