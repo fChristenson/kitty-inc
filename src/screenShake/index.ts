@@ -164,7 +164,10 @@ let flashPausedAt: number | null = null;
 
 export function syncCritFlashPause(now: number): void {
   if (isScreenFrozen()) {
-    flashPausedAt ??= now;
+    if (flashPausedAt === null) {
+      flashPausedAt = now;
+      buzzForFlash(now);
+    }
     return;
   }
   if (flashPausedAt === null) return;
@@ -172,6 +175,17 @@ export function syncCritFlashPause(now: number): void {
   flashPausedAt = null;
   if (flashStartedAt !== null) flashStartedAt += pausedMs;
   if (flashEndsAt !== null) flashEndsAt += pausedMs;
+  buzzForFlash(now);
+}
+
+// the phone buzzes from a crit flash's start until it ends (a new flash takes
+// over the buzz); Android only, iOS has no vibration API
+function buzzForFlash(now: number): void {
+  // no flash: leave any event's buzz alone
+  if (flashEndsAt === null || typeof navigator.vibrate !== "function") return;
+  const left = flashPausedAt !== null ? 0 : flashEndsAt - now;
+  if (left <= 0 && flashPausedAt === null) return;
+  navigator.vibrate(Math.max(0, Math.round(left)));
 }
 
 interface FlashRequest {
@@ -212,6 +226,7 @@ function startFlash(req: FlashRequest): void {
   flashHoldMs = holdMs;
   activeFlashPriority = req.priority;
   flashEndsAt = now + GROWTH_DURATION_MS + holdMs + fadeDurationMs;
+  buzzForFlash(now);
   // a featured crit's image is its own show
   if (CRIT_ICON_BY_LABEL[req.label]) stopCritSparks();
   else startCritSparks(req.priority, now);

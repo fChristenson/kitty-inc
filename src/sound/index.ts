@@ -1,3 +1,5 @@
+import { isScreenFrozen } from "../shared/screenFreeze";
+
 const soundUrl = (filename: string) => `${import.meta.env.BASE_URL}${filename}`;
 const themeUrl = soundUrl("theme.mp3");
 const coinDropUrl = soundUrl("coinDrop.mp3");
@@ -362,37 +364,25 @@ export function playAutoBoost(): void {
 // stack multiple full explosions on top of each other
 export function playExplosion(): void {
   const now = performance.now();
-  // a debounced bang still buzzes: each crit in a quick run is felt
-  vibrateFor(getExplosionDurationMs());
+  buzzDuringEvent(getExplosionDurationMs());
   if (now < explosionsHeldUntil) return;
   if (now - lastExplosionPlayTime < EXPLOSION_DEBOUNCE_MS) return;
   lastExplosionPlayTime = now;
   playSfx("explosion", SFX_VOLUME, 0.04);
 }
 
-// the phone buzzes for as long as a crit's sound is heard, less a beat;
-// Android only (iOS has no vibration API)
+// an event's bangs buzz the phone (crits buzz with their flash, see
+// screenShake); Android only, iOS has no vibration API
 const VIBRATE_TRIM_MS = 200;
 let vibratingUntil = 0;
-function vibrateFor(soundMs: number): void {
-  if (typeof navigator.vibrate !== "function") return;
+function buzzDuringEvent(soundMs: number): void {
+  if (!isScreenFrozen() || typeof navigator.vibrate !== "function") return;
   const ms = Math.max(0, Math.round(soundMs - VIBRATE_TRIM_MS));
   const now = performance.now();
   // a new buzz replaces the running one, so never cut a longer one short
   if (now + ms <= vibratingUntil) return;
   vibratingUntil = now + ms;
   navigator.vibrate(ms);
-}
-
-// the buzz a crit tier's sound brings, for a crit that lands without it
-export function vibrateCritTier(tier: "crit" | "mega" | "ultra"): void {
-  vibrateFor(
-    tier === "ultra"
-      ? PAYOUT_AUDIBLE_MS
-      : tier === "mega"
-        ? getJackpotDurationMs()
-        : getExplosionDurationMs(),
-  );
 }
 
 // drops every explosion for `ms`, so one that lands at the end of it (a slam's
@@ -407,6 +397,7 @@ export function holdExplosions(ms: number): void {
 export function playSlamExplosion(): void {
   lastExplosionPlayTime = performance.now();
   playSfx("explosion", SFX_VOLUME, 0.04);
+  buzzDuringEvent(getExplosionDurationMs());
 }
 
 // one-shot sound effect for clicking a cat or the mouse, and for hitting the
@@ -424,7 +415,7 @@ export function playBloop(): void {
 // crits during a fast held click can't stack overlapping plays
 export function playJackpot(): void {
   const now = performance.now();
-  vibrateFor(getJackpotDurationMs());
+  buzzDuringEvent(getJackpotDurationMs());
   if (now - lastJackpotPlayTime < JACKPOT_DEBOUNCE_MS) return;
   lastJackpotPlayTime = now;
   playSfx("win", JACKPOT_VOLUME);
@@ -493,10 +484,9 @@ export function getJackpotDurationMs(): number {
 // past the point the screen's gone quiet
 const PAYOUT_PLAY_SECONDS = 1.926;
 const PAYOUT_FADE_SECONDS = 0.576;
-const PAYOUT_AUDIBLE_MS = (PAYOUT_PLAY_SECONDS - PAYOUT_FADE_SECONDS) * 1000;
 export function playPayout(): void {
   const now = performance.now();
-  vibrateFor(PAYOUT_AUDIBLE_MS);
+  buzzDuringEvent((PAYOUT_PLAY_SECONDS - PAYOUT_FADE_SECONDS) * 1000);
   if (now - lastPayoutPlayTime < PAYOUT_DEBOUNCE_MS) return;
   lastPayoutPlayTime = now;
   playSfx("payout", SFX_VOLUME, 0, 1, PAYOUT_PLAY_SECONDS, PAYOUT_FADE_SECONDS);
