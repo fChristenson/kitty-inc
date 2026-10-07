@@ -366,6 +366,14 @@ export function playExplosion(): void {
   if (now - lastExplosionPlayTime < EXPLOSION_DEBOUNCE_MS) return;
   lastExplosionPlayTime = now;
   playSfx("explosion", SFX_VOLUME, 0.04);
+  vibrateWithExplosion();
+}
+
+// the phone buzzes for as long as the bang is heard; Android only (iOS has no
+// vibration API)
+function vibrateWithExplosion(): void {
+  if (typeof navigator.vibrate !== "function") return;
+  navigator.vibrate(Math.round(getExplosionDurationMs()));
 }
 
 // drops every explosion for `ms`, so one that lands at the end of it (a slam's
@@ -379,6 +387,7 @@ export function holdExplosions(ms: number): void {
 export function playSlamExplosion(): void {
   lastExplosionPlayTime = performance.now();
   playSfx("explosion", SFX_VOLUME, 0.04);
+  vibrateWithExplosion();
 }
 
 // one-shot sound effect for clicking a cat or the mouse, and for hitting the
