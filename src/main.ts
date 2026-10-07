@@ -112,6 +112,7 @@ import {
   sortTestActionMenus,
   wireIdleOverlayTestButton,
   wireAddBadgesTestButtons,
+  wireFoilRevealTestButtons,
   wireBoostEventTestButton,
   wireUnionEventTestButton,
   wireKickbackEventTestButton,
@@ -683,6 +684,10 @@ async function main() {
       void totalEarnedOverlay.show(fromNumber(123456));
     });
     wireAddBadgesTestButtons(app);
+    wireFoilRevealTestButtons(app, (kind) => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (floor) forceTestCrit(floor, kind, "crit", null, "upgrade");
+    });
     // the event modules load in their own chunk (floors/eventLoader): each
     // event test button loads it first, then runs with it as `ev`
     let ev!: EventCatalog;

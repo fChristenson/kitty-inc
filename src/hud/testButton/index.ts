@@ -1,11 +1,37 @@
 import type { Floor } from "../../gameState";
 import {
   CRIT_PROC_KINDS,
+  BADGE_GLITTER_AT,
+  BADGE_SHIMMER_AT,
   commitCritCounts,
+  getCritProcCount,
+  queueBadgeFoilReveal,
+  type BadgeFoil,
   type CritProcKind,
   type CritTier,
 } from "../../shared/critTypes";
 export { createTestButtonMarkup, wireCritTestActions } from "./critTestActions";
+
+// arms a crit of a random badge brought up to the foil, revealed once clicked
+export function wireFoilRevealTestButtons(
+  container: HTMLElement,
+  armCrit: (kind: CritProcKind) => void,
+): void {
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "[data-foil-reveal]",
+  )) {
+    const foil = button.dataset.foilReveal as BadgeFoil;
+    const at = foil === "glitter" ? BADGE_GLITTER_AT : BADGE_SHIMMER_AT;
+    button.addEventListener("click", () => {
+      const kind =
+        CRIT_PROC_KINDS[Math.floor(Math.random() * CRIT_PROC_KINDS.length)];
+      const missing = at - getCritProcCount(kind);
+      if (missing > 0) commitCritCounts({ [kind]: missing });
+      queueBadgeFoilReveal(kind, foil);
+      armCrit(kind);
+    });
+  }
+}
 
 // adds to every crit's landed count, to see the badge foils
 export function wireAddBadgesTestButtons(container: HTMLElement): void {

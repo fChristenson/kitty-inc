@@ -8,13 +8,6 @@ import type { Floor } from "../../gameState";
 import { CONFIG } from "../../config";
 import { loadImage } from "../../utils";
 import { getImageUrl } from "../../loadAssets";
-import {
-  playBloop,
-  playJackpot,
-  playSwoosh,
-  startBoostEventStreamLoop,
-} from "../../sound";
-import { shakeScreen } from "../../screenShake";
 import { COLOR } from "../../palette";
 import {
   CRIT_PROC_INFO,
@@ -35,14 +28,15 @@ import {
   startRevealStage,
 } from "../revealStage";
 import {
+  badgeFace,
   badgeRevealTimeline,
   drawBadgeReveal,
+  playBadgeRevealBeats,
   silhouetteOf,
   type BadgeScene,
-} from "./badge";
+} from "../../shared/badgeReveal";
 
 const KEY = "reveal";
-const REVEAL_SHAKE = 0.6;
 
 const unseenKinds = () =>
   CRIT_PROC_KINDS.filter((kind) => getCritProcCount(kind) === 0);
@@ -72,8 +66,8 @@ function startReveal(floor: Floor, context: EventProcContext): void {
   const tier = context.critTier ?? pickCritTierByOdds();
   const { icon } = CRIT_PROC_INFO[kind];
   const scene: BadgeScene = {
-    silhouette: null,
-    art: null,
+    before: null,
+    after: null,
     title: unseen.length > 0 ? "New Badge" : "Badge",
   };
   const tl = badgeRevealTimeline();
@@ -89,21 +83,10 @@ function startReveal(floor: Floor, context: EventProcContext): void {
   // the art loads while the stage slides in and the wisp flies over
   loadImage(getImageUrl(icon)).then(
     (image) => {
-      scene.silhouette = silhouetteOf(image);
-      scene.art = image;
+      scene.before = badgeFace(silhouetteOf(image));
+      scene.after = badgeFace(image);
     },
     () => {},
   );
-
-  let stopSound: (() => void) | null = null;
-  beat(0, playSwoosh);
-  beat(tl.spinAt, () => {
-    playBloop();
-    stopSound = startBoostEventStreamLoop();
-  });
-  beat(tl.swapAt, () => {
-    playJackpot();
-    shakeScreen(REVEAL_SHAKE);
-  });
-  beat(tl.settleAt, () => stopSound?.());
+  playBadgeRevealBeats(beat);
 }

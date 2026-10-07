@@ -8,6 +8,7 @@ import {
   getCritProcCount,
   getCritProcIncomeModifierPercent,
   getCritProcNextMilestoneCount,
+  badgeFoilOf,
 } from "../../shared/critTypes";
 import type { CritProcKind } from "../../shared/critTypes";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
@@ -52,9 +53,6 @@ const BADGE_INFO: {
 
 const BADGE_INFO_BY_KIND = new Map(BADGE_INFO.map((info) => [info.kind, info]));
 
-// times a crit must land before its tile gets a foil sweep, then foil + twinkles
-const FOIL_AT = 10;
-const TWINKLE_FOIL_AT = 100;
 // glitter: a few layers of glints, each layer twinkling as one
 const GLINT_LAYERS = 3;
 const GLINTS_PER_LAYER = 5;
@@ -166,8 +164,7 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
     image: HTMLImageElement,
     count: number,
   ): void {
-    const look =
-      count >= TWINKLE_FOIL_AT ? "twinkle" : count >= FOIL_AT ? "foil" : "";
+    const look = badgeFoilOf(count) ?? "";
     if ((host.dataset.foil ?? "") === look) return;
     host.querySelector(".crit-foil")?.remove();
     host.querySelector(".crit-sparkles")?.remove();
@@ -180,7 +177,7 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
     foil.className = "crit-foil";
     foil.hidden = true;
     image.after(foil);
-    if (look === "twinkle") {
+    if (look === "glitter") {
       const sparkles = document.createElement("span");
       sparkles.className = "crit-sparkles";
       sparkles.hidden = true;

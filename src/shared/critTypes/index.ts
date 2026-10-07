@@ -46,6 +46,14 @@ export {
 
 export { getCritProcCount, recordCritProcLanded } from "./critProcCounts";
 export { withDraftCritCounts, commitCritCounts } from "./critProcCounts";
+export {
+  type BadgeFoil,
+  BADGE_SHIMMER_AT,
+  BADGE_GLITTER_AT,
+  badgeFoilOf,
+  takeBadgeFoilReveal,
+  queueBadgeFoilReveal,
+} from "./critProcCounts";
 
 export type CritTier = "crit" | "mega" | "ultra";
 
@@ -1325,7 +1333,7 @@ const PROC_ORDER = new Map<string, number>(
 // the procs set true on result, in CRIT_PROC_KINDS order: results keep only
 // their landed procs as own fields (the rest read false through a
 // prototype), so this skips walking every kind
-function landedProcKinds(
+export function landedProcKinds(
   result: Pick<CritRollResult, CritProcKind>,
 ): CritProcKind[] {
   const landed: CritProcKind[] = [];

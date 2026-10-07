@@ -147,10 +147,13 @@ import {
   tierOnlyCrit,
   pickHigherCritTier,
   recordCritProcLanded,
+  landedProcKinds,
+  takeBadgeFoilReveal,
   triggerPriceMatchCrit,
   LUCKY_NUMBER_MIN_FLOORS,
   LUCKY_NUMBER_MAX_FLOORS,
 } from "../../shared/critTypes";
+import { revealBadgeFoil } from "../foilReveal";
 import {
   playSold as soundSold,
   playBloop as soundBloop,
@@ -1790,8 +1793,9 @@ function eventProcContext(
     applyProcCrit: (floor, tier, kind) => {
       const result = tierOnlyCrit(tier);
       result[kind] = true;
-      applyFloorCrit(deps, floor, result);
+      // counted first, so a badge it takes to a new foil is revealed with it
       recordCritProcLanded(kind);
+      applyFloorCrit(deps, floor, result);
       deps.persist();
     },
     promoteFloorTier: (floor, tier) => {
@@ -1893,6 +1897,20 @@ export function applyFloorCrit(
     result.bonusTier,
     (kind) => grantFollowUpProc(kind, context),
   );
+  for (const kind of landedProcKinds(result))
+    revealFoilOf(deps, floor, kind, isGroundFloor);
+}
+
+// a badge this landing took to a new foil gets its own reveal
+function revealFoilOf(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  kind: CritProcKind,
+  isGroundFloor: boolean,
+): void {
+  const foil = takeBadgeFoilReveal(kind);
+  if (foil)
+    revealBadgeFoil(kind, foil, floor, eventProcContext(deps, isGroundFloor));
 }
 
 // Deja Vu's spawned follow-ups go through the exact same reward dispatcher
@@ -1905,6 +1923,7 @@ function grantFollowUpProc(
 ): void {
   applyCritProcs(onlyCritProc(kind), context, CRIT_REWARDS);
   recordCritProcLanded(kind);
+  revealFoilOf(context.deps, context.floor, kind, context.isGroundFloor);
 }
 
 // one Sale-click payout for `floor`: a full bar of its current payout (times

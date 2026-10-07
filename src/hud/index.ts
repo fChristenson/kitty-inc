@@ -68,6 +68,7 @@ export {
   sortTestActionMenus,
   wireIdleOverlayTestButton,
   wireAddBadgesTestButtons,
+  wireFoilRevealTestButtons,
   wireBoostEventTestButton,
   wireUnionEventTestButton,
   wireKickbackEventTestButton,

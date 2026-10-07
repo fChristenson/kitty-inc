@@ -1255,6 +1255,8 @@ export function createTestButtonMarkup(): string {
           <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
           <button class="game__button" data-add-badges="10">Badges +10</button>
           <button class="game__button" data-add-badges="100">Badges +100</button>
+          <button class="game__button" data-foil-reveal="shimmer">Shimmer Reveal</button>
+          <button class="game__button" data-foil-reveal="glitter">Glitter Reveal</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

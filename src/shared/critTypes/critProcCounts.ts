@@ -83,10 +83,37 @@ export function recordCritProcLanded(kind: CritProcKind): void {
     draftCounts[kind] = (draftCounts[kind] ?? 0) + 1;
     return;
   }
-  counts[kind] = (counts[kind] ?? 0) + 1;
+  const before = counts[kind] ?? 0;
+  counts[kind] = before + 1;
+  const foil = badgeFoilOf(before + 1);
+  if (foil && foil !== badgeFoilOf(before)) pendingFoils.set(kind, foil);
   saveCounts();
 }
 
 export function getCritProcCount(kind: CritProcKind): number {
   return counts[kind] ?? 0;
+}
+
+// a badge landed this often shimmers like a foil card, then glitters too
+export type BadgeFoil = "shimmer" | "glitter";
+export const BADGE_SHIMMER_AT = 10;
+export const BADGE_GLITTER_AT = 100;
+
+export function badgeFoilOf(count: number): BadgeFoil | null {
+  if (count >= BADGE_GLITTER_AT) return "glitter";
+  return count >= BADGE_SHIMMER_AT ? "shimmer" : null;
+}
+
+// badges that just reached a new foil, waiting for their crit to be shown
+const pendingFoils = new Map<CritProcKind, BadgeFoil>();
+
+export function takeBadgeFoilReveal(kind: CritProcKind): BadgeFoil | null {
+  const foil = pendingFoils.get(kind) ?? null;
+  pendingFoils.delete(kind);
+  return foil;
+}
+
+// dev test hook: the next landing of `kind` reveals `foil`
+export function queueBadgeFoilReveal(kind: CritProcKind, foil: BadgeFoil): void {
+  pendingFoils.set(kind, foil);
 }
