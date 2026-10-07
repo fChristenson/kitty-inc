@@ -369,11 +369,14 @@ export function playExplosion(): void {
   vibrateWithExplosion();
 }
 
-// the phone buzzes for as long as the bang is heard; Android only (iOS has no
-// vibration API)
+// the phone buzzes for as long as the bang is heard, less a beat; Android only
+// (iOS has no vibration API)
+const VIBRATE_TRIM_MS = 100;
 function vibrateWithExplosion(): void {
   if (typeof navigator.vibrate !== "function") return;
-  navigator.vibrate(Math.round(getExplosionDurationMs()));
+  navigator.vibrate(
+    Math.max(0, Math.round(getExplosionDurationMs() - VIBRATE_TRIM_MS)),
+  );
 }
 
 // drops every explosion for `ms`, so one that lands at the end of it (a slam's
