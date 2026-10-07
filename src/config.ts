@@ -25,8 +25,8 @@ export const CONFIG = {
     // a floor's price is fixed by its position, never by earnings: at least
     // unlockIncomeSeconds of what the floors below earn at the level a building
     // is expected to reach by then (unlockLevelsPerFloor per floor up)
-    unlockIncomeSeconds: 60,
-    unlockLevelsPerFloor: 50,
+    unlockIncomeSeconds: 20,
+    unlockLevelsPerFloor: 20,
     baseRateStep: 2,
   },
 
@@ -35,7 +35,7 @@ export const CONFIG = {
   // office chairs, supplies and manager); floor scaling lives in floors.
   // Each building after scales by floorEconomyMultiplierPerBuilding
   buildings: {
-    unlockMinutesAtMax: 180,
+    unlockMinutesAtMax: 600,
     // the next building can only be bought once the newest one is maxed out
     requireMaxedBuilding: true,
   },
@@ -64,11 +64,11 @@ export const CONFIG = {
   crit: {
     ...FEATURED_CRIT_BALANCE,
     ...PROC_CRIT_BALANCE,
-    crit: { chance: 0.08, multiplier: 5 },
-    mega: { chance: 0.015, multiplier: 25 },
-    ultra: { chance: 0.001, multiplier: 125 },
+    crit: { chance: 0.08, multiplier: 3 },
+    mega: { chance: 0.015, multiplier: 10 },
+    ultra: { chance: 0.001, multiplier: 50 },
     // a boosted perma worker speeds its floor up by its tier's multiplier to
-    // this power: 0.43 gives x2/x4/x8, about one more boosted worker per step
+    // this power: 0.43 gives x1.6/x2.7/x5.4
     permaBoostExponent: 0.43,
     // one reward payout (payout crits, cash events) pays this many seconds of
     // its floor's income; a bar cycle is under a second, too small to feel

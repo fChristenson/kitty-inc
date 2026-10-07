@@ -295,7 +295,7 @@ export function triggerScreenShake(options?: {
 }): void {
   const req: FlashRequest = {
     intensity: options?.intensity ?? 1,
-    label: options?.label ?? "x5",
+    label: options?.label ?? "x3",
     color: options?.color ?? COLOR.purple,
     strokeWidth: options?.strokeWidth ?? 8,
     blinkHz: options?.blinkHz ?? 0,

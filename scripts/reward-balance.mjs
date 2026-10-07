@@ -88,7 +88,21 @@ const upgradesValue =
     0,
   );
 const unlockCost = (index) => 200 * 2 ** (index - 1);
-const TIER_LEVELS = { crit: 5, mega: 25, ultra: 125 };
+const tierMultiplier = (tier) =>
+  Number(
+    configSource.match(
+      new RegExp(`${tier}: \\{ chance: [\\d.]+, multiplier: (\\d+)`),
+    )?.[1],
+  );
+const TIER_LEVELS = {
+  crit: tierMultiplier("crit"),
+  mega: tierMultiplier("mega"),
+  ultra: tierMultiplier("ultra"),
+};
+// a tier `steps` above multiplier t, capped at ultra
+const LADDER = [1, TIER_LEVELS.crit, TIER_LEVELS.mega, TIER_LEVELS.ultra];
+const stepUp = (t, steps) =>
+  LADDER[Math.min(LADDER.length - 1, Math.max(0, LADDER.indexOf(t)) + steps)];
 
 // ---------- effects: each returns { type, amount, perm, once } ----------
 // perm: permanent gain as a share of total income; once: seconds of income
@@ -103,7 +117,7 @@ const levels = (n, k = 1) => {
 // horizon's growth; counted at half its end gain (it ramps up)
 const floorTier = (steps, k = 1) => {
   k = clampFloors(k);
-  const t = Math.min(125, T * 5 ** steps);
+  const t = stepUp(T, steps);
   const G = S.growth;
   const r = base(L + G, A0 + G * t) / base(L + G, A0 + G * T) - 1;
   return fx("floorTier", steps * k, (0.5 * r * k) / F);
@@ -112,7 +126,7 @@ const workerTier = (steps, k = 1) => {
   if (k <= 0) return fx("workerTier", 0, 0);
   const floorsHit = Math.min(F, Math.ceil(k / W));
   const each = k / floorsHit;
-  const step = (Math.min(125, S.perma * 5 ** steps) / S.perma) ** PERMA_EXP;
+  const step = (stepUp(S.perma, steps) / S.perma) ** PERMA_EXP;
   const boosted =
     1 - S.uptime + S.uptime * boostSpeed(W, S.managers) * step ** each;
   return fx("workerTier", steps * k, ((boosted / E - 1) * floorsHit) / F);
@@ -377,7 +391,7 @@ function featuredEffects(source, c, tierLevels) {
         break;
       }
       case "armCrit":
-        out.push(levels(TIER_LEVELS[v(1)] ?? 5, k));
+        out.push(levels(TIER_LEVELS[v(1)] ?? TIER_LEVELS.crit, k));
         break;
       case "unlockFloors":
         out.push(unlock(v(1)));

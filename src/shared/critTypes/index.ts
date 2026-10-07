@@ -70,20 +70,20 @@ export const CRIT_TIER_CONFIG: Record<CritTier, CritTierDef> = {
   crit: {
     ...CONFIG.crit.crit,
     color: COLOR.purple,
-    label: "x5",
+    label: `x${CONFIG.crit.crit.multiplier}`,
   },
   mega: {
     // ~1 in 100 upgrade clicks — deliberately much rarer than crit's so it reads
     // as a genuine jackpot moment, not just a bigger version of the common crit
     ...CONFIG.crit.mega,
     color: COLOR.starYellow,
-    label: "x25",
+    label: `x${CONFIG.crit.mega.multiplier}`,
   },
   ultra: {
     // rarer still than mega's — the true jackpot-of-jackpots moment
     ...CONFIG.crit.ultra,
     color: COLOR.red,
-    label: "x125",
+    label: `x${CONFIG.crit.ultra.multiplier}`,
   },
 };
 
@@ -1828,7 +1828,7 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
 
     color: LUCKY_CLOVER_CRIT_COLOR,
     icon: "luckyClover",
-    description: "Triggers 4 x125 crits in succession",
+    description: `Triggers 4 x${CONFIG.crit.ultra.multiplier} crits in succession`,
   },
   secondWind: {
     label: SECOND_WIND_CRIT_LABEL,
