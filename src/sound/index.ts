@@ -402,11 +402,11 @@ export function holdExplosions(ms: number): void {
 }
 
 // a slam's impact bang always plays: a crit bang from the clicks just before
-// (overtime's rapid ticks) must not debounce it away
+// (overtime's rapid ticks) must not debounce it away. No buzz: managers'
+// auto-boost slams land every few seconds, crit or not
 export function playSlamExplosion(): void {
   lastExplosionPlayTime = performance.now();
   playSfx("explosion", SFX_VOLUME, 0.04);
-  vibrateFor(getExplosionDurationMs());
 }
 
 // one-shot sound effect for clicking a cat or the mouse, and for hitting the
