@@ -35,6 +35,23 @@ export function floorRateFactor(level: number): number {
   return (1 + step * level) * upgradeSpeedMultiplier(level);
 }
 
+// floor `index`'s unlock price as a multiple of its building's base unlock cost
+export function floorUnlockFactor(index: number): number {
+  if (index < 1) return 1;
+  const { floors } = CONFIG;
+  const level = Math.min(
+    CONFIG.incomePanel.maxFloorLevel,
+    floors.unlockLevelsPerFloor * index,
+  );
+  const scheduled =
+    (floors.unlockIncomeSeconds *
+      index *
+      floorRateFactor(level) *
+      floors.baseIncomeAmount) /
+    floors.baseUnlockCost;
+  return Math.max(floors.unlockCostGrowthFactor ** (index - 1), scheduled);
+}
+
 // the price of the upgrade bought at `level`, as a multiple of the first one:
 // it costs `payback` seconds of the floor's own income, a span that grows
 // by upgradePaybackGrowth of the first one's per level

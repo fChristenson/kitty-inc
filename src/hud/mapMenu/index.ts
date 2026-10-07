@@ -72,7 +72,7 @@ export function wireMapMenu(
       `;
     }).join("");
 
-    const price = getBuildingPrice(count, buildings);
+    const price = getBuildingPrice(count);
     const open = canBuyNextBuilding(buildings);
     const affordable = open && gte(getTotalIncome(), price);
     const buyItem = `
@@ -135,7 +135,7 @@ export function wireMapMenu(
     if (button) {
       button.disabled =
         !canBuyNextBuilding(buildings) ||
-        lt(getTotalIncome(), getBuildingPrice(getBuildingCount(), buildings));
+        lt(getTotalIncome(), getBuildingPrice(getBuildingCount()));
     }
   }
 

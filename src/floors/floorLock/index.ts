@@ -2,17 +2,7 @@ import { buildFloor } from "..";
 import { getUniformCritTier } from "../upgradeButton";
 import { FLOOR_W, FLOOR_H } from "../constants";
 import type { Floor } from "../../gameState";
-import {
-  type BigNumber,
-  ZERO,
-  add,
-  max,
-  multiply,
-  multiplyBig,
-  pow,
-} from "../../shared/bigNumber";
-import { nominalIncomeRatePerSecond } from "../../shared/income";
-import { CONFIG } from "../../config";
+import { type BigNumber, ZERO, add } from "../../shared/bigNumber";
 import { drawCartoonText, formatPrice } from "../../utils";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
@@ -199,31 +189,7 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
     startingUpgradeCost: deps.startingUpgradeCost,
   });
   deps.floors.push(floor);
-  refreshFloorUnlockPrice(deps.floors);
   deps.onAdd(floor);
-}
-
-// reprices the building's locked floor: its own formula price, or its share of
-// seconds of the building's nominal income, whichever is higher
-export function refreshFloorUnlockPrice(floors: Floor[]): void {
-  const index = floors.length - 1;
-  const top = floors[index];
-  const base = floors[0]?.buildingFloorUnlockBaseCost;
-  if (!top || top.unlocked || !base) return;
-  const formula =
-    index === 0
-      ? base
-      : multiplyBig(base, pow(CONFIG.floors.unlockCostGrowthFactor, index - 1));
-  let income = ZERO;
-  for (const floor of floors)
-    if (floor.unlocked) income = add(income, nominalIncomeRatePerSecond(floor));
-  const seconds =
-    CONFIG.floors.unlockIncomeSeconds *
-    CONFIG.floors.unlockIncomeSecondsGrowth ** Math.max(0, index - 1);
-  top.unlockCost = multiply(
-    max(formula, multiply(income, seconds)),
-    top.priceDiscountMultiplier,
-  );
 }
 
 // $ to unlock every remaining locked floor in this building, all the way up to

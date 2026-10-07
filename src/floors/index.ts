@@ -6,13 +6,15 @@ import {
   loadBackgrounds,
   loadGroundImage as loadAssetGroundImage,
 } from "../loadAssets";
-import { baseFloorInterval, floorIncomeScale } from "../shared/upgradeEconomy";
+import {
+  baseFloorInterval,
+  floorIncomeScale,
+  floorUnlockFactor,
+} from "../shared/upgradeEconomy";
 import {
   type BigNumber,
   fromNumber,
-  pow,
   multiply,
-  multiplyBig,
   ZERO,
 } from "../shared/bigNumber";
 import { CONFIG } from "../config";
@@ -53,8 +55,7 @@ const BASE_INCOME_AMOUNT = CONFIG.floors.baseIncomeAmount; // ground floor's sta
 // on why), so a fresh, un-upgraded floor's $/s is flat across floor depth; only
 // upgrades (and other buildings) grow it from there
 const BASE_UPGRADE_COST = CONFIG.floors.baseUpgradeCost; // ground floor's starting upgrade price; each floor above doubles it
-const BASE_UNLOCK_COST = CONFIG.floors.baseUnlockCost; // floor 2's unlock price; each floor above doubles it
-const UNLOCK_COST_GROWTH_FACTOR = CONFIG.floors.unlockCostGrowthFactor;
+const BASE_UNLOCK_COST = CONFIG.floors.baseUnlockCost; // floor 2's unlock price floor; see floorUnlockFactor for the curve above
 // each upgrade click's payoff scales exactly like the base income (same
 // INCOME_GROWTH_FACTOR), so a higher floor's own upgrades are still worth
 // proportionately more per click than a lower floor's — a flat step here would
@@ -181,10 +182,7 @@ export function buildFloor(
     ? groundFloorLocked
       ? floorUnlockBaseCost
       : ZERO
-    : multiplyBig(
-        pow(UNLOCK_COST_GROWTH_FACTOR, floorLevel - 2),
-        floorUnlockBaseCost,
-      );
+    : multiply(floorUnlockBaseCost, floorUnlockFactor(floorLevel - 1));
   const unlockCost = multiply(baseUnlockCost, priceDiscountMultiplier);
   // true once this level's own natural (uncapped) interval already exceeds the
   // 1h cap below — set once, forever, regardless of how far upgrades later
@@ -308,7 +306,6 @@ export {
 } from "./incomePanel";
 export {
   ensureLockedFloorAbove,
-  refreshFloorUnlockPrice,
   unlockFloor,
   drawFloorLock,
   MAX_FLOORS_PER_BUILDING,

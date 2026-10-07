@@ -3,6 +3,7 @@ import { COLOR } from "../../palette";
 import { playSold, playPayout, playAutoPurchase } from "../../sound";
 import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
 import { tierColor } from "../../shared/bonusTierReward";
+import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
 import { setActiveCompanyIndex } from "../../company";
 import { getEffectiveDpr } from "../../shared/devicePixelRatio";
@@ -120,7 +121,6 @@ export interface CityMapDeps {
   buyBuilding: () => boolean; // unlocks building 1 if affordable
   // whether the newest building is maxed out, opening the next one
   canBuyBuilding: () => boolean;
-  getBuildingPrice: (buildingIndex: number) => BigNumber;
   onStateChanged: () => void; // schedules persistence after any map-node purchase
   // long-press on a bought marker: buys everything affordable in that building
   buyOutBuilding: (buildingIndex: number) => Promise<boolean>;
@@ -513,7 +513,7 @@ export function createCityMapView(
       }
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);
       const { cx, feetY } = markerCenter(cssW, cssH, i);
-      const price = deps.getBuildingPrice(globalIndex);
+      const price = getBuildingPrice(globalIndex);
       // only the next building in line can be bought, so only it wiggles
       const affordable =
         globalIndex === buildingCount &&

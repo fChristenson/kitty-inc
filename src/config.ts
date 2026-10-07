@@ -22,12 +22,11 @@ export const CONFIG = {
     baseUpgradeCost: 2,
     baseUnlockCost: 200,
     unlockCostGrowthFactor: 2,
-    // a locked floor also costs at least this many seconds of what its
-    // building's levels and office items alone earn (no crit tiers, perma tiers
-    // or boosts), growing by unlockIncomeSecondsGrowth per floor up: an unlucky
-    // player saves this long, every lucky multiplier makes it quicker
-    unlockIncomeSeconds: 20,
-    unlockIncomeSecondsGrowth: 1.25,
+    // a floor's price is fixed by its position, never by earnings: at least
+    // unlockIncomeSeconds of what the floors below earn at the level a building
+    // is expected to reach by then (unlockLevelsPerFloor per floor up)
+    unlockIncomeSeconds: 60,
+    unlockLevelsPerFloor: 50,
     baseRateStep: 2,
   },
 
@@ -37,8 +36,6 @@ export const CONFIG = {
   // Each building after scales by floorEconomyMultiplierPerBuilding
   buildings: {
     unlockMinutesAtMax: 180,
-    // and at least this many minutes of the whole company's nominal income
-    unlockIncomeMinutes: 60,
     // the next building can only be bought once the newest one is maxed out
     requireMaxedBuilding: true,
   },

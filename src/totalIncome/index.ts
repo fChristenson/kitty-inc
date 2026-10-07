@@ -5,11 +5,7 @@ import {
   type Floor,
 } from "../gameState";
 import { UPGRADE_ECONOMY_VERSION } from "../shared/upgradeEconomy";
-import {
-  collectDueIncome,
-  currentIncomeRatePerSecond,
-  refreshFloorUnlockPrice,
-} from "../floors";
+import { collectDueIncome, currentIncomeRatePerSecond } from "../floors";
 import {
   getActiveCompanyIndex,
   loadCompanyRecord,
@@ -513,7 +509,6 @@ export function startTotalIncomeTicker(
     }
     let collected = ZERO;
     for (const floors of tickerBuildings) {
-      refreshFloorUnlockPrice(floors);
       for (const floor of floors) {
         if (!floor.unlocked || isFloorLocked(floor)) continue;
         collected = add(collected, collectDueIncome(floor, now));
