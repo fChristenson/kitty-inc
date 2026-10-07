@@ -138,6 +138,8 @@ export interface Floor {
   // floor rather than in a worker slot, since the manager's slot index shifts
   // whenever another regular worker is hired
   managerPermaTier?: CritTier | null;
+  // on a ground floor: its building went gold and opened its mystery capsule
+  badgeCapsuleOpened?: boolean;
 }
 
 // gameState.ts is the sole owner of this per-floor data (Floor itself doesn't carry it),
@@ -496,6 +498,7 @@ interface SavedFloor {
   priceDiscountMultiplier?: number; // added after initial release; older saves default to 1 on load
   managerPermaTier?: CritTier | null; // added after initial release; older saves default to null on load
   managerPermaBoosted?: boolean; // legacy single-win flag, loaded as the first tier
+  badgeCapsuleOpened?: boolean;
 }
 
 interface SavedBuildings {
@@ -539,6 +542,7 @@ function toSavedFloor(floor: Floor): SavedFloor {
     overtimeCost: floor.overtimeCost,
     priceDiscountMultiplier: floor.priceDiscountMultiplier,
     managerPermaTier: floor.managerPermaTier,
+    badgeCapsuleOpened: floor.badgeCapsuleOpened || undefined,
   };
 }
 
@@ -637,6 +641,7 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
     priceDiscountMultiplier: sf.priceDiscountMultiplier ?? 1,
     managerPermaTier:
       sf.managerPermaTier ?? (sf.managerPermaBoosted ? "crit" : null),
+    badgeCapsuleOpened: sf.badgeCapsuleOpened ?? false,
   };
   workerSlots.set(floor, sf.workers);
   workerTintIndexes.set(floor, sf.tintIndexes ?? sf.spriteIndexes ?? []);

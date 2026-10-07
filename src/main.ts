@@ -24,6 +24,8 @@ import {
   LUCKY_CLOVER_CRIT_TIER,
   MYSTIC_UPGRADE_COUNT,
   loadFeaturedRewards,
+  recordCritProcLanded,
+  pickCritTierByOdds,
   type CritRollResult,
 } from "./shared/critTypes";
 import {
@@ -51,6 +53,8 @@ import {
   getCritTier,
   getUpgradeCost,
   rollFloorBuyCrit,
+  hasBadgeCapsule,
+  takeBadgeCapsule,
   loadEventCatalog,
   loadNextEventPart,
   type EventCatalog,
@@ -188,6 +192,7 @@ import {
   wireHourglassEventTestButton,
   wireRocketEventTestButton,
   wireRevealEventTestButton,
+  wireBadgeCapsuleTestButton,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireTwisterEventTestButton,
@@ -2532,6 +2537,11 @@ async function main() {
         ev.forceRevealEvent(floor);
       }),
     );
+    wireBadgeCapsuleTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (floor) gameCanvas.scrollActiveToFloor(floor);
+      gameCanvas.openBadgeCapsule(true);
+    });
     // same, for the Jackpot Reels event
     wireJackpotReelsEventTestButton(
       app,
@@ -3477,6 +3487,29 @@ async function main() {
       getUniformCritTier(buildings[buildingIndex] ?? []),
     isBuildingRenovating: (buildingIndex) =>
       renovations.isRunning(activeCompanyIndex, buildingIndex),
+    hasBadgeCapsule: (buildingIndex) =>
+      hasBadgeCapsule(buildings[buildingIndex] ?? []),
+    // the reveal plays on the map; its badge then waits on the building's
+    // ground floor as an armed crit
+    onOpenBadgeCapsule: (buildingIndex) => {
+      const floors = buildings[buildingIndex];
+      const prize = floors && takeBadgeCapsule(floors);
+      if (!prize) return;
+      persist();
+      cityMapView.playBadgeCapsule(prize.kind, prize.title, () => {
+        recordCritProcLanded(prize.kind);
+        const ground = floors[0];
+        if (ground)
+          forceTestCrit(
+            ground,
+            prize.kind,
+            pickCritTierByOdds(),
+            null,
+            "upgrade",
+          );
+        persist();
+      });
+    },
     buyBuilding,
     canBuyBuilding: () => canBuyNextBuilding(buildings),
     onStateChanged: saveCurrentCompanyStateNow,

@@ -9,6 +9,8 @@ import {
   hitTestUpgradeButton,
   hitTestUpgradeArrow,
   handleFloorClick,
+  openBuildingBadgeCapsule,
+  type FloorActionsDeps,
   startButtonHoldAnim,
   stopButtonHoldAnim,
   isUpgradeButtonEnabled,
@@ -155,6 +157,9 @@ export interface GameCanvas {
   scrollActiveToFloor: (floor: Floor, buttonAt?: number) => void;
   // a floor's world-space rect, null when it isn't in the active building
   getFloorRect: FloorRectResolver;
+  // plays the active building's mystery badge capsule reveal if it has one
+  // (force: test button, any building, leaving it in place); true when it started
+  openBadgeCapsule: (force?: boolean) => boolean;
   // a floor-local point in client px, null when it isn't in the active building
   floorToClient: (
     floor: Floor,
@@ -848,23 +853,28 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return null;
   }
 
+  // what the active building's floor actions work with
+  function floorActionsDeps(): FloorActionsDeps {
+    return {
+      floors: activeFloors,
+      backgroundCount: getBackgrounds().length,
+      multiplier: getBuildingMultiplier(),
+      persist,
+      getCompanyValue: deps.getCompanyValue,
+      applyCompanyWideBoost: deps.applyCompanyWideBoost,
+      createMysticBuilding: deps.createMysticBuilding,
+      onFloorAdded: (floor) => notifyFloorAdded(floor),
+      getScreenCenterLocal: screenCenterLocalFor,
+      getScreenAreaLocal: screenAreaLocalFor,
+      getOnScreenFloors: onScreenFloors,
+      getFloorRect,
+    };
+  }
+
   // shared by the upgrade button's hold-repeat interval and a normal tap's release
   function fireHandleFloorClick(hit: UpgradeHit): void {
     handleFloorClick(
-      {
-        floors: activeFloors,
-        backgroundCount: getBackgrounds().length,
-        multiplier: getBuildingMultiplier(),
-        persist,
-        getCompanyValue: deps.getCompanyValue,
-        applyCompanyWideBoost: deps.applyCompanyWideBoost,
-        createMysticBuilding: deps.createMysticBuilding,
-        onFloorAdded: (floor) => notifyFloorAdded(floor),
-        getScreenCenterLocal: screenCenterLocalFor,
-        getScreenAreaLocal: screenAreaLocalFor,
-        getOnScreenFloors: onScreenFloors,
-        getFloorRect,
-      },
+      floorActionsDeps(),
       hit.floor,
       hit.localX,
       hit.localY,
@@ -1086,6 +1096,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     },
     scrollActiveToFloor,
     getFloorRect,
+    openBadgeCapsule: (force) =>
+      openBuildingBadgeCapsule(floorActionsDeps(), force),
     floorToClient: (floor, x, y) => {
       const loc = floorLocation.get(floor);
       if (!loc) return null;

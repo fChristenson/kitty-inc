@@ -297,14 +297,16 @@ function wispAt(
 }
 
 // a pool of light on the floor under the badge, with the badge's small shadow
-// in it; shadowScale narrows the shadow as the badge spins or lifts
-function drawSpotlight(
+// in it; shadowScale narrows the shadow as the badge spins or lifts, shadowX
+// moves it along with something rolling
+export function drawBadgeSpotlight(
   ctx: CanvasRenderingContext2D,
   cx: number,
   floorY: number,
   size: number,
   strength: number,
   shadowScale: number,
+  shadowX = 0,
 ): void {
   ctx.save();
   ctx.translate(cx, floorY);
@@ -318,6 +320,7 @@ function drawSpotlight(
     pool * 2,
     pool * 2,
   );
+  ctx.translate(shadowX, 0);
   ctx.scale(shadowScale, 1);
   const shadow = size * SHADOW;
   ctx.globalAlpha = 0.5;
@@ -343,7 +346,7 @@ function fadeStopsOf(color: string, solid: number): FadeStops {
 }
 
 // its fitted width and height inside a size x size box
-function fitted(image: Art | null | undefined, size: number) {
+export function fitBadge(image: Art | null | undefined, size: number) {
   if (!image) return { w: size, h: size };
   const fit = size / Math.max(image.width, image.height);
   return { w: image.width * fit, h: image.height * fit };
@@ -410,7 +413,7 @@ function drawSpunBadge(
   squash: number,
   faceMs: number | null,
 ): void {
-  const { w, h } = fitted(face.art, size);
+  const { w, h } = fitBadge(face.art, size);
   ctx.save();
   ctx.translate(x, bottom);
   ctx.scale(Math.cos(angle) * (1 + squash), 1 - squash);
@@ -432,7 +435,8 @@ export function drawBadgeReveal(
   const cx = stage.x + stage.w / 2;
   const cy = stage.y + stage.h / 2;
   const swapped = ms >= tl.swapAt;
-  const halfH = fitted((swapped ? scene.after : scene.before)?.art, size).h / 2;
+  const halfH =
+    fitBadge((swapped ? scene.after : scene.before)?.art, size).h / 2;
   // the floor it hovers over; once settled it bobs higher still
   const floorY = cy + halfH + size * HOVER_GAP;
   const lift =
@@ -440,7 +444,7 @@ export function drawBadgeReveal(
   const by = cy - lift;
   const angle = spinAngle(ms, tl);
   const flash = swapped ? Math.max(0, 1 - (ms - tl.swapAt) / POP_MS) : 0;
-  drawSpotlight(
+  drawBadgeSpotlight(
     ctx,
     cx,
     floorY,
@@ -498,21 +502,45 @@ export function drawBadgeReveal(
   );
 
   if (swapped) drawWhiteBurst(ctx, cx, by, (ms - tl.swapAt) / BURST_MS, 0.7);
-  if (ms >= tl.settleAt) {
-    const poppedAt = now - (ms - tl.settleAt);
-    ctx.font = critFont(TITLE_FONT);
-    const titleFont =
-      (TITLE_FONT * stage.w * TITLE_WIDTH) / ctx.measureText(scene.title).width;
-    drawPoppingCritText(
+  if (ms >= tl.settleAt)
+    drawBadgeTitle(
       ctx,
+      stage,
       scene.title,
       cx,
-      // its bottom stays put as it grows
-      by - (size / 2 + TEXT_GAP) * TITLE_RISE - (titleFont - TITLE_FONT) / 2,
-      COLOR.heavenlyGold,
-      poppedAt,
+      by,
+      size / 2,
+      now - (ms - tl.settleAt),
       now,
-      { fontSize: titleFont, strokeWidth: (10 * titleFont) / TITLE_FONT },
     );
-  }
+}
+
+// a reveal's title popping in over a badge centred at (cx, cy)
+export function drawBadgeTitle(
+  ctx: CanvasRenderingContext2D,
+  stage: BadgeStage,
+  title: string,
+  cx: number,
+  cy: number,
+  halfSize: number,
+  poppedAt: number,
+  now: number,
+): void {
+  ctx.font = critFont(TITLE_FONT);
+  const titleFont =
+    (TITLE_FONT * stage.w * TITLE_WIDTH) / ctx.measureText(title).width;
+  drawPoppingCritText(
+    ctx,
+    title,
+    cx,
+    // its bottom stays put as it grows, but never past the stage's top
+    Math.max(
+      stage.y + titleFont * 0.75,
+      cy - (halfSize + TEXT_GAP) * TITLE_RISE - (titleFont - TITLE_FONT) / 2,
+    ),
+    COLOR.heavenlyGold,
+    poppedAt,
+    now,
+    { fontSize: titleFont, strokeWidth: (10 * titleFont) / TITLE_FONT },
+  );
 }

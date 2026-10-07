@@ -322,6 +322,7 @@ export {
 export {
   hitTestFloorHover,
   handleFloorClick,
+  openBuildingBadgeCapsule,
   performAutomatedUpgradeClick,
   performAutomatedUpgradeAfterPayment,
   performAutomatedFloorUnlock,
@@ -331,6 +332,12 @@ export {
 } from "./floorInteractions";
 export type { ChainCritDeps } from "./floorInteractions";
 export type { FloorActionsDeps } from "./floorInteractions";
+export {
+  hasBadgeCapsule,
+  takeBadgeCapsule,
+  capsuleRevealContent,
+} from "./badgeCapsule";
+export { drawRevealStage, revealStageTotalMs } from "./revealStage";
 export {
   loadEventCatalog,
   loadNextEventPart,

@@ -1,6 +1,11 @@
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
-import { playSold, playPayout, playAutoPurchase } from "../../sound";
+import {
+  playSold,
+  playPayout,
+  playAutoPurchase,
+  playSwoosh,
+} from "../../sound";
 import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
 import { tierColor } from "../../shared/bonusTierReward";
 import { getBuildingPrice } from "../../buildings";
@@ -26,10 +31,22 @@ import {
   drawLockedMarkerPrice,
   drawMarkerFloorCount,
   drawMarkerSpinner,
+  markerSideSpot,
+  SPINNER_RADIUS,
   getMarkerJumpOffset,
   MARKER_COIN_BURST_SCALE,
 } from "./markers";
-import { MAX_FLOORS_PER_BUILDING, rollFloorBuyCrit } from "../../floors";
+import {
+  drawCapsuleIcon,
+  playCapsuleRevealBeats,
+} from "../../shared/badgeReveal/capsule";
+import {
+  MAX_FLOORS_PER_BUILDING,
+  rollFloorBuyCrit,
+  capsuleRevealContent,
+  drawRevealStage,
+  revealStageTotalMs,
+} from "../../floors";
 import {
   CRIT_TIER_CONFIG,
   UPGRADE_CRIT_LABEL,
@@ -118,6 +135,9 @@ export interface CityMapDeps {
   // crit building stands out on the map
   getBuildingCritTier: (buildingIndex: number) => CritTier | null;
   isBuildingRenovating: (buildingIndex: number) => boolean;
+  // a fully upgraded building's mystery badge capsule, still unopened
+  hasBadgeCapsule: (buildingIndex: number) => boolean;
+  onOpenBadgeCapsule: (buildingIndex: number) => void;
   buyBuilding: () => boolean; // unlocks building 1 if affordable
   // whether the newest building is maxed out, opening the next one
   canBuyBuilding: () => boolean;
@@ -170,6 +190,12 @@ export interface CityMapView {
   // corporationUpgradeMenu wiring, right after a newly-bought company becomes active)
   animateSwitchToCompany: (companyIndex: number) => void;
   showCritBadges: (counts: Partial<Record<CritProcKind, number>>) => void;
+  // plays a mystery badge capsule's reveal over the map, then calls onEnd
+  playBadgeCapsule: (
+    kind: CritProcKind,
+    title: string,
+    onEnd: () => void,
+  ) => void;
   destroy: () => void;
 }
 
@@ -352,6 +378,49 @@ export function createCityMapView(
   // same, for an affordable locked marker's bouncing price
   let hasWigglingPrice = false;
 
+  // where redraw() last drew each unopened mystery badge capsule: on the
+  // spinner's spot, its side toward the cat where the spinner's is
+  const CAPSULE_ICON_D = 22;
+  const CAPSULE_OFFSET_X = CAPSULE_ICON_D / 2 - SPINNER_RADIUS;
+  const CAPSULE_HIT_R = 18;
+  const capsuleSpots: { x: number; y: number; globalIndex: number }[] = [];
+  function capsuleAt(p: { x: number; y: number }): number | null {
+    for (const spot of capsuleSpots)
+      if (Math.hypot(p.x - spot.x, p.y - spot.y) <= CAPSULE_HIT_R)
+        return spot.globalIndex;
+    return null;
+  }
+
+  // a capsule reveal playing over the map
+  let capsuleReveal: {
+    content: ReturnType<typeof capsuleRevealContent>;
+    startedAt: number;
+  } | null = null;
+
+  function playBadgeCapsule(
+    kind: CritProcKind,
+    title: string,
+    onEnd: () => void,
+  ): void {
+    const content = capsuleRevealContent(kind, title);
+    const totalMs = revealStageTotalMs(content.durationMs);
+    const inMs = (totalMs - content.durationMs) / 2;
+    const reveal = { content, startedAt: performance.now() };
+    capsuleReveal = reveal;
+    const beat = (ms: number, fn: () => void) =>
+      setTimeout(() => {
+        if (capsuleReveal === reveal) fn();
+      }, inMs + ms);
+    playSwoosh();
+    playCapsuleRevealBeats(beat);
+    beat(content.durationMs, playSwoosh);
+    beat(totalMs - inMs, () => {
+      capsuleReveal = null;
+      onEnd();
+      redraw();
+    });
+  }
+
   // a marker's long-press buys out that building as one renovation job
   const markerHop = createPurchaseFeedback({
     sound: playAutoPurchase,
@@ -435,6 +504,7 @@ export function createCityMapView(
     if (cssW <= 0 || cssH <= 0) return;
     hasActiveMarkerJump = false; // recomputed below; drives the tick loop's cadence
     hasWigglingPrice = false;
+    capsuleSpots.length = 0;
     const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -509,6 +579,12 @@ export function createCityMapView(
         );
         if (deps.isBuildingRenovating(globalIndex))
           drawMarkerSpinner(ctx, cssW, cssH, markerSprite, i, Date.now());
+        else if (markerSprite && deps.hasBadgeCapsule(globalIndex)) {
+          const side = markerSideSpot(cssW, cssH, markerSprite, i);
+          const spot = { x: side.x + CAPSULE_OFFSET_X, y: side.y };
+          drawCapsuleIcon(ctx, spot.x, spot.y, CAPSULE_ICON_D, Date.now());
+          capsuleSpots.push({ ...spot, globalIndex });
+        }
         continue;
       }
       drawCatMarker(ctx, cssW, cssH, catSprite, i, CAT_STAND_FRAME, true);
@@ -540,6 +616,16 @@ export function createCityMapView(
     drawCityPageIndicator(buildingCount);
 
     updateArrows(buildingCount);
+    if (capsuleReveal) {
+      const now = performance.now();
+      drawRevealStage(
+        ctx,
+        { x: 0, y: 0, w: cssW, h: cssH },
+        capsuleReveal.content,
+        now - capsuleReveal.startedAt,
+        now,
+      );
+    }
     // the flash holds still while the map rattles
     ctx.translate(-shake.x, -shake.y);
     drawCritFlash(ctx, cssW / 2, cssH / 2, cssW, Date.now());
@@ -568,7 +654,7 @@ export function createCityMapView(
 
   function onPointerMove(event: PointerEvent): void {
     const p = canvasPoint(event);
-    if (p.y < incomeBottomY) {
+    if (p.y < incomeBottomY || capsuleAt(p) !== null) {
       canvas.style.cursor = "pointer";
       return;
     }
@@ -657,6 +743,7 @@ export function createCityMapView(
       suppressNextClick = false;
       return;
     }
+    if (capsuleReveal) return;
     if (critBadges.visible) {
       critBadges.advance();
       return;
@@ -664,6 +751,11 @@ export function createCityMapView(
     const p = canvasPoint(event);
     if (p.y < incomeBottomY) {
       deps.onOpenCorporationStats();
+      return;
+    }
+    const capsule = capsuleAt(p);
+    if (capsule !== null) {
+      deps.onOpenBadgeCapsule(capsule);
       return;
     }
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
@@ -716,8 +808,9 @@ export function createCityMapView(
   function onPointerDown(event: PointerEvent): void {
     clearBuyAllHold(); // safety net against a stale interrupted previous gesture
     suppressNextClick = false; // this is a brand new gesture, not the one that fired
-    if (critBadges.visible) return;
+    if (critBadges.visible || capsuleReveal) return;
     const p = canvasPoint(event);
+    if (capsuleAt(p) !== null) return;
     const hit = hitTestAnyMarker(cssW, cssH, catSprite, p.x, p.y);
     if (hit === null) return;
     const globalIndex = cityIndex * MARKER_COUNT + hit;
@@ -787,6 +880,7 @@ export function createCityMapView(
     const interval =
       hasActiveMarkerJump ||
       hasWigglingPrice ||
+      capsuleReveal ||
       hasActiveCoinBursts() ||
       isCritFlashActive(Date.now())
         ? 0
@@ -825,6 +919,7 @@ export function createCityMapView(
     animateSwitchToCompany: (companyIndex) =>
       transitions.animateSwitchToCompany(companyIndex),
     showCritBadges,
+    playBadgeCapsule,
     destroy,
   };
 }

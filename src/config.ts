@@ -10553,6 +10553,22 @@ export const CONFIG = {
     holdMs: 300, // the settled badge and its name
   },
 
+  // src/floors/badgeCapsule — the mystery badge capsule a building earns once
+  // every floor is at the level cap with every upgrade bought, opened from its
+  // marker on the city map: on the reveal stage, the capsule drops in and rolls
+  // until a wisp dives into its seam and it pops open on a badge never landed,
+  // which then lands on the ground floor
+  badgeCapsule: {
+    dropMs: 350, // the capsule falling onto the light
+    rolls: 1, // back-and-forth rolls before the wisp dives
+    rollMs: 1_200, // one roll to one side, over to the other and back
+    flyMs: 750, // the wisp swooping in to hover over it
+    diveMs: 220, // the wisp dipping to tap its seam
+    warpMs: 420, // the tapped capsule wobbling and swelling until it bursts
+    growMs: 450, // the badge popping out
+    holdMs: 900, // the badge and its title
+  },
+
   // src/floors/jackpotReelsEvent — the rare "Jackpot Reels" event: the button
   // streams coins into three slot reels, which stop one by one with a slam;
   // it pays the floor's income times its floor number times the reels' sum

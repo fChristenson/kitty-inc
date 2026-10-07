@@ -154,6 +154,7 @@ import {
   LUCKY_NUMBER_MAX_FLOORS,
 } from "../../shared/critTypes";
 import { revealBadgeFoil } from "../foilReveal";
+import { openBadgeCapsule } from "../badgeCapsule";
 import {
   playSold as soundSold,
   playBloop as soundBloop,
@@ -1773,6 +1774,14 @@ function critNow(
 ): void {
   const result = rollInstantCrit(allowSpecialProcs);
   if (result) applyFloorCrit(deps, floor, result, allowSpecialProcs);
+}
+
+// opens the building's mystery badge capsule (see ../badgeCapsule); true once it plays
+export function openBuildingBadgeCapsule(
+  deps: FloorActionsDeps,
+  force = false,
+): boolean {
+  return openBadgeCapsule(deps.floors, eventProcContext(deps, true), force);
 }
 
 // what an event proc rolled or armed by a click in this building can work with

@@ -274,10 +274,27 @@ export function drawLockedMarkerPrice(
 
 // spinner beside a bought marker's cat while its building is renovating, in
 // the old buy-all dot's spot and size
-const SPINNER_RADIUS = 4.5;
+export const SPINNER_RADIUS = 4.5;
 const SPINNER_GAP = -64;
 const SPINNER_Y_OFFSET = 36;
 const SPINNER_TURN_MS = 800;
+
+// the spot beside a bought marker's cat for a little status icon (the
+// renovation spinner, the mystery badge capsule), in the old buy-all dot's spot
+export function markerSideSpot(
+  cssW: number,
+  cssH: number,
+  catSprite: HTMLImageElement,
+  buildingIndex: number,
+): { x: number; y: number } {
+  const { cx, feetY } = markerCenter(cssW, cssH, buildingIndex);
+  const frameW = catSprite.naturalWidth / CAT_FRAME_COUNT;
+  const renderW = (MARKER_H * frameW) / catSprite.naturalHeight;
+  return {
+    x: cx - renderW / 2 - SPINNER_GAP - SPINNER_RADIUS,
+    y: feetY - MARKER_H / 2 + SPINNER_Y_OFFSET,
+  };
+}
 
 export function drawMarkerSpinner(
   ctx: CanvasRenderingContext2D,
@@ -288,11 +305,7 @@ export function drawMarkerSpinner(
   now: number,
 ): void {
   if (!catSprite) return;
-  const { cx, feetY } = markerCenter(cssW, cssH, buildingIndex);
-  const frameW = catSprite.naturalWidth / CAT_FRAME_COUNT;
-  const renderW = (MARKER_H * frameW) / catSprite.naturalHeight;
-  const x = cx - renderW / 2 - SPINNER_GAP - SPINNER_RADIUS;
-  const y = feetY - MARKER_H / 2 + SPINNER_Y_OFFSET;
+  const { x, y } = markerSideSpot(cssW, cssH, catSprite, buildingIndex);
   const start = ((now % SPINNER_TURN_MS) / SPINNER_TURN_MS) * Math.PI * 2;
   ctx.save();
   ctx.lineCap = "round";

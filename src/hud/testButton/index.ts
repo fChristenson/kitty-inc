@@ -252,6 +252,16 @@ export function wireRevealEventTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireBadgeCapsuleTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>(
+    "#test-badge-capsule",
+  )!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireWispEventTestButton(
   container: HTMLElement,
   onClick: () => void,
