@@ -1253,6 +1253,8 @@ export function createTestButtonMarkup(): string {
           <button id="add-money" class="game__button">Add Money</button>
           <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
           <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
+          <button class="game__button" data-add-badges="10">Badges +10</button>
+          <button class="game__button" data-add-badges="100">Badges +100</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

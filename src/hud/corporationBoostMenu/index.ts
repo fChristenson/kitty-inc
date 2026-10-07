@@ -52,6 +52,13 @@ const BADGE_INFO: {
 
 const BADGE_INFO_BY_KIND = new Map(BADGE_INFO.map((info) => [info.kind, info]));
 
+// times a crit must land before its tile gets a foil sweep, then foil + twinkles
+const FOIL_AT = 10;
+const TWINKLE_FOIL_AT = 100;
+// glitter: a few layers of glints, each layer twinkling as one
+const GLINT_LAYERS = 3;
+const GLINTS_PER_LAYER = 5;
+
 // the map view's own prev/next/pointer arrow icon (shared/arrowIcon), rotated
 // to point left via CSS for the detail pane's own back button
 const BACK_ARROW_SVG = arrowIconMarkup(22);
@@ -125,9 +132,77 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
   let renderedCount = 0;
   let iconObserver: IntersectionObserver | null = null;
   let pageObserver: IntersectionObserver | null = null;
+  // foils animate only on tiles in view, never mid-slide
+  let liveObserver: IntersectionObserver | null = null;
+  const tilesInView = new Set<HTMLElement>();
+  let sliding = false;
+
+  function syncLive(): void {
+    const gridLive = !sliding && openKind === null;
+    for (const tile of tilesInView) tile.toggleAttribute("data-live", gridLive);
+    detail
+      .querySelector(".crit-info-detail__art")
+      ?.toggleAttribute("data-live", !sliding && openKind !== null);
+  }
   const sentinel = document.createElement("div");
   sentinel.className = "crit-info-grid__sentinel";
   sentinel.setAttribute("aria-hidden", "true");
+
+  // the foil and glitter are masked by the sticker, so they wait for the
+  // lazy-loaded icon
+  function maskFoil(image: HTMLImageElement): void {
+    const host = image.parentElement;
+    if (!host?.dataset.foil || !image.getAttribute("src")) return;
+    host.style.setProperty("--sticker", `url("${image.src}")`);
+    for (const layer of host.querySelectorAll<HTMLElement>(
+      ".crit-foil, .crit-sparkles",
+    ))
+      layer.hidden = false;
+  }
+
+  // a crit landed often enough gets a holo sheen, like a foil trading card
+  function syncFoil(
+    host: HTMLElement,
+    image: HTMLImageElement,
+    count: number,
+  ): void {
+    const look =
+      count >= TWINKLE_FOIL_AT ? "twinkle" : count >= FOIL_AT ? "foil" : "";
+    if ((host.dataset.foil ?? "") === look) return;
+    host.querySelector(".crit-foil")?.remove();
+    host.querySelector(".crit-sparkles")?.remove();
+    if (!look) {
+      delete host.dataset.foil;
+      return;
+    }
+    host.dataset.foil = look;
+    const foil = document.createElement("span");
+    foil.className = "crit-foil";
+    foil.hidden = true;
+    image.after(foil);
+    if (look === "twinkle") {
+      const sparkles = document.createElement("span");
+      sparkles.className = "crit-sparkles";
+      sparkles.hidden = true;
+      for (let layer = 0; layer < GLINT_LAYERS; layer++) {
+        const glints: string[] = [];
+        for (let i = 0; i < GLINTS_PER_LAYER; i++) {
+          const x = (10 + Math.random() * 80).toFixed(1);
+          const y = (10 + Math.random() * 80).toFixed(1);
+          const color = `var(--glint-${(layer + i) % 4})`;
+          glints.push(
+            `radial-gradient(circle at ${x}% ${y}%, #fff 0 1.2%, ${color} 2.4%, transparent 4%)`,
+          );
+        }
+        const glint = document.createElement("i");
+        glint.style.background = glints.join(",");
+        glint.style.animationDelay = `${((-layer * 1.4) / GLINT_LAYERS).toFixed(2)}s`;
+        sparkles.append(glint);
+      }
+      foil.after(sparkles);
+    }
+    maskFoil(image);
+  }
 
   // a crit the player has never landed shows as a black silhouette with no way
   // into its detail card — the artwork is the reward for discovering it, and
@@ -157,6 +232,7 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
       // reached this tile, or it would fetch off-screen icons early
       if (image.hasAttribute("src")) image.src = wanted;
     }
+    syncFoil(tile, image, discovered ? count : 0);
 
     const existing = tile.querySelector<HTMLElement>(
       ".crit-info-tile__count-badge",
@@ -201,8 +277,13 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
       applyDiscovery(tile, kind, getCritProcCount(kind));
       tiles.set(kind, tile);
       fragment.append(tile);
+      if (liveObserver) liveObserver.observe(tile);
+      else tile.toggleAttribute("data-live", true);
       if (iconObserver) iconObserver.observe(image);
-      else image.src = image.dataset.src ?? "";
+      else {
+        image.src = image.dataset.src ?? "";
+        maskFoil(image);
+      }
     }
     renderedCount += page.length;
     grid.insertBefore(fragment, sentinel);
@@ -228,10 +309,25 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
             if (!entry.isIntersecting) continue;
             const image = entry.target as HTMLImageElement;
             image.src = image.dataset.src ?? "";
+            maskFoil(image);
             observer.unobserve(image);
           }
         },
         { root: scrollRoot, rootMargin: "160px" },
+      );
+      liveObserver = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            const tile = entry.target as HTMLElement;
+            if (entry.isIntersecting) tilesInView.add(tile);
+            else {
+              tilesInView.delete(tile);
+              tile.removeAttribute("data-live");
+            }
+          }
+          syncLive();
+        },
+        { root: scrollRoot },
       );
       pageObserver = new IntersectionObserver(
         (entries) => {
@@ -275,7 +371,7 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
     const info = BADGE_INFO.find(({ kind }) => kind === openKind);
     if (!info) return;
     detail.innerHTML = `
-      <img src="${info.icon}" class="crit-info-detail__icon" alt="" />
+      <span class="crit-info-detail__art"><img src="${info.icon}" class="crit-info-detail__icon" alt="" /></span>
       <h3 class="crit-info-detail__name">${info.label}</h3>
       <p class="crit-info-detail__description">${info.description}</p>
       <p class="crit-info-detail__count"></p>
@@ -290,6 +386,9 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
   function syncDetail(): void {
     if (!openKind) return;
     const stats = detailStats(openKind);
+    const art = detail.querySelector<HTMLElement>(".crit-info-detail__art");
+    const icon = art?.querySelector("img");
+    if (art && icon) syncFoil(art, icon, getCritProcCount(openKind));
     const landed = detail.querySelector<HTMLElement>(
       ".crit-info-detail__count",
     );
@@ -320,12 +419,16 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
   let slideTimer: number | null = null;
 
   function slide(toDetail: boolean): void {
+    sliding = true;
+    syncLive();
     slider.classList.add("crit-info-slider--sliding");
     slider.classList.toggle("crit-info-slider--detail", toDetail);
     if (slideTimer !== null) clearTimeout(slideTimer);
     slideTimer = window.setTimeout(() => {
       slider.classList.remove("crit-info-slider--sliding");
       slideTimer = null;
+      sliding = false;
+      syncLive();
     }, 320);
   }
 

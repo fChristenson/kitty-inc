@@ -1,6 +1,25 @@
 import type { Floor } from "../../gameState";
-import type { CritTier } from "../../shared/critTypes";
+import {
+  CRIT_PROC_KINDS,
+  commitCritCounts,
+  type CritProcKind,
+  type CritTier,
+} from "../../shared/critTypes";
 export { createTestButtonMarkup, wireCritTestActions } from "./critTestActions";
+
+// adds to every crit's landed count, to see the badge foils
+export function wireAddBadgesTestButtons(container: HTMLElement): void {
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "[data-add-badges]",
+  )) {
+    const amount = Number(button.dataset.addBadges);
+    button.addEventListener("click", () => {
+      const draft: Partial<Record<CritProcKind, number>> = {};
+      for (const kind of CRIT_PROC_KINDS) draft[kind] = amount;
+      commitCritCounts(draft);
+    });
+  }
+}
 
 export function wireTestButton(
   container: HTMLElement,

@@ -111,6 +111,7 @@ import {
   wireTestActionsFilter,
   sortTestActionMenus,
   wireIdleOverlayTestButton,
+  wireAddBadgesTestButtons,
   wireBoostEventTestButton,
   wireUnionEventTestButton,
   wireKickbackEventTestButton,
@@ -681,6 +682,7 @@ async function main() {
     wireIdleOverlayTestButton(app, () => {
       void totalEarnedOverlay.show(fromNumber(123456));
     });
+    wireAddBadgesTestButtons(app);
     // the event modules load in their own chunk (floors/eventLoader): each
     // event test button loads it first, then runs with it as `ev`
     let ev!: EventCatalog;
