@@ -16,7 +16,7 @@ import { drawCritText } from "../shared/critText";
 import { runWhenIdle } from "../shared/idle";
 import { drawGoldShimmer } from "../shared/goldShimmer";
 import { isScreenFrozen } from "../shared/screenFreeze";
-import { getExplosionDurationMs } from "../sound";
+import { getExplosionDurationMs, MAX_VIBRATE_MS } from "../sound";
 import {
   drawCritSparks,
   startCritSparks,
@@ -186,7 +186,7 @@ function buzzForFlash(now: number): void {
   if (flashEndsAt === null || typeof navigator.vibrate !== "function") return;
   const left = flashPausedAt !== null ? 0 : flashEndsAt - now;
   if (left <= 0 && flashPausedAt === null) return;
-  const ms = Math.max(0, Math.round(left));
+  const ms = Math.min(MAX_VIBRATE_MS, Math.max(0, Math.round(left)));
   navigator.vibrate(
     CRIT_ICON_BY_LABEL[flashLabel] ? Math.min(ms, badgeBuzzMs()) : ms,
   );

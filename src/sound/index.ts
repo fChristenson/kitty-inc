@@ -374,10 +374,14 @@ export function playExplosion(): void {
 // an event's bangs buzz the phone (crits buzz with their flash, see
 // screenShake); Android only, iOS has no vibration API
 const VIBRATE_TRIM_MS = 200;
+export const MAX_VIBRATE_MS = 300;
 let vibratingUntil = 0;
 function buzzDuringEvent(soundMs: number): void {
   if (!isScreenFrozen() || typeof navigator.vibrate !== "function") return;
-  const ms = Math.max(0, Math.round(soundMs - VIBRATE_TRIM_MS));
+  const ms = Math.min(
+    MAX_VIBRATE_MS,
+    Math.max(0, Math.round(soundMs - VIBRATE_TRIM_MS)),
+  );
   const now = performance.now();
   // a new buzz replaces the running one, so never cut a longer one short
   if (now + ms <= vibratingUntil) return;
