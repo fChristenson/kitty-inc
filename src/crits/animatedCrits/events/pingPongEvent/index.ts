@@ -87,7 +87,6 @@ interface Contact {
   landedAt: number | null;
 }
 
-
 // the clicked floor's bar, and the bar above it if that floor's open and in
 // view, local to the clicked floor
 function planPaddles(

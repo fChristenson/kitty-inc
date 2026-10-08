@@ -66,7 +66,6 @@ const BAR_FLASH_MS = 450;
 const BLAST_COINS = 44;
 const BLAST_R: [number, number] = [120, 460];
 
-
 registerEventProc(
   {
     key: KEY,

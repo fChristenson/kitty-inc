@@ -115,7 +115,6 @@ export function forceHeadHopEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // the ball ms in: dropping in, hopping head to head in arcs, then rocketing
 // up off the screen from the last
 function ballAt(hop: RunningHop, ms: number): Point | null {

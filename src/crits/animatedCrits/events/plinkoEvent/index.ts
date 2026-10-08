@@ -63,7 +63,6 @@ const SPARK_SIZE = 22;
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-
 interface Ball {
   dropAt: number;
   // its spot every STEP_MS from dropAt until it lands

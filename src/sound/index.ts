@@ -454,7 +454,7 @@ export function playExplosion(): void {
 }
 
 // an event's bangs buzz the phone (crits buzz with their flash, see
-// screenShake); Android only, iOS has no vibration API
+// critFlash); Android only, iOS has no vibration API
 const VIBRATE_TRIM_MS = 200;
 export const MAX_VIBRATE_MS = 100;
 let vibratingUntil = 0;
@@ -594,7 +594,7 @@ export function getJackpotDurationMs(): number {
 // crits during a fast held click can't stack overlapping plays. Capped at ~1.93s
 // (matching critCelebration.ts's own total flash lifetime) and faded over its
 // last 0.576s to match the flash text's own fade-out phase duration exactly
-// (see screenShake.ts) — both end together with a smooth fade, instead of the
+// (see critFlash) — both end together with a smooth fade, instead of the
 // sound outlasting the (now much shorter) flash by playing the full ~3s .wav
 // past the point the screen's gone quiet
 const PAYOUT_PLAY_SECONDS = 1.926;

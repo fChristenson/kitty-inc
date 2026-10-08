@@ -484,7 +484,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     };
   }
 
-  // converts the current visual screen center (where screenShake's "CRIT!" flash is
+  // converts the current visual screen center (where critFlash's "CRIT!" flash is
   // drawn — dead center of the viewport) into the given floor's own local
   // coordinate space, so a coin burst can be anchored there instead of at a fixed
   // floor-local point (e.g. the upgrade button)
@@ -686,7 +686,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
 
   // floors intersecting the viewport, with their world-space tops and the
-  // floor-local band of each that's actually in view (see floors/eventProcs)
+  // floor-local band of each that's actually in view (see crits/animatedCrits/eventProcs)
   function onScreenFloors(): OnScreenFloor[] {
     const viewTop = viewportTopY();
     const viewBottom = viewportBottomY();

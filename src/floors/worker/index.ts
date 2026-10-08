@@ -530,7 +530,7 @@ export function recruitToCap(
   return hires;
 }
 
-// a worker's "Boost" event tier (see floors/boostEvent): the manager's lives on
+// a worker's "Boost" event tier (see crits/animatedCrits/events/boostEvent): the manager's lives on
 // the floor itself, a regular worker's in its own persisted slot
 export function getWorkerPermaTier(
   floor: Floor,
@@ -577,7 +577,7 @@ export interface UnionPlan {
   mergedIndexes: number[];
 }
 
-// "Union" event (see floors/unionEvent): the manager if it isn't maxed, else a
+// "Union" event (see crits/animatedCrits/events/unionEvent): the manager if it isn't maxed, else a
 // random non-maxed worker, absorbs the fewest other non-maxed regular workers whose
 // combined worth (1 + their own perma steps each) reaches its top tier, all of
 // them if that's not enough — only the manager may take the last regular worker

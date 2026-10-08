@@ -52,7 +52,6 @@ const POP_COIN_REACH: [number, number] = [40, 180];
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-
 // p bounced back and forth between lo and hi
 function fold(p: number, lo: number, hi: number): number {
   const span = hi - lo;

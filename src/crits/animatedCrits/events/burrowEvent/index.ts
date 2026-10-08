@@ -61,7 +61,6 @@ const SPARK_SIZE = 22;
 const COINS = 46;
 const COIN_R: [number, number] = [110, 440];
 
-
 let scratch: HTMLCanvasElement | null = null;
 // what the scratch last held, so it's only redrawn when the button's look changes
 let scratchOf: { floor: Floor; white: number } | null = null;

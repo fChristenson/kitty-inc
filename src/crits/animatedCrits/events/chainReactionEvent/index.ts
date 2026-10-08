@@ -44,7 +44,6 @@ const SPARK_SIZE = 18;
 const COINS: [number, number] = [5, 12];
 const SPRAY_R: [number, number] = [60, 220];
 
-
 // the mines in order, each the nearest still unlit one to the last
 function chainFrom(start: Point, spots: Point[]): Point[] {
   const left = [...spots];

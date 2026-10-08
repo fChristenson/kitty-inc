@@ -102,7 +102,6 @@ export function forceOverloadEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 function blowMs(): number {
   const { chargeMs, suckMs } = CONFIG.overloadEvent;
   return chargeMs + suckMs;

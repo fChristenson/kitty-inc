@@ -70,7 +70,6 @@ interface Ring {
   bobPhase: number;
 }
 
-
 // a wide band, then one or two thin rings close behind, then the next wide
 // one; each rolling its own way
 function planRings(): Ring[] {

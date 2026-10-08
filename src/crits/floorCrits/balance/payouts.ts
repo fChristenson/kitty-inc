@@ -14,9 +14,9 @@ export const PAYOUTS_BALANCE = {
   // floor.lastCollectedAt) — the bar keeps ticking from exactly where it was
   tickTockChance: 0.09,
   // "fast forward crit" — same instant-income reward as tick tock above,
-  // just a steeper multiplier (see shared/critTypes' FAST_FORWARD_PAYOUT_MULTIPLIER)
+  // just a steeper multiplier (see crits/critTypes' FAST_FORWARD_PAYOUT_MULTIPLIER)
   fastForwardChance: 0.05,
-  // "snowball crit" — a flat, not-tier-scaled proc (see shared/critTypes'
+  // "snowball crit" — a flat, not-tier-scaled proc (see crits/critTypes'
   // applySnowballCrit): instantly credits every unlocked floor 1 extra
   // payout's worth of income at its own current rate, multiplied by how
   // many floors are currently unlocked — the more floors owned, the bigger

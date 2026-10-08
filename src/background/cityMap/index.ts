@@ -496,7 +496,7 @@ export function createCityMapView(
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, cssW, cssH);
     // buy-all-floors long-press below plays the same shared shake every other
-    // big/free action in the game uses (see screenShake.ts) — applied once here
+    // big/free action in the game uses (see critFlash) — applied once here
     // so it nudges everything drawn on this canvas, same pattern as
     // gameCanvas.ts's own redraw loop
     const shake = getScreenShakeOffset(Date.now());

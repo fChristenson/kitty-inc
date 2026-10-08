@@ -31,7 +31,6 @@ const TURNS: [number, number] = [1.1, 1.6];
 // coins shrink to this (of their size) as they reach the eye
 const EYE_SCALE = 0.5;
 
-
 // a random spot just outside one of the screen's four edges
 function edgeStart(area: CoverArea): { x: number; y: number } {
   const left = area.left - ENTER_MARGIN;

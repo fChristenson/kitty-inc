@@ -78,7 +78,6 @@ const PUFF_MS = 450;
 
 type Pt = { x: number; y: number };
 
-
 // streaks of light rushing down past the rocket at (x, y), speed 0..1
 function drawWarps(
   ctx: CanvasRenderingContext2D,

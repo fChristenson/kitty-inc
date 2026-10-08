@@ -57,7 +57,9 @@ const T = S.tier;
 const W = Math.min(3, S.workers);
 const A0 = L * T; // levels weighted by the tier each was bought at
 // a boosted perma worker's speed-up is its tier multiplier to this power
-const configSource = readFileSync("src/config.ts", "utf8");
+const configSource =
+  readFileSync("src/config.ts", "utf8") +
+  readFileSync("src/crits/config.ts", "utf8");
 const configNumber = (key, fallback) =>
   Number(
     configSource.match(new RegExp(`${key}:\\s*([\\d.]+)`))?.[1] ?? fallback,
@@ -568,7 +570,10 @@ function eventEntry(dir, CONFIG) {
   const cfg = CONFIG[`${name}Event`];
   let src;
   try {
-    src = readFileSync(`src/crits/animatedCrits/events/${dir}/index.ts`, "utf8");
+    src = readFileSync(
+      `src/crits/animatedCrits/events/${dir}/index.ts`,
+      "utf8",
+    );
   } catch {
     return null;
   }

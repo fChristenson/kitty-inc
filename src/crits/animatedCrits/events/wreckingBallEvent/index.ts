@@ -136,7 +136,6 @@ export function forceWreckingBallEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // how far through charging up it is, 0..1
 function chargeAt(ball: RunningBall, ms: number): number {
   const restAt = ball.hitTimes[ball.hitTimes.length - 1];

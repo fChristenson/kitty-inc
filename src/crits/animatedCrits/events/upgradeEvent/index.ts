@@ -1,4 +1,4 @@
-// the "Upgrade" event: a covered crit (see floors/streamTargetEvent) whose
+// the "Upgrade" event: a covered crit (see crits/animatedCrits/events/streamTargetEvent) whose
 // glimmer lights stream into the floor's income bar. When the stream ends the floor's
 // permanent crit tier becomes the crit's rolled tier, or the tier above its own
 // when that roll wouldn't promote it. Never lands on a top-tier floor

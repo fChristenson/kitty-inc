@@ -31,8 +31,8 @@ export type { MergeCompaniesResult } from "./economy";
 
 // every collectible crit badge (see .github/instructions/special-crits.
 // instructions.md), for the info list below — derived straight from
-// shared/critTypes's own canonical CRIT_PROC_INFO table (icon/label match each
-// proc's own celebration flash exactly, screenShake.ts/critCelebration.ts)
+// crits/critTypes's own canonical CRIT_PROC_INFO table (icon/label match each
+// proc's own celebration flash exactly, critFlash/critCelebration.ts)
 // instead of this menu hand-duplicating every label/icon/description a
 // second time. Sorted alphabetically by label — CRIT_PROC_KINDS' own order is
 // roll-rarity-driven, not a sensible reading order for a lookup list

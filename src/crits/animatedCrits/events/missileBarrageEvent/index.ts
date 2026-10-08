@@ -153,7 +153,6 @@ export function forceMissileBarrageEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // a missile ms in: along its bowed path, speeding up
 function missileAt(missile: Missile, ms: number): Point | null {
   if (ms < missile.launchAt || ms >= missile.hitAt) return null;

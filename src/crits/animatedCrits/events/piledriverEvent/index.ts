@@ -94,7 +94,6 @@ interface RunningPiledriver {
 
 let running: RunningPiledriver | null = null;
 
-
 // every visible upgrade button on the open floors in view, top to bottom
 function findButtons(
   floor: Floor,

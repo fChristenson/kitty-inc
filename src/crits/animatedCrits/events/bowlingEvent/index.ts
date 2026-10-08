@@ -108,7 +108,6 @@ export function forceBowlingEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 function ballX(bowl: RunningBowl, ms: number): number {
   const u = clamp01(ms / CONFIG.bowlingEvent.rollMs) ** ROLL_EASE;
   return bowl.fromX + (bowl.toX - bowl.fromX) * u;

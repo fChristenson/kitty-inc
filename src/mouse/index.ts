@@ -22,7 +22,6 @@ import {
   celebrateBonusTier,
 } from "../crits";
 
-
 // a free bonus critter: spawns at random on a random unlocked floor of whichever
 // building is currently active, runs back and forth for a few seconds, and — if
 // clicked before it scurries off — boosts every worker in the building for free,
@@ -81,7 +80,7 @@ interface MouseState {
   spawnedAt: number;
   pausedUntil: number; // Date.now() timestamp; holds still until then
   moveStartedAt: number; // Date.now() this dart's movement actually began, once any pause elapses
-  huntedAt: number | null; // Date.now() a Hunt event (floors/huntEvent) marked it
+  huntedAt: number | null; // Date.now() a Hunt event (crits/animatedCrits/events/huntEvent) marked it
 }
 
 const HUNTED_TINT_ALPHA = 0.5;

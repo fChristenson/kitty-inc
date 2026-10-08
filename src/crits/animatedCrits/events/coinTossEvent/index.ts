@@ -41,7 +41,6 @@ const POP_MS = 400;
 const LABEL_FONT = 72;
 const LABEL_RISE = 80; // px between the coin's top and the label
 
-
 registerEventProc(
   {
     key: KEY,

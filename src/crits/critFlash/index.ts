@@ -76,7 +76,7 @@ function requestCritIcon(name: ImageName): Promise<HTMLImageElement> {
   return promise;
 }
 
-// a special crit's flash outline width (see shared/critFlash playSpecialFlash)
+// a special crit's flash outline width (see crits/critFlash playSpecialFlash)
 export const SPECIAL_FLASH_STROKE_WIDTH = 14;
 
 // Loading all ~1400 celebration icons up front stalled the first seconds of

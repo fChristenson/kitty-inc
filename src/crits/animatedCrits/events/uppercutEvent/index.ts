@@ -98,7 +98,6 @@ export function forceUppercutEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 function beats() {
   const { swoopMs, riseMs, hangMs, fallMs } = CONFIG.uppercutEvent;
   const hit = swoopMs;

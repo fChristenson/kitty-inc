@@ -179,7 +179,7 @@ export function ensureLockedFloorAbove(deps: EnsureLockedFloorDeps): void {
     // reset back to null, so "the default floor is the crit version" holds for
     // every floor the building ever grows, not just the ones that existed yet
     defaultCritTier: getUniformCritTier(deps.floors),
-    // same idea for a seasonal-sale discount (see shared/critTypes'
+    // same idea for a seasonal-sale discount (see crits/critTypes'
     // SEASONAL_SALE_DISCOUNT_MULTIPLIER) — every floor in a building is kept
     // in sync on this value (applySeasonalSaleCrit applies it to all of them
     // at once), so the ground floor's own copy is always this building's

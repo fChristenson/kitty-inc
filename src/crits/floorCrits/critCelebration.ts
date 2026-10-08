@@ -22,7 +22,6 @@ import {
   NIGHT_SHIFT_CRIT_LABEL,
 } from "../critTypes";
 
-
 import { spawnFreezeCoinBurst } from "../../floors/coins";
 import { playCoinDrop } from "../../sound";
 import {

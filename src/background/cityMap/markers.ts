@@ -328,7 +328,7 @@ export function drawMarkerSpinner(
 // how many of MAX_FLOORS_PER_BUILDING (floors/floorLock.ts) it's grown to.
 // Plain white by default; a building with a baseline crit tier
 // (see cityMap/index.ts's getBuildingCritTier) passes that tier's own color,
-// rendered with the same light-to-tier-color glossy gradient screenShake.ts's
+// rendered with the same light-to-tier-color glossy gradient critFlash's
 // own crit flash text uses (scaled down to this marker's much smaller font)
 // instead of a flat fill, so it reads as visually consistent with every other
 // crit-colored text in the game

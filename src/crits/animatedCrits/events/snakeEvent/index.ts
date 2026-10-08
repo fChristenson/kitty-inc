@@ -67,7 +67,6 @@ const BURST_REACH: [number, number] = [60, 300];
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-
 // snack spots over the area, spaced apart, visited nearest first from `from`
 function pickSnacks(
   area: { left: number; top: number; right: number; bottom: number },

@@ -2,7 +2,7 @@
 export const SALES_BALANCE = {
   // "winter sale"/"spring sale"/"summer sale"/"autumn sale" crits — four
   // more flat, not-tier-scaled procs, all sharing one effect (see
-  // shared/critTypes' SEASONAL_SALE_DISCOUNT_MULTIPLIER): permanently cut
+  // crits/critTypes' SEASONAL_SALE_DISCOUNT_MULTIPLIER): permanently cut
   // every unlocked floor's own upgrade AND worker/office chairs/supplies/
   // manager costs by 25%, for the WHOLE building the roll happened in
   winterSaleChance: 0.04,
@@ -13,12 +13,12 @@ export const SALES_BALANCE = {
   seasonalSaleDiscount: 0.25,
   // "halloween sale" crit — same shape as the 4 seasonal sales above (same
   // floor/upgrade/worker cost cut, same building-wide scope), but its own
-  // steeper discount (see shared/critTypes' HALLOWEEN_SALE_DISCOUNT_MULTIPLIER)
+  // steeper discount (see crits/critTypes' HALLOWEEN_SALE_DISCOUNT_MULTIPLIER)
   halloweenSaleChance: 0.02,
   // 0.5 = 50% off — double the seasonal sales' own 25%
   halloweenSaleDiscount: 0.5,
   // "easter sale" crit — same shape/steeper discount again as halloween
-  // sale above, just its own icon/label/color (see shared/critTypes'
+  // sale above, just its own icon/label/color (see crits/critTypes'
   // EASTER_SALE_DISCOUNT_MULTIPLIER)
   easterSaleChance: 0.02,
   easterSaleDiscount: 0.5,

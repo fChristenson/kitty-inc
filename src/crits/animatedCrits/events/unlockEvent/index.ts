@@ -1,4 +1,4 @@
-// the "Unlock" event: a covered crit (see floors/streamTargetEvent) on a floor
+// the "Unlock" event: a covered crit (see crits/animatedCrits/events/streamTargetEvent) on a floor
 // one or two below the building's locked floor, whose coins stream into that
 // floor's unlock price. When the stream ends the floor unlocks for free and
 // rolls its own unlock crit, which (when it lands) also raises its tier

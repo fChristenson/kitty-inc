@@ -1,6 +1,6 @@
 // every animated event's tunables (src/floors/*Event), spread into CONFIG
 export const ANIMATED_EVENT_CONFIG = {
-  // src/floors/boostEvent — the rare "Boost" event button. A crit carrying it
+  // src/crits/animatedCrits/events/boostEvent — the rare "Boost" event button. A crit carrying it
   // arms it once clicked; clicking it freezes the screen, streams coins into
   // one random on-screen worker (or manager) below the top crit tier, and
   // promotes it one crit tier (x5 -> x25 -> x125, see CRIT_TIER_CONFIG): while
@@ -9,7 +9,7 @@ export const ANIMATED_EVENT_CONFIG = {
     chance: 0.01, // per crit whose special-crit gateway hit
   },
 
-  // src/floors/unionEvent — the rare "Union" event button, only on a floor with
+  // src/crits/animatedCrits/events/unionEvent — the rare "Union" event button, only on a floor with
   // 2+ workers. Clicking it streams coins from the floor's other workers into
   // its manager (or a random worker) not yet at the top tier; the merged
   // workers leave and it gains one perma tier per merged worker plus their
@@ -18,7 +18,7 @@ export const ANIMATED_EVENT_CONFIG = {
     chance: 0.01, // per crit whose special-crit gateway hit
   },
 
-  // src/floors/kickbackEvent — the rare "Kickback" event: its crit's click
+  // src/crits/animatedCrits/events/kickbackEvent — the rare "Kickback" event: its crit's click
   // streams coins from a random 1..maxParticipants of the on-screen workers and
   // managers into the total, which is then multiplied by one more than how many
   // took part
@@ -28,7 +28,7 @@ export const ANIMATED_EVENT_CONFIG = {
     maxParticipants: 3,
   },
 
-  // src/floors/glimmerEvent — the rare "Glimmer" event: its crit's click
+  // src/crits/animatedCrits/events/glimmerEvent — the rare "Glimmer" event: its crit's click
   // streams coins into a golden light on the left of the floor, which then
   // sweeps across it, boosting and promoting one perma tier every worker and
   // manager it passes that isn't at the top tier yet
@@ -39,19 +39,19 @@ export const ANIMATED_EVENT_CONFIG = {
     moveFloorChance: 0.5,
   },
 
-  // src/floors/huntEvent — the rare "Hunt" event button, only armed while the
+  // src/crits/animatedCrits/events/huntEvent — the rare "Hunt" event button, only armed while the
   // mouse (src/mouse) is on screen. Clicking it streams coins into the mouse
   // (same freeze/stream/sound as boostEvent), which then grows, turns red and
   // restarts its time on screen; clicking that hunted mouse gives its normal
   // boost plus a guaranteed "special crit crit" bonus tier (5x/25x/125x total
-  // income, weighted by the crit tier odds, see shared/bonusTierReward).
+  // income, weighted by the crit tier odds, see crits/floorCrits/bonusTierReward).
   huntEvent: {
     // the mouse is out ~5s of every ~32.5s (src/mouse), so ~6.5x the other
     // events' 0.01 makes Hunt land about as often overall
     chance: 0.065, // per crit whose special-crit gateway hit, mouse on screen
   },
 
-  // src/floors/burstEvent — the rare "Burst" event: its crit's click freezes
+  // src/crits/animatedCrits/events/burstEvent — the rare "Burst" event: its crit's click freezes
   // the screen while its button blows out one explosion of coins and bills over
   // the whole screen; they hang there, then merge into the total, paying the
   // floor's income times its floor number
@@ -61,7 +61,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500, // the last part, where the coins fly into the total
   },
 
-  // src/floors/sprayEvent — the rare "Spray" event: like Burst, but the button
+  // src/crits/animatedCrits/events/sprayEvent — the rare "Spray" event: like Burst, but the button
   // sprays a stream sweeping round it instead of one explosion
   sprayEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -70,7 +70,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/fountainEvent — the rare "Fountain" event: like Spray, but the
+  // src/crits/animatedCrits/events/fountainEvent — the rare "Fountain" event: like Spray, but the
   // button jets the coins up so they arc over and rain down across the screen
   fountainEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -80,7 +80,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/rippleEvent — the rare "Ripple" event: coins burst out of the
+  // src/crits/animatedCrits/events/rippleEvent — the rare "Ripple" event: coins burst out of the
   // button in round ripples, wide bands each trailed by a thin ring or two,
   // that keep rolling outward at their own pace, then sweep into the total;
   // pays once per ring
@@ -93,7 +93,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500, // the coins flying into the total
   },
 
-  // src/floors/wreckingBallEvent — the rare "Wrecking Ball" event: the wisp
+  // src/crits/animatedCrits/events/wreckingBallEvent — the rare "Wrecking Ball" event: the wisp
   // drops like a heavy ball onto the clicked floor's income bar and bounces on
   // it, each hit an explosion that lands free upgrade levels
   wreckingBallEvent: {
@@ -109,7 +109,7 @@ export const ANIMATED_EVENT_CONFIG = {
     minLevels: 10,
   },
 
-  // src/floors/piledriverEvent — the rare "Piledriver" event: the wisp charges
+  // src/crits/animatedCrits/events/piledriverEvent — the rare "Piledriver" event: the wisp charges
   // over the top of the screen, then plunges straight down through every
   // upgrade button in view, each landing free upgrade levels
   piledriverEvent: {
@@ -121,7 +121,7 @@ export const ANIMATED_EVENT_CONFIG = {
     minLevels: 10,
   },
 
-  // src/floors/orbitalStrikeEvent — the rare "Orbital Strike" event: a
+  // src/crits/animatedCrits/events/orbitalStrikeEvent — the rare "Orbital Strike" event: a
   // reticle locks onto the clicked floor's income bar and a beam of light
   // slams down onto it from the sky, blasting it up a crit tier
   orbitalStrikeEvent: {
@@ -132,7 +132,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 650, // after the strike, before the screen unfreezes
   },
 
-  // src/floors/fuseEvent — the rare "Fuse" event: a spark races along a
+  // src/crits/animatedCrits/events/fuseEvent — the rare "Fuse" event: a spark races along a
   // fuse from the screen's side to the button, which blows up spraying coins
   // across the screen into the total
   fuseEvent: {
@@ -142,7 +142,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500, // the coins sweeping into the total
   },
 
-  // src/floors/supernovaEvent — the rare "Supernova" event: the wisp swells
+  // src/crits/animatedCrits/events/supernovaEvent — the rare "Supernova" event: the wisp swells
   // and pulses in the middle of the screen, collapses and detonates, its
   // shockwave raising every climbable worker it sweeps over one perma tier
   supernovaEvent: {
@@ -153,7 +153,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450, // after it's gone, before the screen unfreezes
   },
 
-  // src/floors/bowlingEvent — the rare "Bowling" event: the wisp rolls along
+  // src/crits/animatedCrits/events/bowlingEvent — the rare "Bowling" event: the wisp rolls along
   // the clicked floor like a bowling ball, knocking every worker flying; each
   // lands and climbs one perma tier
   bowlingEvent: {
@@ -163,7 +163,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500, // after the ball's gone and the last lands
   },
 
-  // src/floors/thunderclapEvent — the rare "Thunderclap" event: two wisps
+  // src/crits/animatedCrits/events/thunderclapEvent — the rare "Thunderclap" event: two wisps
   // smash together on the clicked floor's income bar and the shockwave gives
   // every income bar in view free upgrade levels
   thunderclapEvent: {
@@ -175,7 +175,7 @@ export const ANIMATED_EVENT_CONFIG = {
     minLevels: 10,
   },
 
-  // src/floors/chainReactionEvent — the rare "Chain Reaction" event: mines
+  // src/crits/animatedCrits/events/chainReactionEvent — the rare "Chain Reaction" event: mines
   // pop up over the screen and blow one after another from the button, each
   // spraying coins that then sweep into the total
   chainReactionEvent: {
@@ -185,7 +185,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/bullseyeEvent — the rare "Bullseye" event:
+  // src/crits/animatedCrits/events/bullseyeEvent — the rare "Bullseye" event:
   // bullseyes pop up over the screen and the button shoots the wisp into each,
   // every hit spraying coins that then sweep into the total
   bullseyeEvent: {
@@ -198,7 +198,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/popcornEvent — the rare "Popcorn" event: a row of kernels
+  // src/crits/animatedCrits/events/popcornEvent — the rare "Popcorn" event: a row of kernels
   // heats up along the clicked floor and pops at random, ever faster, each
   // leaping up and bursting into coins that then sweep into the total
   popcornEvent: {
@@ -210,7 +210,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/newtonsCradleEvent — the rare "Newton's Cradle" event: five
+  // src/crits/animatedCrits/events/newtonsCradleEvent — the rare "Newton's Cradle" event: five
   // wisps hang like a Newton's cradle and clack back and forth, ever faster,
   // each clack spraying coins that then sweep into the total
   newtonsCradleEvent: {
@@ -223,7 +223,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/juggleEvent — the rare "Juggle" event: three wisps juggled
+  // src/crits/animatedCrits/events/juggleEvent — the rare "Juggle" event: three wisps juggled
   // round a figure of eight, ever faster and higher, each catch tossing
   // coins, until all three are hurled up into one blast
   juggleEvent: {
@@ -234,7 +234,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/boomerangEvent — the rare "Boomerang" event: the wisp is
+  // src/crits/animatedCrits/events/boomerangEvent — the rare "Boomerang" event: the wisp is
   // hurled out on wide loops that whip back into the button, shedding coins
   // all along them, until the last catch blasts and the coins sweep in
   boomerangEvent: {
@@ -244,7 +244,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/heartbeatEvent — the rare "Heartbeat" event: the wisp runs a
+  // src/crits/animatedCrits/events/heartbeatEvent — the rare "Heartbeat" event: the wisp runs a
   // heart monitor trace into the clicked floor's button, every beat throbbing
   // it for free upgrade levels, ever faster, the last slamming into it
   heartbeatEvent: {
@@ -258,7 +258,7 @@ export const ANIMATED_EVENT_CONFIG = {
     minLevels: 3,
   },
 
-  // src/floors/clashEvent — the rare "Clash" event: two wisps streak in and
+  // src/crits/animatedCrits/events/clashEvent — the rare "Clash" event: two wisps streak in and
   // fight like fish in the middle of the screen, slamming again and again,
   // until one last charged slam blasts them into coins that sweep in
   clashEvent: {
@@ -270,7 +270,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/asteroidsEvent — the rare "Asteroids" event: the wisp blasts
+  // src/crits/animatedCrits/events/asteroidsEvent — the rare "Asteroids" event: the wisp blasts
   // shot after shot at tumbling gold rocks, cracking big ones in two and
   // bursting small ones into coins that sweep into the total
   asteroidsEvent: {
@@ -282,7 +282,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/whackAMoleEvent — the rare "Whack-a-Mole" event: wisps pop up
+  // src/crits/animatedCrits/events/whackAMoleEvent — the rare "Whack-a-Mole" event: wisps pop up
   // out of a grid of holes and a big gold mallet whacks each into coins, ever
   // faster, until it smashes a huge last one and the coins sweep in
   whackAMoleEvent: {
@@ -294,7 +294,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/drumrollEvent — the rare "Drumroll" event: two wisps beat a
+  // src/crits/animatedCrits/events/drumrollEvent — the rare "Drumroll" event: two wisps beat a
   // big gold drum into a blurring drumroll, coins bouncing off it, then slam
   // down together and burst it, and the coins sweep into the total
   drumrollEvent: {
@@ -306,7 +306,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/shellGameEvent — the rare "Shell Game" event: three gold cups
+  // src/crits/animatedCrits/events/shellGameEvent — the rare "Shell Game" event: three gold cups
   // shuffle the wisp round, ever faster, flicking out coins, then fly off
   // and the found wisp blows, and the coins sweep into the total
   shellGameEvent: {
@@ -318,7 +318,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/seesawEvent — the rare "Seesaw" event: two wisps catapult
+  // src/crits/animatedCrits/events/seesawEvent — the rare "Seesaw" event: two wisps catapult
   // each other ever higher off a gold seesaw, coins flung at every landing,
   // until the last rockets the other off the top in a huge blast
   seesawEvent: {
@@ -330,7 +330,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/scratchEvent — the rare "Scratch" event: claw marks rake
+  // src/crits/animatedCrits/events/scratchEvent — the rare "Scratch" event: claw marks rake
   // across the clicked floor's income bar, ever faster, then all burst into
   // coins in a huge blast, and the coins sweep into the total
   scratchEvent: {
@@ -342,7 +342,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/tagEvent — the rare "Tag" event: a big wisp chases a small
+  // src/crits/animatedCrits/events/tagEvent — the rare "Tag" event: a big wisp chases a small
   // one darting round the screen, ever faster, knocking coins loose, and
   // catches it on the button in a huge blast
   tagEvent: {
@@ -353,7 +353,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/bumpersEvent — the rare "Bumpers" event: a ball wisp pings
+  // src/crits/animatedCrits/events/bumpersEvent — the rare "Bumpers" event: a ball wisp pings
   // between three bumper wisps, ever faster, spraying coins, then all three
   // blow in a huge blast
   bumpersEvent: {
@@ -365,7 +365,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/catcherEvent — the rare "Catcher" event: a catcher wisp
+  // src/crits/animatedCrits/events/catcherEvent — the rare "Catcher" event: a catcher wisp
   // dashes along the button's row catching wisps dropping from the top, ever
   // faster, then catches a huge one on the button in a huge blast
   catcherEvent: {
@@ -379,7 +379,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/implosionEvent — the rare "Implosion" event: rings of wisps
+  // src/crits/animatedCrits/events/implosionEvent — the rare "Implosion" event: rings of wisps
   // collapse onto the button from beyond the screen, ever faster, swelling
   // its core, until a last ring blows it in a huge blast
   implosionEvent: {
@@ -392,7 +392,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/atomEvent — the rare "Atom" event: three electron wisps whirl
+  // src/crits/animatedCrits/events/atomEvent — the rare "Atom" event: three electron wisps whirl
   // round a nucleus wisp on crossing orbits, ever faster, slinging coins,
   // then collapse into it and it splits in a huge blast
   atomEvent: {
@@ -403,7 +403,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/spiralEvent — the rare "Spiral" event: the wisp flies in and
+  // src/crits/animatedCrits/events/spiralEvent — the rare "Spiral" event: the wisp flies in and
   // loops a wide spiral into the screen's middle, shedding coins, then shoots
   // up into the total and explodes
   spiralEvent: {
@@ -415,7 +415,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/loopEvent — the rare "Loop" event: the wisp flies in, loops
+  // src/crits/animatedCrits/events/loopEvent — the rare "Loop" event: the wisp flies in, loops
   // a wide circle round the screen's middle, then flies straight up into the
   // total and explodes
   loopEvent: {
@@ -427,7 +427,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/eternityEvent — the rare "Eternity" event: the wisp races
+  // src/crits/animatedCrits/events/eternityEvent — the rare "Eternity" event: the wisp races
   // twice round a huge infinity sign across the screen, shedding coins, then
   // flies up into the total and explodes
   eternityEvent: {
@@ -439,7 +439,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/helixEvent — the rare "Helix" event: two wisps twist round
+  // src/crits/animatedCrits/events/helixEvent — the rare "Helix" event: two wisps twist round
   // each other in a double helix from the button up into the total, flinging
   // coins at every crossing, then fuse into it and explode
   helixEvent: {
@@ -449,7 +449,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/yoYoEvent — the rare "Yo-Yo" event: the wisp yo-yos from the
+  // src/crits/animatedCrits/events/yoYoEvent — the rare "Yo-Yo" event: the wisp yo-yos from the
   // total down onto the button and back, ever faster, then snaps into the
   // total and explodes
   yoYoEvent: {
@@ -459,7 +459,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/racetrackEvent — the rare "Racetrack" event: the wisp laps a
+  // src/crits/animatedCrits/events/racetrackEvent — the rare "Racetrack" event: the wisp laps a
   // track round the screen's edges, ever faster, drifting coins off every
   // corner, then peels off into the total and explodes
   racetrackEvent: {
@@ -471,7 +471,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/swingEvent — the rare "Swing" event: the wisp swings like a
+  // src/crits/animatedCrits/events/swingEvent — the rare "Swing" event: the wisp swings like a
   // pendulum, ever wider, flinging coins at every top, then lets go into the
   // total and explodes
   swingEvent: {
@@ -482,17 +482,17 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // the wisp coin events on src/floors/wispCover, each with its chance per
+  // the wisp coin events on src/crits/animatedCrits/wispCover, each with its chance per
   // crit whose special-crit gateway hit, its timings, then holdMs (after the
   // finale, before the coins sweep in) and mergeMs
-  // src/floors/kaleidoscopeEvent: six wisps bloom a flower, petal by petal
+  // src/crits/animatedCrits/events/kaleidoscopeEvent: six wisps bloom a flower, petal by petal
   kaleidoscopeEvent: {
     chance: 0.01,
     petalMs: [360, 170] as [number, number], // each petal out and back
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/zipperEvent: zigzag stitches down, then unzip up into the total
+  // src/crits/animatedCrits/events/zipperEvent: zigzag stitches down, then unzip up into the total
   zipperEvent: {
     chance: 0.01,
     stitchMs: [170, 70] as [number, number], // each stitch across
@@ -500,14 +500,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/screensaverEvent: DVD-screensaver bounces into a corner
+  // src/crits/animatedCrits/events/screensaverEvent: DVD-screensaver bounces into a corner
   screensaverEvent: {
     chance: 0.01,
     flightMs: 1_900, // from popping up to hitting the corner
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/sprinklerEvent: the button sprinkles drops that land as coins
+  // src/crits/animatedCrits/events/sprinklerEvent: the button sprinkles drops that land as coins
   sprinklerEvent: {
     chance: 0.01,
     sprayMs: 1_300, // sweeping, before the last whirl
@@ -515,14 +515,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/clockworkEvent: a second hand ticks round twice to midnight
+  // src/crits/animatedCrits/events/clockworkEvent: a second hand ticks round twice to midnight
   clockworkEvent: {
     chance: 0.01,
     tickMs: [160, 35] as [number, number], // between ticks, quickening
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/holeInOneEvent: chipped in, two bounces, round the rim, in
+  // src/crits/animatedCrits/events/holeInOneEvent: chipped in, two bounces, round the rim, in
   holeInOneEvent: {
     chance: 0.01,
     hopMs: [560, 320, 220], // the lob, then each bounce
@@ -530,7 +530,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/leapfrogEvent: two wisps leapfrog across, then into the total
+  // src/crits/animatedCrits/events/leapfrogEvent: two wisps leapfrog across, then into the total
   leapfrogEvent: {
     chance: 0.01,
     vaultMs: [300, 170] as [number, number], // each vault, quickening
@@ -538,7 +538,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/lineupEvent: scattered wisps line up, then fire into the total
+  // src/crits/animatedCrits/events/lineupEvent: scattered wisps line up, then fire into the total
   lineupEvent: {
     chance: 0.01,
     alignMs: 320, // snapping into the row
@@ -548,7 +548,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/stampedeEvent: a herd gallops across, then charges the total
+  // src/crits/animatedCrits/events/stampedeEvent: a herd gallops across, then charges the total
   stampedeEvent: {
     chance: 0.01,
     runMs: 900, // each wisp's gallop across
@@ -556,7 +556,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/wormholeEvent: the wisp blinks from spot to spot, then the total
+  // src/crits/animatedCrits/events/wormholeEvent: the wisp blinks from spot to spot, then the total
   wormholeEvent: {
     chance: 0.01,
     jumpMs: [260, 120] as [number, number], // each dart before it blinks out
@@ -564,14 +564,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/splatEvent: the wisp hurtles at the screen and splats on it
+  // src/crits/animatedCrits/events/splatEvent: the wisp hurtles at the screen and splats on it
   splatEvent: {
     chance: 0.01,
     rushMs: [450, 280] as [number, number], // each bounce off and rush back in
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/rouletteEvent: the ball whips round a wheel of coin pockets
+  // src/crits/animatedCrits/events/rouletteEvent: the ball whips round a wheel of coin pockets
   rouletteEvent: {
     chance: 0.01,
     spinMs: 850, // whipping round the rim
@@ -580,7 +580,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/freeKickEvent: two shots blocked by the wall, then the top corner
+  // src/crits/animatedCrits/events/freeKickEvent: two shots blocked by the wall, then the top corner
   freeKickEvent: {
     chance: 0.01,
     kickMs: 300, // each shot up into the wall
@@ -589,14 +589,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/slalomEvent: the wisp carves round gates down to the button
+  // src/crits/animatedCrits/events/slalomEvent: the wisp carves round gates down to the button
   slalomEvent: {
     chance: 0.01,
     gateMs: [320, 170] as [number, number], // each turn, quickening
     holdMs: 450,
     mergeMs: 500,
   },
-  // src/floors/lightningEvent: bolts crack down onto the button
+  // src/crits/animatedCrits/events/lightningEvent: bolts crack down onto the button
   lightningEvent: {
     chance: 0.01,
     strikeMs: 110, // each bolt streaking down
@@ -605,21 +605,21 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // the flowing-cash events on src/floors/wispCover, poured like Stream's river
-  // src/floors/fireHoseEvent: a whipping jet of cash gushes into the total
+  // the flowing-cash events on src/crits/animatedCrits/wispCover, poured like Stream's river
+  // src/crits/animatedCrits/events/fireHoseEvent: a whipping jet of cash gushes into the total
   fireHoseEvent: {
     chance: 0.01,
     sprayMs: 1_500, // the hose gushing
     travelMs: 800, // each coin's trip out the jet and round into the total
   },
-  // src/floors/confluenceEvent: rivers pour in and merge into one into the total
+  // src/crits/animatedCrits/events/confluenceEvent: rivers pour in and merge into one into the total
   confluenceEvent: {
     chance: 0.01,
     staggerMs: 150, // between rivers starting to pour
     pourMs: 900, // how long each pours
     travelMs: 800, // each coin's trip down its river and up the trunk
   },
-  // src/floors/sloshEvent: a pool of cash sloshes, then surges into the total
+  // src/crits/animatedCrits/events/sloshEvent: a pool of cash sloshes, then surges into the total
   sloshEvent: {
     chance: 0.01,
     pourMs: 550, // the button gushing the pool full
@@ -630,8 +630,8 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // wisps and flowing cash together, on src/floors/wispCover + cashFlow
-  // src/floors/siphonEvent: a wisp under the total siphons a spiral of cash
+  // wisps and flowing cash together, on src/crits/animatedCrits/wispCover + cashFlow
+  // src/crits/animatedCrits/events/siphonEvent: a wisp under the total siphons a spiral of cash
   siphonEvent: {
     chance: 0.01,
     streamMs: 1_200, // the river pouring
@@ -639,7 +639,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // src/floors/crossfireEvent: four corner wisps fire rivers that geyser up
+  // src/crits/animatedCrits/events/crossfireEvent: four corner wisps fire rivers that geyser up
   crossfireEvent: {
     chance: 0.01,
     fireMs: 600, // each corner pouring
@@ -648,7 +648,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // src/floors/gravityWellEvent: rivers whip round a planet wisp into the total
+  // src/crits/animatedCrits/events/gravityWellEvent: rivers whip round a planet wisp into the total
   gravityWellEvent: {
     chance: 0.01,
     gapMs: 160, // between rivers
@@ -657,7 +657,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // src/floors/splashdownEvent: a meteor wisp lands in a crown splash of cash
+  // src/crits/animatedCrits/events/splashdownEvent: a meteor wisp lands in a crown splash of cash
   splashdownEvent: {
     chance: 0.01,
     fallMs: 380, // the meteor falling
@@ -666,7 +666,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // src/floors/geysersEvent: wisps along the bottom erupt geysers of cash
+  // src/crits/animatedCrits/events/geysersEvent: wisps along the bottom erupt geysers of cash
   geysersEvent: {
     chance: 0.01,
     leadMs: 300, // the wisps popping up before the first eruption
@@ -676,7 +676,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // src/floors/cashCannonEvent: the button shoots slugs of cash at wisps
+  // src/crits/animatedCrits/events/cashCannonEvent: the button shoots slugs of cash at wisps
   cashCannonEvent: {
     chance: 0.01,
     leadMs: 250, // the targets popping up before the first shot
@@ -686,7 +686,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // src/floors/hooverEvent: a vacuum wisp slurps up puddles of cash
+  // src/crits/animatedCrits/events/hooverEvent: a vacuum wisp slurps up puddles of cash
   hooverEvent: {
     chance: 0.01,
     gapMs: 110, // between jets
@@ -697,7 +697,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // src/floors/airShowEvent: a V of wisps loops trailing contrails of cash
+  // src/crits/animatedCrits/events/airShowEvent: a V of wisps loops trailing contrails of cash
   airShowEvent: {
     chance: 0.01,
     streamMs: 900, // each contrail pouring
@@ -705,7 +705,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // src/floors/leakEvent: a swelling wisp springs leaks of cash, then bursts
+  // src/crits/animatedCrits/events/leakEvent: a swelling wisp springs leaks of cash, then bursts
   leakEvent: {
     chance: 0.01,
     leadMs: 300, // swelling before the first leak
@@ -715,7 +715,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // src/floors/climbEvent: a river zigzags up a ladder of wisps to the total
+  // src/crits/animatedCrits/events/climbEvent: a river zigzags up a ladder of wisps to the total
   climbEvent: {
     chance: 0.01,
     leadMs: 300, // the ladder popping up before the river
@@ -724,7 +724,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // src/floors/kiteEvent: a kite wisp flies on a string of cash, snaps, dives
+  // src/crits/animatedCrits/events/kiteEvent: a kite wisp flies on a string of cash, snaps, dives
   kiteEvent: {
     chance: 0.01,
     riseMs: 400, // the kite rising off the button
@@ -734,7 +734,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // src/floors/rainbowEvent: a wisp arcs over, laying a rainbow of cash
+  // src/crits/animatedCrits/events/rainbowEvent: a wisp arcs over, laying a rainbow of cash
   rainbowEvent: {
     chance: 0.01,
     streamMs: 900, // the bands pouring
@@ -742,7 +742,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // src/floors/branchesEvent: a wisp splits and splits, branching the cash
+  // src/crits/animatedCrits/events/branchesEvent: a wisp splits and splits, branching the cash
   branchesEvent: {
     chance: 0.01,
     streamMs: 800, // the tree pouring
@@ -750,7 +750,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // src/floors/tugOfWarEvent: two wisps heave a rope of cash till it snaps
+  // src/crits/animatedCrits/events/tugOfWarEvent: two wisps heave a rope of cash till it snaps
   tugOfWarEvent: {
     chance: 0.01,
     fillMs: 350, // the button gushing the rope full
@@ -764,7 +764,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // src/floors/waterwheelEvent: cash pours over a spinning wheel of wisps
+  // src/crits/animatedCrits/events/waterwheelEvent: cash pours over a spinning wheel of wisps
   waterwheelEvent: {
     chance: 0.01,
     streamMs: 1_300, // the falls pouring
@@ -773,7 +773,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // money: src/floors/braidEvent: three rivers braid up into the total
+  // money: src/crits/animatedCrits/events/braidEvent: three rivers braid up into the total
   braidEvent: {
     chance: 0.01,
     streamMs: 1_100, // the strands pouring
@@ -781,7 +781,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money: src/floors/skimEvent: a river skips across the screen like a stone
+  // money: src/crits/animatedCrits/events/skimEvent: a river skips across the screen like a stone
   skimEvent: {
     chance: 0.01,
     streamMs: 700, // the river pouring
@@ -789,7 +789,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // money: src/floors/latticeEvent: diagonal rivers weave a net up the screen
+  // money: src/crits/animatedCrits/events/latticeEvent: diagonal rivers weave a net up the screen
   latticeEvent: {
     chance: 0.01,
     gapMs: 90, // between rivers launching
@@ -798,7 +798,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp: src/floors/fireworksEvent: rocket wisps burst into rings of stars
+  // wisp: src/crits/animatedCrits/events/fireworksEvent: rocket wisps burst into rings of stars
   fireworksEvent: {
     chance: 0.01,
     gapMs: 300, // between launches
@@ -806,7 +806,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // wisp: src/floors/slingshotEvent: a wisp drawn back, banks off two walls
+  // wisp: src/crits/animatedCrits/events/slingshotEvent: a wisp drawn back, banks off two walls
   slingshotEvent: {
     chance: 0.01,
     pullMs: 900, // drawn back
@@ -814,7 +814,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // wisp: src/floors/marqueeEvent: a light chases round a ring of bulb wisps
+  // wisp: src/crits/animatedCrits/events/marqueeEvent: a light chases round a ring of bulb wisps
   marqueeEvent: {
     chance: 0.01,
     chaseMs: 1_300, // the light chasing round, speeding up
@@ -823,7 +823,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix: src/floors/cropDusterEvent: a wisp lays curtains of cash, pass by pass
+  // mix: src/crits/animatedCrits/events/cropDusterEvent: a wisp lays curtains of cash, pass by pass
   cropDusterEvent: {
     chance: 0.01,
     passMs: 420, // each pass across
@@ -834,7 +834,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix: src/floors/bolasEvent: two wisps whirl on a rope of cash
+  // mix: src/crits/animatedCrits/events/bolasEvent: two wisps whirl on a rope of cash
   bolasEvent: {
     chance: 0.01,
     flightMs: 1_700, // the bolas's flight into the total
@@ -842,7 +842,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // experiment: src/floors/countdownEvent: 3, 2, 1, GO! slams, then a geyser
+  // experiment: src/crits/animatedCrits/events/countdownEvent: 3, 2, 1, GO! slams, then a geyser
   countdownEvent: {
     chance: 0.01,
     beatMs: 380, // between slams
@@ -851,14 +851,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // experiment: src/floors/sparklerEvent: the button fizzes glitter, then pops
+  // experiment: src/crits/animatedCrits/events/sparklerEvent: the button fizzes glitter, then pops
   sparklerEvent: {
     chance: 0.01,
     burnMs: 1_500, // the sparkler fizzing
     holdMs: 450,
     mergeMs: 500,
   },
-  // money: src/floors/slinkyEvent: a river coils in loops into the total
+  // money: src/crits/animatedCrits/events/slinkyEvent: a river coils in loops into the total
   slinkyEvent: {
     chance: 0.01,
     streamMs: 1_000, // the river pouring
@@ -866,7 +866,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money: src/floors/pipelineEvent: a river runs right-angle pipes to the total
+  // money: src/crits/animatedCrits/events/pipelineEvent: a river runs right-angle pipes to the total
   pipelineEvent: {
     chance: 0.01,
     streamMs: 900, // the river pouring
@@ -874,7 +874,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // money: src/floors/prismEvent: a beam of cash splits into a fan of rivers
+  // money: src/crits/animatedCrits/events/prismEvent: a beam of cash splits into a fan of rivers
   prismEvent: {
     chance: 0.01,
     streamMs: 900, // the beam pouring
@@ -882,14 +882,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // wisp: src/floors/trampolineEvent: a wisp bounces ever higher into the total
+  // wisp: src/crits/animatedCrits/events/trampolineEvent: a wisp bounces ever higher into the total
   trampolineEvent: {
     chance: 0.01,
     dropMs: 300, // the first drop from the top
     holdMs: 400,
     mergeMs: 500,
   },
-  // wisp: src/floors/hummingbirdEvent: a wisp hovers and darts stop to stop
+  // wisp: src/crits/animatedCrits/events/hummingbirdEvent: a wisp hovers and darts stop to stop
   hummingbirdEvent: {
     chance: 0.01,
     dartMs: 70, // each dart between stops
@@ -897,7 +897,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // wisp: src/floors/diveBombEvent: circling wisps dive-bomb the button
+  // wisp: src/crits/animatedCrits/events/diveBombEvent: circling wisps dive-bomb the button
   diveBombEvent: {
     chance: 0.01,
     circleMs: 650, // the ring circling before the first dive
@@ -906,7 +906,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // mix: src/floors/skiJumpEvent: a wisp skis a river of cash off a jump
+  // mix: src/crits/animatedCrits/events/skiJumpEvent: a wisp skis a river of cash off a jump
   skiJumpEvent: {
     chance: 0.01,
     streamMs: 900, // the river pouring
@@ -914,7 +914,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix: src/floors/jetpackEvent: a wisp rides a jet of cash up into the total
+  // mix: src/crits/animatedCrits/events/jetpackEvent: a wisp rides a jet of cash up into the total
   jetpackEvent: {
     chance: 0.01,
     flyMs: 1_500, // the climb to the total
@@ -923,7 +923,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment: src/floors/bassDropEvent: beats, a snare roll, silence, drop
+  // experiment: src/crits/animatedCrits/events/bassDropEvent: beats, a snare roll, silence, drop
   bassDropEvent: {
     chance: 0.01,
     beatMs: 260, // between the heavy beats (the roll speeds up from half this)
@@ -931,7 +931,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // beam: src/floors/scannerEvent: a scan line reveals cash, then scoops it
+  // beam: src/crits/animatedCrits/events/scannerEvent: a scan line reveals cash, then scoops it
   scannerEvent: {
     chance: 0.01,
     scanMs: 800, // the line sweeping down
@@ -940,7 +940,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam: src/floors/laserGridEvent: lasers build a grid, cash pops along them
+  // beam: src/crits/animatedCrits/events/laserGridEvent: lasers build a grid, cash pops along them
   laserGridEvent: {
     chance: 0.01,
     gapMs: 200, // between lasers
@@ -950,7 +950,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam: src/floors/etchEvent: a beam scrawls a trail of cash that runs home
+  // beam: src/crits/animatedCrits/events/etchEvent: a beam scrawls a trail of cash that runs home
   etchEvent: {
     chance: 0.01,
     etchMs: 1_000, // the beam scrawling
@@ -959,7 +959,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam: src/floors/searchlightsEvent: searchlights catch stashes of cash
+  // beam: src/crits/animatedCrits/events/searchlightsEvent: searchlights catch stashes of cash
   searchlightsEvent: {
     chance: 0.01,
     searchMs: 1_300, // the lights sweeping
@@ -969,7 +969,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // beam: src/floors/tractorBeamEvent: a beam lifts a spiral of cash up
+  // beam: src/crits/animatedCrits/events/tractorBeamEvent: a beam lifts a spiral of cash up
   tractorBeamEvent: {
     chance: 0.01,
     aimMs: 260, // the beam flickering down
@@ -979,7 +979,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam: src/floors/beamClashEvent: two beams clash, then a geyser of cash
+  // beam: src/crits/animatedCrits/events/beamClashEvent: two beams clash, then a geyser of cash
   beamClashEvent: {
     chance: 0.01,
     aimMs: 250, // the aim lasers flickering
@@ -991,7 +991,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money: src/floors/butterflyEvent: mirrored rivers open into butterfly wings
+  // money: src/crits/animatedCrits/events/butterflyEvent: mirrored rivers open into butterfly wings
   butterflyEvent: {
     chance: 0.01,
     streamMs: 900, // the rivers pouring
@@ -999,7 +999,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money: src/floors/kelpEvent: stalks of cash grow, sway, then lean into the total
+  // money: src/crits/animatedCrits/events/kelpEvent: stalks of cash grow, sway, then lean into the total
   kelpEvent: {
     chance: 0.01,
     growMs: 450, // each stalk growing
@@ -1009,7 +1009,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp: src/floors/pendulumWaveEvent: a row of pendulum wisps swing in waves
+  // wisp: src/crits/animatedCrits/events/pendulumWaveEvent: a row of pendulum wisps swing in waves
   pendulumWaveEvent: {
     chance: 0.01,
     swingMs: 1_400, // swinging
@@ -1017,7 +1017,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // wisp: src/floors/formationEvent: wisps snap through formations, then fire
+  // wisp: src/crits/animatedCrits/events/formationEvent: wisps snap through formations, then fire
   formationEvent: {
     chance: 0.01,
     snapMs: 170, // each snap into a formation
@@ -1026,7 +1026,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // mix: src/floors/ouroborosEvent: a wisp closes a ring of cash, which spins in
+  // mix: src/crits/animatedCrits/events/ouroborosEvent: a wisp closes a ring of cash, which spins in
   ouroborosEvent: {
     chance: 0.01,
     ringMs: 600, // the head running the first lap
@@ -1035,7 +1035,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix: src/floors/bowstringEvent: a wisp arrow drawn on a string of cash
+  // mix: src/crits/animatedCrits/events/bowstringEvent: a wisp arrow drawn on a string of cash
   bowstringEvent: {
     chance: 0.01,
     stringMs: 450, // the string of cash forming
@@ -1045,7 +1045,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam: src/floors/superlaserEvent: beams converge, then one colossal shot
+  // beam: src/crits/animatedCrits/events/superlaserEvent: beams converge, then one colossal shot
   superlaserEvent: {
     chance: 0.01,
     aimMs: 250, // the aim lasers flickering
@@ -1056,7 +1056,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam: src/floors/ionStormEvent: beams stab down all over, then the button
+  // beam: src/crits/animatedCrits/events/ionStormEvent: beams stab down all over, then the button
   ionStormEvent: {
     chance: 0.01,
     aimMs: 120, // each aim line flickering before its beam
@@ -1064,14 +1064,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // experiment: src/floors/glitchEvent: the screen glitches, then reboots
+  // experiment: src/crits/animatedCrits/events/glitchEvent: the screen glitches, then reboots
   glitchEvent: {
     chance: 0.01,
     gapsMs: [260, 70] as [number, number], // between glitches, quickening
     holdMs: 450,
     mergeMs: 500,
   },
-  // experiment: src/floors/magnifierEvent: a lens zooms in, cash bursts out
+  // experiment: src/crits/animatedCrits/events/magnifierEvent: a lens zooms in, cash bursts out
   magnifierEvent: {
     chance: 0.01,
     glideMs: 250, // gliding to each stop
@@ -1079,7 +1079,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // money: src/floors/waterShowEvent: fountain jets of cash put on a show
+  // money: src/crits/animatedCrits/events/waterShowEvent: fountain jets of cash put on a show
   waterShowEvent: {
     chance: 0.01,
     actMs: 520, // between acts
@@ -1088,7 +1088,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money: src/floors/mercuryEvent: droplets of cash merge into one blob
+  // money: src/crits/animatedCrits/events/mercuryEvent: droplets of cash merge into one blob
   mercuryEvent: {
     chance: 0.01,
     spillMs: 380, // the droplets splashing out
@@ -1098,7 +1098,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp: src/floors/alignmentEvent: orbiting wisps line up, then fire
+  // wisp: src/crits/animatedCrits/events/alignmentEvent: orbiting wisps line up, then fire
   alignmentEvent: {
     chance: 0.01,
     orbitMs: 1_500, // circling until they line up
@@ -1107,7 +1107,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // wisp: src/floors/dandelionEvent: a puff of seed wisps blown into the total
+  // wisp: src/crits/animatedCrits/events/dandelionEvent: a puff of seed wisps blown into the total
   dandelionEvent: {
     chance: 0.01,
     gatherMs: 700, // the puffball swelling
@@ -1116,7 +1116,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // mix: src/floors/bobberEvent: a wisp rides a jet of cash that surges higher
+  // mix: src/crits/animatedCrits/events/bobberEvent: a wisp rides a jet of cash that surges higher
   bobberEvent: {
     chance: 0.01,
     levelMs: 480, // between surges
@@ -1126,7 +1126,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix: src/floors/fishingEvent: a wisp lure cast on a line of cash
+  // mix: src/crits/animatedCrits/events/fishingEvent: a wisp lure cast on a line of cash
   fishingEvent: {
     chance: 0.01,
     castMs: 600, // the cast (and each coin's trip down the line)
@@ -1136,7 +1136,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam: src/floors/scissorsEvent: beams open like scissors up to the total
+  // beam: src/crits/animatedCrits/events/scissorsEvent: beams open like scissors up to the total
   scissorsEvent: {
     chance: 0.01,
     swingMs: 320, // the blades swinging in to cross
@@ -1144,7 +1144,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // beam: src/floors/pulseRifleEvent: the button charges, then fires pulses
+  // beam: src/crits/animatedCrits/events/pulseRifleEvent: the button charges, then fires pulses
   pulseRifleEvent: {
     chance: 0.01,
     chargeMs: 700, // charging
@@ -1154,7 +1154,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // experiment: src/floors/splitEvent: the screen splits open, then slams shut
+  // experiment: src/crits/animatedCrits/events/splitEvent: the screen splits open, then slams shut
   splitEvent: {
     chance: 0.01,
     crackMs: 300, // the crack zipping across
@@ -1164,14 +1164,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // experiment: src/floors/pixelateEvent: the screen pixelates, then snaps back
+  // experiment: src/crits/animatedCrits/events/pixelateEvent: the screen pixelates, then snaps back
   pixelateEvent: {
     chance: 0.01,
     gapsMs: [340, 170] as [number, number], // between beats, quickening
     holdMs: 450,
     mergeMs: 500,
   },
-  // money: src/floors/damBurstEvent: a cliff of cash bursts and floods across
+  // money: src/crits/animatedCrits/events/damBurstEvent: a cliff of cash bursts and floods across
   damBurstEvent: {
     chance: 0.01,
     fillMs: 1_000, // the heap piling up against the dam
@@ -1180,7 +1180,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money: src/floors/spiderwebEvent: spokes, then a spiral, of cash
+  // money: src/crits/animatedCrits/events/spiderwebEvent: spokes, then a spiral, of cash
   spiderwebEvent: {
     chance: 0.01,
     spokeGapMs: 70, // between spokes shooting out
@@ -1191,7 +1191,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money: src/floors/curtainEvent: a curtain of cash drops, opens, flies up
+  // money: src/crits/animatedCrits/events/curtainEvent: a curtain of cash drops, opens, flies up
   curtainEvent: {
     chance: 0.01,
     dropMs: 420, // the curtain dropping
@@ -1202,7 +1202,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp: src/floors/jellyfishEvent: a wisp jellyfish pulses up into the total
+  // wisp: src/crits/animatedCrits/events/jellyfishEvent: a wisp jellyfish pulses up into the total
   jellyfishEvent: {
     chance: 0.01,
     pulseGapsMs: [380, 220] as [number, number], // between pulses, quickening
@@ -1210,7 +1210,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // wisp: src/floors/polarityEvent: a swarm snaps between two poles
+  // wisp: src/crits/animatedCrits/events/polarityEvent: a swarm snaps between two poles
   polarityEvent: {
     chance: 0.01,
     gatherMs: 320, // the swarm gathering on the first pole
@@ -1220,7 +1220,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // wisp: src/floors/colliderEvent: two wisps race round a ring and collide
+  // wisp: src/crits/animatedCrits/events/colliderEvent: two wisps race round a ring and collide
   colliderEvent: {
     chance: 0.01,
     runMs: 1_400, // racing round the ring
@@ -1229,7 +1229,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // mix: src/floors/sheepdogEvent: a wisp herds a spill of cash into the total
+  // mix: src/crits/animatedCrits/events/sheepdogEvent: a wisp herds a spill of cash into the total
   sheepdogEvent: {
     chance: 0.01,
     spillMs: 380, // the cash spilling out
@@ -1240,7 +1240,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix: src/floors/dragonEvent: a wisp head leads a rippling body of cash
+  // mix: src/crits/animatedCrits/events/dragonEvent: a wisp head leads a rippling body of cash
   dragonEvent: {
     chance: 0.01,
     flightMs: 1_700, // the head's flight into the total
@@ -1248,7 +1248,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam: src/floors/reflectorEvent: a beam bounces mirror to mirror
+  // beam: src/crits/animatedCrits/events/reflectorEvent: a beam bounces mirror to mirror
   reflectorEvent: {
     chance: 0.01,
     popMs: 260, // the mirrors popping up
@@ -1259,7 +1259,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 350,
     mergeMs: 500,
   },
-  // beam: src/floors/cookieCutterEvent: a beam cuts a disc out of the screen
+  // beam: src/crits/animatedCrits/events/cookieCutterEvent: a beam cuts a disc out of the screen
   cookieCutterEvent: {
     chance: 0.01,
     aimMs: 240, // the aim laser flickering
@@ -1268,7 +1268,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // experiment: src/floors/cinematicEvent: letterbox bars and punch-in zooms
+  // experiment: src/crits/animatedCrits/events/cinematicEvent: letterbox bars and punch-in zooms
   cinematicEvent: {
     chance: 0.01,
     barsMs: 180, // the bars slamming in
@@ -1277,14 +1277,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450,
     mergeMs: 500,
   },
-  // experiment: src/floors/negativeEvent: the screen strobes to a negative
+  // experiment: src/crits/animatedCrits/events/negativeEvent: the screen strobes to a negative
   negativeEvent: {
     chance: 0.01,
     gapsMs: [300, 90] as [number, number], // between flips, quickening
     holdMs: 450,
     mergeMs: 500,
   },
-  // beam, levels + worker tiers: src/floors/chainLightningEvent: lightning
+  // beam, levels + worker tiers: src/crits/animatedCrits/events/chainLightningEvent: lightning
   // forks from bar to worker to bar
   chainLightningEvent: {
     chance: 0.01,
@@ -1295,7 +1295,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // beam, worker tiers: src/floors/lockOnEvent: an aim laser locks on and fires
+  // beam, worker tiers: src/crits/animatedCrits/events/lockOnEvent: an aim laser locks on and fires
   lockOnEvent: {
     chance: 0.01,
     huntsMs: [420, 180] as [number, number], // hunting each target, quickening
@@ -1304,7 +1304,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // mix, cash + levels: src/floors/stitchEvent: a river of cash threads the bars
+  // mix, cash + levels: src/crits/animatedCrits/events/stitchEvent: a river of cash threads the bars
   stitchEvent: {
     chance: 0.01,
     travelMs: 1_300, // the needle's run through every bar
@@ -1313,7 +1313,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // money, cash + levels + tier: src/floors/stockpileEvent: cash heaps on bars
+  // money, cash + levels + tier: src/crits/animatedCrits/events/stockpileEvent: cash heaps on bars
   stockpileEvent: {
     chance: 0.01,
     rainMs: 800, // the cash raining down onto the bars
@@ -1324,7 +1324,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, tier + levels: src/floors/spotWeldEvent: two beams weld a bar
+  // beam, tier + levels: src/crits/animatedCrits/events/spotWeldEvent: two beams weld a bar
   spotWeldEvent: {
     chance: 0.01,
     aimMs: 240, // the aim lasers flickering
@@ -1333,7 +1333,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 700,
     mergeMs: 0,
   },
-  // experiment, a surprise reward: src/floors/reelsEvent: the screen spins
+  // experiment, a surprise reward: src/crits/animatedCrits/events/reelsEvent: the screen spins
   // like three slot reels
   reelsEvent: {
     chance: 0.01,
@@ -1342,7 +1342,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 700,
     mergeMs: 500,
   },
-  // money, worker tiers + cash: src/floors/cashShowerEvent: a column of cash
+  // money, worker tiers + cash: src/crits/animatedCrits/events/cashShowerEvent: a column of cash
   // showers down onto worker after worker
   cashShowerEvent: {
     chance: 0.01,
@@ -1352,7 +1352,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // money, cash: src/floors/catherineWheelEvent: the button spins like a
+  // money, cash: src/crits/animatedCrits/events/catherineWheelEvent: the button spins like a
   // firework wheel, spraying four jets of cash into spiral arms
   catherineWheelEvent: {
     chance: 0.01,
@@ -1363,7 +1363,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/multiballEvent: three balls pinball off the bars
+  // wisp, levels: src/crits/animatedCrits/events/multiballEvent: three balls pinball off the bars
   multiballEvent: {
     chance: 0.01,
     playMs: 1_500, // pinballing round the screen
@@ -1372,7 +1372,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 700,
     mergeMs: 0,
   },
-  // money, cash + levels: src/floors/avalancheEvent: a torrent of cash roars
+  // money, cash + levels: src/crits/animatedCrits/events/avalancheEvent: a torrent of cash roars
   // down the screen, burying the bars
   avalancheEvent: {
     chance: 0.01,
@@ -1384,7 +1384,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 200,
     mergeMs: 500,
   },
-  // wisp, worker tiers: src/floors/beehiveEvent: a swarm buzzes worker to worker
+  // wisp, worker tiers: src/crits/animatedCrits/events/beehiveEvent: a swarm buzzes worker to worker
   beehiveEvent: {
     chance: 0.01,
     flightsMs: [360, 200] as [number, number], // swooping to each worker
@@ -1393,7 +1393,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash + levels: src/floors/pogoEvent: a wisp pogos bar to bar on a
+  // mix, cash + levels: src/crits/animatedCrits/events/pogoEvent: a wisp pogos bar to bar on a
   // jet of cash
   pogoEvent: {
     chance: 0.01,
@@ -1402,7 +1402,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/laserHarpEvent: a wisp plucks laser strings
+  // beam, levels: src/crits/animatedCrits/events/laserHarpEvent: a wisp plucks laser strings
   laserHarpEvent: {
     chance: 0.01,
     igniteMs: 300, // the strings shooting up
@@ -1413,7 +1413,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // lightning, levels + tier: src/floors/lichtenbergEvent: a branching tree of
+  // lightning, levels + tier: src/crits/animatedCrits/events/lichtenbergEvent: a branching tree of
   // lightning grows down onto the bars
   lichtenbergEvent: {
     chance: 0.01,
@@ -1423,7 +1423,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // shatter, cash: src/floors/shatterEvent: the screen shatters like glass
+  // shatter, cash: src/crits/animatedCrits/events/shatterEvent: the screen shatters like glass
   shatterEvent: {
     chance: 0.01,
     knocksMs: [180, 520, 820], // each knock, the last shattering it
@@ -1431,7 +1431,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 200,
     mergeMs: 500,
   },
-  // money, cash + levels + tier: src/floors/funnelEvent: cash funnels down
+  // money, cash + levels + tier: src/crits/animatedCrits/events/funnelEvent: cash funnels down
   // into the clicked floor's bar
   funnelEvent: {
     chance: 0.01,
@@ -1441,7 +1441,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/grappleEvent: a wisp swings bar to bar
+  // wisp, levels: src/crits/animatedCrits/events/grappleEvent: a wisp swings bar to bar
   grappleEvent: {
     chance: 0.01,
     swingsMs: [520, 300] as [number, number], // each swing, quickening
@@ -1450,7 +1450,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/surfEvent: a wisp surfs a wave of cash
+  // mix, cash: src/crits/animatedCrits/events/surfEvent: a wisp surfs a wave of cash
   surfEvent: {
     chance: 0.01,
     rollMs: 1_500, // the wave rolling across
@@ -1459,7 +1459,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, worker tiers: src/floors/laserTagEvent: workers tag each other
+  // beam, worker tiers: src/crits/animatedCrits/events/laserTagEvent: workers tag each other
   laserTagEvent: {
     chance: 0.01,
     gapsMs: [260, 110] as [number, number], // between tags, quickening
@@ -1469,7 +1469,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // lightning, levels + worker tiers: src/floors/ballLightningEvent: a ball
+  // lightning, levels + worker tiers: src/crits/animatedCrits/events/ballLightningEvent: a ball
   // of lightning careens round zapping bars and workers
   ballLightningEvent: {
     chance: 0.01,
@@ -1479,7 +1479,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // shatter, levels + tier: src/floors/eventHorizonEvent: the shards are
+  // shatter, levels + tier: src/crits/animatedCrits/events/eventHorizonEvent: the shards are
   // sucked into the clicked floor's bar
   eventHorizonEvent: {
     chance: 0.01,
@@ -1489,7 +1489,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // money, cash + an unlock: src/floors/gusherEvent: a jet of cash fills the
+  // money, cash + an unlock: src/crits/animatedCrits/events/gusherEvent: a jet of cash fills the
   // locked floor
   gusherEvent: {
     chance: 0.01,
@@ -1498,7 +1498,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, cash: src/floors/pinataEvent: wisps whack a swinging wisp piñata
+  // wisp, cash: src/crits/animatedCrits/events/pinataEvent: wisps whack a swinging wisp piñata
   pinataEvent: {
     chance: 0.01,
     dropMs: 280, // the piñata dropping in
@@ -1506,7 +1506,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, worker tiers + cash: src/floors/giftWrapEvent: a ribbon of cash
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/giftWrapEvent: a ribbon of cash
   // loops round the workers
   giftWrapEvent: {
     chance: 0.01,
@@ -1515,7 +1515,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels + tier: src/floors/triangulateEvent: three lasers lock onto bars
+  // beam, levels + tier: src/crits/animatedCrits/events/triangulateEvent: three lasers lock onto bars
   triangulateEvent: {
     chance: 0.01,
     huntsMs: [420, 200] as [number, number], // hunting each bar, quickening
@@ -1524,7 +1524,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // lightning, hires: src/floors/sparkOfLifeEvent: bolts bring new workers to life
+  // lightning, hires: src/crits/animatedCrits/events/sparkOfLifeEvent: bolts bring new workers to life
   sparkOfLifeEvent: {
     chance: 0.01,
     chargeMs: 450, // sparks crackling before the first bolt
@@ -1532,7 +1532,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // shatter, levels: src/floors/glassRainEvent: the shards rain down past the bars
+  // shatter, levels: src/crits/animatedCrits/events/glassRainEvent: the shards rain down past the bars
   glassRainEvent: {
     chance: 0.01,
     knocksMs: [180, 450, 680], // each knock, the last shattering it
@@ -1541,7 +1541,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/foldEvent: the screen folds up like paper
+  // experiment, cash: src/crits/animatedCrits/events/foldEvent: the screen folds up like paper
   foldEvent: {
     chance: 0.01,
     foldMs: 320, // each fold
@@ -1550,7 +1550,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money, hires + cash: src/floors/cocoonEvent: cash whirls into cocoons that
+  // money, hires + cash: src/crits/animatedCrits/events/cocoonEvent: cash whirls into cocoons that
   // burst into new workers
   cocoonEvent: {
     chance: 0.01,
@@ -1561,7 +1561,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/gravityAssistEvent: a wisp slingshots round the bars
+  // wisp, levels: src/crits/animatedCrits/events/gravityAssistEvent: a wisp slingshots round the bars
   gravityAssistEvent: {
     chance: 0.01,
     flightMs: 1_900, // the whole flight, speeding up
@@ -1569,7 +1569,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // mix, cash + levels: src/floors/zipLineEvent: wisps zip down lines of cash
+  // mix, cash + levels: src/crits/animatedCrits/events/zipLineEvent: wisps zip down lines of cash
   // from the total onto the bars
   zipLineEvent: {
     chance: 0.01,
@@ -1578,7 +1578,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, an unlock: src/floors/breachEvent: two beams cut the locked floor open
+  // beam, an unlock: src/crits/animatedCrits/events/breachEvent: two beams cut the locked floor open
   breachEvent: {
     chance: 0.01,
     aimMs: 300, // the aim lasers flickering
@@ -1586,7 +1586,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/stormSurgeEvent: bolts strike a river of cash
+  // lightning, cash: src/crits/animatedCrits/events/stormSurgeEvent: bolts strike a river of cash
   stormSurgeEvent: {
     chance: 0.01,
     streamMs: 1_100, // the river pouring
@@ -1594,7 +1594,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // shatter, cash: src/floors/smashAndGrabEvent: the shards fly into the total
+  // shatter, cash: src/crits/animatedCrits/events/smashAndGrabEvent: the shards fly into the total
   smashAndGrabEvent: {
     chance: 0.01,
     knocksMs: [180, 460, 720], // each knock, the last shattering it
@@ -1603,7 +1603,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, a crit tier: src/floors/shrinkRayEvent: the screen shrinks away
+  // experiment, a crit tier: src/crits/animatedCrits/events/shrinkRayEvent: the screen shrinks away
   shrinkRayEvent: {
     chance: 0.01,
     zapsMs: [250, 580, 860], // each zap
@@ -1612,7 +1612,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // money, worker tiers + cash: src/floors/sandstormEvent: a storm of cash
+  // money, worker tiers + cash: src/crits/animatedCrits/events/sandstormEvent: a storm of cash
   // blows across the screen, over the workers
   sandstormEvent: {
     chance: 0.01,
@@ -1622,7 +1622,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels + a crit tier: src/floors/juggernautEvent: a swelling wisp
+  // wisp, levels + a crit tier: src/crits/animatedCrits/events/juggernautEvent: a swelling wisp
   // careens wall to wall down onto the clicked bar
   juggernautEvent: {
     chance: 0.01,
@@ -1631,7 +1631,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // mix, a crit tier + levels + cash: src/floors/fuelLineEvent: a hose of
+  // mix, a crit tier + levels + cash: src/crits/animatedCrits/events/fuelLineEvent: a hose of
   // cash pumps into the clicked bar
   fuelLineEvent: {
     chance: 0.01,
@@ -1644,7 +1644,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, levels + cash: src/floors/checkoutEvent: a scan beam sweeps each bar
+  // beam, levels + cash: src/crits/animatedCrits/events/checkoutEvent: a scan beam sweeps each bar
   checkoutEvent: {
     chance: 0.01,
     hopMs: 160, // the scanner hopping to its next bar
@@ -1653,7 +1653,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // lightning, an unlock: src/floors/lightningRodEvent: bolts charge the
+  // lightning, an unlock: src/crits/animatedCrits/events/lightningRodEvent: bolts charge the
   // locked floor till it bursts open
   lightningRodEvent: {
     chance: 0.01,
@@ -1662,7 +1662,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/flagEvent: the screen ripples like a flag
+  // experiment, cash: src/crits/animatedCrits/events/flagEvent: the screen ripples like a flag
   flagEvent: {
     chance: 0.01,
     waveMs: 1_900, // the ripple growing, then snapping straight
@@ -1670,7 +1670,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/terracesEvent: cash spills bar to bar
+  // money, levels + cash: src/crits/animatedCrits/events/terracesEvent: cash spills bar to bar
   terracesEvent: {
     chance: 0.01,
     pourMs: 500, // the column from the sky onto the top bar
@@ -1679,7 +1679,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp, an unlock: src/floors/batteringRamEvent: a wisp rams the locked floor
+  // wisp, an unlock: src/crits/animatedCrits/events/batteringRamEvent: a wisp rams the locked floor
   batteringRamEvent: {
     chance: 0.01,
     swoopMs: 350, // swooping in under the floor
@@ -1688,7 +1688,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, levels + a crit tier + cash: src/floors/tetherballEvent: a wisp on a
+  // mix, levels + a crit tier + cash: src/crits/animatedCrits/events/tetherballEvent: a wisp on a
   // rope of cash winds round the clicked bar
   tetherballEvent: {
     chance: 0.01,
@@ -1698,7 +1698,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, free hires: src/floors/projectorEvent: beams project new workers
+  // beam, free hires: src/crits/animatedCrits/events/projectorEvent: beams project new workers
   projectorEvent: {
     chance: 0.01,
     riseMs: 300, // the lens rising off the button
@@ -1707,7 +1707,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // lightning, levels + a crit tier: src/floors/clearEvent: paddles shock the
+  // lightning, levels + a crit tier: src/crits/animatedCrits/events/clearEvent: paddles shock the
   // clicked bar
   clearEvent: {
     chance: 0.01,
@@ -1717,14 +1717,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/infinityMirrorEvent: the screen nests in itself
+  // experiment, cash: src/crits/animatedCrits/events/infinityMirrorEvent: the screen nests in itself
   infinityMirrorEvent: {
     chance: 0.01,
     diveMs: 1_600, // diving in through the copies, speeding up
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/elevatorEvent: a column of cash climbs a
+  // money, levels + cash: src/crits/animatedCrits/events/elevatorEvent: a column of cash climbs a
   // shaft, branching into every bar
   elevatorEvent: {
     chance: 0.01,
@@ -1734,7 +1734,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp, free hires: src/floors/migrationEvent: a V of wisps drops hires
+  // wisp, free hires: src/crits/animatedCrits/events/migrationEvent: a V of wisps drops hires
   migrationEvent: {
     chance: 0.01,
     crossMs: 2_000, // the flock crossing the screen
@@ -1744,7 +1744,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // mix, an unlock + cash: src/floors/corkscrewEvent: a wisp corkscrews up to
+  // mix, an unlock + cash: src/crits/animatedCrits/events/corkscrewEvent: a wisp corkscrews up to
   // the locked floor trailing cash
   corkscrewEvent: {
     chance: 0.01,
@@ -1753,7 +1753,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, worker tiers: src/floors/mirrorBallEvent: wheeling beams over workers
+  // beam, worker tiers: src/crits/animatedCrits/events/mirrorBallEvent: wheeling beams over workers
   mirrorBallEvent: {
     chance: 0.01,
     dropMs: 300, // the ball dropping in
@@ -1761,7 +1761,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/plasmaGlobeEvent: tendrils draw cash into a core
+  // lightning, cash: src/crits/animatedCrits/events/plasmaGlobeEvent: tendrils draw cash into a core
   plasmaGlobeEvent: {
     chance: 0.01,
     writheMs: 1_700, // the tendrils writhing, before they whip onto the total
@@ -1770,14 +1770,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/jellyEvent: the screen wobbles like jelly
+  // experiment, cash: src/crits/animatedCrits/events/jellyEvent: the screen wobbles like jelly
   jellyEvent: {
     chance: 0.01,
     thumpsMs: [150, 550, 850, 1_080], // each thump from the button
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/shockwaveEvent: rings of cash ripple out
+  // money, levels + cash: src/crits/animatedCrits/events/shockwaveEvent: rings of cash ripple out
   // of the button over the bars
   shockwaveEvent: {
     chance: 0.01,
@@ -1788,14 +1788,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker tiers: src/floors/passTheParcelEvent: workers toss a wisp on
+  // wisp, worker tiers: src/crits/animatedCrits/events/passTheParcelEvent: workers toss a wisp on
   passTheParcelEvent: {
     chance: 0.01,
     tossesMs: [420, 200] as [number, number], // each toss, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, free hires + cash: src/floors/gardenHoseEvent: a jet of cash waters
+  // mix, free hires + cash: src/crits/animatedCrits/events/gardenHoseEvent: a jet of cash waters
   // empty spots into new workers
   gardenHoseEvent: {
     chance: 0.01,
@@ -1805,7 +1805,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels + a crit tier: src/floors/burningGlassEvent: focused light
+  // beam, levels + a crit tier: src/crits/animatedCrits/events/burningGlassEvent: focused light
   // scorches the bars and ignites the clicked one
   burningGlassEvent: {
     chance: 0.01,
@@ -1816,7 +1816,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker tiers + levels: src/floors/stormFrontEvent: a wall of
+  // lightning, worker tiers + levels: src/crits/animatedCrits/events/stormFrontEvent: a wall of
   // lightning marches across the screen
   stormFrontEvent: {
     chance: 0.01,
@@ -1825,14 +1825,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/slidePuzzleEvent: the screen as a slide puzzle
+  // experiment, cash: src/crits/animatedCrits/events/slidePuzzleEvent: the screen as a slide puzzle
   slidePuzzleEvent: {
     chance: 0.01,
     slidesMs: [150, 80] as [number, number], // each slide, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + a crit tier + cash: src/floors/whirlpoolEvent: cash
+  // money, levels + a crit tier + cash: src/crits/animatedCrits/events/whirlpoolEvent: cash
   // spirals into the clicked bar
   whirlpoolEvent: {
     chance: 0.01,
@@ -1842,7 +1842,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/satellitesEvent: wisps skim the bars into orbit
+  // wisp, levels: src/crits/animatedCrits/events/satellitesEvent: wisps skim the bars into orbit
   satellitesEvent: {
     chance: 0.01,
     launchGapsMs: [300, 160] as [number, number], // between launches, quickening
@@ -1853,7 +1853,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, worker tiers + cash: src/floors/typewriterEvent: a wisp types rows of
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/typewriterEvent: a wisp types rows of
   // cash through the workers
   typewriterEvent: {
     chance: 0.01,
@@ -1862,7 +1862,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, cash: src/floors/railgunEvent: rails build up and fire a slug of cash
+  // beam, cash: src/crits/animatedCrits/events/railgunEvent: rails build up and fire a slug of cash
   railgunEvent: {
     chance: 0.01,
     buildsMs: [220, 110] as [number, number], // each section, quickening
@@ -1871,7 +1871,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, levels + a crit tier: src/floors/thunderdomeEvent: a cage of
+  // lightning, levels + a crit tier: src/crits/animatedCrits/events/thunderdomeEvent: a cage of
   // lightning snaps shut on the clicked bar
   thunderdomeEvent: {
     chance: 0.01,
@@ -1881,7 +1881,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/meltEvent: the screen melts like wax
+  // experiment, cash: src/crits/animatedCrits/events/meltEvent: the screen melts like wax
   meltEvent: {
     chance: 0.01,
     meltMs: 1_700, // sagging, before it snaps back
@@ -1889,7 +1889,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/floodEvent: a flood of cash rises up the
+  // money, levels + cash: src/crits/animatedCrits/events/floodEvent: a flood of cash rises up the
   // screen over the bars
   floodEvent: {
     chance: 0.01,
@@ -1900,7 +1900,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker tiers + a crit tier: src/floors/piedPiperEvent: a wisp leads
+  // wisp, worker tiers + a crit tier: src/crits/animatedCrits/events/piedPiperEvent: a wisp leads
   // a growing train past the workers into the clicked bar
   piedPiperEvent: {
     chance: 0.01,
@@ -1908,7 +1908,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, an unlock + cash: src/floors/tentaclesEvent: tentacles of cash rip
+  // mix, an unlock + cash: src/crits/animatedCrits/events/tentaclesEvent: tentacles of cash rip
   // the locked floor open
   tentaclesEvent: {
     chance: 0.01,
@@ -1919,7 +1919,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, levels + a crit tier: src/floors/laserPendulumEvent: a swinging
+  // beam, levels + a crit tier: src/crits/animatedCrits/events/laserPendulumEvent: a swinging
   // beam slices the bars
   laserPendulumEvent: {
     chance: 0.01,
@@ -1930,7 +1930,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/electricEelEvent: an eel of cash crackles
+  // lightning, cash: src/crits/animatedCrits/events/electricEelEvent: an eel of cash crackles
   // across the screen
   electricEelEvent: {
     chance: 0.01,
@@ -1940,14 +1940,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 200,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/doubleVisionEvent: the screen seen double
+  // experiment, cash: src/crits/animatedCrits/events/doubleVisionEvent: the screen seen double
   doubleVisionEvent: {
     chance: 0.01,
     lurchesMs: [100, 420, 700, 940, 1_140], // each lurch apart
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/honeyEvent: a thread of cash drizzles
+  // money, levels + cash: src/crits/animatedCrits/events/honeyEvent: a thread of cash drizzles
   // down like honey, coiling into heaps on the bars
   honeyEvent: {
     chance: 0.01,
@@ -1959,7 +1959,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker tiers + a crit tier: src/floors/musicalChairsEvent: wisps race
+  // wisp, worker tiers + a crit tier: src/crits/animatedCrits/events/musicalChairsEvent: wisps race
   // round the workers and scramble for them when the music stops
   musicalChairsEvent: {
     chance: 0.01,
@@ -1969,7 +1969,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, hires + cash: src/floors/bubbleWandEvent: a wisp blows bubbles of
+  // mix, hires + cash: src/crits/animatedCrits/events/bubbleWandEvent: a wisp blows bubbles of
   // cash that pop into new workers
   bubbleWandEvent: {
     chance: 0.01,
@@ -1982,7 +1982,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, cash: src/floors/hyperspaceEvent: stars of light and cash streak out
+  // beam, cash: src/crits/animatedCrits/events/hyperspaceEvent: stars of light and cash streak out
   // at light speed, then snap back and fire into the total
   hyperspaceEvent: {
     chance: 0.01,
@@ -1993,7 +1993,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, levels + a crit tier: src/floors/javelinEvent: bolts hurled
+  // lightning, levels + a crit tier: src/crits/animatedCrits/events/javelinEvent: bolts hurled
   // like javelins stick in the bars, then discharge
   javelinEvent: {
     chance: 0.01,
@@ -2004,7 +2004,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/shuffleEvent: the screen riffled like a deck
+  // experiment, cash: src/crits/animatedCrits/events/shuffleEvent: the screen riffled like a deck
   shuffleEvent: {
     chance: 0.01,
     cutMs: 180, // the halves pulling apart
@@ -2013,7 +2013,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/mushroomCloudEvent: a column of cash
+  // money, levels + cash: src/crits/animatedCrits/events/mushroomCloudEvent: a column of cash
   // billows up into a rolling mushroom cap
   mushroomCloudEvent: {
     chance: 0.01,
@@ -2025,7 +2025,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels + a crit tier: src/floors/relayEvent: wisp runners sprint
+  // wisp, levels + a crit tier: src/crits/animatedCrits/events/relayEvent: wisp runners sprint
   // the bars, passing a baton
   relayEvent: {
     chance: 0.01,
@@ -2035,7 +2035,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, worker tiers: src/floors/laserPointerEvent: wisp kittens chase a
+  // beam, worker tiers: src/crits/animatedCrits/events/laserPointerEvent: wisp kittens chase a
   // laser dot onto the workers
   laserPointerEvent: {
     chance: 0.01,
@@ -2044,7 +2044,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker tiers + levels + a crit tier: src/floors/stormChaserEvent:
+  // lightning, worker tiers + levels + a crit tier: src/crits/animatedCrits/events/stormChaserEvent:
   // bolts crack down on a fleeing wisp's heels
   stormChaserEvent: {
     chance: 0.01,
@@ -2053,7 +2053,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/baitBallEvent: wisp hunters slash through a milling
+  // mix, cash: src/crits/animatedCrits/events/baitBallEvent: wisp hunters slash through a milling
   // shoal of cash
   baitBallEvent: {
     chance: 0.01,
@@ -2064,7 +2064,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/videoWallEvent: the screen tiled into a wall
+  // experiment, cash: src/crits/animatedCrits/events/videoWallEvent: the screen tiled into a wall
   // of copies of itself
   videoWallEvent: {
     chance: 0.01,
@@ -2073,7 +2073,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/ferrofluidEvent: a pool of cash bristles
+  // money, levels + cash: src/crits/animatedCrits/events/ferrofluidEvent: a pool of cash bristles
   // into spikes that stab up into the bars
   ferrofluidEvent: {
     chance: 0.01,
@@ -2086,7 +2086,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker tiers: src/floors/hideAndSeekEvent: wisps hide behind the
+  // wisp, worker tiers: src/crits/animatedCrits/events/hideAndSeekEvent: wisps hide behind the
   // workers and a seeker hunts them down
   hideAndSeekEvent: {
     chance: 0.01,
@@ -2096,7 +2096,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/magicCarpetEvent: a wisp rides a rippling carpet of
+  // mix, cash: src/crits/animatedCrits/events/magicCarpetEvent: a wisp rides a rippling carpet of
   // cash round the screen
   magicCarpetEvent: {
     chance: 0.01,
@@ -2106,7 +2106,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/spirographEvent: a beam strung between two
+  // beam, levels: src/crits/animatedCrits/events/spirographEvent: a beam strung between two
   // whirling wisps traces a rosette
   spirographEvent: {
     chance: 0.01,
@@ -2117,7 +2117,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker tiers + levels + a crit tier: src/floors/electricNetEvent:
+  // lightning, worker tiers + levels + a crit tier: src/crits/animatedCrits/events/electricNetEvent:
   // a net of lightning drops over the screen and cinches on the clicked bar
   electricNetEvent: {
     chance: 0.01,
@@ -2127,7 +2127,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, an unlock: src/floors/demolitionEvent: bomb wisps on the
+  // explosion, an unlock: src/crits/animatedCrits/events/demolitionEvent: bomb wisps on the
   // locked floor's corners blow it open
   demolitionEvent: {
     chance: 0.01,
@@ -2138,7 +2138,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 0,
   },
-  // gunfire, hires: src/floors/shootingGalleryEvent: a gun shoots down
+  // gunfire, hires: src/crits/animatedCrits/events/shootingGalleryEvent: a gun shoots down
   // sliding targets over the empty spots
   shootingGalleryEvent: {
     chance: 0.01,
@@ -2147,7 +2147,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/collapseEvent: the screen's storeys collapse
+  // experiment, cash: src/crits/animatedCrits/events/collapseEvent: the screen's storeys collapse
   // into a heap and spring back
   collapseEvent: {
     chance: 0.01,
@@ -2157,7 +2157,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/volcanoEvent: the button erupts a fountain of
+  // money, cash: src/crits/animatedCrits/events/volcanoEvent: the button erupts a fountain of
   // cash and lobs lava bombs of it across the screen
   volcanoEvent: {
     chance: 0.01,
@@ -2168,7 +2168,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, hires: src/floors/skydiversEvent: wisps free-fall into a ring, then
+  // wisp, hires: src/crits/animatedCrits/events/skydiversEvent: wisps free-fall into a ring, then
   // break off and parachute onto empty spots
   skydiversEvent: {
     chance: 0.01,
@@ -2179,7 +2179,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/speedboatEvent: a wisp speedboat carves S-turns
+  // mix, cash: src/crits/animatedCrits/events/speedboatEvent: a wisp speedboat carves S-turns
   // trailing a V-shaped wake of cash
   speedboatEvent: {
     chance: 0.01,
@@ -2188,7 +2188,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels + a crit tier: src/floors/peacockEvent: a fan of beams
+  // beam, levels + a crit tier: src/crits/animatedCrits/events/peacockEvent: a fan of beams
   // unfurls from the button and snaps shut on the clicked bar
   peacockEvent: {
     chance: 0.01,
@@ -2200,7 +2200,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, crit tiers: src/floors/stormWingsEvent: a wisp on wings of
+  // lightning, crit tiers: src/crits/animatedCrits/events/stormWingsEvent: a wisp on wings of
   // lightning beats bolts down onto the bars
   stormWingsEvent: {
     chance: 0.01,
@@ -2209,7 +2209,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, worker tiers: src/floors/clusterBombEvent: a bomb bursts into
+  // explosion, worker tiers: src/crits/animatedCrits/events/clusterBombEvent: a bomb bursts into
   // bomblets that blow up on the workers
   clusterBombEvent: {
     chance: 0.01,
@@ -2219,7 +2219,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/strafingRunEvent: a gunship rakes the bars
+  // gunfire, levels: src/crits/animatedCrits/events/strafingRunEvent: a gunship rakes the bars
   // with wisp bullets pass after pass
   strafingRunEvent: {
     chance: 0.01,
@@ -2229,7 +2229,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/stainedGlassEvent: the screen turns into a
+  // experiment, cash: src/crits/animatedCrits/events/stainedGlassEvent: the screen turns into a
   // stained-glass window that light floods through
   stainedGlassEvent: {
     chance: 0.01,
@@ -2239,7 +2239,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/uprisingEvent: walls of cash climb the
+  // money, levels + cash: src/crits/animatedCrits/events/uprisingEvent: walls of cash climb the
   // screen's sides and crash together at the top
   uprisingEvent: {
     chance: 0.01,
@@ -2250,7 +2250,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker tiers: src/floors/swingRideEvent: riders whirl out on a
+  // wisp, worker tiers: src/crits/animatedCrits/events/swingRideEvent: riders whirl out on a
   // swing ride and are flung onto the workers
   swingRideEvent: {
     chance: 0.01,
@@ -2260,7 +2260,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/lawnmowerEvent: a wisp mows stripes of cash across
+  // mix, cash: src/crits/animatedCrits/events/lawnmowerEvent: a wisp mows stripes of cash across
   // the screen
   lawnmowerEvent: {
     chance: 0.01,
@@ -2271,7 +2271,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, cash: src/floors/lightShowEvent: emitters along the bottom put on a
+  // beam, cash: src/crits/animatedCrits/events/lightShowEvent: emitters along the bottom put on a
   // concert laser show
   lightShowEvent: {
     chance: 0.01,
@@ -2280,7 +2280,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, levels + a crit tier: src/floors/bugZapperEvent: the clicked
+  // lightning, levels + a crit tier: src/crits/animatedCrits/events/bugZapperEvent: the clicked
   // bar zaps wisp bugs that fly near it
   bugZapperEvent: {
     chance: 0.01,
@@ -2290,7 +2290,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, an unlock: src/floors/firecrackersEvent: a string of
+  // explosion, an unlock: src/crits/animatedCrits/events/firecrackersEvent: a string of
   // firecrackers pops up the screen to a banger on the locked floor
   firecrackersEvent: {
     chance: 0.01,
@@ -2299,7 +2299,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 0,
   },
-  // gunfire, hires: src/floors/sixShooterEvent: ricochet shots onto empty
+  // gunfire, hires: src/crits/animatedCrits/events/sixShooterEvent: ricochet shots onto empty
   // spots, each a new worker
   sixShooterEvent: {
     chance: 0.01,
@@ -2308,7 +2308,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/thermalEvent: the screen seen through a
+  // experiment, cash: src/crits/animatedCrits/events/thermalEvent: the screen seen through a
   // thermal camera
   thermalEvent: {
     chance: 0.01,
@@ -2318,7 +2318,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/stalactitesEvent: cash drips into
+  // money, levels + cash: src/crits/animatedCrits/events/stalactitesEvent: cash drips into
   // stalactites that break off onto the bars
   stalactitesEvent: {
     chance: 0.01,
@@ -2330,7 +2330,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/kintsugiEvent: cracks across the bars
+  // money, levels + cash: src/crits/animatedCrits/events/kintsugiEvent: cracks across the bars
   // fill with gold
   kintsugiEvent: {
     chance: 0.01,
@@ -2341,7 +2341,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/galaxyEvent: cash swirls into a spiral galaxy
+  // money, cash: src/crits/animatedCrits/events/galaxyEvent: cash swirls into a spiral galaxy
   galaxyEvent: {
     chance: 0.01,
     formMs: 600, // the arms forming
@@ -2350,7 +2350,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/snowdriftEvent: cash drifts pile up on
+  // money, levels + cash: src/crits/animatedCrits/events/snowdriftEvent: cash drifts pile up on
   // the bars
   snowdriftEvent: {
     chance: 0.01,
@@ -2362,7 +2362,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels + a crit tier: src/floors/snowballEvent: a snowballing wisp
+  // wisp, levels + a crit tier: src/crits/animatedCrits/events/snowballEvent: a snowballing wisp
   // rolls down over the bars
   snowballEvent: {
     chance: 0.01,
@@ -2372,7 +2372,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/cartwheelEvent: a wheel of wisps cartwheels
+  // wisp, cash: src/crits/animatedCrits/events/cartwheelEvent: a wheel of wisps cartwheels
   // across the screen
   cartwheelEvent: {
     chance: 0.01,
@@ -2380,7 +2380,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, hires: src/floors/matryoshkaEvent: a nesting doll wisp opens doll
+  // wisp, hires: src/crits/animatedCrits/events/matryoshkaEvent: a nesting doll wisp opens doll
   // after doll onto empty spots
   matryoshkaEvent: {
     chance: 0.01,
@@ -2390,7 +2390,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, hires + cash: src/floors/salmonRunEvent: wisps leap up a river of
+  // mix, hires + cash: src/crits/animatedCrits/events/salmonRunEvent: wisps leap up a river of
   // cash like salmon
   salmonRunEvent: {
     chance: 0.01,
@@ -2402,7 +2402,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, levels + cash: src/floors/moonTideEvent: a moon wisp pulls a tide
+  // mix, levels + cash: src/crits/animatedCrits/events/moonTideEvent: a moon wisp pulls a tide
   // of cash up the screen
   moonTideEvent: {
     chance: 0.01,
@@ -2413,7 +2413,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/candyFlossEvent: a wisp spins cash into candy floss
+  // mix, cash: src/crits/animatedCrits/events/candyFlossEvent: a wisp spins cash into candy floss
   candyFlossEvent: {
     chance: 0.01,
     riseMs: 400, // the wisp rising
@@ -2422,7 +2422,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, a crit tier + cash: src/floors/figureSkaterEvent: a skater wisp
+  // mix, a crit tier + cash: src/crits/animatedCrits/events/figureSkaterEvent: a skater wisp
   // carves cash across the screen
   figureSkaterEvent: {
     chance: 0.01,
@@ -2433,7 +2433,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, cash: src/floors/tripwireEvent: a thief wisp hops between laser
+  // beam, cash: src/crits/animatedCrits/events/tripwireEvent: a thief wisp hops between laser
   // tripwires, grabbing stashes
   tripwireEvent: {
     chance: 0.01,
@@ -2444,7 +2444,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/sunriseEvent: a sun wisp rises and its rays
+  // beam, levels: src/crits/animatedCrits/events/sunriseEvent: a sun wisp rises and its rays
   // blaze across the bars
   sunriseEvent: {
     chance: 0.01,
@@ -2454,7 +2454,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/rallyEvent: a beam traces a rally chart, then
+  // beam, cash: src/crits/animatedCrits/events/rallyEvent: a beam traces a rally chart, then
   // rockets into the total
   rallyEvent: {
     chance: 0.01,
@@ -2463,7 +2463,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, levels + a crit tier: src/floors/ignitionEvent: sparks crack
+  // lightning, levels + a crit tier: src/crits/animatedCrits/events/ignitionEvent: sparks crack
   // across the bars like ignition
   ignitionEvent: {
     chance: 0.01,
@@ -2473,7 +2473,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker tiers: src/floors/tridentEvent: three-pronged bolts
+  // lightning, worker tiers: src/crits/animatedCrits/events/tridentEvent: three-pronged bolts
   // fork onto the workers
   tridentEvent: {
     chance: 0.01,
@@ -2481,7 +2481,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/crawlEvent: lightning crawls along the
+  // lightning, levels: src/crits/animatedCrits/events/crawlEvent: lightning crawls along the
   // bars
   crawlEvent: {
     chance: 0.01,
@@ -2490,7 +2490,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/carpetBombingEvent: a bomber drops a stick
+  // explosion, cash: src/crits/animatedCrits/events/carpetBombingEvent: a bomber drops a stick
   // of bombs across the screen
   carpetBombingEvent: {
     chance: 0.01,
@@ -2499,7 +2499,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, levels: src/floors/timeBombEvent: a ticking bomb pumps the
+  // explosion, levels: src/crits/animatedCrits/events/timeBombEvent: a ticking bomb pumps the
   // bars with every tick
   timeBombEvent: {
     chance: 0.01,
@@ -2509,7 +2509,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels + cash: src/floors/bunkerBusterEvent: a bomb punches
+  // explosion, levels + cash: src/crits/animatedCrits/events/bunkerBusterEvent: a bomb punches
   // down through the bars
   bunkerBusterEvent: {
     chance: 0.01,
@@ -2519,7 +2519,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, hires: src/floors/grenadeTossEvent: bouncing grenades blow
+  // explosion, hires: src/crits/animatedCrits/events/grenadeTossEvent: bouncing grenades blow
   // new workers onto empty spots
   grenadeTossEvent: {
     chance: 0.01,
@@ -2528,7 +2528,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/depthChargesEvent: charges blow geysers out
+  // explosion, cash: src/crits/animatedCrits/events/depthChargesEvent: charges blow geysers out
   // of a pool of cash
   depthChargesEvent: {
     chance: 0.01,
@@ -2539,7 +2539,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, levels: src/floors/firingSquadEvent: a line of gunmen fires
+  // gunfire, levels: src/crits/animatedCrits/events/firingSquadEvent: a line of gunmen fires
   // volleys into the bars
   firingSquadEvent: {
     chance: 0.01,
@@ -2549,7 +2549,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, crit tiers: src/floors/akimboEvent: two guns on the screen's
+  // gunfire, crit tiers: src/crits/animatedCrits/events/akimboEvent: two guns on the screen's
   // sides fire bursts across the bars
   akimboEvent: {
     chance: 0.01,
@@ -2558,7 +2558,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/flakBarrageEvent: guns along the bottom fill
+  // gunfire, cash: src/crits/animatedCrits/events/flakBarrageEvent: guns along the bottom fill
   // the sky with flak bursts of cash
   flakBarrageEvent: {
     chance: 0.01,
@@ -2568,7 +2568,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, an unlock: src/floors/sniperNestEvent: a sniper's crack shots
+  // gunfire, an unlock: src/crits/animatedCrits/events/sniperNestEvent: a sniper's crack shots
   // blow open the locked floor
   sniperNestEvent: {
     chance: 0.01,
@@ -2578,7 +2578,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/rewindEvent: the cash runs backwards into
+  // experiment, cash: src/crits/animatedCrits/events/rewindEvent: the cash runs backwards into
   // the button, then plays back out
   rewindEvent: {
     chance: 0.01,
@@ -2589,7 +2589,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, crit tiers: src/floors/morseCodeEvent: the button blinks
+  // experiment, crit tiers: src/crits/animatedCrits/events/morseCodeEvent: the button blinks
   // morse at the bars
   morseCodeEvent: {
     chance: 0.01,
@@ -2598,7 +2598,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker tiers: src/floors/stadiumWaveEvent: a stadium wave
+  // experiment, worker tiers: src/crits/animatedCrits/events/stadiumWaveEvent: a stadium wave
   // rolls over the workers
   stadiumWaveEvent: {
     chance: 0.01,
@@ -2608,7 +2608,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, hires: src/floors/knightsTourEvent: a knight wisp hops in Ls
+  // experiment, hires: src/crits/animatedCrits/events/knightsTourEvent: a knight wisp hops in Ls
   // onto empty spots
   knightsTourEvent: {
     chance: 0.01,
@@ -2616,7 +2616,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // money, cash: src/floors/lavaLampEvent: blobs of cash rise like lava-lamp wax
+  // money, cash: src/crits/animatedCrits/events/lavaLampEvent: blobs of cash rise like lava-lamp wax
   lavaLampEvent: {
     chance: 0.01,
     pourMs: 400, // the blobs pouring in
@@ -2627,7 +2627,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/dominoesEvent: a domino run of coins
+  // money, levels + cash: src/crits/animatedCrits/events/dominoesEvent: a domino run of coins
   // topples along the bars
   dominoesEvent: {
     chance: 0.01,
@@ -2638,7 +2638,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/inkblotEvent: mirrored blots of cash, folded shut
+  // money, cash: src/crits/animatedCrits/events/inkblotEvent: mirrored blots of cash, folded shut
   inkblotEvent: {
     chance: 0.01,
     gapsMs: [220, 90] as [number, number], // between blots, quickening
@@ -2648,7 +2648,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/softServeEvent: cash piped into a soft-serve swirl
+  // money, cash: src/crits/animatedCrits/events/softServeEvent: cash piped into a soft-serve swirl
   softServeEvent: {
     chance: 0.01,
     pipeMs: 1_300, // the swirl piped, quickening
@@ -2656,7 +2656,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/dollarSignEvent: cash writes a giant dollar sign
+  // money, cash: src/crits/animatedCrits/events/dollarSignEvent: cash writes a giant dollar sign
   dollarSignEvent: {
     chance: 0.01,
     writeMs: 700, // the sign written
@@ -2665,7 +2665,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/mobiusEvent: a turning Möbius strip of cash
+  // money, cash: src/crits/animatedCrits/events/mobiusEvent: a turning Möbius strip of cash
   mobiusEvent: {
     chance: 0.01,
     formMs: 500, // the band forming
@@ -2674,7 +2674,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/swissRollEvent: a sheet of cash rolls up
+  // money, levels + cash: src/crits/animatedCrits/events/swissRollEvent: a sheet of cash rolls up
   // the screen over the bars
   swissRollEvent: {
     chance: 0.01,
@@ -2685,7 +2685,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, cash: src/floors/dodgeballEvent: two teams of wisps hurl balls
+  // wisp, cash: src/crits/animatedCrits/events/dodgeballEvent: two teams of wisps hurl balls
   dodgeballEvent: {
     chance: 0.01,
     lineUpMs: 300, // the teams lining up
@@ -2694,7 +2694,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, hires: src/floors/congaLineEvent: a conga line drops dancers onto
+  // wisp, hires: src/crits/animatedCrits/events/congaLineEvent: a conga line drops dancers onto
   // empty spots
   congaLineEvent: {
     chance: 0.01,
@@ -2702,7 +2702,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, levels: src/floors/spinningTopEvent: a spinning top grinds over the
+  // wisp, levels: src/crits/animatedCrits/events/spinningTopEvent: a spinning top grinds over the
   // bars
   spinningTopEvent: {
     chance: 0.01,
@@ -2712,14 +2712,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/gobblerEvent: a chomper gobbles rows of pellets
+  // wisp, cash: src/crits/animatedCrits/events/gobblerEvent: a chomper gobbles rows of pellets
   gobblerEvent: {
     chance: 0.01,
     runMs: 2_000, // the gobble along every row, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, crit tiers: src/floors/majoretteEvent: a twirling baton lands on
+  // wisp, crit tiers: src/crits/animatedCrits/events/majoretteEvent: a twirling baton lands on
   // the bars
   majoretteEvent: {
     chance: 0.01,
@@ -2727,7 +2727,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, worker tiers: src/floors/hulaHoopEvent: a hoop of wisps whirls
+  // wisp, worker tiers: src/crits/animatedCrits/events/hulaHoopEvent: a hoop of wisps whirls
   // round the workers
   hulaHoopEvent: {
     chance: 0.01,
@@ -2737,7 +2737,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/calligraphyEvent: a brush wisp paints strokes of cash
+  // mix, cash: src/crits/animatedCrits/events/calligraphyEvent: a brush wisp paints strokes of cash
   calligraphyEvent: {
     chance: 0.01,
     strokesMs: [420, 300] as [number, number], // each stroke, quickening
@@ -2745,7 +2745,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, worker tiers + cash: src/floors/snakeCharmerEvent: a cobra of cash
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/snakeCharmerEvent: a cobra of cash
   // strikes the workers
   snakeCharmerEvent: {
     chance: 0.01,
@@ -2755,7 +2755,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, levels + cash: src/floors/plateSpinnerEvent: plates of cash spin
+  // mix, levels + cash: src/crits/animatedCrits/events/plateSpinnerEvent: plates of cash spin
   // over the bars
   plateSpinnerEvent: {
     chance: 0.01,
@@ -2767,7 +2767,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, hires + cash: src/floors/ferrisWheelEvent: a Ferris wheel of cash
+  // mix, hires + cash: src/crits/animatedCrits/events/ferrisWheelEvent: a Ferris wheel of cash
   // drops its cars onto empty spots
   ferrisWheelEvent: {
     chance: 0.01,
@@ -2778,7 +2778,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/bucketBrigadeEvent: wisps pass loads of cash up to
+  // mix, cash: src/crits/animatedCrits/events/bucketBrigadeEvent: wisps pass loads of cash up to
   // the total
   bucketBrigadeEvent: {
     chance: 0.01,
@@ -2788,7 +2788,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, an unlock + cash: src/floors/skyLanternsEvent: lanterns carry
+  // mix, an unlock + cash: src/crits/animatedCrits/events/skyLanternsEvent: lanterns carry
   // strings of cash up to the locked floor
   skyLanternsEvent: {
     chance: 0.01,
@@ -2798,7 +2798,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/engraverEvent: a laser engraver rasters the
+  // beam, crit tiers: src/crits/animatedCrits/events/engraverEvent: a laser engraver rasters the
   // bars
   engraverEvent: {
     chance: 0.01,
@@ -2807,7 +2807,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, hires: src/floors/xRayEvent: an X-ray sheet of light reveals new
+  // beam, hires: src/crits/animatedCrits/events/xRayEvent: an X-ray sheet of light reveals new
   // workers
   xRayEvent: {
     chance: 0.01,
@@ -2816,7 +2816,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, worker tiers: src/floors/laserLassoEvent: a loop of light lassoes
+  // beam, worker tiers: src/crits/animatedCrits/events/laserLassoEvent: a loop of light lassoes
   // the workers
   laserLassoEvent: {
     chance: 0.01,
@@ -2825,7 +2825,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/hexRingEvent: a hexagon of beams snaps tighter
+  // beam, cash: src/crits/animatedCrits/events/hexRingEvent: a hexagon of beams snaps tighter
   hexRingEvent: {
     chance: 0.01,
     formMs: 400, // the corners flying out
@@ -2834,7 +2834,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/portcullisEvent: a gate of light slams down
+  // beam, levels: src/crits/animatedCrits/events/portcullisEvent: a gate of light slams down
   portcullisEvent: {
     chance: 0.01,
     postsMs: [150, 70] as [number, number], // between posts, quickening
@@ -2843,7 +2843,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, an unlock: src/floors/keyholeEvent: a beam burns a keyhole into the
+  // beam, an unlock: src/crits/animatedCrits/events/keyholeEvent: a beam burns a keyhole into the
   // locked floor
   keyholeEvent: {
     chance: 0.01,
@@ -2854,7 +2854,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 0,
   },
-  // lightning, worker tiers: src/floors/defibrillatorEvent: paddles shock
+  // lightning, worker tiers: src/crits/animatedCrits/events/defibrillatorEvent: paddles shock
   // the workers
   defibrillatorEvent: {
     chance: 0.01,
@@ -2863,7 +2863,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/circuitBoardEvent: sparks race along
+  // lightning, levels: src/crits/animatedCrits/events/circuitBoardEvent: sparks race along
   // circuit traces to the bars
   circuitBoardEvent: {
     chance: 0.01,
@@ -2872,7 +2872,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, crit tiers: src/floors/mjolnirEvent: a charged hammer smashes
+  // lightning, crit tiers: src/crits/animatedCrits/events/mjolnirEvent: a charged hammer smashes
   // the bars
   mjolnirEvent: {
     chance: 0.01,
@@ -2880,7 +2880,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/arcFlashEvent: bolts arc between scattered
+  // lightning, cash: src/crits/animatedCrits/events/arcFlashEvent: bolts arc between scattered
   // wisps
   arcFlashEvent: {
     chance: 0.01,
@@ -2890,7 +2890,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, an unlock: src/floors/fourCornersEvent: an X of lightning is
+  // lightning, an unlock: src/crits/animatedCrits/events/fourCornersEvent: an X of lightning is
   // dragged up onto the locked floor
   fourCornersEvent: {
     chance: 0.01,
@@ -2900,7 +2900,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 0,
   },
-  // lightning, hires: src/floors/boltWheelEvent: a wheel of lightning spokes
+  // lightning, hires: src/crits/animatedCrits/events/boltWheelEvent: a wheel of lightning spokes
   // strikes empty spots
   boltWheelEvent: {
     chance: 0.01,
@@ -2909,7 +2909,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/minefieldEvent: a runner trips mines along
+  // explosion, levels: src/crits/animatedCrits/events/minefieldEvent: a runner trips mines along
   // the bars
   minefieldEvent: {
     chance: 0.01,
@@ -2919,7 +2919,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, crit tiers: src/floors/cannonadeEvent: a cannon shells the bars
+  // explosion, crit tiers: src/crits/animatedCrits/events/cannonadeEvent: a cannon shells the bars
   cannonadeEvent: {
     chance: 0.01,
     rollMs: 300, // the cannon rolling out
@@ -2928,7 +2928,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, worker tiers: src/floors/stickyBombsEvent: bombs stuck on the
+  // explosion, worker tiers: src/crits/animatedCrits/events/stickyBombsEvent: bombs stuck on the
   // workers go off in a chain
   stickyBombsEvent: {
     chance: 0.01,
@@ -2939,7 +2939,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, hires: src/floors/crossblastEvent: bombs blow crosses of blasts
+  // explosion, hires: src/crits/animatedCrits/events/crossblastEvent: bombs blow crosses of blasts
   // onto empty spots
   crossblastEvent: {
     chance: 0.01,
@@ -2949,7 +2949,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/mortarEvent: a walking mortar barrage
+  // explosion, cash: src/crits/animatedCrits/events/mortarEvent: a walking mortar barrage
   mortarEvent: {
     chance: 0.01,
     gapsMs: [200, 90] as [number, number], // between shells, quickening
@@ -2959,7 +2959,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, an unlock: src/floors/flashbangEvent: flashbangs white out the
+  // explosion, an unlock: src/crits/animatedCrits/events/flashbangEvent: flashbangs white out the
   // screen and blow the locked floor open
   flashbangEvent: {
     chance: 0.01,
@@ -2968,7 +2968,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/sentryTurretEvent: a turret swings and fires
+  // gunfire, levels: src/crits/animatedCrits/events/sentryTurretEvent: a turret swings and fires
   // bursts into the bars
   sentryTurretEvent: {
     chance: 0.01,
@@ -2978,7 +2978,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker tiers: src/floors/shotgunEvent: a pump shotgun blasts the
+  // gunfire, worker tiers: src/crits/animatedCrits/events/shotgunEvent: a pump shotgun blasts the
   // workers
   shotgunEvent: {
     chance: 0.01,
@@ -2987,7 +2987,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/bossFightEvent: a fighter shoots down a boss
+  // gunfire, cash: src/crits/animatedCrits/events/bossFightEvent: a fighter shoots down a boss
   bossFightEvent: {
     chance: 0.01,
     enterMs: 400, // the boss and fighter arriving
@@ -2995,7 +2995,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, hires: src/floors/gunshipEvent: a circling gunship shoots new
+  // gunfire, hires: src/crits/animatedCrits/events/gunshipEvent: a circling gunship shoots new
   // workers onto empty spots
   gunshipEvent: {
     chance: 0.01,
@@ -3004,7 +3004,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, crit tiers: src/floors/bulletTimeEvent: a volley freezes in the
+  // gunfire, crit tiers: src/crits/animatedCrits/events/bulletTimeEvent: a volley freezes in the
   // air, then slams into the bars
   bulletTimeEvent: {
     chance: 0.01,
@@ -3014,7 +3014,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, an unlock: src/floors/flechettesEvent: shells burst into hails
+  // gunfire, an unlock: src/crits/animatedCrits/events/flechettesEvent: shells burst into hails
   // of darts on the locked floor
   flechettesEvent: {
     chance: 0.01,
@@ -3023,7 +3023,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 0,
   },
-  // experiment, worker tiers: src/floors/radarEvent: a radar sweep pings the
+  // experiment, worker tiers: src/crits/animatedCrits/events/radarEvent: a radar sweep pings the
   // workers
   radarEvent: {
     chance: 0.01,
@@ -3032,7 +3032,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/bingoEvent: a bingo card daubed to a full row
+  // experiment, cash: src/crits/animatedCrits/events/bingoEvent: a bingo card daubed to a full row
   bingoEvent: {
     chance: 0.01,
     spreadMs: 400, // the card spreading
@@ -3040,7 +3040,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, hires + cash: src/floors/laneHopperEvent: a frog wisp hops
+  // experiment, hires + cash: src/crits/animatedCrits/events/laneHopperEvent: a frog wisp hops
   // across lanes of cash traffic
   laneHopperEvent: {
     chance: 0.01,
@@ -3048,7 +3048,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, crit tiers: src/floors/simonSaysEvent: four pads flash out a
+  // experiment, crit tiers: src/crits/animatedCrits/events/simonSaysEvent: four pads flash out a
   // memory game
   simonSaysEvent: {
     chance: 0.01,
@@ -3058,7 +3058,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, levels: src/floors/equalizerEvent: equalizer columns leap to
+  // experiment, levels: src/crits/animatedCrits/events/equalizerEvent: equalizer columns leap to
   // the bars
   equalizerEvent: {
     chance: 0.01,
@@ -3068,7 +3068,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/loadingBarEvent: a loading bar fills with cash
+  // experiment, cash: src/crits/animatedCrits/events/loadingBarEvent: a loading bar fills with cash
   loadingBarEvent: {
     chance: 0.01,
     frameMs: 350, // the frame drawing itself
@@ -3077,7 +3077,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, levels: src/floors/diceRollEvent: dice of wisp pips roll, then
+  // experiment, levels: src/crits/animatedCrits/events/diceRollEvent: dice of wisp pips roll, then
   // every pip lands on a bar
   diceRollEvent: {
     chance: 0.01,
@@ -3089,7 +3089,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // money, cash: src/floors/mandalaEvent: cash blooms into a sand mandala
+  // money, cash: src/crits/animatedCrits/events/mandalaEvent: cash blooms into a sand mandala
   mandalaEvent: {
     chance: 0.01,
     gapsMs: [180, 80] as [number, number], // between rings, quickening
@@ -3099,7 +3099,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/zenGardenEvent: cash raked round the bars
+  // money, levels + cash: src/crits/animatedCrits/events/zenGardenEvent: cash raked round the bars
   // like a zen garden
   zenGardenEvent: {
     chance: 0.01,
@@ -3109,7 +3109,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/accordionEvent: a pleated band of cash squeezes
+  // money, cash: src/crits/animatedCrits/events/accordionEvent: a pleated band of cash squeezes
   // like an accordion
   accordionEvent: {
     chance: 0.01,
@@ -3119,7 +3119,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, hires + cash: src/floors/fizzEvent: cash fizzes up like soda
+  // money, hires + cash: src/crits/animatedCrits/events/fizzEvent: cash fizzes up like soda
   fizzEvent: {
     chance: 0.01,
     fizzMs: 1_400, // the fizz rising
@@ -3128,7 +3128,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/soundwaveEvent: a wave of cash swells
+  // money, levels + cash: src/crits/animatedCrits/events/soundwaveEvent: a wave of cash swells
   // up and down the screen
   soundwaveEvent: {
     chance: 0.01,
@@ -3139,7 +3139,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/taffyEvent: a rope of cash pulled like taffy
+  // money, cash: src/crits/animatedCrits/events/taffyEvent: a rope of cash pulled like taffy
   taffyEvent: {
     chance: 0.01,
     lumpMs: 350, // the lump bulging out
@@ -3148,7 +3148,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/dripPaintingEvent: cash flicked over the screen
+  // money, cash: src/crits/animatedCrits/events/dripPaintingEvent: cash flicked over the screen
   // like a drip painting
   dripPaintingEvent: {
     chance: 0.01,
@@ -3157,7 +3157,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, hires: src/floors/mothsEvent: moths spiral a flame, then fly to
+  // wisp, hires: src/crits/animatedCrits/events/mothsEvent: moths spiral a flame, then fly to
   // empty spots
   mothsEvent: {
     chance: 0.01,
@@ -3167,7 +3167,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, crit tiers: src/floors/curlingEvent: curling stones glide onto
+  // wisp, crit tiers: src/crits/animatedCrits/events/curlingEvent: curling stones glide onto
   // the bars
   curlingEvent: {
     chance: 0.01,
@@ -3175,7 +3175,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, worker tiers: src/floors/clotheslineEvent: laundry wisps drift down
+  // wisp, worker tiers: src/crits/animatedCrits/events/clotheslineEvent: laundry wisps drift down
   // onto the workers
   clotheslineEvent: {
     chance: 0.01,
@@ -3185,7 +3185,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/balloonPopEvent: a dart pops rising balloons
+  // wisp, cash: src/crits/animatedCrits/events/balloonPopEvent: a dart pops rising balloons
   balloonPopEvent: {
     chance: 0.01,
     floatMs: 700, // before the first pop
@@ -3193,7 +3193,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/spinBottleEvent: a spinning pointer picks bars
+  // wisp, levels: src/crits/animatedCrits/events/spinBottleEvent: a spinning pointer picks bars
   spinBottleEvent: {
     chance: 0.01,
     gatherMs: 300, // the pointer forming
@@ -3202,7 +3202,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/skyWriterEvent: a wisp skywrites loops of glitter
+  // wisp, cash: src/crits/animatedCrits/events/skyWriterEvent: a wisp skywrites loops of glitter
   skyWriterEvent: {
     chance: 0.01,
     climbMs: 300, // climbing to the start
@@ -3211,7 +3211,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, hires + cash: src/floors/goldPanEvent: a pan of cash swirled for
+  // mix, hires + cash: src/crits/animatedCrits/events/goldPanEvent: a pan of cash swirled for
   // nugget wisps
   goldPanEvent: {
     chance: 0.01,
@@ -3221,7 +3221,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, levels + cash: src/floors/bulldozerEvent: a dozer shoves heaps of
+  // mix, levels + cash: src/crits/animatedCrits/events/bulldozerEvent: a dozer shoves heaps of
   // cash off the bars
   bulldozerEvent: {
     chance: 0.01,
@@ -3231,7 +3231,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, worker tiers + cash: src/floors/koiPondEvent: koi leap out of a
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/koiPondEvent: koi leap out of a
   // pond of cash onto the workers
   koiPondEvent: {
     chance: 0.01,
@@ -3241,7 +3241,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, crit tiers + cash: src/floors/pipeOrganEvent: chords blast cash out
+  // mix, crit tiers + cash: src/crits/animatedCrits/events/pipeOrganEvent: chords blast cash out
   // of organ pipes
   pipeOrganEvent: {
     chance: 0.01,
@@ -3251,7 +3251,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/antTrailEvent: ants carry crumbs of cash to the total
+  // mix, cash: src/crits/animatedCrits/events/antTrailEvent: ants carry crumbs of cash to the total
   antTrailEvent: {
     chance: 0.01,
     marchMs: 1_300, // ants setting off, ever thicker
@@ -3259,7 +3259,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, an unlock + cash: src/floors/hotAirBalloonEvent: a balloon of cash
+  // mix, an unlock + cash: src/crits/animatedCrits/events/hotAirBalloonEvent: a balloon of cash
   // floats up to the locked floor
   hotAirBalloonEvent: {
     chance: 0.01,
@@ -3268,7 +3268,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/lensFlareEvent: a lens flare's ghosts sweep
+  // beam, crit tiers: src/crits/animatedCrits/events/lensFlareEvent: a lens flare's ghosts sweep
   // over the bars
   lensFlareEvent: {
     chance: 0.01,
@@ -3277,7 +3277,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, levels: src/floors/tightropeEvent: a wisp walks a rope of light
+  // beam, levels: src/crits/animatedCrits/events/tightropeEvent: a wisp walks a rope of light
   // over each bar
   tightropeEvent: {
     chance: 0.01,
@@ -3286,14 +3286,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/neonSignEvent: a neon sign buzzes on letter by letter
+  // beam, cash: src/crits/animatedCrits/events/neonSignEvent: a neon sign buzzes on letter by letter
   neonSignEvent: {
     chance: 0.01,
     gapsMs: [300, 170] as [number, number], // between letters, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, worker tiers: src/floors/lightCageEvent: cages of light slam shut
+  // beam, worker tiers: src/crits/animatedCrits/events/lightCageEvent: cages of light slam shut
   // on the workers
   lightCageEvent: {
     chance: 0.01,
@@ -3301,7 +3301,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, an unlock: src/floors/stairwayEvent: a stairway of light builds up
+  // beam, an unlock: src/crits/animatedCrits/events/stairwayEvent: a stairway of light builds up
   // to the locked floor
   stairwayEvent: {
     chance: 0.01,
@@ -3309,7 +3309,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 0,
   },
-  // beam, hires: src/floors/beaconsEvent: beacons call new workers down from
+  // beam, hires: src/crits/animatedCrits/events/beaconsEvent: beacons call new workers down from
   // the sky
   beaconsEvent: {
     chance: 0.01,
@@ -3319,7 +3319,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/anvilCrawlerEvent: lightning crawls the sky
+  // lightning, levels: src/crits/animatedCrits/events/anvilCrawlerEvent: lightning crawls the sky
   // dropping forks on the bars
   anvilCrawlerEvent: {
     chance: 0.01,
@@ -3328,7 +3328,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/neuronsEvent: sparks race through a web of
+  // lightning, cash: src/crits/animatedCrits/events/neuronsEvent: sparks race through a web of
   // neurons to the total
   neuronsEvent: {
     chance: 0.01,
@@ -3337,7 +3337,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, crit tiers: src/floors/bottledBoltEvent: trapped lightning
+  // lightning, crit tiers: src/crits/animatedCrits/events/bottledBoltEvent: trapped lightning
   // bursts out onto the bars
   bottledBoltEvent: {
     chance: 0.01,
@@ -3346,7 +3346,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/thunderbirdEvent: a bird of lightning
+  // lightning, cash: src/crits/animatedCrits/events/thunderbirdEvent: a bird of lightning
   // thunderclaps across the screen
   thunderbirdEvent: {
     chance: 0.01,
@@ -3355,7 +3355,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, an unlock: src/floors/sparkGapEvent: sparks jump a gap across
+  // lightning, an unlock: src/crits/animatedCrits/events/sparkGapEvent: sparks jump a gap across
   // the locked floor
   sparkGapEvent: {
     chance: 0.01,
@@ -3365,7 +3365,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 0,
   },
-  // lightning, worker tiers: src/floors/staticShockEvent: a charged wisp
+  // lightning, worker tiers: src/crits/animatedCrits/events/staticShockEvent: a charged wisp
   // zaps the workers
   staticShockEvent: {
     chance: 0.01,
@@ -3374,7 +3374,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/rocketJumpEvent: a wisp blasts itself up
+  // explosion, levels: src/crits/animatedCrits/events/rocketJumpEvent: a wisp blasts itself up
   // the bars
   rocketJumpEvent: {
     chance: 0.01,
@@ -3384,7 +3384,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, worker tiers: src/floors/torpedoesEvent: torpedoes streak in
+  // explosion, worker tiers: src/crits/animatedCrits/events/torpedoesEvent: torpedoes streak in
   // at the workers
   torpedoesEvent: {
     chance: 0.01,
@@ -3393,7 +3393,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, hires: src/floors/airstrikeEvent: flares mark spots for a
+  // explosion, hires: src/crits/animatedCrits/events/airstrikeEvent: flares mark spots for a
   // jet's bombs
   airstrikeEvent: {
     chance: 0.01,
@@ -3403,7 +3403,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/dambusterEvent: a bomb skips across the bottom
+  // explosion, cash: src/crits/animatedCrits/events/dambusterEvent: a bomb skips across the bottom
   dambusterEvent: {
     chance: 0.01,
     lobMs: 400, // the lob down
@@ -3411,7 +3411,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, crit tiers: src/floors/airburstEvent: shells burst over the bars
+  // explosion, crit tiers: src/crits/animatedCrits/events/airburstEvent: shells burst over the bars
   airburstEvent: {
     chance: 0.01,
     gapsMs: [480, 320] as [number, number], // between shells, quickening
@@ -3419,7 +3419,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/bombPinwheelEvent: bombs whirl off a pinwheel
+  // explosion, cash: src/crits/animatedCrits/events/bombPinwheelEvent: bombs whirl off a pinwheel
   bombPinwheelEvent: {
     chance: 0.01,
     spinUpMs: 800, // the wheel spinning up
@@ -3428,7 +3428,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, levels: src/floors/bulletCurtainEvent: curtains of bullets rise
+  // gunfire, levels: src/crits/animatedCrits/events/bulletCurtainEvent: curtains of bullets rise
   // into the bars
   bulletCurtainEvent: {
     chance: 0.01,
@@ -3438,7 +3438,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, crit tiers: src/floors/trickShotEvent: ricochet shots into the bars
+  // gunfire, crit tiers: src/crits/animatedCrits/events/trickShotEvent: ricochet shots into the bars
   trickShotEvent: {
     chance: 0.01,
     setMs: 300, // the gun and bumpers appearing
@@ -3447,7 +3447,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker tiers: src/floors/railShooterEvent: a gunner on a rail
+  // gunfire, worker tiers: src/crits/animatedCrits/events/railShooterEvent: a gunner on a rail
   // shoots up at the workers
   railShooterEvent: {
     chance: 0.01,
@@ -3456,7 +3456,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/skeetShootEvent: clays shot out of the sky
+  // gunfire, cash: src/crits/animatedCrits/events/skeetShootEvent: clays shot out of the sky
   skeetShootEvent: {
     chance: 0.01,
     gapsMs: [280, 140] as [number, number], // between clays, quickening
@@ -3464,7 +3464,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, hires: src/floors/tripleTapEvent: three gunners fire on each
+  // gunfire, hires: src/crits/animatedCrits/events/tripleTapEvent: three gunners fire on each
   // empty spot
   tripleTapEvent: {
     chance: 0.01,
@@ -3472,7 +3472,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/tommyGunEvent: a tommy gun sprays the screen
+  // gunfire, cash: src/crits/animatedCrits/events/tommyGunEvent: a tommy gun sprays the screen
   tommyGunEvent: {
     chance: 0.01,
     riseMs: 300, // the gun rising
@@ -3480,7 +3480,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/sweeperEvent: a minesweeper board floods open
+  // experiment, cash: src/crits/animatedCrits/events/sweeperEvent: a minesweeper board floods open
   sweeperEvent: {
     chance: 0.01,
     spreadMs: 400, // the board dealt
@@ -3488,7 +3488,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, hires + cash: src/floors/clawMachineEvent: a claw grabs prizes
+  // experiment, hires + cash: src/crits/animatedCrits/events/clawMachineEvent: a claw grabs prizes
   // out of a pile of cash
   clawMachineEvent: {
     chance: 0.01,
@@ -3497,7 +3497,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, levels: src/floors/lotteryEvent: a lottery draw lands balls on
+  // experiment, levels: src/crits/animatedCrits/events/lotteryEvent: a lottery draw lands balls on
   // the bars
   lotteryEvent: {
     chance: 0.01,
@@ -3507,7 +3507,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/wordGuessEvent: a word game spells MONEY
+  // experiment, cash: src/crits/animatedCrits/events/wordGuessEvent: a word game spells MONEY
   wordGuessEvent: {
     chance: 0.01,
     showMs: 300, // the board appearing
@@ -3516,7 +3516,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, worker tiers: src/floors/memoryMatchEvent: matched card pairs
+  // experiment, worker tiers: src/crits/animatedCrits/events/memoryMatchEvent: matched card pairs
   // fire wisps at the workers
   memoryMatchEvent: {
     chance: 0.01,
@@ -3525,7 +3525,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, crit tiers: src/floors/ticTacToeEvent: crosses of light win a
+  // experiment, crit tiers: src/crits/animatedCrits/events/ticTacToeEvent: crosses of light win a
   // game of noughts and crosses
   ticTacToeEvent: {
     chance: 0.01,
@@ -3534,7 +3534,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/revCounterEvent: a giant rev counter hits the
+  // experiment, cash: src/crits/animatedCrits/events/revCounterEvent: a giant rev counter hits the
   // redline
   revCounterEvent: {
     chance: 0.01,
@@ -3543,7 +3543,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/sluiceEvent: sluice gates open one by one down a
+  // money, cash: src/crits/animatedCrits/events/sluiceEvent: sluice gates open one by one down a
   // cascade of cash
   sluiceEvent: {
     chance: 0.01,
@@ -3552,7 +3552,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/foundryEvent: molten cash poured from a crucible
+  // money, cash: src/crits/animatedCrits/events/foundryEvent: molten cash poured from a crucible
   // into moulds
   foundryEvent: {
     chance: 0.01,
@@ -3560,7 +3560,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/jetStreamEvent: a jet of cash peels off
+  // money, levels + cash: src/crits/animatedCrits/events/jetStreamEvent: a jet of cash peels off
   // eddies into the bars
   jetStreamEvent: {
     chance: 0.01,
@@ -3570,7 +3570,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/moatEvent: a river of cash circles the screen like
+  // money, cash: src/crits/animatedCrits/events/moatEvent: a river of cash circles the screen like
   // a moat
   moatEvent: {
     chance: 0.01,
@@ -3579,7 +3579,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, worker tiers + cash: src/floors/seepEvent: cash seeps down the walls
+  // money, worker tiers + cash: src/crits/animatedCrits/events/seepEvent: cash seeps down the walls
   // and pools under the workers
   seepEvent: {
     chance: 0.01,
@@ -3589,7 +3589,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/meanderEvent: a meandering river of cash
+  // money, levels + cash: src/crits/animatedCrits/events/meanderEvent: a meandering river of cash
   // loops through the bars
   meanderEvent: {
     chance: 0.01,
@@ -3598,7 +3598,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, cash: src/floors/waltzEvent: wisps waltz in pairs, throwing coins on
+  // wisp, cash: src/crits/animatedCrits/events/waltzEvent: wisps waltz in pairs, throwing coins on
   // every beat
   waltzEvent: {
     chance: 0.01,
@@ -3608,7 +3608,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, crit tiers: src/floors/gyroscopeEvent: gyroscope rings of wisps spin
+  // wisp, crit tiers: src/crits/animatedCrits/events/gyroscopeEvent: gyroscope rings of wisps spin
   // up and fling into the bars
   gyroscopeEvent: {
     chance: 0.01,
@@ -3617,7 +3617,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, worker tiers: src/floors/dragonflyEvent: a dragonfly wisp darts and
+  // wisp, worker tiers: src/crits/animatedCrits/events/dragonflyEvent: a dragonfly wisp darts and
   // hovers from worker to worker
   dragonflyEvent: {
     chance: 0.01,
@@ -3626,7 +3626,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, hires: src/floors/ringTossEvent: wisp rings tossed onto empty spots
+  // wisp, hires: src/crits/animatedCrits/events/ringTossEvent: wisp rings tossed onto empty spots
   ringTossEvent: {
     chance: 0.01,
     gapsMs: [300, 160] as [number, number], // between tosses, quickening
@@ -3634,7 +3634,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, levels: src/floors/slipstreamEvent: wisps race in each other's
+  // wisp, levels: src/crits/animatedCrits/events/slipstreamEvent: wisps race in each other's
   // slipstream past the bars
   slipstreamEvent: {
     chance: 0.01,
@@ -3643,7 +3643,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/sheetMusicEvent: wisp notes play a tune on a staff
+  // wisp, cash: src/crits/animatedCrits/events/sheetMusicEvent: wisp notes play a tune on a staff
   sheetMusicEvent: {
     chance: 0.01,
     staffMs: 300, // the staff drawn in
@@ -3652,7 +3652,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/leafBlowerEvent: a wisp blows drifts of cash about
+  // mix, cash: src/crits/animatedCrits/events/leafBlowerEvent: a wisp blows drifts of cash about
   leafBlowerEvent: {
     chance: 0.01,
     flyMs: 300, // the wisp flying out
@@ -3662,7 +3662,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, levels + cash: src/floors/loomEvent: a shuttle wisp weaves cash
+  // mix, levels + cash: src/crits/animatedCrits/events/loomEvent: a shuttle wisp weaves cash
   // through a warp of rivers
   loomEvent: {
     chance: 0.01,
@@ -3672,7 +3672,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/highDiveEvent: a wisp dives from a tower into a pool
+  // mix, cash: src/crits/animatedCrits/events/highDiveEvent: a wisp dives from a tower into a pool
   // of cash
   highDiveEvent: {
     chance: 0.01,
@@ -3684,7 +3684,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, hires + cash: src/floors/sowerEvent: a wisp sows cash and workers
+  // mix, hires + cash: src/crits/animatedCrits/events/sowerEvent: a wisp sows cash and workers
   // sprout
   sowerEvent: {
     chance: 0.01,
@@ -3692,7 +3692,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 500,
   },
-  // mix, unlock + cash: src/floors/courierEvent: a courier wisp carries a river
+  // mix, unlock + cash: src/crits/animatedCrits/events/courierEvent: a courier wisp carries a river
   // of cash to the locked floor
   courierEvent: {
     chance: 0.01,
@@ -3701,7 +3701,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/rodeoEvent: a wisp rides a bucking river of cash
+  // mix, cash: src/crits/animatedCrits/events/rodeoEvent: a wisp rides a bucking river of cash
   rodeoEvent: {
     chance: 0.01,
     streamMs: 1_200, // the river bucking
@@ -3709,7 +3709,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/crosshairEvent: a crosshair sweeps, hunts and
+  // beam, crit tiers: src/crits/animatedCrits/events/crosshairEvent: a crosshair sweeps, hunts and
   // locks onto the bars
   crosshairEvent: {
     chance: 0.01,
@@ -3718,7 +3718,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/irisEvent: beams fan out and close like a camera
+  // beam, cash: src/crits/animatedCrits/events/irisEvent: beams fan out and close like a camera
   // iris
   irisEvent: {
     chance: 0.01,
@@ -3727,7 +3727,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/bankShotEvent: a beam banks off the screen's edges
+  // beam, levels: src/crits/animatedCrits/events/bankShotEvent: a beam banks off the screen's edges
   // into the bars
   bankShotEvent: {
     chance: 0.01,
@@ -3735,7 +3735,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, worker tiers: src/floors/sunbeamsEvent: sunbeams break through onto
+  // beam, worker tiers: src/crits/animatedCrits/events/sunbeamsEvent: sunbeams break through onto
   // the workers
   sunbeamsEvent: {
     chance: 0.01,
@@ -3744,7 +3744,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, unlock: src/floors/stargateEvent: a ring of beams dials open the
+  // beam, unlock: src/crits/animatedCrits/events/stargateEvent: a ring of beams dials open the
   // locked floor
   stargateEvent: {
     chance: 0.01,
@@ -3754,7 +3754,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, worker tiers: src/floors/catsCradleEvent: beams strung between
+  // beam, worker tiers: src/crits/animatedCrits/events/catsCradleEvent: beams strung between
   // wisps like a cat's cradle
   catsCradleEvent: {
     chance: 0.01,
@@ -3762,7 +3762,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker tiers: src/floors/thunderheadEvent: a thunderhead of
+  // lightning, worker tiers: src/crits/animatedCrits/events/thunderheadEvent: a thunderhead of
   // wisps strikes the workers
   thunderheadEvent: {
     chance: 0.01,
@@ -3771,7 +3771,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/pitchforkEvent: three-pronged bolts fork into
+  // lightning, levels: src/crits/animatedCrits/events/pitchforkEvent: three-pronged bolts fork into
   // the bars
   pitchforkEvent: {
     chance: 0.01,
@@ -3780,7 +3780,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/jumperCablesEvent: two wisps jump-start the
+  // lightning, cash: src/crits/animatedCrits/events/jumperCablesEvent: two wisps jump-start the
   // screen in surges of sparks
   jumperCablesEvent: {
     chance: 0.01,
@@ -3789,7 +3789,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, crit tiers: src/floors/lashEvent: a whip of lightning cracks
+  // lightning, crit tiers: src/crits/animatedCrits/events/lashEvent: a whip of lightning cracks
   // on the bars
   lashEvent: {
     chance: 0.01,
@@ -3798,7 +3798,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, hires: src/floors/sparkPlugEvent: spark plug wisps fire sparks
+  // lightning, hires: src/crits/animatedCrits/events/sparkPlugEvent: spark plug wisps fire sparks
   // onto empty spots
   sparkPlugEvent: {
     chance: 0.01,
@@ -3807,7 +3807,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, unlock: src/floors/liveWireEvent: a live wire thrashes and lashes
+  // lightning, unlock: src/crits/animatedCrits/events/liveWireEvent: a live wire thrashes and lashes
   // open the locked floor
   liveWireEvent: {
     chance: 0.01,
@@ -3816,7 +3816,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/fuseRaceEvent: lit fuses race to bombs on the
+  // explosion, levels: src/crits/animatedCrits/events/fuseRaceEvent: lit fuses race to bombs on the
   // bars
   fuseRaceEvent: {
     chance: 0.01,
@@ -3824,7 +3824,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/bouncingBettyEvent: buried mines bounce up and
+  // explosion, cash: src/crits/animatedCrits/events/bouncingBettyEvent: buried mines bounce up and
   // burst into cash
   bouncingBettyEvent: {
     chance: 0.01,
@@ -3833,7 +3833,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, worker tiers: src/floors/pressureCookerEvent: a pressure cooker
+  // explosion, worker tiers: src/crits/animatedCrits/events/pressureCookerEvent: a pressure cooker
   // builds steam and blows onto the workers
   pressureCookerEvent: {
     chance: 0.01,
@@ -3843,7 +3843,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, hires: src/floors/hotPotatoEvent: a lit bomb hops spot to spot,
+  // explosion, hires: src/crits/animatedCrits/events/hotPotatoEvent: a lit bomb hops spot to spot,
   // blowing where workers form
   hotPotatoEvent: {
     chance: 0.01,
@@ -3851,7 +3851,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, unlock: src/floors/daisyChainEvent: bombs round the screen's edge
+  // explosion, unlock: src/crits/animatedCrits/events/daisyChainEvent: bombs round the screen's edge
   // go off in a chain into the locked floor
   daisyChainEvent: {
     chance: 0.01,
@@ -3861,7 +3861,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, crit tiers: src/floors/shapedChargeEvent: rings of charges blow
+  // explosion, crit tiers: src/crits/animatedCrits/events/shapedChargeEvent: rings of charges blow
   // inward onto the bars
   shapedChargeEvent: {
     chance: 0.01,
@@ -3869,7 +3869,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/detcordEvent: a cord of light erupts in a
+  // explosion, cash: src/crits/animatedCrits/events/detcordEvent: a cord of light erupts in a
   // rolling wall of blasts
   detcordEvent: {
     chance: 0.01,
@@ -3878,7 +3878,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, cash: src/floors/bulletBloomEvent: rings of bullets stop and bloom
+  // gunfire, cash: src/crits/animatedCrits/events/bulletBloomEvent: rings of bullets stop and bloom
   // into rings
   bulletBloomEvent: {
     chance: 0.01,
@@ -3888,7 +3888,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, crit tiers: src/floors/highNoonEvent: two gunners duel, then turn
+  // gunfire, crit tiers: src/crits/animatedCrits/events/highNoonEvent: two gunners duel, then turn
   // on the bars
   highNoonEvent: {
     chance: 0.01,
@@ -3898,7 +3898,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/hailfireEvent: a line of guns rains volleys on
+  // gunfire, levels: src/crits/animatedCrits/events/hailfireEvent: a line of guns rains volleys on
   // the bars
   hailfireEvent: {
     chance: 0.01,
@@ -3907,7 +3907,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker tiers: src/floors/dervishEvent: a spinning gunner snaps
+  // gunfire, worker tiers: src/crits/animatedCrits/events/dervishEvent: a spinning gunner snaps
   // shots at the workers
   dervishEvent: {
     chance: 0.01,
@@ -3916,7 +3916,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/invadersEvent: a gun shoots down a grid of
+  // gunfire, cash: src/crits/animatedCrits/events/invadersEvent: a gun shoots down a grid of
   // invaders
   invadersEvent: {
     chance: 0.01,
@@ -3925,7 +3925,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, hires: src/floors/gunKataEvent: a gunner fires both ways at once
+  // gunfire, hires: src/crits/animatedCrits/events/gunKataEvent: a gunner fires both ways at once
   // onto empty spots
   gunKataEvent: {
     chance: 0.01,
@@ -3934,7 +3934,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, unlock: src/floors/lockbusterEvent: a ring of guns hammers the
+  // gunfire, unlock: src/crits/animatedCrits/events/lockbusterEvent: a ring of guns hammers the
   // locked floor
   lockbusterEvent: {
     chance: 0.01,
@@ -3943,7 +3943,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, crit tiers: src/floors/connectFourEvent: four-in-a-rows of
+  // experiment, crit tiers: src/crits/animatedCrits/events/connectFourEvent: four-in-a-rows of
   // wisp tokens tier up the bars
   connectFourEvent: {
     chance: 0.01,
@@ -3951,7 +3951,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, levels: src/floors/comboEvent: a combo of jabs on the clicked
+  // experiment, levels: src/crits/animatedCrits/events/comboEvent: a combo of jabs on the clicked
   // bar
   comboEvent: {
     chance: 0.01,
@@ -3960,7 +3960,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/skeeBallEvent: wisp balls roll into scoring
+  // experiment, cash: src/crits/animatedCrits/events/skeeBallEvent: wisp balls roll into scoring
   // holes
   skeeBallEvent: {
     chance: 0.01,
@@ -3969,7 +3969,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/bubbleShooterEvent: banked shots pop patches
+  // experiment, cash: src/crits/animatedCrits/events/bubbleShooterEvent: banked shots pop patches
   // of bubble wisps
   bubbleShooterEvent: {
     chance: 0.01,
@@ -3978,7 +3978,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, worker tiers + cash: src/floors/deltaEvent: a river of cash fans out
+  // money, worker tiers + cash: src/crits/animatedCrits/events/deltaEvent: a river of cash fans out
   // into a delta onto the workers
   deltaEvent: {
     chance: 0.01,
@@ -3988,7 +3988,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/hydrantEvent: jets of cash burst out every way
+  // money, cash: src/crits/animatedCrits/events/hydrantEvent: jets of cash burst out every way
   hydrantEvent: {
     chance: 0.01,
     streamMs: 700, // each jet pouring
@@ -3997,7 +3997,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/cloverleafEvent: a river of cash loops a giant
+  // money, cash: src/crits/animatedCrits/events/cloverleafEvent: a river of cash loops a giant
   // four-leaf clover
   cloverleafEvent: {
     chance: 0.01,
@@ -4006,7 +4006,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/pinstripeEvent: rivers of cash shoot across
+  // money, levels + cash: src/crits/animatedCrits/events/pinstripeEvent: rivers of cash shoot across
   // along the bars
   pinstripeEvent: {
     chance: 0.01,
@@ -4016,7 +4016,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, crit tier + cash: src/floors/faucetEvent: a tap drips cash onto the
+  // money, crit tier + cash: src/crits/animatedCrits/events/faucetEvent: a tap drips cash onto the
   // clicked bar, then gushes
   faucetEvent: {
     chance: 0.01,
@@ -4026,7 +4026,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, hires + cash: src/floors/showerheadEvent: a showerhead sprays rivers
+  // money, hires + cash: src/crits/animatedCrits/events/showerheadEvent: a showerhead sprays rivers
   // of cash onto empty spots
   showerheadEvent: {
     chance: 0.01,
@@ -4036,7 +4036,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, crit tiers: src/floors/binaryStarEvent: two wisps spiral in, merge
+  // wisp, crit tiers: src/crits/animatedCrits/events/binaryStarEvent: two wisps spiral in, merge
   // and jet into the bars
   binaryStarEvent: {
     chance: 0.01,
@@ -4045,14 +4045,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, levels: src/floors/hopscotchEvent: a wisp plays hopscotch up the bars
+  // wisp, levels: src/crits/animatedCrits/events/hopscotchEvent: a wisp plays hopscotch up the bars
   hopscotchEvent: {
     chance: 0.01,
     hopsMs: [380, 200] as [number, number], // each hop, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, hires: src/floors/tadpolesEvent: a mother wisp lays tadpoles that
+  // wisp, hires: src/crits/animatedCrits/events/tadpolesEvent: a mother wisp lays tadpoles that
   // wriggle onto empty spots
   tadpolesEvent: {
     chance: 0.01,
@@ -4062,7 +4062,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, worker tiers: src/floors/blinkEvent: a wisp blinks from worker to
+  // wisp, worker tiers: src/crits/animatedCrits/events/blinkEvent: a wisp blinks from worker to
   // worker
   blinkEvent: {
     chance: 0.01,
@@ -4070,14 +4070,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/bumperCarsEvent: wisps career round like bumper cars
+  // wisp, cash: src/crits/animatedCrits/events/bumperCarsEvent: wisps career round like bumper cars
   bumperCarsEvent: {
     chance: 0.01,
     driveMs: 1_700, // the bumping, speeding up
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, cash: src/floors/pigeonsEvent: a flock perches, then bursts into
+  // wisp, cash: src/crits/animatedCrits/events/pigeonsEvent: a flock perches, then bursts into
   // flight
   pigeonsEvent: {
     chance: 0.01,
@@ -4087,7 +4087,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/squidEvent: a squid wisp jets up the screen squirting
+  // mix, cash: src/crits/animatedCrits/events/squidEvent: a squid wisp jets up the screen squirting
   // cash
   squidEvent: {
     chance: 0.01,
@@ -4097,7 +4097,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, worker tiers + cash: src/floors/waterPistolEvent: a wisp drinks a
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/waterPistolEvent: a wisp drinks a
   // river of cash and squirts the workers
   waterPistolEvent: {
     chance: 0.01,
@@ -4108,7 +4108,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/poiEvent: two poi wisps swing rivers of cash into
+  // mix, cash: src/crits/animatedCrits/events/poiEvent: two poi wisps swing rivers of cash into
   // flowers
   poiEvent: {
     chance: 0.01,
@@ -4117,7 +4117,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, crit tiers + cash: src/floors/bartenderEvent: two wisps flair-toss a
+  // mix, crit tiers + cash: src/crits/animatedCrits/events/bartenderEvent: two wisps flair-toss a
   // slug of cash, then pour it on the bars
   bartenderEvent: {
     chance: 0.01,
@@ -4126,7 +4126,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, unlock + cash: src/floors/poleVaultEvent: a wisp sprints a river of
+  // mix, unlock + cash: src/crits/animatedCrits/events/poleVaultEvent: a wisp sprints a river of
   // cash and vaults into the locked floor
   poleVaultEvent: {
     chance: 0.01,
@@ -4135,7 +4135,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 500,
   },
-  // mix, levels + cash: src/floors/paintRollerEvent: a roller wisp paints the
+  // mix, levels + cash: src/crits/animatedCrits/events/paintRollerEvent: a roller wisp paints the
   // bars with cash
   paintRollerEvent: {
     chance: 0.01,
@@ -4144,7 +4144,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/buzzsawEvent: a buzzsaw of beams grinds into
+  // beam, crit tiers: src/crits/animatedCrits/events/buzzsawEvent: a buzzsaw of beams grinds into
   // the bars
   buzzsawEvent: {
     chance: 0.01,
@@ -4153,7 +4153,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, levels: src/floors/lightCyclesEvent: two light cycles race walls of
+  // beam, levels: src/crits/animatedCrits/events/lightCyclesEvent: two light cycles race walls of
   // light through the bars
   lightCyclesEvent: {
     chance: 0.01,
@@ -4161,7 +4161,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, hires: src/floors/fiberOpticEvent: curving fibers of light carry
+  // beam, hires: src/crits/animatedCrits/events/fiberOpticEvent: curving fibers of light carry
   // pulses onto empty spots
   fiberOpticEvent: {
     chance: 0.01,
@@ -4170,7 +4170,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/daddyLonglegsEvent: a wisp strides up the screen on
+  // beam, cash: src/crits/animatedCrits/events/daddyLonglegsEvent: a wisp strides up the screen on
   // legs of light
   daddyLonglegsEvent: {
     chance: 0.01,
@@ -4178,7 +4178,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, worker tiers: src/floors/knighthoodEvent: a blade of light dubs the
+  // beam, worker tiers: src/crits/animatedCrits/events/knighthoodEvent: a blade of light dubs the
   // workers
   knighthoodEvent: {
     chance: 0.01,
@@ -4186,7 +4186,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, unlock: src/floors/cuttingTorchEvent: a torch beam cuts round the
+  // beam, unlock: src/crits/animatedCrits/events/cuttingTorchEvent: a torch beam cuts round the
   // locked floor's lock
   cuttingTorchEvent: {
     chance: 0.01,
@@ -4195,7 +4195,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker tiers: src/floors/stElmosFireEvent: crackling coronas
+  // lightning, worker tiers: src/crits/animatedCrits/events/stElmosFireEvent: crackling coronas
   // build round the workers until bolts strike
   stElmosFireEvent: {
     chance: 0.01,
@@ -4204,7 +4204,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, unlock: src/floors/steppedLeaderEvent: a stepped leader creeps up
+  // lightning, unlock: src/crits/animatedCrits/events/steppedLeaderEvent: a stepped leader creeps up
   // to the locked floor
   steppedLeaderEvent: {
     chance: 0.01,
@@ -4213,7 +4213,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/trolleyEvent: a trolley on a live wire drops
+  // lightning, levels: src/crits/animatedCrits/events/trolleyEvent: a trolley on a live wire drops
   // bolts on the bars
   trolleyEvent: {
     chance: 0.01,
@@ -4221,7 +4221,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/boltBounceEvent: a bolt ricochets round the
+  // lightning, cash: src/crits/animatedCrits/events/boltBounceEvent: a bolt ricochets round the
   // screen
   boltBounceEvent: {
     chance: 0.01,
@@ -4229,7 +4229,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, crit tiers: src/floors/stormCrownEvent: a crown of wisps hurls
+  // lightning, crit tiers: src/crits/animatedCrits/events/stormCrownEvent: a crown of wisps hurls
   // bolts into the bars
   stormCrownEvent: {
     chance: 0.01,
@@ -4237,7 +4237,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, hires: src/floors/vanDeGraaffEvent: a charged dome throws bolts
+  // lightning, hires: src/crits/animatedCrits/events/vanDeGraaffEvent: a charged dome throws bolts
   // onto empty spots
   vanDeGraaffEvent: {
     chance: 0.01,
@@ -4246,7 +4246,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/barrelRollEvent: bomb barrels roll down the
+  // explosion, levels: src/crits/animatedCrits/events/barrelRollEvent: bomb barrels roll down the
   // rows onto the bars
   barrelRollEvent: {
     chance: 0.01,
@@ -4254,7 +4254,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/bombStackEvent: a pyramid of bombs blows from
+  // explosion, cash: src/crits/animatedCrits/events/bombStackEvent: a pyramid of bombs blows from
   // the bottom up
   bombStackEvent: {
     chance: 0.01,
@@ -4263,7 +4263,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, crit tiers: src/floors/romanCandleEvent: a roman candle pops
+  // explosion, crit tiers: src/crits/animatedCrits/events/romanCandleEvent: a roman candle pops
   // bombs onto the bars
   romanCandleEvent: {
     chance: 0.01,
@@ -4272,7 +4272,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, worker tiers: src/floors/whistlersEvent: whistling rockets
+  // explosion, worker tiers: src/crits/animatedCrits/events/whistlersEvent: whistling rockets
   // corkscrew onto the workers
   whistlersEvent: {
     chance: 0.01,
@@ -4281,7 +4281,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, unlock: src/floors/trebuchetEvent: a trebuchet flings bombs into
+  // explosion, unlock: src/crits/animatedCrits/events/trebuchetEvent: a trebuchet flings bombs into
   // the locked floor
   trebuchetEvent: {
     chance: 0.01,
@@ -4289,7 +4289,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, hires: src/floors/dropPodsEvent: bomb pods slam down onto empty
+  // explosion, hires: src/crits/animatedCrits/events/dropPodsEvent: bomb pods slam down onto empty
   // spots
   dropPodsEvent: {
     chance: 0.01,
@@ -4298,7 +4298,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/bombCarouselEvent: a whirling ring of bombs
+  // explosion, cash: src/crits/animatedCrits/events/bombCarouselEvent: a whirling ring of bombs
   // flings out across the screen
   bombCarouselEvent: {
     chance: 0.01,
@@ -4308,7 +4308,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, cash: src/floors/lastStandEvent: a gunner guns down waves of wisps
+  // gunfire, cash: src/crits/animatedCrits/events/lastStandEvent: a gunner guns down waves of wisps
   lastStandEvent: {
     chance: 0.01,
     wavesMs: [550, 450] as [number, number], // between waves, quickening
@@ -4316,7 +4316,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, crit tiers: src/floors/tinCanEvent: a can kept hopping by gunfire
+  // gunfire, crit tiers: src/crits/animatedCrits/events/tinCanEvent: a can kept hopping by gunfire
   // is knocked onto the bars
   tinCanEvent: {
     chance: 0.01,
@@ -4324,7 +4324,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker tiers: src/floors/pointDefenseEvent: a turret shoots down
+  // gunfire, worker tiers: src/crits/animatedCrits/events/pointDefenseEvent: a turret shoots down
   // wisps over the workers
   pointDefenseEvent: {
     chance: 0.01,
@@ -4333,7 +4333,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/targetPracticeEvent: pop-up targets drilled into
+  // gunfire, cash: src/crits/animatedCrits/events/targetPracticeEvent: pop-up targets drilled into
   // coins
   targetPracticeEvent: {
     chance: 0.01,
@@ -4341,7 +4341,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, hires: src/floors/flareGunEvent: flares hang over empty spots and
+  // gunfire, hires: src/crits/animatedCrits/events/flareGunEvent: flares hang over empty spots and
   // drop
   flareGunEvent: {
     chance: 0.01,
@@ -4351,7 +4351,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/rappelEvent: a gunner rappels down, raking the
+  // gunfire, levels: src/crits/animatedCrits/events/rappelEvent: a gunner rappels down, raking the
   // bars
   rappelEvent: {
     chance: 0.01,
@@ -4359,7 +4359,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, crit tiers: src/floors/stackerEvent: rows of wisps stack up like
+  // experiment, crit tiers: src/crits/animatedCrits/events/stackerEvent: rows of wisps stack up like
   // the arcade game
   stackerEvent: {
     chance: 0.01,
@@ -4367,7 +4367,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/coinPusherEvent: a pusher shoves cash off a
+  // experiment, cash: src/crits/animatedCrits/events/coinPusherEvent: a pusher shoves cash off a
   // ledge
   coinPusherEvent: {
     chance: 0.01,
@@ -4377,7 +4377,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, levels: src/floors/highStrikerEvent: a mallet fires a puck up to
+  // experiment, levels: src/crits/animatedCrits/events/highStrikerEvent: a mallet fires a puck up to
   // ring the bell
   highStrikerEvent: {
     chance: 0.01,
@@ -4385,7 +4385,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker tiers: src/floors/noteHighwayEvent: notes stream down
+  // experiment, worker tiers: src/crits/animatedCrits/events/noteHighwayEvent: notes stream down
   // lanes in a rhythm game
   noteHighwayEvent: {
     chance: 0.01,
@@ -4394,7 +4394,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, unlock: src/floors/safecrackerEvent: a dial spun to its
+  // experiment, unlock: src/crits/animatedCrits/events/safecrackerEvent: a dial spun to its
   // combination opens the locked floor
   safecrackerEvent: {
     chance: 0.01,
@@ -4402,7 +4402,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, hires: src/floors/gumballMachineEvent: a gumball machine drops
+  // experiment, hires: src/crits/animatedCrits/events/gumballMachineEvent: a gumball machine drops
   // gumballs onto empty spots
   gumballMachineEvent: {
     chance: 0.01,
@@ -4412,7 +4412,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/ninjaEvent: tossed wisps sliced into coins
+  // experiment, cash: src/crits/animatedCrits/events/ninjaEvent: tossed wisps sliced into coins
   ninjaEvent: {
     chance: 0.01,
     tossesMs: [200, 90] as [number, number], // between tosses, quickening
@@ -4420,7 +4420,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, crit tiers + cash: src/floors/bungeeEvent: a rope of cash plunges
+  // money, crit tiers + cash: src/crits/animatedCrits/events/bungeeEvent: a rope of cash plunges
   // onto the bars and recoils
   bungeeEvent: {
     chance: 0.01,
@@ -4429,7 +4429,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/funnelCakeEvent: cash drizzled in loopy curls
+  // money, cash: src/crits/animatedCrits/events/funnelCakeEvent: cash drizzled in loopy curls
   funnelCakeEvent: {
     chance: 0.01,
     streamMs: 1_000, // the drizzle pouring
@@ -4437,7 +4437,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, hires + cash: src/floors/chrysanthemumEvent: a shell of cash bursts
+  // money, hires + cash: src/crits/animatedCrits/events/chrysanthemumEvent: a shell of cash bursts
   // into streamers onto empty spots
   chrysanthemumEvent: {
     chance: 0.01,
@@ -4447,7 +4447,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 500,
   },
-  // money, cash: src/floors/crossroadsEvent: four rivers collide in the middle
+  // money, cash: src/crits/animatedCrits/events/crossroadsEvent: four rivers collide in the middle
   crossroadsEvent: {
     chance: 0.01,
     streamMs: 700, // the rivers pouring
@@ -4456,7 +4456,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/waterslideEvent: a river loops the loop at
+  // money, levels + cash: src/crits/animatedCrits/events/waterslideEvent: a river loops the loop at
   // every bar
   waterslideEvent: {
     chance: 0.01,
@@ -4465,7 +4465,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/bannerEvent: rivers of cash unfurl like banners
+  // money, cash: src/crits/animatedCrits/events/bannerEvent: rivers of cash unfurl like banners
   bannerEvent: {
     chance: 0.01,
     gapsMs: [380, 250] as [number, number], // between banners, quickening
@@ -4474,7 +4474,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker tiers: src/floors/hauntEvent: a ghost wisp swoops through the
+  // wisp, worker tiers: src/crits/animatedCrits/events/hauntEvent: a ghost wisp swoops through the
   // workers
   hauntEvent: {
     chance: 0.01,
@@ -4482,7 +4482,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/mapleSeedsEvent: seed wisps twirl down and pop
+  // wisp, cash: src/crits/animatedCrits/events/mapleSeedsEvent: seed wisps twirl down and pop
   mapleSeedsEvent: {
     chance: 0.01,
     flingMs: 250, // the seeds flung up
@@ -4490,14 +4490,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/donutsEvent: a wisp spins donuts round the bars
+  // wisp, levels: src/crits/animatedCrits/events/donutsEvent: a wisp spins donuts round the bars
   donutsEvent: {
     chance: 0.01,
     spinsMs: [420, 250] as [number, number], // each set of donuts, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/hamsterWheelEvent: a wheel of wisps spins up and
+  // wisp, cash: src/crits/animatedCrits/events/hamsterWheelEvent: a wheel of wisps spins up and
   // bursts into the total
   hamsterWheelEvent: {
     chance: 0.01,
@@ -4506,7 +4506,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, unlock: src/floors/lunarLanderEvent: a lander touches down on the
+  // wisp, unlock: src/crits/animatedCrits/events/lunarLanderEvent: a lander touches down on the
   // locked floor
   lunarLanderEvent: {
     chance: 0.01,
@@ -4515,14 +4515,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, hires: src/floors/dowsingEvent: a dowsing wisp hunts out empty spots
+  // wisp, hires: src/crits/animatedCrits/events/dowsingEvent: a dowsing wisp hunts out empty spots
   dowsingEvent: {
     chance: 0.01,
     findsMs: [450, 260] as [number, number], // each find, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, crit tiers: src/floors/matadorEvent: a bull wisp charges past a
+  // wisp, crit tiers: src/crits/animatedCrits/events/matadorEvent: a bull wisp charges past a
   // matador into the bars
   matadorEvent: {
     chance: 0.01,
@@ -4530,7 +4530,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/flashFloodEvent: a flood of cash chases a fleeing wisp
+  // mix, cash: src/crits/animatedCrits/events/flashFloodEvent: a flood of cash chases a fleeing wisp
   flashFloodEvent: {
     chance: 0.01,
     streamMs: 1_100, // the flood pouring
@@ -4538,7 +4538,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, levels + cash: src/floors/dolphinEvent: a dolphin leaps from a river
+  // mix, levels + cash: src/crits/animatedCrits/events/dolphinEvent: a dolphin leaps from a river
   // of cash up to the bars
   dolphinEvent: {
     chance: 0.01,
@@ -4548,7 +4548,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/pufferEvent: a puffer gulps rivers of cash and spikes
+  // mix, cash: src/crits/animatedCrits/events/pufferEvent: a puffer gulps rivers of cash and spikes
   pufferEvent: {
     chance: 0.01,
     gulpMs: 800, // the gulping, swelling
@@ -4556,7 +4556,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, hires + cash: src/floors/hockeyStopEvent: a skater hockey-stops at
+  // mix, hires + cash: src/crits/animatedCrits/events/hockeyStopEvent: a skater hockey-stops at
   // empty spots spraying cash
   hockeyStopEvent: {
     chance: 0.01,
@@ -4564,7 +4564,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 500,
   },
-  // mix, crit tiers + cash: src/floors/twirlEvent: a wisp twirls a skirt of
+  // mix, crit tiers + cash: src/crits/animatedCrits/events/twirlEvent: a wisp twirls a skirt of
   // cash, then stamps on the bar
   twirlEvent: {
     chance: 0.01,
@@ -4572,7 +4572,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, worker tiers + cash: src/floors/whaleEvent: a whale blows spouts of
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/whaleEvent: a whale blows spouts of
   // cash up onto the workers
   whaleEvent: {
     chance: 0.01,
@@ -4582,14 +4582,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, cash: src/floors/lightPaintingEvent: a wisp paints the air with light
+  // beam, cash: src/crits/animatedCrits/events/lightPaintingEvent: a wisp paints the air with light
   lightPaintingEvent: {
     chance: 0.01,
     paintMs: 1_600, // the painting
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/saberThrowEvent: a thrown spinning blade of
+  // beam, crit tiers: src/crits/animatedCrits/events/saberThrowEvent: a thrown spinning blade of
   // light slices the bars
   saberThrowEvent: {
     chance: 0.01,
@@ -4597,7 +4597,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, unlock: src/floors/laserMazeEvent: a wisp threads a maze of beams up
+  // beam, unlock: src/crits/animatedCrits/events/laserMazeEvent: a wisp threads a maze of beams up
   // to the locked floor
   laserMazeEvent: {
     chance: 0.01,
@@ -4605,7 +4605,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, levels: src/floors/tapeMeasureEvent: a tape of light measures the
+  // beam, levels: src/crits/animatedCrits/events/tapeMeasureEvent: a tape of light measures the
   // bars
   tapeMeasureEvent: {
     chance: 0.01,
@@ -4613,21 +4613,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/pulsarEvent: a pulsar spins twin beams
+  // beam, cash: src/crits/animatedCrits/events/pulsarEvent: a pulsar spins twin beams
   pulsarEvent: {
     chance: 0.01,
     spinMs: 1_500, // the spin, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, levels: src/floors/shortCircuitEvent: bolts arc between the bars
+  // lightning, levels: src/crits/animatedCrits/events/shortCircuitEvent: bolts arc between the bars
   shortCircuitEvent: {
     chance: 0.01,
     arcsMs: [160, 60] as [number, number], // between arcs, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, crit tiers: src/floors/conductorEvent: a conductor's downbeats
+  // lightning, crit tiers: src/crits/animatedCrits/events/conductorEvent: a conductor's downbeats
   // strike the bars
   conductorEvent: {
     chance: 0.01,
@@ -4635,7 +4635,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker tiers: src/floors/doubleStrikeEvent: lightning strikes
+  // lightning, worker tiers: src/crits/animatedCrits/events/doubleStrikeEvent: lightning strikes
   // each worker twice
   doubleStrikeEvent: {
     chance: 0.01,
@@ -4644,7 +4644,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, unlock: src/floors/lightningFenceEvent: current races up a fence
+  // lightning, unlock: src/crits/animatedCrits/events/lightningFenceEvent: current races up a fence
   // of posts to the locked floor
   lightningFenceEvent: {
     chance: 0.01,
@@ -4653,7 +4653,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, hires: src/floors/heatLightningEvent: sheet lightning drops
+  // lightning, hires: src/crits/animatedCrits/events/heatLightningEvent: sheet lightning drops
   // bolts onto empty spots
   heatLightningEvent: {
     chance: 0.01,
@@ -4662,7 +4662,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/powderKegsEvent: rows of kegs chain along
+  // explosion, levels: src/crits/animatedCrits/events/powderKegsEvent: rows of kegs chain along
   // the bars, clusters jumping row to row
   powderKegsEvent: {
     chance: 0.01,
@@ -4670,7 +4670,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/bombFountainEvent: a fountain of bombs rains
+  // explosion, cash: src/crits/animatedCrits/events/bombFountainEvent: a fountain of bombs rains
   // down in chains and clusters
   bombFountainEvent: {
     chance: 0.01,
@@ -4679,7 +4679,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, worker tiers: src/floors/fragOutEvent: grenades blow on the
+  // explosion, worker tiers: src/crits/animatedCrits/events/fragOutEvent: grenades blow on the
   // workers and fragment
   fragOutEvent: {
     chance: 0.01,
@@ -4688,7 +4688,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, crit tiers: src/floors/faultLineEvent: chains of charges race to
+  // explosion, crit tiers: src/crits/animatedCrits/events/faultLineEvent: chains of charges race to
   // each bar and erupt in a cluster
   faultLineEvent: {
     chance: 0.01,
@@ -4696,7 +4696,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, hires: src/floors/willowShellsEvent: shells burst into willow
+  // explosion, hires: src/crits/animatedCrits/events/willowShellsEvent: shells burst into willow
   // bomblets onto empty spots
   willowShellsEvent: {
     chance: 0.01,
@@ -4706,7 +4706,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, unlock: src/floors/swarmStrikeEvent: a swarm of bombs circles
+  // explosion, unlock: src/crits/animatedCrits/events/swarmStrikeEvent: a swarm of bombs circles
   // and dives into the locked floor
   swarmStrikeEvent: {
     chance: 0.01,
@@ -4715,7 +4715,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/concentricEvent: rings of bombs blow outward
+  // explosion, cash: src/crits/animatedCrits/events/concentricEvent: rings of bombs blow outward
   // ring by ring
   concentricEvent: {
     chance: 0.01,
@@ -4723,7 +4723,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, crit tiers: src/floors/grazeEvent: a dodger threads a bullet storm
+  // gunfire, crit tiers: src/crits/animatedCrits/events/grazeEvent: a dodger threads a bullet storm
   // onto the bars
   grazeEvent: {
     chance: 0.01,
@@ -4731,7 +4731,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker tiers: src/floors/hotfootEvent: bullets stitch up to the
+  // gunfire, worker tiers: src/crits/animatedCrits/events/hotfootEvent: bullets stitch up to the
   // workers' feet
   hotfootEvent: {
     chance: 0.01,
@@ -4739,7 +4739,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/dogfightEvent: two fighters dogfight, misses
+  // gunfire, cash: src/crits/animatedCrits/events/dogfightEvent: two fighters dogfight, misses
   // popping into coins
   dogfightEvent: {
     chance: 0.01,
@@ -4748,14 +4748,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, cash: src/floors/bulletRoseEvent: rings of bullets open into a rose
+  // gunfire, cash: src/crits/animatedCrits/events/bulletRoseEvent: rings of bullets open into a rose
   bulletRoseEvent: {
     chance: 0.01,
     ringsMs: [300, 220] as [number, number], // between rings, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, levels: src/floors/armorPiercerEvent: heavy rounds punch down
+  // gunfire, levels: src/crits/animatedCrits/events/armorPiercerEvent: heavy rounds punch down
   // through every bar
   armorPiercerEvent: {
     chance: 0.01,
@@ -4763,7 +4763,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, hires: src/floors/spotterEvent: a spotter marks empty spots for a
+  // gunfire, hires: src/crits/animatedCrits/events/spotterEvent: a spotter marks empty spots for a
   // sniper
   spotterEvent: {
     chance: 0.01,
@@ -4772,7 +4772,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/pegSolitaireEvent: pegs jump each other and
+  // experiment, cash: src/crits/animatedCrits/events/pegSolitaireEvent: pegs jump each other and
   // pop into coins
   pegSolitaireEvent: {
     chance: 0.01,
@@ -4781,7 +4781,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, hires: src/floors/marbleDropEvent: rods pulled from a nest drop
+  // experiment, hires: src/crits/animatedCrits/events/marbleDropEvent: rods pulled from a nest drop
   // marbles onto empty spots
   marbleDropEvent: {
     chance: 0.01,
@@ -4791,7 +4791,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker tiers: src/floors/statuesEvent: runners race to the
+  // experiment, worker tiers: src/crits/animatedCrits/events/statuesEvent: runners race to the
   // workers on GO! and freeze on STOP!
   statuesEvent: {
     chance: 0.01,
@@ -4800,7 +4800,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/flappyWispEvent: a wisp flaps through gaps in
+  // experiment, cash: src/crits/animatedCrits/events/flappyWispEvent: a wisp flaps through gaps in
   // pillars of light
   flappyWispEvent: {
     chance: 0.01,
@@ -4808,7 +4808,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/buriedTreasureEvent: a digger follows a trail
+  // experiment, cash: src/crits/animatedCrits/events/buriedTreasureEvent: a digger follows a trail
   // to treasure that gushes cash
   buriedTreasureEvent: {
     chance: 0.01,
@@ -4818,14 +4818,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/airHockeyEvent: mallets smack a puck to a goal
+  // experiment, cash: src/crits/animatedCrits/events/airHockeyEvent: mallets smack a puck to a goal
   airHockeyEvent: {
     chance: 0.01,
     shotsMs: [320, 160] as [number, number], // each shot, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, tiers + cash: src/floors/boltOfCashEvent: zigzag bolts of cash
+  // money, tiers + cash: src/crits/animatedCrits/events/boltOfCashEvent: zigzag bolts of cash
   // crack down onto the bars
   boltOfCashEvent: {
     chance: 0.01,
@@ -4834,7 +4834,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/pendulumPourEvent: a swinging jet of cash
+  // money, levels + cash: src/crits/animatedCrits/events/pendulumPourEvent: a swinging jet of cash
   // sweeps across the bars
   pendulumPourEvent: {
     chance: 0.01,
@@ -4842,7 +4842,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/popTheCorkEvent: the button is shaken and the cork
+  // money, cash: src/crits/animatedCrits/events/popTheCorkEvent: the button is shaken and the cork
   // pops, gushing cash
   popTheCorkEvent: {
     chance: 0.01,
@@ -4852,7 +4852,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/wallJumpEvent: a wisp wall-jumps up the screen
+  // wisp, levels: src/crits/animatedCrits/events/wallJumpEvent: a wisp wall-jumps up the screen
   // kicking off the bars
   wallJumpEvent: {
     chance: 0.01,
@@ -4860,21 +4860,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/superballEvent: a superball bounces ever faster
+  // wisp, cash: src/crits/animatedCrits/events/superballEvent: a superball bounces ever faster
   superballEvent: {
     chance: 0.01,
     bounceMs: 1700, // the bouncing
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, tiers: src/floors/spinDashEvent: a wisp revs up and dashes into bars
+  // wisp, tiers: src/crits/animatedCrits/events/spinDashEvent: a wisp revs up and dashes into bars
   spinDashEvent: {
     chance: 0.01,
     revsMs: [480, 260] as [number, number], // each rev, shortening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, worker tiers: src/floors/cupidEvent: a cupid shoots arrows at workers
+  // wisp, worker tiers: src/crits/animatedCrits/events/cupidEvent: a cupid shoots arrows at workers
   cupidEvent: {
     chance: 0.01,
     shotsMs: [300, 160] as [number, number], // between arrows, quickening
@@ -4882,7 +4882,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, hires: src/floors/storkEvent: a stork drops bundles onto empty spots
+  // wisp, hires: src/crits/animatedCrits/events/storkEvent: a stork drops bundles onto empty spots
   storkEvent: {
     chance: 0.01,
     flyMs: 1300, // the stork's flight across the screen
@@ -4890,28 +4890,28 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, unlock: src/floors/paperPlaneEvent: a paper plane stunts into the lock
+  // wisp, unlock: src/crits/animatedCrits/events/paperPlaneEvent: a paper plane stunts into the lock
   paperPlaneEvent: {
     chance: 0.01,
     flightMs: 1900, // the whole flight
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, tiers: src/floors/spikeEvent: a volleyball set and spiked onto bars
+  // wisp, tiers: src/crits/animatedCrits/events/spikeEvent: a volleyball set and spiked onto bars
   spikeEvent: {
     chance: 0.01,
     setsMs: [480, 320] as [number, number], // each set, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/toasterEvent: toast wisps pop up and burst into coins
+  // wisp, cash: src/crits/animatedCrits/events/toasterEvent: toast wisps pop up and burst into coins
   toasterEvent: {
     chance: 0.01,
     roundsMs: [420, 260] as [number, number], // between rounds, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/xylophoneEvent: a mallet plays the bars
+  // wisp, levels: src/crits/animatedCrits/events/xylophoneEvent: a mallet plays the bars
   xylophoneEvent: {
     chance: 0.01,
     downMs: 230, // each hop down the bars
@@ -4920,7 +4920,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, worker tiers: src/floors/birthdayCandlesEvent: candle flames blown out
+  // wisp, worker tiers: src/crits/animatedCrits/events/birthdayCandlesEvent: candle flames blown out
   // by a gust
   birthdayCandlesEvent: {
     chance: 0.01,
@@ -4930,7 +4930,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, levels: src/floors/dropTowerEvent: a rider drops and brakes on each bar
+  // wisp, levels: src/crits/animatedCrits/events/dropTowerEvent: a rider drops and brakes on each bar
   dropTowerEvent: {
     chance: 0.01,
     launchMs: 280, // shot up to the top
@@ -4940,7 +4940,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, tiers: src/floors/arrowVolleyEvent: archers rain volleys onto bars
+  // wisp, tiers: src/crits/animatedCrits/events/arrowVolleyEvent: archers rain volleys onto bars
   arrowVolleyEvent: {
     chance: 0.01,
     volleysMs: [480, 360] as [number, number], // between volleys, quickening
@@ -4948,7 +4948,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, worker tiers + cash: src/floors/makeAWishEvent: cash pours into a well
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/makeAWishEvent: cash pours into a well
   // and wishes leap onto workers
   makeAWishEvent: {
     chance: 0.01,
@@ -4959,7 +4959,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/blunderbussEvent: a recoiling gun sprays cones of cash
+  // mix, cash: src/crits/animatedCrits/events/blunderbussEvent: a recoiling gun sprays cones of cash
   blunderbussEvent: {
     chance: 0.01,
     shotsMs: [380, 240] as [number, number], // between shots, quickening
@@ -4967,7 +4967,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, hires + cash: src/floors/genieEvent: cash smoke forms a genie who flings
+  // mix, hires + cash: src/crits/animatedCrits/events/genieEvent: cash smoke forms a genie who flings
   // rivers onto empty spots
   genieEvent: {
     chance: 0.01,
@@ -4977,7 +4977,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, cash: src/floors/solarFlareEvent: a sun throws arching flares
+  // beam, cash: src/crits/animatedCrits/events/solarFlareEvent: a sun throws arching flares
   solarFlareEvent: {
     chance: 0.01,
     riseMs: 280, // the sun rising into place
@@ -4986,7 +4986,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, worker tiers: src/floors/heatVisionEvent: twin eye beams scorch workers
+  // beam, worker tiers: src/crits/animatedCrits/events/heatVisionEvent: twin eye beams scorch workers
   heatVisionEvent: {
     chance: 0.01,
     aimMs: 120, // the aim lasers flickering
@@ -4995,14 +4995,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, hires: src/floors/printHeadEvent: a print head prints new workers
+  // beam, hires: src/crits/animatedCrits/events/printHeadEvent: a print head prints new workers
   printHeadEvent: {
     chance: 0.01,
     linesMs: [45, 28] as [number, number], // each printed line, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, tiers: src/floors/auroraEvent: curtains of light fold onto the bars
+  // beam, tiers: src/crits/animatedCrits/events/auroraEvent: curtains of light fold onto the bars
   auroraEvent: {
     chance: 0.01,
     curtainsMs: [460, 320] as [number, number], // between curtains, quickening
@@ -5010,7 +5010,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/thunderRingsEvent: strikes blast out rings of
+  // lightning, cash: src/crits/animatedCrits/events/thunderRingsEvent: strikes blast out rings of
   // lightning
   thunderRingsEvent: {
     chance: 0.01,
@@ -5019,14 +5019,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, tiers: src/floors/arcWeldEvent: electrodes weld along the bars
+  // lightning, tiers: src/crits/animatedCrits/events/arcWeldEvent: electrodes weld along the bars
   arcWeldEvent: {
     chance: 0.01,
     weldsMs: [460, 300] as [number, number], // each weld, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/stormKiteEvent: lightning strikes a kite and runs
+  // lightning, cash: src/crits/animatedCrits/events/stormKiteEvent: lightning strikes a kite and runs
   // down its string
   stormKiteEvent: {
     chance: 0.01,
@@ -5036,7 +5036,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, levels: src/floors/volcanicLightningEvent: bolts leap out of an
+  // lightning, levels: src/crits/animatedCrits/events/volcanicLightningEvent: bolts leap out of an
   // ash plume onto the bars
   volcanicLightningEvent: {
     chance: 0.01,
@@ -5046,7 +5046,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, hires: src/floors/sculptorEvent: converging bolts strike new
+  // lightning, hires: src/crits/animatedCrits/events/sculptorEvent: converging bolts strike new
   // workers into being
   sculptorEvent: {
     chance: 0.01,
@@ -5054,7 +5054,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/grandFinaleEvent: chain, cluster shells, salvo
+  // explosion, cash: src/crits/animatedCrits/events/grandFinaleEvent: chain, cluster shells, salvo
   grandFinaleEvent: {
     chance: 0.01,
     riseMs: 300, // each shell's climb
@@ -5063,7 +5063,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, worker tiers: src/floors/bombBouquetEvent: chains up stems into
+  // explosion, worker tiers: src/crits/animatedCrits/events/bombBouquetEvent: chains up stems into
   // clusters on the workers
   bombBouquetEvent: {
     chance: 0.01,
@@ -5072,7 +5072,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/cascadeEvent: blasts cascade down the screen
+  // explosion, cash: src/crits/animatedCrits/events/cascadeEvent: blasts cascade down the screen
   cascadeEvent: {
     chance: 0.01,
     chainMs: 130, // between blasts along the top row
@@ -5080,7 +5080,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, tiers: src/floors/pinballBombEvent: a bomb banks off the walls
+  // explosion, tiers: src/crits/animatedCrits/events/pinballBombEvent: a bomb banks off the walls
   // into the bars
   pinballBombEvent: {
     chance: 0.01,
@@ -5089,7 +5089,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, hires: src/floors/bombTrainEvent: a train drops bomb cars onto
+  // explosion, hires: src/crits/animatedCrits/events/bombTrainEvent: a train drops bomb cars onto
   // empty spots
   bombTrainEvent: {
     chance: 0.01,
@@ -5097,7 +5097,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, unlock: src/floors/breachingChargeEvent: charges blow the lock
+  // explosion, unlock: src/crits/animatedCrits/events/breachingChargeEvent: charges blow the lock
   breachingChargeEvent: {
     chance: 0.01,
     setupMs: 300, // the charges flying into place
@@ -5106,7 +5106,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/confettiCannonEvent: cannon shells burst into
+  // explosion, levels: src/crits/animatedCrits/events/confettiCannonEvent: cannon shells burst into
   // clusters over the bars
   confettiCannonEvent: {
     chance: 0.01,
@@ -5115,7 +5115,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/ammoBeltEvent: a belt-fed gun rakes the bars
+  // gunfire, levels: src/crits/animatedCrits/events/ammoBeltEvent: a belt-fed gun rakes the bars
   ammoBeltEvent: {
     chance: 0.01,
     shotMs: 55, // between shots in a burst
@@ -5123,7 +5123,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/gauntletEvent: a runner dodges crossfire
+  // gunfire, cash: src/crits/animatedCrits/events/gauntletEvent: a runner dodges crossfire
   gauntletEvent: {
     chance: 0.01,
     runMs: 850, // each way across
@@ -5131,7 +5131,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, worker tiers: src/floors/turretTowerEvent: a tower of turrets
+  // gunfire, worker tiers: src/crits/animatedCrits/events/turretTowerEvent: a tower of turrets
   // fires at the workers
   turretTowerEvent: {
     chance: 0.01,
@@ -5140,7 +5140,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/shellCasingsEvent: spent casings tinkle into coins
+  // gunfire, cash: src/crits/animatedCrits/events/shellCasingsEvent: spent casings tinkle into coins
   shellCasingsEvent: {
     chance: 0.01,
     shotMs: 120, // between shots at first
@@ -5148,7 +5148,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, tiers: src/floors/dartsEvent: darts thrown at a board of light
+  // experiment, tiers: src/crits/animatedCrits/events/dartsEvent: darts thrown at a board of light
   dartsEvent: {
     chance: 0.01,
     throwsMs: [480, 340] as [number, number], // between throws, quickening
@@ -5156,7 +5156,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/battleshipEvent: shots sink two hidden ships
+  // experiment, cash: src/crits/animatedCrits/events/battleshipEvent: shots sink two hidden ships
   battleshipEvent: {
     chance: 0.01,
     shotsMs: [170, 90] as [number, number], // between shots, quickening
@@ -5164,7 +5164,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/interceptorsEvent: interceptor blasts catch
+  // experiment, cash: src/crits/animatedCrits/events/interceptorsEvent: interceptor blasts catch
   // falling missiles
   interceptorsEvent: {
     chance: 0.01,
@@ -5173,14 +5173,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/landGrabEvent: cut lines claim regions of coins
+  // experiment, cash: src/crits/animatedCrits/events/landGrabEvent: cut lines claim regions of coins
   landGrabEvent: {
     chance: 0.01,
     cutsMs: [280, 160] as [number, number], // each cut, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, worker tiers: src/floors/duckDuckGooseEvent: duck, duck, goose!
+  // experiment, worker tiers: src/crits/animatedCrits/events/duckDuckGooseEvent: duck, duck, goose!
   duckDuckGooseEvent: {
     chance: 0.01,
     tapsMs: [260, 150] as [number, number], // between taps, quickening
@@ -5188,7 +5188,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/ringerEvent: a shooter knocks marbles out of a
+  // experiment, cash: src/crits/animatedCrits/events/ringerEvent: a shooter knocks marbles out of a
   // ring
   ringerEvent: {
     chance: 0.01,
@@ -5198,7 +5198,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, levels: src/floors/hurdlesEvent: a runner clears a hurdle on
+  // experiment, levels: src/crits/animatedCrits/events/hurdlesEvent: a runner clears a hurdle on
   // every bar
   hurdlesEvent: {
     chance: 0.01,
@@ -5206,7 +5206,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, levels: src/floors/luckyRollEvent: dice rolls and ladders up
+  // experiment, levels: src/crits/animatedCrits/events/luckyRollEvent: dice rolls and ladders up
   // the bars
   luckyRollEvent: {
     chance: 0.01,
@@ -5216,7 +5216,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/cashRegisterEvent: a sale rings up, KA-CHING!
+  // experiment, cash: src/crits/animatedCrits/events/cashRegisterEvent: a sale rings up, KA-CHING!
   cashRegisterEvent: {
     chance: 0.01,
     pressesMs: [260, 130] as [number, number], // between key presses, quickening
@@ -5225,7 +5225,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, tiers: src/floors/horseRaceEvent: horses race down the bars
+  // experiment, tiers: src/crits/animatedCrits/events/horseRaceEvent: horses race down the bars
   horseRaceEvent: {
     chance: 0.01,
     raceMs: 1100, // the winner's race
@@ -5233,7 +5233,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, tiers: src/floors/dunkTankEvent: pitches dunk wisps into bars
+  // experiment, tiers: src/crits/animatedCrits/events/dunkTankEvent: pitches dunk wisps into bars
   dunkTankEvent: {
     chance: 0.01,
     pitchesMs: [480, 330] as [number, number], // between pitches, quickening
@@ -5241,7 +5241,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // money, cash: src/floors/halfPipeEvent: a river rides a half-pipe and launches
+  // money, cash: src/crits/animatedCrits/events/halfPipeEvent: a river rides a half-pipe and launches
   halfPipeEvent: {
     chance: 0.01,
     passesMs: [420, 260] as [number, number], // each pass, quickening
@@ -5249,14 +5249,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/knotEvent: a river ties itself in ever tighter knots
+  // money, cash: src/crits/animatedCrits/events/knotEvent: a river ties itself in ever tighter knots
   knotEvent: {
     chance: 0.01,
     knotsMs: [700, 420] as [number, number], // each knot, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/tickerTapeEvent: bands of cash race across the screen
+  // money, cash: src/crits/animatedCrits/events/tickerTapeEvent: bands of cash race across the screen
   tickerTapeEvent: {
     chance: 0.01,
     bandsMs: [300, 180] as [number, number], // between bands, quickening
@@ -5264,7 +5264,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, hires + cash: src/floors/cashBridgeEvent: arches of cash span spot to
+  // money, hires + cash: src/crits/animatedCrits/events/cashBridgeEvent: arches of cash span spot to
   // spot
   cashBridgeEvent: {
     chance: 0.01,
@@ -5272,42 +5272,42 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/skippingStoneEvent: a stone skips down the bars
+  // wisp, levels: src/crits/animatedCrits/events/skippingStoneEvent: a stone skips down the bars
   skippingStoneEvent: {
     chance: 0.01,
     skipsMs: [340, 160] as [number, number], // each skip, shortening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, tiers: src/floors/woodpeckerEvent: a woodpecker drills the bars
+  // wisp, tiers: src/crits/animatedCrits/events/woodpeckerEvent: a woodpecker drills the bars
   woodpeckerEvent: {
     chance: 0.01,
     pecksMs: [70, 45] as [number, number], // each peck, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/frisbeeEvent: a frisbee curves between catchers
+  // wisp, cash: src/crits/animatedCrits/events/frisbeeEvent: a frisbee curves between catchers
   frisbeeEvent: {
     chance: 0.01,
     throwsMs: [320, 180] as [number, number], // each throw, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, unlock: src/floors/kangarooEvent: a kangaroo bounds up to the lock
+  // wisp, unlock: src/crits/animatedCrits/events/kangarooEvent: a kangaroo bounds up to the lock
   kangarooEvent: {
     chance: 0.01,
     hopsMs: [300, 380] as [number, number], // each hop, ever bigger
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, hires: src/floors/badmintonEvent: shuttlecocks smashed onto spots
+  // wisp, hires: src/crits/animatedCrits/events/badmintonEvent: shuttlecocks smashed onto spots
   badmintonEvent: {
     chance: 0.01,
     lobsMs: [380, 240] as [number, number], // each lob, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/tumbleweedEvent: a tumbleweed bounces in the wind
+  // wisp, cash: src/crits/animatedCrits/events/tumbleweedEvent: a tumbleweed bounces in the wind
   tumbleweedEvent: {
     chance: 0.01,
     hopsMs: [150, 220] as [number, number], // each hop, growing
@@ -5315,14 +5315,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker tiers: src/floors/shuttleRunEvent: a runner tags the workers
+  // wisp, worker tiers: src/crits/animatedCrits/events/shuttleRunEvent: a runner tags the workers
   shuttleRunEvent: {
     chance: 0.01,
     runsMs: [300, 200] as [number, number], // each run out and back, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, hires: src/floors/echolocationEvent: a bat pings and swoops onto spots
+  // wisp, hires: src/crits/animatedCrits/events/echolocationEvent: a bat pings and swoops onto spots
   echolocationEvent: {
     chance: 0.01,
     pingMs: 160, // each ping sweeping out
@@ -5330,14 +5330,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, levels: src/floors/lacrosseEvent: passes caught at the bars' ends
+  // wisp, levels: src/crits/animatedCrits/events/lacrosseEvent: passes caught at the bars' ends
   lacrosseEvent: {
     chance: 0.01,
     passesMs: [260, 160] as [number, number], // each pass, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, levels + cash: src/floors/jetSkiEvent: a jet ski tears along the bars
+  // mix, levels + cash: src/crits/animatedCrits/events/jetSkiEvent: a jet ski tears along the bars
   jetSkiEvent: {
     chance: 0.01,
     runsMs: [340, 220] as [number, number], // each run, quickening
@@ -5345,7 +5345,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, worker tiers + cash: src/floors/drinkingStrawEvent: workers sip cash
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/drinkingStrawEvent: workers sip cash
   // up out of a pool
   drinkingStrawEvent: {
     chance: 0.01,
@@ -5355,7 +5355,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/seaSerpentEvent: a serpent of cash humps across
+  // mix, cash: src/crits/animatedCrits/events/seaSerpentEvent: a serpent of cash humps across
   seaSerpentEvent: {
     chance: 0.01,
     swimMs: 1200, // the swim across
@@ -5363,14 +5363,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/magicTrickEvent: an endless scarf of cash out of a hat
+  // mix, cash: src/crits/animatedCrits/events/magicTrickEvent: an endless scarf of cash out of a hat
   magicTrickEvent: {
     chance: 0.01,
     pullMs: 1500, // the whole pull
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, tiers + cash: src/floors/fountainPenEvent: a pen signs in cash and
+  // mix, tiers + cash: src/crits/animatedCrits/events/fountainPenEvent: a pen signs in cash and
   // stabs the bars
   fountainPenEvent: {
     chance: 0.01,
@@ -5379,7 +5379,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/spoolEvent: a spool unspools and reels in a river
+  // mix, cash: src/crits/animatedCrits/events/spoolEvent: a spool unspools and reels in a river
   spoolEvent: {
     chance: 0.01,
     unspoolMs: 700, // unspooling
@@ -5387,7 +5387,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/laserRainEvent: lasers rain down onto the bars
+  // beam, levels: src/crits/animatedCrits/events/laserRainEvent: lasers rain down onto the bars
   laserRainEvent: {
     chance: 0.01,
     rainMs: 1300, // the downpour
@@ -5395,14 +5395,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, tiers: src/floors/crossCutEvent: two beams cross on each bar
+  // beam, tiers: src/crits/animatedCrits/events/crossCutEvent: two beams cross on each bar
   crossCutEvent: {
     chance: 0.01,
     sweepsMs: [420, 260] as [number, number], // each sweep, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, worker tiers: src/floors/heliographEvent: a mirror flashes sunlight
+  // beam, worker tiers: src/crits/animatedCrits/events/heliographEvent: a mirror flashes sunlight
   // onto the workers
   heliographEvent: {
     chance: 0.01,
@@ -5410,7 +5410,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/starburstEvent: shells burst into stars of beams
+  // beam, cash: src/crits/animatedCrits/events/starburstEvent: shells burst into stars of beams
   starburstEvent: {
     chance: 0.01,
     shellsMs: [300, 180] as [number, number], // between shells, quickening
@@ -5418,7 +5418,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, levels: src/floors/thunderDrumEvent: bolts drum on the bars
+  // lightning, levels: src/crits/animatedCrits/events/thunderDrumEvent: bolts drum on the bars
   thunderDrumEvent: {
     chance: 0.01,
     beatsMs: [170, 90] as [number, number], // between beats, quickening
@@ -5426,21 +5426,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/boltBarrageEvent: a barrage of bolts
+  // lightning, cash: src/crits/animatedCrits/events/boltBarrageEvent: a barrage of bolts
   boltBarrageEvent: {
     chance: 0.01,
     barrageMs: 1400, // the barrage
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, tiers: src/floors/coilgunEvent: a slug fired through coils
+  // lightning, tiers: src/crits/animatedCrits/events/coilgunEvent: a slug fired through coils
   coilgunEvent: {
     chance: 0.01,
     shotMs: [320, 200] as [number, number], // each shot, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/snowflakeEvent: lightning grows into a snowflake
+  // lightning, cash: src/crits/animatedCrits/events/snowflakeEvent: lightning grows into a snowflake
   snowflakeEvent: {
     chance: 0.01,
     stageMs: 300, // each stage of growth
@@ -5448,7 +5448,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, worker tiers: src/floors/bombSnakeEvent: a snake of bombs blows
+  // explosion, worker tiers: src/crits/animatedCrits/events/bombSnakeEvent: a snake of bombs blows
   // tail to head
   bombSnakeEvent: {
     chance: 0.01,
@@ -5457,7 +5457,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, hires: src/floors/spiderMinesEvent: mines scuttle to spots and
+  // explosion, hires: src/crits/animatedCrits/events/spiderMinesEvent: mines scuttle to spots and
   // blow
   spiderMinesEvent: {
     chance: 0.01,
@@ -5466,7 +5466,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/crossetteEvent: shells split in crosses
+  // explosion, cash: src/crits/animatedCrits/events/crossetteEvent: shells split in crosses
   crossetteEvent: {
     chance: 0.01,
     shellsMs: [500, 380] as [number, number], // between shells, quickening
@@ -5475,7 +5475,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, cash: src/floors/spiralChargeEvent: a spiral of charges chains out
+  // explosion, cash: src/crits/animatedCrits/events/spiralChargeEvent: a spiral of charges chains out
   spiralChargeEvent: {
     chance: 0.01,
     setupMs: 300, // the charges flying into place
@@ -5483,7 +5483,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, levels: src/floors/bombBubblesEvent: bubbled bombs blow under
+  // explosion, levels: src/crits/animatedCrits/events/bombBubblesEvent: bubbled bombs blow under
   // the bars
   bombBubblesEvent: {
     chance: 0.01,
@@ -5492,14 +5492,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, tiers: src/floors/rocketSledEvent: a sled boosts along the bars
+  // explosion, tiers: src/crits/animatedCrits/events/rocketSledEvent: a sled boosts along the bars
   rocketSledEvent: {
     chance: 0.01,
     runsMs: [420, 280] as [number, number], // each run, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/dynamiteFishingEvent: dynamite in a pool of cash
+  // explosion, cash: src/crits/animatedCrits/events/dynamiteFishingEvent: dynamite in a pool of cash
   dynamiteFishingEvent: {
     chance: 0.01,
     fillMs: 450, // the pool filling
@@ -5508,14 +5508,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, tiers: src/floors/chargeShotEvent: a charged shot smashes each bar
+  // gunfire, tiers: src/crits/animatedCrits/events/chargeShotEvent: a charged shot smashes each bar
   chargeShotEvent: {
     chance: 0.01,
     chargeMs: [460, 300] as [number, number], // each charge, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/corkscrewRoundsEvent: helix streams of bullets
+  // gunfire, cash: src/crits/animatedCrits/events/corkscrewRoundsEvent: helix streams of bullets
   corkscrewRoundsEvent: {
     chance: 0.01,
     shotMs: 45, // between pairs
@@ -5524,7 +5524,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, worker tiers: src/floors/orbitalGunsEvent: guns orbit and fire on
+  // gunfire, worker tiers: src/crits/animatedCrits/events/orbitalGunsEvent: guns orbit and fire on
   // each worker
   orbitalGunsEvent: {
     chance: 0.01,
@@ -5533,7 +5533,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/tracerRoundsEvent: crossfire tracers into bars
+  // gunfire, levels: src/crits/animatedCrits/events/tracerRoundsEvent: crossfire tracers into bars
   tracerRoundsEvent: {
     chance: 0.01,
     fireMs: 1100, // the crossfire
@@ -5541,14 +5541,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, hires: src/floors/pelletStormEvent: pellet blasts onto spots
+  // gunfire, hires: src/crits/animatedCrits/events/pelletStormEvent: pellet blasts onto spots
   pelletStormEvent: {
     chance: 0.01,
     blastsMs: [300, 180] as [number, number], // between blasts, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, unlock: src/floors/bulletSnakeEvent: a snaking stream into the lock
+  // gunfire, unlock: src/crits/animatedCrits/events/bulletSnakeEvent: a snaking stream into the lock
   bulletSnakeEvent: {
     chance: 0.01,
     fireMs: 1100, // the stream
@@ -5556,7 +5556,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker tiers: src/floors/rockPaperScissorsEvent: rock, paper,
+  // experiment, worker tiers: src/crits/animatedCrits/events/rockPaperScissorsEvent: rock, paper,
   // scissors, shoot!
   rockPaperScissorsEvent: {
     chance: 0.01,
@@ -5565,14 +5565,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, levels: src/floors/limboEvent: a dancer limbos under each pole
+  // experiment, levels: src/crits/animatedCrits/events/limboEvent: a dancer limbos under each pole
   limboEvent: {
     chance: 0.01,
     slidesMs: [380, 240] as [number, number], // each slide, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, tiers: src/floors/quizShowEvent: buzz, correct, crit tier
+  // experiment, tiers: src/crits/animatedCrits/events/quizShowEvent: buzz, correct, crit tier
   quizShowEvent: {
     chance: 0.01,
     questionsMs: [380, 240] as [number, number], // before each buzz, quickening
@@ -5580,14 +5580,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/sumoEvent: two wrestlers clash in a ring
+  // experiment, cash: src/crits/animatedCrits/events/sumoEvent: two wrestlers clash in a ring
   sumoEvent: {
     chance: 0.01,
     clashesMs: [480, 320] as [number, number], // each clash, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, levels: src/floors/paperTossEvent: bank shots into bins
+  // experiment, levels: src/crits/animatedCrits/events/paperTossEvent: bank shots into bins
   paperTossEvent: {
     chance: 0.01,
     tossesMs: [300, 180] as [number, number], // between tosses, quickening
@@ -5595,28 +5595,28 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker tiers: src/floors/armWrestlingEvent: arm-wrestling bouts
+  // experiment, worker tiers: src/crits/animatedCrits/events/armWrestlingEvent: arm-wrestling bouts
   armWrestlingEvent: {
     chance: 0.01,
     strainMs: [320, 180] as [number, number], // each strain, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/keepyUppyEvent: counting kick-ups to ten
+  // experiment, cash: src/crits/animatedCrits/events/keepyUppyEvent: counting kick-ups to ten
   keepyUppyEvent: {
     chance: 0.01,
     touchesMs: [200, 280] as [number, number], // each touch, ever higher
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, tiers: src/floors/pinTheTailEvent: a dizzy wisp pins the bars
+  // experiment, tiers: src/crits/animatedCrits/events/pinTheTailEvent: a dizzy wisp pins the bars
   pinTheTailEvent: {
     chance: 0.01,
     wanderMs: [460, 300] as [number, number], // each stagger, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, hires: src/floors/trustFallEvent: fallers caught on empty spots
+  // experiment, hires: src/crits/animatedCrits/events/trustFallEvent: fallers caught on empty spots
   trustFallEvent: {
     chance: 0.01,
     fallsMs: [220, 130] as [number, number], // between falls, quickening
@@ -5624,14 +5624,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/bubbleGumEvent: bubbles blown until they pop
+  // experiment, cash: src/crits/animatedCrits/events/bubbleGumEvent: bubbles blown until they pop
   bubbleGumEvent: {
     chance: 0.01,
     blowMs: [420, 600] as [number, number], // each bubble, ever bigger
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels + cash: src/floors/canalLocksEvent: a river climbs a flight
+  // money, levels + cash: src/crits/animatedCrits/events/canalLocksEvent: a river climbs a flight
   // of locks beside the bars
   canalLocksEvent: {
     chance: 0.01,
@@ -5639,7 +5639,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/bobsledEvent: a river races down a bobsled run
+  // money, cash: src/crits/animatedCrits/events/bobsledEvent: a river races down a bobsled run
   bobsledEvent: {
     chance: 0.01,
     runMs: [520, 300] as [number, number], // each curve, quickening
@@ -5647,7 +5647,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/springLoadedEvent: a spring of cash squeezes and
+  // money, cash: src/crits/animatedCrits/events/springLoadedEvent: a spring of cash squeezes and
   // lets go
   springLoadedEvent: {
     chance: 0.01,
@@ -5657,7 +5657,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, cash: src/floors/influxEvent: eight rivers pile into a heap
+  // money, cash: src/crits/animatedCrits/events/influxEvent: eight rivers pile into a heap
   influxEvent: {
     chance: 0.01,
     riverMs: 520, // each river's run into the middle
@@ -5666,7 +5666,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/unevenBarsEvent: a gymnast swings bar to bar
+  // wisp, levels: src/crits/animatedCrits/events/unevenBarsEvent: a gymnast swings bar to bar
   unevenBarsEvent: {
     chance: 0.01,
     swingsMs: [420, 260] as [number, number], // each bar's giant circles, quickening
@@ -5674,14 +5674,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, hires: src/floors/bumblebeeEvent: a bee buzzes onto empty spots
+  // wisp, hires: src/crits/animatedCrits/events/bumblebeeEvent: a bee buzzes onto empty spots
   bumblebeeEvent: {
     chance: 0.01,
     flightsMs: [420, 220] as [number, number], // each flight, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, tiers: src/floors/shotPutEvent: a shot spun up and heaved onto bars
+  // wisp, tiers: src/crits/animatedCrits/events/shotPutEvent: a shot spun up and heaved onto bars
   shotPutEvent: {
     chance: 0.01,
     spinsMs: [440, 300] as [number, number], // each wind-up, quickening
@@ -5690,7 +5690,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, unlock: src/floors/humanCannonballEvent: a wisp fired through rings
+  // wisp, unlock: src/crits/animatedCrits/events/humanCannonballEvent: a wisp fired through rings
   // into the lock
   humanCannonballEvent: {
     chance: 0.01,
@@ -5699,14 +5699,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/foxAndHoundsEvent: hounds chase a darting fox
+  // wisp, cash: src/crits/animatedCrits/events/foxAndHoundsEvent: hounds chase a darting fox
   foxAndHoundsEvent: {
     chance: 0.01,
     dartsMs: [240, 120] as [number, number], // each dart, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, cash: src/floors/kingfisherEvent: a kingfisher dives into each bar
+  // wisp, cash: src/crits/animatedCrits/events/kingfisherEvent: a kingfisher dives into each bar
   kingfisherEvent: {
     chance: 0.01,
     divesMs: [520, 320] as [number, number], // each perch, bob and dive, quickening
@@ -5714,7 +5714,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, tiers + cash: src/floors/joustEvent: knights joust on the bars
+  // mix, tiers + cash: src/crits/animatedCrits/events/joustEvent: knights joust on the bars
   joustEvent: {
     chance: 0.01,
     chargesMs: [520, 340] as [number, number], // each charge, quickening
@@ -5722,7 +5722,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, hires + cash: src/floors/pelicanEvent: a pelican scoops cash onto spots
+  // mix, hires + cash: src/crits/animatedCrits/events/pelicanEvent: a pelican scoops cash onto spots
   pelicanEvent: {
     chance: 0.01,
     fillMs: 320, // the pool filling
@@ -5731,7 +5731,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/dragsterEvent: a dragster revs and races the bottom
+  // mix, cash: src/crits/animatedCrits/events/dragsterEvent: a dragster revs and races the bottom
   dragsterEvent: {
     chance: 0.01,
     revMs: 480, // revving at the line
@@ -5741,7 +5741,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, levels + cash: src/floors/fireBreatherEvent: a wisp breathes cash on
+  // mix, levels + cash: src/crits/animatedCrits/events/fireBreatherEvent: a wisp breathes cash on
   // the bars
   fireBreatherEvent: {
     chance: 0.01,
@@ -5750,7 +5750,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/bucketSwingEvent: a bucket of cash swung in loops
+  // mix, cash: src/crits/animatedCrits/events/bucketSwingEvent: a bucket of cash swung in loops
   bucketSwingEvent: {
     chance: 0.01,
     scoopMs: 300, // the scoop out of the button
@@ -5759,7 +5759,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, worker tiers + cash: src/floors/puppeteerEvent: strings of cash yank
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/puppeteerEvent: strings of cash yank
   // the workers
   puppeteerEvent: {
     chance: 0.01,
@@ -5769,7 +5769,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, cash: src/floors/coronaEvent: an eclipse flares corona beams
+  // beam, cash: src/crits/animatedCrits/events/coronaEvent: an eclipse flares corona beams
   coronaEvent: {
     chance: 0.01,
     swellMs: 280, // the sun swelling
@@ -5780,7 +5780,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, worker tiers: src/floors/pillarsEvent: pillars of light slam onto
+  // beam, worker tiers: src/crits/animatedCrits/events/pillarsEvent: pillars of light slam onto
   // the workers
   pillarsEvent: {
     chance: 0.01,
@@ -5790,7 +5790,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, unlock: src/floors/laserLadderEvent: rungs of beams climb to the lock
+  // beam, unlock: src/crits/animatedCrits/events/laserLadderEvent: rungs of beams climb to the lock
   laserLadderEvent: {
     chance: 0.01,
     rungsMs: [150, 70] as [number, number], // between rungs, quickening
@@ -5798,7 +5798,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, tiers: src/floors/beamSplitterEvent: a beam splits into a tree of
+  // beam, tiers: src/crits/animatedCrits/events/beamSplitterEvent: a beam splits into a tree of
   // beams onto the bars
   beamSplitterEvent: {
     chance: 0.01,
@@ -5806,14 +5806,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, hires: src/floors/teleporterEvent: workers beam in on the empty spots
+  // beam, hires: src/crits/animatedCrits/events/teleporterEvent: workers beam in on the empty spots
   teleporterEvent: {
     chance: 0.01,
     spotMs: [520, 280] as [number, number], // each spot, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, levels: src/floors/ringLightEvent: a hoop of beams drops down the
+  // beam, levels: src/crits/animatedCrits/events/ringLightEvent: a hoop of beams drops down the
   // screen
   ringLightEvent: {
     chance: 0.01,
@@ -5824,14 +5824,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker tiers: src/floors/taserEvent: a taser zaps each worker
+  // lightning, worker tiers: src/crits/animatedCrits/events/taserEvent: a taser zaps each worker
   taserEvent: {
     chance: 0.01,
     zapMs: [460, 260] as [number, number], // each worker, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/arcFurnaceEvent: an arc boils a pool of cash
+  // lightning, cash: src/crits/animatedCrits/events/arcFurnaceEvent: an arc boils a pool of cash
   arcFurnaceEvent: {
     chance: 0.01,
     fillMs: 380, // the pool filling
@@ -5840,7 +5840,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, hires: src/floors/fiveFingersEvent: a hand of bolts reaches
+  // lightning, hires: src/crits/animatedCrits/events/fiveFingersEvent: a hand of bolts reaches
   // down onto the empty spots
   fiveFingersEvent: {
     chance: 0.01,
@@ -5849,7 +5849,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/cattleProdEvent: a prod jabs each bar
+  // lightning, levels: src/crits/animatedCrits/events/cattleProdEvent: a prod jabs each bar
   cattleProdEvent: {
     chance: 0.01,
     hopMs: 160, // the prod's hop to each bar
@@ -5858,7 +5858,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, tiers: src/floors/boltSlingEvent: a slingshot of lightning
+  // lightning, tiers: src/crits/animatedCrits/events/boltSlingEvent: a slingshot of lightning
   // fires wisps into the bars
   boltSlingEvent: {
     chance: 0.01,
@@ -5867,7 +5867,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/collidingStormsEvent: two storm clouds collide
+  // lightning, cash: src/crits/animatedCrits/events/collidingStormsEvent: two storm clouds collide
   collidingStormsEvent: {
     chance: 0.01,
     approachMs: 1300, // the clouds rolling in
@@ -5875,7 +5875,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, levels: src/floors/bombJugglerEvent: a juggler tosses lit bombs
+  // explosion, levels: src/crits/animatedCrits/events/bombJugglerEvent: a juggler tosses lit bombs
   // onto the bars
   bombJugglerEvent: {
     chance: 0.01,
@@ -5885,7 +5885,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, worker perma tiers: src/floors/bombSquadEvent: a defuser
+  // explosion, worker perma tiers: src/crits/animatedCrits/events/bombSquadEvent: a defuser
   // wisp zips between bombs over the workers, each blowing as it arrives
   bombSquadEvent: {
     chance: 0.01,
@@ -5893,7 +5893,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/splitterEvent: a bouncing bomb splits into
+  // explosion, cash: src/crits/animatedCrits/events/splitterEvent: a bouncing bomb splits into
   // three, each into three more, the last generation rippling off
   splitterEvent: {
     chance: 0.01,
@@ -5902,7 +5902,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, crit tiers: src/floors/bombPendulumEvent: a bomb on a
+  // explosion, crit tiers: src/crits/animatedCrits/events/bombPendulumEvent: a bomb on a
   // pendulum smashes each end of every income bar
   bombPendulumEvent: {
     chance: 0.01,
@@ -5911,7 +5911,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, free hires: src/floors/paradropEvent: bombs drift down under
+  // explosion, free hires: src/crits/animatedCrits/events/paradropEvent: bombs drift down under
   // glitter canopies onto the empty spots
   paradropEvent: {
     chance: 0.01,
@@ -5920,7 +5920,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/bombPachinkoEvent: bombs rattle down a peg
+  // explosion, cash: src/crits/animatedCrits/events/bombPachinkoEvent: bombs rattle down a peg
   // field and blow along the bottom
   bombPachinkoEvent: {
     chance: 0.01,
@@ -5930,7 +5930,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, cash: src/floors/fuseClockEvent: a spark races round a clock
+  // explosion, cash: src/crits/animatedCrits/events/fuseClockEvent: a spark races round a clock
   // of twelve bombs, blowing each hour
   fuseClockEvent: {
     chance: 0.01,
@@ -5938,7 +5938,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, cash: src/floors/hedgehogEvent: a rolling wisp fires a bullet
+  // gunfire, cash: src/crits/animatedCrits/events/hedgehogEvent: a rolling wisp fires a bullet
   // ring at the top of every bounce
   hedgehogEvent: {
     chance: 0.01,
@@ -5946,7 +5946,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, cash: src/floors/splitShotEvent: a ricochet that splits in two
+  // gunfire, cash: src/crits/animatedCrits/events/splitShotEvent: a ricochet that splits in two
   // at every bounce
   splitShotEvent: {
     chance: 0.01,
@@ -5954,7 +5954,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, crit tiers: src/floors/bulletLassoEvent: a gun circles each
+  // gunfire, crit tiers: src/crits/animatedCrits/events/bulletLassoEvent: a gun circles each
   // bar, a loop of bullets cinching onto it
   bulletLassoEvent: {
     chance: 0.01,
@@ -5962,7 +5962,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker perma tiers: src/floors/bulletWeaveEvent: two guns weave
+  // gunfire, worker perma tiers: src/crits/animatedCrits/events/bulletWeaveEvent: two guns weave
   // a lattice of bullets across each worker
   bulletWeaveEvent: {
     chance: 0.01,
@@ -5970,7 +5970,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/bulletFountainEvent: a fountain of bullets
+  // gunfire, levels: src/crits/animatedCrits/events/bulletFountainEvent: a fountain of bullets
   // arcing up and raining onto the bars
   bulletFountainEvent: {
     chance: 0.01,
@@ -5979,7 +5979,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, hires: src/floors/coveringFireEvent: recruits dash through crossfire
+  // gunfire, hires: src/crits/animatedCrits/events/coveringFireEvent: recruits dash through crossfire
   coveringFireEvent: {
     chance: 0.01,
     gapMs: [210, 130] as [number, number], // between recruits, quickening
@@ -5987,7 +5987,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, tiers: src/floors/checkersEvent: multi-jumps bar to bar, king me
+  // experiment, tiers: src/crits/animatedCrits/events/checkersEvent: multi-jumps bar to bar, king me
   checkersEvent: {
     chance: 0.01,
     hopsMs: [170, 110] as [number, number], // each hop, quickening
@@ -5995,7 +5995,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/minesweeperEvent: squares flood open, mines blow
+  // experiment, cash: src/crits/animatedCrits/events/minesweeperEvent: squares flood open, mines blow
   minesweeperEvent: {
     chance: 0.01,
     waveMs: 46, // per ring of squares opening
@@ -6003,7 +6003,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, unlock: src/floors/jackInTheBoxEvent: crank, POP!, spring up
+  // experiment, unlock: src/crits/animatedCrits/events/jackInTheBoxEvent: crank, POP!, spring up
   jackInTheBoxEvent: {
     chance: 0.01,
     windMs: 950, // the crank winding up, quickening
@@ -6011,7 +6011,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // money, levels + cash: src/floors/spillwayEvent: a pool spills a curtain
+  // money, levels + cash: src/crits/animatedCrits/events/spillwayEvent: a pool spills a curtain
   // of cash down past every bar
   spillwayEvent: {
     chance: 0.01,
@@ -6021,21 +6021,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money, cash: src/floors/crosscurrentsEvent: two rivers weave up, crossing
+  // money, cash: src/crits/animatedCrits/events/crosscurrentsEvent: two rivers weave up, crossing
   crosscurrentsEvent: {
     chance: 0.01,
     travelMs: 1400, // each river's run up into the total
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, tiers + cash: src/floors/oxbowEvent: a river loops round each bar
+  // money, tiers + cash: src/crits/animatedCrits/events/oxbowEvent: a river loops round each bar
   oxbowEvent: {
     chance: 0.01,
     loopsMs: [700, 480] as [number, number], // each river's run, quickening
     holdMs: 300,
     mergeMs: 500,
   },
-  // money, worker tiers + cash: src/floors/breakersEvent: waves crash on workers
+  // money, worker tiers + cash: src/crits/animatedCrits/events/breakersEvent: waves crash on workers
   breakersEvent: {
     chance: 0.01,
     gapsMs: [300, 160] as [number, number], // between waves, quickening
@@ -6043,7 +6043,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money, hires + cash: src/floors/rivuletsEvent: trickles meet at each spot
+  // money, hires + cash: src/crits/animatedCrits/events/rivuletsEvent: trickles meet at each spot
   rivuletsEvent: {
     chance: 0.01,
     gapsMs: [240, 120] as [number, number], // between pairs, quickening
@@ -6051,14 +6051,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money, a free floor + cash: src/floors/torrentEvent: a zigzag torrent up
+  // money, a free floor + cash: src/crits/animatedCrits/events/torrentEvent: a zigzag torrent up
   torrentEvent: {
     chance: 0.01,
     climbMs: 1200, // the torrent's climb to the lock
     holdMs: 500,
     mergeMs: 300,
   },
-  // wisp, levels: src/floors/lissajousEvent: a Lissajous figure over the bars
+  // wisp, levels: src/crits/animatedCrits/events/lissajousEvent: a Lissajous figure over the bars
   lissajousEvent: {
     chance: 0.01,
     traceMs: 1700, // the figure, quickening
@@ -6066,7 +6066,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, tiers: src/floors/moonHopEvent: orbits each bar and slingshots on
+  // wisp, tiers: src/crits/animatedCrits/events/moonHopEvent: orbits each bar and slingshots on
   moonHopEvent: {
     chance: 0.01,
     orbitsMs: [560, 360] as [number, number], // each orbit, quickening
@@ -6074,7 +6074,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, hires: src/floors/peekabooEvent: wisps peek, duck and spring up
+  // wisp, hires: src/crits/animatedCrits/events/peekabooEvent: wisps peek, duck and spring up
   peekabooEvent: {
     chance: 0.01,
     gapsMs: [240, 130] as [number, number], // between spots, quickening
@@ -6082,7 +6082,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, worker tiers: src/floors/tiltAWhirlEvent: a whirling ride per worker
+  // wisp, worker tiers: src/crits/animatedCrits/events/tiltAWhirlEvent: a whirling ride per worker
   tiltAWhirlEvent: {
     chance: 0.01,
     spinsMs: [560, 360] as [number, number], // each whirl, quickening
@@ -6090,28 +6090,28 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/waterStriderEvent: darting glides that ripple coins
+  // wisp, cash: src/crits/animatedCrits/events/waterStriderEvent: darting glides that ripple coins
   waterStriderEvent: {
     chance: 0.01,
     glidesMs: [260, 110] as [number, number], // each glide, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, a free floor: src/floors/ropeClimbEvent: hand over hand up to the lock
+  // wisp, a free floor: src/crits/animatedCrits/events/ropeClimbEvent: hand over hand up to the lock
   ropeClimbEvent: {
     chance: 0.01,
     pullsMs: [190, 110] as [number, number], // each pull, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/paddleSteamerEvent: a paddle wheel flings arcs of cash
+  // mix, cash: src/crits/animatedCrits/events/paddleSteamerEvent: a paddle wheel flings arcs of cash
   paddleSteamerEvent: {
     chance: 0.01,
     crossMs: 1500, // the wheel's roll across, spinning faster
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, tiers + cash: src/floors/jetWashEvent: a jet skims each bar
+  // mix, tiers + cash: src/crits/animatedCrits/events/jetWashEvent: a jet skims each bar
   jetWashEvent: {
     chance: 0.01,
     passesMs: [420, 260] as [number, number], // each skim, quickening
@@ -6119,7 +6119,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, levels + cash: src/floors/bellowsEvent: breathe in coins, puff out cash
+  // mix, levels + cash: src/crits/animatedCrits/events/bellowsEvent: breathe in coins, puff out cash
   bellowsEvent: {
     chance: 0.01,
     pumpsMs: [480, 320] as [number, number], // each pump, quickening
@@ -6127,7 +6127,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, hires + cash: src/floors/rainDanceEvent: a spinning wisp rains cash
+  // mix, hires + cash: src/crits/animatedCrits/events/rainDanceEvent: a spinning wisp rains cash
   rainDanceEvent: {
     chance: 0.01,
     dancesMs: [460, 300] as [number, number], // each dance, quickening
@@ -6135,21 +6135,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, worker tiers + cash: src/floors/skiTowEvent: a cable of cash up the workers
+  // mix, worker tiers + cash: src/crits/animatedCrits/events/skiTowEvent: a cable of cash up the workers
   skiTowEvent: {
     chance: 0.01,
     towMs: 1500, // the tow from the button up into the total
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/ribbonDancerEvent: a ribbon of cash twirled about
+  // mix, cash: src/crits/animatedCrits/events/ribbonDancerEvent: a ribbon of cash twirled about
   ribbonDancerEvent: {
     chance: 0.01,
     danceMs: 1600, // the twirl and the whip into the total
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/laserTurnstileEvent: a spinning cross of beams
+  // beam, levels: src/crits/animatedCrits/events/laserTurnstileEvent: a spinning cross of beams
   laserTurnstileEvent: {
     chance: 0.01,
     spinMs: 1500, // the spin, quickening
@@ -6157,28 +6157,28 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, hires: src/floors/lightBridgeEvent: arches of light to each spot
+  // beam, hires: src/crits/animatedCrits/events/lightBridgeEvent: arches of light to each spot
   lightBridgeEvent: {
     chance: 0.01,
     archesMs: [440, 280] as [number, number], // each bridge built and run
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, tiers: src/floors/laserWebEvent: a hexagon web cinched on each bar
+  // beam, tiers: src/crits/animatedCrits/events/laserWebEvent: a hexagon web cinched on each bar
   laserWebEvent: {
     chance: 0.01,
     websMs: [560, 380] as [number, number], // each web, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, worker tiers: src/floors/footlightsEvent: footlights fire on workers
+  // beam, worker tiers: src/crits/animatedCrits/events/footlightsEvent: footlights fire on workers
   footlightsEvent: {
     chance: 0.01,
     cuesMs: [440, 280] as [number, number], // each cue, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, a free floor: src/floors/fusionBeamEvent: eight beams fused into one
+  // beam, a free floor: src/crits/animatedCrits/events/fusionBeamEvent: eight beams fused into one
   fusionBeamEvent: {
     chance: 0.01,
     gatherMs: 900, // the emitters gathering and charging the focus
@@ -6186,14 +6186,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/pinpointEvent: six beams converge on spot after spot
+  // beam, cash: src/crits/animatedCrits/events/pinpointEvent: six beams converge on spot after spot
   pinpointEvent: {
     chance: 0.01,
     shotsMs: [300, 130] as [number, number], // each volley, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, levels: src/floors/galvanizeEvent: arcs between the bars
+  // lightning, levels: src/crits/animatedCrits/events/galvanizeEvent: arcs between the bars
   galvanizeEvent: {
     chance: 0.01,
     arcsMs: [200, 80] as [number, number], // between arcs, quickening
@@ -6201,28 +6201,28 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, hires: src/floors/sparkJumpEvent: a spark leaps spot to spot
+  // lightning, hires: src/crits/animatedCrits/events/sparkJumpEvent: a spark leaps spot to spot
   sparkJumpEvent: {
     chance: 0.01,
     jumpsMs: [320, 160] as [number, number], // between leaps, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/staticClingEvent: a wisp rubs up static
+  // lightning, cash: src/crits/animatedCrits/events/staticClingEvent: a wisp rubs up static
   staticClingEvent: {
     chance: 0.01,
     chargeMs: 1300, // the rubbing, quickening, then the discharge
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, tiers: src/floors/capacitorEvent: electrodes charge each bar
+  // lightning, tiers: src/crits/animatedCrits/events/capacitorEvent: electrodes charge each bar
   capacitorEvent: {
     chance: 0.01,
     chargesMs: [560, 380] as [number, number], // each bar's charge, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker tiers: src/floors/sparkTrainEvent: a spark rides a rail
+  // lightning, worker tiers: src/crits/animatedCrits/events/sparkTrainEvent: a spark rides a rail
   sparkTrainEvent: {
     chance: 0.01,
     railMs: 360, // the rail snapping out link by link
@@ -6230,14 +6230,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, a free floor: src/floors/arcBridgeEvent: two pylons climb
+  // lightning, a free floor: src/crits/animatedCrits/events/arcBridgeEvent: two pylons climb
   arcBridgeEvent: {
     chance: 0.01,
     stepsMs: [220, 120] as [number, number], // each step up, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/daisyCutterEvent: one bomb's shockwave
+  // explosion, levels: src/crits/animatedCrits/events/daisyCutterEvent: one bomb's shockwave
   daisyCutterEvent: {
     chance: 0.01,
     dropMs: 520, // the bomb's fall
@@ -6246,21 +6246,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, hires: src/floors/rippleMinesEvent: a shockwave sets off mines
+  // explosion, hires: src/crits/animatedCrits/events/rippleMinesEvent: a shockwave sets off mines
   rippleMinesEvent: {
     chance: 0.01,
     waveMs: 900, // the shockwave's ripple out to the farthest mine
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, tiers: src/floors/bombYoYoEvent: a bomb on a string
+  // explosion, tiers: src/crits/animatedCrits/events/bombYoYoEvent: a bomb on a string
   bombYoYoEvent: {
     chance: 0.01,
     throwsMs: [540, 380] as [number, number], // each throw and yank back
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/bombHailEvent: volleys of falling bombs
+  // explosion, cash: src/crits/animatedCrits/events/bombHailEvent: volleys of falling bombs
   bombHailEvent: {
     chance: 0.01,
     hailMs: 1200, // first volley to last
@@ -6268,14 +6268,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, worker tiers: src/floors/groundPoundEvent: a bomb leaps and pounds
+  // explosion, worker tiers: src/crits/animatedCrits/events/groundPoundEvent: a bomb leaps and pounds
   groundPoundEvent: {
     chance: 0.01,
     leapsMs: [500, 300] as [number, number], // each leap, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/cherryBombEvent: a swinging pair, then chains
+  // explosion, cash: src/crits/animatedCrits/events/cherryBombEvent: a swinging pair, then chains
   cherryBombEvent: {
     chance: 0.01,
     swingMs: 900, // the pendulum, wider and faster
@@ -6284,14 +6284,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, a free floor: src/floors/bombCrownEvent: a ring of bombs round the lock
+  // explosion, a free floor: src/crits/animatedCrits/events/bombCrownEvent: a ring of bombs round the lock
   bombCrownEvent: {
     chance: 0.01,
     spinMs: 1000, // the crown forming, spinning and blowing round
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/bulletCombEvent: a comb of bullets per bar
+  // gunfire, levels: src/crits/animatedCrits/events/bulletCombEvent: a comb of bullets per bar
   bulletCombEvent: {
     chance: 0.01,
     combsMs: [440, 300] as [number, number], // each comb, quickening
@@ -6299,21 +6299,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, tiers: src/floors/bulletBraidEvent: braided bullet streams
+  // gunfire, tiers: src/crits/animatedCrits/events/bulletBraidEvent: braided bullet streams
   bulletBraidEvent: {
     chance: 0.01,
     braidsMs: [560, 380] as [number, number], // each braid, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker tiers: src/floors/bulletCageEvent: a ring of bullets per worker
+  // gunfire, worker tiers: src/crits/animatedCrits/events/bulletCageEvent: a ring of bullets per worker
   bulletCageEvent: {
     chance: 0.01,
     cagesMs: [540, 380] as [number, number], // each cage, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, hires: src/floors/gunslingerEvent: twirl, flip and fan the hammer
+  // gunfire, hires: src/crits/animatedCrits/events/gunslingerEvent: twirl, flip and fan the hammer
   gunslingerEvent: {
     chance: 0.01,
     twirlMs: 520, // the twirl round the button
@@ -6321,14 +6321,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/bulletWheelEvent: a rolling wheel of guns
+  // gunfire, cash: src/crits/animatedCrits/events/bulletWheelEvent: a rolling wheel of guns
   bulletWheelEvent: {
     chance: 0.01,
     spinMs: 1500, // the wheel's roll across
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, a free floor: src/floors/bulletLadderEvent: crossfire rungs up the building
+  // gunfire, a free floor: src/crits/animatedCrits/events/bulletLadderEvent: crossfire rungs up the building
   bulletLadderEvent: {
     chance: 0.01,
     rungsMs: [230, 120] as [number, number], // each rung, quickening
@@ -6336,7 +6336,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 31 experiments: the whole screen is the effect
-  // experiment, crit tiers: src/floors/whipZoomEvent: the camera whips onto each bar
+  // experiment, crit tiers: src/crits/animatedCrits/events/whipZoomEvent: the camera whips onto each bar
   whipZoomEvent: {
     chance: 0.01,
     whipMs: 160, // each whip in
@@ -6345,7 +6345,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker perma tiers: src/floors/irisOutEvent: an iris shuts onto each worker
+  // experiment, worker perma tiers: src/crits/animatedCrits/events/irisOutEvent: an iris shuts onto each worker
   irisOutEvent: {
     chance: 0.01,
     closeMs: 260, // the iris shutting in
@@ -6355,7 +6355,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/screenReelsEvent: the screen spins as slot reels
+  // experiment, cash: src/crits/animatedCrits/events/screenReelsEvent: the screen spins as slot reels
   screenReelsEvent: {
     chance: 0.01,
     spinMs: 700, // before the first reel stops
@@ -6364,7 +6364,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, levels: src/floors/goldLeafEvent: the screen gilds bar by bar
+  // experiment, levels: src/crits/animatedCrits/events/goldLeafEvent: the screen gilds bar by bar
   goldLeafEvent: {
     chance: 0.01,
     dartsMs: [360, 200] as [number, number], // each bar, quickening
@@ -6372,7 +6372,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/pixelStormEvent: the screen shatters into swirling tiles
+  // experiment, cash: src/crits/animatedCrits/events/pixelStormEvent: the screen shatters into swirling tiles
   pixelStormEvent: {
     chance: 0.01,
     swirlMs: 600, // the tiles whirling
@@ -6380,7 +6380,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/gravityFlipEvent: the screen falls up and drops back
+  // experiment, cash: src/crits/animatedCrits/events/gravityFlipEvent: the screen falls up and drops back
   gravityFlipEvent: {
     chance: 0.01,
     fallMs: 450, // falling up off the screen
@@ -6390,7 +6390,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/echoEvent: the screen echoes out in ghost copies
+  // experiment, cash: src/crits/animatedCrits/events/echoEvent: the screen echoes out in ghost copies
   echoEvent: {
     chance: 0.01,
     boomsMs: [280, 110] as [number, number], // between booms, quickening
@@ -6398,14 +6398,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/mirrorBoxEvent: the screen mirrors and flips
+  // experiment, cash: src/crits/animatedCrits/events/mirrorBoxEvent: the screen mirrors and flips
   mirrorBoxEvent: {
     chance: 0.01,
     swingsMs: [320, 160] as [number, number], // between mirror swings, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/pullBackEvent: the screen draws back like a slingshot
+  // experiment, cash: src/crits/animatedCrits/events/pullBackEvent: the screen draws back like a slingshot
   pullBackEvent: {
     chance: 0.01,
     pullMs: 600, // the draw back
@@ -6414,7 +6414,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/treadmillEvent: the screen scrolls like a treadmill
+  // experiment, cash: src/crits/animatedCrits/events/treadmillEvent: the screen scrolls like a treadmill
   treadmillEvent: {
     chance: 0.01,
     runMs: 1600,
@@ -6422,7 +6422,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/blastOffEvent: the screen launches off and drops back
+  // experiment, cash: src/crits/animatedCrits/events/blastOffEvent: the screen launches off and drops back
   blastOffEvent: {
     chance: 0.01,
     shudderMs: 500,
@@ -6432,14 +6432,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/popUpEvent: bands of the screen pop up like a book
+  // experiment, cash: src/crits/animatedCrits/events/popUpEvent: bands of the screen pop up like a book
   popUpEvent: {
     chance: 0.01,
     popsMs: [220, 90] as [number, number], // between pops, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/stickerPeelEvent: the screen peels like a sticker
+  // experiment, cash: src/crits/animatedCrits/events/stickerPeelEvent: the screen peels like a sticker
   stickerPeelEvent: {
     chance: 0.01,
     peelMs: 900,
@@ -6447,7 +6447,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/glissandoEvent: strips of the screen play like keys
+  // experiment, cash: src/crits/animatedCrits/events/glissandoEvent: strips of the screen play like keys
   glissandoEvent: {
     chance: 0.01,
     runsMs: [420, 220] as [number, number], // each run, quickening
@@ -6455,7 +6455,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/vaultDoorsEvent: the screen opens like vault doors
+  // experiment, cash: src/crits/animatedCrits/events/vaultDoorsEvent: the screen opens like vault doors
   vaultDoorsEvent: {
     chance: 0.01,
     clunkMs: 500, // the bolts clunking back
@@ -6465,7 +6465,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels and cash: src/floors/champagneTowerEvent: cash cascades down a tower of glasses
+  // money, levels and cash: src/crits/animatedCrits/events/champagneTowerEvent: cash cascades down a tower of glasses
   champagneTowerEvent: {
     chance: 0.01,
     pourMs: 500,
@@ -6474,14 +6474,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money, cash: src/floors/pinballRiverEvent: a river of cash pinballs off bumpers
+  // money, cash: src/crits/animatedCrits/events/pinballRiverEvent: a river of cash pinballs off bumpers
   pinballRiverEvent: {
     chance: 0.01,
     travelMs: 1400,
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, worker perma tiers: src/floors/pressureWasherEvent: jets of cash blast each worker
+  // money, worker perma tiers: src/crits/animatedCrits/events/pressureWasherEvent: jets of cash blast each worker
   pressureWasherEvent: {
     chance: 0.01,
     jetsMs: [320, 160] as [number, number], // between jets, quickening
@@ -6489,21 +6489,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // money, free hires and cash: src/floors/irrigationEvent: cash runs through channels down the screen
+  // money, free hires and cash: src/crits/animatedCrits/events/irrigationEvent: cash runs through channels down the screen
   irrigationEvent: {
     chance: 0.01,
     speed: 1.4, // px per ms
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, a free floor: src/floors/waterspoutEvent: a spout of cash climbs into the lock
+  // money, a free floor: src/crits/animatedCrits/events/waterspoutEvent: a spout of cash climbs into the lock
   waterspoutEvent: {
     chance: 0.01,
     climbMs: 1300,
     holdMs: 500,
     mergeMs: 500,
   },
-  // wisp, cash: src/floors/sidewinderEvent: a wisp snake slithers and strikes
+  // wisp, cash: src/crits/animatedCrits/events/sidewinderEvent: a wisp snake slithers and strikes
   sidewinderEvent: {
     chance: 0.01,
     slitherMs: 1300,
@@ -6511,14 +6511,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, crit tiers: src/floors/orbitSwapEvent: two wisps circle each bar and collide
+  // wisp, crit tiers: src/crits/animatedCrits/events/orbitSwapEvent: two wisps circle each bar and collide
   orbitSwapEvent: {
     chance: 0.01,
     orbitsMs: [620, 360] as [number, number], // on each bar, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, free hires: src/floors/cuckooEvent: cuckoo wisps boing out and fly to spots
+  // wisp, free hires: src/crits/animatedCrits/events/cuckooEvent: cuckoo wisps boing out and fly to spots
   cuckooEvent: {
     chance: 0.01,
     boingsMs: [380, 220] as [number, number],
@@ -6526,7 +6526,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, worker perma tiers: src/floors/gyreEvent: spirals of wisps screw down on workers
+  // wisp, worker perma tiers: src/crits/animatedCrits/events/gyreEvent: spirals of wisps screw down on workers
   gyreEvent: {
     chance: 0.01,
     dropsMs: [600, 380] as [number, number],
@@ -6534,7 +6534,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, levels: src/floors/barHopEvent: a wisp bounces down the bars
+  // wisp, levels: src/crits/animatedCrits/events/barHopEvent: a wisp bounces down the bars
   barHopEvent: {
     chance: 0.01,
     hopsMs: [240, 120] as [number, number], // each hop, quickening
@@ -6542,7 +6542,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, levels and cash: src/floors/cometPlowEvent: a comet plows down through the bars
+  // mix, levels and cash: src/crits/animatedCrits/events/cometPlowEvent: a comet plows down through the bars
   cometPlowEvent: {
     chance: 0.01,
     plowMs: 1100,
@@ -6550,7 +6550,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, cash: src/floors/hoseReelEvent: a wisp unreels a looping hose of cash and reels it in
+  // mix, cash: src/crits/animatedCrits/events/hoseReelEvent: a wisp unreels a looping hose of cash and reels it in
   hoseReelEvent: {
     chance: 0.01,
     unreelMs: 1100,
@@ -6558,7 +6558,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, crit tiers and cash: src/floors/geyserRiderEvent: a wisp surfs geysers into the bars
+  // mix, crit tiers and cash: src/crits/animatedCrits/events/geyserRiderEvent: a wisp surfs geysers into the bars
   geyserRiderEvent: {
     chance: 0.01,
     eruptsMs: [420, 240] as [number, number], // between geysers, quickening
@@ -6566,14 +6566,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, worker perma tiers and cash: src/floors/bubbleBlowerEvent: coin bubbles lift each worker
+  // mix, worker perma tiers and cash: src/crits/animatedCrits/events/bubbleBlowerEvent: coin bubbles lift each worker
   bubbleBlowerEvent: {
     chance: 0.01,
     blowsMs: [420, 240] as [number, number], // each bubble, quickening
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, free hires and cash: src/floors/poolDiveEvent: a wisp dives into a pool and jets out
+  // mix, free hires and cash: src/crits/animatedCrits/events/poolDiveEvent: a wisp dives into a pool and jets out
   poolDiveEvent: {
     chance: 0.01,
     fillMs: 500,
@@ -6582,7 +6582,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/rubberBandEvent: bands of light snap down on the bars
+  // beam, levels: src/crits/animatedCrits/events/rubberBandEvent: bands of light snap down on the bars
   rubberBandEvent: {
     chance: 0.01,
     pullsMs: [420, 220] as [number, number], // each draw back, quickening
@@ -6590,14 +6590,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, crit tiers: src/floors/beamViseEvent: beam jaws clamp onto each bar
+  // beam, crit tiers: src/crits/animatedCrits/events/beamViseEvent: beam jaws clamp onto each bar
   beamViseEvent: {
     chance: 0.01,
     gripsMs: [560, 320] as [number, number], // each grip, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/laserRakeEvent: a rake of light drags cash across the screen
+  // beam, cash: src/crits/animatedCrits/events/laserRakeEvent: a rake of light drags cash across the screen
   laserRakeEvent: {
     chance: 0.01,
     strokesMs: [320, 180] as [number, number], // each yank, quickening
@@ -6605,35 +6605,35 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, free hires: src/floors/lightDominoesEvent: pillars of light topple onto spots
+  // beam, free hires: src/crits/animatedCrits/events/lightDominoesEvent: pillars of light topple onto spots
   lightDominoesEvent: {
     chance: 0.01,
     fallsMs: [360, 200] as [number, number], // each topple, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, a free floor: src/floors/pryBarEvent: a lever of light pries the lock open
+  // beam, a free floor: src/crits/animatedCrits/events/pryBarEvent: a lever of light pries the lock open
   pryBarEvent: {
     chance: 0.01,
     pumpsMs: [420, 240] as [number, number], // each pump, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/teslaTennisEvent: paddles rally a ball with bolts
+  // lightning, cash: src/crits/animatedCrits/events/teslaTennisEvent: paddles rally a ball with bolts
   teslaTennisEvent: {
     chance: 0.01,
     shotsMs: [340, 170] as [number, number], // each return, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, crit tiers: src/floors/tuningForkEvent: a fork hums and strikes each bar
+  // lightning, crit tiers: src/crits/animatedCrits/events/tuningForkEvent: a fork hums and strikes each bar
   tuningForkEvent: {
     chance: 0.01,
     humsMs: [520, 300] as [number, number], // each hum, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/boltSpiralEvent: a spiralling arm of lightning sweeps the bars
+  // lightning, levels: src/crits/animatedCrits/events/boltSpiralEvent: a spiralling arm of lightning sweeps the bars
   boltSpiralEvent: {
     chance: 0.01,
     spinMs: 1700,
@@ -6641,21 +6641,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker perma tiers: src/floors/groundCurrentEvent: current crawls out to the workers
+  // lightning, worker perma tiers: src/crits/animatedCrits/events/groundCurrentEvent: current crawls out to the workers
   groundCurrentEvent: {
     chance: 0.01,
     crawlMs: 1100, // out to the furthest worker
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, a free floor: src/floors/overchargeEvent: the bars fire bolts into the lock
+  // lightning, a free floor: src/crits/animatedCrits/events/overchargeEvent: the bars fire bolts into the lock
   overchargeEvent: {
     chance: 0.01,
     firesMs: [320, 160] as [number, number], // between bolts, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/bombTornadoEvent: a tornado of bombs flings them off
+  // explosion, cash: src/crits/animatedCrits/events/bombTornadoEvent: a tornado of bombs flings them off
   bombTornadoEvent: {
     chance: 0.01,
     spinUpMs: 450,
@@ -6663,28 +6663,28 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, worker perma tiers: src/floors/bombBoomerangEvent: a boomerang bomb drops bomblets
+  // explosion, worker perma tiers: src/crits/animatedCrits/events/bombBoomerangEvent: a boomerang bomb drops bomblets
   bombBoomerangEvent: {
     chance: 0.01,
     loopMs: 1800,
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, a free floor: src/floors/multistageEvent: a bomb rocket drops its stages
+  // explosion, a free floor: src/crits/animatedCrits/events/multistageEvent: a bomb rocket drops its stages
   multistageEvent: {
     chance: 0.01,
     flightMs: 1600,
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, crit tiers: src/floors/bombPileEvent: towers of bombs blow top down
+  // explosion, crit tiers: src/crits/animatedCrits/events/bombPileEvent: towers of bombs blow top down
   bombPileEvent: {
     chance: 0.01,
     dropsMs: [110, 60] as [number, number], // between drops, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/bombGarlandEvent: garlands of bombs blow in from both ends
+  // explosion, levels: src/crits/animatedCrits/events/bombGarlandEvent: garlands of bombs blow in from both ends
   bombGarlandEvent: {
     chance: 0.01,
     burnsMs: [420, 240] as [number, number], // each garland's burn, quickening
@@ -6692,7 +6692,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker perma tiers: src/floors/homingRoundsEvent: curling rounds home in
+  // gunfire, worker perma tiers: src/crits/animatedCrits/events/homingRoundsEvent: curling rounds home in
   homingRoundsEvent: {
     chance: 0.01,
     volleysMs: [320, 160] as [number, number], // between volleys, quickening
@@ -6700,7 +6700,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/waveCannonEvent: sine waves of bullets crash into the bars
+  // gunfire, levels: src/crits/animatedCrits/events/waveCannonEvent: sine waves of bullets crash into the bars
   waveCannonEvent: {
     chance: 0.01,
     volleysMs: [420, 260] as [number, number],
@@ -6709,7 +6709,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, free hires: src/floors/snapbackEvent: rounds overshoot and snap back
+  // gunfire, free hires: src/crits/animatedCrits/events/snapbackEvent: rounds overshoot and snap back
   snapbackEvent: {
     chance: 0.01,
     shotsMs: [220, 120] as [number, number], // between shots, quickening
@@ -6717,7 +6717,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/bulletFunnelEvent: bullets swirl into a vortex of cash
+  // gunfire, cash: src/crits/animatedCrits/events/bulletFunnelEvent: bullets swirl into a vortex of cash
   bulletFunnelEvent: {
     chance: 0.01,
     gapsMs: [170, 70] as [number, number], // between volleys, quickening
@@ -6725,7 +6725,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, crit tiers: src/floors/crisscrossEvent: guns crisscross each bar
+  // gunfire, crit tiers: src/crits/animatedCrits/events/crisscrossEvent: guns crisscross each bar
   crisscrossEvent: {
     chance: 0.01,
     passesMs: [560, 340] as [number, number], // each pass, quickening
@@ -6733,7 +6733,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 32
-  // money, cash: src/floors/chainFountainEvent: a rope of cash leaps out of a heap in rising arches
+  // money, cash: src/crits/animatedCrits/events/chainFountainEvent: a rope of cash leaps out of a heap in rising arches
   chainFountainEvent: {
     chance: 0.01,
     archesMs: [420, 240] as [number, number], // between arches, quickening
@@ -6741,7 +6741,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, levels and cash: src/floors/smokeRingsEvent: rolling rings of cash sail up through the bars
+  // money, levels and cash: src/crits/animatedCrits/events/smokeRingsEvent: rolling rings of cash sail up through the bars
   smokeRingsEvent: {
     chance: 0.01,
     puffsMs: [380, 220] as [number, number], // between puffs, quickening
@@ -6750,7 +6750,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // money, crit tiers and cash: src/floors/waterSaluteEvent: twin jets arch over each bar and crash down
+  // money, crit tiers and cash: src/crits/animatedCrits/events/waterSaluteEvent: twin jets arch over each bar and crash down
   waterSaluteEvent: {
     chance: 0.01,
     salutesMs: [460, 280] as [number, number], // between salutes, quickening
@@ -6758,14 +6758,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp, worker perma tiers: src/floors/doublePendulumEvent: a chaotic double pendulum whips the workers
+  // wisp, worker perma tiers: src/crits/animatedCrits/events/doublePendulumEvent: a chaotic double pendulum whips the workers
   doublePendulumEvent: {
     chance: 0.01,
     flailMs: 1800,
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, free hires: src/floors/trapezeEvent: flyers somersault between trapezes onto spots
+  // wisp, free hires: src/crits/animatedCrits/events/trapezeEvent: flyers somersault between trapezes onto spots
   trapezeEvent: {
     chance: 0.01,
     periodMs: 440, // each trapeze's swing
@@ -6773,7 +6773,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, levels: src/floors/diaboloEvent: a diabolo is whipped, flung up and smashed onto each bar
+  // wisp, levels: src/crits/animatedCrits/events/diaboloEvent: a diabolo is whipped, flung up and smashed onto each bar
   diaboloEvent: {
     chance: 0.01,
     whipsMs: [380, 220] as [number, number], // each whip, quickening
@@ -6783,7 +6783,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/zorbEvent: a ball of cash bounds round the screen with a wisp inside
+  // mix, cash: src/crits/animatedCrits/events/zorbEvent: a ball of cash bounds round the screen with a wisp inside
   zorbEvent: {
     chance: 0.01,
     gatherMs: 260,
@@ -6792,7 +6792,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, crit tiers and cash: src/floors/hoopDiveEvent: a wisp dives through hoops of cash onto the bars
+  // mix, crit tiers and cash: src/crits/animatedCrits/events/hoopDiveEvent: a wisp dives through hoops of cash onto the bars
   hoopDiveEvent: {
     chance: 0.01,
     legsMs: [520, 320] as [number, number], // each climb and dive, quickening
@@ -6800,7 +6800,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, worker perma tiers and cash: src/floors/spinArtEvent: a whirl flings streaks of cash onto the workers
+  // mix, worker perma tiers and cash: src/crits/animatedCrits/events/spinArtEvent: a whirl flings streaks of cash onto the workers
   spinArtEvent: {
     chance: 0.01,
     feedMs: 400, // the river reaching the whirl
@@ -6809,7 +6809,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/paperCutterEvent: a blade of light chops down onto each bar
+  // beam, levels: src/crits/animatedCrits/events/paperCutterEvent: a blade of light chops down onto each bar
   paperCutterEvent: {
     chance: 0.01,
     cutsMs: [480, 280] as [number, number], // each lift and chop, quickening
@@ -6817,7 +6817,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, cash: src/floors/flippersEvent: beam flippers rally a wisp ball up the screen
+  // beam, cash: src/crits/animatedCrits/events/flippersEvent: beam flippers rally a wisp ball up the screen
   flippersEvent: {
     chance: 0.01,
     dropMs: 320,
@@ -6826,7 +6826,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, a free floor: src/floors/drawbridgeEvent: two spans of light clank down onto the lock
+  // beam, a free floor: src/crits/animatedCrits/events/drawbridgeEvent: two spans of light clank down onto the lock
   drawbridgeEvent: {
     chance: 0.01,
     clanksMs: [320, 180] as [number, number], // between clanks, quickening
@@ -6834,14 +6834,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, crit tiers: src/floors/flailEvent: a ball on a lightning chain whirls and smashes each bar
+  // lightning, crit tiers: src/crits/animatedCrits/events/flailEvent: a ball on a lightning chain whirls and smashes each bar
   flailEvent: {
     chance: 0.01,
     whirlsMs: [640, 380] as [number, number], // each whirl, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/vineSwingEvent: a wisp swings up the screen on lightning vines
+  // lightning, cash: src/crits/animatedCrits/events/vineSwingEvent: a wisp swings up the screen on lightning vines
   vineSwingEvent: {
     chance: 0.01,
     swingsMs: [440, 280] as [number, number], // each swing, quickening
@@ -6850,7 +6850,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, free hires: src/floors/bombSnowballEvent: a snowball of bombs blows them onto the spots
+  // explosion, free hires: src/crits/animatedCrits/events/bombSnowballEvent: a snowball of bombs blows them onto the spots
   bombSnowballEvent: {
     chance: 0.01,
     rollMs: 1000,
@@ -6860,7 +6860,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, crit tiers: src/floors/gerbEvent: a bomb fountain on each bar spurts bomblets, then blows
+  // explosion, crit tiers: src/crits/animatedCrits/events/gerbEvent: a bomb fountain on each bar spurts bomblets, then blows
   gerbEvent: {
     chance: 0.01,
     dropMs: 160,
@@ -6868,7 +6868,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/recoilEvent: a gun is hurled round the screen by its own recoil
+  // gunfire, cash: src/crits/animatedCrits/events/recoilEvent: a gun is hurled round the screen by its own recoil
   recoilEvent: {
     chance: 0.01,
     shotsMs: [300, 130] as [number, number], // between shots, quickening
@@ -6876,7 +6876,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, levels: src/floors/tumbleFireEvent: a tumbling gun fires at every bar it swings past
+  // gunfire, levels: src/crits/animatedCrits/events/tumbleFireEvent: a tumbling gun fires at every bar it swings past
   tumbleFireEvent: {
     chance: 0.01,
     fallMs: 1600,
@@ -6884,7 +6884,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/rollUpEvent: the screen rolls up like a blind
+  // experiment, cash: src/crits/animatedCrits/events/rollUpEvent: the screen rolls up like a blind
   rollUpEvent: {
     chance: 0.01,
     rollMs: 900,
@@ -6893,7 +6893,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/shredderEvent: the screen is fed through a shredder
+  // experiment, cash: src/crits/animatedCrits/events/shredderEvent: the screen is fed through a shredder
   shredderEvent: {
     chance: 0.01,
     jerksMs: [300, 160] as [number, number], // between jerks, quickening
@@ -6902,7 +6902,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 33
-  // money, levels + cash: src/floors/headOnEvent: two rivers of cash smash head-on over each bar
+  // money, levels + cash: src/crits/animatedCrits/events/headOnEvent: two rivers of cash smash head-on over each bar
   headOnEvent: {
     chance: 0.01,
     crashesMs: [420, 240] as [number, number], // between crashes, quickening
@@ -6911,7 +6911,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, free hires: src/floors/pyramidEvent: wisps stack into a pyramid, then spring onto the spots
+  // wisp, free hires: src/crits/animatedCrits/events/pyramidEvent: wisps stack into a pyramid, then spring onto the spots
   pyramidEvent: {
     chance: 0.01,
     climbMs: 110, // between vaults onto the pyramid
@@ -6922,7 +6922,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, crit tiers + cash: src/floors/pizzaTossEvent: a wisp tosses a disc of cash onto each bar
+  // mix, crit tiers + cash: src/crits/animatedCrits/events/pizzaTossEvent: a wisp tosses a disc of cash onto each bar
   pizzaTossEvent: {
     chance: 0.01,
     formMs: 160,
@@ -6931,14 +6931,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, worker perma tiers: src/floors/compassEvent: a compass of beams rings each worker
+  // beam, worker perma tiers: src/crits/animatedCrits/events/compassEvent: a compass of beams rings each worker
   compassEvent: {
     chance: 0.01,
     sweepsMs: [340, 160] as [number, number], // each circle, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/skewerEvent: a bolt skewers balls of cash that blow down it
+  // lightning, cash: src/crits/animatedCrits/events/skewerEvent: a bolt skewers balls of cash that blow down it
   skewerEvent: {
     chance: 0.01,
     gatherGapMs: 90,
@@ -6947,7 +6947,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, a free floor: src/floors/bombCometEvent: a comet with a tail of bombs slams the lock
+  // explosion, a free floor: src/crits/animatedCrits/events/bombCometEvent: a comet with a tail of bombs slams the lock
   bombCometEvent: {
     chance: 0.01,
     flightMs: 700,
@@ -6955,7 +6955,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/kaboomEvent: a bomber drops bombs a catcher catches
+  // explosion, cash: src/crits/animatedCrits/events/kaboomEvent: a bomber drops bombs a catcher catches
   kaboomEvent: {
     chance: 0.01,
     dropsMs: [220, 100] as [number, number], // between drops, quickening
@@ -6964,7 +6964,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, levels: src/floors/returnFireEvent: the total readout guns down the bars
+  // gunfire, levels: src/crits/animatedCrits/events/returnFireEvent: the total readout guns down the bars
   returnFireEvent: {
     chance: 0.01,
     burstsMs: [380, 220] as [number, number], // between bursts, quickening
@@ -6974,7 +6974,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/frostedGlassEvent: a wisp wipes through a frosted screen
+  // experiment, cash: src/crits/animatedCrits/events/frostedGlassEvent: a wisp wipes through a frosted screen
   frostedGlassEvent: {
     chance: 0.01,
     frostMs: 250,
@@ -6983,7 +6983,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/switchOffEvent: the screen switches off like an old TV and pops
+  // experiment, cash: src/crits/animatedCrits/events/switchOffEvent: the screen switches off like an old TV and pops
   switchOffEvent: {
     chance: 0.01,
     squashMs: 220,
@@ -6994,7 +6994,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 34
-  // money, levels + cash: src/floors/stuntTrackEvent: a river runs a loop-the-loop round each bar
+  // money, levels + cash: src/crits/animatedCrits/events/stuntTrackEvent: a river runs a loop-the-loop round each bar
   stuntTrackEvent: {
     chance: 0.01,
     streamMs: 900,
@@ -7003,7 +7003,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, free hires: src/floors/fleasEvent: tiny fleas bound round the screen onto the spots
+  // wisp, free hires: src/crits/animatedCrits/events/fleasEvent: tiny fleas bound round the screen onto the spots
   fleasEvent: {
     chance: 0.01,
     springGapMs: 50,
@@ -7011,7 +7011,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, crit tiers + cash: src/floors/handPumpEvent: a wisp pumps jets of cash onto each bar
+  // mix, crit tiers + cash: src/crits/animatedCrits/events/handPumpEvent: a wisp pumps jets of cash onto each bar
   handPumpEvent: {
     chance: 0.01,
     firstMs: 320,
@@ -7021,7 +7021,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/pickUpSticksEvent: a heap of beams is plucked onto the bars
+  // beam, crit tiers: src/crits/animatedCrits/events/pickUpSticksEvent: a heap of beams is plucked onto the bars
   pickUpSticksEvent: {
     chance: 0.01,
     standMs: 220,
@@ -7032,7 +7032,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker perma tiers: src/floors/thunderShellEvent: shells burst into lightning stars over the workers
+  // lightning, worker perma tiers: src/crits/animatedCrits/events/thunderShellEvent: shells burst into lightning stars over the workers
   thunderShellEvent: {
     chance: 0.01,
     shellsMs: [420, 260] as [number, number], // between shells, quickening
@@ -7040,7 +7040,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/midAirEvent: bombs lobbed from both corners collide mid-air
+  // explosion, cash: src/crits/animatedCrits/events/midAirEvent: bombs lobbed from both corners collide mid-air
   midAirEvent: {
     chance: 0.01,
     flightMs: 520,
@@ -7049,7 +7049,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, levels + a free floor: src/floors/chainFireEvent: guns fire bar to bar up to the lock
+  // gunfire, levels + a free floor: src/crits/animatedCrits/events/chainFireEvent: guns fire bar to bar up to the lock
   chainFireEvent: {
     chance: 0.01,
     hopsMs: [140, 80] as [number, number], // from a burst landing to the next firing, quickening
@@ -7059,14 +7059,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, cash: src/floors/rimShotEvent: a wisp ricochets round a ring scoring a star
+  // bounce, cash: src/crits/animatedCrits/events/rimShotEvent: a wisp ricochets round a ring scoring a star
   rimShotEvent: {
     chance: 0.01,
     legsMs: [220, 80] as [number, number], // each chord, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // bounce, levels + cash: src/floors/tinRoofEvent: hail of cash bounces off the bars
+  // bounce, levels + cash: src/crits/animatedCrits/events/tinRoofEvent: hail of cash bounces off the bars
   tinRoofEvent: {
     chance: 0.01,
     barGapMs: 200,
@@ -7075,7 +7075,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/crumpleEvent: the screen is crumpled into a ball and burst
+  // experiment, cash: src/crits/animatedCrits/events/crumpleEvent: the screen is crumpled into a ball and burst
   crumpleEvent: {
     chance: 0.01,
     crumpleMs: 280,
@@ -7085,7 +7085,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/minimizeEvent: the screen is minimized into the total
+  // experiment, cash: src/crits/animatedCrits/events/minimizeEvent: the screen is minimized into the total
   minimizeEvent: {
     chance: 0.01,
     suckMs: 520,
@@ -7095,7 +7095,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 35
-  // money, crit tiers + cash: src/floors/jumpingJetsEvent: jets of cash leap bar to bar
+  // money, crit tiers + cash: src/crits/animatedCrits/events/jumpingJetsEvent: jets of cash leap bar to bar
   jumpingJetsEvent: {
     chance: 0.01,
     flightMs: [420, 300] as [number, number], // each leap, quickening
@@ -7105,14 +7105,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, free hires: src/floors/bubbleChamberEvent: wisps spiral like particle tracks onto the spots
+  // wisp, free hires: src/crits/animatedCrits/events/bubbleChamberEvent: wisps spiral like particle tracks onto the spots
   bubbleChamberEvent: {
     chance: 0.01,
     curlMs: [700, 1500] as [number, number], // the quickest and slowest track
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, worker perma tiers + cash: src/floors/castNetEvent: nets of cash cast over the workers
+  // mix, worker perma tiers + cash: src/crits/animatedCrits/events/castNetEvent: nets of cash cast over the workers
   castNetEvent: {
     chance: 0.01,
     formMs: 200,
@@ -7122,7 +7122,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, a free floor: src/floors/hobermanEvent: a scissoring ring of beams breathes and crushes the lock
+  // beam, a free floor: src/crits/animatedCrits/events/hobermanEvent: a scissoring ring of beams breathes and crushes the lock
   hobermanEvent: {
     chance: 0.01,
     breathsMs: [520, 340] as [number, number], // each breath, quickening
@@ -7131,7 +7131,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/excaliburEvent: a lightning sword heaved out of the button
+  // lightning, levels: src/crits/animatedCrits/events/excaliburEvent: a lightning sword heaved out of the button
   excaliburEvent: {
     chance: 0.01,
     firstMs: 300,
@@ -7141,7 +7141,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/pistonsEvent: bomb cylinders fire in an engine's firing order
+  // explosion, cash: src/crits/animatedCrits/events/pistonsEvent: bomb cylinders fire in an engine's firing order
   pistonsEvent: {
     chance: 0.01,
     firstMs: 200,
@@ -7151,7 +7151,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, worker perma tiers: src/floors/williamTellEvent: apples shot off the workers' heads
+  // gunfire, worker perma tiers: src/crits/animatedCrits/events/williamTellEvent: apples shot off the workers' heads
   williamTellEvent: {
     chance: 0.01,
     shotsMs: [380, 220] as [number, number], // between apples, quickening
@@ -7159,7 +7159,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, levels + cash: src/floors/foosballEvent: foosball rods kick a ball up the bars
+  // bounce, levels + cash: src/crits/animatedCrits/events/foosballEvent: foosball rods kick a ball up the bars
   foosballEvent: {
     chance: 0.01,
     serveMs: 120,
@@ -7168,7 +7168,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/rubberSheetEvent: the screen is hauled down like rubber and snaps back
+  // experiment, cash: src/crits/animatedCrits/events/rubberSheetEvent: the screen is hauled down like rubber and snaps back
   rubberSheetEvent: {
     chance: 0.01,
     diveMs: 220,
@@ -7178,7 +7178,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/rattleEvent: the screen's tiles rattle like crockery on a shaking table
+  // experiment, cash: src/crits/animatedCrits/events/rattleEvent: the screen's tiles rattle like crockery on a shaking table
   rattleEvent: {
     chance: 0.01,
     hopsMs: [240, 300] as [number, number], // the first and last hop, each higher
@@ -7186,7 +7186,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 36
-  // money, cash: src/floors/eddiesEvent: a river sheds swirling eddies of cash past a rock
+  // money, cash: src/crits/animatedCrits/events/eddiesEvent: a river sheds swirling eddies of cash past a rock
   eddiesEvent: {
     chance: 0.01,
     shedMs: 200, // between eddies
@@ -7195,7 +7195,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker perma tiers: src/floors/tubeManEvent: an inflatable tube man slaps each worker
+  // wisp, worker perma tiers: src/crits/animatedCrits/events/tubeManEvent: an inflatable tube man slaps each worker
   tubeManEvent: {
     chance: 0.01,
     riseMs: 300,
@@ -7203,7 +7203,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, levels + cash: src/floors/deflateEvent: a balloon of cash zips round the screen deflating
+  // mix, levels + cash: src/crits/animatedCrits/events/deflateEvent: a balloon of cash zips round the screen deflating
   deflateEvent: {
     chance: 0.01,
     blowMs: 600,
@@ -7212,7 +7212,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, a free floor: src/floors/gearTrainEvent: gears of beams mesh up to the lock and wrench it open
+  // beam, a free floor: src/crits/animatedCrits/events/gearTrainEvent: gears of beams mesh up to the lock and wrench it open
   gearTrainEvent: {
     chance: 0.01,
     clanksMs: [200, 110] as [number, number], // between gears, quickening
@@ -7220,7 +7220,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, crit tiers: src/floors/upstrikeEvent: upward lightning tears out of each bar
+  // lightning, crit tiers: src/crits/animatedCrits/events/upstrikeEvent: upward lightning tears out of each bar
   upstrikeEvent: {
     chance: 0.01,
     climbMs: 260,
@@ -7228,7 +7228,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/creepingBarrageEvent: rows of shells creep up the bars
+  // explosion, levels: src/crits/animatedCrits/events/creepingBarrageEvent: rows of shells creep up the bars
   creepingBarrageEvent: {
     chance: 0.01,
     firstMs: 380,
@@ -7239,7 +7239,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, crit tiers: src/floors/ballisticPendulumEvent: shot bobs swing up into the bars
+  // gunfire, crit tiers: src/crits/animatedCrits/events/ballisticPendulumEvent: shot bobs swing up into the bars
   ballisticPendulumEvent: {
     chance: 0.01,
     firstMs: 400,
@@ -7248,7 +7248,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, free hires: src/floors/ringTawEvent: marbles knocked out of a ring bank onto the spots
+  // bounce, free hires: src/crits/animatedCrits/events/ringTawEvent: marbles knocked out of a ring bank onto the spots
   ringTawEvent: {
     chance: 0.01,
     firstMs: 250,
@@ -7258,7 +7258,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/rainyWindowEvent: rain drops run down the screen's glass
+  // experiment, cash: src/crits/animatedCrits/events/rainyWindowEvent: rain drops run down the screen's glass
   rainyWindowEvent: {
     chance: 0.01,
     dropsMs: [180, 70] as [number, number], // between splats, quickening
@@ -7266,7 +7266,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/inflateEvent: the screen blows up like a balloon and pops
+  // experiment, cash: src/crits/animatedCrits/events/inflateEvent: the screen blows up like a balloon and pops
   inflateEvent: {
     chance: 0.01,
     breathMs: 360,
@@ -7276,7 +7276,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 37
-  // money, levels + cash: src/floors/domeFountainsEvent: each bar blooms into a dome fountain of cash
+  // money, levels + cash: src/crits/animatedCrits/events/domeFountainsEvent: each bar blooms into a dome fountain of cash
   domeFountainsEvent: {
     chance: 0.01,
     domesMs: [420, 240] as [number, number], // between domes, quickening
@@ -7286,7 +7286,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, crit tiers: src/floors/bellRingersEvent: bell wisps ring a peal, then crash onto the bars
+  // wisp, crit tiers: src/crits/animatedCrits/events/bellRingersEvent: bell wisps ring a peal, then crash onto the bars
   bellRingersEvent: {
     chance: 0.01,
     firstMs: 280,
@@ -7295,7 +7295,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/wetDogEvent: a soaked wisp shakes cash off like a wet dog
+  // mix, cash: src/crits/animatedCrits/events/wetDogEvent: a soaked wisp shakes cash off like a wet dog
   wetDogEvent: {
     chance: 0.01,
     soakMs: 500,
@@ -7305,7 +7305,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, a free floor: src/floors/towerCraneEvent: a crane of beams rips the lock out
+  // beam, a free floor: src/crits/animatedCrits/events/towerCraneEvent: a crane of beams rips the lock out
   towerCraneEvent: {
     chance: 0.01,
     raiseMs: 300,
@@ -7316,7 +7316,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker perma tiers: src/floors/beadLightningEvent: a bolt breaks into beads that zip to the workers
+  // lightning, worker perma tiers: src/crits/animatedCrits/events/beadLightningEvent: a bolt breaks into beads that zip to the workers
   beadLightningEvent: {
     chance: 0.01,
     beadsAtMs: 380, // the first bead peeling off
@@ -7325,7 +7325,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/rockslideEvent: bombs bound down the bars like boulders
+  // explosion, levels: src/crits/animatedCrits/events/rockslideEvent: bombs bound down the bars like boulders
   rockslideEvent: {
     chance: 0.01,
     tumblesMs: [200, 120] as [number, number], // between bombs setting off
@@ -7334,7 +7334,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, crit tiers: src/floors/tightGroupEvent: a sharpshooter puts every shot through one spot
+  // gunfire, crit tiers: src/crits/animatedCrits/events/tightGroupEvent: a sharpshooter puts every shot through one spot
   tightGroupEvent: {
     chance: 0.01,
     firstMs: 200,
@@ -7343,7 +7343,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, free hires: src/floors/jacksEvent: a hand scoops jacks between bounces and flicks them onto the spots
+  // bounce, free hires: src/crits/animatedCrits/events/jacksEvent: a hand scoops jacks between bounces and flicks them onto the spots
   jacksEvent: {
     chance: 0.01,
     tossesMs: [520, 300] as [number, number], // each toss, quickening
@@ -7351,7 +7351,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/reflectingPoolEvent: a pool mirrors the screen as cash pours in
+  // experiment, cash: src/crits/animatedCrits/events/reflectingPoolEvent: a pool mirrors the screen as cash pours in
   reflectingPoolEvent: {
     chance: 0.01,
     riseMs: 400,
@@ -7360,7 +7360,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/pinArtEvent: the screen as a bed of pins pushed out from behind
+  // experiment, cash: src/crits/animatedCrits/events/pinArtEvent: the screen as a bed of pins pushed out from behind
   pinArtEvent: {
     chance: 0.01,
     traceMs: 1500,
@@ -7369,7 +7369,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 38
-  // money, crit tiers and cash: src/floors/twinWhirlpoolsEvent: two whirlpools of cash orbit and merge
+  // money, crit tiers and cash: src/crits/animatedCrits/events/twinWhirlpoolsEvent: two whirlpools of cash orbit and merge
   twinWhirlpoolsEvent: {
     chance: 0.01,
     formMs: 500, // pouring in and spinning up over the bars
@@ -7377,7 +7377,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, free hires: src/floors/hatchlingsEvent: egg wisps drop onto the spots, rock and hatch
+  // wisp, free hires: src/crits/animatedCrits/events/hatchlingsEvent: egg wisps drop onto the spots, rock and hatch
   hatchlingsEvent: {
     chance: 0.01,
     dropGapMs: 70, // between eggs dropping
@@ -7386,7 +7386,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, levels and cash: src/floors/butterfingersEvent: a waiter wisp trips and spills a heap of cash over the bars
+  // mix, levels and cash: src/crits/animatedCrits/events/butterfingersEvent: a waiter wisp trips and spills a heap of cash over the bars
   butterfingersEvent: {
     chance: 0.01,
     pourMs: 350, // heaping up on the tray
@@ -7396,14 +7396,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, a free floor: src/floors/lockPickEvent: a pick beam pushes up the lock's pins one by one
+  // beam, a free floor: src/crits/animatedCrits/events/lockPickEvent: a pick beam pushes up the lock's pins one by one
   lockPickEvent: {
     chance: 0.01,
     pinsMs: [300, 160] as [number, number], // each pin, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, crit tiers: src/floors/blacksmithEvent: bolts hammer an anvil wisp, sparks forge the bars
+  // lightning, crit tiers: src/crits/animatedCrits/events/blacksmithEvent: bolts hammer an anvil wisp, sparks forge the bars
   blacksmithEvent: {
     chance: 0.01,
     warmMs: 260,
@@ -7411,7 +7411,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/seismicChargesEvent: charges blow in a chain, their shockwaves meet in a colossal blast
+  // explosion, cash: src/crits/animatedCrits/events/seismicChargesEvent: charges blow in a chain, their shockwaves meet in a colossal blast
   seismicChargesEvent: {
     chance: 0.01,
     fuseMs: 300,
@@ -7420,7 +7420,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, levels: src/floors/skipShotsEvent: shots skip off the screen's bottom up into the bars
+  // gunfire, levels: src/crits/animatedCrits/events/skipShotsEvent: shots skip off the screen's bottom up into the bars
   skipShotsEvent: {
     chance: 0.01,
     aimMs: 150,
@@ -7430,7 +7430,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, worker perma tiers: src/floors/jumpingBeansEvent: beans hop higher and higher on the workers
+  // bounce, worker perma tiers: src/crits/animatedCrits/events/jumpingBeansEvent: beans hop higher and higher on the workers
   jumpingBeansEvent: {
     chance: 0.01,
     staggerMs: 60, // between beans setting off
@@ -7438,7 +7438,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/swissCheeseEvent: holes punched through the screen gush cash
+  // experiment, cash: src/crits/animatedCrits/events/swissCheeseEvent: holes punched through the screen gush cash
   swissCheeseEvent: {
     chance: 0.01,
     punchMs: [200, 90] as [number, number], // between holes, quickening
@@ -7446,7 +7446,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/explodedViewEvent: the screen bursts apart in tiles and slams back
+  // experiment, cash: src/crits/animatedCrits/events/explodedViewEvent: the screen bursts apart in tiles and slams back
   explodedViewEvent: {
     chance: 0.01,
     pulseGapMs: [420, 340] as [number, number], // between jolts apart
@@ -7455,7 +7455,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 39
-  // money, cash: src/floors/riptideEvent: opposing bands of cash torn into one rip current
+  // money, cash: src/crits/animatedCrits/events/riptideEvent: opposing bands of cash torn into one rip current
   riptideEvent: {
     chance: 0.01,
     streamMs: 900, // the bands streaming, speeding up
@@ -7464,7 +7464,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker perma tiers: src/floors/fencingEvent: fencer wisps duel over each worker, then lunge
+  // wisp, worker perma tiers: src/crits/animatedCrits/events/fencingEvent: fencer wisps duel over each worker, then lunge
   fencingEvent: {
     chance: 0.01,
     staggerMs: 130, // between bouts starting
@@ -7472,7 +7472,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, levels and cash: src/floors/waterTowerEvent: a tank of cash pumped up high bursts onto the bars
+  // mix, levels and cash: src/crits/animatedCrits/events/waterTowerEvent: a tank of cash pumped up high bursts onto the bars
   waterTowerEvent: {
     chance: 0.01,
     fillMs: 700, // pumping up into the tank
@@ -7481,7 +7481,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/barberPoleEvent: barber-pole stripes of light spin along each bar
+  // beam, crit tiers: src/crits/animatedCrits/events/barberPoleEvent: barber-pole stripes of light spin along each bar
   barberPoleEvent: {
     chance: 0.01,
     staggerMs: 220, // between poles lighting up
@@ -7489,7 +7489,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, a free floor: src/floors/ionCannonEvent: tendrils charge a core that fires into the lock
+  // lightning, a free floor: src/crits/animatedCrits/events/ionCannonEvent: tendrils charge a core that fires into the lock
   ionCannonEvent: {
     chance: 0.01,
     chargeMs: [230, 90] as [number, number], // between tendrils, quickening
@@ -7497,7 +7497,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/claymoreEvent: fan blasts up through each bar, set off one by one
+  // explosion, levels: src/crits/animatedCrits/events/claymoreEvent: fan blasts up through each bar, set off one by one
   claymoreEvent: {
     chance: 0.01,
     fuseMs: 300,
@@ -7506,7 +7506,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, free hires: src/floors/pepperboxEvent: a spinning ring of barrels fires onto empty spots
+  // gunfire, free hires: src/crits/animatedCrits/events/pepperboxEvent: a spinning ring of barrels fires onto empty spots
   pepperboxEvent: {
     chance: 0.01,
     spinUpMs: 400,
@@ -7515,7 +7515,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, crit tiers: src/floors/squashEvent: rallies off the top and side walls onto the bars
+  // bounce, crit tiers: src/crits/animatedCrits/events/squashEvent: rallies off the top and side walls onto the bars
   squashEvent: {
     chance: 0.01,
     firstMs: 200,
@@ -7524,7 +7524,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/verticalHoldEvent: the screen rolls like a TV losing vertical hold
+  // experiment, cash: src/crits/animatedCrits/events/verticalHoldEvent: the screen rolls like a TV losing vertical hold
   verticalHoldEvent: {
     chance: 0.01,
     slipMs: 250, // jittering before it rolls
@@ -7533,7 +7533,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/halftoneEvent: the screen turns into gold halftone dots that peel off as cash
+  // experiment, cash: src/crits/animatedCrits/events/halftoneEvent: the screen turns into gold halftone dots that peel off as cash
   halftoneEvent: {
     chance: 0.01,
     sweepMs: 450, // the ring sweeping the print over the screen
@@ -7543,7 +7543,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 40
-  // money, levels and cash: src/floors/blowholeEvent: a heaving sea of cash blasts jets up into the bars
+  // money, levels and cash: src/crits/animatedCrits/events/blowholeEvent: a heaving sea of cash blasts jets up into the bars
   blowholeEvent: {
     chance: 0.01,
     swellMs: 450, // the sea rolling in before the first jet
@@ -7552,7 +7552,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, worker perma tiers: src/floors/lamplighterEvent: a wisp hops lamp to lamp over the workers
+  // wisp, worker perma tiers: src/crits/animatedCrits/events/lamplighterEvent: a wisp hops lamp to lamp over the workers
   lamplighterEvent: {
     chance: 0.01,
     appearMs: 200,
@@ -7560,7 +7560,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, a free floor and cash: src/floors/fireBrigadeEvent: three nozzles arc jets of cash onto the lock
+  // mix, a free floor and cash: src/crits/animatedCrits/events/fireBrigadeEvent: three nozzles arc jets of cash onto the lock
   fireBrigadeEvent: {
     chance: 0.01,
     opensMs: [380, 260] as [number, number], // between nozzles opening
@@ -7569,7 +7569,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/spokesEvent: wheels of beam spokes roll along the bars
+  // beam, crit tiers: src/crits/animatedCrits/events/spokesEvent: wheels of beam spokes roll along the bars
   spokesEvent: {
     chance: 0.01,
     staggerMs: 200, // between wheels dropping
@@ -7577,7 +7577,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, free hires: src/floors/thunderRingEvent: a ring of bolts surges out over the empty spots
+  // lightning, free hires: src/crits/animatedCrits/events/thunderRingEvent: a ring of bolts surges out over the empty spots
   thunderRingEvent: {
     chance: 0.01,
     surges: 4,
@@ -7586,7 +7586,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/bottleRocketEvent: zigzag rockets burst on the bars, each lighting the next
+  // explosion, levels: src/crits/animatedCrits/events/bottleRocketEvent: zigzag rockets burst on the bars, each lighting the next
   bottleRocketEvent: {
     chance: 0.01,
     fuseMs: 300,
@@ -7595,7 +7595,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, cash: src/floors/skeetEvent: a gun shoots clay wisps out of the sky at the top of their arcs
+  // gunfire, cash: src/crits/animatedCrits/events/skeetEvent: a gun shoots clay wisps out of the sky at the top of their arcs
   skeetEvent: {
     chance: 0.01,
     riseMs: 420, // a clay's climb to the top of its arc
@@ -7604,7 +7604,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // bounce, crit tiers: src/floors/tennisEvent: a rally bouncing once on a bar every shot
+  // bounce, crit tiers: src/crits/animatedCrits/events/tennisEvent: a rally bouncing once on a bar every shot
   tennisEvent: {
     chance: 0.01,
     serveMs: 200,
@@ -7612,7 +7612,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/interlaceEvent: the screen tears into sliding interlaced lines
+  // experiment, cash: src/crits/animatedCrits/events/interlaceEvent: the screen tears into sliding interlaced lines
   interlaceEvent: {
     chance: 0.01,
     joltsMs: [380, 300] as [number, number], // between jolts
@@ -7620,7 +7620,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/mirrorMirrorEvent: the screen folds into a mirrored kaleidoscope
+  // experiment, cash: src/crits/animatedCrits/events/mirrorMirrorEvent: the screen folds into a mirrored kaleidoscope
   mirrorMirrorEvent: {
     chance: 0.01,
     foldMs: 260, // each half unfolding
@@ -7631,7 +7631,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 41
-  // money, crit tiers and cash: src/floors/cottonCandyEvent: a whirling cloud of cash tears into puffs onto the bars
+  // money, crit tiers and cash: src/crits/animatedCrits/events/cottonCandyEvent: a whirling cloud of cash tears into puffs onto the bars
   cottonCandyEvent: {
     chance: 0.01,
     spinMs: 900, // spinning the cloud up
@@ -7640,14 +7640,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/pelotonEvent: a pack of wisps races end to end along the bars
+  // wisp, levels: src/crits/animatedCrits/events/pelotonEvent: a pack of wisps races end to end along the bars
   pelotonEvent: {
     chance: 0.01,
     levelShare: 0.03, // per bar
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, worker perma tiers and cash: src/floors/drinkingBirdEvent: birds dip into a river of cash, then plunge
+  // mix, worker perma tiers and cash: src/crits/animatedCrits/events/drinkingBirdEvent: birds dip into a river of cash, then plunge
   drinkingBirdEvent: {
     chance: 0.01,
     pourMs: 300, // the river pouring in before the first dip
@@ -7656,14 +7656,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, a free floor: src/floors/laserDrillEvent: a drill beam bores up floor by floor into the lock
+  // beam, a free floor: src/crits/animatedCrits/events/laserDrillEvent: a drill beam bores up floor by floor into the lock
   laserDrillEvent: {
     chance: 0.01,
     punchesMs: [320, 150] as [number, number], // each floor, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker perma tiers: src/floors/hairRaiserEvent: a comb raises static on the workers, then they discharge
+  // lightning, worker perma tiers: src/crits/animatedCrits/events/hairRaiserEvent: a comb raises static on the workers, then they discharge
   hairRaiserEvent: {
     chance: 0.01,
     passesMs: [520, 320] as [number, number], // each pass of the comb
@@ -7671,7 +7671,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, crit tiers: src/floors/detonatorEvent: a plunger sends sparks up wires to charges on the bars
+  // explosion, crit tiers: src/crits/animatedCrits/events/detonatorEvent: a plunger sends sparks up wires to charges on the bars
   detonatorEvent: {
     chance: 0.01,
     plungeMs: 350, // the plunger's first slam
@@ -7679,7 +7679,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/bulletRainEvent: guns along the top rain volleys down onto the bars
+  // gunfire, levels: src/crits/animatedCrits/events/bulletRainEvent: guns along the top rain volleys down onto the bars
   bulletRainEvent: {
     chance: 0.01,
     firstMs: 150,
@@ -7689,7 +7689,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, free hires: src/floors/bouncyCastleEvent: wisps bounce on a springy floor, then leap onto empty spots
+  // bounce, free hires: src/crits/animatedCrits/events/bouncyCastleEvent: wisps bounce on a springy floor, then leap onto empty spots
   bouncyCastleEvent: {
     chance: 0.01,
     staggerMs: 110, // between wisps dropping in
@@ -7697,14 +7697,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/gameOfLifeEvent: Conway's Game of Life in gold cells, bursting into cash
+  // experiment, cash: src/crits/animatedCrits/events/gameOfLifeEvent: Conway's Game of Life in gold cells, bursting into cash
   gameOfLifeEvent: {
     chance: 0.01,
     gensMs: [170, 70] as [number, number], // between generations, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/labyrinthEvent: a maze flood-filled with gold, its path pouring cash
+  // experiment, cash: src/crits/animatedCrits/events/labyrinthEvent: a maze flood-filled with gold, its path pouring cash
   labyrinthEvent: {
     chance: 0.01,
     appearMs: 200,
@@ -7714,7 +7714,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 42
-  // money, levels and cash: src/floors/tidalBoreEvent: a wall of cash surges up the screen over the bars
+  // money, levels and cash: src/crits/animatedCrits/events/tidalBoreEvent: a wall of cash surges up the screen over the bars
   tidalBoreEvent: {
     chance: 0.01,
     riseMs: 1300, // the bore racing up the screen
@@ -7723,7 +7723,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, crit tiers: src/floors/scrumEvent: packs of wisps shove on each bar until one drives through
+  // wisp, crit tiers: src/crits/animatedCrits/events/scrumEvent: packs of wisps shove on each bar until one drives through
   scrumEvent: {
     chance: 0.01,
     staggerMs: 250, // between scrums forming
@@ -7731,7 +7731,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, free hires and cash: src/floors/goldRushEvent: a pan of cash is swirled and nuggets flicked onto empty spots
+  // mix, free hires and cash: src/crits/animatedCrits/events/goldRushEvent: a pan of cash is swirled and nuggets flicked onto empty spots
   goldRushEvent: {
     chance: 0.01,
     panMs: 600, // filling and swirling the pan
@@ -7740,7 +7740,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/suspensionBridgeEvent: a pylon slings cables of light onto every bar
+  // beam, levels: src/crits/animatedCrits/events/suspensionBridgeEvent: a pylon slings cables of light onto every bar
   suspensionBridgeEvent: {
     chance: 0.01,
     cablesMs: [150, 70] as [number, number], // between cables, quickening
@@ -7749,14 +7749,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, cash: src/floors/redlineEvent: spark plugs fire in order, revving to the redline
+  // lightning, cash: src/crits/animatedCrits/events/redlineEvent: spark plugs fire in order, revving to the redline
   redlineEvent: {
     chance: 0.01,
     firesMs: [170, 40] as [number, number], // between sparks, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // explosion, crit tiers: src/floors/willowEvent: firework shells burst into drooping bomb stars over the bars
+  // explosion, crit tiers: src/crits/animatedCrits/events/willowEvent: firework shells burst into drooping bomb stars over the bars
   willowEvent: {
     chance: 0.01,
     riseMs: [480, 300] as [number, number], // each shell's climb, quickening
@@ -7764,7 +7764,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker perma tiers: src/floors/quickdrawEvent: a gunslinger whips round firing at each worker
+  // gunfire, worker perma tiers: src/crits/animatedCrits/events/quickdrawEvent: a gunslinger whips round firing at each worker
   quickdrawEvent: {
     chance: 0.01,
     firstMs: 260,
@@ -7773,14 +7773,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, a free floor: src/floors/galileanCannonEvent: a dropped stack of wisps launches its top one into the lock
+  // bounce, a free floor: src/crits/animatedCrits/events/galileanCannonEvent: a dropped stack of wisps launches its top one into the lock
   galileanCannonEvent: {
     chance: 0.01,
     launchMs: 420, // the top wisp's flight to the lock
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/chaosGameEvent: the chaos game draws Sierpinski's triangle in gold dots
+  // experiment, cash: src/crits/animatedCrits/events/chaosGameEvent: the chaos game draws Sierpinski's triangle in gold dots
   chaosGameEvent: {
     chance: 0.01,
     hopMs: 70, // each of the first, slow hops
@@ -7788,14 +7788,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/sandpileEvent: an Abelian sandpile toppling into a fractal
+  // experiment, cash: src/crits/animatedCrits/events/sandpileEvent: an Abelian sandpile toppling into a fractal
   sandpileEvent: {
     chance: 0.01,
     stagesMs: [160, 70] as [number, number], // between stages, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // drill, levels: src/floors/augerEvent: drills bite into the bars one after another and punch through
+  // drill, levels: src/crits/animatedCrits/events/augerEvent: drills bite into the bars one after another and punch through
   augerEvent: {
     chance: 0.01,
     approachMs: 260, // a drill's flight onto its bar
@@ -7805,7 +7805,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 43
-  // money, levels and cash: src/floors/fountainShowEvent: dancing jets of cash leap bar by bar
+  // money, levels and cash: src/crits/animatedCrits/events/fountainShowEvent: dancing jets of cash leap bar by bar
   fountainShowEvent: {
     chance: 0.01,
     waveMs: 500, // rippling before the first leap
@@ -7815,7 +7815,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, crit tiers: src/floors/spinningPlatesEvent: a juggler keeps plates spinning over the bars, then they drop
+  // wisp, crit tiers: src/crits/animatedCrits/events/spinningPlatesEvent: a juggler keeps plates spinning over the bars, then they drop
   spinningPlatesEvent: {
     chance: 0.01,
     dashMs: [240, 120] as [number, number], // between flicks, quickening
@@ -7823,7 +7823,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, free hires and cash: src/floors/scoopsEvent: balls of cash scooped from a tub onto empty spots
+  // mix, free hires and cash: src/crits/animatedCrits/events/scoopsEvent: balls of cash scooped from a tub onto empty spots
   scoopsEvent: {
     chance: 0.01,
     fillMs: 500, // filling the tub
@@ -7832,7 +7832,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, a free floor: src/floors/solarFurnaceEvent: mirrors bounce sunbeams onto the lock
+  // beam, a free floor: src/crits/animatedCrits/events/solarFurnaceEvent: mirrors bounce sunbeams onto the lock
   solarFurnaceEvent: {
     chance: 0.01,
     appearMs: 200,
@@ -7840,14 +7840,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, crit tiers: src/floors/lightningHandsEvent: a sorcerer pours lightning onto each bar
+  // lightning, crit tiers: src/crits/animatedCrits/events/lightningHandsEvent: a sorcerer pours lightning onto each bar
   lightningHandsEvent: {
     chance: 0.01,
     streamsMs: [420, 260] as [number, number], // each stream, shorter each time
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, worker perma tiers: src/floors/ringOfFireEvent: rings of bombs blow round each worker
+  // explosion, worker perma tiers: src/crits/animatedCrits/events/ringOfFireEvent: rings of bombs blow round each worker
   ringOfFireEvent: {
     chance: 0.01,
     fuseMs: 250,
@@ -7856,7 +7856,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/bulletClashEvent: guns either side fire bullets into each other over the bars
+  // gunfire, levels: src/crits/animatedCrits/events/bulletClashEvent: guns either side fire bullets into each other over the bars
   bulletClashEvent: {
     chance: 0.01,
     firstMs: 250,
@@ -7866,14 +7866,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, worker perma tiers: src/floors/bouncePassEvent: a ball bounce-passed off the floor worker to worker
+  // bounce, worker perma tiers: src/crits/animatedCrits/events/bouncePassEvent: a ball bounce-passed off the floor worker to worker
   bouncePassEvent: {
     chance: 0.01,
     legMs: [230, 140] as [number, number], // each leg, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // drill, cash: src/floors/oilStrikeEvent: drills bore into the bottom and strike gushers of cash
+  // drill, cash: src/crits/animatedCrits/events/oilStrikeEvent: drills bore into the bottom and strike gushers of cash
   oilStrikeEvent: {
     chance: 0.01,
     approachMs: 220, // a drill's plunge onto the ground
@@ -7881,14 +7881,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/harmonographEvent: a pendulum-swung pen draws a rosette that bursts into cash
+  // experiment, cash: src/crits/animatedCrits/events/harmonographEvent: a pendulum-swung pen draws a rosette that bursts into cash
   harmonographEvent: {
     chance: 0.01,
     drawMs: 1600, // the pen drawing, speeding up
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/quicksortEvent: quicksort sorts gold columns into a staircase
+  // experiment, cash: src/crits/animatedCrits/events/quicksortEvent: quicksort sorts gold columns into a staircase
   quicksortEvent: {
     chance: 0.01,
     swapsMs: [70, 18] as [number, number], // between swaps, quickening
@@ -7896,7 +7896,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 44
-  // money, levels and cash: src/floors/capillaryEvent: threads of cash creep up from a pool onto the bars
+  // money, levels and cash: src/crits/animatedCrits/events/capillaryEvent: threads of cash creep up from a pool onto the bars
   capillaryEvent: {
     chance: 0.01,
     spreadMs: 350, // the pool spreading
@@ -7905,7 +7905,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, crit tiers: src/floors/battleTopsEvent: spinning tops battle over each bar, the winner landing on it
+  // wisp, crit tiers: src/crits/animatedCrits/events/battleTopsEvent: spinning tops battle over each bar, the winner landing on it
   battleTopsEvent: {
     chance: 0.01,
     staggerMs: 260, // between battles starting
@@ -7913,7 +7913,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, free hires and cash: src/floors/pneumaticTubesEvent: capsules ride tubes of cash onto empty spots
+  // mix, free hires and cash: src/crits/animatedCrits/events/pneumaticTubesEvent: capsules ride tubes of cash onto empty spots
   pneumaticTubesEvent: {
     chance: 0.01,
     firesMs: [260, 130] as [number, number], // between tubes, quickening
@@ -7921,7 +7921,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, worker perma tiers: src/floors/starPolygonEvent: a beam draws a seven-pointed star round each worker
+  // beam, worker perma tiers: src/crits/animatedCrits/events/starPolygonEvent: a beam draws a seven-pointed star round each worker
   starPolygonEvent: {
     chance: 0.01,
     edgesMs: [80, 45] as [number, number], // each edge, the first star to the last
@@ -7929,14 +7929,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, a free floor: src/floors/voltSpiderEvent: a spider on legs of lightning climbs to the lock
+  // lightning, a free floor: src/crits/animatedCrits/events/voltSpiderEvent: a spider on legs of lightning climbs to the lock
   voltSpiderEvent: {
     chance: 0.01,
     stepsMs: [220, 110] as [number, number], // each stride, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/orbitalDecayEvent: orbiting bombs spiral in and crash into the button
+  // explosion, cash: src/crits/animatedCrits/events/orbitalDecayEvent: orbiting bombs spiral in and crash into the button
   orbitalDecayEvent: {
     chance: 0.01,
     firstMs: 700, // the first bomb's spiral in
@@ -7944,7 +7944,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, levels: src/floors/sprayAndPrayEvent: a turret rakes a stream of bullets along each bar
+  // gunfire, levels: src/crits/animatedCrits/events/sprayAndPrayEvent: a turret rakes a stream of bullets along each bar
   sprayAndPrayEvent: {
     chance: 0.01,
     firstMs: 200,
@@ -7954,14 +7954,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, crit tiers: src/floors/shuttleEvent: a ball shuttles up and down between each pair of bars
+  // bounce, crit tiers: src/crits/animatedCrits/events/shuttleEvent: a ball shuttles up and down between each pair of bars
   shuttleEvent: {
     chance: 0.01,
     legMs: [200, 90] as [number, number], // each leg, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // drill, worker perma tiers: src/floors/drillDuelEvent: drills grind head to head, the winner bores into a worker
+  // drill, worker perma tiers: src/crits/animatedCrits/events/drillDuelEvent: drills grind head to head, the winner bores into a worker
   drillDuelEvent: {
     chance: 0.01,
     approachMs: 220,
@@ -7970,14 +7970,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/rule30Event: the Rule 30 automaton cascades down the screen
+  // experiment, cash: src/crits/animatedCrits/events/rule30Event: the Rule 30 automaton cascades down the screen
   rule30Event: {
     chance: 0.01,
     pourMs: 1500, // the rows cascading down
     holdMs: 250,
     mergeMs: 500,
   },
-  // spray, crit tiers: src/floors/airbrushEvent: an airbrush sprays a gold coat along each bar
+  // spray, crit tiers: src/crits/animatedCrits/events/airbrushEvent: an airbrush sprays a gold coat along each bar
   airbrushEvent: {
     chance: 0.01,
     passesMs: [260, 160] as [number, number], // each pass along a bar, the first bar to the last
@@ -7985,7 +7985,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 45
-  // money, levels and cash: src/floors/calvingEvent: slabs of a cash cliff topple onto the bars
+  // money, levels and cash: src/crits/animatedCrits/events/calvingEvent: slabs of a cash cliff topple onto the bars
   calvingEvent: {
     chance: 0.01,
     riseMs: 300, // the cliff heaping up
@@ -7994,7 +7994,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, crit tiers: src/floors/phoenixEvent: a firebird bursts on each bar and is reborn
+  // wisp, crit tiers: src/crits/animatedCrits/events/phoenixEvent: a firebird bursts on each bar and is reborn
   phoenixEvent: {
     chance: 0.01,
     swoopsMs: [380, 220] as [number, number], // each dive, quickening
@@ -8002,7 +8002,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, free hires and cash: src/floors/steamTrainEvent: a train puffing cash drops workers at each stop
+  // mix, free hires and cash: src/crits/animatedCrits/events/steamTrainEvent: a train puffing cash drops workers at each stop
   steamTrainEvent: {
     chance: 0.01,
     legsMs: [460, 280] as [number, number], // between stops, quickening
@@ -8010,7 +8010,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, a free floor: src/floors/lightSailEvent: beams from below push a sail up into the lock
+  // beam, a free floor: src/crits/animatedCrits/events/lightSailEvent: beams from below push a sail up into the lock
   lightSailEvent: {
     chance: 0.01,
     chargeMs: 220,
@@ -8018,14 +8018,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, crit tiers: src/floors/inchwormEvent: a lightning inchworm inches along each bar
+  // lightning, crit tiers: src/crits/animatedCrits/events/inchwormEvent: a lightning inchworm inches along each bar
   inchwormEvent: {
     chance: 0.01,
     stepsMs: [200, 110] as [number, number], // each inch, the first bar to the last
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/criticalMassEvent: bombs pack into balls that cook off outside in
+  // explosion, cash: src/crits/animatedCrits/events/criticalMassEvent: bombs pack into balls that cook off outside in
   criticalMassEvent: {
     chance: 0.01,
     gatherMs: 500, // the first ball packing
@@ -8033,14 +8033,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, worker perma tiers: src/floors/knifeThrowerEvent: shots outline each worker
+  // gunfire, worker perma tiers: src/crits/animatedCrits/events/knifeThrowerEvent: shots outline each worker
   knifeThrowerEvent: {
     chance: 0.01,
     shotsMs: [55, 30] as [number, number], // between shots, the first worker to the last
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, levels: src/floors/compactorEvent: closing walls crush a ricocheting ball onto each bar
+  // bounce, levels: src/crits/animatedCrits/events/compactorEvent: closing walls crush a ricocheting ball onto each bar
   compactorEvent: {
     chance: 0.01,
     closesMs: [520, 320] as [number, number], // each bar's walls closing, quickening
@@ -8048,7 +8048,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // drill, levels: src/floors/coreSampleEvent: a drill bores down through every bar in the stack
+  // drill, levels: src/crits/animatedCrits/events/coreSampleEvent: a drill bores down through every bar in the stack
   coreSampleEvent: {
     chance: 0.01,
     approachMs: 240,
@@ -8057,21 +8057,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // spray, worker perma tiers: src/floors/foamPartyEvent: two foam cannons coat each worker
+  // spray, worker perma tiers: src/crits/animatedCrits/events/foamPartyEvent: two foam cannons coat each worker
   foamPartyEvent: {
     chance: 0.01,
     coatsMs: [440, 280] as [number, number], // each coat, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/langtonsAntEvent: Langton's ant scrawls chaos, then its highway
+  // experiment, cash: src/crits/animatedCrits/events/langtonsAntEvent: Langton's ant scrawls chaos, then its highway
   langtonsAntEvent: {
     chance: 0.01,
     runMs: 1800, // all its steps, accelerating
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/othelloEvent: a game of Othello plays itself out
+  // experiment, cash: src/crits/animatedCrits/events/othelloEvent: a game of Othello plays itself out
   othelloEvent: {
     chance: 0.01,
     movesMs: [90, 30] as [number, number], // between moves, quickening
@@ -8079,7 +8079,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 46
-  // money, levels and cash: src/floors/gloopEvent: bubbles swell in a pool of cash and burst onto the bars
+  // money, levels and cash: src/crits/animatedCrits/events/gloopEvent: bubbles swell in a pool of cash and burst onto the bars
   gloopEvent: {
     chance: 0.01,
     swellsMs: [520, 320] as [number, number], // each bubble swelling, quickening
@@ -8087,7 +8087,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, a free floor: src/floors/escapeVelocityEvent: a probe burns out of orbit round the button into the lock
+  // wisp, a free floor: src/crits/animatedCrits/events/escapeVelocityEvent: a probe burns out of orbit round the button into the lock
   escapeVelocityEvent: {
     chance: 0.01,
     orbitsMs: [440, 300] as [number, number], // each orbit, quickening
@@ -8095,14 +8095,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, crit tiers and cash: src/floors/sungrazerEvent: a comet whips round the button, its cash tail sweeping the bars
+  // mix, crit tiers and cash: src/crits/animatedCrits/events/sungrazerEvent: a comet whips round the button, its cash tail sweeping the bars
   sungrazerEvent: {
     chance: 0.01,
     passMs: 1500, // the whole pass round the button
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/fractalTreeEvent: a tree of beams forks up from the button and lashes onto the bars
+  // beam, levels: src/crits/animatedCrits/events/fractalTreeEvent: a tree of beams forks up from the button and lashes onto the bars
   fractalTreeEvent: {
     chance: 0.01,
     growsMs: [300, 160] as [number, number], // each generation, quickening
@@ -8111,7 +8111,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker perma tiers: src/floors/switchboardEvent: sparks plug live cords from the button into the workers
+  // lightning, worker perma tiers: src/crits/animatedCrits/events/switchboardEvent: sparks plug live cords from the button into the workers
   switchboardEvent: {
     chance: 0.01,
     runsMs: [300, 160] as [number, number], // each spark's run, quickening
@@ -8119,7 +8119,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/interferenceEvent: crossing shockwave rings set off chains of blasts
+  // explosion, cash: src/crits/animatedCrits/events/interferenceEvent: crossing shockwave rings set off chains of blasts
   interferenceEvent: {
     chance: 0.01,
     blowsMs: [420, 580, 740] as [number, number, number], // each bomb going off
@@ -8127,7 +8127,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, cash: src/floors/towerDefenseEvent: towers gun down creeps marching along a road
+  // gunfire, cash: src/crits/animatedCrits/events/towerDefenseEvent: towers gun down creeps marching along a road
   towerDefenseEvent: {
     chance: 0.01,
     walkMs: 1100, // a creep's walk down the whole road
@@ -8135,14 +8135,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // bounce, crit tiers: src/floors/bounceWaveEvent: a row of balls bounces out of step into waves, then onto the bars
+  // bounce, crit tiers: src/crits/animatedCrits/events/bounceWaveEvent: a row of balls bounces out of step into waves, then onto the bars
   bounceWaveEvent: {
     chance: 0.01,
     waveMs: 1500, // till every ball lands in step again
     holdMs: 500,
     mergeMs: 0,
   },
-  // drill, free hires: src/floors/moleEvent: a drill bores up out of the floor under each empty spot
+  // drill, free hires: src/crits/animatedCrits/events/moleEvent: a drill bores up out of the floor under each empty spot
   moleEvent: {
     chance: 0.01,
     divesMs: [340, 220] as [number, number], // each dive under a spot, quickening
@@ -8150,21 +8150,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // spray, worker perma tiers: src/floors/carWashEvent: a gantry of nozzles sprays a curtain down the screen
+  // spray, worker perma tiers: src/crits/animatedCrits/events/carWashEvent: a gantry of nozzles sprays a curtain down the screen
   carWashEvent: {
     chance: 0.01,
     sweepMs: 1600, // the gantry rolling down the screen
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/dragonCurveEvent: the dragon fractal folds itself out
+  // experiment, cash: src/crits/animatedCrits/events/dragonCurveEvent: the dragon fractal folds itself out
   dragonCurveEvent: {
     chance: 0.01,
     foldsMs: [240, 90] as [number, number], // each fold, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/lightsOutEvent: the Lights Out puzzle solves itself
+  // experiment, cash: src/crits/animatedCrits/events/lightsOutEvent: the Lights Out puzzle solves itself
   lightsOutEvent: {
     chance: 0.01,
     pressesMs: [150, 60] as [number, number], // between presses, quickening
@@ -8172,21 +8172,21 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 47
-  // money, cash: src/floors/tumblerEvent: cash tumbles round a spinning drum that bursts
+  // money, cash: src/crits/animatedCrits/events/tumblerEvent: cash tumbles round a spinning drum that bursts
   tumblerEvent: {
     chance: 0.01,
     spinMs: 1400, // the drum spinning up
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, free hires: src/floors/waggleDanceEvent: a scout's waggle dance sends bees to each empty spot
+  // wisp, free hires: src/crits/animatedCrits/events/waggleDanceEvent: a scout's waggle dance sends bees to each empty spot
   waggleDanceEvent: {
     chance: 0.01,
     runsMs: [150, 80] as [number, number], // each waggle run, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, crit tiers and cash: src/floors/waterCycleEvent: a sun evaporates a pool into clouds that rain onto the bars
+  // mix, crit tiers and cash: src/crits/animatedCrits/events/waterCycleEvent: a sun evaporates a pool into clouds that rain onto the bars
   waterCycleEvent: {
     chance: 0.01,
     riseMs: 500, // the cash evaporating up into clouds
@@ -8194,14 +8194,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/foldingRuleEvent: a folding rule of beams unfolds along each bar
+  // beam, crit tiers: src/crits/animatedCrits/events/foldingRuleEvent: a folding rule of beams unfolds along each bar
   foldingRuleEvent: {
     chance: 0.01,
     hingesMs: [110, 60] as [number, number], // each hinge opening, the first bar to the last
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, worker perma tiers: src/floors/arcSwarmEvent: a swarm webbed by lightning dives onto the workers
+  // lightning, worker perma tiers: src/crits/animatedCrits/events/arcSwarmEvent: a swarm webbed by lightning dives onto the workers
   arcSwarmEvent: {
     chance: 0.01,
     swarmMs: 650, // the swarm weaving before the first dive
@@ -8209,21 +8209,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/lockstepEvent: groups of bombs blink into step and go off together
+  // explosion, cash: src/crits/animatedCrits/events/lockstepEvent: groups of bombs blink into step and go off together
   lockstepEvent: {
     chance: 0.01,
     pullsMs: [250, 600, 950] as [number, number, number], // when each group starts pulling into step
     holdMs: 250,
     mergeMs: 500,
   },
-  // bounce, worker perma tiers: src/floors/hackySackEvent: a ring of players kicks a ball round each worker
+  // bounce, worker perma tiers: src/crits/animatedCrits/events/hackySackEvent: a ring of players kicks a ball round each worker
   hackySackEvent: {
     chance: 0.01,
     kicksMs: [150, 95] as [number, number], // each kick, the first worker to the last
     holdMs: 500,
     mergeMs: 0,
   },
-  // drill, levels: src/floors/woodwormEvent: a swarm of tiny drills riddles each bar
+  // drill, levels: src/crits/animatedCrits/events/woodwormEvent: a swarm of tiny drills riddles each bar
   woodwormEvent: {
     chance: 0.01,
     approachMs: 180,
@@ -8232,21 +8232,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // spray, a free floor: src/floors/graffitiEvent: a nozzle tags the lock in zigzags of gold mist
+  // spray, a free floor: src/crits/animatedCrits/events/graffitiEvent: a nozzle tags the lock in zigzags of gold mist
   graffitiEvent: {
     chance: 0.01,
     strokesMs: [200, 90] as [number, number], // each stroke, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/voronoiEvent: regions grow from seeds into a Voronoi diagram
+  // experiment, cash: src/crits/animatedCrits/events/voronoiEvent: regions grow from seeds into a Voronoi diagram
   voronoiEvent: {
     chance: 0.01,
     growMs: 1600, // the regions growing till they fill the screen
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/percolationEvent: cells open at random till an island spans the screen
+  // experiment, cash: src/crits/animatedCrits/events/percolationEvent: cells open at random till an island spans the screen
   percolationEvent: {
     chance: 0.01,
     openMs: 1400, // till the spanning island links up
@@ -8254,7 +8254,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 78
-  // lightning, a crit tier: src/floors/marxGeneratorEvent: a tower of spark gaps fires gap by gap up the screen, then dumps one colossal bolt onto the clicked bar
+  // lightning, a crit tier: src/crits/animatedCrits/events/marxGeneratorEvent: a tower of spark gaps fires gap by gap up the screen, then dumps one colossal bolt onto the clicked bar
   marxGeneratorEvent: {
     chance: 0.01,
     chargeMs: 380, // the electrodes popping in, bottom to top
@@ -8263,7 +8263,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // galaxy, worker perma tiers: src/floors/oortCloudEvent: a rogue star knocks comets out of a halo; they whip round the sun and fling onto the workers
+  // galaxy, worker perma tiers: src/crits/animatedCrits/events/oortCloudEvent: a rogue star knocks comets out of a halo; they whip round the sun and fling onto the workers
   oortCloudEvent: {
     chance: 0.01,
     growMs: 350, // the halo and the sun flaring up
@@ -8275,7 +8275,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, levels: src/floors/doubleSlitEvent: particles fired through two slits pile up in interference fringes on the bars
+  // experiment, levels: src/crits/animatedCrits/events/doubleSlitEvent: particles fired through two slits pile up in interference fringes on the bars
   doubleSlitEvent: {
     chance: 0.01,
     setupMs: 250, // the slit wall snapping up
@@ -8288,7 +8288,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // clutter, a free floor: src/floors/blastSweepEvent: a ring of bombs round the lock blows the glitter mess in onto it, which blows it open
+  // clutter, a free floor: src/crits/animatedCrits/events/blastSweepEvent: a ring of bombs round the lock blows the glitter mess in onto it, which blows it open
   blastSweepEvent: {
     chance: 0.01,
     spillMs: 420, // the glitter flung out over the screen
@@ -8298,7 +8298,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // money, cash: src/floors/hydraulicJumpEvent: a sheet of cash rears into a swelling roller, which breaks up into the total
+  // money, cash: src/crits/animatedCrits/events/hydraulicJumpEvent: a sheet of cash rears into a swelling roller, which breaks up into the total
   hydraulicJumpEvent: {
     chance: 0.01,
     streamMs: 1000, // the sheet shooting out of the button
@@ -8308,7 +8308,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 77
-  // drill, a crit tier: src/floors/pincushionEvent: four drills grind into the clicked button from the diagonals until it blows
+  // drill, a crit tier: src/crits/animatedCrits/events/pincushionEvent: four drills grind into the clicked button from the diagonals until it blows
   pincushionEvent: {
     chance: 0.01,
     approachMs: 260, // each drill's flight in
@@ -8318,7 +8318,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/updraftEvent: a glider wisp corkscrews up erupting columns of cash, then shoots into the total
+  // mix, cash: src/crits/animatedCrits/events/updraftEvent: a glider wisp corkscrews up erupting columns of cash, then shoots into the total
   updraftEvent: {
     chance: 0.01,
     climbsMs: [650, 420] as [number, number], // each corkscrew up a column, quickening
@@ -8327,7 +8327,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // clutter, free hires: src/floors/plugholesEvent: plugholes over the empty spots drain the screen's glitter and drop it in as hires
+  // clutter, free hires: src/crits/animatedCrits/events/plugholesEvent: plugholes over the empty spots drain the screen's glitter and drop it in as hires
   plugholesEvent: {
     chance: 0.01,
     spillMs: 450, // the glitter whirling out over the screen
@@ -8338,7 +8338,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, levels: src/floors/apollonianGasketEvent: circles pack every gap in a ring of light, then fly onto the bars
+  // experiment, levels: src/crits/animatedCrits/events/apollonianGasketEvent: circles pack every gap in a ring of light, then fly onto the bars
   apollonianGasketEvent: {
     chance: 0.01,
     growMs: 1500, // every circle popping in, biggest first, quickening
@@ -8350,7 +8350,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // drawing, a free floor: src/floors/droneShowEvent: glitter drones lift off and form a giant lightning bolt, which strikes the lock
+  // drawing, a free floor: src/crits/animatedCrits/events/droneShowEvent: glitter drones lift off and form a giant lightning bolt, which strikes the lock
   droneShowEvent: {
     chance: 0.01,
     flyMs: 1300, // every drone launched, quickening
@@ -8361,7 +8361,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 76
-  // drawing, worker perma tiers: src/floors/sweetheartEvent: a pen wisp draws a giant glitter heart, which beats and bursts onto the workers
+  // drawing, worker perma tiers: src/crits/animatedCrits/events/sweetheartEvent: a pen wisp draws a giant glitter heart, which beats and bursts onto the workers
   sweetheartEvent: {
     chance: 0.01,
     drawMs: 1300, // the pen drawing the heart, quickening
@@ -8370,7 +8370,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // drawing, a crit tier: src/floors/mintEvent: glitter rains into a giant coin mould over the clicked bar, which flips down onto it
+  // drawing, a crit tier: src/crits/animatedCrits/events/mintEvent: glitter rains into a giant coin mould over the clicked bar, which flips down onto it
   mintEvent: {
     chance: 0.01,
     pourMs: 1200, // every tile landing, bottom row first, quickening
@@ -8380,7 +8380,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, free hires: src/floors/catSketchEvent: bolts etch a cat's head in glitter over each empty spot, which drops in as a hire
+  // lightning, free hires: src/crits/animatedCrits/events/catSketchEvent: bolts etch a cat's head in glitter over each empty spot, which drops in as a hire
   catSketchEvent: {
     chance: 0.01,
     strikeMs: 650, // one sketch's strikes (the first slower, the last quicker)
@@ -8390,7 +8390,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // spray, levels: src/floors/stencilEvent: an airbrush rasters a giant gem out of the mist, which shatters onto the bars
+  // spray, levels: src/crits/animatedCrits/events/stencilEvent: an airbrush rasters a giant gem out of the mist, which shatters onto the bars
   stencilEvent: {
     chance: 0.01,
     sprayMs: 1200, // every pass, quickening
@@ -8400,7 +8400,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/denoiseEvent: a fog of random dots denoises step by step into a giant crown, which pours into the total
+  // experiment, cash: src/crits/animatedCrits/events/denoiseEvent: a fog of random dots denoises step by step into a giant crown, which pours into the total
   denoiseEvent: {
     chance: 0.01,
     fogMs: 200, // the noise fading in
@@ -8411,7 +8411,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 75
-  // galaxy, levels: src/floors/barredSpiralEvent: a galaxy's bar spins up, flinging the wisps piling at its ends onto the bars
+  // galaxy, levels: src/crits/animatedCrits/events/barredSpiralEvent: a galaxy's bar spins up, flinging the wisps piling at its ends onto the bars
   barredSpiralEvent: {
     chance: 0.01,
     growMs: 250, // the galaxy swirling up
@@ -8421,7 +8421,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, a crit tier: src/floors/bulletMosaicEvent: two guns stud a giant star of bullets over the clicked bar, which slams onto it
+  // gunfire, a crit tier: src/crits/animatedCrits/events/bulletMosaicEvent: two guns stud a giant star of bullets over the clicked bar, which slams onto it
   bulletMosaicEvent: {
     chance: 0.01,
     growMs: 250, // the guns rising
@@ -8431,7 +8431,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, free hires: src/floors/bombGrapesEvent: bunches of bomb grapes on a vine pop in chains, their hearts dropping onto the empty spots
+  // explosion, free hires: src/crits/animatedCrits/events/bombGrapesEvent: bunches of bomb grapes on a vine pop in chains, their hearts dropping onto the empty spots
   bombGrapesEvent: {
     chance: 0.01,
     growMs: 250, // the vine and bunches dropping in
@@ -8441,7 +8441,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/flowFieldEvent: coins ride a swirling flow field in streams and eddies, then pour into the total
+  // experiment, cash: src/crits/animatedCrits/events/flowFieldEvent: coins ride a swirling flow field in streams and eddies, then pour into the total
   flowFieldEvent: {
     chance: 0.01,
     scatterMs: 300, // the coins scattering over the screen
@@ -8450,7 +8450,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // race, worker perma tiers: src/floors/rallyJumpEvent: two racers hairpin round the top bar, fly a jump, hairpin round a worker and dive onto another
+  // race, worker perma tiers: src/crits/animatedCrits/events/rallyJumpEvent: two racers hairpin round the top bar, fly a jump, hairpin round a worker and dive onto another
   rallyJumpEvent: {
     chance: 0.01,
     raceMs: 1700, // the leader's whole run
@@ -8459,7 +8459,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 74
-  // clutter, levels: src/floors/ironFilingsEvent: the clicked bar turns into a bar magnet, its field dragging filings in arcs onto its poles
+  // clutter, levels: src/crits/animatedCrits/events/ironFilingsEvent: the clicked bar turns into a bar magnet, its field dragging filings in arcs onto its poles
   ironFilingsEvent: {
     chance: 0.01,
     sprinkleMs: 350, // the filings sprinkled over the screen
@@ -8469,7 +8469,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker perma tiers: src/floors/syncEvent: a field of spinning, blinking wisps couples up and syncs into unison flashes, then streams onto the workers
+  // experiment, worker perma tiers: src/crits/animatedCrits/events/syncEvent: a field of spinning, blinking wisps couples up and syncs into unison flashes, then streams onto the workers
   syncEvent: {
     chance: 0.01,
     growMs: 250, // the field lighting up
@@ -8478,7 +8478,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // galaxy, cash: src/floors/rocheLobeEvent: a small hot wisp peels a stream of glitter off a big star into a disk, which blows in a nova of coins
+  // galaxy, cash: src/crits/animatedCrits/events/rocheLobeEvent: a small hot wisp peels a stream of glitter off a big star into a disk, which blows in a nova of coins
   rocheLobeEvent: {
     chance: 0.01,
     growMs: 250, // the stars swirling up
@@ -8488,7 +8488,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // bounce, free hires: src/floors/marblesEvent: a shooter marble knocks marbles out of a glitter ring onto the empty spots
+  // bounce, free hires: src/crits/animatedCrits/events/marblesEvent: a shooter marble knocks marbles out of a glitter ring onto the empty spots
   marblesEvent: {
     chance: 0.01,
     growMs: 250, // the ring and marbles appearing
@@ -8499,7 +8499,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, levels and a crit tier: src/floors/bombShuffleboardEvent: lit bomb pucks glide along the bars and blow in a chain, a giant last on the clicked bar
+  // explosion, levels and a crit tier: src/crits/animatedCrits/events/bombShuffleboardEvent: lit bomb pucks glide along the bars and blow in a chain, a giant last on the clicked bar
   bombShuffleboardEvent: {
     chance: 0.01,
     slideMs: 320, // each puck's glide to a stop
@@ -8510,7 +8510,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 73
-  // galaxy, a crit tier: src/floors/polarRingEvent: a ring of stars over a galaxy's poles tips down onto its disk, then showers onto the clicked bar
+  // galaxy, a crit tier: src/crits/animatedCrits/events/polarRingEvent: a ring of stars over a galaxy's poles tips down onto its disk, then showers onto the clicked bar
   polarRingEvent: {
     chance: 0.01,
     growMs: 250, // the galaxy and its ring swirling up
@@ -8520,7 +8520,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // drill, worker perma tiers: src/floors/kebabEvent: a drill skewers a row of workers one after another like a kebab
+  // drill, worker perma tiers: src/crits/animatedCrits/events/kebabEvent: a drill skewers a row of workers one after another like a kebab
   kebabEvent: {
     chance: 0.01,
     approachMs: 260, // the drill flying in from the side
@@ -8529,7 +8529,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // money, cash: src/floors/katamariEvent: a ball of cash rolls along the bars picking up the coins on them, then into the total
+  // money, cash: src/crits/animatedCrits/events/katamariEvent: a ball of cash rolls along the bars picking up the coins on them, then into the total
   katamariEvent: {
     chance: 0.01,
     dropMs: 250, // the ball dropping onto the top bar
@@ -8539,7 +8539,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, free hires: src/floors/harmonicsEvent: a string of light hums up through its harmonics, then each loop flings a piece onto an empty spot
+  // experiment, free hires: src/crits/animatedCrits/events/harmonicsEvent: a string of light hums up through its harmonics, then each loop flings a piece onto an empty spot
   harmonicsEvent: {
     chance: 0.01,
     growMs: 250, // the string stretching out
@@ -8549,7 +8549,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, levels: src/floors/stairwellEvent: a ball bounces down the bars end to end like a superball down a stairwell
+  // bounce, levels: src/crits/animatedCrits/events/stairwellEvent: a ball bounces down the bars end to end like a superball down a stairwell
   stairwellEvent: {
     chance: 0.01,
     hopMs: 260, // each bounce, quickening
@@ -8558,7 +8558,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 72
-  // galaxy, free hires: src/floors/kirkwoodGapsEvent: a giant planet's resonances sweep bands out of an asteroid belt into wisps that drop onto the empty spots
+  // galaxy, free hires: src/crits/animatedCrits/events/kirkwoodGapsEvent: a giant planet's resonances sweep bands out of an asteroid belt into wisps that drop onto the empty spots
   kirkwoodGapsEvent: {
     chance: 0.01,
     growMs: 250, // the belt swirling up
@@ -8569,7 +8569,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, a crit tier: src/floors/periscopeEvent: a beam bounces up a zigzag of mirror wisps, then the top one sends it down onto the clicked bar
+  // beam, a crit tier: src/crits/animatedCrits/events/periscopeEvent: a beam bounces up a zigzag of mirror wisps, then the top one sends it down onto the clicked bar
   periscopeEvent: {
     chance: 0.01,
     growMs: 250, // the mirrors popping up
@@ -8579,7 +8579,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/waterSkiEvent: a boat wisp carves S-bends trailing a wake of cash, a skier jumping it, into the total
+  // mix, cash: src/crits/animatedCrits/events/waterSkiEvent: a boat wisp carves S-bends trailing a wake of cash, a skier jumping it, into the total
   waterSkiEvent: {
     chance: 0.01,
     runMs: 1600, // the boat's run into the total
@@ -8587,7 +8587,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // bounce, levels: src/floors/jaiAlaiEvent: a player wisp loops the ball round its basket and hurls it onto bar after bar
+  // bounce, levels: src/crits/animatedCrits/events/jaiAlaiEvent: a player wisp loops the ball round its basket and hurls it onto bar after bar
   jaiAlaiEvent: {
     chance: 0.01,
     growMs: 250, // the player popping up
@@ -8599,7 +8599,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 71
-  // explosion, a crit tier: src/floors/bombMobileEvent: a turning mobile of lit bombs blows tier by tier, then its giant drops onto the clicked bar
+  // explosion, a crit tier: src/crits/animatedCrits/events/bombMobileEvent: a turning mobile of lit bombs blows tier by tier, then its giant drops onto the clicked bar
   bombMobileEvent: {
     chance: 0.01,
     dropMs: 300, // the mobile dropping in
@@ -8610,7 +8610,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // galaxy, cash: src/floors/ringGalaxyEvent: a dwarf punches through a galaxy's core, sending a ring of starbirth out through it, its knots flung into the total
+  // galaxy, cash: src/crits/animatedCrits/events/ringGalaxyEvent: a dwarf punches through a galaxy's core, sending a ring of starbirth out through it, its knots flung into the total
   ringGalaxyEvent: {
     chance: 0.01,
     growMs: 250, // the galaxy swirling up
@@ -8621,7 +8621,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // galaxy, free hires: src/floors/gravitationalLensEvent: a heavy wisp lenses a galaxy's light into arcs and an Einstein ring, which breaks onto the empty spots
+  // galaxy, free hires: src/crits/animatedCrits/events/gravitationalLensEvent: a heavy wisp lenses a galaxy's light into arcs and an Einstein ring, which breaks onto the empty spots
   gravitationalLensEvent: {
     chance: 0.01,
     growMs: 250, // the galaxy swirling up
@@ -8632,7 +8632,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker perma tiers: src/floors/convectionEvent: jittering glitter organises into convection rolls whose hot plumes erupt onto the workers
+  // experiment, worker perma tiers: src/crits/animatedCrits/events/convectionEvent: jittering glitter organises into convection rolls whose hot plumes erupt onto the workers
   convectionEvent: {
     chance: 0.01,
     settleMs: 350, // the glitter jittering at random
@@ -8642,7 +8642,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, levels: src/floors/paintballEvent: guns at both edges trade volleys of pellets that splat gold onto the bars
+  // gunfire, levels: src/crits/animatedCrits/events/paintballEvent: guns at both edges trade volleys of pellets that splat gold onto the bars
   paintballEvent: {
     chance: 0.01,
     growMs: 250, // the guns popping up
@@ -8652,7 +8652,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 70
-  // galaxy, worker perma tiers: src/floors/tidalTailsEvent: two galaxies swing past each other, tearing off tidal tails of glitter that rain onto the workers
+  // galaxy, worker perma tiers: src/crits/animatedCrits/events/tidalTailsEvent: two galaxies swing past each other, tearing off tidal tails of glitter that rain onto the workers
   tidalTailsEvent: {
     chance: 0.01,
     growMs: 250, // the galaxies swirling up
@@ -8662,7 +8662,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // galaxy, levels: src/floors/hypervelocityEvent: stars sink onto a galaxy's binary core and are slung out onto the bars
+  // galaxy, levels: src/crits/animatedCrits/events/hypervelocityEvent: stars sink onto a galaxy's binary core and are slung out onto the bars
   hypervelocityEvent: {
     chance: 0.01,
     growMs: 250, // the galaxy swirling up
@@ -8673,7 +8673,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // galaxy, a crit tier: src/floors/quasarEvent: a galaxy drains into its core, which fires twin jets, one onto the clicked bar
+  // galaxy, a crit tier: src/crits/animatedCrits/events/quasarEvent: a galaxy drains into its core, which fires twin jets, one onto the clicked bar
   quasarEvent: {
     chance: 0.01,
     growMs: 250, // the galaxy swirling up
@@ -8683,7 +8683,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, free hires: src/floors/volleyballEvent: player wisps bump, set and spike a ball onto the empty spots over a net of light
+  // bounce, free hires: src/crits/animatedCrits/events/volleyballEvent: player wisps bump, set and spike a ball onto the empty spots over a net of light
   volleyballEvent: {
     chance: 0.01,
     growMs: 250, // the net and players popping up
@@ -8692,7 +8692,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/smartRocketsEvent: swarms of rocket wisps evolve by a genetic algorithm to fly round a beam into the total
+  // experiment, cash: src/crits/animatedCrits/events/smartRocketsEvent: swarms of rocket wisps evolve by a genetic algorithm to fly round a beam into the total
   smartRocketsEvent: {
     chance: 0.01,
     growMs: 250, // the beam slamming across
@@ -8702,7 +8702,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 69
-  // drill, levels: src/floors/pilotHoleEvent: three ever bigger drills bore the same spot on the clicked bar one after another
+  // drill, levels: src/crits/animatedCrits/events/pilotHoleEvent: three ever bigger drills bore the same spot on the clicked bar one after another
   pilotHoleEvent: {
     chance: 0.01,
     approachMs: 220, // each bit dropping onto the spot
@@ -8712,7 +8712,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // race, cash: src/floors/pitStopEvent: two racers hairpin round the top bar, pit under the button for cash and launch into the total
+  // race, cash: src/crits/animatedCrits/events/pitStopEvent: two racers hairpin round the top bar, pit under the button for cash and launch into the total
   pitStopEvent: {
     chance: 0.01,
     raceMs: 1500, // the race, not counting the pit stop
@@ -8721,7 +8721,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // clutter, a crit tier: src/floors/blackHoleMergerEvent: two gravity holes spiral in round each other gulping the glitter, merge and sink onto the clicked bar
+  // clutter, a crit tier: src/crits/animatedCrits/events/blackHoleMergerEvent: two gravity holes spiral in round each other gulping the glitter, merge and sink onto the clicked bar
   blackHoleMergerEvent: {
     chance: 0.01,
     rippleMs: 400, // the glitter rippling out in rings
@@ -8730,7 +8730,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, free hires: src/floors/accretionEvent: a dust disk round a star wisp clumps into planets, which drop onto the empty spots
+  // experiment, free hires: src/crits/animatedCrits/events/accretionEvent: a dust disk round a star wisp clumps into planets, which drop onto the empty spots
   accretionEvent: {
     chance: 0.01,
     growMs: 300, // the star flaring and the disk whirling up
@@ -8740,7 +8740,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker perma tiers: src/floors/maxwellsDemonEvent: a demon at a gate sorts a box of hot and cold glimmers, then the hot gas blasts onto the workers
+  // experiment, worker perma tiers: src/crits/animatedCrits/events/maxwellsDemonEvent: a demon at a gate sorts a box of hot and cold glimmers, then the hot gas blasts onto the workers
   maxwellsDemonEvent: {
     chance: 0.01,
     growMs: 250, // the box snapping up
@@ -8752,7 +8752,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 68
-  // explosion, levels: src/floors/fissionEvent: a neutron splits a bomb, whose neutrons split two more, then four, then eight, in a doubling chain reaction
+  // explosion, levels: src/crits/animatedCrits/events/fissionEvent: a neutron splits a bomb, whose neutrons split two more, then four, then eight, in a doubling chain reaction
   fissionEvent: {
     chance: 0.01,
     growMs: 300, // the bombs popping up
@@ -8760,7 +8760,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, free hires: src/floors/hydraEvent: the button shoots a hydra's heads off, two sprouting for each, then a burst takes the last four onto the empty spots
+  // gunfire, free hires: src/crits/animatedCrits/events/hydraEvent: the button shoots a hydra's heads off, two sprouting for each, then a burst takes the last four onto the empty spots
   hydraEvent: {
     chance: 0.01,
     growMs: 250, // the hydra rearing up
@@ -8771,7 +8771,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, worker perma tiers: src/floors/opticalTweezersEvent: three crossing beams trap beads one by one and haul them onto the workers
+  // beam, worker perma tiers: src/crits/animatedCrits/events/opticalTweezersEvent: three crossing beams trap beads one by one and haul them onto the workers
   opticalTweezersEvent: {
     chance: 0.01,
     growMs: 300, // the beads spat up and the beams blazing in
@@ -8779,7 +8779,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, a crit tier: src/floors/travellingSalesmanEvent: a tangled tour through a dozen cities uncrosses itself by 2-opt, then cinches onto the clicked bar
+  // experiment, a crit tier: src/crits/animatedCrits/events/travellingSalesmanEvent: a tangled tour through a dozen cities uncrosses itself by 2-opt, then cinches onto the clicked bar
   travellingSalesmanEvent: {
     chance: 0.01,
     growMs: 300, // the cities and the tangled loop appearing
@@ -8789,7 +8789,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // money, cash: src/floors/spinCycleEvent: cash gushes into a drum that rocks, spins it into a whirling ring, then peels it off the top into the total
+  // money, cash: src/crits/animatedCrits/events/spinCycleEvent: cash gushes into a drum that rocks, spins it into a whirling ring, then peels it off the top into the total
   spinCycleEvent: {
     chance: 0.01,
     pourMs: 320, // the gush into the drum
@@ -8800,7 +8800,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 67
-  // bounce, levels: src/floors/clackersEvent: a hand wisp swings two balls on strings like the clacker toy, clacking ever faster for levels
+  // bounce, levels: src/crits/animatedCrits/events/clackersEvent: a hand wisp swings two balls on strings like the clacker toy, clacking ever faster for levels
   clackersEvent: {
     chance: 0.01,
     growMs: 250, // the balls dropping to hang off the hand
@@ -8809,7 +8809,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, cash: src/floors/shishiOdoshiEvent: a spout wisp fills a bamboo-fountain rocker of light with cash, which tips, gushes onto a heap and clacks back
+  // mix, cash: src/crits/animatedCrits/events/shishiOdoshiEvent: a spout wisp fills a bamboo-fountain rocker of light with cash, which tips, gushes onto a heap and clacks back
   shishiOdoshiEvent: {
     chance: 0.01,
     growMs: 250, // the rocker rising
@@ -8819,7 +8819,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, a free floor: src/floors/isingModelEvent: a grid of little magnets cools into one, then is pulled into the lock like iron filings
+  // experiment, a free floor: src/crits/animatedCrits/events/isingModelEvent: a grid of little magnets cools into one, then is pulled into the lock like iron filings
   isingModelEvent: {
     chance: 0.01,
     growMs: 300, // the grid popping in
@@ -8829,7 +8829,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, a crit tier: src/floors/faradayCageEvent: lightning hammers a cage of light over the clicked bar, then a colossal bolt crushes it into the bar
+  // lightning, a crit tier: src/crits/animatedCrits/events/faradayCageEvent: lightning hammers a cage of light over the clicked bar, then a colossal bolt crushes it into the bar
   faradayCageEvent: {
     chance: 0.01,
     dropMs: 280, // the cage dropping over the bar
@@ -8839,7 +8839,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, free hires: src/floors/freeThrowsEvent: the button shoots ball wisps through rims of light over the empty spots, a worker forming where each lands
+  // bounce, free hires: src/crits/animatedCrits/events/freeThrowsEvent: the button shoots ball wisps through rims of light over the empty spots, a worker forming where each lands
   freeThrowsEvent: {
     chance: 0.01,
     growMs: 250, // the rims popping up
@@ -8850,7 +8850,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 66
-  // experiment, a crit tier: src/floors/towerOfHanoiEvent: bars of light solve the Tower of Hanoi on three pegs on the clicked bar, then hammer it a crit tier
+  // experiment, a crit tier: src/crits/animatedCrits/events/towerOfHanoiEvent: bars of light solve the Tower of Hanoi on three pegs on the clicked bar, then hammer it a crit tier
   towerOfHanoiEvent: {
     chance: 0.01,
     growMs: 300, // the pegs shooting up and the stack dropping on
@@ -8859,7 +8859,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // clutter, a free floor: src/floors/rockTheBoatEvent: the screen rocks like a boat, sloshing a mess of glitter side to side, then pours it into the lock
+  // clutter, a free floor: src/crits/animatedCrits/events/rockTheBoatEvent: the screen rocks like a boat, sloshing a mess of glitter side to side, then pours it into the lock
   rockTheBoatEvent: {
     chance: 0.01,
     dumpMs: 350, // the glitter washing down
@@ -8868,7 +8868,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // spray, levels: src/floors/windowWasherEvent: a window washer's platform drops bar to bar, misting each gold and squeegeeing it clean for levels
+  // spray, levels: src/crits/animatedCrits/events/windowWasherEvent: a window washer's platform drops bar to bar, misting each gold and squeegeeing it clean for levels
   windowWasherEvent: {
     chance: 0.01,
     enterMs: 300, // the platform dropping in
@@ -8879,7 +8879,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // race, worker perma tiers: src/floors/tandemDriftEvent: two racers drift nose to tail round the workers in hairpins, tails out, smoke pouring
+  // race, worker perma tiers: src/crits/animatedCrits/events/tandemDriftEvent: two racers drift nose to tail round the workers in hairpins, tails out, smoke pouring
   tandemDriftEvent: {
     chance: 0.01,
     raceMs: 2000, // the leader's whole run
@@ -8887,7 +8887,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // drill, free hires: src/floors/postHolesEvent: drills dive onto the empty spots and grind down through the floor, a new worker springing up out of each hole
+  // drill, free hires: src/crits/animatedCrits/events/postHolesEvent: drills dive onto the empty spots and grind down through the floor, a new worker springing up out of each hole
   postHolesEvent: {
     chance: 0.01,
     approachMs: 220, // each drill's dive
@@ -8898,7 +8898,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 65
-  // explosion, crit tiers: src/floors/incomingEvent: bombs swell in out of the distance onto the bars in chained cluster blasts, then a giant one onto the clicked bar
+  // explosion, crit tiers: src/crits/animatedCrits/events/incomingEvent: bombs swell in out of the distance onto the bars in chained cluster blasts, then a giant one onto the clicked bar
   incomingEvent: {
     chance: 0.01,
     flyMs: 800, // each bomb's flight in out of the distance
@@ -8907,7 +8907,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600,
     mergeMs: 0,
   },
-  // beam, levels: src/floors/stringArtEvent: strings of light shoot pin to rail like string art, bowing four curves between two bars, then fold flat onto them
+  // beam, levels: src/crits/animatedCrits/events/stringArtEvent: strings of light shoot pin to rail like string art, bowing four curves between two bars, then fold flat onto them
   stringArtEvent: {
     chance: 0.01,
     pinMs: 250, // the pins and rails popping up
@@ -8919,7 +8919,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, a free floor: src/floors/petanqueEvent: boules lobbed round a jack under the lock, the last one knocking the closest into the lock
+  // bounce, a free floor: src/crits/animatedCrits/events/petanqueEvent: boules lobbed round a jack under the lock, the last one knocking the closest into the lock
   petanqueEvent: {
     chance: 0.01,
     lobMs: 420, // each lob up to the lock
@@ -8929,7 +8929,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, worker perma tiers: src/floors/centipedeEvent: the button shoots an arcade centipede apart segment by segment, each dropping onto a worker
+  // gunfire, worker perma tiers: src/crits/animatedCrits/events/centipedeEvent: the button shoots an arcade centipede apart segment by segment, each dropping onto a worker
   centipedeEvent: {
     chance: 0.01,
     crawlMs: 2000, // the centipede's crawl down its rows
@@ -8937,7 +8937,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/mandelbrotEvent: a grid of coins iterated z² + c, escapees peeling off into the total until the Mandelbrot set stands
+  // experiment, cash: src/crits/animatedCrits/events/mandelbrotEvent: a grid of coins iterated z² + c, escapees peeling off into the total until the Mandelbrot set stands
   mandelbrotEvent: {
     chance: 0.01,
     fillMs: 450, // the grid of coins fanning up out of the button
@@ -8948,7 +8948,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 64
-  // spray, levels: src/floors/podiumEvent: a bottle wisp is shaken up, pops its cork and whips a spray up the bars like champagne
+  // spray, levels: src/crits/animatedCrits/events/podiumEvent: a bottle wisp is shaken up, pops its cork and whips a spray up the bars like champagne
   podiumEvent: {
     chance: 0.01,
     shakeMs: 450, // the bottle being shaken up
@@ -8957,7 +8957,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // clutter, a free floor: src/floors/robovacEvent: a gravity hole spirals and bumps round like a robot vacuum, eating glitter, then docks in the lock
+  // clutter, a free floor: src/crits/animatedCrits/events/robovacEvent: a gravity hole spirals and bumps round like a robot vacuum, eating glitter, then docks in the lock
   robovacEvent: {
     chance: 0.01,
     dumpMs: 400, // the glitter raining down
@@ -8965,7 +8965,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // race, free hires: src/floors/figureEightEvent: two racers lap a figure eight round the button and a far bar, then dive onto empty spots
+  // race, free hires: src/crits/animatedCrits/events/figureEightEvent: two racers lap a figure eight round the button and a far bar, then dive onto empty spots
   figureEightEvent: {
     chance: 0.01,
     raceMs: 1700, // the leader's lap and dive
@@ -8973,7 +8973,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // drill, cash: src/floors/bonanzaEvent: a drill grinds down through a heap of cash, coins geysering out, then it surges into the total
+  // drill, cash: src/crits/animatedCrits/events/bonanzaEvent: a drill grinds down through a heap of cash, coins geysering out, then it surges into the total
   bonanzaEvent: {
     chance: 0.01,
     pileMs: 380, // the heap pouring down
@@ -8985,7 +8985,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, a crit tier: src/floors/piClacksEvent: a heavy wisp drives a light one into a wall, 31 clacks counting out pi
+  // experiment, a crit tier: src/crits/animatedCrits/events/piClacksEvent: a heavy wisp drives a light one into a wall, 31 clacks counting out pi
   piClacksEvent: {
     chance: 0.01,
     growMs: 300, // the wall snapping up and the big wisp rolling in
@@ -8996,7 +8996,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 63
-  // money, cash: src/floors/galtonBoardEvent: a jet of cash pours down through a triangle of pegs into a bell curve of heaps, which surge into the total
+  // money, cash: src/crits/animatedCrits/events/galtonBoardEvent: a jet of cash pours down through a triangle of pegs into a bell curve of heaps, which surge into the total
   galtonBoardEvent: {
     chance: 0.01,
     growMs: 250, // the pegs popping up
@@ -9009,7 +9009,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // mix, free hires and cash: src/floors/poohsticksEvent: stick wisps race down a winding river of cash, each leaping out onto an empty spot
+  // mix, free hires and cash: src/crits/animatedCrits/events/poohsticksEvent: stick wisps race down a winding river of cash, each leaping out onto an empty spot
   poohsticksEvent: {
     chance: 0.01,
     travelMs: 900, // each coin's trip down the river
@@ -9020,7 +9020,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // gunfire, a crit tier: src/floors/fireForEffectEvent: ranging shells bracket the clicked bar over and short, then the battery pounds it in salvos
+  // gunfire, a crit tier: src/crits/animatedCrits/events/fireForEffectEvent: ranging shells bracket the clicked bar over and short, then the battery pounds it in salvos
   fireForEffectEvent: {
     chance: 0.01,
     readyMs: 150, // before the first ranging shot
@@ -9030,7 +9030,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels and a crit tier: src/floors/eyewallEvent: lightning strikes a whirling eyewall as it tightens onto the clicked bar
+  // lightning, levels and a crit tier: src/crits/animatedCrits/events/eyewallEvent: lightning strikes a whirling eyewall as it tightens onto the clicked bar
   eyewallEvent: {
     chance: 0.01,
     spinMs: 300, // the wall spinning up
@@ -9039,7 +9039,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, a free floor: src/floors/josephusEvent: a hunter wisp blows up every second wisp round a ring; the survivor flies into the lock
+  // experiment, a free floor: src/crits/animatedCrits/events/josephusEvent: a hunter wisp blows up every second wisp round a ring; the survivor flies into the lock
   josephusEvent: {
     chance: 0.01,
     growMs: 300, // the ring flaring up
@@ -9049,7 +9049,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 62
-  // explosion, a free floor: src/floors/fuseMazeEvent: a flame floods a maze of fuse cord, every dead end a bomb, the far corner's cord into the lock
+  // explosion, a free floor: src/crits/animatedCrits/events/fuseMazeEvent: a flame floods a maze of fuse cord, every dead end a bomb, the far corner's cord into the lock
   fuseMazeEvent: {
     chance: 0.01,
     growMs: 300, // the maze snapping out
@@ -9058,7 +9058,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, levels: src/floors/barBilliardsEvent: a ball ricochets about inside the clicked bar, then smashes out of its top
+  // bounce, levels: src/crits/animatedCrits/events/barBilliardsEvent: a ball ricochets about inside the clicked bar, then smashes out of its top
   barBilliardsEvent: {
     chance: 0.01,
     dropMs: 260, // the ball dropping into the bar
@@ -9067,7 +9067,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, free hires: src/floors/levyFlightEvent: a forager wisp skitters in flurries and dashes across the screen onto each empty spot
+  // wisp, free hires: src/crits/animatedCrits/events/levyFlightEvent: a forager wisp skitters in flurries and dashes across the screen onto each empty spot
   levyFlightEvent: {
     chance: 0.01,
     hopMs: 40, // each skittering hop
@@ -9075,7 +9075,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, a crit tier: src/floors/brachistochroneEvent: wisps race down a ramp, a drop and a cycloid onto the clicked bar
+  // experiment, a crit tier: src/crits/animatedCrits/events/brachistochroneEvent: wisps race down a ramp, a drop and a cycloid onto the clicked bar
   brachistochroneEvent: {
     chance: 0.01,
     growMs: 300, // the tracks snapping in
@@ -9083,7 +9083,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, worker perma tiers: src/floors/ulamSpiralEvent: a counter winds out a square spiral, the primes flaring, then flying onto the workers
+  // experiment, worker perma tiers: src/crits/animatedCrits/events/ulamSpiralEvent: a counter winds out a square spiral, the primes flaring, then flying onto the workers
   ulamSpiralEvent: {
     chance: 0.01,
     stepMs: [14, 6] as [number, number], // each count, quickening
@@ -9092,7 +9092,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 61
-  // race, a crit tier: src/floors/timeTrialEvent: a racer chases a ghost lap round the button's end, overtakes it and dives onto the clicked bar
+  // race, a crit tier: src/crits/animatedCrits/events/timeTrialEvent: a racer chases a ghost lap round the button's end, overtakes it and dives onto the clicked bar
   timeTrialEvent: {
     chance: 0.01,
     raceMs: 1300, // the ghost's lap
@@ -9101,7 +9101,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // clutter, worker perma tiers: src/floors/dustBunniesEvent: a broom sweeps blown dust into a line, then into a bunny per worker
+  // clutter, worker perma tiers: src/crits/animatedCrits/events/dustBunniesEvent: a broom sweeps blown dust into a line, then into a bunny per worker
   dustBunniesEvent: {
     chance: 0.01,
     blowMs: 450, // the gust blowing the dust in
@@ -9112,7 +9112,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // wisp, free hires: src/floors/magneticPendulumEvent: a pendulum wisp swings chaotically between magnets over the empty spots
+  // wisp, free hires: src/crits/animatedCrits/events/magneticPendulumEvent: a pendulum wisp swings chaotically between magnets over the empty spots
   magneticPendulumEvent: {
     chance: 0.01,
     swingMs: 2000, // the chaotic swing
@@ -9120,7 +9120,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/deCasteljauEvent: de Casteljau's scaffold sweeps out a Bézier curve, then cash pours along it
+  // experiment, cash: src/crits/animatedCrits/events/deCasteljauEvent: de Casteljau's scaffold sweeps out a Bézier curve, then cash pours along it
   deCasteljauEvent: {
     chance: 0.01,
     growMs: 250, // the control points flaring up
@@ -9130,7 +9130,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, levels: src/floors/buffonsNeedleEvent: needles rain onto the bars, each landing across one levelling it
+  // experiment, levels: src/crits/animatedCrits/events/buffonsNeedleEvent: needles rain onto the bars, each landing across one levelling it
   buffonsNeedleEvent: {
     chance: 0.01,
     dropMs: [70, 25] as [number, number], // between needles, quickening
@@ -9140,7 +9140,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 60
-  // drill, a crit tier: src/floors/frackingEvent: a drill curves in sideways, grinds along inside the clicked bar, then it fractures in a chain of blasts
+  // drill, a crit tier: src/crits/animatedCrits/events/frackingEvent: a drill curves in sideways, grinds along inside the clicked bar, then it fractures in a chain of blasts
   frackingEvent: {
     chance: 0.01,
     curveMs: 380, // screaming down and round into the bar's end
@@ -9150,7 +9150,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // beam, free hires: src/floors/chopperEvent: a rotor of beams lifts off the button and hovers over each empty spot, setting down a worker
+  // beam, free hires: src/crits/animatedCrits/events/chopperEvent: a rotor of beams lifts off the button and hovers over each empty spot, setting down a worker
   chopperEvent: {
     chance: 0.01,
     spinUpMs: 380, // the rotor spinning up
@@ -9159,7 +9159,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // spray, worker perma tiers: src/floors/extinguisherEvent: a nozzle darts worker to worker blasting each in a recoiling burst of mist
+  // spray, worker perma tiers: src/crits/animatedCrits/events/extinguisherEvent: a nozzle darts worker to worker blasting each in a recoiling burst of mist
   extinguisherEvent: {
     chance: 0.01,
     dartMs: [260, 160] as [number, number], // each dart to a firing spot, quickening
@@ -9168,7 +9168,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/goldenSpiralEvent: Fibonacci squares snap in, then a wisp leads cash round the golden spiral into the total
+  // experiment, cash: src/crits/animatedCrits/events/goldenSpiralEvent: Fibonacci squares snap in, then a wisp leads cash round the golden spiral into the total
   goldenSpiralEvent: {
     chance: 0.01,
     buildMs: [160, 90] as [number, number], // between squares, quickening
@@ -9178,7 +9178,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, levels: src/floors/wildfireEvent: lightning sets a forest of glimmer trees ablaze and the fire front sweeps the bars
+  // experiment, levels: src/crits/animatedCrits/events/wildfireEvent: lightning sets a forest of glimmer trees ablaze and the fire front sweeps the bars
   wildfireEvent: {
     chance: 0.01,
     growMs: 300, // the forest sprouting
@@ -9188,7 +9188,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 59
-  // wisp, free hires: src/floors/pursuitEvent: wisps on a polygon's corners chase each other in along pursuit spirals, then burst onto the empty spots
+  // wisp, free hires: src/crits/animatedCrits/events/pursuitEvent: wisps on a polygon's corners chase each other in along pursuit spirals, then burst onto the empty spots
   pursuitEvent: {
     chance: 0.01,
     chaseMs: 1500, // closing in till they meet
@@ -9196,7 +9196,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/fractalChargeEvent: bombs split down Sierpinski's triangle, 1, 3, 9, 27
+  // explosion, levels: src/crits/animatedCrits/events/fractalChargeEvent: bombs split down Sierpinski's triangle, 1, 3, 9, 27
   fractalChargeEvent: {
     chance: 0.01,
     lobMs: 420, // the first bomb lobbed into the middle
@@ -9206,7 +9206,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // clutter, a free floor: src/floors/snowplowEvent: two plough wisps clear snowed glitter lane by lane into a ridge, then heap it onto the lock
+  // clutter, a free floor: src/crits/animatedCrits/events/snowplowEvent: two plough wisps clear snowed glitter lane by lane into a ridge, then heap it onto the lock
   snowplowEvent: {
     chance: 0.01,
     snowMs: 450, // the glitter snowing down
@@ -9217,7 +9217,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/franklinsKiteEvent: lightning strikes a kite, the charge runs down to the key, which sparks onto the bars
+  // lightning, levels: src/crits/animatedCrits/events/franklinsKiteEvent: lightning strikes a kite, the charge runs down to the key, which sparks onto the bars
   franklinsKiteEvent: {
     chance: 0.01,
     riseMs: 450, // the kite soaring up
@@ -9226,7 +9226,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/sokobanEvent: a keeper wisp plays a Sokoban puzzle, shoving heaps of cash onto targets
+  // experiment, cash: src/crits/animatedCrits/events/sokobanEvent: a keeper wisp plays a Sokoban puzzle, shoving heaps of cash onto targets
   sokobanEvent: {
     chance: 0.01,
     dropMs: 350, // the heaps dropping in
@@ -9237,7 +9237,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 58
-  // money, cash: src/floors/billowsEvent: two shearing currents of cash roll up into curling billows that peel off into the total
+  // money, cash: src/crits/animatedCrits/events/billowsEvent: two shearing currents of cash roll up into curling billows that peel off into the total
   billowsEvent: {
     chance: 0.01,
     floodMs: 400, // the currents flooding in
@@ -9247,7 +9247,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // beam, a crit tier: src/floors/moireEvent: two fans of beams swing through each other in moiré, then lock onto the clicked bar
+  // beam, a crit tier: src/crits/animatedCrits/events/moireEvent: two fans of beams swing through each other in moiré, then lock onto the clicked bar
   moireEvent: {
     chance: 0.01,
     growMs: 220, // the fans blazing up
@@ -9255,7 +9255,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // race, a free floor: src/floors/polePositionEvent: two racers hairpin round the lock and dive onto it
+  // race, a free floor: src/crits/animatedCrits/events/polePositionEvent: two racers hairpin round the lock and dive onto it
   polePositionEvent: {
     chance: 0.01,
     raceMs: 1150, // the leader's race
@@ -9263,7 +9263,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // drill, levels: src/floors/countersinkEvent: a drill grinds into the clicked floor's Lvl label, every shove ticking it up
+  // drill, levels: src/crits/animatedCrits/events/countersinkEvent: a drill grinds into the clicked floor's Lvl label, every shove ticking it up
   countersinkEvent: {
     chance: 0.01,
     approachMs: 280, // the drill screaming down
@@ -9274,7 +9274,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, free hires: src/floors/busyBeaverEvent: a Turing machine head runs the 4-state busy beaver, then its 1s fly onto the empty spots
+  // experiment, free hires: src/crits/animatedCrits/events/busyBeaverEvent: a Turing machine head runs the 4-state busy beaver, then its 1s fly onto the empty spots
   busyBeaverEvent: {
     chance: 0.01,
     bootMs: 200, // the tape and head appearing
@@ -9284,7 +9284,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 57
-  // explosion, a free floor: src/floors/seedPodsEvent: bomb pods burst in a chain up to the lock, flinging seed bombs
+  // explosion, a free floor: src/crits/animatedCrits/events/seedPodsEvent: bomb pods burst in a chain up to the lock, flinging seed bombs
   seedPodsEvent: {
     chance: 0.01,
     growMs: 360, // the pods swelling up
@@ -9293,7 +9293,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // gunfire, a crit tier: src/floors/rippleFireEvent: a row of guns ripple-fires into the clicked bar, then volleys all at once
+  // gunfire, a crit tier: src/crits/animatedCrits/events/rippleFireEvent: a row of guns ripple-fires into the clicked bar, then volleys all at once
   rippleFireEvent: {
     chance: 0.01,
     readyMs: 200, // before the first shot
@@ -9303,7 +9303,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/sparkChamberEvent: charged wisps streak across, sparking onto every bar their tracks cross
+  // lightning, levels: src/crits/animatedCrits/events/sparkChamberEvent: charged wisps streak across, sparking onto every bar their tracks cross
   sparkChamberEvent: {
     chance: 0.01,
     trackMs: [700, 420] as [number, number], // each particle's streak, quickening
@@ -9312,7 +9312,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // mix, free hires + cash: src/floors/turbineEvent: a river of cash spins up a turbine that flings blades onto the empty spots
+  // mix, free hires + cash: src/crits/animatedCrits/events/turbineEvent: a river of cash spins up a turbine that flings blades onto the empty spots
   turbineEvent: {
     chance: 0.01,
     feedMs: 450, // the river reaching the hub
@@ -9322,7 +9322,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, worker perma tiers: src/floors/strangeAttractorEvent: a wisp draws the Lorenz butterfly, which bursts onto the workers
+  // experiment, worker perma tiers: src/crits/animatedCrits/events/strangeAttractorEvent: a wisp draws the Lorenz butterfly, which bursts onto the workers
   strangeAttractorEvent: {
     chance: 0.01,
     traceMs: 1600, // drawing the butterfly, ever faster
@@ -9332,7 +9332,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 56
-  // bounce, free hires: src/floors/topsyTurvyEvent: balls bounce floor to ceiling as gravity flips, then drop onto the empty spots
+  // bounce, free hires: src/crits/animatedCrits/events/topsyTurvyEvent: balls bounce floor to ceiling as gravity flips, then drop onto the empty spots
   topsyTurvyEvent: {
     chance: 0.01,
     launchMs: 320, // each ball's hop out of the button
@@ -9344,7 +9344,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // spray, a crit tier: src/floors/goldPlatingEvent: four nozzles whirl round the clicked bar spraying it gold
+  // spray, a crit tier: src/crits/animatedCrits/events/goldPlatingEvent: four nozzles whirl round the clicked bar spraying it gold
   goldPlatingEvent: {
     chance: 0.01,
     flyMs: 260, // the nozzles flying out to their ring
@@ -9352,7 +9352,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // clutter, worker perma tiers: src/floors/crosswindEvent: gusts squeeze a spiral of glitter into a column, then a heap
+  // clutter, worker perma tiers: src/crits/animatedCrits/events/crosswindEvent: gusts squeeze a spiral of glitter into a column, then a heap
   crosswindEvent: {
     chance: 0.01,
     spillMs: 320, // the glitter blown out over the screen
@@ -9363,7 +9363,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, levels: src/floors/hailstoneEvent: a wisp bounces through a Collatz sequence onto the clicked bar
+  // experiment, levels: src/crits/animatedCrits/events/hailstoneEvent: a wisp bounces through a Collatz sequence onto the clicked bar
   hailstoneEvent: {
     chance: 0.01,
     stepMs: [130, 60] as [number, number], // each hop, quickening
@@ -9371,7 +9371,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/hilbertCurveEvent: a Hilbert curve refines, then a river of cash winds along it into the total
+  // experiment, cash: src/crits/animatedCrits/events/hilbertCurveEvent: a Hilbert curve refines, then a river of cash winds along it into the total
   hilbertCurveEvent: {
     chance: 0.01,
     refineMs: 170, // each preview order
@@ -9382,7 +9382,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 55
-  // race, levels: src/floors/leMansEvent: two racers launch off the button and hairpin round the clicked bar's far end onto it
+  // race, levels: src/crits/animatedCrits/events/leMansEvent: two racers launch off the button and hairpin round the clicked bar's far end onto it
   leMansEvent: {
     chance: 0.01,
     raceMs: 1300, // the leader's race, from a standstill
@@ -9391,7 +9391,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // drill, a free floor: src/floors/tunnelBorerEvent: a drill bores in through the outer wall and on into the lock
+  // drill, a free floor: src/crits/animatedCrits/events/tunnelBorerEvent: a drill bores in through the outer wall and on into the lock
   tunnelBorerEvent: {
     chance: 0.01,
     approachMs: 260, // the drill screaming in
@@ -9401,7 +9401,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, levels + cash: src/floors/harpoonEvent: the button harpoons the bars on lines of cash, tugs them, then rips into the total
+  // mix, levels + cash: src/crits/animatedCrits/events/harpoonEvent: the button harpoons the bars on lines of cash, tugs them, then rips into the total
   harpoonEvent: {
     chance: 0.01,
     fireGapMs: 140, // between harpoons
@@ -9413,7 +9413,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, crit tiers: src/floors/eightQueensEvent: a board solves the eight queens by backtracking; they dive onto the bar
+  // experiment, crit tiers: src/crits/animatedCrits/events/eightQueensEvent: a board solves the eight queens by backtracking; they dive onto the bar
   eightQueensEvent: {
     chance: 0.01,
     boardMs: 250, // the board popping in
@@ -9423,7 +9423,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, worker perma tiers: src/floors/shortestPathEvent: Dijkstra's front floods a road map from the button; wisps race the shortest ways to the workers
+  // experiment, worker perma tiers: src/crits/animatedCrits/events/shortestPathEvent: Dijkstra's front floods a road map from the button; wisps race the shortest ways to the workers
   shortestPathEvent: {
     chance: 0.01,
     appearMs: 150, // the road map fading in
@@ -9433,7 +9433,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 54
-  // clutter, a crit tier: src/floors/sinkholeEvent: a gravity hole gulps a checkerboard of glitter in, then sinks onto the clicked bar
+  // clutter, a crit tier: src/crits/animatedCrits/events/sinkholeEvent: a gravity hole gulps a checkerboard of glitter in, then sinks onto the clicked bar
   sinkholeEvent: {
     chance: 0.01,
     spillMs: 380, // the glitter blown out over the screen
@@ -9443,7 +9443,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // clutter, a free floor: src/floors/backwashEvent: an invisible tide surges glitter up the screen into the lock
+  // clutter, a free floor: src/crits/animatedCrits/events/backwashEvent: an invisible tide surges glitter up the screen into the lock
   backwashEvent: {
     chance: 0.01,
     rainMs: 450, // the glitter raining down
@@ -9453,7 +9453,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // gunfire, free hires: src/floors/deflectorEvent: shots glance off a spinning bar of light onto the empty spots
+  // gunfire, free hires: src/crits/animatedCrits/events/deflectorEvent: shots glance off a spinning bar of light onto the empty spots
   deflectorEvent: {
     chance: 0.01,
     fireMs: [220, 80] as [number, number], // between shots, quickening
@@ -9461,7 +9461,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // explosion, levels: src/floors/sunflowerEvent: a chain of blasts races round a sunflower spiral of bombs into its heart
+  // explosion, levels: src/crits/animatedCrits/events/sunflowerEvent: a chain of blasts races round a sunflower spiral of bombs into its heart
   sunflowerEvent: {
     chance: 0.01,
     growMs: 360, // the seeds popping out
@@ -9470,7 +9470,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/convexHullEvent: a band gift-wraps scattered pins, then snaps in and scoops them into the total
+  // experiment, cash: src/crits/animatedCrits/events/convexHullEvent: a band gift-wraps scattered pins, then snaps in and scoops them into the total
   convexHullEvent: {
     chance: 0.01,
     pinMs: 300, // the pins popping up
@@ -9480,7 +9480,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 53
-  // money, levels + cash: src/floors/rogueWaveEvent: two swells meet in a sea of cash and rear up into a rogue wave
+  // money, levels + cash: src/crits/animatedCrits/events/rogueWaveEvent: two swells meet in a sea of cash and rear up into a rogue wave
   rogueWaveEvent: {
     chance: 0.01,
     floodMs: 400, // the sea rising
@@ -9491,7 +9491,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, a crit tier: src/floors/thunderEggEvent: bolts crack a giant egg of light open over the clicked bar
+  // lightning, a crit tier: src/crits/animatedCrits/events/thunderEggEvent: bolts crack a giant egg of light open over the clicked bar
   thunderEggEvent: {
     chance: 0.01,
     strikesMs: [260, 110] as [number, number], // between strikes, quickening
@@ -9499,7 +9499,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // beam, free hires: src/floors/hologramEvent: a projector beams spinning wireframes that turn into new workers
+  // beam, free hires: src/crits/animatedCrits/events/hologramEvent: a projector beams spinning wireframes that turn into new workers
   hologramEvent: {
     chance: 0.01,
     buildMs: 380, // each wireframe building up
@@ -9507,7 +9507,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // clutter, worker perma: src/floors/leafFallEvent: glitter leaves fall all over, a broom sweeps them into a heap on a worker
+  // clutter, worker perma: src/crits/animatedCrits/events/leafFallEvent: glitter leaves fall all over, a broom sweeps them into a heap on a worker
   leafFallEvent: {
     chance: 0.01,
     fallMs: 700, // the leaves falling
@@ -9516,7 +9516,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/threeBodyEvent: three wisps tangle in a chaotic three-body dance until one is flung out
+  // experiment, cash: src/crits/animatedCrits/events/threeBodyEvent: three wisps tangle in a chaotic three-body dance until one is flung out
   threeBodyEvent: {
     chance: 0.01,
     danceMs: 1500, // the chaotic dance
@@ -9525,7 +9525,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 52
-  // wisp, levels: src/floors/holdingPatternEvent: wisp planes circle a holding stack, then land on the bars one by one
+  // wisp, levels: src/crits/animatedCrits/events/holdingPatternEvent: wisp planes circle a holding stack, then land on the bars one by one
   holdingPatternEvent: {
     chance: 0.01,
     circleMs: 520, // circling before the first landing
@@ -9536,7 +9536,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // mix, levels + cash: src/floors/tankerEvent: a tanker refuels wisps through hoses of cash, which break off onto the bars
+  // mix, levels + cash: src/crits/animatedCrits/events/tankerEvent: a tanker refuels wisps through hoses of cash, which break off onto the bars
   tankerEvent: {
     chance: 0.01,
     flyMs: 1900, // the tanker crossing the screen
@@ -9546,7 +9546,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // explosion, cash: src/floors/vaporCloudEvent: a cloud of glittering fuel spreads over the screen and a spark detonates it
+  // explosion, cash: src/crits/animatedCrits/events/vaporCloudEvent: a cloud of glittering fuel spreads over the screen and a spark detonates it
   vaporCloudEvent: {
     chance: 0.01,
     spreadMs: 650, // the cloud spreading
@@ -9554,14 +9554,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, a crit tier: src/floors/shieldBreakerEvent: guns pound a shield round the button till it shatters
+  // gunfire, a crit tier: src/crits/animatedCrits/events/shieldBreakerEvent: guns pound a shield round the button till it shatters
   shieldBreakerEvent: {
     chance: 0.01,
     shotsMs: [120, 55] as [number, number], // between shots, quickening
     holdMs: 400,
     mergeMs: 0,
   },
-  // bounce, levels: src/floors/bottleneckEvent: a ball ricochets down a narrowing funnel, ever faster, onto the bar
+  // bounce, levels: src/crits/animatedCrits/events/bottleneckEvent: a ball ricochets down a narrowing funnel, ever faster, onto the bar
   bottleneckEvent: {
     chance: 0.01,
     legsMs: [260, 45] as [number, number], // each ricochet, quickening
@@ -9569,7 +9569,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // drill, worker perma: src/floors/skylightEvent: a drill bores up through the ceiling and light pours onto the workers
+  // drill, worker perma: src/crits/animatedCrits/events/skylightEvent: a drill bores up through the ceiling and light pours onto the workers
   skylightEvent: {
     chance: 0.01,
     approachMs: 240,
@@ -9578,7 +9578,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // spray, levels: src/floors/delugeEvent: sprinkler heads burst open over the bars one after another
+  // spray, levels: src/crits/animatedCrits/events/delugeEvent: sprinkler heads burst open over the bars one after another
   delugeEvent: {
     chance: 0.01,
     headsMs: [240, 110] as [number, number], // between heads bursting, quickening
@@ -9587,7 +9587,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // race, a crit tier: src/floors/monacoEvent: two racers hairpin round the total and dive onto the clicked bar
+  // race, a crit tier: src/crits/animatedCrits/events/monacoEvent: two racers hairpin round the total and dive onto the clicked bar
   monacoEvent: {
     chance: 0.01,
     raceMs: 1150, // the leader's race
@@ -9595,7 +9595,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // clutter, a free floor: src/floors/glitterSpillEvent: spilt glitter is swept up into a heap and shoved into the lock
+  // clutter, a free floor: src/crits/animatedCrits/events/glitterSpillEvent: spilt glitter is swept up into a heap and shoved into the lock
   glitterSpillEvent: {
     chance: 0.01,
     spillMs: 600, // the spill spreading
@@ -9605,7 +9605,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
   // batch 51
-  // money, cash: src/floors/partingEvent: a sea of cash parts into towering walls that crash back into a geyser
+  // money, cash: src/crits/animatedCrits/events/partingEvent: a sea of cash parts into towering walls that crash back into a geyser
   partingEvent: {
     chance: 0.01,
     floodMs: 500, // the sea rising
@@ -9617,7 +9617,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, levels: src/floors/buzzWireEvent: a ring races down a wire weaving over the bars, arcing into each
+  // lightning, levels: src/crits/animatedCrits/events/buzzWireEvent: a ring races down a wire weaving over the bars, arcing into each
   buzzWireEvent: {
     chance: 0.01,
     runMs: 1700, // the ring's run down the wire, speeding up
@@ -9625,7 +9625,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/hiccupsEvent: a huge bomb blows, sucks its blast back in and blows bigger, twice
+  // explosion, cash: src/crits/animatedCrits/events/hiccupsEvent: a huge bomb blows, sucks its blast back in and blows bigger, twice
   hiccupsEvent: {
     chance: 0.01,
     fuseMs: 450, // the bomb fizzing before its first blast
@@ -9635,7 +9635,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, a crit tier: src/floors/cutTheRopeEvent: a gun shoots the ropes holding a weight that drops onto the bar
+  // gunfire, a crit tier: src/crits/animatedCrits/events/cutTheRopeEvent: a gun shoots the ropes holding a weight that drops onto the bar
   cutTheRopeEvent: {
     chance: 0.01,
     shotsMs: [320, 170] as [number, number], // between shots, quickening
@@ -9643,7 +9643,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // bounce, a free floor: src/floors/whisperingGalleryEvent: a ball banks round an ellipse through its foci, the button and the lock
+  // bounce, a free floor: src/crits/animatedCrits/events/whisperingGalleryEvent: a ball banks round an ellipse through its foci, the button and the lock
   whisperingGalleryEvent: {
     chance: 0.01,
     drawMs: 220, // the ellipse drawing itself
@@ -9651,7 +9651,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // drill, levels: src/floors/chunnelEvent: two drills bore into the bar's ends and meet in its middle
+  // drill, levels: src/crits/animatedCrits/events/chunnelEvent: two drills bore into the bar's ends and meet in its middle
   chunnelEvent: {
     chance: 0.01,
     approachMs: 260,
@@ -9661,7 +9661,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // spray, crit tiers: src/floors/sneezeEvent: a wisp winds up and sneezes clouds of gold mist onto the bars
+  // spray, crit tiers: src/crits/animatedCrits/events/sneezeEvent: a wisp winds up and sneezes clouds of gold mist onto the bars
   sneezeEvent: {
     chance: 0.01,
     windupMs: 560, // the first wind-up
@@ -9670,7 +9670,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // race, worker perma: src/floors/grandPrixEvent: two racers hairpin round a worker and dive onto workers
+  // race, worker perma: src/crits/animatedCrits/events/grandPrixEvent: two racers hairpin round a worker and dive onto workers
   grandPrixEvent: {
     chance: 0.01,
     raceMs: 1200, // the leader's race
@@ -9678,7 +9678,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // clutter, levels: src/floors/pillowFightEvent: a pillow fight fills the screen with feathers, a broom sweeps them onto the bar
+  // clutter, levels: src/crits/animatedCrits/events/pillowFightEvent: a pillow fight fills the screen with feathers, a broom sweeps them onto the bar
   pillowFightEvent: {
     chance: 0.01,
     swingMs: 260, // the pillows swinging in to the first smack
@@ -9689,7 +9689,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/dotsAndBoxesEvent: a self-playing game of dots and boxes, every box bursting into cash
+  // experiment, cash: src/crits/animatedCrits/events/dotsAndBoxesEvent: a self-playing game of dots and boxes, every box bursting into cash
   dotsAndBoxesEvent: {
     chance: 0.01,
     movesMs: [75, 30] as [number, number], // between moves, quickening
@@ -9697,14 +9697,14 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 50
-  // money, cash: src/floors/chladniEvent: a cloud of coins dances into Chladni plate figures as a tone climbs
+  // money, cash: src/crits/animatedCrits/events/chladniEvent: a cloud of coins dances into Chladni plate figures as a tone climbs
   chladniEvent: {
     chance: 0.01,
     toneMs: 420, // each figure
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/afterimageEvent: a blitzing wisp leaves afterimages that streak into the clicked bar
+  // wisp, levels: src/crits/animatedCrits/events/afterimageEvent: a blitzing wisp leaves afterimages that streak into the clicked bar
   afterimageEvent: {
     chance: 0.01,
     dashMs: 110, // each blitz between stops
@@ -9715,14 +9715,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // mix, free hires + cash: src/floors/snowGlobeEvent: a shaken glitter globe of whirling cash shatters into flakes that hire
+  // mix, free hires + cash: src/crits/animatedCrits/events/snowGlobeEvent: a shaken glitter globe of whirling cash shatters into flakes that hire
   snowGlobeEvent: {
     chance: 0.01,
     shakeMs: 1300, // the three shakes
     holdMs: 400,
     mergeMs: 500,
   },
-  // beam, worker perma: src/floors/sundialEvent: a sun arcs over the button and its beam sweeps round like a sundial's shadow
+  // beam, worker perma: src/crits/animatedCrits/events/sundialEvent: a sun arcs over the button and its beam sweeps round like a sundial's shadow
   sundialEvent: {
     chance: 0.01,
     riseMs: 300, // the sun rising
@@ -9730,21 +9730,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // gunfire, crit tiers: src/floors/riveterEvent: a rivet gun hops along the bars firing rivets into them
+  // gunfire, crit tiers: src/crits/animatedCrits/events/riveterEvent: a rivet gun hops along the bars firing rivets into them
   riveterEvent: {
     chance: 0.01,
     rivetsMs: [140, 70] as [number, number], // between rivets, quickening
     holdMs: 400,
     mergeMs: 0,
   },
-  // bounce, a free floor: src/floors/paddleBallEvent: a paddle smacks a ball on an elastic into the lock till it breaks
+  // bounce, a free floor: src/crits/animatedCrits/events/paddleBallEvent: a paddle smacks a ball on an elastic into the lock till it breaks
   paddleBallEvent: {
     chance: 0.01,
     tripsMs: [520, 260] as [number, number], // each round trip, quickening
     holdMs: 400,
     mergeMs: 0,
   },
-  // drill, cash: src/floors/geodeEvent: a drill grinds into a geode that cracks open into cash
+  // drill, cash: src/crits/animatedCrits/events/geodeEvent: a drill grinds into a geode that cracks open into cash
   geodeEvent: {
     chance: 0.01,
     approachMs: 260, // the drill screaming in
@@ -9753,7 +9753,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // spray, levels: src/floors/fogMachineEvent: fog machines fill the screen with gold fog that swallows the bars
+  // spray, levels: src/crits/animatedCrits/events/fogMachineEvent: fog machines fill the screen with gold fog that swallows the bars
   fogMachineEvent: {
     chance: 0.01,
     riseMs: 1500, // the fog rising up the screen
@@ -9761,7 +9761,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // race, free hires: src/floors/chicaneEvent: two racers flick through a chicane round the button and swoop onto hires
+  // race, free hires: src/crits/animatedCrits/events/chicaneEvent: two racers flick through a chicane round the button and swoop onto hires
   chicaneEvent: {
     chance: 0.01,
     raceMs: 1100, // the leader's race
@@ -9769,21 +9769,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/epicyclesEvent: spinning Fourier arms draw a heart in coins
+  // experiment, cash: src/crits/animatedCrits/events/epicyclesEvent: spinning Fourier arms draw a heart in coins
   epicyclesEvent: {
     chance: 0.01,
     drawMs: 1300, // the tip drawing the heart
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/sieveEvent: a cursor sieves a grid of dots down to its primes, which fire cash
+  // experiment, cash: src/crits/animatedCrits/events/sieveEvent: a cursor sieves a grid of dots down to its primes, which fire cash
   sieveEvent: {
     chance: 0.01,
     hopsMs: [70, 30] as [number, number], // each hop, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, cash: src/floors/clutterEvent: a wisp blasts coins evenly over the screen, one big broom sweeps them into a heap
+  // wisp, cash: src/crits/animatedCrits/events/clutterEvent: a wisp blasts coins evenly over the screen, one big broom sweeps them into a heap
   clutterEvent: {
     chance: 0.01,
     enterMs: 300, // the wisp streaking in
@@ -9794,7 +9794,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 49
-  // money, levels + cash: src/floors/archimedesScrewEvent: cash winds up a turning screw, jetting onto the bars
+  // money, levels + cash: src/crits/animatedCrits/events/archimedesScrewEvent: cash winds up a turning screw, jetting onto the bars
   archimedesScrewEvent: {
     chance: 0.01,
     streamMs: 800, // cash pouring onto the screw's foot
@@ -9803,7 +9803,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // wisp, free hires: src/floors/murmurationEvent: a flock of wisps swirls like starlings, then dives onto empty spots
+  // wisp, free hires: src/crits/animatedCrits/events/murmurationEvent: a flock of wisps swirls like starlings, then dives onto empty spots
   murmurationEvent: {
     chance: 0.01,
     flockMs: 1200, // the flock swirling
@@ -9812,7 +9812,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // mix, a crit tier + cash: src/floors/spiritBombEvent: rivers of cash swell an orb that's hurled onto the bar
+  // mix, a crit tier + cash: src/crits/animatedCrits/events/spiritBombEvent: rivers of cash swell an orb that's hurled onto the bar
   spiritBombEvent: {
     chance: 0.01,
     gatherMs: 1200, // the rivers swelling the orb
@@ -9820,14 +9820,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 500,
   },
-  // beam, crit tiers: src/floors/metronomeEvent: a metronome beam ticks across the bars
+  // beam, crit tiers: src/crits/animatedCrits/events/metronomeEvent: a metronome beam ticks across the bars
   metronomeEvent: {
     chance: 0.01,
     ticksMs: [380, 190] as [number, number], // each swing, quickening
     holdMs: 400,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/powerGridEvent: bolts zigzag pylon to pylon up the bars like a grid powering up
+  // lightning, levels: src/crits/animatedCrits/events/powerGridEvent: bolts zigzag pylon to pylon up the bars like a grid powering up
   powerGridEvent: {
     chance: 0.01,
     linksMs: [240, 110] as [number, number], // between lines, quickening
@@ -9835,7 +9835,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/bombBowlingEvent: a bomb bowls into a rack of bomb pins
+  // explosion, cash: src/crits/animatedCrits/events/bombBowlingEvent: a bomb bowls into a rack of bomb pins
   bombBowlingEvent: {
     chance: 0.01,
     rollMs: 650, // the ball rolling in
@@ -9843,14 +9843,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, crit tiers: src/floors/showdownEvent: two gunslingers' shots meet head-on over each bar
+  // gunfire, crit tiers: src/crits/animatedCrits/events/showdownEvent: two gunslingers' shots meet head-on over each bar
   showdownEvent: {
     chance: 0.01,
     roundsMs: [460, 280] as [number, number], // each round, quickening
     holdMs: 400,
     mergeMs: 0,
   },
-  // bounce, levels + a crit tier: src/floors/jumpRopeEvent: a wisp skips a rope of light on the clicked bar
+  // bounce, levels + a crit tier: src/crits/animatedCrits/events/jumpRopeEvent: a wisp skips a rope of light on the clicked bar
   jumpRopeEvent: {
     chance: 0.01,
     jumpMs: 1500, // the skipping, the rope turning ever faster
@@ -9859,7 +9859,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // drill, cash: src/floors/strongboxEvent: a drill grinds into the total readout like a safecracker
+  // drill, cash: src/crits/animatedCrits/events/strongboxEvent: a drill grinds into the total readout like a safecracker
   strongboxEvent: {
     chance: 0.01,
     approachMs: 300, // the drill screaming up
@@ -9868,7 +9868,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // spray, a free floor: src/floors/snowCannonEvent: a snow cannon buries the lock in falling gold mist
+  // spray, a free floor: src/crits/animatedCrits/events/snowCannonEvent: a snow cannon buries the lock in falling gold mist
   snowCannonEvent: {
     chance: 0.01,
     burstsMs: [420, 300] as [number, number], // each burst, shortening
@@ -9876,7 +9876,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // race, a crit tier + levels: src/floors/hillClimbEvent: two racers switchback up the bars into the top one
+  // race, a crit tier + levels: src/crits/animatedCrits/events/hillClimbEvent: two racers switchback up the bars into the top one
   hillClimbEvent: {
     chance: 0.01,
     raceMs: 1800, // the leader's climb
@@ -9885,14 +9885,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 400,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/abacusEvent: an abacus counts itself up to 9999 and carries over
+  // experiment, cash: src/crits/animatedCrits/events/abacusEvent: an abacus counts itself up to 9999 and carries over
   abacusEvent: {
     chance: 0.01,
     countMs: 1500, // counting up, ever faster
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/coralEvent: a coral of light grows out of the button by diffusion-limited aggregation
+  // experiment, cash: src/crits/animatedCrits/events/coralEvent: a coral of light grows out of the button by diffusion-limited aggregation
   coralEvent: {
     chance: 0.01,
     growMs: 1500, // the coral growing
@@ -9900,7 +9900,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 48
-  // money, levels and cash: src/floors/duneEvent: a crawling dune of cash blows its crest onto the bars
+  // money, levels and cash: src/crits/animatedCrits/events/duneEvent: a crawling dune of cash blows its crest onto the bars
   duneEvent: {
     chance: 0.01,
     crawlMs: 1300, // the dune crawling across
@@ -9908,14 +9908,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // wisp, levels: src/floors/stringOfPearlsEvent: a comet tears into fragments that plunge onto the bars
+  // wisp, levels: src/crits/animatedCrits/events/stringOfPearlsEvent: a comet tears into fragments that plunge onto the bars
   stringOfPearlsEvent: {
     chance: 0.01,
     travelMs: 1300, // the comet's whole path over the bars
     holdMs: 500,
     mergeMs: 0,
   },
-  // mix, crit tiers and cash: src/floors/riverJugglerEvent: two hands juggle rivers of cash, then hurl them onto the bars
+  // mix, crit tiers and cash: src/crits/animatedCrits/events/riverJugglerEvent: two hands juggle rivers of cash, then hurl them onto the bars
   riverJugglerEvent: {
     chance: 0.01,
     throwsMs: [200, 110] as [number, number], // between throws, quickening
@@ -9923,7 +9923,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // lightning, crit tiers: src/floors/likeChargesEvent: repelling charges spread out, then discharge onto the bars
+  // lightning, crit tiers: src/crits/animatedCrits/events/likeChargesEvent: repelling charges spread out, then discharge onto the bars
   likeChargesEvent: {
     chance: 0.01,
     spreadMs: 800, // the charges shoving apart
@@ -9931,7 +9931,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // explosion, cash: src/floors/collisionCourseEvent: two counter-spinning rings of bombs collide where they cross
+  // explosion, cash: src/crits/animatedCrits/events/collisionCourseEvent: two counter-spinning rings of bombs collide where they cross
   collisionCourseEvent: {
     chance: 0.01,
     firstMs: 500, // the first pair meeting
@@ -9939,21 +9939,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // gunfire, crit tiers: src/floors/targetWheelEvent: shots spin a wheel of targets till it flies apart onto the bars
+  // gunfire, crit tiers: src/crits/animatedCrits/events/targetWheelEvent: shots spin a wheel of targets till it flies apart onto the bars
   targetWheelEvent: {
     chance: 0.01,
     shotsMs: [110, 45] as [number, number], // between hits, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // bounce, cash: src/floors/spinningHexagonEvent: a ball bounces round inside a spinning hexagon
+  // bounce, cash: src/crits/animatedCrits/events/spinningHexagonEvent: a ball bounces round inside a spinning hexagon
   spinningHexagonEvent: {
     chance: 0.01,
     spinMs: 1700, // the hexagon spinning up till it bursts
     holdMs: 250,
     mergeMs: 500,
   },
-  // drill, a free floor: src/floors/beadDrillEvent: a drill bores up through a string of beads into the lock
+  // drill, a free floor: src/crits/animatedCrits/events/beadDrillEvent: a drill bores up through a string of beads into the lock
   beadDrillEvent: {
     chance: 0.01,
     approachMs: 160,
@@ -9961,21 +9961,21 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // spray, free hires: src/floors/hydroseederEvent: a nozzle sprays seed-mist on each empty spot till a worker sprouts
+  // spray, free hires: src/crits/animatedCrits/events/hydroseederEvent: a nozzle sprays seed-mist on each empty spot till a worker sprouts
   hydroseederEvent: {
     chance: 0.01,
     passesMs: [170, 100] as [number, number], // each pass of a spot, quickening
     holdMs: 500,
     mergeMs: 0,
   },
-  // experiment, cash: src/floors/mancalaEvent: a game of mancala plays itself out
+  // experiment, cash: src/crits/animatedCrits/events/mancalaEvent: a game of mancala plays itself out
   mancalaEvent: {
     chance: 0.01,
     movesMs: [120, 40] as [number, number], // between moves, quickening
     holdMs: 250,
     mergeMs: 500,
   },
-  // drill, levels and a crit tier: src/floors/breakthroughEvent: a drill stalls on the clicked bar, then bores through it
+  // drill, levels and a crit tier: src/crits/animatedCrits/events/breakthroughEvent: a drill stalls on the clicked bar, then bores through it
   breakthroughEvent: {
     chance: 0.01,
     approachMs: 280, // the drill screaming down
@@ -9985,7 +9985,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 500,
     mergeMs: 0,
   },
-  // wisp, cash: src/floors/curvesEvent: two racing wisps take a hairpin round the clicked button, then dash into the total
+  // wisp, cash: src/crits/animatedCrits/events/curvesEvent: two racing wisps take a hairpin round the clicked button, then dash into the total
   curvesEvent: {
     chance: 0.01,
     raceMs: 900, // the leader's run: flat out in, braking round the button's end, powering out into the total
@@ -9993,7 +9993,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
-  // experiment, cash: src/floors/tileFlipEvent: the screen flips to gold in tiles
+  // experiment, cash: src/crits/animatedCrits/events/tileFlipEvent: the screen flips to gold in tiles
   tileFlipEvent: {
     chance: 0.01,
     waveMs: 700, // the flip wave racing out
@@ -10003,7 +10003,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // mix, levels + tier + cash: src/floors/whipEvent: a whip of flowing cash
+  // mix, levels + tier + cash: src/crits/animatedCrits/events/whipEvent: a whip of flowing cash
   // cracks against the bars
   whipEvent: {
     chance: 0.01,
@@ -10015,7 +10015,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300,
     mergeMs: 500,
   },
-  // beam, levels: src/floors/batteryEvent: every bar fires a laser blast
+  // beam, levels: src/crits/animatedCrits/events/batteryEvent: every bar fires a laser blast
   batteryEvent: {
     chance: 0.01,
     gapsMs: [260, 110] as [number, number], // between shots, quickening
@@ -10026,7 +10026,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 700,
     mergeMs: 0,
   },
-  // lightning, levels + worker tiers: src/floors/teslaCoilEvent: a coil
+  // lightning, levels + worker tiers: src/crits/animatedCrits/events/teslaCoilEvent: a coil
   // throws ever longer arcs
   teslaCoilEvent: {
     chance: 0.01,
@@ -10037,7 +10037,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 700,
     mergeMs: 0,
   },
-  // lightning, levels: src/floors/jacobsLadderEvent: an arc climbs the building
+  // lightning, levels: src/crits/animatedCrits/events/jacobsLadderEvent: an arc climbs the building
   jacobsLadderEvent: {
     chance: 0.01,
     igniteMs: 260, // the arc striking up between its electrodes
@@ -10046,7 +10046,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 700,
     mergeMs: 0,
   },
-  // experiment, mixed rewards: src/floors/comicBookEvent: comic-book sound
+  // experiment, mixed rewards: src/crits/animatedCrits/events/comicBookEvent: comic-book sound
   // effects slam over every reward
   comicBookEvent: {
     chance: 0.01,
@@ -10056,7 +10056,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 0,
   },
 
-  // src/floors/slashEvent — the rare "Slash" event: three fast cuts rip
+  // src/crits/animatedCrits/events/slashEvent — the rare "Slash" event: three fast cuts rip
   // across the screen, smoulder, then burst open blasting coins into the total
   slashEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10067,7 +10067,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/jackhammerEvent — the rare "Jackhammer" event: the wisp
+  // src/crits/animatedCrits/events/jackhammerEvent — the rare "Jackhammer" event: the wisp
   // jackhammers the button ever faster, popping coins, then blows apart on it
   // spraying coins over the screen into the total
   jackhammerEvent: {
@@ -10077,7 +10077,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/pummelEvent — the rare "Pummel" event: a swarm of wisps
+  // src/crits/animatedCrits/events/pummelEvent — the rare "Pummel" event: a swarm of wisps
   // slams into the clicked floor's income bar from every side, then it slams
   // in an explosion and jumps one crit tier
   pummelEvent: {
@@ -10087,7 +10087,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 450, // after the finale lands, before the screen unfreezes
   },
 
-  // src/floors/overloadEvent — the rare "Overload" event: the clicked floor's
+  // src/crits/animatedCrits/events/overloadEvent — the rare "Overload" event: the clicked floor's
   // income bar overheats, shuddering and sparking ever harder, then blows in a
   // huge explosion and jumps one crit tier
   overloadEvent: {
@@ -10097,7 +10097,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600, // after the blast, before the screen unfreezes
   },
 
-  // src/floors/gatlingEvent — the rare "Gatling" event: wisps fire in like
+  // src/crits/animatedCrits/events/gatlingEvent — the rare "Gatling" event: wisps fire in like
   // gatling bullets, each hitting the button and knocking coins out round it,
   // which merge into the total
   gatlingEvent: {
@@ -10108,7 +10108,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/pressEvent — the rare "Press" event: two glowing plates slam
+  // src/crits/animatedCrits/events/pressEvent — the rare "Press" event: two glowing plates slam
   // the clicked floor's income bar, bouncing off it, then grind it flat until
   // it explodes out, bursting coins into the total
   pressEvent: {
@@ -10122,7 +10122,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/drillEvent — the rare "Drill" event: the wisp drills through
+  // src/crits/animatedCrits/events/drillEvent — the rare "Drill" event: the wisp drills through
   // the clicked floor's income bar from the left and bursts out the other
   // side, spraying coins into the total
   drillEvent: {
@@ -10134,7 +10134,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/burrowEvent — the rare "Burrow" event: the wisp falls onto
+  // src/crits/animatedCrits/events/burrowEvent — the rare "Burrow" event: the wisp falls onto
   // the clicked floor's upgrade button and bores in, bending it down at the
   // middle until it explodes, bursting money into the total
   burrowEvent: {
@@ -10145,7 +10145,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/pingPongEvent — the rare "Ping Pong" event: a wisp bounces
+  // src/crits/animatedCrits/events/pingPongEvent — the rare "Ping Pong" event: a wisp bounces
   // between the clicked floor's income bar and the roof (the bar above, if
   // open), each bar hit knocking coins into the total; pays once per bar hit
   pingPongEvent: {
@@ -10157,7 +10157,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/slamDunkEvent — the rare "Slam Dunk" event: the wisp dribbles
+  // src/crits/animatedCrits/events/slamDunkEvent — the rare "Slam Dunk" event: the wisp dribbles
   // across the clicked floor, leaps and dunks into the total readout, which
   // explodes in coins that merge back into it
   slamDunkEvent: {
@@ -10170,7 +10170,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/uppercutEvent — the rare "Uppercut" event: the wisp
+  // src/crits/animatedCrits/events/uppercutEvent — the rare "Uppercut" event: the wisp
   // uppercuts the clicked floor's income bar into the air; it flips and
   // crashes back down with free upgrade levels
   uppercutEvent: {
@@ -10184,7 +10184,7 @@ export const ANIMATED_EVENT_CONFIG = {
     minLevels: 10,
   },
 
-  // src/floors/headHopEvent — the rare "Head Hop" event: the wisp hops
+  // src/crits/animatedCrits/events/headHopEvent — the rare "Head Hop" event: the wisp hops
   // across the clicked floor's workers' heads, each squashing and climbing a
   // perma tier
   headHopEvent: {
@@ -10196,7 +10196,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 650, // after the last head, before the screen unfreezes
   },
 
-  // src/floors/paparazziEvent — the rare "Paparazzi" event: camera flashes
+  // src/crits/animatedCrits/events/paparazziEvent — the rare "Paparazzi" event: camera flashes
   // go off round the clicked floor's workers, ever faster; each worker caught
   // climbs a perma tier, then every camera fires at once
   paparazziEvent: {
@@ -10206,7 +10206,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 650, // after that, before the screen unfreezes
   },
 
-  // src/floors/missileBarrageEvent — the rare "Missile Barrage" event: a
+  // src/crits/animatedCrits/events/missileBarrageEvent — the rare "Missile Barrage" event: a
   // volley of wisp missiles streaks up into every income bar in view, each
   // hit landing free upgrade levels
   missileBarrageEvent: {
@@ -10218,7 +10218,7 @@ export const ANIMATED_EVENT_CONFIG = {
     minLevels: 10,
   },
 
-  // src/floors/sonicBoomEvent — the rare "Sonic Boom" event: the wisp revs
+  // src/crits/animatedCrits/events/sonicBoomEvent — the rare "Sonic Boom" event: the wisp revs
   // up near the middle of the screen, then bursts off it leaving a ball and
   // a trail of money behind that merge into the total
   sonicBoomEvent: {
@@ -10230,7 +10230,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/mitosisEvent — the rare "Mitosis" event: the wisp splits in
+  // src/crits/animatedCrits/events/mitosisEvent — the rare "Mitosis" event: the wisp splits in
   // two again and again, bouncing round the screen, until the swarm blows at
   // once, spraying coins into the total
   mitosisEvent: {
@@ -10241,7 +10241,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/plinkoEvent — the rare "Plinko" event: wisp balls clatter
+  // src/crits/animatedCrits/events/plinkoEvent — the rare "Plinko" event: wisp balls clatter
   // down a triangle of pegs, each hit a coin, and slam into the bottom,
   // spraying coins into the total
   plinkoEvent: {
@@ -10252,7 +10252,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/hammerThrowEvent — the rare "Hammer Throw" event: the wisp
+  // src/crits/animatedCrits/events/hammerThrowEvent — the rare "Hammer Throw" event: the wisp
   // whirls round the clicked floor's button, then is flung into the screen's
   // edge, bursting coins back across the screen into the total
   hammerThrowEvent: {
@@ -10262,7 +10262,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/snakeEvent — the rare "Snake" event: the wisp heads a snake
+  // src/crits/animatedCrits/events/snakeEvent — the rare "Snake" event: the wisp heads a snake
   // of coins that gobbles wisps over the screen, growing, until it bites the
   // big one on the button and blows, its coins merging into the total
   snakeEvent: {
@@ -10272,7 +10272,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/breakoutEvent — the rare "Breakout" event: the clicked
+  // src/crits/animatedCrits/events/breakoutEvent — the rare "Breakout" event: the clicked
   // floor's income bar bats the wisp up through a wall of bricks, each
   // smashing into coins, until the rest blow at once into the total
   breakoutEvent: {
@@ -10284,7 +10284,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/lineClearEvent — the rare "Line Clear" event: blocks
+  // src/crits/animatedCrits/events/lineClearEvent — the rare "Line Clear" event: blocks
   // hard-drop and stack into four full rows, which clear at once in a blast
   // of coins into the total
   lineClearEvent: {
@@ -10296,7 +10296,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/breakShotEvent — the rare "Break Shot" event: the wisp breaks
+  // src/crits/animatedCrits/events/breakShotEvent — the rare "Break Shot" event: the wisp breaks
   // a rack of pool balls, which scatter and then pop into coins for the total
   breakShotEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10305,7 +10305,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/bulletHellEvent — the rare "Bullet Hell" event: the wisp
+  // src/crits/animatedCrits/events/bulletHellEvent — the rare "Bullet Hell" event: the wisp
   // sprays spiral arms of wisps that pop into coins at the screen's edges,
   // then blows in a last ring; the coins merge into the total
   bulletHellEvent: {
@@ -10315,7 +10315,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/vortexEvent — the rare "Vortex" event: like Stream, but the
+  // src/crits/animatedCrits/events/vortexEvent — the rare "Vortex" event: like Stream, but the
   // coins pour in from every screen edge and swirl into the total
   vortexEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10323,7 +10323,7 @@ export const ANIMATED_EVENT_CONFIG = {
     travelMs: 500, // each coin's swirl into the eye
   },
 
-  // src/floors/ricochetEvent — the rare "Ricochet" event: one fat stream
+  // src/crits/animatedCrits/events/ricochetEvent — the rare "Ricochet" event: one fat stream
   // bounces off the screen's edges 3-5 times before diving into the total,
   // paying the floor's payout once per bounce
   ricochetEvent: {
@@ -10331,7 +10331,7 @@ export const ANIMATED_EVENT_CONFIG = {
     travelMs: 500, // each coin's trip, bounces and all
   },
 
-  // src/floors/waterfallEvent — the rare "Waterfall" event: coins spill off the
+  // src/crits/animatedCrits/events/waterfallEvent — the rare "Waterfall" event: coins spill off the
   // top button in view and cascade down the building's side from button to
   // button, each tipping in more, then pour into the total; pays the floor's
   // payout once per button the falls pass
@@ -10341,7 +10341,7 @@ export const ANIMATED_EVENT_CONFIG = {
     maxFloors: 5, // the most buttons the falls cascade over
   },
 
-  // src/floors/conveyorEvent — the rare "Conveyor" event: glimmer hooks glide
+  // src/crits/animatedCrits/events/conveyorEvent — the rare "Conveyor" event: glimmer hooks glide
   // in straight along a rail, one per worker a floor in view is missing, and
   // drop each onto the floor: it fills up to its worker cap
   conveyorEvent: {
@@ -10351,7 +10351,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 700, // after the last worker lands, before the screen unfreezes
   },
 
-  // src/floors/firefliesEvent — the rare "Fireflies" event: one firefly per
+  // src/crits/animatedCrits/events/firefliesEvent — the rare "Fireflies" event: one firefly per
   // worker a floor in view is missing drifts in and wanders the floor, then
   // each settles into an empty spot as a new worker: it fills up to its cap
   firefliesEvent: {
@@ -10363,7 +10363,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 700, // after the last worker forms, before the screen unfreezes
   },
 
-  // src/floors/paydayEvent — the rare "Payday" event: every on-screen worker
+  // src/crits/animatedCrits/events/paydayEvent — the rare "Payday" event: every on-screen worker
   // streams coins into the clicked floor's button, which fires them into the
   // total, paying the floor's payout once per worker
   paydayEvent: {
@@ -10373,7 +10373,7 @@ export const ANIMATED_EVENT_CONFIG = {
     maxWorkers: 3,
   },
 
-  // src/floors/piggyBankEvent — the rare "Piggy Bank" event: the button streams
+  // src/crits/animatedCrits/events/piggyBankEvent — the rare "Piggy Bank" event: the button streams
   // coins into a piggy bank that swells and wiggles, then bursts, showering
   // the screen with coins that merge into the total
   piggyBankEvent: {
@@ -10384,7 +10384,7 @@ export const ANIMATED_EVENT_CONFIG = {
     rewardMultiplier: 3, // on top of the floor's income times its floor number
   },
 
-  // src/floors/coinTossEvent — the rare "Coin Toss" event: the button streams
+  // src/crits/animatedCrits/events/coinTossEvent — the rare "Coin Toss" event: the button streams
   // coins into one giant coin that's tossed high, flips and lands heads or
   // tails, then bursts into coins that merge into the total
   coinTossEvent: {
@@ -10398,7 +10398,7 @@ export const ANIMATED_EVENT_CONFIG = {
     tailsMultiplier: 2,
   },
 
-  // src/floors/hourglassEvent — the rare "Hourglass" event: the button pours
+  // src/crits/animatedCrits/events/hourglassEvent — the rare "Hourglass" event: the button pours
   // coins into an hourglass that flips over, and they trickle out of it into
   // the total; pays `seconds` of the building's income
   hourglassEvent: {
@@ -10409,7 +10409,7 @@ export const ANIMATED_EVENT_CONFIG = {
     seconds: 60,
   },
 
-  // src/floors/rocketEvent — the rare "Rocket" event: the button pours coins
+  // src/crits/animatedCrits/events/rocketEvent — the rare "Rocket" event: the button pours coins
   // into a rocket on the clicked floor that launches up through the floors in
   // view and bursts into a coin firework that merges into the total; pays once
   // more per floor it flies past
@@ -10421,7 +10421,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/revealEvent — the rare "Reveal" event: on the reveal stage, a
+  // src/crits/animatedCrits/events/revealEvent — the rare "Reveal" event: on the reveal stage, a
   // wisp bumps the silhouette of a badge never landed into a spin that flips
   // it to the badge's art, and then that crit lands on the floor
   revealEvent: {
@@ -10434,7 +10434,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 300, // the settled badge and its name
   },
 
-  // src/floors/jackpotReelsEvent — the rare "Jackpot Reels" event: the button
+  // src/crits/animatedCrits/events/jackpotReelsEvent — the rare "Jackpot Reels" event: the button
   // streams coins into three slot reels, which stop one by one with a slam;
   // it pays the floor's income times its floor number times the reels' sum
   jackpotReelsEvent: {
@@ -10453,7 +10453,7 @@ export const ANIMATED_EVENT_CONFIG = {
     matchBonus: 3, // the sum's multiplier when all three reels match
   },
 
-  // src/floors/chainPayEvent — the rare "Chain Pay" event: a coin stream hops
+  // src/crits/animatedCrits/events/chainPayEvent — the rare "Chain Pay" event: a coin stream hops
   // from the button through on-screen workers into the total; the n-th worker
   // reached pays the floor's payout n times over
   chainPayEvent: {
@@ -10463,7 +10463,7 @@ export const ANIMATED_EVENT_CONFIG = {
     maxWorkers: 8,
   },
 
-  // src/floors/twisterEvent — the rare "Twister" event: a funnel of coins
+  // src/crits/animatedCrits/events/twisterEvent — the rare "Twister" event: a funnel of coins
   // zigzags across the screen through the workers in view, sucking a short
   // stream out of each, then spins up into the total; pays the floor's payout
   // once per worker swept up
@@ -10478,7 +10478,7 @@ export const ANIMATED_EVENT_CONFIG = {
     maxWorkers: 10,
   },
 
-  // src/floors/downpourEvent — the rare "Downpour" event: coins rain down from
+  // src/crits/animatedCrits/events/downpourEvent — the rare "Downpour" event: coins rain down from
   // above the screen and pool along its bottom, then drain into the total
   downpourEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10489,7 +10489,7 @@ export const ANIMATED_EVENT_CONFIG = {
     rewardMultiplier: 2, // on top of the floor's income times its floor number
   },
 
-  // src/floors/trickleEvent — the rare "Trickle" event: like Downpour, but the
+  // src/crits/animatedCrits/events/trickleEvent — the rare "Trickle" event: like Downpour, but the
   // coins bounce on every floor in view on their way down to the pool
   trickleEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10500,7 +10500,7 @@ export const ANIMATED_EVENT_CONFIG = {
     rewardMultiplier: 2, // on top of the floor's income times its floor number
   },
 
-  // src/floors/magnetEvent — the rare "Magnet" event: a big magnet yanks coins
+  // src/crits/animatedCrits/events/magnetEvent — the rare "Magnet" event: a big magnet yanks coins
   // in from all over the screen, then flings them into the total, paying the
   // floor's income times its floor number once per floor on screen
   magnetEvent: {
@@ -10510,7 +10510,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500, // the fling into the total
   },
 
-  // src/floors/spilloverEvent — the rare "Spillover" event: the button pours
+  // src/crits/animatedCrits/events/spilloverEvent — the rare "Spillover" event: the button pours
   // coins into the income bar until it brims over and spills into the total;
   // pays the full bar plus bonusPayouts more, and restarts the bar
   spilloverEvent: {
@@ -10520,7 +10520,7 @@ export const ANIMATED_EVENT_CONFIG = {
     bonusPayouts: 2,
   },
 
-  // src/floors/constellationEvent — the rare "Constellation" event: a light
+  // src/crits/animatedCrits/events/constellationEvent — the rare "Constellation" event: a light
   // links several on-screen workers into a star, then each flares and climbs
   // one perma tier
   constellationEvent: {
@@ -10531,7 +10531,7 @@ export const ANIMATED_EVENT_CONFIG = {
     maxStars: 7, // at least 3 promotable workers in view are needed
   },
 
-  // src/floors/ascendEvent — the rare "Ascend" event: a wisp zigzags up
+  // src/crits/animatedCrits/events/ascendEvent — the rare "Ascend" event: a wisp zigzags up
   // the building touching each income bar in view, +1 perma tier each
   ascendEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10539,7 +10539,7 @@ export const ANIMATED_EVENT_CONFIG = {
     maxFloors: 6, // the most bars it touches
   },
 
-  // src/floors/risingTideEvent — the rare "Rising Tide" event: blue water
+  // src/crits/animatedCrits/events/risingTideEvent — the rare "Rising Tide" event: blue water
   // floods up the building, lifting every floor in view to the highest floor
   // tier among them
   risingTideEvent: {
@@ -10549,14 +10549,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600, // after it fades, before the screen unfreezes
   },
 
-  // src/floors/tidalWaveEvent — the rare "Tidal Wave" event: a wall of water
+  // src/crits/animatedCrits/events/tidalWaveEvent — the rare "Tidal Wave" event: a wall of water
   // sweeps across the screen, lifting floors like the Rising Tide
   tidalWaveEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
     sweepMs: 1200, // the wave rolling in from one side until it's fully out the other
   },
 
-  // src/floors/beanstalkEvent — the rare "Beanstalk" event: a vine of light
+  // src/crits/animatedCrits/events/beanstalkEvent — the rare "Beanstalk" event: a vine of light
   // winds up round the locked floor and the one above it, unlocking both
   beanstalkEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10565,14 +10565,14 @@ export const ANIMATED_EVENT_CONFIG = {
     secondUnlockMs: 450, // between the two floors unlocking
   },
 
-  // src/floors/blessingEvent — the rare "Blessing" event: golden glimmers snow
+  // src/crits/animatedCrits/events/blessingEvent — the rare "Blessing" event: golden glimmers snow
   // down over the clicked floor, one settling on each worker, +1 perma tier each
   blessingEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
     snowMs: 1_500, // how long flakes keep starting to fall
   },
 
-  // src/floors/haloEvent — the rare "Halo" event: glimmer lights orbit the
+  // src/crits/animatedCrits/events/haloEvent — the rare "Halo" event: glimmer lights orbit the
   // lowest-tier worker in view and settle as a halo on its head, which jumps
   // straight to the top perma tier
   haloEvent: {
@@ -10583,7 +10583,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 900, // the halo glowing before the screen unfreezes
   },
 
-  // src/floors/cometEvent — the rare "Comet" event: a big light streaks
+  // src/crits/animatedCrits/events/cometEvent — the rare "Comet" event: a big light streaks
   // diagonally down into a worker and explodes, each worker in the blast
   // climbing one perma tier
   cometEvent: {
@@ -10592,7 +10592,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 900, // the explosion, before the screen unfreezes
   },
 
-  // src/floors/meteorShowerEvent — the rare "Meteor Shower" event: 3-6
+  // src/crits/animatedCrits/events/meteorShowerEvent — the rare "Meteor Shower" event: 3-6
   // shooting stars streak down one after another, each striking a different
   // worker, which climbs one perma tier
   meteorShowerEvent: {
@@ -10604,7 +10604,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 800, // after the last strike, before the screen unfreezes
   },
 
-  // src/floors/mentorEvent — the rare "Mentor" event: the top-tier worker in
+  // src/crits/animatedCrits/events/mentorEvent — the rare "Mentor" event: the top-tier worker in
   // view streams lights into the lowest-tier one, which climbs up to two tiers
   mentorEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10612,7 +10612,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 700, // after the last tier, before the screen unfreezes
   },
 
-  // src/floors/sparkChainEvent — the rare "Spark Chain" event: a light jumps
+  // src/crits/animatedCrits/events/sparkChainEvent — the rare "Spark Chain" event: a light jumps
   // like lightning worker to worker, faster each jump, each struck worker
   // climbing one perma tier, until it fizzles on the first maxed one
   sparkChainEvent: {
@@ -10623,7 +10623,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 600, // after the last strike, before the screen unfreezes
   },
 
-  // src/floors/polishEvent — the rare "Polish" event: lights swirl round the
+  // src/crits/animatedCrits/events/polishEvent — the rare "Polish" event: lights swirl round the
   // upgrade button and buff it until it shines, granting free upgrade levels
   polishEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10633,7 +10633,7 @@ export const ANIMATED_EVENT_CONFIG = {
     minLevels: 10,
   },
 
-  // src/floors/lighthouseEvent — the rare "Lighthouse" event: a lamp in the
+  // src/crits/animatedCrits/events/lighthouseEvent — the rare "Lighthouse" event: a lamp in the
   // middle of the screen sweeps its beam one full turn round; every upgrade
   // button in view it lights shines, granting free upgrade levels
   lighthouseEvent: {
@@ -10645,7 +10645,7 @@ export const ANIMATED_EVENT_CONFIG = {
     minLevels: 10,
   },
 
-  // src/floors/recruitEvent — the rare "Recruit" event: lights stream into an
+  // src/crits/animatedCrits/events/recruitEvent — the rare "Recruit" event: lights stream into an
   // empty spot on a floor in view and form a new worker there, a free hire
   recruitEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10653,7 +10653,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 900, // after the new worker lands, before the screen unfreezes
   },
 
-  // src/floors/promotionDayEvent — the rare "Promotion Day" event: lights rise
+  // src/crits/animatedCrits/events/promotionDayEvent — the rare "Promotion Day" event: lights rise
   // from every worker on the clicked floor into its income bar, which climbs
   // one crit tier
   promotionDayEvent: {
@@ -10662,7 +10662,7 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 900, // after the promotion lands, before the screen unfreezes
   },
 
-  // src/floors/alchemyEvent — the rare "Alchemy" event: the button pours coins
+  // src/crits/animatedCrits/events/alchemyEvent — the rare "Alchemy" event: the button pours coins
   // into a cauldron that bubbles up and shoots lights into the lowest-tier
   // worker on the floor: it climbs one perma tier and the floor pays out
   alchemyEvent: {
@@ -10673,7 +10673,7 @@ export const ANIMATED_EVENT_CONFIG = {
     payouts: 2, // the floor's payouts paid with the promotion
   },
 
-  // src/floors/investmentEvent — the rare "Investment" event: the button pours
+  // src/crits/animatedCrits/events/investmentEvent — the rare "Investment" event: the button pours
   // coins into the income bar until it slams full and pays out, then lights
   // burst out of the bar into the button and the floor climbs one crit tier
   investmentEvent: {
@@ -10684,7 +10684,7 @@ export const ANIMATED_EVENT_CONFIG = {
     payouts: 3, // the full bar's payout times this, paid as it slams
   },
 
-  // src/floors/dividendsEvent — the rare "Dividends" event: lights stream from
+  // src/crits/animatedCrits/events/dividendsEvent — the rare "Dividends" event: lights stream from
   // the button into the lowest-tier worker in view, which climbs one perma
   // tier, then sprays a coin stream into the total
   dividendsEvent: {
@@ -10694,7 +10694,7 @@ export const ANIMATED_EVENT_CONFIG = {
     payouts: 3, // the worker's floor's payouts paid into the total
   },
 
-  // src/floors/wispEvent — the rare "Wisp" event: a playful wisp flits
+  // src/crits/animatedCrits/events/wispEvent — the rare "Wisp" event: a playful wisp flits
   // between targets in view sprinkling glitter: a worker climbs one perma
   // tier, an income bar one crit tier, a "Lvl N" label gains free levels
   wispEvent: {
@@ -10707,7 +10707,7 @@ export const ANIMATED_EVENT_CONFIG = {
     levels: 10, // free levels for a sprinkled "Lvl N" label
   },
 
-  // src/floors/streamEvent — the rare "Stream" event: like Spray, but the coins
+  // src/crits/animatedCrits/events/streamEvent — the rare "Stream" event: like Spray, but the coins
   // flow as a river winding and looping across the screen into the total; the
   // button pours until its head arrives, so the whole event lasts ~2x travelMs
   streamEvent: {
@@ -10715,7 +10715,7 @@ export const ANIMATED_EVENT_CONFIG = {
     travelMs: 8_00, // each coin's trip down the river
   },
 
-  // src/floors/trailsEvent — the rare "Trails" event: like Stream, but many
+  // src/crits/animatedCrits/events/trailsEvent — the rare "Trails" event: like Stream, but many
   // short streams leave the button one after another, each winding into the total
   trailsEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10724,7 +10724,7 @@ export const ANIMATED_EVENT_CONFIG = {
     travelMs: 400, // each coin's trip down its trail
   },
 
-  // src/floors/drawEvent — the rare "Draw" event: like Spray, but the stream
+  // src/crits/animatedCrits/events/drawEvent — the rare "Draw" event: like Spray, but the stream
   // draws the crit's own 5/25/125 and the payout is multiplied by it
   drawEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
@@ -10733,7 +10733,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
 
-  // src/floors/nightSkyEvent — the rare "Night Sky" event: the wisp traces
+  // src/crits/animatedCrits/events/nightSkyEvent — the rare "Night Sky" event: the wisp traces
   // the crit's own 5/25/125 in twinkling stars, which stream into the total;
   // pays like Draw
   nightSkyEvent: {
@@ -10745,7 +10745,7 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeFlyMs: 500, // each star's flight into the total
   },
 
-  // src/floors/pitcherEvent — the rare "Pitcher" event: the wisp draws the
+  // src/crits/animatedCrits/events/pitcherEvent — the rare "Pitcher" event: the wisp draws the
   // crit's own 5/25/125 in solid lines open at the top, and money pours down
   // into each finished digit, filling it; pays like Draw
   pitcherEvent: {
@@ -10762,7 +10762,7 @@ export const ANIMATED_EVENT_CONFIG = {
     breakFlyMs: 350, // each sparkle's flight into the total
   },
 
-  // src/floors/swarmEvent — the rare "Swarm" event: its proc animation leaves
+  // src/crits/animatedCrits/events/swarmEvent — the rare "Swarm" event: its proc animation leaves
   // that button armed; clicking it starts a timed swarm sale where every click
   // on it pays a Sale payout from it and each of its mirrored clones
   swarmEvent: {
@@ -10770,14 +10770,14 @@ export const ANIMATED_EVENT_CONFIG = {
     durationMs: 15_000,
   },
 
-  // src/floors/renovateEvent — the rare "Renovate" event: its crit's click
+  // src/crits/animatedCrits/events/renovateEvent — the rare "Renovate" event: its crit's click
   // streams coins into that floor's "Lvl N" label, then lands one regular crit
   // tier on the floor (x5/x25/x125, weighted by the crit tier odds)
   renovateEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
   },
 
-  // src/floors/upgradeEvent — the rare "Upgrade" event: its crit's click
+  // src/crits/animatedCrits/events/upgradeEvent — the rare "Upgrade" event: its crit's click
   // streams coins into that floor's income bar, then promotes the floor's
   // permanent crit tier to the crit's tier (or one above its own); never on a
   // top-tier floor
@@ -10785,7 +10785,7 @@ export const ANIMATED_EVENT_CONFIG = {
     chance: 0.01, // per crit whose special-crit gateway hit
   },
 
-  // src/floors/unlockEvent — the rare "Unlock" event, only on a floor one or
+  // src/crits/animatedCrits/events/unlockEvent — the rare "Unlock" event, only on a floor one or
   // two below the locked floor: its crit's click streams coins into that
   // floor's unlock price, then unlocks it for free with its own unlock crit roll
   unlockEvent: {

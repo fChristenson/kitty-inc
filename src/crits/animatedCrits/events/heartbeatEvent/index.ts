@@ -94,7 +94,6 @@ interface RunningHeartbeat {
 
 let running: RunningHeartbeat | null = null;
 
-
 registerEventProc(
   {
     key: KEY,

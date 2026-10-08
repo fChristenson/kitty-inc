@@ -25,7 +25,6 @@ const POOL_DEPTH = 45;
 // the pool stays at least this far below the lowest floor in view
 const POOL_CLEARANCE = 25;
 
-
 // a drop falling ever faster onto each floor below it, hopping off and
 // slowing at the top of each hop, then falling on into its spot in the pool
 // and settling there with one last little hop; timed like one gravity throughout

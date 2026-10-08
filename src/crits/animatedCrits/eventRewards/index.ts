@@ -1,4 +1,4 @@
-// rewards an event lands on screen besides cash (see floors/wispCover): free
+// rewards an event lands on screen besides cash (see crits/animatedCrits/wispCover): free
 // upgrade levels and crit tiers on the income bars in view, perma tiers on
 // the workers in view. The cover draws the bars and workers it was handed,
 // jolting and flashing each as it's rewarded with a tally over it

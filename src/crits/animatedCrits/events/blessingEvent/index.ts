@@ -47,7 +47,6 @@ const SWAY_TURNS = 1.3;
 const START_ABOVE = 40;
 const BURST_MS = 500;
 
-
 interface Flake {
   x0: number;
   x1: number;

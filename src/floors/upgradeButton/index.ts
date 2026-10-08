@@ -17,7 +17,7 @@
 //                 Snowball/Frozen, both formerly event crits here) is a flat,
 //                 not-button-appearance-changing proc with no file of its
 //                 own in this folder — its state (if any beyond a plain
-//                 landed/not-landed flag) lives in shared/critTypes instead.
+//                 landed/not-landed flag) lives in crits/critTypes instead.
 //
 // Import order below is also the event-button PRIORITY order (see
 // shared/floorEvents' registerEventButton) for the rare case more than one is active on the same
@@ -60,17 +60,10 @@ import {
 import { isSaleActive } from "./sale";
 import { isOvertimeActive } from "./overtime";
 
-
-
-
 import "./sale";
 import "./overtime";
 
 export * from "./shared";
-
-
-
-
 
 export * from "./sale";
 export * from "./overtime";
@@ -171,7 +164,7 @@ function renderUpgradeButton(
     : stepHoldAnim(floor, now, cx, cy);
   const critTier = maxed ? null : getCritTier(floor);
   const crit = critTier !== null;
-  // an event covering this crit (see floors/eventProcs) hides its tier
+  // an event covering this crit (see crits/animatedCrits/eventProcs) hides its tier
   const cover = crit ? getClaimedEventCover(floor) : null;
   const critMultiplier = crit
     ? CRIT_TIER_CONFIG[critTier as CritTier].multiplier

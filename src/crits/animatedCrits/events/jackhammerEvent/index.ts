@@ -49,7 +49,6 @@ const BLAST_SCALE = 1.8;
 const SPARK_REACH = 360;
 const SPARK_SIZE = 22;
 
-
 registerEventProc(
   {
     key: KEY,

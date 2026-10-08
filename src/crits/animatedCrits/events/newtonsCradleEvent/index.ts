@@ -58,7 +58,6 @@ const BLAST_SCALE = 1.8;
 const SPARK_REACH = 380;
 const SPARK_SIZE = 22;
 
-
 interface Clack {
   at: number;
   // which end swung in to make it: 0 the left, BALLS - 1 the right

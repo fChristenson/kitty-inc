@@ -1,4 +1,4 @@
-// a covered-crit event (see floors/eventProcs' EventCritCover): the crit's click
+// a covered-crit event (see crits/animatedCrits/eventProcs' EventCritCover): the crit's click
 // freezes the screen and plays a coin or glimmer stream + the same sfx as the
 // other events,
 // from the floor's button into one of its own widgets, which flashes white and

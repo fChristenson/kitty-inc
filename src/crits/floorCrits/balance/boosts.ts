@@ -6,19 +6,19 @@ export const BOOSTS_BALANCE = {
   // replacing it, adding a free worker boost on top
   boostChance: 0.1,
   // "sunshine crit" — same free-worker-boost reward as boost above, just
-  // its own longer duration (see shared/critTypes' SUNSHINE_BOOST_DURATION_MS)
+  // its own longer duration (see crits/critTypes' SUNSHINE_BOOST_DURATION_MS)
   sunshineChance: 0.08,
   // "snowday crit" — same free-worker-boost reward as sunshine above, just
-  // its own longer duration still (see shared/critTypes' SNOWDAY_BOOST_DURATION_MS)
+  // its own longer duration still (see crits/critTypes' SNOWDAY_BOOST_DURATION_MS)
   snowdayChance: 0.06,
   // "night shift crit" — same building-wide free-worker-boost reward as
   // boost/sunshine/snowday above, but SHORTER than plain boost's own
   // duration, and temporarily counts as +1 worker for boost-strength
-  // purposes (see shared/critTypes' NIGHT_SHIFT_BOOST_DURATION_MS)
+  // purposes (see crits/critTypes' NIGHT_SHIFT_BOOST_DURATION_MS)
   nightShiftChance: 0.08,
   // "Rush Hour" crit — for rushHourDurationMs, every unlocked floor's own
   // income timer is capped at rushHourIntervalSeconds (never slowed down —
-  // see shared/critTypes' isRushHourActive), stacking with whatever worker
+  // see crits/critTypes' isRushHourActive), stacking with whatever worker
   // boost/office-upgrade speedup already applies; a floor already faster
   // than the cap is left completely untouched
   rushHourChance: 0.08,

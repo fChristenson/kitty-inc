@@ -1,4 +1,4 @@
-// a badge turning foil on a lucky landing (see shared/critTypes' rollBadgeFoil)
+// a badge turning foil on a lucky landing (see crits/critTypes' rollBadgeFoil)
 // gets its own reveal once its crit's flash has played: the reveal stage slides
 // in and a wisp bumps the badge spinning until it flips to its shimmering or
 // glittering self

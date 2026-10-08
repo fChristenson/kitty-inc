@@ -144,7 +144,6 @@ export function forcePummelEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // a dive at `angle` round the bar (with its center and half size), waiting
 // somewhere in RING clear of it
 function diveAt(

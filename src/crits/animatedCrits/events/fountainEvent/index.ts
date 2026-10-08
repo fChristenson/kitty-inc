@@ -28,7 +28,6 @@ const PEAK: [number, number] = [0.04, 0.2];
 // arcs always rise at least this far above where they start or land
 const MIN_RISE = 120;
 
-
 // a thrown coin's arc from the button's jet to its landing spot
 function arcPath(
   area: CoverArea,

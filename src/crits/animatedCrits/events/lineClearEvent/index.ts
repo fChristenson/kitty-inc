@@ -153,7 +153,6 @@ const BLOCK_COIN_REACH: [number, number] = [40, 240];
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-
 registerEventProc(
   {
     key: KEY,

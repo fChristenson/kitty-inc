@@ -1,4 +1,4 @@
-// "frozen crit" (see shared/critTypes' isFrozenCrit): locks this floor's own
+// "frozen crit" (see crits/critTypes' isFrozenCrit): locks this floor's own
 // upgrade PRICE for FROZEN_DURATION_MS — incomePanel.ts's increaseIncomeRate
 // skips its normal upgradeCost growth entirely while this is active, so
 // every upgrade bought during the window costs the same frozen price. The

@@ -66,8 +66,6 @@ import {
   triggerSaleBoost,
 } from "../../floors/upgradeButton";
 
-
-
 import {
   isVisibleOnFloor,
   type EventProcContext,
@@ -96,8 +94,6 @@ import { getActiveCompanyIndex } from "../../company";
 import { spawnCoinBurst as animateCoinBurst } from "../../floors/coins";
 
 import { applyBonusTierIncome } from "./bonusTierReward";
-
-
 
 import { computeBaseFloorStats } from "../../floors";
 import {
@@ -135,7 +131,7 @@ const spawnCoinBurst = liveEffect(animateCoinBurst);
 const triggerButtonPress = liveEffect(animateButtonPress);
 const triggerJumpAll = liveEffect(animateJumpAll);
 
-// "peppermint crit" (see shared/critTypes' isPeppermintCrit): promotes every
+// "peppermint crit" (see crits/critTypes' isPeppermintCrit): promotes every
 // OTHER unlocked floor in the building one tier step at once (same
 // nextCritTier promotion upgrade crit uses on a single floor, just applied
 // building-wide to alternating floors) — unlocked floors always form a
@@ -151,7 +147,7 @@ function applyPeppermintCrit(floors: Floor[]): void {
   }
 }
 
-// "Executive Order" crit (see shared/critTypes's isExecutiveOrderCrit): the
+// "Executive Order" crit (see crits/critTypes's isExecutiveOrderCrit): the
 // same tier promotion, but on EVERY unlocked floor instead of every other one
 function applyExecutiveOrderCrit(floors: Floor[]): void {
   for (const floor of floors) {
@@ -160,7 +156,7 @@ function applyExecutiveOrderCrit(floors: Floor[]): void {
   }
 }
 
-// "Round Up" crit (see shared/critTypes's isRoundUpCrit): hands every
+// "Round Up" crit (see crits/critTypes's isRoundUpCrit): hands every
 // unlocked floor however many free upgrades it takes to reach its NEXT whole
 // multiple of ROUND_UP_CRIT_STEP — a floor already sitting exactly on one
 // (a freshly unlocked floor is at 0) gets a full step rather than nothing
@@ -214,7 +210,7 @@ function applyFloorShareCrit(
   );
 }
 
-// "Casual Friday"/"Fancy Friday" crits (see shared/critTypes's
+// "Casual Friday"/"Fancy Friday" crits (see crits/critTypes's
 // isCasualFridayCrit/isFancyFridayCrit): a flat batch of free upgrades on
 // every unlocked floor, not scaled by the landed tier — the two differ only
 // in how big the batch is
@@ -225,7 +221,7 @@ function applyFlatUpgradeBatch(floors: Floor[], count: number): void {
   }
 }
 
-// "heavenly crit" (see shared/critTypes' isHeavenlyCrit): the single biggest
+// "heavenly crit" (see crits/critTypes' isHeavenlyCrit): the single biggest
 // reward in the game — unlocks every remaining floor in the building for
 // free (reusing the exact same unlockAllFloors loop a paid "unlock all"
 // purchase uses), promotes EVERY floor (including the ones just unlocked)
@@ -254,12 +250,12 @@ function applyHeavenlyCrit(deps: FloorActionsDeps): void {
 }
 
 // "pair"/"three of a kind"/"four of a kind"/"full house" crits (see
-// shared/critTypes's isPairCrit etc.): promotes `count` floors' own
+// crits/critTypes's isPairCrit etc.): promotes `count` floors' own
 // permanent crit tier one step, starting AT the floor that actually landed
 // the proc and walking upward \u2014 same auto-unlock-as-it-goes behavior
 // applyChainCrit's walk uses (a locked floor in the path is unlocked for
 // free instead of blocking the walk), just a fixed count instead of a
-// probabilistic continue-chance. `count` always comes from shared/critTypes'
+// probabilistic continue-chance. `count` always comes from crits/critTypes'
 // POKER_HAND_CRIT_COUNTS \u2014 the one place that number is ever named
 function applyPokerHandCrit(
   deps: ChainCritDeps,
@@ -297,21 +293,21 @@ function applyFloorBoost(floors: Floor[], durationMs?: number): void {
   triggerJumpAll(floors, Date.now());
 }
 
-// "sunshine crit" (see shared/critTypes' isSunshineCrit): identical reward to
+// "sunshine crit" (see crits/critTypes' isSunshineCrit): identical reward to
 // boost above, just twice the normal boost duration
 const SUNSHINE_BOOST_DURATION_MS = BOOST_DURATION_MS * 2;
 function applySunshineCrit(floors: Floor[]): void {
   applyFloorBoost(floors, SUNSHINE_BOOST_DURATION_MS);
 }
 
-// "snowday crit" (see shared/critTypes' isSnowdayCrit): identical reward to
+// "snowday crit" (see crits/critTypes' isSnowdayCrit): identical reward to
 // sunshine above, just three times the normal boost duration
 const SNOWDAY_BOOST_DURATION_MS = BOOST_DURATION_MS * 3;
 function applySnowdayCrit(floors: Floor[]): void {
   applyFloorBoost(floors, SNOWDAY_BOOST_DURATION_MS);
 }
 
-// "Coffee Run" crit (see shared/critTypes' isCoffeeRunCrit): the same reward
+// "Coffee Run" crit (see crits/critTypes' isCoffeeRunCrit): the same reward
 // again, at the family's longest duration — a full minute
 const COFFEE_RUN_BOOST_DURATION_MS = BOOST_DURATION_MS * 4;
 function applyCoffeeRunCrit(floors: Floor[]): void {
@@ -361,7 +357,7 @@ function applyMergerCrit(floors: Floor[], floor: Floor): void {
   }
 }
 
-// "night shift crit" (see shared/critTypes' isNightShiftCrit): same
+// "night shift crit" (see crits/critTypes' isNightShiftCrit): same
 // building-wide free-boost reward as boost/sunshine/snowday above, but its
 // own SHORTER duration — half the normal boost length. Also, for the same
 // shorter window, activates `extraWorkers` "virtual" boosted worker slots
@@ -395,13 +391,13 @@ function applyNightShiftCrit(floors: Floor[]): void {
   applyNightShiftBoost(floors, 1);
 }
 
-// "Night Owl" crit (see shared/critTypes' isNightOwlCrit): Night Shift with
+// "Night Owl" crit (see crits/critTypes' isNightOwlCrit): Night Shift with
 // twice the virtual-worker bump
 function applyNightOwlCrit(floors: Floor[]): void {
   applyNightShiftBoost(floors, 2);
 }
 
-// "Headhunter" crit (see shared/critTypes's isHeadhunterCrit): poaches the
+// "Headhunter" crit (see crits/critTypes's isHeadhunterCrit): poaches the
 // building's best headcount onto just the floor that crit — Reinforcements'
 // levelling-up, narrowed to one floor. Nothing happens when that floor is
 // already the best-staffed one (or the only one)
@@ -416,7 +412,7 @@ function applyHeadhunterCrit(floor: Floor, floors: Floor[]): void {
   );
 }
 
-// "bull market crit" (see shared/critTypes's isBullMarketCrit): doubles every
+// "bull market crit" (see crits/critTypes's isBullMarketCrit): doubles every
 // unlocked floor's own upgradeCount building-wide. Uses increaseIncomeRate
 // directly rather than applyUpgradeTick for the same reason applyHeavenlyCrit
 // does — a well-upgraded building would otherwise spawn thousands of bursts
@@ -530,7 +526,7 @@ export function applyChainCrit(
   }
 }
 
-// "explosion crit" (see shared/critTypes's isExplosionCrit): the SAME reward
+// "explosion crit" (see crits/critTypes's isExplosionCrit): the SAME reward
 // walk as applyChainCrit above, but spreads in BOTH directions from the floor
 // that actually crit — reuses applyChainCrit unmodified for the upward half
 // (auto-unlocking a locked floor in its path, same guaranteed-first-step-then-
@@ -554,7 +550,7 @@ export function applyExplosionCrit(
   }
 }
 
-// "bounce crit" (see shared/critTypes's isBounceCrit): unlike chain/explosion,
+// "bounce crit" (see crits/critTypes's isBounceCrit): unlike chain/explosion,
 // ONLY ever cascades downward from the floor that actually crit — like a ball
 // bouncing down a staircase, never up. Same downward-walk shape as
 // applyExplosionCrit's own downward half; no auto-unlock handling needed
@@ -576,7 +572,7 @@ export function applyBounceCrit(
   }
 }
 
-// "tick tock crit" (see shared/critTypes's isTickTockCrit): instantly credits
+// "tick tock crit" (see crits/critTypes's isTickTockCrit): instantly credits
 // every unlocked floor extra payouts' worth of income at its own current
 // rate, WITHOUT touching floor.lastCollectedAt (see incomePanel.ts's
 // currentPayoutAmount) — each floor's own bar keeps ticking from exactly the
@@ -593,14 +589,14 @@ function applyTickTockCrit(floors: Floor[], multiplier = 2): void {
   addTotalIncome(total);
 }
 
-// "fast forward crit" (see shared/critTypes's isFastForwardCrit): same
+// "fast forward crit" (see crits/critTypes's isFastForwardCrit): same
 // instant-income reward as tick tock above, just a steeper multiplier
 const FAST_FORWARD_PAYOUT_MULTIPLIER = 4;
 function applyFastForwardCrit(floors: Floor[]): void {
   applyTickTockCrit(floors, FAST_FORWARD_PAYOUT_MULTIPLIER);
 }
 
-// "Fire Drill" crit (see shared/critTypes's isFireDrillCrit): unlike tick
+// "Fire Drill" crit (see crits/critTypes's isFireDrillCrit): unlike tick
 // tock above, this COMPLETES each unlocked floor's own income timer — one
 // full payout, then the bar restarts from empty
 function applyFireDrillCrit(floors: Floor[]): void {
@@ -751,7 +747,7 @@ function levelFreeFloor(floors: Floor[], floor: Floor): void {
   increaseIncomeRateBy(floor, level - floor.upgradeCount);
 }
 
-// "frozen crit" (see shared/critTypes's isFrozenCrit): no instant payout —
+// "frozen crit" (see crits/critTypes's isFrozenCrit): no instant payout —
 // just starts upgradeButton.ts's own timed window on this ONE floor (see
 // triggerFrozenCrit/isFrozenActive), during which incomePanel.ts's
 // increaseIncomeRate skips growing this floor's own upgradeCost entirely —
@@ -765,7 +761,7 @@ function applySpendingFreezeCrit(floors: Floor[]): void {
   triggerSpendingFreeze(floors);
 }
 
-// "snowball crit" (see shared/critTypes's isSnowballCrit): a flat,
+// "snowball crit" (see crits/critTypes's isSnowballCrit): a flat,
 // not-tier-scaled proc, same instant-income shape as tick tock/fast forward
 // — but instead of a fixed multiplier, it pays every unlocked floor 1 extra
 // payout's worth of income at its own current rate, multiplied by however
@@ -776,7 +772,7 @@ function applySnowballCrit(floors: Floor[]): void {
   applyTickTockCrit(floors, unlockedCount);
 }
 
-// "Grand Opening" crit (see shared/critTypes's isGrandOpeningCrit): unlocks
+// "Grand Opening" crit (see crits/critTypes's isGrandOpeningCrit): unlocks
 // every currently-locked floor in this building for free, preserving each
 // floor's own existing tier/rate/upgrade state (unlike heavenly, which also
 // maxes tiers and grants upgrades)
@@ -822,7 +818,7 @@ function applyKeynoteCrit(floor: Floor, isGroundFloor: boolean): void {
   }
 }
 
-// "Fully Staffed" crit (see shared/critTypes's isFullyStaffedCrit): fills
+// "Fully Staffed" crit (see crits/critTypes's isFullyStaffedCrit): fills
 // every unlocked floor to the existing rendered-worker cap and grants every
 // unlocked floor a manager.
 // This changes the same state fields as the paid menu actions, but skips all
@@ -880,13 +876,13 @@ function applyCloneArmyCrit(floors: Floor[]): void {
   }
 }
 
-// "Espresso Shot" crit (see shared/critTypes's isEspressoShotCrit): applies
+// "Espresso Shot" crit (see crits/critTypes's isEspressoShotCrit): applies
 // the normal all-worker boost for its regular 15-second duration
 function applyEspressoShotCrit(floors: Floor[]): void {
   applyFloorBoost(floors);
 }
 
-// "Deja Vu" crit (see shared/critTypes's isDejaVuCrit): picks one of the
+// "Deja Vu" crit (see crits/critTypes's isDejaVuCrit): picks one of the
 // existing crit tiers uniformly, then applies that tier's free-upgrade batch
 // twice without rolling another crit or piggyback proc.
 function randomDejaVuTier(): CritTier {
@@ -902,7 +898,7 @@ function applyDejaVuCrit(floor: Floor, isGroundFloor: boolean): void {
   }
 }
 
-// "Double Down" crit (see shared/critTypes's isDoubleDownCrit): same shape as
+// "Double Down" crit (see crits/critTypes's isDoubleDownCrit): same shape as
 // Deja Vu above, but replays the tier that ACTUALLY landed rather than a
 // random one — so its value rides on whatever crit spawned it
 function applyDoubleDownCrit(
@@ -920,27 +916,27 @@ function applyDoubleDownCrit(
   }
 }
 
-// "payday crit" (see shared/critTypes's isPaydayCrit): a flat one-time
+// "payday crit" (see crits/critTypes's isPaydayCrit): a flat one-time
 // effect, same shape as booty — triples the currently active company's
 // total income once
 function applyPaydayCrit(): void {
   addTotalIncome(multiply(getTotalIncome(), 2));
 }
 
-// "gold standard crit" (see shared/critTypes's isGoldStandardCrit): same
+// "gold standard crit" (see crits/critTypes's isGoldStandardCrit): same
 // flat one-time effect as payday, just a steeper multiplier — quadruples
 // the currently active company's total income once
 function applyGoldStandardCrit(): void {
   addTotalIncome(multiply(getTotalIncome(), 3));
 }
 
-// "special crit crit" bonus tier (see shared/critTypes's getBonusTierCrit and
-// shared/bonusTierReward): rides on whatever the proc(s) already granted
+// "special crit crit" bonus tier (see crits/critTypes's getBonusTierCrit and
+// crits/floorCrits/bonusTierReward): rides on whatever the proc(s) already granted
 function applyBonusTierCrit(bonusTier: CritTier): void {
   applyBonusTierIncome(bonusTier);
 }
 
-// "Chair Giveaway"/"Supplies Giveaway" crits (see shared/critTypes's isChairGiveawayCrit/
+// "Chair Giveaway"/"Supplies Giveaway" crits (see crits/critTypes's isChairGiveawayCrit/
 // isSuppliesGiveawayCrit): grant the floor being upgraded its one-time office
 // chairs/supplies purchase for free (same flags hud/upgradeMenu's own paid
 // buyOfficeChairs/buyOfficeSupplies set) — a no-op if the floor already has it
@@ -952,14 +948,14 @@ function applySuppliesGiveawayCrit(floor: Floor): void {
   floor.hasOfficeSupplies = true;
 }
 
-// "Supply Run" crit (see shared/critTypes's isSupplyRunCrit): both giveaways
+// "Supply Run" crit (see crits/critTypes's isSupplyRunCrit): both giveaways
 // above at once, on the floor that actually crit
 function applySupplyRunCrit(floor: Floor): void {
   applyChairGiveawayCrit(floor);
   applySuppliesGiveawayCrit(floor);
 }
 
-// "Intern"/"Union Boss" crits (see shared/critTypes's isInternCrit/
+// "Intern"/"Union Boss" crits (see crits/critTypes's isInternCrit/
 // isUnionBossCrit): grant the floor being upgraded one free worker/manager
 // (same fields hud/upgradeMenu's own paid buyWorker/buyManager set), for
 // free — Intern is capped at MAX_RENDERED_WORKERS (same cap buyWorker
@@ -983,7 +979,7 @@ function applyUnionBossCrit(floor: Floor): void {
   floor.hasManager = true;
 }
 
-// "Golden Handshake" crit (see shared/critTypes's isGoldenHandshakeCrit):
+// "Golden Handshake" crit (see crits/critTypes's isGoldenHandshakeCrit):
 // Union Boss applied to every unlocked floor at once
 function applyGoldenHandshakeCrit(floors: Floor[]): void {
   for (const floor of floors) {
@@ -991,7 +987,7 @@ function applyGoldenHandshakeCrit(floors: Floor[]): void {
   }
 }
 
-// "Team Building" crit (see shared/critTypes's isTeamBuildingCrit): the same
+// "Team Building" crit (see crits/critTypes's isTeamBuildingCrit): the same
 // idea for Intern — one free worker on every unlocked floor at once
 function applyTeamBuildingCrit(floors: Floor[]): void {
   for (const floor of floors) {
@@ -1010,7 +1006,7 @@ function applyTeamLunchCrit(floor: Floor): void {
   }
 }
 
-// "Spring Cleaning" crit (see shared/critTypes's isSpringCleaningCrit): wipes
+// "Spring Cleaning" crit (see crits/critTypes's isSpringCleaningCrit): wipes
 // each unlocked floor back to its own level-0 economy (rate/interval/cost, no
 // banked upgrades) but one permanent tier higher — a fresh floor that earns
 // more per upgrade from here on. A floor already at the top tier has nothing
@@ -1067,7 +1063,7 @@ export function promoteTierKeepingLevel(
   floor.critMultiplierTier = tier;
 }
 
-// "Rush Hour" crit (see shared/critTypes's isRushHourCrit): no instant
+// "Rush Hour" crit (see crits/critTypes's isRushHourCrit): no instant
 // payout — just starts the building-wide timed window (see
 // triggerRushHourCrit/isRushHourActive) during which every unlocked floor's
 // own income timer is capped at RUSH_HOUR_INTERVAL_SECONDS (see
@@ -1080,7 +1076,7 @@ function applyRateLockCrit(floor: Floor): void {
   triggerRateLockCrit(floor);
 }
 
-// "Golden Ticket" crit (see shared/critTypes's isGoldenTicketCrit): no
+// "Golden Ticket" crit (see crits/critTypes's isGoldenTicketCrit): no
 // instant payout — just arms upgradeButton.ts's own armGuaranteedUltraCrit
 // so the very next rollCritUpgrade call on this floor is forced straight to
 // ultra, bypassing every tier/proc chance entirely for that one roll
@@ -1088,14 +1084,14 @@ function applyGoldenTicketCrit(floor: Floor): void {
   armGuaranteedUltraCrit(floor);
 }
 
-// "Silver Ticket" crit (see shared/critTypes's isSilverTicketCrit): same
+// "Silver Ticket" crit (see crits/critTypes's isSilverTicketCrit): same
 // shape as Golden Ticket above, but forces the very next rollCritUpgrade
 // call on this floor to mega instead
 function applySilverTicketCrit(floor: Floor): void {
   armGuaranteedMegaCrit(floor);
 }
 
-// "Lucky Clover" crit (see shared/critTypes's isLuckyCloverCrit): instantly
+// "Lucky Clover" crit (see crits/critTypes's isLuckyCloverCrit): instantly
 // pays out LUCKY_CLOVER_CRIT_COUNT back-to-back ultra-tier crits on this
 // floor, all at once
 function applyLuckyCloverCrit(floor: Floor, isGroundFloor: boolean): void {
@@ -1105,14 +1101,14 @@ function applyLuckyCloverCrit(floor: Floor, isGroundFloor: boolean): void {
   }
 }
 
-// "Second Wind" crit (see shared/critTypes's isSecondWindCrit): hands back
+// "Second Wind" crit (see crits/critTypes's isSecondWindCrit): hands back
 // every dollar the active company has spent on upgrades, floor unlocks and
 // building purchases — nothing bought is lost, the money just comes back
 function applySecondWindCrit(): void {
   addTotalIncome(getActiveCompanyInvestedValue());
 }
 
-// "Golden Parachute" crit (see shared/critTypes's isGoldenParachuteCrit): a
+// "Golden Parachute" crit (see crits/critTypes's isGoldenParachuteCrit): a
 // flat, not-tier-scaled instant payout — unlike payday/gold standard (which
 // multiply the ALREADY-BANKED total), this pays out GOLDEN_PARACHUTE_SECONDS
 // worth of the currently active company's own combined income rate across
@@ -1146,7 +1142,7 @@ function applyCashFlowCrit(): void {
   addTotalIncome(getAllCompaniesIncomeRatePerSecond());
 }
 
-// "Payout" crit (see shared/critTypes's isPayoutCrit): the biggest flat
+// "Payout" crit (see crits/critTypes's isPayoutCrit): the biggest flat
 // one-time jackpot — instantly adds the combined total income + upgrades
 // value across EVERY corporation (not just the active one) to the
 // currently active company's own total (see totalIncome.ts's
@@ -1158,7 +1154,7 @@ function applyPayoutCrit(): void {
 }
 
 // "winter sale"/"spring sale"/"summer sale"/"autumn sale"/"halloween sale"
-// crits (see shared/critTypes's isWinterSaleCrit etc.) — all five share this
+// crits (see crits/critTypes's isWinterSaleCrit etc.) — all five share this
 // exact reward shape, only their icon/label/color AND discount size differ
 // (halloween's own HALLOWEEN_SALE_DISCOUNT_MULTIPLIER is steeper than the 4
 // seasonal ones' shared SEASONAL_SALE_DISCOUNT_MULTIPLIER, so this takes the
@@ -1573,7 +1569,6 @@ export function eventProcContext(
     },
   };
 }
-
 
 export function applyFloorCrit(
   deps: FloorActionsDeps,

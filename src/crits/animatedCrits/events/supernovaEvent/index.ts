@@ -103,7 +103,6 @@ export function forceSupernovaEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 function blastMs(): number {
   const { chargeMs, collapseMs } = CONFIG.supernovaEvent;
   return chargeMs + collapseMs;

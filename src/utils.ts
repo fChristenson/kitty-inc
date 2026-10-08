@@ -873,7 +873,7 @@ const shadedColors = new Map<string, string>();
 
 // lightens (positive amount) or darkens (negative amount, -1..1) a "#rrggbb" color;
 // shared helper for deriving a button's ring/border/highlight tones from one fill
-// color, and (screenShake.ts) a flash text's own gradient stops
+// color, and (critFlash) a flash text's own gradient stops
 export function shadeColor(hex: string, amount: number): string {
   const key = `${hex}|${amount}`;
   const cached = shadedColors.get(key);

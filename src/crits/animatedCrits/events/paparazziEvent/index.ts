@@ -98,7 +98,6 @@ interface RunningPaparazzi {
 
 let running: RunningPaparazzi | null = null;
 
-
 // every worker on floor in view
 function subjectsOn(floor: Floor, context: EventProcContext): OnScreenWorker[] {
   return (findOnScreenWorkers(floor, context.getOnScreenFloors) ?? []).filter(

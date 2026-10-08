@@ -67,7 +67,6 @@ const BLAST_SCALE = 2;
 const SPARK_REACH = 420;
 const SPARK_SIZE = 24;
 
-
 interface Slam {
   at: number;
   // the fight's axis then, rad

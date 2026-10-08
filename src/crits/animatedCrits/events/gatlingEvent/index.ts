@@ -61,7 +61,6 @@ interface Shot {
   landedAt: number | null;
 }
 
-
 // a spot `reach` px from the button, every way round
 function around(button: Point, reach: number, angle: number): Point {
   return {

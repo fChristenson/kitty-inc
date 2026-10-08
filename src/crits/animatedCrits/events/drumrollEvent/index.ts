@@ -74,7 +74,6 @@ const BLAST_SCALE = 1.9;
 const SPARK_REACH = 400;
 const SPARK_SIZE = 22;
 
-
 interface Tap {
   at: number;
   // 0 the left stick, 1 the right

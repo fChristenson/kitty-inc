@@ -132,7 +132,6 @@ export function forceFuseEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // a wiggling line from start to end, straight at both ends
 function planFuse(start: Point, end: Point): Point[] {
   const dx = end.x - start.x;

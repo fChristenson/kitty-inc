@@ -1,7 +1,7 @@
 // the floor view's pools of event procs, one per EventCritType: each event
 // module registers itself. Like a special crit, an event only lands on a crit
 // — it claims that crit's special slot when the crit is rolled (see
-// upgradeButton/crit.ts's rollCritUpgrade) and arms once the player clicks
+// crits/floorCrits/upgradeCrit.ts's rollCritUpgrade) and arms once the player clicks
 // it; the events of one type share that type's cooldown
 import type { Floor } from "../../../gameState";
 import type { CritProcKind, CritTier } from "../../critTypes";
@@ -80,7 +80,7 @@ type FloorEventProc = EventProcDef<Floor, EventProcContext>;
 type FloorEventPool = EventProcPool<Floor, EventProcContext>;
 
 // an animated crit: what a regular crit's special slot carries when
-// shared/critTypes' rollCrit picks it (CONFIG.specialCrits). Each event crit
+// crits/critTypes' rollCrit picks it (CONFIG.specialCrits). Each event crit
 // type is a pool of events here, with its own cooldown
 export type EventCritType = "animatedCrit";
 

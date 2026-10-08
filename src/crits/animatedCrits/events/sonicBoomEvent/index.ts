@@ -47,7 +47,6 @@ const BALL_R = 120;
 const COINS = 44;
 const SPRAY: [number, number] = [4, 40];
 
-
 registerEventProc(
   {
     key: KEY,

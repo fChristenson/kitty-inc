@@ -52,7 +52,6 @@ const COINS = 40;
 const COIN_DROP: [number, number] = [80, 520];
 const COIN_SIDE = 420;
 
-
 registerEventProc(
   {
     key: KEY,

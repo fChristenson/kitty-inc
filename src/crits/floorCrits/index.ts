@@ -2,12 +2,7 @@
 // floor/building unlocks, the special crits riding on them (chain, boost,
 // heavenly…), their rewards on floors and buildings and their celebration
 
-export {
-  celebrateBuildingCrit,
-  createBuildingCrits,
-  type BuildingCritDeps,
-  type BuildingCrits,
-} from "./buildingCrits";
+export { celebrateBuildingCrit, createBuildingCrits } from "./buildingCrits";
 export {
   consumeCritUpgrade,
   forceCritMoment,
@@ -24,7 +19,6 @@ export {
   rollFloorBuyCrit,
 } from "./upgradeCrit";
 export {
-  applyChainCrit,
   applyFloorCrit,
   critNow,
   eventProcContext,
@@ -32,8 +26,4 @@ export {
   promoteTierKeepingLevel,
 } from "./floorCritRewards";
 export { triggerCritCelebration } from "./critCelebration";
-export {
-  applyBonusTierIncome,
-  celebrateBonusTier,
-  tierColor,
-} from "./bonusTierReward";
+export { applyBonusTierIncome, celebrateBonusTier } from "./bonusTierReward";

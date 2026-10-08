@@ -48,7 +48,6 @@ const COINS = 56;
 const FAN = 1.3;
 const COIN_REACH: [number, number] = [0.15, 0.9];
 
-
 registerEventProc(
   {
     key: KEY,

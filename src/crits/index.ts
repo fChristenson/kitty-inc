@@ -1,27 +1,13 @@
 // every crit lives under src/crits, one folder per kind of crit; other
 // modules import crit code only from here
 export {
-  CHAIN_CRIT_CONTINUE_CHANCE,
   CRIT_PROC_INFO,
   CRIT_PROC_KINDS,
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
-  GRAND_OPENING_CRIT_COLOR,
-  GRAND_OPENING_CRIT_LABEL,
-  HEAVENLY_CRIT_COLOR,
-  HEAVENLY_CRIT_LABEL,
-  LUCKY_CLOVER_CRIT_COUNT,
-  LUCKY_CLOVER_CRIT_TIER,
-  MYSTIC_CRIT_COLOR,
-  MYSTIC_CRIT_LABEL,
-  MYSTIC_UPGRADE_COUNT,
-  POKER_HAND_CRIT_COUNTS,
   RATE_LOCK_SPEED_MULTIPLIER,
   RUSH_HOUR_INTERVAL_SECONDS,
   SPECIAL_CRIT_GATEWAY,
-  UPGRADE_CRIT_COLOR,
-  UPGRADE_CRIT_LABEL,
-  applyCritProcs,
   consumeBonusTierCrit,
   getBonusTierCrit,
   getCritProcIncomeModifierPercent,
@@ -36,7 +22,6 @@ export {
   pickCritTierByOdds,
   pickHigherCritTier,
   readCritProcs,
-  runFirstCritProc,
   setCritRandom,
   tierOnlyCrit,
 } from "./critTypes";
@@ -52,17 +37,13 @@ export {
   drawPoppingCritText,
   getScreenShakeOffset,
   isCritFlashActive,
-  playSpecialFlash,
-  playTierFlash,
   shakeScreen,
   stopScreenShake,
   syncCritFlashPause,
-  triggerScreenShake,
   warmTierFlashes,
 } from "./critFlash";
 export {
   applyBonusTierIncome,
-  applyChainCrit,
   applyFloorCrit,
   celebrateBonusTier,
   celebrateBuildingCrit,
@@ -84,7 +65,6 @@ export {
   promoteTierKeepingLevel,
   rollCritUpgrade,
   rollFloorBuyCrit,
-  tierColor,
   triggerCritCelebration,
 } from "./floorCrits";
 export {

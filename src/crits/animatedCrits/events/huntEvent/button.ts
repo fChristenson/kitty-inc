@@ -1,6 +1,6 @@
 // "Hunt" event button: a rare upgrade click while the mouse is on screen (see
-// floors/eventProcs' shared pool) arms it; it stays armed only as long
-// as that mouse does. Clicking it is free and starts floors/huntEvent
+// crits/animatedCrits/eventProcs' shared pool) arms it; it stays armed only as long
+// as that mouse does. Clicking it is free and starts crits/animatedCrits/events/huntEvent
 import type { Floor } from "../../../../gameState";
 import { COLOR } from "../../../../palette";
 import { registerEventButton } from "../../../../shared/floorEvents";

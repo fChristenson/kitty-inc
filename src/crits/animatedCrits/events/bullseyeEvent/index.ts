@@ -66,7 +66,6 @@ const BLAST_SCALE = 1.7;
 const SPARK_REACH = 340;
 const SPARK_SIZE = 20;
 
-
 interface Target extends Point {
   r: number;
   popAt: number;

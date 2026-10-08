@@ -85,7 +85,6 @@ export function forceRecruitEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 function drawOverlay(
   ctx: CanvasRenderingContext2D,
   getFloorRect: FloorRectResolver,

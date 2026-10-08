@@ -69,7 +69,6 @@ const COINS = 40;
 const CONE = 1.4;
 const COIN_R: [number, number] = [80, 420];
 
-
 registerEventProc(
   {
     key: KEY,

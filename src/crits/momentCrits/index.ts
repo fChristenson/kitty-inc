@@ -1,5 +1,5 @@
 // crit moments: once a crit's flash has slammed in and sat, its number plays
-// out onto the income bars in view (see shared/critTypes' CritMoment): fired
+// out onto the income bars in view (see crits/critTypes' CritMoment): fired
 // at its bar character by character, pinballing between bars, snowballing
 // down them, juggled onto them, stomped onto all of them, rained onto them,
 // stamped onto each, crashed down through them from a

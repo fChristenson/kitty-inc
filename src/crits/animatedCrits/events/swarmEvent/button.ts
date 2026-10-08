@@ -1,4 +1,4 @@
-// "Swarm" event button: floors/swarmEvent's proc animation arms it; clicking it
+// "Swarm" event button: crits/animatedCrits/events/swarmEvent's proc animation arms it; clicking it
 // is free and starts a timed swarm sale, during which every click on this
 // button pays a Sale payout from it and each of its mirrored clones (see floorInteractions)
 import type { Floor } from "../../../../gameState";

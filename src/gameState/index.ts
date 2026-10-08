@@ -65,10 +65,10 @@ export interface WorkerSlot {
   boostedAt: number; // Date.now() when boosted turned on; auto-resets durationMs later
   // how long THIS activation lasts — defaults to BOOST_DURATION_MS when unset
   // (every slot created before this field existed, or a fresh never-boosted
-  // slot) so a longer-lasting boost (see shared/critTypes' Sunshine crit) can
+  // slot) so a longer-lasting boost (see crits/critTypes' Sunshine crit) can
   // override it per-activation without a separate parallel mechanism
   durationMs?: number;
-  // this regular worker's "Boost" event tier (see floors/boostEvent), promoted
+  // this regular worker's "Boost" event tier (see crits/animatedCrits/events/boostEvent), promoted
   // one crit tier per win. Absent in older saves; permaBoosted is the legacy
   // single-win flag, read as the first tier
   permaTier?: CritTier;
@@ -106,9 +106,9 @@ export interface Floor {
   hasManager: boolean; // one-time per-floor purchase (hud/upgradeMenu); never resets once true
   // permanent per-floor rate multiplier, rolled once when the floor is bought/
   // unlocked (see floorInteractions.ts's rollFloorBuyCrit) — never re-rolled or
-  // cleared afterward. Real CritTier type from shared/critTypes (a type-only
+  // cleared afterward. Real CritTier type from crits/critTypes (a type-only
   // import, erased at build time, so importing it here creates no runtime
-  // cycle even though shared/critTypes itself type-imports Floor from here)
+  // cycle even though crits/critTypes itself type-imports Floor from here)
   critMultiplierTier: CritTier | null;
   // set once at creation (floors/index.ts's buildFloor) when this floor's
   // natural, uncapped incomeIntervalSeconds already exceeds incomePanel.ts's
@@ -128,13 +128,13 @@ export interface Floor {
   overtimeCost: BigNumber; // $ paid for the CURRENT run; ZERO if never triggered
   // permanent per-floor price multiplier (default 1), permanently multiplied
   // by 0.75 each time a "seasonal sale" crit lands on this floor (see
-  // shared/critTypes' SEASONAL_SALE_DISCOUNT_MULTIPLIER) — folded into
+  // crits/critTypes' SEASONAL_SALE_DISCOUNT_MULTIPLIER) — folded into
   // hud/upgradeMenu's getFloorPrice, so it discounts every worker/office
   // chairs/supplies/manager cost derived from it. floor.upgradeCost itself is
   // discounted directly (a stored, already-mutable value), this multiplier is
   // only needed for the derived-from-getFloorPrice costs
   priceDiscountMultiplier: number;
-  // the manager's own "Boost" event tier (see floors/boostEvent) — kept on the
+  // the manager's own "Boost" event tier (see crits/animatedCrits/events/boostEvent) — kept on the
   // floor rather than in a worker slot, since the manager's slot index shifts
   // whenever another regular worker is hired
   managerPermaTier?: CritTier | null;
@@ -195,7 +195,7 @@ export function getBoostEndsAt(floor: Floor, workerIndex: number): number {
 }
 
 // durationMs (default BOOST_DURATION_MS) lets a caller grant a longer-lasting
-// boost than the normal one (see shared/critTypes' Sunshine crit) without
+// boost than the normal one (see crits/critTypes' Sunshine crit) without
 // touching any other activation's own duration
 export function activateBoosted(
   floor: Floor,

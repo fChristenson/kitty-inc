@@ -101,7 +101,6 @@ export function forceBeanstalkEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // how far up its climb the vine is ms in, 0..1
 function progressAt(ms: number): number {
   return ease(Math.min(1, Math.max(0, ms / CONFIG.beanstalkEvent.growMs)));

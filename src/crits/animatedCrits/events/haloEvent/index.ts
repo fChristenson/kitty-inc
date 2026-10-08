@@ -105,7 +105,6 @@ export function forceHaloEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // the ring's turns `ms` in, spinning ever faster until crowned
 function ringTurns(ms: number): number {
   const { gatherMs, orbitMs, settleMs } = CONFIG.haloEvent;

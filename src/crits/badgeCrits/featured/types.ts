@@ -13,5 +13,5 @@ export type FeaturedReward = (
   helpers: RewardHelpers,
 ) => void;
 
-// one reward for every crit in a category's data (shared/critData), no extras
+// one reward for every crit in a category's data (crits/badgeCrits/critData), no extras
 export type FeaturedRewards<Data> = Record<keyof Data, FeaturedReward>;

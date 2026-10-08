@@ -112,7 +112,6 @@ export function forcePolishEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // light i `ms` in around the bar's middle (cx, cy), or null before it pops up
 function lightAt(i: number, ms: number, cx: number, cy: number) {
   const appear = clamp01((ms - i * STAGGER_MS) / APPEAR_MS);

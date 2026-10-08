@@ -157,16 +157,16 @@ export interface FloorActionsDeps {
   createMysticBuilding: () => void;
   getCompanyValue: () => BigNumber;
   applyCompanyWideBoost: () => void;
-  // converts the current visual screen center (where screenShake's "CRIT!" flash is
+  // converts the current visual screen center (where critFlash's "CRIT!" flash is
   // drawn) into this floor's own local coordinate space, so a coin burst can be
   // anchored there instead of at a fixed floor-local point
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number };
   getScreenAreaLocal?: ScreenAreaLocal;
   // floors currently in view, for the "Boost" event's target pick (see
-  // floors/boostEvent) — omitted off-screen (e.g. map/draft purchases), where
+  // crits/animatedCrits/events/boostEvent) — omitted off-screen (e.g. map/draft purchases), where
   // that event simply never starts
   getOnScreenFloors?: OnScreenFloors;
-  // world-space rect of any floor (see floors/swarmEvent's neighbour targets)
+  // world-space rect of any floor (see crits/animatedCrits/events/swarmEvent's neighbour targets)
   getFloorRect?: FloorRectResolver;
 }
 
@@ -418,7 +418,7 @@ export function handleFloorClick(
   }
 
   if (hitTestUpgradeButton(x, y, isGroundFloor) && floor.unlocked) {
-    // a mirrored clone (see floors/swarmEvent) clicks its source button
+    // a mirrored clone (see crits/animatedCrits/events/swarmEvent) clicks its source button
     const source = resolveButtonFloor(floor);
     if (source !== floor) {
       const sourceIsGround = floors.indexOf(source) === 0;
@@ -427,7 +427,7 @@ export function handleFloorClick(
       return;
     }
     announceEventStartClick(floor, Date.now());
-    // "Hunt" event (see floors/huntEvent): free like Boost below, falling
+    // "Hunt" event (see crits/animatedCrits/events/huntEvent): free like Boost below, falling
     // through as a normal click if the mouse has left the screen meanwhile
     if (isHuntEventArmed(floor)) {
       disarmHuntEvent(floor);
@@ -437,7 +437,7 @@ export function handleFloorClick(
         return;
       }
     }
-    // "Boost" event (see floors/boostEvent): free, and leaves any armed crit
+    // "Boost" event (see crits/animatedCrits/events/boostEvent): free, and leaves any armed crit
     // for the next click. If no on-screen worker is left to pick, the button
     // just disarms and this click falls through as a normal one
     if (isBoostEventArmed(floor)) {
@@ -450,7 +450,7 @@ export function handleFloorClick(
         return;
       }
     }
-    // "Union" event (see floors/unionEvent): free like Boost, falling through
+    // "Union" event (see crits/animatedCrits/events/unionEvent): free like Boost, falling through
     // as a normal click if the floor no longer has workers to merge
     if (isUnionEventArmed(floor)) {
       disarmUnionEvent(floor);
@@ -460,7 +460,7 @@ export function handleFloorClick(
         return;
       }
     }
-    // "Swarm" event (see floors/swarmEvent): free, starts the timed swarm
+    // "Swarm" event (see crits/animatedCrits/events/swarmEvent): free, starts the timed swarm
     // sale and leaves any armed crit for the next click
     if (isSwarmEventArmed(floor)) {
       disarmSwarmEvent(floor);
@@ -471,7 +471,7 @@ export function handleFloorClick(
       return;
     }
     // an active swarm sale: every click is a Sale click on this button and
-    // each of its mirrored clones (see floors/swarmEvent)
+    // each of its mirrored clones (see crits/animatedCrits/events/swarmEvent)
     if (isSwarmSaleActive(floor, Date.now())) {
       const tier = getCritTier(floor);
       if (tier) consumeCritUpgrade(floor);
@@ -504,7 +504,7 @@ export function handleFloorClick(
       );
       // re-arm the next crit for AFTER this sale ends without letting it also
       // roll a piggyback proc while a special event is already active (see
-      // shared/critTypes' rollCrit's own allowSpecialProcs param)
+      // crits/critTypes' rollCrit's own allowSpecialProcs param)
       rollCritUpgrade(floor, false);
       persist();
       triggerButtonPress(floor);
@@ -526,7 +526,7 @@ export function handleFloorClick(
       const ticksAdded = getOvertimeTicks(floor) - ticksBefore;
       // re-arm the next crit for AFTER this overtime run ends without
       // letting it also roll a piggyback proc while a special event is
-      // already active (see shared/critTypes' rollCrit's own
+      // already active (see crits/critTypes' rollCrit's own
       // allowSpecialProcs param)
       rollCritUpgrade(floor, false);
       // filling the gauge all the way promotes this floor's own PERMANENT crit
@@ -580,11 +580,11 @@ export function handleFloorClick(
       }
       return;
     }
-    // "Snowball" is no longer a timed click event (see shared/critTypes'
+    // "Snowball" is no longer a timed click event (see crits/critTypes'
     // applySnowballCrit) — it's now a flat, instant reward applied straight
     // from the crit-consumption branches below, so there's no click branch
     // here anymore.
-    // "Frozen" (see shared/critTypes' isFrozenCrit) is likewise no longer a
+    // "Frozen" (see crits/critTypes' isFrozenCrit) is likewise no longer a
     // special click branch — it just locks this floor's own upgradeCost from
     // growing for FROZEN_DURATION_MS (see incomePanel.ts's increaseIncomeRate),
     // so a click here falls straight through to the normal crit/paid-upgrade

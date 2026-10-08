@@ -1,4 +1,4 @@
-// the one on-screen critter a "Hunt" event (floors/huntEvent) can target,
+// the one on-screen critter a "Hunt" event (crits/animatedCrits/events/huntEvent) can target,
 // registered by its owner (src/mouse) so floors never imports it directly
 import type { Floor } from "../../gameState";
 

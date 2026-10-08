@@ -1,6 +1,6 @@
 // "Union" event button: a rare upgrade click on a floor with 2+ workers (see
-// floors/eventProcs' shared pool) arms it, and it stays armed until clicked.
-// Clicking it is free and starts the worker merge in floors/unionEvent
+// crits/animatedCrits/eventProcs' shared pool) arms it, and it stays armed until clicked.
+// Clicking it is free and starts the worker merge in crits/animatedCrits/events/unionEvent
 import type { Floor } from "../../../../gameState";
 import { COLOR } from "../../../../palette";
 import { registerEventButton } from "../../../../shared/floorEvents";

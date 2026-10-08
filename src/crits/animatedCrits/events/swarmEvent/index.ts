@@ -1,4 +1,4 @@
-// the "Swarm" event: a rare upgrade click (floors/eventProcs' shared pool)
+// the "Swarm" event: a rare upgrade click (crits/animatedCrits/eventProcs' shared pool)
 // freezes the screen and plays a coin stream + the same sfx as the Boost/Hunt
 // events, from that button into the closest unlocked floor's button above and
 // below it (one stream at an end of the building). Those buttons become exact

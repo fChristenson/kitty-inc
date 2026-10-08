@@ -28,14 +28,14 @@ export const CRIT_CONFIG = {
     // explosion/booty/upgrade) system: checked ONCE per landed crit/mega/
     // ultra, before any of the individual proc chances (badgeCrits/balance, floorCrits/balance) are even
     // rolled — a miss here means NONE of them get a chance to land at all
-    // this time, silently (see rollCrit in shared/critTypes). A hit just
+    // this time, silently (see rollCrit in crits/critTypes). A hit just
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
     specialCritGatewayChance: 0.15,
     bonusTierGatewayChance: 0.01,
   },
 
-  // shared/critTypes' rollCrit — what a landed crit's special slot carries
+  // crits/critTypes' rollCrit — what a landed crit's special slot carries
   // once its gateway hits: exactly one of these, each with its chance (they
   // add up to 1). One that can't play (an animated crit cooling down) is a
   // badge crit instead

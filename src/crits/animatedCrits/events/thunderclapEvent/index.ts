@@ -139,7 +139,6 @@ export function forceThunderclapEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // how far the shockwave has spread since the clap
 function waveSpread(clap: RunningClap, since: number): number {
   const t = clamp01(since / CONFIG.thunderclapEvent.waveMs);

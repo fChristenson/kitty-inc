@@ -33,7 +33,7 @@ function getFloorPrice(floor: Floor): BigNumber {
     floor.rateStep,
     WORKER_BASE_PRICE_FLOOR_1 / CONFIG.floors.baseRateStep,
   );
-  // "seasonal sale" crits (see shared/critTypes' SEASONAL_SALE_DISCOUNT_
+  // "seasonal sale" crits (see crits/critTypes' SEASONAL_SALE_DISCOUNT_
   // MULTIPLIER) permanently discount this floor's own worker/office chairs/
   // supplies/manager costs, all of which derive from this one price
   return multiply(base, floor.priceDiscountMultiplier);

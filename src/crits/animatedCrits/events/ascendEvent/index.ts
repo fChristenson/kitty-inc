@@ -113,7 +113,6 @@ function barPoint(
   return { x: rect.left + bar.x, y: rect.top + bar.y };
 }
 
-
 // where the orb is `elapsed` ms into the climb: hop k swings out to one side
 // and lands on stop k + 1 (stop 0 below the first bar, the last above the top)
 function orbAt(

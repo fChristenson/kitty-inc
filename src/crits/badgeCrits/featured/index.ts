@@ -1,5 +1,5 @@
 // every featured crit's reward, one file per themed category (their display
-// data is shared/critData); only ever loaded through loadFeaturedRewards
+// data is crits/badgeCrits/critData); only ever loaded through loadFeaturedRewards
 import { CYBERPUNK_REWARDS } from "./cyberpunk";
 import { HEROES_REWARDS } from "./heroes";
 import { GAME_QUOTES_REWARDS } from "./gameQuotes";

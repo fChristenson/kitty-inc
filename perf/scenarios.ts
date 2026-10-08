@@ -22,7 +22,6 @@ import { fromNumber } from "../src/shared/bigNumber";
 
 import { getActiveCorporationIndices } from "../src/company";
 
-
 import type { Floor } from "../src/gameState";
 import type { PerfBridge } from "../src/shared/perfBridge";
 import { start, stop, type Summary } from "./metrics";

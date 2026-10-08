@@ -714,7 +714,7 @@ async function main() {
       const floor = buildings[activeBuildingIndex]?.[0];
       if (floor) forceCritMoment(floor, moment);
     });
-    // the event modules load in their own chunk (floors/eventLoader): each
+    // the event modules load in their own chunk (crits/animatedCrits/eventLoader): each
     // event test button loads it first, then runs with it as `ev`
     let ev!: EventCatalog;
     const later =

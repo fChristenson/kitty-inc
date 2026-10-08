@@ -56,7 +56,6 @@ const BLAST_SCALE = 1.8;
 const SPARK_REACH = 380;
 const SPARK_SIZE = 22;
 
-
 interface Throw {
   at: number;
   ms: number;

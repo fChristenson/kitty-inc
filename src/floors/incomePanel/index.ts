@@ -157,7 +157,7 @@ export function triggerIncomeBarPress(floor: Floor): void {
   barPressedAt.set(floor, Date.now());
 }
 
-// a rapid fire crit's characters punching the bar (screenShake's FlashPunch): each hit jolts
+// a rapid fire crit's characters punching the bar (critFlash's FlashPunch): each hit jolts
 // it down and flashes it white; the levels it gave rise off it, and it glows
 // in the crit's color for a while after
 const barPunches = new WeakMap<
@@ -332,7 +332,7 @@ export function increaseIncomeRate(floor: Floor): void {
     floor.incomeAmount,
     multiply(floor.rateStep, rateMultiplier),
   );
-  // "frozen crit" (see upgradeButton/frozen.ts's isFrozenActive): while
+  // "frozen crit" (see crits/floorCrits/frozen.ts's isFrozenActive): while
   // active, this floor's upgradeCost is locked — every other part of the
   // tick (rate gain, upgradeCount, interval-halving) proceeds as normal
   if (
@@ -404,7 +404,7 @@ function currentSpeedMultiplier(floor: Floor, now: number): number {
     );
   }
   if (!isRushHourActive(floor, now)) return effectiveSpeedMultiplier;
-  // "Rush Hour" crit (see shared/critTypes' isRushHourActive): the floor's
+  // "Rush Hour" crit (see crits/critTypes' isRushHourActive): the floor's
   // own income timer is capped at RUSH_HOUR_INTERVAL_SECONDS while active —
   // Math.max picks whichever multiplier yields the SMALLER (faster) interval,
   // so this stacks with (never undoes) whatever worker/office speed already
@@ -598,7 +598,7 @@ export function drawIncomePanel(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
   isGroundFloor: boolean,
-  // an event overlay's own flashing, wiggling copy (see floors/upgradeEvent),
+  // an event overlay's own flashing, wiggling copy (see crits/animatedCrits/events/upgradeEvent),
   // optionally filled to `fill` (0..1) instead of the live cycle
   eventFlash?: { whiteAlpha: number; rotation: number; fill?: number },
 ): void {

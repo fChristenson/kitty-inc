@@ -95,7 +95,6 @@ export function forceHourglassEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // how far (0..1) it's filled and turned over, and drained, `now`
 function progressAt(event: RunningHourglass, now: number) {
   const { fillMs, flipMs, drainMs } = CONFIG.hourglassEvent;

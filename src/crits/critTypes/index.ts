@@ -1403,7 +1403,7 @@ export function runFirstCritProc<TContext>(
 
 // display metadata for the player-facing "Special Crits" info menu (see
 // hud/corporationBoostMenu's CRIT_INFO) AND the celebration flash each proc
-// triggers (floorInteractions/critCelebration) — one canonical table instead
+// triggers (crits/floorCrits/critCelebration.ts) — one canonical table instead
 // of those hand-duplicating every label/color a second time. `icon` is a
 // loadAssets ImageName key; `description` is short display-only prose, never
 // read by any game logic
@@ -2053,7 +2053,7 @@ const SPECIAL_CRIT_TYPES = Object.keys(
   CONFIG.specialCrits,
 ) as SpecialCritType[];
 
-// the special crits whose number plays out onto the bars (screenShake's
+// the special crits whose number plays out onto the bars (critFlash's
 // critMoments)
 export const CRIT_MOMENTS = [
   "rapidFireCrit",
@@ -2192,7 +2192,7 @@ export function rollCrit(
   // reacting to what landed can walk it instead of all of CRIT_PROC_KINDS
   onLanded: (result: CritRollResult, landedProcs: CritProcKind[]) => void,
   allowSpecialProcs = true,
-  // an animated crit (floors/eventProcs) taking the slot, true when it did;
+  // an animated crit (crits/animatedCrits/eventProcs) taking the slot, true when it did;
   // false leaves the slot to a badge crit
   claimSpecialSlot?: () => boolean,
 ): void {
@@ -2210,7 +2210,7 @@ export function rollCrit(
   const landed = badge ? rollLandedProcs() : [];
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS, critRandom));
   // real-roll-only tally for the "Special Crits" info menu's collectible
-  // count badges — see shared/critTypes/critProcCounts.ts
+  // count badges — see crits/critTypes/critProcCounts.ts
   for (const kind of kept) recordCritProcLanded(kind);
   // "special crit crit": once at least one piggyback proc has actually
   // landed, it gets its own independent shot at a bonus x5/x25/x125 tier,

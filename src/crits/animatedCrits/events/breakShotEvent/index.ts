@@ -71,7 +71,6 @@ const POP_COIN_REACH: [number, number] = [30, 180];
 const FLASH_MS = 220;
 const FLASH_ALPHA = 0.7;
 
-
 interface Ball {
   x: number;
   y: number;

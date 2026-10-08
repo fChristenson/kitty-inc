@@ -1,4 +1,4 @@
-// the "Renovate" event: a rare crit (floors/eventProcs' shared pool) whose click
+// the "Renovate" event: a rare crit (crits/animatedCrits/eventProcs' shared pool) whose click
 // freezes the screen and plays the same coin stream + sfx as the other events,
 // from the floor's button into its own "Lvl N" label, which flashes white and
 // wiggles as the coins land. When the stream ends the floor lands one regular

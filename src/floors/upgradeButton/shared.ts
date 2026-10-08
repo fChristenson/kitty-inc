@@ -77,7 +77,7 @@ export function triggerButtonPress(floor: Floor): void {
 }
 
 // buttons that are a live clone of another floor's button (see
-// floors/swarmEvent): drawn from, animated by and clicked through that source
+// crits/animatedCrits/events/swarmEvent): drawn from, animated by and clicked through that source
 // button's own state for as long as isLinked holds
 interface ButtonMirror {
   source: Floor;

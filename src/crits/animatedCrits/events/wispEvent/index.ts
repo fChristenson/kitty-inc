@@ -188,7 +188,6 @@ export function forceWispEvent(floor: Floor): void {
   forceClaimEventProc(KEY, floor);
 }
 
-
 // where the wisp hovers over each stop, in world space; null while a floor is out of view
 function hoverPoints(
   wisp: RunningWisp,
