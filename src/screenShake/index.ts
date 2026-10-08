@@ -190,17 +190,20 @@ export function syncCritFlashPause(now: number): void {
 }
 
 // the phone buzzes from a crit flash's start until it ends (a new flash takes
-// over the buzz); Android only, iOS has no vibration API
-function buzzForFlash(now: number): void {
+// over the buzz, after a short break when it stacks so each one is felt);
+// Android only, iOS has no vibration API
+function buzzForFlash(now: number, breakMs = 0): void {
   // no flash: leave any event's buzz alone
   if (flashEndsAt === null || typeof navigator.vibrate !== "function") return;
   const left = flashPausedAt !== null ? 0 : flashEndsAt - now;
   if (left <= 0 && flashPausedAt === null) return;
   const ms = Math.min(MAX_VIBRATE_MS, Math.max(0, Math.round(left)));
-  navigator.vibrate(
-    CRIT_ICON_BY_LABEL[flashLabel] ? Math.min(ms, badgeBuzzMs()) : ms,
-  );
+  const buzz = CRIT_ICON_BY_LABEL[flashLabel] ? Math.min(ms, badgeBuzzMs()) : ms;
+  navigator.vibrate(breakMs > 0 && buzz > 0 ? [0, breakMs, buzz] : buzz);
 }
+
+// the break between a crit chain's buzzes
+const STACK_BUZZ_BREAK_MS = 40;
 
 // a badge crit buzzes this much longer than a regular x5 crit (whose flash,
 // and so buzz, lasts as long as its explosion sound), not its whole long flash
@@ -259,7 +262,7 @@ function startFlash(req: FlashRequest): void {
   flashHoldMs = holdMs;
   activeFlashPriority = req.priority;
   flashEndsAt = now + GROWTH_DURATION_MS + holdMs + fadeDurationMs;
-  buzzForFlash(now);
+  buzzForFlash(now, req.stack ? STACK_BUZZ_BREAK_MS : 0);
   // a featured crit's image is its own show
   if (CRIT_ICON_BY_LABEL[req.label]) stopCritSparks();
   else startCritSparks(req.priority, now);

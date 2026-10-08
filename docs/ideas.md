@@ -3,27 +3,21 @@
 ## Built
 
 - **Mystery capsules:** a fully upgraded building earns a capsule, opened from its map marker, that hatches a badge you haven't found yet.
+- **Lucky foils:** a badge landed 10 times can roll shimmer on a floor landing, and at 100 can roll glitter, with its own reveal.
+- **Crit chains:** an x3 crit sometimes fires an x10 and an x50 straight after it, the numbers stacking like paper.
 
-## Rare variants
+## Luck upgrades (like the foils)
 
-- **Shiny events:** about 1 in 50 events plays its gold version, with twice the wisps, blasts and shakes, and pays five times as much.
-- **Shiny badges:** about 1 in 500 badge landings comes out shiny, with its art in an alternate palette. Shinies count separately in the collection.
+- **Foil cats:** a worker promoted to a perma tier rolls to turn foil, its sprite shimmering from then on, revealed on the reveal stage.
+- **Foil buildings:** a maxed building rolls on every floor crit to turn foil, shining on the map once it does.
 
-## Crits
+## Reveals (like the capsule)
 
-- **Boss badge:** a giant badge sometimes parks over the screen with a health ring. Every crit chips it, and breaking it pays a huge reward.
-- **Double feature:** two events sometimes roll on the same click and play at once, mixing into one combined payoff, e.g. lightning striking racing wisps.
-- **Overheat:** three crits in a row on one button make it glow white-hot, and the fourth is forced one tier higher.
+- **Badge reel:** a landed badge sometimes spins like a slot reel through its category's stickers before stopping, sometimes on a rarer one.
+- **Mystery floor:** unlocking a floor sometimes plays a capsule reveal that hatches a floor bonus: free levels, a worker, a manager or office items.
+- **Capsule upgrade:** while a mystery capsule rolls it can flash and turn into a double capsule, hatching two badges.
 
-## Buildings
+## Slot machine (like the chain)
 
-- **Skyscraper merge:** two neighbouring maxed buildings merge into one 40-floor tower with its own skyline look and a bigger capsule.
-- **Big red button:** a maxed building gets a second button that charges for an hour, then fires a guaranteed event when pressed.
-
-## Cats
-
-- **Cat evolution:** workers change look as their perma tier rises, from kitten to tabby to lion.
-
-## Collection
-
-- **Event bingo:** a 3x3 card of event looks (Lightning, Drill, Race and so on). Each event seen marks its square, and every line pays.
+- **Lucky 777:** every 777th click on a building's buttons is a guaranteed ultra, with 7-7-7 rolling in before the flash.
+- **Foil flashes:** a foiled badge's crit flash shows its shimmer or glitter, so a foil landing looks rarer than a plain one.

@@ -83,7 +83,7 @@ export const CONFIG = {
     // this time, silently (see rollCrit in shared/critTypes). A hit just
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
-    specialCritGatewayChance: 0.25,
+    specialCritGatewayChance: 0.15,
     bonusTierGatewayChance: 0.01,
     // a landed x3 crit chains straight into an x10 and an x50 this often
     chainCritChance: 0.01,
