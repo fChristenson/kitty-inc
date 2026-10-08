@@ -198,7 +198,9 @@ function buzzForFlash(now: number, breakMs = 0): void {
   const left = flashPausedAt !== null ? 0 : flashEndsAt - now;
   if (left <= 0 && flashPausedAt === null) return;
   const ms = Math.min(MAX_VIBRATE_MS, Math.max(0, Math.round(left)));
-  const buzz = CRIT_ICON_BY_LABEL[flashLabel] ? Math.min(ms, badgeBuzzMs()) : ms;
+  const buzz = CRIT_ICON_BY_LABEL[flashLabel]
+    ? Math.min(ms, badgeBuzzMs())
+    : ms;
   navigator.vibrate(breakMs > 0 && buzz > 0 ? [0, breakMs, buzz] : buzz);
 }
 
