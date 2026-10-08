@@ -1,4 +1,4 @@
-// the "Freefall" event (experiment; a crit tier), a flight-stage event (see
+// the "Freefall" event (flight; a crit tier), a flight-stage event (see
 // ../../flightStage) with its own way in: it covers its crit, whose click
 // folds the floors' screen in half, its top half tipping backward until it
 // lies flat like a rooftop, baring the stage's blue sky. The view rises onto

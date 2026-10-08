@@ -8254,14 +8254,14 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 79
-  // experiment, cash: src/crits/animatedCrits/events/lightspeedEvent: on the flight stage, spinning coins rush in out of the distance and are picked up as they fly past
+  // flight, cash: src/crits/animatedCrits/events/lightspeedEvent: on the flight stage, spinning coins rush in out of the distance and are picked up as they fly past
   lightspeedEvent: {
     chance: 0.01,
     flyMs: 2000, // flying through the coins, until the floors appear far ahead
     coinApproachMs: 650, // each coin's rush in from the distance to being picked up
     payoutsPerCoin: 0.25, // the floor's payouts each picked-up coin pays
   },
-  // explosion, levels: src/crits/animatedCrits/events/starfighterEvent: on the flight stage, wisps rush in out of the distance and the view's guns lock on and blast them, then a big one
+  // flight + explosion, levels: src/crits/animatedCrits/events/starfighterEvent: on the flight stage, wisps rush in out of the distance and the view's guns lock on and blast them, then a big one
   starfighterEvent: {
     chance: 0.01,
     flyMs: 2100, // the dogfight, until the floors appear far ahead
@@ -8270,7 +8270,7 @@ export const ANIMATED_EVENT_CONFIG = {
     boltMs: 150, // each laser bolt's flight to its wisp
     levelShare: 0.03, // free levels on the floor per wisp shot down (the big one counts thrice)
   },
-  // experiment, a crit tier: src/crits/animatedCrits/events/freefallEvent: the floors' screen folds its top half back flat onto the flight stage's sky, the view walks onto it, looks down over its far edge at a white hole far below and jumps, crash-landing a tier higher
+  // flight, a crit tier: src/crits/animatedCrits/events/freefallEvent: the floors' screen folds its top half back flat onto the flight stage's sky, the view walks onto it, looks down over its far edge at a white hole far below and jumps, crash-landing a tier higher
   freefallEvent: {
     chance: 0.01,
     foldMs: 550, // the top half tipping back until it lies flat

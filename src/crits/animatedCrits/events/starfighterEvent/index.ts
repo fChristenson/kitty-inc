@@ -1,4 +1,4 @@
-// the "Starfighter" event (explosion; levels), a flight-stage event (see
+// the "Starfighter" event (flight + explosion; levels), a flight-stage event (see
 // ../../flightStage): it covers its crit, whose click dives the view into
 // space at lightspeed. Wisps rush in out of the distance, weaving; a reticle
 // closes on each and the view's twin guns fire laser bolts that blow it apart,

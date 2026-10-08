@@ -1,4 +1,4 @@
-// the "Lightspeed" event (experiment; cash), a flight-stage event (see
+// the "Lightspeed" event (flight; cash), a flight-stage event (see
 // ../../flightStage): it covers its crit, whose click dives the view into
 // space at lightspeed. Spinning coins rush in out of the distance in
 // corkscrews, rings and trails and are picked up as they fly past, each paying
