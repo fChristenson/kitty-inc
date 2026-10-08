@@ -2,28 +2,15 @@
 // glimmer lights stream into the floor's income bar. When the stream ends the floor's
 // permanent crit tier becomes the crit's rolled tier, or the tier above its own
 // when that roll wouldn't promote it. Never lands on a top-tier floor
-import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import {
-  CRIT_TIER_ORDER,
-  nextCritTier,
-  pickHigherCritTier,
-  type CritTier,
-} from "../../../critTypes";
 import {
   drawIncomePanel,
   getIncomeBarCenter,
   setIncomePanelHidden,
 } from "../../../../floors/incomePanel";
+import { canPromote, promotedTier } from "../../eventRewards";
 import { registerStreamTargetEvent } from "../streamTargetEvent";
-
-function promotedTier(floor: Floor, rolled: CritTier): CritTier {
-  const current = floor.critMultiplierTier;
-  return pickHigherCritTier(current, rolled) === current
-    ? nextCritTier(current)
-    : rolled;
-}
 
 // dev test hook
 export const forceUpgradeEvent = registerStreamTargetEvent({
@@ -33,8 +20,7 @@ export const forceUpgradeEvent = registerStreamTargetEvent({
   chance: () => CONFIG.upgradeEvent.chance,
   target: (_floor, isGroundFloor) => getIncomeBarCenter(isGroundFloor),
   canStart: (floor, { promoteFloorTier }) =>
-    promoteFloorTier !== undefined &&
-    floor.critMultiplierTier !== CRIT_TIER_ORDER[0],
+    promoteFloorTier !== undefined && canPromote(floor),
   setHidden: setIncomePanelHidden,
   slamPart: "bar",
   drawTarget: (ctx, floor, isGroundFloor, whiteAlpha, rotation) =>

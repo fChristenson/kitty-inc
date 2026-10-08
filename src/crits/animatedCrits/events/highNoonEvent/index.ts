@@ -1,4 +1,4 @@
-// the "High Noon" event (gunfire; crit tiers): it covers its crit, whose
+// the "Duel" event (gunfire; crit tiers): it covers its crit, whose
 // click freezes the screen while two gunner wisps burst out of the clicked
 // floor's button and skid to either side of the screen, face off, and fire:
 // their wisp bullets meet dead in the middle and blow apart in flashes and
@@ -41,7 +41,7 @@ const HIT_SHAKE: [number, number] = [0.7, 1.4];
 
 export const forceHighNoonEvent = registerWispEvent(
   KEY,
-  "High Noon",
+  "Duel",
   () => CONFIG.highNoonEvent.chance,
   (floor, context, area) => {
     const { skidMs, duelsMs, turnMs, holdMs, mergeMs } = CONFIG.highNoonEvent;

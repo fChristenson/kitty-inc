@@ -2202,6 +2202,8 @@ async function main() {
       lightspeed: forceOnActive((e) => e.forceLightspeedEvent),
       starfighter: forceOnActive((e) => e.forceStarfighterEvent),
       freefall: forceOnActive((e) => e.forceFreefallEvent),
+      saloon: forceOnActive((e) => e.forceSaloonEvent),
+      doom: forceOnActive((e) => e.forceDoomEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

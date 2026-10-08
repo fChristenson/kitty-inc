@@ -49,6 +49,8 @@ export function createTestButtonMarkup(): string {
           <button id="test-lightspeed-event" class="game__button">Lightspeed</button>
           <button id="test-starfighter-event" class="game__button">Starfighter</button>
           <button id="test-freefall-event" class="game__button">Freefall</button>
+          <button id="test-saloon-event" class="game__button">High Noon</button>
+          <button id="test-doom-event" class="game__button">Doom</button>
           <button id="test-marx-generator-event" class="game__button">Marx Generator</button>
           <button id="test-oort-cloud-event" class="game__button">Oort Cloud</button>
           <button id="test-double-slit-event" class="game__button">Double Slit</button>
@@ -790,7 +792,7 @@ export function createTestButtonMarkup(): string {
           <button id="test-shaped-charge-event" class="game__button">Shaped Charge</button>
           <button id="test-detcord-event" class="game__button">Detcord</button>
           <button id="test-bullet-bloom-event" class="game__button">Bullet Bloom</button>
-          <button id="test-high-noon-event" class="game__button">High Noon</button>
+          <button id="test-high-noon-event" class="game__button">Duel</button>
           <button id="test-hailfire-event" class="game__button">Hailfire</button>
           <button id="test-dervish-event" class="game__button">Dervish</button>
           <button id="test-invaders-event" class="game__button">Invaders</button>

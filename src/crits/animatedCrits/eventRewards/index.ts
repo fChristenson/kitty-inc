@@ -8,6 +8,8 @@ import {
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
   nextCritTier,
+  pickHigherCritTier,
+  type CritTier,
 } from "../../critTypes";
 import { drawPoppingCritText } from "../../critFlash/critText";
 import { isFloorLocked } from "../../../shared/detachedJob";
@@ -126,6 +128,20 @@ export function findRewardWorkers(
 // a floor's share of its own level count in free levels, at least min
 export function levelsFor(floor: Floor, share = 0.1, min = 3): number {
   return Math.max(min, Math.round(floor.upgradeCount * share));
+}
+
+// the perma tier to promote a floor to: the rolled tier, or the tier above
+// its own when that roll wouldn't promote it
+export function promotedTier(floor: Floor, rolled: CritTier): CritTier {
+  const current = floor.critMultiplierTier;
+  return pickHigherCritTier(current, rolled) === current
+    ? nextCritTier(current)
+    : rolled;
+}
+
+// whether a floor's perma tier can still be promoted
+export function canPromote(floor: Floor): boolean {
+  return floor.critMultiplierTier !== CRIT_TIER_ORDER[0];
 }
 
 // flashes and jolts bar away from `from` (straight down without one)

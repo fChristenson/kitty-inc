@@ -8254,6 +8254,26 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 79
+  // flight, levels: src/crits/animatedCrits/events/saloonEvent ("High Noon"): the floors' screen swings open like saloon doors onto a western street, a countdown, the bandit in the road draws and shoots the view, which staggers and pitches forward into a hole in the road, falling through it onto the floors
+  saloonEvent: {
+    chance: 0.01,
+    doorsMs: 700, // the doors swinging open, flapping as they settle
+    stepMs: 650, // the view stepping out through them onto the street
+    countMs: 450, // each number of the countdown, 3, 2, 1
+    drawMs: 220, // SHOOT! to the bandit's draw and shot
+    boltMs: 140, // the bullet's flight into the view
+    staggerMs: 600, // the view reeling from the hit
+    tumbleMs: 500, // pitching forward into the hole opening in the road
+    flyMs: 300, // the fall through the hole, until the floors fill it
+    levelShare: 0.15, // free levels on the floor it lands on
+  },
+  // fps, perma tier: src/crits/animatedCrits/events/doomEvent ("Doom"): the floors' screen rises like a shutter onto a tech-base corridor, the view marches down it shotgunning demons, a big one last, and rushes through the exit door onto the floors
+  doomEvent: {
+    chance: 0.01,
+    doorMs: 450, // the shutter rising and the shotgun coming up
+    walkMs: 3400, // the march down the corridor, blasting the demon heads
+    flyMs: 250, // the rush at the exit, until the floors behind it come close
+  },
   // flight, cash: src/crits/animatedCrits/events/lightspeedEvent: on the flight stage, spinning coins rush in out of the distance and are picked up as they fly past
   lightspeedEvent: {
     chance: 0.01,

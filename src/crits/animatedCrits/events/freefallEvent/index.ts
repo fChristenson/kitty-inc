@@ -10,9 +10,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { drawBeam } from "../../../../shared/beam";
-import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { shakeScreen } from "../../../../shared/screenShake";
-import { stampGlimmer } from "../../../../shared/twinkle";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { drawScreenPart, type ScreenCopy } from "../../../../shared/screenCopy";
 import { nextCritTier, pickCritTierByOdds } from "../../../critTypes";
@@ -23,6 +21,12 @@ import {
   startFlightStage,
   type FlightView,
 } from "../../flightStage";
+import {
+  drawFlightHole,
+  drawHoleFall,
+  HOLE_FOCAL,
+  HOLE_SIZE,
+} from "../../flightStage/hole";
 import {
   endEventProc,
   forceClaimEventProc,
@@ -35,7 +39,7 @@ const KEY = "freefall";
 // the scene, in screen widths: x right, y up, z away from the view. The
 // screen stands at z 0, its fold along y 0; the view starts FOCAL in front
 // of it, where the screen exactly fills the view
-const FOCAL = 1.2;
+const FOCAL = HOLE_FOCAL;
 // nearer than this to the view, a strip isn't drawn
 const NEAR = 0.05;
 const STRIPS = 24;
@@ -48,14 +52,9 @@ const STEP_ON = 0.08;
 const LEAN_OVER = 0.06;
 const EDGE_PITCH = -1.3;
 const EDGE_GLOW = 22;
-// the hole far below, out past the far edge, and its size
+// the hole far below, out past the far edge
 const HOLE_DEPTH = 7;
 const HOLE_OUT = 1.2;
-const HOLE_SIZE = 0.3;
-// the floors at the hole's bottom, FLOORS_W wide and FLOORS_W * FOCAL below
-// it, so they fill the view exactly as it drops through the hole
-const FLOORS_W = 1;
-const FLOORS_BELOW = FLOORS_W * FOCAL;
 // the jump: a crouch, a spring up to the top of its arc (looking up a
 // little, out past the edge), then the drop out over the hole looking
 // straight down; the shares of it each takes
@@ -66,10 +65,6 @@ const JUMP_UP = 0.8;
 const JUMP_OUT = 0.3;
 const LEAP_DROP = 1.2;
 const LEAP_SHAKE = 1.4;
-const RIM = 24;
-const RIM_SIZE = 0.04;
-const RIM_SPIN = 0.003;
-const HOLE_GLOW = fadeStops(COLOR.white);
 // how far past the far edge the line of sight to the hole clears it before
 // the hole's fully in sight
 const SIGHT_CLEAR = 0.15;
@@ -193,62 +188,6 @@ function drawScreen(
   }
 }
 
-// the hole at (cx, y), radius r, `depth` below the view: the floors at its
-// bottom framed in its white walls, in its glow, ringed by spinning glimmers
-function drawHole(
-  ctx: CanvasRenderingContext2D,
-  view: FlightView,
-  floors: ScreenCopy,
-  y: number,
-  r: number,
-  depth: number,
-  alpha: number,
-  now: number,
-): void {
-  if (alpha <= 0) return;
-  const { cx } = view;
-  const previous = ctx.globalCompositeOperation;
-  ctx.globalAlpha = alpha;
-  ctx.globalCompositeOperation = "lighter";
-  drawGlow(ctx, HOLE_GLOW, cx, y, r * 2.4);
-  ctx.globalCompositeOperation = previous;
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, y, r, 0, Math.PI * 2);
-  ctx.clip();
-  ctx.fillStyle = COLOR.white;
-  ctx.fillRect(cx - r, y - r, r * 2, r * 2);
-  const fw = (FLOORS_W * FOCAL * view.w) / (depth + FLOORS_BELOW);
-  const fh = (fw * view.h) / view.w;
-  drawScreenPart(
-    ctx,
-    floors,
-    view.x,
-    view.y,
-    view.w,
-    view.h,
-    cx - fw / 2,
-    y - fh / 2,
-    fw,
-    fh,
-  );
-  ctx.restore();
-  ctx.globalCompositeOperation = "lighter";
-  for (let i = 0; i < RIM; i++) {
-    const a = (i / RIM) * Math.PI * 2 + now * RIM_SPIN;
-    stampGlimmer(
-      ctx,
-      cx + Math.cos(a) * r * 1.1,
-      y + Math.sin(a) * r * 1.1,
-      Math.min(r, view.w) * RIM_SIZE * 4,
-      a,
-      i % 2 ? COLOR.heavenlyGold : COLOR.white,
-    );
-  }
-  ctx.globalCompositeOperation = previous;
-  ctx.globalAlpha = 1;
-}
-
 // 0..1: how far the hole has come into sight from (y, z) past the folded
 // half's far edge at `top`, which hides it from a view standing back on it
 function holeInSight(top: number, y: number, z: number): number {
@@ -338,7 +277,7 @@ function startFreefall(floor: Floor, context: EventProcContext): void {
         }
         const hole = sight(view, cam, -HOLE_DEPTH, top + HOLE_OUT);
         if (hole && ms >= tiltAt)
-          drawHole(
+          drawFlightHole(
             ctx,
             view,
             floors,
@@ -351,25 +290,18 @@ function startFreefall(floor: Floor, context: EventProcContext): void {
       },
     },
     ownLanding: true,
-    draw: (ctx, view, ms, now, floors) => {
+    draw: (ctx, view, ms, now, floors) =>
       // dropping ever faster onto the hole and through it, the floors at its
       // bottom filling the view right as it lands
-      const u = clamp01(ms / landMs);
-      const height = Math.max(
-        0.001,
-        (HOLE_DEPTH + EYE - LEAP_DROP) * (1 - (u + u * u) / 2),
-      );
-      drawHole(
+      drawHoleFall(
         ctx,
         view,
         floors,
-        view.cy,
-        (HOLE_SIZE * view.w * FOCAL) / height,
-        height,
-        1,
+        ms,
+        landMs,
+        HOLE_DEPTH + EYE - LEAP_DROP,
         now,
-      );
-    },
+      ),
     onEnd: () => {
       context.applyTierCrit?.(floor, nextCritTier(tier));
       endEventProc(KEY);
