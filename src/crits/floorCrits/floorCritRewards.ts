@@ -1667,9 +1667,13 @@ function floorCritLevels(
   if (kind === "ricochetLaserCrit") return step ? 0 : count;
   // a bunker buster's eruption lands them, not its impact and thuds
   if (kind === "bunkerBusterCrit") return step ? count : 0;
-  // a portal falls through each bar three times, and a missile defense's
-  // debris lands three bits a meteor
-  if (kind === "portalCrit" || kind === "missileDefenseCrit")
+  // a portal falls through each bar three times, a missile defense's debris
+  // lands three bits a meteor, and a gunship's burst hits each bar thrice
+  if (
+    kind === "portalCrit" ||
+    kind === "missileDefenseCrit" ||
+    kind === "gunshipCrit"
+  )
     return Math.ceil(count / 3);
   // an artillery barrage lands three shells a bar, then its salvo
   if (kind === "artilleryBarrageCrit") return Math.ceil(count / 4);

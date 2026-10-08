@@ -206,5 +206,10 @@ export const FLOOR_CRIT_CONFIG = {
     liftoffCrit: {
       chance: 0.03,
     },
+    // a gunship circling over the building, raking each bar with tracers,
+    // then one cannon round onto its own
+    gunshipCrit: {
+      chance: 0.03,
+    },
   },
 } as const;

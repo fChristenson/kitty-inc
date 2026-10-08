@@ -230,6 +230,15 @@ Events must run smoothly on phones, so draw them with the shared libs below. Don
 
 **Icon files.** `public/crits/<category>/<kind>.webp` (pixel area about 640×640, so narrow art gets taller; smaller cuts are upscaled), plus `public/stickers/…webp` and `public/silhouettes/…png`.
 
+## Idea lists
+
+New ideas go in `docs/ideas.md` as a `## List N` section. Which kind decides how they're pitched:
+
+- **Animated ideas** (floor crits, events, anything whose look is the point): ALWAYS pitched with the playground, in the same turn as the text. Each idea gets one `IDEAS.push({ list: "nextK", name, about, ms, shakes, draw })` block in `tmp/_playground/ideas.ts`, drawn with the game's libs; the list's heading in `docs/ideas.md` links `tmp/_playground/ideas.html?list=nextK`. Never pitch an animation as text only.
+- **Everything else** (game features, systems, economy, collection): text only in `docs/ideas.md`. Build nothing, playground included, until the user picks one.
+
+Rejected ideas are removed from `docs/ideas.md`; their playground cells stay unless the user asks. An idea the user calls good gets built.
+
 ## Artwork prompts
 
 Template, with a subject of at most 184 characters so the whole prompt is at most 480:

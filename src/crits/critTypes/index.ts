@@ -2108,6 +2108,7 @@ export const FLOOR_CRIT_KINDS = [
   "saberCrit",
   "snapCrit",
   "liftoffCrit",
+  "gunshipCrit",
 ] as const satisfies readonly FloorCritType[];
 export type FloorCritKind = (typeof FLOOR_CRIT_KINDS)[number];
 

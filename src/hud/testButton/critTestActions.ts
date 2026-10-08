@@ -1319,6 +1319,7 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-floor-crit="saberCrit">Saber Crit</button>
           <button class="game__button" data-floor-crit="snapCrit">Snap Crit</button>
           <button class="game__button" data-floor-crit="liftoffCrit">Liftoff Crit</button>
+          <button class="game__button" data-floor-crit="gunshipCrit">Gunship Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
