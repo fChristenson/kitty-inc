@@ -39,6 +39,10 @@
 - **Quake crit:** the number slams into the ground, and a quake ripples up the building, every bar in view leaping off its floor and crashing back down in turn.
 - **Railgun crit:** the number rises over the building and charges, glitter streaming into it from all round faster and faster, then fires one blinding shot straight down through every bar in view at once, recoiling up off the screen.
 - **Buzzsaw crit:** the number spins into a whirling saw blade that drops onto the top bar and rips along it end to end in a fountain of sparks, then hops onto the next bar down and rips through that, all the way down.
+- **Tractor beam crit:** the number rises into a wisp hovering over the roof, which turns on a wide beam that hauls every bar in view up off its floor, holds them there shaking, then cuts out so they all crash back down at once.
+- **Orbital strike crit:** the number shoots up off the top of the screen, glowing aim rings lock onto the bars in view one by one, then pillars of light slam down from the sky onto each in turn, the last onto its own bar the biggest.
+- **Nuke crit:** the number turns into a bomb that drops slowly down past the bars, blinking faster and faster, hits the ground in a blinding white flash and a mushroom cloud of glitter, and the shockwave blasts up through every bar in view.
+- **Ricochet laser crit:** the number floats to the edge and fires a laser that bounces off the top bar, then the next one down, zigzagging down the building, every bounce flaring, then the whole zigzag of light burns brighter and blows up at every bounce.
 
 ## Game ideas
 
@@ -78,3 +82,11 @@ Floor crits in the vein of Laser, Drill, Quake, Fireworks and Shatter. Playgroun
 - **Gatling crit:** the number spins up at the edge of the screen like a gatling and strafes the bars in view with a roaring stream of wisp bullets, raking up and down the building, every bar rattling under the hits, then fires one huge round into its own bar.
 - **Whip crit:** the number unspools into a long whip of glitter that winds back and lashes out, its tip cracking against a bar with a flash and a bang, again and again across the bars in view, the last crack on its own bar the loudest.
 - **Battering ram crit:** the number charges in off the edge of the screen like a battering ram and smashes into the end of each bar in view, shoving it in, then backs off and rams its own bar three times, harder each time, until it bursts.
+
+## List three
+
+More floor crits after Railgun and Buzzsaw. Playground: `tmp/_playground/ideas.html?list=next2`.
+
+- **Hydraulic press crit:** the number swells into a huge flat press that crushes down onto the top bar, squashing it flat as it strains against it, until the bar bursts and the press drives on down onto the next, crushing every bar in view.
+- **Radar crit:** the number turns into a radar dish and a beam sweeps round it like a radar arm, every bar in view pinging as it passes and keeping a glowing blip, the arm spins round again faster, then every blip blows up at once.
+- **Laser grid crit:** the number flies into the corner and a blazing beam sweeps the whole screen top to bottom, then another side to side, every bar flaring where they cross it, then four beams snap into a frame round its own bar and blast it.

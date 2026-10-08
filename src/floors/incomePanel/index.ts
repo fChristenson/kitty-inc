@@ -198,23 +198,37 @@ export function punchIncomeBar(
   } else barPunches.set(floor, { hitAt: now, label, labelAt: now, color });
 }
 
-// a quake crit's bar leaping off its floor and crashing back down
-const barLifts = new WeakMap<Floor, { at: number; ms: number }>();
+// a quake crit's bar leaping off its floor and crashing back down, or a
+// tractor beam's hauling it up, holding it there shaking and dropping it
+const barLifts = new WeakMap<
+  Floor,
+  { at: number; ms: number; haul: boolean }
+>();
 const LIFT_H = BAR_H * 2.4;
+// a haul's rise and shaking hold, of its time; the rest is its drop
+const HAUL_RISE = 0.68;
+const HAUL_HOLD = 0.91;
+const HAUL_SHAKE = 0.04;
 
-export function liftIncomeBar(floor: Floor, ms: number): void {
-  barLifts.set(floor, { at: Date.now(), ms });
+export function liftIncomeBar(floor: Floor, ms: number, haul = false): void {
+  barLifts.set(floor, { at: Date.now(), ms, haul });
 }
 
 function liftOf(floor: Floor, now: number): number {
   const lift = barLifts.get(floor);
   if (!lift) return 0;
-  const u = (now - lift.at) / lift.ms;
+  const u = Math.max(0, (now - lift.at) / lift.ms);
   if (u >= 1) {
     barLifts.delete(floor);
     return 0;
   }
-  return LIFT_H * Math.sin(Math.PI * Math.max(0, u));
+  if (!lift.haul) return LIFT_H * Math.sin(Math.PI * u);
+  if (u < HAUL_RISE) {
+    const p = u / HAUL_RISE;
+    return LIFT_H * p * p * (3 - 2 * p);
+  }
+  if (u < HAUL_HOLD) return LIFT_H * (1 + HAUL_SHAKE * Math.sin(now * 0.35));
+  return LIFT_H * (1 - ((u - HAUL_HOLD) / (1 - HAUL_HOLD)) ** 2);
 }
 
 function punchSince(floor: Floor, now: number) {

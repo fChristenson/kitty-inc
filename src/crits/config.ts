@@ -185,6 +185,21 @@ export const CRIT_CONFIG = {
     buzzsawCrit: {
       chance: 0.03,
     },
+    // a tractor beam hauling every bar up and dropping them; pillars of
+    // light striking each bar from orbit; a nuke's shockwave blasting up
+    // through them; or a laser ricocheting from bar to bar down the building
+    tractorBeamCrit: {
+      chance: 0.03,
+    },
+    orbitalStrikeCrit: {
+      chance: 0.03,
+    },
+    nukeCrit: {
+      chance: 0.03,
+    },
+    ricochetLaserCrit: {
+      chance: 0.03,
+    },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
     badgeShimmer: {

@@ -22,8 +22,9 @@ export interface FlashMoment {
   // a hit on bars()[bar] by a number of `color`; step is a snowball's
   // growth so far
   onHit: (bar: number, step: number, color: string) => void;
-  // bars()[bar] leaping off its floor for ms, landing back down
-  onLift?: (bar: number, ms: number) => void;
+  // bars()[bar] leaping off its floor for ms, landing back down (or hauled
+  // up, held and dropped)
+  onLift?: (bar: number, ms: number, haul: boolean) => void;
 }
 
 // the flash's own baked "x0123456789" glyphs (see critFlash's SpinGlyphs)
@@ -46,6 +47,7 @@ export interface PlannedLift {
   bar: number;
   at: number;
   ms: number;
+  haul: boolean;
 }
 
 export interface Running {
@@ -198,7 +200,7 @@ export interface FloorCritDef {
     r: Running,
     bars: Point[],
     hit: (bar: number, at: number, step?: number) => void,
-    lift: (bar: number, at: number, ms: number) => void,
+    lift: (bar: number, at: number, ms: number, haul?: boolean) => void,
   ): void;
   draw: Draw;
   // how long it keeps drawing after its last hit
@@ -245,6 +247,10 @@ const LOADERS: Record<CritMoment, () => Promise<unknown>> = {
   shatterCrit: () => import("../crits/shatterCrit"),
   railgunCrit: () => import("../crits/railgunCrit"),
   buzzsawCrit: () => import("../crits/buzzsawCrit"),
+  tractorBeamCrit: () => import("../crits/tractorBeamCrit"),
+  orbitalStrikeCrit: () => import("../crits/orbitalStrikeCrit"),
+  nukeCrit: () => import("../crits/nukeCrit"),
+  ricochetLaserCrit: () => import("../crits/ricochetLaserCrit"),
 };
 const loading = new Map<CritMoment, Promise<unknown>>();
 
@@ -291,7 +297,7 @@ function plan(r: Running, bars: Point[], def: FloorCritDef): void {
     r,
     bars,
     (bar, at, step = 0) => r.hits.push({ bar, at, step }),
-    (bar, at, ms) => r.lifts.push({ bar, at, ms }),
+    (bar, at, ms, haul = false) => r.lifts.push({ bar, at, ms, haul }),
   );
   r.hits.sort((a, b) => a.at - b.at);
   r.lifts.sort((a, b) => a.at - b.at);
@@ -381,7 +387,7 @@ export function drawMoment(
   r.lastBars = bars;
   while (r.lifted < r.lifts.length && r.lifts[r.lifted].at <= ms) {
     const lift = r.lifts[r.lifted++];
-    r.moment.onLift?.(lift.bar, lift.ms);
+    r.moment.onLift?.(lift.bar, lift.ms, lift.haul);
   }
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];

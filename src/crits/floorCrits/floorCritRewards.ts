@@ -1661,6 +1661,8 @@ function momentLevels(
   if (moment === "volcanoCrit") return Math.ceil(count / 3);
   // a shatter's shards land their levels as they detonate, not as they embed
   if (moment === "shatterCrit") return step ? Math.ceil(count / 3) : 0;
+  // a ricochet laser's bounces land them, not its blow-up
+  if (moment === "ricochetLaserCrit") return step ? 0 : count;
   if (
     moment === "rainCrit" ||
     moment === "meteorShowerCrit" ||
@@ -1706,7 +1708,7 @@ function critMomentFor(
         return { x: bar.x - center.x, y: top - ownTop + bar.y - center.y };
       });
     },
-    onLift: (bar, ms) => liftIncomeBar(targets[bar], ms),
+    onLift: (bar, ms, haul) => liftIncomeBar(targets[bar], ms, haul),
     onHit: (bar, step, color) => {
       const target = targets[bar];
       // a snowball bangs a step higher with every bar
