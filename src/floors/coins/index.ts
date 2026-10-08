@@ -348,15 +348,17 @@ function advanceCoin(p: Particle, dt: number): void {
 // loop, calling onFrame after each physics step. scale (1 = normal) uniformly
 // scales the spawn-point offset, velocity, size, and gravity together, same
 // convention as coinBurst.ts's own spawnCoinBurstAt — a bigger scale reads as a
-// uniformly bigger burst, not just bigger sprites moving at normal speed
+// uniformly bigger burst, not just bigger sprites moving at normal speed. coins
+// sets how many it throws, without the held button's beat swelling them
 export function spawnCoinBurst(
   floor: Floor,
   x: number,
   y: number,
   onFrame: () => void,
   scale = 1,
+  coins?: [number, number],
 ): void {
-  spawnBurstParticles(floor, x, y, scale, null);
+  spawnBurstParticles(floor, x, y, scale, null, coins);
   pool.ensureTicking((dt) => {
     pool.update(dt, advanceCoin, recycleCoin);
     onFrame();
@@ -467,16 +469,16 @@ function spawnBurstParticles(
   y: number,
   scale: number,
   freezeGroup: HomingGroup | null,
+  coins?: [number, number],
 ): void {
-  if (freezeGroup) {
+  if (freezeGroup || coins) {
     pressure = 1;
     weight = 0;
     plume = false;
   } else burstPressure(performance.now());
-  const count = burstCount(
-    Math.round(40 * pressure),
-    Math.round(85 * pressure),
-  );
+  const count = coins
+    ? burstCount(...coins)
+    : burstCount(Math.round(40 * pressure), Math.round(85 * pressure));
   for (let i = 0; i < count; i++) {
     const jet = plume && Math.random() < PLUME_SHARE;
     const w = jet ? 0 : weight;

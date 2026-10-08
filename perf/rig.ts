@@ -108,6 +108,8 @@ async function boot(): Promise<void> {
     CRIT_MODES,
     eventIds,
     eventScenario,
+    floorCritKinds,
+    floorCritScenario,
     parseRunName,
     prepareRun,
   } = await import("./scenarios");
@@ -118,7 +120,11 @@ async function boot(): Promise<void> {
 
   const find = (name: string) =>
     SCENARIOS.find((s) => s.name === name) ??
-    (name.startsWith("event:") ? eventScenario(name.slice(6)) : null);
+    (name.startsWith("event:")
+      ? eventScenario(name.slice(6))
+      : name.startsWith("floor-crit:")
+        ? floorCritScenario(name.slice(11))
+        : null);
   // "events" and "events-all" stand for a sample of events, or every one,
   // keeping any @mode
   const expand = (names: string[]) =>
@@ -132,6 +138,8 @@ async function boot(): Promise<void> {
         );
       if (base === "events-all")
         return [...known].map((id) => `event:${id}${suffix}`);
+      if (base === "floor-crits")
+        return floorCritKinds().map((kind) => `floor-crit:${kind}${suffix}`);
       if (base === "late")
         return LATE_SCENARIOS.map((id) =>
           id === "startup" ? id : `${id}${suffix}`,
@@ -198,6 +206,7 @@ async function boot(): Promise<void> {
       ...SCENARIOS,
       { name: "events", about: "a sample of events across the templates" },
       { name: "events-all", about: "every event with a test button (slow)" },
+      { name: "floor-crits", about: "every floor crit, one run each" },
       {
         name: "late",
         about: "what grows with the company; open with ?late=1 for a big save",

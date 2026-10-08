@@ -1631,6 +1631,9 @@ export function applyFloorCrit(
 // the levels a crit moment's hit lands on a bar: its own floor already has
 // the crit's, so only a snowball's growth adds to it
 const COIN_SPILL_SCALE = 0.7;
+// a floor crit lands dozens of hits in a second or two: full bursts on each
+// filled the coin pool and swelled like a held button
+const COIN_SPILL: [number, number] = [14, 24];
 // full payouts a moment's hit pays its bar on top of its levels
 const MOMENT_PAYOUT: Partial<Record<CritMoment, number>> = {
   lightningCrit: 2,
@@ -1731,6 +1734,7 @@ function critMomentFor(
         box.y + box.height / 2,
         () => {},
         COIN_SPILL_SCALE,
+        COIN_SPILL,
       );
     },
   };
@@ -1761,4 +1765,3 @@ function grantFollowUpProc(
   recordCritProcLanded(kind);
   revealFoilOf(context.deps, context.floor, kind, context.isGroundFloor);
 }
-

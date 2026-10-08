@@ -441,6 +441,30 @@ export function eventIds(): string[] {
   ].map((button) => button.id.slice(5, -6));
 }
 
+// one floor crit: armed on the ground floor from its test button, then tapped
+export function floorCritScenario(kind: string): Scenario {
+  const name = `floor-crit:${kind}`;
+  return {
+    name,
+    about: `the ${kind} floor crit, start to finish`,
+    run: async (bridge) => {
+      click("#add-money");
+      bridge.scrollToFloor(ground(bridge), 0.6);
+      click(`[data-crit-moment="${kind}"]`);
+      await sleep(300);
+      tap(bridge, ground(bridge));
+      return measure(name, 4000);
+    },
+  };
+}
+
+// every floor crit with a test button
+export function floorCritKinds(): string[] {
+  return [
+    ...document.querySelectorAll<HTMLButtonElement>("[data-crit-moment]"),
+  ].map((button) => button.dataset.critMoment!);
+}
+
 // a spread across the event templates
 export const SAMPLE_EVENTS = [
   "clutter",
