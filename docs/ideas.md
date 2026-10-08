@@ -23,11 +23,18 @@
 
 ## Crit moments
 
-- **Magnet crit:** the number hangs in the middle and every bar in view is yanked in to slam against it, then snaps back to its floor with its levels.
-- **Split crit:** the number splits down the middle into two copies that fly to the bars above and below, each splitting again until every bar in view has one.
-- **Spinning top crit:** the number spins like a top and skids down across the bars, grinding sparks off each one as its levels go in.
-- **Comet crit:** the number streaks across the sky trailing a long tail of glitter, curves round and dives into its bar, the tail raining onto the bars it passed.
+Playground: `tmp/_playground/newCritIdeas.html`.
+
+- **Shockwave crit:** the number slams into its bar and a shockwave rolls up and down the building, every bar bouncing as it passes.
+- **Orbit crit:** copies circle the number like moons, spinning ever faster, then fling off one by one onto the bars.
+- **Train crit:** the number pulls a train of copies down a zigzag track along the bars, top to bottom.
+- **Yo-yo crit:** the number drops on a glowing string to each bar in turn and snaps back up, deeper every time.
+- **Cannon crit:** the number turns into a cannon at the building's side and fires a copy at every bar, recoiling with each shot.
+- **Pendulum crit:** the number swings on a lengthening chain, smashing through a lower bar at the bottom of every swing.
+- **Bubble crit:** the number is blown into bubbles that wobble down onto the bars and pop.
+- **Ping-pong crit:** the number is volleyed between two glowing paddles at the screen's edges, a floor lower each volley.
 
 ## Feel
 
-- **Number shadows:** flying crit numbers cast a soft shadow on the building that shrinks as they come down, so you can see where they'll land.
+- **Level odometer:** a bar's Lvl number rolls up like an odometer as its levels land.
+- **Coin spill:** every hit knocks a few coins off the bar that tumble down the building.
