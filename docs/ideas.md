@@ -29,10 +29,12 @@
 - **Volcano crit:** the number dives into a vent under the building, which erupts, flinging glowing blobs in high arcs down onto the bars in view, then erupts again, bigger.
 - **Supernova crit:** the number collapses into a star that swells up, pulsing faster and faster, then goes supernova, its shards slamming into every bar in view.
 - **Galaxy crit:** the number collapses into a sun with a galaxy of stars swirling round it in spiral arms, spinning faster and faster, then the sun goes supernova and flings the stars off their orbits, comets slamming into every bar in view.
+- **Binary star crit:** the number splits into two suns that circle each other, closer and faster, trailing spirals, until they collide in a huge blast that flings glowing blobs onto every bar in view.
 
 ## Game ideas
 
 Playground: `tmp/_playground/newGameIdeas.html`.
 
-- **Cluster bomb:** a lit bomb drops into the middle of the building, its fuse fizzing faster, then bursts into a bomblet for every bar; they land fizzing and go off in a chain, top to bottom.
-- **Gold geyser:** the ground floor's bar bursts and a geyser of coins blasts straight up through the building and out of the roof, every bar it shoots through paying, coins raining back down.
+- **Plasma ball:** a crackling plasma ball swells in the middle of the building, white tendrils lashing out of it one by one and latching onto each bar with a blast, until it bursts.
+- **Asteroid ring:** a ring of rocks circles the building like Saturn's, faster and faster, then they break off one by one and slam into the bars in a rattle of blasts.
+- **Wormhole:** a wisp dives into a wormhole in the sky and shoots out of a portal beside the top bar, streaking through it into another portal and out beside the next bar down, faster and paying more each time.
