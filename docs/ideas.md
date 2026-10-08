@@ -43,6 +43,12 @@
 - **Orbital strike crit:** the number shoots up off the top of the screen, glowing aim rings lock onto the bars in view one by one, then pillars of light slam down from the sky onto each in turn, the last onto its own bar the biggest.
 - **Nuke crit:** the number turns into a bomb that drops slowly down past the bars, blinking faster and faster, hits the ground in a blinding white flash and a mushroom cloud of glitter, and the shockwave blasts up through every bar in view.
 - **Ricochet laser crit:** the number floats to the edge and fires a laser that bounces off the top bar, then the next one down, zigzagging down the building, every bounce flaring, then the whole zigzag of light burns brighter and blows up at every bounce.
+- **Plasma ball crit:** the number swells into a crackling ball of plasma with glitter whirling round it, then drifts slowly down through the bars in view, arcs crackling out into each bar as it nears and blasting it as it passes through, until it bursts on the ground.
+- **Portal crit:** a glowing portal opens over the top bar and another under the bottom one; the number dives into the top one and falls through every bar in view, comes out of the top again and falls faster, and again, then both portals implode.
+- **Bunker buster crit:** the number slams down like a heavy bomb into the top bar and burrows on down through every bar in view, each one thudding as it goes through, goes quiet under the ground, then erupts in a blast that tears back up through every bar.
+- **Airstrike crit:** the number shoots off the edge of the screen and a jet screams back across the top, dropping a string of blinking bombs that arc down onto the bars in view, blast after blast, its sonic boom shaking the whole building.
+- **Hyperspace crit:** stars streak out of the middle of the screen faster and faster as the number jumps to lightspeed and vanishes into a point, then it drops out of hyperspace in a white flash, copies streaking out onto every bar in view, its own last and hardest.
+- **Missile swarm crit:** the number fires a fan of missiles off in a rattle of launch flashes; they climb, curl over in long loops trailing sparks and dive onto the bars in view one after another in a rolling string of blasts.
 
 ## Game ideas
 
@@ -90,3 +96,7 @@ More floor crits after Railgun and Buzzsaw. Playground: `tmp/_playground/ideas.h
 - **Hydraulic press crit:** the number swells into a huge flat press that crushes down onto the top bar, squashing it flat as it strains against it, until the bar bursts and the press drives on down onto the next, crushing every bar in view.
 - **Radar crit:** the number turns into a radar dish and a beam sweeps round it like a radar arm, every bar in view pinging as it passes and keeping a glowing blip, the arm spins round again faster, then every blip blows up at once.
 - **Laser grid crit:** the number flies into the corner and a blazing beam sweeps the whole screen top to bottom, then another side to side, every bar flaring where they cross it, then four beams snap into a frame round its own bar and blast it.
+
+## List four
+
+Sci-fi weapons and big blasts, after Tractor beam, Orbital strike, Nuke and Ricochet laser, all six built (see Built). Playground: `tmp/_playground/ideas.html?list=next3`.

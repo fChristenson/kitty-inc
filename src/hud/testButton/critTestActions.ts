@@ -1261,6 +1261,11 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-crit-stack="up">Crit Up</button>
           <button class="game__button" data-crit-stack="down">Crit Down</button>
           <button id="test-merge-crit" class="game__button">Merge Crit</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Floor Crits</summary>
+        <div class="test-actions-dropdown__menu">
           <button class="game__button" data-crit-moment="rapidFireCrit">Rapid Fire Crit</button>
           <button class="game__button" data-crit-moment="pinballCrit">Pinball Crit</button>
           <button class="game__button" data-crit-moment="snowballCrit">Snowball Crit</button>
@@ -1295,6 +1300,12 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-crit-moment="orbitalStrikeCrit">Orbital Strike Crit</button>
           <button class="game__button" data-crit-moment="nukeCrit">Nuke Crit</button>
           <button class="game__button" data-crit-moment="ricochetLaserCrit">Ricochet Laser Crit</button>
+          <button class="game__button" data-crit-moment="plasmaBallCrit">Plasma Ball Crit</button>
+          <button class="game__button" data-crit-moment="portalCrit">Portal Crit</button>
+          <button class="game__button" data-crit-moment="bunkerBusterCrit">Bunker Buster Crit</button>
+          <button class="game__button" data-crit-moment="airstrikeCrit">Airstrike Crit</button>
+          <button class="game__button" data-crit-moment="hyperspaceCrit">Hyperspace Crit</button>
+          <button class="game__button" data-crit-moment="missileSwarmCrit">Missile Swarm Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

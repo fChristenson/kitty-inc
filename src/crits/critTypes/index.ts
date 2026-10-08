@@ -2090,6 +2090,12 @@ export const CRIT_MOMENTS = [
   "orbitalStrikeCrit",
   "nukeCrit",
   "ricochetLaserCrit",
+  "plasmaBallCrit",
+  "portalCrit",
+  "bunkerBusterCrit",
+  "airstrikeCrit",
+  "hyperspaceCrit",
+  "missileSwarmCrit",
 ] as const satisfies readonly SpecialCritType[];
 export type CritMoment = (typeof CRIT_MOMENTS)[number];
 

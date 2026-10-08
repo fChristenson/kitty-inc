@@ -1,7 +1,17 @@
 // helpers more than one floor crit kind plays with
-import type { Point } from ".";
+import type { Point, Running } from ".";
 
 export const BURST_MS = 100;
+
+// a bar's half height, in the flash's units
+export const BAR_HALF_H = 46;
+
+// a height `above` over the top bar in view, kept below the HUD, and one
+// `below` under the lowest, kept on screen
+export const skyY = (r: Running, bars: Point[], above: number) =>
+  Math.max(Math.min(...bars.map((b) => b.y)) - above, -r.viewportWidth * 0.55);
+export const groundY = (r: Running, bars: Point[], below: number) =>
+  Math.min(Math.max(...bars.map((b) => b.y)) + below, r.viewportWidth * 0.9);
 
 // a meteor shower's meteor or a volcano's blob: a curve from a, pulled
 // towards c, onto b, at p 0..1

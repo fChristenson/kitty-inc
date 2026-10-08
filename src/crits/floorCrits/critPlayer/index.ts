@@ -251,6 +251,12 @@ const LOADERS: Record<CritMoment, () => Promise<unknown>> = {
   orbitalStrikeCrit: () => import("../crits/orbitalStrikeCrit"),
   nukeCrit: () => import("../crits/nukeCrit"),
   ricochetLaserCrit: () => import("../crits/ricochetLaserCrit"),
+  plasmaBallCrit: () => import("../crits/plasmaBallCrit"),
+  portalCrit: () => import("../crits/portalCrit"),
+  bunkerBusterCrit: () => import("../crits/bunkerBusterCrit"),
+  airstrikeCrit: () => import("../crits/airstrikeCrit"),
+  hyperspaceCrit: () => import("../crits/hyperspaceCrit"),
+  missileSwarmCrit: () => import("../crits/missileSwarmCrit"),
 };
 const loading = new Map<CritMoment, Promise<unknown>>();
 

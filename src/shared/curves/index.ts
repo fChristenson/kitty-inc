@@ -47,3 +47,20 @@ export function bezier(
   into.y = v * v * a.y + 2 * u * v * c.y + u * u * b.y;
   return into;
 }
+
+// the point u 0..1 along the cubic bezier from a, pulled toward b then c, to d
+export function cubic(
+  a: Point,
+  b: Point,
+  c: Point,
+  d: Point,
+  u: number,
+  into: Point,
+): Point {
+  const v = 1 - u;
+  into.x =
+    v * v * v * a.x + 3 * v * v * u * b.x + 3 * v * u * u * c.x + u ** 3 * d.x;
+  into.y =
+    v * v * v * a.y + 3 * v * v * u * b.y + 3 * v * u * u * c.y + u ** 3 * d.y;
+  return into;
+}

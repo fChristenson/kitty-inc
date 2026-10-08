@@ -1663,6 +1663,12 @@ function momentLevels(
   if (moment === "shatterCrit") return step ? Math.ceil(count / 3) : 0;
   // a ricochet laser's bounces land them, not its blow-up
   if (moment === "ricochetLaserCrit") return step ? 0 : count;
+  // a bunker buster's eruption lands them, not its impact and thuds
+  if (moment === "bunkerBusterCrit") return step ? count : 0;
+  // a portal falls through each bar three times
+  if (moment === "portalCrit") return Math.ceil(count / 3);
+  if (moment === "airstrikeCrit" || moment === "missileSwarmCrit")
+    return Math.ceil(count / 2);
   if (
     moment === "rainCrit" ||
     moment === "meteorShowerCrit" ||

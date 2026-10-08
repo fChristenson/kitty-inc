@@ -200,6 +200,28 @@ export const CRIT_CONFIG = {
     ricochetLaserCrit: {
       chance: 0.03,
     },
+    // a plasma ball drifting down through the bars; portals dropping it
+    // through them again and again; a bunker buster burrowing down and
+    // erupting back up; an airstrike's bombs; a hyperspace jump dropping out
+    // onto them; or a swarm of missiles diving onto them
+    plasmaBallCrit: {
+      chance: 0.03,
+    },
+    portalCrit: {
+      chance: 0.03,
+    },
+    bunkerBusterCrit: {
+      chance: 0.03,
+    },
+    airstrikeCrit: {
+      chance: 0.03,
+    },
+    hyperspaceCrit: {
+      chance: 0.03,
+    },
+    missileSwarmCrit: {
+      chance: 0.03,
+    },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
     badgeShimmer: {
