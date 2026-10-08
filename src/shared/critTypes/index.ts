@@ -2052,6 +2052,10 @@ export const CRIT_MOMENTS = [
   "juggleCrit",
   "stompCrit",
   "rainCrit",
+  "stampCrit",
+  "zipCrit",
+  "catapultCrit",
+  "tornadoCrit",
 ] as const satisfies readonly SpecialCritType[];
 export type CritMoment = (typeof CRIT_MOMENTS)[number];
 

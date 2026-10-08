@@ -1,9 +1,12 @@
 // crit moments: once a crit's flash has slammed in and sat, its number plays
 // out onto the income bars in view (see shared/critTypes' CritMoment): fired
 // at its bar character by character, pinballing between bars, snowballing
-// down them, juggled onto them, stomped onto all of them or rained onto them.
+// down them, juggled onto them, stomped onto all of them, rained onto them,
+// stamped onto each, zipped across each, crashed down through them from a
+// catapult or flung onto them by a tornado.
 // Every hit calls back so the floors can jolt and land their levels
 import type { CritMoment } from "../shared/critTypes";
+import { drawGlow, fadeStops, type FadeStops } from "../shared/glowSprite";
 
 interface Point {
   x: number;
@@ -16,8 +19,9 @@ export interface FlashMoment {
   // floor's first; read every frame so a scroll carries them along
   bars: () => Point[];
   barHalfWidth: number;
-  // a hit on bars()[bar]; step is a snowball's growth so far
-  onHit: (bar: number, step: number) => void;
+  // a hit on bars()[bar] by a number of `color`; step is a snowball's
+  // growth so far
+  onHit: (bar: number, step: number, color: string) => void;
 }
 
 // the flash's own baked "x0123456789" glyphs (see index.ts's SpinGlyphs)
@@ -27,6 +31,7 @@ export interface MomentGlyphs {
   pad: number;
   font: number;
   index: (char: string) => number;
+  color: string;
 }
 
 interface PlannedHit {
@@ -50,6 +55,8 @@ interface Running {
   endsAt: number;
   // where each bar was last seen, if one scrolls out of bars()
   lastBars: Point[];
+  // a catapult's fall or a tornado's sweep: from this height to that one
+  span: { from: number; to: number };
   shake: (intensity: number) => void;
 }
 
@@ -87,6 +94,31 @@ const DROPS = 30;
 const DROP_FONT = 110;
 const DROP_SHAKE = 0.12;
 const BURST_MS = 100;
+
+const STAMP_FIRST_MS = 120;
+const STAMP_EACH_MS = 150;
+const STAMP_LIFT = 140;
+const STAMP_PRINT_MS = 900;
+const STAMP_FONT = 160;
+
+const ZIP_FIRST_MS = 150;
+const ZIP_PASS_MS = 170;
+const ZIP_DROP_MS = 60;
+const ZIP_FONT = 150;
+const ZIP_STITCH_MS = 900;
+
+const CATAPULT_UP_MS = 250;
+const CATAPULT_AWAY_MS = 150;
+const CATAPULT_FALL_MS = 350;
+const CATAPULT_LAND_MS = 250;
+const CATAPULT_FONT = 260;
+const CATAPULT_SHAKE = 1.4;
+
+const TORNADO_FORM_MS = 300;
+const TORNADO_DOWN_MS = 700;
+const TORNADO_FLING_MS = 220;
+const TORNADO_COPIES = 12;
+const TORNADO_FONT = 90;
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
@@ -163,12 +195,72 @@ function plan(r: Running, bars: Point[]): void {
         hit(d.bar, d.delay + d.duration);
       }
       break;
+    case "stampCrit":
+      byHeight(bars).forEach((bar, i) =>
+        hit(bar, STAMP_FIRST_MS + i * STAMP_EACH_MS),
+      );
+      break;
+    case "zipCrit":
+      byHeight(bars).forEach((bar, i) =>
+        hit(bar, ZIP_FIRST_MS + i * (ZIP_PASS_MS + ZIP_DROP_MS) + ZIP_PASS_MS),
+      );
+      break;
+    case "catapultCrit": {
+      // flung off the top of the screen, crashing down past the lowest bar
+      const lowest = Math.max(...bars.map((b) => b.y));
+      r.span = {
+        from: -r.viewportWidth * 1.2,
+        to: lowest + r.viewportWidth * 0.3,
+      };
+      bars.forEach((b, bar) => hit(bar, catapultHitAt(r, b.y)));
+      break;
+    }
+    case "tornadoCrit": {
+      const ys = bars.map((b) => b.y);
+      r.span = { from: Math.min(0, Math.min(...ys)), to: Math.max(...ys) };
+      bars.forEach((b, bar) =>
+        hit(bar, tornadoPassesAt(r, b.y) + TORNADO_FLING_MS),
+      );
+      break;
+    }
   }
   r.hits.sort((a, b) => a.at - b.at);
   r.endsAt =
-    Math.max(...r.hits.map((h) => h.at)) +
-    (r.moment.kind === "stompCrit" ? STOMP_SETTLE_MS : 0);
+    Math.max(...r.hits.map((h) => h.at)) + (TAIL_MS[r.moment.kind] ?? 0);
 }
+
+// how long a moment keeps drawing after its last hit
+const TAIL_MS: Partial<Record<CritMoment, number>> = {
+  stompCrit: STOMP_SETTLE_MS,
+  stampCrit: STAMP_PRINT_MS,
+  zipCrit: ZIP_STITCH_MS,
+  catapultCrit: CATAPULT_LAND_MS,
+};
+
+const catapultY = (r: Running, ms: number) => {
+  const p = clamp01(
+    (ms - CATAPULT_UP_MS - CATAPULT_AWAY_MS) / CATAPULT_FALL_MS,
+  );
+  return lerp(r.span.from, r.span.to, p * p);
+};
+
+const catapultHitAt = (r: Running, y: number) =>
+  CATAPULT_UP_MS +
+  CATAPULT_AWAY_MS +
+  Math.sqrt(clamp01((y - r.span.from) / (r.span.to - r.span.from))) *
+    CATAPULT_FALL_MS;
+
+const tornadoY = (r: Running, ms: number) =>
+  lerp(
+    r.span.from,
+    r.span.to,
+    clamp01((ms - TORNADO_FORM_MS) / TORNADO_DOWN_MS),
+  );
+
+const tornadoPassesAt = (r: Running, y: number) =>
+  TORNADO_FORM_MS +
+  clamp01((y - r.span.from) / Math.max(1, r.span.to - r.span.from)) *
+    TORNADO_DOWN_MS;
 
 export function launchMoment(
   moment: FlashMoment,
@@ -205,6 +297,7 @@ export function launchMoment(
     fired: 0,
     endsAt: 0,
     lastBars: bars,
+    span: { from: 0, to: 0 },
     shake,
   };
   plan(running, bars);
@@ -276,11 +369,13 @@ export function drawMoment(
     r.shake(
       kind === "stompCrit"
         ? STOMP_SHAKE
-        : kind === "rainCrit"
-          ? DROP_SHAKE
-          : HIT_SHAKE,
+        : kind === "catapultCrit"
+          ? CATAPULT_SHAKE
+          : kind === "rainCrit"
+            ? DROP_SHAKE
+            : HIT_SHAKE,
     );
-    r.moment.onHit(bar, step);
+    r.moment.onHit(bar, step, r.glyphs.color);
   }
   if (ms >= r.endsAt) {
     running = null;
@@ -476,4 +571,243 @@ const DRAW: Record<CritMoment, Draw> = {
       );
     }
   },
+
+  stampCrit(ctx, r, ms, bars) {
+    const order = byHeight(bars);
+    const hitAt = (i: number) => STAMP_FIRST_MS + i * STAMP_EACH_MS;
+    // the glowing prints it leaves on the bars it has hit
+    order.forEach((bar, i) => {
+      const since = ms - hitAt(i);
+      if (since < 0 || since >= STAMP_PRINT_MS) return;
+      const k = 1 - since / STAMP_PRINT_MS;
+      const at = bars[bar];
+      ctx.save();
+      ctx.globalAlpha = 0.6 * k;
+      drawGlow(
+        ctx,
+        glowStops(r.glyphs.color),
+        at.x,
+        at.y,
+        r.moment.barHalfWidth * 0.7,
+        0.4,
+      );
+      ctx.restore();
+      drawText(ctx, r.glyphs, r.label, at.x, at.y, STAMP_FONT * 0.8, {
+        alpha: 0.85 * k,
+      });
+    });
+    // the stamp: lifting off each bar and coming down hard on the next
+    const last = order.length - 1;
+    if (ms > hitAt(last) + 120) return;
+    const i = Math.min(
+      last,
+      Math.max(0, Math.floor((ms - STAMP_FIRST_MS) / STAMP_EACH_MS) + 1),
+    );
+    const legMs = i === 0 ? STAMP_FIRST_MS : STAMP_EACH_MS;
+    const q = clamp01((ms - (hitAt(i) - legMs)) / legMs);
+    const from = i === 0 ? { x: 0, y: 0 } : bars[order[i - 1]];
+    const to = bars[order[i]];
+    const down = q * q;
+    const lift =
+      i === 0 ? 0 : Math.sin(Math.PI * Math.min(1, q * 1.2)) * STAMP_LIFT;
+    const font = i === 0 ? lerp(r.flashFont, STAMP_FONT, down) : STAMP_FONT;
+    const squash = ms >= hitAt(i) ? Math.exp(-(ms - hitAt(i)) / 40) : 0;
+    drawText(
+      ctx,
+      r.glyphs,
+      r.label,
+      lerp(from.x, to.x, down),
+      lerp(from.y, to.y - font * 0.35, down) - lift,
+      font,
+      { sx: 1 + 0.3 * squash, sy: 1 - 0.4 * squash },
+    );
+  },
+
+  zipCrit(ctx, r, ms, bars) {
+    const order = byHeight(bars);
+    const half = r.moment.barHalfWidth - 60;
+    const start = (i: number) => ZIP_FIRST_MS + i * (ZIP_PASS_MS + ZIP_DROP_MS);
+    // each pass runs one way across its bar, the next back the other way
+    const pass = (i: number) => {
+      const b = bars[order[i]];
+      const [from, to] =
+        i % 2 ? [b.x + half, b.x - half] : [b.x - half, b.x + half];
+      return { from, to, y: b.y };
+    };
+    // the stitches it leaves along each bar
+    ctx.save();
+    ctx.strokeStyle = r.glyphs.color;
+    ctx.lineWidth = 12;
+    ctx.lineCap = "round";
+    ctx.setLineDash([40, 28]);
+    for (let i = 0; i < order.length; i++) {
+      const q = clamp01((ms - start(i)) / ZIP_PASS_MS);
+      const fade = 1 - Math.max(0, ms - start(i) - ZIP_PASS_MS) / ZIP_STITCH_MS;
+      if (q <= 0 || fade <= 0) continue;
+      const p = pass(i);
+      ctx.globalAlpha = fade;
+      ctx.beginPath();
+      ctx.moveTo(p.from, p.y);
+      ctx.lineTo(lerp(p.from, p.to, q), p.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+    // the needle
+    if (ms < ZIP_FIRST_MS) {
+      const p = (ms / ZIP_FIRST_MS) ** 2;
+      const first = pass(0);
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        first.from * p,
+        first.y * p,
+        lerp(r.flashFont, ZIP_FONT, p),
+      );
+      return;
+    }
+    for (let i = 0; i < order.length; i++) {
+      const t = ms - start(i);
+      if (t < 0 || t >= ZIP_PASS_MS + ZIP_DROP_MS) continue;
+      const p = pass(i);
+      if (t < ZIP_PASS_MS) {
+        drawText(
+          ctx,
+          r.glyphs,
+          r.label,
+          lerp(p.from, p.to, t / ZIP_PASS_MS),
+          p.y + Math.sin(t * 0.25) * 20,
+          ZIP_FONT,
+          { along: 0, stretch: 1.4 },
+        );
+      } else if (i < order.length - 1) {
+        const q = (t - ZIP_PASS_MS) / ZIP_DROP_MS;
+        drawText(
+          ctx,
+          r.glyphs,
+          r.label,
+          p.to,
+          lerp(p.y, pass(i + 1).y, q),
+          ZIP_FONT,
+          {
+            along: Math.PI / 2,
+            stretch: 1.3,
+          },
+        );
+      }
+    }
+  },
+
+  catapultCrit(ctx, r, ms, bars) {
+    const x = bars[0].x;
+    if (ms < CATAPULT_UP_MS) {
+      // flung up off the top of the screen, spinning
+      const p = (ms / CATAPULT_UP_MS) ** 2;
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        x * p,
+        lerp(0, r.span.from, p),
+        lerp(r.flashFont, r.flashFont * 1.2, p),
+        {
+          rot: p * 8,
+          along: Math.PI / 2,
+          stretch: 1 + 0.5 * p,
+        },
+      );
+      return;
+    }
+    if (ms < CATAPULT_UP_MS + CATAPULT_AWAY_MS) return;
+    const land = CATAPULT_UP_MS + CATAPULT_AWAY_MS + CATAPULT_FALL_MS;
+    if (ms < land) {
+      // crashing straight down through every bar
+      drawText(ctx, r.glyphs, r.label, x, catapultY(r, ms), CATAPULT_FONT, {
+        along: Math.PI / 2,
+        stretch: 1.5,
+      });
+      return;
+    }
+    const q = (ms - land) / CATAPULT_LAND_MS;
+    ctx.save();
+    ctx.globalAlpha = 1 - q;
+    drawGlow(
+      ctx,
+      glowStops(r.glyphs.color),
+      x,
+      r.span.to,
+      r.viewportWidth * 0.4 * (0.5 + q),
+    );
+    ctx.restore();
+    drawText(ctx, r.glyphs, r.label, x, r.span.to, CATAPULT_FONT, {
+      sx: 1.4,
+      sy: 0.6,
+      alpha: 1 - q,
+    });
+  },
+
+  tornadoCrit(ctx, r, ms, bars) {
+    const x = bars[0].x;
+    const form = clamp01(ms / TORNADO_FORM_MS);
+    const cy =
+      ms < TORNADO_FORM_MS ? lerp(0, r.span.from, form) : tornadoY(r, ms);
+    // the number breaking up into the funnel's copies
+    if (form < 1)
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        x * form,
+        cy,
+        lerp(r.flashFont, TORNADO_FONT, form),
+        {
+          alpha: 1 - form,
+        },
+      );
+    const fade = clamp01((TORNADO_FORM_MS + TORNADO_DOWN_MS + 150 - ms) / 150);
+    const w = r.viewportWidth;
+    for (let k = 0; k < TORNADO_COPIES; k++) {
+      const h = k / (TORNADO_COPIES - 1);
+      const a = ms * 0.02 + k * 1.3;
+      const radius = (w * 0.03 + w * 0.17 * h) * form;
+      const depth = Math.sin(a);
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        x * form + Math.cos(a) * radius,
+        cy - w * 0.3 * h * form,
+        TORNADO_FONT * (1 + 0.25 * depth),
+        { alpha: (0.55 + 0.45 * depth) * fade * form, rot: Math.cos(a) * 0.4 },
+      );
+    }
+    // a copy flung off onto each bar as the funnel passes it
+    bars.forEach((b, bar) => {
+      const passes = tornadoPassesAt(r, b.y);
+      const t = (ms - passes) / TORNADO_FLING_MS;
+      if (t < 0 || t >= 1) return;
+      const to = along(r, bars, bar, bar % 2 ? -1 : 1);
+      const fromY = tornadoY(r, passes) - w * 0.08;
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        lerp(x, to.x, t),
+        lerp(fromY, to.y, t) - w * 0.1 * 4 * t * (1 - t),
+        MOMENT_FONT * 0.75,
+        { rot: t * 6 },
+      );
+    });
+  },
 };
+
+// a glow of `color` fading out, per color
+const glowStopsByColor = new Map<string, FadeStops>();
+function glowStops(color: string): FadeStops {
+  let stops = glowStopsByColor.get(color);
+  if (!stops) {
+    stops = fadeStops(color);
+    glowStopsByColor.set(color, stops);
+  }
+  return stops;
+}

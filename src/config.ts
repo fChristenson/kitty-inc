@@ -106,7 +106,7 @@ export const CONFIG = {
   specialCrits: {
     // a badge crit: the featured and other special crits in src/critBalance
     badgeCrit: {
-      chance: 0.22,
+      chance: 0.1,
     },
     // an animated event (src/animatedEventConfig.ts); none can land again
     // until cooldownMs after one has fully played out
@@ -156,6 +156,21 @@ export const CONFIG = {
       chance: 0.03,
     },
     rainCrit: {
+      chance: 0.03,
+    },
+    // it stamps down onto each bar leaving a glowing print, zips across each
+    // like a sewing machine needle, is catapulted off the top to crash down
+    // through them all, or whirls into a tornado flinging a copy onto each
+    stampCrit: {
+      chance: 0.03,
+    },
+    zipCrit: {
+      chance: 0.03,
+    },
+    catapultCrit: {
+      chance: 0.03,
+    },
+    tornadoCrit: {
       chance: 0.03,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter

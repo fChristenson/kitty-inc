@@ -1201,7 +1201,7 @@ function startMoment(
   );
   launchMoment(
     moment,
-    { ...glyphs, index: (c) => SPIN_CHARS.indexOf(c) },
+    { ...glyphs, index: (c) => SPIN_CHARS.indexOf(c), color: flashColor },
     flashLabel,
     share * viewportWidth,
     viewportWidth,

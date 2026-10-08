@@ -1269,6 +1269,10 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-crit-moment="juggleCrit">Juggle Crit</button>
           <button class="game__button" data-crit-moment="stompCrit">Stomp Crit</button>
           <button class="game__button" data-crit-moment="rainCrit">Rain Crit</button>
+          <button class="game__button" data-crit-moment="stampCrit">Stamp Crit</button>
+          <button class="game__button" data-crit-moment="zipCrit">Zip Crit</button>
+          <button class="game__button" data-crit-moment="catapultCrit">Catapult Crit</button>
+          <button class="game__button" data-crit-moment="tornadoCrit">Tornado Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

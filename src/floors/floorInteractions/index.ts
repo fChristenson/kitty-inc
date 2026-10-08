@@ -2002,7 +2002,7 @@ function critMomentFor(
         return { x: bar.x - center.x, y: top - ownTop + bar.y - center.y };
       });
     },
-    onHit: (bar, step) => {
+    onHit: (bar, step, color) => {
       const target = targets[bar];
       // a snowball bangs a step higher with every bar
       playBarExplosion(1 + step * 0.08);
@@ -2017,6 +2017,7 @@ function critMomentFor(
       punchIncomeBar(
         target,
         fresh && given.has(target) ? `+${given.get(target)} Lvl` : null,
+        color,
       );
     },
   };

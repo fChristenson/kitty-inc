@@ -24,6 +24,7 @@ import {
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { drawPoppingCritText } from "../../shared/critText";
+import { drawGlow, fadeStops, type FadeStops } from "../../shared/glowSprite";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
 import {
   createAbsorbPulse,
@@ -154,10 +155,11 @@ export function triggerIncomeBarPress(floor: Floor): void {
 }
 
 // a rapid fire crit's characters punching the bar (screenShake's FlashPunch): each hit jolts
-// it down and flashes it white; the levels it gave rise off it
+// it down and flashes it white; the levels it gave rise off it, and it glows
+// in the crit's color for a while after
 const barPunches = new WeakMap<
   Floor,
-  { hitAt: number; label: string | null; labelAt: number }
+  { hitAt: number; label: string | null; labelAt: number; color: string | null }
 >();
 // of the bar's height
 const PUNCH_JOLT = 0.45;
@@ -175,13 +177,22 @@ const PUNCH_SLOSH_PERIOD_MS = 200;
 const PUNCH_LABEL_MS = 1000;
 const PUNCH_LABEL_RISE = 70;
 const PUNCH_LABEL_FONT = 80;
+const AFTERGLOW_MS = 1000;
+const AFTERGLOW_ALPHA = 0.8;
 
-// label: what the first hit gave ("+10 Lvl"); later hits keep it
-export function punchIncomeBar(floor: Floor, label: string | null): void {
+// label: what the first hit gave ("+10 Lvl"); later hits keep it. color:
+// the crit's, which the bar glows in afterwards
+export function punchIncomeBar(
+  floor: Floor,
+  label: string | null,
+  color: string | null = null,
+): void {
   const now = Date.now();
   const punch = barPunches.get(floor);
-  if (punch && label === null) punch.hitAt = now;
-  else barPunches.set(floor, { hitAt: now, label, labelAt: now });
+  if (punch && label === null) {
+    punch.hitAt = now;
+    punch.color = color ?? punch.color;
+  } else barPunches.set(floor, { hitAt: now, label, labelAt: now, color });
 }
 
 function punchSince(floor: Floor, now: number) {
@@ -189,12 +200,22 @@ function punchSince(floor: Floor, now: number) {
   if (!punch) return null;
   if (
     now - punch.labelAt > PUNCH_LABEL_MS &&
-    now - punch.hitAt > PUNCH_FLASH_MS
+    now - punch.hitAt > Math.max(PUNCH_FLASH_MS, AFTERGLOW_MS)
   ) {
     barPunches.delete(floor);
     return null;
   }
   return punch;
+}
+
+const afterglowStops = new Map<string, FadeStops>();
+function afterglowStopsFor(color: string): FadeStops {
+  let stops = afterglowStops.get(color);
+  if (!stops) {
+    stops = fadeStops(color);
+    afterglowStops.set(color, stops);
+  }
+  return stops;
 }
 
 function incomeBarPressScale(floor: Floor, now: number): number {
@@ -677,9 +698,11 @@ export function drawIncomePanel(
     }
     // a permanently-crited floor's bar matches its own tier color instead of the
     // usual green, mirroring the upgrade button's own color choice
-    const fillColor = floor.critMultiplierTier
-      ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
-      : COLOR.moneyGreen;
+    const fillColor = afterglowing
+      ? punch!.color!
+      : floor.critMultiplierTier
+        ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
+        : COLOR.moneyGreen;
     let pressure: PressurePose | null = null;
     const boilHeat = getBoilHeat(floor, now);
     const holdHeat = getHoldHeat(floor, now);
@@ -816,6 +839,21 @@ export function drawIncomePanel(
     ctx.restore();
   };
   // overtime's coin stream powers the bar up like every other stream target
+  // a crit moment's hit leaves it glowing in the crit's color
+  const afterglowing = !!punch?.color && sincePunch < AFTERGLOW_MS;
+  if (afterglowing) {
+    ctx.save();
+    ctx.globalAlpha = AFTERGLOW_ALPHA * (1 - sincePunch / AFTERGLOW_MS);
+    drawGlow(
+      ctx,
+      afterglowStopsFor(punch!.color!),
+      barCenter.x,
+      barCenter.y,
+      barW * 0.65,
+      0.45,
+    );
+    ctx.restore();
+  }
   if (!drawTargetStream(ctx, floor, "bar", barCenter.x, barCenter.y, drawBar))
     drawBar();
   if (sincePunch < PUNCH_RING_MS) {
