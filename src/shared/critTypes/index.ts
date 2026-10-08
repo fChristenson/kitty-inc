@@ -970,7 +970,7 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   // whichever proc(s) fired, never itself eligible to roll a further nested
   // bonus
   bonusTier: CritTier | null;
-  // an x3 crit chaining straight into an x10 and an x50 (see rollCrit)
+  // an x3 crit chaining straight into an x7 and an x10 (see rollCrit)
   tierChain?: boolean;
   // the crit also landing on the floor above / below
   critUp?: boolean;
@@ -979,9 +979,8 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   randomCrit?: number;
   // a merge crit's second number, added to the tier's
   mergeCrit?: CritTier;
-  // a rapid fire crit: its number's characters punch its floor's bar once
-  // it has flashed
-  rapidFireCrit?: boolean;
+  // a crit moment: its number playing out onto the bars once it has flashed
+  critMoment?: CritMoment;
   // a badge crit whose landed badges turn this foil, once they qualify
   badgeFoil?: BadgeFoil;
   chain: boolean;
@@ -1088,7 +1087,7 @@ export type CritProcKind = Exclude<
   | "critDown"
   | "randomCrit"
   | "mergeCrit"
-  | "rapidFireCrit"
+  | "critMoment"
   | "badgeFoil"
 >;
 
@@ -2044,6 +2043,22 @@ const SPECIAL_CRIT_TYPES = Object.keys(
   CONFIG.specialCrits,
 ) as SpecialCritType[];
 
+// the special crits whose number plays out onto the bars (screenShake's
+// critMoments)
+export const CRIT_MOMENTS = [
+  "rapidFireCrit",
+  "pinballCrit",
+  "snowballCrit",
+  "juggleCrit",
+  "stompCrit",
+  "rainCrit",
+] as const satisfies readonly SpecialCritType[];
+export type CritMoment = (typeof CRIT_MOMENTS)[number];
+
+export function isCritMoment(type: string | null): type is CritMoment {
+  return (CRIT_MOMENTS as readonly string[]).includes(type ?? "");
+}
+
 // what a gateway-passing crit's special slot carries, each type at its
 // CONFIG.specialCrits chance
 function pickSpecialCrit(): SpecialCritType {
@@ -2192,7 +2207,7 @@ export function rollCrit(
     const [low, high] = CONFIG.specialCrits.randomCrit.range;
     result.randomCrit = low + Math.floor(critRandom() * (high - low + 1));
   } else if (slot === "mergeCrit") result.mergeCrit = pickCritTierByOdds();
-  else if (slot === "rapidFireCrit") result.rapidFireCrit = true;
+  else if (isCritMoment(slot)) result.critMoment = slot;
   else if (slot === "badgeShimmer") result.badgeFoil = "shimmer";
   else if (slot === "badgeGlitter") result.badgeFoil = "glitter";
   for (const kind of landedProcs) result[kind] = true;

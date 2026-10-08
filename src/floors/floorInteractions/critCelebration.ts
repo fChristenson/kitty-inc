@@ -32,7 +32,7 @@ import {
 import {
   playCritMerge,
   playCritSpin,
-  type FlashPunch,
+  type FlashMoment,
   type FlashStack,
 } from "../../screenShake";
 import { CONFIG } from "../../config";
@@ -45,18 +45,18 @@ import {
 import { getScreenUnfrozenAt, isScreenFrozen } from "../../shared/screenFreeze";
 
 // crit celebrations are flash + sound only: no coin bursts (perf)
-function celebrateTier(tier: CritTier, punch: FlashPunch | null): void {
+function celebrateTier(tier: CritTier, moment: FlashMoment | null): void {
   playTierFlash(
     tier,
     CRIT_TIER_CONFIG[tier].label,
     tierColor(tier),
     null,
     0,
-    punch,
+    moment,
   );
 }
 
-// stacked crits: a crit chain's x3, x10 and x50, then a crit up's or crit
+// stacked crits: a crit chain's x3, x7 and x10, then a crit up's or crit
 // down's copy on the floor above/below, land in quick succession, each new
 // number landing at its offset over the ones before it; every number but the
 // last buzzes a short pulse, so the phone gives one distinct kick per number
@@ -118,8 +118,8 @@ function stackSteps(
 
 // a random crit counts up this long before its own slams in
 const SPIN_MS = 600;
-// a merge crit's two numbers fly this long before they hit
-const MERGE_MS = 250;
+// a merge crit's two numbers charge in, circle each other and smash after this
+const MERGE_MS = 900;
 
 const mergeNumber = (tier: CritTier) => ({
   label: CRIT_TIER_CONFIG[tier].label,
@@ -131,7 +131,7 @@ function celebrateStack(
   steps: StackStep[],
   landedTier: CritTier,
   { random, merge }: CritStacking,
-  punch: FlashPunch | null,
+  moment: FlashMoment | null,
 ): void {
   let delay = 0;
   if (random) {
@@ -167,7 +167,7 @@ function celebrateStack(
           stack,
           i < steps.length - 1 ? STACK_PULSE_MS : 0,
           // a lone number fires; a stack of them doesn't
-          steps.length === 1 ? punch : null,
+          steps.length === 1 ? moment : null,
         ),
       delay + i * STACK_STEP_MS,
     ),
@@ -357,7 +357,7 @@ export function triggerCritCelebration(
   onFollowUpProc?: (kind: CritProcKind) => void,
   stacking: CritStacking = {},
   // the number flying into the floor's bar once its flash has held
-  punch: FlashPunch | null = null,
+  moment: FlashMoment | null = null,
 ): void {
   if (isDetachedJobRunning()) {
     if (procs?.dejaVu) {
@@ -378,7 +378,7 @@ export function triggerCritCelebration(
       specialCelebrationQueue.push({
         kind: "critStack",
         queuedAt: now,
-        run: () => celebrateStack(steps, tier, stacking, punch),
+        run: () => celebrateStack(steps, tier, stacking, moment),
       });
     for (const kind of landed) {
       queueProcCelebration(kind, tier, now);
@@ -430,7 +430,7 @@ export function triggerCritCelebration(
   ) {
     return;
   }
-  celebrateTier(tier, punch);
+  celebrateTier(tier, moment);
 }
 
 // the handful of procs whose flash is more than the standard label+color

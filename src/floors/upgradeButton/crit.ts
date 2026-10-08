@@ -300,6 +300,7 @@ export {
 } from "../../shared/critTypes";
 import {
   type CritTier,
+  type CritMoment,
   type CritRollResult,
   pickHigherCritTier as higherCritTier,
   rollCrit,
@@ -519,7 +520,7 @@ export function rollCritUpgrade(
       if (result.tierChain) tierChainCrits.add(floor);
       if (result.randomCrit) randomCrits.set(floor, result.randomCrit);
       if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
-      if (result.rapidFireCrit) rapidFireCrits.add(floor);
+      if (result.critMoment) critMoments.set(floor, result.critMoment);
       if (result.critUp) critUpCrits.add(floor);
       if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
@@ -1024,7 +1025,7 @@ export function isCritUpgrade(floor: Floor): boolean {
   return critTiers.has(floor);
 }
 
-// armed x3 crits that chain into an x10 and an x50 when clicked
+// armed x3 crits that chain into an x7 and an x10 when clicked
 const tierChainCrits = snapshotSet<Floor>();
 
 export function isTierChainCrit(floor: Floor): boolean {
@@ -1084,19 +1085,19 @@ export function forceMergeCrit(floor: Floor): void {
   mergeCrits.set(floor, pick());
 }
 
-// armed rapid fire crits: their number's characters punch the floor's bar
-const rapidFireCrits = snapshotSet<Floor>();
+// armed crits' moments: their number playing out onto the bars
+const critMoments = snapshotMap<Floor, CritMoment>();
 
-export function isRapidFireCrit(floor: Floor): boolean {
-  return rapidFireCrits.has(floor);
+export function getCritMoment(floor: Floor): CritMoment | undefined {
+  return critMoments.get(floor);
 }
 
-// dev/test-only: arms a crit of a random tier that punches
-export function forceRapidFireCrit(floor: Floor): void {
+// dev/test-only: arms a crit of a random tier carrying `moment`
+export function forceCritMoment(floor: Floor, moment: CritMoment): void {
   const tiers: CritTier[] = ["crit", "mega", "ultra"];
   const tier = tiers[Math.floor(Math.random() * tiers.length)];
   forceTestCrit(floor, null, tier, null, "upgrade");
-  rapidFireCrits.add(floor);
+  critMoments.set(floor, moment);
 }
 
 // call right when a crit click is handled, before rolling the next one
@@ -1107,7 +1108,7 @@ export function consumeCritUpgrade(floor: Floor): void {
   critDownCrits.delete(floor);
   randomCrits.delete(floor);
   mergeCrits.delete(floor);
-  rapidFireCrits.delete(floor);
+  critMoments.delete(floor);
   consumeCritProcs(floor);
   dropClaimedEventProc(floor);
 }

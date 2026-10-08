@@ -9,18 +9,19 @@
 - **Random crit:** a crit sometimes counts up and slams in a random multiplier from x3 to x50.
 - **Crit merge:** a crit sometimes brings a second crit number; the two spring in from the sides, wind up, smash together and their sum slams in.
 - **Rapid fire crit:** a crit's number sometimes slams in, then its characters fire one after another into its floor's bar, each one slamming it.
+- **Pinball crit:** the number ricochets between the bars of the floors in view like a pinball, each bar it bounces off jolting and getting levels, then it slams home into its own bar.
+- **Snowball crit:** the number rolls down the bars in view top to bottom, growing a step with every bar it hits (x3, x4, x5…).
+- **Juggle crit:** the number's characters juggle in a circle, then each drops onto a different floor's bar.
+- **Stomp crit:** the number grows huge and stomps down onto the screen, every bar in view bouncing with levels.
+- **Rain crit:** the number bursts into a downpour of copies of itself that rain onto every floor in view, each bar catching some.
+- **Bang bars:** a bar a crit moment hits goes off with an explosion (a snowball's a step higher each bar), its fill sloshing back and forth before it settles.
 
 ## Crit moments
 
-- **Squared crit:** a crit's number gets a little ² slammed onto its corner and turns into its square (x3 becomes x9, x10 becomes x100).
-- **Crit fall:** a crit drops down the building, each floor below landing one tier lower (x50, then x10, then x3), the numbers falling with it.
-- **Overflow:** a crit that hits a floor's max level spills its leftover levels into the next floor up, the number splitting in two.
-- **Crit shatter:** an x50 bursts into ten x5s that scatter onto random floors, each one landing with its own pop.
-- **Lottery crit:** the number's digits drop in one at a time like lottery balls, each one a click and a jolt, then the whole number slams.
-- **Crit double:** a landed crit's number flashes again, doubled, with a second slam (x10 then x20).
-- **Mirror crit:** a crit's number flips over like a card and the floor at the same spot in the next building pays too.
+- **Boomerang crit:** the number spins out to the edge of the screen and whips back, hitting its bar on the way out and again on the way back.
+- **Crit tower:** copies of the number drop and stack into a wobbling tower, then it topples over onto the bars, each block landing on a floor.
+- **Crit dominoes:** the number tips over like a domino into a row of copies, each one falling into the next and onto a bar.
 
 ## Feel
 
-- **Slow-mo slam:** an x50 freezes the screen for a split second just as it lands, then everything snaps back with the shake.
-- **Rising pitch:** crits landing in quick succession play their sound a step higher each time, so a run of crits climbs like a slot machine paying out.
+- **Glitter trail:** every flying crit number leaves a short glitter trail, so its path reads at full speed.

@@ -7,6 +7,7 @@ import {
   getCritProcCount,
   queueBadgeFoilReveal,
   type BadgeFoil,
+  type CritMoment,
   type CritProcKind,
   type CritTier,
 } from "../../shared/critTypes";
@@ -289,13 +290,17 @@ export function wireMergeCritTestButton(
     .addEventListener("click", onClick);
 }
 
-export function wireRapidFireCritTestButton(
+// arms a crit carrying a crit moment
+export function wireCritMomentTestButtons(
   container: HTMLElement,
-  onClick: () => void,
+  onClick: (moment: CritMoment) => void,
 ): void {
-  container
-    .querySelector<HTMLButtonElement>("#test-rapid-fire-crit")!
-    .addEventListener("click", onClick);
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "[data-crit-moment]",
+  ))
+    button.addEventListener("click", () =>
+      onClick(button.dataset.critMoment as CritMoment),
+    );
 }
 
 // arms a crit that also lands on the floor above or below

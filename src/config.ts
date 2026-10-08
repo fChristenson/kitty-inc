@@ -66,10 +66,10 @@ export const CONFIG = {
     ...FEATURED_CRIT_BALANCE,
     ...PROC_CRIT_BALANCE,
     crit: { chance: 0.08, multiplier: 3 },
-    mega: { chance: 0.015, multiplier: 10 },
-    ultra: { chance: 0.001, multiplier: 50 },
+    mega: { chance: 0.015, multiplier: 7 },
+    ultra: { chance: 0.001, multiplier: 10 },
     // a boosted perma worker speeds its floor up by its tier's multiplier to
-    // this power: 0.43 gives x1.6/x2.7/x5.4
+    // this power: 0.43 gives x1.6/x2.3/x2.7
     permaBoostExponent: 0.43,
     // one reward payout (payout crits, cash events) pays this many seconds of
     // its floor's income; a bar cycle is under a second, too small to feel
@@ -106,7 +106,7 @@ export const CONFIG = {
   specialCrits: {
     // a badge crit: the featured and other special crits in src/critBalance
     badgeCrit: {
-      chance: 0.37,
+      chance: 0.22,
     },
     // an animated event (src/animatedEventConfig.ts); none can land again
     // until cooldownMs after one has fully played out
@@ -114,7 +114,7 @@ export const CONFIG = {
       chance: 0.35,
       cooldownMs: 30_000,
     },
-    // an x3 crit chaining straight into an x10 and an x50
+    // an x3 crit chaining straight into an x7 and an x10
     chainCrit: {
       chance: 0.04,
     },
@@ -138,6 +138,25 @@ export const CONFIG = {
     // its number's characters firing into its floor's bar
     rapidFireCrit: {
       chance: 0.04,
+    },
+    // the crit moments: once its number has slammed in, it pinballs between
+    // the bars in view, snowballs down them (growing a step a bar), is
+    // juggled onto them, stomps onto all of them or rains onto them, each
+    // other bar it hits landing levels
+    pinballCrit: {
+      chance: 0.03,
+    },
+    snowballCrit: {
+      chance: 0.03,
+    },
+    juggleCrit: {
+      chance: 0.03,
+    },
+    stompCrit: {
+      chance: 0.03,
+    },
+    rainCrit: {
+      chance: 0.03,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil

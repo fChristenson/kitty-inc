@@ -331,6 +331,17 @@ export function playCoinDrop(): void {
   playSfx("coinDrop", COIN_DROP_VOLUME);
 }
 
+// a bang as a crit's number hits a bar; rate shifts its pitch. Debounced on
+// its own (not playExplosion's), since a crit rain lands dozens of hits
+const BAR_EXPLOSION_DEBOUNCE_MS = 60;
+let lastBarExplosionPlayTime = 0;
+export function playBarExplosion(rate = 1): void {
+  const now = performance.now();
+  if (now - lastBarExplosionPlayTime < BAR_EXPLOSION_DEBOUNCE_MS) return;
+  lastBarExplosionPlayTime = now;
+  playSfx("explosion", SFX_VOLUME, 0.04, rate);
+}
+
 // one-shot sound effect for opening/closing any of the action bar's dialogs
 // (upgrade menu, boost menu, map menu) or switching to/from the static map view.
 // skips swoosh.mp3's own brief quiet lead-in so it reads as instant on click

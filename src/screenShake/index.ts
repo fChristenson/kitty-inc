@@ -16,6 +16,15 @@ import { critFont, drawCritText } from "../shared/critText";
 import { runWhenIdle } from "../shared/idle";
 import { drawGoldShimmer } from "../shared/goldShimmer";
 import { isScreenFrozen } from "../shared/screenFreeze";
+import { clamp01, lerp } from "../shared/easing";
+import {
+  drawMoment,
+  isMomentRunning,
+  launchMoment,
+  type FlashMoment,
+} from "./critMoments";
+
+export type { FlashMoment } from "./critMoments";
 import { getExplosionDurationMs, MAX_VIBRATE_MS } from "../sound";
 import {
   drawCritSparks,
@@ -240,7 +249,7 @@ interface FlashRequest {
   stack: FlashStack | null;
   // buzzes just this long instead of the whole flash (0: the whole flash)
   pulseMs: number;
-  punch: FlashPunch | null;
+  moment: FlashMoment | null;
 }
 
 // how long the grow-in (scale + rotate) phase takes, and the fade-out tail's base
@@ -289,12 +298,12 @@ function startFlash(req: FlashRequest): void {
         flashEndsAt - now - GROWTH_DURATION_MS - fadeDurationMs,
       );
   }
-  // a counted-up number pops; a merge's sum or a punching number slams down
+  // a counted-up number pops; a merge's sum or a moment's number slams down
   // from big
   flashEntry =
     spin !== null
       ? "pop"
-      : merge !== null || (req.punch && !stacking)
+      : merge !== null || (req.moment && !stacking)
         ? "slam"
         : "spin";
   if (flashEntry === "slam")
@@ -308,8 +317,8 @@ function startFlash(req: FlashRequest): void {
   flashStrokeWidth = req.strokeWidth;
   flashBlinkHz = req.blinkHz;
   flashHoldMs = holdMs;
-  flashPunch = stacking ? null : req.punch;
-  if (flashPunch) setTimeout(() => warmPunchGlyphs(req), 50);
+  flashMoment = stacking ? null : req.moment;
+  if (flashMoment) setTimeout(() => warmMomentGlyphs(req), 50);
   activeFlashPriority = stacking
     ? Math.max(activeFlashPriority, req.priority)
     : req.priority;
@@ -368,7 +377,7 @@ export function triggerScreenShake(options?: {
   minDurationMs?: number;
   stack?: FlashStack | null;
   pulseMs?: number;
-  punch?: FlashPunch | null;
+  moment?: FlashMoment | null;
 }): void {
   const req: FlashRequest = {
     intensity: options?.intensity ?? 1,
@@ -381,13 +390,19 @@ export function triggerScreenShake(options?: {
     minDurationMs: options?.minDurationMs ?? 0,
     stack: options?.stack ?? null,
     pulseMs: options?.pulseMs ?? 0,
-    punch: options?.punch ?? null,
+    moment: options?.moment ?? null,
   };
   const now = Date.now();
   kickShake(req.intensity, now);
+  // a counting or merging number owns the screen until its own slam lands
+  const leadIn = pendingLeadInLabel(now);
+  if (leadIn !== null && req.label !== leadIn) return;
   const idle = flashEndsAt === null || now >= flashEndsAt;
   const shouldStart =
-    idle || req.priority > activeFlashPriority || req.stack !== null;
+    idle ||
+    req.priority > activeFlashPriority ||
+    req.stack !== null ||
+    leadIn !== null;
   if (shouldStart) {
     const iconName = CRIT_ICON_BY_LABEL[req.label]?.name;
     const ready = iconName ? requestCritIcon(iconName) : Promise.resolve(null);
@@ -508,10 +523,17 @@ function settlePose(elapsedMs: number): { scale: number; rotation: number } {
 // side effect of clearing the state once expired
 export function isCritFlashActive(now: number): boolean {
   syncCritFlashPause(now);
-  if (spin && now - spin.startedAt < spin.spinMs) return true;
-  if (merge && now - merge.startedAt < merge.mergeMs) return true;
-  if (punch) return true;
+  if (pendingLeadInLabel(now) !== null) return true;
+  if (isMomentRunning()) return true;
   return flashEndsAt !== null && (flashPausedAt ?? now) < flashEndsAt;
+}
+
+// the slam a random crit's count or a merge crit's numbers are still building
+// up to, until it lands (or, if it never does, well past its due time)
+function pendingLeadInLabel(now: number): string | null {
+  if (spin && now - spin.startedAt < spin.spinMs * 2) return spin.label;
+  if (merge && now - merge.startedAt < merge.mergeMs * 2) return merge.label;
+  return null;
 }
 
 // absolute timestamp the CURRENT foreground flash's hold phase ends (right
@@ -519,8 +541,9 @@ export function isCritFlashActive(now: number): boolean {
 // critCelebration.ts's "special crit crit" stacking, which needs to know
 // exactly when to freeze a proc's own celebration as a background layer
 // without hardcoding/duplicating whatever holdMs it happened to be triggered
-// with
+// with. Never while a lead-in is still building up to its slam
 export function getFlashHoldEndsAt(): number | null {
+  if (pendingLeadInLabel(Date.now()) !== null) return Infinity;
   return flashStartedAt !== null
     ? flashStartedAt + GROWTH_DURATION_MS + flashHoldMs
     : null;
@@ -840,7 +863,7 @@ export function drawCritFlash(
   drawFlashLayers(ctx, centerX, centerY, viewportWidth, now);
   drawCritSpin(ctx, centerX, centerY, viewportWidth, now);
   drawCritMerge(ctx, centerX, centerY, viewportWidth, now);
-  drawCritPunch(ctx, centerX, centerY, now);
+  drawMoment(ctx, centerX, centerY, now);
   drawCritSparks(ctx, centerX, centerY, viewportWidth, now);
 }
 
@@ -854,6 +877,8 @@ interface SpinGlyphs {
   font: number;
 }
 interface CritSpin {
+  // the slam it counts up to
+  label: string;
   glyphs: SpinGlyphs;
   low: number;
   range: number;
@@ -960,6 +985,7 @@ export function playCritSpin(
   const steps = Math.round((spinMs / 1000) * SPIN_RATE);
   warmSlamSoon(`x${to}`, color, strokeWidth, sizeLabel);
   spin = {
+    label: `x${to}`,
     glyphs: getSpinGlyphs(color, strokeWidth, res),
     low,
     range,
@@ -995,13 +1021,16 @@ function drawCritSpin(
 }
 
 // a merge crit: two crit numbers charge in from opposite sides or corners of
-// the screen, their sum slamming in the moment they meet
+// the screen, stop facing each other, circle each other ever faster and
+// spiral in, their sum slamming in the moment they smash together
 export interface MergeNumber {
   label: string;
   color: string;
   strokeWidth: number;
 }
 interface CritMerge {
+  // the sum that slams in
+  label: string;
   first: { glyphs: SpinGlyphs; text: string };
   second: { glyphs: SpinGlyphs; text: string };
   // which way they charge: 0 sideways, 1 up and down, 2 and 3 corner to corner
@@ -1015,8 +1044,16 @@ interface CritMerge {
 }
 let merge: CritMerge | null = null;
 const MERGE_IMPACT_SHAKE = 0.6;
-const MERGE_LEAN = 0.25;
-const MERGE_STRETCH = 1.3;
+// of the merge's time: charging in and stopping on their orbit
+const MERGE_ENTER = 0.25;
+// turns they circle each other, speeding up, and how far apart (of the
+// screen's width, from the middle)
+const MERGE_TURNS = 1.5;
+const MERGE_ORBIT = 0.24;
+// of the circling: when they start spiralling in to smash
+const MERGE_SPIRAL_AT = 0.4;
+// a little overlap as they meet
+const MERGE_TOUCH = 1.1;
 const MERGE_LANES = 4;
 
 export function playCritMerge(
@@ -1037,6 +1074,7 @@ export function playCritMerge(
     text: label,
   });
   const started: CritMerge = {
+    label: sum.label,
     first: number(first),
     second: number(second),
     lane: Math.floor(Math.random() * MERGE_LANES),
@@ -1080,143 +1118,96 @@ function drawCritMerge(
   }
   const scale = (merge.sizeShare * viewportWidth) / merge.first.glyphs.font;
   const dir = mergeLane(merge.lane, viewportWidth / 2, centerY);
-  const angle = Math.atan2(dir.y, dir.x);
+  const lane = Math.atan2(dir.y, dir.x);
   // far enough out that each starts fully off screen
   const offScreen = Math.hypot(viewportWidth / 2, centerY);
+  const enter = Math.min(1, t / MERGE_ENTER);
+  const u = Math.max(0, (t - MERGE_ENTER) / (1 - MERGE_ENTER));
+  // circling each other ever faster once they've stopped, then past the
+  // smash ploughing on at the same speed until the slam replaces them
+  const turn =
+    u <= 1
+      ? MERGE_TURNS * 2 * Math.PI * u * u
+      : MERGE_TURNS * 2 * Math.PI * (2 * u - 1);
   for (const [side, { glyphs, text }] of [
     [merge.flip, merge.first],
     [-merge.flip, merge.second],
   ] as const) {
     const halfW = (glyphTextWidth(glyphs, text) * scale) / 2;
     const halfH = glyphs.font * scale * 0.4;
+    const angle = lane + turn + (side < 0 ? Math.PI : 0);
     // how far its centre sits from the middle when it touches the other
     const touch =
-      (Math.abs(dir.x) * halfW + Math.abs(dir.y) * halfH) * MERGE_STRETCH;
-    const start = offScreen + touch * 2;
-    // one constant full speed, ploughing on past impact until the slam
-    // replaces it, so it never slows or stops
-    const dist = Math.max(0, start + (touch - start) * t);
+      (Math.abs(Math.cos(angle)) * halfW + Math.abs(Math.sin(angle)) * halfH) *
+      MERGE_TOUCH;
+    const orbit = Math.max(viewportWidth * MERGE_ORBIT, touch * 1.4);
+    let dist: number;
+    let stretch: number;
+    let along: number;
+    if (t < MERGE_ENTER) {
+      // charging in from off screen, braking to a stop on its orbit
+      const e = 1 - (1 - enter) ** 3;
+      dist = lerp([offScreen + touch * 2, orbit], e);
+      stretch = 1 + 0.3 * (1 - enter);
+      along = angle;
+    } else {
+      const spiral = clamp01((u - MERGE_SPIRAL_AT) / (1 - MERGE_SPIRAL_AT));
+      dist =
+        u <= 1
+          ? lerp([orbit, touch], spiral * spiral)
+          : Math.max(0, touch - (orbit - touch) * 2 * (u - 1));
+      stretch = 1 + 0.35 * Math.min(1, u);
+      along = angle + Math.PI / 2;
+    }
     ctx.save();
-    ctx.translate(centerX + side * dir.x * dist, centerY + side * dir.y * dist);
-    // leaning into the charge, stretched along it
-    ctx.rotate(-side * dir.x * MERGE_LEAN);
-    ctx.rotate(angle);
-    ctx.scale(MERGE_STRETCH, 1 / MERGE_STRETCH);
-    ctx.rotate(-angle);
+    ctx.translate(
+      centerX + Math.cos(angle) * dist,
+      centerY + Math.sin(angle) * dist,
+    );
+    // stretched along its motion
+    ctx.rotate(along);
+    ctx.scale(stretch, 1 / stretch);
+    ctx.rotate(-along);
     drawGlyphText(ctx, glyphs, text, 0, 0, scale);
     ctx.restore();
   }
 }
 
-// a rapid fire crit: once its flash has held, its characters fly off one
-// after another into its floor's income bar, each punching it
-export interface FlashPunch {
-  // where it lands, from the flash's middle, in the flash's units
-  target: () => { x: number; y: number };
-  onHit: (index: number, count: number) => void;
-}
-interface Punch {
-  glyphs: SpinGlyphs;
-  chars: number[];
-  // each character's start, from the flash's middle
-  startX: number[];
-  scale: number;
-  startedAt: number;
-  target: FlashPunch["target"];
-  onHit: FlashPunch["onHit"];
-  hits: number;
-}
-let flashPunch: FlashPunch | null = null;
-let punch: Punch | null = null;
-// how long a punching flash shows before its number flies
-const PUNCH_SIT_MS = 400;
-// the first character's flight, then each next one this much later
-const PUNCH_FLY_MS = 180;
-const PUNCH_STAGGER_MS = 80;
-// the characters' font size as they hit, in the flash's units (about twice
-// the bar's height), and how far apart they land along it
-const PUNCH_END_FONT = 200;
-const PUNCH_SPREAD = 130;
-const PUNCH_SHAKE = 0.5;
+// a crit moment (critMoments.ts) rides the flash it's handed to: once that
+// has slammed in and sat, its number plays out onto the bars instead of fading
+let flashMoment: FlashMoment | null = null;
+// how long a moment's flash shows before its number plays out
+const MOMENT_SIT_MS = 400;
 
-function punchSizeShare(sizeLabel: string): number {
+function momentSizeShare(sizeLabel: string): number {
   return (FLASH_FONT_SIZE * 0.8) / measureLabel(getScratchCtx(), sizeLabel);
 }
 
-function warmPunchGlyphs(req: FlashRequest): void {
-  const share = punchSizeShare(flashSizeLabel);
+function warmMomentGlyphs(req: FlashRequest): void {
+  const share = momentSizeShare(flashSizeLabel);
   getSpinGlyphs(req.color, req.strokeWidth, spinGlyphRes(share));
 }
 
-function launchPunch(
-  { target, onHit }: FlashPunch,
+function startMoment(
+  moment: FlashMoment,
   viewportWidth: number,
   now: number,
 ): void {
-  const chars = [...flashLabel].map((c) => SPIN_CHARS.indexOf(c));
-  if (chars.some((i) => i < 0)) return;
-  const share = punchSizeShare(flashSizeLabel);
+  const share = momentSizeShare(flashSizeLabel);
   const glyphs = getSpinGlyphs(
     flashColor,
     flashStrokeWidth,
     spinGlyphRes(share),
   );
-  const scale = (share * viewportWidth) / glyphs.font;
-  let x = (-glyphTextWidth(glyphs, flashLabel) * scale) / 2;
-  const startX = chars.map((i) => {
-    const mid = x + (glyphs.advances[i] * scale) / 2;
-    x += glyphs.advances[i] * scale;
-    return mid;
-  });
-  punch = {
-    glyphs,
-    chars,
-    startX,
-    scale,
-    startedAt: now,
-    target,
-    onHit,
-    hits: 0,
-  };
-}
-
-function drawCritPunch(
-  ctx: CanvasRenderingContext2D,
-  centerX: number,
-  centerY: number,
-  now: number,
-): void {
-  if (!punch) return;
-  const ms = now - punch.startedAt;
-  const count = punch.chars.length;
-  const to = punch.target();
-  for (let i = 0; i < count; i++) {
-    const hitAt = PUNCH_FLY_MS + i * PUNCH_STAGGER_MS;
-    if (ms >= hitAt) {
-      if (punch.hits === i) {
-        punch.hits++;
-        kickShake(PUNCH_SHAKE, now);
-        punch.onHit(i, count);
-      }
-      continue;
-    }
-    // speeding up the whole way, so it hits at full speed
-    const u = Math.max(0, ms / hitAt);
-    const p = u * u;
-    const sprite = punch.glyphs.sprites[punch.chars[i]];
-    const x =
-      centerX +
-      punch.startX[i] +
-      (to.x + (i - (count - 1) / 2) * PUNCH_SPREAD - punch.startX[i]) * p;
-    const y = centerY + to.y * p;
-    const s =
-      punch.scale + (PUNCH_END_FONT / punch.glyphs.font - punch.scale) * p;
-    // stretched along its fall
-    const w = sprite.width * s * (1 - 0.3 * u);
-    const h = sprite.height * s * (1 + 0.5 * u);
-    ctx.drawImage(sprite, x - w / 2, y - h / 2, w, h);
-  }
-  if (punch.hits >= count) punch = null;
+  launchMoment(
+    moment,
+    { ...glyphs, index: (c) => SPIN_CHARS.indexOf(c) },
+    flashLabel,
+    share * viewportWidth,
+    viewportWidth,
+    now,
+    (intensity) => kickShake(intensity, Date.now()),
+  );
 }
 
 function drawFlashLayers(
@@ -1263,10 +1254,10 @@ function drawFlashLayers(
 
   const elapsed = now - flashStartedAt;
   const holdEndsAt = GROWTH_DURATION_MS + flashHoldMs;
-  // a punching flash's number flies off into its bar after a short sit
-  if (flashPunch && elapsed >= Math.min(holdEndsAt, PUNCH_SIT_MS)) {
-    launchPunch(flashPunch, viewportWidth, now);
-    flashPunch = null;
+  // a moment's flash plays its number out onto the bars after a short sit
+  if (flashMoment && elapsed >= Math.min(holdEndsAt, MOMENT_SIT_MS)) {
+    startMoment(flashMoment, viewportWidth, now);
+    flashMoment = null;
     flashStartedAt = null;
     flashEndsAt = null;
     activeFlashPriority = -1;

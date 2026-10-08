@@ -28,7 +28,7 @@ import {
   isCritDown,
   getRandomCrit,
   getMergeCrit,
-  isRapidFireCrit,
+  getCritMoment,
   getCritTier,
   getBonusTierCrit,
   consumeBonusTierCrit,
@@ -98,10 +98,12 @@ import { startHuntEvent } from "../huntEvent";
 import {
   armTakenEventProc,
   getClaimedEventCover,
+  isVisibleOnFloor,
   takeClaimedEventProc,
   type EventProcContext,
   type ScreenAreaLocal,
 } from "../eventProcs";
+import type { FlashMoment } from "../../screenShake";
 import {
   isScreenFrozen,
   type FloorRectResolver,
@@ -116,6 +118,7 @@ import {
   rewardPayoutAmount,
   currentIncomeRatePerSecond,
   getIncomeBarCenter,
+  getIncomeBarBox,
   punchIncomeBar,
   queueOvertimeTickDelivery,
   deliverOvertimeTicks,
@@ -148,6 +151,7 @@ import { computeBaseFloorStats } from "..";
 import {
   type CritProcKind,
   type CritRollResult,
+  type CritMoment,
   readCritProcs,
   applyCritProcs,
   onlyCritProc,
@@ -167,6 +171,7 @@ import {
   playSold as soundSold,
   playBloop as soundBloop,
   playCoinDrop as soundCoinDrop,
+  playBarExplosion,
 } from "../../sound";
 import {
   hitTestFloorLock,
@@ -1939,24 +1944,82 @@ export function applyFloorCrit(
       random: result.randomCrit,
       merge: result.mergeCrit,
     },
-    result.rapidFireCrit
-      ? {
-          // the bar from the screen's middle, where the flash is
-          target: () => {
-            const bar = getIncomeBarCenter(isGroundFloor);
-            const center = deps.getScreenCenterLocal(floor);
-            return { x: bar.x - center.x, y: bar.y - center.y };
-          },
-          onHit: (index) =>
-            punchIncomeBar(
-              floor,
-              index === 0 ? `+${count + chainTicks} Lvl` : null,
-            ),
-        }
+    result.critMoment
+      ? critMomentFor(deps, floor, result.critMoment, count + chainTicks)
       : null,
   );
   for (const kind of landedProcKinds(result))
     revealFoilOf(deps, floor, kind, isGroundFloor, result.badgeFoil);
+}
+
+// the levels a crit moment's hit lands on a bar: its own floor already has
+// the crit's, so only a snowball's growth adds to it
+function momentLevels(
+  moment: CritMoment,
+  own: boolean,
+  count: number,
+  step: number,
+): number {
+  if (moment === "rapidFireCrit") return 0;
+  if (moment === "snowballCrit") return own ? step : count + step;
+  if (own) return 0;
+  return moment === "rainCrit" ? Math.ceil(count / 6) : count;
+}
+
+// a crit moment playing out from floor's crit onto the income bars in view:
+// its own floor's first, then every other open, not yet maxed floor's
+function critMomentFor(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  moment: CritMoment,
+  count: number,
+): FlashMoment {
+  const isGround = (f: Floor) => deps.floors.indexOf(f) === 0;
+  const others = (deps.getOnScreenFloors?.() ?? [])
+    .filter(
+      (entry) =>
+        entry.floor !== floor &&
+        entry.floor.unlocked &&
+        !isFloorLocked(entry.floor) &&
+        !isFloorMaxed(entry.floor) &&
+        isVisibleOnFloor(entry, getIncomeBarCenter(isGround(entry.floor)).y),
+    )
+    .map((entry) => entry.floor);
+  const targets = [floor, ...others];
+  const given = new Map<Floor, number>([[floor, count]]);
+  const shown = new Set<Floor>();
+  return {
+    kind: moment,
+    barHalfWidth: getIncomeBarBox(isGround(floor)).width / 2,
+    // each bar from the screen's middle, where the flash is
+    bars: () => {
+      const center = deps.getScreenCenterLocal(floor);
+      const onScreen = deps.getOnScreenFloors?.() ?? [];
+      const ownTop = onScreen.find((e) => e.floor === floor)?.top ?? 0;
+      return targets.map((target) => {
+        const top = onScreen.find((e) => e.floor === target)?.top ?? ownTop;
+        const bar = getIncomeBarCenter(isGround(target));
+        return { x: bar.x - center.x, y: top - ownTop + bar.y - center.y };
+      });
+    },
+    onHit: (bar, step) => {
+      const target = targets[bar];
+      // a snowball bangs a step higher with every bar
+      playBarExplosion(1 + step * 0.08);
+      const levels = momentLevels(moment, bar === 0, count, step);
+      if (levels > 0) {
+        increaseIncomeRateBy(target, levels);
+        given.set(target, (given.get(target) ?? 0) + levels);
+        deps.persist();
+      }
+      const fresh = levels > 0 || !shown.has(target);
+      shown.add(target);
+      punchIncomeBar(
+        target,
+        fresh && given.has(target) ? `+${given.get(target)} Lvl` : null,
+      );
+    },
+  };
 }
 
 // a badge landing on a floor turns the foil its crit brought, revealed if it does
@@ -2233,7 +2296,7 @@ export function handleFloorClick(
       const critDown = isCritDown(floor);
       const randomCrit = getRandomCrit(floor);
       const mergeCrit = getMergeCrit(floor);
-      const rapidFireCrit = isRapidFireCrit(floor);
+      const critMoment = getCritMoment(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
       const carriesEvent = takeClaimedEventProc(floor);
@@ -2259,7 +2322,7 @@ export function handleFloorClick(
             critDown,
             randomCrit,
             mergeCrit,
-            rapidFireCrit,
+            critMoment,
           }),
         );
         // the special event this crit carried instead of a special crit

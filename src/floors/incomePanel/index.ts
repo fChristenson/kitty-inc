@@ -167,6 +167,11 @@ const PUNCH_SQUASH = 0.4;
 const PUNCH_SPREAD = 0.12;
 const PUNCH_FLASH_MS = 300;
 const PUNCH_RING_MS = 320;
+// of the bar's width
+const PUNCH_SLOSH = 0.15;
+const PUNCH_SLOSH_MS = 900;
+const PUNCH_SLOSH_DECAY_MS = 250;
+const PUNCH_SLOSH_PERIOD_MS = 200;
 const PUNCH_LABEL_MS = 1000;
 const PUNCH_LABEL_RISE = 70;
 const PUNCH_LABEL_FONT = 80;
@@ -661,6 +666,14 @@ export function drawIncomePanel(
         barMinWidth,
         barW * (eventFlash?.fill ?? cycleFill(floor, cycle, timerNow)),
       );
+    }
+    if (sincePunch < PUNCH_SLOSH_MS) {
+      // rung like a bell, its fill sloshing back and forth as it settles
+      const slosh =
+        PUNCH_SLOSH *
+        Math.exp(-sincePunch / PUNCH_SLOSH_DECAY_MS) *
+        Math.sin((2 * Math.PI * sincePunch) / PUNCH_SLOSH_PERIOD_MS);
+      fillW = Math.min(barW, Math.max(barMinWidth, fillW + barW * slosh));
     }
     // a permanently-crited floor's bar matches its own tier color instead of the
     // usual green, mirroring the upgrade button's own color choice
