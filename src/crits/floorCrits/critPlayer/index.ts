@@ -243,6 +243,8 @@ const LOADERS: Record<CritMoment, () => Promise<unknown>> = {
   quakeCrit: () => import("../crits/quakeCrit"),
   fireworksCrit: () => import("../crits/fireworksCrit"),
   shatterCrit: () => import("../crits/shatterCrit"),
+  railgunCrit: () => import("../crits/railgunCrit"),
+  buzzsawCrit: () => import("../crits/buzzsawCrit"),
 };
 const loading = new Map<CritMoment, Promise<unknown>>();
 

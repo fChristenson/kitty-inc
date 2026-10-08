@@ -37,6 +37,8 @@
 - **Laser crit:** the number floats off to the side, charges, and fires a blazing beam that sweeps down across every bar in view, each flaring as it's crossed, then locks onto its own bar for the final blast.
 - **Drill crit:** the number spins into a drill and bores straight down through every bar in view, stalling and grinding on each one in a gush of sparks before punching through.
 - **Quake crit:** the number slams into the ground, and a quake ripples up the building, every bar in view leaping off its floor and crashing back down in turn.
+- **Railgun crit:** the number rises over the building and charges, glitter streaming into it from all round faster and faster, then fires one blinding shot straight down through every bar in view at once, recoiling up off the screen.
+- **Buzzsaw crit:** the number spins into a whirling saw blade that drops onto the top bar and rips along it end to end in a fountain of sparks, then hops onto the next bar down and rips through that, all the way down.
 
 ## Game ideas
 
@@ -65,3 +67,14 @@ Playground for every idea below: `tmp/_playground/ideas.html` (`?only=Name` for 
 - **Floor crit collection:** every floor crit is collected like a badge the first time it plays, with its own card in the badge book and a capsule once all are found.
 - **Lucky reel:** a crit's number sometimes spins like a slot reel as it lands, now and then ticking over to the next tier up.
 - **Hot bars:** a bar hit by several floor crits in a row heats up, glowing hotter each time, until the next hit makes it boil over in a payout.
+
+## Next ideas
+
+Floor crits in the vein of Laser, Drill, Quake, Fireworks and Shatter. Playground: `tmp/_playground/ideas.html?list=next`.
+
+- **Demolition crit:** the number shrinks into a wisp that zips down the building planting a blinking charge at both ends of every bar in view, the charges blink faster and faster, then blow bottom to top in a chain, each blast bigger.
+- **Fault line crit:** the number drops into a glowing crack that tears slowly down the screen through every bar in view, prising each one open with light pouring out, then the crack slams shut in a blast along its whole length.
+- **Prism crit:** the number turns into a spinning prism high over the building, a blazing beam pours into it from the sky and splits into a fan of beams, one locking onto every bar in view, burning brighter until they all blast together.
+- **Gatling crit:** the number spins up at the edge of the screen like a gatling and strafes the bars in view with a roaring stream of wisp bullets, raking up and down the building, every bar rattling under the hits, then fires one huge round into its own bar.
+- **Whip crit:** the number unspools into a long whip of glitter that winds back and lashes out, its tip cracking against a bar with a flash and a bang, again and again across the bars in view, the last crack on its own bar the loudest.
+- **Battering ram crit:** the number charges in off the edge of the screen like a battering ram and smashes into the end of each bar in view, shoving it in, then backs off and rams its own bar three times, harder each time, until it bursts.

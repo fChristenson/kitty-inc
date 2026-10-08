@@ -177,6 +177,14 @@ export const CRIT_CONFIG = {
     shatterCrit: {
       chance: 0.03,
     },
+    // a railgun charging over the bars and firing one shot down through all
+    // of them, or a buzzsaw ripping along each one end to end
+    railgunCrit: {
+      chance: 0.03,
+    },
+    buzzsawCrit: {
+      chance: 0.03,
+    },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
     badgeShimmer: {
