@@ -1,13 +1,24 @@
 import { drawCartoonText } from "../../utils";
 import { COLOR } from "../../palette";
+import { playSold, playAutoPurchase, playSwoosh } from "../../sound";
 import {
-  playSold,
-  playPayout,
-  playAutoPurchase,
-  playSwoosh,
-} from "../../sound";
-import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
-import { tierColor } from "../../shared/bonusTierReward";
+  drawCapsuleIcon,
+  playCapsuleRevealBeats,
+  rollFloorBuyCrit,
+  capsuleRevealContent,
+  drawRevealStage,
+  revealStageTotalMs,
+  CRIT_TIER_CONFIG,
+  type CritTier,
+  type CritProcKind,
+  type CritRollResult,
+  getCritBadgeOverlay,
+  celebrateBuildingCrit,
+  getScreenShakeOffset,
+  drawCritFlash,
+  isCritFlashActive,
+} from "../../crits";
+
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
 import { setActiveCompanyIndex } from "../../company";
@@ -36,46 +47,18 @@ import {
   getMarkerJumpOffset,
   MARKER_COIN_BURST_SCALE,
 } from "./markers";
-import {
-  drawCapsuleIcon,
-  playCapsuleRevealBeats,
-} from "../../shared/badgeReveal/capsule";
-import {
-  MAX_FLOORS_PER_BUILDING,
-  rollFloorBuyCrit,
-  capsuleRevealContent,
-  drawRevealStage,
-  revealStageTotalMs,
-} from "../../floors";
-import {
-  CRIT_TIER_CONFIG,
-  UPGRADE_CRIT_LABEL,
-  UPGRADE_CRIT_COLOR,
-  HEAVENLY_CRIT_LABEL,
-  HEAVENLY_CRIT_COLOR,
-  MYSTIC_CRIT_LABEL,
-  MYSTIC_CRIT_COLOR,
-  GRAND_OPENING_CRIT_LABEL,
-  GRAND_OPENING_CRIT_COLOR,
-  runFirstCritProc,
-  type CritTier,
-  type CritProcKind,
-  type CritRollResult,
-} from "../../shared/critTypes";
+
+import { MAX_FLOORS_PER_BUILDING } from "../../floors";
+
 import { loadCityMapState, saveCityMapState } from "./cityMapState";
 import { createIncomeReadout } from "./incomeReadout";
 import { createCorpBarrel } from "./corpBarrel";
 import { createCityTransitions } from "./transitions";
 import { loadSprite, loadImageByName } from "../../loadAssets";
-import { getCritBadgeOverlay } from "../../shared/critBadgeOverlay";
+
 import { createPurchaseFeedback } from "../../shared/purchaseFeedback";
 import { type BigNumber, gte } from "../../shared/bigNumber";
-import {
-  triggerScreenShake,
-  getScreenShakeOffset,
-  drawCritFlash,
-  isCritFlashActive,
-} from "../../screenShake";
+
 import { isDialogOpen, isDialogSliding } from "../../shared/dialogVisibility";
 
 // a static overview map (see docs/prompts.md's "City map tile" prompt), drawn
@@ -666,16 +649,15 @@ export function createCityMapView(
     canvas.style.cursor = hit !== null ? "pointer" : "default";
   }
 
-  // same tiered shake/sfx language as floors/floorInteractions/critCelebration.ts's
-  // triggerCritCelebration, adapted for this flat map canvas — no Floor to anchor a
-  // floors/coins burst on, so this reuses coinBurst's own flat-canvas
-  // spawnCoinBurstAt instead
+  // a building crit's coin bursts at its marker (flat map canvas: no Floor to
+  // anchor a floors/coins burst on, so coinBurst's own spawnCoinBurstAt), with
+  // its flash from crits' celebrateBuildingCrit
   function triggerMapCatCritCelebration(
     result: CritRollResult,
     cx: number,
     feetY: number,
   ): void {
-    const { tier, chain } = result;
+    const { tier } = result;
     const burstY = feetY - MARKER_H / 2;
     const burstCount = tier === "ultra" ? 5 : tier === "mega" ? 3 : 2;
     for (let i = 0; i < burstCount; i++) {
@@ -683,50 +665,7 @@ export function createCityMapView(
         spawnCoinBurstAt(cx, burstY, MARKER_COIN_BURST_SCALE * 1.5);
       }, i * 90);
     }
-    // only ONE flash can ever show at once, so Mystic/heavenly/upgrade/grand opening
-    // — the only 3 procs this whole-building event supports (see
-    // setBuildingCritTier) — are mutually exclusive with each other and with
-    // the plain tier flash below, in priority order (heavenly first: it's the
-    // bigger moment if both happen to land together). A landed proc with no
-    // entry here just falls through to the plain tier flash
-    const playedSpecial = runFirstCritProc(
-      result,
-      undefined,
-      {
-        mystic: () => {
-          triggerScreenShake({
-            intensity: 2.2,
-            label: MYSTIC_CRIT_LABEL,
-            color: MYSTIC_CRIT_COLOR,
-            strokeWidth: 15,
-            blinkHz: 6,
-            holdMs: 900,
-            priority: 2,
-          });
-          playPayout();
-        },
-        // heavenly crit: the same ultra-strength flash the floors use
-        heavenly: () =>
-          playTierFlash("ultra", HEAVENLY_CRIT_LABEL, HEAVENLY_CRIT_COLOR),
-        // upgrade crit: the flat special flash (the reward itself, promoting
-        // every floor's tier one step, is applied by main.ts)
-        upgrade: () => playSpecialFlash(UPGRADE_CRIT_LABEL, UPGRADE_CRIT_COLOR),
-        grandOpening: () =>
-          playSpecialFlash(
-            GRAND_OPENING_CRIT_LABEL,
-            GRAND_OPENING_CRIT_COLOR,
-            playSold,
-          ),
-      },
-      ["mystic", "heavenly", "grandOpening", "upgrade"],
-    );
-    if (playedSpecial) return;
-    // chain crit: the flash shows "Chain" instead of the tier's number
-    playTierFlash(
-      tier,
-      chain ? "Chain" : CRIT_TIER_CONFIG[tier].label,
-      tierColor(tier),
-    );
+    celebrateBuildingCrit(result);
   }
 
   // clicking the next locked building (buildings unlock strictly in order) buys it

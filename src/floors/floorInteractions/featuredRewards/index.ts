@@ -6,7 +6,7 @@ import {
   type FeaturedCritKind,
   type FeaturedRewardActions,
 } from "../../../shared/critTypes";
-import type { CritRewardContext } from "../index";
+import type { CritRewardContext } from "../floorCritRewards";
 
 // binds every featured crit's reward (shared/critTypes/featured) to this floor
 // module's upgrade/payout actions. Rolled crits only land once the rewards are

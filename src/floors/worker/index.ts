@@ -24,7 +24,7 @@ import {
   CRIT_TIER_ORDER,
   nextCritTier,
   type CritTier,
-} from "../../shared/critTypes";
+} from "../../crits";
 import { randomInt } from "../../utils";
 import { CONFIG } from "../../config";
 import { loadSprite } from "../../loadAssets";

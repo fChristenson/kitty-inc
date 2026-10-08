@@ -23,7 +23,7 @@ import {
   subtract,
   gte,
 } from "../shared/bigNumber";
-import type { CritTier } from "../shared/critTypes";
+import type { CritTier } from "../crits";
 import { createSaveScheduler } from "../shared/persistence";
 
 // bumped from "cash-clicker:floors" now that this holds Floor[][] (one entry per

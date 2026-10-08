@@ -1,4 +1,5 @@
-import { getCritTier, getUpgradeCost } from "../../floors";
+import { getUpgradeCost } from "../../floors";
+import { getCritTier } from "../../crits";
 import type { RenovationPlan } from "../../shared/buildingJob";
 import { isFloorLocked } from "../../shared/detachedJob";
 import { isFloorMaxed, type Floor } from "../../gameState";

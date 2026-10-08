@@ -1,7 +1,7 @@
 // a number rasterised in the crit font as an ink mask, each digit laid out on
 // its own a clear gap apart so they never merge, for the events that draw the
 // crit's 5, 25 or 125 across the screen (Draw fills it, Night Sky traces it)
-import { critFont } from "../critText";
+import { critFont } from "../../crits";
 
 export type Point = { x: number; y: number };
 export type Area = { left: number; top: number; right: number; bottom: number };

@@ -213,7 +213,7 @@ async function main() {
       };
     });
 
-    // ---------- legacy procs: hand-modelled from src/critBalance/procs ----------
+    // ---------- legacy procs: hand-modelled from src/crits/floorCrits/balance ----------
     const featuredKinds = new Set(Object.keys(crit.FEATURED_CRITS));
     const legacy = crit.CRIT_PROC_KINDS.filter(
       (k) => !featuredKinds.has(k),
@@ -230,7 +230,7 @@ async function main() {
     });
 
     // ---------- events: classified from their source ----------
-    const events = readdirSync("src/floors")
+    const events = readdirSync("src/crits/animatedCrits/events")
       .filter((d) => d.endsWith("Event"))
       .map((dir) => eventEntry(dir, CONFIG))
       .filter(Boolean);
@@ -446,7 +446,7 @@ function featuredEffects(source, c, tierLevels) {
   return out.filter((e) => Number.isFinite(e.perm) && Number.isFinite(e.once));
 }
 
-// ---------- legacy procs (from the comments in src/critBalance/procs) ----------
+// ---------- legacy procs (from the comments in src/crits/floorCrits/balance) ----------
 // ~ marks a guess where the balance file doesn't give the size
 const LEGACY = {
   // payouts
@@ -568,7 +568,7 @@ function eventEntry(dir, CONFIG) {
   const cfg = CONFIG[`${name}Event`];
   let src;
   try {
-    src = readFileSync(`src/floors/${dir}/index.ts`, "utf8");
+    src = readFileSync(`src/crits/animatedCrits/events/${dir}/index.ts`, "utf8");
   } catch {
     return null;
   }

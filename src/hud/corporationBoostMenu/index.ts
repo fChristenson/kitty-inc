@@ -9,8 +9,10 @@ import {
   getCritProcIncomeModifierPercent,
   getCritProcNextMilestoneCount,
   getBadgeFoil,
-} from "../../shared/critTypes";
-import type { BadgeFoil, CritProcKind } from "../../shared/critTypes";
+  type BadgeFoil,
+  type CritProcKind,
+} from "../../crits";
+
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import { onTapOrClick } from "../../shared/tapEvents";
 import { formatBoostPercent } from "./economy";

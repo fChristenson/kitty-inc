@@ -9,7 +9,7 @@ import path from "node:path";
 import { ROOT, WORK } from "./lib/crit-asset-paths.mjs";
 import { writeContactSheet } from "./lib/contact-sheet.mjs";
 
-const FEATURED = path.join(ROOT, "src/shared/critData");
+const FEATURED = path.join(ROOT, "src/crits/badgeCrits/critData");
 const args = process.argv.slice(2);
 const perSheet = Number(
   args.find((arg) => arg.startsWith("--per-sheet="))?.split("=")[1] ?? 48,

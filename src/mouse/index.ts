@@ -16,11 +16,12 @@ import { COLOR } from "../palette";
 import { notifyHuntTargetGone, registerHuntTarget } from "../shared/huntTarget";
 import { whitenImage } from "../shared/mergeFlash";
 import { drawSlamTarget, getSlamPose } from "../shared/eventEndSlam";
-import { pickCritTierByOdds } from "../shared/critTypes";
 import {
+  pickCritTierByOdds,
   applyBonusTierIncome,
   celebrateBonusTier,
-} from "../shared/bonusTierReward";
+} from "../crits";
+
 
 // a free bonus critter: spawns at random on a random unlocked floor of whichever
 // building is currently active, runs back and forth for a few seconds, and — if

@@ -6,9 +6,9 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { ROOT, camelCase } from "./lib/crit-asset-paths.mjs";
 
-const DATA = path.join(ROOT, "src/shared/critData");
-const FEATURED = path.join(ROOT, "src/shared/critTypes/featured");
-const BALANCE = path.join(ROOT, "src/critBalance");
+const DATA = path.join(ROOT, "src/crits/badgeCrits/critData");
+const FEATURED = path.join(ROOT, "src/crits/badgeCrits/featured");
+const BALANCE = path.join(ROOT, "src/crits/badgeCrits/balance");
 const args = process.argv.slice(2);
 if (args.length === 0 || args.length % 2)
   throw new Error(

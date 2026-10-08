@@ -1,0 +1,52 @@
+// the starter pile (see index.ts): a few events of every look, loaded first so
+// events can land while the 8 big parts are still to come; each registers
+// itself with the event-proc pool when it loads
+import "../events/downpourEvent";
+import "../events/tidalWaveEvent";
+import "../events/fountainEvent";
+import "../events/wispEvent";
+import "../events/cometEvent";
+import "../events/orbitalStrikeEvent";
+import "../events/scannerEvent";
+import "../events/chainLightningEvent";
+import "../events/fuseEvent";
+import "../events/supernovaEvent";
+import "../events/chainReactionEvent";
+import "../events/gatlingEvent";
+import "../events/bulletHellEvent";
+import "../events/screensaverEvent";
+import "../events/superballEvent";
+import "../events/ricochetEvent";
+import "../events/drillEvent";
+import "../events/laserDrillEvent";
+import "../events/breakthroughEvent";
+import "../events/airbrushEvent";
+import "../events/curvesEvent";
+import "../events/clutterEvent";
+import "../events/accretionEvent";
+import "../events/bulletMosaicEvent";
+
+export { forceDownpourEvent } from "../events/downpourEvent";
+export { forceTidalWaveEvent } from "../events/tidalWaveEvent";
+export { forceFountainEvent } from "../events/fountainEvent";
+export { forceWispEvent } from "../events/wispEvent";
+export { forceCometEvent } from "../events/cometEvent";
+export { forceOrbitalStrikeEvent } from "../events/orbitalStrikeEvent";
+export { forceScannerEvent } from "../events/scannerEvent";
+export { forceChainLightningEvent } from "../events/chainLightningEvent";
+export { forceFuseEvent } from "../events/fuseEvent";
+export { forceSupernovaEvent } from "../events/supernovaEvent";
+export { forceChainReactionEvent } from "../events/chainReactionEvent";
+export { forceGatlingEvent } from "../events/gatlingEvent";
+export { forceBulletHellEvent } from "../events/bulletHellEvent";
+export { forceScreensaverEvent } from "../events/screensaverEvent";
+export { forceSuperballEvent } from "../events/superballEvent";
+export { forceRicochetEvent } from "../events/ricochetEvent";
+export { forceDrillEvent } from "../events/drillEvent";
+export { forceLaserDrillEvent } from "../events/laserDrillEvent";
+export { forceBreakthroughEvent } from "../events/breakthroughEvent";
+export { forceAirbrushEvent } from "../events/airbrushEvent";
+export { forceCurvesEvent } from "../events/curvesEvent";
+export { forceClutterEvent } from "../events/clutterEvent";
+export { forceAccretionEvent } from "../events/accretionEvent";
+export { forceBulletMosaicEvent } from "../events/bulletMosaicEvent";

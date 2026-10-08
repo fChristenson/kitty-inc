@@ -10,7 +10,7 @@ import {
   type CritMoment,
   type CritProcKind,
   type CritTier,
-} from "../../shared/critTypes";
+} from "../../crits";
 export { createTestButtonMarkup, wireCritTestActions } from "./critTestActions";
 
 // arms a crit of a random badge brought up to the foil, revealed once clicked

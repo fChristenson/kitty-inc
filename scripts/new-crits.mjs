@@ -55,9 +55,9 @@ import { addStickerBorder, writeSilhouette } from "./lib/sticker-border.mjs";
 const ROOT = path.resolve(import.meta.dirname, "..");
 const INBOX = WORK;
 const SHEETS = path.join(WORK, "_sheets");
-const FEATURED = path.join(ROOT, "src/shared/critTypes/featured");
-const DATA = path.join(ROOT, "src/shared/critData");
-const BALANCE = path.join(ROOT, "src/critBalance");
+const FEATURED = path.join(ROOT, "src/crits/badgeCrits/featured");
+const DATA = path.join(ROOT, "src/crits/badgeCrits/critData");
+const BALANCE = path.join(ROOT, "src/crits/badgeCrits/balance");
 const RAW_EXTENSIONS = [".jfif", ".jpg", ".jpeg", ".webp", ".png"];
 const args = process.argv.slice(2);
 const specFile = path.resolve(
@@ -571,13 +571,13 @@ function ensureCategory(category) {
   register(
     DATA,
     `${constant}_CRITS`,
-    'import { COLOR } from "../../palette";\nimport type { FeaturedCritData } from "./types";\n\n',
+    'import { COLOR } from "../../../palette";\nimport type { FeaturedCritData } from "./types";\n\n',
     "} as const satisfies Record<string, FeaturedCritData>;",
   );
   register(
     FEATURED,
     `${constant}_REWARDS`,
-    `import type { ${constant}_CRITS } from "../../critData/${category}";\nimport type { FeaturedRewards } from "./types";\n\n`,
+    `import type { ${constant}_CRITS } from "../critData/${category}";\nimport type { FeaturedRewards } from "./types";\n\n`,
     `} satisfies FeaturedRewards<typeof ${constant}_CRITS>;`,
   );
   register(
@@ -588,7 +588,7 @@ function ensureCategory(category) {
   );
   if (isNew)
     console.log(
-      `add ${category} to its main category in src/shared/critData/groups.ts`,
+      `add ${category} to its main category in src/crits/badgeCrits/critData/groups.ts`,
     );
 }
 

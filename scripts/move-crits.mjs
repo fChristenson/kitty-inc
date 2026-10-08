@@ -8,9 +8,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { ROOT } from "./lib/crit-asset-paths.mjs";
 
-const DATA = path.join(ROOT, "src/shared/critData");
-const FEATURED = path.join(ROOT, "src/shared/critTypes/featured");
-const BALANCE = path.join(ROOT, "src/critBalance");
+const DATA = path.join(ROOT, "src/crits/badgeCrits/critData");
+const FEATURED = path.join(ROOT, "src/crits/badgeCrits/featured");
+const BALANCE = path.join(ROOT, "src/crits/badgeCrits/balance");
 const SRC = path.join(ROOT, "src");
 const RAWS = path.join(ROOT, "tmp/crits");
 const ASSETS = [
@@ -112,7 +112,7 @@ function load(category) {
       isNew: true,
       data: {
         header: [
-          'import { COLOR } from "../../palette";',
+          'import { COLOR } from "../../../palette";',
           'import type { FeaturedCritData } from "./types";',
           "",
           `export const ${constant}_CRITS = {`,
@@ -122,7 +122,7 @@ function load(category) {
       },
       rewards: {
         header: [
-          `import type { ${constant}_CRITS } from "../../critData/${category}";`,
+          `import type { ${constant}_CRITS } from "../critData/${category}";`,
           'import type { FeaturedRewards } from "./types";',
           "",
           `export const ${constant}_REWARDS = {`,
@@ -320,9 +320,9 @@ for (const { from, to } of moved) {
 for (const [route, count] of counts) console.log(`${count}\t${route}`);
 if (added.length)
   console.log(
-    `created: ${added.join(", ")} (add to src/shared/critData/groups.ts)`,
+    `created: ${added.join(", ")} (add to src/crits/badgeCrits/critData/groups.ts)`,
   );
 if (removed.length)
   console.log(
-    `deleted: ${removed.join(", ")} (drop from src/shared/critData/groups.ts)`,
+    `deleted: ${removed.join(", ")} (drop from src/crits/badgeCrits/critData/groups.ts)`,
   );

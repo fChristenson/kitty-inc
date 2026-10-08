@@ -67,9 +67,9 @@ export async function withGame(run) {
   });
   try {
     const { CONFIG } = await server.ssrLoadModule("/src/config.ts");
-    const types = await server.ssrLoadModule("/src/shared/critTypes/index.ts");
+    const types = await server.ssrLoadModule("/src/crits/critTypes/index.ts");
     const { FEATURED_REWARDS } = await server.ssrLoadModule(
-      "/src/shared/critTypes/featured/index.ts",
+      "/src/crits/badgeCrits/featured/index.ts",
     );
     return await run({ CONFIG, crit: { ...types, FEATURED_REWARDS } });
   } finally {

@@ -7,11 +7,15 @@ import {
 } from "../../gameState";
 import { MAX_RENDERED_WORKERS, permaBoostSpeedMultiplier } from "../worker";
 import {
-  CRIT_TIER_CONFIG,
   isOvertimeGaugeVisible,
   isOvertimeCancelArmed,
   getOvertimeDisplayTicks,
   getOvertimeDisplayGoal,
+  getBoilHeat,
+  getHoldHeat,
+} from "../upgradeButton";
+import {
+  CRIT_TIER_CONFIG,
   isFrozenActive,
   isSpendingFreezeActive,
   isRushHourActive,
@@ -19,11 +23,10 @@ import {
   isRateLockActive,
   RATE_LOCK_SPEED_MULTIPLIER,
   getPriceMatchCost,
-  getBoilHeat,
-  getHoldHeat,
-} from "../upgradeButton";
+  drawPoppingCritText,
+} from "../../crits";
 import { getWiggleRotation } from "../../shared/wiggle";
-import { drawPoppingCritText } from "../../shared/critText";
+
 import { drawGlow, fadeStops, type FadeStops } from "../../shared/glowSprite";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
 import {

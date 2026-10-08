@@ -1,0 +1,155 @@
+import { COLOR } from "../../../palette";
+import type { FeaturedCritData } from "./types";
+
+export const EAST_ASIAN_FEASTS_CRITS = {
+  bentoBox: {
+    label: "Bento Box",
+    color: COLOR.headhunterRust,
+    image: "crits/eastAsianFeasts/bentoBox.webp",
+    description: "Pays 31 times the highest floor's upgrade price in cash",
+  },
+  charredSkewer: {
+    label: "Charred Skewer",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/eastAsianFeasts/charredSkewer.webp",
+    description: "Pays 35 times the highest floor's upgrade price in cash",
+  },
+  chickenRiceMound: {
+    label: "Chicken Rice Mound",
+    color: COLOR.supplyRunTan,
+    image: "crits/eastAsianFeasts/chickenRiceMound.webp",
+    description: "Pays 36 times the highest floor's upgrade price in cash",
+  },
+  chopstickDumplings: {
+    label: "Chopstick Dumplings",
+    color: COLOR.gold,
+    image: "crits/eastAsianFeasts/chopstickDumplings.webp",
+    description: "Pays 37 times the highest floor's upgrade price in cash",
+  },
+  cutletAndCake: {
+    label: "Cutlet And Cake",
+    color: COLOR.gold,
+    image: "crits/eastAsianFeasts/cutletAndCake.webp",
+    description: "Promotes 87.5% of this building's workers one perma tier",
+  },
+  dimSumTea: {
+    label: "Dim Sum Tea",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/eastAsianFeasts/dimSumTea.webp",
+    description: "Pays 41 times the highest floor's upgrade price in cash",
+  },
+  eggTopRice: {
+    label: "Egg Top Rice",
+    color: COLOR.amberMuted,
+    image: "crits/eastAsianFeasts/eggTopRice.webp",
+    description: "Promotes 88.5% of this building's workers one perma tier",
+  },
+  friedRiceSkewers: {
+    label: "Fried Rice Skewers",
+    color: COLOR.gold,
+    image: "crits/eastAsianFeasts/friedRiceSkewers.webp",
+    description: "Pays 44 times the highest floor's upgrade price in cash",
+  },
+  glazedPorkPlate: {
+    label: "Glazed Pork Plate",
+    color: COLOR.headhunterRust,
+    image: "crits/eastAsianFeasts/glazedPorkPlate.webp",
+    description: "Pays 60 times the highest floor's upgrade price in cash",
+  },
+  goldenCakeGrill: {
+    label: "Golden Cake Grill",
+    color: COLOR.supplyRunTan,
+    image: "crits/eastAsianFeasts/goldenCakeGrill.webp",
+    description: "Promotes 90% of this building's workers one perma tier",
+  },
+  grilledFishRice: {
+    label: "Grilled Fish Rice",
+    color: COLOR.gold,
+    image: "crits/eastAsianFeasts/grilledFishRice.webp",
+    description: "Pays 62 times the highest floor's upgrade price in cash",
+  },
+  meatballNoodles: {
+    label: "Meatball Noodles",
+    color: COLOR.headhunterRust,
+    image: "crits/eastAsianFeasts/meatballNoodles.webp",
+    description: "Pays 66 times the highest floor's upgrade price in cash",
+  },
+  nigiriRainbow: {
+    label: "Nigiri Rainbow",
+    color: COLOR.coinGold,
+    image: "crits/eastAsianFeasts/nigiriRainbow.webp",
+    description: "Promotes 93% of this building's workers one perma tier",
+  },
+  onigiriParty: {
+    label: "Onigiri Party",
+    color: COLOR.coinGold,
+    image: "crits/eastAsianFeasts/onigiriParty.webp",
+    description: "Pays 68 times the highest floor's upgrade price in cash",
+  },
+  puddingCupMussels: {
+    label: "Pudding Cup Mussels",
+    color: COLOR.gold,
+    image: "crits/eastAsianFeasts/puddingCupMussels.webp",
+    description: "Spreads 82 free upgrades over this floor and the ones below",
+  },
+  redBeanCatch: {
+    label: "Red Bean Catch",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/eastAsianFeasts/redBeanCatch.webp",
+    description: "Promotes 95.5% of this building's workers one perma tier",
+  },
+  redPorkBowl: {
+    label: "Red Pork Bowl",
+    color: COLOR.redActive,
+    image: "crits/eastAsianFeasts/redPorkBowl.webp",
+    description: "Pays 72 times the highest floor's upgrade price in cash",
+  },
+  salmonSquareSnacks: {
+    label: "Salmon Square Snacks",
+    color: COLOR.supplyRunTan,
+    image: "crits/eastAsianFeasts/salmonSquareSnacks.webp",
+    description: "Pays 74 times the highest floor's upgrade price in cash",
+  },
+  sausageToastRice: {
+    label: "Sausage Toast Rice",
+    color: COLOR.coinGold,
+    image: "crits/eastAsianFeasts/sausageToastRice.webp",
+    description: "Pays 75 times the highest floor's upgrade price in cash",
+  },
+  silverFishSupper: {
+    label: "Silver Fish Supper",
+    color: COLOR.starYellow,
+    image: "crits/eastAsianFeasts/silverFishSupper.webp",
+    description: "Promotes 97.5% of this building's workers one perma tier",
+  },
+  steamingHotPot: {
+    label: "Steaming Hot Pot",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/eastAsianFeasts/steamingHotPot.webp",
+    description: "Pays 77 times the highest floor's upgrade price in cash",
+  },
+  teaHouseLunch: {
+    label: "Tea House Lunch",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/eastAsianFeasts/teaHouseLunch.webp",
+    description: "Spreads 90 free upgrades over this floor and the ones below",
+  },
+  tempuraTray: {
+    label: "Tempura Tray",
+    color: COLOR.orange,
+    image: "crits/eastAsianFeasts/tempuraTray.webp",
+    description: "Promotes 99.5% of this building's workers one perma tier",
+  },
+  bunAndFillet: {
+    label: "Bun And Fillet",
+    color: COLOR.chairGiveawayBrown,
+    image: "crits/eastAsianFeasts/bunAndFillet.webp",
+    description: "Pays 85 times the highest floor's upgrade price in cash",
+  },
+  stickyRiceCloud: {
+    label: "Sticky Rice Cloud",
+    color: COLOR.amber,
+    image: "crits/eastAsianFeasts/stickyRiceCloud.webp",
+    description: "Spreads 108 free upgrades over this floor and the ones below",
+  },
+} as const satisfies Record<string, FeaturedCritData>;

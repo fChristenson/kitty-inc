@@ -33,7 +33,7 @@ function registeredFiles() {
     if (!block) throw new Error("Could not parse IMAGE_FILES");
     registered = [...block[1].matchAll(/"([^"]+\.webp)"/g)].map((m) => m[1]);
     // featured crits carry their own `image` path in their data
-    const featuredDir = path.join(ROOT, "src/shared/critData");
+    const featuredDir = path.join(ROOT, "src/crits/badgeCrits/critData");
     for (const file of fs.readdirSync(featuredDir)) {
       const text = fs.readFileSync(path.join(featuredDir, file), "utf8");
       for (const m of text.matchAll(/\bimage: "([^"]+\.webp)"/g))

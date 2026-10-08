@@ -2,24 +2,27 @@
 // holds, test-bar buttons) and measures a window of frames. Loaded only once
 // the game has booted, so these imports share the game's module instances.
 import {
-  applyBoostAll,
-  getButtonCenter,
   loadEventCatalog,
-  spawnCoinBurst,
-  triggerOvertimeBoost,
-} from "../src/floors";
-import { fromNumber } from "../src/shared/bigNumber";
-import {
   CRIT_PROC_INFO,
   CRIT_PROC_KINDS,
   CRIT_TIER_CONFIG,
   CRIT_TIER_ORDER,
   FEATURED_CRIT_KINDS,
   SPECIAL_CRIT_GATEWAY,
-} from "../src/shared/critTypes";
+  setCritRandom,
+  shakeScreen,
+} from "../src/crits";
+import {
+  applyBoostAll,
+  getButtonCenter,
+  spawnCoinBurst,
+  triggerOvertimeBoost,
+} from "../src/floors";
+import { fromNumber } from "../src/shared/bigNumber";
+
 import { getActiveCorporationIndices } from "../src/company";
-import { setCritRandom } from "../src/shared/critRandom";
-import { shakeScreen } from "../src/screenShake";
+
+
 import type { Floor } from "../src/gameState";
 import type { PerfBridge } from "../src/shared/perfBridge";
 import { start, stop, type Summary } from "./metrics";

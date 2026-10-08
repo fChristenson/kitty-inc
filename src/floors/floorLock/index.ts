@@ -1,5 +1,5 @@
 import { buildFloor } from "..";
-import { getUniformCritTier } from "../upgradeButton";
+import { getUniformCritTier } from "../../crits";
 import { FLOOR_W, FLOOR_H } from "../constants";
 import type { Floor } from "../../gameState";
 import { type BigNumber, ZERO, add } from "../../shared/bigNumber";

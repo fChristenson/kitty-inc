@@ -1,5 +1,5 @@
 import type { BuildingDraft } from "../shared/buildingJob";
-import type { CritProcKind } from "../shared/critTypes";
+import type { CritProcKind } from "../crits";
 
 export {
   renovateFloors,

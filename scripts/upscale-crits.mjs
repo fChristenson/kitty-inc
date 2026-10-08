@@ -19,11 +19,14 @@ const imageFiles = Object.fromEntries(
     ...read("src/loadAssets/index.ts").matchAll(
       /^\s+(\w+): "([^"/]+\.webp)"/gm,
     ),
+    ...read("src/crits/critIcons.ts").matchAll(
+      /^\s+(\w+): "([^"/]+\.webp)"/gm,
+    ),
   ].map((m) => [m[1], m[2]]),
 );
 const procIcons = [
   ...new Set(
-    [...read("src/shared/critTypes/index.ts").matchAll(/icon: "(\w+)"/g)]
+    [...read("src/crits/critTypes/index.ts").matchAll(/icon: "(\w+)"/g)]
       .map((m) => imageFiles[m[1]])
       .filter(Boolean),
   ),

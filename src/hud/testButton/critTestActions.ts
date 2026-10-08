@@ -5,7 +5,7 @@ import {
   CRIT_TIER_CONFIG,
   type CritProcKind,
   type CritTier,
-} from "../../shared/critTypes";
+} from "../../crits";
 
 export const MAP_CRIT_TEST_KINDS: readonly CritProcKind[] = [
   "chain",

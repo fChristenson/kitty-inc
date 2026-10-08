@@ -1,4 +1,12 @@
 import {
+  openBuildingBadgeCapsule,
+  type OnScreenFloor,
+  getScreenShakeOffset,
+  drawCritFlash,
+  syncCritFlashPause,
+  stopScreenShake,
+} from "../../crits";
+import {
   FLOOR_W,
   FLOOR_H,
   GROUND_H,
@@ -9,13 +17,11 @@ import {
   hitTestUpgradeButton,
   hitTestUpgradeArrow,
   handleFloorClick,
-  openBuildingBadgeCapsule,
   type FloorActionsDeps,
   startButtonHoldAnim,
   stopButtonHoldAnim,
   isUpgradeButtonEnabled,
   getButtonCenter,
-  type OnScreenFloor,
 } from "../../floors";
 import {
   drawFloorBubbles,
@@ -29,12 +35,7 @@ import { drawRoof } from "../../buildings";
 import { drawHud, HUD_H } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
 import { getTotalIncome } from "../../totalIncome";
-import {
-  getScreenShakeOffset,
-  drawCritFlash,
-  syncCritFlashPause,
-  stopScreenShake,
-} from "../../screenShake";
+
 import { COLOR } from "../../palette";
 import type { BigNumber } from "../../shared/bigNumber";
 import {

@@ -1,0 +1,167 @@
+import { COLOR } from "../../../palette";
+import type { FeaturedCritData } from "./types";
+
+export const EMBRACES_CRITS = {
+  cheekToCheek: {
+    label: "Cheek To Cheek",
+    color: COLOR.disabledGray,
+    image: "crits/embraces/cheekToCheek.webp",
+    description: "Cuts every price in this building by 19.4%",
+  },
+  cropTopCuddle: {
+    label: "Crop Top Cuddle",
+    color: COLOR.luckyCloverGreen,
+    image: "crits/embraces/cropTopCuddle.webp",
+    description: "Boosts every worker for 151s, counting as 3 extra workers",
+  },
+  gildedEmbrace: {
+    label: "Gilded Embrace",
+    color: COLOR.threeOfAKindGreen,
+    image: "crits/embraces/gildedEmbrace.webp",
+    description: "Repeats the crit on the floor below, 93% chance to keep falling",
+  },
+  goldenNecklaceNuzzle: {
+    label: "Golden Necklace Nuzzle",
+    color: COLOR.luckyCloverGreen,
+    image: "crits/embraces/goldenNecklaceNuzzle.webp",
+    description: "Adds 21% of your total income",
+  },
+  handInHandHustle: {
+    label: "Hand In Hand Hustle",
+    color: COLOR.disabledGray,
+    image: "crits/embraces/handInHandHustle.webp",
+    description: "Repeats the crit on the floor above, 94% chance to keep climbing",
+  },
+  ironShoulderKiss: {
+    label: "Iron Shoulder Kiss",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/embraces/ironShoulderKiss.webp",
+    description: "Cuts every price in this building by 19.7%",
+  },
+  leanInLoot: {
+    label: "Lean In Loot",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/embraces/leanInLoot.webp",
+    description: "Boosts every worker for 154s, counting as 3 extra workers",
+  },
+  rainbowHairHuddle: {
+    label: "Rainbow Hair Huddle",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/embraces/rainbowHairHuddle.webp",
+    description: "Repeats the crit on the floor above, 95% chance to keep climbing",
+  },
+  sandwichSmooch: {
+    label: "Sandwich Smooch",
+    color: COLOR.suppliesGiveawayLime,
+    image: "crits/embraces/sandwichSmooch.webp",
+    description: "Adds 21.3% of your total income",
+  },
+  silverHairSnuggle: {
+    label: "Silver Hair Snuggle",
+    color: COLOR.luckyCloverGreen,
+    image: "crits/embraces/silverHairSnuggle.webp",
+    description: "Boosts every worker for 157s, counting as 3 extra workers",
+  },
+  evergreenEmbrace: {
+    label: "Evergreen Embrace",
+    color: COLOR.summerSaleOrange,
+    image: "crits/embraces/evergreenEmbrace.webp",
+    description: "Boosts every worker for 167s, counting as 3 extra workers",
+  },
+  moonbeamHuddle: {
+    label: "Moonbeam Huddle",
+    color: COLOR.teaBreakBrown,
+    image: "crits/embraces/moonbeamHuddle.webp",
+    description: "Cuts every price in this building by 21.1%",
+  },
+  bridalCarryBonus: {
+    label: "Bridal Carry Bonus",
+    color: COLOR.amberMuted,
+    image: "crits/embraces/bridalCarryBonus.webp",
+    description: "Thirty-eight instant payouts on this floor",
+  },
+  cheekToCheekCash: {
+    label: "Cheek to Cheek Cash",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/embraces/cheekToCheekCash.webp",
+    description: "Fifty instant payouts on this floor",
+  },
+  embraceEquity: {
+    label: "Embrace Equity",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/embraces/embraceEquity.webp",
+    description: "Fifty-three free upgrades on this floor",
+  },
+  eyeToEyeEarnings: {
+    label: "Eye to Eye Earnings",
+    color: COLOR.fastForwardBlue,
+    image: "crits/embraces/eyeToEyeEarnings.webp",
+    description: "Adds 24.4% of your total income",
+  },
+  hugItOutIncome: {
+    label: "Hug It Out Income",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/embraces/hugItOutIncome.webp",
+    description: "Adds 24.6% of your total income",
+  },
+  noseToNoseNetWorth: {
+    label: "Nose to Nose Net Worth",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/embraces/noseToNoseNetWorth.webp",
+    description: "Adds 24.7% of your total income",
+  },
+  sweptAwaySalary: {
+    label: "Swept Away Salary",
+    color: COLOR.summerSaleOrange,
+    image: "crits/embraces/sweptAwaySalary.webp",
+    description: "Fifty-five instant payouts on this floor",
+  },
+  warmWelcomeWages: {
+    label: "Warm Welcome Wages",
+    color: COLOR.coinGold,
+    image: "crits/embraces/warmWelcomeWages.webp",
+    description: "Fifty-seven instant payouts on this floor",
+  },
+  armCandy: {
+    label: "Arm Candy",
+    color: COLOR.summerSaleOrange,
+    image: "crits/embraces/armCandy.webp",
+    description: "Grows this floor's level by 8.2% in free upgrades",
+  },
+  snowcapSnuggle: {
+    label: "Snowcap Snuggle",
+    color: COLOR.amberMuted,
+    image: "crits/embraces/snowcapSnuggle.webp",
+    description: "Pays 35 times this floor's upgrade price in cash",
+  },
+  cottonCandyCuddle: {
+    label: "Cotton Candy Cuddle",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/embraces/cottonCandyCuddle.webp",
+    description: "Pays 65 times this floor's upgrade price in cash",
+  },
+  leggingsLeanIn: {
+    label: "Leggings Lean In",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/embraces/leggingsLeanIn.webp",
+    description: "Spreads 37 free upgrades over the lowest-level floors",
+  },
+  tealBraidNuzzle: {
+    label: "Teal Braid Nuzzle",
+    color: COLOR.summerSaleOrange,
+    image: "crits/embraces/tealBraidNuzzle.webp",
+    description: "Spreads 38 free upgrades over the lowest-level floors",
+  },
+  buzzcutBraidBuddies: {
+    label: "Buzzcut Braid Buddies",
+    color: COLOR.amberMuted,
+    image: "crits/embraces/buzzcutBraidBuddies.webp",
+    description: "Pays 68 times this floor's upgrade price in cash",
+  },
+  pinkBraidSnuggle: {
+    label: "Pink Braid Snuggle",
+    color: COLOR.summerSaleOrange,
+    image: "crits/embraces/pinkBraidSnuggle.webp",
+    description: "Spreads 40 free upgrades over the lowest-level floors",
+  },
+} as const satisfies Record<string, FeaturedCritData>;

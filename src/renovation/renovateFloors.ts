@@ -9,7 +9,7 @@ import {
   yieldToFrame,
 } from "../shared/detachedJob";
 import { cloneWithSnapshotState } from "../shared/snapshotState";
-import { withDraftCritCounts, commitCritCounts } from "../shared/critTypes";
+import { withDraftCritCounts, commitCritCounts } from "../crits";
 
 export function planRenovation(
   floors: Floor[],

@@ -9,8 +9,8 @@ import { baseIncomeRatePerSecond } from "../../shared/income";
 import { getTotalIncome } from "../../totalIncome";
 import { isFloorMaxed, type Floor } from "../../gameState";
 import { FLOOR_W, FLOOR_H, DIVIDER_H, SIDE_WALL_WIDTH } from "../constants";
-import { isCritUpgrade } from "./crit";
-import { getPriceMatchCost } from "../../shared/critTypes";
+import { isCritUpgrade, getPriceMatchCost } from "../../crits";
+
 import { isFreeClickEventActive } from "../../shared/floorEvents";
 
 export function getUpgradeCost(floor: Floor, now = Date.now()): BigNumber {

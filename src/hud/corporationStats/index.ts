@@ -25,7 +25,7 @@ import {
   CRIT_PROC_KINDS,
   getCritProcCount,
   getCritProcIncomeModifierPercent,
-} from "../../shared/critTypes";
+} from "../../crits";
 
 // read-only "Corporation income rate"/"Income modifiers" breakdown — split
 // out of corporationBoostMenu so that dialog only has to hold its own

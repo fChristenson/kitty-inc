@@ -4,7 +4,7 @@ import {
   type CritProcKind,
   commitCritCounts,
   withDraftCritCounts,
-} from "../critTypes";
+} from "../../crits";
 import {
   isDetachedJobPending,
   JOB_SLICE_MS,

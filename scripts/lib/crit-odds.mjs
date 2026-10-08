@@ -5,7 +5,7 @@
 // Each crit's Chance is its rank in its group (inside a group the bigger
 // rewards are rarer, within CHANCE_RANGE). Chances only depend on each
 // crit's rank, so re-running it after adding crits never drifts. Rewrites
-// src/critBalance/*.ts.
+// src/crits/badgeCrits/balance/*.ts.
 import fs from "node:fs";
 import path from "node:path";
 import {
@@ -16,7 +16,7 @@ import {
 } from "./crit-catalog.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
-const BALANCE = path.join(ROOT, "src/critBalance");
+const BALANCE = path.join(ROOT, "src/crits/badgeCrits/balance");
 const [LO, HI] = CHANCE_RANGE;
 // how steeply odds fall from a group's most to least common crit, bounded so a
 // group never collapses to one flat chance

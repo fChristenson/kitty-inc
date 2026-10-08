@@ -1,0 +1,167 @@
+import { COLOR } from "../../../palette";
+import type { FeaturedCritData } from "./types";
+
+export const AFFECTIONATE_DUOS_CRITS = {
+  curvyCuddle: {
+    label: "Curvy Cuddle",
+    color: COLOR.fastForwardBlue,
+    image: "crits/affectionateDuos/curvyCuddle.webp",
+    description: "Promotes 28% of this floor's workers two perma tiers",
+  },
+  cyanCuddle: {
+    label: "Cyan Cuddle",
+    color: COLOR.cyan,
+    image: "crits/affectionateDuos/cyanCuddle.webp",
+    description: "Promotes 12% of this building's workers one perma tier",
+  },
+  pinkyLink: {
+    label: "Pinky Link",
+    color: COLOR.fastForwardBlue,
+    image: "crits/affectionateDuos/pinkyLink.webp",
+    description: "Promotes 48.5% of this floor's workers two perma tiers",
+  },
+  squeezeTight: {
+    label: "Squeeze Tight",
+    color: COLOR.fastForwardBlue,
+    image: "crits/affectionateDuos/squeezeTight.webp",
+    description: "Promotes 41% of this building's workers one perma tier",
+  },
+  wristbandHuddle: {
+    label: "Wristband Huddle",
+    color: COLOR.fastForwardBlue,
+    image: "crits/affectionateDuos/wristbandHuddle.webp",
+    description: "Promotes 44.5% of this building's workers one perma tier",
+  },
+  cuddleUp: {
+    label: "Cuddle Up",
+    color: COLOR.redActive,
+    image: "crits/affectionateDuos/cuddleUp.webp",
+    description: "Adds 166s of your company's income",
+  },
+  hugItOut: {
+    label: "Hug It Out",
+    color: COLOR.overflowBlue,
+    image: "crits/affectionateDuos/hugItOut.webp",
+    description: "Adds 60.4% of your total income",
+  },
+  halterHuddle: {
+    label: "Halter Huddle",
+    color: COLOR.redActive,
+    image: "crits/affectionateDuos/halterHuddle.webp",
+    description: "Adds 60.2% of your total income",
+  },
+  sequinSqueeze: {
+    label: "Sequin Squeeze",
+    color: COLOR.coffeeRunTeal,
+    image: "crits/affectionateDuos/sequinSqueeze.webp",
+    description: "Adds 62.1% of your total income",
+  },
+  redBunBuddy: {
+    label: "Red Bun Buddy",
+    color: COLOR.springCleaningMint,
+    image: "crits/affectionateDuos/redBunBuddy.webp",
+    description: "Promotes 38.5% of this building's workers one perma tier",
+  },
+  baldieBesties: {
+    label: "Baldie Besties",
+    color: COLOR.peppermintPink,
+    image: "crits/affectionateDuos/baldieBesties.webp",
+    description: "Promotes 60% of this floor's workers two perma tiers",
+  },
+  pixieBesties: {
+    label: "Pixie Besties",
+    color: COLOR.springCleaningMint,
+    image: "crits/affectionateDuos/pixieBesties.webp",
+    description: "Promotes 35.5% of this building's workers one perma tier",
+  },
+  pintSizePals: {
+    label: "Pint Size Pals",
+    color: COLOR.fastForwardBlue,
+    image: "crits/affectionateDuos/pintSizePals.webp",
+    description: "Promotes 49% of this floor's workers two perma tiers",
+  },
+  ebonyAndIvory: {
+    label: "Ebony And Ivory",
+    color: COLOR.peppermintPink,
+    image: "crits/affectionateDuos/ebonyAndIvory.webp",
+    description: "Promotes 29% of this floor's workers two perma tiers",
+  },
+  blueLipstick: {
+    label: "Blue Lipstick",
+    color: COLOR.fastForwardBlue,
+    image: "crits/affectionateDuos/blueLipstick.webp",
+    description: "Promotes 55% of this building's workers one perma tier",
+  },
+  smirkAndWink: {
+    label: "Smirk And Wink",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/affectionateDuos/smirkAndWink.webp",
+    description: "Adds 62.4% of your total income",
+  },
+  helloGorgeous: {
+    label: "Hello Gorgeous",
+    color: COLOR.nightShiftIndigo,
+    image: "crits/affectionateDuos/helloGorgeous.webp",
+    description: "Adds 60.3% of your total income",
+  },
+  bigSmile: {
+    label: "Big Smile",
+    color: COLOR.overflowBlue,
+    image: "crits/affectionateDuos/bigSmile.webp",
+    description: "Adds 159s of your company's income",
+  },
+  cockyGrins: {
+    label: "Cocky Grins",
+    color: COLOR.springCleaningMint,
+    image: "crits/affectionateDuos/cockyGrins.webp",
+    description: "Promotes 7% of this building's workers one perma tier",
+  },
+  sweatpantsSmiles: {
+    label: "Sweatpants Smiles",
+    color: COLOR.fastForwardBlue,
+    image: "crits/affectionateDuos/sweatpantsSmiles.webp",
+    description: "Promotes 65% of this floor's workers two perma tiers",
+  },
+  stickerSisters: {
+    label: "Sticker Sisters",
+    color: COLOR.teal,
+    image: "crits/affectionateDuos/stickerSisters.webp",
+    description: "Promotes 64.5% of this floor's workers two perma tiers",
+  },
+  merlotMoment: {
+    label: "Merlot Moment",
+    color: COLOR.nightOwlIndigo,
+    image: "crits/affectionateDuos/merlotMoment.webp",
+    description: "Adds 60.8% of your total income",
+  },
+  pixieCutPals: {
+    label: "Pixie Cut Pals",
+    color: COLOR.coffeeRunTeal,
+    image: "crits/affectionateDuos/pixieCutPals.webp",
+    description: "Promotes 36% of this building's workers one perma tier",
+  },
+  ravenHairPals: {
+    label: "Raven Hair Pals",
+    color: COLOR.rainCheckBlue,
+    image: "crits/affectionateDuos/ravenHairPals.webp",
+    description: "Promotes 61.5% of this floor's workers two perma tiers",
+  },
+  baldBigGrins: {
+    label: "Bald Big Grins",
+    color: COLOR.fastForwardBlue,
+    image: "crits/affectionateDuos/baldBigGrins.webp",
+    description: "Promotes 20% of this building's workers one perma tier",
+  },
+  goldStudGrins: {
+    label: "Gold Stud Grins",
+    color: COLOR.fastForwardBlue,
+    image: "crits/affectionateDuos/goldStudGrins.webp",
+    description: "Promotes 14.5% of this building's workers one perma tier",
+  },
+  sideBySide: {
+    label: "Side By Side",
+    color: COLOR.rainCheckBlue,
+    image: "crits/affectionateDuos/sideBySide.webp",
+    description: "Promotes 63% of this floor's workers two perma tiers",
+  },
+} as const satisfies Record<string, FeaturedCritData>;

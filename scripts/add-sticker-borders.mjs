@@ -23,9 +23,17 @@ const loadAssetsFile = path.resolve(
   import.meta.dirname,
   "../src/loadAssets/index.ts",
 );
+const critIconsFile = path.resolve(
+  import.meta.dirname,
+  "../src/crits/critIcons.ts",
+);
 const critTypesDir = path.resolve(
   import.meta.dirname,
-  "../src/shared/critTypes",
+  "../src/crits/critTypes",
+);
+const critDataDir = path.resolve(
+  import.meta.dirname,
+  "../src/crits/badgeCrits/critData",
 );
 
 // Driven by the canonical CRIT_PROC_INFO icons rather than by "everything in
@@ -33,26 +41,29 @@ const critTypesDir = path.resolve(
 // menu's own crits) point at icons the theme also uses, and those still need a
 // sticker cut for the dialog.
 async function critIconFiles() {
-  const source = await fs.readFile(loadAssetsFile, "utf8");
-  const imageBlock = source.match(
-    /export const IMAGE_FILES = \{([\s\S]*?)\n\} as const;/,
-  );
-  if (!imageBlock) {
-    throw new Error("Could not parse IMAGE_FILES from src/loadAssets/index.ts");
+  const filenameByName = new Map();
+  for (const [file, constant] of [
+    [loadAssetsFile, "IMAGE_FILES"],
+    [critIconsFile, "CRIT_IMAGE_FILES"],
+  ]) {
+    const source = await fs.readFile(file, "utf8");
+    const imageBlock = source.match(
+      new RegExp(`export const ${constant} = \\{([\\s\\S]*?)\\n\\} as const;`),
+    );
+    if (!imageBlock) {
+      throw new Error(`Could not parse ${constant} from ${file}`);
+    }
+    for (const match of imageBlock[1].matchAll(/(\w+):\s*"([^"]+\.webp)"/g)) {
+      filenameByName.set(match[1], match[2]);
+    }
   }
-  const filenameByName = new Map(
-    [...imageBlock[1].matchAll(/(\w+):\s*"([^"]+\.webp)"/g)].map((match) => [
-      match[1],
-      match[2],
-    ]),
-  );
   const files = new Set();
   const critSourceFiles = [
     ...(await fs.readdir(critTypesDir)).map((entry) =>
       path.join(critTypesDir, entry),
     ),
-    ...(await fs.readdir(path.join(critTypesDir, "../critData"))).map((entry) =>
-      path.join(critTypesDir, "../critData", entry),
+    ...(await fs.readdir(critDataDir)).map((entry) =>
+      path.join(critDataDir, entry),
     ),
   ];
   for (const file of critSourceFiles) {
