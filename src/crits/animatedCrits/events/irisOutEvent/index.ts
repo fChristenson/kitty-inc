@@ -6,7 +6,8 @@
 // quicker each time; after the last it bursts wide open in a huge blast and
 // shake. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import type { Point } from "../../../../shared/wisp";

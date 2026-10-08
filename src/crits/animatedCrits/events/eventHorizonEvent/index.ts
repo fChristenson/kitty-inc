@@ -6,7 +6,8 @@
 // shard is sucked into the bar, faster and faster, which jumps one crit tier
 // in a huge blast and shake as the last goes in. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";

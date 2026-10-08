@@ -8,11 +8,8 @@
 // all slam into the lock at once in a cluster of blasts and it bursts open
 // in a huge one: the floor unlocked for free. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {

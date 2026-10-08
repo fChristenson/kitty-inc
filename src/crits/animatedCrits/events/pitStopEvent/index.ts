@@ -8,12 +8,8 @@
 // big burst and the chaser right after in a huge blast, their tails pouring
 // in behind them. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";

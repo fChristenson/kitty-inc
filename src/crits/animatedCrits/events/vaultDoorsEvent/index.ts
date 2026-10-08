@@ -5,7 +5,8 @@
 // come flooding out of the gap into the total; then the doors slam shut
 // in a huge blast and shake. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import type { Point } from "../../../../shared/wisp";

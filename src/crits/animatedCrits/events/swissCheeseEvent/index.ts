@@ -6,7 +6,8 @@
 // at the end every hole flares at once in a huge blast and shake and they
 // all snap shut. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import type { Point } from "../../../../shared/wisp";

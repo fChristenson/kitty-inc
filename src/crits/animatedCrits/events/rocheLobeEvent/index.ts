@@ -7,12 +7,8 @@
 // shake that sprays its glitter out as a burst of coins, and the coins pour
 // into the total in a huge blast. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";

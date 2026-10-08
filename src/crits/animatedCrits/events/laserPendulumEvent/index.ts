@@ -6,11 +6,8 @@
 // whips round onto the clicked floor's bar and locks on, blazing twice as
 // thick, and the bar jumps a crit tier in a huge blast and shake
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";

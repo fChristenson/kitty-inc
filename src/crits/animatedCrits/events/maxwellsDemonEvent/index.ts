@@ -9,12 +9,8 @@
 // the hot gas blasts out onto the workers, each climbing a perma tier.
 // Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";

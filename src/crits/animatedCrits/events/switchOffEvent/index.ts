@@ -6,11 +6,8 @@
 // rivers of it curling into the total as the screen pops back on. Pays
 // floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import type { Point } from "../../../../shared/wisp";

@@ -7,12 +7,8 @@
 // holding the whole mess, which sinks onto the clicked floor's bar, the bar
 // jumping a crit tier. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import type { Point } from "../../../../shared/wisp";

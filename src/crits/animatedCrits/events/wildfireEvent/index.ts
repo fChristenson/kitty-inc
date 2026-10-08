@@ -8,11 +8,8 @@
 // in a flash, and as the last trees flare the clicked floor's bar slams in
 // a huge blast. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import type { Point } from "../../../../shared/wisp";

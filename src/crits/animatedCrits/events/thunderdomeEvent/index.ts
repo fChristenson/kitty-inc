@@ -6,7 +6,8 @@
 // it; then the cage slams shut on the bar, which jumps a crit tier in a huge
 // blast and shake
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";

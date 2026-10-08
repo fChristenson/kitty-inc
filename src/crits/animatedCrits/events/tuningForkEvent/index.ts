@@ -7,11 +7,8 @@
 // tier; the fork rings on the next bar, quicker each time, the last strike
 // a huge blast and shake. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

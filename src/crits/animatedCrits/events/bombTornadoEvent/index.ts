@@ -7,7 +7,8 @@
 // quicker; then the core of the funnel goes up in a colossal blast. Pays
 // floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { drawWispHead, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";

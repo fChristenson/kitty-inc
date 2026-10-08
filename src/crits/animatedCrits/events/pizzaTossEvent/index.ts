@@ -7,7 +7,8 @@
 // time; the last slap a huge blast and shake as all the cash pours into the
 // total. Pays floor income × floor number × REWARD, plus the tiers
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import type { CoinPath } from "../../../../floors/coins";
 import { getButtonCenter } from "../../../../floors/upgradeButton";

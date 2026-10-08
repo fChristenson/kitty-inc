@@ -8,11 +8,8 @@
 // big blast and a new worker, the chaser right after in a huge one. Then
 // the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   BTN_H,

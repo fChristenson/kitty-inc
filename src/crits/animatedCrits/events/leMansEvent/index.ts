@@ -7,11 +7,8 @@
 // the leader slams in for free levels in a big blast, the chaser right
 // after for twice as many in a huge one. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

@@ -8,11 +8,8 @@
 // the bar under it with a shake; it goes critical in a colossal blast on
 // the clicked bar and every bar slams. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {

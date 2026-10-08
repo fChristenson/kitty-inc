@@ -103,7 +103,7 @@ import {
 } from "../badgeCrits/critProcCounts";
 import { revealBadgeFoil } from "../badgeCrits/foilReveal";
 import { openBadgeCapsule } from "../badgeCrits/badgeCapsule";
-import { playBarExplosion } from "../../sound";
+import { playBarExplosion } from "../../shared/explosionBang";
 import {
   unlockFloor,
   unlockAllFloors,

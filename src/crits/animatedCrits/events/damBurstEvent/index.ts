@@ -7,7 +7,8 @@
 // in a huge blast, and the coins sweep into the total. Pays floor income ×
 // floor number × REWARD (see ../cashFlow)
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import type { CoinPath } from "../../../../floors/coins";
 import { getButtonCenter } from "../../../../floors/upgradeButton";

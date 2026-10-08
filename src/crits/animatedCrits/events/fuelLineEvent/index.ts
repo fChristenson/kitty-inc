@@ -8,11 +8,8 @@
 // and blows the hose off in a huge blast of cash and shake. Pays floor
 // income × floor number × REWARD, plus the levels and the tier
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import type { CoinPath } from "../../../../floors/coins";
 import {

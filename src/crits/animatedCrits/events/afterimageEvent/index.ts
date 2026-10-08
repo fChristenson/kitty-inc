@@ -6,11 +6,8 @@
 // floor's income bar, each a jolt of free levels, the last in a huge blast
 // and shake. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {

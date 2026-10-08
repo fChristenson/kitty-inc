@@ -6,11 +6,11 @@
 // bang and a shake; then every tile slams back into place at once in a huge
 // blast and shake. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
+import { playBoostEventStream } from "../../../../sound";
 import {
-  playBoostEventStream,
   playExplosion,
   playSlamExplosion,
-} from "../../../../sound";
+} from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import type { Point } from "../../../../shared/wisp";

@@ -9,11 +9,8 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { randomInt } from "../../../../utils";
 import { isFloorLocked } from "../../../../shared/detachedJob";
-import {
-  playExplosion,
-  playSwoosh,
-  startBoostEventStreamLoop,
-} from "../../../../sound";
+import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   createEventFx,

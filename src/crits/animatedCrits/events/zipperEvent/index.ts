@@ -7,7 +7,8 @@
 // sweep into the total. Pays floor income × floor number × REWARD (see
 // ../moneyCover)
 import { CONFIG } from "../../../../config";
-import { playBloop, playExplosion, playSwoosh } from "../../../../sound";
+import { playBloop, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

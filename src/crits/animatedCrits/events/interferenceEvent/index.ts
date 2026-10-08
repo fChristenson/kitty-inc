@@ -8,11 +8,11 @@
 // the rings close on the middle in one colossal blast. Pays floor income ×
 // floor number × REWARD
 import { CONFIG } from "../../../../config";
+import { playBoostEventStream } from "../../../../sound";
 import {
-  playBoostEventStream,
   playExplosion,
   playSlamExplosion,
-} from "../../../../sound";
+} from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawGlitterLight,

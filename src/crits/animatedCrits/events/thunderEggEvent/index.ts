@@ -7,7 +7,8 @@
 // onto the bar in a huge blast and shake, and the bar jumps a crit tier.
 // Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawGlitterLight,

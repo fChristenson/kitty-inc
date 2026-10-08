@@ -4,7 +4,8 @@
 // together in a splash and a jolt and swell into one fat roaring river that
 // surges up into the total (see ../moneyCover's flow and ../riverPaths)
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import type { Point } from "../../../../shared/wisp";
 import { FLOW_FLIGHT_MS } from "../../moneyCover";

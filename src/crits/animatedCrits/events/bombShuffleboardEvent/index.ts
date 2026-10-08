@@ -8,11 +8,8 @@
 // clicked floor's bar and goes up in a colossal ring of blasts, the bar
 // jumping a crit tier. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";

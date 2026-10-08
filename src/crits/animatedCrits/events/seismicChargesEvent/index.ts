@@ -7,11 +7,11 @@
 // blasts at once and then one colossal blast and the hardest shake of all
 // as the cash pours into the total. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
+import { playBoostEventStream } from "../../../../sound";
 import {
-  playBoostEventStream,
   playExplosion,
   playSlamExplosion,
-} from "../../../../sound";
+} from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

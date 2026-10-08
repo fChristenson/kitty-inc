@@ -7,11 +7,8 @@
 // the last in a huge blast and shake. Pays floor income × floor number ×
 // REWARD, plus the tiers
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";

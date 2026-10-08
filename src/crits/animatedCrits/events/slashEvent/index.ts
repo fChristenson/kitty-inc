@@ -8,7 +8,8 @@
 import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import { playSlamExplosion, playSwoosh } from "../../../../sound";
+import { playSwoosh } from "../../../../sound";
+import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";

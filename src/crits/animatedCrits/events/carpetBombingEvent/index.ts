@@ -6,7 +6,8 @@
 // last and biggest goes off in a huge blast and shake and the cash sweeps
 // into the total. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

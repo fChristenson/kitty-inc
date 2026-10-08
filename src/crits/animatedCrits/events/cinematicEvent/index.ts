@@ -9,7 +9,8 @@
 // ../cashFlow)
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { registerWispEvent, startWispCover } from "../../wispCover";

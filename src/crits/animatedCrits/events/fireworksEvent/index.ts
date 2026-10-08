@@ -6,11 +6,8 @@
 // there in a huge blast and shake, and the coins sweep into the total. Pays
 // floor income × floor number × REWARD (see ../cashFlow)
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

@@ -7,11 +7,8 @@
 // with a flash, a pop and a jolt and its worker lights up a perma tier; the
 // last find is a huge blast and shake. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {

@@ -7,7 +7,10 @@
 import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import { playExplosion, playSlamExplosion } from "../../../../sound";
+import {
+  playExplosion,
+  playSlamExplosion,
+} from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawExplosion, drawWhiteBurst } from "../../../../shared/eventFx";

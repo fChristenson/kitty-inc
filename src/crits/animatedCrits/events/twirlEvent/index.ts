@@ -7,7 +7,8 @@
 // stamps again, the last stamp a huge blast and shake as the coins sweep
 // into the total. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {

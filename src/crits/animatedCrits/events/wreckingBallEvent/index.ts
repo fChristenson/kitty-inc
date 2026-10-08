@@ -9,12 +9,11 @@
 import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
+import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
 import {
   playExplosion,
   playSlamExplosion,
-  playSwoosh,
-  startBoostEventStreamLoop,
-} from "../../../../sound";
+} from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawPoppingCritText } from "../../../critFlash/critText";

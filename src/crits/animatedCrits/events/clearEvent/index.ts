@@ -7,7 +7,8 @@
 // third shock forks out to every bar in view, each jolting with free levels,
 // and the clicked bar jumps a crit tier as every bar slams in a huge blast
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

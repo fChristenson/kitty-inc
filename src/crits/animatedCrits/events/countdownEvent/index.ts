@@ -7,7 +7,8 @@
 // income × floor number × REWARD (see ../cashFlow)
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   createCritTextSprite,

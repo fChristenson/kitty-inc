@@ -25,7 +25,8 @@ import {
 } from "../momentCrits";
 
 export type { FlashMoment } from "../momentCrits";
-import { getExplosionDurationMs, MAX_VIBRATE_MS } from "../../sound";
+import { getExplosionDurationMs } from "../../sound";
+import { MAX_VIBRATE_MS, setBuzz } from "../../shared/vibration";
 import { drawCritSparks, startCritSparks, stopCritSparks } from "./critSparks";
 
 // a handful of icons are explicitly designed to spin an extra fixed amount on
@@ -218,7 +219,7 @@ function buzzForFlash(now: number, pulseMs = 0): void {
   const buzz = CRIT_ICON_BY_LABEL[flashLabel]
     ? Math.min(ms, badgeBuzzMs())
     : ms;
-  navigator.vibrate(pulseMs > 0 ? Math.min(buzz, pulseMs) : buzz);
+  setBuzz(pulseMs > 0 ? Math.min(buzz, pulseMs) : buzz);
 }
 
 // a badge crit buzzes this much longer than a regular x5 crit (whose flash,

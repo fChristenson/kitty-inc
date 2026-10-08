@@ -7,11 +7,8 @@
 // with a thunk in a huge blast and shake. Pays floor income × floor number ×
 // REWARD
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playSlamExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import type { Point } from "../../../../shared/wisp";

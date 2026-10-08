@@ -6,12 +6,8 @@
 // bar, each a jolt of free levels, and on into the total, the rest of the
 // sea rushing up after it. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import type { CoinPath } from "../../../../floors/coins";
 import type { Point } from "../../../../shared/wisp";

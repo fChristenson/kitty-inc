@@ -6,7 +6,8 @@
 // on to the next worker in lower, quicker leaps, and its last pound is a
 // colossal blast and the biggest shake. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {

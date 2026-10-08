@@ -7,7 +7,8 @@
 // down to a white-hot pinprick as the screen rumbles, until the bar ignites:
 // it jumps a crit tier and every bar slams in a huge blast and shake
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp, smoothstep } from "../../../../shared/easing";

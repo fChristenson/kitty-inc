@@ -6,7 +6,8 @@
 // crack and a flash and lands free levels; at the top it snaps with a huge
 // blast and shake and every bar slams. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";

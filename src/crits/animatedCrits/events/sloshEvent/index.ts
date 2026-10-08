@@ -6,7 +6,8 @@
 // readout in a huge blast and shake, and the coins sweep into the total. Pays
 // floor income × floor number × REWARD (see ../moneyCover)
 import { CONFIG } from "../../../../config";
-import { playExplosion, playSwoosh } from "../../../../sound";
+import { playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import type { CoinPath } from "../../../../floors/coins";
 import { getButtonCenter } from "../../../../floors/upgradeButton";

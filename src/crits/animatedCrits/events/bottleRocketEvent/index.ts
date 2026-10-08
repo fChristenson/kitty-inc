@@ -7,11 +7,11 @@
 // goes off in one colossal blast ringed by a cluster and the hardest shake
 // of all. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
+import { playBoostEventStream } from "../../../../sound";
 import {
-  playBoostEventStream,
   playExplosion,
   playSlamExplosion,
-} from "../../../../sound";
+} from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

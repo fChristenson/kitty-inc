@@ -8,12 +8,8 @@
 // arc onto the bars for free levels, the clicked floor's bar last with a
 // slam. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";

@@ -7,7 +7,8 @@
 // at the wire's end over the clicked bar the whole wire discharges into it
 // in a colossal bolt and a huge blast. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawGlitterLight,

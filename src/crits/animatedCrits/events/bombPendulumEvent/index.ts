@@ -7,7 +7,8 @@
 // jumps a crit tier and the pendulum drops to the next bar, the very last
 // swing blowing in a huge blast and shake. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import {

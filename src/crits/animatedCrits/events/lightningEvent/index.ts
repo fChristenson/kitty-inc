@@ -7,7 +7,7 @@
 // shake, and the coins sweep into the total. Pays floor income × floor
 // number × REWARD (see ../moneyCover)
 import { CONFIG } from "../../../../config";
-import { playExplosion } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

@@ -7,11 +7,11 @@
 // blast with the hardest shake of all. Pays floor income × floor number ×
 // REWARD
 import { CONFIG } from "../../../../config";
+import { playBoostEventStream } from "../../../../sound";
 import {
-  playBoostEventStream,
   playExplosion,
   playSlamExplosion,
-} from "../../../../sound";
+} from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {

@@ -1,4 +1,5 @@
 import { isScreenFrozen } from "../shared/screenFreeze";
+import { buzz } from "../shared/vibration";
 
 const soundUrl = (filename: string) => `${import.meta.env.BASE_URL}${filename}`;
 const themeUrl = soundUrl("theme.mp3");
@@ -393,14 +394,17 @@ export function playCoinDrop(): void {
 }
 
 // a bang as a crit's number hits a bar; rate shifts its pitch. Debounced on
-// its own (not playExplosion's), since a crit rain lands dozens of hits
+// its own (not playExplosionSound's), since a crit rain lands dozens of hits.
+// The explosion sounds return whether they played; only shared/explosionBang
+// plays them, together with their buzz
 const BAR_EXPLOSION_DEBOUNCE_MS = 60;
 let lastBarExplosionPlayTime = 0;
-export function playBarExplosion(rate = 1): void {
+export function playBarExplosionSound(rate = 1): boolean {
   const now = performance.now();
-  if (now - lastBarExplosionPlayTime < BAR_EXPLOSION_DEBOUNCE_MS) return;
+  if (now - lastBarExplosionPlayTime < BAR_EXPLOSION_DEBOUNCE_MS) return false;
   lastBarExplosionPlayTime = now;
   playSfx("explosion", SFX_VOLUME, 0.04, rate);
+  return true;
 }
 
 // one-shot sound effect for opening/closing any of the action bar's dialogs
@@ -444,31 +448,20 @@ export function playAutoBoost(): void {
 // actual "bang" up earlier with the visual shake/flash. Debounced (see
 // EXPLOSION_DEBOUNCE_MS) so back-to-back crits during a fast held click can't
 // stack multiple full explosions on top of each other
-export function playExplosion(): void {
+export function playExplosionSound(): boolean {
   const now = performance.now();
-  buzzDuringEvent(getExplosionDurationMs());
-  if (now < explosionsHeldUntil) return;
-  if (now - lastExplosionPlayTime < EXPLOSION_DEBOUNCE_MS) return;
+  if (now < explosionsHeldUntil) return false;
+  if (now - lastExplosionPlayTime < EXPLOSION_DEBOUNCE_MS) return false;
   lastExplosionPlayTime = now;
   playSfx("explosion", SFX_VOLUME, 0.04);
+  return true;
 }
 
-// an event's bangs buzz the phone (crits buzz with their flash, see
-// critFlash); Android only, iOS has no vibration API
+// an event's jackpot and payout buzz the phone (crits buzz with their flash,
+// see critFlash)
 const VIBRATE_TRIM_MS = 200;
-export const MAX_VIBRATE_MS = 100;
-let vibratingUntil = 0;
 function buzzDuringEvent(soundMs: number): void {
-  if (!isScreenFrozen() || typeof navigator.vibrate !== "function") return;
-  const ms = Math.min(
-    MAX_VIBRATE_MS,
-    Math.max(0, Math.round(soundMs - VIBRATE_TRIM_MS)),
-  );
-  const now = performance.now();
-  // a new buzz replaces the running one, so never cut a longer one short
-  if (now + ms <= vibratingUntil) return;
-  vibratingUntil = now + ms;
-  navigator.vibrate(ms);
+  if (isScreenFrozen()) buzz(soundMs - VIBRATE_TRIM_MS);
 }
 
 // drops every explosion for `ms`, so one that lands at the end of it (a slam's
@@ -478,21 +471,20 @@ export function holdExplosions(ms: number): void {
 }
 
 // a slam's impact bang always plays: a crit bang from the clicks just before
-// (overtime's rapid ticks) must not debounce it away. No buzz: managers'
-// auto-boost slams land every few seconds, crit or not
-export function playSlamExplosion(): void {
+// (overtime's rapid ticks) must not debounce it away
+export function playSlamExplosionSound(): boolean {
   lastExplosionPlayTime = performance.now();
   playSfx("explosion", SFX_VOLUME, 0.04);
-  buzzDuringEvent(getExplosionDurationMs());
+  return true;
 }
 
 // a crit's own bang (see playCritVoice)
-export function playCritExplosion(): void {
+export function playCritExplosionSound(): boolean {
   const now = performance.now();
-  buzzDuringEvent(getExplosionDurationMs());
-  if (now < explosionsHeldUntil) return;
+  if (now < explosionsHeldUntil) return false;
   lastExplosionPlayTime = now;
   playCritVoice("explosion", SFX_VOLUME, 0.04);
+  return true;
 }
 
 // a mega crit's own jackpot (see playCritVoice)

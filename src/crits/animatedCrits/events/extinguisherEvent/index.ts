@@ -7,11 +7,8 @@
 // kick back, quicker each time, the last a long double blast and a huge
 // blast. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";

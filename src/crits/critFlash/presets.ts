@@ -11,10 +11,10 @@ import {
   getExplosionDurationMs,
   getJackpotDurationMs,
   playCoinDrop,
-  playCritExplosion,
   playCritJackpot,
   playCritPayout,
 } from "../../sound";
+import { playCritExplosion } from "../../shared/explosionBang";
 import { CRIT_TIER_CONFIG, CRIT_TIER_ORDER, type CritTier } from "../critTypes";
 import { tierColor } from "../floorCrits/bonusTierReward";
 

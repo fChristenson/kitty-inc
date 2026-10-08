@@ -8,11 +8,8 @@
 import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import {
-  playExplosion,
-  playSwoosh,
-  startBoostEventStreamLoop,
-} from "../../../../sound";
+import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { isFloorLocked } from "../../../../shared/detachedJob";
 import { pickCritTierByOdds } from "../../../critTypes";

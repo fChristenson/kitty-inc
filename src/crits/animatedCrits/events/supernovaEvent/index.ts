@@ -7,10 +7,8 @@
 import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import {
-  playSlamExplosion,
-  startBoostEventStreamLoop,
-} from "../../../../sound";
+import { startBoostEventStreamLoop } from "../../../../sound";
+import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawExplosion } from "../../../../shared/eventFx";

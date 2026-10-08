@@ -7,7 +7,8 @@
 // unfreezes the floor bursts open: unlocked for free. Then the crit's tier
 // pays out
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";

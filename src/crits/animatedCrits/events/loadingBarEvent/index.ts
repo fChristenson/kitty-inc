@@ -8,11 +8,8 @@
 // floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import type { CoinPath } from "../../../../floors/coins";
 import type { Point } from "../../../../shared/wisp";

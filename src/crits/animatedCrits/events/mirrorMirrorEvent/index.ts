@@ -6,12 +6,11 @@
 // out of both seams; then it all snaps back to normal in a huge blast and
 // shake. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import {
-  playBoostEventStream,
   playExplosion,
   playSlamExplosion,
-  playSwoosh,
-} from "../../../../sound";
+} from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";

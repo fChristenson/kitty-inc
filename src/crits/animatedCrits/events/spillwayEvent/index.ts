@@ -6,7 +6,8 @@
 // bang, a jolt and free levels; at the bottom the curtain slams down in a
 // huge blast. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import type { Point } from "../../../../shared/wisp";

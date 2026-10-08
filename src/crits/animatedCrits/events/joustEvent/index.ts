@@ -6,11 +6,8 @@
 // jumps a crit tier; each joust quicker, the last clash a huge blast as
 // every bar slams. Pays floor income × floor number × REWARD, plus the tiers
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import {
   drawWispBetween,

@@ -7,11 +7,8 @@
 // next locked floor, which bursts open in a huge blast and shake, unlocked
 // for free. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBoostEventStream,
-  playSlamExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";

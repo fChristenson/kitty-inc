@@ -7,11 +7,8 @@
 // into the building's locked floor until the lock blows in a huge blast
 // and shake and the floor bursts open, unlocked for free
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playSlamExplosion,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream } from "../../../../sound";
+import { playSlamExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { WISP_SIZE, type Point } from "../../../../shared/wisp";

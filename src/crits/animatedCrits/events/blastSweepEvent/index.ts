@@ -8,12 +8,8 @@
 // the lock in one heap, which goes up in a colossal blast that bursts the
 // lock open: the floor unlocked for free. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
-import {
-  playBloop,
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { COLOR } from "../../../../palette";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";

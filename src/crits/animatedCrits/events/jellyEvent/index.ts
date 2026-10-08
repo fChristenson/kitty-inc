@@ -6,7 +6,8 @@
 // and a spray of cash; on the last it wobbles wildly, sets dead still and
 // goes off in a huge blast. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { registerWispEvent, startWispCover } from "../../wispCover";

@@ -8,11 +8,8 @@
 // income × floor number × REWARD
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import {
-  playBoostEventStream,
-  playExplosion,
-  playSwoosh,
-} from "../../../../sound";
+import { playBoostEventStream, playSwoosh } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn } from "../../../../shared/easing";

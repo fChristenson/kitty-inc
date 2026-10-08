@@ -6,7 +6,8 @@
 // screen, ever faster, the last span landing in a huge blast and shake as
 // the cash sweeps into the total. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
-import { playBoostEventStream, playExplosion } from "../../../../sound";
+import { playBoostEventStream } from "../../../../sound";
+import { playExplosion } from "../../../../shared/explosionBang";
 import { shakeScreen } from "../../../critFlash";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import type { Point } from "../../../../shared/wisp";

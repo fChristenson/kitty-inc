@@ -14,7 +14,8 @@ import {
   shadeColor,
 } from "../../utils";
 import { isDetachedJobRunning } from "../detachedJob";
-import { holdExplosions, playSlamExplosion } from "../../sound";
+import { holdExplosions } from "../../sound";
+import { playSlamExplosion } from "../explosionBang";
 import { shakeScreen } from "../../crits";
 
 export const GLOBAL_SLAM = {};
