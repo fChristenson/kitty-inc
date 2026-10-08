@@ -231,6 +231,38 @@ function liftOf(floor: Floor, now: number): number {
   return LIFT_H * (1 - ((u - HAUL_HOLD) / (1 - HAUL_HOLD)) ** 2);
 }
 
+// a snap crit's bar crumbling away from its left end, gone a while, then
+// rebuilt from its left end
+const barCrumbles = new WeakMap<
+  Floor,
+  { at: number; crumbleMs: number; holdMs: number; rebuildMs: number }
+>();
+
+export function crumbleIncomeBar(
+  floor: Floor,
+  crumbleMs: number,
+  holdMs: number,
+  rebuildMs: number,
+): void {
+  barCrumbles.set(floor, { at: Date.now(), crumbleMs, holdMs, rebuildMs });
+}
+
+// the share of the bar still standing, as from..to of its width; null if whole
+function crumbleOf(
+  floor: Floor,
+  now: number,
+): { from: number; to: number } | null {
+  const c = barCrumbles.get(floor);
+  if (!c) return null;
+  const t = Math.max(0, now - c.at);
+  if (t < c.crumbleMs) return { from: t / c.crumbleMs, to: 1 };
+  if (t < c.crumbleMs + c.holdMs) return { from: 1, to: 1 };
+  const rebuilt = (t - c.crumbleMs - c.holdMs) / c.rebuildMs;
+  if (rebuilt < 1) return { from: 0, to: rebuilt };
+  barCrumbles.delete(floor);
+  return null;
+}
+
 function punchSince(floor: Floor, now: number) {
   const punch = barPunches.get(floor);
   if (!punch) return null;
@@ -671,6 +703,7 @@ export function drawIncomePanel(
       ? punchK * PUNCH_JOLT * BAR_H * Math.cos(sincePunch * PUNCH_WOBBLE)
       : 0;
   const lift = liftOf(floor, now);
+  const crumble = crumbleOf(floor, now);
   const slam = getSlamPose(floor, "bar", now);
   const drawBar = (): void =>
     drawSlamTarget(
@@ -682,6 +715,7 @@ export function drawIncomePanel(
       now,
     );
   const drawBarBody = (): void => {
+    if (crumble && crumble.from >= crumble.to) return;
     ctx.save();
     ctx.translate(barCenter.x, barCenter.y + punchJolt - lift);
     if (cancellationArmed) ctx.rotate(getWiggleRotation(now));
@@ -703,6 +737,15 @@ export function drawIncomePanel(
       ctx.translate(0, -BAR_H / 2);
     }
     ctx.translate(-barCenter.x, -barCenter.y);
+    if (crumble) {
+      // only the part still standing; a whole end keeps its rounded corner
+      const left = crumble.from > 0 ? barX + barW * crumble.from : barX - barH;
+      const right =
+        crumble.to < 1 ? barX + barW * crumble.to : barX + barW + barH;
+      ctx.beginPath();
+      ctx.rect(left, barY - barH, right - left, barH * 3);
+      ctx.clip();
+    }
 
     // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
     let fillW = barMinWidth;

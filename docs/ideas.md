@@ -55,6 +55,7 @@
 - **Artillery barrage crit:** the number dives off the edge of the screen and shells come whistling in from off it in high arcs, the barrage walking up the building from the bottom bar to the top, then one last huge salvo lands on every bar in view at once.
 - **Crash landing crit:** the number turns into a burning ship that tears in from the sky and comes down across the building, scraping along every bar in a gush of sparks and bouncing off onto the next, until it ploughs into the street in a huge blast that shakes every bar.
 - **Saber crit:** the number ignites into a blade of light that slashes across the whole screen, every bar it cuts through flaring, then back across the other way, then two quick cuts make an X of light on its own bar, which blows.
+- **Snap crit:** the number snaps and every bar in view crumbles into glitter dust from one end to the other, the dust drifting off and swirling together into a whirlwind in the middle of the screen, which then blows back and rebuilds every bar from the dust, fuller, each one flashing as it's whole again.
 
 ## Game ideas
 
@@ -130,3 +131,32 @@ Snipers, fighters, fire and blades, after ICBM and Artillery barrage. Playground
 - **Sniper crit:** the number shrinks into a scope that drifts over the building onto a bar, wobbling and steadying as the view zooms in on it, then one crack of a tracer from a rooftop far off blasts it; the scope drifts on to the next, quicker each time, its own bar last.
 - **Trench run crit:** the number turns into a fighter that dives down the side of the building, jinking through bursts of flak and firing twin bolts into every bar it passes, then pulls up and loops round to drop one shot into its own bar that sets the whole building off.
 - **Flamethrower crit:** the number turns into a nozzle at the end of the top bar and hoses a roaring jet of fire along it, the bar glowing hotter and hotter until it blows, then hops down to the next and torches that, quicker each time.
+
+## List eight
+
+Blades and dives, after Crash landing and Saber. Playground: `tmp/_playground/ideas.html?list=next7`.
+
+- **Iaido crit:** the number slides to the edge as a sheathed blade, then one flash zigzags down the building through every bar in a blink; a beat of dead silence, the cuts light up along each bar, and every bar bursts apart at once.
+- **Excalibur crit:** the number rises over the building into a giant sword of light pointing down, light gathering at its tip, then it plunges straight down through every bar in view into the ground and stands there quivering, the bars pinned and glowing, until it's ripped out in a blinding flash that blows every bar.
+- **Blade storm crit:** the number bursts into a ring of whirling blades round its own bar that spins out wider and wider, slicing through every bar in view as it grows past it, hangs at full size, then snaps back in, slicing them all again, and stabs its own bar all at once.
+- **Slash flurry crit:** the number turns into a blade that darts onto the top bar and slashes it six times in a blur, the cuts crisscrossing it, a beat, then the bar bursts apart along every cut; then the next bar down, faster.
+- **Dive bomber crit:** the number shoots up into a plane that peels off into a screaming dive straight down at a bar, lets go of its bomb at the last moment and pulls up hard as it blows, climbs and dives again at the next, and on the last dive doesn't pull up, slamming into its own bar.
+
+## List nine
+
+Time, saucers, rockets, fuses and a flood of coins. Playground: `tmp/_playground/ideas.html?list=next8`.
+
+- **Rewind crit:** the number bursts and blows up every bar in view, then time rewinds: the blasts suck back in, the bars sink back, the pieces fly back together into the number, and it goes off again, twice as big.
+- **Mothership crit:** the number shoots up and a huge saucer slides in over the building, a ring of lights spinning under it faster and faster as its belly glows, then it fires one giant beam down onto its own bar, and two walls of fire roll out up and down the building through every other bar.
+- **Booster landing crit:** the number is flung up off the screen and comes back as a rocket booster tumbling out of the sky, flips upright and lights its engine, its plume blasting every bar in view as it slows down past them, and touches down on its own bar in a huge blast.
+- **Fuse crit:** the number lands on the roof as a lit spark and races down a cord that loops round every bar in view, each bar fizzing and popping as the spark runs round it, faster and faster, down into a huge blinking charge on its own bar.
+- **Waterfall crit:** the number bursts open over the top bar and a torrent of coins pours out, running along the bar and spilling off its end in a waterfall onto the next, back along that one and off again, all the way down the building, piling up on its own bar until the pile slams down.
+
+## List ten
+
+Arcade games, a particle collider and a snap. Playground: `tmp/_playground/ideas.html?list=next9`.
+
+- **Tetris crit:** the number breaks into glitter blocks that drop one after another onto the top bar, sliding into place until they fill it end to end, then the line blinks and clears in a burst; then the next bar down, faster.
+- **Collider crit:** the number splits into two bunches of light that race opposite ways round a ring circling the building, flashing every time they pass each other, faster and faster, until they break off and smash head-on at its own bar, the debris curling out in spiral tracks onto every other bar.
+- **Snake crit:** the number turns into a snake of glitter that slithers along the bars in sharp turns, gobbling glowing pellets and growing longer with each, every bar blasting once it's eaten clean, then it stops on its own bar and goes off segment by segment from its tail to its head.
+- **Pong crit:** two paddles of light rise up at the sides of the screen and volley the number back and forth across the building, every volley smashing through the next bar down and coming back faster, until the last return is a smash straight down into its own bar.
