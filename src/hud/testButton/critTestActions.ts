@@ -1310,6 +1310,8 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-crit-moment="missileDefenseCrit">Missile Defense Crit</button>
           <button class="game__button" data-crit-moment="icbmCrit">ICBM Crit</button>
           <button class="game__button" data-crit-moment="artilleryBarrageCrit">Artillery Barrage Crit</button>
+          <button class="game__button" data-crit-moment="crashLandingCrit">Crash Landing Crit</button>
+          <button class="game__button" data-crit-moment="saberCrit">Saber Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

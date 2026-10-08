@@ -53,6 +53,8 @@
 - **Missile defense crit:** meteors come streaking down at the building and the number, down by the street, fires interceptor missiles that streak up and blow each meteor apart in mid-air, its burning debris showering down onto the bars in view.
 - **ICBM crit:** the number turns into a missile down by the street and launches straight up off the top of the screen in a roar of smoke, there's a beat of quiet, then its warheads come screaming back down onto every bar in view.
 - **Artillery barrage crit:** the number dives off the edge of the screen and shells come whistling in from off it in high arcs, the barrage walking up the building from the bottom bar to the top, then one last huge salvo lands on every bar in view at once.
+- **Crash landing crit:** the number turns into a burning ship that tears in from the sky and comes down across the building, scraping along every bar in a gush of sparks and bouncing off onto the next, until it ploughs into the street in a huge blast that shakes every bar.
+- **Saber crit:** the number ignites into a blade of light that slashes across the whole screen, every bar it cuts through flaring, then back across the other way, then two quick cuts make an X of light on its own bar, which blows.
 
 ## Game ideas
 
@@ -120,3 +122,11 @@ More battles and blasts, after Cluster bomb and Missile defense. Playground: `tm
 - **Grenade crit:** the number pulls the pins and lobs a handful of grenades that clatter down the building, bouncing from bar to bar with a clink, each fizzing on the bar it comes to rest on before it goes off.
 - **Space battle crit:** the number bursts into two fleets of ships that line up on either side of the sky and trade fire over the building, ships blowing up one after another, their burning wrecks crashing down onto the bars in view, the last the biggest.
 - **Force field crit:** the number spreads into a dome of glitter over the building that soaks up a rain of meteors, rippling and glowing brighter with each one it stops, then collapses down through every bar in view, letting all that energy out.
+
+## List seven
+
+Snipers, fighters, fire and blades, after ICBM and Artillery barrage. Playground: `tmp/_playground/ideas.html?list=next6`.
+
+- **Sniper crit:** the number shrinks into a scope that drifts over the building onto a bar, wobbling and steadying as the view zooms in on it, then one crack of a tracer from a rooftop far off blasts it; the scope drifts on to the next, quicker each time, its own bar last.
+- **Trench run crit:** the number turns into a fighter that dives down the side of the building, jinking through bursts of flak and firing twin bolts into every bar it passes, then pulls up and loops round to drop one shot into its own bar that sets the whole building off.
+- **Flamethrower crit:** the number turns into a nozzle at the end of the top bar and hoses a roaring jet of fire along it, the bar glowing hotter and hotter until it blows, then hops down to the next and torches that, quicker each time.

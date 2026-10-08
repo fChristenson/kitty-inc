@@ -1671,6 +1671,8 @@ function momentLevels(
     return Math.ceil(count / 3);
   // an artillery barrage lands three shells a bar, then its salvo
   if (moment === "artilleryBarrageCrit") return Math.ceil(count / 4);
+  // a saber cuts through each bar twice
+  if (moment === "saberCrit") return Math.ceil(count / 2);
   if (
     moment === "airstrikeCrit" ||
     moment === "missileSwarmCrit" ||

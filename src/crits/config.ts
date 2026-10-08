@@ -238,6 +238,14 @@ export const CRIT_CONFIG = {
     artilleryBarrageCrit: {
       chance: 0.03,
     },
+    // a burning ship bouncing down across the bars into the street, or a
+    // blade of light slashing through them
+    crashLandingCrit: {
+      chance: 0.03,
+    },
+    saberCrit: {
+      chance: 0.03,
+    },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
     badgeShimmer: {

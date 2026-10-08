@@ -261,6 +261,8 @@ const LOADERS: Record<CritMoment, () => Promise<unknown>> = {
   missileDefenseCrit: () => import("../crits/missileDefenseCrit"),
   icbmCrit: () => import("../crits/icbmCrit"),
   artilleryBarrageCrit: () => import("../crits/artilleryBarrageCrit"),
+  crashLandingCrit: () => import("../crits/crashLandingCrit"),
+  saberCrit: () => import("../crits/saberCrit"),
 };
 const loading = new Map<CritMoment, Promise<unknown>>();
 
