@@ -22,6 +22,8 @@ export interface FlashMoment {
   // a hit on bars()[bar] by a number of `color`; step is a snowball's
   // growth so far
   onHit: (bar: number, step: number, color: string) => void;
+  // bars()[bar] leaping off its floor for ms, landing back down
+  onLift?: (bar: number, ms: number) => void;
 }
 
 // the flash's own baked "x0123456789" glyphs (see critFlash's SpinGlyphs)
@@ -40,6 +42,12 @@ export interface PlannedHit {
   step: number;
 }
 
+export interface PlannedLift {
+  bar: number;
+  at: number;
+  ms: number;
+}
+
 export interface Running {
   moment: FlashMoment;
   glyphs: MomentGlyphs;
@@ -52,6 +60,8 @@ export interface Running {
   startedAt: number;
   hits: PlannedHit[];
   fired: number;
+  lifts: PlannedLift[];
+  lifted: number;
   endsAt: number;
   // where each bar was last seen, if one scrolls out of bars()
   lastBars: Point[];
@@ -181,12 +191,14 @@ export function glowStops(color: string): FadeStops {
   return stops;
 }
 
-// a floor crit kind: plan lays out its hits on the bars, draw plays it
+// a floor crit kind: plan lays out its hits (and any bars leaping off their
+// floors) on the bars, draw plays it
 export interface FloorCritDef {
   plan(
     r: Running,
     bars: Point[],
     hit: (bar: number, at: number, step?: number) => void,
+    lift: (bar: number, at: number, ms: number) => void,
   ): void;
   draw: Draw;
   // how long it keeps drawing after its last hit
@@ -226,6 +238,11 @@ const LOADERS: Record<CritMoment, () => Promise<unknown>> = {
   binaryStarCrit: () => import("../crits/binaryStarCrit"),
   pearlsCrit: () => import("../crits/pearlsCrit"),
   starBirthCrit: () => import("../crits/starBirthCrit"),
+  laserCrit: () => import("../crits/laserCrit"),
+  drillCrit: () => import("../crits/drillCrit"),
+  quakeCrit: () => import("../crits/quakeCrit"),
+  fireworksCrit: () => import("../crits/fireworksCrit"),
+  shatterCrit: () => import("../crits/shatterCrit"),
 };
 const loading = new Map<CritMoment, Promise<unknown>>();
 
@@ -268,8 +285,14 @@ export function isMomentRunning(): boolean {
 }
 
 function plan(r: Running, bars: Point[], def: FloorCritDef): void {
-  def.plan(r, bars, (bar, at, step = 0) => r.hits.push({ bar, at, step }));
+  def.plan(
+    r,
+    bars,
+    (bar, at, step = 0) => r.hits.push({ bar, at, step }),
+    (bar, at, ms) => r.lifts.push({ bar, at, ms }),
+  );
   r.hits.sort((a, b) => a.at - b.at);
+  r.lifts.sort((a, b) => a.at - b.at);
   if (!r.endsAt)
     r.endsAt = Math.max(...r.hits.map((h) => h.at)) + (def.tailMs ?? 0);
 }
@@ -300,6 +323,8 @@ function start(p: PendingLaunch, def: FloorCritDef, now: number): void {
     startedAt: now,
     hits: [],
     fired: 0,
+    lifts: [],
+    lifted: 0,
     endsAt: 0,
     lastBars: bars,
     span: { from: 0, to: 0 },
@@ -352,6 +377,10 @@ export function drawMoment(
   const seen = r.moment.bars();
   const bars = r.lastBars.map((last, i) => seen[i] ?? last);
   r.lastBars = bars;
+  while (r.lifted < r.lifts.length && r.lifts[r.lifted].at <= ms) {
+    const lift = r.lifts[r.lifted++];
+    r.moment.onLift?.(lift.bar, lift.ms);
+  }
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];
     r.shake(def.shake?.(step) ?? HIT_SHAKE);

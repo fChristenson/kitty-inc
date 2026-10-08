@@ -198,6 +198,25 @@ export function punchIncomeBar(
   } else barPunches.set(floor, { hitAt: now, label, labelAt: now, color });
 }
 
+// a quake crit's bar leaping off its floor and crashing back down
+const barLifts = new WeakMap<Floor, { at: number; ms: number }>();
+const LIFT_H = BAR_H * 2.4;
+
+export function liftIncomeBar(floor: Floor, ms: number): void {
+  barLifts.set(floor, { at: Date.now(), ms });
+}
+
+function liftOf(floor: Floor, now: number): number {
+  const lift = barLifts.get(floor);
+  if (!lift) return 0;
+  const u = (now - lift.at) / lift.ms;
+  if (u >= 1) {
+    barLifts.delete(floor);
+    return 0;
+  }
+  return LIFT_H * Math.sin(Math.PI * Math.max(0, u));
+}
+
 function punchSince(floor: Floor, now: number) {
   const punch = barPunches.get(floor);
   if (!punch) return null;
@@ -637,6 +656,7 @@ export function drawIncomePanel(
     punchK > 0
       ? punchK * PUNCH_JOLT * BAR_H * Math.cos(sincePunch * PUNCH_WOBBLE)
       : 0;
+  const lift = liftOf(floor, now);
   const slam = getSlamPose(floor, "bar", now);
   const drawBar = (): void =>
     drawSlamTarget(
@@ -649,7 +669,7 @@ export function drawIncomePanel(
     );
   const drawBarBody = (): void => {
     ctx.save();
-    ctx.translate(barCenter.x, barCenter.y + punchJolt);
+    ctx.translate(barCenter.x, barCenter.y + punchJolt - lift);
     if (cancellationArmed) ctx.rotate(getWiggleRotation(now));
     else if (tension) ctx.rotate(tension.rotation);
     else if (flashStrength > 0)

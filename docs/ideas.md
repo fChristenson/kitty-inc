@@ -32,10 +32,36 @@
 - **Binary star crit:** the number splits into two suns that circle each other, closer and faster, trailing spirals, until they collide in a huge blast that flings glowing blobs onto every bar in view.
 - **Pearls crit:** the number is thrown off the top and torn into a chain of glowing fragments that sweep in from the top corner one behind another, two onto each bar in view, each bigger than the last.
 - **Star birth crit:** a cloud of glitter swirls in on itself round the number, collapsing into a newborn star that ignites and fires jets straight up and down into every bar in view.
+- **Fireworks crit:** the number shoots up as a rocket wisp and bursts into a shell of copies high over the building that drift down onto every bar in view, then a second, bigger shell goes off.
+- **Shatter crit:** the number cracks and shatters into shards that spin off and embed in every bar in view, then every shard detonates at once.
+- **Laser crit:** the number floats off to the side, charges, and fires a blazing beam that sweeps down across every bar in view, each flaring as it's crossed, then locks onto its own bar for the final blast.
+- **Drill crit:** the number spins into a drill and bores straight down through every bar in view, stalling and grinding on each one in a gush of sparks before punching through.
+- **Quake crit:** the number slams into the ground, and a quake ripples up the building, every bar in view leaping off its floor and crashing back down in turn.
 
 ## Game ideas
 
-Playground: `tmp/_playground/newGameIdeas.html`.
+Playground for every idea below: `tmp/_playground/ideas.html` (`?only=Name` for one).
 
 - **Orbital decay:** a moon circles the building, its orbit shrinking and quickening, until it crashes into a bar and breaks up, its fragments slamming into the other bars.
 - **Figure eight:** two comets chase each other round a figure eight through the building, faster and faster, every bar they cross blasting, until the one behind catches up and they collide.
+
+## New ideas
+
+### Floor crits
+
+- **Slingshot crit:** the number is pulled down past the lowest bar in view, stretching like a slingshot, then snaps up through every bar bottom to top, each one jolting as it tears past, and bursts off the top in a blast.
+- **Boomerang crit:** the number is hurled out sideways off the screen, curves back in a wide arc that clips every bar in view, and slams home into its own bar.
+- **Pendulum crit:** the number swings on a beam like a wrecking ball, smashing across the bars, each swing lower and harder, until it caves into the bottom bar.
+- **Echo crit:** the number slams into its own bar and the shockwave ring rolls up and down the building, every bar it reaches slamming in turn under a fainter echo of the number.
+- **Swarm crit:** the number bursts into a swarm of wisps that flock round the building like starlings, then split into flights that dive onto each bar in view.
+- **Rocket crit:** the number blasts off from its own bar as a rocket, climbing the building and scorching every bar above in its exhaust, then explodes on the top bar in view.
+- **Split crit:** the number splits in two, each half splits again, and again, the copies doubling down the building until one lands on every bar in view.
+
+### Crit features
+
+- **Encore:** a floor crit sometimes bounces back off its last bar and plays again, smaller and faster, onto the bars it missed.
+- **Full house:** a floor crit that hits every bar in view ends with every bar going off together, paying each one once more.
+- **Double feature:** a rare crit plays two floor crits at once, their numbers weaving through the same bars.
+- **Floor crit collection:** every floor crit is collected like a badge the first time it plays, with its own card in the badge book and a capsule once all are found.
+- **Lucky reel:** a crit's number sometimes spins like a slot reel as it lands, now and then ticking over to the next tier up.
+- **Hot bars:** a bar hit by several floor crits in a row heats up, glowing hotter each time, until the next hit makes it boil over in a payout.

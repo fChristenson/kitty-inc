@@ -158,6 +158,25 @@ export const CRIT_CONFIG = {
     starBirthCrit: {
       chance: 0.03,
     },
+    // a beam swept down every bar in view, locking onto its own for a blast;
+    // a drill grinding down through them; a quake leaping them off their
+    // floors; fireworks shells raining copies onto them; or the number
+    // shattering into shards that embed in them and detonate together
+    laserCrit: {
+      chance: 0.03,
+    },
+    drillCrit: {
+      chance: 0.03,
+    },
+    quakeCrit: {
+      chance: 0.03,
+    },
+    fireworksCrit: {
+      chance: 0.03,
+    },
+    shatterCrit: {
+      chance: 0.03,
+    },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
     badgeShimmer: {

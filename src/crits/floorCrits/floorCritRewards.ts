@@ -80,6 +80,7 @@ import {
   getIncomeBarCenter,
   getIncomeBarBox,
   punchIncomeBar,
+  liftIncomeBar,
 } from "../../floors/incomePanel";
 import {
   addTotalIncome,
@@ -1658,7 +1659,13 @@ function momentLevels(
   )
     return Math.ceil(count / 2);
   if (moment === "volcanoCrit") return Math.ceil(count / 3);
-  if (moment === "rainCrit" || moment === "meteorShowerCrit")
+  // a shatter's shards land their levels as they detonate, not as they embed
+  if (moment === "shatterCrit") return step ? Math.ceil(count / 3) : 0;
+  if (
+    moment === "rainCrit" ||
+    moment === "meteorShowerCrit" ||
+    moment === "fireworksCrit"
+  )
     return Math.ceil(count / 6);
   return count;
 }
@@ -1699,6 +1706,7 @@ function critMomentFor(
         return { x: bar.x - center.x, y: top - ownTop + bar.y - center.y };
       });
     },
+    onLift: (bar, ms) => liftIncomeBar(targets[bar], ms),
     onHit: (bar, step, color) => {
       const target = targets[bar];
       // a snowball bangs a step higher with every bar
