@@ -101,8 +101,8 @@ export const CONFIG = {
 
   // shared/critTypes' rollCrit — what a landed crit's special slot carries
   // once its gateway hits: exactly one of these, each with its chance (they
-  // add up to 1). One that can't play (an animated crit cooling down, a chain
-  // on a bigger tier) is a badge crit instead
+  // add up to 1). One that can't play (an animated crit cooling down) is a
+  // badge crit instead
   specialCrits: {
     // a badge crit: the featured and other special crits in src/critBalance
     badgeCrit: {
@@ -111,12 +111,8 @@ export const CONFIG = {
     // an animated event (src/animatedEventConfig.ts); none can land again
     // until cooldownMs after one has fully played out
     animatedCrit: {
-      chance: 0.23,
+      chance: 0.31,
       cooldownMs: 30_000,
-    },
-    // an x3 crit chaining straight into an x7 and an x10
-    chainCrit: {
-      chance: 0.04,
     },
     // the crit also landing on the floor above / below
     critUp: {
@@ -124,11 +120,6 @@ export const CONFIG = {
     },
     critDown: {
       chance: 0.04,
-    },
-    // a random multiplier in range, counted up and slammed in
-    randomCrit: {
-      chance: 0.04,
-      range: [3, 50] as [number, number],
     },
     // a second crit number (picked by the tiers' own odds) smashing into it,
     // paying their sum
@@ -173,12 +164,8 @@ export const CONFIG = {
     tornadoCrit: {
       chance: 0.03,
     },
-    // it dives into its bar sending a shockwave up and down the building,
-    // flings copies of itself off its orbit, pulls a train of copies down
+    // it flings copies of itself off its orbit, pulls a train of copies down
     // across the bars, or is blown into bubbles that pop on them
-    shockwaveCrit: {
-      chance: 0.03,
-    },
     orbitCrit: {
       chance: 0.03,
     },
@@ -186,6 +173,11 @@ export const CONFIG = {
       chance: 0.03,
     },
     bubbleCrit: {
+      chance: 0.03,
+    },
+    // a bolt cracking down from the sky and chaining through the bars, each
+    // one it strikes paying out double
+    lightningCrit: {
       chance: 0.03,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter

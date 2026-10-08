@@ -3,12 +3,14 @@
 // at its bar character by character, pinballing between bars, snowballing
 // down them, juggled onto them, stomped onto all of them, rained onto them,
 // stamped onto each, zipped across each, crashed down through them from a
-// catapult, flung onto them by a tornado, sent rolling over them as a
-// shockwave, flung onto them from orbit, pulled across them as a train or
-// blown onto them as bubbles.
+// catapult, flung onto them by a tornado, flung onto them from orbit,
+// pulled across them as a train, blown onto them as bubbles or chained
+// through them as a bolt of lightning.
 // Every hit calls back so the floors can jolt and land their levels
 import type { CritMoment } from "../shared/critTypes";
 import { drawGlow, fadeStops, type FadeStops } from "../shared/glowSprite";
+import { createBolt, drawBolt, type Bolt } from "../shared/lightning";
+import { drawDetonation } from "../shared/explosion";
 
 interface Point {
   x: number;
@@ -59,6 +61,8 @@ interface Running {
   lastBars: Point[];
   // a catapult's fall or a tornado's sweep: from this height to that one
   span: { from: number; to: number };
+  // a lightning crit's bolts, their ends kept on the bars as they scroll
+  bolts: Bolt[];
   shake: (intensity: number) => void;
 }
 
@@ -122,12 +126,16 @@ const TORNADO_FLING_MS = 220;
 const TORNADO_COPIES = 12;
 const TORNADO_FONT = 90;
 
-const SHOCK_DIVE_MS = 180;
-// the ring reaching the farthest bar
-const SHOCK_ROLL_MS = 520;
-const SHOCK_SETTLE_MS = 450;
-const SHOCK_TAIL_MS = 250;
-const SHOCK_SHAKE = 1.2;
+const LIGHTNING_RISE_MS = 140;
+const LIGHTNING_FIRST_MS = 160;
+const LIGHTNING_EVERY_MS = 90;
+const LIGHTNING_HOLD_MS = 400;
+const LIGHTNING_FADE_MS = 200;
+const LIGHTNING_WIDTH = 8;
+const LIGHTNING_TAIL_MS = 700;
+const LIGHTNING_SHAKE = 0.9;
+const LIGHTNING_BLAST = 130;
+const LIGHTNING_FONT = 130;
 
 const ORBIT_GATHER_MS = 150;
 const ORBIT_SPIN_MS = 450;
@@ -208,13 +216,13 @@ function bubble(i: number, barCount: number) {
   };
 }
 
-// when the shockwave reaches bar i, its own bar's being the dive's slam
-const shockHitAt = (r: Running, bars: Point[], i: number) =>
-  i === 0
-    ? SHOCK_DIVE_MS
-    : SHOCK_DIVE_MS +
-      (Math.hypot(bars[i].x - bars[0].x, bars[i].y - bars[0].y) / r.span.to) *
-        SHOCK_ROLL_MS;
+const lightningAt = (i: number) => LIGHTNING_FIRST_MS + i * LIGHTNING_EVERY_MS;
+
+// where a lightning crit's first bolt cracks down from, above the top bar
+const lightningSky = (r: Running, bars: Point[], top: number) => ({
+  x: bars[top].x + r.viewportWidth * 0.15,
+  y: bars[top].y - r.viewportWidth * 1.2,
+});
 
 const orbitRelease = (i: number) =>
   ORBIT_GATHER_MS + ORBIT_SPIN_MS + i * ORBIT_GAP_MS;
@@ -322,12 +330,15 @@ function plan(r: Running, bars: Point[]): void {
       );
       break;
     }
-    case "shockwaveCrit": {
-      const farthest = Math.max(
-        ...bars.map((b) => Math.hypot(b.x - bars[0].x, b.y - bars[0].y)),
-      );
-      r.span = { from: 0, to: Math.max(farthest, r.viewportWidth * 0.3) };
-      bars.forEach((_, bar) => hit(bar, shockHitAt(r, bars, bar)));
+    case "lightningCrit": {
+      // from the sky onto the top bar, then bar to bar down the building
+      const order = byHeight(bars);
+      order.forEach((bar, i) => {
+        const from =
+          i === 0 ? lightningSky(r, bars, bar) : { ...bars[order[i - 1]] };
+        r.bolts.push(createBolt(from, { ...bars[bar] }, 3));
+        hit(bar, lightningAt(i));
+      });
       break;
     }
     case "orbitCrit":
@@ -366,11 +377,11 @@ const TAIL_MS: Partial<Record<CritMoment, number>> = {
   stampCrit: STAMP_PRINT_MS,
   zipCrit: ZIP_STITCH_MS,
   catapultCrit: CATAPULT_LAND_MS,
-  shockwaveCrit: SHOCK_TAIL_MS,
   bubbleCrit: BUBBLE_POP_MS,
+  lightningCrit: LIGHTNING_TAIL_MS,
 };
 
-function shakeOf(kind: CritMoment, bar: number): number {
+function shakeOf(kind: CritMoment): number {
   switch (kind) {
     case "stompCrit":
       return STOMP_SHAKE;
@@ -380,8 +391,8 @@ function shakeOf(kind: CritMoment, bar: number): number {
       return DROP_SHAKE;
     case "bubbleCrit":
       return BUBBLE_SHAKE;
-    case "shockwaveCrit":
-      return bar === 0 ? SHOCK_SHAKE : HIT_SHAKE;
+    case "lightningCrit":
+      return LIGHTNING_SHAKE;
     default:
       return HIT_SHAKE;
   }
@@ -448,6 +459,7 @@ export function launchMoment(
     endsAt: 0,
     lastBars: bars,
     span: { from: 0, to: 0 },
+    bolts: [],
     shake,
   };
   plan(running, bars);
@@ -515,7 +527,7 @@ export function drawMoment(
   r.lastBars = bars;
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];
-    r.shake(shakeOf(r.moment.kind, bar));
+    r.shake(shakeOf(r.moment.kind));
     r.moment.onHit(bar, step, r.glyphs.color);
   }
   if (ms >= r.endsAt) {
@@ -941,68 +953,6 @@ const DRAW: Record<CritMoment, Draw> = {
     });
   },
 
-  shockwaveCrit(ctx, r, ms, bars) {
-    const home = bars[0];
-    if (ms < SHOCK_DIVE_MS) {
-      // diving at its own bar, faster and faster
-      const p = (ms / SHOCK_DIVE_MS) ** 2;
-      drawText(
-        ctx,
-        r.glyphs,
-        r.label,
-        home.x * p,
-        home.y * p,
-        lerp(r.flashFont, MOMENT_FONT, p),
-        { along: Math.PI / 2, stretch: 1 + 0.4 * p },
-      );
-      return;
-    }
-    const since = ms - SHOCK_DIVE_MS;
-    // the rings rolling out up and down the building, a white one leading
-    const reach = r.span.to * 1.3;
-    ctx.save();
-    for (const [lag, white] of [
-      [40, false],
-      [0, true],
-    ] as const) {
-      const radius = ((since - lag) / SHOCK_ROLL_MS) * r.span.to;
-      const fade = 1 - radius / reach;
-      if (radius <= 0 || fade <= 0) continue;
-      ctx.globalAlpha = fade;
-      ctx.strokeStyle = white ? "#ffffff" : r.glyphs.color;
-      ctx.lineWidth = (white ? 36 : 26) * fade + 6;
-      ctx.beginPath();
-      ctx.ellipse(
-        home.x,
-        home.y,
-        radius + r.moment.barHalfWidth * 0.6,
-        radius + 20,
-        0,
-        0,
-        Math.PI * 2,
-      );
-      ctx.stroke();
-    }
-    ctx.restore();
-    // squashed flat onto its bar, fading
-    if (since < SHOCK_SETTLE_MS) {
-      const k = Math.exp(-since / 120);
-      drawText(
-        ctx,
-        r.glyphs,
-        r.label,
-        home.x,
-        home.y - MOMENT_FONT * 0.3,
-        MOMENT_FONT,
-        {
-          sx: 1 + 0.4 * k,
-          sy: 1 - 0.5 * k,
-          alpha: 1 - since / SHOCK_SETTLE_MS,
-        },
-      );
-    }
-  },
-
   orbitCrit(ctx, r, ms, bars) {
     const order = byHeight(bars);
     const count = order.length;
@@ -1162,6 +1112,57 @@ const DRAW: Record<CritMoment, Draw> = {
       drawText(ctx, r.glyphs, r.label, x, y, BUBBLE_FONT * grow);
     }
     ctx.restore();
+  },
+
+  lightningCrit(ctx, r, ms, bars) {
+    const now = r.startedAt + ms;
+    const order = byHeight(bars);
+    const top = bars[order[0]];
+    if (ms < LIGHTNING_RISE_MS) {
+      // shot up off the top into the sky the bolt comes down from
+      const p = (ms / LIGHTNING_RISE_MS) ** 2;
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        0,
+        lerp(0, top.y - r.viewportWidth, p),
+        r.flashFont,
+        { along: Math.PI / 2, stretch: 1 + p, alpha: 1 - p },
+      );
+    }
+    const fadesAt = lightningAt(order.length - 1) + LIGHTNING_HOLD_MS;
+    // the whole chain stays lit as it grows, then fades together
+    const boltAlpha = 1 - clamp01((ms - fadesAt) / LIGHTNING_FADE_MS);
+    order.forEach((bar, i) => {
+      const at = bars[bar];
+      const since = ms - lightningAt(i);
+      if (since < 0) return;
+      const last = i === order.length - 1;
+      if (boltAlpha > 0) {
+        // its ends kept on the bars as they scroll
+        const bolt = r.bolts[i];
+        const from = i === 0 ? lightningSky(r, bars, bar) : bars[order[i - 1]];
+        bolt.from.x = from.x;
+        bolt.from.y = from.y;
+        bolt.to.x = at.x;
+        bolt.to.y = at.y;
+        drawBolt(ctx, bolt, boltAlpha, LIGHTNING_WIDTH, "#ffffff");
+      }
+      drawDetonation(ctx, at, since, LIGHTNING_BLAST * (last ? 1.3 : 1), now);
+      // the double payout it struck, slamming in and rising off the bar
+      const t = since / LIGHTNING_TAIL_MS;
+      if (t < 1)
+        drawText(
+          ctx,
+          r.glyphs,
+          "x2",
+          at.x + r.moment.barHalfWidth * 0.5,
+          at.y - 120 - 120 * (1 - (1 - t) ** 2),
+          LIGHTNING_FONT * lerp(2.4, 1, clamp01(since / 110) ** 2),
+          { alpha: t < 0.7 ? 1 : (1 - t) / 0.3 },
+        );
+    });
   },
 };
 

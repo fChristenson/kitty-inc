@@ -3,9 +3,7 @@ import "./shared/gameClock";
 import "./style.css";
 import {
   forceTestCrit,
-  forceTierChainCrit,
   forceCritUpDown,
-  forceRandomCrit,
   forceMergeCrit,
   forceCritMoment,
 } from "./floors";
@@ -200,9 +198,7 @@ import {
   wireRocketEventTestButton,
   wireRevealEventTestButton,
   wireBadgeCapsuleTestButton,
-  wireCritChainTestButton,
   wireCritUpDownTestButtons,
-  wireRandomCritTestButton,
   wireMergeCritTestButton,
   wireCritMomentTestButtons,
   wireJackpotReelsEventTestButton,
@@ -705,17 +701,9 @@ async function main() {
       const floor = buildings[activeBuildingIndex]?.[0];
       if (floor) forceTestCrit(floor, kind, "crit", null, "upgrade");
     });
-    wireCritChainTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (floor) forceTierChainCrit(floor);
-    });
     wireCritUpDownTestButtons(app, (up) => {
       const floor = buildings[activeBuildingIndex]?.[0];
       if (floor) forceCritUpDown(floor, up);
-    });
-    wireRandomCritTestButton(app, () => {
-      const floor = buildings[activeBuildingIndex]?.[0];
-      if (floor) forceRandomCrit(floor);
     });
     wireMergeCritTestButton(app, () => {
       const floor = buildings[activeBuildingIndex]?.[0];

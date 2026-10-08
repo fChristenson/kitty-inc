@@ -4,9 +4,7 @@
 
 - **Mystery capsules:** a fully upgraded building earns a capsule, opened from its map marker, that hatches a badge you haven't found yet.
 - **Lucky foils:** a badge crit sometimes turns its badge shimmer (landed 10+ times) or glitter (100+) foil, with its own reveal.
-- **Crit chains:** an x3 crit sometimes fires an x7 and an x10 straight after it, the numbers stacking like paper.
 - **Crit up / down:** a crit sometimes copies onto the floor above or below, its number stacking over the first.
-- **Random crit:** a crit sometimes counts up and slams in a random multiplier from x3 to x50.
 - **Crit merge:** a crit sometimes brings a second crit number; the two charge in, circle each other, smash together and their sum slams in.
 - **Rapid fire crit:** a crit's number sometimes slams in, then its characters fire one after another into its floor's bar, each one slamming it.
 - **Pinball crit:** the number ricochets between the bars of the floors in view like a pinball, each bar it bounces off jolting and getting levels, then it slams home into its own bar.
@@ -20,21 +18,18 @@
 - **Catapult crit:** the number is flung up off the top of the screen and comes crashing down through every bar in view.
 - **Tornado crit:** the number whirls into a spinning funnel of copies that tears down through the bars, flinging a copy onto each one.
 - **Crit afterglow:** a bar a crit moment hits glows and fills in the crit's color for a second.
-- **Shockwave crit:** the number slams into its bar and a shockwave rolls up and down the building, every bar bouncing as it passes.
 - **Orbit crit:** copies circle the number like moons, spinning ever faster, then fling off one by one onto the bars.
 - **Train crit:** the number pulls a train of copies down a zigzag track along the bars, top to bottom.
 - **Bubble crit:** the number is blown into bubbles that wobble down onto the bars and pop.
 - **Coin spill:** every crit moment hit knocks coins off the bar.
+- **Lightning crit:** the number shoots up into the sky and a bolt cracks down onto the top bar in view, chaining down through every bar below, each strike blasting it and paying it out double.
 
-## Crit moments
+## Game ideas
 
-Playground: `tmp/_playground/newCritIdeas.html`.
+Playground: `tmp/_playground/newGameIdeas.html`.
 
-- **Yo-yo crit:** the number drops on a glowing string to each bar in turn and snaps back up, deeper every time.
-- **Cannon crit:** the number turns into a cannon at the building's side and fires a copy at every bar, recoiling with each shot.
-- **Pendulum crit:** the number swings on a lengthening chain, smashing through a lower bar at the bottom of every swing.
-- **Ping-pong crit:** the number is volleyed between two glowing paddles at the screen's edges, a floor lower each volley.
-
-## Feel
-
-- **Level odometer:** a bar's Lvl number rolls up like an odometer as its levels land.
+- **Overflow:** a bar that fills up overflows: its coins pour off its end onto the bar below, which fills and pours on, cascading down to a blast on the ground floor.
+- **Max level blast:** a floor hitting max level goes off in a chain of blasts along its bar and one huge one that turns the bar gold, MAX slamming onto it.
+- **Record payout:** the biggest payout yet doesn't just tick into the total: its number rises off the bar and slams into the total with a blast.
+- **Milestone fireworks:** crossing $1K, $1M, $1B… launches rockets off the roof that burst into blasts, raining coins down onto every bar.
+- **Comet visitor:** now and then a comet weaves down the building at full speed; every bar it crosses fills, blasts and pays out on the spot.

@@ -1258,10 +1258,8 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-foil-reveal="shimmer">Shimmer Reveal</button>
           <button class="game__button" data-foil-reveal="glitter">Glitter Reveal</button>
           <button id="test-badge-capsule" class="game__button">Badge Capsule</button>
-          <button id="test-crit-chain" class="game__button">Crit Chain</button>
           <button class="game__button" data-crit-stack="up">Crit Up</button>
           <button class="game__button" data-crit-stack="down">Crit Down</button>
-          <button id="test-random-crit" class="game__button">Random Crit</button>
           <button id="test-merge-crit" class="game__button">Merge Crit</button>
           <button class="game__button" data-crit-moment="rapidFireCrit">Rapid Fire Crit</button>
           <button class="game__button" data-crit-moment="pinballCrit">Pinball Crit</button>
@@ -1273,10 +1271,10 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-crit-moment="zipCrit">Zip Crit</button>
           <button class="game__button" data-crit-moment="catapultCrit">Catapult Crit</button>
           <button class="game__button" data-crit-moment="tornadoCrit">Tornado Crit</button>
-          <button class="game__button" data-crit-moment="shockwaveCrit">Shockwave Crit</button>
           <button class="game__button" data-crit-moment="orbitCrit">Orbit Crit</button>
           <button class="game__button" data-crit-moment="trainCrit">Train Crit</button>
           <button class="game__button" data-crit-moment="bubbleCrit">Bubble Crit</button>
+          <button class="game__button" data-crit-moment="lightningCrit">Lightning Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

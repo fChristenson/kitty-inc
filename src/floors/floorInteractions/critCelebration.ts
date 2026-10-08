@@ -24,18 +24,15 @@ import { playCoinDrop } from "../../sound";
 import {
   playTierFlash,
   playSpecialFlash,
-  STACK_CHAIN,
   STACK_DOWN,
   STACK_UP,
   TIER_FLASH_STROKE_WIDTH,
 } from "../../shared/critFlash";
 import {
   playCritMerge,
-  playCritSpin,
   type FlashMoment,
   type FlashStack,
 } from "../../screenShake";
-import { CONFIG } from "../../config";
 import { celebrateBonusTier, tierColor } from "../../shared/bonusTierReward";
 import {
   isCritFlashActive,
@@ -56,20 +53,17 @@ function celebrateTier(tier: CritTier, moment: FlashMoment | null): void {
   );
 }
 
-// stacked crits: a crit chain's x3, x7 and x10, then a crit up's or crit
-// down's copy on the floor above/below, land in quick succession, each new
-// number landing at its offset over the ones before it; every number but the
-// last buzzes a short pulse, so the phone gives one distinct kick per number
+// stacked crits: a crit up's or crit down's copy on the floor above/below
+// lands in quick succession, each new number landing at its offset over the
+// ones before it; every number but the last buzzes a short pulse, so the
+// phone gives one distinct kick per number
 const STACK_STEP_MS = 200;
 const STACK_PULSE_MS = 120;
 
-// what stacks on a landed crit; random is a random crit's own multiplier,
-// merge a merge crit's second number
+// what stacks on a landed crit; merge is a merge crit's second number
 export interface CritStacking {
-  chain?: boolean;
   up?: boolean;
   down?: boolean;
-  random?: number;
   merge?: CritTier;
 }
 
@@ -79,7 +73,7 @@ interface StackStep {
   stack: FlashStack | null;
 }
 
-// a random crit flashes as the tier its multiplier reaches
+// a merge crit flashes as the tier its sum reaches
 const tierOfMultiplier = (multiplier: number): CritTier =>
   multiplier >= CRIT_TIER_CONFIG.ultra.multiplier
     ? "ultra"
@@ -89,35 +83,20 @@ const tierOfMultiplier = (multiplier: number): CritTier =>
 
 function stackSteps(
   landedTier: CritTier,
-  { chain, up, down, random, merge }: CritStacking,
+  { up, down, merge }: CritStacking,
 ): StackStep[] {
-  const multiplier =
-    random ??
-    (merge
-      ? CRIT_TIER_CONFIG[landedTier].multiplier +
-        CRIT_TIER_CONFIG[merge].multiplier
-      : undefined);
+  const multiplier = merge
+    ? CRIT_TIER_CONFIG[landedTier].multiplier +
+      CRIT_TIER_CONFIG[merge].multiplier
+    : undefined;
   const tier = multiplier ? tierOfMultiplier(multiplier) : landedTier;
   const label = multiplier ? `x${multiplier}` : CRIT_TIER_CONFIG[tier].label;
-  const step = (t: CritTier, stack: FlashStack | null): StackStep => ({
-    tier: t,
-    label: CRIT_TIER_CONFIG[t].label,
-    stack,
-  });
-  const steps: StackStep[] = chain
-    ? [
-        step("crit", null),
-        step("mega", STACK_CHAIN),
-        step("ultra", STACK_CHAIN),
-      ]
-    : [{ tier, label, stack: null }];
+  const steps: StackStep[] = [{ tier, label, stack: null }];
   if (up) steps.push({ tier, label, stack: STACK_UP });
   if (down) steps.push({ tier, label, stack: STACK_DOWN });
   return steps;
 }
 
-// a random crit counts up this long before its own slams in
-const SPIN_MS = 600;
 // a merge crit's two numbers charge in, circle each other and smash after this
 const MERGE_MS = 900;
 
@@ -130,21 +109,11 @@ const mergeNumber = (tier: CritTier) => ({
 function celebrateStack(
   steps: StackStep[],
   landedTier: CritTier,
-  { random, merge }: CritStacking,
+  { merge }: CritStacking,
   moment: FlashMoment | null,
 ): void {
   let delay = 0;
-  if (random) {
-    const tier = tierOfMultiplier(random);
-    playCritSpin(
-      CONFIG.specialCrits.randomCrit.range,
-      random,
-      tierColor(tier),
-      TIER_FLASH_STROKE_WIDTH[tier],
-      SPIN_MS,
-    );
-    delay = SPIN_MS;
-  } else if (merge) {
+  if (merge) {
     playCritMerge(
       mergeNumber(landedTier),
       mergeNumber(merge),
@@ -367,10 +336,7 @@ export function triggerCritCelebration(
   }
   const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
   const steps = stackSteps(tier, stacking);
-  const stacked =
-    steps.length > 1 ||
-    stacking.random !== undefined ||
-    stacking.merge !== undefined;
+  const stacked = steps.length > 1 || stacking.merge !== undefined;
   if (landed.length > 0 || stacked) {
     const now = Date.now();
     // the stacked numbers go first; the procs riding them flash after

@@ -1,5 +1,4 @@
 import { snapshotMap, snapshotSet } from "../../shared/snapshotState";
-import { CONFIG } from "../../config";
 // The base crit-TIER system (x5/x25/x125 jackpot rolls) — distinct from the
 // "event crit" framework in shared.ts (Sale/Overtime and any future ones): a
 // tier is what's rolled per click and what makes an event's own piggyback
@@ -517,8 +516,6 @@ export function rollCritUpgrade(
   rollCrit(
     (result, landedProcs) => {
       critTiers.set(floor, result.tier);
-      if (result.tierChain) tierChainCrits.add(floor);
-      if (result.randomCrit) randomCrits.set(floor, result.randomCrit);
       if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
       if (result.critMoment) critMoments.set(floor, result.critMoment);
       if (result.critUp) critUpCrits.add(floor);
@@ -1025,19 +1022,6 @@ export function isCritUpgrade(floor: Floor): boolean {
   return critTiers.has(floor);
 }
 
-// armed x3 crits that chain into an x7 and an x10 when clicked
-const tierChainCrits = snapshotSet<Floor>();
-
-export function isTierChainCrit(floor: Floor): boolean {
-  return tierChainCrits.has(floor);
-}
-
-// dev/test-only: arms an x3 crit that chains
-export function forceTierChainCrit(floor: Floor): void {
-  forceTestCrit(floor, null, "crit", null, "upgrade");
-  tierChainCrits.add(floor);
-}
-
 // armed crits that also land on the floor above / below when clicked
 const critUpCrits = snapshotSet<Floor>();
 const critDownCrits = snapshotSet<Floor>();
@@ -1054,20 +1038,6 @@ export function isCritDown(floor: Floor): boolean {
 export function forceCritUpDown(floor: Floor, up: boolean): void {
   forceTestCrit(floor, null, "crit", null, "upgrade");
   (up ? critUpCrits : critDownCrits).add(floor);
-}
-
-// armed random crits' own multipliers
-const randomCrits = snapshotMap<Floor, number>();
-
-export function getRandomCrit(floor: Floor): number | undefined {
-  return randomCrits.get(floor);
-}
-
-// dev/test-only: arms a random crit
-export function forceRandomCrit(floor: Floor): void {
-  forceTestCrit(floor, null, "crit", null, "upgrade");
-  const [low, high] = CONFIG.specialCrits.randomCrit.range;
-  randomCrits.set(floor, low + Math.floor(Math.random() * (high - low + 1)));
 }
 
 // armed merge crits' second numbers
@@ -1103,10 +1073,8 @@ export function forceCritMoment(floor: Floor, moment: CritMoment): void {
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
-  tierChainCrits.delete(floor);
   critUpCrits.delete(floor);
   critDownCrits.delete(floor);
-  randomCrits.delete(floor);
   mergeCrits.delete(floor);
   critMoments.delete(floor);
   consumeCritProcs(floor);

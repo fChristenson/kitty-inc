@@ -31,9 +31,8 @@ export const TIER_SHAKE_INTENSITY: Record<CritTier, number> = {
   ultra: 2.6,
 };
 
-// where a stacked flash lands from the one under it, CSS px: a crit chain's
-// numbers step up-left like stacked paper, a crit up/down sits above/below
-export const STACK_CHAIN: FlashStack = { x: -50, y: -50 };
+// where a stacked flash lands from the one under it, CSS px: a crit up/down
+// sits above/below
 export const STACK_UP: FlashStack = { x: 0, y: -70 };
 export const STACK_DOWN: FlashStack = { x: 0, y: 70 };
 

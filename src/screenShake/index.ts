@@ -271,11 +271,8 @@ function startFlash(req: FlashRequest): void {
     req.minDurationMs - GROWTH_DURATION_MS - fadeDurationMs,
   );
   const stacking = req.stack !== null && flashStartedAt !== null && flashLabel;
-  const sizeLabel = spin
-    ? spin.sizeLabel
-    : stacking && req.label === flashLabel
-      ? flashSizeLabel
-      : req.label;
+  const sizeLabel =
+    stacking && req.label === flashLabel ? flashSizeLabel : req.label;
   if (!stacking) {
     coveredFlashes = [];
     flashX = 0;
@@ -298,17 +295,10 @@ function startFlash(req: FlashRequest): void {
         flashEndsAt - now - GROWTH_DURATION_MS - fadeDurationMs,
       );
   }
-  // a counted-up number pops; a merge's sum or a moment's number slams down
-  // from big
-  flashEntry =
-    spin !== null
-      ? "pop"
-      : merge !== null || (req.moment && !stacking)
-        ? "slam"
-        : "spin";
+  // a merge's sum or a moment's number slams down from big
+  flashEntry = merge !== null || (req.moment && !stacking) ? "slam" : "spin";
   if (flashEntry === "slam")
     setTimeout(() => kickShake(SLAM_SHAKE, Date.now()), SLAM_MS);
-  spin = null;
   merge = null;
   flashStartedAt = now;
   flashLabel = req.label;
@@ -411,14 +401,14 @@ export function triggerScreenShake(options?: {
         // decoded off the main thread again (the browser may have dropped it),
         // then baked with the label before the reveal's first frame
         if (icon) await icon.decode().catch(() => undefined);
-        warmFlashBitmap(req.label, req.color, req.strokeWidth, spin?.sizeLabel);
+        warmFlashBitmap(req.label, req.color, req.strokeWidth);
         const currentNow = Date.now();
         const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
         if (stillIdle || req.priority > activeFlashPriority || req.stack)
           startFlash(req);
       })
       .catch(() => {
-        warmFlashBitmap(req.label, req.color, req.strokeWidth, spin?.sizeLabel);
+        warmFlashBitmap(req.label, req.color, req.strokeWidth);
         const currentNow = Date.now();
         const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
         if (stillIdle || req.priority > activeFlashPriority || req.stack)
@@ -474,9 +464,7 @@ export function getScreenShakeOffset(now: number): { x: number; y: number } {
 // once and settles still. Plays over the start of the timeline without
 // shifting any timing (holds, blinks)
 const ENTRY_LAND_MS = 50;
-let flashEntry: "spin" | "pop" | "slam" = "spin";
-const POP_IN_MS = 180;
-const POP_IN_SCALE = 0.2;
+let flashEntry: "spin" | "slam" = "spin";
 // a slam drops from this much bigger, lands with a shake, then squishes
 const SLAM_MS = 120;
 const SLAM_FROM = 2.6;
@@ -528,10 +516,9 @@ export function isCritFlashActive(now: number): boolean {
   return flashEndsAt !== null && (flashPausedAt ?? now) < flashEndsAt;
 }
 
-// the slam a random crit's count or a merge crit's numbers are still building
-// up to, until it lands (or, if it never does, well past its due time)
+// the slam a merge crit's numbers are still building up to, until it lands
+// (or, if it never does, well past its due time)
 function pendingLeadInLabel(now: number): string | null {
-  if (spin && now - spin.startedAt < spin.spinMs * 2) return spin.label;
   if (merge && now - merge.startedAt < merge.mergeMs * 2) return merge.label;
   return null;
 }
@@ -821,13 +808,8 @@ function warmFlashBitmap(
 }
 
 // bakes a lead-in's slam a frame after it starts, so the slam doesn't stall
-function warmSlamSoon(
-  label: string,
-  color: string,
-  strokeWidth: number,
-  sizeLabel = label,
-): void {
-  setTimeout(() => warmFlashBitmap(label, color, strokeWidth, sizeLabel), 20);
+function warmSlamSoon(label: string, color: string, strokeWidth: number): void {
+  setTimeout(() => warmFlashBitmap(label, color, strokeWidth), 20);
 }
 
 // builds these flashes' bitmaps at idle, once the canvas has a size and the
@@ -861,14 +843,13 @@ export function drawCritFlash(
   syncCritFlashPause(now);
   if (flashPausedAt !== null) return;
   drawFlashLayers(ctx, centerX, centerY, viewportWidth, now);
-  drawCritSpin(ctx, centerX, centerY, viewportWidth, now);
   drawCritMerge(ctx, centerX, centerY, viewportWidth, now);
   drawMoment(ctx, centerX, centerY, now);
   drawCritSparks(ctx, centerX, centerY, viewportWidth, now);
 }
 
-// a random crit counting up to its number like the total income readout,
-// at the size its own flash slams in at; drawn from baked glyphs
+// a crit's number baked character by character, so a merge or moment can
+// draw any number at the size its own flash slams in at
 interface SpinGlyphs {
   // "x" then 0-9
   sprites: HTMLCanvasElement[];
@@ -876,22 +857,6 @@ interface SpinGlyphs {
   pad: number;
   font: number;
 }
-interface CritSpin {
-  // the slam it counts up to
-  label: string;
-  glyphs: SpinGlyphs;
-  low: number;
-  range: number;
-  start: number;
-  steps: number;
-  // its widest number, which sets its size and its slam's
-  sizeLabel: string;
-  // on-screen font size, as a share of the viewport's width
-  sizeShare: number;
-  startedAt: number;
-  spinMs: number;
-}
-let spin: CritSpin | null = null;
 const spinGlyphCache = new Map<string, SpinGlyphs>();
 const SPIN_CHARS = "x0123456789";
 
@@ -927,9 +892,6 @@ function getSpinGlyphs(
   return glyphs;
 }
 
-// numbers the count runs through a second
-const SPIN_RATE = 120;
-
 // glyphs baked near their on-screen size, so they stay sharp
 function spinGlyphRes(sizeShare: number): number {
   const onScreen = sizeShare * lastViewportWidth * lastDrawScale;
@@ -964,60 +926,6 @@ function drawGlyphText(
     );
     x += glyphs.advances[i] * scale;
   }
-}
-
-export function playCritSpin(
-  [low, high]: [number, number],
-  to: number,
-  color: string,
-  strokeWidth: number,
-  spinMs: number,
-): void {
-  const scratch = getScratchCtx();
-  let sizeLabel = `x${to}`;
-  for (let n = low; n <= high; n++)
-    if (measureLabel(scratch, `x${n}`) > measureLabel(scratch, sizeLabel))
-      sizeLabel = `x${n}`;
-  // the same share of the screen its own flash fills
-  const sizeShare = 0.8 / measureLabel(scratch, sizeLabel);
-  const res = spinGlyphRes(FLASH_FONT_SIZE * sizeShare);
-  const range = high - low + 1;
-  const steps = Math.round((spinMs / 1000) * SPIN_RATE);
-  warmSlamSoon(`x${to}`, color, strokeWidth, sizeLabel);
-  spin = {
-    label: `x${to}`,
-    glyphs: getSpinGlyphs(color, strokeWidth, res),
-    low,
-    range,
-    // so the count wraps round the range and ends on its number
-    start: (((to - low - steps) % range) + range) % range,
-    steps,
-    sizeLabel,
-    sizeShare: sizeShare * FLASH_FONT_SIZE,
-    startedAt: Date.now(),
-    spinMs,
-  };
-}
-
-function drawCritSpin(
-  ctx: CanvasRenderingContext2D,
-  centerX: number,
-  centerY: number,
-  viewportWidth: number,
-  now: number,
-): void {
-  if (!spin) return;
-  const t = (now - spin.startedAt) / spin.spinMs;
-  // held on its number until the slam replaces it (startFlash)
-  if (t >= 2) {
-    spin = null;
-    return;
-  }
-  const { glyphs, low, range, start, steps } = spin;
-  const step = Math.floor(Math.min(1, Math.max(0, t)) * steps);
-  const text = `x${low + ((start + step) % range)}`;
-  const scale = (spin.sizeShare * viewportWidth) / glyphs.font;
-  drawGlyphText(ctx, glyphs, text, centerX, centerY, scale);
 }
 
 // a merge crit: two crit numbers charge in from opposite sides or corners of
@@ -1333,10 +1241,6 @@ function drawFlashLayers(
       const q = (elapsed - SLAM_MS) / SLAM_SQUISH_MS;
       growthScale *= 1 - SLAM_SQUISH * Math.sin(Math.PI * q) * (1 - q);
     }
-  } else if (flashEntry === "pop") {
-    if (elapsed < POP_IN_MS)
-      growthScale *=
-        1 + POP_IN_SCALE * Math.sin((Math.PI * elapsed) / POP_IN_MS);
   } else if (elapsed < ENTRY_LAND_MS) {
     const entry = entryPose(elapsed / ENTRY_LAND_MS);
     growthScale *= entry.scale;

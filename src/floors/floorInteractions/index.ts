@@ -23,10 +23,8 @@ import {
   getButtonCenter,
   triggerButtonPress as animateButtonPress,
   isCritUpgrade,
-  isTierChainCrit,
   isCritUp,
   isCritDown,
-  getRandomCrit,
   getMergeCrit,
   getCritMoment,
   getCritTier,
@@ -1897,13 +1895,9 @@ export function applyFloorCrit(
   if (!allowSpecialProcs) result = tierOnlyCrit(result.tier);
   const isGroundFloor = deps.floors.indexOf(floor) === 0;
   const count =
-    result.randomCrit ??
     CRIT_TIER_CONFIG[result.tier].multiplier +
-      (result.mergeCrit ? CRIT_TIER_CONFIG[result.mergeCrit].multiplier : 0);
-  const chainTicks = result.tierChain
-    ? CRIT_TIER_CONFIG.mega.multiplier + CRIT_TIER_CONFIG.ultra.multiplier
-    : 0;
-  for (let tick = 0; tick < count + chainTicks; tick++)
+    (result.mergeCrit ? CRIT_TIER_CONFIG[result.mergeCrit].multiplier : 0);
+  for (let tick = 0; tick < count; tick++)
     applyUpgradeTick(floor, isGroundFloor);
   // a crit up/down lands the same tier on the floor above/below too
   const index = deps.floors.indexOf(floor);
@@ -1938,14 +1932,12 @@ export function applyFloorCrit(
     result.bonusTier,
     (kind) => grantFollowUpProc(kind, context),
     {
-      chain: result.tierChain,
       up,
       down,
-      random: result.randomCrit,
       merge: result.mergeCrit,
     },
     result.critMoment
-      ? critMomentFor(deps, floor, result.critMoment, count + chainTicks)
+      ? critMomentFor(deps, floor, result.critMoment, count)
       : null,
   );
   for (const kind of landedProcKinds(result))
@@ -1955,6 +1947,7 @@ export function applyFloorCrit(
 // the levels a crit moment's hit lands on a bar: its own floor already has
 // the crit's, so only a snowball's growth adds to it
 const COIN_SPILL_SCALE = 0.7;
+const LIGHTNING_PAYOUT = 2;
 function momentLevels(
   moment: CritMoment,
   own: boolean,
@@ -2021,6 +2014,9 @@ function critMomentFor(
         fresh && given.has(target) ? `+${given.get(target)} Lvl` : null,
         color,
       );
+      // a lightning strike pays its bar out double
+      if (moment === "lightningCrit")
+        paySaleClick(target, isGround(target), LIGHTNING_PAYOUT);
       // the hit knocks coins off the bar
       const box = getIncomeBarBox(isGround(target));
       spawnCoinBurst(
@@ -2303,10 +2299,8 @@ export function handleFloorClick(
       const tier = getCritTier(floor)!;
       const procs = readCritProcs(floor);
       const bonusTier = getBonusTierCrit(floor);
-      const tierChain = isTierChainCrit(floor);
       const critUp = isCritUp(floor);
       const critDown = isCritDown(floor);
-      const randomCrit = getRandomCrit(floor);
       const mergeCrit = getMergeCrit(floor);
       const critMoment = getCritMoment(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
@@ -2329,10 +2323,8 @@ export function handleFloorClick(
           Object.assign(procs, {
             tier,
             bonusTier,
-            tierChain,
             critUp,
             critDown,
-            randomCrit,
             mergeCrit,
             critMoment,
           }),
