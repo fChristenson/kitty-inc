@@ -15,7 +15,7 @@ import {
   playExplosion,
   playSlamExplosion,
 } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawExplosion, drawWhiteBurst } from "../../../../shared/eventFx";
 import {

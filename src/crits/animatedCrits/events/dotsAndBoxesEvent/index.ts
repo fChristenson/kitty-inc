@@ -8,7 +8,7 @@
 // whole board blows in a huge blast. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import {
   drawGlitterLight,
   drawWisp,

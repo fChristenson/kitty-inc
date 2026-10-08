@@ -1,6 +1,6 @@
 // the one set of crit flash presets (text + shake + its sfx), shared by the
 // floors' crit celebrations and the city map's building crits
-import type { FlashMoment } from "../momentCrits";
+import type { FlashMoment } from "../floorCrits/critPlayer";
 import {
   SPECIAL_FLASH_STROKE_WIDTH,
   triggerScreenShake,

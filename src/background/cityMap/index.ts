@@ -14,10 +14,10 @@ import {
   type CritRollResult,
   getCritBadgeOverlay,
   celebrateBuildingCrit,
-  getScreenShakeOffset,
   drawCritFlash,
   isCritFlashActive,
 } from "../../crits";
+import { getScreenShakeOffset } from "../../shared/screenShake";
 
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";

@@ -6,7 +6,7 @@
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
 import { FLOW_FLIGHT_MS } from "../../moneyCover";
 import { pathsAlong } from "../../riverPaths";

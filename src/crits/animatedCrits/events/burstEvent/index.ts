@@ -5,7 +5,7 @@ import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { forceClaimEventProc, registerEventProc } from "../../eventProcs";

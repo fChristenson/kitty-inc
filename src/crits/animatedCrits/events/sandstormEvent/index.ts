@@ -7,7 +7,7 @@
 // shake. Pays floor income × floor number × REWARD, plus the tiers
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";

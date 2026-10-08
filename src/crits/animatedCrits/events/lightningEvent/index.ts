@@ -8,7 +8,7 @@
 // number × REWARD (see ../moneyCover)
 import { CONFIG } from "../../../../config";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import {
   drawWispBetween,
   WISP_SIZE,

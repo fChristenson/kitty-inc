@@ -11,7 +11,7 @@ import {
   playSwoosh,
   startBoostEventStreamLoop,
 } from "../../../sound";
-import { shakeScreen } from "../../critFlash";
+import { shakeScreen } from "../../../shared/screenShake";
 import type { BadgeFoil } from "../critProcCounts";
 import { critFont, drawPoppingCritText } from "../../critFlash/critText";
 import { drawWhiteBurst } from "../../../shared/eventFx";

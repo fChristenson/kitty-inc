@@ -11,7 +11,7 @@ import { randomInt } from "../../../../utils";
 import { isFloorLocked } from "../../../../shared/detachedJob";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import {
   createEventFx,
   drawWhiteBurst,

@@ -10,7 +10,7 @@
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import {
   BTN_H,
   BTN_W,

@@ -10,7 +10,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn } from "../../../../shared/easing";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";

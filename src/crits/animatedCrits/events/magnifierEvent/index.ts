@@ -9,7 +9,7 @@
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { between, clamp01, smoothstep } from "../../../../shared/easing";
 import { sprayTargets } from "../../../../shared/coinTargets";

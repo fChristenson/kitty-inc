@@ -10,7 +10,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp } from "../../../../shared/easing";

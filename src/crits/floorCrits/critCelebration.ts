@@ -31,7 +31,7 @@ import {
   STACK_UP,
   TIER_FLASH_STROKE_WIDTH,
 } from "../critFlash/presets";
-import type { FlashMoment } from "../momentCrits";
+import type { FlashMoment } from "./critPlayer";
 import {
   playCritMerge,
   type FlashStack,

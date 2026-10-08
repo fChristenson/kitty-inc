@@ -10,7 +10,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { createEventFx, drawWhiteBurst } from "../../../../shared/eventFx";
 import { streamCoins } from "../../../../shared/eventStream";

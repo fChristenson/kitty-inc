@@ -7,7 +7,7 @@
 // REWARD (see ../cashFlow)
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import {
   drawWispBetween,
   WISP_SIZE,

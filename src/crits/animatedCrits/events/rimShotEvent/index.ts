@@ -8,7 +8,7 @@
 // number × REWARD
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {
   drawGlitterLight,

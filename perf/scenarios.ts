@@ -10,8 +10,8 @@ import {
   FEATURED_CRIT_KINDS,
   SPECIAL_CRIT_GATEWAY,
   setCritRandom,
-  shakeScreen,
 } from "../src/crits";
+import { shakeScreen } from "../src/shared/screenShake";
 import {
   applyBoostAll,
   getButtonCenter,

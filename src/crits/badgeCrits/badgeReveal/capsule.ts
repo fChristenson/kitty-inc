@@ -6,7 +6,7 @@
 import { CONFIG } from "../../../config";
 import { COLOR } from "../../../palette";
 import { playBloop, playJackpot, playSwoosh } from "../../../sound";
-import { shakeScreen } from "../../critFlash";
+import { shakeScreen } from "../../../shared/screenShake";
 import { drawExplosion } from "../../../shared/eventFx";
 import { drawWisp, swoop, WISP_SIZE } from "../../../shared/wisp";
 import { clamp01, easeIn, easeOutBack } from "../../../shared/easing";

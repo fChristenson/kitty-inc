@@ -7,7 +7,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { randomInt } from "../../../../utils";
 import { playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { forceClaimEventProc, registerEventProc } from "../../eventProcs";

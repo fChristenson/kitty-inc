@@ -35,10 +35,7 @@ export {
   critFont,
   drawCritFlash,
   drawPoppingCritText,
-  getScreenShakeOffset,
   isCritFlashActive,
-  shakeScreen,
-  stopScreenShake,
   syncCritFlashPause,
   warmTierFlashes,
 } from "./critFlash";

@@ -7,7 +7,7 @@
 // × floor number × REWARD
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
 import {
   drawWispBetween,

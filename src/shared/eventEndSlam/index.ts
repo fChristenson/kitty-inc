@@ -16,7 +16,7 @@ import {
 import { isDetachedJobRunning } from "../detachedJob";
 import { holdExplosions } from "../../sound";
 import { playSlamExplosion } from "../explosionBang";
-import { shakeScreen } from "../../crits";
+import { shakeScreen } from "../screenShake";
 
 export const GLOBAL_SLAM = {};
 

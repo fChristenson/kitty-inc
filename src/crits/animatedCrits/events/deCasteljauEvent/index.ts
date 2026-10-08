@@ -9,7 +9,7 @@
 // floor number × 4
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {

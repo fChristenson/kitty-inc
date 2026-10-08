@@ -7,7 +7,7 @@
 // huge blast and shake. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import {
   drawWispBetween,
   WISP_SIZE,

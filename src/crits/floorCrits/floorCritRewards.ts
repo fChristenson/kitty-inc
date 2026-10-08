@@ -70,7 +70,7 @@ import {
   isVisibleOnFloor,
   type EventProcContext,
 } from "../animatedCrits/eventProcs";
-import type { FlashMoment } from "../momentCrits";
+import type { FlashMoment } from "./critPlayer";
 
 import {
   increaseIncomeRate,

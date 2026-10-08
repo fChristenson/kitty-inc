@@ -8,7 +8,7 @@
 // Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { bezier } from "../../../../shared/curves";

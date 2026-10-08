@@ -11,7 +11,7 @@ import {
   playExplosion,
   playSlamExplosion,
 } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut } from "../../../../shared/easing";

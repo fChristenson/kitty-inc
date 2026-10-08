@@ -7,7 +7,7 @@
 // blast and shake. Pays floor income × floor number × REWARD
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
 import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";

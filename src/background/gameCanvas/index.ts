@@ -1,11 +1,13 @@
 import {
   openBuildingBadgeCapsule,
   type OnScreenFloor,
-  getScreenShakeOffset,
   drawCritFlash,
   syncCritFlashPause,
-  stopScreenShake,
 } from "../../crits";
+import {
+  getScreenShakeOffset,
+  stopScreenShake,
+} from "../../shared/screenShake";
 import {
   FLOOR_W,
   FLOOR_H,

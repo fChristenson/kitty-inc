@@ -7,7 +7,7 @@
 // income × floor number × REWARD (see ../cashFlow)
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import {
   drawWispBetween,
   WISP_SIZE,

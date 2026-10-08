@@ -8,7 +8,7 @@
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";

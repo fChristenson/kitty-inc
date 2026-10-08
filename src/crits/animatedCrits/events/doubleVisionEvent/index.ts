@@ -7,7 +7,7 @@
 // REWARD
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOutBack, lerp } from "../../../../shared/easing";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";

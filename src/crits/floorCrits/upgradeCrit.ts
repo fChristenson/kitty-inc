@@ -122,6 +122,7 @@ import {
   isFeaturedCritKind,
   type FeaturedCritKind,
 } from "../badgeCrits/featuredProcs";
+import { preloadFloorCrit } from "./critPlayer";
 
 const critTiers = snapshotMap<Floor, CritTier>();
 
@@ -231,7 +232,7 @@ export function rollCritUpgrade(
     (result, landedProcs) => {
       critTiers.set(floor, result.tier);
       if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
-      if (result.critMoment) critMoments.set(floor, result.critMoment);
+      if (result.critMoment) armCritMoment(floor, result.critMoment);
       if (result.critUp) critUpCrits.add(floor);
       if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
@@ -769,8 +770,14 @@ export function forceMergeCrit(floor: Floor): void {
   mergeCrits.set(floor, pick());
 }
 
-// armed crits' moments: their number playing out onto the bars
+// armed crits' floor crits: their number playing out onto the bars
 const critMoments = snapshotMap<Floor, CritMoment>();
+
+// its module loads now, so it's ready by the time the crit is clicked
+function armCritMoment(floor: Floor, moment: CritMoment): void {
+  critMoments.set(floor, moment);
+  void preloadFloorCrit(moment);
+}
 
 export function getCritMoment(floor: Floor): CritMoment | undefined {
   return critMoments.get(floor);
@@ -781,7 +788,7 @@ export function forceCritMoment(floor: Floor, moment: CritMoment): void {
   const tiers: CritTier[] = ["crit", "mega", "ultra"];
   const tier = tiers[Math.floor(Math.random() * tiers.length)];
   forceTestCrit(floor, null, tier, null, "upgrade");
-  critMoments.set(floor, moment);
+  armCritMoment(floor, moment);
 }
 
 // call right when a crit click is handled, before rolling the next one

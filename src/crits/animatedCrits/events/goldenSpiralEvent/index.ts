@@ -9,7 +9,7 @@
 // floor income × floor number × 4
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import {
   drawWispBetween,
   WISP_SIZE,

@@ -9,7 +9,7 @@
 // and both bars blast and slam. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { COLOR } from "../../../../palette";
 import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";

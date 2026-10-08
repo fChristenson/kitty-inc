@@ -10,7 +10,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh, startBoostEventStreamLoop } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { isFloorLocked } from "../../../../shared/detachedJob";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawExplosion, drawWhiteBurst } from "../../../../shared/eventFx";

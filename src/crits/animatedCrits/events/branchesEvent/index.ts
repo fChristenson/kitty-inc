@@ -9,7 +9,7 @@
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { registerWispEvent, startWispCover } from "../../wispCover";

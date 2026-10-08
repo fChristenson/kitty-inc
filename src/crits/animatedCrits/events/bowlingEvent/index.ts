@@ -12,7 +12,7 @@ import {
   playExplosion,
   playSlamExplosion,
 } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawWhiteBurst } from "../../../../shared/eventFx";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";

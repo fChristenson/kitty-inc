@@ -8,7 +8,7 @@
 // it jumps a crit tier in a huge blast. Then the crit's tier pays out
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";

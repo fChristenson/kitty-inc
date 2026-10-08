@@ -10,7 +10,7 @@
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
 import {
   drawWispBetween,

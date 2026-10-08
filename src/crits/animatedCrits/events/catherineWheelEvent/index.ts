@@ -8,7 +8,7 @@
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { registerWispEvent, startWispCover } from "../../wispCover";

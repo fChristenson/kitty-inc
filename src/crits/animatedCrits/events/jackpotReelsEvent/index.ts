@@ -9,7 +9,7 @@ import { COLOR } from "../../../../palette";
 import { loadImageByName } from "../../../../loadAssets";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawCachedCritText } from "../../../critFlash/critText";
 import { drawWhiteBurst } from "../../../../shared/eventFx";

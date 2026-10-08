@@ -10,7 +10,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";

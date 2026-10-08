@@ -7,7 +7,7 @@
 // unfreezes. Pays floor income × floor number × REWARD, plus the floor
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import {
   drawWispBetween,

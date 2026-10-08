@@ -10,7 +10,7 @@
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";

@@ -10,7 +10,7 @@
 // REWARD
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { drawGlitterLight, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeOut, lerp, smoothstep } from "../../../../shared/easing";

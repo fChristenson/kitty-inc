@@ -9,7 +9,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { startBoostEventStreamLoop } from "../../../../sound";
 import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { pickAtMost, pickCritTierByOdds } from "../../../critTypes";
 import { drawExplosion } from "../../../../shared/eventFx";
 import {

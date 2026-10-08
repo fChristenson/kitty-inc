@@ -8,7 +8,7 @@
 // × floor number × REWARD, plus the hires
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import type { CoinPath } from "../../../../floors/coins";
 import {

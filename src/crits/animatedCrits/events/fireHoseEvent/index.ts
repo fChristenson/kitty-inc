@@ -5,7 +5,7 @@
 // round and pouring on into the total (see ../moneyCover's flow)
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
 import { FLOW_FLIGHT_MS } from "../../moneyCover";
 import { registerWispEvent, startWispCover } from "../../wispCover";

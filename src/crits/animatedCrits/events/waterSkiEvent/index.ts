@@ -8,7 +8,7 @@
 // number × REWARD
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { alongRoute, bezier } from "../../../../shared/curves";

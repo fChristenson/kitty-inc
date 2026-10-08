@@ -8,7 +8,7 @@
 // (see ../cashFlow)
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream, playSwoosh } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { lerp } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";

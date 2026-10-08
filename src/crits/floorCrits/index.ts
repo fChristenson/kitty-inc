@@ -1,6 +1,7 @@
 // floor crits: the x5/x25/x125 crit tiers rolled on upgrade clicks and
 // floor/building unlocks, the special crits riding on them (chain, boost,
-// heavenly…), their rewards on floors and buildings and their celebration
+// heavenly…), their rewards on floors and buildings, their celebration, and
+// the crits playing a number out onto the bars (crits/<kind>, critPlayer)
 
 export { celebrateBuildingCrit, createBuildingCrits } from "./buildingCrits";
 export {

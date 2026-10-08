@@ -9,7 +9,7 @@
 // REWARD, plus the levels
 import { CONFIG } from "../../../../config";
 import { playBloop, playBoostEventStream } from "../../../../sound";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import type { CoinPath } from "../../../../floors/coins";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import type { Point } from "../../../../shared/wisp";

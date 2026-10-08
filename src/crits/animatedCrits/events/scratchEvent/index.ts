@@ -9,7 +9,7 @@ import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playSwoosh } from "../../../../sound";
 import { playSlamExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../critFlash";
+import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { drawExplosion, drawWhiteBurst } from "../../../../shared/eventFx";
 import type { Point } from "../../../../shared/wisp";
