@@ -1947,7 +1947,12 @@ export function applyFloorCrit(
 // the levels a crit moment's hit lands on a bar: its own floor already has
 // the crit's, so only a snowball's growth adds to it
 const COIN_SPILL_SCALE = 0.7;
-const LIGHTNING_PAYOUT = 2;
+// full payouts a moment's hit pays its bar on top of its levels
+const MOMENT_PAYOUT: Partial<Record<CritMoment, number>> = {
+  lightningCrit: 2,
+  meteorCrit: 5,
+  blackHoleCrit: 2,
+};
 function momentLevels(
   moment: CritMoment,
   own: boolean,
@@ -2014,9 +2019,9 @@ function critMomentFor(
         fresh && given.has(target) ? `+${given.get(target)} Lvl` : null,
         color,
       );
-      // a lightning strike pays its bar out double
-      if (moment === "lightningCrit")
-        paySaleClick(target, isGround(target), LIGHTNING_PAYOUT);
+      // a lightning strike, meteor or black hole pays its bar out too
+      const payout = MOMENT_PAYOUT[moment];
+      if (payout) paySaleClick(target, isGround(target), payout);
       // the hit knocks coins off the bar
       const box = getIncomeBarBox(isGround(target));
       spawnCoinBurst(

@@ -111,7 +111,7 @@ export const CONFIG = {
     // an animated event (src/animatedEventConfig.ts); none can land again
     // until cooldownMs after one has fully played out
     animatedCrit: {
-      chance: 0.31,
+      chance: 0.25,
       cooldownMs: 30_000,
     },
     // the crit also landing on the floor above / below
@@ -178,6 +178,15 @@ export const CONFIG = {
     // a bolt cracking down from the sky and chaining through the bars, each
     // one it strikes paying out double
     lightningCrit: {
+      chance: 0.03,
+    },
+    // a meteor slamming into one bar in view, paying it out x5
+    meteorCrit: {
+      chance: 0.03,
+    },
+    // a black hole swallowing the coins off every bar in view, then
+    // collapsing and flinging them back, each paying out double
+    blackHoleCrit: {
       chance: 0.03,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter

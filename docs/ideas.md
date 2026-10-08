@@ -23,13 +23,13 @@
 - **Bubble crit:** the number is blown into bubbles that wobble down onto the bars and pop.
 - **Coin spill:** every crit moment hit knocks coins off the bar.
 - **Lightning crit:** the number shoots up into the sky and a bolt cracks down onto the top bar in view, chaining down through every bar below, each strike blasting it and paying it out double.
+- **Meteor crit:** the number is thrown off the top and a meteor tears in from the sky at full speed, slamming into a bar in a crater of blasts that shakes the building; the bar pays x5.
+- **Black hole crit:** a black hole opens where the number is, swallows it and the coins off every bar in view, then collapses in a blast that flings them back, every bar paying double.
 
 ## Game ideas
 
 Playground: `tmp/_playground/newGameIdeas.html`.
 
-- **Overflow:** a bar that fills up overflows: its coins pour off its end onto the bar below, which fills and pours on, cascading down to a blast on the ground floor.
-- **Max level blast:** a floor hitting max level goes off in a chain of blasts along its bar and one huge one that turns the bar gold, MAX slamming onto it.
-- **Record payout:** the biggest payout yet doesn't just tick into the total: its number rises off the bar and slams into the total with a blast.
-- **Milestone fireworks:** crossing $1K, $1M, $1B… launches rockets off the roof that burst into blasts, raining coins down onto every bar.
-- **Comet visitor:** now and then a comet weaves down the building at full speed; every bar it crosses fills, blasts and pays out on the spot.
+- **Laser sweep:** a laser locks on from the sky and sweeps down the building in a zigzag; every bar it cuts across blasts and pays out on the spot.
+- **Domino payday:** the ground floor's payout knocks up into the bar above, which pays and knocks into the next, up the building, faster and bigger each time: x1, x2, x3, x4.
+- **Rocket ride:** a rocket blasts off from the street and climbs the side of the building, firing a spark into every bar it passes, then bursts over the roof in a shower of coins.

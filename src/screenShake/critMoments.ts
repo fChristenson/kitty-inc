@@ -4,13 +4,22 @@
 // down them, juggled onto them, stomped onto all of them, rained onto them,
 // stamped onto each, zipped across each, crashed down through them from a
 // catapult, flung onto them by a tornado, flung onto them from orbit,
-// pulled across them as a train, blown onto them as bubbles or chained
-// through them as a bolt of lightning.
+// pulled across them as a train, blown onto them as bubbles, chained
+// through them as a bolt of lightning, slammed into one as a meteor or
+// sucked off all of them into a black hole and flung back.
 // Every hit calls back so the floors can jolt and land their levels
 import type { CritMoment } from "../shared/critTypes";
 import { drawGlow, fadeStops, type FadeStops } from "../shared/glowSprite";
 import { createBolt, drawBolt, type Bolt } from "../shared/lightning";
 import { drawDetonation } from "../shared/explosion";
+import { drawGravityHole } from "../shared/clutter";
+import { drawWispBetween, WISP_SIZE } from "../shared/wisp";
+import {
+  beginCoinBatch,
+  drawCoinBurstFrame,
+  endCoinBatch,
+  type CoinBurstSprite,
+} from "../coinBurst";
 
 interface Point {
   x: number;
@@ -63,6 +72,8 @@ interface Running {
   span: { from: number; to: number };
   // a lightning crit's bolts, their ends kept on the bars as they scroll
   bolts: Bolt[];
+  // shakes a moment has kicked itself, off its hits (a blast, a collapse)
+  kicked: number;
   shake: (intensity: number) => void;
 }
 
@@ -136,6 +147,59 @@ const LIGHTNING_TAIL_MS = 700;
 const LIGHTNING_SHAKE = 0.9;
 const LIGHTNING_BLAST = 130;
 const LIGHTNING_FONT = 130;
+
+// the number thrown off the top, then a meteor tearing in from the top
+// corner, faster and faster, into one bar
+const METEOR_LIFT_MS = 120;
+const METEOR_FALL_MS = 380;
+const METEOR_HIT_MS = METEOR_LIFT_MS + METEOR_FALL_MS;
+const METEOR_EASE = 1.6;
+const METEOR_SIZE = 3;
+const METEOR_BLAST = 240;
+const METEOR_SHAKE = 2.4;
+const METEOR_CLUSTER = [
+  { dx: -150, dy: -40, at: 70, size: 130 },
+  { dx: 130, dy: 30, at: 120, size: 130 },
+  { dx: -40, dy: 60, at: 170, size: 130 },
+];
+const METEOR_CLUSTER_SHAKE = 0.8;
+const METEOR_PAYS = "x5";
+const METEOR_FONT = 150;
+const METEOR_TAIL_MS = 900;
+
+// a black hole opening where the number is, swallowing it and the coins off
+// every bar, then collapsing in a blast that flings them back
+const HOLE_OPEN_MS = 250;
+const HOLE_SIZE = 460;
+const HOLE_SUCK_MS = 450;
+const HOLE_COINS = 60;
+// a bar's coins leave it over this long, one after another
+const HOLE_SUCK_SPREAD_MS = 350;
+// how far round its bar a coin starts, up or down
+const HOLE_COIN_SCATTER = 60;
+const HOLE_COLLAPSE_MS = 1150;
+const HOLE_SHRINK_MS = 150;
+const HOLE_RETURN_MS = 250;
+const HOLE_RETURNED_MS = HOLE_COLLAPSE_MS + HOLE_RETURN_MS;
+const HOLE_BLAST = 300;
+const HOLE_SHAKE = 2.2;
+const HOLE_COIN = 45;
+const HOLE_PAYS = "x2";
+const HOLE_FONT = 120;
+const HOLE_TAIL_MS = 800;
+// a bar's coins, by its index and the coin's
+const holeSuckStart = (bar: number, j: number) =>
+  HOLE_OPEN_MS + (j * HOLE_SUCK_SPREAD_MS) / HOLE_COINS + bar * 15;
+const holeCoins: CoinBurstSprite[] = [];
+function holeCoin(i: number, ms: number): CoinBurstSprite {
+  holeCoins[i] ??= {
+    kind: i % 4 === 0 ? "bill" : "coin",
+    spinFrame: 0,
+    axisAngle: (((i * 37) % 100) / 100 - 0.5) * Math.PI,
+  };
+  holeCoins[i].spinFrame = ms * 0.02 + i;
+  return holeCoins[i];
+}
 
 const ORBIT_GATHER_MS = 150;
 const ORBIT_SPIN_MS = 450;
@@ -330,6 +394,16 @@ function plan(r: Running, bars: Point[]): void {
       );
       break;
     }
+    case "meteorCrit":
+      // any bar in view but its own, if there's one
+      hit(
+        bars.length > 1 ? 1 + Math.floor(Math.random() * (bars.length - 1)) : 0,
+        METEOR_HIT_MS,
+      );
+      break;
+    case "blackHoleCrit":
+      bars.forEach((_, bar) => hit(bar, HOLE_RETURNED_MS));
+      break;
     case "lightningCrit": {
       // from the sky onto the top bar, then bar to bar down the building
       const order = byHeight(bars);
@@ -379,6 +453,8 @@ const TAIL_MS: Partial<Record<CritMoment, number>> = {
   catapultCrit: CATAPULT_LAND_MS,
   bubbleCrit: BUBBLE_POP_MS,
   lightningCrit: LIGHTNING_TAIL_MS,
+  meteorCrit: METEOR_TAIL_MS,
+  blackHoleCrit: HOLE_TAIL_MS,
 };
 
 function shakeOf(kind: CritMoment): number {
@@ -393,6 +469,10 @@ function shakeOf(kind: CritMoment): number {
       return BUBBLE_SHAKE;
     case "lightningCrit":
       return LIGHTNING_SHAKE;
+    case "meteorCrit":
+      return METEOR_SHAKE;
+    case "blackHoleCrit":
+      return HIT_SHAKE;
     default:
       return HIT_SHAKE;
   }
@@ -460,6 +540,7 @@ export function launchMoment(
     lastBars: bars,
     span: { from: 0, to: 0 },
     bolts: [],
+    kicked: 0,
     shake,
   };
   plan(running, bars);
@@ -1150,21 +1231,167 @@ const DRAW: Record<CritMoment, Draw> = {
         drawBolt(ctx, bolt, boltAlpha, LIGHTNING_WIDTH, "#ffffff");
       }
       drawDetonation(ctx, at, since, LIGHTNING_BLAST * (last ? 1.3 : 1), now);
-      // the double payout it struck, slamming in and rising off the bar
-      const t = since / LIGHTNING_TAIL_MS;
-      if (t < 1)
-        drawText(
-          ctx,
-          r.glyphs,
-          "x2",
-          at.x + r.moment.barHalfWidth * 0.5,
-          at.y - 120 - 120 * (1 - (1 - t) ** 2),
-          LIGHTNING_FONT * lerp(2.4, 1, clamp01(since / 110) ** 2),
-          { alpha: t < 0.7 ? 1 : (1 - t) / 0.3 },
-        );
+      drawPays(ctx, r, "x2", at, since, LIGHTNING_FONT, LIGHTNING_TAIL_MS);
     });
   },
+
+  meteorCrit(ctx, r, ms, bars) {
+    const now = r.startedAt + ms;
+    const w = r.viewportWidth;
+    if (ms < METEOR_LIFT_MS) {
+      // thrown up off the top into the sky the meteor comes down from
+      const p = (ms / METEOR_LIFT_MS) ** 2;
+      drawText(ctx, r.glyphs, r.label, w * 0.4 * p, -w * 1.2 * p, r.flashFont, {
+        along: -Math.PI / 3,
+        stretch: 1 + p,
+        alpha: 1 - p,
+      });
+    }
+    const target = r.hits[0].bar;
+    const to = along(r, bars, target, 0.4);
+    const top = Math.min(...bars.map((b) => b.y));
+    const from = { x: w * 0.9, y: top - w * 1.1 };
+    const meteorAt = (t: number) => {
+      const p = clamp01((t - METEOR_LIFT_MS) / METEOR_FALL_MS) ** METEOR_EASE;
+      return { x: lerp(from.x, to.x, p), y: lerp(from.y, to.y, p) };
+    };
+    drawWispBetween(
+      ctx,
+      meteorAt,
+      ms,
+      now,
+      WISP_SIZE * METEOR_SIZE,
+      1,
+      METEOR_LIFT_MS,
+      METEOR_HIT_MS,
+    );
+    // the crater: one big blast, then more going off round it
+    const since = ms - METEOR_HIT_MS;
+    drawDetonation(ctx, to, since, METEOR_BLAST, now);
+    METEOR_CLUSTER.forEach((c, i) => {
+      if (since >= c.at && r.kicked === i) {
+        r.kicked++;
+        r.shake(METEOR_CLUSTER_SHAKE);
+      }
+      drawDetonation(
+        ctx,
+        { x: to.x + c.dx, y: to.y + c.dy },
+        since - c.at,
+        c.size,
+        now,
+      );
+    });
+    drawPays(
+      ctx,
+      r,
+      METEOR_PAYS,
+      bars[target],
+      since,
+      METEOR_FONT,
+      METEOR_TAIL_MS,
+    );
+  },
+
+  blackHoleCrit(ctx, r, ms, bars) {
+    const now = r.startedAt + ms;
+    // the number swallowed first, spiralling into the hole as it opens
+    const gulp = clamp01(ms / HOLE_OPEN_MS);
+    if (gulp < 1)
+      drawText(ctx, r.glyphs, r.label, 0, 0, r.flashFont * (1 - gulp), {
+        rot: gulp * gulp * 6,
+      });
+    const size =
+      ms < HOLE_COLLAPSE_MS - HOLE_SHRINK_MS
+        ? HOLE_SIZE *
+          (1 - (1 - gulp) ** 3) *
+          (1 + 0.15 * clamp01((ms - HOLE_OPEN_MS) / 700))
+        : HOLE_SIZE *
+          1.15 *
+          clamp01((HOLE_COLLAPSE_MS - ms) / HOLE_SHRINK_MS) ** 2;
+    ctx.save();
+    drawGravityHole(ctx, { x: 0, y: 0 }, size, 1, ms, now);
+    ctx.restore();
+    const base = ctx.getTransform();
+    beginCoinBatch(ctx);
+    // every bar's coins spiralling down into it
+    bars.forEach((_, bar) => {
+      for (let j = 0; j < HOLE_COINS; j++) {
+        const p = (ms - holeSuckStart(bar, j)) / HOLE_SUCK_MS;
+        if (p < 0 || p >= 1) continue;
+        const from = along(r, bars, bar, ((j * 53) % 100) / 50 - 1);
+        from.y += (((j * 37) % 100) / 50 - 1) * HOLE_COIN_SCATTER;
+        const a = Math.atan2(from.y, from.x) + p * p * 5;
+        const reach = Math.hypot(from.x, from.y) * (1 - p) ** 1.5;
+        drawCoinBurstFrame(
+          ctx,
+          holeCoin(bar * HOLE_COINS + j, ms),
+          Math.cos(a) * reach,
+          Math.sin(a) * reach,
+          HOLE_COIN * (1 - p * 0.7),
+          base,
+        );
+      }
+    });
+    // the collapse, flinging them all back out onto the bars
+    const since = ms - HOLE_COLLAPSE_MS;
+    if (since >= 0 && r.kicked === 0) {
+      r.kicked = 1;
+      r.shake(HOLE_SHAKE);
+    }
+    drawDetonation(ctx, { x: 0, y: 0 }, since, HOLE_BLAST, now);
+    const back = since / HOLE_RETURN_MS;
+    if (back >= 0 && back < 1)
+      bars.forEach((_, bar) => {
+        for (let j = 0; j < HOLE_COINS; j++) {
+          const to = along(r, bars, bar, ((j * 71) % 100) / 50 - 1);
+          to.y += (((j * 29) % 100) / 50 - 1) * HOLE_COIN_SCATTER;
+          drawCoinBurstFrame(
+            ctx,
+            holeCoin(bar * HOLE_COINS + j, ms),
+            to.x * back * back,
+            to.y * back * back,
+            HOLE_COIN * 1.2,
+            base,
+          );
+        }
+      });
+    endCoinBatch(ctx);
+    bars.forEach((b) =>
+      drawPays(
+        ctx,
+        r,
+        HOLE_PAYS,
+        b,
+        ms - HOLE_RETURNED_MS,
+        HOLE_FONT,
+        HOLE_TAIL_MS,
+      ),
+    );
+  },
 };
+
+// a payout's multiplier slamming down from big beside its bar, rising off it
+function drawPays(
+  ctx: CanvasRenderingContext2D,
+  r: Running,
+  label: string,
+  at: Point,
+  since: number,
+  font: number,
+  ms: number,
+): void {
+  const t = since / ms;
+  if (t < 0 || t >= 1) return;
+  drawText(
+    ctx,
+    r.glyphs,
+    label,
+    at.x + r.moment.barHalfWidth * 0.5,
+    at.y - 120 - 120 * (1 - (1 - t) ** 2),
+    font * lerp(2.4, 1, clamp01(since / 110) ** 2),
+    { alpha: t < 0.7 ? 1 : (1 - t) / 0.3 },
+  );
+}
 
 // a glow of `color` fading out, per color
 const glowStopsByColor = new Map<string, FadeStops>();
