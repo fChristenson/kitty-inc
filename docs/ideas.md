@@ -20,21 +20,21 @@
 - **Catapult crit:** the number is flung up off the top of the screen and comes crashing down through every bar in view.
 - **Tornado crit:** the number whirls into a spinning funnel of copies that tears down through the bars, flinging a copy onto each one.
 - **Crit afterglow:** a bar a crit moment hits glows and fills in the crit's color for a second.
+- **Shockwave crit:** the number slams into its bar and a shockwave rolls up and down the building, every bar bouncing as it passes.
+- **Orbit crit:** copies circle the number like moons, spinning ever faster, then fling off one by one onto the bars.
+- **Train crit:** the number pulls a train of copies down a zigzag track along the bars, top to bottom.
+- **Bubble crit:** the number is blown into bubbles that wobble down onto the bars and pop.
+- **Coin spill:** every crit moment hit knocks coins off the bar.
 
 ## Crit moments
 
 Playground: `tmp/_playground/newCritIdeas.html`.
 
-- **Shockwave crit:** the number slams into its bar and a shockwave rolls up and down the building, every bar bouncing as it passes.
-- **Orbit crit:** copies circle the number like moons, spinning ever faster, then fling off one by one onto the bars.
-- **Train crit:** the number pulls a train of copies down a zigzag track along the bars, top to bottom.
 - **Yo-yo crit:** the number drops on a glowing string to each bar in turn and snaps back up, deeper every time.
 - **Cannon crit:** the number turns into a cannon at the building's side and fires a copy at every bar, recoiling with each shot.
 - **Pendulum crit:** the number swings on a lengthening chain, smashing through a lower bar at the bottom of every swing.
-- **Bubble crit:** the number is blown into bubbles that wobble down onto the bars and pop.
 - **Ping-pong crit:** the number is volleyed between two glowing paddles at the screen's edges, a floor lower each volley.
 
 ## Feel
 
 - **Level odometer:** a bar's Lvl number rolls up like an odometer as its levels land.
-- **Coin spill:** every hit knocks a few coins off the bar that tumble down the building.

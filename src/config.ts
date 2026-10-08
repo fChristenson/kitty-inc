@@ -111,7 +111,7 @@ export const CONFIG = {
     // an animated event (src/animatedEventConfig.ts); none can land again
     // until cooldownMs after one has fully played out
     animatedCrit: {
-      chance: 0.35,
+      chance: 0.23,
       cooldownMs: 30_000,
     },
     // an x3 crit chaining straight into an x7 and an x10
@@ -171,6 +171,21 @@ export const CONFIG = {
       chance: 0.03,
     },
     tornadoCrit: {
+      chance: 0.03,
+    },
+    // it dives into its bar sending a shockwave up and down the building,
+    // flings copies of itself off its orbit, pulls a train of copies down
+    // across the bars, or is blown into bubbles that pop on them
+    shockwaveCrit: {
+      chance: 0.03,
+    },
+    orbitCrit: {
+      chance: 0.03,
+    },
+    trainCrit: {
+      chance: 0.03,
+    },
+    bubbleCrit: {
       chance: 0.03,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter

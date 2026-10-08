@@ -1954,6 +1954,7 @@ export function applyFloorCrit(
 
 // the levels a crit moment's hit lands on a bar: its own floor already has
 // the crit's, so only a snowball's growth adds to it
+const COIN_SPILL_SCALE = 0.7;
 function momentLevels(
   moment: CritMoment,
   own: boolean,
@@ -1963,6 +1964,7 @@ function momentLevels(
   if (moment === "rapidFireCrit") return 0;
   if (moment === "snowballCrit") return own ? step : count + step;
   if (own) return 0;
+  if (moment === "bubbleCrit") return Math.ceil(count / 2);
   return moment === "rainCrit" ? Math.ceil(count / 6) : count;
 }
 
@@ -2018,6 +2020,15 @@ function critMomentFor(
         target,
         fresh && given.has(target) ? `+${given.get(target)} Lvl` : null,
         color,
+      );
+      // the hit knocks coins off the bar
+      const box = getIncomeBarBox(isGround(target));
+      spawnCoinBurst(
+        target,
+        box.x + box.width * (0.2 + Math.random() * 0.6),
+        box.y + box.height / 2,
+        () => {},
+        COIN_SPILL_SCALE,
       );
     },
   };

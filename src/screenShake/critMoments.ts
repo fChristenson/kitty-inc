@@ -3,7 +3,9 @@
 // at its bar character by character, pinballing between bars, snowballing
 // down them, juggled onto them, stomped onto all of them, rained onto them,
 // stamped onto each, zipped across each, crashed down through them from a
-// catapult or flung onto them by a tornado.
+// catapult, flung onto them by a tornado, sent rolling over them as a
+// shockwave, flung onto them from orbit, pulled across them as a train or
+// blown onto them as bubbles.
 // Every hit calls back so the floors can jolt and land their levels
 import type { CritMoment } from "../shared/critTypes";
 import { drawGlow, fadeStops, type FadeStops } from "../shared/glowSprite";
@@ -120,6 +122,38 @@ const TORNADO_FLING_MS = 220;
 const TORNADO_COPIES = 12;
 const TORNADO_FONT = 90;
 
+const SHOCK_DIVE_MS = 180;
+// the ring reaching the farthest bar
+const SHOCK_ROLL_MS = 520;
+const SHOCK_SETTLE_MS = 450;
+const SHOCK_TAIL_MS = 250;
+const SHOCK_SHAKE = 1.2;
+
+const ORBIT_GATHER_MS = 150;
+const ORBIT_SPIN_MS = 450;
+const ORBIT_GAP_MS = 90;
+const ORBIT_FLING_MS = 200;
+const ORBIT_FONT = 90;
+// how far it's thrown along its orbit before curving onto its bar
+const ORBIT_KICK = 0.8;
+
+const TRAIN_LEAD_MS = 200;
+const TRAIN_ROW_MS = 260;
+const TRAIN_CARS = 4;
+const TRAIN_GAP = 150;
+const TRAIN_FONT = 150;
+const TRAIN_CAR_FONT = 115;
+// how high it rides over each bar's middle, and the rails under it
+const TRAIN_RIDE = 95;
+const TRAIN_RAIL = 50;
+
+const BUBBLES_PER_BAR = 2;
+const BUBBLE_R = 75;
+const BUBBLE_FONT = 70;
+const BUBBLE_WOBBLE = 40;
+const BUBBLE_POP_MS = 150;
+const BUBBLE_SHAKE = 0.25;
+
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
 
@@ -161,6 +195,71 @@ function drop(i: number, barCount: number, viewportWidth: number) {
     // where along its bar, -1..1
     along: ((i * 53) % 100) / 50 - 1,
     arc: viewportWidth * (0.25 + ((i * 29) % 80) / 400),
+  };
+}
+
+function bubble(i: number, barCount: number) {
+  return {
+    bar: i % barCount,
+    delay: i * 40,
+    duration: 600 + ((i * 53) % 250),
+    // where along its bar, -1..1
+    along: ((i * 71) % 100) / 50 - 1,
+  };
+}
+
+// when the shockwave reaches bar i, its own bar's being the dive's slam
+const shockHitAt = (r: Running, bars: Point[], i: number) =>
+  i === 0
+    ? SHOCK_DIVE_MS
+    : SHOCK_DIVE_MS +
+      (Math.hypot(bars[i].x - bars[0].x, bars[i].y - bars[0].y) / r.span.to) *
+        SHOCK_ROLL_MS;
+
+const orbitRelease = (i: number) =>
+  ORBIT_GATHER_MS + ORBIT_SPIN_MS + i * ORBIT_GAP_MS;
+// spinning ever faster
+const orbitAngle = (i: number, count: number, ms: number) =>
+  (i / count) * Math.PI * 2 + (ms / 1000) * (4 + ms / 150);
+
+// the train's track: from the flash down a zigzag along the bars, top to
+// bottom, one run across each
+function trainTrack(r: Running, bars: Point[]) {
+  const half = r.moment.barHalfWidth - 80;
+  const points: Point[] = [{ x: 0, y: 0 }];
+  byHeight(bars).forEach((bar, i) => {
+    const b = bars[bar];
+    const y = b.y - TRAIN_RIDE;
+    const [from, to] =
+      i % 2 ? [b.x + half, b.x - half] : [b.x - half, b.x + half];
+    points.push({ x: from, y }, { x: to, y });
+  });
+  const lengths = [0];
+  for (let i = 1; i < points.length; i++)
+    lengths.push(
+      lengths[i - 1] +
+        Math.hypot(
+          points[i].x - points[i - 1].x,
+          points[i].y - points[i - 1].y,
+        ),
+    );
+  return { points, lengths, total: lengths[lengths.length - 1] };
+}
+
+function trackAt(
+  track: ReturnType<typeof trainTrack>,
+  s: number,
+): Point & { angle: number } {
+  const { points, lengths } = track;
+  let i = 1;
+  while (i < lengths.length - 1 && lengths[i] < s) i++;
+  const a = points[i - 1];
+  const b = points[i];
+  const q = clamp01((s - lengths[i - 1]) / (lengths[i] - lengths[i - 1] || 1));
+  return {
+    x: lerp(a.x, b.x, q),
+    y: lerp(a.y, b.y, q),
+    angle: Math.atan2(b.y - a.y, b.x - a.x),
   };
 }
 
@@ -223,6 +322,38 @@ function plan(r: Running, bars: Point[]): void {
       );
       break;
     }
+    case "shockwaveCrit": {
+      const farthest = Math.max(
+        ...bars.map((b) => Math.hypot(b.x - bars[0].x, b.y - bars[0].y)),
+      );
+      r.span = { from: 0, to: Math.max(farthest, r.viewportWidth * 0.3) };
+      bars.forEach((_, bar) => hit(bar, shockHitAt(r, bars, bar)));
+      break;
+    }
+    case "orbitCrit":
+      byHeight(bars).forEach((bar, i) =>
+        hit(bar, orbitRelease(i) + ORBIT_FLING_MS),
+      );
+      break;
+    case "trainCrit": {
+      // a steady pace, the cars trailing in off the track's end after
+      const track = trainTrack(r, bars);
+      const trainMs = TRAIN_LEAD_MS + bars.length * TRAIN_ROW_MS;
+      r.span = { from: 0, to: trainMs };
+      byHeight(bars).forEach((bar, i) => {
+        const mid = (track.lengths[1 + i * 2] + track.lengths[2 + i * 2]) / 2;
+        hit(bar, (mid / track.total) * trainMs);
+      });
+      r.hits.sort((a, b) => a.at - b.at);
+      r.endsAt = trainMs * (1 + (TRAIN_CARS * TRAIN_GAP) / track.total);
+      return;
+    }
+    case "bubbleCrit":
+      for (let i = 0; i < bars.length * BUBBLES_PER_BAR; i++) {
+        const b = bubble(i, bars.length);
+        hit(b.bar, b.delay + b.duration);
+      }
+      break;
   }
   r.hits.sort((a, b) => a.at - b.at);
   r.endsAt =
@@ -235,7 +366,26 @@ const TAIL_MS: Partial<Record<CritMoment, number>> = {
   stampCrit: STAMP_PRINT_MS,
   zipCrit: ZIP_STITCH_MS,
   catapultCrit: CATAPULT_LAND_MS,
+  shockwaveCrit: SHOCK_TAIL_MS,
+  bubbleCrit: BUBBLE_POP_MS,
 };
+
+function shakeOf(kind: CritMoment, bar: number): number {
+  switch (kind) {
+    case "stompCrit":
+      return STOMP_SHAKE;
+    case "catapultCrit":
+      return CATAPULT_SHAKE;
+    case "rainCrit":
+      return DROP_SHAKE;
+    case "bubbleCrit":
+      return BUBBLE_SHAKE;
+    case "shockwaveCrit":
+      return bar === 0 ? SHOCK_SHAKE : HIT_SHAKE;
+    default:
+      return HIT_SHAKE;
+  }
+}
 
 const catapultY = (r: Running, ms: number) => {
   const p = clamp01(
@@ -365,16 +515,7 @@ export function drawMoment(
   r.lastBars = bars;
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];
-    const kind = r.moment.kind;
-    r.shake(
-      kind === "stompCrit"
-        ? STOMP_SHAKE
-        : kind === "catapultCrit"
-          ? CATAPULT_SHAKE
-          : kind === "rainCrit"
-            ? DROP_SHAKE
-            : HIT_SHAKE,
-    );
+    r.shake(shakeOf(r.moment.kind, bar));
     r.moment.onHit(bar, step, r.glyphs.color);
   }
   if (ms >= r.endsAt) {
@@ -798,6 +939,229 @@ const DRAW: Record<CritMoment, Draw> = {
         { rot: t * 6 },
       );
     });
+  },
+
+  shockwaveCrit(ctx, r, ms, bars) {
+    const home = bars[0];
+    if (ms < SHOCK_DIVE_MS) {
+      // diving at its own bar, faster and faster
+      const p = (ms / SHOCK_DIVE_MS) ** 2;
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        home.x * p,
+        home.y * p,
+        lerp(r.flashFont, MOMENT_FONT, p),
+        { along: Math.PI / 2, stretch: 1 + 0.4 * p },
+      );
+      return;
+    }
+    const since = ms - SHOCK_DIVE_MS;
+    // the rings rolling out up and down the building, a white one leading
+    const reach = r.span.to * 1.3;
+    ctx.save();
+    for (const [lag, white] of [
+      [40, false],
+      [0, true],
+    ] as const) {
+      const radius = ((since - lag) / SHOCK_ROLL_MS) * r.span.to;
+      const fade = 1 - radius / reach;
+      if (radius <= 0 || fade <= 0) continue;
+      ctx.globalAlpha = fade;
+      ctx.strokeStyle = white ? "#ffffff" : r.glyphs.color;
+      ctx.lineWidth = (white ? 36 : 26) * fade + 6;
+      ctx.beginPath();
+      ctx.ellipse(
+        home.x,
+        home.y,
+        radius + r.moment.barHalfWidth * 0.6,
+        radius + 20,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      ctx.stroke();
+    }
+    ctx.restore();
+    // squashed flat onto its bar, fading
+    if (since < SHOCK_SETTLE_MS) {
+      const k = Math.exp(-since / 120);
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        home.x,
+        home.y - MOMENT_FONT * 0.3,
+        MOMENT_FONT,
+        {
+          sx: 1 + 0.4 * k,
+          sy: 1 - 0.5 * k,
+          alpha: 1 - since / SHOCK_SETTLE_MS,
+        },
+      );
+    }
+  },
+
+  orbitCrit(ctx, r, ms, bars) {
+    const order = byHeight(bars);
+    const count = order.length;
+    const gather = clamp01(ms / ORBIT_GATHER_MS);
+    const rx = r.viewportWidth * 0.3 * gather;
+    const ry = rx * 0.4;
+    const last = orbitRelease(count - 1);
+    // the moons behind it, the number, then the moons in front and the
+    // flung ones
+    for (const front of [false, true]) {
+      if (front)
+        drawText(
+          ctx,
+          r.glyphs,
+          r.label,
+          0,
+          0,
+          lerp(r.flashFont, r.flashFont * 0.8, gather),
+          { alpha: clamp01(1 - (ms - last) / ORBIT_FLING_MS) },
+        );
+      for (let i = 0; i < count; i++) {
+        const release = orbitRelease(i);
+        if (ms >= release + ORBIT_FLING_MS) continue;
+        const a = orbitAngle(i, count, Math.min(ms, release));
+        const at = { x: Math.cos(a) * rx, y: Math.sin(a) * ry };
+        if (ms < release) {
+          const depth = Math.sin(a);
+          if (depth > 0 !== front) continue;
+          drawText(
+            ctx,
+            r.glyphs,
+            r.label,
+            at.x,
+            at.y,
+            ORBIT_FONT * (1 + 0.3 * depth) * lerp(0.4, 1, gather),
+            { alpha: 0.75 + 0.25 * depth },
+          );
+          continue;
+        }
+        if (!front) continue;
+        // flung off along its orbit, curving onto its bar at full speed
+        const p = (ms - release) / ORBIT_FLING_MS;
+        const to = along(r, bars, order[i], i % 2 ? -1 : 1);
+        drawText(
+          ctx,
+          r.glyphs,
+          r.label,
+          lerp(at.x - Math.sin(a) * rx * ORBIT_KICK * p, to.x, p * p),
+          lerp(at.y + Math.cos(a) * ry * ORBIT_KICK * p, to.y, p * p),
+          lerp(ORBIT_FONT, MOMENT_FONT * 0.8, p),
+          { rot: p * 6 },
+        );
+      }
+    }
+  },
+
+  trainCrit(ctx, r, ms, bars) {
+    const track = trainTrack(r, bars);
+    const trainMs = r.span.to;
+    const head = (ms / trainMs) * track.total;
+    // the rails it lays as it goes, fading once it's through
+    const railFade = clamp01((r.endsAt - ms) / 300);
+    ctx.save();
+    ctx.globalAlpha = 0.7 * railFade;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 8;
+    ctx.setLineDash([30, 22]);
+    ctx.beginPath();
+    ctx.moveTo(track.points[0].x, track.points[0].y + TRAIN_RAIL);
+    for (let i = 1; i < track.points.length; i++) {
+      if (track.lengths[i - 1] >= head) break;
+      const p =
+        track.lengths[i] <= head ? track.points[i] : trackAt(track, head);
+      ctx.lineTo(p.x, p.y + TRAIN_RAIL);
+    }
+    ctx.stroke();
+    ctx.restore();
+    for (let c = TRAIN_CARS; c >= 0; c--) {
+      const s = head - c * TRAIN_GAP;
+      if (s < 0 || s >= track.total) continue;
+      const p = trackAt(track, s);
+      const font =
+        c === 0
+          ? lerp(r.flashFont, TRAIN_FONT, clamp01(s / TRAIN_GAP))
+          : TRAIN_CAR_FONT;
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        p.x,
+        p.y + Math.sin(ms * 0.05 + c) * 6,
+        font,
+        { along: p.angle, stretch: 1.15 },
+      );
+    }
+  },
+
+  bubbleCrit(ctx, r, ms, bars) {
+    if (ms < BURST_MS)
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        0,
+        0,
+        r.flashFont * (1 + ms / (BURST_MS * 2)),
+        { alpha: 1 - ms / BURST_MS },
+      );
+    ctx.save();
+    ctx.lineWidth = 6;
+    for (let i = 0; i < bars.length * BUBBLES_PER_BAR; i++) {
+      const b = bubble(i, bars.length);
+      const t = ms - b.delay;
+      if (t < 0 || t >= b.duration + BUBBLE_POP_MS) continue;
+      const to = along(r, bars, b.bar, b.along);
+      if (t >= b.duration) {
+        // popped: a ring bursting off where it landed
+        const q = (t - b.duration) / BUBBLE_POP_MS;
+        ctx.globalAlpha = 1 - q;
+        ctx.strokeStyle = "#ffffff";
+        ctx.beginPath();
+        ctx.arc(
+          to.x,
+          to.y - BUBBLE_R,
+          BUBBLE_R * (1 + 0.8 * q),
+          0,
+          Math.PI * 2,
+        );
+        ctx.stroke();
+        continue;
+      }
+      // wobbling down onto its bar, blown up to size as it leaves
+      const p = t / b.duration;
+      const grow = Math.min(1, p * 5);
+      const x = to.x * p + Math.sin(p * 9 + i) * BUBBLE_WOBBLE * (1 - p);
+      const y = (to.y - BUBBLE_R) * p;
+      const radius = BUBBLE_R * grow;
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = "rgba(186,230,253,0.18)";
+      ctx.strokeStyle = "rgba(255,255,255,0.85)";
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      ctx.beginPath();
+      ctx.ellipse(
+        x - radius * 0.4,
+        y - radius * 0.45,
+        radius * 0.22,
+        radius * 0.12,
+        -0.6,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+      drawText(ctx, r.glyphs, r.label, x, y, BUBBLE_FONT * grow);
+    }
+    ctx.restore();
   },
 };
 
