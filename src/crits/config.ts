@@ -38,16 +38,19 @@ export const CRIT_CONFIG = {
 
   // crits/critTypes' rollCrit — what a landed crit's special slot carries
   // once its gateway hits: exactly one of these, picked by their chances
-  // (relative to their sum). One that can't play (an animated crit cooling
-  // down) is a badge crit instead
+  // (relative to their sum). One that can't play (an animated or floor crit
+  // cooling down) is a badge crit instead
   specialCrits: {
     // a badge crit: the featured and other special crits in badgeCrits/balance
     badgeCrit: {
       chance: 0.46,
     },
-    // a floor crit: one of floorCrits below, picked by their chances
+    // a floor crit: one of floorCrits below, picked by their chances; none
+    // can land again until cooldownMs after the last one was picked and
+    // after it played out
     floorCrit: {
       chance: 0.46,
+      cooldownMs: 5_000,
     },
     // an animated event (animatedCrits/config.ts); none can land again
     // until cooldownMs after one has fully played out

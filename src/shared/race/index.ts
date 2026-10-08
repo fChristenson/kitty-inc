@@ -1,9 +1,13 @@
 // racing for events: a wisp driven along a line like a racecar, flat out on
 // the straights, braking hard into each corner, crawling round it, then
 // accelerating out, faster and faster into the finish. Plan once at arm with
-// planRace, then at(ms) for where it is and msAt for each corner's beats
+// planRace, then at(ms) for where it is and msAt for each corner's beats.
+// The road race look's street (./road) and ship (./ship) are drawn in
+// shared/fps's world
 import type { Point } from "../wisp";
 import { clamp01, lerp, smoothstep } from "../easing";
+export * from "./road";
+export * from "./ship";
 
 // a corner, as distances along the line where it starts and ends
 export interface RaceCorner {

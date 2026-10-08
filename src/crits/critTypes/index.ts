@@ -2127,14 +2127,27 @@ function pickByChance<K extends string>(
   return types.find((t) => (roll -= table[t].chance) < 0) ?? types[0];
 }
 
+// game time before which a floorCrit slot is a badge crit instead
+let floorCritsFreeAt = 0;
+
+// no floor crit lands again until CONFIG's cooldown from now; called when one
+// is picked and when it finishes playing
+export function coolDownFloorCrits(): void {
+  floorCritsFreeAt = Math.max(
+    floorCritsFreeAt,
+    Date.now() + CONFIG.specialCrits.floorCrit.cooldownMs,
+  );
+}
+
 // what a gateway-passing crit's special slot carries: a type by its
 // CONFIG.specialCrits chance, a floorCrit then one by its CONFIG.floorCrits
 // chance
 function pickSpecialCrit(): SlotType {
   const type = pickByChance(CONFIG.specialCrits, SPECIAL_CRIT_TYPES);
-  return type === "floorCrit"
-    ? pickByChance(CONFIG.floorCrits, FLOOR_CRIT_TYPES)
-    : type;
+  if (type !== "floorCrit") return type;
+  if (Date.now() < floorCritsFreeAt) return "badgeCrit";
+  coolDownFloorCrits();
+  return pickByChance(CONFIG.floorCrits, FLOOR_CRIT_TYPES);
 }
 
 // always lands a tier, weighted by each tier's own relative chance

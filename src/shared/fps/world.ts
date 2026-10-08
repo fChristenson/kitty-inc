@@ -33,6 +33,8 @@ export interface Fps {
   view: FpsScreen;
   lens: FpsLens;
   cam: FpsCamera;
+  // how far right the world shows at depth z, for a road curving away ahead
+  bend?: (z: number) => number;
 }
 
 export interface FpsPoint {
@@ -58,12 +60,12 @@ export function fpsSight(
   y: number,
   z: number,
 ): FpsPoint | null {
-  const { view, lens, cam } = fps;
+  const { view, lens, cam, bend } = fps;
   const dz = z - cam.z;
   if (dz < FPS_NEAR) return null;
   const s = (lens.focal * view.w) / dz;
   return {
-    x: view.cx + (x - cam.x) * s,
+    x: view.cx + (x + (bend ? bend(z) : 0) - cam.x) * s,
     y: fpsHorizon(fps) + (cam.y - y) * s,
     s,
   };
@@ -77,7 +79,8 @@ export function fillFpsQuad(
   color: string,
   alpha = 1,
 ): void {
-  const near = fps.cam.z + FPS_NEAR;
+  // a hair past FPS_NEAR, so rounding can't put a clamped corner behind it
+  const near = fps.cam.z + FPS_NEAR * 1.01;
   ctx.beginPath();
   for (let i = 0; i < corners.length; i++) {
     const [x, y, z] = corners[i];

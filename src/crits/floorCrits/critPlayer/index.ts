@@ -2,7 +2,7 @@
 // its flash has slammed in and sat (see critTypes' FloorCritKind). Each kind is
 // its own module under ../crits, loaded when its crit is armed or played;
 // every hit calls back so the floors can jolt and land their levels
-import type { FloorCritKind } from "../../critTypes";
+import { coolDownFloorCrits, type FloorCritKind } from "../../critTypes";
 import { fadeStops, type FadeStops } from "../../../shared/glowSprite";
 import type { Bolt } from "../../../shared/lightning";
 import type { Disk, Orbit } from "../../../shared/galaxy";
@@ -469,6 +469,7 @@ export function drawFloorCrit(
   }
   if (ms >= r.endsAt) {
     running = null;
+    coolDownFloorCrits();
     return;
   }
   ctx.save();

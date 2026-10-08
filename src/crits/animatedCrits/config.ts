@@ -8268,6 +8268,13 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 79
+  // road race, cash: src/crits/animatedCrits/events/roadRaceEvent ("Road Race"): the floors zoom away into a race already flat out, a small ship skimming the street between the buildings through a snake of coins, each paying into the total, round a bend, down the straight and through the finish gate's window onto the floors
+  roadRaceEvent: {
+    chance: 0.01,
+    enterMs: 250, // the floors zooming away into the race
+    flyMs: 4100, // the race, until the finish gate's window is close (5s from the click to the crash)
+    payoutsPerCoin: 0.15, // the floor's payouts each coin pays
+  },
   // flight, levels: src/crits/animatedCrits/events/saloonEvent ("High Noon"): the floors' screen swings open like saloon doors onto a western street, a countdown, the bandit in the road draws and shoots the view, which staggers and pitches forward into a hole in the road, falling through it onto the floors
   saloonEvent: {
     chance: 0.01,
