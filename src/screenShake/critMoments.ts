@@ -2,7 +2,7 @@
 // out onto the income bars in view (see shared/critTypes' CritMoment): fired
 // at its bar character by character, pinballing between bars, snowballing
 // down them, juggled onto them, stomped onto all of them, rained onto them,
-// stamped onto each, zipped across each, crashed down through them from a
+// stamped onto each, crashed down through them from a
 // catapult, flung onto them by a tornado, flung onto them from orbit,
 // pulled across them as a train, blown onto them as bubbles, chained
 // through them as a bolt of lightning, slammed into one as a meteor or
@@ -118,12 +118,6 @@ const STAMP_LIFT = 140;
 const STAMP_PRINT_MS = 900;
 const STAMP_FONT = 160;
 
-const ZIP_FIRST_MS = 150;
-const ZIP_PASS_MS = 170;
-const ZIP_DROP_MS = 60;
-const ZIP_FONT = 150;
-const ZIP_STITCH_MS = 900;
-
 const CATAPULT_UP_MS = 250;
 const CATAPULT_AWAY_MS = 150;
 const CATAPULT_FALL_MS = 350;
@@ -147,6 +141,28 @@ const LIGHTNING_TAIL_MS = 700;
 const LIGHTNING_SHAKE = 0.9;
 const LIGHTNING_BLAST = 130;
 const LIGHTNING_FONT = 130;
+
+// the number diving into the lowest bar in view, whose payout knocks up into
+// the bar above, and on up, faster and paying a step more each time
+const DOMINO_DIVE_MS = 180;
+const DOMINO_FIRST_GAP_MS = 260;
+const DOMINO_SPEEDUP = 0.78;
+const DOMINO_MIN_GAP_MS = 110;
+const DOMINO_ARC = 220;
+const DOMINO_BLAST = 130;
+const DOMINO_BLAST_STEP = 40;
+const DOMINO_SHAKE = 0.5;
+const DOMINO_SHAKE_STEP = 0.25;
+const DOMINO_FONT = 110;
+const DOMINO_TAIL_MS = 800;
+const dominoGap = (k: number) =>
+  Math.max(DOMINO_MIN_GAP_MS, DOMINO_FIRST_GAP_MS * DOMINO_SPEEDUP ** k);
+// when the k-th bar up is knocked
+const dominoAt = (k: number) => {
+  let at = DOMINO_DIVE_MS;
+  for (let i = 0; i < k; i++) at += dominoGap(i);
+  return at;
+};
 
 // the number thrown off the top, then a meteor tearing in from the top
 // corner, faster and faster, into one bar
@@ -172,11 +188,16 @@ const METEOR_TAIL_MS = 900;
 const HOLE_OPEN_MS = 250;
 const HOLE_SIZE = 460;
 const HOLE_SUCK_MS = 450;
-const HOLE_COINS = 60;
-// a bar's coins leave it over this long, one after another
-const HOLE_SUCK_SPREAD_MS = 350;
+// coins it swallows: one in BAR_SHARE off a bar, the rest from all over
+// the screen; all of them flung back onto the bars
+const HOLE_COINS = 800;
+const HOLE_BAR_SHARE = 3;
+// they leave over this long, one after another
+const HOLE_SUCK_SPREAD_MS = 400;
 // how far round its bar a coin starts, up or down
 const HOLE_COIN_SCATTER = 60;
+// the screen they come from, of the viewport's width from its middle
+const HOLE_FIELD: [number, number] = [0.55, 0.9];
 const HOLE_COLLAPSE_MS = 1150;
 const HOLE_SHRINK_MS = 150;
 const HOLE_RETURN_MS = 250;
@@ -187,19 +208,36 @@ const HOLE_COIN = 45;
 const HOLE_PAYS = "x2";
 const HOLE_FONT = 120;
 const HOLE_TAIL_MS = 800;
-// a bar's coins, by its index and the coin's
-const holeSuckStart = (bar: number, j: number) =>
-  HOLE_OPEN_MS + (j * HOLE_SUCK_SPREAD_MS) / HOLE_COINS + bar * 15;
-const holeCoins: CoinBurstSprite[] = [];
-function holeCoin(i: number, ms: number): CoinBurstSprite {
-  holeCoins[i] ??= {
+const holeHash = (i: number, salt: number) => {
+  const s = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
+  return s - Math.floor(s);
+};
+// each coin's own randoms, -1..1 (where it starts and lands) and 0..1 (when
+// it leaves, its size)
+const holeU = Float32Array.from(
+  { length: HOLE_COINS },
+  (_, i) => holeHash(i, 1) * 2 - 1,
+);
+const holeV = Float32Array.from(
+  { length: HOLE_COINS },
+  (_, i) => holeHash(i, 2) * 2 - 1,
+);
+const holeStart = Float32Array.from(
+  { length: HOLE_COINS },
+  (_, i) => HOLE_OPEN_MS + holeHash(i, 3) * HOLE_SUCK_SPREAD_MS,
+);
+const holeSize = Float32Array.from(
+  { length: HOLE_COINS },
+  (_, i) => HOLE_COIN * (0.7 + 0.6 * holeHash(i, 4)),
+);
+const holeCoins: CoinBurstSprite[] = Array.from(
+  { length: HOLE_COINS },
+  (_, i) => ({
     kind: i % 4 === 0 ? "bill" : "coin",
     spinFrame: 0,
-    axisAngle: (((i * 37) % 100) / 100 - 0.5) * Math.PI,
-  };
-  holeCoins[i].spinFrame = ms * 0.02 + i;
-  return holeCoins[i];
-}
+    axisAngle: (holeHash(i, 5) - 0.5) * Math.PI,
+  }),
+);
 
 const ORBIT_GATHER_MS = 150;
 const ORBIT_SPIN_MS = 450;
@@ -371,11 +409,6 @@ function plan(r: Running, bars: Point[]): void {
         hit(bar, STAMP_FIRST_MS + i * STAMP_EACH_MS),
       );
       break;
-    case "zipCrit":
-      byHeight(bars).forEach((bar, i) =>
-        hit(bar, ZIP_FIRST_MS + i * (ZIP_PASS_MS + ZIP_DROP_MS) + ZIP_PASS_MS),
-      );
-      break;
     case "catapultCrit": {
       // flung off the top of the screen, crashing down past the lowest bar
       const lowest = Math.max(...bars.map((b) => b.y));
@@ -403,6 +436,12 @@ function plan(r: Running, bars: Point[]): void {
       break;
     case "blackHoleCrit":
       bars.forEach((_, bar) => hit(bar, HOLE_RETURNED_MS));
+      break;
+    case "dominoCrit":
+      // bottom to top; step is how many it has knocked before
+      byHeight(bars)
+        .reverse()
+        .forEach((bar, k) => hit(bar, dominoAt(k), k));
       break;
     case "lightningCrit": {
       // from the sky onto the top bar, then bar to bar down the building
@@ -449,15 +488,15 @@ function plan(r: Running, bars: Point[]): void {
 const TAIL_MS: Partial<Record<CritMoment, number>> = {
   stompCrit: STOMP_SETTLE_MS,
   stampCrit: STAMP_PRINT_MS,
-  zipCrit: ZIP_STITCH_MS,
   catapultCrit: CATAPULT_LAND_MS,
   bubbleCrit: BUBBLE_POP_MS,
   lightningCrit: LIGHTNING_TAIL_MS,
   meteorCrit: METEOR_TAIL_MS,
   blackHoleCrit: HOLE_TAIL_MS,
+  dominoCrit: DOMINO_TAIL_MS,
 };
 
-function shakeOf(kind: CritMoment): number {
+function shakeOf(kind: CritMoment, step: number): number {
   switch (kind) {
     case "stompCrit":
       return STOMP_SHAKE;
@@ -473,6 +512,8 @@ function shakeOf(kind: CritMoment): number {
       return METEOR_SHAKE;
     case "blackHoleCrit":
       return HIT_SHAKE;
+    case "dominoCrit":
+      return DOMINO_SHAKE + DOMINO_SHAKE_STEP * step;
     default:
       return HIT_SHAKE;
   }
@@ -608,7 +649,7 @@ export function drawMoment(
   r.lastBars = bars;
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];
-    r.shake(shakeOf(r.moment.kind));
+    r.shake(shakeOf(r.moment.kind, step));
     r.moment.onHit(bar, step, r.glyphs.color);
   }
   if (ms >= r.endsAt) {
@@ -855,81 +896,6 @@ const DRAW: Record<CritMoment, Draw> = {
       font,
       { sx: 1 + 0.3 * squash, sy: 1 - 0.4 * squash },
     );
-  },
-
-  zipCrit(ctx, r, ms, bars) {
-    const order = byHeight(bars);
-    const half = r.moment.barHalfWidth - 60;
-    const start = (i: number) => ZIP_FIRST_MS + i * (ZIP_PASS_MS + ZIP_DROP_MS);
-    // each pass runs one way across its bar, the next back the other way
-    const pass = (i: number) => {
-      const b = bars[order[i]];
-      const [from, to] =
-        i % 2 ? [b.x + half, b.x - half] : [b.x - half, b.x + half];
-      return { from, to, y: b.y };
-    };
-    // the stitches it leaves along each bar
-    ctx.save();
-    ctx.strokeStyle = r.glyphs.color;
-    ctx.lineWidth = 12;
-    ctx.lineCap = "round";
-    ctx.setLineDash([40, 28]);
-    for (let i = 0; i < order.length; i++) {
-      const q = clamp01((ms - start(i)) / ZIP_PASS_MS);
-      const fade = 1 - Math.max(0, ms - start(i) - ZIP_PASS_MS) / ZIP_STITCH_MS;
-      if (q <= 0 || fade <= 0) continue;
-      const p = pass(i);
-      ctx.globalAlpha = fade;
-      ctx.beginPath();
-      ctx.moveTo(p.from, p.y);
-      ctx.lineTo(lerp(p.from, p.to, q), p.y);
-      ctx.stroke();
-    }
-    ctx.restore();
-    // the needle
-    if (ms < ZIP_FIRST_MS) {
-      const p = (ms / ZIP_FIRST_MS) ** 2;
-      const first = pass(0);
-      drawText(
-        ctx,
-        r.glyphs,
-        r.label,
-        first.from * p,
-        first.y * p,
-        lerp(r.flashFont, ZIP_FONT, p),
-      );
-      return;
-    }
-    for (let i = 0; i < order.length; i++) {
-      const t = ms - start(i);
-      if (t < 0 || t >= ZIP_PASS_MS + ZIP_DROP_MS) continue;
-      const p = pass(i);
-      if (t < ZIP_PASS_MS) {
-        drawText(
-          ctx,
-          r.glyphs,
-          r.label,
-          lerp(p.from, p.to, t / ZIP_PASS_MS),
-          p.y + Math.sin(t * 0.25) * 20,
-          ZIP_FONT,
-          { along: 0, stretch: 1.4 },
-        );
-      } else if (i < order.length - 1) {
-        const q = (t - ZIP_PASS_MS) / ZIP_DROP_MS;
-        drawText(
-          ctx,
-          r.glyphs,
-          r.label,
-          p.to,
-          lerp(p.y, pass(i + 1).y, q),
-          ZIP_FONT,
-          {
-            along: Math.PI / 2,
-            stretch: 1.3,
-          },
-        );
-      }
-    }
   },
 
   catapultCrit(ctx, r, ms, bars) {
@@ -1312,26 +1278,36 @@ const DRAW: Record<CritMoment, Draw> = {
     drawGravityHole(ctx, { x: 0, y: 0 }, size, 1, ms, now);
     ctx.restore();
     const base = ctx.getTransform();
+    const w = r.viewportWidth;
+    const n = bars.length;
     beginCoinBatch(ctx);
-    // every bar's coins spiralling down into it
-    bars.forEach((_, bar) => {
-      for (let j = 0; j < HOLE_COINS; j++) {
-        const p = (ms - holeSuckStart(bar, j)) / HOLE_SUCK_MS;
-        if (p < 0 || p >= 1) continue;
-        const from = along(r, bars, bar, ((j * 53) % 100) / 50 - 1);
-        from.y += (((j * 37) % 100) / 50 - 1) * HOLE_COIN_SCATTER;
-        const a = Math.atan2(from.y, from.x) + p * p * 5;
-        const reach = Math.hypot(from.x, from.y) * (1 - p) ** 1.5;
-        drawCoinBurstFrame(
-          ctx,
-          holeCoin(bar * HOLE_COINS + j, ms),
-          Math.cos(a) * reach,
-          Math.sin(a) * reach,
-          HOLE_COIN * (1 - p * 0.7),
-          base,
-        );
+    // coins off every bar and from all over the screen spiralling into it
+    for (let i = 0; i < HOLE_COINS; i++) {
+      const p = (ms - holeStart[i]) / HOLE_SUCK_MS;
+      if (p < 0 || p >= 1) continue;
+      let x: number;
+      let y: number;
+      if (i % HOLE_BAR_SHARE === 0) {
+        const b = bars[i % n];
+        x = b.x + holeU[i] * (r.moment.barHalfWidth - 60);
+        y = b.y + holeV[i] * HOLE_COIN_SCATTER;
+      } else {
+        x = holeU[i] * w * HOLE_FIELD[0];
+        y = holeV[i] * w * HOLE_FIELD[1];
       }
-    });
+      const a = Math.atan2(y, x) + p * p * 5;
+      const reach = Math.hypot(x, y) * (1 - p) ** 1.5;
+      const coin = holeCoins[i];
+      coin.spinFrame = ms * 0.02 + i;
+      drawCoinBurstFrame(
+        ctx,
+        coin,
+        Math.cos(a) * reach,
+        Math.sin(a) * reach,
+        holeSize[i] * (1 - p * 0.7),
+        base,
+      );
+    }
     // the collapse, flinging them all back out onto the bars
     const since = ms - HOLE_COLLAPSE_MS;
     if (since >= 0 && r.kicked === 0) {
@@ -1341,20 +1317,20 @@ const DRAW: Record<CritMoment, Draw> = {
     drawDetonation(ctx, { x: 0, y: 0 }, since, HOLE_BLAST, now);
     const back = since / HOLE_RETURN_MS;
     if (back >= 0 && back < 1)
-      bars.forEach((_, bar) => {
-        for (let j = 0; j < HOLE_COINS; j++) {
-          const to = along(r, bars, bar, ((j * 71) % 100) / 50 - 1);
-          to.y += (((j * 29) % 100) / 50 - 1) * HOLE_COIN_SCATTER;
-          drawCoinBurstFrame(
-            ctx,
-            holeCoin(bar * HOLE_COINS + j, ms),
-            to.x * back * back,
-            to.y * back * back,
-            HOLE_COIN * 1.2,
-            base,
-          );
-        }
-      });
+      for (let i = 0; i < HOLE_COINS; i++) {
+        const b = bars[i % n];
+        const k = back * back;
+        const coin = holeCoins[i];
+        coin.spinFrame = ms * 0.02 + i;
+        drawCoinBurstFrame(
+          ctx,
+          coin,
+          (b.x + holeV[i] * (r.moment.barHalfWidth - 60)) * k,
+          (b.y + holeU[i] * HOLE_COIN_SCATTER) * k,
+          holeSize[i] * 1.2,
+          base,
+        );
+      }
     endCoinBatch(ctx);
     bars.forEach((b) =>
       drawPays(
@@ -1367,6 +1343,69 @@ const DRAW: Record<CritMoment, Draw> = {
         HOLE_TAIL_MS,
       ),
     );
+  },
+
+  dominoCrit(ctx, r, ms, bars) {
+    const now = r.startedAt + ms;
+    const order = byHeight(bars).reverse();
+    // each knock lands on alternate ends of its bar
+    const spot = (k: number) => along(r, bars, order[k], k % 2 ? -0.7 : 0.7);
+    if (ms < DOMINO_DIVE_MS) {
+      // diving into the lowest bar, faster and faster
+      const p = (ms / DOMINO_DIVE_MS) ** 2;
+      const to = spot(0);
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        to.x * p,
+        to.y * p,
+        lerp(r.flashFont, MOMENT_FONT, p),
+        { rot: p * 4 },
+      );
+    }
+    order.forEach((_, k) => {
+      const at = dominoAt(k);
+      if (k > 0) {
+        // knocked up off the bar below in an arc, speeding into this one
+        const from = spot(k - 1);
+        const to = spot(k);
+        const gap = dominoGap(k - 1);
+        drawWispBetween(
+          ctx,
+          (t) => {
+            const p = clamp01((t - (at - gap)) / gap) ** 1.3;
+            return {
+              x: lerp(from.x, to.x, p),
+              y: lerp(from.y, to.y, p) - DOMINO_ARC * Math.sin(Math.PI * p),
+            };
+          },
+          ms,
+          now,
+          WISP_SIZE * (1.2 + 0.3 * k),
+          Math.min(1, 0.3 + 0.2 * k),
+          at - gap,
+          at,
+        );
+      }
+      const last = k === order.length - 1;
+      drawDetonation(
+        ctx,
+        spot(k),
+        ms - at,
+        (DOMINO_BLAST + DOMINO_BLAST_STEP * k) * (last ? 1.5 : 1),
+        now,
+      );
+      drawPays(
+        ctx,
+        r,
+        `x${k + 1}`,
+        bars[order[k]],
+        ms - at,
+        DOMINO_FONT + 15 * k,
+        DOMINO_TAIL_MS,
+      );
+    });
   },
 };
 

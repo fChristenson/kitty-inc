@@ -11,9 +11,9 @@ import {
   getExplosionDurationMs,
   getJackpotDurationMs,
   playCoinDrop,
-  playExplosion,
-  playJackpot,
-  playPayout,
+  playCritExplosion,
+  playCritJackpot,
+  playCritPayout,
 } from "../../sound";
 import { CRIT_TIER_CONFIG, CRIT_TIER_ORDER, type CritTier } from "../critTypes";
 import { tierColor } from "../bonusTierReward";
@@ -77,7 +77,7 @@ export function playTierFlash(
       pulseMs,
       moment,
     });
-    playPayout();
+    playCritPayout();
   } else if (tier === "mega") {
     // priority 1: can interrupt a plain crit, never an ultra
     triggerScreenShake({
@@ -91,7 +91,7 @@ export function playTierFlash(
       pulseMs,
       moment,
     });
-    playJackpot();
+    playCritJackpot();
   } else {
     // priority 0: the only tier a still-playing bigger flash suppresses
     triggerScreenShake({
@@ -105,7 +105,7 @@ export function playTierFlash(
       moment,
     });
     playCoinDrop();
-    playExplosion();
+    playCritExplosion();
   }
 }
 
@@ -114,7 +114,7 @@ export function playTierFlash(
 export function playSpecialFlash(
   label: string,
   color: string,
-  playSound: () => void = playExplosion,
+  playSound: () => void = playCritExplosion,
 ): void {
   triggerScreenShake({
     intensity: 1.8,

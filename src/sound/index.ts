@@ -198,23 +198,84 @@ function playSfx(
   maxDurationSeconds?: number,
   fadeOutSeconds = 0.4,
 ): void {
+  withSfxBuffer(name, (ctx, buffer) =>
+    startSfx(
+      ctx,
+      buffer,
+      volume,
+      offsetSeconds,
+      rate,
+      maxDurationSeconds,
+      fadeOutSeconds,
+    ),
+  );
+}
+
+function startSfx(
+  ctx: AudioContext,
+  buffer: AudioBuffer,
+  volume: number,
+  offsetSeconds: number,
+  rate: number,
+  maxDurationSeconds: number | undefined,
+  fadeOutSeconds: number,
+): { source: AudioBufferSourceNode; gain: GainNode } {
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.playbackRate.value = rate;
+  const gain = ctx.createGain();
+  gain.gain.value = volume;
+  source.connect(gain);
+  gain.connect(ctx.destination);
+  const startAt = ctx.currentTime;
+  source.start(0, Math.min(offsetSeconds, buffer.duration));
+  if (maxDurationSeconds !== undefined) {
+    const fadeStartAt =
+      startAt + Math.max(0, maxDurationSeconds - fadeOutSeconds);
+    gain.gain.setValueAtTime(volume, fadeStartAt);
+    gain.gain.linearRampToValueAtTime(0, startAt + maxDurationSeconds);
+    source.stop(startAt + maxDurationSeconds);
+  }
+  return { source, gain };
+}
+
+// a crit's bang is never dropped for landing soon after the last one: that
+// one is cut short instead, so back-to-back crits each get theirs without a
+// fast held click stacking them into noise
+const CRIT_BANG_GUARD_MS = 60;
+const CRIT_BANG_CHOKE_SECONDS = 0.05;
+const critVoices = new Map<
+  SfxName,
+  { source: AudioBufferSourceNode; gain: GainNode; at: number }
+>();
+function playCritVoice(
+  name: SfxName,
+  volume: number,
+  offsetSeconds = 0,
+  maxDurationSeconds?: number,
+  fadeOutSeconds = 0.4,
+): void {
+  const now = performance.now();
+  const last = critVoices.get(name);
+  if (last && now - last.at < CRIT_BANG_GUARD_MS) return;
   withSfxBuffer(name, (ctx, buffer) => {
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.playbackRate.value = rate;
-    const gain = ctx.createGain();
-    gain.gain.value = volume;
-    source.connect(gain);
-    gain.connect(ctx.destination);
-    const startAt = ctx.currentTime;
-    source.start(0, Math.min(offsetSeconds, buffer.duration));
-    if (maxDurationSeconds !== undefined) {
-      const fadeStartAt =
-        startAt + Math.max(0, maxDurationSeconds - fadeOutSeconds);
-      gain.gain.setValueAtTime(volume, fadeStartAt);
-      gain.gain.linearRampToValueAtTime(0, startAt + maxDurationSeconds);
-      source.stop(startAt + maxDurationSeconds);
+    if (last) {
+      const t = ctx.currentTime;
+      last.gain.gain.cancelScheduledValues(t);
+      last.gain.gain.setValueAtTime(last.gain.gain.value, t);
+      last.gain.gain.linearRampToValueAtTime(0, t + CRIT_BANG_CHOKE_SECONDS);
+      last.source.stop(t + CRIT_BANG_CHOKE_SECONDS);
     }
+    const voice = startSfx(
+      ctx,
+      buffer,
+      volume,
+      offsetSeconds,
+      1,
+      maxDurationSeconds,
+      fadeOutSeconds,
+    );
+    critVoices.set(name, { ...voice, at: now });
   });
 }
 
@@ -423,6 +484,35 @@ export function playSlamExplosion(): void {
   lastExplosionPlayTime = performance.now();
   playSfx("explosion", SFX_VOLUME, 0.04);
   buzzDuringEvent(getExplosionDurationMs());
+}
+
+// a crit's own bang (see playCritVoice)
+export function playCritExplosion(): void {
+  const now = performance.now();
+  buzzDuringEvent(getExplosionDurationMs());
+  if (now < explosionsHeldUntil) return;
+  lastExplosionPlayTime = now;
+  playCritVoice("explosion", SFX_VOLUME, 0.04);
+}
+
+// a mega crit's own jackpot (see playCritVoice)
+export function playCritJackpot(): void {
+  buzzDuringEvent(getJackpotDurationMs());
+  lastJackpotPlayTime = performance.now();
+  playCritVoice("win", JACKPOT_VOLUME);
+}
+
+// an ultra crit's own payout (see playCritVoice, playPayout)
+export function playCritPayout(): void {
+  buzzDuringEvent((PAYOUT_PLAY_SECONDS - PAYOUT_FADE_SECONDS) * 1000);
+  lastPayoutPlayTime = performance.now();
+  playCritVoice(
+    "payout",
+    SFX_VOLUME,
+    0,
+    PAYOUT_PLAY_SECONDS,
+    PAYOUT_FADE_SECONDS,
+  );
 }
 
 // one-shot sound effect for clicking a cat or the mouse, and for hitting the

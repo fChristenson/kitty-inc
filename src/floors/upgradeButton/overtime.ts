@@ -13,11 +13,7 @@ const cancellationArmed = new WeakSet<Floor>();
 const barStreams = new WeakMap<Floor, EventFx>();
 
 export function getOvertimeTickGoal(floor: Floor): number {
-  const tier = floor.critMultiplierTier;
-  return (
-    CONFIG.overtime.tickGoal *
-    (tier ? CONFIG.overtime.tickGoalMultiplierByTier[tier] : 1)
-  );
+  return CONFIG.overtime.tickGoalByTier[floor.critMultiplierTier ?? "none"];
 }
 
 export function getOvertimeDisplayGoal(floor: Floor): number {

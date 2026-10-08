@@ -2019,8 +2019,9 @@ function critMomentFor(
         fresh && given.has(target) ? `+${given.get(target)} Lvl` : null,
         color,
       );
-      // a lightning strike, meteor or black hole pays its bar out too
-      const payout = MOMENT_PAYOUT[moment];
+      // a lightning strike, meteor or black hole pays its bar out too; a
+      // domino a step more with every bar it knocks
+      const payout = moment === "dominoCrit" ? step + 1 : MOMENT_PAYOUT[moment];
       if (payout) paySaleClick(target, isGround(target), payout);
       // the hit knocks coins off the bar
       const box = getIncomeBarBox(isGround(target));

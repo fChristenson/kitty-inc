@@ -149,13 +149,10 @@ export const CONFIG = {
     rainCrit: {
       chance: 0.03,
     },
-    // it stamps down onto each bar leaving a glowing print, zips across each
-    // like a sewing machine needle, is catapulted off the top to crash down
-    // through them all, or whirls into a tornado flinging a copy onto each
+    // it stamps down onto each bar leaving a glowing print, is catapulted off
+    // the top to crash down through them all, or whirls into a tornado
+    // flinging a copy onto each
     stampCrit: {
-      chance: 0.03,
-    },
-    zipCrit: {
       chance: 0.03,
     },
     catapultCrit: {
@@ -187,6 +184,11 @@ export const CONFIG = {
     // a black hole swallowing the coins off every bar in view, then
     // collapsing and flinging them back, each paying out double
     blackHoleCrit: {
+      chance: 0.03,
+    },
+    // diving into the lowest bar in view, its payout knocking up bar to bar
+    // to the top, each paying a step more (x1, x2, x3…)
+    dominoCrit: {
       chance: 0.03,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
@@ -225,14 +227,13 @@ export const CONFIG = {
   // Each free click during the event adds a tick (crit-scaled, see
   // CRIT_TIER_CONFIG) to the floor's own overtime gauge (incomePanel.ts).
   overtime: {
-    tickGoal: 125, // base goal for a floor with no permanent crit tier yet
-    // a floor's CURRENT permanent crit tier raises its own gauge's goal further
-    // (multiplies the base tickGoal above) — a higher tier already earns more
-    // per tick, so its own gauge should take proportionally longer to fill
-    tickGoalMultiplierByTier: {
-      crit: 2,
-      mega: 4,
-      ultra: 4,
+    // ticks to fill the gauge, by the floor's CURRENT permanent crit tier:
+    // filling it promotes the floor a tier (none -> crit -> mega -> ultra)
+    tickGoalByTier: {
+      none: 100,
+      crit: 150,
+      mega: 200,
+      ultra: 200,
     },
   },
 
