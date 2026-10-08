@@ -30,11 +30,12 @@
 - **Supernova crit:** the number collapses into a star that swells up, pulsing faster and faster, then goes supernova, its shards slamming into every bar in view.
 - **Galaxy crit:** the number collapses into a sun with a galaxy of stars swirling round it in spiral arms, spinning faster and faster, then the sun goes supernova and flings the stars off their orbits, comets slamming into every bar in view.
 - **Binary star crit:** the number splits into two suns that circle each other, closer and faster, trailing spirals, until they collide in a huge blast that flings glowing blobs onto every bar in view.
+- **Pearls crit:** the number is thrown off the top and torn into a chain of glowing fragments that sweep in from the top corner one behind another, two onto each bar in view, each bigger than the last.
+- **Star birth crit:** a cloud of glitter swirls in on itself round the number, collapsing into a newborn star that ignites and fires jets straight up and down into every bar in view.
 
 ## Game ideas
 
 Playground: `tmp/_playground/newGameIdeas.html`.
 
-- **Plasma ball:** a crackling plasma ball swells in the middle of the building, white tendrils lashing out of it one by one and latching onto each bar with a blast, until it bursts.
-- **Asteroid ring:** a ring of rocks circles the building like Saturn's, faster and faster, then they break off one by one and slam into the bars in a rattle of blasts.
-- **Wormhole:** a wisp dives into a wormhole in the sky and shoots out of a portal beside the top bar, streaking through it into another portal and out beside the next bar down, faster and paying more each time.
+- **Orbital decay:** a moon circles the building, its orbit shrinking and quickening, until it crashes into a bar and breaks up, its fragments slamming into the other bars.
+- **Figure eight:** two comets chase each other round a figure eight through the building, faster and faster, every bar they cross blasting, until the one behind catches up and they collide.

@@ -111,7 +111,7 @@ export const CONFIG = {
     // an animated event (src/animatedEventConfig.ts); none can land again
     // until cooldownMs after one has fully played out
     animatedCrit: {
-      chance: 0.1,
+      chance: 0.04,
       cooldownMs: 30_000,
     },
     // the crit also landing on the floor above / below
@@ -211,6 +211,15 @@ export const CONFIG = {
     // two suns circling each other ever closer and faster, colliding and
     // flinging glowing blobs onto the bars in view
     binaryStarCrit: {
+      chance: 0.03,
+    },
+    // a comet torn into a chain of fragments slamming into the bars in view
+    // one after another, bigger each time; or a glitter cloud collapsing into
+    // a newborn star firing jets up and down through them
+    pearlsCrit: {
+      chance: 0.03,
+    },
+    starBirthCrit: {
       chance: 0.03,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter

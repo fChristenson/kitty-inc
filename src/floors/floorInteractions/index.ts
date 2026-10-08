@@ -1966,7 +1966,8 @@ function momentLevels(
     moment === "bubbleCrit" ||
     moment === "supernovaCrit" ||
     moment === "galaxyCrit" ||
-    moment === "binaryStarCrit"
+    moment === "binaryStarCrit" ||
+    moment === "pearlsCrit"
   )
     return Math.ceil(count / 2);
   if (moment === "volcanoCrit") return Math.ceil(count / 3);

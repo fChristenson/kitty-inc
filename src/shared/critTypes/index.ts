@@ -2061,6 +2061,8 @@ export const CRIT_MOMENTS = [
   "supernovaCrit",
   "galaxyCrit",
   "binaryStarCrit",
+  "pearlsCrit",
+  "starBirthCrit",
 ] as const satisfies readonly SpecialCritType[];
 export type CritMoment = (typeof CRIT_MOMENTS)[number];
 
