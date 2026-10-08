@@ -353,6 +353,7 @@ export {
   forceTierChainCrit,
   forceCritUpDown,
   forceRandomCrit,
+  forceMergeCrit,
   forceSkipCritUpgrade,
   forceSkipFloorBuyCrit,
   forceRainCheckFloorBuyCrit,

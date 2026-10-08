@@ -27,6 +27,7 @@ import {
   isCritUp,
   isCritDown,
   getRandomCrit,
+  getMergeCrit,
   getCritTier,
   getBonusTierCrit,
   consumeBonusTierCrit,
@@ -1887,7 +1888,10 @@ export function applyFloorCrit(
 ): void {
   if (!allowSpecialProcs) result = tierOnlyCrit(result.tier);
   const isGroundFloor = deps.floors.indexOf(floor) === 0;
-  const count = result.randomCrit ?? CRIT_TIER_CONFIG[result.tier].multiplier;
+  const count =
+    result.randomCrit ??
+    CRIT_TIER_CONFIG[result.tier].multiplier +
+      (result.mergeCrit ? CRIT_TIER_CONFIG[result.mergeCrit].multiplier : 0);
   const chainTicks = result.tierChain
     ? CRIT_TIER_CONFIG.mega.multiplier + CRIT_TIER_CONFIG.ultra.multiplier
     : 0;
@@ -1925,7 +1929,13 @@ export function applyFloorCrit(
     result,
     result.bonusTier,
     (kind) => grantFollowUpProc(kind, context),
-    { chain: result.tierChain, up, down, random: result.randomCrit },
+    {
+      chain: result.tierChain,
+      up,
+      down,
+      random: result.randomCrit,
+      merge: result.mergeCrit,
+    },
   );
   for (const kind of landedProcKinds(result))
     revealFoilOf(deps, floor, kind, isGroundFloor);
@@ -2203,6 +2213,7 @@ export function handleFloorClick(
       const critUp = isCritUp(floor);
       const critDown = isCritDown(floor);
       const randomCrit = getRandomCrit(floor);
+      const mergeCrit = getMergeCrit(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
       const carriesEvent = takeClaimedEventProc(floor);
@@ -2227,6 +2238,7 @@ export function handleFloorClick(
             critUp,
             critDown,
             randomCrit,
+            mergeCrit,
           }),
         );
         // the special event this crit carried instead of a special crit

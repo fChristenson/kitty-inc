@@ -94,6 +94,9 @@ export const CONFIG = {
     // this range
     randomCritChance: 0.05,
     randomCritRange: [3, 50] as [number, number],
+    // a landed crit sometimes merges with a second crit number (picked by the
+    // tiers' own odds), paying their sum
+    mergeCritChance: 0.05,
     // a badge landing on a floor rolls these to turn foil, once it qualifies
     // (10 landed for shimmer, 100 for glitter)
     badgeShimmerChance: 0.1,

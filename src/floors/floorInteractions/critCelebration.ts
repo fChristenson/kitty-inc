@@ -29,7 +29,11 @@ import {
   STACK_UP,
   TIER_FLASH_STROKE_WIDTH,
 } from "../../shared/critFlash";
-import { playCritSpin, type FlashStack } from "../../screenShake";
+import {
+  playCritMerge,
+  playCritSpin,
+  type FlashStack,
+} from "../../screenShake";
 import { CONFIG } from "../../config";
 import { celebrateBonusTier, tierColor } from "../../shared/bonusTierReward";
 import {
@@ -51,12 +55,14 @@ function celebrateTier(tier: CritTier): void {
 const STACK_STEP_MS = 200;
 const STACK_PULSE_MS = 120;
 
-// what stacks on a landed crit; random is a random crit's own multiplier
+// what stacks on a landed crit; random is a random crit's own multiplier,
+// merge a merge crit's second number
 export interface CritStacking {
   chain?: boolean;
   up?: boolean;
   down?: boolean;
   random?: number;
+  merge?: CritTier;
 }
 
 interface StackStep {
@@ -75,10 +81,16 @@ const tierOfMultiplier = (multiplier: number): CritTier =>
 
 function stackSteps(
   landedTier: CritTier,
-  { chain, up, down, random }: CritStacking,
+  { chain, up, down, random, merge }: CritStacking,
 ): StackStep[] {
-  const tier = random ? tierOfMultiplier(random) : landedTier;
-  const label = random ? `x${random}` : CRIT_TIER_CONFIG[tier].label;
+  const multiplier =
+    random ??
+    (merge
+      ? CRIT_TIER_CONFIG[landedTier].multiplier +
+        CRIT_TIER_CONFIG[merge].multiplier
+      : undefined);
+  const tier = multiplier ? tierOfMultiplier(multiplier) : landedTier;
+  const label = multiplier ? `x${multiplier}` : CRIT_TIER_CONFIG[tier].label;
   const step = (t: CritTier, stack: FlashStack | null): StackStep => ({
     tier: t,
     label: CRIT_TIER_CONFIG[t].label,
@@ -98,8 +110,20 @@ function stackSteps(
 
 // a random crit counts up this long before its own slams in
 const SPIN_MS = 600;
+// a merge crit's two numbers fly this long before they hit
+const MERGE_MS = 250;
 
-function celebrateStack(steps: StackStep[], random?: number): void {
+const mergeNumber = (tier: CritTier) => ({
+  label: CRIT_TIER_CONFIG[tier].label,
+  color: tierColor(tier),
+  strokeWidth: TIER_FLASH_STROKE_WIDTH[tier],
+});
+
+function celebrateStack(
+  steps: StackStep[],
+  landedTier: CritTier,
+  { random, merge }: CritStacking,
+): void {
   let delay = 0;
   if (random) {
     const tier = tierOfMultiplier(random);
@@ -111,6 +135,18 @@ function celebrateStack(steps: StackStep[], random?: number): void {
       SPIN_MS,
     );
     delay = SPIN_MS;
+  } else if (merge) {
+    playCritMerge(
+      mergeNumber(landedTier),
+      mergeNumber(merge),
+      {
+        label: steps[0].label,
+        color: tierColor(steps[0].tier),
+        strokeWidth: TIER_FLASH_STROKE_WIDTH[steps[0].tier],
+      },
+      MERGE_MS,
+    );
+    delay = MERGE_MS;
   }
   steps.forEach(({ tier, label, stack }, i) =>
     setTimeout(
@@ -318,7 +354,10 @@ export function triggerCritCelebration(
   }
   const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
   const steps = stackSteps(tier, stacking);
-  const stacked = steps.length > 1 || stacking.random !== undefined;
+  const stacked =
+    steps.length > 1 ||
+    stacking.random !== undefined ||
+    stacking.merge !== undefined;
   if (landed.length > 0 || stacked) {
     const now = Date.now();
     // the stacked numbers go first; the procs riding them flash after
@@ -326,7 +365,7 @@ export function triggerCritCelebration(
       specialCelebrationQueue.push({
         kind: "critStack",
         queuedAt: now,
-        run: () => celebrateStack(steps, stacking.random),
+        run: () => celebrateStack(steps, tier, stacking),
       });
     for (const kind of landed) {
       queueProcCelebration(kind, tier, now);

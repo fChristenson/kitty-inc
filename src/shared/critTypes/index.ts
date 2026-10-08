@@ -977,6 +977,8 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   critDown?: boolean;
   // a random crit's own multiplier, in place of the tier's (see rollCrit)
   randomCrit?: number;
+  // a merge crit's second number, added to the tier's
+  mergeCrit?: CritTier;
   chain: boolean;
   dominoEffect: boolean;
   blueprint: boolean;
@@ -1074,7 +1076,13 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
 // modifier riding on an already-landed proc, not itself a boolean proc kind
 export type CritProcKind = Exclude<
   keyof CritRollResult,
-  "tier" | "bonusTier" | "tierChain" | "critUp" | "critDown" | "randomCrit"
+  | "tier"
+  | "bonusTier"
+  | "tierChain"
+  | "critUp"
+  | "critDown"
+  | "randomCrit"
+  | "mergeCrit"
 >;
 
 export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
@@ -2153,7 +2161,9 @@ export function rollCrit(
     if (critRandom() < CONFIG.crit.randomCritChance) {
       const [low, high] = CONFIG.crit.randomCritRange;
       result.randomCrit = low + Math.floor(critRandom() * (high - low + 1));
-    } else if (tier === "crit" && critRandom() < CONFIG.crit.chainCritChance)
+    } else if (critRandom() < CONFIG.crit.mergeCritChance)
+      result.mergeCrit = pickCritTierByOdds();
+    else if (tier === "crit" && critRandom() < CONFIG.crit.chainCritChance)
       result.tierChain = true;
     if (critRandom() < CONFIG.crit.critUpChance) result.critUp = true;
     if (critRandom() < CONFIG.crit.critDownChance) result.critDown = true;

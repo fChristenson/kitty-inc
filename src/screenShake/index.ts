@@ -288,9 +288,12 @@ function startFlash(req: FlashRequest): void {
         flashEndsAt - now - GROWTH_DURATION_MS - fadeDurationMs,
       );
   }
-  // a counted-up number is already on screen at full size: pop, don't spin in
-  flashPopsIn = spin !== null;
+  // a counted-up number pops; a merge's sum slams down from big
+  flashEntry = spin !== null ? "pop" : merge !== null ? "slam" : "spin";
+  if (flashEntry === "slam")
+    setTimeout(() => kickShake(SLAM_SHAKE, Date.now()), SLAM_MS);
   spin = null;
+  merge = null;
   flashStartedAt = now;
   flashLabel = req.label;
   flashSizeLabel = sizeLabel;
@@ -382,14 +385,14 @@ export function triggerScreenShake(options?: {
         // decoded off the main thread again (the browser may have dropped it),
         // then baked with the label before the reveal's first frame
         if (icon) await icon.decode().catch(() => undefined);
-        warmFlashBitmap(req.label, req.color, req.strokeWidth);
+        warmFlashBitmap(req.label, req.color, req.strokeWidth, spin?.sizeLabel);
         const currentNow = Date.now();
         const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
         if (stillIdle || req.priority > activeFlashPriority || req.stack)
           startFlash(req);
       })
       .catch(() => {
-        warmFlashBitmap(req.label, req.color, req.strokeWidth);
+        warmFlashBitmap(req.label, req.color, req.strokeWidth, spin?.sizeLabel);
         const currentNow = Date.now();
         const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
         if (stillIdle || req.priority > activeFlashPriority || req.stack)
@@ -445,9 +448,15 @@ export function getScreenShakeOffset(now: number): { x: number; y: number } {
 // once and settles still. Plays over the start of the timeline without
 // shifting any timing (holds, blinks)
 const ENTRY_LAND_MS = 50;
-let flashPopsIn = false;
+let flashEntry: "spin" | "pop" | "slam" = "spin";
 const POP_IN_MS = 180;
 const POP_IN_SCALE = 0.2;
+// a slam drops from this much bigger, lands with a shake, then squishes
+const SLAM_MS = 120;
+const SLAM_FROM = 2.6;
+const SLAM_SHAKE = 1.2;
+const SLAM_SQUISH_MS = 240;
+const SLAM_SQUISH = 0.16;
 const SETTLE_ROTATION_DEG = 1.25;
 const SETTLE_SCALE_AMOUNT = 0.025;
 const SETTLE_HZ = 1.8;
@@ -489,6 +498,7 @@ function settlePose(elapsedMs: number): { scale: number; rotation: number } {
 export function isCritFlashActive(now: number): boolean {
   syncCritFlashPause(now);
   if (spin && now - spin.startedAt < spin.spinMs) return true;
+  if (merge && now - merge.startedAt < merge.mergeMs) return true;
   return flashEndsAt !== null && (flashPausedAt ?? now) < flashEndsAt;
 }
 
@@ -769,9 +779,20 @@ function warmFlashBitmap(
   label: string,
   color: string,
   strokeWidth: number,
+  sizeLabel = label,
 ): void {
   if (label && lastViewportWidth > 0)
-    getFlashBitmap(label, color, strokeWidth, lastViewportWidth);
+    getFlashBitmap(label, color, strokeWidth, lastViewportWidth, sizeLabel);
+}
+
+// bakes a lead-in's slam a frame after it starts, so the slam doesn't stall
+function warmSlamSoon(
+  label: string,
+  color: string,
+  strokeWidth: number,
+  sizeLabel = label,
+): void {
+  setTimeout(() => warmFlashBitmap(label, color, strokeWidth, sizeLabel), 20);
 }
 
 // builds these flashes' bitmaps at idle, once the canvas has a size and the
@@ -806,6 +827,7 @@ export function drawCritFlash(
   if (flashPausedAt !== null) return;
   drawFlashLayers(ctx, centerX, centerY, viewportWidth, now);
   drawCritSpin(ctx, centerX, centerY, viewportWidth, now);
+  drawCritMerge(ctx, centerX, centerY, viewportWidth, now);
   drawCritSparks(ctx, centerX, centerY, viewportWidth, now);
 }
 
@@ -870,6 +892,42 @@ function getSpinGlyphs(
 // numbers the count runs through a second
 const SPIN_RATE = 120;
 
+// glyphs baked near their on-screen size, so they stay sharp
+function spinGlyphRes(sizeShare: number): number {
+  const onScreen = sizeShare * lastViewportWidth * lastDrawScale;
+  return Math.min(3, Math.max(1, Math.ceil(onScreen / FLASH_FONT_SIZE)));
+}
+
+function glyphTextWidth(glyphs: SpinGlyphs, text: string): number {
+  let width = 0;
+  for (const c of text) width += glyphs.advances[SPIN_CHARS.indexOf(c)];
+  return width;
+}
+
+// glyph text centred on (centerX, centerY)
+function drawGlyphText(
+  ctx: CanvasRenderingContext2D,
+  glyphs: SpinGlyphs,
+  text: string,
+  centerX: number,
+  centerY: number,
+  scale: number,
+): void {
+  let x = centerX - (glyphTextWidth(glyphs, text) * scale) / 2;
+  for (const c of text) {
+    const i = SPIN_CHARS.indexOf(c);
+    const sprite = glyphs.sprites[i];
+    ctx.drawImage(
+      sprite,
+      x - glyphs.pad * scale,
+      centerY - (sprite.height * scale) / 2,
+      sprite.width * scale,
+      sprite.height * scale,
+    );
+    x += glyphs.advances[i] * scale;
+  }
+}
+
 export function playCritSpin(
   [low, high]: [number, number],
   to: number,
@@ -884,11 +942,10 @@ export function playCritSpin(
       sizeLabel = `x${n}`;
   // the same share of the screen its own flash fills
   const sizeShare = 0.8 / measureLabel(scratch, sizeLabel);
-  const onScreen =
-    FLASH_FONT_SIZE * sizeShare * lastViewportWidth * lastDrawScale;
-  const res = Math.min(3, Math.max(1, Math.ceil(onScreen / FLASH_FONT_SIZE)));
+  const res = spinGlyphRes(FLASH_FONT_SIZE * sizeShare);
   const range = high - low + 1;
   const steps = Math.round((spinMs / 1000) * SPIN_RATE);
+  warmSlamSoon(`x${to}`, color, strokeWidth, sizeLabel);
   spin = {
     glyphs: getSpinGlyphs(color, strokeWidth, res),
     low,
@@ -921,20 +978,120 @@ function drawCritSpin(
   const step = Math.floor(Math.min(1, Math.max(0, t)) * steps);
   const text = `x${low + ((start + step) % range)}`;
   const scale = (spin.sizeShare * viewportWidth) / glyphs.font;
-  let width = 0;
-  for (const c of text) width += glyphs.advances[SPIN_CHARS.indexOf(c)];
-  let x = centerX - (width * scale) / 2;
-  for (const c of text) {
-    const i = SPIN_CHARS.indexOf(c);
-    const sprite = glyphs.sprites[i];
-    ctx.drawImage(
-      sprite,
-      x - glyphs.pad * scale,
-      centerY - (sprite.height * scale) / 2,
-      sprite.width * scale,
-      sprite.height * scale,
-    );
-    x += glyphs.advances[i] * scale;
+  drawGlyphText(ctx, glyphs, text, centerX, centerY, scale);
+}
+
+// a merge crit: two crit numbers charge in from opposite sides or corners of
+// the screen, their sum slamming in the moment they meet
+export interface MergeNumber {
+  label: string;
+  color: string;
+  strokeWidth: number;
+}
+interface CritMerge {
+  first: { glyphs: SpinGlyphs; text: string };
+  second: { glyphs: SpinGlyphs; text: string };
+  // which way they charge: 0 sideways, 1 up and down, 2 and 3 corner to corner
+  lane: number;
+  // swaps which end the first one comes from
+  flip: 1 | -1;
+  // on-screen font size, as a share of the viewport's width
+  sizeShare: number;
+  startedAt: number;
+  mergeMs: number;
+}
+let merge: CritMerge | null = null;
+const MERGE_IMPACT_SHAKE = 0.6;
+const MERGE_LEAN = 0.25;
+const MERGE_STRETCH = 1.3;
+const MERGE_LANES = 4;
+
+export function playCritMerge(
+  first: MergeNumber,
+  second: MergeNumber,
+  sum: MergeNumber,
+  mergeMs: number,
+): void {
+  warmSlamSoon(sum.label, sum.color, sum.strokeWidth);
+  // side by side they'd fill this share of the screen's width
+  const scratch = getScratchCtx();
+  const sizeShare =
+    (FLASH_FONT_SIZE * 0.6) /
+    (measureLabel(scratch, first.label) + measureLabel(scratch, second.label));
+  const res = spinGlyphRes(sizeShare);
+  const number = ({ label, color, strokeWidth }: MergeNumber) => ({
+    glyphs: getSpinGlyphs(color, strokeWidth, res),
+    text: label,
+  });
+  const started: CritMerge = {
+    first: number(first),
+    second: number(second),
+    lane: Math.floor(Math.random() * MERGE_LANES),
+    flip: Math.random() < 0.5 ? 1 : -1,
+    sizeShare,
+    startedAt: Date.now(),
+    mergeMs,
+  };
+  merge = started;
+  setTimeout(() => {
+    if (merge === started) kickShake(MERGE_IMPACT_SHAKE, Date.now());
+  }, mergeMs);
+}
+
+// the unit direction from the middle to where the first number starts: a
+// side, the top, or a real corner of the screen
+function mergeLane(lane: number, halfW: number, halfH: number) {
+  const [x, y] =
+    lane === 0
+      ? [1, 0]
+      : lane === 1
+        ? [0, 1]
+        : [halfW, lane === 2 ? halfH : -halfH];
+  const length = Math.hypot(x, y);
+  return { x: x / length, y: y / length };
+}
+
+function drawCritMerge(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  viewportWidth: number,
+  now: number,
+): void {
+  if (!merge) return;
+  const ms = now - merge.startedAt;
+  const t = Math.max(0, ms / merge.mergeMs);
+  if (t >= 2) {
+    merge = null;
+    return;
+  }
+  const scale = (merge.sizeShare * viewportWidth) / merge.first.glyphs.font;
+  const dir = mergeLane(merge.lane, viewportWidth / 2, centerY);
+  const angle = Math.atan2(dir.y, dir.x);
+  // far enough out that each starts fully off screen
+  const offScreen = Math.hypot(viewportWidth / 2, centerY);
+  for (const [side, { glyphs, text }] of [
+    [merge.flip, merge.first],
+    [-merge.flip, merge.second],
+  ] as const) {
+    const halfW = (glyphTextWidth(glyphs, text) * scale) / 2;
+    const halfH = glyphs.font * scale * 0.4;
+    // how far its centre sits from the middle when it touches the other
+    const touch =
+      (Math.abs(dir.x) * halfW + Math.abs(dir.y) * halfH) * MERGE_STRETCH;
+    const start = offScreen + touch * 2;
+    // one constant full speed, ploughing on past impact until the slam
+    // replaces it, so it never slows or stops
+    const dist = Math.max(0, start + (touch - start) * t);
+    ctx.save();
+    ctx.translate(centerX + side * dir.x * dist, centerY + side * dir.y * dist);
+    // leaning into the charge, stretched along it
+    ctx.rotate(-side * dir.x * MERGE_LEAN);
+    ctx.rotate(angle);
+    ctx.scale(MERGE_STRETCH, 1 / MERGE_STRETCH);
+    ctx.rotate(-angle);
+    drawGlyphText(ctx, glyphs, text, 0, 0, scale);
+    ctx.restore();
   }
 }
 
@@ -1042,7 +1199,16 @@ function drawFlashLayers(
 
   // the reveal plays over the start of the timeline without moving it, so
   // holds, blinks and their sound sync stay exactly where they were
-  if (flashPopsIn) {
+  if (flashEntry === "slam") {
+    if (elapsed < SLAM_MS) {
+      const p = elapsed / SLAM_MS;
+      growthScale *= SLAM_FROM + (1 - SLAM_FROM) * p * p;
+      alpha *= Math.min(1, 0.3 + p);
+    } else if (elapsed < SLAM_MS + SLAM_SQUISH_MS) {
+      const q = (elapsed - SLAM_MS) / SLAM_SQUISH_MS;
+      growthScale *= 1 - SLAM_SQUISH * Math.sin(Math.PI * q) * (1 - q);
+    }
+  } else if (flashEntry === "pop") {
     if (elapsed < POP_IN_MS)
       growthScale *=
         1 + POP_IN_SCALE * Math.sin((Math.PI * elapsed) / POP_IN_MS);

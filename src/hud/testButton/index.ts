@@ -280,6 +280,15 @@ export function wireRandomCritTestButton(
     .addEventListener("click", onClick);
 }
 
+export function wireMergeCritTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#test-merge-crit")!
+    .addEventListener("click", onClick);
+}
+
 // arms a crit that also lands on the floor above or below
 export function wireCritUpDownTestButtons(
   container: HTMLElement,

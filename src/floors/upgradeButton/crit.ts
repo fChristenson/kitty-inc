@@ -518,6 +518,7 @@ export function rollCritUpgrade(
       critTiers.set(floor, result.tier);
       if (result.tierChain) tierChainCrits.add(floor);
       if (result.randomCrit) randomCrits.set(floor, result.randomCrit);
+      if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
       if (result.critUp) critUpCrits.add(floor);
       if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
@@ -1067,6 +1068,21 @@ export function forceRandomCrit(floor: Floor): void {
   randomCrits.set(floor, low + Math.floor(Math.random() * (high - low + 1)));
 }
 
+// armed merge crits' second numbers
+const mergeCrits = snapshotMap<Floor, CritTier>();
+
+export function getMergeCrit(floor: Floor): CritTier | undefined {
+  return mergeCrits.get(floor);
+}
+
+// dev/test-only: arms a merge crit of two random tiers
+export function forceMergeCrit(floor: Floor): void {
+  const tiers: CritTier[] = ["crit", "mega", "ultra"];
+  const pick = () => tiers[Math.floor(Math.random() * tiers.length)];
+  forceTestCrit(floor, null, pick(), null, "upgrade");
+  mergeCrits.set(floor, pick());
+}
+
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
@@ -1074,6 +1090,7 @@ export function consumeCritUpgrade(floor: Floor): void {
   critUpCrits.delete(floor);
   critDownCrits.delete(floor);
   randomCrits.delete(floor);
+  mergeCrits.delete(floor);
   consumeCritProcs(floor);
   dropClaimedEventProc(floor);
 }
