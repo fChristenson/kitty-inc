@@ -222,6 +222,14 @@ export const CRIT_CONFIG = {
     missileSwarmCrit: {
       chance: 0.03,
     },
+    // a bomb bursting into bomblets that each burst again on the bars, or
+    // meteors shot down over the building, their debris showering the bars
+    clusterBombCrit: {
+      chance: 0.03,
+    },
+    missileDefenseCrit: {
+      chance: 0.03,
+    },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
     badgeShimmer: {

@@ -49,6 +49,8 @@
 - **Airstrike crit:** the number shoots off the edge of the screen and a jet screams back across the top, dropping a string of blinking bombs that arc down onto the bars in view, blast after blast, its sonic boom shaking the whole building.
 - **Hyperspace crit:** stars streak out of the middle of the screen faster and faster as the number jumps to lightspeed and vanishes into a point, then it drops out of hyperspace in a white flash, copies streaking out onto every bar in view, its own last and hardest.
 - **Missile swarm crit:** the number fires a fan of missiles off in a rattle of launch flashes; they climb, curl over in long loops trailing sparks and dive onto the bars in view one after another in a rolling string of blasts.
+- **Cluster bomb crit:** the number turns into a blinking bomb that drops and bursts in mid-air into a spray of smaller bomblets, which arc down onto the bars in view and each burst again into a cluster of blasts along the bar.
+- **Missile defense crit:** meteors come streaking down at the building and the number, down by the street, fires interceptor missiles that streak up and blow each meteor apart in mid-air, its burning debris showering down onto the bars in view.
 
 ## Game ideas
 
@@ -100,3 +102,11 @@ More floor crits after Railgun and Buzzsaw. Playground: `tmp/_playground/ideas.h
 ## List four
 
 Sci-fi weapons and big blasts, after Tractor beam, Orbital strike, Nuke and Ricochet laser, all six built (see Built). Playground: `tmp/_playground/ideas.html?list=next3`.
+
+## List five
+
+More weapons and disasters. Playground: `tmp/_playground/ideas.html?list=next4`.
+
+- **Drone squad crit:** the number bursts into a squad of drones that zip out and take up position beside every bar in view, aim lasers flickering onto the bars as they charge, then they all fire at once in one huge volley and zoom off.
+- **Bullet time crit:** the number fires a hail of bullets at the bars in view, then time stops: the screen dims, every bullet hangs frozen in mid-air with ripples round it, then time snaps back and they all slam into the bars at once.
+- **Tsunami crit:** the number dives off the edge of the screen and a towering wave of glitter rolls back across it, every bar in view riding up on its crest as it passes, then slamming back down as the wave breaks, glitter spraying everywhere.
