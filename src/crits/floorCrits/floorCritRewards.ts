@@ -82,6 +82,7 @@ import {
   punchIncomeBar,
   liftIncomeBar,
   crumbleIncomeBar,
+  launchIncomeBar,
 } from "../../floors/incomePanel";
 import {
   addTotalIncome,
@@ -1728,6 +1729,7 @@ function critMomentFor(
     onLift: (bar, ms, haul) => liftIncomeBar(targets[bar], ms, haul),
     onCrumble: (bar, crumbleMs, holdMs, rebuildMs) =>
       crumbleIncomeBar(targets[bar], crumbleMs, holdMs, rebuildMs),
+    onRocket: (bar, launch) => launchIncomeBar(targets[bar], launch),
     onHit: (bar, step, color) => {
       const target = targets[bar];
       // a snowball bangs a step higher with every bar

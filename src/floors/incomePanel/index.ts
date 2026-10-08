@@ -54,6 +54,7 @@ import {
   roundRect,
 } from "../../utils";
 import { drawChevronBar, prewarmChevronBar } from "../../shared/glossyWidgets";
+import { launchMs, launchOffset, type BarLaunch } from "../../shared/barLaunch";
 import { runWhenIdle } from "../../shared/idle";
 import {
   drawBoilingBar,
@@ -261,6 +262,25 @@ function crumbleOf(
   if (rebuilt < 1) return { from: 0, to: rebuilt };
   barCrumbles.delete(floor);
   return null;
+}
+
+// a liftoff crit's bar blasting off like a rocket and back
+const barLaunches = new WeakMap<Floor, { at: number; launch: BarLaunch }>();
+
+export function launchIncomeBar(floor: Floor, launch: BarLaunch): void {
+  barLaunches.set(floor, { at: Date.now(), launch });
+}
+
+// px right of its place
+function launchOf(floor: Floor, now: number): number {
+  const l = barLaunches.get(floor);
+  if (!l) return 0;
+  const ms = now - l.at;
+  if (ms >= launchMs(l.launch)) {
+    barLaunches.delete(floor);
+    return 0;
+  }
+  return launchOffset(l.launch, ms) * BAR_W;
 }
 
 function punchSince(floor: Floor, now: number) {
@@ -704,6 +724,7 @@ export function drawIncomePanel(
       : 0;
   const lift = liftOf(floor, now);
   const crumble = crumbleOf(floor, now);
+  const launched = launchOf(floor, now);
   const slam = getSlamPose(floor, "bar", now);
   const drawBar = (): void =>
     drawSlamTarget(
@@ -717,7 +738,7 @@ export function drawIncomePanel(
   const drawBarBody = (): void => {
     if (crumble && crumble.from >= crumble.to) return;
     ctx.save();
-    ctx.translate(barCenter.x, barCenter.y + punchJolt - lift);
+    ctx.translate(barCenter.x + launched, barCenter.y + punchJolt - lift);
     if (cancellationArmed) ctx.rotate(getWiggleRotation(now));
     else if (tension) ctx.rotate(tension.rotation);
     else if (flashStrength > 0)

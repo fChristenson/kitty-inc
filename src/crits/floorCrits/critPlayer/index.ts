@@ -6,6 +6,7 @@ import type { CritMoment } from "../../critTypes";
 import { fadeStops, type FadeStops } from "../../../shared/glowSprite";
 import type { Bolt } from "../../../shared/lightning";
 import type { Disk, Orbit } from "../../../shared/galaxy";
+import type { BarLaunch } from "../../../shared/barLaunch";
 import { loadWhenIdle } from "../../../shared/idle";
 
 export interface Point {
@@ -33,6 +34,8 @@ export interface FlashMoment {
     holdMs: number,
     rebuildMs: number,
   ) => void;
+  // bars()[bar] blasting off to the right like a rocket and back from the left
+  onRocket?: (bar: number, launch: BarLaunch) => void;
 }
 
 // the flash's own baked "x0123456789" glyphs (see critFlash's SpinGlyphs)
@@ -66,6 +69,12 @@ export interface PlannedCrumble {
   rebuildMs: number;
 }
 
+export interface PlannedRocket {
+  bar: number;
+  at: number;
+  launch: BarLaunch;
+}
+
 export interface Running {
   moment: FlashMoment;
   glyphs: MomentGlyphs;
@@ -82,6 +91,8 @@ export interface Running {
   lifted: number;
   crumbles: PlannedCrumble[];
   crumbled: number;
+  rockets: PlannedRocket[];
+  launched: number;
   endsAt: number;
   // where each bar was last seen, if one scrolls out of bars()
   lastBars: Point[];
@@ -226,6 +237,7 @@ export interface FloorCritDef {
       holdMs: number,
       rebuildMs: number,
     ) => void,
+    rocket: (bar: number, at: number, launch: BarLaunch) => void,
   ): void;
   draw: Draw;
   // how long it keeps drawing after its last hit
@@ -289,6 +301,7 @@ const LOADERS: Record<CritMoment, () => Promise<unknown>> = {
   crashLandingCrit: () => import("../crits/crashLandingCrit"),
   saberCrit: () => import("../crits/saberCrit"),
   snapCrit: () => import("../crits/snapCrit"),
+  liftoffCrit: () => import("../crits/liftoffCrit"),
 };
 const loading = new Map<CritMoment, Promise<unknown>>();
 
@@ -338,10 +351,12 @@ function plan(r: Running, bars: Point[], def: FloorCritDef): void {
     (bar, at, ms, haul = false) => r.lifts.push({ bar, at, ms, haul }),
     (bar, at, crumbleMs, holdMs, rebuildMs) =>
       r.crumbles.push({ bar, at, crumbleMs, holdMs, rebuildMs }),
+    (bar, at, launch) => r.rockets.push({ bar, at, launch }),
   );
   r.hits.sort((a, b) => a.at - b.at);
   r.lifts.sort((a, b) => a.at - b.at);
   r.crumbles.sort((a, b) => a.at - b.at);
+  r.rockets.sort((a, b) => a.at - b.at);
   if (!r.endsAt)
     r.endsAt = Math.max(...r.hits.map((h) => h.at)) + (def.tailMs ?? 0);
 }
@@ -376,6 +391,8 @@ function start(p: PendingLaunch, def: FloorCritDef, now: number): void {
     lifted: 0,
     crumbles: [],
     crumbled: 0,
+    rockets: [],
+    launched: 0,
     endsAt: 0,
     lastBars: bars,
     span: { from: 0, to: 0 },
@@ -435,6 +452,10 @@ export function drawMoment(
   while (r.crumbled < r.crumbles.length && r.crumbles[r.crumbled].at <= ms) {
     const c = r.crumbles[r.crumbled++];
     r.moment.onCrumble?.(c.bar, c.crumbleMs, c.holdMs, c.rebuildMs);
+  }
+  while (r.launched < r.rockets.length && r.rockets[r.launched].at <= ms) {
+    const rocket = r.rockets[r.launched++];
+    r.moment.onRocket?.(rocket.bar, rocket.launch);
   }
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];

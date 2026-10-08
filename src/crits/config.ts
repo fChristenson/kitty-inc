@@ -250,6 +250,10 @@ export const CRIT_CONFIG = {
     snapCrit: {
       chance: 0.03,
     },
+    // every bar blasting off like a rocket and screaming back into place
+    liftoffCrit: {
+      chance: 0.03,
+    },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
     badgeShimmer: {

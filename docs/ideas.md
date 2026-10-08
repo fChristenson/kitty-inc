@@ -56,6 +56,7 @@
 - **Crash landing crit:** the number turns into a burning ship that tears in from the sky and comes down across the building, scraping along every bar in a gush of sparks and bouncing off onto the next, until it ploughs into the street in a huge blast that shakes every bar.
 - **Saber crit:** the number ignites into a blade of light that slashes across the whole screen, every bar it cuts through flaring, then back across the other way, then two quick cuts make an X of light on its own bar, which blows.
 - **Snap crit:** the number snaps and every bar in view crumbles into glitter dust from one end to the other, the dust drifting off and swirling together into a whirlwind in the middle of the screen, which then blows back and rebuilds every bar from the dust, fuller, each one flashing as it's whole again.
+- **Liftoff crit:** the number lights a rocket flame on the end of each bar in turn, which rattles and roars, then blasts off across the screen and out of sight, and comes screaming back in from the other side to slam home in a blast.
 
 ## Game ideas
 
@@ -160,3 +161,12 @@ Arcade games, a particle collider and a snap. Playground: `tmp/_playground/ideas
 - **Collider crit:** the number splits into two bunches of light that race opposite ways round a ring circling the building, flashing every time they pass each other, faster and faster, until they break off and smash head-on at its own bar, the debris curling out in spiral tracks onto every other bar.
 - **Snake crit:** the number turns into a snake of glitter that slithers along the bars in sharp turns, gobbling glowing pellets and growing longer with each, every bar blasting once it's eaten clean, then it stops on its own bar and goes off segment by segment from its tail to its head.
 - **Pong crit:** two paddles of light rise up at the sides of the screen and volley the number back and forth across the building, every volley smashing through the next bar down and coming back faster, until the last return is a smash straight down into its own bar.
+
+## List eleven
+
+The bars themselves on the move, after Snap. Playground: `tmp/_playground/ideas.html?list=next10`.
+
+- **Magnet crit:** the number turns into a huge magnet beside the building that switches on with a hum, every bar in view sliding over and clanking onto it one after another, rattling there, then its pull flips and fires them all back into place, slamming in one by one.
+- **Shuffle crit:** the number dives into the bars and they start swapping places like cups in a shell game, two at a time looping round each other, faster and faster, then all slide home together and slam back into place.
+- **Popcorn crit:** the number melts into the bars, which heat up glowing hotter and hotter until coins start popping out of them like popcorn, one, then a few, then a crackling flurry, until every bar bursts in one last huge pop.
+- **Fishing crit:** the number turns into a glowing hook on a line cast out from the corner of the screen; it hooks a bar, tugs, then yanks it up off its floor and lets it slam back down, recasting onto the next bar faster each time, until the last cast hauls its own bar up high, holds it thrashing, and drops it.
