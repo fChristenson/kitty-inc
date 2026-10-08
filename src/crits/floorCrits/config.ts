@@ -211,5 +211,9 @@ export const FLOOR_CRIT_CONFIG = {
     gunshipCrit: {
       chance: 0.03,
     },
+    // a beam of frost icing every bar over, then the ice shattering down them
+    freezeRayCrit: {
+      chance: 0.03,
+    },
   },
 } as const;

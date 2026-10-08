@@ -306,6 +306,7 @@ const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   snapCrit: () => import("../crits/snapCrit"),
   liftoffCrit: () => import("../crits/liftoffCrit"),
   gunshipCrit: () => import("../crits/gunshipCrit"),
+  freezeRayCrit: () => import("../crits/freezeRayCrit"),
 };
 const loading = new Map<FloorCritKind, Promise<unknown>>();
 

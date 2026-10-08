@@ -1677,8 +1677,9 @@ function floorCritLevels(
     return Math.ceil(count / 3);
   // an artillery barrage lands three shells a bar, then its salvo
   if (kind === "artilleryBarrageCrit") return Math.ceil(count / 4);
-  // a saber cuts through each bar twice
-  if (kind === "saberCrit") return Math.ceil(count / 2);
+  // a saber cuts through each bar twice, and a freeze ray ices then shatters it
+  if (kind === "saberCrit" || kind === "freezeRayCrit")
+    return Math.ceil(count / 2);
   if (
     kind === "airstrikeCrit" ||
     kind === "missileSwarmCrit" ||

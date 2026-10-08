@@ -9,3 +9,11 @@ Floor crits in the vein of the ones you kept (Railgun, Nuke, Hyperspace, Snap, S
 - **EMP crit:** the number pulses once, the screen glitches and every bar shorts out, flickering and dead; then the power surges back in with a crackle, every bar slamming back overcharged.
 - **Sonic boom crit:** the number tears across the screen faster and faster, a white vapour cone forming round it, until it breaks the sound barrier with a BOOM whose shockwave flattens every bar in its wake.
 - **Pulsar crit:** the number collapses into a spinning star throwing two lighthouse beams across the screen, every bar flaring as a beam sweeps it, spinning faster and faster until it bursts.
+
+## List eighteen
+
+More floor crits after Gunship: war machines, rays and a monster from under the street. Playground: `tmp/_playground/ideas.html?list=next15`.
+
+- **Battleship crit:** the number steams in along the street as a battleship, its turrets swing up and fire a broadside, a shell onto every bar, the ship heeling back from the recoil; then a second, bigger broadside, the last shell onto its own bar.
+- **Shrink ray crit:** the number turns into a ray gun at the edge of the screen and zaps the bars one by one, each shrinking to a dot with a pop; then it flips round and fires one wide blast that sends every bar shooting back up huge, wobbling into place fuller.
+- **Sandworm crit:** the number dives into the ground, the street rumbles, then a giant worm of glitter bursts up through the building, every bar it bores through blasting, arcs over the roof and dives back down through the other end, erupting under its own bar as its tail goes under.
