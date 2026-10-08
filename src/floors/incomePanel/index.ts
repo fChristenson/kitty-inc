@@ -940,7 +940,7 @@ export function drawIncomePanel(
     ctx.restore();
   };
   // overtime's coin stream powers the bar up like every other stream target
-  // a crit moment's hit leaves it glowing in the crit's color
+  // a floor crit's hit leaves it glowing in the crit's color
   const afterglowing = !!punch?.color && sincePunch < AFTERGLOW_MS;
   if (afterglowing) {
     ctx.save();

@@ -52,7 +52,7 @@ const jetX = (r: Running, ms: number) =>
 function bombs(r: Running, bars: Point[]) {
   const order = byHeight(bars);
   const count = AIR_BOMBS_PER_BAR * bars.length;
-  const half = r.moment.barHalfWidth - 60;
+  const half = r.play.barHalfWidth - 60;
   const w = r.viewportWidth;
   return Array.from({ length: count }, (_, i) => {
     const k = i % order.length;

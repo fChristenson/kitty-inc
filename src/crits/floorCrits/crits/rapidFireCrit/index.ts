@@ -1,7 +1,7 @@
 // the rapidFire floor crit: its number's characters firing one by one into its own bar
 import {
   registerFloorCrit,
-  MOMENT_FONT,
+  FLOOR_CRIT_FONT,
   lerp,
   drawText,
 } from "../../critPlayer";
@@ -13,8 +13,7 @@ const RAPID_SPREAD = 130;
 registerFloorCrit("rapidFireCrit", {
   plan(r, _bars, hit) {
     const count = r.label.length;
-    for (let i = 0; i < count; i++)
-      hit(0, RAPID_FLY_MS + i * RAPID_STAGGER_MS);
+    for (let i = 0; i < count; i++) hit(0, RAPID_FLY_MS + i * RAPID_STAGGER_MS);
   },
   draw(ctx, r, ms, bars) {
     const to = bars[0];
@@ -32,7 +31,7 @@ registerFloorCrit("rapidFireCrit", {
         r.charX[i] +
           (to.x + (i - (count - 1) / 2) * RAPID_SPREAD - r.charX[i]) * p,
         to.y * p,
-        lerp(r.flashFont, MOMENT_FONT, p),
+        lerp(r.flashFont, FLOOR_CRIT_FONT, p),
         { sx: 1 - 0.3 * u, sy: 1 + 0.5 * u },
       );
     }

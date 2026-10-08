@@ -55,7 +55,7 @@ registerFloorCrit("liftoffCrit", {
   draw(ctx, r, ms, bars) {
     const now = r.startedAt + ms;
     const order = byHeight(bars);
-    const half = r.moment.barHalfWidth;
+    const half = r.play.barHalfWidth;
     if (ms < LIFTOFF_IN_MS) {
       const p = ms / LIFTOFF_IN_MS;
       drawText(

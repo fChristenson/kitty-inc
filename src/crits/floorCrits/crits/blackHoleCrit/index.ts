@@ -103,7 +103,7 @@ registerFloorCrit("blackHoleCrit", {
       let y: number;
       if (i % HOLE_BAR_SHARE === 0) {
         const b = bars[i % n];
-        x = b.x + holeU[i] * (r.moment.barHalfWidth - 60);
+        x = b.x + holeU[i] * (r.play.barHalfWidth - 60);
         y = b.y + holeV[i] * HOLE_COIN_SCATTER;
       } else {
         x = holeU[i] * w * HOLE_FIELD[0];
@@ -139,7 +139,7 @@ registerFloorCrit("blackHoleCrit", {
         drawCoinBurstFrame(
           ctx,
           coin,
-          (b.x + holeV[i] * (r.moment.barHalfWidth - 60)) * k,
+          (b.x + holeV[i] * (r.play.barHalfWidth - 60)) * k,
           (b.y + holeU[i] * HOLE_COIN_SCATTER) * k,
           holeSize[i] * 1.2,
           base,

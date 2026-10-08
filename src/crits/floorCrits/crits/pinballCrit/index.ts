@@ -2,7 +2,7 @@
 import {
   registerFloorCrit,
   type Point,
-  MOMENT_FONT,
+  FLOOR_CRIT_FONT,
   lerp,
   byHeight,
   drawText,
@@ -39,7 +39,7 @@ registerFloorCrit("pinballCrit", {
       r.label,
       lerp(from.x, to.x, q),
       lerp(from.y, to.y, q),
-      leg === 0 ? lerp(r.flashFont, MOMENT_FONT, q) : MOMENT_FONT,
+      leg === 0 ? lerp(r.flashFont, FLOOR_CRIT_FONT, q) : FLOOR_CRIT_FONT,
       {
         rot: ms * 0.03,
         along: Math.atan2(to.y - from.y, to.x - from.x),

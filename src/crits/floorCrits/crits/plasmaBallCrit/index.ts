@@ -123,7 +123,7 @@ registerFloorCrit("plasmaBallCrit", {
             const end = {
               x:
                 bar.x +
-                (holeHash(seed, 1801) * 2 - 1) * (r.moment.barHalfWidth - 60),
+                (holeHash(seed, 1801) * 2 - 1) * (r.play.barHalfWidth - 60),
               y: bar.y + (at.y < bar.y ? -BAR_HALF_H : BAR_HALF_H),
             };
             const mid = {

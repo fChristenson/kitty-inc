@@ -26,7 +26,7 @@ export {
   tierOnlyCrit,
 } from "./critTypes";
 export type {
-  CritMoment,
+  FloorCritKind,
   CritProcKind,
   CritRollResult,
   CritTier,
@@ -48,11 +48,11 @@ export {
   createBuildingCrits,
   critNow,
   eventProcContext,
-  forceCritMoment,
+  forceFloorCrit,
   forceCritUpDown,
   forceMergeCrit,
   forceTestCrit,
-  getCritMoment,
+  getFloorCrit,
   getCritTier,
   getMergeCrit,
   isCritDown,

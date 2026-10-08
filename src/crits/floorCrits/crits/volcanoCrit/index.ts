@@ -4,7 +4,7 @@ import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,
   type Point,
-  MOMENT_FONT,
+  FLOOR_CRIT_FONT,
   lerp,
   clamp01,
   drawText,
@@ -53,7 +53,7 @@ registerFloorCrit("volcanoCrit", {
         r.label,
         vent.x * p,
         vent.y * p,
-        lerp(r.flashFont, MOMENT_FONT, p),
+        lerp(r.flashFont, FLOOR_CRIT_FONT, p),
         { along: Math.PI / 2, stretch: 1 + 0.5 * p },
       );
     }

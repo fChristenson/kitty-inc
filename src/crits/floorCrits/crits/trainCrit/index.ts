@@ -22,7 +22,7 @@ const TRAIN_RAIL = 50;
 // the train's track: from the flash down a zigzag along the bars, top to
 // bottom, one run across each
 function trainTrack(r: Running, bars: Point[]) {
-  const half = r.moment.barHalfWidth - 80;
+  const half = r.play.barHalfWidth - 80;
   const points: Point[] = [{ x: 0, y: 0 }];
   byHeight(bars).forEach((bar, i) => {
     const b = bars[bar];

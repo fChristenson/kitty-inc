@@ -1,7 +1,7 @@
 // the orbit floor crit: copies orbiting its number, flung off onto the bars
 import {
   registerFloorCrit,
-  MOMENT_FONT,
+  FLOOR_CRIT_FONT,
   lerp,
   clamp01,
   byHeight,
@@ -78,7 +78,7 @@ registerFloorCrit("orbitCrit", {
           r.label,
           lerp(at.x - Math.sin(a) * rx * ORBIT_KICK * p, to.x, p * p),
           lerp(at.y + Math.cos(a) * ry * ORBIT_KICK * p, to.y, p * p),
-          lerp(ORBIT_FONT, MOMENT_FONT * 0.8, p),
+          lerp(ORBIT_FONT, FLOOR_CRIT_FONT * 0.8, p),
           { rot: p * 6 },
         );
       }

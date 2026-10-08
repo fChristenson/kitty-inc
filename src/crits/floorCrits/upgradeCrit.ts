@@ -13,7 +13,7 @@ import { snapshotMap, snapshotSet } from "../../shared/snapshotState";
 // that tier's upgrade count at once.
 import {
   type CritTier,
-  type CritMoment,
+  type FloorCritKind,
   type CritRollResult,
   pickHigherCritTier as higherCritTier,
   rollCrit,
@@ -232,7 +232,7 @@ export function rollCritUpgrade(
     (result, landedProcs) => {
       critTiers.set(floor, result.tier);
       if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
-      if (result.critMoment) armCritMoment(floor, result.critMoment);
+      if (result.floorCrit) armFloorCrit(floor, result.floorCrit);
       if (result.critUp) critUpCrits.add(floor);
       if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
@@ -771,25 +771,25 @@ export function forceMergeCrit(floor: Floor): void {
 }
 
 // armed crits' floor crits: their number playing out onto the bars
-const critMoments = snapshotMap<Floor, CritMoment>();
+const armedFloorCrits = snapshotMap<Floor, FloorCritKind>();
 
 // its module loads at idle, usually well before the crit is clicked (a click
 // before then loads it on the spot)
-function armCritMoment(floor: Floor, moment: CritMoment): void {
-  critMoments.set(floor, moment);
-  preloadFloorCritWhenIdle(moment);
+function armFloorCrit(floor: Floor, kind: FloorCritKind): void {
+  armedFloorCrits.set(floor, kind);
+  preloadFloorCritWhenIdle(kind);
 }
 
-export function getCritMoment(floor: Floor): CritMoment | undefined {
-  return critMoments.get(floor);
+export function getFloorCrit(floor: Floor): FloorCritKind | undefined {
+  return armedFloorCrits.get(floor);
 }
 
 // dev/test-only: arms a crit of a random tier carrying `moment`
-export function forceCritMoment(floor: Floor, moment: CritMoment): void {
+export function forceFloorCrit(floor: Floor, kind: FloorCritKind): void {
   const tiers: CritTier[] = ["crit", "mega", "ultra"];
   const tier = tiers[Math.floor(Math.random() * tiers.length)];
   forceTestCrit(floor, null, tier, null, "upgrade");
-  armCritMoment(floor, moment);
+  armFloorCrit(floor, kind);
 }
 
 // call right when a crit click is handled, before rolling the next one
@@ -798,7 +798,7 @@ export function consumeCritUpgrade(floor: Floor): void {
   critUpCrits.delete(floor);
   critDownCrits.delete(floor);
   mergeCrits.delete(floor);
-  critMoments.delete(floor);
+  armedFloorCrits.delete(floor);
   consumeCritProcs(floor);
   dropClaimedEventProc(floor);
 }

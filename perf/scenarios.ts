@@ -450,7 +450,7 @@ export function floorCritScenario(kind: string): Scenario {
     run: async (bridge) => {
       click("#add-money");
       bridge.scrollToFloor(ground(bridge), 0.6);
-      click(`[data-crit-moment="${kind}"]`);
+      click(`[data-floor-crit="${kind}"]`);
       await sleep(300);
       tap(bridge, ground(bridge));
       return measure(name, 4000);
@@ -461,8 +461,8 @@ export function floorCritScenario(kind: string): Scenario {
 // every floor crit with a test button
 export function floorCritKinds(): string[] {
   return [
-    ...document.querySelectorAll<HTMLButtonElement>("[data-crit-moment]"),
-  ].map((button) => button.dataset.critMoment!);
+    ...document.querySelectorAll<HTMLButtonElement>("[data-floor-crit]"),
+  ].map((button) => button.dataset.floorCrit!);
 }
 
 // a spread across the event templates

@@ -1268,57 +1268,57 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Floor Crits</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-crit-stack="up">Crit Up</button>
-          <button class="game__button" data-crit-stack="down">Crit Down</button>
+          <button class="game__button" data-crit-up-down="up">Crit Up</button>
+          <button class="game__button" data-crit-up-down="down">Crit Down</button>
           <button id="test-merge-crit" class="game__button">Merge Crit</button>
-          <button class="game__button" data-crit-moment="rapidFireCrit">Rapid Fire Crit</button>
-          <button class="game__button" data-crit-moment="pinballCrit">Pinball Crit</button>
-          <button class="game__button" data-crit-moment="snowballCrit">Snowball Crit</button>
-          <button class="game__button" data-crit-moment="juggleCrit">Juggle Crit</button>
-          <button class="game__button" data-crit-moment="stompCrit">Stomp Crit</button>
-          <button class="game__button" data-crit-moment="rainCrit">Rain Crit</button>
-          <button class="game__button" data-crit-moment="stampCrit">Stamp Crit</button>
-          <button class="game__button" data-crit-moment="catapultCrit">Catapult Crit</button>
-          <button class="game__button" data-crit-moment="tornadoCrit">Tornado Crit</button>
-          <button class="game__button" data-crit-moment="orbitCrit">Orbit Crit</button>
-          <button class="game__button" data-crit-moment="trainCrit">Train Crit</button>
-          <button class="game__button" data-crit-moment="bubbleCrit">Bubble Crit</button>
-          <button class="game__button" data-crit-moment="lightningCrit">Lightning Crit</button>
-          <button class="game__button" data-crit-moment="meteorCrit">Meteor Crit</button>
-          <button class="game__button" data-crit-moment="blackHoleCrit">Black Hole Crit</button>
-          <button class="game__button" data-crit-moment="dominoCrit">Domino Crit</button>
-          <button class="game__button" data-crit-moment="meteorShowerCrit">Meteor Shower Crit</button>
-          <button class="game__button" data-crit-moment="volcanoCrit">Volcano Crit</button>
-          <button class="game__button" data-crit-moment="supernovaCrit">Supernova Crit</button>
-          <button class="game__button" data-crit-moment="galaxyCrit">Galaxy Crit</button>
-          <button class="game__button" data-crit-moment="binaryStarCrit">Binary Star Crit</button>
-          <button class="game__button" data-crit-moment="pearlsCrit">Pearls Crit</button>
-          <button class="game__button" data-crit-moment="starBirthCrit">Star Birth Crit</button>
-          <button class="game__button" data-crit-moment="laserCrit">Laser Crit</button>
-          <button class="game__button" data-crit-moment="drillCrit">Drill Crit</button>
-          <button class="game__button" data-crit-moment="quakeCrit">Quake Crit</button>
-          <button class="game__button" data-crit-moment="fireworksCrit">Fireworks Crit</button>
-          <button class="game__button" data-crit-moment="shatterCrit">Shatter Crit</button>
-          <button class="game__button" data-crit-moment="railgunCrit">Railgun Crit</button>
-          <button class="game__button" data-crit-moment="buzzsawCrit">Buzzsaw Crit</button>
-          <button class="game__button" data-crit-moment="tractorBeamCrit">Tractor Beam Crit</button>
-          <button class="game__button" data-crit-moment="orbitalStrikeCrit">Orbital Strike Crit</button>
-          <button class="game__button" data-crit-moment="nukeCrit">Nuke Crit</button>
-          <button class="game__button" data-crit-moment="ricochetLaserCrit">Ricochet Laser Crit</button>
-          <button class="game__button" data-crit-moment="plasmaBallCrit">Plasma Ball Crit</button>
-          <button class="game__button" data-crit-moment="portalCrit">Portal Crit</button>
-          <button class="game__button" data-crit-moment="bunkerBusterCrit">Bunker Buster Crit</button>
-          <button class="game__button" data-crit-moment="airstrikeCrit">Airstrike Crit</button>
-          <button class="game__button" data-crit-moment="hyperspaceCrit">Hyperspace Crit</button>
-          <button class="game__button" data-crit-moment="missileSwarmCrit">Missile Swarm Crit</button>
-          <button class="game__button" data-crit-moment="clusterBombCrit">Cluster Bomb Crit</button>
-          <button class="game__button" data-crit-moment="missileDefenseCrit">Missile Defense Crit</button>
-          <button class="game__button" data-crit-moment="icbmCrit">ICBM Crit</button>
-          <button class="game__button" data-crit-moment="artilleryBarrageCrit">Artillery Barrage Crit</button>
-          <button class="game__button" data-crit-moment="crashLandingCrit">Crash Landing Crit</button>
-          <button class="game__button" data-crit-moment="saberCrit">Saber Crit</button>
-          <button class="game__button" data-crit-moment="snapCrit">Snap Crit</button>
-          <button class="game__button" data-crit-moment="liftoffCrit">Liftoff Crit</button>
+          <button class="game__button" data-floor-crit="rapidFireCrit">Rapid Fire Crit</button>
+          <button class="game__button" data-floor-crit="pinballCrit">Pinball Crit</button>
+          <button class="game__button" data-floor-crit="snowballCrit">Snowball Crit</button>
+          <button class="game__button" data-floor-crit="juggleCrit">Juggle Crit</button>
+          <button class="game__button" data-floor-crit="stompCrit">Stomp Crit</button>
+          <button class="game__button" data-floor-crit="rainCrit">Rain Crit</button>
+          <button class="game__button" data-floor-crit="stampCrit">Stamp Crit</button>
+          <button class="game__button" data-floor-crit="catapultCrit">Catapult Crit</button>
+          <button class="game__button" data-floor-crit="tornadoCrit">Tornado Crit</button>
+          <button class="game__button" data-floor-crit="orbitCrit">Orbit Crit</button>
+          <button class="game__button" data-floor-crit="trainCrit">Train Crit</button>
+          <button class="game__button" data-floor-crit="bubbleCrit">Bubble Crit</button>
+          <button class="game__button" data-floor-crit="lightningCrit">Lightning Crit</button>
+          <button class="game__button" data-floor-crit="meteorCrit">Meteor Crit</button>
+          <button class="game__button" data-floor-crit="blackHoleCrit">Black Hole Crit</button>
+          <button class="game__button" data-floor-crit="dominoCrit">Domino Crit</button>
+          <button class="game__button" data-floor-crit="meteorShowerCrit">Meteor Shower Crit</button>
+          <button class="game__button" data-floor-crit="volcanoCrit">Volcano Crit</button>
+          <button class="game__button" data-floor-crit="supernovaCrit">Supernova Crit</button>
+          <button class="game__button" data-floor-crit="galaxyCrit">Galaxy Crit</button>
+          <button class="game__button" data-floor-crit="binaryStarCrit">Binary Star Crit</button>
+          <button class="game__button" data-floor-crit="pearlsCrit">Pearls Crit</button>
+          <button class="game__button" data-floor-crit="starBirthCrit">Star Birth Crit</button>
+          <button class="game__button" data-floor-crit="laserCrit">Laser Crit</button>
+          <button class="game__button" data-floor-crit="drillCrit">Drill Crit</button>
+          <button class="game__button" data-floor-crit="quakeCrit">Quake Crit</button>
+          <button class="game__button" data-floor-crit="fireworksCrit">Fireworks Crit</button>
+          <button class="game__button" data-floor-crit="shatterCrit">Shatter Crit</button>
+          <button class="game__button" data-floor-crit="railgunCrit">Railgun Crit</button>
+          <button class="game__button" data-floor-crit="buzzsawCrit">Buzzsaw Crit</button>
+          <button class="game__button" data-floor-crit="tractorBeamCrit">Tractor Beam Crit</button>
+          <button class="game__button" data-floor-crit="orbitalStrikeCrit">Orbital Strike Crit</button>
+          <button class="game__button" data-floor-crit="nukeCrit">Nuke Crit</button>
+          <button class="game__button" data-floor-crit="ricochetLaserCrit">Ricochet Laser Crit</button>
+          <button class="game__button" data-floor-crit="plasmaBallCrit">Plasma Ball Crit</button>
+          <button class="game__button" data-floor-crit="portalCrit">Portal Crit</button>
+          <button class="game__button" data-floor-crit="bunkerBusterCrit">Bunker Buster Crit</button>
+          <button class="game__button" data-floor-crit="airstrikeCrit">Airstrike Crit</button>
+          <button class="game__button" data-floor-crit="hyperspaceCrit">Hyperspace Crit</button>
+          <button class="game__button" data-floor-crit="missileSwarmCrit">Missile Swarm Crit</button>
+          <button class="game__button" data-floor-crit="clusterBombCrit">Cluster Bomb Crit</button>
+          <button class="game__button" data-floor-crit="missileDefenseCrit">Missile Defense Crit</button>
+          <button class="game__button" data-floor-crit="icbmCrit">ICBM Crit</button>
+          <button class="game__button" data-floor-crit="artilleryBarrageCrit">Artillery Barrage Crit</button>
+          <button class="game__button" data-floor-crit="crashLandingCrit">Crash Landing Crit</button>
+          <button class="game__button" data-floor-crit="saberCrit">Saber Crit</button>
+          <button class="game__button" data-floor-crit="snapCrit">Snap Crit</button>
+          <button class="game__button" data-floor-crit="liftoffCrit">Liftoff Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

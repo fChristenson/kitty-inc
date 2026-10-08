@@ -991,8 +991,8 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   critDown?: boolean;
   // a merge crit's second number, added to the tier's
   mergeCrit?: CritTier;
-  // a crit moment: its number playing out onto the bars once it has flashed
-  critMoment?: CritMoment;
+  // a floor crit: its number playing out onto the bars once it has flashed
+  floorCrit?: FloorCritKind;
   // a badge crit whose landed badges turn this foil, once they qualify
   badgeFoil?: BadgeFoil;
   chain: boolean;
@@ -1097,7 +1097,7 @@ export type CritProcKind = Exclude<
   | "critUp"
   | "critDown"
   | "mergeCrit"
-  | "critMoment"
+  | "floorCrit"
   | "badgeFoil"
 >;
 
@@ -2052,10 +2052,14 @@ type SpecialCritType = keyof typeof CONFIG.specialCrits;
 const SPECIAL_CRIT_TYPES = Object.keys(
   CONFIG.specialCrits,
 ) as SpecialCritType[];
+type FloorCritType = keyof typeof CONFIG.floorCrits;
+const FLOOR_CRIT_TYPES = Object.keys(CONFIG.floorCrits) as FloorCritType[];
+// what a special slot ends up carrying: a floorCrit slot is its floor crit
+type SlotType = Exclude<SpecialCritType, "floorCrit"> | FloorCritType;
 
-// the special crits whose number plays out onto the bars (critFlash's
-// critMoments)
-export const CRIT_MOMENTS = [
+// the floor crits whose number plays out onto the bars (floorCrits'
+// critPlayer)
+export const FLOOR_CRIT_KINDS = [
   "rapidFireCrit",
   "pinballCrit",
   "snowballCrit",
@@ -2104,22 +2108,31 @@ export const CRIT_MOMENTS = [
   "saberCrit",
   "snapCrit",
   "liftoffCrit",
-] as const satisfies readonly SpecialCritType[];
-export type CritMoment = (typeof CRIT_MOMENTS)[number];
+] as const satisfies readonly FloorCritType[];
+export type FloorCritKind = (typeof FLOOR_CRIT_KINDS)[number];
 
-export function isCritMoment(type: string | null): type is CritMoment {
-  return (CRIT_MOMENTS as readonly string[]).includes(type ?? "");
+export function isFloorCritKind(type: string | null): type is FloorCritKind {
+  return (FLOOR_CRIT_KINDS as readonly string[]).includes(type ?? "");
 }
 
-// what a gateway-passing crit's special slot carries, each type at its
-// CONFIG.specialCrits chance
-function pickSpecialCrit(): SpecialCritType {
-  let roll = critRandom();
-  return (
-    SPECIAL_CRIT_TYPES.find(
-      (t) => (roll -= CONFIG.specialCrits[t].chance) < 0,
-    ) ?? "badgeCrit"
-  );
+// one of `types`, each weighted by its chance in `table`
+function pickByChance<K extends string>(
+  table: Record<K, { chance: number }>,
+  types: readonly K[],
+): K {
+  const total = types.reduce((sum, t) => sum + table[t].chance, 0);
+  let roll = critRandom() * total;
+  return types.find((t) => (roll -= table[t].chance) < 0) ?? types[0];
+}
+
+// what a gateway-passing crit's special slot carries: a type by its
+// CONFIG.specialCrits chance, a floorCrit then one by its CONFIG.floorCrits
+// chance
+function pickSpecialCrit(): SlotType {
+  const type = pickByChance(CONFIG.specialCrits, SPECIAL_CRIT_TYPES);
+  return type === "floorCrit"
+    ? pickByChance(CONFIG.floorCrits, FLOOR_CRIT_TYPES)
+    : type;
 }
 
 // always lands a tier, weighted by each tier's own relative chance
@@ -2254,7 +2267,7 @@ export function rollCrit(
   if (slot === "critUp") result.critUp = true;
   else if (slot === "critDown") result.critDown = true;
   else if (slot === "mergeCrit") result.mergeCrit = pickCritTierByOdds();
-  else if (isCritMoment(slot)) result.critMoment = slot;
+  else if (isFloorCritKind(slot)) result.floorCrit = slot;
   else if (slot === "badgeShimmer") result.badgeFoil = "shimmer";
   else if (slot === "badgeGlitter") result.badgeFoil = "glitter";
   for (const kind of landedProcs) result[kind] = true;

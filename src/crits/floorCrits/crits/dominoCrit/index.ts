@@ -3,7 +3,7 @@ import { drawDetonation } from "../../../../shared/explosion";
 import { drawWispBetween, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,
-  MOMENT_FONT,
+  FLOOR_CRIT_FONT,
   lerp,
   clamp01,
   byHeight,
@@ -56,7 +56,7 @@ registerFloorCrit("dominoCrit", {
         r.label,
         to.x * p,
         to.y * p,
-        lerp(r.flashFont, MOMENT_FONT, p),
+        lerp(r.flashFont, FLOOR_CRIT_FONT, p),
         { rot: p * 4 },
       );
     }

@@ -1,8 +1,8 @@
 // floor crits playing a crit's number out onto the income bars in view once
-// its flash has slammed in and sat (see critTypes' CritMoment). Each kind is
+// its flash has slammed in and sat (see critTypes' FloorCritKind). Each kind is
 // its own module under ../crits, loaded when its crit is armed or played;
 // every hit calls back so the floors can jolt and land their levels
-import type { CritMoment } from "../../critTypes";
+import type { FloorCritKind } from "../../critTypes";
 import { fadeStops, type FadeStops } from "../../../shared/glowSprite";
 import type { Bolt } from "../../../shared/lightning";
 import type { Disk, Orbit } from "../../../shared/galaxy";
@@ -14,8 +14,8 @@ export interface Point {
   y: number;
 }
 
-export interface FlashMoment {
-  kind: CritMoment;
+export interface FloorCritPlay {
+  kind: FloorCritKind;
   // the bars it can land on, from the flash's middle in its units, its own
   // floor's first; read every frame so a scroll carries them along
   bars: () => Point[];
@@ -39,7 +39,7 @@ export interface FlashMoment {
 }
 
 // the flash's own baked "x0123456789" glyphs (see critFlash's SpinGlyphs)
-export interface MomentGlyphs {
+export interface FloorCritGlyphs {
   sprites: HTMLCanvasElement[];
   advances: number[];
   pad: number;
@@ -76,8 +76,8 @@ export interface PlannedRocket {
 }
 
 export interface Running {
-  moment: FlashMoment;
-  glyphs: MomentGlyphs;
+  play: FloorCritPlay;
+  glyphs: FloorCritGlyphs;
   label: string;
   value: number;
   // the flash's font size, and each character's middle from its middle
@@ -100,7 +100,7 @@ export interface Running {
   span: { from: number; to: number };
   // a lightning crit's bolts, their ends kept on the bars as they scroll
   bolts: Bolt[];
-  // shakes a moment has kicked itself, off its hits (a blast, a collapse)
+  // shakes a floor crit has kicked itself, off its hits (a blast, a collapse)
   kicked: number;
   // a galaxy crit's disk and its stars, planned at launch
   galaxy: { disk: Disk; stars: Orbit[] } | null;
@@ -111,7 +111,7 @@ let running: Running | null = null;
 
 // the font the number plays out at, in the flash's units (about twice a
 // bar's height)
-export const MOMENT_FONT = 200;
+export const FLOOR_CRIT_FONT = 200;
 export const HIT_SHAKE = 0.5;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -126,7 +126,7 @@ export function byHeight(bars: Point[]): number[] {
 // then stretched along `along` (radians) by `stretch`
 export function drawText(
   ctx: CanvasRenderingContext2D,
-  glyphs: MomentGlyphs,
+  glyphs: FloorCritGlyphs,
   text: string,
   x: number,
   y: number,
@@ -184,7 +184,7 @@ export const along = (
   bar: number,
   side: number,
 ) => ({
-  x: bars[bar].x + side * (r.moment.barHalfWidth - 120),
+  x: bars[bar].x + side * (r.play.barHalfWidth - 120),
   y: bars[bar].y,
 });
 
@@ -204,7 +204,7 @@ export function drawPays(
     ctx,
     r.glyphs,
     label,
-    at.x + r.moment.barHalfWidth * 0.5,
+    at.x + r.play.barHalfWidth * 0.5,
     at.y - 120 - 120 * (1 - (1 - t) ** 2),
     font * lerp(2.4, 1, clamp01(since / 110) ** 2),
     { alpha: t < 0.7 ? 1 : (1 - t) / 0.3 },
@@ -246,14 +246,17 @@ export interface FloorCritDef {
   shake?: (step: number) => number;
 }
 
-const DEFS: Partial<Record<CritMoment, FloorCritDef>> = {};
+const DEFS: Partial<Record<FloorCritKind, FloorCritDef>> = {};
 
 // each kind's module calls this once it loads
-export function registerFloorCrit(kind: CritMoment, def: FloorCritDef): void {
+export function registerFloorCrit(
+  kind: FloorCritKind,
+  def: FloorCritDef,
+): void {
   DEFS[kind] = def;
 }
 
-const LOADERS: Record<CritMoment, () => Promise<unknown>> = {
+const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   rapidFireCrit: () => import("../crits/rapidFireCrit"),
   pinballCrit: () => import("../crits/pinballCrit"),
   snowballCrit: () => import("../crits/snowballCrit"),
@@ -303,10 +306,10 @@ const LOADERS: Record<CritMoment, () => Promise<unknown>> = {
   snapCrit: () => import("../crits/snapCrit"),
   liftoffCrit: () => import("../crits/liftoffCrit"),
 };
-const loading = new Map<CritMoment, Promise<unknown>>();
+const loading = new Map<FloorCritKind, Promise<unknown>>();
 
 // loads kind's module (once)
-function preloadFloorCrit(kind: CritMoment): Promise<unknown> {
+function preloadFloorCrit(kind: FloorCritKind): Promise<unknown> {
   let promise = loading.get(kind);
   if (!promise) {
     promise = LOADERS[kind]().catch(() => loading.delete(kind));
@@ -316,8 +319,8 @@ function preloadFloorCrit(kind: CritMoment): Promise<unknown> {
 }
 
 // preloadFloorCrit at idle, queued once per kind
-const queuedKinds = new Set<CritMoment>();
-export function preloadFloorCritWhenIdle(kind: CritMoment): void {
+const queuedKinds = new Set<FloorCritKind>();
+export function preloadFloorCritWhenIdle(kind: FloorCritKind): void {
   if (loading.has(kind) || queuedKinds.has(kind)) return;
   queuedKinds.add(kind);
   loadWhenIdle(() => {
@@ -327,8 +330,8 @@ export function preloadFloorCritWhenIdle(kind: CritMoment): void {
 }
 
 interface PendingLaunch {
-  moment: FlashMoment;
-  glyphs: MomentGlyphs;
+  play: FloorCritPlay;
+  glyphs: FloorCritGlyphs;
   label: string;
   flashFont: number;
   viewportWidth: number;
@@ -339,7 +342,7 @@ interface PendingLaunch {
 // first frame after it has
 let pending: PendingLaunch | null = null;
 
-export function isMomentRunning(): boolean {
+export function isFloorCritRunning(): boolean {
   return running !== null || pending !== null;
 }
 
@@ -362,10 +365,10 @@ function plan(r: Running, bars: Point[], def: FloorCritDef): void {
 }
 
 function start(p: PendingLaunch, def: FloorCritDef, now: number): void {
-  const { moment, glyphs, label, flashFont } = p;
+  const { play, glyphs, label, flashFont } = p;
   const chars = [...label].map(glyphs.index);
   if (chars.some((i) => i < 0)) return;
-  const bars = moment.bars();
+  const bars = play.bars();
   if (bars.length === 0) return;
   const scale = flashFont / glyphs.font;
   let x = 0;
@@ -377,7 +380,7 @@ function start(p: PendingLaunch, def: FloorCritDef, now: number): void {
     return mid;
   });
   running = {
-    moment,
+    play,
     glyphs,
     label,
     value: Number(label.slice(1)) || 0,
@@ -404,35 +407,35 @@ function start(p: PendingLaunch, def: FloorCritDef, now: number): void {
   plan(running, bars, def);
 }
 
-export function launchMoment(
-  moment: FlashMoment,
-  glyphs: MomentGlyphs,
+export function launchFloorCrit(
+  play: FloorCritPlay,
+  glyphs: FloorCritGlyphs,
   label: string,
   flashFont: number,
   viewportWidth: number,
   now: number,
   shake: (intensity: number) => void,
 ): void {
-  const launch = { moment, glyphs, label, flashFont, viewportWidth, shake };
-  const def = DEFS[moment.kind];
+  const launch = { play, glyphs, label, flashFont, viewportWidth, shake };
+  const def = DEFS[play.kind];
   if (def) {
     start(launch, def, now);
     return;
   }
   pending = launch;
-  preloadFloorCrit(moment.kind).then(() => {
-    if (pending === launch && !DEFS[moment.kind]) pending = null;
+  preloadFloorCrit(play.kind).then(() => {
+    if (pending === launch && !DEFS[play.kind]) pending = null;
   });
 }
 
-export function drawMoment(
+export function drawFloorCrit(
   ctx: CanvasRenderingContext2D,
   centerX: number,
   centerY: number,
   now: number,
 ): void {
   if (pending) {
-    const def = DEFS[pending.moment.kind];
+    const def = DEFS[pending.play.kind];
     if (!def) return;
     const launch = pending;
     pending = null;
@@ -440,27 +443,27 @@ export function drawMoment(
   }
   const r = running;
   if (!r) return;
-  const def = DEFS[r.moment.kind]!;
+  const def = DEFS[r.play.kind]!;
   const ms = now - r.startedAt;
-  const seen = r.moment.bars();
+  const seen = r.play.bars();
   const bars = r.lastBars.map((last, i) => seen[i] ?? last);
   r.lastBars = bars;
   while (r.lifted < r.lifts.length && r.lifts[r.lifted].at <= ms) {
     const lift = r.lifts[r.lifted++];
-    r.moment.onLift?.(lift.bar, lift.ms, lift.haul);
+    r.play.onLift?.(lift.bar, lift.ms, lift.haul);
   }
   while (r.crumbled < r.crumbles.length && r.crumbles[r.crumbled].at <= ms) {
     const c = r.crumbles[r.crumbled++];
-    r.moment.onCrumble?.(c.bar, c.crumbleMs, c.holdMs, c.rebuildMs);
+    r.play.onCrumble?.(c.bar, c.crumbleMs, c.holdMs, c.rebuildMs);
   }
   while (r.launched < r.rockets.length && r.rockets[r.launched].at <= ms) {
     const rocket = r.rockets[r.launched++];
-    r.moment.onRocket?.(rocket.bar, rocket.launch);
+    r.play.onRocket?.(rocket.bar, rocket.launch);
   }
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];
     r.shake(def.shake?.(step) ?? HIT_SHAKE);
-    r.moment.onHit(bar, step, r.glyphs.color);
+    r.play.onHit(bar, step, r.glyphs.color);
   }
   if (ms >= r.endsAt) {
     running = null;

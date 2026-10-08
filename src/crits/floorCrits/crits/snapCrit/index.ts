@@ -73,7 +73,7 @@ registerFloorCrit("snapCrit", {
   draw(ctx, r, ms, bars) {
     const now = r.startedAt + ms;
     const n = bars.length;
-    const half = r.moment.barHalfWidth;
+    const half = r.play.barHalfWidth;
     const gather = gatherAt(n);
     if (ms < SNAP_MS + SNAP_FADE_MS)
       drawText(

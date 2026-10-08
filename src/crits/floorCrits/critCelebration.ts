@@ -31,7 +31,7 @@ import {
   STACK_UP,
   TIER_FLASH_STROKE_WIDTH,
 } from "../critFlash/presets";
-import type { FlashMoment } from "./critPlayer";
+import type { FloorCritPlay } from "./critPlayer";
 import {
   playCritMerge,
   type FlashStack,
@@ -44,14 +44,14 @@ import { celebrateBonusTier, tierColor } from "./bonusTierReward";
 import { getScreenUnfrozenAt, isScreenFrozen } from "../../shared/screenFreeze";
 
 // crit celebrations are flash + sound only: no coin bursts (perf)
-function celebrateTier(tier: CritTier, moment: FlashMoment | null): void {
+function celebrateTier(tier: CritTier, floorCrit: FloorCritPlay | null): void {
   playTierFlash(
     tier,
     CRIT_TIER_CONFIG[tier].label,
     tierColor(tier),
     null,
     0,
-    moment,
+    floorCrit,
   );
 }
 
@@ -63,7 +63,7 @@ const STACK_STEP_MS = 200;
 const STACK_PULSE_MS = 120;
 
 // what stacks on a landed crit; merge is a merge crit's second number
-export interface CritStacking {
+export interface UpDownMerge {
   up?: boolean;
   down?: boolean;
   merge?: CritTier;
@@ -85,7 +85,7 @@ const tierOfMultiplier = (multiplier: number): CritTier =>
 
 function stackSteps(
   landedTier: CritTier,
-  { up, down, merge }: CritStacking,
+  { up, down, merge }: UpDownMerge,
 ): StackStep[] {
   const multiplier = merge
     ? CRIT_TIER_CONFIG[landedTier].multiplier +
@@ -108,11 +108,11 @@ const mergeNumber = (tier: CritTier) => ({
   strokeWidth: TIER_FLASH_STROKE_WIDTH[tier],
 });
 
-function celebrateStack(
+function celebrateUpDownMerge(
   steps: StackStep[],
   landedTier: CritTier,
-  { merge }: CritStacking,
-  moment: FlashMoment | null,
+  { merge }: UpDownMerge,
+  floorCrit: FloorCritPlay | null,
 ): void {
   let delay = 0;
   if (merge) {
@@ -138,7 +138,7 @@ function celebrateStack(
           stack,
           i < steps.length - 1 ? STACK_PULSE_MS : 0,
           // a lone number fires; a stack of them doesn't
-          steps.length === 1 ? moment : null,
+          steps.length === 1 ? floorCrit : null,
         ),
       delay + i * STACK_STEP_MS,
     ),
@@ -236,7 +236,7 @@ function celebrateBooty(): void {
 // they're simply skipped while a special celebration is still due, rather
 // than piling up behind it (see triggerCritCelebration below)
 interface QueuedCelebration {
-  kind: CritProcKind | "bonusTier" | "critStack";
+  kind: CritProcKind | "bonusTier" | "floorCrit";
   queuedAt: number;
   maxAgeMs?: number;
   run: () => void;
@@ -326,9 +326,9 @@ export function triggerCritCelebration(
   procs?: Partial<CritProcFlags>,
   bonusTier: CritTier | null = null,
   onFollowUpProc?: (kind: CritProcKind) => void,
-  stacking: CritStacking = {},
+  upDownMerge: UpDownMerge = {},
   // the number flying into the floor's bar once its flash has held
-  moment: FlashMoment | null = null,
+  floorCrit: FloorCritPlay | null = null,
 ): void {
   if (isDetachedJobRunning()) {
     if (procs?.dejaVu) {
@@ -337,16 +337,22 @@ export function triggerCritCelebration(
     return;
   }
   const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
-  const steps = stackSteps(tier, stacking);
-  const stacked = steps.length > 1 || stacking.merge !== undefined;
-  if (landed.length > 0 || stacked) {
+  const steps = stackSteps(tier, upDownMerge);
+  const stacked = steps.length > 1 || upDownMerge.merge !== undefined;
+  if (landed.length > 0 || stacked || floorCrit) {
     const now = Date.now();
-    // the stacked numbers go first; the procs riding them flash after
-    if (stacked)
+    // a floor crit (a crit up, crit down or merge crit's numbers, or one
+    // playing its number onto the bars) waits its turn like a badge crit
+    // rather than being skipped with a plain crit; the procs riding it flash
+    // after
+    if (stacked || floorCrit)
       specialCelebrationQueue.push({
-        kind: "critStack",
+        kind: "floorCrit",
         queuedAt: now,
-        run: () => celebrateStack(steps, tier, stacking, moment),
+        run: () =>
+          stacked
+            ? celebrateUpDownMerge(steps, tier, upDownMerge, floorCrit)
+            : celebrateTier(tier, floorCrit),
       });
     for (const kind of landed) {
       queueProcCelebration(kind, tier, now);
@@ -398,7 +404,7 @@ export function triggerCritCelebration(
   ) {
     return;
   }
-  celebrateTier(tier, moment);
+  celebrateTier(tier, floorCrit);
 }
 
 // the handful of procs whose flash is more than the standard label+color

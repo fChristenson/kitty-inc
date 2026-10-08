@@ -16,13 +16,12 @@ import { isScreenFrozen } from "../../shared/screenFreeze";
 import { clamp01, lerp } from "../../shared/easing";
 import { kickShake } from "../../shared/screenShake";
 import {
-  drawMoment,
-  isMomentRunning,
-  launchMoment,
-  type FlashMoment,
+  drawFloorCrit,
+  isFloorCritRunning,
+  launchFloorCrit,
+  type FloorCritPlay,
 } from "../floorCrits/critPlayer";
 
-export type { FlashMoment } from "../floorCrits/critPlayer";
 import { getExplosionDurationMs } from "../../sound";
 import { MAX_VIBRATE_MS, setBuzz } from "../../shared/vibration";
 import { drawCritSparks, startCritSparks, stopCritSparks } from "./critSparks";
@@ -219,7 +218,7 @@ interface FlashRequest {
   stack: FlashStack | null;
   // buzzes just this long instead of the whole flash (0: the whole flash)
   pulseMs: number;
-  moment: FlashMoment | null;
+  floorCrit: FloorCritPlay | null;
 }
 
 // how long the grow-in (scale + rotate) phase takes, and the fade-out tail's base
@@ -265,8 +264,8 @@ function startFlash(req: FlashRequest): void {
         flashEndsAt - now - GROWTH_DURATION_MS - fadeDurationMs,
       );
   }
-  // a merge's sum or a moment's number slams down from big
-  flashEntry = merge !== null || (req.moment && !stacking) ? "slam" : "spin";
+  // a merge's sum or a floor crit's number slams down from big
+  flashEntry = merge !== null || (req.floorCrit && !stacking) ? "slam" : "spin";
   if (flashEntry === "slam")
     setTimeout(() => kickShake(SLAM_SHAKE, Date.now()), SLAM_MS);
   merge = null;
@@ -277,8 +276,8 @@ function startFlash(req: FlashRequest): void {
   flashStrokeWidth = req.strokeWidth;
   flashBlinkHz = req.blinkHz;
   flashHoldMs = holdMs;
-  flashMoment = stacking ? null : req.moment;
-  if (flashMoment) setTimeout(() => warmMomentGlyphs(req), 50);
+  flashFloorCrit = stacking ? null : req.floorCrit;
+  if (flashFloorCrit) setTimeout(() => warmFloorCritGlyphs(req), 50);
   activeFlashPriority = stacking
     ? Math.max(activeFlashPriority, req.priority)
     : req.priority;
@@ -311,7 +310,7 @@ export function triggerScreenShake(options?: {
   minDurationMs?: number;
   stack?: FlashStack | null;
   pulseMs?: number;
-  moment?: FlashMoment | null;
+  floorCrit?: FloorCritPlay | null;
 }): void {
   const req: FlashRequest = {
     intensity: options?.intensity ?? 1,
@@ -324,7 +323,7 @@ export function triggerScreenShake(options?: {
     minDurationMs: options?.minDurationMs ?? 0,
     stack: options?.stack ?? null,
     pulseMs: options?.pulseMs ?? 0,
-    moment: options?.moment ?? null,
+    floorCrit: options?.floorCrit ?? null,
   };
   const now = Date.now();
   kickShake(req.intensity, now);
@@ -431,7 +430,7 @@ function settlePose(elapsedMs: number): { scale: number; rotation: number } {
 export function isCritFlashActive(now: number): boolean {
   syncCritFlashPause(now);
   if (pendingLeadInLabel(now) !== null) return true;
-  if (isMomentRunning()) return true;
+  if (isFloorCritRunning()) return true;
   return flashEndsAt !== null && (flashPausedAt ?? now) < flashEndsAt;
 }
 
@@ -763,11 +762,11 @@ export function drawCritFlash(
   if (flashPausedAt !== null) return;
   drawFlashLayers(ctx, centerX, centerY, viewportWidth, now);
   drawCritMerge(ctx, centerX, centerY, viewportWidth, now);
-  drawMoment(ctx, centerX, centerY, now);
+  drawFloorCrit(ctx, centerX, centerY, now);
   drawCritSparks(ctx, centerX, centerY, viewportWidth, now);
 }
 
-// a crit's number baked character by character, so a merge or moment can
+// a crit's number baked character by character, so a merge or floor crit can
 // draw any number at the size its own flash slams in at
 interface SpinGlyphs {
   // "x" then 0-9
@@ -1000,34 +999,34 @@ function drawCritMerge(
   }
 }
 
-// a crit moment (critMoments.ts) rides the flash it's handed to: once that
+// a floor crit (floorCrits/critPlayer) rides the flash it's handed to: once that
 // has slammed in and sat, its number plays out onto the bars instead of fading
-let flashMoment: FlashMoment | null = null;
-// how long a moment's flash shows before its number plays out
-const MOMENT_SIT_MS = 400;
+let flashFloorCrit: FloorCritPlay | null = null;
+// how long a floor crit's flash shows before its number plays out
+const FLOOR_CRIT_SIT_MS = 400;
 
-function momentSizeShare(sizeLabel: string): number {
+function floorCritSizeShare(sizeLabel: string): number {
   return (FLASH_FONT_SIZE * 0.8) / measureLabel(getScratchCtx(), sizeLabel);
 }
 
-function warmMomentGlyphs(req: FlashRequest): void {
-  const share = momentSizeShare(flashSizeLabel);
+function warmFloorCritGlyphs(req: FlashRequest): void {
+  const share = floorCritSizeShare(flashSizeLabel);
   getSpinGlyphs(req.color, req.strokeWidth, spinGlyphRes(share));
 }
 
-function startMoment(
-  moment: FlashMoment,
+function startFloorCrit(
+  play: FloorCritPlay,
   viewportWidth: number,
   now: number,
 ): void {
-  const share = momentSizeShare(flashSizeLabel);
+  const share = floorCritSizeShare(flashSizeLabel);
   const glyphs = getSpinGlyphs(
     flashColor,
     flashStrokeWidth,
     spinGlyphRes(share),
   );
-  launchMoment(
-    moment,
+  launchFloorCrit(
+    play,
     { ...glyphs, index: (c) => SPIN_CHARS.indexOf(c), color: flashColor },
     flashLabel,
     share * viewportWidth,
@@ -1081,10 +1080,10 @@ function drawFlashLayers(
 
   const elapsed = now - flashStartedAt;
   const holdEndsAt = GROWTH_DURATION_MS + flashHoldMs;
-  // a moment's flash plays its number out onto the bars after a short sit
-  if (flashMoment && elapsed >= Math.min(holdEndsAt, MOMENT_SIT_MS)) {
-    startMoment(flashMoment, viewportWidth, now);
-    flashMoment = null;
+  // a floor crit's flash plays its number out onto the bars after a short sit
+  if (flashFloorCrit && elapsed >= Math.min(holdEndsAt, FLOOR_CRIT_SIT_MS)) {
+    startFloorCrit(flashFloorCrit, viewportWidth, now);
+    flashFloorCrit = null;
     flashStartedAt = null;
     flashEndsAt = null;
     activeFlashPriority = -1;

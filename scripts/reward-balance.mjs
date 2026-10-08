@@ -242,16 +242,16 @@ async function main() {
     const gatewayPerSec = S.cps * pCrit * c.specialCritGatewayChance;
     // the share of gateways that pick each special crit type
     const types = CONFIG.specialCrits;
-    const weights = Object.values(types).reduce((s, t) => s + t.weight, 0);
+    const weights = Object.values(types).reduce((s, t) => s + t.chance, 0);
     const armWeight = events.reduce((s, e) => s + e.chance * e.arm, 0);
-    const pEvent = types.animatedCrit.weight / weights;
+    const pEvent = types.animatedCrit.chance / weights;
     const cycle =
       types.animatedCrit.cooldownMs / 1000 +
       S.eventMs / 1000 +
       1 / (gatewayPerSec * pEvent);
     const eventsPerHour = 3600 / cycle;
     const procGatewaysPerHour =
-      (gatewayPerSec * 3600 * types.badgeCrit.weight) / weights;
+      (gatewayPerSec * 3600 * types.badgeCrit.chance) / weights;
     const procs = [...featured, ...legacy];
     const lambda = procs.reduce((s, p) => s + p.chance, 0);
     for (const p of procs) {

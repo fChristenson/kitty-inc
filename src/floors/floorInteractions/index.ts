@@ -7,7 +7,7 @@ import {
   isCritUp,
   isCritDown,
   getMergeCrit,
-  getCritMoment,
+  getFloorCrit,
   getCritTier,
   getBonusTierCrit,
   consumeBonusTierCrit,
@@ -606,7 +606,7 @@ export function handleFloorClick(
       const critUp = isCritUp(floor);
       const critDown = isCritDown(floor);
       const mergeCrit = getMergeCrit(floor);
-      const critMoment = getCritMoment(floor);
+      const floorCrit = getFloorCrit(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
       const carriesEvent = takeClaimedEventProc(floor);
@@ -630,7 +630,7 @@ export function handleFloorClick(
             critUp,
             critDown,
             mergeCrit,
-            critMoment,
+            floorCrit,
           }),
         );
         // the special event this crit carried instead of a special crit

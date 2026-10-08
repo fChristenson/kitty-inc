@@ -1,5 +1,19 @@
 // every animated event's tunables (src/floors/*Event), spread into CONFIG
 export const ANIMATED_EVENT_CONFIG = {
+  // animatedCrits/revealStage — the stage every reveal event plays its reveal on
+  revealStage: {
+    windUpMs: 220, // the screen leaning in and rumbling before each whip
+    slideMs: 420, // the whip pan in over the floors, and back out
+  },
+
+  // animatedCrits/flightStage — the stage every space-flight event flies on
+  flightStage: {
+    windUpMs: 250, // the frozen floors rumbling before the dive
+    diveMs: 350, // the floors zooming away as the stage's blue takes over
+    arriveMs: 650, // the floors rushing up out of the distance until the crash
+    holdMs: 350, // the crash's flash and blast before the screen unfreezes
+  },
+
   // src/crits/animatedCrits/events/boostEvent — the rare "Boost" event button. A crit carrying it
   // arms it once clicked; clicking it freezes the screen, streams coins into
   // one random on-screen worker (or manager) below the top crit tier, and

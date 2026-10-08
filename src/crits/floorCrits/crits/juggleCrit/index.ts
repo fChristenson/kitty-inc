@@ -2,7 +2,7 @@
 import {
   registerFloorCrit,
   type Point,
-  MOMENT_FONT,
+  FLOOR_CRIT_FONT,
   lerp,
   clamp01,
   byHeight,
@@ -61,7 +61,11 @@ registerFloorCrit("juggleCrit", {
         r.label[i],
         at.x,
         at.y,
-        lerp(r.flashFont, MOMENT_FONT * 1.1, clamp01(ms / JUGGLE_GATHER_MS)),
+        lerp(
+          r.flashFont,
+          FLOOR_CRIT_FONT * 1.1,
+          clamp01(ms / JUGGLE_GATHER_MS),
+        ),
         { rot: ms * 0.02 * (i % 2 ? 1 : -1) },
       );
     }

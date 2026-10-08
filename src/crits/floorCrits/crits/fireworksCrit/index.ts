@@ -14,7 +14,7 @@ import {
   byHeight,
   drawText,
   along,
-  MOMENT_FONT,
+  FLOOR_CRIT_FONT,
 } from "../../critPlayer";
 import { quadratic, holeHash } from "../../critPlayer/shared";
 
@@ -32,7 +32,7 @@ const SHELLS: Shell[] = [
     rise: [0, 380],
     perBar: 2,
     least: 8,
-    font: MOMENT_FONT * 0.8,
+    font: FLOOR_CRIT_FONT * 0.8,
     blast: 300,
     shake: 1.4,
   },
@@ -40,7 +40,7 @@ const SHELLS: Shell[] = [
     rise: [800, 1150],
     perBar: 3,
     least: 12,
-    font: MOMENT_FONT,
+    font: FLOOR_CRIT_FONT,
     blast: 380,
     shake: 2,
   },

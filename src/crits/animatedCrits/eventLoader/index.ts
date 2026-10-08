@@ -3,7 +3,7 @@
 // on its own while the game is quiet (shared/idle's loadWhenIdle, queued by
 // main.ts). Only the loaded events can claim a crit; crits roll as plain
 // crits until the starter pile is in.
-import { loadWhenIdle, runWhenIdle } from "../../../shared/idle";
+import { loadWhenIdle } from "../../../shared/idle";
 
 const PARTS = [
   () => import("./eventsStarter"),
@@ -40,8 +40,12 @@ function loadPart(index: number): Promise<object> {
   return part;
 }
 
-function idleGap(): Promise<void> {
-  return new Promise((resolve) => runWhenIdle(resolve));
+// every event, all chunks at once (dev test buttons, the perf rig): asked for
+// on a click, so it doesn't wait for the game to go idle
+export function loadEventCatalog(): Promise<EventCatalog> {
+  return (loading ??= Promise.all(PARTS.map((_, i) => loadPart(i))).then(
+    (loaded) => Object.assign({}, ...loaded) as EventCatalog,
+  ));
 }
 
 // loads the next chunk of events, if any are left
@@ -56,16 +60,4 @@ let partsQueued = 0;
 export function queueEventParts(count = PARTS.length): void {
   for (let n = 0; n < count && partsQueued < PARTS.length; n++, partsQueued++)
     loadWhenIdle(loadNextEventPart);
-}
-
-// every event, one chunk per idle gap (dev test buttons, the perf rig)
-export function loadEventCatalog(): Promise<EventCatalog> {
-  return (loading ??= (async () => {
-    const loaded: object[] = [];
-    for (let i = 0; i < PARTS.length; i++) {
-      if (loaded.length > 0 && !parts.has(i)) await idleGap();
-      loaded.push(await loadPart(i));
-    }
-    return Object.assign({}, ...loaded) as EventCatalog;
-  })());
 }

@@ -52,7 +52,7 @@ import {
   EXPLOSION_CRIT_CONTINUE_CHANCE,
   type CritProcKind,
   type CritRollResult,
-  type CritMoment,
+  type FloorCritKind,
   applyCritProcs,
   onlyCritProc,
   tierOnlyCrit,
@@ -70,7 +70,7 @@ import {
   isVisibleOnFloor,
   type EventProcContext,
 } from "../animatedCrits/eventProcs";
-import type { FlashMoment } from "./critPlayer";
+import type { FloorCritPlay } from "./critPlayer";
 
 import {
   increaseIncomeRate,
@@ -1623,81 +1623,81 @@ export function applyFloorCrit(
       down,
       merge: result.mergeCrit,
     },
-    result.critMoment
-      ? critMomentFor(deps, floor, result.critMoment, count)
+    result.floorCrit
+      ? floorCritPlayFor(deps, floor, result.floorCrit, count)
       : null,
   );
   for (const kind of landedProcKinds(result))
     revealFoilOf(deps, floor, kind, isGroundFloor, result.badgeFoil);
 }
 
-// the levels a crit moment's hit lands on a bar: its own floor already has
+// the levels a floor crit's hit lands on a bar: its own floor already has
 // the crit's, so only a snowball's growth adds to it
 const COIN_SPILL_SCALE = 0.7;
 // a floor crit lands dozens of hits in a second or two: full bursts on each
 // filled the coin pool and swelled like a held button
 const COIN_SPILL: [number, number] = [14, 24];
-// full payouts a moment's hit pays its bar on top of its levels
-const MOMENT_PAYOUT: Partial<Record<CritMoment, number>> = {
+// full payouts a floor crit's hit pays its bar on top of its levels
+const FLOOR_CRIT_PAYOUT: Partial<Record<FloorCritKind, number>> = {
   lightningCrit: 2,
   meteorCrit: 5,
   blackHoleCrit: 2,
 };
-function momentLevels(
-  moment: CritMoment,
+function floorCritLevels(
+  kind: FloorCritKind,
   own: boolean,
   count: number,
   step: number,
 ): number {
-  if (moment === "rapidFireCrit") return 0;
-  if (moment === "snowballCrit") return own ? step : count + step;
+  if (kind === "rapidFireCrit") return 0;
+  if (kind === "snowballCrit") return own ? step : count + step;
   if (own) return 0;
   if (
-    moment === "bubbleCrit" ||
-    moment === "supernovaCrit" ||
-    moment === "galaxyCrit" ||
-    moment === "binaryStarCrit" ||
-    moment === "pearlsCrit"
+    kind === "bubbleCrit" ||
+    kind === "supernovaCrit" ||
+    kind === "galaxyCrit" ||
+    kind === "binaryStarCrit" ||
+    kind === "pearlsCrit"
   )
     return Math.ceil(count / 2);
-  if (moment === "volcanoCrit") return Math.ceil(count / 3);
+  if (kind === "volcanoCrit") return Math.ceil(count / 3);
   // a shatter's shards land their levels as they detonate, not as they embed
-  if (moment === "shatterCrit") return step ? Math.ceil(count / 3) : 0;
+  if (kind === "shatterCrit") return step ? Math.ceil(count / 3) : 0;
   // a ricochet laser's bounces land them, not its blow-up
-  if (moment === "ricochetLaserCrit") return step ? 0 : count;
+  if (kind === "ricochetLaserCrit") return step ? 0 : count;
   // a bunker buster's eruption lands them, not its impact and thuds
-  if (moment === "bunkerBusterCrit") return step ? count : 0;
+  if (kind === "bunkerBusterCrit") return step ? count : 0;
   // a portal falls through each bar three times, and a missile defense's
   // debris lands three bits a meteor
-  if (moment === "portalCrit" || moment === "missileDefenseCrit")
+  if (kind === "portalCrit" || kind === "missileDefenseCrit")
     return Math.ceil(count / 3);
   // an artillery barrage lands three shells a bar, then its salvo
-  if (moment === "artilleryBarrageCrit") return Math.ceil(count / 4);
+  if (kind === "artilleryBarrageCrit") return Math.ceil(count / 4);
   // a saber cuts through each bar twice
-  if (moment === "saberCrit") return Math.ceil(count / 2);
+  if (kind === "saberCrit") return Math.ceil(count / 2);
   if (
-    moment === "airstrikeCrit" ||
-    moment === "missileSwarmCrit" ||
-    moment === "clusterBombCrit"
+    kind === "airstrikeCrit" ||
+    kind === "missileSwarmCrit" ||
+    kind === "clusterBombCrit"
   )
     return Math.ceil(count / 2);
   if (
-    moment === "rainCrit" ||
-    moment === "meteorShowerCrit" ||
-    moment === "fireworksCrit"
+    kind === "rainCrit" ||
+    kind === "meteorShowerCrit" ||
+    kind === "fireworksCrit"
   )
     return Math.ceil(count / 6);
   return count;
 }
 
-// a crit moment playing out from floor's crit onto the income bars in view:
+// a floor crit playing out from floor's crit onto the income bars in view:
 // its own floor's first, then every other open, not yet maxed floor's
-function critMomentFor(
+function floorCritPlayFor(
   deps: FloorActionsDeps,
   floor: Floor,
-  moment: CritMoment,
+  kind: FloorCritKind,
   count: number,
-): FlashMoment {
+): FloorCritPlay {
   const isGround = (f: Floor) => deps.floors.indexOf(f) === 0;
   const others = (deps.getOnScreenFloors?.() ?? [])
     .filter(
@@ -1713,7 +1713,7 @@ function critMomentFor(
   const given = new Map<Floor, number>([[floor, count]]);
   const shown = new Set<Floor>();
   return {
-    kind: moment,
+    kind,
     barHalfWidth: getIncomeBarBox(isGround(floor)).width / 2,
     // each bar from the screen's middle, where the flash is
     bars: () => {
@@ -1734,7 +1734,7 @@ function critMomentFor(
       const target = targets[bar];
       // a snowball bangs a step higher with every bar
       playBarExplosion(1 + step * 0.08);
-      const levels = momentLevels(moment, bar === 0, count, step);
+      const levels = floorCritLevels(kind, bar === 0, count, step);
       if (levels > 0) {
         increaseIncomeRateBy(target, levels);
         given.set(target, (given.get(target) ?? 0) + levels);
@@ -1751,11 +1751,11 @@ function critMomentFor(
       // domino a step more with every bar it knocks; a meteor shower's huge
       // last meteor like a meteor
       const payout =
-        moment === "dominoCrit"
+        kind === "dominoCrit"
           ? step + 1
-          : moment === "meteorShowerCrit"
-            ? step && MOMENT_PAYOUT.meteorCrit
-            : MOMENT_PAYOUT[moment];
+          : kind === "meteorShowerCrit"
+            ? step && FLOOR_CRIT_PAYOUT.meteorCrit
+            : FLOOR_CRIT_PAYOUT[kind];
       if (payout) paySaleClick(target, isGround(target), payout);
       // the hit knocks coins off the bar
       const box = getIncomeBarBox(isGround(target));

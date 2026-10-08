@@ -2,7 +2,7 @@
 import {
   registerFloorCrit,
   type Running,
-  MOMENT_FONT,
+  FLOOR_CRIT_FONT,
   lerp,
   clamp01,
   drawText,
@@ -83,7 +83,7 @@ registerFloorCrit("tornadoCrit", {
         r.label,
         lerp(x, to.x, t),
         lerp(fromY, to.y, t) - w * 0.1 * 4 * t * (1 - t),
-        MOMENT_FONT * 0.75,
+        FLOOR_CRIT_FONT * 0.75,
         { rot: t * 6 },
       );
     });

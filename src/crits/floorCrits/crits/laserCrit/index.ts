@@ -64,7 +64,7 @@ function aimAt(
   bottom: Point,
   ms: number,
 ): Point {
-  const rake = r.moment.barHalfWidth * LASER_RAKE;
+  const rake = r.play.barHalfWidth * LASER_RAKE;
   if (ms < LASER_CHARGE_MS) return { x: top.x - rake, y: top.y };
   if (ms < LASER_CHARGE_MS + LASER_SWEEP_MS) {
     const p = (ms - LASER_CHARGE_MS) / LASER_SWEEP_MS;

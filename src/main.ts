@@ -5,7 +5,7 @@ import {
   forceTestCrit,
   forceCritUpDown,
   forceMergeCrit,
-  forceCritMoment,
+  forceFloorCrit,
   loadFeaturedRewards,
   recordCritProcLanded,
   pickCritTierByOdds,
@@ -189,7 +189,7 @@ import {
   wireBadgeCapsuleTestButton,
   wireCritUpDownTestButtons,
   wireMergeCritTestButton,
-  wireCritMomentTestButtons,
+  wireFloorCritTestButtons,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireTwisterEventTestButton,
@@ -712,13 +712,15 @@ async function main() {
       const floor = buildings[activeBuildingIndex]?.[0];
       if (floor) forceMergeCrit(floor);
     });
-    wireCritMomentTestButtons(app, (moment) => {
+    wireFloorCritTestButtons(app, (kind) => {
       const floor = buildings[activeBuildingIndex]?.[0];
-      if (floor) forceCritMoment(floor, moment);
+      if (floor) forceFloorCrit(floor, kind);
     });
     // the event modules load in their own chunk (crits/animatedCrits/eventLoader): each
     // event test button loads it first, then runs with it as `ev`
     let ev!: EventCatalog;
+    // fetched ahead in the background, so the first test button needn't wait
+    runWhenIdle(() => void loadEventCatalog());
     const later =
       <A extends unknown[]>(run: (...args: A) => void) =>
       (...args: A): void => {

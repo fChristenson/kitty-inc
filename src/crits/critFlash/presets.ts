@@ -1,6 +1,6 @@
 // the one set of crit flash presets (text + shake + its sfx), shared by the
 // floors' crit celebrations and the city map's building crits
-import type { FlashMoment } from "../floorCrits/critPlayer";
+import type { FloorCritPlay } from "../floorCrits/critPlayer";
 import {
   SPECIAL_FLASH_STROKE_WIDTH,
   triggerScreenShake,
@@ -50,7 +50,7 @@ export function warmTierFlashes(): void {
 // a landed tier's flash, tier-scaled; label/color let a piggyback proc show
 // its own text in place of the tier's "x5"/"x25"/"x125"; stack lands it at an
 // offset over the flash still showing (see the STACK_ offsets), pulseMs cuts
-// its buzz short so the next one in the stack is felt apart; moment plays its
+// its buzz short so the next one in the stack is felt apart; floorCrit plays its
 // number out onto the bars once it has sat
 export function playTierFlash(
   tier: CritTier,
@@ -58,7 +58,7 @@ export function playTierFlash(
   color: string,
   stack: FlashStack | null = null,
   pulseMs = 0,
-  moment: FlashMoment | null = null,
+  floorCrit: FloorCritPlay | null = null,
 ): void {
   if (tier === "ultra") {
     // holdMs is an exact odd multiple of the blink's half-cycle (15 * 83.33ms
@@ -75,7 +75,7 @@ export function playTierFlash(
       priority: 2,
       stack,
       pulseMs,
-      moment,
+      floorCrit,
     });
     playCritPayout();
   } else if (tier === "mega") {
@@ -89,7 +89,7 @@ export function playTierFlash(
       minDurationMs: getJackpotDurationMs(),
       stack,
       pulseMs,
-      moment,
+      floorCrit,
     });
     playCritJackpot();
   } else {
@@ -102,7 +102,7 @@ export function playTierFlash(
       minDurationMs: getExplosionDurationMs(),
       stack,
       pulseMs,
-      moment,
+      floorCrit,
     });
     playCoinDrop();
     playCritExplosion();

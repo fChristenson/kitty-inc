@@ -1,7 +1,7 @@
 // the snowball floor crit: its number snowballing down the bars, a step bigger each bar
 import {
   registerFloorCrit,
-  MOMENT_FONT,
+  FLOOR_CRIT_FONT,
   lerp,
   byHeight,
   drawText,
@@ -41,8 +41,8 @@ registerFloorCrit("snowballCrit", {
       lerp(from.x, to.x, q),
       lerp(from.y, to.y, leg === 0 ? q * q : q) - hop,
       leg === 0
-        ? lerp(r.flashFont, MOMENT_FONT * 0.9, q)
-        : MOMENT_FONT * (0.9 + 0.15 * leg),
+        ? lerp(r.flashFont, FLOOR_CRIT_FONT * 0.9, q)
+        : FLOOR_CRIT_FONT * (0.9 + 0.15 * leg),
       { rot: (to.x - from.x) * q * 0.004 + leg * 2 },
     );
   },

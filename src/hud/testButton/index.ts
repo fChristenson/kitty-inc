@@ -7,7 +7,7 @@ import {
   getCritProcCount,
   queueBadgeFoilReveal,
   type BadgeFoil,
-  type CritMoment,
+  type FloorCritKind,
   type CritProcKind,
   type CritTier,
 } from "../../crits";
@@ -272,16 +272,16 @@ export function wireMergeCritTestButton(
     .addEventListener("click", onClick);
 }
 
-// arms a crit carrying a crit moment
-export function wireCritMomentTestButtons(
+// arms a crit carrying a floor crit
+export function wireFloorCritTestButtons(
   container: HTMLElement,
-  onClick: (moment: CritMoment) => void,
+  onClick: (kind: FloorCritKind) => void,
 ): void {
   for (const button of container.querySelectorAll<HTMLButtonElement>(
-    "[data-crit-moment]",
+    "[data-floor-crit]",
   ))
     button.addEventListener("click", () =>
-      onClick(button.dataset.critMoment as CritMoment),
+      onClick(button.dataset.floorCrit as FloorCritKind),
     );
 }
 
@@ -291,10 +291,10 @@ export function wireCritUpDownTestButtons(
   onClick: (up: boolean) => void,
 ): void {
   for (const button of container.querySelectorAll<HTMLButtonElement>(
-    "[data-crit-stack]",
+    "[data-crit-up-down]",
   ))
     button.addEventListener("click", () =>
-      onClick(button.dataset.critStack === "up"),
+      onClick(button.dataset.critUpDown === "up"),
     );
 }
 

@@ -37,7 +37,7 @@ registerFloorCrit("stampCrit", {
         glowStops(r.glyphs.color),
         at.x,
         at.y,
-        r.moment.barHalfWidth * 0.7,
+        r.play.barHalfWidth * 0.7,
         0.4,
       );
       ctx.restore();
