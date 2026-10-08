@@ -266,6 +266,14 @@ export const CRIT_CONFIG = {
     slideMs: 420, // the whip pan in over the floors, and back out
   },
 
+  // animatedCrits/flightStage — the stage every space-flight event flies on
+  flightStage: {
+    windUpMs: 250, // the frozen floors rumbling before the dive
+    diveMs: 350, // the floors zooming away as the stage's blue takes over
+    arriveMs: 650, // the floors rushing up out of the distance until the crash
+    holdMs: 350, // the crash's flash and blast before the screen unfreezes
+  },
+
   // badgeCrits/badgeCapsule — the mystery badge capsule a building earns once
   // every floor is at the level cap with every upgrade bought, opened from its
   // marker on the city map: on the reveal stage, the capsule drops in and rolls

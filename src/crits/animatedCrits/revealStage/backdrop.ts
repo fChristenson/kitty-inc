@@ -92,16 +92,18 @@ function backdropSprite(w: number, h: number): HTMLCanvasElement {
   return canvas;
 }
 
-// multiplies into the caller's globalAlpha
+// multiplies into the caller's globalAlpha; stripes off leaves just the sky
 export function drawStageBackdrop(
   ctx: CanvasRenderingContext2D,
   stage: StageRect,
   now: number,
+  stripes = true,
 ): void {
   const { x, y, w, h } = stage;
   const fade = ctx.globalAlpha;
   const feather = w * FEATHER;
   ctx.drawImage(backdropSprite(w, h), x - feather, y, w + feather * 2, h);
+  if (!stripes) return;
   ctx.save();
   ctx.beginPath();
   ctx.rect(x, y, w, h);
