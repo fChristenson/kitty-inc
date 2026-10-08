@@ -136,7 +136,12 @@ export type Draw = (
 ) => void;
 
 // a spot along bar i, `side` -1..1 of the way from its middle to its ends
-export const along = (r: Running, bars: Point[], bar: number, side: number) => ({
+export const along = (
+  r: Running,
+  bars: Point[],
+  bar: number,
+  side: number,
+) => ({
   x: bars[bar].x + side * (r.moment.barHalfWidth - 120),
   y: bars[bar].y,
 });
