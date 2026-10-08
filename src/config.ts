@@ -85,6 +85,8 @@ export const CONFIG = {
     // it doesn't guarantee a proc actually lands
     specialCritGatewayChance: 0.25,
     bonusTierGatewayChance: 0.01,
+    // a landed x3 crit chains straight into an x10 and an x50 this often
+    chainCritChance: 0.01,
     // a badge landing on a floor rolls these to turn foil, once it qualifies
     // (10 landed for shimmer, 100 for glitter)
     badgeShimmerChance: 0.1,

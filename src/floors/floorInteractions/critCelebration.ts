@@ -35,6 +35,26 @@ function celebrateTier(tier: CritTier): void {
   playTierFlash(tier, CRIT_TIER_CONFIG[tier].label, tierColor(tier));
 }
 
+// a crit chain: x3, x10 and x50 land in quick succession, each new number
+// landing over the ones before it
+const CHAIN_STEP_MS = 100;
+const CHAIN_TIERS: CritTier[] = ["crit", "mega", "ultra"];
+
+function celebrateCritChain(): void {
+  CHAIN_TIERS.forEach((tier, i) =>
+    setTimeout(
+      () =>
+        playTierFlash(
+          tier,
+          CRIT_TIER_CONFIG[tier].label,
+          tierColor(tier),
+          i > 0,
+        ),
+      i * CHAIN_STEP_MS,
+    ),
+  );
+}
+
 // chain crit (see upgradeButton.ts's isChainCrit/rollFloorBuyCrit's own chain
 // flag): the flash shows the word "Chain" instead of the tier's usual "x5"/
 // "x25"/"x125" number — a celebration-moment-only swap, the upgrade button's
@@ -126,7 +146,7 @@ function celebrateBooty(): void {
 // they're simply skipped while a special celebration is still due, rather
 // than piling up behind it (see triggerCritCelebration below)
 interface QueuedCelebration {
-  kind: CritProcKind | "bonusTier";
+  kind: CritProcKind | "bonusTier" | "critChain";
   queuedAt: number;
   maxAgeMs?: number;
   run: () => void;
@@ -216,6 +236,7 @@ export function triggerCritCelebration(
   procs?: Partial<CritProcFlags>,
   bonusTier: CritTier | null = null,
   onFollowUpProc?: (kind: CritProcKind) => void,
+  tierChain = false,
 ): void {
   if (isDetachedJobRunning()) {
     if (procs?.dejaVu) {
@@ -224,8 +245,15 @@ export function triggerCritCelebration(
     return;
   }
   const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
-  if (landed.length > 0) {
+  if (landed.length > 0 || tierChain) {
     const now = Date.now();
+    // the chain's numbers go first; the procs riding it flash after
+    if (tierChain)
+      specialCelebrationQueue.push({
+        kind: "critChain",
+        queuedAt: now,
+        run: celebrateCritChain,
+      });
     for (const kind of landed) {
       queueProcCelebration(kind, tier, now);
       // Deja Vu doesn't just FLASH extra procs, it grants them: each follow-up

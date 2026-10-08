@@ -23,6 +23,7 @@ import {
   getButtonCenter,
   triggerButtonPress as animateButtonPress,
   isCritUpgrade,
+  isTierChainCrit,
   getCritTier,
   getBonusTierCrit,
   consumeBonusTierCrit,
@@ -1884,7 +1885,10 @@ export function applyFloorCrit(
   if (!allowSpecialProcs) result = tierOnlyCrit(result.tier);
   const isGroundFloor = deps.floors.indexOf(floor) === 0;
   const count = CRIT_TIER_CONFIG[result.tier].multiplier;
-  for (let tick = 0; tick < count; tick++)
+  const chainTicks = result.tierChain
+    ? CRIT_TIER_CONFIG.mega.multiplier + CRIT_TIER_CONFIG.ultra.multiplier
+    : 0;
+  for (let tick = 0; tick < count + chainTicks; tick++)
     applyUpgradeTick(floor, isGroundFloor);
   const context: CritRewardContext = {
     deps,
@@ -1905,6 +1909,7 @@ export function applyFloorCrit(
     result,
     result.bonusTier,
     (kind) => grantFollowUpProc(kind, context),
+    result.tierChain,
   );
   for (const kind of landedProcKinds(result))
     revealFoilOf(deps, floor, kind, isGroundFloor);
@@ -2178,6 +2183,7 @@ export function handleFloorClick(
       const tier = getCritTier(floor)!;
       const procs = readCritProcs(floor);
       const bonusTier = getBonusTierCrit(floor);
+      const tierChain = isTierChainCrit(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
       const carriesEvent = takeClaimedEventProc(floor);
@@ -2192,7 +2198,11 @@ export function handleFloorClick(
       if (covered) {
         triggerButtonPress(floor);
       } else {
-        applyFloorCrit(deps, floor, Object.assign(procs, { tier, bonusTier }));
+        applyFloorCrit(
+          deps,
+          floor,
+          Object.assign(procs, { tier, bonusTier, tierChain }),
+        );
         // the special event this crit carried instead of a special crit
         if (carriesEvent && !cover) armTakenEventProc(floor, eventContext);
       }

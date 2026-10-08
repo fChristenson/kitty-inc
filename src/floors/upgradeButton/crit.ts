@@ -515,6 +515,7 @@ export function rollCritUpgrade(
   rollCrit(
     (result, landedProcs) => {
       critTiers.set(floor, result.tier);
+      if (result.tierChain) tierChainCrits.add(floor);
       for (const kind of landedProcs) {
         if (isFeaturedCritKind(kind)) forceCritProc(kind, floor);
       }
@@ -1017,9 +1018,23 @@ export function isCritUpgrade(floor: Floor): boolean {
   return critTiers.has(floor);
 }
 
+// armed x3 crits that chain into an x10 and an x50 when clicked
+const tierChainCrits = snapshotSet<Floor>();
+
+export function isTierChainCrit(floor: Floor): boolean {
+  return tierChainCrits.has(floor);
+}
+
+// dev/test-only: arms an x3 crit that chains
+export function forceTierChainCrit(floor: Floor): void {
+  forceTestCrit(floor, null, "crit", null, "upgrade");
+  tierChainCrits.add(floor);
+}
+
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
+  tierChainCrits.delete(floor);
   consumeCritProcs(floor);
   dropClaimedEventProc(floor);
 }

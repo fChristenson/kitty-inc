@@ -41,11 +41,13 @@ export function warmTierFlashes(): void {
 }
 
 // a landed tier's flash, tier-scaled; label/color let a piggyback proc show
-// its own text in place of the tier's "x5"/"x25"/"x125"
+// its own text in place of the tier's "x5"/"x25"/"x125"; stack keeps the
+// flash it lands on showing under it (a crit chain)
 export function playTierFlash(
   tier: CritTier,
   label: string,
   color: string,
+  stack = false,
 ): void {
   if (tier === "ultra") {
     // holdMs is an exact odd multiple of the blink's half-cycle (15 * 83.33ms
@@ -60,6 +62,7 @@ export function playTierFlash(
       blinkHz: 6,
       holdMs: 1250,
       priority: 2,
+      stack,
     });
     playPayout();
   } else if (tier === "mega") {
@@ -71,6 +74,7 @@ export function playTierFlash(
       strokeWidth: TIER_FLASH_STROKE_WIDTH.mega,
       priority: 1,
       minDurationMs: getJackpotDurationMs(),
+      stack,
     });
     playJackpot();
   } else {
@@ -81,6 +85,7 @@ export function playTierFlash(
       color,
       strokeWidth: TIER_FLASH_STROKE_WIDTH.crit,
       minDurationMs: getExplosionDurationMs(),
+      stack,
     });
     playCoinDrop();
     playExplosion();

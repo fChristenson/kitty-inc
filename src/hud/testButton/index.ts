@@ -262,6 +262,15 @@ export function wireBadgeCapsuleTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireCritChainTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#test-crit-chain")!
+    .addEventListener("click", onClick);
+}
+
 export function wireWispEventTestButton(
   container: HTMLElement,
   onClick: () => void,

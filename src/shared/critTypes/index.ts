@@ -970,6 +970,8 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   // whichever proc(s) fired, never itself eligible to roll a further nested
   // bonus
   bonusTier: CritTier | null;
+  // an x3 crit chaining straight into an x10 and an x50 (see rollCrit)
+  tierChain?: boolean;
   chain: boolean;
   dominoEffect: boolean;
   blueprint: boolean;
@@ -1065,7 +1067,10 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
 // (this array + CritRollResult's own field) instead of touching every
 // dispatch site by hand. bonusTier is excluded — it's a CritTier | null
 // modifier riding on an already-landed proc, not itself a boolean proc kind
-export type CritProcKind = Exclude<keyof CritRollResult, "tier" | "bonusTier">;
+export type CritProcKind = Exclude<
+  keyof CritRollResult,
+  "tier" | "bonusTier" | "tierChain"
+>;
 
 export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
   "chain",
@@ -2140,6 +2145,8 @@ export function rollCrit(
       : null;
   const landedProcs = [...kept];
   const result = critResult(tier, bonusTier);
+  if (tier === "crit" && critRandom() < CONFIG.crit.chainCritChance)
+    result.tierChain = true;
   for (const kind of landedProcs) result[kind] = true;
   notifyCritProcsArmed(landedProcs);
   onLanded(result, landedProcs);

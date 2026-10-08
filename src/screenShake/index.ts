@@ -160,6 +160,16 @@ let bgFlashLabel: string | null = null;
 let bgFlashColor: string = COLOR.purple;
 let bgFlashStrokeWidth = 8;
 
+// a crit chain's earlier numbers, frozen under the newest one covering them
+interface CoveredFlash {
+  label: string;
+  color: string;
+  strokeWidth: number;
+}
+let coveredFlashes: CoveredFlash[] = [];
+// how far each covered number sits right of and below the one over it
+const STACK_OFFSET_PX = 50;
+
 // an event's screen freeze hides the flash and stops its clock until it ends
 let flashPausedAt: number | null = null;
 
@@ -212,6 +222,8 @@ interface FlashRequest {
   priority: number;
   // the flash stays up at least this long (its hold stretches to fit)
   minDurationMs: number;
+  // keeps the playing flash showing under this one
+  stack: boolean;
 }
 
 // how long the grow-in (scale + rotate) phase takes, and the fade-out tail's base
@@ -232,6 +244,13 @@ function startFlash(req: FlashRequest): void {
     req.holdMs + iconExtraHoldMs(req),
     req.minDurationMs - GROWTH_DURATION_MS - fadeDurationMs,
   );
+  if (!req.stack) coveredFlashes = [];
+  else if (flashStartedAt !== null && flashLabel)
+    coveredFlashes.push({
+      label: flashLabel,
+      color: flashColor,
+      strokeWidth: flashStrokeWidth,
+    });
   flashStartedAt = now;
   flashLabel = req.label;
   flashColor = req.color;
@@ -292,6 +311,7 @@ export function triggerScreenShake(options?: {
   holdMs?: number;
   priority?: number;
   minDurationMs?: number;
+  stack?: boolean;
 }): void {
   const req: FlashRequest = {
     intensity: options?.intensity ?? 1,
@@ -302,6 +322,7 @@ export function triggerScreenShake(options?: {
     holdMs: options?.holdMs ?? 0,
     priority: options?.priority ?? 0,
     minDurationMs: options?.minDurationMs ?? 0,
+    stack: options?.stack ?? false,
   };
   const now = Date.now();
   kickShake(req.intensity, now);
@@ -762,6 +783,7 @@ function drawFlashLayers(
     // no foreground flash left to eventually clear it — never leave an
     // orphaned frozen background on screen forever
     bgFlashLabel = null;
+    coveredFlashes = [];
     return;
   }
   if (now >= flashEndsAt) {
@@ -769,6 +791,7 @@ function drawFlashLayers(
     flashEndsAt = null;
     activeFlashPriority = -1;
     bgFlashLabel = null;
+    coveredFlashes = [];
     return;
   }
 
@@ -796,6 +819,32 @@ function drawFlashLayers(
     alpha = 1 - (elapsed - holdEndsAt) / (totalLifetimeMs - holdEndsAt);
   }
 
+  // fading out with the number covering them, never blinking with it; each
+  // newer number sits up and left of the one under it, like stacked paper
+  const fade = elapsed >= holdEndsAt ? alpha : 1;
+  // in CSS px, whatever the canvas's world scale
+  const step =
+    (STACK_OFFSET_PX * (window.devicePixelRatio || 1)) / lastDrawScale;
+  // the whole stack centred on the screen
+  const shift = (coveredFlashes.length * step) / 2;
+  coveredFlashes.forEach((covered, i) => {
+    const depth = coveredFlashes.length - i;
+    drawFlashLayer(
+      ctx,
+      centerX + depth * step - shift,
+      centerY + depth * step - shift,
+      viewportWidth,
+      covered.label,
+      covered.color,
+      covered.strokeWidth,
+      fade,
+      1,
+      0,
+      1,
+      now,
+    );
+  });
+
   // the reveal plays over the start of the timeline without moving it, so
   // holds, blinks and their sound sync stay exactly where they were
   if (elapsed < ENTRY_LAND_MS) {
@@ -809,8 +858,8 @@ function drawFlashLayers(
 
   drawFlashLayer(
     ctx,
-    centerX,
-    centerY,
+    centerX - shift,
+    centerY - shift,
     viewportWidth,
     flashLabel,
     flashColor,

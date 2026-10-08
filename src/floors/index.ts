@@ -350,6 +350,7 @@ export {
   forceFeaturedCritUpgrade,
   forceFeaturedFloorBuyCrit,
   forceTestCrit,
+  forceTierChainCrit,
   forceSkipCritUpgrade,
   forceSkipFloorBuyCrit,
   forceRainCheckFloorBuyCrit,
