@@ -237,6 +237,9 @@ export function createCityMapView(
     container.querySelector<HTMLButtonElement>("#city-map-prev")!;
   const nextButton =
     container.querySelector<HTMLButtonElement>("#city-map-next")!;
+  const corpPointer = container.querySelector<HTMLElement>(
+    ".city-map__corp-pointer",
+  )!;
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
@@ -635,10 +638,11 @@ export function createCityMapView(
   // no previous city before the first one; the next city only opens up once every
   // building in this one has been bought
   function updateArrows(buildingCount: number): void {
-    const rewardsVisible = critBadges.visible;
-    prevButton.hidden = rewardsVisible || cityIndex === 0;
+    const covered = critBadges.visible || capsuleReveal !== null;
+    prevButton.hidden = covered || cityIndex === 0;
     nextButton.hidden =
-      rewardsVisible || buildingCount < (cityIndex + 1) * MARKER_COUNT;
+      covered || buildingCount < (cityIndex + 1) * MARKER_COUNT;
+    corpPointer.hidden = capsuleReveal !== null;
   }
 
   // the furthest page updateArrows would ever let the player walk to one tap at

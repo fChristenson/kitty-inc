@@ -90,6 +90,10 @@ export const CONFIG = {
     // a landed crit also lands on the floor above / below this often
     critUpChance: 0.03,
     critDownChance: 0.03,
+    // a landed crit is sometimes a random one instead, of any multiplier in
+    // this range
+    randomCritChance: 0.05,
+    randomCritRange: [3, 50] as [number, number],
     // a badge landing on a floor rolls these to turn foil, once it qualifies
     // (10 landed for shimmer, 100 for glitter)
     badgeShimmerChance: 0.1,

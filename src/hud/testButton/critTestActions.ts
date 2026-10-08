@@ -1261,6 +1261,7 @@ export function createTestButtonMarkup(): string {
           <button id="test-crit-chain" class="game__button">Crit Chain</button>
           <button class="game__button" data-crit-stack="up">Crit Up</button>
           <button class="game__button" data-crit-stack="down">Crit Down</button>
+          <button id="test-random-crit" class="game__button">Random Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

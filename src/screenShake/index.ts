@@ -12,7 +12,7 @@ import {
   onCritProcsArmed,
   type CritProcKind,
 } from "../shared/critTypes";
-import { drawCritText } from "../shared/critText";
+import { critFont, drawCritText } from "../shared/critText";
 import { runWhenIdle } from "../shared/idle";
 import { drawGoldShimmer } from "../shared/goldShimmer";
 import { isScreenFrozen } from "../shared/screenFreeze";
@@ -134,6 +134,8 @@ let flashStartedAt: number | null = null;
 // "is a flash still playing" without re-deriving it from elapsed-time math
 let flashEndsAt: number | null = null;
 let flashLabel = "CRIT";
+// the label whose width sets the flash's size (a random crit's widest number)
+let flashSizeLabel = "CRIT";
 let flashColor: string = COLOR.purple;
 let flashStrokeWidth = 8;
 // how many times/sec the flash strobes on/off during its hold phase, on top of the
@@ -163,6 +165,7 @@ let bgFlashStrokeWidth = 8;
 // stacked flashes' earlier numbers, frozen under the newest one covering them
 interface CoveredFlash {
   label: string;
+  sizeLabel: string;
   color: string;
   strokeWidth: number;
   // where it sits, CSS px from the newest one's own start spot
@@ -258,6 +261,11 @@ function startFlash(req: FlashRequest): void {
     req.minDurationMs - GROWTH_DURATION_MS - fadeDurationMs,
   );
   const stacking = req.stack !== null && flashStartedAt !== null && flashLabel;
+  const sizeLabel = spin
+    ? spin.sizeLabel
+    : stacking && req.label === flashLabel
+      ? flashSizeLabel
+      : req.label;
   if (!stacking) {
     coveredFlashes = [];
     flashX = 0;
@@ -265,6 +273,7 @@ function startFlash(req: FlashRequest): void {
   } else {
     coveredFlashes.push({
       label: flashLabel,
+      sizeLabel: flashSizeLabel,
       color: flashColor,
       strokeWidth: flashStrokeWidth,
       x: flashX,
@@ -279,8 +288,12 @@ function startFlash(req: FlashRequest): void {
         flashEndsAt - now - GROWTH_DURATION_MS - fadeDurationMs,
       );
   }
+  // a counted-up number is already on screen at full size: pop, don't spin in
+  flashPopsIn = spin !== null;
+  spin = null;
   flashStartedAt = now;
   flashLabel = req.label;
+  flashSizeLabel = sizeLabel;
   flashColor = req.color;
   flashStrokeWidth = req.strokeWidth;
   flashBlinkHz = req.blinkHz;
@@ -432,6 +445,9 @@ export function getScreenShakeOffset(now: number): { x: number; y: number } {
 // once and settles still. Plays over the start of the timeline without
 // shifting any timing (holds, blinks)
 const ENTRY_LAND_MS = 50;
+let flashPopsIn = false;
+const POP_IN_MS = 180;
+const POP_IN_SCALE = 0.2;
 const SETTLE_ROTATION_DEG = 1.25;
 const SETTLE_SCALE_AMOUNT = 0.025;
 const SETTLE_HZ = 1.8;
@@ -472,6 +488,7 @@ function settlePose(elapsedMs: number): { scale: number; rotation: number } {
 // side effect of clearing the state once expired
 export function isCritFlashActive(now: number): boolean {
   syncCritFlashPause(now);
+  if (spin && now - spin.startedAt < spin.spinMs) return true;
   return flashEndsAt !== null && (flashPausedAt ?? now) < flashEndsAt;
 }
 
@@ -638,6 +655,7 @@ function getFlashBitmap(
   color: string,
   strokeWidth: number,
   viewportWidth: number,
+  sizeLabel = label,
 ): FlashBitmap {
   const ctx = getScratchCtx();
   const measuredWidth = measureLabel(ctx, label);
@@ -645,6 +663,7 @@ function getFlashBitmap(
     ctx,
     label,
     viewportWidth,
+    sizeLabel,
   );
   const config = CRIT_ICON_BY_LABEL[label];
   const icon = config ? getCritIcon(config.name) : null;
@@ -732,9 +751,10 @@ function flashLayerScales(
   ctx: CanvasRenderingContext2D,
   label: string,
   viewportWidth: number,
+  sizeLabel = label,
 ): { targetScale: number; textScale: number } {
   const measuredWidth = measureLabel(ctx, label);
-  const targetScale = (viewportWidth * 0.8) / measuredWidth;
+  const targetScale = (viewportWidth * 0.8) / measureLabel(ctx, sizeLabel);
   const textScale =
     label === "Skip" ? measuredWidth / measureLabel(ctx, "Heavenly") : 1;
   return { targetScale, textScale };
@@ -785,7 +805,137 @@ export function drawCritFlash(
   syncCritFlashPause(now);
   if (flashPausedAt !== null) return;
   drawFlashLayers(ctx, centerX, centerY, viewportWidth, now);
+  drawCritSpin(ctx, centerX, centerY, viewportWidth, now);
   drawCritSparks(ctx, centerX, centerY, viewportWidth, now);
+}
+
+// a random crit counting up to its number like the total income readout,
+// at the size its own flash slams in at; drawn from baked glyphs
+interface SpinGlyphs {
+  // "x" then 0-9
+  sprites: HTMLCanvasElement[];
+  advances: number[];
+  pad: number;
+  font: number;
+}
+interface CritSpin {
+  glyphs: SpinGlyphs;
+  low: number;
+  range: number;
+  start: number;
+  steps: number;
+  // its widest number, which sets its size and its slam's
+  sizeLabel: string;
+  // on-screen font size, as a share of the viewport's width
+  sizeShare: number;
+  startedAt: number;
+  spinMs: number;
+}
+let spin: CritSpin | null = null;
+const spinGlyphCache = new Map<string, SpinGlyphs>();
+const SPIN_CHARS = "x0123456789";
+
+function getSpinGlyphs(
+  color: string,
+  strokeWidth: number,
+  res: number,
+): SpinGlyphs {
+  const key = `${color}|${strokeWidth}|${res}`;
+  const cached = spinGlyphCache.get(key);
+  if (cached) return cached;
+  const font = FLASH_FONT_SIZE * res;
+  const pad = Math.ceil(strokeWidth * res);
+  const scratch = getScratchCtx();
+  scratch.font = critFont(font);
+  const advances = [...SPIN_CHARS].map((c) => scratch.measureText(c).width);
+  const sprites = [...SPIN_CHARS].map((c, i) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(advances[i] + pad * 2);
+    canvas.height = Math.ceil(font * 1.25 + pad * 2);
+    drawCritText(
+      canvas.getContext("2d")!,
+      c,
+      canvas.width / 2,
+      canvas.height / 2,
+      color,
+      { fontSize: font, strokeWidth: strokeWidth * res },
+    );
+    return canvas;
+  });
+  const glyphs = { sprites, advances, pad, font };
+  spinGlyphCache.set(key, glyphs);
+  return glyphs;
+}
+
+// numbers the count runs through a second
+const SPIN_RATE = 120;
+
+export function playCritSpin(
+  [low, high]: [number, number],
+  to: number,
+  color: string,
+  strokeWidth: number,
+  spinMs: number,
+): void {
+  const scratch = getScratchCtx();
+  let sizeLabel = `x${to}`;
+  for (let n = low; n <= high; n++)
+    if (measureLabel(scratch, `x${n}`) > measureLabel(scratch, sizeLabel))
+      sizeLabel = `x${n}`;
+  // the same share of the screen its own flash fills
+  const sizeShare = 0.8 / measureLabel(scratch, sizeLabel);
+  const onScreen =
+    FLASH_FONT_SIZE * sizeShare * lastViewportWidth * lastDrawScale;
+  const res = Math.min(3, Math.max(1, Math.ceil(onScreen / FLASH_FONT_SIZE)));
+  const range = high - low + 1;
+  const steps = Math.round((spinMs / 1000) * SPIN_RATE);
+  spin = {
+    glyphs: getSpinGlyphs(color, strokeWidth, res),
+    low,
+    range,
+    // so the count wraps round the range and ends on its number
+    start: (((to - low - steps) % range) + range) % range,
+    steps,
+    sizeLabel,
+    sizeShare: sizeShare * FLASH_FONT_SIZE,
+    startedAt: Date.now(),
+    spinMs,
+  };
+}
+
+function drawCritSpin(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  viewportWidth: number,
+  now: number,
+): void {
+  if (!spin) return;
+  const t = (now - spin.startedAt) / spin.spinMs;
+  // held on its number until the slam replaces it (startFlash)
+  if (t >= 2) {
+    spin = null;
+    return;
+  }
+  const { glyphs, low, range, start, steps } = spin;
+  const step = Math.floor(Math.min(1, Math.max(0, t)) * steps);
+  const text = `x${low + ((start + step) % range)}`;
+  const scale = (spin.sizeShare * viewportWidth) / glyphs.font;
+  let width = 0;
+  for (const c of text) width += glyphs.advances[SPIN_CHARS.indexOf(c)];
+  let x = centerX - (width * scale) / 2;
+  for (const c of text) {
+    const i = SPIN_CHARS.indexOf(c);
+    const sprite = glyphs.sprites[i];
+    ctx.drawImage(
+      sprite,
+      x - glyphs.pad * scale,
+      centerY - (sprite.height * scale) / 2,
+      sprite.width * scale,
+      sprite.height * scale,
+    );
+    x += glyphs.advances[i] * scale;
+  }
 }
 
 function drawFlashLayers(
@@ -887,11 +1037,16 @@ function drawFlashLayers(
       0,
       1,
       now,
+      covered.sizeLabel,
     );
 
   // the reveal plays over the start of the timeline without moving it, so
   // holds, blinks and their sound sync stay exactly where they were
-  if (elapsed < ENTRY_LAND_MS) {
+  if (flashPopsIn) {
+    if (elapsed < POP_IN_MS)
+      growthScale *=
+        1 + POP_IN_SCALE * Math.sin((Math.PI * elapsed) / POP_IN_MS);
+  } else if (elapsed < ENTRY_LAND_MS) {
     const entry = entryPose(elapsed / ENTRY_LAND_MS);
     growthScale *= entry.scale;
     raysScale = entry.scale;
@@ -913,6 +1068,7 @@ function drawFlashLayers(
     rotation,
     raysScale,
     elapsed,
+    flashSizeLabel,
   );
 }
 
@@ -945,12 +1101,24 @@ function drawFlashLayer(
   rotation: number,
   raysScale: number,
   motionMs: number,
+  sizeLabel = label,
 ): void {
   // an empty label is a shake with no text at all
   if (!label) return;
   const scratch = getScratchCtx();
-  const { targetScale } = flashLayerScales(scratch, label, viewportWidth);
-  const bitmap = getFlashBitmap(label, color, strokeWidth, viewportWidth);
+  const { targetScale } = flashLayerScales(
+    scratch,
+    label,
+    viewportWidth,
+    sizeLabel,
+  );
+  const bitmap = getFlashBitmap(
+    label,
+    color,
+    strokeWidth,
+    viewportWidth,
+    sizeLabel,
+  );
   ctx.save();
   ctx.globalAlpha = alpha;
   ctx.translate(centerX, centerY);

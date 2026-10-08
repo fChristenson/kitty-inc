@@ -271,6 +271,15 @@ export function wireCritChainTestButton(
     .addEventListener("click", onClick);
 }
 
+export function wireRandomCritTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#test-random-crit")!
+    .addEventListener("click", onClick);
+}
+
 // arms a crit that also lands on the floor above or below
 export function wireCritUpDownTestButtons(
   container: HTMLElement,

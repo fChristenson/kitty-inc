@@ -1,7 +1,12 @@
 // first: every module's Date.now() reads the game clock
 import "./shared/gameClock";
 import "./style.css";
-import { forceTestCrit, forceTierChainCrit, forceCritUpDown } from "./floors";
+import {
+  forceTestCrit,
+  forceTierChainCrit,
+  forceCritUpDown,
+  forceRandomCrit,
+} from "./floors";
 import { wireCritTestActions } from "./hud";
 import {
   add,
@@ -195,6 +200,7 @@ import {
   wireBadgeCapsuleTestButton,
   wireCritChainTestButton,
   wireCritUpDownTestButtons,
+  wireRandomCritTestButton,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireTwisterEventTestButton,
@@ -702,6 +708,10 @@ async function main() {
     wireCritUpDownTestButtons(app, (up) => {
       const floor = buildings[activeBuildingIndex]?.[0];
       if (floor) forceCritUpDown(floor, up);
+    });
+    wireRandomCritTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (floor) forceRandomCrit(floor);
     });
     // the event modules load in their own chunk (floors/eventLoader): each
     // event test button loads it first, then runs with it as `ev`

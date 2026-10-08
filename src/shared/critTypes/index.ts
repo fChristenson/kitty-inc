@@ -975,6 +975,8 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   // the crit also landing on the floor above / below
   critUp?: boolean;
   critDown?: boolean;
+  // a random crit's own multiplier, in place of the tier's (see rollCrit)
+  randomCrit?: number;
   chain: boolean;
   dominoEffect: boolean;
   blueprint: boolean;
@@ -1072,7 +1074,7 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
 // modifier riding on an already-landed proc, not itself a boolean proc kind
 export type CritProcKind = Exclude<
   keyof CritRollResult,
-  "tier" | "bonusTier" | "tierChain" | "critUp" | "critDown"
+  "tier" | "bonusTier" | "tierChain" | "critUp" | "critDown" | "randomCrit"
 >;
 
 export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
@@ -2124,12 +2126,11 @@ export function rollCrit(
 ): void {
   const tier = rollTier();
   if (tier === null) return;
-  const landed =
+  const special =
     allowSpecialProcs &&
     critRandom() < SPECIAL_CRIT_GATEWAY.chance &&
-    !claimSpecialSlot?.()
-      ? rollLandedProcs()
-      : [];
+    !claimSpecialSlot?.();
+  const landed = special ? rollLandedProcs() : [];
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS, critRandom));
   // real-roll-only tally for the "Special Crits" info menu's collectible
   // count badges — see shared/critTypes/critProcCounts.ts
@@ -2148,10 +2149,15 @@ export function rollCrit(
       : null;
   const landedProcs = [...kept];
   const result = critResult(tier, bonusTier);
-  if (tier === "crit" && critRandom() < CONFIG.crit.chainCritChance)
-    result.tierChain = true;
-  if (critRandom() < CONFIG.crit.critUpChance) result.critUp = true;
-  if (critRandom() < CONFIG.crit.critDownChance) result.critDown = true;
+  if (special) {
+    if (critRandom() < CONFIG.crit.randomCritChance) {
+      const [low, high] = CONFIG.crit.randomCritRange;
+      result.randomCrit = low + Math.floor(critRandom() * (high - low + 1));
+    } else if (tier === "crit" && critRandom() < CONFIG.crit.chainCritChance)
+      result.tierChain = true;
+    if (critRandom() < CONFIG.crit.critUpChance) result.critUp = true;
+    if (critRandom() < CONFIG.crit.critDownChance) result.critDown = true;
+  }
   for (const kind of landedProcs) result[kind] = true;
   notifyCritProcsArmed(landedProcs);
   onLanded(result, landedProcs);
