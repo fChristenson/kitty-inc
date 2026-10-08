@@ -519,6 +519,7 @@ export function rollCritUpgrade(
       if (result.tierChain) tierChainCrits.add(floor);
       if (result.randomCrit) randomCrits.set(floor, result.randomCrit);
       if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
+      if (result.rapidFireCrit) rapidFireCrits.add(floor);
       if (result.critUp) critUpCrits.add(floor);
       if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
@@ -1064,7 +1065,7 @@ export function getRandomCrit(floor: Floor): number | undefined {
 // dev/test-only: arms a random crit
 export function forceRandomCrit(floor: Floor): void {
   forceTestCrit(floor, null, "crit", null, "upgrade");
-  const [low, high] = CONFIG.crit.randomCritRange;
+  const [low, high] = CONFIG.specialCrits.randomCrit.range;
   randomCrits.set(floor, low + Math.floor(Math.random() * (high - low + 1)));
 }
 
@@ -1083,6 +1084,21 @@ export function forceMergeCrit(floor: Floor): void {
   mergeCrits.set(floor, pick());
 }
 
+// armed rapid fire crits: their number's characters punch the floor's bar
+const rapidFireCrits = snapshotSet<Floor>();
+
+export function isRapidFireCrit(floor: Floor): boolean {
+  return rapidFireCrits.has(floor);
+}
+
+// dev/test-only: arms a crit of a random tier that punches
+export function forceRapidFireCrit(floor: Floor): void {
+  const tiers: CritTier[] = ["crit", "mega", "ultra"];
+  const tier = tiers[Math.floor(Math.random() * tiers.length)];
+  forceTestCrit(floor, null, tier, null, "upgrade");
+  rapidFireCrits.add(floor);
+}
+
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
@@ -1091,6 +1107,7 @@ export function consumeCritUpgrade(floor: Floor): void {
   critDownCrits.delete(floor);
   randomCrits.delete(floor);
   mergeCrits.delete(floor);
+  rapidFireCrits.delete(floor);
   consumeCritProcs(floor);
   dropClaimedEventProc(floor);
 }

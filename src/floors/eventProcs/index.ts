@@ -5,7 +5,6 @@
 // it; the events of one type share that type's cooldown
 import type { Floor } from "../../gameState";
 import type { CritProcKind, CritTier } from "../../shared/critTypes";
-import { critRandom } from "../../shared/critRandom";
 import { CONFIG } from "../../config";
 import { runWhenIdle } from "../../shared/idle";
 import { loadNextEventPart } from "../eventLoader";
@@ -80,18 +79,12 @@ const covers = new Map<string, EventCritCover>();
 type FloorEventProc = EventProcDef<Floor, EventProcContext>;
 type FloorEventPool = EventProcPool<Floor, EventProcContext>;
 
-// what a regular crit's special slot carries: one of these, picked by its
-// weight in CONFIG.specialCrits. A badge crit (featured or other special crit)
-// rolls in shared/critTypes' rollCrit; each event crit type is a pool of
-// events here, with its own cooldown
+// an animated crit: what a regular crit's special slot carries when
+// shared/critTypes' rollCrit picks it (CONFIG.specialCrits). Each event crit
+// type is a pool of events here, with its own cooldown
 export type EventCritType = "animatedCrit";
-export type SpecialCritType = "badgeCrit" | EventCritType;
 
 const EVENT_CRIT_TYPES: EventCritType[] = ["animatedCrit"];
-const SPECIAL_CRIT_TYPES: SpecialCritType[] = [
-  "badgeCrit",
-  ...EVENT_CRIT_TYPES,
-];
 const pools = new Map<EventCritType, FloorEventPool>(
   EVENT_CRIT_TYPES.map((type) => [
     type,
@@ -122,20 +115,13 @@ export function getClaimedEventCover(floor: Floor): EventCritCover | null {
   return null;
 }
 
-// picks what the crit being rolled on floor carries, by CONFIG.specialCrits'
-// weights: true when an event crit type's pool claimed it; false leaves it to
-// the badge crit roll (also when the picked type is cooling down or none of
-// its events can arm)
+// the crit being rolled on floor carries an animated crit: true when its pool
+// claimed one, false when it's cooling down or none of its events can arm
 export function claimEventProc(
   floor: Floor,
   context: EventProcContext,
 ): boolean {
-  const weight = (type: SpecialCritType) => CONFIG.specialCrits[type].weight;
-  let roll =
-    critRandom() * SPECIAL_CRIT_TYPES.reduce((sum, t) => sum + weight(t), 0);
-  const type =
-    SPECIAL_CRIT_TYPES.find((t) => (roll -= weight(t)) < 0) ?? "badgeCrit";
-  return type !== "badgeCrit" && pools.get(type)!.claim(floor, context);
+  return pools.get("animatedCrit")!.claim(floor, context);
 }
 
 // call right before the player's click spends floor's crit: true when that

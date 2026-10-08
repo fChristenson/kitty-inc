@@ -240,6 +240,7 @@ interface FlashRequest {
   stack: FlashStack | null;
   // buzzes just this long instead of the whole flash (0: the whole flash)
   pulseMs: number;
+  punch: FlashPunch | null;
 }
 
 // how long the grow-in (scale + rotate) phase takes, and the fade-out tail's base
@@ -288,8 +289,14 @@ function startFlash(req: FlashRequest): void {
         flashEndsAt - now - GROWTH_DURATION_MS - fadeDurationMs,
       );
   }
-  // a counted-up number pops; a merge's sum slams down from big
-  flashEntry = spin !== null ? "pop" : merge !== null ? "slam" : "spin";
+  // a counted-up number pops; a merge's sum or a punching number slams down
+  // from big
+  flashEntry =
+    spin !== null
+      ? "pop"
+      : merge !== null || (req.punch && !stacking)
+        ? "slam"
+        : "spin";
   if (flashEntry === "slam")
     setTimeout(() => kickShake(SLAM_SHAKE, Date.now()), SLAM_MS);
   spin = null;
@@ -301,6 +308,8 @@ function startFlash(req: FlashRequest): void {
   flashStrokeWidth = req.strokeWidth;
   flashBlinkHz = req.blinkHz;
   flashHoldMs = holdMs;
+  flashPunch = stacking ? null : req.punch;
+  if (flashPunch) setTimeout(() => warmPunchGlyphs(req), 50);
   activeFlashPriority = stacking
     ? Math.max(activeFlashPriority, req.priority)
     : req.priority;
@@ -359,6 +368,7 @@ export function triggerScreenShake(options?: {
   minDurationMs?: number;
   stack?: FlashStack | null;
   pulseMs?: number;
+  punch?: FlashPunch | null;
 }): void {
   const req: FlashRequest = {
     intensity: options?.intensity ?? 1,
@@ -371,6 +381,7 @@ export function triggerScreenShake(options?: {
     minDurationMs: options?.minDurationMs ?? 0,
     stack: options?.stack ?? null,
     pulseMs: options?.pulseMs ?? 0,
+    punch: options?.punch ?? null,
   };
   const now = Date.now();
   kickShake(req.intensity, now);
@@ -499,6 +510,7 @@ export function isCritFlashActive(now: number): boolean {
   syncCritFlashPause(now);
   if (spin && now - spin.startedAt < spin.spinMs) return true;
   if (merge && now - merge.startedAt < merge.mergeMs) return true;
+  if (punch) return true;
   return flashEndsAt !== null && (flashPausedAt ?? now) < flashEndsAt;
 }
 
@@ -828,6 +840,7 @@ export function drawCritFlash(
   drawFlashLayers(ctx, centerX, centerY, viewportWidth, now);
   drawCritSpin(ctx, centerX, centerY, viewportWidth, now);
   drawCritMerge(ctx, centerX, centerY, viewportWidth, now);
+  drawCritPunch(ctx, centerX, centerY, now);
   drawCritSparks(ctx, centerX, centerY, viewportWidth, now);
 }
 
@@ -1095,6 +1108,117 @@ function drawCritMerge(
   }
 }
 
+// a rapid fire crit: once its flash has held, its characters fly off one
+// after another into its floor's income bar, each punching it
+export interface FlashPunch {
+  // where it lands, from the flash's middle, in the flash's units
+  target: () => { x: number; y: number };
+  onHit: (index: number, count: number) => void;
+}
+interface Punch {
+  glyphs: SpinGlyphs;
+  chars: number[];
+  // each character's start, from the flash's middle
+  startX: number[];
+  scale: number;
+  startedAt: number;
+  target: FlashPunch["target"];
+  onHit: FlashPunch["onHit"];
+  hits: number;
+}
+let flashPunch: FlashPunch | null = null;
+let punch: Punch | null = null;
+// how long a punching flash shows before its number flies
+const PUNCH_SIT_MS = 400;
+// the first character's flight, then each next one this much later
+const PUNCH_FLY_MS = 180;
+const PUNCH_STAGGER_MS = 80;
+// the characters' font size as they hit, in the flash's units (about twice
+// the bar's height), and how far apart they land along it
+const PUNCH_END_FONT = 200;
+const PUNCH_SPREAD = 130;
+const PUNCH_SHAKE = 0.5;
+
+function punchSizeShare(sizeLabel: string): number {
+  return (FLASH_FONT_SIZE * 0.8) / measureLabel(getScratchCtx(), sizeLabel);
+}
+
+function warmPunchGlyphs(req: FlashRequest): void {
+  const share = punchSizeShare(flashSizeLabel);
+  getSpinGlyphs(req.color, req.strokeWidth, spinGlyphRes(share));
+}
+
+function launchPunch(
+  { target, onHit }: FlashPunch,
+  viewportWidth: number,
+  now: number,
+): void {
+  const chars = [...flashLabel].map((c) => SPIN_CHARS.indexOf(c));
+  if (chars.some((i) => i < 0)) return;
+  const share = punchSizeShare(flashSizeLabel);
+  const glyphs = getSpinGlyphs(
+    flashColor,
+    flashStrokeWidth,
+    spinGlyphRes(share),
+  );
+  const scale = (share * viewportWidth) / glyphs.font;
+  let x = (-glyphTextWidth(glyphs, flashLabel) * scale) / 2;
+  const startX = chars.map((i) => {
+    const mid = x + (glyphs.advances[i] * scale) / 2;
+    x += glyphs.advances[i] * scale;
+    return mid;
+  });
+  punch = {
+    glyphs,
+    chars,
+    startX,
+    scale,
+    startedAt: now,
+    target,
+    onHit,
+    hits: 0,
+  };
+}
+
+function drawCritPunch(
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  now: number,
+): void {
+  if (!punch) return;
+  const ms = now - punch.startedAt;
+  const count = punch.chars.length;
+  const to = punch.target();
+  for (let i = 0; i < count; i++) {
+    const hitAt = PUNCH_FLY_MS + i * PUNCH_STAGGER_MS;
+    if (ms >= hitAt) {
+      if (punch.hits === i) {
+        punch.hits++;
+        kickShake(PUNCH_SHAKE, now);
+        punch.onHit(i, count);
+      }
+      continue;
+    }
+    // speeding up the whole way, so it hits at full speed
+    const u = Math.max(0, ms / hitAt);
+    const p = u * u;
+    const sprite = punch.glyphs.sprites[punch.chars[i]];
+    const x =
+      centerX +
+      punch.startX[i] +
+      (to.x + (i - (count - 1) / 2) * PUNCH_SPREAD - punch.startX[i]) * p;
+    const y = centerY + to.y * p;
+    const s =
+      punch.scale + (PUNCH_END_FONT / punch.glyphs.font - punch.scale) * p;
+    // stretched along its fall
+    const w = sprite.width * s * (1 - 0.3 * u);
+    const h = sprite.height * s * (1 + 0.5 * u);
+    ctx.drawImage(sprite, x - w / 2, y - h / 2, w, h);
+  }
+  if (punch.hits >= count) punch = null;
+}
+
 function drawFlashLayers(
   ctx: CanvasRenderingContext2D,
   centerX: number,
@@ -1139,6 +1263,16 @@ function drawFlashLayers(
 
   const elapsed = now - flashStartedAt;
   const holdEndsAt = GROWTH_DURATION_MS + flashHoldMs;
+  // a punching flash's number flies off into its bar after a short sit
+  if (flashPunch && elapsed >= Math.min(holdEndsAt, PUNCH_SIT_MS)) {
+    launchPunch(flashPunch, viewportWidth, now);
+    flashPunch = null;
+    flashStartedAt = null;
+    flashEndsAt = null;
+    activeFlashPriority = -1;
+    coveredFlashes = [];
+    return;
+  }
   const totalLifetimeMs = flashEndsAt - flashStartedAt;
 
   const settle = settlePose(elapsed);

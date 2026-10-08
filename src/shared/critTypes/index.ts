@@ -18,7 +18,7 @@ import type { BigNumber } from "../../shared/bigNumber";
 import { CONFIG } from "../../config";
 import { critRandom } from "../critRandom";
 import { COLOR } from "../../palette";
-import { recordCritProcLanded } from "./critProcCounts";
+import { recordCritProcLanded, type BadgeFoil } from "./critProcCounts";
 import {
   FEATURED_CRITS,
   FEATURED_CRIT_KINDS,
@@ -979,6 +979,11 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   randomCrit?: number;
   // a merge crit's second number, added to the tier's
   mergeCrit?: CritTier;
+  // a rapid fire crit: its number's characters punch its floor's bar once
+  // it has flashed
+  rapidFireCrit?: boolean;
+  // a badge crit whose landed badges turn this foil, once they qualify
+  badgeFoil?: BadgeFoil;
   chain: boolean;
   dominoEffect: boolean;
   blueprint: boolean;
@@ -1083,6 +1088,8 @@ export type CritProcKind = Exclude<
   | "critDown"
   | "randomCrit"
   | "mergeCrit"
+  | "rapidFireCrit"
+  | "badgeFoil"
 >;
 
 export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
@@ -2032,6 +2039,22 @@ function rollTier(): CritTier | null {
   return null;
 }
 
+type SpecialCritType = keyof typeof CONFIG.specialCrits;
+const SPECIAL_CRIT_TYPES = Object.keys(
+  CONFIG.specialCrits,
+) as SpecialCritType[];
+
+// what a gateway-passing crit's special slot carries, each type at its
+// CONFIG.specialCrits chance
+function pickSpecialCrit(): SpecialCritType {
+  let roll = critRandom();
+  return (
+    SPECIAL_CRIT_TYPES.find(
+      (t) => (roll -= CONFIG.specialCrits[t].chance) < 0,
+    ) ?? "badgeCrit"
+  );
+}
+
 // always lands a tier, weighted by each tier's own relative chance
 export function pickCritTierByOdds(): CritTier {
   const total = CRIT_TIER_ORDER.reduce(
@@ -2127,18 +2150,23 @@ export function rollCrit(
   // reacting to what landed can walk it instead of all of CRIT_PROC_KINDS
   onLanded: (result: CritRollResult, landedProcs: CritProcKind[]) => void,
   allowSpecialProcs = true,
-  // an event crit type (animatedCrit, floors/eventProcs)
-  // taking the gateway's slot, true when it did — then no badge crit rolls at
-  // all, so only one or the other lands
+  // an animated crit (floors/eventProcs) taking the slot, true when it did;
+  // false leaves the slot to a badge crit
   claimSpecialSlot?: () => boolean,
 ): void {
   const tier = rollTier();
   if (tier === null) return;
-  const special =
-    allowSpecialProcs &&
-    critRandom() < SPECIAL_CRIT_GATEWAY.chance &&
-    !claimSpecialSlot?.();
-  const landed = special ? rollLandedProcs() : [];
+  const slot =
+    allowSpecialProcs && critRandom() < SPECIAL_CRIT_GATEWAY.chance
+      ? pickSpecialCrit()
+      : null;
+  const badge =
+    slot === "badgeCrit" ||
+    slot === "badgeShimmer" ||
+    slot === "badgeGlitter" ||
+    (slot === "animatedCrit" && !claimSpecialSlot?.()) ||
+    (slot === "chainCrit" && tier !== "crit");
+  const landed = badge ? rollLandedProcs() : [];
   const kept = new Set(pickAtMost(landed, MAX_SPECIAL_CRIT_PROCS, critRandom));
   // real-roll-only tally for the "Special Crits" info menu's collectible
   // count badges — see shared/critTypes/critProcCounts.ts
@@ -2157,17 +2185,16 @@ export function rollCrit(
       : null;
   const landedProcs = [...kept];
   const result = critResult(tier, bonusTier);
-  if (special) {
-    if (critRandom() < CONFIG.crit.randomCritChance) {
-      const [low, high] = CONFIG.crit.randomCritRange;
-      result.randomCrit = low + Math.floor(critRandom() * (high - low + 1));
-    } else if (critRandom() < CONFIG.crit.mergeCritChance)
-      result.mergeCrit = pickCritTierByOdds();
-    else if (tier === "crit" && critRandom() < CONFIG.crit.chainCritChance)
-      result.tierChain = true;
-    if (critRandom() < CONFIG.crit.critUpChance) result.critUp = true;
-    if (critRandom() < CONFIG.crit.critDownChance) result.critDown = true;
-  }
+  if (slot === "chainCrit" && tier === "crit") result.tierChain = true;
+  else if (slot === "critUp") result.critUp = true;
+  else if (slot === "critDown") result.critDown = true;
+  else if (slot === "randomCrit") {
+    const [low, high] = CONFIG.specialCrits.randomCrit.range;
+    result.randomCrit = low + Math.floor(critRandom() * (high - low + 1));
+  } else if (slot === "mergeCrit") result.mergeCrit = pickCritTierByOdds();
+  else if (slot === "rapidFireCrit") result.rapidFireCrit = true;
+  else if (slot === "badgeShimmer") result.badgeFoil = "shimmer";
+  else if (slot === "badgeGlitter") result.badgeFoil = "glitter";
   for (const kind of landedProcs) result[kind] = true;
   notifyCritProcsArmed(landedProcs);
   onLanded(result, landedProcs);

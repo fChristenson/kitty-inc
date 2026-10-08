@@ -23,6 +23,7 @@ import {
   getHoldHeat,
 } from "../upgradeButton";
 import { getWiggleRotation } from "../../shared/wiggle";
+import { drawPoppingCritText } from "../../shared/critText";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
 import {
   createAbsorbPulse,
@@ -150,6 +151,45 @@ const BAR_PRESS_FREQUENCY = 26;
 
 export function triggerIncomeBarPress(floor: Floor): void {
   barPressedAt.set(floor, Date.now());
+}
+
+// a rapid fire crit's characters punching the bar (screenShake's FlashPunch): each hit jolts
+// it down and flashes it white; the levels it gave rise off it
+const barPunches = new WeakMap<
+  Floor,
+  { hitAt: number; label: string | null; labelAt: number }
+>();
+// of the bar's height
+const PUNCH_JOLT = 0.45;
+const PUNCH_DECAY_MS = 90;
+const PUNCH_WOBBLE = 0.05;
+const PUNCH_SQUASH = 0.4;
+const PUNCH_SPREAD = 0.12;
+const PUNCH_FLASH_MS = 300;
+const PUNCH_RING_MS = 320;
+const PUNCH_LABEL_MS = 1000;
+const PUNCH_LABEL_RISE = 70;
+const PUNCH_LABEL_FONT = 80;
+
+// label: what the first hit gave ("+10 Lvl"); later hits keep it
+export function punchIncomeBar(floor: Floor, label: string | null): void {
+  const now = Date.now();
+  const punch = barPunches.get(floor);
+  if (punch && label === null) punch.hitAt = now;
+  else barPunches.set(floor, { hitAt: now, label, labelAt: now });
+}
+
+function punchSince(floor: Floor, now: number) {
+  const punch = barPunches.get(floor);
+  if (!punch) return null;
+  if (
+    now - punch.labelAt > PUNCH_LABEL_MS &&
+    now - punch.hitAt > PUNCH_FLASH_MS
+  ) {
+    barPunches.delete(floor);
+    return null;
+  }
+  return punch;
 }
 
 function incomeBarPressScale(floor: Floor, now: number): number {
@@ -560,6 +600,14 @@ export function drawIncomePanel(
   const tension = overtimeGaugeVisible ? getTargetTension(floor, "bar") : null;
 
   const barCenter = getIncomeBarCenter(isGroundFloor);
+  const punch = punchSince(floor, now);
+  const sincePunch = punch ? now - punch.hitAt : Infinity;
+  const punchK =
+    sincePunch === Infinity ? 0 : Math.exp(-sincePunch / PUNCH_DECAY_MS);
+  const punchJolt =
+    punchK > 0
+      ? punchK * PUNCH_JOLT * BAR_H * Math.cos(sincePunch * PUNCH_WOBBLE)
+      : 0;
   const slam = getSlamPose(floor, "bar", now);
   const drawBar = (): void =>
     drawSlamTarget(
@@ -572,7 +620,7 @@ export function drawIncomePanel(
     );
   const drawBarBody = (): void => {
     ctx.save();
-    ctx.translate(barCenter.x, barCenter.y);
+    ctx.translate(barCenter.x, barCenter.y + punchJolt);
     if (cancellationArmed) ctx.rotate(getWiggleRotation(now));
     else if (tension) ctx.rotate(tension.rotation);
     else if (flashStrength > 0)
@@ -585,6 +633,12 @@ export function drawIncomePanel(
         ? (overtimeAbsorb.get(floor)?.scale(now) ?? 1)
         : 1);
     ctx.scale(pressScale, pressScale);
+    if (punchK > 0.01) {
+      // slammed flat onto its bottom edge, springing back
+      ctx.translate(0, BAR_H / 2);
+      ctx.scale(1 + PUNCH_SPREAD * punchK, 1 - PUNCH_SQUASH * punchK);
+      ctx.translate(0, -BAR_H / 2);
+    }
     ctx.translate(-barCenter.x, -barCenter.y);
 
     // locked floors don't accrue, so their bar stays empty and its cycle hasn't started yet
@@ -715,6 +769,13 @@ export function drawIncomePanel(
       ctx.fill();
       ctx.globalAlpha = 1;
     }
+    if (sincePunch < PUNCH_FLASH_MS) {
+      ctx.globalAlpha = 1 - sincePunch / PUNCH_FLASH_MS;
+      roundRect(ctx, barX, barY, barW, barH, barRadius);
+      ctx.fillStyle = COLOR.white;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
 
     // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
     // time, never advanced), so the rate text uses the static full-interval formatter
@@ -744,4 +805,54 @@ export function drawIncomePanel(
   // overtime's coin stream powers the bar up like every other stream target
   if (!drawTargetStream(ctx, floor, "bar", barCenter.x, barCenter.y, drawBar))
     drawBar();
+  if (sincePunch < PUNCH_RING_MS) {
+    // the punch's impact: a white flash and a gold ring bursting off the bar
+    const t = sincePunch / PUNCH_RING_MS;
+    ctx.save();
+    ctx.globalAlpha = (1 - t) * 0.9;
+    ctx.fillStyle = COLOR.white;
+    ctx.beginPath();
+    ctx.ellipse(
+      barCenter.x,
+      barCenter.y,
+      barW * (0.16 * (1 - t) + 0.04),
+      barH * (0.9 * (1 - t) + 0.3),
+      0,
+      0,
+      Math.PI * 2,
+    );
+    ctx.fill();
+    ctx.strokeStyle = COLOR.starYellow;
+    ctx.lineWidth = 24 * (1 - t) + 4;
+    ctx.beginPath();
+    ctx.ellipse(
+      barCenter.x,
+      barCenter.y,
+      barW * (0.12 + 0.48 * t),
+      barH * (0.6 + 2 * t),
+      0,
+      0,
+      Math.PI * 2,
+    );
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (punch?.label) {
+    const t = (now - punch.labelAt) / PUNCH_LABEL_MS;
+    if (t < 1) {
+      ctx.save();
+      ctx.globalAlpha = t < 0.7 ? 1 : (1 - t) / 0.3;
+      drawPoppingCritText(
+        ctx,
+        punch.label,
+        barCenter.x,
+        barY - PUNCH_LABEL_FONT * 0.6 - PUNCH_LABEL_RISE * (1 - (1 - t) ** 2),
+        COLOR.heavenlyGold,
+        punch.labelAt,
+        now,
+        { fontSize: PUNCH_LABEL_FONT, strokeWidth: 10 },
+      );
+      ctx.restore();
+    }
+  }
 }

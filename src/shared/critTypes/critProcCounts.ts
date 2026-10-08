@@ -7,7 +7,6 @@
 // index.ts) — dev/test "force" buttons deliberately don't bump this, so
 // testing a proc doesn't inflate the player's real collection count.
 import type { CritProcKind } from "./index";
-import { CONFIG } from "../../config";
 
 const STORAGE_KEY = "cash-clicker:crit-proc-counts";
 const FOIL_STORAGE_KEY = "cash-clicker:badge-foils";
@@ -124,27 +123,30 @@ export function getBadgeFoil(kind: CritProcKind): BadgeFoil | null {
   return foils[kind] ?? null;
 }
 
-// a test-queued foil, else the luck rolls the badge qualifies for; the foil
-// it lands is kept and returned for its reveal
-export function rollBadgeFoil(kind: CritProcKind): BadgeFoil | null {
+// a test-queued foil, else the foil a badgeShimmer/badgeGlitter crit brought
+// (`wanted`) once the badge qualifies; the foil it lands is kept and returned
+// for its reveal
+export function rollBadgeFoil(
+  kind: CritProcKind,
+  wanted?: BadgeFoil,
+): BadgeFoil | null {
   const queued = pendingFoils.get(kind);
   pendingFoils.delete(kind);
   const count = getCritProcCount(kind);
   const current = foils[kind];
-  const { badgeShimmerChance, badgeGlitterChance } = CONFIG.crit;
   let foil: BadgeFoil | null = queued ?? null;
   if (
     !foil &&
+    wanted === "glitter" &&
     current !== "glitter" &&
-    count >= BADGE_GLITTER_AT &&
-    Math.random() < badgeGlitterChance
+    count >= BADGE_GLITTER_AT
   )
     foil = "glitter";
   else if (
     !foil &&
+    wanted === "shimmer" &&
     !current &&
-    count >= BADGE_SHIMMER_AT &&
-    Math.random() < badgeShimmerChance
+    count >= BADGE_SHIMMER_AT
   )
     foil = "shimmer";
   if (foil) setBadgeFoil(kind, foil);

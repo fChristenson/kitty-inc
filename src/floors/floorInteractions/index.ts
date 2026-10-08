@@ -28,6 +28,7 @@ import {
   isCritDown,
   getRandomCrit,
   getMergeCrit,
+  isRapidFireCrit,
   getCritTier,
   getBonusTierCrit,
   consumeBonusTierCrit,
@@ -115,6 +116,7 @@ import {
   rewardPayoutAmount,
   currentIncomeRatePerSecond,
   getIncomeBarCenter,
+  punchIncomeBar,
   queueOvertimeTickDelivery,
   deliverOvertimeTicks,
   clearOvertimeTickDelivery,
@@ -154,6 +156,7 @@ import {
   recordCritProcLanded,
   landedProcKinds,
   rollBadgeFoil,
+  type BadgeFoil,
   triggerPriceMatchCrit,
   LUCKY_NUMBER_MIN_FLOORS,
   LUCKY_NUMBER_MAX_FLOORS,
@@ -1936,19 +1939,35 @@ export function applyFloorCrit(
       random: result.randomCrit,
       merge: result.mergeCrit,
     },
+    result.rapidFireCrit
+      ? {
+          // the bar from the screen's middle, where the flash is
+          target: () => {
+            const bar = getIncomeBarCenter(isGroundFloor);
+            const center = deps.getScreenCenterLocal(floor);
+            return { x: bar.x - center.x, y: bar.y - center.y };
+          },
+          onHit: (index) =>
+            punchIncomeBar(
+              floor,
+              index === 0 ? `+${count + chainTicks} Lvl` : null,
+            ),
+        }
+      : null,
   );
   for (const kind of landedProcKinds(result))
-    revealFoilOf(deps, floor, kind, isGroundFloor);
+    revealFoilOf(deps, floor, kind, isGroundFloor, result.badgeFoil);
 }
 
-// a badge landing on a floor rolls its luck to turn foil, revealed if it does
+// a badge landing on a floor turns the foil its crit brought, revealed if it does
 function revealFoilOf(
   deps: FloorActionsDeps,
   floor: Floor,
   kind: CritProcKind,
   isGroundFloor: boolean,
+  wanted?: BadgeFoil,
 ): void {
-  const foil = rollBadgeFoil(kind);
+  const foil = rollBadgeFoil(kind, wanted);
   if (foil)
     revealBadgeFoil(kind, foil, floor, eventProcContext(deps, isGroundFloor));
 }
@@ -2214,6 +2233,7 @@ export function handleFloorClick(
       const critDown = isCritDown(floor);
       const randomCrit = getRandomCrit(floor);
       const mergeCrit = getMergeCrit(floor);
+      const rapidFireCrit = isRapidFireCrit(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
       const carriesEvent = takeClaimedEventProc(floor);
@@ -2239,6 +2259,7 @@ export function handleFloorClick(
             critDown,
             randomCrit,
             mergeCrit,
+            rapidFireCrit,
           }),
         );
         // the special event this crit carried instead of a special crit

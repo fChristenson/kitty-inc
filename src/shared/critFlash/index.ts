@@ -4,6 +4,7 @@ import {
   SPECIAL_FLASH_STROKE_WIDTH,
   triggerScreenShake,
   warmCritFlashes,
+  type FlashPunch,
   type FlashStack,
 } from "../../screenShake";
 import {
@@ -50,13 +51,15 @@ export function warmTierFlashes(): void {
 // a landed tier's flash, tier-scaled; label/color let a piggyback proc show
 // its own text in place of the tier's "x5"/"x25"/"x125"; stack lands it at an
 // offset over the flash still showing (see the STACK_ offsets), pulseMs cuts
-// its buzz short so the next one in the stack is felt apart
+// its buzz short so the next one in the stack is felt apart; punch flies its
+// number off into a target once it has held
 export function playTierFlash(
   tier: CritTier,
   label: string,
   color: string,
   stack: FlashStack | null = null,
   pulseMs = 0,
+  punch: FlashPunch | null = null,
 ): void {
   if (tier === "ultra") {
     // holdMs is an exact odd multiple of the blink's half-cycle (15 * 83.33ms
@@ -73,6 +76,7 @@ export function playTierFlash(
       priority: 2,
       stack,
       pulseMs,
+      punch,
     });
     playPayout();
   } else if (tier === "mega") {
@@ -86,6 +90,7 @@ export function playTierFlash(
       minDurationMs: getJackpotDurationMs(),
       stack,
       pulseMs,
+      punch,
     });
     playJackpot();
   } else {
@@ -98,6 +103,7 @@ export function playTierFlash(
       minDurationMs: getExplosionDurationMs(),
       stack,
       pulseMs,
+      punch,
     });
     playCoinDrop();
     playExplosion();

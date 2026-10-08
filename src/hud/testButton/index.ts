@@ -289,6 +289,15 @@ export function wireMergeCritTestButton(
     .addEventListener("click", onClick);
 }
 
+export function wireRapidFireCritTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  container
+    .querySelector<HTMLButtonElement>("#test-rapid-fire-crit")!
+    .addEventListener("click", onClick);
+}
+
 // arms a crit that also lands on the floor above or below
 export function wireCritUpDownTestButtons(
   container: HTMLElement,

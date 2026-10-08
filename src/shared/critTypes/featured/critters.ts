@@ -63,4 +63,20 @@ export const CRITTERS_REWARDS = {
     actions.addIncomeShare(balance.kettleCrewShare),
   shipshapeCats: (_context, { actions, balance }) =>
     actions.addIncomeShare(balance.shipshapeCatsShare),
+  blubberBlush: (context, { actions, balance }) =>
+    actions.repeatCrit(context, "up", balance.blubberBlushContinueChance),
+  honeyButterball: (context, { actions, balance }) =>
+    actions.repeatCrit(context, "down", balance.honeyButterballContinueChance),
+  rolyPolyParrot: (context, { actions, balance }) =>
+    actions.boostWorkers(context.floors, balance.rolyPolyParrotBoostSeconds, balance.rolyPolyParrotExtraWorkers),
+  sunsetConure: (context, { actions, balance }) =>
+    actions.discountPrices(context.floors, balance.sunsetConureDiscount),
+  tagAlong: (context, { actions, balance }) =>
+    actions.discountPrices(context.floors, balance.tagAlongDiscount),
+  tongueOutPup: (context, { actions, balance }) =>
+    actions.discountPrices(context.floors, balance.tongueOutPupDiscount),
+  waddleBuddy: (context, { actions, balance }) =>
+    actions.discountPrices(context.floors, balance.waddleBuddyDiscount),
+  wavingBruin: (context, { actions, balance }) =>
+    actions.raiseWorkerTiers([context.floor], balance.wavingBruinShare, 2),
 } satisfies FeaturedRewards<typeof CRITTERS_CRITS>;

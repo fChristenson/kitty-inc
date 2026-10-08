@@ -32,6 +32,7 @@ import {
 import {
   playCritMerge,
   playCritSpin,
+  type FlashPunch,
   type FlashStack,
 } from "../../screenShake";
 import { CONFIG } from "../../config";
@@ -44,8 +45,15 @@ import {
 import { getScreenUnfrozenAt, isScreenFrozen } from "../../shared/screenFreeze";
 
 // crit celebrations are flash + sound only: no coin bursts (perf)
-function celebrateTier(tier: CritTier): void {
-  playTierFlash(tier, CRIT_TIER_CONFIG[tier].label, tierColor(tier));
+function celebrateTier(tier: CritTier, punch: FlashPunch | null): void {
+  playTierFlash(
+    tier,
+    CRIT_TIER_CONFIG[tier].label,
+    tierColor(tier),
+    null,
+    0,
+    punch,
+  );
 }
 
 // stacked crits: a crit chain's x3, x10 and x50, then a crit up's or crit
@@ -123,12 +131,13 @@ function celebrateStack(
   steps: StackStep[],
   landedTier: CritTier,
   { random, merge }: CritStacking,
+  punch: FlashPunch | null,
 ): void {
   let delay = 0;
   if (random) {
     const tier = tierOfMultiplier(random);
     playCritSpin(
-      CONFIG.crit.randomCritRange,
+      CONFIG.specialCrits.randomCrit.range,
       random,
       tierColor(tier),
       TIER_FLASH_STROKE_WIDTH[tier],
@@ -157,6 +166,8 @@ function celebrateStack(
           tierColor(tier),
           stack,
           i < steps.length - 1 ? STACK_PULSE_MS : 0,
+          // a lone number fires; a stack of them doesn't
+          steps.length === 1 ? punch : null,
         ),
       delay + i * STACK_STEP_MS,
     ),
@@ -345,6 +356,8 @@ export function triggerCritCelebration(
   bonusTier: CritTier | null = null,
   onFollowUpProc?: (kind: CritProcKind) => void,
   stacking: CritStacking = {},
+  // the number flying into the floor's bar once its flash has held
+  punch: FlashPunch | null = null,
 ): void {
   if (isDetachedJobRunning()) {
     if (procs?.dejaVu) {
@@ -365,7 +378,7 @@ export function triggerCritCelebration(
       specialCelebrationQueue.push({
         kind: "critStack",
         queuedAt: now,
-        run: () => celebrateStack(steps, tier, stacking),
+        run: () => celebrateStack(steps, tier, stacking, punch),
       });
     for (const kind of landed) {
       queueProcCelebration(kind, tier, now);
@@ -417,7 +430,7 @@ export function triggerCritCelebration(
   ) {
     return;
   }
-  celebrateTier(tier);
+  celebrateTier(tier, punch);
 }
 
 // the handful of procs whose flash is more than the standard label+color

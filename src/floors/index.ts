@@ -354,6 +354,7 @@ export {
   forceCritUpDown,
   forceRandomCrit,
   forceMergeCrit,
+  forceRapidFireCrit,
   forceSkipCritUpgrade,
   forceSkipFloorBuyCrit,
   forceRainCheckFloorBuyCrit,

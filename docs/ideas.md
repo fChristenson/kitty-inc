@@ -8,6 +8,7 @@
 - **Crit up / down:** a crit sometimes copies onto the floor above or below, its number stacking over the first.
 - **Random crit:** a crit sometimes counts up and slams in a random multiplier from x3 to x50.
 - **Crit merge:** a crit sometimes brings a second crit number; the two spring in from the sides, wind up, smash together and their sum slams in.
+- **Rapid fire crit:** a crit's number sometimes slams in, then its characters fire one after another into its floor's bar, each one slamming it.
 
 ## Crit moments
 
@@ -22,5 +23,4 @@
 ## Feel
 
 - **Slow-mo slam:** an x50 freezes the screen for a split second just as it lands, then everything snaps back with the shake.
-- **Number punch:** a crit's number flies down into its floor's bar and punches it, the bar jolting with the levels it gained.
 - **Rising pitch:** crits landing in quick succession play their sound a step higher each time, so a run of crits climbs like a slot machine paying out.

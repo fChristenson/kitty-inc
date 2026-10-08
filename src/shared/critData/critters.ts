@@ -140,4 +140,52 @@ export const CRITTERS_CRITS = {
     image: "crits/critters/shipshapeCats.webp",
     description: "Adds 41% of your total income",
   },
+  blubberBlush: {
+    label: "Blubber Blush",
+    color: COLOR.secondWindSky,
+    image: "crits/critters/blubberBlush.webp",
+    description: "Repeats the crit on the floor above, 89% chance to keep climbing",
+  },
+  honeyButterball: {
+    label: "Honey Butterball",
+    color: COLOR.coinGold,
+    image: "crits/critters/honeyButterball.webp",
+    description: "Repeats the crit on the floor below, 82% chance to keep falling",
+  },
+  rolyPolyParrot: {
+    label: "Roly Poly Parrot",
+    color: COLOR.paydayEmerald,
+    image: "crits/critters/rolyPolyParrot.webp",
+    description: "Boosts every worker for 41s",
+  },
+  sunsetConure: {
+    label: "Sunset Conure",
+    color: COLOR.orange,
+    image: "crits/critters/sunsetConure.webp",
+    description: "Cuts every price in this building by 20.7%",
+  },
+  tagAlong: {
+    label: "Tag Along",
+    color: COLOR.summerSaleOrange,
+    image: "crits/critters/tagAlong.webp",
+    description: "Cuts every price in this building by 18.7%",
+  },
+  tongueOutPup: {
+    label: "Tongue Out Pup",
+    color: COLOR.gold,
+    image: "crits/critters/tongueOutPup.webp",
+    description: "Cuts every price in this building by 18.9%",
+  },
+  waddleBuddy: {
+    label: "Waddle Buddy",
+    color: COLOR.orange,
+    image: "crits/critters/waddleBuddy.webp",
+    description: "Cuts every price in this building by 19.1%",
+  },
+  wavingBruin: {
+    label: "Waving Bruin",
+    color: COLOR.goldenParachuteMarigold,
+    image: "crits/critters/wavingBruin.webp",
+    description: "Promotes 65.5% of this floor's workers two perma tiers",
+  },
 } as const satisfies Record<string, FeaturedCritData>;

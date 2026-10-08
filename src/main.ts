@@ -7,6 +7,7 @@ import {
   forceCritUpDown,
   forceRandomCrit,
   forceMergeCrit,
+  forceRapidFireCrit,
 } from "./floors";
 import { wireCritTestActions } from "./hud";
 import {
@@ -203,6 +204,7 @@ import {
   wireCritUpDownTestButtons,
   wireRandomCritTestButton,
   wireMergeCritTestButton,
+  wireRapidFireCritTestButton,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireTwisterEventTestButton,
@@ -718,6 +720,10 @@ async function main() {
     wireMergeCritTestButton(app, () => {
       const floor = buildings[activeBuildingIndex]?.[0];
       if (floor) forceMergeCrit(floor);
+    });
+    wireRapidFireCritTestButton(app, () => {
+      const floor = buildings[activeBuildingIndex]?.[0];
+      if (floor) forceRapidFireCrit(floor);
     });
     // the event modules load in their own chunk (floors/eventLoader): each
     // event test button loads it first, then runs with it as `ev`
