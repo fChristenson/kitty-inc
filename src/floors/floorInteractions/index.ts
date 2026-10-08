@@ -24,6 +24,8 @@ import {
   triggerButtonPress as animateButtonPress,
   isCritUpgrade,
   isTierChainCrit,
+  isCritUp,
+  isCritDown,
   getCritTier,
   getBonusTierCrit,
   consumeBonusTierCrit,
@@ -1890,6 +1892,19 @@ export function applyFloorCrit(
     : 0;
   for (let tick = 0; tick < count + chainTicks; tick++)
     applyUpgradeTick(floor, isGroundFloor);
+  // a crit up/down lands the same tier on the floor above/below too
+  const index = deps.floors.indexOf(floor);
+  const landsOn = (on: boolean | undefined, near: Floor | undefined) => {
+    if (!on || !near?.unlocked || isFloorLocked(near) || isFloorMaxed(near))
+      return false;
+    const nearIsGround = deps.floors.indexOf(near) === 0;
+    for (let tick = 0; tick < count; tick++)
+      applyUpgradeTick(near, nearIsGround);
+    triggerButtonPress(near);
+    return true;
+  };
+  const up = landsOn(result.critUp, deps.floors[index + 1]);
+  const down = landsOn(result.critDown, deps.floors[index - 1]);
   const context: CritRewardContext = {
     deps,
     floors: deps.floors,
@@ -1909,7 +1924,7 @@ export function applyFloorCrit(
     result,
     result.bonusTier,
     (kind) => grantFollowUpProc(kind, context),
-    result.tierChain,
+    { chain: result.tierChain, up, down },
   );
   for (const kind of landedProcKinds(result))
     revealFoilOf(deps, floor, kind, isGroundFloor);
@@ -2184,6 +2199,8 @@ export function handleFloorClick(
       const procs = readCritProcs(floor);
       const bonusTier = getBonusTierCrit(floor);
       const tierChain = isTierChainCrit(floor);
+      const critUp = isCritUp(floor);
+      const critDown = isCritDown(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
       const carriesEvent = takeClaimedEventProc(floor);
@@ -2201,7 +2218,13 @@ export function handleFloorClick(
         applyFloorCrit(
           deps,
           floor,
-          Object.assign(procs, { tier, bonusTier, tierChain }),
+          Object.assign(procs, {
+            tier,
+            bonusTier,
+            tierChain,
+            critUp,
+            critDown,
+          }),
         );
         // the special event this crit carried instead of a special crit
         if (carriesEvent && !cover) armTakenEventProc(floor, eventContext);

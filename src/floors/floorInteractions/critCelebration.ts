@@ -21,7 +21,14 @@ import {
 } from "../upgradeButton";
 import { spawnFreezeCoinBurst } from "../coins";
 import { playCoinDrop } from "../../sound";
-import { playTierFlash, playSpecialFlash } from "../../shared/critFlash";
+import {
+  playTierFlash,
+  playSpecialFlash,
+  STACK_CHAIN,
+  STACK_DOWN,
+  STACK_UP,
+} from "../../shared/critFlash";
+import type { FlashStack } from "../../screenShake";
 import { celebrateBonusTier, tierColor } from "../../shared/bonusTierReward";
 import {
   isCritFlashActive,
@@ -35,22 +42,48 @@ function celebrateTier(tier: CritTier): void {
   playTierFlash(tier, CRIT_TIER_CONFIG[tier].label, tierColor(tier));
 }
 
-// a crit chain: x3, x10 and x50 land in quick succession, each new number
-// landing over the ones before it
-const CHAIN_STEP_MS = 100;
-const CHAIN_TIERS: CritTier[] = ["crit", "mega", "ultra"];
+// stacked crits: a crit chain's x3, x10 and x50, then a crit up's or crit
+// down's copy on the floor above/below, land in quick succession, each new
+// number landing at its offset over the ones before it; every number but the
+// last buzzes a short pulse, so the phone gives one distinct kick per number
+const STACK_STEP_MS = 200;
+const STACK_PULSE_MS = 120;
 
-function celebrateCritChain(): void {
-  CHAIN_TIERS.forEach((tier, i) =>
+// what stacks on a landed crit
+export interface CritStacking {
+  chain?: boolean;
+  up?: boolean;
+  down?: boolean;
+}
+
+function stackSteps(
+  tier: CritTier,
+  { chain, up, down }: CritStacking,
+): { tier: CritTier; stack: FlashStack | null }[] {
+  const steps: { tier: CritTier; stack: FlashStack | null }[] = chain
+    ? [
+        { tier: "crit", stack: null },
+        { tier: "mega", stack: STACK_CHAIN },
+        { tier: "ultra", stack: STACK_CHAIN },
+      ]
+    : [{ tier, stack: null }];
+  if (up) steps.push({ tier, stack: STACK_UP });
+  if (down) steps.push({ tier, stack: STACK_DOWN });
+  return steps;
+}
+
+function celebrateStack(steps: ReturnType<typeof stackSteps>): void {
+  steps.forEach(({ tier, stack }, i) =>
     setTimeout(
       () =>
         playTierFlash(
           tier,
           CRIT_TIER_CONFIG[tier].label,
           tierColor(tier),
-          i > 0,
+          stack,
+          i < steps.length - 1 ? STACK_PULSE_MS : 0,
         ),
-      i * CHAIN_STEP_MS,
+      i * STACK_STEP_MS,
     ),
   );
 }
@@ -146,7 +179,7 @@ function celebrateBooty(): void {
 // they're simply skipped while a special celebration is still due, rather
 // than piling up behind it (see triggerCritCelebration below)
 interface QueuedCelebration {
-  kind: CritProcKind | "bonusTier" | "critChain";
+  kind: CritProcKind | "bonusTier" | "critStack";
   queuedAt: number;
   maxAgeMs?: number;
   run: () => void;
@@ -236,7 +269,7 @@ export function triggerCritCelebration(
   procs?: Partial<CritProcFlags>,
   bonusTier: CritTier | null = null,
   onFollowUpProc?: (kind: CritProcKind) => void,
-  tierChain = false,
+  stacking: CritStacking = {},
 ): void {
   if (isDetachedJobRunning()) {
     if (procs?.dejaVu) {
@@ -245,14 +278,16 @@ export function triggerCritCelebration(
     return;
   }
   const landed = procs ? CRIT_PROC_KINDS.filter((kind) => procs[kind]) : [];
-  if (landed.length > 0 || tierChain) {
+  const steps = stackSteps(tier, stacking);
+  const stacked = steps.length > 1;
+  if (landed.length > 0 || stacked) {
     const now = Date.now();
-    // the chain's numbers go first; the procs riding it flash after
-    if (tierChain)
+    // the stacked numbers go first; the procs riding them flash after
+    if (stacked)
       specialCelebrationQueue.push({
-        kind: "critChain",
+        kind: "critStack",
         queuedAt: now,
-        run: celebrateCritChain,
+        run: () => celebrateStack(steps),
       });
     for (const kind of landed) {
       queueProcCelebration(kind, tier, now);

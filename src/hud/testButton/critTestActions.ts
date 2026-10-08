@@ -1259,6 +1259,8 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-foil-reveal="glitter">Glitter Reveal</button>
           <button id="test-badge-capsule" class="game__button">Badge Capsule</button>
           <button id="test-crit-chain" class="game__button">Crit Chain</button>
+          <button class="game__button" data-crit-stack="up">Crit Up</button>
+          <button class="game__button" data-crit-stack="down">Crit Down</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

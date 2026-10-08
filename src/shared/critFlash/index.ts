@@ -4,6 +4,7 @@ import {
   SPECIAL_FLASH_STROKE_WIDTH,
   triggerScreenShake,
   warmCritFlashes,
+  type FlashStack,
 } from "../../screenShake";
 import {
   getExplosionDurationMs,
@@ -29,6 +30,12 @@ export const TIER_SHAKE_INTENSITY: Record<CritTier, number> = {
   ultra: 2.6,
 };
 
+// where a stacked flash lands from the one under it, CSS px: a crit chain's
+// numbers step up-left like stacked paper, a crit up/down sits above/below
+export const STACK_CHAIN: FlashStack = { x: -50, y: -50 };
+export const STACK_UP: FlashStack = { x: 0, y: -70 };
+export const STACK_DOWN: FlashStack = { x: 0, y: 70 };
+
 // the plain x5/x25/x125 flashes, built at idle before the first crit lands
 export function warmTierFlashes(): void {
   warmCritFlashes(
@@ -41,13 +48,15 @@ export function warmTierFlashes(): void {
 }
 
 // a landed tier's flash, tier-scaled; label/color let a piggyback proc show
-// its own text in place of the tier's "x5"/"x25"/"x125"; stack keeps the
-// flash it lands on showing under it (a crit chain)
+// its own text in place of the tier's "x5"/"x25"/"x125"; stack lands it at an
+// offset over the flash still showing (see the STACK_ offsets), pulseMs cuts
+// its buzz short so the next one in the stack is felt apart
 export function playTierFlash(
   tier: CritTier,
   label: string,
   color: string,
-  stack = false,
+  stack: FlashStack | null = null,
+  pulseMs = 0,
 ): void {
   if (tier === "ultra") {
     // holdMs is an exact odd multiple of the blink's half-cycle (15 * 83.33ms
@@ -63,6 +72,7 @@ export function playTierFlash(
       holdMs: 1250,
       priority: 2,
       stack,
+      pulseMs,
     });
     playPayout();
   } else if (tier === "mega") {
@@ -75,6 +85,7 @@ export function playTierFlash(
       priority: 1,
       minDurationMs: getJackpotDurationMs(),
       stack,
+      pulseMs,
     });
     playJackpot();
   } else {
@@ -86,6 +97,7 @@ export function playTierFlash(
       strokeWidth: TIER_FLASH_STROKE_WIDTH.crit,
       minDurationMs: getExplosionDurationMs(),
       stack,
+      pulseMs,
     });
     playCoinDrop();
     playExplosion();

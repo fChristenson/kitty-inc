@@ -271,6 +271,19 @@ export function wireCritChainTestButton(
     .addEventListener("click", onClick);
 }
 
+// arms a crit that also lands on the floor above or below
+export function wireCritUpDownTestButtons(
+  container: HTMLElement,
+  onClick: (up: boolean) => void,
+): void {
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "[data-crit-stack]",
+  ))
+    button.addEventListener("click", () =>
+      onClick(button.dataset.critStack === "up"),
+    );
+}
+
 export function wireWispEventTestButton(
   container: HTMLElement,
   onClick: () => void,

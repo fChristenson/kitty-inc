@@ -6,18 +6,15 @@
 - **Lucky foils:** a badge landed 10 times can roll shimmer on a floor landing, and at 100 can roll glitter, with its own reveal.
 - **Crit chains:** an x3 crit sometimes fires an x10 and an x50 straight after it, the numbers stacking like paper.
 
-## Luck upgrades (like the foils)
+## Crit moments
 
-- **Foil cats:** a worker promoted to a perma tier rolls to turn foil, its sprite shimmering from then on, revealed on the reveal stage.
-- **Foil buildings:** a maxed building rolls on every floor crit to turn foil, shining on the map once it does.
+- **Tier climb:** an x3 sometimes doesn't settle: its number ticks up like a slot counter (x4, x5, x7…) and stops on a random multiplier up to x50.
+- **Twin crit:** a crit sometimes lands on the floor above too, both numbers flashing side by side and both floors paying.
+- **Crit echo:** a mega or ultra sometimes echoes a second later, its number flashing again fainter and paying again.
+- **Triple crit:** a crit sometimes arms the button for the next two clicks as well, three crits in a row guaranteed, the button glowing until they're spent.
+- **Crit wave:** a rare crit sets off every floor on screen at once, their numbers popping up the building floor by floor and every floor paying.
+- **Lucky match:** a crit whose multiplier matches its floor (x3 on floor 3, x10 on floor 10) pays double with a gold flash.
 
-## Reveals (like the capsule)
+## Feel
 
-- **Badge reel:** a landed badge sometimes spins like a slot reel through its category's stickers before stopping, sometimes on a rarer one.
-- **Mystery floor:** unlocking a floor sometimes plays a capsule reveal that hatches a floor bonus: free levels, a worker, a manager or office items.
-- **Capsule upgrade:** while a mystery capsule rolls it can flash and turn into a double capsule, hatching two badges.
-
-## Slot machine (like the chain)
-
-- **Lucky 777:** every 777th click on a building's buttons is a guaranteed ultra, with 7-7-7 rolling in before the flash.
-- **Foil flashes:** a foiled badge's crit flash shows its shimmer or glitter, so a foil landing looks rarer than a plain one.
+- **Rising pitch:** crits landing in quick succession play their sound a step higher each time, so a run of crits climbs like a slot machine paying out.

@@ -160,15 +160,24 @@ let bgFlashLabel: string | null = null;
 let bgFlashColor: string = COLOR.purple;
 let bgFlashStrokeWidth = 8;
 
-// a crit chain's earlier numbers, frozen under the newest one covering them
+// stacked flashes' earlier numbers, frozen under the newest one covering them
 interface CoveredFlash {
   label: string;
   color: string;
   strokeWidth: number;
+  // where it sits, CSS px from the newest one's own start spot
+  x: number;
+  y: number;
 }
 let coveredFlashes: CoveredFlash[] = [];
-// how far each covered number sits right of and below the one over it
-const STACK_OFFSET_PX = 50;
+// a stacked flash lands this far (CSS px) from the one it covers
+export interface FlashStack {
+  x: number;
+  y: number;
+}
+// the foreground flash's spot, CSS px, in the same frame as the covered ones
+let flashX = 0;
+let flashY = 0;
 
 // an event's screen freeze hides the flash and stops its clock until it ends
 let flashPausedAt: number | null = null;
@@ -190,9 +199,9 @@ export function syncCritFlashPause(now: number): void {
 }
 
 // the phone buzzes from a crit flash's start until it ends (a new flash takes
-// over the buzz, after a short break when it stacks so each one is felt);
-// Android only, iOS has no vibration API
-function buzzForFlash(now: number, breakMs = 0): void {
+// over the buzz), or for just pulseMs when a flash right behind it needs its
+// own distinct buzz; Android only, iOS has no vibration API
+function buzzForFlash(now: number, pulseMs = 0): void {
   // no flash: leave any event's buzz alone
   if (flashEndsAt === null || typeof navigator.vibrate !== "function") return;
   const left = flashPausedAt !== null ? 0 : flashEndsAt - now;
@@ -201,11 +210,8 @@ function buzzForFlash(now: number, breakMs = 0): void {
   const buzz = CRIT_ICON_BY_LABEL[flashLabel]
     ? Math.min(ms, badgeBuzzMs())
     : ms;
-  navigator.vibrate(breakMs > 0 && buzz > 0 ? [0, breakMs, buzz] : buzz);
+  navigator.vibrate(pulseMs > 0 ? Math.min(buzz, pulseMs) : buzz);
 }
-
-// the break between a crit chain's buzzes
-const STACK_BUZZ_BREAK_MS = 40;
 
 // a badge crit buzzes this much longer than a regular x5 crit (whose flash,
 // and so buzz, lasts as long as its explosion sound), not its whole long flash
@@ -227,8 +233,10 @@ interface FlashRequest {
   priority: number;
   // the flash stays up at least this long (its hold stretches to fit)
   minDurationMs: number;
-  // keeps the playing flash showing under this one
-  stack: boolean;
+  // lands this far from the playing flash, which stays showing under it
+  stack: FlashStack | null;
+  // buzzes just this long instead of the whole flash (0: the whole flash)
+  pulseMs: number;
 }
 
 // how long the grow-in (scale + rotate) phase takes, and the fade-out tail's base
@@ -245,26 +253,43 @@ function startFlash(req: FlashRequest): void {
   syncCritFlashPause(Date.now());
   const now = flashPausedAt ?? Date.now();
   const fadeDurationMs = FLASH_DURATION_MS * req.intensity - GROWTH_DURATION_MS;
-  const holdMs = Math.max(
+  let holdMs = Math.max(
     req.holdMs + iconExtraHoldMs(req),
     req.minDurationMs - GROWTH_DURATION_MS - fadeDurationMs,
   );
-  if (!req.stack) coveredFlashes = [];
-  else if (flashStartedAt !== null && flashLabel)
+  const stacking = req.stack !== null && flashStartedAt !== null && flashLabel;
+  if (!stacking) {
+    coveredFlashes = [];
+    flashX = 0;
+    flashY = 0;
+  } else {
     coveredFlashes.push({
       label: flashLabel,
       color: flashColor,
       strokeWidth: flashStrokeWidth,
+      x: flashX,
+      y: flashY,
     });
+    flashX += req.stack!.x;
+    flashY += req.stack!.y;
+    // the stack stays up at least as long as the flash it covers would have
+    if (flashEndsAt !== null)
+      holdMs = Math.max(
+        holdMs,
+        flashEndsAt - now - GROWTH_DURATION_MS - fadeDurationMs,
+      );
+  }
   flashStartedAt = now;
   flashLabel = req.label;
   flashColor = req.color;
   flashStrokeWidth = req.strokeWidth;
   flashBlinkHz = req.blinkHz;
   flashHoldMs = holdMs;
-  activeFlashPriority = req.priority;
+  activeFlashPriority = stacking
+    ? Math.max(activeFlashPriority, req.priority)
+    : req.priority;
   flashEndsAt = now + GROWTH_DURATION_MS + holdMs + fadeDurationMs;
-  buzzForFlash(now, req.stack ? STACK_BUZZ_BREAK_MS : 0);
+  buzzForFlash(now, req.pulseMs);
   // a featured crit's image is its own show
   if (CRIT_ICON_BY_LABEL[req.label]) stopCritSparks();
   else startCritSparks(req.priority, now);
@@ -316,7 +341,8 @@ export function triggerScreenShake(options?: {
   holdMs?: number;
   priority?: number;
   minDurationMs?: number;
-  stack?: boolean;
+  stack?: FlashStack | null;
+  pulseMs?: number;
 }): void {
   const req: FlashRequest = {
     intensity: options?.intensity ?? 1,
@@ -327,12 +353,14 @@ export function triggerScreenShake(options?: {
     holdMs: options?.holdMs ?? 0,
     priority: options?.priority ?? 0,
     minDurationMs: options?.minDurationMs ?? 0,
-    stack: options?.stack ?? false,
+    stack: options?.stack ?? null,
+    pulseMs: options?.pulseMs ?? 0,
   };
   const now = Date.now();
   kickShake(req.intensity, now);
   const idle = flashEndsAt === null || now >= flashEndsAt;
-  const shouldStart = idle || req.priority > activeFlashPriority;
+  const shouldStart =
+    idle || req.priority > activeFlashPriority || req.stack !== null;
   if (shouldStart) {
     const iconName = CRIT_ICON_BY_LABEL[req.label]?.name;
     const ready = iconName ? requestCritIcon(iconName) : Promise.resolve(null);
@@ -344,13 +372,15 @@ export function triggerScreenShake(options?: {
         warmFlashBitmap(req.label, req.color, req.strokeWidth);
         const currentNow = Date.now();
         const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
-        if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
+        if (stillIdle || req.priority > activeFlashPriority || req.stack)
+          startFlash(req);
       })
       .catch(() => {
         warmFlashBitmap(req.label, req.color, req.strokeWidth);
         const currentNow = Date.now();
         const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
-        if (stillIdle || req.priority > activeFlashPriority) startFlash(req);
+        if (stillIdle || req.priority > activeFlashPriority || req.stack)
+          startFlash(req);
       });
     return;
   }
@@ -825,19 +855,29 @@ function drawFlashLayers(
   }
 
   // fading out with the number covering them, never blinking with it; each
-  // newer number sits up and left of the one under it, like stacked paper
+  // newer number sits at its own offset from the one under it, like stacked
+  // paper
   const fade = elapsed >= holdEndsAt ? alpha : 1;
   // in CSS px, whatever the canvas's world scale
-  const step =
-    (STACK_OFFSET_PX * (window.devicePixelRatio || 1)) / lastDrawScale;
+  const px = (window.devicePixelRatio || 1) / lastDrawScale;
   // the whole stack centred on the screen
-  const shift = (coveredFlashes.length * step) / 2;
-  coveredFlashes.forEach((covered, i) => {
-    const depth = coveredFlashes.length - i;
+  let minX = flashX,
+    maxX = flashX,
+    minY = flashY,
+    maxY = flashY;
+  for (const c of coveredFlashes) {
+    minX = Math.min(minX, c.x);
+    maxX = Math.max(maxX, c.x);
+    minY = Math.min(minY, c.y);
+    maxY = Math.max(maxY, c.y);
+  }
+  const midX = (minX + maxX) / 2;
+  const midY = (minY + maxY) / 2;
+  for (const covered of coveredFlashes)
     drawFlashLayer(
       ctx,
-      centerX + depth * step - shift,
-      centerY + depth * step - shift,
+      centerX + (covered.x - midX) * px,
+      centerY + (covered.y - midY) * px,
       viewportWidth,
       covered.label,
       covered.color,
@@ -848,7 +888,6 @@ function drawFlashLayers(
       1,
       now,
     );
-  });
 
   // the reveal plays over the start of the timeline without moving it, so
   // holds, blinks and their sound sync stay exactly where they were
@@ -863,8 +902,8 @@ function drawFlashLayers(
 
   drawFlashLayer(
     ctx,
-    centerX - shift,
-    centerY - shift,
+    centerX + (flashX - midX) * px,
+    centerY + (flashY - midY) * px,
     viewportWidth,
     flashLabel,
     flashColor,

@@ -87,6 +87,9 @@ export const CONFIG = {
     bonusTierGatewayChance: 0.01,
     // a landed x3 crit chains straight into an x10 and an x50 this often
     chainCritChance: 0.01,
+    // a landed crit also lands on the floor above / below this often
+    critUpChance: 0.03,
+    critDownChance: 0.03,
     // a badge landing on a floor rolls these to turn foil, once it qualifies
     // (10 landed for shimmer, 100 for glitter)
     badgeShimmerChance: 0.1,

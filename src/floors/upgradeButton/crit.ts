@@ -516,6 +516,8 @@ export function rollCritUpgrade(
     (result, landedProcs) => {
       critTiers.set(floor, result.tier);
       if (result.tierChain) tierChainCrits.add(floor);
+      if (result.critUp) critUpCrits.add(floor);
+      if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
         if (isFeaturedCritKind(kind)) forceCritProc(kind, floor);
       }
@@ -1031,10 +1033,30 @@ export function forceTierChainCrit(floor: Floor): void {
   tierChainCrits.add(floor);
 }
 
+// armed crits that also land on the floor above / below when clicked
+const critUpCrits = snapshotSet<Floor>();
+const critDownCrits = snapshotSet<Floor>();
+
+export function isCritUp(floor: Floor): boolean {
+  return critUpCrits.has(floor);
+}
+
+export function isCritDown(floor: Floor): boolean {
+  return critDownCrits.has(floor);
+}
+
+// dev/test-only: arms an x3 crit that also lands above (or below)
+export function forceCritUpDown(floor: Floor, up: boolean): void {
+  forceTestCrit(floor, null, "crit", null, "upgrade");
+  (up ? critUpCrits : critDownCrits).add(floor);
+}
+
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
   tierChainCrits.delete(floor);
+  critUpCrits.delete(floor);
+  critDownCrits.delete(floor);
   consumeCritProcs(floor);
   dropClaimedEventProc(floor);
 }

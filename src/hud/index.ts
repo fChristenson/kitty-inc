@@ -146,6 +146,7 @@ export {
   wireRevealEventTestButton,
   wireBadgeCapsuleTestButton,
   wireCritChainTestButton,
+  wireCritUpDownTestButtons,
   wireJackpotReelsEventTestButton,
   wireChainPayEventTestButton,
   wireTwisterEventTestButton,
