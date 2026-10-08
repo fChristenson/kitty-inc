@@ -122,7 +122,7 @@ import {
   isFeaturedCritKind,
   type FeaturedCritKind,
 } from "../badgeCrits/featuredProcs";
-import { preloadFloorCrit } from "./critPlayer";
+import { preloadFloorCritWhenIdle } from "./critPlayer";
 
 const critTiers = snapshotMap<Floor, CritTier>();
 
@@ -773,10 +773,11 @@ export function forceMergeCrit(floor: Floor): void {
 // armed crits' floor crits: their number playing out onto the bars
 const critMoments = snapshotMap<Floor, CritMoment>();
 
-// its module loads now, so it's ready by the time the crit is clicked
+// its module loads at idle, usually well before the crit is clicked (a click
+// before then loads it on the spot)
 function armCritMoment(floor: Floor, moment: CritMoment): void {
   critMoments.set(floor, moment);
-  void preloadFloorCrit(moment);
+  preloadFloorCritWhenIdle(moment);
 }
 
 export function getCritMoment(floor: Floor): CritMoment | undefined {

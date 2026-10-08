@@ -15,7 +15,7 @@ import {
   hasBadgeCapsule,
   takeBadgeCapsule,
   loadEventCatalog,
-  loadNextEventPart,
+  queueEventParts,
   type EventCatalog,
   getCritBadgeOverlay,
   warmTierFlashes,
@@ -285,7 +285,7 @@ import { createNewCorporation } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
 import { getBackgroundUrls } from "./loadAssets";
 
-import { runWhenIdle } from "./shared/idle";
+import { loadWhenIdle, runWhenIdle, runWhenIdleWithin } from "./shared/idle";
 import {
   afterStartup,
   isStartupSettled,
@@ -316,12 +316,14 @@ async function main() {
   afterStartup(startBackgroundMusic);
   warmTierFlashes();
   // creating the AudioContext alone blocked the main thread for tens of ms
-  runWhenIdle(preloadSounds, 1500);
+  runWhenIdle(preloadSounds);
   // the events and featured crit rewards are most of the code: kept out of the
-  // startup bundle, they load once the first screen is up (crits roll without
-  // them till then); only the starter pile of events, the rest after events play
-  runWhenIdle(() => void loadFeaturedRewards(), 2000);
-  runWhenIdle(() => void loadNextEventPart(), 3000);
+  // startup bundle, they load one chunk at a time while the game is quiet
+  // (crits roll without them till then): the starter pile of events, the
+  // featured rewards, then the rest of the events
+  queueEventParts(1);
+  loadWhenIdle(loadFeaturedRewards);
+  queueEventParts();
 
   app.innerHTML = `
     <div class="game">
@@ -444,7 +446,7 @@ async function main() {
     companySaveQueued = true;
     setTimeout(
       () =>
-        runWhenIdle(() => {
+        runWhenIdleWithin(() => {
           companySaveQueued = false;
           saveCurrentCompanyStateNow();
         }, 1000),

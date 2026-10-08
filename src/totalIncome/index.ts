@@ -26,6 +26,7 @@ import {
   log10,
 } from "../shared/bigNumber";
 import { saveCompanySnapshot } from "../shared/persistence";
+import { allowIdleLoads } from "../shared/idle";
 import {
   isDetachedJobPending,
   isDetachedJobRunning,
@@ -218,6 +219,7 @@ export function spendTotalIncome(amount: BigNumber): boolean {
   if (isDetachedJobPending() && !isDetachedJobRunning()) return false;
   if (lt(totalIncome, amount)) return false;
   totalIncome = subtract(totalIncome, amount);
+  allowIdleLoads();
   return true;
 }
 
@@ -240,6 +242,7 @@ function adjustStoredTotalIncome(
   amount: BigNumber,
   sign: 1 | -1,
 ): void {
+  if (sign === -1) allowIdleLoads();
   if (companyIndex === activeCompanyIndex) {
     totalIncome =
       sign === 1 ? add(totalIncome, amount) : subtract(totalIncome, amount);

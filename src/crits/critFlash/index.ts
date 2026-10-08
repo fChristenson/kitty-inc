@@ -94,15 +94,12 @@ onCritProcsArmed((kinds) => {
           // newest, and never under a playing flash (it would stutter)
           if (label === latestArmedLabel && !isCritFlashActive(Date.now()))
             warmFlashBitmap(label, color, SPECIAL_FLASH_STROKE_WIDTH);
-        }, 500),
+        }),
       )
       .catch(() => undefined);
   }
 });
-runWhenIdle(
-  () => void requestCritIcon("cashRegister").catch(() => undefined),
-  4000,
-);
+runWhenIdle(() => void requestCritIcon("cashRegister").catch(() => undefined));
 
 function getCritIcon(name: ImageName): HTMLImageElement | null {
   const cached = loadedCritIcons.get(name);
@@ -746,13 +743,13 @@ export function warmCritFlashes(
       !document.fonts.check(FLASH_FONT) ||
       isCritFlashActive(Date.now())
     ) {
-      runWhenIdle(warm, 1000);
+      runWhenIdle(warm);
       return;
     }
     for (const { label, color, strokeWidth } of flashes)
       warmFlashBitmap(label, color, strokeWidth);
   };
-  runWhenIdle(warm, 1000);
+  runWhenIdle(warm);
 }
 
 export function drawCritFlash(

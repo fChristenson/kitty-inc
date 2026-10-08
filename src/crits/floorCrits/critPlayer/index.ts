@@ -6,6 +6,7 @@ import type { CritMoment } from "../../critTypes";
 import { fadeStops, type FadeStops } from "../../../shared/glowSprite";
 import type { Bolt } from "../../../shared/lightning";
 import type { Disk, Orbit } from "../../../shared/galaxy";
+import { loadWhenIdle } from "../../../shared/idle";
 
 export interface Point {
   x: number;
@@ -228,14 +229,25 @@ const LOADERS: Record<CritMoment, () => Promise<unknown>> = {
 };
 const loading = new Map<CritMoment, Promise<unknown>>();
 
-// loads kind's module (once) ahead of its crit being clicked
-export function preloadFloorCrit(kind: CritMoment): Promise<unknown> {
+// loads kind's module (once)
+function preloadFloorCrit(kind: CritMoment): Promise<unknown> {
   let promise = loading.get(kind);
   if (!promise) {
     promise = LOADERS[kind]().catch(() => loading.delete(kind));
     loading.set(kind, promise);
   }
   return promise;
+}
+
+// preloadFloorCrit at idle, queued once per kind
+const queuedKinds = new Set<CritMoment>();
+export function preloadFloorCritWhenIdle(kind: CritMoment): void {
+  if (loading.has(kind) || queuedKinds.has(kind)) return;
+  queuedKinds.add(kind);
+  loadWhenIdle(() => {
+    queuedKinds.delete(kind);
+    return preloadFloorCrit(kind);
+  });
 }
 
 interface PendingLaunch {

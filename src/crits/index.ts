@@ -97,7 +97,7 @@ export {
   isSwarmSaleActive,
   isUnionEventArmed,
   loadEventCatalog,
-  loadNextEventPart,
+  queueEventParts,
   revealStageTotalMs,
   startBoostEvent,
   startHuntEvent,

@@ -386,9 +386,7 @@ export function prewarmJellyButton(
   r: number,
   colors: readonly string[],
 ): void {
-  processWhenIdle(colors, (color) => getButtonLayer(w, h, r, color), {
-    chunkSize: 1,
-  });
+  processWhenIdle(colors, (color) => getButtonLayer(w, h, r, color));
 }
 
 export function prewarmChevronBar(
@@ -397,7 +395,5 @@ export function prewarmChevronBar(
   r: number,
   colors: readonly string[],
 ): void {
-  processWhenIdle(colors, (color) => getBarLayers(w, h, r, color), {
-    chunkSize: 1,
-  });
+  processWhenIdle(colors, (color) => getBarLayers(w, h, r, color));
 }

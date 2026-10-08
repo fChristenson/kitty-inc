@@ -6,8 +6,6 @@
 import type { Floor } from "../../../gameState";
 import type { CritProcKind, CritTier } from "../../critTypes";
 import { CONFIG } from "../../../config";
-import { runWhenIdle } from "../../../shared/idle";
-import { loadNextEventPart } from "../eventLoader";
 import type { FloorRectResolver } from "../../../shared/screenFreeze";
 import {
   createEventProcPool,
@@ -36,8 +34,6 @@ export type ScreenAreaLocal = (floor: Floor) => {
 
 // how far inside the visible band an event target's center must sit
 const TARGET_VISIBLE_MARGIN = 40;
-// well inside the event cooldown
-const NEXT_PART_TIMEOUT_MS = 5000;
 
 // whether a floor-local y on that on-screen floor is inside the view area
 export function isVisibleOnFloor(entry: OnScreenFloor, y: number): boolean {
@@ -145,8 +141,6 @@ export function armTakenEventProc(
 // an event calls this the moment it has fully played out, starting the cooldown
 export function endEventProc(key: string): void {
   poolOfKey.get(key)?.ended(key);
-  // no event can land during the cooldown: a quiet time to load more of them
-  runWhenIdle(() => void loadNextEventPart(), NEXT_PART_TIMEOUT_MS);
 }
 
 // for events started outside a roll (dev test hooks)

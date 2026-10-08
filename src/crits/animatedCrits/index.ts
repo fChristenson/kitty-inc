@@ -31,5 +31,9 @@ export { startBoostEvent } from "./events/boostEvent";
 export { startUnionEvent } from "./events/unionEvent";
 export { startHuntEvent } from "./events/huntEvent";
 export { drawRevealStage, revealStageTotalMs } from "./revealStage";
-export { loadEventCatalog, loadNextEventPart } from "./eventLoader";
+export {
+  loadEventCatalog,
+  loadNextEventPart,
+  queueEventParts,
+} from "./eventLoader";
 export type { EventCatalog } from "./eventLoader";

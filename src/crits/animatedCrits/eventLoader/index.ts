@@ -1,10 +1,9 @@
 // The ~1,100 event modules are most of the game's code, so they ship in
-// chunks: a small starter pile of every look loads once the game is on screen
-// (main.ts), then one of the 8 big parts after each event plays out, in the
-// cooldown when none can land, so no chunk's load competes with startup or
-// with an event. Only the loaded events can claim a crit; crits roll as plain
+// chunks: a small starter pile of every look, then 8 big parts, each loaded
+// on its own while the game is quiet (shared/idle's loadWhenIdle, queued by
+// main.ts). Only the loaded events can claim a crit; crits roll as plain
 // crits until the starter pile is in.
-import { runWhenIdle } from "../../../shared/idle";
+import { loadWhenIdle, runWhenIdle } from "../../../shared/idle";
 
 const PARTS = [
   () => import("./eventsStarter"),
@@ -28,8 +27,6 @@ export type EventCatalog = typeof import("./eventsStarter") &
   typeof import("./events6") &
   typeof import("./events7");
 
-const PART_GAP_TIMEOUT_MS = 1000;
-
 const parts = new Map<number, Promise<object>>();
 let partsRequested = 0;
 let loading: Promise<EventCatalog> | null = null;
@@ -44,13 +41,21 @@ function loadPart(index: number): Promise<object> {
 }
 
 function idleGap(): Promise<void> {
-  return new Promise((resolve) => runWhenIdle(resolve, PART_GAP_TIMEOUT_MS));
+  return new Promise((resolve) => runWhenIdle(resolve));
 }
 
 // loads the next chunk of events, if any are left
 export function loadNextEventPart(): Promise<unknown> {
   if (partsRequested >= PARTS.length) return Promise.resolve();
   return loadPart(partsRequested++);
+}
+
+// queues up to count more chunks (all that are left by default), each loaded
+// on its own at idle
+let partsQueued = 0;
+export function queueEventParts(count = PARTS.length): void {
+  for (let n = 0; n < count && partsQueued < PARTS.length; n++, partsQueued++)
+    loadWhenIdle(loadNextEventPart);
 }
 
 // every event, one chunk per idle gap (dev test buttons, the perf rig)

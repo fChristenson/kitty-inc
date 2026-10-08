@@ -172,7 +172,7 @@ export async function loadWorkerSprite(): Promise<HTMLImageElement> {
       const image = new Image();
       image.src = url;
       void image.decode().catch(() => undefined);
-    }, 3000);
+    });
   }
   return worker!;
 }

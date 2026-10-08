@@ -71,35 +71,31 @@ function bakeFlipbook(): void {
   const c = canvas.getContext("2d")!;
   const coins = LOOP_MS / SPAWN_MS;
   const frames = Array.from({ length: FRAMES }, (_, f) => f);
-  processWhenIdle(
-    frames,
-    (f) => {
-      const ms = (f / FRAMES) * LOOP_MS;
-      c.setTransform(
-        RES,
-        0,
-        0,
-        RES,
-        (f % COLS) * CELL_W,
-        Math.floor(f / COLS) * CELL_H,
+  processWhenIdle(frames, (f) => {
+    const ms = (f / FRAMES) * LOOP_MS;
+    c.setTransform(
+      RES,
+      0,
+      0,
+      RES,
+      (f % COLS) * CELL_W,
+      Math.floor(f / COLS) * CELL_H,
+    );
+    for (let k = 0; k < coins; k++) {
+      // wrapped round the loop, so it has no seam
+      const age = (ms - k * SPAWN_MS + LOOP_MS) % LOOP_MS;
+      if (!bubbleAt(k, age)) continue;
+      c.globalAlpha = bubble.alpha;
+      c.drawImage(
+        coinCanvas!,
+        FRAME_X + bubble.dx - bubble.r,
+        FRAME_Y + bubble.dy - bubble.r,
+        bubble.r * 2,
+        bubble.r * 2,
       );
-      for (let k = 0; k < coins; k++) {
-        // wrapped round the loop, so it has no seam
-        const age = (ms - k * SPAWN_MS + LOOP_MS) % LOOP_MS;
-        if (!bubbleAt(k, age)) continue;
-        c.globalAlpha = bubble.alpha;
-        c.drawImage(
-          coinCanvas!,
-          FRAME_X + bubble.dx - bubble.r,
-          FRAME_Y + bubble.dy - bubble.r,
-          bubble.r * 2,
-          bubble.r * 2,
-        );
-      }
-      baked++;
-    },
-    { chunkSize: 6 },
-  );
+    }
+    baked++;
+  });
 }
 
 // the bubbles rising off (x, y), floor-local; seed staggers each worker's loop
