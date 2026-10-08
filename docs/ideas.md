@@ -51,6 +51,8 @@
 - **Missile swarm crit:** the number fires a fan of missiles off in a rattle of launch flashes; they climb, curl over in long loops trailing sparks and dive onto the bars in view one after another in a rolling string of blasts.
 - **Cluster bomb crit:** the number turns into a blinking bomb that drops and bursts in mid-air into a spray of smaller bomblets, which arc down onto the bars in view and each burst again into a cluster of blasts along the bar.
 - **Missile defense crit:** meteors come streaking down at the building and the number, down by the street, fires interceptor missiles that streak up and blow each meteor apart in mid-air, its burning debris showering down onto the bars in view.
+- **ICBM crit:** the number turns into a missile down by the street and launches straight up off the top of the screen in a roar of smoke, there's a beat of quiet, then its warheads come screaming back down onto every bar in view.
+- **Artillery barrage crit:** the number dives off the edge of the screen and shells come whistling in from off it in high arcs, the barrage walking up the building from the bottom bar to the top, then one last huge salvo lands on every bar in view at once.
 
 ## Game ideas
 
@@ -110,3 +112,11 @@ More weapons and disasters. Playground: `tmp/_playground/ideas.html?list=next4`.
 - **Drone squad crit:** the number bursts into a squad of drones that zip out and take up position beside every bar in view, aim lasers flickering onto the bars as they charge, then they all fire at once in one huge volley and zoom off.
 - **Bullet time crit:** the number fires a hail of bullets at the bars in view, then time stops: the screen dims, every bullet hangs frozen in mid-air with ripples round it, then time snaps back and they all slam into the bars at once.
 - **Tsunami crit:** the number dives off the edge of the screen and a towering wave of glitter rolls back across it, every bar in view riding up on its crest as it passes, then slamming back down as the wave breaks, glitter spraying everywhere.
+
+## List six
+
+More battles and blasts, after Cluster bomb and Missile defense. Playground: `tmp/_playground/ideas.html?list=next5`.
+
+- **Grenade crit:** the number pulls the pins and lobs a handful of grenades that clatter down the building, bouncing from bar to bar with a clink, each fizzing on the bar it comes to rest on before it goes off.
+- **Space battle crit:** the number bursts into two fleets of ships that line up on either side of the sky and trade fire over the building, ships blowing up one after another, their burning wrecks crashing down onto the bars in view, the last the biggest.
+- **Force field crit:** the number spreads into a dome of glitter over the building that soaks up a rain of meteors, rippling and glowing brighter with each one it stops, then collapses down through every bar in view, letting all that energy out.

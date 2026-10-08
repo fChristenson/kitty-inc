@@ -2098,6 +2098,8 @@ export const CRIT_MOMENTS = [
   "missileSwarmCrit",
   "clusterBombCrit",
   "missileDefenseCrit",
+  "icbmCrit",
+  "artilleryBarrageCrit",
 ] as const satisfies readonly SpecialCritType[];
 export type CritMoment = (typeof CRIT_MOMENTS)[number];
 

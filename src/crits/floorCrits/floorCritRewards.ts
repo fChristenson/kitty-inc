@@ -1669,6 +1669,8 @@ function momentLevels(
   // debris lands three bits a meteor
   if (moment === "portalCrit" || moment === "missileDefenseCrit")
     return Math.ceil(count / 3);
+  // an artillery barrage lands three shells a bar, then its salvo
+  if (moment === "artilleryBarrageCrit") return Math.ceil(count / 4);
   if (
     moment === "airstrikeCrit" ||
     moment === "missileSwarmCrit" ||

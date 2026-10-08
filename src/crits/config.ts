@@ -230,6 +230,14 @@ export const CRIT_CONFIG = {
     missileDefenseCrit: {
       chance: 0.03,
     },
+    // a missile launching off the screen and its warheads screaming back
+    // down onto the bars, or a barrage walking up them, then one last salvo
+    icbmCrit: {
+      chance: 0.03,
+    },
+    artilleryBarrageCrit: {
+      chance: 0.03,
+    },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter
     // (100+) foil
     badgeShimmer: {
