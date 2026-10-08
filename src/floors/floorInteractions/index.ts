@@ -1962,8 +1962,16 @@ function momentLevels(
   if (moment === "rapidFireCrit") return 0;
   if (moment === "snowballCrit") return own ? step : count + step;
   if (own) return 0;
-  if (moment === "bubbleCrit") return Math.ceil(count / 2);
-  return moment === "rainCrit" ? Math.ceil(count / 6) : count;
+  if (
+    moment === "bubbleCrit" ||
+    moment === "supernovaCrit" ||
+    moment === "galaxyCrit"
+  )
+    return Math.ceil(count / 2);
+  if (moment === "volcanoCrit") return Math.ceil(count / 3);
+  if (moment === "rainCrit" || moment === "meteorShowerCrit")
+    return Math.ceil(count / 6);
+  return count;
 }
 
 // a crit moment playing out from floor's crit onto the income bars in view:
@@ -2020,8 +2028,14 @@ function critMomentFor(
         color,
       );
       // a lightning strike, meteor or black hole pays its bar out too; a
-      // domino a step more with every bar it knocks
-      const payout = moment === "dominoCrit" ? step + 1 : MOMENT_PAYOUT[moment];
+      // domino a step more with every bar it knocks; a meteor shower's huge
+      // last meteor like a meteor
+      const payout =
+        moment === "dominoCrit"
+          ? step + 1
+          : moment === "meteorShowerCrit"
+            ? step && MOMENT_PAYOUT.meteorCrit
+            : MOMENT_PAYOUT[moment];
       if (payout) paySaleClick(target, isGround(target), payout);
       // the hit knocks coins off the bar
       const box = getIncomeBarBox(isGround(target));

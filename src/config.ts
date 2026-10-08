@@ -111,7 +111,7 @@ export const CONFIG = {
     // an animated event (src/animatedEventConfig.ts); none can land again
     // until cooldownMs after one has fully played out
     animatedCrit: {
-      chance: 0.25,
+      chance: 0.13,
       cooldownMs: 30_000,
     },
     // the crit also landing on the floor above / below
@@ -189,6 +189,23 @@ export const CONFIG = {
     // diving into the lowest bar in view, its payout knocking up bar to bar
     // to the top, each paying a step more (x1, x2, x3…)
     dominoCrit: {
+      chance: 0.03,
+    },
+    // a hail of meteors pelting the bars in view, the last huge one paying
+    // its own bar x5; an eruption under them flinging blobs onto them; or a
+    // star going supernova, its shards slamming into them
+    meteorShowerCrit: {
+      chance: 0.03,
+    },
+    volcanoCrit: {
+      chance: 0.03,
+    },
+    supernovaCrit: {
+      chance: 0.03,
+    },
+    // a sun with a galaxy of stars swirling round it, ever faster, going
+    // supernova and flinging them off as comets onto the bars in view
+    galaxyCrit: {
       chance: 0.03,
     },
     // a badge crit whose badge turns shimmer (landed 10+ times) or glitter

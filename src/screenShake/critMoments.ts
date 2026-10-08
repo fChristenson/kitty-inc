@@ -11,9 +11,18 @@
 import type { CritMoment } from "../shared/critTypes";
 import { drawGlow, fadeStops, type FadeStops } from "../shared/glowSprite";
 import { createBolt, drawBolt, type Bolt } from "../shared/lightning";
-import { drawDetonation } from "../shared/explosion";
+import { DETONATION_MS, drawDetonation } from "../shared/explosion";
 import { drawGravityHole } from "../shared/clutter";
 import { drawWispBetween, WISP_SIZE } from "../shared/wisp";
+import {
+  drawStars,
+  planDisk,
+  scatterArms,
+  type Disk,
+  type Orbit,
+} from "../shared/galaxy";
+import { stampGlimmer } from "../shared/twinkle";
+import { COLOR } from "../palette";
 import {
   beginCoinBatch,
   drawCoinBurstFrame,
@@ -74,6 +83,8 @@ interface Running {
   bolts: Bolt[];
   // shakes a moment has kicked itself, off its hits (a blast, a collapse)
   kicked: number;
+  // a galaxy crit's disk and its stars, planned at launch
+  galaxy: { disk: Disk; stars: Orbit[] } | null;
   shake: (intensity: number) => void;
 }
 
@@ -141,6 +152,116 @@ const LIGHTNING_TAIL_MS = 700;
 const LIGHTNING_SHAKE = 0.9;
 const LIGHTNING_BLAST = 130;
 const LIGHTNING_FONT = 130;
+
+// a hail of meteors streaking in from the top corner onto the bars, then one
+// huge one into its own; step 1 marks the huge one
+const SHOWER_METEORS = 20;
+const SHOWER_EVERY_MS = 50;
+const SHOWER_FALL_MS = 700;
+const SHOWER_LAST_DELAY_MS = 120;
+// big glowing balls trailing their tails, like the volcano's blobs
+const SHOWER_SIZE = 1.6;
+const SHOWER_HEAT = 0.8;
+const SHOWER_BIG_SIZE = 3;
+const SHOWER_BLAST = 90;
+const SHOWER_BIG_BLAST = 400;
+const SHOWER_SHAKE = 0.25;
+const SHOWER_TAIL_MS = 900;
+const showerStarts = (i: number) =>
+  METEOR_LIFT_MS +
+  i * SHOWER_EVERY_MS +
+  (i === SHOWER_METEORS - 1 ? SHOWER_LAST_DELAY_MS : 0);
+// meteor i's bar, where along it (-1..1), where it comes in from (just over
+// the top bar, so its whole fall is in view) and the pull that curves it
+const showerMeteor = (r: Running, bars: Point[], i: number) => {
+  const last = i === SHOWER_METEORS - 1;
+  const bar = last ? 0 : i % bars.length;
+  const w = r.viewportWidth;
+  const top = Math.min(...bars.map((b) => b.y));
+  const to = last ? bars[0] : along(r, bars, bar, holeHash(i, 21) * 2 - 1);
+  const from = {
+    x: w * (0.25 + 0.3 * holeHash(i, 22)),
+    y: top - w * (0.35 + 0.2 * holeHash(i, 23)),
+  };
+  return {
+    last,
+    to,
+    from,
+    pull: { x: (from.x + to.x) / 2 + w * 0.2, y: from.y - w * 0.15 },
+  };
+};
+
+// a meteor shower's meteor or a volcano's blob: a curve from a, pulled
+// towards c, onto b, at p 0..1
+const quadratic = (a: Point, c: Point, b: Point, p: number): Point => ({
+  x: (1 - p) ** 2 * a.x + 2 * (1 - p) * p * c.x + p * p * b.x,
+  y: (1 - p) ** 2 * a.y + 2 * (1 - p) * p * c.y + p * p * b.y,
+});
+
+// the number diving into a vent under the lowest bar, which erupts twice,
+// flinging glowing blobs in high arcs down onto the bars
+const VOLCANO_DIVE_MS = 220;
+const VOLCANO_AGAIN_MS = 1150;
+const VOLCANO_BLOBS = 12;
+const VOLCANO_EVERY_MS = 45;
+const VOLCANO_FLY_MS = 700;
+const VOLCANO_DEPTH = 300;
+const VOLCANO_BLAST = 260;
+const VOLCANO_BIG_BLAST = 360;
+const VOLCANO_SHAKE = 1.4;
+const VOLCANO_BIG_SHAKE = 2.2;
+const VOLCANO_BLOB_BLAST = 200;
+const VOLCANO_BLOB_SIZE = 1.6;
+const VOLCANO_BLOB_SHAKE = 0.6;
+const VOLCANO_TAIL_MS = 600;
+const volcanoVent = (bars: Point[]): Point => ({
+  x: 0,
+  y: Math.max(...bars.map((b) => b.y)) + VOLCANO_DEPTH,
+});
+const volcanoStarts = (i: number) =>
+  (i < VOLCANO_BLOBS / 2 ? VOLCANO_DIVE_MS : VOLCANO_AGAIN_MS) +
+  (i % (VOLCANO_BLOBS / 2)) * VOLCANO_EVERY_MS;
+
+// a star swelling where the number is, pulsing ever faster, then going
+// supernova, two shards slamming into each bar
+const NOVA_SWELL_MS = 900;
+const NOVA_SHARDS_PER_BAR = 2;
+const NOVA_FLY_MS = 260;
+const NOVA_SIZE = 5;
+const NOVA_BLAST = 380;
+const NOVA_SHAKE = 2.4;
+const NOVA_SHARD_SIZE = 1.3;
+const NOVA_SHARD_BLAST = 160;
+const NOVA_SHARD_SHAKE = 0.4;
+const NOVA_TAIL_MS = 600;
+const novaHits = (i: number) => NOVA_SWELL_MS + NOVA_FLY_MS + (i % 3) * 30;
+
+// a sun blazing up where the number is, a galaxy of stars swirling round it
+// in spiral arms, ever faster, until it goes supernova and flings them off
+// their orbits, two comets slamming into each bar
+const GALAXY_INNER = 0.07;
+const GALAXY_OUTER = 0.45;
+const GALAXY_STARS = 420;
+const GALAXY_STAR_SIZE = 16;
+const GALAXY_GROW_MS = 400;
+const GALAXY_NOVA_MS = 1400;
+const GALAXY_FLY_MS = 380;
+const GALAXY_FLUNG_MS = 700;
+const GALAXY_SUN_SIZE = 2;
+const GALAXY_SUN_SWELL = 3;
+const GALAXY_BLAST = 400;
+const GALAXY_SHAKE = 2.4;
+const GALAXY_COMETS_PER_BAR = 2;
+const GALAXY_COMET_SIZE = 1.3;
+const GALAXY_COMET_BLAST = 160;
+const GALAXY_COMET_SHAKE = 0.4;
+// how far a comet is thrown along its orbit before curving onto its bar
+const GALAXY_KICK = 0.4;
+const GALAXY_TAIL_MS = 600;
+// the disk's own clock, running faster and faster
+const galaxyClock = (ms: number) => ms + (ms * ms) / 600;
+const galaxyHits = (i: number) => GALAXY_NOVA_MS + GALAXY_FLY_MS + (i % 3) * 40;
+const galaxyStar: Point = { x: 0, y: 0 };
 
 // the number diving into the lowest bar in view, whose payout knocks up into
 // the bar above, and on up, faster and paying a step more each time
@@ -443,6 +564,44 @@ function plan(r: Running, bars: Point[]): void {
         .reverse()
         .forEach((bar, k) => hit(bar, dominoAt(k), k));
       break;
+    case "meteorShowerCrit":
+      for (let i = 0; i < SHOWER_METEORS; i++) {
+        const last = i === SHOWER_METEORS - 1;
+        hit(
+          last ? 0 : i % bars.length,
+          showerStarts(i) + SHOWER_FALL_MS,
+          last ? 1 : 0,
+        );
+      }
+      break;
+    case "volcanoCrit":
+      for (let i = 0; i < VOLCANO_BLOBS; i++)
+        hit(i % bars.length, volcanoStarts(i) + VOLCANO_FLY_MS);
+      break;
+    case "supernovaCrit":
+      for (let i = 0; i < bars.length * NOVA_SHARDS_PER_BAR; i++)
+        hit(i % bars.length, novaHits(i));
+      break;
+    case "galaxyCrit": {
+      const w = r.viewportWidth;
+      const disk = planDisk(
+        { x: 0, y: 0 },
+        {
+          inner: w * GALAXY_INNER,
+          outer: w * GALAXY_OUTER,
+          squash: 0.45,
+          tilt: -0.3,
+          rimHz: 0.3,
+        },
+      );
+      r.galaxy = {
+        disk,
+        stars: scatterArms(disk, GALAXY_STARS, 3, 0.9, 0.3),
+      };
+      for (let i = 0; i < bars.length * GALAXY_COMETS_PER_BAR; i++)
+        hit(i % bars.length, galaxyHits(i));
+      break;
+    }
     case "lightningCrit": {
       // from the sky onto the top bar, then bar to bar down the building
       const order = byHeight(bars);
@@ -494,6 +653,10 @@ const TAIL_MS: Partial<Record<CritMoment, number>> = {
   meteorCrit: METEOR_TAIL_MS,
   blackHoleCrit: HOLE_TAIL_MS,
   dominoCrit: DOMINO_TAIL_MS,
+  meteorShowerCrit: SHOWER_TAIL_MS,
+  volcanoCrit: VOLCANO_TAIL_MS,
+  supernovaCrit: NOVA_TAIL_MS,
+  galaxyCrit: GALAXY_TAIL_MS,
 };
 
 function shakeOf(kind: CritMoment, step: number): number {
@@ -514,6 +677,14 @@ function shakeOf(kind: CritMoment, step: number): number {
       return HIT_SHAKE;
     case "dominoCrit":
       return DOMINO_SHAKE + DOMINO_SHAKE_STEP * step;
+    case "meteorShowerCrit":
+      return step ? METEOR_SHAKE : SHOWER_SHAKE;
+    case "volcanoCrit":
+      return VOLCANO_BLOB_SHAKE;
+    case "supernovaCrit":
+      return NOVA_SHARD_SHAKE;
+    case "galaxyCrit":
+      return GALAXY_COMET_SHAKE;
     default:
       return HIT_SHAKE;
   }
@@ -582,6 +753,7 @@ export function launchMoment(
     span: { from: 0, to: 0 },
     bolts: [],
     kicked: 0,
+    galaxy: null,
     shake,
   };
   plan(running, bars);
@@ -1406,6 +1578,252 @@ const DRAW: Record<CritMoment, Draw> = {
         DOMINO_TAIL_MS,
       );
     });
+  },
+
+  meteorShowerCrit(ctx, r, ms, bars) {
+    const now = r.startedAt + ms;
+    const w = r.viewportWidth;
+    if (ms < METEOR_LIFT_MS) {
+      // thrown up off the top into the sky the meteors come down from
+      const p = (ms / METEOR_LIFT_MS) ** 2;
+      drawText(ctx, r.glyphs, r.label, w * 0.4 * p, -w * 1.2 * p, r.flashFont, {
+        along: -Math.PI / 3,
+        stretch: 1 + p,
+        alpha: 1 - p,
+      });
+    }
+    for (let i = 0; i < SHOWER_METEORS; i++) {
+      const starts = showerStarts(i);
+      const hits = starts + SHOWER_FALL_MS;
+      if (ms < starts || ms > hits + DETONATION_MS) continue;
+      const m = showerMeteor(r, bars, i);
+      drawWispBetween(
+        ctx,
+        (t) => {
+          const p = clamp01((t - starts) / SHOWER_FALL_MS);
+          return quadratic(m.from, m.pull, m.to, p);
+        },
+        ms,
+        now,
+        WISP_SIZE * (m.last ? SHOWER_BIG_SIZE : SHOWER_SIZE),
+        m.last ? 1 : SHOWER_HEAT,
+        starts,
+        hits,
+      );
+      drawDetonation(
+        ctx,
+        m.to,
+        ms - hits,
+        m.last ? SHOWER_BIG_BLAST : SHOWER_BLAST,
+        now,
+      );
+      if (m.last)
+        drawPays(
+          ctx,
+          r,
+          METEOR_PAYS,
+          bars[0],
+          ms - hits,
+          METEOR_FONT,
+          SHOWER_TAIL_MS,
+        );
+    }
+  },
+
+  volcanoCrit(ctx, r, ms, bars) {
+    const now = r.startedAt + ms;
+    const vent = volcanoVent(bars);
+    if (ms < VOLCANO_DIVE_MS) {
+      // diving down into the vent, faster and faster
+      const p = (ms / VOLCANO_DIVE_MS) ** 2;
+      drawText(
+        ctx,
+        r.glyphs,
+        r.label,
+        vent.x * p,
+        vent.y * p,
+        lerp(r.flashFont, MOMENT_FONT, p),
+        { along: Math.PI / 2, stretch: 1 + 0.5 * p },
+      );
+    }
+    // its two eruptions, each with its own shake
+    for (const [k, at] of [VOLCANO_DIVE_MS, VOLCANO_AGAIN_MS].entries()) {
+      if (ms >= at && r.kicked === k) {
+        r.kicked++;
+        r.shake(k ? VOLCANO_BIG_SHAKE : VOLCANO_SHAKE);
+      }
+      drawDetonation(
+        ctx,
+        vent,
+        ms - at,
+        k ? VOLCANO_BIG_BLAST : VOLCANO_BLAST,
+        now,
+      );
+    }
+    const top = Math.min(...bars.map((b) => b.y));
+    for (let i = 0; i < VOLCANO_BLOBS; i++) {
+      const starts = volcanoStarts(i);
+      const hits = starts + VOLCANO_FLY_MS;
+      if (ms < starts || ms > hits + DETONATION_MS) continue;
+      const to = along(r, bars, i % bars.length, holeHash(i, 31) * 2 - 1);
+      // a high arc, pulled up well over the top bar
+      const pull = {
+        x:
+          (vent.x + to.x) / 2 + (holeHash(i, 32) - 0.5) * r.viewportWidth * 0.3,
+        y: top - r.viewportWidth * 0.7,
+      };
+      drawWispBetween(
+        ctx,
+        (t) => {
+          const p = clamp01((t - starts) / VOLCANO_FLY_MS);
+          return quadratic(vent, pull, to, p);
+        },
+        ms,
+        now,
+        WISP_SIZE * VOLCANO_BLOB_SIZE,
+        0.8,
+        starts,
+        hits,
+      );
+      drawDetonation(ctx, to, ms - hits, VOLCANO_BLOB_BLAST, now);
+    }
+  },
+
+  supernovaCrit(ctx, r, ms, bars) {
+    const now = r.startedAt + ms;
+    const center = { x: 0, y: 0 };
+    if (ms < NOVA_SWELL_MS) {
+      // the number collapsing into a star that swells, pulsing ever faster
+      const u = ms / NOVA_SWELL_MS;
+      const gulp = clamp01(u * 4);
+      if (gulp < 1)
+        drawText(ctx, r.glyphs, r.label, 0, 0, r.flashFont * (1 - gulp));
+      drawWispBetween(
+        ctx,
+        () => center,
+        ms,
+        now,
+        WISP_SIZE * (1 + NOVA_SIZE * u * u) * (1 + 0.25 * Math.sin(u * u * 60)),
+        u,
+        0,
+        NOVA_SWELL_MS,
+      );
+    }
+    const since = ms - NOVA_SWELL_MS;
+    if (since >= 0 && r.kicked === 0) {
+      r.kicked = 1;
+      r.shake(NOVA_SHAKE);
+    }
+    drawDetonation(ctx, center, since, NOVA_BLAST, now);
+    for (let i = 0; i < bars.length * NOVA_SHARDS_PER_BAR; i++) {
+      const hits = novaHits(i);
+      if (ms < NOVA_SWELL_MS || ms > hits + DETONATION_MS) continue;
+      const to = along(r, bars, i % bars.length, holeHash(i, 41) * 2 - 1);
+      drawWispBetween(
+        ctx,
+        (t) => {
+          const p =
+            clamp01((t - NOVA_SWELL_MS) / (hits - NOVA_SWELL_MS)) ** 0.8;
+          return { x: to.x * p, y: to.y * p };
+        },
+        ms,
+        now,
+        WISP_SIZE * NOVA_SHARD_SIZE,
+        0.8,
+        NOVA_SWELL_MS,
+        hits,
+      );
+      drawDetonation(ctx, to, ms - hits, NOVA_SHARD_BLAST, now);
+    }
+  },
+
+  galaxyCrit(ctx, r, ms, bars) {
+    const now = r.startedAt + ms;
+    const { disk, stars } = r.galaxy!;
+    if (ms < GALAXY_NOVA_MS) {
+      // the number collapsing into the sun as the galaxy grows out round it
+      // and turns, quicker and quicker
+      const gulp = clamp01(ms / GALAXY_GROW_MS);
+      if (gulp < 1)
+        drawText(ctx, r.glyphs, r.label, 0, 0, r.flashFont * (1 - gulp));
+      drawStars(
+        ctx,
+        disk,
+        stars,
+        galaxyClock(ms),
+        GALAXY_STAR_SIZE,
+        1 - (1 - gulp) ** 3,
+      );
+      const u = ms / GALAXY_NOVA_MS;
+      drawWispBetween(
+        ctx,
+        () => disk.center,
+        ms,
+        now,
+        WISP_SIZE *
+          (GALAXY_SUN_SIZE + GALAXY_SUN_SWELL * u * u) *
+          (1 + 0.15 * Math.sin(u * u * 70)),
+        u,
+        0,
+        GALAXY_NOVA_MS,
+      );
+    }
+    const since = ms - GALAXY_NOVA_MS;
+    if (since >= 0 && r.kicked === 0) {
+      r.kicked = 1;
+      r.shake(GALAXY_SHAKE);
+    }
+    const t = galaxyClock(GALAXY_NOVA_MS);
+    // the stars flung off their orbits the way they were heading, fading
+    const fade = 1 - since / GALAXY_FLUNG_MS;
+    if (since >= 0 && fade > 0) {
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.globalAlpha = fade;
+      for (let i = 0; i < stars.length; i++) {
+        const o = stars[i];
+        disk.at(o, t, galaxyStar);
+        const h = disk.heading(o, t);
+        const out = since * (1.2 + o.radius / 300);
+        stampGlimmer(
+          ctx,
+          galaxyStar.x + Math.cos(h) * out,
+          galaxyStar.y + Math.sin(h) * out,
+          GALAXY_STAR_SIZE,
+          h,
+          i % 2 ? COLOR.heavenlyGold : COLOR.white,
+        );
+      }
+      ctx.restore();
+    }
+    drawDetonation(ctx, disk.center, since, GALAXY_BLAST, now);
+    // comets thrown off along their orbits, curving onto the bars
+    for (let i = 0; i < bars.length * GALAXY_COMETS_PER_BAR; i++) {
+      const hits = galaxyHits(i);
+      if (since < 0 || ms > hits + DETONATION_MS) continue;
+      const orbit = stars[(i * 37) % stars.length];
+      const from = disk.at(orbit, t, { x: 0, y: 0 });
+      const h = disk.heading(orbit, t);
+      const kick = r.viewportWidth * GALAXY_KICK;
+      const to = along(r, bars, i % bars.length, holeHash(i, 51) * 2 - 1);
+      drawWispBetween(
+        ctx,
+        (at) => {
+          const p = clamp01((at - GALAXY_NOVA_MS) / (hits - GALAXY_NOVA_MS));
+          return {
+            x: lerp(from.x + Math.cos(h) * kick * p, to.x, p * p),
+            y: lerp(from.y + Math.sin(h) * kick * p, to.y, p * p),
+          };
+        },
+        ms,
+        now,
+        WISP_SIZE * GALAXY_COMET_SIZE,
+        0.8,
+        GALAXY_NOVA_MS,
+        hits,
+      );
+      drawDetonation(ctx, to, ms - hits, GALAXY_COMET_BLAST, now);
+    }
   },
 };
 

@@ -25,10 +25,14 @@
 - **Meteor crit:** the number is thrown off the top and a meteor tears in from the sky at full speed, slamming into a bar in a crater of blasts that shakes the building; the bar pays x5.
 - **Black hole crit:** a black hole opens where the number is, swallows it and the coins off every bar in view, then collapses in a blast that flings them back, every bar paying double.
 - **Domino crit:** the number dives into the lowest bar in view, whose payout knocks up into the bar above, and on up the building, faster and paying a step more each time: x1, x2, x3, x4.
+- **Meteor shower crit:** the number is thrown off the top and a hail of meteors streaks in from the top corner, pelting every bar in view in a rattle of blasts, then one huge one slams into its own bar, paying x5.
+- **Volcano crit:** the number dives into a vent under the building, which erupts, flinging glowing blobs in high arcs down onto the bars in view, then erupts again, bigger.
+- **Supernova crit:** the number collapses into a star that swells up, pulsing faster and faster, then goes supernova, its shards slamming into every bar in view.
+- **Galaxy crit:** the number collapses into a sun with a galaxy of stars swirling round it in spiral arms, spinning faster and faster, then the sun goes supernova and flings the stars off their orbits, comets slamming into every bar in view.
 
 ## Game ideas
 
 Playground: `tmp/_playground/newGameIdeas.html`.
 
-- **Laser sweep:** a laser locks on from the sky and sweeps down the building in a zigzag; every bar it cuts across blasts and pays out on the spot.
-- **Rocket ride:** a rocket blasts off from the street and climbs the side of the building, firing a spark into every bar it passes, then bursts over the roof in a shower of coins.
+- **Cluster bomb:** a lit bomb drops into the middle of the building, its fuse fizzing faster, then bursts into a bomblet for every bar; they land fizzing and go off in a chain, top to bottom.
+- **Gold geyser:** the ground floor's bar bursts and a geyser of coins blasts straight up through the building and out of the roof, every bar it shoots through paying, coins raining back down.
