@@ -50,8 +50,8 @@ export {
   type BadgeFoil,
   BADGE_SHIMMER_AT,
   BADGE_GLITTER_AT,
-  badgeFoilOf,
-  takeBadgeFoilReveal,
+  getBadgeFoil,
+  rollBadgeFoil,
   queueBadgeFoilReveal,
 } from "./critProcCounts";
 

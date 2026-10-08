@@ -8,9 +8,9 @@ import {
   getCritProcCount,
   getCritProcIncomeModifierPercent,
   getCritProcNextMilestoneCount,
-  badgeFoilOf,
+  getBadgeFoil,
 } from "../../shared/critTypes";
-import type { CritProcKind } from "../../shared/critTypes";
+import type { BadgeFoil, CritProcKind } from "../../shared/critTypes";
 import { createGhostClickGuard } from "../../shared/ghostClickGuard";
 import { onTapOrClick } from "../../shared/tapEvents";
 import { formatBoostPercent } from "./economy";
@@ -158,13 +158,13 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
       layer.hidden = false;
   }
 
-  // a crit landed often enough gets a holo sheen, like a foil trading card
+  // a lucky badge gets a holo sheen, like a foil trading card
   function syncFoil(
     host: HTMLElement,
     image: HTMLImageElement,
-    count: number,
+    badgeFoil: BadgeFoil | null,
   ): void {
-    const look = badgeFoilOf(count) ?? "";
+    const look = badgeFoil ?? "";
     if ((host.dataset.foil ?? "") === look) return;
     host.querySelector(".crit-foil")?.remove();
     host.querySelector(".crit-sparkles")?.remove();
@@ -229,7 +229,7 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
       // reached this tile, or it would fetch off-screen icons early
       if (image.hasAttribute("src")) image.src = wanted;
     }
-    syncFoil(tile, image, discovered ? count : 0);
+    syncFoil(tile, image, discovered ? getBadgeFoil(kind) : null);
 
     const existing = tile.querySelector<HTMLElement>(
       ".crit-info-tile__count-badge",
@@ -385,7 +385,7 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
     const stats = detailStats(openKind);
     const art = detail.querySelector<HTMLElement>(".crit-info-detail__art");
     const icon = art?.querySelector("img");
-    if (art && icon) syncFoil(art, icon, getCritProcCount(openKind));
+    if (art && icon) syncFoil(art, icon, getBadgeFoil(openKind));
     const landed = detail.querySelector<HTMLElement>(
       ".crit-info-detail__count",
     );

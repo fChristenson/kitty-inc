@@ -33,7 +33,7 @@ export function wireFoilRevealTestButtons(
   }
 }
 
-// adds to every crit's landed count, to see the badge foils
+// adds to every crit's landed count, qualifying the badges for their foil rolls
 export function wireAddBadgesTestButtons(container: HTMLElement): void {
   for (const button of container.querySelectorAll<HTMLButtonElement>(
     "[data-add-badges]",

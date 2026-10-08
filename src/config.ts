@@ -85,6 +85,10 @@ export const CONFIG = {
     // it doesn't guarantee a proc actually lands
     specialCritGatewayChance: 0.25,
     bonusTierGatewayChance: 0.01,
+    // a badge landing on a floor rolls these to turn foil, once it qualifies
+    // (10 landed for shimmer, 100 for glitter)
+    badgeShimmerChance: 0.1,
+    badgeGlitterChance: 0.05,
   },
 
   // src/floors/upgradeButton/index.ts — the purchasable "Sale" boost.

@@ -1,7 +1,7 @@
-// a badge reaching a new foil (see shared/critTypes' badgeFoilOf) gets its own
-// reveal once its crit's flash has played: the reveal stage slides in and a
-// wisp bumps the badge spinning until it flips to its shimmering (10 landed)
-// or glittering (100 landed) self
+// a badge turning foil on a lucky landing (see shared/critTypes' rollBadgeFoil)
+// gets its own reveal once its crit's flash has played: the reveal stage slides
+// in and a wisp bumps the badge spinning until it flips to its shimmering or
+// glittering self
 import type { Floor } from "../../gameState";
 import { loadImage } from "../../utils";
 import { getImageUrl } from "../../loadAssets";

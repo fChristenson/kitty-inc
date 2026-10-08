@@ -148,7 +148,7 @@ import {
   pickHigherCritTier,
   recordCritProcLanded,
   landedProcKinds,
-  takeBadgeFoilReveal,
+  rollBadgeFoil,
   triggerPriceMatchCrit,
   LUCKY_NUMBER_MIN_FLOORS,
   LUCKY_NUMBER_MAX_FLOORS,
@@ -1802,7 +1802,7 @@ function eventProcContext(
     applyProcCrit: (floor, tier, kind) => {
       const result = tierOnlyCrit(tier);
       result[kind] = true;
-      // counted first, so a badge it takes to a new foil is revealed with it
+      // counted first, so a badge it qualifies for a foil rolls for it
       recordCritProcLanded(kind);
       applyFloorCrit(deps, floor, result);
       deps.persist();
@@ -1910,14 +1910,14 @@ export function applyFloorCrit(
     revealFoilOf(deps, floor, kind, isGroundFloor);
 }
 
-// a badge this landing took to a new foil gets its own reveal
+// a badge landing on a floor rolls its luck to turn foil, revealed if it does
 function revealFoilOf(
   deps: FloorActionsDeps,
   floor: Floor,
   kind: CritProcKind,
   isGroundFloor: boolean,
 ): void {
-  const foil = takeBadgeFoilReveal(kind);
+  const foil = rollBadgeFoil(kind);
   if (foil)
     revealBadgeFoil(kind, foil, floor, eventProcContext(deps, isGroundFloor));
 }
