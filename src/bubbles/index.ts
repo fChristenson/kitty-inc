@@ -9,44 +9,27 @@
 // (updateBubbles), pops on presses (popBubbleAt) and draws them in screen
 // space over the HUD (drawBubbles)
 import { CONFIG } from "../config";
-import {
-  CRIT_TIER_CONFIG,
-  eventProcContext,
-  loadFeaturedRewards,
-  pickCritTierByOdds,
-  pickFeaturedBadge,
-} from "../crits";
-import {
-  getIncomeBarCenter,
-  increaseIncomeRateBy,
-  punchIncomeBar,
-  rewardPayoutAmount,
-  spawnHomingCoinBurst,
-  type FloorActionsDeps,
-} from "../floors";
+import type { FloorActionsDeps } from "../floors";
 import type { Floor } from "../gameState";
-import { addTotalIncome } from "../totalIncome";
 import { playBubbleAppear, playBubblePop } from "../sound";
 import { randomInt } from "../utils";
-import { bezier } from "../shared/curves";
-import {
-  between,
-  easeIn,
-  easeOut,
-  easeOutBack,
-  lerp,
-  progress,
-} from "../shared/easing";
-import { DETONATION_MS, drawDetonation } from "../shared/explosion";
-import { playBarExplosion } from "../shared/explosionBang";
-import { EVENT_COIN_TIMING } from "../shared/floorEvents";
+import { between, easeOutBack, lerp, progress } from "../shared/easing";
 import { isScreenFrozen } from "../shared/screenFreeze";
 import { shakeScreen } from "../shared/screenShake";
 import { drawSoapBubble, drawSoapBubblePop } from "../shared/soapBubble";
-import { pulseHudTotalFlash } from "../shared/totalIncomeCoins";
+import {
+  collectPrize,
+  drawMini,
+  drawPayout,
+  isPayoutDone,
+  pickSpawnFloor,
+  prepareMini,
+  rollPrize,
+  type Payout,
+  type Prize,
+} from "../shared/spawnPrize";
 import { urgentBlink } from "../shared/urgentBlink";
-import { drawWispTrail, WISP_TRAIL_MS, type Point } from "../shared/wisp";
-import { drawMini, prepareMini, type BubbleContent } from "./minis";
+import type { Point } from "../shared/wisp";
 
 const RADIUS = 130;
 const CONTENT_SIZE = 160;
@@ -73,23 +56,9 @@ const WOBBLE_RATE = 7.5;
 // the content inside jiggles this share of the film's
 const CONTENT_WOBBLE = 0.5;
 const POP_MS = 150;
-const STREAM_COINS: [number, number] = [10, 16];
-// a crit number flies up off its bubble, swelling to SMASH_SIZE, and slams
-// down onto its floor's bar SMASH_MS after the pop
-const SMASH_MS = 340;
-const SMASH_ARC = 360;
-const SMASH_SIZE = 340;
-// of the flight spent swelling before the slam
-const SMASH_SWELL = 0.55;
-const SMASH_BLAST = 260;
-const SMASH_SHAKE = 0.6;
-const SQUASH_MS = 250;
-const TRAIL_SIZE = 30;
-// a popped number is done once its blast and trail have faded
-const SMASH_DONE_MS = SMASH_MS + Math.max(DETONATION_MS, WISP_TRAIL_MS);
 
 interface Bubble {
-  content: BubbleContent;
+  content: Prize;
   floor: Floor;
   // performance.now() it blows in
   bornAt: number;
@@ -101,11 +70,7 @@ interface Bubble {
   appeared: boolean;
   poppedAt: number;
   from: Point;
-  // a crit number's flight onto its floor's bar (in screen units, kept up
-  // to date each frame), and whether it has landed
-  bar: Point;
-  smash: (at: number) => Point | null;
-  hit: boolean;
+  payout: Payout | null;
 }
 
 let getDeps: (() => FloorActionsDeps) | null = null;
@@ -125,22 +90,12 @@ export function wireBubbles(deps: () => FloorActionsDeps): void {
   getDeps = deps;
 }
 
-// a random unlocked floor on screen, the one a spawn's bubbles pay
-function pickFloor(): Floor | null {
-  if (!getDeps) return null;
-  const floors = (getDeps().getOnScreenFloors?.() ?? []).filter(
-    (f) => f.floor.unlocked,
-  );
-  return floors.length
-    ? floors[Math.floor(Math.random() * floors.length)].floor
-    : null;
-}
-
 // once its random wait is up and the last bubbles are gone, blows a few
 // more in, like the mouse
 export function updateBubbles(now: number): void {
-  if (bubbles.length > 0 || now < nextSpawnAt || isScreenFrozen()) return;
-  const floor = pickFloor();
+  if (bubbles.length > 0 || now < nextSpawnAt || isScreenFrozen() || !getDeps)
+    return;
+  const floor = pickSpawnFloor(getDeps());
   if (!floor) return;
   spawnBubbles(floor, now);
   nextSpawnAt =
@@ -149,20 +104,12 @@ export function updateBubbles(now: number): void {
 
 // blows a few bubbles in at once, alongside any already floating (test button)
 export function forceBubbles(): void {
-  const floor = pickFloor();
+  const floor = getDeps && pickSpawnFloor(getDeps());
   if (floor) spawnBubbles(floor, performance.now());
 }
 
-function rollContent(): BubbleContent {
-  const { tier, coin } = CONFIG.randomSpawns.bubbles.contentOdds;
-  const roll = Math.random();
-  if (roll < tier) return { kind: "tier", tier: pickCritTierByOdds() };
-  if (roll < tier + coin) return { kind: "coin" };
-  return { kind: "badge", badge: pickFeaturedBadge() };
-}
-
 function spawnBubbles(floor: Floor, now: number): void {
-  const { durationMs } = CONFIG.randomSpawns.bubbles;
+  const { durationMs, contentOdds } = CONFIG.randomSpawns.bubbles;
   const count = randomInt(...CONFIG.randomSpawns.bubbles.count);
   // one lane each across the screen, shuffled, so they don't pile up
   const lanes = Array.from({ length: count }, (_, i) => i);
@@ -171,7 +118,7 @@ function spawnBubbles(floor: Floor, now: number): void {
     [lanes[i], lanes[j]] = [lanes[j], lanes[i]];
   }
   lanes.forEach((lane, i) => {
-    const content = rollContent();
+    const content = rollPrize(contentOdds);
     prepareMini(content);
     const fy = between(SPAWN_Y);
     bubbles.push({
@@ -185,9 +132,7 @@ function spawnBubbles(floor: Floor, now: number): void {
       appeared: false,
       poppedAt: Infinity,
       from: { x: 0, y: 0 },
-      bar: { x: 0, y: 0 },
-      smash: () => null,
-      hit: false,
+      payout: null,
     });
   });
 }
@@ -258,11 +203,6 @@ export function hitTestBubbles(x: number, y: number): boolean {
   return !!hitBubble(x, y, performance.now());
 }
 
-// the floor a bubble pays, or the building's first if it's gone
-function payFloor(deps: FloorActionsDeps, bubble: Bubble): Floor | undefined {
-  return deps.floors.includes(bubble.floor) ? bubble.floor : deps.floors[0];
-}
-
 // pops the bubble under (x, y) and pays what's inside; true if one popped,
 // so the press goes no further
 export function popBubbleAt(x: number, y: number): boolean {
@@ -274,67 +214,16 @@ export function popBubbleAt(x: number, y: number): boolean {
   bubbleAt(bubble, now, bubble.from);
   playBubblePop();
   shakeScreen(0.35);
-  const deps = getDeps();
-  const floor = payFloor(deps, bubble);
-  if (!floor) return true;
-  const { content } = bubble;
-  if (content.kind === "coin") streamCoin(deps, floor, bubble.from);
-  // the badge rewards are a lazy chunk the idle loader may not have reached
-  else if (content.kind === "badge")
-    void loadFeaturedRewards().then(() =>
-      eventProcContext(deps, deps.floors.indexOf(floor) === 0).applyProcCrit?.(
-        floor,
-        "crit",
-        content.badge,
-      ),
-    );
-  else {
-    const from = { ...bubble.from };
-    const bend = { x: 0, y: 0 };
-    const at = { x: 0, y: 0 };
-    const { bar } = bubble;
-    barOnScreen(deps, floor, bar);
-    bubble.smash = (t) => {
-      if (t < now || t > now + SMASH_MS) return null;
-      bend.x = (from.x + bar.x) / 2;
-      bend.y = Math.min(from.y, bar.y) - SMASH_ARC;
-      return bezier(from, bend, bar, progress(t, now, SMASH_MS) ** 1.6, at);
-    };
-  }
+  bubble.payout = collectPrize(
+    getDeps(),
+    bubble.floor,
+    bubble.content,
+    bubble.from,
+    height,
+    CONTENT_SIZE,
+    now,
+  );
   return true;
-}
-
-// where floor's income bar is on screen, kept on the screen's height
-function barOnScreen(deps: FloorActionsDeps, floor: Floor, into: Point): void {
-  const area = deps.getScreenAreaLocal?.(floor);
-  if (!area) return;
-  const bar = getIncomeBarCenter(deps.floors.indexOf(floor) === 0);
-  into.x = bar.x - area.left;
-  into.y = Math.min(height, Math.max(0, bar.y - area.top));
-}
-
-// a coin's payout, streaming from its bubble into the total
-function streamCoin(deps: FloorActionsDeps, floor: Floor, at: Point): void {
-  addTotalIncome(rewardPayoutAmount(floor, Date.now()));
-  deps.persist();
-  const area = deps.getScreenAreaLocal?.(floor);
-  if (area)
-    spawnHomingCoinBurst(floor, at.x + area.left, at.y + area.top, {
-      ...EVENT_COIN_TIMING,
-      coins: STREAM_COINS,
-      onEachArrive: pulseHudTotalFlash,
-    });
-}
-
-// a crit number slamming onto its floor's bar: its levels land
-function smashIn(deps: FloorActionsDeps, floor: Floor, bubble: Bubble): void {
-  if (bubble.content.kind !== "tier") return;
-  const { multiplier, color } = CRIT_TIER_CONFIG[bubble.content.tier];
-  increaseIncomeRateBy(floor, multiplier);
-  deps.persist();
-  punchIncomeBar(floor, `+${multiplier} Lvl`, color);
-  shakeScreen(SMASH_SHAKE);
-  playBarExplosion(1 + 0.1 * Math.random());
 }
 
 // whether a bubble is gone for good: vanished, or popped and paid out
@@ -343,8 +232,10 @@ function isDone(bubble: Bubble, now: number): boolean {
     return (
       now >= bubble.bornAt + CONFIG.randomSpawns.bubbles.durationMs + VANISH_MS
     );
-  const doneMs = bubble.content.kind === "tier" ? SMASH_DONE_MS : POP_MS;
-  return now >= bubble.poppedAt + doneMs;
+  return (
+    now >= bubble.poppedAt + POP_MS &&
+    (!bubble.payout || isPayoutDone(bubble.payout, now))
+  );
 }
 
 // every bubble, in gameCanvas's screen units (w x h), each frame
@@ -393,50 +284,7 @@ export function drawBubbles(
         RADIUS,
         (t - bubble.poppedAt) / POP_MS,
       );
-    const floor = payFloor(deps, bubble);
-    if (bubble.content.kind === "tier" && floor)
-      drawSmash(ctx, deps, floor, bubble, t, now);
+    if (bubble.payout) drawPayout(ctx, deps, bubble.payout, height, t, now);
   }
-  ctx.restore();
-}
-
-// a popped crit number flying up, swelling, and slamming onto its bar
-function drawSmash(
-  ctx: CanvasRenderingContext2D,
-  deps: FloorActionsDeps,
-  floor: Floor,
-  bubble: Bubble,
-  t: number,
-  now: number,
-): void {
-  barOnScreen(deps, floor, bubble.bar);
-  const hitAt = bubble.poppedAt + SMASH_MS;
-  drawWispTrail(ctx, bubble.smash, t, now, TRAIL_SIZE);
-  if (t < hitAt) {
-    const at = bubble.smash(t);
-    const u = progress(t, bubble.poppedAt, SMASH_MS);
-    const size =
-      u < SMASH_SWELL
-        ? lerp([CONTENT_SIZE, SMASH_SIZE], easeOut(u / SMASH_SWELL))
-        : lerp(
-            [SMASH_SIZE, CONTENT_SIZE],
-            easeIn((u - SMASH_SWELL) / (1 - SMASH_SWELL)),
-          );
-    if (at) drawMini(ctx, bubble.content, at.x, at.y, size);
-    return;
-  }
-  if (!bubble.hit) {
-    bubble.hit = true;
-    smashIn(deps, floor, bubble);
-  }
-  drawDetonation(ctx, bubble.bar, t - hitAt, SMASH_BLAST, now);
-  // squashed flat into the bar as it fades
-  const out = progress(t, hitAt, SQUASH_MS);
-  if (out >= 1) return;
-  ctx.save();
-  ctx.globalAlpha = 1 - out;
-  ctx.translate(bubble.bar.x, bubble.bar.y);
-  ctx.scale(1 + 0.6 * out, 1 - 0.5 * out);
-  drawMini(ctx, bubble.content, 0, 0, CONTENT_SIZE);
   ctx.restore();
 }

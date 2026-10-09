@@ -23,6 +23,7 @@ import {
 } from "./crits";
 import { wireCritTestActions } from "./hud";
 import { forceBubbles } from "./bubbles";
+import { forceTosses } from "./tosses";
 import {
   add,
   subtract,
@@ -688,7 +689,7 @@ async function main() {
       addTotalIncome(fromNumber(1e150));
     });
     wireSpawnMouseButton(app, () => {
-      forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
+      forceSpawnMouse();
     });
     wireCritTestActions(app, (kind, tier, event) => {
       const floor = buildings[activeBuildingIndex]?.[0];
@@ -2237,6 +2238,7 @@ async function main() {
       survivors: forceOnActive((e) => e.forceSurvivorsEvent),
       "geometry-run": forceOnActive((e) => e.forceGeometryRunEvent),
       bubbles: forceBubbles,
+      tosses: forceTosses,
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
@@ -2933,7 +2935,7 @@ async function main() {
       later(() => {
         let floor = ev.forceHuntEvent();
         if (!floor) {
-          forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
+          forceSpawnMouse();
           floor = ev.forceHuntEvent();
         }
         if (floor) gameCanvas.scrollActiveToFloor(floor);

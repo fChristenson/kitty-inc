@@ -43,6 +43,13 @@ import {
   updateBubbles,
   wireBubbles,
 } from "../../bubbles";
+import {
+  catchTossAt,
+  drawTosses,
+  hitTestTosses,
+  updateTosses,
+  wireTosses,
+} from "../../tosses";
 import { getTotalIncome } from "../../totalIncome";
 
 import { COLOR } from "../../palette";
@@ -715,8 +722,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
 
   function drawLiveFrame(skipHud = false, skipFlash = false): void {
-    updateMouse(activeFloors, Date.now());
+    updateMouse(onScreenFloors, Date.now());
     updateBubbles(performance.now());
+    updateTosses(performance.now());
     const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -790,6 +798,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // the bubbles float over the crit celebration, rattling with the world
     ctx.translate(shake.x / scale, shake.y / scale);
     drawBubbles(ctx, SLOT_W, contentViewportH(), performance.now());
+    drawTosses(ctx, SLOT_W, contentViewportH(), performance.now());
     ctx.restore();
   }
 
@@ -898,6 +907,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     );
   }
   wireBubbles(floorActionsDeps);
+  wireTosses(floorActionsDeps);
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every
@@ -950,7 +960,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     upgradeFiredOnDown = false;
     const p = canvasPoint(event);
     // bubbles float over everything, the HUD too
-    bubbleTapDown = popBubbleAt(p.x, p.y);
+    bubbleTapDown = popBubbleAt(p.x, p.y) || catchTossAt(p.x, p.y);
     if (bubbleTapDown) return;
     hudTapDown = p.y < hudBottomY;
     if (hudTapDown) return; // HUD is the topmost layer — no floor hit-test underneath it
@@ -1008,7 +1018,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   function onPointerMove(event: PointerEvent): void {
     if (dragPointerId !== event.pointerId) {
       const p = canvasPoint(event);
-      if (p.y < hudBottomY || hitTestBubbles(p.x, p.y)) {
+      if (
+        p.y < hudBottomY ||
+        hitTestBubbles(p.x, p.y) ||
+        hitTestTosses(p.x, p.y)
+      ) {
         canvas.style.cursor = "pointer";
         hoveredPoint = null;
         return;

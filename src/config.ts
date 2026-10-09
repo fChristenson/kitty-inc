@@ -92,7 +92,7 @@ export const CONFIG = {
     // src/mouse — a mouse running about a random unlocked floor
     mouse: {
       // the random wait after one leaves before the next
-      spawnGapMs: [15_000, 40_000],
+      spawnGapMs: [30_000, 60_000],
       // how long it runs about before leaving, pulsing over its last pulseMs
       durationMs: 5_000,
       pulseMs: 2_000,
@@ -101,12 +101,27 @@ export const CONFIG = {
     // what's inside
     bubbles: {
       // the random wait between spawns
-      spawnGapMs: [15_000, 40_000],
+      spawnGapMs: [30_000, 60_000],
       // how long they float before vanishing, pulsing over its last pulseMs
       durationMs: 5_000,
       pulseMs: 2_000,
       count: [3, 7],
       // a bubble's odds of holding a crit number, a coin or a badge
+      contentOdds: { tier: 0.45, coin: 0.4, badge: 0.15 },
+    },
+    // src/tosses — prizes tossed up from the bottom of the screen like
+    // fruit, after a warning sign: tap one in the air to catch it
+    tosses: {
+      // the random wait between spawns
+      spawnGapMs: [30_000, 60_000],
+      // the warning sign before the first toss
+      warningMs: 1_000,
+      count: [3, 7],
+      // between one toss and the next
+      tossGapMs: [180, 420],
+      // a toss's flight, up and back down off the screen
+      flightMs: [1_700, 2_200],
+      // a prize's odds of being a crit number, a coin or a badge
       contentOdds: { tier: 0.45, coin: 0.4, badge: 0.15 },
     },
   },

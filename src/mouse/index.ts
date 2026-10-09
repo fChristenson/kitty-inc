@@ -19,13 +19,16 @@ import { notifyHuntTargetGone, registerHuntTarget } from "../shared/huntTarget";
 import { whitenImage } from "../shared/mergeFlash";
 import { drawSlamTarget, getSlamPose } from "../shared/eventEndSlam";
 import {
+  isVisibleOnFloor,
   pickCritTierByOdds,
   applyBonusTierIncome,
   celebrateBonusTier,
+  type OnScreenFloor,
 } from "../crits";
 
-// a free bonus critter: spawns at random on a random unlocked floor of whichever
-// building is currently active, runs back and forth for a few seconds, and — if
+// a free bonus critter: spawns at random on a random unlocked floor in view
+// (its feet line on screen) of whichever building is currently active, runs
+// back and forth for a few seconds, and — if
 // clicked before it scurries off — boosts every worker in the building for free,
 // same effect as hud/boostMenu's paid "speed up workers" but with no $ cost.
 // Its timings are CONFIG.randomSpawns.mouse
@@ -97,6 +100,8 @@ let huntedImage: HTMLCanvasElement | null = null;
 let active: MouseState | null = null;
 let lastUpdate = 0;
 let nextSpawnAt = Date.now() + spawnGapMs();
+// the floors on screen, as gameCanvas last handed them in
+let onScreen: () => OnScreenFloor[] = () => [];
 
 // loads the mouse sprite once; main.ts awaits this alongside the other image loads
 // before the first redraw ever needs it
@@ -142,11 +147,14 @@ function rollNextDart(state: MouseState, now: number): void {
   state.moveStartedAt = now;
 }
 
-// picks a random unlocked floor and spawns the mouse on it right now, unconditionally
-// (no cooldown/existing-mouse check — callers decide when that's appropriate)
-function spawnOn(floors: Floor[], now: number): void {
-  const unlocked = floors.filter((f) => f.unlocked);
-  if (unlocked.length === 0) return; // nothing to boost yet
+// picks a random unlocked floor with its feet line in view and spawns the
+// mouse on it right now, unconditionally (no cooldown/existing-mouse check —
+// callers decide when that's appropriate)
+function spawnOn(now: number): void {
+  const unlocked = onScreen()
+    .filter((entry) => entry.floor.unlocked && isVisibleOnFloor(entry, MOUSE_Y))
+    .map((entry) => entry.floor);
+  if (unlocked.length === 0) return; // nothing in view to boost yet
   const spawnX = randomInt(FLOOR_X_MIN, FLOOR_X_MAX);
   active = {
     floor: unlocked[randomInt(0, unlocked.length - 1)],
@@ -166,9 +174,13 @@ function spawnOn(floors: Floor[], now: number): void {
 // pausing briefly, then picking a new random point once it arrives — and expires it
 // after its duration, or rolls a fresh spawn on a random unlocked floor once the
 // cooldown since the last one elapses. Call this once per frame — not per floor —
-// with the active building's own floors; there's only ever one mouse building-wide,
-// never one per floor
-export function updateMouse(floors: Floor[], now: number): void {
+// with the active building's floors on screen; there's only ever one mouse
+// building-wide, never one per floor
+export function updateMouse(
+  floorsOnScreen: () => OnScreenFloor[],
+  now: number,
+): void {
+  onScreen = floorsOnScreen;
   const dtSeconds = lastUpdate ? Math.max((now - lastUpdate) / 1000, 0) : 0;
   lastUpdate = now;
 
@@ -197,14 +209,14 @@ export function updateMouse(floors: Floor[], now: number): void {
   }
 
   if (now < nextSpawnAt) return;
-  spawnOn(floors, now);
+  spawnOn(now);
 }
 
 // dev/test-only: force a spawn right now regardless of the cooldown, replacing
 // whatever mouse (if any) is already active — used by the testing actions bar's
 // "Spawn Mouse" button
-export function forceSpawnMouse(floors: Floor[]): void {
-  spawnOn(floors, Date.now());
+export function forceSpawnMouse(): void {
+  spawnOn(Date.now());
 }
 
 // the red-tinted sprite a hunted mouse draws with, built once on first use

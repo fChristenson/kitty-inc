@@ -98,6 +98,7 @@ export {
   isSwarmEventArmed,
   isSwarmSaleActive,
   isUnionEventArmed,
+  isVisibleOnFloor,
   loadEventCatalog,
   queueEventParts,
   revealStageTotalMs,

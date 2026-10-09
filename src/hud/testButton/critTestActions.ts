@@ -1286,6 +1286,7 @@ export function createTestButtonMarkup(): string {
         <div class="test-actions-dropdown__menu">
           <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
           <button id="test-bubbles-event" class="game__button">Spawn Bubbles</button>
+          <button id="test-tosses-event" class="game__button">Spawn Tosses</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

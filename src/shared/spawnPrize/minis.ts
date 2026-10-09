@@ -1,5 +1,6 @@
-// what a bubble holds, drawn small: a crit number, a gold coin or a badge.
-// Every look is rastered once onto a small canvas and stamped after that
+// a random spawn's prize (src/bubbles, src/tosses), drawn small: a crit
+// number, a gold coin or a badge. Every look is rastered once onto a small
+// canvas and stamped after that
 import {
   CRIT_PROC_INFO,
   CRIT_TIER_CONFIG,
@@ -8,11 +9,11 @@ import {
   type CritProcKind,
   type CritTextSprite,
   type CritTier,
-} from "../crits";
-import { getStickerUrl, loadImageByName } from "../loadAssets";
-import { loadImage } from "../utils";
+} from "../../crits";
+import { getStickerUrl, loadImageByName } from "../../loadAssets";
+import { loadImage } from "../../utils";
 
-export type BubbleContent =
+export type Prize =
   | { kind: "tier"; tier: CritTier }
   | { kind: "coin" }
   | { kind: "badge"; badge: CritProcKind };
@@ -45,36 +46,36 @@ function load(key: string, image: () => Promise<HTMLImageElement>): void {
     .catch(() => {});
 }
 
-const imageKey = (content: BubbleContent): string =>
-  content.kind === "badge" ? `badge:${content.badge}` : content.kind;
+const imageKey = (prize: Prize): string =>
+  prize.kind === "badge" ? `badge:${prize.badge}` : prize.kind;
 
-// starts loading (or rastering) what a bubble holding content draws
-export function prepareMini(content: BubbleContent): void {
-  if (content.kind === "coin") load("coin", () => loadImageByName("coin"));
-  else if (content.kind === "badge")
-    load(imageKey(content), () =>
-      loadImage(getStickerUrl(CRIT_PROC_INFO[content.badge].icon)),
+// starts loading (or rastering) what prize draws
+export function prepareMini(prize: Prize): void {
+  if (prize.kind === "coin") load("coin", () => loadImageByName("coin"));
+  else if (prize.kind === "badge")
+    load(imageKey(prize), () =>
+      loadImage(getStickerUrl(CRIT_PROC_INFO[prize.badge].icon)),
     );
-  else if (!tiers.has(content.tier)) {
-    const { label, color } = CRIT_TIER_CONFIG[content.tier];
+  else if (!tiers.has(prize.tier)) {
+    const { label, color } = CRIT_TIER_CONFIG[prize.tier];
     tiers.set(
-      content.tier,
+      prize.tier,
       createCritTextSprite(label, color, TIER_STYLE, TIER_RES),
     );
   }
 }
 
-// content centered on (x, y), about size across
+// prize centered on (x, y), about size across
 export function drawMini(
   ctx: CanvasRenderingContext2D,
-  content: BubbleContent,
+  prize: Prize,
   x: number,
   y: number,
   size: number,
 ): void {
   if (size <= 0) return;
-  if (content.kind === "tier") {
-    const sprite = tiers.get(content.tier);
+  if (prize.kind === "tier") {
+    const sprite = tiers.get(prize.tier);
     if (!sprite) return;
     const scale = Math.min(
       (size * 1.15) / sprite.width,
@@ -83,7 +84,7 @@ export function drawMini(
     drawCritTextSprite(ctx, sprite, x, y, scale);
     return;
   }
-  const image = images.get(imageKey(content));
+  const image = images.get(imageKey(prize));
   if (!image) return;
   const scale = size / Math.max(image.width, image.height);
   const w = image.width * scale;

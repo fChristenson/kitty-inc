@@ -5,6 +5,7 @@
 export {
   armTakenEventProc,
   getClaimedEventCover,
+  isVisibleOnFloor,
   takeClaimedEventProc,
 } from "./eventProcs";
 export type {
