@@ -36,3 +36,19 @@ Two floor crits and two animated crits. Playground: `tmp/_playground/ideas.html?
 
 - **Grinder** (floor crit): the number becomes a spinning grinder wisp that drops onto the top bar and skates along it in a gushing spray of sparks, blasts popping in its wake, then drops off the end onto the next bar and back the other way, quicker and quicker, blowing on its own bar at the bottom.
 - **Timber** (explosion event): a tall column of lit bomb wisps stands beside the building; a blast chops it at the foot and it topples across the building's face like a felled tree, tipping slowly then whipping over, every bomb blowing on the first bar it sweeps across, until it slams down flat in a cluster of huge blasts.
+
+## List thirty-three
+
+Two floor crits of sweeping beams, a lightning event and a money event. Playground: `tmp/_playground/ideas.html?list=next30`.
+
+- **Shears** (floor crit): the number becomes the pivot of two long beam blades crossed like scissors that open wide and snap shut, again and again, quicker each time, blasts racing in along every bar where the blades cross it as they close and a blast on each at the snap; then the blades fly apart onto the bars and the pivot blows on its own bar.
+- **Rake** (floor crit): the number becomes a comb of beam teeth that drops from over the roof and drags down the building faster and faster, each tooth raking every bar in turn, left to right, in a rattling row of blasts; then it flies back up and slams every tooth onto its own bar.
+- **Orbitals** (money event): three tilted rings of coins whirl round the building like electrons round an atom, faster and faster, each vanishing behind it and sweeping back across the front, the bars jolting as they pass; then the rings collapse into one stream that shoots up into the total in a blast.
+
+## List thirty-four
+
+Breaking out of things sweeping the bars: the bars themselves as props, a self-playing puzzle, a Shmup boss and the click itself. Playground: `tmp/_playground/ideas.html?list=next31`.
+
+- **Jenga** (floor crit): the bars themselves fly out of their floors and stack up into a teetering tower mid-screen, the number on top as a lit bomb; the tower sways wider and wider, the bomb blows and the bars rain back down, each slamming into its floor in a blast.
+- **Match three** (experiment): the screen turns into a board of glitter gems (stars, hearts, gems, bolts) that plays itself: one swap sets off a match, the gems blast, the rest fall and match again in a cascade (the board and swap with the longest cascade picked at arm), quicker each time, the bars under each match jolting with levels; then the whole board goes up in a rolling wave of blasts.
+- **Autoclicker** (event): a ghost wisp takes over the clicked floor's upgrade button and hammers it by itself, faster and faster, the button pressing in each time with a burst of coins and a level jolting the bar, until it winds up high and slams the button in a geyser of coins and a huge blast.

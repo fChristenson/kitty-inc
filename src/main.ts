@@ -2226,6 +2226,8 @@ async function main() {
       "blast-coat": forceOnActive((e) => e.forceBlastCoatEvent),
       "cash-coil": forceOnActive((e) => e.forceCashCoilEvent),
       threading: forceOnActive((e) => e.forceThreadingEvent),
+      "bolt-binding": forceOnActive((e) => e.forceBoltBindingEvent),
+      fortress: forceOnActive((e) => e.forceFortressEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

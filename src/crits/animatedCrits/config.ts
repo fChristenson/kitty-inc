@@ -8268,6 +8268,25 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 83
+  // shmup, cash: src/crits/animatedCrits/events/fortressEvent ("Fortress"): the view lifts into space, the ship blows a fortress core's three turning shield rings apart wisp by wisp (each paying), then the bare core in a chain of blasts
+  fortressEvent: {
+    chance: 0.01,
+    enterMs: 450, // the view lifting off the floors
+    flyMs: 3700, // the fight, until the floors rush up
+    leaveMs: 3200, // the ship starts streaking off the top
+    payoutsPerNode: 0.15, // the floor's payouts each shield wisp pays
+    payoutsCore: 3, // the floor's payouts the core pays
+  },
+  // lightning, levels: src/crits/animatedCrits/events/boltBindingEvent ("Bolt Binding"): a spark winds a coil of lightning round each bar, then every coil discharges in a rattle of strikes along the bars
+  boltBindingEvent: {
+    chance: 0.01,
+    windMs: 340, // the first bar's coil, quickening
+    hopMs: 90, // the spark's hop to the next bar
+    fireLagMs: 200, // the pause before every coil discharges
+    levelShare: 0.004, // levels per strike
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // money, cash: src/crits/animatedCrits/events/threadingEvent ("Threading"): a river of coins coils round each bar like a spiral binding, down the building, every front pass a blast, then into the total
   threadingEvent: {
     chance: 0.01,

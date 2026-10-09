@@ -48,6 +48,8 @@ export function createTestButtonMarkup(): string {
         <div class="test-actions-dropdown__menu">
           <button id="test-cash-coil-event" class="game__button">Cash Coil</button>
           <button id="test-threading-event" class="game__button">Threading</button>
+          <button id="test-bolt-binding-event" class="game__button">Bolt Binding</button>
+          <button id="test-fortress-event" class="game__button">Fortress</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
