@@ -22,3 +22,10 @@ Chain reactions, a machine and games playing themselves, on the building. Playgr
 - **Mousetraps** (explosion event): a hundred glitter balls sit cocked along the bars like ping-pong balls on mousetraps; one ball drops onto the top bar and every ball hit pops and flings two more, the pops doubling out in a rattling storm over the whole building, then every bar blows top to bottom.
 - **Contraption** (experiment): a Rube Goldberg machine down the building, every link a different effect, quicker and quicker: a bolt lights a bomb, its blast rolls a ball off the top bar onto a row of wisp dominoes, the last one knocks a beam lever flat along the next bar in a sweep of blasts, which flings a spark onto a string of bombs that blow in a chain into a huge blast.
 - **Qix** (experiment): the old arcade game playing itself: a pen wisp cuts beam lines across the screen, each walling off a slice that flashes gold and blasts the bars inside, quicker and quicker, boxing a bouncing spark into a smaller and smaller corner till it's trapped and blows.
+
+## List thirty
+
+A game, a galaxy, a race and a spray, all on the building. Playground: `tmp/_playground/ideas.html?list=next27`.
+
+- **Dig Dug** (experiment): the old arcade game playing itself: a digger wisp bores a glowing tunnel zigzagging up through the floors, sparks flying, and every wisp enemy it reaches it pumps up with a beam hose, swelling a size with each jolting pump, quicker each time, till it bursts in a blast onto its bar, the last one biggest.
+- **Bomb derby** (race event): two lit bomb wisps race a track zigzagging down the building, flat out along the bars, braking hard and screeching round each end, the chaser on the leader's tail; at the line the chaser rams the leader, which blows big, then the chaser huge.

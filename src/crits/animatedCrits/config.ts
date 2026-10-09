@@ -8268,6 +8268,24 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 82
+  // galaxy, levels: src/crits/animatedCrits/events/novaDiskEvent ("Nova Disk"): glitter stars orbit a lit bomb, spinning faster and tighter as its fuse burns, inner ones swallowed in pops; it blows and flings stars onto the bars
+  novaDiskEvent: {
+    chance: 0.01,
+    growMs: 250, // the bomb and its disk swelling in
+    fuseMs: 1300, // the fuse, the disk quickening and pulling in
+    levelShare: 0.004, // levels per star landing on a bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // spray, crit tiers: src/crits/animatedCrits/events/blastCoatEvent ("Blast Coat"): a nozzle sprays a coat of gold glitter along each bar, then the coat goes off in a blast rolling along each bar the way it was sprayed
+  blastCoatEvent: {
+    chance: 0.01,
+    arriveMs: 200, // the nozzle dropping in
+    sweepMs: 300, // the first bar's sweep, quickening
+    hopMs: 100, // the hop to the next bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // gunfire, levels + crit tier: src/crits/animatedCrits/events/airJuggleEvent ("Air Juggle"): two corner guns keep a bomb wisp in the air, every hit a blast knocking it higher and across, then riddle it over its bar till it blows
   airJuggleEvent: {
     chance: 0.01,

@@ -2222,6 +2222,8 @@ async function main() {
       "wormhole-dive": forceOnActive((e) => e.forceWormholeDiveEvent),
       "doubling-bounce": forceOnActive((e) => e.forceDoublingBounceEvent),
       "air-juggle": forceOnActive((e) => e.forceAirJuggleEvent),
+      "nova-disk": forceOnActive((e) => e.forceNovaDiskEvent),
+      "blast-coat": forceOnActive((e) => e.forceBlastCoatEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
