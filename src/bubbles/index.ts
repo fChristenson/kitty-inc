@@ -89,12 +89,14 @@ export function wireBubbles(deps: () => FloorActionsDeps): void {
 
 // once the last bubbles are gone, rolls to blow a few more in, like the mouse
 export function updateBubbles(now: number): void {
-  if (bubbles.length > 0 || isScreenFrozen() || !getDeps) return;
-  if (!roll.procs(now)) return;
+  if (bubbles.length > 0 || isScreenFrozen()) {
+    roll.hold(now);
+    return;
+  }
+  if (!getDeps || !roll.procs(now)) return;
   const floor = pickSpawnFloor(getDeps());
   if (!floor) return;
   spawnBubbles(floor, now);
-  roll.restart(now + SPAWN_MS + CONFIG.randomSpawns.bubbles.durationMs);
 }
 
 // blows a few bubbles in at once, alongside any already floating (test button)

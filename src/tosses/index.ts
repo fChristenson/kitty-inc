@@ -34,7 +34,11 @@ import { drawWispTrail, type Point } from "../shared/wisp";
 
 const SIZE = 170;
 // tapping counts this far round a prize, for thumbs
-const HIT_REACH = 0.8;
+const HIT_REACH = 1.1;
+// a tap aims where the toss was drawn a moment ago, so it counts along this
+// much of its path behind it, checked at HIT_STEPS spots
+const HIT_LAG_MS = 200;
+const HIT_STEPS = 5;
 // where tosses start (below the bottom edge) and how high they go, of the
 // screen's height, and where across they start, of its width
 const START_BELOW = 0.6; // of SIZE
@@ -99,11 +103,14 @@ export function wireTosses(deps: () => FloorActionsDeps): void {
 // once the last tosses are gone, rolls to warn and toss a few more, like
 // the mouse
 export function updateTosses(now: number): void {
-  if (tosses.length > 0 || warnings.length > 0) return;
-  if (isScreenFrozen() || !getDeps || !roll.procs(now)) return;
+  if (tosses.length > 0 || warnings.length > 0 || isScreenFrozen()) {
+    roll.hold(now);
+    return;
+  }
+  if (!getDeps || !roll.procs(now)) return;
   const floor = pickSpawnFloor(getDeps());
   if (!floor) return;
-  roll.restart(spawnTosses(floor, now));
+  spawnTosses(floor, now);
 }
 
 // warns and tosses a few at once, alongside any already flying (test button)
@@ -112,13 +119,12 @@ export function forceTosses(): void {
   if (floor) spawnTosses(floor, performance.now());
 }
 
-// the warning and its tosses from now; when the last one has fallen
-function spawnTosses(floor: Floor, now: number): number {
+// the warning and its tosses from now
+function spawnTosses(floor: Floor, now: number): void {
   const { warningMs, count, tossGapMs, flightMs, contentOdds } =
     CONFIG.randomSpawns.tosses;
   warnings.push({ at: now, until: now + warningMs, shown: false });
   let launchAt = now + warningMs;
-  let endsAt = launchAt;
   const n = randomInt(...count);
   for (let i = 0; i < n; i++) {
     const prize = rollPrize(contentOdds, floor);
@@ -144,10 +150,8 @@ function spawnTosses(floor: Floor, now: number): number {
         ? null
         : tossAt(toss, t, at);
     tosses.push(toss);
-    endsAt = launchAt + toss.flightMs;
     launchAt += between([...tossGapMs]);
   }
-  return endsAt;
 }
 
 // a toss in flight: up from below the bottom edge to its apex and back
@@ -174,9 +178,13 @@ function isFlying(toss: Toss, now: number): boolean {
 function hitToss(x: number, y: number, now: number): Toss | null {
   for (let i = tosses.length - 1; i >= 0; i--) {
     const toss = tosses[i];
-    if (!isFlying(toss, now)) continue;
-    tossAt(toss, now, spot);
-    if (Math.hypot(x - spot.x, y - spot.y) < SIZE * HIT_REACH) return toss;
+    if (toss.caughtAt !== Infinity) continue;
+    for (let step = 0; step <= HIT_STEPS; step++) {
+      const at = now - (HIT_LAG_MS * step) / HIT_STEPS;
+      if (at < toss.launchAt || at > toss.launchAt + toss.flightMs) continue;
+      tossAt(toss, at, spot);
+      if (Math.hypot(x - spot.x, y - spot.y) < SIZE * HIT_REACH) return toss;
+    }
   }
   return null;
 }
@@ -194,7 +202,8 @@ export function catchTossAt(x: number, y: number): boolean {
   const toss = hitToss(x, y, now);
   if (!toss) return false;
   toss.caughtAt = now;
-  tossAt(toss, now, toss.from);
+  toss.from.x = spot.x;
+  toss.from.y = spot.y;
   playBubblePop();
   shakeScreen(CATCH_SHAKE);
   toss.payout = collectPrize(

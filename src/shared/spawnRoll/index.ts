@@ -8,8 +8,9 @@ export interface SpawnRollConfig {
 export interface SpawnRoll {
   // true when a roll is due and procs; call only while nothing is out
   procs(now: number): boolean;
-  // the next roll is a full step after `at` (when the last spawn ends)
-  restart(at: number): void;
+  // call every frame something is out (or can't spawn): the next roll is a
+  // full step after the last such call
+  hold(now: number): void;
 }
 
 export function createSpawnRoll(
@@ -23,8 +24,8 @@ export function createSpawnRoll(
       nextAt = now + config.rollEveryMs;
       return Math.random() < config.procChance;
     },
-    restart(at) {
-      nextAt = at + config.rollEveryMs;
+    hold(now) {
+      nextAt = now + config.rollEveryMs;
     },
   };
 }
