@@ -96,7 +96,7 @@ export const CONFIG = {
     mouse: {
       rollEveryMs: 5_000,
       procChance: 0.1,
-      cooldownMs: 30_000,
+      cooldownMs: 5_000,
       // how long it runs about before leaving, pulsing over its last pulseMs
       durationMs: 5_000,
       pulseMs: 2_000,
@@ -106,7 +106,7 @@ export const CONFIG = {
     bubbles: {
       rollEveryMs: 5_000,
       procChance: 0.1,
-      cooldownMs: 30_000,
+      cooldownMs: 5_000,
       // how long they float before vanishing, pulsing over its last pulseMs
       durationMs: 5_000,
       pulseMs: 2_000,

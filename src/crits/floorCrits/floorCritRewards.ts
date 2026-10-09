@@ -1688,9 +1688,8 @@ function floorCritLevels(
   if (kind === "atomsCrit") return step ? Math.ceil(count / 5) : 0;
   if (kind === "reactorCrit") return step ? Math.ceil(count / 3) : 0;
   if (kind === "staticCrit") return step ? count : 0;
-  // an EMP's short and a Big Bang's collapse only jolt a bar; their runs land them
+  // an EMP's short only jolts a bar; its runs land them
   if (kind === "empCrit") return step ? Math.ceil(count / 5) : 0;
-  if (kind === "bigBangCrit") return step ? Math.ceil(count / 4) : 0;
   // an inspiral's waves only stretch a bar; its runs land them
   if (kind === "inspiralCrit") return step ? Math.ceil(count / 5) : 0;
   // a thunderstorm strikes each bar about four times, a shotgun peppers
@@ -1702,6 +1701,10 @@ function floorCritLevels(
   if (kind === "solarFlareCrit") return Math.ceil(count / 9);
   if (kind === "flakCrit") return Math.ceil(count / 15);
   if (kind === "revolverCrit") return Math.ceil(count / 3);
+  // seven geysers blast up through each bar; two plasma shots hit each, three
+  // blasts a shot
+  if (kind === "geysersCrit") return Math.ceil(count / 7);
+  if (kind === "plasmaCannonCrit") return Math.ceil(count / 6);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);

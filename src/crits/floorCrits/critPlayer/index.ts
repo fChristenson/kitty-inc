@@ -342,13 +342,14 @@ const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   reactorCrit: () => import("../crits/reactorCrit"),
   staticCrit: () => import("../crits/staticCrit"),
   empCrit: () => import("../crits/empCrit"),
-  bigBangCrit: () => import("../crits/bigBangCrit"),
   inspiralCrit: () => import("../crits/inspiralCrit"),
   thunderstormCrit: () => import("../crits/thunderstormCrit"),
   shotgunCrit: () => import("../crits/shotgunCrit"),
   solarFlareCrit: () => import("../crits/solarFlareCrit"),
   flakCrit: () => import("../crits/flakCrit"),
   revolverCrit: () => import("../crits/revolverCrit"),
+  geysersCrit: () => import("../crits/geysersCrit"),
+  plasmaCannonCrit: () => import("../crits/plasmaCannonCrit"),
 };
 const loading = new Map<FloorCritKind, Promise<unknown>>();
 

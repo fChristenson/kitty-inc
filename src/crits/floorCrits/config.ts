@@ -224,10 +224,6 @@ export const FLOOR_CRIT_CONFIG = {
     empCrit: {
       chance: 0.03,
     },
-    // the whole screen collapsing into the number and banging back out
-    bigBangCrit: {
-      chance: 0.03,
-    },
     // two wisps spiralling into each other, gravity waves stretching the bars
     inspiralCrit: {
       chance: 0.03,
@@ -250,6 +246,14 @@ export const FLOOR_CRIT_CONFIG = {
     },
     // two fans of six heavy revolver shots, the last into its own bar
     revolverCrit: {
+      chance: 0.03,
+    },
+    // geysers of light bursting up through the bars, a giant one under its own
+    geysersCrit: {
+      chance: 0.03,
+    },
+    // heavy plasma shots throwing arcs along the bars, the last into its own
+    plasmaCannonCrit: {
       chance: 0.03,
     },
     // a gunship circling over the building, raking each bar with tracers,
