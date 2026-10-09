@@ -232,6 +232,26 @@ export const FLOOR_CRIT_CONFIG = {
     inspiralCrit: {
       chance: 0.03,
     },
+    // bolts cracking down all over the bars, then a giant one onto its own
+    thunderstormCrit: {
+      chance: 0.03,
+    },
+    // shotgun blasts of pellets down the bars, then a double barrel
+    shotgunCrit: {
+      chance: 0.03,
+    },
+    // a sun lashing the bars with loops of flare, then a fat beam onto its own
+    solarFlareCrit: {
+      chance: 0.03,
+    },
+    // flak shells bursting over the bars, shrapnel raining into them
+    flakCrit: {
+      chance: 0.03,
+    },
+    // two fans of six heavy revolver shots, the last into its own bar
+    revolverCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

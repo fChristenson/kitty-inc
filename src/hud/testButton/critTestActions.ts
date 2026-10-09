@@ -1367,6 +1367,11 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-floor-crit="empCrit">EMP Crit</button>
           <button class="game__button" data-floor-crit="bigBangCrit">Big Bang Crit</button>
           <button class="game__button" data-floor-crit="inspiralCrit">Inspiral Crit</button>
+          <button class="game__button" data-floor-crit="thunderstormCrit">Thunderstorm Crit</button>
+          <button class="game__button" data-floor-crit="shotgunCrit">Shotgun Crit</button>
+          <button class="game__button" data-floor-crit="solarFlareCrit">Solar Flare Crit</button>
+          <button class="game__button" data-floor-crit="flakCrit">Flak Crit</button>
+          <button class="game__button" data-floor-crit="revolverCrit">Revolver Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

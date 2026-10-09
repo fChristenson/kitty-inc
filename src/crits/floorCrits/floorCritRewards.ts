@@ -1693,6 +1693,15 @@ function floorCritLevels(
   if (kind === "bigBangCrit") return step ? Math.ceil(count / 4) : 0;
   // an inspiral's waves only stretch a bar; its runs land them
   if (kind === "inspiralCrit") return step ? Math.ceil(count / 5) : 0;
+  // a thunderstorm strikes each bar about four times, a shotgun peppers
+  // each with about ten pellets
+  if (kind === "thunderstormCrit") return Math.ceil(count / 4);
+  if (kind === "shotgunCrit") return Math.ceil(count / 10);
+  // a solar flare's lashes land about nine blasts a bar, flak about fifteen
+  // bits of shrapnel, a revolver about three shots
+  if (kind === "solarFlareCrit") return Math.ceil(count / 9);
+  if (kind === "flakCrit") return Math.ceil(count / 15);
+  if (kind === "revolverCrit") return Math.ceil(count / 3);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);

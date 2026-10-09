@@ -9,6 +9,10 @@ export const ownLast = (bars: Point[]): number[] => [
   0,
 ];
 
+// the bar indexes other than its own, or just its own if it's alone
+export const otherBars = (bars: Point[]): number[] =>
+  bars.length > 1 ? bars.map((_, i) => i).slice(1) : [0];
+
 // a bar's half height, in the flash's units
 export const BAR_HALF_H = 46;
 
