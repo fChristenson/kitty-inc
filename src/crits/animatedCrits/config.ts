@@ -8267,6 +8267,16 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 80
+  // flight, perma tier: src/crits/animatedCrits/events/lockOnVolleyEvent ("Lock-On Volley"): on the flight stage down a corridor of beam frames, an aim laser locks each wisp of a squadron in turn, then homing wisps blow them all in a rattling chain; three volleys, the last a whirling ring round a huge blast
+  lockOnVolleyEvent: {
+    chance: 0.01,
+  },
+  // flight, cash: src/crits/animatedCrits/events/rockFieldEvent ("Rock Field"): on the flight stage, glitter rocks rush in and twin beams crack each into chunks that burst one after another, each paying; the last huge rock splits eight ways
+  rockFieldEvent: {
+    chance: 0.01,
+    payoutsPerChunk: 0.2, // the floor's payouts each burst chunk pays
+  },
   // batch 79
   // shmup, cash: src/crits/animatedCrits/events/skyRaidEvent ("Sky Raid"): the view lifts high off the floors into space seen from above, the ship weaves up a streaming starfield through drones' fans, gunships' rings and a boss's spiral of wisp bullets, shooting each down in a paying blast, the boss in a chain of blasts, then the view dives back onto the floors
   skyRaidEvent: {

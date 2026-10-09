@@ -2208,6 +2208,8 @@ async function main() {
       doom: forceOnActive((e) => e.forceDoomEvent),
       "road-race": forceOnActive((e) => e.forceRoadRaceEvent),
       "sky-raid": forceOnActive((e) => e.forceSkyRaidEvent),
+      "lock-on-volley": forceOnActive((e) => e.forceLockOnVolleyEvent),
+      "rock-field": forceOnActive((e) => e.forceRockFieldEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

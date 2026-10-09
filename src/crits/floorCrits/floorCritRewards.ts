@@ -1675,6 +1675,8 @@ function floorCritLevels(
     kind === "gunshipCrit"
   )
     return Math.ceil(count / 3);
+  // a missile tangle rains eight missiles on each bar
+  if (kind === "missileTangleCrit") return Math.ceil(count / 8);
   // an artillery barrage lands three shells a bar, then its salvo
   if (kind === "artilleryBarrageCrit") return Math.ceil(count / 4);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it

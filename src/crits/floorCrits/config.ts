@@ -215,5 +215,10 @@ export const FLOOR_CRIT_CONFIG = {
     freezeRayCrit: {
       chance: 0.03,
     },
+    // a ring of missiles looping out and crisscrossing back, raining onto
+    // every bar in a rattling cluster of blasts
+    missileTangleCrit: {
+      chance: 0.03,
+    },
   },
 } as const;
