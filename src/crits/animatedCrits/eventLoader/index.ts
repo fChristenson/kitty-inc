@@ -1,5 +1,6 @@
 // The ~1,100 event modules are most of the game's code, so they ship in
-// chunks: a small starter pile of every look, then 8 big parts, each loaded
+// chunks: a small starter pile of every look, then 9 big parts of about 140
+// events each (new events go in the last), each loaded
 // on its own while the game is quiet (shared/idle's loadWhenIdle, queued by
 // main.ts). Only the loaded events can claim a crit; crits roll as plain
 // crits until the starter pile is in.
@@ -15,6 +16,7 @@ const PARTS = [
   () => import("./events5"),
   () => import("./events6"),
   () => import("./events7"),
+  () => import("./events8"),
 ];
 
 export type EventCatalog = typeof import("./eventsStarter") &
@@ -25,7 +27,8 @@ export type EventCatalog = typeof import("./eventsStarter") &
   typeof import("./events4") &
   typeof import("./events5") &
   typeof import("./events6") &
-  typeof import("./events7");
+  typeof import("./events7") &
+  typeof import("./events8");
 
 const parts = new Map<number, Promise<object>>();
 let partsRequested = 0;

@@ -1,4 +1,4 @@
-// event modules, part 4 of 8 (see index.ts): each registers
+// event modules, part 4 of 9 (see index.ts): each registers
 // itself with the event-proc pool when it loads
 import "../events/courierEvent";
 import "../events/rodeoEvent";

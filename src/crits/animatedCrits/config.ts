@@ -8267,6 +8267,28 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 81
+  // flight, cash: src/crits/animatedCrits/events/galaxyFlightEvent ("Galaxy Flight"): on the flight stage, the view dives at a spiral galaxy of glitter, the guns blowing the wisps on its arms core outward (each paying), then the core
+  galaxyFlightEvent: {
+    chance: 0.01,
+    payoutsPerRider: 0.3, // the floor's payouts each wisp pays
+    payoutsCore: 2, // the floor's payouts the core pays
+  },
+  // flight, levels: src/crits/animatedCrits/events/battlecruiserEvent ("Battlecruiser"): on the flight stage, a lattice of wisps joined by beams looms in and blows in a wave corner to corner, then its core
+  battlecruiserEvent: {
+    chance: 0.01,
+    levelShare: 0.01, // free levels on the floor per node
+  },
+  // flight, perma tier: src/crits/animatedCrits/events/laserGauntletEvent ("Laser Gauntlet"): on the flight stage, laser grids rush in, the guns blowing each one's emitters in turn, the last eight-sided
+  laserGauntletEvent: {
+    chance: 0.01,
+  },
+  // flight, cash: src/crits/animatedCrits/events/wormholeDiveEvent ("Wormhole Dive"): on the flight stage, the view dives down a swirling vortex of glitter rings, shooting the wisps riding its wall (each paying), then bursts out the far end
+  wormholeDiveEvent: {
+    chance: 0.01,
+    payoutsPerRider: 0.3, // the floor's payouts each wisp pays
+    payoutsOut: 2, // the floor's payouts the burst out pays
+  },
   // batch 80
   // flight, levels: src/crits/animatedCrits/events/convoyEvent ("Convoy"): on the flight stage, a snaking train of cargo wisps sweeps across in depth and the guns strafe it tail to head, every car bursting in a chain, the engine last
   convoyEvent: {

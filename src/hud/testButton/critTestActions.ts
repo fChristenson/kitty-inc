@@ -46,6 +46,15 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Events</summary>
+        <div class="test-actions-dropdown__menu">
+          <button id="test-galaxy-flight-event" class="game__button">Galaxy Flight</button>
+          <button id="test-battlecruiser-event" class="game__button">Battlecruiser</button>
+          <button id="test-laser-gauntlet-event" class="game__button">Laser Gauntlet</button>
+          <button id="test-wormhole-dive-event" class="game__button">Wormhole Dive</button>
           <button id="test-convoy-event" class="game__button">Convoy</button>
           <button id="test-fireworks-flight-event" class="game__button">Fireworks Flight</button>
           <button id="test-storm-flight-event" class="game__button">Storm Flight</button>
@@ -66,11 +75,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-double-slit-event" class="game__button">Double Slit</button>
           <button id="test-blast-sweep-event" class="game__button">Blast Sweep</button>
           <button id="test-hydraulic-jump-event" class="game__button">Hydraulic Jump</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-pincushion-event" class="game__button">Pincushion</button>
           <button id="test-updraft-event" class="game__button">Updraft</button>
           <button id="test-plugholes-event" class="game__button">Plugholes</button>
