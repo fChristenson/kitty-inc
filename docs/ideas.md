@@ -23,5 +23,4 @@ More floor crits after Gunship: war machines, rays and a monster from under the 
 New event looks, like Flight and FPS: the screen turned into another kind of game. Playground: `tmp/_playground/ideas.html?list=next17`.
 
 - **Platformer look:** the bars turn into a side-scroller's platforms and the number runs along them, jumping to bump blocks that pop coins, stomping wisps, dropping bar to bar down the building, then leaps onto a flagpole and slides down as every bar goes off.
-- **Shmup look:** the building scrolls down like a vertical shooter's stage under the number's ship, which guns down swooping waves of wisps that burst into coins, then a big boss wisp spraying rings of bullets; when it blows the stage stops and every bar goes off.
 

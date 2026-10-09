@@ -8268,6 +8268,14 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 79
+  // shmup, cash: src/crits/animatedCrits/events/skyRaidEvent ("Sky Raid"): the view lifts high off the floors into space seen from above, the ship weaves up a streaming starfield through drones' fans, gunships' rings and a boss's spiral of wisp bullets, shooting each down in a paying blast, the boss in a chain of blasts, then the view dives back onto the floors
+  skyRaidEvent: {
+    chance: 0.01,
+    enterMs: 450, // the view lifting off the floors
+    flyMs: 4000, // the raid, until the floors rush up (5s from the click to the crash)
+    payoutsPerKill: 0.8, // the floor's payouts each drone and gunship pays
+    payoutsBoss: 3, // the floor's payouts the boss pays
+  },
   // road race, cash: src/crits/animatedCrits/events/roadRaceEvent ("Road Race"): the floors zoom away into a race already flat out, a small ship skimming the street between the buildings through a snake of coins, each paying into the total, round a bend, down the straight and through the finish gate's window onto the floors
   roadRaceEvent: {
     chance: 0.01,

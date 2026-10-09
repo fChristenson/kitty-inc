@@ -2207,6 +2207,7 @@ async function main() {
       saloon: forceOnActive((e) => e.forceSaloonEvent),
       doom: forceOnActive((e) => e.forceDoomEvent),
       "road-race": forceOnActive((e) => e.forceRoadRaceEvent),
+      "sky-raid": forceOnActive((e) => e.forceSkyRaidEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
