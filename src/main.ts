@@ -2235,6 +2235,7 @@ async function main() {
       "ion-haze": forceOnActive((e) => e.forceIonHazeEvent),
       nebula: forceOnActive((e) => e.forceNebulaEvent),
       survivors: forceOnActive((e) => e.forceSurvivorsEvent),
+      "geometry-run": forceOnActive((e) => e.forceGeometryRunEvent),
       bubbles: forceBubbles,
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
