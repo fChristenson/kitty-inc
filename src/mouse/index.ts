@@ -120,7 +120,7 @@ export async function loadMouseImage(): Promise<HTMLImageElement> {
 
 function despawn(now: number): void {
   active = null;
-  roll.hold(now);
+  roll.coolDown(now);
   notifyHuntTargetGone();
 }
 

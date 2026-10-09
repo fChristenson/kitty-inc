@@ -1,16 +1,19 @@
-// a random spawn's roll: every rollEveryMs it procs with procChance
+// a random spawn's roll: every rollEveryMs it procs with procChance, never
+// within cooldownMs of the last one leaving
 
 export interface SpawnRollConfig {
   readonly rollEveryMs: number;
   readonly procChance: number;
+  readonly cooldownMs: number;
 }
 
 export interface SpawnRoll {
   // true when a roll is due and procs; call only while nothing is out
   procs(now: number): boolean;
-  // call every frame something is out (or can't spawn): the next roll is a
-  // full step after the last such call
+  // call every frame it can't spawn: the next roll is a full step after
   hold(now: number): void;
+  // call every frame one is out: the next roll is cooldownMs after
+  coolDown(now: number): void;
 }
 
 export function createSpawnRoll(
@@ -25,7 +28,10 @@ export function createSpawnRoll(
       return Math.random() < config.procChance;
     },
     hold(now) {
-      nextAt = now + config.rollEveryMs;
+      nextAt = Math.max(nextAt, now + config.rollEveryMs);
+    },
+    coolDown(now) {
+      nextAt = now + config.cooldownMs;
     },
   };
 }

@@ -327,22 +327,20 @@ export function startMoneyCover(
   };
 }
 
-// the Burst event's blow-out: coins and bills shot from `from` (the button if
-// unset) over the whole screen, merging into the total; false if it can't start
+// the Burst event's blow-out: coins and bills shot from the button over the
+// whole screen, merging into the total; false if it can't start
 export function startBurstCover(
   key: string,
   floor: Floor,
   context: EventProcContext,
   options: MoneyCoverOptions = {},
-  from?: (area: CoverArea) => Point,
 ): boolean {
   const cover = startMoneyCover(key, floor, context, CONFIG.burstEvent, {
     ...options,
     layout: (area) => coverSpots(area, BURST_COINS),
   });
   if (!cover) return false;
-  if (from) cover.launchFrom(from(cover.area), cover.spots);
-  else cover.launch(cover.spots);
+  cover.launch(cover.spots);
   playExplosion();
   shakeScreen(BURST_SHAKE);
   return true;

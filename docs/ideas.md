@@ -14,4 +14,3 @@
 
 ## Built
 
-- **Odometer** (`src/shared/odometer`): a `,777,` group in the total pops gold, slams and plays the Burst from the total, multiplying it by 7.

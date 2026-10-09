@@ -89,7 +89,11 @@ export function wireBubbles(deps: () => FloorActionsDeps): void {
 
 // once the last bubbles are gone, rolls to blow a few more in, like the mouse
 export function updateBubbles(now: number): void {
-  if (bubbles.length > 0 || isScreenFrozen()) {
+  if (bubbles.length > 0) {
+    roll.coolDown(now);
+    return;
+  }
+  if (isScreenFrozen()) {
     roll.hold(now);
     return;
   }

@@ -89,12 +89,14 @@ export const CONFIG = {
 
   // the random spawns that wander onto the screen on their own every so
   // often, each tapped for a reward. While none of a kind is out, it rolls
-  // every rollEveryMs and spawns with procChance
+  // every rollEveryMs and spawns with procChance, but not until cooldownMs
+  // after the last one left
   randomSpawns: {
     // src/mouse — a mouse running about a random unlocked floor
     mouse: {
       rollEveryMs: 5_000,
       procChance: 0.1,
+      cooldownMs: 30_000,
       // how long it runs about before leaving, pulsing over its last pulseMs
       durationMs: 5_000,
       pulseMs: 2_000,
@@ -104,6 +106,7 @@ export const CONFIG = {
     bubbles: {
       rollEveryMs: 5_000,
       procChance: 0.1,
+      cooldownMs: 30_000,
       // how long they float before vanishing, pulsing over its last pulseMs
       durationMs: 5_000,
       pulseMs: 2_000,
@@ -111,31 +114,6 @@ export const CONFIG = {
       // a bubble's odds of holding a crit number, a coin or a badge
       contentOdds: { tier: 0.45, coin: 0.4, badge: 0.15 },
     },
-    // src/tosses — prizes tossed up from the bottom of the screen like
-    // fruit, after a warning sign: tap one in the air to catch it
-    tosses: {
-      rollEveryMs: 5_000,
-      procChance: 0.1,
-      // the warning sign before the first toss
-      warningMs: 1_000,
-      count: [3, 7],
-      // between one toss and the next
-      tossGapMs: [180, 420],
-      // a toss's flight, up and back down off the screen
-      flightMs: [1_700, 2_200],
-      // a prize's odds of being a crit number, a coin or a badge
-      contentOdds: { tier: 0.45, coin: 0.4, badge: 0.15 },
-    },
-  },
-
-  // src/shared/odometer — the total-income readout as a slot reel: when its
-  // digits show `digits`, they pop gold, the readout slams and plays the Burst
-  // event's blow-out, multiplying the total
-  odometer: {
-    digits: "777",
-    multiplier: 7,
-    // after one, the readout can't hit again for this long
-    cooldownMs: 60_000,
   },
 
   // src/hud/upgradeMenu/index.ts — per-floor worker/office-upgrade pricing.

@@ -14,7 +14,6 @@ import {
   GLOBAL_SLAM,
 } from "../eventEndSlam";
 import { drawTargetStream, getTargetTension } from "../eventFx";
-import { watchOdometer } from "../odometer";
 
 // shared "amount + spelled-out unit name below it" total-income drawing, used by
 // both hud/index.ts's top-of-screen HUD and background/cityMap's map readout —
@@ -33,8 +32,6 @@ const UNIT_STROKE_TO_FONT_RATIO = 10 / (144 * UNIT_FONT_SCALE);
 export interface TotalIncomeReadoutOptions {
   fontSize: number;
   unitNameGapPx: number;
-  // the HUD's readout plays the odometer (see shared/odometer)
-  odometer?: boolean;
 }
 
 export interface TotalIncomeReadout {
@@ -73,7 +70,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     centerX: number,
     top: number,
     totalIncome: BigNumber,
-    { fontSize, unitNameGapPx, odometer }: TotalIncomeReadoutOptions,
+    { fontSize, unitNameGapPx }: TotalIncomeReadoutOptions,
   ): number {
     const displayed = getAnimatedTotalIncome(totalIncome);
     const valueChanged =
@@ -93,10 +90,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     // a freeze event streaming into the total drives its build-up instead
     const tension = getTargetTension(GLOBAL_SLAM, "total");
     const slam = getSlamPose(GLOBAL_SLAM, "total", now);
-    const reel = odometer
-      ? watchOdometer(formatted, tension !== null || slam !== null)
-      : null;
-    const { amount, unitName } = reel ? reel.parts : formatted;
+    const { amount, unitName } = formatted;
     const font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
     const remeasure = valueChanged || font !== measuredFont;
     measuredFont = font;
@@ -115,8 +109,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       tension !== null ||
       wiggleRotation !== 0 ||
       absorbScale !== 1 ||
-      whiteMix > 0 ||
-      reel !== null;
+      whiteMix > 0;
     const pivotY = top + amountHeight / 2;
     let bottom = top;
 
@@ -162,7 +155,6 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         true,
         whiteMix,
         moving,
-        reel?.gold ?? null,
       );
 
       if (remeasure) {
