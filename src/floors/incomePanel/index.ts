@@ -393,13 +393,6 @@ function overtimeFlashStrength(floor: Floor, now: number): number {
 // reload never resets/loses how far into its current cycle a floor already was
 let tickerRunning = false;
 
-// ceiling on a NEW floor's own starting wait, applied once at creation time (see
-// floors/index.ts's buildFloor) — a high floor's exponentially-longer base interval
-// would otherwise start requiring days/weeks between payouts before a single
-// upgrade. Once created, a floor's interval is NOT re-clamped here on every cycle:
-// upgrades halve it below this exactly like any other floor (see increaseIncomeRate)
-export const MAX_INCOME_INTERVAL_SECONDS =
-  CONFIG.incomePanel.maxIncomeIntervalSeconds;
 // upgradeCount hitting a multiple of this is also the "next ten levels" milestone
 // floorInteractions.ts celebrates with an extra coin burst at the upgrade indicator
 export const UPGRADE_MILESTONE_STEP = CONFIG.incomePanel.upgradeMilestoneStep;

@@ -2,26 +2,36 @@ import { CONFIG } from "../../config";
 import type { Floor } from "../../gameState";
 import { multiply, type BigNumber } from "../bigNumber";
 
-export const UPGRADE_ECONOMY_VERSION = 6;
+export const UPGRADE_ECONOMY_VERSION = 8;
 
-export function baseFloorInterval(floorLevel: number): number {
-  return Math.min(
-    CONFIG.floors.baseIncomeIntervalSeconds * 2 ** (floorLevel - 1),
-    CONFIG.incomePanel.maxIncomeIntervalSeconds,
+// a floor's interval and $/s over the ground floor's: 1 on the ground floor,
+// topIncomeIntervalSeconds / baseIncomeIntervalSeconds on the top one
+export function floorScale(floorLevel: number): number {
+  const {
+    baseIncomeIntervalSeconds,
+    topIncomeIntervalSeconds,
+    floorsPerBuilding,
+  } = CONFIG.floors;
+  return (
+    (topIncomeIntervalSeconds / baseIncomeIntervalSeconds) **
+    ((floorLevel - 1) / (floorsPerBuilding - 1))
   );
 }
 
+export function baseFloorInterval(floorLevel: number): number {
+  return CONFIG.floors.baseIncomeIntervalSeconds * floorScale(floorLevel);
+}
+
+// a floor's payout over the ground floor's: a longer cycle at a higher rate
 export function floorIncomeScale(floorLevel: number): number {
-  return (
-    CONFIG.floors.incomeGrowthFactor **
-    Math.min(
-      floorLevel - 1,
-      Math.log2(
-        CONFIG.incomePanel.maxIncomeIntervalSeconds /
-          CONFIG.floors.baseIncomeIntervalSeconds,
-      ),
-    )
-  );
+  return floorScale(floorLevel) ** 2;
+}
+
+// the summed floorScale of floors 1..count
+export function floorsRateScale(count: number): number {
+  let sum = 0;
+  for (let level = 1; level <= count; level++) sum += floorScale(level);
+  return sum;
 }
 
 export function upgradeSpeedMultiplier(level: number): number {
@@ -45,7 +55,7 @@ export function floorUnlockFactor(index: number): number {
   );
   const scheduled =
     (floors.unlockIncomeSeconds *
-      index *
+      floorsRateScale(index) *
       floorRateFactor(level) *
       floors.baseIncomeAmount) /
     floors.baseUnlockCost;

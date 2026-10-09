@@ -3,6 +3,7 @@ import { CONFIG } from "../config";
 import {
   baseFloorInterval,
   floorIncomeScale,
+  floorScale,
   upgradeSpeedMultiplier,
   upgradePriceFactor,
   UPGRADE_ECONOMY_VERSION,
@@ -587,12 +588,29 @@ export function saveBuildingsImmediately(
 function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
   const needsRebalance = (sf.upgradeEconomyVersion ?? 0) < 2;
   const needsSpeedRebalance = (sf.upgradeEconomyVersion ?? 0) < 4;
-  const oldScale = pow(CONFIG.floors.incomeGrowthFactor, floorIndex);
+  // pre-v2 saves grew income 2x per floor
+  const oldScale = pow(2, floorIndex);
   const inverseOldScale = fromLog10(-log10(oldScale));
   const newScale = floorIncomeScale(floorIndex + 1);
+  const version = sf.upgradeEconomyVersion ?? 0;
+  const savedInterval = needsSpeedRebalance
+    ? baseFloorInterval(floorIndex + 1) /
+      upgradeSpeedMultiplier(sf.upgradeCount)
+    : version === 4
+      ? (sf.incomeIntervalSeconds * (1 + sf.upgradeCount / 10)) /
+        upgradeSpeedMultiplier(sf.upgradeCount)
+      : sf.incomeIntervalSeconds;
+  // pre-v8 floors all earned the ground floor's $/s: stretch the interval to
+  // its floor's and grow the payout to the floor's own rate
+  const stretch =
+    version < 8
+      ? baseFloorInterval(floorIndex + 1) /
+        (savedInterval * upgradeSpeedMultiplier(sf.upgradeCount))
+      : 1;
+  const payoutStretch = version < 8 ? stretch * floorScale(floorIndex + 1) : 1;
   const rateStep = needsRebalance
     ? multiply(multiplyBig(toBigNumber(sf.rateStep), inverseOldScale), newScale)
-    : toBigNumber(sf.rateStep);
+    : multiply(toBigNumber(sf.rateStep), payoutStretch);
   // every older save is repriced on the current curve from its level: the
   // building's scale is rateStep over its floor's base rate step
   const upgradeCost =
@@ -601,6 +619,7 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
       : multiply(
           divide(rateStep, CONFIG.floors.baseRateStep * newScale),
           CONFIG.floors.baseUpgradeCost *
+            floorScale(floorIndex + 1) *
             upgradePriceFactor(sf.upgradeCount) *
             (sf.priceDiscountMultiplier ?? 1),
         );
@@ -611,14 +630,8 @@ function fromSavedFloor(sf: SavedFloor, floorIndex: number): Floor {
           multiplyBig(toBigNumber(sf.incomeAmount), inverseOldScale),
           newScale,
         )
-      : toBigNumber(sf.incomeAmount),
-    incomeIntervalSeconds: needsSpeedRebalance
-      ? baseFloorInterval(floorIndex + 1) /
-        upgradeSpeedMultiplier(sf.upgradeCount)
-      : sf.upgradeEconomyVersion === 4
-        ? (sf.incomeIntervalSeconds * (1 + sf.upgradeCount / 10)) /
-          upgradeSpeedMultiplier(sf.upgradeCount)
-        : sf.incomeIntervalSeconds,
+      : multiply(toBigNumber(sf.incomeAmount), payoutStretch),
+    incomeIntervalSeconds: savedInterval * stretch,
     upgradeCost,
     rateStep,
     upgradeCount: sf.upgradeCount,

@@ -5,6 +5,7 @@ import type { Floor } from "../../gameState";
 import { type BigNumber, ZERO, add } from "../../shared/bigNumber";
 import { drawCartoonText, formatPrice } from "../../utils";
 import { COLOR } from "../../palette";
+import { CONFIG } from "../../config";
 import { getWiggleRotation } from "../../shared/wiggle";
 import {
   drawSlamTarget,
@@ -158,7 +159,7 @@ interface EnsureLockedFloorDeps {
 
 // hard ceiling on how tall any one building can grow — shown as an "X/20"
 // indicator under each building's own map marker (see cityMap/markers.ts)
-export const MAX_FLOORS_PER_BUILDING = 20;
+export const MAX_FLOORS_PER_BUILDING = CONFIG.floors.floorsPerBuilding;
 
 // the real (non-test) way the building grows: there must always be exactly one
 // locked floor waiting above the topmost unlocked floor, ready to be bought next.

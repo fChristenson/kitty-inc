@@ -9,6 +9,7 @@ import {
 import {
   baseFloorInterval,
   floorIncomeScale,
+  floorScale,
   floorUnlockFactor,
 } from "../shared/upgradeEconomy";
 import {
@@ -49,17 +50,9 @@ export {
 // every literal balance number below lives in src/config.ts (CONFIG.floors) —
 // tune income/pricing there, not here
 const BASE_INCOME_AMOUNT = CONFIG.floors.baseIncomeAmount; // ground floor's starting $/interval
-// each floor above starts at incomeGrowthFactor times the previous floor's income
-// amount, while the interval only doubles (see BASE_INCOME_INTERVAL_SECONDS) —
-// incomeGrowthFactor is kept equal to that doubling (see config.ts's own comment
-// on why), so a fresh, un-upgraded floor's $/s is flat across floor depth; only
-// upgrades (and other buildings) grow it from there
-const BASE_UPGRADE_COST = CONFIG.floors.baseUpgradeCost; // ground floor's starting upgrade price; each floor above doubles it
+const BASE_UPGRADE_COST = CONFIG.floors.baseUpgradeCost; // ground floor's starting upgrade price; scaled by floorScale above it
 const BASE_UNLOCK_COST = CONFIG.floors.baseUnlockCost; // floor 2's unlock price floor; see floorUnlockFactor for the curve above
-// each upgrade click's payoff scales exactly like the base income (same
-// INCOME_GROWTH_FACTOR), so a higher floor's own upgrades are still worth
-// proportionately more per click than a lower floor's — a flat step here would
-// let enough flat-rate floor-1 upgrades out-earn a higher, unupgraded floor
+// scales like the payout, so an upgrade adds the same share on every floor
 const BASE_RATE_STEP = CONFIG.floors.baseRateStep;
 const ONE = fromNumber(1);
 
@@ -156,7 +149,10 @@ export function computeBaseFloorStats(
   return {
     incomeAmount: multiply(multiplier, incomeScale * BASE_INCOME_AMOUNT),
     incomeIntervalSeconds: baseFloorInterval(floorLevel),
-    upgradeCost: multiply(multiplier, BASE_UPGRADE_COST),
+    upgradeCost: multiply(
+      multiplier,
+      BASE_UPGRADE_COST * floorScale(floorLevel),
+    ),
     rateStep: multiply(multiplier, incomeScale * BASE_RATE_STEP),
   };
 }
@@ -184,13 +180,6 @@ export function buildFloor(
       : ZERO
     : multiply(floorUnlockBaseCost, floorUnlockFactor(floorLevel - 1));
   const unlockCost = multiply(baseUnlockCost, priceDiscountMultiplier);
-  // true once this level's own natural (uncapped) interval already exceeds the
-  // 1h cap below — set once, forever, regardless of how far upgrades later
-  // shrink the floor's actual incomeIntervalSeconds (see incomePanel.ts's
-  // increaseIncomeRate, which charges these floors a steeper per-upgrade cost)
-  const aboveCapTier =
-    CONFIG.floors.baseIncomeIntervalSeconds * 2 ** (floorLevel - 1) >
-    CONFIG.incomePanel.maxIncomeIntervalSeconds;
 
   const baseStats = computeBaseFloorStats(floorLevel, multiplier);
   return {
@@ -206,7 +195,7 @@ export function buildFloor(
     hasOfficeSupplies: false,
     hasManager: false,
     critMultiplierTier: defaultCritTier,
-    aboveCapTier,
+    aboveCapTier: false,
     overtimeTicks: 0,
     overtimeStartedAt: null,
     overtimeEndedAt: null,

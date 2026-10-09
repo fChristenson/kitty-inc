@@ -12,7 +12,11 @@ import {
   multiply,
 } from "../shared/bigNumber";
 import { CONFIG } from "../config";
-import { floorRateFactor, floorUnlockFactor } from "../shared/upgradeEconomy";
+import {
+  floorRateFactor,
+  floorsRateScale,
+  floorUnlockFactor,
+} from "../shared/upgradeEconomy";
 import { MAX_FLOORS_PER_BUILDING } from "../floors/floorLock";
 
 // a BigNumber: 1000 ** index overflows a plain number past ~100 buildings,
@@ -24,7 +28,7 @@ export function getBuildingMultiplier(buildingIndex: number): BigNumber {
 // a fully upgraded first building's income per second: every floor maxed (with
 // its maxed bonus) and all three office upgrades
 const MAXED_BUILDING_INCOME =
-  MAX_FLOORS_PER_BUILDING *
+  floorsRateScale(MAX_FLOORS_PER_BUILDING) *
   CONFIG.floors.baseIncomeAmount *
   floorRateFactor(CONFIG.incomePanel.maxFloorLevel) *
   CONFIG.incomePanel.maxedFloorIncomeMultiplier *

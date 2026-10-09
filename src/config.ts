@@ -11,13 +11,15 @@
 import { CRIT_CONFIG } from "./crits/config";
 
 export const CONFIG = {
-  // Floor income and interval scale together up to the starting interval limit.
-  // With a 1s limit, floors share a base rate; buildings scale the whole economy.
+  // A floor's interval runs from baseIncomeIntervalSeconds on the ground floor
+  // to topIncomeIntervalSeconds on the top one; its $/s, upgrade and unlock
+  // prices grow by the same factor. Buildings scale the whole economy.
   floors: {
     floorEconomyMultiplierPerBuilding: 1_000,
+    floorsPerBuilding: 20,
     baseIncomeAmount: 1,
-    incomeGrowthFactor: 2,
     baseIncomeIntervalSeconds: 1,
+    topIncomeIntervalSeconds: 3_600,
     baseUpgradeCost: 2,
     baseUnlockCost: 200,
     unlockCostGrowthFactor: 2,
@@ -43,7 +45,6 @@ export const CONFIG = {
   // it's upgraded, and the bounds its payout cycle is clamped to.
   incomePanel: {
     minIncomeIntervalSeconds: 0.5,
-    maxIncomeIntervalSeconds: 1,
     upgradeSpeedLevelScale: 20,
     upgradeMilestoneStep: 10,
     // an upgrade costs baseUpgradeCost seconds of its floor's own income, a
