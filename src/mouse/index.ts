@@ -8,6 +8,8 @@ import {
   triggerJumpAll,
 } from "../floors";
 import { randomInt } from "../utils";
+import { CONFIG } from "../config";
+import { urgentBlink } from "../shared/urgentBlink";
 import { applyBoostAll } from "../hud";
 import { playBloop } from "../sound";
 import type { Floor } from "../gameState";
@@ -25,10 +27,9 @@ import {
 // a free bonus critter: spawns at random on a random unlocked floor of whichever
 // building is currently active, runs back and forth for a few seconds, and — if
 // clicked before it scurries off — boosts every worker in the building for free,
-// same effect as hud/boostMenu's paid "speed up workers" but with no $ cost
-const VISIBLE_MS = 5000;
-const MIN_SPAWN_GAP_MS = 15000;
-const MAX_SPAWN_GAP_MS = 40000;
+// same effect as hud/boostMenu's paid "speed up workers" but with no $ cost.
+// Its timings are CONFIG.randomSpawns.mouse
+const spawnGapMs = () => randomInt(...CONFIG.randomSpawns.mouse.spawnGapMs);
 // 8x a cat's own walk speed (WALK_SPEED, worker/index.ts), with a little spread per
 // dart so every run doesn't look identically fast
 const BASE_RUN_SPEED = WALK_SPEED * 8;
@@ -95,7 +96,7 @@ let mouseSprite: HTMLCanvasElement | null = null;
 let huntedImage: HTMLCanvasElement | null = null;
 let active: MouseState | null = null;
 let lastUpdate = 0;
-let nextSpawnAt = Date.now() + randomInt(MIN_SPAWN_GAP_MS, MAX_SPAWN_GAP_MS);
+let nextSpawnAt = Date.now() + spawnGapMs();
 
 // loads the mouse sprite once; main.ts awaits this alongside the other image loads
 // before the first redraw ever needs it
@@ -114,7 +115,7 @@ export async function loadMouseImage(): Promise<HTMLImageElement> {
 
 function despawn(now: number): void {
   active = null;
-  nextSpawnAt = now + randomInt(MIN_SPAWN_GAP_MS, MAX_SPAWN_GAP_MS);
+  nextSpawnAt = now + spawnGapMs();
   notifyHuntTargetGone();
 }
 
@@ -163,7 +164,7 @@ function spawnOn(floors: Floor[], now: number): void {
 
 // advances the current run cycle — darting toward a random point, occasionally
 // pausing briefly, then picking a new random point once it arrives — and expires it
-// after VISIBLE_MS, or rolls a fresh spawn on a random unlocked floor once the
+// after its duration, or rolls a fresh spawn on a random unlocked floor once the
 // cooldown since the last one elapses. Call this once per frame — not per floor —
 // with the active building's own floors; there's only ever one mouse building-wide,
 // never one per floor
@@ -172,7 +173,7 @@ export function updateMouse(floors: Floor[], now: number): void {
   lastUpdate = now;
 
   if (active) {
-    if (now - active.spawnedAt >= VISIBLE_MS) {
+    if (now - active.spawnedAt >= CONFIG.randomSpawns.mouse.durationMs) {
       despawn(now);
       return;
     }
@@ -292,7 +293,13 @@ function drawMouseSprite(
 
   function drawMouse(): void {
     if (!active || !mouseSprite) return;
+    const { durationMs, pulseMs } = CONFIG.randomSpawns.mouse;
     ctx.save();
+    ctx.globalAlpha *= urgentBlink(
+      active.spawnedAt + durationMs - now,
+      pulseMs,
+      now,
+    );
     ctx.translate(x, MOUSE_Y + bob);
     if (rotation !== 0) ctx.rotate(rotation);
     ctx.scale(scale, scale);

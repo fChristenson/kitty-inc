@@ -1,6 +1,6 @@
 // the bubbles: every so often, like the mouse, a few bubbles blow up the
 // screen, each holding a crit number, a gold coin or a badge. Every bubble
-// lives on its own: it floats for CONFIG.bubbles.durationMs, pulsing before
+// lives on its own: it floats for CONFIG.randomSpawns.bubbles.durationMs, pulsing before
 // it vanishes. A tap pops one and pays it at once: a coin streams into the
 // total, a crit number slams into its floor's income bar, and a badge plays
 // its crit celebration.
@@ -117,7 +117,7 @@ let height = 1;
 const spot: Point = { x: 0, y: 0 };
 
 function gapMs(): number {
-  return randomInt(...CONFIG.bubbles.spawnGapMs);
+  return randomInt(...CONFIG.randomSpawns.bubbles.spawnGapMs);
 }
 
 // the floor actions of the building on screen
@@ -143,7 +143,8 @@ export function updateBubbles(now: number): void {
   const floor = pickFloor();
   if (!floor) return;
   spawnBubbles(floor, now);
-  nextSpawnAt = now + SPAWN_MS + CONFIG.bubbles.durationMs + gapMs();
+  nextSpawnAt =
+    now + SPAWN_MS + CONFIG.randomSpawns.bubbles.durationMs + gapMs();
 }
 
 // blows a few bubbles in at once, alongside any already floating (test button)
@@ -153,7 +154,7 @@ export function forceBubbles(): void {
 }
 
 function rollContent(): BubbleContent {
-  const { tier, coin } = CONFIG.bubbles.contentOdds;
+  const { tier, coin } = CONFIG.randomSpawns.bubbles.contentOdds;
   const roll = Math.random();
   if (roll < tier) return { kind: "tier", tier: pickCritTierByOdds() };
   if (roll < tier + coin) return { kind: "coin" };
@@ -161,8 +162,8 @@ function rollContent(): BubbleContent {
 }
 
 function spawnBubbles(floor: Floor, now: number): void {
-  const { durationMs } = CONFIG.bubbles;
-  const count = randomInt(...CONFIG.bubbles.count);
+  const { durationMs } = CONFIG.randomSpawns.bubbles;
+  const count = randomInt(...CONFIG.randomSpawns.bubbles.count);
   // one lane each across the screen, shuffled, so they don't pile up
   const lanes = Array.from({ length: count }, (_, i) => i);
   for (let i = lanes.length - 1; i > 0; i--) {
@@ -233,7 +234,7 @@ function bubbleScale(bubble: Bubble, now: number): number {
   const grow = progress(now, bubble.bornAt, GROW_MS);
   const vanish = progress(
     now,
-    bubble.bornAt + CONFIG.bubbles.durationMs,
+    bubble.bornAt + CONFIG.randomSpawns.bubbles.durationMs,
     VANISH_MS,
   );
   return grow >= 1 ? 1 - vanish : easeOutBack(grow);
@@ -242,7 +243,7 @@ function bubbleScale(bubble: Bubble, now: number): number {
 function hitBubble(x: number, y: number, now: number): Bubble | null {
   for (let i = bubbles.length - 1; i >= 0; i--) {
     const bubble = bubbles[i];
-    if (now >= bubble.bornAt + CONFIG.bubbles.durationMs) continue;
+    if (now >= bubble.bornAt + CONFIG.randomSpawns.bubbles.durationMs) continue;
     const scale = bubbleScale(bubble, now);
     if (scale <= 0.3) continue;
     bubbleAt(bubble, now, spot);
@@ -339,7 +340,9 @@ function smashIn(deps: FloorActionsDeps, floor: Floor, bubble: Bubble): void {
 // whether a bubble is gone for good: vanished, or popped and paid out
 function isDone(bubble: Bubble, now: number): boolean {
   if (bubble.poppedAt === Infinity)
-    return now >= bubble.bornAt + CONFIG.bubbles.durationMs + VANISH_MS;
+    return (
+      now >= bubble.bornAt + CONFIG.randomSpawns.bubbles.durationMs + VANISH_MS
+    );
   const doneMs = bubble.content.kind === "tier" ? SMASH_DONE_MS : POP_MS;
   return now >= bubble.poppedAt + doneMs;
 }
@@ -358,7 +361,7 @@ export function drawBubbles(
   for (let i = bubbles.length - 1; i >= 0; i--)
     if (isDone(bubbles[i], t)) bubbles.splice(i, 1);
   const deps = getDeps();
-  const { durationMs, pulseMs } = CONFIG.bubbles;
+  const { durationMs, pulseMs } = CONFIG.randomSpawns.bubbles;
   ctx.save();
   for (const bubble of bubbles) {
     if (!bubble.appeared && t >= bubble.bornAt) {

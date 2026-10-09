@@ -1,5 +1,5 @@
-// the blink of something about to vanish (a worker's boost bubbles, popping
-// bubbles): an alpha multiplier pulsing harder the closer remainingMs gets
+// the blink of something about to vanish (a worker's boost bubbles, the
+// mouse, popping bubbles): an alpha multiplier pulsing harder the closer remainingMs gets
 // to 0 inside the last thresholdMs, 1 before that
 const BLINK_RATE = 0.525 / (1000 / 60);
 const MAX_AMPLITUDE = 0.425;
