@@ -271,6 +271,37 @@ export function launchIncomeBar(floor: Floor, launch: BarLaunch): void {
   barLaunches.set(floor, { at: Date.now(), launch });
 }
 
+// a meltdown crit's bar heating to white-hot over heatMs, held there for
+// holdMs, then cooling off as it blows
+const barHeats = new WeakMap<
+  Floor,
+  { at: number; heatMs: number; holdMs: number }
+>();
+const HEAT_COOL_MS = 250;
+const HEAT_RATTLE_PX = 9;
+const HEAT_GLOW_ALPHA = 0.8;
+
+export function heatIncomeBar(
+  floor: Floor,
+  heatMs: number,
+  holdMs: number,
+): void {
+  barHeats.set(floor, { at: Date.now(), heatMs, holdMs });
+}
+
+// 0..1
+function heatOf(floor: Floor, now: number): number {
+  const h = barHeats.get(floor);
+  if (!h) return 0;
+  const t = Math.max(0, now - h.at);
+  if (t < h.heatMs) return (t / h.heatMs) ** 1.5;
+  if (t < h.heatMs + h.holdMs) return 1;
+  const cool = 1 - (t - h.heatMs - h.holdMs) / HEAT_COOL_MS;
+  if (cool > 0) return cool;
+  barHeats.delete(floor);
+  return 0;
+}
+
 // px right of its place
 function launchOf(floor: Floor, now: number): number {
   const l = barLaunches.get(floor);
@@ -718,6 +749,8 @@ export function drawIncomePanel(
   const lift = liftOf(floor, now);
   const crumble = crumbleOf(floor, now);
   const launched = launchOf(floor, now);
+  const heat = heatOf(floor, now);
+  const rattle = heat * HEAT_RATTLE_PX;
   const slam = getSlamPose(floor, "bar", now);
   const drawBar = (): void =>
     drawSlamTarget(
@@ -731,7 +764,10 @@ export function drawIncomePanel(
   const drawBarBody = (): void => {
     if (crumble && crumble.from >= crumble.to) return;
     ctx.save();
-    ctx.translate(barCenter.x + launched, barCenter.y + punchJolt - lift);
+    ctx.translate(
+      barCenter.x + launched + rattle * Math.sin(now * 1.7),
+      barCenter.y + punchJolt - lift + 0.6 * rattle * Math.cos(now * 2.3),
+    );
     if (cancellationArmed) ctx.rotate(getWiggleRotation(now));
     else if (tension) ctx.rotate(tension.rotation);
     else if (flashStrength > 0)
@@ -798,8 +834,8 @@ export function drawIncomePanel(
         ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
         : COLOR.moneyGreen;
     let pressure: PressurePose | null = null;
-    const boilHeat = getBoilHeat(floor, now);
-    const holdHeat = getHoldHeat(floor, now);
+    const boilHeat = Math.max(getBoilHeat(floor, now), heat);
+    const holdHeat = Math.max(getHoldHeat(floor, now), heat);
     if (overtimeGaugeVisible) {
       // the gauge flows too, in its tier-preview colors, racing and
       // straining while overtime runs
@@ -906,6 +942,17 @@ export function drawIncomePanel(
       ctx.fill();
       ctx.globalAlpha = 1;
     }
+    if (heat > 0) {
+      // gold, then white-hot
+      roundRect(ctx, barX, barY, barW, barH, barRadius);
+      ctx.globalAlpha = 0.55 * heat;
+      ctx.fillStyle = COLOR.heavenlyGold;
+      ctx.fill();
+      ctx.globalAlpha = 0.8 * Math.max(0, heat - 0.5) * 2;
+      ctx.fillStyle = COLOR.white;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
 
     // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
     // time, never advanced), so the rate text uses the static full-interval formatter
@@ -944,6 +991,19 @@ export function drawIncomePanel(
       barCenter.x,
       barCenter.y,
       barW * 0.65,
+      0.45,
+    );
+    ctx.restore();
+  }
+  if (heat > 0) {
+    ctx.save();
+    ctx.globalAlpha = HEAT_GLOW_ALPHA * heat;
+    drawGlow(
+      ctx,
+      afterglowStopsFor(COLOR.heavenlyGold),
+      barCenter.x,
+      barCenter.y,
+      barW * 0.7,
       0.45,
     );
     ctx.restore();

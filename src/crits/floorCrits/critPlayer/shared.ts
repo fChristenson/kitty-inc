@@ -1,7 +1,13 @@
 // helpers more than one floor crit kind plays with
-import type { Point, Running } from ".";
+import { byHeight, type Point, type Running } from ".";
 
 export const BURST_MS = 100;
+
+// the bar indexes top to bottom, its own bar (0) last
+export const ownLast = (bars: Point[]): number[] => [
+  ...byHeight(bars).filter((bar) => bar !== 0),
+  0,
+];
 
 // a bar's half height, in the flash's units
 export const BAR_HALF_H = 46;

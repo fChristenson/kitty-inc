@@ -83,6 +83,9 @@ import {
   liftIncomeBar,
   crumbleIncomeBar,
   launchIncomeBar,
+  heatIncomeBar,
+  drawIncomePanel,
+  setIncomePanelsHidden,
 } from "../../floors/incomePanel";
 import {
   addTotalIncome,
@@ -1676,6 +1679,14 @@ function floorCritLevels(
     return step ? Math.ceil(count / 2) : Math.ceil(count / 4);
   // an artillery barrage lands three shells a bar, then its salvo
   if (kind === "artilleryBarrageCrit") return Math.ceil(count / 4);
+  // a meltdown's touch only heats a bar; its run of six blasts lands them
+  if (kind === "meltdownCrit") return step ? Math.ceil(count / 6) : 0;
+  // a crunch's crunching in only jolts a bar; its three landing blasts land them
+  if (kind === "crunchCrit") return step ? Math.ceil(count / 3) : 0;
+  // atoms, a reactor and static only charge a bar up; their blasts land them
+  if (kind === "atomsCrit") return step ? Math.ceil(count / 5) : 0;
+  if (kind === "reactorCrit") return step ? Math.ceil(count / 3) : 0;
+  if (kind === "staticCrit") return step ? count : 0;
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);
@@ -1734,6 +1745,21 @@ function floorCritPlayFor(
     onCrumble: (bar, crumbleMs, holdMs, rebuildMs) =>
       crumbleIncomeBar(targets[bar], crumbleMs, holdMs, rebuildMs),
     onRocket: (bar, launch) => launchIncomeBar(targets[bar], launch),
+    onHeat: (bar, heatMs, holdMs) =>
+      heatIncomeBar(targets[bar], heatMs, holdMs),
+    drawBar: (ctx, bar, flash) => {
+      const target = targets[bar];
+      const center = getIncomeBarCenter(isGround(target));
+      ctx.save();
+      ctx.translate(-center.x, -center.y);
+      drawIncomePanel(ctx, target, isGround(target), {
+        whiteAlpha: flash,
+        rotation: 0,
+      });
+      ctx.restore();
+    },
+    hideBars: (bars) =>
+      setIncomePanelsHidden(bars ? bars.map((bar) => targets[bar]) : []),
     onHit: (bar, step, color) => {
       const target = targets[bar];
       // a snowball bangs a step higher with every bar

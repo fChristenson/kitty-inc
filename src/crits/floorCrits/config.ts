@@ -198,6 +198,28 @@ export const FLOOR_CRIT_CONFIG = {
     liftoffCrit: {
       chance: 0.03,
     },
+    // every bar heating up white-hot together, then blowing one after
+    // another down the building in runs of blasts
+    meltdownCrit: {
+      chance: 0.03,
+    },
+    // a gravity well hauling every bar into one stack, crunching it, then
+    // flinging them back onto their floors
+    crunchCrit: {
+      chance: 0.03,
+    },
+    // glitter electrons orbiting every bar, whirling tighter, collapsing in
+    atomsCrit: {
+      chance: 0.03,
+    },
+    // a core beaming into every bar, spinning up to critical
+    reactorCrit: {
+      chance: 0.03,
+    },
+    // static arcing between the bars, then one giant bolt through them
+    staticCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {
