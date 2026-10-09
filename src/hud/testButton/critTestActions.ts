@@ -55,6 +55,7 @@ export function createTestButtonMarkup(): string {
           <button id="test-fork-storm-event" class="game__button">Fork Storm</button>
           <button id="test-ion-haze-event" class="game__button">Ion Haze</button>
           <button id="test-nebula-event" class="game__button">Nebula</button>
+          <button id="test-survivors-event" class="game__button">Survivors</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1351,6 +1352,7 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-floor-crit="missileTangleCrit">Missile Tangle Crit</button>
           <button class="game__button" data-floor-crit="windmillCrit">Windmill Crit</button>
           <button class="game__button" data-floor-crit="saturnCrit">Saturn Crit</button>
+          <button class="game__button" data-floor-crit="beatmapCrit">Beatmap Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

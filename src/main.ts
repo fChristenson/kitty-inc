@@ -2233,6 +2233,7 @@ async function main() {
       "fork-storm": forceOnActive((e) => e.forceForkStormEvent),
       "ion-haze": forceOnActive((e) => e.forceIonHazeEvent),
       nebula: forceOnActive((e) => e.forceNebulaEvent),
+      survivors: forceOnActive((e) => e.forceSurvivorsEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

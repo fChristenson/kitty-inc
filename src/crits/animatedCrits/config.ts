@@ -8267,6 +8267,17 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 85
+  // bullet heaven, cash: src/crits/animatedCrits/events/survivorsEvent ("Survivors"): hordes of glitter close in on a hero wisp that levels up its weapons (gun, orbiting blades, chain lightning, nova) and wipes them out
+  survivorsEvent: {
+    chance: 0.01,
+    hordeMs: 1500, // the horde spawning in from the edges
+    orbitAtMs: 650, // the blades level-up
+    chainAtMs: 1300, // the chain lightning level-up
+    novaAtMs: 1950, // the nova wiping the rest
+    holdMs: 250,
+    mergeMs: 500,
+  },
   // batch 84
   // spray + galaxy, levels + crit tier: src/crits/animatedCrits/events/nebulaEvent ("Nebula"): a nozzle spirals out spraying a cloud of gold mist that spins up into a disk, clumps into stars and flings them onto the bars
   nebulaEvent: {

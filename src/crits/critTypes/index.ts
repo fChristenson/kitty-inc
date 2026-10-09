@@ -2113,6 +2113,7 @@ export const FLOOR_CRIT_KINDS = [
   "missileTangleCrit",
   "windmillCrit",
   "saturnCrit",
+  "beatmapCrit",
 ] as const satisfies readonly FloorCritType[];
 export type FloorCritKind = (typeof FLOOR_CRIT_KINDS)[number];
 

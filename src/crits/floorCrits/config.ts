@@ -230,5 +230,10 @@ export const FLOOR_CRIT_CONFIG = {
     saturnCrit: {
       chance: 0.03,
     },
+    // a rhythm game: circles on the bars hit on the beat by a cursor wisp,
+    // quicker and quicker, then a spinner into a huge blast
+    beatmapCrit: {
+      chance: 0.03,
+    },
   },
 } as const;
