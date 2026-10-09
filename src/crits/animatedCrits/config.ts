@@ -8268,6 +8268,15 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 84
+  // spray + galaxy, levels + crit tier: src/crits/animatedCrits/events/nebulaEvent ("Nebula"): a nozzle spirals out spraying a cloud of gold mist that spins up into a disk, clumps into stars and flings them onto the bars
+  nebulaEvent: {
+    chance: 0.01,
+    sprayMs: 700, // the nozzle spiralling out
+    igniteMs: 600, // the stars igniting, quicker and quicker
+    levelShare: 0.004, // levels per star landing on a bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // lightning, levels + crit tier: src/crits/animatedCrits/events/forkStormEvent ("Fork Storm"): a bolt strikes the top bar and forks 1-2-4-8 down the building, then a return stroke shoots up through every bar
   forkStormEvent: {
     chance: 0.01,
