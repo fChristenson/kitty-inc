@@ -60,7 +60,7 @@ export function wireCorporationUpgradeMenu(
 
   // one checkbox row per still-active (not yet merged) company, including the
   // currently active one — main.ts's onMergeCompanies handles switching away
-  // from/into whichever company survives, so any combination is selectable
+  // from it into the new company the merge founds, so any combination is selectable
   // here. company.ts's getActiveCorporationIndices is the single source of
   // truth for this list, shared with corpBarrel/corporationBoostMenu
   function mergeSectionMarkup(): string {

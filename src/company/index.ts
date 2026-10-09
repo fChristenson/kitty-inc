@@ -159,7 +159,7 @@ export function clearCompanyRecord(companyIndex: number): void {
   }
 }
 
-// a company absorbed into another via corporationUpgradeMenu's "Merge" action
+// a company folded into a new one via corporationUpgradeMenu's "Merge" action
 // (see hud/corporationBoostMenu/economy.ts's mergeCompanies) — its index/name/
 // records still technically exist (indices are never renumbered), it's just
 // permanently hidden from every company list from then on

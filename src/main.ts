@@ -3116,23 +3116,20 @@ async function main() {
       playSwoosh();
       cityMapView.animateSwitchToCompany(newIndex);
     },
-    // "Merge" (see hud/corporationUpgradeMenu's own Merge section): folds every
-    // selected company's income/upgrades/stock into whichever one has the most
-    // map progression, then closes the dialog and barrel-rolls to it. If the
-    // company we're switching AWAY from was itself one of the merged-away
-    // ones, flag the next switch to skip re-snapshotting its now-stale live
-    // state over the clear mergeCompanies already wrote to storage for it
+    // "Merge" (see hud/corporationUpgradeMenu's own Merge section): founds a
+    // new company from scratch carrying every selected company's value, then
+    // closes the dialog and barrel-rolls to it. If the company we're switching
+    // AWAY from was one of the merged ones, flag the next switch to skip
+    // re-snapshotting its now-stale live state over the clear mergeCompanies
+    // already wrote to storage for it
     (companyIndices) => {
       const result = mergeCompanies(companyIndices, buildings);
       if (!result) return;
-      const mergedAway = new Set(
-        companyIndices.filter((index) => index !== result.survivorIndex),
-      );
-      skipNextOutgoingSnapshot = mergedAway.has(activeCompanyIndex);
+      skipNextOutgoingSnapshot = companyIndices.includes(activeCompanyIndex);
       corporationUpgradeMenu.close();
       setTimeout(() => {
         playSwoosh();
-        cityMapView.animateSwitchToCompany(result.survivorIndex);
+        cityMapView.animateSwitchToCompany(result.companyIndex);
       }, DIALOG_CLOSE_MS - SWITCH_LEAD_MS);
     },
   );

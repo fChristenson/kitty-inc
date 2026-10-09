@@ -2,15 +2,13 @@ import {
   loadBuildings,
   getSavedBuildingsVersion,
   clearBuildings,
-  saveBuildingsImmediately,
   type Floor,
 } from "../../gameState";
+import { getActiveBuildings, getStoredTotalIncome } from "../../totalIncome";
 import {
-  getStoredTotalIncome,
-  addCompanyTotalIncome,
-  getActiveBuildings,
-} from "../../totalIncome";
-import { regenerateCorporationName } from "../../corporationName";
+  createNewCorporation,
+  getCorporationName,
+} from "../../corporationName";
 import {
   getOfficeChairsCost,
   getOfficeSuppliesCost,
@@ -141,22 +139,22 @@ export function getActiveCompanyAssetValue(buildings: Floor[][]): BigNumber {
   return getCompanyAssetValue(buildings);
 }
 
-// hud/corporationUpgradeMenu's "Merge" action: picks whichever selected company
-// has the most overall progress (total floor count across every one of its
-// buildings — the simplest holistic "how far into the game is this company"
-// signal) to survive, and carries cash, asset value and modifier contributions
-// separately into the survivor. The merged-away
-// companies are left permanently empty (0 floors, $0) and hidden from
-// every company list from then on (see company.ts's isCompanyMerged). Any
-// company, including the currently ACTIVE one, can be selected — the caller
-// (main.ts) is responsible for switching to the survivor afterward, and if the
-// previously-active company was itself merged away, for not letting its own
-// stale live in-memory buildings/total get re-snapshotted over the clear this
-// function just did (see main.ts's own mergeCompanies wiring / switchToCompany's
-// skipOutgoingSnapshot option). Returns the survivor's index + freshly
-// generated name, or null if fewer than 2 companies were given
+// hud/corporationUpgradeMenu's "Merge" action: founds a brand new company
+// that starts from scratch (one building, first floor, $0) and carries every
+// selected company's value into it — their asset and upgrade values and their
+// income-modifier contributions — so the new company's global boost is the
+// sum of theirs. Their banked cash plus their upgrades value lands in the new
+// company's wallet. Every selected company is left permanently empty (0 floors,
+// $0) and hidden from every company list from then on (see company.ts's
+// isCompanyMerged). Any company,
+// including the currently ACTIVE one, can be selected — the caller (main.ts)
+// switches to the new company afterward, and if the previously-active company
+// was one of the merged ones, must not let its own stale live in-memory
+// buildings/total get re-snapshotted over the clear this function just did
+// (see switchToCompany's skipOutgoingSnapshot option). Returns the new
+// company's index + name, or null if fewer than 2 companies were given
 export interface MergeCompaniesResult {
-  survivorIndex: number;
+  companyIndex: number;
   name: string;
 }
 
@@ -170,88 +168,52 @@ export function mergeCompanies(
   );
   if (companyIndices.length < 2) return null;
 
-  const buildingsByIndex = new Map<number, Floor[][]>();
+  let inheritedAssetValue = ZERO;
+  let inheritedUpgradesValue = ZERO;
+  let bankedTotal = ZERO;
+  let totalModifier = 0;
   for (const index of companyIndices) {
-    buildingsByIndex.set(
-      index,
+    const ownedBuildings =
       index === getActiveCompanyIndex() && activeBuildings
         ? activeBuildings
-        : loadBuildings(index),
-    );
-  }
-  const progression = (index: number): number =>
-    (buildingsByIndex.get(index) ?? []).reduce(
-      (sum, floors) => sum + floors.length,
-      0,
-    );
-  const survivorIndex = companyIndices.reduce((best, index) =>
-    progression(index) > progression(best) ? index : best,
-  );
-
-  const now = Date.now();
-  const survivorBuildings = buildingsByIndex.get(survivorIndex)!;
-  const survivorRecord = loadCompanyRecord(survivorIndex);
-  let inheritedAssetValue = survivorRecord?.inheritedAssetValue ?? ZERO;
-  let inheritedUpgradesValue = survivorRecord?.inheritedUpgradesValue ?? ZERO;
-  let totalModifier = 0;
-  let addedTotal = ZERO;
-  for (const index of companyIndices) {
-    const ownedBuildings = buildingsByIndex.get(index)!;
+        : loadBuildings(index);
     const value = getCompanyAssetValue(ownedBuildings, index);
+    const upgradesValue = getCompanyUpgradesValue(ownedBuildings, index);
     totalModifier +=
       (compressedScale(max(fromNumber(10), value)) ?? 0) * BASE_MODIFIER_RATE +
       (loadCompanyRecord(index)?.inheritedModifierPercent ?? 0);
-    if (index === survivorIndex) continue;
-    addedTotal = add(addedTotal, getStoredTotalIncome(index));
     inheritedAssetValue = add(inheritedAssetValue, value);
-    inheritedUpgradesValue = add(
-      inheritedUpgradesValue,
-      getCompanyUpgradesValue(ownedBuildings, index),
+    inheritedUpgradesValue = add(inheritedUpgradesValue, upgradesValue);
+    bankedTotal = add(
+      bankedTotal,
+      add(getStoredTotalIncome(index), upgradesValue),
     );
   }
-  const assetValue = add(
-    getCompanyAssetValue(survivorBuildings, survivorIndex),
-    companyIndices
-      .filter((index) => index !== survivorIndex)
-      .reduce(
-        (sum, index) =>
-          add(sum, getCompanyAssetValue(buildingsByIndex.get(index)!, index)),
-        ZERO,
-      ),
-  );
-  addCompanyTotalIncome(survivorIndex, addedTotal);
-  saveCompanyRecord(survivorIndex, {
-    bankedTotal: getStoredTotalIncome(survivorIndex),
-    incomeRatePerSecond: survivorRecord?.incomeRatePerSecond ?? ZERO,
-    assetValue,
-    upgradesValue: add(
-      getUpgradesValue(survivorBuildings),
-      inheritedUpgradesValue,
-    ),
+
+  const companyIndex = createNewCorporation();
+  saveCompanyRecord(companyIndex, {
+    bankedTotal,
+    incomeRatePerSecond: ZERO,
+    assetValue: inheritedAssetValue,
+    upgradesValue: inheritedUpgradesValue,
     inheritedAssetValue,
     inheritedUpgradesValue,
+    // what the inherited value alone doesn't already give through the new
+    // company's own size modifier
     inheritedModifierPercent: Math.max(
       0,
       totalModifier -
-        (compressedScale(max(fromNumber(10), assetValue)) ?? 0) *
+        (compressedScale(max(fromNumber(10), inheritedAssetValue)) ?? 0) *
           BASE_MODIFIER_RATE,
     ),
-    updatedAt: now,
+    updatedAt: Date.now(),
   });
-  if (survivorIndex !== getActiveCompanyIndex()) {
-    for (const floor of survivorBuildings.flat()) floor.lastCollectedAt = now;
-  }
-  saveBuildingsImmediately(survivorBuildings, survivorIndex);
   for (const index of companyIndices) {
-    if (index === survivorIndex) continue;
     clearBuildings(index);
     clearCompanyRecord(index);
   }
-
-  markCompaniesMerged(
-    companyIndices.filter((index) => index !== survivorIndex),
-  );
-  return { survivorIndex, name: regenerateCorporationName(survivorIndex) };
+  markCompaniesMerged(companyIndices);
+  return { companyIndex, name: getCorporationName(companyIndex) };
 }
 
 // a company's overall value — the $ actually invested into it, i.e. buildings
