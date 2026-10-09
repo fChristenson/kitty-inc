@@ -2220,6 +2220,7 @@ async function main() {
       battlecruiser: forceOnActive((e) => e.forceBattlecruiserEvent),
       "laser-gauntlet": forceOnActive((e) => e.forceLaserGauntletEvent),
       "wormhole-dive": forceOnActive((e) => e.forceWormholeDiveEvent),
+      "doubling-bounce": forceOnActive((e) => e.forceDoublingBounceEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

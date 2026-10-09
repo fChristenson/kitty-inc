@@ -8267,6 +8267,16 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 82
+  // bounce, levels: src/crits/animatedCrits/events/doublingBounceEvent ("Doubling Bounce"): a bomb wisp bounces down the bars splitting in two at every landing, 1-2-4-8, the last ones bursting in a cluster of sixteen
+  doublingBounceEvent: {
+    chance: 0.01,
+    dropMs: 380, // the first bomb's drop onto the top bar
+    hopMs: 300, // the first hop, quickening
+    levelShare: 0.006, // levels per landing
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 81
   // flight, cash: src/crits/animatedCrits/events/galaxyFlightEvent ("Galaxy Flight"): on the flight stage, the view dives at a spiral galaxy of glitter, the guns blowing the wisps on its arms core outward (each paying), then the core
   galaxyFlightEvent: {
