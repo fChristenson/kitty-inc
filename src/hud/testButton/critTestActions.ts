@@ -52,6 +52,8 @@ export function createTestButtonMarkup(): string {
           <button id="test-fortress-event" class="game__button">Fortress</button>
           <button id="test-meteor-splitter-event" class="game__button">Meteor Splitter</button>
           <button id="test-thunder-duel-event" class="game__button">Thunder Duel</button>
+          <button id="test-fork-storm-event" class="game__button">Fork Storm</button>
+          <button id="test-ion-haze-event" class="game__button">Ion Haze</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

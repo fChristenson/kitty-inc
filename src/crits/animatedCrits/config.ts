@@ -8268,6 +8268,22 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 84
+  // lightning, levels + crit tier: src/crits/animatedCrits/events/forkStormEvent ("Fork Storm"): a bolt strikes the top bar and forks 1-2-4-8 down the building, then a return stroke shoots up through every bar
+  forkStormEvent: {
+    chance: 0.01,
+    levelShare: 0.005, // levels per strike
+    holdMs: 500,
+    mergeMs: 0,
+  },
+  // spray + lightning, levels: src/crits/animatedCrits/events/ionHazeEvent ("Ion Haze"): a nozzle mists the screen in gold, then lightning crawls through the haze and sets it off in a rolling wave of blasts
+  ionHazeEvent: {
+    chance: 0.01,
+    sprayMs: 800, // the nozzle's sweep down the screen
+    strikeLagMs: 250, // the pause before the bolt strikes the haze
+    levelShare: 0.01, // levels per bar the lightning reaches
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // flight, cash: src/crits/animatedCrits/events/meteorSplitterEvent ("Meteor Splitter"): on the flight stage, a huge meteor rushes at the view and the guns split it into two, four, then eight, every split a paying blast
   meteorSplitterEvent: {
     chance: 0.01,

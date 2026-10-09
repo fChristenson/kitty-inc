@@ -2230,6 +2230,8 @@ async function main() {
       fortress: forceOnActive((e) => e.forceFortressEvent),
       "meteor-splitter": forceOnActive((e) => e.forceMeteorSplitterEvent),
       "thunder-duel": forceOnActive((e) => e.forceThunderDuelEvent),
+      "fork-storm": forceOnActive((e) => e.forceForkStormEvent),
+      "ion-haze": forceOnActive((e) => e.forceIonHazeEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
