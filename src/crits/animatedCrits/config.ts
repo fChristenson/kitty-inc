@@ -8268,6 +8268,15 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 82
+  // gunfire, levels + crit tier: src/crits/animatedCrits/events/airJuggleEvent ("Air Juggle"): two corner guns keep a bomb wisp in the air, every hit a blast knocking it higher and across, then riddle it over its bar till it blows
+  airJuggleEvent: {
+    chance: 0.01,
+    tossMs: 340, // the toss up off the clicked bar
+    dropMs: 260, // the drop back over it after the last knock
+    levelShare: 0.006, // levels per knock, on the bar under it
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // bounce, levels: src/crits/animatedCrits/events/doublingBounceEvent ("Doubling Bounce"): a bomb wisp bounces down the bars splitting in two at every landing, 1-2-4-8, the last ones bursting in a cluster of sixteen
   doublingBounceEvent: {
     chance: 0.01,

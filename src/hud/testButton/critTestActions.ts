@@ -47,6 +47,7 @@ export function createTestButtonMarkup(): string {
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
           <button id="test-doubling-bounce-event" class="game__button">Doubling Bounce</button>
+          <button id="test-air-juggle-event" class="game__button">Air Juggle</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
