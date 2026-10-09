@@ -343,6 +343,7 @@ const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   staticCrit: () => import("../crits/staticCrit"),
   empCrit: () => import("../crits/empCrit"),
   bigBangCrit: () => import("../crits/bigBangCrit"),
+  inspiralCrit: () => import("../crits/inspiralCrit"),
 };
 const loading = new Map<FloorCritKind, Promise<unknown>>();
 

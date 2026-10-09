@@ -1691,6 +1691,8 @@ function floorCritLevels(
   // an EMP's short and a Big Bang's collapse only jolt a bar; their runs land them
   if (kind === "empCrit") return step ? Math.ceil(count / 5) : 0;
   if (kind === "bigBangCrit") return step ? Math.ceil(count / 4) : 0;
+  // an inspiral's waves only stretch a bar; its runs land them
+  if (kind === "inspiralCrit") return step ? Math.ceil(count / 5) : 0;
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);

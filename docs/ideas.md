@@ -1,5 +1,31 @@
 # Ideas
 
+## List eighty-five
+
+Floor crits, playable in the playground: [ideas.html?list=next65](../tmp/_playground/ideas.html?list=next65). Physics spectacles that grip the whole building, like Crunch, Atoms and Reactor.
+
+- **Lens**: a black hole drifts in and weaves down through the building, every bar it passes bending towards it, glitter streaming off them into it; it stops over its own bar, swelling and rumbling, the bars round it straining; then it pops in a flash and the bars snap back straight, quivering, blasting top to bottom, its own bar last and biggest.
+- **Ground zero**: the number lands on its own bar and the screen whites out in a silent flash; a shockwave ring rips out from its bar, every bar bowing away as it passes and blasts going off all along them where it crosses; it hits the screen's edges and rushes back in, the bars bowing back, converging on its own bar in a huge blast.
+- **Quasar**: a black core blazes up above the roof and fires a jet of light straight down through the building, swinging it side to side like a pendulum, quicker each swing, blasts tearing along every bar where it cuts; then it locks dead centre, swells to a roaring pillar and every bar blows, top to bottom, its own bar last and biggest.
+
+## List eighty-four
+
+Floor crits, playable in the playground: [ideas.html?list=next64](../tmp/_playground/ideas.html?list=next64). Each one changes every bar on screen at once, the way Meltdown and EMP do.
+
+- **Freeze**: frost races in from the screen's edges and every bar freezes solid white, top to bottom, each with a clink; everything stops dead, then cracks split across the ice, quicker and quicker, each with a jolt, and it shatters in a flash: shards burst off every bar in a barrage of blasts, its own bar last and biggest.
+- **Midas**: the number touches its own bar and it turns to solid gold from end to end; the gold seeps up the wall in a glowing vein to the bar above, which turns too, quicker and quicker up the building; a gleam sweeps every gold bar, they ring, rattling, and burst into coins and blasts top to bottom, its own bar last and biggest.
+- **Eclipse**: a sun blazes up in front of the building and a black disc slides over it, the screen sinking into night, rumbling, the bars glowing faintly; at totality the corona flares out in streamers, then the diamond ring bursts at its edge and light floods back, blasting every bar top to bottom, its own bar last and biggest.
+- **Glitch**: the screen glitches, slices of it jumping sideways, frames dropping to black, each with a jolt, quicker and worse, till it freezes on one torn frame, humming; then it snaps clean in a white flash and every bar blows in a barrage, top to bottom, its own bar last and biggest.
+
+## List eighty-three
+
+Floor crits, playable in the playground: [ideas.html?list=next63](../tmp/_playground/ideas.html?list=next63). Like EMP and Big Bang, each one grabs the whole screen.
+
+- **Rift**: a crack splits down the middle of the screen and the whole screen tears in two, the halves sliding apart over a blazing wall of light, every bar torn in half; the light roars, then the halves slam shut and blasts burst along the seam of every bar and race out to its ends, its own bar's the biggest.
+- **Close-up**: the camera punches in on its own bar till it fills the screen, and the number winds up and hammers it three times, each slam heavier; then the camera yanks back out and every other bar goes off in a barrage on the way, its own bar last with a huge blast.
+- **Vice**: the whole screen is squeezed flat from top and bottom in three grinding clunks, the building crushed shorter and wider, the bars flashing and rattling under the strain; then it springs back up past full height and every bar blows as it bounces, its own bar last.
+- **Drop**: the whole building drops out from under the screen, plunging faster and faster, the bars floating up off their floors, weightless; then it stops dead with a crunch and the bars slam back down onto their floors one after another from the top in rattles of blasts, its own bar last and hardest.
+
 ## List eighty-two
 
 Floor crits, playable in the playground: [ideas.html?list=next62](../tmp/_playground/ideas.html?list=next62).
@@ -71,3 +97,4 @@ Floor crits, playable in the playground: [ideas.html?list=next55](../tmp/_playgr
 - **Crunch** (`crunchCrit` floor crit): a gravity well hauls every bar into a stack (drawn by the crit through `drawBar`/`hideBars`), squeezes it, then flings them back to land in blasts, its own bar last.
 - **Atoms** (`atomsCrit`), **Reactor** (`reactorCrit`), **Static** (`staticCrit`) floor crits: electron orbits, a core beaming into every bar, and static arcs, each building in every bar at once before going off.
 - **EMP** (`empCrit`, bars shorted via `shortIncomeBar`) and **Big Bang** (`bigBangCrit`, the world and HUD zoomed via `shared/screenZoom`) floor crits.
+- **Inspiral** (`inspiralCrit` floor crit): two wisps spiral into each other, each half turn a gravity-wave ring stretching the bars (drawn through `drawBar`/`hideBars`), then they merge and the bars blow outward from the middle, its own bar last.
