@@ -141,6 +141,17 @@ function enterMs(content: FlightContent): number {
   return content.enter?.ms ?? windUpMs + diveMs;
 }
 
+// the view's twin guns, at the screen's bottom corners
+const GUN_X = 0.1;
+const GUN_Y = 0.93;
+export function flightGuns(view: FlightView): [Point, Point] {
+  const y = view.y + view.h * GUN_Y;
+  return [
+    { x: view.x + view.w * GUN_X, y },
+    { x: view.x + view.w * (1 - GUN_X), y },
+  ];
+}
+
 // where a point `x`, `y` (of the screen's width from its middle) at depth z
 // shows: 1 is right in front of the view, farther is bigger
 export function project(

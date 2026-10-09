@@ -8268,6 +8268,26 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 80
+  // flight, levels: src/crits/animatedCrits/events/convoyEvent ("Convoy"): on the flight stage, a snaking train of cargo wisps sweeps across in depth and the guns strafe it tail to head, every car bursting in a chain, the engine last
+  convoyEvent: {
+    chance: 0.01,
+    levelShare: 0.012, // free levels on the floor per car
+  },
+  // flight, cash: src/crits/animatedCrits/events/fireworksFlightEvent ("Fireworks Flight"): on the flight stage, shells streak up and burst round the view into glitter chrysanthemums, each paying, a finale of six at once
+  fireworksFlightEvent: {
+    chance: 0.01,
+    payoutsPerShell: 0.4, // the floor's payouts each shell pays
+  },
+  // flight, perma tier: src/crits/animatedCrits/events/stormFlightEvent ("Storm Flight"): on the flight stage, lightning arcs from wisp to wisp through a storm, every strike blowing its wisp, quicker and quicker
+  stormFlightEvent: {
+    chance: 0.01,
+  },
+  // flight, cash: src/crits/animatedCrits/events/cometChaseEvent ("Comet Chase"): on the flight stage, chasing a comet the guns pop the chunks it sheds (each paying), then lock on and blow it apart from its tail to its head
+  cometChaseEvent: {
+    chance: 0.01,
+    payoutsPerChunk: 0.3, // the floor's payouts each chunk pays
+    payoutsComet: 2, // the floor's payouts the comet pays
+  },
   // flight, levels: src/crits/animatedCrits/events/mineBeltEvent ("Mine Belt"): on the flight stage, rows of blinking bomb wisps drift in, twin beams rake each row setting its mines off in a chain, the last row going up together
   mineBeltEvent: {
     chance: 0.01,
