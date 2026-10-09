@@ -1680,6 +1680,9 @@ function floorCritLevels(
   // a windmill sweeps each bar about twenty times, then a blade slams it
   if (kind === "windmillCrit")
     return step ? Math.ceil(count / 2) : Math.ceil(count / 20);
+  // a saturn's ring cuts each bar about ten times, then its shards land
+  if (kind === "saturnCrit")
+    return step ? Math.ceil(count / 3) : Math.ceil(count / 10);
   // an artillery barrage lands three shells a bar, then its salvo
   if (kind === "artilleryBarrageCrit") return Math.ceil(count / 4);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it

@@ -29,3 +29,10 @@ A game, a galaxy, a race and a spray, all on the building. Playground: `tmp/_pla
 
 - **Dig Dug** (experiment): the old arcade game playing itself: a digger wisp bores a glowing tunnel zigzagging up through the floors, sparks flying, and every wisp enemy it reaches it pumps up with a beam hose, swelling a size with each jolting pump, quicker each time, till it bursts in a blast onto its bar, the last one biggest.
 - **Bomb derby** (race event): two lit bomb wisps race a track zigzagging down the building, flat out along the bars, braking hard and screeching round each end, the chaser on the leader's tail; at the line the chaser rams the leader, which blows big, then the chaser huge.
+
+## List thirty-two
+
+Two floor crits and two animated crits. Playground: `tmp/_playground/ideas.html?list=next29`.
+
+- **Grinder** (floor crit): the number becomes a spinning grinder wisp that drops onto the top bar and skates along it in a gushing spray of sparks, blasts popping in its wake, then drops off the end onto the next bar and back the other way, quicker and quicker, blowing on its own bar at the bottom.
+- **Timber** (explosion event): a tall column of lit bomb wisps stands beside the building; a blast chops it at the foot and it topples across the building's face like a felled tree, tipping slowly then whipping over, every bomb blowing on the first bar it sweeps across, until it slams down flat in a cluster of huge blasts.

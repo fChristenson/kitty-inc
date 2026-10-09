@@ -8268,6 +8268,15 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 83
+  // money, cash: src/crits/animatedCrits/events/threadingEvent ("Threading"): a river of coins coils round each bar like a spiral binding, down the building, every front pass a blast, then into the total
+  threadingEvent: {
+    chance: 0.01,
+    streamMs: 400, // the coins pouring onto the path
+    pathMs: 1500, // each coin's run from the top bar to the total
+    levelShare: 0.006, // levels each time the head passes over a bar's front
+    holdMs: 300,
+    mergeMs: 500,
+  },
   // money, cash: src/crits/animatedCrits/events/cashCoilEvent ("Cash Coil"): a river of coins spirals up round the outside of the building, hidden behind it, crashing through each bar it crosses in front, then into the total
   cashCoilEvent: {
     chance: 0.01,

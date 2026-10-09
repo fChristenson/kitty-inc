@@ -225,5 +225,10 @@ export const FLOOR_CRIT_CONFIG = {
     windmillCrit: {
       chance: 0.03,
     },
+    // a glitter ring spreading out round a planet, blasts racing along each
+    // bar it cuts, then shattering onto the bars
+    saturnCrit: {
+      chance: 0.03,
+    },
   },
 } as const;
