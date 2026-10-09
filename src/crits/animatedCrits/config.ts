@@ -8268,6 +8268,17 @@ export const ANIMATED_EVENT_CONFIG = {
     mergeMs: 500,
   },
   // batch 80
+  // flight, levels: src/crits/animatedCrits/events/mineBeltEvent ("Mine Belt"): on the flight stage, rows of blinking bomb wisps drift in, twin beams rake each row setting its mines off in a chain, the last row going up together
+  mineBeltEvent: {
+    chance: 0.01,
+    levelShare: 0.012, // free levels on the floor per mine
+  },
+  // flight, cash: src/crits/animatedCrits/events/ringRunEvent ("Ring Run"): on the flight stage, the view threads glitter hoops, each bursting into a ring of blasts round the screen's edge and paying, the last a huge golden one
+  ringRunEvent: {
+    chance: 0.01,
+    payoutsPerHoop: 0.5, // the floor's payouts each hoop pays
+    payoutsBigHoop: 2, // the floor's payouts the last hoop pays
+  },
   // flight, perma tier: src/crits/animatedCrits/events/lockOnVolleyEvent ("Lock-On Volley"): on the flight stage down a corridor of beam frames, an aim laser locks each wisp of a squadron in turn, then homing wisps blow them all in a rattling chain; three volleys, the last a whirling ring round a huge blast
   lockOnVolleyEvent: {
     chance: 0.01,

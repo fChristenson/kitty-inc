@@ -2210,6 +2210,8 @@ async function main() {
       "sky-raid": forceOnActive((e) => e.forceSkyRaidEvent),
       "lock-on-volley": forceOnActive((e) => e.forceLockOnVolleyEvent),
       "rock-field": forceOnActive((e) => e.forceRockFieldEvent),
+      "mine-belt": forceOnActive((e) => e.forceMineBeltEvent),
+      "ring-run": forceOnActive((e) => e.forceRingRunEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
