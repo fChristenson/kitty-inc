@@ -71,7 +71,7 @@ export const ANIMATED_EVENT_CONFIG = {
   // floor's income times its floor number
   burstEvent: {
     chance: 0.01, // per crit whose special-crit gateway hit
-    durationMs: 1_500, // ~0.3s blast out, 0.7s hang, then the merge
+    durationMs: 1_000, // ~0.3s blast out, 0.2s hang, then the merge
     mergeMs: 500, // the last part, where the coins fly into the total
   },
 
