@@ -17,6 +17,7 @@ import { isDetachedJobRunning } from "../detachedJob";
 import { holdExplosions } from "../../sound";
 import { playSlamExplosion } from "../explosionBang";
 import { shakeScreen } from "../screenShake";
+import { applyLevelPop } from "../levelPop";
 
 export const GLOBAL_SLAM = {};
 
@@ -518,13 +519,21 @@ function getRestGlyph(
   return glyph;
 }
 
+// letters from..to (exclusive) of a drawSlamText lit gold, popping together
+// like a floor's level label, popMs into the pop
+export interface GoldLetters {
+  from: number;
+  to: number;
+  popMs: number;
+}
+
 // drawCartoonText, but once the slam lands the white shine sweeps across the
 // glowing letters, each hopping as it passes (the text's own part of
 // drawSlamTarget). tabular lays digits out in fixed cells, always, so a
 // counting number never shifts sideways. whiteMix 0..1 blends the fill toward
 // white; moving says the text is swelling, wiggling or flashing this frame, so
 // it's stamped from sprites like a landed slam (see SlamGlyph). A caller that
-// passes moving gets its sprites warmed while the text rests
+// passes moving gets its sprites warmed while the text rests. gold needs moving
 export function drawSlamText(
   ctx: CanvasRenderingContext2D,
   pose: SlamPose | null,
@@ -538,6 +547,7 @@ export function drawSlamText(
   tabular = false,
   whiteMix = 0,
   moving?: boolean,
+  gold: GoldLetters | null = null,
 ): void {
   // past TEXT_FX_MS no letter hops, shines or glows: it's the text at rest
   const landed =
@@ -580,6 +590,19 @@ export function drawSlamText(
     strokeColor,
     strokeWidth,
   );
+  // the gold letters pop round their own middle
+  let goldX = 0;
+  if (gold) {
+    let start = 0;
+    let from = 0;
+    for (let i = 0; i < gold.to; i++) {
+      if (i === gold.from) from = start;
+      start = tabular
+        ? start + (isDigit(text[i]) ? digitCell : measure(ctx, text[i], font))
+        : measure(ctx, text.slice(0, i + 1), font);
+    }
+    goldX = left + (from + start) / 2;
+  }
   const alpha = ctx.globalAlpha;
   ctx.save();
   ctx.textAlign = "left";
@@ -603,9 +626,11 @@ export function drawSlamText(
       start = end;
       if (char === " ") continue;
       const glyph = getSlamGlyph(ctx, glyphs, char);
+      const golden = gold !== null && i >= gold.from && i < gold.to;
       const hop = landed ? hopAt(landed, (centerX - left + band) / path) : 0;
+      if (hop !== 0 || golden) ctx.save();
+      if (golden) applyLevelPop(ctx, gold.popMs, goldX, y + height / 2);
       if (hop !== 0) {
-        ctx.save();
         const s = 1 + WAVE_SCALE * hop;
         ctx.translate(centerX, footY - WAVE_HOP * height * hop);
         ctx.scale(s, s);
@@ -613,8 +638,8 @@ export function drawSlamText(
       }
       if (pass === 0) stampGlyph(ctx, glyph, OUTLINE_CELL, lx, y, 0, 1);
       else if (!landed) {
-        stampGlyph(ctx, glyph, FILL_CELL, lx, y, 0, 1);
-        if (whiteMix > 0) {
+        stampGlyph(ctx, glyph, golden ? GOLD_CELL : FILL_CELL, lx, y, 0, 1);
+        if (whiteMix > 0 && !golden) {
           ctx.globalAlpha = alpha * Math.min(1, whiteMix);
           stampGlyph(ctx, glyph, WHITE_CELL, lx, y, 0, 1);
           ctx.globalAlpha = alpha;
@@ -645,7 +670,7 @@ export function drawSlamText(
           ctx.globalAlpha = alpha;
         }
       }
-      if (hop !== 0) ctx.restore();
+      if (hop !== 0 || golden) ctx.restore();
     }
   }
   ctx.restore();

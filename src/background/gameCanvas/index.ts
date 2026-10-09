@@ -1,7 +1,9 @@
 import {
+  eventProcContext,
   openBuildingBadgeCapsule,
   type OnScreenFloor,
   drawCritFlash,
+  startOdometerBurst,
   syncCritFlashPause,
 } from "../../crits";
 import {
@@ -50,6 +52,7 @@ import {
   updateTosses,
   wireTosses,
 } from "../../tosses";
+import { drawOdometer, setOdometerBurst } from "../../shared/odometer";
 import { getTotalIncome } from "../../totalIncome";
 
 import { COLOR } from "../../palette";
@@ -784,7 +787,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // height varies (a unit-name line only appears once the total is big enough),
     // so the actual bottom edge is captured for the HUD tap-zone hit-test below
     // instead of guessing a fixed height
-    if (!skipHud) hudBottomY = drawHud(ctx, SLOT_W, getTotalIncome());
+    if (!skipHud) {
+      hudBottomY = drawHud(ctx, SLOT_W, getTotalIncome());
+      drawOdometer();
+    }
     // the flash holds still while the world rattles: its huge rays judder otherwise
     ctx.translate(-shake.x / scale, -shake.y / scale);
     if (!skipFlash)
@@ -908,6 +914,16 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
   wireBubbles(floorActionsDeps);
   wireTosses(floorActionsDeps);
+  // the odometer's Burst plays on whichever floor is in view
+  setOdometerBurst((onEnd) => {
+    const floor = onScreenFloors()[0]?.floor;
+    if (!floor) return false;
+    const context = eventProcContext(
+      floorActionsDeps(),
+      activeFloors.indexOf(floor) === 0,
+    );
+    return startOdometerBurst(floor, context, onEnd);
+  });
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every

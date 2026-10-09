@@ -14,6 +14,7 @@ import {
   GLOBAL_SLAM,
 } from "../eventEndSlam";
 import { drawTargetStream, getTargetTension } from "../eventFx";
+import { watchOdometer } from "../odometer";
 
 // shared "amount + spelled-out unit name below it" total-income drawing, used by
 // both hud/index.ts's top-of-screen HUD and background/cityMap's map readout —
@@ -32,6 +33,8 @@ const UNIT_STROKE_TO_FONT_RATIO = 10 / (144 * UNIT_FONT_SCALE);
 export interface TotalIncomeReadoutOptions {
   fontSize: number;
   unitNameGapPx: number;
+  // the HUD's readout plays the odometer (see shared/odometer)
+  odometer?: boolean;
 }
 
 export interface TotalIncomeReadout {
@@ -70,7 +73,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     centerX: number,
     top: number,
     totalIncome: BigNumber,
-    { fontSize, unitNameGapPx }: TotalIncomeReadoutOptions,
+    { fontSize, unitNameGapPx, odometer }: TotalIncomeReadoutOptions,
   ): number {
     const displayed = getAnimatedTotalIncome(totalIncome);
     const valueChanged =
@@ -81,12 +84,6 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       formattedMantissa = displayed.mantissa;
       formattedExponent = displayed.exponent;
     }
-    const { amount, unitName } = formatted;
-    const font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
-    const remeasure = valueChanged || font !== measuredFont;
-    measuredFont = font;
-    const strokeWidth = fontSize * AMOUNT_STROKE_TO_FONT_RATIO;
-
     // "special crit crit" bonus-tier coins merging into the total (see
     // shared/totalIncomeCoins) flash this whole readout white and wiggle it briefly —
     // strength fades 1 -> 0, so both the color blend and the wiggle's own
@@ -95,8 +92,17 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     const flashStrength = getHudTotalFlashStrength(now);
     // a freeze event streaming into the total drives its build-up instead
     const tension = getTargetTension(GLOBAL_SLAM, "total");
-    const whiteMix = Math.max(getHudTotalWhiteMix(now), tension?.white ?? 0);
     const slam = getSlamPose(GLOBAL_SLAM, "total", now);
+    const reel = odometer
+      ? watchOdometer(formatted, tension !== null || slam !== null)
+      : null;
+    const { amount, unitName } = reel ? reel.parts : formatted;
+    const font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
+    const remeasure = valueChanged || font !== measuredFont;
+    measuredFont = font;
+    const strokeWidth = fontSize * AMOUNT_STROKE_TO_FONT_RATIO;
+
+    const whiteMix = Math.max(getHudTotalWhiteMix(now), tension?.white ?? 0);
     const wiggleRotation = tension
       ? tension.rotation
       : flashStrength > 0
@@ -109,7 +115,8 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       tension !== null ||
       wiggleRotation !== 0 ||
       absorbScale !== 1 ||
-      whiteMix > 0;
+      whiteMix > 0 ||
+      reel !== null;
     const pivotY = top + amountHeight / 2;
     let bottom = top;
 
@@ -155,6 +162,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         true,
         whiteMix,
         moving,
+        reel?.gold ?? null,
       );
 
       if (remeasure) {

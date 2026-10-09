@@ -22,7 +22,9 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
 import { drawDetonation } from "../../../../shared/explosion";
 import {
+  BLOW_UP,
   drawBroom,
+  flingOut,
   heapSpots,
   planSweep,
   scatterEvenly,
@@ -39,7 +41,6 @@ const COINS = 800;
 const COIN = 0.4;
 const MARGIN = 40;
 const BLAST_Y = 0.22;
-const BLAST = 380;
 const ENTRY = 140;
 // the heap: how low it sits, and its mound
 const HEAP_Y = 0.84;
@@ -57,7 +58,6 @@ const FADE_MS = 160;
 const GATHER_MS = 180;
 const LEAP_MS = 420;
 const LEAP_SPREAD = 220;
-const BLAST_SHAKE = 1.6;
 const STROKE_SHAKE = 0.3;
 const GATHER_SHAKE = 0.9;
 
@@ -127,10 +127,7 @@ export const forceClutterEvent = registerWispEvent(
       MOUND_H,
     );
     const paths: CoinPath[] = spots.map((spot, i) => {
-      const fling: Point = {
-        x: lerp([centre.x, spot.x], 0.5),
-        y: Math.min(centre.y, spot.y) - 100 * Math.random(),
-      };
+      const lift = Math.random();
       const mound = mounds[i];
       const end = swept.end(i);
       const rise: Point = { x: mound.x, y: Math.min(mound.y, total.y) - 200 };
@@ -140,11 +137,11 @@ export const forceClutterEvent = registerWispEvent(
         const ms = f * travel;
         if (ms < blastAt) return { x: centre.x, y: centre.y, scale: 0 };
         if (ms < sweep.startMs) {
-          const p = bezier(
+          const p = flingOut(
             centre,
-            fling,
             spot,
-            easeOut(clamp01((ms - blastAt) / scatterMs)),
+            lift,
+            (ms - blastAt) / scatterMs,
             at,
           );
           return { x: p.x, y: p.y, scale: COIN };
@@ -189,7 +186,7 @@ export const forceClutterEvent = registerWispEvent(
         cover!.burst(centre, 1);
         if (!cover!.isLive()) return;
         playExplosion();
-        shakeScreen(BLAST_SHAKE);
+        shakeScreen(BLOW_UP.shake);
       },
     );
     const stroking = createBeats(
@@ -240,7 +237,7 @@ export const forceClutterEvent = registerWispEvent(
         drawOver: (ctx, ms, now) => {
           if (ms < 0 || ms > travel) return;
           drawWispBetween(ctx, flierAt, ms, now, WISP_SIZE, 0.8, 0, blastAt);
-          drawDetonation(ctx, centre, ms - blastAt, BLAST, now);
+          drawDetonation(ctx, centre, ms - blastAt, BLOW_UP.size, now);
           // faded in on its first stroke's start and out after its last
           const b = sweep.at(
             Math.min(Math.max(ms, sweep.startMs), sweep.endMs - 1),

@@ -127,6 +127,16 @@ export const CONFIG = {
     },
   },
 
+  // src/shared/odometer — the total-income readout as a slot reel: when its
+  // digits show `digits`, they pop gold, the readout slams and plays the Burst
+  // event's blow-out, multiplying the total
+  odometer: {
+    digits: "777",
+    multiplier: 7,
+    // after one, the readout can't hit again for this long
+    cooldownMs: 60_000,
+  },
+
   // src/hud/upgradeMenu/index.ts — per-floor worker/office-upgrade pricing.
   upgradeMenu: {
     workerBasePriceFloor1: 100,

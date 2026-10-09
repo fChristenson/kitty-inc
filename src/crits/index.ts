@@ -104,6 +104,7 @@ export {
   revealStageTotalMs,
   startBoostEvent,
   startHuntEvent,
+  startOdometerBurst,
   startUnionEvent,
   takeClaimedEventProc,
   triggerSwarmSale,

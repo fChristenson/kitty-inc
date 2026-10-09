@@ -4,21 +4,16 @@
 import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
-import { playExplosion } from "../../../../shared/explosionBang";
-import { shakeScreen } from "../../../../shared/screenShake";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
 import { forceClaimEventProc, registerEventProc } from "../../eventProcs";
 import {
   canStartMoneyCover,
-  coverSpots,
   isMoneyCoverRunning,
-  startMoneyCover,
+  startBurstCover,
 } from "../../moneyCover";
 
 const KEY = "burst";
-const COINS = 300;
-const EXPLOSION_SHAKE = 1.1;
 
 registerEventProc(
   {
@@ -27,13 +22,7 @@ registerEventProc(
     isInProgress: () => isMoneyCoverRunning(KEY),
     canArm: (_floor, context) => canStartMoneyCover(context),
     arm: (floor, context) => {
-      const cover = startMoneyCover(KEY, floor, context, CONFIG.burstEvent, {
-        layout: (area) => coverSpots(area, COINS),
-      });
-      if (!cover) return;
-      cover.launch(cover.spots);
-      playExplosion();
-      shakeScreen(EXPLOSION_SHAKE);
+      startBurstCover(KEY, floor, context);
     },
   },
   { label: "Burst", color: COLOR.moneyGreen },

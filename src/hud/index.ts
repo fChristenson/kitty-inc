@@ -28,6 +28,7 @@ export function drawHud(
     {
       fontSize: HUD_FONT_SIZE,
       unitNameGapPx: HUD_UNIT_NAME_GAP_PX,
+      odometer: true,
     },
   );
 }

@@ -5,7 +5,10 @@
 // which pays the floor's income times its floor number before revealing the
 // covered crit itself
 import type { Floor } from "../../../gameState";
+import { CONFIG } from "../../../config";
 import { playCoinDrop, playSold } from "../../../sound";
+import { playExplosion } from "../../../shared/explosionBang";
+import { shakeScreen } from "../../../shared/screenShake";
 import { GLOBAL_SLAM, triggerEventEndSlam } from "../../../shared/eventEndSlam";
 import { multiply } from "../../../shared/bigNumber";
 import { pickCritTierByOdds, type CritTier } from "../../critTypes";
@@ -120,6 +123,9 @@ export interface MoneyCoverOptions {
 
 const STREAM_INTERVAL_MS = 16;
 const TICK_MS = 1000 / 60;
+// the Burst: one instant explosion of coins and bills over the whole screen
+const BURST_COINS = 300;
+const BURST_SHAKE = 1.1;
 
 let running: { key: string } | null = null;
 
@@ -319,4 +325,25 @@ export function startMoneyCover(
     },
     isLive,
   };
+}
+
+// the Burst event's blow-out: coins and bills shot from `from` (the button if
+// unset) over the whole screen, merging into the total; false if it can't start
+export function startBurstCover(
+  key: string,
+  floor: Floor,
+  context: EventProcContext,
+  options: MoneyCoverOptions = {},
+  from?: (area: CoverArea) => Point,
+): boolean {
+  const cover = startMoneyCover(key, floor, context, CONFIG.burstEvent, {
+    ...options,
+    layout: (area) => coverSpots(area, BURST_COINS),
+  });
+  if (!cover) return false;
+  if (from) cover.launchFrom(from(cover.area), cover.spots);
+  else cover.launch(cover.spots);
+  playExplosion();
+  shakeScreen(BURST_SHAKE);
+  return true;
 }

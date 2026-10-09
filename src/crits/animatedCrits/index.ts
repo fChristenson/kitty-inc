@@ -31,6 +31,7 @@ export {
 export { startBoostEvent } from "./events/boostEvent";
 export { startUnionEvent } from "./events/unionEvent";
 export { startHuntEvent } from "./events/huntEvent";
+export { startOdometerBurst } from "./odometerBurst";
 export { drawRevealStage, revealStageTotalMs } from "./revealStage";
 export {
   loadEventCatalog,

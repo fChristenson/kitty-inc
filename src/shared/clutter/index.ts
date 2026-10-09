@@ -5,7 +5,8 @@
 // simulate everything at arm; drawing is stateless
 import { COLOR } from "../../palette";
 import { drawBeam } from "../beam";
-import { clamp01, lerp, smoothstep } from "../easing";
+import { bezier } from "../curves";
+import { clamp01, easeOut, lerp, smoothstep } from "../easing";
 import { drawGlow, type FadeStops } from "../glowSprite";
 import { drawGlitterLight, type Point } from "../wisp";
 
@@ -13,6 +14,25 @@ import { drawGlitterLight, type Point } from "../wisp";
 export const SWEEP_DEPTH: [number, number] = [4, 34];
 // simulation step, ms
 const STEP = 8;
+
+// a mess blown out of one blast: the blast's size and its shake
+export const BLOW_UP = { size: 380, shake: 1.6 };
+const FLING_LIFT = 100;
+const flingVia: Point = { x: 0, y: 0 };
+
+// a bit blown out of a blast at `from` onto its spot, t 0..1 of its flight:
+// arcing up to `lift` 0..1 of FLING_LIFT over the blast, slowing as it lands
+export function flingOut(
+  from: Point,
+  to: Point,
+  lift: number,
+  t: number,
+  into: Point,
+): Point {
+  flingVia.x = (from.x + to.x) / 2;
+  flingVia.y = Math.min(from.y, to.y) - FLING_LIFT * lift;
+  return bezier(from, flingVia, to, easeOut(clamp01(t)), into);
+}
 
 // one drag of the broom: its front's centre from and to, the way it pushes
 // (radians) and its head's length across that
