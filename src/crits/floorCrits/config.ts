@@ -194,10 +194,6 @@ export const FLOOR_CRIT_CONFIG = {
     saberCrit: {
       chance: 0.03,
     },
-    // every bar crumbling into dust that swirls up and rebuilds them, fuller
-    snapCrit: {
-      chance: 0.03,
-    },
     // every bar blasting off like a rocket and screaming back into place
     liftoffCrit: {
       chance: 0.03,

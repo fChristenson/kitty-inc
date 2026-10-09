@@ -2086,7 +2086,6 @@ export const FLOOR_CRIT_KINDS = [
   "artilleryBarrageCrit",
   "crashLandingCrit",
   "saberCrit",
-  "snapCrit",
   "liftoffCrit",
   "gunshipCrit",
   "freezeRayCrit",

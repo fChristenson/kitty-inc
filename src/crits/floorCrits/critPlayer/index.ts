@@ -302,7 +302,6 @@ const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   artilleryBarrageCrit: () => import("../crits/artilleryBarrageCrit"),
   crashLandingCrit: () => import("../crits/crashLandingCrit"),
   saberCrit: () => import("../crits/saberCrit"),
-  snapCrit: () => import("../crits/snapCrit"),
   liftoffCrit: () => import("../crits/liftoffCrit"),
   gunshipCrit: () => import("../crits/gunshipCrit"),
   freezeRayCrit: () => import("../crits/freezeRayCrit"),

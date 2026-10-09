@@ -232,7 +232,7 @@ function liftOf(floor: Floor, now: number): number {
   return LIFT_H * (1 - ((u - HAUL_HOLD) / (1 - HAUL_HOLD)) ** 2);
 }
 
-// a snap crit's bar crumbling away from its left end, gone a while, then
+// a floor crit's bar crumbling away from its left end, gone a while, then
 // rebuilt from its left end
 const barCrumbles = new WeakMap<
   Floor,
