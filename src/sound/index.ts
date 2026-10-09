@@ -104,7 +104,9 @@ const AudioContextCtor: typeof AudioContext | undefined =
 let audioCtx: AudioContext | null = null;
 
 // opening the audio device blocks the main thread for 40-450ms, so the context
-// waits for the first tap or key (it can't play before one anyway)
+// waits for the first tap or key (it can't play before one anyway). Armed at
+// load: an idle task never runs while the player keeps tapping, which left
+// the game silent from startup
 function createAudioContextOnGesture(): void {
   if (!AudioContextCtor) return;
   const create = () => {
@@ -114,6 +116,7 @@ function createAudioContextOnGesture(): void {
     // scheduled sound reaches the speakers as soon as possible
     audioCtx = new AudioContextCtor({ latencyHint: "interactive" });
     resumeAudioContextOnGesture(audioCtx);
+    decodeAll(audioCtx);
   };
   window.addEventListener("pointerdown", create, true);
   window.addEventListener("keydown", create, true);
@@ -169,20 +172,22 @@ function loadSfxBuffer(
   return promise;
 }
 
-// kicks off decoding every one-shot SFX up front; call once from main.ts alongside
-// its other asset preloading, well before the player can actually act on anything —
-// by the time gameplay starts, every playX() below just schedules an
-// already-decoded buffer instead of fetching/decoding for the first time on that
-// very click
+// kicks off decoding every one-shot SFX up front, well before the player can
+// act on anything, so every playX() below just schedules an already-decoded
+// buffer; the first gesture starts any not yet begun
 export function preloadSounds(): void {
-  createAudioContextOnGesture();
   // decoded buffers play in any context; an offline one opens no audio device
   if (typeof OfflineAudioContext !== "function") return;
-  const decoder = new OfflineAudioContext(1, 1, DECODE_SAMPLE_RATE);
+  decodeAll(new OfflineAudioContext(1, 1, DECODE_SAMPLE_RATE));
+}
+
+function decodeAll(ctx: BaseAudioContext): void {
   (Object.keys(sfxUrls) as SfxName[]).forEach((name) => {
-    loadSfxBuffer(decoder, name).catch(() => {});
+    loadSfxBuffer(ctx, name).catch(() => {});
   });
 }
+
+createAudioContextOnGesture();
 
 // plays a preloaded SFX buffer starting offsetSeconds into it (0 = from the very
 // start) at the given linear volume and playbackRate (1 = unchanged pitch/speed) —
