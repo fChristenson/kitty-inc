@@ -19,7 +19,7 @@ import {
   spawnHomingCoinBurst,
   type FloorActionsDeps,
 } from "../../floors";
-import type { Floor } from "../../gameState";
+import { isFloorMaxed, type Floor } from "../../gameState";
 import { addTotalIncome } from "../../totalIncome";
 import { bezier } from "../curves";
 import { easeIn, easeOut, lerp, progress } from "../easing";
@@ -54,8 +54,14 @@ export interface PrizeOdds {
   badge: number;
 }
 
-export function rollPrize({ tier, coin }: PrizeOdds): Prize {
-  const roll = Math.random();
+// a floor at the level cap can't take a crit number's levels, so it rolls
+// only coins and badges
+export function rollPrize(
+  { tier: tierOdds, coin, badge }: PrizeOdds,
+  floor: Floor,
+): Prize {
+  const tier = isFloorMaxed(floor) ? 0 : tierOdds;
+  const roll = Math.random() * (tier + coin + badge);
   if (roll < tier) return { kind: "tier", tier: pickCritTierByOdds() };
   if (roll < tier + coin) return { kind: "coin" };
   return { kind: "badge", badge: pickFeaturedBadge() };

@@ -10,6 +10,7 @@ import {
 import { randomInt } from "../utils";
 import { CONFIG } from "../config";
 import { urgentBlink } from "../shared/urgentBlink";
+import { createSpawnRoll } from "../shared/spawnRoll";
 import { applyBoostAll } from "../hud";
 import { playBloop } from "../sound";
 import type { Floor } from "../gameState";
@@ -32,7 +33,6 @@ import {
 // clicked before it scurries off — boosts every worker in the building for free,
 // same effect as hud/boostMenu's paid "speed up workers" but with no $ cost.
 // Its timings are CONFIG.randomSpawns.mouse
-const spawnGapMs = () => randomInt(...CONFIG.randomSpawns.mouse.spawnGapMs);
 // 8x a cat's own walk speed (WALK_SPEED, worker/index.ts), with a little spread per
 // dart so every run doesn't look identically fast
 const BASE_RUN_SPEED = WALK_SPEED * 8;
@@ -99,7 +99,7 @@ let mouseSprite: HTMLCanvasElement | null = null;
 let huntedImage: HTMLCanvasElement | null = null;
 let active: MouseState | null = null;
 let lastUpdate = 0;
-let nextSpawnAt = Date.now() + spawnGapMs();
+const roll = createSpawnRoll(CONFIG.randomSpawns.mouse, Date.now());
 // the floors on screen, as gameCanvas last handed them in
 let onScreen: () => OnScreenFloor[] = () => [];
 
@@ -120,7 +120,7 @@ export async function loadMouseImage(): Promise<HTMLImageElement> {
 
 function despawn(now: number): void {
   active = null;
-  nextSpawnAt = now + spawnGapMs();
+  roll.restart(now);
   notifyHuntTargetGone();
 }
 
@@ -208,7 +208,7 @@ export function updateMouse(
     return;
   }
 
-  if (now < nextSpawnAt) return;
+  if (!roll.procs(now)) return;
   spawnOn(now);
 }
 

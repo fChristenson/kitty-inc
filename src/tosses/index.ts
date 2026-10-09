@@ -14,6 +14,7 @@ import type { Floor } from "../gameState";
 import { COLOR } from "../palette";
 import { playBloop, playBubblePop, playSwoosh } from "../sound";
 import { randomInt } from "../utils";
+import { createSpawnRoll } from "../shared/spawnRoll";
 import { between, easeOutBack, progress } from "../shared/easing";
 import { drawWhiteBurst } from "../shared/eventFx";
 import { isScreenFrozen } from "../shared/screenFreeze";
@@ -83,31 +84,26 @@ interface Warning {
 let getDeps: (() => FloorActionsDeps) | null = null;
 const tosses: Toss[] = [];
 const warnings: Warning[] = [];
-let nextSpawnAt = performance.now() + gapMs();
+const roll = createSpawnRoll(CONFIG.randomSpawns.tosses, performance.now());
 // the screen as last drawn, in gameCanvas's screen units
 let width = 1;
 let height = 1;
 const spot: Point = { x: 0, y: 0 };
 let bang: ReturnType<typeof createCritTextSprite> | null = null;
 
-function gapMs(): number {
-  return randomInt(...CONFIG.randomSpawns.tosses.spawnGapMs);
-}
-
 // the floor actions of the building on screen
 export function wireTosses(deps: () => FloorActionsDeps): void {
   getDeps = deps;
 }
 
-// once its random wait is up and the last tosses are gone, warns and tosses
-// a few more, like the mouse
+// once the last tosses are gone, rolls to warn and toss a few more, like
+// the mouse
 export function updateTosses(now: number): void {
   if (tosses.length > 0 || warnings.length > 0) return;
-  if (now < nextSpawnAt || isScreenFrozen() || !getDeps) return;
+  if (isScreenFrozen() || !getDeps || !roll.procs(now)) return;
   const floor = pickSpawnFloor(getDeps());
   if (!floor) return;
-  const endsAt = spawnTosses(floor, now);
-  nextSpawnAt = endsAt + gapMs();
+  roll.restart(spawnTosses(floor, now));
 }
 
 // warns and tosses a few at once, alongside any already flying (test button)
@@ -125,7 +121,7 @@ function spawnTosses(floor: Floor, now: number): number {
   let endsAt = launchAt;
   const n = randomInt(...count);
   for (let i = 0; i < n; i++) {
-    const prize = rollPrize(contentOdds);
+    const prize = rollPrize(contentOdds, floor);
     prepareMini(prize);
     const toss: Toss = {
       prize,

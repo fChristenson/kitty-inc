@@ -87,12 +87,13 @@ export const CONFIG = {
   },
 
   // the random spawns that wander onto the screen on their own every so
-  // often, each tapped for a reward
+  // often, each tapped for a reward. While none of a kind is out, it rolls
+  // every rollEveryMs and spawns with procChance
   randomSpawns: {
     // src/mouse — a mouse running about a random unlocked floor
     mouse: {
-      // the random wait after one leaves before the next
-      spawnGapMs: [30_000, 60_000],
+      rollEveryMs: 5_000,
+      procChance: 0.1,
       // how long it runs about before leaving, pulsing over its last pulseMs
       durationMs: 5_000,
       pulseMs: 2_000,
@@ -100,8 +101,8 @@ export const CONFIG = {
     // src/bubbles — bubbles blown up the screen: tap one to pop it for
     // what's inside
     bubbles: {
-      // the random wait between spawns
-      spawnGapMs: [30_000, 60_000],
+      rollEveryMs: 5_000,
+      procChance: 0.1,
       // how long they float before vanishing, pulsing over its last pulseMs
       durationMs: 5_000,
       pulseMs: 2_000,
@@ -112,8 +113,8 @@ export const CONFIG = {
     // src/tosses — prizes tossed up from the bottom of the screen like
     // fruit, after a warning sign: tap one in the air to catch it
     tosses: {
-      // the random wait between spawns
-      spawnGapMs: [30_000, 60_000],
+      rollEveryMs: 5_000,
+      procChance: 0.1,
       // the warning sign before the first toss
       warningMs: 1_000,
       count: [3, 7],

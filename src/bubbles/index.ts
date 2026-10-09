@@ -13,6 +13,7 @@ import type { FloorActionsDeps } from "../floors";
 import type { Floor } from "../gameState";
 import { playBubbleAppear, playBubblePop } from "../sound";
 import { randomInt } from "../utils";
+import { createSpawnRoll } from "../shared/spawnRoll";
 import { between, easeOutBack, lerp, progress } from "../shared/easing";
 import { isScreenFrozen } from "../shared/screenFreeze";
 import { shakeScreen } from "../shared/screenShake";
@@ -75,31 +76,25 @@ interface Bubble {
 
 let getDeps: (() => FloorActionsDeps) | null = null;
 const bubbles: Bubble[] = [];
-let nextSpawnAt = performance.now() + gapMs();
+const roll = createSpawnRoll(CONFIG.randomSpawns.bubbles, performance.now());
 // the screen as last drawn, in gameCanvas's screen units
 let width = 1;
 let height = 1;
 const spot: Point = { x: 0, y: 0 };
-
-function gapMs(): number {
-  return randomInt(...CONFIG.randomSpawns.bubbles.spawnGapMs);
-}
 
 // the floor actions of the building on screen
 export function wireBubbles(deps: () => FloorActionsDeps): void {
   getDeps = deps;
 }
 
-// once its random wait is up and the last bubbles are gone, blows a few
-// more in, like the mouse
+// once the last bubbles are gone, rolls to blow a few more in, like the mouse
 export function updateBubbles(now: number): void {
-  if (bubbles.length > 0 || now < nextSpawnAt || isScreenFrozen() || !getDeps)
-    return;
+  if (bubbles.length > 0 || isScreenFrozen() || !getDeps) return;
+  if (!roll.procs(now)) return;
   const floor = pickSpawnFloor(getDeps());
   if (!floor) return;
   spawnBubbles(floor, now);
-  nextSpawnAt =
-    now + SPAWN_MS + CONFIG.randomSpawns.bubbles.durationMs + gapMs();
+  roll.restart(now + SPAWN_MS + CONFIG.randomSpawns.bubbles.durationMs);
 }
 
 // blows a few bubbles in at once, alongside any already floating (test button)
@@ -118,7 +113,7 @@ function spawnBubbles(floor: Floor, now: number): void {
     [lanes[i], lanes[j]] = [lanes[j], lanes[i]];
   }
   lanes.forEach((lane, i) => {
-    const content = rollPrize(contentOdds);
+    const content = rollPrize(contentOdds, floor);
     prepareMini(content);
     const fy = between(SPAWN_Y);
     bubbles.push({
