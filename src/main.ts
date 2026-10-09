@@ -2228,6 +2228,8 @@ async function main() {
       threading: forceOnActive((e) => e.forceThreadingEvent),
       "bolt-binding": forceOnActive((e) => e.forceBoltBindingEvent),
       fortress: forceOnActive((e) => e.forceFortressEvent),
+      "meteor-splitter": forceOnActive((e) => e.forceMeteorSplitterEvent),
+      "thunder-duel": forceOnActive((e) => e.forceThunderDuelEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

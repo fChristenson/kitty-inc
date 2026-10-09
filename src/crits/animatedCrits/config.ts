@@ -8267,6 +8267,20 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 84
+  // flight, cash: src/crits/animatedCrits/events/meteorSplitterEvent ("Meteor Splitter"): on the flight stage, a huge meteor rushes at the view and the guns split it into two, four, then eight, every split a paying blast
+  meteorSplitterEvent: {
+    chance: 0.01,
+    payoutsPerSplit: 0.3, // the floor's payouts each blown meteor pays
+  },
+  // lightning, levels + crit tier: src/crits/animatedCrits/events/thunderDuelEvent ("Thunder Duel"): two storm wisps trade bolts across the screen through the bars, quicker and quicker, then clash mid-screen and fork onto every bar
+  thunderDuelEvent: {
+    chance: 0.01,
+    growMs: 250, // the storm wisps swelling in
+    levelShare: 0.006, // levels per bolt through a bar
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 83
   // shmup, cash: src/crits/animatedCrits/events/fortressEvent ("Fortress"): the view lifts into space, the ship blows a fortress core's three turning shield rings apart wisp by wisp (each paying), then the bare core in a chain of blasts
   fortressEvent: {
