@@ -46,6 +46,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-dyson-sphere-event" class="game__button">Dyson Sphere</button>
           <button id="test-cash-coil-event" class="game__button">Cash Coil</button>
           <button id="test-threading-event" class="game__button">Threading</button>
           <button id="test-bolt-binding-event" class="game__button">Bolt Binding</button>

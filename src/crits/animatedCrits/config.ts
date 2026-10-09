@@ -8267,6 +8267,14 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 87
+  // levels + crit tier: src/crits/animatedCrits/events/dysonSphereEvent ("Dyson Sphere"): gold panels lock round a sun band by band, then the finished sphere beams every bar
+  dysonSphereEvent: {
+    chance: 0.01,
+    levelShare: 0.01, // levels per beam
+    holdMs: 500,
+    mergeMs: 0,
+  },
   // batch 86
   // reveal stage (auto-runner), levels + crit tier: src/crits/animatedCrits/events/geometryRunEvent ("Geometry Run"): a side-scrolling run over the floors' bars laid end to end as platforms, every landing a level, off a ramp into a huge blast
   geometryRunEvent: {

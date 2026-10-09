@@ -2237,6 +2237,7 @@ async function main() {
       nebula: forceOnActive((e) => e.forceNebulaEvent),
       survivors: forceOnActive((e) => e.forceSurvivorsEvent),
       "geometry-run": forceOnActive((e) => e.forceGeometryRunEvent),
+      "dyson-sphere": forceOnActive((e) => e.forceDysonSphereEvent),
       bubbles: forceBubbles,
       tosses: forceTosses,
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
