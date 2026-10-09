@@ -220,5 +220,10 @@ export const FLOOR_CRIT_CONFIG = {
     missileTangleCrit: {
       chance: 0.03,
     },
+    // a hub of four beam blades spinning up, blasting every bar they sweep,
+    // then flying off onto the bars
+    windmillCrit: {
+      chance: 0.03,
+    },
   },
 } as const;

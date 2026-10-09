@@ -8267,6 +8267,16 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 83
+  // money, cash: src/crits/animatedCrits/events/cashCoilEvent ("Cash Coil"): a river of coins spirals up round the outside of the building, hidden behind it, crashing through each bar it crosses in front, then into the total
+  cashCoilEvent: {
+    chance: 0.01,
+    streamMs: 500, // the coins pouring in at the bottom
+    climbMs: 1100, // each coin's climb up the coil
+    levelShare: 0.01, // levels each time the head crashes through a bar
+    holdMs: 300,
+    mergeMs: 500,
+  },
   // batch 82
   // galaxy, levels: src/crits/animatedCrits/events/novaDiskEvent ("Nova Disk"): glitter stars orbit a lit bomb, spinning faster and tighter as its fuse burns, inner ones swallowed in pops; it blows and flings stars onto the bars
   novaDiskEvent: {

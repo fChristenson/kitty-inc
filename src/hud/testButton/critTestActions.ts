@@ -46,15 +46,16 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Events</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-doubling-bounce-event" class="game__button">Doubling Bounce</button>
-          <button id="test-air-juggle-event" class="game__button">Air Juggle</button>
-          <button id="test-nova-disk-event" class="game__button">Nova Disk</button>
-          <button id="test-blast-coat-event" class="game__button">Blast Coat</button>
+          <button id="test-cash-coil-event" class="game__button">Cash Coil</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Events</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-doubling-bounce-event" class="game__button">Doubling Bounce</button>
+          <button id="test-air-juggle-event" class="game__button">Air Juggle</button>
+          <button id="test-nova-disk-event" class="game__button">Nova Disk</button>
+          <button id="test-blast-coat-event" class="game__button">Blast Coat</button>
           <button id="test-galaxy-flight-event" class="game__button">Galaxy Flight</button>
           <button id="test-battlecruiser-event" class="game__button">Battlecruiser</button>
           <button id="test-laser-gauntlet-event" class="game__button">Laser Gauntlet</button>
@@ -1340,6 +1341,7 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-floor-crit="gunshipCrit">Gunship Crit</button>
           <button class="game__button" data-floor-crit="freezeRayCrit">Freeze Ray Crit</button>
           <button class="game__button" data-floor-crit="missileTangleCrit">Missile Tangle Crit</button>
+          <button class="game__button" data-floor-crit="windmillCrit">Windmill Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

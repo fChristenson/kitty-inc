@@ -2224,6 +2224,7 @@ async function main() {
       "air-juggle": forceOnActive((e) => e.forceAirJuggleEvent),
       "nova-disk": forceOnActive((e) => e.forceNovaDiskEvent),
       "blast-coat": forceOnActive((e) => e.forceBlastCoatEvent),
+      "cash-coil": forceOnActive((e) => e.forceCashCoilEvent),
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
