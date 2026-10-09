@@ -84,6 +84,7 @@ import {
   crumbleIncomeBar,
   launchIncomeBar,
   heatIncomeBar,
+  shortIncomeBar,
   drawIncomePanel,
   setIncomePanelsHidden,
 } from "../../floors/incomePanel";
@@ -1687,6 +1688,9 @@ function floorCritLevels(
   if (kind === "atomsCrit") return step ? Math.ceil(count / 5) : 0;
   if (kind === "reactorCrit") return step ? Math.ceil(count / 3) : 0;
   if (kind === "staticCrit") return step ? count : 0;
+  // an EMP's short and a Big Bang's collapse only jolt a bar; their runs land them
+  if (kind === "empCrit") return step ? Math.ceil(count / 5) : 0;
+  if (kind === "bigBangCrit") return step ? Math.ceil(count / 4) : 0;
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);
@@ -1747,6 +1751,7 @@ function floorCritPlayFor(
     onRocket: (bar, launch) => launchIncomeBar(targets[bar], launch),
     onHeat: (bar, heatMs, holdMs) =>
       heatIncomeBar(targets[bar], heatMs, holdMs),
+    onShort: (bar, deadMs) => shortIncomeBar(targets[bar], deadMs),
     drawBar: (ctx, bar, flash) => {
       const target = targets[bar];
       const center = getIncomeBarCenter(isGround(target));

@@ -8,6 +8,7 @@ import {
   getScreenShakeOffset,
   stopScreenShake,
 } from "../../shared/screenShake";
+import { getScreenZoom } from "../../shared/screenZoom";
 import {
   FLOOR_W,
   FLOOR_H,
@@ -727,6 +728,18 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     const shake = getScreenShakeOffset(Date.now());
     ctx.translate(shake.x, shake.y);
     ctx.scale(scale, scale);
+    // a floor crit's zoom takes the world and HUD with it, over black
+    const zoom = getScreenZoom(Date.now());
+    ctx.save();
+    if (zoom !== 1) {
+      const cx = SLOT_W / 2;
+      const cy = contentViewportH() / 2;
+      ctx.fillStyle = COLOR.black;
+      ctx.fillRect(0, 0, SLOT_W, contentViewportH());
+      ctx.translate(cx, cy);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-cx, -cy);
+    }
 
     // background first, in plain screen space (fills the whole viewport regardless
     // of camera position) — a gradient, not a flat fill, since the night sky itself
@@ -777,6 +790,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // so the actual bottom edge is captured for the HUD tap-zone hit-test below
     // instead of guessing a fixed height
     if (!skipHud) hudBottomY = drawHud(ctx, SLOT_W, getTotalIncome());
+    ctx.restore();
     // the flash holds still while the world rattles: its huge rays judder otherwise
     ctx.translate(-shake.x / scale, -shake.y / scale);
     if (!skipFlash)

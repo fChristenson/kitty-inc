@@ -2092,6 +2092,8 @@ export const FLOOR_CRIT_KINDS = [
   "atomsCrit",
   "reactorCrit",
   "staticCrit",
+  "empCrit",
+  "bigBangCrit",
   "gunshipCrit",
   "freezeRayCrit",
   "missileTangleCrit",

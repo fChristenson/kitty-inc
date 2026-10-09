@@ -1,5 +1,12 @@
 # Ideas
 
+## List eighty-two
+
+Floor crits, playable in the playground: [ideas.html?list=next62](../tmp/_playground/ideas.html?list=next62).
+
+- **Blink**: the number vanishes in a flash and reappears by a bar, striking it, then blinks away again and again, quicker and quicker, all over the building, till it's everywhere at once, a copy by every bar, trembling; then every copy strikes together and the bars go off in a barrage, its own bar's the biggest.
+- **Shield break**: a dome of light closes over the building and the number hammers it from outside, each hit splitting cracks across it, quicker and harder; then the dome shatters and its shards rain down onto every bar in a rattling barrage, its own bar's the biggest.
+
 ## List eighty-one
 
 Floor crits, playable in the playground: [ideas.html?list=next61](../tmp/_playground/ideas.html?list=next61).
@@ -63,3 +70,4 @@ Floor crits, playable in the playground: [ideas.html?list=next55](../tmp/_playgr
 - **Meltdown** (`meltdownCrit` floor crit): bars heat white-hot together via `heatIncomeBar`, then blow top to bottom in runs of blasts, its own bar last.
 - **Crunch** (`crunchCrit` floor crit): a gravity well hauls every bar into a stack (drawn by the crit through `drawBar`/`hideBars`), squeezes it, then flings them back to land in blasts, its own bar last.
 - **Atoms** (`atomsCrit`), **Reactor** (`reactorCrit`), **Static** (`staticCrit`) floor crits: electron orbits, a core beaming into every bar, and static arcs, each building in every bar at once before going off.
+- **EMP** (`empCrit`, bars shorted via `shortIncomeBar`) and **Big Bang** (`bigBangCrit`, the world and HUD zoomed via `shared/screenZoom`) floor crits.

@@ -220,6 +220,14 @@ export const FLOOR_CRIT_CONFIG = {
     staticCrit: {
       chance: 0.03,
     },
+    // a pulse shorting every bar out, then rebooting them in blasts
+    empCrit: {
+      chance: 0.03,
+    },
+    // the whole screen collapsing into the number and banging back out
+    bigBangCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

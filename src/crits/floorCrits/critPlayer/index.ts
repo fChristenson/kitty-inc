@@ -38,6 +38,8 @@ export interface FloorCritPlay {
   onRocket?: (bar: number, launch: BarLaunch) => void;
   // bars()[bar] heating to white-hot over heatMs, held there for holdMs
   onHeat?: (bar: number, heatMs: number, holdMs: number) => void;
+  // bars()[bar] shorted out, dark but for blips, for deadMs
+  onShort?: (bar: number, deadMs: number) => void;
   // bars()[bar]'s own income bar drawn centred on (0, 0), washed `flash` white
   drawBar?: (ctx: CanvasRenderingContext2D, bar: number, flash: number) => void;
   // these bars are drawn by the crit itself (drawBar); null gives them back
@@ -88,6 +90,12 @@ export interface PlannedHeat {
   holdMs: number;
 }
 
+export interface PlannedShort {
+  bar: number;
+  at: number;
+  deadMs: number;
+}
+
 export interface Running {
   play: FloorCritPlay;
   glyphs: FloorCritGlyphs;
@@ -108,6 +116,8 @@ export interface Running {
   launched: number;
   heats: PlannedHeat[];
   heated: number;
+  shorts: PlannedShort[];
+  shorted: number;
   endsAt: number;
   // where each bar was last seen, if one scrolls out of bars()
   lastBars: Point[];
@@ -254,6 +264,7 @@ export interface FloorCritDef {
     ) => void,
     rocket: (bar: number, at: number, launch: BarLaunch) => void,
     heat: (bar: number, at: number, heatMs: number, holdMs: number) => void,
+    short: (bar: number, at: number, deadMs: number) => void,
   ): void;
   draw: Draw;
   // how long it keeps drawing after its last hit
@@ -330,6 +341,8 @@ const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   atomsCrit: () => import("../crits/atomsCrit"),
   reactorCrit: () => import("../crits/reactorCrit"),
   staticCrit: () => import("../crits/staticCrit"),
+  empCrit: () => import("../crits/empCrit"),
+  bigBangCrit: () => import("../crits/bigBangCrit"),
 };
 const loading = new Map<FloorCritKind, Promise<unknown>>();
 
@@ -381,12 +394,14 @@ function plan(r: Running, bars: Point[], def: FloorCritDef): void {
       r.crumbles.push({ bar, at, crumbleMs, holdMs, rebuildMs }),
     (bar, at, launch) => r.rockets.push({ bar, at, launch }),
     (bar, at, heatMs, holdMs) => r.heats.push({ bar, at, heatMs, holdMs }),
+    (bar, at, deadMs) => r.shorts.push({ bar, at, deadMs }),
   );
   r.hits.sort((a, b) => a.at - b.at);
   r.lifts.sort((a, b) => a.at - b.at);
   r.crumbles.sort((a, b) => a.at - b.at);
   r.rockets.sort((a, b) => a.at - b.at);
   r.heats.sort((a, b) => a.at - b.at);
+  r.shorts.sort((a, b) => a.at - b.at);
   if (!r.endsAt)
     r.endsAt = Math.max(...r.hits.map((h) => h.at)) + (def.tailMs ?? 0);
 }
@@ -425,6 +440,8 @@ function start(p: PendingLaunch, def: FloorCritDef, now: number): void {
     launched: 0,
     heats: [],
     heated: 0,
+    shorts: [],
+    shorted: 0,
     endsAt: 0,
     lastBars: bars,
     span: { from: 0, to: 0 },
@@ -492,6 +509,10 @@ export function drawFloorCrit(
   while (r.heated < r.heats.length && r.heats[r.heated].at <= ms) {
     const h = r.heats[r.heated++];
     r.play.onHeat?.(h.bar, h.heatMs, h.holdMs);
+  }
+  while (r.shorted < r.shorts.length && r.shorts[r.shorted].at <= ms) {
+    const s = r.shorts[r.shorted++];
+    r.play.onShort?.(s.bar, s.deadMs);
   }
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];

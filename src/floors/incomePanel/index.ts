@@ -302,6 +302,36 @@ function heatOf(floor: Floor, now: number): number {
   return 0;
 }
 
+// an EMP crit's bar shorted out for deadMs: dark, blipping back on now and
+// then, more often towards the end
+const barShorts = new WeakMap<
+  Floor,
+  { at: number; deadMs: number; seed: number }
+>();
+const SHORT_BLIP_MS = 60;
+const SHORT_BLIPS: [number, number] = [0.04, 0.35];
+const SHORT_DARK = 0.7;
+const SHORT_TEXT = 0.3;
+
+export function shortIncomeBar(floor: Floor, deadMs: number): void {
+  barShorts.set(floor, { at: Date.now(), deadMs, seed: Math.random() });
+}
+
+function isShorted(floor: Floor, now: number): boolean {
+  const s = barShorts.get(floor);
+  if (!s) return false;
+  const t = now - s.at;
+  if (t >= s.deadMs) {
+    barShorts.delete(floor);
+    return false;
+  }
+  const share = Math.max(0, t / s.deadMs);
+  const blips = SHORT_BLIPS[0] + (SHORT_BLIPS[1] - SHORT_BLIPS[0]) * share;
+  const slot = Math.floor(t / SHORT_BLIP_MS);
+  const h = Math.sin(slot * 12.9898 + s.seed * 78.233) * 43758.5453;
+  return h - Math.floor(h) >= blips;
+}
+
 // px right of its place
 function launchOf(floor: Floor, now: number): number {
   const l = barLaunches.get(floor);
@@ -750,6 +780,7 @@ export function drawIncomePanel(
   const crumble = crumbleOf(floor, now);
   const launched = launchOf(floor, now);
   const heat = heatOf(floor, now);
+  const dark = isShorted(floor, now);
   const rattle = heat * HEAT_RATTLE_PX;
   const slam = getSlamPose(floor, "bar", now);
   const drawBar = (): void =>
@@ -952,6 +983,13 @@ export function drawIncomePanel(
       ctx.fillStyle = COLOR.white;
       ctx.fill();
       ctx.globalAlpha = 1;
+    }
+    if (dark) {
+      roundRect(ctx, barX, barY, barW, barH, barRadius);
+      ctx.globalAlpha = SHORT_DARK;
+      ctx.fillStyle = COLOR.black;
+      ctx.fill();
+      ctx.globalAlpha = SHORT_TEXT;
     }
 
     // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
