@@ -37,16 +37,12 @@ export const FLOOR_CRIT_CONFIG = {
     rainCrit: {
       chance: 0.03,
     },
-    // it stamps down onto each bar leaving a glowing print, is catapulted off
-    // the top to crash down through them all, or whirls into a tornado
-    // flinging a copy onto each
+    // it stamps down onto each bar leaving a glowing print, or is catapulted
+    // off the top to crash down through them all
     stampCrit: {
       chance: 0.03,
     },
     catapultCrit: {
-      chance: 0.03,
-    },
-    tornadoCrit: {
       chance: 0.03,
     },
     // it flings copies of itself off its orbit, pulls a train of copies down

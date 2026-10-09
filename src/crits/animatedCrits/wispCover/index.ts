@@ -126,7 +126,7 @@ export function registerWispEvent(
     { label, color: COLOR.heavenlyGold },
   );
   return (floor) => {
-    forceTestCrit(floor, null, pickCritTierByOdds(), null, "upgrade");
+    forceTestCrit(floor, null, pickCritTierByOdds(), "upgrade");
     forceClaimEventProc(key, floor);
   };
 }

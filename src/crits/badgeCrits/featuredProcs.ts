@@ -84,6 +84,12 @@ export function rollFeaturedCrit(random: () => number): FeaturedCritKind[] {
   return [kinds[kinds.length - 1]];
 }
 
+// one featured badge picked the way a featured roll picks one; its reward
+// needs loadFeaturedRewards before it pays
+export function pickFeaturedBadge(): FeaturedCritKind {
+  return rollFeaturedCrit(Math.random)[0];
+}
+
 export function featuredCritFlags(
   enabled: ReadonlySet<string> = new Set(),
 ): Record<FeaturedCritKind, boolean> {

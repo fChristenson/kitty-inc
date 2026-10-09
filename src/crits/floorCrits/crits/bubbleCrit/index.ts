@@ -1,6 +1,10 @@
 // the bubble floor crit: its number blown into bubbles that pop on the bars
 import { registerFloorCrit, drawText, along } from "../../critPlayer";
 import { BURST_MS } from "../../critPlayer/shared";
+import {
+  drawSoapBubble,
+  drawSoapBubblePop,
+} from "../../../../shared/soapBubble";
 
 const BUBBLES_PER_BAR = 2;
 const BUBBLE_R = 75;
@@ -38,26 +42,19 @@ registerFloorCrit("bubbleCrit", {
         { alpha: 1 - ms / BURST_MS },
       );
     ctx.save();
-    ctx.lineWidth = 6;
     for (let i = 0; i < bars.length * BUBBLES_PER_BAR; i++) {
       const b = bubble(i, bars.length);
       const t = ms - b.delay;
       if (t < 0 || t >= b.duration + BUBBLE_POP_MS) continue;
       const to = along(r, bars, b.bar, b.along);
       if (t >= b.duration) {
-        // popped: a ring bursting off where it landed
-        const q = (t - b.duration) / BUBBLE_POP_MS;
-        ctx.globalAlpha = 1 - q;
-        ctx.strokeStyle = "#ffffff";
-        ctx.beginPath();
-        ctx.arc(
+        drawSoapBubblePop(
+          ctx,
           to.x,
           to.y - BUBBLE_R,
-          BUBBLE_R * (1 + 0.8 * q),
-          0,
-          Math.PI * 2,
+          BUBBLE_R,
+          (t - b.duration) / BUBBLE_POP_MS,
         );
-        ctx.stroke();
         continue;
       }
       // wobbling down onto its bar, blown up to size as it leaves
@@ -66,25 +63,7 @@ registerFloorCrit("bubbleCrit", {
       const x = to.x * p + Math.sin(p * 9 + i) * BUBBLE_WOBBLE * (1 - p);
       const y = (to.y - BUBBLE_R) * p;
       const radius = BUBBLE_R * grow;
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = "rgba(186,230,253,0.18)";
-      ctx.strokeStyle = "rgba(255,255,255,0.85)";
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
-      ctx.beginPath();
-      ctx.ellipse(
-        x - radius * 0.4,
-        y - radius * 0.45,
-        radius * 0.22,
-        radius * 0.12,
-        -0.6,
-        0,
-        Math.PI * 2,
-      );
-      ctx.fill();
+      drawSoapBubble(ctx, x, y, radius);
       drawText(ctx, r.glyphs, r.label, x, y, BUBBLE_FONT * grow);
     }
     ctx.restore();

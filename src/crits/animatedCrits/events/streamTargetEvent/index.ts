@@ -177,7 +177,7 @@ export function registerStreamTargetEvent(
   );
 
   return (floor) => {
-    forceTestCrit(floor, null, pickCritTierByOdds(), null, "upgrade");
+    forceTestCrit(floor, null, pickCritTierByOdds(), "upgrade");
     forceClaimEventProc(def.key, floor);
   };
 }

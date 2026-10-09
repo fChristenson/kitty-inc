@@ -336,6 +336,6 @@ registerEventProc(
 
 // dev test hook: arms a crit on floor (tier by the crit odds) carrying Jackpot Reels
 export function forceJackpotReelsEvent(floor: Floor): void {
-  forceTestCrit(floor, null, pickCritTierByOdds(), null, "upgrade");
+  forceTestCrit(floor, null, pickCritTierByOdds(), "upgrade");
   forceClaimEventProc(KEY, floor);
 }

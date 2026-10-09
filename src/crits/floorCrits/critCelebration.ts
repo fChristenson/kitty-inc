@@ -1,4 +1,3 @@
-import type { Floor } from "../../gameState";
 import {
   type CritProcKind,
   type CritProcFlags,
@@ -22,7 +21,6 @@ import {
   NIGHT_SHIFT_CRIT_LABEL,
 } from "../critTypes";
 
-import { spawnFreezeCoinBurst } from "../../floors/coins";
 import { playCoinDrop } from "../../sound";
 import {
   playTierFlash,
@@ -36,10 +34,8 @@ import {
   playCritMerge,
   type FlashStack,
   isCritFlashActive,
-  getFlashHoldEndsAt,
-  freezeCritFlashAsBackground,
 } from "../critFlash";
-import { celebrateBonusTier, tierColor } from "./bonusTierReward";
+import { tierColor } from "./bonusTierReward";
 
 import { getScreenUnfrozenAt, isScreenFrozen } from "../../shared/screenFreeze";
 
@@ -236,7 +232,7 @@ function celebrateBooty(): void {
 // they're simply skipped while a special celebration is still due, rather
 // than piling up behind it (see triggerCritCelebration below)
 interface QueuedCelebration {
-  kind: CritProcKind | "bonusTier" | "floorCrit";
+  kind: CritProcKind | "floorCrit";
   queuedAt: number;
   maxAgeMs?: number;
   run: () => void;
@@ -260,27 +256,6 @@ function drainSpecialCelebrationQueue(): void {
   const step = () => {
     // an event owns the screen: celebrations wait until it ends
     if (isScreenFrozen()) {
-      setTimeout(step, 100);
-      return;
-    }
-    // a queued "special crit crit" bonus tier never waits for the flash ahead
-    // of it to run its full course (grow -> hold -> fade) like every other
-    // queued kind does below — it freezes that flash as a static backdrop
-    // the INSTANT its own hold phase ends (before any fade begins), then
-    // takes over as the still-animating foreground flash drawn on top of it,
-    // so the proc's own celebration reads as "holds, freezes, and the bonus
-    // tier flash stacks over it" instead of "fully fades out, then a
-    // separate flash starts fresh"
-    const next = specialCelebrationQueue[0];
-    if (next?.kind === "bonusTier") {
-      const holdEndsAt = getFlashHoldEndsAt();
-      if (holdEndsAt !== null && Date.now() < holdEndsAt) {
-        setTimeout(step, 50);
-        return;
-      }
-      freezeCritFlashAsBackground();
-      specialCelebrationQueue.shift();
-      next.run();
       setTimeout(step, 100);
       return;
     }
@@ -320,11 +295,8 @@ function drainSpecialCelebrationQueue(): void {
 import { isDetachedJobRunning } from "../../shared/detachedJob";
 
 export function triggerCritCelebration(
-  floor: Floor,
   tier: CritTier,
-  getScreenCenterLocal: (floor: Floor) => { x: number; y: number },
   procs?: Partial<CritProcFlags>,
-  bonusTier: CritTier | null = null,
   onFollowUpProc?: (kind: CritProcKind) => void,
   upDownMerge: UpDownMerge = {},
   // the number flying into the floor's bar once its flash has held
@@ -371,25 +343,6 @@ export function triggerCritCelebration(
           );
         }
       }
-    }
-    // "special crit crit": queued AFTER every proc's own celebration above,
-    // so it plays right after theirs holds/fades — the queue's own
-    // one-at-a-time draining (drainSpecialCelebrationQueue) is what makes
-    // this read as "show the special crit, then stack a plain x5/x25/x125
-    // tier flash on top of it" instead of both flashing simultaneously
-    if (
-      bonusTier &&
-      !specialCelebrationQueue.some((q) => q.kind === "bonusTier")
-    ) {
-      specialCelebrationQueue.push({
-        kind: "bonusTier",
-        queuedAt: now,
-        run: () =>
-          celebrateBonusTier(bonusTier, (offsetX, offsetY, arrival) => {
-            const p = getScreenCenterLocal(floor);
-            spawnFreezeCoinBurst(floor, p.x + offsetX, p.y + offsetY, arrival);
-          }),
-      });
     }
     drainSpecialCelebrationQueue();
     return;

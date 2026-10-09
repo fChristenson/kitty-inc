@@ -8,8 +8,6 @@ export {
   RATE_LOCK_SPEED_MULTIPLIER,
   RUSH_HOUR_INTERVAL_SECONDS,
   SPECIAL_CRIT_GATEWAY,
-  consumeBonusTierCrit,
-  getBonusTierCrit,
   getCritProcIncomeModifierPercent,
   getCritProcNextMilestoneCount,
   getPriceMatchCost,
@@ -32,13 +30,16 @@ export type {
   CritTier,
 } from "./critTypes";
 export {
+  createCritTextSprite,
   critFont,
   drawCritFlash,
+  drawCritTextSprite,
   drawPoppingCritText,
   isCritFlashActive,
   syncCritFlashPause,
   warmTierFlashes,
 } from "./critFlash";
+export type { CritTextSprite } from "./critFlash";
 export {
   applyBonusTierIncome,
   applyFloorCrit,
@@ -76,6 +77,7 @@ export {
   getCritProcCount,
   hasBadgeCapsule,
   loadFeaturedRewards,
+  pickFeaturedBadge,
   playCapsuleRevealBeats,
   queueBadgeFoilReveal,
   recordCritProcLanded,

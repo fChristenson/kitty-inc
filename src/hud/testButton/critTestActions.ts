@@ -1285,6 +1285,7 @@ export function createTestButtonMarkup(): string {
         <div class="test-actions-dropdown__menu">
           <button id="add-money" class="game__button">Add Money</button>
           <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
+          <button id="test-bubbles-event" class="game__button">Spawn Bubbles</button>
           <button id="test-idle-overlay" class="game__button">Idle Overlay</button>
           <button class="game__button" data-add-badges="10">Badges +10</button>
           <button class="game__button" data-add-badges="100">Badges +100</button>
@@ -1307,7 +1308,6 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-floor-crit="rainCrit">Rain Crit</button>
           <button class="game__button" data-floor-crit="stampCrit">Stamp Crit</button>
           <button class="game__button" data-floor-crit="catapultCrit">Catapult Crit</button>
-          <button class="game__button" data-floor-crit="tornadoCrit">Tornado Crit</button>
           <button class="game__button" data-floor-crit="orbitCrit">Orbit Crit</button>
           <button class="game__button" data-floor-crit="trainCrit">Train Crit</button>
           <button class="game__button" data-floor-crit="bubbleCrit">Bubble Crit</button>
@@ -1360,7 +1360,6 @@ export function createTestButtonMarkup(): string {
         <div class="test-actions-dropdown__menu">
           <label>Event <select id="test-crit-event"><option value="upgrade">Upgrade click</option><option value="unlock">Floor unlock</option><option value="map">Map unlock</option></select></label>
           <label>Tier <select id="test-crit-tier">${tiers}</select></label>
-          <label>Bonus tier <select id="test-crit-bonus"><option value="">None</option>${tiers}</select></label>
           <button class="game__button" data-crit-kind="">Regular Crit</button>
           ${buttons}
         </div>
@@ -1374,13 +1373,11 @@ export function wireCritTestActions(
   onForce: (
     kind: CritProcKind | null,
     tier: CritTier,
-    bonusTier: CritTier | null,
     event: "upgrade" | "unlock" | "map",
   ) => void,
 ): void {
   const event = container.querySelector<HTMLSelectElement>("#test-crit-event")!;
   const tier = container.querySelector<HTMLSelectElement>("#test-crit-tier")!;
-  const bonus = container.querySelector<HTMLSelectElement>("#test-crit-bonus")!;
   const buttons =
     container.querySelectorAll<HTMLButtonElement>("[data-crit-kind]");
   const filter = container.querySelector<HTMLInputElement>(
@@ -1396,8 +1393,6 @@ export function wireCritTestActions(
       button.hidden = unavailable;
       button.disabled = unavailable;
     }
-    bonus.disabled = map;
-    if (map) bonus.value = "";
     filter.dispatchEvent(new Event("input"));
   }
   event.addEventListener("change", updateEvent);
@@ -1409,9 +1404,6 @@ export function wireCritTestActions(
       onForce(
         kind || null,
         tier.value as CritTier,
-        kind && event.value !== "map"
-          ? (bonus.value as CritTier) || null
-          : null,
         event.value as "upgrade" | "unlock" | "map",
       );
     });

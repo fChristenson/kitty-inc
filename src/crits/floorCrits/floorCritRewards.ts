@@ -96,8 +96,6 @@ import {
 import { getActiveCompanyIndex } from "../../company";
 import { spawnCoinBurst as animateCoinBurst } from "../../floors/coins";
 
-import { applyBonusTierIncome } from "./bonusTierReward";
-
 import { computeBaseFloorStats } from "../../floors";
 import {
   recordCritProcLanded,
@@ -933,12 +931,6 @@ function applyGoldStandardCrit(): void {
   addTotalIncome(multiply(getTotalIncome(), 3));
 }
 
-// "special crit crit" bonus tier (see crits/critTypes's getBonusTierCrit and
-// crits/floorCrits/bonusTierReward): rides on whatever the proc(s) already granted
-function applyBonusTierCrit(bonusTier: CritTier): void {
-  applyBonusTierIncome(bonusTier);
-}
-
 // "Chair Giveaway"/"Supplies Giveaway" crits (see crits/critTypes's isChairGiveawayCrit/
 // isSuppliesGiveawayCrit): grant the floor being upgraded its one-time office
 // chairs/supplies purchase for free (same flags hud/upgradeMenu's own paid
@@ -1558,7 +1550,7 @@ export function eventProcContext(
     promoteFloorTier: (floor, tier) => {
       floor.critMultiplierTier = tier;
       triggerButtonPress(floor);
-      triggerCritCelebration(floor, tier, deps.getScreenCenterLocal);
+      triggerCritCelebration(tier);
       deps.persist();
     },
     unlockFloorFree: (floor) => {
@@ -1609,14 +1601,10 @@ export function applyFloorCrit(
     multiplier: deps.multiplier,
   };
   applyCritProcs(result, context, CRIT_REWARDS);
-  if (result.bonusTier) applyBonusTierCrit(result.bonusTier);
   triggerButtonPress(floor);
   triggerCritCelebration(
-    floor,
     result.tier,
-    deps.getScreenCenterLocal,
     result,
-    result.bonusTier,
     (kind) => grantFollowUpProc(kind, context),
     {
       up,

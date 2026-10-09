@@ -362,6 +362,6 @@ registerEventProc(
 
 // dev test hook: arms a crit on floor (tier by the crit odds) carrying Shell Game
 export function forceShellGameEvent(floor: Floor): void {
-  forceTestCrit(floor, null, pickCritTierByOdds(), null, "upgrade");
+  forceTestCrit(floor, null, pickCritTierByOdds(), "upgrade");
   forceClaimEventProc(KEY, floor);
 }

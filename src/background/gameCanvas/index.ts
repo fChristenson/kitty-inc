@@ -36,6 +36,13 @@ import { drawStars } from "../stars";
 import { drawRoof } from "../../buildings";
 import { drawHud, HUD_H } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
+import {
+  drawBubbles,
+  hitTestBubbles,
+  popBubbleAt,
+  updateBubbles,
+  wireBubbles,
+} from "../../bubbles";
 import { getTotalIncome } from "../../totalIncome";
 
 import { COLOR } from "../../palette";
@@ -709,6 +716,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
 
   function drawLiveFrame(skipHud = false, skipFlash = false): void {
     updateMouse(activeFloors, Date.now());
+    updateBubbles(performance.now());
     const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -779,6 +787,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         SLOT_W,
         Date.now(),
       );
+    // the bubbles float over the crit celebration, rattling with the world
+    ctx.translate(shake.x / scale, shake.y / scale);
+    drawBubbles(ctx, SLOT_W, contentViewportH(), performance.now());
     ctx.restore();
   }
 
@@ -799,6 +810,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   // sits over whatever floor content happens to be scrolled underneath it, so
   // that gesture must never also fire a floor tap/upgrade-button hit
   let hudTapDown = false;
+  // true for the whole gesture if it popped a bubble: nothing under it fires
+  let bubbleTapDown = false;
 
   function stopMomentum(): void {
     if (momentumFrame !== null) {
@@ -884,6 +897,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       hit.isGroundFloor,
     );
   }
+  wireBubbles(floorActionsDeps);
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every
@@ -935,6 +949,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     stopHoldRepeat(); // safety net against a stale hold from an interrupted previous gesture
     upgradeFiredOnDown = false;
     const p = canvasPoint(event);
+    // bubbles float over everything, the HUD too
+    bubbleTapDown = popBubbleAt(p.x, p.y);
+    if (bubbleTapDown) return;
     hudTapDown = p.y < hudBottomY;
     if (hudTapDown) return; // HUD is the topmost layer — no floor hit-test underneath it
     const hit = hitTestPoint(p.x, p.y);
@@ -981,6 +998,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     dragging = false;
     didDrag = false;
     hudTapDown = false;
+    bubbleTapDown = false;
     upgradeFiredOnDown = true;
     canvas.setPointerCapture(event.pointerId);
     button.fire();
@@ -990,7 +1008,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   function onPointerMove(event: PointerEvent): void {
     if (dragPointerId !== event.pointerId) {
       const p = canvasPoint(event);
-      if (p.y < hudBottomY) {
+      if (p.y < hudBottomY || hitTestBubbles(p.x, p.y)) {
         canvas.style.cursor = "pointer";
         hoveredPoint = null;
         return;
@@ -1049,6 +1067,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       }
       return;
     }
+    if (bubbleTapDown) return;
     if (hudTapDown) {
       onOpenCorporationStats();
       return;

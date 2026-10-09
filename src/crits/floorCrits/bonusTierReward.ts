@@ -1,9 +1,8 @@
-// The "special crit crit" bonus tier reward: multiplies the active company's
-// total income by a crit tier's multiplier (5x/25x/125x) and plays its
+// The hunted mouse's bonus tier reward (src/mouse): multiplies the active
+// company's total income by a crit tier's multiplier and plays its
 // celebration — a tier-sized screen shake, the coin burst sfx, and a tier-sized pattern
 // of coin bursts whose coins freeze mid-air and then fly into the total-income
-// readout. Shared by piggyback-proc bonus tiers (floors/) and the hunted mouse
-// (src/mouse).
+// readout.
 import { addTotalIncome, getTotalIncome } from "../../totalIncome";
 import { triggerScreenShake } from "../critFlash";
 import { playCoinDrop, playSold } from "../../sound";

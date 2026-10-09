@@ -105,7 +105,6 @@ import {
   forceRecruitmentDriveCritProc,
   forceMergerCritProc,
   forceShareholdersCritProc,
-  forceBonusTierCritProc,
   forceCritProc,
   readCritProcs,
   tierOnlyCrit,
@@ -132,7 +131,6 @@ export function forceTestCrit(
   floor: Floor,
   kind: CritProcKind | null,
   tier: CritTier,
-  bonusTier: CritTier | null,
   event: "upgrade" | "unlock" | "map",
 ): void {
   if (testCritFloor) consumeCritUpgrade(testCritFloor);
@@ -143,7 +141,6 @@ export function forceTestCrit(
   const result: CritRollResult = {
     ...readCritProcs(floor),
     tier,
-    bonusTier: kind ? bonusTier : null,
   };
   if (kind) result[kind] = true;
   if (event !== "upgrade") {
@@ -152,7 +149,6 @@ export function forceTestCrit(
   }
   critTiers.set(floor, tier);
   if (kind) forceCritProc(kind, floor);
-  if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
 }
 
 export function forceFeaturedCritUpgrade(
@@ -319,7 +315,6 @@ export function rollCritUpgrade(
       if (result.recruitmentDrive) forceRecruitmentDriveCritProc(floor);
       if (result.merger) forceMergerCritProc(floor);
       if (result.shareholders) forceShareholdersCritProc(floor);
-      if (result.bonusTier) forceBonusTierCritProc(floor, result.bonusTier);
     },
     allowSpecialProcs,
     eventContext && (() => claimEventProc(floor, eventContext)),
@@ -407,7 +402,6 @@ export function forceFloorBuyCrit(
   goldStandard = false,
   royalFlush = false,
   nightShift = false,
-  bonusTier: CritTier | null = null,
   intern = false,
   talentScout = false,
   unionBoss = false,
@@ -435,7 +429,6 @@ export function forceFloorBuyCrit(
   forcedFloorBuyCrit = {
     ...featuredCritFlags(),
     tier,
-    bonusTier,
     chain,
     dominoEffect,
     blueprint: false,
@@ -751,7 +744,7 @@ export function isCritDown(floor: Floor): boolean {
 
 // dev/test-only: arms an x3 crit that also lands above (or below)
 export function forceCritUpDown(floor: Floor, up: boolean): void {
-  forceTestCrit(floor, null, "crit", null, "upgrade");
+  forceTestCrit(floor, null, "crit", "upgrade");
   (up ? critUpCrits : critDownCrits).add(floor);
 }
 
@@ -766,7 +759,7 @@ export function getMergeCrit(floor: Floor): CritTier | undefined {
 export function forceMergeCrit(floor: Floor): void {
   const tiers: CritTier[] = ["crit", "mega", "ultra"];
   const pick = () => tiers[Math.floor(Math.random() * tiers.length)];
-  forceTestCrit(floor, null, pick(), null, "upgrade");
+  forceTestCrit(floor, null, pick(), "upgrade");
   mergeCrits.set(floor, pick());
 }
 
@@ -788,7 +781,7 @@ export function getFloorCrit(floor: Floor): FloorCritKind | undefined {
 export function forceFloorCrit(floor: Floor, kind: FloorCritKind): void {
   const tiers: CritTier[] = ["crit", "mega", "ultra"];
   const tier = tiers[Math.floor(Math.random() * tiers.length)];
-  forceTestCrit(floor, null, tier, null, "upgrade");
+  forceTestCrit(floor, null, tier, "upgrade");
   armFloorCrit(floor, kind);
 }
 
@@ -1363,14 +1356,4 @@ export function forceMergerCritUpgrade(
 export function forceShareholdersCritUpgrade(floor: Floor): void {
   critTiers.set(floor, "crit");
   forceShareholdersCritProc(floor);
-}
-
-// dev/test-only: force the NEXT "special crit crit" bonus tier a floor's
-// already-armed (or yet to be armed) proc rides in on, bypassing chance
-// entirely and WITHOUT forcing any particular proc itself — combine with any
-// of the existing "Spawn X Crit" buttons (see hud/testButton's "Spawn Bonus
-// Tier Crit"/"Mega Crit"/"Ultra Crit") to test a chosen proc + a chosen
-// bonus tier together
-export function forceBonusTierCritUpgrade(floor: Floor, tier: CritTier): void {
-  forceBonusTierCritProc(floor, tier);
 }

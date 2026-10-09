@@ -9,8 +9,6 @@ import {
   getMergeCrit,
   getFloorCrit,
   getCritTier,
-  getBonusTierCrit,
-  consumeBonusTierCrit,
   consumeCritUpgrade,
   rollCritUpgrade,
   rollFloorBuyCrit,
@@ -332,19 +330,6 @@ export function completeFloorUnlock(
   });
   const buyTier = rollFloorBuyCrit();
   if (buyTier) {
-    // an armed "force bonus tier" test button (see forceBonusTierCritProc)
-    // always arms buildings[activeBuildingIndex][0] (main.ts's own test
-    // wiring — the only floor a test button can address), which is never
-    // the actual locked `floor` being unlocked here (floor 0 always
-    // starts unlocked already) — so this searches the WHOLE building
-    // instead of just this one floor, unlike the plain-click branch
-    // (where the armed floor and the clicked floor are always the
-    // same, so a direct getBonusTierCrit(floor) there is correct)
-    const forcedBonusTierFloor = floors.find((f) => getBonusTierCrit(f));
-    if (forcedBonusTierFloor) {
-      buyTier.bonusTier = getBonusTierCrit(forcedBonusTierFloor)!;
-      consumeBonusTierCrit(forcedBonusTierFloor);
-    }
     if (fromEvent) {
       floor.critMultiplierTier = pickHigherCritTier(
         floor.critMultiplierTier,
@@ -395,7 +380,7 @@ export function handleFloorClick(
     (isDetachedJobPending() && !isDetachedJobRunning())
   )
     return;
-  const { floors, multiplier, persist, getScreenCenterLocal } = deps;
+  const { floors, multiplier, persist } = deps;
 
   if (
     canCancelOvertime(floor, Date.now()) &&
@@ -484,7 +469,7 @@ export function handleFloorClick(
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
-      if (tier) triggerCritCelebration(floor, tier, getScreenCenterLocal);
+      if (tier) triggerCritCelebration(tier);
       return;
     }
     // "Sale" boost: free clicks that add upgradeCount straight to incomeAmount,
@@ -509,7 +494,7 @@ export function handleFloorClick(
       persist();
       triggerButtonPress(floor);
       playCoinDrop();
-      if (tier) triggerCritCelebration(floor, tier, getScreenCenterLocal);
+      if (tier) triggerCritCelebration(tier);
       return;
     }
     // "Work overtime" boost (see hud/boostMenu.ts's buyOvertimeBoost): free clicks
@@ -556,13 +541,9 @@ export function handleFloorClick(
       playCoinDrop();
       if (goalReached) {
         // revealed as the bar jumps (see announceEventEnded)
-        triggerCritCelebration(
-          floor,
-          floor.critMultiplierTier!,
-          getScreenCenterLocal,
-        );
+        triggerCritCelebration(floor.critMultiplierTier!);
       } else if (tier) {
-        triggerCritCelebration(floor, tier, getScreenCenterLocal);
+        triggerCritCelebration(tier);
       }
       const center = getButtonCenter(isGroundFloor);
       const jitterX = (Math.random() - 0.5) * (BTN_W * 0.75);
@@ -602,7 +583,6 @@ export function handleFloorClick(
     if (isCritUpgrade(floor)) {
       const tier = getCritTier(floor)!;
       const procs = readCritProcs(floor);
-      const bonusTier = getBonusTierCrit(floor);
       const critUp = isCritUp(floor);
       const critDown = isCritDown(floor);
       const mergeCrit = getMergeCrit(floor);
@@ -626,7 +606,6 @@ export function handleFloorClick(
           floor,
           Object.assign(procs, {
             tier,
-            bonusTier,
             critUp,
             critDown,
             mergeCrit,

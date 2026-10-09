@@ -33,7 +33,6 @@ export const CRIT_CONFIG = {
     // opens the door to the existing independent-roll-then-cap-at-2 logic,
     // it doesn't guarantee a proc actually lands
     specialCritGatewayChance: 0.15,
-    bonusTierGatewayChance: 0.01,
   },
 
   // crits/critTypes' rollCrit — what a landed crit's special slot carries

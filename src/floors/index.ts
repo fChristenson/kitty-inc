@@ -303,6 +303,8 @@ export {
   getIncomeBarCenter,
   increaseIncomeRate,
   increaseIncomeRateBy,
+  punchIncomeBar,
+  rewardPayoutAmount,
 } from "./incomePanel";
 export {
   ensureLockedFloorAbove,
@@ -317,6 +319,7 @@ export {
   hasActiveCoins,
   spawnCoinBurst,
   spawnFreezeCoinBurst,
+  spawnHomingCoinBurst,
   loadCoinImage,
 } from "./coins";
 export {

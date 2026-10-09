@@ -79,7 +79,7 @@ registerEventProc(
 
 // dev test hook: arms a crit on floor (tier by the crit odds) carrying Fireflies
 export function forceFirefliesEvent(floor: Floor): void {
-  forceTestCrit(floor, null, pickCritTierByOdds(), null, "upgrade");
+  forceTestCrit(floor, null, pickCritTierByOdds(), "upgrade");
   forceClaimEventProc(KEY, floor);
 }
 

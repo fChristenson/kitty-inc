@@ -22,6 +22,7 @@ import {
   createBuildingCrits,
 } from "./crits";
 import { wireCritTestActions } from "./hud";
+import { forceBubbles } from "./bubbles";
 import {
   add,
   subtract,
@@ -689,9 +690,9 @@ async function main() {
     wireSpawnMouseButton(app, () => {
       forceSpawnMouse(buildings[activeBuildingIndex] ?? []);
     });
-    wireCritTestActions(app, (kind, tier, bonusTier, event) => {
+    wireCritTestActions(app, (kind, tier, event) => {
       const floor = buildings[activeBuildingIndex]?.[0];
-      if (floor) forceTestCrit(floor, kind, tier, bonusTier, event);
+      if (floor) forceTestCrit(floor, kind, tier, event);
     });
     // shows the idle-income "You have earned" overlay (see
     // hud/totalEarnedOverlay) on demand, without needing to actually leave and
@@ -702,7 +703,7 @@ async function main() {
     wireAddBadgesTestButtons(app);
     wireFoilRevealTestButtons(app, (kind) => {
       const floor = buildings[activeBuildingIndex]?.[0];
-      if (floor) forceTestCrit(floor, kind, "crit", null, "upgrade");
+      if (floor) forceTestCrit(floor, kind, "crit", "upgrade");
     });
     wireCritUpDownTestButtons(app, (up) => {
       const floor = buildings[activeBuildingIndex]?.[0];
@@ -2234,6 +2235,7 @@ async function main() {
       "ion-haze": forceOnActive((e) => e.forceIonHazeEvent),
       nebula: forceOnActive((e) => e.forceNebulaEvent),
       survivors: forceOnActive((e) => e.forceSurvivorsEvent),
+      bubbles: forceBubbles,
       "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
       "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
       "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),
@@ -3353,13 +3355,7 @@ async function main() {
         recordCritProcLanded(prize.kind);
         const ground = floors[0];
         if (ground)
-          forceTestCrit(
-            ground,
-            prize.kind,
-            pickCritTierByOdds(),
-            null,
-            "upgrade",
-          );
+          forceTestCrit(ground, prize.kind, pickCritTierByOdds(), "upgrade");
         persist();
       });
     },

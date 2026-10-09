@@ -130,16 +130,6 @@ let flashHoldMs = 0;
 // currently still-playing flash's own priority
 let activeFlashPriority = -1;
 
-// a second, fully STATIC flash layer drawn BEHIND the normal animated one —
-// null means nothing frozen. Set only by freezeCritFlashAsBackground below
-// (see critCelebration.ts's "special crit crit" stacking): once the foreground
-// proc's own flash finishes its hold phase, it's captured here (frozen at full
-// size/opacity, no further growth/fade) so the bonus tier's own flash
-// can animate on top of it, and both are cleared together once THAT flash ends
-let bgFlashLabel: string | null = null;
-let bgFlashColor: string = COLOR.purple;
-let bgFlashStrokeWidth = 8;
-
 // stacked flashes' earlier numbers, frozen under the newest one covering them
 interface CoveredFlash {
   label: string;
@@ -439,35 +429,6 @@ export function isCritFlashActive(now: number): boolean {
 function pendingLeadInLabel(now: number): string | null {
   if (merge && now - merge.startedAt < merge.mergeMs * 2) return merge.label;
   return null;
-}
-
-// absolute timestamp the CURRENT foreground flash's hold phase ends (right
-// before its fade would normally begin), or null if nothing is playing — see
-// critCelebration.ts's "special crit crit" stacking, which needs to know
-// exactly when to freeze a proc's own celebration as a background layer
-// without hardcoding/duplicating whatever holdMs it happened to be triggered
-// with. Never while a lead-in is still building up to its slam
-export function getFlashHoldEndsAt(): number | null {
-  if (pendingLeadInLabel(Date.now()) !== null) return Infinity;
-  return flashStartedAt !== null
-    ? flashStartedAt + GROWTH_DURATION_MS + flashHoldMs
-    : null;
-}
-
-// captures whatever's CURRENTLY playing as the foreground flash (label/color/
-// stroke width) into the separate static background layer above, then clears
-// the foreground's own timing so it stops animating/fading — the very next
-// triggerScreenShake call (see critCelebration.ts's stacked bonus-tier
-// celebration, called right after this) becomes the new foreground flash,
-// drawn on top of this now-frozen backdrop
-export function freezeCritFlashAsBackground(): void {
-  if (flashStartedAt === null) return;
-  bgFlashLabel = flashLabel;
-  bgFlashColor = flashColor;
-  bgFlashStrokeWidth = flashStrokeWidth;
-  flashStartedAt = null;
-  flashEndsAt = null;
-  activeFlashPriority = -1;
 }
 
 // caches the expensive blurred bloom glow (see drawCritFlash) per distinct
@@ -1046,26 +1007,7 @@ function drawFlashLayers(
   const base = ctx.getTransform();
   lastDrawScale = Math.hypot(base.a, base.b);
   lastViewportWidth = viewportWidth;
-  if (bgFlashLabel !== null) {
-    drawFlashLayer(
-      ctx,
-      centerX,
-      centerY,
-      viewportWidth,
-      bgFlashLabel,
-      bgFlashColor,
-      bgFlashStrokeWidth,
-      1,
-      1,
-      0,
-      1,
-      now,
-    );
-  }
   if (flashStartedAt === null || flashEndsAt === null) {
-    // no foreground flash left to eventually clear it — never leave an
-    // orphaned frozen background on screen forever
-    bgFlashLabel = null;
     coveredFlashes = [];
     return;
   }
@@ -1073,7 +1015,6 @@ function drawFlashLayers(
     flashStartedAt = null;
     flashEndsAt = null;
     activeFlashPriority = -1;
-    bgFlashLabel = null;
     coveredFlashes = [];
     return;
   }
@@ -1263,5 +1204,11 @@ function drawFlashLayer(
   ctx.restore();
 }
 
-export { critFont, drawPoppingCritText } from "./critText";
+export {
+  createCritTextSprite,
+  critFont,
+  drawCritTextSprite,
+  drawPoppingCritText,
+  type CritTextSprite,
+} from "./critText";
 export { playSpecialFlash, playTierFlash, warmTierFlashes } from "./presets";

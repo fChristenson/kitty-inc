@@ -19,4 +19,8 @@ export {
   takeBadgeCapsule,
 } from "./badgeCapsule";
 export { getCritBadgeOverlay } from "./critBadgeOverlay";
-export { FEATURED_CRIT_KINDS, loadFeaturedRewards } from "./featuredProcs";
+export {
+  FEATURED_CRIT_KINDS,
+  loadFeaturedRewards,
+  pickFeaturedBadge,
+} from "./featuredProcs";

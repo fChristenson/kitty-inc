@@ -34,11 +34,11 @@ New event LOOKS, the way Shmup and Road race were: whole game genres played out 
 
 - **Peggle**: a launcher wisp at the top aims and fires one ball into a field of forty glitter pegs; it ricochets down through them, lighting every peg it touches, and drops out the bottom; then every lit peg goes off in turn, quicker and quicker, levelling the bar behind it, the last in a huge blast.
 
-## List fifty-one
+## List fifty-eight
 
-Not crits: new directions for the tower itself to grow. Today a building only grows up, 20 floors, and then it's done. Text only; nothing gets built until one is picked.
+New concepts in the vein of the gestures list: the player's hands get a moment to act while a win is happening, and acting only ever adds to it (the base win is always paid). Text only; nothing gets built until one is picked.
 
-- **Basement**: dig down under the street. Each basement level is a vault that banks a slice of everything the building earns, filling up visibly (cash piling up behind glass). Tap a full vault and it bursts open in one big haul. Every level dug is deeper, slower to fill and bigger, so a maxed building still has somewhere to grow.
-- **Elevator**: a glass elevator shaft runs up the side of the building. Tap it and the car shoots to the top, then drops floor by floor, scooping each floor's waiting cash into the car and dumping the lot into the lobby. It's an active way to collect that pays more the taller the building is; upgrades make it faster and bigger.
-- **Penthouse**: once a building tops out at 20 floors, its roof opens up as a penthouse level with its own slots: a helipad, a pool, a sign with the company name in lights. Each is bought once and does one thing for the whole building, and the skyline on the map shows which towers have them.
-- **Street front**: the street in front of the building gets plots for shops (a café, a kiosk, a bank branch), built sideways along the pavement. Each earns on its own clock and feeds the building above it, so the tower spreads along the street as well as up.
+- **Pump**: as a crit's number slams in, a gold gauge appears under it for a second. Tapping as fast as you can pumps it, each tap a click and a jolt, and the number grows from x5 towards x10 before it lands.
+- **Catch**: after a big crit, coins rain down the screen. Drag the total readout like a basket to catch them, and every coin caught is added on top of the win.
+- **Steer**: during an animated crit, dragging a finger bends the wisp's path towards it. Steered over extra bars it lands extra hits, so watching becomes playing.
+

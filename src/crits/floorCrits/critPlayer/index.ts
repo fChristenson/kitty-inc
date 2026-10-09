@@ -96,7 +96,7 @@ export interface Running {
   endsAt: number;
   // where each bar was last seen, if one scrolls out of bars()
   lastBars: Point[];
-  // a catapult's fall or a tornado's sweep: from this height to that one
+  // a catapult's fall: from this height to that one
   span: { from: number; to: number };
   // a lightning crit's bolts, their ends kept on the bars as they scroll
   bolts: Bolt[];
@@ -265,7 +265,6 @@ const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   rainCrit: () => import("../crits/rainCrit"),
   stampCrit: () => import("../crits/stampCrit"),
   catapultCrit: () => import("../crits/catapultCrit"),
-  tornadoCrit: () => import("../crits/tornadoCrit"),
   orbitCrit: () => import("../crits/orbitCrit"),
   trainCrit: () => import("../crits/trainCrit"),
   bubbleCrit: () => import("../crits/bubbleCrit"),

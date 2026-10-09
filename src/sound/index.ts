@@ -522,6 +522,34 @@ export function playBloop(): void {
   playSfx("bloop", SFX_VOLUME);
 }
 
+// a short slice of the bubbling loop from where it's audible (the file opens
+// on silence), pitched by rate (src/bubbles)
+const BUBBLE_SECONDS = 0.3;
+const BUBBLE_FADE_SECONDS = 0.1;
+function playBubble(rate: number, volume: number): void {
+  withSfxBuffer("liquidBubble", (ctx, buffer) =>
+    startSfx(
+      ctx,
+      buffer,
+      volume,
+      audibleRange(buffer)[0],
+      rate,
+      BUBBLE_SECONDS,
+      BUBBLE_FADE_SECONDS,
+    ),
+  );
+}
+
+// a tapped bubble popping, varied so quick pops don't sound the same
+export function playBubblePop(): void {
+  playBubble(1.3 + Math.random() * 0.5, SFX_VOLUME);
+}
+
+// a bubble blowing in: deeper and softer than its pop
+export function playBubbleAppear(): void {
+  playBubble(0.8 + Math.random() * 0.3, SFX_VOLUME * 0.6);
+}
+
 // one-shot sound effect for the rare mega-crit "JACKPOT!" moment (see
 // floorInteractions.ts). Debounced (see JACKPOT_DEBOUNCE_MS) so back-to-back mega
 // crits during a fast held click can't stack overlapping plays

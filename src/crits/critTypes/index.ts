@@ -935,10 +935,6 @@ const dressCodeCrits = snapshotSet<Floor>();
 const recruitmentDriveCrits = snapshotSet<Floor>();
 const mergerCrits = snapshotSet<Floor>();
 const shareholdersCrits = snapshotSet<Floor>();
-// "special crit crit" bonus tier riding on an already-landed proc (see
-// rollCrit's own bonusTier) — a CritTier value per floor, not a WeakSet, since
-// unlike every other proc this one carries actual tier data, not just a flag
-const bonusTierCrits = snapshotMap<Floor, CritTier>();
 
 // call once a tier has just landed (see rollCrit below) to roll every
 // piggyback proc independently, each against its own chance — then, if one
@@ -981,11 +977,6 @@ export function pickAtMost<T>(
 // now get back from the exact same shared roll
 export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   tier: CritTier;
-  // "special crit crit": set only when at least one piggyback proc below also
-  // landed (see rollCrit) — an independent bonus x5/x25/x125 tier on top of
-  // whichever proc(s) fired, never itself eligible to roll a further nested
-  // bonus
-  bonusTier: CritTier | null;
   // the crit also landing on the floor above / below
   critUp?: boolean;
   critDown?: boolean;
@@ -1088,17 +1079,10 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
 // canonical list every "for each landed proc" loop below (and rollCrit
 // itself) iterates, so adding a brand new proc is a two-line change here
 // (this array + CritRollResult's own field) instead of touching every
-// dispatch site by hand. bonusTier is excluded — it's a CritTier | null
-// modifier riding on an already-landed proc, not itself a boolean proc kind
+// dispatch site by hand
 export type CritProcKind = Exclude<
   keyof CritRollResult,
-  | "tier"
-  | "bonusTier"
-  | "critUp"
-  | "critDown"
-  | "mergeCrit"
-  | "floorCrit"
-  | "badgeFoil"
+  "tier" | "critUp" | "critDown" | "mergeCrit" | "floorCrit" | "badgeFoil"
 >;
 
 export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
@@ -1309,7 +1293,7 @@ export function readCritProcs(floor: Floor): CritProcFlags {
 // through the same applyCritProcs dispatcher everything else uses (see
 // critCelebration's Deja Vu follow-ups)
 export function tierOnlyCrit(tier: CritTier): CritRollResult {
-  return critResult(tier, null);
+  return critResult(tier);
 }
 
 export function onlyCritProc(kind: CritProcKind): CritProcFlags {
@@ -2037,10 +2021,7 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
 };
 
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
-// chance hits (or null on a full miss) — the single roll cascade shared by
-// both the base tier roll in rollCrit below AND the "special crit crit"
-// bonus roll (rollCrit's own bonusTier line), so both always use IDENTICAL
-// odds, per-tier, with zero duplicated logic
+// chance hits (or null on a full miss)
 function rollTier(): CritTier | null {
   for (const tier of CRIT_TIER_ORDER) {
     if (critRandom() < CRIT_TIER_CONFIG[tier].chance) return tier;
@@ -2068,7 +2049,6 @@ export const FLOOR_CRIT_KINDS = [
   "rainCrit",
   "stampCrit",
   "catapultCrit",
-  "tornadoCrit",
   "orbitCrit",
   "trainCrit",
   "bubbleCrit",
@@ -2218,13 +2198,9 @@ const ALL_CRIT_PROC_FLAGS_FALSE = Object.fromEntries(
 
 // a result whose procs all read false through the shared prototype, so a roll
 // never copies every one of the ~1,700 proc flags (a renovation rolls thousands)
-function critResult(
-  tier: CritTier,
-  bonusTier: CritTier | null,
-): CritRollResult {
+function critResult(tier: CritTier): CritRollResult {
   const result = Object.create(ALL_CRIT_PROC_FLAGS_FALSE) as CritRollResult;
   result.tier = tier;
-  result.bonusTier = bonusTier;
   return result;
 }
 
@@ -2269,20 +2245,8 @@ export function rollCrit(
   // real-roll-only tally for the "Special Crits" info menu's collectible
   // count badges — see crits/critTypes/critProcCounts.ts
   for (const kind of kept) recordCritProcLanded(kind);
-  // "special crit crit": once at least one piggyback proc has actually
-  // landed, it gets its own independent shot at a bonus x5/x25/x125 tier,
-  // reusing the EXACT same rarest-first cascade/odds as the base tier roll
-  // above (rollTier) — never rolled at all when no proc landed, and never
-  // itself eligible to roll a further nested bonus (one level only). See
-  // getBonusTierCrit/floorInteractions.ts's applyBonusTierCrit for the
-  // reward (multiplies total income by the bonus tier's own multiplier) and
-  // critCelebration.ts for the stacked celebration this triggers
-  const bonusTier =
-    kept.size > 0 && critRandom() < CONFIG.crit.bonusTierGatewayChance
-      ? rollTier()
-      : null;
   const landedProcs = [...kept];
-  const result = critResult(tier, bonusTier);
+  const result = critResult(tier);
   if (slot === "critUp") result.critUp = true;
   else if (slot === "critDown") result.critDown = true;
   else if (slot === "mergeCrit") result.mergeCrit = pickCritTierByOdds();
@@ -2640,25 +2604,10 @@ export function isShareholdersCrit(floor: Floor): boolean {
   return shareholdersCrits.has(floor);
 }
 
-// the armed "special crit crit" bonus tier riding on this floor's already-
-// landed proc(s), if any (see rollCrit's own bonusTier)
-export function getBonusTierCrit(floor: Floor): CritTier | null {
-  return bonusTierCrits.get(floor) ?? null;
-}
-
-// call once a landed floor-buy/unlock crit (see rollFloorBuyCrit) has picked
-// up an armed bonus tier — unlike consumeCritProcs below, this leaves every
-// OTHER per-floor armed test proc untouched, since a floor-buy roll never
-// consults those
-export function consumeBonusTierCrit(floor: Floor): void {
-  bonusTierCrits.delete(floor);
-}
-
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   if (armedProcCounts.get(floor))
     for (const kind of CRIT_PROC_KINDS) CRIT_PROC_SETS[kind].delete(floor);
-  bonusTierCrits.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed
@@ -3010,12 +2959,6 @@ export function forceMergerCritProc(floor: Floor): void {
 
 export function forceShareholdersCritProc(floor: Floor): void {
   shareholdersCrits.add(floor);
-}
-
-// dev/test-only: force a "special crit crit" bonus tier onto whatever proc(s)
-// the caller already armed on this floor, bypassing chance entirely
-export function forceBonusTierCritProc(floor: Floor, tier: CritTier): void {
-  bonusTierCrits.set(floor, tier);
 }
 
 // rarer tiers always carry a bigger multiplier by design (see CRIT_TIER_CONFIG),

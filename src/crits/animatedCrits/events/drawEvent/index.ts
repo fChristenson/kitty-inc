@@ -168,6 +168,6 @@ registerEventProc(
 // dev test hook: arms a crit on floor carrying Draw, drawing tier's number
 // (by the crit odds if unset)
 export function forceDrawEvent(floor: Floor, tier?: CritTier): void {
-  forceTestCrit(floor, null, tier ?? pickCritTierByOdds(), null, "upgrade");
+  forceTestCrit(floor, null, tier ?? pickCritTierByOdds(), "upgrade");
   forceClaimEventProc(KEY, floor);
 }
