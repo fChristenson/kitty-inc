@@ -79,6 +79,13 @@ import {
   wirePump,
 } from "../../spawn/pump";
 import {
+  drawGusher,
+  hitTestGusher,
+  tapGusher,
+  updateGusher,
+  wireGusher,
+} from "../../spawn/gusher";
+import {
   drawStarSwirl,
   hitTestStarSwirl,
   tapStarSwirl,
@@ -773,6 +780,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     updateBouncer(performance.now());
     updatePump(performance.now());
     updateStarSwirl(performance.now());
+    updateGusher(performance.now());
     const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -861,6 +869,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     );
     drawFireflies(ctx, SLOT_W, performance.now());
     drawStarSwirl(ctx, SLOT_W, HUD_H / 2, performance.now());
+    drawGusher(ctx, SLOT_W, contentViewportH(), HUD_H / 2, performance.now());
     drawPump(ctx, SLOT_W, contentViewportH(), performance.now());
     drawBouncer(ctx, SLOT_W, contentViewportH(), performance.now());
     drawBubbles(ctx, SLOT_W, contentViewportH(), performance.now());
@@ -983,6 +992,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   wireBouncer(floorActionsDeps);
   wirePump(floorActionsDeps);
   wireStarSwirl(floorActionsDeps);
+  wireGusher(floorActionsDeps);
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every
@@ -1043,7 +1053,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       tapCoinSpawn(p.x, p.y) ||
       tapBouncer(p.x, p.y) ||
       tapPump(p.x, p.y) ||
-      tapStarSwirl(p.x, p.y);
+      tapStarSwirl(p.x, p.y) ||
+      tapGusher(p.x, p.y);
     if (bubbleTapDown) return;
     wispSwipe = hitTestWispGlitter(p.x, p.y) || hitTestFireflies(p.x, p.y);
     if (wispSwipe) {
@@ -1115,6 +1126,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         hitTestBouncer(p.x, p.y) ||
         hitTestPump(p.x, p.y) ||
         hitTestStarSwirl(p.x, p.y) ||
+        hitTestGusher(p.x, p.y) ||
         hitTestWispGlitter(p.x, p.y) ||
         hitTestFireflies(p.x, p.y)
       ) {

@@ -32,6 +32,7 @@ import { forceFireflies } from "./spawn/fireflies";
 import { forceBouncer } from "./spawn/bouncer";
 import { forcePump } from "./spawn/pump";
 import { forceStarSwirl } from "./spawn/starSwirl";
+import { forceGusher } from "./spawn/gusher";
 import {
   add,
   subtract,
@@ -2290,6 +2291,7 @@ async function main() {
           "bouncer-spawn": forceBouncer,
           "pump-spawn": forcePump,
           "star-swirl-spawn": forceStarSwirl,
+          "gusher-spawn": forceGusher,
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
           "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

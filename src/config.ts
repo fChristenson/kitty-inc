@@ -194,6 +194,19 @@ export const CONFIG = {
       // income
       rewardSecondsPerWorker: 4,
     },
+    // src/spawn/gusher — a vent fizzing at the bottom of the screen: a tap
+    // blows it into a stream of coins and cash flowing into the total
+    gusher: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      // how long it fizzes before vanishing, blinking over its last pulseMs
+      durationMs: 6_000,
+      pulseMs: 2_000,
+      coins: 320,
+      // all its coins landed pay this many seconds of the company's income
+      rewardSeconds: 30,
+    },
   },
 
   // src/hud/upgradeMenu/index.ts — per-floor worker/office-upgrade pricing.

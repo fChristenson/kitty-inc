@@ -205,6 +205,11 @@ export interface CoinBurstParticle extends CoinBurstSprite {
   spinDir: 1 | -1; // picked once per coin so a burst doesn't spin in lockstep
 }
 
+// one burst piece's radius (drawCoinBurstFrame's size)
+export function randomCoinBurstSize(): number {
+  return (22 + Math.random() * 46) * 1.15 * 1.25;
+}
+
 // one burst's worth of particles at (x, y) — same random ranges regardless of
 // caller, so a burst looks identical whether it's floors/coins's own
 // Floor-anchored version or background/cityMap's flat-canvas one
@@ -228,7 +233,7 @@ export function createCoinBurstParticles(
       vy: Math.sin(angle) * speed,
       life: 0,
       maxLife: 45 + Math.random() * 75,
-      size: (22 + Math.random() * 46) * 1.15 * 1.25,
+      size: randomCoinBurstSize(),
       // bills are paper — they fall a flat 0.2 slower than coins, and ramp up to
       // full fall speed more gradually
       gravity: Math.max(
