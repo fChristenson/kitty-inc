@@ -871,6 +871,16 @@ export function triggerJumpAll(floors: Floor[], now: number): void {
   }
 }
 
+// starts one worker's click-bounce/jump, ignoring its click cooldown
+export function triggerJump(
+  floor: Floor,
+  workerIndex: number,
+  now: number,
+): void {
+  const walker = getFloorWorkers(floor, now).walkers[workerIndex];
+  if (walker) walker.clickedAt = now;
+}
+
 // on-screen (floor-local) center of one of a floor's workers, for aiming a coin burst
 // at it; null if it hasn't been drawn yet (shouldn't happen once unlocked)
 export function getWorkerCenter(

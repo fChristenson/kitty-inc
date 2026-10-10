@@ -23,7 +23,8 @@ import {
   sprayLandsAt,
 } from "../../../../shared/spray";
 import { shapeFill, SHAPES } from "../../../../shared/drawing";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "stencil";
 const TILES = 220;

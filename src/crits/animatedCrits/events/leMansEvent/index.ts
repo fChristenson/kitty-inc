@@ -22,8 +22,9 @@ import { planRace } from "../../../../shared/race";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawDetonation } from "../../../../shared/explosion";
 import { measure } from "../../cashFlow";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
 import { BTN_X, getButtonCenter } from "../../../../floors/upgradeButton";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "leMans";
 // px the hairpin clears the bar by, above and below

@@ -18,7 +18,8 @@ import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { alongRoute, bezier } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
 import { totalSpot } from "../../cashFlow";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "dominoes";
 const REWARD = 3;

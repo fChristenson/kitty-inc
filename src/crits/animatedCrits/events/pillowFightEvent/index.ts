@@ -29,7 +29,8 @@ import {
   sweepLane,
   type BroomState,
 } from "../../../../shared/clutter";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "pillowFight";
 const FEATHERS = 300;

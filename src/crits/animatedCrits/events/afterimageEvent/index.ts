@@ -19,7 +19,8 @@ import {
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "afterimage";
 const MAX_BARS = 4;

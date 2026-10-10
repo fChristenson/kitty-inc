@@ -20,7 +20,8 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { drawBeam } from "../../../../shared/beam";
 import { createBeats } from "../../../../shared/eventBeats";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "hurdles";
 const MAX_BARS = 4;

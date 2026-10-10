@@ -16,7 +16,8 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawGrind, planDrill, planGrind } from "../../../../shared/drill";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "breakthrough";
 const SIZE = WISP_SIZE * 1.3;

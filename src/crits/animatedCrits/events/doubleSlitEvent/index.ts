@@ -23,7 +23,8 @@ import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { hash01, stampGlimmer } from "../../../../shared/twinkle";
 import { drawBeam } from "../../../../shared/beam";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "doubleSlit";
 const PARTICLES = 340;

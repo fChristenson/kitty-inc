@@ -23,7 +23,8 @@ import {
   WISP_SIZE,
   type Point,
 } from "../../../../shared/wisp";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "whip";
 const REWARD = 2;

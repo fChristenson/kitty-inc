@@ -5,7 +5,7 @@
 // quicker and quicker, until a big one looms in, takes three volleys and goes
 // up in a huge blast. The view crash-lands back on the floors, the floor gets
 // free levels for every wisp shot down and the crit's tier pays out
-import type { Floor } from "../../../../gameState";
+import { levelsFor, type Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
@@ -25,7 +25,6 @@ import {
 } from "../../../../shared/wisp";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
-import { levelsFor } from "../../eventRewards";
 import {
   canStartFlightStage,
   isFlightStageRunning,

@@ -18,8 +18,9 @@ import {
   sampleLine,
   type Pour,
 } from "../../cashFlow";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
 import type { Point } from "../../../../shared/wisp";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "elevator";
 const REWARD = 2;

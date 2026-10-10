@@ -15,8 +15,9 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOutBack, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
 import type { Point } from "../../../../shared/wisp";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "peacock";
 const MAX_BARS = 5;

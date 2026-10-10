@@ -25,7 +25,8 @@ import {
   drawDetonation,
   drawLitFuse,
 } from "../../../../shared/explosion";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "bombJuggler";
 const MAX_BARS = 4;

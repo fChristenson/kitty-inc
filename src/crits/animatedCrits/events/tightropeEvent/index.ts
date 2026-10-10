@@ -19,7 +19,8 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "tightrope";
 const MAX_BARS = 4;

@@ -339,7 +339,8 @@ export function drawGlitterLight(
 
 // the wisp at at(ms) with its sparkle trail through where it just was; at
 // returns null while it's off stage (a fixed point makes a hovering wisp
-// fizzing in place). size sets its scale; heat 0..1 swells its white core
+// fizzing in place). size sets its scale; heat 0..1 swells its white core;
+// alpha fades all of it
 export function drawWisp(
   ctx: CanvasRenderingContext2D,
   at: (ms: number) => Point | null,
@@ -347,9 +348,10 @@ export function drawWisp(
   now: number,
   size: number,
   heat = 0,
+  alpha = 1,
 ): void {
-  drawWispTrail(ctx, at, ms, now, size);
-  drawWispHead(ctx, at, ms, now, size, heat);
+  drawWispTrail(ctx, at, ms, now, size, alpha);
+  drawWispHead(ctx, at, ms, now, size, heat, alpha);
 }
 
 // drawWisp for a wisp only on stage from fromMs to toMs: costs nothing before
@@ -376,8 +378,9 @@ export function drawWispTrail(
   ms: number,
   now: number,
   size: number,
+  alpha = 1,
 ): void {
-  if (size <= 0) return;
+  if (size <= 0 || alpha <= 0) return;
   const stride = trailStride();
   // a thinned trail's sparkles brighten (and grow a touch) to keep its glow;
   // the look was tuned at one sparkle per 3ms
@@ -392,8 +395,8 @@ export function drawWispTrail(
   for (let e = start; e <= Math.floor(ms / TAIL_MS); e += stride) {
     const bornAt = e * TAIL_MS;
     const age = (ms - bornAt) / TAIL_LIFE_MS;
-    const alpha = (1 - age) ** 1.2;
-    if (alpha < MIN_ALPHA) continue;
+    const life = (1 - age) ** 1.2;
+    if (life * alpha < MIN_ALPHA) continue;
     const from = at(bornAt);
     if (!from) continue;
     shed = true;
@@ -409,7 +412,7 @@ export function drawWispTrail(
       slotRate[slot],
       slotGlint[slot] === 1,
       slotTurn[slot],
-      alpha * brighten,
+      life * alpha * brighten,
       now,
     );
   }
@@ -427,21 +430,22 @@ export function drawWispHead(
   now: number,
   size: number,
   heat = 0,
+  alpha = 1,
 ): void {
   const head = at(ms);
-  if (!head || size <= 0) return;
+  if (!head || size <= 0 || alpha <= 0) return;
   const detail = headDetail();
   const smear = Math.max(1, Math.round(SMEAR * detail));
   const huddle = Math.round(HUDDLE * detail);
   const halo = size * HALO * (1 + 0.5 * heat);
-  ctx.globalAlpha = Math.min(1, HALO_ALPHA * (1 + heat));
+  ctx.globalAlpha = Math.min(1, HALO_ALPHA * (1 + heat)) * alpha;
   ctx.drawImage(haloSprite(), head.x - halo, head.y - halo, halo * 2, halo * 2);
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
   const core = size * CORE * (1 + 0.6 * heat);
   for (let k = smear; k >= 0; k--) {
     const p = at(ms - (k * SMEAR * SMEAR_MS) / smear) ?? head;
-    ctx.globalAlpha = 1 - k / (smear + 1);
+    ctx.globalAlpha = (1 - k / (smear + 1)) * alpha;
     drawGlow(ctx, p.x, p.y, core * (1 - (0.6 * k) / smear), 0);
   }
   ctx.globalAlpha = 1;
@@ -459,7 +463,7 @@ export function drawWispHead(
       slotRate[seed],
       slotGlint[seed] === 1,
       slotTurn[seed],
-      1,
+      alpha,
       now,
     );
   }

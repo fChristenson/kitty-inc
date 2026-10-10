@@ -24,7 +24,8 @@ import {
   drawStrike,
   type Bolt,
 } from "../../../../shared/lightning";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "clear";
 const SHOCKS = 3;

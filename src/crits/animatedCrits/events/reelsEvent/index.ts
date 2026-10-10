@@ -20,10 +20,10 @@ import { CRIT_TIER_ORDER } from "../../../critTypes";
 import {
   findRewardBars,
   findRewardWorkers,
-  levelsFor,
   type RewardBar,
   type RewardWorker,
 } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "reels";
 const CASH_REWARD = 6;

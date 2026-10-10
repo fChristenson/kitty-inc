@@ -19,7 +19,8 @@ import {
   type Bolt,
 } from "../../../../shared/lightning";
 import { createBeats } from "../../../../shared/eventBeats";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "galvanize";
 const MAX_BARS = 5;

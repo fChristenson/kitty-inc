@@ -17,8 +17,9 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { sampleLine } from "../../cashFlow";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "boltSpiral";
 const MAX_BARS = 5;

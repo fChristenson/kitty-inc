@@ -26,7 +26,8 @@ import {
   drawDetonation,
   drawLitFuse,
 } from "../../../../shared/explosion";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "fission";
 // four generations: 1, 2, 4 and 8 bombs

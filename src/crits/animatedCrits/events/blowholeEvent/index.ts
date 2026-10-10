@@ -15,8 +15,9 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
 import { pourLine, sampleLine, totalSpot, type Pour } from "../../cashFlow";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "blowhole";
 const REWARD = 2;

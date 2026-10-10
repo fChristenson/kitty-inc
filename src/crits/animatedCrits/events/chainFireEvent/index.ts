@@ -24,10 +24,10 @@ import {
 import {
   findRewardBars,
   findRewardLocked,
-  levelsFor,
   type RewardBar,
 } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "chainFire";
 const MAX_BARS = 3;

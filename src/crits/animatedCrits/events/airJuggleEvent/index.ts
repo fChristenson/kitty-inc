@@ -28,7 +28,8 @@ import {
   drawMuzzleFlash,
   type Bullet,
 } from "../../../../shared/bullets";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "airJuggle";
 // each hit's height, 0 just over the clicked bar to 1 near the screen's top,

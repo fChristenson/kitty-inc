@@ -14,6 +14,7 @@ import type { Floor } from "../../gameState";
 import { playBubbleAppear, playBubblePop } from "../../sound";
 import { randomInt } from "../../utils";
 import { createSpawnRoll } from "../../shared/spawnRoll";
+import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
 import { between, easeOutBack, lerp, progress } from "../../shared/easing";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { drawSoapBubble, drawSoapBubblePop } from "../../shared/soapBubble";
@@ -28,17 +29,15 @@ import {
   type Payout,
   type Prize,
 } from "../../shared/spawnPrize";
-import { urgentBlink } from "../../shared/urgentBlink";
 import { tapHits } from "../../shared/tapTarget";
 import type { Point } from "../../shared/wisp";
 
 const RADIUS = 130;
 const CONTENT_SIZE = 160;
 // a spawn blows its bubbles in over SPAWN_MS, each growing in over GROW_MS;
-// each vanishes over VANISH_MS once its time is up
+// each vanishes the way every spawn does (shared/spawnFade) once its time is up
 const SPAWN_MS = 2_400;
 const GROW_MS = 240;
-const VANISH_MS = 250;
 // they start between SPAWN_Y of the screen's height and rise to TOP_Y by the end
 const SPAWN_Y: [number, number] = [0.5, 0.88];
 const TOP_Y = 0.22;
@@ -172,23 +171,18 @@ function applyWobble(
   ctx.rotate(-axis);
 }
 
-// how big a bubble is at now (0 before it blows in), its pulse aside
-function bubbleScale(bubble: Bubble, now: number): number {
+// how big a bubble is as it blows in at now (0 before), its way out aside
+function bubbleGrow(bubble: Bubble, now: number): number {
   if (now < bubble.bornAt || now >= bubble.poppedAt) return 0;
   const grow = progress(now, bubble.bornAt, GROW_MS);
-  const vanish = progress(
-    now,
-    bubble.bornAt + CONFIG.randomSpawns.bubbles.durationMs,
-    VANISH_MS,
-  );
-  return grow >= 1 ? 1 - vanish : easeOutBack(grow);
+  return grow >= 1 ? 1 : easeOutBack(grow);
 }
 
 function hitBubble(x: number, y: number, now: number): Bubble | null {
   for (let i = bubbles.length - 1; i >= 0; i--) {
     const bubble = bubbles[i];
     if (now >= bubble.bornAt + CONFIG.randomSpawns.bubbles.durationMs) continue;
-    const scale = bubbleScale(bubble, now);
+    const scale = bubbleGrow(bubble, now);
     if (scale <= 0.3) continue;
     bubbleAt(bubble, now, spot);
     if (tapHits(x, y, spot, RADIUS * scale)) return bubble;
@@ -226,8 +220,8 @@ export function popBubbleAt(x: number, y: number): boolean {
 // whether a bubble is gone for good: vanished, or popped and paid out
 function isDone(bubble: Bubble, now: number): boolean {
   if (bubble.poppedAt === Infinity)
-    return (
-      now >= bubble.bornAt + CONFIG.randomSpawns.bubbles.durationMs + VANISH_MS
+    return isSpawnGone(
+      bubble.bornAt + CONFIG.randomSpawns.bubbles.durationMs - now,
     );
   return (
     now >= bubble.poppedAt + POP_MS &&
@@ -256,12 +250,12 @@ export function drawBubbles(
       bubble.appeared = true;
       playBubbleAppear();
     }
-    const scale = bubbleScale(bubble, t);
+    const grow = bubbleGrow(bubble, t);
+    const fade = spawnFade(bubble.bornAt + durationMs - t, pulseMs, now);
+    const scale = grow * fade.scale;
     if (scale > 0) {
       bubbleAt(bubble, t, spot);
-      ctx.globalAlpha =
-        Math.min(1, scale) *
-        urgentBlink(bubble.bornAt + durationMs - t, pulseMs, now);
+      ctx.globalAlpha = Math.min(1, grow) * fade.alpha;
       ctx.save();
       applyWobble(ctx, bubble, t, spot.x, spot.y, 1);
       drawSoapBubble(ctx, 0, 0, RADIUS * scale);

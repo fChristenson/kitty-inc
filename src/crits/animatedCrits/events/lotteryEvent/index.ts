@@ -21,7 +21,8 @@ import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawBeam } from "../../../../shared/beam";
 import { drawCachedCritText } from "../../../critFlash/critText";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "lottery";
 const MAX_BARS = 5;

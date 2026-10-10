@@ -9,14 +9,17 @@ import {
 } from "../../floors";
 import { randomInt } from "../../utils";
 import { CONFIG } from "../../config";
-import { urgentBlink } from "../../shared/urgentBlink";
+import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { applyBoostAll } from "../../hud";
 import { playBloop } from "../../sound";
 import type { Floor } from "../../gameState";
 import { loadImageByName } from "../../loadAssets";
 import { COLOR } from "../../palette";
-import { notifyHuntTargetGone, registerHuntTarget } from "../../shared/huntTarget";
+import {
+  notifyHuntTargetGone,
+  registerHuntTarget,
+} from "../../shared/huntTarget";
 import { whitenImage } from "../../shared/mergeFlash";
 import { tapHitsMoving } from "../../shared/tapTarget";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
@@ -185,7 +188,9 @@ export function updateMouse(
   lastUpdate = now;
 
   if (active) {
-    if (now - active.spawnedAt >= CONFIG.randomSpawns.mouse.durationMs) {
+    const msLeft =
+      active.spawnedAt + CONFIG.randomSpawns.mouse.durationMs - now;
+    if (isSpawnGone(msLeft)) {
       despawn(now);
       return;
     }
@@ -306,15 +311,12 @@ function drawMouseSprite(
   function drawMouse(): void {
     if (!active || !mouseSprite) return;
     const { durationMs, pulseMs } = CONFIG.randomSpawns.mouse;
+    const fade = spawnFade(active.spawnedAt + durationMs - now, pulseMs, now);
     ctx.save();
-    ctx.globalAlpha *= urgentBlink(
-      active.spawnedAt + durationMs - now,
-      pulseMs,
-      now,
-    );
+    ctx.globalAlpha *= fade.alpha;
     ctx.translate(x, MOUSE_Y + bob);
     if (rotation !== 0) ctx.rotate(rotation);
-    ctx.scale(scale, scale);
+    ctx.scale(scale * fade.scale, scale * fade.scale);
     ctx.transform(
       active.direction !== ART_FACES ? -stretchX : stretchX,
       0,
@@ -342,6 +344,8 @@ function drawMouseSprite(
 export function hitTestMouse(x: number, y: number, floor: Floor): boolean {
   if (!active || active.floor !== floor) return false;
   const now = Date.now();
+  if (now - active.spawnedAt >= CONFIG.randomSpawns.mouse.durationMs)
+    return false;
   const scale = getScale(active, now);
   const halfW = (RENDER_W * scale) / 2;
   const middleY = MOUSE_Y - (RENDER_H * scale) / 2;

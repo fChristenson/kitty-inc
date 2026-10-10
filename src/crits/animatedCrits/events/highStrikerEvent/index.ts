@@ -25,7 +25,8 @@ import {
   createCritTextSprite,
   drawCritTextSprite,
 } from "../../../critFlash/critText";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "highStriker";
 const MAX_BARS = 5;

@@ -20,7 +20,8 @@ import {
   planGrind,
   type Grind,
 } from "../../../../shared/drill";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "pilotHole";
 // each bit: its size, its shoves, how far it sinks, its stall and bore (as

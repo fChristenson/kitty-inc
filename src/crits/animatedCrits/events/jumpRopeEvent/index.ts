@@ -26,7 +26,8 @@ import {
   SPLASH_MS,
   type Bounce,
 } from "../../../../shared/bounce";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "jumpRope";
 const POINTS = 28;

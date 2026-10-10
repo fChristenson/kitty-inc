@@ -23,7 +23,8 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
 import { drawBeam } from "../../../../shared/beam";
 import { clampTargetsY, sprayTargets } from "../../../../shared/coinTargets";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "tanker";
 const REWARD = 3;

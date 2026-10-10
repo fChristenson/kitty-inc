@@ -16,7 +16,8 @@ import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
 import { totalSpot } from "../../cashFlow";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "cashCoil";
 const REWARD = 2;

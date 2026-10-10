@@ -27,7 +27,8 @@ import {
   sprayLandsAt,
   type Spray,
 } from "../../../../shared/spray";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "podium";
 const MAX_BARS = 5;

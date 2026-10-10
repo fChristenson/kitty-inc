@@ -19,7 +19,8 @@ import { between, clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { hops, type BouncePath } from "../../../../shared/bounce";
 import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "rockslide";
 const MAX_BARS = 4;

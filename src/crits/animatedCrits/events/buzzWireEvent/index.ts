@@ -28,7 +28,8 @@ import {
   type Bolt,
 } from "../../../../shared/lightning";
 import { measure, pointAlong, sampleLine } from "../../cashFlow";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "buzzWire";
 const MAX_BARS = 4;

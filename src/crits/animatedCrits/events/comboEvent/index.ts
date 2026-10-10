@@ -23,7 +23,8 @@ import {
   drawCritTextSprite,
   type CritTextSprite,
 } from "../../../critFlash/critText";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "combo";
 const HITS = 12;

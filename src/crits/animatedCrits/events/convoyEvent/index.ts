@@ -4,7 +4,7 @@
 // strafe it from tail to head, every car bursting one after another in a
 // chain, the big engine at the front going up last; the view crash-lands
 // and the floor gets free levels for every car
-import type { Floor } from "../../../../gameState";
+import { levelsFor, type Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawBeam } from "../../../../shared/beam";
@@ -22,7 +22,6 @@ import {
 } from "../../../../shared/wisp";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
-import { levelsFor } from "../../eventRewards";
 import {
   canStartFlightStage,
   flightGuns,

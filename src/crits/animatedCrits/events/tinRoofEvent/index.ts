@@ -21,7 +21,8 @@ import {
   type Bounce,
 } from "../../../../shared/bounce";
 import { totalSpot } from "../../cashFlow";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "tinRoof";
 const REWARD = 2;

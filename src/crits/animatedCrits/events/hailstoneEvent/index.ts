@@ -23,7 +23,8 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { hops } from "../../../../shared/bounce";
 import { drawBeam } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "hailstone";
 // starts that take 14 to 23 steps to fall to 1

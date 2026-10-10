@@ -22,8 +22,9 @@ import {
   releasePane,
   type Shard,
 } from "../../../../shared/shatter";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
 import type { Point } from "../../../../shared/wisp";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "glassRain";
 const MAX_BARS = 5;

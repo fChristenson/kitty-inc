@@ -22,7 +22,8 @@ import {
   drawDetonation,
   drawLitFuse,
 } from "../../../../shared/explosion";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "doublingBounce";
 const MAX_GENERATIONS = 4;

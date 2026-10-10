@@ -25,7 +25,7 @@ import { shakeScreen } from "../../shared/screenShake";
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { stampGlimmer } from "../../shared/twinkle";
 import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
-import { urgentBlink } from "../../shared/urgentBlink";
+import { spawnFade } from "../../shared/spawnFade";
 import { drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
 import { swipeHits, tapHits } from "../../shared/tapTarget";
 
@@ -72,7 +72,6 @@ const WAKE_BACK: [number, number] = [10, 40];
 const WAKE_SETTLE_MS: [number, number] = [250, 450];
 const SPECK_SIZE: [number, number] = [14, 24];
 const SPECK_POP_MS = 160;
-const SPECK_FADE_MS = 300;
 const SPECK_SPIN = 0.0015;
 const COLORS = [COLOR.heavenlyGold, COLOR.wispGlitter, COLOR.white];
 // swept specks hop off the swipe, then fly into the total
@@ -503,7 +502,7 @@ export function drawWispSpawn(
       COLOR.white,
     );
   }
-  const blink = urgentBlink(r.fadeAt - t, pulseMs, now);
+  const fade = spawnFade(r.fadeAt - t, pulseMs, now);
   for (const speck of r.specks) {
     if (speck.paid || t < speck.bornAt) {
       alive ||= !speck.paid;
@@ -535,17 +534,16 @@ export function drawWispSpawn(
       );
       continue;
     }
-    const fade = 1 - (t - r.fadeAt) / SPECK_FADE_MS;
-    if (fade <= 0) continue;
+    if (fade.scale <= 0) continue;
     alive = true;
     const pop = clamp01((t - speck.bornAt) / SPECK_POP_MS);
     const spread = easeOutCubic(clamp01((t - speck.bornAt) / speck.spreadMs));
-    ctx.globalAlpha = Math.min(1, fade) * blink;
+    ctx.globalAlpha = fade.alpha;
     stampGlimmer(
       ctx,
       speck.fx * w + speck.ox * spread,
       speck.fy * h + speck.oy * spread,
-      speck.size * pop * (2 - pop) * twinkle,
+      speck.size * pop * (2 - pop) * twinkle * fade.scale,
       spin,
       speck.color,
     );

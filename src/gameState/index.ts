@@ -84,6 +84,11 @@ export const MAX_FLOOR_LEVEL = CONFIG.incomePanel.maxFloorLevel;
 export function isFloorMaxed(floor: Floor): boolean {
   return floor.upgradeCount >= MAX_FLOOR_LEVEL;
 }
+
+// a floor's share of its own level count in free levels, at least min
+export function levelsFor(floor: Floor, share = 0.1, min = 3): number {
+  return Math.max(min, Math.round(floor.upgradeCount * share));
+}
 // floors/coinFloat.ts blinks a boosted worker's floating coins once this little
 // time is left, so letting a boost run out down to the wire visibly reads as
 // "about to lose this" instead of it just quietly expiring

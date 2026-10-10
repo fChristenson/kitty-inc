@@ -19,7 +19,8 @@ import { drawBeam } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawGlow, fadeStops } from "../../../../shared/glowSprite";
 import { registerWispEvent, startWispCover } from "../../wispCover";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "dysonSphere";
 // sizes are shares of the screen's width

@@ -4,7 +4,7 @@
 // the distance. The guns strafe it and its nodes blow in a wave rolling from
 // corner to corner, its beams snapping as they go, then its core goes up in
 // a huge blast; the view crash-lands and the floor gets free levels
-import type { Floor } from "../../../../gameState";
+import { levelsFor, type Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawBeam } from "../../../../shared/beam";
@@ -18,7 +18,6 @@ import { shakeScreen } from "../../../../shared/screenShake";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
-import { levelsFor } from "../../eventRewards";
 import {
   canStartFlightStage,
   flightGuns,

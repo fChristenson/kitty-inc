@@ -26,7 +26,8 @@ import {
   type Pour,
 } from "../../cashFlow";
 import type { CoinPath } from "../../../../floors/coins";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "bellows";
 const REWARD = 2;

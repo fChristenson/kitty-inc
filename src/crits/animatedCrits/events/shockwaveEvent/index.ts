@@ -17,8 +17,9 @@ import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
 import { totalSpot } from "../../cashFlow";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
 import type { Point } from "../../../../shared/wisp";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "shockwave";
 const REWARD = 2;

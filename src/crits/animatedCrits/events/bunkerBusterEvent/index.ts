@@ -22,7 +22,8 @@ import {
   drawLitFuse,
   DETONATION_MS,
 } from "../../../../shared/explosion";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "bunkerBuster";
 const REWARD = 2;

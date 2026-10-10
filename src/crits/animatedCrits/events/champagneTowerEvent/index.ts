@@ -21,7 +21,8 @@ import {
   sampleLine,
   type Pour,
 } from "../../cashFlow";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "champagneTower";
 const REWARD = 2;

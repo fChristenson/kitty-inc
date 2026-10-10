@@ -22,7 +22,8 @@ import {
   type Grind,
 } from "../../../../shared/drill";
 import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "chunnel";
 const SIZE = WISP_SIZE * 1.2;

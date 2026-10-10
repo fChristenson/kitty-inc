@@ -24,11 +24,11 @@ import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
 import {
   findRewardBars,
   findRewardWorkers,
-  levelsFor,
   type RewardBar,
   type RewardWorker,
 } from "../../eventRewards";
 import { WORKER_HEIGHT } from "../../../../floors/worker";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "ballLightning";
 const MAX_BARS = 4;

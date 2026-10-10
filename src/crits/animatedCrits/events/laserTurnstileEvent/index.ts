@@ -18,7 +18,8 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, lerp } from "../../../../shared/easing";
 import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
 import { createBeats } from "../../../../shared/eventBeats";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "laserTurnstile";
 const MAX_BARS = 5;

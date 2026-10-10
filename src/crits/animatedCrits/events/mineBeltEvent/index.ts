@@ -5,7 +5,7 @@
 // one after another in a chain, row after row, the last row all going up
 // together in one cluster; the view crash-lands and the floor gets free
 // levels for every mine
-import type { Floor } from "../../../../gameState";
+import { levelsFor, type Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { drawBeam } from "../../../../shared/beam";
@@ -21,7 +21,6 @@ import { clamp01 } from "../../../../shared/easing";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
-import { levelsFor } from "../../eventRewards";
 import {
   canStartFlightStage,
   isFlightStageRunning,

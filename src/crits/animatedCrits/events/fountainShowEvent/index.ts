@@ -15,8 +15,9 @@ import type { Point } from "../../../../shared/wisp";
 import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, easeOutBack, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
 import { totalSpot } from "../../cashFlow";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "fountainShow";
 const REWARD = 2;

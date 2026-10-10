@@ -28,12 +28,12 @@ import {
 import {
   findRewardBars,
   findRewardWorkers,
-  levelsFor,
   type RewardBar,
   type RewardWorker,
 } from "../../eventRewards";
 import { WORKER_HEIGHT } from "../../../../floors/worker";
 import type { Point } from "../../../../shared/wisp";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "comicBook";
 const MAX_BARS = 3;

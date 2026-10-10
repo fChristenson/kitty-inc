@@ -19,7 +19,8 @@ import { clamp01, easeOut, lerp, smoothstep } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
 import { sprayTargets } from "../../../../shared/coinTargets";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "checkout";
 const REWARD = 2;

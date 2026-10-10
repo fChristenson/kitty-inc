@@ -11,6 +11,8 @@ import { stampGlimmer } from "../twinkle";
 import type { Point } from "../wisp";
 
 const COIN_PX = 192;
+// a hovering coin turns once every 900ms, like the splash screen's
+export const COIN_SPIN = (Math.PI * 2) / 900;
 // a flip goes FLIP_HIGH up, spinning FLIP_SPIN radians a ms faster, swelling
 // a little; at the peak it's sucked into the total, shrinking as it goes
 const FLIP_MS = 380;

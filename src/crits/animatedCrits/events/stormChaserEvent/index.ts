@@ -31,10 +31,10 @@ import {
 import {
   findRewardBars,
   findRewardWorkers,
-  levelsFor,
   type RewardBar,
   type RewardWorker,
 } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "stormChaser";
 const MAX_WORKERS = 4;

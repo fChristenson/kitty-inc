@@ -23,7 +23,8 @@ import { stampGlimmer } from "../../../../shared/twinkle";
 import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
 import { drawSpray, planSpray } from "../../../../shared/spray";
 import { planDisk, type Orbit } from "../../../../shared/galaxy";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "nebula";
 const SPECKS = 320;

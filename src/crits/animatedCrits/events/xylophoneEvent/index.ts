@@ -19,7 +19,8 @@ import { clamp01, lerp } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
 import { drawBeam } from "../../../../shared/beam";
 import { createBeats } from "../../../../shared/eventBeats";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "xylophone";
 const MAX_BARS = 5;

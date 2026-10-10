@@ -125,11 +125,6 @@ export function findRewardWorkers(
     }));
 }
 
-// a floor's share of its own level count in free levels, at least min
-export function levelsFor(floor: Floor, share = 0.1, min = 3): number {
-  return Math.max(min, Math.round(floor.upgradeCount * share));
-}
-
 // the perma tier to promote a floor to: the rolled tier, or the tier above
 // its own when that roll wouldn't promote it
 export function promotedTier(floor: Floor, rolled: CritTier): CritTier {

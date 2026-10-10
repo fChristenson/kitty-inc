@@ -27,7 +27,8 @@ import {
   drawLitFuse,
 } from "../../../../shared/explosion";
 import { drawStars, planDisk, type Orbit } from "../../../../shared/galaxy";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "novaDisk";
 const STARS = 300;

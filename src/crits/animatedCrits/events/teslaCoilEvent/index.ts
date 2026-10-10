@@ -29,11 +29,11 @@ import {
 import {
   findRewardBars,
   findRewardWorkers,
-  levelsFor,
   type RewardBar,
   type RewardWorker,
 } from "../../eventRewards";
 import { WORKER_HEIGHT } from "../../../../floors/worker";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "teslaCoil";
 const MAX_BARS = 3;

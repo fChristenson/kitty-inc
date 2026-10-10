@@ -18,8 +18,9 @@ import {
   drawStrike,
   type Bolt,
 } from "../../../../shared/lightning";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
 import type { Point } from "../../../../shared/wisp";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "crawl";
 const MAX_BARS = 5;

@@ -25,7 +25,8 @@ import {
   drawMuzzleFlash,
 } from "../../../../shared/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "ammoBelt";
 const MAX_BARS = 3;

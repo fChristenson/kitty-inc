@@ -26,7 +26,8 @@ import {
   drawMuzzleFlash,
   type Bullet,
 } from "../../../../shared/bullets";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "sentryTurret";
 const MAX_BARS = 5;

@@ -23,8 +23,9 @@ import {
   createCritTextSprite,
   drawCritTextSprite,
 } from "../../../critFlash/critText";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
 import { COLOR } from "../../../../palette";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "limbo";
 const MAX_BARS = 4;

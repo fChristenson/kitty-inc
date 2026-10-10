@@ -16,8 +16,7 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawGrind, planDrill, planGrind } from "../../../../shared/drill";
-import { isFloorMaxed } from "../../../../gameState";
-import { levelsFor } from "../../eventRewards";
+import { isFloorMaxed, levelsFor } from "../../../../gameState";
 import {
   drawUpgradeStarSpotlight,
   getUpgradeIndicatorCenter,

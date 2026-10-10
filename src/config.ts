@@ -153,10 +153,46 @@ export const CONFIG = {
       rollEveryMs: 5_000,
       procChance: 0.1,
       cooldownMs: 5_000,
-      // how long the flock takes to drift across, in past one side and out
-      // past the other
+      // how long the flock stays, flying in and meandering over the floor,
+      // blinking over its last pulseMs
       durationMs: 6_000,
+      pulseMs: 2_000,
       count: [12, 16] as [number, number],
+    },
+    // src/spawn/bouncer — a ball bouncing round the screen's edges: a tap
+    // smashes it down the bars in view, levelling each
+    bouncer: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      // how long it bounces before fading, pulsing over its last pulseMs
+      durationMs: 7_000,
+      pulseMs: 2_000,
+    },
+    // src/spawn/pump — an orb over a floor: `pumps` taps blow it over the
+    // bars in view, a crit number onto each
+    pump: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      // how long it hangs before fizzling, pulsing over its last pulseMs
+      durationMs: 6_000,
+      pulseMs: 2_000,
+      pumps: 5,
+    },
+    // src/spawn/starSwirl — a spiral of stars over a floor: a tap on its
+    // core flings them onto every worker in view, each one paying
+    starSwirl: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      // how long it turns before fading, pulsing over its last pulseMs
+      durationMs: 6_000,
+      pulseMs: 2_000,
+      stars: 110,
+      // each worker a star reaches pays this many seconds of the company's
+      // income
+      rewardSecondsPerWorker: 4,
     },
   },
 

@@ -15,8 +15,9 @@ import { registerWispEvent, startWispCover } from "../../wispCover";
 import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { bezier } from "../../../../shared/curves";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
 import { totalSpot } from "../../cashFlow";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "tidalBore";
 const REWARD = 2;

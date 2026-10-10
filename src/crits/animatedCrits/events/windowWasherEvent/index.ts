@@ -22,7 +22,8 @@ import {
   sprayLandsAt,
   sweepAim,
 } from "../../../../shared/spray";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "windowWasher";
 const MAX_STOPS = 4;

@@ -27,7 +27,8 @@ import {
   SPLASH_MS,
 } from "../../../../shared/bounce";
 import { totalSpot } from "../../cashFlow";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "foosball";
 const REWARD = 2;

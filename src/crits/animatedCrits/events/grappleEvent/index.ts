@@ -21,7 +21,8 @@ import { clamp01, lerp, smoothstep } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "grapple";
 const MAX_BARS = 5;

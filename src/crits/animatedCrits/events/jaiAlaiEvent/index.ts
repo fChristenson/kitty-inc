@@ -20,7 +20,8 @@ import {
 } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawBounceSplash, type Bounce } from "../../../../shared/bounce";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "jaiAlai";
 const MAX_THROWS = 6;

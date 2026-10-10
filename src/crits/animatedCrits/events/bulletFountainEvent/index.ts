@@ -20,7 +20,8 @@ import { clamp01, lerp } from "../../../../shared/easing";
 import { bezier } from "../../../../shared/curves";
 import { drawMuzzleFlash } from "../../../../shared/bullets";
 import { createBeats } from "../../../../shared/eventBeats";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "bulletFountain";
 const MAX_BARS = 5;

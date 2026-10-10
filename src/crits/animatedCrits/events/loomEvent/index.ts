@@ -26,7 +26,8 @@ import {
   sampleLine,
   type Pour,
 } from "../../cashFlow";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "loom";
 const REWARD = 2;

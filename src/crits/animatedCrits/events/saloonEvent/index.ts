@@ -7,7 +7,7 @@
 // draws and fires, the view staggers, pitches forward and falls into a hole
 // opening in the road, dropping through it back onto the floors, which get
 // free levels as the crit's tier pays out
-import type { Floor } from "../../../../gameState";
+import { levelsFor, type Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { playBloop, playSwoosh } from "../../../../sound";
@@ -43,7 +43,6 @@ import {
 } from "../../../critFlash/critText";
 import { pickCritTierByOdds } from "../../../critTypes";
 import { forceTestCrit } from "../../../floorCrits/upgradeCrit";
-import { levelsFor } from "../../eventRewards";
 import {
   canStartFlightStage,
   isFlightStageRunning,

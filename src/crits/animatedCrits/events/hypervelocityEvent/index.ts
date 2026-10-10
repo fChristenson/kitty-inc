@@ -26,7 +26,8 @@ import {
   scatterArms,
   type Orbit,
 } from "../../../../shared/galaxy";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "hypervelocity";
 const MAX_FLINGS = 6;

@@ -19,7 +19,8 @@ import {
   WISP_SIZE,
   type Point,
 } from "../../../../shared/wisp";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "jacobsLadder";
 const MAX_BARS = 6;

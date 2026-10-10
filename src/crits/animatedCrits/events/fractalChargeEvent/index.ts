@@ -23,7 +23,8 @@ import { bezier } from "../../../../shared/curves";
 import { clamp01, easeOut } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
-import { findRewardBars, levelsFor, type RewardBar } from "../../eventRewards";
+import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "fractalCharge";
 const GENERATIONS = 4;

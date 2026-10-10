@@ -19,7 +19,8 @@ import {
   drawStrike,
   type Bolt,
 } from "../../../../shared/lightning";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "ignition";
 const MAX_BARS = 4;

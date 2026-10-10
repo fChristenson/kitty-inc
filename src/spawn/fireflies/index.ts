@@ -1,10 +1,10 @@
 // the fireflies: every so often, like the mouse and the bubbles, a flock of
-// little gold wisps drifts along a floor over its workers' heads, swirling
-// round each other, in past one side and out past the other over
-// CONFIG.randomSpawns.fireflies.durationMs. A swipe through the flock
-// catches every one it touches: each pops in a glint and zips onto one of
-// that floor's workers, and a worker's first firefly promotes it a perma
-// tier for good. The ones missed drift off with the flock.
+// little gold wisps drifts in along a floor over its workers' heads,
+// swirling round each other, and meanders there for
+// CONFIG.randomSpawns.fireflies.durationMs, blinking before it vanishes. A
+// swipe through the flock catches every one it touches: each pops in a glint
+// and zips onto one of that floor's workers, and a worker's first firefly
+// promotes it a perma tier for good.
 //
 // gameCanvas wires the floor actions in (wireFireflies), ticks the spawn
 // timer (updateFireflies), sweeps them along every drag (sweepFireflies) and
@@ -26,18 +26,25 @@ import { isVisibleOnFloor } from "../../crits";
 import { randomInt } from "../../utils";
 import { bezier } from "../../shared/curves";
 import { isFloorLocked } from "../../shared/detachedJob";
-import { between, clamp01, lerp } from "../../shared/easing";
+import { between, clamp01, easeOutCubic, lerp } from "../../shared/easing";
 import { drawGlow, fadeStops } from "../../shared/glowSprite";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { shakeScreen } from "../../shared/screenShake";
 import { createSpawnRoll } from "../../shared/spawnRoll";
+import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
 import { swipeHits, tapHits } from "../../shared/tapTarget";
 import { stampGlimmer } from "../../shared/twinkle";
 import { drawWisp, WISP_SIZE, type Point } from "../../shared/wisp";
 
-// the flock's middle flies FLOCK_ABOVE over its workers' middles, bobbing
+// the flock's middle flies in from ENTER_PAST beyond the floor's side to a
+// spot REST_EDGE or more in from its sides over ENTER_MS, then meanders
+// MEANDER either way of it; FLOCK_ABOVE over its workers' middles, bobbing
 const FLOCK_ABOVE = 190;
 const ENTER_PAST = 300;
+const ENTER_MS = 1_400;
+const REST_EDGE = 300;
+const MEANDER = 160;
+const MEANDER_RATE = 0.0012;
 const FLOCK_BOB = 40;
 const FLOCK_BOB_RATE = 0.003;
 // each firefly circles the middle (squashed flat), either way round
@@ -82,9 +89,9 @@ interface Firefly {
 interface Flock {
   floor: Floor;
   startAt: number;
-  // the middle's run across the floor, in floor space
+  // where the middle flies in from and settles over, in floor space
   fromX: number;
-  toX: number;
+  restX: number;
   y: number;
   flies: Firefly[];
   // the workers they fly to, in turn, and when one last landed on each
@@ -128,9 +135,12 @@ export function forceFireflies(): void {
 // a firefly circling the flock's middle at ms, into `at` (floor space)
 function swirl(f: Flock, fly: Firefly, ms: number): void {
   const age = ms - f.startAt;
-  const across = age / CONFIG.randomSpawns.fireflies.durationMs;
+  const settle = clamp01(age / ENTER_MS);
   const a = fly.angle + age * fly.speed;
-  at.x = lerp([f.fromX, f.toX], across) + Math.cos(a) * fly.radius;
+  at.x =
+    lerp([f.fromX, f.restX], easeOutCubic(settle)) +
+    Math.sin(age * MEANDER_RATE) * MEANDER * settle +
+    Math.cos(a) * fly.radius;
   at.y =
     f.y +
     Math.sin(age * FLOCK_BOB_RATE) * FLOCK_BOB +
@@ -180,13 +190,14 @@ function pickFloor(deps: FloorActionsDeps): Flock | null {
   const { floor, y, workers } =
     options[Math.floor(Math.random() * options.length)];
   const fromLeft = Math.random() < 0.5;
-  const left = FLOOR_X_MIN - ENTER_PAST;
-  const right = FLOOR_X_MAX + ENTER_PAST;
   return {
     floor,
     startAt: 0,
-    fromX: fromLeft ? left : right,
-    toX: fromLeft ? right : left,
+    fromX: fromLeft ? FLOOR_X_MIN - ENTER_PAST : FLOOR_X_MAX + ENTER_PAST,
+    restX: lerp(
+      [FLOOR_X_MIN + REST_EDGE, FLOOR_X_MAX - REST_EDGE],
+      Math.random(),
+    ),
     y,
     flies: [],
     workers,
@@ -220,9 +231,11 @@ function startFlock(now: number): void {
 }
 
 // a free firefly's spot on screen now, null while it's more than `margin`
-// off screen
+// off screen or the flock's time is up
 function freeAt(fly: Firefly, now: number, margin = 0): Point | null {
-  if (fly.caughtAt !== Infinity) return null;
+  if (fly.caughtAt !== Infinity || !flock) return null;
+  if (now - flock.startAt >= CONFIG.randomSpawns.fireflies.durationMs)
+    return null;
   const p = fly.path(now);
   return p && p.x > -margin && p.x < width + margin ? p : null;
 }
@@ -292,7 +305,10 @@ export function drawFireflies(
     return;
   }
   const t = performance.now();
-  let busy = t < f.startAt + CONFIG.randomSpawns.fireflies.durationMs;
+  const { durationMs, pulseMs } = CONFIG.randomSpawns.fireflies;
+  const msLeft = f.startAt + durationMs - t;
+  let busy = !isSpawnGone(msLeft);
+  const fade = spawnFade(msLeft, pulseMs, now);
   for (const fly of f.flies) {
     if (fly.caughtAt === Infinity || fly.landed) continue;
     if (t >= fly.caughtAt + POP_MS + ZIP_MS) land(f, fly, t);
@@ -322,9 +338,15 @@ export function drawFireflies(
   for (const fly of f.flies) {
     if (fly.landed) continue;
     const caught = fly.caughtAt !== Infinity;
-    if (!caught && !freeAt(fly, t, DRAW_MARGIN)) continue;
-    const pop = caught ? clamp01((t - fly.caughtAt) / POP_MS) : 0;
-    drawWisp(ctx, fly.path, t, now, SIZE * (1 + POP_GROW * pop), pop);
+    if (caught) {
+      const pop = clamp01((t - fly.caughtAt) / POP_MS);
+      drawWisp(ctx, fly.path, t, now, SIZE * (1 + POP_GROW * pop), pop);
+      continue;
+    }
+    if (fade.scale <= 0) continue;
+    const p = fly.path(t);
+    if (!p || p.x < -DRAW_MARGIN || p.x > w + DRAW_MARGIN) continue;
+    drawWisp(ctx, fly.path, t, now, SIZE * fade.scale, 0, fade.alpha);
   }
   if (!busy) flock = null;
 }

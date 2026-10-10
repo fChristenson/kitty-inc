@@ -5,7 +5,7 @@
 // glitter spike on each; every landing jolts its platform and levels that
 // floor's bar. Off the last one it launches up a ramp into a huge blast, the
 // stage whips out and the crit's tier lands on the clicked floor
-import type { Floor } from "../../../../gameState";
+import { levelsFor, type Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { COLOR } from "../../../../palette";
 import { pickCritTierByOdds } from "../../../critTypes";
@@ -23,7 +23,7 @@ import {
   startRevealStage,
   type StageRect,
 } from "../../revealStage";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
 import { drawBeam } from "../../../../shared/beam";
 import { bezier } from "../../../../shared/curves";
 import { clamp01, lerp } from "../../../../shared/easing";

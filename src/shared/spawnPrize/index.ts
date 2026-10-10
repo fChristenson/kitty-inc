@@ -19,10 +19,12 @@ import {
   type FloorActionsDeps,
 } from "../../floors";
 import { isFloorMaxed, type Floor } from "../../gameState";
+import { COLOR } from "../../palette";
 import { addTotalIncome } from "../../totalIncome";
 import { playSold } from "../../sound";
 import { drawCoinFlip, startCoinFlip, type CoinFlip } from "../coinFlip";
 import { bezier } from "../curves";
+import { isFloorLocked } from "../detachedJob";
 import { easeIn, easeOut, lerp, progress } from "../easing";
 import { DETONATION_MS, drawDetonation } from "../explosion";
 import { playBarExplosion } from "../explosionBang";
@@ -112,11 +114,51 @@ function barOnScreen(
   height: number,
   into: Point,
 ): void {
+  barAt(deps, floor, into);
+  into.y = Math.min(height, Math.max(0, into.y));
+}
+
+// where floor's income bar's middle is on screen
+export function barAt(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  into: Point,
+): Point {
   const area = deps.getScreenAreaLocal?.(floor);
-  if (!area) return;
+  if (!area) return into;
   const bar = getIncomeBarCenter(deps.floors.indexOf(floor) === 0);
   into.x = bar.x - area.left;
-  into.y = Math.min(height, Math.max(0, bar.y - area.top));
+  into.y = bar.y - area.top;
+  return into;
+}
+
+// every open floor whose income bar is in view and can still take levels,
+// top first: what a spawn's blasts level up
+export function barsInView(deps: FloorActionsDeps): Floor[] {
+  return (deps.getOnScreenFloors?.() ?? [])
+    .filter(
+      (entry) =>
+        entry.floor.unlocked &&
+        !isFloorMaxed(entry.floor) &&
+        !isFloorLocked(entry.floor) &&
+        isVisibleOnFloor(
+          entry,
+          getIncomeBarCenter(deps.floors.indexOf(entry.floor) === 0).y,
+        ),
+    )
+    .sort((a, b) => a.top - b.top)
+    .map((entry) => entry.floor);
+}
+
+// free levels landing on floor's bar, tallied over it
+export function landBarLevels(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  levels: number,
+): void {
+  increaseIncomeRateBy(floor, levels);
+  deps.persist();
+  punchIncomeBar(floor, `+${levels} Lvl`, COLOR.heavenlyGold);
 }
 
 // pays prize, tapped at `from` (screen units on a screen `height` tall) for

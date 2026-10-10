@@ -14,7 +14,8 @@ import { clamp01, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawBeam } from "../../../../shared/beam";
 import { drawBounceSplash, ricochetThrough } from "../../../../shared/bounce";
-import { findRewardBars, levelsFor } from "../../eventRewards";
+import { findRewardBars } from "../../eventRewards";
+import { levelsFor } from "../../../../gameState";
 
 const KEY = "bottleneck";
 const BOUNCES = 10;

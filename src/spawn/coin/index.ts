@@ -2,9 +2,10 @@
 // holes open one after another on the floors in view, a gold coin rises out
 // of each and its hole closes behind it. Each coin hovers just over the floor
 // where the workers walk, spinning, for CONFIG.randomSpawns.coin.durationMs,
-// pulsing before its hole opens again and swallows it. A tap flips one up
-// into the air; at the peak of the flip it's sucked into the total, paying
-// its share of rewardSeconds of the company's income as it lands.
+// then blinks and vanishes the way every spawn does (shared/spawnFade). A tap
+// flips one up into the air; at the peak of the flip it's sucked into the
+// total, paying its share of rewardSeconds of the company's income as it
+// lands.
 //
 // gameCanvas wires the floor actions in (wireCoinSpawn), ticks the spawn
 // timer (updateCoinSpawn), taps them (tapCoinSpawn) and draws them in screen
@@ -28,6 +29,7 @@ import { isVisibleOnFloor } from "../../crits";
 import { randomInt } from "../../utils";
 import { multiply, type BigNumber } from "../../shared/bigNumber";
 import {
+  COIN_SPIN,
   drawCoinFlip,
   drawSpinCoin,
   loadSpinCoin,
@@ -39,9 +41,9 @@ import { drawGlow, fadeStops } from "../../shared/glowSprite";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { shakeScreen } from "../../shared/screenShake";
 import { createSpawnRoll } from "../../shared/spawnRoll";
+import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
 import { tapHits } from "../../shared/tapTarget";
 import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
-import { urgentBlink } from "../../shared/urgentBlink";
 import type { Point } from "../../shared/wisp";
 
 // a hole, lying flat on the floor (squashed to HOLE_SQUASH of its width);
@@ -63,10 +65,6 @@ const RISE_MS = 420;
 const HOVER = 104;
 const BOB = 8;
 const BOB_RATE = 0.004;
-const SPIN = (Math.PI * 2) / 900;
-// left untapped, its hole reopens and it sinks in SINK_LEAD_MS later
-const SINK_LEAD_MS = 150;
-const SINK_MS = 300;
 const GLOW = fadeStops(COLOR.heavenlyGold);
 const GLOW_ALPHA = 0.35;
 // a tapped one shakes the screen as it lands in the total
@@ -167,29 +165,17 @@ function holeAt(c: Coin): boolean {
   return true;
 }
 
-// left untapped: when a coin starts sinking, and when its hole shuts on it
-const sinkAt = () => CONFIG.randomSpawns.coin.durationMs + SINK_LEAD_MS;
-const swallowedAt = () => sinkAt() + SINK_MS;
-
-// how far a hole is open at age (0..1): open while its coin rises out, shut
-// while it hovers, open again to swallow it if it's never tapped
-function holeOpen(age: number, tapped: boolean): number {
-  const { durationMs } = CONFIG.randomSpawns.coin;
+// how far a hole is open at age (0..1): open while its coin rises out, then
+// shut
+function holeOpen(age: number): number {
   if (age < HOLE_SHUT_MS) return easeOutBack(clamp01(age / HOLE_OPEN_MS));
-  if (tapped || age < durationMs)
-    return 1 - easeIn(clamp01((age - HOLE_SHUT_MS) / HOLE_CLOSE_MS));
-  if (age < swallowedAt())
-    return easeOutBack(clamp01((age - durationMs) / HOLE_OPEN_MS));
-  return 1 - easeIn(clamp01((age - swallowedAt()) / HOLE_CLOSE_MS));
+  return 1 - easeIn(clamp01((age - HOLE_SHUT_MS) / HOLE_CLOSE_MS));
 }
 
 // a hovering coin's spot and how far it has risen out of its hole (0..1)
 function hoverAt(c: Coin, now: number): number {
   const age = now - c.bornAt;
-  const out =
-    age < RISE_MS
-      ? easeOutBack(clamp01(age / RISE_MS))
-      : 1 - easeIn(clamp01((age - sinkAt()) / SINK_MS));
+  const out = age < RISE_MS ? easeOutBack(clamp01(age / RISE_MS)) : 1;
   spot.x = hole.x;
   spot.y = hole.y - HOVER * out + Math.sin(age * BOB_RATE) * BOB * out;
   return out;
@@ -227,7 +213,8 @@ export function tapCoinSpawn(x: number, y: number): boolean {
   const now = performance.now();
   const c = coinAt(x, y, now);
   if (!c) return false;
-  c.flip = startCoinFlip(spot, now, COIN_RADIUS, (now - c.bornAt) * SPIN);
+  const turn = (now - c.bornAt) * COIN_SPIN;
+  c.flip = startCoinFlip(spot, now, COIN_RADIUS, turn);
   playBloop();
   return true;
 }
@@ -249,7 +236,7 @@ function drawHole(ctx: CanvasRenderingContext2D, open: number): void {
   ctx.fill();
 }
 
-// an untapped coin: its hole, and it rising, hovering or sinking
+// an untapped coin: its hole, and it rising, hovering or vanishing
 function drawHovering(
   ctx: CanvasRenderingContext2D,
   c: Coin,
@@ -262,23 +249,23 @@ function drawHovering(
     c.chimed = true;
     playCoinAppear();
   }
-  if (age >= swallowedAt() + HOLE_CLOSE_MS || !holeAt(c)) {
+  const { durationMs, pulseMs } = CONFIG.randomSpawns.coin;
+  const msLeft = durationMs - age;
+  if (isSpawnGone(msLeft) || !holeAt(c)) {
     c.done = true;
     return;
   }
-  drawHole(ctx, holeOpen(age, false));
+  drawHole(ctx, holeOpen(age));
   const out = hoverAt(c, t);
-  if (out <= 0) return;
-  const { durationMs, pulseMs } = CONFIG.randomSpawns.coin;
-  const blink = urgentBlink(c.bornAt + durationMs - t, pulseMs, now);
+  const fade = spawnFade(msLeft, pulseMs, now);
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
-  ctx.globalAlpha = GLOW_ALPHA * out * blink;
-  drawGlow(ctx, GLOW, spot.x, spot.y, COIN_RADIUS * 1.6);
+  ctx.globalAlpha = GLOW_ALPHA * out * fade.alpha;
+  drawGlow(ctx, GLOW, spot.x, spot.y, COIN_RADIUS * 1.6 * fade.scale);
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = previous;
-  const radius = COIN_RADIUS * (0.4 + 0.6 * out);
-  drawSpinCoin(ctx, spot.x, spot.y, radius, blink, age * SPIN);
+  const radius = COIN_RADIUS * (0.4 + 0.6 * out) * fade.scale;
+  drawSpinCoin(ctx, spot.x, spot.y, radius, fade.alpha, age * COIN_SPIN);
 }
 
 // a tapped coin: its hole shutting, the coin flipped up into the total
@@ -288,7 +275,7 @@ function drawFlipped(
   flip: CoinFlip,
   t: number,
 ): void {
-  if (holeAt(c)) drawHole(ctx, holeOpen(t - c.bornAt, true));
+  if (holeAt(c)) drawHole(ctx, holeOpen(t - c.bornAt));
   drawCoinFlip(ctx, flip, t, total, () => {
     pay();
     c.done = true;

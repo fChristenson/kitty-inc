@@ -64,6 +64,27 @@ import {
   updateFireflies,
   wireFireflies,
 } from "../../spawn/fireflies";
+import {
+  drawBouncer,
+  hitTestBouncer,
+  tapBouncer,
+  updateBouncer,
+  wireBouncer,
+} from "../../spawn/bouncer";
+import {
+  drawPump,
+  hitTestPump,
+  tapPump,
+  updatePump,
+  wirePump,
+} from "../../spawn/pump";
+import {
+  drawStarSwirl,
+  hitTestStarSwirl,
+  tapStarSwirl,
+  updateStarSwirl,
+  wireStarSwirl,
+} from "../../spawn/starSwirl";
 import { getTotalIncome } from "../../totalIncome";
 
 import { COLOR } from "../../palette";
@@ -749,6 +770,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     updateWispSpawn(performance.now());
     updateCoinSpawn(performance.now());
     updateFireflies(performance.now());
+    updateBouncer(performance.now());
+    updatePump(performance.now());
+    updateStarSwirl(performance.now());
     const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -836,6 +860,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       performance.now(),
     );
     drawFireflies(ctx, SLOT_W, performance.now());
+    drawStarSwirl(ctx, SLOT_W, HUD_H / 2, performance.now());
+    drawPump(ctx, SLOT_W, contentViewportH(), performance.now());
+    drawBouncer(ctx, SLOT_W, contentViewportH(), performance.now());
     drawBubbles(ctx, SLOT_W, contentViewportH(), performance.now());
     ctx.restore();
   }
@@ -953,6 +980,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   wireBubbles(floorActionsDeps);
   wireCoinSpawn(floorActionsDeps);
   wireFireflies(floorActionsDeps);
+  wireBouncer(floorActionsDeps);
+  wirePump(floorActionsDeps);
+  wireStarSwirl(floorActionsDeps);
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every
@@ -1008,7 +1038,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     sweepX = p.x;
     sweepY = p.y;
     // bubbles float over everything, the HUD too
-    bubbleTapDown = popBubbleAt(p.x, p.y) || tapCoinSpawn(p.x, p.y);
+    bubbleTapDown =
+      popBubbleAt(p.x, p.y) ||
+      tapCoinSpawn(p.x, p.y) ||
+      tapBouncer(p.x, p.y) ||
+      tapPump(p.x, p.y) ||
+      tapStarSwirl(p.x, p.y);
     if (bubbleTapDown) return;
     wispSwipe = hitTestWispGlitter(p.x, p.y) || hitTestFireflies(p.x, p.y);
     if (wispSwipe) {
@@ -1077,6 +1112,9 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         p.y < hudBottomY ||
         hitTestBubbles(p.x, p.y) ||
         hitTestCoinSpawn(p.x, p.y) ||
+        hitTestBouncer(p.x, p.y) ||
+        hitTestPump(p.x, p.y) ||
+        hitTestStarSwirl(p.x, p.y) ||
         hitTestWispGlitter(p.x, p.y) ||
         hitTestFireflies(p.x, p.y)
       ) {
