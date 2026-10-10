@@ -284,6 +284,36 @@ export const FLOOR_CRIT_CONFIG = {
     coinShotCrit: {
       chance: 0.03,
     },
+    // gold rods dropping from orbit straight down through the bars, then a
+    // fat one into its own
+    rodsCrit: {
+      chance: 0.03,
+    },
+    // a pillar of light from orbit cutting across the bars in a zigzag down
+    // the building, stopping on its own
+    ionCannonCrit: {
+      chance: 0.03,
+    },
+    // a bolt cracked like a whip across the bars, then straight down onto its
+    // own
+    boltWhipCrit: {
+      chance: 0.03,
+    },
+    // a targeting dot darting over the bars, pillars from orbit chasing it,
+    // then a giant one on its own
+    designatorCrit: {
+      chance: 0.03,
+    },
+    // a fan of beams split off a mirror sweeping the bars, then snapping
+    // shut onto its own
+    beamSplitterCrit: {
+      chance: 0.03,
+    },
+    // a coil at the street firing forking bolts up at the bars, then one
+    // discharge onto every bar and its own
+    teslaCannonCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

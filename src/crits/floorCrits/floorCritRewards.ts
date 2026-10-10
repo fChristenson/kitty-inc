@@ -1714,6 +1714,17 @@ function floorCritLevels(
   if (kind === "claymoresCrit") return Math.ceil(count / 14);
   if (kind === "strafeCrit") return Math.ceil(count / 6);
   if (kind === "coinShotCrit") return Math.ceil(count / 4);
+  // rods punch through each bar about ten times, an ion cannon's cut blasts
+  // each about six times and a bolt whip lashes each about eight
+  if (kind === "rodsCrit") return Math.ceil(count / 10);
+  if (kind === "ionCannonCrit") return Math.ceil(count / 6);
+  if (kind === "boltWhipCrit") return Math.ceil(count / 8);
+  // a designator's pillars land on each bar about four times, a beam
+  // splitter's fan lands about five hits on each and a tesla cannon's forks
+  // strike each about six
+  if (kind === "designatorCrit") return Math.ceil(count / 4);
+  if (kind === "beamSplitterCrit") return Math.ceil(count / 5);
+  if (kind === "teslaCannonCrit") return Math.ceil(count / 6);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);

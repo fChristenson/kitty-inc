@@ -360,6 +360,12 @@ const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   claymoresCrit: () => import("../crits/claymoresCrit"),
   strafeCrit: () => import("../crits/strafeCrit"),
   coinShotCrit: () => import("../crits/coinShotCrit"),
+  rodsCrit: () => import("../crits/rodsCrit"),
+  ionCannonCrit: () => import("../crits/ionCannonCrit"),
+  boltWhipCrit: () => import("../crits/boltWhipCrit"),
+  designatorCrit: () => import("../crits/designatorCrit"),
+  beamSplitterCrit: () => import("../crits/beamSplitterCrit"),
+  teslaCannonCrit: () => import("../crits/teslaCannonCrit"),
 };
 const loading = new Map<FloorCritKind, Promise<unknown>>();
 
