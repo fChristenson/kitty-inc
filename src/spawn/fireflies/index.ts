@@ -148,11 +148,29 @@ function swirl(f: Flock, fly: Firefly, ms: number): void {
     Math.sin(age * JITTER_RATE + fly.seed) * JITTER;
 }
 
+// a firefly's swirl (floor space) is the same at a given time every frame, and
+// its trail asks for the same past times frame after frame: kept per fly in a
+// ring by time, so 16 trails don't redo the trig for every sparkle
+const SWIRL_SLOTS = 1024;
+
 function makePath(f: Flock, fly: Firefly): (ms: number) => Point | null {
+  const times = new Float64Array(SWIRL_SLOTS).fill(NaN);
+  const xs = new Float64Array(SWIRL_SLOTS);
+  const ys = new Float64Array(SWIRL_SLOTS);
   return (ms) => {
     if (!area) return null;
-    if (ms < fly.caughtAt) swirl(f, fly, ms);
-    else {
+    if (ms < fly.caughtAt) {
+      const slot = Math.floor(ms) & (SWIRL_SLOTS - 1);
+      if (times[slot] === ms) {
+        at.x = xs[slot];
+        at.y = ys[slot];
+      } else {
+        swirl(f, fly, ms);
+        times[slot] = ms;
+        xs[slot] = at.x;
+        ys[slot] = at.y;
+      }
+    } else {
       const t = (ms - fly.caughtAt - POP_MS) / ZIP_MS;
       if (t >= 1) return null;
       const to = getWorkerCenter(f.floor, fly.workerIndex);

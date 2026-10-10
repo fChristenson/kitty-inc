@@ -29,7 +29,7 @@ type ProfilerCtor = new (options: {
 // finest
 const SAMPLE_MS = 1;
 const MAX_SAMPLES = 100_000;
-const TOP = 25;
+const TOP = 60;
 // a sample's weight is the gap to the next, but never more than this many
 // intervals (the page was busy elsewhere, or idle)
 const MAX_GAP = 4;

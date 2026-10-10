@@ -9,7 +9,8 @@
 //            --url=http://localhost:5173/kitty-inc/perf/index.html
 //            --desktop (no phone screen) --keep (leave the browser open) --json
 //            --warm (only the warm runs); run:<name> measures any rig run
-//            as is (run:idle for a baseline)
+//            as is (run:idle for a baseline); --mode=on|frequent|tiers|off
+//            sets the runs' crits (off by default)
 //
 // Each crit plays twice: cold (its first play after a page load) and warm
 // (played once first), budgets checked on both.
@@ -50,6 +51,8 @@ const flag = (name, fallback) => {
 const throttle = Number(flag("throttle", "4"));
 const url = flag("url", "http://localhost:5173/kitty-inc/perf/index.html");
 const ref = flag("ref", "");
+// the rig's crit mode for every run (perf/scenarios CRIT_MODES)
+const mode = flag("mode", "off");
 const desktop = args.includes("--desktop");
 const keep = args.includes("--keep");
 const json = args.includes("--json");
@@ -219,7 +222,7 @@ async function measure(runs) {
       deviceScaleFactor: 3,
       mobile: true,
     });
-  const query = `run=${runs.map((r) => `${r}@off`).join(",")}${counts ? "" : "&counts=0"}&stamp=${Date.now()}`;
+  const query = `run=${runs.map((r) => `${r}@${mode}`).join(",")}${counts ? "" : "&counts=0"}&stamp=${Date.now()}`;
   await cdp.send("Page.navigate", { url: `${url}?${query}` });
   const deadline = Date.now() + 90_000 + runs.length * 60_000;
   let results = null;
@@ -270,7 +273,7 @@ const relative = (file) => file.replaceAll("\\", "/").replace(/^src\//, "");
 
 function report(targets, results, errors) {
   const lines = [];
-  const result = (run) => results.find((s) => s.name === `${run}@off`);
+  const result = (run) => results.find((s) => s.name === `${run}@${mode}`);
   const reference = ref ? result(`warm:${toRun(ref).run}`) : null;
   lines.push(
     `crit perf: ${throttle}x CPU, ${desktop ? "desktop" : "phone 430x932 @3x"}${reference ? `, against ${reference.name}` : ""}`,

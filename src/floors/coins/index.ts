@@ -280,6 +280,10 @@ function drawHangGlint(
   );
 }
 
+// a tick's air drag, worked out once per dt rather than per coin
+let dragDt = NaN;
+let drag = 1;
+
 function advanceCoin(p: Particle, dt: number): void {
   const fling = p.fling;
   if (fling) {
@@ -349,7 +353,11 @@ function advanceCoin(p: Particle, dt: number): void {
   // floating — bills use a much gentler ramp (see gravityRamp's own comment)
   // since paper flutters down instead of dropping like metal
   p.vy += (p.gravity + p.life * p.gravityRamp) * dt;
-  p.vx *= Math.pow(0.96, dt);
+  if (dt !== dragDt) {
+    dragDt = dt;
+    drag = Math.pow(0.96, dt);
+  }
+  p.vx *= drag;
   p.life += dt;
   p.spinFrame += p.spinDir * p.spinRate * dt;
 }
@@ -406,6 +414,45 @@ export function spawnFreezeCoinBurst(
 const spareCoins: Particle[] = [];
 function recycleCoin(p: Particle): void {
   if (spareCoins.length < MAX_PARTICLES) spareCoins.push(p);
+}
+
+// a coin with every field set in one order: however coins spawn they share
+// one shape, so the loops over hundreds of them each frame stay fast
+function takeCoin(floor: Floor): Particle {
+  const p = spareCoins.pop();
+  if (p) {
+    p.floor = floor;
+    return p;
+  }
+  return {
+    floor,
+    x: 0,
+    y: 0,
+    vx: 0,
+    vy: 0,
+    life: 0,
+    maxLife: 0,
+    size: 0,
+    gravity: 0,
+    gravityRamp: 0,
+    kind: "coin",
+    spinFrame: 0,
+    spinRate: 0,
+    spinDir: 1,
+    axisAngle: 0,
+    axisCos: 1,
+    axisSin: 0,
+    homing: undefined,
+    fling: undefined,
+    pathScale: undefined,
+  };
+}
+
+// a random tilt for the coin's spin, its cos and sin kept for the draw
+function tilt(p: Particle): void {
+  p.axisAngle = (Math.random() * 2 - 1) * (Math.PI / 2);
+  p.axisCos = Math.cos(p.axisAngle);
+  p.axisSin = Math.sin(p.axisAngle);
 }
 
 // the flow's heartbeat: while bursts keep coming (a held upgrade button), the
@@ -508,8 +555,7 @@ function spawnBurstParticles(
     const spread = freezeGroup ? FREEZE_SPAWN_SPREAD_PX : 20 * scale;
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
-    const p = spareCoins.pop() ?? ({} as Particle);
-    p.floor = floor;
+    const p = takeCoin(floor);
     p.x = x + (Math.random() - 0.5) * spread;
     p.y = y + (Math.random() - 0.5) * spread;
     p.vx = Math.cos(angle) * speed;
@@ -536,7 +582,7 @@ function spawnBurstParticles(
     p.spinRate =
       MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE);
     p.spinDir = Math.random() < 0.5 ? 1 : -1;
-    p.axisAngle = (Math.random() * 2 - 1) * (Math.PI / 2);
+    tilt(p);
     p.homing = freezeGroup
       ? {
           burstLife: Infinity,
@@ -577,26 +623,28 @@ export function spawnHomingCoinBurst(
             burstLife,
         )
       : HOMING_FLIGHT_TICKS;
-    pool.spawn({
-      floor,
-      x: x + (Math.random() - 0.5) * 20,
-      y: y + (Math.random() - 0.5) * 20,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      life: 0,
-      maxLife: burstLife + flightTicks,
-      size: (22 + Math.random() * 40) * 1.15 * 1.25,
-      gravity: 0.1 + Math.random() * 0.15,
-      gravityRamp: 0,
-      kind,
-      spinFrame:
-        Math.random() *
-        (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
-      spinRate: MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE),
-      spinDir: Math.random() < 0.5 ? 1 : -1,
-      axisAngle: (Math.random() * 2 - 1) * (Math.PI / 2),
-      homing: { burstLife, flightTicks, group },
-    });
+    const p = takeCoin(floor);
+    p.x = x + (Math.random() - 0.5) * 20;
+    p.y = y + (Math.random() - 0.5) * 20;
+    p.vx = Math.cos(angle) * speed;
+    p.vy = Math.sin(angle) * speed;
+    p.life = 0;
+    p.maxLife = burstLife + flightTicks;
+    p.size = (22 + Math.random() * 40) * 1.15 * 1.25;
+    p.gravity = 0.1 + Math.random() * 0.15;
+    p.gravityRamp = 0;
+    p.kind = kind;
+    p.spinFrame =
+      Math.random() *
+      (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT);
+    p.spinRate =
+      MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE);
+    p.spinDir = Math.random() < 0.5 ? 1 : -1;
+    tilt(p);
+    p.homing = { burstLife, flightTicks, group };
+    p.fling = undefined;
+    p.pathScale = undefined;
+    pool.spawn(p);
   }
 
   pool.ensureTicking((dt) => {
@@ -637,8 +685,7 @@ export function spawnFlingCoinBurst(
     const reach = randomIn(FLING_REACH) * width;
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
-    const p = spareCoins.pop() ?? ({} as Particle);
-    p.floor = floor;
+    const p = takeCoin(floor);
     p.x = x;
     p.y = y;
     p.vx = 0;
@@ -655,7 +702,7 @@ export function spawnFlingCoinBurst(
     p.spinRate =
       MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE);
     p.spinDir = Math.random() < 0.5 ? 1 : -1;
-    p.axisAngle = (Math.random() * 2 - 1) * (Math.PI / 2);
+    tilt(p);
     p.homing = undefined;
     p.pathScale = undefined;
     p.fling = {
@@ -777,36 +824,36 @@ function spawnSprayCoin(
     life > 0 || spray.path
       ? sprayPosition(spray, life)
       : { x: spray.x0, y: spray.y0 };
-  sprayPool.spawn({
-    floor,
-    x: at.x,
-    y: at.y,
-    // a path's own scale from the first frame, so hidden coins never flash
-    pathScale: spray.path ? at.scale : undefined,
-    vx: 0,
-    vy: 0,
-    life,
-    maxLife: Infinity,
-    size: Math.min(
-      (22 + Math.random() * 46) * 1.15 * 1.25,
-      (maxSize ?? Infinity) / getSpriteReach(kind),
-    ),
-    gravity: 0,
-    gravityRamp: 0,
-    kind,
-    spinFrame:
-      Math.random() *
-      (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
-    spinRate: MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE),
-    spinDir: Math.random() < 0.5 ? 1 : -1,
-    axisAngle: (Math.random() * 2 - 1) * (Math.PI / 2),
-    homing: {
-      burstLife: Infinity,
-      flightTicks: randomIn(flightTicks),
-      group,
-      spray,
-    },
-  });
+  const p = takeCoin(floor);
+  p.x = at.x;
+  p.y = at.y;
+  p.vx = 0;
+  p.vy = 0;
+  p.life = life;
+  p.maxLife = Infinity;
+  p.size = Math.min(
+    (22 + Math.random() * 46) * 1.15 * 1.25,
+    (maxSize ?? Infinity) / getSpriteReach(kind),
+  );
+  p.gravity = 0;
+  p.gravityRamp = 0;
+  p.kind = kind;
+  p.spinFrame =
+    Math.random() *
+    (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT);
+  p.spinRate = MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE);
+  p.spinDir = Math.random() < 0.5 ? 1 : -1;
+  tilt(p);
+  p.homing = {
+    burstLife: Infinity,
+    flightTicks: randomIn(flightTicks),
+    group,
+    spray,
+  };
+  p.fling = undefined;
+  // a path's own scale from the first frame, so hidden coins never flash
+  p.pathScale = spray.path ? at.scale : undefined;
+  sprayPool.spawn(p);
 }
 
 registerCoinStream({

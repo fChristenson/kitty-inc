@@ -20,6 +20,8 @@ export interface Summary {
   longTaskMs: number;
   // canvas calls per frame, by method
   calls: Record<string, number>;
+  // drawImage calls per frame by who made them (sampled), most first
+  drawCallers: [string, number][];
   canvases: number;
   canvasSources: [string, number][];
   bitmaps: number;
@@ -68,6 +70,10 @@ const COUNTED = [
 
 let recording = false;
 let counts: Record<string, number> = {};
+// every DRAW_SAMPLE-th drawImage is traced to its caller
+const DRAW_SAMPLE = 16;
+const drawCallers = new Map<string, number>();
+let drawCalls = 0;
 const deltas: number[] = [];
 // when each of deltas' frames ended, from start()
 const frameEnds: number[] = [];
@@ -95,12 +101,12 @@ const memory = () =>
 
 // a short "file:line < file:line" of who made a canvas: a source file on the
 // dev server, a chunk (named after its function) in the perf build
-function caller(): string {
+function caller(depth = 2): string {
   return (new Error().stack ?? "")
     .split("\n")
     .slice(3)
     .filter((line) => /\/(src|assets)\//.test(line))
-    .slice(0, 2)
+    .slice(0, depth)
     .map((line) =>
       line
         .trim()
@@ -130,7 +136,13 @@ export function instrument(countCalls: boolean): void {
     for (const name of COUNTED) {
       const original = proto[name];
       proto[name] = function (this: unknown, ...args: unknown[]) {
-        if (recording) counts[name] = (counts[name] ?? 0) + 1;
+        if (recording) {
+          counts[name] = (counts[name] ?? 0) + 1;
+          if (name === "drawImage" && ++drawCalls % DRAW_SAMPLE === 0) {
+            const at = caller(4);
+            drawCallers.set(at, (drawCallers.get(at) ?? 0) + 1);
+          }
+        }
         return original.apply(this, args);
       };
     }
@@ -193,6 +205,8 @@ export function timeRedraw(redraw: () => void): () => void {
 
 export function start(): void {
   counts = {};
+  drawCallers.clear();
+  drawCalls = 0;
   deltas.length = 0;
   frameEnds.length = 0;
   redraws.length = 0;
@@ -275,6 +289,10 @@ export async function stop(name: string): Promise<Summary> {
     calls: Object.fromEntries(
       Object.entries(counts).map(([key, n]) => [key, perFrame(n)]),
     ),
+    drawCallers: [...drawCallers.entries()]
+      .map(([at, n]): [string, number] => [at, perFrame(n * DRAW_SAMPLE)])
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 40),
     canvases,
     canvasSources: [...sources.entries()]
       .sort((a, b) => b[1] - a[1])

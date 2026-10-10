@@ -34,6 +34,10 @@ const MAX_SPIN_RATE = 0.12;
 const PRESCALE_CELL_H = 200; // comfortably above any real on-screen particle size
 let coinFrameCanvases: HTMLCanvasElement[] | null = null;
 let billFrameCanvases: HTMLCanvasElement[] | null = null;
+// every frame's width over its height: reading a canvas's size per coin is a
+// DOM call
+let coinAspect = 1;
+let billAspect = 1;
 
 function buildFrameCanvases(
   image: HTMLImageElement,
@@ -72,6 +76,8 @@ export async function loadCoinBurstImages(): Promise<HTMLImageElement> {
   ]);
   coinFrameCanvases = buildFrameCanvases(coin, COIN_SPIN_FRAME_COUNT);
   billFrameCanvases = buildFrameCanvases(bill, BILL_SPIN_FRAME_COUNT);
+  coinAspect = coinFrameCanvases[0].width / coinFrameCanvases[0].height;
+  billAspect = billFrameCanvases[0].width / billFrameCanvases[0].height;
   // off the startup path, each in its own slice: until then coins draw from
   // the full-size frames
   const coinFrames = coinFrameCanvases;
@@ -170,6 +176,10 @@ export interface CoinBurstSprite {
   kind: "coin" | "bill";
   spinFrame: number; // fractional flipbook position, floored when drawing
   axisAngle: number; // screen-space tilt of the spin's squish axis; 0 if the caller doesn't care
+  // cos and sin of axisAngle, if the caller keeps them (a coin drawn every
+  // frame needn't work them out each time)
+  axisCos?: number;
+  axisSin?: number;
 }
 
 // per sprite: how far from its center it reaches when drawn at radius 1, at
@@ -226,6 +236,7 @@ export function createCoinBurstParticles(
     const speed = 3 + Math.random() * 16;
     const kind: "coin" | "bill" =
       Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
+    const axisAngle = (Math.random() * 2 - 1) * (Math.PI / 2);
     out.push({
       x: x + (Math.random() - 0.5) * 20,
       y: y + (Math.random() - 0.5) * 20,
@@ -247,7 +258,9 @@ export function createCoinBurstParticles(
         (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
       spinRate: MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE),
       spinDir: Math.random() < 0.5 ? 1 : -1,
-      axisAngle: (Math.random() * 2 - 1) * (Math.PI / 2),
+      axisAngle,
+      axisCos: Math.cos(axisAngle),
+      axisSin: Math.sin(axisAngle),
     });
   }
   return out;
@@ -257,6 +270,10 @@ export function createCoinBurstParticles(
 // unit spawnCoinBurst's own random ranges above are tuned against); pruning
 // expired particles is the pool's own job (see shared/particlePool), not this
 // function's
+// a tick's air drag, worked out once per dt rather than per particle
+let dragDt = NaN;
+let drag = 1;
+
 function advanceCoinBurstParticle(p: CoinBurstParticle, dt: number): void {
   p.x += p.vx * dt;
   p.y += p.vy * dt;
@@ -264,7 +281,11 @@ function advanceCoinBurstParticle(p: CoinBurstParticle, dt: number): void {
   // floating — bills use a much gentler ramp (see gravityRamp's own comment)
   // since paper flutters down instead of dropping like metal
   p.vy += (p.gravity + p.life * p.gravityRamp) * dt;
-  p.vx *= Math.pow(0.96, dt);
+  if (dt !== dragDt) {
+    dragDt = dt;
+    drag = Math.pow(0.96, dt);
+  }
+  p.vx *= drag;
   p.life += dt;
   p.spinFrame += p.spinDir * p.spinRate * dt;
 }
@@ -393,10 +414,9 @@ export function queueCoinSprite(
   const d = batchD;
   const px = a * x + c * y + batchE;
   const py = b * x + d * y + batchF;
-  const frameCanvas = frameCanvases[frame];
-  const halfW = radius * (frameCanvas.width / frameCanvas.height);
-  const cos = Math.cos(sprite.axisAngle);
-  const sin = Math.sin(sprite.axisAngle);
+  const halfW = radius * (bill ? billAspect : coinAspect);
+  const cos = sprite.axisCos ?? Math.cos(sprite.axisAngle);
+  const sin = sprite.axisSin ?? Math.sin(sprite.axisAngle);
   const ux = (a * cos + c * sin) * halfW;
   const uy = (b * cos + d * sin) * halfW;
   const vx = (c * cos - a * sin) * radius;
@@ -505,11 +525,10 @@ export function drawCoinBurstFrame(
   const px = a * x + c * y + e;
   const py = b * x + d * y + f;
   if (batchCtx === ctx) {
-    const frameCanvas = frameCanvases[frame];
     const halfH = destH / 2;
-    const halfW = halfH * (frameCanvas.width / frameCanvas.height);
-    const cos = Math.cos(sprite.axisAngle);
-    const sin = Math.sin(sprite.axisAngle);
+    const halfW = halfH * (sprite.kind === "bill" ? billAspect : coinAspect);
+    const cos = sprite.axisCos ?? Math.cos(sprite.axisAngle);
+    const sin = sprite.axisSin ?? Math.sin(sprite.axisAngle);
     queueCoin(
       (sprite.kind === "bill" ? COIN_SPIN_FRAME_COUNT : 0) + frame,
       px,

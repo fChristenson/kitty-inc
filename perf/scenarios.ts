@@ -90,6 +90,9 @@ export function prepareRun(mode: CritMode, seed: number): void {
     mode === "on" || mode === "frequent" ? gameOdds.gateway : 0;
   setCritRandom(seed ? seeded(seed) : Math.random);
   scenarioRandom = seed ? seeded(seed + 1) : Math.random;
+  // every other roll in the game too (spawns, coin bursts, sparkles), so runs
+  // repeat closely enough to compare
+  if (seed) Math.random = seeded(seed + 2);
 }
 
 const sleep = (ms: number) =>
@@ -296,6 +299,75 @@ export const SCENARIOS: Scenario[] = [
       bridge.scrollToFloor(bridge.getActiveFloors()[2] ?? ground(bridge));
       await sleep(500);
       return measure("idle", 6000);
+    },
+  },
+  {
+    name: "crit-hold",
+    about:
+      "a long-press on the ground floor while floor and income crits play back to back",
+    run: async (bridge) => {
+      click("#add-money");
+      bridge.scrollToFloor(ground(bridge), 0.6);
+      await sleep(300);
+      const income = [
+        ...document.querySelectorAll<HTMLButtonElement>("[data-income-crit]"),
+      ].map((button) => button.dataset.incomeCrit!);
+      let n = 0;
+      const arm = () =>
+        click(
+          n++ % 2
+            ? `[data-income-crit="${pick(income)}"]`
+            : `[data-floor-crit="${pick(floorCritKinds())}"]`,
+        );
+      arm();
+      const release = press(bridge, ground(bridge));
+      const stopArming = every(2500, arm);
+      const summary = await measure("crit-hold", 10000);
+      stopArming();
+      release();
+      return summary;
+    },
+  },
+  {
+    name: "max",
+    about:
+      "everything at once: a long-press during Overtime, floor, income and badge crits back to back, an event, coin storms, shakes and every spawn out (try @frequent)",
+    run: async (bridge) => {
+      await loadEventCatalog();
+      click("#add-money");
+      const floor = ground(bridge);
+      triggerOvertimeBoost(floor, fromNumber(0));
+      bridge.scrollToFloor(floor, 0.6);
+      await sleep(300);
+      for (const id of ["wisp", "fireflies", "coin", "gusher"])
+        click(`#test-${id}-spawn-event`);
+      click("#test-bubbles-event");
+      click("#spawn-mouse");
+      const income = [
+        ...document.querySelectorAll<HTMLButtonElement>("[data-income-crit]"),
+      ].map((button) => button.dataset.incomeCrit!);
+      let n = 0;
+      const arm = () => {
+        const k = n++ % 3;
+        if (k === 0) click(`[data-floor-crit="${pick(floorCritKinds())}"]`);
+        else if (k === 1) click(`[data-income-crit="${pick(income)}"]`);
+        else armRandomCrit();
+      };
+      arm();
+      const release = press(bridge, floor);
+      const stopArming = every(900, arm);
+      const stopStorm = burstStorm(bridge);
+      const stopShakes = every(400, () => shakeScreen(1.3));
+      const event = setTimeout(() => {
+        click(`#test-${pick(SAMPLE_EVENTS)}-event`);
+      }, 4000);
+      const summary = await measure("max", 10000);
+      clearTimeout(event);
+      stopShakes();
+      stopStorm();
+      stopArming();
+      release();
+      return summary;
     },
   },
   {
@@ -561,6 +633,32 @@ export function floorCritScenario(kind: string, group = "floor"): Scenario {
       await sleep(300);
       tap(bridge, ground(bridge));
       return measure(name, 4000);
+    },
+  };
+}
+
+const SPAWN_BUTTONS: Record<string, string> = {
+  mouse: "#spawn-mouse",
+  bubbles: "#test-bubbles-event",
+};
+
+// a long-press with a random spawn (spawn:fireflies, spawn:none for none)
+// forced on screen as it starts; spawn-idle: without the press
+export function spawnScenario(id: string, hold = true): Scenario {
+  const name = `spawn${hold ? "" : "-idle"}:${id}`;
+  return {
+    name,
+    about: `${hold ? "a long-press" : "idle"} with the ${id} spawn out`,
+    run: async (bridge) => {
+      click("#add-money");
+      const floor = second(bridge);
+      bridge.scrollToFloor(floor, 0.6);
+      await sleep(300);
+      if (id !== "none") click(SPAWN_BUTTONS[id] ?? `#test-${id}-spawn-event`);
+      const release = hold ? press(bridge, floor) : () => {};
+      const summary = await measure(name, 6000);
+      release();
+      return summary;
     },
   };
 }

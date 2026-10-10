@@ -144,6 +144,7 @@ async function boot(): Promise<void> {
     floorCritKinds,
     floorCritScenario,
     critScenario,
+    spawnScenario,
     warmScenario,
     parseRunName,
     prepareRun,
@@ -169,9 +170,13 @@ async function boot(): Promise<void> {
             ? floorCritScenario(name.slice(12), "income")
             : name.startsWith("crit:")
               ? critScenario(name.slice(5))
-              : fixtureOf(name)
-                ? scaleScenario(name)
-                : null)
+              : name.startsWith("spawn:")
+                ? spawnScenario(name.slice(6))
+                : name.startsWith("spawn-idle:")
+                  ? spawnScenario(name.slice(11), false)
+                  : fixtureOf(name)
+                    ? scaleScenario(name)
+                    : null)
     );
   };
   // "events" and "events-all" stand for a sample of events, or every one,

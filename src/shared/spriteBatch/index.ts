@@ -17,7 +17,7 @@ export interface SpriteTexture {
 }
 
 interface Gl {
-  canvas: HTMLCanvasElement;
+  canvas: HTMLCanvasElement | OffscreenCanvas;
   gl: WebGL2RenderingContext;
   vao: WebGLVertexArrayObject;
   instances: WebGLBuffer;
@@ -68,7 +68,12 @@ function compile(
 
 function getGl(): Gl | null {
   if (shared || failed) return shared;
-  const canvas = document.createElement("canvas");
+  // offscreen, the batch hands its pixels over (transferToImageBitmap)
+  // instead of the 2D canvas copying the whole WebGL canvas every stamp
+  const canvas =
+    typeof OffscreenCanvas === "undefined"
+      ? document.createElement("canvas")
+      : new OffscreenCanvas(1, 1);
   const gl = canvas.getContext("webgl2", {
     alpha: true,
     premultipliedAlpha: true,
@@ -76,7 +81,7 @@ function getGl(): Gl | null {
     depth: false,
     stencil: false,
     preserveDrawingBuffer: false,
-  });
+  }) as WebGL2RenderingContext | null;
   if (!gl) {
     failed = true;
     return null;
@@ -203,7 +208,13 @@ export function drawSprites(
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;
-  ctx.drawImage(canvas, x, y, w, h, x, y, w, h);
+  if (canvas instanceof HTMLCanvasElement)
+    ctx.drawImage(canvas, x, y, w, h, x, y, w, h);
+  else {
+    const bitmap = canvas.transferToImageBitmap();
+    ctx.drawImage(bitmap, x, y, w, h, x, y, w, h);
+    bitmap.close();
+  }
   ctx.restore();
   return true;
 }
