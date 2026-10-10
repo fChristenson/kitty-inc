@@ -132,7 +132,7 @@ export const forceBingoEvent = registerWispEvent(
             const shown = clamp01((ms - (i / cells.length) * spreadMs) / 120);
             if (shown <= 0) return;
             const daubed = daubedAt.get(i);
-            const won = ms > lineAt && line.includes(i);
+            const won = ms > lineAt && Math.floor(i / SIZE) === row;
             ctx.globalAlpha = shown * fade * (won ? 1 : 0.6);
             drawGlow(ctx, DOT_GLOW, cell.x, cell.y, DOT);
             if (daubed !== undefined && ms >= daubed) {

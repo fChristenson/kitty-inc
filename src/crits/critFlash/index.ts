@@ -713,8 +713,15 @@ export function warmCritFlashes(
       runWhenIdle(warm);
       return;
     }
-    for (const { label, color, strokeWidth } of flashes)
+    for (const { label, color, strokeWidth } of flashes) {
       warmFlashBitmap(label, color, strokeWidth);
+      // the number a floor crit riding this flash plays out onto the bars
+      getSpinGlyphs(
+        color,
+        strokeWidth,
+        spinGlyphRes(floorCritSizeShare(label)),
+      );
+    }
   };
   runWhenIdle(warm);
 }

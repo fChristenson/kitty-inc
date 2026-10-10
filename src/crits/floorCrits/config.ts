@@ -256,6 +256,34 @@ export const FLOOR_CRIT_CONFIG = {
     plasmaCannonCrit: {
       chance: 0.03,
     },
+    // grenades lobbed onto the bars, each skipping twice and blowing
+    grenadesCrit: {
+      chance: 0.03,
+    },
+    // a salvo of small rockets all over the bars, then a heavy one onto its own
+    rocketPodsCrit: {
+      chance: 0.03,
+    },
+    // shots banking off the screen's sides down the bars, then a slug
+    bankShotsCrit: {
+      chance: 0.03,
+    },
+    // a minigun's stream whipping across the bars, then locked onto its own
+    minigunCrit: {
+      chance: 0.03,
+    },
+    // mines on the bars' ends rattling blasts along them, meeting on its own
+    claymoresCrit: {
+      chance: 0.03,
+    },
+    // a fighter diving across the bars in an X, then strafing its own
+    strafeCrit: {
+      chance: 0.03,
+    },
+    // a shot ricocheting coin to coin down onto the bars, then into its own
+    coinShotCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

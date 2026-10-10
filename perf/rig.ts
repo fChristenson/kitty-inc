@@ -28,6 +28,11 @@
 // A run name can carry its crit mode: hold@off (no crits), hold@tiers (crit
 // tiers, no procs or events), hold@on.
 //
+// One crit start to finish: floor-crit:<kind>, event:<id> or crit:<kind> (a
+// proc or badge crit at the top tier); warm:<run> plays it once unmeasured
+// first. `node scripts/crit-perf.mjs` runs new crits both ways, throttled, and
+// reports what they cost and where.
+//
 // scale:<buildings>[x<companies>] runs the same idle, long-press and map on a
 // fixture of that size, whatever the URL says ("scale" runs 1, 50 and 100
 // buildings; "scale-companies" the same with 10 companies).
@@ -39,6 +44,7 @@
 import { clearBase, hasBase, loadFixture, seedBase } from "./storage";
 import { instrument, start, stop, timeRedraw, type Summary } from "./metrics";
 import { loadResults, mountPanel, saveResults } from "./report";
+import type { Scenario } from "./scenarios";
 
 const QUEUE_KEY = "perf-rig:queue";
 const RESULTS_KEY = "perf-rig:results";
@@ -137,6 +143,8 @@ async function boot(): Promise<void> {
     eventScenario,
     floorCritKinds,
     floorCritScenario,
+    critScenario,
+    warmScenario,
     parseRunName,
     prepareRun,
     scaleScenario,
@@ -146,15 +154,24 @@ async function boot(): Promise<void> {
       ? (options.crits as keyof typeof CRIT_MODES)
       : "on";
 
-  const find = (name: string) =>
-    SCENARIOS.find((s) => s.name === name) ??
-    (name.startsWith("event:")
-      ? eventScenario(name.slice(6))
-      : name.startsWith("floor-crit:")
-        ? floorCritScenario(name.slice(11))
-        : fixtureOf(name)
-          ? scaleScenario(name)
-          : null);
+  const find = (name: string): Scenario | null => {
+    if (name.startsWith("warm:")) {
+      const inner = find(name.slice(5));
+      return inner && warmScenario(inner);
+    }
+    return (
+      SCENARIOS.find((s) => s.name === name) ??
+      (name.startsWith("event:")
+        ? eventScenario(name.slice(6))
+        : name.startsWith("floor-crit:")
+          ? floorCritScenario(name.slice(11))
+          : name.startsWith("crit:")
+            ? critScenario(name.slice(5))
+            : fixtureOf(name)
+              ? scaleScenario(name)
+              : null)
+    );
+  };
   // "events" and "events-all" stand for a sample of events, or every one,
   // keeping any @mode
   const expand = (names: string[]) =>
@@ -215,11 +232,11 @@ async function boot(): Promise<void> {
     let summary: Summary;
     if (current === "startup") {
       await sleep(STARTUP_MS);
-      summary = stop("startup");
+      summary = await stop("startup");
     } else {
       if (!find(parseRunName(current).base)?.cold) await sleep(options.warmup);
       summary = (await runNamed(current)) ?? {
-        ...stop(current),
+        ...(await stop(current)),
         name: `${current} (unknown)`,
       };
     }

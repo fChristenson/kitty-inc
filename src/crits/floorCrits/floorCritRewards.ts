@@ -1702,6 +1702,18 @@ function floorCritLevels(
   // blasts a shot
   if (kind === "geysersCrit") return Math.ceil(count / 7);
   if (kind === "plasmaCannonCrit") return Math.ceil(count / 6);
+  // grenades touch each bar about eight times, rocket pods hit each about
+  // five times, bank shots cross each about five times and a minigun's
+  // stream blasts each about eight times
+  if (kind === "grenadesCrit" || kind === "minigunCrit")
+    return Math.ceil(count / 8);
+  if (kind === "rocketPodsCrit" || kind === "bankShotsCrit")
+    return Math.ceil(count / 5);
+  // claymores rattle about fourteen blasts along each bar, a strafe about six
+  // and a coin shot's ricochets about four
+  if (kind === "claymoresCrit") return Math.ceil(count / 14);
+  if (kind === "strafeCrit") return Math.ceil(count / 6);
+  if (kind === "coinShotCrit") return Math.ceil(count / 4);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);

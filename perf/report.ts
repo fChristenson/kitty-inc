@@ -62,6 +62,10 @@ function row(s: Summary, base: Summary | undefined): string {
   const startup = Object.entries(s.startup ?? {})
     .map(([mark, ms]) => `${mark} ${fixed(ms, 0)}`)
     .join(" · ");
+  const hot = (s.profile?.self ?? [])
+    .slice(0, 8)
+    .map(([fn, ms]) => `<li>${fixed(ms, 0)}ms ${fn}</li>`)
+    .join("");
   return `
     <tr>
       <td title="${s.ms.toFixed(0)}ms, ${s.frames} frames">${s.name}</td>
@@ -85,6 +89,7 @@ function row(s: Summary, base: Summary | undefined): string {
         ${timeline ? `<div>each 0.5s, fps/worst frame ms: ${timeline}</div>` : ""}
         ${startup ? `<div>ms from navigation: ${startup}</div>` : ""}
         ${sources ? `<div>canvases made by:</div><ul>${sources}</ul>` : ""}
+        ${hot ? `<div>own time by function:</div><ul>${hot}</ul>` : ""}
       </details>
     </td></tr>`;
 }

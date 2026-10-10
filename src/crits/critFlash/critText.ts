@@ -66,6 +66,8 @@ const textSprites = new Map<
   string,
   { canvas: HTMLCanvasElement; width: number; height: number }
 >();
+// document.fonts.check is slow: once a font is in, it stays in
+const readyFonts = new Set<string>();
 
 function critTextSprite(
   label: string,
@@ -75,7 +77,10 @@ function critTextSprite(
 ): { canvas: HTMLCanvasElement; width: number; height: number } | null {
   const font = critFont(style.fontSize);
   // never bake in the fallback font while Fredoka is still loading
-  if (!document.fonts.check(font)) return null;
+  if (!readyFonts.has(font)) {
+    if (!document.fonts.check(font)) return null;
+    readyFonts.add(font);
+  }
   const key = `${label}|${color}|${style.fontSize}|${style.strokeWidth}|${scale}`;
   let sprite = textSprites.get(key);
   if (sprite) return sprite;

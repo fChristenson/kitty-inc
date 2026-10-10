@@ -35,6 +35,10 @@ const gameMarkup: Plugin = {
   },
 };
 
+// the perf rig samples its runs with the JS Self-Profiling API, which the page
+// must be served with this header for
+const profiling = { "Document-Policy": "js-profiling" };
+
 // served from https://fChristenson.github.io/kitty-inc/ (a GitHub Pages project
 // site, not a custom domain or a <user>.github.io repo), so every asset URL must be
 // prefixed with the repo name or they'd 404 once deployed.
@@ -45,6 +49,8 @@ const gameMarkup: Plugin = {
 export default defineConfig(({ mode }) => ({
   base: "/kitty-inc/",
   plugins: [critKinds, gameMarkup],
+  server: { headers: profiling },
+  preview: { headers: profiling },
   ...(mode === "perf" && {
     build: {
       outDir: "dist-perf",

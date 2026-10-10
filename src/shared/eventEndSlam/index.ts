@@ -555,11 +555,9 @@ export function drawSlamText(
     return;
   }
   const digitCell = tabular ? maxDigitWidth(ctx, font) : 0;
-  let fullWidth = 0;
-  if (!tabular) fullWidth = measure(ctx, text, font);
-  else
-    for (let i = 0; i < text.length; i++)
-      fullWidth += isDigit(text[i]) ? digitCell : measure(ctx, text[i], font);
+  // where each letter sits, worked out once per text
+  const layout = restLayout(ctx, text, font, tabular);
+  const fullWidth = layout.width;
   const align = ctx.textAlign;
   const left =
     align === "center"
@@ -594,12 +592,10 @@ export function drawSlamText(
       // a kerned letter is measured through itself, so the kern before it is kept
       const end = tabular
         ? start + (digit ? digitCell : width)
-        : measure(ctx, text.slice(0, i + 1), font);
-      const cellWidth = end - start;
+        : layout.offsets[i] + width;
       // a digit centers in its cell; a kerned letter sits flush right, after the kern
-      const lx =
-        left + start + (digit ? (cellWidth - width) / 2 : cellWidth - width);
-      const centerX = left + start + cellWidth / 2;
+      const lx = left + layout.offsets[i];
+      const centerX = left + (start + end) / 2;
       start = end;
       if (char === " ") continue;
       const glyph = getSlamGlyph(ctx, glyphs, char);
@@ -704,21 +700,47 @@ function getSlamGlyphSet(
   strokeColor: string,
   strokeWidth: number,
 ): SlamGlyphSet {
+  // a moving text finds its set every frame: remembered per font and text,
+  // so it isn't measured again each time
+  const font = ctx.font;
+  const baseline = ctx.textBaseline;
+  let byText = setsByText.get(font);
+  if (!byText) setsByText.set(font, (byText = new Map()));
+  const known = byText.get(text);
+  if (
+    known &&
+    known.baseline === baseline &&
+    known.set.fillColor === fillColor &&
+    known.set.strokeColor === strokeColor &&
+    known.set.strokeWidth === strokeWidth
+  )
+    return known.set;
   const metrics = ctx.measureText(text);
   const ascent = Math.round(metrics.actualBoundingBoxAscent);
   const descent = Math.round(metrics.actualBoundingBoxDescent);
-  const key = `${ctx.font}|${ctx.textBaseline}|${fillColor}|${strokeColor}|${strokeWidth}|${ascent}|${descent}`;
+  const key = `${font}|${baseline}|${fillColor}|${strokeColor}|${strokeWidth}|${ascent}|${descent}`;
   let set = glyphSets.get(key);
   if (!set) {
     if (glyphSets.size >= MAX_GLYPH_SETS) {
       glyphSets.clear();
       warmedSets.clear();
+      setsByText.clear();
+      setsByText.set(font, byText);
+      byText.clear();
     }
     set = { glyphs: new Map(), text, fillColor, strokeColor, strokeWidth };
     glyphSets.set(key, set);
   }
+  if (byText.size >= MAX_KNOWN_TEXTS) byText.clear();
+  byText.set(text, { baseline, set });
   return set;
 }
+
+const MAX_KNOWN_TEXTS = 400;
+const setsByText = new Map<
+  string,
+  Map<string, { baseline: CanvasTextBaseline; set: SlamGlyphSet }>
+>();
 
 // per font, the set a resting text last warmed: a counting readout's text
 // changes every frame, so it isn't measured again to find its set

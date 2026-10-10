@@ -133,7 +133,7 @@ Draw with these so events run smoothly on phones; never rebuild them inside an e
 | Shattering, screen pieces          | `shared/shatter` (`createPane`, `drawCracks`, `drawShards`, `releasePane`); `shared/screenCopy` (`copyScreen` once, `drawScreenPart`)                                                                                     |
 | Sparkles, text, impacts, dimming   | `shared/twinkle` `stampGlimmer` (set `"lighter"` once per loop); `critFlash/critText` `drawCachedCritText`; `shared/eventFx` `drawWhiteBurst` / `drawExplosion`; `shared/screenFreeze` `drawFreezeDimmed` (stable key)    |
 
-Performance: build sprites, paths and lookups once at arm, never allocate in the draw loop; skip anything past its window (`drawWispBetween`) and return early once done; never `ctx.filter` or `shadowBlur` in a frame.
+Performance (every crit: events, floor crits, flashes): build sprites, paths, gradients, glyphs and lookups once at arm or on first use (cached), never in the draw loop; in a draw, no `.map`/`.filter`/`.slice`/spread/closures per item, no sort (presort at arm, or reuse one array and sort it in place), no `indexOf`/`includes`/`find` inside a loop (keep the index, or a Set/flag made at arm), no `measureText` (cache by text); skip anything past its window (`drawWispBetween`) and return early once done; never `ctx.filter`, `shadowBlur` or pixel readback in a frame. Check every new crit with `node scripts/crit-perf.mjs` (the dev server running; with no names it takes the crits changed in git): it plays each cold and warm at 4x CPU on a phone screen, checks budgets, profiles where the time goes and runs `scripts/perf-audit.mjs` over its code; fix every HOT or high finding before handing it over.
 
 ## Crit rules
 

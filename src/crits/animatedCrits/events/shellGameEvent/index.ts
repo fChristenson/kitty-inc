@@ -92,6 +92,9 @@ interface CupPose {
   scale: number;
 }
 
+const byDepth = (p: { pose: CupPose }, q: { pose: CupPose }) =>
+  p.pose.y - q.pose.y;
+
 registerEventProc(
   {
     key: KEY,
@@ -235,6 +238,11 @@ registerEventProc(
         pose: CupPose,
         grow: number,
       ) => drawGlowSprite(ctx, cup, pose.x, pose.y, pose.scale * grow);
+      // each frame's cups, reused and sorted in place
+      const posed = Array.from({ length: CUPS }, () => ({
+        pose: { x: 0, y: 0, scale: 1 } as CupPose,
+        grow: 1,
+      }));
 
       const cover = startMoneyCover(
         KEY,
@@ -301,13 +309,13 @@ registerEventProc(
             );
             if (ms < shuffledAt + revealMs * FLY) {
               const grow = 1 - (1 - clamp01(ms / POP_MS)) ** 3;
-              const poses = Array.from({ length: CUPS }, (_, cup) => ({
-                pose: cupAt(cup, ms),
-                grow: cup === 1 ? 1 : grow,
-              }));
+              for (let k = 0; k < CUPS; k++) {
+                posed[k].pose = cupAt(k, ms);
+                posed[k].grow = k === 1 ? 1 : grow;
+              }
               // the ones swinging behind first
-              poses.sort((p, q) => p.pose.y - q.pose.y);
-              for (const { pose, grow: g } of poses) drawCup(ctx, pose, g);
+              posed.sort(byDepth);
+              for (const { pose, grow: g } of posed) drawCup(ctx, pose, g);
             }
             ctx.restore();
           },

@@ -353,6 +353,13 @@ const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   revolverCrit: () => import("../crits/revolverCrit"),
   geysersCrit: () => import("../crits/geysersCrit"),
   plasmaCannonCrit: () => import("../crits/plasmaCannonCrit"),
+  grenadesCrit: () => import("../crits/grenadesCrit"),
+  rocketPodsCrit: () => import("../crits/rocketPodsCrit"),
+  bankShotsCrit: () => import("../crits/bankShotsCrit"),
+  minigunCrit: () => import("../crits/minigunCrit"),
+  claymoresCrit: () => import("../crits/claymoresCrit"),
+  strafeCrit: () => import("../crits/strafeCrit"),
+  coinShotCrit: () => import("../crits/coinShotCrit"),
 };
 const loading = new Map<FloorCritKind, Promise<unknown>>();
 

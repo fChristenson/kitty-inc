@@ -1373,6 +1373,13 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-floor-crit="revolverCrit">Revolver Crit</button>
           <button class="game__button" data-floor-crit="geysersCrit">Geysers Crit</button>
           <button class="game__button" data-floor-crit="plasmaCannonCrit">Plasma Cannon Crit</button>
+          <button class="game__button" data-floor-crit="grenadesCrit">Grenades Crit</button>
+          <button class="game__button" data-floor-crit="rocketPodsCrit">Rocket Pods Crit</button>
+          <button class="game__button" data-floor-crit="bankShotsCrit">Bank Shots Crit</button>
+          <button class="game__button" data-floor-crit="minigunCrit">Minigun Crit</button>
+          <button class="game__button" data-floor-crit="claymoresCrit">Claymores Crit</button>
+          <button class="game__button" data-floor-crit="strafeCrit">Strafe Crit</button>
+          <button class="game__button" data-floor-crit="coinShotCrit">Coin Shot Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

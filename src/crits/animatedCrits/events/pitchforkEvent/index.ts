@@ -92,10 +92,11 @@ export const forcePitchforkEvent = registerWispEvent(
         tick: (ms, now) => striking.tick(ms, now),
         drawOver: (ctx, ms, now) => {
           if (ms > endAt + 1_200) return;
-          for (const r of rounds) {
+          for (let k = 0; k < rounds.length; k++) {
+            const r = rounds[k];
             const t = (ms - r.at) / BOLT_MS;
             if (t < 0 || t >= 1) continue;
-            const scale = 1 + 0.3 * rounds.indexOf(r);
+            const scale = 1 + 0.3 * k;
             drawBolt(ctx, r.trunk, 1 - t, scale);
             for (const p of r.prongs) {
               drawBolt(ctx, p.bolt, 1 - t, scale * 0.8);

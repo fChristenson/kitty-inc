@@ -169,10 +169,10 @@ export const forceHoldingPatternEvent = registerWispEvent(
         },
         drawOver: (ctx, ms, now) => {
           if (ms < 0 || ms > endAt) return;
-          for (const l of landings) {
-            const t = (ms - l.touches) / skidMs;
+          for (let k = 0; k < landings.length; k++) {
+            const t = (ms - landings[k].touches) / skidMs;
             if (t < 0 || t >= 1) continue;
-            const at = planes[landings.indexOf(l)](ms);
+            const at = planes[k](ms);
             if (!at) continue;
             skid.x = at.x;
             skid.y = at.y;

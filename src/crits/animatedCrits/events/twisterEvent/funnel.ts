@@ -34,26 +34,49 @@ interface FunnelCoin extends CoinBurstSprite {
   spinRate: number;
 }
 
-export interface Funnel {
-  coins: FunnelCoin[];
+// a coin where it's drawn this frame, reused every frame
+interface Placed {
+  sprite: CoinBurstSprite;
+  depth: number;
+  x: number;
+  y: number;
+  size: number;
 }
 
+export interface Funnel {
+  coins: FunnelCoin[];
+  slots: Placed[];
+  // the shown coins' slots, back to front
+  placed: Placed[];
+}
+
+const byDepth = (a: Placed, b: Placed) => a.depth - b.depth;
+
 export function createFunnel(count: number): Funnel {
+  const coins: FunnelCoin[] = Array.from({ length: count }, () => {
+    const kind = Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
+    return {
+      // more of them up where the funnel is wide
+      h: Math.sqrt(Math.random()),
+      angle: Math.random() * Math.PI * 2,
+      kind,
+      spinFrame:
+        Math.random() *
+        (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
+      spinRate: 8 + Math.random() * 8,
+      axisAngle: (Math.random() * 2 - 1) * 0.6,
+    };
+  });
   return {
-    coins: Array.from({ length: count }, () => {
-      const kind = Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
-      return {
-        // more of them up where the funnel is wide
-        h: Math.sqrt(Math.random()),
-        angle: Math.random() * Math.PI * 2,
-        kind,
-        spinFrame:
-          Math.random() *
-          (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT),
-        spinRate: 8 + Math.random() * 8,
-        axisAngle: (Math.random() * 2 - 1) * 0.6,
-      };
-    }),
+    coins,
+    slots: coins.map((coin) => ({
+      sprite: { kind: coin.kind, spinFrame: 0, axisAngle: coin.axisAngle },
+      depth: 0,
+      x: 0,
+      y: 0,
+      size: 0,
+    })),
+    placed: [],
   };
 }
 
@@ -79,22 +102,26 @@ export function drawFunnel(
   const ringY = (h: number) => y - h * height;
   const spinAt = (h: number) => (TIP_SPIN + (TOP_SPIN - TIP_SPIN) * h) * spin;
 
-  const placed = funnel.coins.slice(0, Math.ceil(shown)).map((coin, i) => {
+  const { coins, slots, placed } = funnel;
+  const count = Math.min(coins.length, Math.ceil(shown));
+  placed.length = 0;
+  for (let i = 0; i < count; i++) {
+    const coin = coins[i];
+    const slot = slots[i];
     const angle = coin.angle + t * spinAt(coin.h);
     const depth = Math.sin(angle);
     const r = radius(coin.h);
     // the newest coin pops in as it arrives
     const pop = Math.min(1, shown - i);
-    return {
-      coin,
-      depth,
-      x: centerX(coin.h) + Math.cos(angle) * r,
-      y: ringY(coin.h) + depth * r * RING_SQUASH,
-      size:
-        COIN_SIZE * scale * (0.6 + 0.4 * coin.h) * (0.8 + 0.2 * depth) * pop,
-    };
-  });
-  placed.sort((a, b) => a.depth - b.depth);
+    slot.depth = depth;
+    slot.x = centerX(coin.h) + Math.cos(angle) * r;
+    slot.y = ringY(coin.h) + depth * r * RING_SQUASH;
+    slot.size =
+      COIN_SIZE * scale * (0.6 + 0.4 * coin.h) * (0.8 + 0.2 * depth) * pop;
+    slot.sprite.spinFrame = coin.spinFrame + t * coin.spinRate;
+    placed.push(slot);
+  }
+  placed.sort(byDepth);
 
   const streaks = (front: boolean) => {
     ctx.save();
@@ -141,14 +168,7 @@ export function drawFunnel(
   beginCoinBatch(ctx);
   for (const p of placed) {
     ctx.globalAlpha = p.depth < 0 ? 0.75 : 1;
-    drawCoinBurstFrame(
-      ctx,
-      { ...p.coin, spinFrame: p.coin.spinFrame + t * p.coin.spinRate },
-      p.x,
-      p.y,
-      p.size,
-      base,
-    );
+    drawCoinBurstFrame(ctx, p.sprite, p.x, p.y, p.size, base);
   }
   ctx.globalAlpha = 1;
   endCoinBatch(ctx);

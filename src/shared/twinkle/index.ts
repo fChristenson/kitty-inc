@@ -3,6 +3,7 @@
 // additive light suits white glints, plain paint keeps a colored one true.
 // Rendered once per color and stamped, since trails and glitter draw hundreds
 import { COLOR } from "../../palette";
+import { processWhenIdle } from "../idle";
 
 const SPRITE_HALF = 128;
 const bigSprites = new Map<string, HTMLCanvasElement>();
@@ -66,34 +67,63 @@ const cellSize = (level: number) => SMALL_HALVES[level] * 2 + CELL_PAD * 2;
 const rowTops = SMALL_HALVES.map((_, level) =>
   SMALL_HALVES.slice(0, level).reduce((sum, _h, l) => sum + cellSize(l), 0),
 );
-const atlases = new Map<string, HTMLCanvasElement>();
-const pairedAtlases = new Map<string, HTMLCanvasElement>();
+const atlases = new Map<string, Atlas>();
+const pairedAtlases = new Map<string, Atlas>();
 
-// paired: each cell also carries a white twinkle half its size added over it
-function getAtlas(color: string, paired = false): HTMLCanvasElement {
+// painted a size level at a time, so warming one never lands as one burst
+interface Atlas {
+  canvas: HTMLCanvasElement;
+  painted: number;
+}
+
+function atlasOf(color: string, paired: boolean): Atlas {
   const cache = paired ? pairedAtlases : atlases;
   let atlas = cache.get(color);
   if (atlas) return atlas;
-  atlas = document.createElement("canvas");
+  const canvas = document.createElement("canvas");
   const last = SMALL_HALVES.length - 1;
-  atlas.width = TURN_STEPS * cellSize(last);
-  atlas.height = rowTops[last] + cellSize(last);
-  const ctx = atlas.getContext("2d")!;
-  SMALL_HALVES.forEach((half, level) => {
-    for (let step = 0; step < TURN_STEPS; step++) {
-      const cx = step * cellSize(level) + CELL_PAD + half;
-      const cy = rowTops[level] + CELL_PAD + half;
-      const turn = (step / TURN_STEPS) * QUARTER;
-      paintTwinkleAt(ctx, cx, cy, half, turn, color);
-      if (!paired) continue;
-      ctx.globalCompositeOperation = "lighter";
-      paintTwinkleAt(ctx, cx, cy, half * 0.5, turn, COLOR.white);
-      ctx.globalCompositeOperation = "source-over";
-    }
-  });
+  canvas.width = TURN_STEPS * cellSize(last);
+  canvas.height = rowTops[last] + cellSize(last);
+  atlas = { canvas, painted: 0 };
   cache.set(color, atlas);
   return atlas;
 }
+
+function paintNextLevel(atlas: Atlas, color: string, paired: boolean): void {
+  const level = atlas.painted++;
+  const half = SMALL_HALVES[level];
+  const ctx = atlas.canvas.getContext("2d")!;
+  for (let step = 0; step < TURN_STEPS; step++) {
+    const cx = step * cellSize(level) + CELL_PAD + half;
+    const cy = rowTops[level] + CELL_PAD + half;
+    const turn = (step / TURN_STEPS) * QUARTER;
+    paintTwinkleAt(ctx, cx, cy, half, turn, color);
+    if (!paired) continue;
+    ctx.globalCompositeOperation = "lighter";
+    paintTwinkleAt(ctx, cx, cy, half * 0.5, turn, COLOR.white);
+    ctx.globalCompositeOperation = "source-over";
+  }
+}
+
+// paired: each cell also carries a white twinkle half its size added over it
+function getAtlas(color: string, paired = false): HTMLCanvasElement {
+  const atlas = atlasOf(color, paired);
+  while (atlas.painted < SMALL_HALVES.length)
+    paintNextLevel(atlas, color, paired);
+  return atlas.canvas;
+}
+
+// the glimmers crits stamp by the hundred, painted a level per idle slot
+// before the first one plays
+processWhenIdle(
+  [COLOR.heavenlyGold, COLOR.white].flatMap((color) =>
+    SMALL_HALVES.map(() => color),
+  ),
+  (color) => {
+    const atlas = atlasOf(color, true);
+    if (atlas.painted < SMALL_HALVES.length) paintNextLevel(atlas, color, true);
+  },
+);
 
 // a twinkle stamp in whatever composite ctx is already set to
 export function stampTwinkle(
@@ -170,7 +200,8 @@ export function drawGlimmer(
 }
 
 // drawGlimmer in whatever composite ctx is already set to ("lighter"), for
-// loops stamping many
+// loops stamping many: one stamp from the paired atlas, its white centre
+// baked in
 export function stampGlimmer(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -180,8 +211,7 @@ export function stampGlimmer(
   color: string,
 ): void {
   if (size <= 0) return;
-  stampTwinkle(ctx, x, y, size, rotation, color);
-  stampTwinkle(ctx, x, y, size * 0.5, rotation, COLOR.white);
+  stampTwinkle(ctx, x, y, size, rotation, color, true);
 }
 
 export function hash01(a: number, b: number): number {

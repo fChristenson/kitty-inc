@@ -1,6 +1,8 @@
 // What a scenario measures: frame times, the game's own redraw time, canvas
-// calls per frame, canvases created, long tasks and the JS heap. Recording is
-// on only between start() and stop(), so setup work never counts.
+// calls per frame, canvases created, long tasks, the JS heap and a sampled
+// profile. Recording is on only between start() and stop(), so setup work
+// never counts.
+import { startProfile, stopProfile, type ProfileSummary } from "./profile";
 
 export interface Summary {
   name: string;
@@ -36,6 +38,8 @@ export interface Summary {
   // ms from navigation to each of this page load's startup milestones
   // (performance.mark "game:*"): code running, art in, first frame, settled
   startup: Record<string, number>;
+  // where the time went, per function (absent where the browser can't sample)
+  profile?: ProfileSummary;
 }
 
 export interface Stats {
@@ -202,6 +206,7 @@ export function start(): void {
   startedAt = performance.now();
   lastFrame = 0;
   recording = true;
+  startProfile();
 }
 
 function stats(values: number[]): Stats {
@@ -224,8 +229,14 @@ function timeline(ms: number): Summary["timeline"] {
     worst: 0,
   }));
   deltas.forEach((delta, i) => {
+    // a frame's rAF stamp can fall just before the run started
     const slot =
-      slots[Math.min(slots.length - 1, Math.floor(frameEnds[i] / TIMELINE_MS))];
+      slots[
+        Math.max(
+          0,
+          Math.min(slots.length - 1, Math.floor(frameEnds[i] / TIMELINE_MS)),
+        )
+      ];
     slot.frames++;
     slot.worst = Math.max(slot.worst, delta);
   });
@@ -235,9 +246,10 @@ function timeline(ms: number): Summary["timeline"] {
   }));
 }
 
-export function stop(name: string): Summary {
+export async function stop(name: string): Promise<Summary> {
   recording = false;
   const ms = performance.now() - startedAt;
+  const profile = await stopProfile();
   const frames = deltas.length;
   const perFrame = (n: number) => (frames > 0 ? n / frames : 0);
   let canvasBytes = 0;
@@ -281,5 +293,6 @@ export function stop(name: string): Summary {
         .filter((mark) => mark.name.startsWith("game:"))
         .map((mark) => [mark.name.slice(5), mark.startTime]),
     ),
+    profile,
   };
 }

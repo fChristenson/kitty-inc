@@ -114,10 +114,14 @@ const runSpot = (r: Running, bars: Point[], bar: number, j: number) =>
   along(r, bars, bar, (j / (runOf(bar) - 1)) * 2 - 1);
 
 const hidden = new WeakSet<Running>();
+// each run's bars out from the middle, as planned
+const orders = new WeakMap<Running, number[]>();
 
 registerFloorCrit("inspiralCrit", {
-  plan(_r, bars, hit) {
-    outward(bars).forEach((bar, k) => {
+  plan(r, bars, hit) {
+    const order = outward(bars);
+    orders.set(r, order);
+    order.forEach((bar, k) => {
       for (let j = 0; j < runOf(bar); j++)
         hit(bar, runAt(k) + j * IS_EVERY_MS, 1);
     });
@@ -125,7 +129,8 @@ registerFloorCrit("inspiralCrit", {
   },
   draw(ctx, r, ms, bars) {
     const now = r.startedAt + ms;
-    const order = outward(bars);
+    const order = orders.get(r);
+    if (!order) return;
     if (ms < IS_IN_MS)
       drawText(
         ctx,

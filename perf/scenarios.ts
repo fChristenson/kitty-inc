@@ -506,6 +506,40 @@ export function eventIds(): string[] {
   ].map((button) => button.id.slice(5, -6));
 }
 
+// one crit (a proc or a badge crit) at the top tier, armed from the test bar
+// and tapped on the ground floor
+export function critScenario(kind: string): Scenario {
+  const name = `crit:${kind}`;
+  return {
+    name,
+    about: `the ${kind} crit at the top tier, start to finish`,
+    run: async (bridge) => {
+      click("#add-money");
+      bridge.scrollToFloor(ground(bridge), 0.6);
+      await sleep(300);
+      forceCrit(bridge, kind, CRIT_TIER_ORDER[0]);
+      return measure(name, 4000);
+    },
+  };
+}
+
+const WARM_GAP_MS = 1500;
+
+// a run played once unmeasured first: what it costs once its chunk is
+// loaded and its sprites baked; anything still made then is made every play
+export function warmScenario(scenario: Scenario): Scenario {
+  return {
+    ...scenario,
+    name: `warm:${scenario.name}`,
+    about: `${scenario.about}, after playing it once`,
+    run: async (bridge) => {
+      await scenario.run(bridge);
+      await sleep(WARM_GAP_MS);
+      return scenario.run(bridge);
+    },
+  };
+}
+
 // one floor crit: armed on the ground floor from its test button, then tapped
 export function floorCritScenario(kind: string): Scenario {
   const name = `floor-crit:${kind}`;
@@ -553,7 +587,7 @@ export function scaleScenario(name: string): Scenario {
       release();
       click("#action-bar-map");
       await sleep(SCALE_MAP_MS);
-      const summary = stop(name);
+      const summary = await stop(name);
       click("#action-bar-map");
       return summary;
     },
