@@ -3485,8 +3485,13 @@ main();
 // exists under any Vite dev server (regardless of --mode), so this is the one
 // check that's actually true exclusively for genuinely built/served dist output.
 // BASE_URL already carries the "/kitty-inc/" GitHub Pages prefix (see
-// vite.config.ts), so this resolves correctly once deployed
-if ("serviceWorker" in navigator && !import.meta.hot) {
+// vite.config.ts), so this resolves correctly once deployed. The perf build
+// skips it, so a rebuilt rig never runs on a cached older one
+if (
+  "serviceWorker" in navigator &&
+  !import.meta.hot &&
+  import.meta.env.MODE !== "perf"
+) {
   afterStartup(() => {
     navigator.serviceWorker
       .register(`${import.meta.env.BASE_URL}sw.js`)

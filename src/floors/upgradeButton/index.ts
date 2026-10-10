@@ -30,7 +30,7 @@ import {
   getJellyPose,
   prewarmJellyButton,
 } from "../../shared/glossyWidgets";
-import { runWhenIdle } from "../../shared/idle";
+import { prepareSoon } from "../../shared/idle";
 import { COLOR } from "../../palette";
 import { getWiggleRotation } from "../../shared/wiggle";
 import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
@@ -71,7 +71,7 @@ export * from "./overtime";
 // how hard the button and its bar boil: a long press, or a full boil all
 // through a Sale or Overtime
 // every color the button takes on outside a covering event's own
-runWhenIdle(() =>
+prepareSoon(() =>
   prewarmJellyButton(BTN_W, BTN_H, 40, [
     COLOR.moneyGreen,
     COLOR.disabledGray,

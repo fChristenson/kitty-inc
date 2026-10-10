@@ -26,6 +26,13 @@ export interface Summary {
   // heap drops over 1MB between frames: garbage collections
   gcs: number;
   gcMb: number;
+  // every TIMELINE_MS of the run: its fps and worst frame, so a cold start's
+  // first slow seconds show apart from the warmed-up rest
+  timeline: { fps: number; worst: number }[];
+  // backing stores of every canvas still alive at the end, since boot: iOS
+  // blanks canvases past its total limit, and a lost GPU blanks big ones
+  canvasMb: number;
+  liveCanvases: number;
 }
 
 export interface Stats {
@@ -55,10 +62,15 @@ const COUNTED = [
 let recording = false;
 let counts: Record<string, number> = {};
 const deltas: number[] = [];
+// when each of deltas' frames ended, from start()
+const frameEnds: number[] = [];
+const TIMELINE_MS = 500;
 const redraws: number[] = [];
 const longTasks: number[] = [];
 const sources = new Map<string, number>();
 let canvases = 0;
+// every canvas made since boot, recording or not
+const madeCanvases: WeakRef<HTMLCanvasElement>[] = [];
 let bitmaps = 0;
 let heapStart = 0;
 let heapLast = 0;
@@ -74,19 +86,21 @@ const memory = () =>
   (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory
     ?.usedJSHeapSize ?? 0;
 
-// a short "file:line < file:line" of who made a canvas
+// a short "file:line < file:line" of who made a canvas: a source file on the
+// dev server, a chunk (named after its function) in the perf build
 function caller(): string {
   return (new Error().stack ?? "")
     .split("\n")
     .slice(3)
-    .filter((line) => line.includes("/src/"))
+    .filter((line) => /\/(src|assets)\//.test(line))
     .slice(0, 2)
     .map((line) =>
       line
         .trim()
         .replace(/^at\s+/, "")
-        .replace(/\(?https?:\/\/[^/]+\/[^/]+\/src\//, "")
+        .replace(/\(?https?:\/\/[^/]+\/[^/]+\/(src|assets)\//, "")
         .replace(/\?[^:)]*/, "")
+        .replace(/-[\w-]{8}\.js/, ".js")
         .replace(/\)$/, ""),
     )
     .join(" < ");
@@ -125,7 +139,10 @@ export function instrument(countCalls: boolean): void {
       const at = caller();
       sources.set(at, (sources.get(at) ?? 0) + 1);
     }
-    return createElement.call(this, tag, options);
+    const element = createElement.call(this, tag, options);
+    if (element instanceof HTMLCanvasElement)
+      madeCanvases.push(new WeakRef(element));
+    return element;
   } as typeof createElement;
   const createBitmap = window.createImageBitmap;
   window.createImageBitmap = function (
@@ -142,6 +159,7 @@ export function instrument(countCalls: boolean): void {
     requestAnimationFrame(frame);
     if (recording && lastFrame > 0) {
       deltas.push(t - lastFrame);
+      frameEnds.push(t - startedAt);
       if (t - lastFrame > 50) hitchMarker();
     }
     lastFrame = t;
@@ -169,6 +187,7 @@ export function timeRedraw(redraw: () => void): () => void {
 export function start(): void {
   counts = {};
   deltas.length = 0;
+  frameEnds.length = 0;
   redraws.length = 0;
   longTasks.length = 0;
   sources.clear();
@@ -196,11 +215,36 @@ function stats(values: number[]): Stats {
   };
 }
 
+function timeline(ms: number): Summary["timeline"] {
+  const slots = Array.from({ length: Math.ceil(ms / TIMELINE_MS) }, () => ({
+    frames: 0,
+    worst: 0,
+  }));
+  deltas.forEach((delta, i) => {
+    const slot =
+      slots[Math.min(slots.length - 1, Math.floor(frameEnds[i] / TIMELINE_MS))];
+    slot.frames++;
+    slot.worst = Math.max(slot.worst, delta);
+  });
+  return slots.map((slot) => ({
+    fps: (slot.frames * 1000) / TIMELINE_MS,
+    worst: slot.worst,
+  }));
+}
+
 export function stop(name: string): Summary {
   recording = false;
   const ms = performance.now() - startedAt;
   const frames = deltas.length;
   const perFrame = (n: number) => (frames > 0 ? n / frames : 0);
+  let canvasBytes = 0;
+  let liveCanvases = 0;
+  for (const ref of madeCanvases) {
+    const canvas = ref.deref();
+    if (!canvas) continue;
+    liveCanvases++;
+    canvasBytes += canvas.width * canvas.height * 4;
+  }
   return {
     name,
     ms,
@@ -225,5 +269,8 @@ export function stop(name: string): Summary {
     heapEndMb: memory() / 1e6,
     gcs,
     gcMb: gcBytes / 1e6,
+    timeline: timeline(ms),
+    canvasMb: canvasBytes / 1e6,
+    liveCanvases,
   };
 }

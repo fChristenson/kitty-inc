@@ -137,11 +137,48 @@ function scheduleAfter(ms: number): void {
 afterStartup(() => {
   started = true;
   schedule();
+  scheduleSoon();
 });
 
 export function runWhenIdle(task: () => void): void {
   light.push(task);
   schedule();
+}
+
+// warm-ups play itself draws from (coin atlases, the button and bar sprites):
+// a slice each frame from startup on, held button or not, so the first long
+// press after a load already runs on them instead of waiting for a pause
+const SOON_SLICE_MS = 3;
+const soon: (() => void)[] = [];
+let soonScheduled = false;
+
+function pumpSoon(): void {
+  soonScheduled = false;
+  const end = performance.now() + SOON_SLICE_MS;
+  do soon.shift()!();
+  while (soon.length > 0 && performance.now() < end);
+  scheduleSoon();
+}
+
+function scheduleSoon(): void {
+  if (!started || soonScheduled || soon.length === 0) return;
+  soonScheduled = true;
+  // right after a frame paints, so a slice never delays one
+  requestAnimationFrame(() => window.setTimeout(pumpSoon, 0));
+}
+
+export function prepareSoon(task: () => void): void {
+  soon.push(task);
+  scheduleSoon();
+}
+
+// prepareSoon for each item, one task apiece
+export function prepareEachSoon<T>(
+  items: readonly T[],
+  handle: (item: T) => void,
+): void {
+  for (const item of items) soon.push(() => handle(item));
+  scheduleSoon();
 }
 
 // works through items one per idle slot, so a long warm-up list never lands

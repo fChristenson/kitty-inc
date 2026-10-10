@@ -55,7 +55,7 @@ import {
 } from "../../utils";
 import { drawChevronBar, prewarmChevronBar } from "../../shared/glossyWidgets";
 import { launchMs, launchOffset, type BarLaunch } from "../../shared/barLaunch";
-import { runWhenIdle } from "../../shared/idle";
+import { prepareSoon } from "../../shared/idle";
 import {
   drawBoilingBar,
   drawPressureBar,
@@ -89,7 +89,7 @@ export const BAR_W = (PANEL_W - 36) * 1.5;
 // scaled up alongside PANEL_W; still comfortably clears the divider band's vertical bounds
 const BAR_H = 92;
 
-runWhenIdle(() =>
+prepareSoon(() =>
   prewarmChevronBar(BAR_W, BAR_H, BAR_H / 3, [
     COLOR.moneyGreen,
     ...Object.values(CRIT_TIER_CONFIG).map((tier) => tier.color),

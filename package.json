@@ -8,7 +8,9 @@
     "dev:prod": "vite --mode production",
     "prebuild": "node scripts/add-sticker-borders.mjs --stale",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "perf:build": "vite build --mode perf",
+    "perf:preview": "vite preview --mode perf"
   },
   "devDependencies": {
     "sharp": "^0.35.3",

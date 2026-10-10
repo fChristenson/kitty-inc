@@ -8,7 +8,7 @@
 import { COLOR } from "../../palette";
 import { hash01, paintTwinkleAt } from "../../shared/twinkle";
 import { drawGlitterLight } from "../../shared/wisp";
-import { runWhenIdle } from "../../shared/idle";
+import { prepareSoon } from "../../shared/idle";
 import {
   createSpriteTexture,
   drawSprites,
@@ -96,7 +96,7 @@ function getSheet(): SpriteTexture | null {
   return sheet;
 }
 
-runWhenIdle(getSheet);
+prepareSoon(getSheet);
 
 // a crit's flash just started (level 0 crit, 1 mega or special, 2 ultra), at
 // `now` on the flash's own clock

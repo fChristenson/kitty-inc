@@ -29,6 +29,8 @@ import { start, stop, type Summary } from "./metrics";
 export interface Scenario {
   name: string;
   about: string;
+  // runs the moment the game is up, with no warm-up first
+  cold?: boolean;
   run: (bridge: PerfBridge) => Promise<Summary>;
 }
 
@@ -221,7 +223,70 @@ function critSeries(
   };
 }
 
+// a long-press the moment the game is up, before anything has warmed up;
+// arm (if given) readies a crit for its first click. warm first runs the
+// same press once unmeasured, so the pair shows what being cold costs
+function coldHold(
+  name: string,
+  floorOf: (bridge: PerfBridge) => Floor,
+  arm?: () => () => void,
+  warm = false,
+): Scenario["run"] {
+  return async (bridge) => {
+    click("#add-money");
+    const floor = floorOf(bridge);
+    bridge.scrollToFloor(floor, 0.6);
+    const rearm = arm?.();
+    if (warm) {
+      await sleep(300);
+      const release = press(bridge, floor);
+      await sleep(4000);
+      release();
+      await sleep(1500);
+      click("#add-money");
+      rearm?.();
+    }
+    start();
+    // the scroll settles first, as a player's thumb would
+    await sleep(300);
+    const release = press(bridge, floor);
+    await sleep(7000);
+    release();
+    return stop(name);
+  };
+}
+
+// arms one floor crit, picked once per run, and returns how to arm it again
+function armFloorCrit(): () => void {
+  const arm = () => click(`[data-floor-crit="${kind}"]`);
+  const kind = pick(floorCritKinds());
+  arm();
+  return arm;
+}
+
 export const SCENARIOS: Scenario[] = [
+  {
+    name: "cold-hold",
+    about: "the first long-press, the moment the game is up: nothing warmed up",
+    cold: true,
+    run: coldHold("cold-hold", (bridge) => second(bridge)),
+  },
+  {
+    name: "cold-floor-crit",
+    about: "a floor crit on the first long-press, the moment the game is up",
+    cold: true,
+    run: coldHold("cold-floor-crit", ground, armFloorCrit),
+  },
+  {
+    name: "warm-hold",
+    about: "cold-hold's long-press again, after one unmeasured long-press",
+    run: coldHold("warm-hold", (bridge) => second(bridge), undefined, true),
+  },
+  {
+    name: "warm-floor-crit",
+    about: "cold-floor-crit's floor crit again, after one unmeasured run of it",
+    run: coldHold("warm-floor-crit", ground, armFloorCrit, true),
+  },
   {
     name: "idle",
     about: "a busy building on screen, nothing touched",

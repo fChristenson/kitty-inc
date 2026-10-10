@@ -1,7 +1,7 @@
 import { randomInt } from "../utils";
 import { loadSprite } from "../loadAssets";
 import { createParticlePool, clampedDtSince } from "../shared/particlePool";
-import { runWhenIdle } from "../shared/idle";
+import { prepareSoon } from "../shared/idle";
 import {
   createSpriteTexture,
   drawSprites,
@@ -72,13 +72,13 @@ export async function loadCoinBurstImages(): Promise<HTMLImageElement> {
   ]);
   coinFrameCanvases = buildFrameCanvases(coin, COIN_SPIN_FRAME_COUNT);
   billFrameCanvases = buildFrameCanvases(bill, BILL_SPIN_FRAME_COUNT);
-  // off the startup path, each on its own idle slot: until then coins draw
-  // from the full-size frames
+  // off the startup path, each in its own slice: until then coins draw from
+  // the full-size frames
   const coinFrames = coinFrameCanvases;
   const billFrames = billFrameCanvases;
-  runWhenIdle(() => (coinAtlas = buildAtlas(coinFrames)));
-  runWhenIdle(() => (billAtlas = buildAtlas(billFrames)));
-  runWhenIdle(() => buildSheet(coinFrames, billFrames));
+  prepareSoon(() => (coinAtlas = buildAtlas(coinFrames)));
+  prepareSoon(() => (billAtlas = buildAtlas(billFrames)));
+  prepareSoon(() => buildSheet(coinFrames, billFrames));
   return coin;
 }
 

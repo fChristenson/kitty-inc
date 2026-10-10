@@ -1779,7 +1779,7 @@ function floorCritPlayFor(
     },
     hideBars: (bars) =>
       setIncomePanelsHidden(bars ? bars.map((bar) => targets[bar]) : []),
-    onHit: (bar, step, color) => {
+    onHit: (bar, step, color, spill) => {
       const target = targets[bar];
       // a snowball bangs a step higher with every bar
       playBarExplosion(1 + step * 0.08);
@@ -1814,7 +1814,10 @@ function floorCritPlayFor(
         box.y + box.height / 2,
         () => {},
         COIN_SPILL_SCALE,
-        COIN_SPILL,
+        [
+          Math.max(1, Math.round(COIN_SPILL[0] * spill)),
+          Math.max(1, Math.round(COIN_SPILL[1] * spill)),
+        ],
       );
     },
   };

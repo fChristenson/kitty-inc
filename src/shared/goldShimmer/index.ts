@@ -1,7 +1,7 @@
 // the gold "reward" shimmer: a soft glow with spinning light rays around a
 // point, used behind a coin stream's target and behind special crit images
 import { COLOR } from "../../palette";
-import { runWhenIdle } from "../idle";
+import { prepareSoon } from "../idle";
 
 const RAY_COUNT = 14;
 
@@ -67,7 +67,7 @@ const GLOW_GAIN = 0.45 / 0.8;
 const shimmerCache = new Map<string, HTMLCanvasElement>();
 
 // the reward golds, ready before their first slam
-runWhenIdle(() => {
+prepareSoon(() => {
   getShimmer(COLOR.coinGold);
   getShimmer(COLOR.coinSpriteGold);
 });

@@ -21,8 +21,8 @@ export interface FloorCritPlay {
   bars: () => Point[];
   barHalfWidth: number;
   // a hit on bars()[bar] by a number of `color`; step is a snowball's
-  // growth so far
-  onHit: (bar: number, step: number, color: string) => void;
+  // growth so far; spill is its share of a full hit's coin spill
+  onHit: (bar: number, step: number, color: string, spill: number) => void;
   // bars()[bar] leaping off its floor for ms, landing back down (or hauled
   // up, held and dropped)
   onLift?: (bar: number, ms: number, haul: boolean) => void;
@@ -138,6 +138,9 @@ let running: Running | null = null;
 // bar's height)
 export const FLOOR_CRIT_FONT = 200;
 export const HIT_SHAKE = 0.5;
+// a crit's hits spill this many full hits' worth of coins between them, so a
+// barrage of fifty hits doesn't flood the coin pool during a held button
+const SPILL_HITS = 16;
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 export const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
@@ -521,10 +524,11 @@ export function drawFloorCrit(
     const s = r.shorts[r.shorted++];
     r.play.onShort?.(s.bar, s.deadMs);
   }
+  const spill = Math.min(1, SPILL_HITS / r.hits.length);
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];
     r.shake(def.shake?.(step) ?? HIT_SHAKE);
-    r.play.onHit(bar, step, r.glyphs.color);
+    r.play.onHit(bar, step, r.glyphs.color, spill);
   }
   if (ms >= r.endsAt) {
     running = null;

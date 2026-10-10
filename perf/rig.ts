@@ -2,6 +2,11 @@
 // runs scenarios one page load each (so none inherits another's caches,
 // particles or timers), collecting a summary per scenario.
 //
+// Cold starts (startup, cold-*) only mean something on a build: the dev
+// server loads hundreds of unbundled modules for seconds after boot. Run
+// `npm run perf:build`, then `npx vite preview --mode perf` and open
+// /kitty-inc/perf/index.html there (its own origin, so it seeds its own save).
+//
 // ?run=idle,hold,events      runs those at once, then shows the report
 //                            ("late" runs the big-company set; pair with ?late=1)
 // ?floors=10                 unlocked floors in each fixture building
@@ -180,7 +185,7 @@ async function boot(): Promise<void> {
       await sleep(STARTUP_MS);
       summary = stop("startup");
     } else {
-      await sleep(options.warmup);
+      if (!find(parseRunName(current).base)?.cold) await sleep(options.warmup);
       summary = (await runNamed(current)) ?? {
         ...stop(current),
         name: `${current} (unknown)`,

@@ -357,6 +357,16 @@ export function drawWhiteBurst(
 const EXPLOSION_BURST_MS = 500;
 const EXPLOSION_SPARK_MS = 800;
 const EXPLOSION_SPARKS = 28;
+// a barrage stacks dozens of blasts at once; past these in one frame their
+// white flashes and sparks (all additive, so long since saturated) thin out.
+// Blasts of at least BIG_SCALE, a barrage's climax, always draw in full
+const FRAME_FLASHES = 10;
+const FRAME_SPARKS = 300;
+const THINNED_SPARKS = 7;
+const BIG_SCALE = 2.5;
+let budgetFrame = NaN;
+let flashesLeft = FRAME_FLASHES;
+let sparksLeft = FRAME_SPARKS;
 
 // an impact ms ago at (x, y): a white burst of `scale`, and glimmer sparks of
 // up to sparkSize flung out to `reach`, slowing and fading
@@ -370,13 +380,29 @@ export function drawExplosion(
   reach: number,
   sparkSize: number,
 ): void {
-  drawWhiteBurst(ctx, x, y, ms / EXPLOSION_BURST_MS, scale);
+  // every blast of one frame shares its `now`
+  if (now !== budgetFrame) {
+    budgetFrame = now;
+    flashesLeft = FRAME_FLASHES;
+    sparksLeft = FRAME_SPARKS;
+  }
+  const big = scale >= BIG_SCALE;
+  const burst = ms / EXPLOSION_BURST_MS;
+  if (burst > 0 && burst < 1 && (big || flashesLeft > 0)) {
+    flashesLeft--;
+    drawWhiteBurst(ctx, x, y, burst, scale);
+  }
   const t = ms / EXPLOSION_SPARK_MS;
   if (t < 0 || t >= 1) return;
+  // spread round the whole ring, however few are left
+  const sparks =
+    big || sparksLeft >= EXPLOSION_SPARKS ? EXPLOSION_SPARKS : THINNED_SPARKS;
+  const stride = EXPLOSION_SPARKS / sparks;
+  sparksLeft -= sparks;
   const out = 1 - (1 - t) ** 3;
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
-  for (let i = 0; i < EXPLOSION_SPARKS; i++) {
+  for (let i = 0; i < EXPLOSION_SPARKS; i += stride) {
     const angle = ((i + hash01(i, 4) * 0.5) / EXPLOSION_SPARKS) * Math.PI * 2;
     const r = reach * (0.45 + 0.55 * hash01(i, 5)) * out;
     stampGlimmer(

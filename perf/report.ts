@@ -55,6 +55,10 @@ function row(s: Summary, base: Summary | undefined): string {
   const sources = s.canvasSources
     .map(([at, n]) => `<li>${n}× ${at}</li>`)
     .join("");
+  // older saved results predate the timeline
+  const timeline = (s.timeline ?? [])
+    .map((slot) => `${fixed(slot.fps, 0)}/${fixed(slot.worst, 0)}`)
+    .join(" · ");
   return `
     <tr>
       <td title="${s.ms.toFixed(0)}ms, ${s.frames} frames">${s.name}</td>
@@ -73,7 +77,9 @@ function row(s: Summary, base: Summary | undefined): string {
         frame avg ${fixed(s.frame.avg)} · p50 ${fixed(s.frame.p50)} · p99 ${fixed(s.frame.p99)} · max ${fixed(s.frame.max)} ·
         &gt;33ms ${pct(s.over33)} · long tasks ${s.longTasks} (${fixed(s.longTaskMs, 0)}ms) ·
         redraw max ${fixed(s.redraw.max, 1)} · bitmaps ${s.bitmaps} · heap ${fixed(s.heapStartMb)}→${fixed(s.heapEndMb)}MB
+        ${s.canvasMb === undefined ? "" : `· live canvases ${s.liveCanvases} (${fixed(s.canvasMb)}MB)`}
         <div>per frame: ${calls || "(counting off)"}</div>
+        ${timeline ? `<div>each 0.5s, fps/worst frame ms: ${timeline}</div>` : ""}
         ${sources ? `<div>canvases made by:</div><ul>${sources}</ul>` : ""}
       </details>
     </td></tr>`;

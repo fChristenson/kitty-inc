@@ -1,5 +1,5 @@
 import { loadImageByName } from "../../loadAssets";
-import { processWhenIdle } from "../../shared/idle";
+import { prepareEachSoon } from "../../shared/idle";
 import { hash01 } from "../../shared/twinkle";
 
 // a boosted worker's coin bubbles: small coins trickling up off it, swaying
@@ -68,10 +68,18 @@ function bakeFlipbook(): void {
   canvas.width = CELL_W * COLS;
   canvas.height = CELL_H * Math.ceil(FRAMES / COLS);
   flipbook = canvas;
+  baked = 0;
+  // a lost GPU (a phone backgrounding the browser) comes back with this big
+  // canvas blank, and every bubble with it: baked again
+  canvas.addEventListener("contextrestored", () => {
+    flipbook = null;
+    bakeFlipbook();
+  });
   const c = canvas.getContext("2d")!;
   const coins = LOOP_MS / SPAWN_MS;
   const frames = Array.from({ length: FRAMES }, (_, f) => f);
-  processWhenIdle(frames, (f) => {
+  prepareEachSoon(frames, (f) => {
+    if (flipbook !== canvas) return;
     const ms = (f / FRAMES) * LOOP_MS;
     c.setTransform(
       RES,
