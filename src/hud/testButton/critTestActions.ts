@@ -46,7 +46,9 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-gusher-spawn-event" class="game__button">Spawn Gusher</button>
+          <button class="game__button" data-floor-crit="yoYoCrit">Yo-yo Crit</button>
+          <button class="game__button" data-floor-crit="harpoonsCrit">Harpoons Crit</button>
+          <button class="game__button" data-floor-crit="bolasCrit">Bolas Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1294,6 +1296,7 @@ export function createTestButtonMarkup(): string {
           <button id="test-bouncer-spawn-event" class="game__button">Spawn Bouncer</button>
           <button id="test-pump-spawn-event" class="game__button">Spawn Pump</button>
           <button id="test-star-swirl-spawn-event" class="game__button">Spawn Star Swirl</button>
+          <button id="test-gusher-spawn-event" class="game__button">Spawn Gusher</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

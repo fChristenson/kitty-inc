@@ -314,6 +314,21 @@ export const FLOOR_CRIT_CONFIG = {
     teslaCannonCrit: {
       chance: 0.03,
     },
+    // a yo-yo dropped off a hand onto the bars, slamming and zipping back,
+    // then whipped round and fired into its own
+    yoYoCrit: {
+      chance: 0.03,
+    },
+    // harpoons fired into the bars on lines of light, yanked all at once,
+    // then reeled in onto its own
+    harpoonsCrit: {
+      chance: 0.03,
+    },
+    // whirling bolas wrapping round the bars and blowing, a fat one round
+    // its own
+    bolasCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {

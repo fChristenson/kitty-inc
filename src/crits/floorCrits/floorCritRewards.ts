@@ -1810,6 +1810,11 @@ function floorCritLevels(
   if (kind === "designatorCrit") return Math.ceil(count / 4);
   if (kind === "beamSplitterCrit") return Math.ceil(count / 5);
   if (kind === "teslaCannonCrit") return Math.ceil(count / 6);
+  // a yo-yo slams each bar three times, harpoons thunk into and yank each
+  // about four times and bolas land, wrap and blow on each about eight
+  if (kind === "yoYoCrit") return Math.ceil(count / 3);
+  if (kind === "harpoonsCrit") return Math.ceil(count / 4);
+  if (kind === "bolasCrit") return Math.ceil(count / 8);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);
