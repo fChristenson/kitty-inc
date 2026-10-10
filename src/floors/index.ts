@@ -331,7 +331,6 @@ export {
   getWorkerIconUrl,
   getManagerIconUrl,
   triggerJumpAll,
-  triggerJump,
   getRenderedWorkerCount,
   applyBoostAll,
   celebrateWorkerBoost,
