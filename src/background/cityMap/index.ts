@@ -83,17 +83,20 @@ let managerSprite: HTMLImageElement | null = null;
 let permaCatSprite: HTMLImageElement | null = null;
 let permaManagerSprite: HTMLImageElement | null = null;
 
-// loads the map screen's own backdrop + marker cat sprites
-export async function loadCityMapImage(): Promise<HTMLImageElement> {
-  [mapImage, catSprite, managerSprite, permaCatSprite, permaManagerSprite] =
-    await Promise.all([
-      loadImageByName("cityMapBackground"),
-      loadSprite("worker"),
-      loadSprite("manager"),
-      loadSprite("workerRapper"),
-      loadSprite("managerDiva"),
-    ]);
-  return mapImage!;
+// loads the map screen's own backdrop + marker cat sprites (once)
+let mapImageLoad: Promise<HTMLImageElement> | null = null;
+export function loadCityMapImage(): Promise<HTMLImageElement> {
+  return (mapImageLoad ??= (async () => {
+    [mapImage, catSprite, managerSprite, permaCatSprite, permaManagerSprite] =
+      await Promise.all([
+        loadImageByName("cityMapBackground"),
+        loadSprite("worker"),
+        loadSprite("manager"),
+        loadSprite("workerRapper"),
+        loadSprite("managerDiva"),
+      ]);
+    return mapImage!;
+  })());
 }
 
 // a taller sheet (room for a hat) renders taller so its cat keeps the base scale
@@ -162,6 +165,10 @@ export interface CityMapView {
   // whichever city the player's currently-active building lives in, so opening the
   // map always starts on "where you are" instead of wherever it was last left
   refresh: () => void;
+  // scales the backdrop for a map of that CSS size ahead of time (it's in the
+  // game canvas's slot, hidden until opened), so opening the map is a blit
+  // instead of a long resample of the huge original
+  prepareBackdrop: (cssWidth: number, cssHeight: number) => void;
   // flashes the same speed-line rays the city prev/next arrows use, but running
   // vertically — for the action bar's own scroll-to-top/scroll-to-bottom buttons
   // while the map is open (see main.ts). -1 streams upward, 1 streams downward
@@ -226,11 +233,14 @@ export function createCityMapView(
   let scaledMapForImage: HTMLImageElement | null = null;
   let scaledMapW = 0;
   let scaledMapH = 0;
-  function getScaledMapCanvas(): HTMLCanvasElement | null {
+  function getScaledMapCanvas(
+    cssWidth = cssW,
+    cssHeight = cssH,
+  ): HTMLCanvasElement | null {
     if (!mapImage) return null;
     const dpr = getEffectiveDpr();
-    const targetW = Math.round(cssW * dpr);
-    const targetH = Math.round(cssH * dpr);
+    const targetW = Math.round(cssWidth * dpr);
+    const targetH = Math.round(cssHeight * dpr);
     if (
       scaledMapCanvas &&
       scaledMapForImage === mapImage &&
@@ -846,6 +856,10 @@ export function createCityMapView(
       cityIndex = Math.floor(deps.getActiveBuildingIndex() / MARKER_COUNT);
       persistCityMapState();
       redraw();
+    },
+    prepareBackdrop: (cssWidth, cssHeight) => {
+      if (cssWidth > 0 && cssHeight > 0)
+        getScaledMapCanvas(cssWidth, cssHeight);
     },
     flashVerticalRays: (direction) => transitions.flashVertical(direction),
     jumpToEnd: (direction) => transitions.jumpToEnd(direction),

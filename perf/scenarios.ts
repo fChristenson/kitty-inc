@@ -530,6 +530,36 @@ export function floorCritKinds(): string[] {
   ].map((button) => button.dataset.floorCrit!);
 }
 
+const SCALE_IDLE_MS = 3000;
+const SCALE_HOLD_MS = 5000;
+const SCALE_MAP_MS = 3000;
+
+// the same play at any company size or money scale: the run's name picks its
+// fixture (scale:<buildings>x<companies>, money:<exponent>, see rig.ts), so
+// runs compare like for like: the newest building idle, a long-press, the map
+export function scaleScenario(name: string): Scenario {
+  return {
+    name,
+    about: "idle, a long-press and the map on this run's fixture",
+    run: async (bridge) => {
+      click("#add-money");
+      const floor = second(bridge);
+      bridge.scrollToFloor(floor, 0.6);
+      await sleep(300);
+      start();
+      await sleep(SCALE_IDLE_MS);
+      const release = press(bridge, floor);
+      await sleep(SCALE_HOLD_MS);
+      release();
+      click("#action-bar-map");
+      await sleep(SCALE_MAP_MS);
+      const summary = stop(name);
+      click("#action-bar-map");
+      return summary;
+    },
+  };
+}
+
 // a spread across the event templates
 export const SAMPLE_EVENTS = [
   "clutter",

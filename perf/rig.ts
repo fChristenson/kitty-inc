@@ -28,6 +28,12 @@
 // A run name can carry its crit mode: hold@off (no crits), hold@tiers (crit
 // tiers, no procs or events), hold@on.
 //
+// scale:<buildings>[x<companies>] runs the same idle, long-press and map on a
+// fixture of that size, whatever the URL says ("scale" runs 1, 50 and 100
+// buildings; "scale-companies" the same with 10 companies).
+// money:<exponent> runs it with every amount that many powers of ten bigger
+// ("money" runs 0, 100, 1000 and 1000000), affording just the same.
+//
 // window.perfRig drives it from a console or Playwright: queue(names),
 // run(name) on the current page, results, done.
 import { clearBase, hasBase, loadFixture, seedBase } from "./storage";
@@ -52,10 +58,26 @@ const options = {
   warmup: Number(params.get("warmup") ?? 2500),
   crits: params.get("crits") ?? "on",
   seed: Number(params.get("seed") ?? 1),
+  money: Number(params.get("money") ?? 0),
 };
 
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+const SCALE_BUILDINGS = [1, 50, 100];
+const SCALE_COMPANIES = 10;
+const MONEY_EXPONENTS = [0, 100, 1000, 1_000_000];
+
+// a scale or money run's own fixture options, from its name (any @mode ignored)
+function fixtureOf(
+  name: string,
+): { buildings?: number; companies?: number; money?: number } | null {
+  const scale = /^scale:(\d+)(?:x(\d+))?(?:@|$)/.exec(name);
+  if (scale)
+    return { buildings: Number(scale[1]), companies: Number(scale[2] ?? 1) };
+  const money = /^money:(\d+)(?:@|$)/.exec(name);
+  return money ? { money: Number(money[1]) } : null;
+}
 
 const readQueue = (): string[] =>
   JSON.parse(sessionStorage.getItem(QUEUE_KEY) ?? "[]") as string[];
@@ -101,7 +123,7 @@ async function boot(): Promise<void> {
   document.body.classList.toggle("running", Boolean(current));
   if (current === "startup") start();
 
-  loadFixture(options);
+  loadFixture({ ...options, ...fixtureOf(current ?? "") });
   await import("../src/boot");
   const { whenPerfBridge } = await import("../src/shared/perfBridge");
   const bridge = await whenPerfBridge();
@@ -117,6 +139,7 @@ async function boot(): Promise<void> {
     floorCritScenario,
     parseRunName,
     prepareRun,
+    scaleScenario,
   } = await import("./scenarios");
   const defaultMode =
     options.crits in CRIT_MODES
@@ -129,7 +152,9 @@ async function boot(): Promise<void> {
       ? eventScenario(name.slice(6))
       : name.startsWith("floor-crit:")
         ? floorCritScenario(name.slice(11))
-        : null);
+        : fixtureOf(name)
+          ? scaleScenario(name)
+          : null);
   // "events" and "events-all" stand for a sample of events, or every one,
   // keeping any @mode
   const expand = (names: string[]) =>
@@ -149,6 +174,13 @@ async function boot(): Promise<void> {
         return LATE_SCENARIOS.map((id) =>
           id === "startup" ? id : `${id}${suffix}`,
         );
+      if (base === "scale" || base === "scale-companies")
+        return SCALE_BUILDINGS.map(
+          (buildings) =>
+            `scale:${buildings}${base === "scale" ? "" : `x${SCALE_COMPANIES}`}${suffix}`,
+        );
+      if (base === "money")
+        return MONEY_EXPONENTS.map((exponent) => `money:${exponent}${suffix}`);
       return [name];
     });
   // a run under its crit mode and freshly seeded dice, named as asked
@@ -215,6 +247,18 @@ async function boot(): Promise<void> {
       {
         name: "late",
         about: "what grows with the company; open with ?late=1 for a big save",
+      },
+      {
+        name: "scale",
+        about: `idle, a long-press and the map with ${SCALE_BUILDINGS.join(", ")} buildings: should run alike`,
+      },
+      {
+        name: "scale-companies",
+        about: `the same with ${SCALE_COMPANIES} companies of that many buildings each`,
+      },
+      {
+        name: "money",
+        about: `the same with every amount 1e${MONEY_EXPONENTS.join(", 1e")} times bigger: should run alike`,
       },
     ],
     onRun: rig.queue,

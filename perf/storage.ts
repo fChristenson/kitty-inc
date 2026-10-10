@@ -69,6 +69,9 @@ export interface FixtureOptions {
   maxed: boolean;
   // every floor's level, when set
   level: number | null;
+  // powers of ten added to every amount (totals, income, costs), so only the
+  // numbers' size changes, not what's affordable
+  money: number;
 }
 
 interface SavedWorker {
@@ -114,6 +117,7 @@ export function loadFixture({
   heavy,
   maxed,
   level,
+  money,
 }: FixtureOptions): void {
   const base = JSON.parse(realStorage.getItem(BASE_KEY)!) as Record<
     string,
@@ -154,19 +158,19 @@ export function loadFixture({
         floor.incomeIntervalSeconds = 0.01;
       }
       if (level !== null) floor.upgradeCount = level;
-      scaleMoney(floor, building * BUILDING_EXPONENT);
+      scaleMoney(floor, building * BUILDING_EXPONENT + money);
       built.push(floor);
     }
     if (locked && floors < MAX_FLOORS) {
       const next: SavedFloor = structuredClone(locked);
-      scaleMoney(next, building * BUILDING_EXPONENT);
+      scaleMoney(next, building * BUILDING_EXPONENT + money);
       built.push(next);
     }
     return built;
   };
   save.buildings = Array.from({ length: buildings }, (_, b) => buildFloors(b));
   const saved = JSON.stringify(save);
-  const top = buildings * BUILDING_EXPONENT;
+  const top = buildings * BUILDING_EXPONENT + money;
   const names = JSON.parse(
     base["cash-clicker:corporation-names"] ?? "[]",
   ) as string[];
@@ -188,7 +192,7 @@ export function loadFixture({
       updatedAt: now,
     });
   }
-  if (companies > 1 || buildings > 1) {
+  if (companies > 1 || buildings > 1 || money > 0) {
     memory.setItem("cash-clicker:corporation-names", JSON.stringify(names));
     memory.setItem("cash-clicker:corporations", JSON.stringify(records));
     memory.setItem("cash-clicker:active-company-index", "0");

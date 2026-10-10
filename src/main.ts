@@ -341,9 +341,6 @@ async function main() {
     loadBuildingThemeAssets(),
     loadCityImage(),
   ]);
-  // the map's backdrop is the biggest image in the game (14MB decoded) and
-  // nothing shows it until the map opens
-  afterStartup(() => void loadCityMapImage());
   await firstScreen;
   performance.mark("game:assets");
 
@@ -3391,6 +3388,16 @@ async function main() {
     },
     onOpenCorporationStats: () => corporationStats.open(),
   });
+  // the map's backdrop is the biggest image in the game (14MB decoded) and
+  // nothing shows it until the map opens; it fills the game canvas's slot, so
+  // it's scaled for that size at idle, before the first open
+  afterStartup(() =>
+    loadCityMapImage().then(() =>
+      runWhenIdle(() =>
+        cityMapView.prepareBackdrop(canvas.clientWidth, canvas.clientHeight),
+      ),
+    ),
+  );
   wireActionBar(app, {
     onScrollTop: () => {
       playSwoosh();
