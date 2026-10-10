@@ -35,7 +35,7 @@ import { drawCity, CITY_MAX_HEIGHT, getCitySkyGroundColor } from "../city";
 import { drawStars } from "../stars";
 import { drawRoof } from "../../buildings";
 import { drawHud, HUD_H } from "../../hud";
-import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
+import { updateMouse, hitTestMouse, handleMouseClick } from "../../spawn/mouse";
 import { setTapScale } from "../../shared/tapTarget";
 import {
   drawBubbles,
@@ -43,13 +43,20 @@ import {
   popBubbleAt,
   updateBubbles,
   wireBubbles,
-} from "../../bubbles";
+} from "../../spawn/bubbles";
 import {
   drawWispSpawn,
   hitTestWispGlitter,
   sweepWispGlitter,
   updateWispSpawn,
-} from "../../wispSpawn";
+} from "../../spawn/wisp";
+import {
+  drawCoinSpawn,
+  hitTestCoinSpawn,
+  tapCoinSpawn,
+  updateCoinSpawn,
+  wireCoinSpawn,
+} from "../../spawn/coin";
 import { getTotalIncome } from "../../totalIncome";
 
 import { COLOR } from "../../palette";
@@ -733,6 +740,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     updateMouse(onScreenFloors, Date.now());
     updateBubbles(performance.now());
     updateWispSpawn(performance.now());
+    updateCoinSpawn(performance.now());
     const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -806,6 +814,13 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // the bubbles float over the crit celebration, rattling with the world
     ctx.translate(shake.x / scale, shake.y / scale);
     drawWispSpawn(
+      ctx,
+      SLOT_W,
+      contentViewportH(),
+      HUD_H / 2,
+      performance.now(),
+    );
+    drawCoinSpawn(
       ctx,
       SLOT_W,
       contentViewportH(),
@@ -927,6 +942,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     );
   }
   wireBubbles(floorActionsDeps);
+  wireCoinSpawn(floorActionsDeps);
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every
@@ -982,7 +998,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     sweepX = p.x;
     sweepY = p.y;
     // bubbles float over everything, the HUD too
-    bubbleTapDown = popBubbleAt(p.x, p.y);
+    bubbleTapDown = popBubbleAt(p.x, p.y) || tapCoinSpawn(p.x, p.y);
     if (bubbleTapDown) return;
     wispSwipe = hitTestWispGlitter(p.x, p.y);
     if (wispSwipe) {
@@ -1049,6 +1065,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       if (
         p.y < hudBottomY ||
         hitTestBubbles(p.x, p.y) ||
+        hitTestCoinSpawn(p.x, p.y) ||
         hitTestWispGlitter(p.x, p.y)
       ) {
         canvas.style.cursor = "pointer";

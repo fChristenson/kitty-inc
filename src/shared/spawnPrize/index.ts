@@ -1,5 +1,5 @@
 // a random spawn's prize and its payout once tapped, shared by every random
-// spawn (src/bubbles, src/tosses): a coin streams into the total, a crit
+// spawn (src/spawn/bubbles): a coin streams into the total, a crit
 // number flies up, swells and slams into its floor's income bar, and a badge
 // plays its crit celebration. The spawn keeps the Payout and draws it each
 // frame until it's done

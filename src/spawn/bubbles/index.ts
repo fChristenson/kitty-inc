@@ -8,15 +8,15 @@
 // gameCanvas wires the floor actions in (wireBubbles), ticks the spawn timer
 // (updateBubbles), pops on presses (popBubbleAt) and draws them in screen
 // space over the HUD (drawBubbles)
-import { CONFIG } from "../config";
-import type { FloorActionsDeps } from "../floors";
-import type { Floor } from "../gameState";
-import { playBubbleAppear, playBubblePop } from "../sound";
-import { randomInt } from "../utils";
-import { createSpawnRoll } from "../shared/spawnRoll";
-import { between, easeOutBack, lerp, progress } from "../shared/easing";
-import { isScreenFrozen } from "../shared/screenFreeze";
-import { drawSoapBubble, drawSoapBubblePop } from "../shared/soapBubble";
+import { CONFIG } from "../../config";
+import type { FloorActionsDeps } from "../../floors";
+import type { Floor } from "../../gameState";
+import { playBubbleAppear, playBubblePop } from "../../sound";
+import { randomInt } from "../../utils";
+import { createSpawnRoll } from "../../shared/spawnRoll";
+import { between, easeOutBack, lerp, progress } from "../../shared/easing";
+import { isScreenFrozen } from "../../shared/screenFreeze";
+import { drawSoapBubble, drawSoapBubblePop } from "../../shared/soapBubble";
 import {
   collectPrize,
   drawMini,
@@ -27,10 +27,10 @@ import {
   rollPrize,
   type Payout,
   type Prize,
-} from "../shared/spawnPrize";
-import { urgentBlink } from "../shared/urgentBlink";
-import { tapHits } from "../shared/tapTarget";
-import type { Point } from "../shared/wisp";
+} from "../../shared/spawnPrize";
+import { urgentBlink } from "../../shared/urgentBlink";
+import { tapHits } from "../../shared/tapTarget";
+import type { Point } from "../../shared/wisp";
 
 const RADIUS = 130;
 const CONTENT_SIZE = 160;

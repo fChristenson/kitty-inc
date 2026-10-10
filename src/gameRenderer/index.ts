@@ -11,7 +11,7 @@ import {
   drawIncomeFloatText,
 } from "../floors";
 import { drawOuterWall } from "../buildings";
-import { drawMouse } from "../mouse";
+import { drawMouse } from "../spawn/mouse";
 import { getTotalIncome } from "../totalIncome";
 import { hasAffordableFloorUpgrade } from "../hud";
 import { gte } from "../shared/bigNumber";

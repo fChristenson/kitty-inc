@@ -1,4 +1,4 @@
-// The hunted mouse's bonus tier reward (src/mouse): multiplies the active
+// The hunted mouse's bonus tier reward (src/spawn/mouse): multiplies the active
 // company's total income by a crit tier's multiplier and plays its
 // celebration — a tier-sized screen shake, the coin burst sfx, and a tier-sized pattern
 // of coin bursts whose coins freeze mid-air and then fly into the total-income

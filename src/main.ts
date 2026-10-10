@@ -25,8 +25,9 @@ import {
   withFeaturedCatalog,
 } from "./crits";
 import { wireCritTestActions } from "./hud";
-import { forceBubbles } from "./bubbles";
-import { forceWispSpawn } from "./wispSpawn";
+import { forceBubbles } from "./spawn/bubbles";
+import { forceWispSpawn } from "./spawn/wisp";
+import { forceCoinSpawn } from "./spawn/coin";
 import {
   add,
   subtract,
@@ -275,7 +276,7 @@ import {
   loadWallMaterial,
   loadRoofImage,
 } from "./buildings";
-import { loadMouseImage, forceSpawnMouse } from "./mouse";
+import { loadMouseImage, forceSpawnMouse } from "./spawn/mouse";
 import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation } from "./corporationName";
 import { observeActionBarHeight } from "./utils";
@@ -2262,6 +2263,7 @@ async function main() {
           "dyson-sphere": forceOnActive((e) => e.forceDysonSphereEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
+          "coin-spawn": forceCoinSpawn,
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
           "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

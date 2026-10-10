@@ -9,22 +9,25 @@
 // gameCanvas ticks the spawn timer (updateWispSpawn), sweeps it along every
 // drag (sweepWispGlitter) and draws it in screen space over the HUD
 // (drawWispSpawn)
-import { CONFIG } from "../config";
-import { COLOR } from "../palette";
-import { playBubblePop, playCoinDrop, playSwoosh } from "../sound";
-import { getActiveCompanyIndex } from "../company";
-import { addTotalIncome, getCompanyIncomeRatePerSecond } from "../totalIncome";
-import { multiply, type BigNumber } from "../shared/bigNumber";
-import { alongRoute, bezier } from "../shared/curves";
-import { between, clamp01, easeOutCubic, lerp } from "../shared/easing";
-import { isScreenFrozen } from "../shared/screenFreeze";
-import { shakeScreen } from "../shared/screenShake";
-import { createSpawnRoll } from "../shared/spawnRoll";
-import { stampGlimmer } from "../shared/twinkle";
-import { pulseHudTotalFlash } from "../shared/totalIncomeCoins";
-import { urgentBlink } from "../shared/urgentBlink";
-import { drawWispBetween, WISP_SIZE, type Point } from "../shared/wisp";
-import { swipeHits, tapHits } from "../shared/tapTarget";
+import { CONFIG } from "../../config";
+import { COLOR } from "../../palette";
+import { playCoinDrop, playSwoosh } from "../../sound";
+import { getActiveCompanyIndex } from "../../company";
+import {
+  addTotalIncome,
+  getCompanyIncomeRatePerSecond,
+} from "../../totalIncome";
+import { multiply, type BigNumber } from "../../shared/bigNumber";
+import { alongRoute, bezier } from "../../shared/curves";
+import { between, clamp01, easeOutCubic, lerp } from "../../shared/easing";
+import { isScreenFrozen } from "../../shared/screenFreeze";
+import { shakeScreen } from "../../shared/screenShake";
+import { createSpawnRoll } from "../../shared/spawnRoll";
+import { stampGlimmer } from "../../shared/twinkle";
+import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
+import { urgentBlink } from "../../shared/urgentBlink";
+import { drawWispBetween, WISP_SIZE, type Point } from "../../shared/wisp";
+import { swipeHits, tapHits } from "../../shared/tapTarget";
 
 // the dash: in from one side through a few spots across the screen, out the
 // other side; the other paths are sized in fractions of the screen's
@@ -487,7 +490,6 @@ export function drawWispSpawn(
     if (since < 0 || since > BURST_FLASH_MS) continue;
     if (!burst.fired) {
       burst.fired = true;
-      playBubblePop();
       shakeScreen(BURST_SHAKE);
     }
     const p = since / BURST_FLASH_MS;

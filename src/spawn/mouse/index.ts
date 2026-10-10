@@ -6,27 +6,27 @@ import {
   WORKER_FEET_Y_NUDGE_PX,
   spawnFreezeCoinBurst,
   triggerJumpAll,
-} from "../floors";
-import { randomInt } from "../utils";
-import { CONFIG } from "../config";
-import { urgentBlink } from "../shared/urgentBlink";
-import { createSpawnRoll } from "../shared/spawnRoll";
-import { applyBoostAll } from "../hud";
-import { playBloop } from "../sound";
-import type { Floor } from "../gameState";
-import { loadImageByName } from "../loadAssets";
-import { COLOR } from "../palette";
-import { notifyHuntTargetGone, registerHuntTarget } from "../shared/huntTarget";
-import { whitenImage } from "../shared/mergeFlash";
-import { tapHitsMoving } from "../shared/tapTarget";
-import { drawSlamTarget, getSlamPose } from "../shared/eventEndSlam";
+} from "../../floors";
+import { randomInt } from "../../utils";
+import { CONFIG } from "../../config";
+import { urgentBlink } from "../../shared/urgentBlink";
+import { createSpawnRoll } from "../../shared/spawnRoll";
+import { applyBoostAll } from "../../hud";
+import { playBloop } from "../../sound";
+import type { Floor } from "../../gameState";
+import { loadImageByName } from "../../loadAssets";
+import { COLOR } from "../../palette";
+import { notifyHuntTargetGone, registerHuntTarget } from "../../shared/huntTarget";
+import { whitenImage } from "../../shared/mergeFlash";
+import { tapHitsMoving } from "../../shared/tapTarget";
+import { drawSlamTarget, getSlamPose } from "../../shared/eventEndSlam";
 import {
   isVisibleOnFloor,
   pickCritTierByOdds,
   applyBonusTierIncome,
   celebrateBonusTier,
   type OnScreenFloor,
-} from "../crits";
+} from "../../crits";
 
 // a free bonus critter: spawns at random on a random unlocked floor in view
 // (its feet line on screen) of whichever building is currently active, runs

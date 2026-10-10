@@ -1,4 +1,4 @@
-// a random spawn's prize (src/bubbles, src/tosses), drawn small: a crit
+// a random spawn's prize (src/spawn/bubbles), drawn small: a crit
 // number, a gold coin or a badge. Every look is rastered once onto a small
 // canvas and stamped after that
 import {

@@ -334,6 +334,7 @@ export {
   applyBoostAll,
   MAX_RENDERED_WORKERS,
   WALK_SPEED,
+  WORKER_FEET_Y,
   WORKER_FEET_Y_NUDGE_PX,
 } from "./worker";
 export { drawUpgradeStar, getUpgradeIndicatorCenter } from "./star";

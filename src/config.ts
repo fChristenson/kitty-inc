@@ -92,7 +92,7 @@ export const CONFIG = {
   // every rollEveryMs and spawns with procChance, but not until cooldownMs
   // after the last one left
   randomSpawns: {
-    // src/mouse — a mouse running about a random unlocked floor
+    // src/spawn/mouse — a mouse running about a random unlocked floor
     mouse: {
       rollEveryMs: 5_000,
       procChance: 0.1,
@@ -101,7 +101,7 @@ export const CONFIG = {
       durationMs: 5_000,
       pulseMs: 2_000,
     },
-    // src/bubbles — bubbles blown up the screen: tap one to pop it for
+    // src/spawn/bubbles — bubbles blown up the screen: tap one to pop it for
     // what's inside
     bubbles: {
       rollEveryMs: 5_000,
@@ -114,7 +114,7 @@ export const CONFIG = {
       // a bubble's odds of holding a crit number, a coin or a badge
       contentOdds: { tier: 0.45, coin: 0.4, badge: 0.15 },
     },
-    // src/wispSpawn — a wisp dashing across the screen, shedding glitter: a
+    // src/spawn/wisp — a wisp dashing across the screen, shedding glitter: a
     // swipe sweeps it up into the total
     wisp: {
       rollEveryMs: 5_000,
@@ -130,6 +130,20 @@ export const CONFIG = {
       specks: 380,
       // all its glitter swept up pays this many seconds of the company's income
       rewardSeconds: 30,
+    },
+    // src/spawn/coin — black holes opening on the floors, a coin hovering over
+    // each: a tap flips one up and it's sucked into the total
+    coin: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      // how long each hovers before sinking back, pulsing over its last
+      // pulseMs
+      durationMs: 5_000,
+      pulseMs: 2_000,
+      count: [3, 7] as [number, number],
+      // all of them tapped pay this many seconds of the company's income
+      rewardSeconds: 20,
     },
   },
 

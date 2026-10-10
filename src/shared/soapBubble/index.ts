@@ -1,5 +1,5 @@
 // a soap bubble: a pale blue film in a white rim with a white shine, and the
-// ring it bursts into. Shared by the bubble floor crit and src/bubbles
+// ring it bursts into. Shared by the bubble floor crit and src/spawn/bubbles
 const TAU = Math.PI * 2;
 const FILM = "rgba(186,230,253,0.18)";
 const RIM = "rgba(255,255,255,0.85)";

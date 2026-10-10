@@ -46,6 +46,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-coin-spawn-event" class="game__button">Spawn Coin</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1422,7 +1423,7 @@ export function createTestButtonMarkup(): string {
         </div>
       </details>
       <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Crits</summary>
+        <summary class="test-actions-dropdown__toggle">Badge Crits</summary>
         <div class="test-actions-dropdown__menu">
           <label>Event <select id="test-crit-event"><option value="upgrade">Upgrade click</option><option value="unlock">Floor unlock</option><option value="map">Map unlock</option></select></label>
           <label>Tier <select id="test-crit-tier">${tiers}</select></label>

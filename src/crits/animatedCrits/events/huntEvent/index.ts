@@ -2,7 +2,7 @@
 // the screen freezes and the same glimmer stream + sfx as the Boost event
 // (crits/animatedCrits/events/boostEvent) flies from the button into the on-screen mouse. When it
 // ends the mouse grows, turns red and restarts its time on screen; clicking
-// it then (see src/mouse) also multiplies the player's total income
+// it then (see src/spawn/mouse) also multiplies the player's total income
 import type { Floor } from "../../../../gameState";
 import { CONFIG } from "../../../../config";
 import { playBoostEventStream } from "../../../../sound";

@@ -523,7 +523,7 @@ export function playBloop(): void {
 }
 
 // a short slice of the bubbling loop from where it's audible (the file opens
-// on silence), pitched by rate (src/bubbles)
+// on silence), pitched by rate (src/spawn/bubbles)
 const BUBBLE_SECONDS = 0.3;
 const BUBBLE_FADE_SECONDS = 0.1;
 function playBubble(rate: number, volume: number): void {
@@ -570,6 +570,11 @@ export function playEventEnded(): void {
   if (now - lastEventEndedPlayTime < EVENT_ENDED_DEBOUNCE_MS) return;
   lastEventEndedPlayTime = now;
   playSfx("notification", NOTIFICATION_VOLUME);
+}
+
+// the coin spawn's coins rising out of their holes (src/spawn/coin)
+export function playCoinAppear(): void {
+  playSfx("notification", NOTIFICATION_VOLUME * 0.8);
 }
 
 // how long the event-ending cue plays, so animations can span it exactly;

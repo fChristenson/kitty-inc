@@ -1,8 +1,18 @@
 # Ideas
 
+## List 108: game features
+
+New things popping up on screen to catch, each with its own gesture (like the mouse, bubbles and wisp), all made of the game's own wisps, coins and glitter.
+
+1. **Shooting star**: a wisp streaks across the sky beside the building in under a second; tap it before it's gone and it dives into the floor nearest your tap, landing a crit there.
+2. **Overflow**: a floor's income bar fills past full and starts dribbling coins over its edge; scrub back and forth across it and it bursts, the faster the scrub the bigger the payout.
+3. **Coin flick**: a big coin bounces onto the street; flick it upward and it shoots up the building, every bar it passes paying out, and lands in the total.
+4. **Cat nap**: a worker dozes off with a glowing z over its head; tap it and it jolts awake one perma tier higher.
+5. **Gold rush**: a random floor turns gold for ten seconds; every tap anywhere on that floor throws a handful of coins into the total, so you hammer it as fast as you can.
+
 ## Built
 
-- **Wake** (wisp spawn glitter, `src/wispSpawn`): the wisp sprays glitter out to both sides behind it like a boat's wake, its reach different every time; a swipe sends what it touches flying into the total.
+- **Wake** (wisp spawn glitter, `src/spawn/wisp`): the wisp sprays glitter out to both sides behind it like a boat's wake, its reach different every time; a swipe sends what it touches flying into the total.
 
 - **Wrecking swing** (`wreckingSwingCrit`), **Drones** (`dronesCrit`), **Sticky darts** (`stickyDartsCrit`) and **Storm ball** (`stormBallCrit`) income crits: a wrecking ball on a chain of light swinging through the total, wider and faster, snapping into it; three drones weaving under the total lasering it, then ramming it; darts fired into the total that stick with lit fuses and go off in a chain; a lightning ball ricocheting round the screen, bolting the total on every wall it hits.
 
