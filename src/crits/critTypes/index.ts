@@ -2181,6 +2181,16 @@ export function isFloorCritKind(type: string | null): type is FloorCritKind {
 // the income crits whose number plays out onto the total income (incomeCrits)
 export const INCOME_CRIT_KINDS = [
   "windfallCrit",
+  "bulletHoseCrit",
+  "boltMagnetCrit",
+  "bombLobCrit",
+  "haloDiveCrit",
+  "victoryLapCrit",
+  "ceilingBounceCrit",
+  "drillBitCrit",
+  "gulpCrit",
+  "goldCoatCrit",
+  "pegboardCrit",
 ] as const satisfies readonly IncomeCritType[];
 export type IncomeCritKind = (typeof INCOME_CRIT_KINDS)[number];
 

@@ -47,6 +47,16 @@ export function createTestButtonMarkup(): string {
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
           <button id="test-wisp-spawn-event" class="game__button">Spawn Wisp</button>
+          <button class="game__button" data-income-crit="bulletHoseCrit">Bullet Hose Crit</button>
+          <button class="game__button" data-income-crit="boltMagnetCrit">Bolt Magnet Crit</button>
+          <button class="game__button" data-income-crit="bombLobCrit">Bomb Lob Crit</button>
+          <button class="game__button" data-income-crit="haloDiveCrit">Halo Dive Crit</button>
+          <button class="game__button" data-income-crit="victoryLapCrit">Victory Lap Crit</button>
+          <button class="game__button" data-income-crit="ceilingBounceCrit">Ceiling Bounce Crit</button>
+          <button class="game__button" data-income-crit="drillBitCrit">Drill Bit Crit</button>
+          <button class="game__button" data-income-crit="gulpCrit">Gulp Crit</button>
+          <button class="game__button" data-income-crit="goldCoatCrit">Gold Coat Crit</button>
+          <button class="game__button" data-income-crit="pegboardCrit">Pegboard Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

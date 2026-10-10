@@ -294,6 +294,16 @@ export function registerFloorCrit(kind: CritPlayKind, def: FloorCritDef): void {
 
 const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
   windfallCrit: () => import("../../incomeCrits/crits/windfallCrit"),
+  bulletHoseCrit: () => import("../../incomeCrits/crits/bulletHoseCrit"),
+  boltMagnetCrit: () => import("../../incomeCrits/crits/boltMagnetCrit"),
+  bombLobCrit: () => import("../../incomeCrits/crits/bombLobCrit"),
+  haloDiveCrit: () => import("../../incomeCrits/crits/haloDiveCrit"),
+  victoryLapCrit: () => import("../../incomeCrits/crits/victoryLapCrit"),
+  ceilingBounceCrit: () => import("../../incomeCrits/crits/ceilingBounceCrit"),
+  drillBitCrit: () => import("../../incomeCrits/crits/drillBitCrit"),
+  gulpCrit: () => import("../../incomeCrits/crits/gulpCrit"),
+  goldCoatCrit: () => import("../../incomeCrits/crits/goldCoatCrit"),
+  pegboardCrit: () => import("../../incomeCrits/crits/pegboardCrit"),
   rapidFireCrit: () => import("../crits/rapidFireCrit"),
   pinballCrit: () => import("../crits/pinballCrit"),
   snowballCrit: () => import("../crits/snowballCrit"),
