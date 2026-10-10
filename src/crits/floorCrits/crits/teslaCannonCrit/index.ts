@@ -141,8 +141,7 @@ registerFloorCrit("teslaCannonCrit", {
   plan(r, bars, hit) {
     const cannon = planCannon(bars);
     cannons.set(r, cannon);
-    for (const s of cannon.shots)
-      for (const f of s.forks) hit(f.bar, f.at, 0);
+    for (const s of cannon.shots) for (const f of s.forks) hit(f.bar, f.at, 0);
     for (const f of cannon.finale) hit(f.bar, f.at, 0);
     hit(0, cannon.boom, 1);
     TC_CLUSTER.forEach((_, k) =>
@@ -199,16 +198,16 @@ registerFloorCrit("teslaCannonCrit", {
       for (const f of s.forks) {
         const since = ms - f.at;
         if (since < 0 || since >= 1000) continue;
-        drawDetonation(ctx, along(r, bars, f.bar, f.side), since, TC_BLAST, now);
+        drawDetonation(
+          ctx,
+          along(r, bars, f.bar, f.side),
+          since,
+          TC_BLAST,
+          now,
+        );
       }
     for (const f of finale)
-      drawDetonation(
-        ctx,
-        along(r, bars, f.bar, f.side),
-        t,
-        TC_BIG_BLAST,
-        now,
-      );
+      drawDetonation(ctx, along(r, bars, f.bar, f.side), t, TC_BIG_BLAST, now);
     drawDetonation(ctx, bars[0], t, TC_BOOM, now);
     for (let k = 0; k < TC_CLUSTER.length; k++)
       drawDetonation(
