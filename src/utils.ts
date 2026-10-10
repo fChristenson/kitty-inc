@@ -12,6 +12,26 @@ import {
 } from "./shared/bigNumber";
 
 export function loadImage(src: string): Promise<HTMLImageElement> {
+  const early = earlyImages.get(src);
+  if (early) {
+    earlyImages.delete(src);
+    return early;
+  }
+  return fetchImage(src);
+}
+
+// images the boot started before the game's code ran (loadAssets
+// preloadFirstScreen): the first loadImage of each takes it over
+const earlyImages = new Map<string, Promise<HTMLImageElement>>();
+export function loadImageEarly(src: string): void {
+  if (earlyImages.has(src)) return;
+  const image = fetchImage(src);
+  // a failure surfaces to whoever takes it over, not as an unhandled rejection
+  image.catch(() => undefined);
+  earlyImages.set(src, image);
+}
+
+function fetchImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
     // decoded off the main thread before it's handed out, so its first

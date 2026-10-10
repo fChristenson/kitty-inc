@@ -81,7 +81,7 @@ instrument(options.counts);
 if (params.get("reseed") === "1") clearBase();
 if (!hasBase()) {
   document.title = "Perf rig: seeding…";
-  await import("../src/main");
+  await import("../src/boot");
   await seedBase();
   params.delete("reseed");
   location.replace(`${location.pathname}?${params}`);
@@ -102,7 +102,7 @@ async function boot(): Promise<void> {
   if (current === "startup") start();
 
   loadFixture(options);
-  await import("../src/main");
+  await import("../src/boot");
   const { whenPerfBridge } = await import("../src/shared/perfBridge");
   const bridge = await whenPerfBridge();
   bridge.wrapRedraw(timeRedraw);

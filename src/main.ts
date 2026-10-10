@@ -310,6 +310,7 @@ const BOOST_BUTTON_SCREEN_SHARE = 0.6;
 const BUY_ALL_MAX_PURCHASES = 20_000;
 
 async function main() {
+  performance.mark("game:main");
   const app = document.querySelector<HTMLDivElement>("#app");
   if (!app) throw new Error("#app not found");
   initSessionGuard();
@@ -348,19 +349,25 @@ async function main() {
 
   // canvas text doesn't re-render on its own once a web font finishes loading (unlike
   // DOM text), so every weight the canvas draws with must be loaded before the first
-  // redraw below, or the very first frame silently falls back to system-ui
-  await Promise.all([
+  // redraw below, or the very first frame silently falls back to system-ui.
+  // Every first-screen download starts at once: awaited in turn, each cost a
+  // round trip and a decode before the first frame
+  const firstScreen = Promise.all([
     document.fonts.load('700 16px "Fredoka"'),
     document.fonts.load('900 16px "Fredoka"'),
-  ]);
-
-  await Promise.all([
     loadCloudImages(),
     loadMouseImage(),
     loadCoinImage(),
     loadFloatingCoinImage(),
     loadRoofImage(), // same roof art for every theme, loaded once
+    loadBuildingThemeAssets(),
+    loadCityImage(),
   ]);
+  // the map's backdrop is the biggest image in the game (14MB decoded) and
+  // nothing shows it until the map opens
+  afterStartup(() => void loadCityMapImage());
+  await firstScreen;
+  performance.mark("game:assets");
 
   // one Floor[] per building; only one building is ever shown on screen at a time
   // (see gameCanvas.ts's setActiveFloors) — switching which one is active/visible
@@ -488,9 +495,6 @@ async function main() {
     Math.max(loadActiveBuildingIndex(activeCompanyIndex), 0),
     buildings.length - 1,
   );
-  await loadBuildingThemeAssets();
-  await loadCityImage();
-  await loadCityMapImage();
 
   const floorUpgradeMenu = wireFloorUpgradeMenu(app, () => persist());
   const corporationStats = wireCorporationStats(app);
@@ -665,8 +669,10 @@ async function main() {
     refreshRenovationView();
   }
 
-  // dev/test-only controls; markup is stripped entirely in production builds
-  if (import.meta.env.MODE !== "production") {
+  // dev/test-only controls; markup is stripped entirely in production builds.
+  // Wired once the game is up, so dev and perf builds reach their first frame
+  // as soon as the shipped game does
+  if (import.meta.env.MODE !== "production") afterStartup(() => {
     exposePerfBridge({
       getActiveFloors: () => buildings[activeBuildingIndex],
       floorToClient: gameCanvas.floorToClient,
@@ -2986,7 +2992,7 @@ async function main() {
     // wired last, so it sees every dropdown/button the block above created
     sortTestActionMenus(app);
     wireTestActionsFilter(app);
-  }
+  });
   function startBuildingRenovation(
     floors: Floor[],
     plan: RenovationPlan,
@@ -3452,6 +3458,7 @@ async function main() {
   }
 
   gameCanvas.redraw();
+  performance.mark("game:first-frame");
 
   // one continuous redraw loop drives every animation (workers, clouds, income bars,
   // coin bursts) — gameCanvas.ts itself only ever draws whichever buildings/floors are

@@ -33,6 +33,9 @@ export interface Summary {
   // blanks canvases past its total limit, and a lost GPU blanks big ones
   canvasMb: number;
   liveCanvases: number;
+  // ms from navigation to each of this page load's startup milestones
+  // (performance.mark "game:*"): code running, art in, first frame, settled
+  startup: Record<string, number>;
 }
 
 export interface Stats {
@@ -272,5 +275,11 @@ export function stop(name: string): Summary {
     timeline: timeline(ms),
     canvasMb: canvasBytes / 1e6,
     liveCanvases,
+    startup: Object.fromEntries(
+      performance
+        .getEntriesByType("mark")
+        .filter((mark) => mark.name.startsWith("game:"))
+        .map((mark) => [mark.name.slice(5), mark.startTime]),
+    ),
   };
 }

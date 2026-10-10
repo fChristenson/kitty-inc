@@ -1,6 +1,6 @@
 import { FLOOR_W } from "../../floors";
 import { drawCartoonText, loadImage } from "../../utils";
-const roofUrl = `${import.meta.env.BASE_URL}roof.webp`;
+import { getRoofUrl } from "../../loadAssets";
 
 // native size of roof.png — width already matches FLOOR_W exactly, so it's drawn
 // 1:1, never rescaled horizontally
@@ -19,7 +19,7 @@ let roofPromise: Promise<HTMLImageElement> | null = null;
 // drawRoof reads from
 export function loadRoofImage(): Promise<HTMLImageElement> {
   if (!roofPromise) {
-    roofPromise = loadImage(roofUrl).then((loaded) => {
+    roofPromise = loadImage(getRoofUrl()).then((loaded) => {
       roofImage = loaded;
       return loaded;
     });

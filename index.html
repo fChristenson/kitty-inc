@@ -12,11 +12,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Kitty Inc</title>
+  <!-- the canvas waits for this font before its first frame: fetched alongside the code -->
+  <link rel="preload" href="/Fredoka-Bold.woff2" as="font" type="font/woff2" crossorigin />
 </head>
 
 <body>
   <div id="app"></div>
-  <script type="module" src="/src/main.ts"></script>
+  <script type="module" src="/src/boot.ts"></script>
 </body>
 
 </html>

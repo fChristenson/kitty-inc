@@ -1,7 +1,8 @@
 // every crit's icon by image name -> its file under public/: featured crits
 // by their own kind, every other proc by the icon named in CRIT_PROC_INFO.
-// Pure data, spread into loadAssets' IMAGE_FILES at load time. Read through
-// critTypes: it has to load before the featured catalog it imports
+// Registered with loadAssets as the crits load (crits/index imports this).
+// Read through critTypes: it has to load before the featured catalog it imports
+import { registerImageFiles } from "../loadAssets";
 import {
   FEATURED_CRITS,
   FEATURED_CRIT_KINDS,
@@ -98,3 +99,5 @@ export const CRIT_IMAGE_FILES = {
   luckyNumber: "crits/gamesOfChance/luckyNumber.webp", // Lucky Number crit flash's own backdrop icon
   openBook: "crits/office/openBook.webp", // Open Book crit flash's own backdrop icon
 } as const;
+
+registerImageFiles(CRIT_IMAGE_FILES);

@@ -4,7 +4,7 @@
 // Bump CACHE_NAME whenever this file's own strategy changes, to drop any stale cache.
 // Also bump it when shipped art is replaced in place (v6: crit icons upscaled),
 // or returning players keep seeing the old cached files.
-const CACHE_NAME = "kitty-inc-v10";
+const CACHE_NAME = "kitty-inc-v11";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -65,6 +65,10 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(
     caches.match(request).then((cached) => {
+      // a build's /assets/ file names carry their content hash, so a cached
+      // one never changes: no refetch racing the next startup for the network
+      if (cached && new URL(request.url).pathname.includes("/assets/"))
+        return cached;
       const network = fetch(request)
         .then((response) => {
           // audio/video elements issue Range requests (byte-range fetches, e.g.

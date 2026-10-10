@@ -48,17 +48,23 @@ export function isFeaturedCritKind(kind: string): kind is FeaturedCritKind {
   return kind in ALL_FEATURED_FLAGS_FALSE;
 }
 
-// every main category (CRIT_GROUPS), as all its crits and their chances
-const FEATURED_GROUPS = (() => {
+// every main category (CRIT_GROUPS), as all its crits and their chances;
+// built at the first roll, which waits for the rewards, so not at startup
+type FeaturedGroup = {
+  kinds: FeaturedCritKind[];
+  chances: number[];
+  total: number;
+};
+let featuredGroups: FeaturedGroup[] | null = null;
+function getFeaturedGroups(): FeaturedGroup[] {
+  if (featuredGroups) return featuredGroups;
   const groupOf = new Map<string, number>();
   Object.values(CRIT_GROUPS).forEach((categories, group) => {
     for (const category of categories) groupOf.set(category, group);
   });
-  const groups = Object.values(CRIT_GROUPS).map(() => ({
-    kinds: [] as FeaturedCritKind[],
-    chances: [] as number[],
-    total: 0,
-  }));
+  const groups = Object.values(CRIT_GROUPS).map(
+    (): FeaturedGroup => ({ kinds: [], chances: [], total: 0 }),
+  );
   for (const kind of FEATURED_CRIT_KINDS) {
     const group =
       groups[groupOf.get(FEATURED_CRITS[kind].image.split("/")[1])!];
@@ -69,13 +75,14 @@ const FEATURED_GROUPS = (() => {
     group.chances.push(chance);
     group.total += chance;
   }
-  return groups;
-})();
+  return (featuredGroups = groups);
+}
 
 // picks a main category at random, then one of its crits weighted by its chance
 export function rollFeaturedCrit(random: () => number): FeaturedCritKind[] {
+  const groups = getFeaturedGroups();
   const { kinds, chances, total } =
-    FEATURED_GROUPS[Math.floor(random() * FEATURED_GROUPS.length)];
+    groups[Math.floor(random() * groups.length)];
   let roll = random() * total;
   for (let i = 0; i < kinds.length; i++) {
     roll -= chances[i];

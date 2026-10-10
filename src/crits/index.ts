@@ -1,5 +1,6 @@
 // every crit lives under src/crits, one folder per kind of crit; other
 // modules import crit code only from here
+import "./critIcons";
 export {
   CRIT_PROC_INFO,
   CRIT_PROC_KINDS,

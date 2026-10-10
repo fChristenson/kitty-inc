@@ -16,6 +16,7 @@ export function afterStartup(task: () => void): void {
 export function markStartupSettled(): void {
   if (settled) return;
   settled = true;
+  performance.mark("game:settled");
   for (const task of waiting.splice(0)) task();
 }
 

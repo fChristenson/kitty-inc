@@ -59,6 +59,9 @@ function row(s: Summary, base: Summary | undefined): string {
   const timeline = (s.timeline ?? [])
     .map((slot) => `${fixed(slot.fps, 0)}/${fixed(slot.worst, 0)}`)
     .join(" · ");
+  const startup = Object.entries(s.startup ?? {})
+    .map(([mark, ms]) => `${mark} ${fixed(ms, 0)}`)
+    .join(" · ");
   return `
     <tr>
       <td title="${s.ms.toFixed(0)}ms, ${s.frames} frames">${s.name}</td>
@@ -80,6 +83,7 @@ function row(s: Summary, base: Summary | undefined): string {
         ${s.canvasMb === undefined ? "" : `· live canvases ${s.liveCanvases} (${fixed(s.canvasMb)}MB)`}
         <div>per frame: ${calls || "(counting off)"}</div>
         ${timeline ? `<div>each 0.5s, fps/worst frame ms: ${timeline}</div>` : ""}
+        ${startup ? `<div>ms from navigation: ${startup}</div>` : ""}
         ${sources ? `<div>canvases made by:</div><ul>${sources}</ul>` : ""}
       </details>
     </td></tr>`;

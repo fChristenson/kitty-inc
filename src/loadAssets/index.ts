@@ -1,5 +1,5 @@
-import { loadImage } from "../utils";
-import { CRIT_IMAGE_FILES } from "../crits/critIcons";
+import { loadImage, loadImageEarly } from "../utils";
+import type { CRIT_IMAGE_FILES } from "../crits/critIcons";
 
 const PUBLIC_ASSET_BASE = import.meta.env.BASE_URL;
 const themeAssetUrl = (filename: string) => `${PUBLIC_ASSET_BASE}${filename}`;
@@ -41,7 +41,6 @@ export type SpriteName = keyof typeof SPRITE_FILES;
 // every flat single-file image this game loads, by logical name -> its filename
 // inside dist/ root — same reasoning as SPRITE_FILES above
 export const IMAGE_FILES = {
-  ...CRIT_IMAGE_FILES,
   city: "city.webp", // distant tiled skyline behind buildings
   cityMapBackground: "mapBg.webp", // city map screen's own backdrop
   wallMaterial: "wallMaterial.webp", // exterior wall/floor-divider tile material
@@ -55,7 +54,33 @@ export const IMAGE_FILES = {
   clock: "clock.webp", // Work overtime's own menu icon
   slotsFrame: "slotsFrame.webp", // Jackpot Reels event's slot machine, windows cut out
 } as const;
-export type ImageName = keyof typeof IMAGE_FILES;
+export type ImageName =
+  | keyof typeof IMAGE_FILES
+  | keyof typeof CRIT_IMAGE_FILES;
+
+// the crit icons register themselves as the crits load (crits/critIcons), so
+// this module stays out of the crit catalog and the boot can load it first
+const imageFiles: Record<string, string> = { ...IMAGE_FILES };
+export function registerImageFiles(files: Record<string, string>): void {
+  Object.assign(imageFiles, files);
+}
+
+export function getRoofUrl(): string {
+  return themeAssetUrl("roof.webp");
+}
+
+// the first screen's art, fetched and decoded while the game's code is still
+// loading; each image's first loadImage takes it over
+export function preloadFirstScreen(): void {
+  [
+    ...getBackgroundUrls(),
+    getGroundUrl(),
+    ...getCloudUrls(),
+    getRoofUrl(),
+    ...(Object.keys(SPRITE_FILES) as SpriteName[]).map(getSpriteUrl),
+    ...(["city", "wallMaterial", "coin", "mouse"] as const).map(getImageUrl),
+  ].forEach(loadImageEarly);
+}
 
 export function getBackgroundUrls(): string[] {
   return backgroundFiles.map(themeAssetUrl);
@@ -82,7 +107,7 @@ export function loadSprite(name: SpriteName): Promise<HTMLImageElement> {
 }
 
 export function getImageUrl(name: ImageName): string {
-  const filename = IMAGE_FILES[name];
+  const filename = imageFiles[name];
   return sharedThemeImages.has(filename)
     ? themeAssetUrl(filename)
     : critAssetUrl(filename);
@@ -92,14 +117,14 @@ export function getImageUrl(name: ImageName): string {
 // public/stickers/ by scripts/add-sticker-borders.mjs — used by the Special
 // Crits dialog, while the celebration flash draws the plain cut-out
 export function getStickerUrl(name: ImageName): string {
-  return `${PUBLIC_ASSET_BASE}stickers/${IMAGE_FILES[name]}`;
+  return `${PUBLIC_ASSET_BASE}stickers/${imageFiles[name]}`;
 }
 
 // flat black cut of the same sticker, shown for a crit the player hasn't
 // discovered yet — its own file so an undiscovered crit never downloads the
 // artwork it's hiding; two-colour art stays PNG, which beats WebP there
 export function getSilhouetteUrl(name: ImageName): string {
-  return `${PUBLIC_ASSET_BASE}silhouettes/${IMAGE_FILES[name].replace(/\.webp$/, ".png")}`;
+  return `${PUBLIC_ASSET_BASE}silhouettes/${imageFiles[name].replace(/\.webp$/, ".png")}`;
 }
 
 export function loadImageByName(name: ImageName): Promise<HTMLImageElement> {
