@@ -98,5 +98,21 @@ export const INCOME_CRIT_CONFIG = {
     skyrocketsCrit: {
       chance: 0.03,
     },
+    // a wrecking ball swinging through the total, snapping its chain
+    wreckingSwingCrit: {
+      chance: 0.03,
+    },
+    // three drones lasering the total, then ramming it
+    dronesCrit: {
+      chance: 0.03,
+    },
+    // darts stuck in the total with lit fuses, going off in a chain
+    stickyDartsCrit: {
+      chance: 0.03,
+    },
+    // a lightning ball ricocheting round the screen, bolting the total
+    stormBallCrit: {
+      chance: 0.03,
+    },
   },
 };

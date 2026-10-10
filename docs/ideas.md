@@ -2,6 +2,8 @@
 
 ## Built
 
+- **Wrecking swing** (`wreckingSwingCrit`), **Drones** (`dronesCrit`), **Sticky darts** (`stickyDartsCrit`) and **Storm ball** (`stormBallCrit`) income crits: a wrecking ball on a chain of light swinging through the total, wider and faster, snapping into it; three drones weaving under the total lasering it, then ramming it; darts fired into the total that stick with lit fuses and go off in a chain; a lightning ball ricocheting round the screen, bolting the total on every wall it hits.
+
 - **Homing missiles** (`homingMissilesCrit`) and **Skyrockets** (`skyrocketsCrit`) income crits: two dozen missile wisps fanning out from the amount, then hooking round and homing in on the total one after another; rockets shooting up from the screen's bottom, quicker and quicker, each bursting on the total in a ring of glitter, three together for the finale.
 
 - **Mortars** (`mortarsCrit`), **Arc chain** (`arcChainCrit`), **Sweep up** (`sweepUpCrit`) and **Cork pop** (`corkPopCrit`) income crits: five mortar tubes along the screen's bottom lobbing shells off the top down onto the total, then a volley; a bolt chaining coin to coin, each firing a bolt up into the total, then a giant one; a broom of light shoving glitter up into a line under the total, side brooms heaping it, the heap slammed in; a cork popped into the total, then a jet of gold spray whipping across it in pops.

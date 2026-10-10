@@ -69,6 +69,10 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-income-crit="corkPopCrit">Cork Pop Crit</button>
           <button class="game__button" data-income-crit="homingMissilesCrit">Homing Missiles Crit</button>
           <button class="game__button" data-income-crit="skyrocketsCrit">Skyrockets Crit</button>
+          <button class="game__button" data-income-crit="wreckingSwingCrit">Wrecking Swing Crit</button>
+          <button class="game__button" data-income-crit="dronesCrit">Drones Crit</button>
+          <button class="game__button" data-income-crit="stickyDartsCrit">Sticky Darts Crit</button>
+          <button class="game__button" data-income-crit="stormBallCrit">Storm Ball Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
