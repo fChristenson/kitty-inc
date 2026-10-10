@@ -59,6 +59,7 @@ export {
   wireTestActionsFilter,
   sortTestActionMenus,
   wireIdleOverlayTestButton,
+  wireSplashTestButton,
   wireAddBadgesTestButtons,
   wireFoilRevealTestButtons,
   wireBoostEventTestButton,

@@ -119,6 +119,7 @@ import {
   wireTestActionsFilter,
   sortTestActionMenus,
   wireIdleOverlayTestButton,
+  wireSplashTestButton,
   wireAddBadgesTestButtons,
   wireFoilRevealTestButtons,
   wireBoostEventTestButton,
@@ -310,6 +311,22 @@ const BOOST_BUTTON_SCREEN_SHARE = 0.6;
 const BUY_ALL_MAX_PURCHASES = 20_000;
 // matches style.css's .splash--out transition
 const SPLASH_FADE_MS = 150;
+// index.html's splash as it first showed, for the test button to bring back
+let splashCopy: HTMLElement | null = null;
+
+// fades a splash out and drops it
+function hideSplash(splash: HTMLElement): void {
+  splash.classList.add("splash--out");
+  setTimeout(() => splash.remove(), SPLASH_FADE_MS);
+}
+
+// the splash screen again over the game until it's clicked (test button)
+function showSplashTest(app: HTMLElement): void {
+  if (!splashCopy) return;
+  const splash = splashCopy.cloneNode(true) as HTMLElement;
+  splash.addEventListener("click", () => hideSplash(splash), { once: true });
+  app.append(splash);
+}
 
 async function main() {
   performance.mark("game:main");
@@ -702,6 +719,7 @@ async function main() {
         wireIdleOverlayTestButton(app, () => {
           void totalEarnedOverlay.show(fromNumber(123456));
         });
+        wireSplashTestButton(app, () => showSplashTest(app));
         wireAddBadgesTestButtons(app);
         wireFoilRevealTestButtons(app, (kind) => {
           const floor = buildings[activeBuildingIndex]?.[0];
@@ -3501,8 +3519,10 @@ async function main() {
   gameCanvas.redraw();
   performance.mark("game:first-frame");
   const splash = document.getElementById("splash");
-  splash?.classList.add("splash--out");
-  setTimeout(() => splash?.remove(), SPLASH_FADE_MS);
+  if (splash) {
+    splashCopy = splash.cloneNode(true) as HTMLElement;
+    hideSplash(splash);
+  }
 
   // one continuous redraw loop drives every animation (workers, clouds, income bars,
   // coin bursts) — gameCanvas.ts itself only ever draws whichever buildings/floors are

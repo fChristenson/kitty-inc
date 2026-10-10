@@ -74,6 +74,14 @@ export function wireIdleOverlayTestButton(
   button.addEventListener("click", onClick);
 }
 
+export function wireSplashTestButton(
+  container: HTMLElement,
+  onClick: () => void,
+): void {
+  const button = container.querySelector<HTMLButtonElement>("#test-splash")!;
+  button.addEventListener("click", onClick);
+}
+
 export function wireBoostEventTestButton(
   container: HTMLElement,
   onClick: () => void,
