@@ -46,33 +46,6 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button id="test-wisp-spawn-event" class="game__button">Spawn Wisp</button>
-          <button class="game__button" data-income-crit="bulletHoseCrit">Bullet Hose Crit</button>
-          <button class="game__button" data-income-crit="boltMagnetCrit">Bolt Magnet Crit</button>
-          <button class="game__button" data-income-crit="bombLobCrit">Bomb Lob Crit</button>
-          <button class="game__button" data-income-crit="haloDiveCrit">Halo Dive Crit</button>
-          <button class="game__button" data-income-crit="victoryLapCrit">Victory Lap Crit</button>
-          <button class="game__button" data-income-crit="ceilingBounceCrit">Ceiling Bounce Crit</button>
-          <button class="game__button" data-income-crit="drillBitCrit">Drill Bit Crit</button>
-          <button class="game__button" data-income-crit="gulpCrit">Gulp Crit</button>
-          <button class="game__button" data-income-crit="goldCoatCrit">Gold Coat Crit</button>
-          <button class="game__button" data-income-crit="pegboardCrit">Pegboard Crit</button>
-          <button class="game__button" data-income-crit="starFlingCrit">Star Fling Crit</button>
-          <button class="game__button" data-income-crit="moneySpoutCrit">Money Spout Crit</button>
-          <button class="game__button" data-income-crit="salvoCrit">Salvo Crit</button>
-          <button class="game__button" data-income-crit="lightPillarsCrit">Light Pillars Crit</button>
-          <button class="game__button" data-income-crit="bankShotCrit">Bank Shot Crit</button>
-          <button class="game__button" data-income-crit="bombletsCrit">Bomblets Crit</button>
-          <button class="game__button" data-income-crit="mortarsCrit">Mortars Crit</button>
-          <button class="game__button" data-income-crit="arcChainCrit">Arc Chain Crit</button>
-          <button class="game__button" data-income-crit="sweepUpCrit">Sweep Up Crit</button>
-          <button class="game__button" data-income-crit="corkPopCrit">Cork Pop Crit</button>
-          <button class="game__button" data-income-crit="homingMissilesCrit">Homing Missiles Crit</button>
-          <button class="game__button" data-income-crit="skyrocketsCrit">Skyrockets Crit</button>
-          <button class="game__button" data-income-crit="wreckingSwingCrit">Wrecking Swing Crit</button>
-          <button class="game__button" data-income-crit="dronesCrit">Drones Crit</button>
-          <button class="game__button" data-income-crit="stickyDartsCrit">Sticky Darts Crit</button>
-          <button class="game__button" data-income-crit="stormBallCrit">Storm Ball Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1314,6 +1287,7 @@ export function createTestButtonMarkup(): string {
         <div class="test-actions-dropdown__menu">
           <button id="spawn-mouse" class="game__button">Spawn Mouse</button>
           <button id="test-bubbles-event" class="game__button">Spawn Bubbles</button>
+          <button id="test-wisp-spawn-event" class="game__button">Spawn Wisp</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
@@ -1332,6 +1306,32 @@ export function createTestButtonMarkup(): string {
         <summary class="test-actions-dropdown__toggle">Income Crits</summary>
         <div class="test-actions-dropdown__menu">
           <button class="game__button" data-income-crit="windfallCrit">Windfall Crit</button>
+          <button class="game__button" data-income-crit="bulletHoseCrit">Bullet Hose Crit</button>
+          <button class="game__button" data-income-crit="boltMagnetCrit">Bolt Magnet Crit</button>
+          <button class="game__button" data-income-crit="bombLobCrit">Bomb Lob Crit</button>
+          <button class="game__button" data-income-crit="haloDiveCrit">Halo Dive Crit</button>
+          <button class="game__button" data-income-crit="victoryLapCrit">Victory Lap Crit</button>
+          <button class="game__button" data-income-crit="ceilingBounceCrit">Ceiling Bounce Crit</button>
+          <button class="game__button" data-income-crit="drillBitCrit">Drill Bit Crit</button>
+          <button class="game__button" data-income-crit="gulpCrit">Gulp Crit</button>
+          <button class="game__button" data-income-crit="goldCoatCrit">Gold Coat Crit</button>
+          <button class="game__button" data-income-crit="pegboardCrit">Pegboard Crit</button>
+          <button class="game__button" data-income-crit="starFlingCrit">Star Fling Crit</button>
+          <button class="game__button" data-income-crit="moneySpoutCrit">Money Spout Crit</button>
+          <button class="game__button" data-income-crit="salvoCrit">Salvo Crit</button>
+          <button class="game__button" data-income-crit="lightPillarsCrit">Light Pillars Crit</button>
+          <button class="game__button" data-income-crit="bankShotCrit">Bank Shot Crit</button>
+          <button class="game__button" data-income-crit="bombletsCrit">Bomblets Crit</button>
+          <button class="game__button" data-income-crit="mortarsCrit">Mortars Crit</button>
+          <button class="game__button" data-income-crit="arcChainCrit">Arc Chain Crit</button>
+          <button class="game__button" data-income-crit="sweepUpCrit">Sweep Up Crit</button>
+          <button class="game__button" data-income-crit="corkPopCrit">Cork Pop Crit</button>
+          <button class="game__button" data-income-crit="homingMissilesCrit">Homing Missiles Crit</button>
+          <button class="game__button" data-income-crit="skyrocketsCrit">Skyrockets Crit</button>
+          <button class="game__button" data-income-crit="wreckingSwingCrit">Wrecking Swing Crit</button>
+          <button class="game__button" data-income-crit="dronesCrit">Drones Crit</button>
+          <button class="game__button" data-income-crit="stickyDartsCrit">Sticky Darts Crit</button>
+          <button class="game__button" data-income-crit="stormBallCrit">Storm Ball Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

@@ -16,7 +16,6 @@ import { randomInt } from "../utils";
 import { createSpawnRoll } from "../shared/spawnRoll";
 import { between, easeOutBack, lerp, progress } from "../shared/easing";
 import { isScreenFrozen } from "../shared/screenFreeze";
-import { shakeScreen } from "../shared/screenShake";
 import { drawSoapBubble, drawSoapBubblePop } from "../shared/soapBubble";
 import {
   collectPrize,
@@ -212,7 +211,6 @@ export function popBubbleAt(x: number, y: number): boolean {
   bubble.poppedAt = now;
   bubbleAt(bubble, now, bubble.from);
   playBubblePop();
-  shakeScreen(0.35);
   bubble.payout = collectPrize(
     getDeps(),
     bubble.floor,
