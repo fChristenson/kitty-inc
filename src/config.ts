@@ -114,6 +114,21 @@ export const CONFIG = {
       // a bubble's odds of holding a crit number, a coin or a badge
       contentOdds: { tier: 0.45, coin: 0.4, badge: 0.15 },
     },
+    // src/wispSpawn — a wisp dashing across the screen, shedding glitter: a
+    // swipe sweeps it up into the total
+    wisp: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      // its dash, then how long the glitter lingers, pulsing over its last
+      // pulseMs
+      dashMs: 1_600,
+      durationMs: 6_000,
+      pulseMs: 2_000,
+      specks: 90,
+      // all its glitter swept up pays this many seconds of the company's income
+      rewardSeconds: 30,
+    },
   },
 
   // src/hud/upgradeMenu/index.ts — per-floor worker/office-upgrade pricing.

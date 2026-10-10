@@ -46,6 +46,7 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-wisp-spawn-event" class="game__button">Spawn Wisp</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

@@ -26,6 +26,7 @@ import {
 } from "./crits";
 import { wireCritTestActions } from "./hud";
 import { forceBubbles } from "./bubbles";
+import { forceWispSpawn } from "./wispSpawn";
 import {
   add,
   subtract,
@@ -2260,6 +2261,7 @@ async function main() {
           "geometry-run": forceOnActive((e) => e.forceGeometryRunEvent),
           "dyson-sphere": forceOnActive((e) => e.forceDysonSphereEvent),
           bubbles: forceBubbles,
+          "wisp-spawn": forceWispSpawn,
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
           "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

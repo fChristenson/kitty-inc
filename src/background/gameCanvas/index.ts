@@ -43,6 +43,12 @@ import {
   updateBubbles,
   wireBubbles,
 } from "../../bubbles";
+import {
+  drawWispSpawn,
+  hitTestWispGlitter,
+  sweepWispGlitter,
+  updateWispSpawn,
+} from "../../wispSpawn";
 import { getTotalIncome } from "../../totalIncome";
 
 import { COLOR } from "../../palette";
@@ -724,6 +730,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   function drawLiveFrame(skipHud = false, skipFlash = false): void {
     updateMouse(onScreenFloors, Date.now());
     updateBubbles(performance.now());
+    updateWispSpawn(performance.now());
     const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -796,6 +803,13 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       );
     // the bubbles float over the crit celebration, rattling with the world
     ctx.translate(shake.x / scale, shake.y / scale);
+    drawWispSpawn(
+      ctx,
+      SLOT_W,
+      contentViewportH(),
+      HUD_H / 2,
+      performance.now(),
+    );
     drawBubbles(ctx, SLOT_W, contentViewportH(), performance.now());
     ctx.restore();
   }
@@ -819,6 +833,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   let hudTapDown = false;
   // true for the whole gesture if it popped a bubble: nothing under it fires
   let bubbleTapDown = false;
+  // true for the whole gesture if it started on the wisp's glitter: it
+  // sweeps instead of scrolling or tapping; every drag sweeps from the last spot
+  let wispSwipe = false;
+  let sweepX = 0;
+  let sweepY = 0;
 
   function stopMomentum(): void {
     if (momentumFrame !== null) {
@@ -957,9 +976,17 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     stopHoldRepeat(); // safety net against a stale hold from an interrupted previous gesture
     upgradeFiredOnDown = false;
     const p = canvasPoint(event);
+    wispSwipe = false;
+    sweepX = p.x;
+    sweepY = p.y;
     // bubbles float over everything, the HUD too
     bubbleTapDown = popBubbleAt(p.x, p.y);
     if (bubbleTapDown) return;
+    wispSwipe = hitTestWispGlitter(p.x, p.y);
+    if (wispSwipe) {
+      sweepWispGlitter(p.x, p.y, p.x, p.y);
+      return;
+    }
     hudTapDown = p.y < hudBottomY;
     if (hudTapDown) return; // HUD is the topmost layer — no floor hit-test underneath it
     const hit = hitTestPoint(p.x, p.y);
@@ -1007,6 +1034,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     didDrag = false;
     hudTapDown = false;
     bubbleTapDown = false;
+    wispSwipe = false;
     upgradeFiredOnDown = true;
     canvas.setPointerCapture(event.pointerId);
     button.fire();
@@ -1016,7 +1044,11 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   function onPointerMove(event: PointerEvent): void {
     if (dragPointerId !== event.pointerId) {
       const p = canvasPoint(event);
-      if (p.y < hudBottomY || hitTestBubbles(p.x, p.y)) {
+      if (
+        p.y < hudBottomY ||
+        hitTestBubbles(p.x, p.y) ||
+        hitTestWispGlitter(p.x, p.y)
+      ) {
         canvas.style.cursor = "pointer";
         hoveredPoint = null;
         return;
@@ -1044,6 +1076,12 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     }
     // a held freeze button never scrolls the frozen frame
     if (isScreenFrozen()) return;
+
+    const swipe = canvasPoint(event);
+    sweepWispGlitter(sweepX, sweepY, swipe.x, swipe.y);
+    sweepX = swipe.x;
+    sweepY = swipe.y;
+    if (wispSwipe) return;
 
     const dy = event.clientY - lastY;
     const now = performance.now();
@@ -1075,7 +1113,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       }
       return;
     }
-    if (bubbleTapDown) return;
+    if (bubbleTapDown || wispSwipe) return;
     if (hudTapDown) {
       onOpenCorporationStats();
       return;
