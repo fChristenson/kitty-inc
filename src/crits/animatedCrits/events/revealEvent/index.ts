@@ -11,7 +11,7 @@ import { getImageUrl } from "../../../../loadAssets";
 import { COLOR } from "../../../../palette";
 import { getCritProcCount } from "../../../badgeCrits/critProcCounts";
 import {
-  CRIT_PROC_INFO,
+  critProcIcon,
   CRIT_PROC_KINDS,
   pickCritTierByOdds,
 } from "../../../critTypes";
@@ -64,7 +64,7 @@ function startReveal(floor: Floor, context: EventProcContext): void {
   const pool = unseen.length > 0 ? unseen : CRIT_PROC_KINDS;
   const kind = pool[Math.floor(Math.random() * pool.length)];
   const tier = context.critTier ?? pickCritTierByOdds();
-  const { icon } = CRIT_PROC_INFO[kind];
+  const icon = critProcIcon(kind);
   const scene: BadgeScene = {
     before: null,
     after: null,

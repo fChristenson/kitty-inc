@@ -6,7 +6,7 @@ import type { Floor } from "../../../gameState";
 import { loadImage } from "../../../utils";
 import { getImageUrl } from "../../../loadAssets";
 import type { BadgeFoil } from "../critProcCounts";
-import { CRIT_PROC_INFO, type CritProcKind } from "../../critTypes";
+import { critProcIcon, type CritProcKind } from "../../critTypes";
 import {
   badgeFace,
   badgeRevealTimeline,
@@ -76,7 +76,7 @@ function playNext(): void {
   }
   queue.shift();
   // the art loads while the stage slides in and the wisp flies over
-  loadImage(getImageUrl(CRIT_PROC_INFO[kind].icon)).then(
+  loadImage(getImageUrl(critProcIcon(kind))).then(
     (image) => {
       scene.before = badgeFace(image, foil === "glitter" ? "shimmer" : null);
       scene.after = badgeFace(image, foil);

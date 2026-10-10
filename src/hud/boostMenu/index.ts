@@ -128,20 +128,6 @@ export function buyOvertimeBoost(floors: Floor[]): Floor | null {
 }
 
 // reuses .worker-menu's styling — same generic "dialog with a list of buyable items" shape
-export function createBoostMenuMarkup(): string {
-  return `
-    <div class="worker-menu" id="boost-menu" hidden>
-      <div class="worker-menu__backdrop" id="boost-menu-backdrop"></div>
-      <div class="worker-menu__panel">
-        <div class="worker-menu__header">
-          <h2>Boosts</h2>
-        </div>
-        <div class="worker-menu__list" id="boost-menu-list"></div>
-      </div>
-    </div>
-  `;
-}
-
 export interface BoostMenu {
   open: () => void;
   close: () => void;

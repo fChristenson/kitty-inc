@@ -10,7 +10,7 @@ import { loadImage } from "../../../utils";
 import { getImageUrl } from "../../../loadAssets";
 import { getCritProcCount } from "../critProcCounts";
 import {
-  CRIT_PROC_INFO,
+  critProcIcon,
   CRIT_PROC_KINDS,
   pickCritTierByOdds,
   type CritProcKind,
@@ -81,7 +81,7 @@ export function takeBadgeCapsule(
 export function capsuleRevealContent(kind: CritProcKind, title: string) {
   const scene: CapsuleScene = { art: null, title };
   // the art loads while the capsule rolls
-  loadImage(getImageUrl(CRIT_PROC_INFO[kind].icon)).then(
+  loadImage(getImageUrl(critProcIcon(kind))).then(
     (image) => {
       scene.art = image;
     },

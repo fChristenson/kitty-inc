@@ -23,6 +23,8 @@ export const MAP_CRIT_TEST_KINDS: readonly CritProcKind[] = [
 ];
 
 export function createTestButtonMarkup(): string {
+  const label = (kind: (typeof CRIT_PROC_KINDS)[number]) =>
+    CRIT_PROC_INFO[kind]?.label ?? kind;
   const tiers = [...CRIT_TIER_ORDER]
     .reverse()
     .map(
@@ -31,12 +33,10 @@ export function createTestButtonMarkup(): string {
     )
     .join("");
   const buttons = [...CRIT_PROC_KINDS]
-    .sort((left, right) =>
-      CRIT_PROC_INFO[left].label.localeCompare(CRIT_PROC_INFO[right].label),
-    )
+    .sort((left, right) => label(left).localeCompare(label(right)))
     .map(
       (kind) =>
-        `<button class="game__button" data-crit-kind="${kind}">${CRIT_PROC_INFO[kind].label}</button>`,
+        `<button class="game__button" data-crit-kind="${kind}">${label(kind)}</button>`,
     )
     .join("");
   return `

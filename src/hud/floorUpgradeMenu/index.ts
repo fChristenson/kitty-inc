@@ -57,20 +57,6 @@ export function hasAffordableFloorUpgrade(floor: Floor): boolean {
 // reuses .worker-menu's styling (same generic "dialog with a list of buyable
 // items" shape every other hud dialog uses) — opened via the green arrow drawn
 // on each floor's own room (floors/upgradeArrow), scoped to that one floor only
-export function createFloorUpgradeMenuMarkup(): string {
-  return `
-    <div class="worker-menu" id="floor-upgrade-menu" hidden>
-      <div class="worker-menu__backdrop" id="floor-upgrade-menu-backdrop"></div>
-      <div class="worker-menu__panel">
-        <div class="worker-menu__header">
-          <h2 id="floor-upgrade-menu-title">Floor upgrades</h2>
-        </div>
-        <div class="worker-menu__list" id="floor-upgrade-menu-list"></div>
-      </div>
-    </div>
-  `;
-}
-
 export interface FloorUpgradeMenu {
   // floorNumber is 1-indexed, matching what floors/floorNumber.ts already shows
   open: (floor: Floor, floorNumber: number) => void;

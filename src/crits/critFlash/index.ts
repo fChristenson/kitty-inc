@@ -7,6 +7,7 @@ import {
   CRIT_PROC_INFO,
   CRIT_PROC_KINDS,
   onCritProcsArmed,
+  onFeaturedCatalog,
   type CritProcKind,
 } from "../critTypes";
 import { critFont, drawCritText } from "./critText";
@@ -39,18 +40,22 @@ const CRIT_ICON_EXTRA_ROTATION: Partial<Record<CritProcKind, number>> = {
 // text below, keyed by that flash's own label. Derived from critTypes'
 // canonical CRIT_PROC_INFO rather than hand-listed here — a third copy of the
 // label -> icon mapping is exactly how Bull Market ended up flashing with no
-// icon at all
+// icon at all. The featured crits join once their catalog loads
 const CRIT_ICON_BY_LABEL: Partial<
   Record<string, { name: ImageName; rotateDeg?: number }>
-> = Object.fromEntries(
-  CRIT_PROC_KINDS.map((kind) => [
-    CRIT_PROC_INFO[kind].label,
-    {
-      name: CRIT_PROC_INFO[kind].icon,
-      rotateDeg: CRIT_ICON_EXTRA_ROTATION[kind],
-    },
-  ]),
-);
+> = {};
+function addCritIcons(): void {
+  for (const kind of CRIT_PROC_KINDS) {
+    const info = CRIT_PROC_INFO[kind];
+    if (info)
+      CRIT_ICON_BY_LABEL[info.label] = {
+        name: info.icon,
+        rotateDeg: CRIT_ICON_EXTRA_ROTATION[kind],
+      };
+  }
+}
+addCritIcons();
+onFeaturedCatalog(addCritIcons);
 
 // the Sale boost's own flash isn't a piggyback proc, so it isn't in
 // CRIT_PROC_INFO and still needs its own entry
@@ -84,7 +89,9 @@ export const SPECIAL_FLASH_STROKE_WIDTH = 14;
 let latestArmedLabel = "";
 onCritProcsArmed((kinds) => {
   for (const kind of kinds) {
-    const { icon, label, color } = CRIT_PROC_INFO[kind];
+    const info = CRIT_PROC_INFO[kind];
+    if (!info) continue;
+    const { icon, label, color } = info;
     latestArmedLabel = label;
     void requestCritIcon(icon)
       .then(() =>

@@ -25,26 +25,13 @@ import {
   CRIT_PROC_KINDS,
   getCritProcCount,
   getCritProcIncomeModifierPercent,
+  withFeaturedCatalog,
 } from "../../crits";
 
 // read-only "Corporation income rate"/"Income modifiers" breakdown — split
 // out of corporationBoostMenu so that dialog only has to hold its own
 // buy/spend buttons. Opened by tapping corporationBoostMenu's own "Total
 // income" summary row, on top of it
-export function createCorporationStatsMarkup(): string {
-  return `
-    <div class="worker-menu" id="corporation-stats-menu" hidden>
-      <div class="worker-menu__backdrop" id="corporation-stats-menu-backdrop"></div>
-      <div class="worker-menu__panel">
-        <div class="worker-menu__header">
-          <h2>Corporation Statistics</h2>
-        </div>
-        <div class="worker-menu__list" id="corporation-stats-menu-list"></div>
-      </div>
-    </div>
-  `;
-}
-
 export interface CorporationStats {
   open: () => void;
   close: () => void;
@@ -126,7 +113,7 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
       0,
     );
     const critModifierRows = CRIT_PROC_KINDS.map((kind) => ({
-      label: CRIT_PROC_INFO[kind].label,
+      label: CRIT_PROC_INFO[kind]!.label,
       pct: getCritProcIncomeModifierPercent(kind, getCritProcCount(kind)),
     }))
       .filter(({ pct }) => pct > 0)
@@ -203,6 +190,10 @@ export function wireCorporationStats(container: HTMLElement): CorporationStats {
   }
 
   function open(): void {
+    withFeaturedCatalog(show);
+  }
+
+  function show(): void {
     cancelDialogClose(panel);
     render();
     menu.hidden = false;

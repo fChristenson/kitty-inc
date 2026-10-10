@@ -9,6 +9,7 @@ export {
   RATE_LOCK_SPEED_MULTIPLIER,
   RUSH_HOUR_INTERVAL_SECONDS,
   SPECIAL_CRIT_GATEWAY,
+  critProcIcon,
   getCritProcIncomeModifierPercent,
   getCritProcNextMilestoneCount,
   getPriceMatchCost,
@@ -17,12 +18,14 @@ export {
   isRateLockActive,
   isRushHourActive,
   isSpendingFreezeActive,
+  loadFeaturedCatalog,
   nextCritTier,
   pickCritTierByOdds,
   pickHigherCritTier,
   readCritProcs,
   setCritRandom,
   tierOnlyCrit,
+  withFeaturedCatalog,
 } from "./critTypes";
 export type {
   FloorCritKind,

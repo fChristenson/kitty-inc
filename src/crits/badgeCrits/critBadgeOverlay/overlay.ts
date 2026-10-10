@@ -4,7 +4,7 @@ import { getStickerUrl } from "../../../loadAssets";
 import { getEffectiveDpr } from "../../../shared/devicePixelRatio";
 import {
   CRIT_PROC_KINDS,
-  CRIT_PROC_INFO,
+  critProcIcon,
   type CritProcKind,
 } from "../../critTypes";
 
@@ -49,7 +49,7 @@ export function createCritBadgeRenderer(
       scaledCritBadgeImages.delete(kind);
       redraw();
     };
-    image.src = getStickerUrl(CRIT_PROC_INFO[kind].icon);
+    image.src = getStickerUrl(critProcIcon(kind));
     return image;
   }
 

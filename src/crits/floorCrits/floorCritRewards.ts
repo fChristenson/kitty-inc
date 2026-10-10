@@ -50,6 +50,7 @@ import {
   DOMINO_EFFECT_CONTINUE_CHANCE,
   BOUNCE_CRIT_CONTINUE_CHANCE,
   EXPLOSION_CRIT_CONTINUE_CHANCE,
+  type CritProcHandlers,
   type CritProcKind,
   type CritRollResult,
   type FloorCritKind,
@@ -1206,309 +1207,305 @@ function asRewardContext(context: FeaturedRewardContext): CritRewardContext {
 
 const CELEBRATED_PROMOTIONS = 6;
 
-const CRIT_REWARDS: Record<CritProcKind, (context: CritRewardContext) => void> =
-  {
-    ...createFeaturedCritRewards({
-      upgrade: (floors, count) => {
-        for (const floor of floors) {
-          if (!floor.unlocked) continue;
-          increaseIncomeRateBy(floor, count);
-        }
-      },
-      payCycles: applyTickTockCrit,
-      incomeRate: currentIncomeRatePerSecond,
-      addIncomeShare: (fraction) =>
-        addTotalIncome(multiply(getTotalIncome(), fraction)),
-      addIncomeSeconds: (seconds) =>
-        addTotalIncome(
-          multiply(
-            getCompanyIncomeRatePerSecond(getActiveCompanyIndex()),
-            seconds,
-          ),
-        ),
-      repeatCrit: (context, direction, continueChance) => {
-        const c = asRewardContext(context);
-        const start = c.floors.indexOf(c.floor);
-        const reward = (reached: Floor, isGround: boolean) => {
-          for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
-        };
-        if (direction === "up") {
-          applyChainCrit(c.deps, start, reward, continueChance);
-        } else if (direction === "down") {
-          applyBounceCrit(c.deps, start, reward, continueChance);
-        } else {
-          applyExplosionCrit(c.deps, start, reward, continueChance);
-        }
-      },
-      armCrit: (floors, tier) => {
-        for (const floor of floors) {
-          if (floor.unlocked) armCritUpgrade(floor, tier);
-        }
-      },
-      unlockFloors: (context, count) => {
-        const c = asRewardContext(context);
-        unlockFloorsAbove(c.deps, c.floor, count);
-      },
-      hireWorkers: (floors, count) => {
-        for (const floor of floors) {
-          if (!floor.unlocked) continue;
-          const room = Math.max(0, MAX_RENDERED_WORKERS - floor.workerCount);
-          floor.workerCount += Math.min(count, room);
-          // a floor with no room for the hires promotes one worker a perma tier instead
-          const promotable = getBoostEventCandidates(floor);
-          if (count > room && promotable.length > 0)
-            promoteWorkerPermaTier(floor, promotable[0]);
-        }
-      },
-      hireManagers: (floors) => {
-        for (const floor of floors) {
-          if (floor.unlocked) applyUnionBossCrit(floor);
-        }
-      },
-      giveOfficeChairs: (floors) => {
-        for (const floor of floors) {
-          if (floor.unlocked) applyChairGiveawayCrit(floor);
-        }
-      },
-      giveOfficeSupplies: (floors) => {
-        for (const floor of floors) {
-          if (floor.unlocked) applySuppliesGiveawayCrit(floor);
-        }
-      },
-      boostWorkers: (floors, seconds, extraWorkers) => {
-        const durationMs = seconds * 1000;
-        const unlocked = floors.filter((floor) => floor.unlocked);
-        applyFloorBoost(unlocked, durationMs);
-        const now = Date.now();
-        for (const floor of unlocked) {
-          const firstVirtualIndex = getRenderedWorkerCount(floor);
-          for (let i = 0; i < extraWorkers; i++) {
-            activateBoosted(floor, firstVirtualIndex + i, now, durationMs);
-          }
-        }
-      },
-      discountPrices: (floors, fraction) =>
-        applySeasonalSaleCrit(floors, 1 - fraction),
-      raiseLevels: (floors, level) => {
-        for (const floor of floors) {
-          if (floor.unlocked && floor.upgradeCount < level) {
-            increaseIncomeRateBy(floor, level - floor.upgradeCount);
-          }
-        }
-      },
-      addUpgradePriceCash: (floors, multiple) => {
-        for (const floor of floors) {
-          if (floor.unlocked)
-            addTotalIncome(multiply(floor.upgradeCost, multiple));
-        }
-      },
-      growLevels: (floors, fraction) => {
-        for (const floor of floors) {
-          if (!floor.unlocked) continue;
-          increaseIncomeRateBy(
-            floor,
-            Math.max(1, Math.ceil(floor.upgradeCount * fraction)),
-          );
-        }
-      },
-      spreadUpgrades: (floors, total) => {
-        const unlocked = floors.filter((floor) => floor.unlocked);
-        if (unlocked.length === 0) return;
-        const levels = unlocked.map((floor) => floor.upgradeCount);
-        const given = unlocked.map(() => 0);
-        for (let i = 0; i < total; i++) {
-          let lowest = 0;
-          for (let j = 1; j < levels.length; j++) {
-            if (levels[j] < levels[lowest]) lowest = j;
-          }
-          levels[lowest] += 1;
-          given[lowest] += 1;
-        }
-        unlocked.forEach((floor, j) => increaseIncomeRateBy(floor, given[j]));
-      },
-      raiseWorkerTiers: (floors, share, steps) => {
-        const climbers = floors
-          .filter((floor) => floor.unlocked)
-          .flatMap((floor) =>
-            getBoostEventCandidates(floor).map((workerIndex) => ({
-              floor,
-              workerIndex,
-            })),
-          )
-          .sort(() => Math.random() - 0.5);
-        const count = Math.min(
-          climbers.length,
-          Math.max(1, Math.ceil(climbers.length * share)),
-        );
-        const now = Date.now();
-        climbers.slice(0, count).forEach(({ floor, workerIndex }, i) => {
-          for (let step = 0; step < steps; step++)
-            promoteWorkerPermaTier(floor, workerIndex);
-          // only a few celebrate, so a big promotion doesn't stack dozens of sounds
-          if (i < CELEBRATED_PROMOTIONS)
-            celebrateWorkerBoost(floor, workerIndex, now);
-        });
-      },
-      startEvent: (floors, event) => {
-        const unlocked = floors.filter((floor) => floor.unlocked);
-        if (event === "spendingFreeze") triggerSpendingFreeze(unlocked);
-        else if (event === "rushHour") triggerRushHourCrit(unlocked);
-        else {
-          for (const floor of unlocked) {
-            if (event === "sale") triggerSaleBoost(floor);
-            else triggerFrozenCrit(floor);
-          }
-        }
-      },
+// every featured crit's reward, paid through one function
+const payFeaturedCrit = createFeaturedCritRewards({
+  upgrade: (floors, count) => {
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      increaseIncomeRateBy(floor, count);
+    }
+  },
+  payCycles: applyTickTockCrit,
+  incomeRate: currentIncomeRatePerSecond,
+  addIncomeShare: (fraction) =>
+    addTotalIncome(multiply(getTotalIncome(), fraction)),
+  addIncomeSeconds: (seconds) =>
+    addTotalIncome(
+      multiply(getCompanyIncomeRatePerSecond(getActiveCompanyIndex()), seconds),
+    ),
+  repeatCrit: (context, direction, continueChance) => {
+    const c = asRewardContext(context);
+    const start = c.floors.indexOf(c.floor);
+    const reward = (reached: Floor, isGround: boolean) => {
+      for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
+    };
+    if (direction === "up") {
+      applyChainCrit(c.deps, start, reward, continueChance);
+    } else if (direction === "down") {
+      applyBounceCrit(c.deps, start, reward, continueChance);
+    } else {
+      applyExplosionCrit(c.deps, start, reward, continueChance);
+    }
+  },
+  armCrit: (floors, tier) => {
+    for (const floor of floors) {
+      if (floor.unlocked) armCritUpgrade(floor, tier);
+    }
+  },
+  unlockFloors: (context, count) => {
+    const c = asRewardContext(context);
+    unlockFloorsAbove(c.deps, c.floor, count);
+  },
+  hireWorkers: (floors, count) => {
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      const room = Math.max(0, MAX_RENDERED_WORKERS - floor.workerCount);
+      floor.workerCount += Math.min(count, room);
+      // a floor with no room for the hires promotes one worker a perma tier instead
+      const promotable = getBoostEventCandidates(floor);
+      if (count > room && promotable.length > 0)
+        promoteWorkerPermaTier(floor, promotable[0]);
+    }
+  },
+  hireManagers: (floors) => {
+    for (const floor of floors) {
+      if (floor.unlocked) applyUnionBossCrit(floor);
+    }
+  },
+  giveOfficeChairs: (floors) => {
+    for (const floor of floors) {
+      if (floor.unlocked) applyChairGiveawayCrit(floor);
+    }
+  },
+  giveOfficeSupplies: (floors) => {
+    for (const floor of floors) {
+      if (floor.unlocked) applySuppliesGiveawayCrit(floor);
+    }
+  },
+  boostWorkers: (floors, seconds, extraWorkers) => {
+    const durationMs = seconds * 1000;
+    const unlocked = floors.filter((floor) => floor.unlocked);
+    applyFloorBoost(unlocked, durationMs);
+    const now = Date.now();
+    for (const floor of unlocked) {
+      const firstVirtualIndex = getRenderedWorkerCount(floor);
+      for (let i = 0; i < extraWorkers; i++) {
+        activateBoosted(floor, firstVirtualIndex + i, now, durationMs);
+      }
+    }
+  },
+  discountPrices: (floors, fraction) =>
+    applySeasonalSaleCrit(floors, 1 - fraction),
+  raiseLevels: (floors, level) => {
+    for (const floor of floors) {
+      if (floor.unlocked && floor.upgradeCount < level) {
+        increaseIncomeRateBy(floor, level - floor.upgradeCount);
+      }
+    }
+  },
+  addUpgradePriceCash: (floors, multiple) => {
+    for (const floor of floors) {
+      if (floor.unlocked) addTotalIncome(multiply(floor.upgradeCost, multiple));
+    }
+  },
+  growLevels: (floors, fraction) => {
+    for (const floor of floors) {
+      if (!floor.unlocked) continue;
+      increaseIncomeRateBy(
+        floor,
+        Math.max(1, Math.ceil(floor.upgradeCount * fraction)),
+      );
+    }
+  },
+  spreadUpgrades: (floors, total) => {
+    const unlocked = floors.filter((floor) => floor.unlocked);
+    if (unlocked.length === 0) return;
+    const levels = unlocked.map((floor) => floor.upgradeCount);
+    const given = unlocked.map(() => 0);
+    for (let i = 0; i < total; i++) {
+      let lowest = 0;
+      for (let j = 1; j < levels.length; j++) {
+        if (levels[j] < levels[lowest]) lowest = j;
+      }
+      levels[lowest] += 1;
+      given[lowest] += 1;
+    }
+    unlocked.forEach((floor, j) => increaseIncomeRateBy(floor, given[j]));
+  },
+  raiseWorkerTiers: (floors, share, steps) => {
+    const climbers = floors
+      .filter((floor) => floor.unlocked)
+      .flatMap((floor) =>
+        getBoostEventCandidates(floor).map((workerIndex) => ({
+          floor,
+          workerIndex,
+        })),
+      )
+      .sort(() => Math.random() - 0.5);
+    const count = Math.min(
+      climbers.length,
+      Math.max(1, Math.ceil(climbers.length * share)),
+    );
+    const now = Date.now();
+    climbers.slice(0, count).forEach(({ floor, workerIndex }, i) => {
+      for (let step = 0; step < steps; step++)
+        promoteWorkerPermaTier(floor, workerIndex);
+      // only a few celebrate, so a big promotion doesn't stack dozens of sounds
+      if (i < CELEBRATED_PROMOTIONS)
+        celebrateWorkerBoost(floor, workerIndex, now);
+    });
+  },
+  startEvent: (floors, event) => {
+    const unlocked = floors.filter((floor) => floor.unlocked);
+    if (event === "spendingFreeze") triggerSpendingFreeze(unlocked);
+    else if (event === "rushHour") triggerRushHourCrit(unlocked);
+    else {
+      for (const floor of unlocked) {
+        if (event === "sale") triggerSaleBoost(floor);
+        else triggerFrozenCrit(floor);
+      }
+    }
+  },
+});
+
+const CRIT_REWARDS: CritProcHandlers<CritRewardContext> = {
+  openBook: () => applyOpenBookCrit(),
+  firstClass: (c) => applyFirstClassCrit(c.deps, c.floor),
+  luckyNumber: (c) => applyLuckyNumberCrit(c.deps, c.floor),
+  powerSurge: (c) => c.deps.applyCompanyWideBoost(),
+  priceMatch: (c) => applyPriceMatchCrit(c.floors, c.floor),
+  executiveBonus: (c) =>
+    addTotalIncome(multiply(c.deps.getCompanyValue(), 0.25)),
+  boost: (c) => applyFloorBoost(c.floors),
+  booty: () => addTotalIncome(getTotalIncome()),
+  bullMarket: (c) => applyBullMarketCrit(c.floors),
+  upgrade: (c) => {
+    c.floor.critMultiplierTier = nextCritTier(c.floor.critMultiplierTier);
+  },
+  peppermint: (c) => applyPeppermintCrit(c.floors),
+  heavenly: (c) => applyHeavenlyCrit(c.deps),
+  pair: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      POKER_HAND_CRIT_COUNTS.pair,
+    ),
+  threeOfAKind: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      POKER_HAND_CRIT_COUNTS.threeOfAKind,
+    ),
+  fourOfAKind: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      POKER_HAND_CRIT_COUNTS.fourOfAKind,
+    ),
+  fullHouse: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      POKER_HAND_CRIT_COUNTS.fullHouse,
+    ),
+  // unlike the fixed-count hands above, this one climbs all the way to the
+  // building's own cap, auto-unlocking as it goes
+  royalFlush: (c) =>
+    applyPokerHandCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      MAX_FLOORS_PER_BUILDING,
+    ),
+  tickTock: (c) => applyTickTockCrit(c.floors),
+  chairGiveaway: (c) => applyChairGiveawayCrit(c.floor),
+  suppliesGiveaway: (c) => applySuppliesGiveawayCrit(c.floor),
+  winterSale: (c) =>
+    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+  springSale: (c) =>
+    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+  summerSale: (c) =>
+    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+  autumnSale: (c) =>
+    applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
+  halloweenSale: (c) =>
+    applySeasonalSaleCrit(c.floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER),
+  easterSale: (c) =>
+    applySeasonalSaleCrit(c.floors, EASTER_SALE_DISCOUNT_MULTIPLIER),
+  sunshine: (c) => applySunshineCrit(c.floors),
+  snowday: (c) => applySnowdayCrit(c.floors),
+  fastForward: (c) => applyFastForwardCrit(c.floors),
+  frozen: (c) => applyFrozenCrit(c.floor),
+  spendingFreeze: (c) => applySpendingFreezeCrit(c.floors),
+  snowball: (c) => applySnowballCrit(c.floors),
+  payday: () => applyPaydayCrit(),
+  goldStandard: () => applyGoldStandardCrit(),
+  nightShift: (c) => applyNightShiftCrit(c.floors),
+  intern: (c) => applyInternCrit(c.floor),
+  talentScout: (c) => applyTalentScoutCrit(c.floor),
+  unionBoss: (c) => applyUnionBossCrit(c.floor),
+  rushHour: (c) => applyRushHourCrit(c.floors),
+  rateLock: (c) => applyRateLockCrit(c.floor),
+  goldenTicket: (c) => applyGoldenTicketCrit(c.floor),
+  silverTicket: (c) => applySilverTicketCrit(c.floor),
+  goldenParachute: () => applyGoldenParachuteCrit(),
+  rainCheck: (c) => applyRainCheckCrit(c.floors),
+  cashFlow: () => applyCashFlowCrit(),
+  payout: () => applyPayoutCrit(),
+  grandOpening: (c) => applyGrandOpeningCrit(c.deps),
+  fullyStaffed: (c) => applyFullyStaffedCrit(c.floors),
+  skip: (c) => applySkipCrit(c.deps),
+  shiftChange: (c) => applyShiftChangeCrit(c.floors, c.floor),
+  espressoShot: (c) => applyEspressoShotCrit(c.floors),
+  dejaVu: (c) => applyDejaVuCrit(c.floor, c.isGroundFloor),
+  cloneArmy: (c) => applyCloneArmyCrit(c.floors),
+  luckyClover: (c) => applyLuckyCloverCrit(c.floor, c.isGroundFloor),
+  secondWind: () => applySecondWindCrit(),
+  executiveOrder: (c) => applyExecutiveOrderCrit(c.floors),
+  roundUp: (c) => applyRoundUpCrit(c.floors),
+  safetyNet: (c) => applySafetyNetCrit(c.floors),
+  floorShare: (c) => applyFloorShareCrit(c.floors, c.floor),
+  sameBoat: (c) => applyFloorShareCrit(c.floors, c.floor, 2),
+  goldenHandshake: (c) => applyGoldenHandshakeCrit(c.floors),
+  supplyRun: (c) => applySupplyRunCrit(c.floor),
+  casualFriday: (c) =>
+    applyFlatUpgradeBatch(c.floors, CASUAL_FRIDAY_CRIT_UPGRADES),
+  fancyFriday: (c) =>
+    applyFlatUpgradeBatch(c.floors, FANCY_FRIDAY_CRIT_UPGRADES),
+  fireDrill: (c) => applyFireDrillCrit(c.floors),
+  bonusRound: (c) => applyBonusRoundCrit(c.floor),
+  overflow: (c) => applyOverflowCrit(c.floor),
+  performanceBonus: (c) => applyPerformanceBonusCrit(c.floors),
+  teaBreak: (c) => applyTeaBreakCrit(c.floor, c.isGroundFloor),
+  doubleDown: (c) => applyDoubleDownCrit(c.floor, c.isGroundFloor, c.tier),
+  coffeeRun: (c) => applyCoffeeRunCrit(c.floors),
+  dressCode: (c) => applyDressCodeCrit(c.floors),
+  recruitmentDrive: (c) => applyRecruitmentDriveCrit(c.floors, c.floor),
+  merger: (c) => applyMergerCrit(c.floors, c.floor),
+  shareholders: (c) => applyShareholdersCrit(c.floors),
+  teamBuilding: (c) => applyTeamBuildingCrit(c.floors),
+  teamLunch: (c) => applyTeamLunchCrit(c.floor),
+  springCleaning: (c) => applySpringCleaningCrit(c.floors, c.multiplier),
+  nightOwl: (c) => applyNightOwlCrit(c.floors),
+  headhunter: (c) => applyHeadhunterCrit(c.floor, c.floors),
+  blueprint: (c) => applyBlueprintCrit(c.deps, c.floors.indexOf(c.floor)),
+  keynote: (c) => applyKeynoteCrit(c.floor, c.isGroundFloor),
+  mystic: (c) => applyMysticCrit(c.deps, c.floor),
+  dominoEffect: (c) => applyDominoEffectCrit(c.deps, c.floors.indexOf(c.floor)),
+  chain: (c) =>
+    applyChainCrit(c.deps, c.floors.indexOf(c.floor), (reached, isGround) => {
+      for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
+      critNow(c.deps, reached);
     }),
-    openBook: () => applyOpenBookCrit(),
-    firstClass: (c) => applyFirstClassCrit(c.deps, c.floor),
-    luckyNumber: (c) => applyLuckyNumberCrit(c.deps, c.floor),
-    powerSurge: (c) => c.deps.applyCompanyWideBoost(),
-    priceMatch: (c) => applyPriceMatchCrit(c.floors, c.floor),
-    executiveBonus: (c) =>
-      addTotalIncome(multiply(c.deps.getCompanyValue(), 0.25)),
-    boost: (c) => applyFloorBoost(c.floors),
-    booty: () => addTotalIncome(getTotalIncome()),
-    bullMarket: (c) => applyBullMarketCrit(c.floors),
-    upgrade: (c) => {
-      c.floor.critMultiplierTier = nextCritTier(c.floor.critMultiplierTier);
-    },
-    peppermint: (c) => applyPeppermintCrit(c.floors),
-    heavenly: (c) => applyHeavenlyCrit(c.deps),
-    pair: (c) =>
-      applyPokerHandCrit(
-        c.deps,
-        c.floors.indexOf(c.floor),
-        POKER_HAND_CRIT_COUNTS.pair,
-      ),
-    threeOfAKind: (c) =>
-      applyPokerHandCrit(
-        c.deps,
-        c.floors.indexOf(c.floor),
-        POKER_HAND_CRIT_COUNTS.threeOfAKind,
-      ),
-    fourOfAKind: (c) =>
-      applyPokerHandCrit(
-        c.deps,
-        c.floors.indexOf(c.floor),
-        POKER_HAND_CRIT_COUNTS.fourOfAKind,
-      ),
-    fullHouse: (c) =>
-      applyPokerHandCrit(
-        c.deps,
-        c.floors.indexOf(c.floor),
-        POKER_HAND_CRIT_COUNTS.fullHouse,
-      ),
-    // unlike the fixed-count hands above, this one climbs all the way to the
-    // building's own cap, auto-unlocking as it goes
-    royalFlush: (c) =>
-      applyPokerHandCrit(
-        c.deps,
-        c.floors.indexOf(c.floor),
-        MAX_FLOORS_PER_BUILDING,
-      ),
-    tickTock: (c) => applyTickTockCrit(c.floors),
-    chairGiveaway: (c) => applyChairGiveawayCrit(c.floor),
-    suppliesGiveaway: (c) => applySuppliesGiveawayCrit(c.floor),
-    winterSale: (c) =>
-      applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
-    springSale: (c) =>
-      applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
-    summerSale: (c) =>
-      applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
-    autumnSale: (c) =>
-      applySeasonalSaleCrit(c.floors, SEASONAL_SALE_DISCOUNT_MULTIPLIER),
-    halloweenSale: (c) =>
-      applySeasonalSaleCrit(c.floors, HALLOWEEN_SALE_DISCOUNT_MULTIPLIER),
-    easterSale: (c) =>
-      applySeasonalSaleCrit(c.floors, EASTER_SALE_DISCOUNT_MULTIPLIER),
-    sunshine: (c) => applySunshineCrit(c.floors),
-    snowday: (c) => applySnowdayCrit(c.floors),
-    fastForward: (c) => applyFastForwardCrit(c.floors),
-    frozen: (c) => applyFrozenCrit(c.floor),
-    spendingFreeze: (c) => applySpendingFreezeCrit(c.floors),
-    snowball: (c) => applySnowballCrit(c.floors),
-    payday: () => applyPaydayCrit(),
-    goldStandard: () => applyGoldStandardCrit(),
-    nightShift: (c) => applyNightShiftCrit(c.floors),
-    intern: (c) => applyInternCrit(c.floor),
-    talentScout: (c) => applyTalentScoutCrit(c.floor),
-    unionBoss: (c) => applyUnionBossCrit(c.floor),
-    rushHour: (c) => applyRushHourCrit(c.floors),
-    rateLock: (c) => applyRateLockCrit(c.floor),
-    goldenTicket: (c) => applyGoldenTicketCrit(c.floor),
-    silverTicket: (c) => applySilverTicketCrit(c.floor),
-    goldenParachute: () => applyGoldenParachuteCrit(),
-    rainCheck: (c) => applyRainCheckCrit(c.floors),
-    cashFlow: () => applyCashFlowCrit(),
-    payout: () => applyPayoutCrit(),
-    grandOpening: (c) => applyGrandOpeningCrit(c.deps),
-    fullyStaffed: (c) => applyFullyStaffedCrit(c.floors),
-    skip: (c) => applySkipCrit(c.deps),
-    shiftChange: (c) => applyShiftChangeCrit(c.floors, c.floor),
-    espressoShot: (c) => applyEspressoShotCrit(c.floors),
-    dejaVu: (c) => applyDejaVuCrit(c.floor, c.isGroundFloor),
-    cloneArmy: (c) => applyCloneArmyCrit(c.floors),
-    luckyClover: (c) => applyLuckyCloverCrit(c.floor, c.isGroundFloor),
-    secondWind: () => applySecondWindCrit(),
-    executiveOrder: (c) => applyExecutiveOrderCrit(c.floors),
-    roundUp: (c) => applyRoundUpCrit(c.floors),
-    safetyNet: (c) => applySafetyNetCrit(c.floors),
-    floorShare: (c) => applyFloorShareCrit(c.floors, c.floor),
-    sameBoat: (c) => applyFloorShareCrit(c.floors, c.floor, 2),
-    goldenHandshake: (c) => applyGoldenHandshakeCrit(c.floors),
-    supplyRun: (c) => applySupplyRunCrit(c.floor),
-    casualFriday: (c) =>
-      applyFlatUpgradeBatch(c.floors, CASUAL_FRIDAY_CRIT_UPGRADES),
-    fancyFriday: (c) =>
-      applyFlatUpgradeBatch(c.floors, FANCY_FRIDAY_CRIT_UPGRADES),
-    fireDrill: (c) => applyFireDrillCrit(c.floors),
-    bonusRound: (c) => applyBonusRoundCrit(c.floor),
-    overflow: (c) => applyOverflowCrit(c.floor),
-    performanceBonus: (c) => applyPerformanceBonusCrit(c.floors),
-    teaBreak: (c) => applyTeaBreakCrit(c.floor, c.isGroundFloor),
-    doubleDown: (c) => applyDoubleDownCrit(c.floor, c.isGroundFloor, c.tier),
-    coffeeRun: (c) => applyCoffeeRunCrit(c.floors),
-    dressCode: (c) => applyDressCodeCrit(c.floors),
-    recruitmentDrive: (c) => applyRecruitmentDriveCrit(c.floors, c.floor),
-    merger: (c) => applyMergerCrit(c.floors, c.floor),
-    shareholders: (c) => applyShareholdersCrit(c.floors),
-    teamBuilding: (c) => applyTeamBuildingCrit(c.floors),
-    teamLunch: (c) => applyTeamLunchCrit(c.floor),
-    springCleaning: (c) => applySpringCleaningCrit(c.floors, c.multiplier),
-    nightOwl: (c) => applyNightOwlCrit(c.floors),
-    headhunter: (c) => applyHeadhunterCrit(c.floor, c.floors),
-    blueprint: (c) => applyBlueprintCrit(c.deps, c.floors.indexOf(c.floor)),
-    keynote: (c) => applyKeynoteCrit(c.floor, c.isGroundFloor),
-    mystic: (c) => applyMysticCrit(c.deps, c.floor),
-    dominoEffect: (c) =>
-      applyDominoEffectCrit(c.deps, c.floors.indexOf(c.floor)),
-    chain: (c) =>
-      applyChainCrit(c.deps, c.floors.indexOf(c.floor), (reached, isGround) => {
+  bounce: (c) =>
+    applyBounceCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      (reached, isGround) => {
         for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
         critNow(c.deps, reached);
-      }),
-    bounce: (c) =>
-      applyBounceCrit(
-        c.deps,
-        c.floors.indexOf(c.floor),
-        (reached, isGround) => {
-          for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
-          critNow(c.deps, reached);
-        },
-        BOUNCE_CRIT_CONTINUE_CHANCE,
-      ),
-    explosion: (c) =>
-      applyExplosionCrit(
-        c.deps,
-        c.floors.indexOf(c.floor),
-        (reached, isGround) => {
-          for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
-          critNow(c.deps, reached);
-        },
-      ),
-  };
+      },
+      BOUNCE_CRIT_CONTINUE_CHANCE,
+    ),
+  explosion: (c) =>
+    applyExplosionCrit(
+      c.deps,
+      c.floors.indexOf(c.floor),
+      (reached, isGround) => {
+        for (let i = 0; i < c.count; i++) applyUpgradeTick(reached, isGround);
+        critNow(c.deps, reached);
+      },
+    ),
+};
 
 // a crit that lands on `floor` and pays out immediately, without arming its button
 export function critNow(
@@ -1604,7 +1601,7 @@ export function applyFloorCrit(
     count,
     multiplier: deps.multiplier,
   };
-  applyCritProcs(result, context, CRIT_REWARDS);
+  applyCritProcs(result, context, CRIT_REWARDS, payFeaturedCrit);
   triggerButtonPress(floor);
   triggerCritCelebration(
     result.tier,
@@ -1844,7 +1841,7 @@ function grantFollowUpProc(
   kind: CritProcKind,
   context: CritRewardContext,
 ): void {
-  applyCritProcs(onlyCritProc(kind), context, CRIT_REWARDS);
+  applyCritProcs(onlyCritProc(kind), context, CRIT_REWARDS, payFeaturedCrit);
   recordCritProcLanded(kind);
   revealFoilOf(context.deps, context.floor, kind, context.isGroundFloor);
 }

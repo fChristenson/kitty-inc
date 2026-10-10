@@ -9,6 +9,7 @@ import {
   getCritProcIncomeModifierPercent,
   getCritProcNextMilestoneCount,
   getBadgeFoil,
+  withFeaturedCatalog,
   type BadgeFoil,
   type CritProcKind,
 } from "../../crits";
@@ -35,25 +36,32 @@ export type { MergeCompaniesResult } from "./economy";
 // proc's own celebration flash exactly, critFlash/critCelebration.ts)
 // instead of this menu hand-duplicating every label/icon/description a
 // second time. Sorted alphabetically by label — CRIT_PROC_KINDS' own order is
-// roll-rarity-driven, not a sensible reading order for a lookup list
-const BADGE_INFO: {
+// roll-rarity-driven, not a sensible reading order for a lookup list. Built
+// on the first open, once the featured catalog is in
+type BadgeInfo = {
   kind: CritProcKind;
   icon: string;
   silhouette: string;
   label: string;
   description: string;
-}[] = CRIT_PROC_KINDS.map((kind) => {
-  const info = CRIT_PROC_INFO[kind];
-  return {
-    kind,
-    icon: getStickerUrl(info.icon),
-    silhouette: getSilhouetteUrl(info.icon),
-    label: info.label,
-    description: info.description,
-  };
-}).sort((a, b) => a.label.localeCompare(b.label));
+};
+let BADGE_INFO: BadgeInfo[] = [];
+const BADGE_INFO_BY_KIND = new Map<CritProcKind, BadgeInfo>();
 
-const BADGE_INFO_BY_KIND = new Map(BADGE_INFO.map((info) => [info.kind, info]));
+function buildBadgeInfo(): void {
+  if (BADGE_INFO.length > 0) return;
+  BADGE_INFO = CRIT_PROC_KINDS.map((kind) => {
+    const info = CRIT_PROC_INFO[kind]!;
+    return {
+      kind,
+      icon: getStickerUrl(info.icon),
+      silhouette: getSilhouetteUrl(info.icon),
+      label: info.label,
+      description: info.description,
+    };
+  }).sort((a, b) => a.label.localeCompare(b.label));
+  for (const info of BADGE_INFO) BADGE_INFO_BY_KIND.set(info.kind, info);
+}
 
 // glitter: a few layers of glints, each layer twinkling as one
 const GLINT_LAYERS = 3;
@@ -67,36 +75,6 @@ const BACK_ARROW_SVG = arrowIconMarkup(22);
 // 3-column grid of icons; tapping one slides the grid out to the left and a
 // full detail card (big icon + name + description) in from the right, with a
 // back arrow in the header to slide back (see render()/showDetail() below)
-export function createBadgeCollectionMarkup(): string {
-  return `
-    <div class="worker-menu" id="badge-collection" hidden>
-      <div class="worker-menu__backdrop" id="badge-collection-backdrop"></div>
-      <div class="worker-menu__panel">
-        <div class="worker-menu__header">
-          <button
-            type="button"
-            class="crit-info-back"
-            id="badge-collection-back"
-            aria-label="Back to all crits"
-            hidden
-          >${BACK_ARROW_SVG}</button>
-          <h2>Badge Collection</h2>
-        </div>
-        <div class="crit-info-slider" id="badge-collection-slider">
-          <div class="crit-info-slider__track">
-            <div class="crit-info-slider__pane">
-              <div class="crit-info-grid" id="badge-collection-grid"></div>
-            </div>
-            <div class="crit-info-slider__pane">
-              <div class="crit-info-detail" id="badge-collection-detail"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
 export interface BadgeCollection {
   open: () => void;
   close: () => void;
@@ -121,6 +99,7 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
   const backButton = container.querySelector<HTMLButtonElement>(
     "#badge-collection-back",
   )!;
+  backButton.innerHTML = BACK_ARROW_SVG;
 
   // which crit the detail pane is currently showing, so refresh() can re-render
   // its live landed count without kicking the player back to the grid
@@ -468,6 +447,11 @@ export function wireBadgeCollection(container: HTMLElement): BadgeCollection {
   const ghostClickGuard = createGhostClickGuard();
 
   function open(): void {
+    withFeaturedCatalog(show);
+  }
+
+  function show(): void {
+    buildBadgeInfo();
     cancelDialogClose(panel);
     panel.classList.remove("worker-menu__panel--closing");
     void panel.offsetWidth;

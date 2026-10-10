@@ -29,18 +29,22 @@ import {
   FEATURED_CRIT_KINDS,
   getFeaturedRewards,
   isFeaturedCritKind,
+  onFeaturedCatalog,
   rollFeaturedCrit,
   type FeaturedCritKind,
 } from "../badgeCrits/featuredProcs";
-import { FEATURED_CRITS } from "../badgeCrits/critData";
 
-export { FEATURED_CRITS } from "../badgeCrits/critData";
 export {
   FEATURED_CRIT_KINDS,
   featuredCritFlags,
+  featuredCritImages,
   isFeaturedCritKind,
+  isFeaturedCatalogLoaded,
+  loadFeaturedCatalog,
   loadFeaturedRewards,
   getFeaturedRewards,
+  onFeaturedCatalog,
+  withFeaturedCatalog,
   type FeaturedCritKind,
 } from "../badgeCrits/featuredProcs";
 export {
@@ -1179,11 +1183,19 @@ export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
 // the one kind -> "is this proc armed on this floor" registry. Every per-proc
 // WeakSet above is reachable from here, so anything that needs to act on procs
 // generically (consumeCritProcs, readCritProcs, forceCritProc) walks
-// CRIT_PROC_KINDS instead of hand-listing all 59 of them again
-const CRIT_PROC_SETS: Record<CritProcKind, WeakSet<Floor>> = {
-  ...(Object.fromEntries(
-    FEATURED_CRIT_KINDS.map((kind) => [kind, snapshotSet<Floor>()]),
-  ) as Record<FeaturedCritKind, WeakSet<Floor>>),
+// CRIT_PROC_KINDS instead of hand-listing all 59 of them again. A featured
+// crit's set is made the first time it's armed: thousands of empty sets made
+// at load were a measurable slice of startup
+const featuredProcSets = new Map<FeaturedCritKind, WeakSet<Floor>>();
+function procSet(kind: CritProcKind): WeakSet<Floor> | undefined {
+  return isFeaturedCritKind(kind)
+    ? featuredProcSets.get(kind)
+    : CRIT_PROC_SETS[kind];
+}
+const CRIT_PROC_SETS: Record<
+  Exclude<CritProcKind, FeaturedCritKind>,
+  WeakSet<Floor>
+> = {
   chain: chainCrits,
   dominoEffect: dominoEffectCrits,
   blueprint: blueprintCrits,
@@ -1281,10 +1293,10 @@ export type CritProcFlags = Record<CritProcKind, boolean>;
 
 export function readCritProcs(floor: Floor): CritProcFlags {
   // unset procs read false through the prototype (see critResult)
-  const flags = Object.create(ALL_CRIT_PROC_FLAGS_FALSE) as CritProcFlags;
+  const flags = Object.create(allCritProcFlagsFalse()) as CritProcFlags;
   if (!armedProcCounts.get(floor)) return flags;
   for (const kind of CRIT_PROC_KINDS) {
-    if (CRIT_PROC_SETS[kind].has(floor)) flags[kind] = true;
+    if (procSet(kind)?.has(floor)) flags[kind] = true;
   }
   return flags;
 }
@@ -1317,7 +1329,13 @@ function notifyCritProcsArmed(kinds: readonly CritProcKind[]): void {
 }
 
 export function forceCritProc(kind: CritProcKind, floor: Floor): void {
-  CRIT_PROC_SETS[kind].add(floor);
+  let set = procSet(kind);
+  if (!set)
+    featuredProcSets.set(
+      kind as FeaturedCritKind,
+      (set = snapshotSet<Floor>()),
+    );
+  set.add(floor);
   notifyCritProcsArmed([kind]);
 }
 
@@ -1340,13 +1358,16 @@ export function applyCritProcs<TContext>(
   result: Pick<CritRollResult, CritProcKind>,
   ctx: TContext,
   handlers: CritProcHandlers<TContext>,
+  featured?: (kind: FeaturedCritKind, ctx: TContext) => void,
 ): void {
-  for (const kind of landedProcKinds(result)) handlers[kind]?.(ctx);
+  for (const kind of landedProcKinds(result)) {
+    const handler = handlers[kind];
+    if (handler) handler(ctx);
+    else if (featured && isFeaturedCritKind(kind)) featured(kind, ctx);
+  }
 }
 
-const PROC_ORDER = new Map<string, number>(
-  CRIT_PROC_KINDS.map((kind, i) => [kind, i]),
-);
+let procOrder: Map<string, number> | null = null;
 
 // the procs set true on result, in CRIT_PROC_KINDS order: results keep only
 // their landed procs as own fields (the rest read false through a
@@ -1354,6 +1375,9 @@ const PROC_ORDER = new Map<string, number>(
 export function landedProcKinds(
   result: Pick<CritRollResult, CritProcKind>,
 ): CritProcKind[] {
+  const PROC_ORDER = (procOrder ??= new Map(
+    CRIT_PROC_KINDS.map((kind, i) => [kind, i]),
+  ));
   const landed: CritProcKind[] = [];
   for (const key of Object.keys(result))
     if (PROC_ORDER.has(key) && result[key as CritProcKind])
@@ -1428,16 +1452,13 @@ export function getCritProcIncomeModifierPercent(
   return getCritProcMilestone(count) * (CRIT_PROC_MODIFIER_WEIGHT / chance);
 }
 
-// each featured crit's display half; loadAssets registers its image under its kind
-const FEATURED_CRIT_DISPLAY_INFO = Object.fromEntries(
-  FEATURED_CRIT_KINDS.map((kind) => {
-    const { label, color, description } = FEATURED_CRITS[kind];
-    return [kind, { label, color, icon: kind, description }];
-  }),
-) as Record<FeaturedCritKind, CritProcDisplayInfo>;
-
-export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
-  ...FEATURED_CRIT_DISPLAY_INFO,
+// featured crits join once their catalog loads (onFeaturedCatalog below): a
+// featured kind reads undefined till then; every other proc is here from the start
+export const CRIT_PROC_INFO: Record<
+  Exclude<CritProcKind, FeaturedCritKind>,
+  CritProcDisplayInfo
+> &
+  Partial<Record<FeaturedCritKind, CritProcDisplayInfo>> = {
   chain: {
     label: CHAIN_CRIT_LABEL,
 
@@ -2020,6 +2041,19 @@ export const CRIT_PROC_INFO: Record<CritProcKind, CritProcDisplayInfo> = {
   },
 };
 
+// loadAssets registers each featured crit's image under its kind
+onFeaturedCatalog((catalog) => {
+  for (const kind of FEATURED_CRIT_KINDS) {
+    const { label, color, description } = catalog[kind];
+    CRIT_PROC_INFO[kind] = { label, color, icon: kind, description };
+  }
+});
+
+// a proc's icon, known before the featured catalog loads
+export function critProcIcon(kind: CritProcKind): ImageName {
+  return isFeaturedCritKind(kind) ? kind : CRIT_PROC_INFO[kind].icon;
+}
+
 // walks CRIT_TIER_ORDER rarest-first, returning the first tier whose own
 // chance hits (or null on a full miss)
 function rollTier(): CritTier | null {
@@ -2162,8 +2196,12 @@ export function pickCritTierByOdds(): CritTier {
 }
 
 // every non-featured proc bucketed by its exact chance, so rollLandedProcs can
-// jump straight from one landed proc to the next inside a bucket
-const PROC_CHANCE_GROUPS = (() => {
+// jump straight from one landed proc to the next inside a bucket; built at the
+// first roll
+type ProcChanceGroup = { logMiss: number; kinds: CritProcKind[] };
+let procChanceGroups: ProcChanceGroup[] | null = null;
+function getProcChanceGroups(): ProcChanceGroup[] {
+  if (procChanceGroups) return procChanceGroups;
   const byChance = new Map<number, CritProcKind[]>();
   for (const kind of new Set(CRIT_PROC_KINDS)) {
     const chance = getCritProcChance(kind);
@@ -2175,11 +2213,11 @@ const PROC_CHANCE_GROUPS = (() => {
     if (kinds) kinds.push(kind);
     else byChance.set(chance, [kind]);
   }
-  return [...byChance].map(([chance, kinds]) => ({
+  return (procChanceGroups = [...byChance].map(([chance, kinds]) => ({
     logMiss: Math.log1p(-chance),
     kinds,
-  }));
-})();
+  })));
+}
 
 // procs skipped before the next hit — Geometric(chance), the exact gap left by
 // rolling each proc's own `Math.random() < chance` one at a time
@@ -2192,7 +2230,7 @@ function landedGap(logMiss: number): number {
 // a main category picked at random (rollFeaturedCrit), so every one is seen as often
 export function rollLandedProcs(): CritProcKind[] {
   const landed: CritProcKind[] = [];
-  for (const { logMiss, kinds } of PROC_CHANCE_GROUPS) {
+  for (const { logMiss, kinds } of getProcChanceGroups()) {
     for (
       let i = landedGap(logMiss);
       i < kinds.length;
@@ -2205,14 +2243,17 @@ export function rollLandedProcs(): CritProcKind[] {
   return landed;
 }
 
-const ALL_CRIT_PROC_FLAGS_FALSE = Object.fromEntries(
-  CRIT_PROC_KINDS.map((kind) => [kind, false]),
-) as CritProcFlags;
+let allCritProcFlagsFalseProto: CritProcFlags | null = null;
+function allCritProcFlagsFalse(): CritProcFlags {
+  return (allCritProcFlagsFalseProto ??= Object.fromEntries(
+    CRIT_PROC_KINDS.map((kind) => [kind, false]),
+  ) as CritProcFlags);
+}
 
 // a result whose procs all read false through the shared prototype, so a roll
 // never copies every one of the ~1,700 proc flags (a renovation rolls thousands)
 function critResult(tier: CritTier): CritRollResult {
-  const result = Object.create(ALL_CRIT_PROC_FLAGS_FALSE) as CritRollResult;
+  const result = Object.create(allCritProcFlagsFalse()) as CritRollResult;
   result.tier = tier;
   return result;
 }
@@ -2620,7 +2661,7 @@ export function isShareholdersCrit(floor: Floor): boolean {
 // call right when an armed crit's click is handled, before rolling the next one
 export function consumeCritProcs(floor: Floor): void {
   if (armedProcCounts.get(floor))
-    for (const kind of CRIT_PROC_KINDS) CRIT_PROC_SETS[kind].delete(floor);
+    for (const kind of CRIT_PROC_KINDS) procSet(kind)?.delete(floor);
 }
 
 // dev/test-only: force the proc onto whatever tier the caller already armed

@@ -3,15 +3,9 @@
 // Registered with loadAssets as the crits load (crits/index imports this).
 // Read through critTypes: it has to load before the featured catalog it imports
 import { registerImageFiles } from "../loadAssets";
-import {
-  FEATURED_CRITS,
-  FEATURED_CRIT_KINDS,
-  type FeaturedCritKind,
-} from "./critTypes";
+import { featuredCritImages } from "./critTypes";
 
-const FEATURED_CRIT_IMAGE_FILES = Object.fromEntries(
-  FEATURED_CRIT_KINDS.map((kind) => [kind, FEATURED_CRITS[kind].image]),
-) as Record<FeaturedCritKind, string>;
+const FEATURED_CRIT_IMAGE_FILES = featuredCritImages();
 
 export const CRIT_IMAGE_FILES = {
   ...FEATURED_CRIT_IMAGE_FILES,

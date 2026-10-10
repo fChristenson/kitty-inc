@@ -35,16 +35,11 @@ export function drawHud(
 // everything below is this module's own facade: hud/ has several nested widgets
 // (actionBar, upgradeMenu, boostMenu, ...) that stay together for internal reuse, but
 // anything outside src/hud must import them from here, never from a nested path
-export { createActionBarMarkup, wireActionBar } from "./actionBar";
+export { wireActionBar } from "./actionBar";
 export type { ActionBarHandlers } from "./actionBar";
-export {
-  createBoostMenuMarkup,
-  wireBoostMenu,
-  applyBoostAll,
-} from "./boostMenu";
+export { wireBoostMenu, applyBoostAll } from "./boostMenu";
 export type { BoostMenu } from "./boostMenu";
 export {
-  createBadgeCollectionMarkup,
   wireBadgeCollection,
   getGlobalIncomeBoostMultiplier,
   getCompanyAssetValue,
@@ -53,12 +48,9 @@ export {
   mergeCompanies,
 } from "./corporationBoostMenu";
 export type { BadgeCollection } from "./corporationBoostMenu";
-export {
-  createCorporationStatsMarkup,
-  wireCorporationStats,
-} from "./corporationStats";
+export { wireCorporationStats } from "./corporationStats";
 export type { CorporationStats } from "./corporationStats";
-export { createMapMenuMarkup, wireMapMenu } from "./mapMenu";
+export { wireMapMenu } from "./mapMenu";
 export type { MapMenu } from "./mapMenu";
 export {
   createTestButtonMarkup,
@@ -187,7 +179,7 @@ export {
   wireUnlockEventTestButton,
   wireResetButton,
 } from "./testButton";
-export { createUpgradeMenuMarkup, wireUpgradeMenu } from "./upgradeMenu";
+export { wireUpgradeMenu } from "./upgradeMenu";
 export {
   getWorkerCost,
   getOfficeChairsCost,
@@ -202,18 +194,11 @@ export {
 } from "./upgradeMenu";
 export type { UpgradeMenu } from "./upgradeMenu";
 export {
-  createFloorUpgradeMenuMarkup,
   wireFloorUpgradeMenu,
   hasAffordableFloorUpgrade,
 } from "./floorUpgradeMenu";
 export type { FloorUpgradeMenu } from "./floorUpgradeMenu";
-export {
-  createCorporationUpgradeMenuMarkup,
-  wireCorporationUpgradeMenu,
-} from "./corporationUpgradeMenu";
+export { wireCorporationUpgradeMenu } from "./corporationUpgradeMenu";
 export type { CorporationUpgradeMenu } from "./corporationUpgradeMenu";
-export {
-  createTotalEarnedOverlayMarkup,
-  wireTotalEarnedOverlay,
-} from "./totalEarnedOverlay";
+export { wireTotalEarnedOverlay } from "./totalEarnedOverlay";
 export type { TotalEarnedOverlay } from "./totalEarnedOverlay";

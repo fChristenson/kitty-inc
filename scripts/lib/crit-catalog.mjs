@@ -71,7 +71,12 @@ export async function withGame(run) {
     const { FEATURED_REWARDS } = await server.ssrLoadModule(
       "/src/crits/badgeCrits/featured/index.ts",
     );
-    return await run({ CONFIG, crit: { ...types, FEATURED_REWARDS } });
+    // the game loads the featured catalog after startup; CRIT_PROC_INFO fills then
+    const FEATURED_CRITS = await types.loadFeaturedCatalog();
+    return await run({
+      CONFIG,
+      crit: { ...types, FEATURED_CRITS, FEATURED_REWARDS },
+    });
   } finally {
     await server.close();
   }

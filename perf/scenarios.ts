@@ -198,7 +198,7 @@ const FEATURED = new Set<string>(FEATURED_CRIT_KINDS);
 const PROCS = CRIT_PROC_KINDS.filter((kind) => !FEATURED.has(kind));
 // procs that reach past the crit's floor: every floor, building or worker
 const WIDE_PROCS = PROCS.filter((kind) =>
-  /\b(every|all)\b/i.test(CRIT_PROC_INFO[kind].description),
+  /\b(every|all)\b/i.test(CRIT_PROC_INFO[kind]?.description ?? ""),
 );
 const pick = <T>(items: readonly T[]): T =>
   items[Math.floor(scenarioRandom() * items.length)];

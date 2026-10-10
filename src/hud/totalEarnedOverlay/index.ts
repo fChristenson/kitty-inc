@@ -7,19 +7,6 @@ import { onTapOrClick } from "../../shared/tapEvents";
 // when that idle income is > 0 (nothing to celebrate on a quick reload with no
 // away time), dismissed by tapping anywhere on it.
 
-export function createTotalEarnedOverlayMarkup(): string {
-  return `
-    <div class="earned-overlay" id="earned-overlay" hidden>
-      <div class="earned-overlay__backdrop"></div>
-      <div class="earned-overlay__content">
-        <p class="earned-overlay__label">You have earned</p>
-        <span class="worker-menu__total-income earned-overlay__amount"></span>
-        <span class="worker-menu__total-income earned-overlay__unit-name"></span>
-      </div>
-    </div>
-  `;
-}
-
 export interface TotalEarnedOverlay {
   // resolves once the spin-in animation has finished (or the overlay was dismissed)
   show(totalIncome: BigNumber): Promise<void>;

@@ -297,20 +297,6 @@ function renovateFloorsItemMarkup(
   `;
 }
 
-export function createUpgradeMenuMarkup(): string {
-  return `
-    <div class="worker-menu" id="upgrade-menu" hidden>
-      <div class="worker-menu__backdrop" id="upgrade-menu-backdrop"></div>
-      <div class="worker-menu__panel">
-        <div class="worker-menu__header">
-          <h2>Upgrades</h2>
-        </div>
-        <div class="worker-menu__list" id="upgrade-menu-list"></div>
-      </div>
-    </div>
-  `;
-}
-
 export interface UpgradeMenu {
   open: () => void;
   close: () => void;

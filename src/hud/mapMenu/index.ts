@@ -17,20 +17,6 @@ import { onTapOrClick } from "../../shared/tapEvents";
 // shape as boostMenu/upgradeMenu. Lists a button per building already owned (how you
 // navigate between streets, since only one building is ever on screen at a time —
 // see gameCanvas.ts's setActiveFloors) plus the "buy a new building" item at the end
-export function createMapMenuMarkup(): string {
-  return `
-    <div class="worker-menu" id="map-menu" hidden>
-      <div class="worker-menu__backdrop" id="map-menu-backdrop"></div>
-      <div class="worker-menu__panel">
-        <div class="worker-menu__header">
-          <h2>Map</h2>
-        </div>
-        <div class="worker-menu__list" id="map-menu-list"></div>
-      </div>
-    </div>
-  `;
-}
-
 export interface MapMenu {
   open: () => void;
   close: () => void;

@@ -390,12 +390,14 @@ function queueProcCelebration(
     return;
   const custom = CUSTOM_PROC_CELEBRATIONS[kind];
   const info = CRIT_PROC_INFO[kind];
+  // a featured crit forced before its catalog loads has nothing to show
+  if (!custom && !info) return;
   specialCelebrationQueue.push({
     kind,
     queuedAt: now,
     maxAgeMs,
     run: () =>
-      custom ? custom(tier) : celebrateFlatProc(info.label, info.color),
+      custom ? custom(tier) : celebrateFlatProc(info!.label, info!.color),
   });
 }
 

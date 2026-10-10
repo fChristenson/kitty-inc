@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "dev:prod": "vite --mode production",
-    "prebuild": "node scripts/add-sticker-borders.mjs --stale",
+    "prebuild": "node scripts/crit-kinds.mjs && node scripts/add-sticker-borders.mjs --stale",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "perf:build": "vite build --mode perf",

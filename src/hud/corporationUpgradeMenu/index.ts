@@ -21,20 +21,6 @@ const selectedForMerge = new Set<number>();
 // cityMap's drawCorporationNames) — just the "Corporation assets"/"Create new
 // Company" action. The per-item bulk "Budget approvals" buying feature that
 // used to live here has been removed
-export function createCorporationUpgradeMenuMarkup(): string {
-  return `
-    <div class="worker-menu" id="corporation-upgrade-menu" hidden>
-      <div class="worker-menu__backdrop" id="corporation-upgrade-menu-backdrop"></div>
-      <div class="worker-menu__panel">
-        <div class="worker-menu__header">
-          <h2>Corporation Upgrades</h2>
-        </div>
-        <div class="worker-menu__list" id="corporation-upgrade-menu-list"></div>
-      </div>
-    </div>
-  `;
-}
-
 export interface CorporationUpgradeMenu {
   open: () => void;
   close: () => void;

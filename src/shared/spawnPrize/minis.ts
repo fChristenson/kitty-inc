@@ -2,7 +2,7 @@
 // number, a gold coin or a badge. Every look is rastered once onto a small
 // canvas and stamped after that
 import {
-  CRIT_PROC_INFO,
+  critProcIcon,
   CRIT_TIER_CONFIG,
   createCritTextSprite,
   drawCritTextSprite,
@@ -54,7 +54,7 @@ export function prepareMini(prize: Prize): void {
   if (prize.kind === "coin") load("coin", () => loadImageByName("coin"));
   else if (prize.kind === "badge")
     load(imageKey(prize), () =>
-      loadImage(getStickerUrl(CRIT_PROC_INFO[prize.badge].icon)),
+      loadImage(getStickerUrl(critProcIcon(prize.badge))),
     );
   else if (!tiers.has(prize.tier)) {
     const { label, color } = CRIT_TIER_CONFIG[prize.tier];

@@ -17,7 +17,147 @@
 </head>
 
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <!-- game:start (perf/index.html gets the same markup from here, see vite.config.ts) -->
+    <!-- shown from the first paint until the game draws its first frame -->
+    <div class="splash" id="splash" aria-hidden="true">
+      <img class="splash__coin" src="/coin.webp" alt="" />
+      <p class="splash__title">Kitty Inc</p>
+    </div>
+    <div class="game">
+      <canvas class="game__canvas" id="game-canvas"></canvas>
+      <div class="city-map" id="city-map" hidden>
+        <canvas class="game__canvas" id="map-canvas"></canvas>
+        <svg class="city-map__speed-lines" id="city-map-speed-lines" aria-hidden="true"></svg>
+        <span class="city-map__corp-pointer" aria-hidden="true"></span>
+        <button class="city-map__arrow city-map__arrow--prev" id="city-map-prev" aria-label="Previous city"
+          hidden></button>
+        <button class="city-map__arrow city-map__arrow--next" id="city-map-next" aria-label="Next city" hidden></button>
+      </div>
+      <div class="action-bar" id="action-bar">
+        <div class="action-bar__panel">
+          <button class="action-bar__button" id="action-bar-scroll-top" aria-label="Scroll to the top floor">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 19V5" />
+              <path d="M5 12l7-7 7 7" />
+            </svg>
+          </button>
+          <button class="action-bar__button" id="action-bar-scroll-bottom" aria-label="Scroll to the ground floor">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12l7 7 7-7" />
+            </svg>
+          </button>
+          <button class="action-bar__button action-bar__button--boost" id="action-bar-boost-all"
+            aria-label="Boost every worker">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+              <path d="M13 2 3 14h7l-1 8 11-14h-7z" />
+            </svg>
+          </button>
+          <button class="action-bar__button action-bar__button--hire" id="action-bar-hire" aria-label="Open upgrades">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14" />
+              <path d="M5 12h14" />
+            </svg>
+          </button>
+          <button class="action-bar__button action-bar__button--map" id="action-bar-map" aria-label="Open map">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="3"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 3 3 6v15l6-3 6 3 6-3V3l-6 3-6-3z" />
+              <path d="M9 3v15" />
+              <path d="M15 6v15" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="worker-menu" id="upgrade-menu" hidden>
+      <div class="worker-menu__backdrop" id="upgrade-menu-backdrop"></div>
+      <div class="worker-menu__panel">
+        <div class="worker-menu__header">
+          <h2>Upgrades</h2>
+        </div>
+        <div class="worker-menu__list" id="upgrade-menu-list"></div>
+      </div>
+    </div>
+    <div class="worker-menu" id="floor-upgrade-menu" hidden>
+      <div class="worker-menu__backdrop" id="floor-upgrade-menu-backdrop"></div>
+      <div class="worker-menu__panel">
+        <div class="worker-menu__header">
+          <h2 id="floor-upgrade-menu-title">Floor upgrades</h2>
+        </div>
+        <div class="worker-menu__list" id="floor-upgrade-menu-list"></div>
+      </div>
+    </div>
+    <div class="worker-menu" id="corporation-upgrade-menu" hidden>
+      <div class="worker-menu__backdrop" id="corporation-upgrade-menu-backdrop"></div>
+      <div class="worker-menu__panel">
+        <div class="worker-menu__header">
+          <h2>Corporation Upgrades</h2>
+        </div>
+        <div class="worker-menu__list" id="corporation-upgrade-menu-list"></div>
+      </div>
+    </div>
+    <div class="worker-menu" id="boost-menu" hidden>
+      <div class="worker-menu__backdrop" id="boost-menu-backdrop"></div>
+      <div class="worker-menu__panel">
+        <div class="worker-menu__header">
+          <h2>Boosts</h2>
+        </div>
+        <div class="worker-menu__list" id="boost-menu-list"></div>
+      </div>
+    </div>
+    <div class="worker-menu" id="badge-collection" hidden>
+      <div class="worker-menu__backdrop" id="badge-collection-backdrop"></div>
+      <div class="worker-menu__panel">
+        <div class="worker-menu__header">
+          <button type="button" class="crit-info-back" id="badge-collection-back" aria-label="Back to all crits"
+            hidden></button>
+          <h2>Badge Collection</h2>
+        </div>
+        <div class="crit-info-slider" id="badge-collection-slider">
+          <div class="crit-info-slider__track">
+            <div class="crit-info-slider__pane">
+              <div class="crit-info-grid" id="badge-collection-grid"></div>
+            </div>
+            <div class="crit-info-slider__pane">
+              <div class="crit-info-detail" id="badge-collection-detail"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="worker-menu" id="corporation-stats-menu" hidden>
+      <div class="worker-menu__backdrop" id="corporation-stats-menu-backdrop"></div>
+      <div class="worker-menu__panel">
+        <div class="worker-menu__header">
+          <h2>Corporation Statistics</h2>
+        </div>
+        <div class="worker-menu__list" id="corporation-stats-menu-list"></div>
+      </div>
+    </div>
+    <div class="worker-menu" id="map-menu" hidden>
+      <div class="worker-menu__backdrop" id="map-menu-backdrop"></div>
+      <div class="worker-menu__panel">
+        <div class="worker-menu__header">
+          <h2>Map</h2>
+        </div>
+        <div class="worker-menu__list" id="map-menu-list"></div>
+      </div>
+    </div>
+    <div class="earned-overlay" id="earned-overlay" hidden>
+      <div class="earned-overlay__backdrop"></div>
+      <div class="earned-overlay__content">
+        <p class="earned-overlay__label">You have earned</p>
+        <span class="worker-menu__total-income earned-overlay__amount"></span>
+        <span class="worker-menu__total-income earned-overlay__unit-name"></span>
+      </div>
+    </div>
+    <!-- game:end -->
+  </div>
   <script type="module" src="/src/boot.ts"></script>
 </body>
 

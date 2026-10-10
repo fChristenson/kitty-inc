@@ -188,26 +188,14 @@ export interface CityMapView {
 // since these are open stroked lines rather than a fillable shape
 const ARROW_SVG = arrowIconMarkup(52);
 
-// canvas + prev/next city arrows + the anime-style transition overlay (an SVG
-// JS animates real <line> rays across, in sync with a swoosh, while cityIndex
-// changes underneath — see playSpeedLines), wrapped together so toggling the
-// wrapper's hidden attribute hides all of it at once (see main.ts's
-// openMapView/closeMapView)
-export function createCityMapMarkup(): string {
-  return `
-    <div class="city-map" id="city-map" hidden>
-      <canvas class="game__canvas" id="map-canvas"></canvas>
-      <svg class="city-map__speed-lines" id="city-map-speed-lines" aria-hidden="true"></svg>
-      <span class="city-map__corp-pointer" aria-hidden="true">${ARROW_SVG}</span>
-      <button class="city-map__arrow city-map__arrow--prev" id="city-map-prev" aria-label="Previous city" hidden>${ARROW_SVG}</button>
-      <button class="city-map__arrow city-map__arrow--next" id="city-map-next" aria-label="Next city" hidden>${ARROW_SVG}</button>
-    </div>
-  `;
-}
-
 // so a reload lands the player back on the same city page they had selected —
 // namespaced per company (see ./cityMapState)
 
+// wires index.html's #city-map: canvas + prev/next city arrows + the
+// anime-style transition overlay (an SVG JS animates real <line> rays across,
+// in sync with a swoosh, while cityIndex changes underneath — see
+// playSpeedLines), wrapped together so toggling the wrapper's hidden attribute
+// hides all of it at once (see main.ts's openMapView/closeMapView)
 export function createCityMapView(
   container: HTMLElement,
   deps: CityMapDeps,
@@ -223,6 +211,8 @@ export function createCityMapView(
   const corpPointer = container.querySelector<HTMLElement>(
     ".city-map__corp-pointer",
   )!;
+  for (const arrow of [prevButton, nextButton, corpPointer])
+    arrow.innerHTML = ARROW_SVG;
   const ctx = canvas.getContext("2d")!;
   let cssW = 0;
   let cssH = 0;
