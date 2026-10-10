@@ -1394,6 +1394,7 @@ export function createTestButtonMarkup(): string {
           <label>Event <select id="test-crit-event"><option value="upgrade">Upgrade click</option><option value="unlock">Floor unlock</option><option value="map">Map unlock</option></select></label>
           <label>Tier <select id="test-crit-tier">${tiers}</select></label>
           <button class="game__button" data-crit-kind="">Regular Crit</button>
+          <button id="test-cash-crit" class="game__button">Cash Crit</button>
           ${buttons}
         </div>
       </details>
@@ -1408,9 +1409,14 @@ export function wireCritTestActions(
     tier: CritTier,
     event: "upgrade" | "unlock" | "map",
   ) => void,
+  // arms a cash crit of the selected tier
+  onCash: (tier: CritTier) => void,
 ): void {
   const event = container.querySelector<HTMLSelectElement>("#test-crit-event")!;
   const tier = container.querySelector<HTMLSelectElement>("#test-crit-tier")!;
+  container
+    .querySelector<HTMLButtonElement>("#test-cash-crit")!
+    .addEventListener("click", () => onCash(tier.value as CritTier));
   const buttons =
     container.querySelectorAll<HTMLButtonElement>("[data-crit-kind]");
   const filter = container.querySelector<HTMLInputElement>(

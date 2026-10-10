@@ -981,6 +981,8 @@ export function pickAtMost<T>(
 // now get back from the exact same shared roll
 export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   tier: CritTier;
+  // a cash crit: pays its upgrades' price instead of them
+  cash?: boolean;
   // the crit also landing on the floor above / below
   critUp?: boolean;
   critDown?: boolean;
@@ -1086,7 +1088,13 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
 // dispatch site by hand
 export type CritProcKind = Exclude<
   keyof CritRollResult,
-  "tier" | "critUp" | "critDown" | "mergeCrit" | "floorCrit" | "badgeFoil"
+  | "tier"
+  | "cash"
+  | "critUp"
+  | "critDown"
+  | "mergeCrit"
+  | "floorCrit"
+  | "badgeFoil"
 >;
 
 export const CRIT_PROC_KINDS: readonly CritProcKind[] = [
@@ -2298,6 +2306,8 @@ export function rollCrit(
 ): void {
   const tier = rollTier();
   if (tier === null) return;
+  // the starting crit is a multiplier or a cash crit, gateway or not
+  const cash = critRandom() < CONFIG.crit.cashCrit.chance;
   const slot =
     allowSpecialProcs && critRandom() < SPECIAL_CRIT_GATEWAY.chance
       ? pickSpecialCrit()
@@ -2314,6 +2324,7 @@ export function rollCrit(
   for (const kind of kept) recordCritProcLanded(kind);
   const landedProcs = [...kept];
   const result = critResult(tier);
+  if (cash) result.cash = true;
   if (slot === "critUp") result.critUp = true;
   else if (slot === "critDown") result.critDown = true;
   else if (slot === "mergeCrit") result.mergeCrit = pickCritTierByOdds();

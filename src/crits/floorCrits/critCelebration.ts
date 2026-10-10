@@ -26,6 +26,7 @@ import { playCritExplosion } from "../../shared/explosionBang";
 import {
   playTierFlash,
   playSpecialFlash,
+  playCashFlash,
   STACK_DOWN,
   STACK_UP,
   TIER_FLASH_STROKE_WIDTH,
@@ -306,6 +307,8 @@ export function triggerCritCelebration(
   upDownMerge: UpDownMerge = {},
   // the number flying into the floor's bar once its flash has held
   floorCrit: FloorCritPlay | null = null,
+  // handed to the player (a tapped badge): waits its turn however long
+  granted = false,
 ): void {
   if (isDetachedJobRunning()) {
     if (procs?.dejaVu) {
@@ -332,7 +335,8 @@ export function triggerCritCelebration(
             : celebrateTier(tier, floorCrit),
       });
     for (const kind of landed) {
-      queueProcCelebration(kind, tier, now);
+      if (granted) queueProcCelebration(kind, tier, now, Infinity, true);
+      else queueProcCelebration(kind, tier, now);
       // Deja Vu doesn't just FLASH extra procs, it grants them: each follow-up
       // is applied and tallied through the same path a real roll uses (see
       // floorInteractions' onFollowUpProc)
@@ -363,6 +367,23 @@ export function triggerCritCelebration(
     return;
   }
   celebrateTier(tier, floorCrit);
+}
+
+// a cash crit's amount slams in like a plain crit, skipped the same way
+// (silently); onShown runs as it lands
+export function celebrateCash(
+  tier: CritTier,
+  label: string,
+  onShown: () => void,
+): void {
+  if (
+    isDetachedJobRunning() ||
+    isScreenFrozen() ||
+    specialCelebrationQueue.length > 0 ||
+    isCritFlashActive(Date.now())
+  )
+    return;
+  playCashFlash(tier, label, onShown);
 }
 
 // the handful of procs whose flash is more than the standard label+color

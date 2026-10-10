@@ -2,6 +2,7 @@
 
 ## Built
 
+- **Cash crit** (`CONFIG.crit.cashCrit`): every landed crit tier is a multiplier crit or, half the time, a cash crit, both able to carry special crits behind the gateway. A cash crit pays the price of its tier's upgrades at once; its `+$` amount spins in green like an x3 with the buy sound and flings money out where a crit throws glitter.
 - **Designator** (`designatorCrit`), **Beam splitter** (`beamSplitterCrit`) and **Tesla cannon** (`teslaCannonCrit`) floor crits: a targeting dot darting over the bars with pillars from orbit chasing it, then a giant one on its own; a fan of beams split off a mirror over the roof sweeping the bars, then snapping shut onto its own; a coil at the street firing forking bolts up at the bars, then one discharge onto every bar and its own.
 - **Rods** (`rodsCrit`), **Ion cannon** (`ionCannonCrit`) and **Bolt whip** (`boltWhipCrit`) floor crits: gold rods from orbit punching down through every bar in their column, then a fat one into its own; a pillar of light cutting across the bars in a zigzag down the building, stopping on its own; a bolt cracked like a whip along the bars, then straight down onto its own.
 - **Meltdown** (`meltdownCrit` floor crit): bars heat white-hot together via `heatIncomeBar`, then blow top to bottom in runs of blasts, its own bar last.

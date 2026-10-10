@@ -6,6 +6,7 @@
 export { celebrateBuildingCrit, createBuildingCrits } from "./buildingCrits";
 export {
   consumeCritUpgrade,
+  forceCashCrit,
   forceFloorCrit,
   forceCritUpDown,
   forceMergeCrit,
@@ -13,6 +14,7 @@ export {
   getFloorCrit,
   getCritTier,
   getMergeCrit,
+  isCashCrit,
   isCritDown,
   isCritUp,
   isCritUpgrade,

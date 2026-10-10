@@ -124,6 +124,18 @@ import {
 import { preloadFloorCritWhenIdle } from "./critPlayer";
 
 const critTiers = snapshotMap<Floor, CritTier>();
+// armed crits that pay cash instead of free upgrades
+const cashCrits = snapshotSet<Floor>();
+
+export function isCashCrit(floor: Floor): boolean {
+  return cashCrits.has(floor);
+}
+
+// dev/test-only: arms a cash crit of `tier`
+export function forceCashCrit(floor: Floor, tier: CritTier): void {
+  forceTestCrit(floor, null, tier, "upgrade");
+  cashCrits.add(floor);
+}
 
 let testCritFloor: Floor | null = null;
 
@@ -191,6 +203,7 @@ export function armGuaranteedMegaCrit(floor: Floor): void {
 // arms floor's button with a crit of at least `tier` right now, keeping a
 // bigger one already armed
 export function armCritUpgrade(floor: Floor, tier: CritTier): void {
+  cashCrits.delete(floor);
   critTiers.set(
     floor,
     higherCritTier(critTiers.get(floor) ?? null, tier) ?? tier,
@@ -227,6 +240,7 @@ export function rollCritUpgrade(
   rollCrit(
     (result, landedProcs) => {
       critTiers.set(floor, result.tier);
+      if (result.cash) cashCrits.add(floor);
       if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
       if (result.floorCrit) armFloorCrit(floor, result.floorCrit);
       if (result.critUp) critUpCrits.add(floor);
@@ -788,6 +802,7 @@ export function forceFloorCrit(floor: Floor, kind: FloorCritKind): void {
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
+  cashCrits.delete(floor);
   critUpCrits.delete(floor);
   critDownCrits.delete(floor);
   mergeCrits.delete(floor);

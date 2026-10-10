@@ -26,6 +26,7 @@ import {
 import { getExplosionDurationMs } from "../../sound";
 import { MAX_VIBRATE_MS, setBuzz } from "../../shared/vibration";
 import { drawCritSparks, startCritSparks, stopCritSparks } from "./critSparks";
+import { drawLetters, lettersWidth, warmLetters } from "./letters";
 
 // a handful of icons are explicitly designed to spin an extra fixed amount on
 // top of the flash text's own animated entrance rotation (see drawFlashLayer).
@@ -128,6 +129,8 @@ let flashLabel = "CRIT";
 let flashSizeLabel = "CRIT";
 let flashColor: string = COLOR.purple;
 let flashStrokeWidth = 8;
+// drawn letter by letter instead of baked (see ./letters)
+let flashLetters = false;
 // how many times/sec the flash strobes on/off during its hold phase, on top of the
 // regular grow-in/fade-out animation — 0 (the default) means no strobe at all, just
 // the plain animation every tier already had
@@ -148,6 +151,7 @@ interface CoveredFlash {
   sizeLabel: string;
   color: string;
   strokeWidth: number;
+  letters: boolean;
   // where it sits, CSS px from the newest one's own start spot
   x: number;
   y: number;
@@ -221,6 +225,8 @@ interface FlashRequest {
   // buzzes just this long instead of the whole flash (0: the whole flash)
   pulseMs: number;
   floorCrit: FloorCritPlay | null;
+  // drawn letter by letter: a label too varied to bake each (a cash amount)
+  letters: boolean;
 }
 
 // how long the grow-in (scale + rotate) phase takes, and the fade-out tail's base
@@ -254,6 +260,7 @@ function startFlash(req: FlashRequest): void {
       sizeLabel: flashSizeLabel,
       color: flashColor,
       strokeWidth: flashStrokeWidth,
+      letters: flashLetters,
       x: flashX,
       y: flashY,
     });
@@ -277,6 +284,7 @@ function startFlash(req: FlashRequest): void {
   flashSizeLabel = sizeLabel;
   flashColor = req.color;
   flashStrokeWidth = req.strokeWidth;
+  flashLetters = req.letters;
   flashBlinkHz = req.blinkHz;
   flashHoldMs = holdMs;
   flashFloorCrit = stacking ? null : req.floorCrit;
@@ -286,8 +294,8 @@ function startFlash(req: FlashRequest): void {
     : req.priority;
   flashEndsAt = now + GROWTH_DURATION_MS + holdMs + fadeDurationMs;
   buzzForFlash(now, req.pulseMs);
-  // a featured crit's image is its own show
-  if (CRIT_ICON_BY_LABEL[req.label]) stopCritSparks();
+  // a featured crit's image is its own show; a cash crit throws money instead
+  if (CRIT_ICON_BY_LABEL[req.label] || req.letters) stopCritSparks();
   else startCritSparks(req.priority, now);
 }
 
@@ -314,8 +322,11 @@ export function triggerScreenShake(options?: {
   stack?: FlashStack | null;
   pulseMs?: number;
   floorCrit?: FloorCritPlay | null;
-  // its sound: played as the flash lands (or at once if it's dropped)
-  onStart?: () => void;
+  // drawn letter by letter: a label too varied to bake each (a cash amount)
+  letters?: boolean;
+  // its sound: played as the flash lands (or at once if it's dropped);
+  // started is false when it was dropped
+  onStart?: (started: boolean) => void;
 }): void {
   const req: FlashRequest = {
     intensity: options?.intensity ?? 1,
@@ -329,18 +340,19 @@ export function triggerScreenShake(options?: {
     stack: options?.stack ?? null,
     pulseMs: options?.pulseMs ?? 0,
     floorCrit: options?.floorCrit ?? null,
+    letters: options?.letters ?? false,
   };
   const now = Date.now();
   // a badge's icon may still need decoding and baking: its shake and sound
   // wait for it, so they land with the reveal
-  const land = (): void => {
+  const land = (started: boolean): void => {
     kickShake(req.intensity, Date.now());
-    options?.onStart?.();
+    options?.onStart?.(started);
   };
   // a counting or merging number owns the screen until its own slam lands
   const leadIn = pendingLeadInLabel(now);
   if (leadIn !== null && req.label !== leadIn) {
-    land();
+    land(false);
     return;
   }
   const idle = flashEndsAt === null || now >= flashEndsAt;
@@ -353,12 +365,20 @@ export function triggerScreenShake(options?: {
     const iconName = CRIT_ICON_BY_LABEL[req.label]?.name;
     const ready = iconName ? requestCritIcon(iconName) : Promise.resolve(null);
     const begin = (): void => {
-      warmFlashBitmap(req.label, req.color, req.strokeWidth);
+      if (req.letters)
+        warmLetters(
+          req.label,
+          req.color,
+          req.strokeWidth,
+          lettersRes(req.label, req.color, req.strokeWidth),
+        );
+      else warmFlashBitmap(req.label, req.color, req.strokeWidth);
       const currentNow = Date.now();
       const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
-      if (stillIdle || req.priority > activeFlashPriority || req.stack)
-        startFlash(req);
-      land();
+      const started =
+        stillIdle || req.priority > activeFlashPriority || req.stack !== null;
+      if (started) startFlash(req);
+      land(started);
     };
     ready
       .then(async (icon) => {
@@ -370,7 +390,7 @@ export function triggerScreenShake(options?: {
       .catch(begin);
     return;
   }
-  land();
+  land(false);
   // a strictly bigger celebration still preempts whatever's currently playing
   // as soon as its icon is ready (an ultra shouldn't wait behind a plain crit);
   // anything else
@@ -697,6 +717,52 @@ function flashLayerScales(
 // its flash starts instead of stalling the reveal's first frame
 let lastDrawScale = 1;
 let lastViewportWidth = 0;
+
+// a letters flash fills 80% of the viewport's width, like a baked one
+function lettersTargetScale(
+  label: string,
+  color: string,
+  strokeWidth: number,
+  viewportWidth: number,
+): number {
+  return (viewportWidth * 0.8) / lettersWidth(label, color, strokeWidth, 1);
+}
+
+// its glyphs baked near their on-screen size, so they stay sharp
+function lettersRes(label: string, color: string, strokeWidth: number): number {
+  const onScreen =
+    lettersTargetScale(label, color, strokeWidth, lastViewportWidth) *
+    FLASH_FONT_SIZE *
+    lastDrawScale;
+  return Math.min(3, Math.max(1, Math.ceil(onScreen / FLASH_FONT_SIZE)));
+}
+
+// builds a letters flash's glyphs at idle, once the canvas has a size and the
+// font has loaded (sample sets the size they're built for)
+export function warmLetterFlash(
+  chars: string,
+  sample: string,
+  color: string,
+  strokeWidth: number,
+): void {
+  const warm = (): void => {
+    if (
+      lastViewportWidth === 0 ||
+      !document.fonts.check(FLASH_FONT) ||
+      isCritFlashActive(Date.now())
+    ) {
+      runWhenIdle(warm);
+      return;
+    }
+    lettersWidth(
+      chars,
+      color,
+      strokeWidth,
+      lettersRes(sample, color, strokeWidth),
+    );
+  };
+  runWhenIdle(warm);
+}
 
 function warmFlashBitmap(
   label: string,
@@ -1122,6 +1188,7 @@ function drawFlashLayers(
       1,
       now,
       covered.sizeLabel,
+      covered.letters,
     );
 
   // the reveal plays over the start of the timeline without moving it, so
@@ -1158,6 +1225,7 @@ function drawFlashLayers(
     raysScale,
     elapsed,
     flashSizeLabel,
+    flashLetters,
   );
 }
 
@@ -1191,9 +1259,24 @@ function drawFlashLayer(
   raysScale: number,
   motionMs: number,
   sizeLabel = label,
+  letters = false,
 ): void {
   // an empty label is a shake with no text at all
   if (!label) return;
+  if (letters) {
+    const res = lettersRes(label, color, strokeWidth);
+    const scale =
+      growthScale *
+      lettersTargetScale(label, color, strokeWidth, viewportWidth);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(centerX, centerY);
+    ctx.rotate(rotation);
+    ctx.scale(scale, scale);
+    drawLetters(ctx, label, color, strokeWidth, res);
+    ctx.restore();
+    return;
+  }
   const scratch = getScratchCtx();
   const { targetScale } = flashLayerScales(
     scratch,

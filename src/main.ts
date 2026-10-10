@@ -3,6 +3,7 @@ import "./shared/gameClock";
 import "./style.css";
 import {
   forceTestCrit,
+  forceCashCrit,
   forceCritUpDown,
   forceMergeCrit,
   forceFloorCrit,
@@ -676,10 +677,17 @@ async function main() {
         wireSpawnMouseButton(app, () => {
           forceSpawnMouse();
         });
-        wireCritTestActions(app, (kind, tier, event) => {
-          const floor = buildings[activeBuildingIndex]?.[0];
-          if (floor) forceTestCrit(floor, kind, tier, event);
-        });
+        wireCritTestActions(
+          app,
+          (kind, tier, event) => {
+            const floor = buildings[activeBuildingIndex]?.[0];
+            if (floor) forceTestCrit(floor, kind, tier, event);
+          },
+          (tier) => {
+            const floor = buildings[activeBuildingIndex]?.[0];
+            if (floor) forceCashCrit(floor, tier);
+          },
+        );
         // shows the idle-income "You have earned" overlay (see
         // hud/totalEarnedOverlay) on demand, without needing to actually leave and
         // reopen the tab to earn real idle income first

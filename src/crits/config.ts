@@ -16,6 +16,10 @@ export const CRIT_CONFIG = {
     crit: { chance: 0.08, multiplier: 3 },
     mega: { chance: 0.015, multiplier: 7 },
     ultra: { chance: 0.001, multiplier: 10 },
+    // a landed crit of any tier is a cash crit this often (else a multiplier
+    // crit): it pays the price of its tier's upgrades times upgradeCosts at
+    // once instead of them; special crits ride either
+    cashCrit: { chance: 0.5, upgradeCosts: 1 },
     // a boosted perma worker speeds its floor up by its tier's multiplier to
     // this power: 0.43 gives x1.6/x2.3/x2.7
     permaBoostExponent: 0.43,

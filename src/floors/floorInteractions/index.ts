@@ -3,6 +3,7 @@ import {
   critNow,
   eventProcContext,
   promoteTierKeepingLevel,
+  isCashCrit,
   isCritUpgrade,
   isCritUp,
   isCritDown,
@@ -263,9 +264,11 @@ export function performAutomatedUpgradeAfterPayment(
   if (!floor.unlocked) return false;
   if (isCritUpgrade(floor)) {
     const tier = getCritTier(floor)!;
+    const result = tierOnlyCrit(tier);
+    result.cash = isCashCrit(floor);
     consumeCritUpgrade(floor);
     rollCritUpgrade(floor, false);
-    applyFloorCrit(deps, floor, tierOnlyCrit(tier), false);
+    applyFloorCrit(deps, floor, result, false);
     deps.persist();
     return true;
   }
@@ -587,6 +590,7 @@ export function handleFloorClick(
       const critDown = isCritDown(floor);
       const mergeCrit = getMergeCrit(floor);
       const floorCrit = getFloorCrit(floor);
+      const cash = isCashCrit(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
       const carriesEvent = takeClaimedEventProc(floor);
@@ -606,6 +610,7 @@ export function handleFloorClick(
           floor,
           Object.assign(procs, {
             tier,
+            cash,
             critUp,
             critDown,
             mergeCrit,

@@ -182,14 +182,16 @@ const second = (bridge: PerfBridge) =>
   bridge.getActiveFloors()[1] ?? ground(bridge);
 
 // arms one crit from the test bar on the next upgrade click (kind "" is a
-// regular crit), then clicks the ground floor's button
+// regular crit, "cash" a cash crit), then clicks the ground floor's button
 function forceCrit(bridge: PerfBridge, kind: string, tier: string): void {
   const event = document.querySelector<HTMLSelectElement>("#test-crit-event");
   if (event) event.value = "upgrade";
   const select = document.querySelector<HTMLSelectElement>("#test-crit-tier");
   if (select) select.value = tier;
   document
-    .querySelector<HTMLButtonElement>(`[data-crit-kind="${kind}"]`)
+    .querySelector<HTMLButtonElement>(
+      kind === "cash" ? "#test-cash-crit" : `[data-crit-kind="${kind}"]`,
+    )
     ?.click();
   setTimeout(() => tap(bridge, ground(bridge)), 50);
 }
@@ -374,6 +376,11 @@ export const SCENARIOS: Scenario[] = [
     name: "crit-tiers",
     about: "a regular crit every second, x5, x25, x125 in turn",
     run: critSeries("crit-tiers", 1000, () => ""),
+  },
+  {
+    name: "cash-crits",
+    about: "a cash crit every second, tiers in turn",
+    run: critSeries("cash-crits", 1000, () => "cash"),
   },
   {
     name: "featured",

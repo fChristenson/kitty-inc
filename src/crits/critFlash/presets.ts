@@ -5,6 +5,7 @@ import {
   SPECIAL_FLASH_STROKE_WIDTH,
   triggerScreenShake,
   warmCritFlashes,
+  warmLetterFlash,
   type FlashStack,
 } from ".";
 import {
@@ -13,7 +14,9 @@ import {
   playCoinDrop,
   playCritJackpot,
   playCritPayout,
+  playSold,
 } from "../../sound";
+import { COLOR } from "../../palette";
 import { playCritExplosion } from "../../shared/explosionBang";
 import { CRIT_TIER_CONFIG, CRIT_TIER_ORDER, type CritTier } from "../critTypes";
 import { tierColor } from "../floorCrits/bonusTierReward";
@@ -45,6 +48,39 @@ export function warmTierFlashes(): void {
       strokeWidth: TIER_FLASH_STROKE_WIDTH[tier],
     })),
   );
+  warmLetterFlash(
+    CASH_FLASH_CHARS,
+    "+$123M",
+    COLOR.moneyGreen,
+    TIER_FLASH_STROKE_WIDTH.crit,
+  );
+}
+
+// what a cash crit's amount is written with (formatPrice's suffixes build
+// the rest on first use)
+const CASH_FLASH_CHARS = "+$0123456789KMBT";
+
+// a cash crit: its amount slams in green like an x3 and lands with the buy
+// sound; a dropped one stays silent, onShown runs only if it shows
+export function playCashFlash(
+  tier: CritTier,
+  label: string,
+  onShown: () => void,
+): void {
+  triggerScreenShake({
+    intensity: TIER_SHAKE_INTENSITY[tier],
+    label,
+    color: COLOR.moneyGreen,
+    strokeWidth: TIER_FLASH_STROKE_WIDTH[tier],
+    priority: tier === "ultra" ? 2 : tier === "mega" ? 1 : 0,
+    minDurationMs: getExplosionDurationMs(),
+    letters: true,
+    onStart: (started) => {
+      if (!started) return;
+      playSold();
+      onShown();
+    },
+  });
 }
 
 // a landed tier's flash, tier-scaled; label/color let a piggyback proc show

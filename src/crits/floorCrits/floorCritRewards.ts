@@ -65,7 +65,9 @@ import {
 import {
   triggerButtonPress as animateButtonPress,
   triggerSaleBoost,
+  getUpgradeCost,
 } from "../../floors/upgradeButton";
+import { formatPrice } from "../../utils";
 
 import {
   isVisibleOnFloor,
@@ -99,7 +101,11 @@ import {
   getActiveCompanyInvestedValue,
 } from "../../totalIncome";
 import { getActiveCompanyIndex } from "../../company";
-import { spawnCoinBurst as animateCoinBurst } from "../../floors/coins";
+import {
+  spawnCoinBurst as animateCoinBurst,
+  spawnFlingCoinBurst as animateFlingCoinBurst,
+} from "../../floors/coins";
+import { FLOOR_W } from "../../floors/constants";
 
 import { computeBaseFloorStats } from "../../floors";
 import {
@@ -131,9 +137,10 @@ import {
   multiply,
   subtract,
 } from "../../shared/bigNumber";
-import { triggerCritCelebration } from "./critCelebration";
+import { celebrateCash, triggerCritCelebration } from "./critCelebration";
 
 const spawnCoinBurst = liveEffect(animateCoinBurst);
+const spawnFlingCoinBurst = liveEffect(animateFlingCoinBurst);
 const triggerButtonPress = liveEffect(animateButtonPress);
 const triggerJumpAll = liveEffect(animateJumpAll);
 
@@ -1545,7 +1552,7 @@ export function eventProcContext(
       result[kind] = true;
       // counted first, so a badge it qualifies for a foil rolls for it
       recordCritProcLanded(kind);
-      applyFloorCrit(deps, floor, result);
+      applyFloorCrit(deps, floor, result, true, true);
       deps.persist();
     },
     promoteFloorTier: (floor, tier) => {
@@ -1566,27 +1573,70 @@ export function eventProcContext(
   };
 }
 
+// a cash crit pays the price of the upgrades a crit would give, at once. Its
+// flash flings money out where a crit throws glitter, as far (grow matches
+// the glitter's tiers)
+const CASH_BURST: Record<CritTier, { grow: number; coins: [number, number] }> =
+  {
+    crit: { grow: 1, coins: [30, 40] },
+    mega: { grow: 1.25, coins: [45, 60] },
+    ultra: { grow: 1.5, coins: [60, 80] },
+  };
+
+function payCash(floor: Floor, upgrades: number): BigNumber {
+  const amount = multiply(
+    getUpgradeCost(floor),
+    upgrades * CONFIG.crit.cashCrit.upgradeCosts,
+  );
+  addTotalIncome(amount);
+  return amount;
+}
+
+function celebrateCashCrit(
+  deps: FloorActionsDeps,
+  floor: Floor,
+  tier: CritTier,
+  amount: BigNumber,
+): void {
+  celebrateCash(tier, `+${formatPrice(amount)}`, () => {
+    const middle = deps.getScreenCenterLocal(floor);
+    const area = deps.getScreenAreaLocal?.(floor);
+    const width = area ? area.right - area.left : FLOOR_W;
+    const { grow, coins } = CASH_BURST[tier];
+    spawnFlingCoinBurst(floor, middle.x, middle.y, width * grow, coins);
+  });
+}
+
 export function applyFloorCrit(
   deps: FloorActionsDeps,
   floor: Floor,
   result: CritRollResult,
   allowSpecialProcs = true,
+  // handed to the player (a tapped badge): its celebration is never dropped
+  granted = false,
 ): void {
-  if (!allowSpecialProcs) result = tierOnlyCrit(result.tier);
+  if (!allowSpecialProcs) {
+    const { cash } = result;
+    result = tierOnlyCrit(result.tier);
+    result.cash = cash;
+  }
   const isGroundFloor = deps.floors.indexOf(floor) === 0;
   const count =
     CRIT_TIER_CONFIG[result.tier].multiplier +
     (result.mergeCrit ? CRIT_TIER_CONFIG[result.mergeCrit].multiplier : 0);
-  for (let tick = 0; tick < count; tick++)
-    applyUpgradeTick(floor, isGroundFloor);
+  // a cash crit pays where a crit upgrades
+  const reward = (target: Floor, isGround: boolean): BigNumber | null => {
+    if (result.cash) return payCash(target, count);
+    for (let tick = 0; tick < count; tick++) applyUpgradeTick(target, isGround);
+    return null;
+  };
+  const cash = reward(floor, isGroundFloor);
   // a crit up/down lands the same tier on the floor above/below too
   const index = deps.floors.indexOf(floor);
   const landsOn = (on: boolean | undefined, near: Floor | undefined) => {
     if (!on || !near?.unlocked || isFloorLocked(near) || isFloorMaxed(near))
       return false;
-    const nearIsGround = deps.floors.indexOf(near) === 0;
-    for (let tick = 0; tick < count; tick++)
-      applyUpgradeTick(near, nearIsGround);
+    reward(near, deps.floors.indexOf(near) === 0);
     triggerButtonPress(near);
     return true;
   };
@@ -1603,20 +1653,33 @@ export function applyFloorCrit(
   };
   applyCritProcs(result, context, CRIT_REWARDS, payFeaturedCrit);
   triggerButtonPress(floor);
-  triggerCritCelebration(
-    result.tier,
-    result,
-    (kind) => grantFollowUpProc(kind, context),
-    {
-      up,
-      down,
-      merge: result.mergeCrit,
-    },
-    result.floorCrit
-      ? floorCritPlayFor(deps, floor, result.floorCrit, count)
-      : null,
-  );
-  for (const kind of landedProcKinds(result))
+  const landed = landedProcKinds(result);
+  // a plain cash crit shows its amount where a plain crit shows its tier
+  if (
+    cash &&
+    landed.length === 0 &&
+    !up &&
+    !down &&
+    !result.mergeCrit &&
+    !result.floorCrit
+  )
+    celebrateCashCrit(deps, floor, result.tier, cash);
+  else
+    triggerCritCelebration(
+      result.tier,
+      result,
+      (kind) => grantFollowUpProc(kind, context),
+      {
+        up,
+        down,
+        merge: result.mergeCrit,
+      },
+      result.floorCrit
+        ? floorCritPlayFor(deps, floor, result.floorCrit, count)
+        : null,
+      granted,
+    );
+  for (const kind of landed)
     revealFoilOf(deps, floor, kind, isGroundFloor, result.badgeFoil);
 }
 

@@ -52,6 +52,7 @@ import {
 import { getActiveEventButton } from "../../shared/floorEvents";
 import {
   getCritTier,
+  isCashCrit,
   CRIT_TIER_CONFIG,
   type CritTier,
   getClaimedEventCover,
@@ -82,6 +83,17 @@ prepareSoon(() =>
     ...Object.values(CRIT_TIER_CONFIG).map((tier) => tier.color),
   ]),
 );
+
+// an armed cash crit's button label, "$x3"
+let cashCritLabels: Record<CritTier, string> | null = null;
+function cashCritLabel(tier: CritTier): string {
+  cashCritLabels ??= {
+    crit: `$${CRIT_TIER_CONFIG.crit.label}`,
+    mega: `$${CRIT_TIER_CONFIG.mega.label}`,
+    ultra: `$${CRIT_TIER_CONFIG.ultra.label}`,
+  };
+  return cashCritLabels[tier];
+}
 
 export function getBoilHeat(floor: Floor, now: number): number {
   const source = resolveButtonFloor(floor);
@@ -225,7 +237,10 @@ function renderUpgradeButton(
     const label = activeEvent
       ? activeEvent.label(critMultiplier)
       : crit
-        ? (cover?.label ?? CRIT_TIER_CONFIG[critTier as CritTier].label)
+        ? (cover?.label ??
+          (isCashCrit(floor)
+            ? cashCritLabel(critTier as CritTier)
+            : CRIT_TIER_CONFIG[critTier as CritTier].label))
         : maxed
           ? "MAX"
           : formatPrice(cost);

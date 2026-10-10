@@ -55,6 +55,7 @@ interface Particle extends CoinBurstSprite {
   spinRate: number; // this particle's own frames/tick speed
   spinDir: 1 | -1; // picked once per coin so a burst doesn't spin in lockstep
   homing?: HomingFlight;
+  fling?: FlingFlight;
   // set by a coin path: its size along the way, times size
   pathScale?: number;
 }
@@ -280,6 +281,15 @@ function drawHangGlint(
 }
 
 function advanceCoin(p: Particle, dt: number): void {
+  const fling = p.fling;
+  if (fling) {
+    p.life += dt;
+    const out = 1 - Math.exp(-p.life / FLING_DRAG_TICKS);
+    p.x = fling.x0 + fling.dx * out;
+    p.y = fling.y0 + fling.dy * out + fling.fall * p.life * p.life;
+    p.spinFrame += p.spinDir * p.spinRate * dt;
+    return;
+  }
   const homing = p.homing;
   if (homing?.spray) {
     const { spray, group } = homing;
@@ -536,6 +546,7 @@ function spawnBurstParticles(
         }
       : undefined;
     p.pathScale = undefined;
+    p.fling = undefined;
     pool.spawn(p);
   }
 }
@@ -592,6 +603,71 @@ export function spawnHomingCoinBurst(
     pool.update(dt, advanceCoin, recycleCoin);
   });
   return count;
+}
+
+// a flung coin's whole path: out along (dx, dy), slowing to a stop, while
+// falling ever faster
+type FlingFlight = {
+  x0: number;
+  y0: number;
+  dx: number;
+  dy: number;
+  fall: number;
+};
+
+// matches the crit flash's glitter (crits/critFlash/critSparks), in ticks and
+// shares of the width it's flung across
+const FLING_DRAG_TICKS = 16;
+const FLING_REACH: [number, number] = [0.25, 0.65];
+const FLING_LIFE: [number, number] = [30, 54];
+const FLING_FALL = 0.11 / 360;
+
+// coins flung out from (x, y) in every direction, like the crit flash's
+// glitter: reach scales them to a burst `width` across (floor-local)
+export function spawnFlingCoinBurst(
+  floor: Floor,
+  x: number,
+  y: number,
+  width: number,
+  coins: [number, number],
+): void {
+  const count = burstCount(...coins);
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const reach = randomIn(FLING_REACH) * width;
+    const kind: "coin" | "bill" =
+      Math.random() < COIN_BILL_CHANCE ? "bill" : "coin";
+    const p = spareCoins.pop() ?? ({} as Particle);
+    p.floor = floor;
+    p.x = x;
+    p.y = y;
+    p.vx = 0;
+    p.vy = 0;
+    p.life = 0;
+    p.maxLife = randomIn(FLING_LIFE);
+    p.size = (22 + Math.random() * 46) * 1.15 * 1.25;
+    p.gravity = 0;
+    p.gravityRamp = 0;
+    p.kind = kind;
+    p.spinFrame =
+      Math.random() *
+      (kind === "bill" ? BILL_SPIN_FRAME_COUNT : COIN_SPIN_FRAME_COUNT);
+    p.spinRate =
+      MIN_SPIN_RATE + Math.random() * (MAX_SPIN_RATE - MIN_SPIN_RATE);
+    p.spinDir = Math.random() < 0.5 ? 1 : -1;
+    p.axisAngle = (Math.random() * 2 - 1) * (Math.PI / 2);
+    p.homing = undefined;
+    p.pathScale = undefined;
+    p.fling = {
+      x0: x,
+      y0: y,
+      dx: Math.cos(angle) * reach,
+      dy: Math.sin(angle) * reach,
+      fall: FLING_FALL * width,
+    };
+    pool.spawn(p);
+  }
+  pool.ensureTicking((dt) => pool.update(dt, advanceCoin, recycleCoin));
 }
 
 // spray coins fly at constant speed, braking to a stop only in the last 0.1s
