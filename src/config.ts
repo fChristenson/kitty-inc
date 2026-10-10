@@ -123,9 +123,11 @@ export const CONFIG = {
       // its dash, then how long the glitter lingers, pulsing over its last
       // pulseMs
       dashMs: 1_600,
+      // longer paths (loops, spirals, rows) at the dash's speed, capped here
+      maxDashMs: 2_800,
       durationMs: 6_000,
       pulseMs: 2_000,
-      specks: 90,
+      specks: 380,
       // all its glitter swept up pays this many seconds of the company's income
       rewardSeconds: 30,
     },

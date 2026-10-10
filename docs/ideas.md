@@ -2,6 +2,8 @@
 
 ## Built
 
+- **Wake** (wisp spawn glitter, `src/wispSpawn`): the wisp sprays glitter out to both sides behind it like a boat's wake, its reach different every time; a swipe sends what it touches flying into the total.
+
 - **Wrecking swing** (`wreckingSwingCrit`), **Drones** (`dronesCrit`), **Sticky darts** (`stickyDartsCrit`) and **Storm ball** (`stormBallCrit`) income crits: a wrecking ball on a chain of light swinging through the total, wider and faster, snapping into it; three drones weaving under the total lasering it, then ramming it; darts fired into the total that stick with lit fuses and go off in a chain; a lightning ball ricocheting round the screen, bolting the total on every wall it hits.
 
 - **Homing missiles** (`homingMissilesCrit`) and **Skyrockets** (`skyrocketsCrit`) income crits: two dozen missile wisps fanning out from the amount, then hooking round and homing in on the total one after another; rockets shooting up from the screen's bottom, quicker and quicker, each bursting on the total in a ring of glitter, three together for the finale.
