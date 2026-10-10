@@ -26,6 +26,23 @@ export function drawNumberShrink(
 const READOUT_X = 300;
 const READOUT_Y = 35;
 
+// a cubic curve from a, pulled towards b then c, onto d, at t 0..1
+export function cubic(
+  a: Point,
+  b: Point,
+  c: Point,
+  d: Point,
+  t: number,
+  into: Point,
+): Point {
+  const u = 1 - t;
+  into.x =
+    u * u * u * a.x + 3 * u * u * t * b.x + 3 * u * t * t * c.x + t ** 3 * d.x;
+  into.y =
+    u * u * u * a.y + 3 * u * u * t * b.y + 3 * u * t * t * c.y + t ** 3 * d.y;
+  return into;
+}
+
 // a spot on the total's readout at `to`, spread across it
 export const readoutSpot = (to: Point, k: number, salt: number): Point => ({
   x: to.x + (holeHash(k, salt) * 2 - 1) * READOUT_X,

@@ -36,6 +36,7 @@ import { drawStars } from "../stars";
 import { drawRoof } from "../../buildings";
 import { drawHud, HUD_H } from "../../hud";
 import { updateMouse, hitTestMouse, handleMouseClick } from "../../mouse";
+import { setTapScale } from "../../shared/tapTarget";
 import {
   drawBubbles,
   hitTestBubbles,
@@ -341,6 +342,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     cssW = rect.width;
     cssH = rect.height;
     scale = cssW / SLOT_W;
+    setTapScale(scale);
     const dpr = getEffectiveDpr();
     canvas.width = Math.round(cssW * dpr);
     canvas.height = Math.round(cssH * dpr);

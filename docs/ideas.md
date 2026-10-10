@@ -2,6 +2,13 @@
 
 ## Built
 
+- **Homing missiles** (`homingMissilesCrit`) and **Skyrockets** (`skyrocketsCrit`) income crits: two dozen missile wisps fanning out from the amount, then hooking round and homing in on the total one after another; rockets shooting up from the screen's bottom, quicker and quicker, each bursting on the total in a ring of glitter, three together for the finale.
+
+- **Mortars** (`mortarsCrit`), **Arc chain** (`arcChainCrit`), **Sweep up** (`sweepUpCrit`) and **Cork pop** (`corkPopCrit`) income crits: five mortar tubes along the screen's bottom lobbing shells off the top down onto the total, then a volley; a bolt chaining coin to coin, each firing a bolt up into the total, then a giant one; a broom of light shoving glitter up into a line under the total, side brooms heaping it, the heap slammed in; a cork popped into the total, then a jet of gold spray whipping across it in pops.
+
+- **Salvo** (`salvoCrit`), **Light pillars** (`lightPillarsCrit`), **Bank shot** (`bankShotCrit`) and **Bomblets** (`bombletsCrit`) income crits: two launchers at the screen's bottom corners ripple-firing rockets that curl in onto the total, then a fat pair; pillars of light blasting up from a wisp racing along the screen's bottom into the total, then a giant one; shots banking off the screen's sides up onto the total, then a fat one up the middle; a bomb bursting under the total into four bomblets, each into three more hopping along it.
+
+- **Star fling** (`starFlingCrit`) and **Money spout** (`moneySpoutCrit`) income crits: a galaxy of glitter stars spun up round the amount, knots slung off it one after another into the total, then its core; a spinning spout of hundreds of coins twisting up into the total, its top swaying across it in a rattle of blasts.
 - **Drill bit** (`drillBitCrit`), **Gulp** (`gulpCrit`), **Gold coat** (`goldCoatCrit`) and **Pegboard** (`pegboardCrit`) income crits: a drill biting up into the total, stalling in a gush of sparks, then boring through in eight shoves; glitter flung all over the screen and gulped by a gravity hole under the total, each gulp spurting blasts into it; two nozzles spraying gold mist across the total, pops quickening, until it blows; wisp balls fired up through a fan of flashing pegs onto the total.
 
 - **Victory lap** (`victoryLapCrit`) and **Ceiling bounce** (`ceilingBounceCrit`) income crits: two wisps racing laps round the total, blasts trailing the leader across it, braking into the hairpins at its ends, both diving in at the finish; a wisp bouncing along under the total, smacking up into it every bounce, off both sides of the screen, then dunked into the middle.

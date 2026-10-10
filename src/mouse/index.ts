@@ -18,6 +18,7 @@ import { loadImageByName } from "../loadAssets";
 import { COLOR } from "../palette";
 import { notifyHuntTargetGone, registerHuntTarget } from "../shared/huntTarget";
 import { whitenImage } from "../shared/mergeFlash";
+import { tapHitsMoving } from "../shared/tapTarget";
 import { drawSlamTarget, getSlamPose } from "../shared/eventEndSlam";
 import {
   isVisibleOnFloor,
@@ -49,10 +50,9 @@ const MID_DART_PAUSE_CHANCE_PER_SEC = 0.5;
 // scaled down to that same aspect ratio
 const RENDER_W = 110;
 const RENDER_H = Math.round(RENDER_W * (524 / 603));
-// hitTestMouse pads the actual sprite bounds out by this much on every side — the
-// mouse darts around fast and small, so a click landing just outside its rendered
-// fur should still count rather than requiring pixel-perfect precision
-const HIT_PADDING = 24;
+// a tap this long behind the mouse still catches it: a finger lags a
+// darting target
+const TAP_LAG_MS = 150;
 // squash/stretch + a tiny full-body wiggle while actively scurrying (skipped while
 // paused, so it isn't still jittering while standing still) — the sprite is a
 // single static pose with no walk-cycle frames of its own, so without this it just
@@ -341,13 +341,20 @@ function drawMouseSprite(
 // whether a floor-local point lands on the currently-visible mouse on this floor
 export function hitTestMouse(x: number, y: number, floor: Floor): boolean {
   if (!active || active.floor !== floor) return false;
-  const scale = getScale(active, Date.now());
+  const now = Date.now();
+  const scale = getScale(active, now);
   const halfW = (RENDER_W * scale) / 2;
-  return (
-    x >= active.x - halfW - HIT_PADDING &&
-    x <= active.x + halfW + HIT_PADDING &&
-    y >= MOUSE_Y - RENDER_H * scale - HIT_PADDING &&
-    y <= MOUSE_Y + HIT_PADDING
+  const middleY = MOUSE_Y - (RENDER_H * scale) / 2;
+  const running = now >= active.pausedUntil;
+  const behind = running
+    ? active.direction * active.speed * (TAP_LAG_MS / 1000)
+    : 0;
+  return tapHitsMoving(
+    x,
+    y,
+    { x: active.x - behind, y: middleY },
+    { x: active.x, y: middleY },
+    halfW,
   );
 }
 

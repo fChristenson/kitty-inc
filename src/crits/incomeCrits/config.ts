@@ -50,5 +50,53 @@ export const INCOME_CRIT_CONFIG = {
     pegboardCrit: {
       chance: 0.03,
     },
+    // a galaxy round the number slinging knots of stars up into the total
+    starFlingCrit: {
+      chance: 0.03,
+    },
+    // a spinning spout of coins twisting up into the total
+    moneySpoutCrit: {
+      chance: 0.03,
+    },
+    // rockets ripple-fired from the screen's bottom corners onto the total
+    salvoCrit: {
+      chance: 0.03,
+    },
+    // pillars of light blasting up from the screen's bottom into the total
+    lightPillarsCrit: {
+      chance: 0.03,
+    },
+    // shots banking off the screen's sides up onto the total
+    bankShotCrit: {
+      chance: 0.03,
+    },
+    // a bomb bursting into bomblets that hop along the total
+    bombletsCrit: {
+      chance: 0.03,
+    },
+    // mortar tubes along the screen's bottom lobbing shells onto the total
+    mortarsCrit: {
+      chance: 0.03,
+    },
+    // a bolt chaining coin to coin, each firing a bolt up into the total
+    arcChainCrit: {
+      chance: 0.03,
+    },
+    // brooms of light sweeping glitter up into a heap slammed into the total
+    sweepUpCrit: {
+      chance: 0.03,
+    },
+    // a cork popped into the total, then a whipping jet of gold spray
+    corkPopCrit: {
+      chance: 0.03,
+    },
+    // missiles fanning out from the number, then homing in on the total
+    homingMissilesCrit: {
+      chance: 0.03,
+    },
+    // rockets from the screen's bottom bursting in glitter rings on the total
+    skyrocketsCrit: {
+      chance: 0.03,
+    },
   },
 };

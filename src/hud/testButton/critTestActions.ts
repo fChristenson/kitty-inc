@@ -57,6 +57,18 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-income-crit="gulpCrit">Gulp Crit</button>
           <button class="game__button" data-income-crit="goldCoatCrit">Gold Coat Crit</button>
           <button class="game__button" data-income-crit="pegboardCrit">Pegboard Crit</button>
+          <button class="game__button" data-income-crit="starFlingCrit">Star Fling Crit</button>
+          <button class="game__button" data-income-crit="moneySpoutCrit">Money Spout Crit</button>
+          <button class="game__button" data-income-crit="salvoCrit">Salvo Crit</button>
+          <button class="game__button" data-income-crit="lightPillarsCrit">Light Pillars Crit</button>
+          <button class="game__button" data-income-crit="bankShotCrit">Bank Shot Crit</button>
+          <button class="game__button" data-income-crit="bombletsCrit">Bomblets Crit</button>
+          <button class="game__button" data-income-crit="mortarsCrit">Mortars Crit</button>
+          <button class="game__button" data-income-crit="arcChainCrit">Arc Chain Crit</button>
+          <button class="game__button" data-income-crit="sweepUpCrit">Sweep Up Crit</button>
+          <button class="game__button" data-income-crit="corkPopCrit">Cork Pop Crit</button>
+          <button class="game__button" data-income-crit="homingMissilesCrit">Homing Missiles Crit</button>
+          <button class="game__button" data-income-crit="skyrocketsCrit">Skyrockets Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

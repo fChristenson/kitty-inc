@@ -22,6 +22,7 @@ import { stampGlimmer } from "../shared/twinkle";
 import { pulseHudTotalFlash } from "../shared/totalIncomeCoins";
 import { urgentBlink } from "../shared/urgentBlink";
 import { drawWispBetween, WISP_SIZE, type Point } from "../shared/wisp";
+import { swipeHits, tapHits } from "../shared/tapTarget";
 
 // the dash: in from one side through a few spots across the screen, out the
 // other side, as fractions of the screen
@@ -35,8 +36,6 @@ const SPECK_POP_MS = 160;
 const SPECK_FADE_MS = 300;
 const SPECK_SPIN = 0.0015;
 const COLORS = [COLOR.heavenlyGold, COLOR.wispGlitter, COLOR.white];
-// a swipe gathers glitter this far either side of the finger
-const SWEEP_REACH = 90;
 // gathered specks hop off the swipe, then fly into the total
 const FLY_MS: [number, number] = [380, 620];
 const FLY_STAGGER_MS = 6;
@@ -154,6 +153,11 @@ const isLying = (speck: Speck, now: number, fadeAt: number) =>
   speck.sweptAt === Infinity && now >= speck.bornAt && now < fadeAt;
 const speckX = (speck: Speck) => speck.fx * width + speck.ox;
 const speckY = (speck: Speck) => speck.fy * height + speck.oy;
+const speckAt = (speck: Speck): Point => {
+  spot.x = speckX(speck);
+  spot.y = speckY(speck);
+  return spot;
+};
 
 // whether a press at (x, y) (gameCanvas screen units) lands on glitter
 export function hitTestWispGlitter(x: number, y: number): boolean {
@@ -161,8 +165,7 @@ export function hitTestWispGlitter(x: number, y: number): boolean {
   if (!run) return false;
   for (const speck of run.specks) {
     if (!isLying(speck, now, run.fadeAt)) continue;
-    if (Math.hypot(speckX(speck) - x, speckY(speck) - y) < SWEEP_REACH)
-      return true;
+    if (tapHits(x, y, speckAt(speck), speck.size / 2)) return true;
   }
   return false;
 }
@@ -176,20 +179,14 @@ export function sweepWispGlitter(
 ): void {
   if (!run) return;
   const now = performance.now();
-  const dx = x1 - x0;
-  const dy = y1 - y0;
-  const length2 = dx * dx + dy * dy || 1;
   let swept = 0;
   for (const speck of run.specks) {
     if (!isLying(speck, now, run.fadeAt)) continue;
-    const x = speckX(speck);
-    const y = speckY(speck);
-    const t = clamp01(((x - x0) * dx + (y - y0) * dy) / length2);
-    if (Math.hypot(x - (x0 + dx * t), y - (y0 + dy * t)) >= SWEEP_REACH)
-      continue;
+    const at = speckAt(speck);
+    if (!swipeHits(x0, y0, x1, y1, at, speck.size / 2)) continue;
     speck.sweptAt = now + swept++ * FLY_STAGGER_MS;
-    speck.from.x = x;
-    speck.from.y = y;
+    speck.from.x = at.x;
+    speck.from.y = at.y;
   }
   if (swept > 0 && now - lastSwooshAt > SWOOSH_GAP_MS) {
     lastSwooshAt = now;

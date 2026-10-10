@@ -2191,6 +2191,18 @@ export const INCOME_CRIT_KINDS = [
   "gulpCrit",
   "goldCoatCrit",
   "pegboardCrit",
+  "starFlingCrit",
+  "moneySpoutCrit",
+  "salvoCrit",
+  "lightPillarsCrit",
+  "bankShotCrit",
+  "bombletsCrit",
+  "mortarsCrit",
+  "arcChainCrit",
+  "sweepUpCrit",
+  "corkPopCrit",
+  "homingMissilesCrit",
+  "skyrocketsCrit",
 ] as const satisfies readonly IncomeCritType[];
 export type IncomeCritKind = (typeof INCOME_CRIT_KINDS)[number];
 

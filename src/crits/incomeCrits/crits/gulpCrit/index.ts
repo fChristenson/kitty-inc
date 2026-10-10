@@ -7,6 +7,7 @@ import { COLOR } from "../../../../palette";
 import { DETONATION_MS, drawDetonation } from "../../../../shared/explosion";
 import { drawGravityHole } from "../../../../shared/clutter";
 import { stampGlimmer } from "../../../../shared/twinkle";
+import { smoothstep } from "../../../../shared/easing";
 import { playSwoosh } from "../../../../sound";
 import {
   registerFloorCrit,
@@ -26,7 +27,12 @@ const GROW_MS = 120;
 const GULPS = 5;
 const GAPS_MS = [230, 200, 170, 140];
 const STAGGER_MS = 70;
-const PULL_MS = 200;
+const PULL_MS = 340;
+// before its gulp a bit leans this share of the way towards the hole, trembling
+const LEAN_MS = 220;
+const LEAN = 0.12;
+const TREMBLE = 6;
+const TREMBLE_RATE = 0.09;
 const SPURTS = 3;
 const SPURT_EVERY_MS = 45;
 // the bits' spread: off the screen's sides, and from under the hole down
@@ -39,7 +45,12 @@ const HOLE = 160;
 const GULP_SWELL = 0.4;
 const SWELL_MS = 90;
 const HOLE_GROWTH_MS = 2000;
-const SWIRL = 2.2;
+// laps round the hole on the way in, the streak trailing a pulled bit (as
+// shares of its pull) and how small it is by the time it's swallowed
+const SWIRL = 4;
+const TRAIL = [0.05, 0.1];
+const TRAIL_SIZE = [0.75, 0.5];
+const SWALLOWED = 0.35;
 const BIT = 26;
 const TWINKLE = 0.004;
 const OPEN_BLAST = 300;
@@ -60,6 +71,19 @@ interface Gulp {
 }
 const gulps = new WeakMap<Running, Gulp>();
 const origin: Point = { x: 0, y: 0 };
+const bit: Point = { x: 0, y: 0 };
+
+// a bit u (0..1) of the way through its pull, from (dx, dy) off the hole:
+// spiralling in, faster and faster
+function pulled(hole: Point, dx: number, dy: number, u: number): Point {
+  const a = u * u * SWIRL;
+  const s = 1 - u * u;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  bit.x = hole.x + (dx * cos - dy * sin) * s;
+  bit.y = hole.y + (dx * sin + dy * cos) * s;
+  return bit;
+}
 
 function planGulp(to: Point, viewportWidth: number): Gulp {
   const hole = { x: to.x, y: to.y + HOLE_DOWN };
@@ -161,32 +185,37 @@ registerFloorCrit("gulpCrit", {
         const sx = spots[i * 2];
         const sy = spots[i * 2 + 1];
         const pull = pullAt[i];
-        let x: number;
-        let y: number;
+        const color = i % 3 ? COLOR.heavenlyGold : COLOR.white;
+        const spin = i + ms * TWINKLE;
         if (ms < pull) {
-          x = sx * fling;
-          y = sy * fling;
-        } else {
-          const u = (ms - pull) / PULL_MS;
-          if (u >= 1) continue;
-          // swirling in, faster and faster
-          const dx = sx - hole.x;
-          const dy = sy - hole.y;
-          const a = u * u * SWIRL;
-          const s = 1 - u * u;
-          const cos = Math.cos(a);
-          const sin = Math.sin(a);
-          x = hole.x + (dx * cos - dy * sin) * s;
-          y = hole.y + (dx * sin + dy * cos) * s;
+          // leaning towards the hole and trembling as its gulp nears
+          const lean =
+            LEAN * smoothstep(clamp01((ms - pull + LEAN_MS) / LEAN_MS));
+          const tremble =
+            lean > 0 ? Math.sin(ms * TREMBLE_RATE + i) * TREMBLE : 0;
+          stampGlimmer(
+            ctx,
+            lerp(sx * fling, hole.x, lean) + tremble,
+            lerp(sy * fling, hole.y, lean),
+            BIT,
+            spin,
+            color,
+          );
+          continue;
         }
-        stampGlimmer(
-          ctx,
-          x,
-          y,
-          BIT,
-          i + ms * TWINKLE,
-          i % 3 ? COLOR.heavenlyGold : COLOR.white,
-        );
+        const u = (ms - pull) / PULL_MS;
+        if (u >= 1) continue;
+        const dx = (sx - hole.x) * (1 - LEAN);
+        const dy = (sy - hole.y) * (1 - LEAN);
+        const size = BIT * lerp(1, SWALLOWED, u * u);
+        // a streak dragged out behind it, then the bit itself, white-hot
+        for (let j = TRAIL.length - 1; j >= 0; j--) {
+          if (u < TRAIL[j]) continue;
+          const p = pulled(hole, dx, dy, u - TRAIL[j]);
+          stampGlimmer(ctx, p.x, p.y, size * TRAIL_SIZE[j], spin, color);
+        }
+        const p = pulled(hole, dx, dy, u);
+        stampGlimmer(ctx, p.x, p.y, size, spin, u > 0.5 ? COLOR.white : color);
       }
       ctx.restore();
     }

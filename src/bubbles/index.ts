@@ -30,12 +30,11 @@ import {
   type Prize,
 } from "../shared/spawnPrize";
 import { urgentBlink } from "../shared/urgentBlink";
+import { tapHits } from "../shared/tapTarget";
 import type { Point } from "../shared/wisp";
 
 const RADIUS = 130;
 const CONTENT_SIZE = 160;
-// tapping counts this far round a bubble, for thumbs
-const HIT_REACH = 1.15;
 // a spawn blows its bubbles in over SPAWN_MS, each growing in over GROW_MS;
 // each vanishes over VANISH_MS once its time is up
 const SPAWN_MS = 2_400;
@@ -193,8 +192,7 @@ function hitBubble(x: number, y: number, now: number): Bubble | null {
     const scale = bubbleScale(bubble, now);
     if (scale <= 0.3) continue;
     bubbleAt(bubble, now, spot);
-    if (Math.hypot(x - spot.x, y - spot.y) < RADIUS * scale * HIT_REACH)
-      return bubble;
+    if (tapHits(x, y, spot, RADIUS * scale)) return bubble;
   }
   return null;
 }
