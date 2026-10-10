@@ -28,8 +28,6 @@ import { wireCritTestActions } from "./hud";
 import { forceBubbles } from "./spawn/bubbles";
 import { forceWispSpawn } from "./spawn/wisp";
 import { forceCoinSpawn } from "./spawn/coin";
-import { forceFireflies } from "./spawn/fireflies";
-import { forceGusher } from "./spawn/gusher";
 import {
   add,
   subtract,
@@ -2284,8 +2282,6 @@ async function main() {
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
           "coin-spawn": forceCoinSpawn,
-          "fireflies-spawn": forceFireflies,
-          "gusher-spawn": forceGusher,
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
           "spark-chamber": forceOnActive((e) => e.forceSparkChamberEvent),

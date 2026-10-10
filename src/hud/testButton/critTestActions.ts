@@ -1292,8 +1292,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-bubbles-event" class="game__button">Spawn Bubbles</button>
           <button id="test-wisp-spawn-event" class="game__button">Spawn Wisp</button>
           <button id="test-coin-spawn-event" class="game__button">Spawn Coin</button>
-          <button id="test-fireflies-spawn-event" class="game__button">Spawn Fireflies</button>
-          <button id="test-gusher-spawn-event" class="game__button">Spawn Gusher</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

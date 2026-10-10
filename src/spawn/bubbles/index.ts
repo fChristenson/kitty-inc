@@ -2,8 +2,9 @@
 // screen, each holding a crit number, a gold coin or a badge. Every bubble
 // lives on its own: it floats for CONFIG.randomSpawns.bubbles.durationMs, pulsing before
 // it vanishes. A tap pops one and pays it at once: a coin streams into the
-// total, a crit number slams into its floor's income bar, and a badge plays
-// its crit celebration.
+// total, a crit number slams into its floor's income bar (its levels) or one
+// of the floor's workers (a perma tier up), and a badge plays its crit
+// celebration.
 //
 // gameCanvas wires the floor actions in (wireBubbles), ticks the spawn timer
 // (updateBubbles), pops on presses (popBubbleAt) and draws them in screen
@@ -213,6 +214,7 @@ export function popBubbleAt(x: number, y: number): boolean {
     height,
     CONTENT_SIZE,
     now,
+    CONFIG.randomSpawns.bubbles.workerChance,
   );
   return true;
 }

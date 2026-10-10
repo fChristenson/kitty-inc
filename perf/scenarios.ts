@@ -339,8 +339,7 @@ export const SCENARIOS: Scenario[] = [
       triggerOvertimeBoost(floor, fromNumber(0));
       bridge.scrollToFloor(floor, 0.6);
       await sleep(300);
-      for (const id of ["wisp", "fireflies", "coin", "gusher"])
-        click(`#test-${id}-spawn-event`);
+      for (const id of ["wisp", "coin"]) click(`#test-${id}-spawn-event`);
       click("#test-bubbles-event");
       click("#spawn-mouse");
       const income = [
@@ -642,7 +641,7 @@ const SPAWN_BUTTONS: Record<string, string> = {
   bubbles: "#test-bubbles-event",
 };
 
-// a long-press with a random spawn (spawn:fireflies, spawn:none for none)
+// a long-press with a random spawn (spawn:wisp, spawn:none for none)
 // forced on screen as it starts; spawn-idle: without the press
 export function spawnScenario(id: string, hold = true): Scenario {
   const name = `spawn${hold ? "" : "-idle"}:${id}`;

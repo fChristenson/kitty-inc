@@ -115,6 +115,9 @@ export const CONFIG = {
       count: [3, 7],
       // a bubble's odds of holding a crit number, a coin or a badge
       contentOdds: { tier: 0.45, coin: 0.4, badge: 0.15 },
+      // a crit number's odds of promoting one of its floor's workers a perma
+      // tier instead of adding its levels to the floor's bar
+      workerChance: 0.5,
     },
     // src/spawn/wisp — a wisp dashing across the screen, shedding glitter: a
     // swipe sweeps it up into the total
@@ -146,31 +149,6 @@ export const CONFIG = {
       count: [3, 7] as [number, number],
       // all of them tapped pay this many seconds of the company's income
       rewardSeconds: 20,
-    },
-    // src/spawn/fireflies — a flock of little wisps drifting along a floor:
-    // a swipe catches them, each zipping onto a worker, promoting it
-    fireflies: {
-      rollEveryMs: 5_000,
-      procChance: 0.1,
-      cooldownMs: 5_000,
-      // how long the flock stays, flying in and meandering over the floor,
-      // blinking over its last pulseMs
-      durationMs: 6_000,
-      pulseMs: 2_000,
-      count: [12, 16] as [number, number],
-    },
-    // src/spawn/gusher — a vent fizzing at the bottom of the screen: a tap
-    // blows it into a stream of coins and cash flowing into the total
-    gusher: {
-      rollEveryMs: 5_000,
-      procChance: 0.1,
-      cooldownMs: 5_000,
-      // how long it fizzes before vanishing, blinking over its last pulseMs
-      durationMs: 6_000,
-      pulseMs: 2_000,
-      coins: 320,
-      // all its coins landed pay this many seconds of the company's income
-      rewardSeconds: 30,
     },
   },
 

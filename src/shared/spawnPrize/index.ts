@@ -1,8 +1,9 @@
 // a random spawn's prize and its payout once tapped, shared by every random
 // spawn (src/spawn/bubbles): a coin flips up into the total, a crit
-// number flies up, swells and slams into its floor's income bar, and a badge
-// plays its crit celebration. The spawn keeps the Payout and draws it each
-// frame until it's done
+// number flies up, swells and slams into its floor's income bar (its levels)
+// or one of the floor's workers (a perma tier up), and a badge plays its crit
+// celebration. The spawn keeps the Payout and draws it each frame until it's
+// done
 import {
   CRIT_TIER_CONFIG,
   eventProcContext,
@@ -12,8 +13,12 @@ import {
   pickFeaturedBadge,
 } from "../../crits";
 import {
+  celebrateWorkerBoost,
+  getBoostEventCandidates,
   getIncomeBarCenter,
+  getWorkerCenter,
   increaseIncomeRateBy,
+  promoteWorkerPermaTier,
   punchIncomeBar,
   rewardPayoutAmount,
   type FloorActionsDeps,
@@ -56,12 +61,15 @@ export interface PrizeOdds {
 }
 
 // a floor at the level cap can't take a crit number's levels, so it rolls
-// only coins and badges
+// one only while a worker there can still climb a perma tier
 export function rollPrize(
   { tier: tierOdds, coin, badge }: PrizeOdds,
   floor: Floor,
 ): Prize {
-  const tier = isFloorMaxed(floor) ? 0 : tierOdds;
+  const tier =
+    isFloorMaxed(floor) && !getBoostEventCandidates(floor).length
+      ? 0
+      : tierOdds;
   const roll = Math.random() * (tier + coin + badge);
   if (roll < tier) return { kind: "tier", tier: pickCritTierByOdds() };
   if (roll < tier + coin) return { kind: "coin" };
@@ -89,10 +97,12 @@ export interface Payout {
   floor: Floor;
   // performance.now() it was tapped, and the spot it was tapped at
   at: number;
-  // a crit number's flight onto its floor's bar (screen units, kept up to
-  // date each frame), and whether it has landed
+  // a crit number's flight onto its target (screen units, kept up to date
+  // each frame), and whether it has landed
   bar: Point;
   smash: (at: number) => Point | null;
+  // the worker a crit number promotes instead of its floor's bar, or -1
+  worker: number;
   // drawn this big, as the spawn showed it
   size: number;
   hit: boolean;
@@ -105,15 +115,43 @@ function payFloor(deps: FloorActionsDeps, floor: Floor): Floor | undefined {
   return deps.floors.includes(floor) ? floor : deps.floors[0];
 }
 
-// where floor's income bar is on screen, kept on the screen's height
-function barOnScreen(
+// where a crit number lands on screen, kept on the screen's height: its
+// worker, or its floor's income bar
+function targetOnScreen(
+  deps: FloorActionsDeps,
+  payout: Payout,
+  height: number,
+): void {
+  const into = payout.bar;
+  const worker =
+    payout.worker >= 0 ? getWorkerCenter(payout.floor, payout.worker) : null;
+  const area = worker && deps.getScreenAreaLocal?.(payout.floor);
+  if (worker && area) {
+    into.x = worker.x - area.left;
+    into.y = worker.y - area.top;
+  } else barAt(deps, payout.floor, into);
+  into.y = Math.min(height, Math.max(0, into.y));
+}
+
+// a worker of floor for a crit number to promote instead of the bar, one in
+// view if any is (-1 for the bar): workerChance of the time, or always once
+// the floor is at the level cap
+function pickWorker(
   deps: FloorActionsDeps,
   floor: Floor,
   height: number,
-  into: Point,
-): void {
-  barAt(deps, floor, into);
-  into.y = Math.min(height, Math.max(0, into.y));
+  workerChance: number,
+): number {
+  const workers = getBoostEventCandidates(floor);
+  if (!workers.length) return -1;
+  if (!isFloorMaxed(floor) && Math.random() >= workerChance) return -1;
+  const area = deps.getScreenAreaLocal?.(floor);
+  const inView = workers.filter((i) => {
+    const c = getWorkerCenter(floor, i);
+    return area && c && c.y - area.top >= 0 && c.y - area.top <= height;
+  });
+  const pool = inView.length ? inView : workers;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 // where floor's income bar's middle is on screen
@@ -128,7 +166,7 @@ function barAt(deps: FloorActionsDeps, floor: Floor, into: Point): Point {
 
 // pays prize, tapped at `from` (screen units on a screen `height` tall) for
 // floor: badges at once, a coin once its flip lands in the total, a crit
-// number once its smash lands
+// number once its smash lands on the bar or, workerChance of the time, a worker
 export function collectPrize(
   deps: FloorActionsDeps,
   floor: Floor,
@@ -137,6 +175,7 @@ export function collectPrize(
   height: number,
   size: number,
   now: number,
+  workerChance: number,
 ): Payout | null {
   const target = payFloor(deps, floor);
   if (!target) return null;
@@ -146,6 +185,7 @@ export function collectPrize(
     at: now,
     bar: { x: 0, y: 0 },
     smash: () => null,
+    worker: -1,
     size,
     hit: false,
     flip: null,
@@ -166,7 +206,8 @@ export function collectPrize(
     const bend = { x: 0, y: 0 };
     const at = { x: 0, y: 0 };
     const { bar } = payout;
-    barOnScreen(deps, target, height, bar);
+    payout.worker = pickWorker(deps, target, height, workerChance);
+    targetOnScreen(deps, payout, height);
     payout.smash = (t) => {
       if (t < now || t > now + SMASH_MS) return null;
       bend.x = (start.x + bar.x) / 2;
@@ -199,13 +240,20 @@ function totalOnScreen(
   into.y = total.y - area.top;
 }
 
-// a crit number slamming onto its floor's bar: its levels land
+// a crit number slamming onto its target: its worker climbs a perma tier, or
+// its floor's bar takes its levels
 function smashIn(deps: FloorActionsDeps, payout: Payout): void {
   if (payout.prize.kind !== "tier") return;
-  const { multiplier, color } = CRIT_TIER_CONFIG[payout.prize.tier];
-  increaseIncomeRateBy(payout.floor, multiplier);
+  const { floor, worker } = payout;
+  if (worker >= 0) {
+    promoteWorkerPermaTier(floor, worker);
+    celebrateWorkerBoost(floor, worker, Date.now());
+  } else {
+    const { multiplier, color } = CRIT_TIER_CONFIG[payout.prize.tier];
+    increaseIncomeRateBy(floor, multiplier);
+    punchIncomeBar(floor, `+${multiplier} Lvl`, color);
+  }
   deps.persist();
-  punchIncomeBar(payout.floor, `+${multiplier} Lvl`, color);
   shakeScreen(SMASH_SHAKE);
   playBarExplosion(1 + 0.1 * Math.random());
 }
@@ -217,7 +265,7 @@ export function isPayoutDone(payout: Payout, now: number): boolean {
 }
 
 // a coin flipping up into the total, or a crit number flying up, swelling,
-// and slamming onto its bar; nothing for badges, which paid on the tap
+// and slamming onto its bar or worker; nothing for badges, which paid on the tap
 export function drawPayout(
   ctx: CanvasRenderingContext2D,
   deps: FloorActionsDeps,
@@ -234,7 +282,7 @@ export function drawPayout(
     return;
   }
   if (payout.prize.kind !== "tier") return;
-  barOnScreen(deps, payout.floor, height, payout.bar);
+  targetOnScreen(deps, payout, height);
   const hitAt = payout.at + SMASH_MS;
   drawWispTrail(ctx, payout.smash, t, now, TRAIL_SIZE);
   if (t < hitAt) {

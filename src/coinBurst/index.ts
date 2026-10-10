@@ -216,7 +216,7 @@ export interface CoinBurstParticle extends CoinBurstSprite {
 }
 
 // one burst piece's radius (drawCoinBurstFrame's size)
-export function randomCoinBurstSize(): number {
+function randomCoinBurstSize(): number {
   return (22 + Math.random() * 46) * 1.15 * 1.25;
 }
 
