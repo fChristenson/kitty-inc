@@ -386,6 +386,24 @@ export function celebrateCash(
   playCashFlash(tier, label, onShown);
 }
 
+// a cash crit carrying an income crit: its amount slams in green, then plays
+// out onto the total, paying it. It waits its turn like a floor crit and is
+// never dropped, since its hits pay the money
+export function celebrateIncomeCrit(
+  tier: CritTier,
+  label: string,
+  play: FloorCritPlay,
+): void {
+  if (isDetachedJobRunning()) return;
+  specialCelebrationQueue.push({
+    kind: "floorCrit",
+    queuedAt: Date.now(),
+    maxAgeMs: Infinity,
+    run: () => playCashFlash(tier, label, () => {}, play),
+  });
+  drainSpecialCelebrationQueue();
+}
+
 // the handful of procs whose flash is more than the standard label+color
 // treatment celebrateFlatProc gives every other one
 const CUSTOM_PROC_CELEBRATIONS: Partial<

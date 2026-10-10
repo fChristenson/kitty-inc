@@ -74,6 +74,7 @@ import {
   type EventProcContext,
 } from "../animatedCrits/eventProcs";
 import type { FloorCritPlay } from "./critPlayer";
+import { incomeCritBonus, incomeCritPlayFor } from "../incomeCrits";
 
 import {
   increaseIncomeRate,
@@ -137,7 +138,11 @@ import {
   multiply,
   subtract,
 } from "../../shared/bigNumber";
-import { celebrateCash, triggerCritCelebration } from "./critCelebration";
+import {
+  celebrateCash,
+  celebrateIncomeCrit,
+  triggerCritCelebration,
+} from "./critCelebration";
 
 const spawnCoinBurst = liveEffect(animateCoinBurst);
 const spawnFlingCoinBurst = liveEffect(animateFlingCoinBurst);
@@ -1583,11 +1588,15 @@ const CASH_BURST: Record<CritTier, { grow: number; coins: [number, number] }> =
     ultra: { grow: 1.5, coins: [60, 80] },
   };
 
-function payCash(floor: Floor, upgrades: number): BigNumber {
-  const amount = multiply(
+function cashFor(floor: Floor, upgrades: number): BigNumber {
+  return multiply(
     getUpgradeCost(floor),
     upgrades * CONFIG.crit.cashCrit.upgradeCosts,
   );
+}
+
+function payCash(floor: Floor, upgrades: number): BigNumber {
+  const amount = cashFor(floor, upgrades);
   addTotalIncome(amount);
   return amount;
 }
@@ -1624,9 +1633,14 @@ export function applyFloorCrit(
   const count =
     CRIT_TIER_CONFIG[result.tier].multiplier +
     (result.mergeCrit ? CRIT_TIER_CONFIG[result.mergeCrit].multiplier : 0);
-  // a cash crit pays where a crit upgrades
+  // a cash crit pays where a crit upgrades; one carrying an income crit
+  // leaves its own amount for the income crit to carry into the total
+  const incomeCrit = result.cash ? result.incomeCrit : undefined;
   const reward = (target: Floor, isGround: boolean): BigNumber | null => {
-    if (result.cash) return payCash(target, count);
+    if (result.cash)
+      return incomeCrit && target === floor
+        ? cashFor(target, count)
+        : payCash(target, count);
     for (let tick = 0; tick < count; tick++) applyUpgradeTick(target, isGround);
     return null;
   };
@@ -1654,8 +1668,16 @@ export function applyFloorCrit(
   applyCritProcs(result, context, CRIT_REWARDS, payFeaturedCrit);
   triggerButtonPress(floor);
   const landed = landedProcKinds(result);
+  if (incomeCrit && cash) {
+    const amount = add(cash, incomeCritBonus(count));
+    celebrateIncomeCrit(
+      result.tier,
+      `+${formatPrice(amount)}`,
+      incomeCritPlayFor(deps, floor, incomeCrit, amount),
+    );
+  }
   // a plain cash crit shows its amount where a plain crit shows its tier
-  if (
+  else if (
     cash &&
     landed.length === 0 &&
     !up &&
@@ -1674,7 +1696,7 @@ export function applyFloorCrit(
         down,
         merge: result.mergeCrit,
       },
-      result.floorCrit
+      result.floorCrit && !result.cash
         ? floorCritPlayFor(deps, floor, result.floorCrit, count)
         : null,
       granted,

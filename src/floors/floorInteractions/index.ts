@@ -9,6 +9,7 @@ import {
   isCritDown,
   getMergeCrit,
   getFloorCrit,
+  getIncomeCrit,
   getCritTier,
   consumeCritUpgrade,
   rollCritUpgrade,
@@ -160,6 +161,8 @@ export interface FloorActionsDeps {
   // drawn) into this floor's own local coordinate space, so a coin burst can be
   // anchored there instead of at a fixed floor-local point
   getScreenCenterLocal: (floor: Floor) => { x: number; y: number };
+  // the total-income readout's middle, in floor's local space
+  getTotalLocal?: (floor: Floor) => { x: number; y: number };
   getScreenAreaLocal?: ScreenAreaLocal;
   // floors currently in view, for the "Boost" event's target pick (see
   // crits/animatedCrits/events/boostEvent) — omitted off-screen (e.g. map/draft purchases), where
@@ -590,6 +593,7 @@ export function handleFloorClick(
       const critDown = isCritDown(floor);
       const mergeCrit = getMergeCrit(floor);
       const floorCrit = getFloorCrit(floor);
+      const incomeCrit = getIncomeCrit(floor);
       const cash = isCashCrit(floor);
       const eventContext = eventProcContext(deps, isGroundFloor);
       const cover = getClaimedEventCover(floor);
@@ -615,6 +619,7 @@ export function handleFloorClick(
             critDown,
             mergeCrit,
             floorCrit,
+            incomeCrit,
           }),
         );
         // the special event this crit carried instead of a special crit

@@ -165,11 +165,13 @@ async function boot(): Promise<void> {
         ? eventScenario(name.slice(6))
         : name.startsWith("floor-crit:")
           ? floorCritScenario(name.slice(11))
-          : name.startsWith("crit:")
-            ? critScenario(name.slice(5))
-            : fixtureOf(name)
-              ? scaleScenario(name)
-              : null)
+          : name.startsWith("income-crit:")
+            ? floorCritScenario(name.slice(12), "income")
+            : name.startsWith("crit:")
+              ? critScenario(name.slice(5))
+              : fixtureOf(name)
+                ? scaleScenario(name)
+                : null)
     );
   };
   // "events" and "events-all" stand for a sample of events, or every one,

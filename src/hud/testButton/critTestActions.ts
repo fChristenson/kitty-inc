@@ -44,7 +44,12 @@ export function createTestButtonMarkup(): string {
       <input type="search" id="test-actions-filter" class="test-actions-filter" placeholder="Filter actions" autocomplete="off" />
       <p class="test-actions-empty" id="test-actions-empty" hidden>No matches</p>
       <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">New Events</summary>
+        <summary class="test-actions-dropdown__toggle">New Effects</summary>
+        <div class="test-actions-dropdown__menu">
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Animated Crits</summary>
         <div class="test-actions-dropdown__menu">
           <button id="test-dyson-sphere-event" class="game__button">Dyson Sphere</button>
           <button id="test-cash-coil-event" class="game__button">Cash Coil</button>
@@ -58,11 +63,6 @@ export function createTestButtonMarkup(): string {
           <button id="test-nebula-event" class="game__button">Nebula</button>
           <button id="test-survivors-event" class="game__button">Survivors</button>
           <button id="test-geometry-run-event" class="game__button">Geometry Run</button>
-        </div>
-      </details>
-      <details class="test-actions-dropdown">
-        <summary class="test-actions-dropdown__toggle">Events</summary>
-        <div class="test-actions-dropdown__menu">
           <button id="test-doubling-bounce-event" class="game__button">Doubling Bounce</button>
           <button id="test-air-juggle-event" class="game__button">Air Juggle</button>
           <button id="test-nova-disk-event" class="game__button">Nova Disk</button>
@@ -1299,6 +1299,12 @@ export function createTestButtonMarkup(): string {
           <button class="game__button" data-foil-reveal="shimmer">Shimmer Reveal</button>
           <button class="game__button" data-foil-reveal="glitter">Glitter Reveal</button>
           <button id="test-badge-capsule" class="game__button">Badge Capsule</button>
+        </div>
+      </details>
+      <details class="test-actions-dropdown">
+        <summary class="test-actions-dropdown__toggle">Income Crits</summary>
+        <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-income-crit="windfallCrit">Windfall Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">

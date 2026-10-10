@@ -61,11 +61,13 @@ export function warmTierFlashes(): void {
 const CASH_FLASH_CHARS = "+$0123456789KMBT";
 
 // a cash crit: its amount slams in green like an x3 and lands with the buy
-// sound; a dropped one stays silent, onShown runs only if it shows
+// sound; a dropped one stays silent, onShown runs only if it shows; an
+// income crit riding it carries the amount into the total once it has sat
 export function playCashFlash(
   tier: CritTier,
   label: string,
   onShown: () => void,
+  incomeCrit: FloorCritPlay | null = null,
 ): void {
   triggerScreenShake({
     intensity: TIER_SHAKE_INTENSITY[tier],
@@ -75,8 +77,13 @@ export function playCashFlash(
     priority: tier === "ultra" ? 2 : tier === "mega" ? 1 : 0,
     minDurationMs: getExplosionDurationMs(),
     letters: true,
+    floorCrit: incomeCrit,
     onStart: (started) => {
-      if (!started) return;
+      // a dropped flash never plays its income crit: it pays at once instead
+      if (!started) {
+        incomeCrit?.onHit(0, 0, COLOR.moneyGreen, 1, 1);
+        return;
+      }
       playSold();
       onShown();
     },

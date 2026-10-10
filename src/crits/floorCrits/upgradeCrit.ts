@@ -14,6 +14,7 @@ import { snapshotMap, snapshotSet } from "../../shared/snapshotState";
 import {
   type CritTier,
   type FloorCritKind,
+  type IncomeCritKind,
   type CritRollResult,
   pickHigherCritTier as higherCritTier,
   rollCrit,
@@ -243,6 +244,7 @@ export function rollCritUpgrade(
       if (result.cash) cashCrits.add(floor);
       if (result.mergeCrit) mergeCrits.set(floor, result.mergeCrit);
       if (result.floorCrit) armFloorCrit(floor, result.floorCrit);
+      if (result.incomeCrit) armIncomeCrit(floor, result.incomeCrit);
       if (result.critUp) critUpCrits.add(floor);
       if (result.critDown) critDownCrits.add(floor);
       for (const kind of landedProcs) {
@@ -799,6 +801,26 @@ export function forceFloorCrit(floor: Floor, kind: FloorCritKind): void {
   armFloorCrit(floor, kind);
 }
 
+// armed crits' income crits: their number playing out onto the total
+const armedIncomeCrits = snapshotMap<Floor, IncomeCritKind>();
+
+function armIncomeCrit(floor: Floor, kind: IncomeCritKind): void {
+  armedIncomeCrits.set(floor, kind);
+  preloadFloorCritWhenIdle(kind);
+}
+
+export function getIncomeCrit(floor: Floor): IncomeCritKind | undefined {
+  return armedIncomeCrits.get(floor);
+}
+
+// dev/test-only: arms a cash crit of a random tier carrying an income crit
+export function forceIncomeCrit(floor: Floor, kind: IncomeCritKind): void {
+  const tiers: CritTier[] = ["crit", "mega", "ultra"];
+  const tier = tiers[Math.floor(Math.random() * tiers.length)];
+  forceCashCrit(floor, tier);
+  armIncomeCrit(floor, kind);
+}
+
 // call right when a crit click is handled, before rolling the next one
 export function consumeCritUpgrade(floor: Floor): void {
   critTiers.delete(floor);
@@ -807,6 +829,7 @@ export function consumeCritUpgrade(floor: Floor): void {
   critDownCrits.delete(floor);
   mergeCrits.delete(floor);
   armedFloorCrits.delete(floor);
+  armedIncomeCrits.delete(floor);
   consumeCritProcs(floor);
   dropClaimedEventProc(floor);
 }

@@ -20,13 +20,19 @@ import {
   drawFloorCrit,
   isFloorCritRunning,
   launchFloorCrit,
+  type FloorCritGlyphs,
   type FloorCritPlay,
 } from "../floorCrits/critPlayer";
 
 import { getExplosionDurationMs } from "../../sound";
 import { MAX_VIBRATE_MS, setBuzz } from "../../shared/vibration";
 import { drawCritSparks, startCritSparks, stopCritSparks } from "./critSparks";
-import { drawLetters, lettersWidth, warmLetters } from "./letters";
+import {
+  drawLetters,
+  letterGlyphs,
+  lettersWidth,
+  warmLetters,
+} from "./letters";
 
 // a handful of icons are explicitly designed to spin an extra fixed amount on
 // top of the flash text's own animated entrance rotation (see drawFlashLayer).
@@ -1062,12 +1068,30 @@ let flashFloorCrit: FloorCritPlay | null = null;
 const FLOOR_CRIT_SIT_MS = 400;
 
 function floorCritSizeShare(sizeLabel: string): number {
-  return (FLASH_FONT_SIZE * 0.8) / measureLabel(getScratchCtx(), sizeLabel);
+  const width = flashLetters
+    ? lettersWidth(sizeLabel, flashColor, flashStrokeWidth, 1)
+    : measureLabel(getScratchCtx(), sizeLabel);
+  return (FLASH_FONT_SIZE * 0.8) / width;
+}
+
+// the flash's own number as glyphs: baked spin glyphs, or a letters flash's
+function floorCritGlyphs(
+  color: string,
+  strokeWidth: number,
+  share: number,
+): FloorCritGlyphs {
+  const res = spinGlyphRes(share);
+  if (flashLetters) return letterGlyphs(flashLabel, color, strokeWidth, res);
+  const glyphs = getSpinGlyphs(color, strokeWidth, res);
+  return { ...glyphs, index: (c) => SPIN_CHARS.indexOf(c), color };
 }
 
 function warmFloorCritGlyphs(req: FlashRequest): void {
-  const share = floorCritSizeShare(flashSizeLabel);
-  getSpinGlyphs(req.color, req.strokeWidth, spinGlyphRes(share));
+  floorCritGlyphs(
+    req.color,
+    req.strokeWidth,
+    floorCritSizeShare(flashSizeLabel),
+  );
 }
 
 function startFloorCrit(
@@ -1076,14 +1100,9 @@ function startFloorCrit(
   now: number,
 ): void {
   const share = floorCritSizeShare(flashSizeLabel);
-  const glyphs = getSpinGlyphs(
-    flashColor,
-    flashStrokeWidth,
-    spinGlyphRes(share),
-  );
   launchFloorCrit(
     play,
-    { ...glyphs, index: (c) => SPIN_CHARS.indexOf(c), color: flashColor },
+    floorCritGlyphs(flashColor, flashStrokeWidth, share),
     flashLabel,
     share * viewportWidth,
     viewportWidth,

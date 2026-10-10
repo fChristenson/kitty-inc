@@ -504,6 +504,13 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     return { x: FLOOR_W / 2, y: worldCenterY - floorTop };
   }
 
+  // the total-income readout's middle (where coins home to) in floor's space
+  function totalLocalFor(floor: Floor): { x: number; y: number } {
+    const loc = floorLocation.get(floor);
+    const floorTop = loc ? floorWorldY(loc.floorIndex).top : 0;
+    return { x: FLOOR_W / 2, y: viewportTopY() + HUD_H / 2 - floorTop };
+  }
+
   // the whole visible canvas, side gutters included, in floor's local space
   function screenAreaLocalFor(floor: Floor): {
     left: number;
@@ -881,6 +888,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       createMysticBuilding: deps.createMysticBuilding,
       onFloorAdded: (floor) => notifyFloorAdded(floor),
       getScreenCenterLocal: screenCenterLocalFor,
+      getTotalLocal: totalLocalFor,
       getScreenAreaLocal: screenAreaLocalFor,
       getOnScreenFloors: onScreenFloors,
       getFloorRect,

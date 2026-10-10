@@ -990,6 +990,8 @@ export interface CritRollResult extends Record<FeaturedCritKind, boolean> {
   mergeCrit?: CritTier;
   // a floor crit: its number playing out onto the bars once it has flashed
   floorCrit?: FloorCritKind;
+  // an income crit: its number playing out onto the total income
+  incomeCrit?: IncomeCritKind;
   // a badge crit whose landed badges turn this foil, once they qualify
   badgeFoil?: BadgeFoil;
   chain: boolean;
@@ -1094,6 +1096,7 @@ export type CritProcKind = Exclude<
   | "critDown"
   | "mergeCrit"
   | "floorCrit"
+  | "incomeCrit"
   | "badgeFoil"
 >;
 
@@ -2077,8 +2080,14 @@ const SPECIAL_CRIT_TYPES = Object.keys(
 ) as SpecialCritType[];
 type FloorCritType = keyof typeof CONFIG.floorCrits;
 const FLOOR_CRIT_TYPES = Object.keys(CONFIG.floorCrits) as FloorCritType[];
-// what a special slot ends up carrying: a floorCrit slot is its floor crit
-type SlotType = Exclude<SpecialCritType, "floorCrit"> | FloorCritType;
+type IncomeCritType = keyof typeof CONFIG.incomeCrits;
+const INCOME_CRIT_TYPES = Object.keys(CONFIG.incomeCrits) as IncomeCritType[];
+// what a special slot ends up carrying: a floorCrit slot is its floor or
+// income crit
+type SlotType =
+  | Exclude<SpecialCritType, "floorCrit">
+  | FloorCritType
+  | IncomeCritType;
 
 // the floor crits whose number plays out onto the bars (floorCrits'
 // critPlayer)
@@ -2169,6 +2178,19 @@ export function isFloorCritKind(type: string | null): type is FloorCritKind {
   return (FLOOR_CRIT_KINDS as readonly string[]).includes(type ?? "");
 }
 
+// the income crits whose number plays out onto the total income (incomeCrits)
+export const INCOME_CRIT_KINDS = [
+  "windfallCrit",
+] as const satisfies readonly IncomeCritType[];
+export type IncomeCritKind = (typeof INCOME_CRIT_KINDS)[number];
+
+export function isIncomeCritKind(type: string | null): type is IncomeCritKind {
+  return (INCOME_CRIT_KINDS as readonly string[]).includes(type ?? "");
+}
+
+// what the crit player plays: a floor or an income crit
+export type CritPlayKind = FloorCritKind | IncomeCritKind;
+
 // one of `types`, each weighted by its chance in `table`
 function pickByChance<K extends string>(
   table: Record<K, { chance: number }>,
@@ -2179,11 +2201,12 @@ function pickByChance<K extends string>(
   return types.find((t) => (roll -= table[t].chance) < 0) ?? types[0];
 }
 
-// game time before which a floorCrit slot is a badge crit instead
+// game time before which a floorCrit or incomeCrit slot is a badge crit
+// instead: they share one player
 let floorCritsFreeAt = 0;
 
-// no floor crit lands again until CONFIG's cooldown from now; called when one
-// is picked and when it finishes playing
+// no floor or income crit lands again until CONFIG's cooldown from now;
+// called when one is picked and when it finishes playing
 export function coolDownFloorCrits(): void {
   floorCritsFreeAt = Math.max(
     floorCritsFreeAt,
@@ -2192,14 +2215,17 @@ export function coolDownFloorCrits(): void {
 }
 
 // what a gateway-passing crit's special slot carries: a type by its
-// CONFIG.specialCrits chance, a floorCrit then one by its CONFIG.floorCrits
-// chance
-function pickSpecialCrit(): SlotType {
+// CONFIG.specialCrits chance; a floorCrit slot is then a floor crit (by its
+// CONFIG.floorCrits chance) on a multiplier crit, an income crit (by its
+// CONFIG.incomeCrits chance) on a cash crit
+function pickSpecialCrit(cash: boolean): SlotType {
   const type = pickByChance(CONFIG.specialCrits, SPECIAL_CRIT_TYPES);
   if (type !== "floorCrit") return type;
   if (Date.now() < floorCritsFreeAt) return "badgeCrit";
   coolDownFloorCrits();
-  return pickByChance(CONFIG.floorCrits, FLOOR_CRIT_TYPES);
+  return cash
+    ? pickByChance(CONFIG.incomeCrits, INCOME_CRIT_TYPES)
+    : pickByChance(CONFIG.floorCrits, FLOOR_CRIT_TYPES);
 }
 
 // always lands a tier, weighted by each tier's own relative chance
@@ -2310,7 +2336,7 @@ export function rollCrit(
   const cash = critRandom() < CONFIG.crit.cashCrit.chance;
   const slot =
     allowSpecialProcs && critRandom() < SPECIAL_CRIT_GATEWAY.chance
-      ? pickSpecialCrit()
+      ? pickSpecialCrit(cash)
       : null;
   const badge =
     slot === "badgeCrit" ||
@@ -2329,6 +2355,7 @@ export function rollCrit(
   else if (slot === "critDown") result.critDown = true;
   else if (slot === "mergeCrit") result.mergeCrit = pickCritTierByOdds();
   else if (isFloorCritKind(slot)) result.floorCrit = slot;
+  else if (isIncomeCritKind(slot)) result.incomeCrit = slot;
   else if (slot === "badgeShimmer") result.badgeFoil = "shimmer";
   else if (slot === "badgeGlitter") result.badgeFoil = "glitter";
   for (const kind of landedProcs) result[kind] = true;

@@ -8,6 +8,7 @@ import {
   queueBadgeFoilReveal,
   type BadgeFoil,
   type FloorCritKind,
+  type IncomeCritKind,
   type CritProcKind,
   type CritTier,
 } from "../../crits";
@@ -282,6 +283,19 @@ export function wireFloorCritTestButtons(
   ))
     button.addEventListener("click", () =>
       onClick(button.dataset.floorCrit as FloorCritKind),
+    );
+}
+
+// arms a crit carrying an income crit
+export function wireIncomeCritTestButtons(
+  container: HTMLElement,
+  onClick: (kind: IncomeCritKind) => void,
+): void {
+  for (const button of container.querySelectorAll<HTMLButtonElement>(
+    "[data-income-crit]",
+  ))
+    button.addEventListener("click", () =>
+      onClick(button.dataset.incomeCrit as IncomeCritKind),
     );
 }
 

@@ -29,6 +29,7 @@ export {
 } from "./critTypes";
 export type {
   FloorCritKind,
+  IncomeCritKind,
   CritProcKind,
   CritRollResult,
   CritTier,
@@ -55,10 +56,12 @@ export {
   eventProcContext,
   forceCashCrit,
   forceFloorCrit,
+  forceIncomeCrit,
   forceCritUpDown,
   forceMergeCrit,
   forceTestCrit,
   getFloorCrit,
+  getIncomeCrit,
   getCritTier,
   getMergeCrit,
   isCashCrit,

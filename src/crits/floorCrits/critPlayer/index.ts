@@ -1,8 +1,10 @@
 // floor crits playing a crit's number out onto the income bars in view once
-// its flash has slammed in and sat (see critTypes' FloorCritKind). Each kind is
-// its own module under ../crits, loaded when its crit is armed or played;
-// every hit calls back so the floors can jolt and land their levels
-import { coolDownFloorCrits, type FloorCritKind } from "../../critTypes";
+// its flash has slammed in and sat (see critTypes' FloorCritKind), and income
+// crits playing it onto the total income (its one "bar"). Each kind is
+// its own module under ../crits (../../incomeCrits/crits), loaded when its
+// crit is armed or played; every hit calls back so the floors or the total
+// can jolt and land their reward
+import { coolDownFloorCrits, type CritPlayKind } from "../../critTypes";
 import { fadeStops, type FadeStops } from "../../../shared/glowSprite";
 import type { Bolt } from "../../../shared/lightning";
 import type { Disk, Orbit } from "../../../shared/galaxy";
@@ -15,14 +17,21 @@ export interface Point {
 }
 
 export interface FloorCritPlay {
-  kind: FloorCritKind;
+  kind: CritPlayKind;
   // the bars it can land on, from the flash's middle in its units, its own
   // floor's first; read every frame so a scroll carries them along
   bars: () => Point[];
   barHalfWidth: number;
   // a hit on bars()[bar] by a number of `color`; step is a snowball's
-  // growth so far; spill is its share of a full hit's coin spill
-  onHit: (bar: number, step: number, color: string, spill: number) => void;
+  // growth so far; spill is its share of a full hit's coin spill, share its
+  // share of all the crit's hits
+  onHit: (
+    bar: number,
+    step: number,
+    color: string,
+    spill: number,
+    share?: number,
+  ) => void;
   // bars()[bar] leaping off its floor for ms, landing back down (or hauled
   // up, held and dropped)
   onLift?: (bar: number, ms: number, haul: boolean) => void;
@@ -276,17 +285,15 @@ export interface FloorCritDef {
   shake?: (step: number) => number;
 }
 
-const DEFS: Partial<Record<FloorCritKind, FloorCritDef>> = {};
+const DEFS: Partial<Record<CritPlayKind, FloorCritDef>> = {};
 
 // each kind's module calls this once it loads
-export function registerFloorCrit(
-  kind: FloorCritKind,
-  def: FloorCritDef,
-): void {
+export function registerFloorCrit(kind: CritPlayKind, def: FloorCritDef): void {
   DEFS[kind] = def;
 }
 
-const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
+const LOADERS: Record<CritPlayKind, () => Promise<unknown>> = {
+  windfallCrit: () => import("../../incomeCrits/crits/windfallCrit"),
   rapidFireCrit: () => import("../crits/rapidFireCrit"),
   pinballCrit: () => import("../crits/pinballCrit"),
   snowballCrit: () => import("../crits/snowballCrit"),
@@ -367,10 +374,10 @@ const LOADERS: Record<FloorCritKind, () => Promise<unknown>> = {
   beamSplitterCrit: () => import("../crits/beamSplitterCrit"),
   teslaCannonCrit: () => import("../crits/teslaCannonCrit"),
 };
-const loading = new Map<FloorCritKind, Promise<unknown>>();
+const loading = new Map<CritPlayKind, Promise<unknown>>();
 
 // loads kind's module (once)
-function preloadFloorCrit(kind: FloorCritKind): Promise<unknown> {
+function preloadFloorCrit(kind: CritPlayKind): Promise<unknown> {
   let promise = loading.get(kind);
   if (!promise) {
     promise = LOADERS[kind]().catch(() => loading.delete(kind));
@@ -380,8 +387,8 @@ function preloadFloorCrit(kind: FloorCritKind): Promise<unknown> {
 }
 
 // preloadFloorCrit at idle, queued once per kind
-const queuedKinds = new Set<FloorCritKind>();
-export function preloadFloorCritWhenIdle(kind: FloorCritKind): void {
+const queuedKinds = new Set<CritPlayKind>();
+export function preloadFloorCritWhenIdle(kind: CritPlayKind): void {
   if (loading.has(kind) || queuedKinds.has(kind)) return;
   queuedKinds.add(kind);
   loadWhenIdle(() => {
@@ -541,7 +548,7 @@ export function drawFloorCrit(
   while (r.fired < r.hits.length && r.hits[r.fired].at <= ms) {
     const { bar, step } = r.hits[r.fired++];
     r.shake(def.shake?.(step) ?? HIT_SHAKE);
-    r.play.onHit(bar, step, r.glyphs.color, spill);
+    r.play.onHit(bar, step, r.glyphs.color, spill, 1 / r.hits.length);
   }
   if (ms >= r.endsAt) {
     running = null;

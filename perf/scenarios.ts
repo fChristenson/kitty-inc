@@ -547,16 +547,17 @@ export function warmScenario(scenario: Scenario): Scenario {
   };
 }
 
-// one floor crit: armed on the ground floor from its test button, then tapped
-export function floorCritScenario(kind: string): Scenario {
-  const name = `floor-crit:${kind}`;
+// one floor (or income) crit: armed on the ground floor from its test
+// button, then tapped
+export function floorCritScenario(kind: string, group = "floor"): Scenario {
+  const name = `${group}-crit:${kind}`;
   return {
     name,
-    about: `the ${kind} floor crit, start to finish`,
+    about: `the ${kind} ${group} crit, start to finish`,
     run: async (bridge) => {
       click("#add-money");
       bridge.scrollToFloor(ground(bridge), 0.6);
-      click(`[data-floor-crit="${kind}"]`);
+      click(`[data-${group}-crit="${kind}"]`);
       await sleep(300);
       tap(bridge, ground(bridge));
       return measure(name, 4000);

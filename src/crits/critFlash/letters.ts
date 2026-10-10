@@ -115,6 +115,35 @@ export function lettersWidth(
   return labelWidth(letterSet(color, strokeWidth, res), label);
 }
 
+// the label's letters as an income crit's glyphs (critPlayer's
+// FloorCritGlyphs): sprites at font FONT_SIZE * res
+export function letterGlyphs(
+  label: string,
+  color: string,
+  strokeWidth: number,
+  res: number,
+) {
+  const set = letterSet(color, strokeWidth, res);
+  const sprites: HTMLCanvasElement[] = [];
+  const advances: number[] = [];
+  const at = new Map<string, number>();
+  for (const c of label) {
+    if (at.has(c)) continue;
+    const { sprite, advance } = letter(set, c);
+    at.set(c, sprites.length);
+    sprites.push(sprite);
+    advances.push(advance * res);
+  }
+  return {
+    sprites,
+    advances,
+    pad: set.pad,
+    font: FONT_SIZE * res,
+    index: (c: string) => at.get(c) ?? -1,
+    color,
+  };
+}
+
 // builds the glyphs and glow ahead of the first frame
 export function warmLetters(
   label: string,

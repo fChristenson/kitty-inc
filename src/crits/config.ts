@@ -4,6 +4,7 @@
 import { FEATURED_CRIT_BALANCE } from "./badgeCrits/balance";
 import { PROC_CRIT_BALANCE } from "./floorCrits/balance";
 import { FLOOR_CRIT_CONFIG } from "./floorCrits/config";
+import { INCOME_CRIT_CONFIG } from "./incomeCrits/config";
 import { ANIMATED_EVENT_CONFIG } from "./animatedCrits/config";
 
 export const CRIT_CONFIG = {
@@ -20,6 +21,9 @@ export const CRIT_CONFIG = {
     // crit): it pays the price of its tier's upgrades times upgradeCosts at
     // once instead of them; special crits ride either
     cashCrit: { chance: 0.5, upgradeCosts: 1 },
+    // an income crit pays this many seconds of the company's income per
+    // multiple of its tier, into the total
+    incomeCritSeconds: 10,
     // a boosted perma worker speeds its floor up by its tier's multiplier to
     // this power: 0.43 gives x1.6/x2.3/x2.7
     permaBoostExponent: 0.43,
@@ -48,9 +52,10 @@ export const CRIT_CONFIG = {
     badgeCrit: {
       chance: 0.46,
     },
-    // a floor crit: one of floorCrits below, picked by their chances; none
-    // can land again until cooldownMs after the last one was picked and
-    // after it played out
+    // a floor crit (one of floorCrits below, by their chances) on a
+    // multiplier crit, an income crit (one of incomeCrits) on a cash crit;
+    // neither can land again until cooldownMs after the last one was picked
+    // and after it played out (they share one player)
     floorCrit: {
       chance: 0.46,
       cooldownMs: 5_000,
@@ -73,6 +78,9 @@ export const CRIT_CONFIG = {
 
   // the floor crits a floorCrit slot picks from (floorCrits/config.ts)
   ...FLOOR_CRIT_CONFIG,
+
+  // the income crits an incomeCrit slot picks from (incomeCrits/config.ts)
+  ...INCOME_CRIT_CONFIG,
 
   // badgeCrits/badgeCapsule — the mystery badge capsule a building earns once
   // every floor is at the level cap with every upgrade bought, opened from its
