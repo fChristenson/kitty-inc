@@ -87,21 +87,23 @@ export const SPECIAL_FLASH_STROKE_WIDTH = 14;
 // getCritIcon still loads any icon on demand. Its flash bitmap is baked then
 // too, at idle, instead of on the click that shows it.
 let latestArmedLabel = "";
+const ARMED_BAKE_RETRY_MS = 250;
 onCritProcsArmed((kinds) => {
   for (const kind of kinds) {
     const info = CRIT_PROC_INFO[kind];
     if (!info) continue;
     const { icon, label, color } = info;
     latestArmedLabel = label;
+    // a held button arms procs far faster than they flash: bake only the
+    // newest, and never under a playing flash (it would stutter): after it
+    const bake = (): void => {
+      if (label !== latestArmedLabel) return;
+      if (isCritFlashActive(Date.now()))
+        setTimeout(() => runWhenIdle(bake), ARMED_BAKE_RETRY_MS);
+      else warmFlashBitmap(label, color, SPECIAL_FLASH_STROKE_WIDTH);
+    };
     void requestCritIcon(icon)
-      .then(() =>
-        runWhenIdle(() => {
-          // a held button arms procs far faster than they flash: bake only the
-          // newest, and never under a playing flash (it would stutter)
-          if (label === latestArmedLabel && !isCritFlashActive(Date.now()))
-            warmFlashBitmap(label, color, SPECIAL_FLASH_STROKE_WIDTH);
-        }),
-      )
+      .then(() => runWhenIdle(bake))
       .catch(() => undefined);
   }
 });
@@ -114,6 +116,9 @@ function getCritIcon(name: ImageName): HTMLImageElement | null {
   return null;
 }
 let flashStartedAt: number | null = null;
+// not drawn yet: its clock starts on its first frame, so a late frame can't
+// skip the reveal
+let flashFresh = false;
 // absolute end timestamp, computed once at trigger time from GROWTH_DURATION_MS +
 // flashHoldMs + the fade tail — lets triggerScreenShake and drawCritFlash both check
 // "is a flash still playing" without re-deriving it from elapsed-time math
@@ -267,6 +272,7 @@ function startFlash(req: FlashRequest): void {
     setTimeout(() => kickShake(SLAM_SHAKE, Date.now()), SLAM_MS);
   merge = null;
   flashStartedAt = now;
+  flashFresh = true;
   flashLabel = req.label;
   flashSizeLabel = sizeLabel;
   flashColor = req.color;
@@ -308,6 +314,8 @@ export function triggerScreenShake(options?: {
   stack?: FlashStack | null;
   pulseMs?: number;
   floorCrit?: FloorCritPlay | null;
+  // its sound: played as the flash lands (or at once if it's dropped)
+  onStart?: () => void;
 }): void {
   const req: FlashRequest = {
     intensity: options?.intensity ?? 1,
@@ -323,10 +331,18 @@ export function triggerScreenShake(options?: {
     floorCrit: options?.floorCrit ?? null,
   };
   const now = Date.now();
-  kickShake(req.intensity, now);
+  // a badge's icon may still need decoding and baking: its shake and sound
+  // wait for it, so they land with the reveal
+  const land = (): void => {
+    kickShake(req.intensity, Date.now());
+    options?.onStart?.();
+  };
   // a counting or merging number owns the screen until its own slam lands
   const leadIn = pendingLeadInLabel(now);
-  if (leadIn !== null && req.label !== leadIn) return;
+  if (leadIn !== null && req.label !== leadIn) {
+    land();
+    return;
+  }
   const idle = flashEndsAt === null || now >= flashEndsAt;
   const shouldStart =
     idle ||
@@ -336,26 +352,25 @@ export function triggerScreenShake(options?: {
   if (shouldStart) {
     const iconName = CRIT_ICON_BY_LABEL[req.label]?.name;
     const ready = iconName ? requestCritIcon(iconName) : Promise.resolve(null);
+    const begin = (): void => {
+      warmFlashBitmap(req.label, req.color, req.strokeWidth);
+      const currentNow = Date.now();
+      const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
+      if (stillIdle || req.priority > activeFlashPriority || req.stack)
+        startFlash(req);
+      land();
+    };
     ready
       .then(async (icon) => {
         // decoded off the main thread again (the browser may have dropped it),
         // then baked with the label before the reveal's first frame
         if (icon) await icon.decode().catch(() => undefined);
-        warmFlashBitmap(req.label, req.color, req.strokeWidth);
-        const currentNow = Date.now();
-        const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
-        if (stillIdle || req.priority > activeFlashPriority || req.stack)
-          startFlash(req);
+        begin();
       })
-      .catch(() => {
-        warmFlashBitmap(req.label, req.color, req.strokeWidth);
-        const currentNow = Date.now();
-        const stillIdle = flashEndsAt === null || currentNow >= flashEndsAt;
-        if (stillIdle || req.priority > activeFlashPriority || req.stack)
-          startFlash(req);
-      });
+      .catch(begin);
     return;
   }
+  land();
   // a strictly bigger celebration still preempts whatever's currently playing
   // as soon as its icon is ready (an ultra shouldn't wait behind a plain crit);
   // anything else
@@ -1024,6 +1039,12 @@ function drawFlashLayers(
   if (flashStartedAt === null || flashEndsAt === null) {
     coveredFlashes = [];
     return;
+  }
+  if (flashFresh) {
+    flashFresh = false;
+    const lag = Math.max(0, now - flashStartedAt);
+    flashStartedAt += lag;
+    flashEndsAt += lag;
   }
   if (now >= flashEndsAt) {
     flashStartedAt = null;

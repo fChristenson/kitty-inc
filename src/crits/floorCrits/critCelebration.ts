@@ -22,6 +22,7 @@ import {
 } from "../critTypes";
 
 import { playCoinDrop } from "../../sound";
+import { playCritExplosion } from "../../shared/explosionBang";
 import {
   playTierFlash,
   playSpecialFlash,
@@ -40,6 +41,11 @@ import { tierColor } from "./bonusTierReward";
 import { getScreenUnfrozenAt, isScreenFrozen } from "../../shared/screenFreeze";
 
 // crit celebrations are flash + sound only: no coin bursts (perf)
+function explosionAndCoins(): void {
+  playCritExplosion();
+  playCoinDrop();
+}
+
 function celebrateTier(tier: CritTier, floorCrit: FloorCritPlay | null): void {
   playTierFlash(
     tier,
@@ -153,16 +159,14 @@ function celebrateChain(tier: CritTier): void {
 // boost crit (see upgradeButton.ts's isBoostCrit): same swap as chain above,
 // but with its own dedicated blue and an extra coin-drop sound
 function celebrateBoost(): void {
-  playSpecialFlash(BOOST_CRIT_LABEL, BOOST_CRIT_COLOR);
-  playCoinDrop();
+  playSpecialFlash(BOOST_CRIT_LABEL, BOOST_CRIT_COLOR, explosionAndCoins);
 }
 
 // sunshine crit (see upgradeButton.ts's isSunshineCrit): same celebration
 // shape as boost above (the reward itself — a longer-lasting free worker
 // boost — is applied by floorInteractions.ts), just its own dedicated gold
 function celebrateSunshine(): void {
-  playSpecialFlash(SUNSHINE_CRIT_LABEL, SUNSHINE_CRIT_COLOR);
-  playCoinDrop();
+  playSpecialFlash(SUNSHINE_CRIT_LABEL, SUNSHINE_CRIT_COLOR, explosionAndCoins);
 }
 
 // snowday crit (see upgradeButton.ts's isSnowdayCrit): same celebration
@@ -170,8 +174,7 @@ function celebrateSunshine(): void {
 // free worker boost — is applied by floorInteractions.ts), its own dedicated
 // frost color
 function celebrateSnowday(): void {
-  playSpecialFlash(SNOWDAY_CRIT_LABEL, SNOWDAY_CRIT_COLOR);
-  playCoinDrop();
+  playSpecialFlash(SNOWDAY_CRIT_LABEL, SNOWDAY_CRIT_COLOR, explosionAndCoins);
 }
 
 // night shift crit (see upgradeButton.ts's isNightShiftCrit): same
@@ -179,8 +182,11 @@ function celebrateSnowday(): void {
 // shorter free worker boost plus a temporary +1-worker boost-strength bonus
 // — is applied by floorInteractions.ts), its own dedicated midnight indigo
 function celebrateNightShift(): void {
-  playSpecialFlash(NIGHT_SHIFT_CRIT_LABEL, NIGHT_SHIFT_CRIT_COLOR);
-  playCoinDrop();
+  playSpecialFlash(
+    NIGHT_SHIFT_CRIT_LABEL,
+    NIGHT_SHIFT_CRIT_COLOR,
+    explosionAndCoins,
+  );
 }
 
 // bounce crit (see upgradeButton.ts's isBounceCrit): same swap as chain
@@ -220,8 +226,7 @@ function celebrateExplosion(tier: CritTier): void {
 
 // booty adds a coin drop sound on top of the standard flash
 function celebrateBooty(): void {
-  celebrateFlatProc(BOOTY_CRIT_LABEL, BOOTY_CRIT_COLOR);
-  playCoinDrop();
+  playSpecialFlash(BOOTY_CRIT_LABEL, BOOTY_CRIT_COLOR, explosionAndCoins);
 }
 
 // chain and boost are both "special" procs riding the SAME landed tier (see
