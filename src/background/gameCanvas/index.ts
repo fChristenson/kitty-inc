@@ -57,6 +57,13 @@ import {
   updateCoinSpawn,
   wireCoinSpawn,
 } from "../../spawn/coin";
+import {
+  drawFireflies,
+  hitTestFireflies,
+  sweepFireflies,
+  updateFireflies,
+  wireFireflies,
+} from "../../spawn/fireflies";
 import { getTotalIncome } from "../../totalIncome";
 
 import { COLOR } from "../../palette";
@@ -741,6 +748,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     updateBubbles(performance.now());
     updateWispSpawn(performance.now());
     updateCoinSpawn(performance.now());
+    updateFireflies(performance.now());
     const dpr = getEffectiveDpr();
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -827,6 +835,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
       HUD_H / 2,
       performance.now(),
     );
+    drawFireflies(ctx, SLOT_W, performance.now());
     drawBubbles(ctx, SLOT_W, contentViewportH(), performance.now());
     ctx.restore();
   }
@@ -943,6 +952,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
   }
   wireBubbles(floorActionsDeps);
   wireCoinSpawn(floorActionsDeps);
+  wireFireflies(floorActionsDeps);
 
   // fires the upgrade button's click logic once (same overlapping-mouse-critter
   // courtesy a normal tap gets); called once on pointerdown, then again every
@@ -1000,9 +1010,10 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // bubbles float over everything, the HUD too
     bubbleTapDown = popBubbleAt(p.x, p.y) || tapCoinSpawn(p.x, p.y);
     if (bubbleTapDown) return;
-    wispSwipe = hitTestWispGlitter(p.x, p.y);
+    wispSwipe = hitTestWispGlitter(p.x, p.y) || hitTestFireflies(p.x, p.y);
     if (wispSwipe) {
       sweepWispGlitter(p.x, p.y, p.x, p.y);
+      sweepFireflies(p.x, p.y, p.x, p.y);
       return;
     }
     hudTapDown = p.y < hudBottomY;
@@ -1066,7 +1077,8 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
         p.y < hudBottomY ||
         hitTestBubbles(p.x, p.y) ||
         hitTestCoinSpawn(p.x, p.y) ||
-        hitTestWispGlitter(p.x, p.y)
+        hitTestWispGlitter(p.x, p.y) ||
+        hitTestFireflies(p.x, p.y)
       ) {
         canvas.style.cursor = "pointer";
         hoveredPoint = null;
@@ -1098,6 +1110,7 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
 
     const swipe = canvasPoint(event);
     sweepWispGlitter(sweepX, sweepY, swipe.x, swipe.y);
+    sweepFireflies(sweepX, sweepY, swipe.x, swipe.y);
     sweepX = swipe.x;
     sweepY = swipe.y;
     if (wispSwipe) return;

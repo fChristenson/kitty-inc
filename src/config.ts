@@ -92,6 +92,8 @@ export const CONFIG = {
   // every rollEveryMs and spawns with procChance, but not until cooldownMs
   // after the last one left
   randomSpawns: {
+    // across every kind: at most `count` spawn within any windowMs
+    gate: { count: 2, windowMs: 15_000 },
     // src/spawn/mouse — a mouse running about a random unlocked floor
     mouse: {
       rollEveryMs: 5_000,
@@ -144,6 +146,17 @@ export const CONFIG = {
       count: [3, 7] as [number, number],
       // all of them tapped pay this many seconds of the company's income
       rewardSeconds: 20,
+    },
+    // src/spawn/fireflies — a flock of little wisps drifting along a floor:
+    // a swipe catches them, each zipping onto a worker, promoting it
+    fireflies: {
+      rollEveryMs: 5_000,
+      procChance: 0.1,
+      cooldownMs: 5_000,
+      // how long the flock takes to drift across, in past one side and out
+      // past the other
+      durationMs: 6_000,
+      count: [12, 16] as [number, number],
     },
   },
 

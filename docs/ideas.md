@@ -1,43 +1,13 @@
 # Ideas
 
-## List 108: game features
+## List 109
 
-New things popping up on screen to catch, each with its own gesture (like the mouse, bubbles and wisp), all made of the game's own wisps, coins and glitter.
+Random spawns, [in the playground](../tmp/_playground/ideas.html?list=next87).
 
-1. **Shooting star**: a wisp streaks across the sky beside the building in under a second; tap it before it's gone and it dives into the floor nearest your tap, landing a crit there.
-2. **Overflow**: a floor's income bar fills past full and starts dribbling coins over its edge; scrub back and forth across it and it bursts, the faster the scrub the bigger the payout.
-3. **Coin flick**: a big coin bounces onto the street; flick it upward and it shoots up the building, every bar it passes paying out, and lands in the total.
-4. **Cat nap**: a worker dozes off with a glowing z over its head; tap it and it jolts awake one perma tier higher.
-5. **Gold rush**: a random floor turns gold for ten seconds; every tap anywhere on that floor throws a handful of coins into the total, so you hammer it as fast as you can.
+1. **Coin trail**: a row of spinning coins pops up one by one, snaking across two floors. One swipe along it scoops them up, each a pop and a rising ping into the total. The last one bursts into a river of coins (cash).
+2. **Searchlight**: a gold beam swings down from over the roof, its spot roaming the floors. Tap while it's on a bar and it locks on, burns along the bar in a quick-fire run of blasts, then slams a crit number onto it (a crit tier).
+3. **Garland**: a string of gold wisps on a thread of light lowers in, draped across three floors. Tap any one and blasts race both ways along the string, levelling every bar they pass. The two ends go off hugest.
 
 ## Built
 
-- **Wake** (wisp spawn glitter, `src/spawn/wisp`): the wisp sprays glitter out to both sides behind it like a boat's wake, its reach different every time; a swipe sends what it touches flying into the total.
-
-- **Wrecking swing** (`wreckingSwingCrit`), **Drones** (`dronesCrit`), **Sticky darts** (`stickyDartsCrit`) and **Storm ball** (`stormBallCrit`) income crits: a wrecking ball on a chain of light swinging through the total, wider and faster, snapping into it; three drones weaving under the total lasering it, then ramming it; darts fired into the total that stick with lit fuses and go off in a chain; a lightning ball ricocheting round the screen, bolting the total on every wall it hits.
-
-- **Homing missiles** (`homingMissilesCrit`) and **Skyrockets** (`skyrocketsCrit`) income crits: two dozen missile wisps fanning out from the amount, then hooking round and homing in on the total one after another; rockets shooting up from the screen's bottom, quicker and quicker, each bursting on the total in a ring of glitter, three together for the finale.
-
-- **Mortars** (`mortarsCrit`), **Arc chain** (`arcChainCrit`), **Sweep up** (`sweepUpCrit`) and **Cork pop** (`corkPopCrit`) income crits: five mortar tubes along the screen's bottom lobbing shells off the top down onto the total, then a volley; a bolt chaining coin to coin, each firing a bolt up into the total, then a giant one; a broom of light shoving glitter up into a line under the total, side brooms heaping it, the heap slammed in; a cork popped into the total, then a jet of gold spray whipping across it in pops.
-
-- **Salvo** (`salvoCrit`), **Light pillars** (`lightPillarsCrit`), **Bank shot** (`bankShotCrit`) and **Bomblets** (`bombletsCrit`) income crits: two launchers at the screen's bottom corners ripple-firing rockets that curl in onto the total, then a fat pair; pillars of light blasting up from a wisp racing along the screen's bottom into the total, then a giant one; shots banking off the screen's sides up onto the total, then a fat one up the middle; a bomb bursting under the total into four bomblets, each into three more hopping along it.
-
-- **Star fling** (`starFlingCrit`) and **Money spout** (`moneySpoutCrit`) income crits: a galaxy of glitter stars spun up round the amount, knots slung off it one after another into the total, then its core; a spinning spout of hundreds of coins twisting up into the total, its top swaying across it in a rattle of blasts.
-- **Drill bit** (`drillBitCrit`), **Gulp** (`gulpCrit`), **Gold coat** (`goldCoatCrit`) and **Pegboard** (`pegboardCrit`) income crits: a drill biting up into the total, stalling in a gush of sparks, then boring through in eight shoves; glitter flung all over the screen and gulped by a gravity hole under the total, each gulp spurting blasts into it; two nozzles spraying gold mist across the total, pops quickening, until it blows; wisp balls fired up through a fan of flashing pegs onto the total.
-
-- **Victory lap** (`victoryLapCrit`) and **Ceiling bounce** (`ceilingBounceCrit`) income crits: two wisps racing laps round the total, blasts trailing the leader across it, braking into the hairpins at its ends, both diving in at the finish; a wisp bouncing along under the total, smacking up into it every bounce, off both sides of the screen, then dunked into the middle.
-- **Bullet hose** (`bulletHoseCrit`), **Bolt magnet** (`boltMagnetCrit`), **Bomb lob** (`bombLobCrit`) and **Halo dive** (`haloDiveCrit`) income crits: the green amount hosing a quickening stream of wisp bullets across the total, then fired in as a slug; bolts cracking in from the screen's sides onto the total, then a giant one the amount shoots up; bomb wisps lobbed onto the total one after another, a cluster last; wisps ringing the total, whirling tighter, then diving in one by one.
-
-- **Cash crit** (`CONFIG.crit.cashCrit`): every landed crit tier is a multiplier crit or, half the time, a cash crit, both able to carry special crits behind the gateway. A cash crit pays the price of its tier's upgrades at once; its `+$` amount spins in green like an x3 with the buy sound and flings money out where a crit throws glitter.
-- **Designator** (`designatorCrit`), **Beam splitter** (`beamSplitterCrit`) and **Tesla cannon** (`teslaCannonCrit`) floor crits: a targeting dot darting over the bars with pillars from orbit chasing it, then a giant one on its own; a fan of beams split off a mirror over the roof sweeping the bars, then snapping shut onto its own; a coil at the street firing forking bolts up at the bars, then one discharge onto every bar and its own.
-- **Rods** (`rodsCrit`), **Ion cannon** (`ionCannonCrit`) and **Bolt whip** (`boltWhipCrit`) floor crits: gold rods from orbit punching down through every bar in their column, then a fat one into its own; a pillar of light cutting across the bars in a zigzag down the building, stopping on its own; a bolt cracked like a whip along the bars, then straight down onto its own.
-- **Meltdown** (`meltdownCrit` floor crit): bars heat white-hot together via `heatIncomeBar`, then blow top to bottom in runs of blasts, its own bar last.
-- **Crunch** (`crunchCrit` floor crit): a gravity well hauls every bar into a stack (drawn by the crit through `drawBar`/`hideBars`), squeezes it, then flings them back to land in blasts, its own bar last.
-- **Atoms** (`atomsCrit`), **Reactor** (`reactorCrit`), **Static** (`staticCrit`) floor crits: electron orbits, a core beaming into every bar, and static arcs, each building in every bar at once before going off.
-- **EMP** (`empCrit` floor crit, bars shorted via `shortIncomeBar`).
-- **Inspiral** (`inspiralCrit` floor crit): two wisps spiral into each other, each half turn a gravity-wave ring stretching the bars (drawn through `drawBar`/`hideBars`), then they merge and the bars blow outward from the middle, its own bar last.
-- **Thunderstorm** (`thunderstormCrit`) and **Shotgun** (`shotgunCrit`) floor crits: quick-fire bolt strikes all over the bars then a giant one on its own; pellet spreads down the bars then a double barrel.
-- **Solar flare** (`solarFlareCrit`), **Flak** (`flakCrit`) and **Revolver** (`revolverCrit`) floor crits: a sun lashing the bars with flare then a fat beam onto its own; shells bursting over the bars raining shrapnel; two fans of six heavy shots, the last into its own.
-- **Geysers** (`geysersCrit`) and **Plasma cannon** (`plasmaCannonCrit`) floor crits: light columns bursting up through every bar, a giant one under its own; heavy plasma shots throwing arcs along their bars, the last into its own.
-- **Grenades** (`grenadesCrit`), **Rocket pods** (`rocketPodsCrit`), **Bank shots** (`bankShotsCrit`) and **Minigun** (`minigunCrit`) floor crits: grenades skipping along the bars and blowing on the third touch; a ripple salvo of rockets then a heavy one; shots banking off the screen's sides, a blast at every bar they cross, then a slug; a stream whipping across the bars in quickening passes, then locked onto its own.
-- **Claymores** (`claymoresCrit`), **Strafe** (`strafeCrit`) and **Coin shot** (`coinShotCrit`) floor crits: mines on the bars' ends rattling blasts along them, its own bar's two meeting in the middle; a fighter diving across the bars in an X, then strafing its own bar end to end; a shot ricocheting coin to coin down onto the bars, the last coin bending it into its own.
+- Fireflies (`src/spawn/fireflies`)
