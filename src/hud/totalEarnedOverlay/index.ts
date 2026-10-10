@@ -1,6 +1,7 @@
 import { formatTotalIncomeParts } from "../../utils";
 import type { BigNumber } from "../../shared/bigNumber";
 import { onTapOrClick } from "../../shared/tapEvents";
+import { whenFramesSmooth } from "../../shared/smoothFrames";
 
 // one-shot "You have earned..." splash — a pure celebratory reveal of the idle
 // income collected while the tab was closed/away. main.ts only calls show()
@@ -39,22 +40,10 @@ export function wireTotalEarnedOverlay(
     amountEl.textContent = amount;
     unitNameEl.textContent = unitName;
     unitNameEl.hidden = !unitName;
-    // main.ts calls show() with plenty of its own synchronous work still left
-    // to run right after (gameCanvas.redraw(), starting tickers) — un-hiding
-    // synchronously here let that work eat into the CSS spin-in animation's own
-    // clock before the browser ever got to paint a frame, so by the time
-    // anything actually rendered the animation had already finished, and the
-    // overlay just silently popped in at rest. A 0ms setTimeout defers the
-    // actual reveal until after that synchronous work has fully returned
-    // control to the event loop (setTimeout over requestAnimationFrame since
-    // rAF can be paused/throttled in backgrounded tabs — see
-    // playwright-raf-throttling notes — this must still fire either way)
-    setTimeout(() => {
-      overlay.hidden = false;
-    }, 0);
+    // revealed only once the browser can animate smoothly: shown right at
+    // startup, the spin-in otherwise stutters through the first heavy frames
     return new Promise<void>((resolve) => {
-      // fallback for when animationend never fires (backgrounded tab, reduced motion)
-      const fallback = window.setTimeout(() => settleIntro?.(), 1500);
+      let fallback = 0;
       const onEnd = (event: AnimationEvent): void => {
         if (event.target === contentEl) settleIntro?.();
       };
@@ -64,7 +53,12 @@ export function wireTotalEarnedOverlay(
         contentEl.removeEventListener("animationend", onEnd);
         resolve();
       };
-      contentEl.addEventListener("animationend", onEnd);
+      void whenFramesSmooth().then(() => {
+        overlay.hidden = false;
+        // for when animationend never fires (reduced motion)
+        fallback = window.setTimeout(() => settleIntro?.(), 1500);
+        contentEl.addEventListener("animationend", onEnd);
+      });
     });
   }
 

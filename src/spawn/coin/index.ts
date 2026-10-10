@@ -11,7 +11,7 @@
 // space over the HUD (drawCoinSpawn)
 import { CONFIG } from "../../config";
 import { COLOR } from "../../palette";
-import { playBloop, playCoinAppear, playSold, playSwoosh } from "../../sound";
+import { playBloop, playCoinAppear, playSold } from "../../sound";
 import { getActiveCompanyIndex } from "../../company";
 import {
   addTotalIncome,
@@ -25,24 +25,22 @@ import {
 } from "../../floors";
 import type { Floor } from "../../gameState";
 import { isVisibleOnFloor } from "../../crits";
-import { loadImageByName } from "../../loadAssets";
 import { randomInt } from "../../utils";
 import { multiply, type BigNumber } from "../../shared/bigNumber";
-import { bezier } from "../../shared/curves";
 import {
-  clamp01,
-  easeIn,
-  easeOut,
-  easeOutBack,
-  lerp,
-} from "../../shared/easing";
+  drawCoinFlip,
+  drawSpinCoin,
+  loadSpinCoin,
+  startCoinFlip,
+  type CoinFlip,
+} from "../../shared/coinFlip";
+import { clamp01, easeIn, easeOutBack, lerp } from "../../shared/easing";
 import { drawGlow, fadeStops } from "../../shared/glowSprite";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { shakeScreen } from "../../shared/screenShake";
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { tapHits } from "../../shared/tapTarget";
 import { pulseHudTotalFlash } from "../../shared/totalIncomeCoins";
-import { stampGlimmer } from "../../shared/twinkle";
 import { urgentBlink } from "../../shared/urgentBlink";
 import type { Point } from "../../shared/wisp";
 
@@ -61,7 +59,6 @@ const PLACE_TRIES = 12;
 // spinning round its upright axis like the splash screen's coin (a turn
 // every 900ms), three quarters of a bubble's coin
 const COIN_RADIUS = 60;
-const COIN_PX = 128;
 const RISE_MS = 420;
 const HOVER = 104;
 const BOB = 8;
@@ -72,29 +69,17 @@ const SINK_LEAD_MS = 150;
 const SINK_MS = 300;
 const GLOW = fadeStops(COLOR.heavenlyGold);
 const GLOW_ALPHA = 0.35;
-// a tap flips it FLIP_HIGH up, spinning fast, swelling a little; at the
-// peak it's sucked into the total, shrinking as it goes
-const FLIP_MS = 380;
-const FLIP_HIGH = 300;
-const FLIP_SPIN = 0.03;
-const FLIP_GROW = 0.2;
-const SUCK_MS = 320;
-const SUCK_SHRINK = 0.65;
-const PEAK_GLINT = 90;
-const PEAK_GLINT_MS = 180;
+// a tapped one shakes the screen as it lands in the total
 const LAND_SHAKE = 0.4;
 
 interface Coin {
   floor: Floor;
   // where on the floor it opens, in the floor's own space
   localX: number;
-  // performance.now() it opens, it's tapped (Infinity until then) and from
-  // where on screen
+  // performance.now() it opens, and its flip once tapped
   bornAt: number;
-  tappedAt: number;
-  from: Point;
+  flip: CoinFlip | null;
   chimed: boolean;
-  swooshed: boolean;
   done: boolean;
 }
 
@@ -103,13 +88,8 @@ const coins: Coin[] = [];
 // what each coin pays
 let share: BigNumber | null = null;
 const roll = createSpawnRoll(CONFIG.randomSpawns.coin, performance.now());
-// the coin, rastered once from coin.webp
-let face: HTMLCanvasElement | null = null;
-let loading = false;
 const hole: Point = { x: 0, y: 0 };
 const spot: Point = { x: 0, y: 0 };
-const peak: Point = { x: 0, y: 0 };
-const bend: Point = { x: 0, y: 0 };
 const total: Point = { x: 0, y: 0 };
 
 // the floor actions of the building on screen
@@ -135,27 +115,6 @@ export function forceCoinSpawn(): void {
   startCoins(performance.now());
 }
 
-function raster(image: HTMLImageElement): HTMLCanvasElement {
-  const canvas = document.createElement("canvas");
-  canvas.width = canvas.height = COIN_PX;
-  const c = canvas.getContext("2d")!;
-  c.imageSmoothingQuality = "high";
-  c.drawImage(image, 0, 0, COIN_PX, COIN_PX);
-  return canvas;
-}
-
-function loadCoin(): void {
-  if (loading) return;
-  loading = true;
-  loadImageByName("coin")
-    .then((image) => {
-      face = raster(image);
-    })
-    .catch(() => {
-      loading = false;
-    });
-}
-
 // a spot on floor at least SPREAD from every other coin there, the last try
 // if none is
 function placeOn(floor: Floor): number {
@@ -172,7 +131,7 @@ function placeOn(floor: Floor): number {
 
 function startCoins(now: number): void {
   if (!getDeps) return;
-  loadCoin();
+  loadSpinCoin();
   const floors = (getDeps().getOnScreenFloors?.() ?? []).filter(
     (entry) => entry.floor.unlocked && isVisibleOnFloor(entry, WORKER_FEET_Y),
   );
@@ -188,10 +147,8 @@ function startCoins(now: number): void {
       floor,
       localX: placeOn(floor),
       bornAt: now + i * STAGGER_MS,
-      tappedAt: Infinity,
-      from: { x: 0, y: 0 },
+      flip: null,
       chimed: false,
-      swooshed: false,
       done: false,
     });
   }
@@ -242,7 +199,7 @@ function canTap(c: Coin, now: number): boolean {
   const age = now - c.bornAt;
   return (
     !c.done &&
-    c.tappedAt === Infinity &&
+    !c.flip &&
     age >= RISE_MS * 0.5 &&
     age < CONFIG.randomSpawns.coin.durationMs
   );
@@ -270,9 +227,7 @@ export function tapCoinSpawn(x: number, y: number): boolean {
   const now = performance.now();
   const c = coinAt(x, y, now);
   if (!c) return false;
-  c.tappedAt = now;
-  c.from.x = spot.x;
-  c.from.y = spot.y;
+  c.flip = startCoinFlip(spot, now, COIN_RADIUS, (now - c.bornAt) * SPIN);
   playBloop();
   return true;
 }
@@ -292,24 +247,6 @@ function drawHole(ctx: CanvasRenderingContext2D, open: number): void {
   ctx.beginPath();
   ctx.ellipse(hole.x, hole.y, r, r * HOLE_SQUASH, 0, 0, Math.PI * 2);
   ctx.fill();
-}
-
-// the coin turned `turn` round its upright axis, mirrored once past edge-on
-function drawCoin(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  radius: number,
-  alpha: number,
-  turn: number,
-): void {
-  if (!face || radius <= 0 || alpha <= 0) return;
-  ctx.save();
-  ctx.globalAlpha = alpha;
-  ctx.translate(x, y);
-  ctx.scale(Math.cos(turn), 1);
-  ctx.drawImage(face, -radius, -radius, radius * 2, radius * 2);
-  ctx.restore();
 }
 
 // an untapped coin: its hole, and it rising, hovering or sinking
@@ -341,69 +278,21 @@ function drawHovering(
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = previous;
   const radius = COIN_RADIUS * (0.4 + 0.6 * out);
-  drawCoin(ctx, spot.x, spot.y, radius, blink, age * SPIN);
+  drawSpinCoin(ctx, spot.x, spot.y, radius, blink, age * SPIN);
 }
 
-// a tapped coin: flipped up, then sucked into the total at the peak
+// a tapped coin: its hole shutting, the coin flipped up into the total
 function drawFlipped(
   ctx: CanvasRenderingContext2D,
   c: Coin,
+  flip: CoinFlip,
   t: number,
-  w: number,
-  totalAtY: number,
 ): void {
-  const age = t - c.bornAt;
-  const since = t - c.tappedAt;
-  if (holeAt(c)) drawHole(ctx, holeOpen(age, true));
-  const turn = age * SPIN + since * FLIP_SPIN;
-  if (since < FLIP_MS) {
-    const u = easeOut(since / FLIP_MS);
-    drawCoin(
-      ctx,
-      c.from.x,
-      c.from.y - FLIP_HIGH * u,
-      COIN_RADIUS * (1 + FLIP_GROW * u),
-      1,
-      turn,
-    );
-    return;
-  }
-  peak.x = c.from.x;
-  peak.y = c.from.y - FLIP_HIGH;
-  if (!c.swooshed) {
-    c.swooshed = true;
-    playSwoosh();
-  }
-  const glint = (since - FLIP_MS) / PEAK_GLINT_MS;
-  if (glint < 1) {
-    const previous = ctx.globalCompositeOperation;
-    ctx.globalCompositeOperation = "lighter";
-    ctx.globalAlpha = 1 - glint;
-    const size = PEAK_GLINT * (0.6 + glint);
-    stampGlimmer(ctx, peak.x, peak.y, size, age, COLOR.white);
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = previous;
-  }
-  const p = (since - FLIP_MS) / SUCK_MS;
-  if (p >= 1) {
+  if (holeAt(c)) drawHole(ctx, holeOpen(t - c.bornAt, true));
+  drawCoinFlip(ctx, flip, t, total, () => {
     pay();
     c.done = true;
-    return;
-  }
-  total.x = w / 2;
-  total.y = totalAtY;
-  bend.x = lerp([peak.x, total.x], 0.3);
-  bend.y = Math.min(peak.y, total.y) - 60;
-  const k = easeIn(p);
-  bezier(peak, bend, total, k, spot);
-  drawCoin(
-    ctx,
-    spot.x,
-    spot.y,
-    COIN_RADIUS * (1 + FLIP_GROW) * (1 - SUCK_SHRINK * k),
-    1,
-    turn,
-  );
+  });
 }
 
 // the holes and their coins, in gameCanvas's screen units (w wide, the
@@ -417,10 +306,12 @@ export function drawCoinSpawn(
 ): void {
   if (coins.length === 0) return;
   const t = performance.now();
+  total.x = w / 2;
+  total.y = totalAtY;
   for (const c of coins) {
     if (c.done) continue;
-    if (c.tappedAt === Infinity) drawHovering(ctx, c, t, now);
-    else drawFlipped(ctx, c, t, w, totalAtY);
+    if (c.flip) drawFlipped(ctx, c, c.flip, t);
+    else drawHovering(ctx, c, t, now);
   }
   for (let i = coins.length - 1; i >= 0; i--)
     if (coins[i].done) coins.splice(i, 1);

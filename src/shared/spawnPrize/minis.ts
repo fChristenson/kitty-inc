@@ -12,6 +12,7 @@ import {
 } from "../../crits";
 import { getStickerUrl, loadImageByName } from "../../loadAssets";
 import { loadImage } from "../../utils";
+import { loadSpinCoin } from "../coinFlip";
 
 export type Prize =
   | { kind: "tier"; tier: CritTier }
@@ -51,8 +52,10 @@ const imageKey = (prize: Prize): string =>
 
 // starts loading (or rastering) what prize draws
 export function prepareMini(prize: Prize): void {
-  if (prize.kind === "coin") load("coin", () => loadImageByName("coin"));
-  else if (prize.kind === "badge")
+  if (prize.kind === "coin") {
+    load("coin", () => loadImageByName("coin"));
+    loadSpinCoin();
+  } else if (prize.kind === "badge")
     load(imageKey(prize), () =>
       loadImage(getStickerUrl(critProcIcon(prize.badge))),
     );
