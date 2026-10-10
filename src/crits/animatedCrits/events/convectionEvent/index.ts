@@ -24,6 +24,7 @@ import {
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "convection";
 const MAX_WORKERS = 6;
@@ -210,6 +211,7 @@ export const forceConvectionEvent = registerWispEvent(
           const fade = 1 - clamp01((ms - eruptAt) / 300);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < GRAINS; i++) {
             const t = throws[i];
             let heat: number;
@@ -236,6 +238,7 @@ export const forceConvectionEvent = registerWispEvent(
               heat > 0.4 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

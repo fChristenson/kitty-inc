@@ -9,6 +9,7 @@ import { COLOR } from "../../palette";
 import { stampGlimmer } from "../twinkle";
 import { lerp } from "../easing";
 import type { Point } from "../wisp";
+import { beginLightBatch, endLightBatch } from "../lightBatch";
 
 const TAU = Math.PI * 2;
 
@@ -142,6 +143,7 @@ export function drawStars(
   if (size <= 0 || alpha <= 0) return;
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
   ctx.globalAlpha = alpha;
   for (let i = 0; i < stars.length; i++) {
     const o = stars[i];
@@ -156,5 +158,6 @@ export function drawStars(
       i % 2 ? COLOR.heavenlyGold : COLOR.white,
     );
   }
+  endLightBatch(ctx);
   ctx.restore();
 }

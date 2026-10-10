@@ -19,6 +19,7 @@ import { clamp01, easeIn, easeOutBack, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "sync";
 const MAX_WORKERS = 6;
@@ -201,6 +202,7 @@ export const forceSyncEvent = registerWispEvent(
           const pop = easeOutBack(clamp01(ms / growMs));
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < n; i++) {
             const d = drops[i];
             if (ms > d.lands) continue;
@@ -232,6 +234,7 @@ export const forceSyncEvent = registerWispEvent(
               size > DOT * 1.5 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

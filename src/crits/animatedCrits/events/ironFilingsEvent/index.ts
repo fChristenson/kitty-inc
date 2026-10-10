@@ -19,6 +19,7 @@ import { stampGlimmer } from "../../../../shared/twinkle";
 import { scatterEvenly, simulateClean } from "../../../../shared/clutter";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "ironFilings";
 const BITS = 420;
@@ -178,6 +179,7 @@ export const forceIronFilingsEvent = registerWispEvent(
             drawWisp(ctx, p, ms, now, POLE * (0.5 + 0.5 * glow), glow);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           const slam = easeIn(clamp01((ms - slamAt) / slamMs));
           for (let i = 0; i < spots.length; i++) {
             if (ms < drops[i]) continue;
@@ -206,6 +208,7 @@ export const forceIronFilingsEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

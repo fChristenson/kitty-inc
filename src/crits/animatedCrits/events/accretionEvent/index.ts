@@ -29,6 +29,7 @@ import {
   giveHire,
   type RewardHire,
 } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "accretion";
 const MAX_PLANETS = 5;
@@ -211,6 +212,7 @@ export const forceAccretionEvent = registerWispEvent(
           joined.fill(0);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (const g of grains) {
             if (ms >= g.joins) {
               joined[g.k]++;
@@ -227,6 +229,7 @@ export const forceAccretionEvent = registerWispEvent(
               g.k % 2 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           for (let k = 0; k < n; k++) {
             const size = lerp(PLANET, joined[k] / Math.max(1, total[k]));

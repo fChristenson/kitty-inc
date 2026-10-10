@@ -18,6 +18,7 @@ import {
   drawText,
   along,
 } from "../../critPlayer";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const SATURN_IN_MS = 300;
 const SATURN_GROW_MS = 1300;
@@ -149,6 +150,7 @@ registerFloorCrit("saturnCrit", {
     if (ms >= SATURN_IN_MS * 0.6 && ms < SATURN_BREAK) {
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let i = 0; i < SATURN_DOTS; i++) {
         dotAt(plan, i, ms, dot);
         stampGlimmer(
@@ -160,6 +162,7 @@ registerFloorCrit("saturnCrit", {
           i % 2 ? COLOR.heavenlyGold : COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.restore();
     }
     if (ms >= SATURN_BREAK && r.kicked === 0) {

@@ -7,6 +7,7 @@ import { stampGlimmer } from "../../../shared/twinkle";
 import { clamp01 } from "../../../shared/easing";
 import { drawScreenPart, type ScreenCopy } from "../../../shared/screenCopy";
 import type { FlightView } from ".";
+import { beginLightBatch, endLightBatch } from "../../../shared/lightBatch";
 
 // the view's focal length (in screen widths), the hole's radius in screen
 // widths, and the floors at its bottom: FLOORS_W wide, FLOORS_W * FOCAL
@@ -65,6 +66,7 @@ export function drawFlightHole(
   );
   ctx.restore();
   ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
   for (let i = 0; i < RIM; i++) {
     const a = (i / RIM) * Math.PI * 2 + now * RIM_SPIN;
     stampGlimmer(
@@ -76,6 +78,7 @@ export function drawFlightHole(
       i % 2 ? COLOR.heavenlyGold : COLOR.white,
     );
   }
+  endLightBatch(ctx);
   ctx.globalCompositeOperation = previous;
   ctx.globalAlpha = 1;
 }

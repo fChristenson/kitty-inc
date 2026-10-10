@@ -29,6 +29,7 @@ import {
   totalSpot,
   type Pour,
 } from "../../cashFlow";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "fuseClock";
 const REWARD = 4;
@@ -241,6 +242,7 @@ export const forceFuseClockEvent = registerWispEvent(
           const ty = tip.y;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let d = 0; d < HAND_DOTS; d++) {
             const f = d / HAND_DOTS;
             stampGlimmer(
@@ -252,6 +254,7 @@ export const forceFuseClockEvent = registerWispEvent(
               d % 2 === 0 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           drawWispBetween(
             ctx,

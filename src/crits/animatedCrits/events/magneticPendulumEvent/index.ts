@@ -19,6 +19,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { drawBeam } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "magneticPendulum";
 const MAX_HIRES = 4;
@@ -164,6 +165,7 @@ export const forceMagneticPendulumEvent = registerWispEvent(
           const fade = 1 - clamp01((ms - caughtAt) / 300);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (const m of magnets)
             for (let g = 0; g < GLIMMERS; g++) {
               const a = (Math.PI * 2 * g) / GLIMMERS - ms * 0.003;
@@ -184,6 +186,7 @@ export const forceMagneticPendulumEvent = registerWispEvent(
             ms * 0.004,
             COLOR.white,
           );
+          endLightBatch(ctx);
           ctx.restore();
           const bob = bobAt(ms);
           drawBeam(ctx, pivot, bob, THREAD_W, THREAD_ALPHA * fade);

@@ -29,6 +29,7 @@ import {
   giveHire,
   type RewardHire,
 } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "gravitationalLens";
 const MAX_PIECES = 5;
@@ -190,6 +191,7 @@ export const forceGravitationalLensEvent = registerWispEvent(
           // faint twin on the far side when it's close
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = fade;
           for (let i = 0; i < stars.length; i++) {
             disk.at(stars[i], ms, star, grow);
@@ -237,6 +239,7 @@ export const forceGravitationalLensEvent = registerWispEvent(
               );
             }
           }
+          endLightBatch(ctx);
           ctx.restore();
           if (ring < 0.5)
             drawWisp(ctx, centreAt, ms, now, CORE * grow * (1 - ring), 0.6);

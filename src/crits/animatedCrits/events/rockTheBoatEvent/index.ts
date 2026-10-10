@@ -18,6 +18,7 @@ import { stampGlimmer } from "../../../../shared/twinkle";
 import { scatterWaves, simulateClean } from "../../../../shared/clutter";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "rockTheBoat";
 const BITS = 380;
@@ -158,6 +159,7 @@ export const forceRockTheBoatEvent = registerWispEvent(
           if (ms < 0 || ms >= openAt) return;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < spots.length; i++) {
             if (ms < drops[i]) continue;
             if (ms < dumpMs) {
@@ -174,6 +176,7 @@ export const forceRockTheBoatEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

@@ -17,6 +17,7 @@ import {
   drawText,
 } from "../../critPlayer";
 import { holeHash } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const NUKE_IN_MS = 250;
 const NUKE_FALL_MS = 1000;
@@ -123,6 +124,7 @@ registerFloorCrit("nukeCrit", {
       const capY = lerp(ground.y, ground.y - w * NUKE_CLOUD_HEIGHT, rise);
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       ctx.globalAlpha = fade;
       for (let i = 0; i < NUKE_STEM; i++)
         stampGlimmer(
@@ -150,6 +152,7 @@ registerFloorCrit("nukeCrit", {
         );
       }
       ctx.globalAlpha = 1;
+      endLightBatch(ctx);
       ctx.globalCompositeOperation = previous;
     }
     // the blinding flash over everything

@@ -32,6 +32,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { drawBeam } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardBars } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "eightQueens";
 const N = 8;
@@ -234,6 +235,7 @@ export const forceEightQueensEvent = registerWispEvent(
             const solved = ms >= solvedAt ? flare : 0;
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             ctx.globalAlpha = fade;
             for (let r = 0; r < N; r++) {
               const grow = easeOut(
@@ -253,6 +255,7 @@ export const forceEightQueensEvent = registerWispEvent(
                 );
               }
             }
+            endLightBatch(ctx);
             ctx.restore();
           }
           // replay the solver up to now

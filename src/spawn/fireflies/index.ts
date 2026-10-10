@@ -28,13 +28,19 @@ import { bezier } from "../../shared/curves";
 import { isFloorLocked } from "../../shared/detachedJob";
 import { between, clamp01, easeOutCubic, lerp } from "../../shared/easing";
 import { drawGlow, fadeStops } from "../../shared/glowSprite";
+import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { shakeScreen } from "../../shared/screenShake";
 import { createSpawnRoll } from "../../shared/spawnRoll";
 import { isSpawnGone, spawnFade } from "../../shared/spawnFade";
 import { swipeHits, tapHits } from "../../shared/tapTarget";
 import { stampGlimmer } from "../../shared/twinkle";
-import { drawWisp, WISP_SIZE, type Point } from "../../shared/wisp";
+import {
+  drawWispHead,
+  drawWispTrail,
+  WISP_SIZE,
+  type Point,
+} from "../../shared/wisp";
 
 // the flock's middle flies in from ENTER_PAST beyond the floor's side to a
 // spot REST_EDGE or more in from its sides over ENTER_MS, then meanders
@@ -352,19 +358,31 @@ export function drawFireflies(
     stampGlimmer(ctx, x, y, GLINT, fly.seed, COLOR.white);
   }
   ctx.globalAlpha = 1;
-  ctx.globalCompositeOperation = previous;
-  for (const fly of f.flies) {
-    if (fly.landed) continue;
-    const caught = fly.caughtAt !== Infinity;
-    if (caught) {
-      const pop = clamp01((t - fly.caughtAt) / POP_MS);
-      drawWisp(ctx, fly.path, t, now, SIZE * (1 + POP_GROW * pop), pop);
-      continue;
+  // every trail in one light batch, then the heads over them
+  beginLightBatch(ctx);
+  for (let pass = 0; pass < 2; pass++) {
+    if (pass === 1) {
+      endLightBatch(ctx);
+      ctx.globalCompositeOperation = previous;
     }
-    if (fade.scale <= 0) continue;
-    const p = fly.path(t);
-    if (!p || p.x < -DRAW_MARGIN || p.x > w + DRAW_MARGIN) continue;
-    drawWisp(ctx, fly.path, t, now, SIZE * fade.scale, 0, fade.alpha);
+    for (const fly of f.flies) {
+      if (fly.landed) continue;
+      let size: number;
+      let heat = 0;
+      let alpha = 1;
+      if (fly.caughtAt !== Infinity) {
+        heat = clamp01((t - fly.caughtAt) / POP_MS);
+        size = SIZE * (1 + POP_GROW * heat);
+      } else {
+        if (fade.scale <= 0) continue;
+        const p = fly.path(t);
+        if (!p || p.x < -DRAW_MARGIN || p.x > w + DRAW_MARGIN) continue;
+        size = SIZE * fade.scale;
+        alpha = fade.alpha;
+      }
+      if (pass === 0) drawWispTrail(ctx, fly.path, t, now, size, alpha);
+      else drawWispHead(ctx, fly.path, t, now, size, heat, alpha);
+    }
   }
   if (!busy) flock = null;
 }

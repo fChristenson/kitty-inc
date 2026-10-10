@@ -29,6 +29,7 @@ import {
   giveHire,
   type RewardHire,
 } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "kirkwoodGaps";
 const STARS = 360;
@@ -192,6 +193,7 @@ export const forceKirkwoodGapsEvent = registerWispEvent(
           const fade = 1 - clamp01((ms - last.flings) / 500);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = fade;
           for (let i = 0; i < STARS; i++) {
             const g = owner[i];
@@ -208,6 +210,7 @@ export const forceKirkwoodGapsEvent = registerWispEvent(
               u > 0 || i % 2 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           drawWisp(ctx, sunAt, ms, now, SUN * grow * (0.3 + 0.7 * fade), 0.6);
           if (fade > 0)

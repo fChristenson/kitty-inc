@@ -31,6 +31,7 @@ import {
 } from "../../../../shared/clutter";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "pillowFight";
 const FEATHERS = 300;
@@ -246,6 +247,7 @@ export const forcePillowFightEvent = registerWispEvent(
           const fade = 1 - clamp01((ms - landsAt) / FADE_MS);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = fade;
           for (let i = 0; i < FEATHERS; i++) {
             const { born, from } = flings[i];
@@ -276,6 +278,7 @@ export const forcePillowFightEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           for (const at of pillows)
             drawWispBetween(

@@ -30,6 +30,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawStars, planDisk, type Orbit } from "../../../../shared/galaxy";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "oortCloud";
 const MAX_WORKERS = 6;
@@ -256,6 +257,7 @@ export const forceOortCloudEvent = registerWispEvent(
           );
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < comets.length; i++) {
             const c = comets[i];
             if (ms >= c.lands) continue;
@@ -288,6 +290,7 @@ export const forceOortCloudEvent = registerWispEvent(
               i % 2 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

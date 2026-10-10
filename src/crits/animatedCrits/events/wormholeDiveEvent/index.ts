@@ -41,6 +41,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../../eventProcs";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "wormholeDive";
 
@@ -164,6 +165,7 @@ function startWormholeDive(floor: Floor, context: EventProcContext): void {
         const s = travel(ms);
         const previous = ctx.globalCompositeOperation;
         ctx.globalCompositeOperation = "lighter";
+        beginLightBatch(ctx);
         for (let j = 0; j < RINGS; j++) {
           const z = NEAR + ((((j * RING_GAP - s) % SPAN) + SPAN) % SPAN);
           const twist = z * TWIST + ms * SPIN;
@@ -185,6 +187,7 @@ function startWormholeDive(floor: Floor, context: EventProcContext): void {
             );
           }
         }
+        endLightBatch(ctx);
         ctx.globalCompositeOperation = previous;
         const guns = flightGuns(view);
         for (const r of riders) {

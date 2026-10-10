@@ -20,6 +20,7 @@ import {
   along,
 } from "../../critPlayer";
 import { groundY, holeHash, otherBars } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const FL_IN_MS = 220;
 const FL_SHELLS = 12;
@@ -163,6 +164,7 @@ registerFloorCrit("flakCrit", {
       if (t >= 0 && t < FL_STREAK_MS) {
         const previous = ctx.globalCompositeOperation;
         ctx.globalCompositeOperation = "lighter";
+        beginLightBatch(ctx);
         const d = t * FL_STREAK_SPEED;
         for (let j = 0; j < FL_STREAKS; j++) {
           const a = Math.PI / 2 + (holeHash(j, i + 884) - 0.5) * FL_STREAK_FAN;
@@ -175,6 +177,7 @@ registerFloorCrit("flakCrit", {
             j % 2 ? COLOR.white : COLOR.heavenlyGold,
           );
         }
+        endLightBatch(ctx);
         ctx.globalCompositeOperation = previous;
       }
       drawDetonation(ctx, burst, t, s.last ? FL_BOOM : FL_BURST, now);

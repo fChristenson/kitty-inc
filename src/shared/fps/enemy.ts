@@ -2,6 +2,7 @@ import { COLOR } from "../../palette";
 import { lerp } from "../easing";
 import { stampGlimmer } from "../twinkle";
 import { fpsSight, type Fps, type FpsPoint } from "./world";
+import { beginLightBatch, endLightBatch } from "../lightBatch";
 
 // an enemy's colours and the parts it wears: a bandit, a demon, a soldier
 export interface FpsEnemyLook {
@@ -248,6 +249,7 @@ export function drawFpsEnemy(
   if (look.glow && down < 1) {
     const previous = ctx.globalCompositeOperation;
     ctx.globalCompositeOperation = "lighter";
+    beginLightBatch(ctx);
     for (const ex of [-0.021, 0.021])
       stampGlimmer(
         ctx,
@@ -257,6 +259,7 @@ export function drawFpsEnemy(
         now * 0.006,
         look.eyes,
       );
+    endLightBatch(ctx);
     ctx.globalCompositeOperation = previous;
   }
   return { x: feet.x + (hand.x + sway) * s, y: feet.y + hand.y * s, s };

@@ -35,6 +35,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../../eventProcs";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "ringRun";
 
@@ -175,6 +176,7 @@ function startRingRun(floor: Floor, context: EventProcContext): void {
         rattled.tick(ms, now);
         const previous = ctx.globalCompositeOperation;
         ctx.globalCompositeOperation = "lighter";
+        beginLightBatch(ctx);
         for (const hoop of hoops) {
           if (ms < hoop.pass - RUSH_MS || ms >= hoop.pass) continue;
           const z = depthOf(hoop, ms);
@@ -192,6 +194,7 @@ function startRingRun(floor: Floor, context: EventProcContext): void {
             );
           }
         }
+        endLightBatch(ctx);
         ctx.globalCompositeOperation = previous;
         for (const b of bursts)
           drawDetonation(

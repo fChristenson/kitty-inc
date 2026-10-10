@@ -12,6 +12,7 @@ import {
   drawText,
 } from "../../critPlayer";
 import { holeHash } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 // a cloud of glitter swirling in on itself round the number's column into a
 // newborn star that ignites, firing jets straight up and down into every bar
@@ -84,6 +85,7 @@ registerFloorCrit("starBirthCrit", {
       const shrink = 1 - u * u;
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let i = 0; i < BIRTH_SPECKS; i++) {
         const radius =
           w * lerp(BIRTH_CLOUD[0], BIRTH_CLOUD[1], holeHash(i, 71)) * shrink;
@@ -99,6 +101,7 @@ registerFloorCrit("starBirthCrit", {
           i % 2 ? COLOR.heavenlyGold : COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.restore();
     }
     // the star swelling as the cloud falls in, then igniting

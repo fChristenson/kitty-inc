@@ -20,6 +20,7 @@ import {
   drawText,
 } from "../../critPlayer";
 import { skyY, BAR_HALF_H, holeHash } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const FRZ_IN_MS = 400;
 // the nozzle: this far over the top bar, this far left (of the viewport's
@@ -130,6 +131,7 @@ function drawShards(
   if (msSince < 0 || msSince > FRZ_SHARD_MS) return;
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
   ctx.globalAlpha = 1 - msSince / FRZ_SHARD_MS;
   for (let i = 0; i < FRZ_SHARDS; i++) {
     const vx = (holeHash(i, salt) - 0.5) * FRZ_SHARD_SPEED;
@@ -146,6 +148,7 @@ function drawShards(
     );
   }
   ctx.globalAlpha = 1;
+  endLightBatch(ctx);
   ctx.globalCompositeOperation = previous;
 }
 
@@ -184,6 +187,7 @@ registerFloorCrit("freezeRayCrit", {
       drawBeam(ctx, nozzle, to, FRZ_BEAM, 0.7);
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let i = 0; i < FRZ_FLAKES; i++) {
         const u = (holeHash(i, 81) + ms * 0.002) % 1;
         stampGlimmer(
@@ -195,6 +199,7 @@ registerFloorCrit("freezeRayCrit", {
           COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.globalCompositeOperation = previous;
     }
     const order = byHeight(bars);

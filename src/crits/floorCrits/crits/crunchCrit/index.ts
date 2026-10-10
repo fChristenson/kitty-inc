@@ -22,6 +22,7 @@ import {
   glowStops,
 } from "../../critPlayer";
 import { holeHash } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const CR_IN_MS = 260;
 const CR_PULL_AT = CR_IN_MS + 100;
@@ -227,6 +228,7 @@ registerFloorCrit("crunchCrit", {
     if (ms >= CR_PULL_AT && ms < CR_SQUEEZE_AT) {
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       const reach = r.viewportWidth * CR_STREAM_REACH;
       for (let i = 0; i < CR_STREAM; i++) {
         const u = ((ms - CR_PULL_AT) * 0.002 + holeHash(i, 70)) % 1;
@@ -241,6 +243,7 @@ registerFloorCrit("crunchCrit", {
           i % 3 ? COLOR.heavenlyGold : COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.globalCompositeOperation = previous;
     }
 

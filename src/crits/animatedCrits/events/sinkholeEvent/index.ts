@@ -22,6 +22,7 @@ import {
   simulateClean,
 } from "../../../../shared/clutter";
 import { findRewardBars } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "sinkhole";
 const BITS = 320;
@@ -204,6 +205,7 @@ export const forceSinkholeEvent = registerWispEvent(
           }
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = fade;
           const h = holeAt(ms);
           const gather = easeOut(clamp01((ms - swallowed) / GATHER_MS));
@@ -230,6 +232,7 @@ export const forceSinkholeEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

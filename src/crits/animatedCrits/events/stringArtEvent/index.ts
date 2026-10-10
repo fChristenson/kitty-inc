@@ -19,6 +19,7 @@ import { drawBeam, drawBeamFlare } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "stringArt";
 // pins along each side, so PINS - 1 strings per corner
@@ -184,6 +185,7 @@ export const forceStringArtEvent = registerWispEvent(
           }
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < pins.length; i++) {
             const p = pins[i];
             const onRail = i >= threads.length;
@@ -198,6 +200,7 @@ export const forceStringArtEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

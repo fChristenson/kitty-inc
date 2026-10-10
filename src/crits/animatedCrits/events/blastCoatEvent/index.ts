@@ -29,6 +29,7 @@ import {
   type Spray,
 } from "../../../../shared/spray";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "blastCoat";
 const MAX_BARS = 4;
@@ -276,6 +277,7 @@ export const forceBlastCoatEvent = registerWispEvent(
           }
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < drops.length; i++) {
             const d = drops[i];
             if (ms < d.lands || ms >= d.goes) continue;
@@ -288,6 +290,7 @@ export const forceBlastCoatEvent = registerWispEvent(
               i % 3 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           for (const c of coats) {
             if (ms < c.starts || ms > c.ends + FLIGHT_MS) continue;

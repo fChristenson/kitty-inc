@@ -23,6 +23,7 @@ import { clamp01, easeIn, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardWorkers } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "strangeAttractor";
 const MAX_WORKERS = 6;
@@ -224,6 +225,7 @@ export const forceStrangeAttractorEvent = registerWispEvent(
           const reached = stepAt(ms);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < flights.length; i++) {
             const f = flights[i];
             if (f.step > reached || ms >= f.arrives) continue;
@@ -248,6 +250,7 @@ export const forceStrangeAttractorEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           drawWispBetween(ctx, penAt, ms, now, PEN, 0.9, 0, traceMs);
         },

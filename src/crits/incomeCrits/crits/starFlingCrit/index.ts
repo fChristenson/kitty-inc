@@ -22,6 +22,7 @@ import {
 } from "../../../floorCrits/critPlayer";
 import { holeHash, quadratic } from "../../../floorCrits/critPlayer/shared";
 import { drawFinale, drawNumberShrink, readoutSpot } from "../shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const STARS = 260;
 const KNOTS = 8;
@@ -148,6 +149,7 @@ registerFloorCrit("starFlingCrit", {
       const grow = 1 - (1 - clamp01(ms / SPREAD_MS)) ** 3;
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let i = 0; i < STARS; i++) {
         const release = releaseAt[knot[i]];
         let p: Point;
@@ -174,6 +176,7 @@ registerFloorCrit("starFlingCrit", {
           i % 3 ? COLOR.heavenlyGold : COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.restore();
     }
     drawWispBetween(ctx, fling.core, ms, now, CORE, 1, 0, fling.endAt);

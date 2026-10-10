@@ -13,6 +13,7 @@ import {
   along,
 } from "../../critPlayer";
 import { holeHash } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 // a sun blazing up where the number is, a galaxy of stars swirling round it
 // in spiral arms, ever faster, until it goes supernova and flings them off
@@ -103,6 +104,7 @@ registerFloorCrit("galaxyCrit", {
     if (since >= 0 && fade > 0) {
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       ctx.globalAlpha = fade;
       for (let i = 0; i < stars.length; i++) {
         const o = stars[i];
@@ -118,6 +120,7 @@ registerFloorCrit("galaxyCrit", {
           i % 2 ? COLOR.heavenlyGold : COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.restore();
     }
     drawDetonation(ctx, disk.center, since, GALAXY_BLAST, now);

@@ -31,6 +31,7 @@ import {
 } from "../../../../shared/clutter";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "snowplow";
 const BITS = 380;
@@ -255,6 +256,7 @@ export const forceSnowplowEvent = registerWispEvent(
           if (ms < 0 || ms > burstAt) return;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           const gather = easeOut(clamp01((ms - heapedAt) / gatherMs));
           for (let i = 0; i < spots.length; i++) {
             if (ms < falls[i]) continue;
@@ -278,6 +280,7 @@ export const forceSnowplowEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           if (ms >= snowMs - 200 && ms <= heapedAt + 200) {
             drawWisp(ctx, a.at, ms, now, radius * SIZE, 0.4);

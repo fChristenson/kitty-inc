@@ -33,6 +33,7 @@ import {
   giveHire,
   type RewardHire,
 } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "marbles";
 const MAX_MARBLES = 5;
@@ -206,6 +207,7 @@ export const forceMarblesEvent = registerWispEvent(
           const fade = 1 - clamp01((ms - last.hits) / 500);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let k = 0; k < RING_DOTS; k++) {
             const a = (k / RING_DOTS) * Math.PI * 2;
             stampGlimmer(
@@ -217,6 +219,7 @@ export const forceMarblesEvent = registerWispEvent(
               k % 2 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           for (const b of splashes)
             drawBounceSplash(ctx, b, ms - b.ms, 110, now);

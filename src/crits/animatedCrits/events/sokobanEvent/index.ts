@@ -20,6 +20,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import type { CoinPath } from "../../../../floors/coins";
 import { totalSpot } from "../../cashFlow";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "sokoban";
 const REWARD = 4;
@@ -241,6 +242,7 @@ export const forceSokobanEvent = registerWispEvent(
           const fade = 1 - clamp01((ms - burstAt) / 400);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (const t of targets) {
             for (let g = 0; g < GLIMMERS; g++) {
               const a = (Math.PI * 2 * g) / GLIMMERS + ms * 0.002;
@@ -255,6 +257,7 @@ export const forceSokobanEvent = registerWispEvent(
               );
             }
           }
+          endLightBatch(ctx);
           ctx.restore();
           if (ms <= burstAt) drawWisp(ctx, keeperAt, ms, now, SIZE, 0.4);
         },

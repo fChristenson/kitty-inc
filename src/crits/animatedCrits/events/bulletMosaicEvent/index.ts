@@ -22,6 +22,7 @@ import {
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { shapeOutline, SHAPES } from "../../../../shared/drawing";
 import { findRewardBars } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "bulletMosaic";
 const STUDS = 130;
@@ -157,6 +158,7 @@ export const forceBulletMosaicEvent = registerWispEvent(
           const down = easeIn(clamp01((ms - slamAt) / slamMs));
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < STUDS; i++) {
             const b = bullets[i];
             if (ms < b.hitAt) continue;
@@ -172,6 +174,7 @@ export const forceBulletMosaicEvent = registerWispEvent(
               blaze > 0.5 || i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

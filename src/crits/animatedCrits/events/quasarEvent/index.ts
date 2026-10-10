@@ -24,6 +24,7 @@ import { stampGlimmer } from "../../../../shared/twinkle";
 import { COLOR } from "../../../../palette";
 import { planDisk, scatterArms, type Orbit } from "../../../../shared/galaxy";
 import { findRewardBars } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "quasar";
 const STARS = 280;
@@ -159,6 +160,7 @@ export const forceQuasarEvent = registerWispEvent(
           }
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < falls.length; i++) {
             const f = falls[i];
             if (ms >= f.swallowed) continue;
@@ -173,6 +175,7 @@ export const forceQuasarEvent = registerWispEvent(
               i % 2 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           const size = lerp(CORE, fed) * grow * (ms >= igniteAt ? 1.3 : 1);
           drawWisp(ctx, coreAt, ms, now, size, 0.3 + 0.7 * fed);

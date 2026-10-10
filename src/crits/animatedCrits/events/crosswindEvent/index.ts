@@ -25,6 +25,7 @@ import {
   simulateClean,
 } from "../../../../shared/clutter";
 import { findRewardWorkers } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "crosswind";
 const BITS = 320;
@@ -205,6 +206,7 @@ export const forceCrosswindEvent = registerWispEvent(
           if (ms < 0 || ms > endAt) return;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           const gather = easeOut(clamp01((ms - packed) / gatherMs));
           for (let i = 0; i < spots.length; i++) {
             if (ms < leaves[i]) continue;
@@ -238,6 +240,7 @@ export const forceCrosswindEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

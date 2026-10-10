@@ -24,6 +24,7 @@ import {
   totalSpot,
   type Pour,
 } from "../../cashFlow";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "pulseRifle";
 const REWARD = 4;
@@ -133,6 +134,7 @@ export const forcePulseRifleEvent = registerWispEvent(
         drawOver: (ctx, ms, now) => {
           if (ms < chargeMs) {
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (const s of sparks) {
               const t = (ms - s.born) / s.life;
               if (t < 0 || t >= 1) continue;
@@ -146,6 +148,7 @@ export const forcePulseRifleEvent = registerWispEvent(
                 COLOR.heavenlyGold,
               );
             }
+            endLightBatch(ctx);
             ctx.globalCompositeOperation = "source-over";
             drawBeamFlare(
               ctx,

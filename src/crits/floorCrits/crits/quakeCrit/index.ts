@@ -13,6 +13,7 @@ import {
   byHeight,
   drawText,
 } from "../../critPlayer";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const QUAKE_DROP_MS = 260;
 const QUAKE_DELAY_MS = 120;
@@ -75,6 +76,7 @@ registerFloorCrit("quakeCrit", {
       const radius = since * QUAKE_RING_SPEED;
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       ctx.globalAlpha = 1 - since / QUAKE_RING_MS;
       for (let i = 0; i < QUAKE_RING_GLINTS; i++) {
         const a = (i / QUAKE_RING_GLINTS) * Math.PI * 2;
@@ -88,6 +90,7 @@ registerFloorCrit("quakeCrit", {
         );
       }
       ctx.globalAlpha = 1;
+      endLightBatch(ctx);
       ctx.globalCompositeOperation = previous;
     }
     byHeight(bars)

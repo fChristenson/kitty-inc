@@ -18,6 +18,7 @@ import {
   along,
 } from "../../critPlayer";
 import { holeHash } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const RV_IN_MS = 220;
 const RV_FIRST_MS = RV_IN_MS + 60;
@@ -112,6 +113,7 @@ registerFloorCrit("revolverCrit", {
       if (spin > RV_HIT_MS && spin < RV_SPIN_MS + RV_HIT_MS) {
         const previous = ctx.globalCompositeOperation;
         ctx.globalCompositeOperation = "lighter";
+        beginLightBatch(ctx);
         for (let i = 0; i < RV_WHIRL; i++) {
           const a = spin * 0.06 + (i / RV_WHIRL) * Math.PI * 2;
           stampGlimmer(
@@ -123,6 +125,7 @@ registerFloorCrit("revolverCrit", {
             i % 2 ? COLOR.white : COLOR.heavenlyGold,
           );
         }
+        endLightBatch(ctx);
         ctx.globalCompositeOperation = previous;
       }
     }

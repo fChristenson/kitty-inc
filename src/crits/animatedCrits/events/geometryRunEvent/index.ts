@@ -39,6 +39,7 @@ import {
 import { shakeScreen } from "../../../../shared/screenShake";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawWisp, WISP_SIZE, type Point } from "../../../../shared/wisp";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "geometryRun";
 
@@ -234,6 +235,7 @@ function startRun(floor: Floor, context: EventProcContext): void {
       ctx.restore();
       // the glitter spike in its middle
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let s = 0; s < SPIKES; s++)
         stampGlimmer(
           ctx,
@@ -243,6 +245,7 @@ function startRun(floor: Floor, context: EventProcContext): void {
           now * 0.003 + s,
           COLOR.heavenlyGold,
         );
+      endLightBatch(ctx);
       ctx.globalCompositeOperation = "source-over";
       landing.x = x + h;
       landing.y = y;

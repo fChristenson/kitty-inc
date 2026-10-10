@@ -29,6 +29,7 @@ import {
   totalSpot,
   type Pour,
 } from "../../cashFlow";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "deCasteljau";
 const REWARD = 4;
@@ -184,6 +185,7 @@ export const forceDeCasteljauEvent = registerWispEvent(
             }
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (const p of control)
               stampGlimmer(
                 ctx,
@@ -204,6 +206,7 @@ export const forceDeCasteljauEvent = registerWispEvent(
                     ms * 0.004,
                     COLOR.heavenlyGold,
                   );
+            endLightBatch(ctx);
             ctx.restore();
           }
           drawWispBetween(ctx, tipAt, ms, now, HEAD, 0.7, sweepAt, doneAt);

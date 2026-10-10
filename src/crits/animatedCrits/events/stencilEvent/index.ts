@@ -25,6 +25,7 @@ import {
 import { shapeFill, SHAPES } from "../../../../shared/drawing";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "stencil";
 const TILES = 220;
@@ -187,6 +188,7 @@ export const forceStencilEvent = registerWispEvent(
             // the tiles the mist has reached
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (let i = 0; i < tiles.length; i++) {
               if (ms < shows[i]) continue;
               const pop = clamp01((ms - shows[i]) / 150);
@@ -200,6 +202,7 @@ export const forceStencilEvent = registerWispEvent(
                 blaze > 0.5 || i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
               );
             }
+            endLightBatch(ctx);
             ctx.restore();
             if (ms <= sprayMs) {
               drawSpray(ctx, spray, ms, now, SPRAY);
@@ -217,6 +220,7 @@ export const forceStencilEvent = registerWispEvent(
           }
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < shards.length; i++) {
             const s = shards[i];
             if (ms >= s.lands) continue;
@@ -240,6 +244,7 @@ export const forceStencilEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

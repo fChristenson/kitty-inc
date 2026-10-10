@@ -24,6 +24,7 @@ import {
   type Orbit,
 } from "../../../../shared/galaxy";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "tidalTails";
 const MAX_WORKERS = 6;
@@ -219,6 +220,7 @@ export const forceTidalTailsEvent = registerWispEvent(
           }
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < torn.length; i++) {
             const t = torn[i];
             if (ms >= t.lands) continue;
@@ -243,6 +245,7 @@ export const forceTidalTailsEvent = registerWispEvent(
               i % 2 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

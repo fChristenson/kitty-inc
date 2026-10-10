@@ -20,6 +20,7 @@ import { stampGlimmer } from "../../../../shared/twinkle";
 import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "wildfire";
 const COLS = 9;
@@ -186,6 +187,7 @@ export const forceWildfireEvent = registerWispEvent(
           const fade = 1 - clamp01((ms - endAt) / 300);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < n; i++) {
             if (!tree[i]) continue;
             const g = gen[i];
@@ -216,6 +218,7 @@ export const forceWildfireEvent = registerWispEvent(
               COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           const since = ms - strikeAt;
           if (since >= 0 && since < STRIKE_MS) {

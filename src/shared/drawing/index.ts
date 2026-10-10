@@ -7,6 +7,7 @@
 import { COLOR } from "../../palette";
 import { stampGlimmer } from "../twinkle";
 import type { Point } from "../wisp";
+import { beginLightBatch, endLightBatch } from "../lightBatch";
 
 // closed loops in a unit box (-1..1, y down); a hole is a loop inside another
 export type Shape = readonly (readonly Point[])[];
@@ -224,6 +225,7 @@ export function drawDots(
   if (n <= 0 || size <= 0) return;
   ctx.save();
   ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
   for (let i = 0; i < n; i++)
     stampGlimmer(
       ctx,
@@ -233,5 +235,6 @@ export function drawDots(
       i + ms * 0.004,
       blaze > 0.5 || i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
     );
+  endLightBatch(ctx);
   ctx.restore();
 }

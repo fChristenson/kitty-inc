@@ -26,6 +26,7 @@ import { drawAimLaser } from "../../../../shared/beam";
 import { drawDetonation } from "../../../../shared/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardBars } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "fireForEffect";
 // each ranging shell lands this share of the gun's range past (+) or short
@@ -237,6 +238,7 @@ export const forceFireForEffectEvent = registerWispEvent(
           // from the spotting gun while it's still ranging
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (const s of misses) {
             if (ms < s.landsAt) continue;
             const fade = 1 - clamp01((ms - zeroedAt) / 400);
@@ -249,6 +251,7 @@ export const forceFireForEffectEvent = registerWispEvent(
               COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           if (ms < zeroedAt) {
             const next = misses.find((s) => s.landsAt > ms) ?? misses[0];

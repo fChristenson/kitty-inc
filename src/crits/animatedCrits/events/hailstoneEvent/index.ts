@@ -25,6 +25,7 @@ import { drawBeam } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "hailstone";
 // starts that take 14 to 23 steps to fall to 1
@@ -137,6 +138,7 @@ export const forceHailstoneEvent = registerWispEvent(
             );
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = fade;
           for (let i = 0; i <= landed; i++)
             stampGlimmer(
@@ -147,6 +149,7 @@ export const forceHailstoneEvent = registerWispEvent(
               ms * 0.004 + i,
               i === peakAt ? COLOR.white : COLOR.heavenlyGold,
             );
+          endLightBatch(ctx);
           ctx.restore();
           drawWispBetween(ctx, path.at, ms, now, STONE, 0.8, 0, endAt);
         },

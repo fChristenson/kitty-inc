@@ -26,6 +26,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import type { CoinPath } from "../../../../floors/coins";
 import { totalSpot } from "../../cashFlow";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "spinCycle";
 const REWARD = 4;
@@ -204,6 +205,7 @@ export const forceSpinCycleEvent = registerWispEvent(
           const turn = turnAt(ms);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let k = 0; k < STUDS; k++) {
             const a = (k / STUDS) * Math.PI * 2 + turn;
             stampGlimmer(
@@ -223,6 +225,7 @@ export const forceSpinCycleEvent = registerWispEvent(
             turn,
             COLOR.white,
           );
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

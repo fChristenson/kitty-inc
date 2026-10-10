@@ -22,6 +22,7 @@ import {
   SHAPES,
 } from "../../../../shared/drawing";
 import { findRewardWorkers } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "sweetheart";
 const MAX_WORKERS = 6;
@@ -184,6 +185,7 @@ export const forceSweetheartEvent = registerWispEvent(
           }
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < DOTS; i++) {
             const s = showers[i];
             if (ms >= s.lands) continue;
@@ -207,6 +209,7 @@ export const forceSweetheartEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

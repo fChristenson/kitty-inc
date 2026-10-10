@@ -25,6 +25,7 @@ import {
 } from "../../../../shared/lightning";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "eyewall";
 const STRIKES = 14;
@@ -188,6 +189,7 @@ export const forceEyewallEvent = registerWispEvent(
             const whirl = ms * 0.004;
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (let i = 0; i < GLITTER; i++) {
               const g = wallA + whirl + (i / GLITTER) * Math.PI * 2;
               const wobble = 1 + 0.08 * Math.sin(i * 2.3 + ms / 90);
@@ -200,6 +202,7 @@ export const forceEyewallEvent = registerWispEvent(
                 i % 4 ? COLOR.heavenlyGold : COLOR.white,
               );
             }
+            endLightBatch(ctx);
             ctx.restore();
           }
           for (const s of strikes) {

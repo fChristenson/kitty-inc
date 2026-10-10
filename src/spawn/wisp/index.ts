@@ -20,6 +20,7 @@ import {
 import { multiply, type BigNumber } from "../../shared/bigNumber";
 import { alongRoute, bezier } from "../../shared/curves";
 import { between, clamp01, easeOutCubic, lerp } from "../../shared/easing";
+import { beginLightBatch, endLightBatch } from "../../shared/lightBatch";
 import { isScreenFrozen } from "../../shared/screenFreeze";
 import { shakeScreen } from "../../shared/screenShake";
 import { createSpawnRoll } from "../../shared/spawnRoll";
@@ -484,6 +485,7 @@ export function drawWispSpawn(
   let alive = false;
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
   for (const burst of r.bursts) {
     const since = t - burst.at;
     if (since < 0 || since > BURST_FLASH_MS) continue;
@@ -548,6 +550,7 @@ export function drawWispSpawn(
       speck.color,
     );
   }
+  endLightBatch(ctx);
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = previous;
   if (!alive && ms > dashMs) run = null;

@@ -18,6 +18,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { drawBeam } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardBars } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "travellingSalesman";
 const CITIES = 14;
@@ -234,6 +235,7 @@ export const forceTravellingSalesmanEvent = registerWispEvent(
           const pop = easeOutBack(grow);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < n; i++)
             stampGlimmer(
               ctx,
@@ -243,6 +245,7 @@ export const forceTravellingSalesmanEvent = registerWispEvent(
               now / 500 + i,
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
+          endLightBatch(ctx);
           ctx.restore();
           drawWisp(ctx, runnerAt, ms, now, RUNNER, 1);
         },

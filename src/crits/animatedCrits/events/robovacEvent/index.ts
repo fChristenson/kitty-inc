@@ -26,6 +26,7 @@ import {
 import { ricochet } from "../../../../shared/bounce";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "robovac";
 const BITS = 380;
@@ -184,6 +185,7 @@ export const forceRobovacEvent = registerWispEvent(
           if (ms < 0 || ms > dockAt) return;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < spots.length; i++) {
             if (ms < drops[i]) continue;
             if (ms < dumpMs) {
@@ -200,6 +202,7 @@ export const forceRobovacEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           if (!vacAt(ms, vac)) return;
           const full = clamp01((ms - dumpMs) / (dockAt - dumpMs));

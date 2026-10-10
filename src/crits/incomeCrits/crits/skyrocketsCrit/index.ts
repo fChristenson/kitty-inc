@@ -15,6 +15,7 @@ import {
 } from "../../../floorCrits/critPlayer";
 import { holeHash } from "../../../floorCrits/critPlayer/shared";
 import { drawFinale, drawNumberShrink, readoutSpot } from "../shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const DROP_MS = 200;
 const ROCKETS = 10;
@@ -119,6 +120,7 @@ registerFloorCrit("skyrocketsCrit", {
     drawNumberShrink(ctx, r, ms);
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
+    beginLightBatch(ctx);
     // sparks dropping to their pads, waiting there till they go up
     const drop = clamp01(ms / DROP_MS);
     for (let k = 0; k < rockets.length; k++) {
@@ -156,6 +158,7 @@ registerFloorCrit("skyrocketsCrit", {
         );
       }
     }
+    endLightBatch(ctx);
     ctx.restore();
     for (let k = 0; k < rockets.length; k++) {
       const rk = rockets[k];

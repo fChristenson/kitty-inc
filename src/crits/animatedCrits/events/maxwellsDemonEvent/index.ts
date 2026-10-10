@@ -21,6 +21,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { drawBeam } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardWorkers, type RewardWorker } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "maxwellsDemon";
 const MAX_WORKERS = 6;
@@ -286,6 +287,7 @@ export const forceMaxwellsDemonEvent = registerWispEvent(
           }
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < GAS; i++) {
             const f = flights[i];
             if (ms < burstAt || !f) {
@@ -309,6 +311,7 @@ export const forceMaxwellsDemonEvent = registerWispEvent(
               hot[i] ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

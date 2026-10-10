@@ -23,6 +23,7 @@ interface Gl {
   instances: WebGLBuffer;
   capacity: number;
   resolution: WebGLUniformLocation;
+  pointAt: (first: number) => void;
 }
 
 let shared: Gl | null = null;
@@ -110,16 +111,29 @@ function getGl(): Gl | null {
   const instances = gl.createBuffer()!;
   gl.bindBuffer(gl.ARRAY_BUFFER, instances);
   const stride = SPRITE_FLOATS * 4;
-  const attribute = (name: string, size: number, offset: number) => {
-    const at = gl.getAttribLocation(program, name);
+  const layout: [number, number, number][] = [
+    [gl.getAttribLocation(program, "center"), 2, 0],
+    [gl.getAttribLocation(program, "axes"), 4, 2],
+    [gl.getAttribLocation(program, "rect"), 4, 6],
+    [gl.getAttribLocation(program, "alpha"), 1, 10],
+  ];
+  for (const [at] of layout) {
     gl.enableVertexAttribArray(at);
-    gl.vertexAttribPointer(at, size, gl.FLOAT, false, stride, offset * 4);
     gl.vertexAttribDivisor(at, 1);
+  }
+  // the instance attributes read from `first` instance on
+  const pointAt = (first: number) => {
+    for (const [at, size, offset] of layout)
+      gl.vertexAttribPointer(
+        at,
+        size,
+        gl.FLOAT,
+        false,
+        stride,
+        (first * SPRITE_FLOATS + offset) * 4,
+      );
   };
-  attribute("center", 2, 0);
-  attribute("axes", 4, 2);
-  attribute("rect", 4, 6);
-  attribute("alpha", 1, 10);
+  pointAt(0);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
   gl.enable(gl.SCISSOR_TEST);
@@ -135,14 +149,16 @@ function getGl(): Gl | null {
     instances,
     capacity: 0,
     resolution: gl.getUniformLocation(program, "resolution")!,
+    pointAt,
   };
   return shared;
 }
 
-// a texture of image with mipmaps, so sprites drawn small stay smooth; null
-// without WebGL2
+// a texture of image, with mipmaps so sprites drawn small stay smooth (or
+// without, sampled like a 2D drawImage); null without WebGL2
 export function createSpriteTexture(
   image: TexImageSource & { width: number; height: number },
+  mipmaps = true,
 ): SpriteTexture | null {
   const g = getGl();
   if (!g) return null;
@@ -151,11 +167,11 @@ export function createSpriteTexture(
   gl.bindTexture(gl.TEXTURE_2D, texture);
   gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-  gl.generateMipmap(gl.TEXTURE_2D);
+  if (mipmaps) gl.generateMipmap(gl.TEXTURE_2D);
   gl.texParameteri(
     gl.TEXTURE_2D,
     gl.TEXTURE_MIN_FILTER,
-    gl.LINEAR_MIPMAP_LINEAR,
+    mipmaps ? gl.LINEAR_MIPMAP_LINEAR : gl.LINEAR,
   );
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -176,6 +192,40 @@ export function drawSprites(
   right: number,
   bottom: number,
 ): boolean {
+  oneSheet[0] = sheet;
+  oneCount[0] = count;
+  return drawSpriteGroups(
+    ctx,
+    oneSheet,
+    oneCount,
+    1,
+    data,
+    left,
+    top,
+    right,
+    bottom,
+    false,
+  );
+}
+
+const oneSheet: SpriteTexture[] = [];
+const oneCount = new Int32Array(1);
+
+// drawSprites for instances from several sheets: counts[i] of sheets[i]'s,
+// one group after another in data. additive sums overlapping sprites, as a
+// "lighter" ctx would, instead of laying each over the last
+export function drawSpriteGroups(
+  ctx: CanvasRenderingContext2D,
+  sheets: readonly SpriteTexture[],
+  counts: ArrayLike<number>,
+  groups: number,
+  data: Float32Array,
+  left: number,
+  top: number,
+  right: number,
+  bottom: number,
+  additive: boolean,
+): boolean {
   const g = shared;
   if (!g || g.gl.isContextLost()) return false;
   const { gl, canvas } = g;
@@ -185,6 +235,8 @@ export function drawSprites(
   const y = Math.max(0, Math.floor(top));
   const w = Math.min(width, Math.ceil(right)) - x;
   const h = Math.min(height, Math.ceil(bottom)) - y;
+  let count = 0;
+  for (let i = 0; i < groups; i++) count += counts[i];
   if (count === 0 || w <= 0 || h <= 0) return true;
   if (canvas.width !== width || canvas.height !== height) {
     canvas.width = width;
@@ -195,6 +247,7 @@ export function drawSprites(
   // GL counts rows from the bottom
   gl.scissor(x, height - y - h, w, h);
   gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.blendFunc(gl.ONE, additive ? gl.ONE : gl.ONE_MINUS_SRC_ALPHA);
   gl.bindVertexArray(g.vao);
   gl.bindBuffer(gl.ARRAY_BUFFER, g.instances);
   const floats = count * SPRITE_FLOATS;
@@ -203,8 +256,15 @@ export function drawSprites(
     gl.bufferData(gl.ARRAY_BUFFER, g.capacity * 4, gl.DYNAMIC_DRAW);
   }
   gl.bufferSubData(gl.ARRAY_BUFFER, 0, data, 0, floats);
-  gl.bindTexture(gl.TEXTURE_2D, sheet.texture);
-  gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, count);
+  let first = 0;
+  for (let i = 0; i < groups; i++) {
+    const n = counts[i];
+    if (n === 0) continue;
+    g.pointAt(first);
+    gl.bindTexture(gl.TEXTURE_2D, sheets[i].texture);
+    gl.drawArraysInstanced(gl.TRIANGLE_STRIP, 0, 4, n);
+    first += n;
+  }
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalAlpha = 1;

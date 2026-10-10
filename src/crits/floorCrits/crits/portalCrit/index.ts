@@ -16,6 +16,7 @@ import {
   drawText,
 } from "../../critPlayer";
 import { skyY, groundY, BAR_HALF_H } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const PORTAL_IN_MS = 300;
 const PORTAL_OPEN_MS = 200;
@@ -71,6 +72,7 @@ function drawPortal(
   if (open <= 0) return;
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
   for (let i = 0; i < PORTAL_GLINTS; i++) {
     const a = (i / PORTAL_GLINTS) * Math.PI * 2 + ms * 0.006;
     stampGlimmer(
@@ -82,6 +84,7 @@ function drawPortal(
       i % 2 ? COLOR.heavenlyGold : COLOR.white,
     );
   }
+  endLightBatch(ctx);
   ctx.globalCompositeOperation = previous;
 }
 

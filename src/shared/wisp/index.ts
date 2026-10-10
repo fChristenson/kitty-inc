@@ -4,6 +4,7 @@
 // that sends one flitting about, with the playful swoop it flies along
 import { COLOR } from "../../palette";
 import { fadeStops, glowSprite } from "../glowSprite";
+import { beginLightBatch, endLightBatch, queueLight } from "../lightBatch";
 import { hash01, paintTwinkleAt, stampTwinkle } from "../twinkle";
 
 export type Point = { x: number; y: number };
@@ -141,17 +142,12 @@ function stampCell(
   y: number,
   r: number,
 ): void {
-  ctx.drawImage(
-    atlas!,
-    cell.x - cell.half,
-    cell.y - cell.half,
-    cell.half * 2,
-    cell.half * 2,
-    x - r,
-    y - r,
-    r * 2,
-    r * 2,
-  );
+  const sx = cell.x - cell.half;
+  const sy = cell.y - cell.half;
+  const side = cell.half * 2;
+  if (queueLight(ctx, atlas!, sx, sy, side, side, x - r, y - r, r * 2, r * 2))
+    return;
+  ctx.drawImage(atlas!, sx, sy, side, side, x - r, y - r, r * 2, r * 2);
 }
 
 // colorIndex into ATLAS_COLORS
@@ -392,6 +388,7 @@ export function drawWispTrail(
   const first = Math.floor((ms - TAIL_LIFE_MS) / TAIL_MS);
   const start = (Math.floor(first / stride) + 1) * stride;
   let shed = false;
+  beginLightBatch(ctx);
   for (let e = start; e <= Math.floor(ms / TAIL_MS); e += stride) {
     const bornAt = e * TAIL_MS;
     const age = (ms - bornAt) / TAIL_LIFE_MS;
@@ -416,6 +413,7 @@ export function drawWispTrail(
       now,
     );
   }
+  endLightBatch(ctx);
   if (shed) trailsThisFrame++;
   lastTrailAt = performance.now();
   ctx.globalAlpha = 1;

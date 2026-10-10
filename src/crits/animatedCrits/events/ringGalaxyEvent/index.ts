@@ -25,6 +25,7 @@ import { stampGlimmer } from "../../../../shared/twinkle";
 import { ringTargets } from "../../../../shared/coinTargets";
 import { planDisk, scatterArms, type Orbit } from "../../../../shared/galaxy";
 import { totalSpot } from "../../cashFlow";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "ringGalaxy";
 const REWARD = 4;
@@ -206,6 +207,7 @@ export const forceRingGalaxyEvent = registerWispEvent(
           const ring = ms >= hitAt ? ringAt(ms) : -1e4;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = fade;
           for (let i = 0; i < stars.length; i++) {
             const o = stars[i];
@@ -222,6 +224,7 @@ export const forceRingGalaxyEvent = registerWispEvent(
               near > 0.5 || i % 2 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           if (fade > 0)
             drawWisp(ctx, centreAt, ms, now, WISP_SIZE * grow * fade, 0.5);

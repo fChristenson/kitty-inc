@@ -9,6 +9,7 @@ import { aimBullet, fireBullet, type Box, type Bullet } from "../bullets";
 import { clamp01, easeOut, easeOutCubic, lerp } from "../easing";
 import { hash01, stampGlimmer } from "../twinkle";
 import { drawWisp, type Point } from "../wisp";
+import { beginLightBatch, endLightBatch } from "../lightBatch";
 
 // the screen the game is played on, in the canvas's space
 export interface ShmupBox {
@@ -39,6 +40,7 @@ export function drawStarfield(
   ctx.fillRect(box.x, box.y, box.w, box.h);
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
   for (let l = 0; l < STAR_LAYERS.length; l++) {
     const { speed, size, color } = STAR_LAYERS[l];
     for (let i = 0; i < STARS; i++) {
@@ -54,6 +56,7 @@ export function drawStarfield(
       );
     }
   }
+  endLightBatch(ctx);
   ctx.globalCompositeOperation = previous;
 }
 

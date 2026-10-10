@@ -39,6 +39,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../../eventProcs";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "lockOnVolley";
 
@@ -237,6 +238,7 @@ function startLockOnVolley(floor: Floor, context: EventProcContext): void {
             const r = size * LOCK_R * (1 + Math.exp(-(ms - foe.lock) / 80));
             const previous = ctx.globalCompositeOperation;
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (let i = 0; i < LOCK_GLIMMERS; i++) {
               const a = (i / LOCK_GLIMMERS) * Math.PI * 2 + ms * 0.004;
               stampGlimmer(
@@ -248,6 +250,7 @@ function startLockOnVolley(floor: Floor, context: EventProcContext): void {
                 i % 2 ? COLOR.heavenlyGold : COLOR.white,
               );
             }
+            endLightBatch(ctx);
             ctx.globalCompositeOperation = previous;
           }
         }

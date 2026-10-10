@@ -38,6 +38,7 @@ import {
   findOnScreenWorkers,
   type OnScreenWorker,
 } from "../../onScreenWorkers";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "constellation";
 const STAR_SIZE = WORKER_HEIGHT * 0.22;
@@ -200,6 +201,7 @@ function drawOverlay(
     ctx.restore();
     ctx.save();
     ctx.globalCompositeOperation = "lighter";
+    beginLightBatch(ctx);
     for (let k = 0, d = TRAIL_STEP / 2; d < laid; k++, d += TRAIL_STEP) {
       const scatter = (hash01(s, k) - 0.5) * 2 * TRAIL_SCATTER;
       const twinkle = 0.5 + 0.5 * Math.sin(now / 140 + hash01(k, s) * 20);
@@ -214,6 +216,7 @@ function drawOverlay(
         COLOR.heavenlyGold,
       );
     }
+    endLightBatch(ctx);
     ctx.restore();
   }
 

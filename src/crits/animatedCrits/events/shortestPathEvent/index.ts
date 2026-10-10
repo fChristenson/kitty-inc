@@ -25,6 +25,7 @@ import { stampGlimmer } from "../../../../shared/twinkle";
 import { measure, pointAlong } from "../../cashFlow";
 import { findRewardWorkers } from "../../eventRewards";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "shortestPath";
 const COLS = 5;
@@ -242,6 +243,7 @@ export const forceShortestPathEvent = registerWispEvent(
           }
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = fade;
           for (let i = 0; i < nodes.length; i++) {
             const lit = front >= dist[i];
@@ -257,6 +259,7 @@ export const forceShortestPathEvent = registerWispEvent(
               lit ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           for (const run of runs)
             drawWispBetween(

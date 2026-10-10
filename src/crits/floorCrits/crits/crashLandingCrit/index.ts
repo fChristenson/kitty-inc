@@ -24,6 +24,7 @@ import {
   groundY,
   BAR_HALF_H,
 } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const CRASH_IN_MS = 250;
 const CRASH_ENTRY_MS = 420;
@@ -162,6 +163,7 @@ registerFloorCrit("crashLandingCrit", {
     if (ms >= CRASH_IN_MS && ms < crash) {
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let i = 1; i <= CRASH_DEBRIS; i++) {
         const at = shipAt(
           points,
@@ -176,6 +178,7 @@ registerFloorCrit("crashLandingCrit", {
           i % 2 ? COLOR.heavenlyGold : COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.globalCompositeOperation = previous;
     }
     drawWispBetween(

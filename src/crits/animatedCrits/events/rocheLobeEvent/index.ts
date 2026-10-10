@@ -20,6 +20,7 @@ import { stampGlimmer } from "../../../../shared/twinkle";
 import { ringTargets } from "../../../../shared/coinTargets";
 import { planDisk, scatterDisk, type Orbit } from "../../../../shared/galaxy";
 import { totalSpot } from "../../cashFlow";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "rocheLobe";
 const REWARD = 4;
@@ -182,6 +183,7 @@ export const forceRocheLobeEvent = registerWispEvent(
           if (ms < novaAt) {
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (let i = 0; i < grains.length; i++) {
               const g = grains[i];
               if (ms < g.leaves - SLIDE_MS)
@@ -216,6 +218,7 @@ export const forceRocheLobeEvent = registerWispEvent(
                 ms >= g.arrives || i % 2 ? COLOR.white : COLOR.heavenlyGold,
               );
             }
+            endLightBatch(ctx);
             ctx.restore();
           }
           drawWisp(

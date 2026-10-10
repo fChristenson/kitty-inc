@@ -20,6 +20,7 @@ import {
   along,
 } from "../../critPlayer";
 import { holeHash, groundY } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const ICBM_IN_MS = 280;
 const ICBM_CLIMB_MS = 700;
@@ -114,6 +115,7 @@ registerFloorCrit("icbmCrit", {
     ) {
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let i = 0; i < ICBM_SMOKE; i++) {
         const life =
           ((ms - ICBM_IN_MS) / ICBM_SMOKE_MS + holeHash(i, 3002)) % 1;
@@ -127,6 +129,7 @@ registerFloorCrit("icbmCrit", {
           COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.globalCompositeOperation = previous;
     }
     byHeight(bars).forEach((bar, k) => {

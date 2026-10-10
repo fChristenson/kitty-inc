@@ -24,6 +24,7 @@ import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawStars, planDisk, scatterArms } from "../../../../shared/galaxy";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "barredSpiral";
 const MAX_FLINGS = 6;
@@ -210,6 +211,7 @@ export const forceBarredSpiralEvent = registerWispEvent(
           const a = angleAt(ms);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = fade;
           for (let i = 0; i < BAR_STARS; i++) {
             const u = (i + 0.5) / BAR_STARS;
@@ -224,6 +226,7 @@ export const forceBarredSpiralEvent = registerWispEvent(
               i % 2 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           drawWisp(
             ctx,

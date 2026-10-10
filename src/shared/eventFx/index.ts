@@ -9,6 +9,7 @@ import { LONG_PRESS_TICK_MS } from "../pressAndHold";
 import { drawGoldShimmer } from "../goldShimmer";
 import { fadeStops, glowSprite } from "../glowSprite";
 import { hash01, stampGlimmer } from "../twinkle";
+import { beginLightBatch, endLightBatch } from "../lightBatch";
 
 const BEAT_MS = LONG_PRESS_TICK_MS * 4;
 const RING_MS = 420;
@@ -402,6 +403,7 @@ export function drawExplosion(
   const out = 1 - (1 - t) ** 3;
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
   for (let i = 0; i < EXPLOSION_SPARKS; i += stride) {
     const angle = ((i + hash01(i, 4) * 0.5) / EXPLOSION_SPARKS) * Math.PI * 2;
     const r = reach * (0.45 + 0.55 * hash01(i, 5)) * out;
@@ -414,6 +416,7 @@ export function drawExplosion(
       COLOR.heavenlyGold,
     );
   }
+  endLightBatch(ctx);
   ctx.globalCompositeOperation = previous;
 }
 

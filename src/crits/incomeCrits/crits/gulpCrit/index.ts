@@ -18,6 +18,7 @@ import {
 } from "../../../floorCrits/critPlayer";
 import { holeHash } from "../../../floorCrits/critPlayer/shared";
 import { drawFinale, drawNumberShrink, readoutSpot } from "../shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const FLING_MS = 220;
 const BITS = 420;
@@ -181,6 +182,7 @@ registerFloorCrit("gulpCrit", {
       const fling = 1 - (1 - clamp01(ms / FLING_MS)) ** 3;
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let i = 0; i < BITS; i++) {
         const sx = spots[i * 2];
         const sy = spots[i * 2 + 1];
@@ -217,6 +219,7 @@ registerFloorCrit("gulpCrit", {
         const p = pulled(hole, dx, dy, u);
         stampGlimmer(ctx, p.x, p.y, size, spin, u > 0.5 ? COLOR.white : color);
       }
+      endLightBatch(ctx);
       ctx.restore();
     }
     const { spurts, spurtAt } = gulp;

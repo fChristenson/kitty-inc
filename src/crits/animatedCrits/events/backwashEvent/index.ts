@@ -22,6 +22,7 @@ import {
 } from "../../../../shared/clutter";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "backwash";
 const BITS = 300;
@@ -190,6 +191,7 @@ export const forceBackwashEvent = registerWispEvent(
           if (ms < 0 || ms > endAt) return;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = 1 - clamp01((ms - burstAt) / FADE_MS);
           const settle = easeOut(clamp01((ms - gathered) / SETTLE_MS));
           const shove = easeIn(clamp01((ms - settled) / BURST_MS));
@@ -215,6 +217,7 @@ export const forceBackwashEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

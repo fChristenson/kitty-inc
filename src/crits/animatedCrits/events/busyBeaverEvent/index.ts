@@ -23,6 +23,7 @@ import { clamp01, easeIn, easeOut, lerp } from "../../../../shared/easing";
 import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "busyBeaver";
 const MAX_HIRES = 4;
@@ -255,6 +256,7 @@ export const forceBusyBeaverEvent = registerWispEvent(
           const grow = easeOut(clamp01(ms / bootMs));
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < machine.cells; i++) {
             const lit = tape[i] === 1;
             // a gold mark that's flown off leaves its cell dark
@@ -268,6 +270,7 @@ export const forceBusyBeaverEvent = registerWispEvent(
               lit ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           drawWispBetween(
             ctx,

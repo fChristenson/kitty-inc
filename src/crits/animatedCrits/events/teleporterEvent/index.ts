@@ -17,6 +17,7 @@ import { drawAimLaser, drawBeam, drawBeamFlare } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { createBeats } from "../../../../shared/eventBeats";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "teleporter";
 const MAX_HIRES = 6;
@@ -121,6 +122,7 @@ export const forceTeleporterEvent = registerWispEvent(
             const run = (ms - p.fires) * RING_SPEED * (1 + charge);
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (let r = 0; r < RINGS; r++) {
               const y = p.sky.y + ((run + (r * length) / RINGS) % length);
               for (let g = 0; g < RING_GLINTS; g++) {
@@ -135,6 +137,7 @@ export const forceTeleporterEvent = registerWispEvent(
                 );
               }
             }
+            endLightBatch(ctx);
             ctx.restore();
           }
         },

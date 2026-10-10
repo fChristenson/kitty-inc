@@ -18,6 +18,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "isingModel";
 const COLS = 14;
@@ -145,6 +146,7 @@ export const forceIsingModelEvent = registerWispEvent(
           const blaze = ms >= blazeAt ? 0.7 + 0.3 * Math.sin(now / 40) : 1;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < n; i++) {
             const grow = easeOut(clamp01((ms - (i % COLS) * 15) / growMs));
             if (grow <= 0) continue;
@@ -172,6 +174,7 @@ export const forceIsingModelEvent = registerWispEvent(
               up ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

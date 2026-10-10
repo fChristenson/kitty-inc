@@ -23,6 +23,7 @@ import {
   scatterDisk,
 } from "../../../../shared/galaxy";
 import { findRewardBars } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "polarRing";
 const DISK_STARS = 240;
@@ -178,6 +179,7 @@ export const forcePolarRingEvent = registerWispEvent(
           const heat = 1 - tiltAt(ms) / (Math.PI / 2);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < RING_STARS; i++) {
             const s = shower[i];
             if (ms >= s.lands) continue;
@@ -199,6 +201,7 @@ export const forcePolarRingEvent = registerWispEvent(
               heat > 0.5 || i % 2 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

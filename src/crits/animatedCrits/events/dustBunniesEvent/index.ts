@@ -29,6 +29,7 @@ import {
   type SweepStroke,
 } from "../../../../shared/clutter";
 import { findRewardWorkers } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "dustBunnies";
 const BITS = 360;
@@ -203,6 +204,7 @@ export const forceDustBunniesEvent = registerWispEvent(
           if (ms < 0 || ms > endAt) return;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           const gather = easeOut(clamp01((ms - sweptAt) / gatherMs));
           for (let i = 0; i < spots.length; i++) {
             const k = owner[i];
@@ -237,6 +239,7 @@ export const forceDustBunniesEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           if (ms >= blowMs - 100 && ms <= sweptAt + 100) {
             const b = sweep.at(Math.min(Math.max(ms, blowMs), sweptAt), broom);

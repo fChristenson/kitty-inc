@@ -23,6 +23,7 @@ import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
 import { getButtonCenter } from "../../../../floors/upgradeButton";
 import { getLockCenter } from "../../../../floors/floorLock";
 import { findRewardLocked } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "blastSweep";
 const BITS = 460;
@@ -238,6 +239,7 @@ export const forceBlastSweepEvent = registerWispEvent(
           const collapse = easeIn(clamp01((ms - collapseAt) / COLLAPSE_MS));
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < n; i++) {
             if (ms < lands[i])
               bezier(button, bows[i], spots[i], easeOut(ms / lands[i]), bit);
@@ -255,6 +257,7 @@ export const forceBlastSweepEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

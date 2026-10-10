@@ -43,6 +43,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../../eventProcs";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "cometChase";
 
@@ -182,6 +183,7 @@ function startCometChase(floor: Floor, context: EventProcContext): void {
           // the tail: glitter streaming back along where it's been
           const previous = ctx.globalCompositeOperation;
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let j = 0; j < TAIL_BITS; j++) {
             const at = cometAt(view, ms - j * TAIL_LAG);
             const spread = (j / TAIL_BITS) * TAIL_SPREAD * view.w;
@@ -194,6 +196,7 @@ function startCometChase(floor: Floor, context: EventProcContext): void {
               j % 3 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.globalCompositeOperation = previous;
           drawWisp(ctx, (t) => cometAt(view, t), ms, now, WISP_SIZE * COMET, 1);
         }

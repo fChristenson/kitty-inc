@@ -29,6 +29,7 @@ import {
   giveHire,
   type RewardHire,
 } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "harmonics";
 const MAX_LOOPS = 5;
@@ -195,6 +196,7 @@ export const forceHarmonicsEvent = registerWispEvent(
             }
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (let j = 1; j < n; j++)
               stampGlimmer(
                 ctx,
@@ -204,6 +206,7 @@ export const forceHarmonicsEvent = registerWispEvent(
                 now / 300 + j,
                 COLOR.white,
               );
+            endLightBatch(ctx);
             ctx.restore();
             for (const p of pegAt)
               drawWisp(ctx, p, ms, now, PEG * grow * fade, 0.5);

@@ -4,6 +4,7 @@
 // Rendered once per color and stamped, since trails and glitter draw hundreds
 import { COLOR } from "../../palette";
 import { processWhenIdle } from "../idle";
+import { queueLight } from "../lightBatch";
 
 const SPRITE_HALF = 128;
 const bigSprites = new Map<string, HTMLCanvasElement>();
@@ -157,17 +158,15 @@ export function stampTwinkle(
   const turn = ((rotation % QUARTER) + QUARTER) % QUARTER;
   const step = Math.round((turn / QUARTER) * TURN_STEPS) % TURN_STEPS;
   const half = SMALL_HALVES[level];
-  ctx.drawImage(
-    getAtlas(color, paired),
-    step * cellSize(level) + CELL_PAD,
-    rowTops[level] + CELL_PAD,
-    half * 2,
-    half * 2,
-    x - size,
-    y - size,
-    size * 2,
-    size * 2,
-  );
+  const atlas = getAtlas(color, paired);
+  const sx = step * cellSize(level) + CELL_PAD;
+  const sy = rowTops[level] + CELL_PAD;
+  const side = half * 2;
+  const dx = x - size;
+  const dy = y - size;
+  const ds = size * 2;
+  if (queueLight(ctx, atlas, sx, sy, side, side, dx, dy, ds, ds)) return;
+  ctx.drawImage(atlas, sx, sy, side, side, dx, dy, ds, ds);
 }
 
 export function drawTwinkle(

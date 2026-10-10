@@ -17,6 +17,7 @@ import {
 } from "../../../floorCrits/critPlayer";
 import { holeHash } from "../../../floorCrits/critPlayer/shared";
 import { drawFinale, drawNumberShrink, readoutSpot } from "../shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const BITS = 380;
 const COLS = 14;
@@ -141,6 +142,7 @@ registerFloorCrit("sweepUpCrit", {
       const { spots, ahead } = sweep;
       ctx.save();
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let i = 0; i < BITS; i++) {
         let x = spots[i * 2] * fling;
         let y = Math.min(spots[i * 2 + 1] * fling, by - ahead[i]);
@@ -159,6 +161,7 @@ registerFloorCrit("sweepUpCrit", {
           i % 3 ? COLOR.heavenlyGold : COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.restore();
     }
     if (ms >= SHOVE1_MS && ms < SQUEEZE_MS) {

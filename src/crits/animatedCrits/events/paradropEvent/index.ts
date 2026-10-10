@@ -21,6 +21,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "paradrop";
 const MAX_HIRES = 5;
@@ -159,6 +160,7 @@ export const forceParadropEvent = registerWispEvent(
               ) * 0.3;
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (let c = 0; c < CANOPY; c++) {
               const a = -Math.PI * (0.85 - 0.7 * (c / (CANOPY - 1))) + tilt;
               stampGlimmer(
@@ -170,6 +172,7 @@ export const forceParadropEvent = registerWispEvent(
                 c % 2 === 0 ? COLOR.heavenlyGold : COLOR.white,
               );
             }
+            endLightBatch(ctx);
             ctx.restore();
             drawLitFuse(ctx, d.at(ms), (ms - d.leaves) / dropMs, FUSE, now);
             drawWispBetween(

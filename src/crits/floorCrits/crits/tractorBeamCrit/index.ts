@@ -16,6 +16,7 @@ import {
   drawText,
 } from "../../critPlayer";
 import { holeHash } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const TRACTOR_IN_MS = 300;
 const TRACTOR_ON_MS = 450;
@@ -104,6 +105,7 @@ registerFloorCrit("tractorBeamCrit", {
       // glitter drifting up the beam
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       ctx.globalAlpha = on;
       for (let i = 0; i < TRACTOR_SPECKS; i++) {
         const life =
@@ -120,6 +122,7 @@ registerFloorCrit("tractorBeamCrit", {
         );
       }
       ctx.globalAlpha = 1;
+      endLightBatch(ctx);
       ctx.globalCompositeOperation = previous;
     }
     if (ms >= TRACTOR_IN_MS * 0.6 && ms < TRACTOR_CRASH_MS + 400)

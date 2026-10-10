@@ -38,6 +38,7 @@ import {
   registerEventProc,
   type EventProcContext,
 } from "../../eventProcs";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "starfighter";
 
@@ -217,6 +218,7 @@ function startStarfighter(floor: Floor, context: EventProcContext): void {
             lerp([RETICLE_FROM, RETICLE_TO], clamp01((ms - lockAt) / lockMs));
           const previous = ctx.globalCompositeOperation;
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < RETICLE; i++) {
             const a = (i / RETICLE) * Math.PI * 2 + ms * 0.004;
             stampGlimmer(
@@ -228,6 +230,7 @@ function startStarfighter(floor: Floor, context: EventProcContext): void {
               i % 3 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.globalCompositeOperation = previous;
         }
         for (const hit of wisp.hits) {

@@ -29,6 +29,7 @@ import {
   type GravityHole,
 } from "../../../../shared/clutter";
 import { findRewardBars } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "blackHoleMerger";
 const BITS = 420;
@@ -197,6 +198,7 @@ export const forceBlackHoleMergerEvent = registerWispEvent(
             drawGravityHole(ctx, sunkAt(ms, hole), MERGED * grow, 1, ms, now);
           }
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           const gather = clamp01((ms - meetAt) / GATHER_MS);
           if (ms >= meetAt) sunkAt(ms, hole);
           for (let i = 0; i < spots.length; i++) {
@@ -217,6 +219,7 @@ export const forceBlackHoleMergerEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

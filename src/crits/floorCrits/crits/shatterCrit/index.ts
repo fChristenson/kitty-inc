@@ -13,6 +13,7 @@ import {
   along,
 } from "../../critPlayer";
 import { quadratic, holeHash } from "../../critPlayer/shared";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const SHATTER_CRACK_MS = 350;
 const SHATTER_FLY_MS = 380;
@@ -81,6 +82,7 @@ registerFloorCrit("shatterCrit", {
     if (ms >= SHATTER_CRACK_MS && ms < SHATTER_DETONATE_MS) {
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       for (let i = 0; i < count; i++) {
         const embeds = embedsAt(i);
         const p = clamp01(
@@ -117,6 +119,7 @@ registerFloorCrit("shatterCrit", {
           i % 2 ? COLOR.heavenlyGold : COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.globalCompositeOperation = previous;
     }
     for (let i = 0; i < count; i++) {

@@ -21,6 +21,7 @@ import { drawBeam } from "../../../../shared/beam";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import type { CoinPath } from "../../../../floors/coins";
 import { totalSpot } from "../../cashFlow";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "galtonBoard";
 const REWARD = 4;
@@ -248,6 +249,7 @@ export const forceGaltonBoardEvent = registerWispEvent(
           );
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < pegs.length; i++)
             stampGlimmer(
               ctx,
@@ -257,6 +259,7 @@ export const forceGaltonBoardEvent = registerWispEvent(
               ms * 0.003 + i,
               i % 3 ? COLOR.heavenlyGold : COLOR.white,
             );
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

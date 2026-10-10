@@ -30,6 +30,7 @@ import {
 } from "../../../../shared/lightning";
 import { findRewardBars } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "ionHaze";
 // the mist: its specks, kept this far in from the screen's sides, between
@@ -223,6 +224,7 @@ export const forceIonHazeEvent = registerWispEvent(
           if (ms < 0 || ms > endMs) return;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < specks.length; i++) {
             const s = specks[i];
             if (ms < s.lands || ms >= s.ignites) continue;
@@ -235,6 +237,7 @@ export const forceIonHazeEvent = registerWispEvent(
               i % 3 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           drawSpray(ctx, spray, ms, now, DROPLET);
           drawWispBetween(ctx, nozzleAt, ms, now, NOZZLE, 0.6, 0, sprayMs);

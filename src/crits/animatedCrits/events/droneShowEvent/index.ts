@@ -21,6 +21,7 @@ import { drawDots, shapeFill, SHAPES } from "../../../../shared/drawing";
 import { createBolt, drawBolt, drawStrike } from "../../../../shared/lightning";
 import { findRewardLocked } from "../../eventRewards";
 import { FLOOR_H, FLOOR_W } from "../../../../floors/constants";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "droneShow";
 const DOTS = 200;
@@ -174,6 +175,7 @@ export const forceDroneShowEvent = registerWispEvent(
           if (landed >= n) return;
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = landed; i < n && launches[i] <= ms; i++) {
             const d = drones[i];
             bezier(
@@ -192,6 +194,7 @@ export const forceDroneShowEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

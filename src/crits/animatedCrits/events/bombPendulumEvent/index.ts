@@ -22,6 +22,7 @@ import { createBeats } from "../../../../shared/eventBeats";
 import { drawDetonation, drawLitFuse } from "../../../../shared/explosion";
 import { stampGlimmer } from "../../../../shared/twinkle";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "bombPendulum";
 const MAX_BARS = 3;
@@ -186,6 +187,7 @@ export const forceBombPendulumEvent = registerWispEvent(
             // the pendulum's rope: a line of glitter up to the pivot
             ctx.save();
             ctx.globalCompositeOperation = "lighter";
+            beginLightBatch(ctx);
             for (let d = 1; d < ROPE_DOTS; d++) {
               const f = d / ROPE_DOTS;
               stampGlimmer(
@@ -197,6 +199,7 @@ export const forceBombPendulumEvent = registerWispEvent(
                 d % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
               );
             }
+            endLightBatch(ctx);
             ctx.restore();
             drawLitFuse(
               ctx,

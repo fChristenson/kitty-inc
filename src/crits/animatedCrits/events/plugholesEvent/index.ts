@@ -23,6 +23,7 @@ import {
   type Cleaner,
 } from "../../../../shared/clutter";
 import { drawRewardHires, findRewardHires, giveHire } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "plugholes";
 const MAX_HOLES = 4;
@@ -224,6 +225,7 @@ export const forcePlugholesEvent = registerWispEvent(
           const gather = easeOut(clamp01((ms - drained) / GATHER_MS));
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < spots.length; i++) {
             const t = throws[i];
             if (ms < t.leaves) continue;
@@ -258,6 +260,7 @@ export const forcePlugholesEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
         },
       },

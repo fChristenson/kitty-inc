@@ -25,6 +25,7 @@ import { drawSpray, planSpray } from "../../../../shared/spray";
 import { planDisk, type Orbit } from "../../../../shared/galaxy";
 import { findRewardBars, type RewardBar } from "../../eventRewards";
 import { levelsFor } from "../../../../gameState";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "nebula";
 const SPECKS = 320;
@@ -252,6 +253,7 @@ export const forceNebulaEvent = registerWispEvent(
           const t = clock(ms);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           for (let i = 0; i < specks.length; i++) {
             const s = specks[i];
             const star = stars[s.clump];
@@ -268,6 +270,7 @@ export const forceNebulaEvent = registerWispEvent(
               i % 3 ? COLOR.heavenlyGold : COLOR.white,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           drawSpray(ctx, spray, ms, now, DROPLET);
           drawWispBetween(ctx, nozzleAt, ms, now, NOZZLE, 0.6, 0, sprayMs);

@@ -26,6 +26,7 @@ import {
   type BroomState,
 } from "../../../../shared/clutter";
 import { findRewardWorkers } from "../../eventRewards";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const KEY = "leafFall";
 const LEAVES = 300;
@@ -176,6 +177,7 @@ export const forceLeafFallEvent = registerWispEvent(
           const fade = 1 - clamp01((ms - gathered) / FADE_MS);
           ctx.save();
           ctx.globalCompositeOperation = "lighter";
+          beginLightBatch(ctx);
           ctx.globalAlpha = fade;
           for (let i = 0; i < LEAVES; i++) {
             const { born, sway } = falls[i];
@@ -202,6 +204,7 @@ export const forceLeafFallEvent = registerWispEvent(
               i % 3 === 0 ? COLOR.white : COLOR.heavenlyGold,
             );
           }
+          endLightBatch(ctx);
           ctx.restore();
           // faded in on its first stroke's start and out after its last
           const b = sweep.at(
