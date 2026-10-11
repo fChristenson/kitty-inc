@@ -147,7 +147,19 @@ function stampCell(
   const sy = cell.y - cell.half;
   const side = cell.half * 2;
   if (
-    queueLight(ctx, atlas!, sx, sy, side, side, x - r, y - r, r * 2, r * 2, alpha)
+    queueLight(
+      ctx,
+      atlas!,
+      sx,
+      sy,
+      side,
+      side,
+      x - r,
+      y - r,
+      r * 2,
+      r * 2,
+      alpha,
+    )
   )
     return;
   ctx.globalAlpha = alpha;
