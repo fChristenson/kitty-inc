@@ -1815,6 +1815,8 @@ function floorCritLevels(
   if (kind === "yoYoCrit") return Math.ceil(count / 3);
   if (kind === "harpoonsCrit") return Math.ceil(count / 4);
   if (kind === "bolasCrit") return Math.ceil(count / 8);
+  // a block bonk bonks each bar twice (its own is ground-pounded too)
+  if (kind === "blockBonkCrit") return Math.ceil(count / 3);
   // a saber cuts through each bar twice, and a freeze ray ices then shatters it
   if (kind === "saberCrit" || kind === "freezeRayCrit")
     return Math.ceil(count / 2);

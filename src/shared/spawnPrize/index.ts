@@ -38,8 +38,8 @@ import { drawMini, type Prize } from "./minis";
 
 export { drawMini, prepareMini, type Prize } from "./minis";
 
-// a coin shakes the screen as it lands in the total
-const COIN_SHAKE = 0.4;
+// a coin landing in the total, or a crit number on its bar, shakes the screen
+const PAY_SHAKE = 0.4;
 // a crit number flies up off its spot, swelling to SMASH_SIZE, and slams
 // down onto its floor's bar SMASH_MS after the tap
 const SMASH_MS = 340;
@@ -48,7 +48,6 @@ const SMASH_SIZE = 340;
 // of the flight spent swelling before the slam
 const SMASH_SWELL = 0.55;
 const SMASH_BLAST = 260;
-const SMASH_SHAKE = 0.6;
 const SQUASH_MS = 250;
 const TRAIL_SIZE = 30;
 // a number is done once its blast and trail have faded
@@ -224,7 +223,7 @@ function landCoin(deps: FloorActionsDeps, floor: Floor): void {
   deps.persist();
   pulseHudTotalFlash();
   playSold();
-  shakeScreen(COIN_SHAKE);
+  shakeScreen(PAY_SHAKE);
 }
 
 // where the total readout is on screen, from floor's space
@@ -254,7 +253,7 @@ function smashIn(deps: FloorActionsDeps, payout: Payout): void {
     punchIncomeBar(floor, `+${multiplier} Lvl`, color);
   }
   deps.persist();
-  shakeScreen(SMASH_SHAKE);
+  shakeScreen(PAY_SHAKE);
   playBarExplosion(1 + 0.1 * Math.random());
 }
 

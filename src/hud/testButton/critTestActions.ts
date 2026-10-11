@@ -46,14 +46,23 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
-          <button class="game__button" data-floor-crit="yoYoCrit">Yo-yo Crit</button>
-          <button class="game__button" data-floor-crit="harpoonsCrit">Harpoons Crit</button>
-          <button class="game__button" data-floor-crit="bolasCrit">Bolas Crit</button>
+          <button id="test-nitro-event" class="game__button">Nitro</button>
+          <button id="test-bullet-cancel-event" class="game__button">Bullet Cancel</button>
+          <button class="game__button" data-floor-crit="blockBonkCrit">Block Bonk Crit</button>
         </div>
       </details>
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Animated Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button id="test-overtake-event" class="game__button">Overtake</button>
+          <button id="test-harrier-event" class="game__button">Harrier</button>
+          <button id="test-rooftops-event" class="game__button">Rooftops</button>
+          <button id="test-crate-yard-event" class="game__button">Crate Yard</button>
+          <button id="test-ghost-hall-event" class="game__button">Ghost Hall</button>
+          <button id="test-lift-ride-event" class="game__button">Lift Ride</button>
+          <button id="test-bank-job-event" class="game__button">Bank Job</button>
+          <button id="test-mine-run-event" class="game__button">Mine Run</button>
+          <button id="test-arena-event" class="game__button">Arena</button>
           <button id="test-dyson-sphere-event" class="game__button">Dyson Sphere</button>
           <button id="test-cash-coil-event" class="game__button">Cash Coil</button>
           <button id="test-threading-event" class="game__button">Threading</button>
@@ -1341,6 +1350,9 @@ export function createTestButtonMarkup(): string {
       <details class="test-actions-dropdown">
         <summary class="test-actions-dropdown__toggle">Floor Crits</summary>
         <div class="test-actions-dropdown__menu">
+          <button class="game__button" data-floor-crit="yoYoCrit">Yo-yo Crit</button>
+          <button class="game__button" data-floor-crit="harpoonsCrit">Harpoons Crit</button>
+          <button class="game__button" data-floor-crit="bolasCrit">Bolas Crit</button>
           <button class="game__button" data-crit-up-down="up">Crit Up</button>
           <button class="game__button" data-crit-up-down="down">Crit Down</button>
           <button id="test-merge-crit" class="game__button">Merge Crit</button>

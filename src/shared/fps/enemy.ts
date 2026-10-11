@@ -28,6 +28,32 @@ export interface FpsEnemyLook {
   glow?: boolean;
 }
 
+// a security guard in navy, pistol drawn
+export const FPS_GUARD: FpsEnemyLook = {
+  skin: COLOR.woodFill,
+  eyes: COLOR.black,
+  body: COLOR.nightShiftIndigo,
+  arms: COLOR.nightShiftIndigo,
+  legs: COLOR.tideDeep,
+  boots: COLOR.black,
+  belt: { strap: COLOR.black, buckle: COLOR.silverTicketGray },
+  holster: COLOR.black,
+  gun: COLOR.cauldronIron,
+};
+
+// a horned red imp, clawed, eyes glowing gold
+export const FPS_IMP: FpsEnemyLook = {
+  skin: COLOR.fullHouseCrimson,
+  eyes: COLOR.heavenlyGold,
+  body: COLOR.doubleDownCrimson,
+  arms: COLOR.fullHouseCrimson,
+  legs: COLOR.doubleDownCrimson,
+  boots: COLOR.woodOutline,
+  horns: COLOR.woodRing,
+  claws: COLOR.woodRing,
+  glow: true,
+};
+
 export interface FpsEnemyPose {
   // 0 arm down at the hip, 1 raised to aim at the view
   aim: number;

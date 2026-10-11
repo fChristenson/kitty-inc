@@ -2168,6 +2168,7 @@ export const FLOOR_CRIT_KINDS = [
   "yoYoCrit",
   "harpoonsCrit",
   "bolasCrit",
+  "blockBonkCrit",
   "gunshipCrit",
   "freezeRayCrit",
   "missileTangleCrit",

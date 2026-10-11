@@ -85,20 +85,23 @@ const WINDOW_DARK = COLOR.cauldronIronDark;
 const WINDOW_LIT_COLOR = COLOR.goldenTicketYellow;
 const LINE = COLOR.white;
 
-// the road from the view out to `end` (or REACH ahead), then the blocks
-// lining it, far to near
+// the road from `from` (or the view) out to `end` (or REACH ahead), then the
+// blocks lining it, far to near; drawing a far stretch, then whatever spans
+// the road there, then the near stretch keeps them in depth order
 export function drawRoadStreet(
   ctx: CanvasRenderingContext2D,
   fps: Fps,
   street: RoadStreet,
   end: number,
+  from = -Infinity,
 ): void {
   end = Math.min(end, fps.cam.z + REACH);
   const { half, kerb, pavement } = street;
-  const near = Math.floor(fps.cam.z / SEG);
+  const near = Math.floor(Math.max(fps.cam.z, from) / SEG);
   for (let k = Math.ceil(end / SEG) - 1; k >= near; k--) {
-    const z0 = k * SEG;
-    const z1 = Math.min(end, z0 + SEG);
+    const z0 = Math.max(k * SEG, from);
+    const z1 = Math.min(end, k * SEG + SEG);
+    if (z1 <= z0) continue;
     drawFpsFlat(ctx, fps, 0, -half, half, z0, z1, ASPHALT[k % 2]);
     drawFpsFlat(ctx, fps, 0, -DASH_W, DASH_W, z0, z0 + DASH, LINE);
     for (const side of [-1, 1]) {
@@ -129,13 +132,13 @@ export function drawRoadStreet(
     }
   }
   const pitch = street.block + street.alley;
-  const first = Math.floor(fps.cam.z / pitch);
+  const first = Math.floor(Math.max(fps.cam.z, from) / pitch);
   for (let k = Math.ceil(end / pitch) - 1; k >= first; k--)
-    for (const side of [-1, 1]) drawBlock(ctx, fps, street, k, side, end);
+    for (const side of [-1, 1]) drawBlock(ctx, fps, street, k, side, end, from);
 }
 
-// block k on one side: the face along the road with its windows, and its
-// near end
+// block k on one side between `from` and `end`: the face along the road with
+// its windows, and its near end
 function drawBlock(
   ctx: CanvasRenderingContext2D,
   fps: Fps,
@@ -143,9 +146,11 @@ function drawBlock(
   k: number,
   side: number,
   end: number,
+  from: number,
 ): void {
-  const z0 = k * (street.block + street.alley);
-  const z1 = Math.min(end, z0 + street.block);
+  const start = k * (street.block + street.alley);
+  const z0 = Math.max(start, from);
+  const z1 = Math.min(end, start + street.block);
   if (z1 <= z0) return;
   const salt = street.salt + (side > 0 ? 7 : 0);
   const [low, high] = street.heights;
@@ -167,10 +172,11 @@ function drawBlock(
   if (z0 - fps.cam.z < WINDOW_REACH)
     for (let y = WINDOW_FROM_Y; y + WINDOW_H < tall - 0.1; y += WINDOW_EVERY_Y)
       for (
-        let z = z0 + WINDOW_EVERY_Z / 2;
+        let z = start + WINDOW_EVERY_Z / 2;
         z + WINDOW_W < z1;
         z += WINDOW_EVERY_Z
-      )
+      ) {
+        if (z < z0) continue;
         drawFpsWall(
           ctx,
           fps,
@@ -183,6 +189,8 @@ function drawBlock(
             ? WINDOW_LIT_COLOR
             : WINDOW_DARK,
         );
+      }
+  if (z0 > start) return;
   drawFpsFace(
     ctx,
     fps,

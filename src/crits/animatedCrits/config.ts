@@ -8267,6 +8267,96 @@ export const ANIMATED_EVENT_CONFIG = {
     holdMs: 250,
     mergeMs: 500,
   },
+  // batch 91
+  // road race, crit tiers: src/crits/animatedCrits/events/nitroEvent ("Nitro"): the floors zoom away into the race; the ship hits a run of gold boost pads, each a surge (the view punching wide, speed lines, flames roaring), through a tunnel under a building, the last pad cracking a sonic boom, and through the finish gate's window onto the floors, every bar in view a crit tier up
+  nitroEvent: {
+    chance: 0.01,
+    enterMs: 250, // the floors zooming away into the race
+    flyMs: 4100, // the race, until the finish gate's window is close (5s from the click to the crash)
+    tierGapMs: 90, // between the bars' crit tiers, top to bottom
+  },
+  // shmup, cash: src/crits/animatedCrits/events/bulletCancelEvent ("Bullet Cancel"): the floors shrink away into space; a boss core fills the screen with a bullet curtain, the ship weaving untouched through it; its bomb's ring turns every bullet into a coin sucked into the ship, and the boss blows apart in a chain
+  bulletCancelEvent: {
+    chance: 0.01,
+    enterMs: 300, // the floors shrinking away below
+    payouts: 4, // the floor's payouts all the coins pay between them
+    payoutsBoss: 2, // the floor's payouts the boss pays
+  },
+  // batch 90
+  // road race, crit tiers: src/crits/animatedCrits/events/overtakeEvent ("Overtake"): the floors zoom away into a race flat out behind three rival ships; the ship tucks into each one's slipstream and slingshots past, quicker each time, and leads through the finish gate's window onto the floors, every bar in view a crit tier up
+  overtakeEvent: {
+    chance: 0.01,
+    enterMs: 250, // the floors zooming away into the race
+    flyMs: 4100, // the race, until the finish gate's window is close (5s from the click to the crash)
+    tierGapMs: 90, // between the bars' crit tiers, top to bottom
+  },
+  // rail shooter, cash: src/crits/animatedCrits/events/harrierEvent ("Harrier"): the floors' screen splits into strips onto a checkerboard plain; the ship weaves low between pillars shooting waves of wisps into paying sprays of coins, then a wisp serpent head to tail, and flies into a giant screen of the floors at the horizon
+  harrierEvent: {
+    chance: 0.01,
+    splitMs: 300, // the floors' screen's strips sliding apart
+    flyMs: 0, // the flight into the floors' screen is the landing
+    payoutsPerKill: 0.3, // the floor's payouts each wave wisp pays
+    payoutsSerpent: 3, // the floor's payouts the serpent pays
+  },
+  // batch 89
+  // fps, hires: src/crits/animatedCrits/events/rooftopsEvent ("Rooftops"): the floors' screen tips flat into the first roof; the view sprints over the night rooftops leaping the gaps, dropping guards mid-leap, and leaps through a lit window across the street onto the floors
+  rooftopsEvent: {
+    chance: 0.01,
+    tipMs: 300, // the floors' screen tipping forward flat
+    flyMs: 0, // the leap at the window is the landing
+    hireGapMs: 80, // between the hires, floor by floor
+  },
+  // fps, levels: src/crits/animatedCrits/events/crateYardEvent ("Crate Yard"): the floors' screen slides aside onto a yard of crates; the view leans out of cover as guards pop up one by one, a big one behind a crate wall blown apart; the back shutter rolls up on the floors
+  crateYardEvent: {
+    chance: 0.01,
+    slideMs: 250, // the floors' screen sliding aside
+    flyMs: 0, // the rush through the shutter is the landing
+    levelShare: 0.1, // levels for every bar in view
+    levelGapMs: 70, // between the bars' levels, top to bottom
+  },
+  // fps, cash: src/crits/animatedCrits/events/ghostHallEvent ("Ghost Hall"): the floors' screen drops away in strips onto a candlelit hall of portraits; ghost wisps swoop out of the frames and pop into paying coins, a huge one last; the view rushes into the great portrait onto the floors
+  ghostHallEvent: {
+    chance: 0.01,
+    dropMs: 320, // the floors' screen falling away in strips
+    glideMs: 3200, // the view gliding down the hall
+    flyMs: 0, // the rush into the great portrait is the landing
+    payoutsPerGhost: 0.4, // the floor's payouts each ghost pays
+    payoutsBig: 3, // the floor's payouts the huge ghost pays
+  },
+  // batch 88
+  // fps, a free floor: src/crits/animatedCrits/events/liftRideEvent ("Lift Ride"): the floors' screen slides apart like lift doors; at each stop the doors open on a guard the pistol drops, the car rattling up between, a big one last; the last doors open on the floors and blow the locked floor's lock
+  liftRideEvent: {
+    chance: 0.01,
+    openMs: 200, // the doors sliding open or shut
+    rideMs: 260, // the car rattling up between stops
+    flyMs: 0, // the last doors open as the flight starts; then the landing
+  },
+  // fps, cash: src/crits/animatedCrits/events/bankJobEvent ("Bank Job"): the floors' screen swings open like a vault door onto a strongroom of gold; guards dropped one by one burst their gold into paying coins, then the round vault door is blown and a flood of coins pours out
+  bankJobEvent: {
+    chance: 0.01,
+    swingMs: 320, // the floors' screen swinging open
+    walkMs: 3000, // the walk down the strongroom
+    flyMs: 600, // the flood pouring out before the floors rush up
+    payoutsPerGuard: 0.6, // the floor's payouts each guard's gold pays
+    payoutsVault: 3, // the floor's payouts the vault door pays
+  },
+  // fps, crit tiers: src/crits/animatedCrits/events/mineRunEvent ("Mine Run"): the floors' screen drops away under a mine cart racing down a timbered tunnel, imps dropped as it rattles past, a big one on the rails; it bursts out of the mouth onto the floors, every bar in view taking a crit tier
+  mineRunEvent: {
+    chance: 0.01,
+    dropMs: 300, // the floors' screen dropping away
+    rideMs: 2500, // the ride, until the mouth's close
+    flyMs: 150, // the rush at the mouth, before the landing
+    tierGapMs: 70, // between the bars' crit tiers, top to bottom
+  },
+  // fps, levels: src/crits/animatedCrits/events/arenaEvent ("Arena"): the view dives into a walled pit, imps teleporting in on pads and dropped as it strafes, a champion last, each kill a gold wisp; flung back up, the wisps rain onto the bars as levels
+  arenaEvent: {
+    chance: 0.01,
+    diveMs: 300, // diving through the floors' screen
+    riseMs: 320, // flung up out of the pit as the floors drop back in
+    flyMs: 300, // the wisps raining on the bars, before the landing
+    levelShare: 0.02, // levels per imp's wisp
+    champLevelShare: 0.06, // levels for the champion's wisp
+  },
   // batch 87
   // levels + crit tier: src/crits/animatedCrits/events/dysonSphereEvent ("Dyson Sphere"): gold panels lock round a sun band by band, then the finished sphere beams every bar
   dysonSphereEvent: {

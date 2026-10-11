@@ -329,6 +329,11 @@ export const FLOOR_CRIT_CONFIG = {
     bolasCrit: {
       chance: 0.03,
     },
+    // a wisp platforming up the bars, bonking each from below, then
+    // ground-pounding its own
+    blockBonkCrit: {
+      chance: 0.03,
+    },
     // a gunship circling over the building, raking each bar with tracers,
     // then one cannon round onto its own
     gunshipCrit: {
