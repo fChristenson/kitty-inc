@@ -2191,7 +2191,6 @@ export const INCOME_CRIT_KINDS = [
   "victoryLapCrit",
   "ceilingBounceCrit",
   "drillBitCrit",
-  "gulpCrit",
   "goldCoatCrit",
   "pegboardCrit",
   "starFlingCrit",

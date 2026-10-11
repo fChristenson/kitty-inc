@@ -38,10 +38,6 @@ export const INCOME_CRIT_CONFIG = {
     drillBitCrit: {
       chance: 0.03,
     },
-    // glitter all over the screen gulped by a hole under the total
-    gulpCrit: {
-      chance: 0.03,
-    },
     // two nozzles coating the total in gold mist until it blows
     goldCoatCrit: {
       chance: 0.03,
