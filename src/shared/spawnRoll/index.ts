@@ -1,9 +1,7 @@
 // a random spawn's roll: every rollEveryMs it procs with procChance, never
 // within cooldownMs of the last one leaving, never past the gate shared by
-// every kind (CONFIG.randomSpawns.gate), and never while something heavy is
-// playing (holdSpawnsWhile) with the frames already running slow
+// every kind (CONFIG.randomSpawns.gate)
 import { CONFIG } from "../../config";
-import { isFrameLoaded } from "../frameLoad";
 
 export interface SpawnRollConfig {
   readonly rollEveryMs: number;
@@ -20,20 +18,6 @@ function gateOpen(): boolean {
   const now = performance.now();
   while (recent.length && now - recent[0] >= windowMs) recent.shift();
   return recent.length < count;
-}
-
-const holds: (() => boolean)[] = [];
-
-// no spawn starts while check() is true and the frames run slow: the crit
-// playing keeps its frame rate, the spawn just comes later
-export function holdSpawnsWhile(check: () => boolean): void {
-  holds.push(check);
-}
-
-function held(): boolean {
-  if (!isFrameLoaded()) return false;
-  for (const check of holds) if (check()) return true;
-  return false;
 }
 
 export interface SpawnRoll {
@@ -54,8 +38,7 @@ export function createSpawnRoll(
     procs(now) {
       if (now < nextAt) return false;
       nextAt = now + config.rollEveryMs;
-      if (held() || !gateOpen() || Math.random() >= config.procChance)
-        return false;
+      if (!gateOpen() || Math.random() >= config.procChance) return false;
       recent.push(performance.now());
       return true;
     },

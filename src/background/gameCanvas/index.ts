@@ -60,7 +60,6 @@ import {
   wireCoinSpawn,
 } from "../../spawn/coin";
 import { getTotalIncome } from "../../totalIncome";
-import { noteFrame } from "../../shared/frameLoad";
 
 import { COLOR } from "../../palette";
 import type { BigNumber } from "../../shared/bigNumber";
@@ -581,7 +580,6 @@ export function createGameCanvas(deps: GameCanvasDeps): GameCanvas {
     // (derived from cssW), so drawing anything against a zero/invalid size produces
     // non-finite coordinates and throws (e.g. inside createLinearGradient)
     if (cssW <= 0 || cssH <= 0) return;
-    noteFrame(performance.now());
     if (!isScreenFrozen()) {
       frozenFrame = null;
       drawLiveFrame();

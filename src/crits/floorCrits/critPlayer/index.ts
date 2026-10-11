@@ -10,8 +10,6 @@ import type { Bolt } from "../../../shared/lightning";
 import type { Disk, Orbit } from "../../../shared/galaxy";
 import type { BarLaunch } from "../../../shared/barLaunch";
 import { loadWhenIdle } from "../../../shared/idle";
-import { holdSpawnsWhile } from "../../../shared/spawnRoll";
-import { deferLights, flushLights } from "../../../shared/lightBatch";
 
 export interface Point {
   x: number;
@@ -445,7 +443,6 @@ let pending: PendingLaunch | null = null;
 export function isFloorCritRunning(): boolean {
   return running !== null || pending !== null;
 }
-holdSpawnsWhile(isFloorCritRunning);
 
 function plan(r: Running, bars: Point[], def: FloorCritDef): void {
   def.plan(
@@ -591,8 +588,6 @@ export function drawFloorCrit(
   }
   ctx.save();
   ctx.translate(centerX, centerY);
-  deferLights(ctx);
   def.draw(ctx, r, ms, bars);
-  flushLights(ctx);
   ctx.restore();
 }
