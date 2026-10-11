@@ -27,13 +27,13 @@ import { registerCoinStream } from "../../shared/eventStream";
 const MIN_SPIN_RATE = 0.04; // flipbook frames advanced per physics tick (~16.67ms)
 const MAX_SPIN_RATE = 0.12;
 // hard cap on simultaneously-active particles — a fast press-and-hold can fire a
-// full burst (40-85 particles) every long-press tick (see shared/pressAndHold's
+// full burst (20-43 particles) every long-press tick (see shared/pressAndHold's
 // LONG_PRESS_TICK_MS), spawning particles far faster than a ~1-2s lifespan
 // lets them expire; without this cap a sustained hold grows the array (and every
 // frame's update/draw cost) without bound instead of settling at a steady state.
 // High enough that a held button's flow pours out thick, like a liquid; the
 // coins draw in one WebGL batch, which the 3,000-coin spray pool shows holds up
-const MAX_PARTICLES = 1_500;
+const MAX_PARTICLES = 750;
 
 export async function loadCoinImage(): Promise<HTMLImageElement> {
   return loadCoinBurstImages();
@@ -535,7 +535,7 @@ function spawnBurstParticles(
   } else burstPressure(performance.now());
   const count = coins
     ? burstCount(...coins)
-    : burstCount(Math.round(40 * pressure), Math.round(85 * pressure));
+    : burstCount(Math.round(20 * pressure), Math.round(43 * pressure));
   for (let i = 0; i < count; i++) {
     const jet = plume && Math.random() < PLUME_SHARE;
     const w = jet ? 0 : weight;

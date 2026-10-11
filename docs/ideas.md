@@ -37,16 +37,6 @@ More little surprises in what's already on screen, each one only paying.
 3. **Cat nap**: a cat sometimes nods off at its desk without slowing anything, a little z floating up; tap it and it jolts awake and works at double speed for a while.
 4. **Echo**: a crit number sometimes echoes, a smaller copy of it landing on the floor above a beat later with its own levels.
 
-## List 121: game features
-
-Small surprises in the floors, cats and buttons, each one only paying.
-
-1. **Double up**: a buy now and then tosses the button's price up as a coin that flips over and lands; heads gives the level a second time for free.
-2. **Lunch rush**: every cat on a floor sometimes jumps up at once and dashes to the bar, filling it in one go for a payout that slams into the total.
-3. **Coin stack**: a floor's payouts now and then leave a coin on the end of its bar; when five have stacked up they topple into the total as a bonus worth ten payouts.
-4. **Shooting star**: a gold streak sometimes crosses the sky behind the building; tap it before it's gone and the floor it passed gets a free crit.
-5. **Tip jar**: a boosted cat now and then flips a coin into a small jar on its floor; once the jar is full, tapping it empties it into the total.
-
 ## Built
 
 - **Gold standard** (`floors/incomePanel`): a floor at the level cap gets a coin-gold bar with gloss slashes and gold glimmers twinkling calmly over it.
