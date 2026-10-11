@@ -289,6 +289,7 @@ export {
   currentIncomeRatePerSecond,
   currentPayoutAmount,
   drawIncomePanel,
+  forceGoldSwitch,
   getIncomeBarCenter,
   getIncomeBarBox,
   increaseIncomeRate,

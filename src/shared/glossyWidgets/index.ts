@@ -2,6 +2,13 @@ import { COLOR } from "../../palette";
 import { createGlossyGradient, drawPillBorder, shadeColor } from "../../utils";
 import { processWhenIdle } from "../idle";
 import { hash01, stampGlimmer } from "../twinkle";
+import {
+  SLAM_WAVE_HOP,
+  SLAM_WAVE_MS,
+  SLAM_WAVE_SCALE,
+  slamWaveHop,
+  slamWavePassed,
+} from "../slamWave";
 
 // the upgrade button and income bar. Drawn every frame for every floor on
 // screen, so each is a few blits of layers baked once per color:
@@ -357,14 +364,7 @@ const GOLD_SLASHES: readonly (readonly [number, number])[] = [
 const GOLD_SLASH = "rgba(255,255,255,0.55)";
 const GOLD_SLASH_LEAN = 0.45; // of the bar's height
 let goldBar: { w: number; h: number; r: number; bar: Layer } | null = null;
-export function drawGoldBar(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-): void {
+function getGoldBar(w: number, h: number, r: number): Layer {
   if (!goldBar || goldBar.w !== w || goldBar.h !== h || goldBar.r !== r) {
     const c = layer(w, h);
     roundedPath(c, 0, 0, w, h, r);
@@ -390,7 +390,99 @@ export function drawGoldBar(
     goldBar = { w, h, r, bar: c.canvas as Layer };
     toBitmap(goldBar, "bar");
   }
-  ctx.drawImage(goldBar.bar, x, y);
+  return goldBar.bar;
+}
+
+export function drawGoldBar(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+): void {
+  ctx.drawImage(getGoldBar(w, h, r), x, y);
+}
+
+// the switch to gold: the "Lvl" label's landed wave run along the bar, its
+// slices hopping up one after another from the left like the label's
+// letters, each turning gold and flashing bright as it hops. ms into it
+export const GOLD_SWITCH_MS = SLAM_WAVE_MS;
+const SWITCH_SLICE = 16;
+// the label's wave band, a little wider than the text is tall
+const SWITCH_BAND = 1.2; // of the bar's height
+const SWITCH_SHINE = 0.6;
+const switchCanvas = document.createElement("canvas");
+const switchCtx = switchCanvas.getContext("2d")!;
+
+// the switch's hop (0..1..0) at bar-local x, ms in, so what sits on the bar
+// can ride it: the bar's middle there is GOLD_SWITCH_RISE x hop x h higher
+export const GOLD_SWITCH_RISE = SLAM_WAVE_HOP + SLAM_WAVE_SCALE / 2;
+export function goldSwitchHop(
+  ms: number,
+  x: number,
+  w: number,
+  h: number,
+): number {
+  const band = h * SWITCH_BAND;
+  return slamWaveHop(ms, (x + band) / (w + band * 2));
+}
+export function drawGoldSwitch(
+  ctx: CanvasRenderingContext2D,
+  key: object,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+  fillW: number,
+  fromColor: string,
+  now: number,
+  ms: number,
+): void {
+  // the old bar, at the canvas's own scale so its slices stay sharp
+  const m = ctx.getTransform();
+  const res = Math.min(2, Math.max(1, Math.hypot(m.a, m.b)));
+  const pxW = Math.ceil(w * res);
+  const pxH = Math.ceil(h * res);
+  if (switchCanvas.width !== pxW || switchCanvas.height !== pxH) {
+    switchCanvas.width = pxW;
+    switchCanvas.height = pxH;
+  } else {
+    switchCtx.setTransform(1, 0, 0, 1, 0, 0);
+    switchCtx.clearRect(0, 0, pxW, pxH);
+  }
+  switchCtx.setTransform(res, 0, 0, res, 0, 0);
+  drawChevronBar(switchCtx, key, 0, 0, w, h, r, fillW, fromColor, now, 0);
+  const gold = getGoldBar(w, h, r);
+  const band = h * SWITCH_BAND;
+  const path = w + band * 2;
+  const alpha = ctx.globalAlpha;
+  const foot = y + h;
+  for (let sx = 0; sx < w; sx += SWITCH_SLICE) {
+    const sw = Math.min(SWITCH_SLICE, w - sx);
+    const along = (sx + sw / 2 + band) / path;
+    const hop = slamWaveHop(ms, along);
+    const passed = slamWavePassed(ms, along);
+    const s = 1 + SLAM_WAVE_SCALE * hop;
+    const dh = h * s;
+    const dy = foot - dh - SLAM_WAVE_HOP * h * hop;
+    const dx = x + sx - (sw * (s - 1)) / 2;
+    const dw = sw * s + 0.6;
+    if (passed < 1)
+      ctx.drawImage(switchCanvas, sx * res, 0, sw * res, pxH, dx, dy, dw, dh);
+    if (passed > 0) {
+      ctx.globalAlpha = alpha * passed;
+      ctx.drawImage(gold, sx, 0, sw, h, dx, dy, dw, dh);
+      if (hop > 0) {
+        ctx.globalCompositeOperation = "lighter";
+        ctx.globalAlpha = alpha * SWITCH_SHINE * hop;
+        ctx.drawImage(gold, sx, 0, sw, h, dx, dy, dw, dh);
+        ctx.globalCompositeOperation = "source-over";
+      }
+      ctx.globalAlpha = alpha;
+    }
+  }
 }
 
 // glimmers twinkling calmly over it, each at a fresh spot every life

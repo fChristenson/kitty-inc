@@ -48,19 +48,28 @@ import {
 } from "../../shared/income";
 import { type BigNumber, add, multiply } from "../../shared/bigNumber";
 import {
+  createTextGlossyGradient,
   drawCachedCartoonText,
+  drawCartoonText,
   formatPrice,
   formatTime,
   roundRect,
 } from "../../utils";
 import {
   drawChevronBar,
+  drawGoldSwitch,
+  GOLD_SWITCH_MS,
+  GOLD_SWITCH_RISE,
+  goldSwitchHop,
   drawGoldBar,
   drawGoldGlimmers,
   prewarmChevronBar,
 } from "../../shared/glossyWidgets";
 import { launchMs, launchOffset, type BarLaunch } from "../../shared/barLaunch";
 import { prepareSoon } from "../../shared/idle";
+import { isDetachedJobRunning } from "../../shared/detachedJob";
+import { playNotification } from "../../sound";
+import { applyLevelPop, LEVEL_POP_MS } from "../../shared/levelPop";
 import {
   drawBoilingBar,
   drawPressureBar,
@@ -488,6 +497,22 @@ let tickerRunning = false;
 export const UPGRADE_MILESTONE_STEP = CONFIG.incomePanel.upgradeMilestoneStep;
 // Cost growth stays close to income's milestone speed growth for sustained progression.
 
+// a floor reaching the level cap: its bar turns gold and the notification
+// rings (not in a background job's replay)
+function noteLevelCap(floor: Floor, before: number): void {
+  if (
+    before < MAX_FLOOR_LEVEL &&
+    isFloorMaxed(floor) &&
+    !isDetachedJobRunning()
+  )
+    celebrateLevelCap(floor);
+}
+
+function celebrateLevelCap(floor: Floor): void {
+  goldSwitches.set(floor, Date.now());
+  playNotification();
+}
+
 export function increaseIncomeRate(floor: Floor): void {
   if (isFloorMaxed(floor)) return;
   // a permanently-crited floor (see floorInteractions.ts's rollFloorBuyCrit)
@@ -511,6 +536,7 @@ export function increaseIncomeRate(floor: Floor): void {
     floor.upgradeCost = upgradePriceAfter(floor, 1);
   }
   floor.upgradeCount += 1;
+  noteLevelCap(floor, floor.upgradeCount - 1);
   // no MIN_INCOME_INTERVAL_SECONDS clamp here — this stores the floor's true,
   // uncapped base interval, which effectiveIncomeCycle's own clamp below already
   // folds into the overspeed payout multiplier the exact same way it does for a
@@ -546,6 +572,7 @@ export function increaseIncomeRateBy(floor: Floor, count: number): void {
   }
   const previousUpgradeCount = floor.upgradeCount;
   floor.upgradeCount += count;
+  noteLevelCap(floor, previousUpgradeCount);
   floor.incomeIntervalSeconds *=
     upgradeSpeedMultiplier(previousUpgradeCount) /
     upgradeSpeedMultiplier(floor.upgradeCount);
@@ -762,6 +789,130 @@ export function startIncomeTicker(onFrame: () => void): void {
   requestAnimationFrame(tick);
 }
 
+const BAR_TEXT_SIZE = 44;
+const GOLD_BAR_SWITCH_MS = Math.max(GOLD_SWITCH_MS, LEVEL_POP_MS);
+
+// the bar's text during the switch: the text in white and in gold, rastered
+// once per text, cut into letters that each rise with the bar under them
+interface SwitchText {
+  white: HTMLCanvasElement;
+  gold: HTMLCanvasElement;
+  // each letter's left edge from the text's, then its full width
+  offsets: Float32Array;
+}
+const SWITCH_TEXT_PAD = 7;
+const switchTexts = new Map<string, SwitchText>();
+function getSwitchText(font: string, text: string): SwitchText {
+  const cached = switchTexts.get(text);
+  if (cached) return cached;
+  if (switchTexts.size >= 4) switchTexts.clear();
+  const make = (
+    fill: (c: CanvasRenderingContext2D) => string | CanvasGradient,
+  ) => {
+    const canvas = document.createElement("canvas");
+    const c = canvas.getContext("2d")!;
+    c.font = font;
+    canvas.width = Math.ceil(c.measureText(text).width + SWITCH_TEXT_PAD * 2);
+    canvas.height = Math.ceil(BAR_TEXT_SIZE * 1.4 + SWITCH_TEXT_PAD * 2);
+    c.font = font;
+    c.textAlign = "left";
+    c.textBaseline = "middle";
+    drawCartoonText(c, text, SWITCH_TEXT_PAD, canvas.height / 2, fill(c));
+    return canvas;
+  };
+  const white = make(() => COLOR.white);
+  const gold = make((c) =>
+    createTextGlossyGradient(c, text, c.canvas.height / 2, COLOR.heavenlyGold),
+  );
+  const c = white.getContext("2d")!;
+  c.font = font;
+  const offsets = new Float32Array(text.length + 1);
+  for (let i = 1; i <= text.length; i++)
+    offsets[i] = c.measureText(text.slice(0, i)).width;
+  const entry = { white, gold, offsets };
+  switchTexts.set(text, entry);
+  return entry;
+}
+
+function drawSwitchText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  cx: number,
+  cy: number,
+  barX: number,
+  barW: number,
+  barH: number,
+  ms: number,
+): void {
+  const { white, gold, offsets } = getSwitchText(ctx.font, text);
+  const n = text.length;
+  const left = cx - offsets[n] / 2;
+  const top = cy - white.height / 2;
+  const alpha = ctx.globalAlpha;
+  for (let i = 0; i < n; i++) {
+    // cut between letters, the ends keeping their padding
+    const from = i === 0 ? -SWITCH_TEXT_PAD : offsets[i];
+    const to = i === n - 1 ? offsets[n] + SWITCH_TEXT_PAD : offsets[i + 1];
+    const middle = left + (offsets[i] + offsets[i + 1]) / 2;
+    const hop = goldSwitchHop(ms, middle - barX, barW, barH);
+    const dy = top - GOLD_SWITCH_RISE * barH * hop;
+    const sx = from + SWITCH_TEXT_PAD;
+    const w = to - from;
+    ctx.drawImage(
+      white,
+      sx,
+      0,
+      w,
+      white.height,
+      left + from,
+      dy,
+      w,
+      white.height,
+    );
+    if (hop > 0) {
+      ctx.globalAlpha = alpha * hop;
+      ctx.drawImage(
+        gold,
+        sx,
+        0,
+        w,
+        gold.height,
+        left + from,
+        dy,
+        w,
+        gold.height,
+      );
+      ctx.globalAlpha = alpha;
+    }
+  }
+}
+const GOLD_SWITCH_SPAN_MS = GOLD_BAR_SWITCH_MS;
+// a bar turning gold as its floor reaches the level cap: when it did, NaN
+// while it isn't gold, -Infinity if it already was when first drawn
+const goldSwitches = new WeakMap<Floor, number>();
+function goldSwitchAge(floor: Floor, maxed: boolean, now: number): number {
+  const at = goldSwitches.get(floor);
+  if (at !== undefined && now - at < GOLD_SWITCH_SPAN_MS) return now - at;
+  if (!maxed) {
+    goldSwitches.set(floor, NaN);
+    return Infinity;
+  }
+  if (at === undefined) {
+    goldSwitches.set(floor, -Infinity);
+    return Infinity;
+  }
+  if (Number.isNaN(at)) {
+    goldSwitches.set(floor, now);
+    return 0;
+  }
+  return now - at;
+}
+
+// the test button's replay of reaching the cap, on any floor
+export function forceGoldSwitch(floor: Floor): void {
+  celebrateLevelCap(floor);
+}
+
 export function drawIncomePanel(
   ctx: CanvasRenderingContext2D,
   floor: Floor,
@@ -892,13 +1043,16 @@ export function drawIncomePanel(
     // usual green, mirroring the upgrade button's own color choice; a floor at
     // the level cap's is gold
     const maxed = floor.unlocked && isFloorMaxed(floor);
+    const goldAge = goldSwitchAge(floor, maxed, now);
+    const switching = goldAge < GOLD_BAR_SWITCH_MS;
+    const tierColor = floor.critMultiplierTier
+      ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
+      : COLOR.moneyGreen;
     const fillColor = afterglowing
       ? punch!.color!
       : maxed
         ? COLOR.heavenlyGold
-        : floor.critMultiplierTier
-          ? CRIT_TIER_CONFIG[floor.critMultiplierTier].color
-          : COLOR.moneyGreen;
+        : tierColor;
     let pressure: PressurePose | null = null;
     const boilHeat = Math.max(getBoilHeat(floor, now), heat);
     const holdHeat = Math.max(getHoldHeat(floor, now), heat);
@@ -949,6 +1103,25 @@ export function drawIncomePanel(
         ctx.fill();
         ctx.globalAlpha = 1;
       }
+    } else if (switching) {
+      // popping like the floor's "Lvl" label, which pops on reaching the cap
+      // too, while the label's landed wave runs along it turning it gold
+      ctx.save();
+      applyLevelPop(ctx, goldAge, barX + barW / 2, barY + barH / 2);
+      drawGoldSwitch(
+        ctx,
+        floor,
+        barX,
+        barY,
+        barW,
+        barH,
+        barRadius,
+        fillW,
+        tierColor,
+        now,
+        goldAge,
+      );
+      ctx.restore();
     } else if (maxed) {
       drawGoldBar(ctx, barX, barY, barW, barH, barRadius);
     } else if (overspeed) {
@@ -996,7 +1169,7 @@ export function drawIncomePanel(
         boilHeat,
       );
     }
-    if (maxed && !overtimeGaugeVisible)
+    if (maxed && !overtimeGaugeVisible && !switching)
       drawGoldGlimmers(ctx, barX, barY, barW, barH, now, floor.bgIndex);
     if (eventFlash && eventFlash.whiteAlpha > 0) {
       ctx.globalAlpha = eventFlash.whiteAlpha;
@@ -1041,7 +1214,7 @@ export function drawIncomePanel(
     // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
     // time, never advanced), so the rate text uses the static full-interval formatter
     // instead of the live countdown — still visible, just doesn't tick
-    ctx.font = '900 44px "Fredoka", system-ui, sans-serif';
+    ctx.font = `900 ${BAR_TEXT_SIZE}px "Fredoka", system-ui, sans-serif`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     // the text swells and shakes with a pressurised bar
@@ -1050,17 +1223,18 @@ export function drawIncomePanel(
       ctx.scale(pressure.textScale, pressure.textScale);
       ctx.translate(-(barX + barW / 2), -(barY + barH / 2));
     }
-    drawCachedCartoonText(
-      ctx,
-      overtimeGaugeVisible
-        ? formatOvertimeProgress(floor, now)
-        : cycle
-          ? formatIncomeRate(floor, now, cycle)
-          : formatStaticIncomeRate(floor, now),
-      barX + barW / 2,
-      barY + barH / 2 + 1,
-      44,
-    );
+    const text = overtimeGaugeVisible
+      ? formatOvertimeProgress(floor, now)
+      : cycle
+        ? formatIncomeRate(floor, now, cycle)
+        : formatStaticIncomeRate(floor, now);
+    const textX = barX + barW / 2;
+    const textY = barY + barH / 2 + 1;
+    if (goldAge < GOLD_BAR_SWITCH_MS) {
+      // popping with the bar, each letter riding the bar's wave under it
+      applyLevelPop(ctx, goldAge, barX + barW / 2, barY + barH / 2);
+      drawSwitchText(ctx, text, textX, textY, barX, barW, barH, goldAge);
+    } else drawCachedCartoonText(ctx, text, textX, textY, BAR_TEXT_SIZE);
     ctx.restore();
   };
   // overtime's coin stream powers the bar up like every other stream target

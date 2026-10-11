@@ -17,6 +17,13 @@ import { isDetachedJobRunning } from "../detachedJob";
 import { holdExplosions } from "../../sound";
 import { playSlamExplosion } from "../explosionBang";
 import { shakeScreen } from "../screenShake";
+import {
+  SLAM_SHINE_MS,
+  SLAM_WAVE_HOP,
+  SLAM_WAVE_MS,
+  SLAM_WAVE_SCALE,
+  slamWaveHop,
+} from "../slamWave";
 
 export const GLOBAL_SLAM = {};
 
@@ -47,11 +54,8 @@ const JOLT = 0.12; // of the target's height
 // the impact's screen shake; slams landing together share one
 const IMPACT_SHAKE = 1.3;
 const IMPACT_SHARE_MS = 150;
-const FLASH_MS = 450;
-// text targets: each letter hops as the shine band passes over it
-const WAVE_MS = 280; // one letter's hop
-const WAVE_HOP = 0.5; // of the text's height
-const WAVE_SCALE = 0.15;
+const FLASH_MS = SLAM_SHINE_MS;
+// text targets: each letter hops as the shine band passes over it (slamWave)
 // and the whole text pops big and jiggles back, glowing, over spinning rays
 const TEXT_FX_MS = 1100;
 const TEXT_POP = 0.55;
@@ -68,7 +72,7 @@ const GLITTER_TWINKLE_MS = 450;
 const GLITTER_COUNT = 26;
 const GLITTER_SIZE = 0.5; // of the target's height, at most
 const LINGER_MS = Math.max(
-  FLASH_MS + WAVE_MS,
+  SLAM_WAVE_MS,
   TEXT_FX_MS,
   SPARKLE_START_MS + SPARKLE_MS,
   GLITTER_START_MS + GLITTER_SPAN_MS + GLITTER_TWINKLE_MS,
@@ -241,8 +245,7 @@ function drawSlamLights(
 // 0..1..0: a letter's hop, peaking as the shine band (sweeping over FLASH_MS)
 // crosses its center, `along` 0..1 of the band's path
 function hopAt(pose: SlamPose, along: number): number {
-  const t = (pose.landedMs - FLASH_MS * along) / WAVE_MS + 0.5;
-  return t <= 0 || t >= 1 ? 0 : Math.sin(Math.PI * t);
+  return slamWaveHop(pose.landedMs, along);
 }
 
 // widest digit per font, so tabular text gives every digit the same cell
@@ -734,8 +737,8 @@ export function drawSlamText(
       const hop = landed ? hopAt(landed, (centerX - left + band) / path) : 0;
       if (hop !== 0) {
         ctx.save();
-        const s = 1 + WAVE_SCALE * hop;
-        ctx.translate(centerX, footY - WAVE_HOP * height * hop);
+        const s = 1 + SLAM_WAVE_SCALE * hop;
+        ctx.translate(centerX, footY - SLAM_WAVE_HOP * height * hop);
         ctx.scale(s, s);
         ctx.translate(-centerX, -footY);
       }

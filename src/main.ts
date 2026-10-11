@@ -59,6 +59,7 @@ import {
   performAutomatedFloorUnlock,
   getUpgradeCost,
   forceLuckySevens,
+  forceGoldSwitch,
   type FloorActionsDeps,
 } from "./floors";
 import {
@@ -2298,6 +2299,12 @@ async function main() {
             if (!floor) return;
             gameCanvas.scrollActiveToFloor(floor);
             forceLuckySevens(floor);
+          }),
+          "gold-switch": later(() => {
+            const floor = buildings[activeBuildingIndex]?.[0];
+            if (!floor) return;
+            gameCanvas.scrollActiveToFloor(floor);
+            forceGoldSwitch(floor);
           }),
           "coin-spawn": forceCoinSpawn,
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),

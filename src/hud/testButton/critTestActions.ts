@@ -47,6 +47,7 @@ export function createTestButtonMarkup(): string {
         <summary class="test-actions-dropdown__toggle">New Effects</summary>
         <div class="test-actions-dropdown__menu">
           <button id="test-lucky-sevens-event" class="game__button">Lucky Sevens</button>
+          <button id="test-gold-switch-event" class="game__button">Gold Standard</button>
           <button id="test-nitro-event" class="game__button">Nitro</button>
           <button id="test-bullet-cancel-event" class="game__button">Bullet Cancel</button>
           <button class="game__button" data-floor-crit="blockBonkCrit">Block Bonk Crit</button>
