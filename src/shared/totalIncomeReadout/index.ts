@@ -63,6 +63,9 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     tier: 0,
   };
   let measuredFont = "";
+  // the heights only change with the font, the amount's length or the unit
+  let measuredLength = -1;
+  let measuredUnit: string | null = null;
   let amountHeight = 0;
   let unitHeight = 0;
 
@@ -93,8 +96,12 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
     const slam = getSlamPose(GLOBAL_SLAM, "total", now);
     const { amount, unitName } = formatted;
     const font = `900 ${fontSize}px "Fredoka", system-ui, sans-serif`;
-    const remeasure = valueChanged || font !== measuredFont;
+    const fontChanged = font !== measuredFont;
+    const remeasure = fontChanged || amount.length !== measuredLength;
+    const remeasureUnit = fontChanged || unitName !== measuredUnit;
     measuredFont = font;
+    measuredLength = amount.length;
+    measuredUnit = unitName;
     const strokeWidth = fontSize * AMOUNT_STROKE_TO_FONT_RATIO;
 
     const whiteMix = Math.max(getHudTotalWhiteMix(now), tension?.white ?? 0);
@@ -186,7 +193,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
           whiteMix,
           moving,
         );
-        if (remeasure) {
+        if (remeasureUnit) {
           const unitMetrics = ctx.measureText(unitName);
           unitHeight =
             unitMetrics.actualBoundingBoxAscent +

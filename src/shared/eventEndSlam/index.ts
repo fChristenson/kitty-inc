@@ -390,6 +390,21 @@ function drawRestText(
       strokeWidth,
       m.a,
     );
+    const word =
+      !tabular && hideIndex < 0
+        ? getRestWord(ctx, set, text, layout.offsets)
+        : null;
+    if (word) {
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(
+        word.canvas,
+        Math.round(m.a * left + m.e) - word.left,
+        Math.round(m.d * y + m.f) - word.up,
+      );
+      ctx.restore();
+      return;
+    }
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     for (let pass = 0; pass < 2; pass++) {
@@ -452,6 +467,10 @@ interface RestGlyph {
 }
 interface RestGlyphSet {
   glyphs: Map<string, RestGlyph>;
+  // whole texts that stayed put, baked from the glyphs: one stamp a frame
+  words: Map<string, RestWord>;
+  // how many frames in a row each text not yet baked has been drawn
+  pending: Map<string, number>;
   baseline: CanvasTextBaseline;
   fillColor: string;
   strokeColor: string;
@@ -490,6 +509,8 @@ function getRestGlyphSet(
   }
   const set: RestGlyphSet = {
     glyphs: new Map(),
+    words: new Map(),
+    pending: new Map(),
     baseline,
     fillColor,
     strokeColor,
@@ -542,6 +563,76 @@ function getRestGlyph(
   glyph = { canvas, cellW, cellH, left, up };
   set.glyphs.set(char, glyph);
   return glyph;
+}
+
+// a resting text baked whole from its glyph stamps; left/up are its origin
+// from the bitmap's top-left, in canvas px
+interface RestWord {
+  canvas: HTMLCanvasElement;
+  left: number;
+  up: number;
+}
+// a label (not a counting number) is baked once it has been drawn this many
+// times, so a changing one doesn't build a canvas per value
+const BAKE_REST_AFTER = 8;
+const MAX_REST_WORDS = 32;
+const MAX_REST_PENDING = 256;
+
+function getRestWord(
+  ctx: CanvasRenderingContext2D,
+  set: RestGlyphSet,
+  text: string,
+  offsets: Float64Array,
+): RestWord | null {
+  const baked = set.words.get(text);
+  if (baked) return baked;
+  const draws = (set.pending.get(text) ?? 0) + 1;
+  if (draws < BAKE_REST_AFTER) {
+    if (set.pending.size >= MAX_REST_PENDING) set.pending.clear();
+    set.pending.set(text, draws);
+    return null;
+  }
+  set.pending.delete(text);
+  if (set.words.size >= MAX_REST_WORDS) set.words.clear();
+  const { scale } = set;
+  let minX = Infinity;
+  let maxX = -Infinity;
+  let up = 0;
+  let down = 0;
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === " ") continue;
+    const glyph = getRestGlyph(ctx, set, text[i]);
+    const x = Math.round(scale * offsets[i] - glyph.left);
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x + glyph.cellW);
+    up = Math.max(up, glyph.up);
+    down = Math.max(down, glyph.cellH - glyph.up);
+  }
+  if (minX === Infinity) return null;
+  up = Math.ceil(up);
+  const canvas = document.createElement("canvas");
+  canvas.width = maxX - minX;
+  canvas.height = up + Math.ceil(down);
+  const c = canvas.getContext("2d")!;
+  for (let pass = 0; pass < 2; pass++)
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === " ") continue;
+      const glyph = getRestGlyph(ctx, set, text[i]);
+      c.drawImage(
+        glyph.canvas,
+        pass * glyph.cellW,
+        0,
+        glyph.cellW,
+        glyph.cellH,
+        Math.round(scale * offsets[i] - glyph.left) - minX,
+        Math.round(up - glyph.up),
+        glyph.cellW,
+        glyph.cellH,
+      );
+    }
+  const word = { canvas, left: -minX, up };
+  set.words.set(text, word);
+  return word;
 }
 
 // drawCartoonText, but once the slam lands the white shine sweeps across the
