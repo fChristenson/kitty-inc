@@ -8,6 +8,7 @@ import {
   drawText,
   glowStops,
 } from "../../critPlayer";
+import { bottomBarY } from "../../critPlayer/shared";
 
 const CATAPULT_UP_MS = 250;
 const CATAPULT_AWAY_MS = 150;
@@ -32,7 +33,7 @@ const catapultHitAt = (r: Running, y: number) =>
 registerFloorCrit("catapultCrit", {
   plan(r, bars, hit) {
     // flung off the top of the screen, crashing down past the lowest bar
-    const lowest = Math.max(...bars.map((b) => b.y));
+    const lowest = bottomBarY(bars);
     r.span = {
       from: -r.viewportWidth * 1.2,
       to: lowest + r.viewportWidth * 0.3,

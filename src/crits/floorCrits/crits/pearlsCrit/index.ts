@@ -9,7 +9,12 @@ import {
   drawText,
   along,
 } from "../../critPlayer";
-import { quadratic, METEOR_LIFT_MS, holeHash } from "../../critPlayer/shared";
+import {
+  quadratic,
+  METEOR_LIFT_MS,
+  holeHash,
+  topBarY,
+} from "../../critPlayer/shared";
 
 // the number thrown off the top, torn into a chain of glowing fragments that
 // sweep in from the top corner one behind another, two onto each bar (top to
@@ -48,7 +53,7 @@ registerFloorCrit("pearlsCrit", {
         alpha: 1 - p,
       });
     }
-    const top = Math.min(...bars.map((b) => b.y));
+    const top = topBarY(bars);
     const from = { x: w * 0.75, y: top - w * 0.6 };
     for (let k = 0; k < bars.length * PEARLS_PER_BAR; k++) {
       const starts = pearlStarts(k);

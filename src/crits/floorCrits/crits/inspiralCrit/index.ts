@@ -154,7 +154,8 @@ registerFloorCrit("inspiralCrit", {
     }
 
     // the bars, drawn here stretching while the waves run through them
-    const far = Math.max(...bars.map((b) => Math.hypot(b.x, b.y)));
+    let far = 0;
+    for (const b of bars) far = Math.max(far, Math.hypot(b.x, b.y));
     const quiet =
       WAVES[WAVES.length - 1] + (far + IS_SWELL * 3) / IS_WAVE_SPEED;
     const warping = ms >= IS_IN_MS && ms < quiet;

@@ -14,6 +14,7 @@ import {
   drawText,
 } from "../../critPlayer";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
+import { bottomBarY } from "../../critPlayer/shared";
 
 const QUAKE_DROP_MS = 260;
 const QUAKE_DELAY_MS = 120;
@@ -37,7 +38,7 @@ const QUAKE_TAIL_MS = 800;
 const ground = (r: Running, bars: Point[]): Point => ({
   x: bars[0].x,
   y: Math.min(
-    Math.max(...bars.map((b) => b.y)) + QUAKE_DEPTH,
+    bottomBarY(bars) + QUAKE_DEPTH,
     r.viewportWidth * QUAKE_LOWEST,
   ),
 });

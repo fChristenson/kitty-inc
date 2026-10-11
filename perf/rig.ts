@@ -160,6 +160,10 @@ async function boot(): Promise<void> {
       const inner = find(name.slice(5));
       return inner && warmScenario(inner);
     }
+    if (name.startsWith("spawns-floor-crit:"))
+      return floorCritScenario(name.slice(18), "floor", true);
+    if (name.startsWith("spawns-income-crit:"))
+      return floorCritScenario(name.slice(19), "income", true);
     return (
       SCENARIOS.find((s) => s.name === name) ??
       (name.startsWith("event:")

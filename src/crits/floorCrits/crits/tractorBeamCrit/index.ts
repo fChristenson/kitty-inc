@@ -15,7 +15,11 @@ import {
   clamp01,
   drawText,
 } from "../../critPlayer";
-import { holeHash } from "../../critPlayer/shared";
+import {
+  holeHash,
+  topBarY,
+  bottomBarY,
+} from "../../critPlayer/shared";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const TRACTOR_IN_MS = 300;
@@ -53,7 +57,7 @@ const TRACTOR_TAIL_MS = 900;
 const ufo = (r: Running, bars: Point[]): Point => ({
   x: bars[0].x,
   y: Math.max(
-    Math.min(...bars.map((b) => b.y)) - TRACTOR_ABOVE,
+    topBarY(bars) - TRACTOR_ABOVE,
     -r.viewportWidth * TRACTOR_HIGHEST,
   ),
 });
@@ -96,7 +100,7 @@ registerFloorCrit("tractorBeamCrit", {
       const bottom = {
         x: u.x,
         y: Math.min(
-          Math.max(...bars.map((b) => b.y)) + TRACTOR_BELOW,
+          bottomBarY(bars) + TRACTOR_BELOW,
           r.viewportWidth * TRACTOR_LOWEST,
         ),
       };

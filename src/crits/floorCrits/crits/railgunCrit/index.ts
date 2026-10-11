@@ -17,7 +17,11 @@ import {
   drawText,
   glowStops,
 } from "../../critPlayer";
-import { holeHash } from "../../critPlayer/shared";
+import {
+  holeHash,
+  topBarY,
+  bottomBarY,
+} from "../../critPlayer/shared";
 
 const RAIL_MOVE_MS = 280;
 const RAIL_CHARGE_MS = 1100;
@@ -54,13 +58,13 @@ const RAIL_TAIL_MS = 900;
 const gun = (r: Running, bars: Point[]): Point => ({
   x: bars[0].x,
   y: Math.max(
-    Math.min(...bars.map((b) => b.y)) - RAIL_ABOVE,
+    topBarY(bars) - RAIL_ABOVE,
     -r.viewportWidth * RAIL_HIGHEST,
   ),
 });
 const groundY = (r: Running, bars: Point[]) =>
   Math.min(
-    Math.max(...bars.map((b) => b.y)) + RAIL_BELOW,
+    bottomBarY(bars) + RAIL_BELOW,
     r.viewportWidth * RAIL_LOWEST,
   );
 const rumbleAt = (i: number) =>
@@ -70,7 +74,7 @@ const BAR_PITCH = 700;
 const strikesAt = (bars: Point[], bar: number) =>
   RAIL_FIRE_MS +
   RAIL_STAGGER_MS *
-    (1 + (bars[bar].y - Math.min(...bars.map((b) => b.y))) / BAR_PITCH);
+    (1 + (bars[bar].y - topBarY(bars)) / BAR_PITCH);
 
 registerFloorCrit("railgunCrit", {
   plan(_r, bars, hit) {

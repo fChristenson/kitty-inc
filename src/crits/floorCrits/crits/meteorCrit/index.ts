@@ -14,6 +14,7 @@ import {
   METEOR_SHAKE,
   METEOR_PAYS,
   METEOR_FONT,
+  topBarY,
 } from "../../critPlayer/shared";
 
 const METEOR_FALL_MS = 380;
@@ -51,7 +52,7 @@ registerFloorCrit("meteorCrit", {
     }
     const target = r.hits[0].bar;
     const to = along(r, bars, target, 0.4);
-    const top = Math.min(...bars.map((b) => b.y));
+    const top = topBarY(bars);
     const from = { x: w * 0.9, y: top - w * 1.1 };
     const meteorAt = (t: number) => {
       const p = clamp01((t - METEOR_LIFT_MS) / METEOR_FALL_MS) ** METEOR_EASE;

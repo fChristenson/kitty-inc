@@ -141,12 +141,16 @@ function stampCell(
   x: number,
   y: number,
   r: number,
+  alpha: number,
 ): void {
   const sx = cell.x - cell.half;
   const sy = cell.y - cell.half;
   const side = cell.half * 2;
-  if (queueLight(ctx, atlas!, sx, sy, side, side, x - r, y - r, r * 2, r * 2))
+  if (
+    queueLight(ctx, atlas!, sx, sy, side, side, x - r, y - r, r * 2, r * 2, alpha)
+  )
     return;
+  ctx.globalAlpha = alpha;
   ctx.drawImage(atlas!, sx, sy, side, side, x - r, y - r, r * 2, r * 2);
 }
 
@@ -157,9 +161,10 @@ function drawGlow(
   y: number,
   r: number,
   colorIndex: number,
+  alpha: number,
 ): void {
   atlas ??= buildAtlas();
-  stampCell(ctx, glowCells[colorIndex], x, y, r);
+  stampCell(ctx, glowCells[colorIndex], x, y, r, alpha);
 }
 
 function drawGlint(
@@ -169,18 +174,20 @@ function drawGlint(
   size: number,
   turn: number,
   colorIndex: number,
+  alpha: number,
 ): void {
   atlas ??= buildAtlas();
   const need = size * GLINT_SHARPNESS;
   let level = 0;
   while (level < GLINT_HALVES.length && GLINT_HALVES[level] < need) level++;
   if (level === GLINT_HALVES.length) {
+    ctx.globalAlpha = alpha;
     stampTwinkle(ctx, x, y, size, turn, ATLAS_COLORS[colorIndex]);
     return;
   }
   const quarterTurn = ((turn % QUARTER) + QUARTER) % QUARTER;
   const step = Math.round((quarterTurn / QUARTER) * GLINT_TURNS) % GLINT_TURNS;
-  stampCell(ctx, glintCells[colorIndex][level][step], x, y, size);
+  stampCell(ctx, glintCells[colorIndex][level][step], x, y, size, alpha);
 }
 
 // the head's soft gold halo, fading out to its edge
@@ -298,9 +305,8 @@ function stampSparkle(
   if (shown < MIN_ALPHA) return;
   const colorIndex =
     SPARKLE_COLOR_INDEX[Math.abs(seed) % SPARKLE_COLOR_INDEX.length];
-  ctx.globalAlpha = shown;
-  if (glint) drawGlint(ctx, x, y, r * GLINT_SIZE, turn, colorIndex);
-  else drawGlow(ctx, x, y, r, colorIndex);
+  if (glint) drawGlint(ctx, x, y, r * GLINT_SIZE, turn, colorIndex, shown);
+  else drawGlow(ctx, x, y, r, colorIndex, shown);
 }
 
 // one tiny twinkling sparkle of glow radius r at (x, y); seed picks its
@@ -440,13 +446,13 @@ export function drawWispHead(
   ctx.drawImage(haloSprite(), head.x - halo, head.y - halo, halo * 2, halo * 2);
   const previous = ctx.globalCompositeOperation;
   ctx.globalCompositeOperation = "lighter";
+  beginLightBatch(ctx);
   const core = size * CORE * (1 + 0.6 * heat);
   for (let k = smear; k >= 0; k--) {
     const p = at(ms - (k * SMEAR * SMEAR_MS) / smear) ?? head;
-    ctx.globalAlpha = (1 - k / (smear + 1)) * alpha;
-    drawGlow(ctx, p.x, p.y, core * (1 - (0.6 * k) / smear), 0);
+    const glow = (1 - k / (smear + 1)) * alpha;
+    drawGlow(ctx, p.x, p.y, core * (1 - (0.6 * k) / smear), 0, glow);
   }
-  ctx.globalAlpha = 1;
   for (let i = 0; i < huddle; i++) {
     const angle =
       hash01(i, 41) * Math.PI * 2 + now / (300 + 200 * hash01(i, 42));
@@ -465,6 +471,7 @@ export function drawWispHead(
       now,
     );
   }
+  endLightBatch(ctx);
   ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = previous;
 }

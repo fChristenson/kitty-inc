@@ -16,7 +16,11 @@ import {
   drawText,
   along,
 } from "../../critPlayer";
-import { holeHash, skyY } from "../../critPlayer/shared";
+import {
+  holeHash,
+  skyY,
+  bottomBarY,
+} from "../../critPlayer/shared";
 
 const RD_IN_MS = 220;
 const RD_FIRST_MS = RD_IN_MS + 60;
@@ -68,7 +72,7 @@ const drops = new WeakMap<Running, Drop>();
 function planDrop(r: Running, bars: Point[]): Drop {
   const own = bars[0].y;
   const from = skyY(r, bars, RD_ABOVE) - own;
-  const past = Math.max(...bars.map((b) => b.y)) + RD_PAST - own;
+  const past = bottomBarY(bars) + RD_PAST - own;
   const reach = (y: number) => (y - own - from) / RD_SPEED;
   const rods: Rod[] = [];
   let clock = RD_FIRST_MS;

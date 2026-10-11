@@ -9,11 +9,11 @@ import { drawDetonation } from "../../../../shared/explosion";
 import { playExplosion } from "../../../../shared/explosionBang";
 import { drawGlow } from "../../../../shared/glowSprite";
 import { stampGlimmer } from "../../../../shared/twinkle";
+import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 import { drawWisp, WISP_SIZE } from "../../../../shared/wisp";
 import {
   registerFloorCrit,
   type Point,
-  type Running,
   lerp,
   clamp01,
   drawText,
@@ -62,13 +62,6 @@ const RC_TAIL_MS = 1100;
 
 const lockAt = (k: number) => RC_FIRST_LOCK_MS + k * RC_LOCK_MS;
 const criticalAt = (bars: Point[]) => lockAt(bars.length - 1) + RC_CHARGE_MS;
-// blast j of a race out from a bar's middle: 0 its middle, then out both ways
-const raceSpots = (r: Running, bars: Point[], bar: number) =>
-  Array.from({ length: RC_RACE }, (_, j) =>
-    (j ? [-1, 1] : [0]).map((side) =>
-      along(r, bars, bar, (side * j) / (RC_RACE - 1)),
-    ),
-  );
 
 registerFloorCrit("reactorCrit", {
   plan(_r, bars, hit) {
@@ -132,6 +125,7 @@ registerFloorCrit("reactorCrit", {
       });
       const previous = ctx.globalCompositeOperation;
       ctx.globalCompositeOperation = "lighter";
+      beginLightBatch(ctx);
       // glitter pumped down every locked beam, quickening
       order.forEach((bar, k) => {
         if (ms < lockAt(k) + RC_REACH_MS || ms >= critical) return;
@@ -163,6 +157,7 @@ registerFloorCrit("reactorCrit", {
           i % 3 ? COLOR.heavenlyGold : COLOR.white,
         );
       }
+      endLightBatch(ctx);
       ctx.globalAlpha = 0.3 + 0.6 * c;
       drawGlow(
         ctx,
@@ -187,16 +182,16 @@ registerFloorCrit("reactorCrit", {
     // locking on, critical's races, the core's burst and its own bar's boom
     order.forEach((bar, k) => {
       drawDetonation(ctx, bars[bar], ms - lockAt(k), RC_BLAST * 0.5, now);
-      raceSpots(r, bars, bar).forEach((spots, j) => {
-        for (const spot of spots)
+      if (ms < critical) return;
+      for (let j = 0; j < RC_RACE; j++)
+        for (let side = j ? -1 : 0; side <= (j ? 1 : 0); side += 2)
           drawDetonation(
             ctx,
-            spot,
+            along(r, bars, bar, (side * j) / (RC_RACE - 1)),
             ms - critical - j * RC_EVERY_MS,
             bar === 0 ? RC_OWN_BLAST : RC_BLAST,
             now,
           );
-      });
     });
     drawDetonation(ctx, RC_CORE, ms - coreBurst, RC_CORE_BLAST, now);
     drawDetonation(ctx, bars[0], ms - critical - RC_BOOM_MS, RC_BOOM, now);

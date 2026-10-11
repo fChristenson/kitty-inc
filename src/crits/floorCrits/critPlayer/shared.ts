@@ -16,12 +16,24 @@ export const otherBars = (bars: Point[]): number[] =>
 // a bar's half height, in the flash's units
 export const BAR_HALF_H = 46;
 
+// the top and the lowest bar's y, without an array a frame
+export const topBarY = (bars: Point[]): number => {
+  let y = Infinity;
+  for (let i = 0; i < bars.length; i++) if (bars[i].y < y) y = bars[i].y;
+  return y;
+};
+export const bottomBarY = (bars: Point[]): number => {
+  let y = -Infinity;
+  for (let i = 0; i < bars.length; i++) if (bars[i].y > y) y = bars[i].y;
+  return y;
+};
+
 // a height `above` over the top bar in view, kept below the HUD, and one
 // `below` under the lowest, kept on screen
 export const skyY = (r: Running, bars: Point[], above: number) =>
-  Math.max(Math.min(...bars.map((b) => b.y)) - above, -r.viewportWidth * 0.55);
+  Math.max(topBarY(bars) - above, -r.viewportWidth * 0.55);
 export const groundY = (r: Running, bars: Point[], below: number) =>
-  Math.min(Math.max(...bars.map((b) => b.y)) + below, r.viewportWidth * 0.9);
+  Math.min(bottomBarY(bars) + below, r.viewportWidth * 0.9);
 
 // a meteor shower's meteor or a volcano's blob: a curve from a, pulled
 // towards c, onto b, at p 0..1

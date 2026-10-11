@@ -619,15 +619,24 @@ export function warmScenario(scenario: Scenario): Scenario {
 }
 
 // one floor (or income) crit: armed on the ground floor from its test
-// button, then tapped
-export function floorCritScenario(kind: string, group = "floor"): Scenario {
-  const name = `${group}-crit:${kind}`;
+// button, then tapped; withSpawns puts every random spawn out first
+export function floorCritScenario(
+  kind: string,
+  group = "floor",
+  withSpawns = false,
+): Scenario {
+  const name = `${withSpawns ? "spawns-" : ""}${group}-crit:${kind}`;
   return {
     name,
-    about: `the ${kind} ${group} crit, start to finish`,
+    about: `the ${kind} ${group} crit, start to finish${withSpawns ? ", every random spawn out" : ""}`,
     run: async (bridge) => {
       click("#add-money");
       bridge.scrollToFloor(ground(bridge), 0.6);
+      if (withSpawns) {
+        for (const id of ["wisp", "coin"]) click(`#test-${id}-spawn-event`);
+        click("#test-bubbles-event");
+        click("#spawn-mouse");
+      }
       click(`[data-${group}-crit="${kind}"]`);
       await sleep(300);
       tap(bridge, ground(bridge));

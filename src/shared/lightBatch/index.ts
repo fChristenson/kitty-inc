@@ -3,7 +3,10 @@
 // "lighter", queueLight takes each drawImage instead of drawing it, and the
 // end draws them all at once (shared/spriteBatch, summed like "lighter"
 // does). The same pixels as stamping them one by one, since added light
-// doesn't care about order. A small batch is just stamped the 2D way
+// doesn't care about order. A small batch is just stamped the 2D way.
+// deferLights/flushLights around a busy draw (a floor crit's frame) holds
+// every batch opened inside it for one pass at its end: dozens of blasts'
+// sparks and wisps' trails in one go instead of a pass (or 2D stamps) each
 import {
   createSpriteTexture,
   drawSpriteGroups,
@@ -16,15 +19,21 @@ import {
 const MIN_BATCH = 160;
 // at most this many source canvases per batch; another flushes it first
 const MAX_SOURCES = 16;
+// at most this many transforms (one per batch opened) per pass
+const MAX_MATRICES = 255;
 // stamp fields: sx, sy, sw, sh, dx, dy, dw, dh, alpha
 const FIELDS = 9;
 const MAX_QUEUED = 1 << 16;
+// a level held open by deferLights: its own stamps aren't queued
+const DEFERRED = -1;
 
 let batchCtx: CanvasRenderingContext2D | null = null;
-let depth = 0;
-let matrix: DOMMatrix | null = null;
+// per open level, the index of its transform in `matrices` (or DEFERRED)
+const levels: number[] = [];
+const matrices: DOMMatrix[] = [];
 let stamps = new Float64Array(FIELDS * 1024);
 let stampSource = new Uint8Array(1024);
+let stampMatrix = new Uint8Array(1024);
 let queued = 0;
 const sources: HTMLCanvasElement[] = [];
 let lastSource: HTMLCanvasElement | null = null;
@@ -35,23 +44,47 @@ const starts = new Int32Array(MAX_SOURCES);
 let data = new Float32Array(SPRITE_FLOATS * 1024);
 const textures = new WeakMap<HTMLCanvasElement, SpriteTexture | null>();
 
+function open(ctx: CanvasRenderingContext2D, level: number): void {
+  batchCtx = ctx;
+  levels.push(level);
+}
+
 // stamps on ctx are queued until the matching endLightBatch; ctx must stay
 // "lighter", under the same transform and clip, until then
 export function beginLightBatch(ctx: CanvasRenderingContext2D): void {
-  if (batchCtx) {
-    if (batchCtx === ctx) depth++;
-    return;
-  }
-  batchCtx = ctx;
-  depth = 1;
-  matrix = ctx.getTransform();
+  if (batchCtx && batchCtx !== ctx) return;
+  if (matrices.length === MAX_MATRICES) flush(ctx);
+  matrices.push(ctx.getTransform());
+  open(ctx, matrices.length - 1);
 }
 
 export function endLightBatch(ctx: CanvasRenderingContext2D): void {
-  if (batchCtx !== ctx || --depth > 0) return;
+  close(ctx);
+}
+
+// every light batch opened on ctx from here to flushLights draws in one
+// pass then, over whatever is drawn in between (and outside any clip set in
+// between: only for draws that don't clip)
+export function deferLights(ctx: CanvasRenderingContext2D): void {
+  if (batchCtx && batchCtx !== ctx) return;
+  open(ctx, DEFERRED);
+}
+
+export function flushLights(ctx: CanvasRenderingContext2D): void {
+  close(ctx);
+}
+
+function close(ctx: CanvasRenderingContext2D): void {
+  if (batchCtx !== ctx) return;
+  if (levels.length > 1) {
+    levels.pop();
+    return;
+  }
+  // flushed while its level is still open, so it knows whose transform is on ctx
   flush(ctx);
+  levels.length = 0;
+  matrices.length = 0;
   batchCtx = null;
-  matrix = null;
 }
 
 // ctx.drawImage(source, sx, sy, sw, sh, dx, dy, dw, dh) at ctx's alpha, queued
@@ -67,8 +100,10 @@ export function queueLight(
   dy: number,
   dw: number,
   dh: number,
+  // the stamp's alpha, if the caller hasn't set it on ctx
+  alpha?: number,
 ): boolean {
-  if (batchCtx !== ctx) return false;
+  if (batchCtx !== ctx || levels[levels.length - 1] === DEFERRED) return false;
   let s = source === lastSource ? lastIndex : sources.indexOf(source);
   if (s < 0) {
     if (sources.length === MAX_SOURCES) flush(ctx);
@@ -87,7 +122,8 @@ export function queueLight(
   stamps[o + 5] = dy;
   stamps[o + 6] = dw;
   stamps[o + 7] = dh;
-  stamps[o + 8] = ctx.globalAlpha;
+  stamps[o + 8] = alpha ?? ctx.globalAlpha;
+  stampMatrix[queued] = levels[levels.length - 1];
   stampSource[queued++] = s;
   if (queued === MAX_QUEUED) flush(ctx);
   return true;
@@ -100,19 +136,44 @@ function grow(): void {
   const moreSources = new Uint8Array(stampSource.length * 2);
   moreSources.set(stampSource);
   stampSource = moreSources;
+  const moreMatrices = new Uint8Array(stampMatrix.length * 2);
+  moreMatrices.set(stampMatrix);
+  stampMatrix = moreMatrices;
 }
 
+// draws what's queued, "lighter" under each stamp's own transform, leaving
+// ctx as it was; the levels still open keep their transforms
 function flush(ctx: CanvasRenderingContext2D): void {
-  if (queued > 0 && (queued < MIN_BATCH || !drawOnGpu(ctx))) stampAll(ctx);
+  if (queued > 0) {
+    const composite = ctx.globalCompositeOperation;
+    ctx.globalCompositeOperation = "lighter";
+    if (queued < MIN_BATCH || !drawOnGpu(ctx)) stampAll(ctx);
+    ctx.globalCompositeOperation = composite;
+  }
   queued = 0;
   sources.length = 0;
   lastSource = null;
+  let kept = 0;
+  for (let i = 0; i < levels.length; i++) {
+    if (levels[i] === DEFERRED) continue;
+    matrices[kept] = matrices[levels[i]];
+    levels[i] = kept++;
+  }
+  matrices.length = kept;
 }
 
 function stampAll(ctx: CanvasRenderingContext2D): void {
   const alpha = ctx.globalAlpha;
+  // a lone batch flushes under its own transform, still on ctx
+  const own = matrices.length === 1 && levels[0] !== DEFERRED;
+  const transform = own ? null : ctx.getTransform();
+  let current = own ? 0 : -1;
   for (let i = 0; i < queued; i++) {
     const o = i * FIELDS;
+    if (stampMatrix[i] !== current) {
+      current = stampMatrix[i];
+      ctx.setTransform(matrices[current]);
+    }
     ctx.globalAlpha = stamps[o + 8];
     ctx.drawImage(
       sources[stampSource[i]],
@@ -126,6 +187,7 @@ function stampAll(ctx: CanvasRenderingContext2D): void {
       stamps[o + 7],
     );
   }
+  if (transform) ctx.setTransform(transform);
   ctx.globalAlpha = alpha;
 }
 
@@ -155,7 +217,13 @@ function drawOnGpu(ctx: CanvasRenderingContext2D): boolean {
   }
   if (data.length < queued * SPRITE_FLOATS)
     data = new Float32Array(queued * SPRITE_FLOATS * 2);
-  const { a, b, c, d, e, f } = matrix!;
+  let current = -1;
+  let a = 1;
+  let b = 0;
+  let c = 0;
+  let d = 1;
+  let e = 0;
+  let f = 0;
   let left = Infinity;
   let top = Infinity;
   let right = -Infinity;
@@ -164,6 +232,10 @@ function drawOnGpu(ctx: CanvasRenderingContext2D): boolean {
     const o = i * FIELDS;
     const s = stampSource[i];
     const sheet = sheets[s];
+    if (stampMatrix[i] !== current) {
+      current = stampMatrix[i];
+      ({ a, b, c, d, e, f } = matrices[current]);
+    }
     const hw = stamps[o + 6] / 2;
     const hh = stamps[o + 7] / 2;
     const cx = stamps[o + 4] + hw;

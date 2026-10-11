@@ -17,6 +17,7 @@ import {
   METEOR_PAYS,
   METEOR_FONT,
   holeHash,
+  topBarY,
 } from "../../critPlayer/shared";
 
 // a hail of meteors streaking in from the top corner onto the bars, then one
@@ -43,7 +44,7 @@ const showerMeteor = (r: Running, bars: Point[], i: number) => {
   const last = i === SHOWER_METEORS - 1;
   const bar = last ? 0 : i % bars.length;
   const w = r.viewportWidth;
-  const top = Math.min(...bars.map((b) => b.y));
+  const top = topBarY(bars);
   const to = last ? bars[0] : along(r, bars, bar, holeHash(i, 21) * 2 - 1);
   const from = {
     x: w * (0.25 + 0.3 * holeHash(i, 22)),

@@ -10,7 +10,12 @@ import {
   drawText,
   along,
 } from "../../critPlayer";
-import { quadratic, holeHash } from "../../critPlayer/shared";
+import {
+  quadratic,
+  holeHash,
+  topBarY,
+  bottomBarY,
+} from "../../critPlayer/shared";
 
 // the number diving into a vent under the lowest bar, which erupts twice,
 // flinging glowing blobs in high arcs down onto the bars
@@ -30,7 +35,7 @@ const VOLCANO_BLOB_SHAKE = 0.6;
 const VOLCANO_TAIL_MS = 600;
 const volcanoVent = (bars: Point[]): Point => ({
   x: 0,
-  y: Math.max(...bars.map((b) => b.y)) + VOLCANO_DEPTH,
+  y: bottomBarY(bars) + VOLCANO_DEPTH,
 });
 const volcanoStarts = (i: number) =>
   (i < VOLCANO_BLOBS / 2 ? VOLCANO_DIVE_MS : VOLCANO_AGAIN_MS) +
@@ -71,7 +76,7 @@ registerFloorCrit("volcanoCrit", {
         now,
       );
     }
-    const top = Math.min(...bars.map((b) => b.y));
+    const top = topBarY(bars);
     for (let i = 0; i < VOLCANO_BLOBS; i++) {
       const starts = volcanoStarts(i);
       const hits = starts + VOLCANO_FLY_MS;

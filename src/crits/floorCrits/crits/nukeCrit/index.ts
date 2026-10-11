@@ -16,7 +16,11 @@ import {
   byHeight,
   drawText,
 } from "../../critPlayer";
-import { holeHash } from "../../critPlayer/shared";
+import {
+  holeHash,
+  topBarY,
+  bottomBarY,
+} from "../../critPlayer/shared";
 import { beginLightBatch, endLightBatch } from "../../../../shared/lightBatch";
 
 const NUKE_IN_MS = 250;
@@ -61,14 +65,14 @@ function drop(r: Running, bars: Point[]) {
     from: {
       x,
       y: Math.max(
-        Math.min(...bars.map((b) => b.y)) - NUKE_ABOVE,
+        topBarY(bars) - NUKE_ABOVE,
         -w * NUKE_HIGHEST,
       ),
     },
     ground: {
       x,
       y: Math.min(
-        Math.max(...bars.map((b) => b.y)) + NUKE_BELOW,
+        bottomBarY(bars) + NUKE_BELOW,
         w * NUKE_LOWEST,
       ),
     },
