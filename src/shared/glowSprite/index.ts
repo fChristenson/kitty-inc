@@ -77,11 +77,5 @@ export function drawGlow(
     )
   )
     return;
-  ctx.drawImage(
-    sprite,
-    x - r,
-    y - r * squash,
-    r * 2,
-    r * 2 * squash,
-  );
+  ctx.drawImage(sprite, x - r, y - r * squash, r * 2, r * 2 * squash);
 }

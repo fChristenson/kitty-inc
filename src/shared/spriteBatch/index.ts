@@ -279,10 +279,30 @@ export function drawSpriteGroups(
   ctx.globalAlpha = 1;
   const top2d = height - glH + sy;
   if (canvas instanceof HTMLCanvasElement)
-    ctx.drawImage(canvas, sx, top2d, sw, sh, sx / res, sy / res, sw / res, sh / res);
+    ctx.drawImage(
+      canvas,
+      sx,
+      top2d,
+      sw,
+      sh,
+      sx / res,
+      sy / res,
+      sw / res,
+      sh / res,
+    );
   else {
     const bitmap = canvas.transferToImageBitmap();
-    ctx.drawImage(bitmap, sx, top2d, sw, sh, sx / res, sy / res, sw / res, sh / res);
+    ctx.drawImage(
+      bitmap,
+      sx,
+      top2d,
+      sw,
+      sh,
+      sx / res,
+      sy / res,
+      sw / res,
+      sh / res,
+    );
     bitmap.close();
   }
   ctx.restore();

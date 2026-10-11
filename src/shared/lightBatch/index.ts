@@ -251,7 +251,14 @@ function stampAll(ctx: CanvasRenderingContext2D): void {
       const cos = stamps[o + 9];
       const hw = stamps[o + 6] / 2;
       const hh = stamps[o + 7] / 2;
-      ctx.transform(cos, sin, -sin, cos, stamps[o + 4] + hw, stamps[o + 5] + hh);
+      ctx.transform(
+        cos,
+        sin,
+        -sin,
+        cos,
+        stamps[o + 4] + hw,
+        stamps[o + 5] + hh,
+      );
       ctx.drawImage(
         sources[stampSource[i]],
         stamps[o],

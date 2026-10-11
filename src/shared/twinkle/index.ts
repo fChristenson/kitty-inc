@@ -133,7 +133,8 @@ processWhenIdle(
   WARM_COLORS.flatMap((color) => SMALL_HALVES.map(() => color)),
   (color) => {
     const atlas = atlasOf(color, false);
-    if (atlas.painted < SMALL_HALVES.length) paintNextLevel(atlas, color, false);
+    if (atlas.painted < SMALL_HALVES.length)
+      paintNextLevel(atlas, color, false);
   },
 );
 
