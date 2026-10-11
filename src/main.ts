@@ -27,9 +27,13 @@ import {
 import { wireCritTestActions } from "./hud";
 import { forceBubbles } from "./spawn/bubbles";
 import { forceWispSpawn } from "./spawn/wisp";
+import { setUnitUpPayout, setUnitUpRecord } from "./shared/unitUp";
+import { CONFIG } from "./config";
 import { forceCoinSpawn } from "./spawn/coin";
 import {
   add,
+  multiply,
+  fromLog10,
   subtract,
   fromNumber,
   gt,
@@ -280,7 +284,7 @@ import {
 import { loadMouseImage, forceSpawnMouse } from "./spawn/mouse";
 import { startBackgroundMusic, preloadSounds, playSwoosh } from "./sound";
 import { createNewCorporation } from "./corporationName";
-import { observeActionBarHeight } from "./utils";
+import { formatTotalIncomeParts, observeActionBarHeight } from "./utils";
 import { getBackgroundUrls } from "./loadAssets";
 
 import { loadWhenIdle, runWhenIdle, runWhenIdleWithin } from "./shared/idle";
@@ -2292,6 +2296,7 @@ async function main() {
           "bullet-cancel": forceOnActive((e) => e.forceBulletCancelEvent),
           bubbles: forceBubbles,
           "wisp-spawn": forceWispSpawn,
+          "unit-up": procUnitUp,
           "coin-spawn": forceCoinSpawn,
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
@@ -3540,6 +3545,9 @@ async function main() {
     gameCanvas.redraw();
   });
   startTotalIncomeTicker(buildings, getGlobalIncomeBoostMultiplier);
+  setUnitUpPayout(() =>
+    addTotalIncome(multiply(getTotalIncome(), CONFIG.unitUp.payShare)),
+  );
 
   bindSaveLifecycle({
     isIntact: isStorageIntact,
@@ -3571,4 +3579,16 @@ if (
       .register(`${import.meta.env.BASE_URL}sw.js`)
       .catch((err) => console.error("Service worker registration failed", err));
   });
+}
+
+// the Unit Up test button: lifts the total just into its next unit, with the
+// record set back to the current one so the reel plays as it rolls over
+function procUnitUp(): void {
+  const total = getTotalIncome();
+  const tier = formatTotalIncomeParts(total).tier;
+  const next = tier + 1;
+  // tier 1 (Million) starts at 1e12; each after it 1000x the last, from 1e18
+  const target = fromLog10((next === 1 ? 12 : 3 * next + 12) + 0.02);
+  setUnitUpRecord(tier);
+  addTotalIncome(subtract(target, total));
 }

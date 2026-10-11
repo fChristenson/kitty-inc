@@ -1,16 +1,15 @@
 # Ideas
 
-## List 114: game features
+## List 117: game features ([playground](../tmp/_playground/ideas.html?list=next101))
 
-Systems on top of the crits, floors, buildings and companies, every one a fresh pull of the lever and always to the good.
+Small surprise moments in what's already on screen (the total, the buttons, the crit numbers, the cats), in the spirit of the Odometer and the crit chains.
 
-1. **Progressive jackpot**: every crit drops a sliver of its payout into a pot shown under the total, growing all game; a rare Jackpot proc (on any tier) pays the whole pot at once with its own event, then the pot starts again from a seed.
-2. **Hot symbol**: one badge crit is the bonus symbol, its icon pinned by the total; when it lands it pays ten times its reward with a gold flash, and a new symbol is picked. Collecting it again and again makes chasing one face a thing.
-3. **Set bonuses**: finishing a category in the badge collection (every crit in Wrestling, Cakes, Space Knights...) seals it with a gold frame and a permanent perk themed on it: food sets pay more cash, girl sets more levels, wealth sets more tiers.
-4. **Sticker walls**: every badge you land slaps its sticker onto the building's outer wall where it rolled; a wall covered top to bottom gets a permanent income boost and starts again on the next building, so each building wears its own luck.
-5. **Company charters**: a new company draws a charter from a slot reel when it's founded (Bakery Barons: food crits twice as often; Fight Club: wrestling crits pay double; High Rollers: mega crits more likely), shown on its map, so every company plays a bit differently.
-6. **Welcome-back spin**: the money earned while away lands as three reels that spin and stop on a multiplier (x1 to x10, a matching row x25) before the coins pour into the total, so every return is a pull.
-7. **Floor businesses**: a floor picks its business when bought (casino, bakery, gym, salon...) shown on its sign; its crits lean on the matching badge category, so a building full of casinos rains Games of Chance crits.
-8. **Milestone pulls**: maxing a floor, filling a building or buying a building earns a big lever pull: a full-screen slot machine of crit icons, three of a kind firing an animated crit, a pair a floor crit, anything else a cash jackpot.
-9. **Landmark**: each company's map has one landmark lot (casino tower, stadium, rocket pad) at a fixed price; buying it builds the landmark on the map and gives every building of that company a lasting multiplier plus a landmark-only crit pool.
-10. **IPO**: a company with every building maxed can float on the market: it leaves the map with a bell-ringing finale and turns into golden shares that raise every remaining company's income for good. Opt-in, never forced.
+1. **Mystery price**: now and then a floor's button shows `???` instead of its price; tapping it reveals what the level cost: the normal price, half, nothing at all, or nothing plus ten levels on top.
+2. **Loose digit**: a digit in the total sometimes wobbles loose and glows; tap it and it pops out as a coin, its value (a 9 most of all) paid into the total before it snaps back in.
+3. **Catch the number**: a crit number sometimes hangs a beat longer with a gold rim; tap it then and it jumps a tier (x3 to x10, x10 to x50) before it lands.
+4. **Lasso**: a ring of coins spins over a floor; draw a loop round it with a finger and the whole ring is caught and pulled into the total.
+5. **High five**: two cats walking past each other sometimes stop and high-five, a coin popping up between them; tap it and both cats light up with a boost.
+
+## Built
+
+- **Unit up** (`src/shared/unitUp`, drawn by `shared/totalIncomeReadout`): the first time ever the total reaches a unit, its unit word spins as a slot reel between gold rims, clicking and braking, three times round onto the new unit, slamming in gold in a cluster of blasts; coins swing up into the total, which pays `CONFIG.unitUp.payShare` of itself. Test: New Effects "Unit Up".

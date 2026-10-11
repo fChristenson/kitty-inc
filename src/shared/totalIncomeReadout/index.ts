@@ -14,6 +14,7 @@ import {
   GLOBAL_SLAM,
 } from "../eventEndSlam";
 import { drawTargetStream, getTargetTension } from "../eventFx";
+import { drawUnitUp, noteUnitTier } from "../unitUp";
 
 // shared "amount + spelled-out unit name below it" total-income drawing, used by
 // both hud/index.ts's top-of-screen HUD and background/cityMap's map readout —
@@ -60,10 +61,13 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
   let formatted: ReturnType<typeof formatTotalIncomeParts> = {
     amount: "",
     unitName: null,
+    tier: 0,
   };
   let measuredFont = "";
   let amountHeight = 0;
   let unitHeight = 0;
+  // where the reel's coins fly into (see shared/unitUp)
+  const amountSpot = { x: 0, y: 0 };
 
   function draw(
     ctx: CanvasRenderingContext2D,
@@ -80,6 +84,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       formatted = formatTotalIncomeParts(displayed);
       formattedMantissa = displayed.mantissa;
       formattedExponent = displayed.exponent;
+      noteUnitTier(formatted.tier);
     }
     // "special crit crit" bonus-tier coins merging into the total (see
     // shared/totalIncomeCoins) flash this whole readout white and wiggle it briefly —
@@ -171,20 +176,32 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         ctx.font = `900 ${unitFontSize}px "Fredoka", system-ui, sans-serif`;
         ctx.textAlign = "center";
         const unitTop = bottom + unitNameGapPx;
-        drawSlamText(
+        amountSpot.x = centerX;
+        amountSpot.y = pivotY;
+        const reeling = drawUnitUp(
           ctx,
-          slam,
-          unitName,
           centerX,
           unitTop,
           unitHeight,
-          COLOR.moneyGreen,
-          COLOR.white,
           unitStrokeWidth,
-          false,
-          whiteMix,
-          moving,
+          cachedAmountWidth * 1.1,
+          amountSpot,
         );
+        if (!reeling)
+          drawSlamText(
+            ctx,
+            slam,
+            unitName,
+            centerX,
+            unitTop,
+            unitHeight,
+            COLOR.moneyGreen,
+            COLOR.white,
+            unitStrokeWidth,
+            false,
+            whiteMix,
+            moving,
+          );
         if (remeasure) {
           const unitMetrics = ctx.measureText(unitName);
           unitHeight =

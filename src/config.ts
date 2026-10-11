@@ -172,4 +172,10 @@ export const CONFIG = {
     // size-based baseline contribution uses (see getCompanyBaseModifierPercent)
     baseModifierRate: 0.5,
   },
+
+  // src/shared/unitUp — the total reaching a new unit for the first time pays
+  // this share of itself once the reel's coins land
+  unitUp: {
+    payShare: 0.25,
+  },
 } as const;

@@ -18,6 +18,7 @@ import {
   isCritFlashActive,
 } from "../../crits";
 import { getScreenShakeOffset } from "../../shared/screenShake";
+import { isUnitUpActive } from "../../shared/unitUp";
 
 import { getBuildingPrice } from "../../buildings";
 import { getCityName } from "../../cityName";
@@ -825,6 +826,7 @@ export function createCityMapView(
       hasWigglingPrice ||
       capsuleReveal ||
       hasActiveCoinBursts() ||
+      isUnitUpActive(Date.now()) ||
       isCritFlashActive(Date.now())
         ? 0
         : REDRAW_INTERVAL_MS;

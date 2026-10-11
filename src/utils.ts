@@ -217,7 +217,7 @@ function illionSuffix(tier: number): string {
 
 // same tier numbering as illionSuffix, but the full spelled-out word instead of
 // the abbreviation — used by formatTotalIncomeParts
-function illionName(tier: number): string {
+export function illionName(tier: number): string {
   const raw =
     tier <= SMALL_ILLION_NAMES.length
       ? SMALL_ILLION_NAMES[tier - 1]
@@ -312,7 +312,7 @@ function withCommas(value: number): string {
 const lastTotalParts = {
   mantissa: NaN,
   exponent: NaN,
-  parts: { amount: "", unitName: null as string | null },
+  parts: { amount: "", unitName: null as string | null, tier: 0 },
 };
 
 // same total-income number, but split into the plain amount and the full spelled-out
@@ -320,10 +320,11 @@ const lastTotalParts = {
 // instead of one string with an abbreviation glued onto the end — for callers that
 // want to lay the unit out on its own line under the number. unitName is null below
 // formatTotalIncome's own 1e12 cutoff, since the full comma-separated number there
-// has no unit at all
+// has no unit at all. tier is unitName's illion tier (1 = Million), 0 without one
 export function formatTotalIncomeParts(value: BigNumber): {
   amount: string;
   unitName: string | null;
+  tier: number;
 } {
   if (
     value.mantissa === lastTotalParts.mantissa &&
@@ -336,6 +337,7 @@ export function formatTotalIncomeParts(value: BigNumber): {
     lastTotalParts.parts = {
       amount: `$${withCommas(Math.max(0, toNumber(value)))}`,
       unitName: null,
+      tier: 0,
     };
     return lastTotalParts.parts;
   }
@@ -343,6 +345,7 @@ export function formatTotalIncomeParts(value: BigNumber): {
   lastTotalParts.parts = {
     amount: `$${withCommas(Math.round(mantissa))}`,
     unitName: illionName(tier),
+    tier,
   };
   return lastTotalParts.parts;
 }
