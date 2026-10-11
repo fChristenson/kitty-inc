@@ -136,14 +136,6 @@ export const tornado = flight(
   },
 );
 
-export const FLOAT_EFFECTS: readonly FloatEffect[] = [
-  arcSmash,
-  flipArc,
-  tornado,
-];
-
-// candidates on trial in the playground, not picked in the game yet
-
 // a low arch turning one full cartwheel backwards
 export const cartwheel = flight(
   "Cartwheel",
@@ -174,7 +166,74 @@ export const headOverHeels = flight(
   },
 );
 
-export const CANDIDATE_FLIGHTS: readonly FloatEffect[] = [
+// a medium arch, one slow lazy flip round its upright axis
+export const lazyFlip = flight(
+  "Lazy flip",
+  "a medium arch turning one slow, lazy flip round its upright axis",
+  560,
+  (u, from, to, out, l) => {
+    p0.x = (from.x + to.x) / 2 + l.nx * 0.7 * l.dist;
+    p0.y = (from.y + to.y) / 2 + l.ny * 0.7 * l.dist;
+    bezier(from, p0, to, u, at);
+    out.x = at.x;
+    out.y = at.y;
+    out.sx = spinFace(smoothstep(u));
+  },
+);
+
+// a tall arch, spinning fast like a flicked coin and slowing to land face on
+export const spinDown = flight(
+  "Spin down",
+  "a tall arch spinning fast like a flicked coin, slowing to land face on",
+  620,
+  (u, from, to, out, l) => {
+    p0.x = (from.x + to.x) / 2 + l.nx * 1.1 * l.dist;
+    p0.y = (from.y + to.y) / 2 + l.ny * 1.1 * l.dist;
+    bezier(from, p0, to, u, at);
+    out.x = at.x;
+    out.y = at.y;
+    out.sx = spinFace(8 * (1 - (1 - u) ** 3));
+  },
+);
+
+// dips under the line like a swing and up into its target, turning once
+export const swing = flight(
+  "Swing",
+  "dips down under the way like a swing and up into its target, turning once",
+  560,
+  (u, from, to, out, l) => {
+    p0.x = (from.x + to.x) / 2 - l.nx * 0.6 * l.dist;
+    p0.y = (from.y + to.y) / 2 - l.ny * 0.6 * l.dist;
+    bezier(from, p0, to, u, at);
+    out.x = at.x;
+    out.y = at.y;
+    out.rotation = Math.PI * 2 * smoothstep(u);
+  },
+);
+
+// shot up a very tall arch, speeding up, tumbling head over heels twice
+export const skyrocket = flight(
+  "Skyrocket",
+  "shot up a very tall arch, gathering speed, tumbling head over heels twice",
+  600,
+  (u, from, to, out, l) => {
+    p0.x = (from.x + to.x) / 2 + l.nx * 1.4 * l.dist;
+    p0.y = (from.y + to.y) / 2 + l.ny * 1.4 * l.dist;
+    bezier(from, p0, to, u ** 1.3, at);
+    out.x = at.x;
+    out.y = at.y;
+    out.sy = spinFace(2 * u);
+  },
+);
+
+export const FLOAT_EFFECTS: readonly FloatEffect[] = [
+  arcSmash,
+  flipArc,
+  tornado,
+  lazyFlip,
+  spinDown,
+  swing,
+  skyrocket,
   cartwheel,
   headOverHeels,
 ];
