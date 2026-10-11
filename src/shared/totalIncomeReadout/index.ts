@@ -21,6 +21,11 @@ import {
   newDigitHideIndex,
   noteTotalExponent,
 } from "../newDigit";
+import {
+  drawMatchingDigits,
+  matchingDigitsHideIndex,
+  noteMatchingDigits,
+} from "../matchingDigits";
 
 // shared "amount + spelled-out unit name below it" total-income drawing, used by
 // both hud/index.ts's top-of-screen HUD and background/cityMap's map readout —
@@ -92,6 +97,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       formattedExponent = displayed.exponent;
       noteUnitTier(formatted.tier);
       noteTotalExponent(displayed.exponent);
+      noteMatchingDigits(formatted.amount);
     }
     // "special crit crit" bonus-tier coins merging into the total (see
     // shared/totalIncomeCoins) flash this whole readout white and wiggle it briefly —
@@ -155,6 +161,7 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
       drawNewDigitPop(ctx);
+      const matchAt = matchingDigitsHideIndex(amount, now);
       drawSlamText(
         ctx,
         slam,
@@ -168,9 +175,11 @@ export function createTotalIncomeReadout(): TotalIncomeReadout {
         true,
         whiteMix,
         moving,
-        newDigitHideIndex(now),
+        matchAt >= 0 ? matchAt : newDigitHideIndex(now),
+        matchAt >= 0 ? 3 : 1,
       );
       drawNewDigit(ctx, amount, centerX, top, amountHeight, strokeWidth, now);
+      drawMatchingDigits(ctx, amount, centerX, top, amountHeight, strokeWidth);
 
       if (remeasure) {
         const amountMetrics = ctx.measureText(amount);

@@ -22,6 +22,10 @@ export function startHoldTally(floor: Floor): void {
   holds.set(floor, { at: Date.now(), levels: floor.upgradeCount });
 }
 
+export function isHoldingUpgrade(floor: Floor): boolean {
+  return holds.has(floor);
+}
+
 export function endHoldTally(floor: Floor): void {
   const hold = holds.get(floor);
   holds.delete(floor);

@@ -350,6 +350,7 @@ export {
   hitTestUpgradeStar,
 } from "./star";
 export { startHoldTally, endHoldTally } from "./holdTally";
+export { forceLuckySevens } from "./luckySevens";
 export {
   drawUpgradeButton,
   hitTestUpgradeButton,

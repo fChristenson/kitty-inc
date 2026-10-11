@@ -48,6 +48,8 @@ export function createTestButtonMarkup(): string {
         <div class="test-actions-dropdown__menu">
           <button id="test-unit-up-event" class="game__button">Unit Up</button>
           <button id="test-new-digit-event" class="game__button">New Digit</button>
+          <button id="test-lucky-sevens-event" class="game__button">Lucky Sevens</button>
+          <button id="test-matching-digits-event" class="game__button">Matching Digits</button>
           <button id="test-nitro-event" class="game__button">Nitro</button>
           <button id="test-bullet-cancel-event" class="game__button">Bullet Cancel</button>
           <button class="game__button" data-floor-crit="blockBonkCrit">Block Bonk Crit</button>

@@ -178,4 +178,10 @@ export const CONFIG = {
   unitUp: {
     payShare: 0.25,
   },
+
+  // src/shared/matchingDigits — a group of three matching digits in the total
+  // pays this share of it
+  matchingDigits: {
+    payShare: 0.03,
+  },
 } as const;

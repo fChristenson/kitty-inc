@@ -28,6 +28,10 @@ import { wireCritTestActions } from "./hud";
 import { forceBubbles } from "./spawn/bubbles";
 import { forceWispSpawn } from "./spawn/wisp";
 import { setUnitUpPayout, setUnitUpRecord } from "./shared/unitUp";
+import {
+  forceMatchingDigits,
+  setMatchingDigitsPayout,
+} from "./shared/matchingDigits";
 import { setNewDigitRecord } from "./shared/newDigit";
 import { CONFIG } from "./config";
 import { forceCoinSpawn } from "./spawn/coin";
@@ -63,6 +67,7 @@ import {
   performAutomatedUpgradeAfterPayment,
   performAutomatedFloorUnlock,
   getUpgradeCost,
+  forceLuckySevens,
   type FloorActionsDeps,
 } from "./floors";
 import {
@@ -2299,6 +2304,13 @@ async function main() {
           "wisp-spawn": forceWispSpawn,
           "unit-up": procUnitUp,
           "new-digit": procNewDigit,
+          "matching-digits": forceMatchingDigits,
+          "lucky-sevens": later(() => {
+            const floor = buildings[activeBuildingIndex]?.[0];
+            if (!floor) return;
+            gameCanvas.scrollActiveToFloor(floor);
+            forceLuckySevens(floor);
+          }),
           "coin-spawn": forceCoinSpawn,
           "seed-pods": forceOnActive((e) => e.forceSeedPodsEvent),
           "ripple-fire": forceOnActive((e) => e.forceRippleFireEvent),
@@ -3549,6 +3561,9 @@ async function main() {
   startTotalIncomeTicker(buildings, getGlobalIncomeBoostMultiplier);
   setUnitUpPayout(() =>
     addTotalIncome(multiply(getTotalIncome(), CONFIG.unitUp.payShare)),
+  );
+  setMatchingDigitsPayout(() =>
+    addTotalIncome(multiply(getTotalIncome(), CONFIG.matchingDigits.payShare)),
   );
 
   bindSaveLifecycle({

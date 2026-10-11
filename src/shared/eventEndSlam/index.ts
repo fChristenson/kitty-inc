@@ -360,6 +360,7 @@ function drawRestText(
   strokeWidth: number,
   tabular: boolean,
   hideIndex: number,
+  hideCount: number,
 ): void {
   const font = ctx.font;
   const m = ctx.getTransform();
@@ -394,7 +395,8 @@ function drawRestText(
     for (let pass = 0; pass < 2; pass++) {
       for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        if (char === " " || i === hideIndex) continue;
+        if (char === " " || (i >= hideIndex && i < hideIndex + hideCount))
+          continue;
         const lx = left + layout.offsets[i];
         const glyph = getRestGlyph(ctx, set, char);
         ctx.drawImage(
@@ -427,7 +429,7 @@ function drawRestText(
       const width = measure(ctx, char, font);
       const cell = isDigit(char) ? digitCell : width;
       const lx = at + (isDigit(char) ? (cell - width) / 2 : 0);
-      if (i !== hideIndex) {
+      if (i < hideIndex || i >= hideIndex + hideCount) {
         if (pass === 0) ctx.strokeText(char, lx, y);
         else ctx.fillText(char, lx, y);
       }
@@ -548,8 +550,8 @@ function getRestGlyph(
 // counting number never shifts sideways. whiteMix 0..1 blends the fill toward
 // white; moving says the text is swelling, wiggling or flashing this frame, so
 // it's stamped from sprites like a landed slam (see SlamGlyph). A caller that
-// passes moving gets its sprites warmed while the text rests. hideIndex
-// leaves that letter out, its place kept
+// passes moving gets its sprites warmed while the text rests. hideCount
+// letters from hideIndex are left out, their places kept
 export function drawSlamText(
   ctx: CanvasRenderingContext2D,
   pose: SlamPose | null,
@@ -564,6 +566,7 @@ export function drawSlamText(
   whiteMix = 0,
   moving?: boolean,
   hideIndex = -1,
+  hideCount = 1,
 ): void {
   // past TEXT_FX_MS no letter hops, shines or glows: it's the text at rest
   const landed =
@@ -587,6 +590,7 @@ export function drawSlamText(
       strokeWidth,
       tabular,
       hideIndex,
+      hideCount,
     );
     return;
   }
@@ -633,7 +637,8 @@ export function drawSlamText(
       const lx = left + layout.offsets[i];
       const centerX = left + (start + end) / 2;
       start = end;
-      if (char === " " || i === hideIndex) continue;
+      if (char === " " || (i >= hideIndex && i < hideIndex + hideCount))
+        continue;
       const glyph = getSlamGlyph(ctx, glyphs, char);
       const hop = landed ? hopAt(landed, (centerX - left + band) / path) : 0;
       if (hop !== 0) {

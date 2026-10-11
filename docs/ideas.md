@@ -28,11 +28,24 @@ Still small moments in what's on screen, each a little surprise that only pays.
 2. **Conga**: boosting every cat on a floor at once sometimes sets them dancing in a conga line across the floor, a coin popping off each one as it passes the bar.
 3. **Change of tier**: a floor climbing a crit tier has its bar's new colour pour in from the left like paint, a coin popping out at the end.
 
+## List 120: game features
+
+More little surprises in what's already on screen, each one only paying.
+
+1. **Domino**: a floor's payout now and then knocks the floor above into paying early, and it climbs the building floor by floor, each bar jolting as it pays, the last one slamming.
+2. **Price drop**: a floor's price sometimes rolls down digit by digit like an odometer running backwards, holding the low price for a few seconds before it rolls back up.
+3. **Cat nap**: a cat sometimes nods off at its desk without slowing anything, a little z floating up; tap it and it jolts awake and works at double speed for a while.
+4. **Echo**: a crit number sometimes echoes, a smaller copy of it landing on the floor above a beat later with its own levels.
+
 ## Built
+
+- **Matching digits** (`src/shared/matchingDigits`, drawn by `shared/totalIncomeReadout`): any group of three between the total's commas newly showing the same digit (444, 777) jumps out digit by digit in gold, slams back in a burst of glitter and pays `CONFIG.matchingDigits.payShare` of the total (then a 4s quiet spell). Test: New Effects "Matching Digits" (the next change plays its last group as 777).
 
 - **New digit** (`src/shared/newDigit`, drawn by `shared/totalIncomeReadout`): the first time ever the total grows a digit, its new leading digit drops in from above in gold, lands with a pop of coins and cools back to green (a digit that starts a new unit plays Unit up instead). Test: New Effects "New Digit".
 
 - **Gold standard** (`floors/incomePanel`): a floor at the level cap gets a coin-gold bar with gloss slashes and gold glimmers twinkling calmly over it.
+
+- **Lucky sevens** (`src/floors/luckySevens`, drawn by `floors/star`): a floor's label reaching any level with a 7 in it (by any means) sends each 7 in turn flying up out of the number half as big again, spinning seven times round its upright axis, then slamming back in gold in a burst of glitter before cooling back to its usual colour; the floor pays out once per 7. Test: New Effects "Lucky Sevens".
 
 - **Hold tally** (`src/floors/holdTally`, started and ended by gameCanvas's upgrade-button hold): letting go of a long-press buy (held 0.5s+) rattles the floor's bar with a gold flash per hundred levels the hold gave (up to ten), then the bar does the jackpot slam and lands with `+N Lvl` in gold.
 
