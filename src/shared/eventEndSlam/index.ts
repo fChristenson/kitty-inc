@@ -403,10 +403,30 @@ function drawRestText(
       ctx.restore();
       return;
     }
+    // a counting number: its leading digits hold still while the last few
+    // count, so they're one baked stamp and only the tail goes glyph by glyph
+    const head =
+      tabular && hideIndex < 0 && text.length > COUNT_TAIL + 1
+        ? getRestWord(
+            ctx,
+            set,
+            text.slice(0, text.length - COUNT_TAIL),
+            layout.offsets,
+          )
+        : null;
+    const from = head ? text.length - COUNT_TAIL : 0;
     ctx.save();
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     for (let pass = 0; pass < 2; pass++) {
-      for (let i = 0; i < text.length; i++) {
+      // the head goes between the tail's outlines and its fills, as a
+      // letter's fill always covers its neighbours' outlines
+      if (head && pass === 1)
+        ctx.drawImage(
+          head.canvas,
+          Math.round(m.a * left + m.e) - head.left,
+          Math.round(m.d * y + m.f) - head.up,
+        );
+      for (let i = from; i < text.length; i++) {
         const char = text[i];
         if (char === " " || (i >= hideIndex && i < hideIndex + hideCount))
           continue;
@@ -573,6 +593,8 @@ interface RestWord {
 // a label (not a counting number) is baked once it has been drawn this many
 // times (half a second), so a changing one doesn't build a canvas per value
 const BAKE_REST_AFTER = 30;
+// a counting number's trailing digits stamped glyph by glyph
+const COUNT_TAIL = 4;
 const MAX_REST_WORDS = 32;
 const MAX_REST_PENDING = 256;
 
@@ -996,17 +1018,18 @@ export type SlamShine = "text" | "figure" | { radius: number };
 
 // every stream target's end slam, drawn the same way around drawTarget: gold
 // rays behind, the hop and slam with a jelly pop, the white shine, then a
-// sparkle and glitter over the target's box (in its own drawing space)
+// sparkle and glitter over the target's box (in its own drawing space).
+// drawTarget draws onto the context it's given
 export function drawSlamTarget(
   ctx: CanvasRenderingContext2D,
   pose: SlamPose | null,
   box: SlamBox,
   shine: SlamShine,
-  drawTarget: () => void,
+  drawTarget: (target: CanvasRenderingContext2D) => void,
   now = Date.now(),
 ): void {
   if (!pose) {
-    drawTarget();
+    drawTarget(ctx);
     return;
   }
   const cx = box.x + box.width / 2;
@@ -1015,7 +1038,7 @@ export function drawSlamTarget(
   ctx.save();
   applySlamPose(ctx, pose, cx, box.y + box.height, box.height);
   applySlamPop(ctx, pose, cx, cy);
-  drawTarget();
+  drawTarget(ctx);
   if (shine === "figure")
     drawSlamFlash(ctx, pose, cx, cy, Math.max(box.width, box.height));
   else if (shine !== "text") drawSlamShine(ctx, pose, box, shine.radius);

@@ -252,7 +252,7 @@ async function measure(runs) {
   }
   if (!results)
     throw new Error(
-      `the rig didn't finish within the time (${errors.length} page errors)`,
+      `the rig didn't finish within the time (${errors.length} page errors)${errors.length ? `:\n${errors.join("\n")}` : ""}`,
     );
   return { results, errors };
 }

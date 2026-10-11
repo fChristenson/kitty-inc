@@ -183,10 +183,12 @@ function renderUpgradeButton(
     : null;
   const slam = getSlamPose(own, "button", now);
   const box = { x, y, width: BTN_W, height: BTN_H };
+  const buttonCtx = ctx;
 
   drawSlamTarget(ctx, slam, box, { radius: 40 }, drawBody, now);
 
-  function drawBody(): void {
+  function drawBody(target?: CanvasRenderingContext2D): void {
+    const ctx = target ?? buttonCtx;
     const wiggle =
       (crit || activeEvent ? getWiggleRotation(now) : 0) + holdAnim.rotation;
     // a wiggling button (a crit, an event, a Sale) only rocks, like the Sale:

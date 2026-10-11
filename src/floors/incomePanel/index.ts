@@ -790,7 +790,28 @@ export function startIncomeTicker(onFrame: () => void): void {
 }
 
 const BAR_TEXT_SIZE = 44;
+const BAR_TEXT_FONT = `900 ${BAR_TEXT_SIZE}px "Fredoka", system-ui, sans-serif`;
 const GOLD_BAR_SWITCH_MS = Math.max(GOLD_SWITCH_MS, LEVEL_POP_MS);
+
+// each bar's rate text, worked out at most this often: rebuilding it (the
+// rate, its formatting) every frame for every bar in view added up
+const RATE_TEXT_MS = 100;
+const rateTexts = new WeakMap<Floor, { text: string; at: number }>();
+function cachedIncomeRate(
+  floor: Floor,
+  now: number,
+  cycle: ReturnType<typeof effectiveIncomeCycle>,
+): string {
+  let entry = rateTexts.get(floor);
+  if (entry && now - entry.at < RATE_TEXT_MS && now >= entry.at)
+    return entry.text;
+  const text = formatIncomeRate(floor, now, cycle);
+  if (entry) {
+    entry.text = text;
+    entry.at = now;
+  } else rateTexts.set(floor, (entry = { text, at: now }));
+  return text;
+}
 
 // the bar's text during the switch: the text in white and in gold, rastered
 // once per text, cut into letters that each rise with the bar under them
@@ -964,6 +985,7 @@ export function drawIncomePanel(
   const rattle = heat * HEAT_RATTLE_PX;
   const wiggle = barWiggle(floor, now);
   const slam = getSlamPose(floor, "bar", now);
+  const barCtx = ctx;
   const drawBar = (): void =>
     drawSlamTarget(
       ctx,
@@ -973,7 +995,8 @@ export function drawIncomePanel(
       drawBarBody,
       now,
     );
-  const drawBarBody = (): void => {
+  const drawBarBody = (target?: CanvasRenderingContext2D): void => {
+    const ctx = target ?? barCtx;
     if (crumble && crumble.from >= crumble.to) return;
     ctx.save();
     ctx.translate(
@@ -1214,7 +1237,7 @@ export function drawIncomePanel(
     // a locked floor's cycle hasn't started (lastCollectedAt is just its creation
     // time, never advanced), so the rate text uses the static full-interval formatter
     // instead of the live countdown — still visible, just doesn't tick
-    ctx.font = `900 ${BAR_TEXT_SIZE}px "Fredoka", system-ui, sans-serif`;
+    ctx.font = BAR_TEXT_FONT;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     // the text swells and shakes with a pressurised bar
@@ -1226,7 +1249,7 @@ export function drawIncomePanel(
     const text = overtimeGaugeVisible
       ? formatOvertimeProgress(floor, now)
       : cycle
-        ? formatIncomeRate(floor, now, cycle)
+        ? cachedIncomeRate(floor, now, cycle)
         : formatStaticIncomeRate(floor, now);
     const textX = barX + barW / 2;
     const textY = barY + barH / 2 + 1;

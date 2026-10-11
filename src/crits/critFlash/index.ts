@@ -760,12 +760,10 @@ export function warmLetterFlash(
       runWhenIdle(warm);
       return;
     }
-    lettersWidth(
-      chars,
-      color,
-      strokeWidth,
-      lettersRes(sample, color, strokeWidth),
-    );
+    // a longer amount shows smaller, so at a lower res: every res is ready
+    const res = lettersRes(sample, color, strokeWidth);
+    for (let r = Math.max(1, res - 1); r <= Math.min(3, res + 1); r++)
+      warmLetters(chars, color, strokeWidth, r, false);
   };
   runWhenIdle(warm);
 }

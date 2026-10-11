@@ -56,10 +56,17 @@ const GUN_TAIL_MS = 1000;
 
 const ROUNDS = Math.floor(GUN_BURST_MS / GUN_ROUND_MS);
 
-// the bars it rakes, top to bottom: every other bar, or its own if alone
+// the bars it rakes, top to bottom: every other bar, or its own if alone.
+// Kept per bars array: the ship's path asks for it every trail sparkle
+const rakedOf = new WeakMap<Point[], number[]>();
 function raked(bars: Point[]): number[] {
-  const order = byHeight(bars);
-  return order.length > 1 ? order.filter((i) => i !== 0) : order;
+  let order = rakedOf.get(bars);
+  if (!order) {
+    const sorted = byHeight(bars);
+    order = sorted.length > 1 ? sorted.filter((i) => i !== 0) : sorted;
+    rakedOf.set(bars, order);
+  }
+  return order;
 }
 const burstAt = (k: number) => GUN_IN_MS + GUN_FIRST_MS + k * GUN_GAP_MS;
 const cannonAt = (bars: Point[]) =>

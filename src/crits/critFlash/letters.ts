@@ -70,10 +70,24 @@ function letter(set: LetterSet, c: string): Letter {
   return built;
 }
 
-function labelWidth(set: LetterSet, label: string): number {
+function labelWidth(label: string): number {
   let width = 0;
-  for (let i = 0; i < label.length; i++) width += letter(set, label[i]).advance;
+  for (let i = 0; i < label.length; i++) width += advanceOf(label[i]);
   return width;
+}
+
+// a letter's advance in FONT_SIZE units, the same at every res: measuring a
+// label baked a sprite per letter it never drew
+const advances = new Map<string, number>();
+function advanceOf(c: string): number {
+  let advance = advances.get(c);
+  if (advance === undefined) {
+    const ctx = scratchCtx();
+    ctx.font = critFont(FONT_SIZE);
+    advance = ctx.measureText(c).width;
+    advances.set(c, advance);
+  }
+  return advance;
 }
 
 // the latest label's glow: only one shows at a time
@@ -105,14 +119,14 @@ function labelBloom(label: string, width: number): NonNullable<typeof bloom> {
   return bloom;
 }
 
-// the label's width in FONT_SIZE units
+// the label's width in FONT_SIZE units (the same at every colour and res)
 export function lettersWidth(
   label: string,
-  color: string,
-  strokeWidth: number,
-  res: number,
+  _color: string,
+  _strokeWidth: number,
+  _res: number,
 ): number {
-  return labelWidth(letterSet(color, strokeWidth, res), label);
+  return labelWidth(label);
 }
 
 // the label's letters as an income crit's glyphs (critPlayer's
@@ -150,9 +164,11 @@ export function warmLetters(
   color: string,
   strokeWidth: number,
   res: number,
+  glow = true,
 ): void {
-  const width = lettersWidth(label, color, strokeWidth, res);
-  if (label) labelBloom(label, width);
+  const set = letterSet(color, strokeWidth, res);
+  for (let i = 0; i < label.length; i++) letter(set, label[i]);
+  if (label && glow) labelBloom(label, labelWidth(label));
 }
 
 export function drawLetters(
@@ -163,7 +179,7 @@ export function drawLetters(
   res: number,
 ): void {
   const set = letterSet(color, strokeWidth, res);
-  const width = labelWidth(set, label);
+  const width = labelWidth(label);
   const glow = labelBloom(label, width);
   ctx.drawImage(
     glow.canvas,

@@ -48,17 +48,19 @@ export function warmTierFlashes(): void {
       strokeWidth: TIER_FLASH_STROKE_WIDTH[tier],
     })),
   );
-  warmLetterFlash(
-    CASH_FLASH_CHARS,
-    "+$123M",
-    COLOR.moneyGreen,
-    TIER_FLASH_STROKE_WIDTH.crit,
-  );
+  // every tier's stroke, each sized for a sample amount
+  for (const tier of CRIT_TIER_ORDER)
+    warmLetterFlash(
+      CASH_FLASH_CHARS,
+      "+$123M",
+      COLOR.moneyGreen,
+      TIER_FLASH_STROKE_WIDTH[tier],
+    );
 }
 
 // what a cash crit's amount is written with (formatPrice's suffixes build
 // the rest on first use)
-const CASH_FLASH_CHARS = "+$0123456789KMBT";
+const CASH_FLASH_CHARS = "+$0123456789.,KMBT";
 
 // a cash crit: its amount slams in green like an x3 and lands with the buy
 // sound; a dropped one stays silent, onShown runs only if it shows; an
